@@ -1,0 +1,1 @@
+"D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\Win32\Release\WindowsDWService.exe" -uninstall
