@@ -1,0 +1,220 @@
+Alterações :
+
+1.0.1.105 (CORE Version) :
+===========
+
+ Adicionado a Compressão de Dados entre Lazarus/Delphi 6 a Tokyo.
+ Adicionados novos Samples.
+ Melhorias no Servidor CORE, agora contempla o DWDatamodule e a DWClass.
+ Componente ListPooler já consultando o Servidor CORE.
+ Sistema de Métodos da Versão CORE Funcional.
+
+1.0.1.40 (CORE Version) :
+===========
+
+ Atualização para POST enviar dados Binários em pacotes JSON.
+ Ajuste para envio e recebimento do Servidor.
+ Ajustes do Parser de dados.
+
+1.0.1.27 (CORE Version) :
+===========
+
+Início da Conversão dos Componentes Datasnap DW para CORE DW.
+
+1.0.1.26 (CORE Version) :
+===========
+
+ Novo sistema de Encode dos Caracteres String, permitindo escolher encodar ou não nativamente para envio, tanto JSON comum como Parametros de JSON.
+ Correções de estabilidade.
+ Retirada a transmissão e recebimento de dados por string e mudado para Stream.
+ Melhorias no recebimento de Stream dos Dados.
+
+1.0.1.257 :
+===========
+
+ Adicionadas as cláusulas de compilação para Delphi XE5 e superiores(Laelson).
+ Modificado o código para adaptar as versões(Laelson).
+ Melhorias na versão CORE(XyberX).
+ Ajustes na versão core.
+ Criação do TJSONObject.
+ Criação das funções de geração e load dos dados.
+ Ajustes para compilação em Linux/Windows com Lazarus.
+ Ajustes para Delphi/Lazarus, compilação.
+ Ajustes de codificação de dados.
+ Criação e ajustes dos DEMOS da versção CORE para consumo de JSON a partir do Dataset.
+ Criação de DEMOS Lazarus.
+
+1.0.1.1 (CORE Version) :
+===========
+
+ Novo componente criado o RESTClientPooler, o Exemplo também está criado e Funcionando.
+
+1.0.1.252 :
+===========
+
+ Nova propriedade criada no RESTPooler, Active. A propriedade Active serve para o Servidor continuar respondendo como ativo porém,
+o Pooler que estiver com a propriedade Active False vai retornar do WS o Erro Pooler not active e assim não trará dados, com isso você
+pode colocar seu Servidor em Manutenção sem Derrubar o Serviço.
+ Exemplo Servidor "RestDWServerProject" alterado para demonstração da nova propriedade.
+ Retirado do Servidor "RestDWServerProject" os exemplos com Drivers UniDAC e Zeos por reclamações de outros usuários, não tendo os mesmos e não
+conseguindo usar o exemplo. Porém a dinâmica eh a mesma, sendo assim para implementar qualquer um dos Drivers somente seguir o exemplo atual. 
+ Propriedade pedida PoolerOffMessage criada para poder ser dita a MSG de Pooler desligado desejada pelo programador.
+
+1.0.1.251 :
+===========
+
+ Ajuste no Driver UniDAC para retirar BUG de Access violation em campos array(XyberX/Gilson).
+ Ajuste no Server Project para ter um Pooler UniDAC(XyberX).
+ Ajuste no conversor de aplicações para contemplar IBX (Flavio/Mizael).
+
+1.0.1.249 :
+===========
+
+ Adicionado ao RESTClientSQL o novo método DynamicFilter para ajudar as pesquisas incrementais com conceito WEB.
+ Exemplo DynamicFilter adicionado para mostrar o uso de pesquisas incrementais na WEB.
+ Melhoria do sistema de Erros.
+
+1.0.1.248 :
+===========
+
+ Criação do componente RESTStoredProc para ajudar na compatibilidade de conversão dos sistemas e para execução simples de procedures
+com RESTDataware.
+ Exemplo de uso do RESTStoredProc adicionado no ProjectGroup dos Exemplos.
+ Adicionado ao RESTClientSQL o métodos ExecOrOpen.
+ Exemplo ClientWin alterado para usar o novo método "ExecOrOpen".
+
+1.0.1.245 :
+===========
+
+ Implementada a nova propriedade CachedUpdates para o RESTClientSQL, e a implementação do cache de dados para você conseguir dar
+vários post's e somente um ApplyUpdates você enviar todos os dados do Cache para o Servidor.
+ Ajuste do conversor de Projetos para DW enviado por Flavio Motta.
+
+1.0.1.241 :
+===========
+
+ Alterado no Servidor a Propriedade Database dos Poolers para RESTDriver; Ajuste no RESTDriverZEOS para mostrar a msg de
+Metodo não implementado para algo que não foi convertido.
+ Ajuste do conversor de Projetos para DW enviado por Flavio Motta.
+ Correções de Ajustes nos DEMOS em todos os Servidores para a nova propriedade estar ligada no Driver corretamente.
+
+1.0.1.232 :
+===========
+
+ Mudado o conceito do Servidor para agora suportar RESTDriver, o RESTDriver é um componente intermediário
+do DW que serve para adicionar ao DW a capacidade de suportar agora mais de um tipo de componente para
+acesso a Dados.
+ Removido o conversor de Projetos para DW e adicionado a versão final enviada pelo desenvolvedor Flavio Motta.
+ Correções diversas de Layout e bugs nos exemplos em geral.
+
+1.0.1.229 :
+===========
+
+ Novo Servidor Baseado em Serviço do Windows enviado pelo Alexandre e Alterado por Mim.
+ Adicionado SSL no Servidor de Exemplos.
+ Várias correções de BUG.
+
+1.0.1.218 :
+===========
+
+ Adicionados Eventos de Erro do componente em Tempo de Design.
+ Novas propriedades para o Pooler :
+ StrsTrim, StrsEmpty2Null, StrsTrim2Len
+ Ajustes na Autenticação, favor consutarem o arquivo "Correcao de Servidor DW Para Autenticacao.txt". 
+
+ Class Helper para ajudar quem utiliza TServerModules
+ Autor: Giovani Da Cruz
+
+1.0.1.205 :
+===========
+
+ Adicionados novos métodos para maior compatibilidade na conversão de outros sistemas usando outros componentes
+DataAccess.
+
+ Database
+  Close;
+  Open;
+
+ RestClient
+  ParamCount
+
+ Bug fix para uso de mais de um Pooler, foi relatado o BUG e já corrigido.
+ Início do desenvolvimento dos ServerMethods do Próprio REST Dataware.
+ 
+1.0.1.202 :
+===========
+
+Servidor :
+ 
+ Vários BUG's de métodos corrigidos, Melhorias no Master/Detail.
+ Adição da compressão de Dados Nativa no Pooler.
+ Adição do Servidor Re Estilizado Fornecido pelo Flavio Motta usuário do REST Dataware e uploader do Projeto.
+
+Client :
+ 
+ Melhorias na transferência de dados.
+ Correções de BUG's.
+ Adição da compressão de Dados Nativa no Database. 
+ Fix no ParamSQL Parser, ajuste para melhor identificação de Parâmetros dentro de um SQL
+
+Demos :
+ 
+ Novo DEMO Adicionado, Apache WebBroker Modulo.
+
+1.0.1.183 :
+===========
+
+Servidor :
+ 
+ Vários BUG's de métodos corrigidos.
+
+Client :
+ 
+ Adição da propriedade MasterClient que traz a possibilidade de uso como Master/Detail de Dataset.
+ MasterCascadeDelete para Deleção em Cascata.
+ Após uma inserção em uma tabela de detalhe, a mesma recebe os dados dos campos relacionados em masterfields da tabela master.
+
+1.0.1.172 :
+===========
+
+ Ambos :
+  Criação do componente como padrão de codificação Utf8, para ganho de velocidade e ajuste de BUG's no ANSI.
+  Ajuste no Delta, para não dar o applyupdates no Delta quando retornar Erro do Servidor.
+  Várias correções de velocidade e de Estabilidade.
+  Adição do DEMO SimpleProject, um cadastro funcional com os comandos básicos para gravação de Dados no DB.
+  Adição do DEMO CGI, para criação de um Servidor DW usando APACHE ou IIS.
+
+1.0.1.153 :
+===========
+
+Servidor :
+ 
+ Vários BUG's de métodos corrigidos.
+
+Client :
+ 
+ Várias correções e melhoria de velocidade, ganho de 60% com relação a versão anterior.
+ Início da compressão de dados nativa em andamento.
+ Início de autenticação CORS.
+
+Servidor :
+ Alexandre Abade - Adicionado o campos Context e RestContext para que usa alteração no nome do 
+ contexto e foi adicionado a codificação utf8,e ascii  pois quando for utilizado cors deve-se usar 
+ utf8 devido a criptografia das string
+
+Servidor
+  Alexandre Abade - Adicionado unit URestPoolerDBMethod que possue todos os methodos nescessarios 
+  para que o componente possa trabalhar , foi feita essa divisão para deixa o codigo do cliente mais limpo
+  e sempre que adicionar o componente adicionar URestPoolerDBMethod no uses pois nela que esta os methodos
+ 
+1.0.1.140 :
+===========
+
+Servidor :
+
+ Na Unit ServerMethodsUnit1 foram criadas duas variáveis, UserName e Password, são usadas para Autenticação de Usuário, 
+ preencha o valor para cada uma no OnCreate do ServerMethods.
+ 
+Client :
+ Foi criada a Propriedade RequestTimeOut para você poder definir o timeout da requisição.
+ Ajustes da Autenticação para acertar os Bug's de Autenticação.
