@@ -1,0 +1,28 @@
+<E:Envelope
+	xmlns:E="http://schemas.xmlsoap.org/soap/envelope/"
+	xmlns:A="http://schemas.xmlsoap.org/soap/encoding/"
+	xmlns:s="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:y="http://www.w3.org/2001/XMLSchema"
+	E:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+<E:Body>
+<m:echo2DStringArrayResponse
+	xmlns:m="http://soapinterop.org/">
+<return
+	s:type="A:Array"
+	A:arrayType="y:string[3,4]">
+<item>t00</item>
+<item>t01</item>
+<item>t02</item>
+<item>t03</item>
+<item>t10</item>
+<item>t11</item>
+<item>t12</item>
+<item>t13</item>
+<item>t20</item>
+<item>t21</item>
+<item>t22</item>
+<item>t23</item>
+</return>
+</m:echo2DStringArrayResponse>
+</E:Body>
+</E:Envelope>

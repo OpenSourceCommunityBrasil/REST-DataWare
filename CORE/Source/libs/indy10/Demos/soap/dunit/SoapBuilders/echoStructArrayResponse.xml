@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance"
+xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+<SOAP-ENV:Body>
+<namesp1:echoStructArrayResponse  xmlns:xx="http://soapinterop.org/xsd" xmlns:namesp1="http://soapinterop.org/">
+<return SOAP-ENC:arrayType="xx:SOAPStruct[2]"
+xsi:type="SOAP-ENC:Array">
+<item 
+xsi:type="xx:SOAPStruct">
+<varFloat xsi:type="xsd:float">6.2</varFloat>
+<varString xsi:type="xsd:string">test string</varString>
+<varInt xsi:type="xsd:int">5</varInt></item>
+<item
+xsi:type="xx:SOAPStruct">
+<varFloat xsi:type="xsd:float">12.4</varFloat>
+<varString xsi:type="xsd:string">another test</varString>
+<varInt xsi:type="xsd:int">10</varInt>
+</item>
+</return>
+</namesp1:echoStructArrayResponse>
+</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+

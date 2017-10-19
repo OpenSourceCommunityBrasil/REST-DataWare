@@ -1,0 +1,192 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{6FE7FEDB-3C0E-45CC-A75C-FDC7A25FC64B}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="RestDatawareCORE.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\FileTransfer\Client\FileClient.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\FileTransfer\Server\FileServer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\JSONDataset\JSONDatasetSample.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\JSONDataset\LoadfromJSON\LoadfromJSON.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\SimpleServer\Server\RestDWServerProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\SimpleServer\Client\RestDWClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\ClientBLOB\ClientBLOB.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\DwErp\Server\ServerDw.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\DwErp\Client\ClientDw.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="RestDatawareCORE">
+        <MSBuild Projects="RestDatawareCORE.dproj"/>
+    </Target>
+    <Target Name="RestDatawareCORE:Clean">
+        <MSBuild Projects="RestDatawareCORE.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDatawareCORE:Make">
+        <MSBuild Projects="RestDatawareCORE.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDriverFD">
+        <MSBuild Projects="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj"/>
+    </Target>
+    <Target Name="RESTDWDriverFD:Clean">
+        <MSBuild Projects="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDriverFD:Make">
+        <MSBuild Projects="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FileClient">
+        <MSBuild Projects="..\..\..\Samples\FileTransfer\Client\FileClient.dproj"/>
+    </Target>
+    <Target Name="FileClient:Clean">
+        <MSBuild Projects="..\..\..\Samples\FileTransfer\Client\FileClient.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FileClient:Make">
+        <MSBuild Projects="..\..\..\Samples\FileTransfer\Client\FileClient.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FileServer">
+        <MSBuild Projects="..\..\..\Samples\FileTransfer\Server\FileServer.dproj"/>
+    </Target>
+    <Target Name="FileServer:Clean">
+        <MSBuild Projects="..\..\..\Samples\FileTransfer\Server\FileServer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FileServer:Make">
+        <MSBuild Projects="..\..\..\Samples\FileTransfer\Server\FileServer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="JSONDatasetSample">
+        <MSBuild Projects="..\..\..\Samples\JSONDataset\JSONDatasetSample.dproj"/>
+    </Target>
+    <Target Name="JSONDatasetSample:Clean">
+        <MSBuild Projects="..\..\..\Samples\JSONDataset\JSONDatasetSample.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="JSONDatasetSample:Make">
+        <MSBuild Projects="..\..\..\Samples\JSONDataset\JSONDatasetSample.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="LoadfromJSON">
+        <MSBuild Projects="..\..\..\Samples\JSONDataset\LoadfromJSON\LoadfromJSON.dproj"/>
+    </Target>
+    <Target Name="LoadfromJSON:Clean">
+        <MSBuild Projects="..\..\..\Samples\JSONDataset\LoadfromJSON\LoadfromJSON.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="LoadfromJSON:Make">
+        <MSBuild Projects="..\..\..\Samples\JSONDataset\LoadfromJSON\LoadfromJSON.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWServerProject">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\Server\RestDWServerProject.dproj"/>
+    </Target>
+    <Target Name="RestDWServerProject:Clean">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\Server\RestDWServerProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWServerProject:Make">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\Server\RestDWServerProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWClientProject">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\Client\RestDWClientProject.dproj"/>
+    </Target>
+    <Target Name="RestDWClientProject:Clean">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\Client\RestDWClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWClientProject:Make">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\Client\RestDWClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWClientProjectThread">
+        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj"/>
+    </Target>
+    <Target Name="RestDWClientProjectThread:Clean">
+        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWClientProjectThread:Make">
+        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWServerProjectZEOS">
+        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj"/>
+    </Target>
+    <Target Name="RestDWServerProjectZEOS:Clean">
+        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWServerProjectZEOS:Make">
+        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ClientBLOB">
+        <MSBuild Projects="..\..\..\Samples\ClientBLOB\ClientBLOB.dproj"/>
+    </Target>
+    <Target Name="ClientBLOB:Clean">
+        <MSBuild Projects="..\..\..\Samples\ClientBLOB\ClientBLOB.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ClientBLOB:Make">
+        <MSBuild Projects="..\..\..\Samples\ClientBLOB\ClientBLOB.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ServerDw">
+        <MSBuild Projects="..\..\..\Samples\DwErp\Server\ServerDw.dproj"/>
+    </Target>
+    <Target Name="ServerDw:Clean">
+        <MSBuild Projects="..\..\..\Samples\DwErp\Server\ServerDw.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ServerDw:Make">
+        <MSBuild Projects="..\..\..\Samples\DwErp\Server\ServerDw.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ClientDw">
+        <MSBuild Projects="..\..\..\Samples\DwErp\Client\ClientDw.dproj"/>
+    </Target>
+    <Target Name="ClientDw:Clean">
+        <MSBuild Projects="..\..\..\Samples\DwErp\Client\ClientDw.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ClientDw:Make">
+        <MSBuild Projects="..\..\..\Samples\DwErp\Client\ClientDw.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ClienteFMX">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj"/>
+    </Target>
+    <Target Name="ClienteFMX:Clean">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ClienteFMX:Make">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClienteFMX"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClienteFMX:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClienteFMX:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

@@ -1,0 +1,144 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{6FE7FEDB-3C0E-45CC-A75C-FDC7A25FC64B}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="RestEasyObjectsCORE.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\FileTransfer\Client\FileClient.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\FileTransfer\Server\FileServer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\JSONDataset\JSONDatasetSample.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\JSONDataset\LoadfromJSON\LoadfromJSON.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\SimpleServer\Server\RestDWServerProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\SimpleServer\Client\RestDWClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\ListPoolers\ListDWPoolers.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="RestEasyObjectsCORE">
+        <MSBuild Projects="RestEasyObjectsCORE.dproj"/>
+    </Target>
+    <Target Name="RestEasyObjectsCORE:Clean">
+        <MSBuild Projects="RestEasyObjectsCORE.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestEasyObjectsCORE:Make">
+        <MSBuild Projects="RestEasyObjectsCORE.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FileClient">
+        <MSBuild Projects="..\..\..\Samples\FileTransfer\Client\FileClient.dproj"/>
+    </Target>
+    <Target Name="FileClient:Clean">
+        <MSBuild Projects="..\..\..\Samples\FileTransfer\Client\FileClient.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FileClient:Make">
+        <MSBuild Projects="..\..\..\Samples\FileTransfer\Client\FileClient.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FileServer">
+        <MSBuild Projects="..\..\..\Samples\FileTransfer\Server\FileServer.dproj"/>
+    </Target>
+    <Target Name="FileServer:Clean">
+        <MSBuild Projects="..\..\..\Samples\FileTransfer\Server\FileServer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FileServer:Make">
+        <MSBuild Projects="..\..\..\Samples\FileTransfer\Server\FileServer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="JSONDatasetSample">
+        <MSBuild Projects="..\..\..\Samples\JSONDataset\JSONDatasetSample.dproj"/>
+    </Target>
+    <Target Name="JSONDatasetSample:Clean">
+        <MSBuild Projects="..\..\..\Samples\JSONDataset\JSONDatasetSample.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="JSONDatasetSample:Make">
+        <MSBuild Projects="..\..\..\Samples\JSONDataset\JSONDatasetSample.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="LoadfromJSON">
+        <MSBuild Projects="..\..\..\Samples\JSONDataset\LoadfromJSON\LoadfromJSON.dproj"/>
+    </Target>
+    <Target Name="LoadfromJSON:Clean">
+        <MSBuild Projects="..\..\..\Samples\JSONDataset\LoadfromJSON\LoadfromJSON.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="LoadfromJSON:Make">
+        <MSBuild Projects="..\..\..\Samples\JSONDataset\LoadfromJSON\LoadfromJSON.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWServerProject">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\Server\RestDWServerProject.dproj"/>
+    </Target>
+    <Target Name="RestDWServerProject:Clean">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\Server\RestDWServerProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWServerProject:Make">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\Server\RestDWServerProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWClientProject">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\Client\RestDWClientProject.dproj"/>
+    </Target>
+    <Target Name="RestDWClientProject:Clean">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\Client\RestDWClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWClientProject:Make">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\Client\RestDWClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWClientProjectThread">
+        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj"/>
+    </Target>
+    <Target Name="RestDWClientProjectThread:Clean">
+        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWClientProjectThread:Make">
+        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWServerProjectZEOS">
+        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj"/>
+    </Target>
+    <Target Name="RestDWServerProjectZEOS:Clean">
+        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWServerProjectZEOS:Make">
+        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ListDWPoolers">
+        <MSBuild Projects="..\..\..\Samples\ListPoolers\ListDWPoolers.dproj"/>
+    </Target>
+    <Target Name="ListDWPoolers:Clean">
+        <MSBuild Projects="..\..\..\Samples\ListPoolers\ListDWPoolers.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ListDWPoolers:Make">
+        <MSBuild Projects="..\..\..\Samples\ListPoolers\ListDWPoolers.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="RestEasyObjectsCORE;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ListDWPoolers"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="RestEasyObjectsCORE:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ListDWPoolers:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="RestEasyObjectsCORE:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ListDWPoolers:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

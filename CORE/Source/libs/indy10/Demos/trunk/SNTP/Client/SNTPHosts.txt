@@ -1,0 +1,66 @@
+AU  ntp0.cs.mu.OZ.AU
+AU  ntp1.cs.mu.OZ.AU
+BR  ntps1.pads.ufrj.br
+BR  ntps1.pads.ufrj.br
+CA  tick.usask.ca
+CA  tock.usask.ca
+CH  ntp.metas.ch
+CH  swisstime.ethz.ch
+CL  ntp.dgf.uchile.cl
+CL  ntp.shoa.cl
+DE  ntp1.fau.de
+DE  ntp.three.fau.de
+DE  ntp2.fau.de
+DE  ntp0.fau.de
+DE  ntps1-1.cs.tu-berlin.de
+DE  ntps1-0.cs.tu-berlin.de
+DE  ptbtime1.ptb.de
+DE  ptbtime2.ptb.de
+DE  rustime01.rus.uni-stuttgart.de
+DE  time1.one4vision.de
+FR  canon.inria.fr
+HK  clock.cuhk.edu.hk
+IE  ntp-galway.hea.net
+IT  ntp1.ien.it
+IT  ntp2.ien.it
+IT  tempo.cstv.to.cnr.it
+JP  clock.nc.fukuoka-u.ac.jp
+JP  clock.tl.fukuoka-u.ac.jp
+MX  cronos.cenam.mx
+NL  ntp1.nl.net
+NL  ntp2.nl.net
+NL  ntp0.nl.net
+PL  ntp.certum.pl
+PL  vega.cbk.poznan.pl
+SE  ntp1.gbg.netnod.se
+SE  ntp1.mmo.netnod.se
+SE  ntp1.sp.se
+SE  ntp1.sth.netnod.se
+SE  ntp2.gbg.netnod.se
+SE  ntp2.mmo.netnod.se
+SE  ntp2.sp.se
+SE  ntp2.sth.netnod.se
+SE  time1.stupi.se
+SE  time2.stupi.se
+UK  chronos.csr.net
+UK  ntp.my-inbox.co.uk
+US CA  clepsydra.dec.com
+US CA  clock.isc.org
+US CA  clock.via.net
+US CA  ntp-cup.external.hp.com
+US CA  timekeeper.isi.edu
+US CA  usno.pa-x.dec.com
+US CO  navobs1.usnogps.navy.mil
+US CO  time-c.timefreq.bldrdoc.gov
+US DC  tick.usno.navy.mil
+US DC  tock.usno.navy.mil
+US DE  ntp1.connectiv.com
+US MA  bonehed.lcs.mit.edu
+US MA  time.keneli.org
+US MO  navobs1.wustl.edu
+US NC  terrapin.csc.ncsu.edu
+US OH  lerc-dns.lerc.nasa.gov
+US OK  now.okstate.edu
+US PA  otc1.psu.edu
+US PA  wwv.otc.psu.edu
+US UT  time.xmission.com

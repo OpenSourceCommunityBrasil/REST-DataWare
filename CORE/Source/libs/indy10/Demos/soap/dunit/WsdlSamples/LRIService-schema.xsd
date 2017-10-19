@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema attributeFormDefault="qualified" elementFormDefault="qualified"
+    targetNamespace="http://www.lriservice.com/schemas/LRIServiceRemoteInterface"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd1="http://www.lriservice.com/schemas/LRIServiceRemoteInterface">
+     <import namespace="http://schemas.xmlsoap.org/soap/encoding/" schemaLocation="http://schemas.xmlsoap.org/soap/encoding/"/>
+     <complexType name="CommonUserData">
+        <all>
+            <element name="homepageURL" nillable="true" type="string"/>
+            <element name="statisticalArea" nillable="true" type="string"/>
+            <element name="profession" nillable="true" type="string"/>
+            <element name="contactOrBuyer" nillable="true" type="int"/>
+            <element name="poBoxCity" nillable="true" type="string"/>
+            <element name="phone" nillable="true" type="string"/>
+            <element name="fax" nillable="true" type="string"/>
+            <element name="city" nillable="true" type="string"/>
+            <element name="salutation" nillable="true" type="string"/>
+            <element name="lastName" nillable="true" type="string"/>
+            <element name="countrySpecific" nillable="true" type="string"/>
+            <element name="userCategory" nillable="true" type="string"/>
+            <element name="email" nillable="true" type="string"/>
+            <element name="preferredLanguage" nillable="true" type="string"/>
+            <element name="street" nillable="true" type="string"/>
+            <element name="companyName" nillable="true" type="string"/>
+            <element name="poBoxNo" nillable="true" type="string"/>
+            <element name="maritalStatus" nillable="true" type="int"/>
+            <element name="title" nillable="true" type="string"/>
+            <element name="userSubCategory" nillable="true" type="string"/>
+            <element name="mobile" nillable="true" type="string"/>
+            <element name="comment" nillable="true" type="string"/>
+            <element name="preferredContactMethod" nillable="true" type="int"/>
+            <element name="cityOfBirth" nillable="true" type="string"/>
+            <element name="middleName" nillable="true" type="string"/>
+            <element name="validAddress" nillable="true" type="int"/>
+            <element name="countryCode" nillable="true" type="string"/>
+            <element name="firstName" nillable="true" type="string"/>
+            <element name="country" nillable="true" type="string"/>
+            <element name="allowMarketingFlag" nillable="true" type="int"/>
+            <element name="zipCode" nillable="true" type="string"/>
+            <element name="stateOfBirth" nillable="true" type="string"/>
+            <element name="dateOfBirth" nillable="true" type="string"/>
+            <element name="poBoxZipCode" nillable="true" type="string"/>
+            <element name="gender" nillable="true" type="int"/>
+            <element name="countryOfBirth" nillable="true" type="string"/>
+            <element name="streetNumber" nillable="true" type="string"/>
+            <element name="storeAgreementFlag" nillable="true" type="int"/>
+            <element name="state" nillable="true" type="string"/>
+        </all>
+    </complexType>
+    <complexType name="AttributeValue">
+        <all>
+            <element name="softwareVersion" nillable="true" type="string"/>
+            <element name="dataVersion" nillable="true" type="string"/>
+            <element name="lastAccessDate" nillable="true" type="string"/>
+            <element name="shortDescr5" nillable="true" type="string"/>
+            <element name="shortDescr4" nillable="true" type="string"/>
+            <element name="shortDescr3" nillable="true" type="string"/>
+            <element name="shortDescr2" nillable="true" type="string"/>
+            <element name="shortDescr1" nillable="true" type="string"/>
+            <element name="createdDate" nillable="true" type="string"/>
+        </all>
+    </complexType>
+    <complexType name="ArrayOfString">
+        <complexContent>
+            <restriction base="soapenc:Array">
+                <sequence/>
+                <attribute ref="soapenc:arrayType" wsdl:arrayType="string[]"/>
+            </restriction>
+        </complexContent>
+    </complexType>
+    <complexType name="ArrayOfAttributeValue">
+        <complexContent>
+            <restriction base="soapenc:Array">
+                <sequence/>
+                <attribute ref="soapenc:arrayType" wsdl:arrayType="xsd1:AttributeValue[]"/>
+            </restriction>
+        </complexContent>
+    </complexType>
+</schema>

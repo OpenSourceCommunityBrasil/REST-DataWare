@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="LRIService-binding"
+    targetNamespace="http://www.lriservice.com/definitions/LRIServiceRemoteInterface"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://www.lriservice.com/definitions/LRIServiceRemoteInterface"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd1="http://www.lriservice.com/schemas/LRIServiceRemoteInterface" xmlns:xsd2="http://schemas.xmlsoap.org/soap/encoding/">
+    <import
+        location="LRIService-schema.xsd" namespace="http://www.lriservice.com/schemas/LRIServiceRemoteInterface"/>
+    <message name="getSpecificUserDataBlobRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="applicationId" type="xsd:string"/>
+        <part name="type" type="xsd:string"/>
+        <part name="name" type="xsd:string"/>
+    </message>
+    <message name="getSpecificUserDataBlobResponse">
+        <part name="result" type="xsd2:base64Binary"/>
+    </message>
+    <message name="deleteAllSpecificUserDataForApplicationRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="applicationId" type="xsd:string"/>
+    </message>
+    <message name="deleteAllSpecificUserDataForApplicationResponse"/>
+    <message name="registerUserRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="passwd" type="xsd:string"/>
+        <part name="userData" type="xsd1:CommonUserData"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="applicationId" type="xsd:string"/>
+    </message>
+    <message name="registerUserResponse"/>
+    <message name="authenticateUserRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="passwd" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="anApplicationId" type="xsd:string"/>
+    </message>
+    <message name="authenticateUserResponse"/>
+    <message name="getSpecificUserDataRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="applicationId" type="xsd:string"/>
+        <part name="type" type="xsd:string"/>
+        <part name="name" type="xsd:string"/>
+    </message>
+    <message name="getSpecificUserDataResponse">
+        <part name="result" type="xsd1:AttributeValue"/>
+    </message>
+    <message name="updateCommonUserDataRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="userData" type="xsd1:CommonUserData"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="applicationId" type="xsd:string"/>
+    </message>
+    <message name="updateCommonUserDataResponse"/>
+    <message name="expireUserRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+    </message>
+    <message name="expireUserResponse"/>
+    <message name="getDistinctAttributeNamesRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="applicationId" type="xsd:string"/>
+        <part name="objektType" type="xsd:string"/>
+    </message>
+    <message name="getDistinctAttributeNamesResponse">
+        <part name="result" type="xsd1:ArrayOfString"/>
+    </message>
+    <message name="getAllSpecificUserDataOfTypeOrderByNameRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="applicationId" type="xsd:string"/>
+        <part name="objectType" type="xsd:string"/>
+    </message>
+    <message name="getAllSpecificUserDataOfTypeOrderByNameResponse">
+        <part name="result" type="xsd1:ArrayOfAttributeValue"/>
+    </message>
+    <message name="addSpecificUserDataRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="applicationId" type="xsd:string"/>
+        <part name="type" type="xsd:string"/>
+        <part name="name" type="xsd:string"/>
+        <part name="dataVersion" type="xsd:string"/>
+        <part name="softwareVersion" type="xsd:string"/>
+        <part name="shortDescr1" type="xsd:string"/>
+        <part name="shortDescr2" type="xsd:string"/>
+        <part name="shortDescr3" type="xsd:string"/>
+        <part name="shortDescr4" type="xsd:string"/>
+        <part name="shortDescr5" type="xsd:string"/>
+        <part name="blob" type="xsd2:base64Binary"/>
+    </message>
+    <message name="addSpecificUserDataResponse"/>
+    <message name="getAttributeCountRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="applicationId" type="xsd:string"/>
+        <part name="objektType" type="xsd:string"/>
+    </message>
+    <message name="getAttributeCountResponse">
+        <part name="result" type="xsd:int"/>
+    </message>
+    <message name="logoutUserRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+    </message>
+    <message name="logoutUserResponse"/>
+    <message name="forgottenPasswdUsingTempPasswdRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+    </message>
+    <message name="forgottenPasswdUsingTempPasswdResponse"/>
+    <message name="updatePasswdRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="newPasswd" type="xsd:string"/>
+    </message>
+    <message name="updatePasswdResponse"/>
+    <message name="deleteSpecificUserDataRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="applicationId" type="xsd:string"/>
+        <part name="type" type="xsd:string"/>
+        <part name="name" type="xsd:string"/>
+    </message>
+    <message name="deleteSpecificUserDataResponse"/>
+    <message name="deleteAllSpecificUserDataRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+    </message>
+    <message name="deleteAllSpecificUserDataResponse"/>
+    <message name="deleteUserRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+    </message>
+    <message name="deleteUserResponse"/>
+    <message name="getAllSpecificUserDataOfTypeOrderByDateRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="applicationId" type="xsd:string"/>
+        <part name="objectType" type="xsd:string"/>
+    </message>
+    <message name="getAllSpecificUserDataOfTypeOrderByDateResponse">
+        <part name="result" type="xsd1:ArrayOfAttributeValue"/>
+    </message>
+    <message name="updateNameOfSpecificAttributeRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+        <part name="applicationId" type="xsd:string"/>
+        <part name="type" type="xsd:string"/>
+        <part name="oldAttributeName" type="xsd:string"/>
+        <part name="newAttributeName" type="xsd:string"/>
+    </message>
+    <message name="updateNameOfSpecificAttributeResponse"/>
+    <message name="getCommonUserDataRequest">
+        <part name="userName" type="xsd:string"/>
+        <part name="accountCountryCode" type="xsd:string"/>
+    </message>
+    <message name="getCommonUserDataResponse">
+        <part name="result" type="xsd1:CommonUserData"/>
+    </message>
+    <portType name="LRIService">
+        <operation name="getSpecificUserDataBlob" parameterOrder="userName accountCountryCode applicationId type name">
+            <input message="tns:getSpecificUserDataBlobRequest" name="getSpecificUserDataBlobRequest"/>
+            <output message="tns:getSpecificUserDataBlobResponse" name="getSpecificUserDataBlobResponse"/>
+        </operation>
+        <operation name="deleteAllSpecificUserDataForApplication" parameterOrder="userName accountCountryCode applicationId">
+            <input
+                message="tns:deleteAllSpecificUserDataForApplicationRequest" name="deleteAllSpecificUserDataForApplicationRequest"/>
+            <output
+                message="tns:deleteAllSpecificUserDataForApplicationResponse" name="deleteAllSpecificUserDataForApplicationResponse"/>
+        </operation>
+        <operation name="registerUser" parameterOrder="userName passwd userData accountCountryCode applicationId">
+            <input message="tns:registerUserRequest" name="registerUserRequest"/>
+            <output message="tns:registerUserResponse" name="registerUserResponse"/>
+        </operation>
+        <operation name="authenticateUser" parameterOrder="userName passwd accountCountryCode anApplicationId">
+            <input message="tns:authenticateUserRequest" name="authenticateUserRequest"/>
+            <output message="tns:authenticateUserResponse" name="authenticateUserResponse"/>
+        </operation>
+        <operation name="getSpecificUserData" parameterOrder="userName accountCountryCode applicationId type name">
+            <input message="tns:getSpecificUserDataRequest" name="getSpecificUserDataRequest"/>
+            <output message="tns:getSpecificUserDataResponse" name="getSpecificUserDataResponse"/>
+        </operation>
+        <operation name="updateCommonUserData" parameterOrder="userName userData accountCountryCode applicationId">
+            <input message="tns:updateCommonUserDataRequest" name="updateCommonUserDataRequest"/>
+            <output message="tns:updateCommonUserDataResponse" name="updateCommonUserDataResponse"/>
+        </operation>
+        <operation name="expireUser" parameterOrder="userName accountCountryCode">
+            <input message="tns:expireUserRequest" name="expireUserRequest"/>
+            <output message="tns:expireUserResponse" name="expireUserResponse"/>
+        </operation>
+        <operation name="getDistinctAttributeNames" parameterOrder="userName accountCountryCode applicationId objektType">
+            <input message="tns:getDistinctAttributeNamesRequest" name="getDistinctAttributeNamesRequest"/>
+            <output message="tns:getDistinctAttributeNamesResponse" name="getDistinctAttributeNamesResponse"/>
+        </operation>
+        <operation name="getAllSpecificUserDataOfTypeOrderByName" parameterOrder="userName accountCountryCode applicationId objectType">
+            <input
+                message="tns:getAllSpecificUserDataOfTypeOrderByNameRequest" name="getAllSpecificUserDataOfTypeOrderByNameRequest"/>
+            <output
+                message="tns:getAllSpecificUserDataOfTypeOrderByNameResponse" name="getAllSpecificUserDataOfTypeOrderByNameResponse"/>
+        </operation>
+        <operation name="addSpecificUserData" parameterOrder="userName accountCountryCode applicationId type name dataVersion softwareVersion shortDescr1 shortDescr2 shortDescr3 shortDescr4 shortDescr5 blob">
+            <input message="tns:addSpecificUserDataRequest" name="addSpecificUserDataRequest"/>
+            <output message="tns:addSpecificUserDataResponse" name="addSpecificUserDataResponse"/>
+        </operation>
+        <operation name="getAttributeCount" parameterOrder="userName accountCountryCode applicationId objektType">
+            <input message="tns:getAttributeCountRequest" name="getAttributeCountRequest"/>
+            <output message="tns:getAttributeCountResponse" name="getAttributeCountResponse"/>
+        </operation>
+        <operation name="logoutUser" parameterOrder="userName accountCountryCode">
+            <input message="tns:logoutUserRequest" name="logoutUserRequest"/>
+            <output message="tns:logoutUserResponse" name="logoutUserResponse"/>
+        </operation>
+        <operation name="forgottenPasswdUsingTempPasswd" parameterOrder="userName accountCountryCode">
+            <input message="tns:forgottenPasswdUsingTempPasswdRequest" name="forgottenPasswdUsingTempPasswdRequest"/>
+            <output message="tns:forgottenPasswdUsingTempPasswdResponse" name="forgottenPasswdUsingTempPasswdResponse"/>
+        </operation>
+        <operation name="updatePasswd" parameterOrder="userName accountCountryCode newPasswd">
+            <input message="tns:updatePasswdRequest" name="updatePasswdRequest"/>
+            <output message="tns:updatePasswdResponse" name="updatePasswdResponse"/>
+        </operation>
+        <operation name="deleteSpecificUserData" parameterOrder="userName accountCountryCode applicationId type name">
+            <input message="tns:deleteSpecificUserDataRequest" name="deleteSpecificUserDataRequest"/>
+            <output message="tns:deleteSpecificUserDataResponse" name="deleteSpecificUserDataResponse"/>
+        </operation>
+        <operation name="deleteAllSpecificUserData" parameterOrder="userName accountCountryCode">
+            <input message="tns:deleteAllSpecificUserDataRequest" name="deleteAllSpecificUserDataRequest"/>
+            <output message="tns:deleteAllSpecificUserDataResponse" name="deleteAllSpecificUserDataResponse"/>
+        </operation>
+        <operation name="deleteUser" parameterOrder="userName accountCountryCode">
+            <input message="tns:deleteUserRequest" name="deleteUserRequest"/>
+            <output message="tns:deleteUserResponse" name="deleteUserResponse"/>
+        </operation>
+        <operation name="getAllSpecificUserDataOfTypeOrderByDate" parameterOrder="userName accountCountryCode applicationId objectType">
+            <input
+                message="tns:getAllSpecificUserDataOfTypeOrderByDateRequest" name="getAllSpecificUserDataOfTypeOrderByDateRequest"/>
+            <output
+                message="tns:getAllSpecificUserDataOfTypeOrderByDateResponse" name="getAllSpecificUserDataOfTypeOrderByDateResponse"/>
+        </operation>
+        <operation name="updateNameOfSpecificAttribute" parameterOrder="userName accountCountryCode applicationId type oldAttributeName newAttributeName">
+            <input message="tns:updateNameOfSpecificAttributeRequest" name="updateNameOfSpecificAttributeRequest"/>
+            <output message="tns:updateNameOfSpecificAttributeResponse" name="updateNameOfSpecificAttributeResponse"/>
+        </operation>
+        <operation name="getCommonUserData" parameterOrder="userName accountCountryCode">
+            <input message="tns:getCommonUserDataRequest" name="getCommonUserDataRequest"/>
+            <output message="tns:getCommonUserDataResponse" name="getCommonUserDataResponse"/>
+        </operation>
+    </portType>
+    <binding name="LRIServiceBinding" type="tns:LRIService">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="getSpecificUserDataBlob">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="getSpecificUserDataBlobRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="getSpecificUserDataBlobResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="deleteAllSpecificUserDataForApplication">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="deleteAllSpecificUserDataForApplicationRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="deleteAllSpecificUserDataForApplicationResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="registerUser">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="registerUserRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="registerUserResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="authenticateUser">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="authenticateUserRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="authenticateUserResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="getSpecificUserData">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="getSpecificUserDataRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="getSpecificUserDataResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="updateCommonUserData">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="updateCommonUserDataRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="updateCommonUserDataResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="expireUser">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="expireUserRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="expireUserResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="getDistinctAttributeNames">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="getDistinctAttributeNamesRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="getDistinctAttributeNamesResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="getAllSpecificUserDataOfTypeOrderByName">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="getAllSpecificUserDataOfTypeOrderByNameRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="getAllSpecificUserDataOfTypeOrderByNameResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="addSpecificUserData">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="addSpecificUserDataRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="addSpecificUserDataResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="getAttributeCount">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="getAttributeCountRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="getAttributeCountResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="logoutUser">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="logoutUserRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="logoutUserResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="forgottenPasswdUsingTempPasswd">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="forgottenPasswdUsingTempPasswdRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="forgottenPasswdUsingTempPasswdResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="updatePasswd">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="updatePasswdRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="updatePasswdResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="deleteSpecificUserData">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="deleteSpecificUserDataRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="deleteSpecificUserDataResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="deleteAllSpecificUserData">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="deleteAllSpecificUserDataRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="deleteAllSpecificUserDataResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="deleteUser">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="deleteUserRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="deleteUserResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="getAllSpecificUserDataOfTypeOrderByDate">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="getAllSpecificUserDataOfTypeOrderByDateRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="getAllSpecificUserDataOfTypeOrderByDateResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="updateNameOfSpecificAttribute">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="updateNameOfSpecificAttributeRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="updateNameOfSpecificAttributeResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+        <operation name="getCommonUserData">
+            <soap:operation soapAction="" style="rpc"/>
+            <input name="getCommonUserDataRequest">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </input>
+            <output name="getCommonUserDataResponse">
+                <soap:body
+                    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="http://www.is.danet.de/LRIService" use="encoded"/>
+            </output>
+        </operation>
+    </binding>
+</definitions>

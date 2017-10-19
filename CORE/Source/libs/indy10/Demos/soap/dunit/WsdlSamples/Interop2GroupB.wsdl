@@ -1,0 +1,202 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions name='InteropServiceB' targetNamespace='http://soapinterop.org/'
+            xmlns='http://schemas.xmlsoap.org/wsdl/'
+            xmlns:tns='http://soapinterop.org/'
+            xmlns:xsd='http://www.w3.org/2001/XMLSchema'
+            xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+            xmlns:suds='http://www.w3.org/2000/wsdl/suds'
+            xmlns:wsdl='http://schemas.xmlsoap.org/wsdl/'
+            xmlns:soapenc='http://schemas.xmlsoap.org/soap/encoding/'
+            xmlns:ns2='http://soapinterop.org/xsd'
+            xmlns:ns1='http://schemas.microsoft.com/clr/ns/System'
+            xmlns:ns0='http://soapinterop.org/'
+            xmlns:soap='http://schemas.xmlsoap.org/wsdl/soap/'>
+    <types>
+        <schema targetNamespace='http://soapinterop.org/'
+                xmlns='http://www.w3.org/2001/XMLSchema'
+                elementFormDefault='unqualified' attributeFormDefault='unqualified'>
+            <import namespace='http://soapinterop.org/xsd'/>
+            <complexType name='ArrayOfString2'>
+                    <complexContent>
+                            <restriction base='soapenc:Array'>
+                                    <attribute ref='soapenc:arrayType' wsdl:arrayType ='xsd:string[,]'/>
+                            </restriction>
+                    </complexContent>
+            </complexType>
+        </schema>
+        <schema targetNamespace='http://soapinterop.org/xsd'
+                xmlns='http://www.w3.org/2001/XMLSchema'
+                elementFormDefault='unqualified' attributeFormDefault='unqualified'>
+            <element name='SOAPStruct' type='ns2:SOAPStruct'/>
+            <complexType name='SOAPStruct'>
+                <all>
+                        <element name='varString' type='xsd:string'/>
+                        <element name='varInt' type='xsd:int'/>
+                        <element name='varFloat' type='xsd:float'/>
+                </all>
+            </complexType>
+            <element name='SOAPStructStruct' type='ns2:SOAPStructStruct'/>
+            <complexType name='SOAPStructStruct'>
+                <all>
+                        <element name='varString' type='xsd:string'/>
+                        <element name='varInt' type='xsd:int'/>
+                        <element name='varFloat' type='xsd:float'/>
+                        <element name='varStruct' type='ns2:SOAPStruct'/>
+                </all>
+            </complexType>
+            <element name='SOAPArrayStruct' type='ns2:SOAPArrayStruct'/>
+            <complexType name='SOAPArrayStruct'>
+                <all>
+                        <element name='varString' type='xsd:string'/>
+                        <element name='varInt' type='xsd:int'/>
+                        <element name='varFloat' type='xsd:float'/>
+                        <element name='varArray' type='ns2:ArrayOfString'/>
+                </all>
+            </complexType>
+            <complexType name='ArrayOfString'>
+                    <complexContent>
+                            <restriction base='soapenc:Array'>
+                                    <attribute ref='soapenc:arrayType' wsdl:arrayType ='xsd:string[]'/>
+                            </restriction>
+                    </complexContent>
+            </complexType>
+        </schema>
+    </types>
+
+    <message name='InteropServiceB.echoSimpleTypesAsStructInput'>
+        <part name='inputString' type='xsd:string'/>
+        <part name='inputInteger' type='xsd:int'/>
+        <part name='inputFloat' type='xsd:float'/>
+    </message>
+    <message name='InteropServiceB.echoSimpleTypesAsStructOutput'>
+        <part name='return' type='ns2:SOAPStruct'/>
+    </message>
+
+    <message name='InteropServiceB.echo2DStringArrayInput'>
+        <part name='input2DStringArray' type='ns0:ArrayOfString2'/>
+    </message>
+    <message name='InteropServiceB.echo2DStringArrayOutput'>
+        <part name='return' type='ns0:ArrayOfString2'/>
+    </message>
+
+    <message name='InteropServiceB.echoNestedStructInput'>
+        <part name='inputStruct' type='ns2:SOAPStructStruct'/>
+    </message>
+    <message name='InteropServiceB.echoNestedStructOutput'>
+        <part name='return' type='ns2:SOAPStructStruct'/>
+    </message>
+
+    <message name='InteropServiceB.echoNestedArrayInput'>
+        <part name='inputStruct' type='ns2:SOAPArrayStruct'/>
+    </message>
+    <message name='InteropServiceB.echoNestedArrayOutput'>
+        <part name='return' type='ns2:SOAPArrayStruct'/>
+    </message>
+
+    <message name='InteropServiceB.echoStructAsSimpleTypesInput'>
+        <part name='inputStruct' type='ns2:SOAPStruct'/>
+    </message>
+    <message name='InteropServiceB.echoStructAsSimpleTypesOutput'>
+        <part name='outputString' type='xsd:string'/>
+        <part name='outputInteger' type='xsd:int'/>
+        <part name='outputFloat' type='xsd:float'/>
+    </message>
+
+    <portType name='InteropServiceBPortType'>
+        <operation name='echoSimpleTypesAsStruct' parameterOrder='inputString inputInteger inputFloat'>
+            <input name='echoSimpleTypesAsStructRequest' message='tns:InteropServiceB.echoSimpleTypesAsStructInput'/>
+            <output name='echoSimpleTypesAsStructResponse' message='tns:InteropServiceB.echoSimpleTypesAsStructOutput'/>
+        </operation>
+        <operation name='echo2DStringArray' parameterOrder='input2DStringArray'>
+            <input name='echo2DStringArrayRequest' message='tns:InteropServiceB.echo2DStringArrayInput'/>
+            <output name='echo2DStringArrayResponse' message='tns:InteropServiceB.echo2DStringArrayOutput'/>
+        </operation>
+        <operation name='echoNestedStruct' parameterOrder='inputStruct'>
+            <input name='echoNestedStructRequest' message='tns:InteropServiceB.echoNestedStructInput'/>
+            <output name='echoNestedStructResponse' message='tns:InteropServiceB.echoNestedStructOutput'/>
+        </operation>
+        <operation name='echoNestedArray' parameterOrder='inputStruct'>
+            <input name='echoNestedArrayRequest' message='tns:InteropServiceB.echoNestedArrayInput'/>
+            <output name='echoNestedArrayResponse' message='tns:InteropServiceB.echoNestedArrayOutput'/>
+        </operation>
+        <operation name='echoStructAsSimpleTypes' parameterOrder='inputStruct outputString outputInteger outputFloat'>
+            <input name='echoStructAsSimpleTypesRequest' message='tns:InteropServiceB.echoStructAsSimpleTypesInput'/>
+            <output name='echoStructAsSimpleTypesResponse' message='tns:InteropServiceB.echoStructAsSimpleTypesOutput'/>
+        </operation>
+    </portType>
+
+    <binding name='InteropServiceBBinding' type='tns:InteropServiceBPortType'>
+        <soap:binding style='rpc' transport='http://schemas.xmlsoap.org/soap/http'/>
+        <suds:class type='ns0:InteropServiceB' rootType='MarshalByRefObject'>
+        </suds:class>
+        <operation name='echoSimpleTypesAsStruct'>
+            <soap:operation soapAction='http://soapinterop.org/'/>
+            <suds:method attributes='public'/>
+            <input name='echoSimpleTypesAsStructRequest'>
+                <soap:body use='encoded' encodingStyle='http://schemas.xmlsoap.org/soap/encoding/' namespace='http://soapinterop.org/'/>
+            </input>
+            <output name='echoSimpleTypesAsStructResponse'>
+                <soap:body use='encoded' encodingStyle='http://schemas.xmlsoap.org/soap/encoding/' namespace='http://soapinterop.org/'/>
+            </output>
+        </operation>
+        <operation name='echo2DStringArray'>
+            <soap:operation soapAction='http://soapinterop.org/'/>
+            <suds:method attributes='public'/>
+            <input name='echo2DStringArrayRequest'>
+                <soap:body use='encoded' encodingStyle='http://schemas.xmlsoap.org/soap/encoding/' namespace='http://soapinterop.org/'/>
+            </input>
+            <output name='echo2DStringArrayResponse'>
+                <soap:body use='encoded' encodingStyle='http://schemas.xmlsoap.org/soap/encoding/' namespace='http://soapinterop.org/'/>
+            </output>
+        </operation>
+        <operation name='echoNestedStruct'>
+            <soap:operation soapAction='http://soapinterop.org/'/>
+            <suds:method attributes='public'/>
+            <input name='echoNestedStructRequest'>
+                <soap:body use='encoded' encodingStyle='http://schemas.xmlsoap.org/soap/encoding/' namespace='http://soapinterop.org/'/>
+            </input>
+            <output name='echoNestedStructResponse'>
+                <soap:body use='encoded' encodingStyle='http://schemas.xmlsoap.org/soap/encoding/' namespace='http://soapinterop.org/'/>
+            </output>
+        </operation>
+        <operation name='echoNestedArray'>
+            <soap:operation soapAction='http://soapinterop.org/'/>
+            <suds:method attributes='public'/>
+            <input name='echoNestedArrayRequest'>
+                <soap:body use='encoded' encodingStyle='http://schemas.xmlsoap.org/soap/encoding/' namespace='http://soapinterop.org/'/>
+            </input>
+            <output name='echoNestedArrayResponse'>
+                <soap:body use='encoded' encodingStyle='http://schemas.xmlsoap.org/soap/encoding/' namespace='http://soapinterop.org/'/>
+            </output>
+        </operation>
+        <operation name='echoStructAsSimpleTypes'>
+            <soap:operation soapAction='http://soapinterop.org/'/>
+            <suds:method attributes='public'/>
+            <input name='echoStructAsSimpleTypesRequest'>
+                <soap:body use='encoded' encodingStyle='http://schemas.xmlsoap.org/soap/encoding/' namespace='http://soapinterop.org/'/>
+            </input>
+            <output name='echoStructAsSimpleTypesResponse'>
+                <soap:body use='encoded' encodingStyle='http://schemas.xmlsoap.org/soap/encoding/' namespace='http://soapinterop.org/'/>
+            </output>
+        </operation>
+    </binding>
+
+    <portType name='SOAPStructPortType'>
+    </portType>
+
+    <binding name='SOAPStructBinding' type='tns:SOAPStructPortType'>
+        <soap:binding style='rpc' transport='http://schemas.xmlsoap.org/soap/http'/>
+        <suds:class type='ns2:SOAPStruct'>
+        </suds:class>
+        <suds:class type='ns2:SOAPStructStruct'>
+        </suds:class>
+        <suds:class type='ns2:SOAPArrayStruct'>
+        </suds:class>
+    </binding>
+
+    <service name='InteropServiceBService'>
+        <port name='InteropServiceBPort' binding='tns:InteropServiceBBinding'>
+            <soap:address location='http://www.mssoapinterop.org:80/Remoting/ServiceB.soap'/>
+        </port>
+    </service>
+</definitions>

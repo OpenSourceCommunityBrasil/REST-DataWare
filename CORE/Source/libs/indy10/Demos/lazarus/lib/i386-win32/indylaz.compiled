@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <Compiler Value="C:\lazarus\fpc\2.6.1\bin\i386-win32\fpc.exe" Date="1113068498"/>
+  <Params Value=" -MDelphi -Scgi -O1 -g -gl -vewnhi -FuC:\lazarus\packager\units\i386-win32 -FuC:\lazarus\components\lazutils\lib\i386-win32 -FuC:\lazarus\lcl\units\i386-win32 -FuC:\lazarus\lcl\units\i386-win32\win32 -FuC:\lazarus\components\lazcontrols\lib\i386-win32\win32 -FuC:\lazarus\ideintf\units\i386-win32\win32 -FuC:\Componentes\lazarus\indy-10.2.0.3\lazarus\ -FUC:\Componentes\lazarus\indy-10.2.0.3\lazarus\lib\i386-win32\ -l -dLCL -dLCLwin32 indylaz.pas"/>
+  <Complete Value="False" MainPPUExists="False"/>
+</CONFIG>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:s1="http://dinoch.dyndns.org/bookService" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:s0="http://dinoch.dyndns.org/webservices/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" targetNamespace="http://dinoch.dyndns.org/webservices/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://dinoch.dyndns.org/webservices/">
+      <s:import namespace="http://dinoch.dyndns.org/bookService" />
+      <s:element name="GetInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ISBN" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" ref="s1:GetInfoResult" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://dinoch.dyndns.org/bookService">
+      <s:element name="GetInfoResult" type="s1:bookInfo" />
+      <s:complexType name="bookInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="isbn" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="author" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="pubdate" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="publisher" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="imgUrl" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="timestamp" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="unbounded" name="vendorprice" type="s1:bookInfoVendorprice" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="bookInfoVendorprice">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="siteUrl" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="pricePrefix" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="price" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="bookInfo" type="s1:bookInfo" />
+    </s:schema>
+  </types>
+  <message name="GetInfoSoapIn">
+    <part name="parameters" element="s0:GetInfo" />
+  </message>
+  <message name="GetInfoSoapOut">
+    <part name="parameters" element="s0:GetInfoResponse" />
+  </message>
+  <message name="GetInfoHttpGetIn">
+    <part name="ISBN" type="s:string" />
+  </message>
+  <message name="GetInfoHttpGetOut">
+    <part name="Body" element="s1:bookInfo" />
+  </message>
+  <message name="GetInfoHttpPostIn">
+    <part name="ISBN" type="s:string" />
+  </message>
+  <message name="GetInfoHttpPostOut">
+    <part name="Body" element="s1:bookInfo" />
+  </message>
+  <portType name="LookyBookServiceSoap">
+    <operation name="GetInfo">
+      <documentation>retrieves book information for a given ISBN.  Returns an XML schema containing title, author, publisher, pubdate and other info.</documentation>
+      <input message="s0:GetInfoSoapIn" />
+      <output message="s0:GetInfoSoapOut" />
+    </operation>
+  </portType>
+  <portType name="LookyBookServiceHttpGet">
+    <operation name="GetInfo">
+      <documentation>retrieves book information for a given ISBN.  Returns an XML schema containing title, author, publisher, pubdate and other info.</documentation>
+      <input message="s0:GetInfoHttpGetIn" />
+      <output message="s0:GetInfoHttpGetOut" />
+    </operation>
+  </portType>
+  <portType name="LookyBookServiceHttpPost">
+    <operation name="GetInfo">
+      <documentation>retrieves book information for a given ISBN.  Returns an XML schema containing title, author, publisher, pubdate and other info.</documentation>
+      <input message="s0:GetInfoHttpPostIn" />
+      <output message="s0:GetInfoHttpPostOut" />
+    </operation>
+  </portType>
+  <binding name="LookyBookServiceSoap" type="s0:LookyBookServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+    <operation name="GetInfo">
+      <soap:operation soapAction="http://dinoch.dyndns.org/webservices/GetInfo" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <binding name="LookyBookServiceHttpGet" type="s0:LookyBookServiceHttpGet">
+    <http:binding verb="GET" />
+    <operation name="GetInfo">
+      <http:operation location="/GetInfo" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+  </binding>
+  <binding name="LookyBookServiceHttpPost" type="s0:LookyBookServiceHttpPost">
+    <http:binding verb="POST" />
+    <operation name="GetInfo">
+      <http:operation location="/GetInfo" />
+      <input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+  </binding>
+  <service name="LookyBookService">
+    <port name="LookyBookServiceSoap" binding="s0:LookyBookServiceSoap">
+      <soap:address location="http://hosting.msugs.ch/cheeso9/books/books.asmx" />
+    </port>
+    <port name="LookyBookServiceHttpGet" binding="s0:LookyBookServiceHttpGet">
+      <http:address location="http://hosting.msugs.ch/cheeso9/books/books.asmx" />
+    </port>
+    <port name="LookyBookServiceHttpPost" binding="s0:LookyBookServiceHttpPost">
+      <http:address location="http://hosting.msugs.ch/cheeso9/books/books.asmx" />
+    </port>
+  </service>
+</definitions>

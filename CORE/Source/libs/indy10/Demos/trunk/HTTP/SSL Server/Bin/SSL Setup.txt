@@ -1,0 +1,76 @@
+Steps to Successfully install and run an SSL Server in Indy 10.1.3
+
+First open a browser and navigate to: http://www.intelicom.si/
+  Select your language at the top of the page (EN for english)
+  Select downloads
+  Select "Indy OpenSSL"
+  Extract the Zip file that you just downloaded to your project
+  folder (in the case of the demos this is the Bin folder)
+
+Navigate to http://www.arcanatech.com/
+  Find the products page
+  Their should be a listing either SSL Tools or SSL Buddy
+  Download SSL Buddy and install it
+
+Start SSL Buddy
+  Click Start SSL Buddy
+  Select "Generate and Self-Sign a certificate"
+  Click Start
+  Follow the On Screen Directions VERY CLOSLY
+  If you are going to use this for localhost then make sure that you
+    use localhost, if its for a website make sure you use the
+	website URL (EX: eonclash.com) failure to do so will result in
+	an invalid certificate.
+  Set the export key file location to your application folder
+  This will generate the certificate and bring you back to the main
+    screen where you started out.
+  Now select "Prepare an SSL certificate for installation in an
+    Indy/IntraWeb Server."
+  
+  Click start, then next
+  Select that you created it with SSL Buddy then Next
+  Select the key file (<URL>.reg file) in your application root
+    folder that you generated above.  In the case of using
+	localhost the file is named: localhost.key
+  The export path should fill in automatically for you, if not
+    then fill it in as your default application folder
+  The last line enter the common name, IE: Localhost, eonclash.com
+    ect...
+  You will get a window asking you to paste your certificate file
+    below, it should already be filled in for you, simply click
+	next
+  For the existing password use the e-mail address you entered
+    as the administrative e-mail.
+  Follow the directions on the SSL Buddy screen.  Your certificate
+    won't appear, simply click import, locate the certificate file
+	and import it into the trusted.  Then move down the list given
+	on the screen.  Its imparative that you follow the directions
+	too the letter.
+  Place the exported root.pem key file into your application folder
+  Close SSL Buddy
+  
+  Open and compile the SSL HTTP Server Demo application located
+    in the folder with this file.
+  Set the following paramaters up on the SSL Setup Page:
+      Certificate File: <URL>.cer (or <URL>.crt)
+	  Key File: key.pem
+	  Password: <The new password used from above>
+  Unfortunately I have no idea what Root Certificate File or
+    Cipher List are used for.  Nothing in the help files, so
+	just to get this far was a set of educated guesses.
+	
+Of special NOTE:
+  For some reason when I use this method everything works fine,
+  but I do get an error while running in the debugger I do get
+  an assertion failure on line 703:(IdCustomHTTPServer.pas)
+  Source:
+    Assert(not IOHandler.ReadLnTimedOut);
+  But everything runs fine.  Connecting to my new SSL Server
+  at http://localhost/ results in me being asked to verify that
+  I want to use "Their/My" certificate and once accepted I can
+  browse w/o any problems.
+  
+  
+Anyways, thats the documentation to go with this demo.  I know
+its not much, but hopefully its enough to get you up and running.
+

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance"
+xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" 
+xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+
+<SOAP-ENV:Body>
+<namesp1:echoFloat xmlns:namesp1="http://soapinterop.org/">
+<inputFloat xsi:type="xsd:float">5.5</inputFloat>
+</namesp1:echoFloat>
+</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

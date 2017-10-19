@@ -1,0 +1,18 @@
+{.$DEFINE RESJEDI}  // Descomentar se quiser o Jedi 
+{.$DEFINE RESTKBMMEMTABLE} // Descomentar se quiser o a suite kbmmemtable
+{$DEFINE RESTFDMEMTABLE} // Descomentar se quiser o a suite FDMmemtable
+
+{$IFDEF RESJEDI}
+  {$UNDEF RESTKBMMEMTABLE}
+  {$UNDEF RESTFDMEMTABLE}
+{$ENDIF}
+
+{$IFDEF RESTKBMMEMTABLE}
+  {$UNDEF RESJEDI}
+  {$UNDEF RESTFDMEMTABLE}
+{$ENDIF}
+
+{$IFDEF RESTFDMEMTABLE}
+  {$UNDEF RESJEDI}
+  {$UNDEF RESTKBMMEMTABLE}
+{$ENDIF}

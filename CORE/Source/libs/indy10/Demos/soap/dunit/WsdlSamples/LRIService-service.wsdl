@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="LRIServiceService"
+    targetNamespace="http://www.is.danet.de/LRInterimWeb/wsdl/LRIService-service.wsdl"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:binding="http://www.lriservice.com/definitions/LRIServiceRemoteInterface"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.is.danet.de/LRInterimWeb/wsdl/LRIService-service.wsdl">
+    <import
+        location="LRIService-binding.wsdl" namespace="http://www.lriservice.com/definitions/LRIServiceRemoteInterface"/>
+    <service name="LRIServiceService">
+        <port binding="binding:LRIServiceBinding" name="LRIServicePort">
+            <soap:address location="http://www.is.danet.de/LRInterimWeb/servlet/rpcrouter"/>
+        </port>
+    </service>
+</definitions>

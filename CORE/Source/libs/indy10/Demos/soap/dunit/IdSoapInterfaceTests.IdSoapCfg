@@ -1,0 +1,10 @@
+[Project]
+Directory=c:\IndyMasters\Soap\DUnit
+
+[Source]
+IdSoapInterfaceTestsIntfDefn.pas
+IdSoapMultipleIntfDefn.pas
+
+[Output]
+XMLOutput=IdSoapInterfaceTests.iti.xml
+ResOutput=IdSoapInterfaceTests.res

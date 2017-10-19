@@ -1,0 +1,5 @@
+[Source]
+Interop2GroupB.pas
+
+[Output]
+ResOutput=Interop2GroupB.res

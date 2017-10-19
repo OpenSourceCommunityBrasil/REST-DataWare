@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+ <SOAP-ENV:Body>
+  <SOAP-ENV:Fault>
+  <faultcode>SOAP-ENV:Server</faultcode>
+  <faultstring>exception.AttributeMissing</faultstring>
+  <faultactor>/LRInterimWeb/servlet/rpcrouter</faultactor>
+  <detail>
+  <attribute name="email" problem="MISSING"/>
+  <attribute name="userName" problem="WRONG_FORMAT"/>
+  <attribute name="password" problem="WRONG_FORMAT"/>
+  <attribute name="email" problem="MISSING"/>
+  </detail>
+  </SOAP-ENV:Fault>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

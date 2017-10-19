@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance"
+xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+<SOAP-ENV:Body>
+<namesp1:echoStringArray xmlns:namesp1="http://soapinterop.org/">
+<inputStringArray SOAP-ENC:arrayType="xsd:string[2]"
+xsi:type="SOAP-ENC:Array">
+<c-gensym5 xsi:type="xsd:string">hello</c-gensym5>
+<c-gensym5 xsi:type="xsd:string">goodbye</c-gensym5>
+</inputStringArray>
+</namesp1:echoStringArray>
+</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

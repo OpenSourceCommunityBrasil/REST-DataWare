@@ -1,0 +1,89 @@
+               <div id="jqxInternetProtSettingsTabs">
+                <ul>
+                    <li>Settings</li>
+                    <li>Advanced</li>
+                    <li>Proxy Settings</li>          
+                    <li>Security</li>                     
+                </ul>
+                <div>           
+                    <!--Settings-->                                                                                                   <div>Container</div><div><input type="text" id="inptIntProtSet_Asure_container"/></div>                 
+                    <div>Folder</div><div><input type="text" id="inptInternetFolder"/></div>
+                    <div>Your Account ID is the first word of your Asure endpoint,<br/>Example: is endpoint is test.blob.core.windows.net, then ID = test.</div>
+                    <br/><br/>
+                    <div>Account ID( opt. )</div><div><input type="text" id="inptIntProtSet_Asure_account_id"/></div>
+                    <div>Access Key( opt. )</div><div><input type="password" id="inptAccountOpt"/></div>
+                    <br/><br/>    
+
+                    <table style="width:250px">
+                    <tr>
+                      <td><div>Save Account ID</div><div><div id="cbIntProtSet_Asure_save_user_id"/></div></td>  
+                      <td><div>Save Access Key</div><div><div id="cbIntProtSet_Asure_save_password"/></div></td>
+                      <td><div>Allow IPV6</div><div><div id="cbIntProtSet_Asure_allow_ipv6"/></div></td>                       
+                    </tr>  
+                    </table>
+                                                                    
+                    <div>Filename Encoding: on right side, put timestamp in file names(to preserve it if server doesn"t support setting file times)</div>
+                    <div><div id="cbIntProtSet_Asure_filename_encoding"/></div><br/>                
+                </div>                  
+                <div>
+                    <!--Advanced--> 
+                    <div>Character Set:</div><div id ="comboIntProtSet_Asure_adv_Charset" style="float: left;"></div><br/><br/>      
+                    <div>Replace characters...</div><div><div id="cbIntProtSet_Asure_adv_replace_characters"/></div>
+
+                    <div>Recursive listing</div><div><div id="cbIntProtSet_Asure_adv_recursive_listing"/></div>                
+
+                    <div>Cache Control</div><div><input type="text" id="inptIntProtSet_Asure_adv_cache_control"/></div> 
+                    <div>Seconds (0=unspecified )</div>                
+                    <br/><br/> 
+                    <table>                        
+                    <tr>
+                      <td><div>Zone</div><div><div id="cbIntProtSet_Asure_adv_zone"/></div></td>  
+                      <td><div>Auto</div><div><div id="cbIntProtSet_Asure_adv_auto"/></div></td>                      
+                      <td class="auto-style_IntProtAdv2" >UTC Offsets List<div><input type="text" id="inptIntProtSet_Asure_adv_list"/></div></td>                       
+                      <td class="auto-style_IntProtAdv1" >Upload (min)<div><input type="text" id="inptIntProtSet_Asure_adv_upload_min"/></div></td>                       
+                    </tr>  
+                    </table>
+
+                      
+                    <div>Timeout</div><div><input type="text" id="inptIntProtSet_Asure_adv_timeout"/></div><div>seconds. These are global settings</div>   
+                    <div>Retries</div><div><input type="text" id="inptIntProtSet_Asure_adv_retries"/></div>   
+                    <div>HTTP Authentication Retries</div><div><input type="text" id="inptIntProtSet_Asure_adv_http_retries"/></div>   
+                               
+                </div>
+                <div>
+                    <!--Proxy Settings-->
+
+                    <div>Proxy Type</div><div id ="comboIntProtSet_Asure_proxy_proxy_type" style="float: left;"></div><br/><br/>                
+                    <div>Proxy Host:</div><div><input type="text" id="inptIntProtSet_Asure_proxy_proxy_host"/></div>
+                    <div>Port:</div><div><input type="text" id="inptIntProtSet_Asure_proxy_proxy_port"/></div>
+                    <div>User ID (login):</div><div><input type="text" id="inptIntProtSet_Asure_proxy_login"/></div>
+                    <div>Password:</div><div><input type="password" id="inptIntProtSet_Asure_proxy_password"/></div>
+                    <div>if a proxy login is needed, it must be specified here and will be stored permamently(encrypted)</div> 
+                    <div>For "USER" with no logon, please leave User ID and Passwor fields blank!</div>
+                    <div>Send HOST command</div><div><div id="cbIntProtSet_Asure_proxy_send_host_command"/></div>                           
+                    
+                </div>
+                <div>
+                    <!---->
+                    <div>Secure Transfer Settings</div>
+                    
+                    <div>Version:</div>     
+                    <div id="rbIntProtSet_Asure_Security_SSLv2">SSL v2</div> 
+                    <div id="rbIntProtSet_Asure_Security_SSLv2_3">SSL v2/3</div>
+                    <div id="rbIntProtSet_Asure_Security_SSLv3">SSL v3</div>    
+                    <div id="rbIntProtSet_Asure_Security_TLSv_1_1_2">TLS v1-1.2</div>
+                     
+                    <button id="btnIntProtSet_Asure_Security_Advanced_SSH">Advanced SHH Settings</button>
+                    <div>Authentication Methods for SSH</div>
+                    <div>User Name / Password</div><div><div id="cbIntProtSet_Asure_Security_SSH_username_password"/></div>
+                    <div>Keyboard</div><div><div id="cbIntProtSet_Asure_Security_SSH_keyboard"/></div>
+                    <div>Certificate / Public Key</div><div><div id="cbIntProtSet_Asure_Security_SSH_certificate"/></div>
+                    <div>Client certificate for SSL/SSH</div>
+                    <div id ="comboIntProtSet_Asure_security_Certificate" style="float: left;"></div><br/><br/>
+                    <div>Certificate Password(max len: 24):</div><div><input type="password" id="inptIntProtSet_Asure_security_CertificatePassword"/></div>
+                    <div>No password needed</div><div><div id="cbIntProtSet_Asure_security_nopassword"/></div>
+                   
+                </div>                
+             </div>
+    
+   

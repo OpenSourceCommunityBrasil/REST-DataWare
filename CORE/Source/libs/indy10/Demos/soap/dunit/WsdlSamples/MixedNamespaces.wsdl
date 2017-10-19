@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:s1="http://www.trx.com/DelphiTest/TopLevel"
+xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+xmlns:s="http://www.w3.org/2001/XMLSchema"
+xmlns:s0="http://www.trx.com/DelphiTest/"
+xmlns:s2="http://www.trx.com/DelphiTest/BaseLevel"
+xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/"
+xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+targetNamespace="http://www.trx.com/DelphiTest/"
+xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <s:schema elementFormDefault="qualified"
+targetNamespace="http://www.trx.com/DelphiTest/">
+      <s:import namespace="http://www.trx.com/DelphiTest/TopLevel" />
+      <s:element name="HelloWorld">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="oObj" type="s1:Foo"
+/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="HelloWorldResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="HelloWorldResult"
+type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+    <s:schema elementFormDefault="qualified"
+targetNamespace="http://www.trx.com/DelphiTest/TopLevel">
+      <s:import namespace="http://www.trx.com/DelphiTest/BaseLevel" />
+      <s:complexType name="Foo">
+        <s:complexContent mixed="false">
+          <s:extension base="s2:Foo" />
+        </s:complexContent>
+      </s:complexType>
+    </s:schema>
+    <s:schema elementFormDefault="qualified"
+targetNamespace="http://www.trx.com/DelphiTest/BaseLevel">
+      <s:import namespace="http://www.trx.com/DelphiTest/TopLevel" />
+      <s:complexType name="Foo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Bar" type="s:string"
+/>
+        </s:sequence>
+      </s:complexType>
+    </s:schema>
+  </types>
+  <message name="HelloWorldSoapIn">
+    <part name="parameters" element="s0:HelloWorld" />
+  </message>
+  <message name="HelloWorldSoapOut">
+    <part name="parameters" element="s0:HelloWorldResponse" />
+  </message>
+  <portType name="DelphiTestSoap">
+    <operation name="HelloWorld">
+      <input message="s0:HelloWorldSoapIn" />
+      <output message="s0:HelloWorldSoapOut" />
+    </operation>
+  </portType>
+  <portType name="DelphiTestHttpGet" />
+  <portType name="DelphiTestHttpPost" />
+  <binding name="DelphiTestSoap" type="s0:DelphiTestSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"
+style="document" />
+    <operation name="HelloWorld">
+      <soap:operation soapAction="http://www.trx.com/DelphiTest/HelloWorld"
+style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <binding name="DelphiTestHttpGet" type="s0:DelphiTestHttpGet">
+    <http:binding verb="GET" />
+  </binding>
+  <binding name="DelphiTestHttpPost" type="s0:DelphiTestHttpPost">
+    <http:binding verb="POST" />
+  </binding>
+  <service name="DelphiTest">
+    <port name="DelphiTestSoap" binding="s0:DelphiTestSoap">
+      <soap:address location="http://doug/DelphiTest/test1.asmx" />
+    </port>
+    <port name="DelphiTestHttpGet" binding="s0:DelphiTestHttpGet">
+      <http:address location="http://doug/DelphiTest/test1.asmx" />
+    </port>
+    <port name="DelphiTestHttpPost" binding="s0:DelphiTestHttpPost">
+      <http:address location="http://doug/DelphiTest/test1.asmx" />
+    </port>
+  </service>
+</definitions>

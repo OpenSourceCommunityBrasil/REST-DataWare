@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<SOAP-ENV:Envelope
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:ns2="urn:test"
+    xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" 
+    xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+ <SOAP-ENV:Body>
+  <NS1:CreateSessionResponse xmlns:NS1="urn:RPC_Sessions-ISessionServices" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+   <return xsi:type="xsd:unsignedInt">35981685</return>
+
+   <Array1 xsi:type="SOAP-ENC:array" SOAP-ENC:arrayType="xsd:int[2]">
+     <number>3</number>
+     <number>4</number>
+   </Array1>
+
+   <Array2 xsi:type="SOAP-ENC:array" SOAP-ENC:arrayType="ns2:Order[2]">
+     <Order>
+       <Product xsi:type="string">Apple</Product>
+       <Price xsi:type="float">1.56</Price>
+     </Order>
+     <Order>
+       <Product xsi:type="string">Peach</Product>
+       <Price xsi:type="float">1.48</Price>
+     </Order>
+   </Array2>
+
+   <Array3 xsi:type="SOAP-ENC:array" SOAP-ENC:arrayType="xsd:string[][2]">
+     <item href="#array-1"/>
+     <item href="#array-2"/>
+   </Array3>
+   <Array4 id="array-1" xsi:type="SOAP-ENC:array" SOAP-ENC:arrayType="xsd:string[3]">
+     <item>r1c1</item>
+     <item>r1c2</item>
+     <item>r1c3</item>
+   </Array4>
+   <Array5 id="array-2" xsi:type="SOAP-ENC:array" SOAP-ENC:arrayType="xsd:string[2]">
+     <item>r2c1</item>
+     <item>r2c2</item>
+   </Array5>
+
+   <Array6 xsi:type="SOAP-ENC:array" SOAP-ENC:arrayType="xsd:string[2,3]">
+     <item>r1c1</item>
+     <item>r1c2</item>
+     <item>r1c3</item>
+     <item>r2c1</item>
+     <item>r2c2</item>
+     <item>r2c3</item>
+   </Array6>
+
+   <Array7 xsi:type="SOAP-ENC:array" SOAP-ENC:arrayType="xsd:string[6]" SOAP-ENC:offset="[3]">
+     <item>The fourth element</item>
+     <item>The fifth element</item>
+     <item>The sixth element</item>
+   </Array7>
+
+   <Array8 xsi:type="SOAP-ENC:array" SOAP-ENC:arrayType="xsd:string[,][4]">
+     <item href="#array-3" SOAP-ENC:position="[2]" />
+   </Array8>
+   <Array9 id="array-3" xsi:type="SOAP-ENC:array" SOAP-ENC:arrayType="xsd:string[10,10]">
+     <item SOAP-ENC:position="[2,2]">Third row, third col</item>
+     <item SOAP-ENC:position="[7,2]">Eighth row, third col</item>
+   </Array9>
+
+   <Array10 xsi:type="SOAP-ENC:array" SOAP-ENC:arrayType="xsd:string[,][4]">
+     <Array11 xsi:type="SOAP-ENC:array" SOAP-ENC:position="[2]" SOAP-ENC:arrayType="xsd:string[10,10]" >    
+      <item SOAP-ENC:position="[2,2]">Third row, third col</item>
+      <item SOAP-ENC:position="[7,2]">Eighth row, third col</item>
+    </Array11>
+   </Array10>
+  </NS1:CreateSessionResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

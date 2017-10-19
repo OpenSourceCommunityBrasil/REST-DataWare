@@ -1,0 +1,8 @@
+clock.isc.org
+clock.psu.edu
+clock.via.net
+tick.usno.navy.mil
+tock.usno.navy.mil
+time.twc.weather.com
+north-america.pool.ntp.org
+us.pool.ntp.org

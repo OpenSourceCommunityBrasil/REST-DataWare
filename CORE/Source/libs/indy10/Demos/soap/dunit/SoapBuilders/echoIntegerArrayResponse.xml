@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance"
+xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+<SOAP-ENV:Body><namesp1:echoIntegerArrayResponse
+xmlns:namesp1="http://soapinterop.org/">
+<return SOAP-ENC:arrayType="xsd:int[7]"
+xsi:type="SOAP-ENC:Array">
+<s-gensym5 xsi:type="xsd:int">-1</s-gensym5>
+<s-gensym5 xsi:type="xsd:int">0</s-gensym5>
+<s-gensym5 xsi:type="xsd:int">1</s-gensym5>
+<s-gensym5 xsi:type="xsd:int">2</s-gensym5>
+<s-gensym5 xsi:type="xsd:int">3</s-gensym5>
+<s-gensym5 xsi:type="xsd:int">4</s-gensym5>
+<s-gensym5 xsi:type="xsd:int">5</s-gensym5>
+</return>
+</namesp1:echoIntegerArrayResponse>
+</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

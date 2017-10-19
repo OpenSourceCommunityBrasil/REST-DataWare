@@ -1,0 +1,406 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 566
+  ClientWidth = 427
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object Layout1: TLayout
+    Align = Client
+    Size.Width = 427.000000000000000000
+    Size.Height = 566.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+    object tlb1: TToolBar
+      Size.Width = 427.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object Text1: TText
+        Align = Client
+        Size.Width = 273.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'RESTDataware Core Version'
+        TextSettings.Font.Size = 20.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+      end
+      object btn1: TButton
+        Align = Right
+        Position.X = 347.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'refreshtoolbutton'
+        TabOrder = 1
+        Text = 'btn1'
+        OnClick = btn1Click
+      end
+      object img1: TImage
+        MultiResBitmap.Height = 36
+        MultiResBitmap.Width = 36
+        MultiResBitmap = <
+          item
+            Width = 36
+            Height = 36
+            PNG = {
+              89504E470D0A1A0A0000000D4948445200000024000000240806000000E10098
+              98000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+              0AE3494441545847C557596C54E715FE665FED192F33C68C011B087642880193
+              05C262A8AA2809699A449148248292A8CD4315A951D5288D908854F5A56A54A5
+              7DEB439A22119048DE8A5445554A29854030E0D4C60BF6D8833D36E3B167F3EC
+              DBED77FE190F7641286D55F5688EEE9DBB9CFFFBCFF9CE7275F80FC505B81F05
+              BA77008FEE0676E580C2DF81F35F037DA3407F0848551FFDB7E45B03EA04DAB7
+              00DB9EE4E23BCCE6C71E6E6BEB763735B9E070D00ACD685A45D369CC85C3F337
+              42A1FEAF33994B17810B04797D1A08564DDD57EE09C80BB410C0866E606B8FD1
+              F8D8769FAFA7D3E57AD8522ED335F44D7D3D42C522E6B219C4637164A6B91CEF
+              D956B7C2E56E80D76E478BD1082493402C8698A615C63299816BC1605F5F3E7F
+              B99F1E0C00FE5960BEBA644D14A087F8DB033CD9033CB6ADAE6E47C7EAD50F36
+              35365AE0AC030C0694CA25CC2D2E223A3F8F344114C2F32867B3CA80815AA096
+              A8762A7DA4546F36C3E8F5C061B1C2DD4090DC888EB650E293990CC2F3F3E99B
+              E1F08DFE68F44A1F70F92A437D0D1852804E188D9FBFBA65CB8B58B54AB93DCB
+              9712DC5D3A1241613A88722A09FA46891C65C132C324C7249F8F724178BDB08F
+              8CC0CBEB6254C7EB02562FE7D5A3DE668361B50FF6A646389D4E58C48B62241E
+              03BEF9061BB3D90714A09F7A3C1FFCB2B7F758E8C205186E87A0958A7716A696
+              F47AE581A228179273B997E5F9088FBE4F3FC543CF3E8B736E3756F15A531594
+              8147138F5C56813368656A151C55A4D0D282A6DE5E44AE5C296D1E1F77A9EB37
+              E2F1414C4CC0160CC2CAF0D8E85A0BD5483510CCD2CBCBA5C485C903645F7A09
+              0FBFF20ABCE4D5864F3EC12D5ECBF1DE123DE54C44CFFF063DEDD1A649ECD33B
+              56A301D65008BAB1310C4422D72533D55A817C7EA26832C1E8F128578B9418B6
+              9C28C95AA2AA302C533A19FA4387B0F3B3CF40A631D21A1E79ED356C78F7DD2A
+              53B59A27E479E1A15041B44815D1C952E41AAC56DC8AC526E49A0234058CCF96
+              4A79735D9DDA9118CF353723FFF4D3C8EEDF8F055E8B5481E969BD2CA0F9EC5A
+              DE5F3C7E1CF3A3A3EA9DC1932751FFF8E370F05DF160054859BD2B20B3070EA0
+              F4CC3328916FE5B2466A109CF08FCFFA356D8C8F5400C581E8642EE737B2A628
+              40A28C7FB9B111BADE7D709D3801D3FBEF83C98D040D1979AF8199923A720417
+              A873E3E3D033B4575E7D157E86B09E0961D2E991269049BEA37BEF3D349C3A05
+              FDBE5E940940E3B3B28AACA3CA084BC84D6058FE0ADF944CE57213703ABAE421
+              1D8D59C261140824CDFFA5EDDBD1F49B8FD070F830AE6DDD0A7D2E07378D3879
+              8F7949664AE2031E92DACDBA936149B8CDFF8B5C78CBD5AB7010FCC2DB6F437F
+              E58A7A47659FC9088D800DCC3CE4F360BCFC624379486432951A87C154CD2EA6
+              2C89E7A47AE80D338D0EEEDE832453F391FEEBC8EED903C30B2F6091B1976A54
+              4824948D743C8E453E9F7EEA298418BA07F89E2110C0C0CE9D30128C8700EB68
+              539245422C6B59C9A124010B6DC4460D903F1E1F611A54DCB84C745CA08EEAE0
+              8B5367CE606D67175E3C770EC58E765CA527586D915E5850C6435C64801A2347
+              5EFEEA2B6CEEEE46FC8B2FE02070A784897696441826EF98984C81783C484033
+              72FD0EA04442B94C47178A2B45049CE4438986E858E4B8E311A6B64892373793
+              573B3EFC10DE9DBB54566EFEE823741F3B06136B8BD41FFFE9D3983B7B161686
+              54EC54BC7F47D42AB43D9DAAAC2D52E3103B9F3F45204692AE34A3C02A110352
+              104B8C73899E08E4B228B1666D3C7A148D247D9E0FC40213181E1CC4C6B7DE82
+              CD62417C2182EBC3C39861A32DD96D2ACD0BF410135CD9537EE2B532ABB5C8C4
+              625A659848CD431C19FC53C562CC564DFD25915D6408B4CCBED475F1127C878F
+              20CD5E969999457060106102492E44914A67101D2288EBFD484C06909C0BA3A5
+              773F7CE72FA2B07BB7CAB84AF5A988940EC96269CA5C5B0ABE921A204A3E98CD
+              4E186CD63BBBA048FA8B8772363B0C762BCA53D3C8E4F298E3822156D950688E
+              0D3DCEC69EE27918B7D97AC2CCD0542687F91BC3C84423D05870250F976F5444
+              27A30BC3C9D2A0082DB21C10588BC66132AF88B564839CA753296418B2565F2B
+              FBA887E5A31E368214528A5A182A1B37E3E02275F4B2DBEDC2BAF5EBE0A97322
+              CFBA249BAA30B32262D348B26BA402D1DC1BD07822C14C637DA8FE5F3A91839E
+              A95AA67B73AC4146F6211BC96F360B75659A60914C49C5D2B10B58382ED5A189
+              1DBD817C34F0D97F25B3885C93CC9D4B2472CC54D6C58AAC00C47EE297D4AF89
+              8A5BA573175908C5A88BC54F006599F2152029442251CC73568A738C90D0C93D
+              F1AC93F3943C2B9B58BE90D8114052EBA6D3E9C9309356DDA0ACF490848C86F4
+              2CE7D26794A80E081592D9D9595CBE7C09C1E0B46A1576BB4385C8E9AC1CED9C
+              1445CD660B7915C3C58B17F037D6AC123753F165758F5C43461A49F940345A0B
+              97C80A40F4DBCD305F36D30B02A346ECEA7115EB8B8C1081C02D0C0CFC034343
+              3738B5F815B9239179127A167EFF38EF7D431DC00239B7BEA3434D8CF9AA0D11
+              A973E5066618818D160A4CB23BB20210BBFACC4CB13863E32E6BA2556015990D
+              668B193D3B76600F5BC7FAF51B485CB7F28C95E41475389CE48F0B3E5F1B76ED
+              DA8583070FA263DD3A1448DCA54DD584F393D4A2E51926B20290089BACDF40E3
+              B58C60C80492D40DE187EC4A4446508FC74BF2362BAE582C76957502D2E572AB
+              CC331A4D48A4537C2FA91AEA928805836C9A9B249A1AA145EE02349E4A8DD29A
+              7A69F9AEC403525FBEFCF22F0C8B9F0D3A4F1EE9A886EA911321492AFFCBF251
+              30378733EC7D67F9BC805B0E48366B6189C893FC8CD7FD01DD4A26FDDC5ACD43
+              3A864C8049CAB7B7B773F72EC6358861B606D1C9C90A87A2D105726846FD1F1E
+              1EC2C8C830B32B8B9E9E1E9599C2A1E59C7410E4ECE2629C23AF4CBD35B9DB43
+              91C898B05F475052D697FCA467A864A7DBB66DC53E0E5A9D9D9D68E66428E112
+              1E097FA4204AED696FEFC06E8E2BCF3FFF7DB4B5B6AA2C5B12B539AA4C1193C9
+              A4F4B03B37297701F297CB37658E36B0CF482D910784E211CE3C8B853CEA59CC
+              F26C1D265674595C548AA48105D56AB52980F25F3C6A6798655EBA4D0F4A1B55
+              8BF17A892544FC351E8BAD0897C8DD2123A6594D2B4A595773200DD8B89B7A16
+              C05FBFF3137CCC869AAF27A1DB7C68E1779C747C217203BF589B9A9AD435AFCF
+              07B3A7197F9C9CC0BB3F7E07A9BEBECAA711B34A3EA372F42898B1B7346D4586
+              892C85758504366E4CACEDEAAA9BE627F2E2E4248A2C72320F9DA39E7237A271
+              DF5E781F7C10566F0B8CF4860CF21CB5D5E74D995ECCB1FE44C6C73073FE3C0E
+              10D44B7C4FE2629212B16913D6AC5D0BD0F6EB7D7D6F72BAFA98B76A724F40CF
+              0107DF6B6E3EBAABABEB716E1B2166C3048159F8652AE41CA4CAF02E5F2339A6
+              7689FD4B4C19A45691C86EFE6BA36EA1365353AC59DE4D1BB196959DFD05E191
+              9185E3D3D39FFC1CF8857C60F0919ADC13D0927C173870C4687CFD7B9B371FAA
+              6B6B3366E88141B68F447F3F4C4C7B6907425269326248A63DE18084BAC01039
+              B66FC3A6B635A8E739531197FBFBBFFA433A7DFC14BFDE23FC80E16377C97D01
+              2D898F1B7E1338F2E29A352F77777676B30AE226BFFB030C657668A80644C262
+              61485AE9D5873803C9E7CDADD1D1A93F8F8DFDE93870FCAFC079B1773FF95680
+              96CB7780DE1FD86C6F3CB766CD217B47872945F2F771E4D5F8E9D4BDBA156E86
+              0D535338EBF77FF1BB64F2F72781D37C6DF9B0F8BF11F1DA07C0CF263C9E61ED
+              8927346DEF5E6D7ED5AAE06F815F6D031EA93EF6FF913780C33F027EC85361F7
+              7F21C03F014E89ECD09A72BE280000000049454E44AE426082}
+            FileName = 
+              'C:\CompXE_10_2\RestDW\CORE\Samples\SimpleServer\CienteFMX\Artwor' +
+              'k\Android\FM_LauncherIcon_36x36.png'
+          end>
+        Align = Left
+        Size.Width = 74.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+    object Layout2: TLayout
+      Align = Client
+      Size.Width = 427.000000000000000000
+      Size.Height = 526.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object Layout3: TLayout
+        Align = Bottom
+        Position.Y = 294.000000000000000000
+        Size.Width = 427.000000000000000000
+        Size.Height = 232.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object Grid1: TGrid
+          Align = Client
+          CanFocus = True
+          ClipChildren = True
+          Size.Width = 427.000000000000000000
+          Size.Height = 232.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          RowCount = 0
+          Viewport.Width = 423.000000000000000000
+          Viewport.Height = 207.000000000000000000
+        end
+      end
+      object Layout4: TLayout
+        Align = Top
+        Size.Width = 427.000000000000000000
+        Size.Height = 131.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object lst1: TListBox
+          Align = Client
+          Size.Width = 427.000000000000000000
+          Size.Height = 131.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          DisableFocusEffect = True
+          ItemHeight = 40.000000000000000000
+          DefaultItemStyles.ItemStyle = ''
+          DefaultItemStyles.GroupHeaderStyle = ''
+          DefaultItemStyles.GroupFooterStyle = ''
+          Viewport.Width = 423.000000000000000000
+          Viewport.Height = 127.000000000000000000
+          object ListBoxItem1: TListBoxItem
+            Size.Width = 423.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+            Text = 'Ip do Servidor'
+            object edtip: TEdit
+              Touch.InteractiveGestures = [LongTap, DoubleTap]
+              Align = Right
+              TabOrder = 0
+              Text = '127.0.0.1'
+              TextSettings.HorzAlign = Trailing
+              Position.X = 262.000000000000000000
+              Position.Y = 3.000000000000000000
+              Margins.Left = 3.000000000000000000
+              Margins.Top = 3.000000000000000000
+              Margins.Right = 5.000000000000000000
+              Margins.Bottom = 3.000000000000000000
+              Size.Width = 156.000000000000000000
+              Size.Height = 34.000000000000000000
+              Size.PlatformDefault = False
+            end
+          end
+          object ListBoxItem2: TListBoxItem
+            Position.Y = 40.000000000000000000
+            Size.Width = 423.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 1
+            Text = 'Porta do Servidor'
+            object edtporta: TEdit
+              Touch.InteractiveGestures = [LongTap, DoubleTap]
+              Align = Right
+              TabOrder = 0
+              Text = '8082'
+              TextSettings.HorzAlign = Trailing
+              Position.X = 262.000000000000000000
+              Position.Y = 3.000000000000000000
+              Margins.Left = 3.000000000000000000
+              Margins.Top = 3.000000000000000000
+              Margins.Right = 5.000000000000000000
+              Margins.Bottom = 3.000000000000000000
+              Size.Width = 156.000000000000000000
+              Size.Height = 34.000000000000000000
+              Size.PlatformDefault = False
+            end
+          end
+          object ListBoxItem3: TListBoxItem
+            Position.Y = 80.000000000000000000
+            Size.Width = 423.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 2
+            Text = 'Tempo de Resposta:'
+          end
+        end
+      end
+      object Layout5: TLayout
+        Align = Client
+        Size.Width = 427.000000000000000000
+        Size.Height = 163.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        object mmo1: TMemo
+          Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+          DataDetectorTypes = []
+          Lines.Strings = (
+            'select first(1)* from employee')
+          Align = Client
+          Size.Width = 427.000000000000000000
+          Size.Height = 163.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          Viewport.Width = 423.000000000000000000
+          Viewport.Height = 159.000000000000000000
+        end
+      end
+    end
+  end
+  object RESTDWDataBase1: TRESTDWDataBase
+    Active = False
+    Compression = True
+    Login = 'testserver'
+    Password = 'testserver'
+    Proxy = False
+    ProxyOptions.Port = 8888
+    PoolerService = '192.168.2.40'
+    PoolerPort = 8082
+    PoolerName = 'TServerMethodDM.RESTDWPoolerDB1'
+    StateConnection.AutoCheck = False
+    StateConnection.InTime = 1000
+    RequestTimeOut = 10000
+    EncodeStrings = True
+    Encoding = esUtf8
+    StrsTrim = False
+    StrsEmpty2Null = False
+    StrsTrim2Len = True
+    DateSeparator = '/'
+    TimeSeparator = ':'
+    DecimalSeparator = ','
+    Left = 32
+    Top = 72
+  end
+  object DataSource1: TDataSource
+    DataSet = RESTDWClientSQL1
+    Left = 128
+    Top = 160
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 84
+    Top = 69
+    object LinkGridToDataSourceBindSourceDB1: TLinkGridToDataSource
+      Category = 'Quick Bindings'
+      DataSource = BindSourceDB1
+      GridControl = Grid1
+      Columns = <>
+    end
+  end
+  object RESTDWClientSQL1: TRESTDWClientSQL
+    FieldDefs = <
+      item
+        Name = 'EMP_NO'
+        Attributes = [faRequired]
+        DataType = ftSmallint
+      end
+      item
+        Name = 'FIRST_NAME'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 15
+      end
+      item
+        Name = 'LAST_NAME'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 20
+      end
+      item
+        Name = 'PHONE_EXT'
+        DataType = ftString
+        Size = 4
+      end
+      item
+        Name = 'HIRE_DATE'
+        Attributes = [faRequired]
+        DataType = ftTimeStamp
+      end
+      item
+        Name = 'DEPT_NO'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 3
+      end
+      item
+        Name = 'JOB_CODE'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 5
+      end
+      item
+        Name = 'JOB_GRADE'
+        Attributes = [faRequired]
+        DataType = ftSmallint
+      end
+      item
+        Name = 'JOB_COUNTRY'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 15
+      end
+      item
+        Name = 'SALARY'
+        Attributes = [faRequired]
+        DataType = ftFloat
+      end
+      item
+        Name = 'FULL_NAME'
+        DataType = ftString
+        Size = 37
+      end>
+    IndexDefs = <>
+    MasterFields = ''
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    StoreDefs = True
+    MasterCascadeDelete = True
+    Inactive = False
+    DataCache = False
+    Params = <>
+    DataBase = RESTDWDataBase1
+    SQL.Strings = (
+      'select * from employee')
+    CacheUpdateRecords = True
+    InBlockEvents = False
+    Left = 40
+    Top = 153
+  end
+  object BindSourceDB1: TBindSourceDB
+    DataSet = RESTDWClientSQL1
+    ScopeMappings = <>
+    Left = 200
+    Top = 224
+  end
+end

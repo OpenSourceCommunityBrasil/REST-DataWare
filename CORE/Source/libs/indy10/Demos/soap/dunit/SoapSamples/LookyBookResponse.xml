@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <soap:Body>
+      <GetInfoResponse xmlns="http://dinoch.dyndns.org/webservices/">
+         <GetInfoResult xmlns="http://dinoch.dyndns.org/bookService">
+            <isbn>0060652942</isbn>
+
+            <title>The Abolition of Man</title>
+
+            <author>C. S. Lewis</author>
+
+            <pubdate>March 2001</pubdate>
+
+            <publisher>Harper San Francisco</publisher>
+
+            <imgUrl>http://images.barnesandnoble.com/images/5400000/5400321.gif</imgUrl>
+
+            <timestamp>22.08.2002 05:38:30</timestamp>
+
+            <vendorprice>
+               <name>Barnes &amp; Noble</name>
+
+               <siteUrl>http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=35831040&amp;bfpid=0060652942</siteUrl>
+
+               <pricePrefix>$</pricePrefix>
+
+               <price>8.00</price>
+            </vendorprice>
+
+            <vendorprice>
+               <name>Amazon</name>
+
+               <siteUrl>http://www.amazon.com/exec/obidos/ASIN/0060652942</siteUrl>
+
+               <pricePrefix>$</pricePrefix>
+
+               <price>8.00</price>
+            </vendorprice>
+
+            <vendorprice>
+               <name>Bookshop.co.uk</name>
+
+               <siteUrl>http://www.bookshop.co.uk/ser/serdsp.asp?isbn=0060652942</siteUrl>
+
+               <pricePrefix>£</pricePrefix>
+
+               <price>[unavailable]</price>
+            </vendorprice>
+         </GetInfoResult>
+      </GetInfoResponse>
+   </soap:Body>
+</soap:Envelope>
+

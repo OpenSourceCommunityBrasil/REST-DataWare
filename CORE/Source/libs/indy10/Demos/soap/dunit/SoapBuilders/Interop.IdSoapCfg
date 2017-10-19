@@ -1,0 +1,6 @@
+[WSDL]
+Source=file:Interop.wsdl
+Pascal=Interop.pas
+factory=1
+PrependTypes=1
+

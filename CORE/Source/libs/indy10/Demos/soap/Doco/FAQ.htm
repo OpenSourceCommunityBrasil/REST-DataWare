@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>IndySoap FQA</title>
+</head>
+<body>
+<h1 style="margin: 0in 0in 6pt; text-indent: 0in;">IndySoap FAQ</h1>
+<h3 class="MsoNormal">Project </h3>
+<p style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>What&#8217;s 	the relationship
+between IndySoap and Indy?<br>
+	IndySoap and Indy are closely related but there is some differences
+between the 	2 projects. The projects share some of the same
+development team, the same 	licence, and similar coding standards.
+IndySoap makes use of some core Indy 	infrastructure, but other
+transport mechanisms that are not Indy dependent are 	provided 	<span
+ style="">&nbsp;</span></p>
+<p style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>Where&#8217;s 	the source etc<br>
+	see the Project Home page at <a
+ href="http://www.nevrona.com/indy/soap">http://www.indyproject.org/soap</a><span
+ style="">&nbsp;</span></p>
+<p style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>What 	compilers are
+currently supported?<br>
+	Delphi 4 &#8211; 7, all editions except Delphi 4 personal<br>
+	Kylix 2 &amp; 3(?), all editions</p>
+<p style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>Does/Will 	IndySoap
+support dynamic WSDL usage?<br>
+	Possibly. If you can figure out a coherent use case, then the IndySoap
+	development team will look at it.<br style="">
+	<br style="">
+</p>
+<span style="font-family: Symbol;"></span>
+<h3 class="MsoNormal">&nbsp;Specifications and Standards</h3>
+<p style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>Is 	IndySoap compliant
+with the SOAP specification?<br>
+	IndySoap is [nearly] compliant with the SOAP V1.1 and WSDL V1.1
+specifications. 	For further information, see the doco</p>
+<p class="MsoNormal" style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>Does 	IndySoap handle
+SOAP-Document?<br>
+	<span style="">Well, sort of.&nbsp;It depends whether this is
+SOAP-Document&nbsp;but actually for RPC, like .Net uses
+it,&nbsp;or&nbsp;whether this is really Soap-Document that can't be
+supported by an object serialiser</span></p>
+<p class="MsoNormal" style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>How 	does SOAP compare
+with CORBA?<br>
+	Don&#8217;t know. Go ask an expert in both<br style="">
+</p>
+<p class="MsoNormal" style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>Why 	would you use SOAP
+instead of CORBA?<br>
+	Well, CORBA requires a intermediary server, for one. Otherwise, see
+previous 	question.<span style="">&nbsp;</span></p>
+<p class="MsoNormal" style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>Why 	would you use SOAP
+instead of XML-RPC?<br>
+	Cause the whole world is jumping on SOAP. IndySoap may support XML-RPC
+at some 	stage. This possibility has not been investigated
+though.&nbsp; 	<o:p></o:p></p>
+<h3 class="MsoNormal">Security</h3>
+<p class="MsoNormal" style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>What 	support does
+IndySoap have for Security?<br>
+	Refer the IndySoap documentation for a discussion about security&nbsp;
+	<o:p></o:p></p>
+<h3 class="MsoNormal">State vs Stateless / Persistence</h3>
+<p class="MsoNormal" style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>Can 	you use properties
+in interfaces?<br>
+	Well, yes, but they don&#8217;t have any meaning to IndySoap </p>
+<p class="MsoNormal" style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>Is 	my interface
+implementation persistent on the server?<br>
+	No. A different object will be used for each method call. You cannot
+rely on 	any persistence on the server. You will have to organize this
+yourself.</p>
+<p class="MsoNormal" style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>Can 	the client and
+server pass object references back and forwards?<br>
+	There is no built in support for this in either SOAP or IndySoap. </p>
+<p class="MsoNormal" style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>Why 	is it called an
+&#8220;object&#8221; access protocol?<br>
+	We don&#8217;t know. You tell us, (Actually, it is an &#8220;object&#8221; access
+protocol, but 	not an object in the same narrow sense meant in a 3GL
+programming 	language)&nbsp; 	<o:p></o:p></p>
+<h3 class="MsoNormal">Coding standards</h3>
+<p class="MsoNormal" style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>Does 	Kestral apply them
+internally?<br>
+	Yes. Where possible.&nbsp; 	<o:p></o:p></p>
+<h3 class="MsoNormal">Interface Issues</h3>
+<p class="MsoNormal" style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>What 	types can be used
+in interfaces?<br>
+	Currently, the list is as follows:</p>
+<ol>
+	
+</ol>
+		
+<ul>
+  <li>ShortInt 		</li>
+  <li>Byte 		</li>
+  <li>SmallInt 		</li>
+  <li>Word 		</li>
+  <li>Integer,Longint 		</li>
+  <li>Cardinal 		</li>
+  <li>Int64 		</li>
+  <li>ShortString 		</li>
+  <li>String,AnsiString 		</li>
+  <li>WideString 		</li>
+  <li>Char 		</li>
+  <li>WideChar 		</li>
+  <li>Single 		</li>
+  <li>Double 		</li>
+  <li>Extended 		</li>
+  <li>Comp 		</li>
+  <li>Currency 		</li>
+  <li>Enumerations 		</li>
+  <li>Dynamic 			arrays 		</li>
+  <li>Classes 		</li>
+  <li>Sets</li>
+</ul>
+	 		 	 		 	 		 	 		 	 		 	 		 	 		 	 		 	 		 	 		 	 		 	 		 	 		 	 		 	 		 	 		 	 		 	 		 	 		 	
+<p class="MsoNormal"
+ style="margin: 5pt 0in 5pt 0.5in; text-indent: -0.25in;"><span
+ style="font-size: 10pt; font-family: Symbol;">&middot;</span>What
+	about DateTime types?<br>
+	You can use either TDateTime, or the IndySoap types TIdSoapDateTime ,
+	TIdSoapDate and TidSoapTime. Refer to the IndySoap Documentation for
+discussion 	on the merits of otherwise of these types 	<br style="">
+</p>
+<p class="MsoNormal"
+ style="margin: 5pt 0in 5pt 0.5in; text-indent: -0.25in;"><span
+ style="font-size: 10pt; font-family: Symbol;">&middot;</span>Can 	I
+transfer binary content?<br>
+	Yes &#8211; use a TStream or THexStream. Attachments are not yet completely
+supported. Read the IndySoap doco for further information</p>
+<h3 class="MsoNormal">Server Deployment</h3>
+<p class="MsoNormal" style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>Can 	you run IndySoap in
+an ISAPI server?<br>
+	Yes, though we haven&#8217;t implemented any ISAPI framework support yet.
+For further 	information, consult the doco&nbsp; 	<o:p></o:p></p>
+<h3 class="MsoNormal">Compiler Issues</h3>
+<p class="MsoNormal" style="margin-left: 0.5in; text-indent: -0.25in;"><span
+ style="font-family: Symbol;">&middot;</span>Why 	can&#8217;t I compile a
+program using IndySoap?<br>
+	There is a known bug in most windows versions of the compiler that
+will cause 	an internal error on lines like this:<br>
+	<span style="">&nbsp; </span>LIntf<span style="">&nbsp; </span>:=
+	AClient as IMyInterface;<br>
+	The only known workaround is to build the application at this point,
+or use 	IdSoapD4Interface - see the doco</p>
+<p class="MsoNormal">&nbsp; 	<o:p></o:p></p>
+</body>
+</html>

@@ -1,0 +1,552 @@
+<definitions name="statservice"
+   targetNamespace="http://www.genesyslab.com/services/statservice/wsdl/2001/05"
+   xmlns:tns="http://www.genesyslab.com/services/statservice/wsdl/2001/05"
+   xmlns:sst="http://www.genesyslab.com/services/statservice/types/2001/05"
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+   xmlns="http://schemas.xmlsoap.org/wsdl/"
+   xmlns:dsml="http://www.dsml.org/DSML">
+
+	<!-- Messages definitions -->
+	<!-- Login message definitions -->
+	<!-- Login input message definition -->
+	<message name="loginInput">
+		<!-- reference of the client request -->
+		<part name="reference" type="xsd:string"/>
+		<!-- the login name and the password parameters -->
+		<part name="identity" type="sst:identity"/>
+		<!-- the notification mode and the timeout parameters -->
+		<part name="notification" type="sst:notification"/>
+	</message>
+	<!-- Login output message definition -->
+	<message name="loginOutput">
+		<!-- the reference of the client request and the server session identifier -->
+		<part name="loginResult" type="sst:loginResponse"/>
+	</message>
+	<!-- Logout message definitions -->
+	<!-- Logout input message definition -->
+	<message name="logoutInput">
+		<!-- reference of the client request -->
+		<part name="reference" type="xsd:string"/>
+		<!-- the server session identifier -->
+		<part name="sid" type="xsd:string"/>
+	</message>
+	<!-- Logout output message definition -->
+	<message name="logoutOutput">
+		<!-- reference of the client request -->
+		<part name="reference" type="xsd:string"/>
+	</message>
+	<!-- Session update message definitions -->
+	<!-- Session update input message definition -->
+	<message name="sessionUpdateInput">
+		<!-- reference of the client request -->
+		<part name="reference" type="xsd:string"/>
+		<!-- the server session identifier -->
+		<part name="sid" type="xsd:string"/>
+		<!-- the notification mode and the timeout parameters -->
+		<part name="notification" type="sst:notification"/>
+	</message>
+	<!-- Session update output message definition -->
+	<message name="sessionUpdateOutput">
+		<!-- reference of the client request -->
+		<part name="reference" type="xsd:string"/>
+	</message>
+	<!-- Retrieve configuration message definitions -->
+	<!-- RetrieveConfiguration input message definition -->
+	<message name="retrieveConfigurationInput">
+		<!-- reference of the client request -->
+		<part name="reference" type="xsd:string"/>
+		<!-- the server session identifier -->
+		<part name="sid" type="xsd:string"/>
+		<!-- the RFC2254 criteria string and the attribute list parameters -->
+		<part name="configurationRequest" type="sst:configurationRequest"/>
+	</message>
+	<!-- RetrieveConfiguration output message definition -->
+	<message name="retrieveConfigurationOutput">
+		<!-- the reference of the client request and the configuration in DSML syntax -->
+		<part name="retrieveConfigurationResult" type="sst:retrieveConfigurationResponse"/>
+	</message>
+	<!-- Subscribe statistic message definitions -->
+	<!-- SubscribeStatistic input message definition -->
+	<message name="subscribeStatisticInput">
+		<!-- reference of the client request -->
+		<part name="reference" type="xsd:string"/>
+		<!-- the server session identifier -->
+		<part name="sid" type="xsd:string"/>
+		<!-- the statistic identifier, object type, metric and schedule parameters -->
+		<part name="statistic" type="sst:statistic"/>
+		<!-- the statistic server resource -->
+		<part name="resource" type="xsd:string" nullable="true"/>
+	</message>
+	<!-- SubscribeStatistic output message definition -->
+	<message name="subscribeStatisticOutput">
+		<!-- reference of the client request -->
+		<part name="reference" type="xsd:string"/>
+	</message>
+	<!-- Unsubscribe statistic message definitions -->
+	<!-- UnsubscribeStatistic input message definition -->
+	<message name="unsubscribeStatisticInput">
+		<!-- reference of the client request -->
+		<part name="reference" type="xsd:string"/>
+		<!-- the server session identifier -->
+		<part name="sid" type="xsd:string"/>
+		<!-- the statistic identifier parameter -->
+		<part name="statisticId" type="xsd:string"/>
+	</message>
+	<!-- UnsubscribeStatistic output message definition -->
+	<message name="unsubscribeStatisticOutput">
+		<!-- reference of the client request -->
+		<part name="reference" type="xsd:string"/>
+	</message>
+	<!-- Retrieve subscribed statistics message definitions -->
+	<!-- RetrieveSubscribedStatistics input message definition -->
+	<message name="retrieveSubscribedStatisticsInput">
+		<!-- reference of the client request -->
+		<part name="reference" type="xsd:string"/>
+		<!-- the server session identifier -->
+		<part name="sid" type="xsd:string"/>
+		<!-- the scope and statistic identifier list -->
+		<part name="subscriptions" type="sst:statisticSubscriptions"/>
+	</message>
+	<!-- RetrieveSubscribedStatistics output message definition -->
+	<message name="retrieveSubscribedStatisticsOutput">
+		<!-- the reference of the client request and the statistic values -->
+		<part name="retrieveSubscribedStatisticsResult" type="sst:retrieveSubscribedStatisticsResponse"/>
+	</message>
+	<!-- Retrieve statistic message definitions -->
+	<!-- RetrieveStatistic input message definition -->
+	<message name="retrieveStatisticInput">
+		<!-- reference of the client request -->
+		<part name="reference" type="xsd:string"/>
+		<!-- the server session identifier -->
+		<part name="sid" type="xsd:string"/>
+		<!-- the statistic identifier, object type, metric and schedule parameters -->
+		<part name="statistic" type="sst:statistic"/>
+		<!-- the statistic server resource -->
+		<part name="resource" type="xsd:string" nullable="true"/>
+	</message>
+	<!-- RetrieveStatistic output message definition -->
+	<message name="retrieveStatisticOutput">
+		<!-- the reference of the client request and the statistic value -->
+		<part name="retrieveStatisticResult" type="sst:retrieveStatisticResponse"/>
+	</message>
+	<!-- Retrieve statistical profile message definitions -->
+	<!-- RetrieveStatisticalProfile input message definition -->
+	<message name="retrieveStatisticalProfileInput">
+		<!-- reference of the client request -->
+		<part name="reference" type="xsd:string"/>
+		<!-- the server session identifier -->
+		<part name="sid" type="xsd:string"/>
+		<!-- the statistic server -->
+		<part name="resource" type="xsd:string" nullable="true"/>
+		<!-- the statistical profile type parameter -->
+		<part name="profileType" type="sst:statisticalProfileType"/>
+	</message>
+	<!-- RetrieveStatisticalProfile output message definition -->
+	<message name="retrieveStatisticalProfileOutput">
+		<!-- the reference of the client request and the statistical profile information -->
+		<part name="retrieveStatisticalProfileResult" type="sst:retrieveStatisticalProfileResponse"/>
+	</message>
+	<portType name="statPortType">
+		<operation name="login">
+			<input message="tns:loginInput"/>
+			<output message="tns:loginOutput"/>
+		</operation>
+		<!-- Definition of the logout operation -->
+		<operation name="logout">
+			<input message="tns:logoutInput"/>
+			<output message="tns:logoutOutput"/>
+		</operation>
+		<!-- Definition of the sessionUpdate operation -->
+		<operation name="sessionUpdate">
+			<input message="tns:sessionUpdateInput"/>
+			<output message="tns:sessionUpdateOutput"/>
+		</operation>
+		<!-- Definition of the retrieveConfiguration operation -->
+		<operation name="retrieveConfiguration">
+			<input message="tns:retrieveConfigurationInput"/>
+			<output message="tns:retrieveConfigurationOutput"/>
+		</operation>
+		<!-- Definition of the subscribeStatistic operation -->
+		<operation name="subscribeStatistic">
+			<input message="tns:subscribeStatisticInput"/>
+			<output message="tns:subscribeStatisticOutput"/>
+		</operation>
+		<!-- Definition of the unsubscribeStatistic operation -->
+		<operation name="unsubscribeStatistic">
+			<input message="tns:unsubscribeStatisticInput"/>
+			<output message="tns:unsubscribeStatisticOutput"/>
+		</operation>
+		<!-- Definition of the retrieveSubscribedStatistics operation -->
+		<operation name="retrieveSubscribedStatistics">
+			<input message="tns:retrieveSubscribedStatisticsInput"/>
+			<output message="tns:retrieveSubscribedStatisticsOutput"/>
+		</operation>
+		<!-- Definition of the retrieveStatistic operations -->
+		<operation name="retrieveStatistic">
+			<input message="tns:retrieveStatisticInput"/>
+			<output message="tns:retrieveStatisticOutput"/>
+		</operation>
+		<!-- Definition of the retrieveStatisticalProfile operation -->
+		<operation name="retrieveStatisticalProfile">
+			<input message="tns:retrieveStatisticalProfileInput"/>
+			<output message="tns:retrieveStatisticalProfileOutput"/>
+		</operation>
+	</portType>
+	<binding name="statPortSoapBinding" type="tns:statPortType">
+		<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="login">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</input>
+			<output>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</output>
+		</operation>
+		<!-- SOAP Binding of the logout operation -->
+		<operation name="logout">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</input>
+			<output>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</output>
+		</operation>
+		<!-- SOAP Binding of the sessionUpdate operation -->
+		<operation name="sessionUpdate">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</input>
+			<output>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</output>
+		</operation>
+		<!-- SOAP Binding of the retrieveConfiguration operation -->
+		<operation name="retrieveConfiguration">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</input>
+			<output>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</output>
+		</operation>
+		<!-- SOAP Binding of the subscribeStatistic operation -->
+		<operation name="subscribeStatistic">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</input>
+			<output>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</output>
+		</operation>
+		<!-- SOAP Binding of the unsubscribeStatistic operation -->
+		<operation name="unsubscribeStatistic">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</input>
+			<output>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</output>
+		</operation>
+		<!-- SOAP Binding of the retrieveSubscribedStatistics operation -->
+		<operation name="retrieveSubscribedStatistics">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</input>
+			<output>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</output>
+		</operation>
+		<!-- SOAP Binding of the retrieveStatistic operation -->
+		<operation name="retrieveStatistic">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</input>
+			<output>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</output>
+		</operation>
+		<!-- SOAP Binding of the retrieveStatisticalProfile operation -->
+		<operation name="retrieveStatisticalProfile">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</input>
+			<output>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.genesyslab.com/services/statservice/types/2001/05"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="statService">
+		<documentation>Genesys Statistical Service</documentation>
+		<port name="statPort" binding="tns:statPortSoapBinding">
+<soap:address location="http://astro:8080/gis/services/statservice/soap-1"/>
+<!--<soap:address location="http://localhost:8080/Project1.GISServer/soap/statPortType"/> -->
+		</port>
+	</service>
+	<!-- Definition of the types or data types of the statservice API -->
+	<types>
+		<!-- Definition of the XML schema of the statservice API -->
+		<schema
+		   targetNamespace="http://www.genesyslab.com/services/statservice/types/2001/05"
+		   xmlns="http://www.w3.org/2001/XMLSchema"
+		   xmlns:sst="http://www.genesyslab.com/services/statservice/types/2001/05">
+			<simpleType name="requestReference">
+				<restriction base="xsd:string"/>
+			</simpleType>
+<!--			<element name="dsml" type="dsml:dsml"/>-->
+			<simpleType name="rfc2254">
+				<restriction base="xsd:string"/>
+			</simpleType>
+			<complexType name="parameter">
+				<sequence>
+					<element name="key" type="xsd:string"/>
+					<element name="value" type="xsd:string"/>
+				</sequence>
+			</complexType>
+			<complexType name="parameters">
+				<sequence>
+					<element name="parameter" type="sst:parameter" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+			<simpleType name="objectType">
+				<restriction base="xsd:string">
+					<enumeration value="Agent"/>
+					<enumeration value="Place"/>
+					<enumeration value="GroupAgents"/>
+					<enumeration value="GroupPlaces"/>
+					<enumeration value="GroupQueues"/>
+					<enumeration value="RegDN"/>
+					<enumeration value="Queue"/>
+					<enumeration value="RoutePoint"/>
+				</restriction>
+			</simpleType>
+			<complexType name="actions">
+				<sequence>
+					<element name="action" type="xsd:string" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+			<complexType name="statisticType">
+				<sequence>
+					<element name="objectType" type="sst:objectType" maxOccurs="unbounded"/>
+					<element name="category" type="xsd:string"/>
+					<element name="subject" type="xsd:string"/>
+					<element name="mainActions" type="sst:actions" minOccurs="0"/>
+					<element name="relativeActions" type="sst:actions" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<simpleType name="timeIntervalType">
+				<restriction base="xsd:string">
+					<enumeration value="GrowingWindow"/>
+					<enumeration value="SlidingWindow"/>
+					<enumeration value="SelectionWindow"/>
+				</restriction>
+			</simpleType>
+			<complexType name="timeInterval">
+				<sequence>
+					<element name="intervalType" type="sst:timeIntervalType"/>
+					<element name="length" type="xsd:int" minOccurs="0"/>
+					<element name="slideLength" type="xsd:int" minOccurs="0"/>
+					<element name="timeProfileName" type="xsd:string" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<complexType name="timeRangeType">
+				<sequence>
+					<element name="leftTime" type="xsd:int"/>
+					<element name="rightTime" type="xsd:int"/>
+				</sequence>
+			</complexType>
+			<complexType name="metric">
+				<sequence>
+					<element name="typeName" type="xsd:string" minOccurs="0"/>
+					<element name="statisticType" type="sst:statisticType" minOccurs="0"/>
+					<element name="interval" type="sst:timeInterval"/>
+					<element name="filterName" type="xsd:string" minOccurs="0"/>
+					<element name="timeRangeName" type="xsd:string" minOccurs="0"/>
+					<element name="timeRange" type="sst:timeRangeType" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<complexType name="schedule">
+				<sequence>
+					<element name="notificationMode">
+						<simpleType>
+							<restriction base="xsd:string">
+								<enumeration value="ChangesBased"/>
+								<enumeration value="TimeBased"/>
+								<enumeration value="ResetBased"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="timeout" type="xsd:int" minOccurs="0"/>
+					<element name="insensitivity" type="xsd:int" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<complexType name="objectIdType">
+				<sequence>
+					<element name="id" type="xsd:string"/>
+					<element name="tenantName" type="xsd:string"/>
+				</sequence>
+			</complexType>
+			<complexType name="statistic">
+				<sequence>
+					<element name="statisticId" type="xsd:string"/>
+					<element name="objectId" type="sst:objectIdType"/>
+					<element name="metric" type="sst:metric"/>
+					<element name="schedule" type="sst:schedule" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<complexType name="loginResponse">
+				<sequence>
+					<element name="reference" type="sst:requestReference"/>
+					<element name="sid" type="xsd:string"/>
+				</sequence>
+			</complexType>
+			<complexType name="retrieveConfigurationResponse">
+				<sequence>
+					<element name="reference" type="sst:requestReference"/>
+					<element name="configurationResponse">
+						<complexType>
+							<sequence>
+								<any namespace="##any" maxOccurs="unbounded" processContents="skip"/>
+							</sequence>
+						</complexType>
+					</element>
+				</sequence>
+			</complexType>
+			<complexType name="retrieveSubscribedStatisticsResponse">
+				<sequence>
+					<element name="reference" type="sst:requestReference"/>
+					<element name="statisticValues" type="sst:statisticValues"/>
+				</sequence>
+			</complexType>
+			<complexType name="retrieveStatisticResponse">
+				<sequence>
+					<element name="reference" type="sst:requestReference"/>
+					<element name="statisticValue" type="sst:statisticValue"/>
+				</sequence>
+			</complexType>
+			<complexType name="configurationRequest">
+				<sequence>
+					<element name="criteria" type="sst:rfc2254"/>
+					<element name="attribute" type="xsd:string" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+			<complexType name="retrieveStatisticalProfileResponse">
+				<sequence>
+					<element name="reference" type="sst:requestReference"/>
+					<element name="statisticalProfileInfo" type="sst:profileInfo"/>
+				</sequence>
+			</complexType>
+			<complexType name="notification">
+				<sequence>
+					<element name="mode">
+						<simpleType>
+							<restriction base="xsd:string">
+								<enumeration value="Polling"/>
+								<enumeration value="Blocked"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="timeout" type="xsd:integer"/>
+				</sequence>
+			</complexType>
+			<complexType name="identity">
+				<sequence>
+					<element name="principal" type="xsd:string"/>
+					<element name="credentials" type="xsd:string"/>
+				</sequence>
+			</complexType>
+			<complexType name="statisticSubscription">
+				<sequence>
+					<element name="scope" type="xsd:integer"/>
+					<element name="statisticId" type="xsd:string"/>
+				</sequence>
+			</complexType>
+			<complexType name="statisticSubscriptions">
+				<sequence>
+					<element name="statisticSubscription" type="sst:statisticSubscription" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+			<complexType name="eventValue">
+				<sequence>
+					<element name="date" type="xsd:long"/>
+					<element name="intervalLength" type="xsd:long"/>
+		    		<choice>
+						<element name="fValue" type="xsd:float"/>
+						<element name="lValue" type="xsd:long"/>
+						<element name="unknownValue" type="xsd:string"/>
+					</choice>
+				</sequence>
+			</complexType>
+			<complexType name="statisticValue">
+				<sequence>
+					<element name="statisticId" type="xsd:string" nullable="true"/>
+					<element name="eventValue" type="sst:eventValue" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+			<complexType name="statisticValues">
+				<sequence>
+					<element name="statisticValue" type="sst:statisticValue" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+			<complexType name="timeProfile">
+				<sequence>
+					<element name="key" type="xsd:string"/>
+					<element name="intervalType" type="sst:timeIntervalType"/>
+					<element name="value" type="xsd:string"/>
+				</sequence>
+			</complexType>
+			<complexType name="timeProfiles">
+				<sequence>
+					<element name="timeProfile" type="sst:timeProfile" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+			<complexType name="statisticInfos">
+				<sequence>
+					<element name="statisticTypeInfo" type="sst:statisticTypeInfoType" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+			<complexType name="statisticTypeInfoType">
+				<sequence>
+					<element name="typeName" type="xsd:string"/>
+					<element name="type" type="sst:eventValueTypeType"/>
+					<element name="objectType" type="sst:objectType" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+			<simpleType name="eventValueTypeType">
+				<restriction base="xsd:string">
+					<enumeration value="fValue"/>
+					<enumeration value="lValue"/>
+					<enumeration value="unknownValue"/>
+				</restriction>
+			</simpleType>
+			<complexType name="profileInfo">
+				<sequence>
+					<element name="profileType" type="sst:statisticalProfileType"/>
+					<element name="statisticInfos" type="sst:statisticInfos" minOccurs="0"/>
+					<element name="timeProfiles" type="sst:timeProfiles" minOccurs="0"/>
+					<element name="filters" type="sst:parameters" minOccurs="0"/>
+					<element name="timeRanges" type="sst:parameters" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<complexType name="statisticalProfileType">
+				<simpleContent>
+					<restriction base="xsd:string">
+						<enumeration value="statisticalProfile"/>
+						<enumeration value="timeProfile"/>
+						<enumeration value="filterProfile"/>
+						<enumeration value="timeRangeProfile"/>
+					</restriction>
+				</simpleContent>
+			</complexType> 
+		</schema>
+	</types>
+</definitions>

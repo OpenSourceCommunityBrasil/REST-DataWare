@@ -1,0 +1,170 @@
+<HTML>
+<HEAD>
+<TITLE> echoDate SOAP RPC Method Test </TITLE>
+</HEAD>
+<BODY>
+<H2>METHOD: echoDate</H2>
+<p>
+Enter the SOAP service endpoint URL you wish to use:
+<p>
+URL:&nbsp;<INPUT NAME="soap_svc_url" SIZE="50" VALUE="http://delta.whitemesa.net/interop">
+
+<!-- [in] parameter input goes here -->
+
+<!-- end of parameter input --> 
+
+<p>
+<INPUT TYPE="button" VALUE="Make 'echoDate' Method Call" onclick="OnMakeCall()">
+<p>
+Request message buffer:
+<p>
+<TEXTAREA  NAME="buffer_request" ROWS="15" COLS="80"></TEXTAREA>
+<p>
+Response message buffer:
+<p>
+<TEXTAREA  NAME="buffer_response" ROWS="15" COLS="80"></TEXTAREA>
+<SCRIPT language="Jscript">
+
+// jscript proxy goes here
+// SOAP proxy implementation...this function makes the SOAP invocation
+// and returns the DOM object containing the parsed response message
+// along with the request and response message XML.
+
+// constructor for parameter class
+function classParameter(strName, strContent, strAttributes)
+{
+	this.strName = strName;
+	this.strContent = strContent;
+	this.strAttributes = strAttributes;
+}
+
+// constructor for header class
+function classHeader(strName, strNS, strContent, strAttributes)
+{
+	this.strName = strName;
+	this.strNamespace = strNS;
+	this.strContent = strContent;
+	this.strAttributes = strAttributes;
+}
+
+// SOAP method invocation over HTTP
+// parameters:
+// (1) strURL... the URL for the HTTP 'POST' request.
+// (2) strSOAPAction... the value of the 'SOAPAction" HTTP header sent along with the 'POST' request.
+// (3) strMethod... the name of the method being invoked via SOAP.
+// (4) strMethodNS... the namespace to be associated with the method element in the SOAP request message.
+// (5) arrParameters... an array of type classParameters containing the method parameter names and values.
+// (6) arrHeaders... an array of type classHeader containing any headers to be sent in the SOAP request message.
+// (7) objTextAreaReq... a text area object into which the request message XML will be placed.
+// (8) objTextAreaResp... a text area into which the response message XML will be placed.
+//
+function SOAPInvoke(strURL, strSOAPAction, strMethod, strMethodNS, arrParameters, arrHeaders, objTextAreaReq, objTextAreaResp)
+{
+	var objXMLHTTP = new ActiveXObject("Microsoft.XMLHTTP");
+	var strRequestMsg = "";
+	var index = 0;
+	var elemName = "";
+	var elemContent = "";
+	var objParam;
+
+	objXMLHTTP.Open("POST", strURL, false, "", "");
+	objXMLHTTP.setRequestHeader("SOAPAction", '"' + strSOAPAction + '"');
+	objXMLHTTP.setRequestHeader("Content-Type:", 'text/xml; charset="utf-8"');
+	strRequestMsg=  '<?xml version="1.0" encoding="UTF-8"?>\r\n';
+	strRequestMsg=strRequestMsg + '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">\r\n';
+
+	// construct any header elements required
+	if (arrHeaders.length > 0)
+	{
+		strRequestMsg=strRequestMsg + '<SOAP-ENV:Header>\r\n';
+		for (index = 0 ; index < arrHeaders.length; index++)
+		{
+			objHeader = arrHeaders[index]; 
+			strRequestMsg = strRequestMsg + '<h:' + objHeader.strName + ' xmlns:h="' + objHeader.strNamespace + '"';
+			if (objHeader.strAttributes != "")
+			{
+				strRequestMsg = strRequestMsg + ' ' + objHeader.strAttributes;
+			}
+			strRequestMsg = strRequestMsg + '>';
+			strRequestMsg = strRequestMsg + objHeader.strContent;
+			strRequestMsg = strRequestMsg + '</h:' + objHeader.strName + '>\r\n'; 
+		}
+		strRequestMsg=strRequestMsg + '</SOAP-ENV:Header>\r\n';
+	}
+	strRequestMsg=strRequestMsg + '<SOAP-ENV:Body>\r\n';
+	strRequestMsg=strRequestMsg + '<m:' + strMethod + ' xmlns:m="' + strMethodNS + '">\r\n';
+
+	// construct parameter elements
+
+	for (index = 0 ; index < arrParameters.length; index++)
+	{
+		objParam = arrParameters[index]; 
+		strRequestMsg = strRequestMsg + '<' + objParam.strName;
+		if (objParam.strAttributes != "")
+		{
+			strRequestMsg = strRequestMsg + ' ' + objParam.strAttributes;
+		}
+		strRequestMsg = strRequestMsg + '>'; 
+		strRequestMsg = strRequestMsg + objParam.strContent;
+		strRequestMsg = strRequestMsg + '</' + objParam.strName + '>\r\n'; 
+	}
+	strRequestMsg=strRequestMsg + '</m:' + strMethod + '>\r\n';
+	strRequestMsg=strRequestMsg + '</SOAP-ENV:Body>\r\n';
+	strRequestMsg=strRequestMsg + '</SOAP-ENV:Envelope>';
+	objXMLHTTP.Send (strRequestMsg);
+    
+	if (objXMLHTTP.ResponseXML.xml == "")
+	{
+	      alert(objXMLHTTP.ResponseText);
+	}
+	objTextAreaReq.value = strRequestMsg;
+	objTextAreaResp.value = objXMLHTTP.ResponseText;
+	return objXMLHTTP.ResponseXML;
+}
+
+//
+
+// additional methods
+
+//
+
+function OnMakeCall()
+{
+	var objResponseDOM;
+	var strSOAPAction = "http://soapinterop.org/";
+	var strMethod = "echoDate";
+	var strMethodNS = "http://soapinterop.org/";
+	var strURL = soap_svc_url.value;
+	// set up array of SOAP method parameters
+	var arrParameters = new Array(1);
+
+// input parameter setup goes here
+
+var varParam0 = new classParameter("inputDate", "2002-02-01T10:00:00Z", "");
+arrParameters[0] = varParam0;
+
+//
+
+	// set up array of SOAP message headers
+	var arrHeaders = new Array(0);
+
+	window.status = "Connecting... ";
+	objResponseDOM = SOAPInvoke(strURL, strSOAPAction, strMethod, strMethodNS, arrParameters, arrHeaders, buffer_request, buffer_response);
+
+ 	var objBody = objResponseDOM.selectSingleNode("//SOAP-ENV:Body");
+	var objResponse = objBody.firstChild;
+	// SOAP:Fault??
+	if (objResponse.baseName == "Fault")
+	{
+		alert("Method call failed: SOAP Fault received.");
+		window.status = "Method call failed";
+	}
+	else
+	{
+		// update status bar
+		window.status = "Method call succeeded";
+	}
+}
+</SCRIPT>
+</BODY>
+</HTML>

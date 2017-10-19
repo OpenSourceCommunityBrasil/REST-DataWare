@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+  <SOAP-ENV:Body>
+    <ns1:doGoogleSearchResponse xmlns:ns1="urn:GoogleSearch" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+      <return xsi:type="ns1:GoogleSearchResult">
+        <documentFiltering xsi:type="xsd:boolean">false</documentFiltering>
+        <estimatedTotalResultsCount xsi:type="xsd:int">3</estimatedTotalResultsCount>
+        <directoryCategories xmlns:ns2="http://schemas.xmlsoap.org/soap/encoding/" xsi:type="ns2:Array" ns2:arrayType="ns1:DirectoryCategory[0]"></directoryCategories>
+        <searchTime xsi:type="xsd:double">0.194871</searchTime>
+        <resultElements xmlns:ns3="http://schemas.xmlsoap.org/soap/encoding/" xsi:type="ns3:Array" ns3:arrayType="ns1:ResultElement[3]">
+          <item xsi:type="ns1:ResultElement">
+            <cachedSize xsi:type="xsd:string">12k</cachedSize>
+            <hostName xsi:type="xsd:string"></hostName>
+            <snippet xsi:type="xsd:string"> &lt;b&gt;...&lt;/b&gt; on a simple dialog (via &lt;b&gt;teletype&lt;/b&gt;) with a user, about a &lt;b&gt;...&lt;/b&gt; http://hci.stanford.edu/&lt;b&gt;winograd&lt;/b&gt;/&lt;b&gt;shrdlu&lt;/b&gt;&lt;br&gt; . It is written in &lt;b&gt;MacLisp&lt;/b&gt;, vintage 1970, and to &lt;b&gt;...&lt;/b&gt;</snippet>
+            <directoryCategory xsi:type="ns1:DirectoryCategory">
+              <specialEncoding xsi:type="xsd:string"></specialEncoding>
+              <fullViewableName xsi:type="xsd:string"></fullViewableName>
+            </directoryCategory>
+            <relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
+            <directoryTitle xsi:type="xsd:string"></directoryTitle>
+            <summary xsi:type="xsd:string"></summary>
+            <URL xsi:type="xsd:string">http://hci.stanford.edu/cs147/examples/shrdlu/</URL>
+            <title xsi:type="xsd:string">&lt;b&gt;SHRDLU&lt;/b&gt;</title>
+          </item>
+          <item xsi:type="ns1:ResultElement">
+            <cachedSize xsi:type="xsd:string">12k</cachedSize>
+            <hostName xsi:type="xsd:string"></hostName>
+            <snippet xsi:type="xsd:string"> &lt;b&gt;...&lt;/b&gt; on a simple dialog (via &lt;b&gt;teletype&lt;/b&gt;) with a user, about a &lt;b&gt;...&lt;/b&gt; http://hci.stanford.edu/&lt;b&gt;winograd&lt;/b&gt;/&lt;b&gt;shrdlu&lt;/b&gt;/code&lt;br&gt; . It is written in &lt;b&gt;MacLisp&lt;/b&gt;, vintage 1970, and to &lt;b&gt;...&lt;/b&gt;</snippet>
+            <directoryCategory xsi:type="ns1:DirectoryCategory">
+              <specialEncoding xsi:type="xsd:string"></specialEncoding>
+              <fullViewableName xsi:type="xsd:string"></fullViewableName>
+            </directoryCategory>
+            <relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
+            <directoryTitle xsi:type="xsd:string"></directoryTitle>
+            <summary xsi:type="xsd:string"></summary>
+            <URL xsi:type="xsd:string">http://hci.stanford.edu/winograd/shrdlu</URL>
+            <title xsi:type="xsd:string">&lt;b&gt;SHRDLU&lt;/b&gt;</title>
+          </item>
+          <item xsi:type="ns1:ResultElement">
+            <cachedSize xsi:type="xsd:string">32k</cachedSize>
+            <hostName xsi:type="xsd:string"></hostName>
+            <snippet xsi:type="xsd:string"> &lt;b&gt;...&lt;/b&gt; man and woman through &lt;b&gt;teletype&lt;/b&gt; and has to &lt;b&gt;...&lt;/b&gt; human diseases) 1970* Terry &lt;b&gt;Winograd&apos;s&lt;/b&gt; &lt;b&gt;SHRDLU&lt;/b&gt;&lt;br&gt; (Natural Language Processing &lt;b&gt;...&lt;/b&gt; Lisp Machine Lisp, &lt;b&gt;MacLisp&lt;/b&gt;, NIL, S-1 &lt;b&gt;...&lt;/b&gt;</snippet>
+            <directoryCategory xsi:type="ns1:DirectoryCategory">
+              <specialEncoding xsi:type="xsd:string"></specialEncoding>
+              <fullViewableName xsi:type="xsd:string"></fullViewableName>
+            </directoryCategory>
+            <relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
+            <directoryTitle xsi:type="xsd:string"></directoryTitle>
+            <summary xsi:type="xsd:string"></summary>
+            <URL xsi:type="xsd:string">http://www.trentu.ca/csd/newsarchives/trentu/csp/cr350/79</URL>
+            <title xsi:type="xsd:string"></title>
+          </item>
+        </resultElements>
+        <endIndex xsi:type="xsd:int">3</endIndex>
+        <searchTips xsi:type="xsd:string"></searchTips>
+        <searchComments xsi:type="xsd:string"></searchComments>
+        <startIndex xsi:type="xsd:int">1</startIndex>
+        <estimateIsExact xsi:type="xsd:boolean">true</estimateIsExact>
+        <searchQuery xsi:type="xsd:string">shrdlu winograd maclisp teletype</searchQuery>
+      </return>
+    </ns1:doGoogleSearchResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

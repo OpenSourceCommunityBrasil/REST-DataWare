@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+  <SOAP-ENV:Body>
+    <ns1:doGoogleSearch xmlns:ns1="urn:GoogleSearch" 
+         SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+      <key xsi:type="xsd:string">00000000000000000000000000000000</key>
+      <q xsi:type="xsd:string">shrdlu winograd maclisp teletype</q>
+      <start xsi:type="xsd:int">0</start>
+      <maxResults xsi:type="xsd:int">10</maxResults>
+      <filter xsi:type="xsd:boolean">true</filter>
+      <restrict xsi:type="xsd:string"></restrict>
+      <safeSearch xsi:type="xsd:boolean">false</safeSearch>
+      <lr xsi:type="xsd:string"></lr>
+      <ie xsi:type="xsd:string">latin1</ie>
+      <oe xsi:type="xsd:string">latin1</oe>
+    </ns1:doGoogleSearch>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

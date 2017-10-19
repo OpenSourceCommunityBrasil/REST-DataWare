@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+ <SOAP-ENV:Body>
+  <SOAP-ENV:Fault>
+   <faultcode
+xmlns:ns1="http://xml.apache.org/axis/">ns1:Server.userException</faultcode>
+   <faultstring>java.lang.Exception: BLJAJAJA JAKAS HUJNJA</faultstring>
+   <detail>
+    <ns2:stackTrace xmlns:ns2="http://xml.apache.org/axis/">
+java.lang.Exception: BLJAJAJA JAKAS HUJNJA&#xd; at com.componence.cms.soapapi.login.loginFacade.Login(loginFacade.java:26)&#xd;
+at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)&#xd;
+at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)&#xd;
+at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)&#xd;
+at java.lang.reflect.Method.invoke(Method.java:324)&#xd;
+at org.apache.axis.providers.java.RPCProvider.processMessage(RPCProvider.java:229)&#xd;
+at org.apache.axis.providers.java.JavaProvider.invoke(JavaProvider.java:262)&#xd;
+at org.apache.axis.strategies.InvocationStrategy.visit(InvocationStrategy.java:71)&#xd;
+at org.apache.axis.SimpleChain.doVisiting(SimpleChain.java:154)&#xd;
+at org.apache.axis.SimpleChain.invoke(SimpleChain.java:121)&#xd;
+at org.apache.axis.server.AxisServer.invoke(AxisServer.java:288)&#xd;
+at org.apache.axis.transport.http.AxisServlet.doPost(AxisServlet.java:576)&#xd;
+at javax.servlet.http.HttpServlet.service(HttpServlet.java:211)&#xd;
+at javax.servlet.http.HttpServlet.service(HttpServlet.java:309)&#xd;
+at javax.servlet.http.HttpServlet.service(HttpServlet.java:336)&#xd;
+at com.evermind._cxb._abe(Unknown Source)&#xd;
+at com.evermind._cxb._uec(Unknown Source)&#xd;
+at com.evermind._io._twc(Unknown Source)&#xd;
+at com.evermind._io._gc(Unknown Source)&#xd;
+at com.evermind._if.run(Unknown Source)&#xd;
+</ns2:stackTrace>
+   </detail>
+  </SOAP-ENV:Fault>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

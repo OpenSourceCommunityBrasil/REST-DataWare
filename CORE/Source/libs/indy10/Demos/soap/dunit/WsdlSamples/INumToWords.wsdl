@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="INumToWordsservice" targetNamespace="http://tempuri.org/" xmlns:tns="http://tempuri.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
+  <message name="NumToWords_SwedishRequest">
+    <part name="aNumber" type="xs:int"/>
+    <part name="bStripSpaces" type="xs:boolean"/>
+  </message>
+  <message name="NumToWords_SwedishResponse">
+    <part name="return" type="xs:string"/>
+  </message>
+  <message name="NumToWords_EnglishRequest">
+    <part name="aNumber" type="xs:int"/>
+  </message>
+  <message name="NumToWords_EnglishResponse">
+    <part name="return" type="xs:string"/>
+  </message>
+  <portType name="INumToWords">
+    <operation name="NumToWords_Swedish">
+      <input message="tns:NumToWords_SwedishRequest"/>
+      <output message="tns:NumToWords_SwedishResponse"/>
+    </operation>
+    <operation name="NumToWords_English">
+      <input message="tns:NumToWords_EnglishRequest"/>
+      <output message="tns:NumToWords_EnglishResponse"/>
+    </operation>
+  </portType>
+  <binding name="INumToWordsbinding" type="tns:INumToWords">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="NumToWords_Swedish">
+      <soap:operation soapAction="urn:NumToWordsIntf-INumToWords#NumToWords_Swedish" style="rpc"/>
+      <input>
+        <soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:NumToWordsIntf-INumToWords"/>
+      </input>
+      <output>
+        <soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:NumToWordsIntf-INumToWords"/>
+      </output>
+    </operation>
+    <operation name="NumToWords_English">
+      <soap:operation soapAction="urn:NumToWordsIntf-INumToWords#NumToWords_English" style="rpc"/>
+      <input>
+        <soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:NumToWordsIntf-INumToWords"/>
+      </input>
+      <output>
+        <soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:NumToWordsIntf-INumToWords"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="INumToWordsservice">
+    <port name="INumToWordsPort" binding="tns:INumToWordsbinding">
+      <soap:address location="http://www.tankebolaget.se/scripts/NumToWords.dll/soap/INumToWords"/>
+    </port>
+  </service>
+</definitions>
+

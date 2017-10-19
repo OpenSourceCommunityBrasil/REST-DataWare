@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/10/19 15:38:17.000.383,=rtl.dcp</Transaction>
+    <Transaction>2017/10/19 16:21:31.000.662,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Packages\Delphi\Berlin\RestDatawareCORE.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj</Transaction>
+    <Transaction>2017/10/19 16:22:45.000.588,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\uDWPoolerMethod.pas</Transaction>
+    <Transaction>2017/10/19 16:22:45.000.607,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\uRESTDWBase.pas</Transaction>
+    <Transaction>2017/10/19 16:22:45.000.647,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\uRESTDWReg.pas</Transaction>
+    <Transaction>2017/10/19 16:22:45.000.635,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\uRESTDWPoolerDB.pas</Transaction>
+    <Transaction>2017/10/19 16:22:45.000.617,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\uRESTDWMasterDetailData.pas</Transaction>
+    <Transaction>2017/10/19 16:23:13.000.001,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\DmDados\uDWDatamodule.pas</Transaction>
+    <Transaction>2017/10/19 16:23:50.000.992,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\StringBuilderUnit.pas</Transaction>
+    <Transaction>2017/10/19 16:23:50.000.963,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\ServerUtils.pas</Transaction>
+    <Transaction>2017/10/19 16:23:51.000.049,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\uDWConsts.pas</Transaction>
+    <Transaction>2017/10/19 16:23:51.000.021,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\SysTypes.pas</Transaction>
+    <Transaction>2017/10/19 16:23:51.000.075,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\uDWConstsData.pas</Transaction>
+    <Transaction>2017/10/19 16:23:51.000.106,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\uDWJSONObject.pas</Transaction>
+    <Transaction>2017/10/19 16:23:51.000.129,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\uDWJSONTools.pas</Transaction>
+    <Transaction>2017/10/19 16:24:04.000.140,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\uzliblaz.pas</Transaction>
+    <Transaction>2017/10/19 16:24:18.000.734,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\StringBuilderUnit.pas=</Transaction>
+    <Transaction>2017/10/19 16:24:50.000.541,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\JSON\uDWJSON.pas</Transaction>
+    <Transaction>2017/10/19 16:26:40.000.349,=designide.dcp</Transaction>
+    <Transaction>2017/10/19 16:26:54.000.630,=dbrtl.dcp</Transaction>
+    <Transaction>2017/10/19 16:26:54.000.734,=FireDAC.dcp</Transaction>
+    <Transaction>2017/10/19 16:26:54.000.754,=FireDACCommonDriver.dcp</Transaction>
+    <Transaction>2017/10/19 16:26:54.000.775,=FireDACCommon.dcp</Transaction>
+    <Transaction>2017/10/19 16:26:54.000.651,=soaprtl.dcp</Transaction>
+    <Transaction>2017/10/19 16:26:54.000.672,=IndySystem.dcp</Transaction>
+    <Transaction>2017/10/19 16:26:54.000.693,=IndyProtocols.dcp</Transaction>
+    <Transaction>2017/10/19 16:26:54.000.795,=dsnap.dcp</Transaction>
+    <Transaction>2017/10/19 16:26:54.000.714,=IndyCore.dcp</Transaction>
+    <Transaction>2017/10/19 16:35:46.000.313,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Images\TRESTClientPooler.bmp</Transaction>
+    <Transaction>2017/10/19 16:41:53.000.374,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Images\TRESTDWPoolerDB.bmp</Transaction>
+    <Transaction>2017/10/19 16:41:53.000.412,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Images\TRESTDWStoredProc.bmp</Transaction>
+    <Transaction>2017/10/19 16:41:53.000.393,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Images\TRESTDWPoolerList.bmp</Transaction>
+    <Transaction>2017/10/19 16:41:53.000.335,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Images\TRESTDWClientSQL.bmp</Transaction>
+    <Transaction>2017/10/19 16:41:53.000.355,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Images\TRESTDWDataBase.bmp</Transaction>
+    <Transaction>2017/10/19 16:41:53.000.433,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Images\TRESTServicePooler.bmp</Transaction>
+  </Transactions>
+	<ActiveMobileDevice>
+		<NoProfile iOSSimulator="iPhone5"/>
+	</ActiveMobileDevice>
+</BorlandProject>

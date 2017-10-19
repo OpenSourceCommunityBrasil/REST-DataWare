@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions name="HelloWorld" targetNamespace="http://proxy.org/wsdl" xmlns:tns="http://proxy.org/wsdl" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <types/>
+  <message name="sayHello">
+    <part name="String_1" type="xsd:string"/></message>
+  <message name="sayHelloResponse">
+    <part name="result" type="xsd:string"/></message>
+  <portType name="HelloIF">
+    <operation name="sayHello" parameterOrder="String_1">
+      <input message="tns:sayHello"/>
+      <output message="tns:sayHelloResponse"/></operation></portType>
+  <binding name="HelloIFBinding" type="tns:HelloIF">
+    <operation name="sayHello">
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="encoded" namespace="http://proxy.org/wsdl"/></input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="encoded" namespace="http://proxy.org/wsdl"/></output>
+      <soap:operation soapAction=""/></operation>
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc"/></binding>
+  <service name="HelloWorld">
+    <port name="HelloIFPort" binding="tns:HelloIFBinding">
+      <soap:address location="http://localhost:8080/jaxrpc-proxy/jaxrpc/HelloIF"/></port></service></definitions>

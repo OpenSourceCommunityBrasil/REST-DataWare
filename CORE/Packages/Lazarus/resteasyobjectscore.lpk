@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="4">
+    <PathDelim Value="\"/>
+    <Name Value="resteasyobjectscore"/>
+    <Type Value="RunAndDesignTime"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="..\..\Source\libs\zLibEX_Laz\obj;..\..\Source\zlib;..\..\Source"/>
+        <OtherUnitFiles Value="..\..\Source\libs;..\..\Source;..\..\Source\libs\JSON;..\..\Source\libs\zLibEX_Laz;..\..\Source\zlib;..\..\Source\DmDados"/>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+    </CompilerOptions>
+    <Files Count="15">
+      <Item1>
+        <Filename Value="..\..\Source\libs\ServerUtils.pas"/>
+        <UnitName Value="ServerUtils"/>
+      </Item1>
+      <Item2>
+        <Filename Value="..\..\Source\libs\SysTypes.pas"/>
+        <UnitName Value="SysTypes"/>
+      </Item2>
+      <Item3>
+        <Filename Value="..\..\Source\libs\uDWConsts.pas"/>
+        <UnitName Value="uDWConsts"/>
+      </Item3>
+      <Item4>
+        <Filename Value="..\..\Source\libs\uDWJSONObject.pas"/>
+        <UnitName Value="uDWJSONObject"/>
+      </Item4>
+      <Item5>
+        <Filename Value="..\..\Source\libs\uDWJSONTools.pas"/>
+        <UnitName Value="uDWJSONTools"/>
+      </Item5>
+      <Item6>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <UnitName Value="uRESTDWBase"/>
+      </Item6>
+      <Item7>
+        <Filename Value="..\..\Source\uRESTDWReg.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="uRESTDWReg"/>
+      </Item7>
+      <Item8>
+        <Filename Value="resteasyobjectscore.lrs"/>
+        <Type Value="LRS"/>
+      </Item8>
+      <Item9>
+        <Filename Value="..\..\Source\uRESTDWMasterDetailData.pas"/>
+        <UnitName Value="uRESTDWMasterDetailData"/>
+      </Item9>
+      <Item10>
+        <Filename Value="..\..\Source\uRESTDWPoolerDB.pas"/>
+        <UnitName Value="uRESTDWPoolerDB"/>
+      </Item10>
+      <Item11>
+        <Filename Value="..\..\Source\libs\uzliblaz.pas"/>
+        <UnitName Value="uZlibLaz"/>
+      </Item11>
+      <Item12>
+        <Filename Value="..\..\Source\uDWPoolerMethod.pas"/>
+        <UnitName Value="uDWPoolerMethod"/>
+      </Item12>
+      <Item13>
+        <Filename Value="..\..\Source\DmDados\uDWDatamodule.pas"/>
+        <UnitName Value="uDWDatamodule"/>
+      </Item13>
+      <Item14>
+        <Filename Value="..\..\Source\libs\JSON\uDWJSON.pas"/>
+        <UnitName Value="uDWJSON"/>
+      </Item14>
+      <Item15>
+        <Filename Value="..\..\Source\uRESTDW.inc"/>
+        <Type Value="Include"/>
+      </Item15>
+    </Files>
+    <RequiredPkgs Count="2">
+      <Item1>
+        <PackageName Value="indylaz"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="FCL"/>
+      </Item2>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

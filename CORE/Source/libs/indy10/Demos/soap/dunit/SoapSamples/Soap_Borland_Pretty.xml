@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<SOAP-ENV:Envelope
+            xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" 
+            xmlns:xsd="http://www.w3.org/1999/XMLSchema" 
+            xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" 
+            xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+ <SOAP-ENV:Body>
+  <NS1:TestParam 
+            xmlns:NS1="urn:Defn-ITestInterface" 
+            SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" 
+            xmlns:NS2="urn:Defn">
+   <AInt xsi:type="xsd:int">2</AInt>
+   <AString xsi:type="xsd:string">AString&lt;something&gt;</AString>
+   <AArray xsi:type="SOAP-ENC:Array" SOAP-ENC:arrayType="xsd:string[5]">
+    <item>ArrayString 0</item>
+    <item>ArrayString 1</item>
+    <item>ArrayString 2</item>
+    <item>ArrayString 3</item>
+    <item>ArrayString 4</item>
+   </AArray>
+   <NS1:AObject href="#1"/>
+   <NS2:AObject id="1" xsi:type="NS2:TTestObject">
+    <TestInt xsi:type="xsd:int">3</TestInt>
+    <TestString xsi:type="xsd:string">ClassString 1 something</TestString>
+    <TestArray xsi:type="SOAP-ENC:Array" SOAP-ENC:arrayType="xsd:string[3]">
+     <item>ClassArrayString 0</item>
+     <item>ClassArrayString 1</item>
+     <item>ClassArrayString 2</item>
+    </TestArray>
+    <NS2:TestObject href="#2"/>
+   </NS2:AObject>
+   <NS2:TestObject id="2" xsi:type="NS2:TTestObject">
+    <TestInt xsi:type="xsd:int">5</TestInt>
+    <TestString xsi:type="xsd:string">ClassString  2 something</TestString>
+    <TestArray xsi:type="SOAP-ENC:Array" SOAP-ENC:arrayType="xsd:string[30]">
+     <item>Class2ArrayString 0</item>
+     <item>Class2ArrayString 1</item>
+     <item>Class2ArrayString 2</item>
+     <item>Class2ArrayString 3</item>
+     <item>Class2ArrayString 4</item>
+     <item>Class2ArrayString 5</item>
+     <item>Class2ArrayString 6</item>
+     <item>Class2ArrayString 7</item>
+     <item>Class2ArrayString 8</item>
+     <item>Class2ArrayString 9</item>
+     <item>Class2ArrayString 10</item>
+     <item>Class2ArrayString 11</item>
+     <item>Class2ArrayString 12</item>
+     <item>Class2ArrayString 13</item>
+     <item>Class2ArrayString 14</item>
+     <item>Class2ArrayString 15</item>
+     <item>Class2ArrayString 16</item>
+     <item>Class2ArrayString 17</item>    
+     <item>Class2ArrayString 18</item>
+     <item>Class2ArrayString 19</item>
+     <item>Class2ArrayString 20</item>
+     <item>Class2ArrayString 21</item>
+     <item>Class2ArrayString 22</item>
+     <item>Class2ArrayString 23</item>
+     <item>Class2ArrayString 24</item>
+     <item>Class2ArrayString 25</item>
+     <item>Class2ArrayString 26</item>
+     <item>Class2ArrayString 27</item>
+     <item>Class2ArrayString 28</item>
+     <item>Class2ArrayString 29</item>
+    </TestArray>
+    <NS2:TestObject xsi:NULL="True"/>
+   </NS2:TestObject>
+  </NS1:TestParam>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

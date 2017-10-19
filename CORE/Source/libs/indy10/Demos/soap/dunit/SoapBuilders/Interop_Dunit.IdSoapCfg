@@ -1,0 +1,12 @@
+; this has a different set of pathing restraints
+
+[WSDL]
+Source=file:SoapBuilders\Interop.wsdl
+Pascal=SoapBuilders\Interop.pas
+factory=1
+
+[Source]
+SoapBuilders\Interop.pas
+
+[Output]
+BinOutput=SoapBuilders\Interop.iti

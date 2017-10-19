@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html>
+<head>
+<meta name="GENERATOR" content="PasDoc 0.10.0">
+<title>JSON DELPHI: uJSON: Classe TZAbstractObject</title>
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000ff" vlink="#800080" alink="#FF0000">
+<a name="TZAbstractObject"></a><h1 class="cio">Classe TZAbstractObject</h1>
+<table class="sections wide_list">
+<tr>
+<td><a class="section"  href="#@Description">Descrição</a></td><td><a class="section"  href="#@Hierarchy">Hierarquia</a></td><td>Campos</td><td><a class="section"  href="#@Methods">Métodos</a></td><td>Properties</td></tr></table>
+<a name="@Description"></a><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a   href="uJSON.html">uJSON</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TZAbstractObject = class(TObject)</code></p>
+<h2 class="description">Descrição</h2>
+<p>
+Classe pai de todas as classes em uJSON , resolve o problema de impedância entre a classe java Object e a classe delphi TObject</p>
+<a name="@Hierarchy"></a><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="thisitem">TZAbstractObject</li></ul><h2 class="overview">Visão Geral</h2>
+<a name="@Methods"></a><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="uJSON.TZAbstractObject.html#equals">equals</a></b>(const Value: <a   href="uJSON.TZAbstractObject.html">TZAbstractObject</a>): Boolean; virtual;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="uJSON.TZAbstractObject.html#hash">hash</a></b>: LongInt;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="uJSON.TZAbstractObject.html#Clone">Clone</a></b>: <a   href="uJSON.TZAbstractObject.html">TZAbstractObject</a>; virtual;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="uJSON.TZAbstractObject.html#toString">toString</a></b>: string; virtual;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="uJSON.TZAbstractObject.html#instanceOf">instanceOf</a></b>(const Value: <a   href="uJSON.TZAbstractObject.html">TZAbstractObject</a>): Boolean;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="equals"></a><code>function <b>equals</b>(const Value: <a   href="uJSON.TZAbstractObject.html">TZAbstractObject</a>): Boolean; virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+retorna true se value é igual ao objeto</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="hash"></a><code>function <b>hash</b>: LongInt;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+código hash do objeto , usa-se o endereço de memória</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Clone"></a><code>function <b>Clone</b>: <a   href="uJSON.TZAbstractObject.html">TZAbstractObject</a>; virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+clona o objeto </p>
+<h6 class="description_section">Retornos</h6>
+<p class="return">( um TZAbstractObject )</p></td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="toString"></a><code>function <b>toString</b>: string; virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+retorna a representação com string do objeto </p>
+<h6 class="description_section">Retornos</h6>
+<p class="return">(uma string)</p></td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="instanceOf"></a><code>function <b>instanceOf</b>(const Value: <a   href="uJSON.TZAbstractObject.html">TZAbstractObject</a>): Boolean;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+retorna true se o parâmetro Value é uma instância de TZAbstractObject</p>
+</td></tr>
+</table>
+<hr noshade size="1"><span class="appinfo"><em>Gerado por <a  target="_parent" href="http://pasdoc.sourceforge.net/">PasDoc 0.10.0</a> as 2006-07-26 10:00:10</em>
+</span>
+</body></html>

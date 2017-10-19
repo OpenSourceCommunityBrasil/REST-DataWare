@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899/12/30 00:00:00.000.024,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit4.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\FileTransfer\Client\uFileClient.dfm</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.113,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\FileTransfer\Client\FileClient.dproj</Transaction>
+  </Transactions>
+</BorlandProject>
