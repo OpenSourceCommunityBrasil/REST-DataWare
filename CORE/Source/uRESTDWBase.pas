@@ -2326,10 +2326,7 @@ Var
     End;
   End;
  End;
- {$ENDIF}
-
-
-
+ {$IFEND}
  Procedure SetParamsValues(DWParams : TDWParams; SendParamsData : TIdMultipartFormDataStream);
  Var
   I : Integer;

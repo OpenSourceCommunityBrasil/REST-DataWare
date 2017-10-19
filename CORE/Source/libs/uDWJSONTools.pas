@@ -42,7 +42,7 @@ Function  GetPairJSON  (Tag,
   Function  DecodeBase64 (Const Value : AnsiString)             : AnsiString;
   Function  EncodeBase64 (Const Value : AnsiString)             : AnsiString;
 {$ENDIF}
-{$ENDIF}
+{$IFEND}
 Function  EncodeStrings(Value       : String)                 : String;
 Function  DecodeStrings(Value       : String)                 : String;
 Function  EncodeBytes  (Value : String{$IFNDEF FPC}{$if CompilerVersion > 21}
@@ -62,7 +62,7 @@ Function Decode4to3Ex(const Value, Table: String): String;
 {$ELSE}
 Function Decode4to3Ex(const Value, Table: AnsiString): AnsiString;
 {$ENDIF}
-{$ENDIF}
+{$IFEND}
 Var
  p,  x, y,
  lv, d, dl : Integer;
@@ -108,7 +108,7 @@ Begin
    Inc(p);
    Result[p] := AnsiChar(d and $ff);
    {$ENDIF}
-   {$ENDIF}
+   {$IFEND}
    Inc(p);
    d := 0;
    dl := 4;
@@ -133,7 +133,7 @@ Begin
        Result[p] := AnsiChar(d and $ff);
        Inc(p);
        {$ENDIF}
-       {$ENDIF}
+       {$IFEND}
       End;
   2 : Begin
        d := d shr 4;
@@ -148,7 +148,7 @@ Begin
         Result[p] := AnsiChar(d and $ff);
        Inc(p);
        {$ENDIF}
-       {$ENDIF}
+       {$IFEND}
       End;
  End;
  SetLength(Result, p - 1);
@@ -195,7 +195,7 @@ Begin
     Result := TIdEncoderMIME.EncodeString(S, IndyTextEncoding_ASCII);
    {$IFEND}
   {$ENDIF}
- {$ENDIF}
+ {$IFEND}
 End;
 
 {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
@@ -206,7 +206,7 @@ Function Encode3to4(Const Value, Table : String) : String;
 {$ELSE}
 Function Encode3to4(Const Value, Table : AnsiString) : AnsiString;
 {$ENDIF}
-{$ENDIF}
+{$IFEND}
 Begin
  Result := Encode64(Value);
 End;
@@ -261,7 +261,7 @@ Begin
     Result := UTF8Decode(TIdDecoderMIME.DecodeString(S, IndyTextEncoding_ASCII));
    {$IFEND}
   {$ENDIF}
- {$ENDIF}
+ {$IFEND}
 End;
 
 {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
@@ -272,7 +272,7 @@ Function DecodeBase64(Const Value : String) : String;
 {$ELSE}
   Function DecodeBase64(Const Value : AnsiString) : AnsiString;
   {$ENDIF}
-{$ENDIF}
+{$IFEND}
 Begin
  Result := Decode64(Value);
 End;
@@ -285,7 +285,7 @@ Function EncodeBase64(Const Value : String) : String;
 {$ELSE}
   Function EncodeBase64(Const Value : AnsiString) : AnsiString;
 {$ENDIF}
-{$ENDIF}
+{$IFEND}
 Begin
  Result := Encode64(Value);
 End;
@@ -340,7 +340,7 @@ Begin
       HexToBin(PChar(Value), TMemoryStream(BinaryStream).Memory, BinaryStream.Size);
       Result := BinaryStream.DataString;
     {$ENDIF}
-    {$ENDIF}
+    {$IFEND}
    End;
  Finally
   BinaryStream.Free;
@@ -379,7 +379,7 @@ Begin
     If BinaryStream.Size > 0 Then
     HexToBin(PChar(Value), TMemoryStream(BinaryStream).Memory, BinaryStream.Size);
    {$ENDIF}
-   {$ENDIF}
+   {$IFEND}
  Except
  End;
 End;
@@ -401,7 +401,7 @@ Begin
    {$ELSE}
    BinaryStream := TStringStream.Create(AnsiString(Utf8Encode(Value)), TEncoding.ANSI);
    {$ENDIF}
-   {$ENDIF}
+   {$IFEND}
   {$ELSE}
    BinaryStream := TStringStream.Create(Value);
   {$IFEND}
@@ -423,7 +423,7 @@ Begin
   {$ELSE}
    BinToHex(TMemoryStream(BinaryStream).Memory, PChar(Result), BinaryStream.Size);
   {$ENDIF}
-  {$ENDIF}
+  {$IFEND}
  Finally
   BinaryStream.Free;
  End;
@@ -449,7 +449,7 @@ Begin
   {$ELSE}
   BinToHex(TMemoryStream(Value).Memory, PChar(Result), Value.Size);
   {$ENDIF}
-  {$ENDIF}
+  {$IFEND}
  Except
  End;
 End;
@@ -460,7 +460,7 @@ Begin
  Result := Encode64(Value); //TIdencoderMIME.EncodeString(Value, nil);
 {$ELSE}
  Result := EncodeBase64(Value);
-{$ENDIF}
+{$IFEND}
 End;
 
 Function DecodeStrings(Value : String) : String;
@@ -472,7 +472,7 @@ Begin
   Result := Decode64(Value); //TIdencoderMIME.EncodeString(Value, nil);
  {$ELSE}
   Result := DecodeBase64(Value);
-  {$ENDIF}
+  {$IFEND}
  {$ENDIF}
 End;
 

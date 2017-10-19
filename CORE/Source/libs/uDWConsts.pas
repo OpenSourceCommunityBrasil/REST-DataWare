@@ -21,7 +21,7 @@ Const
    InitStrPos            = 0;
    {$ELSE}
    InitStrPos            = 1;
-   {$ENDIF}
+   {$IFEND}
  {$ELSE}
  InitStrPos            = 1;
  {$ENDIF}
@@ -334,7 +334,7 @@ Begin
      HexToBin(PChar (Str),   TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
     {$IFEND}
    {$ENDIF}
- {$ENDIF}
+ {$IFEND}
  Stream.Position := 0;
 End;
 
@@ -385,7 +385,7 @@ Begin
    SetLength     (Result, Stream.Size * 2);
    BinToHex      (TMemoryStream(Stream).Memory, PChar(Result), Stream.Size);
    {$ENDIF}
- {$ENDIF}
+ {$IFEND}
  If QQuoted Then
   Result := '"' + Result + '"';
 End;

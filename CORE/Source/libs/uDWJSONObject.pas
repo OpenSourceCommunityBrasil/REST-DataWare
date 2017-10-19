@@ -16,7 +16,7 @@ Uses
  {$IFDEF POSIX} //ANDROID}
  {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
    ,system.json, FMX.Types
-   {$ENDIF}
+ {$IFEND}
  {$IFDEF LINUX}
  ,system.json
  {$ENDIF}
@@ -297,7 +297,7 @@ Begin
  Result := vTempString;
  bValue := StringReplace(bValue, Result, '', [rfReplaceAll]);
 End;
-{$ENDIF}
+{$IFEND}
 
 Function TDWParams.Add(Item : TJSONParam): Integer;
 Var
@@ -322,7 +322,7 @@ Begin
   vEncoding := TEncoding.UTF8;
  {$ELSE}
   vEncoding := TEncoding.ASCII;
-  {$ENDIF}
+  {$IFEND}
  {$IFEND}
  {$ENDIF}
 End;
@@ -676,8 +676,7 @@ Else
   End
  Else
   Result := vTempString;
-
- {$ENDIF}
+ {$IFEND}
 End;
 
 Function TJSONValue.DatasetValues(bValue      : TDataset;
@@ -1627,7 +1626,7 @@ Begin
   DestDS.EnableControls;
  End;
 End;
-{$ENDIF}
+{$IFEND}
 
 Procedure TJSONValue.SaveToStream(Stream: TMemoryStream);
 Begin
@@ -1752,7 +1751,7 @@ Begin
   bJsonValue.Free;
  End;
 End;
-{$ENDIF}
+{$IFEND}
 
 Procedure TJSONValue.LoadFromStream(Stream : TMemoryStream;
                                     Encode : Boolean = True);
