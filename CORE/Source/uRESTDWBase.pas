@@ -1417,7 +1417,8 @@ Begin
                                                                                                       vError,
                                                                                                       vMessageError,
                                                                                                       vExecute);
-             DWParams.ItemsString['MessageError'].SetValue(vMessageError);
+             If vMessageError <> '' Then
+              DWParams.ItemsString['MessageError'].SetValue(vMessageError);
              DWParams.ItemsString['Error'].SetValue(BooleanToString(vError));
              If DWParams.ItemsString['Result'] <> Nil Then
               Begin
@@ -1481,7 +1482,8 @@ Begin
                                                                                                      vError,
                                                                                                      vMessageError,
                                                                                                      vExecute);
-           DWParams.ItemsString['MessageError'].SetValue(vMessageError);
+           If vMessageError <> '' Then
+            DWParams.ItemsString['MessageError'].SetValue(vMessageError);
            DWParams.ItemsString['Error'].SetValue(BooleanToString(vError));
            If DWParams.ItemsString['Result'] <> Nil Then
             Begin

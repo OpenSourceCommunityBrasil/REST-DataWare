@@ -160,19 +160,24 @@ Var
  outstream : TStringStream;
  encoder   : TBase64EncodingStream;
 Begin
- outstream:=TStringStream.Create('');
- Try
-  encoder := TBase64EncodingStream.Create(outstream);
-  Try
-   encoder.write(s[1],length(s));
-  Finally
-   encoder.free;
-  End;
-  outstream.position:=0;
-  Result := outstream.readstring(outstream.size);
- Finally
-  outstream.free;
- End;
+ If Length(s) > 0 Then
+  Begin
+   outstream := TStringStream.Create('');
+   Try
+    encoder := TBase64EncodingStream.Create(outstream);
+    Try
+     encoder.write(s[1], length(s));
+    Finally
+     encoder.free;
+    End;
+    outstream.position:=0;
+    Result := outstream.readstring(outstream.size);
+   Finally
+    outstream.free;
+   End;
+  End
+ Else
+  Result := '';
 End;
 {$ENDIF}
 
@@ -213,24 +218,32 @@ Var
  outstream : TStringStream;
  decoder   : TBase64DecodingStream;
 Begin
- instream := TStringStream.Create(s);
- Try
-  outstream:=TStringStream.Create('');
-  Try
-   decoder := TBase64DecodingStream.create(instream,bdmmime);
+ If s <> '' Then
+  Begin
+   instream := TStringStream.Create(s);
    Try
-    outstream.CopyFrom(decoder, decoder.size);
-    outstream.position:=0;
-    Result := outstream.Readstring(outstream.size);
+    outstream:=TStringStream.Create('');
+    Try
+     decoder := TBase64DecodingStream.create(instream,bdmmime);
+     Try
+      If decoder.size > 0 Then
+       Begin
+        outstream.CopyFrom(decoder, decoder.size);
+        outstream.position:=0;
+        Result := outstream.Readstring(outstream.size);
+       End;
+     Finally
+      decoder.free;
+     End;
+    Finally
+     outstream.free;
+    End;
    Finally
-    decoder.free;
+    instream.free;
    End;
-  Finally
-   outstream.free;
-  End;
- Finally
-  instream.free;
- End;
+  End
+ Else
+  Result := '';
 End;
 {$ENDIF}
 

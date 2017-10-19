@@ -909,7 +909,7 @@ Begin
   JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
- JSONParam.ObjectDirection       := odInOut;
+ JSONParam.ObjectDirection       := odOUT;
  JSONParam.SetValue(MessageError);
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
