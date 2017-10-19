@@ -27,7 +27,7 @@ object ServerMethodDM: TServerMethodDM
     DatabaseName = 'D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\EMPLOYEE.FDB'
     KeepConnection = False
     Params.Strings = (
-      ''
+      'lc_ctype=UTF8'
     )
     Password = 'masterkey'
     Transaction = SQLTransaction1

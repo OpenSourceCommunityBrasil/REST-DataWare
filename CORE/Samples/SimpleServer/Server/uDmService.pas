@@ -179,7 +179,6 @@ BEGIN
   TFDConnection(Sender).Params.Add('Protocol=TCPIP');
   TFDConnection(Sender).DriverName  := Driver_BD;
   TFDConnection(Sender).LoginPrompt := FALSE;
-  // Server_FDConnection.Params.Add('CharacterSet=ISO8859_1');
   TFDConnection(Sender).UpdateOptions.CountUpdatedRecords := False;
 END;
 

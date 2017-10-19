@@ -7,7 +7,7 @@ Interface
 Uses
  {$IFDEF FPC}
  SysUtils,            Classes, uDWJSONTools,    IdGlobal, DB, uDWJSON,   uDWConsts,
- uDWConstsData,       memds,   Variants;
+ uDWConstsData,       memds,   Variants,        LConvEncoding;
  {$ELSE}
  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
  System.SysUtils,     System.Classes, Variants, uDWJSONTools, uDWConsts, uDWJSON,
@@ -771,9 +771,21 @@ Var
                                               ftFmtMemo, ftFixedChar] Then
          Begin
           If vEncoded Then
-           vTempValue := Format('"%s"',      [EncodeStrings(bValue.Fields[I].AsString)])     //AsString
+           Begin
+            {$IFDEF FPC}
+             vTempValue := Format('"%s"',      [EncodeStrings(CP1252ToUTF8(bValue.Fields[I].AsString))]);
+            {$ELSE}
+             vTempValue := Format('"%s"',      [EncodeStrings(bValue.Fields[I].AsString)]);
+            {$ENDIF}
+           End
           Else
-           vTempValue := Format('"%s"',      [bValue.Fields[I].AsString])
+           Begin
+            {$IFDEF FPC}
+             vTempValue := Format('"%s"',      [CP1252ToUTF8(bValue.Fields[I].AsString)])
+            {$ELSE}
+             vTempValue := Format('"%s"',      [bValue.Fields[I].AsString])
+            {$ENDIF}
+           End;
          End
         Else If bValue.Fields[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
          Begin
