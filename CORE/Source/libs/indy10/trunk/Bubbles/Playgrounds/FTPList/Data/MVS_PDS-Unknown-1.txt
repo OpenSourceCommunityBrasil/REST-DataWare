@@ -1,3 +1,0 @@
- Name     VV.MM  Created     Changed     Size  Init   Mod   Id
-ISPSPROF
-ISRPROF

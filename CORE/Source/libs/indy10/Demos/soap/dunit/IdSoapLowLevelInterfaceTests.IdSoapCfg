@@ -1,6 +1,0 @@
-[Source]
-IdSoapLowLevelInterfaceIntfDefn.pas
-IdSoapLowLevelInterface1IntfDefn.pas
-
-[Output]
-ResOutput=IdSoapLowLevelInterfaceTests.res;IdSoapLowLevelInterfaceTests

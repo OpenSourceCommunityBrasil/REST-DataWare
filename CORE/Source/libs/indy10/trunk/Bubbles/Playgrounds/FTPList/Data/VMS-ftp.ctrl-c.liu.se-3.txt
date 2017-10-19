@@ -1,4 +1,0 @@
-
-ANONYMOUS:[000000.MSDOS.SOUND]
-
-*.*;               <%RMS-E-FNF, file not found>
