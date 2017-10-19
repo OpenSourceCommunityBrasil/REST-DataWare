@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="10"/>
+    <BuildModes Active="Default"/>
+    <Units Count="58">
+      <Unit0>
+        <Filename Value="RestClient.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="19"/>
+        <UsageCount Value="173"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="formMain.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form2"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="70"/>
+        <CursorPos X="30" Y="82"/>
+        <UsageCount Value="173"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="urestrequest.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uRESTRequest"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="117"/>
+        <CursorPos X="17" Y="127"/>
+        <UsageCount Value="169"/>
+        <Bookmarks Count="2">
+          <Item0 X="2" Y="124" ID="2"/>
+          <Item1 X="119" Y="41" ID="1"/>
+        </Bookmarks>
+      </Unit2>
+      <Unit3>
+        <Filename Value="C:\lazarus\fpc\3.0.2\source\rtl\objpas\classes\classesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="877"/>
+        <CursorPos X="14" Y="886"/>
+        <UsageCount Value="3"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="C:\lazarus\fpc\3.0.2\source\packages\fcl-json\src\fpjson.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="130"/>
+        <CursorPos Y="150"/>
+        <UsageCount Value="1"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="C:\lazarus\components\indy\trunk\Lib\Protocols\IdHTTP.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3037"/>
+        <CursorPos X="24" Y="3044"/>
+        <UsageCount Value="2"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="..\..\..\..\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\ServerUtils.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="28" Y="11"/>
+        <UsageCount Value="10"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="..\..\..\..\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\StringBuilderUnit.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\..\..\..\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\SysTypes.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="..\..\..\..\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\uDWConsts.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="11"/>
+        <UsageCount Value="10"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="..\..\..\..\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\uDWJSONObject.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="89"/>
+        <CursorPos X="4" Y="97"/>
+        <UsageCount Value="10"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="..\..\..\..\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\uDWJSONTools.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="7"/>
+        <UsageCount Value="10"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="..\..\..\..\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\uKBDynamic.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="41"/>
+        <CursorPos Y="58"/>
+        <UsageCount Value="10"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="..\..\..\..\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\uRESTDWBase.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="468"/>
+        <CursorPos Y="484"/>
+        <UsageCount Value="10"/>
+        <Bookmarks Count="2">
+          <Item0 Y="437" ID="1"/>
+          <Item1 Y="479" ID="2"/>
+        </Bookmarks>
+      </Unit13>
+      <Unit14>
+        <Filename Value="..\..\..\..\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\uRESTDWReg.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="36" Y="8"/>
+        <UsageCount Value="10"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="C:\lazarus\fpc\3.0.2\source\rtl\objpas\sysutils\sysencodingh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="11"/>
+        <CursorPos X="3" Y="21"/>
+        <UsageCount Value="10"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="..\..\..\..\Source\libs\uDWConsts.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="308"/>
+        <CursorPos Y="314"/>
+        <UsageCount Value="13"/>
+        <Bookmarks Count="1">
+          <Item0 X="6" Y="319" ID="1"/>
+        </Bookmarks>
+      </Unit16>
+      <Unit17>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="328"/>
+        <CursorPos X="37" Y="336"/>
+        <UsageCount Value="65"/>
+        <Bookmarks Count="1">
+          <Item0 Y="212" ID="3"/>
+        </Bookmarks>
+      </Unit17>
+      <Unit18>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1433"/>
+        <CursorPos X="45" Y="1442"/>
+        <UsageCount Value="72"/>
+        <Bookmarks Count="1">
+          <Item0 Y="854" ID="2"/>
+        </Bookmarks>
+      </Unit18>
+      <Unit19>
+        <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSONParser.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="23" Y="8"/>
+        <UsageCount Value="2"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="C:\lazarus\lcl\include\control.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2113"/>
+        <CursorPos Y="2125"/>
+        <UsageCount Value="11"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1449"/>
+        <CursorPos Y="1458"/>
+        <UsageCount Value="17"/>
+        <Bookmarks Count="1">
+          <Item0 X="14" Y="606" ID="4"/>
+        </Bookmarks>
+      </Unit21>
+      <Unit22>
+        <Filename Value="..\..\..\..\Source\libs\SysTypes.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="74"/>
+        <CursorPos X="41" Y="84"/>
+        <UsageCount Value="2"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="C:\lazarus\components\indy\trunk\Lib\System\IdGlobal.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1515"/>
+        <CursorPos X="10" Y="1525"/>
+        <UsageCount Value="1"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="Q:\RestDB\rest-dataware-componentes-dataware\CORE\Source\libs\uDWJSONObject.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="574"/>
+        <CursorPos Y="592"/>
+        <UsageCount Value="10"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="Q:\RESTDataware\CORE\Samples\SimpleServerZEOS\Thread\Lazarus\formMain.pas"/>
+        <ComponentName Value="Form2"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="123"/>
+        <CursorPos X="16" Y="145"/>
+        <UsageCount Value="10"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="..\..\..\..\Source\libs\zLibEX_Laz\ZLibEx.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="..\..\..\..\Source\libs\zLibEX_Laz\ZLibExApi.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="91"/>
+        <CursorPos X="34" Y="104"/>
+        <UsageCount Value="10"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="..\..\..\..\Source\libs\backup\uDWConsts.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="56" Y="6"/>
+        <UsageCount Value="10"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="..\..\..\..\Packages\Lazarus\resteasyobjectscore.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="79" Y="12"/>
+        <UsageCount Value="10"/>
+      </Unit29>
+      <Unit30>
+        <Filename Value="..\..\..\..\Source\libs\ServerUtils.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="22"/>
+        <CursorPos Y="31"/>
+        <UsageCount Value="3"/>
+      </Unit30>
+      <Unit31>
+        <Filename Value="..\..\..\..\Source\libs\uzliblaz.pas"/>
+        <UnitName Value="uZlibLaz"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="52"/>
+        <CursorPos Y="55"/>
+        <UsageCount Value="3"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="..\..\..\..\Source\zlib\dzlib.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="66"/>
+        <CursorPos X="52" Y="75"/>
+        <UsageCount Value="1"/>
+      </Unit32>
+      <Unit33>
+        <Filename Value="..\..\..\..\Source\zlib\zDeflate.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="429"/>
+        <CursorPos X="75" Y="439"/>
+        <UsageCount Value="10"/>
+      </Unit33>
+      <Unit34>
+        <Filename Value="C:\lazarus\fpc\3.0.2\source\packages\fcl-image\src\fpreadpng.pp"/>
+        <UnitName Value="FPReadPNG"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="13"/>
+        <CursorPos X="32" Y="19"/>
+        <UsageCount Value="10"/>
+      </Unit34>
+      <Unit35>
+        <Filename Value="C:\lazarus\fpc\3.0.2\source\rtl\objpas\classes\streams.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="429"/>
+        <CursorPos Y="437"/>
+        <UsageCount Value="3"/>
+      </Unit35>
+      <Unit36>
+        <Filename Value="..\..\..\..\Source\libs\indy10\trunk\Lib\Protocols\IdHTTP.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3034"/>
+        <CursorPos Y="3048"/>
+        <UsageCount Value="12"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit36>
+      <Unit37>
+        <Filename Value="..\..\..\..\Packages\Lazarus\resteasyobjectscore.lrs"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit37>
+      <Unit38>
+        <Filename Value="..\..\..\..\Source\uRESTDWReg.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="52"/>
+        <CursorPos X="12" Y="57"/>
+        <UsageCount Value="10"/>
+      </Unit38>
+      <Unit39>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2395"/>
+        <CursorPos Y="2408"/>
+        <UsageCount Value="59"/>
+      </Unit39>
+      <Unit40>
+        <Filename Value="..\..\..\..\Source\uDWPoolerMethod.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="963"/>
+        <CursorPos Y="975"/>
+        <UsageCount Value="10"/>
+      </Unit40>
+      <Unit41>
+        <Filename Value="formMain.lfm"/>
+        <EditorIndex Value="-1"/>
+        <ExtraEditorCount Value="1"/>
+        <ExtraEditor1>
+          <EditorIndex Value="4"/>
+        </ExtraEditor1>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit41>
+      <Unit42>
+        <Filename Value="..\..\..\..\Source\libs\indy10\trunk\Lib\Protocols\IdCoder.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="199"/>
+        <CursorPos Y="214"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit42>
+      <Unit43>
+        <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSON.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2043"/>
+        <CursorPos Y="2053"/>
+        <UsageCount Value="23"/>
+      </Unit43>
+      <Unit44>
+        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\restdwlazdriver.pas"/>
+        <UnitName Value="RESTDWLazDriver"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="10"/>
+        <UsageCount Value="11"/>
+      </Unit44>
+      <Unit45>
+        <Filename Value="C:\lazarus\lcl\include\buttoncontrol.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="8"/>
+        <CursorPos Y="21"/>
+        <UsageCount Value="10"/>
+      </Unit45>
+      <Unit46>
+        <Filename Value="C:\lazarus\lcl\include\buttons.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="157"/>
+        <CursorPos Y="170"/>
+        <UsageCount Value="10"/>
+      </Unit46>
+      <Unit47>
+        <Filename Value="C:\lazarus\lcl\include\wincontrol.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="5372"/>
+        <CursorPos Y="5385"/>
+        <UsageCount Value="10"/>
+      </Unit47>
+      <Unit48>
+        <Filename Value="C:\lazarus\lcl\lclmessageglue.pas"/>
+        <UnitName Value="LCLMessageGlue"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="107"/>
+        <CursorPos X="17" Y="113"/>
+        <UsageCount Value="10"/>
+      </Unit48>
+      <Unit49>
+        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="160"/>
+        <CursorPos X="74" Y="170"/>
+        <UsageCount Value="11"/>
+      </Unit49>
+      <Unit50>
+        <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-db\src\base\db.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="220"/>
+        <CursorPos X="3" Y="229"/>
+        <UsageCount Value="11"/>
+      </Unit50>
+      <Unit51>
+        <Filename Value="..\..\..\..\Source\libs\indy10\trunk\Lib\System\IdBaseComponent.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="283"/>
+        <CursorPos Y="292"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit51>
+      <Unit52>
+        <Filename Value="..\..\..\..\Source\libs\indy10\trunk\Lib\Protocols\IdCoderMIME.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="153"/>
+        <CursorPos Y="167"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit52>
+      <Unit53>
+        <Filename Value="..\..\..\..\Source\libs\indy10\trunk\Lib\System\IdGlobal.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3747"/>
+        <CursorPos Y="3755"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit53>
+      <Unit54>
+        <Filename Value="..\..\..\..\Source\libs\indy10\trunk\Lib\System\IdStreamVCL.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="87"/>
+        <CursorPos Y="101"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit54>
+      <Unit55>
+        <Filename Value="..\..\..\..\Source\libs\indy10\trunk\Lib\Protocols\IdCoder3to4.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="224"/>
+        <CursorPos Y="236"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit55>
+      <Unit56>
+        <Filename Value="C:\lazarus\components\lazutils\lconvencoding.pas"/>
+        <UnitName Value="LConvEncoding"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="5259"/>
+        <CursorPos Y="5269"/>
+        <UsageCount Value="10"/>
+      </Unit56>
+      <Unit57>
+        <Filename Value="..\..\..\..\Source\libs\indy10\trunk\Lib\System\IdStream.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="20"/>
+        <CursorPos X="3" Y="29"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit57>
+    </Units>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="82" Column="30" TopLine="70"/>
+      </Position1>
+    </JumpHistory>
+  </ProjectSession>
+  <Debugging>
+    <Watches Count="2">
+      <Item1>
+        <Expression Value="DestDS.RECORDCOUNT"/>
+      </Item1>
+      <Item2>
+        <Expression Value="DestDS"/>
+      </Item2>
+    </Watches>
+  </Debugging>
+</CONFIG>

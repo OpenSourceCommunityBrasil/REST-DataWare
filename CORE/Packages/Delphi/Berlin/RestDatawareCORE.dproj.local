@@ -2,12 +2,8 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>2017/10/19 16:21:31.000.662,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Packages\Delphi\Berlin\RestDatawareCORE.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj</Transaction>
-    <Transaction>2017/10/19 16:22:45.000.635,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\uRESTDWPoolerDB.pas</Transaction>
-    <Transaction>2017/10/19 16:23:51.000.049,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\libs\uDWConsts.pas</Transaction>
-    <Transaction>2017/10/19 16:41:53.000.374,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Images\TRESTDWPoolerDB.bmp</Transaction>
-    <Transaction>2017/10/19 16:41:53.000.393,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Images\TRESTDWPoolerList.bmp</Transaction>
   </Transactions>
 	<ActiveMobileDevice>
-		<NoProfile iOSSimulator="iPhone5"/>
+		<NoProfile iOSSimulator="iPhone5" Android="38019fd23720a200"/>
 	</ActiveMobileDevice>
 </BorlandProject>
