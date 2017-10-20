@@ -335,7 +335,6 @@ Begin
      ATransaction.Rollback;
     Except
     End;
-
    End;
  End;
  vTempQuery.Close;
@@ -352,23 +351,223 @@ Function TRESTDWLazDriver.InsertMySQLReturnID(SQL              : String;
                                              Params           : TDWParams;
                                              Var Error        : Boolean;
                                              Var MessageError : String): Integer;
+Var
+ vTempQuery   : TSQLQuery;
+ ATransaction : TSQLTransaction;
+ A, I          : Integer;
+ vParamName    : String;
+ vStringStream : TMemoryStream;
+ Function GetParamIndex(Params : TParams; ParamName : String) : Integer;
+ Var
+  I : Integer;
+ Begin
+  Result := -1;
+  For I := 0 To Params.Count -1 Do
+   Begin
+    If UpperCase(Params[I].Name) = UpperCase(ParamName) Then
+     Begin
+      Result := I;
+      Break;
+     End;
+   End;
+ End;
 Begin
+ Result := -1;
+ Error  := False;
+ vTempQuery               := TSQLQuery.Create(Nil);
+ vTempQuery.DataBase     := TDatabase(vConnection);
+ If Assigned(vTempQuery.DataBase) Then
+  Begin
+   If Not TDatabase(vConnection).Connected Then
+    TDatabase(vConnection).Open;
+   ATransaction := TSQLTransaction.Create(vTempQuery.DataBase);
+  End
+ Else
+  Begin
+   FreeAndNil(vTempQuery);
+   Exit;
+  End;
+ vTempQuery.SQL.Clear;
+ vTempQuery.SQL.Add(SQL);
+ If Params <> Nil Then
+  Begin
+   For I := 0 To Params.Count -1 Do
+    Begin
+     If vTempQuery.Params.Count > I Then
+      Begin
+       vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
+       A          := GetParamIndex(vTempQuery.Params, vParamName);
+       If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
+        Begin
+         If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                                               ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                              ftString,    ftWideString]    Then
+          Begin
+           If vTempQuery.Params[A].Size > 0 Then
+            vTempQuery.Params[A].Value := Copy(Params[I].Value, 1, vTempQuery.Params[A].Size)
+           Else
+            vTempQuery.Params[A].Value := Params[I].Value;
+          End
+         Else
+          Begin
+           If vTempQuery.Params[A].DataType in [ftUnknown] Then
+            Begin
+             If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
+              vTempQuery.Params[A].DataType := ObjectValueToFieldType(Params[I].ObjectValue)
+             Else
+              vTempQuery.Params[A].DataType := ftString;
+            End;
+           If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord] Then
+            Begin
+             If Trim(Params[I].Value) <> '' Then
+              Begin
+               If vTempQuery.Params[A].DataType = ftSmallInt Then
+                vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+               Else
+                vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+              End;
+            End
+           Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
+            Begin
+             If Trim(Params[I].Value) <> '' Then
+              vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value);
+            End
+           Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+            Begin
+             If Trim(Params[I].Value) <> '' Then
+              Begin
+               If vTempQuery.Params[A].DataType      = ftDate Then
+                vTempQuery.Params[A].AsDate      := StrToDate(Params[I].Value)
+               Else If vTempQuery.Params[A].DataType = ftTime Then
+                vTempQuery.Params[A].AsDateTime  := StrToTime(Params[I].Value)
+               Else If vTempQuery.Params[A].DataType In [ftDateTime, ftTimeStamp] Then
+                vTempQuery.Params[A].AsDateTime  := StrToDateTime(Params[I].Value);
+              End;
+            End
+           Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+            Begin
+             vStringStream := TMemoryStream.Create;
+             Try
+              Params[I].SaveToStream(vStringStream);
+              vStringStream.Position := 0;
+              vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
+             Finally
+              FreeAndNil(vStringStream);
+             End;
+            End
+           Else
+            vTempQuery.Params[A].Value    := Params[I].Value;
+          End;
+        End;
+      End
+     Else
+      Break;
+    End;
+  End;
+ Result := -1;
+ Error  := False;
+ Try
+  Try
+   ATransaction.DataBase := TDatabase(vConnection);
+   ATransaction.StartTransaction;;
+   vTempQuery.ExecSQL;
+   If (vConnection is TMySQL40Connection)      Then
+   Else If (vConnection is TMySQL41Connection) Then
+    Result := TMySQL41Connection(vConnection).GetInsertID
+   Else If (vConnection is TMySQL50Connection) Then
+    Result := TMySQL50Connection(vConnection).GetInsertID
+   Else If (vConnection is TMySQL51Connection) Then
+    Result := TMySQL51Connection(vConnection).GetInsertID
+   Else If (vConnection is TMySQL55Connection) Then
+    Result := TMySQL55Connection(vConnection).GetInsertID
+   Else If (vConnection is TMySQL56Connection) Then
+    Result := TMySQL56Connection(vConnection).GetInsertID
+   Else If (vConnection is TMySQL57Connection) Then
+    Result := TMySQL57Connection(vConnection).GetInsertID;
+   Error         := False;
+   ATransaction.Commit;
+  Finally
+  End;
+ Except
+  On E : Exception do
+   Begin
+    Try
+     Error        := True;
+     MessageError := E.Message;
+     Result       := -1;
+     ATransaction.Rollback;
+    Except
+    End;
+   End;
+ End;
+ vTempQuery.Close;
+ FreeAndNil(vTempQuery);
+ FreeAndNil(ATransaction);
 End;
 
 Function TRESTDWLazDriver.InsertMySQLReturnID(SQL              : String;
                                              Var Error        : Boolean;
                                              Var MessageError : String): Integer;
+Var
+ vTempQuery   : TSQLQuery;
+ ATransaction : TSQLTransaction;
 Begin
  Result := -1;
  Error  := False;
+ vTempQuery               := TSQLQuery.Create(Nil);
+ vTempQuery.DataBase     := TDatabase(vConnection);
+ If Assigned(vTempQuery.DataBase) Then
+  Begin
+   If Not TDatabase(vConnection).Connected Then
+    TDatabase(vConnection).Open;
+   ATransaction := TSQLTransaction.Create(vTempQuery.DataBase);
+  End
+ Else
+  Begin
+   FreeAndNil(vTempQuery);
+   Exit;
+  End;
+ vTempQuery.SQL.Clear;
+ vTempQuery.SQL.Add(SQL);
+ Result := -1;
+ Error  := False;
  Try
+  Try
+   ATransaction.DataBase := TDatabase(vConnection);
+   ATransaction.StartTransaction;;
+   vTempQuery.ExecSQL;
+   If (vConnection is TMySQL40Connection)      Then
+   Else If (vConnection is TMySQL41Connection) Then
+    Result := TMySQL41Connection(vConnection).GetInsertID
+   Else If (vConnection is TMySQL50Connection) Then
+    Result := TMySQL50Connection(vConnection).GetInsertID
+   Else If (vConnection is TMySQL51Connection) Then
+    Result := TMySQL51Connection(vConnection).GetInsertID
+   Else If (vConnection is TMySQL55Connection) Then
+    Result := TMySQL55Connection(vConnection).GetInsertID
+   Else If (vConnection is TMySQL56Connection) Then
+    Result := TMySQL56Connection(vConnection).GetInsertID
+   Else If (vConnection is TMySQL57Connection) Then
+    Result := TMySQL57Connection(vConnection).GetInsertID;
+   ATransaction.Commit;
+   Error         := False;
+  Finally
+  End;
  Except
   On E : Exception do
    Begin
-    Error        := True;
-    MessageError := E.Message;
+    Try
+     Error        := True;
+     MessageError := E.Message;
+     Result       := -1;
+     ATransaction.Rollback;
+    Except
+    End;
    End;
  End;
+ vTempQuery.Close;
+ FreeAndNil(vTempQuery);
+ FreeAndNil(ATransaction);
 End;
 
 Procedure TRESTDWLazDriver.SetConnection(Value : TComponent);

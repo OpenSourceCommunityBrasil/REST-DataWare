@@ -1028,8 +1028,150 @@ Function TDWPoolerMethodClient.InsertValue(Pooler, Method_Prefix,
                                            UserName                : String  = '';
                                            Password                : String  = '';
                                            RESTClientPooler        : TRESTClientPooler = Nil): Integer;
+Var
+ RESTClientPoolerExec : TRESTClientPooler;
+ lResponse            : String;
+ JSONParam            : TJSONParam;
+ DWParams             : TDWParams;
 Begin
-
+ Result := -1;
+ If Not Assigned(RESTClientPooler) Then
+  RESTClientPoolerExec                := TRESTClientPooler.Create(Nil)
+ Else
+  RESTClientPoolerExec                := RESTClientPooler;
+ RESTClientPoolerExec.WelcomeMessage  := vWelcomeMessage;
+ RESTClientPoolerExec.Host            := Host;
+ RESTClientPoolerExec.Port            := Port;
+ RESTClientPoolerExec.UserName        := UserName;
+ RESTClientPoolerExec.Password        := Password;
+ RESTClientPoolerExec.RequestTimeOut  := TimeOut;
+ RESTClientPoolerExec.UrlPath         := Method_Prefix;
+ RESTClientPoolerExec.DataCompression := vCompression;
+ {$IFDEF FPC}
+  RESTClientPoolerExec.OnWork        := vOnWork;
+  RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
+  RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
+  RESTClientPoolerExec.OnStatus      := vOnStatus;
+  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
+ {$ELSE}
+  RESTClientPoolerExec.OnWork        := vOnWork;
+  RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
+  RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
+  RESTClientPoolerExec.OnStatus      := vOnStatus;
+ {$ENDIF}
+ DWParams                        := TDWParams.Create;
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ENDIF}
+ JSONParam.ParamName             := 'Pooler';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.SetValue(Pooler);
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ENDIF}
+ JSONParam.ParamName             := 'Method_Prefix';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.SetValue(Method_Prefix);
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ENDIF}
+ JSONParam.ParamName             := 'SQL';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.SetValue(SQL);
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ENDIF}
+ JSONParam.ParamName             := 'Params';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.SetValue(Params.ToJSON);
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ENDIF}
+ JSONParam.ParamName             := 'Error';
+ JSONParam.ObjectDirection       := odInOut;
+ JSONParam.SetValue(BooleanToString(False));
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ENDIF}
+ JSONParam.ParamName             := 'MessageError';
+ JSONParam.ObjectDirection       := odInOut;
+ JSONParam.SetValue(MessageError);
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ENDIF}
+ JSONParam.ParamName             := 'Result';
+ JSONParam.ObjectDirection       := odOUT;
+ JSONParam.SetValue('');
+ DWParams.Add(JSONParam);
+ Try
+  Try
+   lResponse := RESTClientPoolerExec.SendEvent('InsertMySQLReturnID_PARAMS', DWParams);
+   If (lResponse <> '') And
+      (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
+    Begin
+     Result         := -1;
+     If DWParams.ItemsString['Error'] <> Nil Then
+      Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
+     If DWParams.ItemsString['MessageError'] <> Nil Then
+      MessageError  := DWParams.ItemsString['MessageError'].Value;
+     If DWParams.ItemsString['Result'] <> Nil Then
+      Result := StrToInt(DWParams.ItemsString['Result'].Value);
+    End
+   Else
+    Begin
+     If (lResponse = '') Then
+      Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+     Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
+      Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+    End;
+  Except
+  End;
+ Finally
+  If Not Assigned(RESTClientPooler) Then
+   FreeAndNil(RESTClientPoolerExec);
+  FreeAndNil(DWParams);
+ End;
 End;
 
 Function TDWPoolerMethodClient.InsertValuePure(Pooler, Method_Prefix,
@@ -1040,8 +1182,137 @@ Function TDWPoolerMethodClient.InsertValuePure(Pooler, Method_Prefix,
                                                UserName                : String  = '';
                                                Password                : String  = '';
                                                RESTClientPooler        : TRESTClientPooler = Nil): Integer;
+Var
+ RESTClientPoolerExec : TRESTClientPooler;
+ lResponse            : String;
+ JSONParam            : TJSONParam;
+ DWParams             : TDWParams;
 Begin
-
+ Result := -1;
+ If Not Assigned(RESTClientPooler) Then
+  RESTClientPoolerExec                := TRESTClientPooler.Create(Nil)
+ Else
+  RESTClientPoolerExec                := RESTClientPooler;
+ RESTClientPoolerExec.WelcomeMessage  := vWelcomeMessage;
+ RESTClientPoolerExec.Host            := Host;
+ RESTClientPoolerExec.Port            := Port;
+ RESTClientPoolerExec.UserName        := UserName;
+ RESTClientPoolerExec.Password        := Password;
+ RESTClientPoolerExec.RequestTimeOut  := TimeOut;
+ RESTClientPoolerExec.UrlPath         := Method_Prefix;
+ RESTClientPoolerExec.DataCompression := vCompression;
+ {$IFDEF FPC}
+  RESTClientPoolerExec.OnWork        := vOnWork;
+  RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
+  RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
+  RESTClientPoolerExec.OnStatus      := vOnStatus;
+  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
+ {$ELSE}
+  RESTClientPoolerExec.OnWork        := vOnWork;
+  RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
+  RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
+  RESTClientPoolerExec.OnStatus      := vOnStatus;
+ {$ENDIF}
+ DWParams                        := TDWParams.Create;
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ENDIF}
+ JSONParam.ParamName             := 'Pooler';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.SetValue(Pooler);
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ENDIF}
+ JSONParam.ParamName             := 'Method_Prefix';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.SetValue(Method_Prefix);
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ENDIF}
+ JSONParam.ParamName             := 'SQL';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.SetValue(SQL);
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ENDIF}
+ JSONParam.ParamName             := 'Error';
+ JSONParam.ObjectDirection       := odInOut;
+ JSONParam.SetValue(BooleanToString(False));
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ENDIF}
+ JSONParam.ParamName             := 'MessageError';
+ JSONParam.ObjectDirection       := odInOut;
+ JSONParam.SetValue(MessageError);
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ENDIF}
+ JSONParam.ParamName             := 'Result';
+ JSONParam.ObjectDirection       := odOUT;
+ JSONParam.SetValue('');
+ DWParams.Add(JSONParam);
+ Try
+  Try
+   lResponse := RESTClientPoolerExec.SendEvent('InsertMySQLReturnID', DWParams);
+   If (lResponse <> '') And
+      (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
+    Begin
+     If DWParams.ItemsString['Error'] <> Nil Then
+      Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
+     If DWParams.ItemsString['MessageError'] <> Nil Then
+      MessageError  := DWParams.ItemsString['MessageError'].Value;
+     If DWParams.ItemsString['Result'] <> Nil Then
+      Result := StrToInt(DWParams.ItemsString['Result'].Value);
+    End
+   Else
+    Begin
+     If (lResponse = '') Then
+      Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+     Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
+      Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+    End;
+  Except
+  End;
+ Finally
+  If Not Assigned(RESTClientPooler) Then
+   FreeAndNil(RESTClientPoolerExec);
+  FreeAndNil(DWParams);
+ End;
 End;
 
 Function TDWPoolerMethodClient.PoolersDataSet(Method_Prefix    : String;

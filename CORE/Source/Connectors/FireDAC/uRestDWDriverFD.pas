@@ -447,6 +447,7 @@ Var
  A, I        : Integer;
  vParamName  : String;
  fdCommand   : TFDCommand;
+ vStringStream : TMemoryStream;
  Function GetParamIndex(Params : TFDParams; ParamName : String) : Integer;
  Var
   I : Integer;
@@ -472,14 +473,78 @@ Begin
   fdCommand.CommandText.Add(SQL + '; SELECT LAST_INSERT_ID()ID');
   If Params <> Nil Then
    Begin
+    Try
+    // vTempQuery.Prepare;
+    Except
+    End;
     For I := 0 To Params.Count -1 Do
      Begin
       If fdCommand.Params.Count > I Then
        Begin
         vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
         A          := GetParamIndex(fdCommand.Params, vParamName);
-        If A > -1 Then
-         fdCommand.Params[A].Value := Params[I].Value;
+        If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
+         Begin
+          If fdCommand.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                                ftString,    ftWideString]    Then
+           Begin
+            If fdCommand.Params[A].Size > 0 Then
+             fdCommand.Params[A].Value := Copy(Params[I].Value, 1, fdCommand.Params[A].Size)
+            Else
+             fdCommand.Params[A].Value := Params[I].Value;
+           End
+          Else
+           Begin
+            If fdCommand.Params[A].DataType in [ftUnknown] Then
+             Begin
+              If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
+               fdCommand.Params[A].DataType := ObjectValueToFieldType(Params[I].ObjectValue)
+              Else
+               fdCommand.Params[A].DataType := ftString;
+             End;
+            If fdCommand.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord] Then
+             Begin
+              If Trim(Params[I].Value) <> '' Then
+               Begin
+                If fdCommand.Params[A].DataType = ftSmallInt Then
+                 fdCommand.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                Else
+                 fdCommand.Params[A].AsInteger  := StrToInt(Params[I].Value);
+               End;
+             End
+            Else If fdCommand.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
+             Begin
+              If Trim(Params[I].Value) <> '' Then
+               fdCommand.Params[A].AsFloat  := StrToFloat(Params[I].Value);
+             End
+            Else If fdCommand.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+             Begin
+              If Trim(Params[I].Value) <> '' Then
+               Begin
+                If fdCommand.Params[A].DataType      = ftDate Then
+                 fdCommand.Params[A].AsDate      := StrToDate(Params[I].Value)
+                Else If fdCommand.Params[A].DataType = ftTime Then
+                 fdCommand.Params[A].AsDateTime  := StrToTime(Params[I].Value)
+                Else If fdCommand.Params[A].DataType In [ftDateTime, ftTimeStamp] Then
+                 fdCommand.Params[A].AsDateTime  := StrToDateTime(Params[I].Value);
+               End;
+             End  //Tratar Blobs de Parametros...
+            Else If fdCommand.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+             Begin
+              vStringStream := TMemoryStream.Create;
+              Try
+               Params[I].SaveToStream(vStringStream);
+               vStringStream.Position := 0;
+               fdCommand.Params[A].LoadFromStream(vStringStream, ftBlob);
+              Finally
+               FreeAndNil(vStringStream);
+              End;
+             End
+            Else
+             fdCommand.Params[A].Value    := Params[I].Value;
+           End;
+         End;
        End
       Else
        Break;

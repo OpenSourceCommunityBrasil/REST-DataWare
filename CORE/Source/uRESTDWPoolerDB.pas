@@ -1064,11 +1064,10 @@ Function TRESTDWDataBase.InsertMySQLReturnID(Var SQL          : TStringList;
                                              Var Error        : Boolean;
                                              Var MessageError : String;
                                              RESTClientPooler : TRESTClientPooler = Nil) : Integer;
-{
 Var
- vDSRConnection    : TRESTClientPooler;
- vRESTConnectionDB : TSMPoolerMethodClient;
- oJsonObject       : Integer;
+ vRESTConnectionDB : TDWPoolerMethodClient;
+ LDataSetList      : Integer;
+ DWParams          : TDWParams;
  Function GetLineSQL(Value : TStringList) : String;
  Var
   I : Integer;
@@ -1083,47 +1082,96 @@ Var
       Result := Result + ' ' + Value[I];
     End;
  End;
-}
+ Procedure ParseParams;
+ Var
+  I : Integer;
+ Begin
+  If Params <> Nil Then
+   For I := 0 To Params.Count -1 Do
+    Begin
+     If Params[I].DataType = ftUnknown then
+      Params[I].DataType := ftString;
+    End;
+ End;
 Begin
-{
- Result := -1;
- Error  := False;
+// Result := Nil;
  if vRestPooler = '' then
   Exit;
- SetConnectionOptions(vDSRConnection);
- vRESTConnectionDB := TSMPoolerMethodClient.Create(vDSRConnection, True);
- vRESTConnectionDB.Compression := vCompression;
- vRESTConnectionDB.Encoding    := GetEncoding(VEncondig);
+ ParseParams;
+ vRESTConnectionDB                := TDWPoolerMethodClient.Create(Nil);
+ vRESTConnectionDB.WelcomeMessage := vWelcomeMessage;
+ vRESTConnectionDB.Host           := vRestWebService;
+ vRESTConnectionDB.Port           := vPoolerPort;
+ vRESTConnectionDB.Compression    := vCompression;
+ {$IFNDEF FPC}
+  vRESTConnectionDB.OnWork        := vOnWork;
+  vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
+  vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
+  vRESTConnectionDB.OnStatus      := vOnStatus;
+  {$if CompilerVersion > 21}
+  vRESTConnectionDB.Encoding      := VEncondig;
+  {$IFEND}
+ {$ELSE}
+  vRESTConnectionDB.OnWork        := vOnWork;
+  vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
+  vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
+  vRESTConnectionDB.OnStatus        := vOnStatus;
+  vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
+ {$ENDIF}
  Try
   If Params.Count > 0 Then
-   oJsonObject := vRESTConnectionDB.InsertValue(vRestPooler,
-                                                vRestModule,
-                                                GetLineSQL(SQL),
-                                                Params,
-                                                Error, MessageError, '',
-                                                vTimeOut, vLogin, vPassword)
+   Begin
+    DWParams     := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vEncondig{$IFEND}{$ENDIF});
+    LDataSetList := vRESTConnectionDB.InsertValue(vRestPooler,
+                                                  vRestModule, GetLineSQL(SQL),
+                                                  DWParams, Error,
+                                                  MessageError, vTimeOut, vLogin, vPassword, RESTClientPooler);
+    FreeAndNil(DWParams);
+   End
   Else
-   oJsonObject := vRESTConnectionDB.InsertValuePure(vRestPooler,
-                                                    vRestModule,
-                                                    GetLineSQL(SQL),
-                                                    Error, MessageError, '',
-                                                    vTimeOut, vLogin, vPassword);
-  Result := oJsonObject;
-  If Assigned(vOnEventConnection) Then
-   vOnEventConnection(True, 'ExecuteCommand Ok');
+   LDataSetList := vRESTConnectionDB.InsertValuePure (vRestPooler,
+                                                      vRestModule,
+                                                      GetLineSQL(SQL), Error,
+                                                      MessageError, vTimeOut, vLogin, vPassword, RESTClientPooler);
+  If (LDataSetList <> -1) Then
+   Begin
+//    If Not Assigned(Result) Then //Correção fornecida por romyllldo no Forum
+    Result := -1;
+    Error  := Trim(MessageError) <> '';
+    If (LDataSetList <> -1) And
+       (Not (Error))        Then
+     Begin
+      Try
+       Result := LDataSetList;
+      Finally
+      End;
+     End;
+    If (Not (Error)) Then
+     Begin
+      If Assigned(vOnEventConnection) Then
+       vOnEventConnection(True, 'InsertValue Ok');
+     End
+    Else
+     Begin
+      If Assigned(vOnEventConnection) then
+       vOnEventConnection(False, MessageError)
+      Else
+       Raise Exception.Create(PChar(MessageError));
+     End;
+   End
+  Else
+   Begin
+    If Assigned(vOnEventConnection) Then
+     vOnEventConnection(False, MessageError);
+   End;
  Except
   On E : Exception do
    Begin
-    vDSRConnection.SessionID := '';
-    Error                    := True;
-    MessageError             := E.Message;
     if Assigned(vOnEventConnection) then
      vOnEventConnection(False, E.Message);
    End;
  End;
- vDSRConnection.Free;
- vRESTConnectionDB.Free;
-}
+ FreeAndNil(vRESTConnectionDB);
 End;
 
 Procedure TRESTDWDataBase.Open;

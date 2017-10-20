@@ -177,6 +177,9 @@ Type
   Procedure ExecuteCommandJSON(ServerMethodsClass     : TComponent;
                                Var Pooler             : String;
                                Var DWParams           : TDWParams);
+  Procedure InsertMySQLReturnID(ServerMethodsClass : TComponent;
+                                Var Pooler         : String;
+                                Var DWParams       : TDWParams);
  Public
   Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                      //Destroy a Classe
@@ -1449,6 +1452,63 @@ Begin
   end;
 End;
 
+Procedure TRESTServicePooler.InsertMySQLReturnID(ServerMethodsClass : TComponent;
+                                                 Var Pooler         : String;
+                                                 Var DWParams       : TDWParams);
+Var
+ I,
+ vTempJSON     : Integer;
+ vError        : Boolean;
+ vMessageError : String;
+ DWParamsD     : TDWParams;
+Begin
+ DWParamsD := Nil;
+ vTempJSON := -1;
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
+      Begin
+       If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
+        Begin
+         If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
+          Begin
+           vError   := StringToBoolean(DWParams.ItemsString['Error'].Value);
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+           If DWParams.ItemsString['Params'] <> Nil Then
+            Begin
+             DWParamsD := TDWParams.Create;
+             DWParamsD.FromJSON(DWParams.ItemsString['Params'].Value);
+            End;
+           If DWParamsD <> Nil Then
+            Begin
+             vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.InsertMySQLReturnID(DWParams.ItemsString['SQL'].Value,
+                                                                                                           DWParamsD, vError, vMessageError);
+             DWParamsD.Free;
+            End
+           Else
+            vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.InsertMySQLReturnID(DWParams.ItemsString['SQL'].Value,
+                                                                                                          vError,
+                                                                                                          vMessageError);
+           If vMessageError <> '' Then
+            DWParams.ItemsString['MessageError'].SetValue(vMessageError);
+           DWParams.ItemsString['Error'].SetValue(BooleanToString(vError));
+           If DWParams.ItemsString['Result'] <> Nil Then
+            Begin
+             If vTempJSON <> -1 Then
+              DWParams.ItemsString['Result'].SetValue(IntToStr(vTempJSON))
+             Else
+              DWParams.ItemsString['Result'].SetValue('-1');
+            End;
+          End;
+         Break;
+        End;
+      End;
+    End;
+  End;
+End;
+
 Procedure TRESTServicePooler.ExecuteCommandJSON(ServerMethodsClass : TComponent;
                                                 Var Pooler         : String;
                                                 Var DWParams       : TDWParams);
@@ -1553,6 +1613,26 @@ Begin
   Begin
    vResult    := DWParams.ItemsString['Pooler'].Value;
    ExecuteCommandJSON(BaseObject, vResult, DWParams);
+   Result     := True;
+   If Not(StringToBoolean(DWParams.ItemsString['Error'].Value)) Then
+    JSONStr    := TReplyOK
+   Else
+    JSONStr    := TReplyNOK;
+  End
+ Else If vUrlMethod = UpperCase('InsertMySQLReturnID_PARAMS') Then
+  Begin
+   vResult    := DWParams.ItemsString['Pooler'].Value;
+   InsertMySQLReturnID(BaseObject, vResult, DWParams);
+   Result     := True;
+   If Not(StringToBoolean(DWParams.ItemsString['Error'].Value)) Then
+    JSONStr    := TReplyOK
+   Else
+    JSONStr    := TReplyNOK;
+  End
+ Else If vUrlMethod = UpperCase('InsertMySQLReturnID') Then
+  Begin
+   vResult    := DWParams.ItemsString['Pooler'].Value;
+   InsertMySQLReturnID(BaseObject, vResult, DWParams);
    Result     := True;
    If Not(StringToBoolean(DWParams.ItemsString['Error'].Value)) Then
     JSONStr    := TReplyOK
