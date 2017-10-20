@@ -1811,9 +1811,11 @@ Begin
            DeleteCriticalSection(vCriticalSection);
           {$ELSE}
            vCriticalSection.Release;
+           FreeAndNil(vCriticalSection);
           {$ENDIF}
          {$ELSE}
            vCriticalSection.Release;
+           FreeAndNil(vCriticalSection);
          {$IFEND}
          {$ELSE}
           LeaveCriticalSection(vCriticalSection);
@@ -1893,6 +1895,7 @@ Begin
         AResponseInfo.WriteHeader;
         // AResponseInfo.WriteContent;
        Finally
+        FreeAndNil(mb);
 //        AResponseInfo.ContentStream.Free;
 //        AResponseInfo.ContentStream := Nil;
        End;
@@ -1927,9 +1930,11 @@ Begin
            DeleteCriticalSection(vCriticalSection);
           {$ELSE}
            vCriticalSection.Release;
+           FreeAndNil(vCriticalSection);
           {$ENDIF}
          {$ELSE}
            vCriticalSection.Release;
+           FreeAndNil(vCriticalSection);
          {$IFEND}
          {$ELSE}
           LeaveCriticalSection(vCriticalSection);
