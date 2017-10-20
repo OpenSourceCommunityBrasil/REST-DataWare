@@ -45,6 +45,9 @@
         <Projects Include="..\..\..\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\..\Samples\ClientSlides\ClientSlides.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -179,14 +182,23 @@
     <Target Name="ClienteFMX:Make">
         <MSBuild Projects="..\..\..\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj" Targets="Make"/>
     </Target>
+    <Target Name="ClientSlides">
+        <MSBuild Projects="..\..\..\Samples\ClientSlides\ClientSlides.dproj"/>
+    </Target>
+    <Target Name="ClientSlides:Clean">
+        <MSBuild Projects="..\..\..\Samples\ClientSlides\ClientSlides.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ClientSlides:Make">
+        <MSBuild Projects="..\..\..\Samples\ClientSlides\ClientSlides.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClienteFMX"/>
+        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClienteFMX;ClientSlides"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClienteFMX:Clean"/>
+        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClienteFMX:Clean;ClientSlides:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClienteFMX:Make"/>
+        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClienteFMX:Make;ClientSlides:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -105,9 +105,10 @@ function TRESTDWDriverFD.ExecuteCommand(SQL              : String;
                                         Var MessageError : String;
                                         Execute          : Boolean) : TJSONValue;
 Var
- vTempQuery  : TFDQuery;
- A, I        : Integer;
- vParamName  : String;
+ vTempQuery    : TFDQuery;
+ A, I          : Integer;
+ vParamName    : String;
+ vStringStream : TMemoryStream;
  Function GetParamIndex(Params : TFDParams; ParamName : String) : Integer;
  Var
   I : Integer;
@@ -193,6 +194,17 @@ Begin
                  vTempQuery.Params[A].AsDateTime  := StrToDateTime(Params[I].Value);
                End;
              End  //Tratar Blobs de Parametros...
+            Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+             Begin
+              vStringStream := TMemoryStream.Create;
+              Try
+               Params[I].SaveToStream(vStringStream);
+               vStringStream.Position := 0;
+               vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
+              Finally
+               FreeAndNil(vStringStream);
+              End;
+             End
             Else
              vTempQuery.Params[A].Value    := Params[I].Value;
            End;

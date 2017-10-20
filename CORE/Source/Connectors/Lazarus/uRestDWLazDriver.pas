@@ -97,10 +97,11 @@ function TRESTDWLazDriver.ExecuteCommand(SQL              : String;
                                          Var MessageError : String;
                                          Execute          : Boolean) : TJSONValue;
 Var
- vTempQuery   : TSQLQuery;
- ATransaction : TSQLTransaction;
- A, I         : Integer;
- vParamName   : String;
+ vTempQuery    : TSQLQuery;
+ ATransaction  : TSQLTransaction;
+ A, I          : Integer;
+ vParamName    : String;
+ vStringStream : TMemoryStream;
  Function GetParamIndex(Params : TParams; ParamName : String) : Integer;
  Var
   I : Integer;
@@ -141,7 +142,8 @@ Begin
   If Params <> Nil Then
    Begin
     Try
-     vTempQuery.Prepare;
+     If Not Execute Then
+      vTempQuery.Prepare;
     Except
     End;
     For I := 0 To Params.Count -1 Do
@@ -196,6 +198,17 @@ Begin
                 Else If vTempQuery.Params[A].DataType In [ftDateTime, ftTimeStamp] Then
                  vTempQuery.Params[A].AsDateTime  := StrToDateTime(Params[I].Value);
                End;
+             End
+            Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+             Begin
+              vStringStream := TMemoryStream.Create;
+              Try
+               Params[I].SaveToStream(vStringStream);
+               vStringStream.Position := 0;
+               vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
+              Finally
+               FreeAndNil(vStringStream);
+              End;
              End
             Else
              vTempQuery.Params[A].Value    := Params[I].Value;
