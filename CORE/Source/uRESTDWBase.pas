@@ -198,7 +198,7 @@ Type
   Property Encoding              : TEncodeSelect   Read VEncondig              Write VEncondig;          //Encoding da string
   Property ServerContext         : String          Read vServerContext         Write vServerContext;
   {TODO CRISTIANO BARBOSA}
-  Property RootPath              : String         Read FRootPath              Write FRootPath ;
+  Property RootPath              : String          Read FRootPath              Write FRootPath;
 End;
 
 Type
@@ -234,6 +234,9 @@ Type
   vAutenticacao     : Boolean;
   vTransparentProxy : TIdProxyConnectionInfo;
   vRequestTimeOut   : Integer;
+  {$IFDEF FPC}
+  vDatabaseCharSet  : TDatabaseCharSet;
+  {$ENDIF}
   Procedure SetUserName(Value : String);
   Procedure SetPassword(Value : String);
   Procedure SetUrlPath (Value : String);
@@ -267,6 +270,9 @@ Type
   Property OnWorkBegin      : TOnWorkBegin           Read vOnWorkBegin       Write SetOnWorkBegin;
   Property OnWorkEnd        : TOnWorkEnd             Read vOnWorkEnd         Write SetOnWorkEnd;
   Property OnStatus         : TOnStatus              Read vOnStatus          Write SetOnStatus;
+  {$IFDEF FPC}
+  Property DatabaseCharSet  : TDatabaseCharSet       Read vDatabaseCharSet   Write vDatabaseCharSet;
+  {$ENDIF}
 End;
 
 implementation
@@ -291,6 +297,9 @@ Begin
  vRequestTimeOut                 := 10000;
  vThreadRequest                  := False;
  vDatacompress                   := True;
+ {$IFDEF FPC}
+ vDatabaseCharSet                := csUndefined;
+ {$ENDIF}
 End;
 
 Destructor  TRESTClientPooler.Destroy;
@@ -962,7 +971,7 @@ Var
           JSONParam.ObjectDirection := GetDirectionName(bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString);
           JSONParam.Encoded         := GetBooleanFromString(bJsonOBJ.opt(bJsonOBJ.names.get(2).ToString).ToString);
           If JSONParam.Encoded Then
-           vValue := DecodeStrings(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString)
+           vValue := DecodeStrings(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
           Else
            vValue := bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString;
           JSONParam.SetValue(vValue);
@@ -1089,7 +1098,7 @@ Begin
        If Params <> Nil Then
         SetParamsValues(Params, SendParams);
        If vWelcomeMessage <> '' Then
-        SendParams.AddFormField('dwwelcomemessage', EncodeStrings(vWelcomeMessage));
+        SendParams.AddFormField('dwwelcomemessage', EncodeStrings(vWelcomeMessage, vDatabaseCharSet));
        If (Params <> Nil) Or (vWelcomeMessage <> '') Then
         Begin
          HttpRequest.Request.ContentType     := 'application/x-www-form-urlencoded';
@@ -1720,7 +1729,7 @@ Begin
                If Decoder <> Nil Then
                 TIdMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
                If pos('dwwelcomemessage', tmp) > 0 Then
-                vWelcomeMessage := DecodeStrings(ms.DataString)
+                vWelcomeMessage := DecodeStrings(ms.DataString{$IFDEF FPC}, csUndefined{$ENDIF})
                Else
                 Begin
                  JSONParam   := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF};
@@ -2034,7 +2043,7 @@ Begin
        EnterCriticalSection(vCriticalSection);
       {$ENDIF}
       Try
-       vLastResponse(DecodeStrings(JSONStr));
+       vLastResponse(DecodeStrings(JSONStr{$IFDEF FPC}, csUndefined{$ENDIF}));
       Finally
        {$IFDEF WINDOWS}
         LeaveCriticalSection(vCriticalSection);
@@ -2302,7 +2311,7 @@ Var
           JSONParam.ObjectDirection := GetDirectionName(bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString);
           JSONParam.Encoded         := GetBooleanFromString(bJsonOBJ.opt(bJsonOBJ.names.get(2).ToString).ToString);
           If JSONParam.Encoded Then
-           vValue := DecodeStrings(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString)
+           vValue := DecodeStrings(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString{$IFDEF FPC}, csUndefined{$ENDIF})
           Else
            vValue := bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString;
           JSONParam.SetValue(vValue);

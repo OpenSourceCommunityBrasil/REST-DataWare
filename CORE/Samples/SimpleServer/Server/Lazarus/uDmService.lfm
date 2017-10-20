@@ -32,6 +32,7 @@ object ServerMethodDM: TServerMethodDM
     Password = 'masterkey'
     Transaction = SQLTransaction1
     UserName = 'SYSDBA'
+    CharSet = 'win1252'
     HostName = 'localhost'
     CheckTransactionParams = False
     left = 80
@@ -44,6 +45,7 @@ object ServerMethodDM: TServerMethodDM
     top = 24
   end
   object RESTDWDriverFD1: TRESTDWLazDriver
+    DatabaseCharSet = csWin1252
     Connection = Server_FDConnection
     left = 80
     top = 104

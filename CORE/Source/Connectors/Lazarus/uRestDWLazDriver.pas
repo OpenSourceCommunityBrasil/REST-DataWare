@@ -210,6 +210,7 @@ Begin
    Begin
     vTempQuery.Active := True;
     Result := TJSONValue.Create;
+    Result.DatabaseCharSet := DatabaseCharSet;
     Try
      Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
     Finally
@@ -217,10 +218,12 @@ Begin
    End
   Else
    Begin
+    ATransaction.DataBase := TDatabase(vConnection);
+    ATransaction.StartTransaction;;
     vTempQuery.ExecSQL;
     Result := TJSONValue.Create;
     Result.SetValue('COMMANDOK');
-    ATransaction.CommitRetaining;
+    ATransaction.Commit;
    End;
  Except
   On E : Exception do
@@ -230,7 +233,7 @@ Begin
      MessageError := E.Message;
      Result.Encoded := True;
      Result.SetValue(GetPairJSON('NOK', MessageError));
-     ATransaction.RollbackRetaining;
+     ATransaction.Rollback;
     Except
     End;
    End;
@@ -286,6 +289,7 @@ Begin
    Begin
     vTempQuery.Open;
     Result         := TJSONValue.Create;
+    Result.DatabaseCharSet := DatabaseCharSet;
     Try
      Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
      Error         := False;
@@ -294,15 +298,16 @@ Begin
    End
   Else
    Begin
-    try
-      vTempQuery.ExecSQL;
-      Result := TJSONValue.Create;
-      Result.SetValue('COMMANDOK');
-      ATransaction.CommitRetaining;
-      Error         := False;
-    finally
-    end;
-
+    Try
+     ATransaction.DataBase := TDatabase(vConnection);
+     ATransaction.StartTransaction;;
+     vTempQuery.ExecSQL;
+     Result := TJSONValue.Create;
+     Result.SetValue('COMMANDOK');
+     ATransaction.Commit;
+     Error         := False;
+    Finally
+    End;
    End;
  Except
   On E : Exception do
@@ -312,8 +317,9 @@ Begin
      MessageError := E.Message;
      Result := TJSONValue.Create;
      Result.Encoded := True;
+     Result.DatabaseCharSet := DatabaseCharSet;
      Result.SetValue(GetPairJSON('NOK', MessageError));
-     ATransaction.RollbackRetaining;
+     ATransaction.Rollback;
     Except
     End;
 

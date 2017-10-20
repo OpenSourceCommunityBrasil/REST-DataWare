@@ -28,6 +28,9 @@ Uses {$IFDEF FPC}
      vEncoding           : TEncodeSelect;
     {$IFEND}
    {$ENDIF}
+   {$IFDEF FPC}
+   vDatabaseCharSet   : TDatabaseCharSet;
+   {$ENDIF}
    vWelcomeMessage,
    vHost : String;
    vPort : Integer;
@@ -168,6 +171,9 @@ Uses {$IFDEF FPC}
    Property OnWorkBegin    : TOnWorkBegin  Read vOnWorkBegin    Write SetOnWorkBegin;
    Property OnWorkEnd      : TOnWorkEnd    Read vOnWorkEnd      Write SetOnWorkEnd;
    Property OnStatus       : TOnStatus     Read vOnStatus       Write SetOnStatus;
+   {$IFDEF FPC}
+   Property DatabaseCharSet: TDatabaseCharSet Read vDatabaseCharSet Write vDatabaseCharSet;
+   {$ENDIF}
   End;
 
 implementation
@@ -249,6 +255,9 @@ Begin
    vEncoding  := esASCII;
   {$IFEND}
  {$ENDIF}
+ {$IFDEF FPC}
+ vDatabaseCharSet := csUndefined;
+ {$ENDIF}
  Host := '127.0.0.1';
  Port := 8082;
 End;
@@ -287,6 +296,7 @@ Begin
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus      := vOnStatus;
+  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ELSE}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
@@ -375,6 +385,7 @@ Begin
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus      := vOnStatus;
+  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ELSE}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
@@ -469,6 +480,7 @@ Begin
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus      := vOnStatus;
+  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ELSE}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
@@ -632,10 +644,11 @@ Begin
  RESTClientPoolerExec.UrlPath         := Method_Prefix;
  RESTClientPoolerExec.DataCompression := vCompression;
  {$IFDEF FPC}
-  RESTClientPoolerExec.OnWork        := vOnWork;
-  RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
-  RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
-  RESTClientPoolerExec.OnStatus      := vOnStatus;
+  RESTClientPoolerExec.OnWork           := vOnWork;
+  RESTClientPoolerExec.OnWorkBegin      := vOnWorkBegin;
+  RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
+  RESTClientPoolerExec.OnStatus         := vOnStatus;
+  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ELSE}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
@@ -835,6 +848,7 @@ Begin
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus      := vOnStatus;
+  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ELSE}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;

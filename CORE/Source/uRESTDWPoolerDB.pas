@@ -105,6 +105,9 @@ End;
 Type
  TRESTDWDataBase = Class(TComponent)
  Private
+  {$IFDEF FPC}
+  vDatabaseCharSet     : TDatabaseCharSet;
+  {$ENDIF}
   vOnWork              : TOnWork;
   vOnWorkBegin         : TOnWorkBegin;
   vOnWorkEnd           : TOnWorkEnd;
@@ -205,6 +208,9 @@ Type
   Property OnWorkBegin        : TOnWorkBegin             Read vOnWorkBegin        Write SetOnWorkBegin;
   Property OnWorkEnd          : TOnWorkEnd               Read vOnWorkEnd          Write SetOnWorkEnd;
   Property OnStatus           : TOnStatus                Read vOnStatus           Write SetOnStatus;
+  {$IFDEF FPC}
+  Property DatabaseCharSet    : TDatabaseCharSet         Read vDatabaseCharSet    Write vDatabaseCharSet;
+  {$ENDIF}
 End;
 
 Type
@@ -423,6 +429,9 @@ Type
   vEncodeStrings,
   vCompression       : Boolean;
   vEncoding          : TEncodeSelect;
+  {$IFDEF FPC}
+  vDatabaseCharSet   : TDatabaseCharSet;
+  {$ENDIF}
  Public
   Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
   Procedure ApplyChanges        (TableName,
@@ -461,12 +470,16 @@ Type
                                  Var MessageError : String);Virtual;abstract;
   Procedure Close;Virtual;abstract;
  Public
-  Property StrsTrim       : Boolean       Read vStrsTrim       Write vStrsTrim;
-  Property StrsEmpty2Null : Boolean       Read vStrsEmpty2Null Write vStrsEmpty2Null;
-  Property StrsTrim2Len   : Boolean       Read vStrsTrim2Len   Write vStrsTrim2Len;
-  Property Compression    : Boolean       Read vCompression    Write vCompression;
-  Property EncodeStringsJSON : Boolean       Read vEncodeStrings  Write vEncodeStrings;
-  Property Encoding       : TEncodeSelect Read vEncoding       Write vEncoding;
+  Property StrsTrim          : Boolean          Read vStrsTrim        Write vStrsTrim;
+  Property StrsEmpty2Null    : Boolean          Read vStrsEmpty2Null  Write vStrsEmpty2Null;
+  Property StrsTrim2Len      : Boolean          Read vStrsTrim2Len    Write vStrsTrim2Len;
+  Property Compression       : Boolean          Read vCompression     Write vCompression;
+  Property EncodeStringsJSON : Boolean          Read vEncodeStrings   Write vEncodeStrings;
+  Property Encoding          : TEncodeSelect    Read vEncoding        Write vEncoding;
+ {$IFDEF FPC}
+ Published
+  Property DatabaseCharSet   : TDatabaseCharSet Read vDatabaseCharSet Write vDatabaseCharSet;
+ {$ENDIF}
 End;
 
 //PoolerDB Control
@@ -1176,7 +1189,8 @@ Begin
   vRESTConnectionDB.OnWork        := vOnWork;
   vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
   vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
-  vRESTConnectionDB.OnStatus      := vOnStatus;
+  vRESTConnectionDB.OnStatus        := vOnStatus;
+  vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
  {$ENDIF}
  Try
   If Params.Count > 0 Then
@@ -1318,6 +1332,9 @@ Begin
  vDateSeparator            := '/';
  vTimeSeparator            := ':';
  vDecimalSeparator         := ',';
+ {$IFDEF FPC}
+ vDatabaseCharSet := csUndefined;
+ {$ENDIF}
 End;
 
 Destructor  TRESTDWPoolerList.Destroy;
@@ -1378,10 +1395,11 @@ Begin
   vConnection.Encoding      := VEncondig;
   {$IFEND}
  {$ELSE}
-  vConnection.OnWork        := vOnWork;
-  vConnection.OnWorkBegin   := vOnWorkBegin;
-  vConnection.OnWorkEnd     := vOnWorkEnd;
-  vConnection.OnStatus      := vOnStatus;
+  vConnection.OnWork          := vOnWork;
+  vConnection.OnWorkBegin     := vOnWorkBegin;
+  vConnection.OnWorkEnd       := vOnWorkEnd;
+  vConnection.OnStatus        := vOnStatus;
+  vConnection.DatabaseCharSet := vDatabaseCharSet;
  {$ENDIF}
  Try
   Try
@@ -2621,7 +2639,10 @@ End;
 Constructor TRESTDWDriver.Create(AOwner: TComponent);
 Begin
  Inherited;
- vEncodeStrings := True;
+ vEncodeStrings   := True;
+ {$IFDEF FPC}
+ vDatabaseCharSet := csUndefined;
+ {$ENDIF}
 End;
 
 end.

@@ -11,7 +11,7 @@ object Form2: TForm2
   Font.Height = -11
   Font.Name = 'Tahoma'
   Position = poDesktopCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.0.5'
   object Image1: TImage
     Left = 366
     Height = 100
@@ -1104,9 +1104,8 @@ object Form2: TForm2
     top = 328
   end
   object RESTDWDataBase1: TRESTDWDataBase
-    Active = True
+    Active = False
     Compression = True
-    MyIP = '127.0.0.1'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -1128,6 +1127,7 @@ object Form2: TForm2
     OnWork = RESTDWDataBase1Work
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd
+    DatabaseCharSet = csWin1252
     left = 344
     top = 280
   end

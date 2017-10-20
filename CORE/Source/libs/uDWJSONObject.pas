@@ -63,6 +63,9 @@ Private
  vEncoding: TEncoding;
  {$IFEND}
  {$ENDIF}
+ {$IFDEF FPC}
+ vDatabaseCharSet   : TDatabaseCharSet;
+ {$ENDIF}
  Function  GetValue : String;
  Procedure WriteValue   (bValue      : String);
  Function  FormatValue  (bValue      : String)       : String;
@@ -79,14 +82,16 @@ Public
                            EncodedValue : Boolean = True;
                            DTSeparator  : String = '/';
                            TMSeparator  : String = ':';
-                           DCSeparator  : String = ',');
+                           DCSeparator  : String = ','{$IFDEF FPC};
+                           CharSet      : TDatabaseCharSet = csUndefined{$ENDIF});
  // alterado por fabricio  passa o nome da tabela
  Procedure WriteToDataset (DatasetType  : TDatasetType;
                            JSONValue    : String;
                            DestDS       : TDataset;
                            DTSeparator  : String = '/';
                            TMSeparator  : String = ':';
-                           DCSeparator  : String = ',');
+                           DCSeparator  : String = ','{$IFDEF FPC};
+                           CharSet      : TDatabaseCharSet = csUndefined{$ENDIF});
  Procedure LoadFromJSON   (bValue       : String);
  Procedure LoadFromStream (Stream       : TMemoryStream;
                            Encode       : Boolean = True);
@@ -107,6 +112,9 @@ Public
  {$ENDIF}
  Property    Tagname         : String           Read vtagName         Write vtagName;
  Property    Encoded         : Boolean          Read vEncoded         Write vEncoded;
+ {$IFDEF FPC}
+ Property DatabaseCharSet    : TDatabaseCharSet Read vDatabaseCharSet Write vDatabaseCharSet;
+ {$ENDIF}
 End;
 
 Type
@@ -557,6 +565,9 @@ Begin
  vEncoding       := TEncoding.ASCII;
  {$IFEND}
  {$ENDIF}
+ {$IFDEF FPC}
+ vDatabaseCharSet := csUndefined;
+ {$ENDIF}
  vTypeObject     := toObject;
  ObjectDirection := odINOUT;
  vObjectValue    := ovString;
@@ -658,7 +669,7 @@ Else
    Else
     Begin
      If Length(vTempString) > 0 Then
-      vTempString := DecodeStrings(vTempString);
+      vTempString := DecodeStrings(vTempString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
     End;
   End
  Else
@@ -773,7 +784,7 @@ Var
           If vEncoded Then
            Begin
             {$IFDEF FPC}
-             vTempValue := Format('"%s"',      [EncodeStrings(CP1252ToUTF8(bValue.Fields[I].AsString))]);
+             vTempValue := Format('"%s"',      [EncodeStrings(bValue.Fields[I].AsString, vDatabaseCharSet)]);
             {$ELSE}
              vTempValue := Format('"%s"',      [EncodeStrings(bValue.Fields[I].AsString)]);
             {$ENDIF}
@@ -848,7 +859,8 @@ Procedure TJSONValue.LoadFromDataset(TableName    : String;
                                      EncodedValue : Boolean = True;
                                      DTSeparator  : String = '/';
                                      TMSeparator  : String = ':';
-                                     DCSeparator  : String = ',');
+                                     DCSeparator  : String = ','{$IFDEF FPC};
+                                     CharSet      : TDatabaseCharSet = csUndefined{$ENDIF});
 Var
  vTagGeral        : String;
 Begin
@@ -1258,7 +1270,8 @@ Procedure TJSONValue.WriteToDataset(DatasetType : TDatasetType;
                                     DestDS      : TDataset;
                                     DTSeparator : String = '/';
                                     TMSeparator : String = ':';
-                                    DCSeparator : String = ',');
+                                    DCSeparator : String = ','{$IFDEF FPC};
+                                    CharSet     : TDatabaseCharSet = csUndefined{$ENDIF});
 Var
  bJsonOBJ,
  bJsonArraySub,
@@ -1596,7 +1609,7 @@ Begin
                Else
                 Begin
                  If vEncoded Then
-                  DestDS.Fields[I].AsString := DecodeStrings(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString)
+                  DestDS.Fields[I].AsString := DecodeStrings(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                  Else
                   DestDS.Fields[I].AsString := bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString;
                 End;
@@ -1743,7 +1756,7 @@ Begin
         End;
        End
       Else
-       vTempValue := DecodeStrings(vTempValue);
+       vTempValue := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
      End;
     If Not(vObjectValue In [ovBytes,   ovVarBytes, ovBlob,
                             ovGraphic, ovOraBlob,  ovOraClob]) Then
@@ -1783,7 +1796,7 @@ Begin
                        ovGraphic, ovOraBlob,  ovOraClob] Then
     WriteValue(Value)
    Else
-    WriteValue(EncodeStrings(Value))
+    WriteValue(EncodeStrings(Value{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}))
   End
  Else
   WriteValue(Value);
@@ -1852,7 +1865,10 @@ Begin
                             {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,
                             {$IFEND}{$ENDIF}
                             ftFmtMemo, ftFixedChar] Then
-  SetValue(Param.AsString, False)
+  Begin
+   vEncoded := true;
+   SetValue(Param.AsString, vEncoded);
+  End
  Else If Param.DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended,
                             {$IFEND}{$ENDIF}ftInteger, ftSmallint, ftFloat,
                             ftCurrency, ftFMTBcd, ftBCD] Then
@@ -1965,7 +1981,7 @@ Begin
  vEncoded := Encode;
  vJSONValue.vEncoded := vEncoded;
  If Encode Then
-  WriteValue(EncodeStrings(aValue))
+  WriteValue(EncodeStrings(aValue{$IFDEF FPC}, csUndefined{$ENDIF}))
  Else
   WriteValue(aValue);
  vBinary := False;

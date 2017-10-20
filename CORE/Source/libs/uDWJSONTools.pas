@@ -39,12 +39,16 @@ Function  GetPairJSON  (Tag,
   Function  DecodeBase64 (Const Value : String)             : String;
   Function  EncodeBase64 (Const Value : String)             : String;
 {$ELSE}
-  Function  DecodeBase64 (Const Value : AnsiString)             : AnsiString;
-  Function  EncodeBase64 (Const Value : AnsiString)             : AnsiString;
+  Function  DecodeBase64 (Const Value : AnsiString
+                          {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : AnsiString;
+  Function  EncodeBase64 (Const Value : AnsiString
+                          {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF})             : AnsiString;
 {$ENDIF}
 {$IFEND}
-Function  EncodeStrings(Value       : String)                 : String;
-Function  DecodeStrings(Value       : String)                 : String;
+Function  EncodeStrings(Value       : String
+                        {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF})                 : String;
+Function  DecodeStrings(Value       : String
+                        {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF})                 : String;
 Function  EncodeBytes  (Value : String{$IFNDEF FPC}{$if CompilerVersion > 21}
                                       ;Encoding : TEncoding {$IFEND}{$ENDIF}) : TIdBytes;
 Procedure HexStringToStream(Value : String; Var BinaryStream : TStringStream);
@@ -270,11 +274,28 @@ Function DecodeBase64(Const Value : String) : String;
 {$IFDEF LINUX}
   Function  DecodeBase64 (Const Value : String)             : String;
 {$ELSE}
-  Function DecodeBase64(Const Value : AnsiString) : AnsiString;
+  Function DecodeBase64(Const Value : AnsiString
+                       {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : AnsiString;
   {$ENDIF}
 {$IFEND}
+Var
+ vValue : String;
 Begin
- Result := Decode64(Value);
+ vValue := Decode64(Value);
+ {$IFDEF FPC}
+ Case DatabaseCharSet Of
+   csWin1250 : vValue := CP1250ToUTF8(vValue);
+   csWin1251 : vValue := CP1251ToUTF8(vValue);
+   csWin1252 : vValue := CP1252ToUTF8(vValue);
+   csWin1253 : vValue := CP1253ToUTF8(vValue);
+   csWin1254 : vValue := CP1254ToUTF8(vValue);
+   csWin1255 : vValue := CP1255ToUTF8(vValue);
+   csWin1256 : vValue := CP1256ToUTF8(vValue);
+   csWin1257 : vValue := CP1257ToUTF8(vValue);
+   csWin1258 : vValue := CP1258ToUTF8(vValue);
+ End;
+ {$ENDIF}
+ Result := vValue;
 End;
 
 {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
@@ -283,11 +304,28 @@ Function EncodeBase64(Const Value : String) : String;
 {$IFDEF LINUX} //ANDROID}
 Function EncodeBase64(Const Value : String) : String;
 {$ELSE}
-  Function EncodeBase64(Const Value : AnsiString) : AnsiString;
+  Function EncodeBase64(Const Value : AnsiString
+                        {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : AnsiString;
 {$ENDIF}
 {$IFEND}
+Var
+ vValue : String;
 Begin
- Result := Encode64(Value);
+ vValue := Value;
+ {$IFDEF FPC}
+ Case DatabaseCharSet Of
+   csWin1250 : vValue := CP1250ToUTF8(vValue);
+   csWin1251 : vValue := CP1251ToUTF8(vValue);
+   csWin1252 : vValue := CP1252ToUTF8(vValue);
+   csWin1253 : vValue := CP1253ToUTF8(vValue);
+   csWin1254 : vValue := CP1254ToUTF8(vValue);
+   csWin1255 : vValue := CP1255ToUTF8(vValue);
+   csWin1256 : vValue := CP1256ToUTF8(vValue);
+   csWin1257 : vValue := CP1257ToUTF8(vValue);
+   csWin1258 : vValue := CP1258ToUTF8(vValue);
+ End;
+ {$ENDIF}
+ Result := Encode64(vValue);
 End;
 
 Function EncodeBytes(Value : String{$IFNDEF FPC}{$if CompilerVersion > 21}; Encoding : TEncoding{$IFEND}{$ENDIF}) : TIdBytes;
@@ -454,19 +492,21 @@ Begin
  End;
 End;
 
-Function EncodeStrings(Value : String) : String;
+Function EncodeStrings(Value : String
+                      {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : String;
 Begin
 {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
  Result := Encode64(Value); //TIdencoderMIME.EncodeString(Value, nil);
 {$ELSE}
- Result := EncodeBase64(Value);
+ Result := EncodeBase64(Value{$IFDEF FPC}, DatabaseCharSet{$ENDIF});
 {$IFEND}
 End;
 
-Function DecodeStrings(Value : String) : String;
+Function DecodeStrings(Value : String
+                       {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : String;
 Begin
  {$IFDEF FPC}
-  Result := DecodeBase64(Value);
+  Result := DecodeBase64(Value, DatabaseCharSet);
  {$ELSE}
  {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
   Result := Decode64(Value); //TIdencoderMIME.EncodeString(Value, nil);
@@ -484,7 +524,7 @@ Var
 Begin
  WSResult.STATUS      := Tag;
  WSResult.MessageText := MessageText;
- Result               := EncodeStrings(TServerUtils.Result2JSON(WSResult));
+ Result               := EncodeStrings(TServerUtils.Result2JSON(WSResult){$IFDEF FPC}, csUndefined{$ENDIF});
 End;
 
 Function GetPairJSON(Status      : Integer;
@@ -495,7 +535,7 @@ Var
 Begin
  WSResult.STATUS      := IntToStr(Status);
  WSResult.MessageText := MessageText;
- Result               := EncodeStrings(TServerUtils.Result2JSON(WSResult));
+ Result               := EncodeStrings(TServerUtils.Result2JSON(WSResult){$IFDEF FPC}, csUndefined{$ENDIF});
 End;
 
 end.
