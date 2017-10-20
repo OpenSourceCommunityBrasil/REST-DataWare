@@ -1,9 +1,11 @@
 object Form6: TForm6
   Left = 0
   Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
   Caption = 'REST Client Slide'
-  ClientHeight = 405
-  ClientWidth = 468
+  ClientHeight = 415
+  ClientWidth = 469
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
