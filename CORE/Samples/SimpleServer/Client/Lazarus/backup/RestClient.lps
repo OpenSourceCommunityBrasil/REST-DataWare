@@ -133,18 +133,17 @@
       </Unit16>
       <Unit17>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="499"/>
-        <CursorPos Y="509"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="497"/>
+        <CursorPos X="37" Y="506"/>
         <UsageCount Value="67"/>
-        <Loaded Value="True"/>
       </Unit17>
       <Unit18>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="139"/>
-        <CursorPos X="14" Y="158"/>
+        <TopLine Value="417"/>
+        <CursorPos Y="429"/>
         <UsageCount Value="74"/>
         <Bookmarks Count="1">
           <Item0 Y="67" ID="2"/>
@@ -333,11 +332,10 @@
       </Unit42>
       <Unit43>
         <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSON.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="2045"/>
         <CursorPos Y="2056"/>
         <UsageCount Value="23"/>
-        <Loaded Value="True"/>
       </Unit43>
       <Unit44>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\restdwlazdriver.pas"/>
@@ -451,7 +449,8 @@
       <Unit59>
         <Filename Value="..\..\..\..\Source\libs\uDWConstsData.pas"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="22" Y="13"/>
+        <TopLine Value="2"/>
+        <CursorPos X="33" Y="13"/>
         <UsageCount Value="11"/>
       </Unit59>
       <Unit60>
@@ -462,130 +461,89 @@
         <UsageCount Value="10"/>
       </Unit60>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="18" HistoryIndex="17">
       <Position1>
-        <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSON.pas"/>
-        <Caret Line="2304" TopLine="2288"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="1984" Column="59" TopLine="1974"/>
       </Position1>
       <Position2>
-        <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSON.pas"/>
-        <Caret Line="2305" TopLine="2289"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
       </Position2>
       <Position3>
-        <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSON.pas"/>
-        <Caret Line="2055" TopLine="2045"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="95" Column="23" TopLine="80"/>
       </Position3>
       <Position4>
-        <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSON.pas"/>
-        <Caret Line="2056" TopLine="2045"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="1773" TopLine="1755"/>
       </Position4>
       <Position5>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="1611" Column="85" TopLine="1605"/>
+        <Caret Line="95" Column="23" TopLine="87"/>
       </Position5>
       <Position6>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="50" Column="11" TopLine="40"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="1730" TopLine="1724"/>
       </Position6>
       <Position7>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="509" TopLine="505"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="95" Column="24" TopLine="87"/>
       </Position7>
       <Position8>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="283" TopLine="274"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="1667" Column="34" TopLine="1651"/>
       </Position8>
       <Position9>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="284" TopLine="274"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="1724" Column="34" TopLine="1708"/>
       </Position9>
       <Position10>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="286" TopLine="274"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="95" Column="24" TopLine="87"/>
       </Position10>
       <Position11>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="298" TopLine="290"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="1667" Column="33" TopLine="1651"/>
       </Position11>
       <Position12>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="509" TopLine="499"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
       </Position12>
       <Position13>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="283" TopLine="274"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="95" Column="24" TopLine="80"/>
       </Position13>
       <Position14>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="284" TopLine="274"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="141" Column="21" TopLine="126"/>
       </Position14>
       <Position15>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="286" TopLine="274"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="1937" TopLine="1937"/>
       </Position15>
       <Position16>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="509" TopLine="500"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="95" Column="24" TopLine="87"/>
       </Position16>
       <Position17>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="517" TopLine="501"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="141" Column="22" TopLine="126"/>
       </Position17>
       <Position18>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="509" TopLine="501"/>
-      </Position18>
-      <Position19>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="283" TopLine="274"/>
-      </Position19>
-      <Position20>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="284" TopLine="274"/>
-      </Position20>
-      <Position21>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="286" TopLine="274"/>
-      </Position21>
-      <Position22>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="509" TopLine="500"/>
-      </Position22>
-      <Position23>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="283" TopLine="274"/>
-      </Position23>
-      <Position24>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="284" TopLine="274"/>
-      </Position24>
-      <Position25>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="282" Column="27" TopLine="274"/>
-      </Position25>
-      <Position26>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="254" Column="10" TopLine="246"/>
-      </Position26>
-      <Position27>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="274" Column="10" TopLine="256"/>
-      </Position27>
-      <Position28>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="298" TopLine="290"/>
-      </Position28>
-      <Position29>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
-        <Caret Line="509" TopLine="499"/>
-      </Position29>
-      <Position30>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="1984" Column="48" TopLine="1975"/>
-      </Position30>
+        <Caret Line="193" Column="21" TopLine="178"/>
+      </Position18>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
+    <BreakPoints Count="1">
+      <Item1>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Line Value="429"/>
+      </Item1>
+    </BreakPoints>
     <Watches Count="2">
       <Item1>
         <Expression Value="DestDS.RECORDCOUNT"/>

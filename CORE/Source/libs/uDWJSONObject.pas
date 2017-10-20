@@ -426,7 +426,10 @@ Begin
      JSONParam.ObjectDirection := GetDirectionName    (bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString);
      JSONParam.ObjectValue     := GetValueType        (bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString);
      JSONParam.Encoded         := GetBooleanFromString(bJsonOBJ.opt(bJsonOBJ.names.get(2).ToString).ToString);
-     JSONParam.SetValue(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
+     If (JSONParam.ObjectValue in [ovString, ovWideString]) And (JSONParam.Encoded) Then
+      JSONParam.SetValue(DecodeStrings(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString{$IFDEF FPC}, csUndefined{$ENDIF}))
+     Else
+      JSONParam.SetValue(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
      Add(JSONParam);
     Finally
      bJsonOBJ.Clean;
