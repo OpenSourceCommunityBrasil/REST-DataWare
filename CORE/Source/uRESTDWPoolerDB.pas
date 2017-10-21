@@ -1614,7 +1614,7 @@ Begin
  TDataset(Self).AfterCancel        := ProcAfterCancel;
  Inherited AfterPost               := OldAfterPost;
  Inherited AfterDelete             := OldAfterDelete;
- vMassiveDataset                   := TMassiveDataset.Create;
+ vMassiveDataset                   := TMassiveDatasetBuffer.Create;
  {$ENDIF}
 End;
 
@@ -1822,8 +1822,12 @@ Begin
    OldData.Clear;
    SaveToStream(OldData);
    If Not vInBlockEvents Then
-    If Assigned(vBeforeDelete) Then
-     vBeforeDelete(DataSet);
+    Begin
+     If Trim(vUpdateTableName) <> '' Then
+      TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmDelete);
+     If Assigned(vBeforeDelete) Then
+      vBeforeDelete(DataSet);
+    End;
    If vCascadeDelete Then
     Begin
      For I := 0 To vMasterDetailList.Count -1 Do
@@ -1849,8 +1853,12 @@ End;
 Procedure TRESTDWClientSQL.ProcBeforeEdit(DataSet: TDataSet);
 Begin
  If Not vInBlockEvents Then
-  If Assigned(vBeforeEdit) Then
-   vBeforeEdit(Dataset);
+  Begin
+   If Trim(vUpdateTableName) <> '' Then
+    TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, uDWConsts.TMassiveMode.mmUpdate);
+   If Assigned(vBeforeEdit) Then
+    vBeforeEdit(Dataset);
+  End;
 End;
 
 Procedure TRESTDWClientSQL.ProcBeforeInsert(DataSet: TDataSet);
@@ -1993,15 +2001,21 @@ Begin
    vFields.Free;
   End;
  If Not vInBlockEvents Then
-  If Assigned(vAfterInsert) Then
-   vAfterInsert(Dataset);
+  Begin
+   If Trim(vUpdateTableName) <> '' Then
+    TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmInsert);
+   If Assigned(vAfterInsert) Then
+    vAfterInsert(Dataset);
+  End;
 End;
 
 Procedure TRESTDWClientSQL.ProcAfterOpen(DataSet: TDataSet);
 Begin
  If Not vInBlockEvents Then
-  If Assigned(vOnAfterOpen) Then
-   vOnAfterOpen(Dataset);
+  Begin
+   If Assigned(vOnAfterOpen) Then
+    vOnAfterOpen(Dataset);
+  End;
 End;
 
 Procedure TRESTDWClientSQL.ProcAfterCancel(DataSet : TDataSet);
@@ -2585,7 +2599,11 @@ Begin
       vActive        := GetData;
      End;
     If State = dsBrowse Then
-     PrepareDetails(True)
+     Begin
+      If Trim(vUpdateTableName) <> '' Then
+       TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vUpdateTableName));
+      PrepareDetails(True);
+     End
     Else If State = dsInactive Then
      PrepareDetails(False);
    Except

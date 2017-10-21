@@ -43,6 +43,7 @@ Const
  CompressBuffer        = 1024 * 2;
 
 Type
+ TMassiveMode     = (mmInactive, mmBrowse, mmInsert, mmUpdate, mmDelete);
  TTypeObject      = (toDataset,   toParam,
                      toVariable,  toObject);
  TObjectValue     = (ovUnknown,         ovString,       ovSmallint,         ovInteger,    ovWord,                            // 0..4
@@ -95,12 +96,23 @@ Type
  Function  BytesArrToString(aValue : tIdBytes) : String;
  Function  ObjectValueToFieldType(TypeObject : TObjectValue) : TFieldType;
  Function  FieldTypeToObjectValue(FieldType  : TFieldType)   : TObjectValue;
+ Function  DatasetStateToMassiveType(DatasetState : TDatasetState) : TMassiveMode;
 
 
 implementation
 
 //Uses uDWJSONTools;
 
+Function DatasetStateToMassiveType(DatasetState : TDatasetState) : TMassiveMode;
+Begin
+ Result := mmInactive;
+ Case DatasetState Of
+  dsInactive : Result := mmInactive;
+  dsBrowse   : Result := mmBrowse;
+  dsInsert   : Result := mmInsert;
+  dsEdit     : Result := mmUpdate;
+ End;
+End;
 
 Function BytesArrToString(aValue : tIdBytes) : String;
 {$IFDEF FPC}

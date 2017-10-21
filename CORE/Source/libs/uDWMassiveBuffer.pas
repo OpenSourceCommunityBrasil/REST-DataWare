@@ -9,9 +9,6 @@ uses SysUtils,  Classes,        uDWJSONObject,
      uDWConsts, uDWConstsData;
 
 Type
- TMassiveMode = (mmInactive, mmBrowse, mmInsert, mmUpdate, mmDelete);
-
-Type
  TMassiveValue = Class
  Private
   vJSONValue  : TJSONValue;
@@ -49,6 +46,8 @@ Type
   vJSONValue  : ^TMassiveValue;
   vFieldsName : String;
   vFieldType  : TObjectValue;
+  vSize,
+  vPrecision  : Integer;
  Protected
  Public
   Constructor Create;
@@ -60,6 +59,8 @@ Type
   Property    KeyField   : Boolean      Read vKeyField   Write vKeyField;
   Property    FieldType  : TObjectValue Read vFieldType  Write vFieldType;
   Property    FieldsName : String       Read vFieldsName Write vFieldsName;
+  Property    Size       : Integer      Read vSize       Write vSize;
+  Property    Precision  : Integer      Read vPrecision  Write vPrecision;
 End;
 
 Type
@@ -129,7 +130,11 @@ Type
   Procedure Prior;
   Procedure Next;
   Procedure Last;
-  Procedure BuildDataset(Dataset     : TRESTDWClientSQLBase);   //Constroi o Dataset Massivo
+  Procedure BuildDataset(Dataset             : TRESTDWClientSQLBase;
+                         UpdateTableName     : String);   //Constroi o Dataset Massivo
+  Procedure BuildLine   (Dataset             : TRESTDWClientSQLBase;
+                         MassiveModeBuff     : TMassiveMode;
+                         Var MassiveLineBuff : TMassiveLine);
   Procedure BuildBuffer (Dataset     : TRESTDWClientSQLBase;    //Cria um Valor Massivo Baseado nos Dados de Um Dataset
                          MassiveMode : TMassiveMode);
   Procedure SaveBuffer  (Dataset     : TRESTDWClientSQLBase);   //Salva Um Buffer Massivo na Lista de Massivos
@@ -436,23 +441,67 @@ End;
 
 { TMassiveDatasetBuffer }
 
+Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQLBase;
+                                          MassiveModeBuff     : TMassiveMode;
+                                          Var MassiveLineBuff : TMassiveLine);
+Var
+ I : Integer;
+Begin
+ Case MassiveModeBuff Of
+  mmInsert : Begin
+
+             End;
+  mmUpdate : Begin
+
+             End;
+  mmDelete : Begin
+
+             End;
+ End;
+End;
+
 Procedure TMassiveDatasetBuffer.BuildBuffer(Dataset     : TRESTDWClientSQLBase;
                                             MassiveMode : TMassiveMode);
 Begin
-
+ Case MassiveMode Of
+  mmInactive : Begin
+                vMassiveBuffer.ClearAll;
+                vMassiveLine.ClearAll;
+                vMassiveFields.ClearAll;
+               End;
+  mmBrowse   : Begin
+                vMassiveLine.ClearAll;
+               End;
+  Else
+   BuildLine(Dataset, MassiveMode, vMassiveLine);
+ End;
 End;
 
-Procedure TMassiveDatasetBuffer.BuildDataset(Dataset : TRESTDWClientSQLBase);
+Procedure TMassiveDatasetBuffer.BuildDataset(Dataset         : TRESTDWClientSQLBase;
+                                             UpdateTableName : String);
 Var
  I : Integer;
+ MassiveField : TMassiveField;
 Begin
  vMassiveBuffer.ClearAll;
  vMassiveLine.ClearAll;
  vMassiveFields.ClearAll;
  For I := 0 To Dataset.Fields.Count -1 Do
   Begin
-
+   If Dataset.Fields[I].FieldKind = fkData Then
+    Begin
+     MassiveField             := TMassiveField.Create;
+     MassiveField.vRequired   := Dataset.Fields[I].Required;
+     MassiveField.vKeyField   := pfInKey in Dataset.Fields[I].ProviderFlags;
+     MassiveField.vFieldsName := Dataset.Fields[I].FieldName;
+     MassiveField.vFieldType  := FieldTypeToObjectValue(Dataset.Fields[I].DataType);
+     MassiveField.vSize       := Dataset.Fields[I].DataSize;
+     vMassiveFields.Add(MassiveField);
+    End;
   End;
+ If vMassiveFields.Count > 0 Then
+  vMassiveLine.vMassiveMode := mmBrowse;
+ vTableName := UpdateTableName;
 End;
 
 Procedure TMassiveDatasetBuffer.ClearBuffer;
