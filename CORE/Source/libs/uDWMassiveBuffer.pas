@@ -138,11 +138,12 @@ Type
   Procedure BuildBuffer (Dataset     : TRESTDWClientSQLBase;    //Cria um Valor Massivo Baseado nos Dados de Um Dataset
                          MassiveMode : TMassiveMode);
   Procedure SaveBuffer  (Dataset     : TRESTDWClientSQLBase);   //Salva Um Buffer Massivo na Lista de Massivos
-  Procedure ClearBuffer;                                    //Limpa o Buffer Massivo Atual
-  Procedure ClearDataset;                                   //Limpa Todo o Dataset Massivo
-  Function  ToJSON      : String;                           //Gera o JSON do Dataset Massivo
-  Procedure FromJSON    (Value : String);                   //Carrega o Dataset Massivo a partir de um JSON
-  Property  MassiveMode : TMassiveMode   Read vMassiveMode; //Modo Massivo do Buffer Atual
+  Procedure ClearBuffer;                                        //Limpa o Buffer Massivo Atual
+  Procedure ClearDataset;                                       //Limpa Todo o Dataset Massivo
+  Procedure ClearLine;                                          //Limpa o Buffer Temporario
+  Function  ToJSON      : String;                               //Gera o JSON do Dataset Massivo
+  Procedure FromJSON    (Value : String);                       //Carrega o Dataset Massivo a partir de um JSON
+  Property  MassiveMode : TMassiveMode   Read vMassiveMode;     //Modo Massivo do Buffer Atual
   Property  Fields      : TMassiveFields Read vMassiveFields Write vMassiveFields;
   Property  TableName   : String         Read vTableName;
 End;
@@ -506,12 +507,19 @@ End;
 
 Procedure TMassiveDatasetBuffer.ClearBuffer;
 Begin
+ vMassiveBuffer.ClearAll;
+End;
 
+Procedure TMassiveDatasetBuffer.ClearLine;
+Begin
+ vMassiveLine.ClearAll;
 End;
 
 Procedure TMassiveDatasetBuffer.ClearDataset;
 Begin
-
+ vMassiveBuffer.ClearAll;
+ vMassiveLine.ClearAll;
+ vMassiveFields.ClearAll;
 End;
 
 Constructor TMassiveDatasetBuffer.Create;

@@ -2021,8 +2021,12 @@ End;
 Procedure TRESTDWClientSQL.ProcAfterCancel(DataSet : TDataSet);
 Begin
  If Not vInBlockEvents Then
-  If Assigned(vAfterCancel) Then
-   vAfterCancel(Dataset);
+  Begin
+   If Trim(vUpdateTableName) <> '' Then
+    TMassiveDatasetBuffer(vMassiveDataset).ClearLine;
+   If Assigned(vAfterCancel) Then
+    vAfterCancel(Dataset);
+  End;
 End;
 
 Procedure TRESTDWClientSQL.ProcAfterPost(DataSet : TDataSet);

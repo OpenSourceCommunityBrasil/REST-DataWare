@@ -1027,7 +1027,7 @@ object Form2: TForm2
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
-    Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgTabs, dgTitleClick, dgTitleHotTrack]
+    Options = [dgEditing, dgTitles, dgIndicator, dgColumnResize, dgColLines, dgTabs, dgTitleClick, dgTitleHotTrack]
     ParentFont = False
     TabOrder = 4
     TitleFont.Charset = DEFAULT_CHARSET
@@ -1443,6 +1443,7 @@ object Form2: TForm2
     DataBase = RESTDWDataBase1
     SQL.Strings = (
       'select * from adclifor')
+    UpdateTableName = 'employee'
     CacheUpdateRecords = True
     InBlockEvents = True
     Left = 344
