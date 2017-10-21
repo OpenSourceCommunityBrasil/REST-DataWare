@@ -190,6 +190,8 @@
         <DCCReference Include="..\..\..\Source\libs\uDWJSONTools.pas"/>
         <DCCReference Include="..\..\..\Source\libs\uzliblaz.pas"/>
         <DCCReference Include="..\..\..\Source\libs\JSON\uDWJSON.pas"/>
+        <DCCReference Include="..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <DCCReference Include="..\..\..\Source\libs\StringBuilderUnit.pas"/>
         <RcItem Include="..\..\..\Images\TRESTClientPooler.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTClientPooler</ResourceId>

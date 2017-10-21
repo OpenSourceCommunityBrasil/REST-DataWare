@@ -1,10 +1,15 @@
 unit uDWMassiveBuffer;
 
+{$I uRESTDW.inc}
+
 interface
 
-uses SysUtils,  Classes,       uDWJSONObject,
-     DB,        uRESTDWBase,   uDWPoolerMethod,
+uses SysUtils,  Classes,        uDWJSONObject,
+     DB,        uRESTDWBase,    uDWPoolerMethod,
      uDWConsts, uDWConstsData;
+
+Type
+ TMassiveMode = (mmInactive, mmBrowse, mmInsert, mmUpdate, mmDelete);
 
 Type
  TMassiveValue = Class
@@ -69,10 +74,77 @@ Type
   Destructor Destroy;Override;
   Procedure  Delete(Index : Integer);                          Overload;
   Function   Add   (Item  : TMassiveField) : Integer;          Overload;
+  Function   FieldByName(FieldName : String) : TMassiveField;
   Property   Items[Index  : Integer]       : TMassiveField Read GetRec Write PutRec; Default;
 End;
 
+Type
+ TMassiveLine = Class
+ Private
+  vMassiveValues  : TMassiveValues;
+  vMassiveMode    : TMassiveMode;
+  Function   GetRec(Index : Integer)       : TMassiveValue;
+  Procedure  PutRec(Index : Integer; Item  : TMassiveValue);
+ Protected
+ Public
+  Constructor Create;
+  Destructor  Destroy;Override;
+  Procedure   ClearAll;
+  Property    MassiveMode  : TMassiveMode              Read vMassiveMode Write vMassiveMode;
+  Property    Value[Index  : Integer] : TMassiveValue  Read GetRec       Write PutRec;
+End;
+
+Type
+ PMassiveLine   = ^TMassiveLine;
+ TMassiveBuffer = Class(TList)
+ Private
+  Function   GetRec(Index : Integer)       : TMassiveLine;    Overload;
+  Procedure  PutRec(Index : Integer; Item  : TMassiveLine);   Overload;
+  Procedure  ClearAll;
+ Protected
+ Public
+  Destructor Destroy;Override;
+  Procedure  Delete(Index : Integer);                         Overload;
+  Function   Add   (Item  : TMassiveLine)  : Integer;         Overload;
+  Property   Items[Index  : Integer]       : TMassiveLine Read GetRec Write PutRec; Default;
+End;
+
+Type
+ TMassiveDatasetBuffer = Class(TMassiveDataset)
+ Protected
+  vRecNo         : Integer;
+  vMassiveBuffer : TMassiveBuffer;
+  vMassiveLine   : TMassiveLine;
+  vMassiveFields : TMassiveFields;
+  vMassiveMode   : TMassiveMode;
+  vTableName     : String;
+ Private
+  Procedure ReadBuffer;
+ Public
+  Constructor Create;
+  Destructor  Destroy;Override;
+  Function  RecNo       : Integer;
+  Function  RecordCount : Integer;
+  Procedure First;
+  Procedure Prior;
+  Procedure Next;
+  Procedure Last;
+  Procedure BuildDataset(Dataset     : TRESTDWClientSQLBase);   //Constroi o Dataset Massivo
+  Procedure BuildBuffer (Dataset     : TRESTDWClientSQLBase;    //Cria um Valor Massivo Baseado nos Dados de Um Dataset
+                         MassiveMode : TMassiveMode);
+  Procedure SaveBuffer  (Dataset     : TRESTDWClientSQLBase);   //Salva Um Buffer Massivo na Lista de Massivos
+  Procedure ClearBuffer;                                    //Limpa o Buffer Massivo Atual
+  Procedure ClearDataset;                                   //Limpa Todo o Dataset Massivo
+  Function  ToJSON      : String;                           //Gera o JSON do Dataset Massivo
+  Procedure FromJSON    (Value : String);                   //Carrega o Dataset Massivo a partir de um JSON
+  Property  MassiveMode : TMassiveMode   Read vMassiveMode; //Modo Massivo do Buffer Atual
+  Property  Fields      : TMassiveFields Read vMassiveFields Write vMassiveFields;
+  Property  TableName   : String         Read vTableName;
+End;
+
 implementation
+
+Uses uRESTDWPoolerDB;
 
 { TMassiveField }
 
@@ -155,6 +227,22 @@ Destructor TMassiveFields.Destroy;
 Begin
  ClearAll;
  Inherited;
+End;
+
+Function TMassiveFields.FieldByName(FieldName : String): TMassiveField;
+Var
+ I : Integer;
+Begin
+ Result := Nil;
+ For I := 0 To Self.Count -1 Do
+  Begin
+   If LowerCase(TMassiveField(TList(Self).Items[I]^).vFieldsName) =
+      LowerCase(FieldName) Then
+    Begin
+     Result := TMassiveField(TList(Self).Items[I]^);
+     Break;
+    End;
+  End;
 End;
 
 Function TMassiveFields.GetRec(Index : Integer) : TMassiveField;
@@ -256,6 +344,218 @@ Procedure TMassiveValues.PutRec(Index: Integer; Item: TMassiveValue);
 Begin
  If (Index < Self.Count) And (Index > -1) Then
   TMassiveValue(TList(Self).Items[Index]^) := Item;
+End;
+
+{ TMassiveLine }
+
+Constructor TMassiveLine.Create;
+Begin
+ vMassiveValues  := TMassiveValues.Create;
+ vMassiveMode    := mmBrowse;
+End;
+
+Destructor TMassiveLine.Destroy;
+Begin
+ FreeAndNil(vMassiveValues);
+ Inherited;
+End;
+
+Function TMassiveLine.GetRec(Index: Integer): TMassiveValue;
+Begin
+ Result := Nil;
+ If (Index < vMassiveValues.Count) And (Index > -1) Then
+  Result := TMassiveValue(TList(vMassiveValues).Items[Index]^);
+End;
+
+Procedure TMassiveLine.ClearAll;
+Begin
+ vMassiveValues.ClearAll;
+End;
+
+Procedure TMassiveLine.PutRec(Index: Integer; Item: TMassiveValue);
+Begin
+ If (Index < vMassiveValues.Count) And (Index > -1) Then
+  TMassiveValue(TList(vMassiveValues).Items[Index]^) := Item;
+End;
+
+{ TMassiveBuffer }
+
+Function TMassiveBuffer.Add(Item : TMassiveLine): Integer;
+Var
+ vItem : ^TMassiveLine;
+Begin
+ New(vItem);
+ vItem^ := Item;
+ Result := TList(Self).Add(vItem);
+End;
+
+Procedure TMassiveBuffer.ClearAll;
+Var
+ I : Integer;
+Begin
+ For I := TList(Self).Count -1 DownTo 0 Do
+  Self.Delete(I);
+End;
+
+Procedure TMassiveBuffer.Delete(Index: Integer);
+Begin
+ If (Index < Self.Count) And (Index > -1) Then
+  Begin
+   If Assigned(TList(Self).Items[Index]) Then
+    Begin
+     If Assigned(TMassiveLine(TList(Self).Items[Index]^)) Then
+      FreeAndNil(TList(Self).Items[Index]^);
+     {$IFDEF FPC}
+      Dispose(PMassiveLine(TList(Self).Items[Index]));
+     {$ELSE}
+      Dispose(TList(Self).Items[Index]);
+     {$ENDIF}
+    End;
+   TList(Self).Delete(Index);
+  End;
+End;
+
+Destructor TMassiveBuffer.Destroy;
+Begin
+ ClearAll;
+ Inherited;
+End;
+
+Function TMassiveBuffer.GetRec(Index: Integer): TMassiveLine;
+Begin
+ Result := Nil;
+ If (Index < Self.Count) And (Index > -1) Then
+  Result := TMassiveLine(TList(Self).Items[Index]^);
+End;
+
+Procedure TMassiveBuffer.PutRec(Index: Integer; Item: TMassiveLine);
+Begin
+ If (Index < Self.Count) And (Index > -1) Then
+  TMassiveLine(TList(Self).Items[Index]^) := Item;
+End;
+
+{ TMassiveDatasetBuffer }
+
+Procedure TMassiveDatasetBuffer.BuildBuffer(Dataset     : TRESTDWClientSQLBase;
+                                            MassiveMode : TMassiveMode);
+Begin
+
+End;
+
+Procedure TMassiveDatasetBuffer.BuildDataset(Dataset : TRESTDWClientSQLBase);
+Var
+ I : Integer;
+Begin
+ vMassiveBuffer.ClearAll;
+ vMassiveLine.ClearAll;
+ vMassiveFields.ClearAll;
+ For I := 0 To Dataset.Fields.Count -1 Do
+  Begin
+
+  End;
+End;
+
+Procedure TMassiveDatasetBuffer.ClearBuffer;
+Begin
+
+End;
+
+Procedure TMassiveDatasetBuffer.ClearDataset;
+Begin
+
+End;
+
+Constructor TMassiveDatasetBuffer.Create;
+Begin
+ vRecNo         := -1;
+ vMassiveBuffer := TMassiveBuffer.Create;
+ vMassiveLine   := TMassiveLine.Create;
+ vMassiveFields := TMassiveFields.Create;
+ vMassiveMode   := mmInactive;
+ vTableName     := '';
+End;
+
+Destructor TMassiveDatasetBuffer.Destroy;
+Begin
+ FreeAndNil(vMassiveBuffer);
+ FreeAndNil(vMassiveLine);
+ FreeAndNil(vMassiveFields);
+ Inherited;
+End;
+
+Procedure TMassiveDatasetBuffer.First;
+Begin
+ If RecordCount > 0 Then
+  Begin
+   vRecNo := 0;
+   ReadBuffer;
+  End;
+End;
+
+Procedure TMassiveDatasetBuffer.FromJSON(Value: String);
+Begin
+
+End;
+
+Procedure TMassiveDatasetBuffer.Last;
+Begin
+ If RecordCount > 0 Then
+  Begin
+   If vRecNo <> (RecordCount -1) Then
+    Begin
+     vRecNo := RecordCount -1;
+     ReadBuffer;
+    End;
+  End;
+End;
+
+Procedure TMassiveDatasetBuffer.Next;
+Begin
+ If RecordCount > 0 Then
+  Begin
+   If vRecNo < (RecordCount -1) Then
+    Begin
+     Inc(vRecNo);
+     ReadBuffer;
+    End;
+  End;
+End;
+
+Procedure TMassiveDatasetBuffer.Prior;
+Begin
+ If RecordCount > 0 Then
+  Begin
+   If vRecNo > 0 Then
+    Begin
+     Dec(vRecNo);
+     ReadBuffer;
+    End;
+  End;
+End;
+
+Procedure TMassiveDatasetBuffer.ReadBuffer;
+Begin
+
+End;
+
+Function TMassiveDatasetBuffer.RecNo : Integer;
+Begin
+ Result := vRecNo;
+End;
+
+Function TMassiveDatasetBuffer.RecordCount : Integer;
+Begin
+ Result := vMassiveBuffer.Count -1;
+End;
+
+Procedure TMassiveDatasetBuffer.SaveBuffer(Dataset : TRESTDWClientSQLBase);
+Begin
+
+End;
+
+Function TMassiveDatasetBuffer.ToJSON : String;
+Begin
+
 End;
 
 End.

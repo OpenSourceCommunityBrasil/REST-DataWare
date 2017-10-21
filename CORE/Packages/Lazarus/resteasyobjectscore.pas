@@ -4,12 +4,13 @@
 
 unit resteasyobjectscore;
 
+{$warn 5023 off : no warning about unused units}
 interface
 
 uses
   ServerUtils, SysTypes, uDWConsts, uDWJSONObject, uDWJSONTools, uRESTDWBase, 
   uRESTDWReg, uRESTDWMasterDetailData, uRESTDWPoolerDB, uZlibLaz, 
-  uDWPoolerMethod, uDWDatamodule, uDWJSON, LazarusPackageIntf;
+  uDWPoolerMethod, uDWDatamodule, uDWJSON, uDWMassiveBuffer, LazarusPackageIntf;
 
 implementation
 

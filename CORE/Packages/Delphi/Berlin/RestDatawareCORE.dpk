@@ -55,6 +55,8 @@ contains
   uDWJSONObject in '..\..\..\Source\libs\uDWJSONObject.pas',
   uDWJSONTools in '..\..\..\Source\libs\uDWJSONTools.pas',
   uzliblaz in '..\..\..\Source\libs\uzliblaz.pas',
-  uDWJSON in '..\..\..\Source\libs\JSON\uDWJSON.pas';
+  uDWJSON in '..\..\..\Source\libs\JSON\uDWJSON.pas',
+  uDWMassiveBuffer in '..\..\..\Source\libs\uDWMassiveBuffer.pas',
+  StringBuilderUnit in '..\..\..\Source\libs\StringBuilderUnit.pas';
 
 end.

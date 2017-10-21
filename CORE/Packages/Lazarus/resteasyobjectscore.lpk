@@ -13,7 +13,7 @@
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="15">
+    <Files Count="16">
       <Item1>
         <Filename Value="..\..\Source\libs\ServerUtils.pas"/>
         <UnitName Value="ServerUtils"/>
@@ -75,6 +75,10 @@
         <Filename Value="..\..\Source\uRESTDW.inc"/>
         <Type Value="Include"/>
       </Item15>
+      <Item16>
+        <Filename Value="..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <UnitName Value="uDWMassiveBuffer"/>
+      </Item16>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>

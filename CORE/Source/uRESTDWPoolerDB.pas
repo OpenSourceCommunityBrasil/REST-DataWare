@@ -15,7 +15,7 @@ interface
 
 uses SysUtils,  Classes,      uDWJSONObject,
      DB,        uRESTDWBase,  uDWPoolerMethod,
-     uRESTDWMasterDetailData, uDWConsts, uDWConstsData, SyncObjs
+     uRESTDWMasterDetailData, uDWConsts, uDWConstsData, uDWMassiveBuffer, SyncObjs
      {$IFDEF FPC}
       ,memds;
      {$ELSE}
@@ -214,19 +214,7 @@ Type
 End;
 
 Type
- {$IFDEF FPC}
-  TRESTDWClientSQL   = Class(TMemDataset)                   //Classe com as funcionalidades de um DBQuery
- {$ELSE}
-   {$IFDEF RESJEDI}
-  TRESTDWClientSQL   = Class(TJvMemoryData)                 //Classe com as funcionalidades de um DBQuery
-  {$ENDIF}
-  {$IFDEF RESTKBMMEMTABLE}
-  TRESTDWClientSQL   = Class(TKbmMemtable)                 //Classe com as funcionalidades de um DBQuery
-  {$ENDIF}
-  {$IFDEF RESTFDMEMTABLE}
-  TRESTDWClientSQL   = Class(TFDMemtable)                 //Classe com as funcionalidades de um DBQuery
-  {$ENDIF}
- {$ENDIF}
+ TRESTDWClientSQL     = Class(TRESTDWClientSQLBase) //Classe com as funcionalidades de um DBQuery
  Private
   vRESTClientPooler    : TRESTClientPooler;
   vOldStatus           : TDatasetState;
@@ -269,6 +257,7 @@ Type
   FieldDefsUPD         : TFieldDefs;
   vMasterDataSet       : TRESTDWClientSQL;
   vMasterDetailList    : TMasterDetailList;                 //DataSet MasterDetail Function
+  vMassiveDataset      : TMassiveDataset;
   {$IFDEF FPC}
   Procedure CloneDefinitions     (Source  : TMemDataset;
                                   aSelf   : TMemDataset);   //Fields em Definições
@@ -1625,7 +1614,7 @@ Begin
  TDataset(Self).AfterCancel        := ProcAfterCancel;
  Inherited AfterPost               := OldAfterPost;
  Inherited AfterDelete             := OldAfterDelete;
-
+ vMassiveDataset                   := TMassiveDataset.Create;
  {$ENDIF}
 End;
 
@@ -1643,6 +1632,7 @@ Begin
  FreeAndNil(OldData);
  FreeAndNil(vRESTClientPooler);
  vInactive := False;
+ FreeAndNil(vMassiveDataset);
  Inherited;
 End;
 
