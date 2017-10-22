@@ -1824,7 +1824,10 @@ Begin
    If Not vInBlockEvents Then
     Begin
      If Trim(vUpdateTableName) <> '' Then
-      TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmDelete);
+      Begin
+       TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmDelete);
+       TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self);
+      End;
      If Assigned(vBeforeDelete) Then
       vBeforeDelete(DataSet);
     End;
@@ -1898,8 +1901,15 @@ Begin
    Edit;
    vReadData     := False;
    If Not vInBlockEvents Then
-    If Assigned(vBeforePost) Then
-     vBeforePost(DataSet);
+    Begin
+     If Trim(vUpdateTableName) <> '' Then
+      Begin
+       TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, DatasetStateToMassiveType(vOldState));
+       TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self);
+      End;
+     If Assigned(vBeforePost) Then
+      vBeforePost(DataSet);
+    End;
   End;
 End;
 
@@ -2003,7 +2013,10 @@ Begin
  If Not vInBlockEvents Then
   Begin
    If Trim(vUpdateTableName) <> '' Then
-    TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmInsert);
+    Begin
+     TMassiveDatasetBuffer(vMassiveDataset).NewBuffer(mmInsert);
+     TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmInsert);
+    End;
    If Assigned(vAfterInsert) Then
     vAfterInsert(Dataset);
   End;

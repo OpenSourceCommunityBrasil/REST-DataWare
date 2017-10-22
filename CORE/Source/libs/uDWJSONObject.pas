@@ -615,6 +615,9 @@ Function TJSONValue.GetValue: String;
 Var
  vTempString : String;
 Begin
+ Result := '';
+ If Length(aValue) = 0 Then
+  Exit;
  vTempString := BytesArrToString(aValue);
 {$IF Defined(ANDROID) or defined(IOS)} //Alterado para IOS Brito
 If Length(vTempString) > 0 Then
@@ -705,18 +708,22 @@ Var
   I              : Integer;
   vPrimary,
   vRequired,
+  vReadOnly,
   vGenerateLine,
   vAutoinc       : string;
  Begin
   For I := 0 To bValue.Fields.Count - 1 Do
    Begin
-    vPrimary := 'N';
-    vAutoinc := 'N';
+    vPrimary  := 'N';
+    vAutoinc  := 'N';
+    vReadOnly := 'N';
     If pfInKey in bValue.Fields[I].ProviderFlags Then
      vPrimary := 'S';
     vRequired := 'N';
     If bValue.Fields[I].Required Then
      vRequired := 'S';
+    If Not (bValue.Fields[I].CanModify) Then
+     vReadOnly := 'S';
     {$IFNDEF FPC}{$IF CompilerVersion > 21}
      If bValue.Fields[I].AutoGenerateValue = arAutoInc Then
       vAutoinc := 'S';
@@ -729,11 +736,11 @@ Var
      vGenerateLine := Format(TJsonDatasetHeader, [bValue.Fields[I].FieldName,
                                                   GetFieldType(bValue.Fields[I].DataType),
                                                   vPrimary, vRequired, TFloatField(bValue.Fields[I]).Size,
-                                                  TFloatField(bValue.Fields[I]).Precision, vAutoinc])
+                                                  TFloatField(bValue.Fields[I]).Precision, vReadOnly, vAutoinc])
     Else
      vGenerateLine := Format(TJsonDatasetHeader, [bValue.Fields[I].FieldName,
                                                   GetFieldType(bValue.Fields[I].DataType),
-                                                  vPrimary, vRequired, bValue.Fields[I].Size, 0, vAutoinc]);
+                                                  vPrimary, vRequired, bValue.Fields[I].Size, 0, vReadOnly, vAutoinc]);
     If I = 0 Then
      Result := vGenerateLine
     Else
@@ -1518,14 +1525,15 @@ Begin
             Field.ProviderFlags := [pfInUpdate, pfInWhere, pfInKey]
            Else
             Field.ProviderFlags := [];
+           {$IFNDEF FPC}{$IF CompilerVersion > 21}
+           If bJsonOBJ.names.Length > 6 Then
+            Begin
+             //Set ReadOnlyProp
+             If (Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(7).ToString).ToString)) = 'S') Then
+              Field.AutoGenerateValue := arAutoInc;
+            End;
+           {$IFEND}
           End;
-         {$IFNDEF FPC}{$IF CompilerVersion > 21}
-         If bJsonOBJ.names.Length > 6 Then
-          Begin
-           If (Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(6).ToString).ToString)) = 'S') Then
-            Field.AutoGenerateValue := arAutoInc;
-          End;
-         {$IFEND}
          {$ENDIF}
         End;
       Finally
@@ -1546,6 +1554,9 @@ Begin
             vFindFlag := Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString)) = Uppercase(DestDS.Fields[A].FieldName);
             If vFindFlag Then
              Begin
+              If bJsonOBJ.names.Length > 6 Then
+               If Not (DestDS.Fields[A].ReadOnly) Then
+                DestDS.Fields[A].ReadOnly := (Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(6).ToString).ToString)) = 'S');
               ListFields.Add(IntToStr(J));
               Break;
              End;

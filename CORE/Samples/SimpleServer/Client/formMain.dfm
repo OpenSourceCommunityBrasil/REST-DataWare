@@ -1027,7 +1027,7 @@ object Form2: TForm2
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
-    Options = [dgEditing, dgTitles, dgIndicator, dgColumnResize, dgColLines, dgTabs, dgTitleClick, dgTitleHotTrack]
+    Options = [dgEditing, dgTitles, dgIndicator, dgColumnResize, dgColLines, dgTabs, dgConfirmDelete, dgTitleClick, dgTitleHotTrack]
     ParentFont = False
     TabOrder = 4
     TitleFont.Charset = DEFAULT_CHARSET
@@ -1141,7 +1141,6 @@ object Form2: TForm2
     TabOrder = 12
   end
   object DataSource1: TDataSource
-    AutoEdit = False
     DataSet = RESTDWClientSQL1
     Left = 440
   end
@@ -1149,281 +1148,64 @@ object Form2: TForm2
     AutoCalcFields = False
     FieldDefs = <
       item
-        Name = 'Cod_Clifor'
-        Attributes = [faRequired]
-        DataType = ftInteger
-      end
-      item
-        Name = 'Nome'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 50
-      end
-      item
-        Name = 'Cod_TipoRomaneio'
+        Name = 'EMP_NO'
         Attributes = [faRequired]
         DataType = ftSmallint
       end
       item
-        Name = 'Cod_GrupoCentro_Custo'
-        Attributes = [faRequired]
-        DataType = ftInteger
-      end
-      item
-        Name = 'Cod_Regiao'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'Nome_fantasia'
-        DataType = ftString
-        Size = 50
-      end
-      item
-        Name = 'Cod_Centro_Custo'
-        DataType = ftInteger
-      end
-      item
-        Name = 'Tipo_pessoa'
-        DataType = ftString
-        Size = 1
-      end
-      item
-        Name = 'Cod_TipoClifor'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'Cod_Carteira'
+        Name = 'FIRST_NAME'
         Attributes = [faRequired]
         DataType = ftString
-        Size = 1
+        Size = 15
       end
       item
-        Name = 'Inscricao'
-        DataType = ftString
-        Size = 18
-      end
-      item
-        Name = 'Cod_CondPag'
+        Name = 'LAST_NAME'
         Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'Cod_ClasseABC'
-        Attributes = [faRequired]
-        DataType = ftInteger
-      end
-      item
-        Name = 'CGC'
-        DataType = ftString
-        Size = 18
-      end
-      item
-        Name = 'Contribuinte'
-        DataType = ftString
-        Size = 1
-      end
-      item
-        Name = 'Cod_ConceitoClifor'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'Data_cadastro'
-        DataType = ftTimeStamp
-      end
-      item
-        Name = 'Data_alteracao'
-        DataType = ftTimeStamp
-      end
-      item
-        Name = 'Data_Situacao'
-        DataType = ftTimeStamp
-      end
-      item
-        Name = 'Cod_ramo'
-        DataType = ftSmallint
-      end
-      item
-        Name = 'Cod_portador'
-        DataType = ftSmallint
-      end
-      item
-        Name = 'Lim_credito'
-        Attributes = [faRequired]
-        DataType = ftInteger
-      end
-      item
-        Name = 'TipoCobranca'
-        DataType = ftString
-        Size = 2
-      end
-      item
-        Name = 'Flag_Orcamento'
-        DataType = ftString
-        Size = 1
-      end
-      item
-        Name = 'Flag_Supermercado'
-        DataType = ftString
-        Size = 1
-      end
-      item
-        Name = 'Flag_Exportador'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 1
-      end
-      item
-        Name = 'Cod_situacaoClifor'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'Observacao'
-        DataType = ftString
-        Size = 250
-      end
-      item
-        Name = 'Banco'
-        DataType = ftSmallint
-      end
-      item
-        Name = 'Agencia'
-        DataType = ftInteger
-      end
-      item
-        Name = 'Dig_Agencia'
-        DataType = ftString
-        Size = 1
-      end
-      item
-        Name = 'Conta'
-        DataType = ftString
-        Size = 10
-      end
-      item
-        Name = 'Dig_Conta'
-        DataType = ftString
-        Size = 2
-      end
-      item
-        Name = 'Nome_Agencia'
         DataType = ftString
         Size = 20
       end
       item
-        Name = 'Tipo_Pagto'
+        Name = 'PHONE_EXT'
+        DataType = ftString
+        Size = 4
+      end
+      item
+        Name = 'HIRE_DATE'
+        Attributes = [faRequired]
+        DataType = ftTimeStamp
+      end
+      item
+        Name = 'DEPT_NO'
+        Attributes = [faRequired]
         DataType = ftString
         Size = 3
       end
       item
-        Name = 'Desc_Bonif_Perc'
+        Name = 'JOB_CODE'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 5
+      end
+      item
+        Name = 'JOB_GRADE'
+        Attributes = [faRequired]
+        DataType = ftSmallint
+      end
+      item
+        Name = 'JOB_COUNTRY'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 15
+      end
+      item
+        Name = 'SALARY'
+        Attributes = [faRequired]
         DataType = ftFloat
       end
       item
-        Name = 'Sexo'
-        Attributes = [faRequired]
+        Name = 'FULL_NAME'
         DataType = ftString
-        Size = 1
-      end
-      item
-        Name = 'Cod_Estado_Civil'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 1
-      end
-      item
-        Name = 'Num_Identidade'
-        DataType = ftString
-        Size = 20
-      end
-      item
-        Name = 'Orgao_Exped_Identidade'
-        DataType = ftString
-        Size = 10
-      end
-      item
-        Name = 'Data_Nascimento'
-        Attributes = [faRequired]
-        DataType = ftTimeStamp
-      end
-      item
-        Name = 'Natu_Cod_Cidade'
-        DataType = ftInteger
-      end
-      item
-        Name = 'Natu_Uf'
-        DataType = ftString
-        Size = 2
-      end
-      item
-        Name = 'Nome_Mae'
-        DataType = ftString
-        Size = 40
-      end
-      item
-        Name = 'Nome_Pai'
-        DataType = ftString
-        Size = 40
-      end
-      item
-        Name = 'cod_filial_antigo'
-        DataType = ftSmallint
-      end
-      item
-        Name = 'cod_cliente_antigo'
-        DataType = ftInteger
-      end
-      item
-        Name = 'controle_ref'
-        DataType = ftSmallint
-      end
-      item
-        Name = 'controle_dep'
-        DataType = ftSmallint
-      end
-      item
-        Name = 'cod_clifor_titular'
-        DataType = ftInteger
-      end
-      item
-        Name = 'natural'
-        DataType = ftString
-        Size = 20
-      end
-      item
-        Name = 'Renda'
-        DataType = ftCurrency
-      end
-      item
-        Name = 'Matricula_Convenio'
-        DataType = ftString
-        Size = 25
-      end
-      item
-        Name = 'cod_fornec_estoque'
-        DataType = ftInteger
-      end
-      item
-        Name = 'cod_fornec_financ'
-        DataType = ftInteger
-      end
-      item
-        Name = 'Data_Negativacao'
-        DataType = ftTimeStamp
-      end
-      item
-        Name = 'Flag_Conferido'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 1
-      end
-      item
-        Name = 'usuario_alteracao'
-        DataType = ftString
-        Size = 50
+        Size = 37
       end>
     IndexDefs = <>
     MasterFields = ''
@@ -1442,10 +1224,10 @@ object Form2: TForm2
     Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
-      'select * from adclifor')
+      'select * from employee')
     UpdateTableName = 'employee'
     CacheUpdateRecords = True
-    InBlockEvents = True
+    InBlockEvents = False
     Left = 344
   end
   object RESTDWDataBase1: TRESTDWDataBase
@@ -1453,11 +1235,12 @@ object Form2: TForm2
     OnBeforeConnect = RESTDWDataBase1BeforeConnect
     Active = False
     Compression = True
+    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
     ProxyOptions.Port = 8888
-    PoolerService = 'seudominio.com.br'
+    PoolerService = 'localhost'
     PoolerPort = 8082
     PoolerName = 'TServerMethodDM.RESTDWPoolerDB1'
     StateConnection.AutoCheck = False

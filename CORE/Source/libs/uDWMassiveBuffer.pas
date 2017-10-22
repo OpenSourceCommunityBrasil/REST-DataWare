@@ -12,15 +12,15 @@ Type
  TMassiveValue = Class
  Private
   vJSONValue  : TJSONValue;
+  Function    GetValue       : String;
+  Procedure   SetValue(Value : String);
  Protected
  Public
   Constructor Create;
   Destructor  Free;
-  Function    GetValue   : String;
-  Procedure   SetValue(Value : String);
   Procedure   LoadFromStream(Stream : TMemoryStream);
   Procedure   SaveToStream  (Stream : TMemoryStream);
-  Property    Value      : String  Read GetValue Write SetValue;
+  Property    Value          : String  Read GetValue Write SetValue;
 End;
 
 Type
@@ -48,11 +48,12 @@ Type
   vFieldType  : TObjectValue;
   vSize,
   vPrecision  : Integer;
+  Function    GetValue       : String;
+  Procedure   SetValue(Value : String);
  Protected
  Public
   Constructor Create;
-  Destructor  Free;
-  Function    Value      : String;
+  Destructor  Destroy;Override;
   Procedure   LoadFromStream(Stream : TMemoryStream);
   Procedure   SaveToStream  (Stream : TMemoryStream);
   Property    Required   : Boolean      Read vRequired   Write vRequired;
@@ -61,6 +62,7 @@ Type
   Property    FieldsName : String       Read vFieldsName Write vFieldsName;
   Property    Size       : Integer      Read vSize       Write vSize;
   Property    Precision  : Integer      Read vPrecision  Write vPrecision;
+  Property    Value      : String       Read GetValue    Write SetValue;
 End;
 
 Type
@@ -121,6 +123,8 @@ Type
   vTableName     : String;
  Private
   Procedure ReadBuffer;
+  Procedure NewLineBuffer(Var MassiveLineBuff : TMassiveLine;
+                          MassiveModeData : TMassiveMode);
  Public
   Constructor Create;
   Destructor  Destroy;Override;
@@ -130,6 +134,9 @@ Type
   Procedure Prior;
   Procedure Next;
   Procedure Last;
+  Procedure NewBuffer   (Var MassiveLineBuff : TMassiveLine;
+                         MassiveModeData     : TMassiveMode); Overload;
+  Procedure NewBuffer   (MassiveModeData     : TMassiveMode); Overload;
   Procedure BuildDataset(Dataset             : TRESTDWClientSQLBase;
                          UpdateTableName     : String);   //Constroi o Dataset Massivo
   Procedure BuildLine   (Dataset             : TRESTDWClientSQLBase;
@@ -163,12 +170,15 @@ Begin
  vFieldsName := '';
 End;
 
-Destructor TMassiveField.Free;
+Destructor TMassiveField.Destroy;
 Begin
+ {
  If Assigned(vJSONValue) Then
   If Assigned(vJSONValue^) Then
    FreeAndNil(vJSONValue^);
+ }
  vJSONValue := Nil;
+ Inherited;
 End;
 
 Procedure TMassiveField.LoadFromStream(Stream: TMemoryStream);
@@ -185,7 +195,14 @@ Begin
    vJSONValue^.SaveToStream(Stream);
 End;
 
-Function TMassiveField.Value : String;
+Procedure TMassiveField.SetValue(Value: String);
+Begin
+ If Assigned(vJSONValue) Then
+  If Assigned(vJSONValue^) Then
+   vJSONValue^.Value := Value;
+End;
+
+Function TMassiveField.GetValue : String;
 Begin
  If Assigned(vJSONValue) Then
   If Assigned(vJSONValue^) Then
@@ -442,21 +459,101 @@ End;
 
 { TMassiveDatasetBuffer }
 
+Procedure TMassiveDatasetBuffer.NewLineBuffer(Var MassiveLineBuff : TMassiveLine;
+                                              MassiveModeData : TMassiveMode);
+Var
+ I            : Integer;
+ MassiveValue : TMassiveValue;
+ vresult      : String;
+Begin
+ For I := 0 To vMassiveFields.Count Do
+  Begin
+   MassiveValue       := TMassiveValue.Create;
+   If I = 0 Then
+    MassiveValue.Value := MassiveModeToString(MassiveModeData);
+   MassiveLineBuff.vMassiveValues.Add(MassiveValue);
+   If I > 0 Then
+    If vMassiveFields.FieldByName(vMassiveFields.Items[I-1].FieldsName) <> Nil Then
+     vMassiveFields.FieldByName(vMassiveFields.Items[I-1].FieldsName).vJSONValue := @MassiveValue;
+  End;
+End;
+
 Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQLBase;
                                           MassiveModeBuff     : TMassiveMode;
                                           Var MassiveLineBuff : TMassiveLine);
-Var
- I : Integer;
+ Procedure CopyValue(MassiveModeBuff : TMassiveMode);
+ Var
+  I             : Integer;
+  Field         : TField;
+  vStringStream : TMemoryStream;
+ Begin
+  For I := 0 To vMassiveFields.Count -1 Do
+   Begin
+    Field := Dataset.FindField(vMassiveFields.Items[I].vFieldsName);
+    If Field <> Nil Then
+     Begin
+      If MassiveModeBuff = mmDelete Then
+       If Not(pfInKey in Field.ProviderFlags) Then
+        Continue;
+      Case Field.DataType Of
+       {$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+       ftString,    ftWideString : Begin
+                                    If Trim(Field.AsString) <> '' Then
+                                     Begin
+                                      If Field.Size > 0 Then
+                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Copy(Field.AsString, 1, Field.Size)
+                                      Else
+                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString;
+                                     End;
+                                   End;
+       ftInteger, ftSmallInt,
+       ftWord, ftLongWord        : Begin
+                                    If Trim(Field.AsString) <> '' Then
+                                     MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Trim(Field.AsString);
+                                   End;
+       ftFloat,
+       ftCurrency, ftBCD         : Begin
+                                    If Trim(Field.AsString) <> '' Then
+                                     MassiveLineBuff.vMassiveValues.Items[I + 1].Value := FloatToStr(Field.AsCurrency);
+                                   End;
+       ftDate, ftTime,
+       ftDateTime, ftTimeStamp   : Begin
+                                    If Trim(Field.AsString) <> '' Then
+                                     MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString;
+                                   End;
+       ftBytes, ftVarBytes,
+       ftBlob, ftGraphic,
+       ftOraBlob, ftOraClob      : Begin
+                                    vStringStream := TMemoryStream.Create;
+                                    Try
+                                     TBlobField(Field).SaveToStream(vStringStream);
+                                     vStringStream.Position := 0;
+                                     MassiveLineBuff.vMassiveValues.Items[I + 1].LoadFromStream(vStringStream);
+                                    Finally
+                                     FreeAndNil(vStringStream);
+                                    End;
+                                   End;
+       Else
+        Begin
+         If Trim(Field.AsString) <> '' Then
+          MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString;
+        End;
+      End;
+     End;
+   End;
+ End;
 Begin
+ MassiveLineBuff.vMassiveMode := MassiveModeBuff;
  Case MassiveModeBuff Of
-  mmInsert : Begin
-
-             End;
+  mmInsert : CopyValue(MassiveModeBuff);
   mmUpdate : Begin
-
+              NewBuffer(MassiveModeBuff);
+              CopyValue(MassiveModeBuff);
              End;
   mmDelete : Begin
-
+              NewBuffer(MassiveModeBuff);
+              CopyValue(MassiveModeBuff);
              End;
  End;
 End;
@@ -470,9 +567,7 @@ Begin
                 vMassiveLine.ClearAll;
                 vMassiveFields.ClearAll;
                End;
-  mmBrowse   : Begin
-                vMassiveLine.ClearAll;
-               End;
+  mmBrowse   : vMassiveLine.ClearAll;
   Else
    BuildLine(Dataset, MassiveMode, vMassiveLine);
  End;
@@ -489,7 +584,7 @@ Begin
  vMassiveFields.ClearAll;
  For I := 0 To Dataset.Fields.Count -1 Do
   Begin
-   If Dataset.Fields[I].FieldKind = fkData Then
+   If (Dataset.Fields[I].FieldKind = fkData) And (Not(Dataset.Fields[I].ReadOnly)) Then
     Begin
      MassiveField             := TMassiveField.Create;
      MassiveField.vRequired   := Dataset.Fields[I].Required;
@@ -566,6 +661,21 @@ Begin
   End;
 End;
 
+Procedure TMassiveDatasetBuffer.NewBuffer(Var MassiveLineBuff : TMassiveLine;
+                                          MassiveModeData     : TMassiveMode);
+Begin
+ MassiveLineBuff.ClearAll;
+ MassiveLineBuff.vMassiveMode := MassiveModeData;
+ NewLineBuffer(MassiveLineBuff, MassiveModeData); //Sempre se assume mmInsert como padrão
+End;
+
+Procedure TMassiveDatasetBuffer.NewBuffer(MassiveModeData     : TMassiveMode);
+Begin
+ vMassiveLine.ClearAll;
+ vMassiveLine.vMassiveMode := MassiveModeData;
+ NewLineBuffer(vMassiveLine, MassiveModeData); //Sempre se assume mmInsert como padrão
+End;
+
 Procedure TMassiveDatasetBuffer.Next;
 Begin
  If RecordCount > 0 Then
@@ -606,8 +716,50 @@ Begin
 End;
 
 Procedure TMassiveDatasetBuffer.SaveBuffer(Dataset : TRESTDWClientSQLBase);
+Var
+ I             : Integer;
+ Field         : TField;
+ vStringStream : TMemoryStream;
+ MassiveLine   : TMassiveLine;
+ vresult       : String;
 Begin
-
+ MassiveLine   := TMassiveLine.Create;
+ NewBuffer(MassiveLine, vMassiveLine.vMassiveMode);
+ Try
+  For I := 0 To vMassiveFields.Count -1 Do
+   Begin
+    If I = 0 Then
+     MassiveLine.vMassiveValues.Items[I].Value := vMassiveLine.vMassiveValues.Items[I].Value;
+    Field := Dataset.FindField(vMassiveFields.Items[I].vFieldsName);
+    If vMassiveLine.vMassiveMode = mmDelete Then
+     If Not(pfInKey in Field.ProviderFlags) Then
+      Continue;
+    If Field <> Nil Then
+     Begin
+      If Field.DataType  In [ftBytes, ftVarBytes,
+                             ftBlob, ftGraphic,
+                             ftOraBlob, ftOraClob] Then
+       Begin
+        vStringStream := TMemoryStream.Create;
+        Try
+         vMassiveLine.vMassiveValues.Items[I +1].SaveToStream(vStringStream);
+         vStringStream.Position := 0;
+         MassiveLine.vMassiveValues.Items[I +1].LoadFromStream(vStringStream);
+        Finally
+         FreeAndNil(vStringStream);
+        End;
+       End
+      Else
+       Begin
+        If vMassiveLine.vMassiveValues.Items[I +1].Value <> '' Then
+         MassiveLine.vMassiveValues.Items[I +1].Value := vMassiveLine.vMassiveValues.Items[I +1].Value;
+       End;
+     End;
+   End;
+ Finally
+  vMassiveBuffer.Add(MassiveLine);
+  vMassiveLine.ClearAll;
+ End;
 End;
 
 Function TMassiveDatasetBuffer.ToJSON : String;

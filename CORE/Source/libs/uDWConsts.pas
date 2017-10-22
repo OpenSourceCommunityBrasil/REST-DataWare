@@ -30,7 +30,7 @@ Const
  TValueDisp            = '{"PARAMS":[%s], "RESULT":[%s]}';
  TValueArrayJSON       = '[%s]';
  TValueFormatJSONValue = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":%s}';
- TJsonDatasetHeader    = '{"Field":"%s", "Type":"%s", "Primary":"%s", "Required":"%s", "Size":%d, "Precision":%d, "Autogeneration":"%s"}';
+ TJsonDatasetHeader    = '{"Field":"%s", "Type":"%s", "Primary":"%s", "Required":"%s", "Size":%d, "Precision":%d, "ReadOnly":"%s", "Autogeneration":"%s"}';
  TJsonValueFormat      = '%s';
  TJsonStringValue      = '"%s"';
  TSepValueMemString    = '\\';
@@ -97,11 +97,37 @@ Type
  Function  ObjectValueToFieldType(TypeObject : TObjectValue) : TFieldType;
  Function  FieldTypeToObjectValue(FieldType  : TFieldType)   : TObjectValue;
  Function  DatasetStateToMassiveType(DatasetState : TDatasetState) : TMassiveMode;
+ Function  MassiveModeToString(MassiveMode : TMassiveMode) : String;
+ Function  StringToMassiveMode(Value       : String)       : TMassiveMode;
 
 
 implementation
 
 //Uses uDWJSONTools;
+
+Function MassiveModeToString(MassiveMode : TMassiveMode) : String;
+Begin
+ Case MassiveMode Of
+  mmInactive : Result := 'mmInactive';
+  mmBrowse   : Result := 'mmBrowse';
+  mmInsert   : Result := 'mmInsert';
+  mmUpdate   : Result := 'mmUpdate';
+  mmDelete   : Result := 'mmDelete';
+ End;
+End;
+
+Function StringToMassiveMode(Value       : String)       : TMassiveMode;
+Begin
+ Result  := mmInactive;
+ If LowerCase(Value)      = 'mmBrowse' Then
+  Result := mmBrowse
+ Else If LowerCase(Value) = 'mmInsert' Then
+  Result := mmInsert
+ Else If LowerCase(Value) = 'mmUpdate' Then
+  Result := mmUpdate
+ Else If LowerCase(Value) = 'mmDelete' Then
+  Result := mmDelete;
+End;
 
 Function DatasetStateToMassiveType(DatasetState : TDatasetState) : TMassiveMode;
 Begin

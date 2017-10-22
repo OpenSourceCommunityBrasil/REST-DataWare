@@ -24,7 +24,9 @@ object ServerMethodDM: TServerMethodDM
   end
   object Server_FDConnection: TFDConnection
     Params.Strings = (
-      'Database=P:\Desenvolvimento\RESTDATAWARE\Samples\EMPLOYEE.FDB'
+      
+        'Database=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST' +
+        '_Controls\DEMO\EMPLOYEE.FDB'
       'User_Name=SYSDBA'
       'Password=masterkey'
       'Server=localhost'
