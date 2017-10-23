@@ -85,16 +85,22 @@ Type
  TMassiveLine = Class
  Private
   vMassiveValues  : TMassiveValues;
+  vPrimaryValues  : TMassiveValues;
   vMassiveMode    : TMassiveMode;
-  Function   GetRec(Index : Integer)       : TMassiveValue;
-  Procedure  PutRec(Index : Integer; Item  : TMassiveValue);
+  vChanges        : TStringList;
+  Function   GetRec  (Index : Integer)       : TMassiveValue;
+  Procedure  PutRec  (Index : Integer; Item  : TMassiveValue);
+  Function   GetRecPK(Index : Integer)       : TMassiveValue;
+  Procedure  PutRecPK(Index : Integer; Item  : TMassiveValue);
  Protected
  Public
   Constructor Create;
   Destructor  Destroy;Override;
   Procedure   ClearAll;
-  Property    MassiveMode  : TMassiveMode              Read vMassiveMode Write vMassiveMode;
-  Property    Value[Index  : Integer] : TMassiveValue  Read GetRec       Write PutRec;
+  Property    MassiveMode                     : TMassiveMode   Read vMassiveMode Write vMassiveMode;
+  Property    UpdateFieldChanges              : TStringList    Read vChanges     Write vChanges;
+  Property    Values       [Index  : Integer] : TMassiveValue  Read GetRec       Write PutRec;
+  Property    PrimaryValues[Index  : Integer] : TMassiveValue  Read GetRecPK     Write PutRecPK;
 End;
 
 Type
@@ -134,6 +140,8 @@ Type
   Procedure Prior;
   Procedure Next;
   Procedure Last;
+  Procedure NewBuffer   (Dataset             : TRESTDWClientSQLBase;
+                         MassiveModeData     : TMassiveMode); Overload;
   Procedure NewBuffer   (Var MassiveLineBuff : TMassiveLine;
                          MassiveModeData     : TMassiveMode); Overload;
   Procedure NewBuffer   (MassiveModeData     : TMassiveMode); Overload;
@@ -141,9 +149,11 @@ Type
                          UpdateTableName     : String);   //Constroi o Dataset Massivo
   Procedure BuildLine   (Dataset             : TRESTDWClientSQLBase;
                          MassiveModeBuff     : TMassiveMode;
-                         Var MassiveLineBuff : TMassiveLine);
+                         Var MassiveLineBuff : TMassiveLine;
+                         UpdateTag           : Boolean = False);
   Procedure BuildBuffer (Dataset     : TRESTDWClientSQLBase;    //Cria um Valor Massivo Baseado nos Dados de Um Dataset
-                         MassiveMode : TMassiveMode);
+                         MassiveMode : TMassiveMode;
+                         UpdateTag   : Boolean = False);
   Procedure SaveBuffer  (Dataset     : TRESTDWClientSQLBase);   //Salva Um Buffer Massivo na Lista de Massivos
   Procedure ClearBuffer;                                        //Limpa o Buffer Massivo Atual
   Procedure ClearDataset;                                       //Limpa Todo o Dataset Massivo
@@ -375,11 +385,13 @@ Constructor TMassiveLine.Create;
 Begin
  vMassiveValues  := TMassiveValues.Create;
  vMassiveMode    := mmBrowse;
+ vChanges        := TStringList.Create;
 End;
 
 Destructor TMassiveLine.Destroy;
 Begin
  FreeAndNil(vMassiveValues);
+ FreeAndNil(vChanges);
  Inherited;
 End;
 
@@ -390,15 +402,28 @@ Begin
   Result := TMassiveValue(TList(vMassiveValues).Items[Index]^);
 End;
 
+Function TMassiveLine.GetRecPK(Index : Integer) : TMassiveValue;
+Begin
+ Result := Nil;
+ If (Index < vPrimaryValues.Count) And (Index > -1) Then
+  Result := TMassiveValue(TList(vPrimaryValues).Items[Index]^);
+End;
+
 Procedure TMassiveLine.ClearAll;
 Begin
  vMassiveValues.ClearAll;
 End;
 
-Procedure TMassiveLine.PutRec(Index: Integer; Item: TMassiveValue);
+Procedure TMassiveLine.PutRec(Index: Integer;   Item : TMassiveValue);
 Begin
  If (Index < vMassiveValues.Count) And (Index > -1) Then
   TMassiveValue(TList(vMassiveValues).Items[Index]^) := Item;
+End;
+
+Procedure TMassiveLine.PutRecPK(Index: Integer; Item : TMassiveValue);
+Begin
+ If (Index < vPrimaryValues.Count) And (Index > -1) Then
+  TMassiveValue(TList(vPrimaryValues).Items[Index]^) := Item;
 End;
 
 { TMassiveBuffer }
@@ -464,7 +489,6 @@ Procedure TMassiveDatasetBuffer.NewLineBuffer(Var MassiveLineBuff : TMassiveLine
 Var
  I            : Integer;
  MassiveValue : TMassiveValue;
- vresult      : String;
 Begin
  For I := 0 To vMassiveFields.Count Do
   Begin
@@ -480,7 +504,8 @@ End;
 
 Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQLBase;
                                           MassiveModeBuff     : TMassiveMode;
-                                          Var MassiveLineBuff : TMassiveLine);
+                                          Var MassiveLineBuff : TMassiveLine;
+                                          UpdateTag           : Boolean = False);
  Procedure CopyValue(MassiveModeBuff : TMassiveMode);
  Var
   I             : Integer;
@@ -499,45 +524,124 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
        {$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
        ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
        ftString,    ftWideString : Begin
-                                    If Trim(Field.AsString) <> '' Then
+                                    If Not UpdateTag Then
                                      Begin
-                                      If Field.Size > 0 Then
-                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Copy(Field.AsString, 1, Field.Size)
+                                      If Trim(Field.AsString) <> '' Then
+                                       Begin
+                                        If Field.Size > 0 Then
+                                         MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Copy(Field.AsString, 1, Field.Size)
+                                        Else
+                                         MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString;
+                                       End
                                       Else
-                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString;
+                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
+                                     End
+                                    Else
+                                     Begin
+                                      If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> Field.AsString Then
+                                       Begin
+                                        MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString;
+                                        MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
+                                       End;
                                      End;
                                    End;
        ftInteger, ftSmallInt,
        ftWord, ftLongWord        : Begin
-                                    If Trim(Field.AsString) <> '' Then
-                                     MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Trim(Field.AsString);
+                                    If Not UpdateTag Then
+                                     Begin
+                                      If Trim(Field.AsString) <> '' Then
+                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Trim(Field.AsString)
+                                      Else
+                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
+                                     End
+                                    Else
+                                     Begin
+                                      If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> Field.AsString Then
+                                       Begin
+                                        MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Trim(Field.AsString);
+                                        MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
+                                       End;
+                                     End;
                                    End;
        ftFloat,
        ftCurrency, ftBCD         : Begin
-                                    If Trim(Field.AsString) <> '' Then
-                                     MassiveLineBuff.vMassiveValues.Items[I + 1].Value := FloatToStr(Field.AsCurrency);
+                                    If Not UpdateTag Then
+                                     Begin
+                                      If Trim(Field.AsString) <> '' Then
+                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := FloatToStr(Field.AsCurrency)
+                                      Else
+                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
+                                     End
+                                    Else
+                                     Begin
+                                      If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> Field.AsString Then
+                                       Begin
+                                        If Trim(Field.AsString) <> '' Then
+                                         MassiveLineBuff.vMassiveValues.Items[I + 1].Value := FloatToStr(Field.AsCurrency)
+                                        Else
+                                         MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
+                                        MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
+                                       End;
+                                     End;
                                    End;
        ftDate, ftTime,
        ftDateTime, ftTimeStamp   : Begin
-                                    If Trim(Field.AsString) <> '' Then
-                                     MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString;
+                                    If Not UpdateTag Then
+                                     Begin
+                                      If Trim(Field.AsString) <> '' Then
+                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString
+                                      Else
+                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
+                                     End
+                                    Else
+                                     Begin
+                                      If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> Field.AsString Then
+                                       Begin
+                                        MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString;
+                                        MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
+                                       End;
+                                     End;
                                    End;
        ftBytes, ftVarBytes,
        ftBlob, ftGraphic,
        ftOraBlob, ftOraClob      : Begin
                                     vStringStream := TMemoryStream.Create;
                                     Try
-                                     TBlobField(Field).SaveToStream(vStringStream);
-                                     vStringStream.Position := 0;
-                                     MassiveLineBuff.vMassiveValues.Items[I + 1].LoadFromStream(vStringStream);
+                                     If TBlobField(Field).Size > 0 Then
+                                      Begin
+                                       TBlobField(Field).SaveToStream(vStringStream);
+                                       vStringStream.Position := 0;
+                                       If Not UpdateTag Then
+                                        MassiveLineBuff.vMassiveValues.Items[I + 1].LoadFromStream(vStringStream)
+                                       Else
+                                        Begin
+                                         If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> StreamToHex(vStringStream) Then
+                                          MassiveLineBuff.vMassiveValues.Items[I + 1].LoadFromStream(vStringStream);
+                                        End;
+                                      End
+                                     Else
+                                      MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
                                     Finally
                                      FreeAndNil(vStringStream);
                                     End;
                                    End;
        Else
         Begin
-         If Trim(Field.AsString) <> '' Then
-          MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString;
+         If Not UpdateTag Then
+          Begin
+           If Trim(Field.AsString) <> '' Then
+            MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString
+           Else
+            MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
+          End
+         Else
+          Begin
+           If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> Field.AsString Then
+            Begin
+             MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString;
+             MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
+            End;
+          End;
         End;
       End;
      End;
@@ -547,10 +651,7 @@ Begin
  MassiveLineBuff.vMassiveMode := MassiveModeBuff;
  Case MassiveModeBuff Of
   mmInsert : CopyValue(MassiveModeBuff);
-  mmUpdate : Begin
-              NewBuffer(MassiveModeBuff);
-              CopyValue(MassiveModeBuff);
-             End;
+  mmUpdate : CopyValue(MassiveModeBuff);
   mmDelete : Begin
               NewBuffer(MassiveModeBuff);
               CopyValue(MassiveModeBuff);
@@ -559,7 +660,8 @@ Begin
 End;
 
 Procedure TMassiveDatasetBuffer.BuildBuffer(Dataset     : TRESTDWClientSQLBase;
-                                            MassiveMode : TMassiveMode);
+                                            MassiveMode : TMassiveMode;
+                                            UpdateTag   : Boolean = False);
 Begin
  Case MassiveMode Of
   mmInactive : Begin
@@ -569,7 +671,7 @@ Begin
                End;
   mmBrowse   : vMassiveLine.ClearAll;
   Else
-   BuildLine(Dataset, MassiveMode, vMassiveLine);
+   BuildLine(Dataset, MassiveMode, vMassiveLine, UpdateTag);
  End;
 End;
 
@@ -669,6 +771,15 @@ Begin
  NewLineBuffer(MassiveLineBuff, MassiveModeData); //Sempre se assume mmInsert como padrão
 End;
 
+Procedure TMassiveDatasetBuffer.NewBuffer(Dataset         : TRESTDWClientSQLBase;
+                                          MassiveModeData : TMassiveMode);
+Begin
+ vMassiveLine.ClearAll;
+ vMassiveLine.vMassiveMode := MassiveModeData;
+ NewLineBuffer(vMassiveLine, MassiveModeData); //Sempre se assume mmInsert como padrão
+ BuildLine(Dataset, MassiveModeData, vMassiveLine);//Sempre se assume mmInsert como padrão
+End;
+
 Procedure TMassiveDatasetBuffer.NewBuffer(MassiveModeData     : TMassiveMode);
 Begin
  vMassiveLine.ClearAll;
@@ -721,7 +832,6 @@ Var
  Field         : TField;
  vStringStream : TMemoryStream;
  MassiveLine   : TMassiveLine;
- vresult       : String;
 Begin
  MassiveLine   := TMassiveLine.Create;
  NewBuffer(MassiveLine, vMassiveLine.vMassiveMode);

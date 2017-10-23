@@ -1858,7 +1858,10 @@ Begin
  If Not vInBlockEvents Then
   Begin
    If Trim(vUpdateTableName) <> '' Then
-    TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, uDWConsts.TMassiveMode.mmUpdate);
+    Begin
+     TMassiveDatasetBuffer(vMassiveDataset).NewBuffer(Self, uDWConsts.TMassiveMode.mmUpdate);
+     TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, uDWConsts.TMassiveMode.mmUpdate);
+    End;
    If Assigned(vBeforeEdit) Then
     vBeforeEdit(Dataset);
   End;
@@ -1904,7 +1907,7 @@ Begin
     Begin
      If Trim(vUpdateTableName) <> '' Then
       Begin
-       TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, DatasetStateToMassiveType(vOldState));
+       TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, DatasetStateToMassiveType(vOldState), vOldState = dsEdit);
        TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self);
       End;
      If Assigned(vBeforePost) Then
