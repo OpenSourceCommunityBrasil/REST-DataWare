@@ -392,6 +392,8 @@ Destructor TMassiveLine.Destroy;
 Begin
  FreeAndNil(vMassiveValues);
  FreeAndNil(vChanges);
+ If Assigned(vPrimaryValues) Then
+  FreeAndNil(vPrimaryValues);
  Inherited;
 End;
 
@@ -412,6 +414,10 @@ End;
 Procedure TMassiveLine.ClearAll;
 Begin
  vMassiveValues.ClearAll;
+ If Assigned(vPrimaryValues) Then
+  vPrimaryValues.ClearAll;
+ If Assigned(vChanges)       Then
+  vChanges.Clear;
 End;
 
 Procedure TMassiveLine.PutRec(Index: Integer;   Item : TMassiveValue);
@@ -511,7 +517,14 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
   I             : Integer;
   Field         : TField;
   vStringStream : TMemoryStream;
+  vUpdateCase   : Boolean;
+  MassiveValue  : TMassiveValue;
  Begin
+  //KeyValues to Update
+  If MassiveModeBuff = mmUpdate Then
+   vUpdateCase := MassiveLineBuff.vPrimaryValues = Nil;
+  If MassiveLineBuff.vPrimaryValues <> Nil Then
+   vUpdateCase := MassiveLineBuff.vPrimaryValues.Count = 0;
   For I := 0 To vMassiveFields.Count -1 Do
    Begin
     Field := Dataset.FindField(vMassiveFields.Items[I].vFieldsName);
@@ -521,11 +534,40 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
        If Not(pfInKey in Field.ProviderFlags) Then
         Continue;
       //KeyValues to Update
-      If MassiveModeBuff = mmUpdate Then
+      If (MassiveModeBuff = mmUpdate)      And
+         (vUpdateCase)                     Then
        If (pfInKey in Field.ProviderFlags) Then
         Begin
-//          For A := 0 To vMassiveLine.vPrimaryValues.Count -1 do
-//           MassiveLine.vPrimaryValues.Items[I].Value := vMassiveLine.vPrimaryValues.Items[A].Value;
+         If MassiveLineBuff.vPrimaryValues = Nil Then
+          MassiveLineBuff.vPrimaryValues := TMassiveValues.Create;
+         If vUpdateCase Then
+          Begin
+           MassiveValue  := TMassiveValue.Create;
+           If Field.DataType in [ftBytes, ftVarBytes,
+                                 ftBlob, ftGraphic,
+                                 ftOraBlob, ftOraClob] Then
+            Begin
+             vStringStream := TMemoryStream.Create;
+             Try
+              If TBlobField(Field).Size > 0 Then
+               Begin
+                TBlobField(Field).SaveToStream(vStringStream);
+                vStringStream.Position := 0;
+                MassiveValue.LoadFromStream(vStringStream);
+               End
+              Else
+               MassiveValue.Value := '';
+             Finally
+              FreeAndNil(vStringStream);
+             End;
+            End
+           Else
+            Begin
+             If Trim(Field.AsString) <> '' Then
+              MassiveValue.Value := Field.AsString;
+            End;
+           MassiveLineBuff.vPrimaryValues.Add(MassiveValue);
+          End;
         End;
       Case Field.DataType Of
        {$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
@@ -553,7 +595,9 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                      End;
                                    End;
        ftInteger, ftSmallInt,
-       ftWord, ftLongWord        : Begin
+       ftWord
+       {$IFNDEF FPC}{$if CompilerVersion > 21}, ftLongWord{$IFEND}{$ENDIF}
+                                 : Begin
                                     If Not UpdateTag Then
                                      Begin
                                       If Trim(Field.AsString) <> '' Then
@@ -834,6 +878,7 @@ Var
  Field         : TField;
  vStringStream : TMemoryStream;
  MassiveLine   : TMassiveLine;
+ MassiveValue  : TMassiveValue;
 Begin
  MassiveLine   := TMassiveLine.Create;
  NewBuffer(MassiveLine, vMassiveLine.vMassiveMode);
@@ -874,8 +919,20 @@ Begin
   For A := 0 To vMassiveLine.vChanges.Count -1 do
    MassiveLine.vChanges.Add(vMassiveLine.vChanges[A]);
   //KeyValues to Update
-  For A := 0 To vMassiveLine.vPrimaryValues.Count -1 do
-   MassiveLine.vPrimaryValues.Items[I].Value := vMassiveLine.vPrimaryValues.Items[A].Value;
+  If vMassiveLine.vPrimaryValues <> Nil Then
+   Begin
+    If vMassiveLine.vPrimaryValues.Count > 0 Then
+     Begin
+      If MassiveLine.vPrimaryValues = Nil Then
+       MassiveLine.vPrimaryValues := TMassiveValues.Create;
+      For A := 0 To vMassiveLine.vPrimaryValues.Count -1 do
+       Begin
+        MassiveValue  := TMassiveValue.Create;
+        MassiveValue.Value := vMassiveLine.vPrimaryValues.Items[A].Value;
+        MassiveLine.vPrimaryValues.Add(MassiveValue);
+       End;
+     End;
+   End;
   vMassiveBuffer.Add(MassiveLine);
   vMassiveLine.ClearAll;
  End;

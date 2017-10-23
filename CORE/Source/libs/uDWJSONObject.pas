@@ -1533,8 +1533,8 @@ Begin
               Field.AutoGenerateValue := arAutoInc;
             End;
            {$IFEND}
+           {$ENDIF}
           End;
-         {$ENDIF}
         End;
       Finally
        bJsonOBJ.Clean;
