@@ -1227,6 +1227,8 @@ object Form2: TForm2
       'select * from employee')
     UpdateTableName = 'employee'
     CacheUpdateRecords = True
+    AutoCommitData = True
+    AutoRefreshAfterCommit = True
     InBlockEvents = False
     Left = 344
   end
@@ -1235,7 +1237,6 @@ object Form2: TForm2
     OnBeforeConnect = RESTDWDataBase1BeforeConnect
     Active = False
     Compression = True
-    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False

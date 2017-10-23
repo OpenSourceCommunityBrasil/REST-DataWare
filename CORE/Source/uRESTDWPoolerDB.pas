@@ -233,6 +233,8 @@ Type
   vAfterPost,
   vAfterDelete,
   vAfterCancel         : TDatasetEvents;
+  vAutoCommitData,
+  vAutoRefreshAfterCommit,
   vInBlockEvents       : Boolean;
   vActualRec           : Integer;
   vMasterFields,
@@ -297,11 +299,9 @@ Type
   Procedure   ProcBeforeInsert   (DataSet : TDataSet);
   Procedure   ProcAfterInsert    (DataSet : TDataSet);
   Procedure   ProcBeforeDelete   (DataSet : TDataSet); //Evento para Delta
-  Procedure   ProcAfterDelete    (DataSet : TDataSet);
   Procedure   ProcBeforeEdit     (DataSet : TDataSet); //Evento para Delta
   Procedure   ProcAfterEdit      (DataSet : TDataSet);
   Procedure   ProcBeforePost     (DataSet : TDataSet); //Evento para Delta
-  Procedure   ProcAfterPost      (DataSet : TDataSet);
   Procedure   ProcAfterCancel    (DataSet : TDataSet);
   Procedure   CommitData;
  Protected
@@ -328,32 +328,34 @@ Type
   Procedure   Refresh;
   Procedure   SaveToStream    (Var Stream : TMemoryStream);
  Published
-  Property MasterDataSet       : TRESTDWClientSQL    Read vMasterDataSet            Write SetMasterDataSet;
-  Property MasterCascadeDelete : Boolean             Read vCascadeDelete            Write vCascadeDelete;
-  Property Inactive            : Boolean             Read vInactive                 Write vInactive;
-  Property OnGetDataError      : TOnEventConnection  Read vOnGetDataError           Write vOnGetDataError;         //Recebe os Erros de ExecSQL ou de GetData
-  Property AfterScroll         : TOnAfterScroll      Read vOnAfterScroll            Write vOnAfterScroll;
-  Property AfterOpen           : TOnAfterOpen        Read vOnAfterOpen              Write vOnAfterOpen;
-  Property AfterClose          : TOnAfterClose       Read vOnAfterClose             Write vOnAfterClose;
-  Property Active              : Boolean             Read vActive                   Write SetActiveDB;             //Estado do Dataset
-  Property DataCache           : Boolean             Read vDataCache                Write vDataCache;              //Diz se será salvo o último Stream do Dataset
-  Property Params              : TParams             Read vParams                   Write vParams;                 //Parametros de Dataset
-  Property DataBase            : TRESTDWDataBase     Read vRESTDataBase             Write SetDataBase;             //Database REST do Dataset
-  Property SQL                 : TStringList         Read vSQL                      Write SetSQL;                  //SQL a ser Executado
-  Property UpdateTableName     : String              Read vUpdateTableName          Write SetUpdateTableName;      //Tabela que será usada para Reflexão de Dados
-  Property CacheUpdateRecords  : Boolean             Read vCacheUpdateRecords       Write SetCacheUpdateRecords;
-  Property MasterFields        : String              Read vMasterFields             Write vMasterFields;
-  Property BeforeOpen          : TDatasetEvents      Read vBeforeOpen               Write vBeforeOpen;
-  Property BeforeEdit          : TDatasetEvents      Read vBeforeEdit               Write vBeforeEdit;
-  Property BeforeInsert        : TDatasetEvents      Read vBeforeInsert             Write vBeforeInsert;
-  Property BeforePost          : TDatasetEvents      Read vBeforePost               Write vBeforePost;
-  Property BeforeDelete        : TDatasetEvents      Read vBeforeDelete             Write vBeforeDelete;
-  Property AfterEdit           : TDatasetEvents      Read vAfterEdit                Write vAfterEdit;
-  Property AfterInsert         : TDatasetEvents      Read vAfterInsert              Write vAfterInsert;
-  Property AfterPost           : TDatasetEvents      Read vAfterPost                Write vAfterPost;
-  Property AfterDelete         : TDatasetEvents      Read vAfterDelete              Write vAfterDelete;
-  Property AfterCancel         : TDatasetEvents      Read vAfterCancel              Write vAfterCancel;
-  Property InBlockEvents       : Boolean             Read vInBlockEvents            Write vInBlockEvents;
+  Property MasterDataSet          : TRESTDWClientSQL    Read vMasterDataSet            Write SetMasterDataSet;
+  Property MasterCascadeDelete    : Boolean             Read vCascadeDelete            Write vCascadeDelete;
+  Property Inactive               : Boolean             Read vInactive                 Write vInactive;
+  Property OnGetDataError         : TOnEventConnection  Read vOnGetDataError           Write vOnGetDataError;         //Recebe os Erros de ExecSQL ou de GetData
+  Property AfterScroll            : TOnAfterScroll      Read vOnAfterScroll            Write vOnAfterScroll;
+  Property AfterOpen              : TOnAfterOpen        Read vOnAfterOpen              Write vOnAfterOpen;
+  Property AfterClose             : TOnAfterClose       Read vOnAfterClose             Write vOnAfterClose;
+  Property Active                 : Boolean             Read vActive                   Write SetActiveDB;             //Estado do Dataset
+  Property DataCache              : Boolean             Read vDataCache                Write vDataCache;              //Diz se será salvo o último Stream do Dataset
+  Property Params                 : TParams             Read vParams                   Write vParams;                 //Parametros de Dataset
+  Property DataBase               : TRESTDWDataBase     Read vRESTDataBase             Write SetDataBase;             //Database REST do Dataset
+  Property SQL                    : TStringList         Read vSQL                      Write SetSQL;                  //SQL a ser Executado
+  Property UpdateTableName        : String              Read vUpdateTableName          Write SetUpdateTableName;      //Tabela que será usada para Reflexão de Dados
+  Property CacheUpdateRecords     : Boolean             Read vCacheUpdateRecords       Write SetCacheUpdateRecords;
+  Property AutoCommitData         : Boolean             Read vAutoCommitData           Write vAutoCommitData;
+  Property AutoRefreshAfterCommit : Boolean             Read vAutoRefreshAfterCommit   Write vAutoRefreshAfterCommit;
+  Property MasterFields           : String              Read vMasterFields             Write vMasterFields;
+  Property BeforeOpen             : TDatasetEvents      Read vBeforeOpen               Write vBeforeOpen;
+  Property BeforeEdit             : TDatasetEvents      Read vBeforeEdit               Write vBeforeEdit;
+  Property BeforeInsert           : TDatasetEvents      Read vBeforeInsert             Write vBeforeInsert;
+  Property BeforePost             : TDatasetEvents      Read vBeforePost               Write vBeforePost;
+  Property BeforeDelete           : TDatasetEvents      Read vBeforeDelete             Write vBeforeDelete;
+  Property AfterEdit              : TDatasetEvents      Read vAfterEdit                Write vAfterEdit;
+  Property AfterInsert            : TDatasetEvents      Read vAfterInsert              Write vAfterInsert;
+  Property AfterPost              : TDatasetEvents      Read vAfterPost                Write vAfterPost;
+  Property AfterDelete            : TDatasetEvents      Read vAfterDelete              Write vAfterDelete;
+  Property AfterCancel            : TDatasetEvents      Read vAfterCancel              Write vAfterCancel;
+  Property InBlockEvents          : Boolean             Read vInBlockEvents            Write vInBlockEvents;
 End;
 
 Type
@@ -1561,6 +1563,8 @@ Begin
  vRESTClientPooler                 := TRESTClientPooler.Create(Nil);
  vInactive                         := False;
  vDataCache                        := False;
+ vAutoCommitData                   := False;
+ vAutoRefreshAfterCommit           := False;
  vConnectedOnce                    := True;
  vActive                           := False;
  vCacheUpdateRecords               := True;
@@ -1592,10 +1596,8 @@ Begin
  TDataset(Self).BeforeEdit         := @ProcBeforeEdit;
  TDataset(Self).AfterEdit          := @ProcAfterEdit;
  TDataset(Self).BeforePost         := @ProcBeforePost;
- TDataset(Self).AfterPost          := @ProcAfterPost;
  TDataset(Self).AfterCancel        := @ProcAfterCancel;
  TDataset(Self).BeforeDelete       := @ProcBeforeDelete;
- TDataset(Self).AfterDelete        := @ProcAfterDelete;
  Inherited AfterPost               := @OldAfterPost;
  Inherited AfterDelete             := @OldAfterDelete;
  {$ELSE}
@@ -1608,9 +1610,7 @@ Begin
  TDataset(Self).BeforeEdit         := ProcBeforeEdit;
  TDataset(Self).AfterEdit          := ProcAfterEdit;
  TDataset(Self).BeforePost         := ProcBeforePost;
- TDataset(Self).AfterPost          := ProcAfterPost;
  TDataset(Self).BeforeDelete       := ProcBeforeDelete;
- TDataset(Self).AfterDelete        := ProcAfterDelete;
  TDataset(Self).AfterCancel        := ProcAfterCancel;
  Inherited AfterPost               := OldAfterPost;
  Inherited AfterDelete             := OldAfterDelete;
@@ -1955,13 +1955,6 @@ Begin
   End;
 End;
 
-Procedure TRESTDWClientSQL.ProcAfterDelete(DataSet: TDataSet);
-Begin
- If Not vInBlockEvents Then
-  If Assigned(vAfterDelete) Then
-   vAfterDelete(Dataset);
-End;
-
 Procedure TRESTDWClientSQL.ProcAfterEdit(DataSet: TDataSet);
 Begin
  If Not vInBlockEvents Then
@@ -2045,108 +2038,10 @@ Begin
   End;
 End;
 
-Procedure TRESTDWClientSQL.ProcAfterPost(DataSet : TDataSet);
-Begin
- If Not vReadData Then
-  Begin
-   If Not vInBlockEvents Then
-    If Assigned(vAfterPost) Then
-     vAfterPost(Dataset);
-  End;
-End;
-
 Function  TRESTDWClientSQL.ApplyUpdates(Var Error : String) : Boolean;
-{
-var
- LDeltaList    : TJSONValue;
- vError        : Boolean;
- vMessageError : String;
- oJsonObject   : TJSONObject;
- MemTable      : TDataset;
- Original      : TStringStream;
- gZIPStream    : TMemoryStream;
- Function GetDeltas : TJSONValue;
- Begin
-  UpdateOptions.CountUpdatedRecords := vCacheUpdateRecords;
-  If State In [dsEdit, dsInsert] Then
-   Post;
-  Result := TJSONValue.Create;
-  TJSONValueWriter.ListAdd(Result, vUpdateTableName, TDataset(Self));
- End;
-}
 Begin
-{
- If vReadData Then
-  Begin
-   Result := True;
-   Exit;
-  End;
- LDeltaList := GetDeltas;
- If vRESTDataBase <> Nil Then
-  Begin
-   If vRESTDataBase.vCompression Then
-    Begin
-     oJsonObject   := TJSONObject.Create;
-      TFDJSONInterceptor.DataSetsToJSONObject(LDeltaList, oJsonObject);
-      LDeltaList.Free;
-      LDeltaList   := TJSONValue.Create;
-      MemTable     := TDataset.Create(Nil);
-      Original     := TStringStream.Create(oJsonObject.ToString);
-      gZIPStream   := TMemoryStream.Create;
-     Try
-       //make it gzip
-      doGZIP(Original, gZIPStream);
-      MemTable.FieldDefs.Add('compress', ftBlob);
-      MemTable.CreateDataSet;
-      MemTable.CachedUpdates := True;
-      MemTable.Insert;
-      TBlobField(MemTable.FieldByName('compress')).LoadFromStream(gZIPStream);
-      MemTable.Post;
-      TJSONValueWriter.ListAdd(LDeltaList, 'TempTable', MemTable);
-     Finally
-      MemTable.Free;
-      Original.Free;
-      gZIPStream.Free;
-     End;
-    End;
-  End
- Else
-  Begin
-   Raise Exception.Create(PChar('Empty Database Property'));
-   Exit;
-  End;
- If Assigned(vRESTDataBase) And (Trim(UpdateTableName) <> '') Then
-  vRESTDataBase.ApplyUpdates(vSQL, vParams, LDeltaList, Trim(vUpdateTableName), vError, vMessageError)
- Else
-  Begin
-   vError := True;
-   If Not Assigned(vRESTDataBase) Then
-    vMessageError := 'No RESTDatabase defined'
-   Else
-    vMessageError := 'No UpdateTableName defined';
-  End;
- Result       := Not vError;
- Error        := vMessageError;
- vErrorBefore := vError;
- If (Result) And (Not(vError)) Then
-  Begin
-   TDataset(Self).ApplyUpdates(-1);
-   If Not (vErrorBefore)     Then
-    TDataset(Self).CommitUpdates;
-  End
- Else If vError Then
-  Begin
-   TDataset(Self).Close;
-   OldData.Position := 0;
-   LoadFromStream(OldData, TFDStorageFormat.sfBinary);
-   vReadData  := False;
-  End;
- Try
-  If vActualRec > -1 Then
-   GoToRec(vActualRec);
- Except
- End;
-}
+ //vAutoRefreshAfterCommit           := False;
+ //TMassiveDatasetBuffer(vMassiveDataset).ToJSON;
 End;
 
 Function  TRESTDWClientSQL.ParamByName(Value : String) : TParam;
@@ -2378,13 +2273,33 @@ Begin
 End;
 
 Procedure TRESTDWClientSQL.OldAfterPost(DataSet: TDataSet);
+Var
+ vError : String;
 Begin
  vErrorBefore := False;
  If Not vReadData Then
   Begin
    If Not vInBlockEvents Then
-    If Assigned(vAfterPost) Then
-     vAfterPost(Self);
+    Begin
+     Try
+      If Trim(vUpdateTableName) <> '' Then
+       If vAutoCommitData Then
+        ApplyUpdates(vError);
+      If vError <> '' Then
+       Begin
+
+       End
+      Else
+       Begin
+        If Trim(vUpdateTableName) <> '' Then
+         TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+        If Assigned(vAfterPost) Then
+         vAfterPost(Dataset);
+       End;
+     Except
+
+     End;
+    End;
   End;
 End;
 

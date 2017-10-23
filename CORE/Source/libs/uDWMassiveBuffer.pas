@@ -130,7 +130,7 @@ Type
  Private
   Procedure ReadBuffer;
   Procedure NewLineBuffer(Var MassiveLineBuff : TMassiveLine;
-                          MassiveModeData : TMassiveMode);
+                          MassiveModeData     : TMassiveMode);
  Public
   Constructor Create;
   Destructor  Destroy;Override;
@@ -140,27 +140,27 @@ Type
   Procedure Prior;
   Procedure Next;
   Procedure Last;
-  Procedure NewBuffer   (Dataset             : TRESTDWClientSQLBase;
-                         MassiveModeData     : TMassiveMode); Overload;
-  Procedure NewBuffer   (Var MassiveLineBuff : TMassiveLine;
-                         MassiveModeData     : TMassiveMode); Overload;
-  Procedure NewBuffer   (MassiveModeData     : TMassiveMode); Overload;
-  Procedure BuildDataset(Dataset             : TRESTDWClientSQLBase;
-                         UpdateTableName     : String);   //Constroi o Dataset Massivo
-  Procedure BuildLine   (Dataset             : TRESTDWClientSQLBase;
-                         MassiveModeBuff     : TMassiveMode;
-                         Var MassiveLineBuff : TMassiveLine;
-                         UpdateTag           : Boolean = False);
-  Procedure BuildBuffer (Dataset     : TRESTDWClientSQLBase;    //Cria um Valor Massivo Baseado nos Dados de Um Dataset
-                         MassiveMode : TMassiveMode;
-                         UpdateTag   : Boolean = False);
-  Procedure SaveBuffer  (Dataset     : TRESTDWClientSQLBase);   //Salva Um Buffer Massivo na Lista de Massivos
-  Procedure ClearBuffer;                                        //Limpa o Buffer Massivo Atual
-  Procedure ClearDataset;                                       //Limpa Todo o Dataset Massivo
-  Procedure ClearLine;                                          //Limpa o Buffer Temporario
-  Function  ToJSON      : String;                               //Gera o JSON do Dataset Massivo
-  Procedure FromJSON    (Value : String);                       //Carrega o Dataset Massivo a partir de um JSON
-  Property  MassiveMode : TMassiveMode   Read vMassiveMode;     //Modo Massivo do Buffer Atual
+  Procedure NewBuffer   (Dataset              : TRESTDWClientSQLBase;
+                         MassiveModeData      : TMassiveMode); Overload;
+  Procedure NewBuffer   (Var MassiveLineBuff  : TMassiveLine;
+                         MassiveModeData      : TMassiveMode); Overload;
+  Procedure NewBuffer   (MassiveModeData      : TMassiveMode); Overload;
+  Procedure BuildDataset(Dataset              : TRESTDWClientSQLBase;
+                         UpdateTableName      : String);                 //Constroi o Dataset Massivo
+  Procedure BuildLine   (Dataset              : TRESTDWClientSQLBase;
+                         MassiveModeBuff      : TMassiveMode;
+                         Var MassiveLineBuff  : TMassiveLine;
+                         UpdateTag            : Boolean = False);
+  Procedure BuildBuffer (Dataset              : TRESTDWClientSQLBase;    //Cria um Valor Massivo Baseado nos Dados de Um Dataset
+                         MassiveMode          : TMassiveMode;
+                         UpdateTag            : Boolean = False);
+  Procedure SaveBuffer  (Dataset              : TRESTDWClientSQLBase);   //Salva Um Buffer Massivo na Lista de Massivos
+  Procedure ClearBuffer;                                                //Limpa o Buffer Massivo Atual
+  Procedure ClearDataset;                                               //Limpa Todo o Dataset Massivo
+  Procedure ClearLine;                                                  //Limpa o Buffer Temporario
+  Function  ToJSON      : String;                                       //Gera o JSON do Dataset Massivo
+  Procedure FromJSON    (Value : String);                               //Carrega o Dataset Massivo a partir de um JSON
+  Property  MassiveMode : TMassiveMode   Read vMassiveMode;             //Modo Massivo do Buffer Atual
   Property  Fields      : TMassiveFields Read vMassiveFields Write vMassiveFields;
   Property  TableName   : String         Read vTableName;
 End;
