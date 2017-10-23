@@ -520,6 +520,13 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
       If MassiveModeBuff = mmDelete Then
        If Not(pfInKey in Field.ProviderFlags) Then
         Continue;
+      //KeyValues to Update
+      If MassiveModeBuff = mmUpdate Then
+       If (pfInKey in Field.ProviderFlags) Then
+        Begin
+//          For A := 0 To vMassiveLine.vPrimaryValues.Count -1 do
+//           MassiveLine.vPrimaryValues.Items[I].Value := vMassiveLine.vPrimaryValues.Items[A].Value;
+        End;
       Case Field.DataType Of
        {$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
        ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
@@ -746,11 +753,6 @@ Begin
   End;
 End;
 
-Procedure TMassiveDatasetBuffer.FromJSON(Value: String);
-Begin
-
-End;
-
 Procedure TMassiveDatasetBuffer.Last;
 Begin
  If RecordCount > 0 Then
@@ -828,7 +830,7 @@ End;
 
 Procedure TMassiveDatasetBuffer.SaveBuffer(Dataset : TRESTDWClientSQLBase);
 Var
- I             : Integer;
+ I, A          : Integer;
  Field         : TField;
  vStringStream : TMemoryStream;
  MassiveLine   : TMassiveLine;
@@ -854,7 +856,8 @@ Begin
         Try
          vMassiveLine.vMassiveValues.Items[I +1].SaveToStream(vStringStream);
          vStringStream.Position := 0;
-         MassiveLine.vMassiveValues.Items[I +1].LoadFromStream(vStringStream);
+         If vStringStream.Size > 0 Then
+          MassiveLine.vMassiveValues.Items[I +1].LoadFromStream(vStringStream);
         Finally
          FreeAndNil(vStringStream);
         End;
@@ -867,9 +870,20 @@ Begin
      End;
    End;
  Finally
+  //Update Changes
+  For A := 0 To vMassiveLine.vChanges.Count -1 do
+   MassiveLine.vChanges.Add(vMassiveLine.vChanges[A]);
+  //KeyValues to Update
+  For A := 0 To vMassiveLine.vPrimaryValues.Count -1 do
+   MassiveLine.vPrimaryValues.Items[I].Value := vMassiveLine.vPrimaryValues.Items[A].Value;
   vMassiveBuffer.Add(MassiveLine);
   vMassiveLine.ClearAll;
  End;
+End;
+
+Procedure TMassiveDatasetBuffer.FromJSON(Value: String);
+Begin
+
 End;
 
 Function TMassiveDatasetBuffer.ToJSON : String;
