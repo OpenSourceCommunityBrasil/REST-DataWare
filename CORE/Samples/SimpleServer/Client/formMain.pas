@@ -62,6 +62,7 @@ TYPE
     Button3: TButton;
     StatusBar1: TStatusBar;
     Memo1: TMemo;
+    Button4: TButton;
     PROCEDURE Button1Click(Sender: TObject);
     PROCEDURE Button2Click(Sender: TObject);
     PROCEDURE RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
@@ -73,6 +74,7 @@ TYPE
     PROCEDURE FormCreate(Sender: TObject);
     PROCEDURE RESTDWDataBase1Connection(Sucess: Boolean; CONST Error: STRING);
     PROCEDURE RESTDWDataBase1BeforeConnect(Sender: TComponent);
+    procedure Button4Click(Sender: TObject);
   PRIVATE
     { Private declarations }
     FBytesToTransfer: Int64;
@@ -173,6 +175,14 @@ BEGIN
   END;
   FreeAndNil(Cliente);
 END;
+
+procedure TForm2.Button4Click(Sender: TObject);
+Var
+ vError : String;
+begin
+ If Not RESTDWClientSQL1.ApplyUpdates(vError) Then
+  MessageDlg(vError, TMsgDlgType.mtError, [TMsgDlgBtn.mbOK], 0);
+end;
 
 PROCEDURE TForm2.FormCreate(Sender: TObject);
 BEGIN

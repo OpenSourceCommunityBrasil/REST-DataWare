@@ -2039,9 +2039,24 @@ Begin
 End;
 
 Function  TRESTDWClientSQL.ApplyUpdates(Var Error : String) : Boolean;
+Var
+ vMassiveJSON : String;
 Begin
+ Result := False;
+ If TMassiveDatasetBuffer(vMassiveDataset).RecordCount = 0 Then
+  Error := 'No have data to "Applyupdates"...'
+ Else
+  Begin
+   vMassiveJSON := TMassiveDatasetBuffer(vMassiveDataset).ToJSON;
+   Result       := vMassiveJSON <> '';
+   If Result Then
+    Begin
+     Result     := False;
  //vAutoRefreshAfterCommit           := False;
- //TMassiveDatasetBuffer(vMassiveDataset).ToJSON;
+    End;
+   If Result Then
+    TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+  End;
 End;
 
 Function  TRESTDWClientSQL.ParamByName(Value : String) : TParam;
@@ -2291,8 +2306,6 @@ Begin
        End
       Else
        Begin
-        If Trim(vUpdateTableName) <> '' Then
-         TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
         If Assigned(vAfterPost) Then
          vAfterPost(Dataset);
        End;

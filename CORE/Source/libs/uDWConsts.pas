@@ -44,7 +44,7 @@ Const
 
 Type
  TMassiveMode     = (mmInactive, mmBrowse, mmInsert, mmUpdate, mmDelete);
- TTypeObject      = (toDataset,   toParam,
+ TTypeObject      = (toDataset,   toParam, toMassive,
                      toVariable,  toObject);
  TObjectValue     = (ovUnknown,         ovString,       ovSmallint,         ovInteger,    ovWord,                            // 0..4
                      ovBoolean,         ovFloat,        ovCurrency,         ovBCD,        ovDate,      ovTime,    ovDateTime,// 5..11
@@ -119,13 +119,13 @@ End;
 Function StringToMassiveMode(Value       : String)       : TMassiveMode;
 Begin
  Result  := mmInactive;
- If LowerCase(Value)      = 'mmBrowse' Then
+ If LowerCase(Value)      = LowerCase('mmBrowse') Then
   Result := mmBrowse
- Else If LowerCase(Value) = 'mmInsert' Then
+ Else If LowerCase(Value) = LowerCase('mmInsert') Then
   Result := mmInsert
- Else If LowerCase(Value) = 'mmUpdate' Then
+ Else If LowerCase(Value) = LowerCase('mmUpdate') Then
   Result := mmUpdate
- Else If LowerCase(Value) = 'mmDelete' Then
+ Else If LowerCase(Value) = LowerCase('mmDelete') Then
   Result := mmDelete;
 End;
 
@@ -543,6 +543,7 @@ Begin
   toParam    : Result := 'toParam';
   toVariable : Result := 'toVariable';
   toObject   : Result := 'toObject';
+  toMassive  : Result := 'toMassive';
  End;
 End;
 
@@ -683,11 +684,9 @@ Begin
  Else If vTypeObject = Uppercase('toParam') Then
   Result := toParam
  Else If vTypeObject = Uppercase('toVariable') Then
-  Result := toVariable;
-{
- Else If vTypeObject = Uppercase('toObject') Then
-  Result := toObject;
-}  
+  Result := toVariable
+ Else If vTypeObject = Uppercase('toMassive') Then
+  Result := toMassive;
 End;
 
 Function GetDirectionName(ObjectDirection : TObjectDirection) : String;

@@ -1140,12 +1140,26 @@ object Form2: TForm2
       'Memo1')
     TabOrder = 12
   end
+  object Button4: TButton
+    Left = 505
+    Top = 173
+    Width = 133
+    Height = 24
+    Caption = 'ApplyUpdates'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 13
+    OnClick = Button4Click
+  end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1
     Left = 440
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    AutoCalcFields = False
     FieldDefs = <
       item
         Name = 'EMP_NO'
@@ -1227,7 +1241,7 @@ object Form2: TForm2
       'select * from employee')
     UpdateTableName = 'employee'
     CacheUpdateRecords = True
-    AutoCommitData = True
+    AutoCommitData = False
     AutoRefreshAfterCommit = True
     InBlockEvents = False
     Left = 344

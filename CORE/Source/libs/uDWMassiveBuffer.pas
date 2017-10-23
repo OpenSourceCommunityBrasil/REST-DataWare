@@ -41,10 +41,11 @@ End;
 Type
  TMassiveField = Class
  Private
+  vAutoGenerateValue,
   vRequired,
   vKeyField   : Boolean;
   vJSONValue  : ^TMassiveValue;
-  vFieldsName : String;
+  vFieldName  : String;
   vFieldType  : TObjectValue;
   vSize,
   vPrecision  : Integer;
@@ -56,13 +57,14 @@ Type
   Destructor  Destroy;Override;
   Procedure   LoadFromStream(Stream : TMemoryStream);
   Procedure   SaveToStream  (Stream : TMemoryStream);
-  Property    Required   : Boolean      Read vRequired   Write vRequired;
-  Property    KeyField   : Boolean      Read vKeyField   Write vKeyField;
-  Property    FieldType  : TObjectValue Read vFieldType  Write vFieldType;
-  Property    FieldsName : String       Read vFieldsName Write vFieldsName;
-  Property    Size       : Integer      Read vSize       Write vSize;
-  Property    Precision  : Integer      Read vPrecision  Write vPrecision;
-  Property    Value      : String       Read GetValue    Write SetValue;
+  Property    Required          : Boolean      Read vRequired          Write vRequired;
+  Property    AutoGenerateValue : Boolean      Read vAutoGenerateValue Write vAutoGenerateValue;
+  Property    KeyField          : Boolean      Read vKeyField          Write vKeyField;
+  Property    FieldType         : TObjectValue Read vFieldType         Write vFieldType;
+  Property    FieldName         : String       Read vFieldName         Write vFieldName;
+  Property    Size              : Integer      Read vSize              Write vSize;
+  Property    Precision         : Integer      Read vPrecision         Write vPrecision;
+  Property    Value             : String       Read GetValue           Write SetValue;
 End;
 
 Type
@@ -173,11 +175,12 @@ Uses uRESTDWPoolerDB;
 
 Constructor TMassiveField.Create;
 Begin
- vRequired   := False;
- vKeyField   := vRequired;
- vFieldType  := ovUnknown;
- vJSONValue  := Nil;
- vFieldsName := '';
+ vRequired          := False;
+ vAutoGenerateValue := False;
+ vKeyField          := vRequired;
+ vFieldType         := ovUnknown;
+ vJSONValue         := Nil;
+ vFieldName         := '';
 End;
 
 Destructor TMassiveField.Destroy;
@@ -269,7 +272,7 @@ Begin
  Result := Nil;
  For I := 0 To Self.Count -1 Do
   Begin
-   If LowerCase(TMassiveField(TList(Self).Items[I]^).vFieldsName) =
+   If LowerCase(TMassiveField(TList(Self).Items[I]^).vFieldName) =
       LowerCase(FieldName) Then
     Begin
      Result := TMassiveField(TList(Self).Items[I]^);
@@ -503,8 +506,8 @@ Begin
     MassiveValue.Value := MassiveModeToString(MassiveModeData);
    MassiveLineBuff.vMassiveValues.Add(MassiveValue);
    If I > 0 Then
-    If vMassiveFields.FieldByName(vMassiveFields.Items[I-1].FieldsName) <> Nil Then
-     vMassiveFields.FieldByName(vMassiveFields.Items[I-1].FieldsName).vJSONValue := @MassiveValue;
+    If vMassiveFields.FieldByName(vMassiveFields.Items[I-1].FieldName) <> Nil Then
+     vMassiveFields.FieldByName(vMassiveFields.Items[I-1].FieldName).vJSONValue := @MassiveValue;
   End;
 End;
 
@@ -527,7 +530,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
    vUpdateCase := MassiveLineBuff.vPrimaryValues.Count = 0;
   For I := 0 To vMassiveFields.Count -1 Do
    Begin
-    Field := Dataset.FindField(vMassiveFields.Items[I].vFieldsName);
+    Field := Dataset.FindField(vMassiveFields.Items[I].vFieldName);
     If Field <> Nil Then
      Begin
       If MassiveModeBuff = mmDelete Then
@@ -739,12 +742,18 @@ Begin
   Begin
    If (Dataset.Fields[I].FieldKind = fkData) And (Not(Dataset.Fields[I].ReadOnly)) Then
     Begin
-     MassiveField             := TMassiveField.Create;
-     MassiveField.vRequired   := Dataset.Fields[I].Required;
-     MassiveField.vKeyField   := pfInKey in Dataset.Fields[I].ProviderFlags;
-     MassiveField.vFieldsName := Dataset.Fields[I].FieldName;
-     MassiveField.vFieldType  := FieldTypeToObjectValue(Dataset.Fields[I].DataType);
-     MassiveField.vSize       := Dataset.Fields[I].DataSize;
+     MassiveField                    := TMassiveField.Create;
+     MassiveField.vRequired          := Dataset.Fields[I].Required;
+     MassiveField.vKeyField          := pfInKey in Dataset.Fields[I].ProviderFlags;
+     MassiveField.vFieldName         := Dataset.Fields[I].FieldName;
+     MassiveField.vFieldType         := FieldTypeToObjectValue(Dataset.Fields[I].DataType);
+     MassiveField.vSize              := Dataset.Fields[I].DataSize;
+     {$IFNDEF FPC}{$IF CompilerVersion > 21}
+     MassiveField.vAutoGenerateValue := Dataset.Fields[I].AutoGenerateValue = arAutoInc;
+     {$ELSE}
+     MassiveField.vAutoGenerateValue := False;
+     {$IFEND}
+     {$ENDIF}
      vMassiveFields.Add(MassiveField);
     End;
   End;
@@ -869,7 +878,7 @@ End;
 
 Function TMassiveDatasetBuffer.RecordCount : Integer;
 Begin
- Result := vMassiveBuffer.Count -1;
+ Result := vMassiveBuffer.Count;
 End;
 
 Procedure TMassiveDatasetBuffer.SaveBuffer(Dataset : TRESTDWClientSQLBase);
@@ -887,7 +896,7 @@ Begin
    Begin
     If I = 0 Then
      MassiveLine.vMassiveValues.Items[I].Value := vMassiveLine.vMassiveValues.Items[I].Value;
-    Field := Dataset.FindField(vMassiveFields.Items[I].vFieldsName);
+    Field := Dataset.FindField(vMassiveFields.Items[I].vFieldName);
     If vMassiveLine.vMassiveMode = mmDelete Then
      If Not(pfInKey in Field.ProviderFlags) Then
       Continue;
@@ -944,8 +953,143 @@ Begin
 End;
 
 Function TMassiveDatasetBuffer.ToJSON : String;
+Var
+ A           : Integer;
+ vLines,
+ vTagFields,
+ vTagGeral   : String;
+ Function GenerateHeader: String;
+ Var
+  I              : Integer;
+  vPrimary,
+  vRequired,
+  vReadOnly,
+  vGenerateLine,
+  vAutoinc       : string;
+ Begin
+  For I := 0 To vMassiveFields.Count - 1 Do
+   Begin
+    vPrimary  := 'N';
+    vAutoinc  := 'N';
+    vReadOnly := 'N';
+    If vMassiveFields.Items[I].vKeyField Then
+     vPrimary := 'S';
+    vRequired := 'N';
+    If vMassiveFields.Items[I].vRequired Then
+     vRequired := 'S';
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}
+     If vMassiveFields.Items[I].vAutoGenerateValue Then
+      vAutoinc := 'S';
+    {$ELSE}
+     vAutoinc := 'N';
+    {$IFEND}
+    {$ENDIF}
+    If vMassiveFields.Items[I].FieldType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ovExtended,
+                                             {$IFEND}{$ENDIF}ovFloat, ovCurrency, ovFMTBcd, ovBCD] Then
+     vGenerateLine := Format(TJsonDatasetHeader, [vMassiveFields.Items[I].vFieldName,
+                                                  GetValueType(vMassiveFields.Items[I].FieldType),
+                                                  vPrimary, vRequired, vMassiveFields.Items[I].Size,
+                                                  vMassiveFields.Items[I].Precision, vReadOnly, vAutoinc])
+    Else
+     vGenerateLine := Format(TJsonDatasetHeader, [vMassiveFields.Items[I].vFieldName,
+                                                  GetValueType(vMassiveFields.Items[I].FieldType),
+                                                  vPrimary, vRequired, vMassiveFields.Items[I].Size, 0, vReadOnly, vAutoinc]);
+    If I = 0 Then
+     Result := vGenerateLine
+    Else
+     Result := Result + ', ' + vGenerateLine;
+   End;
+ End;
+ Function GenerateLine(MassiveLineBuff : TMassiveLine) : String;
+ Var
+  A, I          : Integer;
+  vTempLine,
+  vTempComp,
+  vTempKeys,
+  vTempValue    : String;
+  vMassiveMode  : TMassiveMode;
+  vNoChange     : Boolean;
+ Begin
+  For I := 0 To MassiveLineBuff.vMassiveValues.Count - 1 Do
+   Begin
+    If I = 0 Then
+     vMassiveMode  := StringToMassiveMode(MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value)
+    Else
+     Begin
+      If vMassiveMode = mmUpdate Then
+       Begin
+        If MassiveLineBuff.vChanges.Count = 0 Then
+         Continue;
+        vNoChange := True;
+        For A := 0 To MassiveLineBuff.vChanges.Count -1 Do
+         Begin
+          vNoChange := Lowercase(vMassiveFields.Items[I-1].vFieldName) <>
+                       Lowercase(MassiveLineBuff.vChanges[A]);
+          If Not (vNoChange) Then
+           Break;
+         End;
+        If vNoChange Then
+         Continue;
+       End;
+     End;
+    If MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.IsNull Then
+     vTempValue := Format('"%s"', ['null'])
+    Else
+     vTempValue    := Format('"%s"', [MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value]);    //asstring
+    If I = 0 Then
+     vTempLine := vTempValue
+    Else
+     vTempLine := vTempLine + ', ' + vTempValue;
+   End;
+  vTempLine := '[' + vTempLine + ']';
+  If MassiveLineBuff.vChanges.Count > 0 Then
+   Begin
+    For A := 0 To MassiveLineBuff.vChanges.Count -1 Do
+     Begin
+      vTempValue := Format('"%s"', [MassiveLineBuff.vChanges[A]]);    //asstring
+      If A = 0 Then
+       vTempKeys := vTempValue
+      Else
+       vTempKeys := vTempKeys + ', ' + vTempValue;
+     End;
+    vTempKeys := '[' + vTempKeys + ']';
+   End;
+  If MassiveLineBuff.vPrimaryValues <> Nil Then
+   Begin
+    For I := 0 To MassiveLineBuff.vPrimaryValues.Count - 1 Do
+     Begin
+      If MassiveLineBuff.vPrimaryValues.Items[I].vJSONValue.IsNull Then
+       vTempValue := Format('"%s"', ['null'])
+      Else
+       vTempValue    := Format('"%s"', [MassiveLineBuff.vPrimaryValues.Items[I].vJSONValue.Value]);    //asstring
+      If I = 0 Then
+       vTempComp := vTempValue
+      Else
+       vTempComp := vTempComp + ', ' + vTempValue;
+     End;
+    If MassiveLineBuff.vPrimaryValues.Count > 0 Then
+     vTempComp := '[' + vTempComp + ']';
+   End;
+  If (vTempComp <> '') And (vTempKeys <> '') Then
+   Result := Format('%s,%s,%s', [vTempLine, vTempComp, vTempKeys])
+  Else
+   Result := vTempLine;
+ End;
 Begin
-
+ vTagFields  := '{"fields":[' + GenerateHeader + ']}, {"lines":[%s]}';
+ For A := 0 To vMassiveBuffer.Count -1 Do
+  Begin
+   If A = 0 Then
+    vLines := Format('[%s]', [GenerateLine(vMassiveBuffer.Items[A])])
+   Else
+    vLines := vLines + Format(', [%s]', [GenerateLine(vMassiveBuffer.Items[A])]);
+  End;
+ vTagFields := Format(vTagFields, [vLines]);
+ Result := Format(TValueFormatJSON,      ['ObjectType',   GetObjectName(toMassive),
+                                          'Direction',    GetDirectionName(odOUT),
+                                          'Encoded',      'true',
+                                          'ValueType',    GetValueType(ovObject),
+                                          'MassiveValue', vTagFields]);
 End;
 
 End.

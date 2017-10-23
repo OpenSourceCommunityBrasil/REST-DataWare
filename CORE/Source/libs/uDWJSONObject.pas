@@ -51,6 +51,7 @@ End;
 Type
  TJSONValue = Class
 Private
+ vNullValue,
  vBinary: Boolean;
  vtagName: String;
  vTypeObject: TTypeObject;
@@ -102,6 +103,7 @@ Public
  Function  Value   : String;
  Constructor Create;
  Destructor  Destroy; Override;
+ Function    IsNull          : Boolean;
  Property    TypeObject      : TTypeObject      Read vTypeObject      Write vTypeObject;
  Property    ObjectDirection : TObjectDirection Read vObjectDirection Write vObjectDirection;
  Property    ObjectValue     : TObjectValue     Read vObjectValue     Write vObjectValue;
@@ -576,6 +578,7 @@ Begin
  vObjectValue    := ovString;
  vtagName        := 'TAGJSON';
  vBinary         := True;
+ vNullValue      := True;
 End;
 
 Destructor TJSONValue.Destroy;
@@ -590,6 +593,11 @@ Begin
  If vObjectValue In [ovString,        ovFixedChar,    ovWideString,
                      ovFixedWideChar, ovDate, ovTime, ovDateTime] Then
   Result := bValue;
+End;
+
+Function TJSONValue.IsNull: Boolean;
+Begin
+ Result := vNullValue;
 End;
 
 Function TJSONValue.FormatValue(bValue: String): String;
@@ -1745,6 +1753,7 @@ Begin
  Try
   If bJsonValue.names.Length > 0 Then
    Begin
+    vNullValue       := False;
     vTempValue       := CopyValue(bValue);
     vTypeObject      := GetObjectName(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString);
     vObjectDirection := GetDirectionName(bJsonValue.opt(bJsonValue.names.get(1).ToString).ToString);
@@ -1804,6 +1813,7 @@ Procedure TJSONValue.SetValue      (Value  : String;
 Begin
  vBinary := False;
  vEncoded := Encode;
+ vNullValue := False;
  If Encode Then
   Begin
    If vObjectValue in [ovBytes,   ovVarBytes, ovBlob,
