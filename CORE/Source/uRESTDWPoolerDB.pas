@@ -157,17 +157,18 @@ Type
                              Params           : TParams;
                              Var Error        : Boolean;
                              Var MessageError : String);
-  Procedure ApplyUpdates(Var SQL          : TStringList;
-                         Var Params       : TParams;
-                         ADeltaList       : TJSONValue;
-                         TableName        : String;
-                         Var Error        : Boolean;
-                         Var MessageError : String);
   Function InsertMySQLReturnID(Var SQL          : TStringList;
                                Var Params       : TParams;
                                Var Error        : Boolean;
                                Var MessageError : String;
                                RESTClientPooler : TRESTClientPooler = Nil) : Integer;
+  Procedure ApplyUpdates  (Massive          : TMassiveDatasetBuffer;
+                           SQL              : TStringList;
+                           Var Params       : TParams;
+                           Var Error        : Boolean;
+                           Var MessageError : String;
+                           Var Result       : TJSONValue;
+                           RESTClientPooler : TRESTClientPooler = Nil);
   Function  GetStateDB : Boolean;
   Procedure SetMyIp(Value : String);
  Public
@@ -982,72 +983,15 @@ Begin
  {$ENDIF}
 End;
 
-Procedure TRESTDWDataBase.ApplyUpdates(Var SQL          : TStringList;
+Procedure TRESTDWDataBase.ApplyUpdates(Massive          : TMassiveDatasetBuffer;
+                                       SQL              : TStringList;
                                        Var Params       : TParams;
-                                       ADeltaList       : TJSONValue;
-                                       TableName        : String;
                                        Var Error        : Boolean;
-                                       Var MessageError : String);
-{
-Var
- vDSRConnection    : TRESTClientPooler;
- vRESTConnectionDB : TSMPoolerMethodClient;
- Function GetLineSQL(Value : TStringList) : String;
- Var
-  I : Integer;
- Begin
-  Result := '';
-  If Value <> Nil Then
-   For I := 0 To Value.Count -1 do
-    Begin
-     If I = 0 then
-      Result := Value[I]
-     Else
-      Result := Result + ' ' + Value[I];
-    End;
- End;
-}
+                                       Var MessageError : String;
+                                       Var Result       : TJSONValue;
+                                       RESTClientPooler : TRESTClientPooler = Nil);
 Begin
-{
- if vRestPooler = '' then
-  Exit;
- SetConnectionOptions(vDSRConnection);
- vRESTConnectionDB := TSMPoolerMethodClient.Create(vDSRConnection, True);
- vRESTConnectionDB.Compression := vCompression;
- vRESTConnectionDB.Encoding    := GetEncoding(VEncondig);
- Try
-  If Params.Count > 0 Then
-   vRESTConnectionDB.ApplyChanges(vRestPooler,
-                                  vRestModule,
-                                  TableName,
-                                  GetLineSQL(SQL),
-                                  Params,
-                                  ADeltaList,
-                                  Error,
-                                  MessageError, '',
-                                  vTimeOut, vLogin, vPassword)
-  Else
-   vRESTConnectionDB.ApplyChangesPure(vRestPooler,
-                                      vRestModule,
-                                      TableName,
-                                      GetLineSQL(SQL),
-                                      ADeltaList,
-                                      Error,
-                                      MessageError, '',
-                                      vTimeOut, vLogin, vPassword);
-  If Assigned(vOnEventConnection) Then
-   vOnEventConnection(True, 'ApplyUpdates Ok')
- Except
-  On E : Exception do
-   Begin
-    vDSRConnection.SessionID := '';
-    if Assigned(vOnEventConnection) then
-     vOnEventConnection(False, E.Message);
-   End;
- End;
- vDSRConnection.Free;
- vRESTConnectionDB.Free;
-}
+
 End;
 
 Function TRESTDWDataBase.InsertMySQLReturnID(Var SQL          : TStringList;
@@ -2040,7 +1984,10 @@ End;
 
 Function  TRESTDWClientSQL.ApplyUpdates(Var Error : String) : Boolean;
 Var
+ vError       : Boolean;
+ vErrorMSG,
  vMassiveJSON : String;
+ vResult      : TJSONValue;
 Begin
  Result := False;
  If TMassiveDatasetBuffer(vMassiveDataset).RecordCount = 0 Then
@@ -2052,10 +1999,24 @@ Begin
    If Result Then
     Begin
      Result     := False;
- //vAutoRefreshAfterCommit           := False;
+     If vRESTDataBase <> Nil Then
+      Begin
+       If vAutoRefreshAfterCommit Then
+        vRESTDataBase.ApplyUpdates(TMassiveDatasetBuffer(vMassiveDataset), vSQL, vParams, vError, vErrorMSG, vResult, vRESTClientPooler)
+       Else
+        vRESTDataBase.ApplyUpdates(TMassiveDatasetBuffer(vMassiveDataset), Nil,  vParams, vError, vErrorMSG, vResult, vRESTClientPooler);
+       Result := Not vError;
+       Error  := vErrorMSG;
+       If Assigned(vResult) Then
+        FreeAndNil(vResult);
+      End
+     Else
+      Raise Exception.Create(PChar('Empty Database Property'));
     End;
    If Result Then
-    TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+    TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer
+   Else
+    Error := vErrorMSG;
   End;
 End;
 
