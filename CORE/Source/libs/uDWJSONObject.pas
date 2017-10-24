@@ -1562,9 +1562,9 @@ Begin
             vFindFlag := Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString)) = Uppercase(DestDS.Fields[A].FieldName);
             If vFindFlag Then
              Begin
-              If bJsonOBJ.names.Length > 6 Then
-               If Not (DestDS.Fields[A].ReadOnly) Then
-                DestDS.Fields[A].ReadOnly := (Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(6).ToString).ToString)) = 'S');
+             // If bJsonOBJ.names.Length > 6 Then
+             //  If Not (DestDS.Fields[A].ReadOnly) Then
+             //   DestDS.Fields[A].ReadOnly := (Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(6).ToString).ToString)) = 'S');
               ListFields.Add(IntToStr(J));
               Break;
              End;
