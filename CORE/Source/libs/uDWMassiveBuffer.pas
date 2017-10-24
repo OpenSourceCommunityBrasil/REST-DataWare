@@ -6,7 +6,7 @@ interface
 
 uses SysUtils,  Classes,        uDWJSONObject,
      DB,        uRESTDWBase,    uDWPoolerMethod,
-     uDWConsts, uDWConstsData;
+     uDWConsts, uDWConstsData,  uDWJSONTools;
 
 Type
  TMassiveValue = Class
@@ -1035,7 +1035,17 @@ Var
     If MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.IsNull Then
      vTempValue := Format('"%s"', ['null'])
     Else
-     vTempValue    := Format('"%s"', [MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value]);    //asstring
+     Begin
+      If I = 0 Then
+       vTempValue    := Format('"%s"', [MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value])    //asstring
+      Else
+       Begin
+        If vMassiveFields.Items[I-1].vFieldType in [ovString, ovWideString] Then
+         vTempValue    := Format('"%s"', [EncodeStrings(MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value{$IFDEF FPC}, csUndefined{$ENDIF})])
+        Else
+         vTempValue    := Format('"%s"', [MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value])
+       End;
+     End;
     If I = 0 Then
      vTempLine := vTempValue
     Else
@@ -1086,7 +1096,7 @@ Begin
   End;
  vTagFields := Format(vTagFields, [vLines]);
  Result := Format(TValueFormatJSON,      ['ObjectType',   GetObjectName(toMassive),
-                                          'Direction',    GetDirectionName(odOUT),
+                                          'Direction',    GetDirectionName(odINOUT),
                                           'Encoded',      'true',
                                           'ValueType',    GetValueType(ovObject),
                                           'MassiveValue', vTagFields]);
