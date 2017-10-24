@@ -990,8 +990,109 @@ Procedure TRESTDWDataBase.ApplyUpdates(Massive          : TMassiveDatasetBuffer;
                                        Var MessageError : String;
                                        Var Result       : TJSONValue;
                                        RESTClientPooler : TRESTClientPooler = Nil);
+Var
+ vRESTConnectionDB : TDWPoolerMethodClient;
+ LDataSetList      : TJSONValue;
+ DWParams          : TDWParams;
+ Function GetLineSQL(Value : TStringList) : String;
+ Var
+  I : Integer;
+ Begin
+  Result := '';
+  If Value <> Nil Then
+   For I := 0 To Value.Count -1 do
+    Begin
+     If I = 0 then
+      Result := Value[I]
+     Else
+      Result := Result + ' ' + Value[I];
+    End;
+ End;
+ Procedure ParseParams;
+ Var
+  I : Integer;
+ Begin
+  If Params <> Nil Then
+   For I := 0 To Params.Count -1 Do
+    Begin
+     If Params[I].DataType = ftUnknown then
+      Params[I].DataType := ftString;
+    End;
+ End;
 Begin
-
+// Result := Nil;
+ if vRestPooler = '' then
+  Exit;
+ ParseParams;
+ vRESTConnectionDB                := TDWPoolerMethodClient.Create(Nil);
+ vRESTConnectionDB.WelcomeMessage := vWelcomeMessage;
+ vRESTConnectionDB.Host           := vRestWebService;
+ vRESTConnectionDB.Port           := vPoolerPort;
+ vRESTConnectionDB.Compression    := vCompression;
+ {$IFNDEF FPC}
+  vRESTConnectionDB.OnWork        := vOnWork;
+  vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
+  vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
+  vRESTConnectionDB.OnStatus      := vOnStatus;
+  {$if CompilerVersion > 21}
+  vRESTConnectionDB.Encoding      := VEncondig;
+  {$IFEND}
+ {$ELSE}
+  vRESTConnectionDB.OnWork        := vOnWork;
+  vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
+  vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
+  vRESTConnectionDB.OnStatus        := vOnStatus;
+  vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
+ {$ENDIF}
+ Try
+  If Params.Count > 0 Then
+   DWParams     := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vEncondig{$IFEND}{$ENDIF});
+  LDataSetList := vRESTConnectionDB.ApplyUpdates(Massive,      vRestPooler,
+                                                 vRestModule,  GetLineSQL(SQL),
+                                                 DWParams,     Error,
+                                                 MessageError, vTimeOut,
+                                                 vLogin,       vPassword,
+                                                 RESTClientPooler);
+  If Assigned(DWParams) Then
+   FreeAndNil(DWParams);
+  If (LDataSetList <> Nil) Then
+   Begin
+    Result := Nil;
+    Error  := Trim(MessageError) <> '';
+    If (LDataSetList <> Nil) And
+       (Not (Error))        Then
+     Begin
+      Try
+       Result := LDataSetList;
+      Finally
+      End;
+     End;
+    If (Not (Error)) Then
+     Begin
+      If Assigned(vOnEventConnection) Then
+       vOnEventConnection(True, 'ApplyUpdates Ok');
+     End
+    Else
+     Begin
+      If Assigned(vOnEventConnection) then
+       vOnEventConnection(False, MessageError)
+      Else
+       Raise Exception.Create(PChar(MessageError));
+     End;
+   End
+  Else
+   Begin
+    If Assigned(vOnEventConnection) Then
+     vOnEventConnection(False, MessageError);
+   End;
+ Except
+  On E : Exception do
+   Begin
+    if Assigned(vOnEventConnection) then
+     vOnEventConnection(False, E.Message);
+   End;
+ End;
+ FreeAndNil(vRESTConnectionDB);
 End;
 
 Function TRESTDWDataBase.InsertMySQLReturnID(Var SQL          : TStringList;
@@ -1029,7 +1130,7 @@ Var
     End;
  End;
 Begin
-// Result := Nil;
+ Result := -1;
  if vRestPooler = '' then
   Exit;
  ParseParams;
@@ -2011,7 +2112,7 @@ Begin
         FreeAndNil(vResult);
       End
      Else
-      Raise Exception.Create(PChar('Empty Database Property'));
+      Error := 'Empty Database Property';
     End;
    If Result Then
     TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer

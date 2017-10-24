@@ -5,8 +5,8 @@ unit uDWMassiveBuffer;
 interface
 
 uses SysUtils,  Classes,        uDWJSONObject,
-     DB,        uRESTDWBase,    uDWPoolerMethod,
-     uDWConsts, uDWConstsData,  uDWJSONTools;
+     DB,        uRESTDWBase,    uDWConsts,
+     uDWConstsData,  uDWJSONTools;
 
 Type
  TMassiveValue = Class
@@ -169,7 +169,7 @@ End;
 
 implementation
 
-Uses uRESTDWPoolerDB;
+Uses uRESTDWPoolerDB, uDWPoolerMethod;
 
 { TMassiveField }
 
