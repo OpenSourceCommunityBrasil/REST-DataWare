@@ -470,7 +470,7 @@ VAR
 BEGIN
   ArqIni := TIniFile.Create(PathArquivoIni);
   TRY
-    EdtDirDestino.Text    := ExtractFilePath(ParamStr(0));//ArqIni.ReadString('CONFIG', 'DiretorioInstalacao', ExtractFilePath(ParamStr(0)));
+    EdtDirDestino.Text    := ExtractFilePath(ParamStr(0)); // ArqIni.ReadString('CONFIG', 'DiretorioInstalacao', ExtractFilePath(ParamStr(0)));
     EdtPlatform.ItemIndex := EdtPlatform.Items.IndexOf('Win32'); // edtPlatform.Items.IndexOf(ArqIni.ReadString('CONFIG', 'Plataforma', 'Win32'));
     // edtDelphiVersion.ItemIndex  := edtDelphiVersion.Items.IndexOf(ArqIni.ReadString('CONFIG', 'DelphiVersao', ''));
     CkbFecharTortoise.Checked   := ArqIni.ReadBool('CONFIG', 'FecharTortoise', True);
@@ -707,11 +707,23 @@ BEGIN
     // DATASNAP - incluir o path raiz por causa da localização do pacote
     IF FrameDpk.RestEasyObjects_dpk.Checked THEN
     BEGIN
-      AddToLibrarySearchPath(SDirRoot, TPlatform); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
-      AddToLibrarySearchPath(SDirLibrary, TPlatform); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
-      AddToLibrarySearchPath(SDirLibrary, TPlatform); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
-      AddToLibraryBrowsingPath(SDirLibrary, TPlatform); // Arquivos que devem ser usados sem ser compilados
-      AddToDebugDCUPath(SDirLibrary + '\Debug', TPlatform);
+      AddToLibrarySearchPath(SDirRoot, bpWin32); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+      AddToLibrarySearchPath(SDirLibrary, bpWin32); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+      AddToLibrarySearchPath(SDirLibrary, bpWin32); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+      AddToLibraryBrowsingPath(SDirLibrary, bpWin32); // Arquivos que devem ser usados sem ser compilados
+      AddToDebugDCUPath(SDirLibrary + '\Debug', bpWin32);
+
+      AddToLibrarySearchPath(SDirRoot, bpWin64); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+      AddToLibrarySearchPath(SDirLibrary, bpWin64); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+      AddToLibrarySearchPath(SDirLibrary, bpWin64); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+      AddToLibraryBrowsingPath(SDirLibrary, bpWin64); // Arquivos que devem ser usados sem ser compilados
+      AddToDebugDCUPath(SDirLibrary + '\Debug', bpWin64);
+
+      AddToLibrarySearchPath(SDirRoot, bpOSX32); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+      AddToLibrarySearchPath(SDirLibrary, bpOSX32); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+      AddToLibrarySearchPath(SDirLibrary, bpOSX32); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+      AddToLibraryBrowsingPath(SDirLibrary, bpOSX32); // Arquivos que devem ser usados sem ser compilados
+      AddToDebugDCUPath(SDirLibrary + '\Debug', bpOSX32);
     END;
 
     // CORE
@@ -721,27 +733,51 @@ BEGIN
       WITH ODW.Installations[IVersion] DO
       BEGIN
         AddToLibrarySearchPath(SDirLibrary, TPlatform); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpWin32);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpWin32);
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpWin32);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpWin32);
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpWin32);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpWin32);
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpWin32);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpWin32);
+        AddToDebugDCUPath(SDirLibrary + '\Debug', bpWin32);
 
-        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', TPlatform);
-        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', TPlatform);
+        AddToLibrarySearchPath(SDirLibrary, TPlatform); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpWin64);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpWin64);
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpWin64);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpWin64);
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpWin64);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpWin64);
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpWin64);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpWin64);
+        AddToDebugDCUPath(SDirLibrary + '\Debug', bpWin64);
 
-        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', TPlatform);
-        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', TPlatform);
-
-        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', TPlatform);
-        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', TPlatform);
-
-        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', TPlatform);
-        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', TPlatform);
-
-        AddToDebugDCUPath(SDirLibrary + '\Debug', TPlatform);
+        AddToLibrarySearchPath(SDirLibrary, TPlatform); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpOSX32);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpOSX32);
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpOSX32);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpOSX32);
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpOSX32);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpOSX32);
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpOSX32);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpOSX32);
+        AddToDebugDCUPath(SDirLibrary + '\Debug', bpOSX32);
       END;
     END;
     // Conectores CORE
     IF FrameDpk.RestEasyObjects_dpk.Checked THEN
     BEGIN
-      AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', TPlatform);
-      AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', TPlatform);
+      AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpWin32);
+      AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpWin32);
+
+      AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpWin64);
+      AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpWin64);
+
+      AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpOSX32);
+      AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpOSX32);
+
     END;
   END;
 
@@ -763,13 +799,13 @@ BEGIN
 
   IF EdtPlatform.ItemIndex = 0 THEN // Win32
   BEGIN
-    TPlatform   := BpWin32;
-    SDirLibrary := SDirRoot + STipo + 'Lib' + SVersao;
+    TPlatform   := bpWin32;
+    SDirLibrary := SDirRoot + STipo + SVersao;
   END
   ELSE IF EdtPlatform.ItemIndex = 1 THEN // Win64
   BEGIN
-    TPlatform   := BpWin64;
-    SDirLibrary := SDirRoot + STipo + 'Lib' + SVersao + 'x64';
+    TPlatform   := bpWin64;
+    SDirLibrary := SDirRoot + STipo + SVersao + 'x64';
   END;
 END;
 
@@ -1282,7 +1318,7 @@ BEGIN
           IF (IsDelphiPackage(NomePacote)) AND (FrameDpk.Pacotes[IDpk].Checked) THEN
           BEGIN
             WriteToTXT(PathArquivoLog, '');
-            //                                            [        Pacote         ] [pasta BPL ] [pasta DCP ]
+            // [        Pacote         ] [pasta BPL ] [pasta DCP ]
             IF ODW.Installations[IVersion].CompilePackage(SDirPackage + NomePacote, SDirLibrary, SDirLibrary) THEN
               Logar(Format('Pacote "%s" compilado com sucesso.', [NomePacote]))
             ELSE
@@ -1466,7 +1502,7 @@ VAR
   IFor: Integer;
 BEGIN
   // para 64 bit somente compilar
-  IF TPlatform = BpWin32 THEN // Win32
+  IF TPlatform = bpWin32 THEN // Win32
     BtnInstalarDW.Caption := 'Instalar'
   ELSE // win64
     BtnInstalarDW.Caption := 'Compilar';
