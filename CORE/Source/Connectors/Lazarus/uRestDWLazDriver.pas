@@ -16,17 +16,6 @@ Type
   Procedure SetConnection(Value : TComponent);
   Function  GetConnection       : TComponent;
  Public
-  Procedure ApplyChanges        (TableName,
-                                 SQL              : String;
-                                 Params           : TDWParams;
-                                 Var Error        : Boolean;
-                                 Var MessageError : String;
-                                 Const ADeltaList : TJSONValue);Overload;Override;
-  Procedure ApplyChanges        (TableName,
-                                 SQL              : String;
-                                 Var Error        : Boolean;
-                                 Var MessageError : String;
-                                 Const ADeltaList : TJSONValue);Overload;Override;
   Function ExecuteCommand       (SQL              : String;
                                  Var Error        : Boolean;
                                  Var MessageError : String;
@@ -67,23 +56,6 @@ Begin
 End;
 
 { TConnection }
-
-procedure TRESTDWLazDriver.ApplyChanges(TableName,
-                                     SQL              : String;
-                                     Var Error        : Boolean;
-                                     Var MessageError : String;
-                                     Const ADeltaList : TJSONValue);
-begin
-end;
-
-procedure TRESTDWLazDriver.ApplyChanges(TableName,
-                                       SQL              : String;
-                                       Params           : TDWParams;
-                                       Var Error        : Boolean;
-                                       Var MessageError : String;
-                                       Const ADeltaList : TJSONValue);
-begin
-end;
 
 Procedure TRESTDWLazDriver.Close;
 Begin

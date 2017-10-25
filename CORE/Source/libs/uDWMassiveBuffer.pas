@@ -973,7 +973,6 @@ Var
  MassiveValue : TMassiveValue;
  A, C,
  D, E, I      : Integer;
- vTableName   : String;
  MassiveField : TMassiveField;
  MassiveLine  : TMassiveLine;
  Function GetFieldIndex(FieldName : String) : Integer;

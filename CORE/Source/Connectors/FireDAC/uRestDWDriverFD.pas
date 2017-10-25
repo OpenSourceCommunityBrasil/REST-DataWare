@@ -382,14 +382,14 @@ Var
    MassiveDataset.FromJSON(Massive);
    MassiveDataset.First;
    B             := 1;
-   For A := 0 To MassiveDataset.RecordCount -1 Do
+   For A := 1 To MassiveDataset.RecordCount Do
     Begin
      If Not vFDConnection.InTransaction Then
       vFDConnection.StartTransaction;
      Query.SQL.Clear;
      PrepareData(Query, MassiveDataset);
      Query.ExecSQL;
-     If B = CommitRecords Then
+     If B >= CommitRecords Then
       Begin
        Try
         If vFDConnection.InTransaction Then
@@ -421,6 +421,7 @@ Var
    End;
   Finally
    FreeAndNil(MassiveDataset);
+   Query.SQL.Clear;
   End;
  End;
 Begin
