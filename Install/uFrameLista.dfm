@@ -212,7 +212,7 @@ object framePacotes: TframePacotes
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 2
+    TabOrder = 1
     OnClick = VerificarCheckboxes
   end
   object RESTDriverFD_dpk: TCheckBox
@@ -232,7 +232,7 @@ object framePacotes: TframePacotes
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 1
+    TabOrder = 2
     OnClick = VerificarCheckboxes
   end
   object RESTDriverUniDAC_dpk: TCheckBox
@@ -255,7 +255,7 @@ object framePacotes: TframePacotes
     TabOrder = 3
     OnClick = VerificarCheckboxes
   end
-  object RestEasyObjectsCORE_dpk: TCheckBox
+  object RestDatawareCORE_dpk: TCheckBox
     Tag = 2
     Left = 24
     Top = 162
@@ -265,7 +265,7 @@ object framePacotes: TframePacotes
     Margins.Top = 0
     Margins.Right = 0
     Margins.Bottom = 0
-    Caption = 'RestEasyObjectsCORE.dpk'
+    Caption = 'RestDatawareCORE.dpk'
     Checked = True
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText

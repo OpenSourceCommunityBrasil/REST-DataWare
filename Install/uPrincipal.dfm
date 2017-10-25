@@ -1,10 +1,10 @@
 object frmPrincipal: TfrmPrincipal
   Left = 359
   Top = 202
-  ActiveControl = frameDpk.RestEasyObjects_dpk
+  ActiveControl = wizPgInicio
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
-  Caption = 'Instalador REST Dataware'
+  Caption = 'Instalador REST Dataware Componentes'
   ClientHeight = 612
   ClientWidth = 720
   Color = clBtnFace
@@ -24,7 +24,7 @@ object frmPrincipal: TfrmPrincipal
     Top = 0
     Width = 720
     Height = 612
-    ActivePage = wizPgPacotes
+    ActivePage = wizPgInicio
     ButtonBarHeight = 42
     ButtonStart.Caption = 'Para o in'#237'cio'
     ButtonStart.NumGlyphs = 1
@@ -60,7 +60,7 @@ object frmPrincipal: TfrmPrincipal
       Header.Height = 50
       Header.ParentFont = False
       Header.Title.Color = clNone
-      Header.Title.Text = 'Bem vindo a instala'#231#227'o do projeto REST Dataware'
+      Header.Title.Text = 'Bem vindo a instala'#231#227'o do projeto DW'
       Header.Title.Anchors = [akLeft, akTop, akRight]
       Header.Title.Font.Charset = DEFAULT_CHARSET
       Header.Title.Font.Color = clWindowText
@@ -69,9 +69,7 @@ object frmPrincipal: TfrmPrincipal
       Header.Title.Font.Style = [fsBold]
       Header.Subtitle.Color = clNone
       Header.Subtitle.Visible = False
-      Header.Subtitle.Text = 
-        'Este instalar o guiar'#225' no processo de instala'#231#227'o do projeto REST' +
-        ' Dataware.'
+      Header.Subtitle.Text = 'Este instalar o guiar'#225' no processo de instala'#231#227'o do projeto DW.'
       Header.Subtitle.Anchors = [akLeft, akTop, akRight, akBottom]
       Header.Subtitle.Font.Charset = DEFAULT_CHARSET
       Header.Subtitle.Font.Color = clWindowText
@@ -86,6 +84,43 @@ object frmPrincipal: TfrmPrincipal
       WaterMark.Image.Alignment = iaCenter
       WaterMark.Image.Layout = ilTop
       WaterMark.Width = 80
+      object Label27: TLabel
+        Left = 25
+        Top = 6
+        Width = 326
+        Height = 26
+        Caption = 
+          'Este assistente o guiar'#225' no processo de instala'#231#227'o do Projeto RE' +
+          'ST Dataware em seu computador.'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        WordWrap = True
+      end
+      object Label26: TLabel
+        Left = 25
+        Top = 40
+        Width = 360
+        Height = 91
+        Caption = 
+          'O Rest Dataware '#233' uma su'#237'te de componentes que abstrai a complex' +
+          'idade para acesso '#224' dados remotos em uma aplica'#231#227'o constru'#237'da ut' +
+          'ilizando a arquitetura multicamadas. Totalmente free e de c'#243'digo' +
+          ' fonte aberto, o REST Dataware '#233' mais uma iniciativa que visa fo' +
+          'rtalecer a comunidade Delphi, reduzindo o tempo de desenvolvimen' +
+          'to e permitindo que o desenvolvedor foque naquilo que '#233' importan' +
+          'te: as regras de neg'#243'cio da aplica'#231#227'o.'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        WordWrap = True
+      end
       object imgLogomarca: TImage
         Left = 397
         Top = 6
@@ -869,13 +904,44 @@ object frmPrincipal: TfrmPrincipal
           6BA0ADD352D21A68EBB494F43F29FEFE158013655F0000000049454E44AE4260
           82}
       end
-      object lblUrlForum1: TLabel
+      object Label6: TLabel
+        Left = 25
+        Top = 152
+        Width = 338
+        Height = 13
+        Caption = 
+          #201' recomend'#225'vel fechar todos os outros aplicativos antes de conti' +
+          'nuar.'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        WordWrap = True
+      end
+      object Label20: TLabel
+        Left = 25
+        Top = 219
+        Width = 56
+        Height = 13
+        Caption = 'Youtube : '
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGray
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
+      end
+      object Label28: TLabel
         Left = 66
-        Top = 365
-        Width = 178
+        Top = 235
+        Width = 467
         Height = 13
         Cursor = crHandPoint
-        Caption = 'http://www.resteasyobjects.com.br/'
+        Caption = 
+          'https://www.youtube.com/watch?v=V9FKdb_W-HQ&list=PLsaAFR4SZlacHK' +
+          'VmsCaabixv2R7iQkRDj'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlue
         Font.Height = -11
@@ -883,6 +949,19 @@ object frmPrincipal: TfrmPrincipal
         Font.Style = [fsUnderline]
         ParentFont = False
         OnClick = URLClick
+      end
+      object Label19: TLabel
+        Left = 25
+        Top = 262
+        Width = 117
+        Height = 13
+        Caption = 'Grupo no Telegram : '
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGray
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
       end
       object lblUrlDW1: TLabel
         Left = 66
@@ -899,71 +978,17 @@ object frmPrincipal: TfrmPrincipal
         ParentFont = False
         OnClick = URLClick
       end
-      object Label19: TLabel
-        Left = 25
-        Top = 262
-        Width = 101
-        Height = 13
-        Caption = 'Grupo no Telegram : '
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clGreen
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-      end
-      object Label21: TLabel
-        Left = 25
-        Top = 349
-        Width = 241
-        Height = 13
-        Caption = 'Para tirar d'#250'vidas, ajudar ou dar sugest'#245'es visite:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clGreen
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-      end
-      object Label11: TLabel
-        Left = 66
-        Top = 441
-        Width = 137
-        Height = 13
-        Cursor = crHandPoint
-        Caption = 'http://tortoisesvn.tigris.org/'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlue
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsUnderline]
-        ParentFont = False
-        OnClick = URLClick
-      end
-      object Label12: TLabel
-        Left = 25
-        Top = 425
-        Width = 250
-        Height = 13
-        Caption = 'Para baixar o cliente de SVN TORTOISE visite o site:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clGreen
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-      end
       object Label24: TLabel
         Left = 25
         Top = 308
-        Width = 94
+        Width = 107
         Height = 13
         Caption = 'Convite do Skype : '
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = clGreen
+        Font.Color = clGray
         Font.Height = -11
         Font.Name = 'Tahoma'
-        Font.Style = []
+        Font.Style = [fsBold]
         ParentFont = False
       end
       object Label25: TLabel
@@ -981,81 +1006,54 @@ object frmPrincipal: TfrmPrincipal
         ParentFont = False
         OnClick = URLClick
       end
-      object Label26: TLabel
+      object Label21: TLabel
         Left = 25
-        Top = 40
-        Width = 360
-        Height = 91
-        Caption = 
-          'O Rest Dataware '#233' uma su'#237'te de componentes que abstrai a complex' +
-          'idade para acesso '#224' dados remotos em uma aplica'#231#227'o constru'#237'da ut' +
-          'ilizando a arquitetura multicamadas. Totalmente free e de c'#243'digo' +
-          ' fonte aberto, o REST Dataware '#233' mais uma iniciativa que visa fo' +
-          'rtalecer a comunidade Delphi, reduzindo o tempo de desenvolvimen' +
-          'to e permitindo que o desenvolvedor foque naquilo que '#233' importan' +
-          'te: as regras de neg'#243'cio da aplica'#231#227'o.'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clNavy
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-        WordWrap = True
-      end
-      object Label27: TLabel
-        Left = 25
-        Top = 6
-        Width = 326
-        Height = 26
-        Caption = 
-          'Este assistente o guiar'#225' no processo de instala'#231#227'o do Projeto RE' +
-          'ST Dataware em seu computador.'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clNavy
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-        WordWrap = True
-      end
-      object Label6: TLabel
-        Left = 25
-        Top = 152
-        Width = 338
+        Top = 349
+        Width = 281
         Height = 13
-        Caption = 
-          #201' recomend'#225'vel fechar todos os outros aplicativos antes de conti' +
-          'nuar.'
+        Caption = 'Para tirar d'#250'vidas, ajudar ou dar sugest'#245'es visite:'
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = clNavy
+        Font.Color = clGray
         Font.Height = -11
         Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-        WordWrap = True
-      end
-      object Label20: TLabel
-        Left = 25
-        Top = 219
-        Width = 50
-        Height = 13
-        Caption = 'Youtube : '
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clGreen
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
+        Font.Style = [fsBold]
         ParentFont = False
       end
-      object Label28: TLabel
+      object lblUrlForum1: TLabel
         Left = 66
-        Top = 235
-        Width = 467
+        Top = 365
+        Width = 178
         Height = 13
         Cursor = crHandPoint
-        Caption = 
-          'https://www.youtube.com/watch?v=V9FKdb_W-HQ&list=PLsaAFR4SZlacHK' +
-          'VmsCaabixv2R7iQkRDj'
+        Caption = 'http://www.resteasyobjects.com.br/'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlue
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsUnderline]
+        ParentFont = False
+        OnClick = URLClick
+      end
+      object Label12: TLabel
+        Left = 25
+        Top = 425
+        Width = 287
+        Height = 13
+        Caption = 'Para baixar o cliente de SVN TORTOISE visite o site:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGray
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
+      end
+      object Label11: TLabel
+        Left = 66
+        Top = 441
+        Width = 137
+        Height = 13
+        Cursor = crHandPoint
+        Caption = 'http://tortoisesvn.tigris.org/'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlue
         Font.Height = -11
@@ -1089,6 +1087,10 @@ object frmPrincipal: TfrmPrincipal
       Color = clWhite
       Caption = 'Configura'#231#245'es'
       OnNextButtonClick = wizPgConfiguracaoNextButtonClick
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label4: TLabel
         Left = 17
         Top = 68
@@ -1155,6 +1157,20 @@ object frmPrincipal: TfrmPrincipal
         ParentFont = False
         Visible = False
       end
+      object Label7: TLabel
+        Left = 211
+        Top = 201
+        Width = 55
+        Height = 13
+        Margins.Left = 5
+        Caption = 'Conectores'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clMaroon
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+      end
       object edtDelphiVersion: TComboBox
         Left = 373
         Top = 84
@@ -1204,22 +1220,6 @@ object frmPrincipal: TfrmPrincipal
         TabOrder = 0
         Text = 'C:\RESTDataware'
       end
-      object chkDeixarSomenteLIB: TCheckBox
-        Left = 195
-        Top = 125
-        Width = 350
-        Height = 17
-        Caption = 'Deixar somente a pasta LibXX no Library Path do Delphi?'
-        TabOrder = 3
-      end
-      object ckbRemoverArquivosAntigos: TCheckBox
-        Left = 195
-        Top = 161
-        Width = 379
-        Height = 17
-        Caption = 'Remover arquivos antigos do disco (pode demorar bastante)'
-        TabOrder = 4
-      end
       object clbDelphiVersion: TCheckListBox
         Left = 17
         Top = 84
@@ -1227,35 +1227,51 @@ object frmPrincipal: TfrmPrincipal
         Height = 371
         Color = clBtnFace
         ItemHeight = 13
-        TabOrder = 5
+        TabOrder = 3
         OnClick = clbDelphiVersionClick
       end
-      object ckUseFireDAC: TCheckBox
+      object chkDeixarSomenteLIB: TCheckBox
         Left = 195
-        Top = 231
-        Width = 379
+        Top = 125
+        Width = 350
+        Height = 17
+        Caption = 'Deixar somente a pasta LibXX no Library Path do Delphi?'
+        TabOrder = 4
+      end
+      object ckbRemoverArquivosAntigos: TCheckBox
+        Left = 195
+        Top = 161
+        Width = 350
+        Height = 17
+        Caption = 'Remover arquivos antigos do disco (pode demorar bastante)'
+        TabOrder = 5
+      end
+      object ckUseJEDI: TCheckBox
+        Left = 211
+        Top = 220
+        Width = 350
+        Height = 17
+        Caption = 'Usar Cliente JEDI (JVMemoryData)'
+        TabOrder = 6
+        OnClick = ckUseJEDIClick
+      end
+      object ckUseFireDAC: TCheckBox
+        Left = 211
+        Top = 245
+        Width = 350
         Height = 17
         Caption = 'Usar Cliente FireDAC (FDMmemTable)'
-        TabOrder = 6
+        TabOrder = 7
         OnClick = ckUseFireDACClick
       end
       object ckUseKBMemTable: TCheckBox
-        Left = 195
-        Top = 266
-        Width = 379
+        Left = 211
+        Top = 270
+        Width = 350
         Height = 17
         Caption = 'Usar Cliente KBMemTable (KBMemTable)'
-        TabOrder = 7
-        OnClick = ckUseKBMemTableClick
-      end
-      object ckUseJEDI: TCheckBox
-        Left = 195
-        Top = 196
-        Width = 379
-        Height = 17
-        Caption = 'Usar Cliente JEDI (JVMemoryData)'
         TabOrder = 8
-        OnClick = ckUseJEDIClick
+        OnClick = ckUseKBMemTableClick
       end
     end
     object wizPgPacotes: TJvWizardInteriorPage
@@ -1278,6 +1294,10 @@ object frmPrincipal: TfrmPrincipal
       Header.Subtitle.Font.Name = 'Tahoma'
       Header.Subtitle.Font.Style = []
       Caption = 'Pacotes'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       inline frameDpk: TframePacotes
         Left = 0
         Top = 0
@@ -1295,33 +1315,6 @@ object frmPrincipal: TfrmPrincipal
         TabOrder = 0
         ExplicitWidth = 554
         ExplicitHeight = 499
-        DesignSize = (
-          537
-          499)
-        inherited Label3: TLabel
-          Width = 83
-          Caption = 'Conector UniDAC'
-          ExplicitWidth = 83
-        end
-        inherited btnPacotesDesmarcarTodos: TSpeedButton
-          Top = 465
-          Anchors = [akLeft, akBottom]
-          ExplicitTop = 465
-        end
-        inherited btnPacotesMarcarTodos: TSpeedButton
-          Top = 465
-          Anchors = [akLeft, akBottom]
-          OnClick = frameDpkbtnPacotesMarcarTodosClick
-          ExplicitTop = 465
-        end
-        inherited RestEasyObjects_dpk: TCheckBox
-          Checked = False
-          State = cbUnchecked
-        end
-        inherited RestEasyObjectsCORE_dpk: TCheckBox
-          Checked = False
-          State = cbUnchecked
-        end
       end
     end
     object wizPgObterFontes: TJvWizardInteriorPage
@@ -1338,7 +1331,7 @@ object frmPrincipal: TfrmPrincipal
       Header.Subtitle.Color = clNone
       Header.Subtitle.Text = 
         'O assistente far'#225' o download ou atualiza'#231#227'o dos fontes diretamen' +
-        'te do reposit'#243'rio do REST Dataware neste momento.'
+        'te do reposit'#243'rio do DW neste momento.'
       Header.Subtitle.Anchors = [akLeft, akTop, akRight, akBottom]
       Header.Subtitle.Font.Charset = DEFAULT_CHARSET
       Header.Subtitle.Font.Color = clWindowText
@@ -1349,6 +1342,10 @@ object frmPrincipal: TfrmPrincipal
       Caption = 'Reposit'#243'rio'
       OnEnterPage = wizPgObterFontesEnterPage
       OnNextButtonClick = wizPgObterFontesNextButtonClick
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label1: TLabel
         Left = 77
         Top = 177
@@ -1405,7 +1402,7 @@ object frmPrincipal: TfrmPrincipal
         Height = 17
         Caption = 
           'Fechar automaticamente o tortoise se n'#227'o ocorrem erros ou confli' +
-          'tos?'
+          'tos'
         TabOrder = 1
       end
     end
@@ -1434,6 +1431,10 @@ object frmPrincipal: TfrmPrincipal
       Caption = 'Instala'#231#227'o'
       OnEnterPage = wizPgInstalacaoEnterPage
       OnNextButtonClick = wizPgInstalacaoNextButtonClick
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object btnInstalarDW: TSpeedButton
         Left = 430
         Top = 463
@@ -1513,7 +1514,7 @@ object frmPrincipal: TfrmPrincipal
       Header.Visible = False
       Header.ParentFont = False
       Header.Title.Color = clNone
-      Header.Title.Text = 'Projeto REST Dataware'
+      Header.Title.Text = 'Projeto DW'
       Header.Title.Anchors = [akLeft, akTop, akRight]
       Header.Title.Font.Charset = DEFAULT_CHARSET
       Header.Title.Font.Color = clWindowText
@@ -1521,7 +1522,7 @@ object frmPrincipal: TfrmPrincipal
       Header.Title.Font.Name = 'Arial'
       Header.Title.Font.Style = [fsBold]
       Header.Subtitle.Color = clNone
-      Header.Subtitle.Text = 'O projeto REST Dataware foi instalado.'
+      Header.Subtitle.Text = 'O projeto DW foi instalado.'
       Header.Subtitle.Anchors = [akLeft, akTop, akRight, akBottom]
       Header.Subtitle.Font.Charset = DEFAULT_CHARSET
       Header.Subtitle.Font.Color = clWindowText
@@ -1531,6 +1532,10 @@ object frmPrincipal: TfrmPrincipal
       VisibleButtons = [bkFinish]
       Color = clWhite
       Caption = 'Fim'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label3: TLabel
         Left = 39
         Top = 58
@@ -1544,6 +1549,19 @@ object frmPrincipal: TfrmPrincipal
         Font.Style = []
         ParentFont = False
         WordWrap = True
+      end
+      object Label18: TLabel
+        Left = 45
+        Top = 186
+        Width = 241
+        Height = 13
+        Caption = 'Para tirar d'#250'vidas, ajudar ou dar sugest'#245'es visite:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGreen
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
       end
       object Label14: TLabel
         Left = 113
@@ -1560,19 +1578,6 @@ object frmPrincipal: TfrmPrincipal
         ParentFont = False
         OnClick = URLClick
       end
-      object Label18: TLabel
-        Left = 45
-        Top = 186
-        Width = 241
-        Height = 13
-        Caption = 'Para tirar d'#250'vidas, ajudar ou dar sugest'#245'es visite:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clGreen
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-      end
     end
     object wizMapa: TJvWizardRouteMapNodes
       Left = 0
@@ -1581,7 +1586,7 @@ object frmPrincipal: TfrmPrincipal
       Height = 499
       ItemHeight = 30
       AllowClickableNodes = False
-      Color = 5875712
+      Color = clGray
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWhite
       Font.Height = -11
@@ -1600,15 +1605,15 @@ object frmPrincipal: TfrmPrincipal
       Height = 71
       Align = alTop
       BevelOuter = bvNone
-      Color = 8404992
+      Color = clBlack
       ParentBackground = False
       TabOrder = 2
       object Label9: TLabel
         Left = 14
         Top = 19
-        Width = 392
+        Width = 445
         Height = 19
-        Caption = 'Assistente de instala'#231#227'o do Projeto REST Dataware'
+        Caption = 'Assistente de instala'#231#227'o do REST Dataware Componentes'
         Color = clWhite
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWhite
@@ -1621,7 +1626,7 @@ object frmPrincipal: TfrmPrincipal
       end
       object Label10: TLabel
         Left = 14
-        Top = 44
+        Top = 41
         Width = 303
         Height = 13
         Cursor = crHandPoint

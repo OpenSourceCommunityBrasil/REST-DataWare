@@ -1,14 +1,45 @@
 { ****************************************************************************** }
-{ Projeto: Componentes REST Dataware }
+{ Projeto: Componentes DW }
+{ Biblioteca multiplataforma de componentes Delphi para interação com equipa- }
+{ mentos de Automação Comercial utilizados no Brasil }
+{ }
+{ Direitos Autorais Reservados (c) 2009   Isaque Pinheiro }
+{ }
+{ Colaboradores nesse arquivo: }
+{ }
+{ Você pode obter a última versão desse arquivo na pagina do  Projeto DW }
+{ Componentes localizado em      http://www.sourceforge.net/projects/DW }
+{ }
+{ Esta biblioteca é software livre; você pode redistribuí-la e/ou modificá-la }
+{ sob os termos da Licença Pública Geral Menor do GNU conforme publicada pela }
+{ Free Software Foundation; tanto a versão 2.1 da Licença, ou (a seu critério) }
+{ qualquer versão posterior. }
+{ }
+{ Esta biblioteca é distribuída na expectativa de que seja útil, porém, SEM }
+{ NENHUMA GARANTIA; nem mesmo a garantia implícita de COMERCIABILIDADE OU }
+{ ADEQUAÇÃO A UMA FINALIDADE ESPECÍFICA. Consulte a Licença Pública Geral Menor }
+{ do GNU para mais detalhes. (Arquivo LICENÇA.TXT ou LICENSE.TXT) }
+{ }
+{ Você deve ter recebido uma cópia da Licença Pública Geral Menor do GNU junto }
+{ com esta biblioteca; se não, escreva para a Free Software Foundation, Inc., }
+{ no endereço 59 Temple Street, Suite 330, Boston, MA 02111-1307 USA. }
+{ Você também pode obter uma copia da licença em: }
+{ http://www.opensource.org/licenses/lgpl-license.php }
+{ }
+{ Daniel Simões de Almeida  -  daniel@djsystem.com.br  -  www.djsystem.com.br }
+{ Praça Anita Costa, 34 - Tatuí - SP - 18270-410 }
+{ }
+{ ****************************************************************************** }
+
 { ******************************************************************************
   |* Historico
   |*
-  |* 10/10/2017: Paulo Tenório
-  |*  - Adaptação do instalador ACBr
+  |* 29/03/2012: Isaque Pinheiro / Régys Borges da Silveira
+  |*  - Criação e distribuição da Primeira Versao
   ******************************************************************************* }
-UNIT uPrincipal;
+unit uPrincipal;
 
-INTERFACE
+interface
 
 USES
   JclIDEUtils,
@@ -40,10 +71,10 @@ USES
   JvWizardRouteMapNodes,
   CheckLst;
 
-TYPE
+type
   TDestino = (TdSystem, TdDelphi, TdNone);
 
-  TfrmPrincipal = CLASS(TForm)
+  TfrmPrincipal = class(TForm)
     WizPrincipal: TJvWizard;
     WizMapa: TJvWizardRouteMapNodes;
     WizPgConfiguracao: TJvWizardInteriorPage;
@@ -59,23 +90,13 @@ TYPE
     EdtDirDestino: TEdit;
     Label1: TLabel;
     EdtURL: TEdit;
-    ImgLogomarca: TImage;
     LblInfoObterFontes: TLabel;
     LstMsgInstalacao: TListBox;
     PnlTopo: TPanel;
     Label9: TLabel;
     BtnSelecDirInstall: TSpeedButton;
-    Label3: TLabel;
     PgbInstalacao: TProgressBar;
-    LblUrlForum1: TLabel;
-    LblUrlDW1: TLabel;
-    Label19: TLabel;
-    Label21: TLabel;
     Label10: TLabel;
-    Label11: TLabel;
-    Label12: TLabel;
-    Label14: TLabel;
-    Label18: TLabel;
     BtnSVNCheckoutUpdate: TSpeedButton;
     BtnInstalarDW: TSpeedButton;
     CkbFecharTortoise: TCheckBox;
@@ -84,89 +105,99 @@ TYPE
     WizPgPacotes: TJvWizardInteriorPage;
     FrameDpk: TframePacotes;
     LbInfo: TListBox;
-    ChkDeixarSomenteLIB: TCheckBox;
     BtnWCInfo: TButton;
-    CkbRemoverArquivosAntigos: TCheckBox;
     JvCreateProcess1: TJvCreateProcess;
     ClbDelphiVersion: TCheckListBox;
     Label23: TLabel;
-    CkUseFireDAC: TCheckBox;
-    CkUseKBMemTable: TCheckBox;
-    Label24: TLabel;
-    Label25: TLabel;
-    Label26: TLabel;
     Label27: TLabel;
+    Label26: TLabel;
+    ImgLogomarca: TImage;
     Label6: TLabel;
     Label20: TLabel;
     Label28: TLabel;
+    Label19: TLabel;
+    LblUrlDW1: TLabel;
+    Label24: TLabel;
+    Label25: TLabel;
+    Label21: TLabel;
+    LblUrlForum1: TLabel;
+    Label12: TLabel;
+    Label11: TLabel;
+    ChkDeixarSomenteLIB: TCheckBox;
+    CkbRemoverArquivosAntigos: TCheckBox;
     CkUseJEDI: TCheckBox;
-    PROCEDURE FormCreate(Sender: TObject);
-    PROCEDURE FormClose(Sender: TObject; VAR Action: TCloseAction);
-    PROCEDURE EdtDelphiVersionChange(Sender: TObject);
-    PROCEDURE WizPgInicioNextButtonClick(Sender: TObject; VAR Stop: Boolean);
-    PROCEDURE URLClick(Sender: TObject);
-    PROCEDURE BtnSelecDirInstallClick(Sender: TObject);
-    PROCEDURE WizPrincipalCancelButtonClick(Sender: TObject);
-    PROCEDURE WizPrincipalFinishButtonClick(Sender: TObject);
-    PROCEDURE WizPgConfiguracaoNextButtonClick(Sender: TObject; VAR Stop: Boolean);
-    PROCEDURE BtnSVNCheckoutUpdateClick(Sender: TObject);
-    PROCEDURE WizPgObterFontesEnterPage(Sender: TObject; CONST FromPage: TJvWizardCustomPage);
-    PROCEDURE BtnInstalarDWClick(Sender: TObject);
-    PROCEDURE WizPgObterFontesNextButtonClick(Sender: TObject; VAR Stop: Boolean);
-    PROCEDURE WizPgInstalacaoNextButtonClick(Sender: TObject; VAR Stop: Boolean);
-    PROCEDURE BtnVisualizarLogCompilacaoClick(Sender: TObject);
-    PROCEDURE WizPgInstalacaoEnterPage(Sender: TObject; CONST FromPage: TJvWizardCustomPage);
-    PROCEDURE BtnWCInfoClick(Sender: TObject);
-    PROCEDURE ClbDelphiVersionClick(Sender: TObject);
-    PROCEDURE FrameDpkbtnPacotesMarcarTodosClick(Sender: TObject);
-    PROCEDURE WriteToTXT(CONST ArqTXT: STRING; ABinaryString: AnsiString; CONST AppendIfExists: Boolean = True; CONST AddLineBreak: Boolean = True);
-    PROCEDURE ckUseJEDIClick(Sender: TObject);
-    PROCEDURE ckUseFireDACClick(Sender: TObject);
-    PROCEDURE ckUseKBMemTableClick(Sender: TObject);
-  PRIVATE
+    CkUseFireDAC: TCheckBox;
+    CkUseKBMemTable: TCheckBox;
+    Label3: TLabel;
+    Label18: TLabel;
+    Label14: TLabel;
+    Label7: TLabel;
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure EdtDelphiVersionChange(Sender: TObject);
+    procedure WizPgInicioNextButtonClick(Sender: TObject; var Stop: Boolean);
+    procedure URLClick(Sender: TObject);
+    procedure BtnSelecDirInstallClick(Sender: TObject);
+    procedure WizPrincipalCancelButtonClick(Sender: TObject);
+    procedure WizPrincipalFinishButtonClick(Sender: TObject);
+    procedure WizPgConfiguracaoNextButtonClick(Sender: TObject; var Stop: Boolean);
+    procedure BtnSVNCheckoutUpdateClick(Sender: TObject);
+    procedure WizPgObterFontesEnterPage(Sender: TObject; const FromPage: TJvWizardCustomPage);
+    procedure BtnInstalarDWClick(Sender: TObject);
+    procedure WizPgObterFontesNextButtonClick(Sender: TObject; var Stop: Boolean);
+    procedure WizPgInstalacaoNextButtonClick(Sender: TObject; var Stop: Boolean);
+    procedure BtnVisualizarLogCompilacaoClick(Sender: TObject);
+    procedure WizPgInstalacaoEnterPage(Sender: TObject; const FromPage: TJvWizardCustomPage);
+    procedure BtnWCInfoClick(Sender: TObject);
+    procedure ClbDelphiVersionClick(Sender: TObject);
+    procedure WriteToTXT(const ArqTXT: STRING; ABinaryString: AnsiString; const AppendIfExists: Boolean = True; const AddLineBreak: Boolean = True);
+    procedure CkUseJEDIClick(Sender: TObject);
+    procedure CkUseFireDACClick(Sender: TObject);
+    procedure CkUseKBMemTableClick(Sender: TObject);
+  private
     FCountErros: Integer;
-    ODW: TJclBorRADToolInstallations;
-    IVersion: Integer;
-    TPlatform: TJclBDSPlatform;
-    SDirRoot: STRING;
+    ODW:         TJclBorRADToolInstallations;
+    IVersion:    Integer;
+    TPlatform:   TJclBDSPlatform;
+    SDirRoot:    STRING;
     SDirLibrary: STRING;
     SDirPackage: STRING;
-    SDestino: TDestino;
-    SPathBin: STRING;
-    PastaDW: STRING;
-    PROCEDURE BeforeExecute(Sender: TJclBorlandCommandLineTool);
-    PROCEDURE AddLibrarySearchPath;
-    PROCEDURE OutputCallLine(CONST Text: STRING);
-    PROCEDURE SetPlatformSelected;
-    FUNCTION IsCheckOutJaFeito(CONST ADiretorio: STRING): Boolean;
-    PROCEDURE CreateDirectoryLibrarysNotExist;
-    PROCEDURE GravarConfiguracoes;
-    PROCEDURE LerConfiguracoes;
-    FUNCTION PathApp: STRING;
-    FUNCTION PathArquivoIni: STRING;
-    FUNCTION PathArquivoLog: STRING;
-    PROCEDURE InstalarDiversos;
-    FUNCTION PathSystem: STRING;
-    FUNCTION RegistrarActiveXServer(CONST AServerLocation: STRING; CONST ARegister: Boolean): Boolean;
-    PROCEDURE CopiarArquivoTo(ADestino: TDestino; CONST ANomeArquivo: STRING);
-    PROCEDURE ExtrairDiretorioPacote(NomePacote: STRING);
-    PROCEDURE AddLibraryPathToDelphiPath(CONST APath, AProcurarRemover: STRING);
-    PROCEDURE FindDirs(ADirRoot: STRING; BAdicionar: Boolean = True);
-    PROCEDURE DeixarSomenteLib;
-    PROCEDURE RemoverArquivosAntigosDoDisco;
-    PROCEDURE RemoverDiretoriosEPacotesAntigos;
-    FUNCTION RunAsAdminAndWaitForCompletion(HWnd: HWnd; Filename: STRING): Boolean;
-    PROCEDURE GetDriveLetters(AList: TStrings);
-    PROCEDURE MostraDadosVersao;
-    FUNCTION GetPathDWInc: TFileName;
-    PROCEDURE DesligarDefineDWInc(ADefineName: STRING; ADesligar: Boolean);
-  PUBLIC
-  END;
+    PastaDW:     STRING;
+    SDestino:    TDestino;
+    SPathBin:    STRING;
+    procedure BeforeExecute(Sender: TJclBorlandCommandLineTool);
+    procedure AddLibrarySearchPath;
+    procedure OutputCallLine(const Text: STRING);
+    procedure SetPlatformSelected;
+    function IsCheckOutJaFeito(const ADiretorio: STRING): Boolean;
+    procedure CreateDirectoryLibrarysNotExist;
+    procedure GravarConfiguracoes;
+    procedure LerConfiguracoes;
+    function PathApp: STRING;
+    function PathArquivoIni: STRING;
+    function PathArquivoLog: STRING;
+    procedure InstalarCapicom;
+    function PathSystem: STRING;
+    function RegistrarActiveXServer(const AServerLocation: STRING; const ARegister: Boolean): Boolean;
+    procedure CopiarArquivoTo(ADestino: TDestino; const ANomeArquivo: STRING);
+    procedure ExtrairDiretorioPacote(NomePacote: STRING);
+    procedure AddLibraryPathToDelphiPath(const APath, AProcurarRemover: STRING);
+    procedure FindDirs(ADirRoot: STRING; BAdicionar: Boolean = True);
+    procedure DeixarSomenteLib;
+    procedure RemoverArquivosAntigosDoDisco;
+    procedure RemoverDiretoriosEPacotesAntigos;
+    function RunAsAdminAndWaitForCompletion(HWnd: HWND; Filename: STRING): Boolean;
+    procedure GetDriveLetters(AList: TStrings);
+    procedure MostraDadosVersao;
+    function GetPathDWInc: TFileName;
+  public
 
-VAR
+  end;
+
+var
   FrmPrincipal: TfrmPrincipal;
 
-IMPLEMENTATION
+implementation
 
 USES
   SVN_Class,
@@ -179,379 +210,428 @@ USES
 
 {$R *.dfm}
 
-FUNCTION TfrmPrincipal.RunAsAdminAndWaitForCompletion(HWnd: HWnd; Filename: STRING): Boolean;
-VAR
-  Sei: TShellExecuteInfo;
+function TfrmPrincipal.RunAsAdminAndWaitForCompletion(HWnd: HWND; Filename: STRING): Boolean;
+{
+  See Step 3: Redesign for UAC Compatibility (UAC)
+  http://msdn.microsoft.com/en-us/library/bb756922.aspx
+}
+var
+  Sei:      TShellExecuteInfo;
   ExitCode: DWORD;
-BEGIN
+begin
   ZeroMemory(@Sei, SizeOf(Sei));
   Sei.CbSize       := SizeOf(TShellExecuteInfo);
-  Sei.Wnd          := HWnd;
-  Sei.FMask        := SEE_MASK_FLAG_DDEWAIT OR SEE_MASK_FLAG_NO_UI OR SEE_MASK_NOCLOSEPROCESS;
+  Sei.Wnd          := Hwnd;
+  Sei.FMask        := SEE_MASK_FLAG_DDEWAIT or SEE_MASK_FLAG_NO_UI or SEE_MASK_NOCLOSEPROCESS;
   Sei.LpVerb       := PWideChar('runas');
   Sei.LpFile       := PWideChar(Filename);
   Sei.LpParameters := PWideChar('');
   Sei.NShow        := SW_HIDE;
-  IF ShellExecuteEx(@Sei) THEN
-  BEGIN
-    REPEAT
+
+  if ShellExecuteEx(@Sei) then
+  begin
+    repeat
       Application.ProcessMessages;
       GetExitCodeProcess(Sei.HProcess, ExitCode);
-    UNTIL (ExitCode <> STILL_ACTIVE) OR Application.Terminated;
-  END;
-END;
+    until (ExitCode <> STILL_ACTIVE) or Application.Terminated;
+  end;
+end;
 
-PROCEDURE TfrmPrincipal.ExtrairDiretorioPacote(NomePacote: STRING);
-  PROCEDURE FindDirPackage(SDir, SPacote: STRING);
-  VAR
-    ODirList: TSearchRec;
-    IRet: Integer;
-    SDirDpk: STRING;
-  BEGIN
-    SDir := IncludeTrailingPathDelimiter(SDir);
-    IF NOT DirectoryExists(SDir) THEN
-      Exit;
-    IF SysUtils.FindFirst(SDir + '*.*', FaAnyFile, ODirList) = 0 THEN
-    BEGIN
-      TRY
-        REPEAT
-          IF (ODirList.Name = '.') OR (ODirList.Name = '..') OR (ODirList.Name = '__history') OR (ODirList.Name = '__recovery') THEN
-            Continue;
-          IF DirectoryExists(SDir + ODirList.Name) THEN
-            FindDirPackage(SDir + ODirList.Name, SPacote)
-          ELSE
-          BEGIN
-            IF UpperCase(ODirList.Name) = UpperCase(SPacote) THEN
-              SDirPackage := IncludeTrailingPathDelimiter(SDir);
-          END;
-        UNTIL SysUtils.FindNext(ODirList) <> 0;
-      FINALLY
-        SysUtils.FindClose(ODirList);
-      END;
-    END;
-  END;
+procedure TfrmPrincipal.ExtrairDiretorioPacote(NomePacote: STRING);
 
-BEGIN
+procedure FindDirPackage(SDir, SPacote: STRING);
+var
+  ODirList: TSearchRec;
+  IRet:     Integer;
+  SDirDpk:  STRING;
+begin
+  SDir := IncludeTrailingPathDelimiter(SDir);
+  if not DirectoryExists(SDir) then
+    Exit;
+
+  if SysUtils.FindFirst(SDir + '*.*', FaAnyFile, ODirList) = 0 then
+  begin
+    try
+      repeat
+
+        if (ODirList.Name = '.') or (ODirList.Name = '..') or (ODirList.Name = '__history') or (ODirList.Name = '__recovery') then
+          Continue;
+
+        // if oDirList.Attr = faDirectory then
+        if DirectoryExists(SDir + ODirList.Name) then
+          FindDirPackage(SDir + ODirList.Name, SPacote)
+        else
+        begin
+          if UpperCase(ODirList.Name) = UpperCase(SPacote) then
+            SDirPackage := IncludeTrailingPathDelimiter(SDir);
+        end;
+
+      until SysUtils.FindNext(ODirList) <> 0;
+    finally
+      SysUtils.FindClose(ODirList);
+    end;
+  end;
+end;
+
+begin
   SDirPackage := '';
-
-  IF ((NomePacote = 'RestEasyObjects_dpk') OR (NomePacote = 'RESTDriverFD.dpk') OR (NomePacote = 'RESTDriverZEOS.dpk') OR (NomePacote = 'RESTDriverUniDAC.dpk')) THEN
-  BEGIN
-    // Versão Datasnap
+  if NomePacote = 'RestEasyObjects.dpk' then
+  begin
     FindDirPackage(IncludeTrailingPathDelimiter(SDirRoot), NomePacote);
-  END
-  ELSE
-  BEGIN
-    // Versão CORE
-    IF NomePacote = 'RestEasyObjectsCORE.dpk' THEN
-    BEGIN
-      FindDirPackage(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Packages\Delphi\' + PastaDW + '\', NomePacote);
-    END
-    ELSE
-    BEGIN
-      // Conectores
-      IF NomePacote = 'RESTDWDriverFD.dpk' THEN
-      BEGIN
-        FindDirPackage(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC\Package\', NomePacote);
-      END;
-    END;
-  END;
-END;
+  end;
+  if NomePacote = 'RESTDriverFD.dpk' then
+  begin
+    FindDirPackage(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\FireDAC', NomePacote);
+  end;
+  if NomePacote = 'RESTDriverZEOS.dpk' then
+  begin
+    FindDirPackage(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\ZEOS', NomePacote);
+  end;
+  if NomePacote = 'RESTDriverUniDAC.dpk' then
+  begin
+    FindDirPackage(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\UniDAC', NomePacote);
+  end;
+
+  if NomePacote = 'RestDatawareCORE.dpk' then
+  begin
+    FindDirPackage(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Packages\Delphi\' + PastaDW, NomePacote);
+  end;
+  if NomePacote = 'RESTDWDriverFD.dpk' then
+  begin
+    FindDirPackage(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC\Package\', NomePacote);
+  end;
+
+  // Original
+  // FindDirPackage(IncludeTrailingPathDelimiter(SDirRoot) + 'Pacotes\Delphi', NomePacote);
+end;
 
 // retornar o path do aplicativo
-FUNCTION TfrmPrincipal.PathApp: STRING;
-BEGIN
+function TfrmPrincipal.PathApp: STRING;
+begin
   Result := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)));
-END;
+end;
 
 // retornar o caminho completo para o arquivo .ini de configurações
-FUNCTION TfrmPrincipal.PathArquivoIni: STRING;
-VAR
+function TfrmPrincipal.PathArquivoIni: STRING;
+var
   NomeApp: STRING;
-BEGIN
+begin
   NomeApp := ExtractFileName(ParamStr(0));
   Result  := PathApp + ChangeFileExt(NomeApp, '.ini');
-END;
+end;
 
 // retornar o caminho completo para o arquivo de logs
-FUNCTION TfrmPrincipal.PathArquivoLog: STRING;
-BEGIN
+function TfrmPrincipal.PathArquivoLog: STRING;
+begin
   Result := PathApp + 'log_' + StringReplace(EdtDelphiVersion.Text, ' ', '_', [RfReplaceAll]) + '.txt';
-END;
+end;
 
-// verificar se no caminho informado já existe o .svn indicando que o checkout já foi feito no diretorio
-FUNCTION TfrmPrincipal.IsCheckOutJaFeito(CONST ADiretorio: STRING): Boolean;
-BEGIN
+// verificar se no caminho informado já existe o .svn indicando que o
+// checkout já foi feito no diretorio
+function TfrmPrincipal.IsCheckOutJaFeito(const ADiretorio: STRING): Boolean;
+begin
   Result := DirectoryExists(IncludeTrailingPathDelimiter(ADiretorio) + '.svn')
-END;
+end;
 
 // retorna o diretório de sistema atual
-FUNCTION TfrmPrincipal.PathSystem: STRING;
-VAR
-  StrTmp: ARRAY [0 .. MAX_PATH] OF Char;
+function TfrmPrincipal.PathSystem: STRING;
+var
+  StrTmp:     array [0 .. MAX_PATH] of Char;
   DirWindows: STRING;
-CONST
+const
   SYS_64 = 'SysWOW64';
   SYS_32 = 'System32';
-BEGIN
+begin
   Result := '';
-  IF Windows.GetWindowsDirectory(StrTmp, MAX_PATH) > 0 THEN
-  BEGIN
+
+  // SetLength(strTmp, MAX_PATH);
+  if Windows.GetWindowsDirectory(StrTmp, MAX_PATH) > 0 then
+  begin
     DirWindows := Trim(StrPas(StrTmp));
     DirWindows := IncludeTrailingPathDelimiter(DirWindows);
-    IF DirectoryExists(DirWindows + SYS_64) THEN
+
+    if DirectoryExists(DirWindows + SYS_64) then
       Result := DirWindows + SYS_64
-    ELSE IF DirectoryExists(DirWindows + SYS_32) THEN
+    else if DirectoryExists(DirWindows + SYS_32) then
       Result := DirWindows + SYS_32
-    ELSE
-      RAISE EFileNotFoundException.Create('Diretório de sistema não encontrado.');
-  END
-  ELSE
-    RAISE EFileNotFoundException.Create('Ocorreu um erro ao tentar obter o diretório do windows.');
-END;
+    else
+      raise EFileNotFoundException.Create('Diretório de sistema não encontrado.');
+  end
+  else
+    raise EFileNotFoundException.Create('Ocorreu um erro ao tentar obter o diretório do windows.');
+end;
 
-FUNCTION TfrmPrincipal.RegistrarActiveXServer(CONST AServerLocation: STRING; CONST ARegister: Boolean): Boolean;
-VAR
-  ServerDllRegisterServer: FUNCTION: HResult; STDCALL;
-  ServerDllUnregisterServer: FUNCTION: HResult; STDCALL;
-  ServerHandle: THandle;
+function TfrmPrincipal.RegistrarActiveXServer(const AServerLocation: STRING; const ARegister: Boolean): Boolean;
+var
+  ServerDllRegisterServer:   function: HResult; stdcall;
+  ServerDllUnregisterServer: function: HResult; stdcall;
+  ServerHandle:              THandle;
 
-  PROCEDURE UnloadServerFunctions;
-  BEGIN
-    @ServerDllRegisterServer   := NIL;
-    @ServerDllUnregisterServer := NIL;
-    FreeLibrary(ServerHandle);
-  END;
+procedure UnloadServerFunctions;
+begin
+  @ServerDllRegisterServer   := nil;
+  @ServerDllUnregisterServer := nil;
+  FreeLibrary(ServerHandle);
+end;
 
-  FUNCTION LoadServerFunctions: Boolean;
-  BEGIN
-    Result       := False;
-    ServerHandle := SafeLoadLibrary(AServerLocation);
-    IF (ServerHandle <> 0) THEN
-    BEGIN
-      @ServerDllRegisterServer   := GetProcAddress(ServerHandle, 'DllRegisterServer');
-      @ServerDllUnregisterServer := GetProcAddress(ServerHandle, 'DllUnregisterServer');
-      IF (@ServerDllRegisterServer = NIL) OR (@ServerDllUnregisterServer = NIL) THEN
-        UnloadServerFunctions
-      ELSE
-        Result := True;
-    END;
-  END;
+function LoadServerFunctions: Boolean;
+begin
+  Result       := False;
+  ServerHandle := SafeLoadLibrary(AServerLocation);
 
-BEGIN
+  if (ServerHandle <> 0) then
+  begin
+    @ServerDllRegisterServer   := GetProcAddress(ServerHandle, 'DllRegisterServer');
+    @ServerDllUnregisterServer := GetProcAddress(ServerHandle, 'DllUnregisterServer');
+
+    if (@ServerDllRegisterServer = nil) or (@ServerDllUnregisterServer = nil) then
+      UnloadServerFunctions
+    else
+      Result := True;
+  end;
+end;
+
+begin
   Result := False;
-  TRY
-    IF LoadServerFunctions THEN
-      TRY
-        IF ARegister THEN
+  try
+    if LoadServerFunctions then
+      try
+        if ARegister then
           Result := ServerDllRegisterServer = S_OK
-        ELSE
+        else
           Result := ServerDllUnregisterServer = S_OK;
-      FINALLY
+      finally
         UnloadServerFunctions;
-      END;
-  EXCEPT
-  END;
-END;
+      end;
+  except
+  end;
+end;
 
-PROCEDURE TfrmPrincipal.CopiarArquivoTo(ADestino: TDestino; CONST ANomeArquivo: STRING);
-VAR
-  PathOrigem: STRING;
+procedure TfrmPrincipal.CopiarArquivoTo(ADestino: TDestino; const ANomeArquivo: STRING);
+var
+  PathOrigem:  STRING;
   PathDestino: STRING;
-  DirSystem: STRING;
-  DirDW: STRING;
-BEGIN
-  CASE ADestino OF
+  DirSystem:   STRING;
+  DirDW:       STRING;
+begin
+  case ADestino of
     TdSystem:
       DirSystem := Trim(PathSystem);
     TdDelphi:
       DirSystem := SPathBin;
-  END;
+  end;
+
   DirDW := IncludeTrailingPathDelimiter(EdtDirDestino.Text);
-  IF DirSystem <> EmptyStr THEN
+
+  if DirSystem <> EmptyStr then
     DirSystem := IncludeTrailingPathDelimiter(DirSystem)
-  ELSE
-    RAISE EFileNotFoundException.Create('Diretório de sistema não encontrado.');
+  else
+    raise EFileNotFoundException.Create('Diretório de sistema não encontrado.');
+
   PathOrigem  := DirDW + 'DLLs\' + ANomeArquivo;
   PathDestino := DirSystem + ExtractFileName(ANomeArquivo);
-  IF FileExists(PathOrigem) AND NOT(FileExists(PathDestino)) THEN
-  BEGIN
-    IF NOT CopyFile(PWideChar(PathOrigem), PWideChar(PathDestino), True) THEN
-    BEGIN
-      RAISE EFilerError.CreateFmt('Ocorreu o seguinte erro ao tentar copiar o arquivo "%s": %d - %s', [ANomeArquivo, GetLastError, SysErrorMessage(GetLastError)]);
-    END;
-  END;
-END;
 
-// copia as dlls da pasta Diversoso para a pasta escolhida pelo usuario
-PROCEDURE TfrmPrincipal.InstalarDiversos;
-BEGIN
-  IF SDestino <> TdNone THEN
-  BEGIN
-    CopiarArquivoTo(SDestino, 'Diversos\iconv.dll');
-    CopiarArquivoTo(SDestino, 'Diversos\inpout32.dll');
-    CopiarArquivoTo(SDestino, 'Diversos\msvcr71.dll');
-  END;
-END;
+  if FileExists(PathOrigem) and not(FileExists(PathDestino)) then
+  begin
+    if not CopyFile(PWideChar(PathOrigem), PWideChar(PathDestino), True) then
+    begin
+      raise EFilerError.CreateFmt('Ocorreu o seguinte erro ao tentar copiar o arquivo "%s": %d - %s', [ANomeArquivo, GetLastError, SysErrorMessage(GetLastError)]);
+    end;
+  end;
+end;
 
+// copia as dlls da pasta capcom para a pasta escolhida pelo usuario e registra a dll
+procedure TfrmPrincipal.InstalarCapicom;
+begin
+  if SDestino <> TdNone then
+  begin
+    CopiarArquivoTo(SDestino, 'Capicom\capicom.dll');
+    CopiarArquivoTo(SDestino, 'Capicom\msxml5.dll');
+    CopiarArquivoTo(SDestino, 'Capicom\msxml5r.dll');
+
+    if SDestino = TdDelphi then
+    begin
+      RegistrarActiveXServer(SPathBin + 'capicom.dll', True);
+      RegistrarActiveXServer(SPathBin + 'msxml5.dll', True);
+    end
+    else
+    begin
+      RegistrarActiveXServer('capicom.dll', True);
+      RegistrarActiveXServer('msxml5.dll', True);
+    end;
+  end;
+end;
 
 // ler o arquivo .ini de configurações e setar os campos com os valores lidos
-PROCEDURE TfrmPrincipal.LerConfiguracoes;
-VAR
+procedure TfrmPrincipal.LerConfiguracoes;
+var
   ArqIni: TIniFile;
-  I: Integer;
-BEGIN
+  I:      Integer;
+begin
   ArqIni := TIniFile.Create(PathArquivoIni);
-  TRY
-    EdtDirDestino.Text := ArqIni.ReadString('CONFIG', 'DiretorioInstalacao', ExtractFilePath(ParamStr(0)));
-    // EdtPlatform.ItemIndex := EdtPlatform.Items.IndexOf('Win32');
-    EdtPlatform.Items.IndexOf(ArqIni.ReadString('CONFIG', 'Plataforma', 'Win32'));
-    EdtDelphiVersion.ItemIndex  := EdtDelphiVersion.Items.IndexOf(ArqIni.ReadString('CONFIG', 'DelphiVersao', ''));
+  try
+    EdtDirDestino.Text    := ArqIni.ReadString('CONFIG', 'DiretorioInstalacao', ExtractFilePath(ParamStr(0)));
+    EdtPlatform.ItemIndex := EdtPlatform.Items.IndexOf('Win32'); // edtPlatform.Items.IndexOf(ArqIni.ReadString('CONFIG', 'Plataforma', 'Win32'));
+    // edtDelphiVersion.ItemIndex  := edtDelphiVersion.Items.IndexOf(ArqIni.ReadString('CONFIG', 'DelphiVersao', ''));
     CkbFecharTortoise.Checked   := ArqIni.ReadBool('CONFIG', 'FecharTortoise', True);
     ChkDeixarSomenteLIB.Checked := ArqIni.ReadBool('CONFIG', 'DexarSomenteLib', False);
-    CkUseJEDI.Checked           := ArqIni.ReadBool('CONFIG', 'UsarJVMemoryData', False);
-    CkUseFireDAC.Checked        := ArqIni.ReadBool('CONFIG', 'UsarFDMemTable', False);
-    CkUseKBMemTable.Checked     := ArqIni.ReadBool('CONFIG', 'UsarKBMemTable', False);
-    CkUseKBMemTable.Checked     := ArqIni.ReadBool('CONFIG', 'RemoverCastWarnings', False);
-    IF Trim(EdtDelphiVersion.Text) = '' THEN
-      EdtDelphiVersion.ItemIndex := 0;
-    EdtDelphiVersionChange(EdtDelphiVersion);
-    FOR I                         := 0 TO FrameDpk.Pacotes.Count - 1 DO
-      FrameDpk.Pacotes[I].Checked := ArqIni.ReadBool('PACOTES', FrameDpk.Pacotes[I].Caption, False);
-  FINALLY
-    ArqIni.Free;
-  END;
-END;
 
-PROCEDURE TfrmPrincipal.MostraDadosVersao;
-BEGIN
+    if Trim(EdtDelphiVersion.Text) = '' then
+      EdtDelphiVersion.ItemIndex := 0;
+
+    EdtDelphiVersionChange(EdtDelphiVersion);
+
+    for I                         := 0 to FrameDpk.Pacotes.Count - 1 do
+      FrameDpk.Pacotes[I].Checked := ArqIni.ReadBool('PACOTES', FrameDpk.Pacotes[I].Caption, False);
+  finally
+    ArqIni.Free;
+  end;
+end;
+
+procedure TfrmPrincipal.MostraDadosVersao;
+begin
   // mostrar ao usuário as informações de compilação
   LbInfo.Clear;
-  WITH LbInfo.Items DO
-  BEGIN
+  with LbInfo.Items do
+  begin
     Clear;
     Add(EdtDelphiVersion.Text + ' ' + EdtPlatform.Text);
     Add('Dir. Instalação  : ' + EdtDirDestino.Text);
     Add('Dir. Bibliotecas : ' + SDirLibrary);
-  END;
-END;
+  end;
+end;
 
 // gravar as configurações efetuadas pelo usuário
-PROCEDURE TfrmPrincipal.GravarConfiguracoes;
-VAR
+procedure TfrmPrincipal.GravarConfiguracoes;
+var
   ArqIni: TIniFile;
-  I: Integer;
-BEGIN
+  I:      Integer;
+begin
   ArqIni := TIniFile.Create(PathArquivoIni);
-  TRY
+  try
     ArqIni.WriteString('CONFIG', 'DiretorioInstalacao', EdtDirDestino.Text);
     // ArqIni.WriteString('CONFIG', 'DelphiVersao', edtDelphiVersion.Text);
     ArqIni.WriteString('CONFIG', 'Plataforma', EdtPlatform.Text);
     ArqIni.WriteBool('CONFIG', 'FecharTortoise', CkbFecharTortoise.Checked);
     ArqIni.WriteBool('CONFIG', 'DexarSomenteLib', ChkDeixarSomenteLIB.Checked);
-    ArqIni.WriteBool('CONFIG', 'UsarJVMemoryData', CkUseJEDI.Checked);
-    ArqIni.WriteBool('CONFIG', 'UsarFDMemTable', CkUseFireDAC.Checked);
-    ArqIni.WriteBool('CONFIG', 'UsarKBMemTable', CkUseKBMemTable.Checked);
-    FOR I := 0 TO FrameDpk.Pacotes.Count - 1 DO
+
+    for I := 0 to FrameDpk.Pacotes.Count - 1 do
       ArqIni.WriteBool('PACOTES', FrameDpk.Pacotes[I].Caption, FrameDpk.Pacotes[I].Checked);
-  FINALLY
+  finally
     ArqIni.Free;
-  END;
-END;
+  end;
+end;
 
 // criação dos diretórios necessários
-PROCEDURE TfrmPrincipal.CreateDirectoryLibrarysNotExist;
-BEGIN
+procedure TfrmPrincipal.CreateDirectoryLibrarysNotExist;
+begin
   // Checa se existe diretório da plataforma
-  IF NOT DirectoryExists(SDirLibrary) THEN
+  if not DirectoryExists(SDirLibrary) then
     ForceDirectories(SDirLibrary);
-END;
+  if not DirectoryExists(SDirLibrary + '\Debug') then
+    ForceDirectories(SDirLibrary + '\Debug');
+end;
 
-PROCEDURE TfrmPrincipal.DeixarSomenteLib;
-  PROCEDURE Copiar(CONST Extensao: STRING);
-  VAR
-    ListArquivos: TStringDynArray;
-    Arquivo: STRING;
-    I: Integer;
-  BEGIN
-    ListArquivos := TDirectory.GetFiles(IncludeTrailingPathDelimiter(SDirRoot) + 'Fontes', Extensao, TSearchOption.SoAllDirectories);
-    FOR I        := LOW(ListArquivos) TO HIGH(ListArquivos) DO
-    BEGIN
-      Arquivo := ExtractFileName(ListArquivos[I]);
-      CopyFile(PWideChar(ListArquivos[I]), PWideChar(IncludeTrailingPathDelimiter(SDirLibrary) + Arquivo), False);
-    END;
-  END;
+procedure TfrmPrincipal.DeixarSomenteLib;
+procedure Copiar(const Extensao: STRING);
+var
+  ListArquivos: TStringDynArray;
+  Arquivo:      STRING;
+  I:            Integer;
+begin
+  ListArquivos := TDirectory.GetFiles(IncludeTrailingPathDelimiter(SDirRoot) + 'Fontes', Extensao, TSearchOption.SoAllDirectories);
+  for I        := Low(ListArquivos) to High(ListArquivos) do
+  begin
+    Arquivo := ExtractFileName(ListArquivos[I]);
+    CopyFile(PWideChar(ListArquivos[I]), PWideChar(IncludeTrailingPathDelimiter(SDirLibrary) + Arquivo), False);
+  end;
+end;
 
-BEGIN
+begin
   // remover os path com o segundo parametro
-  FindDirs(IncludeTrailingPathDelimiter(SDirRoot) + 'Fontes', False);
+  //
+  FindDirs(IncludeTrailingPathDelimiter(SDirRoot));
   Copiar('*.dcr');
   Copiar('*.res');
   Copiar('*.dfm');
   Copiar('*.ini');
   Copiar('*.inc');
-END;
+  FindDirs(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\FireDAC');
+  Copiar('*.dcr');
+  Copiar('*.res');
+  Copiar('*.dfm');
+  Copiar('*.ini');
+  Copiar('*.inc');
+  FindDirs(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\ZEOS');
+  Copiar('*.dcr');
+  Copiar('*.res');
+  Copiar('*.dfm');
+  Copiar('*.ini');
+  Copiar('*.inc');
+  FindDirs(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\UniDAC');
+  Copiar('*.dcr');
+  Copiar('*.res');
+  Copiar('*.dfm');
+  Copiar('*.ini');
+  Copiar('*.inc');
+  FindDirs(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Packages\Delphi');
+  Copiar('*.dcr');
+  Copiar('*.res');
+  Copiar('*.dfm');
+  Copiar('*.ini');
+  Copiar('*.inc');
+  FindDirs(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC\Package');
+  Copiar('*.dcr');
+  Copiar('*.res');
+  Copiar('*.dfm');
+  Copiar('*.ini');
+  Copiar('*.inc');
+  //
+  // original -> FindDirs(IncludeTrailingPathDelimiter(SDirRoot) + 'Fontes', False);
+  //
+  // Copiar('*.dcr');
+  // Copiar('*.res');
+  // Copiar('*.dfm');
+  // Copiar('*.ini');
+  // Copiar('*.inc');
+end;
 
-PROCEDURE TfrmPrincipal.DesligarDefineDWInc(ADefineName: STRING; ADesligar: Boolean);
-VAR
-  F: TStringList;
-  I: Integer;
-BEGIN
-  F := TStringList.Create;
-  TRY
-    F.LoadFromFile(GetPathDWInc);
-    FOR I := 0 TO F.Count - 1 DO
-    BEGIN
-      IF Pos(ADefineName.ToUpper, F[I].ToUpper) > 0 THEN
-      BEGIN
-        IF ADesligar THEN
-          F[I] := '{$DEFINE ' + ADefineName + '}'
-        ELSE
-          F[I] := '{.$DEFINE ' + ADefineName + '}';
-        Break;
-      END;
-    END;
-    F.SaveToFile(GetPathDWInc);
-  FINALLY
-    F.Free;
-  END;
-END;
-
-PROCEDURE TfrmPrincipal.AddLibraryPathToDelphiPath(CONST APath: STRING; CONST AProcurarRemover: STRING);
-CONST
+procedure TfrmPrincipal.AddLibraryPathToDelphiPath(const APath: STRING; const AProcurarRemover: STRING);
+const
   Cs: PChar = 'Environment Variables';
-VAR
+var
   LParam, WParam: Integer;
-  AResult: Cardinal;
-  ListaPaths: TStringList;
-  I: Integer;
-  PathsAtuais: STRING;
-  PathFonte: STRING;
-BEGIN
-  WITH ODW.Installations[IVersion] DO
-  BEGIN
+  AResult:        Cardinal;
+  ListaPaths:     TStringList;
+  I:              Integer;
+  PathsAtuais:    STRING;
+  PathFonte:      STRING;
+begin
+  with ODW.Installations[IVersion] do
+  begin
     // tentar ler o path configurado na ide do delphi, se não existir ler
     // a atual para complementar e fazer o override
     PathsAtuais := Trim(EnvironmentVariables.Values['PATH']);
-    IF PathsAtuais = '' THEN
+    if PathsAtuais = '' then
       PathsAtuais := GetEnvironmentVariable('PATH');
 
     // manipular as strings
     ListaPaths := TStringList.Create;
-    TRY
+    try
       ListaPaths.Clear;
       ListaPaths.Delimiter       := ';';
       ListaPaths.StrictDelimiter := True;
       ListaPaths.DelimitedText   := PathsAtuais;
 
       // verificar se existe algo do DW e remover do environment variable PATH do delphi
-      IF Trim(AProcurarRemover) <> '' THEN
-      BEGIN
-        FOR I := ListaPaths.Count - 1 DOWNTO 0 DO
-        BEGIN
-          IF Pos(AnsiUpperCase(AProcurarRemover), AnsiUpperCase(ListaPaths[I])) > 0 THEN
+      if Trim(AProcurarRemover) <> '' then
+      begin
+        for I := ListaPaths.Count - 1 downto 0 do
+        begin
+          if Pos(AnsiUpperCase(AProcurarRemover), AnsiUpperCase(ListaPaths[I])) > 0 then
             ListaPaths.Delete(I);
-        END;
-      END;
+        end;
+      end;
 
       // adicionar o path
       ListaPaths.Add(APath);
@@ -563,219 +643,153 @@ BEGIN
       WParam := 0;
       LParam := LongInt(Cs);
       SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, WParam, LParam, SMTO_NORMAL, 4000, AResult);
-      IF AResult <> 0 THEN
-        RAISE Exception.Create('Ocorreu um erro ao tentar configurar o path: ' + SysErrorMessage(AResult));
-    FINALLY
+      if AResult <> 0 then
+        raise Exception.Create('Ocorreu um erro ao tentar configurar o path: ' + SysErrorMessage(AResult));
+    finally
       ListaPaths.Free;
-    END;
-  END;
-END;
+    end;
+  end;
+end;
 
-PROCEDURE TfrmPrincipal.FindDirs(ADirRoot: STRING; BAdicionar: Boolean = True);
-VAR
+procedure TfrmPrincipal.FindDirs(ADirRoot: STRING; BAdicionar: Boolean = True);
+var
   ODirList: TSearchRec;
 
-  FUNCTION EProibido(CONST ADir: STRING): Boolean;
-  CONST
-    LISTA_PROIBIDOS: ARRAY [0 .. 5] OF STRING = ('quick', 'rave', 'laz', 'VerificarNecessidade', '__history', '__recovery');
-  VAR
-    Str: STRING;
-  BEGIN
-    Result := False;
-    FOR Str IN LISTA_PROIBIDOS DO
-    BEGIN
-      Result := Pos(AnsiUpperCase(Str), AnsiUpperCase(ADir)) > 0;
-      IF Result THEN
-        Break;
-    END;
-  END;
+function EProibido(const ADir: STRING): Boolean;
+const
+  LISTA_PROIBIDOS: array [0 .. 5] of STRING = ('quick', 'rave', 'laz', 'VerificarNecessidade', '__history', '__recovery');
+var
+  Str: STRING;
+begin
+  Result := False;
+  for Str in LISTA_PROIBIDOS do
+  begin
+    Result := Pos(AnsiUpperCase(Str), AnsiUpperCase(ADir)) > 0;
+    if Result then
+      Break;
+  end;
+end;
 
-BEGIN
+begin
   ADirRoot := IncludeTrailingPathDelimiter(ADirRoot);
-  IF FindFirst(ADirRoot + '*.*', FaDirectory, ODirList) = 0 THEN
-  BEGIN
-    TRY
-      REPEAT
-        IF ((ODirList.Attr AND FaDirectory) <> 0) AND (ODirList.Name <> '.') AND (ODirList.Name <> '..') AND (NOT EProibido(ODirList.Name)) THEN
-        BEGIN
-          WITH ODW.Installations[IVersion] DO
-          BEGIN
-            IF BAdicionar THEN
-            BEGIN
+
+  if FindFirst(ADirRoot + '*.*', FaDirectory, ODirList) = 0 then
+  begin
+    try
+      repeat
+        if ((ODirList.Attr and FaDirectory) <> 0) and (ODirList.Name <> '.') and (ODirList.Name <> '..') and (not EProibido(ODirList.Name)) then
+        begin
+          with ODW.Installations[IVersion] do
+          begin
+            if BAdicionar then
+            begin
               AddToLibrarySearchPath(ADirRoot + ODirList.Name, TPlatform);
               AddToLibraryBrowsingPath(ADirRoot + ODirList.Name, TPlatform);
-              AddToDebugDCUPath(ADirRoot + ODirList.Name, TPlatform);
-            END
-            ELSE
-            BEGIN
+            end
+            else
               RemoveFromLibrarySearchPath(ADirRoot + ODirList.Name, TPlatform);
-              RemoveFromLibraryBrowsingPath(ADirRoot + ODirList.Name, TPlatform);
-              RemoveFromDebugDCUPath(ADirRoot + ODirList.Name, TPlatform);
-            END;
-          END;
+          end;
           // -- Procura subpastas
           FindDirs(ADirRoot + ODirList.Name, BAdicionar);
-        END;
-      UNTIL FindNext(ODirList) <> 0;
-    FINALLY
+        end;
+      until FindNext(ODirList) <> 0;
+    finally
       SysUtils.FindClose(ODirList)
-    END;
-  END;
-END;
+    end;
+  end;
+end;
 
 // adicionar o paths ao library path do delphi
-PROCEDURE TfrmPrincipal.AddLibrarySearchPath;
-BEGIN
-  // Browsing Path
-  // Geral
-  ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirLibrary), TPlatform);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirLibrary), bpWin32);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirLibrary), bpWin64);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirLibrary), bpOSX32);
+procedure TfrmPrincipal.AddLibrarySearchPath;
+begin
+  with ODW.Installations[IVersion] do
+  begin
+    // DATASNAP - incluir o path raiz por causa da localização do pacote
+    if FrameDpk.RestEasyObjects_dpk.Checked then
+    begin
+      AddToLibrarySearchPath(SDirRoot, TPlatform); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+      AddToLibrarySearchPath(SDirLibrary, TPlatform); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+      AddToLibrarySearchPath(SDirLibrary, TPlatform); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
+      AddToLibraryBrowsingPath(SDirLibrary, TPlatform); // Arquivos que devem ser usados sem ser compilados
+      AddToDebugDCUPath(SDirLibrary + '\Debug', TPlatform);
+    end;
 
-  // Datasnap
-  ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot), TPlatform);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot), bpWin32);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot), bpWin64);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot), bpOSX32);
+    // CORE
+    if FrameDpk.RestEasyObjects_dpk.Checked then
+    begin
+      FindDirs(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Packages\Delphi\' + PastaDW + '\RestEasyObjects.dpk', True);
+      with ODW.Installations[IVersion] do
+      begin
+        AddToLibrarySearchPath(SDirLibrary, TPlatform); // arquivos do projeto ou global (*.pas contidos na uses Library (DCUs) é para qualquer projeto Search apenas para o pacote (PASs))
 
-  // Conectores Datasnap
-  ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\FireDAC', TPlatform);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\FireDAC', bpWin32);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\FireDAC', bpWin64);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\FireDAC', bpOSX32);
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', TPlatform);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', TPlatform);
 
-  // CORE
-  ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', TPlatform);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpWin32);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpWin64);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpOSX32);
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', TPlatform);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', TPlatform);
 
-  ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', TPlatform);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpWin32);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpWin64);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpOSX32);
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', TPlatform);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', TPlatform);
 
-  ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', TPlatform);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpWin32);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpWin64);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpOSX32);
+        AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', TPlatform);
+        AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', TPlatform);
 
-  ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', TPlatform);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpWin32);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpWin64);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpOSX32);
-  // Conectores CORE
+        AddToDebugDCUPath(SDirLibrary + '\Debug', TPlatform);
+      end;
+    end;
+    // Conectores CORE
+    if FrameDpk.RestEasyObjects_dpk.Checked then
+    begin
+      AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', TPlatform);
+      AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', TPlatform);
+    end;
+  end;
 
-  ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', TPlatform);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpWin32);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpWin64);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpOSX32);
-
-  ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', TPlatform);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', bpWin32);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', bpWin64);
-  // ODW.Installations[IVersion].AddToLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', bpOSX32);
-
-  // Library Path
-  // Geral
-  ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirLibrary), TPlatform);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirLibrary), bpWin32);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirLibrary), bpWin64);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirLibrary), bpOSX32);
-
-  // Datasnap
-  ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot), TPlatform);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot), bpWin32);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot), bpWin64);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot), bpOSX32);
-
-  // Conectores Datasnap
-  ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\FireDAC', TPlatform);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\FireDAC', bpWin32);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\FireDAC', bpWin64);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\FireDAC', bpOSX32);
-
-  // CORE
-  ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', TPlatform);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpWin32);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpWin64);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpOSX32);
-
-  ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', TPlatform);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpWin32);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpWin64);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpOSX32);
-
-  ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', TPlatform);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpWin32);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpWin64);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpOSX32);
-
-  ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', TPlatform);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpWin32);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpWin64);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpOSX32);
-
-  // Conectores CORE
-  ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', TPlatform);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpWin32);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpWin64);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpOSX32);
-
-  ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', TPlatform);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', bpWin32);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', bpWin64);
-  // ODW.Installations[IVersion].AddToLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', bpOSX32);
-
-  ODW.Installations[IVersion].AddToDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot), TPlatform);
-  // ODW.Installations[IVersion].AddToDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot), bpWin32);
-  // ODW.Installations[IVersion].AddToDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot), bpWin64);
-  // ODW.Installations[IVersion].AddToDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot), bpOSX32);
-
-  // -- adicionar a library path ao path do windows
+  LstMsgInstalacao.Items.Add('Adicionar à library path ao path do Windows: ' + SDirLibrary);
   AddLibraryPathToDelphiPath(SDirLibrary, 'DW');
-END;
+end;
 
 // setar a plataforma de compilação
-PROCEDURE TfrmPrincipal.SetPlatformSelected;
-VAR
+procedure TfrmPrincipal.SetPlatformSelected;
+var
   SVersao: STRING;
-  STipo: STRING;
-BEGIN
+  STipo:   STRING;
+begin
   IVersion := EdtDelphiVersion.ItemIndex;
   SVersao  := AnsiUpperCase(ODW.Installations[IVersion].VersionNumberStr);
   SDirRoot := IncludeTrailingPathDelimiter(EdtDirDestino.Text);
 
   STipo := 'Lib\Delphi\';
-  IF EdtPlatform.ItemIndex = 0 THEN // Win32
-  BEGIN
-    TPlatform   := bpWin32;
+
+  if EdtPlatform.ItemIndex = 0 then // Win32
+  begin
+    TPlatform   := BpWin32;
     SDirLibrary := SDirRoot + STipo + 'Lib' + SVersao;
-  END
-  ELSE IF EdtPlatform.ItemIndex = 1 THEN // Win64
-  BEGIN
-    TPlatform   := bpWin64;
+  end
+  else if EdtPlatform.ItemIndex = 1 then // Win64
+  begin
+    TPlatform   := BpWin64;
     SDirLibrary := SDirRoot + STipo + 'Lib' + SVersao + 'x64';
-  END;
-END;
+  end;
+end;
 
 // Evento disparado a cada ação do instalador
-PROCEDURE TfrmPrincipal.OutputCallLine(CONST Text: STRING);
-BEGIN
+procedure TfrmPrincipal.OutputCallLine(const Text: STRING);
+begin
   // remover a warnings de conversão de string (delphi 2010 em diante)
   // as diretivas -W e -H não removem estas mensagens
-  IF (Pos('Warning: W1057', Text) <= 0) AND ((Pos('Warning: W1058', Text) <= 0)) THEN
+  if (Pos('Warning: W1057', Text) <= 0) and ((Pos('Warning: W1058', Text) <= 0)) then
     WriteToTXT(PathArquivoLog, Text);
-END;
+end;
 
 // evento para setar os parâmetros do compilador antes de compilar
-PROCEDURE TfrmPrincipal.BeforeExecute(Sender: TJclBorlandCommandLineTool);
-BEGIN
+procedure TfrmPrincipal.BeforeExecute(Sender: TJclBorlandCommandLineTool);
+begin
   // limpar os parâmetros do compilador
   Sender.Options.Clear;
+
   // não utilizar o dcc32.cfg
-  IF ODW.Installations[IVersion].SupportsNoConfig THEN
+  if ODW.Installations[IVersion].SupportsNoConfig then
     Sender.Options.Add('--no-config');
 
   // -B = Build all units
@@ -809,392 +823,371 @@ BEGIN
   Sender.AddPathOption('LE', SDirLibrary);
   Sender.AddPathOption('LN', SDirLibrary);
 
-  WITH ODW.Installations[IVersion] DO
-  BEGIN
+  with ODW.Installations[IVersion] do
+  begin
+    // -- Path de outros componentespara necessários
+    // Sender.AddPathOption('U', ODW.Installations[IVersion].RootDir + 'caminho da lib do pacote');
     // -- Na versão XE2 por motivo da nova tecnologia FireMonkey, deve-se adicionar
     // -- os prefixos dos nomes, para identificar se será compilado para VCL ou FMX
-    IF VersionNumberStr = 'd16' THEN
+    if VersionNumberStr = 'd16' then
       Sender.Options.Add('-NSData.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win');
-
-    IF MatchText(VersionNumberStr, ['d17', 'd18', 'd19', 'd20', 'd21', 'd22', 'd23', 'd24', 'd25']) THEN
+    if MatchText(VersionNumberStr, ['d17', 'd18', 'd19', 'd20', 'd21', 'd22', 'd23', 'd24', 'd25']) then
       Sender.Options.Add('-NSWinapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell');
-  END;
-END;
+  end;
+end;
 
-PROCEDURE TfrmPrincipal.FormCreate(Sender: TObject);
-VAR
+procedure TfrmPrincipal.FormCreate(Sender: TObject);
+var
   IFor: Integer;
-BEGIN
+begin
   IVersion    := -1;
   SDirRoot    := '';
   SDirLibrary := '';
   SDirPackage := '';
+  PastaDW     := '';
 
   ODW := TJclBorRADToolInstallations.Create;
 
   // popular o combobox de versões do delphi instaladas na máquina
-  FOR IFor := 0 TO ODW.Count - 1 DO
-  BEGIN
-    IF ODW.Installations[IFor].VersionNumberStr = 'd3' THEN
+  for IFor := 0 to ODW.Count - 1 do
+  begin
+    if ODW.Installations[IFor].VersionNumberStr = 'd3' then
       EdtDelphiVersion.Items.Add('Delphi 3')
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd4' THEN
+    else if ODW.Installations[IFor].VersionNumberStr = 'd4' then
       EdtDelphiVersion.Items.Add('Delphi 4')
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd5' THEN
+    else if ODW.Installations[IFor].VersionNumberStr = 'd5' then
       EdtDelphiVersion.Items.Add('Delphi 5')
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd6' THEN
-    BEGIN
+    else if ODW.Installations[IFor].VersionNumberStr = 'd6' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi 6');
       PastaDW := ODW.Installations[IFor].VersionNumberStr;
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd7' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd7' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi 7');
       PastaDW := ODW.Installations[IFor].VersionNumberStr;
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd9' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd9' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi 2005');
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd10' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd10' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi 2006');
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd11' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd11' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi 2007');
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd12' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd12' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi 2009');
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd14' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd14' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi 2010');
       PastaDW := 'D2010';
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd15' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd15' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi XE');
       PastaDW := 'XE';
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd16' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd16' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi XE2');
       PastaDW := 'XE2';
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd17' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd17' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi XE3');
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd18' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd18' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi XE4');
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd19' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd19' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi XE5');
       PastaDW := 'XE5';
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd20' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd20' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi XE6');
       PastaDW := 'XE6';
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd21' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd21' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi XE7');
       PastaDW := 'XE7';
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd22' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd22' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi XE8');
       PastaDW := 'XE8';
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd23' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd23' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi 10 Seattle');
       PastaDW := 'Seattle';
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd24' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd24' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi 10.1 Berlin');
       PastaDW := 'Berlin';
-    END
-    ELSE IF ODW.Installations[IFor].VersionNumberStr = 'd25' THEN
-    BEGIN
+    end
+    else if ODW.Installations[IFor].VersionNumberStr = 'd25' then
+    begin
       EdtDelphiVersion.Items.Add('Delphi 10.2 Tokyo');
       PastaDW := 'Tokyo';
-    END;
+    end;
 
     // -- Evento disparado antes de iniciar a execução do processo.
     ODW.Installations[IFor].DCC32.OnBeforeExecute := BeforeExecute;
 
     // -- Evento para saidas de mensagens.
     ODW.Installations[IFor].OutputCallback := OutputCallLine;
-  END;
+  end;
   ClbDelphiVersion.Items.Text := EdtDelphiVersion.Items.Text;
 
-  IF EdtDelphiVersion.Items.Count > 0 THEN
-  BEGIN
+  if EdtDelphiVersion.Items.Count > 0 then
+  begin
     EdtDelphiVersion.ItemIndex := 0;
     IVersion                   := 0;
-  END;
+  end;
 
   LerConfiguracoes;
-END;
+end;
 
-PROCEDURE TfrmPrincipal.FrameDpkbtnPacotesMarcarTodosClick(Sender: TObject);
-BEGIN
-  FrameDpk.BtnPacotesMarcarTodosClick(Sender);
-END;
-
-PROCEDURE TfrmPrincipal.FormClose(Sender: TObject; VAR Action: TCloseAction);
-BEGIN
+procedure TfrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
   ODW.Free;
-END;
+end;
 
-PROCEDURE TfrmPrincipal.RemoverDiretoriosEPacotesAntigos;
-VAR
+procedure TfrmPrincipal.RemoverDiretoriosEPacotesAntigos;
+var
   ListaPaths: TStringList;
-  I: Integer;
-BEGIN
-  {
-    // Geral
-    ODW.Installations[IVersion].RemoveFromLibrarySearchPath(IncludeTrailingPathDelimiter(SDirLibrary), bpWin32);
-    ODW.Installations[IVersion].RemoveFromLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirLibrary), bpWin64);
-    ODW.Installations[IVersion].RemoveFromDebugDCUPath(IncludeTrailingPathDelimiter(SDirLibrary), bpOSX32);
-
-    // Datasnap
-    ODW.Installations[IVersion].RemoveFromLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot), bpWin32);
-    ODW.Installations[IVersion].RemoveFromLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot), bpWin64);
-    ODW.Installations[IVersion].RemoveFromLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot), bpOSX32);
-    ODW.Installations[IVersion].RemoveFromLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot), bpWin32);
-    ODW.Installations[IVersion].RemoveFromLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot), bpWin64);
-    ODW.Installations[IVersion].RemoveFromLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot), bpOSX32);
-    ODW.Installations[IVersion].RemoveFromDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot), bpWin32);
-    ODW.Installations[IVersion].RemoveFromDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot), bpWin64);
-    ODW.Installations[IVersion].RemoveFromDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot), bpOSX32);
-    // Conectores Datasnap
-    ODW.Installations[IVersion].RemoveFromLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\FireDAC', bpWin32);
-    ODW.Installations[IVersion].RemoveFromLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\FireDAC', bpWin64);
-    ODW.Installations[IVersion].RemoveFromDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot) + 'Connectors\FireDAC', bpOSX32);
-
-    // CORE
-    ODW.Installations[IVersion].RemoveFromLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpWin32);
-    ODW.Installations[IVersion].RemoveFromLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpWin64);
-    ODW.Installations[IVersion].RemoveFromDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source', bpOSX32);
-    ODW.Installations[IVersion].RemoveFromLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpWin32);
-    ODW.Installations[IVersion].RemoveFromLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpWin64);
-    ODW.Installations[IVersion].RemoveFromDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs', bpOSX32);
-    ODW.Installations[IVersion].RemoveFromLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpWin32);
-    ODW.Installations[IVersion].RemoveFromLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpWin64);
-    ODW.Installations[IVersion].RemoveFromDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\libs\JSON', bpOSX32);
-    ODW.Installations[IVersion].RemoveFromLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpWin32);
-    ODW.Installations[IVersion].RemoveFromLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpWin64);
-    ODW.Installations[IVersion].RemoveFromDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\DmDados', bpOSX32);
-    // Conectores Datasnap
-    ODW.Installations[IVersion].RemoveFromLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpWin32);
-    ODW.Installations[IVersion].RemoveFromLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpWin64);
-    ODW.Installations[IVersion].RemoveFromLibrarySearchPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\FireDAC', bpOSX32);
-    ODW.Installations[IVersion].RemoveFromLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', bpWin32);
-    ODW.Installations[IVersion].RemoveFromLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', bpWin64);
-    ODW.Installations[IVersion].RemoveFromLibraryBrowsingPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', bpOSX32);
-    ODW.Installations[IVersion].RemoveFromDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', bpWin32);
-    ODW.Installations[IVersion].RemoveFromDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', bpWin64);
-    ODW.Installations[IVersion].RemoveFromDebugDCUPath(IncludeTrailingPathDelimiter(SDirRoot) + 'CORE\Source\Connectors\ZEOS', bpOSX32);
-
-    ListaPaths := TStringList.Create;
-    TRY
+  I:          Integer;
+begin
+  ListaPaths := TStringList.Create;
+  try
     ListaPaths.StrictDelimiter := True;
     ListaPaths.Delimiter       := ';';
-    WITH ODW.Installations[IVersion] DO
-    BEGIN
-    // remover do search path
-    ListaPaths.Clear;
-    ListaPaths.DelimitedText := RawLibrarySearchPath[TPlatform];
-    FOR I                    := ListaPaths.Count - 1 DOWNTO 0 DO
-    BEGIN
-    IF Pos('RESTEasy', AnsiUpperCase(ListaPaths[I])) > 0 THEN
-    ListaPaths.Delete(I);
-    END;
-    RawLibrarySearchPath[TPlatform] := ListaPaths.DelimitedText;
-
-    // remover do browse path
-    ListaPaths.Clear;
-    ListaPaths.DelimitedText := RawLibraryBrowsingPath[TPlatform];
-    FOR I                    := ListaPaths.Count - 1 DOWNTO 0 DO
-    BEGIN
-    IF Pos('RESTEasy', AnsiUpperCase(ListaPaths[I])) > 0 THEN
-    ListaPaths.Delete(I);
-    END;
-    RawLibraryBrowsingPath[TPlatform] := ListaPaths.DelimitedText;
-
-    // remover do Debug DCU path
-    ListaPaths.Clear;
-    ListaPaths.DelimitedText := RawDebugDCUPath[TPlatform];
-    FOR I                    := ListaPaths.Count - 1 DOWNTO 0 DO
-    BEGIN
-    IF Pos('RESTEasy', AnsiUpperCase(ListaPaths[I])) > 0 THEN
-    ListaPaths.Delete(I);
-    END;
-    RawDebugDCUPath[TPlatform] := ListaPaths.DelimitedText;
-
-    // remover pacotes antigos
-    FOR I := IdePackages.Count - 1 DOWNTO 0 DO
-    BEGIN
-    IF Pos('RESTEasy', AnsiUpperCase(IdePackages.PackageFileNames[I])) > 0 THEN
-    IdePackages.RemovePackage(IdePackages.PackageFileNames[I]);
-    END;
-    END;
-    FINALLY
+    with ODW.Installations[IVersion] do
+    begin
+      // remover do search path
+      ListaPaths.Clear;
+      ListaPaths.DelimitedText := RawLibrarySearchPath[TPlatform];
+      for I                    := ListaPaths.Count - 1 downto 0 do
+      begin
+        if Pos('DW', AnsiUpperCase(ListaPaths[I])) > 0 then
+          ListaPaths.Delete(I);
+      end;
+      RawLibrarySearchPath[TPlatform] := ListaPaths.DelimitedText;
+      // remover do browse path
+      ListaPaths.Clear;
+      ListaPaths.DelimitedText := RawLibraryBrowsingPath[TPlatform];
+      for I                    := ListaPaths.Count - 1 downto 0 do
+      begin
+        if Pos('DW', AnsiUpperCase(ListaPaths[I])) > 0 then
+          ListaPaths.Delete(I);
+      end;
+      RawLibraryBrowsingPath[TPlatform] := ListaPaths.DelimitedText;
+      // remover do Debug DCU path
+      ListaPaths.Clear;
+      ListaPaths.DelimitedText := RawDebugDCUPath[TPlatform];
+      for I                    := ListaPaths.Count - 1 downto 0 do
+      begin
+        if Pos('DW', AnsiUpperCase(ListaPaths[I])) > 0 then
+          ListaPaths.Delete(I);
+      end;
+      RawDebugDCUPath[TPlatform] := ListaPaths.DelimitedText;
+      // remover pacotes antigos
+      for I := IdePackages.Count - 1 downto 0 do
+      begin
+        if Pos('DW', AnsiUpperCase(IdePackages.PackageFileNames[I])) > 0 then
+          IdePackages.RemovePackage(IdePackages.PackageFileNames[I]);
+      end;
+    end;
+  finally
     ListaPaths.Free;
-    END;
-  }
-END;
+  end;
+end;
 
-PROCEDURE TfrmPrincipal.GetDriveLetters(AList: TStrings);
-VAR
+procedure TfrmPrincipal.GetDriveLetters(AList: TStrings);
+var
   VDrivesSize: Cardinal;
-  VDrives: ARRAY [0 .. 128] OF Char;
-  VDrive: PChar;
-  VDriveType: Cardinal;
-BEGIN
+  VDrives:     array [0 .. 128] of Char;
+  VDrive:      PChar;
+  VDriveType:  Cardinal;
+begin
   AList.BeginUpdate;
-  TRY
+  try
     // clear the list from possible leftover from prior operations
     AList.Clear;
     VDrivesSize := GetLogicalDriveStrings(SizeOf(VDrives), VDrives);
-    IF VDrivesSize = 0 THEN
+    if VDrivesSize = 0 then
       Exit;
 
     VDrive := VDrives;
-    WHILE VDrive^ <> #0 DO
-    BEGIN
+    while VDrive^ <> #0 do
+    begin
       // adicionar somente drives fixos
       VDriveType := GetDriveType(VDrive);
-      IF VDriveType = DRIVE_FIXED THEN
+      if VDriveType = DRIVE_FIXED then
         AList.Add(StrPas(VDrive));
 
       Inc(VDrive, SizeOf(VDrive));
-    END;
-  FINALLY
+    end;
+  finally
     AList.EndUpdate;
-  END;
-END;
+  end;
+end;
 
-PROCEDURE TfrmPrincipal.RemoverArquivosAntigosDoDisco;
-VAR
-  PathBat: STRING;
-  DriverList: TStringList;
+procedure TfrmPrincipal.RemoverArquivosAntigosDoDisco;
+var
+  PathBat:         STRING;
+  DriverList:      TStringList;
   ConteudoArquivo: STRING;
-  I: Integer;
-BEGIN
+  I:               Integer;
+begin
   PathBat := ExtractFilePath(ParamStr(0)) + 'apagarDW.bat';
 
   // listar driver para montar o ConteudoArquivo
   DriverList := TStringList.Create;
-  TRY
+  try
     GetDriveLetters(DriverList);
     ConteudoArquivo := '@echo off' + SLineBreak;
-    FOR I           := 0 TO DriverList.Count - 1 DO
-    BEGIN
+    for I           := 0 to DriverList.Count - 1 do
+    begin
       ConteudoArquivo := ConteudoArquivo + StringReplace(DriverList[I], '\', '', []) + SLineBreak;
       ConteudoArquivo := ConteudoArquivo + 'cd\' + SLineBreak;
       ConteudoArquivo := ConteudoArquivo + 'del RestEasyObjects*.dcp RestEasyObjects*.bpl RestEasyObjects*.bpi RestEasyObjects*.lib RestEasyObjects*.hpp /s' + SLineBreak;
       ConteudoArquivo := ConteudoArquivo + SLineBreak;
-    END;
+    end;
 
     WriteToTXT(PathBat, ConteudoArquivo, False);
-  FINALLY
+  finally
     DriverList.Free;
-  END;
+  end;
 
   RunAsAdminAndWaitForCompletion(Handle, PathBat);
-END;
+end;
+
+function TfrmPrincipal.GetPathDWInc: TFileName;
+begin
+  Result := IncludeTrailingPathDelimiter(EdtDirDestino.Text) + 'CORE\Source\uRESTDW.inc';
+end;
 
 // botão de compilação e instalação dos pacotes selecionados no treeview
-PROCEDURE TfrmPrincipal.BtnInstalarDWClick(Sender: TObject);
-VAR
-  IDpk: Integer;
-  BRunOnly: Boolean;
+procedure TfrmPrincipal.BtnInstalarDWClick(Sender: TObject);
+var
+  IDpk:       Integer;
+  BRunOnly:   Boolean;
   NomePacote: STRING;
-  Cabecalho: STRING;
-  IListaVer: Integer;
+  Cabecalho:  STRING;
+  IListaVer:  Integer;
 
-  PROCEDURE Logar(CONST AString: STRING);
-  BEGIN
-    IF Trim(AString) <> '' THEN
-    BEGIN
-      LstMsgInstalacao.Items.Add(DateTimeToStr(Now) + ' - ' + AString);
-    END
-    ELSE
-    BEGIN
-      LstMsgInstalacao.Items.Add(AString);
-    END;
+procedure Logar(const AString: STRING);
+begin
+  LstMsgInstalacao.Items.Add(AString);
+  LstMsgInstalacao.ItemIndex := LstMsgInstalacao.Count - 1;
+  Application.ProcessMessages;
 
-    LstMsgInstalacao.ItemIndex := LstMsgInstalacao.Count - 1;
-    Application.ProcessMessages;
+  WriteToTXT(PathArquivoLog, AString);
+end;
 
-    WriteToTXT(PathArquivoLog, AString);
-  END;
+procedure MostrarMensagemInstalado(const AMensagem: STRING; const AErro: STRING = '');
+var
+  Msg: STRING;
+begin
 
-  PROCEDURE MostrarMensagemInstalado(CONST AMensagem: STRING; CONST AErro: STRING = '');
-  VAR
-    Msg: STRING;
-  BEGIN
+  if Trim(AErro) = EmptyStr then
+  begin
+    case SDestino of
+      TdSystem:
+        Msg := Format(AMensagem + ' em "%s"', [PathSystem]);
+      TdDelphi:
+        Msg := Format(AMensagem + ' em "%s"', [SPathBin]);
+      TdNone:
+        Msg := 'Tipo de destino "nenhum" não aceito!';
+    end;
+  end
+  else
+  begin
+    Inc(FCountErros);
 
-    IF Trim(AErro) = EmptyStr THEN
-    BEGIN
-      CASE SDestino OF
-        TdSystem:
-          Msg := Format(AMensagem + ' em "%s"', [PathSystem]);
-        TdDelphi:
-          Msg := Format(AMensagem + ' em "%s"', [SPathBin]);
-        TdNone:
-          Msg := 'Tipo de destino "nenhum" não aceito!';
-      END;
-    END
-    ELSE
-    BEGIN
-      Inc(FCountErros);
+    case SDestino of
+      TdSystem:
+        Msg := Format(AMensagem + ' em "%s": "%s"', [PathSystem, AErro]);
+      TdDelphi:
+        Msg := Format(AMensagem + ' em "%s": "%s"', [SPathBin, AErro]);
+      TdNone:
+        Msg := 'Tipo de destino "nenhum" não aceito!';
+    end;
+  end;
 
-      CASE SDestino OF
-        TdSystem:
-          Msg := Format(AMensagem + ' em "%s": "%s"', [PathSystem, AErro]);
-        TdDelphi:
-          Msg := Format(AMensagem + ' em "%s": "%s"', [SPathBin, AErro]);
-        TdNone:
-          Msg := 'Tipo de destino "nenhum" não aceito!';
-      END;
-    END;
+  WriteToTXT(PathArquivoLog, '');
+  Logar(Msg);
+end;
 
-    WriteToTXT(PathArquivoLog, '');
-    Logar(Msg);
-  END;
+procedure IncrementaBarraProgresso;
+begin
+  PgbInstalacao.Position := PgbInstalacao.Position + 1;
+  Application.ProcessMessages;
+end;
 
-  PROCEDURE IncrementaBarraProgresso;
-  BEGIN
-    PgbInstalacao.Position := PgbInstalacao.Position + 1;
-    Application.ProcessMessages;
-  END;
+procedure DesligarDefineDWInc(const ADefineName: STRING; const ADesligar: Boolean);
+var
+  F: TStringList;
+  I: Integer;
+begin
+  F := TStringList.Create;
+  try
+    F.LoadFromFile(GetPathDWInc);
+    for I := 0 to F.Count - 1 do
+    begin
+      if Pos(ADefineName.ToUpper, F[I].ToUpper) > 0 then
+      begin
+        if ADesligar then
+        begin
+          F[I] := '{.$DEFINE ' + ADefineName + '}';
+        end
+        else
+        begin
+          F[I] := '{$DEFINE ' + ADefineName + '}';
+        end;
 
-BEGIN
-  FOR IListaVer := 0 TO ClbDelphiVersion.Count - 1 DO
-  BEGIN
-    // só instala as versão marcadas para instalar.
-    IF ClbDelphiVersion.Checked[IListaVer] THEN
-    BEGIN
+        Break;
+      end;
+    end;
+    F.SaveToFile(GetPathDWInc);
+  finally
+    F.Free;
+  end;
+end;
+
+begin
+  DesligarDefineDWInc('RESTKBMMEMTABLE', (not CkUseKBMemTable.Checked));
+  DesligarDefineDWInc('RESJEDI', (not CkUseJEDI.Checked));
+  DesligarDefineDWInc('RESTFDMEMTABLE', (not CkUseFireDAC.Checked));
+
+  for IListaVer := 0 to ClbDelphiVersion.Count - 1 do
+  begin
+    // Instalar nas versões marcadas, permitindo várias versões do Delphi.
+    if ClbDelphiVersion.Checked[IListaVer] then
+    begin
       LstMsgInstalacao.Clear;
       PgbInstalacao.Position := 0;
 
-      // seleciona a versão no combobox.
+      // Define a versão marcada no combobox.
       EdtDelphiVersion.ItemIndex := IListaVer;
       EdtDelphiVersionChange(EdtDelphiVersion);
 
       // define dados da plataforna selecionada
       SetPlatformSelected;
 
-      // mostra dados da versão na tela a ser instaladas
+      // mostra na tela os dados da versão a ser instalada
       MostraDadosVersao();
 
       FCountErros := 0;
@@ -1203,8 +1196,7 @@ BEGIN
       WizPgInstalacao.EnableButton(BkNext, False);
       WizPgInstalacao.EnableButton(BkBack, False);
       WizPgInstalacao.EnableButton(TJvWizardButtonKind(BkCancel), False);
-
-      TRY
+      try
         Cabecalho := 'Caminho: ' + EdtDirDestino.Text + SLineBreak + 'Versão do delphi: ' + EdtDelphiVersion.Text + ' (' + IntToStr(IVersion) + ')' + SLineBreak + 'Plataforma: ' + EdtPlatform.Text + '(' + IntToStr(Integer(TPlatform)) + ')' + SLineBreak +
           StringOfChar('=', 80);
 
@@ -1219,21 +1211,14 @@ BEGIN
         // *************************************************************************
         // removendo arquivos antigos se configurado
         // *************************************************************************
-        IF CkbRemoverArquivosAntigos.Checked THEN
-        BEGIN
-          IF Application.MessageBox('você optou por limpar arquivos antigos do REST Dataware do seu computador, essa ação pode demorar vários minutos, deseja realmente continuar com está ação?', 'Limpar', MB_YESNO + MB_DEFBUTTON2) = ID_YES THEN
-          BEGIN
+        if CkbRemoverArquivosAntigos.Checked then
+        begin
+          if Application.MessageBox('você optou por limpar arquivos antigos do DW do seu computador, essa ação pode demorar vários minutos, deseja realmente continuar com está ação?', 'Limpar', MB_YESNO + MB_DEFBUTTON2) = ID_YES then
+          begin
             Logar('Removendo arquivos antigos do disco...');
             RemoverArquivosAntigosDoDisco;
-            IncrementaBarraProgresso;
-          END;
-        END;
-
-        // *************************************************************************
-        // Seta a plataforna selecionada
-        // *************************************************************************
-        Logar('Setando parâmetros de plataforma...');
-        SetPlatformSelected;
+          end;
+        end;
         IncrementaBarraProgresso;
 
         // *************************************************************************
@@ -1254,7 +1239,7 @@ BEGIN
         // *************************************************************************
         // Adiciona os paths dos fontes na versão do delphi selecionada
         // *************************************************************************
-        Logar('Adicionando library paths...');
+        Logar('Adicionando Library Paths...');
         AddLibrarySearchPath;
         IncrementaBarraProgresso;
 
@@ -1263,177 +1248,165 @@ BEGIN
         // *************************************************************************
         Logar('');
         Logar('COMPILANDO OS PACOTES...');
-        FOR IDpk := 0 TO FrameDpk.Pacotes.Count - 1 DO
-        BEGIN
-          IF (FrameDpk.Pacotes[IDpk].Checked) THEN
-          BEGIN
-            NomePacote := FrameDpk.Pacotes[IDpk].Caption;
+        for IDpk := 0 to FrameDpk.Pacotes.Count - 1 do
+        begin
+          NomePacote := FrameDpk.Pacotes[IDpk].Caption;
 
-            // Busca diretório do pacote
-            ExtrairDiretorioPacote(NomePacote);
+          // Busca diretório do pacote
+          ExtrairDiretorioPacote(NomePacote);
 
-            IF (IsDelphiPackage(NomePacote)) AND (FrameDpk.Pacotes[IDpk].Checked) THEN
-            BEGIN
-              WriteToTXT(PathArquivoLog, '');
+          if (IsDelphiPackage(NomePacote)) and (FrameDpk.Pacotes[IDpk].Checked) then
+          begin
+            WriteToTXT(PathArquivoLog, '');
 
-              IF ODW.Installations[IVersion].CompilePackage(SDirPackage + NomePacote, SDirLibrary, SDirLibrary) THEN
-                Logar(Format('Pacote "%s" compilado com sucesso.', [NomePacote]))
-              ELSE
-              BEGIN
-                Inc(FCountErros);
-                Logar(Format('Erro ao compilar o pacote "%s".', [NomePacote]));
-
-                // parar no primeiro erro para evitar de compilar outros pacotes que
-                // precisam do pacote que deu erro
-                Break
-              END;
-            END;
-          END;
+            if ODW.Installations[IVersion].CompilePackage(SDirPackage + NomePacote, SDirLibrary, SDirLibrary) then
+              Logar(Format('Pacote "%s" compilado com sucesso.', [NomePacote]))
+            else
+            begin
+              Inc(FCountErros);
+              Logar(Format('Erro ao compilar o pacote "%s".', [NomePacote]));
+              // parar no primeiro erro para evitar de compilar outros pacotes que
+              // precisam do pacote que deu erro
+              Break
+            end;
+          end;
 
           IncrementaBarraProgresso;
-        END;
+        end;
 
         // *************************************************************************
         // instalar os pacotes somente se não ocorreu erro na compilação e plataforma for Win32
         // *************************************************************************
-        IF (EdtPlatform.ItemIndex = 0) THEN
-        BEGIN
-          IF (FCountErros <= 0) THEN
-          BEGIN
+        if (EdtPlatform.ItemIndex = 0) then
+        begin
+          if (FCountErros <= 0) then
+          begin
             Logar('');
             Logar('INSTALANDO OS PACOTES...');
 
-            FOR IDpk := 0 TO FrameDpk.Pacotes.Count - 1 DO
-            BEGIN
+            for IDpk := 0 to FrameDpk.Pacotes.Count - 1 do
+            begin
               NomePacote := FrameDpk.Pacotes[IDpk].Caption;
-              ExtrairDiretorioPacote(NomePacote); // Busca diretório do pacote
-              IF IsDelphiPackage(NomePacote) THEN
-              BEGIN
+
+              // Busca diretório do pacote
+              ExtrairDiretorioPacote(NomePacote);
+              if (IsDelphiPackage(NomePacote)) and (FrameDpk.Pacotes[IDpk].Checked) then
+              begin
                 // instalar somente os pacotes de designtime
                 GetDPKFileInfo(SDirPackage + NomePacote, BRunOnly);
-                IF NOT BRunOnly THEN
-                BEGIN
+                if not BRunOnly then
+                begin
                   // se o pacote estiver marcado instalar, senão desinstalar
-                  IF FrameDpk.Pacotes[IDpk].Checked THEN
-                  BEGIN
+                  if FrameDpk.Pacotes[IDpk].Checked then
+                  begin
                     WriteToTXT(PathArquivoLog, '');
-                    IF ODW.Installations[IVersion].InstallPackage(SDirPackage + NomePacote, SDirLibrary, SDirLibrary) THEN
-                    BEGIN
-                      Logar(Format('Pacote "%s" instalado com sucesso.', [NomePacote]));
-                    END
-                    ELSE
-                    BEGIN
+                    if ODW.Installations[IVersion].InstallPackage(SDirPackage + NomePacote, SDirLibrary, SDirLibrary) then
+                      Logar(Format('Pacote "%s" instalado com sucesso.', [NomePacote]))
+                    else
+                    begin
                       Inc(FCountErros);
                       Logar(Format('Ocorreu um erro ao instalar o pacote "%s".', [NomePacote]));
                       Break;
-                    END;
-                  END
-                  ELSE
-                  BEGIN
-                    WriteToTXT(PathArquivoLog, '');
-                    IF ODW.Installations[IVersion].UninstallPackage(SDirPackage + NomePacote, SDirLibrary, SDirLibrary) THEN
-                    BEGIN
-                      Logar(Format('Pacote "%s" removido com sucesso...', [NomePacote]));
-                    END;
-                  END;
-                END;
-              END;
+                    end;
+                  end
+                  else
+                  begin
+                    // WriteToTXT(PathArquivoLog, '');
+                    // if ODW.Installations[IVersion].UninstallPackage(SDirPackage + NomePacote, SDirLibrary, SDirLibrary) then
+                    // Logar(Format('Pacote "%s" removido com sucesso...', [NomePacote]));
+                  end;
+                end;
+              end;
+
               IncrementaBarraProgresso;
-            END;
-          END
-          ELSE
-          BEGIN
+            end;
+          end
+          else
+          begin
             Logar('');
             Logar('Abortando... Ocorreram erros na compilação dos pacotes.');
-          END;
-        END
-        ELSE
-        BEGIN
+          end;
+        end
+        else
+        begin
           Logar('');
           Logar('Para a plataforma de 64 bits os pacotes são somente compilados.');
-        END;
+        end;
 
-        IF FCountErros > 0 THEN
-        BEGIN
-          IF Application.MessageBox(PWideChar('Ocorreram erros durante o processo de instalação, ' + SLineBreak + 'para maiores informações verifique o arquivo de log gerado.' + SLineBreak + SLineBreak + 'Deseja visualizar o arquivo de log gerado?'),
-            'Instalação', MB_ICONQUESTION + MB_YESNO) = ID_YES THEN
-          BEGIN
+        if FCountErros > 0 then
+        begin
+          if Application.MessageBox(PWideChar('Ocorreram erros durante o processo de instalação, ' + SLineBreak + 'para maiores informações verifique o arquivo de log gerado.' + SLineBreak + SLineBreak + 'Deseja visualizar o arquivo de log gerado?'),
+            'Instalação', MB_ICONQUESTION + MB_YESNO) = ID_YES then
+          begin
             BtnVisualizarLogCompilacao.Click;
             Break
-          END;
-        END;
+          end;
+        end;
 
-        {
-          // *************************************************************************
-          // não instalar outros requisitos se ocorreu erro anteriormente
-          // *************************************************************************
-          IF FCountErros <= 0 THEN
-          BEGIN
+        // *************************************************************************
+        // não instalar outros requisitos se ocorreu erro anteriormente
+        // *************************************************************************
+        if FCountErros <= 0 then
+        begin
           Logar('');
           Logar('INSTALANDO OUTROS REQUISITOS...');
 
           // *************************************************************************
           // deixar somente a pasta lib se for configurado assim
           // *************************************************************************
-          IF ChkDeixarSomenteLIB.Checked THEN
-          BEGIN
-          TRY
-          DeixarSomenteLib;
-          MostrarMensagemInstalado('Limpeza library path com sucesso');
-          MostrarMensagemInstalado('Copia dos arquivos necessário.');
-          EXCEPT
-          ON E: Exception DO
-          BEGIN
-          MostrarMensagemInstalado('Ocorreu erro ao limpar o Path e copiar arquivos' + SLineBreak + E.Message)
-          END;
-          END;
-          END;
-          END;
-        }
-      FINALLY
+          if ChkDeixarSomenteLIB.Checked then
+          begin
+            try
+              DeixarSomenteLib;
+
+              MostrarMensagemInstalado('Limpeza library path com sucesso');
+              MostrarMensagemInstalado('Copia dos arquivos necessário.');
+            except
+              on E: Exception do
+              begin
+                MostrarMensagemInstalado('Ocorreu erro ao limpas os path e copiar arquivos' + SLineBreak + E.Message)
+              end;
+            end;
+          end;
+        end;
+      finally
         BtnInstalarDW.Enabled := True;
         WizPgInstalacao.EnableButton(BkBack, True);
         WizPgInstalacao.EnableButton(BkNext, FCountErros = 0);
         WizPgInstalacao.EnableButton(TJvWizardButtonKind(BkCancel), True);
-      END;
-    END;
-  END;
+      end;
+    end;
+  end;
 
-  IF FCountErros = 0 THEN
-  BEGIN
+  if FCountErros = 0 then
+  begin
     Application.MessageBox(PWideChar('Pacotes compilados e instalados com sucesso! ' + SLineBreak + 'Clique em "Próximo" para finalizar a instalação.'), 'Instalação', MB_ICONINFORMATION + MB_OK);
-  END;
-END;
+  end;
+
+end;
 
 // chama a caixa de dialogo para selecionar o diretório de instalação
 // seria bom que a caixa fosse aquele que possui o botão de criar pasta
-PROCEDURE TfrmPrincipal.BtnSelecDirInstallClick(Sender: TObject);
-VAR
+procedure TfrmPrincipal.BtnSelecDirInstallClick(Sender: TObject);
+var
   Dir: STRING;
-BEGIN
-  IF SelectDirectory('Selecione o diretório de instalação', '', Dir, [SdNewFolder, SdNewUI, SdValidateDir]) THEN
+begin
+  if SelectDirectory('Selecione o diretório de instalação', '', Dir, [SdNewFolder, SdNewUI, SdValidateDir]) then
     EdtDirDestino.Text := Dir;
-END;
+end;
 
 // quando trocar a versão verificar se libera ou não o combo
 // da plataforma de compilação
-PROCEDURE TfrmPrincipal.ClbDelphiVersionClick(Sender: TObject);
-BEGIN
-  IF MatchText(ODW.Installations[ClbDelphiVersion.ItemIndex].VersionNumberStr, ['d3', 'd4', 'd5']) THEN
-  BEGIN
+procedure TfrmPrincipal.ClbDelphiVersionClick(Sender: TObject);
+begin
+  if MatchText(ODW.Installations[ClbDelphiVersion.ItemIndex].VersionNumberStr, ['d3', 'd4', 'd5']) then
+  begin
     Application.MessageBox('Versão do delphi não suportada pelo REST Dataware.', 'Erro.', MB_OK + MB_ICONERROR);
-  END;
+  end;
+end;
 
-  {
-    if MatchText(ODW.Installations[ClbDelphiVersion.ItemIndex].VersionNumberStr, ['d7', 'd9', 'd10', 'd11']) then
-    begin
-    Application.MessageBox('Atenção: a partir de Agosto de 2016 o Projeto REST Dataware não suportará mais versões não Unicode do Delphi, atualize o quanto antes para versões mais recentes do Delphi.', 'Erro.', MB_OK + MB_ICONWARNING);
-    end;
-  }
-END;
-
-PROCEDURE TfrmPrincipal.EdtDelphiVersionChange(Sender: TObject);
-BEGIN
+procedure TfrmPrincipal.EdtDelphiVersionChange(Sender: TObject);
+begin
   IVersion := EdtDelphiVersion.ItemIndex;
   SPathBin := IncludeTrailingPathDelimiter(ODW.Installations[IVersion].BinFolderName);
   // -- Plataforma só habilita para Delphi XE2
@@ -1441,251 +1414,240 @@ BEGIN
   // edtPlatform.Enabled := oDW.Installations[iVersion].VersionNumber >= 9;
   // if oDW.Installations[iVersion].VersionNumber < 9 then
   EdtPlatform.ItemIndex := 0;
-END;
+end;
 
 // quando clicar em alguma das urls chamar o link mostrado no caption
-PROCEDURE TfrmPrincipal.URLClick(Sender: TObject);
-BEGIN
+procedure TfrmPrincipal.URLClick(Sender: TObject);
+begin
   ShellExecute(Handle, 'open', PWideChar(TLabel(Sender).Caption), '', '', 1);
-END;
+end;
 
-PROCEDURE TfrmPrincipal.WizPgInicioNextButtonClick(Sender: TObject; VAR Stop: Boolean);
-BEGIN
+procedure TfrmPrincipal.WizPgInicioNextButtonClick(Sender: TObject; var Stop: Boolean);
+begin
   // Verificar se o delphi está aberto
-{$IFNDEF DEBUG}
-  IF ODW.AnyInstanceRunning THEN
-  BEGIN
+  {$IFNDEF DEBUG}
+  if ODW.AnyInstanceRunning then
+  begin
     Stop := True;
     Application.MessageBox('Feche a IDE do delphi antes de continuar.', PWideChar(Application.Title), MB_ICONERROR + MB_OK);
-  END;
-{$ENDIF}
+  end;
+  {$ENDIF}
   // Verificar se o tortoise está instalado, se não estiver, não mostrar a aba de atualização
   // o usuário deve utilizar software proprio e fazer manualmente
   // pedido do forum
   WizPgObterFontes.Visible := TSVN_Class.SVNInstalled;
-END;
+end;
 
-PROCEDURE TfrmPrincipal.WizPgInstalacaoEnterPage(Sender: TObject; CONST FromPage: TJvWizardCustomPage);
-VAR
+procedure TfrmPrincipal.WizPgInstalacaoEnterPage(Sender: TObject; const FromPage: TJvWizardCustomPage);
+var
   IFor: Integer;
-BEGIN
+begin
   // para 64 bit somente compilar
-  IF TPlatform = bpWin32 THEN // Win32
+  if TPlatform = BpWin32 then // Win32
     BtnInstalarDW.Caption := 'Instalar'
-  ELSE // win64
+  else // win64
     BtnInstalarDW.Caption := 'Compilar';
 
   LbInfo.Clear;
-  FOR IFor := 0 TO ClbDelphiVersion.Count - 1 DO
-  BEGIN
+  for IFor := 0 to ClbDelphiVersion.Count - 1 do
+  begin
     // Só pega os dados da 1a versão selecionada, para mostrar na tela qual vai iniciar
-    IF ClbDelphiVersion.Checked[IFor] THEN
-    BEGIN
-      LbInfo.Items.Add('Instalar : ' + ClbDelphiVersion.Items[IFor] + ' ' + EdtPlatform.Text);
-    END;
-  END;
-END;
+    if ClbDelphiVersion.Checked[IFor] then
+    begin
+      LbInfo.Items.Add('Instalar : ' + ClbDelphiVersion.Items[Ifor] + ' ' + EdtPlatform.Text);
+    end;
+  end;
+end;
 
-PROCEDURE TfrmPrincipal.WizPgInstalacaoNextButtonClick(Sender: TObject; VAR Stop: Boolean);
-BEGIN
-  IF (LstMsgInstalacao.Count <= 0) THEN
-  BEGIN
+procedure TfrmPrincipal.WizPgInstalacaoNextButtonClick(Sender: TObject; var Stop: Boolean);
+begin
+  if (LstMsgInstalacao.Count <= 0) then
+  begin
     Stop := True;
     Application.MessageBox('Clique no botão instalar antes de continuar.', 'Erro.', MB_OK + MB_ICONERROR);
-  END;
+  end;
 
-  IF (FCountErros > 0) THEN
-  BEGIN
+  if (FCountErros > 0) then
+  begin
     Stop := True;
     Application.MessageBox('Ocorreram erros durante a compilação e instalação dos pacotes, verifique.', 'Erro.', MB_OK + MB_ICONERROR);
-  END;
-END;
+  end;
+end;
 
-PROCEDURE TfrmPrincipal.WizPgConfiguracaoNextButtonClick(Sender: TObject; VAR Stop: Boolean);
-VAR
+procedure TfrmPrincipal.WizPgConfiguracaoNextButtonClick(Sender: TObject; var Stop: Boolean);
+var
   IFor: Integer;
   BChk: Boolean;
-BEGIN
-  BChk := False;
-
-  DesligarDefineDWInc('RESTKBMMEMTABLE', NOT CkUseFireDAC.Checked);
-  DesligarDefineDWInc('RESJEDI', NOT CkUseJEDI.Checked);
-  DesligarDefineDWInc('RESTFDMEMTABLE', NOT CkUseKBMemTable.Checked);
-
-  FOR IFor := 0 TO ClbDelphiVersion.Count - 1 DO
-  BEGIN
-    IF ClbDelphiVersion.Checked[IFor] THEN
+begin
+  BChk     := False;
+  for IFor := 0 to ClbDelphiVersion.Count - 1 do
+  begin
+    if ClbDelphiVersion.Checked[IFor] then
       BChk := True;
-  END;
+  end;
 
-  IF NOT BChk THEN
-  BEGIN
+  if not BChk then
+  begin
     Stop := True;
     ClbDelphiVersion.SetFocus;
-    Application.MessageBox('Para continuar escolha a versão do Delphi para a qual deseja instalar o REST Dataware.', 'Erro.', MB_OK + MB_ICONERROR);
-  END;
+    Application.MessageBox('Para continuar escolha a versão do Delphi para a qual deseja instalar o DW.', 'Erro.', MB_OK + MB_ICONERROR);
+  end;
 
   // verificar se foi informado o diretório
-  IF Trim(EdtDirDestino.Text) = EmptyStr THEN
-  BEGIN
+  if Trim(EdtDirDestino.Text) = EmptyStr then
+  begin
     Stop := True;
     EdtDirDestino.SetFocus;
     Application.MessageBox('Diretório de instalação não foi informado.', 'Erro.', MB_OK + MB_ICONERROR);
-  END;
+  end;
 
   // prevenir plataforma em branco
-  IF Trim(EdtPlatform.Text) = '' THEN
-  BEGIN
+  if Trim(EdtPlatform.Text) = '' then
+  begin
     Stop := True;
     EdtPlatform.SetFocus;
     Application.MessageBox('Plataforma de compilação não foi informada.', 'Erro.', MB_OK + MB_ICONERROR);
-  END;
+  end;
 
   // Gravar as configurações em um .ini para utilizar depois
   GravarConfiguracoes;
-END;
+end;
 
-PROCEDURE TfrmPrincipal.WizPgObterFontesEnterPage(Sender: TObject; CONST FromPage: TJvWizardCustomPage);
-BEGIN
+procedure TfrmPrincipal.WizPgObterFontesEnterPage(Sender: TObject; const FromPage: TJvWizardCustomPage);
+begin
   // verificar se o checkout já foi feito se sim, atualizar
   // se não fazer o checkout
-  IF IsCheckOutJaFeito(EdtDirDestino.Text) THEN
-  BEGIN
-    LblInfoObterFontes.Caption   := 'Clique em "Atualizar" para efetuar a atualização do repositório REST Dataware.';
+  if IsCheckOutJaFeito(EdtDirDestino.Text) then
+  begin
+    LblInfoObterFontes.Caption   := 'Clique em "Atualizar" para efetuar a atualização do repositório DW.';
     BtnSVNCheckoutUpdate.Caption := 'Atualizar...';
     BtnSVNCheckoutUpdate.Tag     := -1;
-  END
-  ELSE
-  BEGIN
-    LblInfoObterFontes.Caption   := 'Clique em "Download" para efetuar o download do repositório REST Dataware.';
+  end
+  else
+  begin
+    LblInfoObterFontes.Caption   := 'Clique em "Download" para efetuar o download do repositório DW.';
     BtnSVNCheckoutUpdate.Caption := 'Download...';
     BtnSVNCheckoutUpdate.Tag     := 1;
-  END;
-END;
+  end;
+end;
 
-PROCEDURE TfrmPrincipal.BtnSVNCheckoutUpdateClick(Sender: TObject);
-BEGIN
+procedure TfrmPrincipal.BtnSVNCheckoutUpdateClick(Sender: TObject);
+begin
   // chamar o método de update ou checkout conforme a necessidade
-  IF TButton(Sender).Tag > 0 THEN
-  BEGIN
+  if TButton(Sender).Tag > 0 then
+  begin
     // criar o diretório onde será baixado o repositório
-    IF NOT DirectoryExists(EdtDirDestino.Text) THEN
-    BEGIN
-      IF NOT ForceDirectories(EdtDirDestino.Text) THEN
-      BEGIN
-        RAISE EDirectoryNotFoundException.Create('Ocorreu o seguinte erro ao criar o diretório' + SLineBreak + SysErrorMessage(GetLastError));
-      END;
-    END;
+    if not SysUtils.DirectoryExists(EdtDirDestino.Text) then
+    begin
+      if not SysUtils.ForceDirectories(EdtDirDestino.Text) then
+      begin
+        raise EDirectoryNotFoundException.Create('Ocorreu o seguinte erro ao criar o diretório' + SLineBreak + SysErrorMessage(GetLastError));
+      end;
+    end;
 
     // checkout
     TSVN_Class.SVNTortoise_CheckOut(EdtURL.Text, EdtDirDestino.Text, CkbFecharTortoise.Checked);
-  END
-  ELSE
-  BEGIN
+  end
+  else
+  begin
     // update
     TSVN_Class.SVNTortoise_Update(EdtDirDestino.Text, CkbFecharTortoise.Checked);
-  END;
-END;
+  end;
+end;
 
-PROCEDURE TfrmPrincipal.BtnVisualizarLogCompilacaoClick(Sender: TObject);
-BEGIN
+procedure TfrmPrincipal.BtnVisualizarLogCompilacaoClick(Sender: TObject);
+begin
   ShellExecute(Handle, 'open', PWideChar(PathArquivoLog), '', '', 1);
-END;
+end;
 
-PROCEDURE TfrmPrincipal.BtnWCInfoClick(Sender: TObject);
-BEGIN
+procedure TfrmPrincipal.BtnWCInfoClick(Sender: TObject);
+begin
   // capturar informações da última revisão
   TSVN_Class.GetRevision(EdtDirDestino.Text);
-  showmessage('Última Revisão: ' + TSVN_Class.WCInfo.Revision + SLineBreak + 'Autor: ' + TSVN_Class.WCInfo.Author + SLineBreak + 'Data: ' + TSVN_Class.WCInfo.Date);
-END;
+  ShowMessage('Última Revisão: ' + TSVN_Class.WCInfo.Revision + SLineBreak + 'Autor: ' + TSVN_Class.WCInfo.Author + SLineBreak + 'Data: ' + TSVN_Class.WCInfo.Date);
+end;
 
-PROCEDURE TfrmPrincipal.ckUseFireDACClick(Sender: TObject);
-BEGIN
+procedure TfrmPrincipal.CkUseFireDACClick(Sender: TObject);
+begin
   CkUseJEDI.Checked       := False;
   CkUseKBMemTable.Checked := False;
-END;
+end;
 
-PROCEDURE TfrmPrincipal.ckUseJEDIClick(Sender: TObject);
-BEGIN
+procedure TfrmPrincipal.CkUseJEDIClick(Sender: TObject);
+begin
   CkUseFireDAC.Checked    := False;
   CkUseKBMemTable.Checked := False;
-END;
+end;
 
-PROCEDURE TfrmPrincipal.ckUseKBMemTableClick(Sender: TObject);
-BEGIN
+procedure TfrmPrincipal.CkUseKBMemTableClick(Sender: TObject);
+begin
   CkUseJEDI.Checked    := False;
   CkUseFireDAC.Checked := False;
-END;
+end;
 
-PROCEDURE TfrmPrincipal.WizPgObterFontesNextButtonClick(Sender: TObject; VAR Stop: Boolean);
-VAR
-  I: Integer;
+procedure TfrmPrincipal.WizPgObterFontesNextButtonClick(Sender: TObject; var Stop: Boolean);
+var
+  I:          Integer;
   NomePacote: STRING;
-BEGIN
+begin
   GravarConfiguracoes;
 
-  // verificar se os pacotes existem antes de seguir para o próximo passo
-  FOR I := 0 TO FrameDpk.Pacotes.Count - 1 DO
-  BEGIN
-    IF FrameDpk.Pacotes[I].Checked THEN
-    BEGIN
+  // verificar se os pacotes existem antes de seguir para o próximo paso
+  for I := 0 to FrameDpk.Pacotes.Count - 1 do
+  begin
+    if FrameDpk.Pacotes[I].Checked then
+    begin
       SDirRoot   := IncludeTrailingPathDelimiter(EdtDirDestino.Text);
       NomePacote := FrameDpk.Pacotes[I].Caption;
 
-      // Busca diretório do pacote
-      // ExtrairDiretorioPacote(NomePacote);
-      // IF Trim(SDirPackage) = '' THEN
-      // RAISE Exception.Create('Não foi possível retornar o diretório do pacote : ' + NomePacote);
+      ExtrairDiretorioPacote(NomePacote);
+      if Trim(SDirPackage) = '' then
+        raise Exception.Create('Não foi possível retornar o diretório do pacote : ' + NomePacote);
 
-      // IF IsDelphiPackage(NomePacote) THEN
-      // BEGIN
-      // IF NOT FileExists(IncludeTrailingPathDelimiter(SDirPackage) + NomePacote) THEN
-      // BEGIN
-      // Stop := True;
-      // Application.MessageBox(PWideChar(Format('Pacote "%s" não encontrado, efetue novamente o download do repositório', [NomePacote])), 'Erro.', MB_ICONERROR + MB_OK);
-      // Break;
-      // END;
-      // END;
-    END;
-  END;
-END;
+      if IsDelphiPackage(NomePacote) then
+      begin
+        if not FileExists(IncludeTrailingPathDelimiter(SDirPackage) + NomePacote) then
+        begin
+          Stop := True;
+          Application.MessageBox(PWideChar(Format('Pacote "%s" não encontrado, efetue novamente o download do repositório', [NomePacote])), 'Erro.', MB_ICONERROR + MB_OK);
+          Break;
+        end;
+      end;
+    end;
+  end;
+end;
 
-PROCEDURE TfrmPrincipal.WizPrincipalCancelButtonClick(Sender: TObject);
-BEGIN
-  IF Application.MessageBox('Deseja realmente cancelar a instalação?', 'Fechar', MB_ICONQUESTION + MB_YESNO) = ID_YES THEN
-  BEGIN
+procedure TfrmPrincipal.WizPrincipalCancelButtonClick(Sender: TObject);
+begin
+  if Application.MessageBox('Deseja realmente cancelar a instalação?', 'Fechar', MB_ICONQUESTION + MB_YESNO) = ID_YES then
+  begin
     Self.Close;
-  END;
-END;
+  end;
+end;
 
-PROCEDURE TfrmPrincipal.WizPrincipalFinishButtonClick(Sender: TObject);
-BEGIN
+procedure TfrmPrincipal.WizPrincipalFinishButtonClick(Sender: TObject);
+begin
   Self.Close;
-END;
+end;
 
-PROCEDURE TfrmPrincipal.WriteToTXT(CONST ArqTXT: STRING; ABinaryString: AnsiString; CONST AppendIfExists: Boolean; CONST AddLineBreak: Boolean);
-VAR
-  FS: TFileStream;
+procedure TfrmPrincipal.WriteToTXT(const ArqTXT: STRING; ABinaryString: AnsiString; const AppendIfExists, AddLineBreak: Boolean);
+var
+  FS:        TFileStream;
   LineBreak: AnsiString;
-BEGIN
-  FS := TFileStream.Create(ArqTXT, IfThen(AppendIfExists AND FileExists(ArqTXT), Integer(FmOpenReadWrite), Integer(FmCreate)) OR FmShareDenyWrite);
-  TRY
+begin
+  FS := TFileStream.Create(ArqTXT, IfThen(AppendIfExists and FileExists(ArqTXT), Integer(FmOpenReadWrite), Integer(FmCreate)) or FmShareDenyWrite);
+  try
     FS.Seek(0, SoFromEnd); // vai para EOF
     FS.Write(Pointer(ABinaryString)^, Length(ABinaryString));
 
-    IF AddLineBreak THEN
-    BEGIN
+    if AddLineBreak then
+    begin
       LineBreak := SLineBreak;
       FS.Write(Pointer(LineBreak)^, Length(LineBreak));
-    END;
-  FINALLY
+    end;
+  finally
     FS.Free;
-  END;
-END;
+  end;
+end;
 
-FUNCTION TfrmPrincipal.GetPathDWInc: TFileName;
-BEGIN
-  Result := IncludeTrailingPathDelimiter(EdtDirDestino.Text) + 'CORE\Source\uRESTDW.inc';
-END;
-
-END.
+end.

@@ -1,7 +1,7 @@
-DWInstall
+ACBrInstall
 -----------
 
-Instalador do projeto REST Dataware
+Instalador do projeto ACBr.
 
 Para compilar e necessário ter a JCL e JVCL instaladas.
-Projeto desenvolvido em Delphi Tokyo.
+Projeto desenvolvido em Delphi 2010.

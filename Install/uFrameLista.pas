@@ -1,10 +1,41 @@
 ﻿{ ****************************************************************************** }
-{ Projeto: Componentes REST Dataware }
+{ Projeto: Componentes DW }
+{ Biblioteca multiplataforma de componentes Delphi para interação com equipa- }
+{ mentos de Automação Comercial utilizados no Brasil }
+{ }
+{ Direitos Autorais Reservados (c) 2009   Isaque Pinheiro }
+{ }
+{ Colaboradores nesse arquivo: }
+{ }
+{ Você pode obter a última versão desse arquivo na pagina do  Projeto DW }
+{ Componentes localizado em      http://www.sourceforge.net/projects/DW }
+{ }
+{ Esta biblioteca é software livre; você pode redistribuí-la e/ou modificá-la }
+{ sob os termos da Licença Pública Geral Menor do GNU conforme publicada pela }
+{ Free Software Foundation; tanto a versão 2.1 da Licença, ou (a seu critério) }
+{ qualquer versão posterior. }
+{ }
+{ Esta biblioteca é distribuída na expectativa de que seja útil, porém, SEM }
+{ NENHUMA GARANTIA; nem mesmo a garantia implícita de COMERCIABILIDADE OU }
+{ ADEQUAÇÃO A UMA FINALIDADE ESPECÍFICA. Consulte a Licença Pública Geral Menor }
+{ do GNU para mais detalhes. (Arquivo LICENÇA.TXT ou LICENSE.TXT) }
+{ }
+{ Você deve ter recebido uma cópia da Licença Pública Geral Menor do GNU junto }
+{ com esta biblioteca; se não, escreva para a Free Software Foundation, Inc., }
+{ no endereço 59 Temple Street, Suite 330, Boston, MA 02111-1307 USA. }
+{ Você também pode obter uma copia da licença em: }
+{ http://www.opensource.org/licenses/lgpl-license.php }
+{ }
+{ Daniel Simões de Almeida  -  daniel@djsystem.com.br  -  www.djsystem.com.br }
+{ Praça Anita Costa, 34 - Tatuí - SP - 18270-410 }
+{ }
+{ ****************************************************************************** }
+
 { ******************************************************************************
   |* Historico
   |*
-  |* 10/10/2017: Paulo Tenório
-  |*  - Adaptação do instalador ACBr
+  |* 29/03/2012: Isaque Pinheiro / Régys Borges da Silveira
+  |*  - Criação e distribuição da Primeira Versao
   ******************************************************************************* }
 unit uFrameLista;
 
@@ -13,6 +44,7 @@ interface
 uses
   Generics.Collections,
   Generics.Defaults,
+
   Windows,
   Messages,
   SysUtils,
@@ -33,18 +65,18 @@ type
   TframePacotes = class(TFrame)
     Label2: TLabel;
     Label3: TLabel;
-    RestEasyObjects_dpk: TCheckBox;
-    RESTDriverZEOS_dpk: TCheckBox;
-    RESTDriverFD_dpk: TCheckBox;
-    RESTDriverUniDAC_dpk: TCheckBox;
     BtnPacotesDesmarcarTodos: TSpeedButton;
     BtnPacotesMarcarTodos: TSpeedButton;
     Label27: TLabel;
     Label28: TLabel;
-    RestEasyObjectsCORE_dpk: TCheckBox;
-    RESTDWDriverFD_dpk: TCheckBox;
     Label8: TLabel;
     Label21: TLabel;
+    RestEasyObjects_dpk: TCheckBox;
+    RESTDriverZEOS_dpk: TCheckBox;
+    RESTDriverFD_dpk: TCheckBox;
+    RESTDriverUniDAC_dpk: TCheckBox;
+    RestDatawareCORE_dpk: TCheckBox;
+    RESTDWDriverFD_dpk: TCheckBox;
     procedure BtnPacotesMarcarTodosClick(Sender: TObject);
     procedure BtnPacotesDesmarcarTodosClick(Sender: TObject);
     procedure VerificarCheckboxes(Sender: TObject);
@@ -151,9 +183,10 @@ begin
   if not FUtilizarBotoesMarcar then
   begin
     FUtilizarBotoesMarcar := True;
+
     /// caso algum evento abaixo dispare novamente
     try
-      // quando não for selecionada uma versão, devemos desmarcar seus conectores
+      // quando não for selecionada a versão Datasnap, devemos desmarcar os conectores
       if not RestEasyObjects_dpk.Checked then
       begin
         RESTDriverFD_dpk.Checked     := False;
@@ -161,7 +194,8 @@ begin
         RESTDriverUniDAC_dpk.Checked := False;
       end;
 
-      if not RestEasyObjectsCORE_dpk.Checked then
+      // quando não for selecionada a versão CORE, devemos desmarcar
+      if not RestDatawareCORE_dpk.Checked then
       begin
         RESTDWDriverFD_dpk.Checked := False;
       end;
@@ -172,4 +206,3 @@ begin
 end;
 
 end.
-

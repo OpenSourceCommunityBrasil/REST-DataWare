@@ -1,4 +1,4 @@
-program DWInstalL;
+program DWInstall;
 
 uses
   Forms,
@@ -11,7 +11,7 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.Title := 'Instalação do Projeto REST Dataware';
+  Application.Title := 'Instalação do Projeto ACBr';
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
   Application.Run;
 end.
