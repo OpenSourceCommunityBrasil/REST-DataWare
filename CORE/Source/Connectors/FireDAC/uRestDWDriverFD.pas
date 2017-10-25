@@ -8,7 +8,8 @@ uses System.SysUtils,          System.Classes,          Data.DBXJSON,
      FireDAC.DApt,             FireDAC.UI.Intf,         FireDAC.Stan.Def,
      FireDAC.Stan.Pool,        FireDAC.Comp.Client,     FireDAC.Comp.UI,
      FireDAC.Comp.DataSet,     FireDAC.DApt.Intf,       Data.DB,
-     uDWConsts, uDWConstsData, uRestDWPoolerDB,         uDWJSONObject;
+     uDWConsts, uDWConstsData, uRestDWPoolerDB,         uDWJSONObject,
+     uDWMassiveBuffer;
 
 Type
  TRESTDWDriverFD   = Class(TRESTDWDriver)
@@ -18,17 +19,11 @@ Type
   Procedure SetConnection(Value : TFDConnection);
   Function  GetConnection       : TFDConnection;
  Public
-  Procedure ApplyChanges        (TableName,
+  Function ApplyUpdates         (Massive,
                                  SQL              : String;
                                  Params           : TDWParams;
                                  Var Error        : Boolean;
-                                 Var MessageError : String;
-                                 Const ADeltaList : TJSONValue);Overload;Override;
-  Procedure ApplyChanges        (TableName,
-                                 SQL              : String;
-                                 Var Error        : Boolean;
-                                 Var MessageError : String;
-                                 Const ADeltaList : TJSONValue);Overload;Override;
+                                 Var MessageError : String)          : TJSONValue;Override;
   Function ExecuteCommand       (SQL              : String;
                                  Var Error        : Boolean;
                                  Var MessageError : String;
@@ -72,25 +67,6 @@ Begin
 End;
 
 
-
-procedure TRESTDWDriverFD.ApplyChanges(TableName,
-                                     SQL              : String;
-                                     Var Error        : Boolean;
-                                     Var MessageError : String;
-                                     Const ADeltaList : TJSONValue);
-begin
-  Inherited;
-end;
-
-procedure TRESTDWDriverFD.ApplyChanges(TableName,
-                                       SQL              : String;
-                                       Params           : TDWParams;
-                                       Var Error        : Boolean;
-                                       Var MessageError : String;
-                                       Const ADeltaList : TJSONValue);
-begin
-  Inherited;
-end;
 
 Procedure TRESTDWDriverFD.Close;
 Begin
@@ -364,6 +340,209 @@ Begin
    End;
  End;
  vTempStoredProc.DisposeOf;
+End;
+
+Function TRESTDWDriverFD.ApplyUpdates(Massive,
+                                      SQL               : String;
+                                      Params            : TDWParams;
+                                      Var Error         : Boolean;
+                                      Var MessageError  : String) : TJSONValue;
+Var
+ vTempQuery     : TFDQuery;
+ A, I           : Integer;
+ vParamName     : String;
+ vStringStream  : TMemoryStream;
+ Function GetParamIndex(Params : TFDParams; ParamName : String) : Integer;
+ Var
+  I : Integer;
+ Begin
+  Result := -1;
+  For I := 0 To Params.Count -1 Do
+   Begin
+    If UpperCase(Params[I].Name) = UpperCase(ParamName) Then
+     Begin
+      Result := I;
+      Break;
+     End;
+   End;
+ End;
+ Function LoadMassive(Massive : String; Var Query : TFDQuery) : Boolean;
+ Var
+  MassiveDataset : TMassiveDatasetBuffer;
+  A, B           : Integer;
+  Procedure PrepareData(Var Query      : TFDQuery;
+                        MassiveDataset : TMassiveDatasetBuffer);
+  Begin
+
+  End;
+ Begin
+  Result         := False;
+  MassiveDataset := TMassiveDatasetBuffer.Create;
+  Try
+   MassiveDataset.FromJSON(Massive);
+   MassiveDataset.First;
+   B             := 1;
+   For A := 0 To MassiveDataset.RecordCount -1 Do
+    Begin
+     If Not vFDConnection.InTransaction Then
+      vFDConnection.StartTransaction;
+     Query.SQL.Clear;
+     PrepareData(Query, MassiveDataset);
+     Query.ExecSQL;
+     If B = CommitRecords Then
+      Begin
+       Try
+        If vFDConnection.InTransaction Then
+         vFDConnection.Commit;
+       Except
+        On E : Exception do
+         Begin
+          If vFDConnection.InTransaction Then
+           vFDConnection.Rollback;
+          Raise Exception.Create(E.Message);
+         End;
+       End;
+       B := 1;
+      End
+     Else
+      Inc(B);
+     MassiveDataset.Next;
+    End;
+   Try
+    If vFDConnection.InTransaction Then
+     vFDConnection.Commit;
+   Except
+    On E : Exception do
+     Begin
+      If vFDConnection.InTransaction Then
+       vFDConnection.Rollback;
+      Raise Exception.Create(E.Message);
+     End;
+   End;
+  Finally
+   FreeAndNil(MassiveDataset);
+  End;
+ End;
+Begin
+ Inherited;
+ Try
+  Result     := Nil;
+  Error      := False;
+  vTempQuery := TFDQuery.Create(Owner);
+  If Not vFDConnection.Connected Then
+   vFDConnection.Connected := True;
+  vTempQuery.Connection   := vFDConnection;
+  vTempQuery.FormatOptions.StrsTrim       := StrsTrim;
+  vTempQuery.FormatOptions.StrsEmpty2Null := StrsEmpty2Null;
+  vTempQuery.FormatOptions.StrsTrim2Len   := StrsTrim2Len;
+  vTempQuery.SQL.Clear;
+  If LoadMassive(Massive, vTempQuery) Then
+   Begin
+    If SQL <> '' Then
+     Begin
+      Try
+       vTempQuery.SQL.Clear;
+       vTempQuery.SQL.Add(SQL);
+       If Params <> Nil Then
+        Begin
+         For I := 0 To Params.Count -1 Do
+          Begin
+           If vTempQuery.ParamCount > I Then
+            Begin
+             vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
+             A          := GetParamIndex(vTempQuery.Params, vParamName);
+             If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
+              Begin
+               If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                                                     ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                                     ftString,    ftWideString]    Then
+                Begin
+                 If vTempQuery.Params[A].Size > 0 Then
+                  vTempQuery.Params[A].Value := Copy(Params[I].Value, 1, vTempQuery.Params[A].Size)
+                 Else
+                  vTempQuery.Params[A].Value := Params[I].Value;
+                End
+               Else
+                Begin
+                 If vTempQuery.Params[A].DataType in [ftUnknown] Then
+                  Begin
+                   If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
+                    vTempQuery.Params[A].DataType := ObjectValueToFieldType(Params[I].ObjectValue)
+                   Else
+                    vTempQuery.Params[A].DataType := ftString;
+                  End;
+                 If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord] Then
+                  Begin
+                   If Trim(Params[I].Value) <> '' Then
+                    Begin
+                     If vTempQuery.Params[A].DataType = ftSmallInt Then
+                      vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                     Else
+                      vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                    End;
+                  End
+                 Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
+                  Begin
+                   If Trim(Params[I].Value) <> '' Then
+                    vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value);
+                  End
+                 Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+                  Begin
+                   If Trim(Params[I].Value) <> '' Then
+                    Begin
+                     If vTempQuery.Params[A].DataType      = ftDate Then
+                      vTempQuery.Params[A].AsDate      := StrToDate(Params[I].Value)
+                     Else If vTempQuery.Params[A].DataType = ftTime Then
+                      vTempQuery.Params[A].AsDateTime  := StrToTime(Params[I].Value)
+                     Else If vTempQuery.Params[A].DataType In [ftDateTime, ftTimeStamp] Then
+                      vTempQuery.Params[A].AsDateTime  := StrToDateTime(Params[I].Value);
+                    End;
+                  End  //Tratar Blobs de Parametros...
+                 Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+                  Begin
+                   vStringStream := TMemoryStream.Create;
+                   Try
+                    Params[I].SaveToStream(vStringStream);
+                    vStringStream.Position := 0;
+                    vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
+                   Finally
+                    FreeAndNil(vStringStream);
+                   End;
+                  End
+                 Else
+                  vTempQuery.Params[A].Value    := Params[I].Value;
+                End;
+              End;
+            End
+           Else
+            Break;
+          End;
+        End;
+       vTempQuery.Open;
+       Result         := TJSONValue.Create;
+       Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
+       Error         := False;
+      Except
+       On E : Exception do
+        Begin
+         Try
+          Error          := True;
+          MessageError   := E.Message;
+          If Result = Nil Then
+           Result        := TJSONValue.Create;
+          Result.Encoded := True;
+          Result.SetValue(GetPairJSON('NOK', MessageError));
+          vFDConnection.RollbackRetaining;
+         Except
+         End;
+        End;
+      End;
+     End;
+   End;
+ Finally
+  vTempQuery.Close;
+  vTempQuery.Free;
+ End;
 End;
 
 Function TRESTDWDriverFD.ExecuteCommand(SQL              : String;

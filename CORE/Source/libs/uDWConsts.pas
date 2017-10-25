@@ -27,6 +27,7 @@ Const
  {$ENDIF}
  TSepParams            = '|xxx|xxx|%';
  TValueFormatJSON      = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":[%s]}';
+ TMassiveFormatJSON    = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":[%s]}';
  TValueDisp            = '{"PARAMS":[%s], "RESULT":[%s]}';
  TValueArrayJSON       = '[%s]';
  TValueFormatJSONValue = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":%s}';

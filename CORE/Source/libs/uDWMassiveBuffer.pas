@@ -4,9 +4,9 @@ unit uDWMassiveBuffer;
 
 interface
 
-uses SysUtils,  Classes,        uDWJSONObject,
-     DB,        uRESTDWBase,    uDWConsts,
-     uDWConstsData,  uDWJSONTools;
+uses SysUtils,       Classes,      uDWJSONObject,
+     DB,             uRESTDWBase,  uDWConsts,
+     uDWConstsData,  uDWJSONTools, udwjson;
 
 Type
  TMassiveValue = Class
@@ -41,19 +41,20 @@ End;
 Type
  TMassiveField = Class
  Private
+  vMassiveFields : TList;
   vAutoGenerateValue,
   vRequired,
   vKeyField   : Boolean;
-  vJSONValue  : ^TMassiveValue;
   vFieldName  : String;
   vFieldType  : TObjectValue;
+  vFieldIndex,
   vSize,
   vPrecision  : Integer;
   Function    GetValue       : String;
   Procedure   SetValue(Value : String);
  Protected
  Public
-  Constructor Create;
+  Constructor Create(MassiveFields : TList; FieldIndex : Integer);
   Destructor  Destroy;Override;
   Procedure   LoadFromStream(Stream : TMemoryStream);
   Procedure   SaveToStream  (Stream : TMemoryStream);
@@ -71,11 +72,13 @@ Type
  PMassiveField  = ^TMassiveField;
  TMassiveFields = Class(TList)
  Private
+  vMassiveDataset : TMassiveDataset;
   Function   GetRec(Index : Integer)       : TMassiveField;  Overload;
   Procedure  PutRec(Index : Integer; Item  : TMassiveField); Overload;
   Procedure  ClearAll;
  Protected
  Public
+  Constructor Create(MassiveDataset : TMassiveDataset);
   Destructor Destroy;Override;
   Procedure  Delete(Index : Integer);                          Overload;
   Function   Add   (Item  : TMassiveField) : Integer;          Overload;
@@ -130,7 +133,6 @@ Type
   vMassiveMode   : TMassiveMode;
   vTableName     : String;
  Private
-  Procedure ReadBuffer;
   Procedure NewLineBuffer(Var MassiveLineBuff : TMassiveLine;
                           MassiveModeData     : TMassiveMode);
  Public
@@ -173,53 +175,76 @@ Uses uRESTDWPoolerDB, uDWPoolerMethod;
 
 { TMassiveField }
 
-Constructor TMassiveField.Create;
+Constructor TMassiveField.Create(MassiveFields : TList; FieldIndex : Integer);
 Begin
  vRequired          := False;
  vAutoGenerateValue := False;
  vKeyField          := vRequired;
  vFieldType         := ovUnknown;
- vJSONValue         := Nil;
  vFieldName         := '';
+ vMassiveFields     := MassiveFields;
+ vFieldIndex        := FieldIndex;
 End;
 
 Destructor TMassiveField.Destroy;
 Begin
- {
- If Assigned(vJSONValue) Then
-  If Assigned(vJSONValue^) Then
-   FreeAndNil(vJSONValue^);
- }
- vJSONValue := Nil;
  Inherited;
 End;
 
 Procedure TMassiveField.LoadFromStream(Stream: TMemoryStream);
+Var
+ vRecNo : Integer;
 Begin
- If Assigned(vJSONValue) Then
-  If Assigned(vJSONValue^) Then
-   vJSONValue^.LoadFromStream(Stream);
+ If TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Count > 0 Then
+  Begin
+   vRecNo := TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo;
+   If vRecNo <= 0 Then
+    TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo := 1;
+   vRecNo := TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo;
+   TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].LoadFromStream(Stream);
+  End;
 End;
 
 Procedure TMassiveField.SaveToStream(Stream: TMemoryStream);
+Var
+ vRecNo : Integer;
 Begin
- If Assigned(vJSONValue) Then
-  If Assigned(vJSONValue^) Then
-   vJSONValue^.SaveToStream(Stream);
+ If TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Count > 0 Then
+  Begin
+   vRecNo := TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo;
+   If vRecNo <= 0 Then
+    TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo := 1;
+   vRecNo := TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo;
+   TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].SaveToStream(Stream);
+  End;
 End;
 
 Procedure TMassiveField.SetValue(Value: String);
+Var
+ vRecNo : Integer;
 Begin
- If Assigned(vJSONValue) Then
-  If Assigned(vJSONValue^) Then
-   vJSONValue^.Value := Value;
+ If TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Count > 0 Then
+  Begin
+   vRecNo := TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo;
+   If vRecNo <= 0 Then
+    TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo := 1;
+   vRecNo := TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo;
+   TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].Value := Value;
+  End;
 End;
 
 Function TMassiveField.GetValue : String;
+Var
+ vRecNo : Integer;
 Begin
- If Assigned(vJSONValue) Then
-  If Assigned(vJSONValue^) Then
-   Result := vJSONValue^.Value;
+ If TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Count > 0 Then
+  Begin
+   vRecNo := TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo;
+   If vRecNo <= 0 Then
+    TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo := 1;
+   vRecNo := TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo;
+   Result := TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].Value;
+  End;
 End;
 
 { TMassiveFields }
@@ -257,6 +282,12 @@ Var
 Begin
  For I := TList(Self).Count -1 DownTo 0 Do
   Self.Delete(I);
+End;
+
+Constructor TMassiveFields.Create(MassiveDataset: TMassiveDataset);
+Begin
+ Inherited Create;
+ vMassiveDataset := MassiveDataset;
 End;
 
 Destructor TMassiveFields.Destroy;
@@ -494,20 +525,18 @@ End;
 { TMassiveDatasetBuffer }
 
 Procedure TMassiveDatasetBuffer.NewLineBuffer(Var MassiveLineBuff : TMassiveLine;
-                                              MassiveModeData : TMassiveMode);
+                                              MassiveModeData     : TMassiveMode);
 Var
  I            : Integer;
  MassiveValue : TMassiveValue;
 Begin
+ MassiveLineBuff.vMassiveMode := MassiveModeData;
  For I := 0 To vMassiveFields.Count Do
   Begin
    MassiveValue       := TMassiveValue.Create;
    If I = 0 Then
     MassiveValue.Value := MassiveModeToString(MassiveModeData);
    MassiveLineBuff.vMassiveValues.Add(MassiveValue);
-   If I > 0 Then
-    If vMassiveFields.FieldByName(vMassiveFields.Items[I-1].FieldName) <> Nil Then
-     vMassiveFields.FieldByName(vMassiveFields.Items[I-1].FieldName).vJSONValue := @MassiveValue;
   End;
 End;
 
@@ -523,6 +552,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
   vUpdateCase   : Boolean;
   MassiveValue  : TMassiveValue;
  Begin
+  vUpdateCase := False;
   //KeyValues to Update
   If MassiveModeBuff = mmUpdate Then
    vUpdateCase := MassiveLineBuff.vPrimaryValues = Nil;
@@ -742,7 +772,7 @@ Begin
   Begin
    If (Dataset.Fields[I].FieldKind = fkData) And (Not(Dataset.Fields[I].ReadOnly)) Then
     Begin
-     MassiveField                    := TMassiveField.Create;
+     MassiveField                    := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
      MassiveField.vRequired          := Dataset.Fields[I].Required;
      MassiveField.vKeyField          := pfInKey in Dataset.Fields[I].ProviderFlags;
      MassiveField.vFieldName         := Dataset.Fields[I].FieldName;
@@ -784,7 +814,7 @@ Begin
  vRecNo         := -1;
  vMassiveBuffer := TMassiveBuffer.Create;
  vMassiveLine   := TMassiveLine.Create;
- vMassiveFields := TMassiveFields.Create;
+ vMassiveFields := TMassiveFields.Create(Self);
  vMassiveMode   := mmInactive;
  vTableName     := '';
 End;
@@ -800,21 +830,15 @@ End;
 Procedure TMassiveDatasetBuffer.First;
 Begin
  If RecordCount > 0 Then
-  Begin
-   vRecNo := 0;
-   ReadBuffer;
-  End;
+  vRecNo := 1;
 End;
 
 Procedure TMassiveDatasetBuffer.Last;
 Begin
  If RecordCount > 0 Then
   Begin
-   If vRecNo <> (RecordCount -1) Then
-    Begin
-     vRecNo := RecordCount -1;
-     ReadBuffer;
-    End;
+   If vRecNo <> RecordCount Then
+    vRecNo := RecordCount;
   End;
 End;
 
@@ -846,11 +870,8 @@ Procedure TMassiveDatasetBuffer.Next;
 Begin
  If RecordCount > 0 Then
   Begin
-   If vRecNo < (RecordCount -1) Then
-    Begin
-     Inc(vRecNo);
-     ReadBuffer;
-    End;
+   If vRecNo < RecordCount Then
+    Inc(vRecNo);
   End;
 End;
 
@@ -858,17 +879,9 @@ Procedure TMassiveDatasetBuffer.Prior;
 Begin
  If RecordCount > 0 Then
   Begin
-   If vRecNo > 0 Then
-    Begin
-     Dec(vRecNo);
-     ReadBuffer;
-    End;
+   If vRecNo > 1 Then
+    Dec(vRecNo);
   End;
-End;
-
-Procedure TMassiveDatasetBuffer.ReadBuffer;
-Begin
-
 End;
 
 Function TMassiveDatasetBuffer.RecNo : Integer;
@@ -947,17 +960,159 @@ Begin
  End;
 End;
 
-Procedure TMassiveDatasetBuffer.FromJSON(Value: String);
+Procedure TMassiveDatasetBuffer.FromJSON(Value : String);
+Var
+ bJsonOBJ,
+ bJsonOBJb,
+ bJsonValue  : udwjson.TJsonObject;
+ bJsonArray,
+ bJsonArrayB,
+ bJsonArrayC,
+ bJsonArrayD,
+ bJsonArrayE  : udwjson.TJsonArray;
+ MassiveValue : TMassiveValue;
+ A, C,
+ D, E, I      : Integer;
+ vTableName   : String;
+ MassiveField : TMassiveField;
+ MassiveLine  : TMassiveLine;
+ Function GetFieldIndex(FieldName : String) : Integer;
+ Var
+  I : Integer;
+ Begin
+  Result := -1;
+  For I := 0 To vMassiveFields.Count -1 Do
+   Begin
+    If LowerCase(vMassiveFields.Items[I].FieldName) = LowerCase(FieldName) Then
+     Result := I;
+    If Result <> -1 Then
+     Break;
+   End;
+ End;
 Begin
-
+ bJsonValue := udwjson.TJsonObject.Create(Value);
+ vMassiveBuffer.ClearAll;
+ vMassiveLine.ClearAll;
+ vMassiveFields.ClearAll;
+ Try
+  vTableName  := bJsonValue.opt(bJsonValue.names.get(4).ToString).ToString;
+  bJsonArray  := bJsonValue.optJSONArray(bJsonValue.names.get(5).ToString);
+  For A := 0 To 1 Do
+   Begin
+    If A = 0 Then //Fields
+     Begin
+      bJsonOBJ    := udwjson.TJsonObject.Create(bJsonArray.get(A).ToString); //bJsonOBJ.names.get(0).ToString);
+      Try
+       bJsonArrayB := bJsonOBJ.optJSONArray('fields');
+       For I := 0 To bJsonArrayB.Length - 1 Do
+        Begin
+         bJsonOBJb := udwjson.TJsonObject.Create(bJsonArrayB.get(I).ToString);
+         Try
+          MassiveField                    := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
+          MassiveField.vRequired          := bJsonOBJb.opt('Required').ToString       = 'S';
+          MassiveField.vKeyField          := bJsonOBJb.opt('Primary').ToString        = 'S';
+          MassiveField.vFieldName         := bJsonOBJb.opt('field').ToString;
+          MassiveField.vFieldType         := GetValueType(bJsonOBJb.opt('Type').ToString);
+          MassiveField.vSize              := StrToInt(bJsonOBJb.opt('Size').ToString);
+          {$IFNDEF FPC}{$IF CompilerVersion > 21}
+          MassiveField.vAutoGenerateValue := bJsonOBJb.opt('Autogeneration').ToString = 'S';
+          {$ELSE}
+          MassiveField.vAutoGenerateValue := False;
+          {$IFEND}
+          {$ENDIF}
+          vMassiveFields.Add(MassiveField);
+         Finally
+          bJsonOBJb.Clean;
+          FreeAndNil(bJsonOBJb);
+         End;
+        End;
+      Finally
+       bJsonOBJ.Clean;
+       FreeAndNil(bJsonOBJ);
+      End;
+     End
+    Else //Data
+     Begin
+      bJsonOBJ    := udwjson.TJsonObject.Create(bJsonArray.get(A).ToString); //bJsonOBJ.names.get(0).ToString);
+      bJsonArrayB := bJsonOBJ.optJSONArray('lines');
+      For E := 0 to bJsonArrayB.length -1  Do
+       Begin
+        bJsonArrayC := bJsonArrayB.getJSONArray(E);
+        Try
+         bJsonArrayD  := bJsonArrayC.getJSONArray(0); //Line
+         vMassiveMode := StringToMassiveMode(bJsonArrayD.opt(0).tostring);
+         MassiveLine  := TMassiveLine.Create;
+         NewLineBuffer(MassiveLine, vMassiveMode); //Sempre se assume MassiveMode vindo na String
+         If vMassiveMode = mmUpdate Then
+          Begin
+           If bJsonArrayD.length > 1 Then
+            Begin
+             bJsonArrayE  := bJsonArrayC.getJSONArray(2); //Campos Alterados
+             For D := 0 To bJsonArrayE.length -1 Do //Valores
+              MassiveLine.vChanges.Add(bJsonArrayE.opt(D).tostring);
+             bJsonArrayE  := bJsonArrayC.getJSONArray(1); //Key Primary
+             For D := 0 To bJsonArrayE.length -1 Do //Valores
+              Begin
+               MassiveValue       := TMassiveValue.Create;
+               If vMassiveFields.Items[D].vFieldType in [ovString, ovWideString, ovFixedChar, ovFixedWideChar] Then
+                Begin
+                 If lowercase(bJsonArrayE.opt(D).tostring) <> 'null' then
+                  MassiveValue.Value := DecodeStrings(bJsonArrayE.opt(D).tostring{$IFDEF FPC}, csUndefined{$ENDIF})
+                 Else
+                  MassiveValue.Value := bJsonArrayE.opt(D).tostring;
+                End
+               Else
+                MassiveValue.Value := bJsonArrayE.opt(D).tostring;
+               If Not Assigned(MassiveLine.vPrimaryValues) Then
+                MassiveLine.vPrimaryValues := TMassiveValues.Create;
+               MassiveLine.vPrimaryValues.Add(MassiveValue);
+              End;
+            End;
+           For C := 1 To bJsonArrayD.length -1 Do //Valores
+            Begin
+             If vMassiveFields.Items[GetFieldIndex(MassiveLine.vChanges[C-1])].vFieldType in [ovString, ovWideString, ovFixedChar, ovFixedWideChar] Then
+              Begin
+               If lowercase(bJsonArrayD.opt(C).tostring) <> 'null' then
+                MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Value := DecodeStrings(bJsonArrayD.opt(C).tostring{$IFDEF FPC}, csUndefined{$ENDIF})
+               Else
+                MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Value := bJsonArrayD.opt(C).tostring;
+              End
+             Else
+              MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Value := bJsonArrayD.opt(C).tostring;
+            End;
+          End
+         Else
+          Begin
+           For C := 1 To bJsonArrayD.length -1 Do //Valores
+            Begin
+             If vMassiveFields.Items[C-1].vFieldType in [ovString, ovWideString, ovFixedChar, ovFixedWideChar] Then
+              Begin
+               If lowercase(bJsonArrayD.opt(C).tostring) <> 'null' then
+                MassiveLine.Values[C].Value := DecodeStrings(bJsonArrayD.opt(C).tostring{$IFDEF FPC}, csUndefined{$ENDIF})
+               Else
+                MassiveLine.Values[C].Value := bJsonArrayD.opt(C).tostring;
+              End
+             Else
+              MassiveLine.Values[C].Value := bJsonArrayD.opt(C).tostring;
+            End;
+          End;
+        Finally
+         vMassiveBuffer.Add(MassiveLine);
+        End;
+       End;
+      FreeAndNil(bJsonOBJ);
+     End;
+   End;
+ Finally
+  bJsonValue.Free;
+ End;
 End;
 
 Function TMassiveDatasetBuffer.ToJSON : String;
 Var
  A           : Integer;
  vLines,
- vTagFields,
- vTagGeral   : String;
+ vTagFields  : String;
  Function GenerateHeader: String;
  Var
   I              : Integer;
@@ -1040,7 +1195,7 @@ Var
        vTempValue    := Format('"%s"', [MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value])    //asstring
       Else
        Begin
-        If vMassiveFields.Items[I-1].vFieldType in [ovString, ovWideString] Then
+        If vMassiveFields.Items[I-1].vFieldType in [ovString, ovWideString, ovFixedChar, ovFixedWideChar] Then
          vTempValue    := Format('"%s"', [EncodeStrings(MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value{$IFDEF FPC}, csUndefined{$ENDIF})])
         Else
          vTempValue    := Format('"%s"', [MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value])
@@ -1095,11 +1250,12 @@ Begin
     vLines := vLines + Format(', [%s]', [GenerateLine(vMassiveBuffer.Items[A])]);
   End;
  vTagFields := Format(vTagFields, [vLines]);
- Result := Format(TValueFormatJSON,      ['ObjectType',   GetObjectName(toMassive),
-                                          'Direction',    GetDirectionName(odINOUT),
-                                          'Encoded',      'true',
-                                          'ValueType',    GetValueType(ovObject),
-                                          'MassiveValue', vTagFields]);
+ Result := Format(TMassiveFormatJSON, ['ObjectType',   GetObjectName(toMassive),
+                                       'Direction',    GetDirectionName(odINOUT),
+                                       'Encoded',      'true',
+                                       'ValueType',    GetValueType(ovObject),
+                                       'TableName',    vTableName,
+                                       'MassiveValue', vTagFields]);
 End;
 
 End.

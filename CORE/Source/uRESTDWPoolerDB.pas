@@ -421,22 +421,17 @@ Type
   vEncodeStrings,
   vCompression       : Boolean;
   vEncoding          : TEncodeSelect;
+  vCommitRecords     : Integer;
   {$IFDEF FPC}
   vDatabaseCharSet   : TDatabaseCharSet;
   {$ENDIF}
  Public
   Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
-  Procedure ApplyChanges        (TableName,
+  Function ApplyUpdates         (Massive,
                                  SQL               : String;
                                  Params            : TDWParams;
                                  Var Error         : Boolean;
-                                 Var MessageError  : String;
-                                 Const ADeltaList  : TJSONValue);Overload;Virtual; abstract;
-  Procedure ApplyChanges        (TableName,
-                                 SQL               : String;
-                                 Var Error         : Boolean;
-                                 Var MessageError  : String;
-                                 Const ADeltaList  : TJSONValue);Overload;Virtual; abstract;
+                                 Var MessageError  : String) : TJSONValue;Virtual; Abstract;
   Function ExecuteCommand       (SQL        : String;
                                  Var Error  : Boolean;
                                  Var MessageError : String;
@@ -472,6 +467,7 @@ Type
  Published
   Property DatabaseCharSet   : TDatabaseCharSet Read vDatabaseCharSet Write vDatabaseCharSet;
  {$ENDIF}
+  Property CommitRecords     : Integer          Read vCommitRecords   Write vCommitRecords;
 End;
 
 //PoolerDB Control
@@ -492,17 +488,6 @@ Type
   Procedure SetConnection(Value : TRESTDWDriver);
   Function  GetConnection  : TRESTDWDriver;
  Public
-  Procedure ApplyChanges(TableName,
-                         SQL               : String;
-                         Params            : TDWParams;
-                         Var Error         : Boolean;
-                         Var MessageError  : String;
-                         Const ADeltaList  : TJSONValue);Overload;
-  Procedure ApplyChanges(TableName,
-                         SQL               : String;
-                         Var Error         : Boolean;
-                         Var MessageError  : String;
-                         Const ADeltaList  : TJSONValue);Overload;
   Function ExecuteCommand(SQL        : String;
                           Var Error  : Boolean;
                           Var MessageError : String;
@@ -529,7 +514,7 @@ Type
   Constructor Create(AOwner : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                     //Destroy a Classe
  Published
-  Property    RESTDriver       : TRESTDWDriver   Read GetConnection     Write SetConnection;
+  Property    RESTDriver       : TRESTDWDriver Read GetConnection     Write SetConnection;
   Property    Compression      : Boolean       Read vCompression      Write vCompression;
   Property    Encoding         : TEncodeSelect Read vEncoding         Write vEncoding;
   Property    StrsTrim         : Boolean       Read vStrsTrim         Write vStrsTrim;
@@ -770,51 +755,6 @@ Begin
    MessageError := 'Selected Pooler Does Not Have a Driver Set';
   End;
 End;
-
-Procedure TRESTDWPoolerDB.ApplyChanges(TableName,
-                                     SQL               : String;
-                                     Var Error         : Boolean;
-                                     Var MessageError  : String;
-                                     Const ADeltaList  : TJSONValue);
-begin
- If vRESTDriver <> Nil Then
-  Begin
-   vRESTDriver.vStrsTrim          := vStrsTrim;
-   vRESTDriver.vStrsEmpty2Null    := vStrsEmpty2Null;
-   vRESTDriver.vStrsTrim2Len      := vStrsTrim2Len;
-   vRESTDriver.vCompression       := vCompression;
-   vRESTDriver.vEncoding          := vEncoding;
-   vRESTDriver.ApplyChanges(TableName, SQL, Error, MessageError, ADeltaList);
-  End
- Else
-  Begin
-   Error        := True;
-   MessageError := 'Selected Pooler Does Not Have a Driver Set';
-  End;
-end;
-
-Procedure TRESTDWPoolerDB.ApplyChanges(TableName,
-                                     SQL               : String;
-                                     Params            : TDWParams;
-                                     Var Error         : Boolean;
-                                     Var MessageError  : String;
-                                     Const ADeltaList  : TJSONValue);
-begin
- If vRESTDriver <> Nil Then
-  Begin
-   vRESTDriver.vStrsTrim          := vStrsTrim;
-   vRESTDriver.vStrsEmpty2Null    := vStrsEmpty2Null;
-   vRESTDriver.vStrsTrim2Len      := vStrsTrim2Len;
-   vRESTDriver.vCompression       := vCompression;
-   vRESTDriver.vEncoding          := vEncoding;
-   vRESTDriver.ApplyChanges(TableName, SQL, Params, Error, MessageError, ADeltaList);
-  End
- Else
-  Begin
-   Error        := True;
-   MessageError := 'Selected Pooler Does Not Have a Driver Set';
-  End;
-end;
 
 Constructor TRESTDWPoolerDB.Create(AOwner : TComponent);
 Begin
@@ -2090,7 +2030,8 @@ Var
  vMassiveJSON : String;
  vResult      : TJSONValue;
 Begin
- Result := False;
+ Result  := False;
+ vResult := Nil;
  If TMassiveDatasetBuffer(vMassiveDataset).RecordCount = 0 Then
   Error := 'No have data to "Applyupdates"...'
  Else
@@ -2709,6 +2650,7 @@ Begin
  {$IFDEF FPC}
  vDatabaseCharSet := csUndefined;
  {$ENDIF}
+ vCommitRecords   := 100;
 End;
 
 end.
