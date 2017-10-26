@@ -1093,12 +1093,7 @@ Begin
               Begin
                MassiveValue       := TMassiveValue.Create;
                If vMassiveFields.Items[D].vFieldType in [ovString, ovWideString, ovFixedChar, ovFixedWideChar] Then
-                Begin
-                 If lowercase(bJsonArrayE.opt(D).tostring) <> 'null' then
-                  MassiveValue.Value := DecodeStrings(bJsonArrayE.opt(D).tostring{$IFDEF FPC}, csUndefined{$ENDIF})
-                 Else
-                  MassiveValue.Value := bJsonArrayE.opt(D).tostring;
-                End
+                MassiveValue.Value := bJsonArrayE.opt(D).tostring
                Else
                 MassiveValue.Value := bJsonArrayE.opt(D).tostring;
                If Not Assigned(MassiveLine.vPrimaryValues) Then

@@ -322,17 +322,17 @@ Begin
      JSONParam.SetValue(Params.ToJSON);
      DWParams.Add(JSONParam);
     End;
-   {$IFNDEF FPC}
-    {$if CompilerVersion > 21}
-     RESTClientPoolerExec.Encoding     := vEncoding;
-     JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-    {$ELSE}
-     JSONParam                     := TJSONParam.Create;
-    {$IFEND}
-   {$ELSE}
-    JSONParam                     := TJSONParam.Create;
-   {$ENDIF}
   End;
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ELSE}
+  JSONParam                     := TJSONParam.Create;
+ {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.SetValue(BooleanToString(False));

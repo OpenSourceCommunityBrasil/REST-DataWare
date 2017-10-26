@@ -1519,6 +1519,7 @@ Var
  I             : Integer;
  vTempJSON     : TJSONValue;
  vError        : Boolean;
+ vSQL,
  vMessageError : String;
  DWParamsD     : TDWParams;
 Begin
@@ -1540,8 +1541,10 @@ Begin
              DWParamsD := TDWParams.Create;
              DWParamsD.FromJSON(DWParams.ItemsString['Params'].Value);
             End;
-           vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdates(DWParams.ItemsString['Massive'].Value,
-                                                                                                  DWParams.ItemsString['SQL'].Value,
+          If DWParams.ItemsString['SQL'] <> Nil Then
+           vSQL := DWParams.ItemsString['SQL'].Value;
+          vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdates(DWParams.ItemsString['Massive'].Value,
+                                                                                                  vSQL,
                                                                                                   DWParamsD, vError, vMessageError);
            If DWParamsD <> Nil Then
             DWParamsD.Free;
