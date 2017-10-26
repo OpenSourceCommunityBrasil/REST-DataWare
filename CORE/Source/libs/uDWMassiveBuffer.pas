@@ -11,6 +11,7 @@ uses SysUtils,       Classes,      uDWJSONObject,
 Type
  TMassiveValue = Class
  Private
+  vBinary     : Boolean;
   vJSONValue  : TJSONValue;
   Function    GetValue       : String;
   Procedure   SetValue(Value : String);
@@ -21,6 +22,7 @@ Type
   Procedure   LoadFromStream(Stream : TMemoryStream);
   Procedure   SaveToStream  (Stream : TMemoryStream);
   Property    Value          : String  Read GetValue Write SetValue;
+  Property    Binary         : Boolean Read vBinary  Write vBinary;
 End;
 
 Type
@@ -332,6 +334,7 @@ End;
 
 Constructor TMassiveValue.Create;
 Begin
+ vBinary    := False;
  vJSONValue := TJSONValue.Create;
 End;
 
@@ -348,17 +351,28 @@ End;
 
 Procedure TMassiveValue.LoadFromStream(Stream: TMemoryStream);
 Begin
+ vBinary := True;
  vJSONValue.LoadFromStream(Stream);
 End;
 
 Procedure TMassiveValue.SaveToStream(Stream: TMemoryStream);
 Begin
- vJSONValue.SaveToStream(Stream);
+ vJSONValue.ObjectValue := ovBlob;
+ vJSONValue.Encoded     := True;
+ vJSONValue.SaveToStream(Stream, True);
 End;
 
 Procedure TMassiveValue.SetValue(Value: String);
 Begin
- vJSONValue.SetValue(Value);
+ vJSONValue.Binary  := vBinary;
+ If vJSONValue.Binary Then
+  Begin
+   vJSONValue.ObjectValue := ovBlob;
+   vJSONValue.SetValue(Value, False);
+   vJSONValue.Encoded := True;
+  End
+ Else
+  vJSONValue.SetValue(Value);
 End;
 
 { TMassiveValues }
@@ -445,8 +459,9 @@ End;
 Function TMassiveLine.GetRecPK(Index : Integer) : TMassiveValue;
 Begin
  Result := Nil;
- If (Index < vPrimaryValues.Count) And (Index > -1) Then
-  Result := TMassiveValue(TList(vPrimaryValues).Items[Index]^);
+ If vPrimaryValues <> Nil Then
+  If (Index < vPrimaryValues.Count) And (Index > -1) Then
+   Result := TMassiveValue(TList(vPrimaryValues).Items[Index]^);
 End;
 
 Procedure TMassiveLine.ClearAll;
@@ -586,11 +601,12 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
             Begin
              vStringStream := TMemoryStream.Create;
              Try
-              If TBlobField(Field).Size > 0 Then
+              If Not Field.IsNull Then
                Begin
                 TBlobField(Field).SaveToStream(vStringStream);
                 vStringStream.Position := 0;
                 MassiveValue.LoadFromStream(vStringStream);
+                MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
                End
               Else
                MassiveValue.Value := '';
@@ -695,7 +711,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
        ftOraBlob, ftOraClob      : Begin
                                     vStringStream := TMemoryStream.Create;
                                     Try
-                                     If TBlobField(Field).Size > 0 Then
+                                     If Not Field.IsNull Then
                                       Begin
                                        TBlobField(Field).SaveToStream(vStringStream);
                                        vStringStream.Position := 0;
@@ -706,6 +722,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                          If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> StreamToHex(vStringStream) Then
                                           MassiveLineBuff.vMassiveValues.Items[I + 1].LoadFromStream(vStringStream);
                                         End;
+                                       MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
                                       End
                                      Else
                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
@@ -1111,7 +1128,16 @@ Begin
                 MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Value := bJsonArrayD.opt(C).tostring;
               End
              Else
-              MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Value := bJsonArrayD.opt(C).tostring;
+              Begin
+               If vMassiveFields.Items[GetFieldIndex(MassiveLine.vChanges[C-1])].vFieldType in [ovBytes, ovVarBytes, ovBlob,
+                                                                                                ovGraphic, ovOraBlob, ovOraClob] Then
+                Begin
+                 MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Binary := True;
+                 MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Value  := bJsonArrayD.opt(C).tostring;
+                End
+               Else
+                MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Value := bJsonArrayD.opt(C).tostring;
+              End;
             End;
           End
          Else

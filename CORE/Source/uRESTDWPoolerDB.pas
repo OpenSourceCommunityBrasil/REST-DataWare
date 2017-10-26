@@ -2050,7 +2050,7 @@ Begin
         vRESTDataBase.ApplyUpdates(TMassiveDatasetBuffer(vMassiveDataset), Nil,  vParams, vError, vErrorMSG, vResult, vRESTClientPooler);
        Result := Not vError;
        Error  := vErrorMSG;
-       If Assigned(vResult) Then
+       If Assigned(vResult) And (vAutoRefreshAfterCommit) Then
         Begin
          Try
           vActive := False;

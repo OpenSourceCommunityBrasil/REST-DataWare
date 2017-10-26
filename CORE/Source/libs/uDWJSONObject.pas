@@ -96,7 +96,7 @@ Public
  Procedure LoadFromJSON   (bValue       : String);
  Procedure LoadFromStream (Stream       : TMemoryStream;
                            Encode       : Boolean = True);
- Procedure SaveToStream   (Stream       : TMemoryStream);
+ Procedure SaveToStream   (Stream       : TMemoryStream; Binary : Boolean = False);
  Function  ToJSON  : String;
  Procedure SetValue       (Value        : String;
                            Encode       : Boolean = True);
@@ -107,6 +107,7 @@ Public
  Property    TypeObject      : TTypeObject      Read vTypeObject      Write vTypeObject;
  Property    ObjectDirection : TObjectDirection Read vObjectDirection Write vObjectDirection;
  Property    ObjectValue     : TObjectValue     Read vObjectValue     Write vObjectValue;
+ Property    Binary          : Boolean          Read vBinary          Write vBinary;
  {$IFNDEF FPC}
  {$IF CompilerVersion > 21}
  Property    Encoding        : TEncoding        Read vEncoding        Write vEncoding;
@@ -665,7 +666,6 @@ If vObjectValue = ovString Then
  End
 Else
  Result := vTempString;
-
 {$ELSE}
  If Length(vTempString) > 0 Then
   Begin
@@ -790,6 +790,7 @@ Var
           vTempValue := Format('"%s"', [vStringStream.DataString])
         Finally
          vStringStream.Free;
+         bStream.Free;
         End;
        End
       Else
@@ -1611,13 +1612,19 @@ Begin
                                           {$IFNDEF FPC}{$IF CompilerVersion > 21},
                                           ftParams, ftStream{$IFEND}{$ENDIF}] Then
           Begin
-           If vEncoded Then
+           If (vEncoded) And (bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString <> 'null') Then
             HexStringToStream(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString, vBlobStream)
            Else
-            vBlobStream := TStringStream.Create(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString);
+            Begin
+             If (bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString <> 'null') Then
+              vBlobStream := TStringStream.Create(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString)
+             Else
+              vBlobStream := TStringStream.Create('');
+            End;
            Try
             vBlobStream.Position := 0;
-            TBlobField(DestDS.Fields[I]).LoadFromStream(vBlobStream);
+            If (bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString <> 'null') Then
+             TBlobField(DestDS.Fields[I]).LoadFromStream(vBlobStream);
            Finally
             {$IFNDEF FPC}
             {$IF CompilerVersion > 21}
@@ -1685,10 +1692,13 @@ Begin
 End;
 {$IFEND}
 
-Procedure TJSONValue.SaveToStream(Stream: TMemoryStream);
+Procedure TJSONValue.SaveToStream(Stream: TMemoryStream; Binary : Boolean = False);
 Begin
  Try
-  Stream.Write(aValue[0], Length(aValue));
+  If Not Binary Then
+   Stream.Write(aValue[0], Length(aValue))
+  Else
+   HexToStream(Value, Stream);
  Finally
   Stream.Position := 0;
  End;
@@ -1815,25 +1825,43 @@ Procedure TJSONValue.LoadFromStream(Stream : TMemoryStream;
                                     Encode : Boolean = True);
 Begin
  ObjectValue := ovBlob;
+ vBinary     := True;
  SetValue(StreamToHex(Stream), Encode);
 End;
 
 Procedure TJSONValue.SetValue      (Value  : String;
                                     Encode : Boolean);
 Begin
- vBinary := False;
  vEncoded := Encode;
  vNullValue := False;
  If Encode Then
   Begin
    If vObjectValue in [ovBytes,   ovVarBytes, ovBlob,
                        ovGraphic, ovOraBlob,  ovOraClob] Then
-    WriteValue(Value)
+    Begin
+     vBinary := True;
+     WriteValue(Value);
+    End
    Else
-    WriteValue(EncodeStrings(Value{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}))
+    Begin
+     vBinary := False;
+     WriteValue(EncodeStrings(Value{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}))
+    End;
   End
  Else
-  WriteValue(Value);
+  Begin
+   If vObjectValue in [ovBytes,   ovVarBytes, ovBlob,
+                       ovGraphic, ovOraBlob,  ovOraClob] Then
+    Begin
+     vBinary := True;
+     WriteValue(Value);
+    End
+   Else
+    Begin
+     vBinary := False;
+     WriteValue(Value);
+    End;
+  End;
 End;
 
 Procedure TJSONValue.WriteValue(bValue: String);

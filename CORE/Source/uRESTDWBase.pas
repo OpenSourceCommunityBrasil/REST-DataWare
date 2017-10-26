@@ -1554,7 +1554,10 @@ Begin
            If DWParams.ItemsString['Result'] <> Nil Then
             Begin
              If vTempJSON <> Nil Then
-              DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON)
+              Begin
+               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON);
+               vTempJSON.Free;
+              End
              Else
               DWParams.ItemsString['Result'].SetValue('');
             End;
