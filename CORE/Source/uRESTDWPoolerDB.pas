@@ -463,8 +463,8 @@ Type
   Property Compression       : Boolean          Read vCompression     Write vCompression;
   Property EncodeStringsJSON : Boolean          Read vEncodeStrings   Write vEncodeStrings;
   Property Encoding          : TEncodeSelect    Read vEncoding        Write vEncoding;
- {$IFDEF FPC}
  Published
+ {$IFDEF FPC}
   Property DatabaseCharSet   : TDatabaseCharSet Read vDatabaseCharSet Write vDatabaseCharSet;
  {$ENDIF}
   Property CommitRecords     : Integer          Read vCommitRecords   Write vCommitRecords;
