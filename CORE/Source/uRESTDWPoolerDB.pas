@@ -17,7 +17,7 @@ uses SysUtils,  Classes,      uDWJSONObject,
      DB,        uRESTDWBase,  uDWPoolerMethod,
      uRESTDWMasterDetailData, uDWConstsData, uDWMassiveBuffer, SyncObjs
      {$IFDEF FPC}
-      ,memds;
+      , uDWConsts, memds;
      {$ELSE}
        {$IFDEF RESJEDI}
         , JvMemoryDataset
