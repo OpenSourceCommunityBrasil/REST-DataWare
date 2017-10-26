@@ -1157,7 +1157,8 @@ object Form2: TForm2
   end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1
-    Left = 440
+    Left = 240
+    Top = 96
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
     AfterInsert = RESTDWClientSQL1AfterInsert
@@ -1243,9 +1244,10 @@ object Form2: TForm2
     UpdateTableName = 'employee'
     CacheUpdateRecords = True
     AutoCommitData = False
-    AutoRefreshAfterCommit = True
+    AutoRefreshAfterCommit = False
     InBlockEvents = False
-    Left = 344
+    Left = 240
+    Top = 48
     object RESTDWClientSQL1EMP_NO: TSmallintField
       FieldName = 'EMP_NO'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
@@ -1302,7 +1304,6 @@ object Form2: TForm2
     OnBeforeConnect = RESTDWDataBase1BeforeConnect
     Active = False
     Compression = True
-    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False

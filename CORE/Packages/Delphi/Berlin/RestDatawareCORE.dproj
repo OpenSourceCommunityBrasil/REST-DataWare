@@ -145,8 +145,8 @@
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Build>16</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.3.1.16;InternalName=REST Dataware CORE Version;LegalCopyright=REST Dataware CORE Version;LegalTrademarks=REST Dataware CORE Version;OriginalFilename=REST Dataware CORE Version;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.3.1;Comments=</VerInfo_Keys>
+        <VerInfo_Build>18</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.3.1.18;InternalName=REST Dataware CORE Version;LegalCopyright=REST Dataware CORE Version;LegalTrademarks=REST Dataware CORE Version;OriginalFilename=REST Dataware CORE Version;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.3.1;Comments=</VerInfo_Keys>
         <VerInfo_Release>1</VerInfo_Release>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>

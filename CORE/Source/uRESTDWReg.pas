@@ -83,13 +83,14 @@ Begin
  RegisterPropertyEditor(TypeInfo(String), TRESTDWDataBase, 'PoolerName', TPoolersList);
 End;
 
-{$IFDEF FPC}
 initialization
+{$IFDEF FPC}
 {$I resteasyobjectscore.lrs}
 {$ELSE}
 {$if CompilerVersion < 21}
  {$R ..\Packages\Delphi\D7\RestEasyObjectsCORE.dcr}
 {$IFEND}
+UnlistPublishedProperty(TRESTDWClientSQL, 'CachedUpdates');
 {$ENDIF}
 
 end.
