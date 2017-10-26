@@ -89,15 +89,15 @@ Type
   EventType         : TSendEvent;
   FCallBack         : TCallBack;
  Private
-  Procedure SetParams(HttpRequest:TIdHTTP);
-  function GetHttpRequest(): TIdHTTP;
+  Procedure SetParams(HttpRequest : TIdHTTP);
+  Function  GetHttpRequest : TIdHTTP;
  Protected
-  Procedure Execute; override;
+  Procedure Execute;  Override;
  Public
   Constructor Create;
-  Destructor Destroy; override;
-  Property CallBack:TCallBack read FCallBack write FCallBack;
-  Property HttpRequest:TIdHTTP read GetHttpRequest;
+  Destructor Destroy; Override;
+  Property CallBack:TCallBack  Read FCallBack Write FCallBack;
+  Property HttpRequest:TIdHTTP Read GetHttpRequest;
  End;
  TProxyOptions = Class(TPersistent)
  Private
@@ -154,37 +154,37 @@ Type
   vServerContext,
   ASSLPrivateKeyFile,
   ASSLPrivateKeyPassword,
+  FRootPath,
   ASSLCertFile     : String;
   VEncondig        : TEncodeSelect;              //Enconding se usar CORS usar UTF8 - Alexandre Abade
-  FRootPath : String;
-  Procedure GetSSLPassWord(Var Password: String);
-  Procedure SetActive(Value : Boolean);
+  Procedure GetSSLPassWord (Var Password              : String);
+  Procedure SetActive      (Value                     : Boolean);
   Function  GetSecure : Boolean;
-  Procedure SetServerMethod(Value : TComponentClass);
-  Procedure GetPoolerList(ServerMethodsClass : TComponent;
-                          Var PoolerList     : String);
-  Function  ServiceMethods(BaseObject   : TComponent;
-                           AContext     : TIdContext;
-                           UrlMethod    : String;
-                           Var DWParams : TDWParams;
-                           Var JSONStr  : String) : Boolean;
-  Procedure EchoPooler(ServerMethodsClass : TComponent;
-                       AContext           : TIdContext;
-                       Var Pooler, MyIP   : String);
+  Procedure SetServerMethod(Value                     : TComponentClass);
+  Procedure GetPoolerList(ServerMethodsClass          : TComponent;
+                          Var PoolerList              : String);
+  Function  ServiceMethods(BaseObject                 : TComponent;
+                           AContext                   : TIdContext;
+                           UrlMethod                  : String;
+                           Var DWParams               : TDWParams;
+                           Var JSONStr                : String) : Boolean;
+  Procedure EchoPooler    (ServerMethodsClass         : TComponent;
+                           AContext                   : TIdContext;
+                           Var Pooler, MyIP           : String);
   Procedure ExecuteCommandPureJSON(ServerMethodsClass : TComponent;
                                    Var Pooler         : String;
                                    Var DWParams       : TDWParams);
   Procedure ExecuteCommandJSON(ServerMethodsClass     : TComponent;
                                Var Pooler             : String;
                                Var DWParams           : TDWParams);
-  Procedure InsertMySQLReturnID(ServerMethodsClass : TComponent;
-                                Var Pooler         : String;
-                                Var DWParams       : TDWParams);
-  Procedure ApplyUpdatesJSON   (ServerMethodsClass : TComponent;
-                                Var Pooler         : String;
-                                Var DWParams       : TDWParams);
+  Procedure InsertMySQLReturnID(ServerMethodsClass    : TComponent;
+                                Var Pooler            : String;
+                                Var DWParams          : TDWParams);
+  Procedure ApplyUpdatesJSON   (ServerMethodsClass    : TComponent;
+                                Var Pooler            : String;
+                                Var DWParams          : TDWParams);
  Public
-  Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
+  Constructor Create           (AOwner                : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                      //Destroy a Classe
  Published
   Property Active                : Boolean         Read vActive                Write SetActive;
@@ -248,12 +248,12 @@ Type
   Procedure SetUrlPath (Value : String);
  Public
   //Métodos, Propriedades, Variáveis, Procedures e Funções Publicas
-  Function    SendEvent(EventData  : String) : String;Overload;
+  Function    SendEvent(EventData  : String)           : String;Overload;
   Function    SendEvent(EventData  : String;
                         Var Params : TDWParams;
                         EventType  : TSendEvent = sePOST;
                         CallBack   : TCallBack  = Nil) : String;Overload;
-  Constructor Create(AOwner: TComponent);Override;
+  Constructor Create   (AOwner     : TComponent);Override;
   Destructor  Destroy;Override;
  Published
   //Métodos e Propriedades
@@ -2344,10 +2344,10 @@ Begin
  HttpRequest.ReadTimeout := vRequestTimeout;
 End;
 
-function TThread_Request.GetHttpRequest(): TIdHTTP;
-begin
-  result :=FHttpRequest;
-end;
+Function TThread_Request.GetHttpRequest : TIdHTTP;
+Begin
+ Result := FHttpRequest;
+End;
 
 procedure TThread_Request.Execute;
 Var

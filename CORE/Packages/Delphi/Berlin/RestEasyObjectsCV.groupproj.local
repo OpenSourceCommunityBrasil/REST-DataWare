@@ -2,6 +2,6 @@
 <BorlandProject>
 	<Transactions/>
 	<Default.Personality>
-		<Projects ActiveProject="D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj"/>
+		<Projects ActiveProject="D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServer\Client\RestDWClientProject.dproj"/>
 	</Default.Personality>
 </BorlandProject>

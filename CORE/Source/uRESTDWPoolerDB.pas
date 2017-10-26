@@ -15,21 +15,22 @@ interface
 
 uses SysUtils,  Classes,      uDWJSONObject,
      DB,        uRESTDWBase,  uDWPoolerMethod,
-     uRESTDWMasterDetailData, uDWConstsData, uDWMassiveBuffer, SyncObjs
+     uRESTDWMasterDetailData, uDWConstsData,
+     uDWMassiveBuffer,        SyncObjs
      {$IFDEF FPC}
-      , uDWConsts, memds;
+     , uDWConsts,             memds;
      {$ELSE}
        {$IFDEF RESJEDI}
-        , JvMemoryDataset
+       , JvMemoryDataset
        {$ENDIF}
        {$IFDEF RESTKBMMEMTABLE}
-        , kbmmemtable
+       , kbmmemtable
        {$ENDIF}
        {$IF CompilerVersion > 21} // Delphi 2010 pra cima
         {$IFDEF RESTFDMEMTABLE}
-         , FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
-         FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-         FireDAC.Comp.DataSet, FireDAC.Comp.Client
+        , FireDAC.Stan.Intf,  FireDAC.Stan.Option,  FireDAC.Stan.Param,
+        FireDAC.Stan.Error,   FireDAC.DatS,         FireDAC.Phys.Intf,
+        FireDAC.DApt.Intf,    FireDAC.Comp.DataSet, FireDAC.Comp.Client
         {$ENDIF}
        {$IFEND}, uDWConsts;
      {$ENDIF}
@@ -284,7 +285,7 @@ Type
   Procedure   SetSQL             (Value   : TStringList);   //Seta o SQL a ser usado
   Procedure   CreateParams;                                 //Cria os Parametros na lista de Dataset
   Procedure   SetDataBase        (Value   : TRESTDWDataBase); //Diz o REST Database
-  Function    GetData : Boolean;                            //Recebe os Dados da Internet vindo do Servidor REST
+  Function    GetData(DataSet  : TJSONValue = Nil) : Boolean;                            //Recebe os Dados da Internet vindo do Servidor REST
   Procedure   SetUpdateTableName (Value   : String);        //Diz qual a tabela que será feito Update no Banco
   Procedure   OldAfterPost       (DataSet : TDataSet);      //Eventos do Dataset para realizar o AfterPost
   Procedure   OldAfterDelete     (DataSet : TDataSet);      //Eventos do Dataset para realizar o AfterDelete
@@ -2050,7 +2051,40 @@ Begin
        Result := Not vError;
        Error  := vErrorMSG;
        If Assigned(vResult) Then
-        FreeAndNil(vResult);
+        Begin
+         Try
+          vActive := False;
+          ProcBeforeOpen(Self);
+          vInBlockEvents := True;
+          Filter         := '';
+          Filtered       := False;
+          vActive        := GetData(vResult);
+          If State = dsBrowse Then
+           Begin
+            If Trim(vUpdateTableName) <> '' Then
+             TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vUpdateTableName));
+            PrepareDetails(True);
+           End
+          Else If State = dsInactive Then
+           PrepareDetails(False);
+         Except
+          On E : Exception do
+           Begin
+            vInBlockEvents := False;
+            If csDesigning in ComponentState Then
+             Raise Exception.Create(PChar(E.Message))
+            Else
+             Begin
+              If Assigned(vOnGetDataError) Then
+               vOnGetDataError(False, E.Message)
+              Else
+               Raise Exception.Create(PChar(E.Message));
+             End;
+           End;
+         End;
+         If Assigned(vResult) Then
+          FreeAndNil(vResult);
+        End;
       End
      Else
       Error := 'Empty Database Property';
@@ -2441,7 +2475,7 @@ Begin
   End;
 End;
 
-Function TRESTDWClientSQL.GetData : Boolean;
+Function TRESTDWClientSQL.GetData(DataSet  : TJSONValue = Nil) : Boolean;
 Var
  LDataSetList  : TJSONValue;
  vError        : Boolean;
@@ -2453,7 +2487,13 @@ Begin
  If Assigned(vRESTDataBase) Then
   Begin
    Try
-    vRESTDataBase.ExecuteCommand(vSQL, vParams, vError, vMessageError, LDataSetList, False, vRESTClientPooler);
+    If DataSet = Nil Then
+     vRESTDataBase.ExecuteCommand(vSQL, vParams, vError, vMessageError, LDataSetList, False, vRESTClientPooler)
+    Else
+     Begin
+      vError := False;
+      LDataSetList := DataSet;
+     End;
     If (Assigned(LDataSetList)) And (Not (vError)) Then
      Begin
       Try
@@ -2468,7 +2508,8 @@ Begin
      End;
    Except
    End;
-   If LDataSetList <> Nil Then
+   If (LDataSetList <> Nil) And
+      (DataSet = Nil) Then
     FreeAndNil(LDataSetList);
    If vError Then
     Begin

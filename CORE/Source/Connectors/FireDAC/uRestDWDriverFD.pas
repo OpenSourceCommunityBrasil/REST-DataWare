@@ -656,6 +656,7 @@ Var
    MassiveDataset.FromJSON(Massive);
    MassiveDataset.First;
    B             := 1;
+   Result        := True;
    For A := 1 To MassiveDataset.RecordCount Do
     Begin
      If Not vFDConnection.InTransaction Then
@@ -667,7 +668,8 @@ Var
      Except
       On E : Exception do
        Begin
-        Error := True;
+        Error  := True;
+        Result := False;
         If vFDConnection.InTransaction Then
          vFDConnection.Rollback;
         MessageError := E.Message;
@@ -682,7 +684,8 @@ Var
        Except
         On E : Exception do
          Begin
-          Error := True;
+          Error  := True;
+          Result := False;
           If vFDConnection.InTransaction Then
            vFDConnection.Rollback;
           MessageError := E.Message;
@@ -701,9 +704,11 @@ Var
    Except
     On E : Exception do
      Begin
+      Error  := True;
+      Result := False;
       If vFDConnection.InTransaction Then
        vFDConnection.Rollback;
-      Raise Exception.Create(E.Message);
+      MessageError := E.Message;
      End;
    End;
   Finally
