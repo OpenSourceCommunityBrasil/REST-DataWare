@@ -362,7 +362,7 @@ Begin
    HexToBin(PChar (Str), TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
    {$ELSE}
     {$IF CompilerVersion > 21} // Delphi 2010 pra cima
-    {$IFDEF LINUX} //Android}
+    {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
      SetLength(bytes, Length(str) div 2);
      HexToBin(PChar(str), 0, bytes, 0, Length(bytes));
      stream.WriteBuffer(bytes[0], length(bytes));

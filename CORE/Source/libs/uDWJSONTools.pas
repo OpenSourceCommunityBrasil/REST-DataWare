@@ -35,7 +35,7 @@ Function  GetPairJSON  (Tag,
   Function  DecodeBase64 (Const Value : String)             : String;
   Function  EncodeBase64 (Const Value : String)             : String;
 {$ELSE}
-{$IFDEF LINUX}
+{$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
   Function  DecodeBase64 (Const Value : String)             : String;
   Function  EncodeBase64 (Const Value : String)             : String;
 {$ELSE}
@@ -61,7 +61,7 @@ Uses SysTypes;
 {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
 Function Decode4to3Ex(const Value, Table: String): String;
 {$ELSE}
-{$IFDEF LINUX} 
+{$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
 Function Decode4to3Ex(const Value, Table: String): String;
 {$ELSE}
 Function Decode4to3Ex(const Value, Table: AnsiString): AnsiString;
@@ -99,7 +99,7 @@ Begin
    Inc(p);
    Result[p] := Char(d and $ff);
    {$ELSE}
-   {$IFDEF LINUX} //Android}
+   {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
    Result[p] := Char((d shr 16) and $ff);
    Inc(p);
    Result[p] := Char((d shr 8) and $ff);
@@ -126,7 +126,7 @@ Begin
        Result[p] := Char(d and $ff);
        Inc(p);
        {$ELSE}
-       {$IFDEF LINUX} //Android}
+       {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
        Result[p] := Char((d shr 8) and $ff);
        Inc(p);
        Result[p] := Char(d and $ff);
@@ -145,7 +145,7 @@ Begin
         Result[p] := Char(d and $ff);
         Inc(p);
        {$ELSE}
-       {$IFDEF LINUX}
+       {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
         Result[p] := Char(d and $ff);
         Inc(p);
        {$ELSE}
@@ -205,7 +205,7 @@ End;
 {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
 Function Encode3to4(Const Value, Table : String) : String;
 {$ELSE}
-{$IFDEF LINUX} //ANDROID}
+{$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
 Function Encode3to4(Const Value, Table : String) : String;
 {$ELSE}
 Function Encode3to4(Const Value, Table : AnsiString) : AnsiString;
@@ -271,7 +271,7 @@ End;
 {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
 Function DecodeBase64(Const Value : String) : String;
 {$ELSE}
-{$IFDEF LINUX}
+{$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
   Function  DecodeBase64 (Const Value : String)             : String;
 {$ELSE}
   Function DecodeBase64(Const Value : AnsiString
@@ -301,7 +301,7 @@ End;
 {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
 Function EncodeBase64(Const Value : String) : String;
 {$ELSE}
-{$IFDEF LINUX} //ANDROID}
+{$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
 Function EncodeBase64(Const Value : String) : String;
 {$ELSE}
   Function EncodeBase64(Const Value : AnsiString
@@ -370,7 +370,7 @@ Begin
       HexToBin(PWideChar(value), 0, bytes, 0, Length(bytes));
       Result:= TEncoding.UTF8.GetString(bytes);
      {$ELSE}
-     {$IFDEF LINUX}
+     {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
       SetLength(bytes, Length(value) div 2);
       HexToBin(PWideChar(value), 0, bytes, 0, Length(bytes));
       Result:= TEncoding.UTF8.GetString(bytes);
@@ -408,7 +408,7 @@ Begin
     HexToBin(PWideChar(value), 0, bytes, 0, Length(bytes));
     BinaryStream.write(bytes,length(bytes));
    {$ELSE}
-   {$IFDEF LINUX} //Android}
+   {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
     SetLength(bytes, Length(value) div 2);
     HexToBin(PWideChar(value), 0, bytes, 0, Length(bytes));
     BinaryStream.write(bytes,length(bytes));
@@ -434,7 +434,7 @@ Begin
    {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
    BinaryStream := TStringStream.Create(String(Utf8Encode(Value)), TEncoding.ANSI);
    {$ELSE}
-   {$IFDEF LINUX}
+   {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
    BinaryStream := TStringStream.Create(String(Utf8Encode(Value)), TEncoding.ANSI);
    {$ELSE}
    BinaryStream := TStringStream.Create(AnsiString(Utf8Encode(Value)), TEncoding.ANSI);
@@ -454,7 +454,7 @@ Begin
    HexToBin(PWideChar(value), 0, bytes, 0, Length(bytes));
    Result:= TEncoding.UTF8.GetString(bytes);
   {$ELSE}
-  {$IFDEF LINUX} //Android}
+  {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
    SetLength(bytes, Length(value) div 2);
    HexToBin(PWideChar(value), 0, bytes, 0, Length(bytes));
    Result:= TEncoding.UTF8.GetString(bytes);
@@ -480,7 +480,7 @@ Begin
    HexToBin(PWideChar(value), 0, bytes, 0, Length(bytes));
    Result:= TEncoding.UTF8.GetString(bytes);
   {$ELSE}
-  {$IFDEF LINUX} //Android}
+  {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
    SetLength(bytes, TMemoryStream(Value).Size * 2);
    HexToBin(PWideChar(value), 0, bytes, 0, Length(bytes));
    Result:= TEncoding.UTF8.GetString(bytes);

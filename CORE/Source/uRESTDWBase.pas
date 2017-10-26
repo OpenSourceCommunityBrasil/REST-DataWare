@@ -1725,7 +1725,11 @@ Var
  msgEnd             : Boolean;
  mb,
  ms                 : TStringStream;
+ {$IFDEF FPC}
+ CS                 : TRTLcriticalsection;
+ {$ELSE}
  CS                 : Tcriticalsection;
+ {$ENDIF}
  Function GetParamsReturn(Params : TDWParams) : String;
  Var
   A, I : Integer;
@@ -1949,7 +1953,7 @@ Begin
           vCriticalSection.Acquire;
          {$IFEND}
          {$ELSE}
-          InitializeCriticalSection(vCriticalSection);
+          InitCriticalSection(vCriticalSection);
           EnterCriticalSection(vCriticalSection);
          {$ENDIF}
           Try
@@ -1971,7 +1975,7 @@ Begin
          {$IFEND}
          {$ELSE}
           LeaveCriticalSection(vCriticalSection);
-          DeleteCriticalSection(vCriticalSection);
+          DoneCriticalSection(vCriticalSection);
          {$ENDIF}
          End;
         End;
@@ -2069,7 +2073,7 @@ Begin
            vCriticalSection.Acquire;
          {$IFEND}
          {$ELSE}
-          InitializeCriticalSection(vCriticalSection);
+          InitCriticalSection(vCriticalSection);
           EnterCriticalSection(vCriticalSection);
          {$ENDIF}
          Try
@@ -2090,7 +2094,7 @@ Begin
          {$IFEND}
          {$ELSE}
           LeaveCriticalSection(vCriticalSection);
-          DeleteCriticalSection(vCriticalSection);
+          DoneCriticalSection(vCriticalSection);
          {$ENDIF}
          End;
         End;

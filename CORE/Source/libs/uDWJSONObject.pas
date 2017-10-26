@@ -17,7 +17,7 @@ Uses
  {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
    ,system.json, FMX.Types
  {$IFEND}
- {$IFDEF LINUX}
+ {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
  ,system.json
  {$ENDIF}
  {$ENDIF}
@@ -351,7 +351,7 @@ Begin
 End;
 
 {$IFDEF POSIX}
-{$IFDEF LINUX}
+{$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
 Procedure TDWParams.FromJSON(JSON: String);
 Var
  bJsonOBJ,
@@ -1938,7 +1938,7 @@ Begin
  SetValue(StreamToHex(Stream), False);
 End;
 
-{$IFDEF LINUX}
+{$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
 Procedure TJSONParam.FromJSON(JSON: String);
 Var
  bJsonValue : system.json.TJsonObject;
