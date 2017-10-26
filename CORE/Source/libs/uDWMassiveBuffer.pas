@@ -17,7 +17,7 @@ Type
  Protected
  Public
   Constructor Create;
-  Destructor  Free;
+  Destructor  Destroy;Override;
   Procedure   LoadFromStream(Stream : TMemoryStream);
   Procedure   SaveToStream  (Stream : TMemoryStream);
   Property    Value          : String  Read GetValue Write SetValue;
@@ -335,9 +335,10 @@ Begin
  vJSONValue := TJSONValue.Create;
 End;
 
-Destructor TMassiveValue.Free;
+Destructor TMassiveValue.Destroy;
 Begin
  FreeAndNil(vJSONValue);
+ Inherited;
 End;
 
 Function TMassiveValue.GetValue: String;
