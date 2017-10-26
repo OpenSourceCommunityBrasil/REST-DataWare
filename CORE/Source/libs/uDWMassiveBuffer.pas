@@ -133,6 +133,7 @@ Type
   vMassiveMode   : TMassiveMode;
   vTableName     : String;
  Private
+  Procedure ReadStatus;
   Procedure NewLineBuffer(Var MassiveLineBuff : TMassiveLine;
                           MassiveModeData     : TMassiveMode);
  Public
@@ -144,6 +145,8 @@ Type
   Procedure Prior;
   Procedure Next;
   Procedure Last;
+  Function  PrimaryKeys : TStringList;
+  Function  AtualRec    : TMassiveLine;
   Procedure NewBuffer   (Dataset              : TRESTDWClientSQLBase;
                          MassiveModeData      : TMassiveMode); Overload;
   Procedure NewBuffer   (Var MassiveLineBuff  : TMassiveLine;
@@ -743,6 +746,12 @@ Begin
  End;
 End;
 
+Function TMassiveDatasetBuffer.AtualRec : TMassiveLine;
+Begin
+ If RecordCount > 0 Then
+  Result := vMassiveBuffer.Items[vRecNo -1];
+End;
+
 Procedure TMassiveDatasetBuffer.BuildBuffer(Dataset     : TRESTDWClientSQLBase;
                                             MassiveMode : TMassiveMode;
                                             UpdateTag   : Boolean = False);
@@ -830,7 +839,10 @@ End;
 Procedure TMassiveDatasetBuffer.First;
 Begin
  If RecordCount > 0 Then
-  vRecNo := 1;
+  Begin
+   vRecNo := 1;
+   ReadStatus;
+  End;
 End;
 
 Procedure TMassiveDatasetBuffer.Last;
@@ -839,6 +851,7 @@ Begin
   Begin
    If vRecNo <> RecordCount Then
     vRecNo := RecordCount;
+   ReadStatus;
   End;
 End;
 
@@ -872,6 +885,22 @@ Begin
   Begin
    If vRecNo < RecordCount Then
     Inc(vRecNo);
+   ReadStatus;
+  End;
+End;
+
+Function TMassiveDatasetBuffer.PrimaryKeys : TStringList;
+Var
+ I : Integer;
+Begin
+ Result := TStringList.Create;
+ If vMassiveFields <> Nil Then
+  Begin
+   For I := 0 To vMassiveFields.Count -1 Do
+    Begin
+     If vMassiveFields.Items[I].vKeyField Then
+      Result.Add(vMassiveFields.Items[I].vFieldName);
+    End;
   End;
 End;
 
@@ -881,7 +910,16 @@ Begin
   Begin
    If vRecNo > 1 Then
     Dec(vRecNo);
+   ReadStatus;
   End;
+End;
+
+Procedure TMassiveDatasetBuffer.ReadStatus;
+Begin
+ If RecordCount > 0 Then
+  vMassiveMode := StringToMassiveMode(vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[0].Value)
+ Else
+  vMassiveMode := mmInactive;
 End;
 
 Function TMassiveDatasetBuffer.RecNo : Integer;

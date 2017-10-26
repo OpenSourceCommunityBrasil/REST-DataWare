@@ -115,10 +115,8 @@ object RestDWForm: TRestDWForm
     Align = alTop
     Anchors = []
     TabOrder = 3
-    ExplicitWidth = 520
     object tsConfigs: TTabSheet
       Caption = 'Configuration'
-      ExplicitWidth = 512
       DesignSize = (
         515
         346)
@@ -1415,6 +1413,10 @@ object RestDWForm: TRestDWForm
     object tsLogs: TTabSheet
       Caption = 'Logs'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label19: TLabel
         Left = 7
         Top = 147

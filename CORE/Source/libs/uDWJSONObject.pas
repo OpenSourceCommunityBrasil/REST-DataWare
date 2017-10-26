@@ -1302,6 +1302,7 @@ Var
  A, J, I        : Integer;
  FieldDef       : TFieldDef;
  Field          : TField;
+ vOldReadOnly,
  vFindFlag      : Boolean;
  vBlobStream    : TStringStream;
  ListFields     : TStringList;
@@ -1597,8 +1598,13 @@ Begin
       Try
        For I := 0 To DestDS.Fields.Count - 1 Do
         Begin
+         vOldReadOnly := DestDS.Fields[I].ReadOnly;
+         DestDS.Fields[I].ReadOnly := False;
          If (StrToInt(ListFields[I]) = -1) Or Not(DestDS.Fields[I].FieldKind = fkData) Then
-          Continue;
+          Begin
+           DestDS.Fields[I].ReadOnly := vOldReadOnly;
+           Continue;
+          End;
          If DestDS.Fields[I].DataType In [ftGraphic,     ftParadoxOle, ftDBaseOle,
                                           ftTypedBinary, ftCursor,     ftDataSet,
                                           ftBlob,        ftOraBlob,    ftOraClob
@@ -1649,6 +1655,7 @@ Begin
               End;
             End;
           End;
+         DestDS.Fields[I].ReadOnly := vOldReadOnly;
         End;
       Finally
        If Assigned(bJsonOBJ) Then
