@@ -824,8 +824,7 @@ Begin
           End;
         End;
        vTempQuery.Open;
-       If Result = Nil Then
-        Result         := TJSONValue.Create;
+       Result         := TJSONValue.Create;
        Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
        Error         := False;
       Except
