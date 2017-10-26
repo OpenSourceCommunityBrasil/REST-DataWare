@@ -19,7 +19,7 @@ Uses
  {$IFEND}
  {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
  ,system.json
- {$ENDIF}
+ {$IFEND}
  {$ENDIF}
  {$IFDEF RESJEDI}
   ,JvMemoryDataset
@@ -398,7 +398,7 @@ End;
     raise Exception.Create('Nao Usado no android)');//Não usado no android ainda
 
  End;
-{$ENDIF}
+{$IFEND}
 {$ELSE}
 Procedure TDWParams.FromJSON(JSON: String);
 Var
@@ -1982,7 +1982,7 @@ Begin
   bJsonValue.Free;
  End;
 End;
-{$ENDIF}
+{$IFEND}
 
 Procedure TJSONParam.CopyFrom(JSONParam: TJSONParam);
 Var

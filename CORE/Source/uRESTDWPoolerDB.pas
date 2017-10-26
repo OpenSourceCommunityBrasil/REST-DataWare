@@ -15,7 +15,7 @@ interface
 
 uses SysUtils,  Classes,      uDWJSONObject,
      DB,        uRESTDWBase,  uDWPoolerMethod,
-     uRESTDWMasterDetailData, uDWConsts, uDWConstsData, uDWMassiveBuffer, SyncObjs
+     uRESTDWMasterDetailData, uDWConstsData, uDWMassiveBuffer, SyncObjs
      {$IFDEF FPC}
       ,memds;
      {$ELSE}
@@ -31,7 +31,7 @@ uses SysUtils,  Classes,      uDWJSONObject,
          FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
          FireDAC.Comp.DataSet, FireDAC.Comp.Client
         {$ENDIF}
-       {$IFEND};
+       {$IFEND}, uDWConsts;
      {$ENDIF}
 
 Type
@@ -1844,8 +1844,8 @@ Begin
   Begin
    If Trim(vUpdateTableName) <> '' Then
     Begin
-     TMassiveDatasetBuffer(vMassiveDataset).NewBuffer(Self,  TMassiveMode.mmUpdate);
-     TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, TMassiveMode.mmUpdate);
+     TMassiveDatasetBuffer(vMassiveDataset).NewBuffer(Self,  mmUpdate);
+     TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmUpdate);
     End;
    If Assigned(vBeforeEdit) Then
     vBeforeEdit(Dataset);

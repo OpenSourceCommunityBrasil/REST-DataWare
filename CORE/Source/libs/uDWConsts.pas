@@ -368,7 +368,7 @@ Begin
      stream.WriteBuffer(bytes[0], length(bytes));
     {$ELSE}
      HexToBin(PWideChar (Str),   TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
-     {$ENDIF}
+    {$IFEND}
     {$ELSE}
      HexToBin(PChar (Str),   TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
     {$IFEND}

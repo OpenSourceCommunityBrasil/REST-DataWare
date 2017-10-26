@@ -43,7 +43,7 @@ Function  GetPairJSON  (Tag,
                           {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : AnsiString;
   Function  EncodeBase64 (Const Value : AnsiString
                           {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF})             : AnsiString;
-{$ENDIF}
+{$IFEND}
 {$IFEND}
 Function  EncodeStrings(Value       : String
                         {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF})                 : String;
@@ -65,7 +65,7 @@ Function Decode4to3Ex(const Value, Table: String): String;
 Function Decode4to3Ex(const Value, Table: String): String;
 {$ELSE}
 Function Decode4to3Ex(const Value, Table: AnsiString): AnsiString;
-{$ENDIF}
+{$IFEND}
 {$IFEND}
 Var
  p,  x, y,
@@ -111,7 +111,7 @@ Begin
    Result[p] := AnsiChar((d shr 8) and $ff);
    Inc(p);
    Result[p] := AnsiChar(d and $ff);
-   {$ENDIF}
+   {$IFEND}
    {$IFEND}
    Inc(p);
    d := 0;
@@ -136,7 +136,7 @@ Begin
        Inc(p);
        Result[p] := AnsiChar(d and $ff);
        Inc(p);
-       {$ENDIF}
+       {$IFEND}
        {$IFEND}
       End;
   2 : Begin
@@ -151,7 +151,7 @@ Begin
        {$ELSE}
         Result[p] := AnsiChar(d and $ff);
        Inc(p);
-       {$ENDIF}
+       {$IFEND}
        {$IFEND}
       End;
  End;
@@ -209,7 +209,7 @@ Function Encode3to4(Const Value, Table : String) : String;
 Function Encode3to4(Const Value, Table : String) : String;
 {$ELSE}
 Function Encode3to4(Const Value, Table : AnsiString) : AnsiString;
-{$ENDIF}
+{$IFEND}
 {$IFEND}
 Begin
  Result := Encode64(Value);
@@ -276,7 +276,7 @@ Function DecodeBase64(Const Value : String) : String;
 {$ELSE}
   Function DecodeBase64(Const Value : AnsiString
                        {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : AnsiString;
-  {$ENDIF}
+  {$IFEND}
 {$IFEND}
 Var
  vValue : String;
@@ -306,7 +306,7 @@ Function EncodeBase64(Const Value : String) : String;
 {$ELSE}
   Function EncodeBase64(Const Value : AnsiString
                         {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : AnsiString;
-{$ENDIF}
+{$IFEND}
 {$IFEND}
 Var
  vValue : String;
@@ -377,7 +377,7 @@ Begin
      {$ELSE}
       HexToBin(PChar(Value), TMemoryStream(BinaryStream).Memory, BinaryStream.Size);
       Result := BinaryStream.DataString;
-    {$ENDIF}
+    {$IFEND}
     {$IFEND}
    End;
  Finally
@@ -416,7 +416,7 @@ Begin
     BinaryStream.Size := Length(Value) div 2;
     If BinaryStream.Size > 0 Then
     HexToBin(PChar(Value), TMemoryStream(BinaryStream).Memory, BinaryStream.Size);
-   {$ENDIF}
+   {$IFEND}
    {$IFEND}
  Except
  End;
@@ -438,7 +438,7 @@ Begin
    BinaryStream := TStringStream.Create(String(Utf8Encode(Value)), TEncoding.ANSI);
    {$ELSE}
    BinaryStream := TStringStream.Create(AnsiString(Utf8Encode(Value)), TEncoding.ANSI);
-   {$ENDIF}
+   {$IFEND}
    {$IFEND}
   {$ELSE}
    BinaryStream := TStringStream.Create(Value);
@@ -460,7 +460,7 @@ Begin
    Result:= TEncoding.UTF8.GetString(bytes);
   {$ELSE}
    BinToHex(TMemoryStream(BinaryStream).Memory, PChar(Result), BinaryStream.Size);
-  {$ENDIF}
+  {$IFEND}
   {$IFEND}
  Finally
   BinaryStream.Free;
@@ -486,7 +486,7 @@ Begin
    Result:= TEncoding.UTF8.GetString(bytes);
   {$ELSE}
   BinToHex(TMemoryStream(Value).Memory, PChar(Result), Value.Size);
-  {$ENDIF}
+  {$IFEND}
   {$IFEND}
  Except
  End;
