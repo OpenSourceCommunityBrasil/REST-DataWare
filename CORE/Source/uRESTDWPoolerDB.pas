@@ -36,20 +36,20 @@ uses SysUtils,  Classes,      uDWJSONObject,
      {$ENDIF}
 
 Type
- TOnEventDB               = Procedure (DataSet : TDataSet)         of Object;
- TOnAfterScroll           = Procedure (DataSet : TDataSet)         of Object;
- TOnAfterOpen             = Procedure (DataSet : TDataSet)         of Object;
- TOnAfterClose            = Procedure (DataSet : TDataSet)         of Object;
- TOnAfterCancel           = Procedure (DataSet : TDataSet)         of Object;
- TOnAfterInsert           = Procedure (DataSet : TDataSet)         of Object;
- TOnBeforeDelete          = Procedure (DataSet : TDataSet)         of Object;
- TOnBeforePost            = Procedure (DataSet : TDataSet)         of Object;
- TOnAfterPost             = Procedure (DataSet : TDataSet)         of Object;
- TOnEventConnection       = Procedure (Sucess  : Boolean;
-                                       Const Error : String)       of Object;
- TOnEventBeforeConnection = Procedure (Sender  : TComponent)       of Object;
+ TOnEventDB               = Procedure (DataSet       : TDataSet)   of Object;
+ TOnAfterScroll           = Procedure (DataSet       : TDataSet)   of Object;
+ TOnAfterOpen             = Procedure (DataSet       : TDataSet)   of Object;
+ TOnAfterClose            = Procedure (DataSet       : TDataSet)   of Object;
+ TOnAfterCancel           = Procedure (DataSet       : TDataSet)   of Object;
+ TOnAfterInsert           = Procedure (DataSet       : TDataSet)   of Object;
+ TOnBeforeDelete          = Procedure (DataSet       : TDataSet)   of Object;
+ TOnBeforePost            = Procedure (DataSet       : TDataSet)   of Object;
+ TOnAfterPost             = Procedure (DataSet       : TDataSet)   of Object;
+ TOnEventConnection       = Procedure (Sucess        : Boolean;
+                                       Const Error   : String)     of Object;
+ TOnEventBeforeConnection = Procedure (Sender        : TComponent) of Object;
  TOnEventTimer            = Procedure of Object;
- TBeforeGetRecords        = Procedure (Sender  : TObject;
+ TBeforeGetRecords        = Procedure (Sender        : TObject;
                                        Var OwnerData : OleVariant) of Object;
 
 Type

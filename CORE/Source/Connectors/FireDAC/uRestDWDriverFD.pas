@@ -380,7 +380,7 @@ Var
    vLineSQL,
    vFields,
    vParamsSQL : String;
-   I, X       : Integer;
+   I          : Integer;
    Procedure SetUpdateBuffer;
    Var
     X : Integer;

@@ -2362,7 +2362,6 @@ Var
  StringStream  : TStringStream;
  SendParams    : TIdMultipartFormDataStream;
  ss            : TStringStream;
-
  {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
  Procedure SetData(InputValue     : String;
                    Var ParamsData : TDWParams;

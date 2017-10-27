@@ -50,7 +50,7 @@ object Form2: TForm2
   end
   object Image1: TImage
     Left = 326
-    Top = 31
+    Top = 35
     Width = 133
     Height = 100
     Picture.Data = {
@@ -897,7 +897,7 @@ object Form2: TForm2
   object Bevel1: TBevel
     Left = 8
     Top = 32
-    Width = 491
+    Width = 689
     Height = 2
     Shape = bsTopLine
   end
@@ -945,7 +945,7 @@ object Form2: TForm2
   object Bevel2: TBevel
     Left = 8
     Top = 137
-    Width = 491
+    Width = 457
     Height = 2
     Shape = bsTopLine
   end
@@ -1133,7 +1133,7 @@ object Form2: TForm2
   object Memo1: TMemo
     Left = 465
     Top = 35
-    Width = 235
+    Width = 232
     Height = 100
     Anchors = [akLeft, akTop, akRight]
     Lines.Strings = (
