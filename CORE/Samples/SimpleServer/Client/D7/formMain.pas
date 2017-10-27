@@ -6,7 +6,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, Dialogs, StdCtrls, uDWJSONObject, uLkJSON,
   DB, Grids, DBGrids, uRESTDWBase, uDWJSONTools, uDWConsts, idComponent,
-  ExtCtrls, acPNG, DBClient, uRESTDWPoolerDB, JvMemoryDataset, ComCtrls;
+  ExtCtrls, acPNG, DBClient, uRESTDWPoolerDB, JvMemoryDataset, ComCtrls,
+  uDWConstsData;
 
 type
 

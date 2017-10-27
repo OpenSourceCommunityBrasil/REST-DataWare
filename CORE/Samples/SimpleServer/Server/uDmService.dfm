@@ -14,13 +14,14 @@ object ServerMethodDM: TServerMethodDM
     StrsTrim2Len = True
     Active = True
     PoolerOffMessage = 'RESTPooler not active.'
-    Left = 56
+    Left = 96
     Top = 120
   end
   object RESTDWDriverFD1: TRESTDWDriverFD
+    CommitRecords = 100
     Connection = Server_FDConnection
-    Left = 152
-    Top = 120
+    Left = 96
+    Top = 72
   end
   object Server_FDConnection: TFDConnection
     Params.Strings = (
@@ -40,8 +41,8 @@ object ServerMethodDM: TServerMethodDM
     LoginPrompt = False
     OnError = Server_FDConnectionError
     BeforeConnect = Server_FDConnectionBeforeConnect
-    Left = 54
-    Top = 50
+    Left = 94
+    Top = 18
   end
   object FDPhysFBDriverLink1: TFDPhysFBDriverLink
     Left = 278

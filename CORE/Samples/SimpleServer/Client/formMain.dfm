@@ -1158,10 +1158,9 @@ object Form2: TForm2
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1
     Left = 240
-    Top = 96
+    Top = 128
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    AfterInsert = RESTDWClientSQL1AfterInsert
     FieldDefs = <
       item
         Name = 'ID'
@@ -1195,10 +1194,10 @@ object Form2: TForm2
     UpdateTableName = 'STRINGTABLE'
     CacheUpdateRecords = True
     AutoCommitData = False
-    AutoRefreshAfterCommit = False
+    AutoRefreshAfterCommit = True
     InBlockEvents = False
     Left = 240
-    Top = 48
+    Top = 64
     object RESTDWClientSQL1ID: TStringField
       FieldName = 'ID'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
@@ -1238,5 +1237,6 @@ object Form2: TForm2
     OnWorkEnd = RESTDWDataBase1WorkEnd
     OnStatus = RESTDWDataBase1Status
     Left = 240
+    Top = 8
   end
 end

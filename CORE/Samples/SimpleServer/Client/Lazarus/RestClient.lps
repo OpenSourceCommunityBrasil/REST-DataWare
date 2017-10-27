@@ -10,7 +10,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos Y="19"/>
-        <UsageCount Value="179"/>
+        <UsageCount Value="182"/>
       </Unit0>
       <Unit1>
         <Filename Value="formMain.pas"/>
@@ -18,8 +18,9 @@
         <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <CursorPos X="7" Y="11"/>
-        <UsageCount Value="179"/>
+        <UsageCount Value="182"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -30,7 +31,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="117"/>
         <CursorPos X="17" Y="127"/>
-        <UsageCount Value="175"/>
+        <UsageCount Value="178"/>
         <Bookmarks Count="2">
           <Item0 X="2" Y="124" ID="2"/>
           <Item1 X="119" Y="41" ID="1"/>
@@ -140,15 +141,13 @@
       </Unit17>
       <Unit18>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="417"/>
         <CursorPos Y="429"/>
         <UsageCount Value="74"/>
         <Bookmarks Count="1">
           <Item0 Y="67" ID="2"/>
         </Bookmarks>
-        <Loaded Value="True"/>
       </Unit18>
       <Unit19>
         <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSONParser.pas"/>
@@ -461,78 +460,7 @@
         <UsageCount Value="10"/>
       </Unit60>
     </Units>
-    <JumpHistory Count="18" HistoryIndex="17">
-      <Position1>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="1984" Column="59" TopLine="1974"/>
-      </Position1>
-      <Position2>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-      </Position2>
-      <Position3>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="95" Column="23" TopLine="80"/>
-      </Position3>
-      <Position4>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="1773" TopLine="1755"/>
-      </Position4>
-      <Position5>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="95" Column="23" TopLine="87"/>
-      </Position5>
-      <Position6>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="1730" TopLine="1724"/>
-      </Position6>
-      <Position7>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="95" Column="24" TopLine="87"/>
-      </Position7>
-      <Position8>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="1667" Column="34" TopLine="1651"/>
-      </Position8>
-      <Position9>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="1724" Column="34" TopLine="1708"/>
-      </Position9>
-      <Position10>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="95" Column="24" TopLine="87"/>
-      </Position10>
-      <Position11>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="1667" Column="33" TopLine="1651"/>
-      </Position11>
-      <Position12>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-      </Position12>
-      <Position13>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="95" Column="24" TopLine="80"/>
-      </Position13>
-      <Position14>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="141" Column="21" TopLine="126"/>
-      </Position14>
-      <Position15>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="1937" TopLine="1937"/>
-      </Position15>
-      <Position16>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="95" Column="24" TopLine="87"/>
-      </Position16>
-      <Position17>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="141" Column="22" TopLine="126"/>
-      </Position17>
-      <Position18>
-        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="193" Column="21" TopLine="178"/>
-      </Position18>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
   </ProjectSession>
   <Debugging>
     <Watches Count="2">

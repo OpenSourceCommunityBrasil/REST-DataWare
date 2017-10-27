@@ -1413,10 +1413,6 @@ object RestDWForm: TRestDWForm
     object tsLogs: TTabSheet
       Caption = 'Logs'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label19: TLabel
         Left = 7
         Top = 147
@@ -1454,7 +1450,7 @@ object RestDWForm: TRestDWForm
   object ApplicationEvents1: TApplicationEvents
     OnIdle = ApplicationEvents1Idle
     Left = 220
-    Top = 128
+    Top = 126
   end
   object ctiPrincipal: TTrayIcon
     Hint = 'REST Dataware - Service'

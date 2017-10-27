@@ -77,7 +77,6 @@ TYPE
     PROCEDURE RESTDWDataBase1Connection(Sucess: Boolean; CONST Error: STRING);
     PROCEDURE RESTDWDataBase1BeforeConnect(Sender: TComponent);
     procedure Button4Click(Sender: TObject);
-    procedure RESTDWClientSQL1AfterInsert(DataSet: TDataSet);
   PRIVATE
     { Private declarations }
     FBytesToTransfer: Int64;
@@ -191,11 +190,6 @@ PROCEDURE TForm2.FormCreate(Sender: TObject);
 BEGIN
   Memo1.Lines.Clear;
 END;
-
-procedure TForm2.RESTDWClientSQL1AfterInsert(DataSet: TDataSet);
-begin
-// RESTDWClientSQL1HIRE_DATE.AsDateTime := Now;
-end;
 
 PROCEDURE TForm2.RESTDWClientSQL1GetDataError(Sucess: Boolean; CONST Error: STRING);
 BEGIN

@@ -185,7 +185,7 @@ Begin
    JSONParam.ObjectDirection    := odOUT;
    JSONParam.SetValue('');
    DWParams.Add(JSONParam);
-   lResponse := RESTClientPooler1.SendEvent('SendReplicationFile', DWParams, sePost);
+   lResponse := RESTClientPooler1.SendEvent('SendReplicationFile', DWParams); //, sePost);
    If lResponse <> '' Then
     Begin
       Try

@@ -1982,6 +1982,9 @@ object Form2: TForm2
     StrsEmpty2Null = False
     StrsTrim2Len = True
     WelcomeMessage = 'EMPLOYEE.FDB'
+    DateSeparator = '/'
+    TimeSeparator = ':'
+    DecimalSeparator = ','
     OnWork = RESTDWDataBase1Work
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd
@@ -1999,6 +2002,9 @@ object Form2: TForm2
     SQL.Strings = (
       'SELECT * FROM EMPLOYEE')
     CacheUpdateRecords = True
+    AutoCommitData = False
+    AutoRefreshAfterCommit = False
+    InBlockEvents = False
     Left = 248
     Top = 144
   end
