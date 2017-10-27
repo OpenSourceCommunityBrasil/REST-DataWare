@@ -134,6 +134,7 @@
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
+        <Icon_MainIcon>RestDWServerProject_Icon3.ico</Icon_MainIcon>
         <DCC_BplOutput>.\$(Platform)\$(Config)</DCC_BplOutput>
         <DCC_DcpOutput>.\$(Platform)\$(Config)</DCC_DcpOutput>
         <VerInfo_Locale>1033</VerInfo_Locale>
@@ -180,10 +181,7 @@
                 <Source>
                     <Source Name="MainSource">RestDWServerProject.dpr</Source>
                 </Source>
-                <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp250.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                </Excluded_Packages>
+                <Excluded_Packages/>
             </Delphi.Personality>
             <Platforms>
                 <Platform value="iOSDevice64">False</Platform>

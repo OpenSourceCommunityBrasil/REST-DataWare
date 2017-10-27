@@ -41,7 +41,7 @@ object ServerMethodDM: TServerMethodDM
   object SQLTransaction1: TSQLTransaction
     Active = False
     Database = Server_FDConnection
-    left = 152
+    left = 264
     top = 24
   end
   object RESTDWDriverFD1: TRESTDWLazDriver

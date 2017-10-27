@@ -305,22 +305,25 @@ Begin
    JSONParam.ObjectDirection       := odIn;
    JSONParam.SetValue(SQL);
    DWParams.Add(JSONParam);
-   If Assigned(Params) Then
+   If Params <> Nil Then
     Begin
-     {$IFNDEF FPC}
-      {$if CompilerVersion > 21}
-       RESTClientPoolerExec.Encoding     := vEncoding;
-       JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-      {$ELSE}
-       JSONParam                     := TJSONParam.Create;
-      {$IFEND}
-     {$ELSE}
-      JSONParam                     := TJSONParam.Create;
-     {$ENDIF}
-     JSONParam.ParamName             := 'Params';
-     JSONParam.ObjectDirection       := odInOut;
-     JSONParam.SetValue(Params.ToJSON);
-     DWParams.Add(JSONParam);
+     If Params.Count > 0 Then
+      Begin
+       {$IFNDEF FPC}
+        {$if CompilerVersion > 21}
+         RESTClientPoolerExec.Encoding     := vEncoding;
+         JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+        {$ELSE}
+         JSONParam                     := TJSONParam.Create;
+        {$IFEND}
+       {$ELSE}
+        JSONParam                     := TJSONParam.Create;
+       {$ENDIF}
+       JSONParam.ParamName             := 'Params';
+       JSONParam.ObjectDirection       := odInOut;
+       JSONParam.SetValue(Params.ToJSON);
+       DWParams.Add(JSONParam);
+      End;
     End;
   End;
  {$IFNDEF FPC}

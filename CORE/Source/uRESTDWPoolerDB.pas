@@ -987,15 +987,18 @@ Begin
  {$ENDIF}
  Try
   If Params.Count > 0 Then
-   DWParams     := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vEncondig{$IFEND}{$ENDIF});
+   DWParams     := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vEncondig{$IFEND}{$ENDIF})
+  Else
+   DWParams     := Nil;
   LDataSetList := vRESTConnectionDB.ApplyUpdates(Massive,      vRestPooler,
                                                  vRestModule,  GetLineSQL(SQL),
                                                  DWParams,     Error,
                                                  MessageError, vTimeOut,
                                                  vLogin,       vPassword,
                                                  RESTClientPooler);
-  If Assigned(DWParams) Then
-   FreeAndNil(DWParams);
+  If Params.Count > 0 Then
+   If DWParams <> Nil Then
+    FreeAndNil(DWParams);
   If (LDataSetList <> Nil) Then
    Begin
     Result := Nil;
