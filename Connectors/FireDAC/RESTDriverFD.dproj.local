@@ -1,15 +1,2 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject>
-	<Transactions>
-<<<<<<< .mine
-    <Transaction>2017-06-16 23:23:24.000.201,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\RESTDriverFD.dproj</Transaction>
-    <Transaction>2017-06-16 23:24:00.000.446,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\RESTDriverFD.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\Connectors\FireDAC\RESTDriverFD.dproj</Transaction>
-||||||| .r528
-    <Transaction>2017/06/16 23:23:24.000.201,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\RESTDriverFD.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj</Transaction>
-    <Transaction>2017/06/16 23:24:00.000.446,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\Connectors\FireDAC\RESTDriverFD.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\RESTDriverFD.dproj</Transaction>
-=======
-    <Transaction>2017/06/16 23:23:24.000.201,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\RESTDriverFD.dproj</Transaction>
-    <Transaction>2017/06/16 23:24:00.000.446,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\RESTDriverFD.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\Connectors\FireDAC\RESTDriverFD.dproj</Transaction>
->>>>>>> .r534
-  </Transactions>
-</BorlandProject>
+<BorlandProject/>

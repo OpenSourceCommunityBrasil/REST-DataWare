@@ -1,12 +1,2 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject>
-	<Transactions>
-<<<<<<< .mine
-    <Transaction>2017-06-19 13:03:40.000.312,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\Connectors\UniDAC\RESTDriverUniDAC.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj</Transaction>
-||||||| .r528
-    <Transaction>2017/06/19 13:03:40.000.312,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\Connectors\UniDAC\RESTDriverUniDAC.dproj</Transaction>
-=======
-    <Transaction>2017/06/19 13:03:40.000.312,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\Connectors\UniDAC\RESTDriverUniDAC.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj</Transaction>
->>>>>>> .r534
-  </Transactions>
-</BorlandProject>
+<BorlandProject/>
