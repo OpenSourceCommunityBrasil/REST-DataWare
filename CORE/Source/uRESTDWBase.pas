@@ -1920,7 +1920,7 @@ Begin
        End;
       If Assigned(vServerMethod) Then
        Begin
-           vTempServerMethods:=vServerMethod.Create(owner);
+           vTempServerMethods:=vServerMethod.Create(nil);
         If vServerBaseMethod = TServerMethods Then
          Begin
           If Trim(vWelcomeMessage) <> '' Then

@@ -1073,18 +1073,18 @@ Begin
         Try
          If Trim(removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'"')) <> '' then // opt(bJsonOBJ.names.get(0).ToString).ToString) <> '' Then
           Begin
-           If TRESTDWClientSQL(DestDS).FieldDefExist(removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'""')) = nil then // opt(bJsonOBJ.names.get(0).ToString).ToString) = Nil Then
+           If TRESTDWClientSQL(DestDS).FieldDefExist(removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'"')) = nil then // opt(bJsonOBJ.names.get(0).ToString).ToString) = Nil Then
             Begin
-             FieldDef := TFieldDef.Create(DestDS.FieldDefs, removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'""'),
-                                                            GetFieldType(removestr(bJsonOBJ.Pairs[1].JsonValue.tostring,'""')), //bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString),
-                                                            StrToInt(removestr(bJsonOBJ.Pairs[4].JsonValue.tostring,'""')), //bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString),
-                                                            Uppercase(removestr(bJsonOBJ.Pairs[3].JsonValue.tostring,'""'))='S', //bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S',
+             FieldDef := TFieldDef.Create(DestDS.FieldDefs, removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'"'),
+                                                            GetFieldType(removestr(bJsonOBJ.Pairs[1].JsonValue.tostring,'"')), //bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString),
+                                                            StrToInt(removestr(bJsonOBJ.Pairs[4].JsonValue.tostring,'"')), //bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString),
+                                                            Uppercase(removestr(bJsonOBJ.Pairs[3].JsonValue.tostring,'"'))='S', //bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S',
                                                             DestDS.FieldDefs.Count);
              If Not(FieldDef.DataType In [ftSmallint, ftInteger, ftFloat,
                                           ftCurrency, ftBCD,     ftFMTBcd]) Then
               Begin
-               FieldDef.Size      := StrToInt(removestr(bJsonOBJ.Pairs[4].JsonValue.tostring,'""')); // bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
-               FieldDef.Precision := StrToInt(removestr(bJsonOBJ.Pairs[5].JsonValue.tostring,'""')); //bJsonOBJ.opt(bJsonOBJ.names.get(5).ToString).ToString);
+               FieldDef.Size      := StrToInt(removestr(bJsonOBJ.Pairs[4].JsonValue.tostring,'"')); // bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
+               FieldDef.Precision := StrToInt(removestr(bJsonOBJ.Pairs[5].JsonValue.tostring,'"')); //bJsonOBJ.opt(bJsonOBJ.names.get(5).ToString).ToString);
               End;
             End;
           End;
@@ -1150,7 +1150,7 @@ Begin
          {$IFNDEF FPC}{$IF CompilerVersion > 21}
          If bJsonOBJ.Count > 6 then // names.Length > 6 Then
           Begin
-           If (Uppercase(Trim( removestr(bJsonOBJ.Pairs[6].JsonValue.tostring,'"' ))) = 'S') then //  bJsonOBJ.opt(bJsonOBJ.names.get(6).ToString).ToString)) = 'S') Then
+           If (Uppercase(Trim( removestr(bJsonOBJ.Pairs[7].JsonValue.tostring,'"' ))) = 'S') then //  bJsonOBJ.opt(bJsonOBJ.names.get(6).ToString).ToString)) = 'S') Then
             Field.AutoGenerateValue := arAutoInc;
           End;
          {$IFEND}
@@ -1174,9 +1174,9 @@ Begin
             vFindFlag := Uppercase(Trim(removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'"' ))) = Uppercase(DestDS.Fields[A].FieldName); // bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString)) = Uppercase(DestDS.Fields[A].FieldName);
             If vFindFlag Then
              Begin
-              // If bJsonOBJ.names.Length > 6 Then
-             //  If Not (DestDS.Fields[A].ReadOnly) Then
-             //   DestDS.Fields[A].ReadOnly := (Uppercase(Trim(removestr(bJsonOBJ.opt(bJsonOBJ.Pairs[0].JsonValue.ToString,'"'))) = 'S');
+               If bJsonOBJ.count > 6 Then
+               If Not (DestDS.Fields[A].ReadOnly) Then
+               DestDS.Fields[A].ReadOnly := (Uppercase(Trim(removestr(bJsonOBJ.Pairs[0].JsonValue.ToString,'"'))) = 'S');
               ListFields.Add(IntToStr(J));
               Break;
              End;
@@ -1567,9 +1567,9 @@ Begin
             vFindFlag := Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString)) = Uppercase(DestDS.Fields[A].FieldName);
             If vFindFlag Then
              Begin
-             // If bJsonOBJ.names.Length > 6 Then
-             //  If Not (DestDS.Fields[A].ReadOnly) Then
-             //   DestDS.Fields[A].ReadOnly := (Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(6).ToString).ToString)) = 'S');
+              If bJsonOBJ.names.Length > 6 Then
+               If Not (DestDS.Fields[A].ReadOnly) Then
+                DestDS.Fields[A].ReadOnly := (Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(6).ToString).ToString)) = 'S');
               ListFields.Add(IntToStr(J));
               Break;
              End;
@@ -1716,6 +1716,7 @@ Begin
  Try
   If bJsonValue.count > 0 Then
    Begin
+    vNullValue       := False;
     vTempValue       := CopyValue(bValue);
     vTypeObject      := GetObjectName(removestr(bJsonvalue.Pairs[0].Jsonvalue.tostring,'"') ); //bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString);
     vObjectDirection := GetDirectionName(removestr(bjsonvalue.Pairs[1].JsonValue.tostring,'"')); // bJsonValue.opt(bJsonValue.names.get(1).ToString).ToString);
