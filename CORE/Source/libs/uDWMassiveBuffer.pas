@@ -1296,7 +1296,7 @@ Var
    Result := vTempLine;
  End;
 Begin
- vTagFields  := '{"fields":[' + GenerateHeader + ']}, {"lines":[%s]}';
+ vTagFields  := '{"fields":[' + GenerateHeader + ']}';
  For A := 0 To vMassiveBuffer.Count -1 Do
   Begin
    If A = 0 Then
