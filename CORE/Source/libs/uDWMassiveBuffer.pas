@@ -720,9 +720,11 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                        Else
                                         Begin
                                          If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> StreamToHex(vStringStream) Then
-                                          MassiveLineBuff.vMassiveValues.Items[I + 1].LoadFromStream(vStringStream);
+                                          Begin
+                                           MassiveLineBuff.vMassiveValues.Items[I + 1].LoadFromStream(vStringStream);
+                                           MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
+                                          End;
                                         End;
-                                       MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
                                       End
                                      Else
                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
@@ -733,12 +735,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
        Else
         Begin
          If Not UpdateTag Then
-          Begin
-           If Trim(Field.AsString) <> '' Then
-            MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString
-           Else
-            MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
-          End
+          MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString
          Else
           Begin
            If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> Field.AsString Then
@@ -962,38 +959,80 @@ Var
  vStringStream : TMemoryStream;
  MassiveLine   : TMassiveLine;
  MassiveValue  : TMassiveValue;
+ Function GetFieldIndex(FieldName : String) : Integer;
+ Var
+  I : Integer;
+ Begin
+  Result := -1;
+  For I := 0 To vMassiveFields.Count -1 Do
+   Begin
+    If LowerCase(vMassiveFields.Items[I].FieldName) = LowerCase(FieldName) Then
+     Result := I;
+    If Result <> -1 Then
+     Break;
+   End;
+ End;
 Begin
  MassiveLine   := TMassiveLine.Create;
  NewBuffer(MassiveLine, vMassiveLine.vMassiveMode);
  Try
-  For I := 0 To vMassiveFields.Count -1 Do
+  If vMassiveLine.vMassiveMode = mmUpdate Then
    Begin
-    If I = 0 Then
-     MassiveLine.vMassiveValues.Items[I].Value := vMassiveLine.vMassiveValues.Items[I].Value;
-    Field := Dataset.FindField(vMassiveFields.Items[I].vFieldName);
-    If vMassiveLine.vMassiveMode = mmDelete Then
-     If Not(pfInKey in Field.ProviderFlags) Then
-      Continue;
-    If Field <> Nil Then
+    For I := 0 To vMassiveLine.vChanges.Count -1 Do
      Begin
-      If Field.DataType  In [ftBytes, ftVarBytes,
-                             ftBlob, ftGraphic,
-                             ftOraBlob, ftOraClob] Then
+      Field := Dataset.FindField(vMassiveLine.vChanges[I]);
+      If Field <> Nil Then
        Begin
-        vStringStream := TMemoryStream.Create;
-        Try
-         vMassiveLine.vMassiveValues.Items[I +1].SaveToStream(vStringStream);
-         vStringStream.Position := 0;
-         If vStringStream.Size > 0 Then
-          MassiveLine.vMassiveValues.Items[I +1].LoadFromStream(vStringStream);
-        Finally
-         FreeAndNil(vStringStream);
-        End;
-       End
-      Else
+        If Field.DataType  In [ftBytes, ftVarBytes,
+                               ftBlob, ftGraphic,
+                               ftOraBlob, ftOraClob] Then
+         Begin
+          vStringStream := TMemoryStream.Create;
+          Try
+           vMassiveLine.vMassiveValues.Items[GetFieldIndex(vMassiveLine.vChanges[I]) +1].SaveToStream(vStringStream);
+           vStringStream.Position := 0;
+           If vStringStream.Size > 0 Then
+            MassiveLine.vMassiveValues.Items[GetFieldIndex(vMassiveLine.vChanges[I]) +1].LoadFromStream(vStringStream);
+          Finally
+           FreeAndNil(vStringStream);
+          End;
+         End
+        Else
+         MassiveLine.vMassiveValues.Items[GetFieldIndex(vMassiveLine.vChanges[I]) +1].Value := vMassiveLine.vMassiveValues.Items[GetFieldIndex(vMassiveLine.vChanges[I]) +1].Value;
+       End;
+     End;
+   End
+  Else
+   Begin
+    For I := 0 To vMassiveFields.Count -1 Do
+     Begin
+      If I = 0 Then
+       MassiveLine.vMassiveValues.Items[I].Value := vMassiveLine.vMassiveValues.Items[I].Value;
+      Field := Dataset.FindField(vMassiveFields.Items[I].vFieldName);
+      If vMassiveLine.vMassiveMode = mmDelete Then
+       If Not(pfInKey in Field.ProviderFlags) Then
+        Continue;
+      If Field <> Nil Then
        Begin
-        If vMassiveLine.vMassiveValues.Items[I +1].Value <> '' Then
-         MassiveLine.vMassiveValues.Items[I +1].Value := vMassiveLine.vMassiveValues.Items[I +1].Value;
+        If Field.DataType  In [ftBytes, ftVarBytes,
+                               ftBlob, ftGraphic,
+                               ftOraBlob, ftOraClob] Then
+         Begin
+          vStringStream := TMemoryStream.Create;
+          Try
+           vMassiveLine.vMassiveValues.Items[I +1].SaveToStream(vStringStream);
+           vStringStream.Position := 0;
+           If vStringStream.Size > 0 Then
+            MassiveLine.vMassiveValues.Items[I +1].LoadFromStream(vStringStream);
+          Finally
+           FreeAndNil(vStringStream);
+          End;
+         End
+        Else
+         Begin
+          If vMassiveLine.vMassiveValues.Items[I +1].Value <> '' Then
+           MassiveLine.vMassiveValues.Items[I +1].Value := vMassiveLine.vMassiveValues.Items[I +1].Value;
+         End;
        End;
      End;
    End;
