@@ -1603,8 +1603,8 @@ Begin
  TDataset(Self).AfterCancel        := ProcAfterCancel;
  Inherited AfterPost               := OldAfterPost;
  Inherited AfterDelete             := OldAfterDelete;
- vMassiveDataset                   := TMassiveDatasetBuffer.Create;
  {$ENDIF}
+ vMassiveDataset                   := TMassiveDatasetBuffer.Create;
 End;
 
 Destructor  TRESTDWClientSQL.Destroy;

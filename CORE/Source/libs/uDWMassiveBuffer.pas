@@ -807,9 +807,13 @@ Begin
      MassiveField.vSize              := Dataset.Fields[I].DataSize;
      {$IFNDEF FPC}{$IF CompilerVersion > 21}
      MassiveField.vAutoGenerateValue := Dataset.Fields[I].AutoGenerateValue = arAutoInc;
+     If Not (MassiveField.vAutoGenerateValue) Then
+      MassiveField.vAutoGenerateValue := Dataset.Fields[I].FieldKind = fkInternalCalc;
      {$ELSE}
-     MassiveField.vAutoGenerateValue := False;
+     MassiveField.vAutoGenerateValue := Dataset.Fields[I].FieldKind = fkInternalCalc;
      {$IFEND}
+     {$ELSE}
+     MassiveField.vAutoGenerateValue := Dataset.Fields[I].FieldKind = fkInternalCalc;
      {$ENDIF}
      vMassiveFields.Add(MassiveField);
     End;
@@ -947,7 +951,8 @@ End;
 
 Function TMassiveDatasetBuffer.RecordCount : Integer;
 Begin
- Result := vMassiveBuffer.Count;
+ If vMassiveBuffer <> Nil Then
+  Result := vMassiveBuffer.Count;
 End;
 
 Procedure TMassiveDatasetBuffer.SaveBuffer(Dataset : TRESTDWClientSQLBase);
@@ -1069,12 +1074,7 @@ Begin
           MassiveField.vFieldName         := bJsonOBJb.opt('field').ToString;
           MassiveField.vFieldType         := GetValueType(bJsonOBJb.opt('Type').ToString);
           MassiveField.vSize              := StrToInt(bJsonOBJb.opt('Size').ToString);
-          {$IFNDEF FPC}{$IF CompilerVersion > 21}
           MassiveField.vAutoGenerateValue := bJsonOBJb.opt('Autogeneration').ToString = 'S';
-          {$ELSE}
-          MassiveField.vAutoGenerateValue := False;
-          {$IFEND}
-          {$ENDIF}
           vMassiveFields.Add(MassiveField);
          Finally
           bJsonOBJb.Clean;
@@ -1191,13 +1191,9 @@ Var
     vRequired := 'N';
     If vMassiveFields.Items[I].vRequired Then
      vRequired := 'S';
-    {$IFNDEF FPC}{$IF CompilerVersion > 21}
-     If vMassiveFields.Items[I].vAutoGenerateValue Then
-      vAutoinc := 'S';
-    {$ELSE}
-     vAutoinc := 'N';
-    {$IFEND}
-    {$ENDIF}
+    If (vMassiveFields.Items[I].vAutoGenerateValue) Or
+       (vMassiveFields.Items[I].FieldType = ovAutoInc) Then
+     vAutoinc := 'S';
     If vMassiveFields.Items[I].FieldType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ovExtended,
                                              {$IFEND}{$ENDIF}ovFloat, ovCurrency, ovFMTBcd, ovBCD] Then
      vGenerateLine := Format(TJsonDatasetHeader, [vMassiveFields.Items[I].vFieldName,
@@ -1308,7 +1304,7 @@ Begin
    Else
     vLines := vLines + Format(', [%s]', [GenerateLine(vMassiveBuffer.Items[A])]);
   End;
- vTagFields := Format(vTagFields, [vLines]);
+ vTagFields := vTagFields + Format(', {"lines":[%s]}', [vLines]);
  Result := Format(TMassiveFormatJSON, ['ObjectType',   GetObjectName(toMassive),
                                        'Direction',    GetDirectionName(odINOUT),
                                        'Encoded',      'true',

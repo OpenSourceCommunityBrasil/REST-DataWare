@@ -145,8 +145,8 @@
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Build>27</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.3.1.27;InternalName=REST Dataware CORE Version;LegalCopyright=REST Dataware CORE Version;LegalTrademarks=REST Dataware CORE Version;OriginalFilename=REST Dataware CORE Version;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.3.1;Comments=</VerInfo_Keys>
+        <VerInfo_Build>28</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.3.1.28;InternalName=REST Dataware CORE Version;LegalCopyright=REST Dataware CORE Version;LegalTrademarks=REST Dataware CORE Version;OriginalFilename=REST Dataware CORE Version;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.3.1;Comments=</VerInfo_Keys>
         <VerInfo_Release>1</VerInfo_Release>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
@@ -275,7 +275,16 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployClass Name="ProjectiOSDeviceResourceRules"/>
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="ProjectOSXResource">
                     <Platform Name="OSX32">
                         <RemoteDir>Contents\Resources</RemoteDir>
@@ -614,16 +623,7 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="DependencyModule">
-                    <Platform Name="Win32">
-                        <Operation>0</Operation>
-                        <Extensions>.dll;.bpl</Extensions>
-                    </Platform>
-                    <Platform Name="OSX32">
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceResourceRules"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>

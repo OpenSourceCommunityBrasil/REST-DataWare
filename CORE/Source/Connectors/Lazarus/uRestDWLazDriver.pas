@@ -297,7 +297,10 @@ Var
                 vLineSQL := Format('INSERT INTO %s ', [UpperCase(MassiveDataset.TableName) + ' (%s) VALUES (%s)']);
                 For I := 0 To MassiveDataset.Fields.Count -1 Do
                  Begin
-                  If I = 0 Then
+                  If (MassiveDataset.Fields.Items[I].AutoGenerateValue) And
+                     (MassiveDataset.AtualRec.MassiveMode = mmInsert) Then
+                   Continue;
+                  If vFields = '' Then
                    Begin
                     vFields     := MassiveDataset.Fields.Items[I].FieldName;
                     vParamsSQL  := ':' + MassiveDataset.Fields.Items[I].FieldName;
@@ -647,6 +650,7 @@ Begin
     If Not TDatabase(vConnection).Connected Then
      TDatabase(vConnection).Open;
     ATransaction := TSQLTransaction.Create(vTempQuery.DataBase);
+    ATransaction.DataBase := TDatabase(vConnection);
    End
   Else
    Begin

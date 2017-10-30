@@ -1246,6 +1246,8 @@ Begin
   {$ELSE}
    JSONParam                     := TJSONParam.Create;
   {$IFEND}
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
@@ -1258,6 +1260,8 @@ Begin
   {$ELSE}
    JSONParam                     := TJSONParam.Create;
   {$IFEND}
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
@@ -1270,6 +1274,8 @@ Begin
   {$ELSE}
    JSONParam                     := TJSONParam.Create;
   {$IFEND}
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
@@ -1282,6 +1288,8 @@ Begin
   {$ELSE}
    JSONParam                     := TJSONParam.Create;
   {$IFEND}
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odIn;
@@ -1294,6 +1302,8 @@ Begin
   {$ELSE}
    JSONParam                     := TJSONParam.Create;
   {$IFEND}
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
@@ -1306,6 +1316,8 @@ Begin
   {$ELSE}
    JSONParam                     := TJSONParam.Create;
   {$IFEND}
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
@@ -1318,6 +1330,8 @@ Begin
   {$ELSE}
    JSONParam                     := TJSONParam.Create;
   {$IFEND}
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
