@@ -1849,7 +1849,7 @@ Begin
    If Trim(vUpdateTableName) <> '' Then
     Begin
      TMassiveDatasetBuffer(vMassiveDataset).NewBuffer(Self,  mmUpdate);
-     TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmUpdate);
+     //TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmUpdate);
     End;
    If Assigned(vBeforeEdit) Then
     vBeforeEdit(Dataset);

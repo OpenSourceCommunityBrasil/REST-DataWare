@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899-12-30 00:00:00.000.277,=C:\shryu.workspace\source\source_MediaPlayer\FileSelect\lib_fileexplorer.jar</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.913,=C:\shryu.workspace\source\source_MediaPlayer\FileSelect\Androidapi.JNI.Interfaces.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.340,C:\shryu.workspace\source\source_MediaPlayer\FileSelect\lib_fileexplorer.jar=</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.920,=C:\shryu.workspace\source\source_MediaPlayer\FileSelect\lib_fileexplorer.jar</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.069,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\FileExplorer\FMX_CRUD2.dproj=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\FileExplorer\FMX_CRUD.dproj</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.174,C:\shryu.workspace\source\source_MediaPlayer\FileSelect\bluexmas_android_library.jar=</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.392,C:\shryu.workspace\source\source_MediaPlayer\FileSelect\Unit1.pas=C:\Users\bluesanta\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.197,C:\shryu.workspace\source\source_MediaPlayer\FileSelect\Project1.dproj=C:\Users\bluesanta\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.335,=C:\shryu.workspace\source\source_MediaPlayer\FileSelect\bluexmas_android_library.jar</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.080,=C:\Users\bluesanta\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.374,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\FileExplorer\FM_CRUD2.dproj=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\FileExplorer\FileExplorer.dproj</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.590,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\FileExplorer\FM_CRUD2.dproj=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\FileExplorer\FMX_CRUD2.dproj</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.392,C:\shryu.workspace\source\source_MediaPlayer\FileSelect\Unit1.fmx=C:\Users\bluesanta\Documents\Embarcadero\Studio\Projects\Unit1.fmx</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.533,C:\shryu.workspace\source\source_MediaPlayer\FileExplorer\Project1.dproj=C:\shryu.workspace\source\source_MediaPlayer\FileExplorer\FileExplorer.dproj</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.506,=C:\Users\bluesanta\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.475,=C:\Users\bluesanta\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.596,=C:\Users\bluesanta\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.238,=C:\Users\bluesanta\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.791,=C:\Users\bluesanta\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+  </Transactions>
+	<ActiveMobileDevice>
+		<NoProfile Android="K15VS67060002491"/>
+		<PMAC_VIRTUAL iOSSimulator="iPhone5"/>
+	</ActiveMobileDevice>
+</BorlandProject>

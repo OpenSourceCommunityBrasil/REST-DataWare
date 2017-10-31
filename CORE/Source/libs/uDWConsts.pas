@@ -377,7 +377,7 @@ Begin
  Stream.Position := 0;
 End;
 
-{$IFDEF LINUX}
+{$IF Defined(ANDROID) or Defined(LINUX) or Defined(IOS)}
 function abbintohexstring(stream: Tstream):string;
 var
   s: TStream;
@@ -399,7 +399,7 @@ begin
     s.Free;
   end;
 end;
-{$ENDIF}
+{$IFend}
 
 Function StreamToHex(Stream  : TStream; QQuoted : Boolean = True) : String;
 {$IFDEF POSIX} //Android}
@@ -408,11 +408,12 @@ var bytes, bytes2: TBytes;
 Begin
  Stream.Position := 0;
  {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
-  SetLength(bytes, Stream.Size);
-  Stream.Read(bytes[0], Stream.Size);
-  SetLength(bytes2, Length(bytes));
-  BinToHex(bytes,0,bytes2,0, Length(bytes));
-   result:= TEncoding.Unicode.GetString( bytes2 );
+  //SetLength(bytes, Stream.Size);
+  //Stream.Read(bytes[0], Stream.Size);
+  //SetLength(bytes2, Length(bytes));
+  //BinToHex(bytes,0,bytes2,0, Length(bytes));
+  // result:= TEncoding.Unicode.GetString( bytes2 );
+  result:=abbintohexstring(stream);
  {$ELSE}
  {$IFDEF LINUX} // Android}
   //SetLength(bytes, Stream.Size);

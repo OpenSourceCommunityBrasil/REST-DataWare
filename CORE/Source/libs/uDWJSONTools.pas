@@ -451,12 +451,12 @@ Begin
   SetLength(Result, BinaryStream.Size * 2);
   {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
    SetLength(bytes, Length(value) div 2);
-   HexToBin(PWideChar(value), 0, bytes, 0, Length(bytes));
+   HexToBin(PwideChar(value), 0, bytes, 0, Length(bytes));
    Result:= TEncoding.UTF8.GetString(bytes);
   {$ELSE}
   {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
    SetLength(bytes, Length(value) div 2);
-   HexToBin(PWideChar(value), 0, bytes, 0, Length(bytes));
+   HexToBin(PwideChar(value), 0, bytes, 0, Length(bytes));
    Result:= TEncoding.UTF8.GetString(bytes);
   {$ELSE}
    BinToHex(TMemoryStream(BinaryStream).Memory, PChar(Result), BinaryStream.Size);
@@ -467,24 +467,54 @@ Begin
  End;
 End;
 
+{$IF Defined(ANDROID) or Defined(LINUX) or Defined(IOS)}
+function abbintohexstring(stream: Tstream):string;
+var
+  s: TStream;
+  i: Integer;
+  b: Byte;
+  hex: String;
+begin
+  s := stream;
+  try
+    s.Seek(int64(0), word(soFromBeginning));
+    for i:=1 to s.Size do
+    begin
+      s.Read(b, 1);
+      hex := IntToHex(b, 2);
+      //.....
+      result:=result+hex;
+    end;
+  finally
+    s.Free;
+  end;
+end;
+{$IFend}
+
 Function StreamToHex(Value : TStream) : String;
-{$IFDEF POSIX} //Android}
-var bytes: TBytes;
-{$ENDIF}
+{.$IFDEF POSIX} //Android}
+//var bytes: TBytes;
+//i: Integer;
+//b: Byte;
+//hex: String;
+{//$ENDIF}
 Begin
  Try
   TMemoryStream(Value).Position := 0;
-  SetLength(Result, TMemoryStream(Value).Size * 2);
   {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
-   SetLength(bytes, TMemoryStream(Value).Size * 2);
-   HexToBin(PWideChar(value), 0, bytes, 0, Length(bytes));
-   Result:= TEncoding.UTF8.GetString(bytes);
+    result:=abbintohexstring(value);
+
+ {  SetLength(bytes, TMemoryStream(Value).Size * 2);
+   HexToBin(PwideChar(value), 0, bytes, 0, Length(bytes));
+   Result:= TEncoding.UTF8.GetString(bytes);}
   {$ELSE}
   {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
-   SetLength(bytes, TMemoryStream(Value).Size * 2);
-   HexToBin(PWideChar(value), 0, bytes, 0, Length(bytes));
-   Result:= TEncoding.UTF8.GetString(bytes);
+   //SetLength(bytes, TMemoryStream(Value).Size * 2);
+   //HexToBin(PwideChar(value), 0, bytes, 0, Length(bytes));
+   //Result:= TEncoding.UTF8.GetString(bytes);
+   result:=abbintohexstring(value);
   {$ELSE}
+  SetLength(Result, TMemoryStream(Value).Size * 2);
   BinToHex(TMemoryStream(Value).Memory, PChar(Result), Value.Size);
   {$IFEND}
   {$IFEND}

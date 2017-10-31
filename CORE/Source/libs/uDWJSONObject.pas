@@ -941,11 +941,11 @@ Var
  A, J, I        : Integer;
  FieldDef       : TFieldDef;
  Field          : TField;
+ vOldReadOnly,
  vFindFlag      : Boolean;
  vBlobStream    : TStringStream;
  ListFields     : TStringList;
- //debug strings
- deb1, deb2     : String;
+
  Procedure SetValueA(Field : TField;
                      Value : String);
  Var
@@ -1047,8 +1047,6 @@ Begin
     Exit;
    End;
 
-   deb1 := copy(jsonvalue, length(jsonvalue)-250, length(jsonvalue)-1);
-   deb2 := copy(jsonvalue, 0, length(jsonvalue)-250);
 
   bJsonValue := TJsonObject.ParseJSONValue(JSONValue) as system.json.TJsonObject;
   If bJsonValue.count > 0 Then
@@ -1062,6 +1060,7 @@ Begin
     DestDS.DisableControls;
     If DestDS.Active Then
      DestDS.Close;
+     DestDS.Fielddefs.clear;
     If DestDS.FieldDefs.Count = 0 Then
      Begin
       bJsonArray    :=  bJsonValue.Pairs[4].JsonValue as tjsonarray; //  bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
@@ -1121,6 +1120,37 @@ Begin
      {$ENDIF}
     Except
     End;
+    {$IFNDEF FPC}
+    //Clean Invalid Fields
+    bJsonArray    := bJsonArraySub.Pairs[0].JsonValue as tjsonarray; //bJsonArraySub.optJSONArray(bJsonArraySub.names.get(0).ToString);
+    For A := TRESTDWClientSQL(DestDS).Fields.Count -1 DownTo 0 Do
+     Begin
+      If TRESTDWClientSQL(DestDS).Fields[A].FieldKind = fkData Then
+       Begin
+        vFindFlag := False;
+        For J := 0 To bJsonArray.count - 1 Do
+         Begin
+          bJsonOBJ := bJsonarray.Items[j] as Tjsonobject; // udwjson.TJsonObject.Create(bJsonArray.get(J).ToString);
+          Try
+           If Trim(removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'"')) <> '' Then //Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) <> '' Then
+            Begin
+             //vFindFlag := Lowercase(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) =
+             //             Lowercase(TRESTDWClientSQL(DestDS).Fields[A].FieldName);
+             vFindFlag := Lowercase(removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'"')) =
+                          Lowercase(TRESTDWClientSQL(DestDS).Fields[A].FieldName);
+             If vFindFlag Then
+              Break;
+            End;
+          Finally
+          // bJsonOBJ.Clean;
+           FreeAndNil(bJsonOBJ);
+          End;
+         End;
+        If Not vFindFlag Then
+         TRESTDWClientSQL(DestDS).Fields.Remove(TRESTDWClientSQL(DestDS).Fields[A]);
+       End;
+     End;
+    {$ENDIF}
     //Add Set PK Fields
     bJsonArray    := bJsonValue.Pairs[4].JsonValue as Tjsonarray; //   bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
     bJsonArraySub := bJsonArray.Items[0] as Tjsonobject; //optJSONObject  (0);
@@ -1146,7 +1176,6 @@ Begin
             Field.ProviderFlags := [pfInUpdate, pfInWhere, pfInKey]
            Else
             Field.ProviderFlags := [];
-          End;
          {$IFNDEF FPC}{$IF CompilerVersion > 21}
          If bJsonOBJ.Count > 6 then // names.Length > 6 Then
           Begin
@@ -1155,6 +1184,7 @@ Begin
           End;
          {$IFEND}
          {$ENDIF}
+         end;
         End;
       Finally
        //bJsonOBJ.Clean;
@@ -1206,20 +1236,31 @@ Begin
       Try
        For I := 0 To DestDS.Fields.Count - 1 Do
         Begin
+          vOldReadOnly := DestDS.Fields[I].ReadOnly;
+          DestDS.Fields[I].ReadOnly := False;
          If (StrToInt(ListFields[I]) = -1) Or Not(DestDS.Fields[I].FieldKind = fkData) Then
-          Continue;
+          Begin
+           DestDS.Fields[I].ReadOnly := vOldReadOnly;
+           Continue;
+          End;
          If DestDS.Fields[I].DataType In [ftGraphic,     ftParadoxOle, ftDBaseOle,
                                           ftTypedBinary, ftCursor,     ftDataSet,
                                           ftBlob,        ftOraBlob,    ftOraClob
                                           {$IFNDEF FPC}{$IF CompilerVersion > 21},
                                           ftParams, ftStream{$IFEND}{$ENDIF}] Then
           Begin
-           If vEncoded Then
-            HexStringToStream(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString, vBlobStream)
+           If vEncoded And (removestr(bJsonOBJTemp.items[StrToInt(ListFields[I])].value,'"') <> 'null') Then
+            HexStringToStream(removestr(bJsonOBJTemp.items[StrToInt(ListFields[I])].value,'"'), vBlobStream)
            Else
-            vBlobStream := TStringStream.Create(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString);
+           Begin
+            If (removestr(bJsonOBJTemp.items[StrToInt(ListFields[I])].value,'"') <> 'null') Then
+             vBlobStream := TStringStream.Create(removestr(bJsonOBJTemp.items[StrToInt(ListFields[I])].value,'"'))
+            Else
+             vBlobStream := TStringStream.Create('');
+           End;
            Try
             vBlobStream.Position := 0;
+            If (removestr(bJsonOBJTemp.items[StrToInt(ListFields[I])].value,'"') <> 'null') Then
             TBlobField(DestDS.Fields[I]).LoadFromStream(vBlobStream);
            Finally
             {$IFNDEF FPC}

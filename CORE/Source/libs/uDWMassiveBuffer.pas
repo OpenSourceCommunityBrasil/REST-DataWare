@@ -888,7 +888,7 @@ Begin
  vMassiveLine.ClearAll;
  vMassiveLine.vMassiveMode := MassiveModeData;
  NewLineBuffer(vMassiveLine, MassiveModeData); //Sempre se assume mmInsert como padrão
- BuildLine(Dataset, MassiveModeData, vMassiveLine);//Sempre se assume mmInsert como padrão
+ //BuildLine(Dataset, MassiveModeData, vMassiveLine);//Sempre se assume mmInsert como padrão
 End;
 
 Procedure TMassiveDatasetBuffer.NewBuffer(MassiveModeData     : TMassiveMode);
