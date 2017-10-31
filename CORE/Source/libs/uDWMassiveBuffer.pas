@@ -128,6 +128,7 @@ End;
 Type
  TMassiveDatasetBuffer = Class(TMassiveDataset)
  Protected
+  vDataset       : TRESTDWClientSQLBase;
   vRecNo         : Integer;
   vMassiveBuffer : TMassiveBuffer;
   vMassiveLine   : TMassiveLine;
@@ -139,7 +140,7 @@ Type
   Procedure NewLineBuffer(Var MassiveLineBuff : TMassiveLine;
                           MassiveModeData     : TMassiveMode);
  Public
-  Constructor Create;
+  Constructor Create(Dataset : TRESTDWClientSQLBase);
   Destructor  Destroy;Override;
   Function  RecNo       : Integer;
   Function  RecordCount : Integer;
@@ -837,8 +838,9 @@ Begin
  vMassiveFields.ClearAll;
 End;
 
-Constructor TMassiveDatasetBuffer.Create;
+Constructor TMassiveDatasetBuffer.Create(Dataset : TRESTDWClientSQLBase);
 Begin
+ vDataset       := Dataset;
  vRecNo         := -1;
  vMassiveBuffer := TMassiveBuffer.Create;
  vMassiveLine   := TMassiveLine.Create;
@@ -1222,6 +1224,24 @@ Var
  Begin
   For I := 0 To vMassiveFields.Count - 1 Do
    Begin
+    If vDataset <> Nil Then
+     Begin
+      If (vDataset.FieldByName(vMassiveFields.Items[I].vFieldName) <> Nil) Then
+       Begin
+        If vDataset.FieldByName(vMassiveFields.Items[I].vFieldName).ReadOnly Then
+         Continue;
+        {$IFNDEF FPC}{$IF CompilerVersion > 21}
+        vMassiveFields.Items[I].vAutoGenerateValue := vDataset.FieldByName(vMassiveFields.Items[I].vFieldName).AutoGenerateValue = arAutoInc;
+        If Not (vMassiveFields.Items[I].vAutoGenerateValue) Then
+         vMassiveFields.Items[I].vAutoGenerateValue := vDataset.FieldByName(vMassiveFields.Items[I].vFieldName).FieldKind = fkInternalCalc;
+        {$ELSE}
+        vMassiveFields.Items[I].vAutoGenerateValue := vDataset.FieldByName(vMassiveFields.Items[I].vFieldName).FieldKind = fkInternalCalc;
+        {$IFEND}
+        {$ELSE}
+        vMassiveFields.Items[I].vAutoGenerateValue := vDataset.FieldByName(vMassiveFields.Items[I].vFieldName).FieldKind = fkInternalCalc;
+        {$ENDIF}
+       End;
+     End;
     vPrimary  := 'N';
     vAutoinc  := 'N';
     vReadOnly := 'N';
@@ -1272,6 +1292,14 @@ Var
         vNoChange := True;
         For A := 0 To MassiveLineBuff.vChanges.Count -1 Do
          Begin
+          If vDataset <> Nil Then
+           Begin
+            If (vDataset.FieldByName(vMassiveFields.Items[I-1].vFieldName) <> Nil) Then
+             Begin
+              If vDataset.FieldByName(vMassiveFields.Items[I-1].vFieldName).ReadOnly Then
+               Continue;
+             End;
+           End;
           vNoChange := Lowercase(vMassiveFields.Items[I-1].vFieldName) <>
                        Lowercase(MassiveLineBuff.vChanges[A]);
           If Not (vNoChange) Then
@@ -1279,6 +1307,14 @@ Var
          End;
         If vNoChange Then
          Continue;
+       End;
+      If vDataset <> Nil Then
+       Begin
+        If (vDataset.FieldByName(vMassiveFields.Items[I-1].vFieldName) <> Nil) Then
+         Begin
+          If vDataset.FieldByName(vMassiveFields.Items[I-1].vFieldName).ReadOnly Then
+           Continue;
+         End;
        End;
      End;
     If MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.IsNull Then

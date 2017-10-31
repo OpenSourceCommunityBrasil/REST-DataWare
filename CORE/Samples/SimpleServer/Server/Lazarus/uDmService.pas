@@ -16,7 +16,6 @@ type
     RESTDWDriverFD1: TRESTDWLazDriver;
     RESTDWPoolerDB1: TRESTDWPoolerDB;
     Server_FDConnection: TIBConnection;
-    SQLTransaction1: TSQLTransaction;
     procedure DataModuleWelcomeMessage(Welcomemsg: String);
     procedure ServerMethodDataModuleReplyEvent(SendType: TSendEvent;
       Context: string; var Params: TDWParams; var Result: string);

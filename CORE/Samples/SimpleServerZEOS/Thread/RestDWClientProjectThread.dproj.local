@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899-12-30 00:00:00.000.040,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServerZEOS\Thread\RestDWClientProjectZEOS.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.877,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServerZEOS\Client\RestDWClientProject.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServerZEOS\Client\RestDWClientProjectZEOS.dproj</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.040,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServerZEOS\Thread\RestDWClientProjectZEOS.dproj</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.877,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServerZEOS\Client\RestDWClientProjectZEOS.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServerZEOS\Client\RestDWClientProject.dproj</Transaction>
   </Transactions>
 </BorlandProject>

@@ -9,12 +9,16 @@ uses SysUtils, Classes, DB, sqldb,       mssqlconn,     pqconnection,
      uDWConstsData,     uRESTDWPoolerDB, uDWJSONObject, uDWMassiveBuffer;
 
 Type
+
+ { TRESTDWLazDriver }
+
  TRESTDWLazDriver   = Class(TRESTDWDriver)
  Private
   vConnectionBack,
   vConnection                   : TComponent;
   Procedure SetConnection(Value : TComponent);
   Function  GetConnection       : TComponent;
+  Procedure SetTransaction(Var Value: TSQLTransaction);
  Public
   Function ApplyUpdates         (Massive,
                                  SQL              : String;
@@ -62,6 +66,38 @@ End;
 
 { TConnection }
 
+Procedure TRESTDWLazDriver.SetTransaction(Var Value : TSQLTransaction);
+Begin
+ If (vConnection is TIBConnection) Then
+  TIBConnection(vConnection).Transaction := Value
+ Else If (vConnection is TMSSQLConnection) Then
+  TMSSQLConnection(vConnection).Transaction := Value
+ Else If (vConnection is TMySQL40Connection) Then
+  TMySQL40Connection(vConnection).Transaction := Value
+ Else If (vConnection is TMySQL41Connection) Then
+  TMySQL41Connection(vConnection).Transaction := Value
+ Else If (vConnection is TMySQL50Connection) Then
+  TMySQL50Connection(vConnection).Transaction := Value
+ Else If (vConnection is TMySQL51Connection) Then
+  TMySQL51Connection(vConnection).Transaction := Value
+ Else If (vConnection is TMySQL55Connection) Then
+  TMySQL55Connection(vConnection).Transaction := Value
+ Else If (vConnection is TMySQL56Connection) Then
+  TMySQL56Connection(vConnection).Transaction := Value
+ Else If (vConnection is TMySQL57Connection) Then
+  TMySQL57Connection(vConnection).Transaction := Value
+ Else If (vConnection is TODBCConnection) Then
+  TODBCConnection(vConnection).Transaction := Value
+ Else If (vConnection is TOracleConnection) Then
+  TOracleConnection(vConnection).Transaction := Value
+ Else If (vConnection is TPQConnection) Then
+  TPQConnection(vConnection).Transaction := Value
+ Else If (vConnection is TSQLite3Connection) Then
+  TSQLite3Connection(vConnection).Transaction := Value
+ Else If (vConnection is TSybaseConnection) Then
+  TSybaseConnection(vConnection).Transaction := Value;
+End;
+
 Procedure TRESTDWLazDriver.Close;
 Begin
  If Connection <> Nil Then
@@ -99,12 +135,14 @@ Begin
  Result := TJSONValue.Create;
  vTempQuery               := TSQLQuery.Create(Nil);
  Try
-  vTempQuery.DataBase     := TDatabase(vConnection);
-  If Assigned(vTempQuery.DataBase) Then
+  If Assigned(vConnection) Then
    Begin
+    ATransaction := TSQLTransaction.Create(vTempQuery.DataBase);
+    ATransaction.DataBase := TDatabase(vConnection);
+    SetTransaction(ATransaction);
     If Not TDatabase(vConnection).Connected Then
      TDatabase(vConnection).Open;
-    ATransaction := TSQLTransaction.Create(vTempQuery.DataBase);
+    vTempQuery.DataBase     := TDatabase(vConnection);
    End
   Else
    Begin
@@ -561,7 +599,7 @@ Var
  Begin
   Result         := False;
   InTransaction  := False;
-  MassiveDataset := TMassiveDatasetBuffer.Create;
+  MassiveDataset := TMassiveDatasetBuffer.Create(Nil);
   Try
    MassiveDataset.FromJSON(Massive);
    MassiveDataset.First;
@@ -644,13 +682,14 @@ Begin
   Result     := Nil;
   Error      := False;
   vTempQuery := TSQLQuery.Create(Owner);
-  vTempQuery.DataBase     := TDatabase(vConnection);
-  If Assigned(vTempQuery.DataBase) Then
+  If Assigned(vConnection) Then
    Begin
+    ATransaction          := TSQLTransaction.Create(vTempQuery.DataBase);
+    ATransaction.DataBase := TDatabase(vConnection);
+    SetTransaction(ATransaction);
     If Not TDatabase(vConnection).Connected Then
      TDatabase(vConnection).Open;
-    ATransaction := TSQLTransaction.Create(vTempQuery.DataBase);
-    ATransaction.DataBase := TDatabase(vConnection);
+    vTempQuery.DataBase := TDatabase(vConnection);
    End
   Else
    Begin
@@ -767,7 +806,6 @@ Begin
   ATransaction.Free;
  End;
 End;
-
 Function TRESTDWLazDriver.ExecuteCommand(SQL              : String;
                                         Var Error        : Boolean;
                                         Var MessageError : String;
@@ -780,12 +818,14 @@ Begin
  Error  := False;
  vTempQuery               := TSQLQuery.Create(Nil);
  Try
-  vTempQuery.DataBase     := TDatabase(vConnection);
-  If Assigned(vTempQuery.DataBase) Then
+  If Assigned(vConnection) Then
    Begin
+    ATransaction := TSQLTransaction.Create(vTempQuery.DataBase);
+    ATransaction.DataBase := TDatabase(vConnection);
+    SetTransaction(ATransaction);
     If Not TDatabase(vConnection).Connected Then
      TDatabase(vConnection).Open;
-    ATransaction := TSQLTransaction.Create(vTempQuery.DataBase);
+    vTempQuery.DataBase     := TDatabase(vConnection);
    End
   Else
    Begin
@@ -874,12 +914,14 @@ Begin
  Result := -1;
  Error  := False;
  vTempQuery               := TSQLQuery.Create(Nil);
- vTempQuery.DataBase     := TDatabase(vConnection);
- If Assigned(vTempQuery.DataBase) Then
+ If Assigned(vConnection) Then
   Begin
+   ATransaction := TSQLTransaction.Create(vTempQuery.DataBase);
+   ATransaction.DataBase := TDatabase(vConnection);
+   SetTransaction(ATransaction);
    If Not TDatabase(vConnection).Connected Then
     TDatabase(vConnection).Open;
-   ATransaction := TSQLTransaction.Create(vTempQuery.DataBase);
+   vTempQuery.DataBase     := TDatabase(vConnection);
   End
  Else
   Begin
@@ -1014,12 +1056,14 @@ Begin
  Result := -1;
  Error  := False;
  vTempQuery               := TSQLQuery.Create(Nil);
- vTempQuery.DataBase     := TDatabase(vConnection);
- If Assigned(vTempQuery.DataBase) Then
+ If Assigned(vConnection) Then
   Begin
+   ATransaction := TSQLTransaction.Create(vTempQuery.DataBase);
+   ATransaction.DataBase := TDatabase(vConnection);
+   SetTransaction(ATransaction);
    If Not TDatabase(vConnection).Connected Then
     TDatabase(vConnection).Open;
-   ATransaction := TSQLTransaction.Create(vTempQuery.DataBase);
+   vTempQuery.DataBase     := TDatabase(vConnection);
   End
  Else
   Begin

@@ -26,26 +26,16 @@ object ServerMethodDM: TServerMethodDM
     BeforeConnect = Server_FDConnectionBeforeConnect
     DatabaseName = 'D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\EMPLOYEE.FDB'
     KeepConnection = False
-    Params.Strings = (
-      'lc_ctype=UTF8'
-    )
     Password = 'masterkey'
-    Transaction = SQLTransaction1
     UserName = 'SYSDBA'
-    CharSet = 'win1252'
     HostName = 'localhost'
     CheckTransactionParams = False
     left = 80
     top = 24
   end
-  object SQLTransaction1: TSQLTransaction
-    Active = False
-    Database = Server_FDConnection
-    left = 264
-    top = 24
-  end
   object RESTDWDriverFD1: TRESTDWLazDriver
     DatabaseCharSet = csWin1252
+    CommitRecords = 100
     Connection = Server_FDConnection
     left = 80
     top = 104

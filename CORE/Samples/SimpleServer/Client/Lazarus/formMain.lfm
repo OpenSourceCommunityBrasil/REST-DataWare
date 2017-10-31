@@ -1024,7 +1024,7 @@ object Form2: TForm2
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
-    Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgTabs]
+    Options = [dgEditing, dgTitles, dgIndicator, dgColumnResize, dgColLines, dgTabs, dgConfirmDelete]
     ParentFont = False
     TabOrder = 4
     TitleFont.Color = clWindowText
@@ -1079,7 +1079,7 @@ object Form2: TForm2
   object Button2: TButton
     Left = 366
     Height = 24
-    Top = 166
+    Top = 161
     Width = 133
     Caption = 'Execute'
     Font.Color = clWindowText
@@ -1093,12 +1093,25 @@ object Form2: TForm2
   object ProgressBar1: TProgressBar
     Left = 366
     Height = 17
-    Top = 193
+    Top = 208
     Width = 133
     TabOrder = 9
   end
+  object Button4: TButton
+    Left = 366
+    Height = 24
+    Top = 184
+    Width = 133
+    Caption = 'ApplyUpdates'
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    OnClick = Button4Click
+    ParentFont = False
+    TabOrder = 10
+  end
   object DataSource1: TDataSource
-    AutoEdit = False
     DataSet = RESTDWClientSQL1
     left = 160
     top = 328
@@ -1188,6 +1201,7 @@ object Form2: TForm2
         DataType = ftString
         Size = 37
       end>
+    AfterInsert = RESTDWClientSQL1AfterInsert
     MasterCascadeDelete = True
     Inactive = False
     DataCache = False
@@ -1196,7 +1210,10 @@ object Form2: TForm2
     SQL.Strings = (
       'SELECT * FROM EMPLOYEE'
     )
+    UpdateTableName = 'employee'
     CacheUpdateRecords = True
+    AutoCommitData = False
+    AutoRefreshAfterCommit = True
     InBlockEvents = False
     left = 255
     top = 288

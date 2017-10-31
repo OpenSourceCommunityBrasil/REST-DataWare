@@ -8,7 +8,7 @@ uses
   uDWJSON,  Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, Dialogs, StdCtrls, fpjson, jsonparser, DB, BufDataset, memds,
   Grids, DBGrids, ExtCtrls, ComCtrls, uRESTDWBase, uRESTDWPoolerDB, uDWConsts,
-  uDWJSONObject, uDWJSONTools, IdComponent;
+  uDWJSONObject, uDWJSONTools, IdComponent, uDWConstsData;
 
 type
 
@@ -20,6 +20,7 @@ type
     Bevel3: TBevel;
     Button1: TButton;
     Button2: TButton;
+    Button4: TButton;
     CheckBox1: TCheckBox;
     DBGrid1: TDBGrid;
     edPasswordDW: TEdit;
@@ -41,6 +42,8 @@ type
     RESTDWDataBase1: TRESTDWDataBase;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
+    procedure RESTDWClientSQL1AfterInsert(DataSet: TDataSet);
     procedure RESTDWDataBase1Work(ASender: TObject; AWorkMode: TWorkMode;
       AWorkCount: Int64);
     procedure RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode;
@@ -85,6 +88,10 @@ Begin
  RESTDWClientSQL1.sql.clear;
  RESTDWClientSQL1.sql.add(mComando.Text);
  RESTDWClientSQL1.Active       := True;
+ If RESTDWClientSQL1.FindField('emp_no') <> Nil Then
+  RESTDWClientSQL1.FindField('emp_no').ProviderFlags := [pfInUpdate, pfInWhere, pfInKey];
+ If RESTDWClientSQL1.FindField('FULL_NAME') <> Nil Then
+  RESTDWClientSQL1.FindField('FULL_NAME').ReadOnly   := true;
 End;
 
 procedure TForm2.Button2Click(Sender: TObject);
@@ -105,6 +112,19 @@ begin
   Showmessage('Erro executando o comando ' + RESTDWClientSQL1.SQL.Text)
  Else
   Showmessage('Comando executado com sucesso...');
+end;
+
+procedure TForm2.Button4Click(Sender: TObject);
+Var
+ vError : String;
+begin
+ If Not RESTDWClientSQL1.ApplyUpdates(vError) Then
+  MessageDlg(vError, TMsgDlgType.mtError, [TMsgDlgBtn.mbOK], 0);
+end;
+
+procedure TForm2.RESTDWClientSQL1AfterInsert(DataSet: TDataSet);
+begin
+ RESTDWClientSQL1.FieldByName('HIRE_DATE').AsDateTime := Now;
 end;
 
 procedure TForm2.RESTDWDataBase1Work(ASender: TObject; AWorkMode: TWorkMode;

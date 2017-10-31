@@ -665,7 +665,7 @@ Var
     End;
   End;
  Begin
-  MassiveDataset := TMassiveDatasetBuffer.Create;
+  MassiveDataset := TMassiveDatasetBuffer.Create(Nil);
   Try
    Result         := False;
    MassiveDataset.FromJSON(Massive);

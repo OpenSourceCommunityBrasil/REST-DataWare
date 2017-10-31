@@ -24,7 +24,6 @@ USES
   Vcl.ExtCtrls,
   Vcl.Imaging.Pngimage,
   URESTDWPoolerDB,
-  JvMemoryDataset,
   Vcl.ComCtrls,
   IdComponent, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
