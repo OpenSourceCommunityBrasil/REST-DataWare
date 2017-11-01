@@ -2022,14 +2022,15 @@ object Form1: TForm1
     Size.PlatformDefault = False
     TabOrder = 5
     object Button1: TButton
+      Action = TakePhotoFromLibraryAction1
       Align = Left
+      Enabled = True
+      ImageIndex = -1
       Size.Width = 48.000000000000000000
       Size.Height = 48.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'searchtoolbutton'
       TabOrder = 0
-      Text = 'File Select'
-      OnClick = Button1Click
     end
     object btnsair: TButton
       Align = Right
@@ -2059,6 +2060,16 @@ object Form1: TForm1
       TabOrder = 3
       Text = 'Applly'
       OnClick = btnapllyClick
+    end
+    object btndel: TButton
+      Align = Right
+      Position.X = 56.000000000000000000
+      Size.Width = 63.000000000000000000
+      Size.Height = 48.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 5
+      Text = 'Del'
+      OnClick = btndelClick
     end
   end
   object lytconfig: TLayout
@@ -2273,14 +2284,14 @@ object Form1: TForm1
   object BindSourceDB1: TBindSourceDB
     DataSet = RESTDWClientSQL1
     ScopeMappings = <>
-    Left = 160
-    Top = 264
+    Left = 112
+    Top = 216
   end
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    Left = 20
-    Top = 5
+    Left = 28
+    Top = 69
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
       DataSource = BindSourceDB1
@@ -2311,6 +2322,14 @@ object Form1: TForm1
       FieldName = 'DESCRICAO'
       Control = Edit1
       Track = False
+    end
+  end
+  object actlst1: TActionList
+    Left = 168
+    Top = 272
+    object TakePhotoFromLibraryAction1: TTakePhotoFromLibraryAction
+      Category = 'Media Library'
+      OnDidFinishTaking = TakePhotoFromLibraryAction1DidFinishTaking
     end
   end
 end

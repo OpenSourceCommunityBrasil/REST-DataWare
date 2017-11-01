@@ -5,9 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
-  Androidapi.JNI.Interfaces, System.Messaging,
-  FMX.Platform.Android,
-  Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.GraphicsContentViewText,
+  System.Messaging, FMX.Platform,
   FMX.Controls.Presentation, FMX.Edit, FMX.ListView.Types,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base, FMX.ListView,
   FMX.Objects, FMX.Effects, FMX.Layouts, FireDAC.Stan.Intf, FireDAC.Stan.Option,
@@ -15,7 +13,8 @@ uses
   FireDAC.DApt.Intf, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
   uDWConstsData, uRESTDWPoolerDB, System.Rtti, System.Bindings.Outputs,
   Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt, Data.Bind.Components,
-  Data.Bind.DBScope, FMX.DialogService ;
+  Data.Bind.DBScope, FMX.DialogService, System.Actions, FMX.ActnList,
+  FMX.StdActns, FMX.MediaLibrary.Actions ;
 
 type
   TForm1 = class(TForm)
@@ -56,16 +55,15 @@ type
     LinkPropertyToFieldBitmap: TLinkPropertyToField;
     LinkControlToField1: TLinkControlToField;
     btnaplly: TButton;
-    procedure Button1Click(Sender: TObject);
+    btndel: TButton;
+    actlst1: TActionList;
+    TakePhotoFromLibraryAction1: TTakePhotoFromLibraryAction;
     procedure btnconnectClick(Sender: TObject);
     procedure btnokClick(Sender: TObject);
     procedure btncancelarClick(Sender: TObject);
     procedure btnapllyClick(Sender: TObject);
-  private
-    const ScanRequestCode = 0;
-    var FMessageSubscriptionID: Integer;
-    procedure HandleActivityMessage(const Sender: TObject; const M: TMessage);
-    function OnActivityResult(RequestCode, ResultCode: Integer; Data: JIntent): Boolean;
+    procedure TakePhotoFromLibraryAction1DidFinishTaking(Image: TBitmap);
+    procedure btndelClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -99,45 +97,30 @@ begin
 
   Result := lResultStr;
 end;
-procedure TForm1.HandleActivityMessage(const Sender: TObject; const M: TMessage);
-begin
-  if M is TMessageResultNotification then
-    OnActivityResult(TMessageResultNotification(M).RequestCode, TMessageResultNotification(M).ResultCode,
-      TMessageResultNotification(M).Value);
-end;
 
-function TForm1.OnActivityResult(RequestCode, ResultCode: Integer; Data: JIntent): Boolean;
-var
-  filename : string;
-begin
-  Result := False;
 
-  TMessageManager.DefaultManager.Unsubscribe(TMessageResultNotification, FMessageSubscriptionID);
-  FMessageSubscriptionID := 0;
 
-  // For more info see https://github.com/zxing/zxing/wiki/Scanning-Via-Intent
-  if RequestCode = ScanRequestCode then
+
+procedure TForm1.TakePhotoFromLibraryAction1DidFinishTaking(Image: TBitmap);
+  var
+    ScaleFactor: Single;
+    bl: TmemoryStream;
   begin
-    if ResultCode = TJActivity.JavaClass.RESULT_OK then
+    if Image.Width > 1024 then
     begin
-      if Assigned(Data) then
-      begin
-        filename := JStringToString(Data.getStringExtra(StringToJString('RESULT_PATH')));
-
-        if not (RESTDWClientSQL1.State in [dsEdit, dsInsert]) then
-          RESTDWClientSQL1.Edit;
-        TBlobField(RESTDWClientSQL1BLOBIMAGE).LoadFromFile(filename);
-        RESTDWClientSQL1.Post;
-
-        //Toast(Format('Found %s format barcode:'#10'%s', [ScanFormat, ScanContent]), LongToast);
-      end;
-    end
-    else if ResultCode = TJActivity.JavaClass.RESULT_CANCELED then
-    begin
-      //Toast('You cancelled the scan', ShortToast);
+      ScaleFactor := Image.Width / 1024;
+      Image.Resize(Round(Image.Width / ScaleFactor), Round(Image.Height / ScaleFactor));
     end;
-    Result := True;
-  end;
+
+    if not (RESTDWClientSQL1.State in [dsEdit, dsInsert]) then
+      RESTDWClientSQL1.Edit;
+      bl:=Tmemorystream.Create;
+      image.SaveToStream(bl);
+      TBlobField(RESTDWClientSQL1BLOBIMAGE).LoadFromStream(bl);
+      bl.Clear;
+      freeandnil(bl);
+      RESTDWClientSQL1.Post;
+
 end;
 
 procedure TForm1.btnapllyClick(Sender: TObject);
@@ -159,6 +142,12 @@ begin
 lytconfig.Visible:=true;
 end;
 
+procedure TForm1.btndelClick(Sender: TObject);
+begin
+  if not (RESTDWClientSQL1.State in [dsEdit, dsInsert]) then
+  RESTDWClientSQL1.Delete
+end;
+
 procedure TForm1.btnokClick(Sender: TObject);
 begin
   lytconfig.visible := false;
@@ -172,16 +161,5 @@ begin
   RESTDWClientSQL1.active := true;
 end;
 
-procedure TForm1.Button1Click(Sender: TObject);
-var
-  Intent: JIntent; // JFileDialog;
-begin
-  FMessageSubscriptionID := TMessageManager.DefaultManager.SubscribeToMessage
-    (TMessageResultNotification, HandleActivityMessage);
-
-  Intent := TJIntent.JavaClass.init;
-  Intent.setClassName(SharedActivityContext, StringToJString('com.lamerman.FileDialog'));
-  SharedActivity.startActivityForResult(Intent, 0);
-end;
 
 end.

@@ -32,11 +32,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter> 
         </activity>
-        
-        <!-- shryu -->
-				<activity android:name="com.lamerman.FileDialog"
-            android:configChanges="orientation|keyboard" />        
-       
+             
         <%activity%>
         <receiver android:name="com.embarcadero.firemonkey.notifications.FMXNotificationAlarm" />
         <%receivers%>

@@ -3,8 +3,7 @@ program FMX_CRUD;
 uses
   System.StartUpCopy,
   FMX.Forms,
-  Unit1 in 'Unit1.pas' {Form1},
-  Androidapi.JNI.Interfaces in 'Androidapi.JNI.Interfaces.pas';
+  Unit1 in 'Unit1.pas' {Form1};
 
 {$R *.res}
 
