@@ -11,7 +11,7 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.Title := 'Instalação do Projeto ACBr';
+  Application.Title := 'Instalação do REST Dataware';
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
   Application.Run;
 end.

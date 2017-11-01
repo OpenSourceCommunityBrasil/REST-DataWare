@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>2017/10/20 21:13:12.000.645,P:\Desenvolvimento\DWInstall\DWInstall.dproj=P:\Desenvolvimento\DWInstall\ACBrInstall_Trunk2.dproj</Transaction>
-    <Transaction>2017/10/20 21:55:30.000.307,P:\Desenvolvimento\DWInstall\DWInstallNovo.dproj=P:\Desenvolvimento\DWInstall\DWInstall.dproj</Transaction>
-    <Transaction>2017/10/20 23:37:06.000.842,P:\Desenvolvimento\DWInstall\DWInstall.dproj=P:\Desenvolvimento\DWInstall\DWInstallNovo.dproj</Transaction>
+    <Transaction>2017/10/20 21:13:12.000.645,P:\Desenvolvimento\DWInstall\ACBrInstall_Trunk2.dproj=P:\Desenvolvimento\DWInstall\DWInstall.dproj</Transaction>
+    <Transaction>2017/10/20 21:55:30.000.307,P:\Desenvolvimento\DWInstall\DWInstall.dproj=P:\Desenvolvimento\DWInstall\DWInstallNovo.dproj</Transaction>
+    <Transaction>2017/10/20 23:37:06.000.842,P:\Desenvolvimento\DWInstall\DWInstallNovo.dproj=P:\Desenvolvimento\DWInstall\DWInstall.dproj</Transaction>
   </Transactions>
 </BorlandProject>
