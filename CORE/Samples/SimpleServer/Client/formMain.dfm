@@ -1190,7 +1190,7 @@ object Form2: TForm2
     Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
-      'select * from STRINGTABLE')
+      'select * from stringtable')
     UpdateTableName = 'STRINGTABLE'
     CacheUpdateRecords = True
     AutoCommitData = False
@@ -1198,22 +1198,13 @@ object Form2: TForm2
     InBlockEvents = False
     Left = 240
     Top = 64
-    object RESTDWClientSQL1ID: TStringField
-      FieldName = 'ID'
-      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
-      Required = True
-      Size = 10
-    end
-    object RESTDWClientSQL1DESC: TStringField
-      FieldName = 'DESC'
-      Size = 100
-    end
   end
   object RESTDWDataBase1: TRESTDWDataBase
     OnConnection = RESTDWDataBase1Connection
     OnBeforeConnect = RESTDWDataBase1BeforeConnect
-    Active = False
+    Active = True
     Compression = True
+    MyIP = '127.0.0.1'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False

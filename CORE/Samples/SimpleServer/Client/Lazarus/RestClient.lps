@@ -4,13 +4,14 @@
     <PathDelim Value="\"/>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="62">
+    <Units Count="63">
       <Unit0>
         <Filename Value="RestClient.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
         <CursorPos Y="19"/>
-        <UsageCount Value="190"/>
+        <UsageCount Value="193"/>
       </Unit0>
       <Unit1>
         <Filename Value="formMain.pas"/>
@@ -18,9 +19,10 @@
         <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="117"/>
-        <CursorPos X="2" Y="121"/>
-        <UsageCount Value="190"/>
+        <CursorPos X="19" Y="123"/>
+        <UsageCount Value="193"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -31,7 +33,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="117"/>
         <CursorPos X="17" Y="127"/>
-        <UsageCount Value="186"/>
+        <UsageCount Value="189"/>
         <Bookmarks Count="2">
           <Item0 X="2" Y="124" ID="2"/>
           <Item1 X="119" Y="41" ID="1"/>
@@ -292,14 +294,14 @@
       </Unit38>
       <Unit39>
         <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="1842"/>
-        <CursorPos X="24" Y="1851"/>
-        <UsageCount Value="65"/>
-        <Bookmarks Count="1">
-          <Item0 X="2" Y="2633" ID="3"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2571"/>
+        <CursorPos X="44" Y="2573"/>
+        <UsageCount Value="67"/>
+        <Bookmarks Count="2">
+          <Item0 X="2" Y="2650" ID="3"/>
+          <Item1 Y="355" ID="1"/>
         </Bookmarks>
-        <Loaded Value="True"/>
       </Unit39>
       <Unit40>
         <Filename Value="..\..\..\..\Source\uDWPoolerMethod.pas"/>
@@ -316,9 +318,9 @@
         <EditorIndex Value="-1"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
-          <EditorIndex Value="4"/>
+          <EditorIndex Value="-1"/>
         </ExtraEditor1>
-        <UsageCount Value="9"/>
+        <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit41>
       <Unit42>
@@ -375,14 +377,16 @@
       <Unit49>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
         <EditorIndex Value="-1"/>
+        <TopLine Value="217"/>
+        <CursorPos Y="231"/>
         <UsageCount Value="12"/>
       </Unit49>
       <Unit50>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-db\src\base\db.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="219"/>
-        <CursorPos X="63" Y="229"/>
-        <UsageCount Value="15"/>
+        <TopLine Value="1677"/>
+        <CursorPos X="47" Y="1684"/>
+        <UsageCount Value="17"/>
       </Unit50>
       <Unit51>
         <Filename Value="..\..\..\..\Source\libs\indy10\trunk\Lib\System\IdBaseComponent.pas"/>
@@ -461,24 +465,21 @@
       </Unit60>
       <Unit61>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="745"/>
-        <CursorPos Y="754"/>
-        <UsageCount Value="13"/>
-        <Bookmarks Count="2">
-          <Item0 X="12" Y="1243" ID="1"/>
-          <Item1 Y="815" ID="2"/>
+        <CursorPos X="15" Y="754"/>
+        <UsageCount Value="15"/>
+        <Bookmarks Count="1">
+          <Item0 Y="815" ID="2"/>
         </Bookmarks>
-        <Loaded Value="True"/>
       </Unit61>
+      <Unit62>
+        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriverReg.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit62>
     </Units>
-    <JumpHistory Count="1">
-      <Position1>
-        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <Caret Line="1851" Column="24" TopLine="1842"/>
-      </Position1>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
   </ProjectSession>
   <Debugging>
     <Watches Count="2">

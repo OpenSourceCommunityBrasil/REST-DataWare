@@ -62,8 +62,6 @@ TYPE
     StatusBar1: TStatusBar;
     Memo1: TMemo;
     Button4: TButton;
-    RESTDWClientSQL1ID: TStringField;
-    RESTDWClientSQL1DESC: TStringField;
     PROCEDURE Button1Click(Sender: TObject);
     PROCEDURE Button2Click(Sender: TObject);
     PROCEDURE RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);

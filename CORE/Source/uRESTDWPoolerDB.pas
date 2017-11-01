@@ -216,6 +216,9 @@ Type
 End;
 
 Type
+
+ { TRESTDWClientSQL }
+
  TRESTDWClientSQL     = Class(TRESTDWClientSQLBase) //Classe com as funcionalidades de um DBQuery
  Private
   vRESTClientPooler    : TRESTClientPooler;
@@ -241,6 +244,7 @@ Type
   vActualRec           : Integer;
   vMasterFields,
   vUpdateTableName     : String;                            //Tabela que será feito Update no Servidor se for usada Reflexão de Dados
+  vOnOpenCursor,
   vInactive,
   vCacheUpdateRecords,
   vReadData,
@@ -329,6 +333,9 @@ Type
   Procedure   DynamicFilter (Field, Value : String; InText : Boolean = False);
   Procedure   Refresh;
   Procedure   SaveToStream    (Var Stream : TMemoryStream);
+  {$IFDEF FPC}
+  Function    GetFields           : TFields;
+  {$ENDIF}
  Published
   Property MasterDataSet          : TRESTDWClientSQL    Read vMasterDataSet            Write SetMasterDataSet;
   Property MasterCascadeDelete    : Boolean             Read vCascadeDelete            Write vCascadeDelete;
@@ -342,6 +349,9 @@ Type
   Property Params                 : TParams             Read vParams                   Write vParams;                 //Parametros de Dataset
   Property DataBase               : TRESTDWDataBase     Read vRESTDataBase             Write SetDataBase;             //Database REST do Dataset
   Property SQL                    : TStringList         Read vSQL                      Write SetSQL;                  //SQL a ser Executado
+  {$IFDEF FPC}
+  Property Fields                 : TFields             Read GetFields;
+  {$ENDIF}
   Property UpdateTableName        : String              Read vUpdateTableName          Write SetUpdateTableName;      //Tabela que será usada para Reflexão de Dados
   Property CacheUpdateRecords     : Boolean             Read vCacheUpdateRecords       Write SetCacheUpdateRecords;
   Property AutoCommitData         : Boolean             Read vAutoCommitData           Write vAutoCommitData;
@@ -1508,7 +1518,7 @@ Begin
  vRestPooler := Value;
 End;
 
-Procedure TRESTDWClientSQL.SetDataBase(Value : TRESTDWDataBase);
+procedure TRESTDWClientSQL.SetDataBase(Value: TRESTDWDataBase);
 Begin
  if Value is TRESTDWDataBase then
   vRESTDataBase := Value
@@ -1516,7 +1526,7 @@ Begin
   vRESTDataBase := Nil;
 End;
 
-Procedure TRESTDWClientSQL.SetMasterDataSet(Value : TRESTDWClientSQL);
+procedure TRESTDWClientSQL.SetMasterDataSet(Value: TRESTDWClientSQL);
 Var
  MasterDetailItem : TMasterDetailItem;
 Begin
@@ -1544,11 +1554,12 @@ End;
 
 
 
-Constructor TRESTDWClientSQL.Create(AOwner : TComponent);
+constructor TRESTDWClientSQL.Create(AOwner: TComponent);
 Begin
  vInactive                         := True;
  Inherited;
  vInBlockEvents                    := False;
+ vOnOpenCursor                     := False;
  vRESTClientPooler                 := TRESTClientPooler.Create(Nil);
  vInactive                         := False;
  vDataCache                        := False;
@@ -1607,7 +1618,7 @@ Begin
  vMassiveDataset                   := TMassiveDatasetBuffer.Create(Self);
 End;
 
-Destructor  TRESTDWClientSQL.Destroy;
+destructor TRESTDWClientSQL.Destroy;
 Begin
  FreeAndNil(vSQL);
  FreeAndNil(vParams);
@@ -1625,7 +1636,7 @@ Begin
  Inherited;
 End;
 
-Procedure TRESTDWClientSQL.DynamicFilter(Field, Value : String; InText : Boolean = False);
+procedure TRESTDWClientSQL.DynamicFilter(Field, Value: String; InText: Boolean);
 Begin
  ExecOrOpen;
  If vActive Then
@@ -1710,9 +1721,23 @@ Begin
  Result := ScanParams(SQL);
 End;
 
-Procedure TRESTDWClientSQL.CreateParams;
+Function ReturnParamsAtual(ParamsList : TParams) : TStringList;
+Var
+ I : Integer;
+Begin
+ Result := Nil;
+ If ParamsList.Count > 0 Then
+  Begin
+   Result := TStringList.Create;
+   For I := 0 To ParamsList.Count -1 Do
+    Result.Add(ParamsList[I].Name);
+  End;
+End;
+
+procedure TRESTDWClientSQL.CreateParams;
 Var
  I         : Integer;
+ ParamsListAtual,
  ParamList : TStringList;
  Procedure CreateParam(Value : String);
   Function ParamSeek (Name : String) : Boolean;
@@ -1742,16 +1767,40 @@ Var
   Else If Not(ParamSeek(Value)) Then
    vParams.CreateParam(ftString, Value, ptInput);
  End;
+ Function CompareParams(A, B : TStringList) : Boolean;
+ Var
+  I, X : Integer;
+ Begin
+  Result := (A <> Nil) And (B <> Nil);
+  If Result Then
+   Begin
+    For I := 0 To A.Count -1 Do
+     Begin
+      For X := 0 To B.Count -1 Do
+       Begin
+        Result := lowercase(A[I]) = lowercase(B[X]);
+        If Result Then
+         Break;
+       End;
+      If Not Result Then
+       Break;
+     End;
+   End;
+  If Result Then
+   Result := B.Count > 0;
+ End;
 Begin
- vParams.Clear;
- ParamList := ReturnParams(vSQL.Text);
+ ParamList       := ReturnParams(vSQL.Text);
+ ParamsListAtual := ReturnParamsAtual(vParams);
+ If Not CompareParams(ParamsListAtual, ParamList) Then
+  vParams.Clear;
  If ParamList <> Nil Then
  For I := 0 to ParamList.Count -1 Do
   CreateParam(ParamList[I]);
  ParamList.Free;
 End;
 
-Procedure TRESTDWClientSQL.ProcAfterScroll(DataSet: TDataSet);
+procedure TRESTDWClientSQL.ProcAfterScroll(DataSet: TDataSet);
 Begin
  If State = dsBrowse Then
   Begin
@@ -1773,7 +1822,7 @@ Begin
   vOnAfterScroll(Dataset);
 End;
 
-Procedure TRESTDWClientSQL.GotoRec(Const aRecNo: Integer);
+procedure TRESTDWClientSQL.GotoRec(const aRecNo: Integer);
 Var
  ActiveRecNo,
  Distance     : Integer;
@@ -1794,7 +1843,7 @@ Begin
   End;
 End;
 
-Procedure TRESTDWClientSQL.ProcBeforeDelete(DataSet: TDataSet);
+procedure TRESTDWClientSQL.ProcBeforeDelete(DataSet: TDataSet);
 Var
  I : Integer;
  vDetailClient : TRESTDWClientSQL;
@@ -1842,7 +1891,7 @@ Begin
   End;
 End;
 
-Procedure TRESTDWClientSQL.ProcBeforeEdit(DataSet: TDataSet);
+procedure TRESTDWClientSQL.ProcBeforeEdit(DataSet: TDataSet);
 Begin
  If Not vInBlockEvents Then
   Begin
@@ -1856,14 +1905,14 @@ Begin
   End;
 End;
 
-Procedure TRESTDWClientSQL.ProcBeforeInsert(DataSet: TDataSet);
+procedure TRESTDWClientSQL.ProcBeforeInsert(DataSet: TDataSet);
 Begin
  If Not vInBlockEvents Then
   If Assigned(vBeforeInsert) Then
    vBeforeInsert(Dataset);
 End;
 
-Procedure TRESTDWClientSQL.ProcBeforeOpen(DataSet: TDataSet);
+procedure TRESTDWClientSQL.ProcBeforeOpen(DataSet: TDataSet);
 Begin
  If Not vInBlockEvents Then
   If Assigned(vBeforeOpen) Then
@@ -1925,7 +1974,7 @@ begin
 
 end;
 
-Procedure TRESTDWClientSQL.ProcAfterClose(DataSet: TDataSet);
+procedure TRESTDWClientSQL.ProcAfterClose(DataSet: TDataSet);
 Var
  I : Integer;
  vDetailClient : TRESTDWClientSQL;
@@ -1944,14 +1993,14 @@ Begin
   End;
 End;
 
-Procedure TRESTDWClientSQL.ProcAfterEdit(DataSet: TDataSet);
+procedure TRESTDWClientSQL.ProcAfterEdit(DataSet: TDataSet);
 Begin
  If Not vInBlockEvents Then
   If Assigned(vAfterEdit) Then
    vAfterEdit(Dataset);
 End;
 
-Procedure TRESTDWClientSQL.ProcAfterInsert(DataSet: TDataSet);
+procedure TRESTDWClientSQL.ProcAfterInsert(DataSet: TDataSet);
 Var
  I : Integer;
  vFields       : TStringList;
@@ -2007,7 +2056,7 @@ Begin
   End;
 End;
 
-Procedure TRESTDWClientSQL.ProcAfterOpen(DataSet: TDataSet);
+procedure TRESTDWClientSQL.ProcAfterOpen(DataSet: TDataSet);
 Begin
  If Not vInBlockEvents Then
   Begin
@@ -2016,7 +2065,7 @@ Begin
   End;
 End;
 
-Procedure TRESTDWClientSQL.ProcAfterCancel(DataSet : TDataSet);
+procedure TRESTDWClientSQL.ProcAfterCancel(DataSet: TDataSet);
 Begin
  If Not vInBlockEvents Then
   Begin
@@ -2027,7 +2076,7 @@ Begin
   End;
 End;
 
-Function  TRESTDWClientSQL.ApplyUpdates(Var Error : String) : Boolean;
+function TRESTDWClientSQL.ApplyUpdates(Var Error: String): Boolean;
 Var
  vError       : Boolean;
  vErrorMSG,
@@ -2099,7 +2148,7 @@ Begin
   End;
 End;
 
-Function  TRESTDWClientSQL.ParamByName(Value : String) : TParam;
+function TRESTDWClientSQL.ParamByName(Value: String): TParam;
 Var
  I : Integer;
  vParamName,
@@ -2122,12 +2171,12 @@ Begin
   End;
 End;
 
-Function TRESTDWClientSQL.ParamCount: Integer;
+function TRESTDWClientSQL.ParamCount: Integer;
 Begin
  Result := vParams.Count;
 End;
 
-Procedure TRESTDWClientSQL.FieldDefsToFields;
+procedure TRESTDWClientSQL.FieldDefsToFields;
 Var
  I          : Integer;
  FieldValue : TField;
@@ -2144,7 +2193,7 @@ Begin
   End;
 End;
 
-Function TRESTDWClientSQL.FirstWord(Value : String) : String;
+function TRESTDWClientSQL.FirstWord(Value: String): String;
 Var
  vTempValue : PChar;
 Begin
@@ -2159,7 +2208,7 @@ Begin
   End;
 End;
 
-Procedure TRESTDWClientSQL.ExecOrOpen;
+procedure TRESTDWClientSQL.ExecOrOpen;
 Var
  vError : String;
  Function OpenSQL : Boolean;
@@ -2189,7 +2238,7 @@ Begin
   End;
 End;
 
-Function TRESTDWClientSQL.ExecSQL(Var Error : String) : Boolean;
+function TRESTDWClientSQL.ExecSQL(Var Error: String): Boolean;
 Var
  vError        : Boolean;
  vMessageError : String;
@@ -2211,7 +2260,7 @@ Begin
  End;
 End;
 
-Function TRESTDWClientSQL.InsertMySQLReturnID : Integer;
+function TRESTDWClientSQL.InsertMySQLReturnID: Integer;
 Var
  vError        : Boolean;
  vMessageError : String;
@@ -2226,12 +2275,12 @@ Begin
  End;
 End;
 
-Procedure TRESTDWClientSQL.OnChangingSQL(Sender: TObject);
+procedure TRESTDWClientSQL.OnChangingSQL(Sender: TObject);
 Begin
  CreateParams;
 End;
 
-Procedure TRESTDWClientSQL.SetSQL(Value : TStringList);
+procedure TRESTDWClientSQL.SetSQL(Value: TStringList);
 Var
  I : Integer;
 Begin
@@ -2240,7 +2289,7 @@ Begin
   vSQL.Add(Value[I]);
 End;
 
-Procedure TRESTDWClientSQL.CreateDataSet;
+procedure TRESTDWClientSQL.CreateDataSet;
 Begin
  vCreateDS := True;
  {$IFDEF FPC}
@@ -2261,7 +2310,7 @@ Begin
  vCreateDS := False;
 End;
 
-Procedure TRESTDWClientSQL.Close;
+procedure TRESTDWClientSQL.Close;
 Begin
  vActive := False;
  Inherited Close;
@@ -2269,12 +2318,12 @@ Begin
 // FieldDefs.Clear;
 End;
 
-Procedure TRESTDWClientSQL.CommitData;
+procedure TRESTDWClientSQL.CommitData;
 Begin
 
 End;
 
-Procedure TRESTDWClientSQL.Open;
+procedure TRESTDWClientSQL.Open;
 Begin
  Try
   If Not vInactive Then
@@ -2293,7 +2342,7 @@ Begin
  End;
 End;
 
-Procedure TRESTDWClientSQL.Open(SQL : String);
+procedure TRESTDWClientSQL.Open(SQL: String);
 Begin
  If Not vActive Then
   Begin
@@ -2305,12 +2354,31 @@ Begin
   End;
 End;
 
-Procedure TRESTDWClientSQL.OpenCursor(InfoQuery: Boolean);
+procedure TRESTDWClientSQL.OpenCursor(InfoQuery: Boolean);
 Begin
  Try
-  Inherited OpenCursor(InfoQuery);
-  If FieldDefs.Count = 0 Then
-   FieldDefs.Update;
+{
+  If csDesigning in ComponentState Then
+   Begin
+    If Not vOnOpenCursor Then
+     Begin
+      vOnOpenCursor := True;
+      Try
+       SetActiveDB(False);
+       SetActiveDB(True);
+      Finally
+
+      End;
+      vOnOpenCursor := False;
+     End;
+   End;
+ }
+  If (vRESTDataBase <> Nil) Then
+   Inherited OpenCursor(InfoQuery)
+  Else
+   Raise Exception.Create('Database not found...');
+//  If FieldDefs.Count = 0 Then
+//   FieldDefs.Update;
  Except
   On E : Exception do
    Begin
@@ -2327,7 +2395,7 @@ Begin
  End;
 End;
 
-Procedure TRESTDWClientSQL.OldAfterPost(DataSet: TDataSet);
+procedure TRESTDWClientSQL.OldAfterPost(DataSet: TDataSet);
 Var
  vError : String;
 Begin
@@ -2356,7 +2424,7 @@ Begin
   End;
 End;
 
-Procedure TRESTDWClientSQL.OldAfterDelete(DataSet: TDataSet);
+procedure TRESTDWClientSQL.OldAfterDelete(DataSet: TDataSet);
 Begin
  vErrorBefore := False;
  Try
@@ -2369,19 +2437,20 @@ Begin
  End;
 End;
 
-Procedure TRESTDWClientSQL.SetUpdateTableName(Value : String);
+procedure TRESTDWClientSQL.SetUpdateTableName(Value: String);
 Begin
  vCommitUpdates    := Trim(Value) <> '';
  vUpdateTableName  := Value;
 End;
 
-Procedure TRESTDWClientSQL.Loaded;
+procedure TRESTDWClientSQL.Loaded;
 Begin
  Inherited Loaded;
 End;
 
 {$IFDEF FPC}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source : TMemDataset; aSelf : TMemDataset);
+procedure TRESTDWClientSQL.CloneDefinitions(Source: TMemDataset;
+  aSelf: TMemDataset);
 {$ELSE}
 {$IFDEF RESJEDI}
 Procedure TRESTDWClientSQL.CloneDefinitions(Source : TJvMemoryData; aSelf : TJvMemoryData);
@@ -2424,7 +2493,7 @@ Begin
   aSelf.Open;
 End;
 
-Procedure TRESTDWClientSQL.PrepareDetailsNew;
+procedure TRESTDWClientSQL.PrepareDetailsNew;
 Var
  I : Integer;
  vDetailClient : TRESTDWClientSQL;
@@ -2444,7 +2513,7 @@ Begin
   End;
 End;
 
-Procedure TRESTDWClientSQL.PrepareDetails(ActiveMode : Boolean);
+procedure TRESTDWClientSQL.PrepareDetails(ActiveMode: Boolean);
 Var
  I : Integer;
  vDetailClient : TRESTDWClientSQL;
@@ -2478,7 +2547,7 @@ Begin
   End;
 End;
 
-Function TRESTDWClientSQL.GetData(DataSet  : TJSONValue = Nil) : Boolean;
+function TRESTDWClientSQL.GetData(DataSet: TJSONValue): Boolean;
 Var
  LDataSetList  : TJSONValue;
  vError        : Boolean;
@@ -2531,12 +2600,19 @@ Begin
   Raise Exception.Create(PChar('Empty Database Property'));
 End;
 
-Procedure TRESTDWClientSQL.SaveToStream(var Stream: TMemoryStream);
+procedure TRESTDWClientSQL.SaveToStream(Var Stream: TMemoryStream);
 Begin
 
 End;
 
-Procedure TRESTDWClientSQL.SetActiveDB(Value : Boolean);
+{$IFDEF FPC}
+Function TRESTDWClientSQL.GetFields: TFields;
+Begin
+ Result := TMemDataset(Self).Fields;
+End;
+{$ENDIF}
+
+procedure TRESTDWClientSQL.SetActiveDB(Value: Boolean);
 Begin
  If vInactive then
   Begin
@@ -2627,7 +2703,7 @@ Begin
   End;
 End;
 
-Procedure TRESTDWClientSQL.SetCacheUpdateRecords(Value: Boolean);
+procedure TRESTDWClientSQL.SetCacheUpdateRecords(Value: Boolean);
 Begin
  vCacheUpdateRecords := Value;
 End;
@@ -2670,7 +2746,7 @@ Procedure TRESTDWDataBase.SetMyIp(Value: String);
 Begin
 End;
 
-Function TRESTDWClientSQL.FieldDefExist(Value: String): TFieldDef;
+function TRESTDWClientSQL.FieldDefExist(Value: String): TFieldDef;
 Var
  I : Integer;
 Begin

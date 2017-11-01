@@ -181,6 +181,10 @@ Begin
                FreeAndNil(vStringStream);
               End;
              End
+            Else If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                                                      ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                                      ftString,    ftWideString]    Then
+             vTempQuery.Params[A].AsString := Params[I].Value
             Else
              vTempQuery.Params[A].Value    := Params[I].Value;
            End;
