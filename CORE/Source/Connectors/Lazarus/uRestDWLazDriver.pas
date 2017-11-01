@@ -665,6 +665,7 @@ Var
       InTransaction := False;
       ATransaction.Commit;
      End;
+    Result         := True;
    Except
     On E : Exception do
      Begin
@@ -706,6 +707,7 @@ Begin
     If SQL <> '' Then
      Begin
       Try
+       vTempQuery.Close;
        vTempQuery.SQL.Clear;
        vTempQuery.SQL.Add(SQL);
        If Params <> Nil Then
@@ -1013,7 +1015,6 @@ Begin
  Error  := False;
  Try
   Try
-   ATransaction.DataBase := TDatabase(vConnection);
    ATransaction.StartTransaction;;
    vTempQuery.ExecSQL;
    If (vConnection is TMySQL40Connection)      Then
@@ -1080,7 +1081,6 @@ Begin
  Error  := False;
  Try
   Try
-   ATransaction.DataBase := TDatabase(vConnection);
    ATransaction.StartTransaction;;
    vTempQuery.ExecSQL;
    If (vConnection is TMySQL40Connection)      Then
