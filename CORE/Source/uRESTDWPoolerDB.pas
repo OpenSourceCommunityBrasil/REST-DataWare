@@ -1943,13 +1943,13 @@ Begin
    vReadData     := False;
    If Not vInBlockEvents Then
     Begin
+     If Assigned(vBeforePost) Then
+      vBeforePost(DataSet);
      If Trim(vUpdateTableName) <> '' Then
       Begin
        TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, DatasetStateToMassiveType(vOldState), vOldState = dsEdit);
        TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self);
       End;
-     If Assigned(vBeforePost) Then
-      vBeforePost(DataSet);
     End;
   End;
 End;
