@@ -205,14 +205,9 @@ Begin
             Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
-               Begin
-                If vTempQuery.Params[A].DataType      = ftDate Then
-                 vTempQuery.Params[A].AsDate      := StrToDate(Params[I].Value)
-                Else If vTempQuery.Params[A].DataType = ftTime Then
-                 vTempQuery.Params[A].AsDateTime  := StrToTime(Params[I].Value)
-                Else If vTempQuery.Params[A].DataType In [ftDateTime, ftTimeStamp] Then
-                 vTempQuery.Params[A].AsDateTime  := StrToDateTime(Params[I].Value);
-               End;
+               vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
+              Else
+               vTempQuery.Params[A].AsDateTime  := Null;
              End
             Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
              Begin
@@ -442,14 +437,9 @@ Var
          Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
           Begin
            If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
-            Begin
-             If Query.Params[I].DataType      = ftDate Then
-              Query.Params[I].AsDate      := StrToDate(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-             Else If Query.Params[I].DataType = ftTime Then
-              Query.Params[I].AsDateTime  := StrToTime(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-             Else If Query.Params[I].DataType In [ftDateTime, ftTimeStamp] Then
-              Query.Params[I].AsDateTime  := StrToDateTime(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
-            End;
+            Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+           Else
+            Query.Params[I].AsDateTime  := Null;
           End  //Tratar Blobs de Parametros...
          Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
           Begin
@@ -510,14 +500,9 @@ Var
               Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
                Begin
                 If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
-                 Begin
-                  If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType      = ftDate Then
-                   Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDate      := StrToDate(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-                  Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftTime Then
-                   Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := StrToTime(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-                  Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType In [ftDateTime, ftTimeStamp] Then
-                   Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := StrToDateTime(MassiveDataset.AtualRec.PrimaryValues[X].Value);
-                 End;
+                 Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := StrToFloat(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+                Else
+                 Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := Null;
                End  //Tratar Blobs de Parametros...
               Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
                Begin
@@ -574,14 +559,9 @@ Var
          Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
           Begin
            If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
-            Begin
-             If Query.Params[I].DataType      = ftDate Then
-              Query.Params[I].AsDate      := StrToDate(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-             Else If Query.Params[I].DataType = ftTime Then
-              Query.Params[I].AsDateTime  := StrToTime(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-             Else If Query.Params[I].DataType In [ftDateTime, ftTimeStamp] Then
-              Query.Params[I].AsDateTime  := StrToDateTime(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
-            End;
+            Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+           Else
+            Query.Params[I].AsDateTime  := Null;
           End  //Tratar Blobs de Parametros...
          Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
           Begin
@@ -756,14 +736,9 @@ Begin
                  Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
                   Begin
                    If Trim(Params[I].Value) <> '' Then
-                    Begin
-                     If vTempQuery.Params[A].DataType      = ftDate Then
-                      vTempQuery.Params[A].AsDate      := StrToDate(Params[I].Value)
-                     Else If vTempQuery.Params[A].DataType = ftTime Then
-                      vTempQuery.Params[A].AsDateTime  := StrToTime(Params[I].Value)
-                     Else If vTempQuery.Params[A].DataType In [ftDateTime, ftTimeStamp] Then
-                      vTempQuery.Params[A].AsDateTime  := StrToDateTime(Params[I].Value);
-                    End;
+                    vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
+                   Else
+                    vTempQuery.Params[A].AsDateTime  := Null;
                   End  //Tratar Blobs de Parametros...
                  Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
                   Begin
@@ -982,14 +957,9 @@ Begin
            Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
             Begin
              If Trim(Params[I].Value) <> '' Then
-              Begin
-               If vTempQuery.Params[A].DataType      = ftDate Then
-                vTempQuery.Params[A].AsDate      := StrToDate(Params[I].Value)
-               Else If vTempQuery.Params[A].DataType = ftTime Then
-                vTempQuery.Params[A].AsDateTime  := StrToTime(Params[I].Value)
-               Else If vTempQuery.Params[A].DataType In [ftDateTime, ftTimeStamp] Then
-                vTempQuery.Params[A].AsDateTime  := StrToDateTime(Params[I].Value);
-              End;
+              vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
+             Else
+              vTempQuery.Params[A].AsDateTime  := Null;
             End
            Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
             Begin

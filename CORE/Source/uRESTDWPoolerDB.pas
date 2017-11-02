@@ -113,8 +113,6 @@ Type
   vOnWorkBegin         : TOnWorkBegin;
   vOnWorkEnd           : TOnWorkEnd;
   vOnStatus            : TOnStatus;
-  vDateSeparator,
-  vTimeSeparator,
   vDecimalSeparator,
   vWelcomeMessage,
   vLogin,                                            //Login do Usuário caso haja autenticação
@@ -203,8 +201,6 @@ Type
   Property StrsEmpty2Null     : Boolean                  Read vStrsEmpty2Null     Write vStrsEmpty2Null;
   Property StrsTrim2Len       : Boolean                  Read vStrsTrim2Len       Write vStrsTrim2Len;
   Property WelcomeMessage     : String                   Read vWelcomeMessage     Write vWelcomeMessage;
-  Property DateSeparator      : String                   Read vDateSeparator      Write vDateSeparator;
-  Property TimeSeparator      : String                   Read vTimeSeparator      Write vTimeSeparator;
   Property DecimalSeparator   : String                   Read vDecimalSeparator   Write vDecimalSeparator;
   Property OnWork             : TOnWork                  Read vOnWork             Write SetOnWork;
   Property OnWorkBegin        : TOnWorkBegin             Read vOnWorkBegin        Write SetOnWorkBegin;
@@ -1367,8 +1363,6 @@ Begin
  vStrsTrim                 := False;
  vStrsEmpty2Null           := False;
  vStrsTrim2Len             := True;
- vDateSeparator            := '/';
- vTimeSeparator            := ':';
  vDecimalSeparator         := ',';
  {$IFDEF FPC}
  vDatabaseCharSet := csUndefined;
@@ -2571,8 +2565,6 @@ Begin
       Try
        LDataSetList.Encoded := vRESTDataBase.EncodeStrings;
        LDataSetList.WriteToDataset(dtFull, LDataSetList.ToJSON, Self,
-                                   vRESTDataBase.vDateSeparator,
-                                   vRESTDataBase.vTimeSeparator,
                                    vRESTDataBase.vDecimalSeparator);
        Result := True;
       Except

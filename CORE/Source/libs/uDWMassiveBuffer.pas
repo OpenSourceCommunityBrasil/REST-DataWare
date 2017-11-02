@@ -694,7 +694,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                     If Not UpdateTag Then
                                      Begin
                                       If Trim(Field.AsString) <> '' Then
-                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString
+                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := FloatToStr(Field.AsDateTime)
                                       Else
                                        MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
                                      End

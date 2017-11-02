@@ -1117,9 +1117,9 @@ object Form2: TForm2
     top = 328
   end
   object RESTDWDataBase1: TRESTDWDataBase
-    Active = True
+    Active = False
     Compression = True
-    MyIP = '127.0.0.1'
+    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -1135,15 +1135,13 @@ object Form2: TForm2
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    DateSeparator = '/'
-    TimeSeparator = ':'
     DecimalSeparator = ','
     OnWork = RESTDWDataBase1Work
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd
     DatabaseCharSet = csWin1252
-    left = 344
-    top = 280
+    left = 256
+    top = 248
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
     Active = False
@@ -1216,7 +1214,7 @@ object Form2: TForm2
     AutoCommitData = False
     AutoRefreshAfterCommit = True
     InBlockEvents = False
-    left = 255
+    left = 192
     top = 288
   end
 end

@@ -72,8 +72,6 @@ Private
  Function  FormatValue  (bValue      : String)       : String;
  Function  GetValueJSON (bValue      : String)       : String;
  Function  DatasetValues(bValue      : TDataset;
-                         DTSeparator : String = '/';
-                         TMSeparator : String = ':';
                          DCSeparator : String = ',') : String;
  Function EncodedString : String;
 Public
@@ -81,16 +79,12 @@ Public
  Procedure LoadFromDataset(TableName    : String;
                            bValue       : TDataset;
                            EncodedValue : Boolean = True;
-                           DTSeparator  : String = '/';
-                           TMSeparator  : String = ':';
                            DCSeparator  : String = ','{$IFDEF FPC};
                            CharSet      : TDatabaseCharSet = csUndefined{$ENDIF});
  // alterado por fabricio  passa o nome da tabela
  Procedure WriteToDataset (DatasetType  : TDatasetType;
                            JSONValue    : String;
                            DestDS       : TDataset;
-                           DTSeparator  : String = '/';
-                           TMSeparator  : String = ':';
                            DCSeparator  : String = ','{$IFDEF FPC};
                            CharSet      : TDatabaseCharSet = csUndefined{$ENDIF});
  Procedure LoadFromJSON   (bValue       : String);
@@ -705,8 +699,6 @@ Else
 End;
 
 Function TJSONValue.DatasetValues(bValue      : TDataset;
-                                  DTSeparator : String = '/';
-                                  TMSeparator : String = ':';
                                   DCSeparator : String = ',') : String;
 Var
  vLines : String;
@@ -818,19 +810,9 @@ Var
            End;
          End
         Else If bValue.Fields[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
-         Begin
-          If bValue.Fields[I].DataType      = ftDate Then
-           vTempValue := Format ('"%s"',       [StringReplace(FormatDateTime('dd/mm/yyyy', bValue.Fields[I].AsDateTime), '/', 'dt', [rfReplaceAll])])
-          Else If bValue.Fields[I].DataType = ftTime Then
-           vTempValue := Format ('"%s"',       [StringReplace(FormatDateTime('hh:mm:ss',   bValue.Fields[I].AsDateTime), ':', 'ts', [rfReplaceAll])])
-          Else If bValue.Fields[I].DataType In [ftDateTime, ftTimeStamp] Then
-           Begin
-            vTempValue := StringReplace  (FormatDateTime('dd/mm/yyyy', bValue.Fields[I].AsDateTime), '/', 'dt', [rfReplaceAll]);
-            vTempValue := Format('"%s"', [vTempValue + ' ' + StringReplace(FormatDateTime('hh:mm:ss', bValue.Fields[I].AsDateTime), ':', 'ts', [rfReplaceAll])]);
-           End;
-         End
+         vTempValue     := Format('"%s"',      [FloatToStr(bValue.Fields[I].AsDateTime)])
         Else
-         vTempValue    := Format('"%s"', [bValue.Fields[I].AsString]);    //asstring
+         vTempValue     := Format('"%s"',      [bValue.Fields[I].AsString]);    //asstring
        End;
      End
     Else
@@ -876,8 +858,6 @@ End;
 Procedure TJSONValue.LoadFromDataset(TableName    : String;
                                      bValue       : TDataset;
                                      EncodedValue : Boolean = True;
-                                     DTSeparator  : String = '/';
-                                     TMSeparator  : String = ':';
                                      DCSeparator  : String = ','{$IFDEF FPC};
                                      CharSet      : TDatabaseCharSet = csUndefined{$ENDIF});
 Var
@@ -888,7 +868,7 @@ Begin
  vObjectValue     := ovDataSet;
  vtagName         := Lowercase(TableName);
  vEncoded         := EncodedValue;
- vTagGeral        := DatasetValues(bValue, DTSeparator, TMSeparator, DCSeparator);
+ vTagGeral        := DatasetValues(bValue, DCSeparator);
  aValue           := ToBytes(vTagGeral);
 End;
 
@@ -1008,16 +988,8 @@ Var
    ftDateTime,
    ftTimeStamp  : Begin
                    vTempValue        := Value;
-                   If (Pos('dt', vTempValue) > 0) or (Pos('-', vTempValue) > 0) or (Pos('/', vTempValue) > 0)Then
-                   Begin
-                    vTempValue       := StringReplace(vTempValue, 'dt', DTSeparator, [rfReplaceAll]);
-                    vTempValue       := StringReplace(vTempValue, '-', DTSeparator, [rfReplaceAll]);
-                    vTempValue       := StringReplace(vTempValue, '/', DTSeparator, [rfReplaceAll]);
-                   End;
-                   If Pos('ts', vTempValue) > 0 Then
-                    vTempValue       := StringReplace(vTempValue, 'ts', TMSeparator, [rfReplaceAll]);
                    If vTempValue <> '' Then
-                    Field.AsDateTime := StrToDateTime(vTempValue);
+                    Field.AsDateTime := StrToFloat(vTempValue);
                   End;
   End;
  End;
@@ -1331,8 +1303,6 @@ End;
 Procedure TJSONValue.WriteToDataset(DatasetType : TDatasetType;
                                     JSONValue   : String;
                                     DestDS      : TDataset;
-                                    DTSeparator : String = '/';
-                                    TMSeparator : String = ':';
                                     DCSeparator : String = ','{$IFDEF FPC};
                                     CharSet     : TDatabaseCharSet = csUndefined{$ENDIF});
 Var
@@ -1410,16 +1380,8 @@ Var
                   ftDateTime,
                   ftTimeStamp  : Begin
                                   vTempValue        := Value;
-                                  If (Pos('dt', vTempValue) > 0) or (Pos('-', vTempValue) > 0) or (Pos('/', vTempValue) > 0)Then
-                                  Begin
-                                   vTempValue       := StringReplace(vTempValue, 'dt', DTSeparator, [rfReplaceAll]);
-                                   vTempValue       := StringReplace(vTempValue, '-', DTSeparator, [rfReplaceAll]);
-                                   vTempValue       := StringReplace(vTempValue, '/', DTSeparator, [rfReplaceAll]);
-                                  End;
-                                  If Pos('ts', vTempValue) > 0 Then
-                                   vTempValue       := StringReplace(vTempValue, 'ts', TMSeparator, [rfReplaceAll]);
                                   If vTempValue <> '' Then
-                                   Field.AsDateTime := StrToDateTime(vTempValue);
+                                   Field.AsDateTime := StrToFloat(vTempValue);
                                  End;
   End;
  End;

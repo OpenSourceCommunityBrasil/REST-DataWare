@@ -1047,7 +1047,7 @@ object Form2: TForm2
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     Lines.Strings = (
-      'select * from STRINGTABLE')
+      'select * from employee')
     ParentFont = False
     TabOrder = 5
   end
@@ -1161,17 +1161,67 @@ object Form2: TForm2
     Top = 128
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
+    AfterInsert = RESTDWClientSQL1AfterInsert
     FieldDefs = <
       item
-        Name = 'ID'
+        Name = 'EMP_NO'
         Attributes = [faRequired]
-        DataType = ftString
-        Size = 10
+        DataType = ftSmallint
       end
       item
-        Name = 'DESC'
+        Name = 'FIRST_NAME'
+        Attributes = [faRequired]
         DataType = ftString
-        Size = 100
+        Size = 15
+      end
+      item
+        Name = 'LAST_NAME'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 20
+      end
+      item
+        Name = 'PHONE_EXT'
+        DataType = ftString
+        Size = 4
+      end
+      item
+        Name = 'HIRE_DATE'
+        Attributes = [faRequired]
+        DataType = ftTimeStamp
+      end
+      item
+        Name = 'DEPT_NO'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 3
+      end
+      item
+        Name = 'JOB_CODE'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 5
+      end
+      item
+        Name = 'JOB_GRADE'
+        Attributes = [faRequired]
+        DataType = ftSmallint
+      end
+      item
+        Name = 'JOB_COUNTRY'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 15
+      end
+      item
+        Name = 'SALARY'
+        Attributes = [faRequired]
+        DataType = ftFloat
+      end
+      item
+        Name = 'FULL_NAME'
+        DataType = ftString
+        Size = 37
       end>
     IndexDefs = <>
     MasterFields = ''
@@ -1190,21 +1240,70 @@ object Form2: TForm2
     Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
-      'select * from stringtable')
-    UpdateTableName = 'STRINGTABLE'
+      'select * from employee')
+    UpdateTableName = 'employee'
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = True
     InBlockEvents = False
     Left = 240
     Top = 64
+    object RESTDWClientSQL1EMP_NO: TSmallintField
+      FieldName = 'EMP_NO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object RESTDWClientSQL1FIRST_NAME: TStringField
+      FieldName = 'FIRST_NAME'
+      Required = True
+      Size = 15
+    end
+    object RESTDWClientSQL1LAST_NAME: TStringField
+      FieldName = 'LAST_NAME'
+      Required = True
+    end
+    object RESTDWClientSQL1PHONE_EXT: TStringField
+      FieldName = 'PHONE_EXT'
+      Size = 4
+    end
+    object RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField
+      FieldName = 'HIRE_DATE'
+      Required = True
+    end
+    object RESTDWClientSQL1DEPT_NO: TStringField
+      FieldName = 'DEPT_NO'
+      Required = True
+      Size = 3
+    end
+    object RESTDWClientSQL1JOB_CODE: TStringField
+      FieldName = 'JOB_CODE'
+      Required = True
+      Size = 5
+    end
+    object RESTDWClientSQL1JOB_GRADE: TSmallintField
+      FieldName = 'JOB_GRADE'
+      Required = True
+    end
+    object RESTDWClientSQL1JOB_COUNTRY: TStringField
+      FieldName = 'JOB_COUNTRY'
+      Required = True
+      Size = 15
+    end
+    object RESTDWClientSQL1SALARY: TFloatField
+      FieldName = 'SALARY'
+      Required = True
+    end
+    object RESTDWClientSQL1FULL_NAME: TStringField
+      FieldName = 'FULL_NAME'
+      ReadOnly = True
+      Size = 37
+    end
   end
   object RESTDWDataBase1: TRESTDWDataBase
     OnConnection = RESTDWDataBase1Connection
     OnBeforeConnect = RESTDWDataBase1BeforeConnect
-    Active = True
+    Active = False
     Compression = True
-    MyIP = '127.0.0.1'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -1220,8 +1319,6 @@ object Form2: TForm2
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    DateSeparator = '/'
-    TimeSeparator = ':'
     DecimalSeparator = ','
     OnWork = RESTDWDataBase1Work
     OnWorkBegin = RESTDWDataBase1WorkBegin
