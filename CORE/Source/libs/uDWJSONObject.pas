@@ -909,9 +909,8 @@ End;
 Procedure TJSONValue.WriteToDataset(DatasetType : TDatasetType;
                                     JSONValue   : String;
                                     DestDS      : TDataset;
-                                    DTSeparator : String = '/';
-                                    TMSeparator : String = ':';
-                                    DCSeparator : String = ',');
+                                    DCSeparator : String = ','{$IFDEF FPC};
+                                    CharSet     : TDatabaseCharSet = csUndefined{$ENDIF});
 Var
  bJsonOBJ,
  bJsonArraySub,
