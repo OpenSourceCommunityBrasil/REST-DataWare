@@ -1094,6 +1094,8 @@ object Form6: TForm6
     SQL.Strings = (
       'select * from IMAGELIST')
     CacheUpdateRecords = True
+    AutoCommitData = False
+    AutoRefreshAfterCommit = False
     InBlockEvents = False
     Left = 224
     Top = 64
@@ -1123,8 +1125,6 @@ object Form6: TForm6
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    DateSeparator = '/'
-    TimeSeparator = ':'
     DecimalSeparator = ','
     Left = 240
   end

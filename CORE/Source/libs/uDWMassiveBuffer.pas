@@ -702,7 +702,10 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                      Begin
                                       If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> Field.AsString Then
                                        Begin
-                                        MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsString;
+                                        If Trim(Field.AsString) <> '' Then
+                                         MassiveLineBuff.vMassiveValues.Items[I + 1].Value := FloatToStr(Field.AsDateTime)
+                                        Else
+                                         MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
                                         MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
                                        End;
                                      End;

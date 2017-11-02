@@ -1192,7 +1192,6 @@ object Form7: TForm7
   object RESTDWDataBase1: TRESTDWDataBase
     Active = False
     Compression = True
-    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -1208,8 +1207,6 @@ object Form7: TForm7
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    DateSeparator = '/'
-    TimeSeparator = ':'
     DecimalSeparator = ','
     Left = 240
   end
