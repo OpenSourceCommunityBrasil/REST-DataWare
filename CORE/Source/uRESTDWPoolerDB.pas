@@ -1944,7 +1944,25 @@ Begin
      If Trim(vUpdateTableName) <> '' Then
       Begin
        TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, DatasetStateToMassiveType(vOldState), vOldState = dsEdit);
-       TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self);
+       If vOldState = dsEdit Then
+        Begin
+         If TMassiveDatasetBuffer(vMassiveDataset).TempBuffer <> Nil Then
+          Begin
+           If TMassiveDatasetBuffer(vMassiveDataset).TempBuffer.UpdateFieldChanges <> Nil Then
+            Begin
+             If TMassiveDatasetBuffer(vMassiveDataset).TempBuffer.UpdateFieldChanges.Count = 0 Then
+              TMassiveDatasetBuffer(vMassiveDataset).ClearLine
+             Else
+              TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self);
+            End
+           Else
+            TMassiveDatasetBuffer(vMassiveDataset).ClearLine;
+          End
+         Else
+          TMassiveDatasetBuffer(vMassiveDataset).ClearLine;
+        End
+       Else
+        TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self);
       End;
     End;
   End;

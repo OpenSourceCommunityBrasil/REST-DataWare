@@ -148,6 +148,7 @@ Type
   Procedure Prior;
   Procedure Next;
   Procedure Last;
+  Property  TempBuffer  : TMassiveLine     Read vMassiveLine;
   Function  PrimaryKeys : TStringList;
   Function  AtualRec    : TMassiveLine;
   Procedure NewBuffer   (Dataset              : TRESTDWClientSQLBase;
