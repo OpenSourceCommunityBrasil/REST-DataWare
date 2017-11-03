@@ -38,6 +38,18 @@ type
     DataSource1: TDataSource;
     Button2: TButton;
     ProgressBar1: TProgressBar;
+    RESTDWClientSQL1EMP_NO: TSmallintField;
+    RESTDWClientSQL1FIRST_NAME: TStringField;
+    RESTDWClientSQL1LAST_NAME: TStringField;
+    RESTDWClientSQL1PHONE_EXT: TStringField;
+    RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField;
+    RESTDWClientSQL1DEPT_NO: TStringField;
+    RESTDWClientSQL1JOB_CODE: TStringField;
+    RESTDWClientSQL1JOB_GRADE: TSmallintField;
+    RESTDWClientSQL1JOB_COUNTRY: TStringField;
+    RESTDWClientSQL1SALARY: TFloatField;
+    RESTDWClientSQL1FULL_NAME: TStringField;
+    Button4: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure RESTDWDataBase1WorkBegin(ASender: TObject;
@@ -46,6 +58,8 @@ type
       AWorkCount: Int64);
     procedure RESTDWDataBase1WorkEnd(ASender: TObject;
       AWorkMode: TWorkMode);
+    procedure Button4Click(Sender: TObject);
+    procedure RESTDWClientSQL1AfterInsert(DataSet: TDataSet);
   private
     { Private declarations }
    FBytesToTransfer : Int64;
@@ -118,6 +132,19 @@ procedure TForm2.RESTDWDataBase1WorkEnd(ASender: TObject;
 begin
  ProgressBar1.Position := FBytesToTransfer;
  FBytesToTransfer      := 0;
+end;
+
+procedure TForm2.Button4Click(Sender: TObject);
+Var
+ vError : String;
+begin
+ If Not RESTDWClientSQL1.ApplyUpdates(vError) Then
+  MessageDlg(vError, mtError, [mbOK], 0);
+end;
+
+procedure TForm2.RESTDWClientSQL1AfterInsert(DataSet: TDataSet);
+begin
+ RESTDWClientSQL1HIRE_DATE.AsDateTime := Now;
 end;
 
 end.

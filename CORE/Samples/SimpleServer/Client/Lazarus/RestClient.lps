@@ -19,6 +19,9 @@
         <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="117"/>
+        <CursorPos X="57" Y="126"/>
         <UsageCount Value="193"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -473,7 +476,6 @@
       </Unit61>
       <Unit62>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="972"/>
         <CursorPos Y="981"/>
@@ -499,123 +501,122 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="591" TopLine="566"/>
+        <Caret Line="626" TopLine="610"/>
       </Position1>
       <Position2>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="626" TopLine="610"/>
+        <Caret Line="630" TopLine="610"/>
       </Position2>
       <Position3>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="630" TopLine="610"/>
+        <Caret Line="644" TopLine="628"/>
       </Position3>
       <Position4>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="644" TopLine="628"/>
+        <Caret Line="583" TopLine="566"/>
       </Position4>
       <Position5>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="583" TopLine="566"/>
+        <Caret Line="584" TopLine="566"/>
       </Position5>
       <Position6>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="584" TopLine="566"/>
+        <Caret Line="586" TopLine="566"/>
       </Position6>
       <Position7>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="586" TopLine="566"/>
+        <Caret Line="590" TopLine="566"/>
       </Position7>
       <Position8>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="590" TopLine="566"/>
+        <Caret Line="591" TopLine="566"/>
       </Position8>
       <Position9>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="591" TopLine="566"/>
+        <Caret Line="626" TopLine="610"/>
       </Position9>
       <Position10>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="626" TopLine="610"/>
+        <Caret Line="630" TopLine="610"/>
       </Position10>
       <Position11>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="630" TopLine="610"/>
+        <Caret Line="644" TopLine="628"/>
       </Position11>
       <Position12>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="644" TopLine="628"/>
+        <Caret Line="583" TopLine="566"/>
       </Position12>
       <Position13>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="583" TopLine="566"/>
+        <Caret Line="584" TopLine="566"/>
       </Position13>
       <Position14>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="584" TopLine="566"/>
+        <Caret Line="586" TopLine="566"/>
       </Position14>
       <Position15>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="586" TopLine="566"/>
+        <Caret Line="590" TopLine="566"/>
       </Position15>
       <Position16>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="590" TopLine="566"/>
+        <Caret Line="591" TopLine="566"/>
       </Position16>
       <Position17>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="591" TopLine="566"/>
+        <Caret Line="626" TopLine="610"/>
       </Position17>
       <Position18>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="626" TopLine="610"/>
+        <Caret Line="630" TopLine="610"/>
       </Position18>
       <Position19>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="630" TopLine="610"/>
+        <Caret Line="644" TopLine="628"/>
       </Position19>
       <Position20>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="644" TopLine="628"/>
+        <Caret Line="583" TopLine="566"/>
       </Position20>
       <Position21>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="583" TopLine="566"/>
+        <Caret Line="584" TopLine="566"/>
       </Position21>
       <Position22>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="584" TopLine="566"/>
+        <Caret Line="586" TopLine="566"/>
       </Position22>
       <Position23>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="586" TopLine="566"/>
+        <Caret Line="590" TopLine="566"/>
       </Position23>
       <Position24>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="590" TopLine="566"/>
+        <Caret Line="591" TopLine="566"/>
       </Position24>
       <Position25>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="591" TopLine="566"/>
+        <Caret Line="626" TopLine="610"/>
       </Position25>
       <Position26>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="626" TopLine="610"/>
+        <Caret Line="694" TopLine="678"/>
       </Position26>
       <Position27>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="694" TopLine="678"/>
+        <Caret Line="703" TopLine="678"/>
       </Position27>
       <Position28>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="703" TopLine="678"/>
+        <Caret Line="696" TopLine="679"/>
       </Position28>
       <Position29>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="696" TopLine="679"/>
+        <Caret Line="757" TopLine="747"/>
       </Position29>
       <Position30>
-        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="757" TopLine="747"/>
+        <Filename Value="formMain.pas"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>
