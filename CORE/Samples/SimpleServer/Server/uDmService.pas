@@ -112,7 +112,7 @@ BEGIN
   CASE SendType OF
     SePOST:
       BEGIN
-        IF UpperCase(Context) = UpperCase('ConsultaBanco') THEN
+        IF UpperCase(Context) = UpperCase('EMPLOYEE') THEN
           Result := ConsultaBanco(Params)
         ELSE
         BEGIN

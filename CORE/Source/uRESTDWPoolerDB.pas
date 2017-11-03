@@ -329,6 +329,8 @@ Type
   Procedure   DynamicFilter (Field, Value : String; InText : Boolean = False);
   Procedure   Refresh;
   Procedure   SaveToStream    (Var Stream : TMemoryStream);
+  Procedure   ClearMassive;
+  Function    MassiveCount : Integer;
   {$IFDEF FPC}
   Function    GetFields           : TFields;
   {$ENDIF}
@@ -2304,6 +2306,13 @@ Begin
  vCreateDS := False;
 End;
 
+Procedure TRESTDWClientSQL.ClearMassive;
+Begin
+ If Trim(vUpdateTableName) <> '' Then
+  If TMassiveDatasetBuffer(vMassiveDataset).RecordCount > 0 Then
+   TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+End;
+
 procedure TRESTDWClientSQL.Close;
 Begin
  vActive := False;
@@ -2440,6 +2449,13 @@ End;
 procedure TRESTDWClientSQL.Loaded;
 Begin
  Inherited Loaded;
+End;
+
+Function TRESTDWClientSQL.MassiveCount : Integer;
+Begin
+ Result := 0;
+ If Trim(vUpdateTableName) <> '' Then
+  Result := TMassiveDatasetBuffer(vMassiveDataset).RecordCount;
 End;
 
 {$IFDEF FPC}
