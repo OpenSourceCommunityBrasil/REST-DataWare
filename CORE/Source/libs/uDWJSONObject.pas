@@ -1957,7 +1957,7 @@ Begin
    End;
   End
  Else If Param.DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
-  SetValue(Param.AsString, False);
+  SetValue(FloatToStr(Param.AsFloat), False);
  vObjectValue            := FieldTypeToObjectValue(Param.DataType);
  vJSONValue.vObjectValue := vObjectValue;
 End;
