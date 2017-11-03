@@ -109,86 +109,147 @@ Begin
   vTempQuery.FormatOptions.StrsTrim       := StrsTrim;
   vTempQuery.FormatOptions.StrsEmpty2Null := StrsEmpty2Null;
   vTempQuery.FormatOptions.StrsTrim2Len   := StrsTrim2Len;
+  vTempQuery.ResourceOptions.ParamCreate  := ParamCreate;
   vTempQuery.SQL.Clear;
   vTempQuery.SQL.Add(SQL);
   If Params <> Nil Then
-   Begin
-    Try
-    // vTempQuery.Prepare;
-    Except
-    End;
-    For I := 0 To Params.Count -1 Do
-     Begin
-      If vTempQuery.ParamCount > I Then
+  Begin
+    if vTempQuery.ResourceOptions.ParamCreate then
+    begin
+      Try
+      // vTempQuery.Prepare;
+      Except
+      End;
+      For I := 0 To Params.Count -1 Do
        Begin
-        vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
-        A          := GetParamIndex(vTempQuery.Params, vParamName);
-        If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
+        If vTempQuery.ParamCount > I Then
          Begin
-          If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
-                                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                ftString,    ftWideString]    Then
+          vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
+          A          := GetParamIndex(vTempQuery.Params, vParamName);
+          If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
            Begin
-            If vTempQuery.Params[A].Size > 0 Then
-             vTempQuery.Params[A].Value := Copy(Params[I].Value, 1, vTempQuery.Params[A].Size)
-            Else
-             vTempQuery.Params[A].Value := Params[I].Value;
-           End
-          Else
-           Begin
-            If vTempQuery.Params[A].DataType in [ftUnknown] Then
+            If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                                                  ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                                  ftString,    ftWideString]    Then
              Begin
-              If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
-               vTempQuery.Params[A].DataType := ObjectValueToFieldType(Params[I].ObjectValue)
+              If vTempQuery.Params[A].Size > 0 Then
+               vTempQuery.Params[A].Value := Copy(Params[I].Value, 1, vTempQuery.Params[A].Size)
               Else
-               vTempQuery.Params[A].DataType := ftString;
+               vTempQuery.Params[A].Value := Params[I].Value;
+             End
+            Else
+             Begin
+              If vTempQuery.Params[A].DataType in [ftUnknown] Then
+               Begin
+                If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
+                 vTempQuery.Params[A].DataType := ObjectValueToFieldType(Params[I].ObjectValue)
+                Else
+                 vTempQuery.Params[A].DataType := ftString;
+               End;
+              If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord] Then
+               Begin
+                If Trim(Params[I].Value) <> '' Then
+                 Begin
+                  If vTempQuery.Params[A].DataType = ftSmallInt Then
+                   vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                  Else
+                   vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                 End;
+               End
+              Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
+               Begin
+                If Trim(Params[I].Value) <> '' Then
+                 vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value);
+               End
+              Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+               Begin
+                If Trim(Params[I].Value) <> '' Then
+                 vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
+                Else
+                 vTempQuery.Params[A].AsDateTime  := Null;
+               End  //Tratar Blobs de Parametros...
+              Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+               Begin
+                vStringStream := TMemoryStream.Create;
+                Try
+                 Params[I].SaveToStream(vStringStream);
+                 vStringStream.Position := 0;
+                 vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
+                Finally
+                 FreeAndNil(vStringStream);
+                End;
+               End
+              Else If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                                                        ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                                        ftString,    ftWideString]    Then
+               vTempQuery.Params[A].AsString := Params[I].Value
+              Else
+               vTempQuery.Params[A].Value    := Params[I].Value;
              End;
-            If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord] Then
+           End;
+         End
+        Else
+         Break;
+       End;
+     end
+     else
+     begin
+       For I := 0 To Params.Count -1 Do
+       begin
+          with vTempQuery.Params.Add do
+          begin
+            vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
+            Name := vParamName;
+            ParamType := ptInput;
+
+            If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
+               DataType := ObjectValueToFieldType(Params[I].ObjectValue)
+            Else
+               DataType := ftString;
+
+            If vTempQuery.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
                Begin
-                If vTempQuery.Params[A].DataType = ftSmallInt Then
-                 vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                If vTempQuery.Params[I].DataType = ftSmallInt Then
+                 vTempQuery.Params[I].AsSmallInt := StrToInt(Params[I].Value)
                 Else
-                 vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                 vTempQuery.Params[I].AsInteger  := StrToInt(Params[I].Value);
                End;
              End
-            Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
+            Else If vTempQuery.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
-               vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value);
+               vTempQuery.Params[I].AsFloat  := StrToFloat(Params[I].Value);
              End
-            Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+            Else If vTempQuery.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
-               vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
+               vTempQuery.Params[I].AsDateTime  := StrToFloat(Params[I].Value)
               Else
-               vTempQuery.Params[A].AsDateTime  := Null;
+               vTempQuery.Params[I].AsDateTime  := Null;
              End  //Tratar Blobs de Parametros...
-            Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+            Else If vTempQuery.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
              Begin
               vStringStream := TMemoryStream.Create;
               Try
                Params[I].SaveToStream(vStringStream);
                vStringStream.Position := 0;
-               vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
+               vTempQuery.Params[I].LoadFromStream(vStringStream, ftBlob);
               Finally
                FreeAndNil(vStringStream);
               End;
              End
-            Else If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+            Else If vTempQuery.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                                       ftString,    ftWideString]    Then
-             vTempQuery.Params[A].AsString := Params[I].Value
+             vTempQuery.Params[I].AsString := Params[I].Value
             Else
-             vTempQuery.Params[A].Value    := Params[I].Value;
+             vTempQuery.Params[I].Value    := Params[I].Value;
            End;
-         End;
-       End
-      Else
-       Break;
-     End;
-   End;
+       End;
+     end;
+  End;
   If Not Execute Then
    Begin
     vTempQuery.Active := True;

@@ -137,6 +137,7 @@ Type
   vStrsTrim,
   vStrsEmpty2Null,
   vStrsTrim2Len        : Boolean;
+  vParamCreate         : Boolean;
   Procedure SetOnWork     (Value : TOnWork);
   Procedure SetOnWorkBegin(Value : TOnWorkBegin);
   Procedure SetOnWorkEnd  (Value : TOnWorkEnd);
@@ -209,6 +210,7 @@ Type
   {$IFDEF FPC}
   Property DatabaseCharSet    : TDatabaseCharSet         Read vDatabaseCharSet    Write vDatabaseCharSet;
   {$ENDIF}
+  Property ParamCreate        : Boolean                  read vParamCreate        write vParamCreate;
 End;
 
 Type
@@ -434,6 +436,7 @@ Type
   {$IFDEF FPC}
   vDatabaseCharSet   : TDatabaseCharSet;
   {$ENDIF}
+  vParamCreate       : Boolean;
  Public
   Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
   Function ApplyUpdates         (Massive,
@@ -472,6 +475,7 @@ Type
   Property Compression       : Boolean          Read vCompression     Write vCompression;
   Property EncodeStringsJSON : Boolean          Read vEncodeStrings   Write vEncodeStrings;
   Property Encoding          : TEncodeSelect    Read vEncoding        Write vEncoding;
+  property ParamCreate       : Boolean          Read vParamCreate     Write vParamCreate;
  Published
  {$IFDEF FPC}
   Property DatabaseCharSet   : TDatabaseCharSet Read vDatabaseCharSet Write vDatabaseCharSet;
@@ -494,6 +498,7 @@ Type
   vCompression   : Boolean;
   vEncoding      : TEncodeSelect;
   vMessagePoolerOff : String;
+  vParamCreate   : Boolean;
   Procedure SetConnection(Value : TRESTDWDriver);
   Function  GetConnection  : TRESTDWDriver;
  Public
@@ -531,6 +536,7 @@ Type
   Property    StrsTrim2Len     : Boolean       Read vStrsTrim2Len     Write vStrsTrim2Len;
   Property    Active           : Boolean       Read vActive           Write vActive;
   Property    PoolerOffMessage : String        Read vMessagePoolerOff Write vMessagePoolerOff;
+  Property    ParamCreate      : Boolean       Read vParamCreate      Write vParamCreate;
 End;
 
 {$IFNDEF FPC}
@@ -648,6 +654,7 @@ Begin
    vRESTDriver.vStrsTrim2Len      := vStrsTrim2Len;
    vRESTDriver.vCompression       := vCompression;
    vRESTDriver.vEncoding          := vEncoding;
+   vRESTDriver.vParamCreate       := vParamCreate;
    Result := vRESTDriver.InsertMySQLReturnID(SQL, Error, MessageError);
   End
  Else
@@ -692,6 +699,7 @@ Begin
    vRESTDriver.vStrsTrim2Len      := vStrsTrim2Len;
    vRESTDriver.vCompression       := vCompression;
    vRESTDriver.vEncoding          := vEncoding;
+   vRESTDriver.vParamCreate       := vParamCreate;
    Result := vRESTDriver.ExecuteCommand(SQL, Error, MessageError, Execute);
   End
  Else
@@ -715,6 +723,7 @@ Begin
    vRESTDriver.vStrsTrim2Len      := vStrsTrim2Len;
    vRESTDriver.vCompression       := vCompression;
    vRESTDriver.vEncoding          := vEncoding;
+   vRESTDriver.vParamCreate       := vParamCreate;
    Result := vRESTDriver.ExecuteCommand(SQL, Params, Error, MessageError, Execute);
   End
  Else
@@ -736,6 +745,7 @@ Begin
    vRESTDriver.vStrsTrim2Len      := vStrsTrim2Len;
    vRESTDriver.vCompression       := vCompression;
    vRESTDriver.vEncoding          := vEncoding;
+   vRESTDriver.vParamCreate       := vParamCreate;
    vRESTDriver.ExecuteProcedure(ProcName, Params, Error, MessageError);
   End
  Else
@@ -756,6 +766,7 @@ Begin
    vRESTDriver.vStrsTrim2Len      := vStrsTrim2Len;
    vRESTDriver.vCompression       := vCompression;
    vRESTDriver.vEncoding          := vEncoding;
+   vRESTDriver.vParamCreate       := vParamCreate;
    vRESTDriver.ExecuteProcedurePure(ProcName, Error, MessageError);
   End
  Else
@@ -776,6 +787,7 @@ Begin
  vActive           := True;
  vEncoding         := esASCII;
  vMessagePoolerOff := 'RESTPooler not active.';
+ vParamCreate      := True;
 End;
 
 Destructor  TRESTDWPoolerDB.Destroy;
@@ -1369,6 +1381,7 @@ Begin
  {$IFDEF FPC}
  vDatabaseCharSet := csUndefined;
  {$ENDIF}
+ vParamCreate              := True;
 End;
 
 Destructor  TRESTDWPoolerList.Destroy;
