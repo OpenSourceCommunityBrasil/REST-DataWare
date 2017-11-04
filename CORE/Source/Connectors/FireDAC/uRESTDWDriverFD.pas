@@ -146,7 +146,7 @@ Begin
                 Else
                  vTempQuery.Params[A].DataType := ftString;
                End;
-              If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord] Then
+              If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
                Begin
                 If Trim(Params[I].Value) <> '' Then
                  Begin
@@ -207,7 +207,7 @@ Begin
             Else
                DataType := ftString;
 
-            If vTempQuery.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord] Then
+            If vTempQuery.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
                Begin
@@ -469,7 +469,7 @@ Var
              Else
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType := ftString;
             End;
-           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord] Then
+           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
               Begin
@@ -528,7 +528,7 @@ Var
         Else
          Query.Params[I].DataType := ftString;
        End;
-      If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord] Then
+      If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
        Begin
         If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
          Begin
@@ -660,7 +660,7 @@ Var
              Else
               Query.Params[I].DataType := ftString;
             End;
-           If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord] Then
+           If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
             Begin
              If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
               Begin
@@ -824,7 +824,7 @@ Begin
                    Else
                     vTempQuery.Params[A].DataType := ftString;
                   End;
-                 If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord] Then
+                 If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
                   Begin
                    If Trim(Params[I].Value) <> '' Then
                     Begin
@@ -1031,7 +1031,7 @@ Begin
               Else
                fdCommand.Params[A].DataType := ftString;
              End;
-            If fdCommand.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord] Then
+            If fdCommand.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
                Begin

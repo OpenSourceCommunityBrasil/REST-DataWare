@@ -650,7 +650,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                      End;
                                    End;
        ftInteger, ftSmallInt,
-       ftWord
+       ftWord,    ftLargeint
        {$IFNDEF FPC}{$if CompilerVersion > 21}, ftLongWord{$IFEND}{$ENDIF}
                                  : Begin
                                     If Not UpdateTag Then

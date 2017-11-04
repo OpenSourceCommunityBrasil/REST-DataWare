@@ -1050,8 +1050,8 @@ Begin
                                                             StrToInt(removestr(bJsonOBJ.Pairs[4].JsonValue.tostring,'"')), //bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString),
                                                             Uppercase(removestr(bJsonOBJ.Pairs[3].JsonValue.tostring,'"'))='S', //bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S',
                                                             DestDS.FieldDefs.Count);
-             If Not(FieldDef.DataType In [ftSmallint, ftInteger, ftFloat,
-                                          ftCurrency, ftBCD,     ftFMTBcd]) Then
+             If Not(FieldDef.DataType In [ftSmallint, ftInteger,  ftLargeint,
+                                          ftFloat,    ftCurrency, ftBCD, ftFMTBcd]) Then
               Begin
                FieldDef.Size      := StrToInt(removestr(bJsonOBJ.Pairs[4].JsonValue.tostring,'"')); // bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
                FieldDef.Precision := StrToInt(removestr(bJsonOBJ.Pairs[5].JsonValue.tostring,'"')); //bJsonOBJ.opt(bJsonOBJ.names.get(5).ToString).ToString);
@@ -1441,8 +1441,8 @@ Begin
                                                             StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString),
                                                             Uppercase(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S',
                                                             DestDS.FieldDefs.Count);
-             If Not(FieldDef.DataType In [ftSmallint, ftInteger, ftFloat,
-                                          ftCurrency, ftBCD,     ftFMTBcd]) Then
+             If Not(FieldDef.DataType In [ftSmallint, ftInteger,  ftLargeint,
+                                          ftFloat,    ftCurrency, ftBCD, ftFMTBcd]) Then
               Begin
                FieldDef.Size      := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
                FieldDef.Precision := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(5).ToString).ToString);
@@ -1935,7 +1935,7 @@ Begin
    SetValue(Param.AsString, vEncoded);
   End
  Else If Param.DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended,
-                            {$IFEND}{$ENDIF}ftInteger, ftSmallint, ftFloat,
+                            {$IFEND}{$ENDIF}ftInteger, ftSmallint, ftLargeint, ftFloat,
                             ftCurrency, ftFMTBcd, ftBCD] Then
   SetValue(Param.AsString, False)
  Else If Param.DataType In [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
