@@ -18,7 +18,7 @@ uses SysUtils,  Classes,      uDWJSONObject,
      uRESTDWMasterDetailData, uDWConstsData,
      uDWMassiveBuffer,        SyncObjs
      {$IFDEF FPC}
-     , uDWConsts,             memds;
+     , uDWConsts,             BufDataset;
      {$ELSE}
        {$IFDEF RESJEDI}
        , JvMemoryDataset
@@ -266,8 +266,8 @@ Type
   vMasterDetailList    : TMasterDetailList;                 //DataSet MasterDetail Function
   vMassiveDataset      : TMassiveDataset;
   {$IFDEF FPC}
-  Procedure CloneDefinitions     (Source  : TMemDataset;
-                                  aSelf   : TMemDataset);   //Fields em Definições
+  Procedure CloneDefinitions     (Source  : TBufDataset;
+                                  aSelf   : TBufDataset);   //Fields em Definições
   {$ELSE}
   {$IFDEF RESJEDI}
   Procedure  CloneDefinitions    (Source  : TJvMemoryData;
@@ -1564,8 +1564,6 @@ Begin
   End;
 End;
 
-
-
 constructor TRESTDWClientSQL.Create(AOwner: TComponent);
 Begin
  vInactive                         := True;
@@ -1630,6 +1628,9 @@ Begin
  Inherited AfterDelete             := OldAfterDelete;
  {$ENDIF}
  vMassiveDataset                   := TMassiveDatasetBuffer.Create(Self);
+ {$IFDEF FPC}
+  TBufDataset(Self).PacketRecords  := 1;
+ {$ENDIF}
 End;
 
 destructor TRESTDWClientSQL.Destroy;
@@ -2334,7 +2335,7 @@ procedure TRESTDWClientSQL.CreateDataSet;
 Begin
  vCreateDS := True;
  {$IFDEF FPC}
-  TMemDataset(Self).Open;
+  TBufDataset(Self).Open;
  {$ELSE}
  {$IFDEF RESJEDI}
      TJvMemoryData(Self).Open;
@@ -2504,8 +2505,8 @@ Begin
 End;
 
 {$IFDEF FPC}
-procedure TRESTDWClientSQL.CloneDefinitions(Source: TMemDataset;
-  aSelf: TMemDataset);
+procedure TRESTDWClientSQL.CloneDefinitions(Source: TBufDataset;
+  aSelf: TBufDataset);
 {$ELSE}
 {$IFDEF RESJEDI}
 Procedure TRESTDWClientSQL.CloneDefinitions(Source : TJvMemoryData; aSelf : TJvMemoryData);
@@ -2661,7 +2662,7 @@ End;
 {$IFDEF FPC}
 Function TRESTDWClientSQL.GetFields: TFields;
 Begin
- Result := TMemDataset(Self).Fields;
+ Result := TBufDataset(Self).Fields;
 End;
 {$ENDIF}
 
@@ -2673,7 +2674,7 @@ Begin
    If vActive Then
     Begin
      {$IFDEF FPC}
-      TMemDataset(Self).Open;
+      TBufDataset(Self).Open;
      {$ELSE}
      {$IFDEF RESJEDI}
       TJvMemoryData(Self).Open;
@@ -2690,7 +2691,7 @@ Begin
    Else
     Begin
      {$IFDEF FPC}
-      TMemDataset(Self).Close;
+      TBufDataset(Self).Close;
      {$ELSE}
      {$IFDEF RESJEDI}
       TJvMemoryData(Self).Close;

@@ -7,7 +7,7 @@ interface
 Uses
  SysUtils,  Classes,  DB
  {$IFDEF FPC}
-  ,memds;
+  , BufDataset;
  {$ELSE}
    {$IFDEF RESJEDI}
     , JvMemoryDataset
@@ -31,7 +31,7 @@ End;
 
 Type
  {$IFDEF FPC}
-  TRESTDWClientSQLBase   = Class(TMemDataset)                   //Classe com as funcionalidades de um DBQuery
+  TRESTDWClientSQLBase   = Class(TBufDataset)                   //Classe com as funcionalidades de um DBQuery
  {$ELSE}
   {$IFDEF RESJEDI}
   TRESTDWClientSQLBase   = Class(TJvMemoryData)                 //Classe com as funcionalidades de um DBQuery

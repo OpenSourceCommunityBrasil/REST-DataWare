@@ -22,6 +22,7 @@ type
     Button2: TButton;
     Button4: TButton;
     CheckBox1: TCheckBox;
+    DataSource1: TDataSource;
     DBGrid1: TDBGrid;
     edPasswordDW: TEdit;
     edUserNameDW: TEdit;
@@ -36,7 +37,6 @@ type
     Label7: TLabel;
     Label8: TLabel;
     mComando: TMemo;
-    DataSource1: TDataSource;
     ProgressBar1: TProgressBar;
     RESTDWClientSQL1: TRESTDWClientSQL;
     RESTDWDataBase1: TRESTDWDataBase;
@@ -90,8 +90,6 @@ Begin
  RESTDWClientSQL1.Active       := True;
  If RESTDWClientSQL1.FindField('emp_no') <> Nil Then
   RESTDWClientSQL1.FindField('emp_no').ProviderFlags := [pfInUpdate, pfInWhere, pfInKey];
- If RESTDWClientSQL1.FindField('FULL_NAME') <> Nil Then
-  RESTDWClientSQL1.FindField('FULL_NAME').ReadOnly   := true;
 End;
 
 procedure TForm2.Button2Click(Sender: TObject);

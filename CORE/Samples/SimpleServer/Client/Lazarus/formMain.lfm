@@ -1111,15 +1111,10 @@ object Form2: TForm2
     ParentFont = False
     TabOrder = 10
   end
-  object DataSource1: TDataSource
-    DataSet = RESTDWClientSQL1
-    left = 160
-    top = 328
-  end
   object RESTDWDataBase1: TRESTDWDataBase
-    Active = False
+    Active = True
     Compression = True
-    MyIP = '0.0.0.0'
+    MyIP = '127.0.0.1'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -1140,11 +1135,13 @@ object Form2: TForm2
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd
     DatabaseCharSet = csWin1252
-    left = 256
-    top = 248
+    ParamCreate = True
+    left = 264
+    top = 184
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    Active = False
+    PacketRecords = 1
+    IndexName = 'DEFAULT_ORDER'
     FieldDefs = <    
       item
         Name = 'EMP_NO'
@@ -1200,6 +1197,7 @@ object Form2: TForm2
         DataType = ftString
         Size = 37
       end>
+    Active = False
     AfterInsert = RESTDWClientSQL1AfterInsert
     MasterCascadeDelete = True
     Inactive = False
@@ -1214,7 +1212,12 @@ object Form2: TForm2
     AutoCommitData = False
     AutoRefreshAfterCommit = True
     InBlockEvents = False
-    left = 192
-    top = 288
+    left = 168
+    top = 168
+  end
+  object DataSource1: TDataSource
+    DataSet = RESTDWClientSQL1
+    left = 161
+    top = 221
   end
 end

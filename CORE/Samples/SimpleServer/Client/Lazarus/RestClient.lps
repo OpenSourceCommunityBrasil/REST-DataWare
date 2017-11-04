@@ -11,7 +11,7 @@
         <EditorIndex Value="-1"/>
         <WindowIndex Value="-1"/>
         <CursorPos Y="19"/>
-        <UsageCount Value="193"/>
+        <UsageCount Value="195"/>
       </Unit0>
       <Unit1>
         <Filename Value="formMain.pas"/>
@@ -20,9 +20,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="117"/>
-        <CursorPos Y="127"/>
-        <UsageCount Value="193"/>
+        <TopLine Value="83"/>
+        <CursorPos X="39" Y="92"/>
+        <UsageCount Value="195"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -33,7 +33,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="117"/>
         <CursorPos X="17" Y="127"/>
-        <UsageCount Value="189"/>
+        <UsageCount Value="191"/>
         <Bookmarks Count="2">
           <Item0 X="2" Y="124" ID="2"/>
           <Item1 X="119" Y="41" ID="1"/>
@@ -154,11 +154,11 @@
       <Unit19>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="899"/>
-        <CursorPos Y="910"/>
-        <UsageCount Value="73"/>
+        <TopLine Value="1366"/>
+        <CursorPos Y="1382"/>
+        <UsageCount Value="74"/>
         <Bookmarks Count="1">
-          <Item0 Y="67" ID="2"/>
+          <Item0 X="23" Y="1425" ID="2"/>
         </Bookmarks>
       </Unit19>
       <Unit20>
@@ -170,9 +170,9 @@
       <Unit21>
         <Filename Value="C:\lazarus\lcl\include\control.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="3890"/>
-        <CursorPos Y="3900"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="2853"/>
+        <CursorPos X="44" Y="2866"/>
+        <UsageCount Value="11"/>
       </Unit21>
       <Unit22>
         <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
@@ -305,10 +305,12 @@
       <Unit40>
         <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="67"/>
+        <TopLine Value="1627"/>
+        <CursorPos X="36" Y="1633"/>
+        <UsageCount Value="68"/>
         <Bookmarks Count="2">
-          <Item0 X="2" Y="2650" ID="3"/>
-          <Item1 X="41" Y="2105" ID="1"/>
+          <Item0 X="2" Y="2651" ID="3"/>
+          <Item1 X="41" Y="2106" ID="1"/>
         </Bookmarks>
       </Unit40>
       <Unit41>
@@ -344,7 +346,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="2045"/>
         <CursorPos Y="2056"/>
-        <UsageCount Value="22"/>
+        <UsageCount Value="23"/>
       </Unit44>
       <Unit45>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\restdwlazdriver.pas"/>
@@ -356,23 +358,23 @@
       <Unit46>
         <Filename Value="C:\lazarus\lcl\include\buttoncontrol.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="8"/>
-        <CursorPos Y="21"/>
-        <UsageCount Value="9"/>
+        <TopLine Value="12"/>
+        <CursorPos Y="22"/>
+        <UsageCount Value="10"/>
       </Unit46>
       <Unit47>
         <Filename Value="C:\lazarus\lcl\include\buttons.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="157"/>
         <CursorPos Y="170"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="10"/>
       </Unit47>
       <Unit48>
         <Filename Value="C:\lazarus\lcl\include\wincontrol.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="5372"/>
-        <CursorPos Y="5385"/>
-        <UsageCount Value="9"/>
+        <TopLine Value="5392"/>
+        <CursorPos Y="5401"/>
+        <UsageCount Value="10"/>
       </Unit48>
       <Unit49>
         <Filename Value="C:\lazarus\lcl\lclmessageglue.pas"/>
@@ -385,8 +387,6 @@
       <Unit50>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="926"/>
-        <CursorPos X="90" Y="942"/>
         <UsageCount Value="12"/>
       </Unit50>
       <Unit51>
@@ -460,9 +460,9 @@
       <Unit60>
         <Filename Value="..\..\..\..\Source\libs\uDWConstsData.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2"/>
-        <CursorPos X="33" Y="13"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="23"/>
+        <CursorPos Y="42"/>
+        <UsageCount Value="11"/>
       </Unit60>
       <Unit61>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\win\wininc\struct.inc"/>
@@ -494,14 +494,111 @@
         <UsageCount Value="10"/>
       </Unit64>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="25" HistoryIndex="24">
       <Position1>
         <Filename Value="formMain.pas"/>
+        <Caret Line="92" Column="39" TopLine="83"/>
       </Position1>
+      <Position2>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="93" Column="39" TopLine="84"/>
+      </Position2>
+      <Position3>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="94" Column="39" TopLine="85"/>
+      </Position3>
+      <Position4>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="95" Column="39" TopLine="86"/>
+      </Position4>
+      <Position5>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="96" Column="39" TopLine="87"/>
+      </Position5>
+      <Position6>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="97" Column="39" TopLine="88"/>
+      </Position6>
+      <Position7>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="98" Column="39" TopLine="89"/>
+      </Position7>
+      <Position8>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="99" Column="39" TopLine="90"/>
+      </Position8>
+      <Position9>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="100" Column="39" TopLine="91"/>
+      </Position9>
+      <Position10>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="101" Column="39" TopLine="92"/>
+      </Position10>
+      <Position11>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="102" Column="39" TopLine="93"/>
+      </Position11>
+      <Position12>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="103" Column="39" TopLine="94"/>
+      </Position12>
+      <Position13>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="102" Column="39" TopLine="93"/>
+      </Position13>
+      <Position14>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="101" Column="39" TopLine="92"/>
+      </Position14>
+      <Position15>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="100" Column="39" TopLine="91"/>
+      </Position15>
+      <Position16>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="99" Column="39" TopLine="90"/>
+      </Position16>
+      <Position17>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="98" Column="39" TopLine="89"/>
+      </Position17>
+      <Position18>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="97" Column="39" TopLine="88"/>
+      </Position18>
+      <Position19>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="96" Column="39" TopLine="87"/>
+      </Position19>
+      <Position20>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="95" Column="39" TopLine="86"/>
+      </Position20>
+      <Position21>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="94" Column="39" TopLine="85"/>
+      </Position21>
+      <Position22>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="93" Column="39" TopLine="84"/>
+      </Position22>
+      <Position23>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="92" Column="39" TopLine="83"/>
+      </Position23>
+      <Position24>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="93" Column="39" TopLine="84"/>
+      </Position24>
+      <Position25>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="92" Column="39" TopLine="83"/>
+      </Position25>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
-    <BreakPoints Count="1">
+    <BreakPoints Count="2">
       <Item1>
         <Kind Value="bpkSource"/>
         <WatchScope Value="wpsLocal"/>
@@ -509,6 +606,13 @@
         <Source Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
         <Line Value="1038"/>
       </Item1>
+      <Item2>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Line Value="1330"/>
+      </Item2>
     </BreakPoints>
     <Watches Count="2">
       <Item1>

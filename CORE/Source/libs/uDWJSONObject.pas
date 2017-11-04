@@ -7,7 +7,7 @@ Interface
 Uses
  {$IFDEF FPC}
  SysUtils,            Classes, uDWJSONTools,    IdGlobal, DB, uDWJSON,   uDWConsts,
- uDWConstsData,       memds,   Variants,        LConvEncoding;
+ uDWConstsData,       BufDataset,  Variants,    LConvEncoding;
  {$ELSE}
  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
  System.SysUtils,     System.Classes, Variants, uDWJSONTools, uDWConsts, uDWJSON,
@@ -1083,8 +1083,8 @@ Begin
       DestDS.Open;
      {$ELSE}
      TRESTDWClientSQL(DestDS).Inactive   := True;
-     If DestDS is TMemDataset Then
-      TMemDataset(DestDS).CreateTable;
+     If DestDS is TBufDataset Then
+      TBufDataset(DestDS).CreateTable;
      DestDS.Open;
      TRESTDWClientSQL(DestDS).Active     := True;
      TRESTDWClientSQL(DestDS).Inactive   := False;
@@ -1420,9 +1420,8 @@ Begin
     DestDS.DisableControls;
     If DestDS.Active Then
      DestDS.Close;
-    {$IFNDEF FPC}
+    If DestDS.FieldDefs.Count > 0 Then
      DestDS.FieldDefs.Clear;
-    {$ENDIF}
     If DestDS.FieldDefs.Count = 0 Then
      Begin
       bJsonArray    := bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
@@ -1436,16 +1435,15 @@ Begin
           Begin
            If TRESTDWClientSQL(DestDS).FieldDefExist(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) = Nil Then
             Begin
-             FieldDef := TFieldDef.Create(DestDS.FieldDefs, bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString,
-                                                            GetFieldType(bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString),
-                                                            StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString),
-                                                            Uppercase(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S',
-                                                            DestDS.FieldDefs.Count);
-             If Not(FieldDef.DataType In [ftSmallint, ftInteger,  ftLargeint,
-                                          ftFloat,    ftCurrency, ftBCD, ftFMTBcd]) Then
+             TRESTDWClientSQL(DestDS).FieldDefs.Add(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString,
+                                                    GetFieldType(bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString),
+                                                    StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString),
+                                                    Uppercase(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S');
+             If Not(TRESTDWClientSQL(DestDS).FieldDefs[TRESTDWClientSQL(DestDS).FieldDefs.Count -1].DataType In [ftSmallint, ftInteger,  ftLargeint,
+                                                                                                                 ftFloat,    ftCurrency, ftBCD, ftFMTBcd]) Then
               Begin
-               FieldDef.Size      := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
-               FieldDef.Precision := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(5).ToString).ToString);
+               TRESTDWClientSQL(DestDS).FieldDefs[TRESTDWClientSQL(DestDS).FieldDefs.Count -1].Size      := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
+               TRESTDWClientSQL(DestDS).FieldDefs[TRESTDWClientSQL(DestDS).FieldDefs.Count -1].Precision := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(5).ToString).ToString);
               End;
             End;
           End;
@@ -1454,11 +1452,7 @@ Begin
          FreeAndNil(bJsonOBJ);
         End;
        End;
-     End
-   {$IFDEF FPC}
-    Else
-     DestDS.FieldDefs.Update
-   {$ENDIF};
+     End;
     Try
      {$IFNDEF FPC}
      If DestDS Is TClientDataset Then
@@ -1474,15 +1468,14 @@ Begin
       DestDS.Open;
      {$ELSE}
      TRESTDWClientSQL(DestDS).Inactive   := True;
-     If DestDS is TMemDataset Then
-      TMemDataset(DestDS).CreateTable;
+     If DestDS is TBufDataset Then
+      TBufDataset(DestDS).CreateDataset;
      DestDS.Open;
      TRESTDWClientSQL(DestDS).Active     := True;
      TRESTDWClientSQL(DestDS).Inactive   := False;
      {$ENDIF}
     Except
     End;
-   {$IFNDEF FPC}
     //Clean Invalid Fields
     bJsonArray    := bJsonArraySub.optJSONArray(bJsonArraySub.names.get(0).ToString);
     For A := TRESTDWClientSQL(DestDS).Fields.Count -1 DownTo 0 Do
@@ -1510,7 +1503,6 @@ Begin
          TRESTDWClientSQL(DestDS).Fields.Remove(TRESTDWClientSQL(DestDS).Fields[A]);
        End;
      End;
-    {$ENDIF}
     //Add Set PK Fields
     bJsonArray    := bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
     bJsonArraySub := bJsonArray.optJSONObject  (0);
@@ -1522,7 +1514,7 @@ Begin
        If Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(2).ToString).ToString)) = 'S' Then
         Begin
          {$IFDEF FPC}
-         Field := TMemDataset(DestDS).FindField  (bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString);
+         Field := TBufDataset(DestDS).FindField  (bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString);
          {$ELSE}
          {$IFDEF RESJEDI}
            Field := TJvMemoryData(DestDS).FindField(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString);
