@@ -3,8 +3,8 @@
 	<Transactions>
     <Transaction>1899/12/30 00:00:00.000.183,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\Unit1.fmx=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\RESTDW_CORE_ANDROID\Unit1.fmx</Transaction>
     <Transaction>1899/12/30 00:00:00.000.608,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\RESTDW_CORE_ANDROID\Project1.dproj</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.642,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\RESTDW_CORE_ANDROID\Project1.dproj=C:\CompXE_10_2\RestDW\CORE\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj</Transaction>
     <Transaction>1899/12/30 00:00:00.000.386,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\RESTDW_CORE_ANDROID\Unit1.fmx=C:\CompXE_10_2\RestDW\CORE\Samples\SimpleServer\CienteFMX\Unit1.fmx</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.642,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\RESTDW_CORE_ANDROID\Project1.dproj=C:\CompXE_10_2\RestDW\CORE\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj</Transaction>
   </Transactions>
 	<ActiveMobileDevice>
 		<NoProfile iOSSimulator="iPhone5" Android="38019fd23720a200"/>

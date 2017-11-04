@@ -12,7 +12,7 @@ uses
   FMX.ListBox, FMX.Memo, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Comp.DataSet, FireDAC.Comp.Client, system.diagnostics,
-  System.TimeSpan, IdComponent;
+  System.TimeSpan, IdComponent, uDWConstsData;
 
 type
   TForm1 = class(TForm)
@@ -81,18 +81,8 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
  {$IF Defined(ANDROID) OR Defined(IOS)}
- formatsettings.ShortDateFormat:='dd-mm-yyyy';
- formatsettings.DateSeparator:='-';
- formatsettings.DecimalSeparator:='.';
- formatsettings.ThousandSeparator:=',';
- RESTDWDataBase1.DateSeparator:= formatsettings.DateSeparator;
  RESTDWDataBase1.DecimalSeparator:=formatsettings.DecimalSeparator;
  {$ELSE}
- formatsettings.ShortDateFormat:='dd-mm-yyyy';
- formatsettings.DateSeparator:='-';
- formatsettings.DecimalSeparator:='.';
- formatsettings.ThousandSeparator:=',';
- RESTDWDataBase1.DateSeparator:= formatsettings.DateSeparator;
  RESTDWDataBase1.DecimalSeparator:=formatsettings.DecimalSeparator;
  {$IFEND}
 end;

@@ -1047,7 +1047,7 @@ object Form2: TForm2
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     Lines.Strings = (
-      'select * from employee')
+      'select * from tb_item')
     ParentFont = False
     TabOrder = 5
   end
@@ -1161,68 +1161,7 @@ object Form2: TForm2
     Top = 128
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    AfterInsert = RESTDWClientSQL1AfterInsert
-    FieldDefs = <
-      item
-        Name = 'EMP_NO'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'FIRST_NAME'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 15
-      end
-      item
-        Name = 'LAST_NAME'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 20
-      end
-      item
-        Name = 'PHONE_EXT'
-        DataType = ftString
-        Size = 4
-      end
-      item
-        Name = 'HIRE_DATE'
-        Attributes = [faRequired]
-        DataType = ftTimeStamp
-      end
-      item
-        Name = 'DEPT_NO'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 3
-      end
-      item
-        Name = 'JOB_CODE'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 5
-      end
-      item
-        Name = 'JOB_GRADE'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'JOB_COUNTRY'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 15
-      end
-      item
-        Name = 'SALARY'
-        Attributes = [faRequired]
-        DataType = ftFloat
-      end
-      item
-        Name = 'FULL_NAME'
-        DataType = ftString
-        Size = 37
-      end>
+    FieldDefs = <>
     IndexDefs = <>
     MasterFields = ''
     FetchOptions.AssignedValues = [evMode]
@@ -1240,63 +1179,31 @@ object Form2: TForm2
     Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
-      'select * from employee')
-    UpdateTableName = 'employee'
+      'select * from tb_item')
+    UpdateTableName = 'tb_item'
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = True
     InBlockEvents = False
     Left = 240
     Top = 64
-    object RESTDWClientSQL1EMP_NO: TSmallintField
-      FieldName = 'EMP_NO'
+    object RESTDWClientSQL1ID_ITEM: TIntegerField
+      FieldName = 'ID_ITEM'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
       Required = True
     end
-    object RESTDWClientSQL1FIRST_NAME: TStringField
-      FieldName = 'FIRST_NAME'
-      Required = True
-      Size = 15
+    object RESTDWClientSQL1NM_ITEM: TStringField
+      FieldName = 'NM_ITEM'
+      Size = 100
     end
-    object RESTDWClientSQL1LAST_NAME: TStringField
-      FieldName = 'LAST_NAME'
-      Required = True
+    object RESTDWClientSQL1VL_PRECOCUSTO: TFloatField
+      FieldName = 'VL_PRECOCUSTO'
     end
-    object RESTDWClientSQL1PHONE_EXT: TStringField
-      FieldName = 'PHONE_EXT'
-      Size = 4
+    object RESTDWClientSQL1VL_PRECOVENDA: TFloatField
+      FieldName = 'VL_PRECOVENDA'
     end
-    object RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField
-      FieldName = 'HIRE_DATE'
-      Required = True
-    end
-    object RESTDWClientSQL1DEPT_NO: TStringField
-      FieldName = 'DEPT_NO'
-      Required = True
-      Size = 3
-    end
-    object RESTDWClientSQL1JOB_CODE: TStringField
-      FieldName = 'JOB_CODE'
-      Required = True
-      Size = 5
-    end
-    object RESTDWClientSQL1JOB_GRADE: TSmallintField
-      FieldName = 'JOB_GRADE'
-      Required = True
-    end
-    object RESTDWClientSQL1JOB_COUNTRY: TStringField
-      FieldName = 'JOB_COUNTRY'
-      Required = True
-      Size = 15
-    end
-    object RESTDWClientSQL1SALARY: TFloatField
-      FieldName = 'SALARY'
-      Required = True
-    end
-    object RESTDWClientSQL1FULL_NAME: TStringField
-      FieldName = 'FULL_NAME'
-      ReadOnly = True
-      Size = 37
+    object RESTDWClientSQL1QT_FISICO: TFloatField
+      FieldName = 'QT_FISICO'
     end
   end
   object RESTDWDataBase1: TRESTDWDataBase

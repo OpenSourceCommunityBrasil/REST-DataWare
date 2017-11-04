@@ -62,17 +62,11 @@ TYPE
     StatusBar1: TStatusBar;
     Memo1: TMemo;
     Button4: TButton;
-    RESTDWClientSQL1EMP_NO: TSmallintField;
-    RESTDWClientSQL1FIRST_NAME: TStringField;
-    RESTDWClientSQL1LAST_NAME: TStringField;
-    RESTDWClientSQL1PHONE_EXT: TStringField;
-    RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField;
-    RESTDWClientSQL1DEPT_NO: TStringField;
-    RESTDWClientSQL1JOB_CODE: TStringField;
-    RESTDWClientSQL1JOB_GRADE: TSmallintField;
-    RESTDWClientSQL1JOB_COUNTRY: TStringField;
-    RESTDWClientSQL1SALARY: TFloatField;
-    RESTDWClientSQL1FULL_NAME: TStringField;
+    RESTDWClientSQL1ID_ITEM: TIntegerField;
+    RESTDWClientSQL1NM_ITEM: TStringField;
+    RESTDWClientSQL1VL_PRECOCUSTO: TFloatField;
+    RESTDWClientSQL1VL_PRECOVENDA: TFloatField;
+    RESTDWClientSQL1QT_FISICO: TFloatField;
     PROCEDURE Button1Click(Sender: TObject);
     PROCEDURE Button2Click(Sender: TObject);
     PROCEDURE RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
@@ -85,7 +79,6 @@ TYPE
     PROCEDURE RESTDWDataBase1Connection(Sucess: Boolean; CONST Error: STRING);
     PROCEDURE RESTDWDataBase1BeforeConnect(Sender: TComponent);
     procedure Button4Click(Sender: TObject);
-    procedure RESTDWClientSQL1AfterInsert(DataSet: TDataSet);
   PRIVATE
     { Private declarations }
     FBytesToTransfer: Int64;
@@ -199,11 +192,6 @@ PROCEDURE TForm2.FormCreate(Sender: TObject);
 BEGIN
   Memo1.Lines.Clear;
 END;
-
-procedure TForm2.RESTDWClientSQL1AfterInsert(DataSet: TDataSet);
-begin
- RESTDWClientSQL1HIRE_DATE.AsDateTime := Now;
-end;
 
 PROCEDURE TForm2.RESTDWClientSQL1GetDataError(Sucess: Boolean; CONST Error: STRING);
 BEGIN
