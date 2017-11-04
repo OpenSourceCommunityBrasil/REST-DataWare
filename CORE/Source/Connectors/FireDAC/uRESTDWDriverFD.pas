@@ -150,10 +150,19 @@ Begin
                Begin
                 If Trim(Params[I].Value) <> '' Then
                  Begin
-                  If vTempQuery.Params[A].DataType = ftSmallInt Then
-                   vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
-                  Else
-                   vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                   // Alterado por: Alexandre Magno - 04/11/2017
+                   If vTempQuery.Params[A].DataType = ftLargeint Then
+                     vTempQuery.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
+                   else If vTempQuery.Params[A].DataType = ftSmallInt Then
+                     vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                   Else
+                     vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+
+                   // Como estava Anteriormente
+                   //If vTempQuery.Params[A].DataType = ftSmallInt Then
+                   //  vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                   //Else
+                   //  vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
                  End;
                End
               Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
@@ -211,10 +220,19 @@ Begin
              Begin
               If Trim(Params[I].Value) <> '' Then
                Begin
-                If vTempQuery.Params[I].DataType = ftSmallInt Then
-                 vTempQuery.Params[I].AsSmallInt := StrToInt(Params[I].Value)
-                Else
-                 vTempQuery.Params[I].AsInteger  := StrToInt(Params[I].Value);
+                 // Alterado por: Alexandre Magno - 04/11/2017
+                 If vTempQuery.Params[I].DataType = ftLargeint Then
+                   vTempQuery.Params[I].AsLargeInt := StrToInt64(Params[I].Value)
+                 else If vTempQuery.Params[I].DataType = ftSmallInt Then
+                   vTempQuery.Params[I].AsSmallInt := StrToInt(Params[I].Value)
+                 Else
+                   vTempQuery.Params[I].AsInteger  := StrToInt(Params[I].Value);
+
+                 // Como estava Anteriormente
+                 //If vTempQuery.Params[I].DataType = ftSmallInt Then
+                 //  vTempQuery.Params[I].AsSmallInt := StrToInt(Params[I].Value)
+                 //Else
+                 //  vTempQuery.Params[I].AsInteger  := StrToInt(Params[I].Value);
                End;
              End
             Else If vTempQuery.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
@@ -473,10 +491,19 @@ Var
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
               Begin
-               If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
-                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-               Else
-                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+                // Alterado por: Alexandre Magno - 04/11/2017
+                If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftLargeint Then
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsLargeInt := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+                else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+                Else
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+
+                // Como estava Anteriormente
+                //If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
+                //  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+                //Else
+                //  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
               End;
             End
            Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD] Then
@@ -532,10 +559,19 @@ Var
        Begin
         If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
          Begin
-          If Query.Params[I].DataType = ftSmallInt Then
-           Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-          Else
-           Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+           // Alterado por: Alexandre Magno - 04/11/2017
+           If Query.Params[I].DataType = ftLargeint Then
+             Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+           else If Query.Params[I].DataType = ftSmallInt Then
+             Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+           Else
+             Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+
+           // Como estava Anteriormente
+           //If Query.Params[I].DataType = ftSmallInt Then
+           //  Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+           //Else
+           //  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
          End;
        End
       Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
@@ -664,10 +700,19 @@ Var
             Begin
              If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
               Begin
-               If Query.Params[I].DataType = ftSmallInt Then
-                Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-               Else
-                Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+                // Alterado por: Alexandre Magno - 04/11/2017
+                If Query.Params[I].DataType = ftLargeint Then
+                  Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+                else If Query.Params[I].DataType = ftSmallInt Then
+                  Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+                Else
+                  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+
+                // Como estava Anteriormente
+                //If Query.Params[I].DataType = ftSmallInt Then
+                //  Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+                //Else
+                //  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
               End;
             End
            Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
@@ -828,10 +873,19 @@ Begin
                   Begin
                    If Trim(Params[I].Value) <> '' Then
                     Begin
-                     If vTempQuery.Params[A].DataType = ftSmallInt Then
-                      vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
-                     Else
-                      vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                      // Alterado por: Alexandre Magno - 04/11/2017
+                      If vTempQuery.Params[A].DataType = ftLargeint Then
+                        vTempQuery.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
+                      else If vTempQuery.Params[A].DataType = ftSmallInt Then
+                        vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                      Else
+                        vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+
+                      // Como estava Anteriormente
+                      //If vTempQuery.Params[A].DataType = ftSmallInt Then
+                      //  vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                      //Else
+                      //  vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
                     End;
                   End
                  Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
@@ -1035,10 +1089,19 @@ Begin
              Begin
               If Trim(Params[I].Value) <> '' Then
                Begin
-                If fdCommand.Params[A].DataType = ftSmallInt Then
-                 fdCommand.Params[A].AsSmallInt := StrToInt(Params[I].Value)
-                Else
-                 fdCommand.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                 // Alterado por: Alexandre Magno - 04/11/2017
+                 If fdCommand.Params[A].DataType = ftLargeint Then
+                   fdCommand.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
+                 else If fdCommand.Params[A].DataType = ftSmallInt Then
+                   fdCommand.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                 Else
+                   fdCommand.Params[A].AsInteger  := StrToInt(Params[I].Value);
+
+                 // Como estava Anteriormente
+                 //If fdCommand.Params[A].DataType = ftSmallInt Then
+                 //  fdCommand.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                 //Else
+                 //  fdCommand.Params[A].AsInteger  := StrToInt(Params[I].Value);
                End;
              End
             Else If fdCommand.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
