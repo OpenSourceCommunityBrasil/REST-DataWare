@@ -1231,6 +1231,7 @@ object Form2: TForm2
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd
     OnStatus = RESTDWDataBase1Status
+    ParamCreate = True
     Left = 240
     Top = 8
   end

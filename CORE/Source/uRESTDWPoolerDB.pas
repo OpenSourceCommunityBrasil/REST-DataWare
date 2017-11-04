@@ -226,6 +226,7 @@ Type
   vOnAfterOpen         : TOnAfterOpen;
   vOnAfterClose        : TOnAfterClose;
   OldData              : TMemoryStream;
+  vNewRecord,
   vBeforeOpen,
   vBeforeEdit,
   vBeforeInsert,
@@ -302,6 +303,7 @@ Type
   Procedure   ProcAfterClose     (DataSet : TDataSet);
   Procedure   ProcBeforeInsert   (DataSet : TDataSet);
   Procedure   ProcAfterInsert    (DataSet : TDataSet);
+  Procedure   ProcNewRecord      (DataSet : TDataSet);
   Procedure   ProcBeforeDelete   (DataSet : TDataSet); //Evento para Delta
   Procedure   ProcBeforeEdit     (DataSet : TDataSet); //Evento para Delta
   Procedure   ProcAfterEdit      (DataSet : TDataSet);
@@ -367,6 +369,7 @@ Type
   Property AfterPost              : TDatasetEvents      Read vAfterPost                Write vAfterPost;
   Property AfterDelete            : TDatasetEvents      Read vAfterDelete              Write vAfterDelete;
   Property AfterCancel            : TDatasetEvents      Read vAfterCancel              Write vAfterCancel;
+  Property OnNewRecord            : TDatasetEvents      Read vNewRecord                Write vNewRecord;
   Property InBlockEvents          : Boolean             Read vInBlockEvents            Write vInBlockEvents;
 End;
 
@@ -1607,6 +1610,7 @@ Begin
  TDataset(Self).BeforePost         := @ProcBeforePost;
  TDataset(Self).AfterCancel        := @ProcAfterCancel;
  TDataset(Self).BeforeDelete       := @ProcBeforeDelete;
+ TDataset(Self).OnNewRecord        := @ProcNewRecord;
  Inherited AfterPost               := @OldAfterPost;
  Inherited AfterDelete             := @OldAfterDelete;
  {$ELSE}
@@ -1621,6 +1625,7 @@ Begin
  TDataset(Self).BeforePost         := ProcBeforePost;
  TDataset(Self).BeforeDelete       := ProcBeforeDelete;
  TDataset(Self).AfterCancel        := ProcAfterCancel;
+ TDataset(Self).OnNewRecord        := ProcNewRecord;
  Inherited AfterPost               := OldAfterPost;
  Inherited AfterDelete             := OldAfterDelete;
  {$ENDIF}
@@ -1980,6 +1985,15 @@ Begin
     End;
   End;
 End;
+
+procedure TRESTDWClientSQL.ProcNewRecord(DataSet: TDataSet);
+begin
+ If Not vInBlockEvents Then
+  Begin
+   If Assigned(vNewRecord) Then
+    vNewRecord(Dataset);
+  End;
+end;
 
 procedure TRESTDWClientSQL.Refresh;
 var
