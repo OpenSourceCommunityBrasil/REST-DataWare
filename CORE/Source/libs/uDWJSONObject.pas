@@ -1420,39 +1420,46 @@ Begin
     DestDS.DisableControls;
     If DestDS.Active Then
      DestDS.Close;
-    If DestDS.FieldDefs.Count > 0 Then
-     DestDS.FieldDefs.Clear;
+    If DestDS.Fields.Count = 0 Then
+     If DestDS.FieldDefs.Count > 0 Then
+      DestDS.FieldDefs.Clear;
+    bJsonArray    := bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
+    bJsonArraySub := bJsonArray.optJSONObject  (0);
+    bJsonArray    := bJsonArraySub.optJSONArray(bJsonArraySub.names.get(0).ToString);
+    TRESTDWClientSQL(DestDS).FieldDefs.BeginUpdate;
     If DestDS.FieldDefs.Count = 0 Then
+    For J := 0 To bJsonArray.Length - 1 Do
      Begin
-      bJsonArray    := bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
-      bJsonArraySub := bJsonArray.optJSONObject  (0);
-      bJsonArray    := bJsonArraySub.optJSONArray(bJsonArraySub.names.get(0).ToString);
-      For J := 0 To bJsonArray.Length - 1 Do
-       Begin
-        bJsonOBJ := udwjson.TJsonObject.Create(bJsonArray.get(J).ToString);
-        Try
-         If Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) <> '' Then
+      bJsonOBJ := udwjson.TJsonObject.Create(bJsonArray.get(J).ToString);
+      Try
+       If Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) <> '' Then
+        Begin
+         If TRESTDWClientSQL(DestDS).FieldDefExist(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) = Nil Then
           Begin
-           If TRESTDWClientSQL(DestDS).FieldDefExist(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) = Nil Then
+           FieldDef          := TRESTDWClientSQL(DestDS).FieldDefs.AddFieldDef;
+           FieldDef.Name     := bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString;
+           FieldDef.DataType := GetFieldType(bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString);
+           FieldDef.Size     := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
+           FieldDef.Required := Uppercase(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S';
+           {
+           TRESTDWClientSQL(DestDS).FieldDefs.Add(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString,
+                                                  GetFieldType(bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString),
+                                                  StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString),
+                                                  Uppercase(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S');
+           }
+           If FieldDef.DataType In [ftFloat, ftCurrency, ftBCD, ftFMTBcd] Then
             Begin
-             TRESTDWClientSQL(DestDS).FieldDefs.Add(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString,
-                                                    GetFieldType(bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString),
-                                                    StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString),
-                                                    Uppercase(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S');
-             If Not(TRESTDWClientSQL(DestDS).FieldDefs[TRESTDWClientSQL(DestDS).FieldDefs.Count -1].DataType In [ftSmallint, ftInteger,  ftLargeint,
-                                                                                                                 ftFloat,    ftCurrency, ftBCD, ftFMTBcd]) Then
-              Begin
-               TRESTDWClientSQL(DestDS).FieldDefs[TRESTDWClientSQL(DestDS).FieldDefs.Count -1].Size      := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
-               TRESTDWClientSQL(DestDS).FieldDefs[TRESTDWClientSQL(DestDS).FieldDefs.Count -1].Precision := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(5).ToString).ToString);
-              End;
+             FieldDef.Size      := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
+             FieldDef.Precision := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(5).ToString).ToString);
             End;
           End;
-        Finally
-         bJsonOBJ.Clean;
-         FreeAndNil(bJsonOBJ);
         End;
-       End;
+      Finally
+       bJsonOBJ.Clean;
+       FreeAndNil(bJsonOBJ);
+      End;
      End;
+    TRESTDWClientSQL(DestDS).FieldDefs.EndUpdate;;
     Try
      {$IFNDEF FPC}
      If DestDS Is TClientDataset Then
@@ -1548,10 +1555,11 @@ Begin
        FreeAndNil(bJsonOBJ);
       End;
      End;
-    For A := 0 To DestDS.Fields.Count - 1 Do
+    For A := 0 To DestDS.FieldDefs.Count - 1 Do
      Begin
       vFindFlag := False;
-      If DestDS.Fields[A].FieldKind = fkData Then
+      If DestDS.FindField(DestDS.FieldDefs[A].Name) <> Nil Then
+      If DestDS.FindField(DestDS.FieldDefs[A].Name).FieldKind = fkData Then
        Begin
         For J := 0 To bJsonArray.Length - 1 Do
          Begin
@@ -1561,9 +1569,11 @@ Begin
             vFindFlag := Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString)) = Uppercase(DestDS.Fields[A].FieldName);
             If vFindFlag Then
              Begin
+              {
               If bJsonOBJ.names.Length > 6 Then
-               If Not (DestDS.Fields[A].ReadOnly) Then
-                DestDS.Fields[A].ReadOnly := (Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(6).ToString).ToString)) = 'S');
+               If Not (DestDS.FindField(DestDS.FieldDefs[A].Name).ReadOnly) Then
+                DestDS.FindField(DestDS.FieldDefs[A].Name).ReadOnly := (Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(6).ToString).ToString)) = 'S');
+              }
               ListFields.Add(IntToStr(J));
               Break;
              End;
@@ -1589,22 +1599,24 @@ Begin
      Begin
       bJsonOBJ     := uDWJSON.TJsonObject.Create(bJsonArray.get(J).ToString);
       bJsonOBJTemp := bJsonOBJ.optJSONArray(bJsonOBJ.names.get(0).ToString);
-      DestDS.Append;
+      TRESTDWClientSQL(DestDS).Append;
       Try
        For I := 0 To DestDS.Fields.Count - 1 Do
         Begin
-         vOldReadOnly := DestDS.Fields[I].ReadOnly;
-         DestDS.Fields[I].ReadOnly := False;
-         If (StrToInt(ListFields[I]) = -1) Or Not(DestDS.Fields[I].FieldKind = fkData) Then
+         vOldReadOnly := TRESTDWClientSQL(DestDS).Fields[I].ReadOnly;
+         TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := False;
+         If (StrToInt(ListFields[I]) = -1) Or
+            Not(TRESTDWClientSQL(DestDS).Fields[I].FieldKind = fkData) Or
+            (StrToInt(ListFields[I]) = -1) Then
           Begin
-           DestDS.Fields[I].ReadOnly := vOldReadOnly;
+           TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
            Continue;
           End;
-         If DestDS.Fields[I].DataType In [ftGraphic,     ftParadoxOle, ftDBaseOle,
-                                          ftTypedBinary, ftCursor,     ftDataSet,
-                                          ftBlob,        ftOraBlob,    ftOraClob
-                                          {$IFNDEF FPC}{$IF CompilerVersion > 21},
-                                          ftParams, ftStream{$IFEND}{$ENDIF}] Then
+         If TRESTDWClientSQL(DestDS).Fields[I].DataType In [ftGraphic,     ftParadoxOle, ftDBaseOle,
+                                                            ftTypedBinary, ftCursor,     ftDataSet,
+                                                            ftBlob,        ftOraBlob,    ftOraClob
+                                                            {$IFNDEF FPC}{$IF CompilerVersion > 21},
+                                                            ftParams, ftStream{$IFEND}{$ENDIF}] Then
           Begin
            If (vEncoded) And (bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString <> 'null') Then
             HexStringToStream(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString, vBlobStream)
@@ -1618,7 +1630,7 @@ Begin
            Try
             vBlobStream.Position := 0;
             If (bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString <> 'null') Then
-             TBlobField(DestDS.Fields[I]).LoadFromStream(vBlobStream);
+             TBlobField(TRESTDWClientSQL(DestDS).Fields[I]).LoadFromStream(vBlobStream);
            Finally
             {$IFNDEF FPC}
             {$IF CompilerVersion > 21}
@@ -1632,31 +1644,31 @@ Begin
           Begin
            If (Lowercase(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString) <> 'null') Then
             Begin
-             If DestDS.Fields[I].DataType in [ftString, ftWideString,
-                                              {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo, {$IFEND}{$ENDIF}
-                                              ftMemo, ftFmtMemo, ftFixedChar] Then
+             If TRESTDWClientSQL(DestDS).Fields[I].DataType in [ftString, ftWideString,
+                                                               {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo, {$IFEND}{$ENDIF}
+                                                               ftMemo, ftFmtMemo, ftFixedChar] Then
               Begin
                If bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString = '' Then
-                DestDS.Fields[I].Value := ''
+                TRESTDWClientSQL(DestDS).Fields[I].Value := ''
                Else
                 Begin
                  If vEncoded Then
-                  DestDS.Fields[I].AsString := DecodeStrings(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                  TRESTDWClientSQL(DestDS).Fields[I].AsString := DecodeStrings(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                  Else
-                  DestDS.Fields[I].AsString := bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString;
+                  TRESTDWClientSQL(DestDS).Fields[I].AsString := bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString;
                 End;
               End
              Else if (bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString <> '') then
               Begin
                {$IFNDEF FPC}
-               SetValueA(DestDS.Fields[I], bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString);
+               SetValueA(TRESTDWClientSQL(DestDS).Fields[I], bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString);
                {$ELSE}
-               SetValueA(DestDS.Fields[I], bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString);
+               SetValueA(TRESTDWClientSQL(DestDS).Fields[I], bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString);
                {$ENDIF}
               End;
             End;
           End;
-         DestDS.Fields[I].ReadOnly := vOldReadOnly;
+         TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
         End;
       Finally
        If Assigned(bJsonOBJ) Then
@@ -1665,7 +1677,7 @@ Begin
          FreeAndNil(bJsonOBJ);
         End;
       End;
-      DestDS.Post;
+      TRESTDWClientSQL(DestDS).Post;
      End;
    End
   Else

@@ -10,7 +10,6 @@ uses
 {$R *.res}
 
 begin
-  reportmemoryleaksonshutdown:=true;
   Application.Initialize;
   Application.CreateForm(TRestDWForm, RestDWForm);
   Application.Run;

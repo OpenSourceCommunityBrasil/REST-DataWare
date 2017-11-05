@@ -150,7 +150,7 @@ Type
   vLastRequest     : TLastRequest;
   vLastResponse    : TLastResponse;
   lHandler         : TIdServerIOHandlerSSLOpenSSL;
-  aSSLMethod      : TIdSSLVersion;
+  aSSLMethod       : TIdSSLVersion;
   aSSLVersions     : TIdSSLVersions;
   vServerContext,
   ASSLPrivateKeyFile,
@@ -160,7 +160,7 @@ Type
   VEncondig        : TEncodeSelect;              //Enconding se usar CORS usar UTF8 - Alexandre Abade
   vSSLVerifyMode      : TIdSSLVerifyModeSet;
   vSSLVerifyDepth     : integer;
-  function SSLVerifyPeer(Certificate: TIdX509;
+  Function SSLVerifyPeer(Certificate: TIdX509;
                          AOk: Boolean; ADepth, AError: Integer): Boolean;
   Procedure GetSSLPassWord (Var Password              : String);
   Procedure SetActive      (Value                     : Boolean);
@@ -2282,14 +2282,15 @@ Begin
       lHandler.SSLOptions.SSLVersions           :=aSSLVersions;
       {$IFDEF FPC}
       lHandler.OnGetPassword                    := @GetSSLPassword;
+      lHandler.OnVerifyPeer                     := @SSLVerifyPeer;
       {$ELSE}
       lHandler.OnGetPassword                    := GetSSLPassword;
+      lHandler.OnVerifyPeer                     := SSLVerifyPeer;
       {$ENDIF}
       lHandler.SSLOptions.CertFile              := ASSLCertFile;
       lHandler.SSLOptions.KeyFile               := ASSLPrivateKeyFile;
       lHandler.SSLOptions.VerifyMode            := vSSLVerifyMode;
       lHandler.SSLOptions.VerifyDepth           := vSSLVerifyDepth;
-      lHandler.OnVerifyPeer                     := SSLVerifyPeer;
       HTTPServer.IOHandler := lHandler;
      End
     Else

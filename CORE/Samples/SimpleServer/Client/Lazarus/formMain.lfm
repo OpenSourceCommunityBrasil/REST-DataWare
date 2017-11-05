@@ -1151,30 +1151,36 @@ object Form2: TForm2
       item
         Name = 'FIRST_NAME'
         DataType = ftString
+        Precision = -1
         Size = 15
       end    
       item
         Name = 'LAST_NAME'
         DataType = ftString
+        Precision = -1
         Size = 20
       end    
       item
         Name = 'PHONE_EXT'
         DataType = ftString
+        Precision = -1
         Size = 4
       end    
       item
         Name = 'HIRE_DATE'
         DataType = ftDateTime
+        Precision = -1
       end    
       item
         Name = 'DEPT_NO'
         DataType = ftString
+        Precision = -1
         Size = 3
       end    
       item
         Name = 'JOB_CODE'
         DataType = ftString
+        Precision = -1
         Size = 5
       end    
       item
@@ -1185,16 +1191,18 @@ object Form2: TForm2
       item
         Name = 'JOB_COUNTRY'
         DataType = ftString
+        Precision = -1
         Size = 15
       end    
       item
         Name = 'SALARY'
         DataType = ftFloat
-        Precision = -1
+        Precision = 15
       end    
       item
         Name = 'FULL_NAME'
         DataType = ftString
+        Precision = -1
         Size = 37
       end>
     Active = False
@@ -1206,6 +1214,7 @@ object Form2: TForm2
     DataBase = RESTDWDataBase1
     SQL.Strings = (
       'SELECT * FROM EMPLOYEE'
+      'ORDER BY EMP_NO'
     )
     UpdateTableName = 'employee'
     CacheUpdateRecords = True

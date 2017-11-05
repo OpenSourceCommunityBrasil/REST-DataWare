@@ -87,9 +87,9 @@ Begin
  RESTDWClientSQL1.Close;
  RESTDWClientSQL1.sql.clear;
  RESTDWClientSQL1.sql.add(mComando.Text);
- RESTDWClientSQL1.Active       := True;
- If RESTDWClientSQL1.FindField('emp_no') <> Nil Then
-  RESTDWClientSQL1.FindField('emp_no').ProviderFlags := [pfInUpdate, pfInWhere, pfInKey];
+ RESTDWClientSQL1.Open;
+ If RESTDWClientSQL1.FindField('FULL_NAME') <> Nil Then
+  RESTDWClientSQL1.FindField('FULL_NAME').ReadOnly := True;
 End;
 
 procedure TForm2.Button2Click(Sender: TObject);

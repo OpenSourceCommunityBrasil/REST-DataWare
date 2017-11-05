@@ -584,6 +584,8 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
     Field := Dataset.FindField(vMassiveFields.Items[I].vFieldName);
     If Field <> Nil Then
      Begin
+      If (Field.ProviderFlags = []) Or (Field.ReadOnly) Then
+       Continue;
       If MassiveModeBuff = mmDelete Then
        If Not(pfInKey in Field.ProviderFlags) Then
         Continue;

@@ -1285,7 +1285,7 @@ object RestDWForm: TRestDWForm
       object cbAdaptadores: TComboBox
         Left = 7
         Top = 169
-        Width = 212
+        Width = 213
         Height = 21
         TabOrder = 3
         Text = 'cbAdaptadores'
@@ -1413,10 +1413,6 @@ object RestDWForm: TRestDWForm
     object tsLogs: TTabSheet
       Caption = 'Logs'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label19: TLabel
         Left = 7
         Top = 147
@@ -1487,11 +1483,14 @@ object RestDWForm: TRestDWForm
     ServerParams.HasAuthentication = True
     ServerParams.UserName = 'testserver'
     ServerParams.Password = 'testserver'
-    SSLVersion = sslvSSLv2
+    SSLMethod = sslvSSLv2
+    SSLVersions = []
     OnLastRequest = RESTServicePooler1LastRequest
     OnLastResponse = RESTServicePooler1LastResponse
     Encoding = esASCII
     ServerContext = 'restdataware'
+    SSLVerifyMode = []
+    SSLVerifyDepth = 0
     Left = 132
     Top = 192
   end

@@ -218,7 +218,6 @@ End;
 Type
 
  { TRESTDWClientSQL }
-
  TRESTDWClientSQL     = Class(TRESTDWClientSQLBase) //Classe com as funcionalidades de um DBQuery
  Private
   vRESTClientPooler    : TRESTClientPooler;
@@ -283,7 +282,6 @@ Type
   Procedure  CloneDefinitions    (Source  : TFdMemtable;
                                   aSelf   : TFdMemtable); //Fields em Definições
   {$ENDIF}
-
   {$ENDIF}
   Procedure   OnChangingSQL      (Sender  : TObject);       //Quando Altera o SQL da Lista
   Procedure   SetActiveDB        (Value   : Boolean);       //Seta o Estado do Dataset
@@ -298,21 +296,19 @@ Type
   Procedure   PrepareDetails       (ActiveMode : Boolean);
   Procedure   SetCacheUpdateRecords(Value : Boolean);
   Procedure   PrepareDetailsNew;
-  Function    FirstWord          (Value   : String) : String;
-  Procedure   ProcAfterScroll    (DataSet : TDataSet);
-  Procedure   ProcBeforeOpen     (DataSet : TDataSet);
-  Procedure   ProcAfterOpen      (DataSet : TDataSet);
-  Procedure   ProcAfterClose     (DataSet : TDataSet);
-  Procedure   ProcBeforeInsert   (DataSet : TDataSet);
-  Procedure   ProcAfterInsert    (DataSet : TDataSet);
-  Procedure   ProcNewRecord      (DataSet : TDataSet);
-  Procedure   ProcBeforeDelete   (DataSet : TDataSet); //Evento para Delta
-  Procedure   ProcBeforeEdit     (DataSet : TDataSet); //Evento para Delta
-  Procedure   ProcAfterEdit      (DataSet : TDataSet);
-  Procedure   ProcBeforePost     (DataSet : TDataSet); //Evento para Delta
-  Procedure   ProcAfterCancel    (DataSet : TDataSet);
-  Procedure   CommitData;
- Protected
+  Function    FirstWord          (Value     : String) : String;
+  Procedure   ProcAfterScroll    (DataSet   : TDataSet);
+  Procedure   ProcBeforeOpen     (DataSet   : TDataSet);
+  Procedure   ProcAfterOpen      (DataSet   : TDataSet);
+  Procedure   ProcAfterClose     (DataSet   : TDataSet);
+  Procedure   ProcBeforeInsert   (DataSet   : TDataSet);
+  Procedure   ProcAfterInsert    (DataSet   : TDataSet);
+  Procedure   ProcNewRecord      (DataSet   : TDataSet);
+  Procedure   ProcBeforeDelete   (DataSet   : TDataSet); //Evento para Delta
+  Procedure   ProcBeforeEdit     (DataSet   : TDataSet); //Evento para Delta
+  Procedure   ProcAfterEdit      (DataSet   : TDataSet);
+  Procedure   ProcBeforePost     (DataSet   : TDataSet); //Evento para Delta
+  Procedure   ProcAfterCancel    (DataSet   : TDataSet);
  Public
   //Métodos
   Procedure   FieldDefsToFields;
@@ -337,9 +333,6 @@ Type
   Procedure   SaveToStream    (Var Stream : TMemoryStream);
   Procedure   ClearMassive;
   Function    MassiveCount : Integer;
-  {$IFDEF FPC}
-  Function    GetFields           : TFields;
-  {$ENDIF}
  Published
   Property MasterDataSet          : TRESTDWClientSQL    Read vMasterDataSet            Write SetMasterDataSet;
   Property MasterCascadeDelete    : Boolean             Read vCascadeDelete            Write vCascadeDelete;
@@ -353,9 +346,6 @@ Type
   Property Params                 : TParams             Read vParams                   Write vParams;                 //Parametros de Dataset
   Property DataBase               : TRESTDWDataBase     Read vRESTDataBase             Write SetDataBase;             //Database REST do Dataset
   Property SQL                    : TStringList         Read vSQL                      Write SetSQL;                  //SQL a ser Executado
-  {$IFDEF FPC}
-  Property Fields                 : TFields             Read GetFields;
-  {$ENDIF}
   Property UpdateTableName        : String              Read vUpdateTableName          Write SetUpdateTableName;      //Tabela que será usada para Reflexão de Dados
   Property CacheUpdateRecords     : Boolean             Read vCacheUpdateRecords       Write SetCacheUpdateRecords;
   Property AutoCommitData         : Boolean             Read vAutoCommitData           Write vAutoCommitData;
@@ -1590,7 +1580,7 @@ Begin
  vCascadeDelete                    := True;
  vSQL                              := TStringList.Create;
  {$IFDEF FPC}
-  vSQL.OnChange                     := @OnChangingSQL;
+  vSQL.OnChange                    := @OnChangingSQL;
  {$ELSE}
   vSQL.OnChange                    := OnChangingSQL;
  {$ENDIF}
@@ -2003,25 +1993,24 @@ begin
   End;
 end;
 
-procedure TRESTDWClientSQL.Refresh;
-var
-  Curso:integer;
-begin
-    Curso := 0;
-    if Active then
-    begin
-      if RecordCount > 0 then
-      Curso:= self.CurrentRecord;
-      close;
-      Open;
-      if Active then
-      begin
-        if RecordCount > 0 then
-        MoveBy(Curso);
-      end;
-    end;
-
-end;
+Procedure TRESTDWClientSQL.Refresh;
+Var
+ Cursor : Integer;
+Begin
+ Cursor := 0;
+ If Active then
+  Begin
+   If RecordCount > 0 then
+    Cursor := Self.CurrentRecord;
+   Close;
+   Open;
+   If Active then
+    Begin
+     If RecordCount > 0 Then
+      MoveBy(Cursor);
+    End;
+  End;
+End;
 
 procedure TRESTDWClientSQL.ProcAfterClose(DataSet: TDataSet);
 Var
@@ -2359,7 +2348,7 @@ Begin
  vCreateDS := False;
 End;
 
-Procedure TRESTDWClientSQL.ClearMassive;
+procedure TRESTDWClientSQL.ClearMassive;
 Begin
  If Trim(vUpdateTableName) <> '' Then
   If TMassiveDatasetBuffer(vMassiveDataset).RecordCount > 0 Then
@@ -2370,15 +2359,7 @@ procedure TRESTDWClientSQL.Close;
 Begin
  vActive := False;
  Inherited Close;
-// TDataset(Self).Fields.Clear;
-// FieldDefs.Clear;
 End;
-
-procedure TRESTDWClientSQL.CommitData;
-Begin
-
-End;
-
 procedure TRESTDWClientSQL.Open;
 Begin
  Try
@@ -2431,10 +2412,8 @@ Begin
  }
   If (vRESTDataBase <> Nil) Then
    Inherited OpenCursor(InfoQuery)
-  Else
+  Else If csDesigning in ComponentState Then
    Raise Exception.Create('Database not found...');
-//  If FieldDefs.Count = 0 Then
-//   FieldDefs.Update;
  Except
   On E : Exception do
    Begin
@@ -2486,8 +2465,6 @@ Begin
  Try
   If Assigned(vOnAfterDelete) Then
    vOnAfterDelete(Self);
-  If Not vErrorBefore Then
-   CommitData;
  Finally
   vReadData := False;
  End;
@@ -2504,7 +2481,7 @@ Begin
  Inherited Loaded;
 End;
 
-Function TRESTDWClientSQL.MassiveCount : Integer;
+Function TRESTDWClientSQL.MassiveCount: Integer;
 Begin
  Result := 0;
  If Trim(vUpdateTableName) <> '' Then
@@ -2657,7 +2634,7 @@ Begin
       End;
     End;
   End
- Else
+ Else If csDesigning in ComponentState Then
   Raise Exception.Create(PChar('Empty Database Property'));
 End;
 
@@ -2666,12 +2643,6 @@ Begin
 
 End;
 
-{$IFDEF FPC}
-Function TRESTDWClientSQL.GetFields: TFields;
-Begin
- Result := TBufDataset(Self).Fields;
-End;
-{$ENDIF}
 
 procedure TRESTDWClientSQL.SetActiveDB(Value: Boolean);
 Begin

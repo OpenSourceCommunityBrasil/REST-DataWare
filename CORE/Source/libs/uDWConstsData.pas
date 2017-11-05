@@ -32,6 +32,8 @@ End;
 Type
  {$IFDEF FPC}
   TRESTDWClientSQLBase   = Class(TBufDataset)                   //Classe com as funcionalidades de um DBQuery
+  Public
+   Constructor Create(AOwner: TComponent); Override;
  {$ELSE}
   {$IFDEF RESJEDI}
   TRESTDWClientSQLBase   = Class(TJvMemoryData)                 //Classe com as funcionalidades de um DBQuery
@@ -57,5 +59,17 @@ Type
  TDatasetEvents   = Procedure (DataSet: TDataSet) Of Object;
 
 implementation
+
+{ TRESTDWClientSQLBase }
+
+{$IFDEF FPC}
+Constructor TRESTDWClientSQLBase.Create(AOwner: TComponent);
+Begin
+ Inherited Create(AOwner);
+ //SetDefaultFields(csDesigning in ComponentState);
+ SetDefaultFields(True);
+End;
+{$ENDIF}
+
 
 end.
