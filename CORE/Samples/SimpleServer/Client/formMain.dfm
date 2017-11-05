@@ -1047,7 +1047,7 @@ object Form2: TForm2
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     Lines.Strings = (
-      'select * from tb_item')
+      'select * from STRINGTABLE')
     ParentFont = False
     TabOrder = 5
   end
@@ -1155,13 +1155,32 @@ object Form2: TForm2
     TabOrder = 13
     OnClick = Button4Click
   end
+  object chkhttps: TCheckBox
+    Left = 208
+    Top = 57
+    Width = 97
+    Height = 17
+    Caption = 'Usar HTTPS'
+    TabOrder = 14
+  end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1
     Left = 240
     Top = 128
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    FieldDefs = <>
+    FieldDefs = <
+      item
+        Name = 'ID'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 10
+      end
+      item
+        Name = 'DESC'
+        DataType = ftString
+        Size = 100
+      end>
     IndexDefs = <>
     MasterFields = ''
     FetchOptions.AssignedValues = [evMode]
@@ -1179,31 +1198,23 @@ object Form2: TForm2
     Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
-      'select * from tb_item')
-    UpdateTableName = 'tb_item'
+      'select * from STRINGTABLE')
+    UpdateTableName = 'STRINGTABLE'
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = True
     InBlockEvents = False
-    Left = 240
-    Top = 64
-    object RESTDWClientSQL1ID_ITEM: TIntegerField
-      FieldName = 'ID_ITEM'
+    Left = 304
+    Top = 96
+    object RESTDWClientSQL1ID: TStringField
+      FieldName = 'ID'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
       Required = True
+      Size = 10
     end
-    object RESTDWClientSQL1NM_ITEM: TStringField
-      FieldName = 'NM_ITEM'
+    object RESTDWClientSQL1DESC: TStringField
+      FieldName = 'DESC'
       Size = 100
-    end
-    object RESTDWClientSQL1VL_PRECOCUSTO: TFloatField
-      FieldName = 'VL_PRECOCUSTO'
-    end
-    object RESTDWClientSQL1VL_PRECOVENDA: TFloatField
-      FieldName = 'VL_PRECOVENDA'
-    end
-    object RESTDWClientSQL1QT_FISICO: TFloatField
-      FieldName = 'QT_FISICO'
     end
   end
   object RESTDWDataBase1: TRESTDWDataBase
@@ -1222,11 +1233,11 @@ object Form2: TForm2
     StateConnection.InTime = 1000
     RequestTimeOut = 9999999
     EncodeStrings = True
-    Encoding = esASCII
+    Encoding = esUtf8
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    DecimalSeparator = ','
+    DecimalSeparator = '.'
     OnWork = RESTDWDataBase1Work
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd

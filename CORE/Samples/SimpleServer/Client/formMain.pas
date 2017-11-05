@@ -62,11 +62,9 @@ TYPE
     StatusBar1: TStatusBar;
     Memo1: TMemo;
     Button4: TButton;
-    RESTDWClientSQL1ID_ITEM: TIntegerField;
-    RESTDWClientSQL1NM_ITEM: TStringField;
-    RESTDWClientSQL1VL_PRECOCUSTO: TFloatField;
-    RESTDWClientSQL1VL_PRECOVENDA: TFloatField;
-    RESTDWClientSQL1QT_FISICO: TFloatField;
+    RESTDWClientSQL1ID: TStringField;
+    RESTDWClientSQL1DESC: TStringField;
+    chkhttps: TCheckBox;
     PROCEDURE Button1Click(Sender: TObject);
     PROCEDURE Button2Click(Sender: TObject);
     PROCEDURE RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
@@ -104,6 +102,10 @@ BEGIN
   RESTDWDataBase1.Login         := EdUserNameDW.Text;
   RESTDWDataBase1.Password      := EdPasswordDW.Text;
   RESTDWDataBase1.Compression   := CheckBox1.Checked;
+  if chkhttps.Checked then
+     RESTDWDataBase1.TypeRequest:=TTyperequest.trHttps
+  else
+     RESTDWDataBase1.TypeRequest:=TTyperequest.trHttp;
   RESTDWDataBase1.Open;
 
   INICIO                  := Now;
@@ -134,6 +136,10 @@ BEGIN
   RESTDWDataBase1.Login         := EdUserNameDW.Text;
   RESTDWDataBase1.Password      := EdPasswordDW.Text;
   RESTDWDataBase1.Compression   := CheckBox1.Checked;
+  if chkhttps.Checked then
+     RESTDWDataBase1.TypeRequest:=TTyperequest.trHttps
+  else
+     RESTDWDataBase1.TypeRequest:=TTyperequest.trHttp;
   RESTDWDataBase1.Open;
   RESTDWClientSQL1.Close;
   RESTDWClientSQL1.SQL.Clear;
@@ -156,6 +162,10 @@ BEGIN
   RESTDWDataBase1.Login         := EdUserNameDW.Text;
   RESTDWDataBase1.Password      := EdPasswordDW.Text;
   RESTDWDataBase1.Compression   := CheckBox1.Checked;
+  if chkhttps.Checked then
+     RESTDWDataBase1.TypeRequest:=TTyperequest.trHttps
+  else
+     RESTDWDataBase1.TypeRequest:=TTyperequest.trHttp;
   RESTDWDataBase1.Open;
 
   INICIO              := Now;
