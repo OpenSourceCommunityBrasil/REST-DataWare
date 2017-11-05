@@ -150,13 +150,18 @@ Type
   vLastRequest     : TLastRequest;
   vLastResponse    : TLastResponse;
   lHandler         : TIdServerIOHandlerSSLOpenSSL;
-  aSSLVersion      : TIdSSLVersion;
+  aSSLMethod      : TIdSSLVersion;
+  aSSLVersions     : TIdSSLVersions;
   vServerContext,
   ASSLPrivateKeyFile,
   ASSLPrivateKeyPassword,
   FRootPath,
   ASSLCertFile     : String;
   VEncondig        : TEncodeSelect;              //Enconding se usar CORS usar UTF8 - Alexandre Abade
+  vSSLVerifyMode      : TIdSSLVerifyModeSet;
+  vSSLVerifyDepth     : integer;
+  function SSLVerifyPeer(Certificate: TIdX509;
+                         AOk: Boolean; ADepth, AError: Integer): Boolean;
   Procedure GetSSLPassWord (Var Password              : String);
   Procedure SetActive      (Value                     : Boolean);
   Function  GetSecure : Boolean;
@@ -198,13 +203,16 @@ Type
   Property SSLPrivateKeyFile     : String          Read aSSLPrivateKeyFile     Write aSSLPrivateKeyFile;
   Property SSLPrivateKeyPassword : String          Read aSSLPrivateKeyPassword Write aSSLPrivateKeyPassword;
   Property SSLCertFile           : String          Read aSSLCertFile           Write aSSLCertFile;
-  Property SSLVersion            : TIdSSLVersion   Read aSSLVersion            Write aSSLVersion;
+  Property SSLMethod             : TIdSSLVersion   Read aSSLMethod             Write aSSLMethod;
+  Property SSLVersions           : TIdSSLVersions  Read aSSLVersions           Write aSSLVersions;
   Property OnLastRequest         : TLastRequest    Read vLastRequest           Write vLastRequest;
   Property OnLastResponse        : TLastResponse   Read vLastResponse          Write vLastResponse;
   Property Encoding              : TEncodeSelect   Read VEncondig              Write VEncondig;          //Encoding da string
   Property ServerContext         : String          Read vServerContext         Write vServerContext;
   {TODO CRISTIANO BARBOSA}
   Property RootPath              : String          Read FRootPath              Write FRootPath;
+  property SSLVerifyMode: TIdSSLVerifyModeSet read vSSLVerifyMode write vSSLVerifyMode;
+  property SSLVerifyDepth: Integer read vSSLVerifyDepth write vSSLVerifyDepth;
 End;
 
 Type
@@ -291,7 +299,7 @@ Begin
  HttpRequest                     := TIdHTTP.Create(Nil);
  HttpRequest.Request.ContentType := 'application/json';
  HttpRequest.AllowCookies        := False;
- HttpRequest.HandleRedirects     := False;
+ //HttpRequest.HandleRedirects     := False;
  HttpRequest.HTTPOptions         := [hoKeepOrigProtocol];
  vTransparentProxy               := TIdProxyConnectionInfo.Create;
  vHost                           := 'localhost';
@@ -2270,7 +2278,8 @@ Begin
        (ASSLPrivateKeyPassword <> '') And
        (ASSLCertFile <> '')           Then
      Begin
-      lHandler.SSLOptions.Method                := aSSLVersion;
+      lHandler.SSLOptions.Method                := aSSLMethod;
+      lHandler.SSLOptions.SSLVersions           :=aSSLVersions;
       {$IFDEF FPC}
       lHandler.OnGetPassword                    := @GetSSLPassword;
       {$ELSE}
@@ -2278,6 +2287,9 @@ Begin
       {$ENDIF}
       lHandler.SSLOptions.CertFile              := ASSLCertFile;
       lHandler.SSLOptions.KeyFile               := ASSLPrivateKeyFile;
+      lHandler.SSLOptions.VerifyMode            := vSSLVerifyMode;
+      lHandler.SSLOptions.VerifyDepth           := vSSLVerifyDepth;
+      lHandler.OnVerifyPeer                     := SSLVerifyPeer;
       HTTPServer.IOHandler := lHandler;
      End
     Else
@@ -2312,6 +2324,19 @@ Begin
    vServerBaseMethod := TServerMethodDatamodule;
   End;
 End;
+
+function TRESTServicePooler.SSLVerifyPeer(Certificate: TIdX509; AOk: Boolean;
+  ADepth, AError: Integer): Boolean;
+begin
+  if ADepth = 0 then
+  begin
+    Result := AOk;
+  end
+  else
+  begin
+    Result := True;
+  end
+end;
 
 {TThread_Request}
 constructor TThread_Request.Create;

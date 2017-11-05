@@ -138,6 +138,7 @@ Type
   vStrsEmpty2Null,
   vStrsTrim2Len        : Boolean;
   vParamCreate         : Boolean;
+  vTypeRequest         : Ttyperequest;
   Procedure SetOnWork     (Value : TOnWork);
   Procedure SetOnWorkBegin(Value : TOnWorkBegin);
   Procedure SetOnWorkEnd  (Value : TOnWorkEnd);
@@ -211,6 +212,7 @@ Type
   Property DatabaseCharSet    : TDatabaseCharSet         Read vDatabaseCharSet    Write vDatabaseCharSet;
   {$ENDIF}
   Property ParamCreate        : Boolean                  read vParamCreate        write vParamCreate;
+  Property TypeRequest        : TTypeRequest             Read vTypeRequest        Write vTypeRequest       Default trHttp;
 End;
 
 Type
@@ -424,7 +426,7 @@ Type
   Property PoolerPort         : Integer                  Read vPoolerPort         Write SetPoolerPort;      //A Porta do Pooler do DataSet
   Property PoolerPrefix       : String                   Read vPoolerPrefix       Write vPoolerPrefix;      //Prefixo do WebService REST
   Property Poolers            : TStringList              Read vPoolerList;
-End;
+ End;
 
 Type
  TRESTDWDriver    = Class(TComponent)
@@ -993,6 +995,7 @@ Begin
  vRESTConnectionDB.Host           := vRestWebService;
  vRESTConnectionDB.Port           := vPoolerPort;
  vRESTConnectionDB.Compression    := vCompression;
+ vRESTConnectionDB.TypeRequest     := VtypeRequest;
  {$IFNDEF FPC}
   vRESTConnectionDB.OnWork        := vOnWork;
   vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
@@ -1106,6 +1109,7 @@ Begin
  vRESTConnectionDB.Host           := vRestWebService;
  vRESTConnectionDB.Port           := vPoolerPort;
  vRESTConnectionDB.Compression    := vCompression;
+ vRESTConnectionDB.TypeRequest    := VtypeRequest;
  {$IFNDEF FPC}
   vRESTConnectionDB.OnWork        := vOnWork;
   vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
@@ -1228,6 +1232,7 @@ Begin
  vRESTConnectionDB.Host           := vRestWebService;
  vRESTConnectionDB.Port           := vPoolerPort;
  vRESTConnectionDB.Compression    := vCompression;
+ vRESTConnectionDB.TypeRequest    := VtypeRequest;
  {$IFNDEF FPC}
   vRESTConnectionDB.OnWork        := vOnWork;
   vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
@@ -1320,6 +1325,7 @@ Begin
  vConnection.Host           := vRestWebService;
  vConnection.Port           := vPoolerPort;
  vConnection.Compression    := vCompression;
+ vConnection.TypeRequest    := VtypeRequest;
  Result := TStringList.Create;
  Try
   vTempList := vConnection.GetPoolerList(vRestModule, vTimeOut, vLogin, vPassword);
@@ -1432,6 +1438,7 @@ Var
  vConnection : TDWPoolerMethodClient;
 Begin
  vConnection                := TDWPoolerMethodClient.Create(Nil);
+ vConnection.TypeRequest    := vTypeRequest;
  vConnection.WelcomeMessage := vWelcomeMessage;
  vConnection.Host           := vRestWebService;
  vConnection.Port           := vPoolerPort;

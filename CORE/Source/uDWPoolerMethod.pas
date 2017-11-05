@@ -34,6 +34,7 @@ Uses {$IFDEF FPC}
    vWelcomeMessage,
    vHost : String;
    vPort : Integer;
+   vTypeRequest: TtypeRequest;
    Procedure SetOnWork     (Value : TOnWork);
    Procedure SetOnWorkBegin(Value : TOnWorkBegin);
    Procedure SetOnWorkEnd  (Value : TOnWorkEnd);
@@ -169,6 +170,7 @@ Uses {$IFDEF FPC}
    {$IFDEF FPC}
    Property DatabaseCharSet: TDatabaseCharSet Read vDatabaseCharSet Write vDatabaseCharSet;
    {$ENDIF}
+   Property TypeRequest    : TTypeRequest  Read vTypeRequest    Write vTypeRequest       Default trHttp;
   End;
 
 implementation
@@ -233,12 +235,14 @@ Begin
  RESTClientPoolerExec.RequestTimeOut  := TimeOut;
  RESTClientPoolerExec.UrlPath         := Method_Prefix;
  RESTClientPoolerExec.DataCompression := vCompression;
+ RESTClientPoolerExec.TypeRequest     := vtyperequest;
  {$IFDEF FPC}
   RESTClientPoolerExec.OnWork           := vOnWork;
   RESTClientPoolerExec.OnWorkBegin      := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus         := vOnStatus;
   RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
+  RESTClientPoolerExec.TypeRequest     := vtyperequest;
  {$ELSE}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
@@ -483,12 +487,14 @@ Begin
  RESTClientPoolerExec.RequestTimeOut  := TimeOut;
  RESTClientPoolerExec.UrlPath         := Method_Prefix;
  RESTClientPoolerExec.DataCompression := Compression;
+ RESTClientPoolerExec.TypeRequest     := vtyperequest;
  {$IFDEF FPC}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus      := vOnStatus;
   RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
+  RESTClientPoolerExec.TypeRequest     := vtyperequest;
  {$ELSE}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
@@ -572,12 +578,14 @@ Begin
  RESTClientPoolerExec.RequestTimeOut  := TimeOut;
  RESTClientPoolerExec.UrlPath         := Method_Prefix;
  RESTClientPoolerExec.DataCompression := vCompression;
+ RESTClientPoolerExec.TypeRequest     := vtyperequest;
  {$IFDEF FPC}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus      := vOnStatus;
   RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
+  RESTClientPoolerExec.TypeRequest     := vtyperequest;
  {$ELSE}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
@@ -667,12 +675,14 @@ Begin
  RESTClientPoolerExec.RequestTimeOut  := TimeOut;
  RESTClientPoolerExec.UrlPath         := Method_Prefix;
  RESTClientPoolerExec.DataCompression := vCompression;
+ RESTClientPoolerExec.TypeRequest     := vTyperequest;
  {$IFDEF FPC}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus      := vOnStatus;
   RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
+  RESTClientPoolerExec.TypeRequest     := vtyperequest;
  {$ELSE}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
@@ -835,12 +845,14 @@ Begin
  RESTClientPoolerExec.RequestTimeOut  := TimeOut;
  RESTClientPoolerExec.UrlPath         := Method_Prefix;
  RESTClientPoolerExec.DataCompression := vCompression;
+ RESTClientPoolerExec.TypeRequest     := vTyperequest;
  {$IFDEF FPC}
   RESTClientPoolerExec.OnWork           := vOnWork;
   RESTClientPoolerExec.OnWorkBegin      := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus         := vOnStatus;
   RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
+  RESTClientPoolerExec.TypeRequest     := vtyperequest;
  {$ELSE}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
@@ -1022,12 +1034,14 @@ Begin
  RESTClientPoolerExec.RequestTimeOut  := TimeOut;
  RESTClientPoolerExec.UrlPath         := Method_Prefix;
  RESTClientPoolerExec.DataCompression := vCompression;
+ RESTClientPoolerExec.TypeRequest     := vTyperequest;
  {$IFDEF FPC}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus      := vOnStatus;
   RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
+  RESTClientPoolerExec.TypeRequest     := vtyperequest;
  {$ELSE}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
@@ -1226,12 +1240,14 @@ Begin
  RESTClientPoolerExec.RequestTimeOut  := TimeOut;
  RESTClientPoolerExec.UrlPath         := Method_Prefix;
  RESTClientPoolerExec.DataCompression := vCompression;
+ RESTClientPoolerExec.TypeRequest     := vTyperequest;
  {$IFDEF FPC}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus      := vOnStatus;
   RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
+  RESTClientPoolerExec.TypeRequest     := vtyperequest;
  {$ELSE}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
@@ -1394,12 +1410,14 @@ Begin
  RESTClientPoolerExec.RequestTimeOut  := TimeOut;
  RESTClientPoolerExec.UrlPath         := Method_Prefix;
  RESTClientPoolerExec.DataCompression := vCompression;
+ RESTClientPoolerExec.TypeRequest     := vTyperequest;
  {$IFDEF FPC}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus      := vOnStatus;
   RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
+  RESTClientPoolerExec.TypeRequest     := vtyperequest;
  {$ELSE}
   RESTClientPoolerExec.OnWork        := vOnWork;
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;

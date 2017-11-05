@@ -12,13 +12,14 @@ uses
   FMX.ListBox, FMX.Memo, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Comp.DataSet, FireDAC.Comp.Client, system.diagnostics,
-  System.TimeSpan, IdComponent, uDWConstsData;
+  System.TimeSpan, IdComponent, uDWConstsData, kbmMemTable,
+  FMX.TMSLiveGridDataBinding, FMX.TMSBaseControl, FMX.TMSGridCell,
+  FMX.TMSGridOptions, FMX.TMSGridData, FMX.TMSCustomGrid, FMX.TMSLiveGrid;
 
 type
   TForm1 = class(TForm)
     RESTDWDataBase1: TRESTDWDataBase;
     DataSource1: TDataSource;
-    Grid1: TGrid;
     BindingsList1: TBindingsList;
     img1: TImage;
     tlb1: TToolBar;
@@ -37,8 +38,9 @@ type
     mmo1: TMemo;
     RESTDWClientSQL1: TRESTDWClientSQL;
     BindSourceDB1: TBindSourceDB;
-    LinkGridToDataSourceBindSourceDB1: TLinkGridToDataSource;
     ListBoxItem3: TListBoxItem;
+    StringGrid1: TStringGrid;
+    LinkGridToDataSourceBindSourceDB12: TLinkGridToDataSource;
     procedure btn1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -55,7 +57,7 @@ implementation
 
 {$R *.fmx}
 {$R *.NmXhdpiPh.fmx ANDROID}
-
+{$R *.iPhone47in.fmx IOS}
 
 procedure TForm1.btn1Click(Sender: TObject);
 var
@@ -81,8 +83,16 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
  {$IF Defined(ANDROID) OR Defined(IOS)}
+ formatsettings.ShortDateFormat:='dd-mm-yyyy';
+ formatsettings.DateSeparator:='-';
+ formatsettings.DecimalSeparator:='.';
+ formatsettings.ThousandSeparator:=',';
  RESTDWDataBase1.DecimalSeparator:=formatsettings.DecimalSeparator;
  {$ELSE}
+ formatsettings.ShortDateFormat:='dd-mm-yyyy';
+ formatsettings.DateSeparator:='-';
+ formatsettings.DecimalSeparator:='.';
+ formatsettings.ThousandSeparator:=',';
  RESTDWDataBase1.DecimalSeparator:=formatsettings.DecimalSeparator;
  {$IFEND}
 end;

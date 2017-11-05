@@ -1,22 +1,18 @@
-inherited Form1_NmXhdpiPh: TForm1_NmXhdpiPh
-  ClientHeight = 615
-  ClientWidth = 400
+inherited Form1_iPhone47in: TForm1_iPhone47in
+  ClientHeight = 647
+  ClientWidth = 375
   DesignerMasterStyle = 0
   inherited Layout1: TLayout
-    Size.Width = 400.000000000000000000
-    Size.Height = 615.000000000000000000
+    Size.Width = 375.000000000000000000
+    Size.Height = 647.000000000000000000
     inherited tlb1: TToolBar
-      Size.Width = 400.000000000000000000
-      Size.Height = 48.000000000000000000
+      Size.Width = 375.000000000000000000
       inherited Text1: TText
-        Size.Width = 278.000000000000000000
-        Size.Height = 48.000000000000000000
+        Size.Width = 257.000000000000000000
         TextSettings.Font.StyleExt = {00070000000000000004000000}
       end
       inherited btn1: TButton
-        Position.X = 352.000000000000000000
-        Size.Width = 48.000000000000000000
-        Size.Height = 48.000000000000000000
+        Position.X = 331.000000000000000000
       end
       inherited img1: TImage
         MultiResBitmap.Height = 36
@@ -120,54 +116,53 @@ inherited Form1_NmXhdpiPh: TForm1_NmXhdpiPh
               'C:\CompXE_10_2\RestDW\CORE\Samples\SimpleServer\CienteFMX\Artwor' +
               'k\Android\FM_LauncherIcon_36x36.png'
           end>
-        Size.Height = 48.000000000000000000
       end
     end
     inherited Layout2: TLayout
-      Size.Width = 400.000000000000000000
-      Size.Height = 567.000000000000000000
+      Size.Width = 375.000000000000000000
+      Size.Height = 603.000000000000000000
       inherited Layout3: TLayout
-        Size.Width = 400.000000000000000000
-        Size.Height = 273.000000000000000000
+        Size.Width = 375.000000000000000000
+        Size.Height = 309.000000000000000000
         inherited StringGrid1: TStringGrid
-          Size.Width = 400.000000000000000000
-          Size.Height = 273.000000000000000000
-          Viewport.Width = 400.000000000000000000
-          Viewport.Height = 273.000000000000000000
+          Size.Width = 375.000000000000000000
+          Size.Height = 309.000000000000000000
+          Viewport.Width = 375.000000000000000000
+          Viewport.Height = 309.000000000000000000
         end
       end
       inherited Layout4: TLayout
-        Size.Width = 400.000000000000000000
+        Size.Width = 375.000000000000000000
         inherited lst1: TListBox
-          Size.Width = 400.000000000000000000
-          Viewport.Width = 400.000000000000000000
+          Size.Width = 375.000000000000000000
+          Viewport.Width = 375.000000000000000000
           Viewport.Height = 131.000000000000000000
           inherited ListBoxItem1: TListBoxItem
-            Size.Width = 400.000000000000000000
+            Size.Width = 375.000000000000000000
             inherited edtip: TEdit
-              Position.X = 239.000000000000000000
-              Position.Y = 4.000000000000000000
-              Size.Height = 32.000000000000000000
+              Position.X = 214.000000000000000000
+              Position.Y = 5.000000000000000000
+              Size.Height = 30.000000000000000000
             end
           end
           inherited ListBoxItem2: TListBoxItem
-            Size.Width = 400.000000000000000000
+            Size.Width = 375.000000000000000000
             inherited edtporta: TEdit
-              Position.X = 239.000000000000000000
-              Position.Y = 4.000000000000000000
-              Size.Height = 32.000000000000000000
+              Position.X = 214.000000000000000000
+              Position.Y = 5.000000000000000000
+              Size.Height = 30.000000000000000000
             end
           end
           inherited ListBoxItem3: TListBoxItem
-            Size.Width = 400.000000000000000000
+            Size.Width = 375.000000000000000000
           end
         end
       end
       inherited Layout5: TLayout
-        Size.Width = 400.000000000000000000
+        Size.Width = 375.000000000000000000
         inherited mmo1: TMemo
-          Size.Width = 400.000000000000000000
-          Viewport.Width = 400.000000000000000000
+          Size.Width = 375.000000000000000000
+          Viewport.Width = 375.000000000000000000
           Viewport.Height = 163.000000000000000000
         end
       end
