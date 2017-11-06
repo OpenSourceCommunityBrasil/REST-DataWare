@@ -137,15 +137,17 @@
       </Unit16>
       <Unit17>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1418"/>
-        <CursorPos X="32" Y="1430"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="1330"/>
+        <CursorPos X="4" Y="1337"/>
         <UsageCount Value="100"/>
         <Bookmarks Count="3">
           <Item0 X="31" Y="1452" ID="2"/>
           <Item1 X="31" Y="1601" ID="1"/>
           <Item2 X="57" Y="1353" ID="3"/>
         </Bookmarks>
+        <Loaded Value="True"/>
       </Unit17>
       <Unit18>
         <Filename Value="C:\lazarus\lcl\include\control.inc"/>
@@ -156,7 +158,6 @@
       </Unit18>
       <Unit19>
         <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="2280"/>
         <CursorPos X="53" Y="2293"/>
@@ -454,7 +455,7 @@
         <UsageCount Value="9"/>
       </Unit60>
     </Units>
-    <JumpHistory Count="15" HistoryIndex="14">
+    <JumpHistory Count="16" HistoryIndex="15">
       <Position1>
         <Filename Value="formMain.pas"/>
         <Caret Line="101" Column="21" TopLine="87"/>
@@ -514,6 +515,10 @@
         <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
         <Caret Line="163" Column="25" TopLine="148"/>
       </Position15>
+      <Position16>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="2293" Column="53" TopLine="2280"/>
+      </Position16>
     </JumpHistory>
   </ProjectSession>
   <Debugging>

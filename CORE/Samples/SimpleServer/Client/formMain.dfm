@@ -1222,6 +1222,7 @@ object Form2: TForm2
     OnBeforeConnect = RESTDWDataBase1BeforeConnect
     Active = False
     Compression = True
+    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False

@@ -1336,6 +1336,7 @@ Var
    ftWord,
    {$IFNDEF FPC}
     {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+    ftByte,
     ftLongWord,
     {$IFEND}
    {$ENDIF}

@@ -1769,34 +1769,34 @@ Begin
  Cmd := Trim(ARequestInfo.RawHTTPCommand);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
-   AResponseInfo.CustomHeaders.AddValue ('Access-Control-Allow-Origin','*');
+   AResponseInfo.CustomHeaders.AddValue('Access-Control-Allow-Origin','*');
   {$ELSE}
-   AResponseInfo.CustomHeaders.Add('Access-Control-Allow-Origin=*');
+   AResponseInfo.CustomHeaders.Add     ('Access-Control-Allow-Origin=*');
   {$IFEND}
  {$ELSE}
   AResponseInfo.CustomHeaders.AddValue ('Access-Control-Allow-Origin','*');
  {$ENDIF}
- sCharSet:='';
- If (UpperCase(Copy (Cmd, 1, 3)) = 'GET') Then
+ sCharSet := '';
+ If (UpperCase(Copy (Cmd, 1, 3)) = 'GET')    Then
   Begin
-   If (Pos ('.HTML',UpperCase(Cmd))>0 ) Then
+   If     (Pos('.HTML', UpperCase(Cmd)) > 0) Then
     Begin
      sContentType:='text/html';
 	   sCharSet := 'utf-8';
     End
-   Else If (Pos ('.PNG', UpperCase(Cmd)) > 0) Then
+   Else If (Pos('.PNG', UpperCase(Cmd)) > 0) Then
     sContentType := 'image/png'
-   Else If (Pos ('.ICO', UpperCase(Cmd)) > 0) Then
+   Else If (Pos('.ICO', UpperCase(Cmd)) > 0) Then
     sContentType := 'image/ico'
-   Else If (Pos ('.GIF', UpperCase(Cmd)) > 0) Then
+   Else If (Pos('.GIF', UpperCase(Cmd)) > 0) Then
     sContentType := 'image/gif'
-   Else If (Pos ('.JPG', UpperCase(Cmd)) > 0) Then
+   Else If (Pos('.JPG', UpperCase(Cmd)) > 0) Then
     sContentType := 'image/jpg'
-   Else If (Pos ('.JS', UpperCase(Cmd)) > 0)  Then
+   Else If (Pos('.JS',  UpperCase(Cmd)) > 0) Then
     sContentType := 'application/javascript'
-   Else If (Pos ('.PDF', UpperCase(Cmd)) > 0) Then
+   Else If (Pos('.PDF', UpperCase(Cmd)) > 0) Then
     sContentType := 'application/pdf'
-   Else If (Pos ('.CSS',UpperCase(Cmd)) > 0) Then
+   Else If (Pos('.CSS', UpperCase(Cmd)) > 0) Then
     sContentType:='text/css';
    {$IFNDEF FPC}
     {$if CompilerVersion > 21}
@@ -2131,7 +2131,8 @@ Begin
    End;
  Finally
   //JSONParam.Free;
-  FreeAndNil(DWParams);
+  If DWParams.Count > 0 Then
+   FreeAndNil(DWParams);
  End;
 End;
 

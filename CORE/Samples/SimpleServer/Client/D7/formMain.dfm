@@ -1979,9 +1979,9 @@ object Form2: TForm2
     OnClick = Button4Click
   end
   object RESTDWDataBase1: TRESTDWDataBase
-    Active = True
+    Active = False
     Compression = True
-    MyIP = '127.0.0.1'
+    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -1997,11 +1997,11 @@ object Form2: TForm2
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    WelcomeMessage = 'EMPLOYEE.FDB'
     DecimalSeparator = ','
     OnWork = RESTDWDataBase1Work
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd
+    ParamCreate = True
     Left = 216
     Top = 144
   end
