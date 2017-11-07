@@ -169,7 +169,7 @@ Type
                            Var Error        : Boolean;
                            Var MessageError : String;
                            Var Result       : TJSONValue;
-                           RESTClientPooler : TRESTClientPooler = Nil);
+                           RESTClientPooler : TRESTClientPooler = Nil);Overload;
   Function  GetStateDB : Boolean;
   Procedure SetMyIp(Value : String);
  Public
@@ -178,6 +178,12 @@ Type
   Destructor  Destroy;Override;                      //Destroy a Classe
   Procedure   Close;
   Procedure   Open;
+  Procedure   ApplyUpdates(Const Datasets     : TRESTDWDatasetArray;
+                           Var   Error        : Boolean;
+                           Var   MessageError : String);Overload;
+  Procedure   OpenDatasets(Const Datasets     : TRESTDWDatasetArray;
+                           Var   Error        : Boolean;
+                           Var   MessageError : String);Overload;
   Property    Connected       : Boolean                  Read GetStateDB          Write SetConnection;
  Published
   Property OnConnection       : TOnEventConnection       Read vOnEventConnection  Write vOnEventConnection; //Evento relativo a tudo que acontece quando tenta conectar ao Servidor
@@ -216,7 +222,6 @@ Type
 End;
 
 Type
-
  { TRESTDWClientSQL }
  TRESTDWClientSQL     = Class(TRESTDWClientSQLBase) //Classe com as funcionalidades de um DBQuery
  Private
@@ -327,12 +332,14 @@ Type
   Procedure   Loaded; Override;
   procedure   OpenCursor       (InfoQuery : Boolean); Override;  //Subscrevendo o OpenCursor para não ter erros de ADD Fields em Tempo de Design
   Procedure   GotoRec       (Const aRecNo : Integer);
-  Function    ParamCount : Integer;
+  Function    ParamCount    : Integer;
   Procedure   DynamicFilter (Field, Value : String; InText : Boolean = False);
   Procedure   Refresh;
   Procedure   SaveToStream    (Var Stream : TMemoryStream);
   Procedure   ClearMassive;
-  Function    MassiveCount : Integer;
+  Function    MassiveCount  : Integer;
+  Function    MassiveToJSON : String; //Transporte de MASSIVE em formato JSON
+  Procedure   DWParams        (Var Value  : TDWParams);
  Published
   Property MasterDataSet          : TRESTDWClientSQL    Read vMasterDataSet            Write SetMasterDataSet;
   Property MasterCascadeDelete    : Boolean             Read vCascadeDelete            Write vCascadeDelete;
@@ -534,26 +541,26 @@ Type
   Property    ParamCreate      : Boolean       Read vParamCreate      Write vParamCreate;
 End;
 
-{$IFNDEF FPC}
+ {$IFNDEF FPC}
  {$if CompilerVersion > 21}
-  Function GetDWParams(Params : TParams; Encondig : TEncodeSelect) : TDWParams;
+ Function GetDWParams(Params : TParams; Encondig : TEncodeSelect) : TDWParams;
  {$ELSE}
-  Function GetDWParams(Params : TParams) : TDWParams;
- {$IFEND}
-{$ELSE}
  Function GetDWParams(Params : TParams) : TDWParams;
-{$ENDIF}
+ {$IFEND}
+ {$ELSE}
+ Function GetDWParams(Params : TParams) : TDWParams;
+ {$ENDIF}
 
 implementation
 
 {$IFNDEF FPC}
- {$if CompilerVersion > 21}
-  Function GetDWParams(Params : TParams; Encondig : TEncodeSelect) : TDWParams;
- {$ELSE}
-  Function GetDWParams(Params : TParams) : TDWParams;
- {$IFEND}
+{$if CompilerVersion > 21}
+Function GetDWParams(Params : TParams; Encondig : TEncodeSelect) : TDWParams;
 {$ELSE}
- Function GetDWParams(Params : TParams) : TDWParams;
+Function GetDWParams(Params : TParams) : TDWParams;
+{$IFEND}
+{$ELSE}
+Function GetDWParams(Params : TParams) : TDWParams;
 {$ENDIF}
 Var
  I         : Integer;
@@ -1176,6 +1183,59 @@ Begin
  SetConnection(True);
 End;
 
+Procedure TRESTDWDataBase.OpenDatasets(Const Datasets     : TRESTDWDatasetArray;
+                                       Var   Error        : Boolean;
+                                       Var   MessageError : String);
+Var
+ vLinesDS          : String;
+ I                 : Integer;
+ vRESTConnectionDB : TDWPoolerMethodClient;
+ DWParams          : TDWParams;
+Begin
+ vLinesDS := '';
+ For I := 0 To Length(Datasets) -1 Do
+  Begin
+   If I = 0 Then
+    vLinesDS := DatasetRequestToJSON(Datasets[I])
+   Else
+    vLinesDS := Format('%s, %s', [vLinesDS, DatasetRequestToJSON(Datasets[I])]);
+  End;
+ If vLinesDS <> '' Then
+  vLinesDS := Format('[%s]', [vLinesDS])
+ Else
+  vLinesDS := '[]';
+ if vRestPooler = '' then
+  Exit;
+ vRESTConnectionDB                  := TDWPoolerMethodClient.Create(Nil);
+ vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
+ vRESTConnectionDB.Host             := vRestWebService;
+ vRESTConnectionDB.Port             := vPoolerPort;
+ vRESTConnectionDB.Compression      := vCompression;
+ vRESTConnectionDB.TypeRequest      := VtypeRequest;
+ {$IFNDEF FPC}
+  vRESTConnectionDB.OnWork          := vOnWork;
+  vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
+  vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
+  vRESTConnectionDB.OnStatus        := vOnStatus;
+  {$if CompilerVersion > 21}
+  vRESTConnectionDB.Encoding        := VEncondig;
+  {$IFEND}
+ {$ELSE}
+  vRESTConnectionDB.OnWork          := vOnWork;
+  vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
+  vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
+  vRESTConnectionDB.OnStatus        := vOnStatus;
+  vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
+ {$ENDIF}
+ Try
+  vLinesDS := vRESTConnectionDB.OpenDatasets(vLinesDS, vRestPooler,  vRestModule,
+                                             Error,    MessageError, vTimeOut,
+                                             vLogin,   vPassword);
+ Finally
+  FreeAndNil(vRESTConnectionDB);
+ End;
+End;
+
 Procedure TRESTDWDataBase.ExecuteCommand(Var SQL          : TStringList;
                                          Var Params       : TParams;
                                          Var Error        : Boolean;
@@ -1214,7 +1274,7 @@ Var
  End;
 Begin
 // Result := Nil;
- if vRestPooler = '' then
+ If vRestPooler = '' Then
   Exit;
  ParseParams;
  vRESTConnectionDB                := TDWPoolerMethodClient.Create(Nil);
@@ -1397,6 +1457,13 @@ Begin
  FreeAndNil(vProxyOptions);
  FreeAndNil(vAutoCheckData);
  Inherited;
+End;
+
+Procedure TRESTDWDataBase.ApplyUpdates(Const Datasets     : TRESTDWDatasetArray;
+                                       Var   Error        : Boolean;
+                                       Var   MessageError : String);
+Begin
+
 End;
 
 Procedure TRESTDWDataBase.Close;
@@ -1646,6 +1713,14 @@ Begin
  vInactive := False;
  FreeAndNil(vMassiveDataset);
  Inherited;
+End;
+
+Procedure TRESTDWClientSQL.DWParams(Var Value : TDWParams);
+Begin
+ Value := Nil;
+ If vRESTDataBase <> Nil Then
+  If Params.Count > 0 Then
+   Value := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vRESTDataBase.Encoding{$IFEND}{$ENDIF});
 End;
 
 procedure TRESTDWClientSQL.DynamicFilter(Field, Value: String; InText: Boolean);
@@ -2486,6 +2561,14 @@ Begin
  Result := 0;
  If Trim(vUpdateTableName) <> '' Then
   Result := TMassiveDatasetBuffer(vMassiveDataset).RecordCount;
+End;
+
+Function TRESTDWClientSQL.MassiveToJSON : String;
+Begin
+ Result := '';
+ If vMassiveDataset <> Nil Then
+  If TMassiveDatasetBuffer(vMassiveDataset).RecordCount > 0 Then
+   Result := TMassiveDatasetBuffer(vMassiveDataset).ToJSON;
 End;
 
 {$IFDEF FPC}

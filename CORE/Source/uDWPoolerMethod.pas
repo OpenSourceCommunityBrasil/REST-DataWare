@@ -73,6 +73,15 @@ Uses {$IFDEF FPC}
                                    UserName                : String  = '';
                                    Password                : String  = '';
                                    RESTClientPooler        : TRESTClientPooler = Nil)   : TJSONValue;
+   Function OpenDatasets          (LinesDataset,
+                                   Pooler,
+                                   Method_Prefix           : String;
+                                   Var Error               : Boolean;
+                                   Var MessageError        : String;
+                                   TimeOut                 : Integer = 3000;
+                                   UserName                : String  = '';
+                                   Password                : String  = '';
+                                   RESTClientPooler        : TRESTClientPooler = Nil)   : String;
    Function ApplyUpdates          (Massive                 : TMassiveDatasetBuffer;
                                    Pooler, Method_Prefix,
                                    SQL                     : String;
@@ -1524,6 +1533,167 @@ Begin
    FreeAndNil(RESTClientPoolerExec);
   FreeAndNil(DWParams);
  End;
+End;
+
+Function TDWPoolerMethodClient.OpenDatasets(LinesDataset,
+                                            Pooler,
+                                            Method_Prefix           : String;
+                                            Var Error               : Boolean;
+                                            Var MessageError        : String;
+                                            TimeOut                 : Integer = 3000;
+                                            UserName                : String  = '';
+                                            Password                : String  = '';
+                                            RESTClientPooler        : TRESTClientPooler = Nil) : String;
+Var
+ RESTClientPoolerExec : TRESTClientPooler;
+ JSONParam        : TJSONParam;
+ DWParams         : TDWParams;
+Begin
+ Result := '';
+ If LinesDataset <> '' Then
+  Begin
+   If Not Assigned(RESTClientPooler) Then
+    RESTClientPoolerExec                := TRESTClientPooler.Create(Nil)
+   Else
+    RESTClientPoolerExec                := RESTClientPooler;
+   RESTClientPoolerExec.WelcomeMessage  := vWelcomeMessage;
+   RESTClientPoolerExec.Host            := Host;
+   RESTClientPoolerExec.Port            := Port;
+   RESTClientPoolerExec.UserName        := UserName;
+   RESTClientPoolerExec.Password        := Password;
+   RESTClientPoolerExec.RequestTimeOut  := TimeOut;
+   RESTClientPoolerExec.UrlPath         := Method_Prefix;
+   RESTClientPoolerExec.DataCompression := vCompression;
+   RESTClientPoolerExec.TypeRequest     := vtyperequest;
+   {$IFDEF FPC}
+    RESTClientPoolerExec.OnWork           := vOnWork;
+    RESTClientPoolerExec.OnWorkBegin      := vOnWorkBegin;
+    RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
+    RESTClientPoolerExec.OnStatus         := vOnStatus;
+    RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
+    RESTClientPoolerExec.TypeRequest      := vtyperequest;
+   {$ELSE}
+    RESTClientPoolerExec.OnWork           := vOnWork;
+    RESTClientPoolerExec.OnWorkBegin      := vOnWorkBegin;
+    RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
+    RESTClientPoolerExec.OnStatus         := vOnStatus;
+   {$ENDIF}
+   DWParams                               := TDWParams.Create;
+   {$IFNDEF FPC}
+    {$if CompilerVersion > 21}
+     RESTClientPoolerExec.Encoding        := vEncoding;
+     JSONParam                            := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+    {$ELSE}
+     JSONParam                            := TJSONParam.Create;
+    {$IFEND}
+   {$ELSE}
+    JSONParam                             := TJSONParam.Create;
+   {$ENDIF}
+   JSONParam.ParamName                    := 'LinesDataset';
+   JSONParam.ObjectDirection              := odIn;
+   JSONParam.SetValue(LinesDataset);
+   DWParams.Add(JSONParam);
+   {$IFNDEF FPC}
+    {$if CompilerVersion > 21}
+     RESTClientPoolerExec.Encoding        := vEncoding;
+     JSONParam                            := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+    {$ELSE}
+     JSONParam                            := TJSONParam.Create;
+    {$IFEND}
+   {$ELSE}
+    JSONParam                             := TJSONParam.Create;
+   {$ENDIF}
+   JSONParam.ParamName                    := 'Pooler';
+   JSONParam.ObjectDirection              := odIn;
+   JSONParam.SetValue(Pooler);
+   DWParams.Add(JSONParam);
+   {$IFNDEF FPC}
+    {$if CompilerVersion > 21}
+     RESTClientPoolerExec.Encoding        := vEncoding;
+     JSONParam                            := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+    {$ELSE}
+     JSONParam                            := TJSONParam.Create;
+    {$IFEND}
+   {$ELSE}
+    JSONParam                             := TJSONParam.Create;
+   {$ENDIF}
+   JSONParam.ParamName                    := 'Method_Prefix';
+   JSONParam.ObjectDirection              := odIn;
+   JSONParam.SetValue(Method_Prefix);
+   DWParams.Add(JSONParam);
+   {$IFNDEF FPC}
+    {$if CompilerVersion > 21}
+     RESTClientPoolerExec.Encoding       := vEncoding;
+     JSONParam                           := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+    {$ELSE}
+     JSONParam                           := TJSONParam.Create;
+    {$IFEND}
+   {$ELSE}
+    JSONParam                            := TJSONParam.Create;
+   {$ENDIF}
+   JSONParam.ParamName                   := 'Error';
+   JSONParam.ObjectDirection             := odInOut;
+   JSONParam.SetValue(BooleanToString(False));
+   DWParams.Add(JSONParam);
+   {$IFNDEF FPC}
+    {$if CompilerVersion > 21}
+     RESTClientPoolerExec.Encoding       := vEncoding;
+     JSONParam                           := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+    {$ELSE}
+     JSONParam                           := TJSONParam.Create;
+    {$IFEND}
+   {$ELSE}
+    JSONParam                            := TJSONParam.Create;
+   {$ENDIF}
+   JSONParam.ParamName                   := 'MessageError';
+   JSONParam.ObjectDirection             := odInOut;
+   JSONParam.SetValue(MessageError);
+   DWParams.Add(JSONParam);
+   {$IFNDEF FPC}
+    {$if CompilerVersion > 21}
+     RESTClientPoolerExec.Encoding       := vEncoding;
+     JSONParam                           := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+    {$ELSE}
+     JSONParam                           := TJSONParam.Create;
+    {$IFEND}
+   {$ELSE}
+    JSONParam                            := TJSONParam.Create;
+   {$ENDIF}
+   JSONParam.ParamName                   := 'Result';
+   JSONParam.ObjectDirection             := odOUT;
+   JSONParam.SetValue('');
+   DWParams.Add(JSONParam);
+   Try
+    Try
+     Result := RESTClientPoolerExec.SendEvent('OpenDatasets', DWParams);
+     If (Result <> '') And
+        (Uppercase(Result) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
+      Begin
+       If DWParams.ItemsString['MessageError'] <> Nil Then
+        MessageError  := DWParams.ItemsString['MessageError'].Value;
+       If DWParams.ItemsString['Error'] <> Nil Then
+        Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
+       If DWParams.ItemsString['Result'] <> Nil Then
+        Begin
+         If DWParams.ItemsString['Result'].Value <> '' Then
+          Result := DWParams.ItemsString['Result'].Value;
+        End;
+      End
+     Else
+      Begin
+       If (Result = '') Then
+        Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+       Else If (Uppercase(Result) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
+        Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+      End;
+    Except
+    End;
+   Finally
+    If Not Assigned(RESTClientPooler) Then
+     FreeAndNil(RESTClientPoolerExec);
+    FreeAndNil(DWParams);
+   End;
+  End;
 End;
 
 end.

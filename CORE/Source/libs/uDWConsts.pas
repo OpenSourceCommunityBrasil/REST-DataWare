@@ -16,7 +16,7 @@ Uses
     {$ENDIF}
 
 Const
-{$IFDEF POSIX} 
+{$IFDEF POSIX}
   {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
    InitStrPos            = 0;
    {$ELSE}
@@ -27,6 +27,7 @@ Const
  {$ENDIF}
  TSepParams            = '|xxx|xxx|%';
  TValueFormatJSON      = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":[%s]}';
+ TDatasetRequestJSON   = '{"SQL":"%s", "PARAMS":"%s"}';
  TMassiveFormatJSON    = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":[%s]}';
  TValueDisp            = '{"PARAMS":[%s], "RESULT":[%s]}';
  TValueArrayJSON       = '[%s]';
@@ -58,53 +59,82 @@ Type
                      ovTimeStampOffset, ovObject,       ovSingle);                                                           //49..51
  TDatasetType     = (dtReflection,      dtFull,         dtDiff);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   Function GetEncoding(Avalue  : TEncodeSelect)    : TEncoding;
-  {$IFEND}
-  {$ELSE}
-   Function GetEncoding(Avalue  : TEncodeSelect) : IIdTextEncoding;
+ {$if CompilerVersion > 21}
+ Function  GetEncoding              (Avalue          : TEncodeSelect)             : TEncoding;
+ {$IFEND}
+ {$ELSE}
+ Function  GetEncoding              (Avalue          : TEncodeSelect)             : IIdTextEncoding;
  {$ENDIF}
- Function GetObjectName           (TypeObject      : TTypeObject)      : String;          Overload;
- Function GetObjectName           (TypeObject      : String)           : TTypeObject;     Overload;
- Function GetDirectionName        (ObjectDirection : TObjectDirection) : String;          Overload;
- Function GetDirectionName        (ObjectDirection : String)           : TObjectDirection;Overload;
- Function GetBooleanFromString    (Value           : String)           : Boolean;
- Function GetStringFromBoolean    (Value           : Boolean)          : String;
- Function GetValueType            (ObjectValue     : TObjectValue)     : String;          Overload;
- Function GetValueType            (ObjectValue     : String)           : TObjectValue;    Overload;
- Function GetFieldType            (FieldType       : TFieldType)       : String;          Overload;
- Function GetFieldType            (FieldType       : String)           : TFieldType;      Overload;
- Function StringToBoolean         (aValue          : String)           : Boolean;
- Function BooleanToString         (aValue          : Boolean)          : String;
- Function StringFloat             (aValue          : String)           : String;
- Function GenerateStringFromStream(Stream          : TStream{$IFNDEF FPC}{$if CompilerVersion > 21};AEncoding : TEncoding{$IFEND}{$ENDIF}) : String;Overload;
- //Function GenerateStringFromStream(Stream          : TStream)   : String;Overload;
- Function  FileToStr    (Const FileName     : String) : String;
- Procedure StrToFile    (Const FileName,
-                               SourceString : String);
- Function  StreamToHex  (Stream : TStream; QQuoted : Boolean = True)  : String;
- Procedure HexToStream  (Str    : String;
-                         Stream : TStream);
- Function  StreamToBytes(Stream       : TMemoryStream) : tidBytes;
- Procedure CopyStream   (Const Source : TStream;
-                               Dest   : TStream);
- Function  ZDecompressStr(Const S     : String;
-                          Var Value   : String) : Boolean;
- Function  ZDecompressStreamD(Const S   : TStringStream;
-                              Var Value : TStringStream) : Boolean;
- Function  ZCompressStr  (Const s     : String;
-                          Var Value   : String) : Boolean;
- Function  BytesArrToString(aValue : tIdBytes) : String;
- Function  ObjectValueToFieldType(TypeObject : TObjectValue) : TFieldType;
- Function  FieldTypeToObjectValue(FieldType  : TFieldType)   : TObjectValue;
- Function  DatasetStateToMassiveType(DatasetState : TDatasetState) : TMassiveMode;
- Function  MassiveModeToString(MassiveMode : TMassiveMode) : String;
- Function  StringToMassiveMode(Value       : String)       : TMassiveMode;
+ Function  GetObjectName            (TypeObject      : TTypeObject)               : String;          Overload;
+ Function  GetObjectName            (TypeObject      : String)                    : TTypeObject;     Overload;
+ Function  GetDirectionName         (ObjectDirection : TObjectDirection)          : String;          Overload;
+ Function  GetDirectionName         (ObjectDirection : String)                    : TObjectDirection;Overload;
+ Function  GetBooleanFromString     (Value           : String)                    : Boolean;
+ Function  GetStringFromBoolean     (Value           : Boolean)                   : String;
+ Function  GetValueType             (ObjectValue     : TObjectValue)              : String;          Overload;
+ Function  GetValueType             (ObjectValue     : String)                    : TObjectValue;    Overload;
+ Function  GetFieldType             (FieldType       : TFieldType)                : String;          Overload;
+ Function  GetFieldType             (FieldType       : String)                    : TFieldType;      Overload;
+ Function  StringToBoolean          (aValue          : String)                    : Boolean;
+ Function  BooleanToString          (aValue          : Boolean)                   : String;
+ Function  StringFloat              (aValue          : String)                    : String;
+ Function  GenerateStringFromStream (Stream          : TStream
+                                    {$IFNDEF FPC}{$if CompilerVersion > 21};
+                                     AEncoding       : TEncoding{$IFEND}{$ENDIF}) : String;Overload;
+ Function  FileToStr                (Const FileName  : String) : String;
+ Procedure StrToFile                (Const FileName,
+                                     SourceString    : String);
+ Function  StreamToHex              (Stream          : TStream;
+                                     QQuoted         : Boolean = True)            : String;
+ Procedure HexToStream              (Str             : String;
+                                     Stream          : TStream);
+ Function  StreamToBytes            (Stream          : TMemoryStream)             : tidBytes;
+ Procedure CopyStream               (Const Source    : TStream;
+                                     Dest            : TStream);
+ Function  ZDecompressStr           (Const S         : String;
+                                     Var Value       : String)                    : Boolean;
+ Function  ZDecompressStreamD       (Const S         : TStringStream;
+                                     Var Value       : TStringStream)             : Boolean;
+ Function  ZCompressStr             (Const s         : String;
+                                     Var Value       : String)                    : Boolean;
+ Function  BytesArrToString         (aValue          : tIdBytes)                  : String;
+ Function  ObjectValueToFieldType   (TypeObject      : TObjectValue)              : TFieldType;
+ Function  FieldTypeToObjectValue   (FieldType       : TFieldType)                : TObjectValue;
+ Function  DatasetStateToMassiveType(DatasetState    : TDatasetState)             : TMassiveMode;
+ Function  MassiveModeToString      (MassiveMode     : TMassiveMode)              : String;
+ Function  StringToMassiveMode      (Value           : String)                    : TMassiveMode;
+ Function  DatasetRequestToJSON     (Value           : TRESTDWClientSQLBase)      : String;
 
 
 implementation
 
-//Uses uDWJSONTools;
+Uses uRESTDWPoolerDB, uDWJSONObject, uDWJSONTools;
+
+Function DatasetRequestToJSON(Value : TRESTDWClientSQLBase) : String;
+Var
+ vDWParams    : TDWParams;
+ vTempLineParams,
+ vTempLineSQL : String;
+Begin
+ vTempLineParams := '';
+ vTempLineSQL    := vTempLineParams;
+ Result          := vTempLineSQL;
+ If Value <> Nil Then
+  Begin
+   TRESTDWClientSQL(Value).DWParams(vDWParams);
+   If vDWParams <> Nil Then
+    Begin
+     {$IFDEF FPC}
+     vTempLineParams := EncodeStrings(vDWParams.ToJSON, TRESTDWClientSQL(Value).DataBase.DatabaseCharSet)]);
+     {$ELSE}
+     vTempLineParams := EncodeStrings(vDWParams.ToJSON);
+     {$ENDIF}
+     FreeAndNil(vDWParams);
+    End;
+   vTempLineSQL      := EncodeStrings(TRESTDWClientSQL(Value).SQL.Text);
+   Result            := Format(TDatasetRequestJSON, [vTempLineSQL, vTempLineParams]);
+  End;
+End;
 
 Function MassiveModeToString(MassiveMode : TMassiveMode) : String;
 Begin

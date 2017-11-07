@@ -965,7 +965,7 @@ object Form2: TForm2
   object Bevel3: TBevel
     Left = 8
     Top = 234
-    Width = 627
+    Width = 689
     Height = 2
     Shape = bsTopLine
   end
@@ -1047,14 +1047,14 @@ object Form2: TForm2
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     Lines.Strings = (
-      'select * from STRINGTABLE')
+      'select * from employee')
     ParentFont = False
     TabOrder = 5
   end
   object Button1: TButton
     Left = 366
     Top = 143
-    Width = 133
+    Width = 104
     Height = 24
     Caption = 'Open Fixo'
     Font.Charset = DEFAULT_CHARSET
@@ -1085,7 +1085,7 @@ object Form2: TForm2
   object Button2: TButton
     Left = 366
     Top = 173
-    Width = 133
+    Width = 104
     Height = 24
     Caption = 'Execute'
     Font.Charset = DEFAULT_CHARSET
@@ -1105,9 +1105,9 @@ object Form2: TForm2
     TabOrder = 9
   end
   object Button3: TButton
-    Left = 505
+    Left = 481
     Top = 144
-    Width = 133
+    Width = 104
     Height = 24
     Caption = 'Open Runtime'
     Font.Charset = DEFAULT_CHARSET
@@ -1141,9 +1141,9 @@ object Form2: TForm2
     TabOrder = 12
   end
   object Button4: TButton
-    Left = 505
+    Left = 481
     Top = 173
-    Width = 133
+    Width = 104
     Height = 24
     Caption = 'ApplyUpdates'
     Font.Charset = DEFAULT_CHARSET
@@ -1163,6 +1163,21 @@ object Form2: TForm2
     Caption = 'Usar HTTPS'
     TabOrder = 14
   end
+  object Button5: TButton
+    Left = 593
+    Top = 173
+    Width = 104
+    Height = 24
+    Caption = 'Show Massive'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 15
+    OnClick = Button5Click
+  end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1
     Left = 240
@@ -1171,15 +1186,65 @@ object Form2: TForm2
   object RESTDWClientSQL1: TRESTDWClientSQL
     FieldDefs = <
       item
-        Name = 'ID'
+        Name = 'EMP_NO'
         Attributes = [faRequired]
-        DataType = ftString
-        Size = 10
+        DataType = ftSmallint
       end
       item
-        Name = 'DESC'
+        Name = 'FIRST_NAME'
+        Attributes = [faRequired]
         DataType = ftString
-        Size = 100
+        Size = 15
+      end
+      item
+        Name = 'LAST_NAME'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 20
+      end
+      item
+        Name = 'PHONE_EXT'
+        DataType = ftString
+        Size = 4
+      end
+      item
+        Name = 'HIRE_DATE'
+        Attributes = [faRequired]
+        DataType = ftTimeStamp
+      end
+      item
+        Name = 'DEPT_NO'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 3
+      end
+      item
+        Name = 'JOB_CODE'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 5
+      end
+      item
+        Name = 'JOB_GRADE'
+        Attributes = [faRequired]
+        DataType = ftSmallint
+      end
+      item
+        Name = 'JOB_COUNTRY'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 15
+      end
+      item
+        Name = 'SALARY'
+        Attributes = [faRequired]
+        DataType = ftFloat
+        Precision = 15
+      end
+      item
+        Name = 'FULL_NAME'
+        DataType = ftString
+        Size = 37
       end>
     IndexDefs = <>
     MasterFields = ''
@@ -1198,31 +1263,71 @@ object Form2: TForm2
     Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
-      'select * from STRINGTABLE')
-    UpdateTableName = 'STRINGTABLE'
+      'select * from employee')
+    UpdateTableName = 'employee'
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = True
     InBlockEvents = False
     Left = 304
     Top = 96
-    object RESTDWClientSQL1ID: TStringField
-      FieldName = 'ID'
+    object RESTDWClientSQL1EMP_NO: TSmallintField
+      FieldName = 'EMP_NO'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
       Required = True
-      Size = 10
     end
-    object RESTDWClientSQL1DESC: TStringField
-      FieldName = 'DESC'
-      Size = 100
+    object RESTDWClientSQL1FIRST_NAME: TStringField
+      FieldName = 'FIRST_NAME'
+      Required = True
+      Size = 15
+    end
+    object RESTDWClientSQL1LAST_NAME: TStringField
+      FieldName = 'LAST_NAME'
+      Required = True
+    end
+    object RESTDWClientSQL1PHONE_EXT: TStringField
+      FieldName = 'PHONE_EXT'
+      Size = 4
+    end
+    object RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField
+      FieldName = 'HIRE_DATE'
+      Required = True
+    end
+    object RESTDWClientSQL1DEPT_NO: TStringField
+      FieldName = 'DEPT_NO'
+      Required = True
+      Size = 3
+    end
+    object RESTDWClientSQL1JOB_CODE: TStringField
+      FieldName = 'JOB_CODE'
+      Required = True
+      Size = 5
+    end
+    object RESTDWClientSQL1JOB_GRADE: TSmallintField
+      FieldName = 'JOB_GRADE'
+      Required = True
+    end
+    object RESTDWClientSQL1JOB_COUNTRY: TStringField
+      FieldName = 'JOB_COUNTRY'
+      Required = True
+      Size = 15
+    end
+    object RESTDWClientSQL1SALARY: TFloatField
+      FieldName = 'SALARY'
+      Required = True
+    end
+    object RESTDWClientSQL1FULL_NAME: TStringField
+      FieldName = 'FULL_NAME'
+      ReadOnly = True
+      Size = 37
     end
   end
   object RESTDWDataBase1: TRESTDWDataBase
     OnConnection = RESTDWDataBase1Connection
     OnBeforeConnect = RESTDWDataBase1BeforeConnect
-    Active = False
+    Active = True
     Compression = True
-    MyIP = '0.0.0.0'
+    MyIP = '127.0.0.1'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -1238,7 +1343,7 @@ object Form2: TForm2
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    DecimalSeparator = '.'
+    DecimalSeparator = ','
     OnWork = RESTDWDataBase1Work
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd

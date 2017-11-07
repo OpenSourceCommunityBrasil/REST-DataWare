@@ -25,6 +25,7 @@ USES
   Vcl.Imaging.Pngimage,
   URESTDWPoolerDB,
   Vcl.ComCtrls,
+  System.UITypes,
   IdComponent, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, uDWConstsData;
@@ -63,8 +64,18 @@ TYPE
     Memo1: TMemo;
     Button4: TButton;
     chkhttps: TCheckBox;
-    RESTDWClientSQL1ID: TStringField;
-    RESTDWClientSQL1DESC: TStringField;
+    Button5: TButton;
+    RESTDWClientSQL1EMP_NO: TSmallintField;
+    RESTDWClientSQL1FIRST_NAME: TStringField;
+    RESTDWClientSQL1LAST_NAME: TStringField;
+    RESTDWClientSQL1PHONE_EXT: TStringField;
+    RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField;
+    RESTDWClientSQL1DEPT_NO: TStringField;
+    RESTDWClientSQL1JOB_CODE: TStringField;
+    RESTDWClientSQL1JOB_GRADE: TSmallintField;
+    RESTDWClientSQL1JOB_COUNTRY: TStringField;
+    RESTDWClientSQL1SALARY: TFloatField;
+    RESTDWClientSQL1FULL_NAME: TStringField;
     PROCEDURE Button1Click(Sender: TObject);
     PROCEDURE Button2Click(Sender: TObject);
     PROCEDURE RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
@@ -77,6 +88,7 @@ TYPE
     PROCEDURE RESTDWDataBase1Connection(Sucess: Boolean; CONST Error: STRING);
     PROCEDURE RESTDWDataBase1BeforeConnect(Sender: TComponent);
     procedure Button4Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
   PRIVATE
     { Private declarations }
     FBytesToTransfer: Int64;
@@ -196,6 +208,12 @@ Var
 begin
  If Not RESTDWClientSQL1.ApplyUpdates(vError) Then
   MessageDlg(vError, TMsgDlgType.mtError, [TMsgDlgBtn.mbOK], 0);
+end;
+
+procedure TForm2.Button5Click(Sender: TObject);
+begin
+ If RESTDWClientSQL1.MassiveCount > 0 Then
+  Showmessage(RESTDWClientSQL1.MassiveToJSON);
 end;
 
 PROCEDURE TForm2.FormCreate(Sender: TObject);

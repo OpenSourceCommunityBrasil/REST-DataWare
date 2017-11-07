@@ -48,6 +48,9 @@ Type
 End;
 
 Type
+ TRESTDWDatasetArray = Array Of TRESTDWClientSQLBase;
+
+Type
  TSendEvent       = (seGET,       sePOST,
                      sePUT,       seDELETE);
  TTypeRequest     = (trHttp,      trHttps);
