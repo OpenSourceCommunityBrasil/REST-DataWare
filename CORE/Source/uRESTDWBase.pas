@@ -1766,6 +1766,7 @@ Var
  End;
 Begin
  vTempServerMethods := Nil;
+ DWParams           := Nil;
  Cmd := Trim(ARequestInfo.RawHTTPCommand);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
