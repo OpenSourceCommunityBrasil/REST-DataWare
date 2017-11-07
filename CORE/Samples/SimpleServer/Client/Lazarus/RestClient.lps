@@ -19,6 +19,7 @@
         <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="76"/>
         <CursorPos X="21" Y="90"/>
         <UsageCount Value="223"/>
@@ -123,7 +124,6 @@
       </Unit14>
       <Unit15>
         <Filename Value="..\..\..\..\Source\libs\uDWConsts.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="119"/>
         <CursorPos X="106" Y="128"/>

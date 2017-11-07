@@ -1821,12 +1821,6 @@ Begin
      Exit;
     End;
   End;
- DWParams           := TDWParams.Create;
- {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   DWParams.Encoding  := GetEncoding(TEncodeSelect(VEncondig));
-  {$IFEND}
- {$ENDIF}
  If ARequestInfo.PostStream <> Nil Then
   Begin
    ARequestInfo.PostStream.Position := 0;
@@ -1896,6 +1890,15 @@ Begin
                 vWelcomeMessage := DecodeStrings(ms.DataString{$IFDEF FPC}, csUndefined{$ENDIF})
                Else
                 Begin
+                 If Not Assigned(DWParams) Then
+                  Begin
+                   DWParams           := TDWParams.Create;
+                   {$IFNDEF FPC}
+                    {$if CompilerVersion > 21}
+                     DWParams.Encoding  := GetEncoding(TEncodeSelect(VEncondig));
+                    {$IFEND}
+                   {$ENDIF}
+                  End;
                  JSONParam   := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF};
                  JSONParam.FromJSON(ms.DataString);
                  DWParams.Add(JSONParam);
@@ -2116,21 +2119,18 @@ Begin
          End;
         End;
       Finally
-
        If Assigned(vServerMethod) Then
         If Assigned(vTempServerMethods) Then
          Begin
           Try
-           freeandnil(vTempServerMethods); //.free;
+           FreeAndNil(vTempServerMethods); //.free;
           Except
           End;
          End;
-
       End;
      End;
    End;
  Finally
-  //JSONParam.Free;
   If DWParams.Count > 0 Then
    FreeAndNil(DWParams);
  End;

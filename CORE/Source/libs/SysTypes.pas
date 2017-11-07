@@ -114,6 +114,9 @@ Begin
       Delete(NewCmd, 1, IBar2);
     End;
   End;
+ //Alexandre Magno - 07/11/2017
+ If Assigned(JSONParam) Then
+  FreeAndNil(JSONParam);
 End;
 
 Class Function TServerUtils.ParseWebFormsParams(Params: TStrings;
