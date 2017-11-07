@@ -125,13 +125,17 @@ Begin
    If vDWParams <> Nil Then
     Begin
      {$IFDEF FPC}
-     vTempLineParams := EncodeStrings(vDWParams.ToJSON, TRESTDWClientSQL(Value).DataBase.DatabaseCharSet)]);
+     vTempLineParams := EncodeStrings(vDWParams.ToJSON, TRESTDWClientSQL(Value).DataBase.DatabaseCharSet);
      {$ELSE}
      vTempLineParams := EncodeStrings(vDWParams.ToJSON);
      {$ENDIF}
      FreeAndNil(vDWParams);
     End;
+   {$IFDEF FPC}
+   vTempLineSQL      := EncodeStrings(TRESTDWClientSQL(Value).SQL.Text, TRESTDWClientSQL(Value).DataBase.DatabaseCharSet);
+   {$ELSE}
    vTempLineSQL      := EncodeStrings(TRESTDWClientSQL(Value).SQL.Text);
+   {$ENDIF}
    Result            := Format(TDatasetRequestJSON, [vTempLineSQL, vTempLineParams]);
   End;
 End;
