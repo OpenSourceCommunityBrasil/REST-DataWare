@@ -2131,7 +2131,7 @@ Begin
      End;
    End;
  Finally
-  If DWParams.Count > 0 Then
+  If Assigned(DWParams) Then
    FreeAndNil(DWParams);
  End;
 End;
