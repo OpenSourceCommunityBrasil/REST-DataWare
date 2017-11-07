@@ -13,7 +13,6 @@ uses
 {$R *.res}
 
 begin
-  reportmemoryleaksonshutdown:=true;
   Application.Initialize;
   {$IFDEF ANDROID}
   IdOpenSSLSetLibPath(TPath.GetDocumentsPath);
