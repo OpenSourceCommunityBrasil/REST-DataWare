@@ -1331,7 +1331,7 @@ Var
        vTempValue    := Format('"%s"', [MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value])    //asstring
       Else
        Begin
-        If vMassiveFields.Items[I-1].vFieldType in [ovString, ovWideString, ovFixedChar, ovFixedWideChar] Then
+        If vMassiveFields.Items[I-1].vFieldType in [ovString, ovWideString, ovFixedChar, ovFixedWideChar, ovWideMemo] Then
          vTempValue    := Format('"%s"', [EncodeStrings(MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value{$IFDEF FPC}, csUndefined{$ENDIF})])
         Else
          vTempValue    := Format('"%s"', [MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value])
