@@ -12,7 +12,7 @@ uses
   FMX.ListBox, FMX.Memo, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Comp.DataSet, FireDAC.Comp.Client, system.diagnostics,
-  System.TimeSpan, IdComponent, uDWConstsData, kbmMemTable,
+  System.TimeSpan, IdComponent, uDWConstsData, IdSSLOpenSSL,system.ioutils,IdSSLOpenSSLHeaders,
   FMX.TMSLiveGridDataBinding, FMX.TMSBaseControl, FMX.TMSGridCell,
   FMX.TMSGridOptions, FMX.TMSGridData, FMX.TMSCustomGrid, FMX.TMSLiveGrid;
 
@@ -56,14 +56,14 @@ var
 implementation
 
 {$R *.fmx}
-{$R *.NmXhdpiPh.fmx ANDROID}
-{$R *.iPhone47in.fmx IOS}
 
 procedure TForm1.btn1Click(Sender: TObject);
 var
 Stopwatch: TStopwatch;
 Elapsed: TTimeSpan;
 begin
+  Showmessage(OpenSSLVersion);
+  ShowMessage(WhichFailedToLoad);
   Stopwatch := TStopwatch.StartNew;
   if not RESTDWDataBase1.Connected then
   begin
