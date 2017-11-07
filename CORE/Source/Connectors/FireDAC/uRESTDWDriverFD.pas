@@ -675,7 +675,14 @@ Var
       Begin
        vFieldType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).FieldType);
        If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value = 'null' Then
-        Continue;
+       begin
+         if vFieldType = ftUnknown then
+           Query.Params[I].DataType := ftString
+         else
+           Query.Params[I].DataType := vFieldType;
+
+         Continue;
+       end;
        If MassiveDataset.MassiveMode <> mmUpdate Then
         Begin
          If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
