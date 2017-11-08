@@ -130,7 +130,7 @@ Begin
            Begin
             If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                   ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                  ftString,    ftWideString]    Then
+                                                  ftString,    ftWideString, ftWideMemo]    Then
              Begin
               If vTempQuery.Params[A].Size > 0 Then
                vTempQuery.Params[A].Value := Copy(Params[I].Value, 1, vTempQuery.Params[A].Size)
@@ -190,7 +190,7 @@ Begin
                End
               Else If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                         ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                        ftString,    ftWideString]    Then
+                                                        ftString,    ftWideString, ftWideMemo]    Then
                vTempQuery.Params[A].AsString := Params[I].Value
               Else
                vTempQuery.Params[A].Value    := Params[I].Value;
@@ -215,7 +215,6 @@ Begin
                DataType := ObjectValueToFieldType(Params[I].ObjectValue)
             Else
                DataType := ftString;
-
             If vTempQuery.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
@@ -260,7 +259,7 @@ Begin
              End
             Else If vTempQuery.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                      ftString,    ftWideString]    Then
+                                                      ftString,    ftWideString, ftWideMemo]    Then
              vTempQuery.Params[I].AsString := Params[I].Value
             Else
              vTempQuery.Params[I].Value    := Params[I].Value;
@@ -352,7 +351,7 @@ Begin
         If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
          Begin
           If vTempStoredProc.Params[A].DataType in [ftFixedChar, ftFixedWideChar,
-                                               ftString,    ftWideString]    Then
+                                                    ftString,    ftWideString, ftWideMemo]    Then
            Begin
             If vTempStoredProc.Params[A].Size > 0 Then
              vTempStoredProc.Params[A].Value := Copy(Params[I].Value, 1, vTempStoredProc.Params[A].Size)
@@ -471,7 +470,7 @@ Var
         Begin
          If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                                        ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                                       ftString,    ftWideString]    Then
+                                                                       ftString,    ftWideString, ftWideMemo]    Then
           Begin
            If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Size > 0 Then
             Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Value := Copy(MassiveDataset.AtualRec.PrimaryValues[X].Value, 1, Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Size)
@@ -539,7 +538,7 @@ Var
       End;
     If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                           ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                          ftString,    ftWideString]    Then
+                          ftString,    ftWideString, ftWideMemo]    Then
      Begin
       If Query.Params[I].Size > 0 Then
        Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
@@ -687,7 +686,7 @@ Var
         Begin
          If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                               ftString,    ftWideString]    Then
+                               ftString,    ftWideString, ftWideMemo]    Then
           Begin
            If Query.Params[I].Size > 0 Then
             Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
@@ -860,7 +859,7 @@ Begin
               Begin
                If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                      ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                     ftString,    ftWideString]    Then
+                                                     ftString,    ftWideString, ftWideMemo]    Then
                 Begin
                  If vTempQuery.Params[A].Size > 0 Then
                   vTempQuery.Params[A].Value := Copy(Params[I].Value, 1, vTempQuery.Params[A].Size)
@@ -1076,7 +1075,7 @@ Begin
          Begin
           If fdCommand.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                 ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                ftString,    ftWideString]    Then
+                                                ftString,    ftWideString, ftWideMemo]    Then
            Begin
             If fdCommand.Params[A].Size > 0 Then
              fdCommand.Params[A].Value := Copy(Params[I].Value, 1, fdCommand.Params[A].Size)

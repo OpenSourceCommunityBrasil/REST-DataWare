@@ -629,7 +629,8 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
       Case Field.DataType Of
        {$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
        ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-       ftString,    ftWideString : Begin
+       ftString,    ftWideString,
+       ftWideMemo                : Begin
                                     If Not UpdateTag Then
                                      Begin
                                       If Trim(Field.AsString) <> '' Then
@@ -1156,7 +1157,8 @@ Begin
              For D := 0 To bJsonArrayE.length -1 Do //Valores
               Begin
                MassiveValue       := TMassiveValue.Create;
-               If vMassiveFields.Items[D].vFieldType in [ovString, ovWideString, ovFixedChar, ovFixedWideChar] Then
+               If vMassiveFields.Items[D].vFieldType in [ovString, ovWideString, ovWideMemo,
+                                                         ovFixedChar, ovFixedWideChar] Then
                 MassiveValue.Value := bJsonArrayE.opt(D).tostring
                Else
                 MassiveValue.Value := bJsonArrayE.opt(D).tostring;
@@ -1167,7 +1169,7 @@ Begin
             End;
            For C := 1 To bJsonArrayD.length -1 Do //Valores
             Begin
-             If vMassiveFields.Items[GetFieldIndex(MassiveLine.vChanges[C-1])].vFieldType in [ovString, ovWideString, ovFixedChar, ovFixedWideChar] Then
+             If vMassiveFields.Items[GetFieldIndex(MassiveLine.vChanges[C-1])].vFieldType in [ovString, ovWideString, ovWideMemo, ovFixedChar, ovFixedWideChar] Then
               Begin
                If lowercase(bJsonArrayD.opt(C).tostring) <> 'null' then
                 MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Value := DecodeStrings(bJsonArrayD.opt(C).tostring{$IFDEF FPC}, csUndefined{$ENDIF})
@@ -1191,7 +1193,7 @@ Begin
           Begin
            For C := 1 To bJsonArrayD.length -1 Do //Valores
             Begin
-             If vMassiveFields.Items[C-1].vFieldType in [ovString, ovWideString, ovFixedChar, ovFixedWideChar] Then
+             If vMassiveFields.Items[C-1].vFieldType in [ovString, ovWideString, ovWideMemo, ovFixedChar, ovFixedWideChar] Then
               Begin
                If lowercase(bJsonArrayD.opt(C).tostring) <> 'null' then
                 MassiveLine.Values[C].Value := DecodeStrings(bJsonArrayD.opt(C).tostring{$IFDEF FPC}, csUndefined{$ENDIF})
@@ -1331,7 +1333,7 @@ Var
        vTempValue    := Format('"%s"', [MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value])    //asstring
       Else
        Begin
-        If vMassiveFields.Items[I-1].vFieldType in [ovString, ovWideString, ovFixedChar, ovFixedWideChar, ovWideMemo] Then
+        If vMassiveFields.Items[I-1].vFieldType in [ovString, ovWideString, ovWideMemo, ovFixedChar, ovFixedWideChar, ovWideMemo] Then
          vTempValue    := Format('"%s"', [EncodeStrings(MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value{$IFDEF FPC}, csUndefined{$ENDIF})])
         Else
          vTempValue    := Format('"%s"', [MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value])

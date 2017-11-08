@@ -19,9 +19,8 @@
         <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="76"/>
-        <CursorPos X="21" Y="90"/>
+        <CursorPos X="25" Y="84"/>
         <UsageCount Value="223"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -140,8 +139,6 @@
       <Unit17>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="1330"/>
-        <CursorPos X="4" Y="1337"/>
         <UsageCount Value="100"/>
         <Bookmarks Count="3">
           <Item0 X="31" Y="1452" ID="2"/>
@@ -159,9 +156,10 @@
       </Unit18>
       <Unit19>
         <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="2280"/>
-        <CursorPos X="53" Y="2293"/>
+        <TopLine Value="1759"/>
+        <CursorPos X="2" Y="1769"/>
         <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit19>
@@ -456,7 +454,7 @@
         <UsageCount Value="9"/>
       </Unit60>
     </Units>
-    <JumpHistory Count="17" HistoryIndex="16">
+    <JumpHistory Count="23" HistoryIndex="22">
       <Position1>
         <Filename Value="formMain.pas"/>
         <Caret Line="101" Column="21" TopLine="87"/>
@@ -524,6 +522,29 @@
         <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
         <Caret Line="1337" Column="4" TopLine="1330"/>
       </Position17>
+      <Position18>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="2290" Column="23" TopLine="2280"/>
+      </Position18>
+      <Position19>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="1600" Column="31" TopLine="1591"/>
+      </Position19>
+      <Position20>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="2290" Column="23" TopLine="2280"/>
+      </Position20>
+      <Position21>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="166" Column="13" TopLine="159"/>
+      </Position21>
+      <Position22>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+      </Position22>
+      <Position23>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="121" Column="18" TopLine="105"/>
+      </Position23>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
