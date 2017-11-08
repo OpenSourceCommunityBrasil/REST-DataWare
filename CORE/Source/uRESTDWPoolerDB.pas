@@ -241,7 +241,6 @@ Type
   vAfterEdit,
   vAfterInsert,
   vAfterPost,
-  vAfterDelete,
   vAfterCancel         : TDatasetEvents;
   vAutoCommitData,
   vAutoRefreshAfterCommit,
@@ -366,7 +365,6 @@ Type
   Property AfterEdit              : TDatasetEvents      Read vAfterEdit                Write vAfterEdit;
   Property AfterInsert            : TDatasetEvents      Read vAfterInsert              Write vAfterInsert;
   Property AfterPost              : TDatasetEvents      Read vAfterPost                Write vAfterPost;
-  Property AfterDelete            : TDatasetEvents      Read vAfterDelete              Write vAfterDelete;
   Property AfterCancel            : TDatasetEvents      Read vAfterCancel              Write vAfterCancel;
   Property OnNewRecord            : TDatasetEvents      Read vNewRecord                Write vNewRecord;
   Property InBlockEvents          : Boolean             Read vInBlockEvents            Write vInBlockEvents;
