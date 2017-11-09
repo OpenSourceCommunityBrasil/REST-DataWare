@@ -2467,24 +2467,24 @@ End;
 procedure TRESTDWClientSQL.OpenCursor(InfoQuery: Boolean);
 Begin
  Try
-{
-  If csDesigning in ComponentState Then
+{ //Ajuste de Fields
+  If Not vOnOpenCursor Then
    Begin
-    If Not vOnOpenCursor Then
-     Begin
-      vOnOpenCursor := True;
-      Try
-       SetActiveDB(False);
-       SetActiveDB(True);
-      Finally
-
-      End;
-      vOnOpenCursor := False;
-     End;
+    vOnOpenCursor := True;
+    Try
+     SetActiveDB(True);
+    Finally
+    End;
+    vOnOpenCursor := False;
    End;
  }
   If (vRESTDataBase <> Nil) Then
-   Inherited OpenCursor(InfoQuery)
+   Begin
+    If vRESTDataBase.Active Then
+     Inherited OpenCursor(InfoQuery)
+    Else If csDesigning in ComponentState Then
+     Raise Exception.Create('Database Inactive...');
+   End
   Else If csDesigning in ComponentState Then
    Raise Exception.Create('Database not found...');
  Except

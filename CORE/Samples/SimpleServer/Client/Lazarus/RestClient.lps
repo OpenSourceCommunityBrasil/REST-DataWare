@@ -123,7 +123,7 @@
       </Unit14>
       <Unit15>
         <Filename Value="..\..\..\..\Source\libs\uDWConsts.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="119"/>
         <CursorPos X="106" Y="128"/>
         <UsageCount Value="10"/>
@@ -138,7 +138,7 @@
       </Unit16>
       <Unit17>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="3"/>
         <UsageCount Value="100"/>
         <Bookmarks Count="3">
           <Item0 X="31" Y="1452" ID="2"/>
@@ -156,10 +156,9 @@
       </Unit18>
       <Unit19>
         <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="1759"/>
-        <CursorPos X="2" Y="1769"/>
+        <TopLine Value="1760"/>
+        <CursorPos X="23" Y="1766"/>
         <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit19>
@@ -414,10 +413,12 @@
       </Unit54>
       <Unit55>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="799"/>
-        <CursorPos X="38" Y="812"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="1327"/>
+        <CursorPos X="117" Y="1336"/>
         <UsageCount Value="40"/>
+        <Loaded Value="True"/>
       </Unit55>
       <Unit56>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriverReg.pas"/>
@@ -454,7 +455,7 @@
         <UsageCount Value="9"/>
       </Unit60>
     </Units>
-    <JumpHistory Count="23" HistoryIndex="22">
+    <JumpHistory Count="24" HistoryIndex="23">
       <Position1>
         <Filename Value="formMain.pas"/>
         <Caret Line="101" Column="21" TopLine="87"/>
@@ -545,6 +546,10 @@
         <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
         <Caret Line="121" Column="18" TopLine="105"/>
       </Position23>
+      <Position24>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="1766" Column="23" TopLine="1760"/>
+      </Position24>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
