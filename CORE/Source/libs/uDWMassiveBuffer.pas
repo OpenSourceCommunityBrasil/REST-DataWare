@@ -628,9 +628,9 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
         End;
       Case Field.DataType Of
        {$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
-       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-       ftString,    ftWideString,
-       ftWideMemo                : Begin
+       ftFixedChar, ftFixedWideChar,
+       ftWideMemo,  {$IFEND}{$ENDIF}
+       ftString,    ftWideString : Begin
                                     If Not UpdateTag Then
                                      Begin
                                       If Trim(Field.AsString) <> '' Then

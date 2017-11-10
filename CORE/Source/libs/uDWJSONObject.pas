@@ -6,35 +6,35 @@ Interface
 
 Uses
  {$IFDEF FPC}
- SysUtils,            Classes, uDWJSONTools,    IdGlobal, DB, uDWJSON,   uDWConsts,
- uDWConstsData,       BufDataset,  Variants,    LConvEncoding;
+ SysUtils,            Classes, uDWJSONTools,      IdGlobal, DB, uDWJSON,   uDWConsts,
+ uDWConstsData,       BufDataset,  LConvEncoding, Variants;
  {$ELSE}
  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
- System.SysUtils,     System.Classes, Variants, uDWJSONTools, uDWConsts, uDWJSON,
+ System.SysUtils,     System.Classes,      uDWJSONTools, uDWConsts, uDWJSON,
  uDWConstsData,       IdGlobal, System.Rtti,    Data.DB,      Soap.EncdDecd,
  Datasnap.DbClient
  {$IFDEF POSIX} //ANDROID}
  {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
-   ,system.json, FMX.Types
+   ,system.json, FMX.Types, Variants
  {$IFEND}
  {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
- ,system.json
+ ,system.json, Variants
  {$IFEND}
  {$ENDIF}
  {$IFDEF RESJEDI}
-  ,JvMemoryDataset
+  ,JvMemoryDataset, Variants
  {$ENDIF}
  {$IFDEF RESTKBMMEMTABLE}
-  ,kbmmemtable
+  ,kbmmemtable, Variants
  {$ENDIF}
  {$IFDEF RESTFDMEMTABLE}
   ,FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Variants
  {$ENDIF};
  {$ELSE}
- SysUtils, Classes,   Variants, uDWJSONTools,   uDWJSON, IdGlobal, DB,   EncdDecd,
- DbClient, uDWConsts, uDWConstsData
+ SysUtils, Classes,   uDWJSONTools,   uDWJSON, IdGlobal, DB,   EncdDecd,
+ DbClient, uDWConsts, uDWConstsData,  Variants
  {$IFDEF RESJEDI}
   ,JvMemoryDataset
  {$ENDIF}
@@ -138,7 +138,8 @@ Public
  Procedure   FromJSON(JSON         : String);
  Function    ToJSON                : String;
  Procedure   CopyFrom(JSONParam    : TJSONParam);
- Function    Value                 : String;
+ Procedure   SetDataValue(Value    : Variant);
+ Function    GetValue              : Variant;
  Procedure   SetValue(aValue       : String;
                       Encode       : Boolean = True);
  Procedure   LoadFromStream(Stream : TMemoryStream;
@@ -149,6 +150,7 @@ Public
  Property    ObjectValue           : TObjectValue     Read vObjectValue     Write vObjectValue;
  Property    ParamName             : String           Read vParamName       Write SetParamName;
  Property    Encoded               : Boolean          Read vEncoded         Write vEncoded;
+ Property    Value                 : Variant          Read GetValue         Write SetDataValue;
 End;
 
 Type
@@ -2041,6 +2043,11 @@ Begin
  HexToStream(Value, Stream);
 End;
 
+procedure TJSONParam.SetDataValue(Value: Variant);
+begin
+
+end;
+
 Procedure TJSONParam.SetParamName(bValue: String);
 Begin
  vParamName := Uppercase(bValue);
@@ -2063,9 +2070,88 @@ Begin
  Result := vJSONValue.ToJSON;
 End;
 
-Function TJSONParam.Value: String;
+Function TJSONParam.GetValue: Variant;
+Var
+ ms       : TMemoryStream;
+ MyBuffer : Pointer;
 Begin
- Result := vJSONValue.Value;
+ Case vObjectValue Of
+  ovVariant,
+  ovUnknown         : Result := vJSONValue.Value;
+  ovString,
+  ovFixedChar,
+  ovWideString,
+  ovWideMemo,
+  ovFixedWideChar,
+  ovMemo,
+  ovFmtMemo         : Result := vJSONValue.Value;
+  ovLargeint,
+  ovLongWord,
+  ovShortint,
+  ovSingle,
+  ovSmallint,
+  ovInteger,
+  ovWord,
+  ovBoolean,
+  ovAutoInc,
+  ovOraInterval     : Begin
+                       If (vJSONValue.Value <> '') And
+                          (lowercase(vJSONValue.Value) <> 'null') Then
+                        Result := StrToInt(vJSONValue.Value)
+                       Else
+                        Result := Null;
+                      End;
+  ovFloat,
+  ovCurrency,
+  ovBCD,
+  ovFMTBcd,
+  ovExtended        : Begin
+                       If (vJSONValue.Value <> '') And
+                          (lowercase(vJSONValue.Value) <> 'null') Then
+                        Result := StrToFloat(vJSONValue.Value)
+                       Else
+                        Result := Null;
+                      End;
+  ovDate,
+  ovTime,
+  ovDateTime,
+  ovTimeStamp,
+  ovOraTimeStamp,
+  ovTimeStampOffset : Begin
+                       If (vJSONValue.Value <> '') And
+                          (lowercase(vJSONValue.Value) <> 'null') Then
+                        Result := StrToDateTime(vJSONValue.Value)
+                       Else
+                        Result := Null;
+                      End;
+  ovBytes,
+  ovVarBytes,
+  ovBlob,
+  ovByte,
+  ovGraphic,
+  ovParadoxOle,
+  ovDBaseOle,
+  ovTypedBinary,
+  ovOraBlob,
+  ovOraClob,
+  ovStream          : Begin
+                       ms := TMemoryStream.Create;
+                       Try
+                        vJSONValue.SaveToStream(ms, vJSONValue.vBinary);
+                        If ms.Size > 0 Then
+                         Begin
+                          Result   := VarArrayCreate([0, ms.Size - 1], VarByte);
+                          MyBuffer := VarArrayLock(Result);
+                          ms.ReadBuffer(MyBuffer^, ms.Size);
+                          VarArrayUnlock(Result);
+                         End
+                        Else
+                         Result := Null;
+                       Finally
+                        ms.Free;
+                       End
+                      End;
+ End;
 End;
 
 Procedure TJSONParam.WriteValue(bValue: String);
