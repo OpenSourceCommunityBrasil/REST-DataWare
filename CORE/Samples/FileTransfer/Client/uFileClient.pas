@@ -106,7 +106,7 @@ Begin
    JSONParam                  := TJSONParam.Create(DWParams.Encoding);
    JSONParam.ParamName        := 'Arquivo';
    JSONParam.ObjectDirection  := odIN;
-   JSONParam.SetValue(lbLocalFiles.Items[lbLocalFiles.ItemIndex]);
+   JSONParam.Value            := lbLocalFiles.Items[lbLocalFiles.ItemIndex];
    DWParams.Add(JSONParam);
    Try
     Try
@@ -161,13 +161,13 @@ Begin
    JSONParam                    := TJSONParam.Create(DWParams.Encoding);
    JSONParam.ParamName          := 'Arquivo';
    JSONParam.ObjectDirection    := odIN;
-   JSONParam.SetValue(OpenDialog1.FileName);
+   JSONParam.Value              := OpenDialog1.FileName;
    DWParams.Add(JSONParam);
    {
    JSONParam                    := TJSONParam.Create(DWParams.Encoding);
    JSONParam.ParamName          := 'Diretorio';
    JSONParam.ObjectDirection    := odIN;
-   JSONParam.SetValue('SubPasta');
+   JSONParam.Value              := 'SubPasta';
    DWParams.Add(JSONParam);
    }
    JSONParam                    := TJSONParam.Create(DWParams.Encoding);
@@ -183,7 +183,7 @@ Begin
    JSONParam                    := TJSONParam.Create(DWParams.Encoding);
    JSONParam.ParamName          := 'Result';
    JSONParam.ObjectDirection    := odOUT;
-   JSONParam.SetValue('');
+   JSONParam.Value              := '';
    DWParams.Add(JSONParam);
    lResponse := RESTClientPooler1.SendEvent('SendReplicationFile', DWParams); //, sePost);
    If lResponse <> '' Then

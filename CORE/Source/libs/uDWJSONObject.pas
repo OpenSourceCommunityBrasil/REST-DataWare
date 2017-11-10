@@ -2045,31 +2045,30 @@ End;
 
 procedure TJSONParam.SetDataValue(Value: Variant);
 var
- ms : TStream;
+ ms : TMemoryStream;
  p  : Pointer;
 begin
-{
-begin
-  ov := dmMain.ComConnection.AppServer.TimeZone;
-  ms := TMemoryStream.Create;
-  ms.Position := 0;
-  p := VarArrayLock(ov);
-  ms.Write(p ^, VarArrayHighBound(ov, 1));
- //is it the best way to get the Variant's length?
-  VarArrayUnlock(ov);
-
-  ms.Position := 0;
-...ms.Free;
-end;
-} //Variant para Stream
- If (VarIsNull(Value)) Or (VarIsEmpty(Value)) Then
+ If (VarIsNull(Value)) Or (VarIsEmpty(Value)) Or (VarType(Value) = vtPointer) Then
   Exit;
  Case VarType(Value) Of
+  vtPointer   : Begin
+                 ms := TMemoryStream.Create;
+                 Try
+                  ms.Position := 0;
+                  p := VarArrayLock(Value);
+                  ms.Write(p ^, VarArrayHighBound(Value, 1));
+                  VarArrayUnlock(Value);
+                  ms.Position := 0;
+                  If ms.Size > 0 Then
+                   LoadFromStream(ms);
+                 Finally
+                  ms.Free;
+                 End;
+                End;
   varVariant,
   varUnknown  : Begin
                  vObjectValue := ovString;
-                 If Value <> '' Then
-                  SetValue(Value, True);
+                 SetValue(Value, True);
                 End;
   vtInt64,
   vtInteger,
@@ -2098,21 +2097,15 @@ end;
                     SetValue('0', False);
                   End
                  Else
-                  Begin
-                   If Value <> '' Then
-                    SetValue(IntToStr(Value), False);
-                  End;
+                  SetValue(IntToStr(Value), False);
                 End;
-  varDouble,
   varCurrency : Begin
                  vObjectValue := ovFloat;
-                 If Value <> '' Then
-                  SetValue(FloatToStr(Value), False);
+                 SetValue(FloatToStr(Value), False);
                 End;
   varDate     : Begin
                  vObjectValue := ovDateTime;
-                 If Value <> '' Then
-                  SetValue(FloatToStr(Value), False);
+                 SetValue(FloatToStr(Value), False);
                 End;
   vtWideChar,
   vtPWideChar,
