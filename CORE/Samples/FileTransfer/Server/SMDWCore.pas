@@ -136,7 +136,7 @@ Begin
     vFileIn.SaveToFile(vArquivo);
     fServer.LoadLocalFiles;
    Finally
-    Params.ItemsString['Result'].SetValue(GetStringFromBoolean(vFileIn.Size > 0));
+    Params.ItemsString['Result'].Value := (vFileIn.Size > 0);
     Result := 'SEND(OK)';
     vFileIn.Clear;
     vFileIn.Free;

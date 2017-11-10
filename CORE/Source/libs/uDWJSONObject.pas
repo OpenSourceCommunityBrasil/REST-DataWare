@@ -2044,8 +2044,93 @@ Begin
 End;
 
 procedure TJSONParam.SetDataValue(Value: Variant);
+var
+ ms : TStream;
+ p  : Pointer;
 begin
+{
+begin
+  ov := dmMain.ComConnection.AppServer.TimeZone;
+  ms := TMemoryStream.Create;
+  ms.Position := 0;
+  p := VarArrayLock(ov);
+  ms.Write(p ^, VarArrayHighBound(ov, 1));
+ //is it the best way to get the Variant's length?
+  VarArrayUnlock(ov);
 
+  ms.Position := 0;
+...ms.Free;
+end;
+} //Variant para Stream
+ If (VarIsNull(Value)) Or (VarIsEmpty(Value)) Then
+  Exit;
+ Case VarType(Value) Of
+  varVariant,
+  varUnknown  : Begin
+                 vObjectValue := ovString;
+                 If Value <> '' Then
+                  SetValue(Value, True);
+                End;
+  vtInt64,
+  vtInteger,
+  vtBoolean,
+  varInt64,
+  {$IFNDEF FPC}
+  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+  varUInt64,
+  {$IFEND}
+  {$ENDIF}
+  varWord,
+  varLongWord,
+  varSmallint,
+  varInteger,
+  varSingle,
+  varBoolean  : Begin
+                 If VarType(Value) = varBoolean then
+                  vObjectValue := ovBoolean
+                 Else
+                  vObjectValue := ovInteger;
+                 If vObjectValue = ovBoolean Then
+                  Begin
+                   If Boolean(Value) then
+                    SetValue('1', False)
+                   Else
+                    SetValue('0', False);
+                  End
+                 Else
+                  Begin
+                   If Value <> '' Then
+                    SetValue(IntToStr(Value), False);
+                  End;
+                End;
+  varDouble,
+  varCurrency : Begin
+                 vObjectValue := ovFloat;
+                 If Value <> '' Then
+                  SetValue(FloatToStr(Value), False);
+                End;
+  varDate     : Begin
+                 vObjectValue := ovDateTime;
+                 If Value <> '' Then
+                  SetValue(FloatToStr(Value), False);
+                End;
+  vtWideChar,
+  vtPWideChar,
+  vtWideString,
+  {$IFNDEF FPC}
+  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+  vtUnicodeString,
+  varUString,
+  {$IFEND}
+  {$ELSE}
+  varUString,
+  {$ENDIF}
+  varString  : Begin
+                 vObjectValue := ovString;
+                 If Value <> '' Then
+                  SetValue(Value, True);
+                End;
+ End;
 end;
 
 Procedure TJSONParam.SetParamName(bValue: String);
@@ -2097,7 +2182,13 @@ Begin
   ovOraInterval     : Begin
                        If (vJSONValue.Value <> '') And
                           (lowercase(vJSONValue.Value) <> 'null') Then
-                        Result := StrToInt(vJSONValue.Value)
+                        Begin
+                         If vObjectValue = ovBoolean Then
+                          Result := (vJSONValue.Value = '1') or
+                                    (lowercase(vJSONValue.Value) = 'true')
+                         Else
+                          Result := StrToInt(vJSONValue.Value)
+                        End
                        Else
                         Result := Null;
                       End;
@@ -2120,7 +2211,7 @@ Begin
   ovTimeStampOffset : Begin
                        If (vJSONValue.Value <> '') And
                           (lowercase(vJSONValue.Value) <> 'null') Then
-                        Result := StrToDateTime(vJSONValue.Value)
+                        Result := StrToFloat(vJSONValue.Value)
                        Else
                         Result := Null;
                       End;

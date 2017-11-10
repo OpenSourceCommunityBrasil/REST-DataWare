@@ -189,7 +189,7 @@ Begin
    If lResponse <> '' Then
     Begin
       Try
-       If GetBooleanFromString(DWParams.ItemsString['Result'].Value) Then
+       If DWParams.ItemsString['Result'].Value Then
         Showmessage('Upload concluído...');
       Finally
       End;
