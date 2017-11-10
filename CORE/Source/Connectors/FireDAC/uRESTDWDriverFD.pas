@@ -607,7 +607,7 @@ Var
    vParamsSQL := vFields;
    Case MassiveDataset.MassiveMode Of
     mmInsert : Begin
-                vLineSQL := Format('INSERT INTO %s ', [UpperCase(MassiveDataset.TableName) + ' (%s) VALUES (%s)']);
+                vLineSQL := Format('INSERT INTO %s ', [MassiveDataset.TableName + ' (%s) VALUES (%s)']);
                 For I := 0 To MassiveDataset.Fields.Count -1 Do
                  Begin
                   If (MassiveDataset.Fields.Items[I].AutoGenerateValue) And
@@ -627,7 +627,7 @@ Var
                 vLineSQL := Format(vLineSQL, [vFields, vParamsSQL]);
                End;
     mmUpdate : Begin
-                vLineSQL := Format('UPDATE %s ',      [UpperCase(MassiveDataset.TableName) + ' SET %s %s']);
+                vLineSQL := Format('UPDATE %s ',      [MassiveDataset.TableName + ' SET %s %s']);
                 For I := 0 To MassiveDataset.AtualRec.UpdateFieldChanges.Count -1 Do
                  Begin
                   If I = 0 Then
@@ -650,7 +650,7 @@ Var
                 vLineSQL := Format(vLineSQL, [vFields, vParamsSQL]);
                End;
     mmDelete : Begin
-                vLineSQL := Format('DELETE FROM %s ', [UpperCase(MassiveDataset.TableName) + ' %s ']);
+                vLineSQL := Format('DELETE FROM %s ', [MassiveDataset.TableName + ' %s ']);
                 bPrimaryKeys := MassiveDataset.PrimaryKeys;
                 Try
                  For I := 0 To bPrimaryKeys.Count -1 Do
