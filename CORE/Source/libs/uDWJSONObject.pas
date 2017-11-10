@@ -170,11 +170,11 @@ Public
  Procedure   FromJSON(JSON         : String);
  Function    ToJSON                : String;
  Procedure   CopyFrom(JSONParam    : TJSONParam);
- Procedure   SetDataValue(Value    : Variant); Overload;
+ Procedure   SetVariantValue(Value : Variant);
  Procedure   SetDataValue(Value    : Variant;
-                          DataType : TObjectValue);Overload;
- Function    GetValue              : Variant; Overload;
- Function    GetValue(Value        : TObjectValue) : Variant;Overload;
+                          DataType : TObjectValue);
+ Function    GetVariantValue       : Variant;
+ Function    GetValue(Value        : TObjectValue) : Variant;
  Procedure   SetValue(aValue       : String;
                       Encode       : Boolean = True);
  Procedure   LoadFromStream(Stream : TMemoryStream;
@@ -186,7 +186,7 @@ Public
  Property    ParamName             : String           Read vParamName       Write SetParamName;
  Property    Encoded               : Boolean          Read vEncoded         Write vEncoded;
  //Propriedades Novas
- Property    Value                 : Variant          Read GetValue         Write SetDataValue;
+ Property    Value                 : Variant          Read GetVariantValue  Write SetVariantValue;
  //Novas definições por tipo
  Property    AsBCD                 : Currency         Read GetAsBCD         Write SetAsBCD;
  Property    AsFMTBCD              : Currency         Read GetAsFMTBCD      Write SetAsFMTBCD;
@@ -2295,7 +2295,7 @@ begin
  End;
 end;
 
-procedure TJSONParam.SetDataValue(Value: Variant);
+procedure TJSONParam.SetVariantValue(Value: Variant);
 var
  ms : TMemoryStream;
  p  : Pointer;
@@ -2568,7 +2568,7 @@ Begin
  End;
 End;
 
-Function TJSONParam.GetValue: Variant;
+Function TJSONParam.GetVariantValue: Variant;
 Var
  ms       : TMemoryStream;
  MyBuffer : Pointer;
