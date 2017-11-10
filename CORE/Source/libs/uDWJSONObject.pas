@@ -132,14 +132,49 @@ Private
  vEncoded         : Boolean;
  Procedure WriteValue  (bValue     : String);
  Procedure SetParamName(bValue     : String);
+ Function  GetAsString             : String;
+ Procedure SetAsString (Value      : String);
+ Function  GetAsWideString         : WideString;
+ Procedure SetAsWideString  (Value : WideString);
+ Function  GetAsAnsiString         : AnsiString;
+ Procedure SetAsAnsiString  (Value : AnsiString);
+ Function  GetAsBCD                : Currency;
+ Procedure SetAsBCD (Value         : Currency);
+ Function  GetAsFMTBCD             : Currency;
+ Procedure SetAsFMTBCD(Value       : Currency);
+ Function  GetAsCurrency           : Currency;
+ Procedure SetAsCurrency(Value     : Currency);
+ Function  GetAsBoolean            : Boolean;
+ Procedure SetAsBoolean (Value     : Boolean);
+ Function  GetAsDateTime           : TDateTime;
+ Procedure SetAsDateTime(Value     : TDateTime);
+ Procedure SetAsDate    (Value     : TDateTime);
+ Procedure SetAsTime    (Value     : TDateTime);
+ Function  GetAsSingle             : Single;
+ Procedure SetAsSingle  (Value     : Single);
+ Function  GetAsFloat              : Double;
+ Procedure SetAsFloat   (Value     : Double);
+ Function  GetAsInteger            : Integer;
+ Procedure SetAsInteger (Value     : Integer);
+ Function  GetAsWord               : Word;
+ Procedure SetAsWord    (Value     : Word);
+ Procedure SetAsSmallInt(Value     : Integer);
+ Procedure SetAsShortInt(Value     : Integer);
+ Function  GetAsLongWord           : LongWord;
+ Procedure SetAsLongWord(Value     : LongWord);
+ Function  GetAsLargeInt           : LargeInt;
+ Procedure SetAsLargeInt(Value     : LargeInt);
 Public
  Constructor Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(Encoding: TEncoding){$IFEND}{$ENDIF};
  Destructor  Destroy; Override;
  Procedure   FromJSON(JSON         : String);
  Function    ToJSON                : String;
  Procedure   CopyFrom(JSONParam    : TJSONParam);
- Procedure   SetDataValue(Value    : Variant);
- Function    GetValue              : Variant;
+ Procedure   SetDataValue(Value    : Variant); Overload;
+ Procedure   SetDataValue(Value    : Variant;
+                          DataType : TObjectValue);Overload;
+ Function    GetValue              : Variant; Overload;
+ Function    GetValue(Value        : TObjectValue) : Variant;Overload;
  Procedure   SetValue(aValue       : String;
                       Encode       : Boolean = True);
  Procedure   LoadFromStream(Stream : TMemoryStream;
@@ -150,7 +185,33 @@ Public
  Property    ObjectValue           : TObjectValue     Read vObjectValue     Write vObjectValue;
  Property    ParamName             : String           Read vParamName       Write SetParamName;
  Property    Encoded               : Boolean          Read vEncoded         Write vEncoded;
+ //Propriedades Novas
  Property    Value                 : Variant          Read GetValue         Write SetDataValue;
+ //Novas definições por tipo
+ Property    AsBCD                 : Currency         Read GetAsBCD         Write SetAsBCD;
+ Property    AsFMTBCD              : Currency         Read GetAsFMTBCD      Write SetAsFMTBCD;
+ Property    AsBoolean             : Boolean          Read GetAsBoolean     Write SetAsBoolean;
+ Property    AsCurrency            : Currency         Read GetAsCurrency    Write SetAsCurrency;
+ Property    AsDate                : TDateTime        Read GetAsDateTime    Write SetAsDate;
+ Property    AsTime                : TDateTime        Read GetAsDateTime    Write SetAsTime;
+ Property    AsDateTime            : TDateTime        Read GetAsDateTime    Write SetAsDateTime;
+ Property    AsSingle              : Single           Read GetAsSingle      Write SetAsSingle;
+ Property    AsFloat               : Double           Read GetAsFloat       Write SetAsFloat;
+ Property    AsInteger             : LongInt          Read GetAsInteger     Write SetAsInteger;
+ Property    AsSmallInt            : LongInt          Read GetAsInteger     Write SetAsSmallInt;
+ Property    AsShortInt            : LongInt          Read GetAsInteger     Write SetAsShortInt;
+ Property    AsWord                : Word             Read GetAsWord        Write SetAsWord;
+ Property    AsLongWord            : LongWord         Read GetAsLongWord    Write SetAsLongWord;
+ Property    AsLargeInt            : LargeInt         Read GetAsLargeInt    Write SetAsLargeInt;
+ Property    AsString              : String           Read GetAsString      Write SetAsString;
+ Property    AsWideString          : WideString       Read GetAsWideString  Write SetAsWideString;
+ Property    AsAnsiString          : AnsiString       Read GetAsAnsiString  Write SetAsAnsiString;
+ Property    AsMemo                : String           Read GetAsString      Write SetAsString;
+{
+ Property    AsBytes               : TArray<Byte>     Read GetAsBytes       Write SetAsBytes;
+//    Property AsDataSet: TDataSet read GetAsDataSet write SetAsDataSet;
+ Property    AsStream              : TStream          Read GetAsStream      Write SetAsStream;
+}
 End;
 
 Type
@@ -2043,6 +2104,197 @@ Begin
  HexToStream(Value, Stream);
 End;
 
+Procedure TJSONParam.SetAsAnsiString(Value: AnsiString);
+Begin
+ {$IFDEF FPC}
+ SetDataValue(Value, ovString);
+ {$ELSE}
+  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+  SetDataValue(Utf8ToAnsi(Value), ovString);
+  {$ELSE}
+  SetDataValue(Value, ovString);
+  {$IFEND}
+ {$ENDIF}
+End;
+
+procedure TJSONParam.SetAsBCD(Value: Currency);
+begin
+ SetDataValue(Value, ovBcd);
+end;
+
+procedure TJSONParam.SetAsBoolean(Value: Boolean);
+begin
+ SetDataValue(Value, ovBoolean);
+end;
+
+procedure TJSONParam.SetAsCurrency(Value: Currency);
+begin
+ SetDataValue(Value, ovCurrency);
+end;
+
+procedure TJSONParam.SetAsDate(Value: TDateTime);
+begin
+ SetDataValue(Value, ovDate);
+end;
+
+procedure TJSONParam.SetAsDateTime(Value: TDateTime);
+begin
+ SetDataValue(Value, ovDateTime);
+end;
+
+procedure TJSONParam.SetAsFloat(Value: Double);
+begin
+ SetDataValue(Value, ovFloat);
+end;
+
+procedure TJSONParam.SetAsFMTBCD(Value: Currency);
+begin
+ SetDataValue(Value, ovFMTBcd);
+end;
+
+procedure TJSONParam.SetAsInteger(Value: Integer);
+begin
+ SetDataValue(Value, ovInteger);
+end;
+
+procedure TJSONParam.SetAsLargeInt(Value: LargeInt);
+begin
+ SetDataValue(Value, ovLargeInt);
+end;
+
+procedure TJSONParam.SetAsLongWord(Value: LongWord);
+begin
+ SetDataValue(Value, ovLongWord);
+end;
+
+procedure TJSONParam.SetAsShortInt(Value: Integer);
+begin
+ SetDataValue(Value, ovShortInt);
+end;
+
+procedure TJSONParam.SetAsSingle(Value: Single);
+begin
+ SetDataValue(Value, ovSmallInt);
+end;
+
+procedure TJSONParam.SetAsSmallInt(Value: Integer);
+begin
+ SetDataValue(Value, ovSmallInt);
+end;
+
+procedure TJSONParam.SetAsString(Value: String);
+begin
+ SetDataValue(Value, ovString);
+end;
+
+procedure TJSONParam.SetAsTime(Value: TDateTime);
+begin
+ SetDataValue(Value, ovTime);
+end;
+
+procedure TJSONParam.SetAsWideString(Value: WideString);
+begin
+ SetDataValue(Value, ovWideString);
+end;
+
+procedure TJSONParam.SetAsWord(Value: Word);
+begin
+ SetDataValue(Value, ovWord);
+end;
+
+Procedure TJSONParam.SetDataValue(Value: Variant; DataType : TObjectValue);
+var
+ ms : TMemoryStream;
+ p  : Pointer;
+begin
+ If (VarIsNull(Value)) Or (VarIsEmpty(Value)) Or
+    (DataType in [ovBytes,    ovVarBytes,    ovBlob,
+                  ovByte,     ovGraphic,     ovParadoxOle,
+                  ovDBaseOle, ovTypedBinary, ovOraBlob,
+                  ovOraClob,  ovStream]) Then
+  Exit;
+ vObjectValue := DataType;
+ Case vObjectValue Of
+  ovBytes,
+  ovVarBytes,
+  ovBlob,
+  ovByte,
+  ovGraphic,
+  ovParadoxOle,
+  ovDBaseOle,
+  ovTypedBinary,
+  ovOraBlob,
+  ovOraClob,
+  ovStream    : Begin
+                 ms := TMemoryStream.Create;
+                 Try
+                  ms.Position := 0;
+                  p := VarArrayLock(Value);
+                  ms.Write(p ^, VarArrayHighBound(Value, 1));
+                  VarArrayUnlock(Value);
+                  ms.Position := 0;
+                  If ms.Size > 0 Then
+                   LoadFromStream(ms);
+                 Finally
+                  ms.Free;
+                 End;
+                End;
+  ovVariant,
+  ovUnknown   : Begin
+                 vObjectValue := ovString;
+                 SetValue(Value, True);
+                End;
+  ovLargeint,
+  ovLongWord,
+  ovShortint,
+  ovSingle,
+  ovSmallint,
+  ovInteger,
+  ovWord,
+  ovBoolean,
+  ovAutoInc,
+  ovOraInterval:Begin
+                 If vObjectValue = ovBoolean Then
+                  Begin
+                   If Boolean(Value) then
+                    SetValue('1', False)
+                   Else
+                    SetValue('0', False);
+                  End
+                 Else
+                  SetValue(IntToStr(Value), False);
+                End;
+  ovFloat,
+  ovCurrency,
+  ovBCD,
+  ovFMTBcd,
+  ovExtended  : Begin
+                 vObjectValue := ovFloat;
+                 SetValue(FloatToStr(Value), False);
+                End;
+  ovDate,
+  ovTime,
+  ovDateTime,
+  ovTimeStamp,
+  ovOraTimeStamp,
+  ovTimeStampOffset : Begin
+                       vObjectValue := ovDateTime;
+                       SetValue(FloatToStr(Value), False);
+                      End;
+  ovString,
+  ovFixedChar,
+  ovWideString,
+  ovWideMemo,
+  ovFixedWideChar,
+  ovMemo,
+  ovFmtMemo   : Begin
+                 vObjectValue := ovString;
+                 If Value <> '' Then
+                  SetValue(Value, True);
+                End;
+ End;
+end;
+
 procedure TJSONParam.SetDataValue(Value: Variant);
 var
  ms : TMemoryStream;
@@ -2146,6 +2398,174 @@ End;
 Function TJSONParam.ToJSON: String;
 Begin
  Result := vJSONValue.ToJSON;
+End;
+
+Function TJSONParam.GetAsAnsiString: AnsiString;
+begin
+ {$IFDEF FPC}
+ Result := GetValue(ovString);
+ {$ELSE}
+  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+  Result := Utf8ToAnsi(GetValue(ovString));
+  {$ELSE}
+  Result := GetValue(ovString);
+  {$IFEND}
+ {$ENDIF}
+end;
+
+Function TJSONParam.GetAsBCD: Currency;
+begin
+ Result := GetValue(ovBcd);
+end;
+
+function TJSONParam.GetAsBoolean: Boolean;
+begin
+ Result := GetValue(ovBoolean);
+end;
+
+function TJSONParam.GetAsCurrency: Currency;
+begin
+ Result := GetValue(ovCurrency);
+end;
+
+Function TJSONParam.GetAsDateTime: TDateTime;
+Begin
+ Result := GetValue(ovDateTime);
+End;
+
+function TJSONParam.GetAsFloat: Double;
+begin
+ Result := GetValue(ovFloat);
+end;
+
+function TJSONParam.GetAsFMTBCD: Currency;
+begin
+ Result := GetValue(ovFMTBcd);
+end;
+
+function TJSONParam.GetAsInteger: Integer;
+begin
+ Result := GetValue(ovInteger);
+end;
+
+function TJSONParam.GetAsLargeInt: LargeInt;
+begin
+ Result := GetValue(ovLargeInt);
+end;
+
+function TJSONParam.GetAsLongWord: LongWord;
+begin
+ Result := GetValue(ovLongWord);
+end;
+
+function TJSONParam.GetAsSingle: Single;
+begin
+ Result := GetValue(ovSmallInt);
+end;
+
+Function TJSONParam.GetAsString: String;
+Begin
+ Result := GetValue(ovString);
+End;
+
+function TJSONParam.GetAsWideString: WideString;
+begin
+ Result := GetValue(ovWideString);
+end;
+
+function TJSONParam.GetAsWord: Word;
+begin
+ Result := GetValue(ovWord);
+end;
+
+Function TJSONParam.GetValue(Value: TObjectValue): Variant;
+Var
+ ms       : TMemoryStream;
+ MyBuffer : Pointer;
+Begin
+ Case Value Of
+  ovVariant,
+  ovUnknown         : Result := vJSONValue.Value;
+  ovString,
+  ovFixedChar,
+  ovWideString,
+  ovWideMemo,
+  ovFixedWideChar,
+  ovMemo,
+  ovFmtMemo         : Result := vJSONValue.Value;
+  ovLargeint,
+  ovLongWord,
+  ovShortint,
+  ovSingle,
+  ovSmallint,
+  ovInteger,
+  ovWord,
+  ovBoolean,
+  ovAutoInc,
+  ovOraInterval     : Begin
+                       If (vJSONValue.Value <> '') And
+                          (lowercase(vJSONValue.Value) <> 'null') Then
+                        Begin
+                         If vObjectValue = ovBoolean Then
+                          Result := (vJSONValue.Value = '1') or
+                                    (lowercase(vJSONValue.Value) = 'true')
+                         Else
+                          Result := StrToInt(vJSONValue.Value)
+                        End
+                       Else
+                        Result := Null;
+                      End;
+  ovFloat,
+  ovCurrency,
+  ovBCD,
+  ovFMTBcd,
+  ovExtended        : Begin
+                       If (vJSONValue.Value <> '') And
+                          (lowercase(vJSONValue.Value) <> 'null') Then
+                        Result := StrToFloat(vJSONValue.Value)
+                       Else
+                        Result := Null;
+                      End;
+  ovDate,
+  ovTime,
+  ovDateTime,
+  ovTimeStamp,
+  ovOraTimeStamp,
+  ovTimeStampOffset : Begin
+                       If (vJSONValue.Value <> '') And
+                          (lowercase(vJSONValue.Value) <> 'null') Then
+                        Result := StrToFloat(vJSONValue.Value)
+                       Else
+                        Result := Null;
+                      End;
+  ovBytes,
+  ovVarBytes,
+  ovBlob,
+  ovByte,
+  ovGraphic,
+  ovParadoxOle,
+  ovDBaseOle,
+  ovTypedBinary,
+  ovOraBlob,
+  ovOraClob,
+  ovStream          : Begin
+                       ms := TMemoryStream.Create;
+                       Try
+                        vJSONValue.SaveToStream(ms, vJSONValue.vBinary);
+                        If ms.Size > 0 Then
+                         Begin
+                          Result   := VarArrayCreate([0, ms.Size - 1], VarByte);
+                          MyBuffer := VarArrayLock(Result);
+                          ms.ReadBuffer(MyBuffer^, ms.Size);
+                          VarArrayUnlock(Result);
+                         End
+                        Else
+                         Result := Null;
+                       Finally
+                        ms.Free;
+                       End
+                      End;
+ End;
 End;
 
 Function TJSONParam.GetValue: Variant;

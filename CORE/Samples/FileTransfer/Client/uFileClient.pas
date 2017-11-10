@@ -106,7 +106,7 @@ Begin
    JSONParam                  := TJSONParam.Create(DWParams.Encoding);
    JSONParam.ParamName        := 'Arquivo';
    JSONParam.ObjectDirection  := odIN;
-   JSONParam.Value            := lbLocalFiles.Items[lbLocalFiles.ItemIndex];
+   JSONParam.AsString         := lbLocalFiles.Items[lbLocalFiles.ItemIndex];
    DWParams.Add(JSONParam);
    Try
     Try
@@ -161,13 +161,13 @@ Begin
    JSONParam                    := TJSONParam.Create(DWParams.Encoding);
    JSONParam.ParamName          := 'Arquivo';
    JSONParam.ObjectDirection    := odIN;
-   JSONParam.Value              := OpenDialog1.FileName;
+   JSONParam.AsString           := OpenDialog1.FileName;
    DWParams.Add(JSONParam);
    {
    JSONParam                    := TJSONParam.Create(DWParams.Encoding);
    JSONParam.ParamName          := 'Diretorio';
    JSONParam.ObjectDirection    := odIN;
-   JSONParam.Value              := 'SubPasta';
+   JSONParam.AsString           := 'SubPasta';
    DWParams.Add(JSONParam);
    }
    JSONParam                    := TJSONParam.Create(DWParams.Encoding);
@@ -183,13 +183,13 @@ Begin
    JSONParam                    := TJSONParam.Create(DWParams.Encoding);
    JSONParam.ParamName          := 'Result';
    JSONParam.ObjectDirection    := odOUT;
-   JSONParam.Value              := '';
+   JSONParam.AsBoolean          := False;
    DWParams.Add(JSONParam);
    lResponse := RESTClientPooler1.SendEvent('SendReplicationFile', DWParams); //, sePost);
    If lResponse <> '' Then
     Begin
       Try
-       If DWParams.ItemsString['Result'].Value Then
+       If DWParams.ItemsString['Result'].AsBoolean Then
         Showmessage('Upload concluído...');
       Finally
       End;

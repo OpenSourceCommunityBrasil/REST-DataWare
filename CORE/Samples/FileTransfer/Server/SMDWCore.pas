@@ -118,15 +118,15 @@ Begin
    vDiretorio := '';
    If (Params.ItemsString['Diretorio'] <> Nil) Then
    begin
-     if Params.ItemsString['Diretorio'].value <> '' then
+     if Params.ItemsString['Diretorio'].AsString <> '' then
      begin
-       vDiretorio := IncludeTrailingPathDelimiter(Params.ItemsString['Diretorio'].value);
+       vDiretorio := IncludeTrailingPathDelimiter(Params.ItemsString['Diretorio'].AsString);
        ForceDirectories(fServer.DirName + vDiretorio);
      end;
    end;
    JSONValue          := TJSONValue.Create;
    JSONValue.Encoding := GetEncoding(fServer.rspServerFiles.Encoding);
-   vArquivo           := fServer.DirName + vDiretorio + Trim(ExtractFileName(Params.ItemsString['Arquivo'].Value));
+   vArquivo           := fServer.DirName + vDiretorio + Trim(ExtractFileName(Params.ItemsString['Arquivo'].AsString));
    If FileExists(vArquivo) Then
     DeleteFile(vArquivo);
    vFileIn            := TMemoryStream.Create;
@@ -136,7 +136,8 @@ Begin
     vFileIn.SaveToFile(vArquivo);
     fServer.LoadLocalFiles;
    Finally
-    Params.ItemsString['Result'].Value := (vFileIn.Size > 0);
+    If Params.ItemsString['Result'] <> Nil Then
+     Params.ItemsString['Result'].AsBoolean := (vFileIn.Size > 0);
     Result := 'SEND(OK)';
     vFileIn.Clear;
     vFileIn.Free;
@@ -156,7 +157,7 @@ Begin
    JSONValue             := TJSONValue.Create;
    JSONValue.Encoding    := Params.Encoding;
    JSONValue.ObjectValue := ovBlob;
-   vArquivo              := fServer.DirName + Trim(Params.ItemsString['Arquivo'].Value);
+   vArquivo              := fServer.DirName + Trim(Params.ItemsString['Arquivo'].AsString);
    If (vArquivo     <> '') Then
     Begin
      Try
