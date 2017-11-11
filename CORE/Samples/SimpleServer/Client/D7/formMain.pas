@@ -38,17 +38,6 @@ type
     DataSource1: TDataSource;
     Button2: TButton;
     ProgressBar1: TProgressBar;
-    RESTDWClientSQL1EMP_NO: TSmallintField;
-    RESTDWClientSQL1FIRST_NAME: TStringField;
-    RESTDWClientSQL1LAST_NAME: TStringField;
-    RESTDWClientSQL1PHONE_EXT: TStringField;
-    RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField;
-    RESTDWClientSQL1DEPT_NO: TStringField;
-    RESTDWClientSQL1JOB_CODE: TStringField;
-    RESTDWClientSQL1JOB_GRADE: TSmallintField;
-    RESTDWClientSQL1JOB_COUNTRY: TStringField;
-    RESTDWClientSQL1SALARY: TFloatField;
-    RESTDWClientSQL1FULL_NAME: TStringField;
     Button4: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -144,7 +133,7 @@ end;
 
 procedure TForm2.RESTDWClientSQL1AfterInsert(DataSet: TDataSet);
 begin
- RESTDWClientSQL1HIRE_DATE.AsDateTime := Now;
+// RESTDWClientSQL1HIRE_DATE.AsDateTime := Now;
 end;
 
 end.

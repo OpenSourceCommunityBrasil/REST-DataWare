@@ -1981,7 +1981,6 @@ object Form2: TForm2
   object RESTDWDataBase1: TRESTDWDataBase
     Active = False
     Compression = True
-    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -2083,56 +2082,6 @@ object Form2: TForm2
     InBlockEvents = False
     Left = 248
     Top = 144
-    object RESTDWClientSQL1EMP_NO: TSmallintField
-      FieldName = 'EMP_NO'
-      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
-      Required = True
-    end
-    object RESTDWClientSQL1FIRST_NAME: TStringField
-      FieldName = 'FIRST_NAME'
-      Required = True
-      Size = 15
-    end
-    object RESTDWClientSQL1LAST_NAME: TStringField
-      FieldName = 'LAST_NAME'
-      Required = True
-    end
-    object RESTDWClientSQL1PHONE_EXT: TStringField
-      FieldName = 'PHONE_EXT'
-      Size = 4
-    end
-    object RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField
-      FieldName = 'HIRE_DATE'
-      Required = True
-    end
-    object RESTDWClientSQL1DEPT_NO: TStringField
-      FieldName = 'DEPT_NO'
-      Required = True
-      Size = 3
-    end
-    object RESTDWClientSQL1JOB_CODE: TStringField
-      FieldName = 'JOB_CODE'
-      Required = True
-      Size = 5
-    end
-    object RESTDWClientSQL1JOB_GRADE: TSmallintField
-      FieldName = 'JOB_GRADE'
-      Required = True
-    end
-    object RESTDWClientSQL1JOB_COUNTRY: TStringField
-      FieldName = 'JOB_COUNTRY'
-      Required = True
-      Size = 15
-    end
-    object RESTDWClientSQL1SALARY: TFloatField
-      FieldName = 'SALARY'
-      Required = True
-    end
-    object RESTDWClientSQL1FULL_NAME: TStringField
-      FieldName = 'FULL_NAME'
-      ReadOnly = True
-      Size = 37
-    end
   end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1

@@ -15,10 +15,10 @@ Uses
  Datasnap.DbClient
  {$IFDEF POSIX} //ANDROID}
  {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
-   ,system.json, FMX.Types, Variants
+   ,system.json, FMX.Types
  {$IFEND}
  {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
- ,system.json, Variants
+ ,system.json
  {$IFEND}
  {$ENDIF}
  {$IFDEF RESJEDI}
@@ -134,10 +134,12 @@ Private
  Procedure SetParamName(bValue     : String);
  Function  GetAsString             : String;
  Procedure SetAsString (Value      : String);
+ {$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}
  Function  GetAsWideString         : WideString;
  Procedure SetAsWideString  (Value : WideString);
  Function  GetAsAnsiString         : AnsiString;
  Procedure SetAsAnsiString  (Value : AnsiString);
+ {$ENDIF}
  Function  GetAsBCD                : Currency;
  Procedure SetAsBCD (Value         : Currency);
  Function  GetAsFMTBCD             : Currency;
@@ -204,8 +206,10 @@ Public
  Property    AsLongWord            : LongWord         Read GetAsLongWord    Write SetAsLongWord;
  Property    AsLargeInt            : LargeInt         Read GetAsLargeInt    Write SetAsLargeInt;
  Property    AsString              : String           Read GetAsString      Write SetAsString;
+ {$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}
  Property    AsWideString          : WideString       Read GetAsWideString  Write SetAsWideString;
  Property    AsAnsiString          : AnsiString       Read GetAsAnsiString  Write SetAsAnsiString;
+ {$ENDIF}
  Property    AsMemo                : String           Read GetAsString      Write SetAsString;
 {
  Property    AsBytes               : TArray<Byte>     Read GetAsBytes       Write SetAsBytes;
@@ -2121,6 +2125,7 @@ Begin
  HexToStream(Value, Stream);
 End;
 
+{$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}
 Procedure TJSONParam.SetAsAnsiString(Value: AnsiString);
 Begin
  {$IFDEF FPC}
@@ -2133,6 +2138,7 @@ Begin
   {$IFEND}
  {$ENDIF}
 End;
+{$ENDIF}
 
 procedure TJSONParam.SetAsBCD(Value: Currency);
 begin
@@ -2209,10 +2215,12 @@ begin
  SetDataValue(Value, ovTime);
 end;
 
+{$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}
 procedure TJSONParam.SetAsWideString(Value: WideString);
 begin
  SetDataValue(Value, ovWideString);
 end;
+{$ENDIF}
 
 procedure TJSONParam.SetAsWord(Value: Word);
 begin
@@ -2419,6 +2427,7 @@ Begin
  Result := vJSONValue.ToJSON;
 End;
 
+{$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}
 Function TJSONParam.GetAsAnsiString: AnsiString;
 begin
  {$IFDEF FPC}
@@ -2431,6 +2440,7 @@ begin
   {$IFEND}
  {$ENDIF}
 end;
+{$ENDIF}
 
 Function TJSONParam.GetAsBCD: Currency;
 begin
@@ -2487,10 +2497,12 @@ Begin
  Result := GetValue(ovString);
 End;
 
+{$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}
 function TJSONParam.GetAsWideString: WideString;
 begin
  Result := GetValue(ovWideString);
 end;
+{$ENDIF}
 
 function TJSONParam.GetAsWord: Word;
 begin
