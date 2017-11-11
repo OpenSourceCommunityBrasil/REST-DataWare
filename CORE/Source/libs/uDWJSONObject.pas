@@ -85,7 +85,8 @@ Public
  Procedure WriteToDataset (DatasetType  : TDatasetType;
                            JSONValue    : String;
                            DestDS       : TDataset;
-                           DCSeparator  : String = ','{$IFDEF FPC};
+                           DCSeparator  : String = ',';
+                           ClearDataset : Boolean = False{$IFDEF FPC};
                            CharSet      : TDatabaseCharSet = csUndefined{$ENDIF});
  Procedure LoadFromJSON   (bValue       : String);
  Procedure LoadFromStream (Stream       : TMemoryStream;
@@ -1374,7 +1375,8 @@ End;
 Procedure TJSONValue.WriteToDataset(DatasetType : TDatasetType;
                                     JSONValue   : String;
                                     DestDS      : TDataset;
-                                    DCSeparator : String = ','{$IFDEF FPC};
+                                    DCSeparator : String = ',';
+                                    ClearDataset : Boolean = False{$IFDEF FPC};
                                     CharSet     : TDatabaseCharSet = csUndefined{$ENDIF});
 Var
  bJsonOBJ,
@@ -1493,7 +1495,7 @@ Begin
     DestDS.DisableControls;
     If DestDS.Active Then
      DestDS.Close;
-    If DestDS.Fields.Count = 0 Then
+    If (DestDS.Fields.Count = 0) Then
      If DestDS.FieldDefs.Count > 0 Then
       DestDS.FieldDefs.Clear;
     bJsonArray    := bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
@@ -1540,8 +1542,11 @@ Begin
      Else If DestDS Is TRESTDWClientSQL Then
       Begin
        TRESTDWClientSQL(DestDS).Inactive := True;
+       {
+       If DestDS Is TFDMemtable Then
+        TFDMemtable(DestDS).CreateDataSet;
+       }
        DestDS.Open;
-       TRESTDWClientSQL(DestDS).Active   := True;
        TRESTDWClientSQL(DestDS).Inactive := False;
       End
      Else

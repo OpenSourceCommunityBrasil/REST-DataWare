@@ -16,7 +16,7 @@ interface
 uses SysUtils,  Classes,      uDWJSONObject,
      DB,        uRESTDWBase,  uDWPoolerMethod,
      uRESTDWMasterDetailData, uDWConstsData,
-     uDWMassiveBuffer,        SyncObjs
+     uDWMassiveBuffer,        SyncObjs, uDWJSONTools, udwjson
      {$IFDEF FPC}
      , uDWConsts,             BufDataset;
      {$ELSE}
@@ -181,7 +181,7 @@ Type
   Procedure   ApplyUpdates(Const Datasets     : TRESTDWDatasetArray;
                            Var   Error        : Boolean;
                            Var   MessageError : String);Overload;
-  Procedure   OpenDatasets(Const Datasets     : TRESTDWDatasetArray;
+  Procedure   OpenDatasets(Var   Datasets     : TRESTDWDatasetArray;
                            Var   Error        : Boolean;
                            Var   MessageError : String);Overload;
   Property    Connected       : Boolean                  Read GetStateDB          Write SetConnection;
@@ -467,6 +467,9 @@ Type
   Procedure ExecuteProcedurePure(ProcName         : String;
                                  Var Error        : Boolean;
                                  Var MessageError : String);Virtual;abstract;
+  Function  OpenDatasets        (DatasetsLine     : String;
+                                 Var Error        : Boolean;
+                                 Var MessageError : String) : TJSONValue;Virtual;abstract;
   Procedure Close;Virtual;abstract;
  Public
   Property StrsTrim          : Boolean          Read vStrsTrim        Write vStrsTrim;
@@ -1181,14 +1184,18 @@ Begin
  SetConnection(True);
 End;
 
-Procedure TRESTDWDataBase.OpenDatasets(Const Datasets     : TRESTDWDatasetArray;
-                                       Var   Error        : Boolean;
-                                       Var   MessageError : String);
+Procedure TRESTDWDataBase.OpenDatasets(Var Datasets     : TRESTDWDatasetArray;
+                                       Var Error        : Boolean;
+                                       Var MessageError : String);
 Var
+ vJsonLine,
  vLinesDS          : String;
  I                 : Integer;
  vRESTConnectionDB : TDWPoolerMethodClient;
  DWParams          : TDWParams;
+ JSONValue         : TJSONValue;
+ bJsonValue        : TJsonObject;
+ bJsonArray        : TJsonArray;
 Begin
  vLinesDS := '';
  For I := 0 To Length(Datasets) -1 Do
@@ -1229,6 +1236,28 @@ Begin
   vLinesDS := vRESTConnectionDB.OpenDatasets(vLinesDS, vRestPooler,  vRestModule,
                                              Error,    MessageError, vTimeOut,
                                              vLogin,   vPassword);
+  If Not Error Then
+   Begin
+    JSONValue := TJSONValue.Create;
+    Try
+     JSONValue.Encoded := True;
+     JSONValue.LoadFromJSON(vLinesDS);
+     vJsonLine := JSONValue.value;
+     FreeAndNil(JSONValue);
+     bJsonArray := udwjson.TJsonArray.create(vJsonLine);
+     For I := 0 To bJsonArray.Length - 1 Do
+      Begin
+       JSONValue := TJSONValue.Create;
+       JSONValue.LoadFromJSON(bJsonArray.optJSONObject(I).ToString);
+       JSONValue.Encoded := True;
+       JSONValue.WriteToDataset(dtFull, JSONValue.ToJSON, TRESTDWClientSQL(Datasets[I]), vDecimalSeparator);
+      End;
+    Finally
+     If bJsonArray <> Nil Then
+      FreeAndNil(bJsonArray);
+     FreeAndNil(JSONValue);
+    End;
+   End;
  Finally
   FreeAndNil(vRESTConnectionDB);
  End;

@@ -34,22 +34,9 @@ type
     Label1: TLabel;
     Label2: TLabel;
     rdwSQLStringTable: TRESTDWClientSQL;
-    rdwSQLStringTableID: TStringField;
-    rdwSQLStringTableDESC: TStringField;
     dsSQLStringTable: TDataSource;
     dsSQLEmployee: TDataSource;
     rdwSQLEmployee: TRESTDWClientSQL;
-    rdwSQLEmployeeEMP_NO: TSmallintField;
-    rdwSQLEmployeeFIRST_NAME: TStringField;
-    rdwSQLEmployeeLAST_NAME: TStringField;
-    rdwSQLEmployeePHONE_EXT: TStringField;
-    rdwSQLEmployeeHIRE_DATE: TSQLTimeStampField;
-    rdwSQLEmployeeDEPT_NO: TStringField;
-    rdwSQLEmployeeJOB_CODE: TStringField;
-    rdwSQLEmployeeJOB_GRADE: TSmallintField;
-    rdwSQLEmployeeJOB_COUNTRY: TStringField;
-    rdwSQLEmployeeSALARY: TFloatField;
-    rdwSQLEmployeeFULL_NAME: TStringField;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
   private
@@ -70,6 +57,17 @@ Var
  vError        : Boolean;
  vMessageError : String;
 begin
+ RESTDWDataBase1.Close;
+ RESTDWDataBase1.PoolerService := EHost.Text;
+ RESTDWDataBase1.PoolerPort    := StrToInt(EPort.Text);
+ RESTDWDataBase1.Login         := EdUserNameDW.Text;
+ RESTDWDataBase1.Password      := EdPasswordDW.Text;
+ RESTDWDataBase1.Compression   := CheckBox1.Checked;
+ If chkhttps.Checked then
+  RESTDWDataBase1.TypeRequest  := TTyperequest.trHttps
+ Else
+  RESTDWDataBase1.TypeRequest  := TTyperequest.trHttp;
+ RESTDWDataBase1.Open;
  RESTDWDataBase1.OpenDatasets([rdwSQLStringTable, rdwSQLEmployee], vError, vMessageError);
  If vError Then
   Showmessage(vMessageError);
@@ -80,6 +78,17 @@ Var
  vError        : Boolean;
  vMessageError : String;
 begin
+ RESTDWDataBase1.Close;
+ RESTDWDataBase1.PoolerService := EHost.Text;
+ RESTDWDataBase1.PoolerPort    := StrToInt(EPort.Text);
+ RESTDWDataBase1.Login         := EdUserNameDW.Text;
+ RESTDWDataBase1.Password      := EdPasswordDW.Text;
+ RESTDWDataBase1.Compression   := CheckBox1.Checked;
+ If chkhttps.Checked then
+  RESTDWDataBase1.TypeRequest  := TTyperequest.trHttps
+ Else
+  RESTDWDataBase1.TypeRequest  := TTyperequest.trHttp;
+ RESTDWDataBase1.Open;
  RESTDWDataBase1.ApplyUpdates([rdwSQLStringTable, rdwSQLEmployee], vError, vMessageError);
  If vError Then
   Showmessage(vMessageError);

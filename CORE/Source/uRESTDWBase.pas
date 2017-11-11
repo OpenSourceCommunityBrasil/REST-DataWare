@@ -188,6 +188,9 @@ Type
   Procedure ApplyUpdatesJSON   (ServerMethodsClass    : TComponent;
                                 Var Pooler            : String;
                                 Var DWParams          : TDWParams);
+  Procedure OpenDatasets       (ServerMethodsClass    : TComponent;
+                                Var Pooler            : String;
+                                Var DWParams          : TDWParams);
  Public
   Constructor Create           (AOwner                : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                      //Destroy a Classe
@@ -1640,6 +1643,52 @@ Begin
   End;
 End;
 
+Procedure TRESTServicePooler.OpenDatasets(ServerMethodsClass : TComponent;
+                                          Var Pooler         : String;
+                                          Var DWParams       : TDWParams);
+Var
+ I         : Integer;
+ vTempJSON : TJSONValue;
+ vError    : Boolean;
+ vMessageError : String;
+ DWParamsD     : TDWParams;
+Begin
+ DWParamsD := Nil;
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
+      Begin
+       If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
+        Begin
+         If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
+          Begin
+           vError   := DWParams.ItemsString['Error'].AsBoolean;
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+           vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.OpenDatasets(DWParams.ItemsString['LinesDataset'].Value,
+                                                                                                  vError, vMessageError);
+           If vMessageError <> '' Then
+            DWParams.ItemsString['MessageError'].AsString := vMessageError;
+           DWParams.ItemsString['Error'].AsBoolean        := vError;
+           If DWParams.ItemsString['Result'] <> Nil Then
+            Begin
+             If vTempJSON <> Nil Then
+              Begin
+               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON);
+               FreeAndNil(vTempJSON);
+              End
+             Else
+              DWParams.ItemsString['Result'].SetValue('');
+            End;
+          End;
+         Break;
+        End;
+      End;
+    End;
+  End;
+End;
+
 Function TRESTServicePooler.ServiceMethods(BaseObject   : TComponent;
                                            AContext     : TIdContext;
                                            UrlMethod    : String;
@@ -1719,7 +1768,17 @@ Begin
     JSONStr    := TReplyOK
    Else
     JSONStr    := TReplyNOK;
-  End;
+  End
+ Else If vUrlMethod = UpperCase('OpenDatasets') Then
+  Begin
+   vResult     := DWParams.ItemsString['Pooler'].Value;
+   OpenDatasets(BaseObject, vResult, DWParams);
+   Result      := True;
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+    JSONStr    := TReplyOK
+   Else
+    JSONStr    := TReplyNOK;
+  End
 End;
 
 Procedure TRESTServicePooler.aCommandGet(AContext      : TIdContext;

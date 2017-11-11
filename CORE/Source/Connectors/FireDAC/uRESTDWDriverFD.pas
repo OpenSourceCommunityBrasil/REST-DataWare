@@ -8,8 +8,8 @@ uses System.SysUtils,          System.Classes,          Data.DBXJSON,
      FireDAC.DApt,             FireDAC.UI.Intf,         FireDAC.Stan.Def,
      FireDAC.Stan.Pool,        FireDAC.Comp.Client,     FireDAC.Comp.UI,
      FireDAC.Comp.DataSet,     FireDAC.DApt.Intf,       Data.DB,
-     uDWConsts, uDWConstsData, uRestDWPoolerDB,         uDWJSONObject,
-     uDWMassiveBuffer,         Variants;
+     uDWConsts, uDWConstsData, uRestDWPoolerDB,         udwjson,
+     uDWJSONObject,            uDWMassiveBuffer,        Variants;
 
 Type
  TRESTDWDriverFD   = Class(TRESTDWDriver)
@@ -47,6 +47,9 @@ Type
   Procedure ExecuteProcedurePure(ProcName         : String;
                                  Var Error        : Boolean;
                                  Var MessageError : String);Override;
+  Function  OpenDatasets        (DatasetsLine     : String;
+                                 Var Error        : Boolean;
+                                 Var MessageError : String) : TJSONValue;Override;
   Procedure Close;Override;
  Published
   Property Connection : TFDConnection Read GetConnection Write SetConnection;
@@ -65,8 +68,6 @@ Procedure Register;
 Begin
  RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWDriverFD]);
 End;
-
-
 
 Procedure TRESTDWDriverFD.Close;
 Begin
@@ -157,7 +158,6 @@ Begin
                      vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
                    Else
                      vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
-
                    // Como estava Anteriormente
                    //If vTempQuery.Params[A].DataType = ftSmallInt Then
                    //  vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
@@ -1159,6 +1159,88 @@ Begin
  fdCommand.Close;
  FreeAndNil(fdCommand);
  FreeAndNil(oTab);
+End;
+
+Function TRESTDWDriverFD.OpenDatasets       (DatasetsLine     : String;
+                                             Var Error        : Boolean;
+                                             Var MessageError : String): TJSONValue;
+Var
+ vTempQuery  : TFDQuery;
+ vTempJSON   : TJSONValue;
+ vJSONLine   : String;
+ I, X        : Integer;
+ DWParams    : TDWParams;
+ bJsonValue  : udwjson.TJsonObject;
+ bJsonArray  : udwjson.TJsonArray;
+Begin
+ Inherited;
+ Result := Nil;
+ Error  := False;
+ vTempQuery               := TFDQuery.Create(Owner);
+ Try
+  If Not vFDConnection.Connected Then
+   vFDConnection.Connected := True;
+  vTempQuery.Connection   := vFDConnection;
+  vTempQuery.FormatOptions.StrsTrim       := StrsTrim;
+  vTempQuery.FormatOptions.StrsEmpty2Null := StrsEmpty2Null;
+  vTempQuery.FormatOptions.StrsTrim2Len   := StrsTrim2Len;
+  bJsonArray := udwjson.TJsonArray.create(DatasetsLine);
+  For I := 0 To bJsonArray.Length - 1 Do
+   Begin
+    bJsonValue := bJsonArray.optJSONObject(I);
+    vTempQuery.Close;
+    vTempQuery.SQL.Clear;
+    vTempQuery.SQL.Add(DecodeStrings(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString));
+    If bJsonValue.names.length > 1 Then
+     Begin
+      DWParams := TDWParams.Create;
+      Try
+       DWParams.FromJSON(DecodeStrings(bJsonValue.opt(bJsonValue.names.get(1).ToString).ToString));
+       For X := 0 To DWParams.Count -1 Do
+        Begin
+         If vTempQuery.ParamByName(DWParams[X].ParamName) <> Nil Then
+          Begin
+           vTempQuery.ParamByName(DWParams[X].ParamName).DataType := ObjectValueToFieldType(DWParams[X].ObjectValue);
+           vTempQuery.ParamByName(DWParams[X].ParamName).Value    := DWParams[X].Value;
+          End;
+        End;
+      Finally
+       DWParams.Free;
+      End;
+     End;
+    vTempQuery.Open;
+    vTempJSON  := TJSONValue.Create;
+    vTempJSON.Encoded := True;
+    vTempJSON.LoadFromDataset('RESULTDATA', vTempQuery, True);
+    Try
+     If Length(vJSONLine) = 0 Then
+      vJSONLine := Format('%s', [vTempJSON.ToJSON])
+     Else
+      vJSONLine := vJSONLine + Format(', %s', [vTempJSON.ToJSON]);
+    Finally
+     vTempJSON.Free;
+    End;
+   End;
+ Except
+  On E : Exception do
+   Begin
+    Try
+     Error          := True;
+     MessageError   := E.Message;
+     vJSONLine      := GetPairJSON('NOK', MessageError);
+    Except
+    End;
+   End;
+ End;
+ Result         := TJSONValue.Create;
+ Try
+  vJSONLine     := Format('[%s]', [vJSONLine]);
+  Result.SetValue(vJSONLine);
+ Finally
+
+ End;
+ vTempQuery.Close;
+ vTempQuery.Free;
 End;
 
 Function TRESTDWDriverFD.InsertMySQLReturnID(SQL              : String;
