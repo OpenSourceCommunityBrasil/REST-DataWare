@@ -2744,7 +2744,6 @@ Begin
      {$IFDEF RESTFDMEMTABLE}
       TFDmemtable(Self).Open;
      {$ENDIF}
-
      {$ENDIF}
     End
    Else

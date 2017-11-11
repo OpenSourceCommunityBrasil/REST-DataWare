@@ -650,7 +650,10 @@ Begin
  Result := bValue;
  If vObjectValue In [ovString,        ovFixedChar,    ovWideString,
                      ovFixedWideChar, ovDate, ovTime, ovDateTime] Then
-  Result := bValue;
+  If bValue = '' Then
+   Result := '""'
+  Else
+   Result := bValue;
 End;
 
 Function TJSONValue.IsNull: Boolean;
@@ -946,6 +949,8 @@ Begin
   {$ELSE}
   vTempValue := FormatValue(BytesToString(TBytes(aValue)))
   {$ENDIF}
+ Else If BytesArrToString(aValue) = '' Then
+  vTempValue  := FormatValue('""')
  Else
   vTempValue  := FormatValue(BytesArrToString(aValue));
  If Not(Pos('"TAGJSON":}', vTempValue) > 0) Then
@@ -1938,6 +1943,8 @@ End;
 Procedure TJSONValue.WriteValue(bValue: String);
 Begin
  SetLength(aValue, 0);
+ If bValue = '' Then
+  Exit;
  If vObjectValue in [ovString, ovMemo, ovWideMemo, ovFmtMemo] Then
   Begin
    If vEncoded Then
@@ -2207,6 +2214,7 @@ var
  ms : TMemoryStream;
  p  : Pointer;
 begin
+ vEncoded := False;
  If (VarIsNull(Value)) Or (VarIsEmpty(Value)) Or
     (DataType in [ovBytes,    ovVarBytes,    ovBlob,
                   ovByte,     ovGraphic,     ovParadoxOle,
@@ -2241,8 +2249,9 @@ begin
                 End;
   ovVariant,
   ovUnknown   : Begin
+                 vEncoded     := True;
                  vObjectValue := ovString;
-                 SetValue(Value, True);
+                 SetValue(Value, vEncoded);
                 End;
   ovLargeint,
   ovLongWord,
@@ -2257,12 +2266,12 @@ begin
                  If vObjectValue = ovBoolean Then
                   Begin
                    If Boolean(Value) then
-                    SetValue('1', False)
+                    SetValue('1', vEncoded)
                    Else
-                    SetValue('0', False);
+                    SetValue('0', vEncoded);
                   End
                  Else
-                  SetValue(IntToStr(Value), False);
+                  SetValue(IntToStr(Value), vEncoded);
                 End;
   ovFloat,
   ovCurrency,
@@ -2270,7 +2279,7 @@ begin
   ovFMTBcd,
   ovExtended  : Begin
                  vObjectValue := ovFloat;
-                 SetValue(FloatToStr(Value), False);
+                 SetValue(FloatToStr(Value), vEncoded);
                 End;
   ovDate,
   ovTime,
@@ -2279,7 +2288,7 @@ begin
   ovOraTimeStamp,
   ovTimeStampOffset : Begin
                        vObjectValue := ovDateTime;
-                       SetValue(FloatToStr(Value), False);
+                       SetValue(FloatToStr(Value), vEncoded);
                       End;
   ovString,
   ovFixedChar,
@@ -2288,9 +2297,9 @@ begin
   ovFixedWideChar,
   ovMemo,
   ovFmtMemo   : Begin
+                 vEncoded     := True;
                  vObjectValue := ovString;
-                 If Value <> '' Then
-                  SetValue(Value, True);
+                 SetValue(Value, vEncoded);
                 End;
  End;
 end;

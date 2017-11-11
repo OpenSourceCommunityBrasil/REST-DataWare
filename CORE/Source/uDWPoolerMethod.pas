@@ -120,28 +120,6 @@ Uses {$IFDEF FPC}
                                    UserName                : String  = '';
                                    Password                : String  = '';
                                    RESTClientPooler        : TRESTClientPooler = Nil)   : TJSONValue;
-   //Executa um ApplyUpdate no Servidor
-   Procedure   ApplyChangesPure   (Pooler, Method_Prefix,
-                                   TableName,
-                                   SQL                     : String;
-                                   ADeltaList              : TDWDatalist;
-                                   Var Error               : Boolean;
-                                   Var MessageError        : String;
-                                   TimeOut                 : Integer = 3000;
-                                   UserName                : String  = '';
-                                   Password                : String  = '';
-                                   RESTClientPooler        : TRESTClientPooler = Nil);
-   Procedure   ApplyChanges       (Pooler, Method_Prefix,
-                                   TableName,
-                                   SQL                     : String;
-                                   Params                  : TDWParams;
-                                   ADeltaList              : TDWDatalist;
-                                   Var Error               : Boolean;
-                                   Var MessageError        : String;
-                                   TimeOut                 : Integer = 3000;
-                                   UserName                : String  = '';
-                                   Password                : String  = '';
-                                   RESTClientPooler        : TRESTClientPooler = Nil);
    //Lista todos os Pooler's do Servidor
    Procedure GetPoolerList        (Method_Prefix           : String;
                                    Var PoolerList          : TStringList;
@@ -185,35 +163,6 @@ Uses {$IFDEF FPC}
 implementation
 
 { TDWPoolerMethodClient }
-
-Procedure TDWPoolerMethodClient.ApplyChanges(Pooler, Method_Prefix,
-                                             TableName,
-                                             SQL                     : String;
-                                             Params                  : TDWParams;
-                                             ADeltaList              : TDWDatalist;
-                                             Var Error               : Boolean;
-                                             Var MessageError        : String;
-                                             TimeOut                 : Integer = 3000;
-                                             UserName                : String  = '';
-                                             Password                : String  = '';
-                                             RESTClientPooler        : TRESTClientPooler = Nil);
-Begin
-
-End;
-
-Procedure TDWPoolerMethodClient.ApplyChangesPure(Pooler, Method_Prefix,
-                                                 TableName,
-                                                 SQL                     : String;
-                                                 ADeltaList              : TDWDatalist;
-                                                 Var Error               : Boolean;
-                                                 Var MessageError        : String;
-                                                 TimeOut                 : Integer = 3000;
-                                                 UserName                : String  = '';
-                                                 Password                : String  = '';
-                                                 RESTClientPooler        : TRESTClientPooler = Nil);
-Begin
-
-End;
 
 Function TDWPoolerMethodClient.ApplyUpdates(Massive          : TMassiveDatasetBuffer;
                                             Pooler,
@@ -272,7 +221,7 @@ Begin
  JSONParam.ParamName             := 'Massive';
  JSONParam.ObjectDirection       := odIn;
  If Massive <> Nil Then
-  JSONParam.SetValue(TMassiveDatasetBuffer(Massive).ToJSON);
+  JSONParam.AsString             := TMassiveDatasetBuffer(Massive).ToJSON;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -286,7 +235,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Pooler);
+ JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -300,7 +249,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Method_Prefix);
+ JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
  If Trim(SQL) <> '' Then
   Begin
@@ -316,7 +265,7 @@ Begin
    {$ENDIF}
    JSONParam.ParamName             := 'SQL';
    JSONParam.ObjectDirection       := odIn;
-   JSONParam.SetValue(SQL);
+   JSONParam.AsString              := SQL;
    DWParams.Add(JSONParam);
    If Params <> Nil Then
     Begin
@@ -334,7 +283,7 @@ Begin
        {$ENDIF}
        JSONParam.ParamName             := 'Params';
        JSONParam.ObjectDirection       := odInOut;
-       JSONParam.SetValue(Params.ToJSON);
+       JSONParam.AsString              := Params.ToJSON;
        DWParams.Add(JSONParam);
       End;
     End;
@@ -351,7 +300,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
- JSONParam.SetValue(BooleanToString(False));
+ JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -365,7 +314,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
- JSONParam.SetValue(MessageError);
+ JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -379,7 +328,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.SetValue('');
+ JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
  Try
   Try
@@ -407,6 +356,11 @@ Begin
       Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
     End;
   Except
+   On E : Exception Do
+    Begin
+     Error         := True;
+     MessageError  := E.Message;
+    End;
   End;
  Finally
   If Not Assigned(RESTClientPooler) Then
@@ -522,7 +476,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.SetValue('');
+ JSONParam.AsString              := '';
  DWParams  := TDWParams.Create;
  DWParams.Add(JSONParam);
  Try
@@ -555,6 +509,10 @@ Begin
       Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
     End;
   Except
+   On E : Exception Do
+    Begin
+     Raise Exception.Create(E.Message);
+    End;
   End;
  Finally
   If Not Assigned(RESTClientPooler) Then
@@ -614,7 +572,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Pooler);
+ JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -628,7 +586,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.SetValue('');
+ JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
  Try
   Try
@@ -709,7 +667,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Pooler);
+ JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -721,7 +679,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Method_Prefix);
+ JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -733,7 +691,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(SQL);
+ JSONParam.AsString              := SQL;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -745,7 +703,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Params.ToJSON);
+ JSONParam.AsString              := Params.ToJSON;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -757,7 +715,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
- JSONParam.SetValue(BooleanToString(False));
+ JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -769,7 +727,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
- JSONParam.SetValue(MessageError);
+ JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -781,7 +739,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Execute';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(BooleanToString(Execute));
+ JSONParam.AsBoolean             := Execute;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -793,7 +751,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.SetValue('');
+ JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
  Try
   Try
@@ -818,6 +776,11 @@ Begin
       Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
     End;
   Except
+   On E : Exception Do
+    Begin
+     Error         := True;
+     MessageError  := E.Message;
+    End;
   End;
  Finally
   If Not Assigned(RESTClientPooler) Then
@@ -881,7 +844,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Pooler);
+ JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -895,7 +858,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Method_Prefix);
+ JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -909,7 +872,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(SQL);
+ JSONParam.AsString              := SQL;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -923,7 +886,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odInOut;
- JSONParam.SetValue(Params.ToJSON);
+ JSONParam.AsString              := Params.ToJSON;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -937,7 +900,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
- JSONParam.SetValue(BooleanToString(False));
+ JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -951,7 +914,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
- JSONParam.SetValue(MessageError);
+ JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -965,7 +928,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Execute';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(BooleanToString(Execute));
+ JSONParam.AsBoolean             := Execute;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -979,7 +942,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.SetValue('');
+ JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
  Try
   Try
@@ -1007,6 +970,11 @@ Begin
       Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
     End;
   Except
+   On E : Exception Do
+    Begin
+     Error         := True;
+     MessageError  := E.Message;
+    End;
   End;
  Finally
   If Not Assigned(RESTClientPooler) Then
@@ -1070,7 +1038,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Pooler);
+ JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1084,7 +1052,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Method_Prefix);
+ JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1098,7 +1066,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(SQL);
+ JSONParam.AsString              := SQL;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1112,7 +1080,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
- JSONParam.SetValue(BooleanToString(False));
+ JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1126,7 +1094,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.SetValue(MessageError);
+ JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1140,7 +1108,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Execute';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(BooleanToString(Execute));
+ JSONParam.AsBoolean             := Execute;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1154,7 +1122,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.SetValue('');
+ JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
  Try
   Try
@@ -1182,6 +1150,11 @@ Begin
       Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
     End;
   Except
+   On E : Exception Do
+    Begin
+     Error         := True;
+     MessageError  := E.Message;
+    End;
   End;
  Finally
   If Not Assigned(RESTClientPooler) Then
@@ -1276,7 +1249,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Pooler);
+ JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1290,7 +1263,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Method_Prefix);
+ JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1304,7 +1277,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(SQL);
+ JSONParam.AsString              := SQL;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1318,7 +1291,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Params.ToJSON);
+ JSONParam.AsString              := Params.ToJSON;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1332,7 +1305,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
- JSONParam.SetValue(BooleanToString(False));
+ JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1346,7 +1319,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
- JSONParam.SetValue(MessageError);
+ JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1360,7 +1333,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.SetValue('');
+ JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
  Try
   Try
@@ -1384,6 +1357,11 @@ Begin
       Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
     End;
   Except
+   On E : Exception Do
+    Begin
+     Error         := True;
+     MessageError  := E.Message;
+    End;
   End;
  Finally
   If Not Assigned(RESTClientPooler) Then
@@ -1444,7 +1422,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Pooler);
+ JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1456,7 +1434,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(Method_Prefix);
+ JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1468,7 +1446,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.SetValue(SQL);
+ JSONParam.AsString              := SQL;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1480,7 +1458,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
- JSONParam.SetValue(BooleanToString(False));
+ JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1492,7 +1470,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
- JSONParam.SetValue(MessageError);
+ JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -1504,7 +1482,7 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.SetValue('');
+ JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
  Try
   Try
@@ -1527,6 +1505,11 @@ Begin
       Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
     End;
   Except
+   On E : Exception Do
+    Begin
+     Error         := True;
+     MessageError  := E.Message;
+    End;
   End;
  Finally
   If Not Assigned(RESTClientPooler) Then
@@ -1591,7 +1574,7 @@ Begin
    {$ENDIF}
    JSONParam.ParamName                    := 'LinesDataset';
    JSONParam.ObjectDirection              := odIn;
-   JSONParam.SetValue(LinesDataset);
+   JSONParam.AsString                     := LinesDataset;
    DWParams.Add(JSONParam);
    {$IFNDEF FPC}
     {$if CompilerVersion > 21}
@@ -1605,7 +1588,7 @@ Begin
    {$ENDIF}
    JSONParam.ParamName                    := 'Pooler';
    JSONParam.ObjectDirection              := odIn;
-   JSONParam.SetValue(Pooler);
+   JSONParam.AsString                     := Pooler;
    DWParams.Add(JSONParam);
    {$IFNDEF FPC}
     {$if CompilerVersion > 21}
@@ -1619,7 +1602,7 @@ Begin
    {$ENDIF}
    JSONParam.ParamName                    := 'Method_Prefix';
    JSONParam.ObjectDirection              := odIn;
-   JSONParam.SetValue(Method_Prefix);
+   JSONParam.AsString                     := Method_Prefix;
    DWParams.Add(JSONParam);
    {$IFNDEF FPC}
     {$if CompilerVersion > 21}
@@ -1633,7 +1616,7 @@ Begin
    {$ENDIF}
    JSONParam.ParamName                   := 'Error';
    JSONParam.ObjectDirection             := odInOut;
-   JSONParam.SetValue(BooleanToString(False));
+   JSONParam.AsBoolean                   := False;
    DWParams.Add(JSONParam);
    {$IFNDEF FPC}
     {$if CompilerVersion > 21}
@@ -1647,7 +1630,7 @@ Begin
    {$ENDIF}
    JSONParam.ParamName                   := 'MessageError';
    JSONParam.ObjectDirection             := odInOut;
-   JSONParam.SetValue(MessageError);
+   JSONParam.AsString                    := MessageError;
    DWParams.Add(JSONParam);
    {$IFNDEF FPC}
     {$if CompilerVersion > 21}
@@ -1661,7 +1644,8 @@ Begin
    {$ENDIF}
    JSONParam.ParamName                   := 'Result';
    JSONParam.ObjectDirection             := odOUT;
-   JSONParam.SetValue('');
+   //JSONParam.SetValue('');
+   JSONParam.AsString                    := '';
    DWParams.Add(JSONParam);
    Try
     Try
@@ -1687,6 +1671,11 @@ Begin
         Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
       End;
     Except
+     On E : Exception Do
+      Begin
+       Error         := True;
+       MessageError  := E.Message;
+      End;
     End;
    Finally
     If Not Assigned(RESTClientPooler) Then

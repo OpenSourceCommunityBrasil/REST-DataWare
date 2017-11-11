@@ -1433,16 +1433,16 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
             Begin
-             vExecute := StringToBoolean(DWParams.ItemsString['Execute'].Value);
-             vError   := StringToBoolean(DWParams.ItemsString['Error'].Value);
+             vExecute := DWParams.ItemsString['Execute'].AsBoolean;
+             vError   := DWParams.ItemsString['Error'].AsBoolean;
              TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
              vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ExecuteCommand(DWParams.ItemsString['SQL'].Value,
                                                                                                       vError,
                                                                                                       vMessageError,
                                                                                                       vExecute);
              If vMessageError <> '' Then
-              DWParams.ItemsString['MessageError'].SetValue(vMessageError);
-             DWParams.ItemsString['Error'].SetValue(BooleanToString(vError));
+              DWParams.ItemsString['MessageError'].AsString := vMessageError;
+             DWParams.ItemsString['Error'].AsBoolean := vError;
              If DWParams.ItemsString['Result'] <> Nil Then
               Begin
                If vTempJSON <> Nil Then
@@ -1485,7 +1485,7 @@ Begin
         Begin
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
-           vError   := StringToBoolean(DWParams.ItemsString['Error'].Value);
+           vError   := DWParams.ItemsString['Error'].AsBoolean;
            TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
            If DWParams.ItemsString['Params'] <> Nil Then
             Begin
@@ -1503,8 +1503,8 @@ Begin
                                                                                                           vError,
                                                                                                           vMessageError);
            If vMessageError <> '' Then
-            DWParams.ItemsString['MessageError'].SetValue(vMessageError);
-           DWParams.ItemsString['Error'].SetValue(BooleanToString(vError));
+            DWParams.ItemsString['MessageError'].AsString := vMessageError;
+           DWParams.ItemsString['Error'].AsBoolean := vError;
            If DWParams.ItemsString['Result'] <> Nil Then
             Begin
              If vTempJSON <> -1 Then
@@ -1542,7 +1542,7 @@ Begin
         Begin
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
-           vError   := StringToBoolean(DWParams.ItemsString['Error'].Value);
+           vError   := DWParams.ItemsString['Error'].AsBoolean;
            TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
            If DWParams.ItemsString['Params'] <> Nil Then
             Begin
@@ -1557,8 +1557,8 @@ Begin
            If DWParamsD <> Nil Then
             DWParamsD.Free;
            If vMessageError <> '' Then
-            DWParams.ItemsString['MessageError'].SetValue(vMessageError);
-           DWParams.ItemsString['Error'].SetValue(BooleanToString(vError));
+            DWParams.ItemsString['MessageError'].AsString := vMessageError;
+           DWParams.ItemsString['Error'].AsBoolean        := vError;
            If DWParams.ItemsString['Result'] <> Nil Then
             Begin
              If vTempJSON <> Nil Then
@@ -1599,8 +1599,8 @@ Begin
         Begin
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
-           vExecute := StringToBoolean(DWParams.ItemsString['Execute'].Value);
-           vError   := StringToBoolean(DWParams.ItemsString['Error'].Value);
+           vExecute := DWParams.ItemsString['Execute'].AsBoolean;
+           vError   := DWParams.ItemsString['Error'].AsBoolean;
            TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
            If DWParams.ItemsString['Params'] <> Nil Then
             Begin
@@ -1620,8 +1620,8 @@ Begin
                                                                                                      vMessageError,
                                                                                                      vExecute);
            If vMessageError <> '' Then
-            DWParams.ItemsString['MessageError'].SetValue(vMessageError);
-           DWParams.ItemsString['Error'].SetValue(BooleanToString(vError));
+            DWParams.ItemsString['MessageError'].AsString := vMessageError;
+           DWParams.ItemsString['Error'].AsBoolean        := vError;
            If DWParams.ItemsString['Result'] <> Nil Then
             Begin
              If vTempJSON <> Nil Then
@@ -1675,7 +1675,7 @@ Begin
    vResult    := DWParams.ItemsString['Pooler'].Value;
    ExecuteCommandPureJSON(BaseObject, vResult, DWParams);
    Result     := True;
-   If Not(StringToBoolean(DWParams.ItemsString['Error'].Value)) Then
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
     JSONStr    := TReplyOK
    Else
     JSONStr    := TReplyNOK;
@@ -1685,7 +1685,7 @@ Begin
    vResult    := DWParams.ItemsString['Pooler'].Value;
    ExecuteCommandJSON(BaseObject, vResult, DWParams);
    Result     := True;
-   If Not(StringToBoolean(DWParams.ItemsString['Error'].Value)) Then
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
     JSONStr    := TReplyOK
    Else
     JSONStr    := TReplyNOK;
@@ -1695,7 +1695,7 @@ Begin
    vResult    := DWParams.ItemsString['Pooler'].Value;
    ApplyUpdatesJSON(BaseObject, vResult, DWParams);
    Result     := True;
-   If Not(StringToBoolean(DWParams.ItemsString['Error'].Value)) Then
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
     JSONStr    := TReplyOK
    Else
     JSONStr    := TReplyNOK;
@@ -1705,7 +1705,7 @@ Begin
    vResult    := DWParams.ItemsString['Pooler'].Value;
    InsertMySQLReturnID(BaseObject, vResult, DWParams);
    Result     := True;
-   If Not(StringToBoolean(DWParams.ItemsString['Error'].Value)) Then
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
     JSONStr    := TReplyOK
    Else
     JSONStr    := TReplyNOK;
@@ -1715,7 +1715,7 @@ Begin
    vResult    := DWParams.ItemsString['Pooler'].Value;
    InsertMySQLReturnID(BaseObject, vResult, DWParams);
    Result     := True;
-   If Not(StringToBoolean(DWParams.ItemsString['Error'].Value)) Then
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
     JSONStr    := TReplyOK
    Else
     JSONStr    := TReplyNOK;
