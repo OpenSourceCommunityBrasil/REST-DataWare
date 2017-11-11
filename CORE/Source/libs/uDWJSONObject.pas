@@ -1674,6 +1674,16 @@ Begin
         Begin
          vOldReadOnly := TRESTDWClientSQL(DestDS).Fields[I].ReadOnly;
          TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := False;
+         If (TRESTDWClientSQL(DestDS).Fields[I].FieldKind = fkLookup) Then
+          Begin
+           TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
+           Continue;
+          End;
+         If (I >= ListFields.Count) then
+          Begin
+           TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
+           Continue;
+          End;
          If (StrToInt(ListFields[I]) = -1) Or
             Not(TRESTDWClientSQL(DestDS).Fields[I].FieldKind = fkData) Or
             (StrToInt(ListFields[I]) = -1) Then
