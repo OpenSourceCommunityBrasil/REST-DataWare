@@ -29,9 +29,15 @@ package RestEasyObjectsCORE;
 requires
   rtl,
   soaprtl,
-  IndyCore60,
-  IndySystem60,
-  IndyProtocols60;
+  IndyCore70,
+  IndySystem70,
+  IndyProtocols70,
+  inet,
+  DesignIDE,
+  vcljpg,
+  Jcl,
+  JvCore,
+  JvDB;
 
 contains
   uRESTDWBase in '..\..\..\Source\uRESTDWBase.pas',
@@ -42,8 +48,10 @@ contains
   uDWConsts in '..\..\..\Source\libs\uDWConsts.pas',
   uDWJSONTools in '..\..\..\Source\libs\uDWJSONTools.pas',
   uDWJSONObject in '..\..\..\Source\libs\uDWJSONObject.pas',
-  uDWJSONParser in '..\..\..\Source\libs\JSON\uDWJSONParser.pas',
   uRESTDWPoolerDB in '..\..\..\Source\uRESTDWPoolerDB.pas',
-  uRESTDWMasterDetailData in '..\..\..\Source\uRESTDWMasterDetailData.pas';
+  uRESTDWMasterDetailData in '..\..\..\Source\uRESTDWMasterDetailData.pas',
+  uzliblaz in '..\..\..\Source\libs\uzliblaz.pas',
+  uDWDatamodule in '..\..\..\Source\DmDados\uDWDatamodule.pas' {ServerMethodDataModule: TDataModule},
+  uDWJSON in '..\..\..\Source\libs\JSON\uDWJSON.pas';
 
 end.
