@@ -226,6 +226,7 @@ Type
  TRESTDWClientSQL     = Class(TRESTDWClientSQLBase) //Classe com as funcionalidades de um DBQuery
  Private
   vRESTClientPooler    : TRESTClientPooler;
+  vMassiveCache        : TDWMassiveCache;
   vOldStatus           : TDatasetState;
   vDataSource          : TDataSource;
   vOnAfterScroll       : TOnAfterScroll;
@@ -368,6 +369,7 @@ Type
   Property AfterCancel            : TDatasetEvents      Read vAfterCancel              Write vAfterCancel;
   Property OnNewRecord            : TDatasetEvents      Read vNewRecord                Write vNewRecord;
   Property InBlockEvents          : Boolean             Read vInBlockEvents            Write vInBlockEvents;
+  Property MassiveCache           : TDWMassiveCache     Read vMassiveCache             Write vMassiveCache;
 End;
 
 Type

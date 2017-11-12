@@ -1160,6 +1160,7 @@ object fPrincipal: TfPrincipal
     AutoCommitData = False
     AutoRefreshAfterCommit = True
     InBlockEvents = False
+    MassiveCache = DWMassiveCache1
     Left = 192
     Top = 120
   end
@@ -1171,7 +1172,7 @@ object fPrincipal: TfPrincipal
   object dsSQLEmployee: TDataSource
     DataSet = rdwSQLEmployee
     Left = 264
-    Top = 192
+    Top = 216
   end
   object rdwSQLEmployee: TRESTDWClientSQL
     FieldDefs = <>
@@ -1197,7 +1198,12 @@ object fPrincipal: TfPrincipal
     AutoCommitData = False
     AutoRefreshAfterCommit = True
     InBlockEvents = False
+    MassiveCache = DWMassiveCache1
     Left = 192
-    Top = 192
+    Top = 216
+  end
+  object DWMassiveCache1: TDWMassiveCache
+    Left = 232
+    Top = 168
   end
 end

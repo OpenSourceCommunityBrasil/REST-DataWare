@@ -176,6 +176,36 @@ Type
   Property  TableName   : String         Read vTableName;
 End;
 
+Type
+ TDWMassiveCacheValue = String;
+
+Type
+ PMassiveCacheValue  = ^TDWMassiveCacheValue;
+ TDWMassiveCacheList = Class(TList)
+ Private
+  Function   GetRec(Index : Integer)       : TDWMassiveCacheValue;     Overload;
+  Procedure  PutRec(Index : Integer; Item  : TDWMassiveCacheValue);    Overload;
+  Procedure  ClearAll;
+ Protected
+ Public
+  Destructor Destroy;Override;
+  Procedure  Delete(Index : Integer);                                Overload;
+  Function   Add   (Item  : TDWMassiveCacheValue) : Integer;           Overload;
+  Property   Items[Index  : Integer]            : TDWMassiveCacheValue Read GetRec Write PutRec; Default;
+End;
+
+Type
+ TDWMassiveCache = Class(TComponent)
+ Private
+  MassiveCacheList : TDWMassiveCacheList;
+ Public
+  Function MassiveCount      : Integer;
+  Function ToJSON            : String;
+  Procedure   Clear;
+  Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
+  Destructor  Destroy;Override;                      //Destroy a Classe
+End;
+
 implementation
 
 Uses uRESTDWPoolerDB, uDWPoolerMethod;
@@ -771,6 +801,7 @@ End;
 
 Function TMassiveDatasetBuffer.AtualRec : TMassiveLine;
 Begin
+ Result := Nil;
  If RecordCount > 0 Then
   Result := vMassiveBuffer.Items[vRecNo -1];
 End;
@@ -957,6 +988,7 @@ End;
 
 Function TMassiveDatasetBuffer.RecordCount : Integer;
 Begin
+ Result := 0;
  If vMassiveBuffer <> Nil Then
   Result := vMassiveBuffer.Count;
 End;
@@ -1287,6 +1319,7 @@ Var
   vMassiveMode  : TMassiveMode;
   vNoChange     : Boolean;
  Begin
+  vMassiveMode := mmInactive;
   For I := 0 To MassiveLineBuff.vMassiveValues.Count - 1 Do
    Begin
     If I = 0 Then
@@ -1394,6 +1427,98 @@ Begin
                                        'ValueType',    GetValueType(ovObject),
                                        'TableName',    vTableName,
                                        'MassiveValue', vTagFields]);
+End;
+
+{ TDWMassiveCacheList }
+
+function TDWMassiveCacheList.Add(Item: TDWMassiveCacheValue): Integer;
+Var
+ vItem : ^TDWMassiveCacheValue;
+Begin
+ New(vItem);
+ vItem^ := Item;
+ Result := TList(Self).Add(vItem);
+End;
+
+procedure TDWMassiveCacheList.ClearAll;
+Var
+ I : Integer;
+Begin
+ For I := TList(Self).Count -1 DownTo 0 Do
+  Self.Delete(I);
+End;
+
+procedure TDWMassiveCacheList.Delete(Index: Integer);
+begin
+ If (Index < Self.Count) And (Index > -1) Then
+  Begin
+   If Assigned(TList(Self).Items[Index]) Then
+    Begin
+     If TDWMassiveCacheValue(TList(Self).Items[Index]^) <> '' Then
+      TDWMassiveCacheValue(TList(Self).Items[Index]^) := '';
+     {$IFDEF FPC}
+      Dispose(PMassiveCacheValue(TList(Self).Items[Index]));
+     {$ELSE}
+      Dispose(TList(Self).Items[Index]);
+     {$ENDIF}
+    End;
+   TList(Self).Delete(Index);
+  End;
+end;
+
+destructor TDWMassiveCacheList.Destroy;
+begin
+ ClearAll;
+ Inherited;
+end;
+
+function TDWMassiveCacheList.GetRec(Index: Integer): TDWMassiveCacheValue;
+begin
+ Result := '';
+ If (Index < Self.Count) And (Index > -1) Then
+  Result := TDWMassiveCacheValue(TList(Self).Items[Index]^);
+end;
+
+procedure TDWMassiveCacheList.PutRec(Index: Integer; Item: TDWMassiveCacheValue);
+begin
+ If (Index < Self.Count) And (Index > -1) Then
+  TDWMassiveCacheValue(TList(Self).Items[Index]^) := Item;
+end;
+
+{ TDWMassiveCache }
+
+Constructor TDWMassiveCache.Create(AOwner: TComponent);
+Begin
+  inherited;
+ MassiveCacheList := TDWMassiveCacheList.Create;
+End;
+
+Function TDWMassiveCache.MassiveCount : Integer;
+Begin
+ Result := MassiveCacheList.Count -1;
+End;
+
+Procedure TDWMassiveCache.Clear;
+Begin
+ MassiveCacheList.Clear;
+End;
+
+Function TDWMassiveCache.ToJSON : String;
+Var
+ I : Integer;
+ vMassiveLine : String;
+Begin
+ Result := '';
+ For I := 0 To MassiveCacheList.Count -1 Do
+  Begin
+
+  End;
+End;
+
+Destructor TDWMassiveCache.Destroy;
+Begin
+ FreeAndNil(MassiveCacheList);
+  inherited;
 End;
 
 End.
