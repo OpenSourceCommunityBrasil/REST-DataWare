@@ -1,1 +1,1 @@
-c:\lazarus\tools\lazres.exe resteasyobjectscore.lrs TRESTClientPooler.png TRESTServicePooler.png TRESTDWClientSQL.png TRESTDWDataBase.png TRESTDWPoolerList.png TRESTDWStoredProc.png TRESTDWPoolerDB.png
+c:\lazarus\tools\lazres.exe resteasyobjectscore.lrs TRESTClientPooler.png TRESTServicePooler.png TRESTDWClientSQL.png TRESTDWDataBase.png TRESTDWPoolerList.png TRESTDWStoredProc.png TRESTDWPoolerDB.png TDWMassiveCache.png
