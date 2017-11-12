@@ -195,6 +195,7 @@ Public
  Property    AsFMTBCD              : Currency         Read GetAsFMTBCD      Write SetAsFMTBCD;
  Property    AsBoolean             : Boolean          Read GetAsBoolean     Write SetAsBoolean;
  Property    AsCurrency            : Currency         Read GetAsCurrency    Write SetAsCurrency;
+ Property    AsExtended            : Currency         Read GetAsCurrency    Write SetAsCurrency;
  Property    AsDate                : TDateTime        Read GetAsDateTime    Write SetAsDate;
  Property    AsTime                : TDateTime        Read GetAsDateTime    Write SetAsTime;
  Property    AsDateTime            : TDateTime        Read GetAsDateTime    Write SetAsDateTime;

@@ -199,8 +199,8 @@ Type
  Private
   MassiveCacheList : TDWMassiveCacheList;
  Public
-  Function MassiveCount      : Integer;
-  Function ToJSON            : String;
+  Function    MassiveCount   : Integer;
+  Function    ToJSON         : String;
   Procedure   Clear;
   Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                      //Destroy a Classe
