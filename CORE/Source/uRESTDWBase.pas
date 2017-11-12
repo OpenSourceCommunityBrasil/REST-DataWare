@@ -191,6 +191,9 @@ Type
   Procedure OpenDatasets       (ServerMethodsClass    : TComponent;
                                 Var Pooler            : String;
                                 Var DWParams          : TDWParams);
+  Procedure ApplyUpdates_MassiveCache(ServerMethodsClass : TComponent;
+                                      Var Pooler         : String;
+                                      Var DWParams       : TDWParams);
  Public
   Constructor Create           (AOwner                : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                      //Destroy a Classe
@@ -1523,6 +1526,43 @@ Begin
   End;
 End;
 
+Procedure TRESTServicePooler.ApplyUpdates_MassiveCache(ServerMethodsClass : TComponent;
+                                                       Var Pooler         : String;
+                                                       Var DWParams       : TDWParams);
+Var
+ I             : Integer;
+ vTempJSON     : TJSONValue;
+ vError        : Boolean;
+ vSQL,
+ vMessageError : String;
+ DWParamsD     : TDWParams;
+Begin
+ DWParamsD := Nil;
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
+      Begin
+       If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
+        Begin
+         If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
+          Begin
+           vError   := DWParams.ItemsString['Error'].AsBoolean;
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdates_MassiveCache(DWParams.ItemsString['MassiveCache'].Value,
+                                                                                                  vError,  vMessageError);
+           If vMessageError <> '' Then
+            DWParams.ItemsString['MessageError'].AsString := vMessageError;
+           DWParams.ItemsString['Error'].AsBoolean        := vError;
+          End;
+         Break;
+        End;
+      End;
+    End;
+  End;
+End;
+
 Procedure TRESTServicePooler.ApplyUpdatesJSON(ServerMethodsClass : TComponent;
                                               Var Pooler         : String;
                                               Var DWParams       : TDWParams);
@@ -1743,6 +1783,16 @@ Begin
   Begin
    vResult    := DWParams.ItemsString['Pooler'].Value;
    ApplyUpdatesJSON(BaseObject, vResult, DWParams);
+   Result     := True;
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+    JSONStr    := TReplyOK
+   Else
+    JSONStr    := TReplyNOK;
+  End
+ Else If vUrlMethod = UpperCase('ApplyUpdates_MassiveCache') Then
+  Begin
+   vResult    := DWParams.ItemsString['Pooler'].Value;
+   ApplyUpdates_MassiveCache(BaseObject, vResult, DWParams);
    Result     := True;
    If Not(DWParams.ItemsString['Error'].AsBoolean) Then
     JSONStr    := TReplyOK
@@ -2603,8 +2653,8 @@ Var
    End;
  End;
 Begin
-
-ss            := Nil;
+ ss            := Nil;
+ SendParams    := Nil;
  vResultParams := TMemoryStream.Create;
  If vTypeRequest = trHttp Then
   vTpRequest := 'http'
@@ -2647,9 +2697,6 @@ ss            := Nil;
         Begin
          SendParams := TIdMultiPartFormDataStream.Create;
          SetParamsValues(Params, SendParams);
-        End;
-       If Params <> Nil Then
-        Begin
          HttpRequest.Request.ContentType     := 'application/x-www-form-urlencoded';
          HttpRequest.Request.ContentEncoding := 'multipart/form-data';
          StringStream          := TStringStream.Create('');
@@ -2687,6 +2734,8 @@ ss            := Nil;
       End
      Else If EventType = sePUT Then
       Begin
+       If SendParams = Nil Then
+        SendParams := TIdMultiPartFormDataStream.Create;
        HttpRequest.Request.ContentType := 'application/x-www-form-urlencoded';
        StringStream  := TStringStream.Create('');
        HttpRequest.Post(vURL, SendParams, StringStream);

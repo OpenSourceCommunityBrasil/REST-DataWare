@@ -71,6 +71,7 @@ Var
  vError        : Boolean;
  vMessageError : String;
 begin
+ DWMassiveCache1.Clear;
  RESTDWDataBase1.Close;
  RESTDWDataBase1.PoolerService := EHost.Text;
  RESTDWDataBase1.PoolerPort    := StrToInt(EPort.Text);

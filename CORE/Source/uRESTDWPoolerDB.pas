@@ -178,7 +178,7 @@ Type
   Destructor  Destroy;Override;                      //Destroy a Classe
   Procedure   Close;
   Procedure   Open;
-  Procedure   ApplyUpdates(MassiveCache       : TDWMassiveCache;
+  Procedure   ApplyUpdates(Var MassiveCache   : TDWMassiveCache;
                            Var   Error        : Boolean;
                            Var   MessageError : String);Overload;
   Procedure   OpenDatasets(Var   Datasets     : TRESTDWDatasetArray;
@@ -447,6 +447,9 @@ Type
                                  Params            : TDWParams;
                                  Var Error         : Boolean;
                                  Var MessageError  : String) : TJSONValue;Virtual; Abstract;
+  Procedure ApplyUpdates_MassiveCache(MassiveCache : String;
+                                      Var Error    : Boolean;
+                                      Var MessageError  : String);Virtual; Abstract;
   Function ExecuteCommand       (SQL        : String;
                                  Var Error  : Boolean;
                                  Var MessageError : String;
@@ -1493,9 +1496,9 @@ Begin
  Inherited;
 End;
 
-Procedure TRESTDWDataBase.ApplyUpdates(MassiveCache       : TDWMassiveCache;
-                                       Var   Error        : Boolean;
-                                       Var   MessageError : String);
+Procedure TRESTDWDataBase.ApplyUpdates(Var MassiveCache : TDWMassiveCache;
+                                       Var Error        : Boolean;
+                                       Var MessageError : String);
 Var
  vUpdateLine       : String;
  vRESTConnectionDB : TDWPoolerMethodClient;
@@ -1528,6 +1531,8 @@ Begin
   vRESTConnectionDB.ApplyUpdates_MassiveCache(vUpdateLine, vRestPooler,  vRestModule,
                                               Error,       MessageError, vTimeOut,
                                               vLogin,      vPassword);
+  If Not Error Then
+   MassiveCache.Clear;
  Finally
   FreeAndNil(vRESTConnectionDB);
  End;

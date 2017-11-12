@@ -1143,18 +1143,10 @@ object fPrincipal: TfPrincipal
     MasterCascadeDelete = False
     Inactive = False
     DataCache = True
-    Params = <
-      item
-        DataType = ftString
-        Name = 'ID'
-        ParamType = ptInput
-        Size = 10
-        Value = '111122333'
-      end>
+    Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
-      'select * from STRINGTABLE'
-      'where ID = :ID')
+      'select * from STRINGTABLE')
     UpdateTableName = 'STRINGTABLE'
     CacheUpdateRecords = True
     AutoCommitData = False

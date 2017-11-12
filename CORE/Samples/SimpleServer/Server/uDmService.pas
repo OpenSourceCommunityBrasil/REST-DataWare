@@ -47,6 +47,7 @@ TYPE
     FDStanStorageJSONLink1: TFDStanStorageJSONLink;
     FDGUIxWaitCursor1: TFDGUIxWaitCursor;
     FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink;
+    FDTransaction1: TFDTransaction;
     PROCEDURE ServerMethodDataModuleReplyEvent(SendType: TSendEvent; Context: STRING; VAR Params: TDWParams; VAR Result: STRING);
     PROCEDURE ServerMethodDataModuleCreate(Sender: TObject);
     PROCEDURE Server_FDConnectionBeforeConnect(Sender: TObject);

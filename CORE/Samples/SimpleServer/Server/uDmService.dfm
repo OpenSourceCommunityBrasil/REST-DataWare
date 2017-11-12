@@ -14,6 +14,7 @@ object ServerMethodDM: TServerMethodDM
     StrsTrim2Len = True
     Active = True
     PoolerOffMessage = 'RESTPooler not active.'
+    ParamCreate = True
     Left = 96
     Top = 120
   end
@@ -39,6 +40,7 @@ object ServerMethodDM: TServerMethodDM
     UpdateOptions.AssignedValues = [uvCountUpdatedRecords]
     ConnectedStoredUsage = []
     LoginPrompt = False
+    Transaction = FDTransaction1
     OnError = Server_FDConnectionError
     BeforeConnect = Server_FDConnectionBeforeConnect
     Left = 94
@@ -60,5 +62,12 @@ object ServerMethodDM: TServerMethodDM
   object FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink
     Left = 280
     Top = 144
+  end
+  object FDTransaction1: TFDTransaction
+    Options.AutoStop = False
+    Options.DisconnectAction = xdRollback
+    Connection = Server_FDConnection
+    Left = 168
+    Top = 72
   end
 end

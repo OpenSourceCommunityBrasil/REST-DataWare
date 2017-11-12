@@ -358,10 +358,12 @@ Begin
     End
    Else
     Begin
+     Error         := True;
      If (lResponse = '') Then
-      Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+      MessageError  := Format('Unresolved Host : ''%s''', [Host])
      Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
-      Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+      MessageError  := Format('Unauthorized Username : ''%s''', [UserName]);
+     Raise Exception.Create(MessageError);
     End;
   Except
    On E : Exception Do
@@ -535,10 +537,12 @@ Begin
     End
    Else
     Begin
+     Error         := True;
      If (lResponse = '') Then
-      Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+      MessageError  := Format('Unresolved Host : ''%s''', [Host])
      Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
-      Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+      MessageError  := Format('Unauthorized Username : ''%s''', [UserName]);
+     Raise Exception.Create(MessageError);
     End;
   Except
    On E : Exception Do
@@ -653,9 +657,11 @@ Begin
    Else
     Begin
      If (lResponse = '') Then
-      Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+      lResponse  := Format('Unresolved Host : ''%s''', [Host])
      Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
-      Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+      lResponse  := Format('Unauthorized Username : ''%s''', [UserName]);
+     Raise Exception.Create(lResponse);
+     lResponse := '';
     End;
   Except
    On E : Exception Do
@@ -746,9 +752,11 @@ Begin
    Else
     Begin
      If (lResponse = '') Then
-      Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+      lResponse  := Format('Unresolved Host : ''%s''', [Host])
      Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
-      Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+      lResponse  := Format('Unauthorized Username : ''%s''', [UserName]);
+     Raise Exception.Create(lResponse);
+     lResponse   := '';
     End;
   Except
    On E : Exception Do
@@ -919,10 +927,12 @@ Begin
     End
    Else
     Begin
+     Error         := True;
      If (lResponse = '') Then
-      Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+      MessageError  := Format('Unresolved Host : ''%s''', [Host])
      Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
-      Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+      MessageError  := Format('Unauthorized Username : ''%s''', [UserName]);
+     Raise Exception.Create(MessageError);
     End;
   Except
    On E : Exception Do
@@ -1113,10 +1123,12 @@ Begin
     End
    Else
     Begin
+     Error         := True;
      If (lResponse = '') Then
-      Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+      MessageError  := Format('Unresolved Host : ''%s''', [Host])
      Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
-      Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+      MessageError  := Format('Unauthorized Username : ''%s''', [UserName]);
+     Raise Exception.Create(MessageError);
     End;
   Except
    On E : Exception Do
@@ -1293,10 +1305,12 @@ Begin
     End
    Else
     Begin
+     Error         := True;
      If (lResponse = '') Then
-      Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+      MessageError  := Format('Unresolved Host : ''%s''', [Host])
      Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
-      Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+      MessageError  := Format('Unauthorized Username : ''%s''', [UserName]);
+     Raise Exception.Create(MessageError);
     End;
   Except
    On E : Exception Do
@@ -1500,10 +1514,12 @@ Begin
     End
    Else
     Begin
+     Error         := True;
      If (lResponse = '') Then
-      Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+      MessageError  := Format('Unresolved Host : ''%s''', [Host])
      Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
-      Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+      MessageError  := Format('Unauthorized Username : ''%s''', [UserName]);
+     Raise Exception.Create(MessageError);
     End;
   Except
    On E : Exception Do
@@ -1648,10 +1664,12 @@ Begin
     End
    Else
     Begin
+     Error         := True;
      If (lResponse = '') Then
-      Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+      MessageError  := Format('Unresolved Host : ''%s''', [Host])
      Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
-      Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+      MessageError  := Format('Unauthorized Username : ''%s''', [UserName]);
+     Raise Exception.Create(MessageError);
     End;
   Except
    On E : Exception Do
@@ -1814,10 +1832,12 @@ Begin
       End
      Else
       Begin
+       Error         := True;
        If (Result = '') Then
-        Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+        MessageError  := Format('Unresolved Host : ''%s''', [Host])
        Else If (Uppercase(Result) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
-        Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+        MessageError  := Format('Unauthorized Username : ''%s''', [UserName]);
+       Raise Exception.Create(MessageError);
       End;
     Except
      On E : Exception Do

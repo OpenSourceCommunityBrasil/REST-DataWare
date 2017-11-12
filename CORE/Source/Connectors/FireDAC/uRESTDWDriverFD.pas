@@ -24,6 +24,9 @@ Type
                                  Params           : TDWParams;
                                  Var Error        : Boolean;
                                  Var MessageError : String)          : TJSONValue;Override;
+  Procedure ApplyUpdates_MassiveCache(MassiveCache : String;
+                                      Var Error    : Boolean;
+                                      Var MessageError  : String);Override;
   Function ExecuteCommand       (SQL              : String;
                                  Var Error        : Boolean;
                                  Var MessageError : String;
@@ -67,6 +70,428 @@ Uses uDWJSONTools;
 Procedure Register;
 Begin
  RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWDriverFD]);
+End;
+
+Procedure TRESTDWDriverFD.ApplyUpdates_MassiveCache(MassiveCache     : String;
+                                                    Var Error        : Boolean;
+                                                    Var MessageError : String);
+Var
+ vTempQuery     : TFDQuery;
+ A, I           : Integer;
+ vParamName     : String;
+ vStringStream  : TMemoryStream;
+ bPrimaryKeys   : TStringList;
+ vFieldType     : TFieldType;
+ Function GetParamIndex(Params : TFDParams; ParamName : String) : Integer;
+ Var
+  I : Integer;
+ Begin
+  Result := -1;
+  For I := 0 To Params.Count -1 Do
+   Begin
+    If UpperCase(Params[I].Name) = UpperCase(ParamName) Then
+     Begin
+      Result := I;
+      Break;
+     End;
+   End;
+ End;
+ Function LoadMassive(Massive : String; Var Query : TFDQuery) : Boolean;
+ Var
+  MassiveDataset : TMassiveDatasetBuffer;
+  A, B, X        : Integer;
+  bJsonArray     : udwjson.TJsonArray;
+  Procedure PrepareData(Var Query      : TFDQuery;
+                        MassiveDataset : TMassiveDatasetBuffer;
+                        Var vError     : Boolean;
+                        Var ErrorMSG   : String);
+  Var
+   vLineSQL,
+   vFields,
+   vParamsSQL : String;
+   I          : Integer;
+   Procedure SetUpdateBuffer;
+   Var
+    X : Integer;
+   Begin
+    If I = 0 Then
+     Begin
+      bPrimaryKeys := MassiveDataset.PrimaryKeys;
+      Try
+       For X := 0 To bPrimaryKeys.Count -1 Do
+        Begin
+         If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                                                                       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                                                       ftString,    ftWideString, ftWideMemo]    Then
+          Begin
+           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Size > 0 Then
+            Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Value := Copy(MassiveDataset.AtualRec.PrimaryValues[X].Value, 1, Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Size)
+           Else
+            Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Value := MassiveDataset.AtualRec.PrimaryValues[X].Value;
+          End
+         Else
+          Begin
+           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftUnknown] Then
+            Begin
+             If Not (ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(bPrimaryKeys[X]).FieldType) in [ftUnknown]) Then
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(bPrimaryKeys[X]).FieldType)
+             Else
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType := ftString;
+            End;
+           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+            Begin
+             If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
+              Begin
+                // Alterado por: Alexandre Magno - 04/11/2017
+                If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftLargeint Then
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsLargeInt := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+                else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+                Else
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+
+                // Como estava Anteriormente
+                //If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
+                //  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+                //Else
+                //  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+              End;
+            End
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD] Then
+            Begin
+             If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsFloat  := StrToFloat(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+            End
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+            Begin
+             If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := StrToFloat(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+             Else
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := Null;
+            End  //Tratar Blobs de Parametros...
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+            Begin
+             vStringStream := TMemoryStream.Create;
+             Try
+              MassiveDataset.AtualRec.PrimaryValues[X].SaveToStream(vStringStream);
+              vStringStream.Position := 0;
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).LoadFromStream(vStringStream, ftBlob);
+             Finally
+              FreeAndNil(vStringStream);
+             End;
+            End
+           Else
+            Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Value := MassiveDataset.AtualRec.PrimaryValues[X].Value;
+          End;
+        End;
+       Finally
+        FreeAndNil(bPrimaryKeys);
+       End;
+      End;
+    If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                          ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                          ftString,    ftWideString, ftWideMemo]    Then
+     Begin
+      If Query.Params[I].Size > 0 Then
+       Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
+      Else
+       Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value;
+     End
+    Else
+     Begin
+      If Query.Params[I].DataType in [ftUnknown] Then
+       Begin
+        If Not (ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).FieldType) in [ftUnknown]) Then
+         Query.Params[I].DataType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).FieldType)
+        Else
+         Query.Params[I].DataType := ftString;
+       End;
+      If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+       Begin
+        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+         Begin
+           // Alterado por: Alexandre Magno - 04/11/2017
+           If Query.Params[I].DataType = ftLargeint Then
+             Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+           else If Query.Params[I].DataType = ftSmallInt Then
+             Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+           Else
+             Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+
+           // Como estava Anteriormente
+           //If Query.Params[I].DataType = ftSmallInt Then
+           //  Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+           //Else
+           //  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+         End;
+       End
+      Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
+       Begin
+        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+         Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+       End
+      Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+       Begin
+        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+         Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+        Else
+         Query.Params[I].Clear;
+       End  //Tratar Blobs de Parametros...
+      Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+       Begin
+        vStringStream := TMemoryStream.Create;
+        Try
+         MassiveDataset.Fields.FieldByName(Query.Params[I].Name).SaveToStream(vStringStream);
+         vStringStream.Position := 0;
+         Query.Params[I].LoadFromStream(vStringStream, ftBlob);
+        Finally
+         FreeAndNil(vStringStream);
+        End;
+       End
+      Else
+       Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value;
+     End;
+   End;
+  Begin
+   Query.Close;
+   Query.SQL.Clear;
+   vFields    := '';
+   vParamsSQL := vFields;
+   Case MassiveDataset.MassiveMode Of
+    mmInsert : Begin
+                vLineSQL := Format('INSERT INTO %s ', [MassiveDataset.TableName + ' (%s) VALUES (%s)']);
+                For I := 0 To MassiveDataset.Fields.Count -1 Do
+                 Begin
+                  If (MassiveDataset.Fields.Items[I].AutoGenerateValue) And
+                     (MassiveDataset.AtualRec.MassiveMode = mmInsert) Then
+                   Continue;
+                  If vFields = '' Then
+                   Begin
+                    vFields     := MassiveDataset.Fields.Items[I].FieldName;
+                    vParamsSQL  := ':' + MassiveDataset.Fields.Items[I].FieldName;
+                   End
+                  Else
+                   Begin
+                    vFields     := vFields    + ', '  + MassiveDataset.Fields.Items[I].FieldName;
+                    vParamsSQL  := vParamsSQL + ', :' + MassiveDataset.Fields.Items[I].FieldName;
+                   End;
+                 End;
+                vLineSQL := Format(vLineSQL, [vFields, vParamsSQL]);
+               End;
+    mmUpdate : Begin
+                vLineSQL := Format('UPDATE %s ',      [MassiveDataset.TableName + ' SET %s %s']);
+                For I := 0 To MassiveDataset.AtualRec.UpdateFieldChanges.Count -1 Do
+                 Begin
+                  If I = 0 Then
+                   vFields  := MassiveDataset.AtualRec.UpdateFieldChanges[I] + ' = :' + MassiveDataset.AtualRec.UpdateFieldChanges[I]
+                  Else
+                   vFields  := vFields + ', ' + MassiveDataset.AtualRec.UpdateFieldChanges[I] + ' = :' + MassiveDataset.AtualRec.UpdateFieldChanges[I];
+                 End;
+                bPrimaryKeys := MassiveDataset.PrimaryKeys;
+                Try
+                 For I := 0 To bPrimaryKeys.Count -1 Do
+                  Begin
+                   If I = 0 Then
+                    vParamsSQL := 'WHERE ' + bPrimaryKeys[I] + ' = :DWKEY_' + bPrimaryKeys[I]
+                   Else
+                    vParamsSQL := vParamsSQL + ' AND ' + bPrimaryKeys[I] + ' = :DWKEY_' + bPrimaryKeys[I]
+                  End;
+                Finally
+                 FreeAndNil(bPrimaryKeys);
+                End;
+                vLineSQL := Format(vLineSQL, [vFields, vParamsSQL]);
+               End;
+    mmDelete : Begin
+                vLineSQL := Format('DELETE FROM %s ', [MassiveDataset.TableName + ' %s ']);
+                bPrimaryKeys := MassiveDataset.PrimaryKeys;
+                Try
+                 For I := 0 To bPrimaryKeys.Count -1 Do
+                  Begin
+                   If I = 0 Then
+                    vParamsSQL := 'WHERE ' + bPrimaryKeys[I] + ' = :' + bPrimaryKeys[I]
+                   Else
+                    vParamsSQL := vParamsSQL + ' AND ' + bPrimaryKeys[I] + ' = :' + bPrimaryKeys[I]
+                  End;
+                Finally
+                 FreeAndNil(bPrimaryKeys);
+                End;
+                vLineSQL := Format(vLineSQL, [vParamsSQL]);
+               End;
+   End;
+   Query.SQL.Add(vLineSQL);
+   //Params
+   For I := 0 To Query.ParamCount -1 Do
+    Begin
+     If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name) <> Nil) Then
+      Begin
+       vFieldType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).FieldType);
+       If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value = 'null' Then
+        Begin
+         If vFieldType = ftUnknown Then
+          Query.Params[I].DataType := ftString
+         Else
+          Query.Params[I].DataType := vFieldType;
+         Continue;
+        End;
+       If MassiveDataset.MassiveMode <> mmUpdate Then
+        Begin
+         If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                               ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                               ftString,    ftWideString, ftWideMemo]    Then
+          Begin
+           If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+            Begin
+             If Query.Params[I].Size > 0 Then
+              Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
+             Else
+              Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value;
+            End
+           Else
+            Query.Params[I].Clear;
+          End
+         Else
+          Begin
+           If Query.Params[I].DataType in [ftUnknown] Then
+            Begin
+             If Not (ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).FieldType) in [ftUnknown]) Then
+              Query.Params[I].DataType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).FieldType)
+             Else
+              Query.Params[I].DataType := ftString;
+            End;
+           If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+            Begin
+             If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+              Begin
+               If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+                Begin
+                 If Query.Params[I].DataType = ftLargeint Then
+                  Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+                 Else If Query.Params[I].DataType = ftSmallInt Then
+                  Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+                 Else
+                  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+                End;
+              End
+             Else
+              Query.Params[I].Clear;
+            End
+           Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
+            Begin
+             If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+              Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+             Else
+              Query.Params[I].Clear;
+            End
+           Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+            Begin
+             If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+              Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+             Else
+              Query.Params[I].Clear;
+            End  //Tratar Blobs de Parametros...
+           Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+            Begin
+             vStringStream := TMemoryStream.Create;
+             Try
+              MassiveDataset.Fields.FieldByName(Query.Params[I].Name).SaveToStream(vStringStream);
+              vStringStream.Position := 0;
+              If vStringStream.Size > 0 Then
+               Query.Params[I].LoadFromStream(vStringStream, ftBlob)
+              Else
+               Query.Params[I].Clear;
+             Finally
+              FreeAndNil(vStringStream);
+             End;
+            End
+           Else If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+            Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value
+           Else
+            Query.Params[I].Clear;
+          End;
+        End
+       Else //Update
+        Begin
+         SetUpdateBuffer;
+        End;
+      End
+     Else
+      Begin
+       If I = 0 Then
+        SetUpdateBuffer;
+      End;
+    End;
+  End;
+ Begin
+  MassiveDataset := TMassiveDatasetBuffer.Create(Nil);
+  bJsonArray     := udwjson.TJsonArray.Create(MassiveCache);
+  Result         := False;
+  For x := 0 To bJsonArray.length -1 Do
+   Begin
+    If Not vFDConnection.InTransaction Then
+     vFDConnection.StartTransaction;
+    Try
+     MassiveDataset.FromJSON(bJsonArray.get(X).toString);
+     MassiveDataset.First;
+     For A := 1 To MassiveDataset.RecordCount Do
+      Begin
+       Query.SQL.Clear;
+       PrepareData(Query, MassiveDataset, Error, MessageError);
+       Try
+        Query.ExecSQL;
+       Except
+        On E : Exception do
+         Begin
+          Error  := True;
+          Result := False;
+          If vFDConnection.InTransaction Then
+           vFDConnection.Rollback;
+          MessageError := E.Message;
+          Break;
+         End;
+       End;
+       MassiveDataset.Next;
+      End;
+    Finally
+     Query.SQL.Clear;
+    End;
+   End;
+  If Not Error Then
+   Begin
+    Try
+     Result        := True;
+     If vFDConnection.InTransaction Then
+      vFDConnection.Commit;
+    Except
+     On E : Exception do
+      Begin
+       Error  := True;
+       Result := False;
+       If vFDConnection.InTransaction Then
+        vFDConnection.Rollback;
+       MessageError := E.Message;
+      End;
+    End;
+   End;
+  FreeAndNil(MassiveDataset);
+  FreeAndNil(bJsonArray);
+ End;
+Begin
+ Inherited;
+ Try
+  Error      := False;
+  vTempQuery := TFDQuery.Create(Owner);
+  If Not vFDConnection.Connected Then
+   vFDConnection.Connected := True;
+  vTempQuery.Connection   := vFDConnection;
+  vTempQuery.FormatOptions.StrsTrim       := StrsTrim;
+  vTempQuery.FormatOptions.StrsEmpty2Null := StrsEmpty2Null;
+  vTempQuery.FormatOptions.StrsTrim2Len   := StrsTrim2Len;
+  vTempQuery.SQL.Clear;
+  LoadMassive(MassiveCache, vTempQuery);
+ Finally
+  vTempQuery.Close;
+  vTempQuery.Free;
+ End;
 End;
 
 Procedure TRESTDWDriverFD.Close;
@@ -674,24 +1099,28 @@ Var
       Begin
        vFieldType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).FieldType);
        If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value = 'null' Then
-       begin
-         if vFieldType = ftUnknown then
-           Query.Params[I].DataType := ftString
-         else
-           Query.Params[I].DataType := vFieldType;
-
+        Begin
+         If vFieldType = ftUnknown Then
+          Query.Params[I].DataType := ftString
+         Else
+          Query.Params[I].DataType := vFieldType;
          Continue;
-       end;
+        End;
        If MassiveDataset.MassiveMode <> mmUpdate Then
         Begin
          If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                ftString,    ftWideString, ftWideMemo]    Then
           Begin
-           If Query.Params[I].Size > 0 Then
-            Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
+           If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+            Begin
+             If Query.Params[I].Size > 0 Then
+              Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
+             Else
+              Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value;
+            End
            Else
-            Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value;
+            Query.Params[I].Clear;
           End
          Else
           Begin
@@ -706,32 +1135,30 @@ Var
             Begin
              If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
               Begin
-                // Alterado por: Alexandre Magno - 04/11/2017
-                If Query.Params[I].DataType = ftLargeint Then
+               If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+                Begin
+                 If Query.Params[I].DataType = ftLargeint Then
                   Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-                else If Query.Params[I].DataType = ftSmallInt Then
+                 Else If Query.Params[I].DataType = ftSmallInt Then
                   Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-                Else
+                 Else
                   Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
-
-                // Como estava Anteriormente
-                //If Query.Params[I].DataType = ftSmallInt Then
-                //  Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-                //Else
-                //  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+                End;
               End;
             End
            Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
             Begin
-             If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
-              Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+             If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+              Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+             Else
+              Query.Params[I].Clear;
             End
            Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
             Begin
-             If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+             If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
               Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
              Else
-              Query.Params[I].AsDateTime  := Null;
+              Query.Params[I].Clear;
             End  //Tratar Blobs de Parametros...
            Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
             Begin
@@ -739,13 +1166,18 @@ Var
              Try
               MassiveDataset.Fields.FieldByName(Query.Params[I].Name).SaveToStream(vStringStream);
               vStringStream.Position := 0;
-              Query.Params[I].LoadFromStream(vStringStream, ftBlob);
+              If vStringStream.Size > 0 Then
+               Query.Params[I].LoadFromStream(vStringStream, ftBlob)
+              Else
+               Query.Params[I].Clear;
              Finally
               FreeAndNil(vStringStream);
              End;
             End
+           Else If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+            Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value
            Else
-            Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value;
+            Query.Params[I].Clear;
           End;
         End
        Else //Update
@@ -1176,7 +1608,8 @@ Begin
  Inherited;
  Result := Nil;
  Error  := False;
- vTempQuery               := TFDQuery.Create(Owner);
+ bJsonArray := Nil;
+ vTempQuery               := TFDQuery.Create(Nil);
  Try
   If Not vFDConnection.Connected Then
    vFDConnection.Connected := True;
@@ -1241,6 +1674,8 @@ Begin
  End;
  vTempQuery.Close;
  vTempQuery.Free;
+ If bJsonArray <> Nil Then
+  FreeAndNil(bJsonArray);
 End;
 
 Function TRESTDWDriverFD.InsertMySQLReturnID(SQL              : String;
