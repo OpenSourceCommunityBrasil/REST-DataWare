@@ -200,9 +200,9 @@ Public
  Property    AsDateTime            : TDateTime        Read GetAsDateTime    Write SetAsDateTime;
  Property    AsSingle              : Single           Read GetAsSingle      Write SetAsSingle;
  Property    AsFloat               : Double           Read GetAsFloat       Write SetAsFloat;
- Property    AsInteger             : LongInt          Read GetAsInteger     Write SetAsInteger;
- Property    AsSmallInt            : LongInt          Read GetAsInteger     Write SetAsSmallInt;
- Property    AsShortInt            : LongInt          Read GetAsInteger     Write SetAsShortInt;
+ Property    AsInteger             : integer          Read GetAsInteger     Write SetAsInteger;
+ Property    AsSmallInt            : integer          Read GetAsInteger     Write SetAsSmallInt;
+ Property    AsShortInt            : integer          Read GetAsInteger     Write SetAsShortInt;
  Property    AsWord                : Word             Read GetAsWord        Write SetAsWord;
  Property    AsLongWord            : LongWord         Read GetAsLongWord    Write SetAsLongWord;
  Property    AsLargeInt            : LargeInt         Read GetAsLargeInt    Write SetAsLargeInt;
@@ -982,7 +982,8 @@ End;
 Procedure TJSONValue.WriteToDataset(DatasetType : TDatasetType;
                                     JSONValue   : String;
                                     DestDS      : TDataset;
-                                    DCSeparator : String = ','{$IFDEF FPC};
+                                    DCSeparator : String = ',';
+                                    ClearDataset : Boolean = False{$IFDEF FPC};
                                     CharSet     : TDatabaseCharSet = csUndefined{$ENDIF});
 Var
  bJsonOBJ,
@@ -1370,6 +1371,7 @@ Begin
   DestDS.EnableControls;
  End;
 End;
+
 {$ELSE}
 
 Procedure TJSONValue.WriteToDataset(DatasetType : TDatasetType;

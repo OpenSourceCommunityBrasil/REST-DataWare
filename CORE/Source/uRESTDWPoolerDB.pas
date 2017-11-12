@@ -783,6 +783,7 @@ Constructor TRESTDWPoolerDB.Create(AOwner : TComponent);
 Begin
  Inherited;
  FLock             := TCriticalSection.Create;
+ FLock.Acquire;
  vCompression      := True;
  vStrsTrim         := False;
  vStrsEmpty2Null   := False;
@@ -797,7 +798,9 @@ Destructor  TRESTDWPoolerDB.Destroy;
 Begin
  If Assigned(FLock) Then
   Begin
+   {.$IFNDEF POSIX}
    FLock.Release;
+   {.$ENDIF}
    FreeAndNil(FLock);
   End;
  Inherited;
