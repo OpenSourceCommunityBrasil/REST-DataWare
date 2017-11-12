@@ -3,12 +3,10 @@ unit formMain;
 interface
 
 uses
-  {$IFDEF WINDOWS}Windows,
-  {$ELSE}Lcl,{$ENDIF}
-  uDWJSON,  Messages, SysUtils, Variants, Classes, Graphics,
-  Controls, Forms, Dialogs, StdCtrls, fpjson, jsonparser, DB, BufDataset, memds,
-  Grids, DBGrids, ExtCtrls, ComCtrls, uRESTDWBase, uRESTDWPoolerDB, uDWConsts,
-  uDWJSONObject, uDWJSONTools, IdComponent, uDWConstsData;
+  Lcl, uDWJSON,  SysUtils, Variants, Classes, Graphics,
+  Controls, Forms, Dialogs, StdCtrls, fpjson, jsonparser, DB, BufDataset,
+  DBGrids, ExtCtrls, ComCtrls, uRESTDWPoolerDB,
+  IdComponent;
 
 type
 

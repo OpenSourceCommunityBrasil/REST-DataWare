@@ -1550,6 +1550,7 @@ Begin
         TFDMemtable(DestDS).CreateDataSet;
        }
        DestDS.Open;
+       TRESTDWClientSQL(DestDS).Active   := True;
        TRESTDWClientSQL(DestDS).Inactive := False;
       End
      Else

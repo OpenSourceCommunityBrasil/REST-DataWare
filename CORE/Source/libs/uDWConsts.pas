@@ -200,12 +200,6 @@ Function ZCompressStr(Const s   : String;
 Var
  Utf8Stream   : TStringStream;
  Compressed   : TMemoryStream;
- Base64Stream : TStringStream;
- {$IFDEF FPC}
-  Encoder     : TBase64EncodingStream;
- {$ENDIF}
-
- ST:String;
 Begin
  Result := False;
  {$IFDEF FPC}

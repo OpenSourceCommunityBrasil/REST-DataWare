@@ -38,6 +38,19 @@ type
     dsSQLEmployee: TDataSource;
     rdwSQLEmployee: TRESTDWClientSQL;
     DWMassiveCache1: TDWMassiveCache;
+    rdwSQLStringTableID: TStringField;
+    rdwSQLStringTableDESC: TStringField;
+    rdwSQLEmployeeEMP_NO: TSmallintField;
+    rdwSQLEmployeeFIRST_NAME: TStringField;
+    rdwSQLEmployeeLAST_NAME: TStringField;
+    rdwSQLEmployeePHONE_EXT: TStringField;
+    rdwSQLEmployeeHIRE_DATE: TSQLTimeStampField;
+    rdwSQLEmployeeDEPT_NO: TStringField;
+    rdwSQLEmployeeJOB_CODE: TStringField;
+    rdwSQLEmployeeJOB_GRADE: TSmallintField;
+    rdwSQLEmployeeJOB_COUNTRY: TStringField;
+    rdwSQLEmployeeSALARY: TFloatField;
+    rdwSQLEmployeeFULL_NAME: TStringField;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
   private

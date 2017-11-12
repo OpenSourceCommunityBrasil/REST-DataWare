@@ -314,6 +314,7 @@ Type
   Procedure   ProcAfterEdit      (DataSet   : TDataSet);
   Procedure   ProcBeforePost     (DataSet   : TDataSet); //Evento para Delta
   Procedure   ProcAfterCancel    (DataSet   : TDataSet);
+  procedure   CreateMassiveDataset;
  Public
   //Métodos
   Procedure   FieldDefsToFields;
@@ -1256,6 +1257,7 @@ Begin
        JSONValue.LoadFromJSON(bJsonArray.optJSONObject(I).ToString);
        JSONValue.Encoded := True;
        JSONValue.WriteToDataset(dtFull, JSONValue.ToJSON, TRESTDWClientSQL(Datasets[I]), vDecimalSeparator);
+       TRESTDWClientSQL(Datasets[I]).CreateMassiveDataset;
       End;
     Finally
      If bJsonArray <> Nil Then
@@ -1494,7 +1496,10 @@ End;
 Procedure TRESTDWDataBase.ApplyUpdates(MassiveCache       : TDWMassiveCache;
                                        Var   Error        : Boolean;
                                        Var   MessageError : String);
+Var
+ vUpdateLine : String;
 Begin
+ vUpdateLine := MassiveCache.ToJSON;
 
 End;
 
@@ -1984,6 +1989,11 @@ Begin
       Begin
        TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmDelete);
        TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self);
+       If vMassiveCache <> Nil Then
+        Begin
+         vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON);
+         TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+        End;
       End;
      If Assigned(vBeforeDelete) Then
       vBeforeDelete(DataSet);
@@ -2086,6 +2096,11 @@ Begin
         End
        Else
         TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self);
+       If vMassiveCache <> Nil Then
+        Begin
+         vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON);
+         TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+        End;
       End;
     End;
   End;
@@ -2758,6 +2773,11 @@ Begin
 
 End;
 
+Procedure TRESTDWClientSQL.CreateMassiveDataset;
+Begin
+ If Trim(vUpdateTableName) <> '' Then
+  TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vUpdateTableName));
+End;
 
 procedure TRESTDWClientSQL.SetActiveDB(Value: Boolean);
 Begin
@@ -2817,8 +2837,7 @@ Begin
      End;
     If State = dsBrowse Then
      Begin
-      If Trim(vUpdateTableName) <> '' Then
-       TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vUpdateTableName));
+      CreateMassiveDataset;
       PrepareDetails(True);
      End
     Else If State = dsInactive Then

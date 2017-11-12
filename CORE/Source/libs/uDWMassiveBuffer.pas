@@ -201,6 +201,7 @@ Type
  Public
   Function    MassiveCount   : Integer;
   Function    ToJSON         : String;
+  Procedure   Add(Value : String);
   Procedure   Clear;
   Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                      //Destroy a Classe
@@ -1498,6 +1499,11 @@ Begin
  Result := MassiveCacheList.Count -1;
 End;
 
+Procedure TDWMassiveCache.Add(Value: String);
+Begin
+ MassiveCacheList.Add(Value);
+End;
+
 Procedure TDWMassiveCache.Clear;
 Begin
  MassiveCacheList.Clear;
@@ -1508,11 +1514,19 @@ Var
  I : Integer;
  vMassiveLine : String;
 Begin
- Result := '';
+ Result := '[%s]';
+ vMassiveLine := '';
  For I := 0 To MassiveCacheList.Count -1 Do
   Begin
-
+   If Length(vMassiveLine) = 0 Then
+    vMassiveLine := MassiveCacheList.Items[I]
+   Else
+    vMassiveLine := vMassiveLine + ', ' + MassiveCacheList.Items[I];
   End;
+ If vMassiveLine <> '' Then
+  Result := Format(Result, [vMassiveLine])
+ Else
+  Result := vMassiveLine;
 End;
 
 Destructor TDWMassiveCache.Destroy;

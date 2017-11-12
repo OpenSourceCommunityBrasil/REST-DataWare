@@ -1163,6 +1163,16 @@ object fPrincipal: TfPrincipal
     MassiveCache = DWMassiveCache1
     Left = 192
     Top = 120
+    object rdwSQLStringTableID: TStringField
+      FieldName = 'ID'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 10
+    end
+    object rdwSQLStringTableDESC: TStringField
+      FieldName = 'DESC'
+      Size = 100
+    end
   end
   object dsSQLStringTable: TDataSource
     DataSet = rdwSQLStringTable
@@ -1201,6 +1211,56 @@ object fPrincipal: TfPrincipal
     MassiveCache = DWMassiveCache1
     Left = 192
     Top = 216
+    object rdwSQLEmployeeEMP_NO: TSmallintField
+      FieldName = 'EMP_NO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object rdwSQLEmployeeFIRST_NAME: TStringField
+      FieldName = 'FIRST_NAME'
+      Required = True
+      Size = 15
+    end
+    object rdwSQLEmployeeLAST_NAME: TStringField
+      FieldName = 'LAST_NAME'
+      Required = True
+    end
+    object rdwSQLEmployeePHONE_EXT: TStringField
+      FieldName = 'PHONE_EXT'
+      Size = 4
+    end
+    object rdwSQLEmployeeHIRE_DATE: TSQLTimeStampField
+      FieldName = 'HIRE_DATE'
+      Required = True
+    end
+    object rdwSQLEmployeeDEPT_NO: TStringField
+      FieldName = 'DEPT_NO'
+      Required = True
+      Size = 3
+    end
+    object rdwSQLEmployeeJOB_CODE: TStringField
+      FieldName = 'JOB_CODE'
+      Required = True
+      Size = 5
+    end
+    object rdwSQLEmployeeJOB_GRADE: TSmallintField
+      FieldName = 'JOB_GRADE'
+      Required = True
+    end
+    object rdwSQLEmployeeJOB_COUNTRY: TStringField
+      FieldName = 'JOB_COUNTRY'
+      Required = True
+      Size = 15
+    end
+    object rdwSQLEmployeeSALARY: TFloatField
+      FieldName = 'SALARY'
+      Required = True
+    end
+    object rdwSQLEmployeeFULL_NAME: TStringField
+      FieldName = 'FULL_NAME'
+      ReadOnly = True
+      Size = 37
+    end
   end
   object DWMassiveCache1: TDWMassiveCache
     Left = 232

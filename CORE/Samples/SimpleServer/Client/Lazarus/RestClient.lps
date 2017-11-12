@@ -19,9 +19,7 @@
         <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="76"/>
-        <CursorPos X="25" Y="84"/>
+        <CursorPos X="25" Y="8"/>
         <UsageCount Value="223"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -124,10 +122,12 @@
       </Unit14>
       <Unit15>
         <Filename Value="..\..\..\..\Source\libs\uDWConsts.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="119"/>
-        <CursorPos X="106" Y="128"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="197"/>
+        <CursorPos Y="203"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
@@ -455,7 +455,7 @@
         <UsageCount Value="9"/>
       </Unit60>
     </Units>
-    <JumpHistory Count="9" HistoryIndex="8">
+    <JumpHistory Count="11" HistoryIndex="10">
       <Position1>
         <Filename Value="formMain.pas"/>
         <Caret Line="98" Column="21" TopLine="84"/>
@@ -492,6 +492,14 @@
         <Filename Value="formMain.pas"/>
         <Caret Line="90" Column="21" TopLine="76"/>
       </Position9>
+      <Position10>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="84" Column="25" TopLine="76"/>
+      </Position10>
+      <Position11>
+        <Filename Value="..\..\..\..\Source\libs\uDWConsts.pas"/>
+        <Caret Line="203" TopLine="197"/>
+      </Position11>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
