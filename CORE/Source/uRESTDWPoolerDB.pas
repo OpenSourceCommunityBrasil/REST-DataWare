@@ -178,7 +178,7 @@ Type
   Destructor  Destroy;Override;                      //Destroy a Classe
   Procedure   Close;
   Procedure   Open;
-  Procedure   ApplyUpdates(Const Datasets     : TRESTDWDatasetArray;
+  Procedure   ApplyUpdates(MassiveCache       : TDWMassiveCache;
                            Var   Error        : Boolean;
                            Var   MessageError : String);Overload;
   Procedure   OpenDatasets(Var   Datasets     : TRESTDWDatasetArray;
@@ -1491,7 +1491,7 @@ Begin
  Inherited;
 End;
 
-Procedure TRESTDWDataBase.ApplyUpdates(Const Datasets     : TRESTDWDatasetArray;
+Procedure TRESTDWDataBase.ApplyUpdates(MassiveCache       : TDWMassiveCache;
                                        Var   Error        : Boolean;
                                        Var   MessageError : String);
 Begin

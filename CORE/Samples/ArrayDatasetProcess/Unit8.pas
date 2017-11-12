@@ -90,7 +90,7 @@ begin
  Else
   RESTDWDataBase1.TypeRequest  := TTyperequest.trHttp;
  RESTDWDataBase1.Open;
- RESTDWDataBase1.ApplyUpdates([rdwSQLStringTable, rdwSQLEmployee], vError, vMessageError);
+ RESTDWDataBase1.ApplyUpdates(DWMassiveCache1, vError, vMessageError);
  If vError Then
   Showmessage(vMessageError);
 end;
