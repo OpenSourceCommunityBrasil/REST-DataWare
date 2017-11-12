@@ -1497,10 +1497,40 @@ Procedure TRESTDWDataBase.ApplyUpdates(MassiveCache       : TDWMassiveCache;
                                        Var   Error        : Boolean;
                                        Var   MessageError : String);
 Var
- vUpdateLine : String;
+ vUpdateLine       : String;
+ vRESTConnectionDB : TDWPoolerMethodClient;
 Begin
  vUpdateLine := MassiveCache.ToJSON;
-
+ if vRestPooler = '' then
+  Exit;
+ vRESTConnectionDB                  := TDWPoolerMethodClient.Create(Nil);
+ vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
+ vRESTConnectionDB.Host             := vRestWebService;
+ vRESTConnectionDB.Port             := vPoolerPort;
+ vRESTConnectionDB.Compression      := vCompression;
+ vRESTConnectionDB.TypeRequest      := VtypeRequest;
+ {$IFNDEF FPC}
+  vRESTConnectionDB.OnWork          := vOnWork;
+  vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
+  vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
+  vRESTConnectionDB.OnStatus        := vOnStatus;
+  {$if CompilerVersion > 21}
+  vRESTConnectionDB.Encoding        := VEncondig;
+  {$IFEND}
+ {$ELSE}
+  vRESTConnectionDB.OnWork          := vOnWork;
+  vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
+  vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
+  vRESTConnectionDB.OnStatus        := vOnStatus;
+  vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
+ {$ENDIF}
+ Try
+  vRESTConnectionDB.ApplyUpdates_MassiveCache(vUpdateLine, vRestPooler,  vRestModule,
+                                              Error,       MessageError, vTimeOut,
+                                              vLogin,      vPassword);
+ Finally
+  FreeAndNil(vRESTConnectionDB);
+ End;
 End;
 
 Procedure TRESTDWDataBase.Close;

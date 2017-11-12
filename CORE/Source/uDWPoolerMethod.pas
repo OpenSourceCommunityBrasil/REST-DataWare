@@ -92,6 +92,14 @@ Uses {$IFDEF FPC}
                                    UserName                : String  = '';
                                    Password                : String  = '';
                                    RESTClientPooler        : TRESTClientPooler = Nil)   : TJSONValue;
+   Procedure ApplyUpdates_MassiveCache(MassiveCache,
+                                       Pooler, Method_Prefix   : String;
+                                       Var Error               : Boolean;
+                                       Var MessageError        : String;
+                                       TimeOut                 : Integer = 3000;
+                                       UserName                : String  = '';
+                                       Password                : String  = '';
+                                       RESTClientPooler        : TRESTClientPooler = Nil);
    Function ExecuteCommandJSON    (Pooler, Method_Prefix,
                                    SQL                     : String;
                                    Params                  : TDWParams;
@@ -403,6 +411,147 @@ Begin
  {$ELSE}
   vOnWorkEnd            := Value;
  {$ENDIF}
+End;
+
+Procedure TDWPoolerMethodClient.ApplyUpdates_MassiveCache(MassiveCache,
+                                                          Pooler,
+                                                          Method_Prefix    : String;
+                                                          Var Error        : Boolean;
+                                                          Var MessageError : String;
+                                                          TimeOut          : Integer;
+                                                          UserName,
+                                                          Password         : String;
+                                                          RESTClientPooler : TRESTClientPooler);
+Var
+ RESTClientPoolerExec : TRESTClientPooler;
+ lResponse        : String;
+ JSONParam        : TJSONParam;
+ DWParams         : TDWParams;
+Begin
+ If Not Assigned(RESTClientPooler) Then
+  RESTClientPoolerExec                := TRESTClientPooler.Create(Nil)
+ Else
+  RESTClientPoolerExec                := RESTClientPooler;
+ RESTClientPoolerExec.WelcomeMessage  := vWelcomeMessage;
+ RESTClientPoolerExec.Host            := Host;
+ RESTClientPoolerExec.Port            := Port;
+ RESTClientPoolerExec.UserName        := UserName;
+ RESTClientPoolerExec.Password        := Password;
+ RESTClientPoolerExec.RequestTimeOut  := TimeOut;
+ RESTClientPoolerExec.UrlPath         := Method_Prefix;
+ RESTClientPoolerExec.DataCompression := vCompression;
+ RESTClientPoolerExec.TypeRequest     := vtyperequest;
+ RESTClientPoolerExec.Encoding        := vEncoding;
+ {$IFDEF FPC}
+  RESTClientPoolerExec.OnWork           := vOnWork;
+  RESTClientPoolerExec.OnWorkBegin      := vOnWorkBegin;
+  RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
+  RESTClientPoolerExec.OnStatus         := vOnStatus;
+  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
+  RESTClientPoolerExec.TypeRequest     := vtyperequest;
+ {$ELSE}
+  RESTClientPoolerExec.OnWork        := vOnWork;
+  RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
+  RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
+  RESTClientPoolerExec.OnStatus      := vOnStatus;
+ {$ENDIF}
+ DWParams                        := TDWParams.Create;
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ELSE}
+  JSONParam                      := TJSONParam.Create;
+ {$ENDIF}
+ JSONParam.ParamName             := 'MassiveCache';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.AsString              := MassiveCache;
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ELSE}
+  JSONParam                     := TJSONParam.Create;
+ {$ENDIF}
+ JSONParam.ParamName             := 'Pooler';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.AsString              := Pooler;
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ELSE}
+  JSONParam                     := TJSONParam.Create;
+ {$ENDIF}
+ JSONParam.ParamName             := 'Method_Prefix';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.AsString              := Method_Prefix;
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ELSE}
+  JSONParam                     := TJSONParam.Create;
+ {$ENDIF}
+ JSONParam.ParamName             := 'Error';
+ JSONParam.ObjectDirection       := odInOut;
+ JSONParam.AsBoolean             := False;
+ DWParams.Add(JSONParam);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ELSE}
+  JSONParam                     := TJSONParam.Create;
+ {$ENDIF}
+ JSONParam.ParamName             := 'MessageError';
+ JSONParam.ObjectDirection       := odInOut;
+ JSONParam.AsString              := MessageError;
+ DWParams.Add(JSONParam);
+ Try
+  Try
+   lResponse := RESTClientPoolerExec.SendEvent('ApplyUpdates_MassiveCache', DWParams);
+   If (lResponse <> '') And
+      (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
+    Begin
+     If DWParams.ItemsString['MessageError'] <> Nil Then
+      MessageError  := DWParams.ItemsString['MessageError'].Value;
+     If DWParams.ItemsString['Error'] <> Nil Then
+      Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
+    End
+   Else
+    Begin
+     If (lResponse = '') Then
+      Raise Exception.CreateFmt('Unresolved Host : ''%s''', [Host])
+     Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
+      Raise Exception.CreateFmt('Unauthorized Username : ''%s''', [UserName]);
+    End;
+  Except
+   On E : Exception Do
+    Begin
+     Error         := True;
+     MessageError  := E.Message;
+    End;
+  End;
+ Finally
+  If Not Assigned(RESTClientPooler) Then
+   FreeAndNil(RESTClientPoolerExec);
+  FreeAndNil(DWParams);
+ End;
 End;
 
 Constructor TDWPoolerMethodClient.Create(AOwner: TComponent);
