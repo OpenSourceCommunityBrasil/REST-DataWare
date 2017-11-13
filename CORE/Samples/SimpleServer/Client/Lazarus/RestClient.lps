@@ -137,15 +137,16 @@
       </Unit16>
       <Unit17>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="2106"/>
-        <CursorPos X="42" Y="2106"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="5"/>
+        <CursorPos Y="23"/>
         <UsageCount Value="100"/>
         <Bookmarks Count="3">
           <Item0 X="31" Y="1452" ID="2"/>
           <Item1 X="57" Y="1353" ID="3"/>
           <Item2 Y="2116" ID="1"/>
         </Bookmarks>
+        <Loaded Value="True"/>
       </Unit17>
       <Unit18>
         <Filename Value="C:\lazarus\lcl\include\control.inc"/>
@@ -260,10 +261,8 @@
       </Unit33>
       <Unit34>
         <Filename Value="..\..\..\..\Source\uDWPoolerMethod.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="446"/>
-        <CursorPos X="38" Y="458"/>
+        <CursorPos X="48" Y="2"/>
         <UsageCount Value="10"/>
         <Bookmarks Count="1">
           <Item0 X="2" Y="257" ID="5"/>
@@ -416,10 +415,12 @@
       </Unit54>
       <Unit55>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1327"/>
-        <CursorPos X="117" Y="1336"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="6"/>
+        <CursorPos X="45" Y="14"/>
         <UsageCount Value="40"/>
+        <Loaded Value="True"/>
       </Unit55>
       <Unit56>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriverReg.pas"/>
@@ -456,7 +457,7 @@
         <UsageCount Value="9"/>
       </Unit60>
     </Units>
-    <JumpHistory Count="11" HistoryIndex="10">
+    <JumpHistory Count="14" HistoryIndex="13">
       <Position1>
         <Filename Value="formMain.pas"/>
         <Caret Line="98" Column="21" TopLine="84"/>
@@ -501,6 +502,17 @@
         <Filename Value="..\..\..\..\Source\libs\uDWConsts.pas"/>
         <Caret Line="203" TopLine="197"/>
       </Position11>
+      <Position12>
+        <Filename Value="..\..\..\..\Source\uDWPoolerMethod.pas"/>
+        <Caret Line="458" Column="38" TopLine="446"/>
+      </Position12>
+      <Position13>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="2106" Column="42" TopLine="2106"/>
+      </Position13>
+      <Position14>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+      </Position14>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
@@ -510,7 +522,7 @@
         <WatchScope Value="wpsLocal"/>
         <WatchKind Value="wpkWrite"/>
         <Source Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Line Value="1299"/>
+        <Line Value="1306"/>
       </Item1>
     </BreakPoints>
     <Watches Count="2">

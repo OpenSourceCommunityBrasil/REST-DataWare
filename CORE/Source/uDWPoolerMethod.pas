@@ -455,7 +455,11 @@ Begin
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus      := vOnStatus;
+  {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
   RESTClientPoolerExec.Encoding      := vEncoding;
+  {$IFEND}
+  {$ENDIF}
  {$ENDIF}
  DWParams                        := TDWParams.Create;
  {$IFNDEF FPC}

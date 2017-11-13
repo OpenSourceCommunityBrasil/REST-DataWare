@@ -1639,11 +1639,11 @@ Begin
        FreeAndNil(bJsonOBJ);
       End;
      End;
-    For A := 0 To DestDS.FieldDefs.Count - 1 Do
+    For A := 0 To DestDS.Fields.Count - 1 Do
      Begin
       vFindFlag := False;
-      If DestDS.FindField(DestDS.FieldDefs[A].Name) <> Nil Then
-      If DestDS.FindField(DestDS.FieldDefs[A].Name).FieldKind = fkData Then
+      If DestDS.FindField(DestDS.Fields[A].FieldName) <> Nil Then
+      If DestDS.FindField(DestDS.Fields[A].FieldName).FieldKind = fkData Then
        Begin
         For J := 0 To bJsonArray.Length - 1 Do
          Begin

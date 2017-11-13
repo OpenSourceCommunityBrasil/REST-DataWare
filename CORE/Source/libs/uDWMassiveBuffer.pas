@@ -6,8 +6,15 @@ interface
 
 uses SysUtils,       Classes,      uDWJSONObject,
      DB,             uRESTDWBase,  uDWConsts,
-     uDWConstsData,  uDWJSONTools, udwjson,
-     system.json;
+     uDWConstsData,  uDWJSONTools, udwjson {$IFNDEF FPC}
+                                           {$IF CompilerVersion > 21}
+                                            {$IFDEF POSIX}
+                                            {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
+                                            ,system.json
+                                            {$IFEND}
+                                            {$ENDIF}
+                                            {$IFEND}
+                                            {$ENDIF};
 
 
 
@@ -774,8 +781,11 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                           End;
                                         End;
                                       End
-                                     Else
-                                      MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
+                                     Else If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> '' Then
+                                      Begin
+                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
+                                       MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
+                                      End;
                                     Finally
                                      FreeAndNil(vStringStream);
                                     End;
@@ -1622,7 +1632,7 @@ End;
 
 Function TDWMassiveCache.MassiveCount : Integer;
 Begin
- Result := MassiveCacheList.Count -1;
+ Result := MassiveCacheList.Count;
 End;
 
 Procedure TDWMassiveCache.Add(Value: String);
