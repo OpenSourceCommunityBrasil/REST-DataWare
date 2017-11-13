@@ -9,7 +9,9 @@ uses SysUtils,       Classes,      uDWJSONObject,
      uDWConstsData,  uDWJSONTools, udwjson {$IFNDEF FPC}
                                            {$IF CompilerVersion > 21}
                                             {$IFDEF POSIX}
-                                            {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
+                                            {$IF Defined(ANDROID) or Defined(IOS)} //Alterado para IOS Brito
+                                            ,system.json
+                                            {$else}
                                             ,system.json
                                             {$IFEND}
                                             {$ENDIF}
@@ -1218,10 +1220,12 @@ Begin
         {$ENDIF}
       Finally
         {$IFDEF POSIX}
+         bJsonOBJ:=nil;
         {$ELSE}
          bJsonOBJ.Clean;
+         FreeAndNil(bJsonOBJ);
         {$ENDIF}
-       FreeAndNil(bJsonOBJ);
+
       End;
      End
     Else //Data
@@ -1381,7 +1385,11 @@ Begin
      End;
    End;
  Finally
+ {$IFDEF POSIX}
+ bJsonValue:=nil;
+ {$ELSE}
   bJsonValue.Free;
+  {$ENDIF}
  End;
 End;
 
