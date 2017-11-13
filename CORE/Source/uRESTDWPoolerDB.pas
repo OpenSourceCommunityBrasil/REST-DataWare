@@ -335,7 +335,10 @@ Type
   procedure   OpenCursor       (InfoQuery : Boolean); Override;  //Subscrevendo o OpenCursor para não ter erros de ADD Fields em Tempo de Design
   Procedure   GotoRec       (Const aRecNo : Integer);
   Function    ParamCount    : Integer;
-  Procedure   DynamicFilter (Field, Value : String; InText : Boolean = False);
+  Procedure DynamicFilter(cFields : Array of String;
+                          Value   : String;
+                          InText  : Boolean;
+                          AndOrOR : String);
   Procedure   Refresh;
   Procedure   SaveToStream    (Var Stream : TMemoryStream);
   Procedure   ClearMassive;
@@ -1797,17 +1800,29 @@ Begin
    Value := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vRESTDataBase.Encoding{$IFEND}{$ENDIF});
 End;
 
-procedure TRESTDWClientSQL.DynamicFilter(Field, Value: String; InText: Boolean);
-Begin
+Procedure TRESTDWClientSQL.DynamicFilter(cFields  : Array of String;
+                                         Value   : String;
+                                         InText  : Boolean;
+                                         AndOrOR : String);
+Var
+ I : Integer;
+begin
  ExecOrOpen;
+ Filter := '';
  If vActive Then
   Begin
    If Length(Value) > 0 Then
     Begin
-     If InText Then
-      Filter := Format('%s Like ''%s''', [Field, '%' + Value + '%'])
-     Else
-      Filter := Format('%s Like ''%s''', [Field, Value + '%']);
+     Filtered := False;
+     For I := 0 to High(cFields) do
+      Begin
+       If I = High(cFields) Then
+        AndOrOR := '';
+       If InText Then
+        Filter := Filter + Format('%s Like ''%s'' %s ', [cFields[I], '%' + Value + '%', AndOrOR])
+       Else
+        Filter := Filter + Format('%s Like ''%s'' %s ', [cFields[I], Value + '%', AndOrOR]);
+      End;
      If Not (Filtered) Then
       Filtered := True;
     End
