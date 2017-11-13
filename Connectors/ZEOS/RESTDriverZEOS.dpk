@@ -59,7 +59,7 @@ requires
   ZPlain,
   ZCore,
   ZParseSql,
-  RestEasyObjects;
+  RestDatawareCORE;
 
 contains
   uRestDriverZEOS in 'uRestDriverZEOS.pas';
