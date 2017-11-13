@@ -1263,7 +1263,7 @@ object Form2: TForm2
     Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
-      'select * from employee')
+      'select * from EMPLOYEE')
     UpdateTableName = 'employee'
     CacheUpdateRecords = True
     AutoCommitData = False

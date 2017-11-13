@@ -443,7 +443,6 @@ Begin
  RESTClientPoolerExec.UrlPath         := Method_Prefix;
  RESTClientPoolerExec.DataCompression := vCompression;
  RESTClientPoolerExec.TypeRequest     := vtyperequest;
- RESTClientPoolerExec.Encoding        := vEncoding;
  {$IFDEF FPC}
   RESTClientPoolerExec.OnWork           := vOnWork;
   RESTClientPoolerExec.OnWorkBegin      := vOnWorkBegin;
@@ -456,6 +455,7 @@ Begin
   RESTClientPoolerExec.OnWorkBegin   := vOnWorkBegin;
   RESTClientPoolerExec.OnWorkEnd     := vOnWorkEnd;
   RESTClientPoolerExec.OnStatus      := vOnStatus;
+  RESTClientPoolerExec.Encoding      := vEncoding;
  {$ENDIF}
  DWParams                        := TDWParams.Create;
  {$IFNDEF FPC}

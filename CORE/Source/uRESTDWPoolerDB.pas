@@ -249,6 +249,7 @@ Type
   vActualRec           : Integer;
   vMasterFields,
   vUpdateTableName     : String;                            //Tabela que será feito Update no Servidor se for usada Reflexão de Dados
+  vActiveCursor,
   vOnOpenCursor,
   vInactive,
   vCacheUpdateRecords,
@@ -1716,6 +1717,7 @@ Begin
  vCacheUpdateRecords               := True;
  vBeforeClone                      := False;
  vReadData                         := False;
+ vActiveCursor                     := False;
  vCascadeDelete                    := True;
  vSQL                              := TStringList.Create;
  {$IFDEF FPC}
@@ -2551,19 +2553,23 @@ End;
 procedure TRESTDWClientSQL.OpenCursor(InfoQuery: Boolean);
 Begin
  Try
-{ //Ajuste de Fields
-  If Not vOnOpenCursor Then
-   Begin
-    vOnOpenCursor := True;
-    Try
-     SetActiveDB(True);
-    Finally
-    End;
-    vOnOpenCursor := False;
-   End;
- }
   If (vRESTDataBase <> Nil) Then
    Begin
+    vRESTDataBase.Active := True;
+    If vRESTDataBase.Active Then
+     Begin
+      If csDesigning in ComponentState Then
+       Begin
+        If Not vActiveCursor then
+         Begin
+          Try
+           SetActiveDB(True);
+          Except
+           vActiveCursor := False;
+          End;
+         End;
+       End;
+     End;
     If vRESTDataBase.Active Then
      Inherited OpenCursor(InfoQuery)
     Else If csDesigning in ComponentState Then
@@ -2761,6 +2767,7 @@ Begin
  Result := False;
  LDataSetList := nil;
  Self.Close;
+ vActiveCursor := True;
  If Assigned(vRESTDataBase) Then
   Begin
    Try
@@ -2801,6 +2808,7 @@ Begin
   End
  Else If csDesigning in ComponentState Then
   Raise Exception.Create(PChar('Empty Database Property'));
+ vActiveCursor := False;
 End;
 
 procedure TRESTDWClientSQL.SaveToStream(Var Stream: TMemoryStream);
@@ -2850,6 +2858,7 @@ Begin
       TFDmemtable(Self).Close;
      {$ENDIF}
      {$ENDIF}
+     TRESTDWClientSQL(Self).Close;
     End;
    Exit;
   End;

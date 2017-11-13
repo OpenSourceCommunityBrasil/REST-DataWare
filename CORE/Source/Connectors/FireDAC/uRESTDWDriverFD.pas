@@ -576,31 +576,29 @@ Begin
                Begin
                 If Trim(Params[I].Value) <> '' Then
                  Begin
-                   // Alterado por: Alexandre Magno - 04/11/2017
-                   If vTempQuery.Params[A].DataType = ftLargeint Then
-                     vTempQuery.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
-                   else If vTempQuery.Params[A].DataType = ftSmallInt Then
-                     vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
-                   Else
-                     vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
-                   // Como estava Anteriormente
-                   //If vTempQuery.Params[A].DataType = ftSmallInt Then
-                   //  vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
-                   //Else
-                   //  vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
-                 End;
+                  If vTempQuery.Params[A].DataType = ftLargeint Then
+                   vTempQuery.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
+                  Else If vTempQuery.Params[A].DataType = ftSmallInt Then
+                   vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                  Else
+                   vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                 End
+                Else
+                 vTempQuery.Params[A].Clear;
                End
               Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
                Begin
                 If Trim(Params[I].Value) <> '' Then
-                 vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value);
+                 vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value)
+                Else
+                 vTempQuery.Params[A].Clear;
                End
               Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
                Begin
                 If Trim(Params[I].Value) <> '' Then
                  vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
                 Else
-                 vTempQuery.Params[A].AsDateTime  := Null;
+                 vTempQuery.Params[A].Clear;
                End  //Tratar Blobs de Parametros...
               Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
                Begin
@@ -626,50 +624,47 @@ Begin
          Break;
        End;
      end
-     else
-     begin
+     Else
+      Begin
        For I := 0 To Params.Count -1 Do
-       begin
-          with vTempQuery.Params.Add do
-          begin
-            vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
-            Name := vParamName;
-            ParamType := ptInput;
-
-            If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
-               DataType := ObjectValueToFieldType(Params[I].ObjectValue)
-            Else
-               DataType := ftString;
-            If vTempQuery.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
-             Begin
-              If Trim(Params[I].Value) <> '' Then
-               Begin
-                 // Alterado por: Alexandre Magno - 04/11/2017
-                 If vTempQuery.Params[I].DataType = ftLargeint Then
-                   vTempQuery.Params[I].AsLargeInt := StrToInt64(Params[I].Value)
-                 else If vTempQuery.Params[I].DataType = ftSmallInt Then
-                   vTempQuery.Params[I].AsSmallInt := StrToInt(Params[I].Value)
-                 Else
-                   vTempQuery.Params[I].AsInteger  := StrToInt(Params[I].Value);
-
-                 // Como estava Anteriormente
-                 //If vTempQuery.Params[I].DataType = ftSmallInt Then
-                 //  vTempQuery.Params[I].AsSmallInt := StrToInt(Params[I].Value)
-                 //Else
-                 //  vTempQuery.Params[I].AsInteger  := StrToInt(Params[I].Value);
-               End;
-             End
+        begin
+         With vTempQuery.Params.Add do
+          Begin
+           vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
+           Name := vParamName;
+           ParamType := ptInput;
+           If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
+            DataType := ObjectValueToFieldType(Params[I].ObjectValue)
+           Else
+            DataType := ftString;
+           If vTempQuery.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+            Begin
+             If Trim(Params[I].Value) <> '' Then
+              Begin
+               // Alterado por: Alexandre Magno - 04/11/2017
+               If vTempQuery.Params[I].DataType = ftLargeint Then
+                vTempQuery.Params[I].AsLargeInt := StrToInt64(Params[I].Value)
+               Else If vTempQuery.Params[I].DataType = ftSmallInt Then
+                vTempQuery.Params[I].AsSmallInt := StrToInt(Params[I].Value)
+               Else
+                vTempQuery.Params[I].AsInteger  := StrToInt(Params[I].Value);
+              End
+             Else
+              vTempQuery.Params[I].Clear;
+            End
             Else If vTempQuery.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
-               vTempQuery.Params[I].AsFloat  := StrToFloat(Params[I].Value);
+               vTempQuery.Params[I].AsFloat  := StrToFloat(Params[I].Value)
+              Else
+               vTempQuery.Params[I].Clear;
              End
             Else If vTempQuery.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
                vTempQuery.Params[I].AsDateTime  := StrToFloat(Params[I].Value)
               Else
-               vTempQuery.Params[I].AsDateTime  := Null;
+               vTempQuery.Params[I].Clear;
              End  //Tratar Blobs de Parametros...
             Else If vTempQuery.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
              Begin
@@ -688,9 +683,9 @@ Begin
              vTempQuery.Params[I].AsString := Params[I].Value
             Else
              vTempQuery.Params[I].Value    := Params[I].Value;
-           End;
-       End;
-     end;
+          End;
+        End;
+      End;
   End;
   If Not Execute Then
    Begin
@@ -1311,32 +1306,29 @@ Begin
                   Begin
                    If Trim(Params[I].Value) <> '' Then
                     Begin
-                      // Alterado por: Alexandre Magno - 04/11/2017
-                      If vTempQuery.Params[A].DataType = ftLargeint Then
-                        vTempQuery.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
-                      else If vTempQuery.Params[A].DataType = ftSmallInt Then
-                        vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
-                      Else
-                        vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
-
-                      // Como estava Anteriormente
-                      //If vTempQuery.Params[A].DataType = ftSmallInt Then
-                      //  vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
-                      //Else
-                      //  vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
-                    End;
+                     If vTempQuery.Params[A].DataType = ftLargeint Then
+                      vTempQuery.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
+                     Else If vTempQuery.Params[A].DataType = ftSmallInt Then
+                      vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                     Else
+                      vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                    End
+                   Else
+                    vTempQuery.Params[A].Clear;
                   End
                  Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
                   Begin
                    If Trim(Params[I].Value) <> '' Then
-                    vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value);
+                    vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value)
+                   Else
+                    vTempQuery.Params[A].Clear;
                   End
                  Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
                   Begin
                    If Trim(Params[I].Value) <> '' Then
                     vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
                    Else
-                    vTempQuery.Params[A].AsDateTime  := Null;
+                    vTempQuery.Params[A].Clear;
                   End  //Tratar Blobs de Parametros...
                  Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
                   Begin
