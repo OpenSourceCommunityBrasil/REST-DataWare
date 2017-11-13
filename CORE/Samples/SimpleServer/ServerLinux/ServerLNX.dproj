@@ -6,7 +6,7 @@
         <MainSource>ServerLNX.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Win64</Platform>
+        <Platform Condition="'$(Platform)'==''">Linux64</Platform>
         <TargetedPlatforms>131</TargetedPlatforms>
         <AppType>Console</AppType>
     </PropertyGroup>
@@ -145,7 +145,7 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Linux64)'!=''">
-        <Debugger_DebugSourcePath>C:\CompXE_10_2\Indy_10_6_2\Lib\Protocols\;C:\CompXE_10_2\RestDW\CORE\Source\libs\;C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\firedac\;C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
+        <Debugger_DebugSourcePath>C:\CompXE_10_2\Indy_10_6_2\Lib\Protocols\;C:\CompXE_10_2\RestDW\CORE\Source\libs\;C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\firedac\;C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\;C:\CompXE_10_2\RESTDW\CORE\Source\;C:\CompXE_10_2\RESTDW\CORE\Source\libs\JSON\;C:\CompXE_10_2\RESTDW\CORE\Source\Connectors\FireDAC\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_RemoteDebug>false</DCC_RemoteDebug>

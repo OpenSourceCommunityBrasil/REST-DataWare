@@ -63,7 +63,7 @@ VAR
 
 IMPLEMENTATION
 
-{%CLASSGROUP 'FMX.Controls.TControl'}
+
 {$R *.dfm}
 
 FUNCTION TServerMethodDM.ConsultaBanco(VAR Params: TDWParams): STRING;
@@ -136,7 +136,7 @@ END;
 PROCEDURE TServerMethodDM.ServerMethodDataModuleWelcomeMessage(Welcomemsg: STRING);
 BEGIN
 {$IFDEF WINDOWS}
- RestDWForm.EdBD.Text := Welcomemsg;
+// RestDWForm.EdBD.Text := Welcomemsg;
 {$ENDIF}
 END;
 
@@ -197,14 +197,14 @@ BEGIN
   database:= 'employee.fdb'; //RestDWForm.EdBD.Text;
 
     Driver_BD := 'FB';
-    Servidor_BD := '127.0.0.1';
+    Servidor_BD := '192.168.2.40';
 
     Pasta_BD := ''; //IncludeTrailingPathDelimiter('C:\basedados\');
     Database := Pasta_BD + Database;
 
   Porta_BD   := '3050';
   Usuario_BD := 'SYSDBA';
-  Senha_BD   := 'masterkey';
+  Senha_BD   := 'abrito';
 
   TFDConnection(Sender).Params.Clear;
   TFDConnection(Sender).Params.Add('DriverID=' + Driver_BD);

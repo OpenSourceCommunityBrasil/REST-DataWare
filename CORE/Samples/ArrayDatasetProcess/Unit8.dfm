@@ -1106,13 +1106,14 @@ object fPrincipal: TfPrincipal
     OnClick = Button2Click
   end
   object RESTDWDataBase1: TRESTDWDataBase
-    Active = False
+    Active = True
     Compression = True
+    MyIP = '192.168.2.67'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
     ProxyOptions.Port = 8888
-    PoolerService = 'localhost'
+    PoolerService = '192.168.2.67'
     PoolerPort = 8082
     PoolerName = 'TServerMethodDM.RESTDWPoolerDB1'
     StateConnection.AutoCheck = False
@@ -1129,7 +1130,19 @@ object fPrincipal: TfPrincipal
     Top = 49
   end
   object rdwSQLStringTable: TRESTDWClientSQL
-    FieldDefs = <>
+    Active = True
+    FieldDefs = <
+      item
+        Name = 'ID'
+        Attributes = [faRequired]
+        DataType = ftWideString
+        Size = 10
+      end
+      item
+        Name = 'DESC'
+        DataType = ftWideString
+        Size = 100
+      end>
     IndexDefs = <>
     MasterFields = ''
     FetchOptions.AssignedValues = [evMode]
@@ -1155,13 +1168,13 @@ object fPrincipal: TfPrincipal
     MassiveCache = DWMassiveCache1
     Left = 192
     Top = 120
-    object rdwSQLStringTableID: TStringField
+    object rdwSQLStringTableID: TWideStringField
       FieldName = 'ID'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
       Required = True
       Size = 10
     end
-    object rdwSQLStringTableDESC: TStringField
+    object rdwSQLStringTableDESC: TWideStringField
       FieldName = 'DESC'
       Size = 100
     end

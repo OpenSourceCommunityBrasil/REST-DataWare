@@ -282,6 +282,7 @@ Begin
  result:= stringreplace(Astr,Asubstr,'',[rfReplaceAll, rfIgnoreCase]);
 End;
 
+
 {$IF Defined(ANDROID) or Defined(IOS)} //Alterado para IOS Brito
 Function CopyValue(Var bValue : String) : String;
 Var
@@ -882,7 +883,8 @@ Var
            End;
          End
         Else If bValue.Fields[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
-         vTempValue     := Format('"%s"',      [FloatToStr(bValue.Fields[I].AsDateTime)])
+        // vTempValue     := Format('"%s"',      [FloatToStr(bValue.Fields[I].AsDateTime)])
+         vTempValue     := Format('"%s"',      [inttostr(DateTimeToUnix(bValue.Fields[I].AsDateTime))])
         Else
          vTempValue     := Format('"%s"',      [bValue.Fields[I].AsString]);    //asstring
        End;
@@ -1063,7 +1065,7 @@ Var
    ftTimeStamp  : Begin
                    vTempValue        := Value;
                    If vTempValue <> '' Then
-                    Field.AsDateTime := StrToFloat(vTempValue);
+                    Field.AsDateTime := UnixToDateTime(strtoint(vTempValue));
                   End;
   End;
  End;
@@ -1458,7 +1460,7 @@ Var
                   ftTimeStamp  : Begin
                                   vTempValue        := Value;
                                   If vTempValue <> '' Then
-                                   Field.AsDateTime := StrToFloat(vTempValue);
+                                   Field.AsDateTime := UnixToDateTime(strtoint(vTempValue));
                                  End;
   End;
  End;
@@ -2055,7 +2057,7 @@ Begin
    End;
   End
  Else If Param.DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
-  SetValue(FloatToStr(Param.AsFloat), False);
+  SetValue(intToStr(Param.Asinteger), False);
  vObjectValue            := FieldTypeToObjectValue(Param.DataType);
  vJSONValue.vObjectValue := vObjectValue;
 End;

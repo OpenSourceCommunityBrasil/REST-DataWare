@@ -14,10 +14,12 @@ object ServerMethodDM: TServerMethodDM
     StrsTrim2Len = True
     Active = False
     PoolerOffMessage = 'RESTPooler not active.'
+    ParamCreate = True
     Left = 56
     Top = 120
   end
   object RESTDWDriverFD1: TRESTDWDriverFD
+    CommitRecords = 100
     Connection = Server_FDConnection
     Left = 152
     Top = 120

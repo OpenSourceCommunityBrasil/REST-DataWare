@@ -43,6 +43,8 @@ Const
  UrlBase               = '%s://%s:%d/%s';
  ByteBuffer            = 1024 * 8; //8kb
  CompressBuffer        = 1024 * 2;
+ // Sets UnixStartDate to TDateTime of 01/01/1970
+ UnixStartDate: TDateTime = 25569.0;
 
 Type
  TMassiveMode     = (mmInactive, mmBrowse, mmInsert, mmUpdate, mmDelete);
@@ -104,11 +106,25 @@ Type
  Function  MassiveModeToString      (MassiveMode     : TMassiveMode)              : String;
  Function  StringToMassiveMode      (Value           : String)                    : TMassiveMode;
  Function  DatasetRequestToJSON     (Value           : TRESTDWClientSQLBase)      : String;
-
+ Function  DateTimeToUnix           (ConvDate        : TDateTime)                 : Longint;
+ Function  UnixToDateTime           (USec            : Longint)                   : TDateTime;
 
 implementation
 
 Uses uRESTDWPoolerDB, uDWJSONObject, uDWJSONTools;
+
+
+Function DateTimeToUnix(ConvDate: TDateTime): Longint;
+begin
+  //example: DateTimeToUnix(now);
+  Result := Round((ConvDate - UnixStartDate) * 86400);
+end;
+
+Function UnixToDateTime(USec: Longint): TDateTime;
+begin
+  //Example: UnixToDateTime(1003187418);
+  Result := (Usec / 86400) + UnixStartDate;
+end;
 
 Function DatasetRequestToJSON(Value : TRESTDWClientSQLBase) : String;
 Var

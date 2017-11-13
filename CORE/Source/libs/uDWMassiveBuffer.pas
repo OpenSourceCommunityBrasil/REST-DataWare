@@ -6,13 +6,16 @@ interface
 
 uses SysUtils,       Classes,      uDWJSONObject,
      DB,             uRESTDWBase,  uDWConsts,
-     uDWConstsData,  uDWJSONTools, udwjson;
+     uDWConstsData,  uDWJSONTools, udwjson,
+     system.json;
+
+
 
 Type
  TMassiveValue = Class
  Private
   vBinary     : Boolean;
-  vJSONValue  : TJSONValue;
+  vJSONValue  : uDWJSONObject.TJSONValue;
   Function    GetValue       : String;
   Procedure   SetValue(Value : String);
  Protected
@@ -174,7 +177,7 @@ Type
   Property  MassiveMode : TMassiveMode   Read vMassiveMode;             //Modo Massivo do Buffer Atual
   Property  Fields      : TMassiveFields Read vMassiveFields Write vMassiveFields;
   Property  TableName   : String         Read vTableName;
-End;
+ End;
 
 Type
  TDWMassiveCacheValue = String;
@@ -210,6 +213,12 @@ End;
 implementation
 
 Uses uRESTDWPoolerDB, uDWPoolerMethod;
+
+
+Function removestr(Astr: string; Asubstr: string):string;
+Begin
+ result:= stringreplace(Astr,Asubstr,'',[rfReplaceAll, rfIgnoreCase]);
+End;
 
 { TMassiveField }
 
@@ -368,7 +377,7 @@ End;
 Constructor TMassiveValue.Create;
 Begin
  vBinary    := False;
- vJSONValue := TJSONValue.Create;
+ vJSONValue := udwjsonobject.TJSONValue.Create;
 End;
 
 Destructor TMassiveValue.Destroy;
@@ -1106,12 +1115,12 @@ Procedure TMassiveDatasetBuffer.FromJSON(Value : String);
 Var
  bJsonOBJ,
  bJsonOBJb,
- bJsonValue  : udwjson.TJsonObject;
+ bJsonValue  : {$IFDEF POSIX}system.json.TJsonObject; {$ELSE} udwjson.TJsonObject;{$ENDIF}
  bJsonArray,
  bJsonArrayB,
  bJsonArrayC,
  bJsonArrayD,
- bJsonArrayE  : udwjson.TJsonArray;
+ bJsonArrayE  : {$IFDEF POSIX}system.json.TJsonArray; {$ELSE} udwjson.TJsonArray;{$ENDIF}
  MassiveValue : TMassiveValue;
  A, C,
  D, E, I      : Integer;
@@ -1131,19 +1140,53 @@ Var
    End;
  End;
 Begin
- bJsonValue := udwjson.TJsonObject.Create(Value);
+ {$IFDEF POSIX}
+  bJsonValue:= system.json.TJsonObject.ParseJSONValue(TEncoding.utf8.GetBytes(Value),0) as system.json.TJsonObject;
+ {$ELSE}
+  bJsonValue := udwjson.TJsonObject.Create(Value);
+ {$ENDIF}
  vMassiveBuffer.ClearAll;
  vMassiveLine.ClearAll;
  vMassiveFields.ClearAll;
  Try
-  vTableName  := bJsonValue.opt(bJsonValue.names.get(4).ToString).ToString;
-  bJsonArray  := bJsonValue.optJSONArray(bJsonValue.names.get(5).ToString);
+   {$IFDEF POSIX}
+    vTableName  := removestr(bJsonValue.pairs[4].JsonValue.tostring,'"');  //opt(bJsonValue.names.get(4).ToString).ToString;
+    bJsonArray  := bJsonValue.pairs[5].JsonValue as tjsonarray; //  bJsonValue.optJSONArray(bJsonValue.names.get(5).ToString);
+   {$ELSE}
+    vTableName  := bJsonValue.opt(bJsonValue.names.get(4).ToString).ToString;
+    bJsonArray  := bJsonValue.optJSONArray(bJsonValue.names.get(5).ToString);
+   {$ENDIF}
   For A := 0 To 1 Do
    Begin
     If A = 0 Then //Fields
      Begin
-      bJsonOBJ    := udwjson.TJsonObject.Create(bJsonArray.get(A).ToString); //bJsonOBJ.names.get(0).ToString);
+       {$IFDEF POSIX}
+        bJsonOBJ    := bJsonArray.Items[A] as Tjsonobject; //udwjson.TJsonObject.Create(bJsonArray.get(A).ToString); //bJsonOBJ.names.get(0).ToString);
+       {$ELSE}
+        bJsonOBJ    := udwjson.TJsonObject.Create(bJsonArray.get(A).ToString); //bJsonOBJ.names.get(0).ToString);
+       {$ENDIF}
+
       Try
+        {$IFDEF POSIX}
+        bJsonArrayB := bJsonOBJ.get('fields').JsonValue as Tjsonarray;
+        For I := 0 To bJsonArrayB.count - 1 Do
+         Begin
+          bJsonOBJb :=  bJsonArrayB.items[I] as Tjsonobject; // udwjson.TJsonObject.Create(bJsonArrayB.get(I).ToString);
+          Try
+           MassiveField                    := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
+           MassiveField.vRequired          := removestr(bJsonOBJb.get('Required').JsonValue.tostring,'"')      = 'S';
+           MassiveField.vKeyField          := removestr(bJsonOBJb.get('Primary').JsonValue.tostring,'"')       = 'S';
+           MassiveField.vFieldName         := removestr(bJsonOBJb.get('Field').JsonValue.tostring,'"');
+           MassiveField.vFieldType         := GetValueType(removestr(bJsonOBJb.get('Type').JsonValue.tostring,'"'));
+           MassiveField.vSize              := StrToInt(removestr(bJsonOBJb.get('Size').JsonValue.tostring,'"'));
+           MassiveField.vAutoGenerateValue := removestr(bJsonOBJb.get('Autogeneration').JsonValue.tostring,'"') = 'S';
+           vMassiveFields.Add(MassiveField);
+          Finally
+           //bJsonOBJb.Clean;
+           FreeAndNil(bJsonOBJb);
+          End;
+         End;
+        {$ELSE}
        bJsonArrayB := bJsonOBJ.optJSONArray('fields');
        For I := 0 To bJsonArrayB.Length - 1 Do
         Begin
@@ -1152,7 +1195,7 @@ Begin
           MassiveField                    := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
           MassiveField.vRequired          := bJsonOBJb.opt('Required').ToString       = 'S';
           MassiveField.vKeyField          := bJsonOBJb.opt('Primary').ToString        = 'S';
-          MassiveField.vFieldName         := bJsonOBJb.opt('field').ToString;
+          MassiveField.vFieldName         := bJsonOBJb.opt('Field').ToString;
           MassiveField.vFieldType         := GetValueType(bJsonOBJb.opt('Type').ToString);
           MassiveField.vSize              := StrToInt(bJsonOBJb.opt('Size').ToString);
           MassiveField.vAutoGenerateValue := bJsonOBJb.opt('Autogeneration').ToString = 'S';
@@ -1162,15 +1205,96 @@ Begin
           FreeAndNil(bJsonOBJb);
          End;
         End;
+        {$ENDIF}
       Finally
-       bJsonOBJ.Clean;
+        {$IFDEF POSIX}
+        {$ELSE}
+         bJsonOBJ.Clean;
+        {$ENDIF}
        FreeAndNil(bJsonOBJ);
       End;
      End
     Else //Data
      Begin
-      bJsonOBJ    := udwjson.TJsonObject.Create(bJsonArray.get(A).ToString); //bJsonOBJ.names.get(0).ToString);
-      bJsonArrayB := bJsonOBJ.optJSONArray('lines');
+       {$IFDEF POSIX}
+        bJsonOBJ    := bJsonArray.Items[A] as Tjsonobject; //udwjson.TJsonObject.Create(bJsonArray.get(A).ToString); //bJsonOBJ.names.get(0).ToString);
+        bJsonArrayB := bJsonOBJ.get('lines').JsonValue as Tjsonarray;
+       {$ELSE}
+        bJsonOBJ    := udwjson.TJsonObject.Create(bJsonArray.get(A).ToString); //bJsonOBJ.names.get(0).ToString);
+        bJsonArrayB := bJsonOBJ.optJSONArray('lines');
+       {$ENDIF}
+       {$IFDEF POSIX}
+       For E := 0 to bJsonArrayB.count -1  Do
+       Begin
+        bJsonArrayC := bJsonArrayB.items[E] as tjsonarray; // getJSONArray(E);
+        Try
+         bJsonArrayD  := bJsonArrayC.items[0] as tjsonarray; // getJSONArray(0); //Line
+         vMassiveMode := StringToMassiveMode(removestr(bJsonArrayD.items[0].tostring,'"')); // opt(0).tostring);
+         MassiveLine  := TMassiveLine.Create;
+         NewLineBuffer(MassiveLine, vMassiveMode); //Sempre se assume MassiveMode vindo na String
+         If vMassiveMode = mmUpdate Then
+          Begin
+           If bJsonArrayD.count> 1 Then
+            Begin
+             bJsonArrayE  := bJsonArrayC.items[2] as Tjsonarray; // getJSONArray(2); //Campos Alterados
+             For D := 0 To bJsonArrayE.count -1 Do //Valores
+              MassiveLine.vChanges.Add(removestr(bJsonArrayE.items[D].tostring,'"'));
+             bJsonArrayE  :=bJsonArrayC.items[1] as Tjsonarray;  // bJsonArrayC.getJSONArray(1); //Key Primary
+             For D := 0 To bJsonArrayE.count -1 Do //Valores
+              Begin
+               MassiveValue       := TMassiveValue.Create;
+               If vMassiveFields.Items[D].vFieldType in [ovString, ovWideString, ovWideMemo,
+                                                         ovFixedChar, ovFixedWideChar] Then
+                MassiveValue.Value := removestr(bJsonArrayC.items[D].tostring,'"') //bJsonArrayE.opt(D).tostring
+               Else
+                MassiveValue.Value := removestr(bJsonArrayE.items[D].tostring,'"');
+               If Not Assigned(MassiveLine.vPrimaryValues) Then
+                MassiveLine.vPrimaryValues := TMassiveValues.Create;
+               MassiveLine.vPrimaryValues.Add(MassiveValue);
+              End;
+            End;
+           For C := 1 To bJsonArrayD.count -1 Do //Valores
+            Begin
+             If vMassiveFields.Items[GetFieldIndex(MassiveLine.vChanges[C-1])].vFieldType in [ovString, ovWideString, ovWideMemo, ovFixedChar, ovFixedWideChar] Then
+              Begin
+               If lowercase(removestr(bJsonArrayD.items[C].tostring,'"')) <> 'null' then
+                MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Value := DecodeStrings(removestr(bJsonArrayD.items[C].tostring,'"'){$IFDEF FPC}, csUndefined{$ENDIF})
+               Else
+                MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Value := removestr(bJsonArrayD.items[C].tostring,'"');
+              End
+             Else
+              Begin
+               If vMassiveFields.Items[GetFieldIndex(MassiveLine.vChanges[C-1])].vFieldType in [ovBytes, ovVarBytes, ovBlob,
+                                                                                                ovGraphic, ovOraBlob, ovOraClob] Then
+                Begin
+                 MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Binary := True;
+                 MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Value  := removestr(bJsonArrayD.items[C].tostring,'"'); //bJsonArrayD.opt(C).tostring;
+                End
+               Else
+                MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Value := removestr(bJsonArrayD.items[C].tostring,'"'); //bJsonArrayD.opt(C).tostring;
+              End;
+            End;
+          End
+         Else
+          Begin
+           For C := 1 To bJsonArrayD.count -1 Do //Valores
+            Begin
+             If vMassiveFields.Items[C-1].vFieldType in [ovString, ovWideString, ovWideMemo, ovFixedChar, ovFixedWideChar] Then
+              Begin
+               If lowercase(removestr(bJsonArrayD.items[C].tostring,'"')) <> 'null' then
+                MassiveLine.Values[C].Value := DecodeStrings(removestr(bJsonArrayD.items[C].tostring,'"'){$IFDEF FPC}, csUndefined{$ENDIF})
+               Else
+                MassiveLine.Values[C].Value := removestr(bJsonArrayD.items[C].tostring,'"');
+              End
+             Else
+              MassiveLine.Values[C].Value := removestr(bJsonArrayD.items[C].tostring,'"');
+            End;
+          End;
+        Finally
+         vMassiveBuffer.Add(MassiveLine);
+        End;
+       End;
+       {$ELSE}
       For E := 0 to bJsonArrayB.length -1  Do
        Begin
         bJsonArrayC := bJsonArrayB.getJSONArray(E);
@@ -1241,6 +1365,8 @@ Begin
          vMassiveBuffer.Add(MassiveLine);
         End;
        End;
+       {$ENDIF}
+
       FreeAndNil(bJsonOBJ);
      End;
    End;
