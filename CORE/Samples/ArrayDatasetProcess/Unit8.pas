@@ -49,8 +49,8 @@ type
     rdwSQLEmployeeJOB_COUNTRY: TStringField;
     rdwSQLEmployeeSALARY: TFloatField;
     rdwSQLEmployeeFULL_NAME: TStringField;
-    rdwSQLStringTableID: TWideStringField;
-    rdwSQLStringTableDESC: TWideStringField;
+    rdwSQLStringTableID: TStringField;
+    rdwSQLStringTableDESC: TStringField;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
   private
