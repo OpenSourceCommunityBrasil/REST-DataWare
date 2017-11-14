@@ -19,6 +19,7 @@
         <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="76"/>
         <CursorPos Y="89"/>
         <UsageCount Value="223"/>
@@ -137,7 +138,7 @@
       </Unit16>
       <Unit17>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="1577"/>
         <CursorPos Y="1592"/>
         <UsageCount Value="100"/>
@@ -254,7 +255,7 @@
       </Unit32>
       <Unit33>
         <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="2"/>
         <TopLine Value="2894"/>
         <CursorPos Y="2908"/>
         <UsageCount Value="94"/>
@@ -347,11 +348,10 @@
       </Unit43>
       <Unit44>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-db\src\base\db.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="55"/>
         <CursorPos X="20" Y="64"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit44>
       <Unit45>
         <Filename Value="..\..\..\..\Source\libs\indy10\trunk\Lib\System\IdBaseComponent.pas"/>
@@ -411,7 +411,7 @@
       </Unit52>
       <Unit53>
         <Filename Value="..\..\..\..\Source\libs\uDWConstsData.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="3"/>
         <UsageCount Value="19"/>
         <Loaded Value="True"/>
       </Unit53>
@@ -424,7 +424,6 @@
       </Unit54>
       <Unit55>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="1400"/>
         <CursorPos Y="1409"/>
