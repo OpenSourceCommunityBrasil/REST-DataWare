@@ -175,7 +175,8 @@ Var
              Try
               MassiveDataset.AtualRec.PrimaryValues[X].SaveToStream(vStringStream);
               vStringStream.Position := 0;
-              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).LoadFromStream(vStringStream, ftBlob);
+              If vStringStream.Size > 0 Then
+               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).LoadFromStream(vStringStream, ftBlob);
              Finally
               FreeAndNil(vStringStream);
              End;
@@ -241,9 +242,15 @@ Var
        Begin
         vStringStream := TMemoryStream.Create;
         Try
-         MassiveDataset.Fields.FieldByName(Query.Params[I].Name).SaveToStream(vStringStream);
-         vStringStream.Position := 0;
-         Query.Params[I].LoadFromStream(vStringStream, ftBlob);
+         If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> 'null') And
+            (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> '') Then
+          Begin
+           MassiveDataset.Fields.FieldByName(Query.Params[I].Name).SaveToStream(vStringStream);
+           vStringStream.Position := 0;
+           Query.Params[I].LoadFromStream(vStringStream, ftBlob);
+          End
+         Else
+          Query.Params[I].Clear;
         Finally
          FreeAndNil(vStringStream);
         End;
@@ -331,7 +338,7 @@ Var
           Query.Params[I].DataType := ftString
          Else
           Query.Params[I].DataType := vFieldType;
-         Continue;
+         Query.Params[I].Clear;
         End;
        If MassiveDataset.MassiveMode <> mmUpdate Then
         Begin
@@ -393,10 +400,13 @@ Var
             Begin
              vStringStream := TMemoryStream.Create;
              Try
-              MassiveDataset.Fields.FieldByName(Query.Params[I].Name).SaveToStream(vStringStream);
-              vStringStream.Position := 0;
-              If vStringStream.Size > 0 Then
-               Query.Params[I].LoadFromStream(vStringStream, ftBlob)
+              If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> 'null') And
+                 (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> '') Then
+               Begin
+                MassiveDataset.Fields.FieldByName(Query.Params[I].Name).SaveToStream(vStringStream);
+                vStringStream.Position := 0;
+                Query.Params[I].LoadFromStream(vStringStream, ftBlob);
+               End
               Else
                Query.Params[I].Clear;
              Finally
@@ -606,7 +616,8 @@ Begin
                 Try
                  Params[I].SaveToStream(vStringStream);
                  vStringStream.Position := 0;
-                 vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
+                 If vStringStream.Size > 0 Then
+                  vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
                 Finally
                  FreeAndNil(vStringStream);
                 End;
@@ -672,7 +683,8 @@ Begin
               Try
                Params[I].SaveToStream(vStringStream);
                vStringStream.Position := 0;
-               vTempQuery.Params[I].LoadFromStream(vStringStream, ftBlob);
+               If vStringStream.Size > 0 Then
+                vTempQuery.Params[I].LoadFromStream(vStringStream, ftBlob);
               Finally
                FreeAndNil(vStringStream);
               End;
@@ -1009,9 +1021,15 @@ Var
        Begin
         vStringStream := TMemoryStream.Create;
         Try
-         MassiveDataset.Fields.FieldByName(Query.Params[I].Name).SaveToStream(vStringStream);
-         vStringStream.Position := 0;
-         Query.Params[I].LoadFromStream(vStringStream, ftBlob);
+         If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> 'null') And
+            (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> '') Then
+          Begin
+           MassiveDataset.Fields.FieldByName(Query.Params[I].Name).SaveToStream(vStringStream);
+           vStringStream.Position := 0;
+           Query.Params[I].LoadFromStream(vStringStream, ftBlob);
+          End
+         Else
+          Query.Params[I].Clear;
         Finally
          FreeAndNil(vStringStream);
         End;
@@ -1099,7 +1117,7 @@ Var
           Query.Params[I].DataType := ftString
          Else
           Query.Params[I].DataType := vFieldType;
-         Continue;
+         Query.Params[I].Clear;
         End;
        If MassiveDataset.MassiveMode <> mmUpdate Then
         Begin
@@ -1159,10 +1177,13 @@ Var
             Begin
              vStringStream := TMemoryStream.Create;
              Try
-              MassiveDataset.Fields.FieldByName(Query.Params[I].Name).SaveToStream(vStringStream);
-              vStringStream.Position := 0;
-              If vStringStream.Size > 0 Then
-               Query.Params[I].LoadFromStream(vStringStream, ftBlob)
+              If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> 'null') And
+                 (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> '') Then
+               Begin
+                MassiveDataset.Fields.FieldByName(Query.Params[I].Name).SaveToStream(vStringStream);
+                vStringStream.Position := 0;
+                Query.Params[I].LoadFromStream(vStringStream, ftBlob);
+               End
               Else
                Query.Params[I].Clear;
              Finally
@@ -1336,7 +1357,8 @@ Begin
                    Try
                     Params[I].SaveToStream(vStringStream);
                     vStringStream.Position := 0;
-                    vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
+                    If vStringStream.Size > 0 Then
+                     vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
                    Finally
                     FreeAndNil(vStringStream);
                    End;
@@ -1552,7 +1574,8 @@ Begin
               Try
                Params[I].SaveToStream(vStringStream);
                vStringStream.Position := 0;
-               fdCommand.Params[A].LoadFromStream(vStringStream, ftBlob);
+               If vStringStream.Size > 0 Then
+                fdCommand.Params[A].LoadFromStream(vStringStream, ftBlob);
               Finally
                FreeAndNil(vStringStream);
               End;

@@ -42,9 +42,11 @@ type
     Label3: TLabel;
     SpeedButton3: TSpeedButton;
     OpenPictureDialog1: TOpenPictureDialog;
+    SpeedButton4: TSpeedButton;
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);
     procedure SpeedButton3Click(Sender: TObject);
+    procedure SpeedButton4Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -95,6 +97,13 @@ begin
     RESTDWClientSQL1.Edit;
    TBlobField(RESTDWClientSQL1BLOBIMAGE).LoadFromFile(OpenPictureDialog1.FileName);
   End;
+end;
+
+procedure TForm7.SpeedButton4Click(Sender: TObject);
+begin
+ If Not(RESTDWClientSQL1.State in [dsEdit, dsInsert]) Then
+  RESTDWClientSQL1.Edit;
+ RESTDWClientSQL1BLOBIMAGE.Clear;
 end;
 
 end.

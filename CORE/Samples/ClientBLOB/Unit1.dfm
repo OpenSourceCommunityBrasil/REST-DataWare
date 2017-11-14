@@ -1143,6 +1143,7 @@ object Form5: TForm5
     OnClick = BitBtn1Click
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
+    OnCalcFields = RESTDWClientSQL1CalcFields
     FieldDefs = <
       item
         Name = 'ID_PESSOA'
@@ -1182,7 +1183,16 @@ object Form5: TForm5
         Name = 'DT_ALTERACAO'
         DataType = ftTimeStamp
       end>
-    OnCalcFields = RESTDWClientSQL1CalcFields
+    IndexDefs = <>
+    MasterFields = ''
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
     DataCache = False
@@ -1191,6 +1201,8 @@ object Form5: TForm5
     SQL.Strings = (
       'SELECT * FROM TB_USUARIO')
     CacheUpdateRecords = True
+    AutoCommitData = False
+    AutoRefreshAfterCommit = False
     InBlockEvents = False
     Left = 291
     Top = 23
@@ -1250,12 +1262,11 @@ object Form5: TForm5
     StrsEmpty2Null = False
     StrsTrim2Len = True
     WelcomeMessage = 'EMPLOYEE.FDB'
-    DateSeparator = '/'
-    TimeSeparator = ':'
     DecimalSeparator = ','
     OnWork = RESTDWDataBase1Work
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd
+    ParamCreate = True
     Left = 227
     Top = 23
   end
