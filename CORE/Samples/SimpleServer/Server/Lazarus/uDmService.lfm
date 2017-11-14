@@ -17,6 +17,7 @@ object ServerMethodDM: TServerMethodDM
     StrsTrim2Len = True
     Active = True
     PoolerOffMessage = 'RESTPooler not active.'
+    ParamCreate = True
     left = 80
     top = 176
   end
