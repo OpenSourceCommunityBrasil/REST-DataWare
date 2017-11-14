@@ -5,7 +5,7 @@ interface
 uses
   Lcl, uDWJSON,  SysUtils, Variants, Classes, Graphics,
   Controls, Forms, Dialogs, StdCtrls, fpjson, jsonparser, DB, BufDataset,
-  DBGrids, ExtCtrls, ComCtrls, uRESTDWPoolerDB,
+  DBGrids, ExtCtrls, ComCtrls, uRESTDWPoolerDB, JvMemDS,
   IdComponent;
 
 type
@@ -86,8 +86,10 @@ Begin
  RESTDWClientSQL1.sql.clear;
  RESTDWClientSQL1.sql.add(mComando.Text);
  RESTDWClientSQL1.Open;
+ If RESTDWClientSQL1.FindField('EMP_NO') <> Nil Then
+  RESTDWClientSQL1.FindField('EMP_NO').ProviderFlags := [pfInUpdate, pfInWhere, pfInKey];
  If RESTDWClientSQL1.FindField('FULL_NAME') <> Nil Then
-  RESTDWClientSQL1.FindField('FULL_NAME').ReadOnly := True;
+  RESTDWClientSQL1.FindField('FULL_NAME').ReadOnly   := True;
 End;
 
 procedure TForm2.Button2Click(Sender: TObject);

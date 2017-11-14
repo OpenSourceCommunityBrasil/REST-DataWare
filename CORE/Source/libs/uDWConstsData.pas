@@ -7,7 +7,7 @@ interface
 Uses
  SysUtils,  Classes,  DB
  {$IFDEF FPC}
-  , BufDataset;
+  , memds;
  {$ELSE}
    {$IFDEF RESJEDI}
     , JvMemoryDataset
@@ -31,9 +31,9 @@ End;
 
 Type
  {$IFDEF FPC}
-  TRESTDWClientSQLBase   = Class(TBufDataset)                   //Classe com as funcionalidades de um DBQuery
+  TRESTDWClientSQLBase   = Class(TMemDataset)                   //Classe com as funcionalidades de um DBQuery
   Public
-   Constructor Create(AOwner: TComponent); Override;
+//   Constructor Create(AOwner: TComponent); Override;
  {$ELSE}
   {$IFDEF RESJEDI}
   TRESTDWClientSQLBase   = Class(TJvMemoryData)                 //Classe com as funcionalidades de um DBQuery
@@ -63,16 +63,13 @@ Type
 
 implementation
 
-{ TRESTDWClientSQLBase }
-
-{$IFDEF FPC}
+{
 Constructor TRESTDWClientSQLBase.Create(AOwner: TComponent);
 Begin
- Inherited Create(AOwner);
- //SetDefaultFields(csDesigning in ComponentState);
- SetDefaultFields(True);
+ Inherited;//(AOwner);
+ SetDefaultFields(csDesigning in ComponentState);
+// SetDefaultFields(True);
 End;
-{$ENDIF}
-
+}
 
 end.

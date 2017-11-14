@@ -7,7 +7,7 @@ Interface
 Uses
  {$IFDEF FPC}
  SysUtils,            Classes, uDWJSONTools,      IdGlobal, DB, uDWJSON,   uDWConsts,
- uDWConstsData,       BufDataset,  LConvEncoding, Variants;
+ uDWConstsData,       memds,  LConvEncoding, Variants;
  {$ELSE}
  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
  System.SysUtils,     System.Classes,      uDWJSONTools, uDWConsts, uDWJSON,
@@ -1539,7 +1539,7 @@ Begin
        FreeAndNil(bJsonOBJ);
       End;
      End;
-    TRESTDWClientSQL(DestDS).FieldDefs.EndUpdate;;
+    TRESTDWClientSQL(DestDS).FieldDefs.EndUpdate;
     Try
      {$IFNDEF FPC}
      If DestDS Is TClientDataset Then
@@ -1559,8 +1559,10 @@ Begin
       DestDS.Open;
      {$ELSE}
      TRESTDWClientSQL(DestDS).Inactive   := True;
-     If DestDS is TBufDataset Then
-      TBufDataset(DestDS).CreateDataset;
+//     If DestDS is TBufDataset Then
+//      TBufDataset(DestDS).CreateDataset;
+     If DestDS is TMemDataset Then
+      TMemDataset(DestDS).CreateTable;
      DestDS.Open;
      TRESTDWClientSQL(DestDS).Active     := True;
      TRESTDWClientSQL(DestDS).Inactive   := False;
@@ -1605,7 +1607,7 @@ Begin
        If Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(2).ToString).ToString)) = 'S' Then
         Begin
          {$IFDEF FPC}
-         Field := TBufDataset(DestDS).FindField  (bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString);
+         Field := TMemDataset(DestDS).FindField  (bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString);
          {$ELSE}
          {$IFDEF RESJEDI}
            Field := TJvMemoryData(DestDS).FindField(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString);

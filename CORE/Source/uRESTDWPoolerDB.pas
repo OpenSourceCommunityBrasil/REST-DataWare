@@ -18,7 +18,7 @@ uses SysUtils,  Classes,      uDWJSONObject,
      uRESTDWMasterDetailData, uDWConstsData,
      uDWMassiveBuffer,        SyncObjs, uDWJSONTools, udwjson
      {$IFDEF FPC}
-     , uDWConsts,             BufDataset;
+     , uDWConsts,             memds;
      {$ELSE}
        {$IFDEF RESJEDI}
        , JvMemoryDataset
@@ -224,6 +224,9 @@ End;
 Type
  { TRESTDWClientSQL }
  TRESTDWClientSQL     = Class(TRESTDWClientSQLBase) //Classe com as funcionalidades de um DBQuery
+ Protected
+  vActive,
+  vInactive            : Boolean;
  Private
   vRESTClientPooler    : TRESTClientPooler;
   vMassiveCache        : TDWMassiveCache;
@@ -251,7 +254,6 @@ Type
   vUpdateTableName     : String;                            //Tabela que será feito Update no Servidor se for usada Reflexão de Dados
   vActiveCursor,
   vOnOpenCursor,
-  vInactive,
   vCacheUpdateRecords,
   vReadData,
   vCascadeDelete,
@@ -260,8 +262,7 @@ Type
   vConnectedOnce,                                           //Verifica se foi conectado ao Servidor
   vCommitUpdates,
   vCreateDS,
-  vErrorBefore,
-  vActive              : Boolean;                           //Estado do Dataset
+  vErrorBefore         : Boolean;                           //Estado do Dataset
   vSQL                 : TStringList;                       //SQL a ser utilizado na conexão
   vParams              : TParams;                           //Parametros de Dataset
   vCacheDataDB         : TDataset;                          //O Cache de Dados Salvo para utilização rápida
@@ -273,8 +274,8 @@ Type
   vMasterDetailList    : TMasterDetailList;                 //DataSet MasterDetail Function
   vMassiveDataset      : TMassiveDataset;
   {$IFDEF FPC}
-  Procedure CloneDefinitions     (Source  : TBufDataset;
-                                  aSelf   : TBufDataset);   //Fields em Definições
+  Procedure CloneDefinitions     (Source  : TMemDataset;
+                                  aSelf   : TMemDataset);   //Fields em Definições
   {$ELSE}
   {$IFDEF RESJEDI}
   Procedure  CloneDefinitions    (Source  : TJvMemoryData;
@@ -1714,12 +1715,11 @@ End;
 
 constructor TRESTDWClientSQL.Create(AOwner: TComponent);
 Begin
- vInactive                         := True;
  Inherited;
+ vInactive                         := False;
  vInBlockEvents                    := False;
  vOnOpenCursor                     := False;
  vRESTClientPooler                 := TRESTClientPooler.Create(Nil);
- vInactive                         := False;
  vDataCache                        := False;
  vAutoCommitData                   := False;
  vAutoRefreshAfterCommit           := False;
@@ -1778,7 +1778,7 @@ Begin
  {$ENDIF}
  vMassiveDataset                   := TMassiveDatasetBuffer.Create(Self);
  {$IFDEF FPC}
-  TBufDataset(Self).PacketRecords  := 1;
+//  TBufDataset(Self).PacketRecords  := 1;
  {$ENDIF}
 End;
 
@@ -2513,7 +2513,7 @@ procedure TRESTDWClientSQL.CreateDataSet;
 Begin
  vCreateDS := True;
  {$IFDEF FPC}
-  TBufDataset(Self).Open;
+  TMemDataset(Self).Open;
  {$ELSE}
  {$IFDEF RESJEDI}
      TJvMemoryData(Self).Open;
@@ -2683,8 +2683,8 @@ Begin
 End;
 
 {$IFDEF FPC}
-procedure TRESTDWClientSQL.CloneDefinitions(Source: TBufDataset;
-  aSelf: TBufDataset);
+procedure TRESTDWClientSQL.CloneDefinitions(Source: TMemDataset;
+  aSelf: TMemDataset);
 {$ELSE}
 {$IFDEF RESJEDI}
 Procedure TRESTDWClientSQL.CloneDefinitions(Source : TJvMemoryData; aSelf : TJvMemoryData);
@@ -2853,7 +2853,7 @@ Begin
    If vActive Then
     Begin
      {$IFDEF FPC}
-      TBufDataset(Self).Open;
+      TMemDataset(Self).Open;
      {$ELSE}
      {$IFDEF RESJEDI}
       TJvMemoryData(Self).Open;
@@ -2869,7 +2869,7 @@ Begin
    Else
     Begin
      {$IFDEF FPC}
-      TBufDataset(Self).Close;
+      TMemDataset(Self).Close;
      {$ELSE}
      {$IFDEF RESJEDI}
       TJvMemoryData(Self).Close;
@@ -2892,7 +2892,10 @@ Begin
     If Not vRESTDataBase.Active Then
      vRESTDataBase.Active := True;
    If Not vRESTDataBase.Active then
-    Exit;
+    Begin
+     vActive := False;
+     Exit;
+    End;
    Try
     If Not(vActive) And (Value) Then
      Begin

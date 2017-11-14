@@ -1,8 +1,10 @@
 object Form2: TForm2
-  Left = 398
+  Left = 423
   Height = 430
-  Top = 123
+  Top = 145
   Width = 512
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
   Caption = 'RESTClientPooler Test'
   ClientHeight = 430
   ClientWidth = 512
@@ -1112,9 +1114,9 @@ object Form2: TForm2
     TabOrder = 10
   end
   object RESTDWDataBase1: TRESTDWDataBase
-    Active = False
+    Active = True
     Compression = True
-    MyIP = '0.0.0.0'
+    MyIP = '127.0.0.1'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -1139,8 +1141,13 @@ object Form2: TForm2
     left = 264
     top = 184
   end
+  object DataSource1: TDataSource
+    DataSet = RESTDWClientSQL1
+    left = 336
+    top = 304
+  end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    PacketRecords = 1
+    Active = False
     FieldDefs = <    
       item
         Name = 'EMP_NO'
@@ -1204,28 +1211,20 @@ object Form2: TForm2
         Precision = -1
         Size = 37
       end>
-    Active = False
-    AfterInsert = RESTDWClientSQL1AfterInsert
     MasterCascadeDelete = True
     Inactive = False
     DataCache = False
     Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
-      'SELECT * FROM EMPLOYEE'
-      'ORDER BY EMP_NO'
+      'select * from employee'
     )
     UpdateTableName = 'employee'
     CacheUpdateRecords = True
     AutoCommitData = False
-    AutoRefreshAfterCommit = True
+    AutoRefreshAfterCommit = False
     InBlockEvents = False
-    left = 168
-    top = 168
-  end
-  object DataSource1: TDataSource
-    DataSet = RESTDWClientSQL1
-    left = 161
-    top = 221
+    left = 203
+    top = 261
   end
 end
