@@ -2630,9 +2630,7 @@ Begin
        If vAutoCommitData Then
         ApplyUpdates(vError);
       If vError <> '' Then
-       Begin
-
-       End
+       Raise Exception.Create(vError)
       Else
        Begin
         If Assigned(vAfterPost) Then

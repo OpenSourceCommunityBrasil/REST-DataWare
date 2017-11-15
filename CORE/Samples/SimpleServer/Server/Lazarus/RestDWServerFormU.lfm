@@ -4475,4 +4475,9 @@ object RestDWForm: TRestDWForm
     left = 324
     top = 120
   end
+  object ZQuery1: TZQuery
+    Params = <>
+    left = 216
+    top = 44
+  end
 end

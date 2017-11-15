@@ -4,7 +4,7 @@ Interface
 
 Uses LCL, LCLIntf, LCLType, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, winsock, uSock, IniFiles, IBConnection, uRESTDWBase,
-  ServerMethodsUnit1, ComCtrls, MaskEdit, StdCtrls, ExtCtrls, Menus,
+  ServerMethodsUnit1, ComCtrls, MaskEdit, StdCtrls, ExtCtrls, Menus, ZDataset,
   IdComponent, IdBaseComponent, IdTCPConnection, IdTCPClient, IdHTTP;
 
 type
@@ -67,6 +67,7 @@ type
     RESTServicePooler1: TRESTServicePooler;
     CheckBox1: TCheckBox;
     tupdatelogs: TTimer;
+    ZQuery1: TZQuery;
     procedure ctiPrincipalClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ApplicationEvents1Idle(Sender: TObject; var Done: Boolean);
