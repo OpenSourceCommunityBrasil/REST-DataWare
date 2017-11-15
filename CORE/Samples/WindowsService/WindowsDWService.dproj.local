@@ -1,14 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>2017/06/14 14:11:31.000.537,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\srvModBaseDados.pas=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1.pas</Transaction>
     <Transaction>2017/06/14 14:11:31.000.537,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\srvModBaseDados.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1.dfm</Transaction>
+    <Transaction>2017/06/14 14:11:31.000.537,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\srvModBaseDados.pas=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1.pas</Transaction>
     <Transaction>2017/06/14 14:12:49.000.684,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1Unit.dfm</Transaction>
     <Transaction>2017/06/14 14:32:06.000.792,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServidorREST.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\WindowsDWService.dproj</Transaction>
     <Transaction>2017/06/16 10:13:34.000.040,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1Unit.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethodsUnit1.dfm</Transaction>
-    <Transaction>2017/11/15 18:37:27.000.481,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\WindowsService\ServerMethodsUnit1.pas=</Transaction>
-    <Transaction>2017/11/15 18:38:20.000.332,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\WindowsService\uDmService.pas</Transaction>
-    <Transaction>2017/11/15 18:44:25.000.221,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\WindowsService\Server.Containner.pas=</Transaction>
-    <Transaction>2017/11/15 19:25:16.210,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\WindowsService\Server.Containner.pas</Transaction>
   </Transactions>
 </BorlandProject>
