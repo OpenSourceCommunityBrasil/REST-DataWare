@@ -3,7 +3,7 @@ unit RestDWServerFormU;
 Interface
 
 Uses LCL, LCLIntf, LCLType, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, winsock, uSock, IniFiles, IBConnection, uRESTDWBase,
+  Dialogs, winsock, uSock, IniFiles, IBConnection, db, uRESTDWBase, JvMemDS,
   ServerMethodsUnit1, ComCtrls, MaskEdit, StdCtrls, ExtCtrls, Menus, ZDataset,
   IdComponent, IdBaseComponent, IdTCPConnection, IdTCPClient, IdHTTP;
 
@@ -14,6 +14,9 @@ type
   TRestDWForm = class(TForm)
     ButtonStart: TButton;
     ButtonStop: TButton;
+    JvMemoryData1: TJvMemoryData;
+    JvMemoryData1ID: TLongintField;
+    JvMemoryData1teste: TStringField;
     Label8: TLabel;
     Bevel3: TBevel;
     lSeguro: TLabel;
@@ -224,6 +227,7 @@ procedure TRestDWForm.ButtonStartClick(Sender: TObject);
 Var
  ini       : TIniFile;
 Begin
+ JvMemoryData1.Open;
  If FileExists(FCfgName) Then
   DeleteFile(FCfgName);
  ini       := TIniFile.Create(FCfgName);

@@ -209,7 +209,8 @@ Var
        End;
       If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
        Begin
-        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+        If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+           (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
          Begin
            // Alterado por: Alexandre Magno - 04/11/2017
            If Query.Params[I].DataType = ftLargeint Then
@@ -228,12 +229,14 @@ Var
        End
       Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
        Begin
-        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+        If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+           (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
          Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
        End
       Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
        Begin
-        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+        If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+           (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
          Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
         Else
          Query.Params[I].Clear;
@@ -346,7 +349,8 @@ Var
                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                ftString,    ftWideString, ftWideMemo]    Then
           Begin
-           If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+           If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+              (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
             Begin
              If Query.Params[I].Size > 0 Then
               Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
@@ -367,7 +371,8 @@ Var
             End;
            If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
             Begin
-             If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+             If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+                (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Begin
                If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
                 Begin
@@ -384,14 +389,16 @@ Var
             End
            Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
             Begin
-             If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+             If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+                (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
              Else
               Query.Params[I].Clear;
             End
            Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
             Begin
-             If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+             If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+                (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
              Else
               Query.Params[I].Clear;
@@ -413,7 +420,8 @@ Var
               FreeAndNil(vStringStream);
              End;
             End
-           Else If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+           Else If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+                   (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
             Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value
            Else
             Query.Params[I].Clear;
@@ -972,10 +980,14 @@ Var
                           ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                           ftString,    ftWideString, ftWideMemo]    Then
      Begin
-      If Query.Params[I].Size > 0 Then
-       Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
-      Else
-       Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value;
+      If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+         (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
+       Begin
+        If Query.Params[I].Size > 0 Then
+         Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
+        Else
+         Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value;
+       End;
      End
     Else
      Begin
@@ -988,7 +1000,8 @@ Var
        End;
       If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
        Begin
-        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+        If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+           (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
          Begin
            // Alterado por: Alexandre Magno - 04/11/2017
            If Query.Params[I].DataType = ftLargeint Then
@@ -1003,19 +1016,25 @@ Var
            //  Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
            //Else
            //  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
-         End;
+         End
+        Else
+         Query.Params[I].Clear;
        End
       Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
        Begin
-        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
-         Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+        If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+           (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
+         Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+        Else
+         Query.Params[I].Clear;
        End
       Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
        Begin
-        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+        If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+           (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
          Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
         Else
-         Query.Params[I].AsDateTime  := Null;
+         Query.Params[I].Clear;
        End  //Tratar Blobs de Parametros...
       Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
        Begin
@@ -1125,7 +1144,8 @@ Var
                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                ftString,    ftWideString, ftWideMemo]    Then
           Begin
-           If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+           If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+              (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
             Begin
              If Query.Params[I].Size > 0 Then
               Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
@@ -1146,7 +1166,8 @@ Var
             End;
            If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
             Begin
-             If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+             If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+                (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Begin
                If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
                 Begin
@@ -1157,18 +1178,22 @@ Var
                  Else
                   Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
                 End;
-              End;
+              End
+             Else
+              Query.Params[I].Clear;
             End
            Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
             Begin
-             If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+             If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+                (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
              Else
               Query.Params[I].Clear;
             End
            Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
             Begin
-             If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+             If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+                (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
              Else
               Query.Params[I].Clear;
@@ -1190,7 +1215,8 @@ Var
               FreeAndNil(vStringStream);
              End;
             End
-           Else If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+           Else If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+                   (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
             Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value
            Else
             Query.Params[I].Clear;

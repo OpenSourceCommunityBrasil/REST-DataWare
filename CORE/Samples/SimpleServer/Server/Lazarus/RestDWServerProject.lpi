@@ -30,25 +30,28 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="6">
+    <RequiredPackages Count="7">
       <Item1>
-        <PackageName Value="zcomponent"/>
+        <PackageName Value="JVCL"/>
       </Item1>
       <Item2>
-        <PackageName Value="FCL"/>
+        <PackageName Value="zcomponent"/>
       </Item2>
       <Item3>
-        <PackageName Value="RESTDWLazDriver"/>
+        <PackageName Value="FCL"/>
       </Item3>
       <Item4>
-        <PackageName Value="SQLDBLaz"/>
+        <PackageName Value="RESTDWLazDriver"/>
       </Item4>
       <Item5>
-        <PackageName Value="resteasyobjectscore"/>
+        <PackageName Value="SQLDBLaz"/>
       </Item5>
       <Item6>
-        <PackageName Value="LCL"/>
+        <PackageName Value="resteasyobjectscore"/>
       </Item6>
+      <Item7>
+        <PackageName Value="LCL"/>
+      </Item7>
     </RequiredPackages>
     <Units Count="5">
       <Unit0>

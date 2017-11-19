@@ -4480,4 +4480,28 @@ object RestDWForm: TRestDWForm
     left = 216
     top = 44
   end
+  object JvMemoryData1: TJvMemoryData
+    FieldDefs = <>
+    left = 92
+    top = 127
+    object JvMemoryData1teste: TStringField
+      FieldKind = fkData
+      FieldName = 'teste'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 100
+    end
+    object JvMemoryData1ID: TLongintField
+      FieldKind = fkData
+      FieldName = 'ID'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+  end
 end
