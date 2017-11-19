@@ -592,7 +592,7 @@ Begin
                End;
               If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
                Begin
-                If Trim(Params[I].Value) <> '' Then
+                If (Params[I].Value <> Null) Then
                  Begin
                   If vTempQuery.Params[A].DataType = ftLargeint Then
                    vTempQuery.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
@@ -606,14 +606,14 @@ Begin
                End
               Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
                Begin
-                If Trim(Params[I].Value) <> '' Then
+                If (Params[I].Value <> Null) Then
                  vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value)
                 Else
                  vTempQuery.Params[A].Clear;
                End
               Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
                Begin
-                If Trim(Params[I].Value) <> '' Then
+                If (Params[I].Value <> Null) Then
                  vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
                 Else
                  vTempQuery.Params[A].Clear;
@@ -633,7 +633,12 @@ Begin
               Else If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                         ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                                         ftString,    ftWideString, ftWideMemo]    Then
-               vTempQuery.Params[A].AsString := Params[I].Value
+               Begin
+                If (Trim(Params[I].Value) <> '') Then
+                 vTempQuery.Params[A].AsString := Params[I].Value
+                Else
+                 vTempQuery.Params[A].Clear;
+               End
               Else
                vTempQuery.Params[A].Value    := Params[I].Value;
              End;
@@ -658,7 +663,7 @@ Begin
             DataType := ftString;
            If vTempQuery.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
             Begin
-             If Trim(Params[I].Value) <> '' Then
+             If (Params[I].Value <> Null) Then
               Begin
                // Alterado por: Alexandre Magno - 04/11/2017
                If vTempQuery.Params[I].DataType = ftLargeint Then
@@ -673,14 +678,14 @@ Begin
             End
             Else If vTempQuery.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
              Begin
-              If Trim(Params[I].Value) <> '' Then
+              If (Params[I].Value <> Null) Then
                vTempQuery.Params[I].AsFloat  := StrToFloat(Params[I].Value)
               Else
                vTempQuery.Params[I].Clear;
              End
             Else If vTempQuery.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
              Begin
-              If Trim(Params[I].Value) <> '' Then
+              If (Params[I].Value <> Null) Then
                vTempQuery.Params[I].AsDateTime  := StrToFloat(Params[I].Value)
               Else
                vTempQuery.Params[I].Clear;
@@ -700,7 +705,13 @@ Begin
             Else If vTempQuery.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                                       ftString,    ftWideString, ftWideMemo]    Then
-             vTempQuery.Params[I].AsString := Params[I].Value
+             Begin
+              If (Params[I].Value <> '') And
+                 (Params[I].Value <> Null) Then
+               vTempQuery.Params[I].AsString := Params[I].Value
+              Else
+               vTempQuery.Params[I].Clear;
+             End
             Else
              vTempQuery.Params[I].Value    := Params[I].Value;
           End;

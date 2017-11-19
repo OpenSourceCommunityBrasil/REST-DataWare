@@ -1946,6 +1946,10 @@ Var
      Begin
       vParams.CreateParam(FieldDef.DataType, Value, ptInput);
       vParams.ParamByName(Value).Size := FieldDef.Size;
+//      If FieldDef.DataType in [ftSmallint, ftInteger, ftLargeint, ftWord,
+//                               {$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord,{$IFEND}{$ENDIF}
+//                               ftBoolean, ftFloat, ftCurrency, ftBCD, ftFMTBcd] Then
+//       vParams.ParamByName(Value).Value := -1;
      End;
    End
   Else If Not(ParamSeek(Value)) Then

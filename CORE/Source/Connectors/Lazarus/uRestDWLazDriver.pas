@@ -193,7 +193,7 @@ Begin
              End;
             If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLargeint] Then
              Begin
-              If Trim(Params[I].Value) <> '' Then
+              If (Params[I].Value <> Null) Then
                Begin
                 If vTempQuery.Params[A].DataType = ftSmallInt Then
                  vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
@@ -203,15 +203,17 @@ Begin
              End
             Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
              Begin
-              If Trim(Params[I].Value) <> '' Then
-               vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value);
+              If (Params[I].Value <> Null) Then
+               vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value)
+              Else
+               vTempQuery.Params[A].Clear;
              End
             Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
              Begin
-              If Trim(Params[I].Value) <> '' Then
+              If (Params[I].Value <> Null) Then
                vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
               Else
-               vTempQuery.Params[A].AsDateTime  := Null;
+               vTempQuery.Params[A].Clear;
              End
             Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
              Begin
@@ -228,7 +230,12 @@ Begin
             Else If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                                       ftString,    ftWideString]    Then
-             vTempQuery.Params[A].AsString := Params[I].Value
+             Begin
+              If (Trim(Params[I].Value) <> '') Then
+               vTempQuery.Params[A].AsString := Params[I].Value
+              Else
+               vTempQuery.Params[A].Clear;
+             End
             Else
              vTempQuery.Params[A].Value    := Params[I].Value;
            End;
