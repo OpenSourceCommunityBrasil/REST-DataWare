@@ -3,6 +3,7 @@ object ServerMethodDM: TServerMethodDM
   OnCreate = ServerMethodDataModuleCreate
   OnReplyEvent = ServerMethodDataModuleReplyEvent
   OnWelcomeMessage = ServerMethodDataModuleWelcomeMessage
+  OnMassiveProcess = ServerMethodDataModuleMassiveProcess
   Height = 220
   Width = 366
   object RESTDWPoolerDB1: TRESTDWPoolerDB

@@ -9,7 +9,8 @@ uses System.SysUtils,          System.Classes,          Data.DBXJSON,
      FireDAC.Stan.Pool,        FireDAC.Comp.Client,     FireDAC.Comp.UI,
      FireDAC.Comp.DataSet,     FireDAC.DApt.Intf,       Data.DB,
      uDWConsts, uDWConstsData, uRestDWPoolerDB,         udwjson,
-     uDWJSONObject,            uDWMassiveBuffer,        Variants;
+     uDWJSONObject,            uDWMassiveBuffer,        Variants,
+     uDWDatamodule,            SysTypes;
 
 Type
  TRESTDWDriverFD   = Class(TRESTDWDriver)
@@ -82,6 +83,7 @@ Var
  vStringStream  : TMemoryStream;
  bPrimaryKeys   : TStringList;
  vFieldType     : TFieldType;
+ vMassiveLine   : Boolean;
  Function GetParamIndex(Params : TFDParams; ParamName : String) : Integer;
  Var
   I : Integer;
@@ -453,6 +455,32 @@ Var
      For A := 1 To MassiveDataset.RecordCount Do
       Begin
        Query.SQL.Clear;
+       If Self.Owner      Is TServerMethodDataModule Then
+        Begin
+         vMassiveLine := False;
+         If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveProcess) Then
+          Begin
+           TServerMethodDataModule(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+           If vMassiveLine Then
+            Begin
+             MassiveDataset.Next;
+             Continue;
+            End;
+          End;
+        End
+       Else If Self.Owner Is TServerMethods Then
+        Begin
+         vMassiveLine := False;
+         If Assigned(TServerMethods(Self.Owner).OnMassiveProcess) Then
+          Begin
+           TServerMethods(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+           If vMassiveLine Then
+            Begin
+             MassiveDataset.Next;
+             Continue;
+            End;
+          End;
+        End;
        PrepareData(Query, MassiveDataset, Error, MessageError);
        Try
         Query.ExecSQL;
@@ -882,6 +910,7 @@ Var
  vStringStream  : TMemoryStream;
  bPrimaryKeys   : TStringList;
  vFieldType     : TFieldType;
+ vMassiveLine   : Boolean;
  Function GetParamIndex(Params : TFDParams; ParamName : String) : Integer;
  Var
   I : Integer;
@@ -1258,6 +1287,32 @@ Var
      If Not vFDConnection.InTransaction Then
       vFDConnection.StartTransaction;
      Query.SQL.Clear;
+     If Self.Owner      Is TServerMethodDataModule Then
+      Begin
+       vMassiveLine := False;
+       If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveProcess) Then
+        Begin
+         TServerMethodDataModule(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+         If vMassiveLine Then
+          Begin
+           MassiveDataset.Next;
+           Continue;
+          End;
+        End;
+      End
+     Else If Self.Owner Is TServerMethods Then
+      Begin
+       vMassiveLine := False;
+       If Assigned(TServerMethods(Self.Owner).OnMassiveProcess) Then
+        Begin
+         TServerMethods(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+         If vMassiveLine Then
+          Begin
+           MassiveDataset.Next;
+           Continue;
+          End;
+        End;
+      End;
      PrepareData(Query, MassiveDataset, Error, MessageError);
      Try
       Query.ExecSQL;

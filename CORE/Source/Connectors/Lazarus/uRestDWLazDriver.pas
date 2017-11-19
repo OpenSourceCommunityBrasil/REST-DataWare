@@ -7,7 +7,7 @@ uses SysUtils, Classes, DB, sqldb,       mssqlconn,     pqconnection,
      mysql50conn,       mysql51conn,     mysql55conn,   mysql56conn,
      mysql57conn,       sqlite3conn,     ibconnection,  uDWConsts,
      uDWConstsData,     uRESTDWPoolerDB, uDWJSONObject, uDWMassiveBuffer,
-     udwjson, Variants;
+     udwjson,           SysTypes,        uDWDatamodule, Variants;
 
 Type
 
@@ -305,6 +305,7 @@ Var
  vStringStream  : TMemoryStream;
  bPrimaryKeys   : TStringList;
  vFieldType     : TFieldType;
+ vMassiveLine,
  InTransaction  : Boolean;
  Function GetParamIndex(Params : TParams; ParamName : String) : Integer;
  Var
@@ -689,6 +690,32 @@ Var
        InTransaction := True;
       End;
      Query.SQL.Clear;
+     If Self.Owner      Is TServerMethodDataModule Then
+      Begin
+       vMassiveLine := False;
+       If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveProcess) Then
+        Begin
+         TServerMethodDataModule(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+         If vMassiveLine Then
+          Begin
+           MassiveDataset.Next;
+           Continue;
+          End;
+        End;
+      End
+     Else If Self.Owner Is TServerMethods Then
+      Begin
+       vMassiveLine := False;
+       If Assigned(TServerMethods(Self.Owner).OnMassiveProcess) Then
+        Begin
+         TServerMethods(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+         If vMassiveLine Then
+          Begin
+           MassiveDataset.Next;
+           Continue;
+          End;
+        End;
+      End;
      PrepareData(Query, MassiveDataset);
      Try
       Query.ExecSQL;
@@ -901,6 +928,7 @@ Var
  vStringStream  : TMemoryStream;
  bPrimaryKeys   : TStringList;
  vFieldType     : TFieldType;
+ vMassiveLine,
  InTransaction  : Boolean;
  Function GetParamIndex(Params : TParams; ParamName : String) : Integer;
  Var
@@ -1286,6 +1314,32 @@ Var
      For A := 1 To MassiveDataset.RecordCount Do
       Begin
        Query.SQL.Clear;
+       If Self.Owner      Is TServerMethodDataModule Then
+        Begin
+         vMassiveLine := False;
+         If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveProcess) Then
+          Begin
+           TServerMethodDataModule(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+           If vMassiveLine Then
+            Begin
+             MassiveDataset.Next;
+             Continue;
+            End;
+          End;
+        End
+       Else If Self.Owner Is TServerMethods Then
+        Begin
+         vMassiveLine := False;
+         If Assigned(TServerMethods(Self.Owner).OnMassiveProcess) Then
+          Begin
+           TServerMethods(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+           If vMassiveLine Then
+            Begin
+             MassiveDataset.Next;
+             Continue;
+            End;
+          End;
+        End;
        PrepareData(Query, MassiveDataset);
        Try
         Query.ExecSQL;

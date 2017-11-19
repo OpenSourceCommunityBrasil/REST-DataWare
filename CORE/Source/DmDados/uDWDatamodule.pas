@@ -10,11 +10,13 @@ Uses
   Private
    vReplyEvent     : TReplyEvent;
    vWelcomeMessage : TWelcomeMessage;
+   vMassiveProcess : TMassiveProcess;
   Public
    Encoding: TEncodeSelect;
   Published
    Property OnReplyEvent     : TReplyEvent      Read vReplyEvent     Write vReplyEvent;
    Property OnWelcomeMessage : TWelcomeMessage  Read vWelcomeMessage Write vWelcomeMessage;
+   Property OnMassiveProcess : TMassiveProcess  Read vMassiveProcess Write vMassiveProcess;
  End;
 
 implementation

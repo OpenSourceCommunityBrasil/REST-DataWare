@@ -4,14 +4,15 @@ Interface
 
 Uses
   IdURI, IdGlobal, SysUtils, Classes, ServerUtils, uRESTDWBase, uDWConsts,
-  uDWJSONObject, uDWConstsData;
+  uDWJSONObject, uDWConstsData, uDWMassiveBuffer;
 
 Type
- TReplyEvent     = Procedure(SendType   : TSendEvent;
-                             Context    : String;
-                             Var Params : TDWParams;
-                             Var Result : String) Of Object;
- TWelcomeMessage = Procedure(Welcomemsg : String) Of Object;
+ TReplyEvent     = Procedure(SendType           : TSendEvent;
+                             Context            : String;
+                             Var Params         : TDWParams;
+                             Var Result         : String) Of Object;
+ TWelcomeMessage = Procedure(Welcomemsg         : String) Of Object;
+ TMassiveProcess = Procedure(Var MassiveDataset : TMassiveDatasetBuffer; Var Ignore : Boolean) Of Object;
 
 Type
   TResultErro = Record
@@ -42,6 +43,7 @@ Type
   Protected
    vReplyEvent     : TReplyEvent;
    vWelcomeMessage : TWelcomeMessage;
+   vMassiveProcess : TMassiveProcess;
    Function ReturnIncorrectArgs: String;
    Function ReturnMethodNotFound: String;
   Public
@@ -51,6 +53,7 @@ Type
   Published
    Property OnReplyEvent     : TReplyEvent      Read vReplyEvent     Write vReplyEvent;
    Property OnWelcomeMessage : TWelcomeMessage  Read vWelcomeMessage Write vWelcomeMessage;
+   Property OnMassiveProcess : TMassiveProcess  Read vMassiveProcess Write vMassiveProcess;
   End;
 
 implementation

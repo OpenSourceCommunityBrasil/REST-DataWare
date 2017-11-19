@@ -7,11 +7,11 @@ USES
   Classes,
   SysTypes,
   UDWDatamodule,
+  uDWMassiveBuffer,
   System.JSON,
   UDWJSONObject,
   Dialogs,
   ServerUtils,
-  UDWConsts,
   FireDAC.Dapt,
   UDWConstsData,
   FireDAC.Phys.FBDef,
@@ -36,7 +36,8 @@ USES
   URestDWDriverFD,
   FireDAC.Phys.MSSQLDef,
   FireDAC.Phys.ODBCBase,
-  FireDAC.Phys.MSSQL;
+  FireDAC.Phys.MSSQL,
+  uDWConsts;
 
 TYPE
   TServerMethodDM = CLASS(TServerMethodDataModule)
@@ -53,6 +54,8 @@ TYPE
     PROCEDURE Server_FDConnectionBeforeConnect(Sender: TObject);
     PROCEDURE ServerMethodDataModuleWelcomeMessage(Welcomemsg: STRING);
     PROCEDURE Server_FDConnectionError(ASender, AInitiator: TObject; VAR AException: Exception);
+    procedure ServerMethodDataModuleMassiveProcess(
+      var MassiveDataset: TMassiveDatasetBuffer; var Ignore: Boolean);
   PRIVATE
     { Private declarations }
     FUNCTION ConsultaBanco(VAR Params: TDWParams): STRING; OVERLOAD;
@@ -104,6 +107,23 @@ PROCEDURE TServerMethodDM.ServerMethodDataModuleCreate(Sender: TObject);
 BEGIN
   RESTDWPoolerDB1.Active := RestDWForm.CbPoolerState.Checked;
 END;
+
+procedure TServerMethodDM.ServerMethodDataModuleMassiveProcess(
+  var MassiveDataset: TMassiveDatasetBuffer; var Ignore: Boolean);
+begin
+{ //Esse código é para manipular o evento nao permitindo que sejam alteradas por massive outras
+  //tabelas diferentes de employee e se você alterar o campo last_name no client ele substitui o valor
+  //pelo valor setado abaixo
+ Ignore := (MassiveDataset.MassiveMode in [mmInsert, mmUpdate, mmDelete]) and
+           (lowercase(MassiveDataset.TableName) <> 'employee');
+ If Not Ignore Then
+  Begin
+   If MassiveDataset.MassiveMode = mmUpdate Then
+    If MassiveDataset.Fields.FieldByName('last_name') <> Nil Then
+     MassiveDataset.Fields.FieldByName('last_name').Value := 'Server Alter';
+  End;
+ }
+end;
 
 PROCEDURE TServerMethodDM.ServerMethodDataModuleReplyEvent(SendType: TSendEvent; Context: STRING; VAR Params: TDWParams; VAR Result: STRING);
 VAR
