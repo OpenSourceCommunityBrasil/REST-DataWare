@@ -66,6 +66,9 @@
         <Projects Include="..\..\..\Samples\WindowsService\WindowsDWService.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\..\Samples\ISAPI\RestDWServerISAPI.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -263,14 +266,23 @@
     <Target Name="WindowsDWService:Make">
         <MSBuild Projects="..\..\..\Samples\WindowsService\WindowsDWService.dproj" Targets="Make"/>
     </Target>
+    <Target Name="RestDWServerISAPI">
+        <MSBuild Projects="..\..\..\Samples\ISAPI\RestDWServerISAPI.dproj"/>
+    </Target>
+    <Target Name="RestDWServerISAPI:Clean">
+        <MSBuild Projects="..\..\..\Samples\ISAPI\RestDWServerISAPI.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWServerISAPI:Make">
+        <MSBuild Projects="..\..\..\Samples\ISAPI\RestDWServerISAPI.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;RESTDWDriverZEOS;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClienteFMX;ClientSlides;Server_OSX;SimpleCRUD;ArrayDatasetProcess;exemplounigui;WindowsDWService"/>
+        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;RESTDWDriverZEOS;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClienteFMX;ClientSlides;Server_OSX;SimpleCRUD;ArrayDatasetProcess;exemplounigui;WindowsDWService;RestDWServerISAPI"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;RESTDWDriverZEOS:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClienteFMX:Clean;ClientSlides:Clean;Server_OSX:Clean;SimpleCRUD:Clean;ArrayDatasetProcess:Clean;exemplounigui:Clean;WindowsDWService:Clean"/>
+        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;RESTDWDriverZEOS:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClienteFMX:Clean;ClientSlides:Clean;Server_OSX:Clean;SimpleCRUD:Clean;ArrayDatasetProcess:Clean;exemplounigui:Clean;WindowsDWService:Clean;RestDWServerISAPI:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;RESTDWDriverZEOS:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClienteFMX:Make;ClientSlides:Make;Server_OSX:Make;SimpleCRUD:Make;ArrayDatasetProcess:Make;exemplounigui:Make;WindowsDWService:Make"/>
+        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;RESTDWDriverZEOS:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClienteFMX:Make;ClientSlides:Make;Server_OSX:Make;SimpleCRUD:Make;ArrayDatasetProcess:Make;exemplounigui:Make;WindowsDWService:Make;RestDWServerISAPI:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

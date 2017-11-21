@@ -29,7 +29,8 @@ Uses
      IdContext, IdTCPConnection,    IdHTTPServer,       IdCustomHTTPServer,  IdSSLOpenSSL,    IdSSL,
      IdAuthentication,              IdTCPClient,        IdHTTPHeaderInfo,    IdComponent, IdBaseComponent,
      IdHTTP,                        uDWConstsData,      IdMultipartFormData, IdMessageCoder,
-     IdMessageCoderMIME, IdMessage, uDWJSON,            uDWJSONObject, IdGlobal, IdGlobalProtocols;
+     IdMessageCoderMIME, IdMessage, uDWJSON,            uDWJSONObject, IdGlobal, IdGlobalProtocols,
+     HTTPDefs;
      {$ELSE}
      {$IF CompilerVersion < 21}
      SysUtils, Classes, EncdDecd, SyncObjs,
@@ -221,6 +222,68 @@ Type
   property SSLVerifyDepth: Integer read vSSLVerifyDepth write vSSLVerifyDepth;
 End;
 
+
+Type
+ TRESTServiceCGI = Class(TComponent)
+ Protected
+ Private
+  vServerContext,
+  FRootPath        : String;
+  vDataCompress,
+  vEncodeStrings   : Boolean;
+  vServerBaseMethod,
+  vServerMethod    : TComponentClass;
+  vServerParams    : TServerParams;
+  vLastRequest     : TLastRequest;
+  vLastResponse    : TLastResponse;
+  VEncondig        : TEncodeSelect;              //Enconding se usar CORS usar UTF8 - Alexandre Abade
+  Procedure SetServerMethod(Value                     : TComponentClass);
+  Procedure GetPoolerList(ServerMethodsClass          : TComponent;
+                          Var PoolerList              : String);
+  Function  ServiceMethods(BaseObject                 : TComponent;
+                           AContext,
+                           UrlMethod                  : String;
+                           Var DWParams               : TDWParams;
+                           Var JSONStr                : String) : Boolean;
+  Procedure EchoPooler    (ServerMethodsClass         : TComponent;
+                           AContext                   : String;
+                           Var Pooler, MyIP           : String);
+  Procedure ExecuteCommandPureJSON(ServerMethodsClass : TComponent;
+                                   Var Pooler         : String;
+                                   Var DWParams       : TDWParams);
+  Procedure ExecuteCommandJSON(ServerMethodsClass     : TComponent;
+                               Var Pooler             : String;
+                               Var DWParams           : TDWParams);
+  Procedure InsertMySQLReturnID(ServerMethodsClass    : TComponent;
+                                Var Pooler            : String;
+                                Var DWParams          : TDWParams);
+  Procedure ApplyUpdatesJSON   (ServerMethodsClass    : TComponent;
+                                Var Pooler            : String;
+                                Var DWParams          : TDWParams);
+  Procedure OpenDatasets       (ServerMethodsClass    : TComponent;
+                                Var Pooler            : String;
+                                Var DWParams          : TDWParams);
+  Procedure ApplyUpdates_MassiveCache(ServerMethodsClass : TComponent;
+                                      Var Pooler         : String;
+                                      Var DWParams       : TDWParams);
+ Public
+  {$IFDEF FPC}
+   Procedure Command(ARequest: TRequest; AResponse: TResponse; Var Handled: Boolean);
+  {$ELSE}
+  {$ENDIF}
+  Constructor Create           (AOwner                : TComponent);Override; //Cria o Componente
+  Destructor  Destroy;Override;                      //Destroy a Classe
+ Published
+  Property DataCompression       : Boolean         Read vDatacompress          Write vDatacompress;
+  Property EncodeStrings         : Boolean         Read vEncodeStrings         Write vEncodeStrings;
+  Property ServerParams          : TServerParams   Read vServerParams          Write vServerParams;
+  Property ServerMethodClass     : TComponentClass Read vServerMethod          Write SetServerMethod;
+  Property OnLastRequest         : TLastRequest    Read vLastRequest           Write vLastRequest;
+  Property OnLastResponse        : TLastResponse   Read vLastResponse          Write vLastResponse;
+  Property Encoding              : TEncodeSelect   Read VEncondig              Write VEncondig;          //Encoding da string
+  Property ServerContext         : String          Read vServerContext         Write vServerContext;
+End;
+
 Type
  TRESTClientPooler = Class(TComponent) //Novo Componente de Acesso a Requisições REST para o RESTDataware
  Protected
@@ -298,6 +361,828 @@ End;
 implementation
 
 Uses uDWDatamodule, uRESTDWPoolerDB, SysTypes, uDWConsts, uDWJSONTools;
+
+{ TRESTServiceCGI }
+
+{$IFDEF FPC}
+procedure TRESTServiceCGI.Command(ARequest: TRequest; AResponse: TResponse;
+  Var Handled: Boolean);
+Var
+ DWParams           : TDWParams;
+ vWelcomeMessage,
+ boundary,
+ startboundary,
+ vReplyString,
+ vReplyStringResult,
+ Cmd , UrlMethod,
+ tmp, JSONStr,
+ sFile, sContentType, sCharSet       : String;
+ vTempServerMethods : TObject;
+ newdecoder,
+ Decoder            : TIdMessageDecoder;
+ JSONParam          : TJSONParam;
+ msgEnd             : Boolean;
+ mb,
+ vContentStringStream,
+ ms                 : TStringStream;
+ {$IFDEF FPC}
+ CS                 : TRTLcriticalsection;
+ {$ELSE}
+ CS                 : Tcriticalsection;
+ {$ENDIF}
+ Function GetParamsReturn(Params : TDWParams) : String;
+ Var
+  A, I : Integer;
+ Begin
+  A := 0;
+  For I := 0 To Params.Count -1 Do
+   Begin
+    If TJSONParam(TList(Params).Items[I]^).ObjectDirection in [odOUT, odINOUT] Then
+     Begin
+      If A = 0 Then
+       Result := TJSONParam(TList(Params).Items[I]^).ToJSON
+      Else
+       Result := Result + ', ' + TJSONParam(TList(Params).Items[I]^).ToJSON;
+      Inc(A);
+     End;
+   End;
+ End;
+Begin
+ vTempServerMethods := Nil;
+ DWParams           := Nil;
+ Cmd := Trim(ARequest.HeaderLine);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   AResponse.CustomHeaders.Add('Access-Control-Allow-Origin','*');
+  {$ELSE}
+   AResponse.CustomHeaders.Add('Access-Control-Allow-Origin=*');
+  {$IFEND}
+ {$ELSE}
+  AResponse.CustomHeaders.Add('Access-Control-Allow-Origin=*');
+ {$ENDIF}
+ sCharSet := '';
+ If (UpperCase(Copy (Cmd, 1, 3)) = 'GET')    Then
+  Begin
+   If     (Pos('.HTML', UpperCase(Cmd)) > 0) Then
+    Begin
+     sContentType:='text/html';
+	   sCharSet := 'utf-8';
+    End
+   Else If (Pos('.PNG', UpperCase(Cmd)) > 0) Then
+    sContentType := 'image/png'
+   Else If (Pos('.ICO', UpperCase(Cmd)) > 0) Then
+    sContentType := 'image/ico'
+   Else If (Pos('.GIF', UpperCase(Cmd)) > 0) Then
+    sContentType := 'image/gif'
+   Else If (Pos('.JPG', UpperCase(Cmd)) > 0) Then
+    sContentType := 'image/jpg'
+   Else If (Pos('.JS',  UpperCase(Cmd)) > 0) Then
+    sContentType := 'application/javascript'
+   Else If (Pos('.PDF', UpperCase(Cmd)) > 0) Then
+    sContentType := 'application/pdf'
+   Else If (Pos('.CSS', UpperCase(Cmd)) > 0) Then
+    sContentType:='text/css';
+   {$IFNDEF FPC}
+    {$if CompilerVersion > 21}
+     sFile := FRootPath + ARequest.Command;
+    {$ELSE}
+     sFile := FRootPath + ARequest.Command;
+    {$IFEND}
+   {$ELSE}
+    sFile := FRootPath + ARequest.Command;
+   {$ENDIF}
+   If FileExists(sFile) then
+    Begin
+     AResponse.ContentType := sContentType;
+     {$IFNDEF FPC}
+      {$if CompilerVersion > 21}
+     	 If (sCharSet <> '') Then
+        AResponseInfo.CharSet := sCharSet;
+      {$IFEND}
+     {$ENDIF}
+     AResponse.ContentStream := TIdReadFileExclusiveStream.Create(sFile);
+     AResponse.FreeContentStream := true;
+     Handled := True;
+     Exit;
+    End;
+  End;
+ If ARequest.Content <> '' Then
+  Begin
+   vContentStringStream := TStringStream.Create(ARequest.Content);
+   Try
+    vContentStringStream.Position := 0;
+    msgEnd   := False;
+    boundary := ExtractHeaderSubItem(ARequest.ContentType, 'boundary', QuoteHTTP);
+    startboundary := '--' + boundary;
+    Repeat
+     tmp := ReadLnFromStream(vContentStringStream, -1, True);
+    until tmp = startboundary;
+   finally
+    vContentStringStream.Free;
+   end;
+  End;
+ Try
+  Cmd := Trim(ARequest.HeaderLine);
+  Cmd := StringReplace(Cmd, ' HTTP/1.0', '', [rfReplaceAll]);
+  Cmd := StringReplace(Cmd, ' HTTP/1.1', '', [rfReplaceAll]);
+  Cmd := StringReplace(Cmd, ' HTTP/2.0', '', [rfReplaceAll]);
+  Cmd := StringReplace(Cmd, ' HTTP/2.1', '', [rfReplaceAll]);
+  If (vServerParams.HasAuthentication) Then
+   Begin
+    If ARequest.Authorization <> '' Then
+     Begin
+      If Not ((Pos(ARequest.Authorization, vServerParams.Username) > 0) And
+              (Pos(ARequest.Authorization, vServerParams.Password) > 0)) Then
+       Begin
+        Handled := False;
+        Exit;
+       End;
+     End;
+   End;
+    If ARequest.URI <> '/favicon.ico' Then
+     Begin
+      If ARequest.FieldCount > 0 Then
+       DWParams  := TServerUtils.ParseWebFormsParams (ARequest.ContentFields, ARequest.URI,
+                                                      UrlMethod{$IFNDEF FPC}{$if CompilerVersion > 21}, GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF})
+      Else
+       Begin
+        If Pos('HTTP/', Trim(ARequest.HeaderLine)) > 0 Then
+         DWParams  := TServerUtils.ParseRESTURL (ARequest.URI{$IFNDEF FPC}{$if CompilerVersion > 21},GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF})
+        Else
+         Begin
+          Try
+           Repeat
+            decoder              := TIdMessageDecoderMIME.Create(nil);
+            TIdMessageDecoderMIME(decoder).MIMEBoundary := boundary;
+            Try
+             vContentStringStream := TStringStream.Create(ARequest.Content);
+             decoder.SourceStream := vContentStringStream;
+             decoder.FreeSourceStream := True;
+            finally
+            end;
+            decoder.ReadHeader;
+//            Inc(I);
+            Case Decoder.PartType of
+             mcptAttachment,
+             mcptText :
+              Begin
+              {$IFDEF FPC}
+               ms := TStringStream.Create('');
+              {$ELSE}
+               ms := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+              {$ENDIF}
+               ms.Position := 0;
+               newdecoder  := Decoder.ReadBody(ms, msgEnd);
+               tmp         := Decoder.Headers.Text;
+               FreeAndNil(Decoder);
+               Decoder     := newdecoder;
+               If Decoder <> Nil Then
+                TIdMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
+               If pos('dwwelcomemessage', tmp) > 0 Then
+                vWelcomeMessage := DecodeStrings(ms.DataString{$IFDEF FPC}, csUndefined{$ENDIF})
+               Else
+                Begin
+                 If Not Assigned(DWParams) Then
+                  Begin
+                   DWParams           := TDWParams.Create;
+                   {$IFNDEF FPC}
+                    {$if CompilerVersion > 21}
+                     DWParams.Encoding  := GetEncoding(TEncodeSelect(VEncondig));
+                    {$IFEND}
+                   {$ENDIF}
+                  End;
+                 JSONParam   := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF};
+                 JSONParam.FromJSON(ms.DataString);
+                 DWParams.Add(JSONParam);
+                End;
+               {$IFNDEF FPC}ms.Size := 0;{$ENDIF}
+               FreeAndNil(ms);
+               {ico}
+               FreeAndNil(newdecoder);
+               {ico}
+              End;
+             mcptIgnore :
+              Begin
+               Try
+                If decoder <> Nil Then
+                 FreeAndNil(decoder);
+                decoder := TIdMessageDecoderMIME.Create(Nil);
+                TIdMessageDecoderMIME(decoder).MIMEBoundary := boundary;
+               Finally
+               End;
+              End;
+             mcptEOF:
+              Begin
+               FreeAndNil(decoder);
+               msgEnd := True
+              End;
+             End;
+           Until (Decoder = Nil) Or (msgEnd);
+          Finally
+           If decoder <> nil then
+            FreeAndNil(decoder);
+          End;
+         End;
+       End;
+      If Assigned(vServerMethod) Then
+       Begin
+        vTempServerMethods:=vServerMethod.Create(nil);
+        If vServerBaseMethod = TServerMethods Then
+         Begin
+          If Trim(vWelcomeMessage) <> '' Then
+           Begin
+            If Assigned(TServerMethods(vTempServerMethods).OnWelcomeMessage) then
+             TServerMethods(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage);
+           End;
+         End
+        Else If vServerBaseMethod = TServerMethodDatamodule Then
+         Begin
+          If Trim(vWelcomeMessage) <> '' Then
+           Begin
+            If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
+             TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage);
+           End;
+         End;
+       End
+      Else
+       JSONStr := GetPairJSON(-5, 'Server Methods Cannot Assigned');
+      Try
+       If Assigned(vServerMethod) Then
+        Begin
+         If UrlMethod = '' Then
+          Begin
+           UrlMethod := Cmd;
+           While (Length(UrlMethod) > 0) Do
+            Begin
+             If Pos('/', UrlMethod) > 0 then
+              Delete(UrlMethod, 1, 1)
+             Else
+              Begin
+               UrlMethod := Trim(UrlMethod);
+               Break;
+              End;
+            End;
+          End;
+         If vTempServerMethods <> Nil Then
+          Begin
+           JSONStr := ARequest.RemoteAddr;
+           If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.LocalPathPrefix, UrlMethod, DWParams, JSONStr) Then
+            Begin
+             If Pos('HTTP/', Trim(ARequest.HeaderLine)) > 0 Then
+              Begin
+               If vServerBaseMethod = TServerMethods Then
+                Begin
+                 If Assigned(TServerMethods(vTempServerMethods).OnReplyEvent) then
+                  TServerMethods(vTempServerMethods).OnReplyEvent(seGET, UrlMethod, DWParams, JSONStr);
+                End
+               Else If vServerBaseMethod = TServerMethodDatamodule Then
+                Begin
+                 If Assigned(TServerMethodDatamodule(vTempServerMethods).OnReplyEvent) then
+                  TServerMethodDatamodule(vTempServerMethods).OnReplyEvent(seGET, UrlMethod, DWParams, JSONStr);
+                End;
+              End
+             Else If Pos('HTTP/', Trim(ARequest.HeaderLine)) > 0 Then
+              Begin
+               If vServerBaseMethod = TServerMethods Then
+                Begin
+                 If Assigned(TServerMethods(vTempServerMethods).OnReplyEvent) then
+                  TServerMethods(vTempServerMethods).OnReplyEvent(sePOST, UrlMethod, DWParams, JSONStr);
+                End
+               Else If vServerBaseMethod = TServerMethodDatamodule Then
+                Begin
+                 If Assigned(TServerMethodDatamodule(vTempServerMethods).OnReplyEvent) then
+                  TServerMethodDatamodule(vTempServerMethods).OnReplyEvent(sePOST, UrlMethod, DWParams, JSONStr);
+                End;
+              End;
+            End;
+          End;
+        End;
+       Try
+        vReplyString                         := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
+        If vDataCompress Then
+         Begin
+          ZCompressStr(vReplyString, vReplyStringResult);
+          mb                                 := TStringStream.Create(vReplyStringResult);
+         End
+        Else
+         mb                                  := TStringStream.Create(vReplyString{$IFNDEF FPC}{$if CompilerVersion > 21}, GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF});
+        mb.Position                          := 0;
+        If TEncodeSelect(VEncondig) = esUtf8 Then
+         AResponse.ContentType            := 'text;charset=utf-8'
+        Else If TEncodeSelect(VEncondig) = esASCII Then
+         AResponse.ContentType            := 'text;charset=ansi';
+        AResponse.Content            := mb.Datastring;
+       Finally
+        FreeAndNil(mb);
+       End;
+      Finally
+       If Assigned(vServerMethod) Then
+        If Assigned(vTempServerMethods) Then
+         Begin
+          Try
+           FreeAndNil(vTempServerMethods); //.free;
+          Except
+          End;
+         End;
+      End;
+     End;
+ Finally
+  If AResponse.Content = '' Then
+   AResponse.Content := '<h1>REST Dataware - Server CGI - Online!</h1>';
+  Handled:= True;
+  If Assigned(DWParams) Then
+   FreeAndNil(DWParams);
+ End;
+End;
+{$ELSE}
+{$ENDIF}
+
+procedure TRESTServiceCGI.SetServerMethod(Value: TComponentClass);
+begin
+ If (Value.ClassParent      = TServerMethods) Or
+    (Value                  = TServerMethods) Then
+  Begin
+   vServerMethod     := Value;
+   vServerBaseMethod := TServerMethods;
+  End
+ Else If (Value.ClassParent = TServerMethodDatamodule) Or
+         (Value             = TServerMethodDatamodule) Then
+  Begin
+   vServerMethod := Value;
+   vServerBaseMethod := TServerMethodDatamodule;
+  End;
+end;
+
+procedure TRESTServiceCGI.GetPoolerList(ServerMethodsClass: TComponent;
+  Var PoolerList: String);
+Var
+ I : Integer;
+Begin
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
+      Begin
+       If PoolerList = '' then
+        PoolerList := Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])
+       Else
+        PoolerList := PoolerList + '|' + Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name]);
+      End;
+    End;
+  End;
+End;
+
+function TRESTServiceCGI.ServiceMethods(BaseObject: TComponent;
+  AContext, UrlMethod: String; Var DWParams: TDWParams;
+  Var JSONStr: String): Boolean;
+Var
+ vResult,
+ vResultIP,
+ vUrlMethod   :  String;
+Begin
+ Result       := False;
+ vUrlMethod   := UpperCase(UrlMethod);
+ If vUrlMethod = UpperCase('GetPoolerList') Then
+  Begin
+   Result     := True;
+   GetPoolerList(BaseObject, vResult);
+   DWParams.ItemsString['Result'].SetValue(vResult);
+   JSONStr    := TReplyOK;
+  End
+ Else If vUrlMethod = UpperCase('EchoPooler') Then
+  Begin
+   vResultIP := JSONStr;
+   If DWParams.ItemsString['Pooler'] <> Nil Then
+    vResult    := DWParams.ItemsString['Pooler'].Value
+   Else If DWParams.count > 0 Then
+    JSONStr := DWParams.Items[0].Value
+   Else
+    vResult    := JSONStr;
+   EchoPooler(BaseObject, JSONStr, vResult, vResultIP);
+   If DWParams.ItemsString['Result'] <> Nil Then
+    DWParams.ItemsString['Result'].SetValue(vResultIP);
+   If Result Then
+    Begin
+     If DWParams.ItemsString['Pooler'] <> Nil Then
+      JSONStr  := TReplyOK
+     Else
+      JSONStr  := vResultIP;
+    End
+   Else
+    JSONStr    := TReplyNOK;
+  End
+ Else If vUrlMethod = UpperCase('ExecuteCommandPureJSON') Then
+  Begin
+   vResult    := DWParams.ItemsString['Pooler'].Value;
+   ExecuteCommandPureJSON(BaseObject, vResult, DWParams);
+   Result     := True;
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+    JSONStr    := TReplyOK
+   Else
+    JSONStr    := TReplyNOK;
+  End
+ Else If vUrlMethod = UpperCase('ExecuteCommandJSON') Then
+  Begin
+   vResult    := DWParams.ItemsString['Pooler'].Value;
+   ExecuteCommandJSON(BaseObject, vResult, DWParams);
+   Result     := True;
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+    JSONStr    := TReplyOK
+   Else
+    JSONStr    := TReplyNOK;
+  End
+ Else If vUrlMethod = UpperCase('ApplyUpdates') Then
+  Begin
+   vResult    := DWParams.ItemsString['Pooler'].Value;
+   ApplyUpdatesJSON(BaseObject, vResult, DWParams);
+   Result     := True;
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+    JSONStr    := TReplyOK
+   Else
+    JSONStr    := TReplyNOK;
+  End
+ Else If vUrlMethod = UpperCase('ApplyUpdates_MassiveCache') Then
+  Begin
+   vResult    := DWParams.ItemsString['Pooler'].Value;
+   ApplyUpdates_MassiveCache(BaseObject, vResult, DWParams);
+   Result     := True;
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+    JSONStr    := TReplyOK
+   Else
+    JSONStr    := TReplyNOK;
+  End
+ Else If vUrlMethod = UpperCase('InsertMySQLReturnID_PARAMS') Then
+  Begin
+   vResult    := DWParams.ItemsString['Pooler'].Value;
+   InsertMySQLReturnID(BaseObject, vResult, DWParams);
+   Result     := True;
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+    JSONStr    := TReplyOK
+   Else
+    JSONStr    := TReplyNOK;
+  End
+ Else If vUrlMethod = UpperCase('InsertMySQLReturnID') Then
+  Begin
+   vResult    := DWParams.ItemsString['Pooler'].Value;
+   InsertMySQLReturnID(BaseObject, vResult, DWParams);
+   Result     := True;
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+    JSONStr    := TReplyOK
+   Else
+    JSONStr    := TReplyNOK;
+  End
+ Else If vUrlMethod = UpperCase('OpenDatasets') Then
+  Begin
+   vResult     := DWParams.ItemsString['Pooler'].Value;
+   OpenDatasets(BaseObject, vResult, DWParams);
+   Result      := True;
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+    JSONStr    := TReplyOK
+   Else
+    JSONStr    := TReplyNOK;
+  End
+End;
+
+procedure TRESTServiceCGI.EchoPooler(ServerMethodsClass: TComponent;
+                                     AContext: String; Var Pooler, MyIP: String);
+Var
+ I : Integer;
+Begin
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
+      Begin
+       If Pooler = Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name]) Then
+        Begin
+         If AContext <> '' Then
+          MyIP := AContext;
+         Break;
+        End;
+      End;
+    End;
+  End;
+End;
+
+procedure TRESTServiceCGI.ExecuteCommandPureJSON(
+  ServerMethodsClass: TComponent; Var Pooler: String; Var DWParams: TDWParams);
+Var
+ I         : Integer;
+ vTempJSON : TJSONValue;
+ vError,
+ vExecute  : Boolean;
+ vMessageError : String;
+Begin
+  try
+   If ServerMethodsClass <> Nil Then
+    Begin
+     For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+      Begin
+       If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
+        Begin
+         If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
+            Begin
+             vExecute := DWParams.ItemsString['Execute'].AsBoolean;
+             vError   := DWParams.ItemsString['Error'].AsBoolean;
+             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+             vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ExecuteCommand(DWParams.ItemsString['SQL'].Value,
+                                                                                                      vError,
+                                                                                                      vMessageError,
+                                                                                                      vExecute);
+             If vMessageError <> '' Then
+              DWParams.ItemsString['MessageError'].AsString := vMessageError;
+             DWParams.ItemsString['Error'].AsBoolean := vError;
+             If DWParams.ItemsString['Result'] <> Nil Then
+              Begin
+               If vTempJSON <> Nil Then
+                DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON)
+               Else
+                DWParams.ItemsString['Result'].SetValue('');
+              End;
+            End;
+           Break;
+          End;
+        End;
+      End;
+    End;
+  finally
+  {Ico}
+   FreeAndNil(vTempJSON);
+  {Ico}
+  end;
+End;
+
+procedure TRESTServiceCGI.ExecuteCommandJSON(ServerMethodsClass: TComponent;
+  Var Pooler: String; Var DWParams: TDWParams);
+Var
+ I         : Integer;
+ vTempJSON : TJSONValue;
+ vError,
+ vExecute  : Boolean;
+ vMessageError : String;
+ DWParamsD     : TDWParams;
+Begin
+ DWParamsD := Nil;
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
+      Begin
+       If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
+        Begin
+         If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
+          Begin
+           vExecute := DWParams.ItemsString['Execute'].AsBoolean;
+           vError   := DWParams.ItemsString['Error'].AsBoolean;
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+           If DWParams.ItemsString['Params'] <> Nil Then
+            Begin
+             DWParamsD := TDWParams.Create;
+             DWParamsD.FromJSON(DWParams.ItemsString['Params'].Value);
+            End;
+           If DWParamsD <> Nil Then
+            Begin
+             vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ExecuteCommand(DWParams.ItemsString['SQL'].Value,
+                                                                                                      DWParamsD, vError, vMessageError,
+                                                                                                      vExecute);
+             DWParamsD.Free;
+            End
+           Else
+            vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ExecuteCommand(DWParams.ItemsString['SQL'].Value,
+                                                                                                     vError,
+                                                                                                     vMessageError,
+                                                                                                     vExecute);
+           If vMessageError <> '' Then
+            DWParams.ItemsString['MessageError'].AsString := vMessageError;
+           DWParams.ItemsString['Error'].AsBoolean        := vError;
+           If DWParams.ItemsString['Result'] <> Nil Then
+            Begin
+             If vTempJSON <> Nil Then
+              Begin
+               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON);
+               FreeAndNil(vTempJSON);
+              End
+             Else
+              DWParams.ItemsString['Result'].SetValue('');
+            End;
+          End;
+         Break;
+        End;
+      End;
+    End;
+  End;
+End;
+
+procedure TRESTServiceCGI.InsertMySQLReturnID(ServerMethodsClass: TComponent;
+  Var Pooler: String; Var DWParams: TDWParams);
+Var
+ I,
+ vTempJSON     : Integer;
+ vError        : Boolean;
+ vMessageError : String;
+ DWParamsD     : TDWParams;
+Begin
+ DWParamsD := Nil;
+ vTempJSON := -1;
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
+      Begin
+       If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
+        Begin
+         If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
+          Begin
+           vError   := DWParams.ItemsString['Error'].AsBoolean;
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+           If DWParams.ItemsString['Params'] <> Nil Then
+            Begin
+             DWParamsD := TDWParams.Create;
+             DWParamsD.FromJSON(DWParams.ItemsString['Params'].Value);
+            End;
+           If DWParamsD <> Nil Then
+            Begin
+             vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.InsertMySQLReturnID(DWParams.ItemsString['SQL'].Value,
+                                                                                                           DWParamsD, vError, vMessageError);
+             DWParamsD.Free;
+            End
+           Else
+            vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.InsertMySQLReturnID(DWParams.ItemsString['SQL'].Value,
+                                                                                                          vError,
+                                                                                                          vMessageError);
+           If vMessageError <> '' Then
+            DWParams.ItemsString['MessageError'].AsString := vMessageError;
+           DWParams.ItemsString['Error'].AsBoolean := vError;
+           If DWParams.ItemsString['Result'] <> Nil Then
+            Begin
+             If vTempJSON <> -1 Then
+              DWParams.ItemsString['Result'].SetValue(IntToStr(vTempJSON))
+             Else
+              DWParams.ItemsString['Result'].SetValue('-1');
+            End;
+          End;
+         Break;
+        End;
+      End;
+    End;
+  End;
+End;
+
+procedure TRESTServiceCGI.ApplyUpdatesJSON(ServerMethodsClass: TComponent;
+  Var Pooler: String; Var DWParams: TDWParams);
+Var
+ I             : Integer;
+ vTempJSON     : TJSONValue;
+ vError        : Boolean;
+ vSQL,
+ vMessageError : String;
+ DWParamsD     : TDWParams;
+Begin
+ DWParamsD := Nil;
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
+      Begin
+       If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
+        Begin
+         If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
+          Begin
+           vError   := DWParams.ItemsString['Error'].AsBoolean;
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+           If DWParams.ItemsString['Params'] <> Nil Then
+            Begin
+             DWParamsD := TDWParams.Create;
+             DWParamsD.FromJSON(DWParams.ItemsString['Params'].Value);
+            End;
+          If DWParams.ItemsString['SQL'] <> Nil Then
+           vSQL := DWParams.ItemsString['SQL'].Value;
+          vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdates(DWParams.ItemsString['Massive'].Value,
+                                                                                                  vSQL,
+                                                                                                  DWParamsD, vError, vMessageError);
+           If DWParamsD <> Nil Then
+            DWParamsD.Free;
+           If vMessageError <> '' Then
+            DWParams.ItemsString['MessageError'].AsString := vMessageError;
+           DWParams.ItemsString['Error'].AsBoolean        := vError;
+           If DWParams.ItemsString['Result'] <> Nil Then
+            Begin
+             If vTempJSON <> Nil Then
+              Begin
+               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON);
+               vTempJSON.Free;
+              End
+             Else
+              DWParams.ItemsString['Result'].SetValue('');
+            End;
+          End;
+         Break;
+        End;
+      End;
+    End;
+  End;
+End;
+
+procedure TRESTServiceCGI.OpenDatasets(ServerMethodsClass: TComponent;
+  Var Pooler: String; Var DWParams: TDWParams);
+Var
+ I         : Integer;
+ vTempJSON : TJSONValue;
+ vError    : Boolean;
+ vMessageError : String;
+Begin
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
+      Begin
+       If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
+        Begin
+         If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
+          Begin
+           vError   := DWParams.ItemsString['Error'].AsBoolean;
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+           vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.OpenDatasets(DWParams.ItemsString['LinesDataset'].Value,
+                                                                                                  vError, vMessageError);
+           If vMessageError <> '' Then
+            DWParams.ItemsString['MessageError'].AsString := vMessageError;
+           DWParams.ItemsString['Error'].AsBoolean        := vError;
+           If DWParams.ItemsString['Result'] <> Nil Then
+            Begin
+             If vTempJSON <> Nil Then
+              Begin
+               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON);
+               FreeAndNil(vTempJSON);
+              End
+             Else
+              DWParams.ItemsString['Result'].SetValue('');
+            End;
+          End;
+         Break;
+        End;
+      End;
+    End;
+  End;
+End;
+
+procedure TRESTServiceCGI.ApplyUpdates_MassiveCache(
+  ServerMethodsClass: TComponent; Var Pooler: String; Var DWParams: TDWParams);
+Var
+ I             : Integer;
+ vError        : Boolean;
+ vMessageError : String;
+Begin
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
+      Begin
+       If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
+        Begin
+         If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
+          Begin
+           vError   := DWParams.ItemsString['Error'].AsBoolean;
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdates_MassiveCache(DWParams.ItemsString['MassiveCache'].Value,
+                                                                                                  vError,  vMessageError);
+           If vMessageError <> '' Then
+            DWParams.ItemsString['MessageError'].AsString := vMessageError;
+           DWParams.ItemsString['Error'].AsBoolean        := vError;
+          End;
+         Break;
+        End;
+      End;
+    End;
+  End;
+End;
+
+constructor TRESTServiceCGI.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  vServerParams := TServerParams.Create(Self);
+  vEncodeStrings                  := True;
+  vServerParams.HasAuthentication := True;
+  vServerParams.UserName          := 'testserver';
+  vServerParams.Password          := 'testserver';
+  vServerContext                  := 'restdataware';
+  VEncondig                       := esASCII;
+  vDataCompress                   := True;
+end;
+
+destructor TRESTServiceCGI.Destroy;
+begin
+  vServerParams.Free;
+  inherited Destroy;
+end;
 
 Constructor TRESTClientPooler.Create(AOwner: TComponent);
 Begin
@@ -1410,7 +2295,8 @@ Begin
       Begin
        If Pooler = Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name]) Then
         Begin
-         MyIP := AContext.Connection.Socket.Binding.IP;
+         If AContext <> Nil Then
+          MyIP := AContext.Connection.Socket.Binding.IP;
          Break;
         End;
       End;
@@ -1531,13 +2417,9 @@ Procedure TRESTServicePooler.ApplyUpdates_MassiveCache(ServerMethodsClass : TCom
                                                        Var DWParams       : TDWParams);
 Var
  I             : Integer;
- vTempJSON     : TJSONValue;
  vError        : Boolean;
- vSQL,
  vMessageError : String;
- DWParamsD     : TDWParams;
 Begin
- DWParamsD := Nil;
  If ServerMethodsClass <> Nil Then
   Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
@@ -1691,9 +2573,7 @@ Var
  vTempJSON : TJSONValue;
  vError    : Boolean;
  vMessageError : String;
- DWParamsD     : TDWParams;
 Begin
- DWParamsD := Nil;
  If ServerMethodsClass <> Nil Then
   Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
@@ -2179,11 +3059,8 @@ Begin
          AResponseInfo.Charset := 'ansi';
         AResponseInfo.ContentText            := mb.Datastring;
         AResponseInfo.WriteHeader;
-        // AResponseInfo.WriteContent;
        Finally
         FreeAndNil(mb);
-//        AResponseInfo.ContentStream.Free;
-//        AResponseInfo.ContentStream := Nil;
        End;
        If Assigned(vLastResponse) Then
         Begin

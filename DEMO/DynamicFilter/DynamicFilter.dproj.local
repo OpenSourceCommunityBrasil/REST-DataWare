@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>2016/01/16 17:11:34.000.935,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\Project1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\ClientWin.dproj</Transaction>
-    <Transaction>2017/06/19 09:19:17.000.765,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\DynamicFilter\DynamicFilter.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\DynamicFilter\ClientWin.dproj</Transaction>
+    <Transaction>2016/01/16 17:11:34.000.935,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\ClientWin.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\Project1.dproj</Transaction>
+    <Transaction>2017/06/19 09:19:17.000.765,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\DynamicFilter\ClientWin.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\DynamicFilter\DynamicFilter.dproj</Transaction>
   </Transactions>
 </BorlandProject>

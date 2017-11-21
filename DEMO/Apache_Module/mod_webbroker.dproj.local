@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>2015/05/29 08:35:00.000.472,D:\connectronic\VisualControl\VisualCenter_XE6\WebService\ISAPI_TESTE\ServerMethodsUnit1.dfm=D:\connectronic\VisualControl\VisualCenter_XE6\WebService\DllService\ServerMethodsUnit1.dfm</Transaction>
-    <Transaction>2015/10/21 09:05:04.000.147,D:\connectronic\VisualControl\VisualCenter_XE6\WebService\ISAPI_TESTE\Unit1.dfm=D:\connectronic\VisualControl\VisualCenter_XE6\WebService\ISAPI_TESTE\uServerMConnections.dfm</Transaction>
+    <Transaction>2015/05/29 08:35:00.000.472,D:\connectronic\VisualControl\VisualCenter_XE6\WebService\DllService\ServerMethodsUnit1.dfm=D:\connectronic\VisualControl\VisualCenter_XE6\WebService\ISAPI_TESTE\ServerMethodsUnit1.dfm</Transaction>
+    <Transaction>2015/10/21 09:05:04.000.147,D:\connectronic\VisualControl\VisualCenter_XE6\WebService\ISAPI_TESTE\uServerMConnections.dfm=D:\connectronic\VisualControl\VisualCenter_XE6\WebService\ISAPI_TESTE\Unit1.dfm</Transaction>
   </Transactions>
 </BorlandProject>

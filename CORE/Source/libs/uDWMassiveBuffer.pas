@@ -722,7 +722,11 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                      End;
                                    End;
        ftFloat,
-       ftCurrency, ftBCD, ftSingle : Begin
+       ftCurrency, ftBCD{$IFNDEF FPC}
+                        {$IF CompilerVersion > 21}
+                        , ftSingle
+                        {$ENDIF}
+                        {$ENDIF} : Begin
                                     If Not UpdateTag Then
                                      Begin
                                       If Trim(Field.AsString) <> '' Then

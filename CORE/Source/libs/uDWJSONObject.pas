@@ -804,8 +804,8 @@ Var
      vAutoinc := 'N';
     {$IFEND}
     {$ENDIF}
-    If bValue.Fields[I].DataType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended,
-                                     {$IFEND}{$ENDIF}ftFloat, ftCurrency, ftFMTBcd, ftBCD, ftSingle] Then
+    If bValue.Fields[I].DataType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
+                                     {$IFEND}{$ENDIF}ftFloat, ftCurrency, ftFMTBcd, ftBCD] Then
      vGenerateLine := Format(TJsonDatasetHeader, [bValue.Fields[I].FieldName,
                                                   GetFieldType(bValue.Fields[I].DataType),
                                                   vPrimary, vRequired, TFloatField(bValue.Fields[I]).Size,
@@ -831,8 +831,8 @@ Var
    Begin
     If Not bValue.Fields[I].IsNull then
      Begin
-      If bValue.Fields[I].DataType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended,
-                                       {$IFEND}{$ENDIF}ftFloat, ftCurrency, ftFMTBcd, ftBCD, ftSingle] Then
+      If bValue.Fields[I].DataType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
+                                       {$IFEND}{$ENDIF}ftFloat, ftCurrency, ftFMTBcd, ftBCD] Then
        vTempValue := Format('"%s"', [StringReplace(FormatFloat('########0.0000', bValue.Fields[I].AsFloat), ',', 'dc', [rfReplaceAll])])
       Else If bValue.Fields[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
        Begin
@@ -1438,7 +1438,8 @@ Var
                   ftFloat,
                   ftCurrency,
                   ftBCD,
-				  ftSingle,
+		  {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
+                  {$IFEND}{$ENDIF}
                   ftFMTBcd     : Begin
                                   vTempValue  := Value;
                                   If (Pos('dc', vTempValue) > 0) or (Pos('.', vTempValue) > 0) or (Pos(',', vTempValue) > 0) Then
@@ -1453,7 +1454,8 @@ Var
                                      ftFloat  : Field.AsFloat    := StrToFloat(vTempValue);
                                      ftCurrency,
                                      ftBCD,
-									 ftSingle,
+			    	     {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
+                                     {$IFEND}{$ENDIF}
                                      ftFMTBcd : Field.AsCurrency := StrToFloat(vTempValue);
                                      End;
                                    End;
@@ -1531,7 +1533,8 @@ Begin
                                                   StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString),
                                                   Uppercase(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S');
            }
-           If FieldDef.DataType In [ftFloat, ftCurrency, ftBCD, ftSingle, ftFMTBcd] Then
+           If FieldDef.DataType In [ftFloat, ftCurrency, ftBCD, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
+                                                                {$IFEND}{$ENDIF}ftFMTBcd] Then
             Begin
              FieldDef.Size      := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
              FieldDef.Precision := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(5).ToString).ToString);
@@ -2040,9 +2043,9 @@ Begin
    vEncoded := true;
    SetValue(Param.AsString, vEncoded);
   End
- Else If Param.DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended,
+ Else If Param.DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
                             {$IFEND}{$ENDIF}ftInteger, ftSmallint, ftLargeint, ftFloat,
-                            ftCurrency, ftFMTBcd, ftSingle,ftBCD] Then
+                            ftCurrency, ftFMTBcd, ftBCD] Then
   SetValue(Param.AsString, False)
  Else If Param.DataType In [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
   Begin

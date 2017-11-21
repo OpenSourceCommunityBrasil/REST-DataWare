@@ -147,13 +147,20 @@ Begin
   I := Pos('/', Cmd);
   UrlMethod := Copy(Cmd, 1, I - 1);
   // Extrai Parametros
-  For I := 0 To Params.Count - 1 Do
-  Begin
-    JSONParam := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(Result.Encoding){$IFEND}{$ENDIF};
-    JSONParam.FromJSON(Trim(Copy(Params[I], Pos('=', Params[I]) + 1,
+  If Params.Count > 0 Then
+   Begin
+    For I := 0 To Params.Count - 1 Do
+     Begin
+      JSONParam := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(Result.Encoding){$IFEND}{$ENDIF};
+      JSONParam.FromJSON(Trim(Copy(Params[I], Pos('=', Params[I]) + 1,
       Length(Params[I]))));
-    Result.Add(JSONParam);
-  End;
+      Result.Add(JSONParam);
+     End;
+   End
+  Else
+   Begin
+
+   End;
 End;
 
 Class Function TServerUtils.Result2JSON(wsResult: TResultErro): String;

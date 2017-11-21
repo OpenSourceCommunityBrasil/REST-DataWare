@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>2017/05/18 08:30:18.000.009,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\Employee\uEmployee.dfm=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit4.dfm</Transaction>
-    <Transaction>2017/05/18 08:30:25.000.923,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\Employee\SimpleProject.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2017/05/18 08:30:18.000.009,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit4.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\Employee\uEmployee.dfm</Transaction>
+    <Transaction>2017/05/18 08:30:25.000.923,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\Employee\SimpleProject.dproj</Transaction>
   </Transactions>
 </BorlandProject>
