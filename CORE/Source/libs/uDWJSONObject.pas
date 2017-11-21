@@ -2312,7 +2312,6 @@ begin
   ovCurrency,
   ovBCD,
   ovFMTBcd,
-  ovSingle,
   ovExtended  : Begin
                  vObjectValue := ovFloat;
                  SetValue(FloatToStr(Value), vEncoded);
@@ -2567,7 +2566,6 @@ Begin
   ovFloat,
   ovCurrency,
   ovBCD,
-  ovSingle,
   ovFMTBcd,
   ovExtended        : Begin
                        If (vJSONValue.Value <> '') And
@@ -2658,7 +2656,6 @@ Begin
   ovFloat,
   ovCurrency,
   ovBCD,
-  ovSingle,
   ovFMTBcd,
   ovExtended        : Begin
                        If (vJSONValue.Value <> '') And
