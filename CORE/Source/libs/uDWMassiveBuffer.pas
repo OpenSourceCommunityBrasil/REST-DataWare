@@ -722,7 +722,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                      End;
                                    End;
        ftFloat,
-       ftCurrency, ftBCD         : Begin
+       ftCurrency, ftBCD, ftSingle : Begin
                                     If Not UpdateTag Then
                                      Begin
                                       If Trim(Field.AsString) <> '' Then
@@ -1439,7 +1439,7 @@ Var
        (vMassiveFields.Items[I].FieldType = ovAutoInc) Then
      vAutoinc := 'S';
     If vMassiveFields.Items[I].FieldType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ovExtended,
-                                             {$IFEND}{$ENDIF}ovFloat, ovCurrency, ovFMTBcd, ovBCD] Then
+                                             {$IFEND}{$ENDIF}ovFloat, ovCurrency, ovFMTBcd, ovSingle, ovBCD] Then
      vGenerateLine := Format(TJsonDatasetHeader, [vMassiveFields.Items[I].vFieldName,
                                                   GetValueType(vMassiveFields.Items[I].FieldType),
                                                   vPrimary, vRequired, vMassiveFields.Items[I].Size,
