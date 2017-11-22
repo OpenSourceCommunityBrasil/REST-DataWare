@@ -376,7 +376,9 @@ Var
  vReplyStringResult,
  Cmd , UrlMethod,
  tmp, JSONStr,
- sFile, sContentType, sCharSet       : String;
+ sFile, sContentType,
+ authDecode,
+ sCharSet           : String;
  vTempServerMethods : TObject;
  newdecoder,
  Decoder            : TIdMessageDecoder;
@@ -395,6 +397,7 @@ Var
   A, I : Integer;
  Begin
   A := 0;
+  Result := '';
   For I := 0 To Params.Count -1 Do
    Begin
     If TJSONParam(TList(Params).Items[I]^).ObjectDirection in [odOUT, odINOUT] Then
@@ -482,17 +485,19 @@ Begin
    end;
   End;
  Try
-  Cmd := Trim(ARequest.HeaderLine);
-  Cmd := StringReplace(Cmd, ' HTTP/1.0', '', [rfReplaceAll]);
-  Cmd := StringReplace(Cmd, ' HTTP/1.1', '', [rfReplaceAll]);
-  Cmd := StringReplace(Cmd, ' HTTP/2.0', '', [rfReplaceAll]);
-  Cmd := StringReplace(Cmd, ' HTTP/2.1', '', [rfReplaceAll]);
+  Cmd := stringreplace(Trim(lowercase(ARequest.HeaderLine)), lowercase(vServerContext) + '/', '', [rfReplaceAll]);
+  Cmd := StringReplace(Cmd, lowercase(' HTTP/1.0'), '', [rfReplaceAll]);
+  Cmd := StringReplace(Cmd, lowercase(' HTTP/1.1'), '', [rfReplaceAll]);
+  Cmd := StringReplace(Cmd, lowercase(' HTTP/2.0'), '', [rfReplaceAll]);
+  Cmd := StringReplace(Cmd, lowercase(' HTTP/2.1'), '', [rfReplaceAll]);
   If (vServerParams.HasAuthentication) Then
    Begin
     If ARequest.Authorization <> '' Then
      Begin
-      If Not ((Pos(ARequest.Authorization, vServerParams.Username) > 0) And
-              (Pos(ARequest.Authorization, vServerParams.Password) > 0)) Then
+      authDecode := DecodeStrings(StringReplace(ARequest.Authorization, 'Basic ', '', [rfReplaceAll])
+                                  {$IFDEF FPC}, csUndefined{$ENDIF});
+      If Not ((Pos(vServerParams.Username, authDecode) > 0) And
+              (Pos(vServerParams.Password, authDecode) > 0)) Then
        Begin
         Handled := False;
         Exit;
@@ -501,23 +506,23 @@ Begin
    End;
     If ARequest.URI <> '/favicon.ico' Then
      Begin
-      If ARequest.FieldCount > 0 Then
-       DWParams  := TServerUtils.ParseWebFormsParams (ARequest.ContentFields, ARequest.URI,
+      If (ARequest.FieldCount > 0) And (Trim(ARequest.Content) = '') Then
+       DWParams  := TServerUtils.ParseWebFormsParams (ARequest.ContentFields, Cmd,
                                                       UrlMethod{$IFNDEF FPC}{$if CompilerVersion > 21}, GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF})
       Else
        Begin
-        If Pos('HTTP/', Trim(ARequest.HeaderLine)) > 0 Then
+        If Trim(ARequest.Content) = '' Then
          DWParams  := TServerUtils.ParseRESTURL (ARequest.URI{$IFNDEF FPC}{$if CompilerVersion > 21},GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF})
         Else
          Begin
           Try
+           vContentStringStream := TStringStream.Create(ARequest.Content);
            Repeat
             decoder              := TIdMessageDecoderMIME.Create(nil);
             TIdMessageDecoderMIME(decoder).MIMEBoundary := boundary;
             Try
-             vContentStringStream := TStringStream.Create(ARequest.Content);
              decoder.SourceStream := vContentStringStream;
-             decoder.FreeSourceStream := True;
+             decoder.FreeSourceStream := False;
             finally
             end;
             decoder.ReadHeader;
@@ -581,7 +586,12 @@ Begin
           Finally
            If decoder <> nil then
             FreeAndNil(decoder);
+           If vContentStringStream <> Nil Then
+            FreeAndNil(vContentStringStream);
           End;
+          If DWParams <> Nil Then
+           If DWParams.ItemsString['dwEventNameData'] <> Nil Then
+            UrlMethod := DWParams.ItemsString['dwEventNameData'].Value;
          End;
        End;
       If Assigned(vServerMethod) Then
@@ -628,7 +638,7 @@ Begin
            JSONStr := ARequest.RemoteAddr;
            If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.LocalPathPrefix, UrlMethod, DWParams, JSONStr) Then
             Begin
-             If Pos('HTTP/', Trim(ARequest.HeaderLine)) > 0 Then
+             If Trim(ARequest.Content) = '' Then
               Begin
                If vServerBaseMethod = TServerMethods Then
                 Begin
@@ -641,7 +651,7 @@ Begin
                   TServerMethodDatamodule(vTempServerMethods).OnReplyEvent(seGET, UrlMethod, DWParams, JSONStr);
                 End;
               End
-             Else If Pos('HTTP/', Trim(ARequest.HeaderLine)) > 0 Then
+             Else
               Begin
                If vServerBaseMethod = TServerMethods Then
                 Begin
@@ -739,7 +749,8 @@ function TRESTServiceCGI.ServiceMethods(BaseObject: TComponent;
 Var
  vResult,
  vResultIP,
- vUrlMethod   :  String;
+ vUrlMethod   : String;
+ JSONParam    : TJSONParam;
 Begin
  Result       := False;
  vUrlMethod   := UpperCase(UrlMethod);
@@ -747,6 +758,13 @@ Begin
   Begin
    Result     := True;
    GetPoolerList(BaseObject, vResult);
+   If DWParams.ItemsString['Result'] = Nil Then
+    Begin
+     JSONParam                 := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF};
+     JSONParam.ParamName       := 'Result';
+     JSONParam.ObjectDirection := odOut;
+     DWParams.Add(JSONParam);
+    End;
    DWParams.ItemsString['Result'].SetValue(vResult);
    JSONStr    := TReplyOK;
   End
@@ -760,11 +778,18 @@ Begin
    Else
     vResult    := JSONStr;
    EchoPooler(BaseObject, JSONStr, vResult, vResultIP);
-   If DWParams.ItemsString['Result'] <> Nil Then
-    DWParams.ItemsString['Result'].SetValue(vResultIP);
+   If DWParams.ItemsString['Result'] = Nil Then
+    Begin
+     JSONParam                 := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF};
+     JSONParam.ParamName       := 'Result';
+     JSONParam.ObjectDirection := odOut;
+     DWParams.Add(JSONParam);
+    End;
+   DWParams.ItemsString['Result'].SetValue(vResultIP);
+   Result := vResultIP <> '';
    If Result Then
     Begin
-     If DWParams.ItemsString['Pooler'] <> Nil Then
+     If DWParams.ItemsString['Result'] <> Nil Then
       JSONStr  := TReplyOK
      Else
       JSONStr  := vResultIP;
@@ -849,6 +874,7 @@ procedure TRESTServiceCGI.EchoPooler(ServerMethodsClass: TComponent;
 Var
  I : Integer;
 Begin
+ MyIP := '';
  If ServerMethodsClass <> Nil Then
   Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
@@ -1331,10 +1357,16 @@ Var
  End;
  Procedure SetParamsValues(DWParams : TDWParams; SendParamsData : TIdMultipartFormDataStream);
  Var
-  I : Integer;
+  I         : Integer;
+  JSONParam : TJSONParam;
  Begin
   If DWParams <> Nil Then
    Begin
+    JSONParam                 := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF};
+    JSONParam.ParamName       := 'dwEventNameData';
+    JSONParam.ObjectDirection := odIn;
+    JSONParam.Value           := EventData;
+    DWParams.Add(JSONParam);
     If Not (Assigned(StringStreamList)) Then
      StringStreamList := TStringStreamList.Create;
     For I := 0 To DWParams.Count -1 Do
@@ -1608,9 +1640,15 @@ Var
  Procedure SetParamsValues(DWParams : TDWParams; SendParamsData : TIdMultipartFormDataStream);
  Var
   I : Integer;
+  JSONParam : TJSONParam;
  Begin
   If DWParams <> Nil Then
    Begin
+    JSONParam                 := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF};
+    JSONParam.ParamName       := 'dwEventNameData';
+    JSONParam.ObjectDirection := odIn;
+    JSONParam.AsString        := EventData;
+    DWParams.Add(JSONParam);
     If Not (Assigned(StringStreamList)) Then
      StringStreamList := TStringStreamList.Create;
     For I := 0 To DWParams.Count -1 Do

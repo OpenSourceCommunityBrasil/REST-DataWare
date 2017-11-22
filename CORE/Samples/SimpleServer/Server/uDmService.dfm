@@ -68,7 +68,7 @@ object ServerMethodDM: TServerMethodDM
     Options.AutoStop = False
     Options.DisconnectAction = xdRollback
     Connection = Server_FDConnection
-    Left = 168
-    Top = 72
+    Left = 160
+    Top = 16
   end
 end

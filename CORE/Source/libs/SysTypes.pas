@@ -133,6 +133,8 @@ Var
   I: Integer;
   Cmd: String;
   JSONParam: TJSONParam;
+  vParams : TStringList;
+  Uri : TIdURI;
 Begin
   // Extrai nome do ServerMethod
   Result := TDWParams.Create;
@@ -141,25 +143,57 @@ Begin
   Result.Encoding := vEncoding;
 {$IFEND}
 {$ENDIF}
-  Cmd := URL + '/';
-  I := Pos('/', Cmd);
-  Delete(Cmd, 1, I);
-  I := Pos('/', Cmd);
-  UrlMethod := Copy(Cmd, 1, I - 1);
+  If Pos('?', URL) > 0 Then
+   Begin
+    Cmd := URL;
+    I := Pos('?', Cmd);
+    UrlMethod := StringReplace(Copy(Cmd, 1, I - 1), '/', '', [rfReplaceAll]);
+    Delete(Cmd, 1, I);
+    I := Pos('?', Cmd);
+   End
+  Else
+   Begin
+    Cmd := URL + '/';
+    I := Pos('/', Cmd);
+    Delete(Cmd, 1, I);
+    I := Pos('/', Cmd);
+    UrlMethod := Copy(Cmd, 1, I - 1);
+   End;
   // Extrai Parametros
   If Params.Count > 0 Then
    Begin
     For I := 0 To Params.Count - 1 Do
      Begin
       JSONParam := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(Result.Encoding){$IFEND}{$ENDIF};
-      JSONParam.FromJSON(Trim(Copy(Params[I], Pos('=', Params[I]) + 1,
-      Length(Params[I]))));
+      JSONParam.FromJSON(Trim(Copy(Params[I], Pos('=', Params[I]) + 1, Length(Params[I]))));
       Result.Add(JSONParam);
      End;
    End
   Else
    Begin
-
+    vParams := TStringList.Create;
+    vParams.Delimiter := '&';
+    vParams.StrictDelimiter := true;
+    If pos(UrlMethod + '/', Cmd) > 0 Then
+     Cmd := StringReplace(UrlMethod + '/', Cmd, '', [rfReplaceAll]);
+    Uri := TIdURI.Create(Cmd);
+    Try
+     vParams.DelimitedText := Uri.Params;
+     If vParams.count = 0 Then
+      If Trim(Cmd) <> '' Then
+       vParams.Add(Cmd);
+    Finally
+     Uri.Free;
+     For I := 0 To vParams.Count - 1 Do
+      Begin
+       JSONParam                 := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(Result.Encoding){$IFEND}{$ENDIF};
+       JSONParam.ParamName       := Trim(Copy(vParams[I], 1, Pos('=', vParams[I]) - 1));
+       JSONParam.AsString        := Trim(Copy(vParams[I],    Pos('=', vParams[I]) + 1, Length(vParams[I])));
+       JSONParam.ObjectDirection := odIN;
+       Result.Add(JSONParam);
+      End;
+     vParams.Free;
+    End;
    End;
 End;
 

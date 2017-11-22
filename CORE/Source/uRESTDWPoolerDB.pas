@@ -1029,7 +1029,7 @@ Begin
   Else
    DWParams     := Nil;
   LDataSetList := vRESTConnectionDB.ApplyUpdates(Massive,      vRestPooler,
-                                                 vRestModule,  GetLineSQL(SQL),
+                                                 vRestURL,  GetLineSQL(SQL),
                                                  DWParams,     Error,
                                                  MessageError, vTimeOut,
                                                  vLogin,       vPassword,
@@ -1142,14 +1142,14 @@ Begin
    Begin
     DWParams     := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vEncondig{$IFEND}{$ENDIF});
     LDataSetList := vRESTConnectionDB.InsertValue(vRestPooler,
-                                                  vRestModule, GetLineSQL(SQL),
+                                                  vRestURL, GetLineSQL(SQL),
                                                   DWParams, Error,
                                                   MessageError, vTimeOut, vLogin, vPassword, RESTClientPooler);
     FreeAndNil(DWParams);
    End
   Else
    LDataSetList := vRESTConnectionDB.InsertValuePure (vRestPooler,
-                                                      vRestModule,
+                                                      vRestURL,
                                                       GetLineSQL(SQL), Error,
                                                       MessageError, vTimeOut, vLogin, vPassword, RESTClientPooler);
   If (LDataSetList <> -1) Then
@@ -1345,14 +1345,14 @@ Begin
    Begin
     DWParams     := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vEncondig{$IFEND}{$ENDIF});
     LDataSetList := vRESTConnectionDB.ExecuteCommandJSON(vRestPooler,
-                                                         vRestModule, GetLineSQL(SQL),
+                                                         vRestURL, GetLineSQL(SQL),
                                                          DWParams, Error,
                                                          MessageError, Execute, vTimeOut, vLogin, vPassword, RESTClientPooler);
     FreeAndNil(DWParams);
    End
   Else
    LDataSetList := vRESTConnectionDB.ExecuteCommandPureJSON(vRestPooler,
-                                                            vRestModule,
+                                                            vRestURL,
                                                             GetLineSQL(SQL), Error,
                                                             MessageError, Execute, vTimeOut, vLogin, vPassword, RESTClientPooler);
   If (LDataSetList <> Nil) Then

@@ -1210,12 +1210,12 @@ object Form2: TForm2
       item
         Name = 'HIRE_DATE'
         Attributes = [faRequired]
-        DataType = ftTimeStamp
+        DataType = ftDateTime
       end
       item
         Name = 'DEPT_NO'
-        Attributes = [faRequired]
-        DataType = ftString
+        Attributes = [faRequired, faFixed]
+        DataType = ftFixedChar
         Size = 3
       end
       item
@@ -1238,8 +1238,8 @@ object Form2: TForm2
       item
         Name = 'SALARY'
         Attributes = [faRequired]
-        DataType = ftFloat
-        Precision = 15
+        DataType = ftBCD
+        Size = 2
       end
       item
         Name = 'FULL_NAME'
@@ -1289,13 +1289,14 @@ object Form2: TForm2
       FieldName = 'PHONE_EXT'
       Size = 4
     end
-    object RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField
+    object RESTDWClientSQL1HIRE_DATE: TDateTimeField
       FieldName = 'HIRE_DATE'
       Required = True
     end
     object RESTDWClientSQL1DEPT_NO: TStringField
       FieldName = 'DEPT_NO'
       Required = True
+      FixedChar = True
       Size = 3
     end
     object RESTDWClientSQL1JOB_CODE: TStringField
@@ -1312,9 +1313,10 @@ object Form2: TForm2
       Required = True
       Size = 15
     end
-    object RESTDWClientSQL1SALARY: TFloatField
+    object RESTDWClientSQL1SALARY: TBCDField
       FieldName = 'SALARY'
       Required = True
+      Size = 2
     end
     object RESTDWClientSQL1FULL_NAME: TStringField
       FieldName = 'FULL_NAME'

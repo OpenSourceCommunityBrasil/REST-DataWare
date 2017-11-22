@@ -69,12 +69,12 @@ TYPE
     RESTDWClientSQL1FIRST_NAME: TStringField;
     RESTDWClientSQL1LAST_NAME: TStringField;
     RESTDWClientSQL1PHONE_EXT: TStringField;
-    RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField;
+    RESTDWClientSQL1HIRE_DATE: TDateTimeField;
     RESTDWClientSQL1DEPT_NO: TStringField;
     RESTDWClientSQL1JOB_CODE: TStringField;
     RESTDWClientSQL1JOB_GRADE: TSmallintField;
     RESTDWClientSQL1JOB_COUNTRY: TStringField;
-    RESTDWClientSQL1SALARY: TFloatField;
+    RESTDWClientSQL1SALARY: TBCDField;
     RESTDWClientSQL1FULL_NAME: TStringField;
     PROCEDURE Button1Click(Sender: TObject);
     PROCEDURE Button2Click(Sender: TObject);
@@ -247,6 +247,8 @@ END;
 
 PROCEDURE TForm2.RESTDWDataBase1Status(ASender: TObject; CONST AStatus: TIdStatus; CONST AStatusText: STRING);
 BEGIN
+ if Self = Nil then
+  Exit;
   CASE AStatus OF
     hsResolving:
       BEGIN
@@ -265,7 +267,8 @@ BEGIN
       END;
     hsDisconnecting:
       BEGIN
-        StatusBar1.Panels[0].Text := 'hsDisconnecting...';
+        if StatusBar1.Panels.count > 0 then
+         StatusBar1.Panels[0].Text := 'hsDisconnecting...';
         Memo1.Lines.Add(DateTimeToStr(Now) + ' - ' + AStatusText);
       END;
     hsDisconnected:
