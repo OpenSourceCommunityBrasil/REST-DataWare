@@ -8,9 +8,11 @@
       <Unit0>
         <Filename Value="dwCGIServer.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="5"/>
         <CursorPos X="3" Y="5"/>
-        <UsageCount Value="44"/>
+        <UsageCount Value="45"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -19,17 +21,19 @@
         <ComponentName Value="dwCGIService"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <IsVisibleTab Value="True"/>
-        <UsageCount Value="44"/>
+        <TopLine Value="25"/>
+        <CursorPos X="60" Y="34"/>
+        <UsageCount Value="45"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="uConsts.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
-        <CursorPos X="18" Y="8"/>
-        <UsageCount Value="44"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="7"/>
+        <CursorPos X="20" Y="18"/>
+        <UsageCount Value="45"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -39,23 +43,23 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="75"/>
-        <CursorPos X="122" Y="76"/>
-        <UsageCount Value="44"/>
+        <CursorPos X="38" Y="9"/>
+        <UsageCount Value="45"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="779"/>
-        <CursorPos Y="793"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="748"/>
+        <CursorPos Y="761"/>
         <UsageCount Value="20"/>
         <Bookmarks Count="3">
           <Item0 X="55" Y="524" ID="1"/>
           <Item1 X="28" Y="2852" ID="2"/>
           <Item2 X="28" Y="2889" ID="3"/>
         </Bookmarks>
+        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="..\..\Source\libs\SysTypes.pas"/>
@@ -123,24 +127,138 @@
         <UsageCount Value="11"/>
       </Unit13>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="493" TopLine="479"/>
+      </Position1>
+      <Position2>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="494" TopLine="480"/>
+      </Position2>
+      <Position3>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="495" TopLine="481"/>
+      </Position3>
+      <Position4>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="496" TopLine="482"/>
+      </Position4>
+      <Position5>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="497" TopLine="483"/>
+      </Position5>
+      <Position6>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="499" TopLine="485"/>
+      </Position6>
+      <Position7>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="514" TopLine="506"/>
+      </Position7>
+      <Position8>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="523" TopLine="515"/>
+      </Position8>
+      <Position9>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="524" TopLine="515"/>
+      </Position9>
+      <Position10>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="527" TopLine="515"/>
+      </Position10>
+      <Position11>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="616" TopLine="608"/>
+      </Position11>
+      <Position12>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="618" TopLine="608"/>
+      </Position12>
+      <Position13>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="619" TopLine="608"/>
+      </Position13>
+      <Position14>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="627" TopLine="619"/>
+      </Position14>
+      <Position15>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="629" TopLine="619"/>
+      </Position15>
+      <Position16>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="638" TopLine="630"/>
+      </Position16>
+      <Position17>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="663" TopLine="647"/>
+      </Position17>
+      <Position18>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="657" TopLine="641"/>
+      </Position18>
+      <Position19>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="656" TopLine="648"/>
+      </Position19>
+      <Position20>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="657" TopLine="648"/>
+      </Position20>
+      <Position21>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="658" TopLine="648"/>
+      </Position21>
+      <Position22>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="664" TopLine="650"/>
+      </Position22>
+      <Position23>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="666" TopLine="652"/>
+      </Position23>
+      <Position24>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="671" TopLine="663"/>
+      </Position24>
+      <Position25>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="673" TopLine="663"/>
+      </Position25>
+      <Position26>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="668" Column="29" TopLine="663"/>
+      </Position26>
+      <Position27>
+        <Filename Value="dmdwcgiserver.pas"/>
+        <Caret Line="37" TopLine="25"/>
+      </Position27>
+      <Position28>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="657" TopLine="649"/>
+      </Position28>
+      <Position29>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="756" TopLine="748"/>
+      </Position29>
+      <Position30>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="761" TopLine="748"/>
+      </Position30>
+    </JumpHistory>
   </ProjectSession>
   <Debugging>
-    <BreakPoints Count="2">
+    <BreakPoints Count="1">
       <Item1>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Source Value="..\..\Source\uRESTDWBase.pas"/>
-        <Line Value="658"/>
-      </Item1>
-      <Item2>
         <Kind Value="bpkSource"/>
         <WatchScope Value="wpsLocal"/>
         <WatchKind Value="wpkWrite"/>
         <Source Value="..\..\Source\libs\SysTypes.pas"/>
         <Line Value="165"/>
-      </Item2>
+      </Item1>
     </BreakPoints>
   </Debugging>
 </CONFIG>

@@ -35,7 +35,7 @@ Type
                                                              {$IF CompilerVersion > 21}
                                                               ;vEncoding: TEncoding
                                                              {$IFEND}
-                                                            {$ENDIF}): TDWParams;
+                                                            {$ENDIF};MethodType : String = 'POST'): TDWParams;
   End;
 
 Type
@@ -128,7 +128,7 @@ Class Function TServerUtils.ParseWebFormsParams(Params: TStrings;
 {$IF CompilerVersion > 21};
   vEncoding: TEncoding
 {$IFEND}
-{$ENDIF}): TDWParams;
+{$ENDIF};MethodType : String = 'POST'): TDWParams;
 Var
   I: Integer;
   Cmd: String;
@@ -160,7 +160,7 @@ Begin
     UrlMethod := Copy(Cmd, 1, I - 1);
    End;
   // Extrai Parametros
-  If Params.Count > 0 Then
+  If (Params.Count > 0) And (MethodType = 'POST') Then
    Begin
     For I := 0 To Params.Count - 1 Do
      Begin
@@ -176,6 +176,8 @@ Begin
     vParams.StrictDelimiter := true;
     If pos(UrlMethod + '/', Cmd) > 0 Then
      Cmd := StringReplace(UrlMethod + '/', Cmd, '', [rfReplaceAll]);
+    If (Params.Count > 0) then
+     Cmd := Cmd + Params.Text;
     Uri := TIdURI.Create(Cmd);
     Try
      vParams.DelimitedText := Uri.Params;

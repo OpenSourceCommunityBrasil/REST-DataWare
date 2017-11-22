@@ -2,7 +2,7 @@ object ServerMethodDM: TServerMethodDM
   OnCreate = ServerMethodDataModuleCreate
   OldCreateOrder = False
   OnReplyEvent = ServerMethodDataModuleReplyEvent
-  Height = 337
+  Height = 244
   HorizontalOffset = 508
   VerticalOffset = 207
   Width = 212

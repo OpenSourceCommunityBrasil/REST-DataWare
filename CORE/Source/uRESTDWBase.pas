@@ -37,7 +37,7 @@ Uses
      {$ELSE}
      System.SysUtils, System.Classes, system.SyncObjs,
      {$IFEND}
-     ServerUtils,
+     ServerUtils, HTTPApp,
      {$IFDEF WINDOWS} Windows, {$ENDIF} uDWConstsData,       IdTCPClient,
      {$IF Defined(ANDROID) OR Defined(IOS)} System.json,{$ELSE} uDWJSON,{$IFEND} IdMultipartFormData,
      IdContext,             IdHTTPServer,        IdCustomHTTPServer,    IdSSLOpenSSL,    IdSSL,
@@ -268,8 +268,9 @@ Type
                                       Var DWParams       : TDWParams);
  Public
   {$IFDEF FPC}
-   Procedure Command(ARequest: TRequest; AResponse: TResponse; Var Handled: Boolean);
+   Procedure Command(ARequest: TRequest;    AResponse: TResponse;   Var Handled: Boolean);
   {$ELSE}
+   Procedure Command(ARequest: TWebRequest; AResponse: TWebResponse; var Handled: Boolean);
   {$ENDIF}
   Constructor Create           (AOwner                : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                      //Destroy a Classe
@@ -367,6 +368,10 @@ Uses uDWDatamodule, uRESTDWPoolerDB, SysTypes, uDWConsts, uDWJSONTools;
 {$IFDEF FPC}
 procedure TRESTServiceCGI.Command(ARequest: TRequest; AResponse: TResponse;
   Var Handled: Boolean);
+{$ELSE}
+procedure TRESTServiceCGI.Command(ARequest: TWebRequest; AResponse: TWebResponse;
+  var Handled: Boolean);
+{$ENDIF}
 Var
  DWParams           : TDWParams;
  vWelcomeMessage,
@@ -413,14 +418,11 @@ Var
 Begin
  vTempServerMethods := Nil;
  DWParams           := Nil;
- Cmd := Trim(ARequest.HeaderLine);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   AResponse.CustomHeaders.Add('Access-Control-Allow-Origin','*');
-  {$ELSE}
+   Cmd := Trim(ARequest.PathInfo);
    AResponse.CustomHeaders.Add('Access-Control-Allow-Origin=*');
-  {$IFEND}
  {$ELSE}
+  Cmd := Trim(ARequest.HeaderLine);
   AResponse.CustomHeaders.Add('Access-Control-Allow-Origin=*');
  {$ENDIF}
  sCharSet := '';
@@ -446,11 +448,7 @@ Begin
    Else If (Pos('.CSS', UpperCase(Cmd)) > 0) Then
     sContentType:='text/css';
    {$IFNDEF FPC}
-    {$if CompilerVersion > 21}
-     sFile := FRootPath + ARequest.Command;
-    {$ELSE}
-     sFile := FRootPath + ARequest.Command;
-    {$IFEND}
+    sFile := FRootPath + ARequest.PathInfo;
    {$ELSE}
     sFile := FRootPath + ARequest.Command;
    {$ENDIF}
@@ -460,7 +458,7 @@ Begin
      {$IFNDEF FPC}
       {$if CompilerVersion > 21}
      	 If (sCharSet <> '') Then
-        AResponseInfo.CharSet := sCharSet;
+        AResponse.ContentEncoding := sCharSet;
       {$IFEND}
      {$ENDIF}
      AResponse.ContentStream := TIdReadFileExclusiveStream.Create(sFile);
@@ -485,7 +483,13 @@ Begin
    end;
   End;
  Try
+  {$IFNDEF FPC}
+  Cmd := stringreplace(Trim(lowercase(ARequest.PathInfo)), lowercase(vServerContext) + '/', '', [rfReplaceAll]);
+  {$ELSE}
   Cmd := stringreplace(Trim(lowercase(ARequest.HeaderLine)), lowercase(vServerContext) + '/', '', [rfReplaceAll]);
+  {$ENDIF}
+  if (Trim(ARequest.Content) = '') And (Cmd = '') then
+   Exit;
   Cmd := StringReplace(Cmd, lowercase(' HTTP/1.0'), '', [rfReplaceAll]);
   Cmd := StringReplace(Cmd, lowercase(' HTTP/1.1'), '', [rfReplaceAll]);
   Cmd := StringReplace(Cmd, lowercase(' HTTP/2.0'), '', [rfReplaceAll]);
@@ -504,15 +508,30 @@ Begin
        End;
      End;
    End;
+    {$IFNDEF FPC}
+    If ARequest.PathInfo <> '/favicon.ico' Then
+    {$ELSE}
     If ARequest.URI <> '/favicon.ico' Then
+    {$ENDIF}
      Begin
-      If (ARequest.FieldCount > 0) And (Trim(ARequest.Content) = '') Then
-       DWParams  := TServerUtils.ParseWebFormsParams (ARequest.ContentFields, Cmd,
-                                                      UrlMethod{$IFNDEF FPC}{$if CompilerVersion > 21}, GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF})
+    {$IFNDEF FPC}
+     If (ARequest.QueryFields.Count > 0) And (Trim(ARequest.Content) = '') Then
+      DWParams  := TServerUtils.ParseWebFormsParams (ARequest.QueryFields, Cmd,
+                                                     UrlMethod{$IFNDEF FPC}{$if CompilerVersion > 21}, GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF},
+                                                     ARequest.Method)
+    {$ELSE}
+     If (ARequest.FieldCount > 0) And (Trim(ARequest.Content) = '') Then
+      DWParams  := TServerUtils.ParseWebFormsParams (ARequest.ContentFields, Cmd,
+                                                     UrlMethod{$IFNDEF FPC}{$if CompilerVersion > 21}, GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF})
+    {$ENDIF}
       Else
        Begin
         If Trim(ARequest.Content) = '' Then
+         {$IFNDEF FPC}
+         DWParams  := TServerUtils.ParseRESTURL (ARequest.PathInfo + ARequest.Query{$IFNDEF FPC}{$if CompilerVersion > 21},GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF})
+         {$ELSE}
          DWParams  := TServerUtils.ParseRESTURL (ARequest.URI{$IFNDEF FPC}{$if CompilerVersion > 21},GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF})
+         {$ENDIF}
         Else
          Begin
           Try
@@ -636,7 +655,11 @@ Begin
          If vTempServerMethods <> Nil Then
           Begin
            JSONStr := ARequest.RemoteAddr;
+           {$IFDEF FPC}
            If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.LocalPathPrefix, UrlMethod, DWParams, JSONStr) Then
+           {$ELSE}
+           If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.Method, UrlMethod, DWParams, JSONStr) Then
+           {$ENDIF}
             Begin
              If Trim(ARequest.Content) = '' Then
               Begin
@@ -668,7 +691,10 @@ Begin
           End;
         End;
        Try
-        vReplyString                         := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
+        If Assigned(DWParams) Then
+         vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr])
+        Else
+         vReplyString := 'Message (Internal Error)';
         If vDataCompress Then
          Begin
           ZCompressStr(vReplyString, vReplyStringResult);
@@ -704,8 +730,6 @@ Begin
    FreeAndNil(DWParams);
  End;
 End;
-{$ELSE}
-{$ENDIF}
 
 procedure TRESTServiceCGI.SetServerMethod(Value: TComponentClass);
 begin
@@ -782,6 +806,7 @@ Begin
     Begin
      JSONParam                 := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF};
      JSONParam.ParamName       := 'Result';
+     JSONParam.ObjectValue     := ovString;
      JSONParam.ObjectDirection := odOut;
      DWParams.Add(JSONParam);
     End;

@@ -1420,7 +1420,7 @@ Begin
  vConnection.TypeRequest    := VtypeRequest;
  Result := TStringList.Create;
  Try
-  vTempList := vConnection.GetPoolerList(vRestModule, vTimeOut, vLogin, vPassword);
+  vTempList := vConnection.GetPoolerList(vRestURL, vTimeOut, vLogin, vPassword);
   Try
     For I := 0 To vTempList.Count -1 do
      Result.Add(vTempList[I]);

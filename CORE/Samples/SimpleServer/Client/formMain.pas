@@ -65,17 +65,6 @@ TYPE
     Button4: TButton;
     chkhttps: TCheckBox;
     Button5: TButton;
-    RESTDWClientSQL1EMP_NO: TSmallintField;
-    RESTDWClientSQL1FIRST_NAME: TStringField;
-    RESTDWClientSQL1LAST_NAME: TStringField;
-    RESTDWClientSQL1PHONE_EXT: TStringField;
-    RESTDWClientSQL1HIRE_DATE: TDateTimeField;
-    RESTDWClientSQL1DEPT_NO: TStringField;
-    RESTDWClientSQL1JOB_CODE: TStringField;
-    RESTDWClientSQL1JOB_GRADE: TSmallintField;
-    RESTDWClientSQL1JOB_COUNTRY: TStringField;
-    RESTDWClientSQL1SALARY: TBCDField;
-    RESTDWClientSQL1FULL_NAME: TStringField;
     PROCEDURE Button1Click(Sender: TObject);
     PROCEDURE Button2Click(Sender: TObject);
     PROCEDURE RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
