@@ -1,0 +1,216 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{B9896F08-FBE4-4C46-BDAA-C3C41A03A68E}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="..\RestEasyObjects.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ISAPI\RestDWServerISAPI.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Employee\SimpleProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Android\ClientMobile.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="MasterDetail\MasterDetail.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Apache_Module\mod_webbroker.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ClientWin\ClientWin.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ListPoolers\ListPoolers.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WindowsService\WindowsDWService.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Conversor de ZEOS para RestDW\Replace2RestDW.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\Connectors\FireDAC\RESTDriverFD.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\Connectors\ZEOS\RESTDriverZEOS.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="StoredProc\StoredProc.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="DynamicFilter\DynamicFilter.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\Connectors\UniDAC\RESTDriverUniDAC.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="DwServer\RestDWServerProject.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="RestEasyObjects">
+        <MSBuild Projects="..\RestEasyObjects.dproj"/>
+    </Target>
+    <Target Name="RestEasyObjects:Clean">
+        <MSBuild Projects="..\RestEasyObjects.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestEasyObjects:Make">
+        <MSBuild Projects="..\RestEasyObjects.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWServerISAPI">
+        <MSBuild Projects="ISAPI\RestDWServerISAPI.dproj"/>
+    </Target>
+    <Target Name="RestDWServerISAPI:Clean">
+        <MSBuild Projects="ISAPI\RestDWServerISAPI.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWServerISAPI:Make">
+        <MSBuild Projects="ISAPI\RestDWServerISAPI.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SimpleProject">
+        <MSBuild Projects="Employee\SimpleProject.dproj"/>
+    </Target>
+    <Target Name="SimpleProject:Clean">
+        <MSBuild Projects="Employee\SimpleProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SimpleProject:Make">
+        <MSBuild Projects="Employee\SimpleProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ClientMobile">
+        <MSBuild Projects="Android\ClientMobile.dproj"/>
+    </Target>
+    <Target Name="ClientMobile:Clean">
+        <MSBuild Projects="Android\ClientMobile.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ClientMobile:Make">
+        <MSBuild Projects="Android\ClientMobile.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="MasterDetail">
+        <MSBuild Projects="MasterDetail\MasterDetail.dproj"/>
+    </Target>
+    <Target Name="MasterDetail:Clean">
+        <MSBuild Projects="MasterDetail\MasterDetail.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MasterDetail:Make">
+        <MSBuild Projects="MasterDetail\MasterDetail.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="mod_webbroker">
+        <MSBuild Projects="Apache_Module\mod_webbroker.dproj"/>
+    </Target>
+    <Target Name="mod_webbroker:Clean">
+        <MSBuild Projects="Apache_Module\mod_webbroker.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="mod_webbroker:Make">
+        <MSBuild Projects="Apache_Module\mod_webbroker.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ClientWin">
+        <MSBuild Projects="ClientWin\ClientWin.dproj"/>
+    </Target>
+    <Target Name="ClientWin:Clean">
+        <MSBuild Projects="ClientWin\ClientWin.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ClientWin:Make">
+        <MSBuild Projects="ClientWin\ClientWin.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ListPoolers">
+        <MSBuild Projects="ListPoolers\ListPoolers.dproj"/>
+    </Target>
+    <Target Name="ListPoolers:Clean">
+        <MSBuild Projects="ListPoolers\ListPoolers.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ListPoolers:Make">
+        <MSBuild Projects="ListPoolers\ListPoolers.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WindowsDWService">
+        <MSBuild Projects="WindowsService\WindowsDWService.dproj"/>
+    </Target>
+    <Target Name="WindowsDWService:Clean">
+        <MSBuild Projects="WindowsService\WindowsDWService.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WindowsDWService:Make">
+        <MSBuild Projects="WindowsService\WindowsDWService.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Replace2RestDW">
+        <MSBuild Projects="Conversor de ZEOS para RestDW\Replace2RestDW.dproj"/>
+    </Target>
+    <Target Name="Replace2RestDW:Clean">
+        <MSBuild Projects="Conversor de ZEOS para RestDW\Replace2RestDW.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Replace2RestDW:Make">
+        <MSBuild Projects="Conversor de ZEOS para RestDW\Replace2RestDW.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDriverFD">
+        <MSBuild Projects="..\Connectors\FireDAC\RESTDriverFD.dproj"/>
+    </Target>
+    <Target Name="RESTDriverFD:Clean">
+        <MSBuild Projects="..\Connectors\FireDAC\RESTDriverFD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDriverFD:Make">
+        <MSBuild Projects="..\Connectors\FireDAC\RESTDriverFD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDriverZEOS">
+        <MSBuild Projects="..\Connectors\ZEOS\RESTDriverZEOS.dproj"/>
+    </Target>
+    <Target Name="RESTDriverZEOS:Clean">
+        <MSBuild Projects="..\Connectors\ZEOS\RESTDriverZEOS.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDriverZEOS:Make">
+        <MSBuild Projects="..\Connectors\ZEOS\RESTDriverZEOS.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="StoredProc">
+        <MSBuild Projects="StoredProc\StoredProc.dproj"/>
+    </Target>
+    <Target Name="StoredProc:Clean">
+        <MSBuild Projects="StoredProc\StoredProc.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="StoredProc:Make">
+        <MSBuild Projects="StoredProc\StoredProc.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DynamicFilter">
+        <MSBuild Projects="DynamicFilter\DynamicFilter.dproj"/>
+    </Target>
+    <Target Name="DynamicFilter:Clean">
+        <MSBuild Projects="DynamicFilter\DynamicFilter.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DynamicFilter:Make">
+        <MSBuild Projects="DynamicFilter\DynamicFilter.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDriverUniDAC">
+        <MSBuild Projects="..\Connectors\UniDAC\RESTDriverUniDAC.dproj"/>
+    </Target>
+    <Target Name="RESTDriverUniDAC:Clean">
+        <MSBuild Projects="..\Connectors\UniDAC\RESTDriverUniDAC.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDriverUniDAC:Make">
+        <MSBuild Projects="..\Connectors\UniDAC\RESTDriverUniDAC.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWServerProject">
+        <MSBuild Projects="DwServer\RestDWServerProject.dproj"/>
+    </Target>
+    <Target Name="RestDWServerProject:Clean">
+        <MSBuild Projects="DwServer\RestDWServerProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWServerProject:Make">
+        <MSBuild Projects="DwServer\RestDWServerProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="RestEasyObjects;RestDWServerISAPI;SimpleProject;ClientMobile;MasterDetail;mod_webbroker;ClientWin;ListPoolers;WindowsDWService;Replace2RestDW;RESTDriverFD;RESTDriverZEOS;StoredProc;DynamicFilter;RESTDriverUniDAC;RestDWServerProject"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="RestEasyObjects:Clean;RestDWServerISAPI:Clean;SimpleProject:Clean;ClientMobile:Clean;MasterDetail:Clean;mod_webbroker:Clean;ClientWin:Clean;ListPoolers:Clean;WindowsDWService:Clean;Replace2RestDW:Clean;RESTDriverFD:Clean;RESTDriverZEOS:Clean;StoredProc:Clean;DynamicFilter:Clean;RESTDriverUniDAC:Clean;RestDWServerProject:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="RestEasyObjects:Make;RestDWServerISAPI:Make;SimpleProject:Make;ClientMobile:Make;MasterDetail:Make;mod_webbroker:Make;ClientWin:Make;ListPoolers:Make;WindowsDWService:Make;Replace2RestDW:Make;RESTDriverFD:Make;RESTDriverZEOS:Make;StoredProc:Make;DynamicFilter:Make;RESTDriverUniDAC:Make;RestDWServerProject:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
