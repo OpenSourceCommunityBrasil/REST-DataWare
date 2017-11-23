@@ -1,5 +1,8 @@
 unit dmdwcgiserver;
 
+// Criação de Exemplo usando CGI para Apache Server feito por "Gilberto Rocha da Silva",
+//para uso do Componente TRESTServiceCGI
+
 interface
 
 uses

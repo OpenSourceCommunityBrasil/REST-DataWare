@@ -1,17 +1,22 @@
 unit uRestDWDriverZEOS;
 
+//Conversão do Driver ZEOS feita pelo user "Magnele Sales"
+
 interface
 
-uses SysUtils,       Classes,
-     uDWConsts, DB,  zConnection,      ZDataset,
-     uDWConstsData,  uRestDWPoolerDB,  udwjson,
-     uDWJSONObject,  uDWMassiveBuffer, Variants;
+uses System.SysUtils,          System.Classes,
+     ZSqlUpdate,               ZAbstractRODataset,      ZAbstractDataset,
+     ZDataset,                 ZConnection,             ZStoredProcedure,
+     ZSQLProcessor,            Data.DB,                 uDWConsts,
+     uDWConstsData,            uRestDWPoolerDB,         udwjson,
+     uDWJSONObject,            uDWMassiveBuffer,        Variants,
+     uDWDatamodule,            SysTypes;
 
 Type
  TRESTDWDriverZEOS   = Class(TRESTDWDriver)
  Private
-  vZEOSConnectionBack,
-  vZEOSConnection               : TZConnection;
+  vZConnectionBack,
+  vZConnection                 : TZConnection;
   Procedure SetConnection(Value : TZConnection);
   Function  GetConnection       : TZConnection;
  Public
@@ -54,8 +59,6 @@ Type
   Property Connection : TZConnection Read GetConnection Write SetConnection;
 End;
 
-
-
 Procedure Register;
 
 implementation
@@ -65,10 +68,10 @@ Uses uDWJSONTools;
 
 Procedure Register;
 Begin
- RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWDriverZEOS]);
+ RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWDriverZeos]);
 End;
 
-Procedure TRESTDWDriverZEOS.ApplyUpdates_MassiveCache(MassiveCache   : String;
+Procedure TRESTDWDriverZeos.ApplyUpdates_MassiveCache(MassiveCache     : String;
                                                     Var Error        : Boolean;
                                                     Var MessageError : String);
 Var
@@ -78,6 +81,7 @@ Var
  vStringStream  : TMemoryStream;
  bPrimaryKeys   : TStringList;
  vFieldType     : TFieldType;
+ vMassiveLine   : Boolean;
  Function GetParamIndex(Params : TParams; ParamName : String) : Integer;
  Var
   I : Integer;
@@ -153,7 +157,7 @@ Var
                 //  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
               End;
             End
-           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD] Then
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftSingle, ftBCD] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsFloat  := StrToFloat(MassiveDataset.AtualRec.PrimaryValues[X].Value);
@@ -205,7 +209,8 @@ Var
        End;
       If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
        Begin
-        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+        If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+           (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
          Begin
            // Alterado por: Alexandre Magno - 04/11/2017
            If Query.Params[I].DataType = ftLargeint Then
@@ -222,14 +227,16 @@ Var
            //  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
          End;
        End
-      Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
+      Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftSingle, ftBCD] Then
        Begin
-        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+        If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+           (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
          Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
        End
       Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
        Begin
-        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+        If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+           (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
          Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
         Else
          Query.Params[I].Clear;
@@ -342,7 +349,8 @@ Var
                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                ftString,    ftWideString, ftWideMemo]    Then
           Begin
-           If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+           If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+              (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
             Begin
              If Query.Params[I].Size > 0 Then
               Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
@@ -363,7 +371,8 @@ Var
             End;
            If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
             Begin
-             If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+             If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+                (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Begin
                If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
                 Begin
@@ -378,16 +387,18 @@ Var
              Else
               Query.Params[I].Clear;
             End
-           Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
+           Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
             Begin
-             If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+             If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+                (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
              Else
               Query.Params[I].Clear;
             End
            Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
             Begin
-             If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+             If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+                (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
              Else
               Query.Params[I].Clear;
@@ -409,7 +420,8 @@ Var
               FreeAndNil(vStringStream);
              End;
             End
-           Else If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+           Else If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+                   (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
             Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value
            Else
             Query.Params[I].Clear;
@@ -433,14 +445,40 @@ Var
   Result         := False;
   For x := 0 To bJsonArray.length -1 Do
    Begin
-    If Not vZEOSConnection.InTransaction Then
-     vZEOSConnection.StartTransaction;
+    If Not vZConnection.InTransaction Then
+     vZConnection.StartTransaction;
     Try
      MassiveDataset.FromJSON(bJsonArray.get(X).toString);
      MassiveDataset.First;
      For A := 1 To MassiveDataset.RecordCount Do
       Begin
        Query.SQL.Clear;
+       If Self.Owner      Is TServerMethodDataModule Then
+        Begin
+         vMassiveLine := False;
+         If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveProcess) Then
+          Begin
+           TServerMethodDataModule(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+           If vMassiveLine Then
+            Begin
+             MassiveDataset.Next;
+             Continue;
+            End;
+          End;
+        End
+       Else If Self.Owner Is TServerMethods Then
+        Begin
+         vMassiveLine := False;
+         If Assigned(TServerMethods(Self.Owner).OnMassiveProcess) Then
+          Begin
+           TServerMethods(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+           If vMassiveLine Then
+            Begin
+             MassiveDataset.Next;
+             Continue;
+            End;
+          End;
+        End;
        PrepareData(Query, MassiveDataset, Error, MessageError);
        Try
         Query.ExecSQL;
@@ -449,8 +487,8 @@ Var
          Begin
           Error  := True;
           Result := False;
-          If vZEOSConnection.InTransaction Then
-           vZEOSConnection.Rollback;
+          If vZConnection.InTransaction Then
+           vZConnection.Rollback;
           MessageError := E.Message;
           Break;
          End;
@@ -465,15 +503,15 @@ Var
    Begin
     Try
      Result        := True;
-     If vZEOSConnection.InTransaction Then
-      vZEOSConnection.Commit;
+     If vZConnection.InTransaction Then
+      vZConnection.Commit;
     Except
      On E : Exception do
       Begin
        Error  := True;
        Result := False;
-       If vZEOSConnection.InTransaction Then
-        vZEOSConnection.Rollback;
+       If vZConnection.InTransaction Then
+        vZConnection.Rollback;
        MessageError := E.Message;
       End;
     End;
@@ -486,9 +524,9 @@ Begin
  Try
   Error      := False;
   vTempQuery := TZQuery.Create(Owner);
-  If Not vZEOSConnection.Connected Then
-   vZEOSConnection.Connected := True;
-  vTempQuery.Connection   := vZEOSConnection;
+  If Not vZConnection.Connected Then
+   vZConnection.Connected := True;
+  vTempQuery.Connection   := vZConnection;
   vTempQuery.SQL.Clear;
   LoadMassive(MassiveCache, vTempQuery);
  Finally
@@ -497,14 +535,14 @@ Begin
  End;
 End;
 
-Procedure TRESTDWDriverZEOS.Close;
+Procedure TRESTDWDriverZeos.Close;
 Begin
   Inherited;
  If Connection <> Nil Then
   Connection.Disconnect;
 End;
 
-function TRESTDWDriverZEOS.ExecuteCommand(SQL              : String;
+function TRESTDWDriverZeos.ExecuteCommand(SQL              : String;
                                         Params           : TDWParams;
                                         Var Error        : Boolean;
                                         Var MessageError : String;
@@ -534,96 +572,171 @@ Begin
  Result := TJSONValue.Create;
  vTempQuery               := TZQuery.Create(Owner);
  Try
-  vTempQuery.Connection   := vZEOSConnection;
+  vTempQuery.Connection   := vZConnection;
   vTempQuery.SQL.Clear;
   vTempQuery.SQL.Add(SQL);
-  If Not vZEOSConnection.InTransaction Then
-   vZEOSConnection.StartTransaction;
   If Params <> Nil Then
-   Begin
-    Try
-    // vTempQuery.Prepare;
-    Except
-    End;
-    For I := 0 To Params.Count -1 Do
-     Begin
-      If vTempQuery.Params.Count > I Then
+  Begin
+    if vTempQuery.ParamCheck then
+    begin
+      Try
+      // vTempQuery.Prepare;
+      Except
+      End;
+      For I := 0 To Params.Count -1 Do
        Begin
-        vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
-        A          := GetParamIndex(vTempQuery.Params, vParamName);
-        If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
+        If vTempQuery.Params.Count > I Then
          Begin
-          If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
-                                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                ftString,    ftWideString, ftWideMemo]    Then
+          vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
+          A          := GetParamIndex(vTempQuery.Params, vParamName);
+          If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
            Begin
-            If vTempQuery.Params[A].Size > 0 Then
-             vTempQuery.Params[A].Value := Copy(Params[I].Value, 1, vTempQuery.Params[A].Size)
-            Else
-             vTempQuery.Params[A].Value := Params[I].Value;
-           End
-          Else
-           Begin
-            If vTempQuery.Params[A].DataType in [ftUnknown] Then
+            If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                                                  ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                                  ftString,    ftWideString, ftWideMemo]    Then
              Begin
-              If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
-               vTempQuery.Params[A].DataType := ObjectValueToFieldType(Params[I].ObjectValue)
+              If vTempQuery.Params[A].Size > 0 Then
+               vTempQuery.Params[A].Value := Copy(Params[I].Value, 1, vTempQuery.Params[A].Size)
               Else
-               vTempQuery.Params[A].DataType := ftString;
-             End;
-            If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+               vTempQuery.Params[A].Value := Params[I].Value;
+             End
+            Else
              Begin
-              If Trim(Params[I].Value) <> '' Then
+              If vTempQuery.Params[A].DataType in [ftUnknown] Then
                Begin
-                If vTempQuery.Params[A].DataType = ftLargeint Then
-                 vTempQuery.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
-                Else If vTempQuery.Params[A].DataType = ftSmallInt Then
-                 vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
+                 vTempQuery.Params[A].DataType := ObjectValueToFieldType(Params[I].ObjectValue)
                 Else
-                 vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                 vTempQuery.Params[A].DataType := ftString;
+               End;
+              If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+               Begin
+                If (Params[I].Value <> Null) Then
+                 Begin
+                  If vTempQuery.Params[A].DataType = ftLargeint Then
+                   vTempQuery.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
+                  Else If vTempQuery.Params[A].DataType = ftSmallInt Then
+                   vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                  Else
+                   vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                 End
+                Else
+                 vTempQuery.Params[A].Clear;
+               End
+              Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
+               Begin
+                If (Params[I].Value <> Null) Then
+                 vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value)
+                Else
+                 vTempQuery.Params[A].Clear;
+               End
+              Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+               Begin
+                If (Params[I].Value <> Null) Then
+                 vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
+                Else
+                 vTempQuery.Params[A].Clear;
+               End  //Tratar Blobs de Parametros...
+              Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+               Begin
+                vStringStream := TMemoryStream.Create;
+                Try
+                 Params[I].SaveToStream(vStringStream);
+                 vStringStream.Position := 0;
+                 If vStringStream.Size > 0 Then
+                  vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
+                Finally
+                 FreeAndNil(vStringStream);
+                End;
+               End
+              Else If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                                                        ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                                        ftString,    ftWideString, ftWideMemo]    Then
+               Begin
+                If (Trim(Params[I].Value) <> '') Then
+                 vTempQuery.Params[A].AsString := Params[I].Value
+                Else
+                 vTempQuery.Params[A].Clear;
                End
               Else
-               vTempQuery.Params[A].Clear;
-             End
-            Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
+               vTempQuery.Params[A].Value    := Params[I].Value;
+             End;
+           End;
+         End
+        Else
+         Break;
+       End;
+     end
+     Else
+      Begin
+       For I := 0 To Params.Count -1 Do
+        begin
+         With vTempQuery.Params.AddParameter do
+          Begin
+           vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
+           Name := vParamName;
+           ParamType := ptInput;
+           If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
+            DataType := ObjectValueToFieldType(Params[I].ObjectValue)
+           Else
+            DataType := ftString;
+           If vTempQuery.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+            Begin
+             If (Params[I].Value <> Null) Then
+              Begin
+               // Alterado por: Alexandre Magno - 04/11/2017
+               If vTempQuery.Params[I].DataType = ftLargeint Then
+                vTempQuery.Params[I].AsLargeInt := StrToInt64(Params[I].Value)
+               Else If vTempQuery.Params[I].DataType = ftSmallInt Then
+                vTempQuery.Params[I].AsSmallInt := StrToInt(Params[I].Value)
+               Else
+                vTempQuery.Params[I].AsInteger  := StrToInt(Params[I].Value);
+              End
+             Else
+              vTempQuery.Params[I].Clear;
+            End
+            Else If vTempQuery.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
              Begin
-              If Trim(Params[I].Value) <> '' Then
-               vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value)
+              If (Params[I].Value <> Null) Then
+               vTempQuery.Params[I].AsFloat  := StrToFloat(Params[I].Value)
               Else
-               vTempQuery.Params[A].Clear;
+               vTempQuery.Params[I].Clear;
              End
-            Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+            Else If vTempQuery.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
              Begin
-              If Trim(Params[I].Value) <> '' Then
-               vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
+              If (Params[I].Value <> Null) Then
+               vTempQuery.Params[I].AsDateTime  := StrToFloat(Params[I].Value)
               Else
-               vTempQuery.Params[A].Clear;
+               vTempQuery.Params[I].Clear;
              End  //Tratar Blobs de Parametros...
-            Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+            Else If vTempQuery.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
              Begin
               vStringStream := TMemoryStream.Create;
               Try
                Params[I].SaveToStream(vStringStream);
                vStringStream.Position := 0;
                If vStringStream.Size > 0 Then
-                vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
+                vTempQuery.Params[I].LoadFromStream(vStringStream, ftBlob);
               Finally
                FreeAndNil(vStringStream);
               End;
              End
-            Else If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+            Else If vTempQuery.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                                       ftString,    ftWideString, ftWideMemo]    Then
-             vTempQuery.Params[A].AsString := Params[I].Value
+             Begin
+              If (Params[I].Value <> '') And
+                 (Params[I].Value <> Null) Then
+               vTempQuery.Params[I].AsString := Params[I].Value
+              Else
+               vTempQuery.Params[I].Clear;
+             End
             Else
-             vTempQuery.Params[A].Value    := Params[I].Value;
-           End;
-         End;
-       End
-      Else
-       Break;
-     End;
-   End;
+             vTempQuery.Params[I].Value    := Params[I].Value;
+          End;
+        End;
+      End;
+  End;
   If Not Execute Then
    Begin
     vTempQuery.Active := True;
@@ -640,7 +753,7 @@ Begin
     If Result = Nil Then
      Result := TJSONValue.Create;
     Result.SetValue('COMMANDOK');
-    vZEOSConnection.Commit;
+    vZConnection.Commit;
    End;
  Except
   On E : Exception do
@@ -652,7 +765,7 @@ Begin
       Result := TJSONValue.Create;
      Result.Encoded := True;
      Result.SetValue(GetPairJSON('NOK', MessageError));
-     vZEOSConnection.Rollback;
+     vZConnection.Rollback;
     Except
     End;
    End;
@@ -661,20 +774,116 @@ Begin
  vTempQuery.Free;
 End;
 
-procedure TRESTDWDriverZEOS.ExecuteProcedure(ProcName         : String;
+procedure TRESTDWDriverZeos.ExecuteProcedure(ProcName         : String;
                                            Params           : TDWParams;
                                            Var Error        : Boolean;
                                            Var MessageError : String);
+Var
+ A, I            : Integer;
+ vParamName      : String;
+ vTempStoredProc : TZStoredProc;
+ Function GetParamIndex(Params : TParams; ParamName : String) : Integer;
+ Var
+  I : Integer;
+ Begin
+  Result := -1;
+  For I := 0 To Params.Count -1 Do
+   Begin
+    If UpperCase(Params[I].Name) = UpperCase(ParamName) Then
+     Begin
+      Result := I;
+      Break;
+     End;
+   End;
+ End;
 Begin
+ Inherited;
+ Error  := False;
+ vTempStoredProc                               := TZStoredProc.Create(Owner);
+ Try
+  vTempStoredProc.Connection                   := vZConnection;
+  vTempStoredProc.StoredProcName               := ProcName;
+  If Params <> Nil Then
+   Begin
+    Try
+     vTempStoredProc.Prepare;
+    Except
+    End;
+    For I := 0 To Params.Count -1 Do
+     Begin
+      If vTempStoredProc.Params.Count > I Then
+       Begin
+        vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
+        A          := GetParamIndex(vTempStoredProc.Params, vParamName);
+        If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
+         Begin
+          If vTempStoredProc.Params[A].DataType in [ftFixedChar, ftFixedWideChar,
+                                                    ftString,    ftWideString, ftWideMemo]    Then
+           Begin
+            If vTempStoredProc.Params[A].Size > 0 Then
+             vTempStoredProc.Params[A].Value := Copy(Params[I].Value, 1, vTempStoredProc.Params[A].Size)
+            Else
+             vTempStoredProc.Params[A].Value := Params[I].Value;
+           End
+          Else
+           Begin
+            If vTempStoredProc.Params[A].DataType in [ftUnknown] Then
+             vTempStoredProc.Params[A].DataType := ObjectValueToFieldType(Params[I].ObjectValue);
+            vTempStoredProc.Params[A].Value    := Params[I].Value;
+           End;
+         End;
+       End
+      Else
+       Break;
+     End;
+   End;
+  vTempStoredProc.ExecProc;
+  vZConnection.Commit;
+ Except
+  On E : Exception do
+   Begin
+    Try
+     vZConnection.Rollback;
+    Except
+    End;
+    Error := True;
+    MessageError := E.Message;
+   End;
+ End;
+ vTempStoredProc.DisposeOf;
 End;
 
-procedure TRESTDWDriverZEOS.ExecuteProcedurePure(ProcName         : String;
+procedure TRESTDWDriverZeos.ExecuteProcedurePure(ProcName         : String;
                                                Var Error        : Boolean;
                                                Var MessageError : String);
+Var
+ vTempStoredProc : TZStoredProc;
 Begin
+ Inherited;
+ Error                                         := False;
+ vTempStoredProc                               := TZStoredProc.Create(Owner);
+ Try
+  If Not vZConnection.Connected Then
+   vZConnection.Connected                     := True;
+  vTempStoredProc.Connection                   := vZConnection;
+  vTempStoredProc.StoredProcName               := ProcName;
+  vTempStoredProc.ExecProc;
+  vZConnection.Commit;
+ Except
+  On E : Exception do
+   Begin
+    Try
+     vZConnection.Rollback;
+    Except
+    End;
+    Error := True;
+    MessageError := E.Message;
+   End;
+ End;
+ vTempStoredProc.DisposeOf;
 End;
 
-Function TRESTDWDriverZEOS.ApplyUpdates(Massive,
+Function TRESTDWDriverZeos.ApplyUpdates(Massive,
                                       SQL               : String;
                                       Params            : TDWParams;
                                       Var Error         : Boolean;
@@ -686,6 +895,7 @@ Var
  vStringStream  : TMemoryStream;
  bPrimaryKeys   : TStringList;
  vFieldType     : TFieldType;
+ vMassiveLine   : Boolean;
  Function GetParamIndex(Params : TParams; ParamName : String) : Integer;
  Var
   I : Integer;
@@ -760,7 +970,7 @@ Var
                 //  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
               End;
             End
-           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD] Then
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsFloat  := StrToFloat(MassiveDataset.AtualRec.PrimaryValues[X].Value);
@@ -795,10 +1005,14 @@ Var
                           ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                           ftString,    ftWideString, ftWideMemo]    Then
      Begin
-      If Query.Params[I].Size > 0 Then
-       Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
-      Else
-       Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value;
+      If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+         (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
+       Begin
+        If Query.Params[I].Size > 0 Then
+         Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
+        Else
+         Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value;
+       End;
      End
     Else
      Begin
@@ -811,7 +1025,8 @@ Var
        End;
       If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
        Begin
-        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+        If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+           (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
          Begin
            // Alterado por: Alexandre Magno - 04/11/2017
            If Query.Params[I].DataType = ftLargeint Then
@@ -826,19 +1041,25 @@ Var
            //  Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
            //Else
            //  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
-         End;
+         End
+        Else
+         Query.Params[I].Clear;
        End
-      Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
+      Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
        Begin
-        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
-         Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+        If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+           (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
+         Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+        Else
+         Query.Params[I].Clear;
        End
       Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
        Begin
-        If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+        If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+           (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
          Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
         Else
-         Query.Params[I].AsDateTime  := Null;
+         Query.Params[I].Clear;
        End  //Tratar Blobs de Parametros...
       Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
        Begin
@@ -948,7 +1169,8 @@ Var
                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                ftString,    ftWideString, ftWideMemo]    Then
           Begin
-           If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+           If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+              (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
             Begin
              If Query.Params[I].Size > 0 Then
               Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
@@ -969,7 +1191,8 @@ Var
             End;
            If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
             Begin
-             If Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '' Then
+             If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
+                (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Begin
                If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
                 Begin
@@ -980,18 +1203,22 @@ Var
                  Else
                   Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
                 End;
-              End;
+              End
+             Else
+              Query.Params[I].Clear;
             End
-           Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD] Then
+           Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
             Begin
-             If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+             If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+                (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
              Else
               Query.Params[I].Clear;
             End
            Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
             Begin
-             If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+             If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+                (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
              Else
               Query.Params[I].Clear;
@@ -1013,7 +1240,8 @@ Var
               FreeAndNil(vStringStream);
              End;
             End
-           Else If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
+           Else If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
+                   (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
             Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value
            Else
             Query.Params[I].Clear;
@@ -1041,9 +1269,35 @@ Var
    Result        := True;
    For A := 1 To MassiveDataset.RecordCount Do
     Begin
-     If Not vZEOSConnection.InTransaction Then
-      vZEOSConnection.StartTransaction;
+     If Not vZConnection.InTransaction Then
+      vZConnection.StartTransaction;
      Query.SQL.Clear;
+     If Self.Owner      Is TServerMethodDataModule Then
+      Begin
+       vMassiveLine := False;
+       If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveProcess) Then
+        Begin
+         TServerMethodDataModule(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+         If vMassiveLine Then
+          Begin
+           MassiveDataset.Next;
+           Continue;
+          End;
+        End;
+      End
+     Else If Self.Owner Is TServerMethods Then
+      Begin
+       vMassiveLine := False;
+       If Assigned(TServerMethods(Self.Owner).OnMassiveProcess) Then
+        Begin
+         TServerMethods(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+         If vMassiveLine Then
+          Begin
+           MassiveDataset.Next;
+           Continue;
+          End;
+        End;
+      End;
      PrepareData(Query, MassiveDataset, Error, MessageError);
      Try
       Query.ExecSQL;
@@ -1052,8 +1306,8 @@ Var
        Begin
         Error  := True;
         Result := False;
-        If vZEOSConnection.InTransaction Then
-         vZEOSConnection.Rollback;
+        If vZConnection.InTransaction Then
+         vZConnection.Rollback;
         MessageError := E.Message;
         Break;
        End;
@@ -1061,15 +1315,15 @@ Var
      If B >= CommitRecords Then
       Begin
        Try
-        If vZEOSConnection.InTransaction Then
-         vZEOSConnection.Commit;
+        If vZConnection.InTransaction Then
+         vZConnection.Commit;
        Except
         On E : Exception do
          Begin
           Error  := True;
           Result := False;
-          If vZEOSConnection.InTransaction Then
-           vZEOSConnection.Rollback;
+          If vZConnection.InTransaction Then
+           vZConnection.Rollback;
           MessageError := E.Message;
           Break;
          End;
@@ -1081,15 +1335,15 @@ Var
      MassiveDataset.Next;
     End;
    Try
-    If vZEOSConnection.InTransaction Then
-     vZEOSConnection.Commit;
+    If vZConnection.InTransaction Then
+     vZConnection.Commit;
    Except
     On E : Exception do
      Begin
       Error  := True;
       Result := False;
-      If vZEOSConnection.InTransaction Then
-       vZEOSConnection.Rollback;
+      If vZConnection.InTransaction Then
+       vZConnection.Rollback;
       MessageError := E.Message;
      End;
    End;
@@ -1104,9 +1358,9 @@ Begin
   Result     := Nil;
   Error      := False;
   vTempQuery := TZQuery.Create(Owner);
-  If Not vZEOSConnection.Connected Then
-   vZEOSConnection.Connected := True;
-  vTempQuery.Connection   := vZEOSConnection;
+  If Not vZConnection.Connected Then
+   vZConnection.Connected := True;
+  vTempQuery.Connection   := vZConnection;
   vTempQuery.SQL.Clear;
   If LoadMassive(Massive, vTempQuery) Then
    Begin
@@ -1157,7 +1411,7 @@ Begin
                    Else
                     vTempQuery.Params[A].Clear;
                   End
-                 Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
+                 Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
                   Begin
                    If Trim(Params[I].Value) <> '' Then
                     vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value)
@@ -1207,6 +1461,7 @@ Begin
            Result        := TJSONValue.Create;
           Result.Encoded := True;
           Result.SetValue(GetPairJSON('NOK', MessageError));
+          vZConnection.Rollback;
          Except
          End;
         End;
@@ -1219,7 +1474,7 @@ Begin
  End;
 End;
 
-Function TRESTDWDriverZEOS.ExecuteCommand(SQL              : String;
+Function TRESTDWDriverZeos.ExecuteCommand(SQL              : String;
                                         Var Error        : Boolean;
                                         Var MessageError : String;
                                         Execute          : Boolean) : TJSONValue;
@@ -1232,9 +1487,9 @@ Begin
  //Result := TJSONValue.Create;
  vTempQuery               := TZQuery.Create(Owner);
  Try
-  If Not vZEOSConnection.Connected Then
-   vZEOSConnection.Connected := True;
-  vTempQuery.Connection   := vZEOSConnection;
+  If Not vZConnection.Connected Then
+   vZConnection.Connected := True;
+  vTempQuery.Connection   := vZConnection;
   vTempQuery.SQL.Clear;
   vTempQuery.SQL.Add(SQL);
   If Not Execute Then
@@ -1250,13 +1505,11 @@ Begin
   Else
    Begin
     try
-      if Not vZEOSConnection.InTransaction then
-       vZEOSConnection.StartTransaction;
       vTempQuery.ExecSQL;
       If Result = Nil Then
        Result := TJSONValue.Create;
       Result.SetValue('COMMANDOK');
-      vZEOSConnection.Commit;
+      vZConnection.Commit;
       Error         := False;
     finally
     end;
@@ -1272,8 +1525,7 @@ Begin
       Result        := TJSONValue.Create;
      Result.Encoded := True;
      Result.SetValue(GetPairJSON('NOK', MessageError));
-     if vZEOSConnection.InTransaction then
-     vZEOSConnection.Rollback;
+     vZConnection.Rollback;
     Except
     End;
 
@@ -1286,19 +1538,19 @@ Begin
  vTempQuery.Free;
 End;
 
-Function TRESTDWDriverZEOS.GetConnection: TZConnection;
+Function TRESTDWDriverZeos.GetConnection: TZConnection;
 Begin
- Result := vZEOSConnectionBack;
+ Result := vZConnectionBack;
 End;
 
-Function TRESTDWDriverZEOS.InsertMySQLReturnID(SQL              : String;
+Function TRESTDWDriverZeos.InsertMySQLReturnID(SQL              : String;
                                              Params           : TDWParams;
                                              Var Error        : Boolean;
                                              Var MessageError : String): Integer;
 Var
- vTempQuery   : TZQuery;
- A, I          : Integer;
- vParamName    : String;
+ A, I        : Integer;
+ vParamName  : String;
+ ZCommand   : TZQuery;
  vStringStream : TMemoryStream;
  Function GetParamIndex(Params : TParams; ParamName : String) : Integer;
  Var
@@ -1315,135 +1567,115 @@ Var
    End;
  End;
 Begin
+  Inherited;
  Result := -1;
  Error  := False;
- vTempQuery               := TZQuery.Create(Nil);
- If Assigned(vZEOSConnection) Then
-  Begin
-   If Not vZEOSConnection.Connected Then
-    vZEOSConnection.Connect;
-   vTempQuery.Connection := vZEOSConnection;
-  End
- Else
-  Begin
-   FreeAndNil(vTempQuery);
-   Exit;
-  End;
- vTempQuery.SQL.Clear;
- vTempQuery.SQL.Add(SQL);
- If Params <> Nil Then
-  Begin
-   For I := 0 To Params.Count -1 Do
-    Begin
-     If vTempQuery.Params.Count > I Then
-      Begin
-       vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
-       A          := GetParamIndex(vTempQuery.Params, vParamName);
-       If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
-        Begin
-         If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
-                                               ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                              ftString,    ftWideString]    Then
-          Begin
-           If vTempQuery.Params[A].Size > 0 Then
-            vTempQuery.Params[A].Value := Copy(Params[I].Value, 1, vTempQuery.Params[A].Size)
-           Else
-            vTempQuery.Params[A].Value := Params[I].Value;
-          End
-         Else
-          Begin
-           If vTempQuery.Params[A].DataType in [ftUnknown] Then
-            Begin
-             If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
-              vTempQuery.Params[A].DataType := ObjectValueToFieldType(Params[I].ObjectValue)
-             Else
-              vTempQuery.Params[A].DataType := ftString;
-            End;
-           If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLargeint] Then
-            Begin
-             If Trim(Params[I].Value) <> '' Then
-              Begin
-               If vTempQuery.Params[A].DataType = ftSmallInt Then
-                vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
-               Else
-                vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
-              End;
-            End
-           Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD] Then
-            Begin
-             If Trim(Params[I].Value) <> '' Then
-              vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value);
-            End
-           Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
-            Begin
-             If Trim(Params[I].Value) <> '' Then
-              vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
-             Else
-              vTempQuery.Params[A].AsDateTime  := Null;
-            End
-           Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
-            Begin
-             vStringStream := TMemoryStream.Create;
-             Try
-              Params[I].SaveToStream(vStringStream);
-              vStringStream.Position := 0;
-              If vStringStream.Size > 0 Then
-               vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
-             Finally
-              FreeAndNil(vStringStream);
-             End;
-            End
-           Else
-            vTempQuery.Params[A].Value    := Params[I].Value;
-          End;
-        End;
-      End
-     Else
-      Break;
-    End;
-  End;
- Result := -1;
- Error  := False;
+ ZCommand := TZQuery.Create(Owner);
  Try
-  Try
-   vZEOSConnection.StartTransaction;;
-   vTempQuery.ExecSQL;
-   {
-   If (vConnection is TMySQL40Connection)      Then
-   Else If (vConnection is TMySQL41Connection) Then
-    Result := TMySQL41Connection(vConnection).GetInsertID
-   Else If (vConnection is TMySQL50Connection) Then
-    Result := TMySQL50Connection(vConnection).GetInsertID
-   Else If (vConnection is TMySQL51Connection) Then
-    Result := TMySQL51Connection(vConnection).GetInsertID
-   Else If (vConnection is TMySQL55Connection) Then
-    Result := TMySQL55Connection(vConnection).GetInsertID
-   Else If (vConnection is TMySQL56Connection) Then
-    Result := TMySQL56Connection(vConnection).GetInsertID
-   Else If (vConnection is TMySQL57Connection) Then
-    Result := TMySQL57Connection(vConnection).GetInsertID;
-   }
-   Error         := False;
-   vZEOSConnection.Commit;
-  Finally
-  End;
+  ZCommand.Connection := vZConnection;
+  ZCommand.SQL.Clear;
+  ZCommand.SQL.Add(SQL + '; SELECT LAST_INSERT_ID()ID');
+  If Params <> Nil Then
+   Begin
+    Try
+    // vTempQuery.Prepare;
+    Except
+    End;
+    For I := 0 To Params.Count -1 Do
+     Begin
+      If ZCommand.Params.Count > I Then
+       Begin
+        vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
+        A          := GetParamIndex(ZCommand.Params, vParamName);
+        If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
+         Begin
+          If ZCommand.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                                ftString,    ftWideString, ftWideMemo]    Then
+           Begin
+            If ZCommand.Params[A].Size > 0 Then
+             ZCommand.Params[A].Value := Copy(Params[I].Value, 1, ZCommand.Params[A].Size)
+            Else
+             ZCommand.Params[A].Value := Params[I].Value;
+           End
+          Else
+           Begin
+            If ZCommand.Params[A].DataType in [ftUnknown] Then
+             Begin
+              If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
+               ZCommand.Params[A].DataType := ObjectValueToFieldType(Params[I].ObjectValue)
+              Else
+               ZCommand.Params[A].DataType := ftString;
+             End;
+            If ZCommand.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+             Begin
+              If Trim(Params[I].Value) <> '' Then
+               Begin
+                 // Alterado por: Alexandre Magno - 04/11/2017
+                 If ZCommand.Params[A].DataType = ftLargeint Then
+                   ZCommand.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
+                 else If ZCommand.Params[A].DataType = ftSmallInt Then
+                   ZCommand.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                 Else
+                   ZCommand.Params[A].AsInteger  := StrToInt(Params[I].Value);
+
+                 // Como estava Anteriormente
+                 //If ZCommand.Params[A].DataType = ftSmallInt Then
+                 //  ZCommand.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                 //Else
+                 //  ZCommand.Params[A].AsInteger  := StrToInt(Params[I].Value);
+               End;
+             End
+            Else If ZCommand.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
+             Begin
+              If Trim(Params[I].Value) <> '' Then
+               ZCommand.Params[A].AsFloat  := StrToFloat(Params[I].Value);
+             End
+            Else If ZCommand.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+             Begin
+              If Trim(Params[I].Value) <> '' Then
+               ZCommand.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
+              Else
+               ZCommand.Params[A].AsDateTime  := Null;
+             End  //Tratar Blobs de Parametros...
+            Else If ZCommand.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+             Begin
+              vStringStream := TMemoryStream.Create;
+              Try
+               Params[I].SaveToStream(vStringStream);
+               vStringStream.Position := 0;
+               If vStringStream.Size > 0 Then
+                ZCommand.Params[A].LoadFromStream(vStringStream, ftBlob);
+              Finally
+               FreeAndNil(vStringStream);
+              End;
+             End
+            Else
+             ZCommand.Params[A].Value    := Params[I].Value;
+           End;
+         End;
+       End
+      Else
+       Break;
+     End;
+   End;
+  ZCommand.Open;
+  If ZCommand.RecordCount > 0 Then
+    Result := StrToInt(ZCommand.FindField('ID').AsString);
+  vZConnection.Commit;
  Except
   On E : Exception do
    Begin
-    Try
-     Error        := True;
-     MessageError := E.Message;
-     Result       := -1;
-     vZEOSConnection.Rollback;
-    Except
-    End;
+    vZConnection.Rollback;
+    Error        := True;
+    MessageError := E.Message;
    End;
  End;
- vTempQuery.Close;
- FreeAndNil(vTempQuery);
+ ZCommand.Close;
+ FreeAndNil(ZCommand);
 End;
 
-Function TRESTDWDriverZEOS.OpenDatasets       (DatasetsLine     : String;
+Function TRESTDWDriverZeos.OpenDatasets       (DatasetsLine     : String;
                                              Var Error        : Boolean;
                                              Var MessageError : String): TJSONValue;
 Var
@@ -1461,9 +1693,9 @@ Begin
  bJsonArray := Nil;
  vTempQuery               := TZQuery.Create(Nil);
  Try
-  If Not vZEOSConnection.Connected Then
-   vZEOSConnection.Connected := True;
-  vTempQuery.Connection   := vZEOSConnection;
+  If Not vZConnection.Connected Then
+   vZConnection.Connected := True;
+  vTempQuery.Connection   := vZConnection;
   bJsonArray := udwjson.TJsonArray.create(DatasetsLine);
   For I := 0 To bJsonArray.Length - 1 Do
    Begin
@@ -1525,78 +1757,45 @@ Begin
   FreeAndNil(bJsonArray);
 End;
 
-Function TRESTDWDriverZEOS.InsertMySQLReturnID(SQL              : String;
+Function TRESTDWDriverZeos.InsertMySQLReturnID(SQL              : String;
                                              Var Error        : Boolean;
                                              Var MessageError : String): Integer;
 Var
- vTempQuery   : TZQuery;
+ ZCommand : TZQuery;
 Begin
+  Inherited;
  Result := -1;
  Error  := False;
- vTempQuery               := TZQuery.Create(Nil);
- If Assigned(vZEOSConnection) Then
-  Begin
-   If Not vZEOSConnection.Connected Then
-    vZEOSConnection.Connect;
-   vTempQuery.Connection := vZEOSConnection;
-  End
- Else
-  Begin
-   FreeAndNil(vTempQuery);
-   Exit;
-  End;
- vTempQuery.SQL.Clear;
- vTempQuery.SQL.Add(SQL);
- Result := -1;
- Error  := False;
+ ZCommand := TZQuery.Create(Owner);
  Try
-  Try
-   vZEOSConnection.StartTransaction;
-   vTempQuery.ExecSQL;
-   {
-   If (vConnection is TMySQL40Connection)      Then
-   Else If (vConnection is TMySQL41Connection) Then
-    Result := TMySQL41Connection(vConnection).GetInsertID
-   Else If (vConnection is TMySQL50Connection) Then
-    Result := TMySQL50Connection(vConnection).GetInsertID
-   Else If (vConnection is TMySQL51Connection) Then
-    Result := TMySQL51Connection(vConnection).GetInsertID
-   Else If (vConnection is TMySQL55Connection) Then
-    Result := TMySQL55Connection(vConnection).GetInsertID
-   Else If (vConnection is TMySQL56Connection) Then
-    Result := TMySQL56Connection(vConnection).GetInsertID
-   Else If (vConnection is TMySQL57Connection) Then
-    Result := TMySQL57Connection(vConnection).GetInsertID;
-   }
-   vZEOSConnection.Commit;
-   Error         := False;
-  Finally
-  End;
+  ZCommand.Connection := vZConnection;
+  ZCommand.SQL.Clear;
+  ZCommand.SQL.Add(SQL + '; SELECT LAST_INSERT_ID()ID');
+  ZCommand.Open;
+  If ZCommand.RecordCount > 0 Then
+    Result := StrToInt(ZCommand.FindField('ID').AsString);
+  vZConnection.Commit;
  Except
   On E : Exception do
    Begin
-    Try
-     Error        := True;
-     MessageError := E.Message;
-     Result       := -1;
-     vZEOSConnection.Rollback;
-    Except
-    End;
+    vZConnection.Rollback;
+    Error        := True;
+    MessageError := E.Message;
    End;
  End;
- vTempQuery.Close;
- FreeAndNil(vTempQuery);
+ ZCommand.Close;
+ FreeAndNil(ZCommand);
 End;
 
-Procedure TRESTDWDriverZEOS.SetConnection(Value: TZConnection);
+Procedure TRESTDWDriverZeos.SetConnection(Value: TZConnection);
 Begin
- vZEOSConnectionBack := Value;
+ vZConnectionBack := Value;
  If Value <> Nil Then
-  vZEOSConnection    := vZEOSConnectionBack
+  vZConnection    := vZConnectionBack
  Else
   Begin
-   If vZEOSConnection <> Nil Then
-    vZEOSConnection.Disconnect;
+   If vZConnection <> Nil Then
+    vZConnection.Disconnect;
   End;
 End;
 

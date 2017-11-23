@@ -7,7 +7,7 @@ uses
   CGIApp,
   dmdwcgiserver in 'dmdwcgiserver.pas' {dwCGIService: TWebModule},
   uDmService in 'uDmService.pas' {ServerMethodDM: TServerMethodDataModule},
-  uConsts in '..\LazServerCGI\uConsts.pas';
+  uConsts in 'uConsts.pas';
 
 {$R *.res}
 
