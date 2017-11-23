@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>2017/11/22 16:11:46.000.758,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\EchoService_CGI.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\dwCGIServer.dproj</Transaction>
-    <Transaction>2017/11/22 16:14:32.000.499,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\WebModule_U.pas=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\dmdwcgiserver.pas</Transaction>
-    <Transaction>2017/11/22 16:14:32.000.499,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\WebModule_U.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\dmdwcgiserver.dfm</Transaction>
-    <Transaction>2017/11/22 16:16:32.000.105,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\EchoServiceImpl.pas=</Transaction>
-    <Transaction>2017/11/22 16:16:37.000.031,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\EchoServiceIntf.pas=</Transaction>
-    <Transaction>2017/11/22 16:21:16.000.047,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\uDmService.pas</Transaction>
-    <Transaction>2017/11/22 19:15:38.000.770,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\LazServerCGI\uConsts.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.031,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\EchoServiceIntf.pas=</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.105,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\EchoServiceImpl.pas=</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.499,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\WebModule_U.pas=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\dmdwcgiserver.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.047,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\uDmService.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.758,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\EchoService_CGI.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\dwCGIServer.dproj</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.499,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\WebModule_U.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\dmdwcgiserver.dfm</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.770,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\LazServerCGI\uConsts.pas</Transaction>
   </Transactions>
 </BorlandProject>
