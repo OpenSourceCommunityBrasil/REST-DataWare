@@ -1,0 +1,35 @@
+ Atualização e Correção do Servidor de DW.
+
+ Se for usar um Servidor do Exemplo estará corrigido mais para correção em Servidores
+em (PRODUÇÃO), favor aplicar essa simples modificação.
+
+ Para Servidor ISAPI e Apache WebBroker:
+ 
+  Na Unit WebModuleUnit1, procure pelo componente DSAuthenticationManager1; 
+No Evento OnUserAuthenticate Substitua o código por esse :
+  valid := (((User = vUsername)     And
+            (vUsername <> ''))     And
+           ((Password = vPassword) And
+            (vPassword <> '')));
+
+  Na Cláusula USES Adicione a Unit uConsts; Na Unit ServerMethodsUnit1 remova as variaveis
+vUsername e vPassword da cláusula private, pois as mesmas estão sendo alimentadas pela uConsts, 
+porém no caso de Apache WebBroker no evento oncreate do Datamodule da Unit ServerMethodsUnit deve ser alterado o código para :
+ UserName := vUsername;
+ Password := vPassword;
+
+ Para Servidor VCL:
+ 
+  Na Unit WebModuleUnit1, procure pelo componente DSAuthenticationManager1; 
+No Evento OnUserAuthenticate Substitua o código por esse :
+ valid := (((User = RestDWForm.UserName)     And
+            (RestDWForm.UserName <> ''))     And
+           ((Password = RestDWForm.Password) And
+            (RestDWForm.Password <> '')));
+
+  Na Cláusula USES Após a Cláusula implementation Adicione a Unit RestDWServerFormU; Na Unit ServerMethodsUnit1 remova as variaveis
+vUsername e vPassword da cláusula private, pois as mesmas estão sendo alimentadas pela RestDWForm e no evento oncreate do Datamodule 
+da Unit ServerMethodsUnit deve ser alterado o código para :
+ UserName := RestDWForm.Username;
+ Password := RestDWForm.Password;
+
