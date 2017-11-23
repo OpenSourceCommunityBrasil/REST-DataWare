@@ -2,21 +2,21 @@
   This source is only used to compile and install the package.
  }
 
-unit RESTDWLazDriver;
+unit RESTDWDriverZEOS;
 
 {$warn 5023 off : no warning about unused units}
 interface
 
 uses
-  uRestDWLazDriver, uRestDWLazDriverReg, LazarusPackageIntf;
+  uRESTDWDriverZEOS, uRESTDWDriverZEOSReg, LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
-  RegisterUnit('uRestDWLazDriverReg', @uRestDWLazDriverReg.Register);
+  RegisterUnit('uRESTDWDriverZEOSReg', @uRESTDWDriverZEOSReg.Register);
 end;
 
 initialization
-  RegisterPackage('RESTDWLazDriver', @Register);
+  RegisterPackage('RESTDWDriverZEOS', @Register);
 end.

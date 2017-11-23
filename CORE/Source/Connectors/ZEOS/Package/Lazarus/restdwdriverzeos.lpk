@@ -32,13 +32,19 @@
         <Type Value="Include"/>
       </Item4>
     </Files>
-    <RequiredPkgs Count="2">
+    <RequiredPkgs Count="4">
       <Item1>
-        <PackageName Value="indylaz"/>
+        <PackageName Value="resteasyobjectscore"/>
       </Item1>
       <Item2>
-        <PackageName Value="FCL"/>
+        <PackageName Value="lr_zeosdb"/>
       </Item2>
+      <Item3>
+        <PackageName Value="indylaz"/>
+      </Item3>
+      <Item4>
+        <PackageName Value="FCL"/>
+      </Item4>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>

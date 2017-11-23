@@ -4,13 +4,22 @@ unit uRestDWDriverZEOS;
 
 interface
 
-uses System.SysUtils,          System.Classes,
-     ZSqlUpdate,               ZAbstractRODataset,      ZAbstractDataset,
-     ZDataset,                 ZConnection,             ZStoredProcedure,
-     ZSQLProcessor,            Data.DB,                 uDWConsts,
-     uDWConstsData,            uRestDWPoolerDB,         udwjson,
-     uDWJSONObject,            uDWMassiveBuffer,        Variants,
-     uDWDatamodule,            SysTypes;
+uses
+ {$IFDEF FPC}
+ SysUtils,  Classes, DB,
+ {$ELSE}
+ {$IF CompilerVersion < 21}
+ SysUtils,          Classes, DB,
+ {$ELSE}
+ System.SysUtils,   System.Classes, Data.DB,
+ {$IFEND}
+ {$ENDIF}
+ ZSqlUpdate,               ZAbstractRODataset,      ZAbstractDataset,
+ ZDataset,                 ZConnection,             ZStoredProcedure,
+ ZSQLProcessor,            uDWConsts,
+ uDWConstsData,            uRestDWPoolerDB,         udwjson,
+ uDWJSONObject,            uDWMassiveBuffer,        Variants,
+ uDWDatamodule,            SysTypes;
 
 Type
  TRESTDWDriverZEOS   = Class(TRESTDWDriver)
@@ -76,8 +85,6 @@ Procedure TRESTDWDriverZeos.ApplyUpdates_MassiveCache(MassiveCache     : String;
                                                     Var MessageError : String);
 Var
  vTempQuery     : TZQuery;
- A, I           : Integer;
- vParamName     : String;
  vStringStream  : TMemoryStream;
  bPrimaryKeys   : TStringList;
  vFieldType     : TFieldType;
@@ -99,12 +106,10 @@ Var
  Function LoadMassive(Massive : String; Var Query : TZQuery) : Boolean;
  Var
   MassiveDataset : TMassiveDatasetBuffer;
-  A, B, X        : Integer;
+  A, X           : Integer;
   bJsonArray     : udwjson.TJsonArray;
   Procedure PrepareData(Var Query      : TZQuery;
-                        MassiveDataset : TMassiveDatasetBuffer;
-                        Var vError     : Boolean;
-                        Var ErrorMSG   : String);
+                        MassiveDataset : TMassiveDatasetBuffer);
   Var
    vLineSQL,
    vFields,
@@ -138,7 +143,7 @@ Var
              Else
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType := ftString;
             End;
-           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}ftLongWord, {$ENDIF}ftLargeint] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
               Begin
@@ -157,7 +162,7 @@ Var
                 //  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
               End;
             End
-           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftSingle, ftBCD] Then
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, {$IFNDEF FPC}ftSingle, {$ENDIF}ftBCD] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsFloat  := StrToFloat(MassiveDataset.AtualRec.PrimaryValues[X].Value);
@@ -207,7 +212,7 @@ Var
         Else
          Query.Params[I].DataType := ftString;
        End;
-      If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+      If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}ftLongWord, {$ENDIF}ftLargeint] Then
        Begin
         If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
            (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
@@ -227,7 +232,7 @@ Var
            //  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
          End;
        End
-      Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftSingle, ftBCD] Then
+      Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, {$IFNDEF FPC}ftSingle, {$ENDIF}ftBCD] Then
        Begin
         If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
            (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
@@ -369,7 +374,7 @@ Var
              Else
               Query.Params[I].DataType := ftString;
             End;
-           If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+           If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}ftLongWord, {$ENDIF}ftLargeint] Then
             Begin
              If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
                 (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
@@ -387,7 +392,7 @@ Var
              Else
               Query.Params[I].Clear;
             End
-           Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
+           Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}, ftSingle{$ENDIF}] Then
             Begin
              If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
                 (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
@@ -479,7 +484,7 @@ Var
             End;
           End;
         End;
-       PrepareData(Query, MassiveDataset, Error, MessageError);
+       PrepareData(Query, MassiveDataset);
        Try
         Query.ExecSQL;
        Except
@@ -520,7 +525,7 @@ Var
   FreeAndNil(bJsonArray);
  End;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  Try
   Error      := False;
   vTempQuery := TZQuery.Create(Owner);
@@ -537,7 +542,7 @@ End;
 
 Procedure TRESTDWDriverZeos.Close;
 Begin
-  Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  If Connection <> Nil Then
   Connection.Disconnect;
 End;
@@ -551,6 +556,7 @@ Var
  vTempQuery    : TZQuery;
  A, I          : Integer;
  vParamName    : String;
+ vParam        : TParam;
  vStringStream : TMemoryStream;
  Function GetParamIndex(Params : TParams; ParamName : String) : Integer;
  Var
@@ -567,7 +573,7 @@ Var
    End;
  End;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  Error  := False;
  Result := TJSONValue.Create;
  vTempQuery               := TZQuery.Create(Owner);
@@ -609,7 +615,7 @@ Begin
                 Else
                  vTempQuery.Params[A].DataType := ftString;
                End;
-              If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+              If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}ftLongWord, {$ENDIF}ftLargeint] Then
                Begin
                 If (Params[I].Value <> Null) Then
                  Begin
@@ -623,7 +629,7 @@ Begin
                 Else
                  vTempQuery.Params[A].Clear;
                End
-              Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
+              Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}, ftSingle{$ENDIF}] Then
                Begin
                 If (Params[I].Value <> Null) Then
                  vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value)
@@ -671,7 +677,9 @@ Begin
       Begin
        For I := 0 To Params.Count -1 Do
         begin
-         With vTempQuery.Params.AddParameter do
+         {$IFDEF FPC}vParam := TParam.Create(vTempQuery.Params);
+         {$ELSE}vParam := vTempQuery.Params.AddParameter{$ENDIF};
+         With vParam do
           Begin
            vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
            Name := vParamName;
@@ -680,7 +688,7 @@ Begin
             DataType := ObjectValueToFieldType(Params[I].ObjectValue)
            Else
             DataType := ftString;
-           If vTempQuery.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+           If vTempQuery.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}ftLongWord, {$ENDIF}ftLargeint] Then
             Begin
              If (Params[I].Value <> Null) Then
               Begin
@@ -695,7 +703,7 @@ Begin
              Else
               vTempQuery.Params[I].Clear;
             End
-            Else If vTempQuery.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
+            Else If vTempQuery.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}, ftSingle{$ENDIF}] Then
              Begin
               If (Params[I].Value <> Null) Then
                vTempQuery.Params[I].AsFloat  := StrToFloat(Params[I].Value)
@@ -797,7 +805,7 @@ Var
    End;
  End;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  Error  := False;
  vTempStoredProc                               := TZStoredProc.Create(Owner);
  Try
@@ -850,7 +858,7 @@ Begin
     MessageError := E.Message;
    End;
  End;
- vTempStoredProc.DisposeOf;
+ vTempStoredProc.Free;
 End;
 
 procedure TRESTDWDriverZeos.ExecuteProcedurePure(ProcName         : String;
@@ -859,7 +867,7 @@ procedure TRESTDWDriverZeos.ExecuteProcedurePure(ProcName         : String;
 Var
  vTempStoredProc : TZStoredProc;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  Error                                         := False;
  vTempStoredProc                               := TZStoredProc.Create(Owner);
  Try
@@ -880,7 +888,7 @@ Begin
     MessageError := E.Message;
    End;
  End;
- vTempStoredProc.DisposeOf;
+ vTempStoredProc.Free;
 End;
 
 Function TRESTDWDriverZeos.ApplyUpdates(Massive,
@@ -915,9 +923,7 @@ Var
   MassiveDataset : TMassiveDatasetBuffer;
   A, B           : Integer;
   Procedure PrepareData(Var Query      : TZQuery;
-                        MassiveDataset : TMassiveDatasetBuffer;
-                        Var vError     : Boolean;
-                        Var ErrorMSG   : String);
+                        MassiveDataset : TMassiveDatasetBuffer);
   Var
    vLineSQL,
    vFields,
@@ -951,7 +957,7 @@ Var
              Else
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType := ftString;
             End;
-           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}, ftLongWord{$ENDIF}, ftLargeint] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
               Begin
@@ -962,15 +968,9 @@ Var
                   Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
                 Else
                   Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
-
-                // Como estava Anteriormente
-                //If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
-                //  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-                //Else
-                //  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
               End;
             End
-           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}, ftSingle{$ENDIF}] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsFloat  := StrToFloat(MassiveDataset.AtualRec.PrimaryValues[X].Value);
@@ -1023,7 +1023,7 @@ Var
         Else
          Query.Params[I].DataType := ftString;
        End;
-      If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+      If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}, ftLongWord{$ENDIF}, ftLargeint] Then
        Begin
         If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
            (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
@@ -1035,17 +1035,11 @@ Var
              Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
            Else
              Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
-
-           // Como estava Anteriormente
-           //If Query.Params[I].DataType = ftSmallInt Then
-           //  Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-           //Else
-           //  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
          End
         Else
          Query.Params[I].Clear;
        End
-      Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
+      Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}, ftSingle{$ENDIF}] Then
        Begin
         If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
            (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
@@ -1189,7 +1183,7 @@ Var
              Else
               Query.Params[I].DataType := ftString;
             End;
-           If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+           If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}, ftLongWord{$ENDIF}, ftLargeint] Then
             Begin
              If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
                 (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
@@ -1207,7 +1201,7 @@ Var
              Else
               Query.Params[I].Clear;
             End
-           Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
+           Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}, ftSingle{$ENDIF}] Then
             Begin
              If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
                 (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
@@ -1298,7 +1292,7 @@ Var
           End;
         End;
       End;
-     PrepareData(Query, MassiveDataset, Error, MessageError);
+     PrepareData(Query, MassiveDataset);
      Try
       Query.ExecSQL;
      Except
@@ -1353,7 +1347,7 @@ Var
   End;
  End;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  Try
   Result     := Nil;
   Error      := False;
@@ -1397,7 +1391,7 @@ Begin
                    Else
                     vTempQuery.Params[A].DataType := ftString;
                   End;
-                 If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+                 If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}, ftLongWord{$ENDIF}, ftLargeint] Then
                   Begin
                    If Trim(Params[I].Value) <> '' Then
                     Begin
@@ -1411,7 +1405,7 @@ Begin
                    Else
                     vTempQuery.Params[A].Clear;
                   End
-                 Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
+                 Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}, ftSingle{$ENDIF}] Then
                   Begin
                    If Trim(Params[I].Value) <> '' Then
                     vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value)
@@ -1481,7 +1475,7 @@ Function TRESTDWDriverZeos.ExecuteCommand(SQL              : String;
 Var
  vTempQuery   : TZQuery;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  Result := Nil;
  Error  := False;
  //Result := TJSONValue.Create;
@@ -1567,7 +1561,7 @@ Var
    End;
  End;
 Begin
-  Inherited;
+  {$IFNDEF FPC}Inherited;{$ENDIF}
  Result := -1;
  Error  := False;
  ZCommand := TZQuery.Create(Owner);
@@ -1607,7 +1601,7 @@ Begin
               Else
                ZCommand.Params[A].DataType := ftString;
              End;
-            If ZCommand.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, ftLongWord, ftLargeint] Then
+            If ZCommand.Params[A].DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}, ftLongWord{$ENDIF}, ftLargeint] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
                Begin
@@ -1626,7 +1620,7 @@ Begin
                  //  ZCommand.Params[A].AsInteger  := StrToInt(Params[I].Value);
                End;
              End
-            Else If ZCommand.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
+            Else If ZCommand.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}, ftSingle{$ENDIF}] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
                ZCommand.Params[A].AsFloat  := StrToFloat(Params[I].Value);
@@ -1687,7 +1681,7 @@ Var
  bJsonValue  : udwjson.TJsonObject;
  bJsonArray  : udwjson.TJsonArray;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  Result := Nil;
  Error  := False;
  bJsonArray := Nil;
@@ -1702,12 +1696,12 @@ Begin
     bJsonValue := bJsonArray.optJSONObject(I);
     vTempQuery.Close;
     vTempQuery.SQL.Clear;
-    vTempQuery.SQL.Add(DecodeStrings(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString));
+    vTempQuery.SQL.Add(DecodeStrings(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString{$IFDEF FPC}, csUndefined{$ENDIF}));
     If bJsonValue.names.length > 1 Then
      Begin
       DWParams := TDWParams.Create;
       Try
-       DWParams.FromJSON(DecodeStrings(bJsonValue.opt(bJsonValue.names.get(1).ToString).ToString));
+       DWParams.FromJSON(DecodeStrings(bJsonValue.opt(bJsonValue.names.get(1).ToString).ToString{$IFDEF FPC}, csUndefined{$ENDIF}));
        For X := 0 To DWParams.Count -1 Do
         Begin
          If vTempQuery.ParamByName(DWParams[X].ParamName) <> Nil Then
@@ -1763,7 +1757,7 @@ Function TRESTDWDriverZeos.InsertMySQLReturnID(SQL              : String;
 Var
  ZCommand : TZQuery;
 Begin
-  Inherited;
+ {$IFNDEF FPC} Inherited;{$ENDIF}
  Result := -1;
  Error  := False;
  ZCommand := TZQuery.Create(Owner);
