@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899-12-30 00:00:00.000.226,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\Connectors\FireDAC\Package\Berlin\RESTDriverFD.dproj</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.201,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\RESTDriverFD.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.446,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\Connectors\FireDAC\RESTDriverFD.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\RESTDriverFD.dproj</Transaction>
+    <Transaction>2017-11-23 00:46:10.575,C:\Users\Abrito\Desktop\RESTDW_SVN\trunk\CORE\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD_D25.dproj=C:\Users\Abrito\Desktop\RESTDW_SVN\trunk\CORE\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj</Transaction>
+    <Transaction>2017-11-23 00:47:30.700,C:\Users\Abrito\Desktop\RESTDW_SVN\trunk\CORE\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj=C:\Users\Abrito\Desktop\RESTDW_SVN\trunk\CORE\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD_D25.dproj</Transaction>
+    <Transaction>2017-11-23 00:48:24.638,C:\Users\Abrito\Desktop\RESTDW_SVN\trunk\CORE\Packages\Delphi\Tokyo\RESTDWDriverFD_D25.dproj=C:\Users\Abrito\Desktop\RESTDW_SVN\trunk\CORE\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj</Transaction>
+  </Transactions>
+</BorlandProject>

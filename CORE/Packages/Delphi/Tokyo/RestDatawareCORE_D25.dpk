@@ -1,4 +1,4 @@
-package RestDatawareCORE;
+package RestDatawareCORE_D25;
 
 {$R *.res}
 {$R *.dres}

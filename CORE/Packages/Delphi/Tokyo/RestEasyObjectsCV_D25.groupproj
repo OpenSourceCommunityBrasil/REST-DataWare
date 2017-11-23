@@ -3,10 +3,10 @@
         <ProjectGuid>{6FE7FEDB-3C0E-45CC-A75C-FDC7A25FC64B}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="RestDatawareCORE.dproj">
+        <Projects Include="RestDatawareCORE_D25.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj">
+        <Projects Include="RESTDWDriverFD_D25.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\..\Demos\FileTransfer\Client\FileClient.dproj">
@@ -42,19 +42,25 @@
         <Projects Include="..\..\..\Demos\DwErp\Client\ClientDw.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\..\..\Demos\FMX\CienteFMX\ClienteFMX.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="..\..\..\Demos\ClientSlides\ClientSlides.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Demos\FMX\ServerOSX\Server_OSX.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\..\Demos\SimpleCRUD\SimpleCRUD.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\..\Demos\ArrayDatasetProcess\ArrayDatasetProcess.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\FMX\CienteFMX\ClienteFMX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\FMX\FMX_CRUD\FMX_CRUD.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\FMX\ServerLinux\ServerLNX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\FMX\ServerOSX\Server_OSX.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -65,23 +71,23 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="RestDatawareCORE">
-        <MSBuild Projects="RestDatawareCORE.dproj"/>
+    <Target Name="RestDatawareCORE_D25">
+        <MSBuild Projects="RestDatawareCORE_D25.dproj"/>
     </Target>
-    <Target Name="RestDatawareCORE:Clean">
-        <MSBuild Projects="RestDatawareCORE.dproj" Targets="Clean"/>
+    <Target Name="RestDatawareCORE_D25:Clean">
+        <MSBuild Projects="RestDatawareCORE_D25.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="RestDatawareCORE:Make">
-        <MSBuild Projects="RestDatawareCORE.dproj" Targets="Make"/>
+    <Target Name="RestDatawareCORE_D25:Make">
+        <MSBuild Projects="RestDatawareCORE_D25.dproj" Targets="Make"/>
     </Target>
-    <Target Name="RESTDWDriverFD">
-        <MSBuild Projects="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj"/>
+    <Target Name="RESTDWDriverFD_D25">
+        <MSBuild Projects="RESTDWDriverFD_D25.dproj"/>
     </Target>
-    <Target Name="RESTDWDriverFD:Clean">
-        <MSBuild Projects="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj" Targets="Clean"/>
+    <Target Name="RESTDWDriverFD_D25:Clean">
+        <MSBuild Projects="RESTDWDriverFD_D25.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="RESTDWDriverFD:Make">
-        <MSBuild Projects="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj" Targets="Make"/>
+    <Target Name="RESTDWDriverFD_D25:Make">
+        <MSBuild Projects="RESTDWDriverFD_D25.dproj" Targets="Make"/>
     </Target>
     <Target Name="FileClient">
         <MSBuild Projects="..\..\..\Demos\FileTransfer\Client\FileClient.dproj"/>
@@ -182,15 +188,6 @@
     <Target Name="ClientDw:Make">
         <MSBuild Projects="..\..\..\Demos\DwErp\Client\ClientDw.dproj" Targets="Make"/>
     </Target>
-    <Target Name="ClienteFMX">
-        <MSBuild Projects="..\..\..\Demos\SimpleServer\CienteFMX\ClienteFMX.dproj"/>
-    </Target>
-    <Target Name="ClienteFMX:Clean">
-        <MSBuild Projects="..\..\..\Demos\SimpleServer\CienteFMX\ClienteFMX.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ClienteFMX:Make">
-        <MSBuild Projects="..\..\..\Demos\SimpleServer\CienteFMX\ClienteFMX.dproj" Targets="Make"/>
-    </Target>
     <Target Name="ClientSlides">
         <MSBuild Projects="..\..\..\Demos\ClientSlides\ClientSlides.dproj"/>
     </Target>
@@ -199,15 +196,6 @@
     </Target>
     <Target Name="ClientSlides:Make">
         <MSBuild Projects="..\..\..\Demos\ClientSlides\ClientSlides.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="Server_OSX">
-        <MSBuild Projects="..\..\..\Demos\SimpleServer\ServerOSX\Server_OSX.dproj"/>
-    </Target>
-    <Target Name="Server_OSX:Clean">
-        <MSBuild Projects="..\..\..\Demos\SimpleServer\ServerOSX\Server_OSX.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="Server_OSX:Make">
-        <MSBuild Projects="..\..\..\Demos\SimpleServer\ServerOSX\Server_OSX.dproj" Targets="Make"/>
     </Target>
     <Target Name="SimpleCRUD">
         <MSBuild Projects="..\..\..\Demos\SimpleCRUD\SimpleCRUD.dproj"/>
@@ -227,14 +215,50 @@
     <Target Name="ArrayDatasetProcess:Make">
         <MSBuild Projects="..\..\..\Demos\ArrayDatasetProcess\ArrayDatasetProcess.dproj" Targets="Make"/>
     </Target>
+    <Target Name="ClienteFMX">
+        <MSBuild Projects="..\..\..\Demos\FMX\CienteFMX\ClienteFMX.dproj"/>
+    </Target>
+    <Target Name="ClienteFMX:Clean">
+        <MSBuild Projects="..\..\..\Demos\FMX\CienteFMX\ClienteFMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ClienteFMX:Make">
+        <MSBuild Projects="..\..\..\Demos\FMX\CienteFMX\ClienteFMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FMX_CRUD">
+        <MSBuild Projects="..\..\..\Demos\FMX\FMX_CRUD\FMX_CRUD.dproj"/>
+    </Target>
+    <Target Name="FMX_CRUD:Clean">
+        <MSBuild Projects="..\..\..\Demos\FMX\FMX_CRUD\FMX_CRUD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FMX_CRUD:Make">
+        <MSBuild Projects="..\..\..\Demos\FMX\FMX_CRUD\FMX_CRUD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ServerLNX">
+        <MSBuild Projects="..\..\..\Demos\FMX\ServerLinux\ServerLNX.dproj"/>
+    </Target>
+    <Target Name="ServerLNX:Clean">
+        <MSBuild Projects="..\..\..\Demos\FMX\ServerLinux\ServerLNX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ServerLNX:Make">
+        <MSBuild Projects="..\..\..\Demos\FMX\ServerLinux\ServerLNX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Server_OSX">
+        <MSBuild Projects="..\..\..\Demos\FMX\ServerOSX\Server_OSX.dproj"/>
+    </Target>
+    <Target Name="Server_OSX:Clean">
+        <MSBuild Projects="..\..\..\Demos\FMX\ServerOSX\Server_OSX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Server_OSX:Make">
+        <MSBuild Projects="..\..\..\Demos\FMX\ServerOSX\Server_OSX.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClienteFMX;ClientSlides;Server_OSX;SimpleCRUD;ArrayDatasetProcess"/>
+        <CallTarget Targets="RestDatawareCORE_D25;RESTDWDriverFD_D25;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClientSlides;SimpleCRUD;ArrayDatasetProcess;ClienteFMX;FMX_CRUD;ServerLNX;Server_OSX"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClienteFMX:Clean;ClientSlides:Clean;Server_OSX:Clean;SimpleCRUD:Clean;ArrayDatasetProcess:Clean"/>
+        <CallTarget Targets="RestDatawareCORE_D25:Clean;RESTDWDriverFD_D25:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClientSlides:Clean;SimpleCRUD:Clean;ArrayDatasetProcess:Clean;ClienteFMX:Clean;FMX_CRUD:Clean;ServerLNX:Clean;Server_OSX:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClienteFMX:Make;ClientSlides:Make;Server_OSX:Make;SimpleCRUD:Make;ArrayDatasetProcess:Make"/>
+        <CallTarget Targets="RestDatawareCORE_D25:Make;RESTDWDriverFD_D25:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClientSlides:Make;SimpleCRUD:Make;ArrayDatasetProcess:Make;ClienteFMX:Make;FMX_CRUD:Make;ServerLNX:Make;Server_OSX:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -1,0 +1,8 @@
+TRESTClientPooler BITMAP "..\\..\\..\\Images\\TRESTClientPooler.bmp"
+TRESTDWClientSQL BITMAP "..\\..\\..\\Images\\TRESTDWClientSQL.bmp"
+TRESTDWDataBase BITMAP "..\\..\\..\\Images\\TRESTDWDataBase.bmp"
+TRESTDWPoolerDB BITMAP "..\\..\\..\\Images\\TRESTDWPoolerDB.bmp"
+TRESTDWPoolerList BITMAP "..\\..\\..\\Images\\TRESTDWPoolerList.bmp"
+TRESTDWStoredProc BITMAP "..\\..\\..\\Images\\TRESTDWStoredProc.bmp"
+TRESTServicePooler BITMAP "..\\..\\..\\Images\\TRESTServicePooler.bmp"
+TDWMassiveCache BITMAP "..\\..\\..\\Images\\TDWMassiveCache.bmp"

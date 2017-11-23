@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017-11-23 00:45:22.966,C:\Users\Abrito\Desktop\RESTDW_SVN\trunk\CORE\Packages\Delphi\Tokyo\RestEasyObjectsCV25.groupproj=C:\Users\Abrito\Desktop\RESTDW_SVN\trunk\CORE\Packages\Delphi\Tokyo\RestEasyObjectsCV.groupproj</Transaction>
+    <Transaction>2017-11-23 00:45:52.904,C:\Users\Abrito\Desktop\RESTDW_SVN\trunk\CORE\Packages\Delphi\Tokyo\RestEasyObjectsCV_D25.groupproj=C:\Users\Abrito\Desktop\RESTDW_SVN\trunk\CORE\Packages\Delphi\Tokyo\RestEasyObjectsCV25.groupproj</Transaction>
+  </Transactions>
+	<Default.Personality>
+		<Projects ActiveProject="C:\Users\Abrito\Desktop\RESTDW_SVN\trunk\CORE\Demos\FMX\ServerOSX\Server_OSX.dproj"/>
+	</Default.Personality>
+</BorlandProject>
