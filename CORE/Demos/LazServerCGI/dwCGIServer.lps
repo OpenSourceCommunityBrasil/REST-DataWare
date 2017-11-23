@@ -8,10 +8,9 @@
       <Unit0>
         <Filename Value="dwCGIServer.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="5"/>
-        <CursorPos X="3" Y="5"/>
+        <CursorPos X="52" Y="18"/>
         <UsageCount Value="45"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -21,6 +20,7 @@
         <ComponentName Value="dwCGIService"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="25"/>
         <CursorPos X="60" Y="34"/>
         <UsageCount Value="45"/>
