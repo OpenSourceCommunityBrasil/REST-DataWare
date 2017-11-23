@@ -37,7 +37,7 @@ Uses
      {$ELSE}
      System.SysUtils, System.Classes, system.SyncObjs,
      {$IFEND}
-     ServerUtils, HTTPApp,
+     uRESTServerEvents, ServerUtils, HTTPApp,
      {$IFDEF WINDOWS} Windows, {$ENDIF} uDWConstsData,       IdTCPClient,
      {$IF Defined(ANDROID) OR Defined(IOS)} System.json,{$ELSE} uDWJSON,{$IFEND} IdMultipartFormData,
      IdContext,             IdHTTPServer,        IdCustomHTTPServer,    IdSSLOpenSSL,    IdSSL,

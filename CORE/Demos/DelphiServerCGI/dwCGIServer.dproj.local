@@ -2,9 +2,7 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>1899/12/30 00:00:00.000.499,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\WebModule_U.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\dmdwcgiserver.dfm</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.499,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\WebModule_U.pas=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\dmdwcgiserver.pas</Transaction>
     <Transaction>1899/12/30 00:00:00.000.758,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\EchoService_CGI.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\dwCGIServer.dproj</Transaction>
-    <Transaction>2017/11/23 12:11:26.000.205,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\LazServerCGI\uConsts.pas=</Transaction>
-    <Transaction>2017/11/23 12:11:33.000.953,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\DelphiServerCGI\uConsts.pas</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.499,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\WebModule_U.pas=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\dmdwcgiserver.pas</Transaction>
   </Transactions>
 </BorlandProject>

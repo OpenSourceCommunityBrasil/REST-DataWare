@@ -71,4 +71,8 @@ object ServerMethodDM: TServerMethodDM
     Left = 160
     Top = 16
   end
+  object DWServerEvents1: TDWServerEvents
+    Left = 184
+    Top = 112
+  end
 end

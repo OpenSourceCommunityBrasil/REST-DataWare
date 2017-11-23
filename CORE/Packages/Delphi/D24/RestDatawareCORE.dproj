@@ -192,6 +192,7 @@
         <DCCReference Include="..\..\..\Source\libs\JSON\uDWJSON.pas"/>
         <DCCReference Include="..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
         <DCCReference Include="..\..\..\Source\libs\StringBuilderUnit.pas"/>
+        <DCCReference Include="..\..\..\Source\uRESTServerEvents.pas"/>
         <RcItem Include="..\..\..\Images\TRESTClientPooler.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTClientPooler</ResourceId>
@@ -227,6 +228,10 @@
         <RcItem Include="..\..\..\Images\TRESTServiceCGI.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTServiceCGI</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\..\Images\TDWServerEvents.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TDWServerEvents</ResourceId>
         </RcItem>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

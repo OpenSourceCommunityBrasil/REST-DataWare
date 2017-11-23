@@ -1979,7 +1979,9 @@ Begin
  SetLength(aValue, 0);
  If bValue = '' Then
   Exit;
- If vObjectValue in [ovString, ovMemo, ovWideMemo, ovFmtMemo] Then
+ If vObjectValue in [ovString, ovMemo, ovWideMemo, ovFmtMemo,
+                     ovFloat,  ovCurrency,  ovBCD,  ovFMTBcd,
+                     ovExtended] Then
   Begin
    If vEncoded Then
     Begin
@@ -2316,6 +2318,7 @@ begin
   ovBCD,
   ovFMTBcd,
   ovExtended  : Begin
+                 vEncoded := True;
                  vObjectValue := ovFloat;
                  SetValue(FloatToStr(Value), vEncoded);
                 End;

@@ -37,7 +37,7 @@ USES
   FireDAC.Phys.MSSQLDef,
   FireDAC.Phys.ODBCBase,
   FireDAC.Phys.MSSQL,
-  uDWConsts;
+  uDWConsts, uRESTServerEvents;
 
 TYPE
   TServerMethodDM = CLASS(TServerMethodDataModule)
@@ -49,6 +49,7 @@ TYPE
     FDGUIxWaitCursor1: TFDGUIxWaitCursor;
     FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink;
     FDTransaction1: TFDTransaction;
+    DWServerEvents1: TDWServerEvents;
     PROCEDURE ServerMethodDataModuleReplyEvent(SendType: TSendEvent; Context: STRING; VAR Params: TDWParams; VAR Result: STRING);
     PROCEDURE ServerMethodDataModuleCreate(Sender: TObject);
     PROCEDURE Server_FDConnectionBeforeConnect(Sender: TObject);
