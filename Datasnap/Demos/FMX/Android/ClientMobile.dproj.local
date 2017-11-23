@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2016/01/16 17:08:08.000.863,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\Android\Unit2.fmx=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit2.fmx</Transaction>
+    <Transaction>2016/01/16 17:08:10.000.972,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\Android\Project1.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2016/01/16 17:08:31.000.242,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\Android\Project1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\Android\Project1.dproj</Transaction>
+    <Transaction>2016/01/16 17:11:54.000.380,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\Android\Project1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\Android\ClientMobile.dproj</Transaction>
+  </Transactions>
+	<ActiveMobileDevice>
+		<PIOS9 iOSSimulator="iPhone5"/>
+		<NoProfile Android="420300bfea93b100" iOSSimulator="iPhone5"/>
+	</ActiveMobileDevice>
+</BorlandProject>
