@@ -5,7 +5,7 @@ object ServerMethodDM: TServerMethodDM
   Height = 244
   HorizontalOffset = 508
   VerticalOffset = 207
-  Width = 212
+  Width = 295
   PPI = 96
   object RESTDWPoolerDB1: TRESTDWPoolerDB
     RESTDriver = RESTDWLazDriver1
@@ -39,5 +39,21 @@ object ServerMethodDM: TServerMethodDM
     Connection = Server_FDConnection
     left = 83
     top = 103
+  end
+  object DWServerEvents1: TDWServerEvents
+    Events = <    
+      item
+        DWParams = <        
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovTimeStamp
+            ParamName = 'result'
+            Encoded = True
+          end>
+        Name = 'serverdatetime'
+      end>
+    left = 185
+    top = 81
   end
 end

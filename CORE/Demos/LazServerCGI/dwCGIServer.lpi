@@ -25,16 +25,19 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="3">
+    <RequiredPackages Count="4">
       <Item1>
-        <PackageName Value="RESTDWLazDriver"/>
+        <PackageName Value="FCL"/>
       </Item1>
       <Item2>
-        <PackageName Value="resteasyobjectscore"/>
+        <PackageName Value="RESTDWLazDriver"/>
       </Item2>
       <Item3>
-        <PackageName Value="WebLaz"/>
+        <PackageName Value="resteasyobjectscore"/>
       </Item3>
+      <Item4>
+        <PackageName Value="WebLaz"/>
+      </Item4>
     </RequiredPackages>
     <Units Count="4">
       <Unit0>
