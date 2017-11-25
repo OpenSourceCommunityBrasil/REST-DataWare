@@ -28,7 +28,8 @@ USES
   System.UITypes,
   IdComponent, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client, uDWConstsData;
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, uDWConstsData, System.Actions,
+  Vcl.ActnList;
 
 TYPE
 
@@ -65,6 +66,7 @@ TYPE
     Button4: TButton;
     chkhttps: TCheckBox;
     Button5: TButton;
+    ActionList1: TActionList;
     PROCEDURE Button1Click(Sender: TObject);
     PROCEDURE Button2Click(Sender: TObject);
     PROCEDURE RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);

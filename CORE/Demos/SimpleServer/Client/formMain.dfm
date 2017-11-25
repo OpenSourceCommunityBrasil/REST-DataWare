@@ -1302,4 +1302,8 @@ object Form2: TForm2
     Left = 240
     Top = 8
   end
+  object ActionList1: TActionList
+    Left = 296
+    Top = 16
+  end
 end

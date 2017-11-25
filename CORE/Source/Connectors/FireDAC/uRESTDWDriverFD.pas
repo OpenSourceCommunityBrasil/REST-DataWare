@@ -1713,7 +1713,6 @@ Var
  bJsonArray  : udwjson.TJsonArray;
 Begin
  Inherited;
- Result := Nil;
  Error  := False;
  bJsonArray := Nil;
  vTempQuery               := TFDQuery.Create(Nil);

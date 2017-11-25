@@ -49,7 +49,6 @@ TYPE
     FDGUIxWaitCursor1: TFDGUIxWaitCursor;
     FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink;
     FDTransaction1: TFDTransaction;
-    DWServerEvents1: TDWServerEvents;
     PROCEDURE ServerMethodDataModuleReplyEvent(SendType: TSendEvent; Context: STRING; VAR Params: TDWParams; VAR Result: STRING);
     PROCEDURE ServerMethodDataModuleCreate(Sender: TObject);
     PROCEDURE Server_FDConnectionBeforeConnect(Sender: TObject);
@@ -57,6 +56,10 @@ TYPE
     PROCEDURE Server_FDConnectionError(ASender, AInitiator: TObject; VAR AException: Exception);
     procedure ServerMethodDataModuleMassiveProcess(
       var MassiveDataset: TMassiveDatasetBuffer; var Ignore: Boolean);
+    procedure DWServerEvents1EventsservertimeReplyEvent(var Params: TDWParams;
+      var Result: string);
+    procedure DWServerEvents1EventshelloworldReplyEvent(var Params: TDWParams;
+      var Result: string);
   PRIVATE
     { Private declarations }
     FUNCTION ConsultaBanco(VAR Params: TDWParams): STRING; OVERLOAD;
@@ -103,6 +106,18 @@ BEGIN
     END;
   END;
 END;
+
+procedure TServerMethodDM.DWServerEvents1EventshelloworldReplyEvent(
+  var Params: TDWParams; var Result: string);
+begin
+ //
+end;
+
+procedure TServerMethodDM.DWServerEvents1EventsservertimeReplyEvent(
+  var Params: TDWParams; var Result: string);
+begin
+ //
+end;
 
 PROCEDURE TServerMethodDM.ServerMethodDataModuleCreate(Sender: TObject);
 BEGIN

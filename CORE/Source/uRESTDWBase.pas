@@ -392,11 +392,6 @@ Var
  mb,
  vContentStringStream,
  ms                 : TStringStream;
- {$IFDEF FPC}
- CS                 : TRTLcriticalsection;
- {$ELSE}
- CS                 : Tcriticalsection;
- {$ENDIF}
  Function GetParamsReturn(Params : TDWParams) : String;
  Var
   A, I : Integer;
@@ -1039,7 +1034,6 @@ Var
  DWParamsD     : TDWParams;
 Begin
  DWParamsD := Nil;
- vTempJSON := -1;
  If ServerMethodsClass <> Nil Then
   Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
@@ -2429,7 +2423,6 @@ Var
  DWParamsD     : TDWParams;
 Begin
  DWParamsD := Nil;
- vTempJSON := -1;
  If ServerMethodsClass <> Nil Then
   Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
@@ -2794,11 +2787,6 @@ Var
  msgEnd             : Boolean;
  mb,
  ms                 : TStringStream;
- {$IFDEF FPC}
- CS                 : TRTLcriticalsection;
- {$ELSE}
- CS                 : Tcriticalsection;
- {$ENDIF}
  Function GetParamsReturn(Params : TDWParams) : String;
  Var
   A, I : Integer;

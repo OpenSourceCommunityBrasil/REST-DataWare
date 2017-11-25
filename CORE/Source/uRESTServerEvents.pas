@@ -10,64 +10,130 @@ Type
                            Var Result         : String) Of Object;
 
 Type
- TDWEvent = Class(TPersistent)
+ TDWReplyEventData = Class(TComponent)
  Private
-  vDWParams   : TDWParams;
   vReplyEvent : TDWReplyEvent;
  Public
-  Procedure Assign(Source : TPersistent); Override;
- Published
-  Property DWParams     : TDWParams     Read vDWParams   Write vDWParams;
-  Property OnReplyEvent : TDWReplyEvent Read vReplyEvent Write vReplyEvent;
+  Property    OnReplyEvent : TDWReplyEvent Read vReplyEvent    Write vReplyEvent;
 End;
 
 Type
- TDWEventList = Class(TList)
+ TDWEvent = Class(TCollectionItem)
+ Protected
  Private
-  Function    GetRec    (Index     : Integer) : TDWEvent;  Overload;
-  Procedure   PutRec    (Index     : Integer;
-                         Item      : TDWEvent);            Overload;
-  Procedure   ClearList;
+  FName       : String;
+  vDWParams   : TDWParams;
+  vOwnerCollection : TCollection;
+  DWReplyEventData : TDWReplyEventData;
+  Function  GetReplyEvent : TDWReplyEvent;
+  Procedure SetReplyEvent(Value : TDWReplyEvent);
  Public
+  Function    GetDisplayName             : String;       Override;
+  Procedure   SetDisplayName(Const Value : String);      Override;
+  Procedure   Assign        (Source      : TPersistent); Override;
+  Constructor Create        (Collection  : TCollection); Override;
+  Function    GetNamePath  : String;                     Override;
   Destructor  Destroy; Override;
-  Procedure   Delete     (Index    : Integer);             Overload;
-  Function    Add        (Item     : TDWEvent) : Integer;  Overload;
-  Property    Items      [Index    : Integer]  : TDWEvent Read GetRec Write PutRec; Default;
+ Published
+  Property    DWParams     : TDWParams     Read vDWParams      Write vDWParams;
+  Property    Name         : String        Read GetDisplayName Write SetDisplayName;
+  Property    OnReplyEvent : TDWReplyEvent Read GetReplyEvent  Write SetReplyEvent;
 End;
 
 Type
- TDWEvents = Class(TPersistent)
+ TDWEventList = Class(TOwnedCollection)
  Private
-  vItemsList  : TDWEventList;
+  fOwner      : TPersistent;
+  Function    GetRec    (Index      : Integer) : TDWEvent;  Overload;
+  Procedure   PutRec    (Index      : Integer;
+                         Item       : TDWEvent);            Overload;
+  Procedure   ClearList;
+  Function    GetOwner: TPersistent; override;
  Public
-  Procedure  Assign(Source : TPersistent); Override;
-  Destructor Destroy; Override;
- Published
-//  Property DWParams     : TDWParams     Read vDWParams   Write vDWParams;
+  Constructor Create     (AOwner    : TPersistent;
+                          ItemClass : TCollectionItemClass);
+  Destructor  Destroy; Override;
+  Procedure   Delete     (Index     : Integer);             Overload;
+  Function    Add        (Item      : TDWEvent) : Integer;  Overload;
+  Property    Items      [Index     : Integer]  : TDWEvent Read GetRec Write PutRec; Default;
 End;
 
 Type
  TDWServerEvents = Class(TComponent)
  Protected
  Private
-  vEventList      : TDWEvents;
+  vEventList      : TDWEventList;
  Public
   Destructor  Destroy; Override;
   Constructor Create(AOwner : TComponent);Override; //Cria o Componente
  Published
-  Property Events : TDWEvents Read vEventList Write vEventList;
+  Property Events : TDWEventList Read vEventList Write vEventList;
 End;
 
 implementation
 
 { TDWEvent }
 
-procedure TDWEvent.Assign(Source: TPersistent);
+Function TDWEvent.GetNamePath: String;
 Begin
- Inherited;
+ Result := vOwnerCollection.GetNamePath + FName;
 End;
 
-{ TDWEventList }
+constructor TDWEvent.Create(Collection: TCollection);
+begin
+  inherited;
+  vDWParams        := TDWParams.Create;
+  DWReplyEventData := TDWReplyEventData.Create(Nil);
+  vOwnerCollection := Collection;
+  FName            := 'event' + IntToStr(Collection.Count);
+  DWReplyEventData.Name := FName;
+end;
+
+destructor TDWEvent.Destroy;
+begin
+  vDWParams.Free;
+  DWReplyEventData.Free;
+  inherited;
+end;
+
+Function TDWEvent.GetDisplayName: String;
+Begin
+ Result := DWReplyEventData.Name;
+End;
+
+Procedure TDWEvent.Assign(Source: TPersistent);
+begin
+ If Source is TDWEvent then
+  Begin
+   FName       := TDWEvent(Source).Name;
+   vDWParams   := TDWEvent(Source).DWParams;
+   DWReplyEventData.OnReplyEvent := TDWEvent(Source).OnReplyEvent;
+  End
+ Else
+  Inherited;
+End;
+
+Function TDWEvent.GetReplyEvent: TDWReplyEvent;
+Begin
+ Result := DWReplyEventData.OnReplyEvent;
+End;
+
+Procedure TDWEvent.SetDisplayName(Const Value: String);
+Begin
+ If Trim(Value) = '' Then
+  Raise Exception.Create('Invalid Event Name')
+ Else
+  Begin
+   FName := Value;
+   DWReplyEventData.Name := FName;
+   Inherited;
+  End;
+End;
+
+procedure TDWEvent.SetReplyEvent(Value: TDWReplyEvent);
+begin
+ DWReplyEventData.OnReplyEvent := Value;
+end;
 
 Function TDWEventList.Add(Item: TDWEvent): Integer;
 Var
@@ -85,6 +151,13 @@ Begin
  For I := Count - 1 Downto 0 Do
   Delete(I);
  Self.Clear;
+End;
+
+Constructor TDWEventList.Create(AOwner    : TPersistent;
+                                ItemClass : TCollectionItemClass);
+Begin
+ Inherited Create(AOwner, TDWEvent);
+ Self.fOwner := AOwner;
 End;
 
 procedure TDWEventList.Delete(Index: Integer);
@@ -110,6 +183,11 @@ begin
  inherited;
 end;
 
+Function TDWEventList.GetOwner: TPersistent;
+Begin
+ Result:= fOwner;
+End;
+
 function TDWEventList.GetRec(Index: Integer): TDWEvent;
 begin
  Result := Nil;
@@ -120,15 +198,15 @@ end;
 procedure TDWEventList.PutRec(Index: Integer; Item: TDWEvent);
 begin
  If (Index < Self.Count) And (Index > -1) Then
-  TDWEvent(TList(Self).Items[Index]^) := Item;
+  SetItem(Index, Item);
 end;
 
 { TDWServerEvents }
 
 Constructor TDWServerEvents.Create(AOwner : TComponent);
 Begin
- Inherited;
- vEventList := TDWEvents.Create;
+ Inherited Create(AOwner);
+ vEventList := TDWEventList.Create(Self, TDWEvent);
 End;
 
 Destructor TDWServerEvents.Destroy;
@@ -138,16 +216,5 @@ Begin
 End;
 
 { TDWEvents }
-
-Procedure TDWEvents.Assign(Source: TPersistent);
-Begin
- Inherited;
-End;
-
-Destructor TDWEvents.Destroy;
-Begin
- vItemsList.Free;
- Inherited;
-End;
 
 end.

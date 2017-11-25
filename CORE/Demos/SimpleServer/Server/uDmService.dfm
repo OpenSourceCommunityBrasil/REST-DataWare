@@ -72,7 +72,16 @@ object ServerMethodDM: TServerMethodDM
     Top = 16
   end
   object DWServerEvents1: TDWServerEvents
-    Left = 184
-    Top = 112
+    Events = <
+      item
+        Name = 'servertime'
+        OnReplyEvent = DWServerEvents1EventsservertimeReplyEvent
+      end
+      item
+        Name = 'helloworld'
+        OnReplyEvent = DWServerEvents1EventshelloworldReplyEvent
+      end>
+    Left = 192
+    Top = 80
   end
 end
