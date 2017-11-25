@@ -3,7 +3,7 @@ unit uRESTServerEvents;
 interface
 
 Uses
- SysUtils, Classes, uDWJSONObject;
+ SysUtils, Classes, uDWJSONObject, uDWConsts, uDWConstsData;
 
 Type
  TDWReplyEvent = Procedure(Var Params         : TDWParams;
@@ -18,11 +18,51 @@ Type
 End;
 
 Type
+ PDWParamMethod = ^TDWParamMethod;
+ TDWParamMethod = Class(TCollectionItem)
+ Private
+  vTypeObject      : TTypeObject;
+  vObjectDirection : TObjectDirection;
+  vObjectValue     : TObjectValue;
+  vDefaultValue,
+  vParamName       : String;
+  vEncoded         : Boolean;
+ Public
+  Function    GetDisplayName             : String;       Override;
+  Procedure   SetDisplayName(Const Value : String);      Override;
+  Constructor Create        (aCollection : TCollection); Override;
+ Published
+  Property TypeObject      : TTypeObject      Read vTypeObject      Write vTypeObject;
+  Property ObjectDirection : TObjectDirection Read vObjectDirection Write vObjectDirection;
+  Property ObjectValue     : TObjectValue     Read vObjectValue     Write vObjectValue;
+  Property ParamName       : String           Read GetDisplayName   Write SetDisplayName;
+  Property Encoded         : Boolean          Read vEncoded         Write vEncoded;
+  Property DefaultValue    : String           Read vDefaultValue    Write vDefaultValue;
+End;
+
+Type
+ TDWParamsMethods = Class(TOwnedCollection)
+ Private
+  fOwner      : TPersistent;
+  Function    GetRec    (Index     : Integer) : TDWParamMethod;  Overload;
+  Procedure   PutRec    (Index     : Integer;
+                         Item      : TDWParamMethod);            Overload;
+  Procedure   ClearList;
+ Public
+  Constructor Create     (AOwner     : TPersistent;
+                          aItemClass : TCollectionItemClass);
+  Destructor  Destroy; Override;
+  Procedure   Delete     (Index    : Integer);                   Overload;
+  Property    Items      [Index    : Integer]   : TDWParamMethod Read GetRec Write PutRec; Default;
+End;
+
+Type
+ PDWEvent = ^TDWEvent;
  TDWEvent = Class(TCollectionItem)
  Protected
  Private
   FName       : String;
-  vDWParams   : TDWParams;
+  vDWParams   : TDWParamsMethods;
   vOwnerCollection : TCollection;
   DWReplyEventData : TDWReplyEventData;
   Function  GetReplyEvent : TDWReplyEvent;
@@ -31,31 +71,31 @@ Type
   Function    GetDisplayName             : String;       Override;
   Procedure   SetDisplayName(Const Value : String);      Override;
   Procedure   Assign        (Source      : TPersistent); Override;
-  Constructor Create        (Collection  : TCollection); Override;
+  Constructor Create        (aCollection : TCollection); Override;
   Function    GetNamePath  : String;                     Override;
   Destructor  Destroy; Override;
  Published
-  Property    DWParams     : TDWParams     Read vDWParams      Write vDWParams;
-  Property    Name         : String        Read GetDisplayName Write SetDisplayName;
-  Property    OnReplyEvent : TDWReplyEvent Read GetReplyEvent  Write SetReplyEvent;
+  Property    DWParams     : TDWParamsMethods Read vDWParams      Write vDWParams;
+  Property    Name         : String           Read GetDisplayName Write SetDisplayName;
+  Property    OnReplyEvent : TDWReplyEvent    Read GetReplyEvent  Write SetReplyEvent;
 End;
 
 Type
  TDWEventList = Class(TOwnedCollection)
+ Protected
+  Function    GetOwner: TPersistent; override;
  Private
   fOwner      : TPersistent;
   Function    GetRec    (Index      : Integer) : TDWEvent;  Overload;
   Procedure   PutRec    (Index      : Integer;
                          Item       : TDWEvent);            Overload;
   Procedure   ClearList;
-  Function    GetOwner: TPersistent; override;
  Public
-  Constructor Create     (AOwner    : TPersistent;
-                          ItemClass : TCollectionItemClass);
+  Constructor Create     (AOwner     : TPersistent;
+                          aItemClass : TCollectionItemClass);
   Destructor  Destroy; Override;
   Procedure   Delete     (Index     : Integer);             Overload;
-  Function    Add        (Item      : TDWEvent) : Integer;  Overload;
-  Property    Items      [Index     : Integer]  : TDWEvent Read GetRec Write PutRec; Default;
+  Property    Items      [Index     : Integer]  : TDWEvent  Read GetRec Write PutRec; Default;
 End;
 
 Type
@@ -79,13 +119,13 @@ Begin
  Result := vOwnerCollection.GetNamePath + FName;
 End;
 
-constructor TDWEvent.Create(Collection: TCollection);
+constructor TDWEvent.Create(aCollection: TCollection);
 begin
   inherited;
-  vDWParams        := TDWParams.Create;
+  vDWParams        := TDWParamsMethods.Create(aCollection, TDWParamMethod);
   DWReplyEventData := TDWReplyEventData.Create(Nil);
-  vOwnerCollection := Collection;
-  FName            := 'event' + IntToStr(Collection.Count);
+  vOwnerCollection := aCollection;
+  FName            := 'dwevent' + IntToStr(aCollection.Count);
   DWReplyEventData.Name := FName;
 end;
 
@@ -135,15 +175,6 @@ begin
  DWReplyEventData.OnReplyEvent := Value;
 end;
 
-Function TDWEventList.Add(Item: TDWEvent): Integer;
-Var
- vItem : ^TDWEvent;
-Begin
- New(vItem);
- vItem^ := Item;
- Result := TList(Self).Add(vItem);
-End;
-
 procedure TDWEventList.ClearList;
 Var
  I : Integer;
@@ -153,8 +184,8 @@ Begin
  Self.Clear;
 End;
 
-Constructor TDWEventList.Create(AOwner    : TPersistent;
-                                ItemClass : TCollectionItemClass);
+Constructor TDWEventList.Create(AOwner     : TPersistent;
+                                aItemClass : TCollectionItemClass);
 Begin
  Inherited Create(AOwner, TDWEvent);
  Self.fOwner := AOwner;
@@ -163,18 +194,7 @@ End;
 procedure TDWEventList.Delete(Index: Integer);
 begin
  If (Index < Self.Count) And (Index > -1) Then
-  Begin
-   If Assigned(TList(Self).Items[Index]) Then
-    Begin
-     FreeAndNil(TList(Self).Items[Index]^);
-     {$IFDEF FPC}
-     Dispose(PStringStream(TList(Self).Items[Index]));
-     {$ELSE}
-     Dispose(TList(Self).Items[Index]);
-     {$ENDIF}
-    End;
-   TList(Self).Delete(Index);
-  End;
+  TOwnedCollection(Self).Delete(Index);
 end;
 
 destructor TDWEventList.Destroy;
@@ -190,9 +210,7 @@ End;
 
 function TDWEventList.GetRec(Index: Integer): TDWEvent;
 begin
- Result := Nil;
- If (Index < Self.Count) And (Index > -1) Then
-  Result := TDWEvent(TList(Self).Items[Index]^);
+ Result := TDWEvent(inherited GetItem(Index));
 end;
 
 procedure TDWEventList.PutRec(Index: Integer; Item: TDWEvent);
@@ -215,6 +233,70 @@ Begin
  Inherited;
 End;
 
-{ TDWEvents }
+procedure TDWParamsMethods.ClearList;
+Var
+ I : Integer;
+Begin
+ For I := Count - 1 Downto 0 Do
+  Delete(I);
+ Self.Clear;
+End;
+
+constructor TDWParamsMethods.Create(AOwner     : TPersistent;
+                                    aItemClass : TCollectionItemClass);
+begin
+ Inherited Create(AOwner, TDWParamMethod);
+ Self.fOwner := AOwner;
+end;
+
+procedure TDWParamsMethods.Delete(Index: Integer);
+begin
+ If (Index < Self.Count) And (Index > -1) Then
+  TOwnedCollection(Self).Delete(Index);
+end;
+
+destructor TDWParamsMethods.Destroy;
+begin
+ ClearList;
+ Inherited;
+end;
+
+Function TDWParamsMethods.GetRec(Index: Integer): TDWParamMethod;
+Begin
+ Result := TDWParamMethod(inherited GetItem(Index));
+End;
+
+procedure TDWParamsMethods.PutRec(Index: Integer; Item: TDWParamMethod);
+begin
+ If (Index < Self.Count) And (Index > -1) Then
+  SetItem(Index, Item);
+end;
+
+Constructor TDWParamMethod.Create(aCollection: TCollection);
+Begin
+ Inherited;
+ vTypeObject      := toParam;
+ vObjectDirection := odINOUT;
+ vObjectValue     := ovString;
+ vParamName       :=  'dwparam' + IntToStr(aCollection.Count);
+ vEncoded         := True;
+ vDefaultValue    := '';
+End;
+
+function TDWParamMethod.GetDisplayName: String;
+begin
+ Result := vParamName;
+end;
+
+procedure TDWParamMethod.SetDisplayName(const Value: String);
+begin
+ If Trim(Value) = '' Then
+  Raise Exception.Create('Invalid Param Name')
+ Else
+  Begin
+   vParamName := Trim(Value);
+   Inherited;
+  End;
+end;
 
 end.

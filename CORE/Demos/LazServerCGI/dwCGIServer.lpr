@@ -2,7 +2,7 @@ program dwCGIServer;
 
 {$mode objfpc}{$H+}
 
-{$DEFINE APACHE}
+{$.DEFINE APACHE}
 
 
 uses

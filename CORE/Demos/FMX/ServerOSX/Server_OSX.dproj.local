@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899/12/30 00:00:00.000.705,C:\CompXE_10_2\RestDW\CORE\Samples\SimpleServer\ServerOSX\UnGeral.pas=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\UnGeral.pas</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.425,C:\CompXE_10_2\RestDW\CORE\Samples\SimpleServer\ServerOSX\Server_OSX.dproj=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\Server_OSX.dproj</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.626,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\Server_OSX.dproj=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.425,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\UnGeral.pas=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.705,C:\CompXE_10_2\RestDW\CORE\Samples\SimpleServer\ServerOSX\UnGeral.fmx=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\UnGeral.fmx</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.425,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\UnGeral.fmx=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\Unit1.fmx</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.705,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\UnGeral.pas=C:\CompXE_10_2\RestDW\CORE\Samples\SimpleServer\ServerOSX\UnGeral.pas</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.425,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\Unit1.fmx=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\UnGeral.fmx</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.626,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\Server_OSX.dproj</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.425,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\Server_OSX.dproj=C:\CompXE_10_2\RestDW\CORE\Samples\SimpleServer\ServerOSX\Server_OSX.dproj</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.425,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\Unit1.pas=C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\UnGeral.pas</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.705,C:\Users\Abrito\Documents\Embarcadero\Studio\Projects\UnGeral.fmx=C:\CompXE_10_2\RestDW\CORE\Samples\SimpleServer\ServerOSX\UnGeral.fmx</Transaction>
   </Transactions>
 	<ActiveMobileDevice>
 		<PMAC_VIRTUAL iOSSimulator="_iossimulator_3267DB74-10A4-4B37-8AD6-D845C32C6BAB"/>

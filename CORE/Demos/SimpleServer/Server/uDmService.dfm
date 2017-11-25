@@ -74,14 +74,35 @@ object ServerMethodDM: TServerMethodDM
   object DWServerEvents1: TDWServerEvents
     Events = <
       item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
         Name = 'servertime'
-        OnReplyEvent = DWServerEvents1EventsservertimeReplyEvent
       end
       item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'value'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
         Name = 'helloworld'
-        OnReplyEvent = DWServerEvents1EventshelloworldReplyEvent
       end>
-    Left = 192
+    Left = 176
     Top = 80
   end
 end
