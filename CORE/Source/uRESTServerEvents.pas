@@ -53,7 +53,7 @@ Type
                           aItemClass : TCollectionItemClass);
   Destructor  Destroy; Override;
   Procedure   Delete     (Index    : Integer);                   Overload;
-  Property    Items      [Index    : Integer]   : TDWParamMethod Read GetRec Write PutRec; Default;
+  Property    Items      [Index    : Integer]   : TDWParamMethod Read GetRec     Write PutRec; Default;
 End;
 
 Type
@@ -86,16 +86,22 @@ Type
   Function    GetOwner: TPersistent; override;
  Private
   fOwner      : TPersistent;
-  Function    GetRec    (Index      : Integer) : TDWEvent;  Overload;
+  Function    GetRec    (Index      : Integer) : TDWEvent;       Overload;
   Procedure   PutRec    (Index      : Integer;
-                         Item       : TDWEvent);            Overload;
+                         Item       : TDWEvent);                 Overload;
   Procedure   ClearList;
+  Function    GetRecName(Index     : String)  : TDWEvent;        Overload;
+  Procedure   PutRecName(Index     : String;
+                         Item      : TDWEvent);                  Overload;
  Public
   Constructor Create     (AOwner     : TPersistent;
                           aItemClass : TCollectionItemClass);
   Destructor  Destroy; Override;
-  Procedure   Delete     (Index     : Integer);             Overload;
-  Property    Items      [Index     : Integer]  : TDWEvent  Read GetRec Write PutRec; Default;
+  Function    ToJSON : String;
+  Procedure   FromJSON   (Value     : String );
+  Procedure   Delete     (Index     : Integer);                  Overload;
+  Property    Items      [Index     : Integer]  : TDWEvent       Read GetRec     Write PutRec; Default;
+  Property    EventByName[Index     : String ]  : TDWEvent       Read GetRecName Write PutRecName;
 End;
 
 Type
@@ -203,6 +209,11 @@ begin
  inherited;
 end;
 
+Procedure TDWEventList.FromJSON(Value : String);
+Begin
+
+End;
+
 Function TDWEventList.GetOwner: TPersistent;
 Begin
  Result:= fOwner;
@@ -213,10 +224,44 @@ begin
  Result := TDWEvent(inherited GetItem(Index));
 end;
 
+function TDWEventList.GetRecName(Index: String): TDWEvent;
+Var
+ I : Integer;
+Begin
+ Result := Nil;
+ For I := 0 To Self.Count - 1 Do
+  Begin
+   If (Uppercase(Index) = Uppercase(Self.Items[I].FName)) Then
+    Begin
+     Result := TDWEvent(Self.Items[I]);
+     Break;
+    End;
+  End;
+End;
+
 procedure TDWEventList.PutRec(Index: Integer; Item: TDWEvent);
 begin
  If (Index < Self.Count) And (Index > -1) Then
   SetItem(Index, Item);
+end;
+
+procedure TDWEventList.PutRecName(Index: String; Item: TDWEvent);
+Var
+ I : Integer;
+Begin
+ For I := 0 To Self.Count - 1 Do
+  Begin
+   If (Uppercase(Index) = Uppercase(Self.Items[I].FName)) Then
+    Begin
+     Self.Items[I] := Item;
+     Break;
+    End;
+  End;
+End;
+
+function TDWEventList.ToJSON: String;
+begin
+
 end;
 
 { TDWServerEvents }

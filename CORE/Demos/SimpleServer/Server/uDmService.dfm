@@ -78,11 +78,12 @@ object ServerMethodDM: TServerMethodDM
           item
             TypeObject = toParam
             ObjectDirection = odOUT
-            ObjectValue = ovString
+            ObjectValue = ovTimeStamp
             ParamName = 'result'
             Encoded = True
           end>
         Name = 'servertime'
+        OnReplyEvent = DWServerEvents1EventsservertimeReplyEvent
       end
       item
         DWParams = <
@@ -102,7 +103,7 @@ object ServerMethodDM: TServerMethodDM
           end>
         Name = 'helloworld'
       end>
-    Left = 176
-    Top = 80
+    Left = 184
+    Top = 72
   end
 end
