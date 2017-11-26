@@ -2811,6 +2811,7 @@ Begin
     JSONStr    := TReplyOK
    Else
     JSONStr    := TReplyNOK;
+   Result      := JSONStr = TReplyOK;
   End;
 End;
 

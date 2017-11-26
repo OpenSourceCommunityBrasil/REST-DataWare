@@ -3,7 +3,18 @@ unit uRESTDWServerEvents;
 interface
 
 Uses
- SysUtils, Classes, uDWJSONObject, uDWConsts, uDWConstsData, uRESTDWBase, uDWJSONTools;
+ SysUtils, Classes, uDWJSONObject, uDWConsts, uDWConstsData,
+ uRESTDWBase, uDWJSONTools, udwjson {$IFNDEF FPC}
+                                    {$IF CompilerVersion > 21}
+                                    {$IFDEF POSIX}
+                                    {$IF Defined(ANDROID) or Defined(IOS)} //Alterado para IOS Brito
+                                    ,system.json
+                                    {$else}
+                                    ,system.json
+                                    {$IFEND}
+                                    {$ENDIF}
+                                    {$IFEND}
+                                    {$ENDIF};
 
 Const
  TServerEventsConst = '{"typeobject":"%s", "objectdirection":"%s", "objectvalue":"%s", "paramname":"%s", "encoded":"%s", "default":"%s"}';
@@ -267,8 +278,67 @@ end;
 }
 
 Procedure TDWEventList.FromJSON(Value : String);
+Var
+ bJsonOBJ,
+ bJsonOBJb,
+ bJsonOBJc    : {$IFDEF POSIX}system.json.TJsonObject;
+                {$ELSE}       udwjson.TJsonObject;{$ENDIF}
+ bJsonArray,
+ bJsonArrayB,
+ bJsonArrayC  : {$IFDEF POSIX}system.json.TJsonArray;
+                {$ELSE}       udwjson.TJsonArray;{$ENDIF}
+ I, X, Y      : Integer;
+ vDWEvent     : TDWEvent;
+ vDWParamMethod : TDWParamMethod;
 Begin
-
+ Try
+  bJsonArray  := Tjsonarray.Create(Value);
+  For I := 0 to bJsonArray.length -1 Do
+   Begin
+    bJsonOBJ := bJsonArray.getJSONObject(I);
+    Try
+     bJsonArrayB := Tjsonarray.Create(bJsonOBJ.get('serverevents').tostring);
+     For X := 0 To bJsonArrayB.length -1 Do
+      Begin
+       bJsonOBJb := bJsonArrayB.getJSONObject(X);
+       If EventByName[bJsonOBJb.get('eventname').tostring] = Nil Then
+        vDWEvent  := TDWEvent(Self.Add)
+       Else
+        vDWEvent  := EventByName[bJsonOBJb.get('eventname').tostring];
+       vDWEvent.Name := bJsonOBJb.get('eventname').tostring;
+       If bJsonOBJb.get('params').toString <> '' Then
+        Begin
+         bJsonArrayC    := Tjsonarray.Create(bJsonOBJb.get('params').toString);
+         Try
+          For Y := 0 To bJsonArrayC.length -1 do
+           Begin
+            bJsonOBJc                      := bJsonArrayC.getJSONObject(Y);
+            If vDWEvent.vDWParams.ParamByName[bJsonOBJc.get('paramname').toString] = Nil Then
+             vDWParamMethod                := TDWParamMethod(vDWEvent.vDWParams.Add)
+            Else
+             vDWParamMethod                := vDWEvent.vDWParams.ParamByName[bJsonOBJc.get('paramname').toString];
+            vDWParamMethod.TypeObject      := GetObjectName(bJsonOBJc.get('typeobject').toString);
+            vDWParamMethod.ObjectDirection := GetDirectionName(bJsonOBJc.get('objectdirection').toString);
+            vDWParamMethod.ObjectValue     := GetValueType(bJsonOBJc.get('objectvalue').toString);
+            vDWParamMethod.ParamName       := bJsonOBJc.get('paramname').toString;
+            vDWParamMethod.Encoded         := StringToBoolean(bJsonOBJc.get('encoded').toString);
+            If Trim(bJsonOBJc.get('default').toString) <> '' Then
+             vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.get('default').toString{$IFDEF FPC}, csUndefined{$ENDIF});
+           End;
+         Finally
+          bJsonArrayC.Free;
+         End;
+        End
+       Else
+        vDWEvent.vDWParams.ClearList;
+      End;
+    Finally
+     bJsonArrayB.Free;
+    End;
+   End;
+ Finally
+  bJsonArray.Free;
+ End;
 End;
 
 Function TDWEventList.GetOwner: TPersistent;
