@@ -4,7 +4,7 @@ Interface
 
 Uses
   IdURI, IdGlobal, SysUtils, Classes, ServerUtils, uRESTDWBase, uDWConsts,
-  uDWJSONObject, uDWConstsData, uDWMassiveBuffer;
+  uDWJSONObject, uDWConstsData, uDWMassiveBuffer, uRESTDWServerEvents;
 
 Type
  TReplyEvent     = Procedure(SendType           : TSendEvent;

@@ -58,6 +58,7 @@ contains
   uDWJSON in '..\..\..\Source\libs\JSON\uDWJSON.pas',
   uDWMassiveBuffer in '..\..\..\Source\libs\uDWMassiveBuffer.pas',
   StringBuilderUnit in '..\..\..\Source\libs\StringBuilderUnit.pas',
-  uRESTServerEvents in '..\..\..\Source\uRESTServerEvents.pas';
+  uRESTDWServerEvents in '..\..\..\Source\uRESTDWServerEvents.pas';
 
 end.
+

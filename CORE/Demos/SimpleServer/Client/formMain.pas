@@ -29,7 +29,7 @@ USES
   IdComponent, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, uDWConstsData, System.Actions,
-  Vcl.ActnList, uRESTServerEvents;
+  Vcl.ActnList, uRESTDWServerEvents;
 
 TYPE
 
@@ -69,6 +69,7 @@ TYPE
     ActionList1: TActionList;
     DWClientEvents1: TDWClientEvents;
     RESTClientPooler1: TRESTClientPooler;
+    Button6: TButton;
     PROCEDURE Button1Click(Sender: TObject);
     PROCEDURE Button2Click(Sender: TObject);
     PROCEDURE RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
@@ -82,6 +83,7 @@ TYPE
     PROCEDURE RESTDWDataBase1BeforeConnect(Sender: TComponent);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
   PRIVATE
     { Private declarations }
     FBytesToTransfer: Int64;
@@ -207,6 +209,20 @@ procedure TForm2.Button5Click(Sender: TObject);
 begin
  If RESTDWClientSQL1.MassiveCount > 0 Then
   Showmessage(RESTDWClientSQL1.MassiveToJSON);
+end;
+
+procedure TForm2.Button6Click(Sender: TObject);
+begin
+ RESTClientPooler1.Host            := EHost.Text;
+ RESTClientPooler1.Port            := StrToInt(EPort.Text);
+ RESTClientPooler1.UserName        := EdUserNameDW.Text;
+ RESTClientPooler1.Password        := EdPasswordDW.Text;
+ RESTClientPooler1.DataCompression := CheckBox1.Checked;
+ If chkhttps.Checked then
+  RESTClientPooler1.TypeRequest := TTyperequest.trHttps
+ Else
+  RESTClientPooler1.TypeRequest := TTyperequest.trHttp;
+ DWClientEvents1.GetEvents      := True;
 end;
 
 PROCEDURE TForm2.FormCreate(Sender: TObject);

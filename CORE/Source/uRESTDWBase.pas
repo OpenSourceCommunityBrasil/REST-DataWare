@@ -195,6 +195,9 @@ Type
   Procedure ApplyUpdates_MassiveCache(ServerMethodsClass : TComponent;
                                       Var Pooler         : String;
                                       Var DWParams       : TDWParams);
+  Procedure GetEvents                (ServerMethodsClass : TComponent;
+                                      Var Pooler         : String;
+                                      Var DWParams       : TDWParams);
  Public
   Constructor Create           (AOwner                : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                      //Destroy a Classe
@@ -361,7 +364,7 @@ End;
 
 implementation
 
-Uses uDWDatamodule, uRESTDWPoolerDB, SysTypes, uDWConsts, uDWJSONTools, uRESTServerEvents;
+Uses uDWDatamodule, uRESTDWPoolerDB, SysTypes, uDWConsts, uDWJSONTools, uRESTDWServerEvents;
 
 { TRESTServiceCGI }
 
@@ -2621,6 +2624,42 @@ Begin
   End;
 End;
 
+Procedure TRESTServicePooler.GetEvents(ServerMethodsClass : TComponent;
+                                       Var Pooler         : String;
+                                       Var DWParams       : TDWParams);
+Var
+ I             : Integer;
+ vError        : Boolean;
+ vTempJSON,
+ vMessageError : String;
+Begin
+ vTempJSON := '';
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TDWServerEvents Then
+      Begin
+       If vTempJSON = '' Then
+        vTempJSON := Format('%s', [TDWServerEvents(ServerMethodsClass.Components[i]).Events.ToJSON])
+       Else
+        vTempJSON := vTempJSON + Format(', %s', [TDWServerEvents(ServerMethodsClass.Components[i]).Events.ToJSON])
+      End;
+    End;
+   vError := vTempJSON = '';
+   If vError Then
+    DWParams.ItemsString['MessageError'].AsString := 'Events Not Found';
+   DWParams.ItemsString['Error'].AsBoolean        := vError;
+   If DWParams.ItemsString['Result'] <> Nil Then
+    Begin
+     If vTempJSON <> '' Then
+      DWParams.ItemsString['Result'].SetValue(Format('[%s]', [vTempJSON]))
+     Else
+      DWParams.ItemsString['Result'].SetValue('');
+    End;
+  End;
+End;
+
 Procedure TRESTServicePooler.OpenDatasets(ServerMethodsClass : TComponent;
                                           Var Pooler         : String;
                                           Var DWParams       : TDWParams);
@@ -2765,6 +2804,14 @@ Begin
    Else
     JSONStr    := TReplyNOK;
   End
+ Else If vUrlMethod = UpperCase('GETEVENTS') Then
+  Begin
+   GetEvents(BaseObject, vResult, DWParams);
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+    JSONStr    := TReplyOK
+   Else
+    JSONStr    := TReplyNOK;
+  End;
 End;
 
 Procedure TRESTServicePooler.aCommandGet(AContext      : TIdContext;

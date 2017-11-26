@@ -5,13 +5,13 @@ interface
 uses
   {$IFDEF FPC}
    {$IFNDEF UNIX}Windows,
-   {$ELSE}Lcl,{$ENDIF}LResources, FormEditingIntf, Classes, propedits, uRESTDWBase, uRESTDWPoolerDB, uDWDatamodule, uDWMassiveBuffer, uRESTServerEvents;
+   {$ELSE}Lcl,{$ENDIF}LResources, FormEditingIntf, Classes, propedits, uRESTDWBase, uRESTDWPoolerDB, uDWDatamodule, uDWMassiveBuffer, uRESTDWServerEvents;
   {$ELSE}
    Windows,
    {$if CompilerVersion > 21}
-    ToolsApi, DMForm, DesignEditors, DesignIntf, ExptIntf, Classes, uRESTDWBase, uRESTDWPoolerDB, uDWDatamodule, uDWMassiveBuffer, uRESTServerEvents;
+    ToolsApi, DMForm, DesignEditors, DesignIntf, ExptIntf, Classes, uRESTDWBase, uRESTDWPoolerDB, uDWDatamodule, uDWMassiveBuffer, uRESTDWServerEvents;
    {$ELSE}
-    ToolsApi, DMForm, DesignEditors, DesignIntf, ExptIntf, Classes, uRESTDWBase, uRESTDWPoolerDB, uDWDatamodule, uDWMassiveBuffer, uRESTServerEvents;
+    ToolsApi, DMForm, DesignEditors, DesignIntf, ExptIntf, Classes, uRESTDWBase, uRESTDWPoolerDB, uDWDatamodule, uDWMassiveBuffer, uRESTDWServerEvents;
    {$IFEND}
   {$ENDIF}
 
@@ -78,7 +78,7 @@ Begin
  {$ELSE}
   FormEditingHook.RegisterDesignerBaseClass(TServerMethodDataModule);
  {$ENDIF}
- RegisterComponents('REST Dataware - Service',     [TRESTServicePooler, TRESTServiceCGI, TDWServerEvents,  TRESTClientPooler, TDWClientEvents]);
+ RegisterComponents('REST Dataware - Service',     [TRESTServicePooler, TDWServerEvents, TDWClientEvents,  TRESTServiceCGI,   TRESTClientPooler]);
  RegisterComponents('REST Dataware - CORE - DB',   [TRESTDWPoolerDB,    TRESTDWDataBase, TRESTDWClientSQL, TRESTDWStoredProc, TRESTDWPoolerList, TDWMassiveCache]);
  RegisterPropertyEditor(TypeInfo(String), TRESTDWDataBase, 'PoolerName', TPoolersList);
 End;

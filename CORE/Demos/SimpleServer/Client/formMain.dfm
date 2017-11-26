@@ -1178,6 +1178,21 @@ object Form2: TForm2
     TabOrder = 15
     OnClick = Button5Click
   end
+  object Button6: TButton
+    Left = 593
+    Top = 145
+    Width = 104
+    Height = 24
+    Caption = 'GetOnLine Events'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 16
+    OnClick = Button6Click
+  end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1
     Left = 263

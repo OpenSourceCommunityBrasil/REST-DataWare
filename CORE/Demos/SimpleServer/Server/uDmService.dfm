@@ -16,13 +16,13 @@ object ServerMethodDM: TServerMethodDM
     Active = True
     PoolerOffMessage = 'RESTPooler not active.'
     ParamCreate = True
-    Left = 48
+    Left = 52
     Top = 103
   end
   object RESTDWDriverFD1: TRESTDWDriverFD
     CommitRecords = 100
     Connection = Server_FDConnection
-    Left = 49
+    Left = 53
     Top = 59
   end
   object Server_FDConnection: TFDConnection
@@ -44,31 +44,31 @@ object ServerMethodDM: TServerMethodDM
     Transaction = FDTransaction1
     OnError = Server_FDConnectionError
     BeforeConnect = Server_FDConnectionBeforeConnect
-    Left = 49
+    Left = 53
     Top = 15
   end
   object FDPhysFBDriverLink1: TFDPhysFBDriverLink
-    Left = 105
+    Left = 109
     Top = 59
   end
   object FDStanStorageJSONLink1: TFDStanStorageJSONLink
-    Left = 77
+    Left = 81
     Top = 59
   end
   object FDGUIxWaitCursor1: TFDGUIxWaitCursor
     Provider = 'Forms'
-    Left = 105
+    Left = 109
     Top = 15
   end
   object FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink
-    Left = 133
+    Left = 137
     Top = 59
   end
   object FDTransaction1: TFDTransaction
     Options.AutoStop = False
     Options.DisconnectAction = xdRollback
     Connection = Server_FDConnection
-    Left = 77
+    Left = 81
     Top = 15
   end
   object DWServerEvents1: TDWServerEvents
@@ -124,7 +124,7 @@ object ServerMethodDM: TServerMethodDM
         Name = 'dirf'
         OnReplyEvent = DWServerEvents1EventsdirfReplyEvent
       end>
-    Left = 76
+    Left = 80
     Top = 103
   end
 end

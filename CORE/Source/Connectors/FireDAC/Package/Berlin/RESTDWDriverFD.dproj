@@ -163,7 +163,7 @@
         <DCCReference Include="DataSnapServer.dcp"/>
         <DCCReference Include="DataSnapFireDAC.dcp"/>
         <DCCReference Include="RestDatawareCORE.dcp"/>
-        <DCCReference Include="..\..\uRestDWDriverFD.pas"/>
+        <DCCReference Include="..\..\uRESTDWDriverFD.pas"/>
         <RcItem Include="..\..\TRESTDWDriverFD.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTDWDriverFD</ResourceId>

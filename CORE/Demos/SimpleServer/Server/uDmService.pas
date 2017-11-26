@@ -37,7 +37,7 @@ USES
   FireDAC.Phys.MSSQLDef,
   FireDAC.Phys.ODBCBase,
   FireDAC.Phys.MSSQL,
-  uDWConsts, uRESTServerEvents;
+  uDWConsts, uRESTDWServerEvents;
 
 TYPE
   TServerMethodDM = CLASS(TServerMethodDataModule)

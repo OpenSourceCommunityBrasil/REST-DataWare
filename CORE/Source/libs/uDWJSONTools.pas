@@ -525,6 +525,9 @@ End;
 Function EncodeStrings(Value : String
                       {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : String;
 Begin
+ Result := '';
+ If Value = '' Then
+  Exit;
 {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
  Result := Encode64(Value); //TIdencoderMIME.EncodeString(Value, nil);
 {$ELSE}
