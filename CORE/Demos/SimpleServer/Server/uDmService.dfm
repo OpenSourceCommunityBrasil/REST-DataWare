@@ -85,44 +85,6 @@ object ServerMethodDM: TServerMethodDM
           end>
         Name = 'servertime'
         OnReplyEvent = DWServerEvents1EventsservertimeReplyEvent
-      end
-      item
-        DWParams = <
-          item
-            TypeObject = toParam
-            ObjectDirection = odIN
-            ObjectValue = ovString
-            ParamName = 'value'
-            Encoded = True
-          end
-          item
-            TypeObject = toParam
-            ObjectDirection = odOUT
-            ObjectValue = ovString
-            ParamName = 'result'
-            Encoded = True
-          end>
-        Name = 'helloworld'
-        OnReplyEvent = DWServerEvents1EventshelloworldReplyEvent
-      end
-      item
-        DWParams = <
-          item
-            TypeObject = toParam
-            ObjectDirection = odIN
-            ObjectValue = ovString
-            ParamName = 'cnpj'
-            Encoded = True
-          end
-          item
-            TypeObject = toParam
-            ObjectDirection = odOUT
-            ObjectValue = ovString
-            ParamName = 'result'
-            Encoded = True
-          end>
-        Name = 'dirf'
-        OnReplyEvent = DWServerEvents1EventsdirfReplyEvent
       end>
     Left = 80
     Top = 103

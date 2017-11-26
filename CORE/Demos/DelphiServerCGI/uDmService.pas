@@ -31,13 +31,13 @@ USES
   FireDAC.Comp.UI,
   FireDAC.Phys.IBBase,
   FireDAC.Stan.StorageJSON,
-  RestDWServerFormU,
   URESTDWPoolerDB,
   URestDWDriverFD,
   FireDAC.Phys.MSSQLDef,
   FireDAC.Phys.ODBCBase,
   FireDAC.Phys.MSSQL,
-  uDWConsts, uRESTDWServerEvents;
+  uDWConsts, uRESTDWServerEvents,
+  uConsts;
 
 TYPE
   TServerMethodDM = CLASS(TServerMethodDataModule)
@@ -50,10 +50,7 @@ TYPE
     FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink;
     FDTransaction1: TFDTransaction;
     PROCEDURE ServerMethodDataModuleReplyEvent(SendType: TSendEvent; Context: STRING; VAR Params: TDWParams; VAR Result: STRING);
-    PROCEDURE ServerMethodDataModuleCreate(Sender: TObject);
     PROCEDURE Server_FDConnectionBeforeConnect(Sender: TObject);
-    PROCEDURE ServerMethodDataModuleWelcomeMessage(Welcomemsg: STRING);
-    PROCEDURE Server_FDConnectionError(ASender, AInitiator: TObject; VAR AException: Exception);
     procedure ServerMethodDataModuleMassiveProcess(
       var MassiveDataset: TMassiveDatasetBuffer; var Ignore: Boolean);
     procedure DWServerEvents1EventsservertimeReplyEvent(var Params: TDWParams;
@@ -98,7 +95,7 @@ BEGIN
       TRY
         FdQuery.Connection := Server_FDConnection;
         FdQuery.SQL.Add(VSQL);
-        JSONValue.LoadFromDataset('sql', FdQuery, RestDWForm.CbEncode.Checked);
+        JSONValue.LoadFromDataset('sql', FdQuery, EncodedData);
         Result := JSONValue.ToJSON;
       FINALLY
         JSONValue.Free;
@@ -130,11 +127,6 @@ begin
  If Params.ItemsString['result'] <> Nil Then
   Params.ItemsString['result'].AsDateTime := Now;
 end;
-
-PROCEDURE TServerMethodDM.ServerMethodDataModuleCreate(Sender: TObject);
-BEGIN
-  RESTDWPoolerDB1.Active := RestDWForm.CbPoolerState.Checked;
-END;
 
 procedure TServerMethodDM.ServerMethodDataModuleMassiveProcess(
   var MassiveDataset: TMassiveDatasetBuffer; var Ignore: Boolean);
@@ -174,66 +166,19 @@ BEGIN
   JSONObject.Free;
 END;
 
-PROCEDURE TServerMethodDM.ServerMethodDataModuleWelcomeMessage(Welcomemsg: STRING);
-BEGIN
-  RestDWForm.EdBD.Text := Welcomemsg;
-END;
-
 PROCEDURE TServerMethodDM.Server_FDConnectionBeforeConnect(Sender: TObject);
-VAR
-  Driver_BD: STRING;
-  Porta_BD: STRING;
-  Servidor_BD: STRING;
-  DataBase: STRING;
-  Pasta_BD: STRING;
-  Usuario_BD: STRING;
-  Senha_BD: STRING;
 BEGIN
- database:= RestDWForm.EdBD.Text;
-
-  Driver_BD := RestDWForm.CbDriver.Text;
-  If RestDWForm.CkUsaURL.Checked Then
-  Begin
-    Servidor_BD := RestDWForm.EdURL.Text;
-  end
-  Else
-  Begin
-    Servidor_BD := RestDWForm.DatabaseIP;
-  end;
-
-  Case RestDWForm.CbDriver.ItemIndex Of
-    0: // FireBird
-      Begin
-        Pasta_BD := IncludeTrailingPathDelimiter(RestDWForm.EdPasta.Text);
-        Database := RestDWForm.edBD.Text;
-        Database := Pasta_BD + Database;
-      end;
-    1: // MSSQL
-      Begin
-        Database := RestDWForm.EdBD.Text;
-      end;
-  end;
-
-  Porta_BD   := RestDWForm.EdPortaBD.Text;
-  Usuario_BD := RestDWForm.EdUserNameBD.Text;
-  Senha_BD   := RestDWForm.EdPasswordBD.Text;
-
   TFDConnection(Sender).Params.Clear;
-  TFDConnection(Sender).Params.Add('DriverID=' + Driver_BD);
-  TFDConnection(Sender).Params.Add('Server=' + Servidor_BD);
-  TFDConnection(Sender).Params.Add('Port=' + Porta_BD);
-  TFDConnection(Sender).Params.Add('Database=' + Database);
+  TFDConnection(Sender).Params.Add('DriverID=FB');
+  TFDConnection(Sender).Params.Add('Server=' + servidor);
+  TFDConnection(Sender).Params.Add('Port=' + IntToStr(Porta_BD));
+  TFDConnection(Sender).Params.Add('Database=' + pasta + Database);
   TFDConnection(Sender).Params.Add('User_Name=' + Usuario_BD);
   TFDConnection(Sender).Params.Add('Password=' + Senha_BD);
   TFDConnection(Sender).Params.Add('Protocol=TCPIP');
-  TFDConnection(Sender).DriverName  := Driver_BD;
+  TFDConnection(Sender).DriverName  := 'FB';
   TFDConnection(Sender).LoginPrompt := FALSE;
   TFDConnection(Sender).UpdateOptions.CountUpdatedRecords := False;
-END;
-
-PROCEDURE TServerMethodDM.Server_FDConnectionError(ASender, AInitiator: TObject; VAR AException: Exception);
-BEGIN
-  RestDWForm.memoResp.Lines.Add(AException.Message);
 END;
 
 END.

@@ -1,8 +1,6 @@
 object ServerMethodDM: TServerMethodDM
   OldCreateOrder = False
-  OnCreate = ServerMethodDataModuleCreate
   OnReplyEvent = ServerMethodDataModuleReplyEvent
-  OnWelcomeMessage = ServerMethodDataModuleWelcomeMessage
   OnMassiveProcess = ServerMethodDataModuleMassiveProcess
   Height = 164
   Width = 221
@@ -42,7 +40,6 @@ object ServerMethodDM: TServerMethodDM
     ConnectedStoredUsage = []
     LoginPrompt = False
     Transaction = FDTransaction1
-    OnError = Server_FDConnectionError
     BeforeConnect = Server_FDConnectionBeforeConnect
     Left = 53
     Top = 15

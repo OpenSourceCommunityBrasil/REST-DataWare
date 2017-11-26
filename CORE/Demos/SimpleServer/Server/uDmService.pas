@@ -58,10 +58,6 @@ TYPE
       var MassiveDataset: TMassiveDatasetBuffer; var Ignore: Boolean);
     procedure DWServerEvents1EventsservertimeReplyEvent(var Params: TDWParams;
       var Result: string);
-    procedure DWServerEvents1EventsdirfReplyEvent(var Params: TDWParams;
-      var Result: string);
-    procedure DWServerEvents1EventshelloworldReplyEvent(var Params: TDWParams;
-      var Result: string);
   PRIVATE
     { Private declarations }
     FUNCTION ConsultaBanco(VAR Params: TDWParams): STRING; OVERLOAD;
@@ -109,25 +105,10 @@ BEGIN
   END;
 END;
 
-procedure TServerMethodDM.DWServerEvents1EventsdirfReplyEvent(
-  var Params: TDWParams; var Result: string);
-begin
- If Params.ItemsString['result'] <> Nil Then
-  Params.ItemsString['result'].AsString := 'Respondido pelo Servidor';
-end;
-
-procedure TServerMethodDM.DWServerEvents1EventshelloworldReplyEvent(
-  var Params: TDWParams; var Result: string);
-begin
- If Params.ItemsString['result'] <> Nil Then
-  Params.ItemsString['result'].AsString := 'Hello World...';
-end;
-
 procedure TServerMethodDM.DWServerEvents1EventsservertimeReplyEvent(
   var Params: TDWParams; var Result: string);
 begin
- //servertime
- If Params.ItemsString['result'] <> Nil Then
+ If Params.ItemsString['result'] <> Nil Then //servertime
   Params.ItemsString['result'].AsDateTime := Now;
 end;
 
