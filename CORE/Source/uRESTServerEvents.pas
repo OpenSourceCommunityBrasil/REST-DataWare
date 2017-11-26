@@ -96,7 +96,7 @@ Type
   Function    GetRecName(Index       : String)  : TDWEvent;       Overload;
   Procedure   PutRecName(Index       : String;
                          Item        : TDWEvent);                 Overload;
-  Procedure   Editable  (Value : Boolean);
+//  Procedure   Editable  (Value : Boolean);
  Public
   Function    Add    : TCollectionItem;
   Constructor Create     (AOwner     : TPersistent;
@@ -133,7 +133,7 @@ Type
   vRESTClientPooler : TRESTClientPooler;
   Procedure GetOnlineEvents(Value  : Boolean);
   Procedure SetEventList   (aValue : TDWEventList);
-  Procedure SetEditParamList(Value : Boolean);
+//  Procedure SetEditParamList(Value : Boolean);
  Public
   Destructor  Destroy; Override;
   Constructor Create(AOwner    : TComponent);Override; //Cria o Componente
@@ -252,10 +252,12 @@ begin
  inherited;
 end;
 
+{
 procedure TDWEventList.Editable(Value: Boolean);
 begin
  vEditable := Value;
 end;
+}
 
 Procedure TDWEventList.FromJSON(Value : String);
 Begin
@@ -440,15 +442,72 @@ begin
 end;
 
 procedure TDWClientEvents.GetOnlineEvents(Value: Boolean);
-begin
- //
-end;
+Var
+ RESTClientPoolerExec : TRESTClientPooler;
+ vResult,
+ lResponse            : String;
+ JSONParam            : TJSONParam;
+ DWParams             : TDWParams;
+Begin
+ If Assigned(vRESTClientPooler) Then
+  RESTClientPoolerExec := vRESTClientPooler
+ Else
+  Exit;
+ DWParams                        := TDWParams.Create;
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+  {$ELSE}
+   JSONParam                     := TJSONParam.Create;
+  {$IFEND}
+ {$ELSE}
+  JSONParam                     := TJSONParam.Create;
+ {$ENDIF}
+ JSONParam.ParamName             := 'Result';
+ JSONParam.ObjectDirection       := odOut;
+ JSONParam.AsString              := '';
+ DWParams.Add(JSONParam);
+ Try
+  Try
+   lResponse := RESTClientPoolerExec.SendEvent('GetEvents', DWParams);
+   If (lResponse <> '') And
+      (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
+    Begin
+     vResult := DWParams.ItemsString['Result'].Value;
+     If Trim(vResult) <> '' Then //Carreta o ParamList
+      Begin
 
+      End;
+    End
+   Else
+    Begin
+     If (lResponse = '') Then
+      lResponse  := Format('Unresolved Host : ''%s''', [RESTClientPoolerExec.Host])
+     Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
+      lResponse  := Format('Unauthorized Username : ''%s''', [RESTClientPoolerExec.UserName]);
+     Raise Exception.Create(lResponse);
+     lResponse   := '';
+    End;
+  Except
+   On E : Exception Do
+    Begin
+     Raise Exception.Create(E.Message);
+    End;
+  End;
+ Finally
+  If Not Assigned(RESTClientPooler) Then
+   FreeAndNil(RESTClientPoolerExec);
+  FreeAndNil(DWParams);
+ End;
+End;
+
+{
 procedure TDWClientEvents.SetEditParamList(Value: Boolean);
 begin
  vEditParamList := Value;
  vEventList.Editable(vEditParamList);
 end;
+}
 
 procedure TDWClientEvents.SetEventList(aValue : TDWEventList);
 begin
