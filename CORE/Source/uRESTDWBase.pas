@@ -37,7 +37,7 @@ Uses
      {$ELSE}
      System.SysUtils, System.Classes, system.SyncObjs,
      {$IFEND}
-     uRESTServerEvents, ServerUtils, HTTPApp,
+     ServerUtils, HTTPApp,
      {$IFDEF WINDOWS} Windows, {$ENDIF} uDWConstsData,       IdTCPClient,
      {$IF Defined(ANDROID) OR Defined(IOS)} System.json,{$ELSE} uDWJSON,{$IFEND} IdMultipartFormData,
      IdContext,             IdHTTPServer,        IdCustomHTTPServer,    IdSSLOpenSSL,    IdSSL,
@@ -361,7 +361,7 @@ End;
 
 implementation
 
-Uses uDWDatamodule, uRESTDWPoolerDB, SysTypes, uDWConsts, uDWJSONTools;
+Uses uDWDatamodule, uRESTDWPoolerDB, SysTypes, uDWConsts, uDWJSONTools, uRESTServerEvents;
 
 { TRESTServiceCGI }
 
