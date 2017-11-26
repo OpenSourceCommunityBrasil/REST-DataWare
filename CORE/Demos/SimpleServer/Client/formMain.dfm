@@ -1180,8 +1180,8 @@ object Form2: TForm2
   end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1
-    Left = 240
-    Top = 128
+    Left = 263
+    Top = 64
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
     FieldDefs = <
@@ -1269,8 +1269,8 @@ object Form2: TForm2
     AutoCommitData = False
     AutoRefreshAfterCommit = True
     InBlockEvents = False
-    Left = 304
-    Top = 96
+    Left = 235
+    Top = 64
   end
   object RESTDWDataBase1: TRESTDWDataBase
     OnConnection = RESTDWDataBase1Connection
@@ -1299,11 +1299,33 @@ object Form2: TForm2
     OnWorkEnd = RESTDWDataBase1WorkEnd
     OnStatus = RESTDWDataBase1Status
     ParamCreate = True
-    Left = 240
-    Top = 8
+    Left = 208
+    Top = 64
   end
   object ActionList1: TActionList
-    Left = 296
-    Top = 16
+    Left = 48
+    Top = 56
+  end
+  object DWClientEvents1: TDWClientEvents
+    RESTClientPooler = RESTClientPooler1
+    Events = <>
+    GetEvents = False
+    Left = 237
+    Top = 21
+  end
+  object RESTClientPooler1: TRESTClientPooler
+    DataCompression = True
+    Encoding = esASCII
+    Host = 'localhost'
+    UserName = 'testserver'
+    Password = 'testserver'
+    ProxyOptions.BasicAuthentication = False
+    ProxyOptions.ProxyPort = 0
+    RequestTimeOut = 10000
+    ThreadRequest = False
+    AllowCookies = False
+    HandleRedirects = False
+    Left = 209
+    Top = 21
   end
 end

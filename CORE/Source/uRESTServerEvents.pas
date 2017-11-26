@@ -85,6 +85,7 @@ End;
 Type
  TDWEventList = Class(TOwnedCollection)
  Protected
+  vEditable   : Boolean;
   Function    GetOwner: TPersistent; override;
  Private
   fOwner      : TPersistent;
@@ -95,7 +96,9 @@ Type
   Function    GetRecName(Index       : String)  : TDWEvent;       Overload;
   Procedure   PutRecName(Index       : String;
                          Item        : TDWEvent);                 Overload;
+  Procedure   Editable  (Value : Boolean);
  Public
+  Function    Add    : TCollectionItem;
   Constructor Create     (AOwner     : TPersistent;
                           aItemClass : TCollectionItemClass);
   Destructor  Destroy; Override;
@@ -130,12 +133,13 @@ Type
   vRESTClientPooler : TRESTClientPooler;
   Procedure GetOnlineEvents(Value  : Boolean);
   Procedure SetEventList   (aValue : TDWEventList);
+  Procedure SetEditParamList(Value : Boolean);
  Public
   Destructor  Destroy; Override;
   Constructor Create(AOwner    : TComponent);Override; //Cria o Componente
  Published
   Property    RESTClientPooler : TRESTClientPooler Read vRESTClientPooler Write vRESTClientPooler;
-  Property    EditParamList    : Boolean           Read vEditParamList    Write vEditParamList;
+//  Property    EditParamList    : Boolean           Read vEditParamList    Write SetEditParamList;
   Property    Events           : TDWEventList      Read vEventList        Write SetEventList;
   Property    GetEvents        : Boolean           Read vGetEvents        Write GetOnlineEvents;
 End;
@@ -205,13 +209,27 @@ begin
  DWReplyEventData.OnReplyEvent := Value;
 end;
 
+Function TDWEventList.Add : TCollectionItem;
+Begin
+ Result := Nil;
+ If vEditable Then
+  Result := TDWEvent(Inherited Add);
+End;
+
 procedure TDWEventList.ClearList;
 Var
  I : Integer;
+ vOldEditable : Boolean;
 Begin
- For I := Count - 1 Downto 0 Do
-  Delete(I);
- Self.Clear;
+ vOldEditable := vEditable;
+ vEditable    := True;
+ Try
+  For I := Count - 1 Downto 0 Do
+   Delete(I);
+ Finally
+  Self.Clear;
+  vEditable := vOldEditable;
+ End;
 End;
 
 Constructor TDWEventList.Create(AOwner     : TPersistent;
@@ -219,11 +237,12 @@ Constructor TDWEventList.Create(AOwner     : TPersistent;
 Begin
  Inherited Create(AOwner, TDWEvent);
  Self.fOwner := AOwner;
+ vEditable   := True;
 End;
 
 procedure TDWEventList.Delete(Index: Integer);
 begin
- If (Index < Self.Count) And (Index > -1) Then
+ If (Index < Self.Count) And (Index > -1) And (vEditable) Then
   TOwnedCollection(Self).Delete(Index);
 end;
 
@@ -231,6 +250,11 @@ destructor TDWEventList.Destroy;
 begin
  ClearList;
  inherited;
+end;
+
+procedure TDWEventList.Editable(Value: Boolean);
+begin
+ vEditable := Value;
 end;
 
 Procedure TDWEventList.FromJSON(Value : String);
@@ -245,7 +269,7 @@ End;
 
 function TDWEventList.GetRec(Index: Integer): TDWEvent;
 begin
- Result := TDWEvent(inherited GetItem(Index));
+ Result := TDWEvent(Inherited GetItem(Index));
 end;
 
 function TDWEventList.GetRecName(Index: String): TDWEvent;
@@ -265,7 +289,7 @@ End;
 
 procedure TDWEventList.PutRec(Index: Integer; Item: TDWEvent);
 begin
- If (Index < Self.Count) And (Index > -1) Then
+ If (Index < Self.Count) And (Index > -1) And (vEditable) Then
   SetItem(Index, Item);
 end;
 
@@ -273,22 +297,23 @@ procedure TDWEventList.PutRecName(Index: String; Item: TDWEvent);
 Var
  I : Integer;
 Begin
- For I := 0 To Self.Count - 1 Do
+ If (vEditable) Then
   Begin
-   If (Uppercase(Index) = Uppercase(Self.Items[I].FName)) Then
+   For I := 0 To Self.Count - 1 Do
     Begin
-     Self.Items[I] := Item;
-     Break;
+     If (Uppercase(Index) = Uppercase(Self.Items[I].FName)) Then
+      Begin
+       Self.Items[I] := Item;
+       Break;
+      End;
     End;
   End;
 End;
 
-function TDWEventList.ToJSON: String;
-begin
-
-end;
-
-{ TDWServerEvents }
+Function TDWEventList.ToJSON: String;
+Begin
+ Result := '';
+End;
 
 Constructor TDWServerEvents.Create(AOwner : TComponent);
 Begin
@@ -405,7 +430,7 @@ begin
  Inherited Create(AOwner);
  vEventList     := TDWEventList.Create(Self, TDWEvent);
  vGetEvents     := False;
- vEditParamList := False;
+ vEditParamList := True;
 end;
 
 destructor TDWClientEvents.Destroy;
@@ -417,6 +442,12 @@ end;
 procedure TDWClientEvents.GetOnlineEvents(Value: Boolean);
 begin
  //
+end;
+
+procedure TDWClientEvents.SetEditParamList(Value: Boolean);
+begin
+ vEditParamList := Value;
+ vEventList.Editable(vEditParamList);
 end;
 
 procedure TDWClientEvents.SetEventList(aValue : TDWEventList);

@@ -29,7 +29,7 @@ USES
   IdComponent, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, uDWConstsData, System.Actions,
-  Vcl.ActnList;
+  Vcl.ActnList, uRESTServerEvents;
 
 TYPE
 
@@ -67,6 +67,8 @@ TYPE
     chkhttps: TCheckBox;
     Button5: TButton;
     ActionList1: TActionList;
+    DWClientEvents1: TDWClientEvents;
+    RESTClientPooler1: TRESTClientPooler;
     PROCEDURE Button1Click(Sender: TObject);
     PROCEDURE Button2Click(Sender: TObject);
     PROCEDURE RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
