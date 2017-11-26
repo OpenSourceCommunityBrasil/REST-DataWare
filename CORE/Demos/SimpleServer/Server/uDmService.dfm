@@ -81,7 +81,7 @@ object ServerMethodDM: TServerMethodDM
             ObjectDirection = odOUT
             ObjectValue = ovTimeStamp
             ParamName = 'result'
-            Encoded = True
+            Encoded = False
           end>
         Name = 'servertime'
         OnReplyEvent = DWServerEvents1EventsservertimeReplyEvent

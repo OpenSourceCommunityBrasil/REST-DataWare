@@ -136,6 +136,8 @@ Type
  Public
   Destructor  Destroy; Override;
   Constructor Create(AOwner : TComponent);Override; //Cria o Componente
+  Procedure   CreateDWParams(EventName    : String;
+                             Var DWParams : TDWParams);
  Published
   Property    IgnoreInvalidParams : Boolean      Read vIgnoreInvalidParams Write vIgnoreInvalidParams;
   Property    Events              : TDWEventList Read vEventList           Write vEventList;
@@ -154,7 +156,10 @@ Type
 //  Procedure SetEditParamList(Value : Boolean);
  Public
   Destructor  Destroy; Override;
-  Constructor Create(AOwner    : TComponent);Override; //Cria o Componente
+  Constructor Create        (AOwner    : TComponent);Override; //Cria o Componente
+  Procedure   CreateDWParams(EventName : String; Var DWParams : TDWParams);
+  Function    SendEvent     (EventName : String; Var DWParams : TDWParams;
+                             Var Error : String) : Boolean;
  Published
   Property    RESTClientPooler : TRESTClientPooler Read vRESTClientPooler Write vRESTClientPooler;
 //  Property    EditParamList    : Boolean           Read vEditParamList    Write SetEditParamList;
@@ -426,6 +431,35 @@ Begin
  Result := Format('{"serverevents":[%s]}', [vEventsLines]);
 End;
 
+Procedure TDWServerEvents.CreateDWParams(EventName    : String;
+                                         Var DWParams : TDWParams);
+Var
+ dwParam : TJSONParam;
+ I       : Integer;
+Begin
+ If vEventList.EventByName[EventName] <> Nil Then
+  Begin
+   If Not Assigned(DWParams) Then
+    DWParams := TDWParams.Create;
+   For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
+    Begin
+     If DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] = Nil Then
+      dwParam                := TJSONParam.Create(DWParams.Encoding)
+     Else
+      dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
+     dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
+     dwParam.ObjectDirection := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectDirection;
+     dwParam.ObjectValue     := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectValue;
+     dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
+     If vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '' Then
+      dwParam.Value           := vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue;
+     DWParams.Add(dwParam);
+    End;
+  End
+ Else
+  DWParams := Nil;
+End;
+
 Constructor TDWServerEvents.Create(AOwner : TComponent);
 Begin
  Inherited;
@@ -544,6 +578,36 @@ begin
  vEditParamList := True;
 end;
 
+Procedure TDWClientEvents.CreateDWParams(EventName    : String;
+                                         Var DWParams : TDWParams);
+Var
+ dwParam : TJSONParam;
+ I       : Integer;
+Begin
+ If vEventList.EventByName[EventName] <> Nil Then
+  Begin
+   If Not Assigned(DWParams) Then
+    DWParams := TDWParams.Create;
+   DWParams.Encoding := GetEncoding(vRESTClientPooler.Encoding);
+   For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
+    Begin
+     If DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] = Nil Then
+      dwParam                := TJSONParam.Create(DWParams.Encoding)
+     Else
+      dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
+     dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
+     dwParam.ObjectDirection := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectDirection;
+     dwParam.ObjectValue     := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectValue;
+     dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
+     If vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '' Then
+      dwParam.Value           := vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue;
+     DWParams.Add(dwParam);
+    End;
+  End
+ Else
+  DWParams := Nil;
+End;
+
 destructor TDWClientEvents.Destroy;
 begin
  vEventList.Free;
@@ -646,6 +710,14 @@ begin
  vEventList.Editable(vEditParamList);
 end;
 }
+
+Function TDWClientEvents.SendEvent(EventName    : String;
+                                   Var DWParams : TDWParams;
+                                   Var Error    : String): Boolean;
+Begin
+ If vRESTClientPooler <> Nil Then
+  vRESTClientPooler.SendEvent(EventName, DWParams);
+End;
 
 procedure TDWClientEvents.SetEventList(aValue : TDWEventList);
 begin

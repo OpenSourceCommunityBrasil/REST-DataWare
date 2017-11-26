@@ -1183,7 +1183,7 @@ object Form2: TForm2
     Top = 145
     Width = 104
     Height = 24
-    Caption = 'GetOnLine Events'
+    Caption = 'Server Time'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -1323,7 +1323,54 @@ object Form2: TForm2
   end
   object DWClientEvents1: TDWClientEvents
     RESTClientPooler = RESTClientPooler1
-    Events = <>
+    Events = <
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovTimeStamp
+            ParamName = 'result'
+            Encoded = False
+          end>
+        Name = 'servertime'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'value'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        Name = 'helloworld'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'cnpj'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        Name = 'dirf'
+      end>
     GetEvents = False
     Left = 237
     Top = 21

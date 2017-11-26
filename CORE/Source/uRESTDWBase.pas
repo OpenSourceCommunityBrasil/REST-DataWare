@@ -198,6 +198,10 @@ Type
   Procedure GetEvents                (ServerMethodsClass : TComponent;
                                       Var Pooler         : String;
                                       Var DWParams       : TDWParams);
+  Function ReturnEvent               (ServerMethodsClass : TComponent;
+                                      Var Pooler,
+                                      vResult            : String;
+                                      Var DWParams       : TDWParams) : Boolean;
  Public
   Constructor Create           (AOwner                : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                      //Destroy a Classe
@@ -269,6 +273,13 @@ Type
   Procedure ApplyUpdates_MassiveCache(ServerMethodsClass : TComponent;
                                       Var Pooler         : String;
                                       Var DWParams       : TDWParams);
+  Procedure GetEvents                (ServerMethodsClass : TComponent;
+                                      Var Pooler         : String;
+                                      Var DWParams       : TDWParams);
+  Function ReturnEvent               (ServerMethodsClass : TComponent;
+                                      Var Pooler,
+                                      vResult            : String;
+                                      Var DWParams       : TDWParams): Boolean;
  Public
   {$IFDEF FPC}
    Procedure Command(ARequest: TRequest;    AResponse: TResponse;   Var Handled: Boolean);
@@ -890,6 +901,20 @@ Begin
    Else
     JSONStr    := TReplyNOK;
   End
+ Else If vUrlMethod = UpperCase('GETEVENTS') Then
+  Begin
+   GetEvents(BaseObject, vResult, DWParams);
+   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+    JSONStr    := TReplyOK
+   Else
+    JSONStr    := TReplyNOK;
+   Result      := JSONStr = TReplyOK;
+  End
+ Else
+  Begin
+   If ReturnEvent(BaseObject, vUrlMethod, vResult, DWParams) Then
+    Result := vResult = TReplyOK;
+  End;
 End;
 
 procedure TRESTServiceCGI.EchoPooler(ServerMethodsClass: TComponent;
@@ -1138,6 +1163,71 @@ Begin
   End;
 End;
 
+Function TRESTServiceCGI.ReturnEvent(ServerMethodsClass : TComponent;
+                                     Var Pooler,
+                                     vResult            : String;
+                                     Var DWParams       : TDWParams) : Boolean;
+Var
+ I : Integer;
+Begin
+ Result    := False;
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TDWServerEvents Then
+      Begin
+       Result := TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler] <> Nil;
+       If Result Then
+        Begin
+         TDWServerEvents(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, DWParams);
+         If Assigned(TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent) Then
+          TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent(DWParams, vResult);
+         If Trim(vResult) = '' Then
+          vResult := TReplyOK;
+         Break;
+        End;
+      End;
+    End;
+  End;
+End;
+
+Procedure TRESTServiceCGI.GetEvents(ServerMethodsClass : TComponent;
+                                       Var Pooler         : String;
+                                       Var DWParams       : TDWParams);
+Var
+ I             : Integer;
+ vError        : Boolean;
+ vTempJSON,
+ vMessageError : String;
+Begin
+ vTempJSON := '';
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TDWServerEvents Then
+      Begin
+       If vTempJSON = '' Then
+        vTempJSON := Format('%s', [TDWServerEvents(ServerMethodsClass.Components[i]).Events.ToJSON])
+       Else
+        vTempJSON := vTempJSON + Format(', %s', [TDWServerEvents(ServerMethodsClass.Components[i]).Events.ToJSON])
+      End;
+    End;
+   vError := vTempJSON = '';
+   If vError Then
+    DWParams.ItemsString['MessageError'].AsString := 'Events Not Found';
+   DWParams.ItemsString['Error'].AsBoolean        := vError;
+   If DWParams.ItemsString['Result'] <> Nil Then
+    Begin
+     If vTempJSON <> '' Then
+      DWParams.ItemsString['Result'].SetValue(Format('[%s]', [vTempJSON]))
+     Else
+      DWParams.ItemsString['Result'].SetValue('');
+    End;
+  End;
+End;
+
 procedure TRESTServiceCGI.OpenDatasets(ServerMethodsClass: TComponent;
   Var Pooler: String; Var DWParams: TDWParams);
 Var
@@ -1323,7 +1413,7 @@ Var
       Begin
        For A := 0 To bJsonOBJTemp.count -1 Do
         Begin
-          bJsonOBJ :=  bJsonOBJTemp.get(A) as TJSONObject;
+         bJsonOBJ :=  bJsonOBJTemp.get(A) as TJSONObject;
          If bJsonOBJ.count = 0 Then
           Begin
            FreeAndNil(bJsonOBJ);
@@ -1332,7 +1422,7 @@ Var
          If GetObjectName(bJsonOBJ.Getvalue('ObjectType').value ) <> toParam Then
           Begin
            FreeAndNil(bJsonOBJ);
-           Break;
+           Continue;
           End;
          JSONParam := TJSONParam.Create(GetEncoding(TEncodeSelect(vRSCharset)));
          Try
@@ -1614,7 +1704,7 @@ Var
          If GetObjectName(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) <> toParam Then
           Begin
            FreeAndNil(bJsonOBJ);
-           Break;
+           Continue;
           End;
          JSONParam := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(GetEncoding(TEncodeSelect(vRSCharset))){$IFEND}{$ENDIF};
          Try
@@ -1626,7 +1716,7 @@ Var
            vValue := DecodeStrings(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString)
           Else
            vValue := bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString;
-          JSONParam.SetValue(vValue);
+          JSONParam.SetValue(vValue, JSONParam.Encoded);
           bJsonOBJ.clean;
           FreeAndNil(bJsonOBJ);
           //parametro criandos no servidor
@@ -1638,7 +1728,7 @@ Var
             ParamsData.Add(JSONParamNew);
            End
           Else
-           ParamsData.ItemsString[JSONParam.ParamName].SetValue(JSONParam.Value, JSONParam.Encoded);
+           ParamsData.ItemsString[JSONParam.ParamName].Value := JSONParam.Value; //, JSONParam.Encoded);
          Finally
           FreeAndNil(JSONParam);
           If Assigned(bJsonOBJ) Then
@@ -1927,7 +2017,7 @@ Var
          If GetObjectName(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) <> toParam Then
           Begin
            FreeAndNil(bJsonOBJ);
-           Break;
+           Continue;
           End;
          JSONParam := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(GetEncoding(TEncodeSelect(vRSCharset))){$IFEND}{$ENDIF};
          Try
@@ -2624,6 +2714,36 @@ Begin
   End;
 End;
 
+
+Function TRESTServicePooler.ReturnEvent(ServerMethodsClass : TComponent;
+                                        Var Pooler,
+                                        vResult            : String;
+                                        Var DWParams       : TDWParams) : Boolean;
+Var
+ I : Integer;
+Begin
+ Result    := False;
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If ServerMethodsClass.Components[i] is TDWServerEvents Then
+      Begin
+       Result := TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler] <> Nil;
+       If Result Then
+        Begin
+         TDWServerEvents(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, DWParams);
+         If Assigned(TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent) Then
+          TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent(DWParams, vResult);
+         If Trim(vResult) = '' Then
+          vResult := TReplyOK;
+         Break;
+        End;
+      End;
+    End;
+  End;
+End;
+
 Procedure TRESTServicePooler.GetEvents(ServerMethodsClass : TComponent;
                                        Var Pooler         : String;
                                        Var DWParams       : TDWParams);
@@ -2812,6 +2932,14 @@ Begin
    Else
     JSONStr    := TReplyNOK;
    Result      := JSONStr = TReplyOK;
+  End
+ Else
+  Begin
+   If ReturnEvent(BaseObject, vUrlMethod, vResult, DWParams) Then
+    Begin
+     JSONStr := vResult;
+     Result  := JSONStr <> '';
+    End;
   End;
 End;
 

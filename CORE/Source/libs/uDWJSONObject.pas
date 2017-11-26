@@ -754,7 +754,10 @@ Else
     End;
   End
  Else
-  vTempString := BytesArrToString(aValue);
+  Begin
+   If Length(vTempString) = 0 Then
+    vTempString := BytesArrToString(aValue);
+  End;
  If vObjectValue = ovString Then
   Begin
    If vTempString <> '' Then
@@ -1998,6 +2001,24 @@ Begin
    Else
     aValue := ToBytes(Format(TJsonStringValue, [bValue]));
   End
+ Else If vObjectValue in [ovDate, ovTime, ovDateTime, ovTimeStamp,
+                          ovOraTimeStamp, ovTimeStampOffset] Then
+  Begin
+   If vEncoded Then
+    Begin
+     {$IFDEF FPC}
+     aValue := ToBytes(Format(TJsonStringValue, [bValue]));
+     {$ELSE}
+     {$IF CompilerVersion > 21}
+     aValue := ToBytes(Format(TJsonStringValue, [bValue])); //TIdBytes(vEncoding.GetBytes(Format(TJsonStringValue, [bValue])));
+     {$ELSE}
+     aValue := ToBytes(Format(TJsonStringValue, [bValue]));
+     {$IFEND}
+     {$ENDIF}
+    End
+   Else
+    aValue := ToBytes(Format(TJsonStringValue, [bValue]));
+  End
  Else
   Begin
    {$IFNDEF FPC}
@@ -2329,7 +2350,7 @@ begin
   ovOraTimeStamp,
   ovTimeStampOffset : Begin
                        vObjectValue := ovDateTime;
-                       SetValue(FloatToStr(Value), vEncoded);
+                       SetValue(IntToStr(DateTimeToUnix(Value)), vEncoded);
                       End;
   ovString,
   ovFixedChar,
@@ -2407,7 +2428,7 @@ begin
                 End;
   varDate     : Begin
                  vObjectValue := ovDateTime;
-                 SetValue(FloatToStr(Value), False);
+                 SetValue(IntToStr(DateTimeToUnix(Value)), False);
                 End;
   vtWideChar,
   vtPWideChar,
@@ -2588,7 +2609,7 @@ Begin
   ovTimeStampOffset : Begin
                        If (vJSONValue.Value <> '') And
                           (lowercase(vJSONValue.Value) <> 'null') Then
-                        Result := StrToFloat(vJSONValue.Value)
+                        Result := UnixToDateTime(StrToInt(vJSONValue.Value))
                        Else
                         Result := Null;
                       End;
@@ -2678,7 +2699,7 @@ Begin
   ovTimeStampOffset : Begin
                        If (vJSONValue.Value <> '') And
                           (lowercase(vJSONValue.Value) <> 'null') Then
-                        Result := StrToFloat(vJSONValue.Value)
+                        Result := UnixToDateTime(StrToInt(vJSONValue.Value))
                        Else
                         Result := Null;
                       End;

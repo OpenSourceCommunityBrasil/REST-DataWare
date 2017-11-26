@@ -212,6 +212,9 @@ begin
 end;
 
 procedure TForm2.Button6Click(Sender: TObject);
+Var
+ dwParams      : TDWParams;
+ vErrorMessage : String;
 begin
  RESTClientPooler1.Host            := EHost.Text;
  RESTClientPooler1.Port            := StrToInt(EPort.Text);
@@ -222,7 +225,12 @@ begin
   RESTClientPooler1.TypeRequest := TTyperequest.trHttps
  Else
   RESTClientPooler1.TypeRequest := TTyperequest.trHttp;
- DWClientEvents1.GetEvents      := True;
+ DWClientEvents1.CreateDWParams('servertime', dwParams);
+ DWClientEvents1.SendEvent('servertime', dwParams, vErrorMessage);
+ If vErrorMessage = '' Then
+  Showmessage('Server Date/Time is : ' + DateTimeToStr(dwParams.ItemsString['result'].Value))
+ Else
+  Showmessage(vErrorMessage);
 end;
 
 PROCEDURE TForm2.FormCreate(Sender: TObject);

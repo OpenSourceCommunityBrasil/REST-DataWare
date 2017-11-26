@@ -112,19 +112,23 @@ END;
 procedure TServerMethodDM.DWServerEvents1EventsdirfReplyEvent(
   var Params: TDWParams; var Result: string);
 begin
- //dirf
+ If Params.ItemsString['result'] <> Nil Then
+  Params.ItemsString['result'].AsString := 'Respondido pelo Servidor';
 end;
 
 procedure TServerMethodDM.DWServerEvents1EventshelloworldReplyEvent(
   var Params: TDWParams; var Result: string);
 begin
- //helloworld
+ If Params.ItemsString['result'] <> Nil Then
+  Params.ItemsString['result'].AsString := 'Hello World...';
 end;
 
 procedure TServerMethodDM.DWServerEvents1EventsservertimeReplyEvent(
   var Params: TDWParams; var Result: string);
 begin
  //servertime
+ If Params.ItemsString['result'] <> Nil Then
+  Params.ItemsString['result'].AsDateTime := Now;
 end;
 
 PROCEDURE TServerMethodDM.ServerMethodDataModuleCreate(Sender: TObject);
