@@ -444,7 +444,7 @@ Begin
    For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
     Begin
      If DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] = Nil Then
-      dwParam                := TJSONParam.Create(DWParams.Encoding)
+      dwParam                := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF}
      Else
       dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
      dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
@@ -588,11 +588,13 @@ Begin
   Begin
    If Not Assigned(DWParams) Then
     DWParams := TDWParams.Create;
+   {$IFNDEF FPC}
    DWParams.Encoding := GetEncoding(vRESTClientPooler.Encoding);
+   {$ENDIF}
    For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
     Begin
      If DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] = Nil Then
-      dwParam                := TJSONParam.Create(DWParams.Encoding)
+      dwParam                := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF}
      Else
       dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
      dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
