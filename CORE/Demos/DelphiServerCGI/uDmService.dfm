@@ -2,9 +2,10 @@ object ServerMethodDM: TServerMethodDM
   OldCreateOrder = False
   OnCreate = ServerMethodDataModuleCreate
   OnReplyEvent = ServerMethodDataModuleReplyEvent
+  OnWelcomeMessage = ServerMethodDataModuleWelcomeMessage
   OnMassiveProcess = ServerMethodDataModuleMassiveProcess
-  Height = 220
-  Width = 366
+  Height = 164
+  Width = 221
   object RESTDWPoolerDB1: TRESTDWPoolerDB
     RESTDriver = RESTDWDriverFD1
     Compression = True
@@ -15,14 +16,14 @@ object ServerMethodDM: TServerMethodDM
     Active = True
     PoolerOffMessage = 'RESTPooler not active.'
     ParamCreate = True
-    Left = 96
-    Top = 120
+    Left = 52
+    Top = 103
   end
   object RESTDWDriverFD1: TRESTDWDriverFD
     CommitRecords = 100
     Connection = Server_FDConnection
-    Left = 96
-    Top = 72
+    Left = 53
+    Top = 59
   end
   object Server_FDConnection: TFDConnection
     Params.Strings = (
@@ -41,32 +42,89 @@ object ServerMethodDM: TServerMethodDM
     ConnectedStoredUsage = []
     LoginPrompt = False
     Transaction = FDTransaction1
+    OnError = Server_FDConnectionError
     BeforeConnect = Server_FDConnectionBeforeConnect
-    Left = 94
-    Top = 18
+    Left = 53
+    Top = 15
   end
   object FDPhysFBDriverLink1: TFDPhysFBDriverLink
-    Left = 278
-    Top = 103
+    Left = 109
+    Top = 59
   end
   object FDStanStorageJSONLink1: TFDStanStorageJSONLink
-    Left = 277
-    Top = 55
+    Left = 81
+    Top = 59
   end
   object FDGUIxWaitCursor1: TFDGUIxWaitCursor
     Provider = 'Forms'
-    Left = 278
-    Top = 11
+    Left = 109
+    Top = 15
   end
   object FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink
-    Left = 280
-    Top = 144
+    Left = 137
+    Top = 59
   end
   object FDTransaction1: TFDTransaction
     Options.AutoStop = False
     Options.DisconnectAction = xdRollback
     Connection = Server_FDConnection
-    Left = 160
-    Top = 16
+    Left = 81
+    Top = 15
+  end
+  object DWServerEvents1: TDWServerEvents
+    IgnoreInvalidParams = False
+    Events = <
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovTimeStamp
+            ParamName = 'result'
+            Encoded = False
+          end>
+        Name = 'servertime'
+        OnReplyEvent = DWServerEvents1EventsservertimeReplyEvent
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'value'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        Name = 'helloworld'
+        OnReplyEvent = DWServerEvents1EventshelloworldReplyEvent
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'cnpj'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        Name = 'dirf'
+        OnReplyEvent = DWServerEvents1EventsdirfReplyEvent
+      end>
+    Left = 80
+    Top = 103
   end
 end
