@@ -725,7 +725,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
        ftCurrency, ftBCD{$IFNDEF FPC}
                         {$IF CompilerVersion > 21}
                         , ftSingle
-                        {$ENDIF}
+                        {$IFEND}
                         {$ENDIF} : Begin
                                     If Not UpdateTag Then
                                      Begin

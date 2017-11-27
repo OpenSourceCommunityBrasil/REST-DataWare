@@ -719,7 +719,7 @@ If vEncoded Then
    End;
  End
 Else
- vTempString := BytesArrToString(aValue);
+ vTempString := removestr(BytesArrToString(aValue),'"');
 If vObjectValue = ovString Then
  Begin
   If vTempString <> '' Then
@@ -2699,7 +2699,7 @@ Begin
   ovTimeStampOffset : Begin
                        If (vJSONValue.Value <> '') And
                           (lowercase(vJSONValue.Value) <> 'null') Then
-                        Result := UnixToDateTime(StrToInt(vJSONValue.Value))
+                         Result := UnixToDateTime(StrToInt(vJSONValue.Value))
                        Else
                         Result := Null;
                       End;

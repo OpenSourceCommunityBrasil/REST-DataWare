@@ -282,6 +282,71 @@ begin
 end;
 }
 
+{$IFDEF POSIX}
+Procedure TDWEventList.FromJSON(Value : String);
+Var
+ bJsonOBJ,
+ bJsonOBJb,
+ bJsonOBJc    : system.json.TJsonObject;
+
+ bJsonArray,
+ bJsonArrayB,
+ bJsonArrayC  : system.json.TJsonArray;
+
+ I, X, Y      : Integer;
+ vDWEvent     : TDWEvent;
+ vDWParamMethod : TDWParamMethod;
+Begin
+ Try
+  bJsonArray  := TJSONObject.ParseJSONValue(Value) as TJSONArray;
+  For I := 0 to bJsonArray.count -1 Do
+   Begin
+    bJsonOBJ := bJsonArray.get(I) as TJsonobject;
+    Try
+     bJsonArrayB := bJsonOBJ.getvalue('serverevents') as Tjsonarray;
+     For X := 0 To bJsonArrayB.count -1 Do
+      Begin
+       bJsonOBJb := bJsonArrayB.get(X) as TJsonObject;
+       If EventByName[bJsonOBJb.getvalue('eventname').value] = Nil Then
+        vDWEvent  := TDWEvent(Self.Add)
+       Else
+        vDWEvent  := EventByName[bJsonOBJb.getvalue('eventname').value];
+       vDWEvent.Name := bJsonOBJb.getvalue('eventname').value;
+       If bJsonOBJb.getvalue('params').value <> '' Then
+        Begin
+         bJsonArrayC    := bJsonOBJb.getvalue('params') as Tjsonarray;
+         Try
+          For Y := 0 To bJsonArrayC.count -1 do
+           Begin
+            bJsonOBJc                      := bJsonArrayC.get(Y) as TJsonobject;
+            If vDWEvent.vDWParams.ParamByName[bJsonOBJc.getvalue('paramname').value] = Nil Then
+             vDWParamMethod                := TDWParamMethod(vDWEvent.vDWParams.Add)
+            Else
+             vDWParamMethod                := vDWEvent.vDWParams.ParamByName[bJsonOBJc.getvalue('paramname').value];
+            vDWParamMethod.TypeObject      := GetObjectName(bJsonOBJc.getvalue('typeobject').value);
+            vDWParamMethod.ObjectDirection := GetDirectionName(bJsonOBJc.getvalue('objectdirection').value);
+            vDWParamMethod.ObjectValue     := GetValueType(bJsonOBJc.getvalue('objectvalue').value);
+            vDWParamMethod.ParamName       := bJsonOBJc.getvalue('paramname').value;
+            vDWParamMethod.Encoded         := StringToBoolean(bJsonOBJc.getvalue('encoded').value);
+            If Trim(bJsonOBJc.getvalue('default').value) <> '' Then
+             vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.getvalue('default').value{$IFDEF FPC}, csUndefined{$ENDIF});
+           End;
+         Finally
+          bJsonArrayC.Free;
+         End;
+        End
+       Else
+        vDWEvent.vDWParams.ClearList;
+      End;
+    Finally
+     bJsonArrayB.Free;
+    End;
+   End;
+ Finally
+  bJsonArray.Free;
+ End;
+End;
+{$ELSE}
 Procedure TDWEventList.FromJSON(Value : String);
 Var
  bJsonOBJ,
@@ -345,6 +410,7 @@ Begin
   bJsonArray.Free;
  End;
 End;
+{$ENDIF}
 
 Function TDWEventList.GetOwner: TPersistent;
 Begin

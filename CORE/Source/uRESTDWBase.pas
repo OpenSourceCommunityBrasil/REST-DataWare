@@ -1446,7 +1446,8 @@ Var
             ParamsData.Add(JSONParamNew);
            End
           Else
-           ParamsData.ItemsString[JSONParam.ParamName].SetValue(JSONParam.Value, JSONParam.Encoded);
+          ParamsData.ItemsString[JSONParam.ParamName].Value := JSONParam.Value; //, JSONParam.Encoded);
+           //ParamsData.ItemsString[JSONParam.ParamName].SetValue(JSONParam.Value, JSONParam.Encoded);
          Finally
           FreeAndNil(JSONParam);
           If Assigned(bJsonOBJ) Then
@@ -1474,20 +1475,27 @@ Var
  Begin
   If DWParams <> Nil Then
    Begin
-    JSONParam                 := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF};
-    JSONParam.ParamName       := 'dwEventNameData';
-    JSONParam.ObjectDirection := odIn;
-    JSONParam.Value           := EventData;
-    DWParams.Add(JSONParam);
-    If Not (Assigned(StringStreamList)) Then
+     If Not (Assigned(StringStreamList)) Then
      StringStreamList := TStringStreamList.Create;
-    For I := 0 To DWParams.Count -1 Do
+     For I := 0 To DWParams.Count -1 Do
      Begin
-      If DWParams.Items[I].ObjectValue in [ovWideMemo, ovBytes, ovVarBytes, ovBlob,
+            If DWParams.Items[I].ObjectValue in [ovWideMemo, ovBytes, ovVarBytes, ovBlob,
                                            ovMemo,   ovGraphic, ovFmtMemo,  ovOraBlob, ovOraClob] Then
        Begin
-        StringStreamList.Add(TStringStream.Create(DWParams.Items[I].ToJSON, TEncoding.UTF8));
-        SendParamsData.AddObject(DWParams.Items[I].ParamName, 'multipart/form-data', HttpRequest.Request.Charset, StringStreamList.Items[StringStreamList.Count-1]);
+        StringStreamList.Add({$IFDEF FPC}
+                              TStringStream.Create(DWParams.Items[I].ToJSON)
+                             {$ELSE}
+                              TStringStream.Create(DWParams.Items[I].ToJSON{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND})
+                             {$ENDIF});
+        {$IFNDEF FPC}
+         {$if CompilerVersion > 21}
+          SendParamsData.AddObject(DWParams.Items[I].ParamName, 'multipart/form-data', HttpRequest.Request.Charset, StringStreamList.Items[StringStreamList.Count-1]);
+         {$ELSE}
+          SendParamsData.AddObject(DWParams.Items[I].ParamName, 'multipart/form-data', HttpRequest.Request.Charset, StringStreamList.Items[StringStreamList.Count-1]);
+         {$IFEND}
+        {$ELSE}
+         SendParamsData.AddObject(DWParams.Items[I].ParamName, 'multipart/form-data', HttpRequest.Request.Charset, StringStreamList.Items[StringStreamList.Count-1]);
+        {$ENDIF}
        End
       Else
        SendParamsData.AddFormField(DWParams.Items[I].ParamName, DWParams.Items[I].ToJSON);
