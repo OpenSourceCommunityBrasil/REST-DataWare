@@ -502,14 +502,17 @@ Procedure TDWServerEvents.CreateDWParams(EventName    : String;
 Var
  dwParam : TJSONParam;
  I       : Integer;
+ vFound  : Boolean;
 Begin
+ FreeAndNil(DWParams);
  If vEventList.EventByName[EventName] <> Nil Then
   Begin
    If Not Assigned(DWParams) Then
     DWParams := TDWParams.Create;
    For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
     Begin
-     If DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] = Nil Then
+     vFound  := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil;
+     If Not(vFound) Then
       dwParam                := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF}
      Else
       dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
@@ -519,7 +522,8 @@ Begin
      dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
      If vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '' Then
       dwParam.Value           := vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue;
-     DWParams.Add(dwParam);
+     If Not(vFound) Then
+      DWParams.Add(dwParam);
     End;
   End
  Else
@@ -649,8 +653,9 @@ Procedure TDWClientEvents.CreateDWParams(EventName    : String;
 Var
  dwParam : TJSONParam;
  I       : Integer;
+ vFound  : Boolean;
 Begin
-  freeandnil(DWParams);
+ FreeAndNil(DWParams);
  If vEventList.EventByName[EventName] <> Nil Then
   Begin
    If (Not Assigned(DWParams)) or (dwParams = nil) Then
@@ -660,7 +665,8 @@ Begin
    {$ENDIF}
    For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
     Begin
-     If DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] = Nil Then
+     vFound  := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil;
+     If Not(vFound) Then
       dwParam                := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF}
      Else
       dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
@@ -670,7 +676,8 @@ Begin
      dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
      If vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '' Then
       dwParam.Value           := vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue;
-     DWParams.Add(dwParam);
+     If Not(vFound) Then
+      DWParams.Add(dwParam);
     End;
   End
  Else
