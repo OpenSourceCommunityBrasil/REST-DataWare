@@ -2089,7 +2089,7 @@ Begin
    End;
   End
  Else If Param.DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
-  SetValue(intToStr(Param.Asinteger), False);
+  SetValue(intToStr(DateTimeToUnix(Param.AsDateTime)), False);
  vObjectValue            := FieldTypeToObjectValue(Param.DataType);
  vJSONValue.vObjectValue := vObjectValue;
 End;
