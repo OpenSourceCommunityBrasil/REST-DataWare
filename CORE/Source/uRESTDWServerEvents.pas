@@ -504,7 +504,7 @@ Var
  I       : Integer;
  vFound  : Boolean;
 Begin
- FreeAndNil(DWParams);
+ DWParams := Nil;
  If vEventList.EventByName[EventName] <> Nil Then
   Begin
    If Not Assigned(DWParams) Then
@@ -655,7 +655,7 @@ Var
  I       : Integer;
  vFound  : Boolean;
 Begin
- FreeAndNil(DWParams);
+ DWParams := Nil;
  If vEventList.EventByName[EventName] <> Nil Then
   Begin
    If (Not Assigned(DWParams)) or (dwParams = nil) Then
