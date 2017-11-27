@@ -2584,11 +2584,10 @@ Begin
                          If Value = ovBoolean Then
                           Result := (vJSONValue.Value = '1') or
                                     (lowercase(vJSONValue.Value) = 'true')
-                         Else
+                         Else If (Trim(vJSONValue.Value) <> '') And
+                                 (Trim(vJSONValue.Value) <> 'null') Then
                           Result := StrToInt(vJSONValue.Value)
-                        End
-                       Else
-                        Result := Null;
+                        End;
                       End;
   ovFloat,
   ovCurrency,
