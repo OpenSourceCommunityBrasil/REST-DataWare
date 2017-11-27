@@ -167,7 +167,7 @@ Var
            Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
-              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := StrToFloat(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := UnixToDateTime(StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value))
              Else
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := Null;
             End  //Tratar Blobs de Parametros...
@@ -239,7 +239,7 @@ Var
        Begin
         If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
            (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
-         Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+         Query.Params[I].AsDateTime  := UnixToDateTime(StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value))
         Else
          Query.Params[I].Clear;
        End  //Tratar Blobs de Parametros...
@@ -401,7 +401,7 @@ Var
             Begin
              If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
                 (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
-              Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+              Query.Params[I].AsDateTime  := UnixToDateTime(StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value))
              Else
               Query.Params[I].Clear;
             End  //Tratar Blobs de Parametros...
@@ -642,7 +642,7 @@ Begin
               Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
                Begin
                 If (Params[I].Value <> Null) Then
-                 vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
+                 vTempQuery.Params[A].AsDateTime  := Params[I].AsDateTime
                 Else
                  vTempQuery.Params[A].Clear;
                End  //Tratar Blobs de Parametros...
@@ -714,7 +714,7 @@ Begin
             Else If vTempQuery.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
              Begin
               If (Params[I].Value <> Null) Then
-               vTempQuery.Params[I].AsDateTime  := StrToFloat(Params[I].Value)
+               vTempQuery.Params[I].AsDateTime  := Params[I].AsDateTime
               Else
                vTempQuery.Params[I].Clear;
              End  //Tratar Blobs de Parametros...
@@ -993,7 +993,7 @@ Var
            Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
-              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := StrToFloat(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := UnixToDateTime(StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value))
              Else
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := Null;
             End  //Tratar Blobs de Parametros...
@@ -1072,7 +1072,7 @@ Var
        Begin
         If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
            (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
-         Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+         Query.Params[I].AsDateTime  := UnixToDateTime(StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value))
         Else
          Query.Params[I].Clear;
        End  //Tratar Blobs de Parametros...
@@ -1234,7 +1234,7 @@ Var
             Begin
              If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
                 (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
-              Query.Params[I].AsDateTime  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+              Query.Params[I].AsDateTime  := UnixToDateTime(StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value))
              Else
               Query.Params[I].Clear;
             End  //Tratar Blobs de Parametros...
@@ -1439,7 +1439,7 @@ Begin
                  Else If vTempQuery.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
                   Begin
                    If Trim(Params[I].Value) <> '' Then
-                    vTempQuery.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
+                    vTempQuery.Params[A].AsDateTime  := Params[I].AsDateTime
                    Else
                     vTempQuery.Params[A].Clear;
                   End  //Tratar Blobs de Parametros...
@@ -1656,7 +1656,7 @@ Begin
             Else If fdCommand.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
-               fdCommand.Params[A].AsDateTime  := StrToFloat(Params[I].Value)
+               fdCommand.Params[A].AsDateTime  := Params[I].AsDateTime
               Else
                fdCommand.Params[A].AsDateTime  := Null;
              End  //Tratar Blobs de Parametros...

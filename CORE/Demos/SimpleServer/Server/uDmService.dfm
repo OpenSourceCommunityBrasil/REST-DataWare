@@ -78,8 +78,8 @@ object ServerMethodDM: TServerMethodDM
         DWParams = <
           item
             TypeObject = toParam
-            ObjectDirection = odOUT
-            ObjectValue = ovTimeStamp
+            ObjectDirection = odINOUT
+            ObjectValue = ovDateTime
             ParamName = 'result'
             Encoded = False
           end>

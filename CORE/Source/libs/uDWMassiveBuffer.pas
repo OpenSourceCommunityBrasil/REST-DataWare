@@ -751,7 +751,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                     If Not UpdateTag Then
                                      Begin
                                       If Trim(Field.AsString) <> '' Then
-                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := FloatToStr(Field.AsDateTime)
+                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := IntToStr(DateTimeToUnix(Field.AsDateTime))
                                       Else
                                        MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
                                      End
@@ -760,7 +760,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                       If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> Field.AsString Then
                                        Begin
                                         If Trim(Field.AsString) <> '' Then
-                                         MassiveLineBuff.vMassiveValues.Items[I + 1].Value := FloatToStr(Field.AsDateTime)
+                                         MassiveLineBuff.vMassiveValues.Items[I + 1].Value := IntToStr(DateTimeToUnix(Field.AsDateTime))
                                         Else
                                          MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
                                         MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
