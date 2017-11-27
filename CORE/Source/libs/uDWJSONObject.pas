@@ -2581,7 +2581,7 @@ Begin
                        If (vJSONValue.Value <> '') And
                           (lowercase(vJSONValue.Value) <> 'null') Then
                         Begin
-                         If vObjectValue = ovBoolean Then
+                         If Value = ovBoolean Then
                           Result := (vJSONValue.Value = '1') or
                                     (lowercase(vJSONValue.Value) = 'true')
                          Else
