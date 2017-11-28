@@ -1759,21 +1759,16 @@ Var
  End;
  Procedure SetParamsValues(DWParams : TDWParams; SendParamsData : TIdMultipartFormDataStream);
  Var
-  I : Integer;
+  I         : Integer;
   JSONParam : TJSONParam;
  Begin
   If DWParams <> Nil Then
    Begin
-    JSONParam                 := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF};
-    JSONParam.ParamName       := 'dwEventNameData';
-    JSONParam.ObjectDirection := odIn;
-    JSONParam.AsString        := EventData;
-    DWParams.Add(JSONParam);
-    If Not (Assigned(StringStreamList)) Then
+     If Not (Assigned(StringStreamList)) Then
      StringStreamList := TStringStreamList.Create;
-    For I := 0 To DWParams.Count -1 Do
+     For I := 0 To DWParams.Count -1 Do
      Begin
-      If DWParams.Items[I].ObjectValue in [ovWideMemo, ovBytes, ovVarBytes, ovBlob,
+            If DWParams.Items[I].ObjectValue in [ovWideMemo, ovBytes, ovVarBytes, ovBlob,
                                            ovMemo,   ovGraphic, ovFmtMemo,  ovOraBlob, ovOraClob] Then
        Begin
         StringStreamList.Add({$IFDEF FPC}
