@@ -3115,7 +3115,7 @@ Begin
                 vWelcomeMessage := DecodeStrings(ms.DataString{$IFDEF FPC}, csUndefined{$ENDIF})
                Else
                 Begin
-                 If Not Assigned(DWParams) Then
+                 If DWParams = Nil Then
                   Begin
                    DWParams           := TDWParams.Create;
                    {$IFNDEF FPC}

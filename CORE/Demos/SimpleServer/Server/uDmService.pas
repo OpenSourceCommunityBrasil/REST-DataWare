@@ -108,8 +108,10 @@ END;
 procedure TServerMethodDM.DWServerEvents1EventsservertimeReplyEvent(
   var Params: TDWParams; var Result: string);
 begin
- If Params.ItemsString['result'] <> Nil Then //servertime
-  Params.ItemsString['result'].AsDateTime := Now;
+ If Params.ItemsString['inputdata'].AsString <> '' Then //servertime
+  Params.ItemsString['result'].AsDateTime := Now
+ Else
+  Params.ItemsString['result'].AsDateTime := Now - 1;
 end;
 
 PROCEDURE TServerMethodDM.ServerMethodDataModuleCreate(Sender: TObject);

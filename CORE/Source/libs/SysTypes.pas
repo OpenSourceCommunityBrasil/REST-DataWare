@@ -85,7 +85,8 @@ Var
   End;
 
 Begin
-  NewCmd := Cmd;
+ Result := Nil;
+ NewCmd := Cmd;
   If CountExpression(NewCmd, '/') > 0 Then
   Begin
     ArraySize := CountExpression(NewCmd, '/');

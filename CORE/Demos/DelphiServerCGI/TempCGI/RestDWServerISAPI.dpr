@@ -27,6 +27,5 @@ begin
   Application.WebModuleClass              := Nil;
   TISAPIApplication(Application).OnTerminate := TerminateThreads;
   Application.CreateForm(TdwCGIService, dwCGIService);
-  //  Application.CreateForm(TServerMethodDM, ServerMethodDM);
   Application.Run;
 end.

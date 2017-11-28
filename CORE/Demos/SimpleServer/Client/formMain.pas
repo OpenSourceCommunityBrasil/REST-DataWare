@@ -239,6 +239,7 @@ begin
  Else
   RESTClientPooler1.TypeRequest := TTyperequest.trHttp;
  DWClientEvents1.CreateDWParams('servertime', dwParams);
+ dwParams.ItemsString['inputdata'].AsString := 'teste de string';
  DWClientEvents1.SendEvent('servertime', dwParams, vErrorMessage);
  If vErrorMessage = '' Then
   Showmessage('Server Date/Time is : ' + DateTimeToStr(dwParams.ItemsString['result'].Value))

@@ -504,10 +504,9 @@ Var
  I       : Integer;
  vFound  : Boolean;
 Begin
- DWParams := Nil;
  If vEventList.EventByName[EventName] <> Nil Then
   Begin
-   If Not Assigned(DWParams) Then
+   If (Not (Assigned(DWParams))) Or (DWParams = Nil) Then
     DWParams := TDWParams.Create;
    For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
     Begin
