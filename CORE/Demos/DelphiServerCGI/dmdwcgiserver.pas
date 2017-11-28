@@ -43,7 +43,6 @@ end;
 procedure TdwCGIService.WebModuleCreate(Sender: TObject);
 begin
  RESTServiceCGI1.ServerMethodClass := TServerMethodDM;
- RESTServiceCGI1.DataCompression   := DataCompress;
 end;
 
 initialization

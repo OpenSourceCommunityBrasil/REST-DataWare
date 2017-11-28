@@ -85,7 +85,7 @@ object ServerMethodDM: TServerMethodDM
           end
           item
             TypeObject = toParam
-            ObjectDirection = odINOUT
+            ObjectDirection = odIN
             ObjectValue = ovString
             ParamName = 'inputdata'
             Encoded = True

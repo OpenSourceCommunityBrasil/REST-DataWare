@@ -10,7 +10,6 @@ Const
  servidor     = '127.0.0.1';
  EncodedData  = True;
  ActivePooler = True;
- DataCompress = False;
  database     = 'EMPLOYEE.FDB';
  pasta        = 'D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\';
  serverPort   = 8070;

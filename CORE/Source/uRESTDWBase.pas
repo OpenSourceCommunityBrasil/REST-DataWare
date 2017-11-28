@@ -139,7 +139,6 @@ Type
   {$ELSE}
    vCriticalSection : TRTLCriticalSection;
   {$ENDIF}
-  vDataCompress,
   vEncodeStrings,
   vActive          : Boolean;
   vProxyOptions    : TProxyOptions;
@@ -207,7 +206,6 @@ Type
   Destructor  Destroy;Override;                      //Destroy a Classe
  Published
   Property Active                : Boolean         Read vActive                Write SetActive;
-  Property DataCompression       : Boolean         Read vDatacompress          Write vDatacompress;
   Property Secure                : Boolean         Read GetSecure;
   Property EncodeStrings         : Boolean         Read vEncodeStrings         Write vEncodeStrings;
   Property ServicePort           : Integer         Read vServicePort           Write vServicePort;  //A Porta do Serviço do DataSet
@@ -236,7 +234,6 @@ Type
  Private
   vServerContext,
   FRootPath        : String;
-  vDataCompress,
   vEncodeStrings   : Boolean;
   vServerBaseMethod,
   vServerMethod    : TComponentClass;
@@ -289,7 +286,6 @@ Type
   Constructor Create           (AOwner                : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                      //Destroy a Classe
  Published
-  Property DataCompression       : Boolean         Read vDatacompress          Write vDatacompress;
   Property EncodeStrings         : Boolean         Read vEncodeStrings         Write vEncodeStrings;
   Property ServerParams          : TServerParams   Read vServerParams          Write vServerParams;
   Property ServerMethodClass     : TComponentClass Read vServerMethod          Write SetServerMethod;
@@ -402,6 +398,7 @@ Var
  newdecoder,
  Decoder            : TIdMessageDecoder;
  JSONParam          : TJSONParam;
+ compresseddata,
  msgEnd             : Boolean;
  mb,
  vContentStringStream,
@@ -427,6 +424,7 @@ Var
 Begin
  vTempServerMethods := Nil;
  DWParams           := Nil;
+ compresseddata     := False;
  {$IFNDEF FPC}
    Cmd := Trim(ARequest.PathInfo);
    AResponse.CustomHeaders.Add('Access-Control-Allow-Origin=*');
@@ -573,6 +571,8 @@ Begin
                 TIdMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
                If pos('dwwelcomemessage', tmp) > 0 Then
                 vWelcomeMessage := DecodeStrings(ms.DataString{$IFDEF FPC}, csUndefined{$ENDIF})
+               Else If pos('datacompression', tmp) > 0 Then
+                compresseddata := StringToBoolean(ms.DataString)
                Else
                 Begin
                  If Not Assigned(DWParams) Then
@@ -649,15 +649,34 @@ Begin
         Begin
          If UrlMethod = '' Then
           Begin
-           UrlMethod := Cmd;
-           While (Length(UrlMethod) > 0) Do
+           {$IFNDEF FPC}
+           If ARequest.PathInfo + ARequest.Query <> '' Then
+           {$ELSE}
+           If ARequest.URI <> '' Then
+           {$ENDIF}
             Begin
+             {$IFNDEF FPC}
+             UrlMethod := Trim(ARequest.PathInfo + ARequest.Query);
+             {$ELSE}
+             UrlMethod := Trim(ARequest.URI);
+             {$ENDIF}
+             If UrlMethod <> '' Then
+              If UrlMethod[1] = '/' then
+               Delete(UrlMethod, 1, 1);
              If Pos('/', UrlMethod) > 0 then
-              Delete(UrlMethod, 1, 1)
-             Else
+              UrlMethod := Copy(UrlMethod, 1, Pos('/', UrlMethod) -1);
+            End
+           Else
+            Begin
+             While (Length(UrlMethod) > 0) Do
               Begin
-               UrlMethod := Trim(UrlMethod);
-               Break;
+               If Pos('/', UrlMethod) > 0 then
+                Delete(UrlMethod, 1, 1)
+               Else
+                Begin
+                 UrlMethod := Trim(UrlMethod);
+                 Break;
+                End;
               End;
             End;
           End;
@@ -704,7 +723,7 @@ Begin
          vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr])
         Else
          vReplyString := 'Message (Internal Error)';
-        If vDataCompress Then
+        If compresseddata Then
          Begin
           ZCompressStr(vReplyString, vReplyStringResult);
           mb                                 := TStringStream.Create(vReplyStringResult);
@@ -1313,7 +1332,6 @@ begin
   vServerParams.Password          := 'testserver';
   vServerContext                  := 'restdataware';
   VEncondig                       := esASCII;
-  vDataCompress                   := True;
 end;
 
 destructor TRESTServiceCGI.Destroy;
@@ -1561,6 +1579,7 @@ Begin
         SetParamsValues(Params, SendParams);
        If vWelcomeMessage <> '' Then
         SendParams.AddFormField('dwwelcomemessage', EncodeStrings(vWelcomeMessage));
+       SendParams.AddFormField('datacompression', BooleanToString(vDatacompress));
        If (Params <> Nil) Or (vWelcomeMessage <> '') Then
         Begin
          HttpRequest.Request.ContentType     := 'application/x-www-form-urlencoded';
@@ -1850,6 +1869,7 @@ Begin
         SetParamsValues(Params, SendParams);
        If vWelcomeMessage <> '' Then
         SendParams.AddFormField('dwwelcomemessage', EncodeStrings(vWelcomeMessage));
+       SendParams.AddFormField('datacompression', BooleanToString(vDatacompress));
        If (Params <> Nil) Or (vWelcomeMessage <> '') Then
         Begin
          HttpRequest.Request.ContentType     := 'application/x-www-form-urlencoded';
@@ -2963,6 +2983,7 @@ Var
  newdecoder,
  Decoder            : TIdMessageDecoder;
  JSONParam          : TJSONParam;
+ compresseddata,
  msgEnd             : Boolean;
  mb,
  ms                 : TStringStream;
@@ -2986,6 +3007,7 @@ Var
 Begin
  vTempServerMethods := Nil;
  DWParams           := Nil;
+ compresseddata     := False;
  Cmd := Trim(ARequestInfo.RawHTTPCommand);
  {$IFNDEF FPC}
   {$if CompilerVersion > 21}
@@ -3108,6 +3130,8 @@ Begin
                 TIdMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
                If pos('dwwelcomemessage', tmp) > 0 Then
                 vWelcomeMessage := DecodeStrings(ms.DataString{$IFDEF FPC}, csUndefined{$ENDIF})
+               Else If pos('datacompression', tmp) > 0 Then
+                compresseddata := StringToBoolean(ms.DataString)
                Else
                 Begin
                  If DWParams = Nil Then
@@ -3223,15 +3247,26 @@ Begin
         Begin
          If UrlMethod = '' Then
           Begin
-           UrlMethod := Cmd;
-           While (Length(UrlMethod) > 0) Do
+           If ARequestInfo.URI <> '' Then
             Begin
+             UrlMethod := Trim(ARequestInfo.URI);
+             If UrlMethod <> '' Then
+              If UrlMethod[1] = '/' then
+               Delete(UrlMethod, 1, 1);
              If Pos('/', UrlMethod) > 0 then
-              Delete(UrlMethod, 1, 1)
-             Else
+              UrlMethod := Copy(UrlMethod, 1, Pos('/', UrlMethod) -1);
+            End
+           Else
+            Begin
+             While (Length(UrlMethod) > 0) Do
               Begin
-               UrlMethod := Trim(UrlMethod);
-               Break;
+               If Pos('/', UrlMethod) > 0 then
+                Delete(UrlMethod, 1, 1)
+               Else
+                Begin
+                 UrlMethod := Trim(UrlMethod);
+                 Break;
+                End;
               End;
             End;
           End;
@@ -3270,7 +3305,7 @@ Begin
         End;
        Try
         vReplyString                         := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
-        If vDataCompress Then
+        If compresseddata Then
          Begin
           ZCompressStr(vReplyString, vReplyStringResult);
           mb                                 := TStringStream.Create(vReplyStringResult);
@@ -3463,7 +3498,6 @@ Begin
  vServerContext                  := 'restdataware';
  VEncondig                       := esASCII;
  vServicePort                    := 8082;
- vDataCompress                   := True;
 End;
 
 Destructor TRESTServicePooler.Destroy;

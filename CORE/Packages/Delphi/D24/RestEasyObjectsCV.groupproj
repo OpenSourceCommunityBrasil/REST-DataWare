@@ -63,13 +63,13 @@
         <Projects Include="..\..\..\Demos\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\..\..\Demos\WindowsService\WindowsDWService.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="..\..\..\Demos\DelphiServerCGI\dwCGIServer.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\..\Demos\DelphiServerCGI\TempCGI\RestDWServerISAPI.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\WindowsService\WindowsDWService.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -260,15 +260,6 @@
     <Target Name="exemplounigui:Make">
         <MSBuild Projects="..\..\..\Demos\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj" Targets="Make"/>
     </Target>
-    <Target Name="WindowsDWService">
-        <MSBuild Projects="..\..\..\Demos\WindowsService\WindowsDWService.dproj"/>
-    </Target>
-    <Target Name="WindowsDWService:Clean">
-        <MSBuild Projects="..\..\..\Demos\WindowsService\WindowsDWService.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="WindowsDWService:Make">
-        <MSBuild Projects="..\..\..\Demos\WindowsService\WindowsDWService.dproj" Targets="Make"/>
-    </Target>
     <Target Name="dwCGIServer">
         <MSBuild Projects="..\..\..\Demos\DelphiServerCGI\dwCGIServer.dproj"/>
     </Target>
@@ -287,14 +278,23 @@
     <Target Name="RestDWServerISAPI:Make">
         <MSBuild Projects="..\..\..\Demos\DelphiServerCGI\TempCGI\RestDWServerISAPI.dproj" Targets="Make"/>
     </Target>
+    <Target Name="WindowsDWService">
+        <MSBuild Projects="..\..\..\Demos\WindowsService\WindowsDWService.dproj"/>
+    </Target>
+    <Target Name="WindowsDWService:Clean">
+        <MSBuild Projects="..\..\..\Demos\WindowsService\WindowsDWService.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WindowsDWService:Make">
+        <MSBuild Projects="..\..\..\Demos\WindowsService\WindowsDWService.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;RESTDWDriverZEOS;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClienteFMX;ClientSlides;Server_OSX;SimpleCRUD;ArrayDatasetProcess;exemplounigui;WindowsDWService;dwCGIServer;RestDWServerISAPI"/>
+        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;RESTDWDriverZEOS;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClienteFMX;ClientSlides;Server_OSX;SimpleCRUD;ArrayDatasetProcess;exemplounigui;dwCGIServer;RestDWServerISAPI;WindowsDWService"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;RESTDWDriverZEOS:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClienteFMX:Clean;ClientSlides:Clean;Server_OSX:Clean;SimpleCRUD:Clean;ArrayDatasetProcess:Clean;exemplounigui:Clean;WindowsDWService:Clean;dwCGIServer:Clean;RestDWServerISAPI:Clean"/>
+        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;RESTDWDriverZEOS:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClienteFMX:Clean;ClientSlides:Clean;Server_OSX:Clean;SimpleCRUD:Clean;ArrayDatasetProcess:Clean;exemplounigui:Clean;dwCGIServer:Clean;RestDWServerISAPI:Clean;WindowsDWService:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;RESTDWDriverZEOS:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClienteFMX:Make;ClientSlides:Make;Server_OSX:Make;SimpleCRUD:Make;ArrayDatasetProcess:Make;exemplounigui:Make;WindowsDWService:Make;dwCGIServer:Make;RestDWServerISAPI:Make"/>
+        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;RESTDWDriverZEOS:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClienteFMX:Make;ClientSlides:Make;Server_OSX:Make;SimpleCRUD:Make;ArrayDatasetProcess:Make;exemplounigui:Make;dwCGIServer:Make;RestDWServerISAPI:Make;WindowsDWService:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

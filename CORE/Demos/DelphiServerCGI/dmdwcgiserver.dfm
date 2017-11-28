@@ -11,7 +11,6 @@ object dwCGIService: TdwCGIService
   Height = 240
   Width = 290
   object RESTServiceCGI1: TRESTServiceCGI
-    DataCompression = True
     EncodeStrings = True
     ServerParams.HasAuthentication = True
     ServerParams.UserName = 'testserver'

@@ -58,20 +58,16 @@ Type
 
 implementation
 
-{ TServerMethods }
 
-// Retorna um array de strings com os parametros vindos da URL
-// Ex de Cmd : 'GET /NomedoMetodo/Argumento1/Argumento2/ArgumentoN HTTP/1.1'
-Class Function TServerUtils.ParseRESTURL(Const Cmd: String
-{$IFNDEF FPC}
-{$IF CompilerVersion > 21};
-  vEncoding: TEncoding
-{$IFEND}
-{$ENDIF}): TDWParams;
+Class Function TServerUtils.ParseRESTURL(Const Cmd: String{$IFNDEF FPC}{$IF CompilerVersion > 21};
+                                         vEncoding: TEncoding{$IFEND}{$ENDIF}): TDWParams;
 Var
   NewCmd: String;
-  ArraySize, iBar1, IBar2, Cont: Integer;
-  JSONParam: TJSONParam;
+  ArraySize,
+  iBar1,
+  IBar2, Cont : Integer;
+  newFlags    : Boolean;
+  JSONParam   : TJSONParam;
   Function CountExpression(Value: String; Expression: Char): Integer;
   Var
     I: Integer;
@@ -83,39 +79,37 @@ Var
         Inc(Result);
     End;
   End;
-
 Begin
  Result := Nil;
+ JSONParam := Nil;
  NewCmd := Cmd;
-  If CountExpression(NewCmd, '/') > 0 Then
+ If (CountExpression(NewCmd, '/') > 0) Then
   Begin
-    ArraySize := CountExpression(NewCmd, '/');
-    // SetLength(Result, ArraySize);
-    Result := TDWParams.Create;
-{$IFNDEF FPC}
-{$IF CompilerVersion > 21}
-    Result.Encoding := vEncoding;
-{$IFEND}
-{$ENDIF}
-    NewCmd := NewCmd + '/';
-    iBar1 := Pos('/', NewCmd);
-    Delete(NewCmd, 1, iBar1);
-    For Cont := 0 to ArraySize - 1 Do
+   ArraySize := CountExpression(NewCmd, '/');
+   Result := TDWParams.Create;
+   {$IFNDEF FPC}
+   {$IF CompilerVersion > 21}
+   Result.Encoding := vEncoding;
+   {$IFEND}
+   {$ENDIF}
+   NewCmd := NewCmd + '/';
+   iBar1 := Pos('/', NewCmd);
+   Delete(NewCmd, 1, iBar1);
+   For Cont := 0 to ArraySize - 1 Do
     Begin
-      IBar2 := Pos('/', NewCmd);
-      JSONParam := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21} (Result.Encoding){$IFEND}{$ENDIF};
-      JSONParam.ParamName := Format('PARAM%d', [Cont + 1]);
-{$IFNDEF FPC}
-{$IF CompilerVersion > 21}
-      JSONParam.SetValue(TIdURI.URLDecode(Copy(NewCmd, 1, IBar2 - 1),
-        IndyTextEncoding(encUTF8)));
-{$ELSE}
-      JSONParam.SetValue(TIdURI.URLDecode(Copy(NewCmd, 1, IBar2 - 1)));
-{$IFEND}
-{$ELSE}
-      JSONParam.SetValue(TIdURI.URLDecode(Copy(NewCmd, 1, IBar2 - 1)));
-{$ENDIF}
-      Delete(NewCmd, 1, IBar2);
+     JSONParam := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21} (Result.Encoding){$IFEND}{$ENDIF};
+     IBar2 := Pos('/', NewCmd);
+     JSONParam.ParamName := Format('PARAM%d', [Cont + 1]);
+     {$IFNDEF FPC}
+     {$IF CompilerVersion > 21}
+     JSONParam.SetValue(TIdURI.URLDecode(Copy(NewCmd, 1, IBar2 - 1), IndyTextEncoding(encUTF8)));
+     {$ELSE}
+     JSONParam.SetValue(TIdURI.URLDecode(Copy(NewCmd, 1, IBar2 - 1)));
+     {$IFEND}
+     {$ELSE}
+     JSONParam.SetValue(TIdURI.URLDecode(Copy(NewCmd, 1, IBar2 - 1)));
+     {$ENDIF}
+     Delete(NewCmd, 1, IBar2);
     End;
   End;
  //Alexandre Magno - 07/11/2017
@@ -166,7 +160,14 @@ Begin
     For I := 0 To Params.Count - 1 Do
      Begin
       JSONParam := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(Result.Encoding){$IFEND}{$ENDIF};
-      JSONParam.FromJSON(Trim(Copy(Params[I], Pos('=', Params[I]) + 1, Length(Params[I]))));
+      JSONParam.ObjectDirection := odIN;
+      If Pos('{', Params[I]) > 0 Then
+       JSONParam.FromJSON(Trim(Copy(Params[I], Pos('=', Params[I]) + 1, Length(Params[I]))))
+      Else
+       Begin
+        JSONParam.ParamName := Copy(Params[I], 1, Pos('=', Params[I]) - 1);
+        JSONParam.AsString  := Trim(Copy(Params[I], Pos('=', Params[I]) + 1, Length(Params[I])));
+       End;
       Result.Add(JSONParam);
      End;
    End

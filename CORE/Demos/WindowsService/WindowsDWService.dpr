@@ -9,8 +9,7 @@ uses
   System.SysUtils,
   uRESTDWBase,
   uConsts in 'uConsts.pas',
-  uDmService in 'uDmService.pas' {ServerMethodDM: TServerMethodDataModule},
-  Server.Containner in 'Server.Containner.pas' {RESTDWServer: TService};
+  uDmService in 'uDmService.pas' {ServerMethodDM: TServerMethodDataModule};
 
 {$R *.RES}
 
@@ -23,8 +22,7 @@ Begin
   RESTServicePooler.SSLPrivateKeyPassword := SSLPrivateKeyPassword;
   RESTServicePooler.SSLCertFile           := SSLCertFile;
   RESTServicePooler.EncodeStrings         := EncodedData;
-  RESTServicePooler.DataCompression       := True;
-  RESTServicePooler.Active                := RESTServicePooler.DataCompression;
+  RESTServicePooler.Active                := True;
   {$ifdef DEBUG}
   Try
    // In debug mode the server acts as a console application.
@@ -43,7 +41,6 @@ Begin
    // Run as a true windows service (release).
    If Not Application.DelayInitialize Or Application.Installing Then
     Application.Initialize;
-  Application.CreateForm(TRESTDWServer, RESTDWServer);
   Application.Run;
   {$endif}
 End.

@@ -1480,7 +1480,6 @@ object RestDWForm: TRestDWForm
   end
   object RESTServicePooler1: TRESTServicePooler
     Active = False
-    DataCompression = True
     EncodeStrings = True
     ServicePort = 8082
     ProxyOptions.Port = 8888
