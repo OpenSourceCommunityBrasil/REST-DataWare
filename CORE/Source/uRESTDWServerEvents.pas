@@ -312,7 +312,7 @@ Begin
        Else
         vDWEvent  := EventByName[bJsonOBJb.getvalue('eventname').value];
        vDWEvent.Name := bJsonOBJb.getvalue('eventname').value;
-       If bJsonOBJb.getvalue('params').value <> '' Then
+       If bJsonOBJb.getvalue('params').ToString <> '' Then
         Begin
          bJsonArrayC    := bJsonOBJb.getvalue('params') as Tjsonarray;
          Try
