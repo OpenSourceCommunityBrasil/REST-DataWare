@@ -21,14 +21,22 @@ object DM: TDM
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    DateSeparator = '/'
-    TimeSeparator = ':'
-    DecimalSeparator = ','
+    ParamCreate = True
     Left = 32
     Top = 8
   end
   object CdsConfig: TRESTDWClientSQL
     FieldDefs = <>
+    IndexDefs = <>
+    MasterFields = ''
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
     DataCache = False
@@ -37,11 +45,24 @@ object DM: TDM
     SQL.Strings = (
       'select * from sys_config')
     CacheUpdateRecords = False
+    AutoCommitData = False
+    AutoRefreshAfterCommit = False
+    InBlockEvents = False
     Left = 32
     Top = 64
   end
   object Ret_sql: TRESTDWClientSQL
     FieldDefs = <>
+    IndexDefs = <>
+    MasterFields = ''
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
     DataCache = False
@@ -50,11 +71,24 @@ object DM: TDM
     SQL.Strings = (
       '')
     CacheUpdateRecords = False
+    AutoCommitData = False
+    AutoRefreshAfterCommit = False
+    InBlockEvents = False
     Left = 456
     Top = 88
   end
   object CdsEmpresa: TRESTDWClientSQL
     FieldDefs = <>
+    IndexDefs = <>
+    MasterFields = ''
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
     DataCache = False
@@ -63,6 +97,9 @@ object DM: TDM
     SQL.Strings = (
       '')
     CacheUpdateRecords = False
+    AutoCommitData = False
+    AutoRefreshAfterCommit = False
+    InBlockEvents = False
     Left = 32
     Top = 128
   end
@@ -40400,6 +40437,16 @@ object DM: TDM
   end
   object RunSql: TRESTDWClientSQL
     FieldDefs = <>
+    IndexDefs = <>
+    MasterFields = ''
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
     DataCache = False
@@ -40408,6 +40455,9 @@ object DM: TDM
     SQL.Strings = (
       'select * from sys_config')
     CacheUpdateRecords = False
+    AutoCommitData = False
+    AutoRefreshAfterCommit = False
+    InBlockEvents = False
     Left = 344
     Top = 88
   end
@@ -40429,12 +40479,25 @@ object DM: TDM
   end
   object cdsLocalizar: TRESTDWClientSQL
     FieldDefs = <>
+    IndexDefs = <>
+    MasterFields = ''
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
     DataCache = False
     Params = <>
     DataBase = Coneccao
     CacheUpdateRecords = True
+    AutoCommitData = False
+    AutoRefreshAfterCommit = False
+    InBlockEvents = False
     Left = 400
     Top = 88
   end

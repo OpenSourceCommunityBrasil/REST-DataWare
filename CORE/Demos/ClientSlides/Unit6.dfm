@@ -1125,7 +1125,7 @@ object Form6: TForm6
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    DecimalSeparator = ','
+    ParamCreate = True
     Left = 240
   end
   object OpenPictureDialog1: TOpenPictureDialog

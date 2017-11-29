@@ -1123,7 +1123,6 @@ object fPrincipal: TfPrincipal
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    DecimalSeparator = ','
     ParamCreate = True
     Left = 232
     Top = 49

@@ -113,7 +113,6 @@ Type
   vOnWorkBegin         : TOnWorkBegin;
   vOnWorkEnd           : TOnWorkEnd;
   vOnStatus            : TOnStatus;
-  vDecimalSeparator,
   vWelcomeMessage,
   vLogin,                                            //Login do Usuário caso haja autenticação
   vPassword,                                         //Senha do Usuário caso haja autenticação
@@ -209,7 +208,6 @@ Type
   Property StrsEmpty2Null     : Boolean                  Read vStrsEmpty2Null     Write vStrsEmpty2Null;
   Property StrsTrim2Len       : Boolean                  Read vStrsTrim2Len       Write vStrsTrim2Len;
   Property WelcomeMessage     : String                   Read vWelcomeMessage     Write vWelcomeMessage;
-  Property DecimalSeparator   : String                   Read vDecimalSeparator   Write vDecimalSeparator;
   Property OnWork             : TOnWork                  Read vOnWork             Write SetOnWork;
   Property OnWorkBegin        : TOnWorkBegin             Read vOnWorkBegin        Write SetOnWorkBegin;
   Property OnWorkEnd          : TOnWorkEnd               Read vOnWorkEnd          Write SetOnWorkEnd;
@@ -1264,7 +1262,7 @@ Begin
        JSONValue := TJSONValue.Create;
        JSONValue.LoadFromJSON(bJsonArray.optJSONObject(I).ToString);
        JSONValue.Encoded := True;
-       JSONValue.WriteToDataset(dtFull, JSONValue.ToJSON, TRESTDWClientSQL(Datasets[I]), vDecimalSeparator);
+       JSONValue.WriteToDataset(dtFull, JSONValue.ToJSON, TRESTDWClientSQL(Datasets[I]));
        TRESTDWClientSQL(Datasets[I]).CreateMassiveDataset;
       End;
     Finally
@@ -1478,7 +1476,6 @@ Begin
  vStrsTrim                 := False;
  vStrsEmpty2Null           := False;
  vStrsTrim2Len             := True;
- vDecimalSeparator         := ',';
  {$IFDEF FPC}
  vDatabaseCharSet := csUndefined;
  {$ENDIF}
@@ -2807,8 +2804,7 @@ Begin
      Begin
       Try
        LDataSetList.Encoded := vRESTDataBase.EncodeStrings;
-       LDataSetList.WriteToDataset(dtFull, LDataSetList.ToJSON, Self,
-                                   vRESTDataBase.vDecimalSeparator);
+       LDataSetList.WriteToDataset(dtFull, LDataSetList.ToJSON, Self);
        Result := True;
       Except
       End;

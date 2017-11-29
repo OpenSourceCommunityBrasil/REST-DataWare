@@ -25,6 +25,7 @@ Const
  {$ELSE}
  InitStrPos            = 1;
  {$ENDIF}
+ TDecimalChar          = 'D';
  TSepParams            = '|xxx|xxx|%';
  TValueFormatJSON      = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":[%s]}';
  TDatasetRequestJSON   = '{"SQL":"%s", "PARAMS":"%s"}';
@@ -108,6 +109,11 @@ Type
  Function  DatasetRequestToJSON     (Value           : TRESTDWClientSQLBase)      : String;
  Function  DateTimeToUnix           (ConvDate        : TDateTime)                 : Longint;
  Function  UnixToDateTime           (USec            : Longint)                   : TDateTime;
+ Function  BuildFloatString         (Value           : String)                    : String;
+ Function  BuildStringFloat         (Value           : String)                    : String;
+
+Var
+ DecimalLocal : Char;
 
 implementation
 
@@ -763,7 +769,7 @@ Begin
 {
  Else If vObjectDirection = Uppercase('odOUT') Then
   Result := odOUT;
-}  
+}
 End;
 
 Function GetValueType    (ObjectValue     : TObjectValue)     : String;
@@ -1140,5 +1146,33 @@ Begin
  End;
 End;
 {$ENDIF}
+
+Function BuildStringFloat(Value : String) : String;
+Begin
+ {$IFDEF FPC}
+ DecimalLocal := DecimalSeparator;
+ {$ELSE}
+ {$if CompilerVersion > 21} // Delphi 2010 pra cima
+ DecimalLocal := FormatSettings.DecimalSeparator;
+ {$ELSE}
+ DecimalLocal := DecimalSeparator;
+ {$IFEND}
+ {$ENDIF}
+ Result := StringReplace(Value, DecimalLocal, TDecimalChar, [rfReplaceAll]);
+End;
+
+Function BuildFloatString(Value : String) : String;
+Begin
+ {$IFDEF FPC}
+ DecimalLocal := DecimalSeparator;
+ {$ELSE}
+ {$if CompilerVersion > 21} // Delphi 2010 pra cima
+ DecimalLocal := FormatSettings.DecimalSeparator;
+ {$ELSE}
+ DecimalLocal := DecimalSeparator;
+ {$IFEND}
+ {$ENDIF}
+ Result := StringReplace(Value, TDecimalChar, DecimalLocal, [rfReplaceAll]);
+End;
 
 end.

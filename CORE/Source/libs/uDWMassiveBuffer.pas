@@ -730,7 +730,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                     If Not UpdateTag Then
                                      Begin
                                       If Trim(Field.AsString) <> '' Then
-                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := FloatToStr(Field.AsCurrency)
+                                       MassiveLineBuff.vMassiveValues.Items[I + 1].Value := BuildStringFloat(FloatToStr(Field.AsCurrency))
                                       Else
                                        MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
                                      End
@@ -739,7 +739,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                       If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> Field.AsString Then
                                        Begin
                                         If Trim(Field.AsString) <> '' Then
-                                         MassiveLineBuff.vMassiveValues.Items[I + 1].Value := FloatToStr(Field.AsCurrency)
+                                         MassiveLineBuff.vMassiveValues.Items[I + 1].Value := BuildStringFloat(FloatToStr(Field.AsCurrency))
                                         Else
                                          MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
                                         MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));

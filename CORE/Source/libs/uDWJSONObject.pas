@@ -85,7 +85,6 @@ Public
  Procedure WriteToDataset (DatasetType  : TDatasetType;
                            JSONValue    : String;
                            DestDS       : TDataset;
-                           DCSeparator  : String = ',';
                            ClearDataset : Boolean = False{$IFDEF FPC};
                            CharSet      : TDatabaseCharSet = csUndefined{$ENDIF});
  Procedure LoadFromJSON   (bValue       : String);
@@ -836,7 +835,7 @@ Var
      Begin
       If bValue.Fields[I].DataType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
                                        {$IFEND}{$ENDIF}ftFloat, ftCurrency, ftFMTBcd, ftBCD] Then
-       vTempValue := Format('"%s"', [StringReplace(FormatFloat('########0.0000', bValue.Fields[I].AsFloat), ',', 'dc', [rfReplaceAll])])
+       vTempValue := Format('"%s"', [BuildStringFloat(FloatToStr(bValue.Fields[I].AsFloat))])
       Else If bValue.Fields[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
        Begin
         vStringStream := TStringStream.Create('');
@@ -1046,13 +1045,7 @@ Var
    ftBCD,
    ftSingle,
    ftFMTBcd     : Begin
-                   vTempValue  := Value;
-                   If (Pos('dc', vTempValue) > 0) or (Pos('.', vTempValue) > 0) or (Pos(',', vTempValue) > 0) Then
-                   Begin
-                    vTempValue := StringReplace(vTempValue, 'dc', DCSeparator, [rfReplaceAll]);
-                    vTempValue := StringReplace(vTempValue, '.', DCSeparator, [rfReplaceAll]);
-                    vTempValue := StringReplace(vTempValue, ',', DCSeparator, [rfReplaceAll]);
-                   End;
+                   vTempValue  := BuildFloatString(Value);
                    If vTempValue <> '' Then
                     Begin
                      Case Field.DataType Of
@@ -1385,7 +1378,6 @@ End;
 Procedure TJSONValue.WriteToDataset(DatasetType : TDatasetType;
                                     JSONValue   : String;
                                     DestDS      : TDataset;
-                                    DCSeparator : String = ',';
                                     ClearDataset : Boolean = False{$IFDEF FPC};
                                     CharSet     : TDatabaseCharSet = csUndefined{$ENDIF});
 Var
@@ -1444,13 +1436,7 @@ Var
 		  {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
                   {$IFEND}{$ENDIF}
                   ftFMTBcd     : Begin
-                                  vTempValue  := Value;
-                                  If (Pos('dc', vTempValue) > 0) or (Pos('.', vTempValue) > 0) or (Pos(',', vTempValue) > 0) Then
-                                  Begin
-                                   vTempValue := StringReplace(vTempValue, 'dc', DCSeparator, [rfReplaceAll]);
-                                   vTempValue := StringReplace(vTempValue, '.', DCSeparator, [rfReplaceAll]);
-                                   vTempValue := StringReplace(vTempValue, ',', DCSeparator, [rfReplaceAll]);
-                                  End;
+                                  vTempValue  := BuildFloatString(Value);
                                   If vTempValue <> '' Then
                                    Begin
                                     Case Field.DataType Of
@@ -2341,7 +2327,7 @@ begin
   ovExtended  : Begin
                  vEncoded := True;
                  vObjectValue := ovFloat;
-                 SetValue(FloatToStr(Value), vEncoded);
+                 SetValue(BuildStringFloat(FloatToStr(Value)), vEncoded);
                 End;
   ovDate,
   ovTime,
@@ -2424,7 +2410,7 @@ begin
                 End;
   varCurrency : Begin
                  vObjectValue := ovFloat;
-                 SetValue(FloatToStr(Value), False);
+                 SetValue(BuildStringFloat(FloatToStr(Value)), False);
                 End;
   varDate     : Begin
                  vObjectValue := ovDateTime;
@@ -2596,7 +2582,7 @@ Begin
   ovExtended        : Begin
                        If (vJSONValue.Value <> '') And
                           (lowercase(vJSONValue.Value) <> 'null') Then
-                        Result := StrToFloat(vJSONValue.Value)
+                        Result := StrToFloat(BuildFloatString(vJSONValue.Value))
                        Else
                         Result := Null;
                       End;
@@ -2686,7 +2672,7 @@ Begin
   ovExtended        : Begin
                        If (vJSONValue.Value <> '') And
                           (lowercase(vJSONValue.Value) <> 'null') Then
-                        Result := StrToFloat(vJSONValue.Value)
+                        Result := StrToFloat(BuildFloatString(vJSONValue.Value))
                        Else
                         Result := Null;
                       End;

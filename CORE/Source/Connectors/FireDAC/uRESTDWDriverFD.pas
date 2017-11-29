@@ -162,7 +162,7 @@ Var
            Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftSingle, ftBCD] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
-              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsFloat  := StrToFloat(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsFloat  := StrToFloat(BuildFloatString(MassiveDataset.AtualRec.PrimaryValues[X].Value));
             End
            Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
             Begin
@@ -233,7 +233,7 @@ Var
        Begin
         If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
            (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
-         Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+         Query.Params[I].AsFloat  := StrToFloat(BuildFloatString(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value));
        End
       Else If Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
        Begin
@@ -393,7 +393,7 @@ Var
             Begin
              If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
                 (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
-              Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+              Query.Params[I].AsFloat  := StrToFloat(BuildFloatString(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value))
              Else
               Query.Params[I].Clear;
             End
@@ -635,7 +635,7 @@ Begin
               Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
                Begin
                 If (Params[I].Value <> Null) Then
-                 vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value)
+                 vTempQuery.Params[A].AsFloat  := StrToFloat(BuildFloatString(Params[I].Value))
                 Else
                  vTempQuery.Params[A].Clear;
                End
@@ -707,7 +707,7 @@ Begin
             Else If vTempQuery.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
              Begin
               If (Params[I].Value <> Null) Then
-               vTempQuery.Params[I].AsFloat  := StrToFloat(Params[I].Value)
+               vTempQuery.Params[I].AsFloat  := StrToFloat(BuildFloatString(Params[I].Value))
               Else
                vTempQuery.Params[I].Clear;
              End
@@ -988,7 +988,7 @@ Var
            Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
-              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsFloat  := StrToFloat(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsFloat  := StrToFloat(BuildFloatString(MassiveDataset.AtualRec.PrimaryValues[X].Value));
             End
            Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
             Begin
@@ -1064,7 +1064,7 @@ Var
        Begin
         If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
            (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
-         Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+         Query.Params[I].AsFloat  := StrToFloat(BuildFloatString(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value))
         Else
          Query.Params[I].Clear;
        End
@@ -1226,7 +1226,7 @@ Var
             Begin
              If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
                 (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
-              Query.Params[I].AsFloat  := StrToFloat(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+              Query.Params[I].AsFloat  := StrToFloat(BuildFloatString(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value))
              Else
               Query.Params[I].Clear;
             End
@@ -1432,7 +1432,7 @@ Begin
                  Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
                   Begin
                    If Trim(Params[I].Value) <> '' Then
-                    vTempQuery.Params[A].AsFloat  := StrToFloat(Params[I].Value)
+                    vTempQuery.Params[A].AsFloat  := StrToFloat(BuildFloatString(Params[I].Value))
                    Else
                     vTempQuery.Params[A].Clear;
                   End
@@ -1651,7 +1651,7 @@ Begin
             Else If fdCommand.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD, ftSingle] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
-               fdCommand.Params[A].AsFloat  := StrToFloat(Params[I].Value);
+               fdCommand.Params[A].AsFloat  := StrToFloat(BuildFloatString(Params[I].Value));
              End
             Else If fdCommand.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
              Begin

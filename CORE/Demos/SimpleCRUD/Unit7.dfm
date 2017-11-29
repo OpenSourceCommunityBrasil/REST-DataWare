@@ -1228,7 +1228,6 @@ object Form7: TForm7
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    DecimalSeparator = ','
     ParamCreate = True
     Left = 240
   end

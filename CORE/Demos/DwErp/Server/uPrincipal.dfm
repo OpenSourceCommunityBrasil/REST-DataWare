@@ -1012,18 +1012,20 @@ object FrmServer: TFrmServer
   end
   object ServerMetodos: TRESTServicePooler
     Active = False
-    DataCompression = True
     EncodeStrings = True
     ServicePort = 8080
     ProxyOptions.Port = 8888
     ServerParams.HasAuthentication = True
     ServerParams.UserName = 'testserver'
     ServerParams.Password = 'testserver'
-    SSLVersion = sslvSSLv2
+    SSLMethod = sslvSSLv2
+    SSLVersions = []
     OnLastRequest = ServerMetodosLastRequest
     OnLastResponse = ServerMetodosLastResponse
     Encoding = esASCII
     ServerContext = 'restdataware'
+    SSLVerifyMode = []
+    SSLVerifyDepth = 0
     Left = 232
     Top = 120
   end
