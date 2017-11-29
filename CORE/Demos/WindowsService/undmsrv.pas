@@ -41,25 +41,25 @@ end;
 
 
 procedure TRestDWsrv.ServiceAfterInstall(Sender: TService);
-  var
-    Reg: TRegistry;
-  begin
-  {  Reg := TRegistry.Create(KEY_READ or KEY_WRITE);
-    try
-      Reg.RootKey := HKEY_LOCAL_MACHINE;
-      if Reg.OpenKey('\SYSTEM\CurrentControlSet\Services\' + Name, false) then
-      begin
-        Reg.WriteString('Description', 'RestDataware Server Service Application.');
-        Reg.CloseKey;
-      end;
-    finally
-      Reg.Free;
-    end; }
+//Var
+// Reg : TRegistry;
+Begin
+ {Reg := TRegistry.Create(KEY_READ or KEY_WRITE);
+ Try
+  Reg.RootKey := HKEY_LOCAL_MACHINE;
+  If Reg.OpenKey('\SYSTEM\CurrentControlSet\Services\' + Name, false) Then
+   Begin
+    Reg.WriteString('Description', 'RestDataware Server Service Application.');
+    Reg.CloseKey;
+   End;
+ Finally
+  Reg.Free;
+ End;}
 end;
 
 procedure TRestDWsrv.ServiceCreate(Sender: TObject);
 begin
-  RESTServicePooler.ServerMethodClass := TServerMethodDM;
+  RESTServicePooler.ServerMethodClass     := TServerMethodDM;
   RESTServicePooler.ServerParams.UserName := vUsername;
   RESTServicePooler.ServerParams.Password := vPassword;
   RESTServicePooler.ServicePort           := vPort;

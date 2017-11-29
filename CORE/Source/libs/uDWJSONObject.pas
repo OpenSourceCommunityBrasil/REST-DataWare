@@ -2353,86 +2353,8 @@ begin
 end;
 
 procedure TJSONParam.SetVariantValue(Value: Variant);
-var
- ms : TMemoryStream;
- p  : Pointer;
 begin
- If ((VarIsNull(Value)) Or (VarIsEmpty(Value))) Then //Or (VarType(Value) = vtPointer) Then
-  Exit;
- Case VarType(Value) Of
-  vtPointer   : Begin
-                 ms := TMemoryStream.Create;
-                 Try
-                  ms.Position := 0;
-                  p := VarArrayLock(Value);
-                  ms.Write(p ^, VarArrayHighBound(Value, 1));
-                  VarArrayUnlock(Value);
-                  ms.Position := 0;
-                  If ms.Size > 0 Then
-                   LoadFromStream(ms);
-                 Finally
-                  ms.Free;
-                 End;
-                End;
-  varVariant,
-  varUnknown  : Begin
-                 vObjectValue := ovString;
-                 SetValue(Value, True);
-                End;
-  vtInt64,
-  vtInteger,
-  vtBoolean,
-  varInt64,
-  {$IFNDEF FPC}
-  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
-  varUInt64,
-  {$IFEND}
-  {$ENDIF}
-  varWord,
-  varLongWord,
-  varSmallint,
-  varInteger,
-  varSingle,
-  varBoolean  : Begin
-                 If VarType(Value) = varBoolean then
-                  vObjectValue := ovBoolean
-                 Else
-                  vObjectValue := ovInteger;
-                 If vObjectValue = ovBoolean Then
-                  Begin
-                   If Boolean(Value) then
-                    SetValue('1', False)
-                   Else
-                    SetValue('0', False);
-                  End
-                 Else
-                  SetValue(IntToStr(Value), False);
-                End;
-  varCurrency : Begin
-                 vObjectValue := ovFloat;
-                 SetValue(BuildStringFloat(FloatToStr(Value)), False);
-                End;
-  varDate     : Begin
-                 vObjectValue := ovDateTime;
-                 SetValue(IntToStr(DateTimeToUnix(Value)), False);
-                End;
-  vtWideChar,
-  vtPWideChar,
-  vtWideString,
-  {$IFNDEF FPC}
-  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
-  vtUnicodeString,
-  varUString,
-  {$IFEND}
-  {$ELSE}
-  varUString,
-  {$ENDIF}
-  varString  : Begin
-                 vObjectValue := ovString;
-                 If Value <> '' Then
-                  SetValue(Value, True);
-                End;
- End;
+ SetDataValue(Value, vObjectValue);
 end;
 
 Procedure TJSONParam.SetParamName(bValue: String);
