@@ -987,7 +987,6 @@ End;
 Procedure TJSONValue.WriteToDataset(DatasetType : TDatasetType;
                                     JSONValue   : String;
                                     DestDS      : TDataset;
-                                    DCSeparator : String = ',';
                                     ClearDataset : Boolean = False{$IFDEF FPC};
                                     CharSet     : TDatabaseCharSet = csUndefined{$ENDIF});
 Var
