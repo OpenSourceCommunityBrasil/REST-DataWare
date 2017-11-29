@@ -1967,9 +1967,7 @@ Begin
  SetLength(aValue, 0);
  If bValue = '' Then
   Exit;
- If vObjectValue in [ovString, ovMemo, ovWideMemo, ovFmtMemo,
-                     ovFloat,  ovCurrency,  ovBCD,  ovFMTBcd,
-                     ovExtended] Then
+ If vObjectValue in [ovString, ovMemo, ovWideMemo, ovFmtMemo] Then
   Begin
    If vEncoded Then
     Begin
@@ -2004,6 +2002,9 @@ Begin
    Else
     aValue := ToBytes(Format(TJsonStringValue, [bValue]));
   End
+ Else If vObjectValue in [ovFloat,  ovCurrency,  ovBCD,
+                          ovFMTBcd, ovExtended]  Then
+  aValue := ToBytes(Format(TJsonStringValue, [bValue]))
  Else
   Begin
    {$IFNDEF FPC}
@@ -2324,7 +2325,7 @@ begin
   ovBCD,
   ovFMTBcd,
   ovExtended  : Begin
-                 vEncoded := True;
+                 vEncoded := False;
                  vObjectValue := ovFloat;
                  SetValue(BuildStringFloat(FloatToStr(Value)), vEncoded);
                 End;
@@ -2356,7 +2357,7 @@ var
  ms : TMemoryStream;
  p  : Pointer;
 begin
- If (VarIsNull(Value)) Or (VarIsEmpty(Value)) Or (VarType(Value) = vtPointer) Then
+ If ((VarIsNull(Value)) Or (VarIsEmpty(Value))) Then //Or (VarType(Value) = vtPointer) Then
   Exit;
  Case VarType(Value) Of
   vtPointer   : Begin
