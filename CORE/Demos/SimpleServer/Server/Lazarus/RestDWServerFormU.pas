@@ -3,8 +3,8 @@ unit RestDWServerFormU;
 Interface
 
 Uses LCL, LCLIntf, LCLType, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, winsock, uSock, IniFiles, IBConnection, db, uRESTDWBase, JvMemDS,
-  ServerMethodsUnit1, ComCtrls, MaskEdit, StdCtrls, ExtCtrls, Menus, ZDataset,
+  Dialogs, winsock, uSock, IniFiles, IBConnection, db, uRESTDWBase,
+  ServerMethodsUnit1, ComCtrls, MaskEdit, StdCtrls, ExtCtrls, Menus,
   IdComponent, IdBaseComponent, IdTCPConnection, IdTCPClient, IdHTTP;
 
 type
@@ -14,9 +14,6 @@ type
   TRestDWForm = class(TForm)
     ButtonStart: TButton;
     ButtonStop: TButton;
-    JvMemoryData1: TJvMemoryData;
-    JvMemoryData1ID: TLongintField;
-    JvMemoryData1teste: TStringField;
     Label8: TLabel;
     Bevel3: TBevel;
     lSeguro: TLabel;
@@ -70,7 +67,6 @@ type
     RESTServicePooler1: TRESTServicePooler;
     CheckBox1: TCheckBox;
     tupdatelogs: TTimer;
-    ZQuery1: TZQuery;
     procedure ctiPrincipalClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ApplicationEvents1Idle(Sender: TObject; var Done: Boolean);
@@ -227,7 +223,6 @@ procedure TRestDWForm.ButtonStartClick(Sender: TObject);
 Var
  ini       : TIniFile;
 Begin
- JvMemoryData1.Open;
  If FileExists(FCfgName) Then
   DeleteFile(FCfgName);
  ini       := TIniFile.Create(FCfgName);
@@ -356,7 +351,6 @@ begin
    RESTServicePooler1.SSLCertFile           := eCertFile.Text;
    RESTServicePooler1.EncodeStrings         := cbEncode.Checked;
    RESTServicePooler1.Active                := True;
-   RESTServicePooler1.DataCompression       := CheckBox1.Checked;
    If Not RESTServicePooler1.Active Then
     Exit;
    PageControl1.ActivePage := tsLogs;

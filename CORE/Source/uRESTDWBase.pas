@@ -2177,6 +2177,7 @@ Begin
         SetParamsValues(Params, SendParams);
        If vWelcomeMessage <> '' Then
         SendParams.AddFormField('dwwelcomemessage', EncodeStrings(vWelcomeMessage, vDatabaseCharSet));
+       SendParams.AddFormField('datacompression', BooleanToString(vDatacompress));
        If (Params <> Nil) Or (vWelcomeMessage <> '') Then
         Begin
          HttpRequest.Request.ContentType     := 'application/x-www-form-urlencoded';

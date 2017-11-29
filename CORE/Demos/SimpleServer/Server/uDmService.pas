@@ -58,6 +58,8 @@ TYPE
       var MassiveDataset: TMassiveDatasetBuffer; var Ignore: Boolean);
     procedure DWServerEvents1EventsservertimeReplyEvent(var Params: TDWParams;
       var Result: string);
+    procedure DWServerEvents1EventstesteReplyEvent(var Params: TDWParams;
+      var Result: string);
   PRIVATE
     { Private declarations }
     FUNCTION ConsultaBanco(VAR Params: TDWParams): STRING; OVERLOAD;
@@ -112,6 +114,12 @@ begin
   Params.ItemsString['result'].AsDateTime := Now
  Else
   Params.ItemsString['result'].AsDateTime := Now - 1;
+end;
+
+procedure TServerMethodDM.DWServerEvents1EventstesteReplyEvent(
+  var Params: TDWParams; var Result: string);
+begin
+ Params.ItemsString['result'].Asstring := 'hello World';
 end;
 
 PROCEDURE TServerMethodDM.ServerMethodDataModuleCreate(Sender: TObject);

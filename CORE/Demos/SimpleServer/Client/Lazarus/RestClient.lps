@@ -4,7 +4,7 @@
     <PathDelim Value="\"/>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="69">
+    <Units Count="70">
       <Unit0>
         <Filename Value="RestClient.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -19,12 +19,10 @@
         <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="76"/>
-        <CursorPos Y="89"/>
+        <CursorPos X="20" Y="86"/>
         <UsageCount Value="223"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="urestrequest.pas"/>
@@ -124,10 +122,11 @@
       </Unit14>
       <Unit15>
         <Filename Value="..\..\..\..\Source\libs\uDWConsts.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1076"/>
-        <CursorPos Y="1076"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="273"/>
+        <CursorPos Y="273"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONTools.pas"/>
@@ -138,7 +137,7 @@
       </Unit16>
       <Unit17>
         <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="1577"/>
         <CursorPos Y="1592"/>
         <UsageCount Value="100"/>
@@ -157,10 +156,14 @@
       </Unit18>
       <Unit19>
         <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1760"/>
-        <CursorPos X="23" Y="1766"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="2165"/>
+        <CursorPos Y="2180"/>
         <UsageCount Value="13"/>
+        <Bookmarks Count="1">
+          <Item0 X="37" Y="2178" ID="1"/>
+        </Bookmarks>
+        <Loaded Value="True"/>
       </Unit19>
       <Unit20>
         <Filename Value="C:\lazarus\components\indy\trunk\Lib\System\IdGlobal.pas"/>
@@ -254,20 +257,22 @@
       </Unit32>
       <Unit33>
         <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="2894"/>
-        <CursorPos Y="2908"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="1338"/>
+        <CursorPos Y="1342"/>
         <UsageCount Value="94"/>
         <Loaded Value="True"/>
       </Unit33>
       <Unit34>
         <Filename Value="..\..\..\..\Source\uDWPoolerMethod.pas"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="48" Y="2"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="1108"/>
+        <CursorPos Y="1109"/>
         <UsageCount Value="10"/>
         <Bookmarks Count="1">
           <Item0 X="2" Y="257" ID="5"/>
         </Bookmarks>
+        <Loaded Value="True"/>
       </Unit34>
       <Unit35>
         <Filename Value="formMain.lfm"/>
@@ -336,13 +341,10 @@
       </Unit42>
       <Unit43>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="1169"/>
         <CursorPos Y="1201"/>
         <UsageCount Value="10"/>
-        <Bookmarks Count="1">
-          <Item0 X="44" Y="221" ID="1"/>
-        </Bookmarks>
         <Loaded Value="True"/>
       </Unit43>
       <Unit44>
@@ -410,7 +412,7 @@
       </Unit52>
       <Unit53>
         <Filename Value="..\..\..\..\Source\libs\uDWConstsData.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="8"/>
         <UsageCount Value="19"/>
         <Loaded Value="True"/>
       </Unit53>
@@ -423,7 +425,7 @@
       </Unit54>
       <Unit55>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="1400"/>
         <CursorPos Y="1409"/>
         <UsageCount Value="40"/>
@@ -520,125 +522,140 @@
         <CursorPos X="33" Y="33"/>
         <UsageCount Value="10"/>
       </Unit68>
+      <Unit69>
+        <Filename Value="..\..\..\..\Source\libs\uzliblaz.pas"/>
+        <UnitName Value="uZlibLaz"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="45"/>
+        <CursorPos Y="53"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit69>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="223" Column="46" TopLine="193"/>
+        <Caret Line="463" Column="84" TopLine="436"/>
       </Position1>
       <Position2>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="393" Column="16" TopLine="364"/>
+        <Caret Line="608" Column="89" TopLine="579"/>
       </Position2>
       <Position3>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="460" Column="38" TopLine="433"/>
+        <Caret Line="1027" Column="84" TopLine="995"/>
       </Position3>
       <Position4>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="611" Column="43" TopLine="584"/>
+        <Caret Line="1178" Column="89" TopLine="1148"/>
       </Position4>
       <Position5>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="814" Column="22" TopLine="784"/>
       </Position5>
       <Position6>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="960" Column="16" TopLine="931"/>
+        <Caret Line="468" TopLine="436"/>
       </Position6>
       <Position7>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="1029" Column="11" TopLine="1000"/>
+        <Caret Line="624" TopLine="592"/>
       </Position7>
       <Position8>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="1180" Column="43" TopLine="1153"/>
+        <Caret Line="1043" TopLine="1011"/>
       </Position8>
       <Position9>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="1478" Column="16" TopLine="1448"/>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="86" Column="20" TopLine="76"/>
       </Position9>
       <Position10>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="218" Column="53" TopLine="205"/>
+        <Filename Value="..\..\..\..\Source\libs\uzliblaz.pas"/>
+        <Caret Line="53" TopLine="45"/>
       </Position10>
       <Position11>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
+        <Filename Value="..\..\..\..\Source\libs\uzliblaz.pas"/>
+        <Caret Line="54" TopLine="45"/>
       </Position11>
       <Position12>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="218" Column="53" TopLine="190"/>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="86" Column="20" TopLine="76"/>
       </Position12>
       <Position13>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="388" Column="52" TopLine="361"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="322" Column="15" TopLine="314"/>
       </Position13>
       <Position14>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="457" Column="47" TopLine="430"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="2553" Column="2" TopLine="2548"/>
       </Position14>
       <Position15>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="608" Column="52" TopLine="581"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="292" Column="15" TopLine="284"/>
       </Position15>
       <Position16>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="809" Column="58" TopLine="781"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="2905" Column="2" TopLine="2896"/>
       </Position16>
       <Position17>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="955" Column="52" TopLine="928"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="296" Column="15" TopLine="288"/>
       </Position17>
       <Position18>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="1024" Column="47" TopLine="997"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="2797" Column="2" TopLine="2785"/>
       </Position18>
       <Position19>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="1177" Column="52" TopLine="1150"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="149" Column="13" TopLine="141"/>
       </Position19>
       <Position20>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="1473" Column="52" TopLine="1445"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1342" TopLine="1338"/>
       </Position20>
       <Position21>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
+        <Filename Value="..\..\..\..\Source\uDWPoolerMethod.pas"/>
+        <Caret Line="103" Column="13" TopLine="97"/>
       </Position21>
       <Position22>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="463" Column="84" TopLine="436"/>
+        <Filename Value="..\..\..\..\Source\uDWPoolerMethod.pas"/>
+        <Caret Line="1109" TopLine="1108"/>
       </Position22>
       <Position23>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="608" Column="89" TopLine="579"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="340" Column="15" TopLine="330"/>
       </Position23>
       <Position24>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="1027" Column="84" TopLine="995"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="2178" Column="37" TopLine="2172"/>
       </Position24>
       <Position25>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="1178" Column="89" TopLine="1148"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
       </Position25>
       <Position26>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="1582" TopLine="1567"/>
       </Position26>
       <Position27>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="468" TopLine="436"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="1870" Column="37" TopLine="1856"/>
       </Position27>
       <Position28>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="624" TopLine="592"/>
+        <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="2180" TopLine="2165"/>
       </Position28>
       <Position29>
-        <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
-        <Caret Line="1043" TopLine="1011"/>
+        <Filename Value="..\..\..\..\Source\libs\uzliblaz.pas"/>
+        <Caret Line="53" TopLine="45"/>
       </Position29>
+      <Position30>
+        <Filename Value="..\..\..\..\Source\libs\uzliblaz.pas"/>
+        <Caret Line="54" TopLine="45"/>
+      </Position30>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
-    <BreakPoints Count="1">
+    <BreakPoints Count="2">
       <Item1>
         <Kind Value="bpkSource"/>
         <WatchScope Value="wpsLocal"/>
@@ -646,6 +663,13 @@
         <Source Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
         <Line Value="1306"/>
       </Item1>
+      <Item2>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\..\..\Source\uDWPoolerMethod.pas"/>
+        <Line Value="1109"/>
+      </Item2>
     </BreakPoints>
     <Watches Count="2">
       <Item1>

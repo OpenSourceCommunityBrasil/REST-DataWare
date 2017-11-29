@@ -92,6 +92,18 @@ object ServerMethodDM: TServerMethodDM
           end>
         Name = 'servertime'
         OnReplyEvent = DWServerEvents1EventsservertimeReplyEvent
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        Name = 'teste'
+        OnReplyEvent = DWServerEvents1EventstesteReplyEvent
       end>
     Left = 80
     Top = 103

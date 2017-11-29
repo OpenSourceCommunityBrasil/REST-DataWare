@@ -1,7 +1,7 @@
 object RestDWForm: TRestDWForm
-  Left = 451
+  Left = 489
   Height = 385
-  Top = 173
+  Top = 194
   Width = 520
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
@@ -4451,7 +4451,6 @@ object RestDWForm: TRestDWForm
   end
   object RESTServicePooler1: TRESTServicePooler
     Active = False
-    DataCompression = True
     EncodeStrings = True
     ServicePort = 8082
     ProxyOptions.Port = 8888
@@ -4466,42 +4465,13 @@ object RestDWForm: TRestDWForm
     ServerContext = 'restdataware'
     SSLVerifyMode = []
     SSLVerifyDepth = 0
-    left = 136
-    top = 184
+    left = 144
+    top = 168
   end
   object tupdatelogs: TTimer
     Enabled = False
     OnTimer = tupdatelogsTimer
     left = 324
     top = 120
-  end
-  object ZQuery1: TZQuery
-    Params = <>
-    left = 216
-    top = 44
-  end
-  object JvMemoryData1: TJvMemoryData
-    FieldDefs = <>
-    left = 92
-    top = 127
-    object JvMemoryData1teste: TStringField
-      FieldKind = fkData
-      FieldName = 'teste'
-      Index = 0
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      Size = 100
-    end
-    object JvMemoryData1ID: TLongintField
-      FieldKind = fkData
-      FieldName = 'ID'
-      Index = 1
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-    end
   end
 end

@@ -1114,9 +1114,9 @@ object Form2: TForm2
     TabOrder = 10
   end
   object RESTDWDataBase1: TRESTDWDataBase
-    Active = True
+    Active = False
     Compression = True
-    MyIP = '127.0.0.1'
+    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -1132,14 +1132,13 @@ object Form2: TForm2
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    DecimalSeparator = ','
     OnWork = RESTDWDataBase1Work
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd
     DatabaseCharSet = csWin1252
     ParamCreate = True
-    left = 264
-    top = 184
+    left = 256
+    top = 112
   end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1

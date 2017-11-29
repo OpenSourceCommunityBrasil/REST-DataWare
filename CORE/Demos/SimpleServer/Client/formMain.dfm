@@ -1199,68 +1199,7 @@ object Form2: TForm2
     Top = 64
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    FieldDefs = <
-      item
-        Name = 'EMP_NO'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'FIRST_NAME'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 15
-      end
-      item
-        Name = 'LAST_NAME'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 20
-      end
-      item
-        Name = 'PHONE_EXT'
-        DataType = ftString
-        Size = 4
-      end
-      item
-        Name = 'HIRE_DATE'
-        Attributes = [faRequired]
-        DataType = ftTimeStamp
-      end
-      item
-        Name = 'DEPT_NO'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 3
-      end
-      item
-        Name = 'JOB_CODE'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 5
-      end
-      item
-        Name = 'JOB_GRADE'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'JOB_COUNTRY'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 15
-      end
-      item
-        Name = 'SALARY'
-        Attributes = [faRequired]
-        DataType = ftFloat
-        Precision = 15
-      end
-      item
-        Name = 'FULL_NAME'
-        DataType = ftString
-        Size = 37
-      end>
+    FieldDefs = <>
     IndexDefs = <>
     MasterFields = ''
     FetchOptions.AssignedValues = [evMode]
@@ -1383,12 +1322,23 @@ object Form2: TForm2
           end
           item
             TypeObject = toParam
-            ObjectDirection = odINOUT
+            ObjectDirection = odIN
             ObjectValue = ovString
             ParamName = 'inputdata'
             Encoded = True
           end>
         Name = 'servertime'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        Name = 'teste'
       end>
     GetEvents = False
     Left = 237
