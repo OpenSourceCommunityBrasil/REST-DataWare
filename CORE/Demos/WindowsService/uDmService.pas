@@ -36,7 +36,8 @@ USES
   uConsts,
   FireDAC.Phys.MSSQLDef,
   FireDAC.Phys.ODBCBase,
-  FireDAC.Phys.MSSQL;
+  FireDAC.Phys.MSSQL,
+  Vcl.SvcMgr;
 
 TYPE
   TServerMethodDM = CLASS(TServerMethodDataModule)

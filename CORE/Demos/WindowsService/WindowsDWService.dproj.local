@@ -1,10 +1,35 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899/12/30 00:00:00.000.792,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\WindowsDWService.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServidorREST.dproj</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.537,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\srvModBaseDados.dfm</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.040,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethodsUnit1.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1Unit.dfm</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.684,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1Unit.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1.dfm</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.537,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1.pas=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\srvModBaseDados.pas</Transaction>
-  </Transactions>
+    <Transaction>1899-12-30 00:00:00.000.684,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1Unit.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1.dfm</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.792,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\WindowsDWService.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServidorREST.dproj</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.537,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\srvModBaseDados.dfm</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.537,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1.pas=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\srvModBaseDados.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.040,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethodsUnit1.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\ServerMethods1Unit.dfm</Transaction>
+    <Transaction>2017-11-29 14:44:08.457,C:\CompXE_10_2\RESTDW\CORE\Demos\WindowsService\undmsrv.dfm=C:\CompXE_10_2\RESTDW\CORE\Demos\WindowsService\Unit1.dfm</Transaction>
+  </Transactions>  <ProjectSortOrder AutoSort="0" SortType="0">
+    <File Path="ModelSupport_WindowsDWService"/>
+    <File Path="ModelSupport_WindowsDWService\Server"/>
+    <File Path="ModelSupport_WindowsDWService\Server\Containner"/>
+    <File Path="ModelSupport_WindowsDWService\Server\Containner\default.txaPackage"/>
+    <File Path="ModelSupport_WindowsDWService\Server\Containner\default.txvpck"/>
+    <File Path="ModelSupport_WindowsDWService\Server\default.txaPackage"/>
+    <File Path="ModelSupport_WindowsDWService\Server\default.txvpck"/>
+    <File Path="ModelSupport_WindowsDWService\ServerMethods1Unit"/>
+    <File Path="ModelSupport_WindowsDWService\ServerMethods1Unit\default.txaPackage"/>
+    <File Path="ModelSupport_WindowsDWService\ServerMethods1Unit\default.txvpck"/>
+    <File Path="ModelSupport_WindowsDWService\uConsts"/>
+    <File Path="ModelSupport_WindowsDWService\uConsts\default.txaPackage"/>
+    <File Path="ModelSupport_WindowsDWService\uConsts\default.txvpck"/>
+    <File Path="ModelSupport_WindowsDWService\WindowsDWService"/>
+    <File Path="ModelSupport_WindowsDWService\WindowsDWService\default.txaPackage"/>
+    <File Path="ModelSupport_WindowsDWService\WindowsDWService\default.txvpck"/>
+    <File Path="ModelSupport_WindowsDWService\default.txaPackage"/>
+    <File Path="ModelSupport_WindowsDWService\default.txvpck"/>
+    <File Path="uConsts.pas"/>
+    <File Path="uDmService.pas"/>
+    <File Path="uDmService.dfm"/>
+    <File Path="undmsrv.pas"/>
+    <File Path="undmsrv.dfm"/>
+  </ProjectSortOrder>
 </BorlandProject>

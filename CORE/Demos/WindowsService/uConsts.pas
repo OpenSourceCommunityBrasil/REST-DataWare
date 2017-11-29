@@ -14,11 +14,11 @@ Const
  SSLPrivateKeyPassword = '';
  SSLCertFile           = '';
  database    = 'EMPLOYEE.FDB';
- pasta       = 'D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO';
+ pasta       = 'c:\basedados\';
  porta_BD    = 3050;
  usuario_BD  = 'sysdba';
  senha_BD    = 'masterkey';
- LogFile     = 'D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\WindowsService\Log.txt';
+ LogFile     = 'C:\CompXE_10_2\RESTDW\CORE\Demos\Log.txt';
 
 Var
  RESTServicePooler : TRESTServicePooler;
