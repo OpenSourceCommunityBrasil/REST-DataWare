@@ -233,7 +233,6 @@ Begin
   Compressed := TMemoryStream.Create;
   Try
     ZCompressStream(Utf8Stream, Compressed);
-   // ZdeCompressStream( Compressed, Utf8Stream);      para teste
     Compressed.Position := 0;
    Try
     Value := StreamToHex(Compressed, False);
@@ -241,8 +240,15 @@ Begin
    Finally
    End;
   Finally
-   {$IFNDEF FPC}{$if CompilerVersion > 21}Compressed.Clear;{$IFEND}{$ENDIF}
-   FreeAndNil(Compressed);
+   {$IFNDEF FPC}
+    {$if CompilerVersion > 21}
+     Compressed.Clear;
+    {$ELSE}
+     FreeAndNil(Compressed);
+    {$IFEND}
+   {$ELSE}
+    Compressed := Nil;
+   {$ENDIF}
   End;
  Finally
   {$IFNDEF FPC}{$if CompilerVersion > 21}Utf8Stream.Clear;{$IFEND}{$ENDIF}

@@ -122,10 +122,11 @@
       </Unit14>
       <Unit15>
         <Filename Value="..\..\..\..\Source\libs\uDWConsts.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="273"/>
-        <CursorPos Y="273"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="240"/>
+        <CursorPos X="36" Y="251"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit15>
       <Unit16>
@@ -139,7 +140,7 @@
         <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
         <EditorIndex Value="9"/>
         <TopLine Value="1577"/>
-        <CursorPos Y="1592"/>
+        <CursorPos X="42" Y="1589"/>
         <UsageCount Value="100"/>
         <Bookmarks Count="2">
           <Item0 Y="1413" ID="3"/>
@@ -159,7 +160,7 @@
         <EditorIndex Value="7"/>
         <TopLine Value="2165"/>
         <CursorPos Y="2180"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="14"/>
         <Bookmarks Count="1">
           <Item0 X="37" Y="2178" ID="1"/>
         </Bookmarks>
@@ -260,7 +261,7 @@
         <EditorIndex Value="5"/>
         <TopLine Value="1338"/>
         <CursorPos Y="1342"/>
-        <UsageCount Value="94"/>
+        <UsageCount Value="95"/>
         <Loaded Value="True"/>
       </Unit33>
       <Unit34>
@@ -268,7 +269,7 @@
         <EditorIndex Value="6"/>
         <TopLine Value="1108"/>
         <CursorPos Y="1109"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Bookmarks Count="1">
           <Item0 X="2" Y="257" ID="5"/>
         </Bookmarks>
@@ -344,7 +345,7 @@
         <EditorIndex Value="3"/>
         <TopLine Value="1169"/>
         <CursorPos Y="1201"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit43>
       <Unit44>
@@ -413,7 +414,7 @@
       <Unit53>
         <Filename Value="..\..\..\..\Source\libs\uDWConstsData.pas"/>
         <EditorIndex Value="8"/>
-        <UsageCount Value="19"/>
+        <UsageCount Value="20"/>
         <Loaded Value="True"/>
       </Unit53>
       <Unit54>
@@ -428,7 +429,7 @@
         <EditorIndex Value="4"/>
         <TopLine Value="1400"/>
         <CursorPos Y="1409"/>
-        <UsageCount Value="40"/>
+        <UsageCount Value="41"/>
         <Loaded Value="True"/>
       </Unit55>
       <Unit56>
@@ -525,11 +526,10 @@
       <Unit69>
         <Filename Value="..\..\..\..\Source\libs\uzliblaz.pas"/>
         <UnitName Value="uZlibLaz"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="45"/>
         <CursorPos Y="53"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit69>
     </Units>
