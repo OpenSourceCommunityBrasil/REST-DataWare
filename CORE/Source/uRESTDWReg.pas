@@ -27,6 +27,12 @@ Type
   Procedure Edit;                                 Override;
 End;
 
+  TDWClientEventsEditor = class(TComponentEditor)
+    function GetVerbCount: Integer; override;
+    function GetVerb(Index: Integer): string; override;
+    procedure ExecuteVerb(Index: Integer); override;
+  end;
+
 
 Procedure Register;
 
@@ -81,7 +87,30 @@ Begin
  RegisterComponents('REST Dataware - Service',     [TRESTServicePooler, TDWServerEvents, TDWClientEvents,  TRESTServiceCGI,   TRESTClientPooler]);
  RegisterComponents('REST Dataware - CORE - DB',   [TRESTDWPoolerDB,    TRESTDWDataBase, TRESTDWClientSQL, TRESTDWStoredProc, TRESTDWPoolerList, TDWMassiveCache]);
  RegisterPropertyEditor(TypeInfo(String), TRESTDWDataBase, 'PoolerName', TPoolersList);
+ RegisterComponentEditor(TDWClientEvents, TDWClientEventsEditor);
 End;
+
+{ TDWClientEventsEditor }
+
+procedure TDWClientEventsEditor.ExecuteVerb(Index: Integer);
+begin
+  inherited;
+  case Index of
+    0: (Component as TDWClientEvents).GetEvents:= True; //chama o GetEvents
+  end;
+end;
+
+function TDWClientEventsEditor.GetVerb(Index: Integer): string;
+begin
+  case Index of
+    0: Result := '&Get Server events';
+  end;
+end;
+
+function TDWClientEventsEditor.GetVerbCount: Integer;
+begin
+  Result := 1;
+end;
 
 initialization
 {$IFDEF FPC}
