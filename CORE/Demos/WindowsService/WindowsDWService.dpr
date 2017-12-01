@@ -15,7 +15,6 @@ uses
 {$R *.RES}
 
 Begin
-  
   {$ifdef DEBUG}
   Try
    // In debug mode the server acts as a console application.

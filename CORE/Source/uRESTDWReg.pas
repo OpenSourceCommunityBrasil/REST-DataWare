@@ -5,7 +5,7 @@ interface
 uses
   {$IFDEF FPC}
    {$IFNDEF UNIX}Windows,
-   {$ELSE}Lcl,{$ENDIF}LResources, FormEditingIntf, Classes, propedits, uRESTDWBase, uRESTDWPoolerDB, uDWDatamodule, uDWMassiveBuffer, uRESTDWServerEvents;
+   {$ELSE}Lcl,{$ENDIF}LResources, FormEditingIntf, PropEdits, ComponentEditors, Classes, uRESTDWBase, uRESTDWPoolerDB, uDWDatamodule, uDWMassiveBuffer, uRESTDWServerEvents;
   {$ELSE}
    Windows,
    {$if CompilerVersion > 21}
@@ -97,19 +97,21 @@ begin
   inherited;
   case Index of
     0: (Component as TDWClientEvents).GetEvents:= True; //chama o GetEvents
+    1: (Component as TDWClientEvents).ClearEvents; //chama o GetEvents
   end;
 end;
 
 function TDWClientEventsEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
-    0: Result := '&Get Server events';
+    0: Result := '&Get Server Events';
+    1: Result := '&Clear Client Events';
   end;
 end;
 
 function TDWClientEventsEditor.GetVerbCount: Integer;
 begin
-  Result := 1;
+  Result := 2;
 end;
 
 initialization

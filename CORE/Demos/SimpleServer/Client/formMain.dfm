@@ -1340,7 +1340,6 @@ object Form2: TForm2
           end>
         Name = 'teste'
       end>
-    GetEvents = False
     Left = 237
     Top = 21
   end

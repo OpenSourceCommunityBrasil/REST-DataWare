@@ -1116,7 +1116,6 @@ object Form2: TForm2
   object RESTDWDataBase1: TRESTDWDataBase
     Active = False
     Compression = True
-    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -1137,8 +1136,8 @@ object Form2: TForm2
     OnWorkEnd = RESTDWDataBase1WorkEnd
     DatabaseCharSet = csWin1252
     ParamCreate = True
-    left = 256
-    top = 112
+    left = 168
+    top = 176
   end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1

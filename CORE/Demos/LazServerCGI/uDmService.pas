@@ -5,14 +5,13 @@ interface
 uses
   SysUtils, Classes, IBConnection, sqldb, uDWDatamodule,
   uDWJSONObject, Dialogs, uDWConstsData,
-  uRESTDWPoolerDB, uRESTServerEvents, uRestDWLazDriver,  uConsts;
+  uRESTDWPoolerDB, uRESTDWLazDriver,  uConsts;
 
 type
 
   { TServerMethodDM }
 
   TServerMethodDM = class(TServerMethodDataModule)
-    DWServerEvents1: TDWServerEvents;
     RESTDWLazDriver1: TRESTDWLazDriver;
     RESTDWPoolerDB1: TRESTDWPoolerDB;
     Server_FDConnection: TIBConnection;

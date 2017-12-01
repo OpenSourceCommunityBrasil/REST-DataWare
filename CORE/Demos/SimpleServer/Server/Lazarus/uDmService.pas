@@ -5,7 +5,7 @@ interface
 uses
   SysUtils, Classes, IBConnection, sqldb, SysTypes, uDWDatamodule,
   uDWJSONObject, Dialogs, ServerUtils, uDWConsts, uDWConstsData,
-  RestDWServerFormU, uRESTDWPoolerDB,  uRESTDWLazDriver;
+  RestDWServerFormU, uRESTDWPoolerDB, uRESTDWServerEvents,  uRESTDWLazDriver;
 
 
 type
@@ -13,6 +13,7 @@ type
   { TServerMethodDM }
 
   TServerMethodDM = class(TServerMethodDataModule)
+    DWServerEvents1: TDWServerEvents;
     RESTDWDriverFD1: TRESTDWLazDriver;
     RESTDWPoolerDB1: TRESTDWPoolerDB;
     Server_FDConnection: TIBConnection;

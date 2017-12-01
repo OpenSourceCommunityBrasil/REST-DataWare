@@ -41,4 +41,10 @@ object ServerMethodDM: TServerMethodDM
     left = 80
     top = 104
   end
+  object DWServerEvents1: TDWServerEvents
+    IgnoreInvalidParams = False
+    Events = <>
+    left = 221
+    top = 108
+  end
 end

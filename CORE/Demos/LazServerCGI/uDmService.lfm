@@ -40,20 +40,4 @@ object ServerMethodDM: TServerMethodDM
     left = 83
     top = 103
   end
-  object DWServerEvents1: TDWServerEvents
-    Events = <    
-      item
-        DWParams = <        
-          item
-            TypeObject = toParam
-            ObjectDirection = odOUT
-            ObjectValue = ovTimeStamp
-            ParamName = 'result'
-            Encoded = True
-          end>
-        Name = 'serverdatetime'
-      end>
-    left = 185
-    top = 81
-  end
 end

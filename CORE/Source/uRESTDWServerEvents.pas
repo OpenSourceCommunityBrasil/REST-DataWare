@@ -144,6 +144,9 @@ Type
 End;
 
 Type
+
+ { TDWClientEvents }
+
  TDWClientEvents = Class(TComponent)
  Protected
  Private
@@ -160,11 +163,11 @@ Type
   Procedure   CreateDWParams(EventName : String; Var DWParams : TDWParams);
   Function    SendEvent     (EventName : String; Var DWParams : TDWParams;
                              Var Error : String) : Boolean;
+  Procedure   ClearEvents;
+  Property    GetEvents        : Boolean           Read vGetEvents        Write GetOnlineEvents;
  Published
   Property    RESTClientPooler : TRESTClientPooler Read vRESTClientPooler Write vRESTClientPooler;
-//  Property    EditParamList    : Boolean           Read vEditParamList    Write SetEditParamList;
   Property    Events           : TDWEventList      Read vEventList        Write SetEventList;
-  Property    GetEvents        : Boolean           Read vGetEvents        Write GetOnlineEvents;
 End;
 
 implementation
@@ -648,8 +651,8 @@ begin
  vEditParamList := True;
 end;
 
-Procedure TDWClientEvents.CreateDWParams(EventName    : String;
-                                         Var DWParams : TDWParams);
+procedure TDWClientEvents.CreateDWParams(EventName: String;
+  Var DWParams: TDWParams);
 Var
  dwParam : TJSONParam;
  I       : Integer;
@@ -786,13 +789,17 @@ begin
 end;
 }
 
-Function TDWClientEvents.SendEvent(EventName    : String;
-                                   Var DWParams : TDWParams;
-                                   Var Error    : String): Boolean;
+function TDWClientEvents.SendEvent(EventName: String; Var DWParams: TDWParams;
+  Var Error: String): Boolean;
 Begin
  If vRESTClientPooler <> Nil Then
   vRESTClientPooler.SendEvent(EventName, DWParams);
 End;
+
+procedure TDWClientEvents.ClearEvents;
+begin
+ vEventList.ClearList;
+end;
 
 procedure TDWClientEvents.SetEventList(aValue : TDWEventList);
 begin
