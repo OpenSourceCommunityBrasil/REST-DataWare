@@ -188,7 +188,7 @@ End;
 Function Encode64(const S: string; const ByteEncoding: IIdTextEncoding = nil): string;
 Begin
  {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
-  Result := TIdEncoderMIME.EncodeString(S, ByteEncoding);
+  Result := TIdEncoderMIME.EncodeString(S, IndyTextEncoding_utf8);
  {$ELSE}
   {$IFDEF FPC}
    Result := EncodeStringBase64(S);
