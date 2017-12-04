@@ -220,15 +220,38 @@ Type
 End;
 
 Type
+ TDWMassiveCacheSQLValue = Class
+  MassiveSQLMode : TMassiveSQLMode;
+  SQL            : String;
+  Params         : TDWParams;
+End;
+
+Type
+ PMassiveCacheSQLValue  = ^TDWMassiveCacheSQLValue;
+ TDWMassiveCacheSQLList = Class(TList)
+ Private
+  Function   GetRec(Index : Integer)       : TDWMassiveCacheSQLValue;     Overload;
+  Procedure  PutRec(Index : Integer; Item  : TDWMassiveCacheSQLValue);    Overload;
+  Procedure  ClearAll;
+ Protected
+ Public
+  Destructor Destroy;Override;
+  Procedure  Delete(Index : Integer);                                Overload;
+  Function   Add   (Item  : TDWMassiveCacheSQLValue) : Integer;           Overload;
+  Property   Items[Index  : Integer]            : TDWMassiveCacheSQLValue Read GetRec Write PutRec; Default;
+End;
+
+Type
  TDWMassiveSQLCache = Class(TComponent)
  Private
-  MassiveCacheList : TDWMassiveCacheList;
+  MassiveCacheSQLList : TDWMassiveCacheSQLList;
+  Procedure   Add(Value      : TDWMassiveCacheSQLValue);
  Public
   Function    MassiveCount   : Integer;
   Function    ToJSON         : String;
-  Procedure   Add(Value : String);
   Procedure   Clear;
-  Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
+  Procedure   AddDataset(Dataset : TDataset);
+  Constructor Create    (AOwner  : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                      //Destroy a Classe
 End;
 
@@ -1698,36 +1721,101 @@ End;
 
 { TDWMassiveSQLCache }
 
-procedure TDWMassiveSQLCache.Add(Value: String);
+procedure TDWMassiveSQLCache.Add(Value: TDWMassiveCacheSQLValue);
 begin
-
+ MassiveCacheSQLList.Add(Value);
 end;
+
+procedure TDWMassiveSQLCache.AddDataset(Dataset: TDataset);
+Begin
+ If Dataset is TRESTDWClientSQL Then
+  Begin
+
+  End;
+End;
 
 procedure TDWMassiveSQLCache.Clear;
 begin
-
+ MassiveCacheSQLList.Clear;
 end;
 
 constructor TDWMassiveSQLCache.Create(AOwner: TComponent);
 begin
   inherited;
- MassiveCacheList := TDWMassiveCacheList.Create;
+ MassiveCacheSQLList := TDWMassiveCacheSQLList.Create;
 end;
 
 destructor TDWMassiveSQLCache.Destroy;
 begin
- FreeAndNil(MassiveCacheList);
+ FreeAndNil(MassiveCacheSQLList);
   inherited;
 end;
 
 function TDWMassiveSQLCache.MassiveCount: Integer;
 begin
-
+ Result := MassiveCacheSQLList.Count;
 end;
 
 function TDWMassiveSQLCache.ToJSON: String;
 begin
 
+end;
+
+{ TDWMassiveCacheSQLList }
+
+function TDWMassiveCacheSQLList.Add(Item: TDWMassiveCacheSQLValue): Integer;
+Var
+ vItem : ^TDWMassiveCacheSQLValue;
+Begin
+ New(vItem);
+ vItem^ := Item;
+ Result := TList(Self).Add(vItem);
+End;
+
+procedure TDWMassiveCacheSQLList.ClearAll;
+Var
+ I : Integer;
+Begin
+ For I := TList(Self).Count -1 DownTo 0 Do
+  Self.Delete(I);
+End;
+
+procedure TDWMassiveCacheSQLList.Delete(Index: Integer);
+begin
+ If (Index < Self.Count) And (Index > -1) Then
+  Begin
+   If Assigned(TList(Self).Items[Index]) Then
+    Begin
+     If TDWMassiveCacheSQLValue(TList(Self).Items[Index]^).SQL <> '' Then
+      TDWMassiveCacheSQLValue(TList(Self).Items[Index]^).SQL := '';
+     {$IFDEF FPC}
+      Dispose(PMassiveCacheSQLValue(TList(Self).Items[Index]));
+     {$ELSE}
+      Dispose(TList(Self).Items[Index]);
+     {$ENDIF}
+    End;
+   TList(Self).Delete(Index);
+  End;
+end;
+
+destructor TDWMassiveCacheSQLList.Destroy;
+begin
+ ClearAll;
+  inherited;
+end;
+
+function TDWMassiveCacheSQLList.GetRec(Index: Integer): TDWMassiveCacheSQLValue;
+begin
+ Result := Nil;
+ If (Index < Self.Count) And (Index > -1) Then
+  Result := TDWMassiveCacheSQLValue(TList(Self).Items[Index]^);
+end;
+
+procedure TDWMassiveCacheSQLList.PutRec(Index: Integer;
+  Item: TDWMassiveCacheSQLValue);
+begin
+ If (Index < Self.Count) And (Index > -1) Then
+  TDWMassiveCacheSQLValue(TList(Self).Items[Index]^) := Item;
 end;
 
 End.

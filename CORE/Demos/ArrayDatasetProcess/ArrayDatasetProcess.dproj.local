@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899/12/30 00:00:00.000.241,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit8.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\ArrayDatasetProcess\Unit8.dfm</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.753,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\ArrayDatasetProcess\ArrayDatasetProcess.dproj</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.753,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\ArrayDatasetProcess\ArrayDatasetProcess.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.241,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\ArrayDatasetProcess\Unit8.dfm=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit8.dfm</Transaction>
   </Transactions>
 	<ActiveMobileDevice>
 		<NoProfile iOSSimulator="iPhone5"/>

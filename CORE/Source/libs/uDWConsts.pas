@@ -49,6 +49,7 @@ Const
 
 Type
  TMassiveMode     = (mmInactive, mmBrowse, mmInsert, mmUpdate, mmDelete);
+ TMassiveSQLMode  = (msqlQuery, msqlExecute);
  TTypeObject      = (toDataset,   toParam, toMassive,
                      toVariable,  toObject);
  TObjectValue     = (ovUnknown,         ovString,       ovSmallint,         ovInteger,    ovWord,                            // 0..4
