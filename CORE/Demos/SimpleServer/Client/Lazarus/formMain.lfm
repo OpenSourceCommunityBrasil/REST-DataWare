@@ -1225,4 +1225,26 @@ object Form2: TForm2
     left = 203
     top = 261
   end
+  object DWClientEvents1: TDWClientEvents
+    RESTClientPooler = RESTClientPooler1
+    Events = <>
+    left = 265
+    top = 49
+  end
+  object RESTClientPooler1: TRESTClientPooler
+    DataCompression = True
+    Encoding = esASCII
+    Host = 'localhost'
+    UserName = 'testserver'
+    Password = 'testserver'
+    ProxyOptions.BasicAuthentication = False
+    ProxyOptions.ProxyPort = 0
+    RequestTimeOut = 10000
+    ThreadRequest = False
+    AllowCookies = False
+    HandleRedirects = False
+    DatabaseCharSet = csUndefined
+    left = 237
+    top = 49
+  end
 end

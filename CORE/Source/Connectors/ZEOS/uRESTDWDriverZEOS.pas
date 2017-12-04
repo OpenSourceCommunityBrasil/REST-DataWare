@@ -1717,12 +1717,12 @@ Begin
     bJsonValue := bJsonArray.optJSONObject(I);
     vTempQuery.Close;
     vTempQuery.SQL.Clear;
-    vTempQuery.SQL.Add(DecodeStrings(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString, {$IFDEF FPC}csUndefined{$ENDIF}));
+    vTempQuery.SQL.Add(DecodeStrings(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString{$IFDEF FPC}, csUndefined{$ENDIF}));
     If bJsonValue.names.length > 1 Then
      Begin
       DWParams := TDWParams.Create;
       Try
-       DWParams.FromJSON(DecodeStrings(bJsonValue.opt(bJsonValue.names.get(1).ToString).ToString, {$IFDEF FPC}csUndefined{$ENDIF}));
+       DWParams.FromJSON(DecodeStrings(bJsonValue.opt(bJsonValue.names.get(1).ToString).ToString{$IFDEF FPC}, csUndefined{$ENDIF}));
        For X := 0 To DWParams.Count -1 Do
         Begin
          If vTempQuery.ParamByName(DWParams[X].ParamName) <> Nil Then

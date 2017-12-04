@@ -3,10 +3,9 @@ unit formMain;
 interface
 
 uses
-  Lcl, uDWJSON,  SysUtils, Variants, Classes, Graphics,
-  Controls, Forms, Dialogs, StdCtrls, fpjson, jsonparser, DB, BufDataset,
-  DBGrids, ExtCtrls, ComCtrls, uRESTDWPoolerDB, JvMemDS,
-  IdComponent;
+  Lcl, uDWJSON, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  StdCtrls, fpjson, jsonparser, DB, BufDataset, DBGrids, ExtCtrls, ComCtrls,
+  uRESTDWPoolerDB, uRESTDWServerEvents, uRESTDWBase, JvMemDS, IdComponent;
 
 type
 
@@ -22,6 +21,7 @@ type
     CheckBox1: TCheckBox;
     DataSource1: TDataSource;
     DBGrid1: TDBGrid;
+    DWClientEvents1: TDWClientEvents;
     edPasswordDW: TEdit;
     edUserNameDW: TEdit;
     eHost: TEdit;
@@ -36,6 +36,7 @@ type
     Label8: TLabel;
     mComando: TMemo;
     ProgressBar1: TProgressBar;
+    RESTClientPooler1: TRESTClientPooler;
     RESTDWClientSQL1: TRESTDWClientSQL;
     RESTDWDataBase1: TRESTDWDataBase;
     procedure Button1Click(Sender: TObject);
