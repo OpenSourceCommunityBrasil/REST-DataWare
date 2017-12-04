@@ -21,10 +21,9 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <TopLine Value="77"/>
-        <CursorPos X="20" Y="87"/>
+        <CursorPos X="65" Y="77"/>
         <UsageCount Value="223"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="urestrequest.pas"/>

@@ -84,8 +84,8 @@ Begin
  {$ELSE}
   FormEditingHook.RegisterDesignerBaseClass(TServerMethodDataModule);
  {$ENDIF}
- RegisterComponents('REST Dataware - Service',     [TRESTServicePooler, TDWServerEvents, TDWClientEvents,  TRESTServiceCGI,   TRESTClientPooler]);
- RegisterComponents('REST Dataware - CORE - DB',   [TRESTDWPoolerDB,    TRESTDWDataBase, TRESTDWClientSQL, TRESTDWStoredProc, TRESTDWPoolerList, TDWMassiveCache]);
+ RegisterComponents('REST Dataware - Service',     [TRESTServicePooler, TDWServerEvents, TRESTServiceCGI,  TDWClientEvents,    TRESTClientPooler]);
+ RegisterComponents('REST Dataware - CORE - DB',   [TRESTDWPoolerDB,    TRESTDWDataBase, TRESTDWClientSQL, TDWMassiveSQLCache, TRESTDWStoredProc, TRESTDWPoolerList, TDWMassiveCache]);
  RegisterPropertyEditor(TypeInfo(String), TRESTDWDataBase, 'PoolerName', TPoolersList);
  RegisterComponentEditor(TDWClientEvents, TDWClientEventsEditor);
 End;

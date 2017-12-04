@@ -145,8 +145,8 @@
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Build>98</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.3.1.98;InternalName=REST Dataware CORE Version;LegalCopyright=REST Dataware CORE Version;LegalTrademarks=REST Dataware CORE Version;OriginalFilename=REST Dataware CORE Version;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.3.1;Comments=</VerInfo_Keys>
+        <VerInfo_Build>99</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.3.1.99;InternalName=REST Dataware CORE Version;LegalCopyright=REST Dataware CORE Version;LegalTrademarks=REST Dataware CORE Version;OriginalFilename=REST Dataware CORE Version;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.3.1;Comments=</VerInfo_Keys>
         <VerInfo_Release>1</VerInfo_Release>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
@@ -236,6 +236,10 @@
         <RcItem Include="..\..\..\Images\TDWClientEvents.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TDWClientEvents</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\..\Images\TDWMassiveSQLCache.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TDWMassiveSQLCache</ResourceId>
         </RcItem>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

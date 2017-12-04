@@ -70,6 +70,17 @@ TYPE
     DWClientEvents1: TDWClientEvents;
     RESTClientPooler1: TRESTClientPooler;
     Button6: TButton;
+    RESTDWClientSQL1EMP_NO: TSmallintField;
+    RESTDWClientSQL1FIRST_NAME: TStringField;
+    RESTDWClientSQL1LAST_NAME: TStringField;
+    RESTDWClientSQL1PHONE_EXT: TStringField;
+    RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField;
+    RESTDWClientSQL1DEPT_NO: TStringField;
+    RESTDWClientSQL1JOB_CODE: TStringField;
+    RESTDWClientSQL1JOB_GRADE: TSmallintField;
+    RESTDWClientSQL1JOB_COUNTRY: TStringField;
+    RESTDWClientSQL1SALARY: TFloatField;
+    RESTDWClientSQL1FULL_NAME: TStringField;
     PROCEDURE Button1Click(Sender: TObject);
     PROCEDURE Button2Click(Sender: TObject);
     PROCEDURE RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
@@ -120,8 +131,6 @@ BEGIN
   RESTDWClientSQL1.Active := False;
   RESTDWClientSQL1.SQL.Clear;
   RESTDWClientSQL1.SQL.Add(MComando.Text);
-  if RESTDWClientSQL1.ParamByName('HIRE_DATE') <> Nil then
-   RESTDWClientSQL1.ParamByName('HIRE_DATE').AsDateTime := Now;
   TRY
     RESTDWClientSQL1.Open;
   EXCEPT

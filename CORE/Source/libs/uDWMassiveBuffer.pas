@@ -4,7 +4,7 @@ unit uDWMassiveBuffer;
 
 interface
 
-uses SysUtils,       Classes,      uDWJSONObject,
+uses SysUtils,       Classes,
      DB,             uRESTDWBase,  uDWConsts,
      uDWConstsData,  uDWJSONTools, udwjson {$IFNDEF FPC}
                                            {$IF CompilerVersion > 21}
@@ -16,7 +16,7 @@ uses SysUtils,       Classes,      uDWJSONObject,
                                             {$IFEND}
                                             {$ENDIF}
                                             {$IFEND}
-                                            {$ENDIF};
+                                            {$ENDIF}, uDWJSONObject;
 
 
 
@@ -24,7 +24,7 @@ Type
  TMassiveValue = Class
  Private
   vBinary     : Boolean;
-  vJSONValue  : uDWJSONObject.TJSONValue;
+  vJSONValue  : TJSONValue;
   Function    GetValue       : String;
   Procedure   SetValue(Value : String);
  Protected
@@ -208,6 +208,19 @@ End;
 
 Type
  TDWMassiveCache = Class(TComponent)
+ Private
+  MassiveCacheList : TDWMassiveCacheList;
+ Public
+  Function    MassiveCount   : Integer;
+  Function    ToJSON         : String;
+  Procedure   Add(Value : String);
+  Procedure   Clear;
+  Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
+  Destructor  Destroy;Override;                      //Destroy a Classe
+End;
+
+Type
+ TDWMassiveSQLCache = Class(TComponent)
  Private
   MassiveCacheList : TDWMassiveCacheList;
  Public
@@ -1682,5 +1695,39 @@ Begin
  FreeAndNil(MassiveCacheList);
   inherited;
 End;
+
+{ TDWMassiveSQLCache }
+
+procedure TDWMassiveSQLCache.Add(Value: String);
+begin
+
+end;
+
+procedure TDWMassiveSQLCache.Clear;
+begin
+
+end;
+
+constructor TDWMassiveSQLCache.Create(AOwner: TComponent);
+begin
+  inherited;
+ MassiveCacheList := TDWMassiveCacheList.Create;
+end;
+
+destructor TDWMassiveSQLCache.Destroy;
+begin
+ FreeAndNil(MassiveCacheList);
+  inherited;
+end;
+
+function TDWMassiveSQLCache.MassiveCount: Integer;
+begin
+
+end;
+
+function TDWMassiveSQLCache.ToJSON: String;
+begin
+
+end;
 
 End.

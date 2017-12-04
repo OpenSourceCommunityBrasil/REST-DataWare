@@ -5,7 +5,7 @@ object ServerMethodDM: TServerMethodDM
   OnWelcomeMessage = ServerMethodDataModuleWelcomeMessage
   OnMassiveProcess = ServerMethodDataModuleMassiveProcess
   Height = 164
-  Width = 221
+  Width = 235
   object RESTDWPoolerDB1: TRESTDWPoolerDB
     RESTDriver = RESTDWDriverFD1
     Compression = True
@@ -67,7 +67,6 @@ object ServerMethodDM: TServerMethodDM
   object FDTransaction1: TFDTransaction
     Options.AutoStop = False
     Options.DisconnectAction = xdRollback
-    Connection = Server_FDConnection
     Left = 81
     Top = 15
   end
