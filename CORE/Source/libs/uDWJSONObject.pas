@@ -2083,8 +2083,9 @@ End;
 Procedure TJSONParam.LoadFromStream(Stream: TMemoryStream; Encode: Boolean);
 Begin
  ObjectValue := ovBlob;
- vBinary := False;
  SetValue(StreamToHex(Stream), False);
+ vBinary           := True;
+ vJSONValue.Binary := vBinary;
 End;
 
 {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
@@ -2120,12 +2121,15 @@ Begin
   vValue := CopyValue(JSON);
   If bJsonValue.names.Length > 0 Then
    Begin
-    vTypeObject      := GetObjectName(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString);
-    vObjectDirection := GetDirectionName(bJsonValue.opt(bJsonValue.names.get(1).ToString).ToString);
-    vEncoded         := GetBooleanFromString(bJsonValue.opt(bJsonValue.names.get(2).ToString).ToString);
-    vObjectValue     := GetValueType(bJsonValue.opt(bJsonValue.names.get(3).ToString).ToString);
-    vParamName       := Lowercase(bJsonValue.names.get(4).ToString);
+    vTypeObject        := GetObjectName(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString);
+    vObjectDirection   := GetDirectionName(bJsonValue.opt(bJsonValue.names.get(1).ToString).ToString);
+    vEncoded           := GetBooleanFromString(bJsonValue.opt(bJsonValue.names.get(2).ToString).ToString);
+    vObjectValue       := GetValueType(bJsonValue.opt(bJsonValue.names.get(3).ToString).ToString);
+    vParamName         := Lowercase(bJsonValue.names.get(4).ToString);
     WriteValue(vValue);
+    vBinary            := vObjectValue in [ovBytes, ovVarBytes, ovBlob,
+                                           ovGraphic, ovOraBlob, ovOraClob];
+    vJSONValue.vBinary := vBinary;
    End;
  Finally
   bJsonValue.Free;
@@ -2151,7 +2155,7 @@ End;
 
 Procedure TJSONParam.SaveToStream(Stream: TMemoryStream);
 Begin
- HexToStream(Value, Stream);
+ HexToStream(GetAsString, Stream);
 End;
 
 {$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}
@@ -2626,6 +2630,7 @@ Begin
                         vJSONValue.SaveToStream(ms, vJSONValue.vBinary);
                         If ms.Size > 0 Then
                          Begin
+                          ms.Position := 0;
                           Result   := VarArrayCreate([0, ms.Size - 1], VarByte);
                           MyBuffer := VarArrayLock(Result);
                           ms.ReadBuffer(MyBuffer^, ms.Size);

@@ -409,15 +409,18 @@ Var
  Begin
   A := 0;
   Result := '';
-  For I := 0 To Params.Count -1 Do
+  If Assigned(Params) Then
    Begin
-    If TJSONParam(TList(Params).Items[I]^).ObjectDirection in [odOUT, odINOUT] Then
+    For I := 0 To Params.Count -1 Do
      Begin
-      If A = 0 Then
-       Result := TJSONParam(TList(Params).Items[I]^).ToJSON
-      Else
-       Result := Result + ', ' + TJSONParam(TList(Params).Items[I]^).ToJSON;
-      Inc(A);
+      If TJSONParam(TList(Params).Items[I]^).ObjectDirection in [odOUT, odINOUT] Then
+       Begin
+        If A = 0 Then
+         Result := TJSONParam(TList(Params).Items[I]^).ToJSON
+        Else
+         Result := Result + ', ' + TJSONParam(TList(Params).Items[I]^).ToJSON;
+        Inc(A);
+       End;
      End;
    End;
  End;
@@ -1783,11 +1786,11 @@ Var
  Begin
   If DWParams <> Nil Then
    Begin
-     If Not (Assigned(StringStreamList)) Then
+    If Not (Assigned(StringStreamList)) Then
      StringStreamList := TStringStreamList.Create;
-     For I := 0 To DWParams.Count -1 Do
+    For I := 0 To DWParams.Count -1 Do
      Begin
-            If DWParams.Items[I].ObjectValue in [ovWideMemo, ovBytes, ovVarBytes, ovBlob,
+      If DWParams.Items[I].ObjectValue in [ovWideMemo, ovBytes, ovVarBytes, ovBlob,
                                            ovMemo,   ovGraphic, ovFmtMemo,  ovOraBlob, ovOraClob] Then
        Begin
         StringStreamList.Add({$IFDEF FPC}
@@ -1853,16 +1856,19 @@ Begin
   SetParams(HttpRequest);
   HttpRequest.MaxAuthRetries := 0;
   Case EventType Of
+   {
    seGET :
     Begin
      HttpRequest.Request.ContentType := 'application/json';
      Result := HttpRequest.Get(EventData);
     End;
+   }
+   seGET,
    sePOST,
    sePUT,
    seDELETE :
     Begin;
-     If EventType = sePOST Then
+     If EventType In [seGET, sePOST] Then
       Begin
        SendParams := TIdMultiPartFormDataStream.Create;
        If Params <> Nil Then
@@ -1870,7 +1876,7 @@ Begin
        If vWelcomeMessage <> '' Then
         SendParams.AddFormField('dwwelcomemessage', EncodeStrings(vWelcomeMessage));
        SendParams.AddFormField('datacompression', BooleanToString(vDatacompress));
-       If (Params <> Nil) Or (vWelcomeMessage <> '') Then
+       If (Params <> Nil) Or (vWelcomeMessage <> '') Or (vDatacompress) Then
         Begin
          HttpRequest.Request.ContentType     := 'application/x-www-form-urlencoded';
          HttpRequest.Request.ContentEncoding := 'multipart/form-data';
@@ -1915,9 +1921,11 @@ Begin
           End
          Else
           Begin
-           bStringStream.CopyFrom(aStringStream, aStringStream.Size);
-           bStringStream.Position := 0;
-           HexToStream(bStringStream.DataString, StringStream);
+//           bStringStream.CopyFrom(aStringStream, aStringStream.Size);
+//           bStringStream.Position := 0;
+           StringStream.CopyFrom(aStringStream, aStringStream.Size);
+           StringStream.Position := 0;
+//           HexToStream(bStringStream.DataString, StringStream);
           End;
          FreeAndNil(bStringStream);
          FreeAndNil(aStringStream);
@@ -2993,15 +3001,18 @@ Var
   A, I : Integer;
  Begin
   A := 0;
-  For I := 0 To Params.Count -1 Do
+  If Assigned(Params) Then
    Begin
-    If TJSONParam(TList(Params).Items[I]^).ObjectDirection in [odOUT, odINOUT] Then
+    For I := 0 To Params.Count -1 Do
      Begin
-      If A = 0 Then
-       Result := TJSONParam(TList(Params).Items[I]^).ToJSON
-      Else
-       Result := Result + ', ' + TJSONParam(TList(Params).Items[I]^).ToJSON;
-      Inc(A);
+      If TJSONParam(TList(Params).Items[I]^).ObjectDirection in [odOUT, odINOUT] Then
+       Begin
+        If A = 0 Then
+         Result := TJSONParam(TList(Params).Items[I]^).ToJSON
+        Else
+         Result := Result + ', ' + TJSONParam(TList(Params).Items[I]^).ToJSON;
+        Inc(A);
+       End;
      End;
    End;
  End;
