@@ -2,7 +2,7 @@ object Form2: TForm2
   Left = 426
   Top = 153
   Caption = 'RESTClientPooler Test'
-  ClientHeight = 437
+  ClientHeight = 449
   ClientWidth = 705
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,7 +15,7 @@ object Form2: TForm2
   OnCreate = FormCreate
   DesignSize = (
     705
-    437)
+    449)
   PixelsPerInch = 96
   TextHeight = 13
   object Label4: TLabel
@@ -1121,7 +1121,7 @@ object Form2: TForm2
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 418
+    Top = 430
     Width = 705
     Height = 19
     Panels = <
@@ -1129,6 +1129,7 @@ object Form2: TForm2
         Text = 'Status'
         Width = 50
       end>
+    ExplicitTop = 418
   end
   object Memo1: TMemo
     Left = 465
@@ -1199,68 +1200,7 @@ object Form2: TForm2
     Top = 64
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    FieldDefs = <
-      item
-        Name = 'EMP_NO'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'FIRST_NAME'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 15
-      end
-      item
-        Name = 'LAST_NAME'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 20
-      end
-      item
-        Name = 'PHONE_EXT'
-        DataType = ftString
-        Size = 4
-      end
-      item
-        Name = 'HIRE_DATE'
-        Attributes = [faRequired]
-        DataType = ftTimeStamp
-      end
-      item
-        Name = 'DEPT_NO'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 3
-      end
-      item
-        Name = 'JOB_CODE'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 5
-      end
-      item
-        Name = 'JOB_GRADE'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'JOB_COUNTRY'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 15
-      end
-      item
-        Name = 'SALARY'
-        Attributes = [faRequired]
-        DataType = ftFloat
-        Precision = 15
-      end
-      item
-        Name = 'FULL_NAME'
-        DataType = ftString
-        Size = 37
-      end>
+    FieldDefs = <>
     IndexDefs = <>
     MasterFields = ''
     FetchOptions.AssignedValues = [evMode]
@@ -1340,8 +1280,9 @@ object Form2: TForm2
   object RESTDWDataBase1: TRESTDWDataBase
     OnConnection = RESTDWDataBase1Connection
     OnBeforeConnect = RESTDWDataBase1BeforeConnect
-    Active = False
+    Active = True
     Compression = True
+    MyIP = '127.0.0.1'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False

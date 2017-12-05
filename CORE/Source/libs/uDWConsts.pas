@@ -243,12 +243,11 @@ Begin
   Finally
    {$IFNDEF FPC}
     {$if CompilerVersion > 21}
-     Compressed.Clear;
-    {$ELSE}
-     FreeAndNil(Compressed);
-    {$IFEND}
+    Compressed.Clear;
+    {$ENDIF}
+    FreeAndNil(Compressed);
    {$ELSE}
-    Compressed := Nil;
+   Compressed := Nil;
    {$ENDIF}
   End;
  Finally
