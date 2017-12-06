@@ -523,7 +523,8 @@ Begin
      dwParam.ObjectDirection := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectDirection;
      dwParam.ObjectValue     := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectValue;
      dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
-     If vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '' Then
+     If (vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '')  And
+        (Trim(dwParam.AsString) = '') Then
       dwParam.Value           := vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue;
      If Not(vFound) Then
       DWParams.Add(dwParam);
@@ -676,7 +677,8 @@ Begin
      dwParam.ObjectDirection := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectDirection;
      dwParam.ObjectValue     := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectValue;
      dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
-     If vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '' Then
+     If (vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '') And
+        (Trim(dwParam.AsString) = '') Then
       dwParam.Value           := vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue;
      If Not(vFound) Then
       DWParams.Add(dwParam);
