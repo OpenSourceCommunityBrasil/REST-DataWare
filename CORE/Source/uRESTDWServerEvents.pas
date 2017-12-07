@@ -661,8 +661,8 @@ Var
 Begin
  If vEventList.EventByName[EventName] <> Nil Then
   Begin
-   If (Not Assigned(DWParams)) or (dwParams = nil) Then
-    DWParams := TDWParams.Create;
+//   If (Not Assigned(DWParams)) or (dwParams = nil) Then
+   DWParams := TDWParams.Create;
    {$IFNDEF FPC}
    DWParams.Encoding := GetEncoding(vRESTClientPooler.Encoding);
    {$ENDIF}
