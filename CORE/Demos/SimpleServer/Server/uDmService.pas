@@ -62,7 +62,9 @@ TYPE
       var Result: string);
   PRIVATE
     { Private declarations }
+    vIDVenda : Integer;
     FUNCTION ConsultaBanco(VAR Params: TDWParams): STRING; OVERLOAD;
+    function GetGenID(GenName: String): Integer;
   PUBLIC
     { Public declarations }
   END;
@@ -127,6 +129,23 @@ BEGIN
   RESTDWPoolerDB1.Active := RestDWForm.CbPoolerState.Checked;
 END;
 
+Function TServerMethodDM.GetGenID(GenName  : String): Integer;
+Var
+ vTempClient : TFDQuery;
+Begin
+ vTempClient := TFDQuery.Create(Nil);
+ Result      := -1;
+ Try
+  vTempClient.Connection := Server_FDConnection;
+  vTempClient.SQL.Add(Format('select gen_id(%s, 1)GenID From rdb$database', [GenName]));
+  vTempClient.Active := True;
+  Result := vTempClient.FindField('GenID').AsInteger;
+ Except
+
+ End;
+ vTempClient.Free;
+End;
+
 procedure TServerMethodDM.ServerMethodDataModuleMassiveProcess(
   var MassiveDataset: TMassiveDatasetBuffer; var Ignore: Boolean);
 begin
@@ -135,13 +154,30 @@ begin
   //pelo valor setado abaixo
  Ignore := (MassiveDataset.MassiveMode in [mmInsert, mmUpdate, mmDelete]) and
            (lowercase(MassiveDataset.TableName) <> 'employee');
- If Not Ignore Then
+}
+ If lowercase(MassiveDataset.TableName) = 'vendas' Then
   Begin
-   If MassiveDataset.MassiveMode = mmUpdate Then
-    If MassiveDataset.Fields.FieldByName('last_name') <> Nil Then
-     MassiveDataset.Fields.FieldByName('last_name').Value := 'Server Alter';
+   If MassiveDataset.Fields.FieldByName('ID_VENDA') <> Nil Then
+    If (Trim(MassiveDataset.Fields.FieldByName('ID_VENDA').Value) = '') or
+       (Trim(MassiveDataset.Fields.FieldByName('ID_VENDA').Value) = '-1')  then
+     Begin
+      vIDVenda := GetGenID('GEN_' + lowercase(MassiveDataset.TableName));
+      MassiveDataset.Fields.FieldByName('ID_VENDA').Value := IntToStr(vIDVenda);
+     End
+    Else
+     vIDVenda := StrToInt(MassiveDataset.Fields.FieldByName('ID_VENDA').Value)
+  End
+ Else If lowercase(MassiveDataset.TableName) = 'vendas_items' Then
+  Begin
+   If MassiveDataset.Fields.FieldByName('ID_VENDA') <> Nil Then
+    If (Trim(MassiveDataset.Fields.FieldByName('ID_VENDA').Value) = '') or
+       (Trim(MassiveDataset.Fields.FieldByName('ID_VENDA').Value) = '-1')  then
+     MassiveDataset.Fields.FieldByName('ID_VENDA').Value := IntToStr(vIDVenda);
+   If MassiveDataset.Fields.FieldByName('ID_ITEMS') <> Nil Then
+    If (Trim(MassiveDataset.Fields.FieldByName('ID_ITEMS').Value) = '') or
+       (Trim(MassiveDataset.Fields.FieldByName('ID_ITEMS').Value) = '-1')  then
+     MassiveDataset.Fields.FieldByName('ID_ITEMS').Value := IntToStr(GetGenID('GEN_' + lowercase(MassiveDataset.TableName)));
   End;
- }
 end;
 
 PROCEDURE TServerMethodDM.ServerMethodDataModuleReplyEvent(SendType: TSendEvent; Context: STRING; VAR Params: TDWParams; VAR Result: STRING);

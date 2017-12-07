@@ -298,9 +298,7 @@ Type
   Procedure   OldAfterPost       (DataSet : TDataSet);      //Eventos do Dataset para realizar o AfterPost
   Procedure   OldAfterDelete     (DataSet : TDataSet);      //Eventos do Dataset para realizar o AfterDelete
   Procedure   SetMasterDataSet     (Value : TRESTDWClientSQL);
-  Procedure   PrepareDetails       (ActiveMode : Boolean);
   Procedure   SetCacheUpdateRecords(Value : Boolean);
-  Procedure   PrepareDetailsNew;
   Function    FirstWord          (Value     : String) : String;
   Procedure   ProcAfterScroll    (DataSet   : TDataSet);
   Procedure   ProcBeforeOpen     (DataSet   : TDataSet);
@@ -317,6 +315,8 @@ Type
   procedure   CreateMassiveDataset;
  Public
   //Métodos
+  Procedure   PrepareDetailsNew;
+  Procedure   PrepareDetails     (ActiveMode : Boolean);
   Procedure   FieldDefsToFields;
   Function    FieldDefExist      (Value   : String) : TFieldDef;
   Procedure   Open;Overload; Virtual;                     //Método Open que será utilizado no Componente
@@ -2730,6 +2730,7 @@ procedure TRESTDWClientSQL.PrepareDetailsNew;
 Var
  I : Integer;
  vDetailClient : TRESTDWClientSQL;
+ vOldInBlock   : Boolean;
 Begin
  For I := 0 To vMasterDetailList.Count -1 Do
   Begin
@@ -2739,8 +2740,27 @@ Begin
     Begin
      If vDetailClient.Active Then
       Begin
-       vDetailClient.ClearFields;
+       vOldInBlock   := vDetailClient.InBlockEvents;
+       Try
+        vDetailClient.InBlockEvents := True;
+        vDetailClient.CreateDataSet;
+       Finally
+        vDetailClient.InBlockEvents := vOldInBlock;
+       End;
        vDetailClient.ProcAfterScroll(vDetailClient);
+      End
+     Else
+      Begin
+       If vDetailClient.Fields.Count > 0 Then
+        Begin
+         vOldInBlock   := vDetailClient.InBlockEvents;
+         Try
+          vDetailClient.InBlockEvents := True;
+          vDetailClient.Active := True;
+         Finally
+          vDetailClient.InBlockEvents := vOldInBlock;
+         End;
+        End;
       End;
     End;
   End;

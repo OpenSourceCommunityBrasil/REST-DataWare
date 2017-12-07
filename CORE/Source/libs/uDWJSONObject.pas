@@ -1784,6 +1784,13 @@ Begin
   ListFields.Free;
   If DestDS.Active Then
    DestDS.First;
+  If TRESTDWClientSQL(DestDS).State = dsBrowse Then
+   Begin
+    If TRESTDWClientSQL(DestDS).RecordCount = 0 Then
+     TRESTDWClientSQL(DestDS).PrepareDetailsNew
+    Else
+     TRESTDWClientSQL(DestDS).PrepareDetails(True);
+   End;
   DestDS.EnableControls;
  End;
 End;
