@@ -1106,9 +1106,8 @@ object Form9: TForm9
     TabOrder = 10
   end
   object RESTDWDataBase1: TRESTDWDataBase
-    Active = True
+    Active = False
     Compression = True
-    MyIP = '127.0.0.1'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -1125,8 +1124,8 @@ object Form9: TForm9
     StrsEmpty2Null = False
     StrsTrim2Len = True
     ParamCreate = True
-    Left = 128
-    Top = 264
+    Left = 187
+    Top = 106
   end
   object dwSQLEmployee: TRESTDWClientSQL
     FieldDefs = <
@@ -1161,8 +1160,8 @@ object Form9: TForm9
     AutoCommitData = False
     AutoRefreshAfterCommit = False
     InBlockEvents = False
-    Left = 151
-    Top = 266
+    Left = 215
+    Top = 106
     object dwSQLEmployeeEMP_NO: TSmallintField
       FieldName = 'EMP_NO'
       Required = True
@@ -1199,8 +1198,8 @@ object Form9: TForm9
     AutoRefreshAfterCommit = False
     InBlockEvents = False
     MassiveCache = DWMassiveCache1
-    Left = 128
-    Top = 307
+    Left = 186
+    Top = 148
     object dwSQLVendasID_VENDA: TIntegerField
       FieldName = 'ID_VENDA'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
@@ -1268,14 +1267,14 @@ object Form9: TForm9
     DataCache = False
     Params = <
       item
-        DataType = ftString
-        Name = 'ID'
+        DataType = ftInteger
+        Name = 'ID_VENDA'
         ParamType = ptInput
       end>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
       'select * from VENDAS_ITEMS'
-      'where ID_VENDA = :ID'
+      'where ID_VENDA = :ID_VENDA'
       'Order by ID_ITEMS')
     UpdateTableName = 'VENDAS_ITEMS'
     CacheUpdateRecords = True
@@ -1283,8 +1282,8 @@ object Form9: TForm9
     AutoRefreshAfterCommit = False
     InBlockEvents = False
     MassiveCache = DWMassiveCache1
-    Left = 128
-    Top = 352
+    Left = 186
+    Top = 193
     object dwSQLItemsID_ITEMS: TSmallintField
       FieldName = 'ID_ITEMS'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
@@ -1304,21 +1303,21 @@ object Form9: TForm9
   end
   object dsEmployee: TDataSource
     DataSet = dwSQLEmployee
-    Left = 179
-    Top = 266
+    Left = 243
+    Top = 106
   end
   object dsItems: TDataSource
     DataSet = dwSQLItems
-    Left = 156
-    Top = 352
+    Left = 214
+    Top = 193
   end
   object dsVendas: TDataSource
     DataSet = dwSQLVendas
-    Left = 156
-    Top = 307
+    Left = 214
+    Top = 148
   end
   object DWMassiveCache1: TDWMassiveCache
-    Left = 379
-    Top = 178
+    Left = 259
+    Top = 170
   end
 end

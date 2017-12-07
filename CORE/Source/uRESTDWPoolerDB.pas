@@ -315,6 +315,7 @@ Type
   procedure   CreateMassiveDataset;
  Public
   //Métodos
+  Procedure   Newtable;
   Procedure   PrepareDetailsNew;
   Procedure   PrepareDetails     (ActiveMode : Boolean);
   Procedure   FieldDefsToFields;
@@ -2044,21 +2045,6 @@ Begin
    End;
    OldData.Clear;
    SaveToStream(OldData);
-   If Not vInBlockEvents Then
-    Begin
-     If Trim(vUpdateTableName) <> '' Then
-      Begin
-       TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmDelete);
-       TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self);
-       If vMassiveCache <> Nil Then
-        Begin
-         vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON);
-         TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
-        End;
-      End;
-     If Assigned(vBeforeDelete) Then
-      vBeforeDelete(DataSet);
-    End;
    If vCascadeDelete Then
     Begin
      For I := 0 To vMasterDetailList.Count -1 Do
@@ -2076,6 +2062,21 @@ Begin
          End;
         End;
       End;
+    End;
+   If Not vInBlockEvents Then
+    Begin
+     If Trim(vUpdateTableName) <> '' Then
+      Begin
+       TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmDelete);
+       TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self);
+       If vMassiveCache <> Nil Then
+        Begin
+         vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON);
+         TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+        End;
+      End;
+     If Assigned(vBeforeDelete) Then
+      vBeforeDelete(DataSet);
     End;
    vReadData := False;
   End;
@@ -2636,6 +2637,7 @@ Begin
        Begin
         If Assigned(vAfterPost) Then
          vAfterPost(Dataset);
+        ProcAfterScroll(Dataset);
        End;
      Except
 
@@ -2680,6 +2682,24 @@ Begin
   If TMassiveDatasetBuffer(vMassiveDataset).RecordCount > 0 Then
    Result := TMassiveDatasetBuffer(vMassiveDataset).ToJSON;
 End;
+
+Procedure TRESTDWClientSQL.Newtable;
+Begin
+ TRESTDWClientSQL(Self).Inactive   := True;
+ Try
+ {$IFNDEF FPC}
+  Self.Close;
+  Self.Open;
+ {$ELSE}
+  If DestDS is TBufDataset Then
+   TBufDataset(Self).CreateTable;
+  DestDS.Open;
+  TRESTDWClientSQL(Self).Active     := True;
+ {$ENDIF}
+ Finally
+  TRESTDWClientSQL(Self).Inactive   := False;
+ End;
+end;
 
 {$IFDEF FPC}
 procedure TRESTDWClientSQL.CloneDefinitions(Source: TMemDataset;
@@ -2743,7 +2763,8 @@ Begin
        vOldInBlock   := vDetailClient.InBlockEvents;
        Try
         vDetailClient.InBlockEvents := True;
-        vDetailClient.CreateDataSet;
+        If Self.State = dsInsert Then
+         vDetailClient.Newtable;
        Finally
         vDetailClient.InBlockEvents := vOldInBlock;
        End;
