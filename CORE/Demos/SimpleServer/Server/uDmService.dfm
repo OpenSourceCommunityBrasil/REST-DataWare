@@ -4,8 +4,8 @@ object ServerMethodDM: TServerMethodDM
   OnReplyEvent = ServerMethodDataModuleReplyEvent
   OnWelcomeMessage = ServerMethodDataModuleWelcomeMessage
   OnMassiveProcess = ServerMethodDataModuleMassiveProcess
-  Height = 164
-  Width = 235
+  Height = 199
+  Width = 310
   object RESTDWPoolerDB1: TRESTDWPoolerDB
     RESTDriver = RESTDWDriverFD1
     Compression = True
@@ -104,8 +104,34 @@ object ServerMethodDM: TServerMethodDM
           end>
         Name = 'teste'
         OnReplyEvent = DWServerEvents1EventstesteReplyEvent
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'sql'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        Name = 'loaddatasetevent'
+        OnReplyEvent = DWServerEvents1EventsloaddataseteventReplyEvent
       end>
     Left = 80
     Top = 103
+  end
+  object FDQuery1: TFDQuery
+    Connection = Server_FDConnection
+    SQL.Strings = (
+      '')
+    Left = 172
+    Top = 112
   end
 end

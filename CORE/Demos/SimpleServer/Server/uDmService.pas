@@ -37,7 +37,8 @@ USES
   FireDAC.Phys.MSSQLDef,
   FireDAC.Phys.ODBCBase,
   FireDAC.Phys.MSSQL,
-  uDWConsts, uRESTDWServerEvents;
+  uDWConsts, uRESTDWServerEvents, FireDAC.Stan.Param, FireDAC.DatS,
+  FireDAC.DApt.Intf, FireDAC.Comp.DataSet;
 
 TYPE
   TServerMethodDM = CLASS(TServerMethodDataModule)
@@ -49,6 +50,7 @@ TYPE
     FDGUIxWaitCursor1: TFDGUIxWaitCursor;
     FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink;
     FDTransaction1: TFDTransaction;
+    FDQuery1: TFDQuery;
     PROCEDURE ServerMethodDataModuleReplyEvent(SendType: TSendEvent; Context: STRING; VAR Params: TDWParams; VAR Result: STRING);
     PROCEDURE ServerMethodDataModuleCreate(Sender: TObject);
     PROCEDURE Server_FDConnectionBeforeConnect(Sender: TObject);
@@ -60,6 +62,8 @@ TYPE
       var Result: string);
     procedure DWServerEvents1EventstesteReplyEvent(var Params: TDWParams;
       var Result: string);
+    procedure DWServerEvents1EventsloaddataseteventReplyEvent(
+      var Params: TDWParams; var Result: string);
   PRIVATE
     { Private declarations }
     vIDVenda : Integer;
@@ -108,6 +112,32 @@ BEGIN
     END;
   END;
 END;
+
+procedure TServerMethodDM.DWServerEvents1EventsloaddataseteventReplyEvent(
+  var Params: TDWParams; var Result: string);
+Var
+ JSONValue: TJSONValue;
+BEGIN
+ If Params.ItemsString['sql'] <> Nil Then
+  Begin
+   JSONValue          := TJSONValue.Create;
+   Try
+    FDQuery1.Close;
+    FDQuery1.SQL.Clear;
+    FDQuery1.SQL.Add(Params.ItemsString['sql'].AsString);
+    Try
+     FDQuery1.Open;
+     JSONValue.Encoding := GetEncoding(Encoding);
+     JSONValue.LoadFromDataset('temp', FDQuery1, True);
+     Params.ItemsString['result'].AsString := JSONValue.ToJSON;
+    Except
+
+    End;
+   Finally
+    JSONValue.Free;
+   End;
+  End;
+end;
 
 procedure TServerMethodDM.DWServerEvents1EventsservertimeReplyEvent(
   var Params: TDWParams; var Result: string);

@@ -3,8 +3,8 @@ object Form3: TForm3
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'Load JSON to Dataset'
-  ClientHeight = 286
-  ClientWidth = 629
+  ClientHeight = 410
+  ClientWidth = 460
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,13 +13,11 @@ object Form3: TForm3
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
-  OnClose = FormClose
-  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object Image1: TImage
-    Left = 496
-    Top = 10
+    Left = 326
+    Top = 34
     Width = 133
     Height = 109
     Picture.Data = {
@@ -863,10 +861,101 @@ object Form3: TForm3
       78A2C7BA508FC03148832468101C83D42D0D826390BAA541700C52B7F4BFB752
       4E92F100CAA80000000049454E44AE426082}
   end
+  object Label4: TLabel
+    Left = 13
+    Top = 38
+    Width = 26
+    Height = 13
+    Caption = 'Host'
+    Color = clBtnFace
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Label5: TLabel
+    Left = 155
+    Top = 40
+    Width = 31
+    Height = 13
+    Caption = 'Porta'
+    Color = clBtnFace
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Bevel1: TBevel
+    Left = -60
+    Top = 32
+    Width = 689
+    Height = 2
+    Shape = bsTopLine
+  end
+  object Label7: TLabel
+    Left = 8
+    Top = 13
+    Width = 196
+    Height = 13
+    Caption = 'CONFIGURA'#199#195'O SERVIDOR RestDW'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clNavy
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label6: TLabel
+    Left = 123
+    Top = 79
+    Width = 35
+    Height = 13
+    AutoSize = False
+    Caption = 'Senha'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label8: TLabel
+    Left = 13
+    Top = 79
+    Width = 43
+    Height = 13
+    AutoSize = False
+    Caption = 'Usu'#225'rio'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label1: TLabel
+    Left = 8
+    Top = 122
+    Width = 80
+    Height = 13
+    Caption = 'COMANDO SQL'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clNavy
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
   object DBGrid1: TDBGrid
     Left = 0
-    Top = 128
-    Width = 629
+    Top = 252
+    Width = 460
     Height = 158
     Align = alBottom
     DataSource = DataSource1
@@ -878,16 +967,18 @@ object Form3: TForm3
     TitleFont.Style = []
   end
   object Memo1: TMemo
-    Left = 0
-    Top = 10
-    Width = 383
+    Left = 4
+    Top = 137
+    Width = 319
     Height = 109
+    Lines.Strings = (
+      'Select * from employee')
     TabOrder = 1
   end
   object ButtonStart: TButton
-    Left = 385
-    Top = 94
-    Width = 109
+    Left = 326
+    Top = 149
+    Width = 133
     Height = 25
     Caption = 'Carregar de JSON'
     Font.Charset = DEFAULT_CHARSET
@@ -898,6 +989,63 @@ object Form3: TForm3
     ParentFont = False
     TabOrder = 2
     OnClick = ButtonStartClick
+  end
+  object eHost: TEdit
+    Left = 13
+    Top = 55
+    Width = 136
+    Height = 21
+    TabOrder = 3
+    Text = '127.0.0.1'
+  end
+  object ePort: TEdit
+    Left = 155
+    Top = 55
+    Width = 40
+    Height = 21
+    TabOrder = 4
+    Text = '8082'
+  end
+  object edPasswordDW: TEdit
+    Left = 123
+    Top = 97
+    Width = 100
+    Height = 21
+    PasswordChar = '*'
+    TabOrder = 5
+    Text = 'testserver'
+  end
+  object edUserNameDW: TEdit
+    Left = 13
+    Top = 97
+    Width = 100
+    Height = 21
+    TabOrder = 6
+    Text = 'testserver'
+  end
+  object CheckBox1: TCheckBox
+    Left = 229
+    Top = 98
+    Width = 91
+    Height = 19
+    Caption = 'Compression'
+    Checked = True
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    State = cbChecked
+    TabOrder = 7
+  end
+  object chkhttps: TCheckBox
+    Left = 208
+    Top = 57
+    Width = 97
+    Height = 17
+    Caption = 'Usar HTTPS'
+    TabOrder = 8
   end
   object FDMemTable1: TFDMemTable
     FetchOptions.AssignedValues = [evMode]
@@ -914,5 +1062,77 @@ object Form3: TForm3
     DataSet = FDMemTable1
     Left = 128
     Top = 136
+  end
+  object ActionList1: TActionList
+    Left = 48
+    Top = 56
+  end
+  object DWClientEvents1: TDWClientEvents
+    RESTClientPooler = RESTClientPooler1
+    Events = <
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovDateTime
+            ParamName = 'result'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'inputdata'
+            Encoded = True
+          end>
+        Name = 'servertime'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        Name = 'teste'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'sql'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        Name = 'loaddatasetevent'
+      end>
+    Left = 125
+    Top = 213
+  end
+  object RESTClientPooler1: TRESTClientPooler
+    DataCompression = True
+    Encoding = esASCII
+    Host = 'localhost'
+    UserName = 'testserver'
+    Password = 'testserver'
+    ProxyOptions.BasicAuthentication = False
+    ProxyOptions.ProxyPort = 0
+    RequestTimeOut = 10000
+    ThreadRequest = False
+    AllowCookies = False
+    HandleRedirects = False
+    Left = 65
+    Top = 213
   end
 end

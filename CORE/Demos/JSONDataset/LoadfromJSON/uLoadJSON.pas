@@ -8,7 +8,8 @@ uses
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, Data.DB, Vcl.Imaging.pngimage, Vcl.ExtCtrls, Vcl.StdCtrls,
   Vcl.Grids, Vcl.DBGrids, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  uDWJSONObject, uDWConsts;
+  uDWJSONObject, uDWConsts, uRESTDWBase, uRESTDWServerEvents, System.Actions,
+  uDWConstsData, Vcl.ActnList;
 
 type
   TForm3 = class(TForm)
@@ -18,14 +19,27 @@ type
     Memo1: TMemo;
     Image1: TImage;
     ButtonStart: TButton;
+    Label4: TLabel;
+    Label5: TLabel;
+    Bevel1: TBevel;
+    Label7: TLabel;
+    Label6: TLabel;
+    Label8: TLabel;
+    Label1: TLabel;
+    eHost: TEdit;
+    ePort: TEdit;
+    edPasswordDW: TEdit;
+    edUserNameDW: TEdit;
+    CheckBox1: TCheckBox;
+    chkhttps: TCheckBox;
+    ActionList1: TActionList;
+    DWClientEvents1: TDWClientEvents;
+    RESTClientPooler1: TRESTClientPooler;
     procedure ButtonStartClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
     { Public declarations }
-   JSONValue     : TJSONValue;
   end;
 
 var
@@ -36,18 +50,31 @@ implementation
 {$R *.dfm}
 
 procedure TForm3.ButtonStartClick(Sender: TObject);
+Var
+ JSONValue     : TJSONValue;
+ dwParams      : TDWParams;
+ vErrorMessage : String;
 begin
- JSONValue.WriteToDataset(dtFull, Memo1.Lines.Text, FDMemTable1);
-end;
-
-procedure TForm3.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
+ JSONValue     := TJSONValue.Create;
+ RESTClientPooler1.Host            := EHost.Text;
+ RESTClientPooler1.Port            := StrToInt(EPort.Text);
+ RESTClientPooler1.UserName        := EdUserNameDW.Text;
+ RESTClientPooler1.Password        := EdPasswordDW.Text;
+ RESTClientPooler1.DataCompression := CheckBox1.Checked;
+ If chkhttps.Checked then
+  RESTClientPooler1.TypeRequest := TTyperequest.trHttps
+ Else
+  RESTClientPooler1.TypeRequest := TTyperequest.trHttp;
+ DWClientEvents1.CreateDWParams('loaddatasetevent', dwParams);
+ dwParams.ItemsString['sql'].AsString := Memo1.Text;
+ DWClientEvents1.SendEvent('loaddatasetevent', dwParams, vErrorMessage);
+ FDMemTable1.Close;
+ If vErrorMessage = '' Then
+  JSONValue.WriteToDataset(dtFull, dwParams.ItemsString['result'].Value, FDMemTable1)
+ Else
+  Showmessage(vErrorMessage);
+ dwParams.Free;
  JSONValue.Free;
-end;
-
-procedure TForm3.FormCreate(Sender: TObject);
-begin
- JSONValue := TJSONValue.Create;
 end;
 
 end.

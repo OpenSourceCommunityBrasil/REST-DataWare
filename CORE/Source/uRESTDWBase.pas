@@ -1373,9 +1373,8 @@ Begin
    HttpRequest.Disconnect;
  Except
  End;
- HttpRequest.ProxyParams := Nil;
- FreeAndNil(HttpRequest);
  FreeAndNil(vTransparentProxy);
+ FreeAndNil(HttpRequest);
  Inherited;
 End;
 

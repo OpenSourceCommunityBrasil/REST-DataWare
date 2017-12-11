@@ -2808,6 +2808,7 @@ Var
 Begin
  If vReadData Then
   Exit;
+ If vMasterDetailList <> Nil Then
  For I := 0 To vMasterDetailList.Count -1 Do
   Begin
    vMasterDetailList.Items[I].ParseFields(TRESTDWClientSQL(vMasterDetailList.Items[I].DataSet).MasterFields);
