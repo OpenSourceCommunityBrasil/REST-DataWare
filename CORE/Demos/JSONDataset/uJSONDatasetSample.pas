@@ -86,8 +86,8 @@ Begin
  ini.Free;
  Server_FDConnection.Connected := True;
  FDQuery1.Open;
- JSONValue.LoadFromDataset('employee', FDQuery1, False);
- Memo1.Lines.Add(JSONValue.Value);
+ JSONValue.LoadFromDataset('employee', FDQuery1, True);
+ Memo1.Lines.Add(JSONValue.ToJSON);
 End;
 
 procedure TForm1.cbAdaptadoresChange(Sender: TObject);
