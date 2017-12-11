@@ -131,7 +131,7 @@ object ServerMethodDM: TServerMethodDM
     Connection = Server_FDConnection
     SQL.Strings = (
       '')
-    Left = 172
-    Top = 112
+    Left = 137
+    Top = 15
   end
 end
