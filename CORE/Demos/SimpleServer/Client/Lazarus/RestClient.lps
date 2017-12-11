@@ -24,6 +24,7 @@
         <CursorPos X="65" Y="77"/>
         <UsageCount Value="223"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="urestrequest.pas"/>
@@ -255,10 +256,14 @@
       </Unit32>
       <Unit33>
         <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1338"/>
-        <CursorPos Y="1342"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="2685"/>
+        <CursorPos X="7" Y="2692"/>
         <UsageCount Value="95"/>
+        <Bookmarks Count="1">
+          <Item0 X="14" Y="2694" ID="1"/>
+        </Bookmarks>
+        <Loaded Value="True"/>
       </Unit33>
       <Unit34>
         <Filename Value="..\..\..\..\Source\uDWPoolerMethod.pas"/>
@@ -407,10 +412,11 @@
       </Unit52>
       <Unit53>
         <Filename Value="..\..\..\..\Source\libs\uDWConstsData.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="51"/>
-        <CursorPos X="33" Y="58"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="23"/>
+        <CursorPos X="45" Y="34"/>
         <UsageCount Value="20"/>
+        <Loaded Value="True"/>
       </Unit53>
       <Unit54>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\win\wininc\struct.inc"/>
@@ -552,7 +558,24 @@
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit72>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="4" HistoryIndex="3">
+      <Position1>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="77" Column="65" TopLine="77"/>
+      </Position1>
+      <Position2>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="2696" Column="7" TopLine="2686"/>
+      </Position2>
+      <Position3>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="2694" Column="18" TopLine="2685"/>
+      </Position3>
+      <Position4>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="224" Column="2" TopLine="214"/>
+      </Position4>
+    </JumpHistory>
   </ProjectSession>
   <Debugging>
     <Watches Count="2">

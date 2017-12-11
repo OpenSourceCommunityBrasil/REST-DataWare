@@ -2691,9 +2691,9 @@ Begin
   Self.Close;
   Self.Open;
  {$ELSE}
-  If DestDS is TBufDataset Then
-   TBufDataset(Self).CreateTable;
-  DestDS.Open;
+  If Self is TMemDataset Then
+   TMemDataset(Self).CreateTable;
+  Self.Open;
   TRESTDWClientSQL(Self).Active     := True;
  {$ENDIF}
  Finally

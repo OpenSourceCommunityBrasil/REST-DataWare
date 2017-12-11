@@ -1124,7 +1124,7 @@ object Form9: TForm9
     StrsEmpty2Null = False
     StrsTrim2Len = True
     ParamCreate = True
-    Left = 187
+    Left = 163
     Top = 106
   end
   object dwSQLEmployee: TRESTDWClientSQL
@@ -1160,7 +1160,7 @@ object Form9: TForm9
     AutoCommitData = False
     AutoRefreshAfterCommit = False
     InBlockEvents = False
-    Left = 215
+    Left = 191
     Top = 106
     object dwSQLEmployeeEMP_NO: TSmallintField
       FieldName = 'EMP_NO'
@@ -1303,7 +1303,7 @@ object Form9: TForm9
   end
   object dsEmployee: TDataSource
     DataSet = dwSQLEmployee
-    Left = 243
+    Left = 219
     Top = 106
   end
   object dsItems: TDataSource
@@ -1317,7 +1317,7 @@ object Form9: TForm9
     Top = 148
   end
   object DWMassiveCache1: TDWMassiveCache
-    Left = 259
-    Top = 170
+    Left = 299
+    Top = 178
   end
 end

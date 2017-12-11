@@ -1141,8 +1141,8 @@ object Form2: TForm2
   end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1
-    left = 336
-    top = 304
+    left = 248
+    top = 248
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
     Active = False
@@ -1222,8 +1222,8 @@ object Form2: TForm2
     AutoCommitData = False
     AutoRefreshAfterCommit = False
     InBlockEvents = False
-    left = 203
-    top = 261
+    left = 168
+    top = 248
   end
   object DWClientEvents1: TDWClientEvents
     RESTClientPooler = RESTClientPooler1
