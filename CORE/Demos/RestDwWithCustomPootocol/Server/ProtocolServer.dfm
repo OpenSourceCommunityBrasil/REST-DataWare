@@ -1244,22 +1244,6 @@ object Form1: TForm1
         State = cbChecked
         TabOrder = 12
       end
-      object CheckBox1: TCheckBox
-        Left = 270
-        Top = 81
-        Width = 91
-        Height = 19
-        Caption = 'Compression'
-        Checked = True
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ParentFont = False
-        State = cbChecked
-        TabOrder = 13
-      end
     end
     object tsLogs: TTabSheet
       Caption = 'Logs'
@@ -1316,15 +1300,20 @@ object Form1: TForm1
   end
   object RESTServicePooler1: TRESTServicePooler
     Active = False
-    DataCompression = True
     EncodeStrings = True
     ServicePort = 8082
     ProxyOptions.Port = 8888
-    SSLVersion = sslvSSLv2
+    ServerParams.HasAuthentication = True
+    ServerParams.UserName = 'testserver'
+    ServerParams.Password = 'testserver'
+    SSLMethod = sslvSSLv2
+    SSLVersions = []
     OnLastRequest = RESTServicePooler1LastRequest
     OnLastResponse = RESTServicePooler1LastResponse
     Encoding = esUtf8
     ServerContext = 'restdataware'
+    SSLVerifyMode = []
+    SSLVerifyDepth = 0
     Left = 320
     Top = 40
   end

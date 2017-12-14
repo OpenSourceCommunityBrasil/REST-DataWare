@@ -234,8 +234,11 @@ begin
   JSONValue := uDWJSONObject.TJSONValue.Create;
   try
     StartTime := TimeGetTime;
-    JSONValue.WriteToDataset(dtFull, DataBaseRequest.ItemsString
-      [RequestFrame.Name].Value, RequestFrame.ResponseDataSet);
+    sResponseStatus := DataBaseRequest.ItemsString[RequestFrame.Name].Value;
+    JSONValue.WriteToDataset(dtFull,sResponseStatus, RequestFrame.ResponseDataSet);
+
+//    JSONValue.WriteToDataset(dtFull, DataBaseRequest.ItemsString
+//      [RequestFrame.Name].Value, RequestFrame.ResponseDataSet);
     ProcessTime := TimeGetTime - StartTime;
     AddLog('Load to dataset: ' + IntToStr(ProcessTime));
   finally

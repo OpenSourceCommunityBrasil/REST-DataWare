@@ -1,12 +1,10 @@
 program ServerProtocol;
 
 uses
-  Vcl.Forms,
-  ProtocolServer in 'ProtocolServer.pas' {Form1},
-  ServerModuleUnit in 'ServerModuleUnit.pas' {ServerModule: TDataModule},
+  Forms,
+  MainFormUnit in 'MainFormUnit.pas' {MainForm},
   MyServerMethods in 'MyServerMethods.pas',
   ServerDataModuleUnit in 'ServerDataModuleUnit.pas' {ServerDataModule: TDataModule},
-  FireDacUnit in 'FireDacUnit.pas' {FireDac: TDataModule},
   Protocol in '..\Protocol.pas';
 
 {$R *.res}
@@ -14,6 +12,6 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TMainForm, MainForm);
   Application.Run;
 end.

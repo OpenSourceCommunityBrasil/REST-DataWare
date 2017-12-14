@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'RestDwCore Custom Protocol Client'
-  ClientHeight = 558
+  ClientHeight = 442
   ClientWidth = 888
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -1063,7 +1063,7 @@ object Form1: TForm1
     Left = 0
     Top = 185
     Width = 711
-    Height = 373
+    Height = 257
     Align = alClient
     TabOrder = 1
   end
@@ -1071,7 +1071,7 @@ object Form1: TForm1
     Left = 711
     Top = 185
     Width = 177
-    Height = 373
+    Height = 257
     Align = alRight
     ItemHeight = 13
     TabOrder = 2
@@ -1086,6 +1086,8 @@ object Form1: TForm1
     ProxyOptions.ProxyPort = 0
     RequestTimeOut = 10000
     ThreadRequest = False
+    AllowCookies = False
+    HandleRedirects = False
     OnWork = RESTClientPooler1Work
     OnWorkBegin = RESTClientPooler1WorkBegin
     OnWorkEnd = RESTClientPooler1WorkEnd

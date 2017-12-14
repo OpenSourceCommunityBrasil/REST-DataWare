@@ -3,13 +3,13 @@ unit MainFormUnit;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uRESTDWBase, Datasnap.DSClientRest,
-  Vcl.StdCtrls, Vcl.Mask, Vcl.Imaging.pngimage, Vcl.ExtCtrls, Vcl.ComCtrls;
+  Windows, Messages, SysUtils, Variants,
+  Classes, Graphics,
+  Controls, Forms, Dialogs, uRESTDWBase,
+  StdCtrls, Mask, Vcl.Imaging.pngimage, ExtCtrls, ComCtrls;
 
 type
-  TForm1 = class(TForm)
+  TMainForm = class(TForm)
     RESTServicePooler1: TRESTServicePooler;
     PageControl1: TPageControl;
     tsConfigs: TTabSheet;
@@ -46,7 +46,6 @@ type
     eCertFile: TEdit;
     ePrivKeyPass: TMaskEdit;
     cbEncode: TCheckBox;
-    CheckBox1: TCheckBox;
     tsLogs: TTabSheet;
     Label19: TLabel;
     Label18: TLabel;
@@ -64,7 +63,7 @@ type
   end;
 
 var
-  Form1: TForm1;
+  MainForm: TMainForm;
 
 implementation
 
@@ -72,7 +71,7 @@ implementation
 
 uses MyServerMethods;
 
-procedure TForm1.ButtonStartClick(Sender: TObject);
+procedure TMainForm.ButtonStartClick(Sender: TObject);
 begin
   if ButtonStart.Tag = 0 then begin
     RESTServicePooler1.ServerParams.UserName := edUserNameDW.Text;
@@ -89,17 +88,17 @@ begin
   end;
 end;
 
-procedure TForm1.FormDestroy(Sender: TObject);
+procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   RESTServicePooler1.Active := False;
 end;
 
-procedure TForm1.RESTServicePooler1LastRequest(Value: string);
+procedure TMainForm.RESTServicePooler1LastRequest(Value: string);
 begin
   memoReq.Lines.Add(Value);
 end;
 
-procedure TForm1.RESTServicePooler1LastResponse(Value: string);
+procedure TMainForm.RESTServicePooler1LastResponse(Value: string);
 begin
   memoResp.Lines.Clear;
   memoResp.Lines.Add(Value);

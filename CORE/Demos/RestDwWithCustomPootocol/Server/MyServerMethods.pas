@@ -2,14 +2,18 @@ unit MyServerMethods;
 
 interface
 
-uses Windows, SysUtils, Classes, System.JSON,
+uses
+  Windows, SysUtils, Classes, System.JSON,
   SysTypes, uDWJSONObject, Winapi.ShellAPI, TypInfo, ServerUtils,
-  uDWConstsData, uDWConsts, uDWJSONTools, ServerModuleUnit, Db,
+  uDWConstsData, uDWConsts, uDWJSONTools, Db,
 {$IFDEF FIREDAC}
   FireDacUnit,
 {$ENDIF}
 {$IFDEF ZEOS}
   ZeosUnit,
+{$ENDIF}
+{$IFDEF DBX}
+  DBXUnit,
 {$ENDIF}
   Protocol,
   ServerDataModuleUnit;
@@ -28,10 +32,10 @@ Type
     function GetNextParamIndex: Integer;
     property NextParamIndex: Integer read GetNextParamIndex;
   public
-    constructor Create(aOwner: TComponent); override;
+    // constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Reply(SendType: TSendEvent; Context: string;
-      var Params: TDWParams; var Result: string);
+    procedure Reply(SendType: TSendEvent; Context: string; var Params: TDWParams; var Result: string);
+    procedure AfterConstruction; override;
   end;
 
 implementation
@@ -39,8 +43,7 @@ implementation
 uses
   mmsystem;
 
-procedure TMyServerMethods.Reply(SendType: TSendEvent; Context: String;
-  var Params: TDWParams; var Result: String);
+procedure TMyServerMethods.Reply(SendType: TSendEvent; Context: String; var Params: TDWParams; var Result: String);
 var
   JSONParam: TJSONParam;
   StartTime, ProcessTime: Cardinal;
@@ -53,9 +56,7 @@ begin
       case SendType of
         seGET:
           ;
-        sePOST:
-          begin
-            { Comandos SELECT, INSERT, UPDATE, DELETE }
+        sePOST: begin { Comandos SELECT, INSERT, UPDATE, DELETE }
             if Context = 'ExecuteDML' then
               ExecuteDML
               { Download de um arquivo }
@@ -98,23 +99,25 @@ begin
   end;
 end;
 
-procedure TMyServerMethods.ClassMethod;
+procedure TMyServerMethods.AfterConstruction;
 begin
-
-end;
-
-constructor TMyServerMethods.Create(aOwner: TComponent);
-begin
-  inherited Create(aOwner);
-  ReplyEvent := Reply;
-
+  inherited;
+  OnReplyEvent := Reply;
 {$IFDEF FIREDAC}
   ServerDataModule := TFireDac.Create(Self);
 {$ENDIF}
 {$IFDEF ZEOS}
   ServerDataModule := TZeos.Create(Self);
 {$ENDIF}
+{$IFDEF DBX}
+  ServerDataModule := TDBX.Create(Self);
+{$ENDIF}
   FNextParamIndex := -1;
+end;
+
+procedure TMyServerMethods.ClassMethod;
+begin
+
 end;
 
 destructor TMyServerMethods.Destroy;
@@ -145,8 +148,7 @@ var
   sDataBaseParams: string;
 begin
   { SGDB Driver Index }
-  ServerDataModule.DataBaseIndex :=
-    StrToInt(DWParams.ItemsString[DATABASE_INDEX].Value);
+  ServerDataModule.DataBaseIndex := StrToInt(DWParams.ItemsString[DATABASE_INDEX].Value);
 
   { Parâmetros de conexão - Em branco se optar por configuração dentro do server }
   sDataBaseParams := DWParams.ItemsString[DATABASE_PARAMS].Value;
@@ -177,8 +179,7 @@ begin
               Name := DWParams.Items[NextParamIndex].Value;
 
               { Param type }
-              DataType :=
-                TFieldType(StrToInt(DWParams.Items[NextParamIndex].Value));
+              DataType := TFieldType(StrToInt(DWParams.Items[NextParamIndex].Value));
 
               { Param value }
               Value := DWParams.Items[NextParamIndex].Value;
@@ -188,11 +189,14 @@ begin
         case DMLType of
           dtSelect: begin
               try
+//                JSONValue := uDWJSONObject.TJSONValue.Create;
+//                JSONValue.Encoding := GetEncoding(Encoding);
+//                JSONValue.LoadFromDataset('DATASET', ServerDataModule.ExecuteQuery(sSQL, Params));
+//                DWParams.Items[SqlIndex].SetValue(JSONValue.ToJSON);
                 JSONValue := uDWJSONObject.TJSONValue.Create;
                 JSONValue.Encoding := GetEncoding(Encoding);
-                JSONValue.LoadFromDataset('DATASET',
-                  ServerDataModule.ExecuteQuery(sSQL, Params));
-                DWParams.Items[SqlIndex].SetValue(JSONValue.ToJSON);
+                JSONValue.LoadFromDataset('DATASET', ServerDataModule.ExecuteQuery(sSQL, Params), True);
+                DWParams.Items[SqlIndex].AsString := JSONValue.ToJSON;
               finally
                 FreeAndNil(JSONValue);
               end;
@@ -222,8 +226,7 @@ end;
 function TMyServerMethods.GetNextParamIndex: Integer;
 begin
   if FNextParamIndex = -1 then begin
-    FNextParamIndex :=
-      StrToInt(DWParams.ItemsString[INITIAL_PARAM_INDEX].Value);
+    FNextParamIndex := StrToInt(DWParams.ItemsString[INITIAL_PARAM_INDEX].Value);
   end else begin
     FNextParamIndex := FNextParamIndex + 1;
   end;

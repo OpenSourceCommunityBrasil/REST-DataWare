@@ -2,12 +2,10 @@ inherited FireDac: TFireDac
   OldCreateOrder = True
   object FDConnection: TFDConnection
     Params.Strings = (
-      'Database=C:\DelphiComponents\RestDW\DEMO\EMPLOYEE.FDB'
-      'User_Name=SYSDBA'
+      'Database=C:\Projects\Business\Bin\LOC\JCN.FDB'
+      'User_Name=sysdba'
       'Password=masterkey'
-      'Server=localhost'
-      'Port=3050'
-      'CharacterSet='
+      'CharacterSet=WIN1252'
       'DriverID=FB')
     UpdateOptions.AssignedValues = [uvCountUpdatedRecords]
     ConnectedStoredUsage = []
