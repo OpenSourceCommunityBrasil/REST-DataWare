@@ -19,9 +19,8 @@
         <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="77"/>
-        <CursorPos X="65" Y="77"/>
+        <TopLine Value="79"/>
+        <CursorPos Y="94"/>
         <UsageCount Value="223"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -257,8 +256,8 @@
       <Unit33>
         <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="2685"/>
-        <CursorPos X="7" Y="2692"/>
+        <TopLine Value="2880"/>
+        <CursorPos Y="2891"/>
         <UsageCount Value="95"/>
         <Bookmarks Count="1">
           <Item0 X="14" Y="2694" ID="1"/>
@@ -349,10 +348,11 @@
       </Unit43>
       <Unit44>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-db\src\base\db.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1250"/>
-        <CursorPos X="4" Y="1256"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="55"/>
+        <CursorPos X="50" Y="64"/>
         <UsageCount Value="13"/>
+        <Loaded Value="True"/>
       </Unit44>
       <Unit45>
         <Filename Value="..\..\..\..\Source\libs\indy10\trunk\Lib\System\IdBaseComponent.pas"/>
@@ -412,7 +412,7 @@
       </Unit52>
       <Unit53>
         <Filename Value="..\..\..\..\Source\libs\uDWConstsData.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="23"/>
         <CursorPos X="45" Y="34"/>
         <UsageCount Value="20"/>
@@ -427,10 +427,12 @@
       </Unit54>
       <Unit55>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1400"/>
-        <CursorPos Y="1409"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="889"/>
+        <CursorPos Y="898"/>
         <UsageCount Value="41"/>
+        <Loaded Value="True"/>
       </Unit55>
       <Unit56>
         <Filename Value="..\..\..\..\Source\Connectors\Lazarus\uRestDWLazDriverReg.pas"/>
@@ -558,26 +560,139 @@
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit72>
     </Units>
-    <JumpHistory Count="4" HistoryIndex="3">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="formMain.pas"/>
-        <Caret Line="77" Column="65" TopLine="77"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="899" TopLine="890"/>
       </Position1>
       <Position2>
-        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <Caret Line="2696" Column="7" TopLine="2686"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="903" TopLine="890"/>
       </Position2>
       <Position3>
-        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <Caret Line="2694" Column="18" TopLine="2685"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="898" TopLine="890"/>
       </Position3>
       <Position4>
-        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <Caret Line="224" Column="2" TopLine="214"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="899" TopLine="890"/>
       </Position4>
+      <Position5>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="903" TopLine="890"/>
+      </Position5>
+      <Position6>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="898" TopLine="890"/>
+      </Position6>
+      <Position7>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="899" TopLine="890"/>
+      </Position7>
+      <Position8>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="903" TopLine="890"/>
+      </Position8>
+      <Position9>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="898" TopLine="890"/>
+      </Position9>
+      <Position10>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="899" TopLine="890"/>
+      </Position10>
+      <Position11>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="903" TopLine="890"/>
+      </Position11>
+      <Position12>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="898" TopLine="890"/>
+      </Position12>
+      <Position13>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="899" TopLine="890"/>
+      </Position13>
+      <Position14>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="903" TopLine="890"/>
+      </Position14>
+      <Position15>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="94" TopLine="79"/>
+      </Position15>
+      <Position16>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="2183" TopLine="2174"/>
+      </Position16>
+      <Position17>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="2889" TopLine="2880"/>
+      </Position17>
+      <Position18>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="2890" TopLine="2880"/>
+      </Position18>
+      <Position19>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="2891" TopLine="2880"/>
+      </Position19>
+      <Position20>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="892" TopLine="889"/>
+      </Position20>
+      <Position21>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="893" TopLine="889"/>
+      </Position21>
+      <Position22>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="894" TopLine="889"/>
+      </Position22>
+      <Position23>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="895" TopLine="889"/>
+      </Position23>
+      <Position24>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="896" TopLine="889"/>
+      </Position24>
+      <Position25>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="898" TopLine="889"/>
+      </Position25>
+      <Position26>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="899" TopLine="889"/>
+      </Position26>
+      <Position27>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="903" TopLine="889"/>
+      </Position27>
+      <Position28>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="898" TopLine="889"/>
+      </Position28>
+      <Position29>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="899" TopLine="889"/>
+      </Position29>
+      <Position30>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="903" TopLine="889"/>
+      </Position30>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
+    <BreakPoints Count="1">
+      <Item1>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="formMain.pas"/>
+        <Line Value="94"/>
+      </Item1>
+    </BreakPoints>
     <Watches Count="2">
       <Item1>
         <Expression Value="DestDS.RECORDCOUNT"/>

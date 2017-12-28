@@ -895,7 +895,10 @@ Begin
  vMassiveFields.ClearAll;
  For I := 0 To Dataset.Fields.Count -1 Do
   Begin
-   If (Dataset.Fields[I].FieldKind = fkData) And (Not(Dataset.Fields[I].ReadOnly)) Then
+   If (Dataset.Fields[I].FieldKind = fkData) And (Not(Dataset.Fields[I].ReadOnly)) And
+      ((pfInUpdate in Dataset.Fields[I].ProviderFlags)  Or
+       (pfInWhere  in Dataset.Fields[I].ProviderFlags)  Or
+       (pfInKey    in Dataset.Fields[I].ProviderFlags)) Then
     Begin
      MassiveField                    := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
      MassiveField.vRequired          := Dataset.Fields[I].Required;

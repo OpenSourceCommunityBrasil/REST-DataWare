@@ -91,6 +91,7 @@ Begin
   RESTDWClientSQL1.FindField('EMP_NO').ProviderFlags := [pfInUpdate, pfInWhere, pfInKey];
  If RESTDWClientSQL1.FindField('FULL_NAME') <> Nil Then
   RESTDWClientSQL1.FindField('FULL_NAME').ReadOnly   := True;
+ RESTDWClientSQL1.RebuildMassiveDataset;
 End;
 
 procedure TForm2.Button2Click(Sender: TObject);
