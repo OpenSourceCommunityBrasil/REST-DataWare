@@ -4,8 +4,8 @@ object ServerMethodDM: TServerMethodDM
   OnReplyEvent = ServerMethodDataModuleReplyEvent
   OnWelcomeMessage = ServerMethodDataModuleWelcomeMessage
   OnMassiveProcess = ServerMethodDataModuleMassiveProcess
-  Height = 199
-  Width = 310
+  Height = 178
+  Width = 264
   object RESTDWPoolerDB1: TRESTDWPoolerDB
     RESTDriver = RESTDWDriverFD1
     Compression = True

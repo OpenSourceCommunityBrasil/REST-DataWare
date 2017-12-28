@@ -345,6 +345,7 @@ Type
   Function    MassiveCount  : Integer;
   Function    MassiveToJSON : String; //Transporte de MASSIVE em formato JSON
   Procedure   DWParams        (Var Value  : TDWParams);
+  Procedure   RebuildMassiveDataset;
  Published
   Property MasterDataSet          : TRESTDWClientSQL    Read vMasterDataSet            Write SetMasterDataSet;
   Property MasterCascadeDelete    : Boolean             Read vCascadeDelete            Write vCascadeDelete;
@@ -2176,6 +2177,11 @@ begin
     vNewRecord(Dataset);
   End;
 end;
+
+Procedure TRESTDWClientSQL.RebuildMassiveDataset;
+Begin
+ CreateMassiveDataset;
+End;
 
 Procedure TRESTDWClientSQL.Refresh;
 Var

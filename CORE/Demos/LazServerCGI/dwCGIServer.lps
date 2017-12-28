@@ -19,7 +19,6 @@
         <ComponentName Value="dwCGIService"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="38"/>
         <CursorPos X="105" Y="46"/>
         <UsageCount Value="45"/>
@@ -41,9 +40,12 @@
         <ComponentName Value="ServerMethodDM"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <EditorIndex Value="-1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
         <CursorPos X="25" Y="8"/>
         <UsageCount Value="45"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="..\..\Source\uRESTDWBase.pas"/>
