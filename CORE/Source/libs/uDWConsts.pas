@@ -44,8 +44,17 @@ Const
  UrlBase               = '%s://%s:%d/%s';
  ByteBuffer            = 1024 * 8; //8kb
  CompressBuffer        = 1024 * 2;
- // Sets UnixStartDate to TDateTime of 01/01/1970
- UnixStartDate: TDateTime = 25569.0;
+
+  Date1900 {: LongInt} = $0001AC05;  {Julian day count for 01/01/1900 -- TDateTime Start Date}
+  Date1970 {: LongInt} = $00020FE4;  {Julian day count for 01/01/1970 -- Unix Start Date}
+  Unix0Date: TDateTime = 25568;      {Date1970 - Date1900}
+
+  SecondsInDay    = 86400;  {Number of seconds in a day}
+  SecondsInHour   =  3600;  {Number of seconds in an hour}
+  SecondsInMinute =    60;  {Number of seconds in a minute}
+  HoursInDay      =    24;  {Number of hours in a day}
+  MinutesInHour   =    60;  {Number of minutes in an hour}
+  MinutesInDay    =  1440;  {Number of minutes in a day}
 
 Type
  TMassiveMode     = (mmInactive, mmBrowse, mmInsert, mmUpdate, mmDelete);
@@ -122,15 +131,36 @@ Uses uRESTDWPoolerDB, uDWJSONObject, uDWJSONTools;
 
 
 Function DateTimeToUnix(ConvDate: TDateTime): Longint;
+{ convert Delphi TDateTime to unix date }
+var
+  Hrs, Mins, Secs, MSecs : Word;
+  Dt, Tm : TDateTime;
 begin
-  //example: DateTimeToUnix(now);
-  Result := Round((ConvDate - UnixStartDate) * 86400);
+  Dt := Trunc(ConvDate);
+  Tm := ConvDate - Dt;
+  if Dt < Unix0Date then
+    Result := 0
+  else
+    Result := Trunc(Dt - Unix0Date) * SecondsInDay;
+
+  DecodeTime(Tm, Hrs, Mins, Secs, MSecs);
+  Result := Result + (Hrs * SecondsInHour) + (Mins * SecondsInMinute) + Secs;
+
 end;
 
 Function UnixToDateTime(USec: Longint): TDateTime;
+var
+  Hrs, Mins, Secs : Word;
+  TodaysSecs : LongInt;
 begin
-  //Example: UnixToDateTime(1003187418);
-  Result := (Usec / 86400) + UnixStartDate;
+  TodaysSecs := USec mod SecondsInDay;
+  Hrs := TodaysSecs div SecondsInHour;
+  TodaysSecs := TodaysSecs - (Hrs * SecondsInHour);
+  Mins := TodaysSecs div SecondsInMinute;
+  Secs := TodaysSecs - (Mins * SecondsInMinute);
+
+  Result := Unix0Date + (USec div SecondsInDay) +
+    EncodeTime(Hrs, Mins, Secs, 0);
 end;
 
 Function DatasetRequestToJSON(Value : TRESTDWClientSQLBase) : String;
