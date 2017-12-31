@@ -158,9 +158,9 @@ begin
   TodaysSecs := TodaysSecs - (Hrs * SecondsInHour);
   Mins := TodaysSecs div SecondsInMinute;
   Secs := TodaysSecs - (Mins * SecondsInMinute);
-
-  Result := Unix0Date + (USec div SecondsInDay) +
-    EncodeTime(Hrs, Mins, Secs, 0);
+  If (SecondsInDay > 0) Then
+   Result := Unix0Date + (USec div SecondsInDay) +
+             EncodeTime(Hrs, Mins, Secs, 0);
 end;
 
 Function DatasetRequestToJSON(Value : TRESTDWClientSQLBase) : String;

@@ -1454,7 +1454,8 @@ Var
                   ftTimeStamp  : Begin
                                   vTempValue        := Value;
                                   If vTempValue <> '' Then
-                                   Field.AsDateTime := UnixToDateTime(strtoint(vTempValue));
+                                   If StrToInt(vTempValue) > 0 Then
+                                    Field.AsDateTime := UnixToDateTime(strtoint(vTempValue));
                                  End;
   End;
  End;
