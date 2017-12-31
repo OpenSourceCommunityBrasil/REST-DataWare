@@ -88,15 +88,18 @@ Procedure TMasterDetailList.DeleteDS(Value : TRESTClient);
 Var
  I : Integer;
 Begin
- For I := 0 To Self.Count -1 Do
+ If Self <> Nil Then
   Begin
-   If (TMasterDetailItem(TList(Self).Items[I]^)          <> Nil)   And
-      (TMasterDetailItem(TList(Self).Items[I]^).vDataSet =  Value) Then
+   For I := 0 To Self.Count -1 Do
     Begin
-     If Assigned(TList(Self).Items[I]) Then
-      FreeMem(TList(Self).Items[I]);
-     TList(Self).Delete(I);
-     Break;
+     If (TMasterDetailItem(TList(Self).Items[I]^)          <> Nil)   And
+        (TMasterDetailItem(TList(Self).Items[I]^).vDataSet =  Value) Then
+      Begin
+       If Assigned(TList(Self).Items[I]) Then
+        FreeMem(TList(Self).Items[I]);
+       TList(Self).Delete(I);
+       Break;
+      End;
     End;
   End;
 End;
