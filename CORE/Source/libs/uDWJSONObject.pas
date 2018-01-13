@@ -1426,7 +1426,12 @@ Var
                         Field.AsBoolean := lowercase(Value) = 'true';
                       End
                      Else
-                      Field.AsInteger := StrToInt(Value);
+                      Begin
+                       If Field.DataType = ftLargeint Then
+                        Field.Value := StrToInt64(Value)
+                       Else
+                        Field.AsInteger := StrToInt(Value);
+                      End;
                     End;
                   End;
                   ftFloat,
