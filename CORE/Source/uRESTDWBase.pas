@@ -1218,10 +1218,9 @@ Procedure TRESTServiceCGI.GetEvents(ServerMethodsClass : TComponent;
                                        Var Pooler         : String;
                                        Var DWParams       : TDWParams);
 Var
- I             : Integer;
- vError        : Boolean;
- vTempJSON,
- vMessageError : String;
+ I         : Integer;
+ vError    : Boolean;
+ vTempJSON : String;
 Begin
  vTempJSON := '';
  If ServerMethodsClass <> Nil Then
@@ -1782,7 +1781,6 @@ Var
  Procedure SetParamsValues(DWParams : TDWParams; SendParamsData : TIdMultipartFormDataStream);
  Var
   I         : Integer;
-  JSONParam : TJSONParam;
  Begin
   If DWParams <> Nil Then
    Begin
@@ -2780,10 +2778,9 @@ Procedure TRESTServicePooler.GetEvents(ServerMethodsClass : TComponent;
                                        Var Pooler         : String;
                                        Var DWParams       : TDWParams);
 Var
- I             : Integer;
- vError        : Boolean;
- vTempJSON,
- vMessageError : String;
+ I         : Integer;
+ vError    : Boolean;
+ vTempJSON : String;
 Begin
  vTempJSON := '';
  If ServerMethodsClass <> Nil Then

@@ -78,8 +78,6 @@ Procedure TRESTDWDriverFD.ApplyUpdates_MassiveCache(MassiveCache     : String;
                                                     Var MessageError : String);
 Var
  vTempQuery     : TFDQuery;
- A, I           : Integer;
- vParamName     : String;
  vStringStream  : TMemoryStream;
  bPrimaryKeys   : TStringList;
  vFieldType     : TFieldType;
@@ -101,7 +99,7 @@ Var
  Function LoadMassive(Massive : String; Var Query : TFDQuery) : Boolean;
  Var
   MassiveDataset : TMassiveDatasetBuffer;
-  A, B, X        : Integer;
+  A, X           : Integer;
   bJsonArray     : udwjson.TJsonArray;
   Procedure PrepareData(Var Query      : TFDQuery;
                         MassiveDataset : TMassiveDatasetBuffer;

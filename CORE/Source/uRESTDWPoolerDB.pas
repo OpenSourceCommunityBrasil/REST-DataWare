@@ -247,7 +247,10 @@ Type
   vAutoCommitData,
   vAutoRefreshAfterCommit,
   vInBlockEvents       : Boolean;
+  vDatapacks,
+  vMaxBufferRegs,
   vActualRec           : Integer;
+  vLastBuffer,
   vMasterFields,
   vUpdateTableName     : String;                            //Tabela que será feito Update no Servidor se for usada Reflexão de Dados
   vActiveCursor,
@@ -350,6 +353,7 @@ Type
   Property MasterDataSet          : TRESTDWClientSQL    Read vMasterDataSet            Write SetMasterDataSet;
   Property MasterCascadeDelete    : Boolean             Read vCascadeDelete            Write vCascadeDelete;
   Property Inactive               : Boolean             Read vInactive                 Write vInactive;
+  Property Datapacks              : Integer             Read vDatapacks                Write vDatapacks;
   Property OnGetDataError         : TOnEventConnection  Read vOnGetDataError           Write vOnGetDataError;         //Recebe os Erros de ExecSQL ou de GetData
   Property AfterScroll            : TOnAfterScroll      Read vOnAfterScroll            Write vOnAfterScroll;
   Property AfterOpen              : TOnAfterOpen        Read vOnAfterOpen              Write vOnAfterOpen;
@@ -1728,6 +1732,7 @@ Begin
  vBeforeClone                      := False;
  vReadData                         := False;
  vActiveCursor                     := False;
+ vDatapacks                        := -1;
  vCascadeDelete                    := True;
  vSQL                              := TStringList.Create;
  {$IFDEF FPC}

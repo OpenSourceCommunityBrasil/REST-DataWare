@@ -1212,6 +1212,7 @@ object Form2: TForm2
     StoreDefs = True
     MasterCascadeDelete = False
     Inactive = False
+    Datapacks = -1
     OnGetDataError = RESTDWClientSQL1GetDataError
     DataCache = True
     Params = <>
@@ -1281,7 +1282,6 @@ object Form2: TForm2
     OnBeforeConnect = RESTDWDataBase1BeforeConnect
     Active = False
     Compression = True
-    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False

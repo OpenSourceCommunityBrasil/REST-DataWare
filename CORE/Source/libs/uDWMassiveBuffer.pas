@@ -236,7 +236,7 @@ Type
  Protected
  Public
   Destructor Destroy;Override;
-  Procedure  Delete(Index : Integer);                                Overload;
+  Procedure  Delete(Index : Integer);                                     Overload;
   Function   Add   (Item  : TDWMassiveCacheSQLValue) : Integer;           Overload;
   Property   Items[Index  : Integer]            : TDWMassiveCacheSQLValue Read GetRec Write PutRec; Default;
 End;
@@ -245,7 +245,7 @@ Type
  TDWMassiveSQLCache = Class(TComponent)
  Private
   MassiveCacheSQLList : TDWMassiveCacheSQLList;
-  Procedure   Add(Value      : TDWMassiveCacheSQLValue);
+//  Procedure   Add(Value      : TDWMassiveCacheSQLValue);
  Public
   Function    MassiveCount   : Integer;
   Function    ToJSON         : String;
@@ -1724,10 +1724,12 @@ End;
 
 { TDWMassiveSQLCache }
 
+{
 procedure TDWMassiveSQLCache.Add(Value: TDWMassiveCacheSQLValue);
 begin
  MassiveCacheSQLList.Add(Value);
 end;
+}
 
 procedure TDWMassiveSQLCache.AddDataset(Dataset: TDataset);
 Begin
