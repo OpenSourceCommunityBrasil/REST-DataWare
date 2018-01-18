@@ -472,7 +472,7 @@ Begin
       {$IFEND}
      {$ENDIF}
      AResponse.ContentStream := TIdReadFileExclusiveStream.Create(sFile);
-     {$if CompilerVersion > 21}AResponse.FreeContentStream := true;{$IFEND}{$ENDIF}
+     {$IFNDEF FPC}{$if CompilerVersion > 21}AResponse.FreeContentStream := true;{$IFEND}{$ENDIF}
      Handled := True;
      Exit;
     End;
