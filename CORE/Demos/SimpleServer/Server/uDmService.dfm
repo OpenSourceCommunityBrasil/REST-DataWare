@@ -9,7 +9,7 @@ object ServerMethodDM: TServerMethodDM
   object RESTDWPoolerDB1: TRESTDWPoolerDB
     RESTDriver = RESTDWDriverFD1
     Compression = True
-    Encoding = esUtf8
+    Encoding = esASCII
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True

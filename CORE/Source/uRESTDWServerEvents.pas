@@ -516,7 +516,7 @@ Begin
     Begin
      vFound  := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil;
      If Not(vFound) Then
-      dwParam                := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF}
+      dwParam                := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF}
      Else
       dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
      dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
@@ -664,13 +664,13 @@ Begin
 //   If (Not Assigned(DWParams)) or (dwParams = nil) Then
    DWParams := TDWParams.Create;
    {$IFNDEF FPC}
-   DWParams.Encoding := GetEncoding(vRESTClientPooler.Encoding);
+   {$if CompilerVersion > 21}DWParams.Encoding := GetEncoding(vRESTClientPooler.Encoding);{$IFEND}
    {$ENDIF}
    For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
     Begin
      vFound  := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil;
      If Not(vFound) Then
-      dwParam                := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF}
+      dwParam                := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF}
      Else
       dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
      dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;

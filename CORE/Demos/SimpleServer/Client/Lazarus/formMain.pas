@@ -86,6 +86,7 @@ Begin
  RESTDWClientSQL1.Close;
  RESTDWClientSQL1.sql.clear;
  RESTDWClientSQL1.sql.add(mComando.Text);
+ RESTDWClientSQL1.updatetablename := 'employee';
  RESTDWClientSQL1.Open;
  If RESTDWClientSQL1.FindField('EMP_NO') <> Nil Then
   RESTDWClientSQL1.FindField('EMP_NO').ProviderFlags := [pfInUpdate, pfInWhere, pfInKey];

@@ -175,7 +175,7 @@ Begin
    Begin
     vParams := TStringList.Create;
     vParams.Delimiter := '&';
-    vParams.StrictDelimiter := true;
+    {$IFNDEF FPC}{$if CompilerVersion > 21}vParams.StrictDelimiter := true;{$IFEND}{$ENDIF}
     If pos(UrlMethod + '/', Cmd) > 0 Then
      Cmd := StringReplace(UrlMethod + '/', Cmd, '', [rfReplaceAll]);
     If (Params.Count > 0) then
