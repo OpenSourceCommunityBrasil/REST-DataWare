@@ -18,6 +18,10 @@ Begin
   {$ifdef DEBUG}
   Try
    // In debug mode the server acts as a console application.
+   If Not Application.DelayInitialize Or Application.Installing Then
+    Application.Initialize;
+   Application.CreateForm(TRestDWsrv, RestDWsrv);
+   Application.Run;
    WriteLn('REST Dataware - CORE - Server : DEBUG mode. Press enter to exit.');
    // Create the TService descendant manually.
    ReadLn;
