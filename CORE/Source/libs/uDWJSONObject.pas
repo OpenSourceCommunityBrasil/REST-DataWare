@@ -2048,6 +2048,7 @@ Begin
  vObjectValue := ovString;
  vBinary := False;
  vJSONValue.vBinary := vBinary;
+ vEncoded := True;
 End;
 
 Destructor TJSONParam.Destroy;
@@ -2281,7 +2282,7 @@ var
  ms : TMemoryStream;
  p  : Pointer;
 begin
- vEncoded := False;
+// vEncoded := False;
  If (VarIsNull(Value)) Or (VarIsEmpty(Value)) Or
     (DataType in [ovBytes,    ovVarBytes,    ovBlob,
                   ovByte,     ovGraphic,     ovParadoxOle,
@@ -2330,6 +2331,7 @@ begin
   ovBoolean,
   ovAutoInc,
   ovOraInterval:Begin
+                 vEncoded := False;
                  If vObjectValue = ovBoolean Then
                   Begin
                    If Boolean(Value) then
@@ -2355,6 +2357,7 @@ begin
   ovTimeStamp,
   ovOraTimeStamp,
   ovTimeStampOffset : Begin
+                       vEncoded     := False;
                        vObjectValue := ovDateTime;
                        SetValue(IntToStr(DateTimeToUnix(Value)), vEncoded);
                       End;
@@ -2365,7 +2368,7 @@ begin
   ovFixedWideChar,
   ovMemo,
   ovFmtMemo   : Begin
-                 vEncoded     := True;
+//                 vEncoded     := True;
                  vObjectValue := ovString;
                  SetValue(Value, vEncoded);
                 End;

@@ -146,6 +146,7 @@ begin
   Params.ItemsString['result'].AsDateTime := Now
  Else
   Params.ItemsString['result'].AsDateTime := Now - 1;
+ Params.ItemsString['resultstring'].AsString := 'testservice';
 end;
 
 procedure TServerMethodDM.DWServerEvents1EventstesteReplyEvent(

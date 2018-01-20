@@ -89,6 +89,13 @@ object ServerMethodDM: TServerMethodDM
             ObjectValue = ovString
             ParamName = 'inputdata'
             Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odINOUT
+            ObjectValue = ovString
+            ParamName = 'resultstring'
+            Encoded = False
           end>
         Name = 'servertime'
         OnReplyEvent = DWServerEvents1EventsservertimeReplyEvent

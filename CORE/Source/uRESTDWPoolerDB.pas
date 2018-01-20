@@ -605,6 +605,7 @@ Begin
         JSONParam         := TJSONParam.Create;
        {$ENDIF}
        JSONParam.ParamName := Params[I].Name;
+       JSONParam.Encoded   := True;
        JSONParam.LoadFromParam(Params[I]);
        Result.Add(JSONParam);
       End;

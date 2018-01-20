@@ -79,7 +79,7 @@ Type
   vHost             : String;
   vUrlPath          : String;
   vPort             : Integer;
-  vAutenticacao     : Boolean;
+  vAuthentication   : Boolean;
   vTransparentProxy : TIdProxyConnectionInfo;
   vRequestTimeOut   : Integer;
   vTypeRequest      : TTypeRequest;
@@ -325,7 +325,7 @@ Type
   vPort             : Integer;
   vDatacompress,
   vThreadRequest,
-  vAutenticacao     : Boolean;
+  vAuthentication   : Boolean;
   vTransparentProxy : TIdProxyConnectionInfo;
   vRequestTimeOut   : Integer;
   {$IFDEF FPC}
@@ -353,7 +353,7 @@ Type
   Property Port             : Integer                Read vPort              Write vPort              Default 8082;
   Property UserName         : String                 Read vUserName          Write SetUserName;
   Property Password         : String                 Read vPassword          Write SetPassword;
-  Property Autenticacao     : Boolean                Read vAutenticacao      Write vAutenticacao      Default True;
+  Property Authentication   : Boolean                Read vAuthentication      Write vAuthentication      Default True;
   Property ProxyOptions     : TIdProxyConnectionInfo Read vTransparentProxy  Write vTransparentProxy;
   Property RequestTimeOut   : Integer                Read vRequestTimeOut    Write vRequestTimeOut;
   Property ThreadRequest    : Boolean                Read vThreadRequest     Write vThreadRequest;
@@ -1356,7 +1356,7 @@ Begin
  vUserName                       := 'testserver';
  vPassword                       := 'testserver';
  vRSCharset                      := esASCII;
- vAutenticacao                   := True;
+ vAuthentication                   := True;
  vRequestTimeOut                 := 10000;
  vThreadRequest                  := False;
  vDatacompress                   := True;
@@ -1540,7 +1540,7 @@ Begin
     thd.vUrlPath        := vUrlPath;
     thd.vHost           :=   vHost;
     thd.vPort           :=   vPort;
-    thd.vAutenticacao   :=   vAutenticacao;
+    thd.vAuthentication   :=   vAuthentication;
     thd.vTransparentProxy:=   vTransparentProxy;
     thd.vRequestTimeOut :=   vRequestTimeOut;
     thd.vTypeRequest    :=   vTypeRequest;
@@ -1829,7 +1829,7 @@ Begin
     thd.vUrlPath        := vUrlPath;
     thd.vHost           :=   vHost;
     thd.vPort           :=   vPort;
-    thd.vAutenticacao   :=   vAutenticacao;
+    thd.vAuthentication   :=   vAuthentication;
     thd.vTransparentProxy:=   vTransparentProxy;
     thd.vRequestTimeOut :=   vRequestTimeOut;
     thd.vTypeRequest    :=   vTypeRequest;
@@ -2142,7 +2142,7 @@ Begin
     thd.vUrlPath        := vUrlPath;
     thd.vHost           :=   vHost;
     thd.vPort           :=   vPort;
-    thd.vAutenticacao   :=   vAutenticacao;
+    thd.vAuthentication   :=   vAuthentication;
     thd.vTransparentProxy:=   vTransparentProxy;
     thd.vRequestTimeOut :=   vRequestTimeOut;
     thd.vTypeRequest    :=   vTypeRequest;
@@ -2379,7 +2379,7 @@ End;
 
 Procedure TRESTClientPooler.SetParams(Var aHttpRequest  : TIdHTTP);
 Begin
- aHttpRequest.Request.BasicAuthentication := vAutenticacao;
+ aHttpRequest.Request.BasicAuthentication := vAuthentication;
  If aHttpRequest.Request.BasicAuthentication Then
   Begin
    If aHttpRequest.Request.Authentication = Nil Then
@@ -3625,7 +3625,7 @@ end;
 
 Procedure TThread_Request.SetParams(HttpRequest:TIdHTTP);
 Begin
- HttpRequest.Request.BasicAuthentication := vAutenticacao;
+ HttpRequest.Request.BasicAuthentication := vAuthentication;
  If HttpRequest.Request.BasicAuthentication Then
   Begin
    If HttpRequest.Request.Authentication = Nil Then
