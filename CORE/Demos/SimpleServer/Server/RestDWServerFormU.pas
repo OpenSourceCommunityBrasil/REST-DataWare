@@ -112,7 +112,6 @@ type
     Label20: TLabel;
     CkUsaURL: TCheckBox;
     EdURL: TEdit;
-    cbJsonMode: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure ApplicationEvents1Idle(Sender: TObject; var Done: Boolean);
     procedure ButtonStartClick(Sender: TObject);
@@ -137,7 +136,6 @@ type
     VDatabaseIP,
     VUsername,
     VPassword    : string;
-    vJsonMode    : TJsonMode;
     procedure StartServer;
     Function GetHandleOnTaskBar: THandle;
     procedure ChangeStatusWindow;
@@ -146,7 +144,6 @@ type
     { Public declarations }
     procedure ShowBalloonTips(IconMessage: Integer = 0; MessageValue: string = '');
     procedure ShowApplication;
-    Property  JsonMode       : TJsonMode Read vJsonMode Write vJsonMode;
     Property Username: string
       Read   VUsername
       Write  VUsername;
@@ -352,7 +349,6 @@ procedure TRestDWForm.ButtonStartClick(Sender: TObject);
 var
   Ini: TIniFile;
 Begin
-  JsonMode := TJsonMode(cbJsonMode.ItemIndex);
   If FileExists(FCfgName) Then
     DeleteFile(FCfgName);
   Ini := TIniFile.Create(FCfgName);

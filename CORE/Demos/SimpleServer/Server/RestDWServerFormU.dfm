@@ -117,6 +117,8 @@ object RestDWForm: TRestDWForm
     TabOrder = 3
     object tsConfigs: TTabSheet
       Caption = 'Configuration'
+      ExplicitLeft = 8
+      ExplicitTop = 26
       DesignSize = (
         515
         346)
@@ -135,7 +137,7 @@ object RestDWForm: TRestDWForm
         ParentFont = False
       end
       object Label2: TLabel
-        Left = 57
+        Left = 55
         Top = 46
         Width = 43
         Height = 13
@@ -1254,7 +1256,7 @@ object RestDWForm: TRestDWForm
         Text = '8082'
       end
       object edUserNameDW: TEdit
-        Left = 57
+        Left = 55
         Top = 64
         Width = 100
         Height = 21
@@ -1358,7 +1360,7 @@ object RestDWForm: TRestDWForm
       end
       object cbEncode: TCheckBox
         Left = 268
-        Top = 46
+        Top = 49
         Width = 101
         Height = 19
         Caption = 'Encode Strings'
@@ -1374,7 +1376,7 @@ object RestDWForm: TRestDWForm
       end
       object CheckBox1: TCheckBox
         Left = 268
-        Top = 63
+        Top = 69
         Width = 91
         Height = 19
         Caption = 'Compression'
@@ -1408,20 +1410,6 @@ object RestDWForm: TRestDWForm
         Caption = 'Usa URL'
         TabOrder = 15
         OnClick = ckUsaURLClick
-      end
-      object cbJsonMode: TComboBox
-        Left = 268
-        Top = 83
-        Width = 99
-        Height = 21
-        Style = csDropDownList
-        ItemIndex = 0
-        TabOrder = 17
-        Text = 'jmDataware'
-        Items.Strings = (
-          'jmDataware'
-          'jmPureJSON'
-          'jmMongoDB')
       end
     end
     object tsLogs: TTabSheet
