@@ -64,6 +64,8 @@ TYPE
       var Result: string);
     procedure DWServerEvents1EventsloaddataseteventReplyEvent(
       var Params: TDWParams; var Result: string);
+    procedure DWServerEvents1EventsgetemployeeReplyEvent(var Params: TDWParams;
+      var Result: string);
   PRIVATE
     { Private declarations }
     vIDVenda : Integer;
@@ -112,6 +114,29 @@ BEGIN
     END;
   END;
 END;
+
+procedure TServerMethodDM.DWServerEvents1EventsgetemployeeReplyEvent(
+  var Params: TDWParams; var Result: string);
+Var
+ JSONValue: TJSONValue;
+begin
+ JSONValue          := TJSONValue.Create;
+ Try
+  FDQuery1.Close;
+  FDQuery1.SQL.Clear;
+  FDQuery1.SQL.Add('select * from employee');
+  Try
+   FDQuery1.Open;
+   JSONValue.Encoding := GetEncoding(Encoding);
+   JSONValue.LoadFromDataset('temp', FDQuery1, False,  Params.JsonMode, '');
+   Params.ItemsString['result'].AsString := JSONValue.ToJSON;
+  Except
+
+  End;
+ Finally
+  JSONValue.Free;
+ End;
+end;
 
 procedure TServerMethodDM.DWServerEvents1EventsloaddataseteventReplyEvent(
   var Params: TDWParams; var Result: string);

@@ -80,6 +80,7 @@ Type
  TDWEvent = Class(TCollectionItem)
  Protected
  Private
+  vJsonMode                     : TJsonMode;
   FName                         : String;
   vDWParams                     : TDWParamsMethods;
   vOwnerCollection              : TCollection;
@@ -95,6 +96,7 @@ Type
   Destructor  Destroy; Override;
  Published
   Property    DWParams     : TDWParamsMethods Read vDWParams      Write vDWParams;
+  Property    JsonMode     : TJsonMode        Read vJsonMode      Write vJsonMode;
   Property    Name         : String           Read GetDisplayName Write SetDisplayName;
   Property    OnReplyEvent : TDWReplyEvent    Read GetReplyEvent  Write SetReplyEvent;
 End;
@@ -183,6 +185,7 @@ constructor TDWEvent.Create(aCollection: TCollection);
 begin
   inherited;
   vDWParams        := TDWParamsMethods.Create(aCollection, TDWParamMethod);
+  vJsonMode        := jmDataware;
   DWReplyEventData := TDWReplyEventData.Create(Nil);
   vOwnerCollection := aCollection;
   FName            := 'dwevent' + IntToStr(aCollection.Count);
@@ -512,6 +515,7 @@ Begin
   Begin
    If Not Assigned(DWParams) Then
     DWParams := TDWParams.Create;
+   DWParams.JsonMode := vEventList.EventByName[EventName].JsonMode;
    For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
     Begin
      vFound  := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil;
@@ -523,6 +527,7 @@ Begin
      dwParam.ObjectDirection := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectDirection;
      dwParam.ObjectValue     := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectValue;
      dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
+     dwParam.JsonMode        := DWParams.JsonMode;
      If (vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '')  And
         (Trim(dwParam.AsString) = '') Then
       dwParam.Value           := vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue;

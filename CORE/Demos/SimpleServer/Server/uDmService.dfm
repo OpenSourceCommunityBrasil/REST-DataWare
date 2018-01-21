@@ -97,6 +97,7 @@ object ServerMethodDM: TServerMethodDM
             ParamName = 'resultstring'
             Encoded = False
           end>
+        JsonMode = jmDataware
         Name = 'servertime'
         OnReplyEvent = DWServerEvents1EventsservertimeReplyEvent
       end
@@ -109,6 +110,7 @@ object ServerMethodDM: TServerMethodDM
             ParamName = 'result'
             Encoded = True
           end>
+        JsonMode = jmDataware
         Name = 'teste'
         OnReplyEvent = DWServerEvents1EventstesteReplyEvent
       end
@@ -128,8 +130,22 @@ object ServerMethodDM: TServerMethodDM
             ParamName = 'result'
             Encoded = True
           end>
+        JsonMode = jmDataware
         Name = 'loaddatasetevent'
         OnReplyEvent = DWServerEvents1EventsloaddataseteventReplyEvent
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = False
+          end>
+        JsonMode = jmPureJSON
+        Name = 'getemployee'
+        OnReplyEvent = DWServerEvents1EventsgetemployeeReplyEvent
       end>
     Left = 80
     Top = 103

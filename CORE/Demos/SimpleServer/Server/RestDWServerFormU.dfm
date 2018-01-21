@@ -1374,7 +1374,7 @@ object RestDWForm: TRestDWForm
       end
       object CheckBox1: TCheckBox
         Left = 268
-        Top = 68
+        Top = 63
         Width = 91
         Height = 19
         Caption = 'Compression'
@@ -1409,14 +1409,24 @@ object RestDWForm: TRestDWForm
         TabOrder = 15
         OnClick = ckUsaURLClick
       end
+      object cbJsonMode: TComboBox
+        Left = 268
+        Top = 83
+        Width = 99
+        Height = 21
+        Style = csDropDownList
+        ItemIndex = 0
+        TabOrder = 17
+        Text = 'jmDataware'
+        Items.Strings = (
+          'jmDataware'
+          'jmPureJSON'
+          'jmMongoDB')
+      end
     end
     object tsLogs: TTabSheet
       Caption = 'Logs'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label19: TLabel
         Left = 7
         Top = 147
@@ -1453,19 +1463,19 @@ object RestDWForm: TRestDWForm
   end
   object ApplicationEvents1: TApplicationEvents
     OnIdle = ApplicationEvents1Idle
-    Left = 220
-    Top = 126
+    Left = 276
+    Top = 190
   end
   object ctiPrincipal: TTrayIcon
     Hint = 'REST Dataware - Service'
     PopupMenu = pmMenu
     OnDblClick = ctiPrincipalDblClick
-    Left = 220
-    Top = 80
+    Left = 252
+    Top = 288
   end
   object pmMenu: TPopupMenu
-    Left = 192
-    Top = 80
+    Left = 224
+    Top = 192
     object RestaurarAplicao1: TMenuItem
       Caption = 'Restaurar Aplica'#231#227'o'
       OnClick = RestaurarAplicao1Click
@@ -1500,7 +1510,7 @@ object RestDWForm: TRestDWForm
   object tupdatelogs: TTimer
     Enabled = False
     OnTimer = tupdatelogsTimer
-    Left = 324
-    Top = 120
+    Left = 332
+    Top = 264
   end
 end

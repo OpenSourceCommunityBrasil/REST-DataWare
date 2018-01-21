@@ -49,8 +49,12 @@ Type
 End;
 
 Type
+ TJsonMode = (jmDataware, jmPureJSON, jmMongoDB);
+
+Type
  TJSONValue = Class
 Private
+ vJsonMode   : TJsonMode;
  vNullValue,
  vBinary: Boolean;
  vtagName: String;
@@ -71,16 +75,18 @@ Private
  Procedure WriteValue   (bValue      : String);
  Function  FormatValue  (bValue      : String)       : String;
  Function  GetValueJSON (bValue      : String)       : String;
- Function  DatasetValues(bValue      : TDataset;
-                         DCSeparator : String = ',') : String;
+ Function  DatasetValues(bValue         : TDataset;
+                         DateTimeFormat : String = '';
+                         JsonModeD      : TJsonMode = jmDataware) : String;
  Function EncodedString : String;
 Public
  Procedure ToStream(Var    bValue       : TMemoryStream);
- Procedure LoadFromDataset(TableName    : String;
-                           bValue       : TDataset;
-                           EncodedValue : Boolean = True;
-                           DCSeparator  : String = ','{$IFDEF FPC};
-                           CharSet      : TDatabaseCharSet = csUndefined{$ENDIF});
+ Procedure LoadFromDataset(TableName      : String;
+                           bValue         : TDataset;
+                           EncodedValue   : Boolean          = True;
+                           JsonModeD      : TJsonMode        = jmDataware;
+                           DateTimeFormat : String           = ''{$IFDEF FPC};
+                           CharSet        : TDatabaseCharSet = csUndefined{$ENDIF});
  // alterado por fabricio  passa o nome da tabela
  Procedure WriteToDataset (DatasetType  : TDatasetType;
                            JSONValue    : String;
@@ -109,6 +115,7 @@ Public
  {$ENDIF}
  Property    Tagname         : String           Read vtagName         Write vtagName;
  Property    Encoded         : Boolean          Read vEncoded         Write vEncoded;
+ Property    JsonMode        : TJsonMode        Read vJsonMode        Write vJsonMode;
  {$IFDEF FPC}
  Property DatabaseCharSet    : TDatabaseCharSet Read vDatabaseCharSet Write vDatabaseCharSet;
  {$ENDIF}
@@ -119,6 +126,7 @@ Type
  TJSONParam = Class(TObject)
 Private
  vJSONValue       : TJSONValue;
+ vJsonMode        : TJsonMode;
  {$IFNDEF FPC}
  {$IF CompilerVersion > 21}
   vEncoding       : TEncoding;
@@ -187,6 +195,7 @@ Public
  Property    ObjectValue           : TObjectValue     Read vObjectValue     Write vObjectValue;
  Property    ParamName             : String           Read vParamName       Write SetParamName;
  Property    Encoded               : Boolean          Read vEncoded         Write vEncoded;
+ Property    JsonMode              : TJsonMode        Read vJsonMode        Write vJsonMode;
  //Propriedades Novas
  Property    Value                 : Variant          Read GetVariantValue  Write SetVariantValue;
  //Novas definições por tipo
@@ -238,6 +247,7 @@ End;
 Type
  TDWParams = Class(TList)
 Private
+ vJsonMode : TJsonMode;
  {$IFNDEF FPC}
  {$IF CompilerVersion > 21}
  vEncoding : TEncoding;
@@ -261,6 +271,7 @@ Public
  Function    Add        (Item     : TJSONParam): Integer;   Overload;
  Property    Items      [Index    : Integer]   : TJSONParam Read GetRec     Write PutRec; Default;
  Property    ItemsString[Index    : String]    : TJSONParam Read GetRecName Write PutRecName;
+ Property    JsonMode                          : TJsonMode  Read vJsonMode  Write vJsonMode;
  {$IFNDEF FPC}
  {$IF CompilerVersion > 21}
  Property   Encoding : TEncoding Read vEncoding Write vEncoding;
@@ -384,12 +395,14 @@ Begin
   vItem^.vEncoding := vEncoding;
  {$IFEND}
  {$ENDIF}
+ vItem^.JsonMode := vJsonMode;
  Result := TList(Self).Add(vItem);
 End;
 
 Constructor TDWParams.Create;
 Begin
  Inherited;
+ vJsonMode := jmDataware;
  {$IFNDEF FPC}
  {$IF CompilerVersion > 21}
  {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
@@ -643,6 +656,7 @@ Begin
  vtagName        := 'TAGJSON';
  vBinary         := True;
  vNullValue      := True;
+ vJsonMode       := jmDataware;
 End;
 
 Destructor TJSONValue.Destroy;
@@ -672,18 +686,23 @@ Var
  aResult : String;
 Begin
  aResult := Stringreplace(bValue, #000, '', [rfReplaceAll]);
- If vTypeObject = toDataset Then
-  Result := Format(TValueFormatJSON,      ['ObjectType', GetObjectName(vTypeObject),         'Direction',
-                                                         GetDirectionName(vObjectDirection), 'Encoded',
-                                                         EncodedString,                      'ValueType',
-                                                         GetValueType(vObjectValue),         vtagName,
-                                                         GetValueJSON(aResult)])
+ If JsonMode = jmDataware Then
+  Begin
+   If vTypeObject = toDataset Then
+    Result := Format(TValueFormatJSON,      ['ObjectType', GetObjectName(vTypeObject),         'Direction',
+                                                           GetDirectionName(vObjectDirection), 'Encoded',
+                                                           EncodedString,                      'ValueType',
+                                                           GetValueType(vObjectValue),         vtagName,
+                                                           GetValueJSON(aResult)])
+   Else
+    Result := Format(TValueFormatJSONValue, ['ObjectType', GetObjectName(vTypeObject),         'Direction',
+                                                           GetDirectionName(vObjectDirection), 'Encoded',
+                                                           EncodedString,                      'ValueType',
+                                                           GetValueType(vObjectValue),         vtagName,
+                                                           GetValueJSON(aResult)]);
+  End
  Else
-  Result := Format(TValueFormatJSONValue, ['ObjectType', GetObjectName(vTypeObject),         'Direction',
-                                                         GetDirectionName(vObjectDirection), 'Encoded',
-                                                         EncodedString,                      'ValueType',
-                                                         GetValueType(vObjectValue),         vtagName,
-                                                         GetValueJSON(aResult)]);
+  Result := aResult;
 End;
 
 Function TJSONValue.GetValue: String;
@@ -773,8 +792,9 @@ Else
  {$IFEND}
 End;
 
-Function TJSONValue.DatasetValues(bValue      : TDataset;
-                                  DCSeparator : String = ',') : String;
+Function TJSONValue.DatasetValues(bValue         : TDataset;
+                                  DateTimeFormat : String = '';
+                                  JsonModeD      : TJsonMode = jmDataware) : String;
 Var
  vLines : String;
  A      : Integer;
@@ -825,22 +845,29 @@ Var
  Function GenerateLine: String;
  Var
   I             : Integer;
+  vTempField,
   vTempValue    : String;
   bStream       : TStream;
   vStringStream : TStringStream;
  Begin
   For I := 0 To bValue.Fields.Count - 1 Do
    Begin
+    Case JsonModeD Of
+     jmDataware : Begin
+                  End;
+     jmPureJSON,
+     jmMongoDB  : vTempField := Format('"%s": ', [bValue.Fields[I].FieldName]);
+    End;
     If Not bValue.Fields[I].IsNull then
      Begin
       If bValue.Fields[I].DataType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
                                        {$IFEND}{$ENDIF}ftFloat, ftCurrency, ftFMTBcd, ftBCD] Then
-       vTempValue := Format('"%s"', [BuildStringFloat(FloatToStr(bValue.Fields[I].AsFloat))])
+       vTempValue := Format('%s"%s"', [vTempField, BuildStringFloat(FloatToStr(bValue.Fields[I].AsFloat))])
       Else If bValue.Fields[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
        Begin
         vStringStream := TStringStream.Create('');
+        bStream := bValue.CreateBlobStream(TBlobField(bValue.Fields[I]), bmRead);
         Try
-         bStream := bValue.CreateBlobStream(TBlobField(bValue.Fields[I]), bmRead);
          bStream.Position := 0;
          {$IFDEF FPC}
          vStringStream.CopyFrom(bStream, bStream.Size);
@@ -852,9 +879,9 @@ Var
          {$IFEND}
          {$ENDIF}
          If vEncoded Then
-          vTempValue := Format('%s',   [StreamToHex(vStringStream)])
+          vTempValue := Format('%s%s',   [vTempField, StreamToHex(vStringStream)])
          Else
-          vTempValue := Format('"%s"', [vStringStream.DataString])
+          vTempValue := Format('%s"%s"', [vTempField, vStringStream.DataString])
         Finally
          vStringStream.Free;
          bStream.Free;
@@ -870,29 +897,33 @@ Var
           If vEncoded Then
            Begin
             {$IFDEF FPC}
-             vTempValue := Format('"%s"',      [EncodeStrings(bValue.Fields[I].AsString, vDatabaseCharSet)]);
+             vTempValue := Format('%s"%s"',      [vTempField, EncodeStrings(bValue.Fields[I].AsString, vDatabaseCharSet)]);
             {$ELSE}
-             vTempValue := Format('"%s"',      [EncodeStrings(bValue.Fields[I].AsString)]);
+             vTempValue := Format('%s"%s"',      [vTempField, EncodeStrings(bValue.Fields[I].AsString)]);
             {$ENDIF}
            End
           Else
            Begin
             {$IFDEF FPC}
-             vTempValue := Format('"%s"',      [CP1252ToUTF8(bValue.Fields[I].AsString)])
+             vTempValue := Format('%s"%s"',      [vTempField, CP1252ToUTF8(bValue.Fields[I].AsString)])
             {$ELSE}
-             vTempValue := Format('"%s"',      [bValue.Fields[I].AsString])
+             vTempValue := Format('%s"%s"',      [vTempField, bValue.Fields[I].AsString])
             {$ENDIF}
            End;
          End
         Else If bValue.Fields[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
-        // vTempValue     := Format('"%s"',      [FloatToStr(bValue.Fields[I].AsDateTime)])
-         vTempValue     := Format('"%s"',      [inttostr(DateTimeToUnix(bValue.Fields[I].AsDateTime))])
+         Begin
+          If DateTimeFormat <> '' Then
+           vTempValue     := Format('%s"%s"',    [vTempField, FormatDateTime(DateTimeFormat, bValue.Fields[I].AsDateTime)])
+          Else
+           vTempValue     := Format('%s%s',      [vTempField, inttostr(DateTimeToUnix(bValue.Fields[I].AsDateTime))]);
+         End
         Else
-         vTempValue     := Format('"%s"',      [bValue.Fields[I].AsString]);    //asstring
+         vTempValue     := Format('%s"%s"',      [vTempField, bValue.Fields[I].AsString]);    //asstring
        End;
      End
     Else
-     vTempValue := Format('"%s"', ['null']);
+     vTempValue := Format('%s"%s"', [vTempField, 'null']);
     If I = 0 Then
      Result := vTempValue
     Else
@@ -905,18 +936,41 @@ Begin
   If Not bValue.Active Then
    bValue.Open;
   bValue.First;
-  Result    := '{"fields":[' + GenerateHeader + ']}, {"lines":[%s]}';
+  Case JsonModeD Of
+   jmDataware : Begin
+                 Result    := '{"fields":[' + GenerateHeader + ']}, {"lines":[%s]}';
+                End;
+   jmPureJSON : Begin
+                End;
+   jmMongoDB  : Begin
+                End;
+  End;
   A := 0;
   While Not bValue.Eof Do
    Begin
-    If bValue.RecNo = 1 Then
-     vLines := Format('{"line%d":[%s]}', [A, GenerateLine])
-    Else
-     vLines := vLines + Format(', {"line%d":[%s]}', [A, GenerateLine]);
+    Case JsonModeD Of
+     jmDataware : Begin
+                   If bValue.RecNo = 1 Then
+                    vLines := Format('{"line%d":[%s]}', [A, GenerateLine])
+                   Else
+                    vLines := vLines + Format(', {"line%d":[%s]}', [A, GenerateLine]);
+                  End;
+     jmPureJSON,
+     jmMongoDB  : Begin
+                   If bValue.RecNo = 1 Then
+                    vLines := Format('{%s}', [GenerateLine])
+                   Else
+                    vLines := vLines + Format(', {%s}', [GenerateLine]);
+                  End;
+    End;
     bValue.Next;
     Inc(A);
    End;
-  Result    := Format(Result, [vLines]);
+  Case JsonModeD Of
+   jmDataware : Result := Format(Result, [vLines]);
+   jmPureJSON,
+   jmMongoDB  : Result := Format('{"%s": [%s]}', [vtagName, vLines]);
+  End;
   bValue.First;
  Finally
   bValue.EnableControls;
@@ -931,11 +985,12 @@ Begin
   Result := 'false';
 End;
 
-Procedure TJSONValue.LoadFromDataset(TableName    : String;
-                                     bValue       : TDataset;
-                                     EncodedValue : Boolean = True;
-                                     DCSeparator  : String = ','{$IFDEF FPC};
-                                     CharSet      : TDatabaseCharSet = csUndefined{$ENDIF});
+Procedure TJSONValue.LoadFromDataset(TableName      : String;
+                                     bValue         : TDataset;
+                                     EncodedValue   : Boolean   = True;
+                                     JsonModeD      : TJsonMode = jmDataware;
+                                     DateTimeFormat : String = ''{$IFDEF FPC};
+                                     CharSet        : TDatabaseCharSet = csUndefined{$ENDIF});
 Var
  vTagGeral        : String;
 Begin
@@ -944,8 +999,9 @@ Begin
  vObjectValue     := ovDataSet;
  vtagName         := Lowercase(TableName);
  vEncoded         := EncodedValue;
- vTagGeral        := DatasetValues(bValue, DCSeparator);
+ vTagGeral        := DatasetValues(bValue, DateTimeFormat, JsonModeD);
  aValue           := ToBytes(vTagGeral);
+ vJsonMode        := JsonModeD;
 End;
 
 Function TJSONValue.ToJSON: String;
@@ -1998,7 +2054,12 @@ Begin
      {$ENDIF}
     End
    Else
-    aValue := ToBytes(Format(TJsonStringValue, [bValue]));
+    Begin
+     If jsonmode = jmDataware Then
+      aValue := ToBytes(Format(TJsonStringValue, [bValue]))
+     Else
+      aValue := ToBytes(bValue);
+    End;
   End
  Else If vObjectValue in [ovDate, ovTime, ovDateTime, ovTimeStamp,
                           ovOraTimeStamp, ovTimeStampOffset] Then
@@ -2038,6 +2099,7 @@ End;
 Constructor TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(Encoding: TEncoding){$IFEND}{$ENDIF};
 Begin
  vJSONValue := TJSONValue.Create;
+ vJsonMode  := jmDataware;
  {$IFNDEF FPC}
  {$IF CompilerVersion > 21}
   vEncoding := Encoding;
@@ -2388,6 +2450,7 @@ End;
 Procedure TJSONParam.SetValue(aValue: String; Encode: Boolean);
 Begin
  vEncoded := Encode;
+ vJSONValue.JsonMode := vJsonMode;
  vJSONValue.vEncoded := vEncoded;
  If Encode Then
   WriteValue(EncodeStrings(aValue{$IFDEF FPC}, csUndefined{$ENDIF}))
@@ -2399,6 +2462,7 @@ End;
 
 Function TJSONParam.ToJSON: String;
 Begin
+ vJSONValue.JsonMode := vJsonMode;
  Result := vJSONValue.ToJSON;
 End;
 
