@@ -128,7 +128,7 @@ begin
   Try
    FDQuery1.Open;
    JSONValue.Encoding := GetEncoding(Encoding);
-   JSONValue.LoadFromDataset('temp', FDQuery1, False,  Params.JsonMode, '');
+   JSONValue.LoadFromDataset('employee', FDQuery1, False,  Params.JsonMode, '');
    Params.ItemsString['result'].AsString := JSONValue.ToJSON;
   Except
 

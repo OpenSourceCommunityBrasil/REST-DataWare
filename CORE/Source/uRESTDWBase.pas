@@ -139,6 +139,7 @@ Type
   {$ELSE}
    vCriticalSection : TRTLCriticalSection;
   {$ENDIF}
+  JsonMode         : TJsonMode;
   vEncodeStrings,
   vActive          : Boolean;
   vProxyOptions    : TProxyOptions;
@@ -232,6 +233,7 @@ Type
  TRESTServiceCGI = Class(TComponent)
  Protected
  Private
+  JsonMode         : TJsonMode;
   vServerContext,
   FRootPath        : String;
   vEncodeStrings   : Boolean;
@@ -425,6 +427,7 @@ Var
    End;
  End;
 Begin
+ JsonMode           := jmDataware;
  vTempServerMethods := Nil;
  DWParams           := Nil;
  compresseddata     := False;
@@ -723,7 +726,16 @@ Begin
         End;
        Try
         If Assigned(DWParams) Then
-         vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr])
+         Begin
+          If JsonMode = jmDataware Then
+           vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr])
+          Else If JsonMode in [jmPureJSON, jmMongoDB] Then
+           Begin
+            vReplyString                        := GetParamsReturn(DWParams);
+            If vReplyString = '' Then
+             vReplyString                       := JSONStr;
+           End;
+         End
         Else
          vReplyString := 'Message (Internal Error)';
         If compresseddata Then
@@ -1205,6 +1217,7 @@ Begin
          TDWServerEvents(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, DWParams);
          If Assigned(TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent) Then
           TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent(DWParams, vResult);
+         JsonMode           := TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].JsonMode;
          If Trim(vResult) = '' Then
           vResult := TReplyOK;
          Break;
@@ -2765,6 +2778,7 @@ Begin
          TDWServerEvents(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, DWParams);
          If Assigned(TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent) Then
           TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent(DWParams, vResult);
+         JsonMode := TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].JsonMode;
          If Trim(vResult) = '' Then
           vResult := TReplyOK;
          Break;
@@ -3014,6 +3028,7 @@ Var
    End;
  End;
 Begin
+ JsonMode           := jmDataware;
  vTempServerMethods := Nil;
  DWParams           := Nil;
  compresseddata     := False;
@@ -3313,7 +3328,14 @@ Begin
           End;
         End;
        Try
-        vReplyString                         := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
+        If JsonMode = jmDataware Then
+         vReplyString                         := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr])
+        Else If JsonMode in [jmPureJSON, jmMongoDB] Then
+         Begin
+          vReplyString                        := GetParamsReturn(DWParams);
+          If vReplyString = '' Then
+           vReplyString                       := JSONStr;
+         End;
         If compresseddata Then
          Begin
           ZCompressStr(vReplyString, vReplyStringResult);
