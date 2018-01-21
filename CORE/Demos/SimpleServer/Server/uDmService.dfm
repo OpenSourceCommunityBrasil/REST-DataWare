@@ -142,6 +142,13 @@ object ServerMethodDM: TServerMethodDM
             ObjectValue = ovString
             ParamName = 'result'
             Encoded = False
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'segundoparam'
+            Encoded = False
           end>
         JsonMode = jmPureJSON
         Name = 'getemployee'

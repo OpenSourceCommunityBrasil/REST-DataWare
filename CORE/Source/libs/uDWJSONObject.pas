@@ -2477,6 +2477,12 @@ Function TJSONParam.ToJSON: String;
 Begin
  vJSONValue.JsonMode := vJsonMode;
  Result := vJSONValue.ToJSON;
+ If vJsonMode in [jmPureJSON, jmMongoDB] Then
+  Begin
+   If Not((Pos('{', Result) > 0)  And
+          (Pos('}', Result) > 0)) Then
+    Result := Format('{"%s" : "%s"}', [vParamName, vJSONValue.ToJSON]);
+  End;
 End;
 
 {$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}

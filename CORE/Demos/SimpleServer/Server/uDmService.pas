@@ -130,6 +130,7 @@ begin
    JSONValue.Encoding := GetEncoding(Encoding);
    JSONValue.LoadFromDataset('employee', FDQuery1, False,  Params.JsonMode, '');
    Params.ItemsString['result'].AsString := JSONValue.ToJSON;
+   Params.ItemsString['segundoparam'].AsString := 'teste de array';
   Except
 
   End;
