@@ -264,6 +264,7 @@ Public
  Constructor Create;
  Destructor  Destroy; Override;
  Function    ParamsReturn         : Boolean;
+ Function    CountOutParams       : Integer;
  Function    ToJSON               : String;
  Procedure   FromJSON   (JSON     : String);
  Procedure   CopyFrom   (DWParams : TDWParams);
@@ -589,6 +590,18 @@ Begin
      Result := TJSONParam(TList(Self).Items[I]^);
      Break;
     End;
+  End;
+End;
+
+Function TDWParams.CountOutParams : Integer;
+Var
+ I : Integer;
+Begin
+ Result := 0;
+ For I := 0 To Count -1 Do
+  Begin
+   If TJSONParam(TList(Self).Items[I]^).ObjectDirection in [odOUT, odINOUT] Then
+    Result := Result + 1;
   End;
 End;
 

@@ -139,7 +139,6 @@ Type
   {$ELSE}
    vCriticalSection : TRTLCriticalSection;
   {$ENDIF}
-  JsonMode         : TJsonMode;
   vEncodeStrings,
   vActive          : Boolean;
   vProxyOptions    : TProxyOptions;
@@ -173,7 +172,8 @@ Type
                            AContext                   : TIdContext;
                            UrlMethod                  : String;
                            Var DWParams               : TDWParams;
-                           Var JSONStr                : String) : Boolean;
+                           Var JSONStr                : String;
+                           Var JsonMode               : TJsonMode) : Boolean;
   Procedure EchoPooler    (ServerMethodsClass         : TComponent;
                            AContext                   : TIdContext;
                            Var Pooler, MyIP           : String);
@@ -201,7 +201,8 @@ Type
   Function ReturnEvent               (ServerMethodsClass : TComponent;
                                       Var Pooler,
                                       vResult            : String;
-                                      Var DWParams       : TDWParams) : Boolean;
+                                      Var DWParams       : TDWParams;
+                                      Var JsonMode       : TJsonMode) : Boolean;
  Public
   Constructor Create           (AOwner                : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                      //Destroy a Classe
@@ -233,7 +234,6 @@ Type
  TRESTServiceCGI = Class(TComponent)
  Protected
  Private
-  JsonMode         : TJsonMode;
   vServerContext,
   FRootPath        : String;
   vEncodeStrings   : Boolean;
@@ -250,7 +250,8 @@ Type
                            AContext,
                            UrlMethod                  : String;
                            Var DWParams               : TDWParams;
-                           Var JSONStr                : String) : Boolean;
+                           Var JSONStr                : String;
+                           Var JsonMode               : TJsonMode) : Boolean;
   Procedure EchoPooler    (ServerMethodsClass         : TComponent;
                            AContext                   : String;
                            Var Pooler, MyIP           : String);
@@ -278,7 +279,8 @@ Type
   Function ReturnEvent               (ServerMethodsClass : TComponent;
                                       Var Pooler,
                                       vResult            : String;
-                                      Var DWParams       : TDWParams): Boolean;
+                                      Var DWParams       : TDWParams;
+                                      Var JsonMode       : TJsonMode): Boolean;
  Public
   {$IFDEF FPC}
    Procedure Command(ARequest: TRequest;    AResponse: TResponse;   Var Handled: Boolean);
@@ -385,6 +387,7 @@ procedure TRESTServiceCGI.Command(ARequest: TWebRequest; AResponse: TWebResponse
   var Handled: Boolean);
 {$ENDIF}
 Var
+ JsonMode           : TJsonMode;
  DWParams           : TDWParams;
  vWelcomeMessage,
  boundary,
@@ -395,7 +398,8 @@ Var
  tmp, JSONStr,
  sFile, sContentType,
  authDecode,
- sCharSet           : String;
+ sCharSet,
+ ReturnObject       : String;
  vTempServerMethods : TObject;
  newdecoder,
  Decoder            : TIdMessageDecoder;
@@ -692,7 +696,7 @@ Begin
            {$IFDEF FPC}
            If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.LocalPathPrefix, UrlMethod, DWParams, JSONStr) Then
            {$ELSE}
-           If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.Method, UrlMethod, DWParams, JSONStr) Then
+           If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.Method, UrlMethod, DWParams, JSONStr, JsonMode) Then
            {$ENDIF}
             Begin
              If Trim(ARequest.Content) = '' Then
@@ -731,7 +735,11 @@ Begin
            vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr])
           Else If JsonMode in [jmPureJSON, jmMongoDB] Then
            Begin
-            vReplyString                        := GetParamsReturn(DWParams);
+            If DWParams.CountOutParams < 2 Then
+             ReturnObject := '%s'
+            Else
+             ReturnObject := '[%s]';
+            vReplyString                        := Format(ReturnObject, [GetParamsReturn(DWParams)]);
             If vReplyString = '' Then
              vReplyString                       := JSONStr;
            End;
@@ -812,7 +820,8 @@ End;
 
 function TRESTServiceCGI.ServiceMethods(BaseObject: TComponent;
   AContext, UrlMethod: String; Var DWParams: TDWParams;
-  Var JSONStr: String): Boolean;
+  Var JSONStr        : String;
+  Var JsonMode       : TJsonMode): Boolean;
 Var
  vResult,
  vResultIP,
@@ -946,7 +955,7 @@ Begin
   End
  Else
   Begin
-   If ReturnEvent(BaseObject, vUrlMethod, vResult, DWParams) Then
+   If ReturnEvent(BaseObject, vUrlMethod, vResult, DWParams, JsonMode) Then
     Result := vResult = TReplyOK;
   End;
 End;
@@ -1200,7 +1209,8 @@ End;
 Function TRESTServiceCGI.ReturnEvent(ServerMethodsClass : TComponent;
                                      Var Pooler,
                                      vResult            : String;
-                                     Var DWParams       : TDWParams) : Boolean;
+                                     Var DWParams       : TDWParams;
+                                     Var JsonMode       : TJsonMode) : Boolean;
 Var
  I : Integer;
 Begin
@@ -2761,7 +2771,8 @@ End;
 Function TRESTServicePooler.ReturnEvent(ServerMethodsClass : TComponent;
                                         Var Pooler,
                                         vResult            : String;
-                                        Var DWParams       : TDWParams) : Boolean;
+                                        Var DWParams       : TDWParams;
+                                        Var JsonMode       : TJsonMode) : Boolean;
 Var
  I : Integer;
 Begin
@@ -2871,7 +2882,8 @@ Function TRESTServicePooler.ServiceMethods(BaseObject   : TComponent;
                                            AContext     : TIdContext;
                                            UrlMethod    : String;
                                            Var DWParams : TDWParams;
-                                           Var JSONStr  : String) : Boolean;
+                                           Var JSONStr  : String;
+                                           Var JsonMode : TJsonMode) : Boolean;
 Var
  vResult,
  vResultIP,
@@ -2978,7 +2990,7 @@ Begin
   End
  Else
   Begin
-   If ReturnEvent(BaseObject, vUrlMethod, vResult, DWParams) Then
+   If ReturnEvent(BaseObject, vUrlMethod, vResult, DWParams, JsonMode) Then
     Begin
      JSONStr := vResult;
      Result  := JSONStr <> '';
@@ -2990,6 +3002,7 @@ Procedure TRESTServicePooler.aCommandGet(AContext      : TIdContext;
                                          ARequestInfo  : TIdHTTPRequestInfo;
                                          AResponseInfo : TIdHTTPResponseInfo);
 Var
+ JsonMode           : TJsonMode;
  DWParams           : TDWParams;
  vWelcomeMessage,
  boundary,
@@ -2998,6 +3011,7 @@ Var
  vReplyStringResult,
  Cmd , UrlMethod,
  tmp, JSONStr,
+ ReturnObject,
  sFile, sContentType, sCharSet       : String;
  vTempServerMethods : TObject;
  newdecoder,
@@ -3296,7 +3310,7 @@ Begin
           End;
          If vTempServerMethods <> Nil Then
           Begin
-           If Not ServiceMethods(TComponent(vTempServerMethods), AContext, UrlMethod, DWParams, JSONStr) Then
+           If Not ServiceMethods(TComponent(vTempServerMethods), AContext, UrlMethod, DWParams, JSONStr, JsonMode) Then
             Begin
              If UpperCase(Copy (Cmd, 1, 3)) = 'GET' Then
               Begin
@@ -3332,7 +3346,11 @@ Begin
          vReplyString                         := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr])
         Else If JsonMode in [jmPureJSON, jmMongoDB] Then
          Begin
-          vReplyString                        := GetParamsReturn(DWParams);
+          If DWParams.CountOutParams < 2 Then
+           ReturnObject := '%s'
+          Else
+           ReturnObject := '[%s]';
+          vReplyString                        := Format(ReturnObject, [GetParamsReturn(DWParams)]);
           If vReplyString = '' Then
            vReplyString                       := JSONStr;
          End;
