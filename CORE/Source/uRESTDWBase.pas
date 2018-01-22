@@ -694,7 +694,7 @@ Begin
           Begin
            JSONStr := ARequest.RemoteAddr;
            {$IFDEF FPC}
-           If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.LocalPathPrefix, UrlMethod, DWParams, JSONStr) Then
+           If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.LocalPathPrefix, UrlMethod, DWParams, JSONStr, JSONMode) Then
            {$ELSE}
            If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.Method, UrlMethod, DWParams, JSONStr, JsonMode) Then
            {$ENDIF}

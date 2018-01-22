@@ -19,7 +19,6 @@
         <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="79"/>
         <CursorPos X="82" Y="90"/>
         <UsageCount Value="223"/>
@@ -156,13 +155,12 @@
       </Unit18>
       <Unit19>
         <Filename Value="..\..\..\..\Source\uRESTDWBase.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="2165"/>
-        <CursorPos Y="2180"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="691"/>
+        <CursorPos X="126" Y="697"/>
         <UsageCount Value="14"/>
-        <Bookmarks Count="1">
-          <Item0 X="37" Y="2178" ID="1"/>
-        </Bookmarks>
+        <Loaded Value="True"/>
       </Unit19>
       <Unit20>
         <Filename Value="C:\lazarus\components\indy\trunk\Lib\System\IdGlobal.pas"/>
@@ -256,7 +254,7 @@
       </Unit32>
       <Unit33>
         <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="2"/>
         <TopLine Value="2880"/>
         <CursorPos Y="2891"/>
         <UsageCount Value="95"/>
@@ -349,7 +347,7 @@
       </Unit43>
       <Unit44>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-db\src\base\db.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="55"/>
         <CursorPos X="50" Y="64"/>
         <UsageCount Value="13"/>
@@ -413,7 +411,7 @@
       </Unit52>
       <Unit53>
         <Filename Value="..\..\..\..\Source\libs\uDWConstsData.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="23"/>
         <CursorPos X="45" Y="34"/>
         <UsageCount Value="20"/>
@@ -428,7 +426,7 @@
       </Unit54>
       <Unit55>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="889"/>
         <CursorPos Y="898"/>
         <UsageCount Value="41"/>
@@ -563,123 +561,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="899" TopLine="890"/>
+        <Caret Line="903" TopLine="890"/>
       </Position1>
       <Position2>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="903" TopLine="890"/>
+        <Caret Line="898" TopLine="890"/>
       </Position2>
       <Position3>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="898" TopLine="890"/>
+        <Caret Line="899" TopLine="890"/>
       </Position3>
       <Position4>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="899" TopLine="890"/>
+        <Caret Line="903" TopLine="890"/>
       </Position4>
       <Position5>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="903" TopLine="890"/>
+        <Caret Line="898" TopLine="890"/>
       </Position5>
       <Position6>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="898" TopLine="890"/>
+        <Caret Line="899" TopLine="890"/>
       </Position6>
       <Position7>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="899" TopLine="890"/>
+        <Caret Line="903" TopLine="890"/>
       </Position7>
       <Position8>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="903" TopLine="890"/>
+        <Caret Line="898" TopLine="890"/>
       </Position8>
       <Position9>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="898" TopLine="890"/>
+        <Caret Line="899" TopLine="890"/>
       </Position9>
       <Position10>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="899" TopLine="890"/>
+        <Caret Line="903" TopLine="890"/>
       </Position10>
       <Position11>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="903" TopLine="890"/>
+        <Caret Line="898" TopLine="890"/>
       </Position11>
       <Position12>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="898" TopLine="890"/>
+        <Caret Line="899" TopLine="890"/>
       </Position12>
       <Position13>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="899" TopLine="890"/>
+        <Caret Line="903" TopLine="890"/>
       </Position13>
       <Position14>
-        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="903" TopLine="890"/>
-      </Position14>
-      <Position15>
         <Filename Value="formMain.pas"/>
         <Caret Line="94" TopLine="79"/>
+      </Position14>
+      <Position15>
+        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="2183" TopLine="2174"/>
       </Position15>
       <Position16>
         <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <Caret Line="2183" TopLine="2174"/>
+        <Caret Line="2889" TopLine="2880"/>
       </Position16>
       <Position17>
         <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <Caret Line="2889" TopLine="2880"/>
+        <Caret Line="2890" TopLine="2880"/>
       </Position17>
       <Position18>
         <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <Caret Line="2890" TopLine="2880"/>
+        <Caret Line="2891" TopLine="2880"/>
       </Position18>
       <Position19>
-        <Filename Value="..\..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <Caret Line="2891" TopLine="2880"/>
+        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <Caret Line="892" TopLine="889"/>
       </Position19>
       <Position20>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="892" TopLine="889"/>
+        <Caret Line="893" TopLine="889"/>
       </Position20>
       <Position21>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="893" TopLine="889"/>
+        <Caret Line="894" TopLine="889"/>
       </Position21>
       <Position22>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="894" TopLine="889"/>
+        <Caret Line="895" TopLine="889"/>
       </Position22>
       <Position23>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="895" TopLine="889"/>
+        <Caret Line="896" TopLine="889"/>
       </Position23>
       <Position24>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="896" TopLine="889"/>
+        <Caret Line="898" TopLine="889"/>
       </Position24>
       <Position25>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="898" TopLine="889"/>
+        <Caret Line="899" TopLine="889"/>
       </Position25>
       <Position26>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="899" TopLine="889"/>
+        <Caret Line="903" TopLine="889"/>
       </Position26>
       <Position27>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="903" TopLine="889"/>
+        <Caret Line="898" TopLine="889"/>
       </Position27>
       <Position28>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="898" TopLine="889"/>
+        <Caret Line="899" TopLine="889"/>
       </Position28>
       <Position29>
         <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="899" TopLine="889"/>
+        <Caret Line="903" TopLine="889"/>
       </Position29>
       <Position30>
-        <Filename Value="..\..\..\..\Source\libs\uDWMassiveBuffer.pas"/>
-        <Caret Line="903" TopLine="889"/>
+        <Filename Value="formMain.pas"/>
+        <Caret Line="90" Column="82" TopLine="79"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>
