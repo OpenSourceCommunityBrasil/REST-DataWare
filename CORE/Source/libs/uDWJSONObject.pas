@@ -49,9 +49,6 @@ Type
 End;
 
 Type
- TJsonMode = (jmDataware, jmPureJSON, jmMongoDB);
-
-Type
  TJSONValue = Class
 Private
  vJsonMode   : TJsonMode;

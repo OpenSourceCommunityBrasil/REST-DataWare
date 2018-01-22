@@ -45,18 +45,19 @@ Const
  ByteBuffer            = 1024 * 8; //8kb
  CompressBuffer        = 1024 * 2;
 
-  Date1900 {: LongInt} = $0001AC05;  {Julian day count for 01/01/1900 -- TDateTime Start Date}
-  Date1970 {: LongInt} = $00020FE4;  {Julian day count for 01/01/1970 -- Unix Start Date}
-  Unix0Date: TDateTime = 25568;      {Date1970 - Date1900}
+ Date1900 {: LongInt} = $0001AC05;  {Julian day count for 01/01/1900 -- TDateTime Start Date}
+ Date1970 {: LongInt} = $00020FE4;  {Julian day count for 01/01/1970 -- Unix Start Date}
+ Unix0Date: TDateTime = 25568;      {Date1970 - Date1900}
 
-  SecondsInDay    = 86400;  {Number of seconds in a day}
-  SecondsInHour   =  3600;  {Number of seconds in an hour}
-  SecondsInMinute =    60;  {Number of seconds in a minute}
-  HoursInDay      =    24;  {Number of hours in a day}
-  MinutesInHour   =    60;  {Number of minutes in an hour}
-  MinutesInDay    =  1440;  {Number of minutes in a day}
+ SecondsInDay    = 86400;  {Number of seconds in a day}
+ SecondsInHour   =  3600;  {Number of seconds in an hour}
+ SecondsInMinute =    60;  {Number of seconds in a minute}
+ HoursInDay      =    24;  {Number of hours in a day}
+ MinutesInHour   =    60;  {Number of minutes in an hour}
+ MinutesInDay    =  1440;  {Number of minutes in a day}
 
 Type
+ TJsonMode        = (jmDataware, jmPureJSON, jmMongoDB);
  TMassiveMode     = (mmInactive, mmBrowse, mmInsert, mmUpdate, mmDelete);
  TMassiveSQLMode  = (msqlQuery, msqlExecute);
  TTypeObject      = (toDataset,   toParam, toMassive,
@@ -79,6 +80,8 @@ Type
  Function  GetEncoding              (Avalue          : TEncodeSelect)             : IIdTextEncoding;
  {$ENDIF}
  Function  GetObjectName            (TypeObject      : TTypeObject)               : String;          Overload;
+ Function  GetJSONModeName          (TypeObject      : TJsonMode)                 : String;          Overload;
+ Function  GetJSONModeName          (TypeObject      : String)                    : TJsonMode;       Overload;
  Function  GetObjectName            (TypeObject      : String)                    : TTypeObject;     Overload;
  Function  GetDirectionName         (ObjectDirection : TObjectDirection)          : String;          Overload;
  Function  GetDirectionName         (ObjectDirection : String)                    : TObjectDirection;Overload;
@@ -635,6 +638,18 @@ Begin
  End;
 End;
 
+Function GetJSONModeName(TypeObject      : TJsonMode)       : String;
+Begin
+ Result := 'jmDataware';
+ Case TypeObject Of
+  jmDataware : Result := 'jmDataware';
+  jmPureJSON : Result := 'jmPureJSON';
+  jmMongoDB  : Result := 'jmMongoDB';
+  Else
+   Result := 'jmDataware';
+ End;
+End;
+
 Function FieldTypeToObjectValue(FieldType  : TFieldType)   : TObjectValue;
 Begin
  Result := ovUnknown;
@@ -775,6 +790,20 @@ Begin
   Result := toVariable
  Else If vTypeObject = Uppercase('toMassive') Then
   Result := toMassive;
+End;
+
+Function GetJSONModeName   (TypeObject      : String) : TJsonMode;
+Var
+ vTypeObject : String;
+Begin
+ Result := jmDataware;
+ vTypeObject := Uppercase(TypeObject);
+ If vTypeObject = Uppercase('jmDataware') Then
+  Result := jmDataware
+ Else If vTypeObject = Uppercase('jmPureJSON') Then
+  Result := jmPureJSON
+ Else If vTypeObject = Uppercase('jmMongoDB') Then
+  Result := jmMongoDB;
 End;
 
 Function GetDirectionName(ObjectDirection : TObjectDirection) : String;

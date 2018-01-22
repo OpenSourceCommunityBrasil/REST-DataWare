@@ -384,6 +384,7 @@ Begin
        Else
         vDWEvent  := EventByName[bJsonOBJb.get('eventname').tostring];
        vDWEvent.Name := bJsonOBJb.get('eventname').tostring;
+       vDWEvent.JsonMode := GetJSONModeName(bJsonOBJb.get('jsonmode').tostring);
        If bJsonOBJb.get('params').toString <> '' Then
         Begin
          bJsonArrayC    := Tjsonarray.Create(bJsonOBJb.get('params').toString);
@@ -481,6 +482,7 @@ Begin
  For I := 0 To Count -1 Do
   Begin
    vTagEvent    := Format('{"eventname":"%s"', [Items[I].FName]);
+   vTagEvent    := vTagEvent + Format(', "jsonmode":"%s"', [GetJSONModeName(Items[I].vJsonMode)]);
    vTagEvent    := vTagEvent + ', "params":[%s]}';
    vParamsLines := '';
    For A := 0 To Items[I].vDWParams.Count -1 Do
@@ -684,6 +686,7 @@ Begin
      dwParam.ObjectDirection := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectDirection;
      dwParam.ObjectValue     := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectValue;
      dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
+     dwParam.JsonMode        := jmDataware;
      If (vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '') And
         (Trim(dwParam.AsString) = '') Then
       dwParam.Value           := vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue;

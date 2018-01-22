@@ -28,7 +28,7 @@ Uses
      SysUtils,                      Classes,            ServerUtils, {$IFDEF WINDOWS}Windows,{$ENDIF}
      IdContext, IdTCPConnection,    IdHTTPServer,       IdCustomHTTPServer,  IdSSLOpenSSL,    IdSSL,
      IdAuthentication,              IdTCPClient,        IdHTTPHeaderInfo,    IdComponent, IdBaseComponent,
-     IdHTTP,                        uDWConstsData,      IdMultipartFormData, IdMessageCoder,
+     IdHTTP,                        uDWConsts, uDWConstsData,  IdMultipartFormData, IdMessageCoder,
      IdMessageCoderMIME, IdMessage, uDWJSON,            uDWJSONObject, IdGlobal, IdGlobalProtocols,
      HTTPDefs;
      {$ELSE}
@@ -38,7 +38,7 @@ Uses
      System.SysUtils, System.Classes, system.SyncObjs,
      {$IFEND}
      ServerUtils, HTTPApp,
-     {$IFDEF WINDOWS} Windows, {$ENDIF} uDWConstsData,       IdTCPClient,
+     {$IFDEF WINDOWS} Windows, {$ENDIF} uDWConsts, uDWConstsData,       IdTCPClient,
      {$IF Defined(ANDROID) OR Defined(IOS)} System.json,{$ELSE} uDWJSON,{$IFEND} IdMultipartFormData,
      IdContext,             IdHTTPServer,        IdCustomHTTPServer,    IdSSLOpenSSL,    IdSSL,
      IdAuthentication,      IdHTTPHeaderInfo,    IdComponent, IdBaseComponent, IdTCPConnection,
@@ -375,7 +375,7 @@ End;
 
 implementation
 
-Uses uDWDatamodule, uRESTDWPoolerDB, SysTypes, uDWConsts, uDWJSONTools, uRESTDWServerEvents;
+Uses uDWDatamodule, uRESTDWPoolerDB, SysTypes, uDWJSONTools, uRESTDWServerEvents;
 
 { TRESTServiceCGI }
 
