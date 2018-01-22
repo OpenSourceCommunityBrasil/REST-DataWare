@@ -1441,6 +1441,9 @@ Var
   aValue,
   vTempValue    : String;
  Begin
+  ResultJSON := InputValue;
+  If Pos(', "RESULT":[', InputValue) = 0 Then
+   Exit;
   Try
    InitPos     := Pos(', "RESULT":[', InputValue) + Length(', "RESULT":[') ;
    aValue   := Copy(InputValue, InitPos,    Length(InputValue) -1);
@@ -1732,6 +1735,9 @@ Var
   aValue,
   vTempValue    : String;
  Begin
+  ResultJSON := InputValue;
+  If Pos(', "RESULT":[', InputValue) = 0 Then
+   Exit;
   Try
    InitPos    := Pos(', "RESULT":[', InputValue) + Length(', "RESULT":[') ;
     aValue     := Copy(InputValue, InitPos, Length(InputValue));
@@ -2033,6 +2039,9 @@ Var
   aValue,
   vTempValue    : String;
  Begin
+  ResultJSON := InputValue;
+  If Pos(', "RESULT":[', InputValue) = 0 Then
+   Exit;
   Try
    InitPos    := Pos(', "RESULT":[', InputValue) + Length(', "RESULT":[') ;
    {$IFDEF ANDROID} //Android}
@@ -3706,6 +3715,9 @@ Var
   vValue,
   vTempValue   : String;
  Begin
+  ResultJSON := InputValue;
+  If Pos(', "RESULT":[', InputValue) = 0 Then
+   Exit;
   Try
    InitPos    := Pos('"RESULT":[', InputValue) + 10;
    vTempValue := Copy(InputValue, InitPos, Pos(']}', InputValue) - InitPos);
@@ -3771,6 +3783,9 @@ Var
   vValue,
   vTempValue   : String;
  Begin
+  ResultJSON := InputValue;
+  If Pos(', "RESULT":[', InputValue) = 0 Then
+   Exit;
   Try
    InitPos    := Pos('"RESULT":[', InputValue) + 10;
    vTempValue := Copy(InputValue, InitPos, Pos(']}', InputValue) - InitPos);

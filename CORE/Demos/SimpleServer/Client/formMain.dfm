@@ -1109,7 +1109,7 @@ object Form2: TForm2
     Top = 144
     Width = 104
     Height = 24
-    Caption = 'Open Runtime'
+    Caption = 'Get Employee'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -1327,7 +1327,15 @@ object Form2: TForm2
             ObjectValue = ovString
             ParamName = 'inputdata'
             Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odINOUT
+            ObjectValue = ovString
+            ParamName = 'resultstring'
+            Encoded = False
           end>
+        JsonMode = jmDataware
         Name = 'servertime'
       end
       item
@@ -1339,7 +1347,46 @@ object Form2: TForm2
             ParamName = 'result'
             Encoded = True
           end>
+        JsonMode = jmDataware
         Name = 'teste'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'sql'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'loaddatasetevent'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = False
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'segundoparam'
+            Encoded = False
+          end>
+        JsonMode = jmDataware
+        Name = 'getemployee'
       end>
     Left = 237
     Top = 21

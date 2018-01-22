@@ -2479,8 +2479,10 @@ Begin
  Result := vJSONValue.ToJSON;
  If vJsonMode in [jmPureJSON, jmMongoDB] Then
   Begin
-   If Not((Pos('{', Result) > 0)  And
-          (Pos('}', Result) > 0)) Then
+   If Not(((Pos('{', Result) > 0)  And
+           (Pos('}', Result) > 0)) Or
+          ((Pos('[', Result) > 0)  And
+           (Pos(']', Result) > 0))) Then
     Result := Format('{"%s" : "%s"}', [vParamName, vJSONValue.ToJSON]);
   End;
 End;

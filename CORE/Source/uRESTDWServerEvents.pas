@@ -162,9 +162,11 @@ Type
  Public
   Destructor  Destroy; Override;
   Constructor Create        (AOwner    : TComponent);Override; //Cria o Componente
-  Procedure   CreateDWParams(EventName : String; Var DWParams : TDWParams);
-  Function    SendEvent     (EventName : String; Var DWParams : TDWParams;
-                             Var Error : String) : Boolean;
+  Procedure   CreateDWParams(EventName : String; Var DWParams     : TDWParams);
+  Function    SendEvent     (EventName : String; Var DWParams     : TDWParams;
+                             Var Error : String) : Boolean; Overload;
+  Function    SendEvent     (EventName : String; Var DWParams     : TDWParams;
+                             Var Error : String; Var NativeResult : String) : Boolean; Overload;
   Procedure   ClearEvents;
   Property    GetEvents        : Boolean           Read vGetEvents        Write GetOnlineEvents;
  Published
@@ -796,8 +798,15 @@ begin
 end;
 }
 
-function TDWClientEvents.SendEvent(EventName: String; Var DWParams: TDWParams;
-  Var Error: String): Boolean;
+Function TDWClientEvents.SendEvent(EventName: String; Var DWParams: TDWParams;
+                                   Var Error: String; Var NativeResult : String): Boolean;
+Begin
+ If vRESTClientPooler <> Nil Then
+  NativeResult := vRESTClientPooler.SendEvent(EventName, DWParams);
+End;
+
+Function TDWClientEvents.SendEvent(EventName: String; Var DWParams: TDWParams;
+                                   Var Error: String): Boolean;
 Begin
  If vRESTClientPooler <> Nil Then
   vRESTClientPooler.SendEvent(EventName, DWParams);

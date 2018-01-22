@@ -87,7 +87,6 @@ TYPE
     PROCEDURE RESTDWDataBase1Work(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
     PROCEDURE RESTDWDataBase1WorkEnd(ASender: TObject; AWorkMode: TWorkMode);
     PROCEDURE RESTDWClientSQL1GetDataError(Sucess: Boolean; CONST Error: STRING);
-    PROCEDURE Button3Click(Sender: TObject);
     PROCEDURE RESTDWDataBase1Status(ASender: TObject; CONST AStatus: TIdStatus; CONST AStatusText: STRING);
     PROCEDURE FormCreate(Sender: TObject);
     PROCEDURE RESTDWDataBase1Connection(Sucess: Boolean; CONST Error: STRING);
@@ -95,6 +94,7 @@ TYPE
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   PRIVATE
     { Private declarations }
     FBytesToTransfer: Int64;
@@ -168,45 +168,28 @@ BEGIN
     Application.MessageBox('Comando executado com sucesso...', 'Informação !!!', Mb_iconinformation + Mb_ok);
 END;
 
-PROCEDURE TForm2.Button3Click(Sender: TObject);
-VAR
-  Cliente: TRESTDWClientSQL;
-  INICIO: TdateTime;
-  FIM: TdateTime;
-BEGIN
-  RESTDWDataBase1.Close;
-  RESTDWDataBase1.PoolerService := EHost.Text;
-  RESTDWDataBase1.PoolerPort    := StrToInt(EPort.Text);
-  RESTDWDataBase1.Login         := EdUserNameDW.Text;
-  RESTDWDataBase1.Password      := EdPasswordDW.Text;
-  RESTDWDataBase1.Compression   := CheckBox1.Checked;
-  if chkhttps.Checked then
-     RESTDWDataBase1.TypeRequest:=TTyperequest.trHttps
-  else
-     RESTDWDataBase1.TypeRequest:=TTyperequest.trHttp;
-  RESTDWDataBase1.Open;
-
-  INICIO              := Now;
-  Cliente             := TRESTDWClientSQL.Create(NIL);
-  DataSource1.DataSet := Cliente;
-  WITH Cliente DO
-  BEGIN
-    DataBase := RESTDWDataBase1;
-    SQL.Add(MComando.Text);
-    TRY
-      Open;
-    EXCEPT
-      ON E: Exception DO
-      BEGIN
-        RAISE Exception.Create('Erro ao executar a consulta: ' + sLineBreak + E.Message);
-      END;
-    END;
-    FIM := Now;
-    Showmessage(IntToStr(Recordcount) + ' registro(s) recebido(s) em ' + IntToStr(SecondsBetween(FIM, INICIO)) + ' segundos.');
-    Close;
-  END;
-  FreeAndNil(Cliente);
-END;
+procedure TForm2.Button3Click(Sender: TObject);
+Var
+ dwParams      : TDWParams;
+ vErrorMessage,
+ vNativeResult : String;
+begin
+ RESTClientPooler1.Host            := EHost.Text;
+ RESTClientPooler1.Port            := StrToInt(EPort.Text);
+ RESTClientPooler1.UserName        := EdUserNameDW.Text;
+ RESTClientPooler1.Password        := EdPasswordDW.Text;
+ RESTClientPooler1.DataCompression := CheckBox1.Checked;
+ If chkhttps.Checked then
+  RESTClientPooler1.TypeRequest := TTyperequest.trHttps
+ Else
+  RESTClientPooler1.TypeRequest := TTyperequest.trHttp;
+ DWClientEvents1.CreateDWParams('getemployee', dwParams);
+ DWClientEvents1.SendEvent('getemployee', dwParams, vErrorMessage, vNativeResult);
+ If vErrorMessage = '' Then
+  Showmessage(vNativeResult)
+ Else
+  Showmessage(vErrorMessage);
+end;
 
 procedure TForm2.Button4Click(Sender: TObject);
 Var
