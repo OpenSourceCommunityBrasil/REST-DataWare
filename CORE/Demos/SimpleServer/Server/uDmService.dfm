@@ -153,6 +153,26 @@ object ServerMethodDM: TServerMethodDM
         JsonMode = jmPureJSON
         Name = 'getemployee'
         OnReplyEvent = DWServerEvents1EventsgetemployeeReplyEvent
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = False
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'segundoparam'
+            Encoded = False
+          end>
+        JsonMode = jmDataware
+        Name = 'getemployeeDW'
+        OnReplyEvent = DWServerEvents1EventsgetemployeeDWReplyEvent
       end>
     Left = 80
     Top = 103
