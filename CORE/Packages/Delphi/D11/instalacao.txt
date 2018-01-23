@@ -1,0 +1,86 @@
+1) Instalar o Indy 10 que fica na pasta Extras:
+1.1) Instalar o componente Indy 10 Core Design Time
+1.2) Instalar o componente Indy 10 Protocols Design Time
+
+2) Instalar o JCL (https://sourceforge.net/projects/jvcl/files/JVCL%203/):
+2.1) Executar o jcl\install.bat
+2.2) Executar o jvcl\ install.bat
+
+3) Compilar o RestEasyObjectsCore (.\CORE\Packages\Delphi\D11):
+
+4) Arquivos da pasta BPL após a instalação do INDY 10, JCL e REST DW:
+	dclIndyCore110.bpl
+	dclIndyProtocols110.bpl
+	IndyCore110.bpl
+	IndyCore70.bpl
+	IndyProtocols110.bpl
+	IndySystem110.bpl
+	Jcl110.bpl
+	JclBaseExpert110.bpl
+	JclContainers110.bpl
+	JclDebugExpert110.bpl
+	JclDeveloperTools110.bpl
+	JclFavoriteFoldersExpert110.bpl
+	JclProjectAnalysisExpert110.bpl
+	JclRepositoryExpert110.bpl
+	JclSIMDViewExpert110.bpl
+	JclStackTraceViewerExpert110.bpl
+	JclVcl110.bpl
+	JclVersionControlExpert110.bpl
+	JvAppFrm110.bpl
+	JvAppFrmDesign110.bpl
+	JvBands110.bpl
+	JvBandsDesign110.bpl
+	JvBDE110.bpl
+	JvBDEDesign110.bpl
+	JvCmp110.bpl
+	JvCmpDesign110.bpl
+	JvControls110.bpl
+	JvControlsDesign110.bpl
+	JvCore110.bpl
+	JvCoreDesign110.bpl
+	JvCrypt110.bpl
+	JvCryptDesign110.bpl
+	JvCustom110.bpl
+	JvCustomDesign110.bpl
+	JvDB110.bpl
+	JvDBDesign110.bpl
+	JvDlgs110.bpl
+	JvDlgsDesign110.bpl
+	JvDocking110.bpl
+	JvDockingDesign110.bpl
+	JvDotNetCtrls110.bpl
+	JvDotNetCtrlsDesign110.bpl
+	JvGlobus110.bpl
+	JvGlobusDesign110.bpl
+	JvHMI110.bpl
+	JvHMIDesign110.bpl
+	JvJans110.bpl
+	JvJansDesign110.bpl
+	JvManagedThreads110.bpl
+	JvManagedThreadsDesign110.bpl
+	JvMM110.bpl
+	JvMMDesign110.bpl
+	JvNet110.bpl
+	JvNetDesign110.bpl
+	JvPageComps110.bpl
+	JvPageCompsDesign110.bpl
+	JvPascalInterpreter110.bpl
+	JvPascalInterpreterDesign110.bpl
+	JvPluginSystem110.bpl
+	JvPluginSystemDesign110.bpl
+	JvPrintPreview110.bpl
+	JvPrintPreviewDesign110.bpl
+	JvRuntimeDesign110.bpl
+	JvRuntimeDesignDesign110.bpl
+	JvStdCtrls110.bpl
+	JvStdCtrlsDesign110.bpl
+	JvSystem110.bpl
+	JvSystemDesign110.bpl
+	JvTimeFramework110.bpl
+	JvTimeFrameworkDesign110.bpl
+	JvWizards110.bpl
+	JvWizardsDesign110.bpl
+	JvXPCtrls110.bpl
+	JvXPCtrlsDesign110.bpl
+	RestEasyObjectsCORE.bpl

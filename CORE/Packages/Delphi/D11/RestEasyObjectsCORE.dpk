@@ -1,0 +1,58 @@
+package RestEasyObjectsCORE;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'Rest Dataware - CORE Objects'}
+{$IMPLICITBUILD ON}
+{$DEFINE DEBUG}
+
+requires
+  rtl,
+  soaprtl,
+  IndyCore110,
+  IndySystem110,
+  IndyProtocols110,
+  inet,
+  DesignIDE,
+  vcljpg,
+  Jcl,
+  JvCore,
+  JvDB;
+
+contains
+  uRESTDWBase in '..\..\..\Source\uRESTDWBase.pas',
+  uRESTDWReg in '..\..\..\Source\uRESTDWReg.pas',
+  ServerUtils in '..\..\..\Source\libs\ServerUtils.pas',
+  StringBuilderUnit in '..\..\..\Source\libs\StringBuilderUnit.pas',
+  SysTypes in '..\..\..\Source\libs\SysTypes.pas',
+  uDWConsts in '..\..\..\Source\libs\uDWConsts.pas',
+  uDWJSONTools in '..\..\..\Source\libs\uDWJSONTools.pas',
+  uDWJSONObject in '..\..\..\Source\libs\uDWJSONObject.pas',
+  uRESTDWPoolerDB in '..\..\..\Source\uRESTDWPoolerDB.pas',
+  uRESTDWMasterDetailData in '..\..\..\Source\uRESTDWMasterDetailData.pas',
+  uzliblaz in '..\..\..\Source\libs\uzliblaz.pas',
+  uDWDatamodule in '..\..\..\Source\DmDados\uDWDatamodule.pas' {ServerMethodDataModule: TDataModule},
+  uDWJSON in '..\..\..\Source\libs\JSON\uDWJSON.pas',
+  uDWConstsData in '..\..\..\Source\libs\uDWConstsData.pas';
+
+end.
