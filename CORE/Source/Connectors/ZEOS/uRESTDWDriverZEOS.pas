@@ -127,7 +127,7 @@ Var
       Try
        For X := 0 To bPrimaryKeys.Count -1 Do
         Begin
-         If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+         If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [{$IFNDEF FPC}{$if CompilerVersion >= 21} // Delphi 2010 pra baixo
                                                                        ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                                                        ftString,    ftWideString, ftWideMemo]    Then
           Begin
@@ -146,27 +146,38 @@ Var
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType := ftString;
             End;
            If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftInteger, ftSmallInt, ftWord,
-                                                                        {$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord,{$IFEND}{$ENDIF}
+                                                                        {$IFNDEF FPC}{$IF CompilerVersion >= 21}ftLongWord,{$IFEND}{$ENDIF}
                                                                         ftLargeint] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
               Begin
+                {$IF CompilerVersion < 21}
+                If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
+                begin
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+                end
+                else
+                begin
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+                end;
+                {$ELSE}
                 // Alterado por: Alexandre Magno - 04/11/2017
                 If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftLargeint Then
-                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsLargeInt := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+                begin
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsLargeInt := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+                end
                 else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
-                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+                begin
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+                end
                 Else
+                begin
                   Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
-
-                // Como estava Anteriormente
-                //If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
-                //  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-                //Else
-                //  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+                end;
+                {$IFEND}
               End;
             End
-           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftSingle, {$IFEND}{$ENDIF}ftBCD] Then
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, {$IFNDEF FPC}{$IF CompilerVersion >= 21}ftSingle, {$IFEND}{$ENDIF}ftBCD] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsFloat  := StrToFloat(BuildFloatString(MassiveDataset.AtualRec.PrimaryValues[X].Value));
@@ -198,7 +209,7 @@ Var
         FreeAndNil(bPrimaryKeys);
        End;
       End;
-    If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+    If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion >= 21} // Delphi 2010 pra baixo
                           ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                           ftString,    ftWideString, ftWideMemo]    Then
      Begin
@@ -216,27 +227,38 @@ Var
         Else
          Query.Params[I].DataType := ftString;
        End;
-      If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord,  {$IFEND}{$ENDIF}ftLargeint] Then
+      If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion >= 21}ftLongWord,  {$IFEND}{$ENDIF}ftLargeint] Then
        Begin
         If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
            (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
          Begin
+          {$IF CompilerVersion < 21}
+           If Query.Params[I].DataType = ftSmallInt Then
+           begin
+             Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+           end
+           else
+           begin
+             Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+           end;
+          {$ELSE}
            // Alterado por: Alexandre Magno - 04/11/2017
            If Query.Params[I].DataType = ftLargeint Then
-             Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+           begin
+             Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+           end
            else If Query.Params[I].DataType = ftSmallInt Then
-             Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+           begin
+             Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+           end
            Else
+           begin
              Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
-
-           // Como estava Anteriormente
-           //If Query.Params[I].DataType = ftSmallInt Then
-           //  Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-           //Else
-           //  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+           end;
+          {$IFEND}
          End;
        End
-      Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftSingle, {$IFEND}{$ENDIF}ftBCD] Then
+      Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, {$IFNDEF FPC}{$IF CompilerVersion >= 21}ftSingle, {$IFEND}{$ENDIF}ftBCD] Then
        Begin
         If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
            (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
@@ -354,7 +376,7 @@ Var
         End;
        If MassiveDataset.MassiveMode <> mmUpdate Then
         Begin
-         If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+         If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion >= 21} // Delphi 2010 pra baixo
                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                ftString,    ftWideString, ftWideMemo]    Then
           Begin
@@ -378,25 +400,36 @@ Var
              Else
               Query.Params[I].DataType := ftString;
             End;
-           If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+           If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion >= 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
             Begin
              If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
                 (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Begin
                If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
                 Begin
-                 If Query.Params[I].DataType = ftLargeint Then
-                  Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-                 Else If Query.Params[I].DataType = ftSmallInt Then
-                  Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-                 Else
-                  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+                  {$IF CompilerVersion < 21}
+                   If Query.Params[I].DataType = ftSmallInt Then
+                   begin
+                    Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+                   end
+                   else
+                   begin
+                    Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+                   end;
+                  {$ELSE}
+                   If Query.Params[I].DataType = ftLargeint Then
+                    Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+                   Else If Query.Params[I].DataType = ftSmallInt Then
+                    Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+                   Else
+                    Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+                  {$IFEND}
                 End;
               End
              Else
               Query.Params[I].Clear;
             End
-           Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$IF CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
+           Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$IF CompilerVersion >= 21}, ftSingle{$IFEND}{$ENDIF}] Then
             Begin
              If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
                 (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
@@ -600,7 +633,7 @@ Begin
           A          := GetParamIndex(vTempQuery.Params, vParamName);
           If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
            Begin
-            If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+            If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion >= 21} // Delphi 2010 pra baixo
                                                   ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                                   ftString,    ftWideString, ftWideMemo]    Then
              Begin
@@ -618,21 +651,32 @@ Begin
                 Else
                  vTempQuery.Params[A].DataType := ftString;
                End;
-              If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+              If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion >= 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
                Begin
                 If (Params[I].Value <> Null) Then
                  Begin
+                  {$IF CompilerVersion < 21}
+                  If vTempQuery.Params[A].DataType = ftSmallInt Then
+                  begin
+                   vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value);
+                  end
+                  Else
+                  begin
+                   vTempQuery.Params[A].AsInteger  := StrToInt64(Params[I].Value);
+                  end;
+                  {$ELSE}
                   If vTempQuery.Params[A].DataType = ftLargeint Then
                    vTempQuery.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
                   Else If vTempQuery.Params[A].DataType = ftSmallInt Then
                    vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
                   Else
                    vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                  {$IFEND}
                  End
                 Else
                  vTempQuery.Params[A].Clear;
                End
-              Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$IF CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
+              Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$IF CompilerVersion >= 21}, ftSingle{$IFEND}{$ENDIF}] Then
                Begin
                 If (Params[I].Value <> Null) Then
                  vTempQuery.Params[A].AsFloat  := StrToFloat(BuildFloatString(Params[I].Value))
@@ -658,7 +702,7 @@ Begin
                  FreeAndNil(vStringStream);
                 End;
                End
-              Else If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+              Else If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion >= 21} // Delphi 2010 pra baixo
                                                         ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                                         ftString,    ftWideString, ftWideMemo]    Then
                Begin
@@ -681,7 +725,11 @@ Begin
        For I := 0 To Params.Count -1 Do
         begin
          {$IFNDEF FPC}
-         With vTempQuery.Params.AddParameter do
+          {$if CompilerVersion < 21}
+            With vTempQuery.Params.Add do
+          {$ELSE}
+            With vTempQuery.Params.AddParameter do
+          {$IFEND}
          {$ELSE}
          With vTempQuery.Params.Add do
          {$ENDIF}
@@ -689,29 +737,48 @@ Begin
            vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
            Name := vParamName;
            {$IFNDEF FPC}
-           ParamType := ptInput;
-           If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
-            DataType := ObjectValueToFieldType(Params[I].ObjectValue)
-           Else
-            DataType := ftString;
+            {$IF CompilerVersion >= 21}
+            ParamType := ptInput;
+             If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
+              DataType := ObjectValueToFieldType(Params[I].ObjectValue)
+             Else
+              DataType := ftString;
+            {$IFEND}
            {$ENDIF}
            If vTempQuery.Params[I].DataType in [ftInteger, ftSmallInt, ftWord,
-                                               {$IFNDEF FPC}{$if CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+                                               {$IFNDEF FPC}{$if CompilerVersion >= 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
             Begin
              If (Params[I].Value <> Null) Then
               Begin
-               // Alterado por: Alexandre Magno - 04/11/2017
-               If vTempQuery.Params[I].DataType = ftLargeint Then
-                vTempQuery.Params[I].AsLargeInt := StrToInt64(Params[I].Value)
-               Else If vTempQuery.Params[I].DataType = ftSmallInt Then
-                vTempQuery.Params[I].AsSmallInt := StrToInt(Params[I].Value)
+                {$IF CompilerVersion < 21}
+               If vTempQuery.Params[I].DataType = ftSmallInt Then
+               begin
+                vTempQuery.Params[I].AsSmallInt := StrToInt(Params[I].Value);
+               end
                Else
+               begin
+                vTempQuery.Params[I].AsInteger  := StrToInt64(Params[I].Value);
+               end;
+                {$ELSE}
+                // Alterado por: Alexandre Magno - 04/11/2017
+               If vTempQuery.Params[I].DataType = ftLargeint Then
+               begin
+                vTempQuery.Params[I].AsLargeInt := StrToInt64(Params[I].Value);
+               end
+               else If vTempQuery.Params[I].DataType = ftSmallInt Then
+               begin
+                vTempQuery.Params[I].AsSmallInt := StrToInt(Params[I].Value);
+               end
+               Else
+               begin
                 vTempQuery.Params[I].AsInteger  := StrToInt(Params[I].Value);
+               end;
+                {$IFEND}
               End
              Else
               vTempQuery.Params[I].Clear;
             End
-            Else If vTempQuery.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$if CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
+            Else If vTempQuery.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$if CompilerVersion >= 21}, ftSingle{$IFEND}{$ENDIF}] Then
              Begin
               If (Params[I].Value <> Null) Then
                vTempQuery.Params[I].AsFloat  := StrToFloat(BuildFloatString(Params[I].Value))
@@ -737,7 +804,7 @@ Begin
                FreeAndNil(vStringStream);
               End;
              End
-            Else If vTempQuery.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+            Else If vTempQuery.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion >= 21} // Delphi 2010 pra baixo
                                                       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                                       ftString,    ftWideString, ftWideMemo]    Then
              Begin
@@ -947,7 +1014,7 @@ Var
       Try
        For X := 0 To bPrimaryKeys.Count -1 Do
         Begin
-         If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+         If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [{$IFNDEF FPC}{$if CompilerVersion >= 21} // Delphi 2010 pra baixo
                                                                        ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                                                        ftString,    ftWideString, ftWideMemo]    Then
           Begin
@@ -965,10 +1032,20 @@ Var
              Else
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType := ftString;
             End;
-           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$if CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$if CompilerVersion >= 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
               Begin
+                {$IF CompilerVersion < 21}
+                If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
+                begin
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+                end
+                Else
+                begin
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+                end;
+                {$ELSE}
                 // Alterado por: Alexandre Magno - 04/11/2017
                 If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftLargeint Then
                   Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsLargeInt := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
@@ -976,15 +1053,10 @@ Var
                   Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
                 Else
                   Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
-
-                // Como estava Anteriormente
-                //If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
-                //  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-                //Else
-                //  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+                {$IFEND}
               End;
             End
-           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$if CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$if CompilerVersion >= 21}, ftSingle{$IFEND}{$ENDIF}] Then
             Begin
              If Trim(MassiveDataset.AtualRec.PrimaryValues[X].Value) <> '' Then
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsFloat  := StrToFloat(BuildFloatString(MassiveDataset.AtualRec.PrimaryValues[X].Value));
@@ -1015,7 +1087,7 @@ Var
         FreeAndNil(bPrimaryKeys);
        End;
       End;
-    If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+    If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion >= 21} // Delphi 2010 pra baixo
                           ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                           ftString,    ftWideString, ftWideMemo]    Then
      Begin
@@ -1037,29 +1109,40 @@ Var
         Else
          Query.Params[I].DataType := ftString;
        End;
-      If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}{$if CompilerVersion > 21}, ftLongWord{$IFEND}{$ENDIF}, ftLargeint] Then
+      If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}{$if CompilerVersion >= 21}, ftLongWord{$IFEND}{$ENDIF}, ftLargeint] Then
        Begin
         If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
            (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
          Begin
-           // Alterado por: Alexandre Magno - 04/11/2017
-           If Query.Params[I].DataType = ftLargeint Then
-             Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-           else If Query.Params[I].DataType = ftSmallInt Then
-             Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+          {$IF CompilerVersion < 21}
+           If Query.Params[I].DataType = ftSmallInt Then
+           begin
+             Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+           end
            Else
-             Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
-
-           // Como estava Anteriormente
-           //If Query.Params[I].DataType = ftSmallInt Then
-           //  Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-           //Else
-           //  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+           begin
+             Query.Params[I].AsInteger  := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+           end;
+          {$ELSE}
+          // Alterado por: Alexandre Magno - 04/11/2017
+           If Query.Params[I].DataType = ftLargeint Then
+           begin
+             Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+           end
+           else If Query.Params[I].DataType = ftSmallInt Then
+           begin
+             Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+           end
+           Else
+           begin
+             Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);]
+           end;
+          {$IFEND}
          End
         Else
          Query.Params[I].Clear;
        End
-      Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$if CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
+      Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$if CompilerVersion >= 21}, ftSingle{$IFEND}{$ENDIF}] Then
        Begin
         If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
            (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
@@ -1179,7 +1262,7 @@ Var
         End;
        If MassiveDataset.MassiveMode <> mmUpdate Then
         Begin
-         If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+         If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion >= 21} // Delphi 2010 pra baixo
                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                ftString,    ftWideString, ftWideMemo]    Then
           Begin
@@ -1203,25 +1286,42 @@ Var
              Else
               Query.Params[I].DataType := ftString;
             End;
-           If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}{$if CompilerVersion > 21}, ftLongWord{$IFEND}{$ENDIF}, ftLargeint] Then
+           If Query.Params[I].DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}{$if CompilerVersion >= 21}, ftLongWord{$IFEND}{$ENDIF}, ftLargeint] Then
             Begin
              If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> '') And
                 (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
               Begin
                If MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null Then
                 Begin
-                 If Query.Params[I].DataType = ftLargeint Then
-                  Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-                 Else If Query.Params[I].DataType = ftSmallInt Then
-                  Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-                 Else
-                  Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+                  {$IF CompilerVersion < 21}
+                   If Query.Params[I].DataType = ftSmallInt Then
+                   begin
+                    Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+                   end
+                   else
+                   begin
+                    Query.Params[I].AsInteger  := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+                   end;
+                  {$ELSE}
+                   If Query.Params[I].DataType = ftLargeint Then
+                   begin
+                    Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+                   end
+                   Else If Query.Params[I].DataType = ftSmallInt Then
+                   begin
+                    Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+                   end
+                   else
+                   begin
+                    Query.Params[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+                   end;
+                  {$IFEND}
                 End;
               End
              Else
               Query.Params[I].Clear;
             End
-           Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$if CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
+           Else If Query.Params[I].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$if CompilerVersion >= 21}, ftSingle{$IFEND}{$ENDIF}] Then
             Begin
              If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value <> Null) And
                 (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') Then
@@ -1393,7 +1493,7 @@ Begin
              A          := GetParamIndex(vTempQuery.Params, vParamName);
              If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
               Begin
-               If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+               If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion >= 21} // Delphi 2010 pra baixo
                                                      ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                                      ftString,    ftWideString, ftWideMemo]    Then
                 Begin
@@ -1411,21 +1511,38 @@ Begin
                    Else
                     vTempQuery.Params[A].DataType := ftString;
                   End;
-                 If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}{$if CompilerVersion > 21}, ftLongWord{$IFEND}{$ENDIF}, ftLargeint] Then
+                 If vTempQuery.Params[A].DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}{$if CompilerVersion >= 21}, ftLongWord{$IFEND}{$ENDIF}, ftLargeint] Then
                   Begin
                    If Trim(Params[I].Value) <> '' Then
                     Begin
-                     If vTempQuery.Params[A].DataType = ftLargeint Then
-                      vTempQuery.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
-                     Else If vTempQuery.Params[A].DataType = ftSmallInt Then
-                      vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                    {$IF CompilerVersion < 21}
+                     if vTempQuery.Params[A].DataType = ftSmallInt Then
+                     begin
+                      vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value);
+                     end
                      Else
+                     begin
+                      vTempQuery.Params[A].AsInteger  := StrToInt64(Params[I].Value);
+                     end;
+                    {$ELSE}
+                     If vTempQuery.Params[A].DataType = ftLargeint Then
+                     begin
+                      vTempQuery.Params[A].AsLargeInt := StrToInt64(Params[I].Value);
+                     end
+                     Else if vTempQuery.Params[A].DataType = ftSmallInt Then
+                     begin
+                      vTempQuery.Params[A].AsSmallInt := StrToInt(Params[I].Value);
+                     end
+                     Else
+                     begin
                       vTempQuery.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                     end;
+                    {$IFEND}
                     End
                    Else
                     vTempQuery.Params[A].Clear;
                   End
-                 Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$if CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
+                 Else If vTempQuery.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$if CompilerVersion >= 21}, ftSingle{$IFEND}{$ENDIF}] Then
                   Begin
                    If Trim(Params[I].Value) <> '' Then
                     vTempQuery.Params[A].AsFloat  := StrToFloat(BuildFloatString(Params[I].Value))
@@ -1603,7 +1720,7 @@ Begin
         A          := GetParamIndex(ZCommand.Params, vParamName);
         If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
          Begin
-          If ZCommand.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+          If ZCommand.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion >= 21} // Delphi 2010 pra baixo
                                                 ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                                 ftString,    ftWideString, ftWideMemo]    Then
            Begin
@@ -1621,26 +1738,36 @@ Begin
               Else
                ZCommand.Params[A].DataType := ftString;
              End;
-            If ZCommand.Params[A].DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}{$if CompilerVersion > 21}, ftLongWord{$IFEND}{$ENDIF}, ftLargeint] Then
+            If ZCommand.Params[A].DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}{$if CompilerVersion >= 21}, ftLongWord{$IFEND}{$ENDIF}, ftLargeint] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
                Begin
-                 // Alterado por: Alexandre Magno - 04/11/2017
-                 If ZCommand.Params[A].DataType = ftLargeint Then
+                {$IF CompilerVersion < 21}
+                 If ZCommand.Params[A].DataType = ftSmallInt Then
+                 begin
+                   ZCommand.Params[A].AsSmallInt := StrToInt(Params[I].Value);
+                 end
+                 else
+                 begin
+                   ZCommand.Params[A].AsInteger  := StrToInt64(Params[I].Value);
+                 end;
+                {$ELSE}
+                  If ZCommand.Params[A].DataType = ftLargeint Then
+                  begin
                    ZCommand.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
-                 else If ZCommand.Params[A].DataType = ftSmallInt Then
+                  end
+                  else If ZCommand.Params[A].DataType = ftSmallInt Then
+                  begin
                    ZCommand.Params[A].AsSmallInt := StrToInt(Params[I].Value)
-                 Else
+                  end
+                  Else
+                  begin
                    ZCommand.Params[A].AsInteger  := StrToInt(Params[I].Value);
-
-                 // Como estava Anteriormente
-                 //If ZCommand.Params[A].DataType = ftSmallInt Then
-                 //  ZCommand.Params[A].AsSmallInt := StrToInt(Params[I].Value)
-                 //Else
-                 //  ZCommand.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                  end;
+                {$IFEND}
                End;
              End
-            Else If ZCommand.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$if CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
+            Else If ZCommand.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD{$IFNDEF FPC}{$if CompilerVersion >= 21}, ftSingle{$IFEND}{$ENDIF}] Then
              Begin
               If Trim(Params[I].Value) <> '' Then
                ZCommand.Params[A].AsFloat  := StrToFloat(BuildFloatString(Params[I].Value));
