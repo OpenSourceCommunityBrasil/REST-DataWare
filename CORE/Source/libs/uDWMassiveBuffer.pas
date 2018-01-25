@@ -686,6 +686,11 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
            MassiveValue  := TMassiveValue.Create;
            If Field.DataType in [ftBytes, ftVarBytes,
                                  ftBlob, ftGraphic,
+                                 ftMemo, {$IFNDEF FPC}
+                                           {$IF CompilerVersion > 21}
+                                            ftWideMemo,
+                                            {$IFEND}
+                                         {$ENDIF}
                                  ftOraBlob, ftOraClob] Then
             Begin
              vStringStream := TMemoryStream.Create;
@@ -714,7 +719,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
       Case Field.DataType Of
        {$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
        ftFixedChar, ftFixedWideChar,
-       ftWideMemo,  {$IFEND}{$ENDIF}
+       {$IFEND}{$ENDIF}
        ftString,    ftWideString : Begin
                                     If Not UpdateTag Then
                                      Begin
@@ -805,6 +810,11 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                    End;
        ftBytes, ftVarBytes,
        ftBlob, ftGraphic,
+       ftMemo, {$IFNDEF FPC}
+                                           {$IF CompilerVersion > 21}
+                                            ftWideMemo,
+                                            {$IFEND}
+                                         {$ENDIF}
        ftOraBlob, ftOraClob      : Begin
                                     vStringStream := TMemoryStream.Create;
                                     Try
@@ -1091,6 +1101,11 @@ Begin
        Begin
         If Field.DataType  In [ftBytes, ftVarBytes,
                                ftBlob, ftGraphic,
+                               ftMemo, {$IFNDEF FPC}
+                                           {$IF CompilerVersion > 21}
+                                            ftWideMemo,
+                                            {$IFEND}
+                                         {$ENDIF}
                                ftOraBlob, ftOraClob] Then
          Begin
           vStringStream := TMemoryStream.Create;
@@ -1122,6 +1137,11 @@ Begin
        Begin
         If Field.DataType  In [ftBytes, ftVarBytes,
                                ftBlob, ftGraphic,
+                               ftMemo, {$IFNDEF FPC}
+                                           {$IF CompilerVersion > 21}
+                                            ftWideMemo,
+                                            {$IFEND}
+                                         {$ENDIF}
                                ftOraBlob, ftOraClob] Then
          Begin
           vStringStream := TMemoryStream.Create;

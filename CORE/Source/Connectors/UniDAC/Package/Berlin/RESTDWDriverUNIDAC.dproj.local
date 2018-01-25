@@ -2,9 +2,5 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>2018/01/24 19:58:21.000.693,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\Connectors\UniDAC\Package\Berlin\RESTDWDriverFD.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\Connectors\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj</Transaction>
-    <Transaction>2018/01/24 19:58:38.000.471,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\Connectors\UniDAC\uRESTDWDriverUNIDAC.pas</Transaction>
-    <Transaction>2018/01/24 20:14:15.000.176,=unidac240.dcp</Transaction>
-    <Transaction>2018/01/24 20:14:15.000.153,=dac240.dcp</Transaction>
-    <Transaction>2018/01/24 20:16:00.000.145,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\Connectors\UniDAC\TRESTDWDriverUNIDAC.bmp</Transaction>
   </Transactions>
 </BorlandProject>
