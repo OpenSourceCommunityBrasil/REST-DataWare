@@ -215,7 +215,13 @@ Begin
               Else
                vTempQuery.Params[A].Clear;
              End
-            Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+            Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob,
+                                                      ftGraphic, ftOraBlob, ftOraClob,
+                                                      ftMemo {$IFNDEF FPC}
+                                                             {$IF CompilerVersion > 21}
+                                                              , ftWideMemo
+                                                             {$IFEND}
+                                                             {$ENDIF}] Then
              Begin
               vStringStream := TMemoryStream.Create;
               Try
@@ -344,7 +350,7 @@ Var
         Begin
          If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                                        ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                                       ftString,    ftWideString, ftWideMemo]    Then
+                                                                       ftString,    ftWideString]    Then
           Begin
            If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Size > 0 Then
             Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Value := Copy(MassiveDataset.AtualRec.PrimaryValues[X].Value, 1, Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Size)
@@ -391,7 +397,13 @@ Var
              Else
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := Null;
             End  //Tratar Blobs de Parametros...
-           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftBytes, ftVarBytes, ftBlob,
+                                                                              ftGraphic, ftOraBlob, ftOraClob,
+                                                                              ftMemo {$IFNDEF FPC}
+                                                                                     {$IF CompilerVersion > 21}
+                                                                                      , ftWideMemo
+                                                                                     {$IFEND}
+                                                                                     {$ENDIF}] Then
             Begin
              vStringStream := TMemoryStream.Create;
              Try
@@ -413,7 +425,7 @@ Var
       End;
     If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                           ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                          ftString,    ftWideString, ftWideMemo]    Then
+                          ftString,    ftWideString]    Then
      Begin
       If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') And
            (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> '')  Then
@@ -471,7 +483,13 @@ Var
         Else
          Query.Params[I].Clear;
        End  //Tratar Blobs de Parametros...
-      Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+      Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob,
+                                           ftGraphic, ftOraBlob, ftOraClob,
+                                           ftMemo {$IFNDEF FPC}
+                                                  {$IF CompilerVersion > 21}
+                                                  , ftWideMemo
+                                                  {$IFEND}
+                                                  {$ENDIF}] Then
        Begin
         vStringStream := TMemoryStream.Create;
         Try
@@ -583,7 +601,7 @@ Var
         Begin
          If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                               ftString,    ftWideString, ftWideMemo]    Then
+                               ftString,    ftWideString]    Then
           Begin
            If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') And
               (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> '')  Then
@@ -637,7 +655,13 @@ Var
              Else
               Query.Params[I].Clear;
             End  //Tratar Blobs de Parametros...
-           Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+           Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob,
+                                                ftGraphic, ftOraBlob, ftOraClob,
+                                                ftMemo {$IFNDEF FPC}
+                                                       {$IF CompilerVersion > 21}
+                                                       , ftWideMemo
+                                                       {$IFEND}
+                                                       {$ENDIF}] Then
             Begin
              vStringStream := TMemoryStream.Create;
              Try
@@ -824,7 +848,7 @@ Begin
               Begin
                If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                      ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                     ftString,    ftWideString, ftWideMemo]    Then
+                                                     ftString,    ftWideString]    Then
                 Begin
                  If vTempQuery.Params[A].Size > 0 Then
                   vTempQuery.Params[A].Value := Copy(Params[I].Value, 1, vTempQuery.Params[A].Size)
@@ -868,7 +892,13 @@ Begin
                    Else
                     vTempQuery.Params[A].Clear;
                   End  //Tratar Blobs de Parametros...
-                 Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+                 Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob,
+                                                           ftGraphic, ftOraBlob, ftOraClob,
+                                                           ftMemo {$IFNDEF FPC}
+                                                                  {$IF CompilerVersion > 21}
+                                                                  , ftWideMemo
+                                                                  {$IFEND}
+                                                                  {$ENDIF}] Then
                   Begin
                    vStringStream := TMemoryStream.Create;
                    Try
@@ -968,7 +998,7 @@ Var
         Begin
          If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                                        ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                                       ftString,    ftWideString, ftWideMemo]    Then
+                                                                       ftString,    ftWideString]    Then
           Begin
            If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Size > 0 Then
             Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Value := Copy(MassiveDataset.AtualRec.PrimaryValues[X].Value, 1, Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Size)
@@ -1015,7 +1045,13 @@ Var
              Else
               Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := Null;
             End  //Tratar Blobs de Parametros...
-           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftBytes, ftVarBytes, ftBlob,
+                                                                              ftGraphic, ftOraBlob, ftOraClob,
+                                                                              ftMemo {$IFNDEF FPC}
+                                                                                     {$IF CompilerVersion > 21}
+                                                                                      , ftWideMemo
+                                                                                     {$IFEND}
+                                                                                     {$ENDIF}] Then
             Begin
              vStringStream := TMemoryStream.Create;
              Try
@@ -1037,7 +1073,7 @@ Var
       End;
     If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                           ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                          ftString,    ftWideString, ftWideMemo]    Then
+                          ftString,    ftWideString]    Then
      Begin
       If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') And
          (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> '')  Then
@@ -1095,7 +1131,13 @@ Var
         Else
          Query.Params[I].Clear;
        End  //Tratar Blobs de Parametros...
-      Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+      Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob,
+                                           ftGraphic, ftOraBlob, ftOraClob,
+                                           ftMemo {$IFNDEF FPC}
+                                                  {$IF CompilerVersion > 21}
+                                                  , ftWideMemo
+                                                  {$IFEND}
+                                                  {$ENDIF}] Then
        Begin
         vStringStream := TMemoryStream.Create;
         Try
@@ -1204,7 +1246,7 @@ Var
         Begin
          If Query.Params[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                               ftString,    ftWideString, ftWideMemo]    Then
+                               ftString,    ftWideString]    Then
           Begin
            If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') And
               (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> '')  Then
@@ -1260,7 +1302,13 @@ Var
              Else
               Query.Params[I].Clear;
             End  //Tratar Blobs de Parametros...
-           Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+           Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob,
+                                                ftGraphic, ftOraBlob, ftOraClob,
+                                                ftMemo {$IFNDEF FPC}
+                                                       {$IF CompilerVersion > 21}
+                                                       , ftWideMemo
+                                                       {$IFEND}
+                                                       {$ENDIF}] Then
             Begin
              vStringStream := TMemoryStream.Create;
              Try
@@ -1586,7 +1634,13 @@ Begin
              Else
               vTempQuery.Params[A].AsDateTime  := Null;
             End
-           Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
+           Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob,
+                                                     ftGraphic, ftOraBlob, ftOraClob,
+                                                     ftMemo {$IFNDEF FPC}
+                                                            {$IF CompilerVersion > 21}
+                                                            , ftWideMemo
+                                                            {$IFEND}
+                                                            {$ENDIF}] Then
             Begin
              vStringStream := TMemoryStream.Create;
              Try
