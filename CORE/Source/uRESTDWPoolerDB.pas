@@ -569,6 +569,7 @@ End;
 
 implementation
 
+
 {$IFNDEF FPC}
 {$if CompilerVersion > 21}
 Function GetDWParams(Params : TParams; Encondig : TEncodeSelect) : TDWParams;
@@ -1294,6 +1295,7 @@ Var
  vRESTConnectionDB : TDWPoolerMethodClient;
  LDataSetList      : TJSONValue;
  DWParams          : TDWParams;
+
  Function GetLineSQL(Value : TStringList) : String;
  Var
   I : Integer;
@@ -1346,6 +1348,7 @@ Begin
   vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
  {$ENDIF}
  Try
+
   If Params.Count > 0 Then
    Begin
     DWParams     := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vEncondig{$IFEND}{$ENDIF});
@@ -1360,6 +1363,7 @@ Begin
                                                             vRestURL,
                                                             GetLineSQL(SQL), Error,
                                                             MessageError, Execute, vTimeOut, vLogin, vPassword, RESTClientPooler);
+
   If (LDataSetList <> Nil) Then
    Begin
 //    If Not Assigned(Result) Then //Correção fornecida por romyllldo no Forum
@@ -1370,7 +1374,14 @@ Begin
        (Not (Error))                       Then
      Begin
       Try
-       Result.LoadFromJSON(LDataSetList.ToJSON);
+//       {$IFDEF  ANDROID}
+//       Result.Free;
+//       Result:= LDataSetList;
+//       {$ELSE}
+//       Result.LoadFromJSON(LDataSetList.ToJSON);
+//       {$ENDIF} //retirei isso daqui porque era trabalho duplicado o LDatasetList ja é um JsonValue
+          FreeAndNil(result);
+          Result:= LDataSetList;
       Finally
       End;
      End;
@@ -1399,8 +1410,8 @@ Begin
      vOnEventConnection(False, E.Message);
    End;
  End;
- If LDataSetList <> Nil Then
-  FreeAndNil(LDataSetList);
+// If LDataSetList <> Nil Then
+//     FreeAndNil(LDataSetList);
  FreeAndNil(vRESTConnectionDB);
 End;
 
@@ -2573,6 +2584,9 @@ Begin
  Finally
   vInBlockEvents := False;
  End;
+
+
+
 End;
 
 procedure TRESTDWClientSQL.Open(SQL: String);
@@ -2840,6 +2854,7 @@ Var
  vError        : Boolean;
  vMessageError : String;
 Begin
+
  Result := False;
  LDataSetList := nil;
  Self.Close;
@@ -2847,6 +2862,8 @@ Begin
  If Assigned(vRESTDataBase) Then
   Begin
    Try
+
+
     If DataSet = Nil Then
      vRESTDataBase.ExecuteCommand(vSQL, vParams, vError, vMessageError, LDataSetList, False, vRESTClientPooler)
     Else
@@ -2854,12 +2871,15 @@ Begin
       vError := False;
       LDataSetList := DataSet;
      End;
+
     If (Assigned(LDataSetList)) And (Not (vError)) Then
      Begin
       Try
+
        LDataSetList.Encoded := vRESTDataBase.EncodeStrings;
        LDataSetList.WriteToDataset(dtFull, LDataSetList.ToJSON, Self);
        Result := True;
+
       Except
       End;
      End;
@@ -2884,6 +2904,10 @@ Begin
  Else If csDesigning in ComponentState Then
   Raise Exception.Create(PChar('Empty Database Property'));
  vActiveCursor := False;
+
+
+
+
 End;
 
 procedure TRESTDWClientSQL.SaveToStream(Var Stream: TMemoryStream);
