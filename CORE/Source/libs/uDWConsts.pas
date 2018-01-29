@@ -120,8 +120,8 @@ Type
  Function  MassiveModeToString      (MassiveMode     : TMassiveMode)              : String;
  Function  StringToMassiveMode      (Value           : String)                    : TMassiveMode;
  Function  DatasetRequestToJSON     (Value           : TRESTDWClientSQLBase)      : String;
- Function  DateTimeToUnix           (ConvDate        : TDateTime)                 : Longint;
- Function  UnixToDateTime           (USec            : Longint)                   : TDateTime;
+ Function  DateTimeToUnix           (ConvDate        : TDateTime)                 : Int64;
+ Function  UnixToDateTime           (USec            : Int64)                     : TDateTime;
  Function  BuildFloatString         (Value           : String)                    : String;
  Function  BuildStringFloat         (Value           : String)                    : String;
 
@@ -133,7 +133,7 @@ implementation
 Uses uRESTDWPoolerDB, uDWJSONObject, uDWJSONTools;
 
 
-Function DateTimeToUnix(ConvDate: TDateTime): Longint;
+Function DateTimeToUnix(ConvDate: TDateTime): int64;
 { convert Delphi TDateTime to unix date }
 var
   Hrs, Mins, Secs, MSecs : Word;
@@ -151,10 +151,10 @@ begin
 
 end;
 
-Function UnixToDateTime(USec: Longint): TDateTime;
+Function UnixToDateTime(USec: int64): TDateTime;
 var
   Hrs, Mins, Secs : Word;
-  TodaysSecs : LongInt;
+  TodaysSecs : int64;
 begin
   TodaysSecs := USec mod SecondsInDay;
   Hrs := TodaysSecs div SecondsInHour;

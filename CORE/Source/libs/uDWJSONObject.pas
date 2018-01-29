@@ -926,7 +926,7 @@ Var
           If DateTimeFormat <> '' Then
            vTempValue     := Format('%s"%s"',    [vTempField, FormatDateTime(DateTimeFormat, bValue.Fields[I].AsDateTime)])
           Else
-           vTempValue     := Format('%s%s',      [vTempField, inttostr(DateTimeToUnix(bValue.Fields[I].AsDateTime))]);
+           vTempValue     := Format('%s"%s"',      [vTempField, inttostr(DateTimeToUnix(bValue.Fields[I].AsDateTime))]);
          End
         Else
          vTempValue     := Format('%s"%s"',      [vTempField, bValue.Fields[I].AsString]);    //asstring
@@ -1126,9 +1126,14 @@ Var
    ftTime,
    ftDateTime,
    ftTimeStamp  : Begin
-                   vTempValue        := Value;
-                   If vTempValue <> '' Then
-                    Field.AsDateTime := UnixToDateTime(strtoint(vTempValue));
+                      vTempValue        := Value;
+                      If vTempValue <> '' Then
+                       If StrToInt64(vTempValue) >0 then //  StrToInt(vTempValue) > 0 Then
+                        Field.AsDateTime := UnixToDateTime(strtoint64(vTempValue));
+
+//                   vTempValue        := Value;
+//                   If vTempValue <> '' Then
+//                    Field.AsDateTime := UnixToDateTime(strtoint(vTempValue));
                   End;
   End;
  End;
@@ -1525,8 +1530,8 @@ Var
                   ftTimeStamp  : Begin
                                   vTempValue        := Value;
                                   If vTempValue <> '' Then
-                                   If StrToInt(vTempValue) > 0 Then
-                                    Field.AsDateTime := UnixToDateTime(strtoint(vTempValue));
+                                   If StrToInt64(vTempValue) >0 then //  StrToInt(vTempValue) > 0 Then
+                                    Field.AsDateTime := UnixToDateTime(strtoint64(vTempValue));
                                  End;
   End;
  End;
@@ -1940,6 +1945,7 @@ Begin
  Finally
   bJsonValue.Free;
  End;
+
 End;
 
 {$ELSE}
