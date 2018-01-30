@@ -2,6 +2,9 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>1899/12/30 00:00:00.000.662,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Packages\Delphi\Berlin\RestDatawareCORE.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj</Transaction>
+    <Transaction>2018/01/15 14:39:50.000.438,=JvCore.dcp</Transaction>
+    <Transaction>2018/01/15 14:39:50.000.457,=JvDB.dcp</Transaction>
+    <Transaction>2018/01/15 14:39:50.000.418,=Jcl.dcp</Transaction>
   </Transactions>
 	<ActiveMobileDevice>
 		<NoProfile iOSSimulator="iPhone5" Android="38019fd23720a200"/>

@@ -5,7 +5,8 @@ program RestDWServerProjectZEOS;
 uses
   Vcl.Forms,
   RestDWServerFormU in 'RestDWServerFormU.pas' {RestDWForm},
-  ServerMethodsUnit1 in 'ServerMethodsUnit1.pas' {ServerMethods1: TDataModule};
+  ServerMethodsUnit1 in 'ServerMethodsUnit1.pas' {ServerMethods1: TDataModule},
+  uDataModule3 in 'uDataModule3.pas' {DataModule3: TServerMethodDataModule};
 
 {$R *.res}
 

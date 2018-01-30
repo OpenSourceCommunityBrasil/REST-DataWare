@@ -19,7 +19,7 @@ Type
 {$METHODINFO ON}
   TServerMethodsComp = Class(TServerMethods)
   Private
-   Function ConsultaBanco(Var Params : TDWParams) : String;Overload;
+
   public
    { Public declarations }
    Constructor Create    (aOwner : TComponent); Override;
@@ -59,7 +59,7 @@ Begin
   sePOST   :
    Begin
     If UpperCase(Context) = Uppercase('ConsultaBanco') Then
-     Result := ConsultaBanco(Params)
+//     Result := ConsultaBanco(Params)
     Else
      Begin
       JSONObject.AddPair(TJSONPair.Create('STATUS',   'NOK'));
@@ -71,37 +71,6 @@ Begin
  JSONObject.Free;
 End;
 
-Function TServerMethodsComp.ConsultaBanco(Var Params : TDWParams) : String;
-Var
- vSQL : String;
- JSONValue : uDWJSONObject.TJSONValue;
- fdQuery : TFDQuery;
-Begin
- If Params.ItemsString['SQL'] <> Nil Then
-  Begin
-   JSONValue          := uDWJSONObject.TJSONValue.Create;
-   JSONValue.Encoding := GetEncoding(RestDWForm.RESTServicePooler1.Encoding);
-   If Params.ItemsString['SQL'].value <> '' Then
-    Begin
-     If Params.ItemsString['TESTPARAM'] <> Nil Then
-      Params.ItemsString['TESTPARAM'].SetValue('OK, OK');
-     vSQL      := Params.ItemsString['SQL'].value;
-     {$IFDEF FPC}
-     {$ELSE}
-      fdQuery   := TFDQuery.Create(Nil);
-      Try
-       fdQuery.Connection := Nil;//Server_FDConnection; //Alterar no futuro
-       fdQuery.SQL.Add(vSQL);
-       JSONValue.LoadFromDataset('sql', fdQuery, RestDWForm.cbEncode.Checked);
-       Result             := JSONValue.ToJSON;
-      Finally
-       JSONValue.Free;
-       fdQuery.Free;
-      End;
-     {$ENDIF}
-    End;
-  End;
-End;
 
 
 End.

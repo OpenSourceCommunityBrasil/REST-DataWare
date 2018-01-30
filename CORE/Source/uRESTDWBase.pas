@@ -66,6 +66,10 @@ Type
 
 Type
  TCallBack     = Procedure (JSon : String; DWParams : TDWParams) Of Object;
+ TCallSendEvent= Function (EventData  : String;
+                                     Var Params : TDWParams;
+                                     EventType  : TSendEvent = sePOST;
+                            		     CallBack   : TCallBack  = Nil) : String Of Object;
 
 Type
  TServerMethodClass = Class(TComponent)
@@ -89,6 +93,7 @@ Type
   Params            : TDWParams;
   EventType         : TSendEvent;
   FCallBack         : TCallBack;
+  FCallSendEvent    : TCallSendEvent;
  Private
   Procedure SetParams(HttpRequest : TIdHTTP);
   Function  GetHttpRequest : TIdHTTP;
@@ -100,6 +105,7 @@ Type
   Property CallBack:TCallBack  Read FCallBack Write FCallBack;
   Property HttpRequest:TIdHTTP Read GetHttpRequest;
  End;
+
  TProxyOptions = Class(TPersistent)
  Private
   vServer,                  //Servidor Proxy na Rede
@@ -330,6 +336,7 @@ Type
   vDatacompress,
   vThreadRequest,
   vAuthentication   : Boolean;
+  vThreadExecuting  : Boolean;
   vTransparentProxy : TIdProxyConnectionInfo;
   vRequestTimeOut   : Integer;
   {$IFDEF FPC}
@@ -732,12 +739,12 @@ Begin
         If Assigned(DWParams) Then
          Begin
           If JsonMode = jmDataware Then
-           vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr])
+         vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr])
           Else If JsonMode in [jmPureJSON, jmMongoDB] Then
            Begin
             If DWParams.CountOutParams < 2 Then
              ReturnObject := '%s'
-            Else
+        Else
              ReturnObject := '[%s]';
             vReplyString                        := Format(ReturnObject, [GetParamsReturn(DWParams)]);
             If vReplyString = '' Then
@@ -1427,6 +1434,7 @@ Var
  SendParams    : TIdMultipartFormDataStream;
  thd           : TThread_Request;
  StringStreamList : TStringStreamList;
+ SResult : String;
  Procedure SetData(InputValue     : String;
                    Var ParamsData : TDWParams;
                    Var ResultJSON : String);
@@ -1549,16 +1557,20 @@ Var
    End;
  End;
 Begin
+
+
  SendParams := Nil;
  StringStreamList := Nil;
- If vThreadRequest Then
+
+ // INICIO BLOCO PARA USA thread   CRISTIANO BABSOSA
+ If vThreadRequest and (not vThreadExecuting) then
   Begin
    thd := TThread_Request.Create;
    Try
     thd.FreeOnTerminate := true;
     thd.Priority        := tpHighest;
     thd.EventData       := EventData;
-    {TODO CRISTIANO}
+    {TODO CRISTIANO BARBOSA}
     thd.Params.CopyFrom(Params);
     thd.EventType       := EventType;
     thd.vUserName       := vUserName;
@@ -1572,11 +1584,16 @@ Begin
     thd.vTypeRequest    :=   vTypeRequest;
     thd.vRSCharset      :=   vRSCharset;
     thd.FCallBack       :=  CallBack;
+    thd.FCallSendEvent   :=   self.SendEvent;
+    vThreadExecuting:=True;
    Finally
     thd.Execute;
    End;
    Exit;
   End;
+ 
+ // FIM BLOCO PARA USA thread   CRISTIANO BABSOSA
+
  vResultParams := TMemoryStream.Create;
  If vTypeRequest = trHttp Then
   vTpRequest := 'http'
@@ -1594,7 +1611,16 @@ Begin
    seGET :
     Begin
      HttpRequest.Request.ContentType := 'application/json';
-     Result := HttpRequest.Get(EventData);
+
+     //CRSITIANO BARBOSA - BLOCO PARA USAR TRHEAD
+     If not vThreadRequest Then
+       Result := HttpRequest.Get(EventData)
+     else
+     begin
+       SResult := HttpRequest.Get(EventData);
+       If Assigned(FCallBack) Then
+         FCallBack(SResult, Params);
+     end;
     End;
    sePOST,
    sePUT,
@@ -1659,7 +1685,15 @@ Begin
        HttpRequest.Request.Clear;
        StringStream.Position := 0;
        Try
-        SetData(StringStream.DataString, Params, Result);
+        If not vThreadRequest Then
+          SetData(StringStream.DataString, Params, Result)
+        else
+        begin
+          SetData(StringStream.DataString, Params, SResult);
+          If Assigned(FCallBack) Then
+             FCallBack(SResult, Params);
+        end
+
        Finally
         StringStream.Clear;
         StringStream.Size := 0;
@@ -1674,7 +1708,14 @@ Begin
        StringStream.WriteBuffer(#0' ', 1);
        StringStream.Position := 0;
        Try
-        SetData(StringStream.DataString, Params, Result);
+        If not vThreadRequest Then
+          SetData(StringStream.DataString, Params, Result)
+        else
+        begin
+          SetData(StringStream.DataString, Params, SResult);
+          If Assigned(FCallBack) Then
+            FCallBack(SResult, Params);
+        end;
        Finally
         StringStream.Size := 0;
         FreeAndNil(StringStream);
@@ -1685,11 +1726,25 @@ Begin
        Try
         HttpRequest.Request.ContentType := 'application/json';
         HttpRequest.Delete(vURL);
-        Result := GetPairJSON('OK', 'DELETE COMMAND OK');
+        If not vThreadRequest Then
+          Result := GetPairJSON('OK', 'DELETE COMMAND OK')
+        else
+        begin
+           SResult := GetPairJSON('OK', 'DELETE COMMAND OK');
+           If Assigned(FCallBack) Then
+             FCallBack(SResult, Params);
+        end;
        Except
         On e:exception Do
          Begin
-          Result := GetPairJSON('NOK', e.Message);
+           If not vThreadRequest Then
+             Result := GetPairJSON('NOK', e.Message)
+           else
+           Begin
+              SResult := GetPairJSON('NOK', e.Message);
+              If Assigned(FCallBack) Then
+                FCallBack(SResult, Params);
+           End;
          End;
        End;
       End;
@@ -1699,10 +1754,12 @@ Begin
   On E : Exception Do
    Begin
     {Todo: Acrescentado}
-    Raise Exception.Create(e.Message);
+      Raise Exception.Create(e.Message);
    End;
  End;
  FreeAndNil(vResultParams);
+  vThreadExecuting:=False;
+
 End;
 {$IFEND}
 {$IFEND}
@@ -1720,6 +1777,7 @@ Var
  StringStream  : TStringStream;
  SendParams    : TIdMultipartFormDataStream;
  thd           : TThread_Request;
+ SResult : String;
  StringStreamList : TStringStreamList;
  Procedure SetData(InputValue     : String;
                    Var ParamsData : TDWParams;
@@ -1742,7 +1800,7 @@ Var
    InitPos    := Pos(', "RESULT":[', InputValue) + Length(', "RESULT":[') ;
     aValue     := Copy(InputValue, InitPos, Length(InputValue));
    If Pos(']}', aValue) > 0 Then
-     aValue     := Copy(aValue, 1, Pos(']}', aValue) -1);
+     aValue     :=Copy(aValue, 1, length(aValue)-2); //Copy(aValue, 1, Pos(']}', aValue) -1);      //CRISTIANO BARBOSA -
    vTempValue := aValue;
     InputValue := Copy(InputValue, 1, InitPos -1) + ']}'; //Delete(InputValue, InitPos, Pos(']}', InputValue) - InitPos);
    If (Params <> Nil) And (InputValue <> '{"PARAMS"]}') Then
@@ -1843,14 +1901,16 @@ Var
 Begin
  SendParams := Nil;
  StringStreamList := Nil;
- If vThreadRequest Then
+
+ // INICIO BLOCO PARA USA thread   CRISTIANO BABSOSA
+ If vThreadRequest and (not vThreadExecuting) then
   Begin
    thd := TThread_Request.Create;
    Try
     thd.FreeOnTerminate := true;
     thd.Priority        := tpHighest;
     thd.EventData       := EventData;
-    {TODO CRISTIANO}
+    {TODO CRISTIANO BARBOSA}
     thd.Params.CopyFrom(Params);
     thd.EventType       := EventType;
     thd.vUserName       := vUserName;
@@ -1864,11 +1924,14 @@ Begin
     thd.vTypeRequest    :=   vTypeRequest;
     thd.vRSCharset      :=   vRSCharset;
     thd.FCallBack       :=  CallBack;
+        thd.FCallSendEvent   :=   self.SendEvent;
+   vThreadExecuting:=True;
    Finally
     thd.Execute;
    End;
    Exit;
   End;
+   // FIM BLOCO PARA USA thread   CRISTIANO BABSOSA
  vResultParams := TMemoryStream.Create;
  If vTypeRequest = trHttp Then
   vTpRequest := 'http'
@@ -1960,7 +2023,15 @@ Begin
        HttpRequest.Request.Clear;
        StringStream.Position := 0;
        Try
-        SetData(StringStream.DataString, Params, Result);
+        If not vThreadRequest Then
+         SetData(StringStream.DataString, Params, Result)
+        else
+        begin
+          SetData(StringStream.DataString, Params, SResult);
+          If Assigned(CallBack) Then
+            CallBack(SResult, Params);
+          //Terminate;
+        end;
        Finally
         {$IFNDEF FPC}
          {$IF CompilerVersion > 21}
@@ -1979,7 +2050,14 @@ Begin
        StringStream.WriteBuffer(#0' ', 1);
        StringStream.Position := 0;
        Try
-        SetData(StringStream.DataString, Params, Result);
+         If not vThreadRequest Then
+          SetData(StringStream.DataString, Params, Result)
+         else
+         begin
+            SetData(StringStream.DataString, Params, SResult);
+            If Assigned(CallBack) Then
+              CallBack(SResult, Params);
+          end;
        Finally
         {$IFNDEF FPC}StringStream.Size := 0;{$ENDIF}
         FreeAndNil(StringStream);
@@ -1990,11 +2068,25 @@ Begin
        Try
         HttpRequest.Request.ContentType := 'application/json';
         HttpRequest.Delete(vURL);
-        Result := GetPairJSON('OK', 'DELETE COMMAND OK');
+        If not vThreadRequest Then
+          Result := GetPairJSON('OK', 'DELETE COMMAND OK')
+        else
+        begin
+           SResult := GetPairJSON('OK', 'DELETE COMMAND OK');
+           If Assigned(CallBack) Then
+             CallBack(SResult, Params);
+        end;
        Except
         On e:exception Do
          Begin
-          Result := GetPairJSON('NOK', e.Message);
+          If not vThreadRequest Then
+             Result := GetPairJSON('NOK', e.Message)
+          else
+           Begin
+              SResult := GetPairJSON('NOK', e.Message);
+              If Assigned(CallBack) Then
+                CallBack(SResult, Params);
+           End;
          End;
        End;
       End;
@@ -2008,6 +2100,7 @@ Begin
    End;
  End;
  FreeAndNil(vResultParams);
+ vThreadExecuting:=false;
 End;
 {$IFEND}
 {$ELSE}
@@ -2024,6 +2117,8 @@ Var
  StringStream  : TStringStream;
  SendParams    : TIdMultipartFormDataStream;
  thd           : TThread_Request;
+
+ SResult : String;
  StringStreamList : TStringStreamList;
  Procedure SetData(InputValue     : String;
                    Var ParamsData : TDWParams;
@@ -2159,14 +2254,15 @@ Var
 Begin
  SendParams := Nil;
  StringStreamList := Nil;
- If vThreadRequest Then
+ // INICIO BLOCO PARA USA thread   CRISTIANO BABSOSA
+ If vThreadRequest and (not vThreadExecuting) then
   Begin
    thd := TThread_Request.Create;
    Try
     thd.FreeOnTerminate := true;
     thd.Priority        := tpHighest;
     thd.EventData       := EventData;
-    {TODO CRISTIANO}
+    {TODO CRISTIANO BARBOSA}
     thd.Params.CopyFrom(Params);
     thd.EventType       := EventType;
     thd.vUserName       := vUserName;
@@ -2180,6 +2276,8 @@ Begin
     thd.vTypeRequest    :=   vTypeRequest;
     thd.vRSCharset      :=   vRSCharset;
     thd.FCallBack       :=  CallBack;
+        thd.FCallSendEvent   :=   self.SendEvent;
+        vThreadExecuting:=True;
    Finally
     thd.Execute;
    End;
@@ -2202,7 +2300,15 @@ Begin
    seGET :
     Begin
      HttpRequest.Request.ContentType := 'application/json';
-     Result := HttpRequest.Get(EventData);
+     //CRSITIANO BARBOSA - BLOCO PARA USAR TRHEAD
+     If not vThreadRequest Then
+       Result := HttpRequest.Get(EventData)
+     else
+     begin
+       SResult := HttpRequest.Get(EventData);
+       If Assigned(FCallBack) Then
+         FCallBack(SResult, Params);
+     end;
     End;
    sePOST,
    sePUT,
@@ -2271,7 +2377,14 @@ Begin
        HttpRequest.Request.Clear;
        StringStream.Position := 0;
        Try
-        SetData(StringStream.DataString, Params, Result);
+        If not vThreadRequest Then
+          SetData(StringStream.DataString, Params, Result)
+        else
+        begin
+          SetData(StringStream.DataString, Params, SResult);
+          If Assigned(CallBack) Then
+            CallBack(SResult, Params);
+        end
        Finally
         {$IFNDEF FPC}
          {$IF CompilerVersion > 21}
@@ -2290,7 +2403,14 @@ Begin
        StringStream.WriteBuffer(#0' ', 1);
        StringStream.Position := 0;
        Try
-        SetData(StringStream.DataString, Params, Result);
+        If not vThreadRequest Then
+          SetData(StringStream.DataString, Params, Result)
+        else
+        begin
+          SetData(StringStream.DataString, Params, SResult);
+          If Assigned(CallBack) Then
+            CallBack(SResult, Params);
+        end;
        Finally
         {$IFNDEF FPC}StringStream.Size := 0;{$ENDIF}
         FreeAndNil(StringStream);
@@ -2301,11 +2421,25 @@ Begin
        Try
         HttpRequest.Request.ContentType := 'application/json';
         HttpRequest.Delete(vURL);
-        Result := GetPairJSON('OK', 'DELETE COMMAND OK');
+        If not vThreadRequest Then
+          Result := GetPairJSON('OK', 'DELETE COMMAND OK')
+        else
+        begin
+           SResult := GetPairJSON('OK', 'DELETE COMMAND OK');
+           If Assigned(CallBack) Then
+             CallBack(SResult, Params);
+        end;
        Except
         On e:exception Do
          Begin
-          Result := GetPairJSON('NOK', e.Message);
+          If not vThreadRequest Then
+             Result := GetPairJSON('NOK', e.Message)
+           else
+           Begin
+              SResult := GetPairJSON('NOK', e.Message);
+              If Assigned(CallBack) Then
+                CallBack(SResult, Params);
+           End;
          End;
        End;
       End;
@@ -2319,6 +2453,7 @@ Begin
    End;
  End;
  FreeAndNil(vResultParams);
+ vThreadExecuting:=false;
 End;
 {$ENDIF}
 
@@ -3858,6 +3993,33 @@ Var
    End;
  End;
 Begin
+  If Assigned(FCallSendEvent) Then
+      {$IFDEF FPC}
+       FCallSendEvent(EventData  ,
+                        Params ,
+                       EventType  ,
+                       FCallBack  );
+      {$ELSE}
+       {$if CompilerVersion > 21}
+        Synchronize(CurrentThread, Procedure ()
+                                 Begin
+                                     FCallSendEvent(EventData  ,
+                                                      Params ,
+                                                     EventType  ,
+                                                     FCallBack  );
+                                 End);
+       {$ELSE}
+               FCallSendEvent(EventData  ,
+                        Params ,
+                       EventType  ,
+                       FCallBack  );
+       {$IFEND}
+      {$ENDIF}
+     Terminate;
+
+exit;
+
+ // INICIO   TThread_Request
  ss            := Nil;
  SendParams    := Nil;
  vResultParams := TMemoryStream.Create;

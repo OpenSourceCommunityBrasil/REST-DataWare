@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/11/06 19:57:05.000.241,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit8.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\ArrayDatasetProcess\Unit8.dfm</Transaction>
+    <Transaction>2017/11/06 19:57:07.000.753,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\ArrayDatasetProcess\ArrayDatasetProcess.dproj</Transaction>
+  </Transactions>
+	<ActiveMobileDevice>
+		<NoProfile iOSSimulator="iPhone5"/>
+	</ActiveMobileDevice>
+</BorlandProject>

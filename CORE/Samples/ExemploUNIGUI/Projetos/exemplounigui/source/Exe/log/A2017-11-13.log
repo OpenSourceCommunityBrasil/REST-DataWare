@@ -1,0 +1,276 @@
+exemplounigui.exe: 00004670: 10:22:05 []:>--------------------------------------------------------------<
+exemplounigui.exe: 00004670: 10:22:05 [TUniServerModule]:Server First Init.
+exemplounigui.exe: 00004670: 10:22:05 [TUniServerModule]:Starting HTTP Server...
+exemplounigui.exe: 00004670: 10:22:05 [TUniServerModule]:HTTP Server Started. Port: 8077
+exemplounigui.exe: 00005288: 10:22:45 [127.0.0.1]:EIBNativeException : [FireDAC][Phys][FB]file  is not a valid database : Addr: $007997B6
+exemplounigui.exe: 00005288: 10:22:45 []:TUniThemeProps: File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\css\uni-xtheme.css
+exemplounigui.exe: 00005288: 10:22:45 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\ext\resources\css\ext-all.css
+exemplounigui.exe: 000011D4: 10:22:45 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\css\uni-xtheme.css
+exemplounigui.exe: 00005054: 10:22:46 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\images\loading.gif
+exemplounigui.exe: 00004768: 10:22:47 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\ext\resources\themes\images\default\tree\s.gif
+exemplounigui.exe: 00004670: 10:25:03 [TUniServerModule]:Shutting Down Server.
+exemplounigui.exe: 00004670: 10:25:04 [TUniServerModule]:HTTP Server Stopped.
+exemplounigui.exe: 00004670: 10:25:04 [TUniGUISessionManager]:Terminating Session manager.
+exemplounigui.exe: 00004670: 10:25:04 [TUniGUISessionManager]:Stopping Cache Eraser...
+exemplounigui.exe: 00004670: 10:25:04 [TUniGUISessionManager]:Cache Eraser Stopped.
+exemplounigui.exe: 00004670: 10:25:04 [TUniGUISessionManager]:Destroying Worker Threads.
+exemplounigui.exe: 00004670: 10:25:04 [TUniGUISessionManager]:Session manager terminated.
+exemplounigui.exe: 00004670: 10:25:04 [TUniServerModule]:Server Shutdown Completed.
+exemplounigui.exe: 00004670: 10:25:04 []:<-------------------------------------------------------------->
+exemplounigui.exe: 00004670: 10:25:04 [Terminated]:Exit Code: 0
+exemplounigui.exe: 00005164: 10:25:16 []:>--------------------------------------------------------------<
+exemplounigui.exe: 00005164: 10:25:16 [TUniServerModule]:Server First Init.
+exemplounigui.exe: 00005164: 10:25:16 [TUniServerModule]:Erasing Cache Folder...
+exemplounigui.exe: 00005164: 10:25:16 [TUniServerModule]:Cache Folder Erased. <0> Files deleted.
+exemplounigui.exe: 00005164: 10:25:16 [TUniServerModule]:Starting HTTP Server...
+exemplounigui.exe: 00005164: 10:25:16 [TUniServerModule]:HTTP Server Started. Port: 8077
+exemplounigui.exe: 00004F3C: 10:25:28 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. : Addr: $007941B6
+exemplounigui.exe: 00004F3C: 10:25:32 [127.0.0.1]:EIBNativeException : [FireDAC][Phys][FB]file  is not a valid database : Addr: $007997B6
+exemplounigui.exe: 00004F3C: 10:25:32 []:TUniThemeProps: File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\css\uni-xtheme.css
+exemplounigui.exe: 00005DA4: 10:25:32 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\ext\resources\css\ext-all.css
+exemplounigui.exe: 00004F3C: 10:25:32 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\css\uni-xtheme.css
+exemplounigui.exe: 00005C74: 10:25:33 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\images\loading.gif
+exemplounigui.exe: 00003C18: 10:25:33 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\ext\resources\themes\images\default\tree\s.gif
+exemplounigui.exe: 00005164: 10:27:46 [TUniServerModule]:Shutting Down Server.
+exemplounigui.exe: 00005164: 10:27:47 [TUniServerModule]:HTTP Server Stopped.
+exemplounigui.exe: 00005164: 10:27:47 [TUniGUISessionManager]:Terminating Session manager.
+exemplounigui.exe: 00005164: 10:27:47 [TUniGUISessionManager]:Stopping Cache Eraser...
+exemplounigui.exe: 00005164: 10:27:47 [TUniGUISessionManager]:Cache Eraser Stopped.
+exemplounigui.exe: 00005164: 10:27:47 [TUniGUISessionManager]:Destroying Worker Threads.
+exemplounigui.exe: 00005164: 10:27:47 [TUniGUISessionManager]:Session manager terminated.
+exemplounigui.exe: 00005164: 10:27:47 [TUniServerModule]:Server Shutdown Completed.
+exemplounigui.exe: 00005164: 10:27:47 []:<-------------------------------------------------------------->
+exemplounigui.exe: 00005164: 10:27:47 [Terminated]:Exit Code: 0
+exemplounigui.exe: 00004A30: 10:28:04 []:>--------------------------------------------------------------<
+exemplounigui.exe: 00004A30: 10:28:04 [TUniServerModule]:Server First Init.
+exemplounigui.exe: 00004A30: 10:28:04 [TUniServerModule]:Erasing Cache Folder...
+exemplounigui.exe: 00004A30: 10:28:04 [TUniServerModule]:Cache Folder Erased. <0> Files deleted.
+exemplounigui.exe: 00004A30: 10:28:04 [TUniServerModule]:Starting HTTP Server...
+exemplounigui.exe: 00004A30: 10:28:04 [TUniServerModule]:HTTP Server Started. Port: 8077
+exemplounigui.exe: 000047E8: 10:28:12 [127.0.0.1]:EIBNativeException : [FireDAC][Phys][FB]file  is not a valid database : Addr: $007997B6
+exemplounigui.exe: 000047E8: 10:28:12 []:TUniThemeProps: File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\css\uni-xtheme.css
+exemplounigui.exe: 000047E8: 10:28:12 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\ext\resources\css\ext-all.css
+exemplounigui.exe: 00004C44: 10:28:12 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\css\uni-xtheme.css
+exemplounigui.exe: 00001BE0: 10:28:13 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\images\loading.gif
+exemplounigui.exe: 00002CA4: 10:28:13 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\ext\resources\themes\images\default\tree\s.gif
+exemplounigui.exe: 00004A30: 10:30:32 [TUniServerModule]:Shutting Down Server.
+exemplounigui.exe: 00004A30: 10:30:33 [TUniServerModule]:HTTP Server Stopped.
+exemplounigui.exe: 00004A30: 10:30:33 [TUniGUISessionManager]:Terminating Session manager.
+exemplounigui.exe: 00004A30: 10:30:33 [TUniGUISessionManager]:Stopping Cache Eraser...
+exemplounigui.exe: 00004A30: 10:30:33 [TUniGUISessionManager]:Cache Eraser Stopped.
+exemplounigui.exe: 00004A30: 10:30:33 [TUniGUISessionManager]:Destroying Worker Threads.
+exemplounigui.exe: 00004A30: 10:30:33 [TUniGUISessionManager]:Session manager terminated.
+exemplounigui.exe: 00004A30: 10:30:33 [TUniServerModule]:Server Shutdown Completed.
+exemplounigui.exe: 00004A30: 10:30:33 []:<-------------------------------------------------------------->
+exemplounigui.exe: 00004A30: 10:30:33 [Terminated]:Exit Code: 0
+exemplounigui.exe: 00002828: 10:30:47 []:>--------------------------------------------------------------<
+exemplounigui.exe: 00002828: 10:30:47 [TUniServerModule]:Server First Init.
+exemplounigui.exe: 00002828: 10:30:47 [TUniServerModule]:Erasing Cache Folder...
+exemplounigui.exe: 00002828: 10:30:47 [TUniServerModule]:Cache Folder Erased. <0> Files deleted.
+exemplounigui.exe: 00002828: 10:30:47 [TUniServerModule]:Starting HTTP Server...
+exemplounigui.exe: 00002828: 10:30:47 [TUniServerModule]:HTTP Server Started. Port: 8077
+exemplounigui.exe: 00005C0C: 10:30:52 [127.0.0.1]:EIBNativeException : [FireDAC][Phys][FB]file  is not a valid database : Addr: $0079AF02
+exemplounigui.exe: 00005C0C: 10:30:52 []:TUniThemeProps: File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\css\uni-xtheme.css
+exemplounigui.exe: 00005C0C: 10:30:53 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\ext\resources\css\ext-all.css
+exemplounigui.exe: 000053B0: 10:30:53 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\css\uni-xtheme.css
+exemplounigui.exe: 0000451C: 10:30:53 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. : Addr: $00795902
+exemplounigui.exe: 00000B5C: 10:30:53 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\images\loading.gif
+exemplounigui.exe: 0000451C: 10:30:54 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\ext\resources\themes\images\default\tree\s.gif
+exemplounigui.exe: 00002828: 10:31:05 [TUniServerModule]:Shutting Down Server.
+exemplounigui.exe: 00004150: 10:31:06 [Indy]:EIdNotConnected : Not Connected : Addr: $006BD6F2
+exemplounigui.exe: 00005680: 10:31:06 [Indy]:EIdNotConnected : Not Connected : Addr: $006BD6F2
+exemplounigui.exe: 00002828: 10:31:06 [TUniServerModule]:HTTP Server Stopped.
+exemplounigui.exe: 00002828: 10:31:06 [TUniGUISessionManager]:Terminating Session manager.
+exemplounigui.exe: 00002828: 10:31:06 [TUniGUISessionManager]:Stopping Cache Eraser...
+exemplounigui.exe: 00002828: 10:31:06 [TUniGUISessionManager]:Cache Eraser Stopped.
+exemplounigui.exe: 00002828: 10:31:06 [TUniGUISessionManager]:Destroying Worker Threads.
+exemplounigui.exe: 00002828: 10:31:06 [TUniGUISessionManager]:Session manager terminated.
+exemplounigui.exe: 00002828: 10:31:06 [TUniServerModule]:Server Shutdown Completed.
+exemplounigui.exe: 00002828: 10:31:06 []:<-------------------------------------------------------------->
+exemplounigui.exe: 00002828: 10:31:06 [Terminated]:Exit Code: 0
+exemplounigui.exe: 00001BB0: 10:32:11 []:>--------------------------------------------------------------<
+exemplounigui.exe: 00001BB0: 10:32:11 [TUniServerModule]:Server First Init.
+exemplounigui.exe: 00001BB0: 10:32:11 [TUniServerModule]:Erasing Cache Folder...
+exemplounigui.exe: 00001BB0: 10:32:11 [TUniServerModule]:Cache Folder Erased. <0> Files deleted.
+exemplounigui.exe: 00001BB0: 10:32:11 [TUniServerModule]:Starting HTTP Server...
+exemplounigui.exe: 00001BB0: 10:32:11 [TUniServerModule]:HTTP Server Started. Port: 8077
+exemplounigui.exe: 00000A1C: 10:32:15 [127.0.0.1]:EIBNativeException : [FireDAC][Phys][FB]file  is not a valid database : Addr: $0079AF02
+exemplounigui.exe: 00000A1C: 10:32:15 []:TUniThemeProps: File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\css\uni-xtheme.css
+exemplounigui.exe: 00000A1C: 10:32:15 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\ext\resources\css\ext-all.css
+exemplounigui.exe: 00004D30: 10:32:15 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\css\uni-xtheme.css
+exemplounigui.exe: 00003658: 10:32:15 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. : Addr: $00795902
+exemplounigui.exe: 00003658: 10:32:15 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\images\loading.gif
+exemplounigui.exe: 00001C54: 10:32:16 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\ext\resources\themes\images\default\tree\s.gif
+exemplounigui.exe: 00001CC4: 10:32:57 [127.0.0.1]:EIBNativeException : [FireDAC][Phys][FB]file  is not a valid database : Addr: $0079AF02
+exemplounigui.exe: 00001CC4: 10:32:57 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\ext\resources\css\ext-all.css
+exemplounigui.exe: 00002E18: 10:32:57 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\css\uni-ext.css
+exemplounigui.exe: 00003204: 10:32:57 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\css\uni-xtheme-common.css
+exemplounigui.exe: 000028EC: 10:32:57 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\css\uni-xtheme.css
+exemplounigui.exe: 00005BE0: 10:32:57 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\ext\locale\ext-lang-pt.js
+exemplounigui.exe: 000006F8: 10:32:57 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\jQuery\autoNumeric\autoNumeric-1.9.35.js
+exemplounigui.exe: 00000FB0: 10:32:57 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\ext-treenode-plugin.js
+exemplounigui.exe: 00004C20: 10:32:57 [127.0.0.1]:EIBNativeException : [FireDAC][Phys][FB]file  is not a valid database : Addr: $0079AF02
+exemplounigui.exe: 00004C20: 10:32:57 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\ClearButton\ClearButton.js
+exemplounigui.exe: 000007EC: 10:32:58 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\ext\ext-all.js
+exemplounigui.exe: 000037C0: 10:32:58 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\ext-unicommon-min.js
+exemplounigui.exe: 00004500: 10:32:58 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\ext-sync-min.js
+exemplounigui.exe: 00001728: 10:32:58 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\AlwaysOnTop.js
+exemplounigui.exe: 00001FB4: 10:32:58 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\jQuery\jquery-1.11.2.min.js
+exemplounigui.exe: 0000122C: 10:32:58 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\ClearButton\ClearButton.js
+exemplounigui.exe: 000029D4: 10:32:58 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\jQuery\MaskedInput\jquery.inputmask.min.js
+exemplounigui.exe: 00002A98: 10:32:58 [HandleFileRequest[127.0.0.1]]:File not found: D:\Projetos\Delphi\Atos Sistemas\UniGuiNovoModelo\Projetos\exemplounigui\source\Exe\frame\uni\ext-unigui-min.js
+exemplounigui.exe: 00001BB0: 10:33:47 [TUniServerModule]:Shutting Down Server.
+exemplounigui.exe: 00003650: 10:33:48 [Indy]:EIdNotConnected : Not Connected : Addr: $006BD6F2
+exemplounigui.exe: 00001BB0: 10:33:48 [TUniServerModule]:HTTP Server Stopped.
+exemplounigui.exe: 00001BB0: 10:33:48 [TUniGUISessionManager]:Terminating Session manager.
+exemplounigui.exe: 00001BB0: 10:33:48 [TUniGUISessionManager]:Stopping Cache Eraser...
+exemplounigui.exe: 00001BB0: 10:33:48 [TUniGUISessionManager]:Cache Eraser Stopped.
+exemplounigui.exe: 00001BB0: 10:33:48 [TUniGUISessionManager]:Destroying Worker Threads.
+exemplounigui.exe: 00001BB0: 10:33:48 [TUniGUISessionManager]:Session manager terminated.
+exemplounigui.exe: 00001BB0: 10:33:48 [TUniServerModule]:Server Shutdown Completed.
+exemplounigui.exe: 00001BB0: 10:33:48 []:<-------------------------------------------------------------->
+exemplounigui.exe: 00001BB0: 10:33:48 [Terminated]:Exit Code: 0
+exemplounigui.exe: 000004A8: 10:34:14 []:>--------------------------------------------------------------<
+exemplounigui.exe: 000004A8: 10:34:14 [TUniServerModule]:Server First Init.
+exemplounigui.exe: 000004A8: 10:34:14 [TUniServerModule]:Erasing Cache Folder...
+exemplounigui.exe: 000004A8: 10:34:14 [TUniServerModule]:Cache Folder Erased. <0> Files deleted.
+exemplounigui.exe: 000004A8: 10:34:14 [TUniServerModule]:Starting HTTP Server...
+exemplounigui.exe: 000004A8: 10:34:14 [TUniServerModule]:HTTP Server Started. Port: 8077
+exemplounigui.exe: 000004A8: 10:35:38 [TUniServerModule]:Shutting Down Server.
+exemplounigui.exe: 000047C4: 10:35:39 [Indy]:EIdNotConnected : Not Connected : Addr: $006BC32E
+exemplounigui.exe: 00001A48: 10:35:39 [Indy]:EIdNotConnected : Not Connected : Addr: $006BC32E
+exemplounigui.exe: 000012B4: 10:35:39 [Indy]:EIdNotConnected : Not Connected : Addr: $006BC32E
+exemplounigui.exe: 0000575C: 10:35:39 [Indy]:EIdNotConnected : Not Connected : Addr: $006BC32E
+exemplounigui.exe: 000011A0: 10:35:39 [Indy]:EIdNotConnected : Not Connected : Addr: $006BC32E
+exemplounigui.exe: 00000A5C: 10:35:39 [Indy]:EIdNotConnected : Not Connected : Addr: $006BC32E
+exemplounigui.exe: 000004A8: 10:35:39 [TUniServerModule]:HTTP Server Stopped.
+exemplounigui.exe: 000004A8: 10:35:39 [TUniGUISessionManager]:Terminating Session manager.
+exemplounigui.exe: 000004A8: 10:35:39 [TUniGUISessionManager]:Stopping Cache Eraser...
+exemplounigui.exe: 000004A8: 10:35:39 [TUniGUISessionManager]:Cache Eraser Stopped.
+exemplounigui.exe: 000004A8: 10:35:39 [TUniGUISessionManager]:Destroying Worker Threads.
+exemplounigui.exe: 000004A8: 10:35:39 [TUniGUISessionManager]:Session manager terminated.
+exemplounigui.exe: 000004A8: 10:35:39 [TUniServerModule]:Server Shutdown Completed.
+exemplounigui.exe: 000004A8: 10:35:39 []:<-------------------------------------------------------------->
+exemplounigui.exe: 000004A8: 10:35:39 [Terminated]:Exit Code: 0
+exemplounigui.exe: 00004748: 10:36:04 []:>--------------------------------------------------------------<
+exemplounigui.exe: 00004748: 10:36:04 [TUniServerModule]:Server First Init.
+exemplounigui.exe: 00004748: 10:36:04 [TUniServerModule]:Erasing Cache Folder...
+exemplounigui.exe: 00004748: 10:36:04 [TUniServerModule]:Cache Folder Erased. <0> Files deleted.
+exemplounigui.exe: 00004748: 10:36:04 [TUniServerModule]:Starting HTTP Server...
+exemplounigui.exe: 00004748: 10:36:04 [TUniServerModule]:HTTP Server Started. Port: 8077
+exemplounigui.exe: 000054E8: 10:36:04 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. : Addr: $0079453E
+exemplounigui.exe: 00004748: 10:36:44 [TUniServerModule]:Shutting Down Server.
+exemplounigui.exe: 00003E10: 10:36:44 [Indy]:EIdNotConnected : Not Connected : Addr: $006BC32E
+exemplounigui.exe: 000054E8: 10:36:44 [Indy]:EIdNotConnected : Not Connected : Addr: $006BC32E
+exemplounigui.exe: 00003790: 10:36:44 [Indy]:EIdNotConnected : Not Connected : Addr: $006BC32E
+exemplounigui.exe: 00003468: 10:36:44 [Indy]:EIdNotConnected : Not Connected : Addr: $006BC32E
+exemplounigui.exe: 00003BB8: 10:36:44 [Indy]:EIdNotConnected : Not Connected : Addr: $006BC32E
+exemplounigui.exe: 00005A6C: 10:36:44 [Indy]:EIdNotConnected : Not Connected : Addr: $006BC32E
+exemplounigui.exe: 00004748: 10:36:45 [TUniServerModule]:HTTP Server Stopped.
+exemplounigui.exe: 00004748: 10:36:45 [TUniGUISessionManager]:Terminating Session manager.
+exemplounigui.exe: 00004748: 10:36:45 [TUniGUISessionManager]:Stopping Cache Eraser...
+exemplounigui.exe: 00004748: 10:36:45 [TUniGUISessionManager]:Cache Eraser Stopped.
+exemplounigui.exe: 00004748: 10:36:45 [TUniGUISessionManager]:Destroying Worker Threads.
+exemplounigui.exe: 00004748: 10:36:45 [TUniGUISessionManager]:Session manager terminated.
+exemplounigui.exe: 00004748: 10:36:45 [TUniServerModule]:Server Shutdown Completed.
+exemplounigui.exe: 00004748: 10:36:45 []:<-------------------------------------------------------------->
+exemplounigui.exe: 00004748: 10:36:45 [Terminated]:Exit Code: 0
+exemplounigui.exe: 00001FD4: 10:36:53 []:>--------------------------------------------------------------<
+exemplounigui.exe: 00001FD4: 10:36:53 [TUniServerModule]:Server First Init.
+exemplounigui.exe: 00001FD4: 10:36:53 [TUniServerModule]:Erasing Cache Folder...
+exemplounigui.exe: 00001FD4: 10:36:53 [TUniServerModule]:Cache Folder Erased. <0> Files deleted.
+exemplounigui.exe: 00001FD4: 10:36:53 [TUniServerModule]:Starting HTTP Server...
+exemplounigui.exe: 00001FD4: 10:36:53 [TUniServerModule]:HTTP Server Started. Port: 8077
+exemplounigui.exe: 000026C8: 10:36:55 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. : Addr: $0079453E
+exemplounigui.exe: 00005564: 10:37:05 [127.0.0.1]:EArgumentOutOfRangeException : Argument out of range : Addr: $0044593A
+exemplounigui.exe: 00001FD4: 10:40:10 [TUniServerModule]:Shutting Down Server.
+exemplounigui.exe: 00001FD4: 10:40:11 [TUniServerModule]:HTTP Server Stopped.
+exemplounigui.exe: 00001FD4: 10:40:11 [TUniGUISessionManager]:Terminating Session manager.
+exemplounigui.exe: 00001FD4: 10:40:11 [TUniGUISessionManager]:Stopping Cache Eraser...
+exemplounigui.exe: 00001FD4: 10:40:11 [TUniGUISessionManager]:Cache Eraser Stopped.
+exemplounigui.exe: 00001FD4: 10:40:11 [TUniGUISessionManager]:Destroying Worker Threads.
+exemplounigui.exe: 00001FD4: 10:40:11 [TUniGUISessionManager]:Session manager terminated.
+exemplounigui.exe: 00001FD4: 10:40:11 [TUniServerModule]:Server Shutdown Completed.
+exemplounigui.exe: 00001FD4: 10:40:11 []:<-------------------------------------------------------------->
+exemplounigui.exe: 00001FD4: 10:40:11 [Terminated]:Exit Code: 0
+exemplounigui.exe: 000024C8: 10:40:26 []:>--------------------------------------------------------------<
+exemplounigui.exe: 000024C8: 10:40:26 [TUniServerModule]:Server First Init.
+exemplounigui.exe: 000024C8: 10:40:26 [TUniServerModule]:Erasing Cache Folder...
+exemplounigui.exe: 000024C8: 10:40:26 [TUniServerModule]:Cache Folder Erased. <0> Files deleted.
+exemplounigui.exe: 000024C8: 10:40:26 [TUniServerModule]:Starting HTTP Server...
+exemplounigui.exe: 000024C8: 10:40:26 [TUniServerModule]:HTTP Server Started. Port: 8077
+exemplounigui.exe: 00002F24: 10:40:34 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. : Addr: $0079453E
+exemplounigui.exe: 00001958: 10:41:41 [127.0.0.1]:EDatabaseError : qryCadbase: Cannot perform this operation on a closed dataset : Addr: $00635876
+exemplounigui.exe: 00003FC4: 10:41:47 [127.0.0.1]:EDatabaseError : qryCadbase: Cannot perform this operation on a closed dataset : Addr: $00635876
+exemplounigui.exe: 000024C8: 10:46:45 [TUniServerModule]:Shutting Down Server.
+exemplounigui.exe: 000024C8: 10:46:46 [TUniServerModule]:HTTP Server Stopped.
+exemplounigui.exe: 000024C8: 10:46:46 [TUniGUISessionManager]:Terminating Session manager.
+exemplounigui.exe: 000024C8: 10:46:46 [TUniGUISessionManager]:Stopping Cache Eraser...
+exemplounigui.exe: 000024C8: 10:46:46 [TUniGUISessionManager]:Cache Eraser Stopped.
+exemplounigui.exe: 000024C8: 10:46:46 [TUniGUISessionManager]:Destroying Worker Threads.
+exemplounigui.exe: 000024C8: 10:46:46 [TUniGUISessionManager]:Session manager terminated.
+exemplounigui.exe: 000024C8: 10:46:46 [TUniServerModule]:Server Shutdown Completed.
+exemplounigui.exe: 000024C8: 10:46:46 []:<-------------------------------------------------------------->
+exemplounigui.exe: 000024C8: 10:46:46 [Terminated]:Exit Code: 0
+exemplounigui.exe: 00005C70: 10:47:14 []:>--------------------------------------------------------------<
+exemplounigui.exe: 00005C70: 10:47:14 [TUniServerModule]:Server First Init.
+exemplounigui.exe: 00005C70: 10:47:14 [TUniServerModule]:Debug Mode = ON
+exemplounigui.exe: 00005C70: 10:47:14 [TUniServerModule]:Erasing Cache Folder...
+exemplounigui.exe: 00005C70: 10:47:14 [TUniServerModule]:Cache Folder Erased. <0> Files deleted.
+exemplounigui.exe: 00005C70: 10:47:14 [TUniServerModule]:Starting HTTP Server...
+exemplounigui.exe: 00005C70: 10:47:14 [TUniServerModule]:HTTP Server Started. Port: 8077
+exemplounigui.exe: 00004F84: 10:47:24 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. : Addr: $007964AE
+exemplounigui.exe: 00002074: 10:47:45 [127.0.0.1]:EDatabaseError : qryCadbase: Cannot perform this operation on a closed dataset : Addr: $00635876
+exemplounigui.exe: 00001FB0: 10:51:59 []:>--------------------------------------------------------------<
+exemplounigui.exe: 00001FB0: 10:51:59 [TUniServerModule]:Server First Init.
+exemplounigui.exe: 00001FB0: 10:51:59 [TUniServerModule]:Erasing Cache Folder...
+exemplounigui.exe: 00001FB0: 10:51:59 [TUniServerModule]:Cache Folder Erased. <28> Files deleted.
+exemplounigui.exe: 00001FB0: 10:51:59 [TUniServerModule]:Starting HTTP Server...
+exemplounigui.exe: 00001FB0: 10:51:59 [TUniServerModule]:HTTP Server Started. Port: 8077
+exemplounigui.exe: 00005598: 10:52:01 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. : Addr: $007964AE
+exemplounigui.exe: 00005598: 10:52:01 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. : Addr: $007964AE
+exemplounigui.exe: 000050DC: 10:52:13 [127.0.0.1]:EDatabaseError : qryCadbase: Cannot perform this operation on a closed dataset : Addr: $00635876
+exemplounigui.exe: 00002A88: 10:52:40 [127.0.0.1]:EAccessViolation : Access violation at address 00C19E26 in module 'exemplounigui.exe'. Read of address 0037006C : Addr: $00C19E26
+exemplounigui.exe: 00002A88: 10:52:56 [127.0.0.1]:EAccessViolation : Access violation at address 00C19E26 in module 'exemplounigui.exe'. Read of address 0037006C : Addr: $00C19E26
+exemplounigui.exe: 000011CC: 10:53:04 [127.0.0.1]:EDatabaseError : qryCadbase: Cannot perform this operation on a closed dataset : Addr: $00635876
+exemplounigui.exe: 00002E80: 10:53:04 [Access violation at address 00000000 in module 'exemplounigui.exe'. Read of address 00000000-127.0.0.1]:EAccessViolation : Access violation at address 00000000 in module 'exemplounigui.exe'. Read of address 00000000 : Addr: $00000000
+exemplounigui.exe: 00001FB0: 10:57:09 [TUniServerModule]:Shutting Down Server.
+exemplounigui.exe: 00001FB0: 10:57:10 [TUniServerModule]:HTTP Server Stopped.
+exemplounigui.exe: 00001FB0: 10:57:10 [TUniGUISessionManager]:Terminating Session manager.
+exemplounigui.exe: 00001FB0: 10:57:10 [TUniGUISessionManager]:Stopping Cache Eraser...
+exemplounigui.exe: 00001FB0: 10:57:10 [TUniGUISessionManager]:Cache Eraser Stopped.
+exemplounigui.exe: 00001FB0: 10:57:10 [TUniGUISessionManager]:Destroying Worker Threads.
+exemplounigui.exe: 00001FB0: 10:57:10 [TUniGUISessionManager]:Session manager terminated.
+exemplounigui.exe: 00001FB0: 10:57:10 [TUniServerModule]:Server Shutdown Completed.
+exemplounigui.exe: 00001FB0: 10:57:10 []:<-------------------------------------------------------------->
+exemplounigui.exe: 00001FB0: 10:57:10 [Terminated]:Exit Code: 0
+exemplounigui.exe: 0000346C: 11:06:14 []:>--------------------------------------------------------------<
+exemplounigui.exe: 0000346C: 11:06:14 [TUniServerModule]:Server First Init.
+exemplounigui.exe: 0000346C: 11:06:14 [TUniServerModule]:Erasing Cache Folder...
+exemplounigui.exe: 0000346C: 11:06:14 [TUniServerModule]:Cache Folder Erased. <0> Files deleted.
+exemplounigui.exe: 0000346C: 11:06:14 [TUniServerModule]:Starting HTTP Server...
+exemplounigui.exe: 0000346C: 11:06:14 [TUniServerModule]:HTTP Server Started. Port: 8077
+exemplounigui.exe: 00001A14: 11:06:21 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. : Addr: $007964AE
+exemplounigui.exe: 000059A4: 11:06:29 [127.0.0.1]:EDatabaseError : qryCadbase: Cannot perform this operation on a closed dataset : Addr: $00635876
+exemplounigui.exe: 0000346C: 11:07:49 [TUniServerModule]:Shutting Down Server.
+exemplounigui.exe: 000059A4: 11:07:50 [Indy]:EIdNotConnected : Not Connected : Addr: $006B986A
+exemplounigui.exe: 00001A14: 11:07:50 [Indy]:EIdNotConnected : Not Connected : Addr: $006B986A
+exemplounigui.exe: 0000346C: 11:07:50 [TUniServerModule]:HTTP Server Stopped.
+exemplounigui.exe: 0000346C: 11:07:50 [TUniGUISessionManager]:Terminating Session manager.
+exemplounigui.exe: 0000346C: 11:07:50 [TUniGUISessionManager]:Stopping Cache Eraser...
+exemplounigui.exe: 0000346C: 11:07:50 [TUniGUISessionManager]:Cache Eraser Stopped.
+exemplounigui.exe: 0000346C: 11:07:50 [TUniGUISessionManager]:Destroying Worker Threads.
+exemplounigui.exe: 0000346C: 11:07:50 [TUniGUISessionManager]:Session manager terminated.
+exemplounigui.exe: 0000346C: 11:07:50 [TUniServerModule]:Server Shutdown Completed.
+exemplounigui.exe: 0000346C: 11:07:50 []:<-------------------------------------------------------------->
+exemplounigui.exe: 0000346C: 11:07:50 [Terminated]:Exit Code: 0
+exemplounigui.exe: 00004158: 11:08:08 []:>--------------------------------------------------------------<
+exemplounigui.exe: 00004158: 11:08:08 [TUniServerModule]:Server First Init.
+exemplounigui.exe: 00004158: 11:08:08 [TUniServerModule]:Erasing Cache Folder...
+exemplounigui.exe: 00004158: 11:08:08 [TUniServerModule]:Cache Folder Erased. <0> Files deleted.
+exemplounigui.exe: 00004158: 11:08:08 [TUniServerModule]:Starting HTTP Server...
+exemplounigui.exe: 00004158: 11:08:08 [TUniServerModule]:HTTP Server Started. Port: 8077
+exemplounigui.exe: 00000948: 11:08:09 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. : Addr: $007964AE
+exemplounigui.exe: 00002B44: 11:08:16 [127.0.0.1]:Exception : [FireDAC][Phys][FB]I/O error during "CreateFile (open)" operation for file "D:\Projetos\Delphi\Componentes\XE10.1\REST_Controls_svn\trunk\CORE\Samples\SimpleServer\Server\..\EMPLOYEE.FDB"
+Error while trying to open file
+O sistema não pode encontrar o arquivo especificado.  : Addr: $00BAF738

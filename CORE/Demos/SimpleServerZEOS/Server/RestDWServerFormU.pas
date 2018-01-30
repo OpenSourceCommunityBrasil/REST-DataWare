@@ -12,7 +12,7 @@ Uses Winapi.Windows,    Winapi.Messages, System.SysUtils,         System.Variant
      uRESTDWBase,
      ServerMethodsUnit1, Vcl.ComCtrls, Data.DB,
      ZAbstractConnection, ZConnection, ZAbstractRODataset, ZAbstractDataset,
-    ZDataset, JvMemoryDataset;
+    ZDataset, JvMemoryDataset, uRESTDWPoolerDB, uRESTDWDriverZEOS;
 
 type
   TRestDWForm = class(TForm)
@@ -117,7 +117,7 @@ implementation
 {$ENDIF}
 
 uses
-  Winapi.ShellApi;
+  Winapi.ShellApi, uDataModule3;
 
 Function TRestDWForm.GetHandleOnTaskBar : THandle;
 Begin
@@ -321,7 +321,7 @@ Begin
  FCfgName := StringReplace(ExtractFileName(ParamStr(0) ), '.exe' , '' , [rfReplaceAll]);
  FCfgName := ExtractFilePath(ParamSTR(0)) + 'Config_' + FCfgName + '.ini' ;
 
- RESTServicePooler1.ServerMethodClass := TServerMethods1;
+ RESTServicePooler1.ServerMethodClass := TDataModule3;//TServerMethods1;
 
  PageControl1.ActivePage              := tsConfigs;
 End;
@@ -392,6 +392,9 @@ begin
  If Not RESTServicePooler1.Active Then
   Begin
    RESTServicePooler1.ServicePort           := StrToInt(edPortaDW.Text);
+   RESTServicePooler1.ServerParams.UserName := (edUserNameDW.Text);
+   RESTServicePooler1.ServerParams.Password := (edPasswordDW.Text);
+
    RESTServicePooler1.SSLPrivateKeyFile     := ePrivKeyFile.Text;
    RESTServicePooler1.SSLPrivateKeyPassword := ePrivKeyPass.Text;
    RESTServicePooler1.SSLCertFile           := eCertFile.Text;

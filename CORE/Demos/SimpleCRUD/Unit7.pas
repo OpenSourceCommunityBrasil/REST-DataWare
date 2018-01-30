@@ -8,7 +8,8 @@ uses
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, uRESTDWPoolerDB, Data.DB, FireDAC.Comp.DataSet,
   FireDAC.Comp.Client, uDWConstsData, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.Imaging.pngimage, Vcl.DBCtrls, Vcl.Buttons, Vcl.Mask, Vcl.ExtDlgs;
+  Vcl.Imaging.pngimage, Vcl.DBCtrls, Vcl.Buttons, Vcl.Mask, Vcl.ExtDlgs,
+  JvMemoryDataset;
 
 type
   TForm7 = class(TForm)
@@ -62,6 +63,7 @@ implementation
 
 procedure TForm7.SpeedButton1Click(Sender: TObject);
 Begin
+RESTDWClientSQL1.ClearMassive
  RESTDWDataBase1.Close;
  RESTDWDataBase1.PoolerService := EHost.Text;
  RESTDWDataBase1.PoolerPort    := StrToInt(EPort.Text);

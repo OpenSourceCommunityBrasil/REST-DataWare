@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/11/13 19:12:31.441,Q:\RESTDataware\trunk\CORE\Packages\Delphi\Berlin\RestEasyObjectsCV.groupproj=Q:\RESTDataware\trunk\CORE\Packages\Delphi\Berlin\RestEasyObjectsCV.groupproj</Transaction>
+  </Transactions>
+	<Default.Personality>
+<<<<<<< .mine
+		<Projects ActiveProject="Q:\RESTDataware\trunk\CORE\Packages\Delphi\Berlin\RestDatawareCORE.dproj"/>
+||||||| .r883
+		<Projects ActiveProject="D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServer\Client\RestDWClientProject.dproj"/>
+=======
+		<Projects ActiveProject="D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServer\Server\RestDWServerProject.dproj"/>
+>>>>>>> .r890
+	</Default.Personality>
+</BorlandProject>

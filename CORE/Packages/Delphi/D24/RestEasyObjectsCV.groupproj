@@ -3,7 +3,7 @@
         <ProjectGuid>{6FE7FEDB-3C0E-45CC-A75C-FDC7A25FC64B}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="RestDatawareCORE.dproj">
+        <Projects Include="..\D25\RestDatawareCORE.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj">
@@ -13,6 +13,12 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\..\Source\Connectors\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\ExemploRaudusZeos\ExemploRaudusZeos.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\ExemploRaudus\ExemploRaudusDW.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\..\Demos\FileTransfer\Client\FileClient.dproj">
@@ -78,6 +84,9 @@
         <Projects Include="..\..\..\Demos\MassiveCacheSample\MassiveSample.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="C:\source\oroweb\server\OroWebServer.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -87,13 +96,13 @@
         </BorlandProject>
     </ProjectExtensions>
     <Target Name="RestDatawareCORE">
-        <MSBuild Projects="RestDatawareCORE.dproj"/>
+        <MSBuild Projects="..\D25\RestDatawareCORE.dproj"/>
     </Target>
     <Target Name="RestDatawareCORE:Clean">
-        <MSBuild Projects="RestDatawareCORE.dproj" Targets="Clean"/>
+        <MSBuild Projects="..\D25\RestDatawareCORE.dproj" Targets="Clean"/>
     </Target>
     <Target Name="RestDatawareCORE:Make">
-        <MSBuild Projects="RestDatawareCORE.dproj" Targets="Make"/>
+        <MSBuild Projects="..\D25\RestDatawareCORE.dproj" Targets="Make"/>
     </Target>
     <Target Name="RESTDWDriverFD">
         <MSBuild Projects="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj"/>
@@ -121,6 +130,24 @@
     </Target>
     <Target Name="RESTDWDriverUNIDAC:Make">
         <MSBuild Projects="..\..\..\Source\Connectors\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ExemploRaudusZeos">
+        <MSBuild Projects="..\..\..\Demos\ExemploRaudusZeos\ExemploRaudusZeos.dproj"/>
+    </Target>
+    <Target Name="ExemploRaudusZeos:Clean">
+        <MSBuild Projects="..\..\..\Demos\ExemploRaudusZeos\ExemploRaudusZeos.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ExemploRaudusZeos:Make">
+        <MSBuild Projects="..\..\..\Demos\ExemploRaudusZeos\ExemploRaudusZeos.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ExemploRaudusDW">
+        <MSBuild Projects="..\..\..\Demos\ExemploRaudus\ExemploRaudusDW.dproj"/>
+    </Target>
+    <Target Name="ExemploRaudusDW:Clean">
+        <MSBuild Projects="..\..\..\Demos\ExemploRaudus\ExemploRaudusDW.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ExemploRaudusDW:Make">
+        <MSBuild Projects="..\..\..\Demos\ExemploRaudus\ExemploRaudusDW.dproj" Targets="Make"/>
     </Target>
     <Target Name="FileClient">
         <MSBuild Projects="..\..\..\Demos\FileTransfer\Client\FileClient.dproj"/>
@@ -311,14 +338,23 @@
     <Target Name="MassiveSample:Make">
         <MSBuild Projects="..\..\..\Demos\MassiveCacheSample\MassiveSample.dproj" Targets="Make"/>
     </Target>
+    <Target Name="OroWebServer">
+        <MSBuild Projects="C:\source\oroweb\server\OroWebServer.dproj"/>
+    </Target>
+    <Target Name="OroWebServer:Clean">
+        <MSBuild Projects="C:\source\oroweb\server\OroWebServer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OroWebServer:Make">
+        <MSBuild Projects="C:\source\oroweb\server\OroWebServer.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;RESTDWDriverZEOS;RESTDWDriverUNIDAC;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClienteFMX;ClientSlides;Server_OSX;SimpleCRUD;ArrayDatasetProcess;exemplounigui;dwCGIServer;RestDWServerISAPI;WindowsDWService;MassiveSample"/>
+        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;RESTDWDriverZEOS;RESTDWDriverUNIDAC;ExemploRaudusZeos;ExemploRaudusDW;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClienteFMX;ClientSlides;Server_OSX;SimpleCRUD;ArrayDatasetProcess;exemplounigui;dwCGIServer;RestDWServerISAPI;WindowsDWService;MassiveSample;OroWebServer"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;RESTDWDriverZEOS:Clean;RESTDWDriverUNIDAC:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClienteFMX:Clean;ClientSlides:Clean;Server_OSX:Clean;SimpleCRUD:Clean;ArrayDatasetProcess:Clean;exemplounigui:Clean;dwCGIServer:Clean;RestDWServerISAPI:Clean;WindowsDWService:Clean;MassiveSample:Clean"/>
+        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;RESTDWDriverZEOS:Clean;RESTDWDriverUNIDAC:Clean;ExemploRaudusZeos:Clean;ExemploRaudusDW:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClienteFMX:Clean;ClientSlides:Clean;Server_OSX:Clean;SimpleCRUD:Clean;ArrayDatasetProcess:Clean;exemplounigui:Clean;dwCGIServer:Clean;RestDWServerISAPI:Clean;WindowsDWService:Clean;MassiveSample:Clean;OroWebServer:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;RESTDWDriverZEOS:Make;RESTDWDriverUNIDAC:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClienteFMX:Make;ClientSlides:Make;Server_OSX:Make;SimpleCRUD:Make;ArrayDatasetProcess:Make;exemplounigui:Make;dwCGIServer:Make;RestDWServerISAPI:Make;WindowsDWService:Make;MassiveSample:Make"/>
+        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;RESTDWDriverZEOS:Make;RESTDWDriverUNIDAC:Make;ExemploRaudusZeos:Make;ExemploRaudusDW:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClienteFMX:Make;ClientSlides:Make;Server_OSX:Make;SimpleCRUD:Make;ArrayDatasetProcess:Make;exemplounigui:Make;dwCGIServer:Make;RestDWServerISAPI:Make;WindowsDWService:Make;MassiveSample:Make;OroWebServer:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

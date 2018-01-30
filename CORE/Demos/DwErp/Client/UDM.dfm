@@ -26,21 +26,16 @@ object DM: TDM
     Top = 8
   end
   object CdsConfig: TRESTDWClientSQL
+    Aggregates = <>
     FieldDefs = <>
     IndexDefs = <>
     MasterFields = ''
-    FetchOptions.AssignedValues = [evMode]
-    FetchOptions.Mode = fmAll
-    ResourceOptions.AssignedValues = [rvSilentMode]
-    ResourceOptions.SilentMode = True
-    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
-    UpdateOptions.CheckRequired = False
-    UpdateOptions.AutoCommitUpdates = True
+    Params = <>
     StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
+    Datapacks = -1
     DataCache = False
-    Params = <>
     DataBase = Coneccao
     SQL.Strings = (
       'select * from sys_config')
@@ -52,21 +47,16 @@ object DM: TDM
     Top = 64
   end
   object Ret_sql: TRESTDWClientSQL
+    Aggregates = <>
     FieldDefs = <>
     IndexDefs = <>
     MasterFields = ''
-    FetchOptions.AssignedValues = [evMode]
-    FetchOptions.Mode = fmAll
-    ResourceOptions.AssignedValues = [rvSilentMode]
-    ResourceOptions.SilentMode = True
-    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
-    UpdateOptions.CheckRequired = False
-    UpdateOptions.AutoCommitUpdates = True
+    Params = <>
     StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
+    Datapacks = -1
     DataCache = False
-    Params = <>
     DataBase = Coneccao
     SQL.Strings = (
       '')
@@ -78,21 +68,16 @@ object DM: TDM
     Top = 88
   end
   object CdsEmpresa: TRESTDWClientSQL
+    Aggregates = <>
     FieldDefs = <>
     IndexDefs = <>
     MasterFields = ''
-    FetchOptions.AssignedValues = [evMode]
-    FetchOptions.Mode = fmAll
-    ResourceOptions.AssignedValues = [rvSilentMode]
-    ResourceOptions.SilentMode = True
-    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
-    UpdateOptions.CheckRequired = False
-    UpdateOptions.AutoCommitUpdates = True
+    Params = <>
     StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
+    Datapacks = -1
     DataCache = False
-    Params = <>
     DataBase = Coneccao
     SQL.Strings = (
       '')
@@ -40436,21 +40421,16 @@ object DM: TDM
       00000000}
   end
   object RunSql: TRESTDWClientSQL
+    Aggregates = <>
     FieldDefs = <>
     IndexDefs = <>
     MasterFields = ''
-    FetchOptions.AssignedValues = [evMode]
-    FetchOptions.Mode = fmAll
-    ResourceOptions.AssignedValues = [rvSilentMode]
-    ResourceOptions.SilentMode = True
-    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
-    UpdateOptions.CheckRequired = False
-    UpdateOptions.AutoCommitUpdates = True
+    Params = <>
     StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
+    Datapacks = -1
     DataCache = False
-    Params = <>
     DataBase = Coneccao
     SQL.Strings = (
       'select * from sys_config')
@@ -40478,21 +40458,16 @@ object DM: TDM
     Top = 73
   end
   object cdsLocalizar: TRESTDWClientSQL
+    Aggregates = <>
     FieldDefs = <>
     IndexDefs = <>
     MasterFields = ''
-    FetchOptions.AssignedValues = [evMode]
-    FetchOptions.Mode = fmAll
-    ResourceOptions.AssignedValues = [rvSilentMode]
-    ResourceOptions.SilentMode = True
-    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
-    UpdateOptions.CheckRequired = False
-    UpdateOptions.AutoCommitUpdates = True
+    Params = <>
     StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
+    Datapacks = -1
     DataCache = False
-    Params = <>
     DataBase = Coneccao
     CacheUpdateRecords = True
     AutoCommitData = False

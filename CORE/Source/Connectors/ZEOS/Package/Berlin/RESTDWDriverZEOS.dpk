@@ -39,7 +39,12 @@ requires
   FireDACCommonDriver,
   FireDACCommon,
   dsnap,
-  RestDatawareCORE;
+  RestDatawareCORE,
+  ZComponent,
+  ZDbc,
+  ZPlain,
+  ZCore,
+  ZParseSql;
 
 contains
   uRestDWDriverZEOS in '..\..\uRestDWDriverZEOS.pas';

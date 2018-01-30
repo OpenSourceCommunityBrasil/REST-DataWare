@@ -1,10 +1,30 @@
 [Stats]
-EditorSecs=81305
-DesignerSecs=2874
-InspectorSecs=1612
-CompileSecs=4745468
-OtherSecs=10674
+<<<<<<< .mine
+EditorSecs=81690
+DesignerSecs=2810
+InspectorSecs=1723
+CompileSecs=4633392
+OtherSecs=10261
+||||||| .r1082
+EditorSecs=80007
+DesignerSecs=2802
+InspectorSecs=1539
+CompileSecs=4607901
+OtherSecs=10484
+=======
+EditorSecs=80573
+DesignerSecs=2790
+InspectorSecs=1545
+CompileSecs=4688694
+OtherSecs=10582
+>>>>>>> .r1101
 StartTime=16/10/2017 19:39:05
 RealKeys=0
 EffectiveKeys=0
-DebugSecs=92360
+<<<<<<< .mine
+DebugSecs=97171
+||||||| .r1082
+DebugSecs=91087
+=======
+DebugSecs=91920
+>>>>>>> .r1101

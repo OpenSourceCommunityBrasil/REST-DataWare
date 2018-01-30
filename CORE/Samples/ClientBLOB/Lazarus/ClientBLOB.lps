@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="10"/>
+    <BuildModes Active="Default"/>
+    <Units Count="26">
+      <Unit0>
+        <Filename Value="ClientBLOB.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="25" Y="14"/>
+        <UsageCount Value="42"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="Unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form5"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="71"/>
+        <CursorPos X="30" Y="77"/>
+        <UsageCount Value="42"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="..\..\..\Source\libs\JSON\uDWJSON.pas"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="2038"/>
+        <CursorPos Y="2056"/>
+        <UsageCount Value="19"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="925"/>
+        <CursorPos Y="947"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\..\..\Source\uDWPoolerMethod.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="883"/>
+        <CursorPos Y="909"/>
+        <UsageCount Value="18"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1155"/>
+        <CursorPos Y="1174"/>
+        <UsageCount Value="19"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="1533"/>
+        <CursorPos Y="1549"/>
+        <UsageCount Value="20"/>
+        <Bookmarks Count="4">
+          <Item0 X="71" Y="790" ID="2"/>
+          <Item1 X="47" Y="719" ID="3"/>
+          <Item2 X="23" Y="976" ID="4"/>
+          <Item3 Y="1281" ID="1"/>
+        </Bookmarks>
+        <Loaded Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="..\..\..\Source\libs\uDWJSONTools.pas"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="211"/>
+        <CursorPos X="16" Y="244"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\..\..\Source\libs\uDWConsts.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="458"/>
+        <CursorPos Y="478"/>
+        <UsageCount Value="13"/>
+        <Loaded Value="True"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="..\..\..\Source\libs\uzliblaz.pas"/>
+        <UnitName Value="uZlibLaz"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="39"/>
+        <CursorPos Y="54"/>
+        <UsageCount Value="11"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="..\..\..\Source\libs\uDWConstsData.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="11"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="C:\lazarus\lcl\include\customcheckbox.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="120"/>
+        <CursorPos Y="134"/>
+        <UsageCount Value="10"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="..\..\..\Source\libs\indy10\trunk\Lib\Core\IdIOHandler.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2208"/>
+        <CursorPos X="41" Y="2218"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="C:\lazarus\fpc\3.0.2\source\packages\paszlib\src\zstream.pp"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="..\..\..\Source\libs\indy10\trunk\Lib\Protocols\IdHTTP.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1010"/>
+        <CursorPos X="19" Y="1031"/>
+        <UsageCount Value="12"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="..\..\..\Source\libs\indy10\trunk\Lib\System\IdGlobal.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1087"/>
+        <CursorPos X="114" Y="1096"/>
+        <UsageCount Value="12"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="C:\lazarus\fpc\3.0.2\source\rtl\objpas\classes\classesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="847"/>
+        <CursorPos X="46" Y="861"/>
+        <UsageCount Value="11"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="C:\lazarus\fpc\3.0.2\source\rtl\objpas\classes\streams.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="59"/>
+        <CursorPos Y="65"/>
+        <UsageCount Value="11"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="C:\lazarus\lcl\include\dbimage.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="212"/>
+        <CursorPos Y="226"/>
+        <UsageCount Value="10"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="C:\lazarus\lcl\dbctrls.pp"/>
+        <UnitName Value="DbCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1626"/>
+        <CursorPos Y="1639"/>
+        <UsageCount Value="10"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="C:\lazarus\lcl\include\dbcustomnavigator.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="466"/>
+        <CursorPos Y="479"/>
+        <UsageCount Value="10"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="..\..\..\Source\Connectors\Lazarus\restdwlazdriver.pas"/>
+        <UnitName Value="RESTDWLazDriver"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="10"/>
+        <UsageCount Value="10"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="Unit1.lfm"/>
+        <EditorIndex Value="-1"/>
+        <ExtraEditorCount Value="1"/>
+        <ExtraEditor1>
+          <EditorIndex Value="-1"/>
+          <TopLine Value="701"/>
+          <CursorPos X="32" Y="716"/>
+        </ExtraEditor1>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="..\..\..\Source\libs\indy10\trunk\Lib\System\IdStream.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="20"/>
+        <CursorPos X="14" Y="29"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="..\..\..\Source\Connectors\Lazarus\uRestDWLazDriver.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="169"/>
+        <CursorPos X="86" Y="178"/>
+        <UsageCount Value="10"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="C:\Users\XyberX\AppData\Local\lazarus\onlinepackagemanager\packages\Indy10\source\IdIOHandler.pas"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="2212"/>
+        <CursorPos X="47" Y="2220"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit25>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="965" TopLine="938"/>
+      </Position1>
+      <Position2>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="968" TopLine="941"/>
+      </Position2>
+      <Position3>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="969" TopLine="942"/>
+      </Position3>
+      <Position4>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="970" TopLine="943"/>
+      </Position4>
+      <Position5>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="972" TopLine="945"/>
+      </Position5>
+      <Position6>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="975" TopLine="964"/>
+      </Position6>
+      <Position7>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="947" TopLine="931"/>
+      </Position7>
+      <Position8>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="948" TopLine="931"/>
+      </Position8>
+      <Position9>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="953" TopLine="931"/>
+      </Position9>
+      <Position10>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="958" TopLine="931"/>
+      </Position10>
+      <Position11>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="959" TopLine="932"/>
+      </Position11>
+      <Position12>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="960" TopLine="933"/>
+      </Position12>
+      <Position13>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="961" TopLine="934"/>
+      </Position13>
+      <Position14>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="962" TopLine="935"/>
+      </Position14>
+      <Position15>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="963" TopLine="936"/>
+      </Position15>
+      <Position16>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="964" TopLine="937"/>
+      </Position16>
+      <Position17>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="965" TopLine="938"/>
+      </Position17>
+      <Position18>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="968" TopLine="941"/>
+      </Position18>
+      <Position19>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="969" TopLine="942"/>
+      </Position19>
+      <Position20>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="970" TopLine="943"/>
+      </Position20>
+      <Position21>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="972" TopLine="945"/>
+      </Position21>
+      <Position22>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="980" TopLine="964"/>
+      </Position22>
+      <Position23>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="982" TopLine="964"/>
+      </Position23>
+      <Position24>
+        <Filename Value="..\..\..\Source\uDWPoolerMethod.pas"/>
+        <Caret Line="951" TopLine="934"/>
+      </Position24>
+      <Position25>
+        <Filename Value="..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="1706" TopLine="1689"/>
+      </Position25>
+      <Position26>
+        <Filename Value="..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="1549" TopLine="1533"/>
+      </Position26>
+      <Position27>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="1148" TopLine="1131"/>
+      </Position27>
+      <Position28>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="941" TopLine="925"/>
+      </Position28>
+      <Position29>
+        <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Caret Line="947" TopLine="925"/>
+      </Position29>
+      <Position30>
+        <Filename Value="..\..\..\Source\uDWPoolerMethod.pas"/>
+        <Caret Line="900" TopLine="883"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectSession>
+  <Debugging>
+    <BreakPoints Count="1">
+      <Item1>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\..\Source\uRESTDWBase.pas"/>
+        <Line Value="1167"/>
+      </Item1>
+    </BreakPoints>
+  </Debugging>
+</CONFIG>

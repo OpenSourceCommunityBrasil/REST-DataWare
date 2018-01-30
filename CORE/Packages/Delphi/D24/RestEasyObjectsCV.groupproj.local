@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
-	<Transactions/>
 	<Default.Personality>
-		<Projects ActiveProject="D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\Connectors\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj"/>
+		<Projects ActiveProject="Q:\RESTDataware\trunk\CORE\Demos\ExemploRaudus\ExemploRaudusDW.dproj"/>
 	</Default.Personality>
 </BorlandProject>

@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899/12/30 00:00:00.000.861,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit3.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\JSONDataset\LoadfromJSON\uLoadJSON.dfm</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.838,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\JSONDataset\LoadfromJSON\LoadfromJSON.dproj</Transaction>
+  </Transactions>
+</BorlandProject>

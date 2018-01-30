@@ -1,9 +1,39 @@
 [Stats]
+<<<<<<< .mine
+<<<<<<< .mine
+EditorSecs=2406
+||||||| .r883
+EditorSecs=2379
+=======
+EditorSecs=2729
+||||||| .r967
+EditorSecs=2729
+=======
 EditorSecs=2709
+>>>>>>> .r1079
+>>>>>>> .r967
 DesignerSecs=32
+<<<<<<< .mine
+InspectorSecs=69
+<<<<<<< .mine
+CompileSecs=318330
+OtherSecs=1727
+||||||| .r863
+CompileSecs=304727
+OtherSecs=1518
+=======
+CompileSecs=315836
+OtherSecs=1608
+||||||| .r883
+InspectorSecs=69
+CompileSecs=315836
+OtherSecs=1608
+=======
 InspectorSecs=17
 CompileSecs=442973
 OtherSecs=2158
+>>>>>>> .r967
+>>>>>>> .r882
 StartTime=16/10/2017 19:38:50
 RealKeys=0
 EffectiveKeys=0

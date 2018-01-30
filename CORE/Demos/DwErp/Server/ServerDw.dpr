@@ -7,7 +7,7 @@ uses
   System.UITypes,
   uPrincipal in 'uPrincipal.pas' {FrmServer},
   uClassePonto in 'Libs\uClassePonto.pas',
-  uUpdateDB in 'Libs\uUpdateDB.pas',
+  uUpdateDB in 'Libs\uUpdateDB.pas' {$R *.res},
   Vcl.Dialogs,
   System.SysUtils,
   UDmService in 'UDmService.pas' {ServerMetodDM: TDataModule},

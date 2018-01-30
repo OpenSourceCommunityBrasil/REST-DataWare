@@ -1172,20 +1172,16 @@ object Form7: TForm7
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
     FieldDefs = <>
-    IndexDefs = <>
-    MasterFields = ''
-    FetchOptions.AssignedValues = [evMode]
-    FetchOptions.Mode = fmAll
-    ResourceOptions.AssignedValues = [rvSilentMode]
-    ResourceOptions.SilentMode = True
-    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
-    UpdateOptions.CheckRequired = False
-    UpdateOptions.AutoCommitUpdates = True
-    StoreDefs = True
+    OneValueInArray = False
     MasterCascadeDelete = False
     Inactive = False
+    Datapacks = -1
     DataCache = True
-    Params = <>
+    Params = <
+      item
+        DataType = ftUnknown
+        ParamType = ptInput
+      end>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
       'select * from IMAGELIST'

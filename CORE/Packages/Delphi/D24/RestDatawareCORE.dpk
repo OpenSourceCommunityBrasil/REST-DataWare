@@ -39,7 +39,10 @@ requires
   FireDAC,
   FireDACCommonDriver,
   FireDACCommon,
-  dsnap;
+  dsnap,
+  Jcl,
+  JvCore,
+  JvDB;
 
 contains
   uDWPoolerMethod in '..\..\..\Source\uDWPoolerMethod.pas',

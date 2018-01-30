@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/06/23 21:46:19.000.089,=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2017/06/23 21:47:11.000.498,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit1.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\JSONDataset\uJSONDatasetSample.dfm</Transaction>
+    <Transaction>2017/06/23 21:47:11.000.498,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit1.pas=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\JSONDataset\uJSONDatasetSample.pas</Transaction>
+    <Transaction>2017/06/23 21:47:14.000.875,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\JSONDataset\JSONDatasetSample.dproj</Transaction>
+    <Transaction>2017/06/23 22:09:09.000.393,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\DwServer\uSock.pas</Transaction>
+    <Transaction>2017/06/23 22:09:23.000.239,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\DwServer\uSock.pas=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\JSONDataset\uSock.pas</Transaction>
+  </Transactions>
+</BorlandProject>

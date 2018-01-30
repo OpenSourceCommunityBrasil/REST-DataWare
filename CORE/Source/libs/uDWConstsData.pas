@@ -9,6 +9,9 @@ Uses
  {$IFDEF FPC}
   , memds;
  {$ELSE}
+   {$IFDEF CLIENTDATASET}
+    ,  DBClient
+   {$ENDIF}
    {$IFDEF RESJEDI}
     , JvMemoryDataset
    {$ENDIF}
@@ -35,6 +38,9 @@ Type
   Public
 //   Constructor Create(AOwner: TComponent); Override;
  {$ELSE}
+  {$IFDEF CLIENTDATASET}
+  TRESTDWClientSQLBase   = Class(TClientDataSet)                 //Classe com as funcionalidades de um DBQuery
+  {$ENDIF}
   {$IFDEF RESJEDI}
   TRESTDWClientSQLBase   = Class(TJvMemoryData)                 //Classe com as funcionalidades de um DBQuery
   {$ENDIF}

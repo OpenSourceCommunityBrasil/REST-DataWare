@@ -1,7 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899-12-30 00:00:00.000.662,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Packages\Delphi\Berlin\RestDatawareCORE.dproj</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.662,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Packages\Delphi\Berlin\RestDatawareCORE.dproj</Transaction>
+    <Transaction>2018/01/29 08:59:54.000.631,=Q:\RESTDataware\trunk\CORE\Packages\Delphi\D25\Unit10.pas</Transaction>
+    <Transaction>2018/01/29 23:55:59.422,=Jcl.dcp</Transaction>
+    <Transaction>2018/01/29 23:55:59.439,=JvCore.dcp</Transaction>
+    <Transaction>2018/01/29 23:55:59.456,=JvDB.dcp</Transaction>
   </Transactions>
 	<ActiveMobileDevice>
 		<NoProfile iOSSimulator="iPhone5" Android="38019fd23720a200"/>

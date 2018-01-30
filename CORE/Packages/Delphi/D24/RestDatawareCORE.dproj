@@ -117,7 +117,7 @@
         <BT_BuildType>Debug</BT_BuildType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <DCC_UsePackage>rtl;dbrtl;soaprtl;IndySystem;IndyProtocols;IndyCore;FireDAC;FireDACCommonDriver;FireDACCommon;dsnap;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>rtl;dbrtl;soaprtl;IndySystem;IndyProtocols;IndyCore;FireDAC;FireDACCommonDriver;FireDACCommon;dsnap;Jcl;JvCore;JvDB;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
@@ -145,8 +145,16 @@
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+<<<<<<< .mine
+        <VerInfo_Build>105</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.3.1.105;InternalName=REST Dataware CORE Version;LegalCopyright=REST Dataware CORE Version;LegalTrademarks=REST Dataware CORE Version;OriginalFilename=REST Dataware CORE Version;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.3.1;Comments=</VerInfo_Keys>
+||||||| .r1082
+        <VerInfo_Build>101</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.3.1.101;InternalName=REST Dataware CORE Version;LegalCopyright=REST Dataware CORE Version;LegalTrademarks=REST Dataware CORE Version;OriginalFilename=REST Dataware CORE Version;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.3.1;Comments=</VerInfo_Keys>
+=======
         <VerInfo_Build>106</VerInfo_Build>
         <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.3.1.106;InternalName=REST Dataware CORE Version;LegalCopyright=REST Dataware CORE Version;LegalTrademarks=REST Dataware CORE Version;OriginalFilename=REST Dataware CORE Version;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.3.1;Comments=</VerInfo_Keys>
+>>>>>>> .r1101
         <VerInfo_Release>1</VerInfo_Release>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
@@ -172,6 +180,9 @@
         <DCCReference Include="FireDACCommonDriver.dcp"/>
         <DCCReference Include="FireDACCommon.dcp"/>
         <DCCReference Include="dsnap.dcp"/>
+        <DCCReference Include="Jcl.dcp"/>
+        <DCCReference Include="JvCore.dcp"/>
+        <DCCReference Include="JvDB.dcp"/>
         <DCCReference Include="..\..\..\Source\uDWPoolerMethod.pas"/>
         <DCCReference Include="..\..\..\Source\uRESTDWBase.pas"/>
         <DCCReference Include="..\..\..\Source\uRESTDWMasterDetailData.pas"/>
@@ -262,7 +273,9 @@
                     <Source Name="MainSource">RestDatawareCORE.dpk</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclIntraweb_140_240.bpl">File c:\program files (x86)\embarcadero\studio\18.0\bin\dclIntraweb_140_240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\DevPkg310.bpl">(untitled)</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\ZipMasterD31_Berlin.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\ZipMasterD31_Berlin.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\DevPkgXE10.bpl">Dynamc Forms</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\bcboffice2k240.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\bcbofficexp240.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k240.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>

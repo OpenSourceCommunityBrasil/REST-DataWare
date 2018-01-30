@@ -17,7 +17,7 @@ object ServerMethodDM: TServerMethodDM
     PoolerOffMessage = 'RESTPooler not active.'
     ParamCreate = True
     Left = 52
-    Top = 103
+    Top = 111
   end
   object RESTDWDriverFD1: TRESTDWDriverFD
     CommitRecords = 100
@@ -174,8 +174,8 @@ object ServerMethodDM: TServerMethodDM
         Name = 'getemployeeDW'
         OnReplyEvent = DWServerEvents1EventsgetemployeeDWReplyEvent
       end>
-    Left = 80
-    Top = 103
+    Left = 168
+    Top = 111
   end
   object FDQuery1: TFDQuery
     Connection = Server_FDConnection

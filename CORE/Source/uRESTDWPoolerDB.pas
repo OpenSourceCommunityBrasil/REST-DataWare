@@ -20,6 +20,9 @@ uses SysUtils,  Classes,      uDWJSONObject,
      {$IFDEF FPC}
      , uDWConsts,             memds;
      {$ELSE}
+       {$IFDEF CLIENTDATASET}
+        ,  DBClient
+       {$ENDIF}
        {$IFDEF RESJEDI}
        , JvMemoryDataset
        {$ENDIF}
@@ -51,7 +54,10 @@ Type
  TOnEventTimer            = Procedure of Object;
  TBeforeGetRecords        = Procedure (Sender        : TObject;
                                        Var OwnerData : OleVariant) of Object;
-
+{$IFDEF  UP_BARBOSA1}
+ TOnInBlockEvent          = Procedure (Sender        : TObject;
+                                       Const BlockEvent : Boolean) of Object;
+{$ENDIF}
 Type
  TTimerData = Class(TThread)
  Private
@@ -225,6 +231,10 @@ Type
  Protected
   vActive,
   vInactive            : Boolean;
+{$IFDEF  UP_BARBOSA1}
+  Procedure   ProcInBlockEvents  (Const BlockEvent : Boolean);virtual;
+{$ENDIF}
+
  Private
   vRESTClientPooler    : TRESTClientPooler;
   vMassiveCache        : TDWMassiveCache;
@@ -234,6 +244,9 @@ Type
   vOnAfterOpen         : TOnAfterOpen;
   vOnAfterClose        : TOnAfterClose;
   OldData              : TMemoryStream;
+{$IFDEF  UP_BARBOSA1}
+  vOnInBlockEvent      : TOnInBlockEvent;
+{$ENDIF}
   vNewRecord,
   vBeforeOpen,
   vBeforeEdit,
@@ -274,10 +287,19 @@ Type
   vMasterDataSet       : TRESTDWClientSQL;
   vMasterDetailList    : TMasterDetailList;                 //DataSet MasterDetail Function
   vMassiveDataset      : TMassiveDataset;
+
+{$IFDEF  UP_BARBOSA1}
+  vLoading             : Boolean;                           // corrige bug  OnChangingSQL  CRISTIANO BARBOSA
+{$ENDIF}
+
   {$IFDEF FPC}
   Procedure CloneDefinitions     (Source  : TMemDataset;
                                   aSelf   : TMemDataset);   //Fields em Definições
   {$ELSE}
+  {$IFDEF CLIENTDATASET}
+  Procedure  CloneDefinitions    (Source  : TClientDataset;
+                                  aSelf   : TClientDataset); //Fields em Definições
+  {$ENDIF}
   {$IFDEF RESJEDI}
   Procedure  CloneDefinitions    (Source  : TJvMemoryData;
                                   aSelf   : TJvMemoryData); //Fields em Definições
@@ -316,6 +338,9 @@ Type
   Procedure   ProcBeforePost     (DataSet   : TDataSet); //Evento para Delta
   Procedure   ProcAfterCancel    (DataSet   : TDataSet);
   procedure   CreateMassiveDataset;
+  procedure   SetParams(const Value: TParams);
+  procedure   SetInBlockEvents(const Value: Boolean);
+
  Public
   //Métodos
   Procedure   Newtable;
@@ -357,10 +382,14 @@ Type
   Property OnGetDataError         : TOnEventConnection  Read vOnGetDataError           Write vOnGetDataError;         //Recebe os Erros de ExecSQL ou de GetData
   Property AfterScroll            : TOnAfterScroll      Read vOnAfterScroll            Write vOnAfterScroll;
   Property AfterOpen              : TOnAfterOpen        Read vOnAfterOpen              Write vOnAfterOpen;
+{$IFDEF  UP_BARBOSA1}
+  Property OnInBlockEvent         : TOnInBlockEvent     Read vOnInBlockEvent           Write vOnInBlockEvent;
+{$ENDIF}
+
   Property AfterClose             : TOnAfterClose       Read vOnAfterClose             Write vOnAfterClose;
   Property Active                 : Boolean             Read vActive                   Write SetActiveDB;             //Estado do Dataset
   Property DataCache              : Boolean             Read vDataCache                Write vDataCache;              //Diz se será salvo o último Stream do Dataset
-  Property Params                 : TParams             Read vParams                   Write vParams;                 //Parametros de Dataset
+  Property Params                 : TParams             Read vParams                   Write SetParams;                 //Parametros de Dataset
   Property DataBase               : TRESTDWDataBase     Read vRESTDataBase             Write SetDataBase;             //Database REST do Dataset
   Property SQL                    : TStringList         Read vSQL                      Write SetSQL;                  //SQL a ser Executado
   Property UpdateTableName        : String              Read vUpdateTableName          Write SetUpdateTableName;      //Tabela que será usada para Reflexão de Dados
@@ -378,7 +407,7 @@ Type
   Property AfterPost              : TDatasetEvents      Read vAfterPost                Write vAfterPost;
   Property AfterCancel            : TDatasetEvents      Read vAfterCancel              Write vAfterCancel;
   Property OnNewRecord            : TDatasetEvents      Read vNewRecord                Write vNewRecord;
-  Property InBlockEvents          : Boolean             Read vInBlockEvents            Write vInBlockEvents;
+  Property InBlockEvents          : Boolean             Read vInBlockEvents            Write SetInBlockEvents;
   Property MassiveCache           : TDWMassiveCache     Read vMassiveCache             Write vMassiveCache;
 End;
 
@@ -1081,6 +1110,8 @@ Begin
    End;
  End;
  FreeAndNil(vRESTConnectionDB);
+ if Assigned(LDataSetList) then
+   FreeAndNil(LDataSetList);
 End;
 
 Function TRESTDWDataBase.InsertMySQLReturnID(Var SQL          : TStringList;
@@ -1197,6 +1228,7 @@ Begin
    End;
  End;
  FreeAndNil(vRESTConnectionDB);
+ FreeAndNil(LDataSetList);
 End;
 
 Procedure TRESTDWDataBase.Open;
@@ -1220,6 +1252,11 @@ Begin
  vLinesDS := '';
  For I := 0 To Length(Datasets) -1 Do
   Begin
+  {$IFDEF  UP_BARBOSA1}
+   //execute exeto before open do dataset
+   TRESTDWClientSQL(Datasets[I]).ProcBeforeOpen(Datasets[I]);
+  {$ENDIF}
+
    If I = 0 Then
     vLinesDS := DatasetRequestToJSON(Datasets[I])
    Else
@@ -1314,7 +1351,7 @@ Var
  Var
   I : Integer;
  Begin
-  If Params <> Nil Then
+ If Params <> Nil Then
    For I := 0 To Params.Count -1 Do
     Begin
      If Params[I].DataType = ftUnknown then
@@ -1410,8 +1447,8 @@ Begin
      vOnEventConnection(False, E.Message);
    End;
  End;
-// If LDataSetList <> Nil Then
-//     FreeAndNil(LDataSetList);
+ If LDataSetList <> Nil Then
+     FreeAndNil(LDataSetList);
  FreeAndNil(vRESTConnectionDB);
 End;
 
@@ -1702,6 +1739,14 @@ Begin
   vRESTDataBase := Nil;
 End;
 
+procedure TRESTDWClientSQL.SetInBlockEvents(const Value: Boolean);
+begin
+{$IFDEF  UP_BARBOSA1}
+  ProcInBlockEvents(Value);
+{$ENDIF}
+  vInBlockEvents:=Value;
+end;
+
 procedure TRESTDWClientSQL.SetMasterDataSet(Value: TRESTDWClientSQL);
 Var
  MasterDetailItem : TMasterDetailItem;
@@ -1728,9 +1773,17 @@ Begin
   End;
 End;
 
+procedure TRESTDWClientSQL.SetParams(const Value: TParams);
+begin
+  vParams.Assign(Value);
+end;
+
 constructor TRESTDWClientSQL.Create(AOwner: TComponent);
 Begin
  Inherited;
+{$IFDEF  UP_BARBOSA1}
+ vLoading                          := True;
+{$ENDIF}
  vInactive                         := False;
  vInBlockEvents                    := False;
  vOnOpenCursor                     := False;
@@ -2002,6 +2055,8 @@ Begin
  For I := 0 to ParamList.Count -1 Do
   CreateParam(ParamList[I]);
  ParamList.Free;
+  if Assigned(ParamsListAtual) then
+   FreeAndNil(ParamsListAtual);
 End;
 
 procedure TRESTDWClientSQL.ProcAfterScroll(DataSet: TDataSet);
@@ -2185,6 +2240,15 @@ Begin
     End;
   End;
 End;
+
+{$IFDEF  UP_BARBOSA1}
+procedure TRESTDWClientSQL.ProcInBlockEvents(const BlockEvent: Boolean);
+begin
+  if Assigned(vOnInBlockEvent) then
+    vOnInBlockEvent(Self,BlockEvent);
+end;
+{$ENDIF}
+
 
 procedure TRESTDWClientSQL.ProcNewRecord(DataSet: TDataSet);
 begin
@@ -2522,6 +2586,10 @@ End;
 
 procedure TRESTDWClientSQL.OnChangingSQL(Sender: TObject);
 Begin
+{$IFDEF  UP_BARBOSA1}
+ if vLoading then exit;  // corrige bug.. Cristiano Barbosa
+{$ENDIF}
+
  CreateParams;
 End;
 
@@ -2540,6 +2608,9 @@ Begin
  {$IFDEF FPC}
   TMemDataset(Self).Open;
  {$ELSE}
+ {$IFDEF CLIENTDATASET}
+     TClientDataset(Self).Open;
+ {$ENDIF}
  {$IFDEF RESJEDI}
      TJvMemoryData(Self).Open;
  {$ENDIF}
@@ -2622,23 +2693,25 @@ Begin
        End;
      End;
     If vRESTDataBase.Active Then
-     Inherited OpenCursor(InfoQuery)
+    begin
+       Inherited OpenCursor(InfoQuery)
+    end
     Else If csDesigning in ComponentState Then
-     Raise Exception.Create('Database Inactive...');
+     Raise Exception.Create(Name+': '+'Database Inactive...');
    End
   Else If csDesigning in ComponentState Then
-   Raise Exception.Create('Database not found...');
+   Raise Exception.Create(Name+': '+'Database not found...');
  Except
   On E : Exception do
    Begin
     If csDesigning in ComponentState Then
-     Raise Exception.Create(PChar(E.Message))
+     Raise Exception.Create(Name+': '+PChar(E.Message))
     Else
      Begin
       If Assigned(vOnGetDataError) Then
-       vOnGetDataError(False, E.Message)
+       vOnGetDataError(False, Name+': '+E.Message)
       Else
-       Raise Exception.Create(PChar(E.Message));
+       Raise Exception.Create(PChar(Name+': '+E.Message));
      End;
    End;
  End;
@@ -2692,6 +2765,10 @@ End;
 procedure TRESTDWClientSQL.Loaded;
 Begin
  Inherited Loaded;
+ {$IFDEF  UP_BARBOSA1}
+ vLoading := False;
+{$ENDIF}
+
 End;
 
 Function TRESTDWClientSQL.MassiveCount: Integer;
@@ -2731,6 +2808,9 @@ end;
 procedure TRESTDWClientSQL.CloneDefinitions(Source: TMemDataset;
   aSelf: TMemDataset);
 {$ELSE}
+{$IFDEF CLIENTDATASET}
+Procedure TRESTDWClientSQL.CloneDefinitions(Source : TClientDataset; aSelf : TClientDataset);
+{$ENDIF}
 {$IFDEF RESJEDI}
 Procedure TRESTDWClientSQL.CloneDefinitions(Source : TJvMemoryData; aSelf : TJvMemoryData);
 {$ENDIF}
@@ -2931,6 +3011,9 @@ Begin
      {$IFDEF FPC}
       TMemDataset(Self).Open;
      {$ELSE}
+     {$IFDEF CLIENTDATASET}
+      TClientDataset(Self).Open;
+     {$ENDIF}
      {$IFDEF RESJEDI}
       TJvMemoryData(Self).Open;
      {$ENDIF}
@@ -2947,6 +3030,9 @@ Begin
      {$IFDEF FPC}
       TMemDataset(Self).Close;
      {$ELSE}
+     {$IFDEF CLIENTDATASET}
+      TClientDataset(Self).Close;
+     {$ENDIF}
      {$IFDEF RESJEDI}
       TJvMemoryData(Self).Close;
      {$ENDIF}
