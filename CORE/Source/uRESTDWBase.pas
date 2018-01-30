@@ -1618,8 +1618,8 @@ Begin
      else
      begin
        SResult := HttpRequest.Get(EventData);
-       If Assigned(FCallBack) Then
-         FCallBack(SResult, Params);
+       If Assigned(CallBack) Then
+         CallBack(SResult, Params);
      end;
     End;
    sePOST,
@@ -1690,8 +1690,8 @@ Begin
         else
         begin
           SetData(StringStream.DataString, Params, SResult);
-          If Assigned(FCallBack) Then
-             FCallBack(SResult, Params);
+          If Assigned(CallBack) Then
+             CallBack(SResult, Params);
         end
 
        Finally
@@ -1713,8 +1713,8 @@ Begin
         else
         begin
           SetData(StringStream.DataString, Params, SResult);
-          If Assigned(FCallBack) Then
-            FCallBack(SResult, Params);
+          If Assigned(CallBack) Then
+            CallBack(SResult, Params);
         end;
        Finally
         StringStream.Size := 0;
@@ -1731,8 +1731,8 @@ Begin
         else
         begin
            SResult := GetPairJSON('OK', 'DELETE COMMAND OK');
-           If Assigned(FCallBack) Then
-             FCallBack(SResult, Params);
+           If Assigned(CallBack) Then
+             CallBack(SResult, Params);
         end;
        Except
         On e:exception Do
@@ -1742,8 +1742,8 @@ Begin
            else
            Begin
               SResult := GetPairJSON('NOK', e.Message);
-              If Assigned(FCallBack) Then
-                FCallBack(SResult, Params);
+              If Assigned(CallBack) Then
+                CallBack(SResult, Params);
            End;
          End;
        End;
