@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
-	<Transactions/>
 	<Default.Personality>
-		<Projects ActiveProject="Q:\RESTDataware\trunk\CORE\Demos\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj"/>
+		<Projects ActiveProject="D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\Connectors\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj"/>
 	</Default.Personality>
 </BorlandProject>

@@ -135,7 +135,7 @@ object RestDWForm: TRestDWForm
         ParentFont = False
       end
       object Label2: TLabel
-        Left = 57
+        Left = 55
         Top = 46
         Width = 43
         Height = 13
@@ -1235,7 +1235,7 @@ object RestDWForm: TRestDWForm
         Top = 169
         Width = 213
         Height = 21
-        TabOrder = 16
+        TabOrder = 15
         Text = 'informe  a URL'
         Visible = False
       end
@@ -1254,7 +1254,7 @@ object RestDWForm: TRestDWForm
         Text = '8082'
       end
       object edUserNameDW: TEdit
-        Left = 57
+        Left = 55
         Top = 64
         Width = 100
         Height = 21
@@ -1358,7 +1358,7 @@ object RestDWForm: TRestDWForm
       end
       object cbEncode: TCheckBox
         Left = 268
-        Top = 46
+        Top = 64
         Width = 101
         Height = 19
         Caption = 'Encode Strings'
@@ -1372,28 +1372,12 @@ object RestDWForm: TRestDWForm
         State = cbChecked
         TabOrder = 12
       end
-      object CheckBox1: TCheckBox
-        Left = 268
-        Top = 68
-        Width = 91
-        Height = 19
-        Caption = 'Compression'
-        Checked = True
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ParentFont = False
-        State = cbChecked
-        TabOrder = 13
-      end
       object cbDriver: TComboBox
         Left = 7
         Top = 125
         Width = 162
         Height = 21
-        TabOrder = 14
+        TabOrder = 13
         Text = 'Selecione o SGBD'
         OnCloseUp = cbDriverCloseUp
         Items.Strings = (
@@ -1406,17 +1390,13 @@ object RestDWForm: TRestDWForm
         Width = 68
         Height = 17
         Caption = 'Usa URL'
-        TabOrder = 15
+        TabOrder = 14
         OnClick = ckUsaURLClick
       end
     end
     object tsLogs: TTabSheet
       Caption = 'Logs'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label19: TLabel
         Left = 7
         Top = 147
@@ -1453,19 +1433,19 @@ object RestDWForm: TRestDWForm
   end
   object ApplicationEvents1: TApplicationEvents
     OnIdle = ApplicationEvents1Idle
-    Left = 220
-    Top = 126
+    Left = 276
+    Top = 190
   end
   object ctiPrincipal: TTrayIcon
     Hint = 'REST Dataware - Service'
     PopupMenu = pmMenu
     OnDblClick = ctiPrincipalDblClick
-    Left = 220
-    Top = 80
+    Left = 252
+    Top = 288
   end
   object pmMenu: TPopupMenu
-    Left = 192
-    Top = 80
+    Left = 224
+    Top = 192
     object RestaurarAplicao1: TMenuItem
       Caption = 'Restaurar Aplica'#231#227'o'
       OnClick = RestaurarAplicao1Click
@@ -1480,7 +1460,6 @@ object RestDWForm: TRestDWForm
   end
   object RESTServicePooler1: TRESTServicePooler
     Active = False
-    DataCompression = True
     EncodeStrings = True
     ServicePort = 8082
     ProxyOptions.Port = 8888
@@ -1501,7 +1480,7 @@ object RestDWForm: TRestDWForm
   object tupdatelogs: TTimer
     Enabled = False
     OnTimer = tupdatelogsTimer
-    Left = 324
-    Top = 120
+    Left = 332
+    Top = 264
   end
 end

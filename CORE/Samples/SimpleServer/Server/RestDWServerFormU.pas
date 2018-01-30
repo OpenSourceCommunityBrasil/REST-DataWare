@@ -49,7 +49,7 @@ Uses
   IdBaseComponent,
   IdTCPConnection,
   IdTCPClient,
-  IdHTTP;
+  IdHTTP, uDWJSONObject;
 
 type
   TRestDWForm = class(TForm)
@@ -106,7 +106,6 @@ type
     Label18: TLabel;
     CbEncode: TCheckBox;
     RESTServicePooler1: TRESTServicePooler;
-    CheckBox1: TCheckBox;
     Tupdatelogs: TTimer;
     CbDriver: TComboBox;
     Label20: TLabel;
@@ -129,7 +128,13 @@ type
     procedure CkUsaURLClick(Sender: TObject);
   Private
     { Private declarations }
-    VLastRequest, VLastRequestB, VDatabaseName, FCfgName, VDatabaseIP, VUsername, VPassword: string;
+    VLastRequest,
+    VLastRequestB,
+    VDatabaseName,
+    FCfgName,
+    VDatabaseIP,
+    VUsername,
+    VPassword    : string;
     procedure StartServer;
     Function GetHandleOnTaskBar: THandle;
     procedure ChangeStatusWindow;
@@ -464,7 +469,6 @@ Begin
     RESTServicePooler1.SSLCertFile           := ECertFile.Text;
     RESTServicePooler1.EncodeStrings         := CbEncode.Checked;
     RESTServicePooler1.Active                := True;
-    RESTServicePooler1.DataCompression       := CheckBox1.Checked;
     If Not RESTServicePooler1.Active Then
       Exit;
     PageControl1.ActivePage := TsLogs;

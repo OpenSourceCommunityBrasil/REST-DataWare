@@ -74,7 +74,6 @@ implementation
 
 Uses uDWJSONTools;
 
-
 Procedure Register;
 Begin
  RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWDriverZeos]);

@@ -66,14 +66,11 @@ TYPE
       var Params: TDWParams; var Result: string);
     procedure DWServerEvents1EventsgetemployeeReplyEvent(var Params: TDWParams;
       var Result: string);
-    procedure DWServerEvents1EventsgetemployeeDWReplyEvent(
-      var Params: TDWParams; var Result: string);
   PRIVATE
     { Private declarations }
-   vIDVenda : Integer;
-   Function ConsultaBanco(Var Params : TDWParams) : String; OVERLOAD;
-   Function GetGenID     (GenName    : String)    : Integer;
-   Function GetEmployee  (JsonMode   : TJsonMode) : String;
+    vIDVenda : Integer;
+    FUNCTION ConsultaBanco(VAR Params: TDWParams): STRING; OVERLOAD;
+    function GetGenID(GenName: String): Integer;
   PUBLIC
     { Public declarations }
   END;
@@ -118,10 +115,11 @@ BEGIN
   END;
 END;
 
-Function TServerMethodDM.GetEmployee(JsonMode : TJsonMode) : String;
+procedure TServerMethodDM.DWServerEvents1EventsgetemployeeReplyEvent(
+  var Params: TDWParams; var Result: string);
 Var
  JSONValue: TJSONValue;
-Begin
+begin
  JSONValue          := TJSONValue.Create;
  Try
   FDQuery1.Close;
@@ -130,28 +128,15 @@ Begin
   Try
    FDQuery1.Open;
    JSONValue.Encoding := GetEncoding(Encoding);
-   JSONValue.LoadFromDataset('employee', FDQuery1, False,  JsonMode, '');
-   Result := JSONValue.ToJSON;
+   JSONValue.LoadFromDataset('employee', FDQuery1, False,  Params.JsonMode, '');
+   Params.ItemsString['result'].AsString := JSONValue.ToJSON;
+   Params.ItemsString['segundoparam'].AsString := 'teste de array';
   Except
 
   End;
  Finally
   JSONValue.Free;
  End;
-End;
-
-procedure TServerMethodDM.DWServerEvents1EventsgetemployeeDWReplyEvent(
-  var Params: TDWParams; var Result: string);
-begin
- Params.ItemsString['result'].AsString       := GetEmployee(Params.JsonMode);
- Params.ItemsString['segundoparam'].AsString := 'teste de array';
-end;
-
-procedure TServerMethodDM.DWServerEvents1EventsgetemployeeReplyEvent(
-  var Params: TDWParams; var Result: string);
-begin
- Params.ItemsString['result'].AsString       := GetEmployee(Params.JsonMode);
- Params.ItemsString['segundoparam'].AsString := 'teste de array';
 end;
 
 procedure TServerMethodDM.DWServerEvents1EventsloaddataseteventReplyEvent(

@@ -9,6 +9,12 @@
         <Projects Include="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\..\Source\Connectors\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Source\Connectors\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="..\..\..\Samples\FileTransfer\Client\FileClient.dproj">
             <Dependencies/>
         </Projects>
@@ -45,6 +51,24 @@
         <Projects Include="..\..\..\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\..\Samples\ClientSlides\ClientSlides.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\SimpleServer\ServerOSX\Server_OSX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\SimpleCRUD\SimpleCRUD.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\ArrayDatasetProcess\ArrayDatasetProcess.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Samples\WindowsService\WindowsDWService.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -70,6 +94,24 @@
     </Target>
     <Target Name="RESTDWDriverFD:Make">
         <MSBuild Projects="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDriverUNIDAC">
+        <MSBuild Projects="..\..\..\Source\Connectors\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj"/>
+    </Target>
+    <Target Name="RESTDWDriverUNIDAC:Clean">
+        <MSBuild Projects="..\..\..\Source\Connectors\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDriverUNIDAC:Make">
+        <MSBuild Projects="..\..\..\Source\Connectors\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDriverZEOS">
+        <MSBuild Projects="..\..\..\Source\Connectors\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj"/>
+    </Target>
+    <Target Name="RESTDWDriverZEOS:Clean">
+        <MSBuild Projects="..\..\..\Source\Connectors\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDriverZEOS:Make">
+        <MSBuild Projects="..\..\..\Source\Connectors\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj" Targets="Make"/>
     </Target>
     <Target Name="FileClient">
         <MSBuild Projects="..\..\..\Samples\FileTransfer\Client\FileClient.dproj"/>
@@ -179,14 +221,68 @@
     <Target Name="ClienteFMX:Make">
         <MSBuild Projects="..\..\..\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj" Targets="Make"/>
     </Target>
+    <Target Name="ClientSlides">
+        <MSBuild Projects="..\..\..\Samples\ClientSlides\ClientSlides.dproj"/>
+    </Target>
+    <Target Name="ClientSlides:Clean">
+        <MSBuild Projects="..\..\..\Samples\ClientSlides\ClientSlides.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ClientSlides:Make">
+        <MSBuild Projects="..\..\..\Samples\ClientSlides\ClientSlides.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Server_OSX">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\ServerOSX\Server_OSX.dproj"/>
+    </Target>
+    <Target Name="Server_OSX:Clean">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\ServerOSX\Server_OSX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Server_OSX:Make">
+        <MSBuild Projects="..\..\..\Samples\SimpleServer\ServerOSX\Server_OSX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SimpleCRUD">
+        <MSBuild Projects="..\..\..\Samples\SimpleCRUD\SimpleCRUD.dproj"/>
+    </Target>
+    <Target Name="SimpleCRUD:Clean">
+        <MSBuild Projects="..\..\..\Samples\SimpleCRUD\SimpleCRUD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SimpleCRUD:Make">
+        <MSBuild Projects="..\..\..\Samples\SimpleCRUD\SimpleCRUD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ArrayDatasetProcess">
+        <MSBuild Projects="..\..\..\Samples\ArrayDatasetProcess\ArrayDatasetProcess.dproj"/>
+    </Target>
+    <Target Name="ArrayDatasetProcess:Clean">
+        <MSBuild Projects="..\..\..\Samples\ArrayDatasetProcess\ArrayDatasetProcess.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ArrayDatasetProcess:Make">
+        <MSBuild Projects="..\..\..\Samples\ArrayDatasetProcess\ArrayDatasetProcess.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="exemplounigui">
+        <MSBuild Projects="..\..\..\Samples\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj"/>
+    </Target>
+    <Target Name="exemplounigui:Clean">
+        <MSBuild Projects="..\..\..\Samples\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="exemplounigui:Make">
+        <MSBuild Projects="..\..\..\Samples\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WindowsDWService">
+        <MSBuild Projects="..\..\..\Samples\WindowsService\WindowsDWService.dproj"/>
+    </Target>
+    <Target Name="WindowsDWService:Clean">
+        <MSBuild Projects="..\..\..\Samples\WindowsService\WindowsDWService.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WindowsDWService:Make">
+        <MSBuild Projects="..\..\..\Samples\WindowsService\WindowsDWService.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClienteFMX"/>
+        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;RESTDWDriverUNIDAC;RESTDWDriverZEOS;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClienteFMX;ClientSlides;Server_OSX;SimpleCRUD;ArrayDatasetProcess;exemplounigui;WindowsDWService"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClienteFMX:Clean"/>
+        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;RESTDWDriverUNIDAC:Clean;RESTDWDriverZEOS:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClienteFMX:Clean;ClientSlides:Clean;Server_OSX:Clean;SimpleCRUD:Clean;ArrayDatasetProcess:Clean;exemplounigui:Clean;WindowsDWService:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClienteFMX:Make"/>
+        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;RESTDWDriverUNIDAC:Make;RESTDWDriverZEOS:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClienteFMX:Make;ClientSlides:Make;Server_OSX:Make;SimpleCRUD:Make;ArrayDatasetProcess:Make;exemplounigui:Make;WindowsDWService:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

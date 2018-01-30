@@ -1,18 +1,10 @@
 [Stats]
-EditorSecs=2020
-DesignerSecs=81
-InspectorSecs=38
-<<<<<<< .mine
-CompileSecs=407315
-OtherSecs=1761
-||||||| .r1082
-CompileSecs=369038
-OtherSecs=1433
-=======
-CompileSecs=373295
-OtherSecs=1443
->>>>>>> .r1101
-StartTime=14/11/2017 22:26:17
+EditorSecs=277
+DesignerSecs=1
+InspectorSecs=1
+CompileSecs=40904
+OtherSecs=286
+StartTime=30/01/2018 16:16:38
 RealKeys=0
 EffectiveKeys=0
-DebugSecs=3
+DebugSecs=1

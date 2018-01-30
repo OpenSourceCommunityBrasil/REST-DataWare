@@ -107,6 +107,10 @@ object RestDWForm: TRestDWForm
     TabOrder = 3
     object tsConfigs: TTabSheet
       Caption = 'Configuration'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label1: TLabel
         Left = 7
         Top = 37
@@ -1223,8 +1227,8 @@ object RestDWForm: TRestDWForm
         Text = 'testserver'
       end
       object cbAdaptadores: TComboBox
-        Left = 10
-        Top = 136
+        Left = 8
+        Top = 137
         Width = 212
         Height = 21
         TabOrder = 3
@@ -1384,20 +1388,13 @@ object RestDWForm: TRestDWForm
   end
   object RESTServicePooler1: TRESTServicePooler
     Active = False
-    EncodeStrings = True
     ServicePort = 8082
     ProxyOptions.Port = 8888
-    ServerParams.HasAuthentication = True
-    ServerParams.UserName = 'testserver'
-    ServerParams.Password = 'testserver'
-    SSLMethod = sslvSSLv2
-    SSLVersions = []
+    SSLVersion = sslvSSLv2
     OnLastRequest = RESTServicePooler1LastRequest
     OnLastResponse = RESTServicePooler1LastResponse
     Encoding = esASCII
     ServerContext = 'restdataware'
-    SSLVerifyMode = []
-    SSLVerifyDepth = 0
     Left = 192
     Top = 128
   end

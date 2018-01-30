@@ -2,7 +2,7 @@ object Form2: TForm2
   Left = 426
   Top = 153
   Caption = 'RESTClientPooler Test'
-  ClientHeight = 437
+  ClientHeight = 449
   ClientWidth = 705
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,7 +15,7 @@ object Form2: TForm2
   OnCreate = FormCreate
   DesignSize = (
     705
-    437)
+    449)
   PixelsPerInch = 96
   TextHeight = 13
   object Label4: TLabel
@@ -1052,7 +1052,7 @@ object Form2: TForm2
     TabOrder = 5
   end
   object Button1: TButton
-    Left = 366
+    Left = 368
     Top = 143
     Width = 104
     Height = 24
@@ -1109,7 +1109,7 @@ object Form2: TForm2
     Top = 144
     Width = 104
     Height = 24
-    Caption = 'Open Runtime'
+    Caption = 'Get Employee'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -1121,7 +1121,7 @@ object Form2: TForm2
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 418
+    Top = 430
     Width = 705
     Height = 19
     Panels = <
@@ -1178,74 +1178,28 @@ object Form2: TForm2
     TabOrder = 15
     OnClick = Button5Click
   end
+  object Button6: TButton
+    Left = 593
+    Top = 144
+    Width = 104
+    Height = 24
+    Caption = 'Server Time'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 16
+    OnClick = Button6Click
+  end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1
-    Left = 240
-    Top = 128
+    Left = 263
+    Top = 64
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    FieldDefs = <
-      item
-        Name = 'EMP_NO'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'FIRST_NAME'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 15
-      end
-      item
-        Name = 'LAST_NAME'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 20
-      end
-      item
-        Name = 'PHONE_EXT'
-        DataType = ftString
-        Size = 4
-      end
-      item
-        Name = 'HIRE_DATE'
-        Attributes = [faRequired]
-        DataType = ftDateTime
-      end
-      item
-        Name = 'DEPT_NO'
-        Attributes = [faRequired, faFixed]
-        DataType = ftFixedChar
-        Size = 3
-      end
-      item
-        Name = 'JOB_CODE'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 5
-      end
-      item
-        Name = 'JOB_GRADE'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'JOB_COUNTRY'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 15
-      end
-      item
-        Name = 'SALARY'
-        Attributes = [faRequired]
-        DataType = ftBCD
-        Size = 2
-      end
-      item
-        Name = 'FULL_NAME'
-        DataType = ftString
-        Size = 37
-      end>
+    FieldDefs = <>
     IndexDefs = <>
     MasterFields = ''
     FetchOptions.AssignedValues = [evMode]
@@ -1258,6 +1212,7 @@ object Form2: TForm2
     StoreDefs = True
     MasterCascadeDelete = False
     Inactive = False
+    Datapacks = -1
     OnGetDataError = RESTDWClientSQL1GetDataError
     DataCache = True
     Params = <>
@@ -1269,8 +1224,8 @@ object Form2: TForm2
     AutoCommitData = False
     AutoRefreshAfterCommit = True
     InBlockEvents = False
-    Left = 304
-    Top = 96
+    Left = 235
+    Top = 64
     object RESTDWClientSQL1EMP_NO: TSmallintField
       FieldName = 'EMP_NO'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
@@ -1289,14 +1244,13 @@ object Form2: TForm2
       FieldName = 'PHONE_EXT'
       Size = 4
     end
-    object RESTDWClientSQL1HIRE_DATE: TDateTimeField
+    object RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField
       FieldName = 'HIRE_DATE'
       Required = True
     end
     object RESTDWClientSQL1DEPT_NO: TStringField
       FieldName = 'DEPT_NO'
       Required = True
-      FixedChar = True
       Size = 3
     end
     object RESTDWClientSQL1JOB_CODE: TStringField
@@ -1313,10 +1267,9 @@ object Form2: TForm2
       Required = True
       Size = 15
     end
-    object RESTDWClientSQL1SALARY: TBCDField
+    object RESTDWClientSQL1SALARY: TFloatField
       FieldName = 'SALARY'
       Required = True
-      Size = 2
     end
     object RESTDWClientSQL1FULL_NAME: TStringField
       FieldName = 'FULL_NAME'
@@ -1344,13 +1297,109 @@ object Form2: TForm2
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    DecimalSeparator = ','
     OnWork = RESTDWDataBase1Work
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd
     OnStatus = RESTDWDataBase1Status
     ParamCreate = True
-    Left = 240
-    Top = 8
+    Left = 208
+    Top = 64
+  end
+  object DWClientEvents1: TDWClientEvents
+    RESTClientPooler = RESTClientPooler1
+    Events = <
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovDateTime
+            ParamName = 'result'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'inputdata'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odINOUT
+            ObjectValue = ovString
+            ParamName = 'resultstring'
+            Encoded = False
+          end>
+        JsonMode = jmDataware
+        Name = 'servertime'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'teste'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'sql'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'loaddatasetevent'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = False
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'segundoparam'
+            Encoded = False
+          end>
+        JsonMode = jmDataware
+        Name = 'getemployee'
+      end>
+    Left = 237
+    Top = 21
+  end
+  object RESTClientPooler1: TRESTClientPooler
+    DataCompression = True
+    Encoding = esASCII
+    Host = 'localhost'
+    UserName = 'testserver'
+    Password = 'testserver'
+    ProxyOptions.BasicAuthentication = False
+    ProxyOptions.ProxyPort = 0
+    RequestTimeOut = 10000
+    ThreadRequest = False
+    AllowCookies = False
+    HandleRedirects = False
+    Left = 209
+    Top = 21
   end
 end

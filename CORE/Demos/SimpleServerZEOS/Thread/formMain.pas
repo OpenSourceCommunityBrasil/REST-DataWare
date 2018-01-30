@@ -273,13 +273,10 @@ Var
  s, lResponse : String;
  JSonValue    : TJSonValue;
  I            : Integer;
-
- DWParams  : TDWParams;
-
 begin
  Try
   Try
-   lResponse := RESTClientPooler1.SendEvent('GetListaAlunos/' + Value, DWParams ,sePOST{$IFDEF INTHREAD},CallBackListAlunos {$ENDIF});
+   lResponse := RESTClientPooler1.SendEvent('GetListaAlunos/' + Value{$IFDEF INTHREAD},CallBackListAlunos {$ENDIF});
   Except
    Exit;
   End;

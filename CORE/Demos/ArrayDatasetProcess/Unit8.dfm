@@ -1140,9 +1140,18 @@ object fPrincipal: TfPrincipal
         DataType = ftString
         Size = 100
       end>
+    IndexDefs = <>
+    MasterFields = ''
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    StoreDefs = True
     MasterCascadeDelete = False
     Inactive = False
-    Datapacks = -1
     DataCache = True
     Params = <>
     DataBase = RESTDWDataBase1
@@ -1178,9 +1187,18 @@ object fPrincipal: TfPrincipal
   end
   object rdwSQLEmployee: TRESTDWClientSQL
     FieldDefs = <>
+    IndexDefs = <>
+    MasterFields = ''
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    StoreDefs = True
     MasterCascadeDelete = False
     Inactive = False
-    Datapacks = -1
     DataCache = True
     Params = <>
     DataBase = RESTDWDataBase1

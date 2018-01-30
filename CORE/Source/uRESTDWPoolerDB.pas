@@ -1252,11 +1252,7 @@ Begin
  vLinesDS := '';
  For I := 0 To Length(Datasets) -1 Do
   Begin
-  {$IFDEF  UP_BARBOSA1}
-   //execute exeto before open do dataset
    TRESTDWClientSQL(Datasets[I]).ProcBeforeOpen(Datasets[I]);
-  {$ENDIF}
-
    If I = 0 Then
     vLinesDS := DatasetRequestToJSON(Datasets[I])
    Else
@@ -1385,7 +1381,6 @@ Begin
   vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
  {$ENDIF}
  Try
-
   If Params.Count > 0 Then
    Begin
     DWParams     := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vEncondig{$IFEND}{$ENDIF});
@@ -1411,14 +1406,12 @@ Begin
        (Not (Error))                       Then
      Begin
       Try
-//       {$IFDEF  ANDROID}
-//       Result.Free;
-//       Result:= LDataSetList;
-//       {$ELSE}
-//       Result.LoadFromJSON(LDataSetList.ToJSON);
-//       {$ENDIF} //retirei isso daqui porque era trabalho duplicado o LDatasetList ja é um JsonValue
-          FreeAndNil(result);
-          Result:= LDataSetList;
+       {$IFDEF  ANDROID}
+       Result.Free;
+       Result:= LDataSetList;
+       {$ELSE}
+       Result.LoadFromJSON(LDataSetList.ToJSON); //Esse código server para criar o Objeto, nao pode ser removido
+       {$ENDIF}
       Finally
       End;
      End;
@@ -1448,7 +1441,7 @@ Begin
    End;
  End;
  If LDataSetList <> Nil Then
-     FreeAndNil(LDataSetList);
+  FreeAndNil(LDataSetList);
  FreeAndNil(vRESTConnectionDB);
 End;
 
@@ -2638,6 +2631,7 @@ Begin
  vActive := False;
  Inherited Close;
 End;
+
 procedure TRESTDWClientSQL.Open;
 Begin
  Try
@@ -2655,9 +2649,6 @@ Begin
  Finally
   vInBlockEvents := False;
  End;
-
-
-
 End;
 
 procedure TRESTDWClientSQL.Open(SQL: String);
@@ -2934,7 +2925,6 @@ Var
  vError        : Boolean;
  vMessageError : String;
 Begin
-
  Result := False;
  LDataSetList := nil;
  Self.Close;
@@ -2942,8 +2932,6 @@ Begin
  If Assigned(vRESTDataBase) Then
   Begin
    Try
-
-
     If DataSet = Nil Then
      vRESTDataBase.ExecuteCommand(vSQL, vParams, vError, vMessageError, LDataSetList, False, vRESTClientPooler)
     Else
@@ -2951,15 +2939,12 @@ Begin
       vError := False;
       LDataSetList := DataSet;
      End;
-
     If (Assigned(LDataSetList)) And (Not (vError)) Then
      Begin
       Try
-
        LDataSetList.Encoded := vRESTDataBase.EncodeStrings;
        LDataSetList.WriteToDataset(dtFull, LDataSetList.ToJSON, Self);
        Result := True;
-
       Except
       End;
      End;
@@ -2984,10 +2969,6 @@ Begin
  Else If csDesigning in ComponentState Then
   Raise Exception.Create(PChar('Empty Database Property'));
  vActiveCursor := False;
-
-
-
-
 End;
 
 procedure TRESTDWClientSQL.SaveToStream(Var Stream: TMemoryStream);

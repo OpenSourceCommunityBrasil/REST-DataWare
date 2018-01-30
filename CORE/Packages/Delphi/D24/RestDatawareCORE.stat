@@ -1,24 +1,24 @@
 [Stats]
 <<<<<<< .mine
-EditorSecs=12111
-||||||| .r1080
-EditorSecs=12050
+EditorSecs=8053
+||||||| .r863
+EditorSecs=8268
 =======
-EditorSecs=12148
->>>>>>> .r1082
-DesignerSecs=146
-InspectorSecs=71
+EditorSecs=8274
+>>>>>>> .r882
+DesignerSecs=16
+InspectorSecs=30
 <<<<<<< .mine
-CompileSecs=937999
-OtherSecs=2885
-||||||| .r1080
-CompileSecs=931593
-OtherSecs=2746
+CompileSecs=290843
+OtherSecs=1209
+||||||| .r863
+CompileSecs=276158
+OtherSecs=1076
 =======
-CompileSecs=935803
-OtherSecs=2803
->>>>>>> .r1082
-StartTime=23/11/2017 11:54:32
+CompileSecs=277672
+OtherSecs=1105
+>>>>>>> .r882
+StartTime=19/10/2017 16:25:34
 RealKeys=0
 EffectiveKeys=0
 DebugSecs=7

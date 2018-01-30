@@ -17,7 +17,7 @@ object ServerMethodDM: TServerMethodDM
     PoolerOffMessage = 'RESTPooler not active.'
     ParamCreate = True
     Left = 52
-    Top = 111
+    Top = 103
   end
   object RESTDWDriverFD1: TRESTDWDriverFD
     CommitRecords = 100
@@ -153,29 +153,9 @@ object ServerMethodDM: TServerMethodDM
         JsonMode = jmPureJSON
         Name = 'getemployee'
         OnReplyEvent = DWServerEvents1EventsgetemployeeReplyEvent
-      end
-      item
-        DWParams = <
-          item
-            TypeObject = toParam
-            ObjectDirection = odOUT
-            ObjectValue = ovString
-            ParamName = 'result'
-            Encoded = False
-          end
-          item
-            TypeObject = toParam
-            ObjectDirection = odOUT
-            ObjectValue = ovString
-            ParamName = 'segundoparam'
-            Encoded = False
-          end>
-        JsonMode = jmDataware
-        Name = 'getemployeeDW'
-        OnReplyEvent = DWServerEvents1EventsgetemployeeDWReplyEvent
       end>
-    Left = 168
-    Top = 111
+    Left = 80
+    Top = 103
   end
   object FDQuery1: TFDQuery
     Connection = Server_FDConnection

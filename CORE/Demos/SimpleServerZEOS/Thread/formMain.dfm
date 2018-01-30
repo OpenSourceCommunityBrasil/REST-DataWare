@@ -1224,8 +1224,6 @@ object Form2: TForm2
     ProxyOptions.ProxyPort = 0
     RequestTimeOut = 10000
     ThreadRequest = False
-    AllowCookies = False
-    HandleRedirects = False
     Left = 285
     Top = 145
   end

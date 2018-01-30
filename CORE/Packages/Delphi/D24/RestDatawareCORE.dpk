@@ -1,6 +1,7 @@
 package RestDatawareCORE;
 
 {$R *.res}
+{$R *.otares}
 {$R *.dres}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
@@ -39,10 +40,7 @@ requires
   FireDAC,
   FireDACCommonDriver,
   FireDACCommon,
-  dsnap,
-  Jcl,
-  JvCore,
-  JvDB;
+  dsnap;
 
 contains
   uDWPoolerMethod in '..\..\..\Source\uDWPoolerMethod.pas',
@@ -60,8 +58,6 @@ contains
   uzliblaz in '..\..\..\Source\libs\uzliblaz.pas',
   uDWJSON in '..\..\..\Source\libs\JSON\uDWJSON.pas',
   uDWMassiveBuffer in '..\..\..\Source\libs\uDWMassiveBuffer.pas',
-  StringBuilderUnit in '..\..\..\Source\libs\StringBuilderUnit.pas',
-  uRESTDWServerEvents in '..\..\..\Source\uRESTDWServerEvents.pas';
+  StringBuilderUnit in '..\..\..\Source\libs\StringBuilderUnit.pas';
 
 end.
-

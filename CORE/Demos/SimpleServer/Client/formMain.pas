@@ -29,7 +29,7 @@ USES
   IdComponent, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, uDWConstsData, System.Actions,
-  Vcl.ActnList, uRESTDWServerEvents, JvMemoryDataset;
+  Vcl.ActnList, uRESTDWServerEvents;
 
 TYPE
 
@@ -41,6 +41,7 @@ TYPE
     Label4: TLabel;
     Label5: TLabel;
     DataSource1: TDataSource;
+    Image1: TImage;
     Bevel1: TBevel;
     Label7: TLabel;
     EdPasswordDW: TEdit;
@@ -139,7 +140,7 @@ BEGIN
     END;
   END;
   FIM := Now;
-  Memo1.Lines.add(IntToStr(RESTDWClientSQL1.Recordcount) + ' registro(s) recebido(s) em ' + IntToStr(SecondsBetween(FIM, INICIO)) + ' segundos.');
+  Showmessage(IntToStr(RESTDWClientSQL1.Recordcount) + ' registro(s) recebido(s) em ' + IntToStr(SecondsBetween(FIM, INICIO)) + ' segundos.');
 //  RESTDWClientSQL1.Active := False;
 END;
 
@@ -194,7 +195,6 @@ procedure TForm2.Button4Click(Sender: TObject);
 Var
  vError : String;
 begin
-RESTDWClientSQL1.Edit
  If Not RESTDWClientSQL1.ApplyUpdates(vError) Then
   MessageDlg(vError, TMsgDlgType.mtError, [TMsgDlgBtn.mbOK], 0);
 end;
@@ -314,16 +314,14 @@ END;
 
 PROCEDURE TForm2.RESTDWDataBase1Work(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
 BEGIN
-exit;
   IF FBytesToTransfer = 0 THEN // No Update File
     Exit;
   ProgressBar1.Position := AWorkCount;
- ProgressBar1.Update;
+  ProgressBar1.Update;
 END;
 
 PROCEDURE TForm2.RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
 BEGIN
-exit;
   FBytesToTransfer      := AWorkCountMax;
   ProgressBar1.Max      := FBytesToTransfer;
   ProgressBar1.Position := 0;
@@ -332,7 +330,6 @@ END;
 
 PROCEDURE TForm2.RESTDWDataBase1WorkEnd(ASender: TObject; AWorkMode: TWorkMode);
 BEGIN
-exit;
   ProgressBar1.Position := FBytesToTransfer;
   Application.ProcessMessages;
 

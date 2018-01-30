@@ -1,12 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899/12/30 00:00:00.000.149,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServerZEOS\Server\RestDWServerProject.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj</Transaction>
-    <Transaction>2018/01/29 19:57:56.000.440,Q:\RESTDataware\trunk\CORE\Demos\ExemploRaudusZeos\RestDWServerFormU.dfm=Q:\RESTDataware\trunk\CORE\Demos\SimpleServerZEOS\Server\RestDWServerFormU.dfm</Transaction>
-    <Transaction>2018/01/29 19:57:56.000.440,Q:\RESTDataware\trunk\CORE\Demos\ExemploRaudusZeos\RestDWServerFormU.pas=Q:\RESTDataware\trunk\CORE\Demos\SimpleServerZEOS\Server\RestDWServerFormU.pas</Transaction>
-    <Transaction>2018/01/29 20:47:30.000.548,=Q:\RESTDataware\trunk\CORE\Demos\SimpleServerZEOS\Server\Unit4.pas</Transaction>
-    <Transaction>2018/01/29 20:49:58.000.103,=Q:\RESTDataware\trunk\CORE\Demos\SimpleServerZEOS\Server\udm.pas</Transaction>
-    <Transaction>2018/01/29 21:09:23.000.366,Q:\RESTDataware\trunk\CORE\Demos\SimpleServerZEOS\Server\udm.pas=Q:\RESTDataware\trunk\CORE\Demos\SimpleServerZEOS\Server\uDataModule3.pas</Transaction>
-    <Transaction>2018/01/29 21:09:23.000.366,Q:\RESTDataware\trunk\CORE\Demos\SimpleServerZEOS\Server\udm.dfm=Q:\RESTDataware\trunk\CORE\Demos\SimpleServerZEOS\Server\uDataModule3.dfm</Transaction>
+    <Transaction>1899/12/30 00:00:00.000.149,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\SimpleServerZEOS\Server\RestDWServerProject.dproj</Transaction>
   </Transactions>
 </BorlandProject>

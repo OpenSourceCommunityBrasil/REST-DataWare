@@ -28,7 +28,8 @@ USES
   System.UITypes,
   IdComponent, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client, uDWConstsData;
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, uDWConstsData, System.Actions,
+  Vcl.ActnList, uRESTDWServerEvents;
 
 TYPE
 
@@ -65,16 +66,19 @@ TYPE
     Button4: TButton;
     chkhttps: TCheckBox;
     Button5: TButton;
+    DWClientEvents1: TDWClientEvents;
+    RESTClientPooler1: TRESTClientPooler;
+    Button6: TButton;
     RESTDWClientSQL1EMP_NO: TSmallintField;
     RESTDWClientSQL1FIRST_NAME: TStringField;
     RESTDWClientSQL1LAST_NAME: TStringField;
     RESTDWClientSQL1PHONE_EXT: TStringField;
-    RESTDWClientSQL1HIRE_DATE: TDateTimeField;
+    RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField;
     RESTDWClientSQL1DEPT_NO: TStringField;
     RESTDWClientSQL1JOB_CODE: TStringField;
     RESTDWClientSQL1JOB_GRADE: TSmallintField;
     RESTDWClientSQL1JOB_COUNTRY: TStringField;
-    RESTDWClientSQL1SALARY: TBCDField;
+    RESTDWClientSQL1SALARY: TFloatField;
     RESTDWClientSQL1FULL_NAME: TStringField;
     PROCEDURE Button1Click(Sender: TObject);
     PROCEDURE Button2Click(Sender: TObject);
@@ -82,13 +86,14 @@ TYPE
     PROCEDURE RESTDWDataBase1Work(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
     PROCEDURE RESTDWDataBase1WorkEnd(ASender: TObject; AWorkMode: TWorkMode);
     PROCEDURE RESTDWClientSQL1GetDataError(Sucess: Boolean; CONST Error: STRING);
-    PROCEDURE Button3Click(Sender: TObject);
     PROCEDURE RESTDWDataBase1Status(ASender: TObject; CONST AStatus: TIdStatus; CONST AStatusText: STRING);
     PROCEDURE FormCreate(Sender: TObject);
     PROCEDURE RESTDWDataBase1Connection(Sucess: Boolean; CONST Error: STRING);
     PROCEDURE RESTDWDataBase1BeforeConnect(Sender: TComponent);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   PRIVATE
     { Private declarations }
     FBytesToTransfer: Int64;
@@ -162,45 +167,28 @@ BEGIN
     Application.MessageBox('Comando executado com sucesso...', 'Informação !!!', Mb_iconinformation + Mb_ok);
 END;
 
-PROCEDURE TForm2.Button3Click(Sender: TObject);
-VAR
-  Cliente: TRESTDWClientSQL;
-  INICIO: TdateTime;
-  FIM: TdateTime;
-BEGIN
-  RESTDWDataBase1.Close;
-  RESTDWDataBase1.PoolerService := EHost.Text;
-  RESTDWDataBase1.PoolerPort    := StrToInt(EPort.Text);
-  RESTDWDataBase1.Login         := EdUserNameDW.Text;
-  RESTDWDataBase1.Password      := EdPasswordDW.Text;
-  RESTDWDataBase1.Compression   := CheckBox1.Checked;
-  if chkhttps.Checked then
-     RESTDWDataBase1.TypeRequest:=TTyperequest.trHttps
-  else
-     RESTDWDataBase1.TypeRequest:=TTyperequest.trHttp;
-  RESTDWDataBase1.Open;
-
-  INICIO              := Now;
-  Cliente             := TRESTDWClientSQL.Create(NIL);
-  DataSource1.DataSet := Cliente;
-  WITH Cliente DO
-  BEGIN
-    DataBase := RESTDWDataBase1;
-    SQL.Add(MComando.Text);
-    TRY
-      Open;
-    EXCEPT
-      ON E: Exception DO
-      BEGIN
-        RAISE Exception.Create('Erro ao executar a consulta: ' + sLineBreak + E.Message);
-      END;
-    END;
-    FIM := Now;
-    Showmessage(IntToStr(Recordcount) + ' registro(s) recebido(s) em ' + IntToStr(SecondsBetween(FIM, INICIO)) + ' segundos.');
-    Close;
-  END;
-  FreeAndNil(Cliente);
-END;
+procedure TForm2.Button3Click(Sender: TObject);
+Var
+ dwParams      : TDWParams;
+ vErrorMessage,
+ vNativeResult : String;
+begin
+ RESTClientPooler1.Host            := EHost.Text;
+ RESTClientPooler1.Port            := StrToInt(EPort.Text);
+ RESTClientPooler1.UserName        := EdUserNameDW.Text;
+ RESTClientPooler1.Password        := EdPasswordDW.Text;
+ RESTClientPooler1.DataCompression := CheckBox1.Checked;
+ If chkhttps.Checked then
+  RESTClientPooler1.TypeRequest := TTyperequest.trHttps
+ Else
+  RESTClientPooler1.TypeRequest := TTyperequest.trHttp;
+ DWClientEvents1.CreateDWParams('getemployee', dwParams);
+ DWClientEvents1.SendEvent('getemployee', dwParams, vErrorMessage, vNativeResult);
+ If vErrorMessage = '' Then
+  Showmessage(vNativeResult)
+ Else
+  Showmessage(vErrorMessage);
+end;
 
 procedure TForm2.Button4Click(Sender: TObject);
 Var
@@ -214,6 +202,29 @@ procedure TForm2.Button5Click(Sender: TObject);
 begin
  If RESTDWClientSQL1.MassiveCount > 0 Then
   Showmessage(RESTDWClientSQL1.MassiveToJSON);
+end;
+
+procedure TForm2.Button6Click(Sender: TObject);
+Var
+ dwParams      : TDWParams;
+ vErrorMessage : String;
+begin
+ RESTClientPooler1.Host            := EHost.Text;
+ RESTClientPooler1.Port            := StrToInt(EPort.Text);
+ RESTClientPooler1.UserName        := EdUserNameDW.Text;
+ RESTClientPooler1.Password        := EdPasswordDW.Text;
+ RESTClientPooler1.DataCompression := CheckBox1.Checked;
+ If chkhttps.Checked then
+  RESTClientPooler1.TypeRequest := TTyperequest.trHttps
+ Else
+  RESTClientPooler1.TypeRequest := TTyperequest.trHttp;
+ DWClientEvents1.CreateDWParams('servertime', dwParams);
+ dwParams.ItemsString['inputdata'].AsString := 'teste de string';
+ DWClientEvents1.SendEvent('servertime', dwParams, vErrorMessage);
+ If vErrorMessage = '' Then
+  Showmessage('Server Date/Time is : ' + DateTimeToStr(dwParams.ItemsString['result'].Value))
+ Else
+  Showmessage(vErrorMessage);
 end;
 
 PROCEDURE TForm2.FormCreate(Sender: TObject);

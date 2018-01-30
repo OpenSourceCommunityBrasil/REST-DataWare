@@ -15,10 +15,6 @@ uses
    {$IFEND}
   {$ENDIF}
 
-{$IFNDEF FPC}
-
-{$ENDIF}
-
 Type
  TPoolersList = Class(TStringProperty)
  Public
@@ -27,11 +23,12 @@ Type
   Procedure Edit;                                 Override;
 End;
 
-  TDWClientEventsEditor = class(TComponentEditor)
-    function GetVerbCount: Integer; override;
-    function GetVerb(Index: Integer): string; override;
-    procedure ExecuteVerb(Index: Integer); override;
-  end;
+Type
+ TDWClientEventsEditor = Class(TComponentEditor)
+  Function GetVerbCount : Integer; Override;
+  Function GetVerb     (Index : Integer): String; Override;
+  Procedure ExecuteVerb(Index : Integer); Override;
+End;
 
 
 Procedure Register;
@@ -96,7 +93,7 @@ procedure TDWClientEventsEditor.ExecuteVerb(Index: Integer);
 begin
   inherited;
   case Index of
-    0: (Component as TDWClientEvents).GetEvents:= True; //chama o GetEvents
+    0: (Component as TDWClientEvents).GetEvents := True; //chama o GetEvents
     1: (Component as TDWClientEvents).ClearEvents; //chama o GetEvents
   end;
 end;

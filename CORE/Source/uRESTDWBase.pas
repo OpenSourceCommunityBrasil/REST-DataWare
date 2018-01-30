@@ -65,11 +65,11 @@ Type
                             Const AStatusText : String)              Of Object;
 
 Type
- TCallBack     = Procedure (JSon : String; DWParams : TDWParams) Of Object;
- TCallSendEvent= Function (EventData  : String;
-                                     Var Params : TDWParams;
-                                     EventType  : TSendEvent = sePOST;
-                            		     CallBack   : TCallBack  = Nil) : String Of Object;
+ TCallBack      = Procedure (JSon : String; DWParams : TDWParams) Of Object;
+ TCallSendEvent = Function (EventData  : String;
+                            Var Params : TDWParams;
+                            EventType  : TSendEvent = sePOST;
+                            CallBack   : TCallBack  = Nil) : String Of Object;
 
 Type
  TServerMethodClass = Class(TComponent)
@@ -2107,7 +2107,7 @@ End;
 Function TRESTClientPooler.SendEvent(EventData  : String;
                                      Var Params : TDWParams;
                                      EventType  : TSendEvent = sePOST;
-                            		     CallBack   : TCallBack  = Nil) : String;
+                            	     CallBack   : TCallBack  = Nil) : String;
 Var
  vURL,
  vTpRequest    : String;
@@ -2276,8 +2276,12 @@ Begin
     thd.vTypeRequest    :=   vTypeRequest;
     thd.vRSCharset      :=   vRSCharset;
     thd.FCallBack       :=  CallBack;
-        thd.FCallSendEvent   :=   self.SendEvent;
-        vThreadExecuting:=True;
+    {$IFDEF FPC}
+    thd.FCallSendEvent  :=  @self.SendEvent;
+    {$ELSE}
+    thd.FCallSendEvent  :=  self.SendEvent;
+    {$ENDIF}
+    vThreadExecuting:=True;
    Finally
     thd.Execute;
    End;
@@ -2306,8 +2310,8 @@ Begin
      else
      begin
        SResult := HttpRequest.Get(EventData);
-       If Assigned(FCallBack) Then
-         FCallBack(SResult, Params);
+       If Assigned(CallBack) Then
+         CallBack(SResult, Params);
      end;
     End;
    sePOST,
