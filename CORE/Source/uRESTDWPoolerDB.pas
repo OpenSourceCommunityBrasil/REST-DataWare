@@ -1374,14 +1374,14 @@ Begin
        (Not (Error))                       Then
      Begin
       Try
-//       {$IFDEF  ANDROID}
-//       Result.Free;
-//       Result:= LDataSetList;
-//       {$ELSE}
-//       Result.LoadFromJSON(LDataSetList.ToJSON);
-//       {$ENDIF} //retirei isso daqui porque era trabalho duplicado o LDatasetList ja é um JsonValue
-          FreeAndNil(result);
-          Result:= LDataSetList;
+       {$IFDEF  ANDROID}
+       Result.Free;
+       Result:= LDataSetList;
+       {$ELSE}
+       Result.LoadFromJSON(LDataSetList.ToJSON);
+       {$ENDIF} //retirei isso daqui porque era trabalho duplicado o LDatasetList ja é um JsonValue
+ //         FreeAndNil(result);
+ //         Result:= LDataSetList;
       Finally
       End;
      End;
@@ -1410,8 +1410,8 @@ Begin
      vOnEventConnection(False, E.Message);
    End;
  End;
-// If LDataSetList <> Nil Then
-//     FreeAndNil(LDataSetList);
+ If LDataSetList <> Nil Then
+     FreeAndNil(LDataSetList);
  FreeAndNil(vRESTConnectionDB);
 End;
 
