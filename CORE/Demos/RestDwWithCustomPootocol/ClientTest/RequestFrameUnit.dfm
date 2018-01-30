@@ -61,6 +61,7 @@ object RequestFrame: TRequestFrame
       Font.Style = []
       ParentFont = False
       TabOrder = 0
+      ExplicitWidth = 456
     end
     object ParamsDBGrid: TDBGrid
       Left = 408

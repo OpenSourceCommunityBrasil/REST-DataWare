@@ -3,7 +3,7 @@ unit ServerDataModuleUnit;
 interface
 
 uses
-  SysUtils, Classes, DB;
+  System.SysUtils, System.Classes, Data.DB;
 
 type
   TServerDataModule = class(TDataModule)
@@ -26,6 +26,8 @@ var
   ServerDataModule: TServerDataModule;
 
 implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
 
 {$R *.dfm}
 

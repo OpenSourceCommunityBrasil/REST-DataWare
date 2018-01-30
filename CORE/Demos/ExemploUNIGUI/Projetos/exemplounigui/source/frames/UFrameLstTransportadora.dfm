@@ -161,7 +161,6 @@ inherited FrameLstTransportadora: TFrameLstTransportadora
         TabOrder = 2
         BorderStyle = ubsNone
         Caption = ''
-        ExplicitTop = 85
         object UniLabel8: TUniLabel
           Left = 4
           Top = 6

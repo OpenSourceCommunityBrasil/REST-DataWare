@@ -5,6 +5,6 @@
     <Transaction>2017/07/28 00:08:07.000.343,C:\DelphiComponents\RestDW\CORE\Samples\RestDwWithCustomPootocol\RestDwWithCustomPootocol.groupproj=C:\DelphiComponents\RestDW\CORE\Samples\RestDwWithCustomPootocol\ObbjetoAppServer.groupproj</Transaction>
   </Transactions>
 	<Default.Personality>
-		<Projects ActiveProject="C:\DelphiComponents\RestDW\trunk\CORE\Demos\RestDwWithCustomPootocol\Server\ServerProtocol.dproj"/>
+		<Projects ActiveProject="C:\DelphiComponents\RestDW\CORE\Samples\RestDwWithCustomPootocol\ClientTest\ClientTeste.dproj"/>
 	</Default.Personality>
 </BorlandProject>

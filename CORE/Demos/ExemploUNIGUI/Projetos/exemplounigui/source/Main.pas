@@ -7,7 +7,7 @@ uses
   Controls, Forms, Dialogs, uniGUITypes, uniGUIAbstractClasses,
   uniGUIClasses, uniGUIRegClasses, uniGUIForm, uniGUIBaseClasses, uniButton,
   uniBitBtn, uniPanel, uniPageControl, uniLabel, Vcl.Imaging.pngimage, uniImage,
-  uniHTMLFrame, uniMemo, uniHTMLMemo, uniTreeView, dxGDIPlusClasses, uniGUIFrame,
+  uniHTMLFrame, uniMemo, uniHTMLMemo, uniTreeView,  uniGUIFrame,
   uniTimer;
 
 type

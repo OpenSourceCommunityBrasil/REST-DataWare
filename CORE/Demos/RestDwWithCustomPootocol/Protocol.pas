@@ -3,7 +3,7 @@ unit Protocol;
 interface
 
 uses
-  Classes, SysUtils, uDWJSONObject, uDWConsts, uDWConstsData;
+  Classes, System.SysUtils, uDWJSONObject, uDWConsts, uDWConstsData;
 
 type
   TDMLType = (dtSelect, dtCommand);

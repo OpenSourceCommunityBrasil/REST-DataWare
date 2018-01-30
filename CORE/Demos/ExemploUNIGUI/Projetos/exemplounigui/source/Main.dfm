@@ -13,20 +13,6 @@ object MainForm: TMainForm
   Layout = 'hbox'
   PixelsPerInch = 96
   TextHeight = 13
-  object UniPanel4: TUniPanel
-    Left = 0
-    Top = 815
-    Width = 1153
-    Height = 24
-    Hint = ''
-    Align = alBottom
-    Anchors = [akLeft, akRight, akBottom]
-    TabOrder = 2
-    BorderStyle = ubsNone
-    Alignment = taLeftJustify
-    Caption = ''
-    Color = 15658734
-  end
   object UniPanel1: TUniPanel
     Left = 0
     Top = 0
@@ -435,6 +421,20 @@ object MainForm: TMainForm
       OnClick = NavTreeClick
     end
   end
+  object UniPanel4: TUniPanel
+    Left = 0
+    Top = 815
+    Width = 1153
+    Height = 24
+    Hint = ''
+    Align = alBottom
+    Anchors = [akLeft, akRight, akBottom]
+    TabOrder = 2
+    BorderStyle = ubsNone
+    Alignment = taLeftJustify
+    Caption = ''
+    Color = 15658734
+  end
   object UniPanel14: TUniPanel
     Left = 240
     Top = 0
@@ -827,6 +827,10 @@ object MainForm: TMainForm
           Caption = 'tbDados'
           Layout = 'anchor'
           LayoutConfig.Height = '100%'
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 256
+          ExplicitHeight = 128
         end
       end
     end
