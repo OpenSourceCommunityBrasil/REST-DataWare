@@ -7,9 +7,9 @@ object dm: Tdm
     Top = 176
   end
   object RESTDWDataBase1: TRESTDWDataBase
-    Active = True
+    Active = False
     Compression = True
-    MyIP = '127.0.0.1'
+    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -30,7 +30,7 @@ object dm: Tdm
     Top = 16
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    Aggregates = <>
+    AfterScroll = RESTDWClientSQL1AfterScroll
     FieldDefs = <
       item
         Name = 'DEPT_NO'
@@ -46,13 +46,19 @@ object dm: Tdm
       end>
     IndexDefs = <>
     MasterFields = ''
-    Params = <>
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
     StoreDefs = True
-    AfterScroll = RESTDWClientSQL1AfterScroll
     MasterCascadeDelete = True
     Inactive = False
     Datapacks = -1
     DataCache = False
+    Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
       'select DEPT_NO, DEPARTMENT'
@@ -66,7 +72,6 @@ object dm: Tdm
     Top = 16
   end
   object RESTDWClientSQL2: TRESTDWClientSQL
-    Aggregates = <>
     FieldDefs = <
       item
         Name = 'EMP_NO'
@@ -108,17 +113,24 @@ object dm: Tdm
       end>
     IndexDefs = <>
     MasterFields = ''
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    StoreDefs = True
+    MasterCascadeDelete = True
+    Inactive = False
+    Datapacks = -1
+    DataCache = False
     Params = <
       item
         DataType = ftString
         Name = 'DEPT_NO'
         ParamType = ptInput
       end>
-    StoreDefs = True
-    MasterCascadeDelete = True
-    Inactive = False
-    Datapacks = -1
-    DataCache = False
     DataBase = RESTDWDataBase1
     SQL.Strings = (
       

@@ -1402,8 +1402,9 @@ Begin
    HttpRequest.Disconnect;
  Except
  End;
- FreeAndNil(vTransparentProxy);
- FreeAndNil(HttpRequest);
+// FreeAndNil(vTransparentProxy);
+// FreeAndNil(HttpRequest);
+ HttpRequest.Free;
  Inherited;
 End;
 

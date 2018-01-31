@@ -15,64 +15,55 @@
         <Projects Include="..\..\..\Source\Connectors\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\..\..\Samples\FileTransfer\Client\FileClient.dproj">
+        <Projects Include="..\..\..\Demos\JSONDataset\JSONDatasetSample.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\..\..\Samples\FileTransfer\Server\FileServer.dproj">
+        <Projects Include="..\..\..\Demos\ArrayDatasetProcess\ArrayDatasetProcess.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\..\..\Samples\JSONDataset\JSONDatasetSample.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\JSONDataset\LoadfromJSON\LoadfromJSON.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\SimpleServer\Server\RestDWServerProject.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\SimpleServer\Client\RestDWClientProject.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\ClientBLOB\ClientBLOB.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\DwErp\Server\ServerDw.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\DwErp\Client\ClientDw.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\ClientSlides\ClientSlides.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\SimpleServer\ServerOSX\Server_OSX.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\SimpleCRUD\SimpleCRUD.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\ArrayDatasetProcess\ArrayDatasetProcess.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\..\Samples\WindowsService\WindowsDWService.dproj">
+        <Projects Include="..\..\..\Demos\WindowsService\WindowsDWService.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\..\Demos\DelphiServerCGI\dwCGIServer.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\..\Demos\DelphiServerCGI\TempCGI\RestDWServerISAPI.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\SimpleServer\Client\RestDWClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\ClientBLOB\ClientBLOB.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\ClientSlides\ClientSlides.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\ExemploRaudus\ExemploRaudusDW.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\ExemploRaudusZeos\ExemploRaudusZeos.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\FileTransfer\Server\FileServer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\FileTransfer\Client\FileClient.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\FMX\FMX_CRUD\FMX_CRUD.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\MassiveCacheSample\MassiveSample.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Demos\SimpleCRUD\SimpleCRUD.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -119,167 +110,32 @@
     <Target Name="RESTDWDriverZEOS:Make">
         <MSBuild Projects="..\..\..\Source\Connectors\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj" Targets="Make"/>
     </Target>
-    <Target Name="FileClient">
-        <MSBuild Projects="..\..\..\Samples\FileTransfer\Client\FileClient.dproj"/>
-    </Target>
-    <Target Name="FileClient:Clean">
-        <MSBuild Projects="..\..\..\Samples\FileTransfer\Client\FileClient.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="FileClient:Make">
-        <MSBuild Projects="..\..\..\Samples\FileTransfer\Client\FileClient.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="FileServer">
-        <MSBuild Projects="..\..\..\Samples\FileTransfer\Server\FileServer.dproj"/>
-    </Target>
-    <Target Name="FileServer:Clean">
-        <MSBuild Projects="..\..\..\Samples\FileTransfer\Server\FileServer.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="FileServer:Make">
-        <MSBuild Projects="..\..\..\Samples\FileTransfer\Server\FileServer.dproj" Targets="Make"/>
-    </Target>
     <Target Name="JSONDatasetSample">
-        <MSBuild Projects="..\..\..\Samples\JSONDataset\JSONDatasetSample.dproj"/>
+        <MSBuild Projects="..\..\..\Demos\JSONDataset\JSONDatasetSample.dproj"/>
     </Target>
     <Target Name="JSONDatasetSample:Clean">
-        <MSBuild Projects="..\..\..\Samples\JSONDataset\JSONDatasetSample.dproj" Targets="Clean"/>
+        <MSBuild Projects="..\..\..\Demos\JSONDataset\JSONDatasetSample.dproj" Targets="Clean"/>
     </Target>
     <Target Name="JSONDatasetSample:Make">
-        <MSBuild Projects="..\..\..\Samples\JSONDataset\JSONDatasetSample.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="LoadfromJSON">
-        <MSBuild Projects="..\..\..\Samples\JSONDataset\LoadfromJSON\LoadfromJSON.dproj"/>
-    </Target>
-    <Target Name="LoadfromJSON:Clean">
-        <MSBuild Projects="..\..\..\Samples\JSONDataset\LoadfromJSON\LoadfromJSON.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="LoadfromJSON:Make">
-        <MSBuild Projects="..\..\..\Samples\JSONDataset\LoadfromJSON\LoadfromJSON.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="RestDWServerProject">
-        <MSBuild Projects="..\..\..\Samples\SimpleServer\Server\RestDWServerProject.dproj"/>
-    </Target>
-    <Target Name="RestDWServerProject:Clean">
-        <MSBuild Projects="..\..\..\Samples\SimpleServer\Server\RestDWServerProject.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="RestDWServerProject:Make">
-        <MSBuild Projects="..\..\..\Samples\SimpleServer\Server\RestDWServerProject.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="RestDWClientProject">
-        <MSBuild Projects="..\..\..\Samples\SimpleServer\Client\RestDWClientProject.dproj"/>
-    </Target>
-    <Target Name="RestDWClientProject:Clean">
-        <MSBuild Projects="..\..\..\Samples\SimpleServer\Client\RestDWClientProject.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="RestDWClientProject:Make">
-        <MSBuild Projects="..\..\..\Samples\SimpleServer\Client\RestDWClientProject.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="RestDWClientProjectThread">
-        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj"/>
-    </Target>
-    <Target Name="RestDWClientProjectThread:Clean">
-        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="RestDWClientProjectThread:Make">
-        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Thread\RestDWClientProjectThread.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="RestDWServerProjectZEOS">
-        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj"/>
-    </Target>
-    <Target Name="RestDWServerProjectZEOS:Clean">
-        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="RestDWServerProjectZEOS:Make">
-        <MSBuild Projects="..\..\..\Samples\SimpleServerZEOS\Server\RestDWServerProjectZEOS.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="ClientBLOB">
-        <MSBuild Projects="..\..\..\Samples\ClientBLOB\ClientBLOB.dproj"/>
-    </Target>
-    <Target Name="ClientBLOB:Clean">
-        <MSBuild Projects="..\..\..\Samples\ClientBLOB\ClientBLOB.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ClientBLOB:Make">
-        <MSBuild Projects="..\..\..\Samples\ClientBLOB\ClientBLOB.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="ServerDw">
-        <MSBuild Projects="..\..\..\Samples\DwErp\Server\ServerDw.dproj"/>
-    </Target>
-    <Target Name="ServerDw:Clean">
-        <MSBuild Projects="..\..\..\Samples\DwErp\Server\ServerDw.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ServerDw:Make">
-        <MSBuild Projects="..\..\..\Samples\DwErp\Server\ServerDw.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="ClientDw">
-        <MSBuild Projects="..\..\..\Samples\DwErp\Client\ClientDw.dproj"/>
-    </Target>
-    <Target Name="ClientDw:Clean">
-        <MSBuild Projects="..\..\..\Samples\DwErp\Client\ClientDw.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ClientDw:Make">
-        <MSBuild Projects="..\..\..\Samples\DwErp\Client\ClientDw.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="ClienteFMX">
-        <MSBuild Projects="..\..\..\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj"/>
-    </Target>
-    <Target Name="ClienteFMX:Clean">
-        <MSBuild Projects="..\..\..\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ClienteFMX:Make">
-        <MSBuild Projects="..\..\..\Samples\SimpleServer\CienteFMX\ClienteFMX.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="ClientSlides">
-        <MSBuild Projects="..\..\..\Samples\ClientSlides\ClientSlides.dproj"/>
-    </Target>
-    <Target Name="ClientSlides:Clean">
-        <MSBuild Projects="..\..\..\Samples\ClientSlides\ClientSlides.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ClientSlides:Make">
-        <MSBuild Projects="..\..\..\Samples\ClientSlides\ClientSlides.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="Server_OSX">
-        <MSBuild Projects="..\..\..\Samples\SimpleServer\ServerOSX\Server_OSX.dproj"/>
-    </Target>
-    <Target Name="Server_OSX:Clean">
-        <MSBuild Projects="..\..\..\Samples\SimpleServer\ServerOSX\Server_OSX.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="Server_OSX:Make">
-        <MSBuild Projects="..\..\..\Samples\SimpleServer\ServerOSX\Server_OSX.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="SimpleCRUD">
-        <MSBuild Projects="..\..\..\Samples\SimpleCRUD\SimpleCRUD.dproj"/>
-    </Target>
-    <Target Name="SimpleCRUD:Clean">
-        <MSBuild Projects="..\..\..\Samples\SimpleCRUD\SimpleCRUD.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="SimpleCRUD:Make">
-        <MSBuild Projects="..\..\..\Samples\SimpleCRUD\SimpleCRUD.dproj" Targets="Make"/>
+        <MSBuild Projects="..\..\..\Demos\JSONDataset\JSONDatasetSample.dproj" Targets="Make"/>
     </Target>
     <Target Name="ArrayDatasetProcess">
-        <MSBuild Projects="..\..\..\Samples\ArrayDatasetProcess\ArrayDatasetProcess.dproj"/>
+        <MSBuild Projects="..\..\..\Demos\ArrayDatasetProcess\ArrayDatasetProcess.dproj"/>
     </Target>
     <Target Name="ArrayDatasetProcess:Clean">
-        <MSBuild Projects="..\..\..\Samples\ArrayDatasetProcess\ArrayDatasetProcess.dproj" Targets="Clean"/>
+        <MSBuild Projects="..\..\..\Demos\ArrayDatasetProcess\ArrayDatasetProcess.dproj" Targets="Clean"/>
     </Target>
     <Target Name="ArrayDatasetProcess:Make">
-        <MSBuild Projects="..\..\..\Samples\ArrayDatasetProcess\ArrayDatasetProcess.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="exemplounigui">
-        <MSBuild Projects="..\..\..\Samples\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj"/>
-    </Target>
-    <Target Name="exemplounigui:Clean">
-        <MSBuild Projects="..\..\..\Samples\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="exemplounigui:Make">
-        <MSBuild Projects="..\..\..\Samples\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj" Targets="Make"/>
+        <MSBuild Projects="..\..\..\Demos\ArrayDatasetProcess\ArrayDatasetProcess.dproj" Targets="Make"/>
     </Target>
     <Target Name="WindowsDWService">
-        <MSBuild Projects="..\..\..\Samples\WindowsService\WindowsDWService.dproj"/>
+        <MSBuild Projects="..\..\..\Demos\WindowsService\WindowsDWService.dproj"/>
     </Target>
     <Target Name="WindowsDWService:Clean">
-        <MSBuild Projects="..\..\..\Samples\WindowsService\WindowsDWService.dproj" Targets="Clean"/>
+        <MSBuild Projects="..\..\..\Demos\WindowsService\WindowsDWService.dproj" Targets="Clean"/>
     </Target>
     <Target Name="WindowsDWService:Make">
-        <MSBuild Projects="..\..\..\Samples\WindowsService\WindowsDWService.dproj" Targets="Make"/>
+        <MSBuild Projects="..\..\..\Demos\WindowsService\WindowsDWService.dproj" Targets="Make"/>
     </Target>
     <Target Name="dwCGIServer">
         <MSBuild Projects="..\..\..\Demos\DelphiServerCGI\dwCGIServer.dproj"/>
@@ -299,14 +155,122 @@
     <Target Name="RestDWServerISAPI:Make">
         <MSBuild Projects="..\..\..\Demos\DelphiServerCGI\TempCGI\RestDWServerISAPI.dproj" Targets="Make"/>
     </Target>
+    <Target Name="RestDWServerProject">
+        <MSBuild Projects="..\..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj"/>
+    </Target>
+    <Target Name="RestDWServerProject:Clean">
+        <MSBuild Projects="..\..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWServerProject:Make">
+        <MSBuild Projects="..\..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWClientProject">
+        <MSBuild Projects="..\..\..\Demos\SimpleServer\Client\RestDWClientProject.dproj"/>
+    </Target>
+    <Target Name="RestDWClientProject:Clean">
+        <MSBuild Projects="..\..\..\Demos\SimpleServer\Client\RestDWClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWClientProject:Make">
+        <MSBuild Projects="..\..\..\Demos\SimpleServer\Client\RestDWClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ClientBLOB">
+        <MSBuild Projects="..\..\..\Demos\ClientBLOB\ClientBLOB.dproj"/>
+    </Target>
+    <Target Name="ClientBLOB:Clean">
+        <MSBuild Projects="..\..\..\Demos\ClientBLOB\ClientBLOB.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ClientBLOB:Make">
+        <MSBuild Projects="..\..\..\Demos\ClientBLOB\ClientBLOB.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ClientSlides">
+        <MSBuild Projects="..\..\..\Demos\ClientSlides\ClientSlides.dproj"/>
+    </Target>
+    <Target Name="ClientSlides:Clean">
+        <MSBuild Projects="..\..\..\Demos\ClientSlides\ClientSlides.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ClientSlides:Make">
+        <MSBuild Projects="..\..\..\Demos\ClientSlides\ClientSlides.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ExemploRaudusDW">
+        <MSBuild Projects="..\..\..\Demos\ExemploRaudus\ExemploRaudusDW.dproj"/>
+    </Target>
+    <Target Name="ExemploRaudusDW:Clean">
+        <MSBuild Projects="..\..\..\Demos\ExemploRaudus\ExemploRaudusDW.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ExemploRaudusDW:Make">
+        <MSBuild Projects="..\..\..\Demos\ExemploRaudus\ExemploRaudusDW.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ExemploRaudusZeos">
+        <MSBuild Projects="..\..\..\Demos\ExemploRaudusZeos\ExemploRaudusZeos.dproj"/>
+    </Target>
+    <Target Name="ExemploRaudusZeos:Clean">
+        <MSBuild Projects="..\..\..\Demos\ExemploRaudusZeos\ExemploRaudusZeos.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ExemploRaudusZeos:Make">
+        <MSBuild Projects="..\..\..\Demos\ExemploRaudusZeos\ExemploRaudusZeos.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="exemplounigui">
+        <MSBuild Projects="..\..\..\Demos\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj"/>
+    </Target>
+    <Target Name="exemplounigui:Clean">
+        <MSBuild Projects="..\..\..\Demos\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="exemplounigui:Make">
+        <MSBuild Projects="..\..\..\Demos\ExemploUNIGUI\Projetos\exemplounigui\source\exemplounigui.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FileServer">
+        <MSBuild Projects="..\..\..\Demos\FileTransfer\Server\FileServer.dproj"/>
+    </Target>
+    <Target Name="FileServer:Clean">
+        <MSBuild Projects="..\..\..\Demos\FileTransfer\Server\FileServer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FileServer:Make">
+        <MSBuild Projects="..\..\..\Demos\FileTransfer\Server\FileServer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FileClient">
+        <MSBuild Projects="..\..\..\Demos\FileTransfer\Client\FileClient.dproj"/>
+    </Target>
+    <Target Name="FileClient:Clean">
+        <MSBuild Projects="..\..\..\Demos\FileTransfer\Client\FileClient.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FileClient:Make">
+        <MSBuild Projects="..\..\..\Demos\FileTransfer\Client\FileClient.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FMX_CRUD">
+        <MSBuild Projects="..\..\..\Demos\FMX\FMX_CRUD\FMX_CRUD.dproj"/>
+    </Target>
+    <Target Name="FMX_CRUD:Clean">
+        <MSBuild Projects="..\..\..\Demos\FMX\FMX_CRUD\FMX_CRUD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FMX_CRUD:Make">
+        <MSBuild Projects="..\..\..\Demos\FMX\FMX_CRUD\FMX_CRUD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="MassiveSample">
+        <MSBuild Projects="..\..\..\Demos\MassiveCacheSample\MassiveSample.dproj"/>
+    </Target>
+    <Target Name="MassiveSample:Clean">
+        <MSBuild Projects="..\..\..\Demos\MassiveCacheSample\MassiveSample.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MassiveSample:Make">
+        <MSBuild Projects="..\..\..\Demos\MassiveCacheSample\MassiveSample.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SimpleCRUD">
+        <MSBuild Projects="..\..\..\Demos\SimpleCRUD\SimpleCRUD.dproj"/>
+    </Target>
+    <Target Name="SimpleCRUD:Clean">
+        <MSBuild Projects="..\..\..\Demos\SimpleCRUD\SimpleCRUD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SimpleCRUD:Make">
+        <MSBuild Projects="..\..\..\Demos\SimpleCRUD\SimpleCRUD.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;RESTDWDriverUNIDAC;RESTDWDriverZEOS;FileClient;FileServer;JSONDatasetSample;LoadfromJSON;RestDWServerProject;RestDWClientProject;RestDWClientProjectThread;RestDWServerProjectZEOS;ClientBLOB;ServerDw;ClientDw;ClienteFMX;ClientSlides;Server_OSX;SimpleCRUD;ArrayDatasetProcess;exemplounigui;WindowsDWService;dwCGIServer;RestDWServerISAPI"/>
+        <CallTarget Targets="RestDatawareCORE;RESTDWDriverFD;RESTDWDriverUNIDAC;RESTDWDriverZEOS;JSONDatasetSample;ArrayDatasetProcess;WindowsDWService;dwCGIServer;RestDWServerISAPI;RestDWServerProject;RestDWClientProject;ClientBLOB;ClientSlides;ExemploRaudusDW;ExemploRaudusZeos;exemplounigui;FileServer;FileClient;FMX_CRUD;MassiveSample;SimpleCRUD"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;RESTDWDriverUNIDAC:Clean;RESTDWDriverZEOS:Clean;FileClient:Clean;FileServer:Clean;JSONDatasetSample:Clean;LoadfromJSON:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;RestDWClientProjectThread:Clean;RestDWServerProjectZEOS:Clean;ClientBLOB:Clean;ServerDw:Clean;ClientDw:Clean;ClienteFMX:Clean;ClientSlides:Clean;Server_OSX:Clean;SimpleCRUD:Clean;ArrayDatasetProcess:Clean;exemplounigui:Clean;WindowsDWService:Clean;dwCGIServer:Clean;RestDWServerISAPI:Clean"/>
+        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverFD:Clean;RESTDWDriverUNIDAC:Clean;RESTDWDriverZEOS:Clean;JSONDatasetSample:Clean;ArrayDatasetProcess:Clean;WindowsDWService:Clean;dwCGIServer:Clean;RestDWServerISAPI:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean;ClientBLOB:Clean;ClientSlides:Clean;ExemploRaudusDW:Clean;ExemploRaudusZeos:Clean;exemplounigui:Clean;FileServer:Clean;FileClient:Clean;FMX_CRUD:Clean;MassiveSample:Clean;SimpleCRUD:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;RESTDWDriverUNIDAC:Make;RESTDWDriverZEOS:Make;FileClient:Make;FileServer:Make;JSONDatasetSample:Make;LoadfromJSON:Make;RestDWServerProject:Make;RestDWClientProject:Make;RestDWClientProjectThread:Make;RestDWServerProjectZEOS:Make;ClientBLOB:Make;ServerDw:Make;ClientDw:Make;ClienteFMX:Make;ClientSlides:Make;Server_OSX:Make;SimpleCRUD:Make;ArrayDatasetProcess:Make;exemplounigui:Make;WindowsDWService:Make;dwCGIServer:Make;RestDWServerISAPI:Make"/>
+        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverFD:Make;RESTDWDriverUNIDAC:Make;RESTDWDriverZEOS:Make;JSONDatasetSample:Make;ArrayDatasetProcess:Make;WindowsDWService:Make;dwCGIServer:Make;RestDWServerISAPI:Make;RestDWServerProject:Make;RestDWClientProject:Make;ClientBLOB:Make;ClientSlides:Make;ExemploRaudusDW:Make;ExemploRaudusZeos:Make;exemplounigui:Make;FileServer:Make;FileClient:Make;FMX_CRUD:Make;MassiveSample:Make;SimpleCRUD:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

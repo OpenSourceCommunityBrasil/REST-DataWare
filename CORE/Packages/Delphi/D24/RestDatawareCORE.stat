@@ -6,11 +6,11 @@ EditorSecs=8268
 =======
 EditorSecs=8274
 >>>>>>> .r882
-DesignerSecs=16
+DesignerSecs=18
 InspectorSecs=30
 <<<<<<< .mine
 CompileSecs=290843
-OtherSecs=1209
+OtherSecs=1215
 ||||||| .r863
 CompileSecs=276158
 OtherSecs=1076
