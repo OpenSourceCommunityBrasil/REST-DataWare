@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/07/20 01:42:15.000.940,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\ObbjetoAppServer.groupproj=C:\Users\Windows\Documents\Embarcadero\Studio\Projects\ProjectGroup1.groupproj</Transaction>
+    <Transaction>2017/07/28 00:08:07.000.343,C:\DelphiComponents\RestDW\CORE\Samples\RestDwWithCustomPootocol\ObbjetoAppServer.groupproj=C:\DelphiComponents\RestDW\CORE\Samples\RestDwWithCustomPootocol\RestDwWithCustomPootocol.groupproj</Transaction>
+  </Transactions>
+	<Default.Personality>
+		<Projects ActiveProject="C:\Componentes\dataware\CORE\Demos\RestDwWithCustomProtocol\Server\ServerProtocol.dproj"/>
+	</Default.Personality>
+</BorlandProject>

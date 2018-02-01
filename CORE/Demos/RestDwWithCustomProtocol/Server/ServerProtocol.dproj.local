@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/07/12 03:08:59.000.848,=C:\Users\Windows\Documents\Embarcadero\Studio\Projects\GroupedItems1.pas</Transaction>
+    <Transaction>2017/07/12 03:09:02.000.115,=C:\Users\Windows\Documents\Embarcadero\Studio\Projects\SplitItemDetail1.pas</Transaction>
+    <Transaction>2017/07/12 03:09:23.000.915,=C:\Users\Windows\Documents\Embarcadero\Studio\Projects\GroupedItems2.pas</Transaction>
+    <Transaction>2017/07/12 03:09:24.000.578,=C:\Users\Windows\Documents\Embarcadero\Studio\Projects\ItemDetail1.pas</Transaction>
+    <Transaction>2017/07/19 18:43:44.000.825,=C:\Users\Windows\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2017/07/19 18:48:27.000.117,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\MainFormUnit.pas=C:\Users\Windows\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2017/07/19 18:48:27.000.117,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\MainFormUnit.dfm=C:\Users\Windows\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2017/07/19 18:48:37.000.909,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\ObbjetoAppServer.dproj=C:\Users\Windows\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2017/07/19 18:48:57.000.274,=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.pas</Transaction>
+    <Transaction>2017/07/19 18:49:14.000.101,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\ServerModuleUnit.pas=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.pas</Transaction>
+    <Transaction>2017/07/19 18:49:14.000.101,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\ServerModuleUnit.dfm=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.dfm</Transaction>
+    <Transaction>2017/07/20 14:45:30.000.250,=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.pas</Transaction>
+    <Transaction>2017/07/20 14:53:46.000.722,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.pas=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\MyServerMethods.pas</Transaction>
+    <Transaction>2017/07/21 04:00:46.000.678,=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.pas</Transaction>
+    <Transaction>2017/07/21 04:01:21.000.367,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\ServerDataModuleUnit.pas=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.pas</Transaction>
+    <Transaction>2017/07/21 04:01:21.000.367,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\ServerDataModuleUnit.dfm=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.dfm</Transaction>
+    <Transaction>2017/07/23 02:31:19.000.831,=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.pas</Transaction>
+    <Transaction>2017/07/23 02:32:32.000.434,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.pas=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\FireDacUnit.pas</Transaction>
+    <Transaction>2017/07/23 02:32:32.000.434,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.dfm=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\FireDacUnit.dfm</Transaction>
+    <Transaction>2017/07/23 03:46:39.000.126,=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.pas</Transaction>
+    <Transaction>2017/07/23 03:47:03.000.755,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Protocol.pas=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.pas</Transaction>
+    <Transaction>2017/07/23 05:38:41.000.849,=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Protocol.pas</Transaction>
+    <Transaction>2017/07/23 13:27:05.000.362,=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\Server\Unit1.pas</Transaction>
+    <Transaction>2017/07/28 00:05:43.000.400,C:\DelphiComponents\RestDW\CORE\Samples\RestDwWithCustomPootocol\Server\MainFormUnit.pas=C:\DelphiComponents\RestDW\CORE\Samples\RestDwWithCustomPootocol\Server\ProtocolServer.pas</Transaction>
+    <Transaction>2017/07/28 00:05:43.000.400,C:\DelphiComponents\RestDW\CORE\Samples\RestDwWithCustomPootocol\Server\MainFormUnit.dfm=C:\DelphiComponents\RestDW\CORE\Samples\RestDwWithCustomPootocol\Server\ProtocolServer.dfm</Transaction>
+    <Transaction>2017/07/28 00:09:24.000.110,C:\DelphiComponents\RestDW\CORE\Samples\RestDwWithCustomPootocol\Server\ObbjetoAppServer.dproj=C:\DelphiComponents\RestDW\CORE\Samples\RestDwWithCustomPootocol\Server\ServerProtocol.dproj</Transaction>
+    <Transaction>2018/02/01 07:53:08.000.005,C:\Componentes\dataware\CORE\Demos\RestDwWithCustomProtocol\Server\ServerProtocol.dproj=C:\Componentes\dataware\CORE\Demos\RestDwWithCustomProtocol\Server\ServerProtocol.dproj</Transaction>
+  </Transactions>
+</BorlandProject>

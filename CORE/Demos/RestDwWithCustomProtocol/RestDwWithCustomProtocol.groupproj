@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{66D04A18-82C5-4ACD-BB85-0DC9F3730F8B}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Server\ServerProtocol.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ClientTest\ClientTeste.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ServerProtocol">
+        <MSBuild Projects="Server\ServerProtocol.dproj"/>
+    </Target>
+    <Target Name="ServerProtocol:Clean">
+        <MSBuild Projects="Server\ServerProtocol.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ServerProtocol:Make">
+        <MSBuild Projects="Server\ServerProtocol.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ClientTeste">
+        <MSBuild Projects="ClientTest\ClientTeste.dproj"/>
+    </Target>
+    <Target Name="ClientTeste:Clean">
+        <MSBuild Projects="ClientTest\ClientTeste.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ClientTeste:Make">
+        <MSBuild Projects="ClientTest\ClientTeste.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ServerProtocol;ClientTeste"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ServerProtocol:Clean;ClientTeste:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ServerProtocol:Make;ClientTeste:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

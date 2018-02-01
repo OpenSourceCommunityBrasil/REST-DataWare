@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/07/20 00:17:30.000.793,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\ClientTest\MainFormUnit.dfm=C:\Users\Windows\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2017/07/20 00:17:42.000.094,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\ClientTest\ClientTeste.dproj=C:\Users\Windows\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2017/07/23 13:28:04.000.445,C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\ClientTest\Unit1.dfm=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\ClientTest\RequestFrameUnit.dfm</Transaction>
+    <Transaction>2017/08/01 10:58:47.000.289,C:\Projects\Obbjeto\DevUpperProjects\src\PedidoPdf\PrincipalFormUnit.dfm=C:\Projects\Obbjeto\DevUpperProjects\src\ObbjetoAppServer\ClientTest\Unit2.dfm</Transaction>
+  </Transactions>
+</BorlandProject>
