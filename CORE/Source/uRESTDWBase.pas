@@ -1856,6 +1856,7 @@ Var
           Else
            ParamsData.ItemsString[JSONParam.ParamName].SetValue(vValue, JSONParam.Encoded);
          Finally
+          vValue := '';
           FreeAndNil(JSONParam);
 {
           If Assigned(bJsonOBJ) Then
@@ -3959,12 +3960,13 @@ Var
    If Params <> Nil Then
     Begin
      bJsonValue    := TJsonObject.Create(InputValue);
-     bJsonOBJTemp  := TJSONArray.Create(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString);
+     InputValue    := '';
+     bJsonOBJTemp  := bJsonValue.getJSONArray(bJsonValue.names.get(0).ToString); //TJSONArray.Create(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString);
      If bJsonOBJTemp.length > 0 Then
       Begin
        For A := 0 To bJsonValue.names.length -1 Do
         Begin
-         bJsonOBJ := TJsonObject.Create(bJsonOBJTemp.get(A).ToString);
+         bJsonOBJ := bJsonOBJTemp.getJSONObject(A); //TJsonObject.Create(bJsonOBJTemp.get(A).ToString);
          If Length(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) = 0 Then
           Continue;
          JSONParam := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(GetEncoding(TEncodeSelect(vRSCharset))){$IFEND}{$ENDIF};
@@ -3978,7 +3980,7 @@ Var
           Else
            vValue := bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString;
           JSONParam.SetValue(vValue, JSONParam.Encoded);
-          bJsonOBJ.Free;
+//          bJsonOBJ.Free;
           //parametro criandos no servidor
           If ParamsData.ItemsString[JSONParam.ParamName] = Nil Then
            Begin

@@ -1330,7 +1330,7 @@ Var
  vRESTConnectionDB : TDWPoolerMethodClient;
  LDataSetList      : TJSONValue;
  DWParams          : TDWParams;
-
+ vTempValue        : String;
  Function GetLineSQL(Value : TStringList) : String;
  Var
   I : Integer;
@@ -1403,20 +1403,22 @@ Begin
 //    If Not Assigned(Result) Then //Correção fornecida por romyllldo no Forum
     Result := TJSONValue.Create;
     Error  := Trim(MessageError) <> '';
-    If (Trim(LDataSetList.ToJSON) <> '{}') And
-       (Trim(LDataSetList.Value) <> '')    And
+    vTempValue := LDataSetList.ToJSON;
+    If (Trim(vTempValue) <> '{}') And
+       (Trim(vTempValue) <> '')    And
        (Not (Error))                       Then
      Begin
       Try
        {$IFDEF  ANDROID}
        Result.Free;
-       Result:= LDataSetList;
+       Result := LDataSetList;
        {$ELSE}
-       Result.LoadFromJSON(LDataSetList.ToJSON); //Esse código server para criar o Objeto, nao pode ser removido
+       Result.LoadFromJSON(vTempValue); //Esse código server para criar o Objeto, nao pode ser removido
        {$ENDIF}
       Finally
       End;
      End;
+    vTempValue := '';
     If (Not (Error)) Then
      Begin
       If Assigned(vOnEventConnection) Then

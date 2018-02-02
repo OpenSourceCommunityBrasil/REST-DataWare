@@ -177,6 +177,7 @@ Private
 Public
  Constructor Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(Encoding: TEncoding){$IFEND}{$ENDIF};
  Destructor  Destroy; Override;
+ Function    IsEmpty               : Boolean;
  Procedure   FromJSON(JSON         : String);
  Function    ToJSON                : String;
  Procedure   CopyFrom(JSONParam    : TJSONParam);
@@ -344,7 +345,6 @@ Begin
 End;
 
 {$ELSE}
-
 Function CopyValue(Var bValue : String) : String;
 Var
  vOldString,
@@ -352,8 +352,6 @@ Var
  vTempString      : String;
  A, vLengthString : Integer;
 Begin
-
-
  vOldString := bValue;
  vStringBase := '"ValueType":"';
  vLengthString := Length(vStringBase);
@@ -806,6 +804,7 @@ Else
  Else
   Result := vTempString;
  {$IFEND}
+ vTempString := '';
 End;
 
 Function TJSONValue.DatasetValues(bValue         : TDataset;
@@ -1463,6 +1462,7 @@ Var
  vFindFlag      : Boolean;
  vBlobStream    : TStringStream;
  ListFields     : TStringList;
+ vTempValue     : String;
  Procedure SetValueA(Field : TField;
                      Value : String);
  Var
@@ -1580,15 +1580,16 @@ Begin
 //    TRESTDWClientSQL(DestDS).FieldDefs.BeginUpdate;
     For J := 0 To bJsonArray.Length - 1 Do
      Begin
-      bJsonOBJ := udwjson.TJsonObject.Create(bJsonArray.get(J).ToString);
+      bJsonOBJ := bJsonArray.optJSONObject(J);
       Try
        If Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) <> '' Then
         Begin
-         If (TRESTDWClientSQL(DestDS).FieldDefExist(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) = Nil) And
-            (TRESTDWClientSQL(DestDS).FindField(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString)     = Nil) Then
+         vTempValue := bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString;
+         If (TRESTDWClientSQL(DestDS).FieldDefExist(vTempValue) = Nil) And
+            (TRESTDWClientSQL(DestDS).FindField(vTempValue)     = Nil) Then
           Begin
            FieldDef          := TRESTDWClientSQL(DestDS).FieldDefs.AddFieldDef;
-           FieldDef.Name     := bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString;
+           FieldDef.Name     := vTempValue;
            FieldDef.DataType := GetFieldType(bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString);
            FieldDef.Size     := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
            FieldDef.Required := Uppercase(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S';
@@ -1607,8 +1608,8 @@ Begin
           End;
         End;
       Finally
-       bJsonOBJ.Clean;
-       FreeAndNil(bJsonOBJ);
+//       bJsonOBJ.Clean;
+//       FreeAndNil(bJsonOBJ);
       End;
      End;
 //    TRESTDWClientSQL(DestDS).FieldDefs.EndUpdate;
@@ -1654,7 +1655,7 @@ Begin
         vFindFlag := False;
         For J := 0 To bJsonArray.Length - 1 Do
          Begin
-          bJsonOBJ := udwjson.TJsonObject.Create(bJsonArray.get(J).ToString);
+          bJsonOBJ := bJsonArray.getJSONObject(J);
           Try
            If Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) <> '' Then
             Begin
@@ -1664,8 +1665,8 @@ Begin
               Break;
             End;
           Finally
-           bJsonOBJ.Clean;
-           FreeAndNil(bJsonOBJ);
+//           bJsonOBJ.Clean;
+//           FreeAndNil(bJsonOBJ);
           End;
          End;
         If Not vFindFlag Then
@@ -1678,7 +1679,7 @@ Begin
     bJsonArray    := bJsonArraySub.optJSONArray(bJsonArraySub.names.get(0).ToString);
     For J := 0 To bJsonArray.Length - 1 Do
      Begin
-      bJsonOBJ    := udwjson.TJsonObject.Create(bJsonArray.get(J).ToString);
+      bJsonOBJ    := bJsonArray.getJSONObject(J);
       Try
        If Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(2).ToString).ToString)) = 'S' Then
         Begin
@@ -1716,8 +1717,8 @@ Begin
           End;
         End;
       Finally
-       bJsonOBJ.Clean;
-       FreeAndNil(bJsonOBJ);
+//       bJsonOBJ.Clean;
+//       FreeAndNil(bJsonOBJ);
       End;
      End;
     For A := 0 To DestDS.Fields.Count - 1 Do     //ADICIONA REGISTRO
@@ -1728,31 +1729,28 @@ Begin
        Begin
         For J := 0 To bJsonArray.Length - 1 Do
          Begin
-          bJsonOBJ := uDWJSON.TJsonObject.Create(bJsonArray.get(J).ToString);
+          bJsonOBJ := bJsonArray.getJSONObject(J);
           If Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) <> '' Then
            Begin
             vFindFlag := Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString)) =
                          Uppercase(DestDS.Fields[A].FieldName);
             If vFindFlag Then
              Begin
-              {
-              If bJsonOBJ.names.Length > 6 Then
-               If Not (DestDS.FindField(DestDS.FieldDefs[A].Name).ReadOnly) Then
-                DestDS.FindField(DestDS.FieldDefs[A].Name).ReadOnly := (Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(6).ToString).ToString)) = 'S');
-              }
               ListFields.Add(IntToStr(J));
               Break;
              End;
            End;
-          bJsonOBJ.Clean;
-          FreeAndNil(bJsonOBJ);
+//          bJsonOBJ.Clean;
+//          FreeAndNil(bJsonOBJ);
          End;
        End;
+      {
       If Assigned(bJsonOBJ) Then
        Begin
         bJsonOBJ.Clean;
         FreeAndNil(bJsonOBJ);
        End;
+      }
       If Not vFindFlag Then
        ListFields.Add('-1');
      End;
@@ -1763,11 +1761,9 @@ Begin
      TRESTDWClientSQL(DestDS).InBlockEvents := True;
     For J := 0 To bJsonArray.Length - 1 Do
      Begin
-      bJsonOBJ     := uDWJSON.TJsonObject.Create(bJsonArray.get(J).ToString);
+      bJsonOBJ     := bJsonArray.getJSONObject(J);
       bJsonOBJTemp := bJsonOBJ.optJSONArray(bJsonOBJ.names.get(0).ToString);
-
       TRESTDWClientSQL(DestDS).Append;
-
       Try
        For I := 0 To DestDS.Fields.Count - 1 Do
         Begin
@@ -1849,11 +1845,13 @@ Begin
          TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
         End;
       Finally
+{
        If Assigned(bJsonOBJ) Then
         Begin
          bJsonOBJ.Clean;
          FreeAndNil(bJsonOBJ);
         End;
+}
       End;
       TRESTDWClientSQL(DestDS).Post;
      End;
@@ -2112,7 +2110,7 @@ Begin
   Begin
    {$IFNDEF FPC}
    {$IF CompilerVersion > 21}
-   aValue := ToBytes(Format(TJsonValueFormat, [bValue])); //ToBytes(bValue); // tIdBytes(vEncoding.GetBytes(bValue));
+   aValue := ToBytes(bValue); //ToBytes(bValue); // tIdBytes(vEncoding.GetBytes(bValue));
    {$ELSE}
    aValue := ToBytes(bValue);
    {$IFEND}
@@ -2760,6 +2758,11 @@ Begin
                        End
                       End;
  End;
+End;
+
+Function TJSONParam.IsEmpty: Boolean;
+Begin
+ Result := GetValue(ovString) = '';
 End;
 
 Procedure TJSONParam.WriteValue(bValue: String);

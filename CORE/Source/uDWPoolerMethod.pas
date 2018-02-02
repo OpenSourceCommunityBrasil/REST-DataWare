@@ -1316,7 +1316,7 @@ Begin
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['Result'] <> Nil Then
       Begin
-       If DWParams.ItemsString['Result'].AsString <> '' Then
+       If Not (DWParams.ItemsString['Result'].IsEmpty) Then
         Result.LoadFromJSON(DWParams.ItemsString['Result'].AsString);
       End;
     End
