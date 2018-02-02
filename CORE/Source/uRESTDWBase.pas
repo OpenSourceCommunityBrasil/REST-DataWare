@@ -1776,7 +1776,8 @@ Function TRESTClientPooler.SendEvent(EventData  : String;
                             		     CallBack   : TCallBack  = Nil) : String;
 Var
  vURL,
- vTpRequest    : String;
+ vTpRequest,
+ vDataPack     : String;
  aStringStream : TStringStream;
  vResultParams : TMemoryStream;
  bStringStream,
@@ -1804,28 +1805,29 @@ Var
    Exit;
   Try
    InitPos    := Pos(', "RESULT":[', InputValue) + Length(', "RESULT":[') ;
-    aValue     := Copy(InputValue, InitPos, Length(InputValue));
+   aValue     := Copy(InputValue, InitPos, Length(InputValue));
    If Pos(']}', aValue) > 0 Then
-     aValue     :=Copy(aValue, 1, length(aValue)-2); //Copy(aValue, 1, Pos(']}', aValue) -1);      //CRISTIANO BARBOSA -
+    aValue    := Copy(aValue, 1, length(aValue)-2); //Copy(aValue, 1, Pos(']}', aValue) -1);      //CRISTIANO BARBOSA -
    vTempValue := aValue;
-    InputValue := Copy(InputValue, 1, InitPos -1) + ']}'; //Delete(InputValue, InitPos, Pos(']}', InputValue) - InitPos);
+   InputValue := Copy(InputValue, 1, InitPos -1) + ']}'; //Delete(InputValue, InitPos, Pos(']}', InputValue) - InitPos);
    If (Params <> Nil) And (InputValue <> '{"PARAMS"]}') Then
     Begin
      bJsonValue    := TJsonObject.Create(InputValue);
-     bJsonOBJTemp  := TJSONArray.Create(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString);
+     InputValue    := '';
+     bJsonOBJTemp  := bJsonValue.getJSONArray(bJsonValue.names.get(0).ToString); //TJSONArray.Create(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString);
      If bJsonOBJTemp.length > 0 Then
       Begin
        For A := 0 To bJsonOBJTemp.length -1 Do
         Begin
-         bJsonOBJ := TJsonObject.Create(bJsonOBJTemp.get(A).ToString);
+         bJsonOBJ := bJsonOBJTemp.getJSONObject(A); //TJsonObject.Create(bJsonOBJTemp.get(A).ToString);
          If Length(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) = 0 Then
           Begin
-           FreeAndNil(bJsonOBJ);
+//           FreeAndNil(bJsonOBJ);
            Continue;
           End;
          If GetObjectName(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) <> toParam Then
           Begin
-           FreeAndNil(bJsonOBJ);
+//           FreeAndNil(bJsonOBJ);
            Continue;
           End;
          JSONParam := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(GetEncoding(TEncodeSelect(vRSCharset))){$IFEND}{$ENDIF};
@@ -1839,8 +1841,8 @@ Var
           Else
            vValue := bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString;
           JSONParam.SetValue(vValue, JSONParam.Encoded);
-          bJsonOBJ.clean;
-          FreeAndNil(bJsonOBJ);
+//          bJsonOBJ.clean;
+//          FreeAndNil(bJsonOBJ);
           //parametro criandos no servidor
           If ParamsData.ItemsString[JSONParam.ParamName] = Nil Then
            Begin
@@ -1855,17 +1857,19 @@ Var
            ParamsData.ItemsString[JSONParam.ParamName].SetValue(vValue, JSONParam.Encoded);
          Finally
           FreeAndNil(JSONParam);
+{
           If Assigned(bJsonOBJ) Then
            Begin
             bJsonOBJ.clean;
             FreeAndNil(bJsonOBJ);
            End;
+}
          End;
         End;
       End;
      bJsonValue.Clean;
      FreeAndNil(bJsonValue);
-     FreeAndNil(bJsonOBJTemp);
+//     FreeAndNil(bJsonOBJTemp);
     End;
   Finally
    If vTempValue <> '' Then
@@ -2029,25 +2033,32 @@ Begin
         End;
        HttpRequest.Request.Clear;
        StringStream.Position := 0;
-       Try
-        If not vThreadRequest Then
-         SetData(StringStream.DataString, Params, Result)
-        else
-        begin
-          SetData(StringStream.DataString, Params, SResult);
-          If Assigned(CallBack) Then
-            CallBack(SResult, Params);
-          //Terminate;
-        end;
-       Finally
-        {$IFNDEF FPC}
+       vDataPack := StringStream.DataString;
+       If Not vThreadRequest Then
+        Begin
+         {$IFNDEF FPC}
+         {$IF CompilerVersion > 21}
+         StringStream.Clear;
+         {$IFEND}
+         StringStream.Size := 0;
+         {$ENDIF}
+         FreeAndNil(StringStream);
+         SetData(vDataPack, Params, Result);
+        End
+       Else
+        Begin
+         vDataPack := StringStream.DataString;
+         {$IFNDEF FPC}
          {$IF CompilerVersion > 21}
           StringStream.Clear;
          {$IFEND}
-        StringStream.Size := 0;
-        {$ENDIF}
-        FreeAndNil(StringStream);
-       End;
+         StringStream.Size := 0;
+         {$ENDIF}
+         FreeAndNil(StringStream);
+         SetData(vDataPack, Params, SResult);
+         If Assigned(CallBack) Then
+          CallBack(SResult, Params);
+        End;
       End
      Else If EventType = sePUT Then
       Begin
