@@ -231,10 +231,9 @@ Type
  Protected
   vActive,
   vInactive            : Boolean;
-{$IFDEF  UP_BARBOSA1}
+  {$IFDEF  UP_BARBOSA1}
   Procedure   ProcInBlockEvents  (Const BlockEvent : Boolean);virtual;
-{$ENDIF}
-
+  {$ENDIF}
  Private
   vRESTClientPooler    : TRESTClientPooler;
   vMassiveCache        : TDWMassiveCache;
@@ -244,9 +243,9 @@ Type
   vOnAfterOpen         : TOnAfterOpen;
   vOnAfterClose        : TOnAfterClose;
   OldData              : TMemoryStream;
-{$IFDEF  UP_BARBOSA1}
+  {$IFDEF  UP_BARBOSA1}
   vOnInBlockEvent      : TOnInBlockEvent;
-{$ENDIF}
+  {$ENDIF}
   vNewRecord,
   vBeforeOpen,
   vBeforeEdit,
@@ -263,6 +262,7 @@ Type
   vDatapacks,
   vMaxBufferRegs,
   vActualRec           : Integer;
+  vOldSQL,
   vLastBuffer,
   vMasterFields,
   vUpdateTableName     : String;                            //Tabela que será feito Update no Servidor se for usada Reflexão de Dados
@@ -276,6 +276,7 @@ Type
   vConnectedOnce,                                           //Verifica se foi conectado ao Servidor
   vCommitUpdates,
   vCreateDS,
+  GetNewData,
   vErrorBefore         : Boolean;                           //Estado do Dataset
   vSQL                 : TStringList;                       //SQL a ser utilizado na conexão
   vParams              : TParams;                           //Parametros de Dataset
@@ -287,11 +288,6 @@ Type
   vMasterDataSet       : TRESTDWClientSQL;
   vMasterDetailList    : TMasterDetailList;                 //DataSet MasterDetail Function
   vMassiveDataset      : TMassiveDataset;
-
-{$IFDEF  UP_BARBOSA1}
-  vLoading             : Boolean;                           // corrige bug  OnChangingSQL  CRISTIANO BARBOSA
-{$ENDIF}
-
   {$IFDEF FPC}
   Procedure CloneDefinitions     (Source  : TMemDataset;
                                   aSelf   : TMemDataset);   //Fields em Definições
@@ -314,6 +310,7 @@ Type
   {$ENDIF}
   {$ENDIF}
   Procedure   OnChangingSQL      (Sender  : TObject);       //Quando Altera o SQL da Lista
+  Procedure   OnBeforeChangingSQL(Sender  : TObject);
   Procedure   SetActiveDB        (Value   : Boolean);       //Seta o Estado do Dataset
   Procedure   SetSQL             (Value   : TStringList);   //Seta o SQL a ser usado
   Procedure   CreateParams;                                 //Cria os Parametros na lista de Dataset
@@ -340,7 +337,6 @@ Type
   procedure   CreateMassiveDataset;
   procedure   SetParams(const Value: TParams);
   procedure   SetInBlockEvents(const Value: Boolean);
-
  Public
   //Métodos
   Procedure   Newtable;
@@ -363,10 +359,10 @@ Type
   procedure   OpenCursor       (InfoQuery : Boolean); Override;  //Subscrevendo o OpenCursor para não ter erros de ADD Fields em Tempo de Design
   Procedure   GotoRec       (Const aRecNo : Integer);
   Function    ParamCount    : Integer;
-  Procedure DynamicFilter(cFields : Array of String;
-                          Value   : String;
-                          InText  : Boolean;
-                          AndOrOR : String);
+  Procedure   DynamicFilter(cFields : Array of String;
+                            Value   : String;
+                            InText  : Boolean;
+                            AndOrOR : String);
   Procedure   Refresh;
   Procedure   SaveToStream    (Var Stream : TMemoryStream);
   Procedure   ClearMassive;
@@ -382,10 +378,9 @@ Type
   Property OnGetDataError         : TOnEventConnection  Read vOnGetDataError           Write vOnGetDataError;         //Recebe os Erros de ExecSQL ou de GetData
   Property AfterScroll            : TOnAfterScroll      Read vOnAfterScroll            Write vOnAfterScroll;
   Property AfterOpen              : TOnAfterOpen        Read vOnAfterOpen              Write vOnAfterOpen;
-{$IFDEF  UP_BARBOSA1}
+  {$IFDEF  UP_BARBOSA1}
   Property OnInBlockEvent         : TOnInBlockEvent     Read vOnInBlockEvent           Write vOnInBlockEvent;
-{$ENDIF}
-
+  {$ENDIF}
   Property AfterClose             : TOnAfterClose       Read vOnAfterClose             Write vOnAfterClose;
   Property Active                 : Boolean             Read vActive                   Write SetActiveDB;             //Estado do Dataset
   Property DataCache              : Boolean             Read vDataCache                Write vDataCache;              //Diz se será salvo o último Stream do Dataset
@@ -1080,7 +1075,14 @@ Begin
        (Not (Error))        Then
      Begin
       Try
-       Result := LDataSetList;
+       Result          := TJSONValue.Create;
+       {$IFNDEF FPC}
+        {$if CompilerVersion > 21}
+        Result.Encoding := LDataSetList.Encoding;
+        {$IFEND}
+       {$ENDIF}
+       Result.Encoded  := LDataSetList.Encoded;
+       Result.SetValue(LDataSetList.ToJson, Result.Encoded);
       Finally
       End;
      End;
@@ -1774,9 +1776,6 @@ end;
 constructor TRESTDWClientSQL.Create(AOwner: TComponent);
 Begin
  Inherited;
-{$IFDEF  UP_BARBOSA1}
- vLoading                          := True;
-{$ENDIF}
  vInactive                         := False;
  vInBlockEvents                    := False;
  vOnOpenCursor                     := False;
@@ -1785,6 +1784,7 @@ Begin
  vAutoCommitData                   := False;
  vAutoRefreshAfterCommit           := False;
  vConnectedOnce                    := True;
+ GetNewData                        := True;
  vActive                           := False;
  vCacheUpdateRecords               := True;
  vBeforeClone                      := False;
@@ -1794,8 +1794,10 @@ Begin
  vCascadeDelete                    := True;
  vSQL                              := TStringList.Create;
  {$IFDEF FPC}
+  vSQL.OnChanging                  := @OnBeforeChangingSQL;
   vSQL.OnChange                    := @OnChangingSQL;
  {$ELSE}
+  vSQL.OnChanging                  := OnBeforeChangingSQL;
   vSQL.OnChange                    := OnChangingSQL;
  {$ENDIF}
  vParams                           := TParams.Create(Self);
@@ -2577,12 +2579,14 @@ Begin
  End;
 End;
 
+procedure TRESTDWClientSQL.OnBeforeChangingSQL(Sender: TObject);
+begin
+ vOldSQL := vSQL.Text;
+end;
+
 procedure TRESTDWClientSQL.OnChangingSQL(Sender: TObject);
 Begin
-{$IFDEF  UP_BARBOSA1}
- if vLoading then exit;  // corrige bug.. Cristiano Barbosa
-{$ENDIF}
-
+ GetNewData := vSQL.Text <> vOldSQL;
  CreateParams;
 End;
 
@@ -2756,10 +2760,6 @@ End;
 procedure TRESTDWClientSQL.Loaded;
 Begin
  Inherited Loaded;
- {$IFDEF  UP_BARBOSA1}
- vLoading := False;
-{$ENDIF}
-
 End;
 
 Function TRESTDWClientSQL.MassiveCount: Integer;
@@ -2923,6 +2923,7 @@ function TRESTDWClientSQL.GetData(DataSet: TJSONValue): Boolean;
 Var
  LDataSetList  : TJSONValue;
  vError        : Boolean;
+ vValue,
  vMessageError : String;
 Begin
  Result := False;
@@ -2933,17 +2934,24 @@ Begin
   Begin
    Try
     If DataSet = Nil Then
-     vRESTDataBase.ExecuteCommand(vSQL, vParams, vError, vMessageError, LDataSetList, False, vRESTClientPooler)
+     Begin
+      vRESTDataBase.ExecuteCommand(vSQL, vParams, vError, vMessageError, LDataSetList, False, vRESTClientPooler);
+      If LDataSetList <> Nil Then
+       Begin
+        LDataSetList.Encoded := vRESTDataBase.EncodeStrings;
+        vValue := LDataSetList.ToJSON;
+       End;
+     End
     Else
      Begin
-      vError := False;
-      LDataSetList := DataSet;
+      LDataSetList         := DataSet;
+      vError               := False;
+      vValue               := LDataSetList.Value;
      End;
     If (Assigned(LDataSetList)) And (Not (vError)) Then
      Begin
       Try
-       LDataSetList.Encoded := vRESTDataBase.EncodeStrings;
-       LDataSetList.WriteToDataset(dtFull, LDataSetList.ToJSON, Self);
+       LDataSetList.WriteToDataset(dtFull, vValue, Self);
        Result := True;
       Except
       End;
@@ -3040,13 +3048,14 @@ Begin
      Exit;
     End;
    Try
-    If Not(vActive) And (Value) Then
+    If (Not(vActive) And (Value)) Or (GetNewData) Then
      Begin
       ProcBeforeOpen(Self);
       vInBlockEvents := True;
       Filter         := '';
       Filtered       := False;
       vActive        := GetData;
+      GetNewData     := Not vActive;
      End;
     If State = dsBrowse Then
      Begin

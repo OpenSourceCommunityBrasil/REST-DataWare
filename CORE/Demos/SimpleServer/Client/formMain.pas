@@ -132,7 +132,7 @@ BEGIN
   RESTDWClientSQL1.SQL.Clear;
   RESTDWClientSQL1.SQL.Add(MComando.Text);
   TRY
-    RESTDWClientSQL1.Open;
+    RESTDWClientSQL1.Active := True;
   EXCEPT
     ON E: Exception DO
     BEGIN
@@ -185,6 +185,7 @@ begin
   RESTClientPooler1.TypeRequest := TTyperequest.trHttp;
  DWClientEvents1.CreateDWParams('getemployee', dwParams);
  DWClientEvents1.SendEvent('getemployee', dwParams, vErrorMessage, vNativeResult);
+ dwParams.Free;
  If vErrorMessage = '' Then
   Showmessage(vNativeResult)
  Else
@@ -226,6 +227,7 @@ begin
   Showmessage('Server Date/Time is : ' + DateTimeToStr(dwParams.ItemsString['result'].Value))
  Else
   Showmessage(vErrorMessage);
+ dwParams.Free;
 end;
 
 PROCEDURE TForm2.FormCreate(Sender: TObject);

@@ -195,6 +195,7 @@ Public
  Property    ObjectValue           : TObjectValue     Read vObjectValue     Write vObjectValue;
  Property    ParamName             : String           Read vParamName       Write SetParamName;
  Property    Encoded               : Boolean          Read vEncoded         Write vEncoded;
+ Property    Binary                : Boolean          Read vBinary;
  Property    JsonMode              : TJsonMode        Read vJsonMode        Write vJsonMode;
  //Propriedades Novas
  Property    Value                 : Variant          Read GetVariantValue  Write SetVariantValue;
@@ -682,7 +683,9 @@ Function TJSONValue.GetValueJSON(bValue: String): String;
 Begin
  Result := bValue;
  If vObjectValue In [ovString,        ovFixedChar,    ovWideString,
-                     ovFixedWideChar, ovDate, ovTime, ovDateTime] Then
+                     ovFixedWideChar, ovDate, ovTime, ovDateTime,
+                     ovBlob, ovGraphic, ovOraBlob, ovOraClob,
+                     ovMemo, ovWideMemo, ovFmtMemo] Then
   If bValue = '' Then
    Result := '""'
   Else
@@ -1176,43 +1179,39 @@ Begin
     DestDS.DisableControls;
     If DestDS.Active Then
      DestDS.Close;
-     DestDS.Fielddefs.clear;
-    If DestDS.FieldDefs.Count = 0 Then
+    If (DestDS.Fields.Count = 0) Then
+     If DestDS.FieldDefs.Count > 0 Then
+      DestDS.FieldDefs.Clear;
+    bJsonArray    :=  bJsonValue.Pairs[4].JsonValue as tjsonarray; //  bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
+    bJsonArraySub := bJsonArray.Items[0] as Tjsonobject; //  bJsonArray.optJSONObject  (0);
+    bJsonArray    := bJsonArraySub.Pairs[0].JsonValue as Tjsonarray; // optJSONArray(bJsonArraySub.names.get(0).ToString);
+    For J := 0 To bJsonArray.Count - 1 Do
      Begin
-      bJsonArray    :=  bJsonValue.Pairs[4].JsonValue as tjsonarray; //  bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
-      bJsonArraySub := bJsonArray.Items[0] as Tjsonobject; //  bJsonArray.optJSONObject  (0);
-      bJsonArray    := bJsonArraySub.Pairs[0].JsonValue as Tjsonarray; // optJSONArray(bJsonArraySub.names.get(0).ToString);
-      For J := 0 To bJsonArray.Count - 1 Do
-       Begin
-        bJsonOBJ := bJsonarray.Items[J] as Tjsonobject ; // Create(bJsonArray.get(J).ToString);
-        Try
-         If Trim(removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'"')) <> '' then // opt(bJsonOBJ.names.get(0).ToString).ToString) <> '' Then
+      bJsonOBJ := bJsonarray.Items[J] as Tjsonobject ; // Create(bJsonArray.get(J).ToString);
+      Try
+       If Trim(removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'"')) <> '' Then
+        Begin
+         If (TRESTDWClientSQL(DestDS).FieldDefExist(removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'"')) = Nil) And
+            (TRESTDWClientSQL(DestDS).FindField(removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'"')) = Nil)     Then
           Begin
-           If TRESTDWClientSQL(DestDS).FieldDefExist(removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'"')) = nil then // opt(bJsonOBJ.names.get(0).ToString).ToString) = Nil Then
+           FieldDef := TFieldDef.Create(DestDS.FieldDefs, removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'"'),
+                                                          GetFieldType(removestr(bJsonOBJ.Pairs[1].JsonValue.tostring,'"')), //bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString),
+                                                          StrToInt(removestr(bJsonOBJ.Pairs[4].JsonValue.tostring,'"')), //bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString),
+                                                          Uppercase(removestr(bJsonOBJ.Pairs[3].JsonValue.tostring,'"'))='S', //bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S',
+                                                          DestDS.FieldDefs.Count);
+           If Not(FieldDef.DataType In [ftSmallint, ftInteger,  ftLargeint,
+                                        ftFloat,    ftCurrency, ftBCD, ftSingle, ftFMTBcd]) Then
             Begin
-             FieldDef := TFieldDef.Create(DestDS.FieldDefs, removestr(bJsonOBJ.Pairs[0].JsonValue.tostring,'"'),
-                                                            GetFieldType(removestr(bJsonOBJ.Pairs[1].JsonValue.tostring,'"')), //bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString),
-                                                            StrToInt(removestr(bJsonOBJ.Pairs[4].JsonValue.tostring,'"')), //bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString),
-                                                            Uppercase(removestr(bJsonOBJ.Pairs[3].JsonValue.tostring,'"'))='S', //bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S',
-                                                            DestDS.FieldDefs.Count);
-             If Not(FieldDef.DataType In [ftSmallint, ftInteger,  ftLargeint,
-                                          ftFloat,    ftCurrency, ftBCD, ftSingle, ftFMTBcd]) Then
-              Begin
-               FieldDef.Size      := StrToInt(removestr(bJsonOBJ.Pairs[4].JsonValue.tostring,'"')); // bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
-               FieldDef.Precision := StrToInt(removestr(bJsonOBJ.Pairs[5].JsonValue.tostring,'"')); //bJsonOBJ.opt(bJsonOBJ.names.get(5).ToString).ToString);
-              End;
+             FieldDef.Size      := StrToInt(removestr(bJsonOBJ.Pairs[4].JsonValue.tostring,'"')); // bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
+             FieldDef.Precision := StrToInt(removestr(bJsonOBJ.Pairs[5].JsonValue.tostring,'"')); //bJsonOBJ.opt(bJsonOBJ.names.get(5).ToString).ToString);
             End;
           End;
-        Finally
-        // bJsonOBJ.Clean;
-         FreeAndNil(bJsonOBJ);
         End;
-       End;
-     End
-   {$IFDEF FPC}
-    Else
-     DestDS.FieldDefs.Update
-   {$ENDIF};
+      Finally
+      // bJsonOBJ.Clean;
+       FreeAndNil(bJsonOBJ);
+      End;
+     End;
     Try
      {$IFNDEF FPC}
      If DestDS Is TClientDataset Then
@@ -1435,19 +1434,17 @@ Begin
     Raise Exception.Create('Invalid JSON Data...');
    End;
  Finally
-  If DestDS Is TRESTDWClientSQL Then
-   TRESTDWClientSQL(DestDS).InBlockEvents := False;
   //bJsonValue.Clean;
   FreeAndNil(bJsonValue);
   ListFields.Free;
   If DestDS.Active Then
    DestDS.First;
+  If DestDS Is TRESTDWClientSQL Then
+   TRESTDWClientSQL(DestDS).InBlockEvents := False;
   DestDS.EnableControls;
  End;
 End;
-
 {$ELSE}
-
 Procedure TJSONValue.WriteToDataset(DatasetType : TDatasetType;
                                     JSONValue   : String;
                                     DestDS      : TDataset;
@@ -1511,7 +1508,7 @@ Var
                   ftFloat,
                   ftCurrency,
                   ftBCD,
-		  {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
+            		  {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
                   {$IFEND}{$ENDIF}
                   ftFMTBcd     : Begin
                                   vTempValue  := BuildFloatString(Value);
@@ -1521,7 +1518,7 @@ Var
                                      ftFloat  : Field.AsFloat    := StrToFloat(vTempValue);
                                      ftCurrency,
                                      ftBCD,
-			    	     {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
+			    	                         {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
                                      {$IFEND}{$ENDIF}
                                      ftFMTBcd : Field.AsCurrency := StrToFloat(vTempValue);
                                      End;
@@ -1575,13 +1572,12 @@ Begin
     If DestDS.Active Then
      DestDS.Close;
     If (DestDS.Fields.Count = 0) Then
-     If DestDS.FieldDefs.Count > 0 Then
+     If (DestDS.FieldDefs.Count > 0) Then
       DestDS.FieldDefs.Clear;
     bJsonArray    := bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
     bJsonArraySub := bJsonArray.optJSONObject  (0);
     bJsonArray    := bJsonArraySub.optJSONArray(bJsonArraySub.names.get(0).ToString);
-    TRESTDWClientSQL(DestDS).FieldDefs.BeginUpdate;
-//    If DestDS.FieldDefs.Count = 0 Then
+//    TRESTDWClientSQL(DestDS).FieldDefs.BeginUpdate;
     For J := 0 To bJsonArray.Length - 1 Do
      Begin
       bJsonOBJ := udwjson.TJsonObject.Create(bJsonArray.get(J).ToString);
@@ -1589,7 +1585,7 @@ Begin
        If Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) <> '' Then
         Begin
          If (TRESTDWClientSQL(DestDS).FieldDefExist(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) = Nil) And
-            (TRESTDWClientSQL(DestDS).FindField(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) = Nil) Then
+            (TRESTDWClientSQL(DestDS).FindField(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString)     = Nil) Then
           Begin
            FieldDef          := TRESTDWClientSQL(DestDS).FieldDefs.AddFieldDef;
            FieldDef.Name     := bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString;
@@ -1615,7 +1611,7 @@ Begin
        FreeAndNil(bJsonOBJ);
       End;
      End;
-    TRESTDWClientSQL(DestDS).FieldDefs.EndUpdate;
+//    TRESTDWClientSQL(DestDS).FieldDefs.EndUpdate;
     Try
      {$IFNDEF FPC}
      If DestDS Is TClientDataset Then
@@ -1765,8 +1761,6 @@ Begin
     bJsonArray    := bJsonArraySub.optJSONArray(bJsonArraySub.names.get(0).ToString);
     If DestDS Is TRESTDWClientSQL Then
      TRESTDWClientSQL(DestDS).InBlockEvents := True;
-
-
     For J := 0 To bJsonArray.Length - 1 Do
      Begin
       bJsonOBJ     := uDWJSON.TJsonObject.Create(bJsonArray.get(J).ToString);
@@ -1870,13 +1864,13 @@ Begin
     Raise Exception.Create('Invalid JSON Data...');
    End;
  Finally
-  If DestDS Is TRESTDWClientSQL Then
-   TRESTDWClientSQL(DestDS).InBlockEvents := False;
   bJsonValue.Clean;
   FreeAndNil(bJsonValue);
   ListFields.Free;
   If DestDS.Active Then
    DestDS.First;
+  If DestDS Is TRESTDWClientSQL Then
+   TRESTDWClientSQL(DestDS).InBlockEvents := False;
   If DestDS is TRESTDWClientSQL Then
    Begin
     If TRESTDWClientSQL(DestDS).State = dsBrowse Then
@@ -2488,7 +2482,7 @@ Begin
   WriteValue(EncodeStrings(aValue{$IFDEF FPC}, csUndefined{$ENDIF}))
  Else
   WriteValue(aValue);
- vBinary := False;
+ vBinary := vJSONValue.ObjectValue in [ovBlob, ovGraphic, ovOraBlob, ovOraClob];
  vJSONValue.vBinary := vBinary;
 End;
 

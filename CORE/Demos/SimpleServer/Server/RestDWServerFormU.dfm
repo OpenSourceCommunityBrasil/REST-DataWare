@@ -117,8 +117,6 @@ object RestDWForm: TRestDWForm
     TabOrder = 3
     object tsConfigs: TTabSheet
       Caption = 'Configuration'
-      ExplicitLeft = 8
-      ExplicitTop = 26
       DesignSize = (
         515
         346)
@@ -1237,7 +1235,7 @@ object RestDWForm: TRestDWForm
         Top = 169
         Width = 213
         Height = 21
-        TabOrder = 16
+        TabOrder = 15
         Text = 'informe  a URL'
         Visible = False
       end
@@ -1360,7 +1358,7 @@ object RestDWForm: TRestDWForm
       end
       object cbEncode: TCheckBox
         Left = 268
-        Top = 49
+        Top = 65
         Width = 101
         Height = 19
         Caption = 'Encode Strings'
@@ -1374,28 +1372,12 @@ object RestDWForm: TRestDWForm
         State = cbChecked
         TabOrder = 12
       end
-      object CheckBox1: TCheckBox
-        Left = 268
-        Top = 69
-        Width = 91
-        Height = 19
-        Caption = 'Compression'
-        Checked = True
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ParentFont = False
-        State = cbChecked
-        TabOrder = 13
-      end
       object cbDriver: TComboBox
         Left = 7
         Top = 125
         Width = 162
         Height = 21
-        TabOrder = 14
+        TabOrder = 13
         Text = 'Selecione o SGBD'
         OnCloseUp = cbDriverCloseUp
         Items.Strings = (
@@ -1408,13 +1390,17 @@ object RestDWForm: TRestDWForm
         Width = 68
         Height = 17
         Caption = 'Usa URL'
-        TabOrder = 15
+        TabOrder = 14
         OnClick = ckUsaURLClick
       end
     end
     object tsLogs: TTabSheet
       Caption = 'Logs'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label19: TLabel
         Left = 7
         Top = 147

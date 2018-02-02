@@ -364,7 +364,7 @@ Type
   Property Port             : Integer                Read vPort              Write vPort              Default 8082;
   Property UserName         : String                 Read vUserName          Write SetUserName;
   Property Password         : String                 Read vPassword          Write SetPassword;
-  Property Authentication   : Boolean                Read vAuthentication      Write vAuthentication      Default True;
+  Property Authentication   : Boolean                Read vAuthentication    Write vAuthentication      Default True;
   Property ProxyOptions     : TIdProxyConnectionInfo Read vTransparentProxy  Write vTransparentProxy;
   Property RequestTimeOut   : Integer                Read vRequestTimeOut    Write vRequestTimeOut;
   Property ThreadRequest    : Boolean                Read vThreadRequest     Write vThreadRequest;
@@ -848,7 +848,8 @@ Begin
      JSONParam.ObjectDirection := odOut;
      DWParams.Add(JSONParam);
     End;
-   DWParams.ItemsString['Result'].SetValue(vResult);
+   DWParams.ItemsString['Result'].SetValue(vResult,
+                                           DWParams.ItemsString['Result'].Encoded);
    JSONStr    := TReplyOK;
   End
  Else If vUrlMethod = UpperCase('EchoPooler') Then
@@ -869,7 +870,8 @@ Begin
      JSONParam.ObjectDirection := odOut;
      DWParams.Add(JSONParam);
     End;
-   DWParams.ItemsString['Result'].SetValue(vResultIP);
+   DWParams.ItemsString['Result'].SetValue(vResultIP,
+                                           DWParams.ItemsString['Result'].Encoded);
    Result := vResultIP <> '';
    If Result Then
     Begin
@@ -1023,7 +1025,8 @@ Begin
              If DWParams.ItemsString['Result'] <> Nil Then
               Begin
                If vTempJSON <> Nil Then
-                DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON)
+                DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON,
+                                                        DWParams.ItemsString['Result'].Encoded)
                Else
                 DWParams.ItemsString['Result'].SetValue('');
               End;
@@ -1088,7 +1091,8 @@ Begin
             Begin
              If vTempJSON <> Nil Then
               Begin
-               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON);
+               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON,
+                                                       DWParams.ItemsString['Result'].Encoded);
                FreeAndNil(vTempJSON);
               End
              Else
@@ -1145,7 +1149,8 @@ Begin
            If DWParams.ItemsString['Result'] <> Nil Then
             Begin
              If vTempJSON <> -1 Then
-              DWParams.ItemsString['Result'].SetValue(IntToStr(vTempJSON))
+              DWParams.ItemsString['Result'].SetValue(IntToStr(vTempJSON),
+                                                      DWParams.ItemsString['Result'].Encoded)
              Else
               DWParams.ItemsString['Result'].SetValue('-1');
             End;
@@ -1179,7 +1184,7 @@ Begin
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vError   := DWParams.ItemsString['Error'].AsBoolean;
-           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := False;
            If DWParams.ItemsString['Params'] <> Nil Then
             Begin
              DWParamsD := TDWParams.Create;
@@ -1199,7 +1204,8 @@ Begin
             Begin
              If vTempJSON <> Nil Then
               Begin
-               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON);
+               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON,
+                                                       DWParams.ItemsString['Result'].Encoded);
                vTempJSON.Free;
               End
              Else
@@ -1272,7 +1278,8 @@ Begin
    If DWParams.ItemsString['Result'] <> Nil Then
     Begin
      If vTempJSON <> '' Then
-      DWParams.ItemsString['Result'].SetValue(Format('[%s]', [vTempJSON]))
+      DWParams.ItemsString['Result'].SetValue(Format('[%s]', [vTempJSON]),
+                                              DWParams.ItemsString['Result'].Encoded)
      Else
       DWParams.ItemsString['Result'].SetValue('');
     End;
@@ -1308,7 +1315,8 @@ Begin
             Begin
              If vTempJSON <> Nil Then
               Begin
-               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON);
+               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON,
+                                                       DWParams.ItemsString['Result'].Encoded);
                FreeAndNil(vTempJSON);
               End
              Else
@@ -1340,7 +1348,7 @@ Begin
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vError   := DWParams.ItemsString['Error'].AsBoolean;
-           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := False;
            TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdates_MassiveCache(DWParams.ItemsString['MassiveCache'].Value,
                                                                                                   vError,  vMessageError);
            If vMessageError <> '' Then
@@ -1402,9 +1410,8 @@ Begin
    HttpRequest.Disconnect;
  Except
  End;
-// FreeAndNil(vTransparentProxy);
-// FreeAndNil(HttpRequest);
  HttpRequest.Free;
+ FreeAndNil(vTransparentProxy);
  Inherited;
 End;
 
@@ -1489,7 +1496,7 @@ Var
            vValue := DecodeStrings(stringreplace(bJsonOBJ.pairs[4].JsonValue.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]) )
           Else
            vValue := stringreplace(bJsonOBJ.pairs[4].JsonValue.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]);
-          JSONParam.SetValue(vValue);
+          JSONParam.SetValue(vValue, JSONParam.Encoded);
           //bJsonOBJ.clean;
           FreeAndNil(bJsonOBJ);
           //parametro criandos no servidor
@@ -1500,9 +1507,10 @@ Var
             JSONParamNew.SetValue(JSONParam.Value, JSONParam.Encoded);
             ParamsData.Add(JSONParamNew);
            End
+          Else If Not (JSONParam.Binary) Then
+           ParamsData.ItemsString[JSONParam.ParamName].Value := JSONParam.Value //, JSONParam.Encoded);
           Else
-          ParamsData.ItemsString[JSONParam.ParamName].Value := JSONParam.Value; //, JSONParam.Encoded);
-           //ParamsData.ItemsString[JSONParam.ParamName].SetValue(JSONParam.Value, JSONParam.Encoded);
+           ParamsData.ItemsString[JSONParam.ParamName].SetValue(vValue, JSONParam.Encoded);
          Finally
           FreeAndNil(JSONParam);
           If Assigned(bJsonOBJ) Then
@@ -1558,11 +1566,8 @@ Var
    End;
  End;
 Begin
-
-
  SendParams := Nil;
  StringStreamList := Nil;
-
  // INICIO BLOCO PARA USA thread   CRISTIANO BABSOSA
  If vThreadRequest and (not vThreadExecuting) then
   Begin
@@ -1806,7 +1811,7 @@ Var
     InputValue := Copy(InputValue, 1, InitPos -1) + ']}'; //Delete(InputValue, InitPos, Pos(']}', InputValue) - InitPos);
    If (Params <> Nil) And (InputValue <> '{"PARAMS"]}') Then
     Begin
-     bJsonValue    :=   TJsonObject.Create(InputValue);
+     bJsonValue    := TJsonObject.Create(InputValue);
      bJsonOBJTemp  := TJSONArray.Create(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString);
      If bJsonOBJTemp.length > 0 Then
       Begin
@@ -1844,8 +1849,10 @@ Var
             JSONParamNew.SetValue(JSONParam.Value, JSONParam.Encoded);
             ParamsData.Add(JSONParamNew);
            End
+          Else If Not (JSONParam.Binary) Then
+           ParamsData.ItemsString[JSONParam.ParamName].Value := JSONParam.Value //, JSONParam.Encoded);
           Else
-           ParamsData.ItemsString[JSONParam.ParamName].Value := JSONParam.Value; //, JSONParam.Encoded);
+           ParamsData.ItemsString[JSONParam.ParamName].SetValue(vValue, JSONParam.Encoded);
          Finally
           FreeAndNil(JSONParam);
           If Assigned(bJsonOBJ) Then
@@ -1902,7 +1909,6 @@ Var
 Begin
  SendParams := Nil;
  StringStreamList := Nil;
-
  // INICIO BLOCO PARA USA thread   CRISTIANO BABSOSA
  If vThreadRequest and (not vThreadExecuting) then
   Begin
@@ -1919,13 +1925,13 @@ Begin
     thd.vUrlPath        := vUrlPath;
     thd.vHost           :=   vHost;
     thd.vPort           :=   vPort;
-    thd.vAuthentication   :=   vAuthentication;
-    thd.vTransparentProxy:=   vTransparentProxy;
+    thd.vAuthentication   :=  vAuthentication;
+    thd.vTransparentProxy := vTransparentProxy;
     thd.vRequestTimeOut :=   vRequestTimeOut;
     thd.vTypeRequest    :=   vTypeRequest;
     thd.vRSCharset      :=   vRSCharset;
     thd.FCallBack       :=  CallBack;
-        thd.FCallSendEvent   :=   self.SendEvent;
+    thd.FCallSendEvent   :=   self.SendEvent;
    vThreadExecuting:=True;
    Finally
     thd.Execute;
@@ -2186,7 +2192,7 @@ Var
            vValue := DecodeStrings(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
           Else
            vValue := bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString;
-          JSONParam.SetValue(vValue);
+          JSONParam.SetValue(vValue, JSONParam.Encoded);
           bJsonOBJ.clean;
           FreeAndNil(bJsonOBJ);
           //parametro criandos no servidor
@@ -2197,8 +2203,10 @@ Var
             JSONParamNew.SetValue(JSONParam.Value, JSONParam.Encoded);
             ParamsData.Add(JSONParamNew);
            End
+          Else If Not (JSONParam.Binary) Then
+           ParamsData.ItemsString[JSONParam.ParamName].Value := JSONParam.Value //, JSONParam.Encoded);
           Else
-           ParamsData.ItemsString[JSONParam.ParamName].SetValue(JSONParam.Value, JSONParam.Encoded);
+           ParamsData.ItemsString[JSONParam.ParamName].SetValue(vValue, JSONParam.Encoded);
          Finally
           FreeAndNil(JSONParam);
           If Assigned(bJsonOBJ) Then
@@ -2559,7 +2567,11 @@ Begin
    aHttpRequest.Request.Authentication.Password := vPassword;
    aHttpRequest.Request.Authentication.Username := vUserName;
   End;
- aHttpRequest.ProxyParams         := vTransparentProxy;
+ aHttpRequest.ProxyParams.BasicAuthentication := vTransparentProxy.BasicAuthentication;
+ aHttpRequest.ProxyParams.ProxyUsername       := vTransparentProxy.ProxyUsername;
+ aHttpRequest.ProxyParams.ProxyServer         := vTransparentProxy.ProxyServer;
+ aHttpRequest.ProxyParams.ProxyPassword       := vTransparentProxy.ProxyPassword;
+ aHttpRequest.ProxyParams.ProxyPort           := vTransparentProxy.ProxyPort;
  aHttpRequest.ReadTimeout         := vRequestTimeout;
  aHttpRequest.Request.ContentType := HttpRequest.Request.ContentType;
  aHttpRequest.AllowCookies        := HttpRequest.AllowCookies;
@@ -2666,45 +2678,44 @@ Var
  vExecute  : Boolean;
  vMessageError : String;
 Begin
-  try
-   If ServerMethodsClass <> Nil Then
-    Begin
-     For I := 0 To ServerMethodsClass.ComponentCount -1 Do
-      Begin
-       If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
-        Begin
-         If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
-          Begin
-           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
-            Begin
-             vExecute := DWParams.ItemsString['Execute'].AsBoolean;
-             vError   := DWParams.ItemsString['Error'].AsBoolean;
-             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
-             vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ExecuteCommand(DWParams.ItemsString['SQL'].Value,
-                                                                                                      vError,
-                                                                                                      vMessageError,
-                                                                                                      vExecute);
-             If vMessageError <> '' Then
-              DWParams.ItemsString['MessageError'].AsString := vMessageError;
-             DWParams.ItemsString['Error'].AsBoolean := vError;
-             If DWParams.ItemsString['Result'] <> Nil Then
-              Begin
-               If vTempJSON <> Nil Then
-                DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON)
-               Else
-                DWParams.ItemsString['Result'].SetValue('');
-              End;
-            End;
-           Break;
-          End;
-        End;
-      End;
-    End;
-  finally
-  {Ico}
-   FreeAndNil(vTempJSON);
-  {Ico}
-  end;
+ Try
+  If ServerMethodsClass <> Nil Then
+   Begin
+    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+     Begin
+      If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
+       Begin
+        If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
+         Begin
+          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
+           Begin
+            vExecute := DWParams.ItemsString['Execute'].AsBoolean;
+            vError   := DWParams.ItemsString['Error'].AsBoolean;
+            TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+            vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ExecuteCommand(DWParams.ItemsString['SQL'].Value,
+                                                                                                     vError,
+                                                                                                     vMessageError,
+                                                                                                     vExecute);
+            If vMessageError <> '' Then
+             DWParams.ItemsString['MessageError'].AsString := vMessageError;
+            DWParams.ItemsString['Error'].AsBoolean := vError;
+            If DWParams.ItemsString['Result'] <> Nil Then
+             Begin
+              If vTempJSON <> Nil Then
+               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON,
+                                                       DWParams.ItemsString['Result'].Encoded)
+              Else
+               DWParams.ItemsString['Result'].SetValue('');
+             End;
+           End;
+          Break;
+         End;
+       End;
+     End;
+   End;
+ Finally
+  FreeAndNil(vTempJSON);
+ End;
 End;
 
 Procedure TRESTServicePooler.InsertMySQLReturnID(ServerMethodsClass : TComponent;
@@ -2751,7 +2762,7 @@ Begin
            If DWParams.ItemsString['Result'] <> Nil Then
             Begin
              If vTempJSON <> -1 Then
-              DWParams.ItemsString['Result'].SetValue(IntToStr(vTempJSON))
+              DWParams.ItemsString['Result'].SetValue(IntToStr(vTempJSON), DWParams.ItemsString['Result'].Encoded)
              Else
               DWParams.ItemsString['Result'].SetValue('-1');
             End;
@@ -2782,7 +2793,7 @@ Begin
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vError   := DWParams.ItemsString['Error'].AsBoolean;
-           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := False;
            TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdates_MassiveCache(DWParams.ItemsString['MassiveCache'].Value,
                                                                                                   vError,  vMessageError);
            If vMessageError <> '' Then
@@ -2819,7 +2830,7 @@ Begin
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vError   := DWParams.ItemsString['Error'].AsBoolean;
-           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := vEncodeStrings;
+           TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.EncodeStringsJSON := False;
            If DWParams.ItemsString['Params'] <> Nil Then
             Begin
              DWParamsD := TDWParams.Create;
@@ -2839,7 +2850,7 @@ Begin
             Begin
              If vTempJSON <> Nil Then
               Begin
-               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON);
+               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON, DWParams.ItemsString['Result'].Encoded);
                vTempJSON.Free;
               End
              Else
@@ -2902,7 +2913,7 @@ Begin
             Begin
              If vTempJSON <> Nil Then
               Begin
-               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON);
+               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON, DWParams.ItemsString['Result'].Encoded);
                FreeAndNil(vTempJSON);
               End
              Else
@@ -2976,7 +2987,7 @@ Begin
    If DWParams.ItemsString['Result'] <> Nil Then
     Begin
      If vTempJSON <> '' Then
-      DWParams.ItemsString['Result'].SetValue(Format('[%s]', [vTempJSON]))
+      DWParams.ItemsString['Result'].SetValue(Format('[%s]', [vTempJSON]), DWParams.ItemsString['Result'].Encoded)
      Else
       DWParams.ItemsString['Result'].SetValue('');
     End;
@@ -3013,7 +3024,7 @@ Begin
             Begin
              If vTempJSON <> Nil Then
               Begin
-               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON);
+               DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON, DWParams.ItemsString['Result'].Encoded);
                FreeAndNil(vTempJSON);
               End
              Else
@@ -3044,14 +3055,16 @@ Begin
   Begin
    Result     := True;
    GetPoolerList(BaseObject, vResult);
-   DWParams.ItemsString['Result'].SetValue(vResult);
+   DWParams.ItemsString['Result'].SetValue(vResult,
+                                           DWParams.ItemsString['Result'].Encoded);
    JSONStr    := TReplyOK;
   End
  Else If vUrlMethod = UpperCase('EchoPooler') Then
   Begin
    vResult    := DWParams.ItemsString['Pooler'].Value;
    EchoPooler(BaseObject, AContext, vResult, vResultIP);
-   DWParams.ItemsString['Result'].SetValue(vResultIP);
+   DWParams.ItemsString['Result'].SetValue(vResultIP,
+                                           DWParams.ItemsString['Result'].Encoded);
    Result     := vResultIP <> '';
    If Result Then
     JSONStr    := TReplyOK
@@ -3883,7 +3896,7 @@ Var
            DecodeStrings(stringreplace(bJsonOBJ.pairs[4].JsonValue.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]) )
           Else
            vValue := stringreplace(bJsonOBJ.pairs[4].JsonValue.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]);
-          JSONParam.SetValue(vValue);
+          JSONParam.SetValue(vValue, JSONParam.Encoded);
           bJsonOBJ.Free;
           //parametro criandos no servidor
           If ParamsData.ItemsString[JSONParam.ParamName] = Nil Then
@@ -3893,8 +3906,10 @@ Var
             JSONParamNew.SetValue(JSONParam.Value, JSONParam.Encoded);
             ParamsData.Add(JSONParamNew);
            End
+          Else If Not (JSONParam.Binary) Then
+           ParamsData.ItemsString[JSONParam.ParamName].Value := JSONParam.Value //, JSONParam.Encoded);
           Else
-           ParamsData.ItemsString[JSONParam.ParamName].SetValue(JSONParam.Value, JSONParam.Encoded);
+           ParamsData.ItemsString[JSONParam.ParamName].SetValue(vValue, JSONParam.Encoded);
          Finally
           JSONParam.Free;
          End;
@@ -3951,7 +3966,7 @@ Var
            vValue := DecodeStrings(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString{$IFDEF FPC}, csUndefined{$ENDIF})
           Else
            vValue := bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString;
-          JSONParam.SetValue(vValue);
+          JSONParam.SetValue(vValue, JSONParam.Encoded);
           bJsonOBJ.Free;
           //parametro criandos no servidor
           If ParamsData.ItemsString[JSONParam.ParamName] = Nil Then
@@ -3961,8 +3976,10 @@ Var
             JSONParamNew.SetValue(JSONParam.Value, JSONParam.Encoded);
             ParamsData.Add(JSONParamNew);
            End
+          Else If Not (JSONParam.Binary) Then
+           ParamsData.ItemsString[JSONParam.ParamName].Value := JSONParam.Value //, JSONParam.Encoded);
           Else
-           ParamsData.ItemsString[JSONParam.ParamName].SetValue(JSONParam.Value, JSONParam.Encoded);
+           ParamsData.ItemsString[JSONParam.ParamName].SetValue(vValue, JSONParam.Encoded);
          Finally
           JSONParam.Free;
          End;

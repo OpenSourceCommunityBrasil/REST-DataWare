@@ -336,7 +336,9 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.AsString              := '';
+ JSONParam.ObjectValue           := ovBlob;
+ JSONParam.Encoded               := False;
+ JSONParam.SetValue('', JSONParam.Encoded);
  DWParams.Add(JSONParam);
  Try
   Try
@@ -352,8 +354,8 @@ Begin
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['Result'] <> Nil Then
       Begin
-       If DWParams.ItemsString['Result'].Value <> '' Then
-        Result.LoadFromJSON(DWParams.ItemsString['Result'].Value);
+       If DWParams.ItemsString['Result'].AsString <> '' Then
+        Result.LoadFromJSON(DWParams.ItemsString['Result'].AsString);
       End;
     End
    Else
@@ -633,7 +635,9 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.AsString              := '';
+ JSONParam.ObjectValue           := ovString;
+ JSONParam.Encoded               := True;
+ JSONParam.SetValue('', JSONParam.Encoded);
  DWParams  := TDWParams.Create;
  DWParams.Add(JSONParam);
  Try
@@ -643,7 +647,7 @@ Begin
       (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
     Begin
      Result      := TStringList.Create;
-     vTempString := DWParams.ItemsString['Result'].Value;
+     vTempString := DWParams.ItemsString['Result'].AsString;
      While Not (vTempString = '') Do
       Begin
        if Pos('|', vTempString) > 0 then
@@ -745,14 +749,16 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.AsString              := '';
+ JSONParam.ObjectValue           := ovString;
+ JSONParam.Encoded               := True;
+ JSONParam.SetValue('', JSONParam.Encoded);
  DWParams.Add(JSONParam);
  Try
   Try
    lResponse := RESTClientPoolerExec.SendEvent('EchoPooler', DWParams);
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
-    Result   := DWParams.ItemsString['Result'].Value
+    Result   := DWParams.ItemsString['Result'].AsString
    Else
     Begin
      If (lResponse = '') Then
@@ -770,7 +776,8 @@ Begin
   End;
  Finally
   If Not Assigned(RESTClientPooler) Then
-   FreeAndNil(RESTClientPoolerExec);
+   If Assigned(RESTClientPoolerExec) Then
+    FreeAndNil(RESTClientPoolerExec);
   FreeAndNil(DWParams);
  End;
 End;
@@ -912,7 +919,9 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.AsString              := '';
+ JSONParam.ObjectValue           := ovBlob;
+ JSONParam.Encoded               := False;
+ JSONParam.SetValue('', JSONParam.Encoded);
  DWParams.Add(JSONParam);
  Try
   Try
@@ -927,7 +936,7 @@ Begin
      If DWParams.ItemsString['MessageError'] <> Nil Then
       MessageError  := DWParams.ItemsString['MessageError'].Value;
      If DWParams.ItemsString['Result'] <> Nil Then
-      Result.LoadFromJSON(DWParams.ItemsString['Result'].Value);
+      Result.LoadFromJSON(DWParams.ItemsString['Result'].AsString);
     End
    Else
     Begin
@@ -1105,7 +1114,9 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.AsString              := '';
+ JSONParam.ObjectValue           := ovBlob;
+ JSONParam.Encoded               := False;
+ JSONParam.SetValue('', JSONParam.Encoded);
  DWParams.Add(JSONParam);
  Try
   Try
@@ -1121,8 +1132,8 @@ Begin
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['Result'] <> Nil Then
       Begin
-       If DWParams.ItemsString['Result'].Value <> '' Then
-        Result.LoadFromJSON(DWParams.ItemsString['Result'].Value);
+       If DWParams.ItemsString['Result'].AsString <> '' Then
+        Result.LoadFromJSON(DWParams.ItemsString['Result'].AsString);
       End;
     End
    Else
@@ -1287,7 +1298,9 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.AsString              := '';
+ JSONParam.ObjectValue           := ovBlob;
+ JSONParam.Encoded               := False;
+ JSONParam.SetValue('', JSONParam.Encoded);
  DWParams.Add(JSONParam);
  Try
   Try
@@ -1303,8 +1316,8 @@ Begin
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['Result'] <> Nil Then
       Begin
-       If DWParams.ItemsString['Result'].Value <> '' Then
-        Result.LoadFromJSON(DWParams.ItemsString['Result'].Value);
+       If DWParams.ItemsString['Result'].AsString <> '' Then
+        Result.LoadFromJSON(DWParams.ItemsString['Result'].AsString);
       End;
     End
    Else
@@ -1500,7 +1513,9 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.AsString              := '';
+ JSONParam.ObjectValue           := ovString;
+ JSONParam.Encoded               := True;
+ JSONParam.SetValue('', JSONParam.Encoded);
  DWParams.Add(JSONParam);
  Try
   Try
@@ -1514,7 +1529,7 @@ Begin
      If DWParams.ItemsString['MessageError'] <> Nil Then
       MessageError  := DWParams.ItemsString['MessageError'].Value;
      If DWParams.ItemsString['Result'] <> Nil Then
-      Result := StrToInt(DWParams.ItemsString['Result'].Value);
+      Result := StrToInt(DWParams.ItemsString['Result'].AsString);
     End
    Else
     Begin
@@ -1651,7 +1666,9 @@ Begin
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
- JSONParam.AsString              := '';
+ JSONParam.ObjectValue           := ovString;
+ JSONParam.Encoded               := True;
+ JSONParam.SetValue('', JSONParam.Encoded);
  DWParams.Add(JSONParam);
  Try
   Try
@@ -1664,7 +1681,7 @@ Begin
      If DWParams.ItemsString['MessageError'] <> Nil Then
       MessageError  := DWParams.ItemsString['MessageError'].Value;
      If DWParams.ItemsString['Result'] <> Nil Then
-      Result := StrToInt(DWParams.ItemsString['Result'].Value);
+      Result := StrToInt(DWParams.ItemsString['Result'].AsString);
     End
    Else
     Begin

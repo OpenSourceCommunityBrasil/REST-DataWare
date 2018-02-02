@@ -451,15 +451,18 @@ End;
 
 Procedure TMassiveValue.SetValue(Value: String);
 Begin
- vJSONValue.Binary  := vBinary;
- If vJSONValue.Binary Then
+ If vJSONValue <> Nil Then
   Begin
-   vJSONValue.ObjectValue := ovBlob;
-   vJSONValue.SetValue(Value, False);
-   vJSONValue.Encoded := True;
-  End
- Else
-  vJSONValue.SetValue(Value);
+   vJSONValue.Binary  := vBinary;
+   If vJSONValue.Binary Then
+    Begin
+     vJSONValue.ObjectValue := ovBlob;
+     vJSONValue.SetValue(Value, False);
+     vJSONValue.Encoded := True;
+    End
+   Else
+    vJSONValue.SetValue(Value);
+  End;
 End;
 
 { TMassiveValues }

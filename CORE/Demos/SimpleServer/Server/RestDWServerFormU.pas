@@ -106,7 +106,6 @@ type
     Label18: TLabel;
     CbEncode: TCheckBox;
     RESTServicePooler1: TRESTServicePooler;
-    CheckBox1: TCheckBox;
     Tupdatelogs: TTimer;
     CbDriver: TComboBox;
     Label20: TLabel;
