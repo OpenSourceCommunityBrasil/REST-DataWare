@@ -2136,7 +2136,7 @@ Var
  StringStream  : TStringStream;
  SendParams    : TIdMultipartFormDataStream;
  thd           : TThread_Request;
-
+ vDataPack,
  SResult : String;
  StringStreamList : TStringStreamList;
  Procedure SetData(Var InputValue     : String;
@@ -2407,24 +2407,31 @@ Begin
         End;
        HttpRequest.Request.Clear;
        StringStream.Position := 0;
-       Try
-        If not vThreadRequest Then
-          SetData(StringStream.DataString, Params, Result)
-        else
-        begin
-          SetData(StringStream.DataString, Params, SResult);
-          If Assigned(CallBack) Then
-            CallBack(SResult, Params);
-        end
-       Finally
-        {$IFNDEF FPC}
+       vDataPack := StringStream.DataString;
+       If not vThreadRequest Then
+        Begin
+         {$IFNDEF FPC}
          {$IF CompilerVersion > 21}
-          StringStream.Clear;
+         StringStream.Clear;
          {$IFEND}
-        StringStream.Size := 0;
-        {$ENDIF}
-        FreeAndNil(StringStream);
-       End;
+         StringStream.Size := 0;
+         {$ENDIF}
+         FreeAndNil(StringStream);
+         SetData(vDataPack, Params, Result);
+        End
+       Else
+        Begin
+         {$IFNDEF FPC}
+         {$IF CompilerVersion > 21}
+         StringStream.Clear;
+         {$IFEND}
+         StringStream.Size := 0;
+         {$ENDIF}
+         FreeAndNil(StringStream);
+         SetData(vDataPack, Params, SResult);
+         If Assigned(CallBack) Then
+          CallBack(SResult, Params);
+        End;
       End
      Else If EventType = sePUT Then
       Begin
@@ -2433,19 +2440,31 @@ Begin
        HttpRequest.Post(vURL, SendParams, StringStream);
        StringStream.WriteBuffer(#0' ', 1);
        StringStream.Position := 0;
-       Try
-        If not vThreadRequest Then
-          SetData(StringStream.DataString, Params, Result)
-        else
-        begin
-          SetData(StringStream.DataString, Params, SResult);
-          If Assigned(CallBack) Then
-            CallBack(SResult, Params);
-        end;
-       Finally
-        {$IFNDEF FPC}StringStream.Size := 0;{$ENDIF}
-        FreeAndNil(StringStream);
-       End;
+       vDataPack := StringStream.DataString;
+       If not vThreadRequest Then
+        Begin
+         {$IFNDEF FPC}
+         {$IF CompilerVersion > 21}
+         StringStream.Clear;
+         {$IFEND}
+         StringStream.Size := 0;
+         {$ENDIF}
+         FreeAndNil(StringStream);
+         SetData(vDataPack, Params, Result);
+        End
+       Else
+        Begin
+         {$IFNDEF FPC}
+         {$IF CompilerVersion > 21}
+         StringStream.Clear;
+         {$IFEND}
+         StringStream.Size := 0;
+         {$ENDIF}
+         FreeAndNil(StringStream);
+         SetData(vDataPack, Params, SResult);
+         If Assigned(CallBack) Then
+          CallBack(SResult, Params);
+        End;
       End
      Else If EventType = seDELETE Then
       Begin
