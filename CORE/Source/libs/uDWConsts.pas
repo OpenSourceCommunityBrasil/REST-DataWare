@@ -1155,7 +1155,7 @@ Begin
   {$ENDIF}
  Else If vFieldType = Uppercase('ftFMTBcd')          Then
   Result := ftFMTBcd
-  {$IFNDEF FPC}
+  {.$IFNDEF FPC}      //deve manter compatibilidade quado o server é compilado em versao diferente do Client
    {$if CompilerVersion > 21}
     Else If vFieldType = Uppercase('ftFixedWideChar')   Then
      Result := ftFixedWideChar
@@ -1185,7 +1185,41 @@ Begin
      Result := ftObject
     Else If vFieldType = Uppercase('ftSingle')          Then
      Result := ftSingle
-   {$IFEND}{$ENDIF};
+
+   {$ELSE}
+    (*
+    Else If vFieldType = Uppercase('ftFixedWideChar')   Then
+     Result := ftMemo
+    *)Else If vFieldType = Uppercase('ftWideMemo')        Then
+     Result := ftMemo
+    (*Else If vFieldType = Uppercase('ftOraTimeStamp')    Then
+     Result := ftOraTimeStamp
+    Else If vFieldType = Uppercase('ftOraInterval')     Then
+     Result := ftOraInterval
+    Else If vFieldType = Uppercase('ftLongWord')        Then
+     Result := ftLongWord
+    Else If vFieldType = Uppercase('ftShortint')        Then
+     Result := ftShortint
+    Else If vFieldType = Uppercase('ftByte')            Then
+     Result := ftByte
+    Else If vFieldType = Uppercase('ftExtended')        Then
+     Result := ftExtended
+    Else If vFieldType = Uppercase('ftConnection')      Then
+     Result := ftConnection
+    Else If vFieldType = Uppercase('ftParams')          Then
+     Result := ftParams
+    Else If vFieldType = Uppercase('ftStream')          Then
+     Result := ftStream
+    Else If vFieldType = Uppercase('ftTimeStampOffset') Then
+     Result := ftTimeStampOffset
+    Else If vFieldType = Uppercase('ftObject')          Then
+     Result := ftObject
+    Else If vFieldType = Uppercase('ftSingle')          Then
+     Result := ftSingle
+     *)
+   {$IFEND};
+
+
 End;
 
 {$IFNDEF FPC}
