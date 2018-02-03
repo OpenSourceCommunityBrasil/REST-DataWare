@@ -1792,24 +1792,25 @@ Begin
            TRESTDWClientSQL(DestDS).Fields[I].Required := vRequired;
            Continue;
           End;
+         vTempValue := bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString;
          If TRESTDWClientSQL(DestDS).Fields[I].DataType In [ftGraphic,     ftParadoxOle, ftDBaseOle,
                                                             ftTypedBinary, ftCursor,     ftDataSet,
                                                             ftBlob,        ftOraBlob,    ftOraClob
                                                             {$IFNDEF FPC}{$IF CompilerVersion > 21},
                                                             ftParams, ftStream{$IFEND}{$ENDIF}] Then
           Begin
-           If (vEncoded) And (bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString <> 'null') Then
-            HexStringToStream(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString, vBlobStream)
+           If (vEncoded) And (vTempValue <> 'null') Then
+            HexStringToStream(vTempValue, vBlobStream)
            Else
             Begin
-             If (bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString <> 'null') Then
-              vBlobStream := TStringStream.Create(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString)
+             If (vTempValue <> 'null') Then
+              vBlobStream := TStringStream.Create(vTempValue)
              Else
               vBlobStream := TStringStream.Create('');
             End;
            Try
             vBlobStream.Position := 0;
-            If (bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString <> 'null') Then
+            If (vTempValue <> 'null') Then
              TBlobField(TRESTDWClientSQL(DestDS).Fields[I]).LoadFromStream(vBlobStream);
            Finally
             {$IFNDEF FPC}
@@ -1822,28 +1823,28 @@ Begin
           End
          Else
           Begin
-           If (Lowercase(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString) <> 'null') Then
+           If (Lowercase(vTempValue) <> 'null') Then
             Begin
              If TRESTDWClientSQL(DestDS).Fields[I].DataType in [ftString, ftWideString,
                                                                {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo, {$IFEND}{$ENDIF}
                                                                ftMemo, ftFmtMemo, ftFixedChar] Then
               Begin
-               If bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString = '' Then
+               If vTempValue = '' Then
                 TRESTDWClientSQL(DestDS).Fields[I].Value := ''
                Else
                 Begin
                  If vEncoded Then
-                  TRESTDWClientSQL(DestDS).Fields[I].AsString := DecodeStrings(bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                  TRESTDWClientSQL(DestDS).Fields[I].AsString := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                  Else
-                  TRESTDWClientSQL(DestDS).Fields[I].AsString := bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString;
+                  TRESTDWClientSQL(DestDS).Fields[I].AsString := vTempValue;
                 End;
               End
-             Else if (bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString <> '') then
+             Else if (vTempValue <> '') then
               Begin
                {$IFNDEF FPC}
-               SetValueA(TRESTDWClientSQL(DestDS).Fields[I], bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString);
+               SetValueA(TRESTDWClientSQL(DestDS).Fields[I], vTempValue);
                {$ELSE}
-               SetValueA(TRESTDWClientSQL(DestDS).Fields[I], bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString);
+               SetValueA(TRESTDWClientSQL(DestDS).Fields[I], vTempValue);
                {$ENDIF}
               End;
             End;
@@ -1852,6 +1853,7 @@ Begin
          TRESTDWClientSQL(DestDS).Fields[I].Required := vRequired;
         End;
       Finally
+       vTempValue := '';
 {
        If Assigned(bJsonOBJ) Then
         Begin

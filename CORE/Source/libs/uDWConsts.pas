@@ -145,10 +145,8 @@ begin
     Result := 0
   else
     Result := Trunc(Dt - Unix0Date) * SecondsInDay;
-
   DecodeTime(Tm, Hrs, Mins, Secs, MSecs);
   Result := Result + (Hrs * SecondsInHour) + (Mins * SecondsInMinute) + Secs;
-
 end;
 
 Function UnixToDateTime(USec: int64): TDateTime;

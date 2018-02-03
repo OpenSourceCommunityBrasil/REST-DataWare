@@ -1443,7 +1443,7 @@ Var
  thd           : TThread_Request;
  StringStreamList : TStringStreamList;
  SResult : String;
- Procedure SetData(InputValue     : String;
+ Procedure SetData(Var InputValue : String;
                    Var ParamsData : TDWParams;
                    Var ResultJSON : String);
  Var
@@ -1783,7 +1783,7 @@ Var
  thd           : TThread_Request;
  SResult : String;
  StringStreamList : TStringStreamList;
- Procedure SetData(InputValue     : String;
+ Procedure SetData(Var InputValue : String;
                    Var ParamsData : TDWParams;
                    Var ResultJSON : String);
  Var
@@ -1845,7 +1845,7 @@ Var
            Begin
             JSONParamNew           := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(ParamsData.Encoding){$IFEND}{$ENDIF};
             JSONParamNew.ParamName := JSONParam.ParamName;
-            JSONParamNew.SetValue(JSONParam.Value, JSONParam.Encoded);
+            JSONParamNew.SetValue(vValue, JSONParam.Encoded);
             ParamsData.Add(JSONParamNew);
            End
           Else If Not (JSONParam.Binary) Then
@@ -2065,19 +2065,22 @@ Begin
        HttpRequest.Post(vURL, SendParams, StringStream);
        StringStream.WriteBuffer(#0' ', 1);
        StringStream.Position := 0;
-       Try
-         If not vThreadRequest Then
-          SetData(StringStream.DataString, Params, Result)
-         else
-         begin
-            SetData(StringStream.DataString, Params, SResult);
-            If Assigned(CallBack) Then
-              CallBack(SResult, Params);
-          end;
-       Finally
-        {$IFNDEF FPC}StringStream.Size := 0;{$ENDIF}
-        FreeAndNil(StringStream);
-       End;
+       vDataPack := StringStream.DataString;
+       {$IFNDEF FPC}
+       {$IF CompilerVersion > 21}
+        StringStream.Clear;
+       {$IFEND}
+       StringStream.Size := 0;
+       {$ENDIF}
+       FreeAndNil(StringStream);
+       If not vThreadRequest Then
+        SetData(vDataPack, Params, Result)
+       Else
+        Begin
+         SetData(vDataPack, Params, SResult);
+         If Assigned(CallBack) Then
+           CallBack(SResult, Params);
+        End;
       End
      Else If EventType = seDELETE Then
       Begin
@@ -2136,7 +2139,7 @@ Var
 
  SResult : String;
  StringStreamList : TStringStreamList;
- Procedure SetData(InputValue     : String;
+ Procedure SetData(Var InputValue     : String;
                    Var ParamsData : TDWParams;
                    Var ResultJSON : String);
  Var
@@ -3870,7 +3873,7 @@ Var
  SendParams    : TIdMultipartFormDataStream;
  ss            : TStringStream;
  {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
- Procedure SetData(InputValue     : String;
+ Procedure SetData(Var InputValue     : String;
                    Var ParamsData : TDWParams;
                    Var ResultJSON : String);
  Var
@@ -4031,7 +4034,7 @@ Var
    End;
  End;
 Begin
-  If Assigned(FCallSendEvent) Then
+ If Assigned(FCallSendEvent) Then
       {$IFDEF FPC}
        FCallSendEvent(EventData  ,
                         Params ,
@@ -4054,8 +4057,7 @@ Begin
        {$IFEND}
       {$ENDIF}
      Terminate;
-
-exit;
+     exit;
 
  // INICIO   TThread_Request
  ss            := Nil;
