@@ -1597,9 +1597,7 @@ Begin
    End;
    Exit;
   End;
- 
  // FIM BLOCO PARA USA thread   CRISTIANO BABSOSA
-
  vResultParams := TMemoryStream.Create;
  If vTypeRequest = trHttp Then
   vTpRequest := 'http'
@@ -1765,7 +1763,6 @@ Begin
  End;
  FreeAndNil(vResultParams);
   vThreadExecuting:=False;
-
 End;
 {$IFEND}
 {$IFEND}
@@ -2126,7 +2123,7 @@ End;
 Function TRESTClientPooler.SendEvent(EventData  : String;
                                      Var Params : TDWParams;
                                      EventType  : TSendEvent = sePOST;
-                            	     CallBack   : TCallBack  = Nil) : String;
+                            	       CallBack   : TCallBack  = Nil) : String; //Código original VCL e LCL
 Var
  vURL,
  vTpRequest    : String;
@@ -2161,7 +2158,7 @@ Var
    {$IFDEF ANDROID} //Android}
     aValue    := Copy(InputValue, InitPos, Length(InputValue)-1);
    {$ELSE}
-    aValue     := Copy(InputValue, InitPos, Length(InputValue));
+    aValue    := Copy(InputValue, InitPos, Length(InputValue));
    {$ENDIF}
    If Pos(']}', aValue) > 0 Then
     {$IFDEF ANDROID} //Android}
@@ -2177,21 +2174,23 @@ Var
    {$ENDIF}
    If (Params <> Nil) And (InputValue <> '{"PARAMS"]}') Then
     Begin
-     bJsonValue    :=   TJsonObject.Create(InputValue);
-     bJsonOBJTemp  := TJSONArray.Create(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString);
+     bJsonValue    := TJsonObject.Create(InputValue);
+     InputValue    := '';
+     bJsonOBJTemp  := bJsonValue.getJSONArray(bJsonValue.names.get(0).ToString); //TJSONArray.Create(bJsonValue.opt(bJsonValue.names.get(0).ToString).ToString);
      If bJsonOBJTemp.length > 0 Then
       Begin
        For A := 0 To bJsonOBJTemp.length -1 Do
         Begin
-         bJsonOBJ := TJsonObject.Create(bJsonOBJTemp.get(A).ToString);
+         bJsonOBJ := bJsonOBJTemp.getJSONObject(A); //TJsonObject.Create(bJsonOBJTemp.get(A).ToString);
+//         bJsonOBJ := TJsonObject.Create(bJsonOBJTemp.get(A).ToString);
          If Length(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) = 0 Then
           Begin
-           FreeAndNil(bJsonOBJ);
+//           FreeAndNil(bJsonOBJ);
            Continue;
           End;
          If GetObjectName(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) <> toParam Then
           Begin
-           FreeAndNil(bJsonOBJ);
+//           FreeAndNil(bJsonOBJ);
            Continue;
           End;
          JSONParam := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(GetEncoding(TEncodeSelect(vRSCharset))){$IFEND}{$ENDIF};
@@ -2205,8 +2204,10 @@ Var
           Else
            vValue := bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString;
           JSONParam.SetValue(vValue, JSONParam.Encoded);
+{
           bJsonOBJ.clean;
           FreeAndNil(bJsonOBJ);
+}
           //parametro criandos no servidor
           If ParamsData.ItemsString[JSONParam.ParamName] = Nil Then
            Begin
@@ -2221,17 +2222,19 @@ Var
            ParamsData.ItemsString[JSONParam.ParamName].SetValue(vValue, JSONParam.Encoded);
          Finally
           FreeAndNil(JSONParam);
+{
           If Assigned(bJsonOBJ) Then
            Begin
             bJsonOBJ.clean;
             FreeAndNil(bJsonOBJ);
            End;
+}
          End;
         End;
       End;
      bJsonValue.Clean;
      FreeAndNil(bJsonValue);
-     FreeAndNil(bJsonOBJTemp);
+//     FreeAndNil(bJsonOBJTemp);
     End;
   Finally
    If vTempValue <> '' Then

@@ -1458,6 +1458,7 @@ Var
  A, J, I        : Integer;
  FieldDef       : TFieldDef;
  Field          : TField;
+ vRequired,
  vOldReadOnly,
  vFindFlag      : Boolean;
  vBlobStream    : TStringStream;
@@ -1768,15 +1769,19 @@ Begin
        For I := 0 To DestDS.Fields.Count - 1 Do
         Begin
          vOldReadOnly := TRESTDWClientSQL(DestDS).Fields[I].ReadOnly;
+         vRequired    := TRESTDWClientSQL(DestDS).Fields[I].Required;
          TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := False;
+         TRESTDWClientSQL(DestDS).Fields[I].Required := False;
          If (TRESTDWClientSQL(DestDS).Fields[I].FieldKind = fkLookup) Then
           Begin
            TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
+           TRESTDWClientSQL(DestDS).Fields[I].Required := vRequired;
            Continue;
           End;
          If (I >= ListFields.Count) then
           Begin
            TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
+           TRESTDWClientSQL(DestDS).Fields[I].Required := vRequired;
            Continue;
           End;
          If (StrToInt(ListFields[I]) = -1) Or
@@ -1784,6 +1789,7 @@ Begin
             (StrToInt(ListFields[I]) = -1) Then
           Begin
            TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
+           TRESTDWClientSQL(DestDS).Fields[I].Required := vRequired;
            Continue;
           End;
          If TRESTDWClientSQL(DestDS).Fields[I].DataType In [ftGraphic,     ftParadoxOle, ftDBaseOle,
@@ -1843,6 +1849,7 @@ Begin
             End;
           End;
          TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
+         TRESTDWClientSQL(DestDS).Fields[I].Required := vRequired;
         End;
       Finally
 {
