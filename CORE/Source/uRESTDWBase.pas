@@ -1435,6 +1435,7 @@ Function TRESTClientPooler.SendEvent(EventData  : String;
 Var
  vURL,
  vTpRequest    : String;
+ vDataPack     : String;
  aStringStream : TStringStream;
  vResultParams : TMemoryStream;
  bStringStream,
@@ -1688,21 +1689,22 @@ Begin
         End;
        HttpRequest.Request.Clear;
        StringStream.Position := 0;
-       Try
-        If not vThreadRequest Then
-          SetData(StringStream.DataString, Params, Result)
-        else
-        begin
-          SetData(StringStream.DataString, Params, SResult);
-          If Assigned(CallBack) Then
-             CallBack(SResult, Params);
-        end
-
-       Finally
-        StringStream.Clear;
-        StringStream.Size := 0;
-        FreeAndNil(StringStream);
-       End;
+       vDataPack := StringStream.DataString;
+       If Not vThreadRequest Then
+        Begin
+         StringStream.Clear;
+         FreeAndNil(StringStream);
+         SetData(vDataPack, Params, Result);
+        End
+       Else
+        Begin
+         //vDataPack := StringStream.DataString;
+          StringStream.Clear;
+         FreeAndNil(StringStream);
+         SetData(vDataPack, Params, SResult);
+         If Assigned(CallBack) Then
+          CallBack(SResult, Params);
+        End;
       End
      Else If EventType = sePUT Then
       Begin
@@ -1711,19 +1713,17 @@ Begin
        HttpRequest.Post(vURL, SendParams, StringStream);
        StringStream.WriteBuffer(#0' ', 1);
        StringStream.Position := 0;
-       Try
-        If not vThreadRequest Then
-          SetData(StringStream.DataString, Params, Result)
-        else
-        begin
-          SetData(StringStream.DataString, Params, SResult);
-          If Assigned(CallBack) Then
-            CallBack(SResult, Params);
-        end;
-       Finally
-        StringStream.Size := 0;
-        FreeAndNil(StringStream);
-       End;
+       vDataPack := StringStream.DataString;
+       StringStream.Clear;
+       FreeAndNil(StringStream);
+       If not vThreadRequest Then
+        SetData(vDataPack, Params, Result)
+       Else
+        Begin
+         SetData(vDataPack, Params, SResult);
+         If Assigned(CallBack) Then
+           CallBack(SResult, Params);
+        End;
       End
      Else If EventType = seDELETE Then
       Begin
@@ -3892,7 +3892,7 @@ Var
  SendParams    : TIdMultipartFormDataStream;
  ss            : TStringStream;
  {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
- Procedure SetData(Var InputValue     : String;
+ Procedure SetData( InputValue     : String;
                    Var ParamsData : TDWParams;
                    Var ResultJSON : String);
  Var
