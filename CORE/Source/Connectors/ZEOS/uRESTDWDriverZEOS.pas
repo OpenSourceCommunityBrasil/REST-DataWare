@@ -307,14 +307,23 @@ Var
          Query.Params[I].AsDateTime  := UnixToDateTime(StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value))
         Else
          Query.Params[I].Clear;
-       End  //Tratar Blobs de Parametros...
-      Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob,
-                                           ftGraphic, ftOraBlob, ftOraClob,
-                                           ftMemo {$IFNDEF FPC}
+       End
+      Else If Query.Params[I].DataType in [ftMemo {$IFNDEF FPC}
                                                    {$IF CompilerVersion > 21}
                                                     , ftWideMemo
                                                    {$IFEND}
-                                                  {$ENDIF}] Then
+                                                  {$ENDIF}] Then   //alteração necessaria para trabalhar com campo memo em sqlserver
+      Begin
+         If (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> 'null') And
+            (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> '') Then
+          Begin
+            Query.Params[I].AsString := HexStringToString(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);;
+          End
+         Else
+          Query.Params[I].Clear;
+      end  //Tratar Blobs de Parametros...
+      Else If Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob,
+                                           ftGraphic, ftOraBlob, ftOraClob  ] Then
        Begin
         vStringStream := TMemoryStream.Create;
         Try

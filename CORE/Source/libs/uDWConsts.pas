@@ -1,5 +1,5 @@
 unit uDWConsts;
-
+{$I uRESTDW.inc}
 Interface
 
 Uses
@@ -1109,6 +1109,10 @@ Begin
   Result := ftBlob
  Else If vFieldType = Uppercase('ftMemo')            Then
   Result := ftMemo
+ {$if CompilerVersion =15} // delphi 7   compatibilidade enter Sever no XE e Client no D7
+ Else If vFieldType = Uppercase('ftWideMemo')        Then
+  Result := ftMemo
+{$IFEND}
  Else If vFieldType = Uppercase('ftGraphic')         Then
   Result := ftGraphic
  Else If vFieldType = Uppercase('ftFmtMemo')         Then
@@ -1186,11 +1190,11 @@ Begin
     Else If vFieldType = Uppercase('ftSingle')          Then
      Result := ftSingle
    {$IFEND}
-   {$if CompilerVersion =15}
+  (* {$if CompilerVersion =15}
    Else If vFieldType = Uppercase('ftWideMemo')   Then
      Result := ftMemo
    {$IFEND}
-
+   *)
    {$ENDIF};
 End;
 
