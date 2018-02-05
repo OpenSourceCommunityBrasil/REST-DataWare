@@ -33,9 +33,11 @@ type
     Label1: TLabel;
     Bevel2: TBevel;
     DBNavigator1: TDBNavigator;
+    OpenPictureDialog1: TOpenPictureDialog;
     RESTDWClientSQL1ID: TIntegerField;
     RESTDWClientSQL1BLOBIMAGE: TBlobField;
-    OpenPictureDialog1: TOpenPictureDialog;
+    RESTDWClientSQL1BLOBTEXT: TMemoField;
+    DBMemo1: TDBMemo;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
   private

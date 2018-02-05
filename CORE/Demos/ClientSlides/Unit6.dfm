@@ -4,8 +4,8 @@ object Form6: TForm6
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'REST Client Slide'
-  ClientHeight = 415
-  ClientWidth = 469
+  ClientHeight = 403
+  ClientWidth = 464
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -1012,7 +1012,7 @@ object Form6: TForm6
   object DBImage1: TDBImage
     Left = 8
     Top = 180
-    Width = 452
+    Width = 241
     Height = 217
     DataField = 'BLOBIMAGE'
     DataSource = DataSource1
@@ -1058,6 +1058,15 @@ object Form6: TForm6
     VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast]
     TabOrder = 8
   end
+  object DBMemo1: TDBMemo
+    Left = 253
+    Top = 180
+    Width = 207
+    Height = 217
+    DataField = 'BLOBTEXT'
+    DataSource = DataSource1
+    TabOrder = 9
+  end
   object DataSource1: TDataSource
     AutoEdit = False
     DataSet = RESTDWClientSQL1
@@ -1075,6 +1084,10 @@ object Form6: TForm6
       item
         Name = 'BLOBIMAGE'
         DataType = ftBlob
+      end
+      item
+        Name = 'BLOBTEXT'
+        DataType = ftMemo
       end>
     IndexDefs = <>
     MasterFields = ''
@@ -1088,11 +1101,13 @@ object Form6: TForm6
     StoreDefs = True
     MasterCascadeDelete = False
     Inactive = False
+    Datapacks = -1
     DataCache = True
     Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
-      'select * from IMAGELIST')
+      'select * from IMAGELIST'
+      'order by id')
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = False
@@ -1105,6 +1120,10 @@ object Form6: TForm6
     end
     object RESTDWClientSQL1BLOBIMAGE: TBlobField
       FieldName = 'BLOBIMAGE'
+    end
+    object RESTDWClientSQL1BLOBTEXT: TMemoField
+      FieldName = 'BLOBTEXT'
+      BlobType = ftMemo
     end
   end
   object RESTDWDataBase1: TRESTDWDataBase

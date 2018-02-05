@@ -508,7 +508,7 @@ Begin
      If (JSONParam.ObjectValue in [ovString, ovWideString]) And (JSONParam.Encoded) Then
       JSONParam.SetValue(DecodeStrings(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString{$IFDEF FPC}, csUndefined{$ENDIF}))
      Else
-      JSONParam.SetValue(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
+      JSONParam.SetValue(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString, JSONParam.Encoded);
      Add(JSONParam);
     Finally
      bJsonOBJ.Clean;
@@ -2182,6 +2182,7 @@ Begin
     {$IFEND}
     {$ENDIF}
     LoadFromStream(MemoryStream);
+    vEncoded := False;
    Finally
     MemoryStream.Free;
    End;

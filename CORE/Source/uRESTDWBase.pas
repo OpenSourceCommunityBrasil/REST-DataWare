@@ -2159,21 +2159,21 @@ Var
   Try
    InitPos    := Pos(', "RESULT":[', InputValue) + Length(', "RESULT":[') ;
    {$IFDEF ANDROID} //Android}
-    aValue    := Copy(InputValue, InitPos, Length(InputValue)-1);
+   aValue    := Copy(InputValue, InitPos, Length(InputValue)-1);
    {$ELSE}
-    aValue    := Copy(InputValue, InitPos, Length(InputValue));
+   aValue    := Copy(InputValue, InitPos, Length(InputValue));
    {$ENDIF}
    If Pos(']}', aValue) > 0 Then
     {$IFDEF ANDROID} //Android}
-     aValue     := Copy(aValue, 0, Pos(']}', aValue)-1 );
+    aValue     := Copy(aValue, 0, Pos(']}', aValue)-1 );
     {$ELSE}
-     aValue     := Copy(aValue, 1, Pos(']}', aValue) -1);
+    aValue     := Copy(aValue, 1, Pos(']}', aValue) -1);
     {$ENDIF}
    vTempValue := aValue;
    {$IFDEF ANDROID} //Android}
-    InputValue := Copy(InputValue, 0, InitPos-1) + ']}'; //Delete(InputValue, InitPos, Pos(']}', InputValue) - InitPos);
+   InputValue := Copy(InputValue, 0, InitPos-1) + ']}'; //Delete(InputValue, InitPos, Pos(']}', InputValue) - InitPos);
    {$ELSE}
-    InputValue := Copy(InputValue, 1, InitPos -1) + ']}'; //Delete(InputValue, InitPos, Pos(']}', InputValue) - InitPos);
+   InputValue := Copy(InputValue, 1, InitPos -1) + ']}'; //Delete(InputValue, InitPos, Pos(']}', InputValue) - InitPos);
    {$ENDIF}
    If (Params <> Nil) And (InputValue <> '{"PARAMS"]}') Then
     Begin
