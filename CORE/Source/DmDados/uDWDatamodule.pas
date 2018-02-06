@@ -11,9 +11,10 @@ Uses
    vReplyEvent     : TReplyEvent;
    vWelcomeMessage : TWelcomeMessage;
    vMassiveProcess : TMassiveProcess;
+   vEncoding       : TEncodeSelect;
   Public
-   Encoding: TEncodeSelect;
   Published
+   Property Encoding         : TEncodeSelect    Read vEncoding       Write vEncoding;
    Property OnReplyEvent     : TReplyEvent      Read vReplyEvent     Write vReplyEvent;
    Property OnWelcomeMessage : TWelcomeMessage  Read vWelcomeMessage Write vWelcomeMessage;
    Property OnMassiveProcess : TMassiveProcess  Read vMassiveProcess Write vMassiveProcess;

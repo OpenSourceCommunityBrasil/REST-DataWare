@@ -524,7 +524,7 @@ Begin
     Begin
      vFound  := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil;
      If Not(vFound) Then
-      dwParam                := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF}
+      dwParam                := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF}
      Else
       dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
      dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
@@ -673,13 +673,13 @@ Begin
 //   If (Not Assigned(DWParams)) or (dwParams = nil) Then
    DWParams := TDWParams.Create;
    {$IFNDEF FPC}
-   {$if CompilerVersion > 21}DWParams.Encoding := GetEncoding(vRESTClientPooler.Encoding);{$IFEND}
+   DWParams.Encoding := GetEncodingID(vRESTClientPooler.Encoding);
    {$ENDIF}
    For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
     Begin
      vFound  := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil;
      If Not(vFound) Then
-      dwParam                := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(DWParams.Encoding){$IFEND}{$ENDIF}
+      dwParam                := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF}
      Else
       dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
      dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
@@ -718,39 +718,27 @@ Begin
   Exit;
  DWParams                        := TDWParams.Create;
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ JSONParam                       := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+  JSONParam                      := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ JSONParam                       := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                       := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOut;

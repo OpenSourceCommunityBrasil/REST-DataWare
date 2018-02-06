@@ -1,6 +1,7 @@
 object ServerMethodDM: TServerMethodDM
   OldCreateOrder = False
   OnCreate = ServerMethodDataModuleCreate
+  Encoding = esUtf8
   OnReplyEvent = ServerMethodDataModuleReplyEvent
   OnWelcomeMessage = ServerMethodDataModuleWelcomeMessage
   OnMassiveProcess = ServerMethodDataModuleMassiveProcess
@@ -9,7 +10,7 @@ object ServerMethodDM: TServerMethodDM
   object RESTDWPoolerDB1: TRESTDWPoolerDB
     RESTDriver = RESTDWDriverFD1
     Compression = True
-    Encoding = esASCII
+    Encoding = esUtf8
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True

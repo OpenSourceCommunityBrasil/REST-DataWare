@@ -582,11 +582,7 @@ Type
 End;
 
  {$IFNDEF FPC}
- {$if CompilerVersion > 21}
  Function GetDWParams(Params : TParams; Encondig : TEncodeSelect) : TDWParams;
- {$ELSE}
- Function GetDWParams(Params : TParams) : TDWParams;
- {$IFEND}
  {$ELSE}
  Function GetDWParams(Params : TParams) : TDWParams;
  {$ENDIF}
@@ -595,11 +591,7 @@ implementation
 
 
 {$IFNDEF FPC}
-{$if CompilerVersion > 21}
 Function GetDWParams(Params : TParams; Encondig : TEncodeSelect) : TDWParams;
-{$ELSE}
-Function GetDWParams(Params : TParams) : TDWParams;
-{$IFEND}
 {$ELSE}
 Function GetDWParams(Params : TParams) : TDWParams;
 {$ENDIF}
@@ -614,20 +606,14 @@ Begin
     Begin
      Result := TDWParams.Create;
      {$IFNDEF FPC}
-      {$if CompilerVersion > 21}
-       Result.Encoding := GetEncoding(Encondig);
-      {$IFEND}
+     Result.Encoding := GetEncodingID(Encondig);
      {$ENDIF}
      For I := 0 To Params.Count -1 Do
       Begin
        {$IFNDEF FPC}
-        {$if CompilerVersion > 21}
-         JSONParam         := TJSONParam.Create(Result.Encoding);
-        {$ELSE}
-         JSONParam         := TJSONParam.Create;
-        {$IFEND}
+       JSONParam         := TJSONParam.Create(Result.Encoding);
        {$ELSE}
-        JSONParam         := TJSONParam.Create;
+       JSONParam         := TJSONParam.Create;
        {$ENDIF}
        JSONParam.ParamName := Params[I].Name;
        JSONParam.Encoded   := True;
@@ -1055,7 +1041,7 @@ Begin
  {$ENDIF}
  Try
   If Params.Count > 0 Then
-   DWParams     := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vEncondig{$IFEND}{$ENDIF})
+   DWParams     := GetDWParams(Params{$IFNDEF FPC}, vEncondig{$ENDIF})
   Else
    DWParams     := Nil;
   LDataSetList := vRESTConnectionDB.ApplyUpdates(Massive,      vRestPooler,
@@ -1179,7 +1165,7 @@ Begin
  Try
   If Params.Count > 0 Then
    Begin
-    DWParams     := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vEncondig{$IFEND}{$ENDIF});
+    DWParams     := GetDWParams(Params{$IFNDEF FPC}, vEncondig{$ENDIF});
     LDataSetList := vRESTConnectionDB.InsertValue(vRestPooler,
                                                   vRestURL, GetLineSQL(SQL),
                                                   DWParams, Error,
@@ -1385,7 +1371,7 @@ Begin
  Try
   If Params.Count > 0 Then
    Begin
-    DWParams     := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vEncondig{$IFEND}{$ENDIF});
+    DWParams     := GetDWParams(Params{$IFNDEF FPC}, vEncondig{$ENDIF});
     LDataSetList := vRESTConnectionDB.ExecuteCommandJSON(vRestPooler,
                                                          vRestURL, GetLineSQL(SQL),
                                                          DWParams, Error,
@@ -1871,7 +1857,7 @@ Begin
  Value := Nil;
  If vRESTDataBase <> Nil Then
   If Params.Count > 0 Then
-   Value := GetDWParams(Params{$IFNDEF FPC}{$if CompilerVersion > 21}, vRESTDataBase.Encoding{$IFEND}{$ENDIF});
+   Value := GetDWParams(Params{$IFNDEF FPC}, vRESTDataBase.Encoding{$ENDIF});
 End;
 
 Procedure TRESTDWClientSQL.DynamicFilter(cFields  : Array of String;

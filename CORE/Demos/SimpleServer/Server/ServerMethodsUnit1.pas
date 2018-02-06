@@ -80,7 +80,7 @@ Begin
  If Params.ItemsString['SQL'] <> Nil Then
   Begin
    JSONValue          := uDWJSONObject.TJSONValue.Create;
-   JSONValue.Encoding := GetEncoding(RestDWForm.RESTServicePooler1.Encoding);
+   JSONValue.Encoding := GetEncodingID(RestDWForm.RESTServicePooler1.Encoding);
    If Params.ItemsString['SQL'].value <> '' Then
     Begin
      If Params.ItemsString['TESTPARAM'] <> Nil Then

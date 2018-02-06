@@ -24,9 +24,7 @@ Uses {$IFDEF FPC}
    vOnStatus             : TOnStatus;
    vCompression          : Boolean;
    {$IFNDEF FPC}
-    {$if CompilerVersion > 21}
-     vEncoding           : TEncodeSelect;
-    {$IFEND}
+   vEncoding           : TEncodeSelect;
    {$ENDIF}
    {$IFDEF FPC}
    vDatabaseCharSet   : TDatabaseCharSet;
@@ -150,11 +148,9 @@ Uses {$IFDEF FPC}
                                    Var MessageError        : String;
                                    RESTClientPooler        : TRESTClientPooler = Nil);
    Property Compression  : Boolean   Read vCompression Write vCompression;
-  {$IFNDEF FPC}
-   {$if CompilerVersion > 21}
-   Property Encoding    : TEncodeSelect Read vEncoding    Write vEncoding;
-   {$IFEND}
-  {$ENDIF}
+   {$IFNDEF FPC}
+   Property Encoding       : TEncodeSelect Read vEncoding    Write vEncoding;
+   {$ENDIF}
    Property Host           : String        Read vHost           Write vHost;
    Property Port           : Integer       Read vPort           Write vPort;
    Property WelcomeMessage : String        Read vWelcomeMessage Write vWelcomeMessage;
@@ -217,14 +213,10 @@ Begin
  {$ENDIF}
  DWParams                        := TDWParams.Create;
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Massive';
  JSONParam.ObjectDirection       := odIn;
@@ -232,28 +224,20 @@ Begin
   JSONParam.AsString             := TMassiveDatasetBuffer(Massive).ToJSON;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
@@ -262,14 +246,10 @@ Begin
  If Trim(SQL) <> '' Then
   Begin
    {$IFNDEF FPC}
-    {$if CompilerVersion > 21}
-     RESTClientPoolerExec.Encoding     := vEncoding;
-     JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-    {$ELSE}
-     JSONParam                     := TJSONParam.Create;
-    {$IFEND}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
    {$ELSE}
-    JSONParam                     := TJSONParam.Create;
+   JSONParam                     := TJSONParam.Create;
    {$ENDIF}
    JSONParam.ParamName             := 'SQL';
    JSONParam.ObjectDirection       := odIn;
@@ -280,14 +260,10 @@ Begin
      If Params.Count > 0 Then
       Begin
        {$IFNDEF FPC}
-        {$if CompilerVersion > 21}
-         RESTClientPoolerExec.Encoding     := vEncoding;
-         JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-        {$ELSE}
-         JSONParam                     := TJSONParam.Create;
-        {$IFEND}
+       RESTClientPoolerExec.Encoding     := vEncoding;
+       JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
        {$ELSE}
-        JSONParam                     := TJSONParam.Create;
+       JSONParam                     := TJSONParam.Create;
        {$ENDIF}
        JSONParam.ParamName             := 'Params';
        JSONParam.ObjectDirection       := odInOut;
@@ -297,42 +273,30 @@ Begin
     End;
   End;
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
@@ -465,66 +429,50 @@ Begin
  {$ENDIF}
  DWParams                        := TDWParams.Create;
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                      := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'MassiveCache';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := MassiveCache;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
@@ -624,14 +572,10 @@ Begin
   RESTClientPoolerExec.OnStatus      := vOnStatus;
  {$ENDIF}
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
@@ -724,28 +668,20 @@ Begin
  {$ENDIF}
  DWParams                        := TDWParams.Create;
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
@@ -826,96 +762,80 @@ Begin
  {$ENDIF}
  DWParams                        := TDWParams.Create;
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := SQL;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Params.ToJSON;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Execute';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := Execute;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
@@ -1005,112 +925,80 @@ Begin
  {$ENDIF}
  DWParams                        := TDWParams.Create;
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := SQL;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := Params.ToJSON;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Execute';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := Execute;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
@@ -1203,98 +1091,70 @@ Begin
  {$ENDIF}
  DWParams                        := TDWParams.Create;
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                      := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := SQL;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Execute';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := Execute;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
-  JSONParam                     := TJSONParam.Create;
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
@@ -1418,12 +1278,8 @@ Begin
  {$ENDIF}
  DWParams                        := TDWParams.Create;
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
  JSONParam                     := TJSONParam.Create;
  {$ENDIF}
@@ -1432,12 +1288,8 @@ Begin
  JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
  JSONParam                     := TJSONParam.Create;
  {$ENDIF}
@@ -1446,12 +1298,8 @@ Begin
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
  JSONParam                     := TJSONParam.Create;
  {$ENDIF}
@@ -1460,12 +1308,8 @@ Begin
  JSONParam.AsString              := SQL;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
  JSONParam                     := TJSONParam.Create;
  {$ENDIF}
@@ -1474,12 +1318,8 @@ Begin
  JSONParam.AsString              := Params.ToJSON;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
  JSONParam                     := TJSONParam.Create;
  {$ENDIF}
@@ -1488,12 +1328,8 @@ Begin
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
  JSONParam                     := TJSONParam.Create;
  {$ENDIF}
@@ -1502,12 +1338,8 @@ Begin
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
  {$ELSE}
  JSONParam                     := TJSONParam.Create;
  {$ENDIF}
@@ -1597,72 +1429,60 @@ Begin
  {$ENDIF}
  DWParams                        := TDWParams.Create;
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Pooler;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := SQL;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
  {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-   RESTClientPoolerExec.Encoding     := vEncoding;
-   JSONParam                     := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-  {$ELSE}
-   JSONParam                     := TJSONParam.Create;
-  {$IFEND}
+ RESTClientPoolerExec.Encoding     := vEncoding;
+ JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ {$ELSE}
+ JSONParam                     := TJSONParam.Create;
  {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
@@ -1751,84 +1571,60 @@ Begin
    {$ENDIF}
    DWParams                               := TDWParams.Create;
    {$IFNDEF FPC}
-    {$if CompilerVersion > 21}
-     RESTClientPoolerExec.Encoding        := vEncoding;
-     JSONParam                            := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-    {$ELSE}
-     JSONParam                            := TJSONParam.Create;
-    {$IFEND}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
    {$ELSE}
-    JSONParam                             := TJSONParam.Create;
+   JSONParam                     := TJSONParam.Create;
    {$ENDIF}
    JSONParam.ParamName                    := 'LinesDataset';
    JSONParam.ObjectDirection              := odIn;
    JSONParam.AsString                     := LinesDataset;
    DWParams.Add(JSONParam);
    {$IFNDEF FPC}
-    {$if CompilerVersion > 21}
-     RESTClientPoolerExec.Encoding        := vEncoding;
-     JSONParam                            := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-    {$ELSE}
-     JSONParam                            := TJSONParam.Create;
-    {$IFEND}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
    {$ELSE}
-    JSONParam                             := TJSONParam.Create;
+   JSONParam                     := TJSONParam.Create;
    {$ENDIF}
    JSONParam.ParamName                    := 'Pooler';
    JSONParam.ObjectDirection              := odIn;
    JSONParam.AsString                     := Pooler;
    DWParams.Add(JSONParam);
    {$IFNDEF FPC}
-    {$if CompilerVersion > 21}
-     RESTClientPoolerExec.Encoding        := vEncoding;
-     JSONParam                            := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-    {$ELSE}
-     JSONParam                            := TJSONParam.Create;
-    {$IFEND}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
    {$ELSE}
-    JSONParam                             := TJSONParam.Create;
+   JSONParam                     := TJSONParam.Create;
    {$ENDIF}
    JSONParam.ParamName                    := 'Method_Prefix';
    JSONParam.ObjectDirection              := odIn;
    JSONParam.AsString                     := Method_Prefix;
    DWParams.Add(JSONParam);
    {$IFNDEF FPC}
-    {$if CompilerVersion > 21}
-     RESTClientPoolerExec.Encoding       := vEncoding;
-     JSONParam                           := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-    {$ELSE}
-     JSONParam                           := TJSONParam.Create;
-    {$IFEND}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
    {$ELSE}
-    JSONParam                            := TJSONParam.Create;
+   JSONParam                     := TJSONParam.Create;
    {$ENDIF}
    JSONParam.ParamName                   := 'Error';
    JSONParam.ObjectDirection             := odInOut;
    JSONParam.AsBoolean                   := False;
    DWParams.Add(JSONParam);
    {$IFNDEF FPC}
-    {$if CompilerVersion > 21}
-     RESTClientPoolerExec.Encoding       := vEncoding;
-     JSONParam                           := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-    {$ELSE}
-     JSONParam                           := TJSONParam.Create;
-    {$IFEND}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
    {$ELSE}
-    JSONParam                            := TJSONParam.Create;
+   JSONParam                     := TJSONParam.Create;
    {$ENDIF}
    JSONParam.ParamName                   := 'MessageError';
    JSONParam.ObjectDirection             := odInOut;
    JSONParam.AsString                    := MessageError;
    DWParams.Add(JSONParam);
    {$IFNDEF FPC}
-    {$if CompilerVersion > 21}
-     RESTClientPoolerExec.Encoding       := vEncoding;
-     JSONParam                           := TJSONParam.Create(GetEncoding(TEncodeSelect(RESTClientPoolerExec.Encoding)));
-    {$ELSE}
-     JSONParam                           := TJSONParam.Create;
-    {$IFEND}
+   RESTClientPoolerExec.Encoding     := vEncoding;
+   JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
    {$ELSE}
-    JSONParam                            := TJSONParam.Create;
+   JSONParam                     := TJSONParam.Create;
    {$ENDIF}
    JSONParam.ParamName                   := 'Result';
    JSONParam.ObjectDirection             := odOUT;

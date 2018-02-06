@@ -74,11 +74,10 @@ Type
  TDatasetType     = (dtReflection,      dtFull,         dtDiff);
  {$IFNDEF FPC}
  {$if CompilerVersion > 21}
- Function  GetEncoding              (Avalue          : TEncodeSelect)             : TEncoding;
+ Function  GetEncoding              (Avalue          : TEncodeSelect)             : TEncoding;       Overload;
  {$IFEND}
- {$ELSE}
- Function  GetEncoding              (Avalue          : TEncodeSelect)             : IIdTextEncoding;
  {$ENDIF}
+ Function  GetEncodingID            (Avalue          : TEncodeSelect)             : IIdTextEncoding; Overload;
  Function  GetObjectName            (TypeObject      : TTypeObject)               : String;          Overload;
  Function  GetJSONModeName          (TypeObject      : TJsonMode)                 : String;          Overload;
  Function  GetJSONModeName          (TypeObject      : String)                    : TJsonMode;       Overload;
@@ -113,7 +112,7 @@ Type
                                      Var Value       : TStringStream)             : Boolean;
  Function  ZCompressStr             (Const s         : String;
                                      Var Value       : String)                    : Boolean;
- Function  BytesArrToString         (aValue          : tIdBytes)                  : String;
+ Function  BytesArrToString         (aValue          : tIdBytes{$IFNDEF FPC};IdEncode : IIdTextEncoding = Nil{$ENDIF}) : String;
  Function  ObjectValueToFieldType   (TypeObject      : TObjectValue)              : TFieldType;
  Function  FieldTypeToObjectValue   (FieldType       : TFieldType)                : TObjectValue;
  Function  DatasetStateToMassiveType(DatasetState    : TDatasetState)             : TMassiveMode;
@@ -229,7 +228,7 @@ Begin
  End;
 End;
 
-Function BytesArrToString(aValue : tIdBytes) : String;
+Function BytesArrToString(aValue : tIdBytes{$IFNDEF FPC};IdEncode : IIdTextEncoding = Nil{$ENDIF}) : String;
 {$IFDEF FPC}
 Var
  StringStream : TStringStream;
@@ -245,7 +244,7 @@ Begin
    StringStream.Free;
   End;
  {$ELSE}
-  Result   := BytesToString(aValue);
+  Result   := BytesToString(aValue{$IFNDEF FPC}, IdEncode{$ENDIF});
  {$ENDIF}
 End;
 
@@ -1114,7 +1113,7 @@ Begin
  Else If vFieldType = Uppercase('ftWideMemo')        Then
   Result := ftMemo
 {$IFEND}
-{$IFEND}
+{$ENDIF}
 
  Else If vFieldType = Uppercase('ftGraphic')         Then
   Result := ftGraphic
@@ -1212,8 +1211,9 @@ Begin
  End;
 End;
 {$IFEND}
-{$ELSE}
-Function GetEncoding(Avalue  : TEncodeSelect) : IIdTextEncoding;
+{$ENDIF}
+
+Function GetEncodingID(Avalue  : TEncodeSelect) : IIdTextEncoding;
 Begin
  Result := IndyTextEncoding(encIndyDefault);
  Case Avalue of
@@ -1221,7 +1221,6 @@ Begin
   esASCII : Result := IndyTextEncoding(encASCII);
  End;
 End;
-{$ENDIF}
 
 Function BuildStringFloat(Value : String) : String;
 Begin

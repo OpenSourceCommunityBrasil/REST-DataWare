@@ -24,17 +24,13 @@ Type
 Type
   TServerUtils = Class
     Class Function ParseRESTURL(Const Cmd: String
-{$IFNDEF FPC}
-{$IF CompilerVersion > 21};
-      vEncoding: TEncoding
-{$IFEND}
-{$ENDIF}): TDWParams;
+    {$IFNDEF FPC}
+    ;vEncoding : IIdTextEncoding
+    {$ENDIF}): TDWParams;
     Class Function Result2JSON(wsResult: TResultErro): String;
     Class Function ParseWebFormsParams(Params: TStrings; Const URL: String;
                                        Var UrlMethod: String{$IFNDEF FPC}
-                                                             {$IF CompilerVersion > 21}
-                                                              ;vEncoding: TEncoding
-                                                             {$IFEND}
+                                                              ;vEncoding: IIdTextEncoding
                                                             {$ENDIF};MethodType : String = 'POST'): TDWParams;
   End;
 
@@ -59,8 +55,7 @@ Type
 implementation
 
 
-Class Function TServerUtils.ParseRESTURL(Const Cmd: String{$IFNDEF FPC}{$IF CompilerVersion > 21};
-                                         vEncoding: TEncoding{$IFEND}{$ENDIF}): TDWParams;
+Class Function TServerUtils.ParseRESTURL(Const Cmd: String{$IFNDEF FPC};vEncoding: IIdTextEncoding{$ENDIF}): TDWParams;
 Var
   NewCmd: String;
   ArraySize,
@@ -88,16 +83,14 @@ Begin
    ArraySize := CountExpression(NewCmd, '/');
    Result := TDWParams.Create;
    {$IFNDEF FPC}
-   {$IF CompilerVersion > 21}
    Result.Encoding := vEncoding;
-   {$IFEND}
    {$ENDIF}
    NewCmd := NewCmd + '/';
    iBar1 := Pos('/', NewCmd);
    Delete(NewCmd, 1, iBar1);
    For Cont := 0 to ArraySize - 1 Do
     Begin
-     JSONParam := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21} (Result.Encoding){$IFEND}{$ENDIF};
+     JSONParam := TJSONParam.Create{$IFNDEF FPC}(Result.Encoding){$ENDIF};
      IBar2 := Pos('/', NewCmd);
      JSONParam.ParamName := Format('PARAM%d', [Cont + 1]);
      {$IFNDEF FPC}
@@ -119,10 +112,7 @@ End;
 
 Class Function TServerUtils.ParseWebFormsParams(Params: TStrings;
   const URL: String; Var UrlMethod: String
-{$IFNDEF FPC}
-{$IF CompilerVersion > 21};
-  vEncoding: TEncoding
-{$IFEND}
+{$IFNDEF FPC};vEncoding: IIdTextEncoding
 {$ENDIF};MethodType : String = 'POST'): TDWParams;
 Var
   I: Integer;
@@ -133,11 +123,9 @@ Var
 Begin
   // Extrai nome do ServerMethod
   Result := TDWParams.Create;
-{$IFNDEF FPC}
-{$IF CompilerVersion > 21}
+  {$IFNDEF FPC}
   Result.Encoding := vEncoding;
-{$IFEND}
-{$ENDIF}
+  {$ENDIF}
   If Pos('?', URL) > 0 Then
    Begin
     Cmd := URL;
@@ -159,7 +147,7 @@ Begin
    Begin
     For I := 0 To Params.Count - 1 Do
      Begin
-      JSONParam := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(Result.Encoding){$IFEND}{$ENDIF};
+      JSONParam := TJSONParam.Create{$IFNDEF FPC}(Result.Encoding){$ENDIF};
       JSONParam.ObjectDirection := odIN;
       If Pos('{', Params[I]) > 0 Then
        JSONParam.FromJSON(Trim(Copy(Params[I], Pos('=', Params[I]) + 1, Length(Params[I]))))
@@ -190,7 +178,7 @@ Begin
      Uri.Free;
      For I := 0 To vParams.Count - 1 Do
       Begin
-       JSONParam                 := TJSONParam.Create{$IFNDEF FPC}{$IF CompilerVersion > 21}(Result.Encoding){$IFEND}{$ENDIF};
+       JSONParam                 := TJSONParam.Create{$IFNDEF FPC}(Result.Encoding){$ENDIF};
        JSONParam.ParamName       := Trim(Copy(vParams[I], 1, Pos('=', vParams[I]) - 1));
        JSONParam.AsString        := Trim(Copy(vParams[I],    Pos('=', vParams[I]) + 1, Length(vParams[I])));
        JSONParam.ObjectDirection := odIN;
