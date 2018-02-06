@@ -1,5 +1,7 @@
 unit uDWJSONTools;
 
+{$I uRESTDW.inc}
+
 interface
 
 Uses
@@ -51,6 +53,8 @@ Function  DecodeStrings(Value       : String
                         {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF})                 : String;
 Function  EncodeBytes  (Value : String{$IFNDEF FPC}{$if CompilerVersion > 21}
                                       ;Encoding : TEncoding {$IFEND}{$ENDIF}) : TIdBytes;
+Function HexStringToString(Value : String) : String;
+
 Procedure HexStringToStream(Value : String; Var BinaryStream : TStringStream);
 Function  StreamToHex(Value : TStream) : String;
 
@@ -260,7 +264,7 @@ Begin
    Result := DecodeStringBase64(S);
   {$ELSE}
    {$if CompilerVersion > 21} // Delphi 2010 pra cima
-    Result := TIdDecoderMIME.DecodeString(S, IndyTextEncoding_utf8);
+       Result := TIdDecoderMIME.DecodeString(S, IndyTextEncoding_utf8);
    {$ELSE}
     Result := UTF8Decode(TIdDecoderMIME.DecodeString(S, IndyTextEncoding_ASCII));
    {$IFEND}
