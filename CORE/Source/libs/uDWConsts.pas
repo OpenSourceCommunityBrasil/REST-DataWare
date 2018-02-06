@@ -1109,10 +1109,13 @@ Begin
   Result := ftBlob
  Else If vFieldType = Uppercase('ftMemo')            Then
   Result := ftMemo
+{$IFNDEF FPC}
  {$if CompilerVersion =15} // delphi 7   compatibilidade enter Sever no XE e Client no D7
  Else If vFieldType = Uppercase('ftWideMemo')        Then
   Result := ftMemo
 {$IFEND}
+{$IFEND}
+
  Else If vFieldType = Uppercase('ftGraphic')         Then
   Result := ftGraphic
  Else If vFieldType = Uppercase('ftFmtMemo')         Then
