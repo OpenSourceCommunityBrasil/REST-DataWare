@@ -1433,7 +1433,6 @@ Function TRESTClientPooler.SendEvent(EventData  : String;
 Var
  vURL,
  vTpRequest    : String;
- vDataPack     : String;
  aStringStream : TStringStream;
  vResultParams : TMemoryStream;
  bStringStream,
@@ -1441,6 +1440,7 @@ Var
  SendParams    : TIdMultipartFormDataStream;
  thd           : TThread_Request;
  StringStreamList : TStringStreamList;
+ vDataPack,
  SResult : String;
  Procedure SetData(Var InputValue : String;
                    Var ParamsData : TDWParams;
@@ -1469,6 +1469,7 @@ Var
    If (Params <> Nil) And (InputValue <> '{"PARAMS"]}') Then
     Begin
      bJsonValue:= TJSONObject.ParseJSONValue(InputValue) as TJSONObject;
+     InputValue    := '';
      bJsonOBJTemp:= bJsonValue.GetValue('PARAMS') as TJSONArray;
      If bJsonOBJTemp.count > 0 Then
       Begin
@@ -1485,7 +1486,7 @@ Var
            FreeAndNil(bJsonOBJ);
            Continue;
           End;
-         JSONParam := TJSONParam.Create(GetEncoding(TEncodeSelect(vRSCharset)));
+         JSONParam := TJSONParam.Create(GetEncodingID(TEncodeSelect(vRSCharset)));
          Try
           JSONParam.ParamName       := stringreplace(bJsonOBJ.pairs[4].JsonString.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]);
           JSONParam.ObjectValue     := GetValueType(bJsonOBJ.getvalue('ValueType').value);
@@ -1494,7 +1495,7 @@ Var
           If JSONParam.Encoded Then
            vValue := DecodeStrings(stringreplace(bJsonOBJ.pairs[4].JsonValue.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]) )
           Else
-           vValue := stringreplace(bJsonOBJ.pairs[4].JsonValue.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]);
+           vValue := bJsonOBJ.pairs[4].JsonValue.tostring;
           JSONParam.SetValue(vValue, JSONParam.Encoded);
           //bJsonOBJ.clean;
           FreeAndNil(bJsonOBJ);
@@ -3931,7 +3932,7 @@ Var
          bJsonOBJ :=  bJsonOBJTemp.get(A) as TJSONObject;
          If bJsonOBJ.count = 0 Then
           Continue;
-         JSONParam := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(GetEncoding(TEncodeSelect(vRSCharset))){$IFEND}{$ENDIF};
+         JSONParam := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(GetEncodingid(TEncodeSelect(vRSCharset))){$IFEND}{$ENDIF};
          Try
           JSONParam.ParamName       := stringreplace(bJsonOBJ.pairs[4].JsonString.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]);
           JSONParam.ObjectValue     := GetValueType(bJsonOBJ.getvalue('ValueType').value);
