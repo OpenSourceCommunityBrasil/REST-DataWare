@@ -733,7 +733,7 @@ If vEncoded Then
    End;
  End
 Else
- vTempString := removestr(BytesArrToString(aValue{$IFNDEF FPC},vEncoding{$ENDIF}),'"');
+ vTempString := BytesArrToString(aValue{$IFNDEF FPC},vEncoding{$ENDIF});
 If vObjectValue = ovString Then
  Begin
   If vTempString <> '' Then
@@ -2198,6 +2198,9 @@ Begin
     vObjectValue     := GetValueType(removestr(bJsonValue.pairs[3].jsonvalue.tostring,'"')); //bJsonValue.opt(bJsonValue.names.get(3).ToString).ToString);
     vParamName       := Lowercase(removestr(bJsonValue.pairs[4].jsonstring.tostring,'"')); //bJsonValue.names.get(4).ToString);
     WriteValue(vValue);
+    vBinary            := vObjectValue in [ovBytes, ovVarBytes, ovBlob,
+                                           ovGraphic, ovOraBlob, ovOraClob];
+    vJSONValue.vBinary := vBinary;
    End;
  Finally
   bJsonValue.Free;
