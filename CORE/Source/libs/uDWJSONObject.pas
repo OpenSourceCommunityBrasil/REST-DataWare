@@ -726,7 +726,7 @@ If vEncoded Then
    End;
  End
 Else
- vTempString := BytesArrToString(aValue, vEncoding);
+ vTempString := BytesArrToString(aValue, GetEncodingID(vEncoding));
 If vObjectValue = ovString Then
  Begin
   If vTempString <> '' Then
