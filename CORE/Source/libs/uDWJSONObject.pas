@@ -2169,7 +2169,7 @@ Begin
  Else If Param.DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
                             {$IFEND}{$ENDIF}ftInteger, ftSmallint, ftLargeint, ftFloat,
                             ftCurrency, ftFMTBcd, ftBCD] Then
-  SetValue(Param.AsString, False)
+  SetValue(BuildStringFloat(Param.AsString), False)
  Else If Param.DataType In [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
   Begin
    MemoryStream := TMemoryStream.Create;
