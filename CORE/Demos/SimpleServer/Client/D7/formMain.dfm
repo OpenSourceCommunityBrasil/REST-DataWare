@@ -1996,13 +1996,12 @@ object Form2: TForm2
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
-    DecimalSeparator = ','
     OnWork = RESTDWDataBase1Work
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd
     ParamCreate = True
-    Left = 216
-    Top = 144
+    Left = 232
+    Top = 72
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
     Active = False
@@ -2070,6 +2069,7 @@ object Form2: TForm2
     AfterInsert = RESTDWClientSQL1AfterInsert
     MasterCascadeDelete = True
     Inactive = False
+    Datapacks = -1
     DataCache = False
     Params = <>
     DataBase = RESTDWDataBase1
@@ -2080,12 +2080,12 @@ object Form2: TForm2
     AutoCommitData = False
     AutoRefreshAfterCommit = True
     InBlockEvents = False
-    Left = 248
-    Top = 144
+    Left = 232
+    Top = 112
   end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1
-    Left = 288
-    Top = 144
+    Left = 272
+    Top = 112
   end
 end

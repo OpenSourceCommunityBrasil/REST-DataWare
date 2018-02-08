@@ -524,7 +524,7 @@ Begin
     Begin
      vFound  := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil;
      If Not(vFound) Then
-      dwParam                := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF}
+      dwParam                := TJSONParam.Create(DWParams.Encoding)
      Else
       dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
      dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
@@ -679,7 +679,7 @@ Begin
     Begin
      vFound  := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil;
      If Not(vFound) Then
-      dwParam                := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF}
+      dwParam                := TJSONParam.Create(DWParams.Encoding)
      Else
       dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
      dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
@@ -717,29 +717,17 @@ Begin
  Else
   Exit;
  DWParams                        := TDWParams.Create;
- {$IFNDEF FPC}
  JSONParam                       := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
- {$ELSE}
-  JSONParam                      := TJSONParam.Create;
- {$ENDIF}
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- {$IFNDEF FPC}
  JSONParam                       := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
- {$ELSE}
- JSONParam                       := TJSONParam.Create;
- {$ENDIF}
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
- {$IFNDEF FPC}
  JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
- {$ELSE}
- JSONParam                     := TJSONParam.Create;
- {$ENDIF}
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOut;
  JSONParam.AsString              := '';

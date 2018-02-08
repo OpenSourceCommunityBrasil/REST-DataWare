@@ -581,20 +581,12 @@ Type
   Property    ParamCreate      : Boolean       Read vParamCreate      Write vParamCreate;
 End;
 
- {$IFNDEF FPC}
  Function GetDWParams(Params : TParams; Encondig : TEncodeSelect) : TDWParams;
- {$ELSE}
- Function GetDWParams(Params : TParams) : TDWParams;
- {$ENDIF}
 
 implementation
 
 
-{$IFNDEF FPC}
 Function GetDWParams(Params : TParams; Encondig : TEncodeSelect) : TDWParams;
-{$ELSE}
-Function GetDWParams(Params : TParams) : TDWParams;
-{$ENDIF}
 Var
  I         : Integer;
  JSONParam : TJSONParam;
@@ -605,16 +597,10 @@ Begin
    If Params.Count > 0 Then
     Begin
      Result := TDWParams.Create;
-     {$IFNDEF FPC}
      Result.Encoding := GetEncodingID(Encondig);
-     {$ENDIF}
      For I := 0 To Params.Count -1 Do
       Begin
-       {$IFNDEF FPC}
        JSONParam         := TJSONParam.Create(Result.Encoding);
-       {$ELSE}
-       JSONParam         := TJSONParam.Create;
-       {$ENDIF}
        JSONParam.ParamName := Params[I].Name;
        JSONParam.Encoded   := True;
        JSONParam.LoadFromParam(Params[I]);
@@ -707,6 +693,7 @@ Begin
    vRESTDriver.vStrsTrim2Len      := vStrsTrim2Len;
    vRESTDriver.vCompression       := vCompression;
    vRESTDriver.vEncoding          := vEncoding;
+   vRESTDriver.vParamCreate       := vParamCreate;
    Result := vRESTDriver.InsertMySQLReturnID(SQL, Params, Error, MessageError);
   End
  Else
@@ -816,7 +803,15 @@ Begin
  vStrsEmpty2Null   := False;
  vStrsTrim2Len     := True;
  vActive           := True;
- vEncoding         := esASCII;
+ {$IFNDEF FPC}
+ {$IF CompilerVersion > 21}
+  vEncoding         := esUtf8;
+ {$ELSE}
+  vEncoding         := esASCII;
+ {$IFEND}
+ {$ELSE}
+  vEncoding         := esUtf8;
+ {$ENDIF}
  vMessagePoolerOff := 'RESTPooler not active.';
  vParamCreate      := True;
 End;
@@ -1024,24 +1019,17 @@ Begin
  vRESTConnectionDB.Port           := vPoolerPort;
  vRESTConnectionDB.Compression    := vCompression;
  vRESTConnectionDB.TypeRequest     := VtypeRequest;
- {$IFNDEF FPC}
-  vRESTConnectionDB.OnWork        := vOnWork;
-  vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
-  vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
-  vRESTConnectionDB.OnStatus      := vOnStatus;
-  {$if CompilerVersion > 21}
-  vRESTConnectionDB.Encoding      := VEncondig;
-  {$IFEND}
- {$ELSE}
-  vRESTConnectionDB.OnWork        := vOnWork;
-  vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
-  vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
-  vRESTConnectionDB.OnStatus        := vOnStatus;
+ vRESTConnectionDB.Encoding      := VEncondig;
+ vRESTConnectionDB.OnWork        := vOnWork;
+ vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
+ vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
+ vRESTConnectionDB.OnStatus      := vOnStatus;
+ {$IFDEF FPC}
   vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
  {$ENDIF}
  Try
   If Params.Count > 0 Then
-   DWParams     := GetDWParams(Params{$IFNDEF FPC}, vEncondig{$ENDIF})
+   DWParams     := GetDWParams(Params, vEncondig)
   Else
    DWParams     := Nil;
   LDataSetList := vRESTConnectionDB.ApplyUpdates(Massive,      vRestPooler,
@@ -1146,26 +1134,19 @@ Begin
  vRESTConnectionDB.Host           := vRestWebService;
  vRESTConnectionDB.Port           := vPoolerPort;
  vRESTConnectionDB.Compression    := vCompression;
- vRESTConnectionDB.TypeRequest    := VtypeRequest;
- {$IFNDEF FPC}
-  vRESTConnectionDB.OnWork        := vOnWork;
-  vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
-  vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
-  vRESTConnectionDB.OnStatus      := vOnStatus;
-  {$if CompilerVersion > 21}
-  vRESTConnectionDB.Encoding      := VEncondig;
-  {$IFEND}
- {$ELSE}
-  vRESTConnectionDB.OnWork        := vOnWork;
-  vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
-  vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
-  vRESTConnectionDB.OnStatus        := vOnStatus;
+ vRESTConnectionDB.TypeRequest     := VtypeRequest;
+ vRESTConnectionDB.Encoding      := VEncondig;
+ vRESTConnectionDB.OnWork        := vOnWork;
+ vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
+ vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
+ vRESTConnectionDB.OnStatus      := vOnStatus;
+ {$IFDEF FPC}
   vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
  {$ENDIF}
  Try
   If Params.Count > 0 Then
    Begin
-    DWParams     := GetDWParams(Params{$IFNDEF FPC}, vEncondig{$ENDIF});
+    DWParams     := GetDWParams(Params, vEncondig);
     LDataSetList := vRESTConnectionDB.InsertValue(vRestPooler,
                                                   vRestURL, GetLineSQL(SQL),
                                                   DWParams, Error,
@@ -1352,26 +1333,19 @@ Begin
  vRESTConnectionDB.Host           := vRestWebService;
  vRESTConnectionDB.Port           := vPoolerPort;
  vRESTConnectionDB.Compression    := vCompression;
- vRESTConnectionDB.TypeRequest    := VtypeRequest;
- {$IFNDEF FPC}
-  vRESTConnectionDB.OnWork        := vOnWork;
-  vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
-  vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
-  vRESTConnectionDB.OnStatus      := vOnStatus;
-  {$if CompilerVersion > 21}
-  vRESTConnectionDB.Encoding      := VEncondig;
-  {$IFEND}
- {$ELSE}
-  vRESTConnectionDB.OnWork        := vOnWork;
-  vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
-  vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
-  vRESTConnectionDB.OnStatus        := vOnStatus;
+ vRESTConnectionDB.TypeRequest     := VtypeRequest;
+ vRESTConnectionDB.Encoding      := VEncondig;
+ vRESTConnectionDB.OnWork        := vOnWork;
+ vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
+ vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
+ vRESTConnectionDB.OnStatus      := vOnStatus;
+ {$IFDEF FPC}
   vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
  {$ENDIF}
  Try
   If Params.Count > 0 Then
    Begin
-    DWParams     := GetDWParams(Params{$IFNDEF FPC}, vEncondig{$ENDIF});
+    DWParams     := GetDWParams(Params, vEncondig);
     LDataSetList := vRESTConnectionDB.ExecuteCommandJSON(vRestPooler,
                                                          vRestURL, GetLineSQL(SQL),
                                                          DWParams, Error,
@@ -1857,7 +1831,7 @@ Begin
  Value := Nil;
  If vRESTDataBase <> Nil Then
   If Params.Count > 0 Then
-   Value := GetDWParams(Params{$IFNDEF FPC}, vRESTDataBase.Encoding{$ENDIF});
+   Value := GetDWParams(Params, vRESTDataBase.Encoding);
 End;
 
 Procedure TRESTDWClientSQL.DynamicFilter(cFields  : Array of String;
@@ -2426,9 +2400,9 @@ Begin
              End;
            End;
          End;
-         If Assigned(vResult) Then
-          FreeAndNil(vResult);
         End;
+       If Assigned(vResult) Then
+        FreeAndNil(vResult);
       End
      Else
       Error := 'Empty Database Property';

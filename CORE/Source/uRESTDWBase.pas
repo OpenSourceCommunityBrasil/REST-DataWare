@@ -541,20 +541,20 @@ Begin
     {$IFNDEF FPC}
      If (ARequest.QueryFields.Count > 0) And (Trim(ARequest.Content) = '') Then
       DWParams  := TServerUtils.ParseWebFormsParams (ARequest.QueryFields, Cmd,
-                                                     UrlMethod{$IFNDEF FPC}, GetEncodingID(TEncodeSelect(VEncondig)){$ENDIF},
+                                                     UrlMethod, GetEncodingID(TEncodeSelect(VEncondig)),
                                                      ARequest.Method)
     {$ELSE}
      If (ARequest.FieldCount > 0) And (Trim(ARequest.Content) = '') Then
       DWParams  := TServerUtils.ParseWebFormsParams (ARequest.ContentFields, Cmd,
-                                                     UrlMethod{$IFNDEF FPC}{$if CompilerVersion > 21}, GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF})
+                                                     UrlMethod, GetEncodingID(TEncodeSelect(VEncondig)))
     {$ENDIF}
       Else
        Begin
         If Trim(ARequest.Content) = '' Then
          {$IFNDEF FPC}
-         DWParams  := TServerUtils.ParseRESTURL (ARequest.PathInfo + ARequest.Query{$IFNDEF FPC},GetEncodingID(TEncodeSelect(VEncondig)){$ENDIF})
+         DWParams  := TServerUtils.ParseRESTURL (ARequest.PathInfo + ARequest.Query, GetEncodingID(TEncodeSelect(VEncondig)))
          {$ELSE}
-         DWParams  := TServerUtils.ParseRESTURL (ARequest.URI{$IFNDEF FPC}{$if CompilerVersion > 21},GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF})
+         DWParams  := TServerUtils.ParseRESTURL (ARequest.URI, GetEncodingID(TEncodeSelect(VEncondig)))
          {$ENDIF}
         Else
          Begin
@@ -595,11 +595,9 @@ Begin
                  If Not Assigned(DWParams) Then
                   Begin
                    DWParams           := TDWParams.Create;
-                   {$IFNDEF FPC}
                    DWParams.Encoding  := GetEncodingID(TEncodeSelect(VEncondig));
-                   {$ENDIF}
                   End;
-                 JSONParam   := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF};
+                 JSONParam   := TJSONParam.Create(DWParams.Encoding);
                  JSONParam.FromJSON(ms.DataString);
                  DWParams.Add(JSONParam);
                 End;
@@ -841,7 +839,7 @@ Begin
    GetPoolerList(BaseObject, vResult);
    If DWParams.ItemsString['Result'] = Nil Then
     Begin
-     JSONParam                 := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF};
+     JSONParam                 := TJSONParam.Create(DWParams.Encoding);
      JSONParam.ParamName       := 'Result';
      JSONParam.ObjectDirection := odOut;
      DWParams.Add(JSONParam);
@@ -862,7 +860,7 @@ Begin
    EchoPooler(BaseObject, JSONStr, vResult, vResultIP);
    If DWParams.ItemsString['Result'] = Nil Then
     Begin
-     JSONParam                 := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF};
+     JSONParam                 := TJSONParam.Create(DWParams.Encoding);
      JSONParam.ParamName       := 'Result';
      JSONParam.ObjectValue     := ovString;
      JSONParam.ObjectDirection := odOut;
@@ -2195,7 +2193,7 @@ Var
 //           FreeAndNil(bJsonOBJ);
            Continue;
           End;
-         JSONParam := TJSONParam.Create{$IFNDEF FPC}{$if CompilerVersion > 21}(GetEncoding(TEncodeSelect(vRSCharset))){$IFEND}{$ENDIF};
+         JSONParam := TJSONParam.Create(GetEncodingID(TEncodeSelect(vRSCharset)));
          Try
           JSONParam.ParamName       := bJsonOBJ.names.get(4).ToString;
           JSONParam.ObjectValue     := GetValueType(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString);
@@ -2213,7 +2211,7 @@ Var
           //parametro criandos no servidor
           If ParamsData.ItemsString[JSONParam.ParamName] = Nil Then
            Begin
-            JSONParamNew           := TJSONParam.Create{$IFNDEF FPC}(ParamsData.Encoding){$ENDIF};
+            JSONParamNew           := TJSONParam.Create(ParamsData.Encoding);
             JSONParamNew.ParamName := JSONParam.ParamName;
             JSONParamNew.SetValue(JSONParam.Value, JSONParam.Encoded);
             ParamsData.Add(JSONParamNew);
@@ -3345,11 +3343,11 @@ Begin
      Begin
       If ARequestInfo.Params.Count > 0 Then
        DWParams  := TServerUtils.ParseWebFormsParams (ARequestInfo.Params, ARequestInfo.URI,
-                                                      UrlMethod{$IFNDEF FPC}, GetEncodingID(TEncodeSelect(VEncondig)){$ENDIF})
+                                                      UrlMethod, GetEncodingID(TEncodeSelect(VEncondig)))
       Else
        Begin
         If Copy(Cmd, 1, 3) = 'GET' Then
-         DWParams  := TServerUtils.ParseRESTURL (ARequestInfo.URI{$IFNDEF FPC},GetEncodingID(TEncodeSelect(VEncondig)){$ENDIF})
+         DWParams  := TServerUtils.ParseRESTURL (ARequestInfo.URI, GetEncodingID(TEncodeSelect(VEncondig)))
         Else
          Begin
           Try
@@ -3385,11 +3383,9 @@ Begin
                  If DWParams = Nil Then
                   Begin
                    DWParams           := TDWParams.Create;
-                   {$IFNDEF FPC}
                    DWParams.Encoding  := GetEncodingID(TEncodeSelect(VEncondig));
-                   {$ENDIF}
                   End;
-                 JSONParam   := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF};
+                 JSONParam   := TJSONParam.Create(DWParams.Encoding);
                  JSONParam.FromJSON(ms.DataString);
                  DWParams.Add(JSONParam);
                 End;
@@ -3669,7 +3665,7 @@ Begin
  If (UpperCase(Copy (Cmd, 1, 3)) = 'PUT')    OR
     (UpperCase(Copy (Cmd, 1, 6)) = 'DELETE') Then
   Begin
-   DWParams := TServerUtils.ParseRESTURL (ARequestInfo.URI{$IFNDEF FPC}, GetEncodingID(TEncodeSelect(VEncondig)){$ENDIF});
+   DWParams := TServerUtils.ParseRESTURL (ARequestInfo.URI, GetEncodingID(TEncodeSelect(VEncondig)));
    If Assigned(vServerMethod) Then
     vTempServerMethods := vServerMethod.Create(Nil)
    Else
@@ -4003,7 +3999,7 @@ Var
          bJsonOBJ := bJsonOBJTemp.getJSONObject(A); //TJsonObject.Create(bJsonOBJTemp.get(A).ToString);
          If Length(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) = 0 Then
           Continue;
-         JSONParam := TJSONParam.Create{$IFNDEF FPC}(GetEncodingID(TEncodeSelect(vRSCharset))){$ENDIF};
+         JSONParam := TJSONParam.Create(GetEncodingID(TEncodeSelect(vRSCharset)));
          Try
           JSONParam.ParamName       := bJsonOBJ.names.get(4).ToString;
           JSONParam.ObjectValue     := GetValueType(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString);
@@ -4018,7 +4014,7 @@ Var
           //parametro criandos no servidor
           If ParamsData.ItemsString[JSONParam.ParamName] = Nil Then
            Begin
-            JSONParamNew           := TJSONParam.Create{$IFNDEF FPC}(ParamsData.Encoding){$ENDIF};
+            JSONParamNew           := TJSONParam.Create(ParamsData.Encoding);
             JSONParamNew.ParamName := JSONParam.ParamName;
             JSONParamNew.SetValue(JSONParam.Value, JSONParam.Encoded);
             ParamsData.Add(JSONParamNew);

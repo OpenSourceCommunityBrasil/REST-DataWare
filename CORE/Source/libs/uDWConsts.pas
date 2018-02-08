@@ -112,7 +112,7 @@ Type
                                      Var Value       : TStringStream)             : Boolean;
  Function  ZCompressStr             (Const s         : String;
                                      Var Value       : String)                    : Boolean;
- Function  BytesArrToString         (aValue          : tIdBytes{$IFNDEF FPC};IdEncode : IIdTextEncoding = Nil{$ENDIF}) : String;
+ Function  BytesArrToString         (aValue          : tIdBytes;         IdEncode : IIdTextEncoding = Nil) : String;
  Function  ObjectValueToFieldType   (TypeObject      : TObjectValue)              : TFieldType;
  Function  FieldTypeToObjectValue   (FieldType       : TFieldType)                : TObjectValue;
  Function  DatasetStateToMassiveType(DatasetState    : TDatasetState)             : TMassiveMode;
@@ -228,24 +228,9 @@ Begin
  End;
 End;
 
-Function BytesArrToString(aValue : tIdBytes{$IFNDEF FPC};IdEncode : IIdTextEncoding = Nil{$ENDIF}) : String;
-{$IFDEF FPC}
-Var
- StringStream : TStringStream;
-{$ENDIF}
+Function BytesArrToString(aValue : tIdBytes;IdEncode : IIdTextEncoding = Nil) : String;
 Begin
- {$IFDEF FPC}
-  StringStream := TStringStream.Create('');
-  Try
-   StringStream.Write(aValue[0], Length(aValue));
-   StringStream.Position := 0;
-   Result  := StringStream.DataString;
-  Finally
-   StringStream.Free;
-  End;
- {$ELSE}
-  Result   := BytesToString(aValue{$IFNDEF FPC}, IdEncode{$ENDIF});
- {$ENDIF}
+ Result   := BytesToString(aValue, IdEncode);
 End;
 
 Function ZCompressStr(Const s   : String;

@@ -63,9 +63,7 @@ Private
  vObjectValue: TObjectValue;
  aValue: TIdBytes;
  vEncoded: Boolean;
- {$IFNDEF FPC}
  vEncoding: IIdTextEncoding;
- {$ENDIF}
  {$IFDEF FPC}
  vDatabaseCharSet   : TDatabaseCharSet;
  {$ENDIF}
@@ -106,9 +104,7 @@ Public
  Property    ObjectDirection : TObjectDirection Read vObjectDirection Write vObjectDirection;
  Property    ObjectValue     : TObjectValue     Read vObjectValue     Write vObjectValue;
  Property    Binary          : Boolean          Read vBinary          Write vBinary;
- {$IFNDEF FPC}
  Property    Encoding        : IIdTextEncoding  Read vEncoding        Write vEncoding;
- {$ENDIF}
  Property    Tagname         : String           Read vtagName         Write vtagName;
  Property    Encoded         : Boolean          Read vEncoded         Write vEncoded;
  Property    JsonMode        : TJsonMode        Read vJsonMode        Write vJsonMode;
@@ -123,9 +119,7 @@ Type
 Private
  vJSONValue       : TJSONValue;
  vJsonMode        : TJsonMode;
- {$IFNDEF FPC}
  vEncoding        : IIdTextEncoding;
- {$ENDIF}
  vTypeObject      : TTypeObject;
  vObjectDirection : TObjectDirection;
  vObjectValue     : TObjectValue;
@@ -169,7 +163,7 @@ Private
  Function  GetAsLargeInt           : LargeInt;
  Procedure SetAsLargeInt(Value     : LargeInt);
 Public
- Constructor Create{$IFNDEF FPC}(Encoding: IIdTextEncoding){$ENDIF};
+ Constructor Create(Encoding: IIdTextEncoding);
  Destructor  Destroy; Override;
  Function    IsEmpty               : Boolean;
  Procedure   FromJSON(JSON         : String);
@@ -244,9 +238,7 @@ Type
  TDWParams = Class(TList)
 Private
  vJsonMode : TJsonMode;
- {$IFNDEF FPC}
  vEncoding : IIdTextEncoding;
- {$ENDIF}
  Function    GetRec    (Index     : Integer) : TJSONParam;  Overload;
  Procedure   PutRec    (Index     : Integer;
                         Item      : TJSONParam);            Overload;
@@ -267,9 +259,7 @@ Public
  Property    Items      [Index    : Integer]   : TJSONParam Read GetRec     Write PutRec; Default;
  Property    ItemsString[Index    : String]    : TJSONParam Read GetRecName Write PutRecName;
  Property    JsonMode                          : TJsonMode  Read vJsonMode  Write vJsonMode;
- {$IFNDEF FPC}
  Property   Encoding : IIdTextEncoding Read vEncoding Write vEncoding;
- {$ENDIF}
 End;
 
 Type
@@ -380,9 +370,7 @@ Var
 Begin
  New(vItem);
  vItem^ := Item;
- {$IFNDEF FPC}
  vItem^.vEncoding := vEncoding;
- {$ENDIF}
  vItem^.JsonMode := vJsonMode;
  Result := TList(Self).Add(vItem);
 End;
@@ -393,12 +381,12 @@ Begin
  vJsonMode := jmDataware;
  {$IFNDEF FPC}
  {$IF CompilerVersion > 21}
- {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
   vEncoding := IndyTextEncoding(encUTF8);
  {$ELSE}
   vEncoding := IndyTextEncoding(encASCII);
-  {$IFEND}
  {$IFEND}
+ {$ELSE}
+ vEncoding := IndyTextEncoding(encUTF8);
  {$ENDIF}
 End;
 
@@ -430,15 +418,7 @@ Begin
   bJsonArray  :=   bJsonValue.pairs[0].jsonvalue as TJsonArray; //  bJsonValue.optJSONArray(bJsonValue.names.get(0).ToString);
   For I := 0 To bJsonArray.count - 1 Do
    Begin
-    {$IFNDEF FPC}
-    {$IF CompilerVersion > 21}
     JSONParam := TJSONParam.Create(vEncoding);
-    {$ELSE}
-    JSONParam := TJSONParam.Create;
-    {$IFEND}
-    {$ELSE}
-    JSONParam := TJSONParam.Create;
-    {$ENDIF}
     bJsonOBJ  :=  bJsonArray.items[0] as TJSONObject;  //udwjson.TJsonObject.Create(bJsonArray.get(I).ToString);
     Try
      JSONParam.ParamName       := Lowercase  (removestr(bJsonOBJ.pairs[4].jsonstring.tostring,'"')); //         (bJsonOBJ.names.get(4).ToString);
@@ -483,11 +463,7 @@ Begin
   bJsonArray  := bJsonValue.optJSONArray(bJsonValue.names.get(0).ToString);
   For I := 0 To bJsonArray.Length - 1 Do
    Begin
-    {$IFNDEF FPC}
     JSONParam := TJSONParam.Create(vEncoding);
-    {$ELSE}
-    JSONParam := TJSONParam.Create;
-    {$ENDIF}
     bJsonOBJ  := udwjson.TJsonObject.Create(bJsonArray.get(I).ToString);
     Try
      JSONParam.ParamName       := Lowercase           (bJsonOBJ.names.get(4).ToString);
@@ -521,7 +497,7 @@ Begin
  For I := 0 To DWParams.Count -1 Do
   Begin
    p := DWParams.Items[I];
-   JSONParam := TJSONParam.Create{$IFNDEF FPC}(DWParams.Encoding){$ENDIF};
+   JSONParam := TJSONParam.Create(DWParams.Encoding);
    JSONParam.CopyFrom(p);
    Add(JSONParam);
   End;
@@ -644,7 +620,13 @@ Constructor TJSONValue.Create;
 Begin
  Inherited;
  {$IFNDEF FPC}
- vEncoding       := IndyASCIIEncoding;
+ {$IF CompilerVersion > 21}
+  vEncoding := IndyTextEncoding(encUTF8);
+ {$ELSE}
+  vEncoding := IndyTextEncoding(encASCII);
+ {$IFEND}
+ {$ELSE}
+ vEncoding := IndyTextEncoding(encUTF8);
  {$ENDIF}
  {$IFDEF FPC}
  vDatabaseCharSet := csUndefined;
@@ -713,7 +695,7 @@ Begin
  Result := '';
  If Length(aValue) = 0 Then
   Exit;
- vTempString := BytesArrToString(aValue{$IFNDEF FPC},vEncoding{$ENDIF});
+ vTempString := BytesArrToString(aValue, vEncoding);
 {$IF Defined(ANDROID) or defined(IOS)} //Alterado para IOS Brito
 If Length(vTempString) > 0 Then
  Begin
@@ -738,7 +720,7 @@ If vEncoded Then
    End;
  End
 Else
- vTempString := BytesArrToString(aValue{$IFNDEF FPC},vEncoding{$ENDIF});
+ vTempString := BytesArrToString(aValue, vEncoding);
 If vObjectValue = ovString Then
  Begin
   If vTempString <> '' Then
@@ -775,7 +757,7 @@ Else
  Else
   Begin
    If Length(vTempString) = 0 Then
-    vTempString := BytesArrToString(aValue{$IFNDEF FPC},vEncoding{$ENDIF});
+    vTempString := BytesArrToString(aValue, vEncoding);
   End;
  If vObjectValue = ovString Then
   Begin
@@ -1027,7 +1009,7 @@ Begin
  vtagName         := Lowercase(TableName);
  vEncoded         := EncodedValue;
  vTagGeral        := DatasetValues(bValue, DateTimeFormat, JsonModeD);
- aValue           := ToBytes(vTagGeral{$IFNDEF FPC}, vEncoding{$ENDIF});
+ aValue           := ToBytes(vTagGeral, vEncoding);
  vJsonMode        := JsonModeD;
 End;
 
@@ -1036,16 +1018,11 @@ Var
  vTempValue : String;
 Begin
  If vEncoded Then
-  {$IFNDEF FPC}
-  vTempValue := FormatValue({$IF CompilerVersion > 21}TEncoding.UTF8.GetString(TBytes(aValue))
-                            {$ELSE}BytesToString(aValue){$IFEND})
-  {$ELSE}
-  vTempValue := FormatValue(BytesToString(TBytes(aValue)))
-  {$ENDIF}
- Else If BytesArrToString(aValue{$IFNDEF FPC},vEncoding{$ENDIF}) = '' Then
+  vTempValue := FormatValue(BytesToString(aValue, vEncoding))
+ Else If BytesArrToString(aValue, vEncoding) = '' Then
   vTempValue  := FormatValue('""')
  Else
-  vTempValue  := FormatValue(BytesArrToString(aValue{$IFNDEF FPC},vEncoding{$ENDIF}));
+  vTempValue  := FormatValue(BytesArrToString(aValue, vEncoding));
  If Not(Pos('"TAGJSON":}', vTempValue) > 0) Then
   Result := vTempValue;
 End;
@@ -1419,13 +1396,7 @@ Begin
                 End;
               End
              Else if removestr(bJsonOBJTemp.Items[StrToInt(ListFields[I])].Value,'"') <> '' then // (bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString <> '') then
-              Begin
-               {$IFNDEF FPC}
-               SetValueA(DestDS.Fields[I], removestr(bJsonOBJTemp.Items[StrToInt(ListFields[I])].Value,'"')); //bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString);
-               {$ELSE}
-               SetValueA(DestDS.Fields[I], removestr(bJsonOBJTemp.Items[StrToInt(ListFields[I])].Value,'"')); // bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString);
-               {$ENDIF}
-              End;
+              SetValueA(DestDS.Fields[I], removestr(bJsonOBJTemp.Items[StrToInt(ListFields[I])].Value,'"')); //bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString);
             End;
           End;
         End;
@@ -1852,13 +1823,7 @@ Begin
                 End;
               End
              Else if (vTempValue <> '') then
-              Begin
-               {$IFNDEF FPC}
-               SetValueA(TRESTDWClientSQL(DestDS).Fields[I], vTempValue);
-               {$ELSE}
-               SetValueA(TRESTDWClientSQL(DestDS).Fields[I], vTempValue);
-               {$ENDIF}
-              End;
+              SetValueA(TRESTDWClientSQL(DestDS).Fields[I], vTempValue);
             End;
           End;
          TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
@@ -2087,67 +2052,35 @@ Begin
  If vObjectValue in [ovString, ovMemo, ovWideMemo, ovFmtMemo] Then
   Begin
    If vEncoded Then
-    Begin
-     {$IFDEF FPC}
-     aValue := ToBytes(Format(TJsonStringValue, [bValue]));
-     {$ELSE}
-     {$IF CompilerVersion > 21}
-     aValue := ToBytes(Format(TJsonStringValue, [bValue]){$IFNDEF FPC}, vEncoding{$ENDIF}); //TIdBytes(vEncoding.GetBytes(Format(TJsonStringValue, [bValue])));
-     {$ELSE}
-     aValue := ToBytes(Format(TJsonStringValue, [bValue]){$IFNDEF FPC}, vEncoding{$ENDIF});
-     {$IFEND}
-     {$ENDIF}
-    End
+    aValue := ToBytes(Format(TJsonStringValue, [bValue]), vEncoding) //TIdBytes(vEncoding.GetBytes(Format(TJsonStringValue, [bValue])));
    Else
     Begin
      If jsonmode = jmDataware Then
-      aValue := ToBytes(Format(TJsonStringValue, [bValue]){$IFNDEF FPC}, vEncoding{$ENDIF})
+      aValue := ToBytes(Format(TJsonStringValue, [bValue]), vEncoding)
      Else
-      aValue := ToBytes(bValue{$IFNDEF FPC}, vEncoding{$ENDIF});
+      aValue := ToBytes(bValue, vEncoding);
     End;
   End
  Else If vObjectValue in [ovDate, ovTime, ovDateTime, ovTimeStamp,
                           ovOraTimeStamp, ovTimeStampOffset] Then
   Begin
    If vEncoded Then
-    Begin
-     {$IFDEF FPC}
-     aValue := ToBytes(Format(TJsonStringValue, [bValue]));
-     {$ELSE}
-     {$IF CompilerVersion > 21}
-     aValue := ToBytes(Format(TJsonStringValue, [bValue]){$IFNDEF FPC}, vEncoding{$ENDIF}); //TIdBytes(vEncoding.GetBytes(Format(TJsonStringValue, [bValue])));
-     {$ELSE}
-     aValue := ToBytes(Format(TJsonStringValue, [bValue]){$IFNDEF FPC}, vEncoding{$ENDIF});
-     {$IFEND}
-     {$ENDIF}
-    End
+    aValue := ToBytes(Format(TJsonStringValue, [bValue]), vEncoding) //TIdBytes(vEncoding.GetBytes(Format(TJsonStringValue, [bValue])));
    Else
-    aValue := ToBytes(Format(TJsonStringValue, [bValue]){$IFNDEF FPC}, vEncoding{$ENDIF});
+    aValue := ToBytes(Format(TJsonStringValue, [bValue]), vEncoding);
   End
  Else If vObjectValue in [ovFloat,  ovCurrency,  ovBCD,
                           ovFMTBcd, ovExtended]  Then
-  aValue := ToBytes(Format(TJsonStringValue, [bValue]){$IFNDEF FPC}, vEncoding{$ENDIF})
+  aValue := ToBytes(Format(TJsonStringValue, [bValue]), vEncoding)
  Else
-  Begin
-   {$IFNDEF FPC}
-   {$IF CompilerVersion > 21}
-   aValue := ToBytes(bValue{$IFNDEF FPC}, vEncoding{$ENDIF}); //ToBytes(bValue); // tIdBytes(vEncoding.GetBytes(bValue));
-   {$ELSE}
-   aValue := ToBytes(bValue{$IFNDEF FPC}, vEncoding{$ENDIF});
-   {$IFEND}
-   {$ELSE}
-   aValue := ToBytes(bValue);
-   {$ENDIF}
-  End;
+  aValue := ToBytes(bValue, vEncoding);
 End;
 
-Constructor TJSONParam.Create{$IFNDEF FPC}(Encoding: IIdTextEncoding){$ENDIF};
+Constructor TJSONParam.Create(Encoding: IIdTextEncoding);
 Begin
- vJSONValue := TJSONValue.Create;
- vJsonMode  := jmDataware;
- {$IFNDEF FPC}
-  vEncoding := Encoding;
- {$ENDIF}
+ vJSONValue  := TJSONValue.Create;
+ vJsonMode   := jmDataware;
+ vEncoding   := Encoding;
  vTypeObject := toParam;
  ObjectDirection := odINOUT;
  vObjectValue := ovString;
@@ -2790,9 +2723,7 @@ End;
 
 Procedure TJSONParam.WriteValue(bValue: String);
 Begin
- {$IFNDEF FPC}
  vJSONValue.Encoding        := vEncoding;
- {$ENDIF}
  vJSONValue.vtagName         := vParamName;
  vJSONValue.vTypeObject      := vTypeObject;
  vJSONValue.vObjectDirection := vObjectDirection;
