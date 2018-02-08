@@ -1568,6 +1568,7 @@ Begin
   If Not Execute Then
    Begin
     vTempQuery.Open;
+    vTempQuery.fetchall;
     Result         := TJSONValue.Create;
     Try
      Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
