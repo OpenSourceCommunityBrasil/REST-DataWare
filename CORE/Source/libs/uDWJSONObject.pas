@@ -948,7 +948,30 @@ Begin
                 End;
   End;
   A := 0;
-  While Not bValue.Eof Do
+  {$IFDEF  POSIX}  //aqui para linux tem que ser diferente o rastrwio da query
+  for A := 0 to bvalue.recordcount-1 do
+  //While Not bValue.Eof Do
+   Begin
+    Case JsonModeD Of
+     jmDataware : Begin
+                   If bValue.RecNo = 1 Then
+                    vLines := Format('{"line%d":[%s]}', [A, GenerateLine])
+                   Else
+                    vLines := vLines + Format(', {"line%d":[%s]}', [A, GenerateLine]);
+                  End;
+     jmPureJSON,
+     jmMongoDB  : Begin
+                   If bValue.RecNo = 1 Then
+                    vLines := Format('{%s}', [GenerateLine])
+                   Else
+                    vLines := vLines + Format(', {%s}', [GenerateLine]);
+                  End;
+    End;
+    bValue.Next;
+    //Inc(A);
+   End;
+  {$ELSE}
+    While Not bValue.Eof Do
    Begin
     Case JsonModeD Of
      jmDataware : Begin
@@ -968,6 +991,8 @@ Begin
     bValue.Next;
     Inc(A);
    End;
+  {$ENDIF}
+
   Case JsonModeD Of
    jmDataware : Result := Format(Result, [vLines]);
    jmPureJSON,
