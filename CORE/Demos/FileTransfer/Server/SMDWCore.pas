@@ -125,7 +125,7 @@ Begin
      end;
    end;
    JSONValue          := TJSONValue.Create;
-   JSONValue.Encoding := GetEncoding(fServer.rspServerFiles.Encoding);
+   JSONValue.Encoding := GetEncodingID(fServer.rspServerFiles.Encoding);
    vArquivo           := fServer.DirName + vDiretorio + Trim(ExtractFileName(Params.ItemsString['Arquivo'].AsString));
    If FileExists(vArquivo) Then
     DeleteFile(vArquivo);
@@ -191,9 +191,9 @@ Begin
  List               := TStringList.Create;
  GetFilesServer(List);
  JSONValue          := TJSONValue.Create;
- JSONValue.Encoding := GetEncoding(fServer.rspServerFiles.Encoding);
+ JSONValue.Encoding := GetEncodingID(fServer.rspServerFiles.Encoding);
  Try
-  vFileExport       := TStringStream.Create(List.Text, JSONValue.Encoding);
+  vFileExport       := TStringStream.Create(List.Text);
   vFileExport.Position  := 0;
   JSONValue.LoadFromStream(vFileExport);
   Result := JSONValue.ToJSON;
