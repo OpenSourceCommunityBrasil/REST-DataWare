@@ -1484,7 +1484,7 @@ Var
            FreeAndNil(bJsonOBJ);
            Continue;
           End;
-         JSONParam := TJSONParam.Create(GetEncodingID(TEncodeSelect(vRSCharset)));
+         JSONParam := TJSONParam.Create(vRSCharset);
          Try
           JSONParam.ParamName       := stringreplace(bJsonOBJ.pairs[4].JsonString.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]);
           JSONParam.ObjectValue     := GetValueType(bJsonOBJ.getvalue('ValueType').value);
@@ -3629,7 +3629,10 @@ Begin
         If Assigned(vTempServerMethods) Then
          Begin
           Try
+           {$IFDEF POSIX} //no linux nao precisa libertar porque é [weak]
+           {$ELSE}
            FreeAndNil(vTempServerMethods); //.free;
+           {$ENDIF}
           Except
           End;
          End;
