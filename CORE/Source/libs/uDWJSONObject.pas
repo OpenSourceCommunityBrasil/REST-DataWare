@@ -899,13 +899,7 @@ Var
             {$ENDIF}
            End
           Else
-           Begin
-            {$IFDEF FPC}
-             vTempValue := Format('%s"%s"',      [vTempField, CP1252ToUTF8(bValue.Fields[I].AsString)])
-            {$ELSE}
-             vTempValue := Format('%s"%s"',      [vTempField, bValue.Fields[I].AsString])
-            {$ENDIF}
-           End;
+           vTempValue := Format('%s"%s"',      [vTempField, bValue.Fields[I].AsString]) //CP1252ToUTF8(bValue.Fields[I].AsString)
          End
         Else If bValue.Fields[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
          Begin
