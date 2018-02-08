@@ -432,7 +432,7 @@ Begin
    Begin
     {$IFNDEF FPC}
     {$IF CompilerVersion > 21}
-    JSONParam := TJSONParam.Create(GetEncoding(TEncodeSelect(vEncoding)));
+    JSONParam := TJSONParam.Create(vEncoding);
     {$ELSE}
     JSONParam := TJSONParam.Create;
     {$IFEND}
@@ -445,7 +445,12 @@ Begin
      JSONParam.ObjectDirection := GetDirectionName (removestr(bJsonOBJ.pairs[1].jsonvalue.tostring,'"')); //   (bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString);
      JSONParam.ObjectValue     := GetValueType (removestr(bJsonOBJ.pairs[3].jsonvalue.tostring,'"'));    //       (bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString);
      JSONParam.Encoded         := GetBooleanFromString(removestr(bJsonOBJ.pairs[2].jsonvalue.tostring,'"')); //(bJsonOBJ.opt(bJsonOBJ.names.get(2).ToString).ToString);
-     JSONParam.SetValue(removestr(bJsonOBJ.pairs[4].jsonvalue.tostring,'"')); //bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
+
+      If (JSONParam.ObjectValue in [ovString, ovWideString]) And (JSONParam.Encoded) Then
+      JSONParam.SetValue(DecodeStrings(removestr(bJsonOBJ.pairs[4].jsonvalue.tostring,'"'){$IFDEF FPC}, csUndefined{$ENDIF}))
+     Else
+      JSONParam.SetValue(bJsonOBJ.pairs[4].jsonvalue.tostring, JSONParam.Encoded);
+     //JSONParam.SetValue(removestr(bJsonOBJ.pairs[4].jsonvalue.tostring,'"')); //bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
      Add(JSONParam);
     Finally
      //bJsonOBJ.Clean;
