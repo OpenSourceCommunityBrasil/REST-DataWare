@@ -17,7 +17,11 @@ type
     RESTDWDriverFD1: TRESTDWLazDriver;
     RESTDWPoolerDB1: TRESTDWPoolerDB;
     Server_FDConnection: TIBConnection;
+    FDQuery1: TSQLQuery;
+    SQLTransaction1: TSQLTransaction;
     procedure DataModuleWelcomeMessage(Welcomemsg: String);
+    procedure DWServerEvents1EventsgetemployeeReplyEvent(Var Params: TDWParams;
+      Var Result: String);
     procedure ServerMethodDataModuleReplyEvent(SendType: TSendEvent;
       Context: string; var Params: TDWParams; var Result: string);
     procedure ServerMethodDataModuleCreate(Sender: TObject);
@@ -88,6 +92,29 @@ End;
 procedure TServerMethodDM.DataModuleWelcomeMessage(Welcomemsg: String);
 begin
  RestDWForm.edBD.Text := Welcomemsg;
+end;
+
+procedure TServerMethodDM.DWServerEvents1EventsgetemployeeReplyEvent(
+  Var Params: TDWParams; Var Result: String);
+Var
+ JSONValue: TJSONValue;
+begin
+ JSONValue          := TJSONValue.Create;
+ Try
+  FDQuery1.Close;
+  FDQuery1.SQL.Clear;
+  FDQuery1.SQL.Add('select * from employee');
+  Try
+   FDQuery1.Open;
+   JSONValue.Encoding := Encoding;
+   JSONValue.LoadFromDataset('employee', FDQuery1, False,  Params.JsonMode, '');
+   Params.ItemsString['result'].AsString := JSONValue.ToJSON;
+   Params.ItemsString['segundoparam'].AsString := 'teste de array';
+  Except
+  End;
+ Finally
+  JSONValue.Free;
+ End;
 end;
 
 procedure TServerMethodDM.Server_FDConnectionBeforeConnect(Sender: TObject);

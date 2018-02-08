@@ -1,6 +1,7 @@
 object ServerMethodDM: TServerMethodDM
   OnCreate = ServerMethodDataModuleCreate
   OldCreateOrder = False
+  Encoding = esUtf8
   OnReplyEvent = ServerMethodDataModuleReplyEvent
   OnWelcomeMessage = DataModuleWelcomeMessage
   Height = 337
@@ -28,6 +29,7 @@ object ServerMethodDM: TServerMethodDM
     DatabaseName = 'D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\DEMO\EMPLOYEE.FDB'
     KeepConnection = False
     Password = 'masterkey'
+    Transaction = SQLTransaction1
     UserName = 'SYSDBA'
     HostName = 'localhost'
     CheckTransactionParams = False
@@ -43,8 +45,99 @@ object ServerMethodDM: TServerMethodDM
   end
   object DWServerEvents1: TDWServerEvents
     IgnoreInvalidParams = False
-    Events = <>
-    left = 221
-    top = 108
+    Events = <    
+      item
+        DWParams = <        
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovDateTime
+            ParamName = 'result'
+            Encoded = True
+          end        
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'inputdata'
+            Encoded = True
+          end        
+          item
+            TypeObject = toParam
+            ObjectDirection = odINOUT
+            ObjectValue = ovString
+            ParamName = 'resultstring'
+            Encoded = False
+          end>
+        JsonMode = jmDataware
+        Name = 'servertime'
+      end    
+      item
+        DWParams = <        
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'teste'
+      end    
+      item
+        DWParams = <        
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'sql'
+            Encoded = True
+          end        
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'loaddatasetevent'
+      end    
+      item
+        DWParams = <        
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = False
+          end        
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'segundoparam'
+            Encoded = False
+          end>
+        JsonMode = jmPureJSON
+        Name = 'getemployee'
+        OnReplyEvent = DWServerEvents1EventsgetemployeeReplyEvent
+      end>
+    left = 336
+    top = 80
+  end
+  object FDQuery1: TSQLQuery
+    FieldDefs = <>
+    Database = Server_FDConnection
+    Transaction = SQLTransaction1
+    Params = <>
+    left = 248
+    top = 40
+  end
+  object SQLTransaction1: TSQLTransaction
+    Active = False
+    Database = Server_FDConnection
+    left = 184
+    top = 40
   end
 end

@@ -92,7 +92,7 @@ BEGIN
   IF Params.ItemsString['SQL'] <> NIL THEN
   BEGIN
     JSONValue          := UDWJSONObject.TJSONValue.Create;
-    JSONValue.Encoding := GetEncodingID(Encoding);
+    JSONValue.Encoding := Encoding;
     IF Params.ItemsString['SQL'].Value <> '' THEN
     BEGIN
       IF Params.ItemsString['TESTPARAM'] <> NIL THEN
@@ -127,7 +127,7 @@ begin
   FDQuery1.SQL.Add('select * from employee');
   Try
    FDQuery1.Open;
-   JSONValue.Encoding := GetEncodingID(Encoding);
+   JSONValue.Encoding := Encoding;
    JSONValue.LoadFromDataset('employee', FDQuery1, False,  Params.JsonMode, '');
    Params.ItemsString['result'].AsString := JSONValue.ToJSON;
    Params.ItemsString['segundoparam'].AsString := 'teste de array';
@@ -153,7 +153,7 @@ BEGIN
     FDQuery1.SQL.Add(Params.ItemsString['sql'].AsString);
     Try
      FDQuery1.Open;
-     JSONValue.Encoding := GetEncodingID(Encoding);
+     JSONValue.Encoding := Encoding;
      JSONValue.LoadFromDataset('temp', FDQuery1, True);
      Params.ItemsString['result'].AsString := JSONValue.ToJSON;
     Except

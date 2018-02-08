@@ -63,7 +63,8 @@ Private
  vObjectValue: TObjectValue;
  aValue: TIdBytes;
  vEncoded: Boolean;
- vEncoding: IIdTextEncoding;
+ vEncoding: TEncodeSelect;
+ vEncodingLazarus : TEncoding;
  {$IFDEF FPC}
  vDatabaseCharSet   : TDatabaseCharSet;
  {$ENDIF}
@@ -75,6 +76,7 @@ Private
                          DateTimeFormat : String = '';
                          JsonModeD      : TJsonMode = jmDataware) : String;
  Function EncodedString : String;
+ Procedure SetEncoding(bValue : TEncodeSelect);
 Public
  Procedure ToStream(Var    bValue       : TMemoryStream);
  Procedure LoadFromDataset(TableName      : String;
@@ -104,7 +106,7 @@ Public
  Property    ObjectDirection : TObjectDirection Read vObjectDirection Write vObjectDirection;
  Property    ObjectValue     : TObjectValue     Read vObjectValue     Write vObjectValue;
  Property    Binary          : Boolean          Read vBinary          Write vBinary;
- Property    Encoding        : IIdTextEncoding  Read vEncoding        Write vEncoding;
+ Property    Encoding        : TEncodeSelect    Read vEncoding        Write SetEncoding;
  Property    Tagname         : String           Read vtagName         Write vtagName;
  Property    Encoded         : Boolean          Read vEncoded         Write vEncoded;
  Property    JsonMode        : TJsonMode        Read vJsonMode        Write vJsonMode;
@@ -119,7 +121,7 @@ Type
 Private
  vJSONValue       : TJSONValue;
  vJsonMode        : TJsonMode;
- vEncoding        : IIdTextEncoding;
+ vEncoding        : TEncodeSelect;
  vTypeObject      : TTypeObject;
  vObjectDirection : TObjectDirection;
  vObjectValue     : TObjectValue;
@@ -163,7 +165,7 @@ Private
  Function  GetAsLargeInt           : LargeInt;
  Procedure SetAsLargeInt(Value     : LargeInt);
 Public
- Constructor Create(Encoding: IIdTextEncoding);
+ Constructor Create(Encoding       : TEncodeSelect);
  Destructor  Destroy; Override;
  Function    IsEmpty               : Boolean;
  Procedure   FromJSON(JSON         : String);
@@ -238,7 +240,7 @@ Type
  TDWParams = Class(TList)
 Private
  vJsonMode : TJsonMode;
- vEncoding : IIdTextEncoding;
+ vEncoding : TEncodeSelect;
  Function    GetRec    (Index     : Integer) : TJSONParam;  Overload;
  Procedure   PutRec    (Index     : Integer;
                         Item      : TJSONParam);            Overload;
@@ -259,7 +261,7 @@ Public
  Property    Items      [Index    : Integer]   : TJSONParam Read GetRec     Write PutRec; Default;
  Property    ItemsString[Index    : String]    : TJSONParam Read GetRecName Write PutRecName;
  Property    JsonMode                          : TJsonMode  Read vJsonMode  Write vJsonMode;
- Property   Encoding : IIdTextEncoding Read vEncoding Write vEncoding;
+ Property    Encoding : TEncodeSelect Read vEncoding Write vEncoding;
 End;
 
 Type
@@ -381,12 +383,12 @@ Begin
  vJsonMode := jmDataware;
  {$IFNDEF FPC}
  {$IF CompilerVersion > 21}
-  vEncoding := IndyTextEncoding(encUTF8);
+  vEncoding := esUtf8;
  {$ELSE}
-  vEncoding := IndyTextEncoding(encASCII);
+  vEncoding := esASCII;
  {$IFEND}
  {$ELSE}
- vEncoding := IndyTextEncoding(encUTF8);
+ vEncoding := esUtf8;
  {$ENDIF}
 End;
 
@@ -621,12 +623,12 @@ Begin
  Inherited;
  {$IFNDEF FPC}
  {$IF CompilerVersion > 21}
-  vEncoding := IndyTextEncoding(encUTF8);
+  vEncoding := esUtf8;
  {$ELSE}
-  vEncoding := IndyTextEncoding(encASCII);
+  vEncoding := esASCII;
  {$IFEND}
  {$ELSE}
- vEncoding := IndyTextEncoding(encUTF8);
+ vEncoding := esUtf8;
  {$ENDIF}
  {$IFDEF FPC}
  vDatabaseCharSet := csUndefined;
@@ -695,7 +697,11 @@ Begin
  Result := '';
  If Length(aValue) = 0 Then
   Exit;
- vTempString := BytesArrToString(aValue, vEncoding);
+{$IFDEF FPC}
+ vTempString := vEncodingLazarus.GetString(aValue);
+{$ELSE}
+ vTempString := BytesArrToString(aValue, GetEncodingID(vEncoding));
+{$ENDIF}
 {$IF Defined(ANDROID) or defined(IOS)} //Alterado para IOS Brito
 If Length(vTempString) > 0 Then
  Begin
@@ -757,7 +763,13 @@ Else
  Else
   Begin
    If Length(vTempString) = 0 Then
-    vTempString := BytesArrToString(aValue, vEncoding);
+    Begin
+     {$IFDEF FPC}
+      vTempString := vEncodingLazarus.GetString(aValue);
+     {$ELSE}
+      vTempString := BytesArrToString(aValue, GetEncodingID(vEncoding));
+     {$ENDIF}
+    End;
   End;
  If vObjectValue = ovString Then
   Begin
@@ -1009,7 +1021,7 @@ Begin
  vtagName         := Lowercase(TableName);
  vEncoded         := EncodedValue;
  vTagGeral        := DatasetValues(bValue, DateTimeFormat, JsonModeD);
- aValue           := ToBytes(vTagGeral, vEncoding);
+ aValue           := ToBytes(vTagGeral, GetEncodingID(vEncoding));
  vJsonMode        := JsonModeD;
 End;
 
@@ -1017,12 +1029,23 @@ Function TJSONValue.ToJSON: String;
 Var
  vTempValue : String;
 Begin
+ If vEncodingLazarus = Nil Then
+  SetEncoding(vEncoding);
+ {$IFDEF FPC}
  If vEncoded Then
-  vTempValue := FormatValue(BytesToString(aValue, vEncoding))
- Else If BytesArrToString(aValue, vEncoding) = '' Then
+  vTempValue := FormatValue(vEncodingLazarus.GetString(aValue))
+ Else If vEncodingLazarus.GetString(aValue) = '' Then
   vTempValue  := FormatValue('""')
  Else
-  vTempValue  := FormatValue(BytesArrToString(aValue, vEncoding));
+  vTempValue  := FormatValue(vEncodingLazarus.GetString(aValue));
+ {$ELSE}
+ If vEncoded Then
+  vTempValue := FormatValue(BytesToString(aValue, GetEncodingID(vEncoding)))
+ Else If BytesArrToString(aValue, GetEncodingID(vEncoding)) = '' Then
+  vTempValue  := FormatValue('""')
+ Else
+  vTempValue  := FormatValue(BytesArrToString(aValue, GetEncodingID(vEncoding)));
+ {$ENDIF}
  If Not(Pos('"TAGJSON":}', vTempValue) > 0) Then
   Result := vTempValue;
 End;
@@ -2009,6 +2032,15 @@ Begin
  SetValue(StreamToHex(Stream), Encode);
 End;
 
+procedure TJSONValue.SetEncoding(bValue: TEncodeSelect);
+begin
+ vEncoding := bValue;
+ Case vEncoding Of
+  esASCII : vEncodingLazarus := TEncoding.ANSI;
+  esUtf8  : vEncodingLazarus := TEncoding.Utf8;
+ end;
+end;
+
 Procedure TJSONValue.SetValue      (Value  : String;
                                     Encode : Boolean);
 Begin
@@ -2046,37 +2078,64 @@ End;
 
 Procedure TJSONValue.WriteValue(bValue: String);
 Begin
+ If vEncodingLazarus = Nil Then
+  SetEncoding(vEncoding);
  SetLength(aValue, 0);
  If bValue = '' Then
   Exit;
  If vObjectValue in [ovString, ovMemo, ovWideMemo, ovFmtMemo] Then
   Begin
+   {$IFDEF FPC}
    If vEncoded Then
-    aValue := ToBytes(Format(TJsonStringValue, [bValue]), vEncoding) //TIdBytes(vEncoding.GetBytes(Format(TJsonStringValue, [bValue])));
+    aValue := TIdBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
    Else
     Begin
      If jsonmode = jmDataware Then
-      aValue := ToBytes(Format(TJsonStringValue, [bValue]), vEncoding)
+      aValue := TIdBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
      Else
-      aValue := ToBytes(bValue, vEncoding);
+      aValue := TIdBytes(vEncodingLazarus.GetBytes(bValue));
     End;
+   {$ELSE}
+   If vEncoded Then
+    aValue := ToBytes(Format(TJsonStringValue, [bValue]), GetEncodingID(vEncoding)) //TIdBytes(vEncoding.GetBytes(Format(TJsonStringValue, [bValue])));
+   Else
+    Begin
+     If jsonmode = jmDataware Then
+      aValue := ToBytes(Format(TJsonStringValue, [bValue]), GetEncodingID(vEncoding))
+     Else
+      aValue := ToBytes(bValue, GetEncodingID(vEncoding));
+    End;
+   {$ENDIF}
   End
  Else If vObjectValue in [ovDate, ovTime, ovDateTime, ovTimeStamp,
                           ovOraTimeStamp, ovTimeStampOffset] Then
   Begin
-   If vEncoded Then
-    aValue := ToBytes(Format(TJsonStringValue, [bValue]), vEncoding) //TIdBytes(vEncoding.GetBytes(Format(TJsonStringValue, [bValue])));
-   Else
-    aValue := ToBytes(Format(TJsonStringValue, [bValue]), vEncoding);
+   {$IFDEF FPC}
+   aValue := TIdBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])));
+   {$ELSE}
+   aValue := ToBytes(Format(TJsonStringValue, [bValue]), GetEncodingID(vEncoding));
+   {$ENDIF}
   End
  Else If vObjectValue in [ovFloat,  ovCurrency,  ovBCD,
                           ovFMTBcd, ovExtended]  Then
-  aValue := ToBytes(Format(TJsonStringValue, [bValue]), vEncoding)
+  Begin
+   {$IFDEF FPC}
+   aValue := TIdBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])));
+   {$ELSE}
+   aValue := ToBytes(Format(TJsonStringValue, [bValue]), GetEncodingID(vEncoding));
+   {$ENDIF}
+  End
  Else
-  aValue := ToBytes(bValue, vEncoding);
+  Begin
+   {$IFDEF FPC}
+   aValue := TIdBytes(vEncodingLazarus.GetBytes(bValue));
+   {$ELSE}
+   aValue := ToBytes(bValue, GetEncodingID(vEncoding));
+   {$ENDIF}
+  End;
 End;
 
-Constructor TJSONParam.Create(Encoding: IIdTextEncoding);
+Constructor TJSONParam.Create(Encoding: TEncodeSelect);
 Begin
  vJSONValue  := TJSONValue.Create;
  vJsonMode   := jmDataware;

@@ -597,7 +597,7 @@ Begin
    If Params.Count > 0 Then
     Begin
      Result := TDWParams.Create;
-     Result.Encoding := GetEncodingID(Encondig);
+     Result.Encoding := Encondig;
      For I := 0 To Params.Count -1 Do
       Begin
        JSONParam         := TJSONParam.Create(Result.Encoding);

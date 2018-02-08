@@ -672,9 +672,7 @@ Begin
   Begin
 //   If (Not Assigned(DWParams)) or (dwParams = nil) Then
    DWParams := TDWParams.Create;
-   {$IFNDEF FPC}
-   DWParams.Encoding := GetEncodingID(vRESTClientPooler.Encoding);
-   {$ENDIF}
+   DWParams.Encoding := vRESTClientPooler.Encoding;
    For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
     Begin
      vFound  := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil;
@@ -717,17 +715,17 @@ Begin
  Else
   Exit;
  DWParams                        := TDWParams.Create;
- JSONParam                       := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
- JSONParam                     := TJSONParam.Create(GetEncodingID(TEncodeSelect(RESTClientPoolerExec.Encoding)));
+ JSONParam                     := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOut;
  JSONParam.AsString              := '';

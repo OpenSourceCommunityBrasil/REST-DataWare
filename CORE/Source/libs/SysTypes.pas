@@ -23,10 +23,10 @@ Type
 
 Type
   TServerUtils = Class
-    Class Function ParseRESTURL(Const Cmd: String;vEncoding : IIdTextEncoding): TDWParams;
+    Class Function ParseRESTURL(Const Cmd: String;vEncoding : TEncodeSelect): TDWParams;
     Class Function Result2JSON(wsResult: TResultErro): String;
     Class Function ParseWebFormsParams(Params: TStrings; Const URL: String;
-                                       Var UrlMethod: String;vEncoding: IIdTextEncoding;MethodType : String = 'POST'): TDWParams;
+                                       Var UrlMethod: String;vEncoding: TEncodeSelect;MethodType : String = 'POST'): TDWParams;
   End;
 
 Type
@@ -50,7 +50,7 @@ Type
 implementation
 
 
-Class Function TServerUtils.ParseRESTURL(Const Cmd: String;vEncoding: IIdTextEncoding): TDWParams;
+Class Function TServerUtils.ParseRESTURL(Const Cmd: String;vEncoding: TEncodeSelect): TDWParams;
 Var
   NewCmd: String;
   ArraySize,
@@ -86,7 +86,7 @@ Begin
      JSONParam := TJSONParam.Create(Result.Encoding);
      IBar2 := Pos('/', NewCmd);
      JSONParam.ParamName := Format('PARAM%d', [Cont + 1]);
-     JSONParam.SetValue(TIdURI.URLDecode(Copy(NewCmd, 1, IBar2 - 1), vEncoding));
+     JSONParam.SetValue(TIdURI.URLDecode(Copy(NewCmd, 1, IBar2 - 1), GetEncodingID(vEncoding)));
      Delete(NewCmd, 1, IBar2);
     End;
   End;
@@ -96,7 +96,7 @@ Begin
 End;
 
 Class Function TServerUtils.ParseWebFormsParams(Params: TStrings;
-  const URL: String; Var UrlMethod: String;vEncoding: IIdTextEncoding;
+  const URL: String; Var UrlMethod: String;vEncoding: TEncodeSelect;
   MethodType : String = 'POST'): TDWParams;
 Var
   I: Integer;
