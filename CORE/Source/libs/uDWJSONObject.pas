@@ -1458,7 +1458,6 @@ Var
  A, J, I        : Integer;
  FieldDef       : TFieldDef;
  Field          : TField;
- vRequired,
  vOldReadOnly,
  vFindFlag      : Boolean;
  vBlobStream    : TStringStream;
@@ -1769,19 +1768,15 @@ Begin
        For I := 0 To DestDS.Fields.Count - 1 Do
         Begin
          vOldReadOnly := TRESTDWClientSQL(DestDS).Fields[I].ReadOnly;
-         vRequired    := TRESTDWClientSQL(DestDS).Fields[I].Required;
          TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := False;
-         TRESTDWClientSQL(DestDS).Fields[I].Required := False;
          If (TRESTDWClientSQL(DestDS).Fields[I].FieldKind = fkLookup) Then
           Begin
            TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
-           TRESTDWClientSQL(DestDS).Fields[I].Required := vRequired;
            Continue;
           End;
          If (I >= ListFields.Count) then
           Begin
            TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
-           TRESTDWClientSQL(DestDS).Fields[I].Required := vRequired;
            Continue;
           End;
          If (StrToInt(ListFields[I]) = -1) Or
@@ -1789,7 +1784,6 @@ Begin
             (StrToInt(ListFields[I]) = -1) Then
           Begin
            TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
-           TRESTDWClientSQL(DestDS).Fields[I].Required := vRequired;
            Continue;
           End;
          vTempValue := bJsonOBJTemp.get(StrToInt(ListFields[I])).ToString;
@@ -1844,7 +1838,6 @@ Begin
             End;
           End;
          TRESTDWClientSQL(DestDS).Fields[I].ReadOnly := vOldReadOnly;
-         TRESTDWClientSQL(DestDS).Fields[I].Required := vRequired;
         End;
       Finally
        vTempValue := '';
@@ -1857,6 +1850,19 @@ Begin
 }
       End;
       TRESTDWClientSQL(DestDS).Post;
+     End;
+    bJsonArray    := bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
+    bJsonArraySub := bJsonArray.optJSONObject  (0);
+    bJsonArray    := bJsonArraySub.optJSONArray(bJsonArraySub.names.get(0).ToString);
+    For J := 0 To bJsonArray.Length - 1 Do
+     Begin
+      bJsonOBJ := bJsonArray.optJSONObject(J);
+      If Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) <> '' Then
+       Begin
+        vTempValue := bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString;
+        If (TRESTDWClientSQL(DestDS).FindField(vTempValue)     = Nil) Then
+         TRESTDWClientSQL(DestDS).FindField(vTempValue).Required := Uppercase(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S';
+       End;
      End;
    End
   Else

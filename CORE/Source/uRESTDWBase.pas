@@ -1755,11 +1755,15 @@ Begin
   On E : Exception Do
    Begin
     {Todo: Acrescentado}
-      Raise Exception.Create(e.Message);
+    If Assigned(vResultParams) Then
+     FreeAndNil(vResultParams);
+    vThreadExecuting:=False;
+    Raise Exception.Create(e.Message);
+    Exit;
    End;
  End;
  FreeAndNil(vResultParams);
-  vThreadExecuting:=False;
+ vThreadExecuting:=False;
 End;
 {$IFEND}
 {$IFEND}
@@ -2112,7 +2116,14 @@ Begin
   On E : Exception Do
    Begin
     {Todo: Acrescentado}
+    If Assigned(SendParams) Then
+     SendParams.Free;
+    If Assigned(vResultParams) Then
+     vResultParams.Free;
+    If Assigned(StringStreamList) Then
+     StringStreamList.Free;
     Raise Exception.Create(e.Message);
+    Exit;
    End;
  End;
  FreeAndNil(vResultParams);
