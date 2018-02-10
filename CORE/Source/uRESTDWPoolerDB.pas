@@ -1240,6 +1240,7 @@ Begin
  vRESTConnectionDB.Port             := vPoolerPort;
  vRESTConnectionDB.Compression      := vCompression;
  vRESTConnectionDB.TypeRequest      := VtypeRequest;
+ vRESTConnectionDB.Encoding         := VEncondig;
  {$IFNDEF FPC}
   vRESTConnectionDB.OnWork          := vOnWork;
   vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
@@ -1534,6 +1535,7 @@ Begin
      vRESTConnectionDB.Port             := vPoolerPort;
      vRESTConnectionDB.Compression      := vCompression;
      vRESTConnectionDB.TypeRequest      := VtypeRequest;
+     vRESTConnectionDB.Encoding         := VEncondig;
      {$IFNDEF FPC}
      vRESTConnectionDB.OnWork          := vOnWork;
      vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
