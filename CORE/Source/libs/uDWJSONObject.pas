@@ -64,8 +64,8 @@ Private
  aValue: TIdBytes;
  vEncoded: Boolean;
  vEncoding: TEncodeSelect;
- vEncodingLazarus : TEncoding;
  {$IFDEF FPC}
+ vEncodingLazarus   : TEncoding;
  vDatabaseCharSet   : TDatabaseCharSet;
  {$ENDIF}
  Function  GetValue : String;
@@ -1023,9 +1023,9 @@ Function TJSONValue.ToJSON: String;
 Var
  vTempValue : String;
 Begin
+ {$IFDEF FPC}
  If vEncodingLazarus = Nil Then
   SetEncoding(vEncoding);
- {$IFDEF FPC}
  If vEncoded Then
   vTempValue := FormatValue(vEncodingLazarus.GetString(aValue))
  Else If vEncodingLazarus.GetString(aValue) = '' Then
@@ -2035,10 +2035,12 @@ End;
 procedure TJSONValue.SetEncoding(bValue: TEncodeSelect);
 begin
  vEncoding := bValue;
+ {$IFDEF FPC}
  Case vEncoding Of
   esASCII : vEncodingLazarus := TEncoding.ANSI;
   esUtf8  : vEncodingLazarus := TEncoding.Utf8;
- end;
+ End;
+ {$ENDIF}
 end;
 
 Procedure TJSONValue.SetValue      (Value  : String;
@@ -2078,14 +2080,14 @@ End;
 
 Procedure TJSONValue.WriteValue(bValue: String);
 Begin
- If vEncodingLazarus = Nil Then
-  SetEncoding(vEncoding);
  SetLength(aValue, 0);
  If bValue = '' Then
   Exit;
  If vObjectValue in [ovString, ovMemo, ovWideMemo, ovFmtMemo] Then
   Begin
    {$IFDEF FPC}
+   If vEncodingLazarus = Nil Then
+    SetEncoding(vEncoding);
    If vEncoded Then
     aValue := TIdBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
    Else

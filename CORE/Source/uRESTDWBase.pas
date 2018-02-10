@@ -755,15 +755,26 @@ Begin
           mb                                 := TStringStream.Create(vReplyStringResult);
          End
         Else
-         mb                                  := TStringStream.Create(vReplyString{$IFNDEF FPC}{$if CompilerVersion > 21}, GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF});
+         mb                                  := TStringStream.Create(vReplyString);
         mb.Position                          := 0;
+        {$IFNDEF FPC}
+        {$IF CompilerVersion > 21}
+        AResponse.FreeContentStream          := True;
+        {$IFEND}
+        {$ENDIF}
         If TEncodeSelect(VEncondig) = esUtf8 Then
-         AResponse.ContentType            := 'text;charset=utf-8'
+         AResponse.ContentType            := 'application/json;charset=utf-8'
         Else If TEncodeSelect(VEncondig) = esASCII Then
-         AResponse.ContentType            := 'text;charset=ansi';
-        AResponse.Content            := mb.Datastring;
+         AResponse.ContentType            := 'application/json;charset=ansi';
+        AResponse.ContentStream           := mb;
+        AResponse.ContentStream.Position := 0;
+        AResponse.ContentLength          := mb.Size;
        Finally
+        {$IFNDEF FPC}
+        {$IF CompilerVersion < 21}
         FreeAndNil(mb);
+        {$IFEND}
+        {$ENDIF}
        End;
       Finally
        If Assigned(vServerMethod) Then
@@ -3576,21 +3587,23 @@ Begin
           mb                                 := TStringStream.Create(vReplyStringResult);
          End
         Else
-         mb                                  := TStringStream.Create(vReplyString{$IFNDEF FPC}{$if CompilerVersion > 21}, GetEncoding(TEncodeSelect(VEncondig)){$IFEND}{$ENDIF});
+         mb                                  := TStringStream.Create(vReplyString);
         mb.Position                          := 0;
-//        AResponseInfo.ContentStream          := mb;
-//        AResponseInfo.ContentStream.Position := 0;
-//        AResponseInfo.ContentLength          := mb.Size;
-        AResponseInfo.ContentType            := 'text';//'application/octet-stream';
+        AResponseInfo.FreeContentStream      := True;
+        AResponseInfo.ContentType            := 'application/json'; //'text';//'application/octet-stream';
         AResponseInfo.ResponseNo             := 200;
         If TEncodeSelect(VEncondig) = esUtf8 Then
          AResponseInfo.Charset := 'utf-8'
         Else If TEncodeSelect(VEncondig) = esASCII Then
          AResponseInfo.Charset := 'ansi';
-        AResponseInfo.ContentText            := mb.Datastring;
-        AResponseInfo.WriteHeader;
+        AResponseInfo.ContentStream          := mb;
+        AResponseInfo.ContentStream.Position := 0;
+        AResponseInfo.ContentLength          := mb.Size;
+//        AResponseInfo.ContentText            := mb.Datastring;
+//        AResponseInfo.WriteHeader;
+        AResponseInfo.WriteContent;
        Finally
-        FreeAndNil(mb);
+//        FreeAndNil(mb);
        End;
        If Assigned(vLastResponse) Then
         Begin
