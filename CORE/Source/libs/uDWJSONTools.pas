@@ -394,6 +394,9 @@ Procedure HexStringToStream(Value : String; Var BinaryStream : TStringStream);
 var bytes: TBytes;
 {$ENDIF}
 Begin
+ {$IFDEF FPC}
+ BinaryStream := Nil;
+ {$ENDIF}
  Try
   If Not Assigned(BinaryStream) Then
    Begin

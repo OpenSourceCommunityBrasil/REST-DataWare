@@ -74,7 +74,7 @@ begin
  RESTDWDataBase1.Login         := edUserNameDW.Text;
  RESTDWDataBase1.Password      := edPasswordDW.Text;
  RESTDWDataBase1.Compression   := CheckBox1.Checked;
- RESTDWDataBase1.Open;
+// RESTDWDataBase1.Open;
  RESTDWClientSQL1.Close;
  RESTDWClientSQL1.SQL.Clear;
  RESTDWClientSQL1.SQL.Add('SELECT * FROM TB_USUARIO');

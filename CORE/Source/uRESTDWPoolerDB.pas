@@ -344,6 +344,7 @@ Type
   Procedure   PrepareDetails     (ActiveMode : Boolean);
   Procedure   FieldDefsToFields;
   Function    FieldDefExist      (Value   : String) : TFieldDef;
+  Function    FieldExist         (Value   : String) : TField;
   Procedure   Open;Overload; Virtual;                     //Método Open que será utilizado no Componente
   Procedure   Open               (SQL     : String);Overload; Virtual;//Método Open que será utilizado no Componente
   Procedure   ExecOrOpen;                                 //Método Open que será utilizado no Componente
@@ -1362,6 +1363,7 @@ Begin
    Begin
 //    If Not Assigned(Result) Then //Correção fornecida por romyllldo no Forum
     Result := TJSONValue.Create;
+    Result.Encoding := vRESTConnectionDB.Encoding;
     Error  := Trim(MessageError) <> '';
     vTempValue := LDataSetList.ToJSON;
     If (Trim(vTempValue) <> '{}') And
@@ -2595,6 +2597,7 @@ End;
 procedure TRESTDWClientSQL.Close;
 Begin
  vActive := False;
+ vInactive := False;
  Inherited Close;
 End;
 
@@ -3105,6 +3108,21 @@ Begin
    If UpperCase(Value) = UpperCase(FieldDefs[I].Name) Then
     Begin
      Result := FieldDefs[I];
+     Break;
+    End;
+  End;
+End;
+
+Function TRESTDWClientSQL.FieldExist(Value: String): TField;
+Var
+ I : Integer;
+Begin
+ Result := Nil;
+ For I := 0 To Fields.Count -1 Do
+  Begin
+   If UpperCase(Value) = UpperCase(Fields[I].Name) Then
+    Begin
+     Result := Fields[I];
      Break;
     End;
   End;

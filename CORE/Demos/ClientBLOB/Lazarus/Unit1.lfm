@@ -676,28 +676,29 @@ object Form5: TForm5
     Active = False
     FieldDefs = <    
       item
-        Name = 'ID_PESSOA'
-        Attributes = [faRequired]
+        Name = 'ID_USUARIO'
         DataType = ftInteger
+        Precision = -1
       end    
       item
-        Name = 'NM_LOGIN'
-        Attributes = [faRequired]
+        Name = 'FL_ATIVO'
         DataType = ftString
-        Size = 30
+        Precision = -1
+        Size = 1
       end    
       item
-        Name = 'DS_SENHA'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 30
+        Name = 'DT_INCLUSAO'
+        DataType = ftDateTime
+        Precision = -1
       end    
       item
-        Name = 'DS_FOTO'
-        DataType = ftBlob
+        Name = 'DT_ALTERACAO'
+        DataType = ftDateTime
+        Precision = -1
       end>
     MasterCascadeDelete = True
-    Inactive = False
+    Inactive = True
+    Datapacks = -1
     DataCache = False
     Params = <>
     DataBase = RESTDWDataBase1
@@ -705,9 +706,11 @@ object Form5: TForm5
       'SELECT * FROM TB_USUARIO'
     )
     CacheUpdateRecords = True
+    AutoCommitData = False
+    AutoRefreshAfterCommit = False
     InBlockEvents = False
-    left = 291
-    top = 23
+    left = 216
+    top = 56
     object RESTDWClientSQL1ID_PESSOA: TIntegerField
       FieldKind = fkData
       FieldName = 'ID_PESSOA'
@@ -748,8 +751,9 @@ object Form5: TForm5
     end
   end
   object RESTDWDataBase1: TRESTDWDataBase
-    Active = False
+    Active = True
     Compression = True
+    MyIP = '127.0.0.1'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -761,19 +765,18 @@ object Form5: TForm5
     StateConnection.InTime = 1000
     RequestTimeOut = 120000
     EncodeStrings = True
-    Encoding = esASCII
+    Encoding = esUtf8
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
     WelcomeMessage = 'EMPLOYEE.FDB'
-    DateSeparator = '/'
-    TimeSeparator = ':'
-    DecimalSeparator = ','
     OnWork = RESTDWDataBase1Work
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd
-    left = 227
-    top = 23
+    DatabaseCharSet = csUndefined
+    ParamCreate = True
+    left = 200
+    top = 88
   end
   object DataSource1: TDataSource
     AutoEdit = False

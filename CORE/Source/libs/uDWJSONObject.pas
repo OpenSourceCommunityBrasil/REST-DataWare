@@ -1618,7 +1618,7 @@ Begin
     bJsonArray    := bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
     bJsonArraySub := bJsonArray.optJSONObject  (0);
     bJsonArray    := bJsonArraySub.optJSONArray(bJsonArraySub.names.get(0).ToString);
-//    TRESTDWClientSQL(DestDS).FieldDefs.BeginUpdate;
+    TRESTDWClientSQL(DestDS).FieldDefs.BeginUpdate;
     For J := 0 To bJsonArray.Length - 1 Do
      Begin
       bJsonOBJ := bJsonArray.optJSONObject(J);
@@ -1627,7 +1627,7 @@ Begin
         Begin
          vTempValue := bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString;
          If (TRESTDWClientSQL(DestDS).FieldDefExist(vTempValue) = Nil) And
-            (TRESTDWClientSQL(DestDS).FindField(vTempValue)     = Nil) Then
+            (TRESTDWClientSQL(DestDS).FieldExist   (vTempValue) = Nil) Then
           Begin
            FieldDef          := TRESTDWClientSQL(DestDS).FieldDefs.AddFieldDef;
            FieldDef.Name     := vTempValue;
@@ -1653,7 +1653,7 @@ Begin
 //       FreeAndNil(bJsonOBJ);
       End;
      End;
-//    TRESTDWClientSQL(DestDS).FieldDefs.EndUpdate;
+    TRESTDWClientSQL(DestDS).FieldDefs.EndUpdate;
     Try
      {$IFNDEF FPC}
      If DestDS Is TClientDataset Then
@@ -1901,7 +1901,7 @@ Begin
       If Trim(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString) <> '' Then
        Begin
         vTempValue := bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString;
-        If (TRESTDWClientSQL(DestDS).FindField(vTempValue)     = Nil) Then
+        If Not(TRESTDWClientSQL(DestDS).FieldExist(vTempValue) = Nil) Then
          TRESTDWClientSQL(DestDS).FindField(vTempValue).Required := Uppercase(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S';
        End;
      End;
