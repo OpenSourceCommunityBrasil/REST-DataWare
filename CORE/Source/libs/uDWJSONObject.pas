@@ -47,6 +47,9 @@ Uses
  {$IFEND}
  {$ENDIF}
 
+Const                                                 //\b  \t  \n   \f   \r
+ TSpecialChars : Array [0..7] of Char = ('\', '"', '/', #8, #9, #10, #12, #13);
+
 Type
  TJSONBufferObject = Class
 End;
@@ -268,6 +271,8 @@ Type
  TDWDatalist = Class
 End;
 
+Function StringToJsonString(OriginalString : String) : String;
+
 implementation
 
 Uses uRESTDWPoolerDB;
@@ -277,6 +282,31 @@ Begin
  result:= stringreplace(Astr,Asubstr,'',[rfReplaceAll, rfIgnoreCase]);
 End;
 
+Function StringToJsonString(OriginalString : String) : String;
+Var
+ i : Integer;
+ Function NewChar(OldChar : String) : String;
+ Begin
+  Result := '';
+  If Length(OldChar) > 0 Then
+   Begin
+    Case OldChar[1] Of
+     '\' : Result := '\\';
+     '"' : Result := '\"';
+     '/' : Result := '\/';
+     #8  : Result := '\b';
+     #9  : Result := '\t';
+     #10 : Result := '\n';
+     #12 : Result := '\f';
+     #13 : Result := '\r';
+    End;
+   End;
+ End;
+Begin
+ Result := OriginalString;
+ For i := 0 To Length(TSpecialChars) -1 Do
+  Result := StringReplace(Result, TSpecialChars[i], NewChar(TSpecialChars[i]), [rfReplaceAll]);
+End;
 
 {$IF Defined(ANDROID) or Defined(IOS)} //Alterado para IOS Brito
 Function CopyValue(Var bValue : String) : String;
@@ -697,11 +727,11 @@ Begin
  Result := '';
  If Length(aValue) = 0 Then
   Exit;
-{$IFDEF FPC}
+ {$IFDEF FPC}
  vTempString := vEncodingLazarus.GetString(aValue);
-{$ELSE}
+ {$ELSE}
  vTempString := BytesArrToString(aValue, GetEncodingID(vEncoding));
-{$ENDIF}
+ {$ENDIF}
 {$IF Defined(ANDROID) or defined(IOS)} //Alterado para IOS Brito
 If Length(vTempString) > 0 Then
  Begin
@@ -892,14 +922,30 @@ Var
          Begin
           If vEncoded Then
            Begin
-            {$IFDEF FPC}
-             vTempValue := Format('%s"%s"',      [vTempField, EncodeStrings(bValue.Fields[I].AsString, vDatabaseCharSet)]);
-            {$ELSE}
-             vTempValue := Format('%s"%s"',      [vTempField, EncodeStrings(bValue.Fields[I].AsString)]);
-            {$ENDIF}
+            If vJsonMode in [jmPureJSON, jmMongoDB] Then
+             Begin
+              {$IFDEF FPC}
+              vTempValue := Format('%s"%s"',      [vTempField, EncodeStrings(StringToJsonString(bValue.Fields[I].AsString), vDatabaseCharSet)]);
+              {$ELSE}
+              vTempValue := Format('%s"%s"',      [vTempField, EncodeStrings(StringToJsonString(bValue.Fields[I].AsString))]);
+              {$ENDIF}
+             End
+            Else
+             Begin
+              {$IFDEF FPC}
+              vTempValue := Format('%s"%s"',      [vTempField, EncodeStrings(bValue.Fields[I].AsString, vDatabaseCharSet)]);
+              {$ELSE}
+              vTempValue := Format('%s"%s"',      [vTempField, EncodeStrings(bValue.Fields[I].AsString)]);
+              {$ENDIF}
+             End;
            End
           Else
-           vTempValue := Format('%s"%s"',      [vTempField, bValue.Fields[I].AsString]) //CP1252ToUTF8(bValue.Fields[I].AsString)
+           Begin
+            If vJsonMode in [jmPureJSON, jmMongoDB] Then
+             vTempValue := Format('%s"%s"',      [vTempField, StringToJsonString(bValue.Fields[I].AsString)]) //CP1252ToUTF8(bValue.Fields[I].AsString)
+            Else
+             vTempValue := Format('%s"%s"',      [vTempField, bValue.Fields[I].AsString])
+           End;
          End
         Else If bValue.Fields[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
          Begin

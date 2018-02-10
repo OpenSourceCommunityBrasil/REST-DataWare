@@ -752,10 +752,10 @@ Begin
         If compresseddata Then
          Begin
           ZCompressStr(vReplyString, vReplyStringResult);
-          mb                                 := TStringStream.Create(vReplyStringResult);
+          mb                                 := TStringStream.Create(vReplyStringResult{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
          End
         Else
-         mb                                  := TStringStream.Create(vReplyString);
+         mb                                  := TStringStream.Create(vReplyString{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
         mb.Position                          := 0;
         {$IFNDEF FPC}
         {$IF CompilerVersion > 21}
@@ -3584,10 +3584,10 @@ Begin
         If compresseddata Then
          Begin
           ZCompressStr(vReplyString, vReplyStringResult);
-          mb                                 := TStringStream.Create(vReplyStringResult);
+          mb                                 := TStringStream.Create(vReplyStringResult{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
          End
         Else
-         mb                                  := TStringStream.Create(vReplyString);
+         mb                                  := TStringStream.Create(vReplyString{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
         mb.Position                          := 0;
         AResponseInfo.FreeContentStream      := True;
         AResponseInfo.ContentType            := 'application/json'; //'text';//'application/octet-stream';

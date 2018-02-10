@@ -127,6 +127,7 @@ begin
   FDQuery1.SQL.Add('select * from employee');
   Try
    FDQuery1.Open;
+   JSONValue.JsonMode := Params.JsonMode;
    JSONValue.Encoding := Encoding;
    JSONValue.LoadFromDataset('employee', FDQuery1, False,  Params.JsonMode, '');
    Params.ItemsString['result'].AsString := JSONValue.ToJSON;
