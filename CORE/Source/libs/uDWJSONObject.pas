@@ -940,12 +940,7 @@ Var
              End;
            End
           Else
-           Begin
-            If vJsonMode in [jmPureJSON, jmMongoDB] Then
-             vTempValue := Format('%s"%s"',      [vTempField, StringToJsonString(bValue.Fields[I].AsString)]) //CP1252ToUTF8(bValue.Fields[I].AsString)
-            Else
-             vTempValue := Format('%s"%s"',      [vTempField, bValue.Fields[I].AsString])
-           End;
+            vTempValue := Format('%s"%s"',      [vTempField, StringToJsonString(bValue.Fields[I].AsString)]); //CP1252ToUTF8(bValue.Fields[I].AsString)
          End
         Else If bValue.Fields[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
          Begin
