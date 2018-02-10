@@ -54,7 +54,11 @@ Type
 End;
 
 Type
+ {$IFDEF FPC}
+ TRESTDWDatasetArray = Array of TRESTDWClientSQLBase;
+ {$ELSE}
  TRESTDWDatasetArray = Array Of TRESTDWClientSQLBase;
+ {$ENDIF}
 
 Type
  TSendEvent       = (seGET,       sePOST,

@@ -4,13 +4,13 @@
     <PathDelim Value="\"/>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="26">
+    <Units Count="28">
       <Unit0>
         <Filename Value="ClientBLOB.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos Y="14"/>
-        <UsageCount Value="44"/>
+        <UsageCount Value="46"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit0>
       <Unit1>
@@ -19,10 +19,9 @@
         <ComponentName Value="Form5"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="69"/>
-        <CursorPos X="21" Y="75"/>
-        <UsageCount Value="44"/>
+        <TopLine Value="75"/>
+        <CursorPos X="18" Y="82"/>
+        <UsageCount Value="46"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -54,10 +53,12 @@
       </Unit4>
       <Unit5>
         <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="2911"/>
-        <CursorPos Y="2919"/>
-        <UsageCount Value="19"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1304"/>
+        <CursorPos Y="1313"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="..\..\..\Source\libs\uDWJSONObject.pas"/>
@@ -79,10 +80,11 @@
       </Unit7>
       <Unit8>
         <Filename Value="..\..\..\Source\libs\uDWConsts.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="458"/>
-        <CursorPos Y="478"/>
-        <UsageCount Value="13"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="162"/>
+        <CursorPos Y="172"/>
+        <UsageCount Value="14"/>
+        <Loaded Value="True"/>
       </Unit8>
       <Unit9>
         <Filename Value="..\..\..\Source\libs\uzliblaz.pas"/>
@@ -94,8 +96,14 @@
       </Unit9>
       <Unit10>
         <Filename Value="..\..\..\Source\libs\uDWConstsData.pas"/>
-        <EditorIndex Value="-1"/>
-        <UsageCount Value="11"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="50"/>
+        <CursorPos X="53" Y="58"/>
+        <UsageCount Value="12"/>
+        <Bookmarks Count="1">
+          <Item0 Y="57" ID="1"/>
+        </Bookmarks>
+        <Loaded Value="True"/>
       </Unit10>
       <Unit11>
         <Filename Value="C:\lazarus\lcl\include\customcheckbox.inc"/>
@@ -210,7 +218,142 @@
         <CursorPos X="47" Y="2220"/>
         <UsageCount Value="10"/>
       </Unit25>
+      <Unit26>
+        <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\objpas\classes\classesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="556"/>
+        <CursorPos X="14" Y="563"/>
+        <UsageCount Value="10"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="C:\lazarus\lcl\include\control.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2855"/>
+        <CursorPos X="15" Y="2856"/>
+        <UsageCount Value="11"/>
+      </Unit27>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1272" Column="37" TopLine="1265"/>
+      </Position1>
+      <Position2>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1228" TopLine="1219"/>
+      </Position2>
+      <Position3>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1273" TopLine="1264"/>
+      </Position3>
+      <Position4>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1274" TopLine="1264"/>
+      </Position4>
+      <Position5>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1275" TopLine="1264"/>
+      </Position5>
+      <Position6>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1276" TopLine="1264"/>
+      </Position6>
+      <Position7>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1277" TopLine="1264"/>
+      </Position7>
+      <Position8>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1278" TopLine="1264"/>
+      </Position8>
+      <Position9>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1280" TopLine="1265"/>
+      </Position9>
+      <Position10>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1301" Column="40" TopLine="1283"/>
+      </Position10>
+      <Position11>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1228" TopLine="1220"/>
+      </Position11>
+      <Position12>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1273" TopLine="1264"/>
+      </Position12>
+      <Position13>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1274" TopLine="1264"/>
+      </Position13>
+      <Position14>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1275" TopLine="1264"/>
+      </Position14>
+      <Position15>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1276" TopLine="1264"/>
+      </Position15>
+      <Position16>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1277" TopLine="1264"/>
+      </Position16>
+      <Position17>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1278" TopLine="1264"/>
+      </Position17>
+      <Position18>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1280" TopLine="1265"/>
+      </Position18>
+      <Position19>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1281" TopLine="1266"/>
+      </Position19>
+      <Position20>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1282" TopLine="1267"/>
+      </Position20>
+      <Position21>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1283" TopLine="1268"/>
+      </Position21>
+      <Position22>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1284" TopLine="1269"/>
+      </Position22>
+      <Position23>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1285" TopLine="1270"/>
+      </Position23>
+      <Position24>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1288" TopLine="1279"/>
+      </Position24>
+      <Position25>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1289" TopLine="1279"/>
+      </Position25>
+      <Position26>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1290" TopLine="1279"/>
+      </Position26>
+      <Position27>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1294" TopLine="1279"/>
+      </Position27>
+      <Position28>
+        <Filename Value="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+        <Caret Line="1296" TopLine="1281"/>
+      </Position28>
+      <Position29>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="86" TopLine="75"/>
+      </Position29>
+      <Position30>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="82" Column="18" TopLine="75"/>
+      </Position30>
+    </JumpHistory>
   </ProjectSession>
 </CONFIG>

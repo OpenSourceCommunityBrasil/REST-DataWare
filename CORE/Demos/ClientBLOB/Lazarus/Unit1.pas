@@ -4,7 +4,7 @@ interface
 
 uses
   LCLIntf, LCLType, LMessages, Messages, SysUtils, Variants, Classes, Graphics,
-  Controls, Forms, Dialogs, StdCtrls, uRESTDWPoolerDB, DB,
+  Controls, Forms, Dialogs, StdCtrls, uRESTDWPoolerDB, DB, uDWConstsData,
   ExtCtrls, ComCtrls, DBCtrls, MaskEdit, Buttons, IdComponent;
 
 type
@@ -67,6 +67,9 @@ implementation
 {$R *.lfm}
 
 procedure TForm5.Button1Click(Sender: TObject);
+Var
+ vError : Boolean;
+ vMsgError : String;
 begin
  RESTDWDataBase1.Close;
  RESTDWDataBase1.PoolerService := eHost.Text;
@@ -78,6 +81,7 @@ begin
  RESTDWClientSQL1.Close;
  RESTDWClientSQL1.SQL.Clear;
  RESTDWClientSQL1.SQL.Add('SELECT * FROM TB_USUARIO');
+// RESTDWDataBase1.OpenDatasets([RESTDWClientSQL1], vError, vMsgError);
  RESTDWClientSQL1.Open;
 end;
 

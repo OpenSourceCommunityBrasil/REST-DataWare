@@ -751,9 +751,9 @@ object Form5: TForm5
     end
   end
   object RESTDWDataBase1: TRESTDWDataBase
-    Active = True
+    Active = False
     Compression = True
-    MyIP = '127.0.0.1'
+    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False

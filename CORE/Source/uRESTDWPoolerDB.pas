@@ -58,6 +58,10 @@ Type
  TOnInBlockEvent          = Procedure (Sender        : TObject;
                                        Const BlockEvent : Boolean) of Object;
 {$ENDIF}
+{$IFDEF FPC}
+ TRESTDWClientSQL          = Class;
+{$ENDIF}
+
 Type
  TTimerData = Class(TThread)
  Private
@@ -186,7 +190,7 @@ Type
   Procedure   ApplyUpdates(Var MassiveCache   : TDWMassiveCache;
                            Var   Error        : Boolean;
                            Var   MessageError : String);Overload;
-  Procedure   OpenDatasets(Var   Datasets     : TRESTDWDatasetArray;
+  Procedure   OpenDatasets(Datasets     : Array of {$IFDEF FPC}TRESTDWClientSQL{$ELSE}TObject{$ENDIF};
                            Var   Error        : Boolean;
                            Var   MessageError : String);Overload;
   Property    Connected       : Boolean                  Read GetStateDB          Write SetConnection;
@@ -261,6 +265,7 @@ Type
   vInBlockEvents       : Boolean;
   vDatapacks,
   vMaxBufferRegs,
+  vParamCount,
   vActualRec           : Integer;
   vOldSQL,
   vLastBuffer,
@@ -1206,7 +1211,7 @@ Begin
  SetConnection(True);
 End;
 
-Procedure TRESTDWDataBase.OpenDatasets(Var Datasets     : TRESTDWDatasetArray;
+Procedure TRESTDWDataBase.OpenDatasets(Datasets     : Array of {$IFDEF FPC}TRESTDWClientSQL{$ELSE}TObject{$ENDIF};
                                        Var Error        : Boolean;
                                        Var MessageError : String);
 Var
@@ -1222,11 +1227,11 @@ Begin
  vLinesDS := '';
  For I := 0 To Length(Datasets) -1 Do
   Begin
-   TRESTDWClientSQL(Datasets[I]).ProcBeforeOpen(Datasets[I]);
+   TRESTDWClientSQL(Datasets[I]).ProcBeforeOpen(TRESTDWClientSQL(Datasets[I]));
    If I = 0 Then
-    vLinesDS := DatasetRequestToJSON(Datasets[I])
+    vLinesDS := DatasetRequestToJSON(TRESTDWClientSQL(Datasets[I]))
    Else
-    vLinesDS := Format('%s, %s', [vLinesDS, DatasetRequestToJSON(Datasets[I])]);
+    vLinesDS := Format('%s, %s', [vLinesDS, DatasetRequestToJSON(TRESTDWClientSQL(Datasets[I]))]);
   End;
  If vLinesDS <> '' Then
   vLinesDS := Format('[%s]', [vLinesDS])
@@ -1264,7 +1269,8 @@ Begin
    Begin
     JSONValue := TJSONValue.Create;
     Try
-     JSONValue.Encoded := True;
+     JSONValue.Encoded  := True;
+     JSONValue.Encoding := VEncondig;
      JSONValue.LoadFromJSON(vLinesDS);
      vJsonLine := JSONValue.value;
      FreeAndNil(JSONValue);
@@ -1272,6 +1278,7 @@ Begin
      For I := 0 To bJsonArray.Length - 1 Do
       Begin
        JSONValue := TJSONValue.Create;
+       JSONValue.Encoding := VEncondig;
        JSONValue.LoadFromJSON(bJsonArray.optJSONObject(I).ToString);
        JSONValue.Encoded := True;
        JSONValue.WriteToDataset(dtFull, JSONValue.ToJSON, TRESTDWClientSQL(Datasets[I]));
@@ -1736,12 +1743,13 @@ End;
 
 procedure TRESTDWClientSQL.SetParams(const Value: TParams);
 begin
-  vParams.Assign(Value);
+ vParams.Assign(Value);
 end;
 
 constructor TRESTDWClientSQL.Create(AOwner: TComponent);
 Begin
  Inherited;
+ vParamCount                       := 0;
  vInactive                         := False;
  vInBlockEvents                    := False;
  vOnOpenCursor                     := False;
@@ -1834,8 +1842,8 @@ Procedure TRESTDWClientSQL.DWParams(Var Value : TDWParams);
 Begin
  Value := Nil;
  If vRESTDataBase <> Nil Then
-  If Params.Count > 0 Then
-   Value := GetDWParams(Params, vRESTDataBase.Encoding);
+  If ParamCount > 0 Then
+    Value := GetDWParams(vParams, vRESTDataBase.Encoding);
 End;
 
 Procedure TRESTDWClientSQL.DynamicFilter(cFields  : Array of String;
@@ -2010,11 +2018,14 @@ Var
 Begin
  ParamList       := ReturnParams(vSQL.Text);
  ParamsListAtual := ReturnParamsAtual(vParams);
+ vParamCount     := 0;
  If Not CompareParams(ParamsListAtual, ParamList) Then
   vParams.Clear;
  If ParamList <> Nil Then
  For I := 0 to ParamList.Count -1 Do
   CreateParam(ParamList[I]);
+ If ParamList.Count > 0 Then
+  vParamCount := vParams.Count;
  ParamList.Free;
   if Assigned(ParamsListAtual) then
    FreeAndNil(ParamsListAtual);
@@ -2443,7 +2454,7 @@ End;
 
 function TRESTDWClientSQL.ParamCount: Integer;
 Begin
- Result := vParams.Count;
+ Result := vParamCount; //vParams.Count;
 End;
 
 procedure TRESTDWClientSQL.FieldDefsToFields;
