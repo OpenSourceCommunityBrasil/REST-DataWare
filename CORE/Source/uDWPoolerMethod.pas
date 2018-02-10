@@ -822,6 +822,7 @@ Begin
     Begin
      Result         := TJSONValue.Create;
      Result.Encoded := False;
+     Result.Encoding := RESTClientPoolerExec.Encoding;
      If DWParams.ItemsString['MessageError'] <> Nil Then
       MessageError  := DWParams.ItemsString['MessageError'].Value;
      If DWParams.ItemsString['Error'] <> Nil Then
