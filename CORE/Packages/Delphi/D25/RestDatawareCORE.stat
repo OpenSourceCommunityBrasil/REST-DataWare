@@ -9,8 +9,8 @@ EditorSecs=8274
 DesignerSecs=10
 InspectorSecs=30
 <<<<<<< .mine
-CompileSecs=290843
-OtherSecs=1198
+CompileSecs=298954
+OtherSecs=1271
 ||||||| .r863
 CompileSecs=276158
 OtherSecs=1076
@@ -18,7 +18,7 @@ OtherSecs=1076
 CompileSecs=277672
 OtherSecs=1105
 >>>>>>> .r882
-StartTime=19/10/2017 16:25:34
+StartTime=10-02-2018 11:53:52
 RealKeys=0
 EffectiveKeys=0
 DebugSecs=7
