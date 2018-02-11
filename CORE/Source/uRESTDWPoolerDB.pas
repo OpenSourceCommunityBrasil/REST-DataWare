@@ -3133,7 +3133,7 @@ Begin
  Result := Nil;
  For I := 0 To Fields.Count -1 Do
   Begin
-   If UpperCase(Value) = UpperCase(Fields[I].Name) Then
+   If UpperCase(Value) = UpperCase(Fields[I].FieldName) Then
     Begin
      Result := Fields[I];
      Break;
