@@ -1056,7 +1056,13 @@ Begin
  vtagName         := Lowercase(TableName);
  vEncoded         := EncodedValue;
  vTagGeral        := DatasetValues(bValue, DateTimeFormat, JsonModeD);
+ {$IFDEF FPC}
+ If vEncodingLazarus = Nil Then
+  SetEncoding(vEncoding);
+ aValue           := TIdBytes(vEncodingLazarus.GetBytes(vTagGeral));
+ {$ELSE}
  aValue           := ToBytes(vTagGeral, GetEncodingID(vEncoding));
+ {$ENDIF}
  vJsonMode        := JsonModeD;
 End;
 

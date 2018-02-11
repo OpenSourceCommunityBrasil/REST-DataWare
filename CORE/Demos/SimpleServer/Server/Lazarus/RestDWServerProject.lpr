@@ -2,8 +2,7 @@ program RestDWServerProject;
 
 uses
   {$IFDEF FPC}
-   {$IFDEF UNIX}cthreads,
-   {$ENDIF}
+  cthreads,
   {$ENDIF}
   Forms, Interfaces,
   RestDWServerFormU in 'RestDWServerFormU.pas' {RestDWForm},
