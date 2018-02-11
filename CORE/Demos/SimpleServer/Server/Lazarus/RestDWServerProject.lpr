@@ -1,7 +1,7 @@
 program RestDWServerProject;
 
 uses
-  {$IFDEF FPC}
+  {$IFDEF UNIX}
   cthreads,
   {$ENDIF}
   Forms, Interfaces,
