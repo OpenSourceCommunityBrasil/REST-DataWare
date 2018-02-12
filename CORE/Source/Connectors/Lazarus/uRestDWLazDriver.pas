@@ -255,6 +255,8 @@ Begin
    Begin
     vTempQuery.Active := True;
     Result := TJSONValue.Create;
+    Result.Encoded         := True;
+    Result.Encoding        := Encoding;
     Result.DatabaseCharSet := DatabaseCharSet;
     Try
      Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
@@ -267,6 +269,9 @@ Begin
     ATransaction.StartTransaction;;
     vTempQuery.ExecSQL;
     Result := TJSONValue.Create;
+    Result.Encoded         := True;
+    Result.Encoding        := Encoding;
+    Result.DatabaseCharSet := DatabaseCharSet;
     Result.SetValue('COMMANDOK');
     ATransaction.Commit;
    End;
@@ -276,7 +281,9 @@ Begin
     Try
      Error        := True;
      MessageError := E.Message;
-     Result.Encoded := True;
+     Result.Encoded         := True;
+     Result.Encoding        := Encoding;
+     Result.DatabaseCharSet := DatabaseCharSet;
      Result.SetValue(GetPairJSON('NOK', MessageError));
      ATransaction.Rollback;
     Except
@@ -921,7 +928,10 @@ Begin
         End;
        vTempQuery.Open;
        If Result = Nil Then
-        Result         := TJSONValue.Create;
+        Result                := TJSONValue.Create;
+       Result.Encoded         := True;
+       Result.Encoding        := Encoding;
+       Result.DatabaseCharSet := DatabaseCharSet;
        Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
        Error         := False;
       Except
@@ -932,7 +942,9 @@ Begin
           MessageError   := E.Message;
           If Result = Nil Then
            Result        := TJSONValue.Create;
-          Result.Encoded := True;
+          Result.Encoded         := True;
+          Result.Encoding        := Encoding;
+          Result.DatabaseCharSet := DatabaseCharSet;
           Result.SetValue(GetPairJSON('NOK', MessageError));
           ATransaction.Rollback;
          Except
@@ -1497,6 +1509,8 @@ Begin
    Begin
     vTempQuery.Open;
     Result         := TJSONValue.Create;
+    Result.Encoded         := True;
+    Result.Encoding        := Encoding;
     Result.DatabaseCharSet := DatabaseCharSet;
     Try
      Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
@@ -1511,6 +1525,9 @@ Begin
      ATransaction.StartTransaction;;
      vTempQuery.ExecSQL;
      Result := TJSONValue.Create;
+     Result.Encoded         := True;
+     Result.Encoding        := Encoding;
+     Result.DatabaseCharSet := DatabaseCharSet;
      Result.SetValue('COMMANDOK');
      ATransaction.Commit;
      Error         := False;
@@ -1524,7 +1541,8 @@ Begin
      Error        := True;
      MessageError := E.Message;
      Result := TJSONValue.Create;
-     Result.Encoded := True;
+     Result.Encoded         := True;
+     Result.Encoding        := Encoding;
      Result.DatabaseCharSet := DatabaseCharSet;
      Result.SetValue(GetPairJSON('NOK', MessageError));
      ATransaction.Rollback;

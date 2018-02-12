@@ -774,6 +774,8 @@ Begin
     vTempQuery.Active := True;
     If Result = Nil Then
      Result := TJSONValue.Create;
+    Result.Encoded         := True;
+    Result.Encoding        := Encoding;
     Try
      Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
     Finally
@@ -784,6 +786,8 @@ Begin
     vTempQuery.ExecSQL;
     If Result = Nil Then
      Result := TJSONValue.Create;
+    Result.Encoded         := True;
+    Result.Encoding        := Encoding;
     Result.SetValue('COMMANDOK');
     vFDConnection.CommitRetaining;
    End;
@@ -795,7 +799,8 @@ Begin
      MessageError := E.Message;
      If Result = Nil Then
       Result := TJSONValue.Create;
-     Result.Encoded := True;
+     Result.Encoded         := True;
+     Result.Encoding        := Encoding;
      Result.SetValue(GetPairJSON('NOK', MessageError));
      vFDConnection.RollbackRetaining;
     Except
@@ -1514,6 +1519,8 @@ Begin
        vTempQuery.Open;
        If Result = Nil Then
         Result         := TJSONValue.Create;
+       Result.Encoded         := True;
+       Result.Encoding        := Encoding;
        Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
        Error         := False;
       Except
@@ -1524,7 +1531,8 @@ Begin
           MessageError   := E.Message;
           If Result = Nil Then
            Result        := TJSONValue.Create;
-          Result.Encoded := True;
+          Result.Encoded         := True;
+          Result.Encoding        := Encoding;
           Result.SetValue(GetPairJSON('NOK', MessageError));
           vFDConnection.RollbackRetaining;
          Except
@@ -1565,6 +1573,8 @@ Begin
     vTempQuery.Open;
     Result         := TJSONValue.Create;
     Try
+     Result.Encoded         := True;
+     Result.Encoding        := Encoding;
      Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
      Error         := False;
     Finally
@@ -1576,6 +1586,8 @@ Begin
       vTempQuery.ExecSQL;
       If Result = Nil Then
        Result := TJSONValue.Create;
+      Result.Encoded         := True;
+      Result.Encoding        := Encoding;
       Result.SetValue('COMMANDOK');
       vFDConnection.CommitRetaining;
       Error         := False;
@@ -1591,7 +1603,8 @@ Begin
      MessageError   := E.Message;
      If Result = Nil Then
       Result        := TJSONValue.Create;
-     Result.Encoded := True;
+     Result.Encoded         := True;
+     Result.Encoding        := Encoding;
      Result.SetValue(GetPairJSON('NOK', MessageError));
      vFDConnection.RollbackRetaining;
     Except
@@ -1823,6 +1836,8 @@ Begin
  Result         := TJSONValue.Create;
  Try
   vJSONLine     := Format('[%s]', [vJSONLine]);
+  Result.Encoded         := True;
+  Result.Encoding        := Encoding;
   Result.SetValue(vJSONLine);
  Finally
 

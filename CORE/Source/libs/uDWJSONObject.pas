@@ -1624,9 +1624,14 @@ Begin
     DestDS.DisableControls;
     If DestDS.Active Then
      DestDS.Close;
+    {$IFDEF FPC}
+    If (DestDS.Fields.Count > 0) Then
+     DestDS.Fields.Clear;
+    {$ELSE}
     If (DestDS.Fields.Count = 0) Then
      If (DestDS.FieldDefs.Count > 0) Then
       DestDS.FieldDefs.Clear;
+    {$ENDIF}
     bJsonArray    := bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
     bJsonArraySub := bJsonArray.optJSONObject  (0);
     bJsonArray    := bJsonArraySub.optJSONArray(bJsonArraySub.names.get(0).ToString);

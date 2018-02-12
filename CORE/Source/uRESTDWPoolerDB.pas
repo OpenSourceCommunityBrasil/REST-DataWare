@@ -1057,9 +1057,7 @@ Begin
       Try
        Result          := TJSONValue.Create;
        {$IFNDEF FPC}
-        {$if CompilerVersion > 21}
         Result.Encoding := LDataSetList.Encoding;
-        {$IFEND}
        {$ENDIF}
        Result.Encoded  := LDataSetList.Encoded;
        Result.SetValue(LDataSetList.ToJson, Result.Encoded);
@@ -1251,9 +1249,6 @@ Begin
   vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
   vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
   vRESTConnectionDB.OnStatus        := vOnStatus;
-  {$if CompilerVersion > 21}
-  vRESTConnectionDB.Encoding        := VEncondig;
-  {$IFEND}
  {$ELSE}
   vRESTConnectionDB.OnWork          := vOnWork;
   vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
@@ -1548,9 +1543,6 @@ Begin
      vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
      vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
      vRESTConnectionDB.OnStatus        := vOnStatus;
-     {$if CompilerVersion > 21}
-     vRESTConnectionDB.Encoding        := VEncondig;
-     {$IFEND}
      {$ELSE}
      vRESTConnectionDB.OnWork          := vOnWork;
      vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
@@ -1610,9 +1602,7 @@ Begin
   vConnection.OnWorkBegin   := vOnWorkBegin;
   vConnection.OnWorkEnd     := vOnWorkEnd;
   vConnection.OnStatus      := vOnStatus;
-  {$if CompilerVersion > 21}
   vConnection.Encoding      := VEncondig;
-  {$IFEND}
  {$ELSE}
   vConnection.OnWork          := vOnWork;
   vConnection.OnWorkBegin     := vOnWorkBegin;

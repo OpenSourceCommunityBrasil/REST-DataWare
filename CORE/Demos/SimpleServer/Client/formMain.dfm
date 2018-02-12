@@ -1354,7 +1354,7 @@ object Form2: TForm2
     StateConnection.InTime = 1000
     RequestTimeOut = 9999999
     EncodeStrings = True
-    Encoding = esASCII
+    Encoding = esUtf8
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
@@ -1454,7 +1454,7 @@ object Form2: TForm2
   end
   object RESTClientPooler1: TRESTClientPooler
     DataCompression = True
-    Encoding = esASCII
+    Encoding = esUtf8
     Host = 'localhost'
     UserName = 'testserver'
     Password = 'testserver'

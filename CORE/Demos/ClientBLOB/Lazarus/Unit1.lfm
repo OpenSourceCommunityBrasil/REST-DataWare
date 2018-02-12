@@ -674,28 +674,7 @@ object Form5: TForm5
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
     Active = False
-    FieldDefs = <    
-      item
-        Name = 'ID_USUARIO'
-        DataType = ftInteger
-        Precision = -1
-      end    
-      item
-        Name = 'FL_ATIVO'
-        DataType = ftString
-        Precision = -1
-        Size = 1
-      end    
-      item
-        Name = 'DT_INCLUSAO'
-        DataType = ftDateTime
-        Precision = -1
-      end    
-      item
-        Name = 'DT_ALTERACAO'
-        DataType = ftDateTime
-        Precision = -1
-      end>
+    FieldDefs = <>
     MasterCascadeDelete = True
     Inactive = True
     Datapacks = -1

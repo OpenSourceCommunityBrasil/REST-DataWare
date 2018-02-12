@@ -928,6 +928,11 @@ Begin
     vTempQuery.Active := True;
     If Result = Nil Then
      Result := TJSONValue.Create;
+    Result.Encoded         := True;
+    Result.Encoding        := Encoding;
+    {$IFDEF FPC}
+     Result.DatabaseCharSet := DatabaseCharSet;
+    {$ENDIF}
     Try
      Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
     Finally
@@ -938,6 +943,11 @@ Begin
     vTempQuery.ExecSQL;
     If Result = Nil Then
      Result := TJSONValue.Create;
+    Result.Encoded         := True;
+    Result.Encoding        := Encoding;
+    {$IFDEF FPC}
+     Result.DatabaseCharSet := DatabaseCharSet;
+    {$ENDIF}
     Result.SetValue('COMMANDOK');
     vZConnection.Commit;
    End;
@@ -949,7 +959,11 @@ Begin
      MessageError := E.Message;
      If Result = Nil Then
       Result := TJSONValue.Create;
-     Result.Encoded := True;
+     Result.Encoded         := True;
+     Result.Encoding        := Encoding;
+     {$IFDEF FPC}
+      Result.DatabaseCharSet := DatabaseCharSet;
+     {$ENDIF}
      Result.SetValue(GetPairJSON('NOK', MessageError));
      vZConnection.Rollback;
     Except
@@ -1760,6 +1774,11 @@ Begin
        vTempQuery.Open;
        If Result = Nil Then
         Result         := TJSONValue.Create;
+       Result.Encoded         := True;
+       Result.Encoding        := Encoding;
+       {$IFDEF FPC}
+        Result.DatabaseCharSet := DatabaseCharSet;
+       {$ENDIF}
        Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
        Error         := False;
       Except
@@ -1770,7 +1789,11 @@ Begin
           MessageError   := E.Message;
           If Result = Nil Then
            Result        := TJSONValue.Create;
-          Result.Encoded := True;
+          Result.Encoded         := True;
+          Result.Encoding        := Encoding;
+          {$IFDEF FPC}
+           Result.DatabaseCharSet := DatabaseCharSet;
+          {$ENDIF}
           Result.SetValue(GetPairJSON('NOK', MessageError));
           vZConnection.Rollback;
          Except
@@ -1808,6 +1831,11 @@ Begin
     vTempQuery.Open;
     Result         := TJSONValue.Create;
     Try
+     Result.Encoded         := True;
+     Result.Encoding        := Encoding;
+     {$IFDEF FPC}
+      Result.DatabaseCharSet := DatabaseCharSet;
+     {$ENDIF}
      Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
      Error         := False;
     Finally
@@ -1819,6 +1847,11 @@ Begin
       vTempQuery.ExecSQL;
       If Result = Nil Then
        Result := TJSONValue.Create;
+      Result.Encoded         := True;
+      Result.Encoding        := Encoding;
+      {$IFDEF FPC}
+       Result.DatabaseCharSet := DatabaseCharSet;
+      {$ENDIF}
       Result.SetValue('COMMANDOK');
       vZConnection.Commit;
       Error         := False;
@@ -1834,7 +1867,11 @@ Begin
      MessageError   := E.Message;
      If Result = Nil Then
       Result        := TJSONValue.Create;
-     Result.Encoded := True;
+     Result.Encoded         := True;
+     Result.Encoding        := Encoding;
+     {$IFDEF FPC}
+      Result.DatabaseCharSet := DatabaseCharSet;
+     {$ENDIF}
      Result.SetValue(GetPairJSON('NOK', MessageError));
      vZConnection.Rollback;
     Except
@@ -2088,6 +2125,11 @@ Begin
  Result         := TJSONValue.Create;
  Try
   vJSONLine     := Format('[%s]', [vJSONLine]);
+  Result.Encoded         := True;
+  Result.Encoding        := Encoding;
+  {$IFDEF FPC}
+   Result.DatabaseCharSet := DatabaseCharSet;
+  {$ENDIF}
   Result.SetValue(vJSONLine);
  Finally
 

@@ -1195,6 +1195,7 @@ object Form5: TForm5
     StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
+    Datapacks = -1
     DataCache = False
     Params = <>
     DataBase = RESTDWDataBase1
@@ -1257,7 +1258,7 @@ object Form5: TForm5
     StateConnection.InTime = 1000
     RequestTimeOut = 120000
     EncodeStrings = True
-    Encoding = esASCII
+    Encoding = esUtf8
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True

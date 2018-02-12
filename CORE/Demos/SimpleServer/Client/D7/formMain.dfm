@@ -1992,7 +1992,7 @@ object Form2: TForm2
     StateConnection.InTime = 1000
     RequestTimeOut = 10000
     EncodeStrings = True
-    Encoding = esASCII
+    Encoding = esUtf8
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True

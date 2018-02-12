@@ -478,25 +478,21 @@ var bytes, bytes2: TBytes;
 {$ENDIF}
 Begin
  Stream.Position := 0;
- {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
-  //SetLength(bytes, Stream.Size);
-  //Stream.Read(bytes[0], Stream.Size);
-  //SetLength(bytes2, Length(bytes));
-  //BinToHex(bytes,0,bytes2,0, Length(bytes));
-  // result:= TEncoding.Unicode.GetString( bytes2 );
-  result:=abbintohexstring(stream);
- {$ELSE}
- {$IFDEF LINUX} // Android}
-  //SetLength(bytes, Stream.Size);
- // Stream.Read(bytes, Stream.Size);
-  //SetLength(bytes2, Length(bytes));
-  //BinToHex (bytes,0,bytes2,0, Length(bytes));
-   result:=abbintohexstring(stream); // BytesToString(bytes2);  // TEncoding.UTF8.GetString(bytes2);
- {$ELSE}
-   SetLength     (Result, Stream.Size * 2);
-   BinToHex      (TMemoryStream(Stream).Memory, PChar(Result), Stream.Size);
+ {$IFNDEF FPC}
+  {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
+   Result := abbintohexstring(stream);
+  {$ELSE}
+   {$IFDEF LINUX} // Android}
+    Result := abbintohexstring(stream); // BytesToString(bytes2);  // TEncoding.UTF8.GetString(bytes2);
+   {$ELSE}
+    SetLength     (Result, Stream.Size * 2);
+    BinToHex      (TMemoryStream(Stream).Memory, PChar(Result), Stream.Size);
    {$ENDIF}
- {$IFEND}
+  {$IFEND}
+ {$ELSE}
+  SetLength     (Result, Stream.Size * 2);
+  BinToHex      (TMemoryStream(Stream).Memory, PChar(Result), Stream.Size);
+ {$ENDIF}
  If QQuoted Then
   Result := '"' + Result + '"';
 End;
