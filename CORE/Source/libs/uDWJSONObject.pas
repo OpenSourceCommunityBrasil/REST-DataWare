@@ -940,7 +940,13 @@ Var
              End;
            End
           Else
-            vTempValue := Format('%s"%s"',      [vTempField, StringToJsonString(bValue.Fields[I].AsString)]); //CP1252ToUTF8(bValue.Fields[I].AsString)
+           Begin
+            {$IFDEF FPC}
+            vTempValue := Format('%s"%s"',      [vTempField, StringToJsonString(GetStringEncode(bValue.Fields[I].AsString, vDatabaseCharSet))]);
+            {$ELSE}
+            vTempValue := Format('%s"%s"',      [vTempField, StringToJsonString(bValue.Fields[I].AsString)]);
+            {$ENDIF}
+           End;
          End
         Else If bValue.Fields[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
          Begin

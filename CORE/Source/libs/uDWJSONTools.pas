@@ -57,10 +57,31 @@ Function HexStringToString(Value : String) : String;
 
 Procedure HexStringToStream(Value : String; Var BinaryStream : TStringStream);
 Function  StreamToHex(Value : TStream) : String;
+{$IFDEF FPC}
+Function  GetStringEncode(Value : String;DatabaseCharSet : TDatabaseCharSet) : String;
+{$ENDIF}
 
 Implementation
 
 Uses SysTypes;
+
+{$IFDEF FPC}
+Function  GetStringEncode(Value : String;DatabaseCharSet : TDatabaseCharSet) : String;
+Begin
+ Result := Value;
+ Case DatabaseCharSet Of
+   csWin1250 : Result := CP1250ToUTF8(Value);
+   csWin1251 : Result := CP1251ToUTF8(Value);
+   csWin1252 : Result := CP1252ToUTF8(Value);
+   csWin1253 : Result := CP1253ToUTF8(Value);
+   csWin1254 : Result := CP1254ToUTF8(Value);
+   csWin1255 : Result := CP1255ToUTF8(Value);
+   csWin1256 : Result := CP1256ToUTF8(Value);
+   csWin1257 : Result := CP1257ToUTF8(Value);
+   csWin1258 : Result := CP1258ToUTF8(Value);
+ End;
+End;
+{$ENDIF}
 
 {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
 Function Decode4to3Ex(const Value, Table: String): String;
