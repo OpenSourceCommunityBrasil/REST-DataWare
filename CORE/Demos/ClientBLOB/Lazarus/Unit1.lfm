@@ -732,12 +732,12 @@ object Form5: TForm5
   object RESTDWDataBase1: TRESTDWDataBase
     Active = False
     Compression = True
-    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
     ProxyOptions.Port = 8888
     PoolerService = '127.0.0.1'
+    PoolerURL = 'dwCGI.cgi/'
     PoolerPort = 8082
     PoolerName = 'TServerMethodDM.RESTDWPoolerDB1'
     StateConnection.AutoCheck = False

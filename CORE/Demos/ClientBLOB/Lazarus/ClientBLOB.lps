@@ -19,6 +19,7 @@
         <ComponentName Value="Form5"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="75"/>
         <CursorPos X="9" Y="81"/>
         <UsageCount Value="48"/>
@@ -35,7 +36,6 @@
       </Unit2>
       <Unit3>
         <Filename Value="..\..\..\Source\uRESTDWBase.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="2514"/>
         <CursorPos Y="2522"/>

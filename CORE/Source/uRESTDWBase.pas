@@ -660,37 +660,26 @@ Begin
       Try
        If Assigned(vServerMethod) Then
         Begin
-         If UrlMethod = '' Then
+         {$IFNDEF FPC}
+         If ARequest.PathInfo + ARequest.Query <> '' Then
+         {$ELSE}
+         If ARequest.URI <> '' Then
+         {$ENDIF}
           Begin
            {$IFNDEF FPC}
-           If ARequest.PathInfo + ARequest.Query <> '' Then
+            UrlMethod := Trim(ARequest.PathInfo + ARequest.Query);
            {$ELSE}
-           If ARequest.URI <> '' Then
+            UrlMethod := Trim(ARequest.URI);
            {$ENDIF}
-            Begin
-             {$IFNDEF FPC}
-             UrlMethod := Trim(ARequest.PathInfo + ARequest.Query);
-             {$ELSE}
-             UrlMethod := Trim(ARequest.URI);
-             {$ENDIF}
-             If UrlMethod <> '' Then
-              If UrlMethod[1] = '/' then
-               Delete(UrlMethod, 1, 1);
-             If Pos('/', UrlMethod) > 0 then
-              UrlMethod := Copy(UrlMethod, 1, Pos('/', UrlMethod) -1);
-            End
+          End;
+         While (Length(UrlMethod) > 0) Do
+          Begin
+           If Pos('/', UrlMethod) > 0 then
+            Delete(UrlMethod, 1, 1)
            Else
             Begin
-             While (Length(UrlMethod) > 0) Do
-              Begin
-               If Pos('/', UrlMethod) > 0 then
-                Delete(UrlMethod, 1, 1)
-               Else
-                Begin
-                 UrlMethod := Trim(UrlMethod);
-                 Break;
-                End;
-              End;
+             UrlMethod := Trim(UrlMethod);
+             Break;
             End;
           End;
          If vTempServerMethods <> Nil Then
@@ -762,9 +751,9 @@ Begin
         AResponse.FreeContentStream          := True;
         {$IFEND}
         {$ENDIF}
-        If TEncodeSelect(VEncondig) = esUtf8 Then
+        If VEncondig = esUtf8 Then
          AResponse.ContentType            := 'application/json;charset=utf-8'
-        Else If TEncodeSelect(VEncondig) = esASCII Then
+        Else If VEncondig = esASCII Then
          AResponse.ContentType            := 'application/json;charset=ansi';
         AResponse.ContentStream           := mb;
         AResponse.ContentStream.Position := 0;
@@ -788,8 +777,8 @@ Begin
       End;
      End;
  Finally
-  If AResponse.Content = '' Then
-   AResponse.Content := '<h1>REST Dataware - Server CGI - Online!</h1>';
+  If AResponse.ContentLength = 0 Then
+   AResponse.Content := '{"ServerStarus":"REST Dataware - Server CGI - Online!"}';
   Handled:= True;
   If Assigned(DWParams) Then
    FreeAndNil(DWParams);

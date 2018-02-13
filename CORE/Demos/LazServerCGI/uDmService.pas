@@ -5,16 +5,25 @@ interface
 uses
   SysUtils, Classes, IBConnection, sqldb, uDWDatamodule,
   uDWJSONObject, Dialogs, uDWConstsData,
-  uRESTDWPoolerDB, uRESTDWLazDriver,  uConsts;
+  uRESTDWPoolerDB, uRESTDWServerEvents, uRESTDWLazDriver,  uConsts;
 
 type
 
   { TServerMethodDM }
 
   TServerMethodDM = class(TServerMethodDataModule)
+    DWServerEvents1: TDWServerEvents;
+    FDQuery1: TSQLQuery;
     RESTDWLazDriver1: TRESTDWLazDriver;
     RESTDWPoolerDB1: TRESTDWPoolerDB;
     Server_FDConnection: TIBConnection;
+    SQLTransaction1: TSQLTransaction;
+    procedure DWServerEvents1EventsgetemployeeReplyEvent(Var Params: TDWParams;
+      Var Result: String);
+    procedure DWServerEvents1EventsservertimeReplyEvent(Var Params: TDWParams;
+      Var Result: String);
+    procedure DWServerEvents1EventstesteReplyEvent(Var Params: TDWParams;
+      Var Result: String);
     procedure ServerMethodDataModuleReplyEvent(SendType: TSendEvent;
       Context: string; var Params: TDWParams; var Result: string);
     procedure ServerMethodDataModuleCreate(Sender: TObject);
@@ -81,6 +90,46 @@ Begin
    End;
  End;
 End;
+
+procedure TServerMethodDM.DWServerEvents1EventsservertimeReplyEvent(
+  Var Params: TDWParams; Var Result: String);
+begin
+ If Params.ItemsString['inputdata'].AsString <> '' Then //servertime
+  Params.ItemsString['result'].AsDateTime := Now
+ Else
+  Params.ItemsString['result'].AsDateTime := Now - 1;
+ Params.ItemsString['resultstring'].AsString := 'testservice';
+end;
+
+procedure TServerMethodDM.DWServerEvents1EventsgetemployeeReplyEvent(
+  Var Params: TDWParams; Var Result: String);
+Var
+ JSONValue: TJSONValue;
+begin
+ JSONValue          := TJSONValue.Create;
+ Try
+  FDQuery1.Close;
+  FDQuery1.SQL.Clear;
+  FDQuery1.SQL.Add('select * from employee');
+  Try
+   FDQuery1.Open;
+   JSONValue.Encoding        := Encoding;
+   JSONValue.DatabaseCharSet := RESTDWLazDriver1.DatabaseCharSet;
+   JSONValue.LoadFromDataset('employee', FDQuery1, False,  Params.JsonMode, '');
+   Params.ItemsString['result'].AsString := JSONValue.ToJSON;
+   Params.ItemsString['segundoparam'].AsString := 'teste de array';
+  Except
+  End;
+ Finally
+  JSONValue.Free;
+ End;
+end;
+
+procedure TServerMethodDM.DWServerEvents1EventstesteReplyEvent(
+  Var Params: TDWParams; Var Result: String);
+begin
+ Params.ItemsString['result'].Asstring := 'hello World';
+end;
 
 procedure TServerMethodDM.Server_FDConnectionBeforeConnect(Sender: TObject);
 Begin

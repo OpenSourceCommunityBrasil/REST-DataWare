@@ -1,9 +1,11 @@
 object ServerMethodDM: TServerMethodDM
   OldCreateOrder = False
+  OnCreate = ServerMethodDataModuleCreate
+  Encoding = esUtf8
   OnReplyEvent = ServerMethodDataModuleReplyEvent
   OnMassiveProcess = ServerMethodDataModuleMassiveProcess
-  Height = 164
-  Width = 221
+  Height = 178
+  Width = 264
   object RESTDWPoolerDB1: TRESTDWPoolerDB
     RESTDriver = RESTDWDriverFD1
     Compression = True
@@ -76,9 +78,9 @@ object ServerMethodDM: TServerMethodDM
           item
             TypeObject = toParam
             ObjectDirection = odOUT
-            ObjectValue = ovTimeStamp
+            ObjectValue = ovDateTime
             ParamName = 'result'
-            Encoded = False
+            Encoded = True
           end
           item
             TypeObject = toParam
@@ -86,7 +88,15 @@ object ServerMethodDM: TServerMethodDM
             ObjectValue = ovString
             ParamName = 'inputdata'
             Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odINOUT
+            ObjectValue = ovString
+            ParamName = 'resultstring'
+            Encoded = False
           end>
+        JsonMode = jmDataware
         Name = 'servertime'
         OnReplyEvent = DWServerEvents1EventsservertimeReplyEvent
       end
@@ -94,20 +104,14 @@ object ServerMethodDM: TServerMethodDM
         DWParams = <
           item
             TypeObject = toParam
-            ObjectDirection = odIN
-            ObjectValue = ovString
-            ParamName = 'value'
-            Encoded = True
-          end
-          item
-            TypeObject = toParam
             ObjectDirection = odOUT
             ObjectValue = ovString
             ParamName = 'result'
             Encoded = True
           end>
-        Name = 'helloworld'
-        OnReplyEvent = DWServerEvents1EventshelloworldReplyEvent
+        JsonMode = jmDataware
+        Name = 'teste'
+        OnReplyEvent = DWServerEvents1EventstesteReplyEvent
       end
       item
         DWParams = <
@@ -115,7 +119,7 @@ object ServerMethodDM: TServerMethodDM
             TypeObject = toParam
             ObjectDirection = odIN
             ObjectValue = ovString
-            ParamName = 'cnpj'
+            ParamName = 'sql'
             Encoded = True
           end
           item
@@ -125,10 +129,38 @@ object ServerMethodDM: TServerMethodDM
             ParamName = 'result'
             Encoded = True
           end>
-        Name = 'dirf'
-        OnReplyEvent = DWServerEvents1EventsdirfReplyEvent
+        JsonMode = jmDataware
+        Name = 'loaddatasetevent'
+        OnReplyEvent = DWServerEvents1EventsloaddataseteventReplyEvent
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = False
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'segundoparam'
+            Encoded = False
+          end>
+        JsonMode = jmPureJSON
+        Name = 'getemployee'
+        OnReplyEvent = DWServerEvents1EventsgetemployeeReplyEvent
       end>
     Left = 80
     Top = 103
+  end
+  object FDQuery1: TFDQuery
+    Connection = Server_FDConnection
+    SQL.Strings = (
+      '')
+    Left = 137
+    Top = 15
   end
 end
