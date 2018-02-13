@@ -737,7 +737,6 @@ object Form5: TForm5
     Proxy = False
     ProxyOptions.Port = 8888
     PoolerService = '127.0.0.1'
-    PoolerURL = 'dwCGI.cgi/'
     PoolerPort = 8082
     PoolerName = 'TServerMethodDM.RESTDWPoolerDB1'
     StateConnection.AutoCheck = False

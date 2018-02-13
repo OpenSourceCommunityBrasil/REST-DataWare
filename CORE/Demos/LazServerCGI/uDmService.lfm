@@ -79,7 +79,14 @@ object ServerMethodDM: TServerMethodDM
             ObjectDirection = odOUT
             ObjectValue = ovString
             ParamName = 'result'
-            Encoded = True
+            Encoded = False
+          end        
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'echostring'
+            Encoded = False
           end>
         JsonMode = jmDataware
         Name = 'teste'

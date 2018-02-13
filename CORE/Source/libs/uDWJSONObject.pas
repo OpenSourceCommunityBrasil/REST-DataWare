@@ -681,14 +681,14 @@ End;
 Function TJSONValue.GetValueJSON(bValue: String): String;
 Begin
  Result := bValue;
+ {
  If vObjectValue In [ovString,        ovFixedChar,    ovWideString,
                      ovFixedWideChar, ovDate, ovTime, ovDateTime,
                      ovBlob, ovGraphic, ovOraBlob, ovOraClob,
                      ovMemo, ovWideMemo, ovFmtMemo] Then
   If bValue = '' Then
-   Result := '""'
-  Else
-   Result := bValue;
+   Result := '""';
+ }
 End;
 
 Function TJSONValue.IsNull: Boolean;
@@ -699,8 +699,32 @@ End;
 Function TJSONValue.FormatValue(bValue: String): String;
 Var
  aResult : String;
+ vInsertTag : Boolean;
 Begin
- aResult := Stringreplace(bValue, #000, '', [rfReplaceAll]);
+ aResult    := Stringreplace(bValue, #000, '', [rfReplaceAll]);
+ vInsertTag := vObjectValue In [ovDate, ovTime, ovDateTime,
+                                ovBlob, ovGraphic, ovOraBlob, ovOraClob,
+                                ovMemo, ovWideMemo, ovFmtMemo];
+ If Trim(aResult) <> '' Then
+  Begin
+   If (aResult[InitStrPos] = '"')      And
+      (aResult[Length(aResult)] = '"') Then
+    Begin
+     Delete(aResult, InitStrPos, 1);
+     Delete(aResult, Length(aResult), 1);
+    End;
+   If Not vEncoded Then
+    Begin
+     If Trim(aResult) <> '' Then
+      If Not(((Pos('{', aResult) > 0)  And
+              (Pos('}', aResult) > 0)) Or
+             ((Pos('[', aResult) > 0)  And
+              (Pos(']', aResult) > 0))) Then
+       aResult := StringToJsonString(aResult);
+    End;
+   If (Trim(aResult) = '') And vInsertTag Then
+    aResult := '""';
+  End;
  If JsonMode = jmDataware Then
   Begin
    If vTypeObject = toDataset Then
@@ -710,11 +734,21 @@ Begin
                                                            GetValueType(vObjectValue),         vtagName,
                                                            GetValueJSON(aResult)])
    Else
-    Result := Format(TValueFormatJSONValue, ['ObjectType', GetObjectName(vTypeObject),         'Direction',
-                                                           GetDirectionName(vObjectDirection), 'Encoded',
-                                                           EncodedString,                      'ValueType',
-                                                           GetValueType(vObjectValue),         vtagName,
-                                                           GetValueJSON(aResult)]);
+    Begin
+     If vObjectValue in [ovString, ovWideString, ovMemo,
+                         ovWideMemo, ovFmtMemo, ovFixedChar] Then
+      Result := Format(TValueFormatJSONValueS, ['ObjectType',  GetObjectName(vTypeObject),         'Direction',
+                                                               GetDirectionName(vObjectDirection), 'Encoded',
+                                                               EncodedString,                      'ValueType',
+                                                               GetValueType(vObjectValue),         vtagName,
+                                                               GetValueJSON(aResult)])
+     Else
+      Result := Format(TValueFormatJSONValue, ['ObjectType',  GetObjectName(vTypeObject),         'Direction',
+                                                              GetDirectionName(vObjectDirection), 'Encoded',
+                                                              EncodedString,                      'ValueType',
+                                                              GetValueType(vObjectValue),         vtagName,
+                                                              GetValueJSON(aResult)]);
+    End;
   End
  Else
   Result := aResult;

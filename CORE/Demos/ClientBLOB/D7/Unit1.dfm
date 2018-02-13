@@ -2005,12 +2005,15 @@ object Form5: TForm5
       end>
     MasterCascadeDelete = True
     Inactive = False
+    Datapacks = -1
     DataCache = False
     Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
       'SELECT * FROM TB_USUARIO')
     CacheUpdateRecords = True
+    AutoCommitData = False
+    AutoRefreshAfterCommit = False
     InBlockEvents = False
     Left = 291
     Top = 23
@@ -2052,12 +2055,10 @@ object Form5: TForm5
     StrsEmpty2Null = False
     StrsTrim2Len = True
     WelcomeMessage = 'EMPLOYEE.FDB'
-    DateSeparator = '/'
-    TimeSeparator = ':'
-    DecimalSeparator = ','
     OnWork = RESTDWDataBase1Work
     OnWorkBegin = RESTDWDataBase1WorkBegin
     OnWorkEnd = RESTDWDataBase1WorkEnd
+    ParamCreate = True
     Left = 227
     Top = 23
   end

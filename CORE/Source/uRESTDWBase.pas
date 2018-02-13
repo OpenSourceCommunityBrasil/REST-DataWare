@@ -679,6 +679,8 @@ Begin
            Else
             Begin
              UrlMethod := Trim(UrlMethod);
+             If Pos('?', UrlMethod) > 0 Then
+              UrlMethod := Copy(UrlMethod, 1, Pos('?', UrlMethod)-1);
              Break;
             End;
           End;
@@ -724,12 +726,26 @@ Begin
         If Assigned(DWParams) Then
          Begin
           If JsonMode = jmDataware Then
-         vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr])
+           Begin
+            If Trim(JSONStr) <> '' Then
+             Begin
+              If Not(((Pos('{', JSONStr) > 0)   And
+                      (Pos('}', JSONStr) > 0))  Or
+                     ((Pos('[', JSONStr) > 0)   And
+                      (Pos(']', JSONStr) > 0))) Then
+               Begin
+                If Not((JSONStr[InitStrPos] = '"') And
+                       (JSONStr[Length(JSONStr)] = '"')) Then
+                 JSONStr := '"' + JSONStr + '"';
+               End;
+             End;
+            vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
+           End
           Else If JsonMode in [jmPureJSON, jmMongoDB] Then
            Begin
             If DWParams.CountOutParams < 2 Then
              ReturnObject := '%s'
-        Else
+            Else
              ReturnObject := '[%s]';
             vReplyString                        := Format(ReturnObject, [GetParamsReturn(DWParams)]);
             If vReplyString = '' Then
@@ -3559,7 +3575,21 @@ Begin
         End;
        Try
         If JsonMode = jmDataware Then
-         vReplyString                         := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr])
+         Begin
+          If Trim(JSONStr) <> '' Then
+           Begin
+            If Not(((Pos('{', JSONStr) > 0)   And
+                    (Pos('}', JSONStr) > 0))  Or
+                   ((Pos('[', JSONStr) > 0)   And
+                    (Pos(']', JSONStr) > 0))) Then
+             Begin
+              If Not((JSONStr[InitStrPos] = '"') And
+                     (JSONStr[Length(JSONStr)] = '"')) Then
+               JSONStr := '"' + JSONStr + '"';
+             End;
+           End;
+          vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
+         End
         Else If JsonMode in [jmPureJSON, jmMongoDB] Then
          Begin
           If DWParams.CountOutParams < 2 Then

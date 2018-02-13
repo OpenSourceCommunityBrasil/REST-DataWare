@@ -32,6 +32,7 @@ Const
  TMassiveFormatJSON    = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":[%s]}';
  TValueDisp            = '{"PARAMS":[%s], "RESULT":[%s]}';
  TValueArrayJSON       = '[%s]';
+ TValueFormatJSONValueS = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s"}';
  TValueFormatJSONValue = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":%s}';
  TJsonDatasetHeader    = '{"Field":"%s", "Type":"%s", "Primary":"%s", "Required":"%s", "Size":%d, "Precision":%d, "ReadOnly":"%s", "Autogeneration":"%s"}';
  TJsonValueFormat      = '%s';

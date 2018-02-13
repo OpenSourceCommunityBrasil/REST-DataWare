@@ -128,7 +128,10 @@ end;
 procedure TServerMethodDM.DWServerEvents1EventstesteReplyEvent(
   Var Params: TDWParams; Var Result: String);
 begin
- Params.ItemsString['result'].Asstring := 'hello World';
+ If Params.ItemsString['echostring'].AsString = 'echo' Then
+  Params.ItemsString['result'].Asstring := 'Teste de echo, ÇÁ"\/'
+ Else
+  Params.ItemsString['result'].Asstring := 'Hello World';
 end;
 
 procedure TServerMethodDM.Server_FDConnectionBeforeConnect(Sender: TObject);

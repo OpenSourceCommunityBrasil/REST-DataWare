@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, Dialogs, StdCtrls, uRESTDWPoolerDB, DB,
   JvMemoryDataset, ExtCtrls, ComCtrls, DBCtrls, IdComponent,
-  Mask, acPNG, Buttons;
+  Mask, acPNG, Buttons, uDWConstsData;
 
 type
   TForm5 = class(TForm)
