@@ -2195,7 +2195,7 @@ Var
     {$ENDIF}
    vTempValue := aValue;
    {$IFDEF ANDROID} //Android}
-   InputValue := Copy(InputValue, 0, InitPos-1) + ']}'; //Delete(InputValue, InitPos, Pos(']}', InputValue) - InitPos);
+   InputValue := Copy(InputValue, 0, InitPos12) + ']}'; //Delete(InputValue, InitPos, Pos(']}', InputValue) - InitPos);
    {$ELSE}
    InputValue := Copy(InputValue, 1, InitPos -1) + ']}'; //Delete(InputValue, InitPos, Pos(']}', InputValue) - InitPos);
    {$ENDIF}

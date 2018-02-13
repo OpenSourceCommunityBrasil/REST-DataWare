@@ -713,18 +713,19 @@ Begin
      Delete(aResult, InitStrPos, 1);
      Delete(aResult, Length(aResult), 1);
     End;
-   If Not vEncoded Then
-    Begin
-     If Trim(aResult) <> '' Then
-      If Not(((Pos('{', aResult) > 0)  And
-              (Pos('}', aResult) > 0)) Or
-             ((Pos('[', aResult) > 0)  And
-              (Pos(']', aResult) > 0))) Then
-       aResult := StringToJsonString(aResult);
-    End;
-   If (Trim(aResult) = '') And vInsertTag Then
-    aResult := '""';
   End;
+ If Not vEncoded Then
+  Begin
+   If Trim(aResult) <> '' Then
+    If Not(((Pos('{', aResult) > 0)  And
+            (Pos('}', aResult) > 0)) Or
+           ((Pos('[', aResult) > 0)  And
+            (Pos(']', aResult) > 0))) Then
+     If Not(vObjectValue In [ovBlob, ovGraphic, ovOraBlob, ovOraClob]) Then
+      aResult := StringToJsonString(aResult);
+  End;
+ If (Trim(aResult) = '') And vInsertTag Then
+  aResult := '""';
  If JsonMode = jmDataware Then
   Begin
    If vTypeObject = toDataset Then
@@ -743,11 +744,15 @@ Begin
                                                                GetValueType(vObjectValue),         vtagName,
                                                                GetValueJSON(aResult)])
      Else
-      Result := Format(TValueFormatJSONValue, ['ObjectType',  GetObjectName(vTypeObject),         'Direction',
-                                                              GetDirectionName(vObjectDirection), 'Encoded',
-                                                              EncodedString,                      'ValueType',
-                                                              GetValueType(vObjectValue),         vtagName,
-                                                              GetValueJSON(aResult)]);
+      Begin
+       If (vObjectValue In [ovBlob, ovGraphic, ovOraBlob, ovOraClob]) And ((vEncoded) Or (Not(vEncoded) And (aResult = ''))) Then
+        aResult := '"' + aResult + '"';
+       Result := Format(TValueFormatJSONValue, ['ObjectType',  GetObjectName(vTypeObject),         'Direction',
+                                                               GetDirectionName(vObjectDirection), 'Encoded',
+                                                               EncodedString,                      'ValueType',
+                                                               GetValueType(vObjectValue),         vtagName,
+                                                               GetValueJSON(aResult)]);
+      End;
     End;
   End
  Else
@@ -1040,7 +1045,7 @@ Begin
     //Inc(A);
    End;
   {$ELSE}
-    While Not bValue.Eof Do
+  While Not bValue.Eof Do
    Begin
     Case JsonModeD Of
      jmDataware : Begin
@@ -1061,7 +1066,6 @@ Begin
     Inc(A);
    End;
   {$ENDIF}
-
   Case JsonModeD Of
    jmDataware : Result := Format(Result, [vLines]);
    jmPureJSON,
@@ -1110,20 +1114,35 @@ Function TJSONValue.ToJSON: String;
 Var
  vTempValue : String;
 Begin
+ Result := '';
  {$IFDEF FPC}
  If vEncodingLazarus = Nil Then
   SetEncoding(vEncoding);
  If vEncoded Then
   vTempValue := FormatValue(vEncodingLazarus.GetString(aValue))
  Else If vEncodingLazarus.GetString(aValue) = '' Then
-  vTempValue  := FormatValue('""')
+  Begin
+   If Not(vObjectValue in [ovString, ovFixedChar,   ovWideString,
+                           ovFixedWideChar, ovBlob, ovGraphic,
+                           ovOraBlob, ovOraClob, ovMemo, ovWideMemo, ovFmtMemo]) Then
+    vTempValue  := FormatValue('""')
+   Else
+    vTempValue  := FormatValue('');
+  End
  Else
   vTempValue  := FormatValue(vEncodingLazarus.GetString(aValue));
  {$ELSE}
  If vEncoded Then
   vTempValue := FormatValue(BytesToString(aValue, GetEncodingID(vEncoding)))
  Else If BytesArrToString(aValue, GetEncodingID(vEncoding)) = '' Then
-  vTempValue  := FormatValue('""')
+  Begin
+   If Not(vObjectValue in [ovString, ovFixedChar,   ovWideString,
+                           ovFixedWideChar, ovBlob, ovGraphic,
+                           ovOraBlob, ovOraClob, ovMemo, ovWideMemo, ovFmtMemo]) Then
+    vTempValue  := FormatValue('""')
+   Else
+    vTempValue  := FormatValue('');
+  End
  Else
   vTempValue  := FormatValue(BytesArrToString(aValue, GetEncodingID(vEncoding)));
  {$ENDIF}

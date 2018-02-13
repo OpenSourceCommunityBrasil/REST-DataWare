@@ -72,6 +72,7 @@ Begin
     Begin
      JSONValue := TJSONValue.Create;
      Try
+      JSONValue.Encoding := RESTClientPooler1.Encoding;
       JSONValue.LoadFromJSON(lResponse);
       lbLocalFiles.Items.Text := JSONValue.Value;
      Finally
@@ -100,7 +101,7 @@ Begin
    RESTClientPooler1.UserName := edUserNameDW.Text;
    RESTClientPooler1.Password := edPasswordDW.Text;
    DWParams                   := TDWParams.Create;
-   DWParams.Encoding          := GetEncodingID(RESTClientPooler1.Encoding);
+   DWParams.Encoding          := RESTClientPooler1.Encoding;
    JSONParam                  := TJSONParam.Create(DWParams.Encoding);
    JSONParam.ParamName        := 'Arquivo';
    JSONParam.ObjectDirection  := odIN;
@@ -154,7 +155,7 @@ Begin
   If OpenDialog1.Execute Then
   Begin
    DWParams                     := TDWParams.Create;
-   DWParams.Encoding            := GetEncodingID(RESTClientPooler1.Encoding);
+   DWParams.Encoding            := RESTClientPooler1.Encoding;
    JSONParam                    := TJSONParam.Create(DWParams.Encoding);
    JSONParam.ParamName          := 'Arquivo';
    JSONParam.ObjectDirection    := odIN;

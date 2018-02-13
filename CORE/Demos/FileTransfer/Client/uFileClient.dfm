@@ -1084,7 +1084,7 @@ object Form4: TForm4
   end
   object RESTClientPooler1: TRESTClientPooler
     DataCompression = False
-    Encoding = esASCII
+    Encoding = esUtf8
     Host = 'localhost'
     UserName = 'testserver'
     Password = 'testserver'

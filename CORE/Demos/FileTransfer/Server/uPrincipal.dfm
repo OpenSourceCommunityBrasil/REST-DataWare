@@ -1054,7 +1054,7 @@ object fServer: TfServer
     ServerParams.Password = 'testserver'
     SSLMethod = sslvSSLv2
     SSLVersions = []
-    Encoding = esASCII
+    Encoding = esUtf8
     ServerContext = 'restdataware'
     SSLVerifyMode = []
     SSLVerifyDepth = 0

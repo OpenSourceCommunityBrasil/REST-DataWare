@@ -1585,9 +1585,8 @@ Begin
       Result.SetValue('COMMANDOK');
       vFDConnection.CommitRetaining;
       Error         := False;
-    finally
-    end;
-
+    Finally
+    End;
    End;
  Except
   On E : Exception do

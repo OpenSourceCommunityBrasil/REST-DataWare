@@ -61,6 +61,7 @@ Constructor TSMDWCore.Create (aOwner : TComponent);
 Begin
  Inherited Create (aOwner);
  OnReplyEvent := vReplyEvent;
+ Encoding     := esUtf8;
 End;
 
 Destructor TSMDWCore.Destroy;
@@ -125,7 +126,7 @@ Begin
      end;
    end;
    JSONValue          := TJSONValue.Create;
-   JSONValue.Encoding := fServer.rspServerFiles.Encoding;
+   JSONValue.Encoding := Encoding;
    vArquivo           := fServer.DirName + vDiretorio + Trim(ExtractFileName(Params.ItemsString['Arquivo'].AsString));
    If FileExists(vArquivo) Then
     DeleteFile(vArquivo);
@@ -155,7 +156,7 @@ Begin
  If (Params.ItemsString['Arquivo']     <> Nil) Then
   Begin
    JSONValue             := TJSONValue.Create;
-   JSONValue.Encoding    := Params.Encoding;
+   JSONValue.Encoding    := Encoding;
    JSONValue.ObjectValue := ovBlob;
    vArquivo              := fServer.DirName + Trim(Params.ItemsString['Arquivo'].AsString);
    If (vArquivo     <> '') Then
@@ -191,7 +192,7 @@ Begin
  List               := TStringList.Create;
  GetFilesServer(List);
  JSONValue          := TJSONValue.Create;
- JSONValue.Encoding := fServer.rspServerFiles.Encoding;
+ JSONValue.Encoding := Encoding;
  Try
   vFileExport       := TStringStream.Create(List.Text);
   vFileExport.Position  := 0;
