@@ -66,7 +66,6 @@ begin
   RESTServicePooler.SSLPrivateKeyFile     := SSLPrivateKeyFile;
   RESTServicePooler.SSLPrivateKeyPassword := SSLPrivateKeyPassword;
   RESTServicePooler.SSLCertFile           := SSLCertFile;
-  RESTServicePooler.EncodeStrings         := EncodedData;
   RESTServicePooler.Active                := True;
 end;
 

@@ -438,9 +438,9 @@ Var
            (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> '')  Then
        Begin
         If Query.Params[I].Size > 0 Then
-         Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
+         Query.Params[I].AsString := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
         Else
-         Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value;
+         Query.Params[I].AsString := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value;
        End
       Else
        Query.Params[I].Clear;
@@ -517,7 +517,7 @@ Var
        Begin
         If (Trim(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value) <> 'null') And
            (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).value <> '')  Then
-         Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value
+         Query.Params[I].AsString := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value
         Else
          Query.Params[I].Clear;
        End;

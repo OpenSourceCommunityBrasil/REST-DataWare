@@ -125,7 +125,6 @@ BEGIN
   else
      RESTDWDataBase1.TypeRequest:=TTyperequest.trHttp;
   RESTDWDataBase1.Open;
-
   INICIO                  := Now;
   DataSource1.DataSet     := RESTDWClientSQL1;
   RESTDWClientSQL1.Active := False;

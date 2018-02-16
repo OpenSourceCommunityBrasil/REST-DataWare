@@ -98,6 +98,7 @@ Public
  Procedure LoadFromStream (Stream       : TMemoryStream;
                            Encode       : Boolean = True);
  Procedure SaveToStream   (Stream       : TMemoryStream; Binary : Boolean = False);
+ Procedure StringToBytes  (Value        : String; Encode : Boolean = False);
  Function  ToJSON  : String;
  Procedure SetValue       (Value        : String;
                            Encode       : Boolean = True);
@@ -167,6 +168,8 @@ Private
  Procedure SetAsLongWord(Value     : LongWord);
  Function  GetAsLargeInt           : LargeInt;
  Procedure SetAsLargeInt(Value     : LargeInt);
+ Procedure SetObjectValue(Value    : TObjectValue);
+ Function  GetByteString           : String;
 Public
  Constructor Create(Encoding       : TEncodeSelect);
  Destructor  Destroy; Override;
@@ -183,10 +186,12 @@ Public
                       Encode       : Boolean = True);
  Procedure   LoadFromStream(Stream : TMemoryStream;
                             Encode : Boolean = True);
+ Procedure   StringToBytes (Value  : String;
+                            Encode : Boolean = False);
  Procedure   SaveToStream  (Stream : TMemoryStream);
  Procedure   LoadFromParam (Param  : TParam);
  Property    ObjectDirection       : TObjectDirection Read vObjectDirection Write vObjectDirection;
- Property    ObjectValue           : TObjectValue     Read vObjectValue     Write vObjectValue;
+ Property    ObjectValue           : TObjectValue     Read vObjectValue     Write SetObjectValue;
  Property    ParamName             : String           Read vParamName       Write SetParamName;
  Property    Encoded               : Boolean          Read vEncoded         Write vEncoded;
  Property    Binary                : Boolean          Read vBinary;
@@ -211,6 +216,7 @@ Public
  Property    AsLongWord            : LongWord         Read GetAsLongWord    Write SetAsLongWord;
  Property    AsLargeInt            : LargeInt         Read GetAsLargeInt    Write SetAsLargeInt;
  Property    AsString              : String           Read GetAsString      Write SetAsString;
+ Property    AsByteString          : String           Read GetByteString;
  {$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}
  Property    AsWideString          : WideString       Read GetAsWideString  Write SetAsWideString;
  Property    AsAnsiString          : AnsiString       Read GetAsAnsiString  Write SetAsAnsiString;
@@ -708,9 +714,9 @@ Begin
  If Trim(aResult) <> '' Then
   Begin
    If (aResult[InitStrPos] = '"')      And
-      (aResult[Length(aResult)] = '"') Then
+      (aResult[Length(aResult) - FinalStrPos] = '"') Then
     Begin
-     Delete(aResult, InitStrPos, 1);
+     Delete(aResult, InitStrPos+FinalStrPos, 1);
      Delete(aResult, Length(aResult), 1);
     End;
   End;
@@ -745,8 +751,15 @@ Begin
                                                                GetValueJSON(aResult)])
      Else
       Begin
-       If (vObjectValue In [ovBlob, ovGraphic, ovOraBlob, ovOraClob]) And ((vEncoded) Or (Not(vEncoded) And (aResult = ''))) Then
-        aResult := '"' + aResult + '"';
+       If (vObjectValue In [ovBlob, ovGraphic, ovOraBlob, ovOraClob]) Then
+        Begin
+         If ((((aResult <> '""') And
+            Not((aResult[InitStrPos] = '"') and
+                (aResult[Length(aResult) - FinalStrPos] = '"')))) And (vEncoded)) Or (Not(vEncoded) And (aResult = '')) Then
+          aResult := '"' + aResult + '"'
+         Else If (aResult = '') Then
+          aResult := '""';
+        End;
        Result := Format(TValueFormatJSONValue, ['ObjectType',  GetObjectName(vTypeObject),         'Direction',
                                                                GetDirectionName(vObjectDirection), 'Encoded',
                                                                EncodedString,                      'ValueType',
@@ -943,10 +956,7 @@ Var
          vStringStream.CopyFrom(bStream, bStream.Size);
          {$IFEND}
          {$ENDIF}
-         If vEncoded Then
-          vTempValue := Format('%s%s',   [vTempField, StreamToHex(vStringStream)])
-         Else
-          vTempValue := Format('%s"%s"', [vTempField, vStringStream.DataString])
+         vTempValue := Format('%s%s',   [vTempField, StreamToHex(vStringStream)]);
         Finally
          vStringStream.Free;
          bStream.Free;
@@ -1139,7 +1149,7 @@ Begin
    If Not(vObjectValue in [ovString, ovFixedChar,   ovWideString,
                            ovFixedWideChar, ovBlob, ovGraphic,
                            ovOraBlob, ovOraClob, ovMemo, ovWideMemo, ovFmtMemo]) Then
-    vTempValue  := FormatValue('""')
+    vTempValue  := FormatValue('null')
    Else
     vTempValue  := FormatValue('');
   End
@@ -1568,6 +1578,7 @@ Var
  vFindFlag      : Boolean;
  vBlobStream    : TStringStream;
  ListFields     : TStringList;
+ vConvValue,
  vTempValue     : String;
  Procedure SetValueA(Field : TField;
                      Value : String);
@@ -1682,8 +1693,15 @@ Begin
      DestDS.Fields.Clear;
     {$ELSE}
     If (DestDS.Fields.Count = 0) Then
-     If (DestDS.FieldDefs.Count > 0) Then
-      DestDS.FieldDefs.Clear;
+     Begin
+      If (DestDS.FieldDefs.Count > 0) Then
+       DestDS.FieldDefs.Clear;
+     End
+    Else
+     Begin
+      For J := 0 To DestDS.Fields.Count - 1 Do
+       TRESTDWClientSQL(DestDS).Fields[J].Required := False;
+     End;
     {$ENDIF}
     bJsonArray    := bJsonValue.optJSONArray   (bJsonValue.names.get(4).ToString);
     bJsonArraySub := bJsonArray.optJSONObject  (0);
@@ -1703,7 +1721,7 @@ Begin
            FieldDef.Name     := vTempValue;
            FieldDef.DataType := GetFieldType(bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString);
            FieldDef.Size     := StrToInt(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString);
-           FieldDef.Required := Uppercase(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S';
+//           FieldDef.Required := Uppercase(bJsonOBJ.opt(bJsonOBJ.names.get(3).ToString).ToString) = 'S';
            {
            TRESTDWClientSQL(DestDS).FieldDefs.Add(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString,
                                                   GetFieldType(bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString),
@@ -1736,8 +1754,8 @@ Begin
       Begin
        TRESTDWClientSQL(DestDS).Inactive := True;
        {
-       If DestDS Is TFDMemtable Then
-        TFDMemtable(DestDS).CreateDataSet;
+         If DestDS Is TFDMemtable Then
+          TFDMemtable(DestDS).CreateDataSet;
        }
        DestDS.Open;
        TRESTDWClientSQL(DestDS).Active   := True;
@@ -1904,27 +1922,22 @@ Begin
                                                             {$IFNDEF FPC}{$IF CompilerVersion > 21},
                                                             ftParams, ftStream{$IFEND}{$ENDIF}] Then
           Begin
-           If (vEncoded) And (vTempValue <> 'null') Then
-            HexStringToStream(vTempValue, vBlobStream)
-           Else
+           If (vTempValue <> 'null') And
+              (vTempValue <> '')     Then
             Begin
-             If (vTempValue <> 'null') Then
-              vBlobStream := TStringStream.Create(vTempValue)
-             Else
-              vBlobStream := TStringStream.Create('');
+             HexStringToStream(vTempValue, vBlobStream);
+             Try
+              vBlobStream.Position := 0;
+              TBlobField(TRESTDWClientSQL(DestDS).Fields[I]).LoadFromStream(vBlobStream);
+             Finally
+              {$IFNDEF FPC}
+              {$IF CompilerVersion > 21}
+               vBlobStream.Clear;
+              {$IFEND}
+              {$ENDIF}
+              FreeAndNil(vBlobStream);
+             End;
             End;
-           Try
-            vBlobStream.Position := 0;
-            If (vTempValue <> 'null') Then
-             TBlobField(TRESTDWClientSQL(DestDS).Fields[I]).LoadFromStream(vBlobStream);
-           Finally
-            {$IFNDEF FPC}
-            {$IF CompilerVersion > 21}
-             vBlobStream.Clear;
-            {$IFEND}
-            {$ENDIF}
-            FreeAndNil(vBlobStream);
-           End;
           End
          Else
           Begin
@@ -2143,6 +2156,26 @@ Begin
  SetValue(StreamToHex(Stream), Encode);
 End;
 
+Procedure TJSONValue.StringToBytes(Value : String;
+                                   Encode : Boolean = False);
+Var
+ Stream : TStringStream;
+Begin
+ If Value <> '' Then
+  Begin
+   ObjectValue := ovBlob;
+   vBinary     := True;
+   vEncoded    := Encode;
+   Stream      := TStringStream.Create(Value);
+   Try
+    Stream.Position := 0;
+    SetValue(StreamToHex(Stream), Encode);
+   Finally
+    Stream.Free;
+   End;
+  End;
+End;
+
 procedure TJSONValue.SetEncoding(bValue: TEncodeSelect);
 begin
  vEncoding := bValue;
@@ -2310,8 +2343,9 @@ End;
 
 Procedure TJSONParam.LoadFromStream(Stream: TMemoryStream; Encode: Boolean);
 Begin
- ObjectValue := ovBlob;
- SetValue(StreamToHex(Stream), False);
+ ObjectValue       := ovBlob;
+ vEncoded          := True;
+ SetValue(StreamToHex(Stream), vEncoded);
  vBinary           := True;
  vJSONValue.Binary := vBinary;
 End;
@@ -2589,10 +2623,27 @@ begin
  End;
 end;
 
+procedure TJSONParam.SetObjectValue(Value: TObjectValue);
+begin
+ vObjectValue := Value;
+ vBinary      := vObjectValue In [ovBlob, ovGraphic, ovOraBlob, ovOraClob];
+end;
+
 procedure TJSONParam.SetVariantValue(Value: Variant);
 begin
  SetDataValue(Value, vObjectValue);
 end;
+
+Procedure TJSONParam.StringToBytes(Value: String; Encode: Boolean);
+Begin
+ vJSONValue.JsonMode := vJsonMode;
+ vObjectValue        := ovBlob;
+ vBinary := vObjectValue in [ovBlob, ovGraphic, ovOraBlob, ovOraClob];
+ If vBinary Then
+  vJSONValue.StringToBytes(Value);
+ vEncoded := Encoded;
+ vJSONValue.vEncoded := vEncoded;
+End;
 
 Procedure TJSONParam.SetParamName(bValue: String);
 Begin
@@ -2604,11 +2655,11 @@ Begin
  vEncoded := Encode;
  vJSONValue.JsonMode := vJsonMode;
  vJSONValue.vEncoded := vEncoded;
- If Encode Then
+ vBinary := vObjectValue in [ovBlob, ovGraphic, ovOraBlob, ovOraClob];
+ If (Encode) And Not (vBinary) Then
   WriteValue(EncodeStrings(aValue{$IFDEF FPC}, csUndefined{$ENDIF}))
  Else
   WriteValue(aValue);
- vBinary := vJSONValue.ObjectValue in [ovBlob, ovGraphic, ovOraBlob, ovOraClob];
  vJSONValue.vBinary := vBinary;
 End;
 
@@ -2706,6 +2757,20 @@ end;
 function TJSONParam.GetAsWord: Word;
 begin
  Result := GetValue(ovWord);
+end;
+
+function TJSONParam.GetByteString: String;
+Var
+ Stream : TStringStream;
+begin
+ Stream := TStringStream.Create('');
+ Try
+  HexToStream(GetValue(ovString), Stream);
+  Stream.Position := 0;
+  Result := Stream.DataString;
+ Finally
+  Stream.Free;
+ End;
 end;
 
 Function TJSONParam.GetValue(Value: TObjectValue): Variant;
@@ -2853,7 +2918,7 @@ Begin
   ovTimeStampOffset : Begin
                        If (vJSONValue.Value <> '') And
                           (lowercase(vJSONValue.Value) <> 'null') Then
-                         Result := UnixToDateTime(StrToInt(vJSONValue.Value))
+                         Result := UnixToDateTime(StrToInt64(vJSONValue.Value))
                        Else
                         Result := Null;
                       End;

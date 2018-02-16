@@ -22,6 +22,7 @@ Uses {$IFDEF FPC}
    vOnWorkBegin          : TOnWorkBegin;
    vOnWorkEnd            : TOnWorkEnd;
    vOnStatus             : TOnStatus;
+   vEncodeStrings,
    vCompression          : Boolean;
    vEncoding             : TEncodeSelect;
    {$IFDEF FPC}
@@ -146,7 +147,8 @@ Uses {$IFDEF FPC}
                                    Var MessageError        : String;
                                    RESTClientPooler        : TRESTClientPooler = Nil);
    Property Compression  : Boolean   Read vCompression Write vCompression;
-   Property Encoding       : TEncodeSelect Read vEncoding    Write vEncoding;
+   Property Encoding       : TEncodeSelect Read vEncoding       Write vEncoding;
+   Property EncodeStrings  : Boolean       Read vEncodeStrings  Write vEncodeStrings;
    Property Host           : String        Read vHost           Write vHost;
    Property Port           : Integer       Read vPort           Write vPort;
    Property WelcomeMessage : String        Read vWelcomeMessage Write vWelcomeMessage;
@@ -199,6 +201,7 @@ Begin
  RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
+ RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -366,6 +369,7 @@ Begin
  RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
+ RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -434,6 +438,7 @@ Constructor TDWPoolerMethodClient.Create(AOwner: TComponent);
 Begin
  Inherited;
  vCompression := True;
+ vEncodeStrings := True;
  vEncoding  := esUtf8;
  {$IFNDEF FPC}
   {$if CompilerVersion < 21}
@@ -568,6 +573,7 @@ Begin
  RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
+ RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -648,6 +654,7 @@ Begin
  RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
+ RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -761,12 +768,14 @@ Begin
  RESTClientPoolerExec.RequestTimeOut  := TimeOut;
  RESTClientPoolerExec.UrlPath         := Method_Prefix;
  RESTClientPoolerExec.DataCompression := vCompression;
+ RESTClientPoolerExec.hEncodeStrings  := EncodeStrings;
  RESTClientPoolerExec.TypeRequest     := vtyperequest;
  RESTClientPoolerExec.OnWork           := vOnWork;
  RESTClientPoolerExec.OnWorkBegin      := vOnWorkBegin;
  RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
+ RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -890,6 +899,7 @@ Begin
  RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
+ RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -1151,6 +1161,7 @@ Begin
  RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
+ RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -1260,6 +1271,7 @@ Begin
    RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
    RESTClientPoolerExec.OnStatus         := vOnStatus;
    RESTClientPoolerExec.Encoding         := vEncoding;
+   RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
    {$IFDEF FPC}
    RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
    {$ENDIF}
@@ -1293,8 +1305,9 @@ Begin
    JSONParam                     := TJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Result';
    JSONParam.ObjectDirection             := odOUT;
-   //JSONParam.SetValue('');
-   JSONParam.AsString                    := '';
+   JSONParam.ObjectValue                 := ovBlob;
+   JSONParam.Encoded                     := True;
+   JSONParam.SetValue('', JSONParam.Encoded);
    DWParams.Add(JSONParam);
    Try
     Try
@@ -1308,8 +1321,8 @@ Begin
         Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
        If DWParams.ItemsString['Result'] <> Nil Then
         Begin
-         If DWParams.ItemsString['Result'].Value <> '' Then
-          Result := DWParams.ItemsString['Result'].Value;
+         If DWParams.ItemsString['Result'].AsString <> '' Then
+          Result := DWParams.ItemsString['Result'].AsByteString;
         End;
       End
      Else

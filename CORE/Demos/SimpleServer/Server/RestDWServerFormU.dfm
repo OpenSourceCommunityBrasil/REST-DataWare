@@ -1235,7 +1235,7 @@ object RestDWForm: TRestDWForm
         Top = 169
         Width = 213
         Height = 21
-        TabOrder = 15
+        TabOrder = 14
         Text = 'informe  a URL'
         Visible = False
       end
@@ -1356,28 +1356,12 @@ object RestDWForm: TRestDWForm
         TabOrder = 11
         Text = ''
       end
-      object cbEncode: TCheckBox
-        Left = 268
-        Top = 65
-        Width = 101
-        Height = 19
-        Caption = 'Encode Strings'
-        Checked = True
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ParentFont = False
-        State = cbChecked
-        TabOrder = 12
-      end
       object cbDriver: TComboBox
         Left = 7
         Top = 125
         Width = 162
         Height = 21
-        TabOrder = 13
+        TabOrder = 12
         Text = 'Selecione o SGBD'
         OnCloseUp = cbDriverCloseUp
         Items.Strings = (
@@ -1390,7 +1374,7 @@ object RestDWForm: TRestDWForm
         Width = 68
         Height = 17
         Caption = 'Usa URL'
-        TabOrder = 14
+        TabOrder = 13
         OnClick = ckUsaURLClick
       end
     end
@@ -1464,7 +1448,6 @@ object RestDWForm: TRestDWForm
   end
   object RESTServicePooler1: TRESTServicePooler
     Active = False
-    EncodeStrings = True
     ServicePort = 8082
     ProxyOptions.Port = 8888
     ServerParams.HasAuthentication = True

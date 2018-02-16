@@ -104,7 +104,6 @@ type
     MemoResp: TMemo;
     Label19: TLabel;
     Label18: TLabel;
-    CbEncode: TCheckBox;
     RESTServicePooler1: TRESTServicePooler;
     Tupdatelogs: TTimer;
     CbDriver: TComboBox;
@@ -467,7 +466,6 @@ Begin
     RESTServicePooler1.SSLPrivateKeyFile     := EPrivKeyFile.Text;
     RESTServicePooler1.SSLPrivateKeyPassword := EPrivKeyPass.Text;
     RESTServicePooler1.SSLCertFile           := ECertFile.Text;
-    RESTServicePooler1.EncodeStrings         := CbEncode.Checked;
     RESTServicePooler1.Active                := True;
     If Not RESTServicePooler1.Active Then
       Exit;

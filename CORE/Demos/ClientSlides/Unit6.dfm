@@ -1070,8 +1070,8 @@ object Form6: TForm6
   object DataSource1: TDataSource
     AutoEdit = False
     DataSet = RESTDWClientSQL1
-    Left = 232
-    Top = 104
+    Left = 216
+    Top = 56
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
     AutoCalcFields = False
@@ -1108,14 +1108,16 @@ object Form6: TForm6
     SQL.Strings = (
       'select * from IMAGELIST'
       'order by id')
+    UpdateTableName = 'IMAGELIST'
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = False
     InBlockEvents = False
-    Left = 224
-    Top = 64
+    Left = 280
+    Top = 32
     object RESTDWClientSQL1ID: TIntegerField
       FieldName = 'ID'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
       Required = True
     end
     object RESTDWClientSQL1BLOBIMAGE: TBlobField
@@ -1139,8 +1141,8 @@ object Form6: TForm6
     StateConnection.AutoCheck = False
     StateConnection.InTime = 1000
     RequestTimeOut = 9999999
-    EncodeStrings = True
-    Encoding = esASCII
+    EncodeStrings = False
+    Encoding = esUtf8
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True

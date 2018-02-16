@@ -1231,36 +1231,6 @@ object RestDWForm: TRestDWForm
         TabOrder = 11
         SpaceChar = '_'
       end
-      object cbEncode: TCheckBox
-        Left = 259
-        Height = 19
-        Top = 56
-        Width = 103
-        Caption = 'Encode Strings'
-        Checked = True
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ParentFont = False
-        State = cbChecked
-        TabOrder = 12
-      end
-      object CheckBox1: TCheckBox
-        Left = 259
-        Height = 19
-        Top = 81
-        Width = 93
-        Caption = 'Compression'
-        Checked = True
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ParentFont = False
-        State = cbChecked
-        TabOrder = 13
-      end
     end
     object tsLogs: TTabSheet
       Caption = 'Logs'
@@ -4451,7 +4421,6 @@ object RestDWForm: TRestDWForm
   end
   object RESTServicePooler1: TRESTServicePooler
     Active = False
-    EncodeStrings = True
     ServicePort = 8082
     ProxyOptions.Port = 8888
     ServerParams.HasAuthentication = True
@@ -4461,7 +4430,7 @@ object RestDWForm: TRestDWForm
     SSLVersions = []
     OnLastRequest = RESTServicePooler1LastRequest
     OnLastResponse = RESTServicePooler1LastResponse
-    Encoding = esASCII
+    Encoding = esUtf8
     ServerContext = 'restdataware'
     SSLVerifyMode = []
     SSLVerifyDepth = 0

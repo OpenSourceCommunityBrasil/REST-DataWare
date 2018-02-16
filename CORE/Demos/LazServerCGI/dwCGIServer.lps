@@ -4,15 +4,14 @@
     <PathDelim Value="\"/>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="18">
+    <Units Count="19">
       <Unit0>
         <Filename Value="dwCGIServer.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="5"/>
         <CursorPos X="3" Y="23"/>
         <UsageCount Value="55"/>
-        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="dmdwcgiserver.pas"/>
@@ -20,6 +19,7 @@
         <ComponentName Value="dwCGIService"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="38"/>
         <CursorPos X="105" Y="46"/>
         <UsageCount Value="55"/>
@@ -29,10 +29,9 @@
       <Unit2>
         <Filename Value="uConsts.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="6"/>
         <UsageCount Value="55"/>
-        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="uDmService.pas"/>
@@ -40,7 +39,7 @@
         <ComponentName Value="ServerMethodDM"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="1"/>
         <TopLine Value="56"/>
         <CursorPos X="35" Y="66"/>
         <UsageCount Value="55"/>
@@ -49,8 +48,7 @@
       </Unit3>
       <Unit4>
         <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="971"/>
         <CursorPos X="30" Y="973"/>
         <UsageCount Value="25"/>
@@ -58,43 +56,38 @@
           <Item0 X="28" Y="2894" ID="3"/>
           <Item1 Y="442" ID="2"/>
         </Bookmarks>
-        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="..\..\Source\libs\SysTypes.pas"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="157"/>
         <CursorPos X="30" Y="165"/>
         <UsageCount Value="24"/>
-        <Loaded Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="..\..\Source\libs\uDWJSONObject.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="2315"/>
         <CursorPos X="36" Y="2323"/>
         <UsageCount Value="23"/>
         <Bookmarks Count="1">
           <Item0 X="16" Y="710" ID="1"/>
         </Bookmarks>
-        <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="..\..\Source\libs\uDWConsts.pas"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="25"/>
-        <CursorPos X="53" Y="33"/>
+        <CursorPos X="21" Y="29"/>
         <UsageCount Value="20"/>
-        <Loaded Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="..\..\Source\libs\uzliblaz.pas"/>
         <UnitName Value="uZlibLaz"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="48"/>
         <CursorPos X="17" Y="48"/>
         <UsageCount Value="16"/>
-        <Loaded Value="True"/>
       </Unit8>
       <Unit9>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-web\src\base\httpdefs.pp"/>
@@ -159,134 +152,25 @@
       </Unit16>
       <Unit17>
         <Filename Value="..\..\Source\libs\JSON\uDWJSON.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1095"/>
         <CursorPos Y="1105"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit17>
+      <Unit18>
+        <Filename Value="C:\lazarus\lcl\lresources.pp"/>
+        <UnitName Value="LResources"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3149"/>
+        <CursorPos X="38" Y="3154"/>
+        <UsageCount Value="10"/>
+      </Unit18>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="1">
       <Position1>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="638" TopLine="630"/>
+        <Filename Value="dmdwcgiserver.pas"/>
+        <Caret Line="46" Column="105" TopLine="38"/>
       </Position1>
-      <Position2>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="869" TopLine="861"/>
-      </Position2>
-      <Position3>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="562" TopLine="554"/>
-      </Position3>
-      <Position4>
-        <Filename Value="..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="2324" TopLine="2314"/>
-      </Position4>
-      <Position5>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="562" TopLine="554"/>
-      </Position5>
-      <Position6>
-        <Filename Value="..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="2324" TopLine="2314"/>
-      </Position6>
-      <Position7>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="638" TopLine="630"/>
-      </Position7>
-      <Position8>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="870" Column="38" TopLine="861"/>
-      </Position8>
-      <Position9>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="562" TopLine="554"/>
-      </Position9>
-      <Position10>
-        <Filename Value="..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="2324" TopLine="2314"/>
-      </Position10>
-      <Position11>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="638" TopLine="630"/>
-      </Position11>
-      <Position12>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="869" TopLine="861"/>
-      </Position12>
-      <Position13>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="562" TopLine="554"/>
-      </Position13>
-      <Position14>
-        <Filename Value="..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="2324" TopLine="2314"/>
-      </Position14>
-      <Position15>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="638" TopLine="630"/>
-      </Position15>
-      <Position16>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="869" TopLine="861"/>
-      </Position16>
-      <Position17>
-        <Filename Value="..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="2324" TopLine="2314"/>
-      </Position17>
-      <Position18>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="638" TopLine="630"/>
-      </Position18>
-      <Position19>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="869" TopLine="861"/>
-      </Position19>
-      <Position20>
-        <Filename Value="..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="2324" TopLine="2314"/>
-      </Position20>
-      <Position21>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="638" TopLine="630"/>
-      </Position21>
-      <Position22>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="869" TopLine="861"/>
-      </Position22>
-      <Position23>
-        <Filename Value="..\..\Source\libs\uDWJSONObject.pas"/>
-        <Caret Line="2323" Column="36" TopLine="2315"/>
-      </Position23>
-      <Position24>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="562" TopLine="554"/>
-      </Position24>
-      <Position25>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="979" Column="79" TopLine="975"/>
-      </Position25>
-      <Position26>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="285" Column="12" TopLine="277"/>
-      </Position26>
-      <Position27>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="1255" Column="101" TopLine="1248"/>
-      </Position27>
-      <Position28>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="1256" Column="35" TopLine="1248"/>
-      </Position28>
-      <Position29>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="979" TopLine="971"/>
-      </Position29>
-      <Position30>
-        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
-        <Caret Line="1255" Column="45" TopLine="1245"/>
-      </Position30>
     </JumpHistory>
   </ProjectSession>
   <Debugging>

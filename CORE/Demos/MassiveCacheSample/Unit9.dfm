@@ -1118,8 +1118,8 @@ object Form9: TForm9
     StateConnection.AutoCheck = False
     StateConnection.InTime = 1000
     RequestTimeOut = 9999999
-    EncodeStrings = True
-    Encoding = esASCII
+    EncodeStrings = False
+    Encoding = esUtf8
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = True
@@ -1151,6 +1151,7 @@ object Form9: TForm9
     StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
+    Datapacks = -1
     DataCache = False
     Params = <>
     DataBase = RESTDWDataBase1
@@ -1186,6 +1187,7 @@ object Form9: TForm9
     StoreDefs = True
     MasterCascadeDelete = True
     Inactive = False
+    Datapacks = -1
     DataCache = False
     Params = <>
     DataBase = RESTDWDataBase1
@@ -1264,6 +1266,7 @@ object Form9: TForm9
     MasterDataSet = dwSQLVendas
     MasterCascadeDelete = True
     Inactive = False
+    Datapacks = -1
     DataCache = False
     Params = <
       item

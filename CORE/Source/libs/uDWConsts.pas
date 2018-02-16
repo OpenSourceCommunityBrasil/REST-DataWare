@@ -19,11 +19,14 @@ Const
 {$IFDEF POSIX}
   {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
    InitStrPos            = 0;
+   FinalStrPos           = 1;
    {$ELSE}
    InitStrPos            = 1;
+   FinalStrPos           = 0;
    {$IFEND}
  {$ELSE}
  InitStrPos            = 1;
+ FinalStrPos           = 0;
  {$ENDIF}
  TDecimalChar          = 'D';
  TSepParams            = '|xxx|xxx|%';

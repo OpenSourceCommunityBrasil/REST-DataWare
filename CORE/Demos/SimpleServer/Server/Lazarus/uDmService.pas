@@ -22,13 +22,14 @@ type
     procedure DataModuleWelcomeMessage(Welcomemsg: String);
     procedure DWServerEvents1EventsgetemployeeReplyEvent(Var Params: TDWParams;
       Var Result: String);
+    procedure DWServerEvents1EventsservertimeReplyEvent(Var Params: TDWParams;
+      Var Result: String);
     procedure ServerMethodDataModuleReplyEvent(SendType: TSendEvent;
       Context: string; var Params: TDWParams; var Result: string);
     procedure ServerMethodDataModuleCreate(Sender: TObject);
     procedure Server_FDConnectionBeforeConnect(Sender: TObject);
   private
     { Private declarations }
-   Function ConsultaBanco(Var Params : TDWParams) : String;Overload;
   public
     { Public declarations }
   end;
@@ -42,34 +43,6 @@ implementation
 
 {$R *.lfm}
 
-Function TServerMethodDM.ConsultaBanco(Var Params : TDWParams) : String;
-Var
- vSQL      : String;
- JSONValue : TJSONValue;
- fdQuery   : TSQLQuery;
-Begin
- If Params.ItemsString['SQL'] <> Nil Then
-  Begin
-   JSONValue          := TJSONValue.Create;
-   If Params.ItemsString['SQL'].value <> '' Then
-    Begin
-     If Params.ItemsString['TESTPARAM'] <> Nil Then
-      Params.ItemsString['TESTPARAM'].SetValue('OK, OK');
-     vSQL      := Params.ItemsString['SQL'].value;
-     fdQuery   := TSQLQuery.Create(Nil);
-     Try
-      fdQuery.DataBase := Server_FDConnection;
-      fdQuery.SQL.Add(vSQL);
-      JSONValue.LoadFromDataset('sql', fdQuery, RestDWForm.cbEncode.Checked);
-      Result             := JSONValue.ToJSON;
-     Finally
-      JSONValue.Free;
-      fdQuery.Free;
-     End;
-    End;
-  End;
-End;
-
 procedure TServerMethodDM.ServerMethodDataModuleCreate(Sender: TObject);
 begin
  RESTDWPoolerDB1.Active := RestDWForm.cbPoolerState.Checked;
@@ -79,13 +52,7 @@ procedure TServerMethodDM.ServerMethodDataModuleReplyEvent(SendType: TSendEvent;
   Context: string; var Params: TDWParams; var Result: string);
 Begin
  Case SendType Of
-  sePOST   :
-   Begin
-    If UpperCase(Context) = Uppercase('ConsultaBanco') Then
-     Result := ConsultaBanco(Params)
-    Else
-     Result := '{(''STATUS'',   ''NOK''), (''MENSAGEM'', ''Método não encontrado'')}';
-   End;
+  sePOST   : Result := '{(''STATUS'',   ''NOK''), (''MENSAGEM'', ''Método não encontrado'')}';
  End;
 End;
 
@@ -107,6 +74,7 @@ begin
   Try
    FDQuery1.Open;
    JSONValue.Encoding := Encoding;
+   JSONValue.Encoded  := False;
    JSONValue.LoadFromDataset('employee', FDQuery1, False,  Params.JsonMode, '');
    Params.ItemsString['result'].AsString := JSONValue.ToJSON;
    Params.ItemsString['segundoparam'].AsString := 'teste de array';
@@ -115,6 +83,16 @@ begin
  Finally
   JSONValue.Free;
  End;
+end;
+
+procedure TServerMethodDM.DWServerEvents1EventsservertimeReplyEvent(
+  Var Params: TDWParams; Var Result: String);
+begin
+ If Params.ItemsString['inputdata'].AsString <> '' Then //servertime
+  Params.ItemsString['result'].AsDateTime := Now
+ Else
+  Params.ItemsString['result'].AsDateTime := Now - 1;
+ Params.ItemsString['resultstring'].AsString := 'testservice';
 end;
 
 procedure TServerMethodDM.Server_FDConnectionBeforeConnect(Sender: TObject);

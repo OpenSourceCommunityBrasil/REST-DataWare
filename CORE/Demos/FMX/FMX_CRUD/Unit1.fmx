@@ -2105,7 +2105,7 @@ object Form1: TForm1
       Fill.Gradient.StartPosition.Y = 1.000000000000000000
       Fill.Gradient.StopPosition.X = 0.499999970197677600
       Fill.Gradient.StopPosition.Y = 0.000000000000000000
-      Opacity = 0.800000011920928900
+      Opacity = 0.800000011920929000
       Size.Width = 385.000000000000000000
       Size.Height = 225.000000000000000000
       Size.PlatformDefault = False
@@ -2232,7 +2232,7 @@ object Form1: TForm1
     StateConnection.AutoCheck = False
     StateConnection.InTime = 1000
     RequestTimeOut = 10000
-    EncodeStrings = True
+    EncodeStrings = False
     Encoding = esUtf8
     StrsTrim = False
     StrsEmpty2Null = False

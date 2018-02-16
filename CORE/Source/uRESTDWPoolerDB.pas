@@ -813,7 +813,7 @@ Begin
  {$IF CompilerVersion > 21}
   vEncoding         := esUtf8;
  {$ELSE}
-  vEncoding         := esASCII;
+  vEncoding         := esAscii;
  {$IFEND}
  {$ELSE}
   vEncoding         := esUtf8;
@@ -1024,12 +1024,13 @@ Begin
  vRESTConnectionDB.Host           := vRestWebService;
  vRESTConnectionDB.Port           := vPoolerPort;
  vRESTConnectionDB.Compression    := vCompression;
- vRESTConnectionDB.TypeRequest     := VtypeRequest;
- vRESTConnectionDB.Encoding      := VEncondig;
- vRESTConnectionDB.OnWork        := vOnWork;
- vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
- vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
- vRESTConnectionDB.OnStatus      := vOnStatus;
+ vRESTConnectionDB.TypeRequest    := VtypeRequest;
+ vRESTConnectionDB.Encoding       := VEncondig;
+ vRESTConnectionDB.EncodeStrings  := EncodeStrings;
+ vRESTConnectionDB.OnWork         := vOnWork;
+ vRESTConnectionDB.OnWorkBegin    := vOnWorkBegin;
+ vRESTConnectionDB.OnWorkEnd      := vOnWorkEnd;
+ vRESTConnectionDB.OnStatus       := vOnStatus;
  {$IFDEF FPC}
   vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
  {$ENDIF}
@@ -1337,12 +1338,13 @@ Begin
  vRESTConnectionDB.Host           := vRestWebService;
  vRESTConnectionDB.Port           := vPoolerPort;
  vRESTConnectionDB.Compression    := vCompression;
- vRESTConnectionDB.TypeRequest     := VtypeRequest;
- vRESTConnectionDB.Encoding      := VEncondig;
- vRESTConnectionDB.OnWork        := vOnWork;
- vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
- vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
- vRESTConnectionDB.OnStatus      := vOnStatus;
+ vRESTConnectionDB.TypeRequest    := VtypeRequest;
+ vRESTConnectionDB.Encoding       := VEncondig;
+ vRESTConnectionDB.EncodeStrings  := EncodeStrings;
+ vRESTConnectionDB.OnWork         := vOnWork;
+ vRESTConnectionDB.OnWorkBegin    := vOnWorkBegin;
+ vRESTConnectionDB.OnWorkEnd      := vOnWorkEnd;
+ vRESTConnectionDB.OnStatus       := vOnStatus;
  {$IFDEF FPC}
   vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
  {$ENDIF}
@@ -1487,8 +1489,15 @@ Begin
  vAutoCheckData.vAutoCheck := False;
  vAutoCheckData.vInTime    := 1000;
  vTimeOut                  := 10000;
-// vAutoCheckData.vEvent     := CheckConnection;
- vEncondig                 := esASCII;
+ {$IFNDEF FPC}
+ {$IF CompilerVersion > 21}
+  vEncondig                := esUtf8;
+ {$ELSE}
+  vEncondig                := esAscii;
+ {$IFEND}
+ {$ELSE}
+  vEncondig                := esUtf8;
+ {$ENDIF}
  vContentex                := '';
  vStrsTrim                 := False;
  vStrsEmpty2Null           := False;
@@ -1597,6 +1606,7 @@ Begin
  vConnection.Host           := vRestWebService;
  vConnection.Port           := vPoolerPort;
  vConnection.Compression    := vCompression;
+ vConnection.EncodeStrings  := EncodeStrings;
  {$IFNDEF FPC}
   vConnection.OnWork        := vOnWork;
   vConnection.OnWorkBegin   := vOnWorkBegin;
@@ -2638,7 +2648,7 @@ End;
 procedure TRESTDWClientSQL.OpenCursor(InfoQuery: Boolean);
 Begin
  Try
-  If (vRESTDataBase <> Nil) Then
+  If (vRESTDataBase <> Nil) And Not(vInBlockEvents) Then
    Begin
     vRESTDataBase.Active := True;
     If vRESTDataBase.Active Then
@@ -2655,13 +2665,16 @@ Begin
          End;
        End;
      End;
-    If vRESTDataBase.Active Then
-    begin
+    If Not(csDesigning in ComponentState) Then
+     Begin
+      If (vRESTDataBase.Active) Or Not(vInBlockEvents) Then
        Inherited OpenCursor(InfoQuery)
-    end
-    Else If csDesigning in ComponentState Then
-     Raise Exception.Create(Name+': '+'Database Inactive...');
+      Else If csDesigning in ComponentState Then
+       Raise Exception.Create(Name+': '+'Database Inactive...');
+     End;
    End
+  Else If vInBlockEvents Then
+   Inherited OpenCursor(InfoQuery)
   Else If csDesigning in ComponentState Then
    Raise Exception.Create(Name+': '+'Database not found...');
  Except
@@ -2906,7 +2919,11 @@ Begin
       vRESTDataBase.ExecuteCommand(vSQL, vParams, vError, vMessageError, LDataSetList, False, vRESTClientPooler);
       If LDataSetList <> Nil Then
        Begin
-        LDataSetList.Encoded := vRESTDataBase.EncodeStrings;
+        LDataSetList.Encoded  := vRESTDataBase.EncodeStrings;
+        LDataSetList.Encoding := DataBase.Encoding;
+        {$IFDEF FPC}
+        LDataSetList.DatabaseCharSet := DataBase.DatabaseCharSet;
+        {$ENDIF}
         vValue := LDataSetList.ToJSON;
        End;
      End

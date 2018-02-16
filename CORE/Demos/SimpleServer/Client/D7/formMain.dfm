@@ -1991,7 +1991,7 @@ object Form2: TForm2
     StateConnection.AutoCheck = False
     StateConnection.InTime = 1000
     RequestTimeOut = 10000
-    EncodeStrings = True
+    EncodeStrings = False
     Encoding = esUtf8
     StrsTrim = False
     StrsEmpty2Null = False

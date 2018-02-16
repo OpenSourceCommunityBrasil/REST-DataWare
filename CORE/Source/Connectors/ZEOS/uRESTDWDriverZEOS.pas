@@ -928,7 +928,7 @@ Begin
     vTempQuery.Active := True;
     If Result = Nil Then
      Result := TJSONValue.Create;
-    Result.Encoded         := True;
+    Result.Encoded         := EncodeStringsJSON;
     Result.Encoding        := Encoding;
     {$IFDEF FPC}
      Result.DatabaseCharSet := DatabaseCharSet;
@@ -1774,7 +1774,7 @@ Begin
        vTempQuery.Open;
        If Result = Nil Then
         Result         := TJSONValue.Create;
-       Result.Encoded         := True;
+       Result.Encoded         := EncodeStringsJSON;
        Result.Encoding        := Encoding;
        {$IFDEF FPC}
         Result.DatabaseCharSet := DatabaseCharSet;
@@ -1831,7 +1831,7 @@ Begin
     vTempQuery.Open;
     Result         := TJSONValue.Create;
     Try
-     Result.Encoded         := True;
+     Result.Encoded         := EncodeStringsJSON;
      Result.Encoding        := Encoding;
      {$IFDEF FPC}
       Result.DatabaseCharSet := DatabaseCharSet;
@@ -2099,9 +2099,10 @@ Begin
       End;
      End;
     vTempQuery.Open;
-    vTempJSON  := TJSONValue.Create;
-    vTempJSON.Encoded := True;
-    vTempJSON.LoadFromDataset('RESULTDATA', vTempQuery, True);
+    vTempJSON          := TJSONValue.Create;
+    vTempJSON.Encoded  := EncodeStringsJSON;
+    vTempJSON.Encoding := Encoding;
+    vTempJSON.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
     Try
      If Length(vJSONLine) = 0 Then
       vJSONLine := Format('%s', [vTempJSON.ToJSON])

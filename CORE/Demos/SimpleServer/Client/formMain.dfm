@@ -1199,68 +1199,7 @@ object Form2: TForm2
     Top = 64
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    FieldDefs = <
-      item
-        Name = 'EMP_NO'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'FIRST_NAME'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 15
-      end
-      item
-        Name = 'LAST_NAME'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 20
-      end
-      item
-        Name = 'PHONE_EXT'
-        DataType = ftString
-        Size = 4
-      end
-      item
-        Name = 'HIRE_DATE'
-        Attributes = [faRequired]
-        DataType = ftTimeStamp
-      end
-      item
-        Name = 'DEPT_NO'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 3
-      end
-      item
-        Name = 'JOB_CODE'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 5
-      end
-      item
-        Name = 'JOB_GRADE'
-        Attributes = [faRequired]
-        DataType = ftSmallint
-      end
-      item
-        Name = 'JOB_COUNTRY'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 15
-      end
-      item
-        Name = 'SALARY'
-        Attributes = [faRequired]
-        DataType = ftFloat
-        Precision = 15
-      end
-      item
-        Name = 'FULL_NAME'
-        DataType = ftString
-        Size = 37
-      end>
+    FieldDefs = <>
     IndexDefs = <>
     MasterFields = ''
     FetchOptions.AssignedValues = [evMode]
@@ -1353,7 +1292,7 @@ object Form2: TForm2
     StateConnection.AutoCheck = False
     StateConnection.InTime = 1000
     RequestTimeOut = 9999999
-    EncodeStrings = True
+    EncodeStrings = False
     Encoding = esUtf8
     StrsTrim = False
     StrsEmpty2Null = False
@@ -1455,6 +1394,7 @@ object Form2: TForm2
   object RESTClientPooler1: TRESTClientPooler
     DataCompression = True
     Encoding = esUtf8
+    hEncodeStrings = False
     Host = 'localhost'
     UserName = 'testserver'
     Password = 'testserver'

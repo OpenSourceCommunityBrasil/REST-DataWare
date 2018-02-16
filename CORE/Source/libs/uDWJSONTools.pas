@@ -6,7 +6,7 @@ interface
 
 Uses
   {$IFDEF FPC}
-   SysUtils, Classes, uDWConsts, IdGlobal, IdCoderMIME, uDWConstsData, IdHashMessageDigest, base64, LConvEncoding;
+   SysUtils, Classes, uDWConsts, IdGlobal, IdCoderMIME, uDWConstsData, IdHashMessageDigest, base64, LConvEncoding, lazutf8;
   {$ELSE}
    {$if CompilerVersion > 21} // Delphi 2010 pra cima
     System.SysUtils, ServerUtils, System.Classes, IdGlobal, IdCoderMIME, uDWConsts, uDWConstsData, IdHashMessageDigest;
@@ -58,7 +58,8 @@ Function HexStringToString(Value : String) : String;
 Procedure HexStringToStream(Value : String; Var BinaryStream : TStringStream);
 Function  StreamToHex(Value : TStream) : String;
 {$IFDEF FPC}
-Function  GetStringEncode(Value : String;DatabaseCharSet : TDatabaseCharSet) : String;
+Function  GetStringUnicode(Value : String) : String;
+Function  GetStringEncode (Value : String;DatabaseCharSet : TDatabaseCharSet) : String;
 {$ENDIF}
 
 Implementation
@@ -66,6 +67,22 @@ Implementation
 Uses SysTypes;
 
 {$IFDEF FPC}
+Function  GetStringUnicode(Value : String) : String;
+Var
+ Unicode,
+ Charlen : Integer;
+ P       : PChar;
+Begin
+ P := PChar(Value);
+ Result := '';
+ Repeat
+  Unicode := UTF8CharacterToUnicode(P, Charlen);
+  Result  := Result + UTF8Copy(p, 1, 1);
+  Inc(P, Charlen);
+ Until (Charlen = 0) or (Unicode = 0);
+ Result := P;
+End;
+
 Function  GetStringEncode(Value : String;DatabaseCharSet : TDatabaseCharSet) : String;
 Begin
  Result := Value;

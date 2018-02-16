@@ -19,7 +19,7 @@ object ServerMethodDM: TServerMethodDM
     PoolerOffMessage = 'RESTPooler not active.'
     ParamCreate = True
     left = 80
-    top = 176
+    top = 152
   end
   object Server_FDConnection: TIBConnection
     Connected = False
@@ -40,7 +40,7 @@ object ServerMethodDM: TServerMethodDM
     CommitRecords = 100
     Connection = Server_FDConnection
     left = 83
-    top = 103
+    top = 88
   end
   object DWServerEvents1: TDWServerEvents
     IgnoreInvalidParams = False

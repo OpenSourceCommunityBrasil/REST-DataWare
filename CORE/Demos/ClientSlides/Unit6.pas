@@ -81,11 +81,13 @@ begin
    RESTDWDataBase1.Password      := EdPasswordDW.Text;
    RESTDWDataBase1.Compression   := CheckBox1.Checked;
    RESTDWDataBase1.Open;
-   RESTDWClientSQL1.Active       := False;
-   RESTDWClientSQL1.SQL.Clear;
-   RESTDWClientSQL1.SQL.Add('Insert into IMAGELIST (BLOBIMAGE) values (:img)');
-   RESTDWClientSQL1.ParamByName('img').LoadFromFile(OpenPictureDialog1.FileName, ftBlob);
-   If Not RESTDWClientSQL1.ExecSQL(vError) Then
+   RESTDWClientSQL1.Insert;
+   TBlobField(RESTDWClientSQL1.FindField('BLOBIMAGE')).LoadFromFile(OpenPictureDialog1.FileName);
+   RESTDWClientSQL1.Post;
+//   RESTDWClientSQL1.SQL.Clear;
+//   RESTDWClientSQL1.SQL.Add('Insert into IMAGELIST (BLOBIMAGE) values (:img)');
+//   RESTDWClientSQL1.ParamByName('img').LoadFromFile(OpenPictureDialog1.FileName, ftBlob);
+   If Not RESTDWClientSQL1.ApplyUpdates(vError) Then
     Showmessage(vError)
    Else
     Button1.OnClick(Self);

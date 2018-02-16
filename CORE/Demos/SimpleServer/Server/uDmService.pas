@@ -51,7 +51,6 @@ TYPE
     FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink;
     FDTransaction1: TFDTransaction;
     FDQuery1: TFDQuery;
-    PROCEDURE ServerMethodDataModuleReplyEvent(SendType: TSendEvent; Context: STRING; VAR Params: TDWParams; VAR Result: STRING);
     PROCEDURE ServerMethodDataModuleCreate(Sender: TObject);
     PROCEDURE Server_FDConnectionBeforeConnect(Sender: TObject);
     PROCEDURE ServerMethodDataModuleWelcomeMessage(Welcomemsg: STRING);
@@ -69,7 +68,6 @@ TYPE
   PRIVATE
     { Private declarations }
     vIDVenda : Integer;
-    FUNCTION ConsultaBanco(VAR Params: TDWParams): STRING; OVERLOAD;
     function GetGenID(GenName: String): Integer;
   PUBLIC
     { Public declarations }
@@ -82,38 +80,6 @@ IMPLEMENTATION
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
-
-FUNCTION TServerMethodDM.ConsultaBanco(VAR Params: TDWParams): STRING;
-VAR
-  VSQL: STRING;
-  JSONValue: TJSONValue;
-  FdQuery: TFDQuery;
-BEGIN
-  IF Params.ItemsString['SQL'] <> NIL THEN
-  BEGIN
-    JSONValue          := UDWJSONObject.TJSONValue.Create;
-    JSONValue.Encoding := Encoding;
-    IF Params.ItemsString['SQL'].Value <> '' THEN
-    BEGIN
-      IF Params.ItemsString['TESTPARAM'] <> NIL THEN
-        Params.ItemsString['TESTPARAM'].SetValue('OK, OK');
-      VSQL := Params.ItemsString['SQL'].Value;
-{$IFDEF FPC}
-{$ELSE}
-      FdQuery := TFDQuery.Create(NIL);
-      TRY
-        FdQuery.Connection := Server_FDConnection;
-        FdQuery.SQL.Add(VSQL);
-        JSONValue.LoadFromDataset('sql', FdQuery, RestDWForm.CbEncode.Checked);
-        Result := JSONValue.ToJSON;
-      FINALLY
-        JSONValue.Free;
-        FdQuery.Free;
-      END;
-{$ENDIF}
-    END;
-  END;
-END;
 
 procedure TServerMethodDM.DWServerEvents1EventsgetemployeeReplyEvent(
   var Params: TDWParams; var Result: string);
@@ -237,27 +203,6 @@ begin
      MassiveDataset.Fields.FieldByName('ID_ITEMS').Value := IntToStr(GetGenID('GEN_' + lowercase(MassiveDataset.TableName)));
   End;
 end;
-
-PROCEDURE TServerMethodDM.ServerMethodDataModuleReplyEvent(SendType: TSendEvent; Context: STRING; VAR Params: TDWParams; VAR Result: STRING);
-VAR
-  JSONObject: TJSONObject;
-BEGIN
-  JSONObject := TJSONObject.Create;
-  CASE SendType OF
-    SePOST:
-      BEGIN
-        IF UpperCase(Context) = UpperCase('EMPLOYEE') THEN
-          Result := ConsultaBanco(Params)
-        ELSE
-        BEGIN
-          JSONObject.AddPair(TJSONPair.Create('STATUS', 'NOK'));
-          JSONObject.AddPair(TJSONPair.Create('MENSAGEM', 'Método não encontrado'));
-          Result := JSONObject.ToJSON;
-        END;
-      END;
-  END;
-  JSONObject.Free;
-END;
 
 PROCEDURE TServerMethodDM.ServerMethodDataModuleWelcomeMessage(Welcomemsg: STRING);
 BEGIN

@@ -63,9 +63,7 @@ type
     memoResp: TMemo;
     Label19: TLabel;
     Label18: TLabel;
-    cbEncode: TCheckBox;
     RESTServicePooler1: TRESTServicePooler;
-    CheckBox1: TCheckBox;
     tupdatelogs: TTimer;
     procedure ctiPrincipalClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -349,7 +347,6 @@ begin
    RESTServicePooler1.SSLPrivateKeyFile     := ePrivKeyFile.Text;
    RESTServicePooler1.SSLPrivateKeyPassword := ePrivKeyPass.Text;
    RESTServicePooler1.SSLCertFile           := eCertFile.Text;
-   RESTServicePooler1.EncodeStrings         := cbEncode.Checked;
    RESTServicePooler1.Active                := True;
    If Not RESTServicePooler1.Active Then
     Exit;

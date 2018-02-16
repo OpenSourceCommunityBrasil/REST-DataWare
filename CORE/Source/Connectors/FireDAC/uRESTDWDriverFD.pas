@@ -779,6 +779,7 @@ Begin
     vTempQuery.Active := True;
     If Result = Nil Then
      Result := TJSONValue.Create;
+    Result.Encoding := Encoding;
     Try
      Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
     Finally
@@ -1519,6 +1520,7 @@ Begin
        vTempQuery.Open;
        If Result = Nil Then
         Result         := TJSONValue.Create;
+       Result.Encoding := Encoding;
        Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
        Error         := False;
       Except
@@ -1570,6 +1572,7 @@ Begin
     vTempQuery.Open;
     vTempQuery.fetchall;
     Result         := TJSONValue.Create;
+    Result.Encoding := Encoding;
     Try
      Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
      Error         := False;
@@ -1807,8 +1810,8 @@ Begin
      End;
     vTempQuery.Open;
     vTempJSON  := TJSONValue.Create;
-    vTempJSON.Encoded := True;
-    vTempJSON.LoadFromDataset('RESULTDATA', vTempQuery, True);
+    vTempJSON.Encoding := Encoding;
+    vTempJSON.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
     Try
      If Length(vJSONLine) = 0 Then
       vJSONLine := Format('%s', [vTempJSON.ToJSON])
@@ -1829,10 +1832,13 @@ Begin
     End;
    End;
  End;
- Result         := TJSONValue.Create;
+ Result             := TJSONValue.Create;
+ Result.Encoding    := Encoding;
+ Result.ObjectValue := ovBlob;
  Try
-  vJSONLine     := Format('[%s]', [vJSONLine]);
-  Result.SetValue(vJSONLine);
+  vJSONLine         := Format('[%s]', [vJSONLine]);
+  Result.StringToBytes(vJSONLine, EncodeStringsJSON);
+//  Result.SetValue(vJSONLine);
  Finally
 
  End;
