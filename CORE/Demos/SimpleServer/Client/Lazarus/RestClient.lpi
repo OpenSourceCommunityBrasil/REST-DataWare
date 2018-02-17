@@ -25,30 +25,24 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="7">
+    <RequiredPackages Count="5">
       <Item1>
-        <PackageName Value="utf8tools"/>
+        <PackageName Value="RestEasyObjectsCORE"/>
       </Item1>
       <Item2>
-        <PackageName Value="JVCL"/>
+        <PackageName Value="indylaz"/>
       </Item2>
       <Item3>
-        <PackageName Value="RestEasyObjectsCORE"/>
+        <PackageName Value="MemDSLaz"/>
       </Item3>
       <Item4>
-        <PackageName Value="indylaz"/>
+        <PackageName Value="FCL"/>
       </Item4>
       <Item5>
-        <PackageName Value="MemDSLaz"/>
-      </Item5>
-      <Item6>
-        <PackageName Value="FCL"/>
-      </Item6>
-      <Item7>
         <PackageName Value="LCL"/>
-      </Item7>
+      </Item5>
     </RequiredPackages>
-    <Units Count="3">
+    <Units Count="2">
       <Unit0>
         <Filename Value="RestClient.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -60,11 +54,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit1>
-      <Unit2>
-        <Filename Value="urestrequest.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="uRESTRequest"/>
-      </Unit2>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

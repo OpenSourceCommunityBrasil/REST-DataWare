@@ -5,7 +5,7 @@ interface
 uses
   Lcl, uDWJSON, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, fpjson, jsonparser, DB, BufDataset, DBGrids, ExtCtrls, ComCtrls,
-  uRESTDWPoolerDB, uRESTDWServerEvents, uRESTDWBase, JvMemDS, IdComponent;
+  uRESTDWPoolerDB, uRESTDWServerEvents, uRESTDWBase, IdComponent;
 
 type
 
