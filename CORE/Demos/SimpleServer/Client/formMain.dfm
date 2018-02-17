@@ -1215,10 +1215,16 @@ object Form2: TForm2
     Datapacks = -1
     OnGetDataError = RESTDWClientSQL1GetDataError
     DataCache = True
-    Params = <>
+    Params = <
+      item
+        DataType = ftTimeStamp
+        Name = 'HIRE_DATE'
+        ParamType = ptInput
+      end>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
-      'select * from EMPLOYEE')
+      'select * from EMPLOYEE'
+      'Where HIRE_DATE > :HIRE_DATE')
     UpdateTableName = 'employee'
     CacheUpdateRecords = True
     AutoCommitData = False

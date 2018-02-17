@@ -131,6 +131,7 @@ BEGIN
   RESTDWClientSQL1.SQL.Clear;
   RESTDWClientSQL1.SQL.Add(MComando.Text);
   TRY
+//   RESTDWClientSQL1.ParamByName('HIRE_DATE').AsDateTime := Now;
     RESTDWClientSQL1.Active := True;
   EXCEPT
     ON E: Exception DO
