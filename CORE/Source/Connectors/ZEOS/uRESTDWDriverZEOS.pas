@@ -14,8 +14,8 @@ uses
  {$ENDIF}
  ZSqlUpdate,               ZAbstractRODataset,      ZAbstractDataset,
  ZDataset,                 ZConnection,             ZStoredProcedure,
- ZSQLProcessor,            uDWConsts,
- uDWConstsData,            uRestDWPoolerDB,         udwjson,
+ ZSqlProcessor,            uDWConsts,
+ uDWConstsData,            uRESTDWPoolerDB,         uDWJSON,
  uDWJSONObject,            uDWMassiveBuffer,        Variants,
  uDWDatamodule,            SysTypes;
 

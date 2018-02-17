@@ -7,7 +7,7 @@ uses SysUtils, Classes, DB, sqldb,       mssqlconn,     pqconnection,
      mysql50conn,       mysql51conn,     mysql55conn,   mysql56conn,
      mysql57conn,       sqlite3conn,     ibconnection,  uDWConsts,
      uDWConstsData,     uRESTDWPoolerDB, uDWJSONObject, uDWMassiveBuffer,
-     udwjson,           SysTypes,        uDWDatamodule, Variants;
+     uDWJSON,           SysTypes,        uDWDatamodule, Variants;
 
 Type
 

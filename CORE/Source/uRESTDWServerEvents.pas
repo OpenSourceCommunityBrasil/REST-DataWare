@@ -4,7 +4,7 @@ interface
 
 Uses
  SysUtils, Classes, uDWJSONObject, uDWConsts, uDWConstsData,
- uRESTDWBase, uDWJSONTools, udwjson {$IFNDEF FPC}
+ uRESTDWBase, uDWJSONTools, uDWJSON {$IFNDEF FPC}
                                     {$IF CompilerVersion > 21}
                                     {$IFDEF POSIX}
                                     {$IF Defined(ANDROID) or Defined(IOS)} //Alterado para IOS Brito
