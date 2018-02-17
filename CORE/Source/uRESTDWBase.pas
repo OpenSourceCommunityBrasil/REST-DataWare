@@ -1546,6 +1546,7 @@ Var
            vValue := DecodeStrings(stringreplace(bJsonOBJ.pairs[4].JsonValue.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]) )
           Else
            vValue := bJsonOBJ.pairs[4].JsonValue.tostring;
+           vValue:=stringreplace(vValue, '"', '',[rfReplaceAll, rfIgnoreCase]);
           JSONParam.SetValue(vValue, JSONParam.Encoded);
           //bJsonOBJ.clean;
           FreeAndNil(bJsonOBJ);

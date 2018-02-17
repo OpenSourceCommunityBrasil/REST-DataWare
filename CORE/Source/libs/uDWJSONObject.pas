@@ -752,6 +752,16 @@ Begin
                                                                GetValueType(vObjectValue),         vtagName,
                                                                GetValueJSON(aResult)])
      Else
+       If (vObjectValue In [ovFloat,  ovCurrency,  ovBCD,
+                          ovFMTBcd, ovExtended]) Then
+        Begin
+          Result := Format(TValueFormatJSONValueS, ['ObjectType',  GetObjectName(vTypeObject),         'Direction',
+                                                               GetDirectionName(vObjectDirection), 'Encoded',
+                                                               EncodedString,                      'ValueType',
+                                                               GetValueType(vObjectValue),         vtagName,
+                                                               GetValueJSON(BuildStringFloat(aResult))]);
+      End
+      else
       Begin
        If (vObjectValue In [ovBlob, ovGraphic, ovOraBlob, ovOraClob]) Then
         Begin
@@ -810,7 +820,13 @@ If vEncoded Then
    End;
  End
 Else
- vTempString := BytesArrToString(aValue, GetEncodingID(vEncoding));
+Begin
+   If Length(vTempString) = 0 Then
+    Begin
+      vTempString := BytesArrToString(aValue, GetEncodingID(vEncoding));
+    End;
+  End;
+
 If vObjectValue = ovString Then
  Begin
   If vTempString <> '' Then
