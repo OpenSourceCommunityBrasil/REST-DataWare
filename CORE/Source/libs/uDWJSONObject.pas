@@ -495,14 +495,16 @@ Var
  bJsonArray : udwjson.TJsonArray;
  JSONParam  : TJSONParam;
  I          : Integer;
+ vTempString : String;
 Begin
- bJsonValue := udwjson.TJsonObject.Create(Format('{"PARAMS":[%s]}', [JSON]));
+ vTempString := Format('{"PARAMS":[%s]}', [JSON]);
+ bJsonValue := udwjson.TJsonObject.Create(vTempString);
  Try
   bJsonArray  := bJsonValue.optJSONArray(bJsonValue.names.get(0).ToString);
   For I := 0 To bJsonArray.Length - 1 Do
    Begin
     JSONParam := TJSONParam.Create(vEncoding);
-    bJsonOBJ  := udwjson.TJsonObject.Create(bJsonArray.get(I).ToString);
+    bJsonOBJ  := bJsonArray.optJSONObject(I);
     Try
      JSONParam.ParamName       := Lowercase           (bJsonOBJ.names.get(4).ToString);
      JSONParam.ObjectDirection := GetDirectionName    (bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString);
@@ -514,8 +516,8 @@ Begin
       JSONParam.SetValue(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString, JSONParam.Encoded);
      Add(JSONParam);
     Finally
-     bJsonOBJ.Clean;
-     FreeAndNil(bJsonOBJ);
+//     bJsonOBJ.Clean;
+//     FreeAndNil(bJsonOBJ);
     End;
    End;
  Finally
@@ -1149,7 +1151,7 @@ Begin
    If Not(vObjectValue in [ovString, ovFixedChar,   ovWideString,
                            ovFixedWideChar, ovBlob, ovGraphic,
                            ovOraBlob, ovOraClob, ovMemo, ovWideMemo, ovFmtMemo]) Then
-    vTempValue  := FormatValue('null')
+    vTempValue  := FormatValue('"null"')
    Else
     vTempValue  := FormatValue('');
   End
