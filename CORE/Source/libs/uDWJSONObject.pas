@@ -2268,7 +2268,7 @@ Begin
    {$IFDEF FPC}
    aValue := TIdBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])));
    {$ELSE}
-   aValue := ToBytes(Format(TJsonStringValue, [bValue]), GetEncodingID(vEncoding));
+   aValue := ToBytes(BuildFloatString(Format(TJsonStringValue, [bValue])), GetEncodingID(vEncoding));
    {$ENDIF}
   End
  Else
