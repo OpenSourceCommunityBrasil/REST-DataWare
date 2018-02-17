@@ -2219,7 +2219,8 @@ destructor TJSONObject.destroy;
 begin
   clean;
 //  myHashMap.Clear;
-  FreeAndNil(myHashMap);
+  if Assigned(myHashMap) then
+   FreeAndNil(myHashMap);
   if Assigned(ja) then
    FreeAndNil(ja);
   inherited;
@@ -2275,8 +2276,8 @@ begin
       and (obj <> CONST_TRUE)
       and (Assigned(obj)) then
      Begin
-      FreeAndNil(obj);
-//      Dispose(myArrayList[0]);
+      Dispose(myArrayList[0]);
+//      FreeAndNil(obj);
      End;
     myArrayList.Delete(0);
   end;
@@ -2994,23 +2995,26 @@ End;
 
 Procedure TJSONObject.clean;
 begin
- While myHashMap.Count > 0 do
+ If Assigned(myHashMap) Then
   Begin
-   If (myHashMap.Objects[0] <> CONST_FALSE) And
-      (myHashMap.Objects[0] <> CONST_TRUE)  And
-      (Assigned(myHashMap.Objects[0]))      Then
+   While myHashMap.Count > 0 do
     Begin
-     Try
-      myHashMap.Objects[0].Free;
-     Except
+     If (myHashMap.Objects[0] <> CONST_FALSE) And
+        (myHashMap.Objects[0] <> CONST_TRUE)  And
+        (Assigned(myHashMap.Objects[0]))      Then
+      Begin
+       Try
+        myHashMap.Objects[0].Free;
+       Except
 
+       End;
+      End;
+     Try
+      myHashMap.Delete(0);
+     Except
+      Exit;
      End;
     End;
-   Try
-    myHashMap.Delete(0);
-   Except
-    Exit;
-   End;
   End;
 End;
 
