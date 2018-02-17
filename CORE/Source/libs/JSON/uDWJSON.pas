@@ -2276,11 +2276,11 @@ begin
       and (obj <> CONST_TRUE)
       and (Assigned(obj)) then
      Begin
-      {$IFNDEF FPC}
-      Dispose(myArrayList[0]);
-      {$ELSE}
+//      {$IFNDEF FPC}
+//      Dispose(myArrayList[0]);
+//      {$ELSE}
       FreeAndNil(obj);
-      {$ENDIF}
+//      {$ENDIF}
      End;
     myArrayList.Delete(0);
   end;
