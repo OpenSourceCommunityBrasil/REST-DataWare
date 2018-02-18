@@ -1546,7 +1546,18 @@ Var
            vValue := DecodeStrings(stringreplace(bJsonOBJ.pairs[4].JsonValue.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]) )
           Else
            vValue := bJsonOBJ.pairs[4].JsonValue.tostring;
-           vValue:=stringreplace(vValue, '"', '',[rfReplaceAll, rfIgnoreCase]);
+           If Trim(vValue) <> '' Then
+  Begin
+   If (vValue[InitStrPos] = '"')      And
+      (vValue[Length(vValue) - FinalStrPos] = '"') Then
+    Begin
+     Delete(vValue, InitStrPos+FinalStrPos, 1);
+     Delete(vValue, Length(vValue), 1);
+    End;
+  End;
+
+
+         //  vValue:=stringreplace(vValue, '"', '',[rfReplaceAll, rfIgnoreCase]);
           JSONParam.SetValue(vValue, JSONParam.Encoded);
           //bJsonOBJ.clean;
           FreeAndNil(bJsonOBJ);
