@@ -396,6 +396,17 @@ implementation
 
 Uses uDWDatamodule, uRESTDWPoolerDB, SysTypes, uDWJSONTools, uRESTDWServerEvents;
 
+
+Procedure DeleteInvalidChar(Var Value : String);
+Begin
+ If Length(Value) > 0 Then
+  If Value[InitStrPos] <> '{' then
+   Delete(Value, InitStrPos, 1);
+ If Length(Value) > 0 Then
+  If Value[Length(Value) - FinalStrPos] <> '{' then
+   Delete(Value, Length(Value) - FinalStrPos, 1);
+End;
+
 { TRESTServiceCGI }
 
 {$IFDEF FPC}
@@ -1864,13 +1875,13 @@ Var
   vTempValue    : String;
  Begin
   ResultJSON := InputValue;
-  If Pos(', "RESULT":[', InputValue) = 0 Then
+  If Pos(', "RESULT":[{"MESSAGE":"', InputValue) = 0 Then //TODO Brito
    Exit;
   Try
-   InitPos    := Pos(', "RESULT":[', InputValue) + Length(', "RESULT":[') ;
+   InitPos    := Pos(', "RESULT":[{"MESSAGE":"', InputValue) + Length(', "RESULT":[') ; //TODO Brito
    aValue     := Copy(InputValue, InitPos, Length(InputValue));
-   If Pos(']}', aValue) > 0 Then
-    aValue    := Copy(aValue, 1, length(aValue)-2); //Copy(aValue, 1, Pos(']}', aValue) -1);      //CRISTIANO BARBOSA -
+   If Pos(']}', aValue) > 0 Then                                                        //TODO Brito
+    aValue    := Copy(aValue, 1, Pos(']}', aValue) -1);                                 //TODO Brito
    vTempValue := aValue;
    InputValue := Copy(InputValue, 1, InitPos -1) + ']}'; //Delete(InputValue, InitPos, Pos(']}', InputValue) - InitPos);
    If (Params <> Nil) And (InputValue <> '{"PARAMS"]}') Then
@@ -1912,8 +1923,13 @@ Var
            Begin
             If (JSONParam.Encoded) Then
              vValue := DecodeStrings(bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString)
-            Else
-             vValue := bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString;
+            Else If JSONParam.ObjectValue <> ovObject then
+             vValue := bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString
+            Else                                            //TODO Brito
+             Begin
+              vValue := bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString;
+              DeleteInvalidChar(vValue);
+             End;
            End
           Else
            vValue := bJsonOBJ.opt(bJsonOBJ.names.get(4).ToString).ToString;

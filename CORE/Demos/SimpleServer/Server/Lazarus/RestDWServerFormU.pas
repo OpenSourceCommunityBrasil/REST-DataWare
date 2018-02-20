@@ -3,7 +3,7 @@ unit RestDWServerFormU;
 Interface
 
 Uses LCL, LCLIntf, LCLType, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, winsock, uSock, IniFiles, IBConnection, db, uRESTDWBase,
+  Dialogs, uSock, IniFiles, IBConnection, db, uRESTDWBase,
   ServerMethodsUnit1, ComCtrls, MaskEdit, StdCtrls, ExtCtrls, Menus,
   IdComponent, IdBaseComponent, IdTCPConnection, IdTCPClient, IdHTTP;
 
@@ -318,6 +318,12 @@ Begin
        vTag        := 1;
       End;
     End;
+   cbAdaptadores.ItemIndex := vTag;
+  End;
+ If cbAdaptadores.Items.Count > 0 Then
+  Begin
+   vTag        := 0;
+   vDatabaseIP := aNetInterfaceList[vTag].AddrIP;
    cbAdaptadores.ItemIndex := vTag;
   End;
  ini                     := TIniFile.Create(FCfgName);

@@ -4,10 +4,10 @@ object ServerMethodDM: TServerMethodDM
   Encoding = esUtf8
   OnReplyEvent = ServerMethodDataModuleReplyEvent
   OnWelcomeMessage = DataModuleWelcomeMessage
-  Height = 337
+  Height = 251
   HorizontalOffset = 508
   VerticalOffset = 207
-  Width = 555
+  Width = 380
   PPI = 96
   object RESTDWPoolerDB1: TRESTDWPoolerDB
     RESTDriver = RESTDWDriverFD1
@@ -124,21 +124,21 @@ object ServerMethodDM: TServerMethodDM
         Name = 'getemployee'
         OnReplyEvent = DWServerEvents1EventsgetemployeeReplyEvent
       end>
-    left = 224
-    top = 144
+    left = 192
+    top = 104
   end
   object FDQuery1: TSQLQuery
     FieldDefs = <>
     Database = Server_FDConnection
     Transaction = SQLTransaction1
     Params = <>
-    left = 248
-    top = 40
+    left = 272
+    top = 24
   end
   object SQLTransaction1: TSQLTransaction
     Active = False
     Database = Server_FDConnection
-    left = 184
-    top = 40
+    left = 192
+    top = 24
   end
 end

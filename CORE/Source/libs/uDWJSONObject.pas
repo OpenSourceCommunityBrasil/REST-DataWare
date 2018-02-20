@@ -170,6 +170,7 @@ Private
  Procedure SetAsLargeInt(Value     : LargeInt);
  Procedure SetObjectValue(Value    : TObjectValue);
  Function  GetByteString           : String;
+ Procedure SetAsObject(Value       : String);
 Public
  Constructor Create(Encoding       : TEncodeSelect);
  Destructor  Destroy; Override;
@@ -216,6 +217,7 @@ Public
  Property    AsLongWord            : LongWord         Read GetAsLongWord    Write SetAsLongWord;
  Property    AsLargeInt            : LargeInt         Read GetAsLargeInt    Write SetAsLargeInt;
  Property    AsString              : String           Read GetAsString      Write SetAsString;
+ Property    AsObject              : String           Read GetAsString      Write SetAsObject;
  Property    AsByteString          : String           Read GetByteString;
  {$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}
  Property    AsWideString          : WideString       Read GetAsWideString  Write SetAsWideString;
@@ -736,7 +738,7 @@ Begin
   aResult := '""';
  If JsonMode = jmDataware Then
   Begin
-   If vTypeObject = toDataset Then
+   If (vTypeObject = toDataset) Or (vObjectValue  = ovObject) Then
     Result := Format(TValueFormatJSON,      ['ObjectType', GetObjectName(vTypeObject),         'Direction',
                                                            GetDirectionName(vObjectDirection), 'Encoded',
                                                            EncodedString,                      'ValueType',
@@ -2245,7 +2247,7 @@ Begin
  SetLength(aValue, 0);
  If bValue = '' Then
   Exit;
- If vObjectValue in [ovString, ovMemo, ovWideMemo, ovFmtMemo] Then
+ If vObjectValue in [ovString, ovMemo, ovWideMemo, ovFmtMemo, ovObject] Then
   Begin
    {$IFDEF FPC}
    If vEncodingLazarus = Nil Then
@@ -2254,7 +2256,7 @@ Begin
     aValue := TIdBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
    Else
     Begin
-     If jsonmode = jmDataware Then
+     If ((jsonmode = jmDataware) And (vencoded)) Or Not(vObjectValue  = ovObject) Then
       aValue := TIdBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
      Else
       aValue := TIdBytes(vEncodingLazarus.GetBytes(bValue));
@@ -2264,7 +2266,7 @@ Begin
     aValue := ToBytes(Format(TJsonStringValue, [bValue]), GetEncodingID(vEncoding)) //TIdBytes(vEncoding.GetBytes(Format(TJsonStringValue, [bValue])));
    Else
     Begin
-     If jsonmode = jmDataware Then
+     If ((jsonmode = jmDataware) And (vencoded)) Or Not(vObjectValue  = ovObject) Then
       aValue := ToBytes(Format(TJsonStringValue, [bValue]), GetEncodingID(vEncoding))
      Else
       aValue := ToBytes(bValue, GetEncodingID(vEncoding));
@@ -2506,6 +2508,11 @@ begin
  SetDataValue(Value, ovLongWord);
 end;
 
+procedure TJSONParam.SetAsObject(Value: String);
+begin
+ SetDataValue(Value, ovObject);
+end;
+
 procedure TJSONParam.SetAsShortInt(Value: Integer);
 begin
  SetDataValue(Value, ovShortInt);
@@ -2633,9 +2640,12 @@ begin
   ovWideMemo,
   ovFixedWideChar,
   ovMemo,
-  ovFmtMemo   : Begin
-//                 vEncoded     := True;
-                 vObjectValue := ovString;
+  ovFmtMemo,
+  ovObject   : Begin
+                 If vObjectValue <> ovObject then
+                  vObjectValue := ovString
+                 Else
+                  vObjectValue := ovObject;
                  SetValue(Value, vEncoded);
                 End;
  End;
