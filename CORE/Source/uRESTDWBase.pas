@@ -1875,10 +1875,14 @@ Var
   vTempValue    : String;
  Begin
   ResultJSON := InputValue;
-  If Pos(', "RESULT":[{"MESSAGE":"', InputValue) = 0 Then //TODO Brito
+  If (Pos(', "RESULT":[{"MESSAGE":"', InputValue) = 0) And
+     (Pos(', "RESULT":[', InputValue) = 0)             Then //TODO Brito
    Exit;
   Try
-   InitPos    := Pos(', "RESULT":[{"MESSAGE":"', InputValue) + Length(', "RESULT":[') ; //TODO Brito
+   If (Pos(', "RESULT":[{"MESSAGE":"', InputValue) > 0) Then
+    InitPos   := Pos(', "RESULT":[{"MESSAGE":"', InputValue) + Length(', "RESULT":[')   //TODO Brito
+   Else
+    InitPos   := Pos(', "RESULT":[', InputValue) + Length(', "RESULT":[');
    aValue     := Copy(InputValue, InitPos, Length(InputValue));
    If Pos(']}', aValue) > 0 Then                                                        //TODO Brito
     aValue    := Copy(aValue, 1, Pos(']}', aValue) -1);                                 //TODO Brito
