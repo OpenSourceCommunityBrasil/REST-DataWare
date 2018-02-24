@@ -6,7 +6,7 @@
         <Config Condition="'$(Config)'==''">Debug</Config>
         <TargetedPlatforms>1119</TargetedPlatforms>
         <AppType>Package</AppType>
-        <FrameworkType>None</FrameworkType>
+        <FrameworkType>VCL</FrameworkType>
         <ProjectVersion>18.2</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
     </PropertyGroup>
@@ -90,7 +90,7 @@
         <DCC_N>false</DCC_N>
         <DCC_F>false</DCC_F>
         <DCC_S>false</DCC_S>
-        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Posix;Winapi;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Posix;Winapi;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=;CFBundleName=</VerInfo_Keys>
         <DCC_E>false</DCC_E>
         <GenDll>true</GenDll>
@@ -179,6 +179,8 @@
         <DCCReference Include="FireDACCommonDriver.dcp"/>
         <DCCReference Include="FireDACCommon.dcp"/>
         <DCCReference Include="dsnap.dcp"/>
+        <DCCReference Include="dcldb.dcp"/>
+        <DCCReference Include="dcllmdtoolsdb.dcp"/>
         <DCCReference Include="..\..\..\Source\uDWPoolerMethod.pas"/>
         <DCCReference Include="..\..\..\Source\uRESTDWBase.pas"/>
         <DCCReference Include="..\..\..\Source\uRESTDWMasterDetailData.pas"/>

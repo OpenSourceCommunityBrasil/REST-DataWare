@@ -63,6 +63,18 @@ Type
 {$ENDIF}
 
 Type
+ TFieldDefinition = Class
+  FieldName : String;
+  DataType  : TFieldType;
+  Size,
+  Precision : Integer;
+  Required  : Boolean;
+End;
+
+Type
+ TFieldsList = Array of TFieldDefinition;
+
+Type
  TTimerData = Class(TThread)
  Private
   FValue : Integer;          //Milisegundos para execução
@@ -239,6 +251,7 @@ Type
   Procedure   ProcInBlockEvents  (Const BlockEvent : Boolean);virtual;
   {$ENDIF}
  Private
+  vFieldsList          : TFieldsList;
   vRESTClientPooler    : TRESTClientPooler;
   vMassiveCache        : TDWMassiveCache;
   vOldStatus           : TDatasetState;
@@ -260,6 +273,7 @@ Type
   vAfterInsert,
   vAfterPost,
   vAfterCancel         : TDatasetEvents;
+  vInDesignEvents,
   vAutoCommitData,
   vAutoRefreshAfterCommit,
   vInBlockEvents       : Boolean;
@@ -341,9 +355,17 @@ Type
   Procedure   ProcAfterCancel    (DataSet   : TDataSet);
   procedure   CreateMassiveDataset;
   procedure   SetParams(const Value: TParams);
-  procedure   SetInBlockEvents(const Value: Boolean);
+  Procedure   CleanFieldList;
  Public
   //Métodos
+  Procedure   SetInBlockEvents(const Value: Boolean);
+  Procedure   SetInDesignEvents(const Value: Boolean);
+  Function    GetInBlockEvents : Boolean;
+  Function    GetInDesignEvents : Boolean;
+  Procedure   NewFieldList;
+  Function    GetFieldListByName(aName : String) : TFieldDefinition;
+  Procedure   NewDataField(Value : TFieldDefinition);
+  Function    FieldListCount    : Integer;
   Procedure   Newtable;
   Procedure   PrepareDetailsNew;
   Procedure   PrepareDetails     (ActiveMode : Boolean);
@@ -355,6 +377,7 @@ Type
   Procedure   ExecOrOpen;                                 //Método Open que será utilizado no Componente
   Procedure   Close;Virtual;                              //Método Close que será utilizado no Componente
   Procedure   CreateDataSet; virtual;
+  Procedure   CreateDatasetFromList;
   Function    ExecSQL          (Var Error : String) : Boolean;   //Método ExecSQL que será utilizado no Componente
   Function    InsertMySQLReturnID : Integer;                     //Método de ExecSQL com retorno de Incremento
   Function    ParamByName          (Value : String) : TParam;    //Retorna o Parametro de Acordo com seu nome
@@ -376,6 +399,7 @@ Type
   Function    MassiveToJSON : String; //Transporte de MASSIVE em formato JSON
   Procedure   DWParams        (Var Value  : TDWParams);
   Procedure   RebuildMassiveDataset;
+  Property    ServerFieldList     : TFieldsList         Read vFieldsList;
  Published
   Property MasterDataSet          : TRESTDWClientSQL    Read vMasterDataSet            Write SetMasterDataSet;
   Property MasterCascadeDelete    : Boolean             Read vCascadeDelete            Write vCascadeDelete;
@@ -408,7 +432,6 @@ Type
   Property AfterPost              : TDatasetEvents      Read vAfterPost                Write vAfterPost;
   Property AfterCancel            : TDatasetEvents      Read vAfterCancel              Write vAfterCancel;
   Property OnNewRecord            : TDatasetEvents      Read vNewRecord                Write vNewRecord;
-  Property InBlockEvents          : Boolean             Read vInBlockEvents            Write SetInBlockEvents;
   Property MassiveCache           : TDWMassiveCache     Read vMassiveCache             Write vMassiveCache;
 End;
 
@@ -1715,6 +1738,11 @@ begin
   vInBlockEvents:=Value;
 end;
 
+procedure TRESTDWClientSQL.SetInDesignEvents(const Value: Boolean);
+begin
+ vInDesignEvents := Value;
+end;
+
 procedure TRESTDWClientSQL.SetMasterDataSet(Value: TRESTDWClientSQL);
 Var
  MasterDetailItem : TMasterDetailItem;
@@ -1764,6 +1792,7 @@ Begin
  vBeforeClone                      := False;
  vReadData                         := False;
  vActiveCursor                     := False;
+ vInDesignEvents                   := False;
  vDatapacks                        := -1;
  vCascadeDelete                    := True;
  vSQL                              := TStringList.Create;
@@ -1835,10 +1864,11 @@ Begin
  FreeAndNil(vRESTClientPooler);
  vInactive := False;
  FreeAndNil(vMassiveDataset);
+ NewFieldList;
  Inherited;
 End;
 
-Procedure TRESTDWClientSQL.DWParams(Var Value : TDWParams);
+procedure TRESTDWClientSQL.DWParams(Var Value: TDWParams);
 Begin
  Value := Nil;
  If vRESTDataBase <> Nil Then
@@ -1846,10 +1876,8 @@ Begin
     Value := GetDWParams(vParams, vRESTDataBase.Encoding);
 End;
 
-Procedure TRESTDWClientSQL.DynamicFilter(cFields  : Array of String;
-                                         Value   : String;
-                                         InText  : Boolean;
-                                         AndOrOR : String);
+procedure TRESTDWClientSQL.DynamicFilter(cFields: array of String;
+  Value: String; InText: Boolean; AndOrOR: String);
 Var
  I : Integer;
 begin
@@ -2231,12 +2259,12 @@ begin
   End;
 end;
 
-Procedure TRESTDWClientSQL.RebuildMassiveDataset;
+procedure TRESTDWClientSQL.RebuildMassiveDataset;
 Begin
  CreateMassiveDataset;
 End;
 
-Procedure TRESTDWClientSQL.Refresh;
+procedure TRESTDWClientSQL.Refresh;
 Var
  Cursor : Integer;
 Begin
@@ -2579,25 +2607,67 @@ End;
 procedure TRESTDWClientSQL.CreateDataSet;
 Begin
  vCreateDS := True;
- {$IFDEF FPC}
-  TMemDataset(Self).Open;
- {$ELSE}
- {$IFDEF CLIENTDATASET}
-     TClientDataset(Self).Open;
- {$ENDIF}
- {$IFDEF RESJEDI}
-     TJvMemoryData(Self).Open;
- {$ENDIF}
- {$IFDEF RESTKBMMEMTABLE}
-     Tkbmmemtable(self).open;
- {$ENDIF}
- {$IFDEF RESTFDMEMTABLE}
-     TFDmemtable(self).open;
- {$ENDIF}
+ SetInBlockEvents(True);
+ Try
+  {$IFDEF FPC}
+   TMemDataset(Self).CreateTable;
+   TMemDataset(Self).Open;
+  {$ELSE}
+  {$IFDEF CLIENTDATASET}
+   TClientDataset(Self).CreateDataSet;
+   TClientDataset(Self).Open;
+  {$ENDIF}
+  {$IFDEF RESJEDI}
+   TJvMemoryData(Self).Close;
+   TJvMemoryData(Self).Open;
+  {$ENDIF}
+  {$IFDEF RESTKBMMEMTABLE}
+   Tkbmmemtable(self).open;
+  {$ENDIF}
+  {$IFDEF RESTFDMEMTABLE}
+   TFDmemtable(self).CreateDataSet;
+  {$ENDIF}
+  {$ENDIF}
+  vCreateDS := False;
+ Finally
+ End;
+End;
 
- {$ENDIF}
- vActive   := True;
- vCreateDS := False;
+procedure TRESTDWClientSQL.CreateDatasetFromList;
+Var
+ I        : Integer;
+ FieldDef : TFieldDef;
+Begin
+ TDataset(Self).Close;
+ For I := 0 To Length(vFieldsList) -1 Do
+  Begin
+   FieldDef := FieldDefExist(vFieldsList[I].FieldName);
+   If FieldDef = Nil Then
+    Begin
+     FieldDef          := TDataset(Self).FieldDefs.AddFieldDef;
+     FieldDef.Name     := vFieldsList[I].FieldName;
+     FieldDef.DataType := vFieldsList[I].DataType;
+     FieldDef.Size     := vFieldsList[I].Size;
+     If FieldDef.DataType In [ftFloat, ftCurrency, ftBCD, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
+                                                          {$IFEND}{$ENDIF}ftFMTBcd] Then
+      Begin
+       FieldDef.Size      := vFieldsList[I].Size;
+       FieldDef.Precision := vFieldsList[I].Precision;
+      End;
+     FieldDef.Required    :=  vFieldsList[I].Required;
+    End
+   Else
+    FieldDef.Required    :=  vFieldsList[I].Required;
+  End;
+ CreateDataset;
+End;
+
+procedure TRESTDWClientSQL.CleanFieldList;
+Var
+ I : Integer;
+Begin
+ For I := 0 To Length(vFieldsList) -1 Do
+  FreeAndNil(vFieldsList[I]);
 End;
 
 procedure TRESTDWClientSQL.ClearMassive;
@@ -2629,7 +2699,7 @@ Begin
     Inherited Open;
    End;
  Finally
-  vInBlockEvents := False;
+  vInBlockEvents  := False;
  End;
 End;
 
@@ -2648,35 +2718,59 @@ End;
 procedure TRESTDWClientSQL.OpenCursor(InfoQuery: Boolean);
 Begin
  Try
-  If (vRESTDataBase <> Nil) And Not(vInBlockEvents) Then
+  If (vRESTDataBase <> Nil) And
+     ((Not(vInBlockEvents) or (GetNewData)) Or (vInDesignEvents)) And
+       Not(vActive) Then
    Begin
-    vRESTDataBase.Active := True;
-    If vRESTDataBase.Active Then
+    GetNewData := False;
+    If Not (vRESTDataBase.Active)   Then
+     vRESTDataBase.Active := True;
+    If  ((Self.FieldDefs.Count = 0) Or
+         (vInDesignEvents))         And
+        (Not (vActiveCursor))       Then
      Begin
-      If csDesigning in ComponentState Then
-       Begin
-        If Not vActiveCursor then
-         Begin
-          Try
-           SetActiveDB(True);
-          Except
-           vActiveCursor := False;
-          End;
-         End;
-       End;
-     End;
-    If Not(csDesigning in ComponentState) Then
+      vActiveCursor := True;
+      Try
+       SetActiveDB(True);
+       If vActive Then
+        Begin
+         Inherited Open;
+         vActiveCursor := False;
+         Exit;
+        End;
+      Except
+      End;
+      vActiveCursor := False;
+     End
+    Else If ((Self.FieldDefs.Count > 0) Or
+             (Self.Fields.Count > 0)    Or
+             (vInDesignEvents))         Then
      Begin
-      If (vRESTDataBase.Active) Or Not(vInBlockEvents) Then
-       Inherited OpenCursor(InfoQuery)
-      Else If csDesigning in ComponentState Then
-       Raise Exception.Create(Name+': '+'Database Inactive...');
-     End;
+      Try
+       Inherited OpenCursor(InfoQuery);
+      Except
+       Exception.Create(Name + ': ' + 'Error when try open Dataset...');
+      End;
+     End
+    Else If (Self.FieldDefs.Count = 0)    And
+            (Self.FieldListCount = 0) Then
+     Raise Exception.Create(Name + ': ' + 'No Fields to add on Dataset...')
+    Else
+     Raise Exception.Create(Name + ': ' + 'Error when try open Dataset...');
    End
-  Else If vInBlockEvents Then
-   Inherited OpenCursor(InfoQuery)
+  Else If (vRESTDataBase <> Nil) And
+          ((Self.FieldDefs.Count > 0)  Or
+           (Self.Fields.Count    > 0)) Then
+   Begin
+    Inherited OpenCursor(InfoQuery);
+   End
   Else If csDesigning in ComponentState Then
-   Raise Exception.Create(Name+': '+'Database not found...');
+   Begin
+    If (vRESTDataBase = Nil) then
+     Raise Exception.Create(Name + ': ' + 'Database not found...')
+    Else
+     Raise Exception.Create(Name + ': '+ ' Error when open dataset...');
+   End;
  Except
   On E : Exception do
    Begin
@@ -2743,14 +2837,14 @@ Begin
  Inherited Loaded;
 End;
 
-Function TRESTDWClientSQL.MassiveCount: Integer;
+function TRESTDWClientSQL.MassiveCount: Integer;
 Begin
  Result := 0;
  If Trim(vUpdateTableName) <> '' Then
   Result := TMassiveDatasetBuffer(vMassiveDataset).RecordCount;
 End;
 
-Function TRESTDWClientSQL.MassiveToJSON : String;
+function TRESTDWClientSQL.MassiveToJSON: String;
 Begin
  Result := '';
  If vMassiveDataset <> Nil Then
@@ -2758,7 +2852,31 @@ Begin
    Result := TMassiveDatasetBuffer(vMassiveDataset).ToJSON;
 End;
 
-Procedure TRESTDWClientSQL.Newtable;
+procedure TRESTDWClientSQL.NewDataField(Value: TFieldDefinition);
+Var
+ I : Integer;
+begin
+ SetLength(vFieldsList, Length(vFieldsList) +1);
+ I := Length(vFieldsList) -1;
+ vFieldsList[I] := TFieldDefinition.Create;
+ vFieldsList[I].FieldName := Value.FieldName;
+ vFieldsList[I].DataType  := Value.DataType;
+ vFieldsList[I].Size      := Value.Size;
+ vFieldsList[I].Required  := Value.Required;
+end;
+
+Function TRESTDWClientSQL.FieldListCount: Integer;
+Begin
+ Result := Length(vFieldsList);
+End;
+
+procedure TRESTDWClientSQL.NewFieldList;
+begin
+ CleanFieldList;
+ SetLength(vFieldsList, 0);
+end;
+
+procedure TRESTDWClientSQL.Newtable;
 Begin
  TRESTDWClientSQL(Self).Inactive   := True;
  Try
@@ -2838,13 +2956,13 @@ Begin
     Begin
      If vDetailClient.Active Then
       Begin
-       vOldInBlock   := vDetailClient.InBlockEvents;
+       vOldInBlock   := vDetailClient.GetInBlockEvents;
        Try
-        vDetailClient.InBlockEvents := True;
+        vDetailClient.SetInBlockEvents(True);
         If Self.State = dsInsert Then
          vDetailClient.Newtable;
        Finally
-        vDetailClient.InBlockEvents := vOldInBlock;
+        vDetailClient.SetInBlockEvents(vOldInBlock);
        End;
        vDetailClient.ProcAfterScroll(vDetailClient);
       End
@@ -2852,12 +2970,12 @@ Begin
       Begin
        If vDetailClient.Fields.Count > 0 Then
         Begin
-         vOldInBlock   := vDetailClient.InBlockEvents;
+         vOldInBlock   := vDetailClient.GetInBlockEvents;
          Try
-          vDetailClient.InBlockEvents := True;
+          vDetailClient.SetInBlockEvents(True);
           vDetailClient.Active := True;
          Finally
-          vDetailClient.InBlockEvents := vOldInBlock;
+          vDetailClient.SetInBlockEvents(vOldInBlock);
          End;
         End;
       End;
@@ -2910,7 +3028,6 @@ Begin
  Result := False;
  LDataSetList := nil;
  Self.Close;
- vActiveCursor := True;
  If Assigned(vRESTDataBase) Then
   Begin
    Try
@@ -2961,7 +3078,31 @@ Begin
   End
  Else If csDesigning in ComponentState Then
   Raise Exception.Create(PChar('Empty Database Property'));
- vActiveCursor := False;
+End;
+
+function TRESTDWClientSQL.GetFieldListByName(aName: String): TFieldDefinition;
+Var
+ I : Integer;
+Begin
+ Result := Nil;
+ For I := 0 To Length(vFieldsList) -1 Do
+  Begin
+   If UpperCase(vFieldsList[I].FieldName) = Uppercase(aName) Then
+    Begin
+     Result := vFieldsList[I];
+     Break;
+    End;
+  End;
+End;
+
+function TRESTDWClientSQL.GetInBlockEvents: Boolean;
+Begin
+ Result := vInBlockEvents;
+End;
+
+function TRESTDWClientSQL.GetInDesignEvents: Boolean;
+Begin
+ Result := vInDesignEvents;
 End;
 
 procedure TRESTDWClientSQL.SaveToStream(Var Stream: TMemoryStream);
@@ -2969,7 +3110,7 @@ Begin
 
 End;
 
-Procedure TRESTDWClientSQL.CreateMassiveDataset;
+procedure TRESTDWClientSQL.CreateMassiveDataset;
 Begin
  If Trim(vUpdateTableName) <> '' Then
   TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vUpdateTableName));
@@ -2979,7 +3120,7 @@ procedure TRESTDWClientSQL.SetActiveDB(Value: Boolean);
 Begin
  If vInactive then
   Begin
-   vActive := Value;
+   vActive := (Value) And Not(vInDesignEvents);
    If vActive Then
     Begin
      {$IFDEF FPC}
@@ -3033,14 +3174,22 @@ Begin
      Exit;
     End;
    Try
-    If (Not(vActive) And (Value)) Or (GetNewData) Then
+    If (Not(vActive) And (Value)) Or (GetNewData) Or (vInDesignEvents) Then
      Begin
-      ProcBeforeOpen(Self);
-      vInBlockEvents := True;
+      If Not vInDesignEvents Then
+       ProcBeforeOpen(Self);
       Filter         := '';
       Filtered       := False;
-      vActive        := GetData;
+      GetNewData     := Filtered;
+      vActive        := (GetData) And Not(vInDesignEvents);
       GetNewData     := Not vActive;
+      If vInDesignEvents Then
+       Begin
+        vInactive       := False;
+        vInDesignEvents := False;
+        vInBlockEvents  := vInDesignEvents;
+        Exit;
+       End;
      End;
     If State = dsBrowse Then
      Begin
@@ -3067,6 +3216,7 @@ Begin
   End
  Else
   Begin
+   vInDesignEvents := False;
    vActive := False;
    Close;
    If Value Then
@@ -3133,7 +3283,7 @@ Begin
   End;
 End;
 
-Function TRESTDWClientSQL.FieldExist(Value: String): TField;
+function TRESTDWClientSQL.FieldExist(Value: String): TField;
 Var
  I : Integer;
 Begin

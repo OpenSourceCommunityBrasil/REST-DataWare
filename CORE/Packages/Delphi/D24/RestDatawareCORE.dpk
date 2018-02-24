@@ -39,7 +39,9 @@ requires
   FireDAC,
   FireDACCommonDriver,
   FireDACCommon,
-  dsnap;
+  dsnap,
+  dcldb,
+  dcllmdtoolsdb;
 
 contains
   uDWPoolerMethod in '..\..\..\Source\uDWPoolerMethod.pas',

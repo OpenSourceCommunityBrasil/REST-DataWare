@@ -2076,7 +2076,10 @@ end;
 
 constructor _Integer.create(s: string);
 begin
-  fvalue := strToInt (s);
+ If Length(s) < 5 Then
+  fvalue := strToInt(s)
+ Else
+  fvalue := strToInt64(s);
 end;
 
 function _Integer.doubleValue: double;

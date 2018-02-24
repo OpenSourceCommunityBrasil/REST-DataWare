@@ -133,6 +133,7 @@ BEGIN
   TRY
 //   RESTDWClientSQL1.ParamByName('HIRE_DATE').AsDateTime := Now;
     RESTDWClientSQL1.Active := True;
+//    RESTDWClientSQL1.FieldDefsToFields;
   EXCEPT
     ON E: Exception DO
     BEGIN

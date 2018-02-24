@@ -3,4 +3,5 @@
 	<ActiveMobileDevice>
 		<NoProfile iOSSimulator="iPhone5"/>
 	</ActiveMobileDevice>
+	<Transactions/>
 </BorlandProject>

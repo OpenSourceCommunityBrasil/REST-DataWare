@@ -1979,8 +1979,9 @@ object Form2: TForm2
     OnClick = Button4Click
   end
   object RESTDWDataBase1: TRESTDWDataBase
-    Active = False
+    Active = True
     Compression = True
+    MyIP = '127.0.0.1'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -2079,7 +2080,6 @@ object Form2: TForm2
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = True
-    InBlockEvents = False
     Left = 232
     Top = 112
   end

@@ -1215,21 +1215,14 @@ object Form2: TForm2
     Datapacks = -1
     OnGetDataError = RESTDWClientSQL1GetDataError
     DataCache = True
-    Params = <
-      item
-        DataType = ftTimeStamp
-        Name = 'HIRE_DATE'
-        ParamType = ptInput
-      end>
+    Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
-      'select * from EMPLOYEE'
-      'Where HIRE_DATE > :HIRE_DATE')
+      'select * from EMPLOYEE')
     UpdateTableName = 'employee'
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = True
-    InBlockEvents = False
     Left = 235
     Top = 64
     object RESTDWClientSQL1EMP_NO: TSmallintField
@@ -1286,8 +1279,9 @@ object Form2: TForm2
   object RESTDWDataBase1: TRESTDWDataBase
     OnConnection = RESTDWDataBase1Connection
     OnBeforeConnect = RESTDWDataBase1BeforeConnect
-    Active = False
+    Active = True
     Compression = True
+    MyIP = '127.0.0.1'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
