@@ -50,9 +50,11 @@ Type
   Function  DoCreateField(const FieldName: WideString; Origin: string): TField; override;
   {$ELSE}
   Function  DoCreateField(const FieldName: String; Origin: string): TField; override;
+  {$IFEND}
+  {$IFNDEF FPC}
   Function SupportsAggregates: Boolean; Override;
   Function SupportsInternalCalc: Boolean; Override;
-  {$IFEND}
+  {$ENDIF}
 End;
 
 Type
