@@ -211,28 +211,30 @@ end;
 procedure TServerMethodDM.ServerMethodDataModuleWelcomeMessage(Welcomemsg,
   AccessTag: string; var Accept: Boolean);
 Var
- vUserName,
- vPassword : String;
+ vUserNameWM,
+ vPasswordWM : String;
 begin
+ vUserNameWM := '';
+ vPasswordWM := '';
  If WelcomeSample Then
   Begin
    Try
     If Pos('|', Welcomemsg) > 0 Then
      Begin
-      vUserName := Copy(Welcomemsg, 1, Pos('|', Welcomemsg)-1);
+      vUserNameWM := Copy(Welcomemsg, 1, Pos('|', Welcomemsg)-1);
       Delete(Welcomemsg, 1, Pos('|', Welcomemsg));
      End
     Else
      Begin
-      vUserName := Copy(Welcomemsg, 1, Length(Welcomemsg));
+      vUserNameWM := Copy(Welcomemsg, 1, Length(Welcomemsg));
       Delete(Welcomemsg, 1, Length(Welcomemsg));
      End;
-    vPassword := Copy(Welcomemsg, 1, Length(Welcomemsg));
+    vPasswordWM := Copy(Welcomemsg, 1, Length(Welcomemsg));
     FDQuery1.Close;
     FDQuery1.SQL.Clear;
     FDQuery1.SQL.Add('select * from TB_USUARIO where Upper(NM_LOGIN) = Upper(:USERNAME) AND Upper(DS_SENHA) = Upper(:PASSWORD)');
-    FDQuery1.ParamByName('USERNAME').AsString := vUserName;
-    FDQuery1.ParamByName('PASSWORD').AsString := vPassword;
+    FDQuery1.ParamByName('USERNAME').AsString := vUserNameWM;
+    FDQuery1.ParamByName('PASSWORD').AsString := vPasswordWM;
     FDQuery1.Open;
    Finally
     Accept := Not(FDQuery1.Eof);

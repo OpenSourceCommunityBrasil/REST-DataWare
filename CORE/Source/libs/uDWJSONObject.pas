@@ -1338,6 +1338,7 @@ If JSONValue = '' Then
       DestDS.FieldDefs.Clear
      Else
       Begin
+       If (DestDS is TRESTDWClientSQL) Then
        For J := 0 To TRESTDWClientSQL(DestDS).Fields.Count - 1 Do
         Begin
          vFieldDefinition.FieldName := TRESTDWClientSQL(DestDS).Fields[J].FieldName;
@@ -1351,9 +1352,8 @@ If JSONValue = '' Then
         End;
       End;
    For J := 0 To TRESTDWClientSQL(DestDS).Fields.Count - 1 Do
-      TRESTDWClientSQL(DestDS).Fields[J].Required := False;
+    TRESTDWClientSQL(DestDS).Fields[J].Required := False;
    DestDS.FieldDefs.BeginUpdate;
-
    For J := 0 To bJsonArray.Count - 1 Do
      Begin
       bJsonOBJ := bJsonarray.Items[J] as Tjsonobject ; // Create(bJsonArray.get(J).ToString);
@@ -1364,7 +1364,7 @@ If JSONValue = '' Then
           FieldDef            := TRESTDWClientSQL(DestDS).FieldDefExist(vTempValue);
 		 If (FieldDef = Nil) Then
           Begin
-          If TRESTDWClientSQL(DestDS).FieldExist(vTempValue) = Nil Then
+          If (TRESTDWClientSQL(DestDS).FieldExist(vTempValue) = Nil) And (DestDS is TRESTDWClientSQL) Then
            Begin
 		    vFieldDefinition.FieldName := vTempValue;
 		    vFieldDefinition.DataType  := GetFieldType(removestr(bJsonOBJ.Pairs[1].JsonValue.tostring,'"'));
@@ -1777,6 +1777,7 @@ Begin
       DestDS.FieldDefs.Clear
      Else
       Begin
+       If (DestDS is TRESTDWClientSQL) Then
        For J := 0 To TRESTDWClientSQL(DestDS).Fields.Count - 1 Do
         Begin
          vFieldDefinition.FieldName := TRESTDWClientSQL(DestDS).Fields[J].FieldName;
@@ -1803,7 +1804,8 @@ Begin
          FieldDef            := TRESTDWClientSQL(DestDS).FieldDefExist(vTempValue);
          If (FieldDef = Nil) Then
           Begin
-           If TRESTDWClientSQL(DestDS).FieldExist(vTempValue) = Nil Then
+           If (TRESTDWClientSQL(DestDS).FieldExist(vTempValue) = Nil) And
+              (DestDS is TRESTDWClientSQL)  Then
             Begin
              vFieldDefinition.FieldName := vTempValue;
              vFieldDefinition.DataType  := GetFieldType(bJsonOBJ.opt(bJsonOBJ.names.get(1).ToString).ToString);
