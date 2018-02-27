@@ -28,6 +28,7 @@ Uses {$IFDEF FPC}
    {$IFDEF FPC}
    vDatabaseCharSet      : TDatabaseCharSet;
    {$ENDIF}
+   vAccessTag,
    vWelcomeMessage,
    vHost : String;
    vPort : Integer;
@@ -160,6 +161,7 @@ Uses {$IFDEF FPC}
    Property DatabaseCharSet: TDatabaseCharSet Read vDatabaseCharSet Write vDatabaseCharSet;
    {$ENDIF}
    Property TypeRequest    : TTypeRequest  Read vTypeRequest    Write vTypeRequest       Default trHttp;
+   Property AccessTag      : String        Read vAccessTag      Write vAccessTag;
   End;
 
 implementation
@@ -202,6 +204,7 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
+ RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -265,8 +268,8 @@ Begin
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
     Begin
-     Result         := TJSONValue.Create;
-     Result.Encoded := False;
+     Result          := TJSONValue.Create;
+     Result.Encoding := vEncoding;
      If DWParams.ItemsString['MessageError'] <> Nil Then
       MessageError  := DWParams.ItemsString['MessageError'].Value;
      If DWParams.ItemsString['Error'] <> Nil Then
@@ -274,7 +277,7 @@ Begin
      If DWParams.ItemsString['Result'] <> Nil Then
       Begin
        If DWParams.ItemsString['Result'].AsString <> '' Then
-        Result.LoadFromJSON(DWParams.ItemsString['Result'].AsString);
+        Result.SetValue(DWParams.ItemsString['Result'].AsString);
       End;
     End
    Else
@@ -370,6 +373,7 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
+ RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -487,6 +491,7 @@ Begin
  RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding     := vEncoding;
+ RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -574,6 +579,7 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
+ RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -655,6 +661,7 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
+ RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -776,6 +783,7 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
+ RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -900,6 +908,7 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
+ RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -1049,6 +1058,7 @@ Begin
  RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
+ RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -1162,6 +1172,7 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
+ RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -1272,6 +1283,7 @@ Begin
    RESTClientPoolerExec.OnStatus         := vOnStatus;
    RESTClientPoolerExec.Encoding         := vEncoding;
    RESTClientPoolerExec.hEncodeStrings   := EncodeStrings;
+   RESTClientPoolerExec.SetAccessTag(vAccessTag);
    {$IFDEF FPC}
    RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
    {$ENDIF}

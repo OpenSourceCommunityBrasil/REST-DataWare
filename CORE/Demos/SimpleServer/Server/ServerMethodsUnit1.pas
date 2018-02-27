@@ -26,7 +26,8 @@ Type
    Procedure   vReplyEvent(SendType   : TSendEvent;
                            Context    : String;
                            Var Params : TDWParams;
-                           Var Result : String);
+                           Var Result : String;
+                           AccessTag  : String);
   End;
 {$METHODINFO OFF}
 
@@ -49,7 +50,8 @@ End;
 Procedure TServerMethodsComp.vReplyEvent(SendType   : TSendEvent;
                                          Context    : String;
                                          Var Params : TDWParams;
-                                         Var Result : String);
+                                         Var Result : String;
+                                         AccessTag  : String);
 Var
  JSONObject : TJSONObject;
 Begin

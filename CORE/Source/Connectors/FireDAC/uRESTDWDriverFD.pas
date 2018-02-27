@@ -1521,6 +1521,7 @@ Begin
        If Result = Nil Then
         Result         := TJSONValue.Create;
        Result.Encoding := Encoding;
+       Result.Encoded  := EncodeStringsJSON;
        Result.LoadFromDataset('RESULTDATA', vTempQuery, EncodeStringsJSON);
        Error         := False;
       Except

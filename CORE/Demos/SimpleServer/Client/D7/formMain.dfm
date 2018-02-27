@@ -2006,21 +2006,19 @@ object Form2: TForm2
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
     Active = False
+    Aggregates = <>
     FieldDefs = <
       item
         Name = 'EMP_NO'
-        Attributes = [faRequired]
         DataType = ftSmallint
       end
       item
         Name = 'FIRST_NAME'
-        Attributes = [faRequired]
         DataType = ftString
         Size = 15
       end
       item
         Name = 'LAST_NAME'
-        Attributes = [faRequired]
         DataType = ftString
         Size = 20
       end
@@ -2031,35 +2029,29 @@ object Form2: TForm2
       end
       item
         Name = 'HIRE_DATE'
-        Attributes = [faRequired]
         DataType = ftTimeStamp
       end
       item
         Name = 'DEPT_NO'
-        Attributes = [faRequired]
         DataType = ftString
         Size = 3
       end
       item
         Name = 'JOB_CODE'
-        Attributes = [faRequired]
         DataType = ftString
         Size = 5
       end
       item
         Name = 'JOB_GRADE'
-        Attributes = [faRequired]
         DataType = ftSmallint
       end
       item
         Name = 'JOB_COUNTRY'
-        Attributes = [faRequired]
         DataType = ftString
         Size = 15
       end
       item
         Name = 'SALARY'
-        Attributes = [faRequired]
         DataType = ftFloat
       end
       item
@@ -2067,12 +2059,14 @@ object Form2: TForm2
         DataType = ftString
         Size = 37
       end>
+    IndexDefs = <>
+    Params = <>
+    StoreDefs = True
     AfterInsert = RESTDWClientSQL1AfterInsert
     MasterCascadeDelete = True
     Inactive = False
     Datapacks = -1
     DataCache = False
-    Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
       'SELECT * FROM EMPLOYEE')
@@ -2082,6 +2076,46 @@ object Form2: TForm2
     AutoRefreshAfterCommit = True
     Left = 232
     Top = 112
+    object RESTDWClientSQL1EMP_NO: TSmallintField
+      FieldName = 'EMP_NO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+    end
+    object RESTDWClientSQL1FIRST_NAME: TStringField
+      FieldName = 'FIRST_NAME'
+      Size = 15
+    end
+    object RESTDWClientSQL1LAST_NAME: TStringField
+      FieldName = 'LAST_NAME'
+    end
+    object RESTDWClientSQL1PHONE_EXT: TStringField
+      FieldName = 'PHONE_EXT'
+      Size = 4
+    end
+    object RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField
+      FieldName = 'HIRE_DATE'
+    end
+    object RESTDWClientSQL1DEPT_NO: TStringField
+      FieldName = 'DEPT_NO'
+      Size = 3
+    end
+    object RESTDWClientSQL1JOB_CODE: TStringField
+      FieldName = 'JOB_CODE'
+      Size = 5
+    end
+    object RESTDWClientSQL1JOB_GRADE: TSmallintField
+      FieldName = 'JOB_GRADE'
+    end
+    object RESTDWClientSQL1JOB_COUNTRY: TStringField
+      FieldName = 'JOB_COUNTRY'
+      Size = 15
+    end
+    object RESTDWClientSQL1SALARY: TFloatField
+      FieldName = 'SALARY'
+    end
+    object RESTDWClientSQL1FULL_NAME: TStringField
+      FieldName = 'FULL_NAME'
+      Size = 37
+    end
   end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1

@@ -110,6 +110,7 @@ type
     Label20: TLabel;
     CkUsaURL: TCheckBox;
     EdURL: TEdit;
+    cbForceWelcome: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure ApplicationEvents1Idle(Sender: TObject; var Done: Boolean);
     procedure ButtonStartClick(Sender: TObject);
@@ -374,6 +375,10 @@ Begin
   Ini.WriteString('SSL', 'PKF', EPrivKeyFile.Text);
   Ini.WriteString('SSL', 'PKP', EPrivKeyPass.Text);
   Ini.WriteString('SSL', 'CF', ECertFile.Text);
+  If cbForceWelcome.Checked Then
+   Ini.WriteInteger('Configs', 'ForceWelcomeAccess', 1)
+  Else
+   Ini.WriteInteger('Configs', 'ForceWelcomeAccess', 0);
   Ini.Free;
   VUsername := EdUserNameDW.Text;
   VPassword := EdPasswordDW.Text;
@@ -453,6 +458,7 @@ Begin
   EPrivKeyFile.Text := Ini.ReadString('SSL', 'PKF', '');
   EPrivKeyPass.Text := Ini.ReadString('SSL', 'PKP', '');
   ECertFile.Text    := Ini.ReadString('SSL', 'CF', '');
+  cbForceWelcome.Checked  := Ini.ReadInteger('Configs', 'ForceWelcomeAccess', 0) = 1;
   Ini.Free;
 End;
 
@@ -466,6 +472,7 @@ Begin
     RESTServicePooler1.SSLPrivateKeyFile     := EPrivKeyFile.Text;
     RESTServicePooler1.SSLPrivateKeyPassword := EPrivKeyPass.Text;
     RESTServicePooler1.SSLCertFile           := ECertFile.Text;
+    RESTServicePooler1.ForceWelcomeAccess    := cbForceWelcome.Checked;
     RESTServicePooler1.Active                := True;
     If Not RESTServicePooler1.Active Then
       Exit;

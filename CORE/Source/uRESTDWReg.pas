@@ -9,9 +9,9 @@ uses
   {$ELSE}
    Windows, SysUtils,
    {$if CompilerVersion > 21}
-    ToolsApi, DMForm, DesignEditors, DesignIntf, ExptIntf, Classes, uRESTDWBase, uRESTDWPoolerDB, uDWDatamodule, uDWMassiveBuffer, uRESTDWServerEvents, Db, DbTables, DSDesign;
+    ToolsApi, DMForm, DesignEditors, DesignIntf, ExptIntf, Classes, uRESTDWBase, uRESTDWPoolerDB, uDWDatamodule, uDWMassiveBuffer, uRESTDWServerEvents, Db, DSDesign, ColnEdit;
    {$ELSE}
-    ToolsApi, DMForm, DesignEditors, DesignIntf, ExptIntf, Classes, uRESTDWBase, uRESTDWPoolerDB, uDWDatamodule, uDWMassiveBuffer, uRESTDWServerEvents, Db, DbTables, DSDesign;
+    ToolsApi, DMForm, DesignEditors, DesignIntf, ExptIntf, Classes, uRESTDWBase, uRESTDWPoolerDB, uDWDatamodule, uDWMassiveBuffer, uRESTDWServerEvents, Db, DbTables, DSDesign, ColnEdit;
    {$IFEND}
   {$ENDIF}
 
@@ -24,6 +24,13 @@ Type
   Function  GetAttributes  : TPropertyAttributes; Override;
   Procedure GetValues(Proc : TGetStrProc);        Override;
   Procedure Edit;                                 Override;
+End;
+
+type
+ TDWServerEventsEditor = Class(TComponentEditor)
+  Function GetVerbCount : Integer; Override;
+  Function GetVerb     (Index : Integer): String; Override;
+  Procedure ExecuteVerb(Index : Integer); Override;
 End;
 
 Type
@@ -65,12 +72,24 @@ implementation
 {$IFNDEF FPC}
 procedure TRESTDWClientSQLEditor.Edit;
 Begin
+ {$IFNDEF FPC}
+  {$IF CompilerVersion < 21}
+   TRESTDWClientSQL(Component).Close;
+   TRESTDWClientSQL(Component).CreateDatasetFromList;
+  {$IFEND}
+ {$ENDIF}
  ShowFieldsEditor(Designer, TDataSet(Component), TDSDesignerDW);
 end;
 
 procedure TRESTDWClientSQLEditor.ExecuteVerb(Index: Integer);
  Procedure EditFields(DataSet: TDataSet);
  begin
+  {$IFNDEF FPC}
+   {$IF CompilerVersion < 21}
+    TRESTDWClientSQL(DataSet).Close;
+    TRESTDWClientSQL(DataSet).CreateDatasetFromList;
+   {$IFEND}
+  {$ENDIF}
   ShowFieldsEditor(Designer, TDataSet(Component), TDSDesignerDW);
  End;
 Begin
@@ -94,7 +113,7 @@ End;
 {$if CompilerVersion > 21}
 Function  TDSDesignerDW.DoCreateField(const FieldName: WideString; Origin: string): TField;
 {$ELSE}
-Function  TDSDesignerDW.DoCreateField(const FieldName: String; Origin: string): TField; 
+Function  TDSDesignerDW.DoCreateField(const FieldName: String; Origin: string): TField;
 {$IFEND}
 Var
  FieldDefinition : TFieldDefinition;
@@ -103,8 +122,12 @@ Begin
  Try
   If TRESTDWClientSQL(DataSet).FieldListCount > 0 Then
    Begin
-    TRESTDWClientSQL(DataSet).Close;
-    TRESTDWClientSQL(DataSet).CreateDatasetFromList;
+    {$IFNDEF FPC}
+     {$IF CompilerVersion > 21}
+      TRESTDWClientSQL(DataSet).Close;
+      TRESTDWClientSQL(DataSet).CreateDatasetFromList;
+     {$IFEND}
+    {$ENDIF}
     If TRESTDWClientSQL(DataSet).FieldDefExist(FieldName) <> Nil Then
      Result := Inherited DoCreateField(FieldName, Origin);
    End;
@@ -162,11 +185,40 @@ Begin
  RegisterComponents('REST Dataware - Service',     [TRESTServicePooler, TDWServerEvents, TRESTServiceCGI,  TDWClientEvents,    TRESTClientPooler]);
  RegisterComponents('REST Dataware - CORE - DB',   [TRESTDWPoolerDB,    TRESTDWDataBase, TRESTDWClientSQL, TDWMassiveSQLCache, TRESTDWStoredProc, TRESTDWPoolerList, TDWMassiveCache]);
  RegisterPropertyEditor(TypeInfo(String), TRESTDWDataBase, 'PoolerName', TPoolersList);
+ RegisterComponentEditor(TDWServerEvents, TDWServerEventsEditor);
  RegisterComponentEditor(TDWClientEvents,  TDWClientEventsEditor);
  {$IFNDEF FPC}
  RegisterComponentEditor(TRESTDWClientSQL, TRESTDWClientSQLEditor);
  {$ENDIF}
 End;
+
+{ TDWServerEventsEditor }
+
+procedure TDWServerEventsEditor.ExecuteVerb(Index: Integer);
+begin
+  inherited;
+  case Index of
+    0 : Begin
+         {$IFNDEF FPC}
+          ShowCollectionEditor(Designer, Component, (Component as TDWServerEvents).Events, 'Events');
+         {$ELSE}
+          TCollectionPropertyEditor.ShowCollectionEditor(TDWServerEvents(Component).Events, Component, 'Events');
+         {$ENDIF}
+        End;
+  end;
+end;
+
+function TDWServerEventsEditor.GetVerb(Index: Integer): String;
+begin
+  case Index of
+    0: Result := 'Events &List';
+  end;
+end;
+
+function TDWServerEventsEditor.GetVerbCount: Integer;
+begin
+  Result := 1;
+end;
 
 { TDWClientEventsEditor }
 
@@ -174,22 +226,31 @@ procedure TDWClientEventsEditor.ExecuteVerb(Index: Integer);
 begin
   inherited;
   case Index of
-    0: (Component as TDWClientEvents).GetEvents := True; //chama o GetEvents
-    1: (Component as TDWClientEvents).ClearEvents; //chama o GetEvents
+    // Procedure in the unit ColnEdit.pas
+    0: Begin
+        {$IFNDEF FPC}
+         ShowCollectionEditor(Designer, Component, TDWClientEvents(Component).Events, 'Events');
+        {$ELSE}
+         TCollectionPropertyEditor.ShowCollectionEditor(TDWClientEvents(Component).Events,Component, 'Events');
+        {$ENDIF}
+       End;
+    1: (Component as TDWClientEvents).GetEvents := True;
+    2: (Component as TDWClientEvents).ClearEvents;
   end;
 end;
 
 function TDWClientEventsEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
-    0: Result := '&Get Server Events';
-    1: Result := '&Clear Client Events';
+    0: Result := 'Events &List';
+    1: Result := '&Get Server Events';
+    2: Result := '&Clear Client Events';
   end;
 end;
 
 function TDWClientEventsEditor.GetVerbCount: Integer;
 begin
-  Result := 2;
+  Result := 3;
 end;
 
 initialization

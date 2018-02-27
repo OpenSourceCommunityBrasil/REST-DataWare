@@ -220,9 +220,9 @@ object RestDWForm: TRestDWForm
       object Label13: TLabel
         Left = 7
         Top = 90
-        Width = 206
+        Width = 108
         Height = 13
-        Caption = 'CONFIGURA'#199#195'O DO BANCO DE DADOS'
+        Caption = 'Configura'#231#227'o do BB'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clNavy
         Font.Height = -11
@@ -1377,14 +1377,24 @@ object RestDWForm: TRestDWForm
         TabOrder = 13
         OnClick = ckUsaURLClick
       end
+      object cbForceWelcome: TCheckBox
+        Left = 171
+        Top = 88
+        Width = 197
+        Height = 17
+        Caption = 'Force Welcome Access Events'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 15
+      end
     end
     object tsLogs: TTabSheet
       Caption = 'Logs'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label19: TLabel
         Left = 7
         Top = 147
@@ -1461,6 +1471,7 @@ object RestDWForm: TRestDWForm
     ServerContext = 'restdataware'
     SSLVerifyMode = []
     SSLVerifyDepth = 0
+    ForceWelcomeAccess = False
     Left = 132
     Top = 192
   end

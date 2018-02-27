@@ -81,6 +81,10 @@ TYPE
     RESTDWClientSQL1JOB_COUNTRY: TStringField;
     RESTDWClientSQL1SALARY: TFloatField;
     RESTDWClientSQL1FULL_NAME: TStringField;
+    eAccesstag: TEdit;
+    Label3: TLabel;
+    eWelcomemessage: TEdit;
+    Label9: TLabel;
     PROCEDURE Button1Click(Sender: TObject);
     PROCEDURE Button2Click(Sender: TObject);
     PROCEDURE RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
@@ -115,11 +119,13 @@ VAR
   FIM: TdateTime;
 BEGIN
   RESTDWDataBase1.Close;
-  RESTDWDataBase1.PoolerService := EHost.Text;
-  RESTDWDataBase1.PoolerPort    := StrToInt(EPort.Text);
-  RESTDWDataBase1.Login         := EdUserNameDW.Text;
-  RESTDWDataBase1.Password      := EdPasswordDW.Text;
-  RESTDWDataBase1.Compression   := CheckBox1.Checked;
+  RESTDWDataBase1.PoolerService  := EHost.Text;
+  RESTDWDataBase1.PoolerPort     := StrToInt(EPort.Text);
+  RESTDWDataBase1.Login          := EdUserNameDW.Text;
+  RESTDWDataBase1.Password       := EdPasswordDW.Text;
+  RESTDWDataBase1.Compression    := CheckBox1.Checked;
+  RESTDWDataBase1.AccessTag      := eAccesstag.Text;
+  RESTDWDataBase1.WelcomeMessage := eWelcomemessage.Text;
   if chkhttps.Checked then
      RESTDWDataBase1.TypeRequest:=TTyperequest.trHttps
   else
@@ -155,6 +161,8 @@ BEGIN
   RESTDWDataBase1.Login         := EdUserNameDW.Text;
   RESTDWDataBase1.Password      := EdPasswordDW.Text;
   RESTDWDataBase1.Compression   := CheckBox1.Checked;
+  RESTDWDataBase1.AccessTag     := eAccesstag.Text;
+  RESTDWDataBase1.WelcomeMessage := eWelcomemessage.Text;
   if chkhttps.Checked then
      RESTDWDataBase1.TypeRequest:=TTyperequest.trHttps
   else
@@ -180,6 +188,7 @@ begin
  RESTClientPooler1.UserName        := EdUserNameDW.Text;
  RESTClientPooler1.Password        := EdPasswordDW.Text;
  RESTClientPooler1.DataCompression := CheckBox1.Checked;
+ RESTClientPooler1.WelcomeMessage := eWelcomemessage.Text;
  If chkhttps.Checked then
   RESTClientPooler1.TypeRequest := TTyperequest.trHttps
  Else
@@ -217,6 +226,7 @@ begin
  RESTClientPooler1.UserName        := EdUserNameDW.Text;
  RESTClientPooler1.Password        := EdPasswordDW.Text;
  RESTClientPooler1.DataCompression := CheckBox1.Checked;
+ RESTClientPooler1.WelcomeMessage := eWelcomemessage.Text;
  If chkhttps.Checked then
   RESTClientPooler1.TypeRequest := TTyperequest.trHttps
  Else
@@ -225,7 +235,12 @@ begin
  dwParams.ItemsString['inputdata'].AsString := 'teste de string';
  DWClientEvents1.SendEvent('servertime', dwParams, vErrorMessage);
  If vErrorMessage = '' Then
-  Showmessage('Server Date/Time is : ' + DateTimeToStr(dwParams.ItemsString['result'].Value))
+  Begin
+   If dwParams.ItemsString['result'].AsString <> '' Then
+    Showmessage('Server Date/Time is : ' + DateTimeToStr(dwParams.ItemsString['result'].Value))
+   Else
+    Showmessage('Invalid result data...');
+  End
  Else
   Showmessage(vErrorMessage);
  dwParams.Free;

@@ -1321,6 +1321,8 @@ If JSONValue = '' Then
     vtagName         := Lowercase ( removestr(bJsonvalue.Pairs[4].JsonString.tostring,'"'));           //   (bJsonValue.names.get(4).ToString);
     // Add Field Defs
     DestDS.DisableControls;
+    If Not(DestDS is TRESTDWClientSQL) Then
+     TRESTDWClientSQL(DestDS).SetInDesignEvents(False);
     TRESTDWClientSQL(DestDS).SetInBlockEvents(True);
     DestDS.DisableControls;
     If DestDS.Active Then
@@ -1386,8 +1388,6 @@ If JSONValue = '' Then
           End;
         End;
       Finally
-      // bJsonOBJ.Clean;
-      // FreeAndNil(bJsonOBJ);
       End;
      End;
     FreeAndNil(vFieldDefinition);
@@ -1429,8 +1429,6 @@ If JSONValue = '' Then
               Break;
             End;
           Finally
-          // bJsonOBJ.Clean;
-           //FreeAndNil(bJsonOBJ);
           End;
          End;
         If Not vFindFlag Then
@@ -1476,8 +1474,6 @@ If JSONValue = '' Then
          end;
         End;
       Finally
-       //bJsonOBJ.Clean;
-       //FreeAndNil(bJsonOBJ);
       End;
      End;
     For A := 0 To DestDS.Fields.Count - 1 Do
@@ -1499,15 +1495,8 @@ If JSONValue = '' Then
               Break;
              End;
            End;
-//          //bJsonOBJ.Clean;
-//          FreeAndNil(bJsonOBJ);
          End;
        End;
-      {If Assigned(bJsonOBJ) Then
-       Begin
-        //bJsonOBJ.Clean;
-        FreeAndNil(bJsonOBJ);
-       End;}
       If Not vFindFlag Then
        ListFields.Add('-1');
      End;
@@ -1769,6 +1758,8 @@ Begin
     vObjectValue     := GetValueType        (bJsonValue.opt(bJsonValue.names.get(3).ToString).ToString);
     vtagName         := Lowercase           (bJsonValue.names.get(4).ToString);
     // Add Field Defs
+    If Not(DestDS is TRESTDWClientSQL) Then
+     TRESTDWClientSQL(DestDS).SetInDesignEvents(False);
     TRESTDWClientSQL(DestDS).SetInBlockEvents(True);
     DestDS.DisableControls;
     If DestDS.Active Then
@@ -1836,13 +1827,9 @@ Begin
           End;
         End;
       Finally
-//       bJsonOBJ.Clean;
-//       FreeAndNil(bJsonOBJ);
       End;
      End;
     FreeAndNil(vFieldDefinition);
-    If DestDS Is TRESTDWClientSQL Then              //movido para esse qdo usado cliente dataset
-     TRESTDWClientSQL(DestDS).SetInBlockEvents(True);
     DestDS.FieldDefs.EndUpdate;
     Try
      TRESTDWClientSQL(DestDS).SetInBlockEvents(True);
@@ -1879,8 +1866,6 @@ Begin
               Break;
             End;
           Finally
-//           bJsonOBJ.Clean;
-//           FreeAndNil(bJsonOBJ);
           End;
          End;
         If Not vFindFlag Then
@@ -1897,22 +1882,7 @@ Begin
       Try
        If Uppercase(Trim(bJsonOBJ.opt(bJsonOBJ.names.get(2).ToString).ToString)) = 'S' Then
         Begin
-         {$IFDEF FPC}
-         Field := TMemDataset(DestDS).FindField  (bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString);
-         {$ELSE}
-         {$IFDEF CLIENTDATASET}
-           Field := TClientDataset(DestDS).FindField(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString);
-         {$ENDIF}
-         {$IFDEF RESJEDI}
-           Field := TJvMemoryData(DestDS).FindField(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString);
-         {$ENDIF}
-         {$IFDEF RESTKBMMEMTABLE}
-           Field := Tkbmmemtable(DestDS).FindField(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString);
-         {$ENDIF}
-         {$IFDEF RESTFDMEMTABLE}
-           Field := TFDmemtable(DestDS).FindField(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString);
-         {$ENDIF}
-         {$ENDIF}
+         Field := TRESTDWClientSQL(DestDS).FindField(bJsonOBJ.opt(bJsonOBJ.names.get(0).ToString).ToString);
          If Field <> Nil Then
           Begin
            If Field.FieldKind = fkData Then
@@ -1931,8 +1901,6 @@ Begin
           End;
         End;
       Finally
-//       bJsonOBJ.Clean;
-//       FreeAndNil(bJsonOBJ);
       End;
      End;
     For A := 0 To DestDS.Fields.Count - 1 Do     //ADICIONA REGISTRO
@@ -1954,17 +1922,8 @@ Begin
               Break;
              End;
            End;
-//          bJsonOBJ.Clean;
-//          FreeAndNil(bJsonOBJ);
          End;
        End;
-      {
-      If Assigned(bJsonOBJ) Then
-       Begin
-        bJsonOBJ.Clean;
-        FreeAndNil(bJsonOBJ);
-       End;
-      }
       If Not vFindFlag Then
        ListFields.Add('-1');
      End;

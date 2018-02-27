@@ -145,6 +145,7 @@ Type
   {$ELSE}
    vCriticalSection : TRTLCriticalSection;
   {$ENDIF}
+  vForceWelcomeAccess,
   vActive          : Boolean;
   vProxyOptions    : TProxyOptions;
   HTTPServer       : TIdHTTPServer;
@@ -172,41 +173,52 @@ Type
   Function  GetSecure : Boolean;
   Procedure SetServerMethod(Value                     : TComponentClass);
   Procedure GetPoolerList(ServerMethodsClass          : TComponent;
-                          Var PoolerList              : String);
+                          Var PoolerList              : String;
+                           AccessTag                  : String);
   Function  ServiceMethods(BaseObject                 : TComponent;
                            AContext                   : TIdContext;
                            UrlMethod                  : String;
                            Var DWParams               : TDWParams;
                            Var JSONStr                : String;
                            Var JsonMode               : TJsonMode;
-                           hEncodeStrings             : Boolean) : Boolean;
+                           hEncodeStrings             : Boolean;
+                           AccessTag                  : String;
+                           WelcomeAccept              : Boolean) : Boolean;
   Procedure EchoPooler    (ServerMethodsClass         : TComponent;
                            AContext                   : TIdContext;
-                           Var Pooler, MyIP           : String);
+                           Var Pooler, MyIP           : String;
+                           AccessTag                  : String;
+                           Var InvalidTag             : Boolean);
   Procedure ExecuteCommandPureJSON(ServerMethodsClass : TComponent;
                                    Var Pooler         : String;
                                    Var DWParams       : TDWParams;
-                                   hEncodeStrings     : Boolean);
+                                   hEncodeStrings     : Boolean;
+                                   AccessTag          : String);
   Procedure ExecuteCommandJSON(ServerMethodsClass     : TComponent;
                                Var Pooler             : String;
                                Var DWParams           : TDWParams;
-                               hEncodeStrings         : Boolean);
+                               hEncodeStrings         : Boolean;
+                               AccessTag              : String);
   Procedure InsertMySQLReturnID(ServerMethodsClass    : TComponent;
                                 Var Pooler            : String;
                                 Var DWParams          : TDWParams;
-                                hEncodeStrings        : Boolean);
+                                hEncodeStrings        : Boolean;
+                                AccessTag             : String);
   Procedure ApplyUpdatesJSON   (ServerMethodsClass    : TComponent;
                                 Var Pooler            : String;
                                 Var DWParams          : TDWParams;
-                                hEncodeStrings        : Boolean);
+                                hEncodeStrings        : Boolean;
+                                AccessTag             : String);
   Procedure OpenDatasets       (ServerMethodsClass    : TComponent;
                                 Var Pooler            : String;
                                 Var DWParams          : TDWParams;
-                                hEncodeStrings        : Boolean);
+                                hEncodeStrings        : Boolean;
+                                AccessTag             : String);
   Procedure ApplyUpdates_MassiveCache(ServerMethodsClass : TComponent;
                                       Var Pooler         : String;
                                       Var DWParams       : TDWParams;
-                                      hEncodeStrings     : Boolean);
+                                      hEncodeStrings     : Boolean;
+                                      AccessTag          : String);
   Procedure GetEvents                (ServerMethodsClass : TComponent;
                                       Var Pooler         : String;
                                       Var DWParams       : TDWParams);
@@ -238,6 +250,7 @@ Type
   Property RootPath              : String          Read FRootPath              Write FRootPath;
   property SSLVerifyMode: TIdSSLVerifyModeSet read vSSLVerifyMode write vSSLVerifyMode;
   property SSLVerifyDepth: Integer read vSSLVerifyDepth write vSSLVerifyDepth;
+  Property ForceWelcomeAccess    : Boolean         Read vForceWelcomeAccess    Write vForceWelcomeAccess;
 End;
 
 
@@ -245,6 +258,7 @@ Type
  TRESTServiceCGI = Class(TComponent)
  Protected
  Private
+  vForceWelcomeAccess : Boolean;
   vServerContext,
   FRootPath        : String;
   vServerBaseMethod,
@@ -255,41 +269,52 @@ Type
   VEncondig        : TEncodeSelect;              //Enconding se usar CORS usar UTF8 - Alexandre Abade
   Procedure SetServerMethod(Value                     : TComponentClass);
   Procedure GetPoolerList(ServerMethodsClass          : TComponent;
-                          Var PoolerList              : String);
+                          Var PoolerList              : String;
+                          AccessTag                   : String);
   Function  ServiceMethods(BaseObject                 : TComponent;
                            AContext,
                            UrlMethod                  : String;
                            Var DWParams               : TDWParams;
                            Var JSONStr                : String;
                            Var JsonMode               : TJsonMode;
-                           hEncodeStrings             : Boolean) : Boolean;
+                           hEncodeStrings             : Boolean;
+                           AccessTag                  : String;
+                           WelcomeAccept              : Boolean) : Boolean;
   Procedure EchoPooler    (ServerMethodsClass         : TComponent;
                            AContext                   : String;
-                           Var Pooler, MyIP           : String);
+                           Var Pooler, MyIP           : String;
+                           AccessTag                  : String;
+                           Var InvalidTag             : Boolean);
   Procedure ExecuteCommandPureJSON(ServerMethodsClass : TComponent;
                                    Var Pooler         : String;
                                    Var DWParams       : TDWParams;
-                                   hEncodeStrings     : Boolean);
+                                   hEncodeStrings     : Boolean;
+                                   AccessTag          : String);
   Procedure ExecuteCommandJSON(ServerMethodsClass     : TComponent;
                                Var Pooler             : String;
                                Var DWParams           : TDWParams;
-                                   hEncodeStrings     : Boolean);
+                                   hEncodeStrings     : Boolean;
+                                   AccessTag          : String);
   Procedure InsertMySQLReturnID(ServerMethodsClass    : TComponent;
                                 Var Pooler            : String;
                                 Var DWParams          : TDWParams;
-                                   hEncodeStrings     : Boolean);
+                                   hEncodeStrings     : Boolean;
+                                   AccessTag          : String);
   Procedure ApplyUpdatesJSON   (ServerMethodsClass    : TComponent;
                                 Var Pooler            : String;
                                 Var DWParams          : TDWParams;
-                                   hEncodeStrings     : Boolean);
+                                   hEncodeStrings     : Boolean;
+                                   AccessTag          : String);
   Procedure OpenDatasets       (ServerMethodsClass    : TComponent;
                                 Var Pooler            : String;
                                 Var DWParams          : TDWParams;
-                                   hEncodeStrings     : Boolean);
+                                   hEncodeStrings     : Boolean;
+                                   AccessTag          : String);
   Procedure ApplyUpdates_MassiveCache(ServerMethodsClass : TComponent;
                                       Var Pooler         : String;
                                       Var DWParams       : TDWParams;
-                                      hEncodeStrings     : Boolean);
+                                      hEncodeStrings     : Boolean;
+                                      AccessTag          : String);
   Procedure GetEvents                (ServerMethodsClass : TComponent;
                                       Var Pooler         : String;
                                       Var DWParams       : TDWParams);
@@ -312,6 +337,7 @@ Type
   Property OnLastRequest         : TLastRequest    Read vLastRequest           Write vLastRequest;
   Property OnLastResponse        : TLastResponse   Read vLastResponse          Write vLastResponse;
   Property Encoding              : TEncodeSelect   Read VEncondig              Write VEncondig;          //Encoding da string
+  Property ForceWelcomeAccess    : Boolean         Read vForceWelcomeAccess    Write vForceWelcomeAccess;
   Property ServerContext         : String          Read vServerContext         Write vServerContext;
 End;
 
@@ -337,6 +363,7 @@ Type
   vOnStatus         : TOnStatus;
   vTypeRequest      : TTypeRequest;
   vRSCharset        : TEncodeSelect;
+  vAccessTag,
   vWelcomeMessage,
   vUrlPath,
   vUserName,
@@ -358,6 +385,8 @@ Type
   Procedure SetUrlPath (Value : String);
  Public
   //Métodos, Propriedades, Variáveis, Procedures e Funções Publicas
+  Procedure   SetAccessTag(Value : String);
+  Function    GetAccessTag : String;
   Function    SendEvent(EventData  : String)           : String;Overload;
   Function    SendEvent(EventData  : String;
                         Var Params : TDWParams;
@@ -420,6 +449,7 @@ Var
  JsonMode           : TJsonMode;
  DWParams           : TDWParams;
  vWelcomeMessage,
+ vAccessTag,
  boundary,
  startboundary,
  vReplyString,
@@ -434,6 +464,7 @@ Var
  newdecoder,
  Decoder            : TIdMessageDecoder;
  JSONParam          : TJSONParam;
+ WelcomeAccept,
  encodestrings,
  compresseddata,
  msgEnd             : Boolean;
@@ -565,22 +596,61 @@ Begin
      Begin
     {$IFNDEF FPC}
      If (ARequest.QueryFields.Count > 0) And (Trim(ARequest.Content) = '') Then
-      DWParams  := TServerUtils.ParseWebFormsParams (ARequest.QueryFields, Cmd,
-                                                     UrlMethod, VEncondig,
-                                                     ARequest.Method)
+      Begin
+       DWParams  := TServerUtils.ParseWebFormsParams (ARequest.QueryFields, Cmd,
+                                                      UrlMethod, VEncondig,
+                                                      ARequest.Method);
+       If DWParams <> Nil Then
+        Begin
+         If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then
+          vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, csUndefined{$ENDIF});
+         If DWParams.ItemsString['accesstag'] <> Nil Then
+          vAccessTag := DecodeStrings(DWParams.ItemsString['accesstag'].AsString{$IFDEF FPC}, csUndefined{$ENDIF});
+         If DWParams.ItemsString['datacompression'] <> Nil Then
+          compresseddata := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+         If DWParams.ItemsString['dwencodestrings'] <> Nil Then
+          encodestrings  := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+        End;
+      End
     {$ELSE}
      If (ARequest.FieldCount > 0) And (Trim(ARequest.Content) = '') Then
-      DWParams  := TServerUtils.ParseWebFormsParams (ARequest.ContentFields, Cmd,
-                                                     UrlMethod, VEncondig)
+      Begin
+       DWParams  := TServerUtils.ParseWebFormsParams (ARequest.ContentFields, Cmd,
+                                                      UrlMethod, VEncondig);
+       If DWParams <> Nil Then
+        Begin
+         If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then
+          vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, csUndefined{$ENDIF});
+         If DWParams.ItemsString['accesstag'] <> Nil Then
+          vAccessTag := DecodeStrings(DWParams.ItemsString['accesstag'].AsString{$IFDEF FPC}, csUndefined{$ENDIF});
+         If DWParams.ItemsString['datacompression'] <> Nil Then
+          compresseddata := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+         If DWParams.ItemsString['dwencodestrings'] <> Nil Then
+          encodestrings  := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+        End;
+      End
     {$ENDIF}
       Else
        Begin
         If Trim(ARequest.Content) = '' Then
-         {$IFNDEF FPC}
-         DWParams  := TServerUtils.ParseRESTURL (ARequest.PathInfo + ARequest.Query, VEncondig)
-         {$ELSE}
-         DWParams  := TServerUtils.ParseRESTURL (ARequest.URI, VEncondig)
-         {$ENDIF}
+         Begin
+          {$IFNDEF FPC}
+          DWParams  := TServerUtils.ParseRESTURL (ARequest.PathInfo + ARequest.Query, VEncondig);
+          {$ELSE}
+          DWParams  := TServerUtils.ParseRESTURL (ARequest.URI, VEncondig);
+          {$ENDIF}
+          If DWParams <> Nil Then
+           Begin
+            If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then
+             vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, csUndefined{$ENDIF});
+            If DWParams.ItemsString['accesstag'] <> Nil Then
+             vAccessTag := DecodeStrings(DWParams.ItemsString['accesstag'].AsString{$IFDEF FPC}, csUndefined{$ENDIF});
+            If DWParams.ItemsString['datacompression'] <> Nil Then
+             compresseddata := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+            If DWParams.ItemsString['dwencodestrings'] <> Nil Then
+             encodestrings  := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+           End;
+         End
         Else
          Begin
           Try
@@ -611,11 +681,13 @@ Begin
                Decoder     := newdecoder;
                If Decoder <> Nil Then
                 TIdMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
-               If pos('dwwelcomemessage', tmp) > 0 Then
+               If pos('dwwelcomemessage', lowercase(tmp)) > 0 Then
                 vWelcomeMessage := DecodeStrings(ms.DataString{$IFDEF FPC}, csUndefined{$ENDIF})
-               Else If pos('datacompression', tmp) > 0 Then
+               Else If pos('accesstag', lowercase(tmp)) > 0 Then
+                vAccessTag := DecodeStrings(ms.DataString{$IFDEF FPC}, csUndefined{$ENDIF})
+               Else If pos('datacompression', lowercase(tmp)) > 0 Then
                 compresseddata := StringToBoolean(ms.DataString)
-               Else If pos('dwencodestrings', tmp) > 0 Then
+               Else If pos('dwencodestrings', lowercase(tmp)) > 0 Then
                 encodestrings  := StringToBoolean(ms.DataString)
                Else
                 Begin
@@ -662,24 +734,19 @@ Begin
             UrlMethod := DWParams.ItemsString['dwEventNameData'].Value;
          End;
        End;
+      WelcomeAccept     := True;
       If Assigned(vServerMethod) Then
        Begin
         vTempServerMethods:=vServerMethod.Create(nil);
         If vServerBaseMethod = TServerMethods Then
          Begin
-          If Trim(vWelcomeMessage) <> '' Then
-           Begin
-            If Assigned(TServerMethods(vTempServerMethods).OnWelcomeMessage) then
-             TServerMethods(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage);
-           End;
+          If Assigned(TServerMethods(vTempServerMethods).OnWelcomeMessage) then
+           TServerMethods(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, WelcomeAccept);
          End
         Else If vServerBaseMethod = TServerMethodDatamodule Then
          Begin
-          If Trim(vWelcomeMessage) <> '' Then
-           Begin
-            If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
-             TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage);
-           End;
+          If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
+           TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, WelcomeAccept);
          End;
        End
       Else
@@ -715,9 +782,9 @@ Begin
           Begin
            JSONStr := ARequest.RemoteAddr;
            {$IFDEF FPC}
-           If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.LocalPathPrefix, UrlMethod, DWParams, JSONStr, JSONMode, encodestrings) Then
+           If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.LocalPathPrefix, UrlMethod, DWParams, JSONStr, JSONMode, encodestrings, vAccessTag, WelcomeAccept) Then
            {$ELSE}
-           If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.Method, UrlMethod, DWParams, JSONStr, JsonMode, encodestrings) Then
+           If Not ServiceMethods(TComponent(vTempServerMethods), ARequest.Method, UrlMethod, DWParams, JSONStr, JsonMode, encodestrings, vAccessTag, WelcomeAccept) Then
            {$ENDIF}
             Begin
              If Trim(ARequest.Content) = '' Then
@@ -725,12 +792,12 @@ Begin
                If vServerBaseMethod = TServerMethods Then
                 Begin
                  If Assigned(TServerMethods(vTempServerMethods).OnReplyEvent) then
-                  TServerMethods(vTempServerMethods).OnReplyEvent(seGET, UrlMethod, DWParams, JSONStr);
+                  TServerMethods(vTempServerMethods).OnReplyEvent(seGET, UrlMethod, DWParams, JSONStr, vAccessTag);
                 End
                Else If vServerBaseMethod = TServerMethodDatamodule Then
                 Begin
                  If Assigned(TServerMethodDatamodule(vTempServerMethods).OnReplyEvent) then
-                  TServerMethodDatamodule(vTempServerMethods).OnReplyEvent(seGET, UrlMethod, DWParams, JSONStr);
+                  TServerMethodDatamodule(vTempServerMethods).OnReplyEvent(seGET, UrlMethod, DWParams, JSONStr, vAccessTag);
                 End;
               End
              Else
@@ -738,12 +805,12 @@ Begin
                If vServerBaseMethod = TServerMethods Then
                 Begin
                  If Assigned(TServerMethods(vTempServerMethods).OnReplyEvent) then
-                  TServerMethods(vTempServerMethods).OnReplyEvent(sePOST, UrlMethod, DWParams, JSONStr);
+                  TServerMethods(vTempServerMethods).OnReplyEvent(sePOST, UrlMethod, DWParams, JSONStr, vAccessTag);
                 End
                Else If vServerBaseMethod = TServerMethodDatamodule Then
                 Begin
                  If Assigned(TServerMethodDatamodule(vTempServerMethods).OnReplyEvent) then
-                  TServerMethodDatamodule(vTempServerMethods).OnReplyEvent(sePOST, UrlMethod, DWParams, JSONStr);
+                  TServerMethodDatamodule(vTempServerMethods).OnReplyEvent(sePOST, UrlMethod, DWParams, JSONStr, vAccessTag);
                 End;
               End;
             End;
@@ -845,7 +912,8 @@ begin
 end;
 
 procedure TRESTServiceCGI.GetPoolerList(ServerMethodsClass: TComponent;
-  Var PoolerList: String);
+                                        Var PoolerList    : String;
+                                        AccessTag         : String);
 Var
  I : Integer;
 Begin
@@ -855,6 +923,11 @@ Begin
     Begin
      If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
       Begin
+       If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+        Begin
+         If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+          Continue;
+        End;
        If PoolerList = '' then
         PoolerList := Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])
        Else
@@ -870,131 +943,153 @@ function TRESTServiceCGI.ServiceMethods(BaseObject     : TComponent;
                                         Var DWParams   : TDWParams;
                                         Var JSONStr    : String;
                                         Var JsonMode   : TJsonMode;
-                                        hEncodeStrings : Boolean): Boolean;
+                                        hEncodeStrings : Boolean;
+                                        AccessTag      : String;
+                                        WelcomeAccept  : Boolean): Boolean;
 Var
+ vJsonMSG,
  vResult,
  vResultIP,
  vUrlMethod   : String;
+ vInvalidTag  : Boolean;
  JSONParam    : TJSONParam;
 Begin
  Result       := False;
  vUrlMethod   := UpperCase(UrlMethod);
- If vUrlMethod = UpperCase('GetPoolerList') Then
+ If WelcomeAccept Then
   Begin
-   Result     := True;
-   GetPoolerList(BaseObject, vResult);
-   If DWParams.ItemsString['Result'] = Nil Then
+   If vUrlMethod = UpperCase('GetPoolerList') Then
     Begin
-     JSONParam                 := TJSONParam.Create(DWParams.Encoding);
-     JSONParam.ParamName       := 'Result';
-     JSONParam.ObjectDirection := odOut;
-     DWParams.Add(JSONParam);
-    End;
-   DWParams.ItemsString['Result'].SetValue(vResult, DWParams.ItemsString['Result'].Encoded);
-   JSONStr    := TReplyOK;
-  End
- Else If vUrlMethod = UpperCase('EchoPooler') Then
-  Begin
-   vResultIP := JSONStr;
-   If DWParams.ItemsString['Pooler'] <> Nil Then
-    vResult    := DWParams.ItemsString['Pooler'].Value
-   Else If DWParams.count > 0 Then
-    JSONStr := DWParams.Items[0].Value
-   Else
-    vResult    := JSONStr;
-   EchoPooler(BaseObject, JSONStr, vResult, vResultIP);
-   If DWParams.ItemsString['Result'] = Nil Then
+     Result     := True;
+     GetPoolerList(BaseObject, vResult, AccessTag);
+     If DWParams.ItemsString['Result'] = Nil Then
+      Begin
+       JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+       JSONParam.ParamName       := 'Result';
+       JSONParam.ObjectDirection := odOut;
+       DWParams.Add(JSONParam);
+      End;
+     DWParams.ItemsString['Result'].SetValue(vResult, DWParams.ItemsString['Result'].Encoded);
+     JSONStr    := TReplyOK;
+    End
+   Else If vUrlMethod = UpperCase('EchoPooler') Then
     Begin
-     JSONParam                 := TJSONParam.Create(DWParams.Encoding);
-     JSONParam.ParamName       := 'Result';
-     JSONParam.ObjectValue     := ovString;
-     JSONParam.ObjectDirection := odOut;
-     DWParams.Add(JSONParam);
-    End;
-   DWParams.ItemsString['Result'].SetValue(vResultIP,
-                                           DWParams.ItemsString['Result'].Encoded);
-   Result := vResultIP <> '';
-   If Result Then
-    Begin
-     If DWParams.ItemsString['Result'] <> Nil Then
-      JSONStr  := TReplyOK
+     vResultIP := JSONStr;
+     vJsonMSG  := TReplyNOK;
+     If DWParams.ItemsString['Pooler'] <> Nil Then
+      Begin
+       vResult    := DWParams.ItemsString['Pooler'].Value;
+       EchoPooler(BaseObject, JSONStr, vResult, vResultIP, AccessTag, vInvalidTag);
+      End;
+     If DWParams.ItemsString['Result'] = Nil Then
+      Begin
+       JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+       JSONParam.ParamName       := 'Result';
+       JSONParam.ObjectValue     := ovString;
+       JSONParam.ObjectDirection := odOut;
+       DWParams.Add(JSONParam);
+      End;
+     DWParams.ItemsString['Result'].SetValue(vResultIP,
+                                             DWParams.ItemsString['Result'].Encoded);
+     Result := vResultIP <> '';
+     If Result Then
+      Begin
+       If DWParams.ItemsString['Result'] <> Nil Then
+        JSONStr  := TReplyOK
+       Else
+        JSONStr  := vResultIP;
+      End
+     Else If vInvalidTag Then
+      JSONStr    := TReplyTagError
      Else
-      JSONStr  := vResultIP;
+      JSONStr    := TReplyInvalidPooler;
+    End
+   Else If vUrlMethod = UpperCase('ExecuteCommandPureJSON') Then
+    Begin
+     vResult    := DWParams.ItemsString['Pooler'].Value;
+     ExecuteCommandPureJSON(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result     := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('ExecuteCommandJSON') Then
+    Begin
+     vResult    := DWParams.ItemsString['Pooler'].Value;
+     ExecuteCommandJSON(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result     := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('ApplyUpdates') Then
+    Begin
+     vResult    := DWParams.ItemsString['Pooler'].Value;
+     ApplyUpdatesJSON(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result     := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('ApplyUpdates_MassiveCache') Then
+    Begin
+     vResult    := DWParams.ItemsString['Pooler'].Value;
+     ApplyUpdates_MassiveCache(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result     := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('InsertMySQLReturnID_PARAMS') Then
+    Begin
+     vResult    := DWParams.ItemsString['Pooler'].Value;
+     InsertMySQLReturnID(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result     := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('InsertMySQLReturnID') Then
+    Begin
+     vResult    := DWParams.ItemsString['Pooler'].Value;
+     InsertMySQLReturnID(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result     := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('OpenDatasets') Then
+    Begin
+     vResult     := DWParams.ItemsString['Pooler'].Value;
+     OpenDatasets(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result      := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('GETEVENTS') Then
+    Begin
+     GetEvents(BaseObject, vResult, DWParams);
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+     Result      := JSONStr = TReplyOK;
     End
    Else
-    JSONStr    := TReplyNOK;
+    Begin
+     If ReturnEvent(BaseObject, vUrlMethod, vResult, DWParams, JsonMode) Then
+      Result := vResult = TReplyOK;
+    End;
   End
- Else If vUrlMethod = UpperCase('ExecuteCommandPureJSON') Then
-  Begin
-   vResult    := DWParams.ItemsString['Pooler'].Value;
-   ExecuteCommandPureJSON(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result     := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('ExecuteCommandJSON') Then
-  Begin
-   vResult    := DWParams.ItemsString['Pooler'].Value;
-   ExecuteCommandJSON(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result     := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('ApplyUpdates') Then
-  Begin
-   vResult    := DWParams.ItemsString['Pooler'].Value;
-   ApplyUpdatesJSON(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result     := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('ApplyUpdates_MassiveCache') Then
-  Begin
-   vResult    := DWParams.ItemsString['Pooler'].Value;
-   ApplyUpdates_MassiveCache(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result     := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('InsertMySQLReturnID_PARAMS') Then
-  Begin
-   vResult    := DWParams.ItemsString['Pooler'].Value;
-   InsertMySQLReturnID(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result     := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('InsertMySQLReturnID') Then
-  Begin
-   vResult    := DWParams.ItemsString['Pooler'].Value;
-   InsertMySQLReturnID(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result     := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('OpenDatasets') Then
-  Begin
-   vResult     := DWParams.ItemsString['Pooler'].Value;
-   OpenDatasets(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result      := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('GETEVENTS') Then
+ Else If (vUrlMethod = UpperCase('GETEVENTS')) And (Not (vForceWelcomeAccess)) Then
   Begin
    GetEvents(BaseObject, vResult, DWParams);
    If Not(DWParams.ItemsString['Error'].AsBoolean) Then
@@ -1003,19 +1098,48 @@ Begin
     JSONStr    := TReplyNOK;
    Result      := JSONStr = TReplyOK;
   End
- Else
+ Else If (Not (vForceWelcomeAccess)) Then
   Begin
    If ReturnEvent(BaseObject, vUrlMethod, vResult, DWParams, JsonMode) Then
-    Result := vResult = TReplyOK;
+    Begin
+     JSONStr := vResult;
+     Result  := JSONStr <> '';
+    End
+   Else
+    Begin
+     If Not WelcomeAccept Then
+      JSONStr := TReplyInvalidWelcome
+     Else
+      JSONStr := '';
+     Result  := JSONStr <> '';
+    End;
+  End
+ Else
+  Begin
+  Begin
+   If Not WelcomeAccept Then
+    JSONStr := TReplyInvalidWelcome
+   Else
+    JSONStr := TReplyNOK;
+   Result  := False;
+   If DWParams.ItemsString['Error']        <> Nil Then
+    DWParams.ItemsString['Error'].AsBoolean := True;
+   If DWParams.ItemsString['MessageError'] <> Nil Then
+    DWParams.ItemsString['MessageError'].AsString := 'Invalid welcomemessage...';
+  End;
   End;
 End;
 
-procedure TRESTServiceCGI.EchoPooler(ServerMethodsClass: TComponent;
-                                     AContext: String; Var Pooler, MyIP: String);
+procedure TRESTServiceCGI.EchoPooler(ServerMethodsClass : TComponent;
+                                     AContext           : String;
+                                     Var Pooler, MyIP   : String;
+                                     AccessTag          : String;
+                                     Var InvalidTag     : Boolean);
 Var
  I : Integer;
 Begin
  MyIP := '';
+ InvalidTag := False;
  If ServerMethodsClass <> Nil Then
   Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
@@ -1024,6 +1148,14 @@ Begin
       Begin
        If Pooler = Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name]) Then
         Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             InvalidTag := True;
+             Exit;
+            End;
+          End;
          If AContext <> '' Then
           MyIP := AContext;
          Break;
@@ -1036,7 +1168,8 @@ End;
 procedure TRESTServiceCGI.ExecuteCommandPureJSON(ServerMethodsClass : TComponent;
                                                  Var Pooler         : String;
                                                  Var DWParams       : TDWParams;
-                                                 hEncodeStrings     : Boolean);
+                                                 hEncodeStrings     : Boolean;
+                                                 AccessTag          : String);
 Var
  I         : Integer;
  vTempJSON : TJSONValue;
@@ -1053,6 +1186,15 @@ Begin
         Begin
          If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
           Begin
+           If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+            Begin
+             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+              Begin
+               DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+               DWParams.ItemsString['Error'].AsBoolean       := True;
+               Exit;
+              End;
+            End;
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
             Begin
              vExecute := DWParams.ItemsString['Execute'].AsBoolean;
@@ -1090,7 +1232,8 @@ End;
 procedure TRESTServiceCGI.ExecuteCommandJSON(ServerMethodsClass : TComponent;
                                              Var Pooler         : String;
                                              Var DWParams       : TDWParams;
-                                             hEncodeStrings     : Boolean);
+                                             hEncodeStrings     : Boolean;
+                                             AccessTag          : String);
 Var
  I         : Integer;
  vTempJSON : TJSONValue;
@@ -1108,6 +1251,15 @@ Begin
       Begin
        If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
         Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['Error'].AsBoolean       := True;
+             Exit;
+            End;
+          End;
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vExecute := DWParams.ItemsString['Execute'].AsBoolean;
@@ -1156,7 +1308,8 @@ End;
 procedure TRESTServiceCGI.InsertMySQLReturnID(ServerMethodsClass : TComponent;
                                               Var Pooler         : String;
                                               Var DWParams       : TDWParams;
-                                              hEncodeStrings     : Boolean);
+                                              hEncodeStrings     : Boolean;
+                                              AccessTag          : String);
 Var
  I,
  vTempJSON     : Integer;
@@ -1173,6 +1326,15 @@ Begin
       Begin
        If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
         Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['Error'].AsBoolean       := True;
+             Exit;
+            End;
+          End;
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vError   := DWParams.ItemsString['Error'].AsBoolean;
@@ -1215,7 +1377,8 @@ End;
 procedure TRESTServiceCGI.ApplyUpdatesJSON(ServerMethodsClass : TComponent;
                                            Var Pooler         : String;
                                            Var DWParams       : TDWParams;
-                                           hEncodeStrings     : Boolean);
+                                           hEncodeStrings     : Boolean;
+                                           AccessTag          : String);
 Var
  I             : Integer;
  vTempJSON     : TJSONValue;
@@ -1233,6 +1396,15 @@ Begin
       Begin
        If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
         Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['Error'].AsBoolean       := True;
+             Exit;
+            End;
+          End;
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vError   := DWParams.ItemsString['Error'].AsBoolean;
@@ -1342,7 +1514,8 @@ End;
 procedure TRESTServiceCGI.OpenDatasets(ServerMethodsClass : TComponent;
                                        Var Pooler         : String;
                                        Var DWParams       : TDWParams;
-                                       hEncodeStrings     : Boolean);
+                                       hEncodeStrings     : Boolean;
+                                       AccessTag          : String);
 Var
  I         : Integer;
  vTempJSON : TJSONValue;
@@ -1357,6 +1530,15 @@ Begin
       Begin
        If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
         Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['Error'].AsBoolean       := True;
+             Exit;
+            End;
+          End;
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vError   := DWParams.ItemsString['Error'].AsBoolean;
@@ -1389,7 +1571,8 @@ End;
 procedure TRESTServiceCGI.ApplyUpdates_MassiveCache(ServerMethodsClass : TComponent;
                                                     Var Pooler         : String;
                                                     Var DWParams       : TDWParams;
-                                                    hEncodeStrings     : Boolean);
+                                                    hEncodeStrings     : Boolean;
+                                                    AccessTag          : String);
 Var
  I             : Integer;
  vError        : Boolean;
@@ -1403,6 +1586,15 @@ Begin
       Begin
        If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
         Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['Error'].AsBoolean       := True;
+             Exit;
+            End;
+          End;
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vError   := DWParams.ItemsString['Error'].AsBoolean;
@@ -1426,6 +1618,7 @@ begin
   inherited Create(AOwner);
   vServerParams := TServerParams.Create(Self);
   vServerParams.HasAuthentication := True;
+  vForceWelcomeAccess             := False;
   vServerParams.UserName          := 'testserver';
   vServerParams.Password          := 'testserver';
   vServerContext                  := 'restdataware';
@@ -1474,6 +1667,11 @@ Begin
  Inherited;
 End;
 
+Function TRESTClientPooler.GetAccessTag: String;
+Begin
+ Result := vAccessTag;
+End;
+
 Function TRESTClientPooler.GetAllowCookies: Boolean;
 Begin
  Result := HttpRequest.AllowCookies;
@@ -1518,10 +1716,14 @@ Var
   vTempValue    : String;
  Begin
   ResultJSON := InputValue;
-  If Pos(', "RESULT":[', InputValue) = 0 Then
+  If (Pos(', "RESULT":[{"MESSAGE":"', InputValue) = 0) And
+     (Pos(', "RESULT":[', InputValue) = 0)             Then
    Exit;
   Try
-   InitPos     := Pos(', "RESULT":[', InputValue) + Length(', "RESULT":[') ;
+   If (Pos(', "RESULT":[{"MESSAGE":"', InputValue) > 0) Then
+    InitPos   := Pos(', "RESULT":[{"MESSAGE":"', InputValue) + Length(', "RESULT":[')   //TODO Brito
+   Else
+    InitPos   := Pos(', "RESULT":[', InputValue) + Length(', "RESULT":[');
    aValue   := Copy(InputValue, InitPos,    Length(InputValue) -1);
    If Pos(']}', aValue) > 0 Then
     aValue     := Copy(aValue, 0, Pos(']}', aValue) -1);
@@ -1553,26 +1755,42 @@ Var
           JSONParam.ObjectValue     := GetValueType(bJsonOBJ.getvalue('ValueType').value);
           JSONParam.ObjectDirection := GetDirectionName(bJsonOBJ.getvalue('Direction').value);
           JSONParam.Encoded         := GetBooleanFromString(bJsonOBJ.GetValue('Encoded').value);
-          If JSONParam.Encoded Then
-           vValue := DecodeStrings(stringreplace(bJsonOBJ.pairs[4].JsonValue.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]) )
-          Else
+          If Not(JSONParam.ObjectValue In [ovBlob, ovGraphic, ovOraBlob, ovOraClob]) Then
+           Begin
+            If (JSONParam.Encoded) Then
+             vValue := DecodeStrings(stringreplace(bJsonOBJ.pairs[4].JsonValue.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]) )
+            Else If JSONParam.ObjectValue <> ovObject then
+             vValue := bJsonOBJ.pairs[4].JsonValue.tostring
+            Else                                            //TODO Brito
+             Begin
+              vValue := bJsonOBJ.pairs[4].JsonValue.tostring;
+              DeleteInvalidChar(vValue);
+             End;
+           End
+           Else
            vValue := bJsonOBJ.pairs[4].JsonValue.tostring;
-           If Trim(vValue) <> '' Then
-  Begin
-   If (vValue[InitStrPos] = '"')      And
-      (vValue[Length(vValue) - FinalStrPos] = '"') Then
-    Begin
-     Delete(vValue, InitStrPos+FinalStrPos, 1);
-     Delete(vValue, Length(vValue), 1);
-    End;
-  End;
 
 
-         //  vValue:=stringreplace(vValue, '"', '',[rfReplaceAll, rfIgnoreCase]);
-          JSONParam.SetValue(vValue, JSONParam.Encoded);
-          //bJsonOBJ.clean;
-          FreeAndNil(bJsonOBJ);
-          //parametro criandos no servidor
+//          If JSONParam.Encoded Then
+//           vValue := DecodeStrings(stringreplace(bJsonOBJ.pairs[4].JsonValue.tostring, '"', '',[rfReplaceAll, rfIgnoreCase]) )
+//          Else
+//           vValue := bJsonOBJ.pairs[4].JsonValue.tostring;
+//           If Trim(vValue) <> '' Then
+//  Begin
+//   If (vValue[InitStrPos] = '"')      And
+//      (vValue[Length(vValue) - FinalStrPos] = '"') Then
+//    Begin
+//     Delete(vValue, InitStrPos+FinalStrPos, 1);
+//     Delete(vValue, Length(vValue), 1);
+//    End;
+//  End;
+
+
+//         //  vValue:=stringreplace(vValue, '"', '',[rfReplaceAll, rfIgnoreCase]);
+//          JSONParam.SetValue(vValue, JSONParam.Encoded);
+//          //bJsonOBJ.clean;
+//          FreeAndNil(bJsonOBJ);
+//          //parametro criandos no servidor
           If ParamsData.ItemsString[JSONParam.ParamName] = Nil Then
            Begin
             JSONParamNew           := TJSONParam.Create(ParamsData.Encoding);
@@ -1581,22 +1799,25 @@ Var
             ParamsData.Add(JSONParamNew);
            End
           Else If Not (JSONParam.Binary) Then
-           ParamsData.ItemsString[JSONParam.ParamName].Value := JSONParam.Value //, JSONParam.Encoded);
+           ParamsData.ItemsString[JSONParam.ParamName].SetValue(vValue, JSONParam.Encoded)
           Else
-           ParamsData.ItemsString[JSONParam.ParamName].SetValue(vValue, JSONParam.Encoded);
+           ParamsData.ItemsString[JSONParam.ParamName].SetValue(vValue,
+                                                                (JSONParam.Encoded And
+                                                                 Not(JSONParam.ObjectValue In [ovBlob, ovGraphic, ovOraBlob, ovOraClob])));
          Finally
+          vValue := '';
           FreeAndNil(JSONParam);
-          If Assigned(bJsonOBJ) Then
-           Begin
-            //bJsonOBJ.clean;
-            FreeAndNil(bJsonOBJ);
-           End;
+//          If Assigned(bJsonOBJ) Then
+//           Begin
+//            //bJsonOBJ.clean;
+//            FreeAndNil(bJsonOBJ);
+//           End;
          End;
         End;
       End;
      //bJsonValue.Clean;
      FreeAndNil(bJsonValue);
-     FreeAndNil(bJsonOBJTemp);
+    // FreeAndNil(bJsonOBJTemp);
     End;
   Finally
    If vTempValue <> '' Then
@@ -1710,9 +1931,11 @@ Begin
         SetParamsValues(Params, SendParams);
        If vWelcomeMessage <> '' Then
         SendParams.AddFormField('dwwelcomemessage', EncodeStrings(vWelcomeMessage));
+       If vAccessTag <> '' Then
+        SendParams.AddFormField('accesstag',        EncodeStrings(vAccessTag));
        SendParams.AddFormField('datacompression',   BooleanToString(vDatacompress));
        SendParams.AddFormField('dwencodestrings',   BooleanToString(vEncodeStrings));
-       If (Params <> Nil) Or (vWelcomeMessage <> '') Then
+       If (Params <> Nil) Or (vWelcomeMessage <> '') Or (vDatacompress) Then
         Begin
          HttpRequest.Request.ContentType     := 'application/x-www-form-urlencoded';
          HttpRequest.Request.ContentEncoding := 'multipart/form-data';
@@ -2075,6 +2298,8 @@ Begin
         SetParamsValues(Params, SendParams);
        If vWelcomeMessage <> '' Then
         SendParams.AddFormField('dwwelcomemessage', EncodeStrings(vWelcomeMessage));
+       If vAccessTag <> '' Then
+        SendParams.AddFormField('accesstag',        EncodeStrings(vAccessTag));
        SendParams.AddFormField('datacompression',   BooleanToString(vDatacompress));
        SendParams.AddFormField('dwencodestrings',   BooleanToString(vEncodeStrings));
        If (Params <> Nil) Or (vWelcomeMessage <> '') Or (vDatacompress) Then
@@ -2469,9 +2694,11 @@ Begin
         SetParamsValues(Params, SendParams);
        If vWelcomeMessage <> '' Then
         SendParams.AddFormField('dwwelcomemessage', EncodeStrings(vWelcomeMessage, vDatabaseCharSet));
+       If vAccessTag <> '' Then
+        SendParams.AddFormField('accesstag',        EncodeStrings(vAccessTag, vDatabaseCharSet));
        SendParams.AddFormField('datacompression',   BooleanToString(vDatacompress));
        SendParams.AddFormField('dwencodestrings',   BooleanToString(vEncodeStrings));
-       If (Params <> Nil) Or (vWelcomeMessage <> '') Then
+       If (Params <> Nil) Or (vWelcomeMessage <> '') Or (vDatacompress) Then
         Begin
          HttpRequest.Request.ContentType     := 'application/x-www-form-urlencoded';
          HttpRequest.Request.ContentEncoding := 'multipart/form-data';
@@ -2658,6 +2885,11 @@ Begin
  End;
 End;
 
+Procedure TRESTClientPooler.SetAccessTag(Value : String);
+Begin
+ vAccessTag := Value;
+End;
+
 Procedure TRESTClientPooler.SetAllowCookies(Value: Boolean);
 Begin
  HttpRequest.AllowCookies    := Value;
@@ -2780,7 +3012,8 @@ Begin
 End;
 
 Procedure TRESTServicePooler.GetPoolerList(ServerMethodsClass : TComponent;
-                                           Var PoolerList     : String);
+                                           Var PoolerList     : String;
+                                           AccessTag          : String);
 Var
  I : Integer;
 Begin
@@ -2790,6 +3023,11 @@ Begin
     Begin
      If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
       Begin
+       If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+        Begin
+         If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+          Continue;
+        End;
        If PoolerList = '' then
         PoolerList := Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])
        Else
@@ -2802,18 +3040,30 @@ End;
 Procedure TRESTServicePooler.EchoPooler(ServerMethodsClass : TComponent;
                                         AContext           : TIdContext;
                                         Var Pooler,
-                                            MyIP           : String);
+                                            MyIP           : String;
+                                        AccessTag          : String;
+                                        Var InvalidTag     : Boolean);
 Var
  I : Integer;
 Begin
+ InvalidTag := False;
+ MyIP       := '';
  If ServerMethodsClass <> Nil Then
   Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
     Begin
-     If ServerMethodsClass.Components[i] is TRESTDWPoolerDB Then
+     If (ServerMethodsClass.Components[i] is TRESTDWPoolerDB) Then
       Begin
        If Pooler = Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name]) Then
         Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             InvalidTag := True;
+             Exit;
+            End;
+          End;
          If AContext <> Nil Then
           MyIP := AContext.Connection.Socket.Binding.IP;
          Break;
@@ -2826,7 +3076,8 @@ End;
 Procedure TRESTServicePooler.ExecuteCommandPureJSON(ServerMethodsClass : TComponent;
                                                     Var Pooler         : String;
                                                     Var DWParams       : TDWParams;
-                                                    hEncodeStrings     : Boolean);
+                                                    hEncodeStrings     : Boolean;
+                                                    AccessTag          : String);
 Var
  I         : Integer;
  vTempJSON : TJSONValue;
@@ -2836,6 +3087,7 @@ Var
  vMessageError : String;
 Begin
  Try
+  vTempJSON := Nil;
   If ServerMethodsClass <> Nil Then
    Begin
     For I := 0 To ServerMethodsClass.ComponentCount -1 Do
@@ -2844,6 +3096,15 @@ Begin
        Begin
         If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
          Begin
+          If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+           Begin
+            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+             Begin
+              DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+              DWParams.ItemsString['Error'].AsBoolean       := True;
+              Exit;
+             End;
+           End;
           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
            Begin
             vExecute := DWParams.ItemsString['Execute'].AsBoolean;
@@ -2872,14 +3133,16 @@ Begin
      End;
    End;
  Finally
-  FreeAndNil(vTempJSON);
+  If Assigned(vTempJSON) Then
+   FreeAndNil(vTempJSON);
  End;
 End;
 
 Procedure TRESTServicePooler.InsertMySQLReturnID(ServerMethodsClass : TComponent;
                                                  Var Pooler         : String;
                                                  Var DWParams       : TDWParams;
-                                                 hEncodeStrings     : Boolean);
+                                                 hEncodeStrings     : Boolean;
+                                                 AccessTag          : String);
 Var
  I,
  vTempJSON     : Integer;
@@ -2896,6 +3159,15 @@ Begin
       Begin
        If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
         Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['Error'].AsBoolean       := True;
+             Exit;
+            End;
+          End;
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vError   := DWParams.ItemsString['Error'].AsBoolean;
@@ -2937,7 +3209,8 @@ End;
 Procedure TRESTServicePooler.ApplyUpdates_MassiveCache(ServerMethodsClass : TComponent;
                                                        Var Pooler         : String;
                                                        Var DWParams       : TDWParams;
-                                                       hEncodeStrings     : Boolean);
+                                                       hEncodeStrings     : Boolean;
+                                                       AccessTag          : String);
 Var
  I             : Integer;
  vError        : Boolean;
@@ -2951,6 +3224,15 @@ Begin
       Begin
        If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
         Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['Error'].AsBoolean       := True;
+             Exit;
+            End;
+          End;
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vError   := DWParams.ItemsString['Error'].AsBoolean;
@@ -2972,7 +3254,8 @@ End;
 Procedure TRESTServicePooler.ApplyUpdatesJSON(ServerMethodsClass : TComponent;
                                               Var Pooler         : String;
                                               Var DWParams       : TDWParams;
-                                              hEncodeStrings     : Boolean);
+                                              hEncodeStrings     : Boolean;
+                                              AccessTag          : String);
 Var
  I             : Integer;
  vTempJSON     : TJSONValue;
@@ -2990,6 +3273,15 @@ Begin
       Begin
        If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
         Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['Error'].AsBoolean       := True;
+             Exit;
+            End;
+          End;
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vError   := DWParams.ItemsString['Error'].AsBoolean;
@@ -3031,7 +3323,8 @@ End;
 Procedure TRESTServicePooler.ExecuteCommandJSON(ServerMethodsClass : TComponent;
                                                 Var Pooler         : String;
                                                 Var DWParams       : TDWParams;
-                                                hEncodeStrings     : Boolean);
+                                                hEncodeStrings     : Boolean;
+                                                AccessTag          : String);
 Var
  I         : Integer;
  vTempJSON : TJSONValue;
@@ -3041,6 +3334,7 @@ Var
  DWParamsD     : TDWParams;
 Begin
  DWParamsD := Nil;
+ vTempJSON := Nil;
  If ServerMethodsClass <> Nil Then
   Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
@@ -3049,6 +3343,15 @@ Begin
       Begin
        If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
         Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['Error'].AsBoolean       := True;
+             Exit;
+            End;
+          End;
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vExecute := DWParams.ItemsString['Execute'].AsBoolean;
@@ -3163,7 +3466,8 @@ End;
 Procedure TRESTServicePooler.OpenDatasets(ServerMethodsClass : TComponent;
                                           Var Pooler         : String;
                                           Var DWParams       : TDWParams;
-                                          hEncodeStrings     : Boolean);
+                                          hEncodeStrings     : Boolean;
+                                          AccessTag          : String);
 Var
  I         : Integer;
  vTempJSON : TJSONValue;
@@ -3178,6 +3482,15 @@ Begin
       Begin
        If UpperCase(Pooler) = UpperCase(Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name])) then
         Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['Error'].AsBoolean       := True;
+             Exit;
+            End;
+          End;
          If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver <> Nil Then
           Begin
            vError   := DWParams.ItemsString['Error'].AsBoolean;
@@ -3212,105 +3525,136 @@ Function TRESTServicePooler.ServiceMethods(BaseObject     : TComponent;
                                            Var DWParams   : TDWParams;
                                            Var JSONStr    : String;
                                            Var JsonMode   : TJsonMode;
-                                           hEncodeStrings : Boolean) : Boolean;
+                                           hEncodeStrings : Boolean;
+                                           AccessTag      : String;
+                                           WelcomeAccept  : Boolean) : Boolean;
 Var
+ vJsonMSG,
  vResult,
  vResultIP,
  vUrlMethod   :  String;
+ vInvalidTag  : Boolean;
 Begin
  Result       := False;
  vUrlMethod   := UpperCase(UrlMethod);
- If vUrlMethod = UpperCase('GetPoolerList') Then
+ If WelcomeAccept Then
   Begin
-   Result     := True;
-   GetPoolerList(BaseObject, vResult);
-   DWParams.ItemsString['Result'].SetValue(vResult,
-                                           DWParams.ItemsString['Result'].Encoded);
-   JSONStr    := TReplyOK;
-  End
- Else If vUrlMethod = UpperCase('EchoPooler') Then
-  Begin
-   vResult    := DWParams.ItemsString['Pooler'].Value;
-   EchoPooler(BaseObject, AContext, vResult, vResultIP);
-   DWParams.ItemsString['Result'].SetValue(vResultIP,
-                                           DWParams.ItemsString['Result'].Encoded);
-   Result     := vResultIP <> '';
-   If Result Then
-    JSONStr    := TReplyOK
+   If vUrlMethod = UpperCase('GetPoolerList') Then
+    Begin
+     Result     := True;
+     GetPoolerList(BaseObject, vResult, AccessTag);
+     DWParams.ItemsString['Result'].SetValue(vResult,
+                                             DWParams.ItemsString['Result'].Encoded);
+     JSONStr    := TReplyOK;
+    End
+   Else If vUrlMethod = UpperCase('EchoPooler') Then
+    Begin
+     vJsonMSG := TReplyNOK;
+     If DWParams.ItemsString['Pooler'] <> Nil Then
+      Begin
+       vResult    := DWParams.ItemsString['Pooler'].Value;
+       EchoPooler(BaseObject, AContext, vResult, vResultIP, AccessTag, vInvalidTag);
+       If DWParams.ItemsString['Result'] <> Nil Then
+        DWParams.ItemsString['Result'].SetValue(vResultIP,
+                                                DWParams.ItemsString['Result'].Encoded);
+      End;
+     Result     := vResultIP <> '';
+     If Result Then
+      JSONStr    := TReplyOK
+     Else If vInvalidTag Then
+      JSONStr    := TReplyTagError
+     Else
+      JSONStr    := TReplyInvalidPooler;
+    End
+   Else If vUrlMethod = UpperCase('ExecuteCommandPureJSON') Then
+    Begin
+     vResult    := DWParams.ItemsString['Pooler'].Value;
+     ExecuteCommandPureJSON(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result     := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('ExecuteCommandJSON') Then
+    Begin
+     vResult    := DWParams.ItemsString['Pooler'].Value;
+     ExecuteCommandJSON(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result     := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('ApplyUpdates') Then
+    Begin
+     vResult    := DWParams.ItemsString['Pooler'].Value;
+     ApplyUpdatesJSON(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result     := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('ApplyUpdates_MassiveCache') Then
+    Begin
+     vResult    := DWParams.ItemsString['Pooler'].Value;
+     ApplyUpdates_MassiveCache(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result     := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('InsertMySQLReturnID_PARAMS') Then
+    Begin
+     vResult    := DWParams.ItemsString['Pooler'].Value;
+     InsertMySQLReturnID(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result     := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('InsertMySQLReturnID') Then
+    Begin
+     vResult    := DWParams.ItemsString['Pooler'].Value;
+     InsertMySQLReturnID(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result     := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('OpenDatasets') Then
+    Begin
+     vResult     := DWParams.ItemsString['Pooler'].Value;
+     OpenDatasets(BaseObject, vResult, DWParams, hEncodeStrings, AccessTag);
+     Result      := True;
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+    End
+   Else If vUrlMethod = UpperCase('GETEVENTS') Then
+    Begin
+     GetEvents(BaseObject, vResult, DWParams);
+     If Not(DWParams.ItemsString['Error'].AsBoolean) Then
+      JSONStr    := TReplyOK
+     Else
+      JSONStr    := TReplyNOK;
+     Result      := JSONStr = TReplyOK;
+    End
    Else
-    JSONStr    := TReplyNOK;
+    Begin
+     If ReturnEvent(BaseObject, vUrlMethod, vResult, DWParams, JsonMode) Then
+      Begin
+       JSONStr := vResult;
+       Result  := JSONStr <> '';
+      End;
+    End;
   End
- Else If vUrlMethod = UpperCase('ExecuteCommandPureJSON') Then
-  Begin
-   vResult    := DWParams.ItemsString['Pooler'].Value;
-   ExecuteCommandPureJSON(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result     := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('ExecuteCommandJSON') Then
-  Begin
-   vResult    := DWParams.ItemsString['Pooler'].Value;
-   ExecuteCommandJSON(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result     := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('ApplyUpdates') Then
-  Begin
-   vResult    := DWParams.ItemsString['Pooler'].Value;
-   ApplyUpdatesJSON(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result     := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('ApplyUpdates_MassiveCache') Then
-  Begin
-   vResult    := DWParams.ItemsString['Pooler'].Value;
-   ApplyUpdates_MassiveCache(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result     := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('InsertMySQLReturnID_PARAMS') Then
-  Begin
-   vResult    := DWParams.ItemsString['Pooler'].Value;
-   InsertMySQLReturnID(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result     := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('InsertMySQLReturnID') Then
-  Begin
-   vResult    := DWParams.ItemsString['Pooler'].Value;
-   InsertMySQLReturnID(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result     := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('OpenDatasets') Then
-  Begin
-   vResult     := DWParams.ItemsString['Pooler'].Value;
-   OpenDatasets(BaseObject, vResult, DWParams, hEncodeStrings);
-   Result      := True;
-   If Not(DWParams.ItemsString['Error'].AsBoolean) Then
-    JSONStr    := TReplyOK
-   Else
-    JSONStr    := TReplyNOK;
-  End
- Else If vUrlMethod = UpperCase('GETEVENTS') Then
+ Else If (vUrlMethod = UpperCase('GETEVENTS')) And (Not (vForceWelcomeAccess)) Then
   Begin
    GetEvents(BaseObject, vResult, DWParams);
    If Not(DWParams.ItemsString['Error'].AsBoolean) Then
@@ -3319,13 +3663,33 @@ Begin
     JSONStr    := TReplyNOK;
    Result      := JSONStr = TReplyOK;
   End
- Else
+ Else If (Not (vForceWelcomeAccess)) Then
   Begin
    If ReturnEvent(BaseObject, vUrlMethod, vResult, DWParams, JsonMode) Then
     Begin
      JSONStr := vResult;
      Result  := JSONStr <> '';
+    End
+   Else
+    Begin
+     If Not WelcomeAccept Then
+      JSONStr := TReplyInvalidWelcome
+     Else
+      JSONStr := '';
+     Result  := JSONStr <> '';
     End;
+  End
+ Else
+  Begin
+   If Not WelcomeAccept Then
+    JSONStr := TReplyInvalidWelcome
+   Else
+    JSONStr := TReplyNOK;
+   Result  := False;
+   If DWParams.ItemsString['Error']        <> Nil Then
+    DWParams.ItemsString['Error'].AsBoolean := True;
+   If DWParams.ItemsString['MessageError'] <> Nil Then
+    DWParams.ItemsString['MessageError'].AsString := 'Invalid welcomemessage...';
   End;
 End;
 
@@ -3347,6 +3711,7 @@ Procedure TRESTServicePooler.aCommandGet(AContext      : TIdContext;
 Var
  JsonMode           : TJsonMode;
  DWParams           : TDWParams;
+ vAccessTag,
  vWelcomeMessage,
  boundary,
  startboundary,
@@ -3360,6 +3725,7 @@ Var
  newdecoder,
  Decoder            : TIdMessageDecoder;
  JSONParam          : TJSONParam;
+ WelcomeAccept,
  encodestrings,
  compresseddata,
  msgEnd             : Boolean;
@@ -3479,12 +3845,38 @@ Begin
     If ARequestInfo.URI <> '/favicon.ico' Then
      Begin
       If ARequestInfo.Params.Count > 0 Then
-       DWParams  := TServerUtils.ParseWebFormsParams (ARequestInfo.Params, ARequestInfo.URI,
-                                                      UrlMethod, VEncondig)
+       Begin
+        DWParams := TServerUtils.ParseWebFormsParams (ARequestInfo.Params, ARequestInfo.URI,
+                                                       UrlMethod, VEncondig);
+        If DWParams <> Nil Then
+         Begin
+          If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then
+           vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, csUndefined{$ENDIF});
+          If DWParams.ItemsString['accesstag'] <> Nil Then
+           vAccessTag := DecodeStrings(DWParams.ItemsString['accesstag'].AsString{$IFDEF FPC}, csUndefined{$ENDIF});
+          If DWParams.ItemsString['datacompression'] <> Nil Then
+           compresseddata := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+          If DWParams.ItemsString['dwencodestrings'] <> Nil Then
+           encodestrings  := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+         End;
+       End
       Else
        Begin
         If Copy(Cmd, 1, 3) = 'GET' Then
-         DWParams  := TServerUtils.ParseRESTURL (ARequestInfo.URI, VEncondig)
+         Begin
+          DWParams  := TServerUtils.ParseRESTURL (ARequestInfo.URI, VEncondig);
+          If DWParams <> Nil Then
+           Begin
+            If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then
+             vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, csUndefined{$ENDIF});
+            If DWParams.ItemsString['accesstag'] <> Nil Then
+             vAccessTag := DecodeStrings(DWParams.ItemsString['accesstag'].AsString{$IFDEF FPC}, csUndefined{$ENDIF});
+            If DWParams.ItemsString['datacompression'] <> Nil Then
+             compresseddata := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+            If DWParams.ItemsString['dwencodestrings'] <> Nil Then
+             encodestrings  := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+           End;
+         End
         Else
          Begin
           Try
@@ -3511,11 +3903,13 @@ Begin
                Decoder     := newdecoder;
                If Decoder <> Nil Then
                 TIdMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
-               If pos('dwwelcomemessage', tmp) > 0 Then
+               If pos('dwwelcomemessage', lowercase(tmp)) > 0 Then
                 vWelcomeMessage := DecodeStrings(ms.DataString{$IFDEF FPC}, csUndefined{$ENDIF})
-               Else If pos('datacompression', tmp) > 0 Then
+               Else If pos('accesstag', lowercase(tmp)) > 0 Then
+                vAccessTag := DecodeStrings(ms.DataString{$IFDEF FPC}, csUndefined{$ENDIF})
+               Else If pos('datacompression', lowercase(tmp)) > 0 Then
                 compresseddata := StringToBoolean(ms.DataString)
-               Else If pos('dwencodestrings', tmp) > 0 Then
+               Else If pos('dwencodestrings', lowercase(tmp)) > 0 Then
                 encodestrings  := StringToBoolean(ms.DataString)
                Else
                 Begin
@@ -3557,24 +3951,19 @@ Begin
           End;
          End;
        End;
+      WelcomeAccept     := True;
       If Assigned(vServerMethod) Then
        Begin
         vTempServerMethods:=vServerMethod.Create(nil);
         If vServerBaseMethod = TServerMethods Then
          Begin
-          If Trim(vWelcomeMessage) <> '' Then
-           Begin
-            If Assigned(TServerMethods(vTempServerMethods).OnWelcomeMessage) then
-             TServerMethods(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage);
-           End;
+          If Assigned(TServerMethods(vTempServerMethods).OnWelcomeMessage) then
+           TServerMethods(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, WelcomeAccept);
          End
         Else If vServerBaseMethod = TServerMethodDatamodule Then
          Begin
-          If Trim(vWelcomeMessage) <> '' Then
-           Begin
-            If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
-             TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage);
-           End;
+          If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
+           TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, WelcomeAccept);
          End;
        End
       Else
@@ -3653,19 +4042,20 @@ Begin
           End;
          If vTempServerMethods <> Nil Then
           Begin
-           If Not ServiceMethods(TComponent(vTempServerMethods), AContext, UrlMethod, DWParams, JSONStr, JsonMode, EncodeStrings) Then
+           If Not ServiceMethods(TComponent(vTempServerMethods), AContext, UrlMethod, DWParams,
+                                 JSONStr, JsonMode, EncodeStrings, vAccessTag, WelcomeAccept) Then
             Begin
              If UpperCase(Copy (Cmd, 1, 3)) = 'GET' Then
               Begin
                If vServerBaseMethod = TServerMethods Then
                 Begin
                  If Assigned(TServerMethods(vTempServerMethods).OnReplyEvent) then
-                  TServerMethods(vTempServerMethods).OnReplyEvent(seGET, UrlMethod, DWParams, JSONStr);
+                  TServerMethods(vTempServerMethods).OnReplyEvent(seGET, UrlMethod, DWParams, JSONStr, vAccessTag);
                 End
                Else If vServerBaseMethod = TServerMethodDatamodule Then
                 Begin
                  If Assigned(TServerMethodDatamodule(vTempServerMethods).OnReplyEvent) then
-                  TServerMethodDatamodule(vTempServerMethods).OnReplyEvent(seGET, UrlMethod, DWParams, JSONStr);
+                  TServerMethodDatamodule(vTempServerMethods).OnReplyEvent(seGET, UrlMethod, DWParams, JSONStr, vAccessTag);
                 End;
               End
              Else If UpperCase(Copy (Cmd, 1, 4)) = 'POST' Then
@@ -3673,12 +4063,12 @@ Begin
                If vServerBaseMethod = TServerMethods Then
                 Begin
                  If Assigned(TServerMethods(vTempServerMethods).OnReplyEvent) then
-                  TServerMethods(vTempServerMethods).OnReplyEvent(sePOST, UrlMethod, DWParams, JSONStr);
+                  TServerMethods(vTempServerMethods).OnReplyEvent(sePOST, UrlMethod, DWParams, JSONStr, vAccessTag);
                 End
                Else If vServerBaseMethod = TServerMethodDatamodule Then
                 Begin
                  If Assigned(TServerMethodDatamodule(vTempServerMethods).OnReplyEvent) then
-                  TServerMethodDatamodule(vTempServerMethods).OnReplyEvent(sePOST, UrlMethod, DWParams, JSONStr);
+                  TServerMethodDatamodule(vTempServerMethods).OnReplyEvent(sePOST, UrlMethod, DWParams, JSONStr, vAccessTag);
                 End;
               End;
             End;
@@ -3804,6 +4194,7 @@ Procedure TRESTServicePooler.aCommandOther(AContext      : TIdContext;
                                            AResponseInfo : TIdHTTPResponseInfo);
 Var
  DWParams           : TDWParams;
+ vAccessTag,
  vReplyString,
  Cmd, JSONStr       : String;
  vTempServerMethods : TObject;
@@ -3850,9 +4241,9 @@ Begin
       If vTempServerMethods <> Nil Then
        Begin
         If UpperCase(Copy (Cmd, 1, 3)) = 'PUT' Then
-         TServerMethods(vTempServerMethods).OnReplyEvent(sePUT, '', DWParams, JSONStr);
+         TServerMethods(vTempServerMethods).OnReplyEvent(sePUT, '', DWParams, JSONStr, vAccessTag);
         If UpperCase(Copy (Cmd, 1, 6)) = 'DELETE' Then
-         TServerMethods(vTempServerMethods).OnReplyEvent(seDELETE, '', DWParams, JSONStr);
+         TServerMethods(vTempServerMethods).OnReplyEvent(seDELETE, '', DWParams, JSONStr, vAccessTag);
        End;
      End;
     Try
@@ -3908,6 +4299,7 @@ Begin
  vServerContext                  := 'restdataware';
  VEncondig                       := esUtf8;
  vServicePort                    := 8082;
+ vForceWelcomeAccess             := False;
 End;
 
 Destructor TRESTServicePooler.Destroy;

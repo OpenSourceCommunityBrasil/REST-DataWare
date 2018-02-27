@@ -16,8 +16,8 @@ DesignerSecs=49
 <<<<<<< .mine
 InspectorSecs=95
 <<<<<<< .mine
-CompileSecs=406551
-OtherSecs=2176
+CompileSecs=417727
+OtherSecs=2215
 ||||||| .r863
 CompileSecs=304727
 OtherSecs=1518
@@ -34,7 +34,7 @@ CompileSecs=442973
 OtherSecs=2158
 >>>>>>> .r967
 >>>>>>> .r882
-StartTime=16/10/2017 19:38:50
+StartTime=25/02/2018 20:36:34
 RealKeys=0
 EffectiveKeys=0
 DebugSecs=1
