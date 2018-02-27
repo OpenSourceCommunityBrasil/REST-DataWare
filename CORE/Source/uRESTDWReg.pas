@@ -51,6 +51,8 @@ Type
   {$ELSE}
   Function  DoCreateField(const FieldName: String; Origin: string): TField; override;
   {$IFEND}
+  Function SupportsAggregates: Boolean; Override;
+  Function SupportsInternalCalc: Boolean; Override;
 End;
 
 Type
@@ -78,7 +80,7 @@ Begin
    TRESTDWClientSQL(Component).CreateDatasetFromList;
   {$IFEND}
  {$ENDIF}
- ShowFieldsEditor(Designer, TDataSet(Component), TDSDesignerDW);
+ ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TDSDesignerDW);
 end;
 
 procedure TRESTDWClientSQLEditor.ExecuteVerb(Index: Integer);
@@ -90,7 +92,7 @@ procedure TRESTDWClientSQLEditor.ExecuteVerb(Index: Integer);
     TRESTDWClientSQL(DataSet).CreateDatasetFromList;
    {$IFEND}
   {$ENDIF}
-  ShowFieldsEditor(Designer, TDataSet(Component), TDSDesignerDW);
+  ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TDSDesignerDW);
  End;
 Begin
  Case Index of
@@ -252,6 +254,16 @@ function TDWClientEventsEditor.GetVerbCount: Integer;
 begin
   Result := 3;
 end;
+
+Function TDSDesignerDW.SupportsAggregates: Boolean;
+Begin
+ Result := True;
+End;
+
+Function TDSDesignerDW.SupportsInternalCalc: Boolean;
+Begin
+ Result := True;
+End;
 
 initialization
 {$IFDEF FPC}
