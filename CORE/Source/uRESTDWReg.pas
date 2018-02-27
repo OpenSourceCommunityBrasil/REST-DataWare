@@ -50,9 +50,9 @@ Type
   Function  DoCreateField(const FieldName: WideString; Origin: string): TField; override;
   {$ELSE}
   Function  DoCreateField(const FieldName: String; Origin: string): TField; override;
-  {$IFEND}
   Function SupportsAggregates: Boolean; Override;
   Function SupportsInternalCalc: Boolean; Override;
+  {$IFEND}
 End;
 
 Type
@@ -135,6 +135,16 @@ Begin
    End;
  Finally
  End;
+End;
+
+Function TDSDesignerDW.SupportsAggregates: Boolean;
+Begin
+ Result := True;
+End;
+
+Function TDSDesignerDW.SupportsInternalCalc: Boolean;
+Begin
+ Result := True;
 End;
 {$ENDIF}
 
@@ -254,16 +264,6 @@ function TDWClientEventsEditor.GetVerbCount: Integer;
 begin
   Result := 3;
 end;
-
-Function TDSDesignerDW.SupportsAggregates: Boolean;
-Begin
- Result := True;
-End;
-
-Function TDSDesignerDW.SupportsInternalCalc: Boolean;
-Begin
- Result := True;
-End;
 
 initialization
 {$IFDEF FPC}

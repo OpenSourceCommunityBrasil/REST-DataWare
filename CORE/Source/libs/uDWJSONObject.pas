@@ -2057,6 +2057,9 @@ Begin
        TRESTDWClientSQL(DestDS).PrepareDetails(True);
      End;
    End;
+  If DestDS Is TRESTDWClientSQL Then
+   If TRESTDWClientSQL(DestDS).Active Then
+    TRESTDWClientSQL(DestDS).ForceInternalCalc;
   DestDS.EnableControls;
  End;
 End;
