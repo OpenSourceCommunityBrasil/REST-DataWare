@@ -2804,6 +2804,7 @@ Var
  vError : String;
 Begin
  vErrorBefore := False;
+ vError       := '';
  If Not vReadData Then
   Begin
    If Not vInBlockEvents Then
@@ -2811,7 +2812,8 @@ Begin
      Try
       If Trim(vUpdateTableName) <> '' Then
        If vAutoCommitData Then
-        ApplyUpdates(vError);
+        If TMassiveDatasetBuffer(vMassiveDataset).RecordCount > 0 Then
+         ApplyUpdates(vError);
       If vError <> '' Then
        Raise Exception.Create(vError)
       Else
@@ -2828,11 +2830,30 @@ Begin
 End;
 
 procedure TRESTDWClientSQL.OldAfterDelete(DataSet: TDataSet);
+Var
+ vError : String;
 Begin
  vErrorBefore := False;
+ vError       := '';
  Try
-  If Assigned(vOnAfterDelete) Then
-   vOnAfterDelete(Self);
+  If Not vReadData Then
+   Begin
+    Try
+     If Trim(vUpdateTableName) <> '' Then
+      If vAutoCommitData Then
+       If TMassiveDatasetBuffer(vMassiveDataset).RecordCount > 0 Then
+        ApplyUpdates(vError);
+     If vError <> '' Then
+      Raise Exception.Create(vError)
+     Else
+      Begin
+       If Assigned(vOnAfterDelete) Then
+        vOnAfterDelete(Self);
+       ProcAfterScroll(Dataset);
+      End;
+    Except
+    End;
+   End;
  Finally
   vReadData := False;
  End;

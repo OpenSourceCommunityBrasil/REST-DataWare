@@ -79,7 +79,7 @@ implementation
 
 Function TRESTDWClientSQLBase.OnEditingState: Boolean;
 Begin
- Result := not (State in [dsEdit, dsInsert]);
+ Result := (State in [dsEdit, dsInsert]);
  If Result then
   Edit;
 end;
