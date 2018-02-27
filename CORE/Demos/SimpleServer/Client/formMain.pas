@@ -188,7 +188,8 @@ begin
  RESTClientPooler1.UserName        := EdUserNameDW.Text;
  RESTClientPooler1.Password        := EdPasswordDW.Text;
  RESTClientPooler1.DataCompression := CheckBox1.Checked;
- RESTClientPooler1.WelcomeMessage := eWelcomemessage.Text;
+ RESTClientPooler1.AccessTag       := eAccesstag.Text;
+ RESTClientPooler1.WelcomeMessage  := eWelcomemessage.Text;
  If chkhttps.Checked then
   RESTClientPooler1.TypeRequest := TTyperequest.trHttps
  Else
@@ -226,7 +227,8 @@ begin
  RESTClientPooler1.UserName        := EdUserNameDW.Text;
  RESTClientPooler1.Password        := EdPasswordDW.Text;
  RESTClientPooler1.DataCompression := CheckBox1.Checked;
- RESTClientPooler1.WelcomeMessage := eWelcomemessage.Text;
+ RESTClientPooler1.AccessTag       := eAccesstag.Text;
+ RESTClientPooler1.WelcomeMessage  := eWelcomemessage.Text;
  If chkhttps.Checked then
   RESTClientPooler1.TypeRequest := TTyperequest.trHttps
  Else

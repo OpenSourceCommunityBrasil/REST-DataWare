@@ -412,6 +412,7 @@ Type
   Property AllowCookies     : Boolean                Read GetAllowCookies    Write SetAllowCookies;
   Property HandleRedirects  : Boolean                Read GetHandleRedirects Write SetHandleRedirects;
   Property WelcomeMessage   : String                 Read vWelcomeMessage    Write vWelcomeMessage;
+  Property AccessTag        : String                 Read vAccessTag         Write vAccessTag;
   Property OnWork           : TOnWork                Read vOnWork            Write SetOnWork;
   Property OnWorkBegin      : TOnWorkBegin           Read vOnWorkBegin       Write SetOnWorkBegin;
   Property OnWorkEnd        : TOnWorkEnd             Read vOnWorkEnd         Write SetOnWorkEnd;
