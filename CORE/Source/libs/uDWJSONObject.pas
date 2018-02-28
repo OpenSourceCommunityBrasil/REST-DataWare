@@ -733,7 +733,7 @@ Begin
      If Not(vObjectValue In [ovBlob, ovGraphic, ovOraBlob, ovOraClob]) Then
       aResult := StringToJsonString(aResult);
   End;
- If (Trim(aResult) = '') And vInsertTag Then
+ If ((Trim(aResult) = '') or (Trim(bValue) = '"null"')) And vInsertTag Then
   aResult := '""';
  If JsonMode = jmDataware Then
   Begin
@@ -773,11 +773,18 @@ Begin
          Else If (aResult = '') Then
           aResult := '""';
         End;
-       Result := Format(TValueFormatJSONValue, ['ObjectType',  GetObjectName(vTypeObject),         'Direction',
-                                                               GetDirectionName(vObjectDirection), 'Encoded',
-                                                               EncodedString,                      'ValueType',
-                                                               GetValueType(vObjectValue),         vtagName,
-                                                               GetValueJSON(aResult)]);
+       If (Trim(bValue) = '"null"') Then
+        Result := Format(TValueFormatJSONValue, ['ObjectType',  GetObjectName(vTypeObject),         'Direction',
+                                                                GetDirectionName(vObjectDirection), 'Encoded',
+                                                                EncodedString,                      'ValueType',
+                                                                GetValueType(vObjectValue),         vtagName,
+                                                                GetValueJSON(Trim(bValue))])
+       Else
+        Result := Format(TValueFormatJSONValue, ['ObjectType',  GetObjectName(vTypeObject),         'Direction',
+                                                                GetDirectionName(vObjectDirection), 'Encoded',
+                                                                EncodedString,                      'ValueType',
+                                                                GetValueType(vObjectValue),         vtagName,
+                                                                GetValueJSON(aResult)]);
       End;
     End;
   End

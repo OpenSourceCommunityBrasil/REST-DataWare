@@ -1160,7 +1160,6 @@ object Form9: TForm9
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = False
-    InBlockEvents = False
     Left = 191
     Top = 106
     object dwSQLEmployeeEMP_NO: TSmallintField
@@ -1198,7 +1197,6 @@ object Form9: TForm9
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = False
-    InBlockEvents = False
     MassiveCache = DWMassiveCache1
     Left = 186
     Top = 148
@@ -1283,7 +1281,6 @@ object Form9: TForm9
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = False
-    InBlockEvents = False
     MassiveCache = DWMassiveCache1
     Left = 186
     Top = 193
