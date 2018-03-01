@@ -138,6 +138,11 @@ Begin
        Begin
         JSONParam.ParamName := Copy(Params[I], 1, Pos('=', Params[I]) - 1);
         JSONParam.AsString  := Trim(Copy(Params[I], Pos('=', Params[I]) + 1, Length(Params[I])));
+        If JSONParam.AsString = '' Then
+         Begin
+          JSONParam.ObjectDirection := odOut;
+          JSONParam.Encoded         := False;
+         End;
        End;
       Result.Add(JSONParam);
      End;

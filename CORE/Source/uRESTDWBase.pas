@@ -3066,7 +3066,7 @@ Begin
             End;
           End;
          If AContext <> Nil Then
-          MyIP := AContext.Connection.Socket.Binding.IP;
+          MyIP := AContext.Connection.Socket.Binding.PeerIP;
          Break;
         End;
       End;
