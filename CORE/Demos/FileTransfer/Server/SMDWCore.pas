@@ -18,10 +18,11 @@ Type
    { Public declarations }
    Constructor Create    (aOwner : TComponent); Override;
    Destructor  Destroy; Override;
-   Procedure   vReplyEvent(SendType   : TSendEvent;
-                           Context    : String;
-                           Var Params : TDWParams;
-                           Var Result : String);
+   Procedure   vReplyEvent(SendType           : TSendEvent;
+                           Context            : String;
+                           Var Params         : TDWParams;
+                           Var Result         : String;
+                           AccessTag          : String);
   End;
 {$METHODINFO OFF}
 
@@ -29,10 +30,11 @@ implementation
 
 uses StrUtils, uPrincipal;
 
-Procedure TSMDWCore.vReplyEvent(SendType   : TSendEvent;
-                                Context    : String;
-                                Var Params : TDWParams;
-                                Var Result : String);
+Procedure TSMDWCore.vReplyEvent(SendType           : TSendEvent;
+                                Context            : String;
+                                Var Params         : TDWParams;
+                                Var Result         : String;
+                                AccessTag          : String);
 Var
  JSONObject : TJSONObject;
 Begin

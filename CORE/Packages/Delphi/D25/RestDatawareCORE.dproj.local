@@ -1,2 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject/>
+<BorlandProject>
+	<ActiveMobileDevice>
+		<NoProfile iOSSimulator="iPhone5"/>  <PMacosX iOSSimulator="iPhone5"/>
+  </ActiveMobileDevice>
+	<Transactions/>
+</BorlandProject>

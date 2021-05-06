@@ -180,7 +180,6 @@
         <DCCReference Include="FireDACCommon.dcp"/>
         <DCCReference Include="dsnap.dcp"/>
         <DCCReference Include="dcldb.dcp"/>
-        <DCCReference Include="dcllmdtoolsdb.dcp"/>
         <DCCReference Include="..\..\..\Source\uDWPoolerMethod.pas"/>
         <DCCReference Include="..\..\..\Source\uRESTDWBase.pas"/>
         <DCCReference Include="..\..\..\Source\uRESTDWMasterDetailData.pas"/>

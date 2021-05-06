@@ -1,16 +1,16 @@
 [Stats]
 <<<<<<< .mine
-EditorSecs=20261
+EditorSecs=22345
 ||||||| .r863
 EditorSecs=8268
 =======
 EditorSecs=8274
 >>>>>>> .r882
-DesignerSecs=474
+DesignerSecs=477
 InspectorSecs=798
 <<<<<<< .mine
-CompileSecs=973475
-OtherSecs=4946
+CompileSecs=1088089
+OtherSecs=5362
 ||||||| .r863
 CompileSecs=276158
 OtherSecs=1076

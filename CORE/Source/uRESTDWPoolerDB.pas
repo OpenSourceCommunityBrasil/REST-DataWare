@@ -135,6 +135,7 @@ Type
   vOnWorkBegin         : TOnWorkBegin;
   vOnWorkEnd           : TOnWorkEnd;
   vOnStatus            : TOnStatus;
+  vAccessTag,
   vWelcomeMessage,
   vLogin,                                            //Login do Usuário caso haja autenticação
   vPassword,                                         //Senha do Usuário caso haja autenticação
@@ -237,6 +238,7 @@ Type
   {$IFDEF FPC}
   Property DatabaseCharSet    : TDatabaseCharSet         Read vDatabaseCharSet    Write vDatabaseCharSet;
   {$ENDIF}
+  Property AccessTag          : String                   Read vAccessTag          Write vAccessTag;
   Property ParamCreate        : Boolean                  read vParamCreate        write vParamCreate;
   Property TypeRequest        : TTypeRequest             Read vTypeRequest        Write vTypeRequest       Default trHttp;
 End;
@@ -376,7 +378,7 @@ Type
   Procedure   Open               (SQL     : String);Overload; Virtual;//Método Open que será utilizado no Componente
   Procedure   ExecOrOpen;                                 //Método Open que será utilizado no Componente
   Procedure   Close;Virtual;                              //Método Close que será utilizado no Componente
-  Procedure   CreateDataSet; virtual;
+  Procedure   CreateDataSet;
   Procedure   CreateDatasetFromList;
   Function    ExecSQL          (Var Error : String) : Boolean;   //Método ExecSQL que será utilizado no Componente
   Function    InsertMySQLReturnID : Integer;                     //Método de ExecSQL com retorno de Incremento
@@ -456,6 +458,7 @@ End;
 Type
  TRESTDWPoolerList = Class(TComponent)
  Private
+  vAccessTag,
   vWelcomeMessage,
   vPoolerPrefix,                                     //Prefixo do WS
   vLogin,                                            //Login do Usuário caso haja autenticação
@@ -486,6 +489,7 @@ Type
   Property PoolerPort         : Integer                  Read vPoolerPort         Write SetPoolerPort;      //A Porta do Pooler do DataSet
   Property PoolerPrefix       : String                   Read vPoolerPrefix       Write vPoolerPrefix;      //Prefixo do WebService REST
   Property Poolers            : TStringList              Read vPoolerList;
+  Property AccessTag          : String                   Read vAccessTag          Write vAccessTag;
  End;
 
 Type
@@ -568,6 +572,7 @@ Type
   vStrsTrim2Len,
   vCompression   : Boolean;
   vEncoding      : TEncodeSelect;
+  vAccessTag,
   vMessagePoolerOff : String;
   vParamCreate   : Boolean;
   Procedure SetConnection(Value : TRESTDWDriver);
@@ -607,6 +612,7 @@ Type
   Property    StrsTrim2Len     : Boolean       Read vStrsTrim2Len     Write vStrsTrim2Len;
   Property    Active           : Boolean       Read vActive           Write vActive;
   Property    PoolerOffMessage : String        Read vMessagePoolerOff Write vMessagePoolerOff;
+  Property    AccessTag        : String        Read vAccessTag        Write vAccessTag;
   Property    ParamCreate      : Boolean       Read vParamCreate      Write vParamCreate;
 End;
 
@@ -1054,6 +1060,7 @@ Begin
  vRESTConnectionDB.OnWorkBegin    := vOnWorkBegin;
  vRESTConnectionDB.OnWorkEnd      := vOnWorkEnd;
  vRESTConnectionDB.OnStatus       := vOnStatus;
+ vRESTConnectionDB.AccessTag      := vAccessTag;
  {$IFDEF FPC}
   vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
  {$ENDIF}
@@ -1080,11 +1087,8 @@ Begin
      Begin
       Try
        Result          := TJSONValue.Create;
-       {$IFNDEF FPC}
-        Result.Encoding := LDataSetList.Encoding;
-       {$ENDIF}
-       Result.Encoded  := LDataSetList.Encoded;
-       Result.SetValue(LDataSetList.ToJson, Result.Encoded);
+       Result.Encoding := LDataSetList.Encoding;
+       Result.SetValue(LDataSetList.value);
       Finally
       End;
      End;
@@ -1114,8 +1118,8 @@ Begin
    End;
  End;
  FreeAndNil(vRESTConnectionDB);
- if Assigned(LDataSetList) then
-   FreeAndNil(LDataSetList);
+ If Assigned(LDataSetList) then
+  FreeAndNil(LDataSetList);
 End;
 
 Function TRESTDWDataBase.InsertMySQLReturnID(Var SQL          : TStringList;
@@ -1168,6 +1172,7 @@ Begin
  vRESTConnectionDB.OnWorkBegin   := vOnWorkBegin;
  vRESTConnectionDB.OnWorkEnd     := vOnWorkEnd;
  vRESTConnectionDB.OnStatus      := vOnStatus;
+ vRESTConnectionDB.AccessTag     := vAccessTag;
  {$IFDEF FPC}
   vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
  {$ENDIF}
@@ -1268,6 +1273,7 @@ Begin
  vRESTConnectionDB.Compression      := vCompression;
  vRESTConnectionDB.TypeRequest      := VtypeRequest;
  vRESTConnectionDB.Encoding         := VEncondig;
+ vRESTConnectionDB.AccessTag        := vAccessTag;
  {$IFNDEF FPC}
   vRESTConnectionDB.OnWork          := vOnWork;
   vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
@@ -1368,6 +1374,7 @@ Begin
  vRESTConnectionDB.OnWorkBegin    := vOnWorkBegin;
  vRESTConnectionDB.OnWorkEnd      := vOnWorkEnd;
  vRESTConnectionDB.OnStatus       := vOnStatus;
+ vRESTConnectionDB.AccessTag      := vAccessTag;
  {$IFDEF FPC}
   vRESTConnectionDB.DatabaseCharSet := vDatabaseCharSet;
  {$ENDIF}
@@ -1458,6 +1465,7 @@ Begin
  vConnection.Port           := vPoolerPort;
  vConnection.Compression    := vCompression;
  vConnection.TypeRequest    := VtypeRequest;
+ vConnection.AccessTag      := vAccessTag;
  Result := TStringList.Create;
  Try
   vTempList := vConnection.GetPoolerList(vRestURL, vTimeOut, vLogin, vPassword);
@@ -1570,6 +1578,7 @@ Begin
      vRESTConnectionDB.Compression      := vCompression;
      vRESTConnectionDB.TypeRequest      := VtypeRequest;
      vRESTConnectionDB.Encoding         := VEncondig;
+     vRESTConnectionDB.AccessTag        := vAccessTag;
      {$IFNDEF FPC}
      vRESTConnectionDB.OnWork          := vOnWork;
      vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
@@ -1609,6 +1618,7 @@ Begin
  vConnection.WelcomeMessage := vWelcomeMessage;
  vConnection.Host           := vRestWebService;
  vConnection.Port           := vPoolerPort;
+ vConnection.AccessTag      := vAccessTag;
  Try
   vPoolerList.Clear;
   vPoolerList.Assign(vConnection.GetPoolerList(vPoolerPrefix, 3000, vLogin, vPassword));
@@ -1630,6 +1640,7 @@ Begin
  vConnection.Port           := vPoolerPort;
  vConnection.Compression    := vCompression;
  vConnection.EncodeStrings  := EncodeStrings;
+ vConnection.AccessTag      := vAccessTag;
  {$IFNDEF FPC}
   vConnection.OnWork        := vOnWork;
   vConnection.OnWorkBegin   := vOnWorkBegin;
@@ -2626,6 +2637,7 @@ Begin
   {$ENDIF}
   {$IFDEF RESTFDMEMTABLE}
    TFDmemtable(self).CreateDataSet;
+   TFDmemtable(self).Open;
   {$ENDIF}
   {$ENDIF}
   vCreateDS := False;
@@ -2792,6 +2804,7 @@ Var
  vError : String;
 Begin
  vErrorBefore := False;
+ vError       := '';
  If Not vReadData Then
   Begin
    If Not vInBlockEvents Then
@@ -2799,7 +2812,8 @@ Begin
      Try
       If Trim(vUpdateTableName) <> '' Then
        If vAutoCommitData Then
-        ApplyUpdates(vError);
+        If TMassiveDatasetBuffer(vMassiveDataset).RecordCount > 0 Then
+         ApplyUpdates(vError);
       If vError <> '' Then
        Raise Exception.Create(vError)
       Else
@@ -2816,11 +2830,30 @@ Begin
 End;
 
 procedure TRESTDWClientSQL.OldAfterDelete(DataSet: TDataSet);
+Var
+ vError : String;
 Begin
  vErrorBefore := False;
+ vError       := '';
  Try
-  If Assigned(vOnAfterDelete) Then
-   vOnAfterDelete(Self);
+  If Not vReadData Then
+   Begin
+    Try
+     If Trim(vUpdateTableName) <> '' Then
+      If vAutoCommitData Then
+       If TMassiveDatasetBuffer(vMassiveDataset).RecordCount > 0 Then
+        ApplyUpdates(vError);
+     If vError <> '' Then
+      Raise Exception.Create(vError)
+     Else
+      Begin
+       If Assigned(vOnAfterDelete) Then
+        vOnAfterDelete(Self);
+       ProcAfterScroll(Dataset);
+      End;
+    Except
+    End;
+   End;
  Finally
   vReadData := False;
  End;
@@ -3046,9 +3079,11 @@ Begin
      End
     Else
      Begin
-      LDataSetList         := DataSet;
-      vError               := False;
-      vValue               := LDataSetList.Value;
+      vValue                := DataSet.Value;
+      LDataSetList          := TJSONValue.Create;
+      LDataSetList.Encoded  := vRESTDataBase.EncodeStrings;
+      LDataSetList.Encoding := DataBase.Encoding;
+      vError                := False;
      End;
     If (Assigned(LDataSetList)) And (Not (vError)) Then
      Begin
@@ -3060,8 +3095,7 @@ Begin
      End;
    Except
    End;
-   If (LDataSetList <> Nil) And
-      (DataSet = Nil) Then
+   If (LDataSetList <> Nil) Then
     FreeAndNil(LDataSetList);
    If vError Then
     Begin
@@ -3158,7 +3192,6 @@ Begin
       TFDmemtable(Self).Close;
      {$ENDIF}
      {$ENDIF}
-     TRESTDWClientSQL(Self).Close;
     End;
    Exit;
   End;

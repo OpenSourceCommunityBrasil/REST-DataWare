@@ -36,10 +36,8 @@ requires
   IndySystem,
   IndyProtocols,
   IndyCore,
-  FireDAC,
-  FireDACCommonDriver,
-  FireDACCommon,
-  dsnap;
+  dsnap,
+  dcldb;
 
 contains
   uDWPoolerMethod in '..\..\..\Source\uDWPoolerMethod.pas',

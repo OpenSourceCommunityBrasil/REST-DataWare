@@ -35,7 +35,6 @@ End;
 Type
  {$IFDEF FPC}
   TRESTDWClientSQLBase   = Class(TMemDataset)                   //Classe com as funcionalidades de um DBQuery
-  Public
 //   Constructor Create(AOwner: TComponent); Override;
  {$ELSE}
   {$IFDEF CLIENTDATASET}
@@ -51,6 +50,10 @@ Type
   TRESTDWClientSQLBase   = Class(TFDMemtable)                 //Classe com as funcionalidades de um DBQuery
   {$ENDIF}
  {$ENDIF}
+  Private
+   Function OnEditingState: Boolean;
+  Public
+   Procedure ForceInternalCalc;
 End;
 
 Type
@@ -73,13 +76,28 @@ Type
 
 implementation
 
-{
-Constructor TRESTDWClientSQLBase.Create(AOwner: TComponent);
+
+Function TRESTDWClientSQLBase.OnEditingState: Boolean;
 Begin
- Inherited;//(AOwner);
- SetDefaultFields(csDesigning in ComponentState);
-// SetDefaultFields(True);
+ Result := (State in [dsEdit, dsInsert]);
+ If Result then
+  Edit;
+end;
+
+Procedure TRESTDWClientSQLBase.ForceInternalCalc;
+Var
+ needsPost : Boolean;
+ saveState : TDataSetState;
+Begin
+ needsPost := OnEditingState;
+ saveState := setTempState(dsInternalCalc);
+ Try
+  RefreshInternalCalcFields(ActiveBuffer);
+ Finally
+  RestoreState(saveState);
+ End;
+ If needsPost Then
+  Post;
 End;
-}
 
 end.

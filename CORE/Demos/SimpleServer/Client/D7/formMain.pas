@@ -39,6 +39,17 @@ type
     Button2: TButton;
     ProgressBar1: TProgressBar;
     Button4: TButton;
+    RESTDWClientSQL1EMP_NO: TSmallintField;
+    RESTDWClientSQL1FIRST_NAME: TStringField;
+    RESTDWClientSQL1LAST_NAME: TStringField;
+    RESTDWClientSQL1PHONE_EXT: TStringField;
+    RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField;
+    RESTDWClientSQL1DEPT_NO: TStringField;
+    RESTDWClientSQL1JOB_CODE: TStringField;
+    RESTDWClientSQL1JOB_GRADE: TSmallintField;
+    RESTDWClientSQL1JOB_COUNTRY: TStringField;
+    RESTDWClientSQL1SALARY: TFloatField;
+    RESTDWClientSQL1FULL_NAME: TStringField;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure RESTDWDataBase1WorkBegin(ASender: TObject;

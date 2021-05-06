@@ -915,8 +915,8 @@ object Form2: TForm2
     ParentFont = False
   end
   object Label6: TLabel
-    Left = 123
-    Top = 79
+    Left = 95
+    Top = 77
     Width = 35
     Height = 13
     AutoSize = False
@@ -930,7 +930,7 @@ object Form2: TForm2
   end
   object Label8: TLabel
     Left = 13
-    Top = 79
+    Top = 77
     Width = 43
     Height = 13
     AutoSize = False
@@ -982,6 +982,36 @@ object Form2: TForm2
     Font.Style = [fsBold]
     ParentFont = False
   end
+  object Label3: TLabel
+    Left = 201
+    Top = 40
+    Width = 61
+    Height = 13
+    Caption = 'Access tag'
+    Color = clBtnFace
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Label9: TLabel
+    Left = 201
+    Top = 77
+    Width = 105
+    Height = 13
+    Caption = 'Welcome Message'
+    Color = clBtnFace
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
   object eHost: TEdit
     Left = 13
     Top = 55
@@ -999,9 +1029,9 @@ object Form2: TForm2
     Text = '8082'
   end
   object edPasswordDW: TEdit
-    Left = 123
-    Top = 97
-    Width = 100
+    Left = 95
+    Top = 92
+    Width = 78
     Height = 21
     PasswordChar = '*'
     TabOrder = 2
@@ -1009,8 +1039,8 @@ object Form2: TForm2
   end
   object edUserNameDW: TEdit
     Left = 13
-    Top = 97
-    Width = 100
+    Top = 92
+    Width = 78
     Height = 21
     TabOrder = 3
     Text = 'testserver'
@@ -1068,7 +1098,7 @@ object Form2: TForm2
   end
   object CheckBox1: TCheckBox
     Left = 229
-    Top = 98
+    Top = 114
     Width = 91
     Height = 19
     Caption = 'Compression'
@@ -1156,11 +1186,17 @@ object Form2: TForm2
     OnClick = Button4Click
   end
   object chkhttps: TCheckBox
-    Left = 208
-    Top = 57
+    Left = 126
+    Top = 115
     Width = 97
     Height = 17
     Caption = 'Usar HTTPS'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
     TabOrder = 14
   end
   object Button5: TButton
@@ -1193,10 +1229,24 @@ object Form2: TForm2
     TabOrder = 16
     OnClick = Button6Click
   end
+  object eAccesstag: TEdit
+    Left = 201
+    Top = 55
+    Width = 119
+    Height = 21
+    TabOrder = 17
+  end
+  object eWelcomemessage: TEdit
+    Left = 201
+    Top = 92
+    Width = 119
+    Height = 21
+    TabOrder = 18
+  end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1
-    Left = 263
-    Top = 64
+    Left = 543
+    Top = 208
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
     FieldDefs = <>
@@ -1223,8 +1273,8 @@ object Form2: TForm2
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = True
-    Left = 235
-    Top = 64
+    Left = 515
+    Top = 208
     object RESTDWClientSQL1EMP_NO: TSmallintField
       FieldName = 'EMP_NO'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
@@ -1272,16 +1322,14 @@ object Form2: TForm2
     end
     object RESTDWClientSQL1FULL_NAME: TStringField
       FieldName = 'FULL_NAME'
-      ReadOnly = True
       Size = 37
     end
   end
   object RESTDWDataBase1: TRESTDWDataBase
     OnConnection = RESTDWDataBase1Connection
     OnBeforeConnect = RESTDWDataBase1BeforeConnect
-    Active = True
+    Active = False
     Compression = True
-    MyIP = '127.0.0.1'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
@@ -1302,8 +1350,8 @@ object Form2: TForm2
     OnWorkEnd = RESTDWDataBase1WorkEnd
     OnStatus = RESTDWDataBase1Status
     ParamCreate = True
-    Left = 208
-    Top = 64
+    Left = 488
+    Top = 208
   end
   object ActionList1: TActionList
     Left = 48
@@ -1388,8 +1436,8 @@ object Form2: TForm2
         JsonMode = jmDataware
         Name = 'getemployee'
       end>
-    Left = 237
-    Top = 21
+    Left = 517
+    Top = 165
   end
   object RESTClientPooler1: TRESTClientPooler
     DataCompression = True
@@ -1404,7 +1452,7 @@ object Form2: TForm2
     ThreadRequest = False
     AllowCookies = False
     HandleRedirects = False
-    Left = 209
-    Top = 21
+    Left = 489
+    Top = 165
   end
 end

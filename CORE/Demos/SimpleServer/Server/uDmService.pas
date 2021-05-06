@@ -40,6 +40,9 @@ USES
   uDWConsts, uRESTDWServerEvents, FireDAC.Stan.Param, FireDAC.DatS,
   FireDAC.DApt.Intf, FireDAC.Comp.DataSet;
 
+Const
+ WelcomeSample = False;
+
 TYPE
   TServerMethodDM = CLASS(TServerMethodDataModule)
     RESTDWPoolerDB1: TRESTDWPoolerDB;
@@ -53,7 +56,6 @@ TYPE
     FDQuery1: TFDQuery;
     PROCEDURE ServerMethodDataModuleCreate(Sender: TObject);
     PROCEDURE Server_FDConnectionBeforeConnect(Sender: TObject);
-    PROCEDURE ServerMethodDataModuleWelcomeMessage(Welcomemsg: STRING);
     PROCEDURE Server_FDConnectionError(ASender, AInitiator: TObject; VAR AException: Exception);
     procedure ServerMethodDataModuleMassiveProcess(
       var MassiveDataset: TMassiveDatasetBuffer; var Ignore: Boolean);
@@ -65,6 +67,8 @@ TYPE
       var Params: TDWParams; var Result: string);
     procedure DWServerEvents1EventsgetemployeeReplyEvent(var Params: TDWParams;
       var Result: string);
+    procedure ServerMethodDataModuleWelcomeMessage(Welcomemsg,
+      AccessTag: string; var Accept: Boolean);
   PRIVATE
     { Private declarations }
     vIDVenda : Integer;
@@ -204,10 +208,42 @@ begin
   End;
 end;
 
-PROCEDURE TServerMethodDM.ServerMethodDataModuleWelcomeMessage(Welcomemsg: STRING);
-BEGIN
-  RestDWForm.EdBD.Text := Welcomemsg;
-END;
+procedure TServerMethodDM.ServerMethodDataModuleWelcomeMessage(Welcomemsg,
+  AccessTag: string; var Accept: Boolean);
+Var
+ vUserNameWM,
+ vPasswordWM : String;
+begin
+ vUserNameWM := '';
+ vPasswordWM := '';
+ If WelcomeSample Then
+  Begin
+   Try
+    If Pos('|', Welcomemsg) > 0 Then
+     Begin
+      vUserNameWM := Copy(Welcomemsg, 1, Pos('|', Welcomemsg)-1);
+      Delete(Welcomemsg, 1, Pos('|', Welcomemsg));
+     End
+    Else
+     Begin
+      vUserNameWM := Copy(Welcomemsg, 1, Length(Welcomemsg));
+      Delete(Welcomemsg, 1, Length(Welcomemsg));
+     End;
+    vPasswordWM := Copy(Welcomemsg, 1, Length(Welcomemsg));
+    FDQuery1.Close;
+    FDQuery1.SQL.Clear;
+    FDQuery1.SQL.Add('select * from TB_USUARIO where Upper(NM_LOGIN) = Upper(:USERNAME) AND Upper(DS_SENHA) = Upper(:PASSWORD)');
+    FDQuery1.ParamByName('USERNAME').AsString := vUserNameWM;
+    FDQuery1.ParamByName('PASSWORD').AsString := vPasswordWM;
+    FDQuery1.Open;
+   Finally
+    Accept := Not(FDQuery1.Eof);
+    FDQuery1.Close;
+   End;
+// Accept := ((AccessTag)  = RESTDWPoolerDB1.AccessTag) Or
+//          ((Welcomemsg) = 'teste');
+  End;
+end;
 
 PROCEDURE TServerMethodDM.Server_FDConnectionBeforeConnect(Sender: TObject);
 VAR

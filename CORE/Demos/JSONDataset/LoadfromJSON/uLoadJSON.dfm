@@ -1086,6 +1086,7 @@ object Form3: TForm3
             ParamName = 'inputdata'
             Encoded = True
           end>
+        JsonMode = jmDataware
         Name = 'servertime'
       end
       item
@@ -1097,6 +1098,7 @@ object Form3: TForm3
             ParamName = 'result'
             Encoded = True
           end>
+        JsonMode = jmDataware
         Name = 'teste'
       end
       item
@@ -1115,6 +1117,7 @@ object Form3: TForm3
             ParamName = 'result'
             Encoded = True
           end>
+        JsonMode = jmDataware
         Name = 'loaddatasetevent'
       end>
     Left = 125
@@ -1123,6 +1126,7 @@ object Form3: TForm3
   object RESTClientPooler1: TRESTClientPooler
     DataCompression = True
     Encoding = esASCII
+    hEncodeStrings = True
     Host = 'localhost'
     UserName = 'testserver'
     Password = 'testserver'

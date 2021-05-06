@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{51492283-F4E3-4B42-AF62-715E4F0BADAF}</ProjectGuid>
         <MainSource>RESTDWDriverFD.dpk</MainSource>
-        <ProjectVersion>18.2</ProjectVersion>
+        <ProjectVersion>18.3</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
@@ -163,7 +163,7 @@
         <DCCReference Include="DataSnapServer.dcp"/>
         <DCCReference Include="DataSnapFireDAC.dcp"/>
         <DCCReference Include="RestDatawareCORE.dcp"/>
-        <DCCReference Include="..\..\uRestDWDriverFD.pas"/>
+        <DCCReference Include="..\..\uRESTDWDriverFD.pas"/>
         <RcItem Include="..\..\TRESTDWDriverFD.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTDWDriverFD</ResourceId>

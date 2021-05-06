@@ -44,6 +44,9 @@ Const
  TQuotedValueMemString = '\"';
  TReplyOK              = '{"MESSAGE":"OK",  "RESULT":"OK"}';
  TReplyNOK             = '{"MESSAGE":"NOK", "RESULT":"NOK"}';
+ TReplyTagError        = '{"MESSAGE":"NOK", "RESULT":"Invalid Access tag..."}';
+ TReplyInvalidPooler   = '{"MESSAGE":"NOK", "RESULT":"Invalid Pooler Name..."}';
+ TReplyInvalidWelcome  = '{"MESSAGE":"NOK", "RESULT":"Invalid welcomemessage..."}';
  AuthRealm             = 'Provide Authentication';
  UrlBase               = '%s://%s:%d/%s';
  ByteBuffer            = 1024 * 8; //8kb

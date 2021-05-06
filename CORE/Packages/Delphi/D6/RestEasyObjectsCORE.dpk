@@ -37,7 +37,9 @@ requires
   vcljpg,
   Jcl,
   JvCore,
-  JvDB;
+  JvDB,
+  dcldb,
+  bdertl;
 
 contains
   uRESTDWBase in '..\..\..\Source\uRESTDWBase.pas',

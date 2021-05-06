@@ -1152,6 +1152,7 @@ object fPrincipal: TfPrincipal
     StoreDefs = True
     MasterCascadeDelete = False
     Inactive = False
+    Datapacks = -1
     DataCache = True
     Params = <>
     DataBase = RESTDWDataBase1
@@ -1161,7 +1162,6 @@ object fPrincipal: TfPrincipal
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = True
-    InBlockEvents = False
     MassiveCache = DWMassiveCache1
     Left = 192
     Top = 120
@@ -1199,6 +1199,7 @@ object fPrincipal: TfPrincipal
     StoreDefs = True
     MasterCascadeDelete = False
     Inactive = False
+    Datapacks = -1
     DataCache = True
     Params = <>
     DataBase = RESTDWDataBase1
@@ -1208,7 +1209,6 @@ object fPrincipal: TfPrincipal
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = True
-    InBlockEvents = False
     MassiveCache = DWMassiveCache1
     Left = 192
     Top = 216
