@@ -39,7 +39,12 @@ requires
   JvCore,
   JvDB,
   dcldb,
-  bdertl;
+  bdertl,
+  vcl,
+  dbrtl,
+  vclactnband,
+  vclx,
+  vcldb;
 
 contains
   uRESTDWBase in '..\..\..\Source\uRESTDWBase.pas',
@@ -54,6 +59,10 @@ contains
   uRESTDWMasterDetailData in '..\..\..\Source\uRESTDWMasterDetailData.pas',
   uzliblaz in '..\..\..\Source\libs\uzliblaz.pas',
   uDWDatamodule in '..\..\..\Source\DmDados\uDWDatamodule.pas' {ServerMethodDataModule: TDataModule},
-  uDWJSON in '..\..\..\Source\libs\JSON\uDWJSON.pas';
+  uDWJSON in '..\..\..\Source\libs\JSON\uDWJSON.pas',
+  uDWDataset in '..\..\..\Source\Memdataset\uDWDataset.pas',
+  uDWSqlEditor in '..\..\..\Source\uDWSqlEditor.pas' {FrmDWSqlEditor},
+  uAboutForm in '..\..\..\Source\uAboutForm.pas' {frm_About},
+  uDWAbout in '..\..\..\Source\uDWAbout.pas';
 
 end.

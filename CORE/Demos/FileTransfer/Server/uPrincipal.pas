@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uRESTDWBase, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.Imaging.pngimage, SMDWCore;
+  Vcl.Imaging.pngimage, uDMFileServer, uDWAbout;
 
 type
   TfServer = class(TForm)
@@ -125,7 +125,7 @@ end;
 
 procedure TfServer.FormCreate(Sender: TObject);
 begin
- rspServerFiles.ServerMethodClass := TSMDWCore;
+ rspServerFiles.ServerMethodClass := TdmFileServer;//TSMDWCore;
 end;
 
 end.

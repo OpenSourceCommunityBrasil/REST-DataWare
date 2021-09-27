@@ -6,9 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, uRESTDWPoolerDB, Data.DB,
   Vcl.ExtCtrls, Vcl.Imaging.pngimage, Vcl.ComCtrls, Vcl.DBCtrls, IdComponent,
-  Vcl.Mask, Vcl.Buttons, FireDAC.Stan.Intf, FireDAC.Stan.Option,
-  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
-  FireDAC.DApt.Intf, FireDAC.Comp.DataSet, FireDAC.Comp.Client, uDWConstsData;
+  Vcl.Mask, Vcl.Buttons, uDWConstsData, uDWDataset;
 
 type
   TForm5 = class(TForm)
@@ -32,14 +30,6 @@ type
     ProgressBar1: TProgressBar;
     Button1: TButton;
     DBNavigator1: TDBNavigator;
-    RESTDWClientSQL1ID_PESSOA: TIntegerField;
-    RESTDWClientSQL1NM_LOGIN: TStringField;
-    RESTDWClientSQL1DS_SENHA: TStringField;
-    RESTDWClientSQL1DS_FOTO: TBlobField;
-    RESTDWClientSQL1ID_USUARIO: TIntegerField;
-    RESTDWClientSQL1FL_ATIVO: TStringField;
-    RESTDWClientSQL1DT_INCLUSAO: TSQLTimeStampField;
-    RESTDWClientSQL1DT_ALTERACAO: TSQLTimeStampField;
     Label2: TLabel;
     Label3: TLabel;
     Label9: TLabel;
@@ -49,9 +39,17 @@ type
     DBEdit3: TDBEdit;
     DBImage1: TDBImage;
     BitBtn1: TBitBtn;
-    RESTDWClientSQL1CALCFIELD: TIntegerField;
     Label11: TLabel;
     DBText1: TDBText;
+    RESTDWClientSQL1ID_PESSOA: TIntegerField;
+    RESTDWClientSQL1NM_LOGIN: TStringField;
+    RESTDWClientSQL1DS_SENHA: TStringField;
+    RESTDWClientSQL1DS_FOTO: TBlobField;
+    RESTDWClientSQL1ID_USUARIO: TIntegerField;
+    RESTDWClientSQL1FL_ATIVO: TStringField;
+    RESTDWClientSQL1DT_INCLUSAO: TSQLTimeStampField;
+    RESTDWClientSQL1DT_ALTERACAO: TSQLTimeStampField;
+    RESTDWClientSQL1CALCFIELD: TIntegerField;
     procedure Button1Click(Sender: TObject);
     procedure RESTDWDataBase1Work(ASender: TObject; AWorkMode: TWorkMode;
       AWorkCount: Int64);

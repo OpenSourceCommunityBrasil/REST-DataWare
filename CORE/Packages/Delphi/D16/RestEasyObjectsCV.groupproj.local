@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
-	<Transactions/>
 	<Default.Personality>
-		<Projects ActiveProject="D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Packages\Delphi\Berlin\RestEasyObjectsCORE.dproj"/>
+		<Projects ActiveProject="C:\Componentes\REST Dataware\Trunk\CORE\Packages\Delphi\D16\RestDatawareCORE.dproj"/>
 	</Default.Personality>
 </BorlandProject>

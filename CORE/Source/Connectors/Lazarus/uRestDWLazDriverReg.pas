@@ -3,8 +3,7 @@ unit uRestDWLazDriverReg;
 interface
 
 uses
- {$IFNDEF UNIX}Windows,
- {$ELSE}Lcl,{$ENDIF}LResources, Classes, propedits, uRestDWLazDriver;
+ LResources, Classes, propedits, uRestDWLazDriver;
 
 Procedure Register;
 

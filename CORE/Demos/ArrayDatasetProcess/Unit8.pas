@@ -8,7 +8,8 @@ uses
   uRESTDWPoolerDB, Vcl.StdCtrls, Data.DB, Vcl.Grids, Vcl.DBGrids,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client, uDWConstsData, uDWMassiveBuffer;
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, uDWConstsData, uDWMassiveBuffer,
+  uDWDataset, uDWAbout, System.Generics.Collections;
 
 type
   TfPrincipal = class(TForm)
@@ -51,8 +52,12 @@ type
     rdwSQLEmployeeFULL_NAME: TStringField;
     rdwSQLStringTableID: TStringField;
     rdwSQLStringTableDESC: TStringField;
+    rgUpdType: TRadioGroup;
+    rdwUpdSQLStringTable: TRESTDWUpdateSQL;
+    rdwUpdSQLEmployee: TRESTDWUpdateSQL;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure rgUpdTypeClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -104,9 +109,26 @@ begin
  Else
   RESTDWDataBase1.TypeRequest  := TTyperequest.trHttp;
  RESTDWDataBase1.Open;
- RESTDWDataBase1.ApplyUpdates(DWMassiveCache1, vError, vMessageError);
+ Case rgUpdType.ItemIndex Of
+  0 : RESTDWDataBase1.ApplyUpdates(DWMassiveCache1, vError, vMessageError);
+  1 : RESTDWDataBase1.ApplyUpdates([rdwSQLStringTable, rdwSQLEmployee], vError, vMessageError);
+ End;
  If vError Then
   Showmessage(vMessageError);
+end;
+
+procedure TfPrincipal.rgUpdTypeClick(Sender: TObject);
+begin
+ Case rgUpdType.ItemIndex Of
+  0 : Begin
+       rdwSQLStringTable.MassiveCache := DWMassiveCache1;
+       rdwSQLEmployee.MassiveCache    := rdwSQLStringTable.MassiveCache;
+      End;
+  1 : Begin
+       rdwSQLStringTable.UpdateSQL := rdwupdSQLStringTable;
+       rdwSQLEmployee.UpdateSQL    := rdwUpdSQLEmployee;
+      End;
+ End;
 end;
 
 end.

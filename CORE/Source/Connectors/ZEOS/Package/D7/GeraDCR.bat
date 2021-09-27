@@ -1,1 +1,1 @@
-"C:\Program Files (x86)\Borland\Delphi7\Bin\BRCC32.EXE" RESTDWDriverZEOS.rc RESTDWDriverZEOS.dcr
+"C:\Program Files (x86)\Borland\Delphi7\Bin\BRCC32.EXE" RESTDWDriverZEOS.rc -foRESTDWDriverZEOS.dcr

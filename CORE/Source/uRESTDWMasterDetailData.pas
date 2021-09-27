@@ -1,5 +1,30 @@
 unit uRESTDWMasterDetailData;
 
+{
+  REST Dataware versão CORE.
+  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+ Pascal e com compatibilidade entre sistemas operacionais.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+
+ Membros do Grupo :
+
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do CORE do pacote.
+ Ivan Cesar                 - Admin - Administrador do CORE do pacote.
+ Joanan Mendonça Jr. (jlmj) - Admin - Administrador do CORE do pacote.
+ Giovani da Cruz            - Admin - Administrador do CORE do pacote.
+ Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Alexandre Souza            - Admin - Administrador do Grupo de Organização.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Mizael Rocha               - Member Tester and DEMO Developer.
+ Flávio Motta               - Member Tester and DEMO Developer.
+ Itamar Gaucho              - Member Tester and DEMO Developer.
+ Ico Menezes                - Member Tester and DEMO Developer.
+}
+
+
 Interface
 
 Uses SysUtils, Classes;
@@ -8,14 +33,14 @@ Type
  TRESTClient = Class End;
 
 Type
- TMasterDetailItem = Class
+ TMasterDetailItem = Class(TObject)
  Private
   vDataSet : TRESTClient;
   vFields  : TStringList;
  Protected
  Public
   Constructor Create;
-  Destructor  Free;
+  Destructor  Destroy;Override;
   Procedure   ParseFields(Value : String);
   Property    DataSet : TRESTClient    Read vDataSet Write vDataSet;
   Property    Fields  : TStringList    Read vFields  Write vFields;
@@ -29,6 +54,7 @@ Type
   Procedure PutRec(Index    : Integer; Item : TMasterDetailItem); Overload;
  Protected
  Public
+  Destructor  Destroy;Override;                      //Destroy a Classe
   Function  GetItem(Value: TRESTClient)       : TMasterDetailItem;
   Procedure Delete(Index : Integer);                              Overload;
   Procedure DeleteDS(Value : TRESTClient);
@@ -57,7 +83,15 @@ Begin
   Begin
    If Assigned(TList(Self).Items[Index]) Then
     Begin
+     {$IFDEF FPC}
      FreeAndNil(TList(Self).Items[Index]^);
+     {$ELSE}
+      {$IF CompilerVersion > 33}
+       FreeAndNil(TMasterDetailItem(TList(Self).Items[Index]^));
+      {$ELSE}
+       FreeAndNil(TList(Self).Items[Index]^);
+      {$IFEND}
+     {$ENDIF}
      {$IFDEF FPC}
       Dispose(PMasterDetailItem(TList(Self).Items[Index]));
      {$ELSE}
@@ -95,13 +129,20 @@ Begin
      If (TMasterDetailItem(TList(Self).Items[I]^)          <> Nil)   And
         (TMasterDetailItem(TList(Self).Items[I]^).vDataSet =  Value) Then
       Begin
-       If Assigned(TList(Self).Items[I]) Then
-        FreeMem(TList(Self).Items[I]);
-       TList(Self).Delete(I);
+       TMasterDetailList(Self).Delete(I);
        Break;
       End;
     End;
   End;
+End;
+
+Destructor TMasterDetailList.Destroy;
+Var
+ I : Integer;
+Begin
+  For I := Count-1 downto 0 Do
+   Delete(I);
+  inherited;
 End;
 
 Function TMasterDetailList.GetRec(Index: Integer): TMasterDetailItem;
@@ -122,9 +163,10 @@ Begin
  vFields := TStringList.Create;
 End;
 
-Destructor TMasterDetailItem.Free;
+Destructor TMasterDetailItem.Destroy;
 Begin
  vFields.Free;
+ Inherited;
 End;
 
 Procedure TMasterDetailItem.ParseFields(Value : String);

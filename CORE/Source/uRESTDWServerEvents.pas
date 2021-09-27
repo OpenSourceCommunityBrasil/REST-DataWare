@@ -1,34 +1,68 @@
 unit uRESTDWServerEvents;
 
+{
+  REST Dataware versão CORE.
+  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+ Pascal e com compatibilidade entre sistemas operacionais.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+
+ Membros do Grupo :
+
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do CORE do pacote.
+ Ivan Cesar                 - Admin - Administrador do CORE do pacote.
+ Joanan Mendonça Jr. (jlmj) - Admin - Administrador do CORE do pacote.
+ Giovani da Cruz            - Admin - Administrador do CORE do pacote.
+ Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Alexandre Souza            - Admin - Administrador do Grupo de Organização.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Mizael Rocha               - Member Tester and DEMO Developer.
+ Flávio Motta               - Member Tester and DEMO Developer.
+ Itamar Gaucho              - Member Tester and DEMO Developer.
+ Ico Menezes                - Member Tester and DEMO Developer.
+}
+
+
 interface
 
 Uses
- SysUtils, Classes, uDWJSONObject, uDWConsts, uDWConstsData,
- uRESTDWBase, uDWJSONTools, uDWJSON {$IFNDEF FPC}
-                                    {$IF CompilerVersion > 21}
-                                    {$IFDEF POSIX}
-                                    {$IF Defined(ANDROID) or Defined(IOS)} //Alterado para IOS Brito
-                                    ,system.json
-                                    {$else}
-                                    ,system.json
-                                    {$IFEND}
-                                    {$ENDIF}
-                                    {$IFEND}
-                                    {$ENDIF};
+ SysUtils, Classes, uDWJSONObject, uDWConsts, uDWConstsData, uDWAbout,
+ uRESTDWBase, uDWJSONTools, uDWConstsCharset, uDWJSONInterface;
 
 Const
  TServerEventsConst = '{"typeobject":"%s", "objectdirection":"%s", "objectvalue":"%s", "paramname":"%s", "encoded":"%s", "default":"%s"}';
 
 Type
- TDWReplyEvent = Procedure(Var Params         : TDWParams;
-                           Var Result         : String) Of Object;
+ TDWReplyEvent       = Procedure(Var   Params      : TDWParams;
+                                 Var   Result      : String)          Of Object;
+ TDWReplyEventByType = Procedure(Var   Params      : TDWParams;
+                                 Var   Result      : String;
+                                 Const RequestType : TRequestType;
+                                 Var   StatusCode  : Integer;
+                                 RequestHeader     : TStringList)    Of Object;
+ TDWAuthRequest      = Procedure(Const Params      : TDWParams;
+                                 Var   Rejected    : Boolean;
+                                 Var   ResultError : String;
+                                 Var   StatusCode  : Integer;
+                                 RequestHeader     : TStringList)     Of Object;
+ TObjectEvent        = Procedure(aSelf             : TComponent)      Of Object;
+ TObjectExecute      = Procedure(Const aSelf       : TCollectionItem) Of Object;
+ TOnBeforeSend       = Procedure(aSelf             : TComponent)      Of Object;
 
 Type
  TDWReplyEventData = Class(TComponent)
  Private
-  vReplyEvent : TDWReplyEvent;
+  vReplyEvent         : TDWReplyEvent;
+  vDWReplyEventByType : TDWReplyEventByType;
+  vDWAuthRequest      : TDWAuthRequest;
+  vBeforeExecute      : TObjectExecute;
  Public
-  Property    OnReplyEvent : TDWReplyEvent Read vReplyEvent    Write vReplyEvent;
+  Property    OnReplyEvent       : TDWReplyEvent       Read vReplyEvent         Write vReplyEvent;
+  Property    OnReplyEventByType : TDWReplyEventByType Read vDWReplyEventByType Write vDWReplyEventByType;
+  Property    OnAuthRequest      : TDWAuthRequest      Read vDWAuthRequest      Write vDWAuthRequest;
+  Property    OnBeforeExecute    : TObjectExecute      Read vBeforeExecute      Write vBeforeExecute;
 End;
 
 Type
@@ -38,6 +72,7 @@ Type
   vTypeObject      : TTypeObject;
   vObjectDirection : TObjectDirection;
   vObjectValue     : TObjectValue;
+  vAlias,
   vDefaultValue,
   vParamName       : String;
   vEncoded         : Boolean;
@@ -45,11 +80,13 @@ Type
   Function    GetDisplayName             : String;       Override;
   Procedure   SetDisplayName(Const Value : String);      Override;
   Constructor Create        (aCollection : TCollection); Override;
+  Destructor  Destroy;                                   Override;
  Published
   Property TypeObject      : TTypeObject      Read vTypeObject      Write vTypeObject;
   Property ObjectDirection : TObjectDirection Read vObjectDirection Write vObjectDirection;
   Property ObjectValue     : TObjectValue     Read vObjectValue     Write vObjectValue;
   Property ParamName       : String           Read GetDisplayName   Write SetDisplayName;
+  Property Alias           : String           Read vAlias           Write vAlias;
   Property Encoded         : Boolean          Read vEncoded         Write vEncoded;
   Property DefaultValue    : String           Read vDefaultValue    Write vDefaultValue;
 End;
@@ -59,6 +96,7 @@ Type
  TDWParamsMethods = Class(TOwnedCollection)
  Private
   fOwner      : TPersistent;
+  vAlias      : String;
   Function    GetRec    (Index       : Integer) : TDWParamMethod;  Overload;
   Procedure   PutRec    (Index       : Integer;
                          Item        : TDWParamMethod);            Overload;
@@ -71,6 +109,7 @@ Type
                           aItemClass : TCollectionItemClass);
   Destructor  Destroy; Override;
   Procedure   Delete     (Index      : Integer);                   Overload;
+  Function    Add        (Item       : TDWParamMethod) : Integer;  Overload;
   Property    Items      [Index      : Integer]   : TDWParamMethod Read GetRec     Write PutRec; Default;
   Property    ParamByName[Index      : String ]   : TDWParamMethod Read GetRecName Write PutRecName;
 End;
@@ -80,30 +119,50 @@ Type
  TDWEvent = Class(TCollectionItem)
  Protected
  Private
-  vJsonMode                     : TJsonMode;
-  FName                         : String;
-  vDWParams                     : TDWParamsMethods;
-  vOwnerCollection              : TCollection;
-  DWReplyEventData              : TDWReplyEventData;
-  Function  GetReplyEvent       : TDWReplyEvent;
-  Procedure SetReplyEvent(Value : TDWReplyEvent);
+  vDescription                           : TStrings;
+  vDWRoutes                              : TDWRoutes;
+  vJsonMode                              : TJsonMode;
+  vEventName,
+  FName                                  : String;
+  vDWParams                              : TDWParamsMethods;
+  vOwnerCollection                       : TCollection;
+  vOnlyPreDefinedParams,
+  vNeedAuthorization                     : Boolean;
+  DWReplyEventData                       : TDWReplyEventData;
+  vBeforeExecute                         : TObjectExecute;
+  Function  GetReplyEvent                : TDWReplyEvent;
+  Procedure SetReplyEvent      (Value    : TDWReplyEvent);
+  Function  GetReplyEventByType          : TDWReplyEventByType;
+  Procedure SetReplyEventByType(Value    : TDWReplyEventByType);
+  Function  GetAuthRequest               : TDWAuthRequest;
+  Procedure SetAuthRequest     (Value    : TDWAuthRequest);
+  Procedure SetDescription     (Strings  : TStrings);
  Public
   Function    GetDisplayName             : String;       Override;
   Procedure   SetDisplayName(Const Value : String);      Override;
+  Procedure   CompareParams (Var Dest    : TDWParams);
   Procedure   Assign        (Source      : TPersistent); Override;
   Constructor Create        (aCollection : TCollection); Override;
   Function    GetNamePath  : String;                     Override;
   Destructor  Destroy; Override;
  Published
-  Property    DWParams     : TDWParamsMethods Read vDWParams      Write vDWParams;
-  Property    JsonMode     : TJsonMode        Read vJsonMode      Write vJsonMode;
-  Property    Name         : String           Read GetDisplayName Write SetDisplayName;
-  Property    OnReplyEvent : TDWReplyEvent    Read GetReplyEvent  Write SetReplyEvent;
+  Property    Routes               : TDWRoutes           Read vDWRoutes             Write vDWRoutes;
+  Property    NeedAuthorization    : Boolean             Read vNeedAuthorization    Write vNeedAuthorization;
+  Property    DWParams             : TDWParamsMethods    Read vDWParams             Write vDWParams;
+  Property    JsonMode             : TJsonMode           Read vJsonMode             Write vJsonMode;
+  Property    Name                 : String              Read GetDisplayName        Write SetDisplayName;
+  Property    EventName            : String              Read vEventName            Write vEventName;
+  Property    Description          : TStrings            Read vDescription          Write SetDescription;
+  Property    OnlyPreDefinedParams : Boolean             Read vOnlyPreDefinedParams Write vOnlyPreDefinedParams;
+  Property    OnReplyEvent         : TDWReplyEvent       Read GetReplyEvent         Write SetReplyEvent;
+  Property    OnReplyEventByType   : TDWReplyEventByType Read GetReplyEventByType   Write SetReplyEventByType;
+  Property    OnAuthRequest        : TDWAuthRequest      Read GetAuthRequest        Write SetAuthRequest;
+  Property    OnBeforeExecute      : TObjectExecute      Read vBeforeExecute        Write vBeforeExecute;
 End;
 
 Type
  TDWEventList = Class;
- TDWEventList = Class(TOwnedCollection)
+ TDWEventList = Class(TDWOwnedCollection)
  Protected
   vEditable   : Boolean;
   Function    GetOwner: TPersistent; override;
@@ -130,11 +189,14 @@ Type
 End;
 
 Type
- TDWServerEvents = Class(TComponent)
+ TDWServerEvents = Class(TDWComponent)
  Protected
  Private
   vIgnoreInvalidParams : Boolean;
-  vEventList      : TDWEventList;
+  vEventList           : TDWEventList;
+  vAccessTag,
+  vServerContext       : String;
+  vOnCreate            : TObjectEvent;
  Public
   Destructor  Destroy; Override;
   Constructor Create(AOwner : TComponent);Override; //Cria o Componente
@@ -143,40 +205,56 @@ Type
  Published
   Property    IgnoreInvalidParams : Boolean      Read vIgnoreInvalidParams Write vIgnoreInvalidParams;
   Property    Events              : TDWEventList Read vEventList           Write vEventList;
+  Property    AccessTag           : String       Read vAccessTag           Write vAccessTag;
+  Property    ContextName         : String       Read vServerContext       Write vServerContext;
+  Property    OnCreate            : TObjectEvent Read vOnCreate            Write vOnCreate;
 End;
 
 Type
-
  { TDWClientEvents }
-
- TDWClientEvents = Class(TComponent)
- Protected
+ TDWClientEvents = Class(TDWComponent)
  Private
+  vServerEventName  : String;
   vEditParamList,
   vGetEvents        : Boolean;
   vEventList        : TDWEventList;
   vRESTClientPooler : TRESTClientPooler;
-  Procedure GetOnlineEvents(Value  : Boolean);
-  Procedure SetEventList   (aValue : TDWEventList);
-//  Procedure SetEditParamList(Value : Boolean);
+  vOnBeforeSend     : TOnBeforeSend;
+  vCripto           : TCripto;
+  Procedure GetOnlineEvents         (Value  : Boolean);
+  Procedure SetEventList            (aValue : TDWEventList);
+  Function  GetRESTClientPooler             : TRESTClientPooler;
+  Procedure SetRESTClientPooler(Const Value : TRESTClientPooler);
+  Procedure TokenValidade(Var DWParams : TDWParams;
+                          Var Error    : String);
+ Protected
+  procedure Notification(AComponent: TComponent; Operation: TOperation); override;
  Public
   Destructor  Destroy; Override;
   Constructor Create        (AOwner    : TComponent);Override; //Cria o Componente
-  Procedure   CreateDWParams(EventName : String; Var DWParams     : TDWParams);
-  Function    SendEvent     (EventName : String; Var DWParams     : TDWParams;
-                             Var Error : String) : Boolean; Overload;
-  Function    SendEvent     (EventName : String; Var DWParams     : TDWParams;
-                             Var Error : String; Var NativeResult : String) : Boolean; Overload;
+  Procedure   CreateDWParams(EventName  : String; Var DWParams     : TDWParams);
+  Function    SendEvent     (EventName  : String; Var DWParams     : TDWParams;
+                             Var Error  : String; EventType        : TSendEvent = sePOST;
+                             Assyncexec : Boolean = False)         : Boolean; Overload;
+  Function    SendEvent     (EventName  : String; Var DWParams     : TDWParams;
+                             Var Error  : String; Var NativeResult : String;
+                             EventType  : TSendEvent = sePOST;
+                             Assyncexec : Boolean = False) : Boolean; Overload;
   Procedure   ClearEvents;
-  Property    GetEvents        : Boolean           Read vGetEvents        Write GetOnlineEvents;
+  Property    GetEvents        : Boolean           Read vGetEvents          Write GetOnlineEvents;
  Published
-  Property    RESTClientPooler : TRESTClientPooler Read vRESTClientPooler Write vRESTClientPooler;
-  Property    Events           : TDWEventList      Read vEventList        Write SetEventList;
+  Property    ServerEventName  : String            Read vServerEventName    Write vServerEventName;
+  Property    CriptOptions     : TCripto           Read vCripto             Write vCripto;
+  Property    RESTClientPooler : TRESTClientPooler Read GetRESTClientPooler Write SetRESTClientPooler;
+  Property    Events           : TDWEventList      Read vEventList          Write SetEventList;
+  Property    OnBeforeSend     : TOnBeforeSend     Read vOnBeforeSend       Write vOnBeforeSend; // Add Evento por Ico Menezes
 End;
 
 implementation
 
 { TDWEvent }
+
+Uses ServerUtils;
 
 Function TDWEvent.GetNamePath: String;
 Begin
@@ -185,21 +263,32 @@ End;
 
 constructor TDWEvent.Create(aCollection: TCollection);
 begin
-  inherited;
-  vDWParams        := TDWParamsMethods.Create(aCollection, TDWParamMethod);
-  vJsonMode        := jmDataware;
-  DWReplyEventData := TDWReplyEventData.Create(Nil);
-  vOwnerCollection := aCollection;
-  FName            := 'dwevent' + IntToStr(aCollection.Count);
-  DWReplyEventData.Name := FName;
+ Inherited;
+ vDWParams             := TDWParamsMethods.Create(aCollection, TDWParamMethod);
+ vJsonMode             := jmDataware;
+ DWReplyEventData      := TDWReplyEventData.Create(Nil);
+ vOwnerCollection      := aCollection;
+ FName                 := 'dwevent' + IntToStr(aCollection.Count);
+ DWReplyEventData.Name := FName;
+ vNeedAuthorization    := True;
+ vOnlyPreDefinedParams := False;
+ vEventName            := '';
+ vDescription          := TStringList.Create;
+ vDWRoutes             := [crAll];
 end;
 
-destructor TDWEvent.Destroy;
-begin
-  vDWParams.Free;
-  DWReplyEventData.Free;
-  inherited;
-end;
+Destructor TDWEvent.Destroy;
+Begin
+ vDWParams.Free;
+ DWReplyEventData.Free;
+ vDescription.Free;
+ Inherited;
+End;
+
+Function TDWEvent.GetAuthRequest: TDWAuthRequest;
+Begin
+ Result := DWReplyEventData.OnAuthRequest;
+End;
 
 Function TDWEvent.GetDisplayName: String;
 Begin
@@ -212,6 +301,7 @@ begin
   Begin
    FName       := TDWEvent(Source).Name;
    vDWParams   := TDWEvent(Source).DWParams;
+   DWReplyEventData.OnBeforeExecute := TDWEvent(Source).OnBeforeExecute;
    DWReplyEventData.OnReplyEvent := TDWEvent(Source).OnReplyEvent;
   End
  Else
@@ -223,14 +313,31 @@ Begin
  Result := DWReplyEventData.OnReplyEvent;
 End;
 
+Function TDWEvent.GetReplyEventByType : TDWReplyEventByType;
+Begin
+ Result := DWReplyEventData.OnReplyEventByType;
+End;
+
+Procedure TDWEvent.SetDescription(Strings : TStrings);
+Begin
+ vDescription.Assign(Strings);
+End;
+
+Procedure TDWEvent.SetAuthRequest(Value   : TDWAuthRequest);
+Begin
+ DWReplyEventData.OnAuthRequest := Value;
+End;
+
 Procedure TDWEvent.SetDisplayName(Const Value: String);
 Begin
  If Trim(Value) = '' Then
-  Raise Exception.Create('Invalid Event Name')
+  Raise Exception.Create(cInvalidEvent)
  Else
   Begin
    FName := Value;
    DWReplyEventData.Name := FName;
+   If vEventName = '' Then
+    vEventName := DWReplyEventData.Name;
    Inherited;
   End;
 End;
@@ -239,6 +346,30 @@ procedure TDWEvent.SetReplyEvent(Value: TDWReplyEvent);
 begin
  DWReplyEventData.OnReplyEvent := Value;
 end;
+
+Procedure TDWEvent.SetReplyEventByType(Value: TDWReplyEventByType);
+Begin
+ DWReplyEventData.OnReplyEventByType := Value;
+End;
+
+Procedure TDWEvent.CompareParams(Var Dest : TDWParams);
+Var
+ I : Integer;
+Begin
+ If vOnlyPreDefinedParams Then
+  Begin
+   If Not Assigned(Dest) Then
+    Exit;
+   If vDWParams.Count = 0 Then
+    Dest.Clear;
+   For I := Dest.Count -1 DownTo 0 Do
+    Begin
+     If (vDWParams.ParamByName[Dest.Items[I].Alias]     = Nil) And
+        (vDWParams.ParamByName[Dest.Items[I].ParamName] = Nil) Then
+      Dest.Delete(I);
+    End;
+  End;
+End;
 
 Function TDWEventList.Add : TCollectionItem;
 Begin
@@ -283,143 +414,89 @@ begin
  inherited;
 end;
 
-{
-procedure TDWEventList.Editable(Value: Boolean);
-begin
- vEditable := Value;
-end;
-}
-
-{$IFDEF POSIX}
 Procedure TDWEventList.FromJSON(Value : String);
 Var
+ bJsonOBJBase   : TDWJSONBase;
  bJsonOBJ,
  bJsonOBJb,
- bJsonOBJc    : system.json.TJsonObject;
-
+ bJsonOBJc      : TDWJSONObject;
  bJsonArray,
  bJsonArrayB,
- bJsonArrayC  : system.json.TJsonArray;
-
- I, X, Y      : Integer;
- vDWEvent     : TDWEvent;
+ bJsonArrayC    : TDWJSONArray;
+ I, X, Y        : Integer;
+ vDWEvent       : TDWEvent;
  vDWParamMethod : TDWParamMethod;
+ vEventName,
+ vJsonMode,
+ vparams,
+ vparamname     : String;
+ vneedauth,
+ vonlypredefparams : Boolean;
 Begin
  Try
-  bJsonArray  := TJSONObject.ParseJSONValue(Value) as TJSONArray;
-  For I := 0 to bJsonArray.count -1 Do
+  bJsonOBJBase := TDWJSONBase(TDWJSONObject.Create(Value));
+  bJsonArray   := TDWJSONArray(bJsonOBJBase);
+  For I := 0 to bJsonArray.ElementCount - 1 Do
    Begin
-    bJsonOBJ := bJsonArray.get(I) as TJsonobject;
+    bJsonOBJ := TDWJSONObject(bJsonArray.GetObject(I));
     Try
-     bJsonArrayB := bJsonOBJ.getvalue('serverevents') as Tjsonarray;
-     For X := 0 To bJsonArrayB.count -1 Do
+     bJsonArrayB := bJsonOBJ.OpenArray('serverevents'); //  Tjsonarray.Create(bJsonOBJ.get('serverevents').tostring);
+     For X := 0 To bJsonArrayB.ElementCount - 1 Do
       Begin
-       bJsonOBJb := bJsonArrayB.get(X) as TJsonObject;
-       If EventByName[bJsonOBJb.getvalue('eventname').value] = Nil Then
+       bJsonOBJb  := TDWJSONObject(bJsonArrayB.GetObject(X));
+       vEventName := bJsonOBJb.Pairs[0].Value; //eventname
+       vJsonMode  := bJsonOBJb.Pairs[1].Value; //jsonmode
+       vparams    := bJsonOBJb.Pairs[2].Value; //params
+       vneedauth  := StringToBoolean(bJsonOBJb.Pairs[3].Value); //params
+       vonlypredefparams := StringToBoolean(bJsonOBJb.Pairs[4].Value); //params
+       If EventByName[vEventName] = Nil Then
         vDWEvent  := TDWEvent(Self.Add)
        Else
-        vDWEvent  := EventByName[bJsonOBJb.getvalue('eventname').value];
-       vDWEvent.Name := bJsonOBJb.getvalue('eventname').value;
-       If bJsonOBJb.getvalue('params').ToString <> '' Then
+        vDWEvent  := EventByName[vEventName];
+       vDWEvent.Name := vEventName;
+       vDWEvent.JsonMode := GetJSONModeName(vJsonMode);
+       vDWEvent.NeedAuthorization    := vneedauth;
+       vDWEvent.OnlyPreDefinedParams := vonlypredefparams;
+       If vparams <> '' Then
         Begin
-         bJsonArrayC    := bJsonOBJb.getvalue('params') as Tjsonarray;
+         bJsonArrayC    := bJsonOBJb.OpenArray('params');
          Try
-          For Y := 0 To bJsonArrayC.count -1 do
+          For Y := 0 To bJsonArrayC.ElementCount - 1 do
            Begin
-            bJsonOBJc                      := bJsonArrayC.get(Y) as TJsonobject;
-            If vDWEvent.vDWParams.ParamByName[bJsonOBJc.getvalue('paramname').value] = Nil Then
+            bJsonOBJc                      := TDWJSONObject(bJsonArrayC.GetObject(Y));
+            vparamname                     := bJsonOBJc.Pairs[3].Value; // .get('paramname').toString;
+            If vDWEvent.vDWParams.ParamByName[vparamname] = Nil Then
              vDWParamMethod                := TDWParamMethod(vDWEvent.vDWParams.Add)
             Else
-             vDWParamMethod                := vDWEvent.vDWParams.ParamByName[bJsonOBJc.getvalue('paramname').value];
-            vDWParamMethod.TypeObject      := GetObjectName(bJsonOBJc.getvalue('typeobject').value);
-            vDWParamMethod.ObjectDirection := GetDirectionName(bJsonOBJc.getvalue('objectdirection').value);
-            vDWParamMethod.ObjectValue     := GetValueType(bJsonOBJc.getvalue('objectvalue').value);
-            vDWParamMethod.ParamName       := bJsonOBJc.getvalue('paramname').value;
-            vDWParamMethod.Encoded         := StringToBoolean(bJsonOBJc.getvalue('encoded').value);
-            If Trim(bJsonOBJc.getvalue('default').value) <> '' Then
-             vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.getvalue('default').value{$IFDEF FPC}, csUndefined{$ENDIF});
+             vDWParamMethod                := vDWEvent.vDWParams.ParamByName[vparamname];
+            vDWParamMethod.TypeObject      := GetObjectName(bJsonOBJc.Pairs[0].Value); // GetObjectName(bJsonOBJc.get('typeobject').toString);
+            vDWParamMethod.ObjectDirection := GetDirectionName(bJsonOBJc.Pairs[1].Value); // GetDirectionName(bJsonOBJc.get('objectdirection').toString);
+            vDWParamMethod.ObjectValue     := GetValueType(bJsonOBJc.Pairs[2].Value); // GetValueType(bJsonOBJc.get('objectvalue').toString);
+            vDWParamMethod.ParamName       := vparamname;
+            If bJsonArrayC.ElementCount > 4 Then
+             vDWParamMethod.Encoded         := StringToBoolean(bJsonOBJc.Pairs[4].Value); // StringToBoolean(bJsonOBJc.get('encoded').toString);
+            If bJsonArrayC.ElementCount > 5 Then
+             If Trim(bJsonOBJc.Pairs[5].Value) <> '' Then //Trim(bJsonOBJc.get('default').toString) <> '' Then
+              vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.Pairs[5].Value{$IFDEF FPC}, csUndefined{$ENDIF}); // bJsonOBJc.get('default').toString{$IFDEF FPC}, csUndefined{$ENDIF});
+            FreeAndNil(bJsonOBJc);
            End;
          Finally
-          bJsonArrayC.Free;
+          FreeAndNil(bJsonArrayC);
          End;
         End
        Else
         vDWEvent.vDWParams.ClearList;
+       FreeAndNil(bJsonOBJb);
       End;
     Finally
-     bJsonArrayB.Free;
+     FreeAndNil(bJsonArrayB);
     End;
+    FreeAndNil(bJsonOBJ);
    End;
  Finally
-  bJsonArray.Free;
+  FreeAndNil(bJsonOBJBase);
  End;
 End;
-{$ELSE}
-Procedure TDWEventList.FromJSON(Value : String);
-Var
- bJsonOBJ,
- bJsonOBJb,
- bJsonOBJc    : {$IFDEF POSIX}system.json.TJsonObject;
-                {$ELSE}       udwjson.TJsonObject;{$ENDIF}
- bJsonArray,
- bJsonArrayB,
- bJsonArrayC  : {$IFDEF POSIX}system.json.TJsonArray;
-                {$ELSE}       udwjson.TJsonArray;{$ENDIF}
- I, X, Y      : Integer;
- vDWEvent     : TDWEvent;
- vDWParamMethod : TDWParamMethod;
-Begin
- Try
-  bJsonArray  := Tjsonarray.Create(Value);
-  For I := 0 to bJsonArray.length -1 Do
-   Begin
-    bJsonOBJ := bJsonArray.getJSONObject(I);
-    Try
-     bJsonArrayB := Tjsonarray.Create(bJsonOBJ.get('serverevents').tostring);
-     For X := 0 To bJsonArrayB.length -1 Do
-      Begin
-       bJsonOBJb := bJsonArrayB.getJSONObject(X);
-       If EventByName[bJsonOBJb.get('eventname').tostring] = Nil Then
-        vDWEvent  := TDWEvent(Self.Add)
-       Else
-        vDWEvent  := EventByName[bJsonOBJb.get('eventname').tostring];
-       vDWEvent.Name := bJsonOBJb.get('eventname').tostring;
-       vDWEvent.JsonMode := GetJSONModeName(bJsonOBJb.get('jsonmode').tostring);
-       If bJsonOBJb.get('params').toString <> '' Then
-        Begin
-         bJsonArrayC    := Tjsonarray.Create(bJsonOBJb.get('params').toString);
-         Try
-          For Y := 0 To bJsonArrayC.length -1 do
-           Begin
-            bJsonOBJc                      := bJsonArrayC.getJSONObject(Y);
-            If vDWEvent.vDWParams.ParamByName[bJsonOBJc.get('paramname').toString] = Nil Then
-             vDWParamMethod                := TDWParamMethod(vDWEvent.vDWParams.Add)
-            Else
-             vDWParamMethod                := vDWEvent.vDWParams.ParamByName[bJsonOBJc.get('paramname').toString];
-            vDWParamMethod.TypeObject      := GetObjectName(bJsonOBJc.get('typeobject').toString);
-            vDWParamMethod.ObjectDirection := GetDirectionName(bJsonOBJc.get('objectdirection').toString);
-            vDWParamMethod.ObjectValue     := GetValueType(bJsonOBJc.get('objectvalue').toString);
-            vDWParamMethod.ParamName       := bJsonOBJc.get('paramname').toString;
-            vDWParamMethod.Encoded         := StringToBoolean(bJsonOBJc.get('encoded').toString);
-            If Trim(bJsonOBJc.get('default').toString) <> '' Then
-             vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.get('default').toString{$IFDEF FPC}, csUndefined{$ENDIF});
-           End;
-         Finally
-          bJsonArrayC.Free;
-         End;
-        End
-       Else
-        vDWEvent.vDWParams.ClearList;
-      End;
-    Finally
-     bJsonArrayB.Free;
-    End;
-   End;
- Finally
-  bJsonArray.Free;
- End;
-End;
-{$ENDIF}
 
 Function TDWEventList.GetOwner: TPersistent;
 Begin
@@ -475,15 +552,18 @@ Var
  vTagEvent,
  vParamsLines,
  vParamLine,
+ vParamLine2,
  vEventsLines : String;
 Begin
  Result := '';
  vEventsLines := '';
  For I := 0 To Count -1 Do
   Begin
+   vParamLine2  := Format('"needauth":"%s", "onlypredefparams":"%s"', [BooleanToString(Items[I].NeedAuthorization),
+                                                                       BooleanToString(Items[I].OnlyPreDefinedParams)]);
    vTagEvent    := Format('{"eventname":"%s"', [Items[I].FName]);
    vTagEvent    := vTagEvent + Format(', "jsonmode":"%s"', [GetJSONModeName(Items[I].vJsonMode)]);
-   vTagEvent    := vTagEvent + ', "params":[%s]}';
+   vTagEvent    := vTagEvent + ', "params":[%s], ' + vParamLine2 + '}';
    vParamsLines := '';
    For A := 0 To Items[I].vDWParams.Count -1 Do
     Begin
@@ -510,11 +590,13 @@ End;
 Procedure TDWServerEvents.CreateDWParams(EventName    : String;
                                          Var DWParams : TDWParams);
 Var
- dwParam : TJSONParam;
- I       : Integer;
- vFound  : Boolean;
+ vParamNameS : String;
+ dwParam     : TJSONParam;
+ vParamName,
+ I           : Integer;
+ vFound      : Boolean;
 Begin
-// DWParams := Nil;
+ vParamNameS := '';
  If vEventList.EventByName[EventName] <> Nil Then
   Begin
    If Not Assigned(DWParams) Then
@@ -522,21 +604,43 @@ Begin
    DWParams.JsonMode := vEventList.EventByName[EventName].JsonMode;
    For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
     Begin
-     vFound  := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil;
-     If Not(vFound) Then
-      dwParam                := TJSONParam.Create(DWParams.Encoding)
+     vParamNameS := '';
+     vFound  := (DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil);
+     If vFound Then
+      vParamNameS := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName
      Else
-      dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
-     dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
-     dwParam.ObjectDirection := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectDirection;
-     dwParam.ObjectValue     := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectValue;
-     dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
-     dwParam.JsonMode        := DWParams.JsonMode;
-     If (vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '')  And
-        (Trim(dwParam.AsString) = '') Then
-      dwParam.Value           := vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue;
+      Begin
+       vFound  := (DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].Alias]   <> Nil);
+       If vFound Then
+        vParamNameS := vEventList.EventByName[EventName].vDWParams.Items[I].Alias;
+      End;
      If Not(vFound) Then
-      DWParams.Add(dwParam);
+      Begin
+       dwParam                 := TJSONParam.Create(DWParams.Encoding);
+       dwParam.Alias           := vEventList.EventByName[EventName].vDWParams.Items[I].Alias;
+       dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
+       dwParam.ObjectDirection := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectDirection;
+       dwParam.ObjectValue     := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectValue;
+       dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
+       dwParam.JsonMode        := DWParams.JsonMode;
+       If (vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '')  And
+          (Trim(dwParam.AsString) = '') Then
+        dwParam.Value          := vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue;
+       DWParams.Add(dwParam);
+      End
+     Else
+      Begin
+       If (DWParams.ItemsString[vParamNameS].ParamName             =  '') Or
+          ((DWParams.ItemsString[vParamNameS].ParamName            <> '') And
+           (Lowercase(DWParams.ItemsString[vParamNameS].ParamName) <>
+            Lowercase(vEventList.EventByName[EventName].vDWParams.Items[I].ParamName))) Then
+        Begin
+         DWParams.ItemsString[vParamNameS].Alias      := vEventList.EventByName[EventName].vDWParams.Items[I].Alias;
+         DWParams.ItemsString[vParamNameS].ParamName  := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
+        End;
+       If DWParams.ItemsString[vParamNameS].Alias      = '' Then
+        DWParams.ItemsString[vParamNameS].Alias       := vEventList.EventByName[EventName].vDWParams.Items[I].Alias;
+      End;
     End;
   End
  Else
@@ -548,6 +652,8 @@ Begin
  Inherited;
  vEventList := TDWEventList.Create(Self, TDWEvent);
  vIgnoreInvalidParams := False;
+ If Assigned(vOnCreate) Then
+  vOnCreate(Self);
 End;
 
 Destructor TDWServerEvents.Destroy;
@@ -561,7 +667,9 @@ Var
  I : Integer;
 Begin
  For I := Count - 1 Downto 0 Do
-  Delete(I);
+  Begin
+   Delete(I);
+  End;
  Self.Clear;
 End;
 
@@ -570,7 +678,17 @@ constructor TDWParamsMethods.Create(AOwner     : TPersistent;
 begin
  Inherited Create(AOwner, TDWParamMethod);
  Self.fOwner := AOwner;
+ vAlias      := '';
 end;
+
+Function TDWParamsMethods.Add(Item : TDWParamMethod): Integer;
+Var
+ vItem : ^TDWParamMethod;
+Begin
+ New(vItem);
+ vItem^ := Item;
+ Result := TList(Self).Add(vItem);
+End;
 
 procedure TDWParamsMethods.Delete(Index: Integer);
 begin
@@ -594,12 +712,16 @@ Var
  I : Integer;
 Begin
  Result := Nil;
- For I := 0 To Self.Count - 1 Do
+ If Uppercase(Index) <> '' Then
   Begin
-   If (Uppercase(Index) = Uppercase(Self.Items[I].vParamName)) Then
+   For I := 0 To Self.Count - 1 Do
     Begin
-     Result := TDWParamMethod(Self.Items[I]);
-     Break;
+     If (Uppercase(Index) = Uppercase(Self.Items[I].vParamName)) Or
+        (Uppercase(Index) = Uppercase(Self.Items[I].vAlias))     Then
+      Begin
+       Result := TDWParamMethod(Self.Items[I]);
+       Break;
+      End;
     End;
   End;
 End;
@@ -614,12 +736,16 @@ procedure TDWParamsMethods.PutRecName(Index: String; Item: TDWParamMethod);
 Var
  I : Integer;
 Begin
- For I := 0 To Self.Count - 1 Do
+ If Uppercase(Index) <> '' Then
   Begin
-   If (Uppercase(Index) = Uppercase(Self.Items[I].vParamName)) Then
+   For I := 0 To Self.Count - 1 Do
     Begin
-     Self.Items[I] := Item;
-     Break;
+     If (Uppercase(Index) = Uppercase(Self.Items[I].vParamName)) Or
+        (Uppercase(Index) = Uppercase(Self.Items[I].vAlias))     Then
+      Begin
+       Self.Items[I] := Item;
+       Break;
+      End;
     End;
   End;
 End;
@@ -630,9 +756,15 @@ Begin
  vTypeObject      := toParam;
  vObjectDirection := odINOUT;
  vObjectValue     := ovString;
- vParamName       :=  'dwparam' + IntToStr(aCollection.Count);
+ vParamName       := 'dwparam' + IntToStr(aCollection.Count);
  vEncoded         := True;
  vDefaultValue    := '';
+ vAlias           := '';
+End;
+
+Destructor TDWParamMethod.Destroy;
+Begin
+ Inherited;
 End;
 
 function TDWParamMethod.GetDisplayName: String;
@@ -643,7 +775,7 @@ end;
 procedure TDWParamMethod.SetDisplayName(const Value: String);
 begin
  If Trim(Value) = '' Then
-  Raise Exception.Create('Invalid Param Name')
+  Raise Exception.Create(cInvalidParamName)
  Else
   Begin
    vParamName := Trim(Value);
@@ -657,6 +789,7 @@ constructor TDWClientEvents.Create(AOwner: TComponent);
 begin
  Inherited;
  vEventList     := TDWEventList.Create(Self, TDWEvent);
+ vCripto        := TCripto.Create;
  vGetEvents     := False;
  vEditParamList := True;
 end;
@@ -664,10 +797,12 @@ end;
 procedure TDWClientEvents.CreateDWParams(EventName: String;
   Var DWParams: TDWParams);
 Var
- dwParam : TJSONParam;
- I       : Integer;
- vFound  : Boolean;
+ vParamName : String;
+ dwParam    : TJSONParam;
+ I          : Integer;
+ vFound     : Boolean;
 Begin
+ vParamName := '';
  If vEventList.EventByName[EventName] <> Nil Then
   Begin
 //   If (Not Assigned(DWParams)) or (dwParams = nil) Then
@@ -675,12 +810,22 @@ Begin
    DWParams.Encoding := vRESTClientPooler.Encoding;
    For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
     Begin
-     vFound  := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil;
+     vParamName := '';
+     vFound  := (DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil);
+     If vFound Then
+      vParamName := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName
+     Else
+      Begin
+       vFound  := (DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].Alias]   <> Nil);
+       If vFound Then
+        vParamName := vEventList.EventByName[EventName].vDWParams.Items[I].Alias;
+      End;
      If Not(vFound) Then
       dwParam                := TJSONParam.Create(DWParams.Encoding)
      Else
-      dwParam                := DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName];
+      dwParam                := DWParams.ItemsString[vParamName];
      dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
+     dwParam.Alias           := vEventList.EventByName[EventName].vDWParams.Items[I].Alias;
      dwParam.ObjectDirection := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectDirection;
      dwParam.ObjectValue     := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectValue;
      dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
@@ -699,6 +844,7 @@ End;
 destructor TDWClientEvents.Destroy;
 begin
  vEventList.Free;
+ FreeAndNil(vCripto);
  Inherited;
 end;
 
@@ -709,12 +855,24 @@ Var
  lResponse            : String;
  JSONParam            : TJSONParam;
  DWParams             : TDWParams;
+ vRaised              : Boolean;
 Begin
+ vRaised := False;
  If Assigned(vRESTClientPooler) Then
   RESTClientPoolerExec := vRESTClientPooler
  Else
   Exit;
+ If Assigned(vRESTClientPooler) Then
+  If Assigned(vRESTClientPooler.OnBeforeExecute) Then
+   vRESTClientPooler.OnBeforeExecute(Self);
  DWParams                        := TDWParams.Create;
+ DWParams.CriptOptions.Use       := CriptOptions.Use;
+ DWParams.CriptOptions.Key       := CriptOptions.Key;
+ JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam.ParamName             := 'dwservereventname';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.AsString              := vServerEventName;
+ DWParams.Add(JSONParam);
  JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
@@ -725,39 +883,59 @@ Begin
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
- JSONParam                     := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam.ParamName             := 'BinaryRequest';
+ JSONParam.ObjectDirection       := odIn;
+ If Assigned(vRESTClientPooler) Then
+  JSONParam.AsBoolean            := vRESTClientPooler.BinaryRequest
+ Else
+  JSONParam.AsBoolean            := False;
+ DWParams.Add(JSONParam);
+ JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOut;
  JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
  Try
   Try
+   RESTClientPoolerExec.NewToken;
    lResponse := RESTClientPoolerExec.SendEvent('GetEvents', DWParams);
    If (lResponse <> '') And
-      (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
+      (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
      If Not DWParams.ItemsString['error'].AsBoolean Then
       Begin
-       vResult := DWParams.ItemsString['Result'].Value;
+//       If vRESTClientPooler.CriptOptions.Use Then
+//        DWParams.ItemsString['Result'].CriptOptions.Use := False;
+       vResult := DWParams.ItemsString['Result'].AsString;
        If Trim(vResult) <> '' Then //Carreta o ParamList
         vEventList.FromJSON(Trim(vResult));
       End
      Else
-      Raise Exception.Create(DWParams.ItemsString['MessageError'].AsString);
+      Begin
+       vRaised := True;
+       Raise Exception.Create(DWParams.ItemsString['MessageError'].AsString);
+      End;
     End
    Else
     Begin
      If (lResponse = '') Then
       lResponse  := Format('Unresolved Host : ''%s''', [RESTClientPoolerExec.Host])
-     Else If (Uppercase(lResponse) <> Uppercase('HTTP/1.1 401 Unauthorized')) Then
-      lResponse  := Format('Unauthorized Username : ''%s''', [RESTClientPoolerExec.UserName]);
+     Else If (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
+      lResponse  := 'Unauthorized...';
      Raise Exception.Create(lResponse);
      lResponse   := '';
     End;
   Except
    On E : Exception Do
     Begin
-     Raise Exception.Create(E.Message);
+     If Not vRaised Then
+      Begin
+       If Trim(vServerEventName) = '' Then
+        Raise Exception.Create(cInvalidServerEventName)
+       Else
+        Raise Exception.Create(cServerEventNotFound);
+      End;
     End;
   End;
  Finally
@@ -767,6 +945,21 @@ Begin
  End;
 End;
 
+function TDWClientEvents.GetRESTClientPooler: TRESTClientPooler;
+begin
+  Result := vRESTClientPooler;
+end;
+
+procedure TDWClientEvents.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  if (Operation = opRemove) and (AComponent = vRESTClientPooler) then
+  begin
+    vRESTClientPooler := nil;
+  end;
+  inherited Notification(AComponent, Operation);
+end;
+
 {
 procedure TDWClientEvents.SetEditParamList(Value: Boolean);
 begin
@@ -775,18 +968,214 @@ begin
 end;
 }
 
-Function TDWClientEvents.SendEvent(EventName: String; Var DWParams: TDWParams;
-                                   Var Error: String; Var NativeResult : String): Boolean;
+Function TDWClientEvents.SendEvent(EventName        : String;
+                                   Var DWParams     : TDWParams;
+                                   Var Error        : String;
+                                   Var NativeResult : String;
+                                   EventType        : TSendEvent = sePOST;
+                                   Assyncexec       : Boolean = False): Boolean;
+Var
+ vJsonMode : TJsonMode;
 Begin
+ Error := '';
+ Result := False;
  If vRESTClientPooler <> Nil Then
-  NativeResult := vRESTClientPooler.SendEvent(EventName, DWParams);
+  Begin
+   If Assigned(vOnBeforeSend) Then
+    vOnBeforeSend(Self);
+   If Assigned(vRESTClientPooler.OnBeforeExecute) Then
+    vRESTClientPooler.OnBeforeExecute(Self);
+   If vEventList.EventByName[EventName] = Nil Then
+    Begin
+     Result := False;
+     Error  := cInvalidEvent;
+     Exit
+    End;
+   TokenValidade(DWParams, Error);
+   vJsonMode    := vEventList.EventByName[EventName].vJsonMode;
+   Try
+    Error        := '';
+    NativeResult := vRESTClientPooler.SendEvent(EventName, DWParams, EventType, vJsonMode, vServerEventName);
+    Result       := (NativeResult = TReplyOK) Or (NativeResult = AssyncCommandMSG);
+   Except
+    On E : Exception Do
+     Begin
+      Error := E.Message;
+      If Error = cInvalidAuth Then
+       Begin
+        Case vRESTClientPooler.AuthenticationOptions.AuthorizationOption Of
+         rdwAOBearer : Begin
+                        If (TRDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
+                           (TRDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token <> '')  Then
+                         TRDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
+                        If Assigned(vOnBeforeSend) Then
+                         vOnBeforeSend(Self);
+                        If Assigned(vRESTClientPooler.OnBeforeExecute) Then
+                         vRESTClientPooler.OnBeforeExecute(Self);
+                        If TRDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken Then
+                         TokenValidade(DWParams, Error);
+                       End;
+         rdwAOToken  : Begin
+                        If (TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)  And
+                            (TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token  <> '')  Then
+                         TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
+                        If Assigned(vOnBeforeSend) Then
+                         vOnBeforeSend(Self);
+                        If Assigned(vRESTClientPooler.OnBeforeExecute) Then
+                         vRESTClientPooler.OnBeforeExecute(Self);
+                        If TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken Then
+                         TokenValidade(DWParams, Error);
+                       End;
+        End;
+       End
+      Else
+       Begin
+        Raise Exception.Create(Error);
+       End;
+     End;
+   End;
+  End;
 End;
 
-Function TDWClientEvents.SendEvent(EventName: String; Var DWParams: TDWParams;
-                                   Var Error: String): Boolean;
+Procedure TDWClientEvents.TokenValidade(Var DWParams : TDWParams;
+                                        Var Error    : String);
+Var
+ JSONParam     : TJSONParam;
+ vToken        : String;
+ vErrorBoolean : Boolean;
 Begin
+ vErrorBoolean := False;
+ If Not(Assigned(DWParams)) Then
+  Begin
+   DWParams                  := TDWParams.Create;
+   DWParams.JsonMode         := jmDataware;
+   DWParams.Encoding         := vRESTClientPooler.Encoding;
+   JSONParam                 := TJSONParam.Create(vRESTClientPooler.Encoding);
+   JSONParam.ParamName       := 'BinaryRequest';
+   JSONParam.ObjectDirection := odIn;
+   JSONParam.AsBoolean       := vRESTClientPooler.BinaryRequest;
+   DWParams.Add(JSONParam);
+  End;
+ If vRESTClientPooler.AuthenticationOptions.AuthorizationOption in [rdwAOBearer, rdwAOToken] Then
+  Begin
+   Case vRESTClientPooler.AuthenticationOptions.AuthorizationOption Of
+    rdwAOBearer : Begin
+//                   If (TRDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)    And
+//                      (TRDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).EndTime < Now()) Then
+//                    TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
+                   If (TRDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
+                      (TRDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token = '') Then
+                    Begin
+                     If Assigned(vRESTClientPooler.OnBeforeGetToken) Then
+                      vRESTClientPooler.OnBeforeGetToken(vRESTClientPooler.WelcomeMessage,
+                                                         vRESTClientPooler.AccessTag, DWParams);
+                     vToken :=  vRESTClientPooler.RenewToken(DWParams, vErrorBoolean, Error);
+                     If Not vErrorBoolean Then
+                      TRDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := vToken;
+                    End;
+                  End;
+    rdwAOToken  : Begin
+//                   If (TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)    And
+//                      (TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).EndTime < Now()) Then
+//                    TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
+                   If (TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
+                      (TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token = '') Then
+                    Begin
+                     If Assigned(vRESTClientPooler.OnBeforeGetToken) Then
+                      vRESTClientPooler.OnBeforeGetToken(vRESTClientPooler.WelcomeMessage,
+                                                         vRESTClientPooler.AccessTag, DWParams);
+                     vToken :=  vRESTClientPooler.RenewToken(DWParams, vErrorBoolean, Error);
+                     If Not vErrorBoolean Then
+                      TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := vToken;
+                    End;
+                  End;
+   End;
+  End;
+End;
+
+Function TDWClientEvents.SendEvent(EventName    : String;
+                                   Var DWParams : TDWParams;
+                                   Var Error    : String;
+                                   EventType    : TSendEvent = sePOST;
+                                   Assyncexec   : Boolean = False): Boolean;
+Var
+ vJsonMode     : TJsonMode;
+ I,
+ vErrorCode    : Integer;
+ vRenewTokenData,
+ vErrorBoolean : Boolean;
+ vToken        : String;
+Begin
+ // Add por Ico Menezes
+ Result          := False;
+ vErrorCode      := 0;
+ vErrorBoolean   := False;
+ vRenewTokenData := False;
+ Error           := '';
  If vRESTClientPooler <> Nil Then
-  vRESTClientPooler.SendEvent(EventName, DWParams);
+  Begin
+   If Assigned(vOnBeforeSend) Then
+     vOnBeforeSend(Self);
+   If Assigned(vRESTClientPooler.OnBeforeExecute) Then
+    vRESTClientPooler.OnBeforeExecute(Self);
+   If vEventList.EventByName[EventName] = Nil Then
+    Begin
+     Result := False;
+     Error  := cInvalidEvent;
+     Exit
+    End;
+   TokenValidade(DWParams, Error);
+   vJsonMode := vEventList.EventByName[EventName].vJsonMode;
+   For I := 0 To 1 Do
+    Begin
+     If Error = '' Then
+      Error    := vRESTClientPooler.SendEvent(EventName, DWParams, EventType, vJsonMode, vServerEventName, Assyncexec);
+     Result    := (Error = TReplyOK) Or (Error = AssyncCommandMSG);
+     If Result Then
+      Begin
+       Error  := '';
+       Break;
+      End
+     Else
+      Begin
+       If Error = cInvalidAuth Then
+        Begin
+         Case vRESTClientPooler.AuthenticationOptions.AuthorizationOption Of
+          rdwAOBearer : Begin
+                         If (TRDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
+                            (TRDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token <> '')  Then
+                          TRDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
+                         If Assigned(vOnBeforeSend) Then
+                          vOnBeforeSend(Self);
+                         If Assigned(vRESTClientPooler.OnBeforeExecute) Then
+                          vRESTClientPooler.OnBeforeExecute(Self);
+                         If TRDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken Then
+                          TokenValidade(DWParams, Error)
+                         Else
+                          Break;
+                        End;
+          rdwAOToken  : Begin
+                         If (TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)  And
+                             (TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token  <> '')  Then
+                          TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
+                         If Assigned(vOnBeforeSend) Then
+                          vOnBeforeSend(Self);
+                         If Assigned(vRESTClientPooler.OnBeforeExecute) Then
+                          vRESTClientPooler.OnBeforeExecute(Self);
+                         If TRDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken Then
+                          TokenValidade(DWParams, Error)
+                         Else
+                          Break;
+                        End;
+         End;
+        End
+       Else
+        Begin
+         Break;
+        End;
+      End;
+    End;
+  End;
 End;
 
 procedure TDWClientEvents.ClearEvents;
@@ -800,7 +1189,17 @@ begin
   vEventList := aValue;
 end;
 
+procedure TDWClientEvents.SetRESTClientPooler(const Value: TRESTClientPooler);
+begin
+  //Alexandre Magno - 14/08/2019
+  if vRESTClientPooler <> Value then
+    vRESTClientPooler := Value;
+  if vRESTClientPooler <> nil then
+    vRESTClientPooler.FreeNotification(Self);
+end;
+
 Initialization
  RegisterClass(TDWServerEvents);
  RegisterClass(TDWClientEvents);
 end.
+

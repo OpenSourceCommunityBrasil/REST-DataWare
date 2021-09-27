@@ -8,7 +8,8 @@ uses
   Vcl.Imaging.pngimage, uRESTDWPoolerDB, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  uDWConstsData, Vcl.Grids, Vcl.DBGrids, uDWMassiveBuffer, Vcl.DBCtrls;
+  uDWConstsData, Vcl.Grids, Vcl.DBGrids, uDWMassiveBuffer, Vcl.DBCtrls,
+  uDWDataset, uDWAbout;
 
 type
   TForm9 = class(TForm)

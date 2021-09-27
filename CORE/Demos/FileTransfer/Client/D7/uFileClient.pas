@@ -5,8 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, Dialogs, StdCtrls, uRESTDWBase, ExtCtrls,
-  pngimage, uDWJSONObject, uDWConsts, uDWConstsData, ComCtrls, idComponent,
-  acPNG;
+  uDWJSONObject, uDWConsts, uDWConstsData, ComCtrls, idComponent,
+  uDWAbout, uRESTDWServerEvents, jpeg;
 
 type
   TForm4 = class(TForm)
@@ -32,15 +32,16 @@ type
     cmb_tmp: TComboBox;
     Label2: TLabel;
     ProgressBar1: TProgressBar;
-    procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
+    DWClientEvents1: TDWClientEvents;
     procedure FormCreate(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
     procedure RESTClientPooler1Work(ASender: TObject; AWorkMode: TWorkMode;
       AWorkCount: Int64);
     procedure RESTClientPooler1WorkBegin(ASender: TObject; AWorkMode: TWorkMode;
       AWorkCountMax: Int64);
     procedure RESTClientPooler1WorkEnd(ASender: TObject; AWorkMode: TWorkMode);
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   private
     { Private declarations }
    FBytesToTransfer : Int64;
@@ -54,136 +55,8 @@ var
 
 implementation
 
+uses uDWJSONTools;
 {$R *.dfm}
-
-procedure TForm4.Button1Click(Sender: TObject);
-Var
- lResponse : String;
- JSONValue : TJSONValue;
-Begin
- lbLocalFiles.Clear;
- RESTClientPooler1.Host     := eHost.Text;
- RESTClientPooler1.Port     := StrToInt(ePort.Text);
- RESTClientPooler1.UserName := edUserNameDW.Text;
- RESTClientPooler1.Password := edPasswordDW.Text;
- Try
-  Try
-   lResponse := RESTClientPooler1.SendEvent('FileList');
-   If lResponse <> '' Then
-    Begin
-     JSONValue := TJSONValue.Create;
-     Try
-      JSONValue.LoadFromJSON(lResponse);
-      lbLocalFiles.Items.Text := JSONValue.Value;
-     Finally
-      JSONValue.Free;
-     End;
-    End;
-  Except
-  End;
- Finally
-
- End;
-End;
-
-procedure TForm4.Button2Click(Sender: TObject);
-Var
- lResponse    : String;
- JSONValue    : TJSONValue;
- DWParams     : TDWParams;
- JSONParam    : TJSONParam;
- StringStream : TMemoryStream;
-Begin
- If lbLocalFiles.ItemIndex > -1 Then
-  Begin
-   RESTClientPooler1.Host     := eHost.Text;
-   RESTClientPooler1.Port     := StrToInt(ePort.Text);
-   RESTClientPooler1.UserName := edUserNameDW.Text;
-   RESTClientPooler1.Password := edPasswordDW.Text;
-   DWParams                   := TDWParams.Create;
-   JSONParam                  := TJSONParam.Create;
-   JSONParam.ParamName        := 'Arquivo';
-   JSONParam.ObjectDirection  := odIN;
-   JSONParam.SetValue(lbLocalFiles.Items[lbLocalFiles.ItemIndex]);
-   DWParams.Add(JSONParam);
-   Try
-    Try
-     RESTClientPooler1.Host := eHost.Text;
-     RESTClientPooler1.Port := StrToInt(ePort.Text);
-     lResponse := RESTClientPooler1.SendEvent('DownloadFile', DWParams);
-     If lResponse <> '' Then
-      Begin
-       JSONValue := TJSONValue.Create;
-       Try
-        JSONValue.LoadFromJSON(lResponse);
-        lResponse             := '';
-        StringStream          := TMemoryStream.Create;
-        JSONValue.SaveToStream(StringStream);
-        Try
-         If FileExists(DirName + lbLocalFiles.Items[lbLocalFiles.ItemIndex]) Then
-          DeleteFile(DirName + lbLocalFiles.Items[lbLocalFiles.ItemIndex]);
-         StringStream.SaveToFile(DirName + lbLocalFiles.Items[lbLocalFiles.ItemIndex]);
-         Showmessage('Download concluído...');
-        Finally
-         FreeAndNil(StringStream);
-        End;
-       Finally
-        FreeAndNil(JSONValue);
-       End;
-      End;
-    Except
-    End;
-   Finally
-    FreeAndNil(DWParams);
-   End;
-  End
- Else
-  Showmessage('Escolha um arquivo para Download...');
-End;
-
-procedure TForm4.Button3Click(Sender: TObject);
-Var
- DWParams            : TDWParams;
- JSONParam           : TJSONParam;
- lResponse           : String;
- MemoryStream        : TMemoryStream;
-Begin
-  RESTClientPooler1.RequestTimeOut:= StrToInt(Copy(cmb_tmp.Text, 1,1)) * 60000;
-  If OpenDialog1.Execute Then
-  Begin
-   DWParams                     := TDWParams.Create;
-   JSONParam                    := TJSONParam.Create;
-   JSONParam.ParamName          := 'Arquivo';
-   JSONParam.ObjectDirection    := odIN;
-   JSONParam.SetValue(OpenDialog1.FileName);
-   DWParams.Add(JSONParam);
-   JSONParam                    := TJSONParam.Create;
-   JSONParam.ParamName          := 'FileSend';
-   JSONParam.ObjectDirection    := odIN;
-   JSONParam.ObjectValue        := ovBlob;
-   MemoryStream                 := TMemoryStream.Create;
-   MemoryStream.LoadFromFile(OpenDialog1.FileName);
-   JSONParam.LoadFromStream(MemoryStream);
-   MemoryStream.SetSize(0);
-   MemoryStream.Free;
-   DWParams.Add(JSONParam);
-   JSONParam                    := TJSONParam.Create;
-   JSONParam.ParamName          := 'Result';
-   JSONParam.ObjectDirection    := odOUT;
-   JSONParam.SetValue('');
-   DWParams.Add(JSONParam);
-   lResponse := RESTClientPooler1.SendEvent('SendReplicationFile', DWParams, sePost);
-   If lResponse <> '' Then
-    Begin
-      Try
-       If GetBooleanFromString(DWParams.ItemsString['Result'].Value) Then
-        Showmessage('Upload concluído...');
-      Finally
-      End;
-    End;
-   DWParams.Free;
-  End;
-end;
 
 procedure TForm4.FormCreate(Sender: TObject);
 begin
@@ -214,6 +87,114 @@ procedure TForm4.RESTClientPooler1WorkEnd(ASender: TObject;
 begin
  ProgressBar1.Position := FBytesToTransfer;
  FBytesToTransfer      := 0;
+end;
+
+procedure TForm4.Button1Click(Sender: TObject);
+Var
+ dwParams      : TDWParams;
+ vErrorMessage : String;
+Begin
+ lbLocalFiles.Clear;
+ RESTClientPooler1.Host     := eHost.Text;
+ RESTClientPooler1.Port     := StrToInt(ePort.Text);
+ RESTClientPooler1.UserName := edUserNameDW.Text;
+ RESTClientPooler1.Password := edPasswordDW.Text;
+ Try
+  Try
+   DWClientEvents1.CreateDWParams('FileList', dwParams);
+   DWClientEvents1.SendEvent('FileList', dwParams, vErrorMessage);
+   If vErrorMessage = '' Then
+    Begin
+     If dwParams.ItemsString['result'].AsString <> '' Then
+      Begin
+       Try
+        lbLocalFiles.Items.Text := DecodeStrings(dwParams.ItemsString['result'].AsString);
+       Finally
+       End;
+      End;
+    End
+   Else
+    Showmessage(vErrorMessage);
+  Except
+  End;
+ Finally
+  dwParams.Free;
+ End;
+End;
+
+procedure TForm4.Button2Click(Sender: TObject);
+Var
+ DWParams     : TDWParams;
+ vErrorMessage : String;
+ StringStream : TMemoryStream;
+Begin
+ If lbLocalFiles.ItemIndex > -1 Then
+  Begin
+   RESTClientPooler1.Host     := eHost.Text;
+   RESTClientPooler1.Port     := StrToInt(ePort.Text);
+   RESTClientPooler1.UserName := edUserNameDW.Text;
+   RESTClientPooler1.Password := edPasswordDW.Text;
+   DWParams                   := TDWParams.Create;
+   DWClientEvents1.CreateDWParams('DownloadFile', dwParams);
+   dwParams.ItemsString['Arquivo'].AsString := lbLocalFiles.Items[lbLocalFiles.ItemIndex];
+   Try
+    Try
+     RESTClientPooler1.Host := eHost.Text;
+     RESTClientPooler1.Port := StrToInt(ePort.Text);
+     DWClientEvents1.SendEvent('DownloadFile', dwParams, vErrorMessage);
+     If vErrorMessage = '' Then
+      Begin
+       StringStream          := TMemoryStream.Create;
+       dwParams.ItemsString['result'].SaveToStream(StringStream);
+       Try
+        ForceDirectories(ExtractFilePath(DirName + lbLocalFiles.Items[lbLocalFiles.ItemIndex]));
+        If FileExists(DirName + lbLocalFiles.Items[lbLocalFiles.ItemIndex]) Then
+         DeleteFile(DirName + lbLocalFiles.Items[lbLocalFiles.ItemIndex]);
+        StringStream.SaveToFile(DirName + lbLocalFiles.Items[lbLocalFiles.ItemIndex]);
+        StringStream.SetSize(0);
+        Showmessage('Download concluído...');
+       Finally
+        FreeAndNil(StringStream);
+       End;
+      End;
+    Except
+    End;
+   Finally
+    FreeAndNil(DWParams);
+   End;
+  End
+ Else
+  Showmessage('Escolha um arquivo para Download...');
+End;
+
+procedure TForm4.Button3Click(Sender: TObject);
+Var
+ DWParams      : TDWParams;
+ vErrorMessage : String;
+ MemoryStream  : TMemoryStream;
+Begin
+  RESTClientPooler1.RequestTimeOut:= StrToInt(Copy(cmb_tmp.Text, 1,1)) * 60000;
+  If OpenDialog1.Execute Then
+  Begin
+   DWParams                     := TDWParams.Create;
+   DWClientEvents1.CreateDWParams('SendReplicationFile', dwParams);
+   dwParams.ItemsString['Arquivo'].AsString := OpenDialog1.FileName;
+   MemoryStream                 := TMemoryStream.Create;
+   MemoryStream.LoadFromFile(OpenDialog1.FileName);
+   dwParams.ItemsString['FileSend'].LoadFromStream(MemoryStream);
+   MemoryStream.SetSize(0);
+   MemoryStream.Free;
+   DWClientEvents1.SendEvent('SendReplicationFile', DWParams, vErrorMessage);
+   If vErrorMessage = '' Then
+    Begin
+      Try
+       If DWParams.ItemsString['Result'].AsBoolean Then
+        Showmessage('Upload concluído...');
+      Finally
+      End;
+    End;
+   DWParams.Free;
+  End;
 end;
 
 end.

@@ -1,5 +1,5 @@
 package RestDatawareCORE;
-
+ {$I uRESTDW.inc}
 {$R *.res}
 {$R *.dres}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -36,11 +36,24 @@ requires
   IndySystem,
   IndyProtocols,
   IndyCore,
+  dsnap,
+  dcldb
+  {$IFDEF CLIENTDATASET}
+  //
+  {$ENDIF}
+  {$IFDEF RESJEDI}
+  //
+  {$ENDIF}
+  {$IFDEF RESTKBMMEMTABLE}
+  //
+  {$ENDIF}
+  {$IFDEF RESTFDMEMTABLE}
+    ,
   FireDAC,
   FireDACCommonDriver,
-  FireDACCommon,
-  dsnap,
-  dcldb;
+  FireDACCommon
+  {$ENDIF}
+      ;
 
 contains
   uDWPoolerMethod in '..\..\..\Source\uDWPoolerMethod.pas',
@@ -59,6 +72,8 @@ contains
   uDWJSON in '..\..\..\Source\libs\JSON\uDWJSON.pas',
   uDWMassiveBuffer in '..\..\..\Source\libs\uDWMassiveBuffer.pas',
   StringBuilderUnit in '..\..\..\Source\libs\StringBuilderUnit.pas',
-  uRESTDWServerEvents in '..\..\..\Source\uRESTDWServerEvents.pas';
+  uRESTDWServerEvents in '..\..\..\Source\uRESTDWServerEvents.pas',
+  uDWJSONInterface in '..\..\..\Source\libs\JSON\uDWJSONInterface.pas',
+  uDWDataSync in '..\..\..\Source\libs\uDWDataSync.pas';
 
 end.

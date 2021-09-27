@@ -48,8 +48,10 @@ TYPE
     FDStanStorageJSONLink1: TFDStanStorageJSONLink;
     FDGUIxWaitCursor1: TFDGUIxWaitCursor;
     FDTransaction1: TFDTransaction;
-    PROCEDURE ServerMethodDataModuleReplyEvent(SendType: TSendEvent; Context: STRING; VAR Params: TDWParams; VAR Result: STRING);
     PROCEDURE Server_FDConnectionBeforeConnect(Sender: TObject);
+    procedure ServerMethodDataModuleReplyEvent(SendType: TSendEvent;
+      Context: string; var Params: TDWParams; var Result: string;
+      AccessTag: string);
   PRIVATE
     { Private declarations }
     FUNCTION ConsultaBanco(VAR Params: TDWParams): STRING; OVERLOAD;
@@ -74,7 +76,7 @@ BEGIN
   IF Params.ItemsString['SQL'] <> NIL THEN
   BEGIN
     JSONValue          := UDWJSONObject.TJSONValue.Create;
-    JSONValue.Encoding := GetEncoding(Encoding);
+    JSONValue.Encoding := Encoding;
     IF Params.ItemsString['SQL'].Value <> '' THEN
     BEGIN
       IF Params.ItemsString['TESTPARAM'] <> NIL THEN
@@ -97,7 +99,9 @@ BEGIN
   END;
 END;
 
-PROCEDURE TServerMethodDM.ServerMethodDataModuleReplyEvent(SendType: TSendEvent; Context: STRING; VAR Params: TDWParams; VAR Result: STRING);
+procedure TServerMethodDM.ServerMethodDataModuleReplyEvent(SendType: TSendEvent;
+  Context: string; var Params: TDWParams; var Result: string;
+  AccessTag: string);
 VAR
   JSONObject: TJSONObject;
 BEGIN

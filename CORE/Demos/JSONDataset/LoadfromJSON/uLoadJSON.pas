@@ -9,11 +9,10 @@ uses
   FireDAC.DApt.Intf, Data.DB, Vcl.Imaging.pngimage, Vcl.ExtCtrls, Vcl.StdCtrls,
   Vcl.Grids, Vcl.DBGrids, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
   uDWJSONObject, uDWConsts, uRESTDWBase, uRESTDWServerEvents, System.Actions,
-  uDWConstsData, Vcl.ActnList;
+  uDWConstsData, Vcl.ActnList, uDWDataset, uDWAbout;
 
 type
   TForm3 = class(TForm)
-    FDMemTable1: TFDMemTable;
     DataSource1: TDataSource;
     DBGrid1: TDBGrid;
     Memo1: TMemo;
@@ -35,6 +34,7 @@ type
     ActionList1: TActionList;
     DWClientEvents1: TDWClientEvents;
     RESTClientPooler1: TRESTClientPooler;
+    DWMemtable1: TDWMemtable;
     procedure ButtonStartClick(Sender: TObject);
   private
     { Private declarations }
@@ -68,9 +68,9 @@ begin
  DWClientEvents1.CreateDWParams('loaddatasetevent', dwParams);
  dwParams.ItemsString['sql'].AsString := Memo1.Text;
  DWClientEvents1.SendEvent('loaddatasetevent', dwParams, vErrorMessage);
- FDMemTable1.Close;
+ DWMemtable1.Close;
  If vErrorMessage = '' Then
-  JSONValue.WriteToDataset(dtFull, dwParams.ItemsString['result'].Value, FDMemTable1)
+  JSONValue.WriteToDataset(dtFull, dwParams.ItemsString['result'].Value, DWMemtable1) //FDMemTable1)
  Else
   Showmessage(vErrorMessage);
  dwParams.Free;

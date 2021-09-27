@@ -3,8 +3,8 @@ unit uPrincipal;
 interface
 
 uses
-  Windows, Forms, uRESTDWBase, pngimage, SMDWCore, StdCtrls, Controls, ExtCtrls, acPNG,
-  SysUtils, Classes;
+  Windows, Forms, uRESTDWBase, pngimage, uDMFileServer, StdCtrls, Controls, ExtCtrls, 
+  SysUtils, Classes, uDWAbout, acPNG;
 
 type
   TfServer = class(TForm)
@@ -115,7 +115,7 @@ end;
 
 procedure TfServer.FormCreate(Sender: TObject);
 begin
- rspServerFiles.ServerMethodClass := TSMDWCore;
+ rspServerFiles.ServerMethodClass := TdmFileServer;
 end;
 
 end.

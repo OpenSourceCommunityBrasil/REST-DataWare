@@ -4,7 +4,7 @@ Interface
 
 Uses LCL, LCLIntf, LCLType, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, uSock, IniFiles, IBConnection, db, uRESTDWBase,
-  ServerMethodsUnit1, ComCtrls, MaskEdit, StdCtrls, ExtCtrls, Menus,
+  ComCtrls, MaskEdit, StdCtrls, ExtCtrls, Menus,
   IdComponent, IdBaseComponent, IdTCPConnection, IdTCPClient, IdHTTP;
 
 type
@@ -12,59 +12,99 @@ type
   { TRestDWForm }
 
   TRestDWForm = class(TForm)
+    Bevel3: TBevel;
     ButtonStart: TButton;
     ButtonStop: TButton;
-    Label8: TLabel;
-    Bevel3: TBevel;
-    lSeguro: TLabel;
+    cbAdaptadores: TComboBox;
+    cbAuthOptions: TComboBox;
+    cbDriver: TComboBox;
+    cbForceWelcome: TCheckBox;
     cbPoolerState: TCheckBox;
-    PageControl1: TPageControl;
-    tsConfigs: TTabSheet;
-    tsLogs: TTabSheet;
+    cbTokenType: TComboBox;
+    cbUpdateLog: TCheckBox;
+    ckUsaURL: TCheckBox;
+    ctiPrincipal: TTrayIcon;
+    eCertFile: TEdit;
+    edBD: TEdit;
+    edPasswordBD: TEdit;
+    edPasswordDW: TEdit;
+    edPasswordDW1: TEdit;
+    edPasta: TEdit;
+    edPortaBD: TEdit;
+    edPortaDW: TEdit;
+    edURL: TEdit;
+    edUserNameBD: TEdit;
+    edUserNameDW: TEdit;
+    edUserNameDW1: TEdit;
+    eHostCertFile: TEdit;
+    eLifeCycle: TEdit;
+    ePrivKeyFile: TEdit;
+    ePrivKeyPass: TMaskEdit;
+    eServerSignature: TEdit;
+    eTokenEvent: TEdit;
+    eTokenHash: TEdit;
+    Image2: TImage;
+    Image3: TImage;
+    Image4: TImage;
+    Image5: TImage;
+    Image8: TImage;
+    labConexao: TLabel;
+    labDBConfig: TLabel;
     Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label7: TLabel;
-    Label9: TLabel;
     Label10: TLabel;
     Label11: TLabel;
-    Label13: TLabel;
-    Bevel1: TBevel;
-    Bevel2: TBevel;
     Label12: TLabel;
+    Label13: TLabel;
     Label14: TLabel;
-    Label6: TLabel;
-    Image1: TImage;
-    Label5: TLabel;
-    Bevel4: TBevel;
-    Label4: TLabel;
     Label15: TLabel;
     Label16: TLabel;
     Label17: TLabel;
-    edPortaDW: TEdit;
-    edUserNameDW: TEdit;
-    edPasswordDW: TEdit;
-    cbAdaptadores: TComboBox;
-    edPortaBD: TEdit;
-    edUserNameBD: TEdit;
-    edPasswordBD: TEdit;
-    edPasta: TEdit;
-    edBD: TEdit;
-    ePrivKeyFile: TEdit;
-    eCertFile: TEdit;
-    ePrivKeyPass: TMaskEdit;
-    ApplicationEvents1: TApplicationProperties;
-    ctiPrincipal: TTrayIcon;
-    pmMenu: TPopupMenu;
-    RestaurarAplicao1: TMenuItem;
-    N5: TMenuItem;
-    SairdaAplicao1: TMenuItem;
+    Label18: TLabel;
+    Label19: TLabel;
+    Label2: TLabel;
+    Label20: TLabel;
+    Label21: TLabel;
+    Label22: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
+    labNomeBD: TLabel;
+    labPorta: TLabel;
+    labSenha: TLabel;
+    labSistema: TLabel;
+    labSSL: TLabel;
+    labUsuario: TLabel;
+    labVersao: TLabel;
+    lbPasta: TLabel;
+    lSeguro: TLabel;
     memoReq: TMemo;
     memoResp: TMemo;
-    Label19: TLabel;
-    Label18: TLabel;
+    N5: TMenuItem;
+    paEspanhol: TPanel;
+    PageControl1: TPageControl;
+    paIngles: TPanel;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    Panel4: TPanel;
+    paPortugues: TPanel;
+    paTopo: TPanel;
+    pBasicAuth: TPanel;
+    pBasicAuth1: TPanel;
+    pmMenu: TPopupMenu;
+    pTokenAuth: TPanel;
+    RestaurarAplicao1: TMenuItem;
+    RESTDWServiceNotification1: TRESTDWServiceNotification;
     RESTServicePooler1: TRESTServicePooler;
+    SairdaAplicao1: TMenuItem;
+    tsConfigs: TTabSheet;
+    tsLogs: TTabSheet;
     tupdatelogs: TTimer;
+    procedure cbAuthOptionsChange(Sender: TObject);
+    procedure cbDriverCloseUp(Sender: TObject);
     procedure ctiPrincipalClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ApplicationEvents1Idle(Sender: TObject; var Done: Boolean);
@@ -114,7 +154,22 @@ implementation
 {$ENDIF}
 
 uses
-  ShellApi, uDmService;
+ {$IFNDEF FPC}ShellApi,{$ENDIF}ServerUtils, uDWConsts, uDmService;
+
+Function ServerIpIndex(Items: TStrings; ChooseIP: string): Integer;
+Var
+ I : Integer;
+Begin
+ Result := -1;
+ For I  := 0 To Items.Count - 1 Do
+  Begin
+   If Pos(ChooseIP, Items[I]) > 0 Then
+    Begin
+     Result := I;
+     Break;
+    End;
+  End;
+End;
 
 Function TRestDWForm.GetHandleOnTaskBar : THandle;
 Begin
@@ -236,6 +291,14 @@ Begin
  ini.WriteString('SSL',        'PKF',       ePrivKeyFile.Text);
  ini.WriteString('SSL',        'PKP',       ePrivKeyPass.Text);
  ini.WriteString('SSL',        'CF',        eCertFile.Text);
+ If cbForceWelcome.Checked Then
+  Ini.WriteInteger('Configs', 'ForceWelcomeAccess', 1)
+ Else
+  Ini.WriteInteger('Configs', 'ForceWelcomeAccess', 0);
+ If cbUpdateLog.Checked Then
+  Ini.WriteInteger('Configs', 'UPDLOG', 1)
+ Else
+  Ini.WriteInteger('Configs', 'UPDLOG', 0);
  ini.Free;
  vUsername := edUserNameDW.Text;
  vPassword := edPasswordDW.Text;
@@ -274,6 +337,7 @@ Begin
  // define o nome do .ini de acordo c o EXE
  // dessa forma se quiser testar várias instâncias do servidor em
  // portas diferentes os arquivos não irão conflitar
+ labVersao.Caption := uDWConsts.DWVERSAO;
  FCfgName := StringReplace(ExtractFileName(ParamStr(0) ), '.exe' , '' , [rfReplaceAll]);
  FCfgName := ExtractFilePath(ParamSTR(0)) + 'Config_' + FCfgName + '.ini' ;
  RESTServicePooler1.ServerMethodClass := TServerMethodDM;
@@ -283,6 +347,51 @@ End;
 procedure TRestDWForm.ctiPrincipalClick(Sender: TObject);
 begin
 
+end;
+
+procedure TRestDWForm.cbDriverCloseUp(Sender: TObject);
+Var
+ Ini : TIniFile;
+Begin
+  Ini                     := TIniFile.Create(FCfgName);
+  Try
+   CbAdaptadores.ItemIndex := ServerIpIndex(CbAdaptadores.Items, Ini.ReadString('BancoDados', 'Servidor', '127.0.0.1'));
+   EdBD.Text               := Ini.ReadString('BancoDados', 'BD', 'EMPLOYEE.FDB');
+   EdPasta.Text            := Ini.ReadString('BancoDados', 'Pasta', ExtractFilePath(ParamSTR(0)) + '..\');
+   EdPortaBD.Text          := Ini.ReadString('BancoDados', 'PortaBD', '3050');
+   EdUserNameBD.Text       := Ini.ReadString('BancoDados', 'UsuarioBD', 'SYSDBA');
+   EdPasswordBD.Text       := Ini.ReadString('BancoDados', 'SenhaBD', 'masterkey');
+   EdPortaDW.Text          := Ini.ReadString('BancoDados', 'PortaDW', '8082');
+   EdUserNameDW.Text       := Ini.ReadString('BancoDados', 'UsuarioDW', 'testserver');
+   EdPasswordDW.Text       := Ini.ReadString('BancoDados', 'SenhaDW', 'testserver');
+   Case CbDriver.ItemIndex of
+    0: // FireBird
+      Begin
+       LbPasta.Visible         := True;
+       EdPasta.Visible         := True;
+       DatabaseName            := EdPasta.Text + EdBD.Text;
+      End;
+    1: // MSSQL
+      Begin
+        EdBD.Text         := 'seubanco';
+        LbPasta.Visible   := False;
+        EdPasta.Visible   := False;
+        EdPasta.Text      := EmptyStr;
+        EdPortaBD.Text    := '1433';
+        EdUserNameBD.Text := 'sa';
+        EdPasswordBD.Text := EmptyStr;;
+        DatabaseName      := EdBD.Text;
+      End;
+   End;
+  Finally
+   Ini.Free;
+  End;
+End;
+
+procedure TRestDWForm.cbAuthOptionsChange(Sender: TObject);
+begin
+ pTokenAuth.Visible := cbAuthOptions.ItemIndex > 1;
+ pBasicAuth.Visible := cbAuthOptions.ItemIndex = 1;
 end;
 
 procedure TRestDWForm.FormShow(Sender: TObject);
@@ -327,6 +436,7 @@ Begin
    cbAdaptadores.ItemIndex := vTag;
   End;
  ini                     := TIniFile.Create(FCfgName);
+ cbDriver.ItemIndex      := Ini.ReadInteger('BancoDados', 'DRIVER', 0);
  cbAdaptadores.ItemIndex := ServerIpIndex(cbAdaptadores.Items,
                             ini.ReadString('BancoDados', 'Servidor',  '127.0.0.1'));
  edBD.Text               := ini.ReadString('BancoDados', 'BD',        'EMPLOYEE.FDB');
@@ -340,37 +450,83 @@ Begin
  ePrivKeyFile.Text       := ini.ReadString('SSL',        'PKF',       '');
  ePrivKeyPass.Text       := ini.ReadString('SSL',        'PKP',       '');
  eCertFile.Text          := ini.ReadString('SSL',        'CF',        '');
+ cbForceWelcome.Checked   := Ini.ReadInteger('Configs', 'ForceWelcomeAccess', 0) = 1;
+ cbUpdateLog.Checked      := Ini.ReadInteger('Configs', 'UPDLOG', 1) = 1;
  ini.Free;
 End;
 
 procedure TRestDWForm.StartServer;
-begin
- If Not RESTServicePooler1.Active Then
-  Begin
-   RESTServicePooler1.ServerParams.UserName := edUserNameDW.Text;
-   RESTServicePooler1.ServerParams.Password := edPasswordDW.Text;
-   RESTServicePooler1.ServicePort           := StrToInt(edPortaDW.Text);
-   RESTServicePooler1.SSLPrivateKeyFile     := ePrivKeyFile.Text;
-   RESTServicePooler1.SSLPrivateKeyPassword := ePrivKeyPass.Text;
-   RESTServicePooler1.SSLCertFile           := eCertFile.Text;
-   RESTServicePooler1.Active                := True;
-   If Not RESTServicePooler1.Active Then
+Function GetAuthOption : TRDWAuthOption;
+Begin
+ Case cbAuthOptions.ItemIndex Of
+  0 : Result := rdwAONone;
+  1 : Result := rdwAOBasic;
+  2 : Result := rdwAOBearer;
+  3 : Result := rdwAOToken;
+ End;
+End;
+Function GetTokenType : TRDWTokenType;
+Begin
+ Case cbTokenType.ItemIndex Of
+  0 : Result := rdwTS;
+  1 : Result := rdwJWT;
+ End;
+End;
+Begin
+If Not RESTServicePooler1.Active Then
+ Begin
+  RESTServicePooler1.AuthenticationOptions.AuthorizationOption := GetAuthOption;
+  Case RESTServicePooler1.AuthenticationOptions.AuthorizationOption Of
+   rdwAOBasic : Begin
+                 TRDWAuthOptionBasic(RESTServicePooler1.AuthenticationOptions.OptionParams).Username := EdUserNameDW.Text;
+                 TRDWAuthOptionBasic(RESTServicePooler1.AuthenticationOptions.OptionParams).Password := EdPasswordDW.Text;
+                End;
+   rdwAOBearer,
+   rdwAOToken : Begin
+                 If RESTServicePooler1.AuthenticationOptions.AuthorizationOption = rdwAOBearer Then
+                  Begin
+                   TRDWAuthOptionBearerServer(RESTServicePooler1.AuthenticationOptions.OptionParams).TokenType       := GetTokenType;
+                   TRDWAuthOptionBearerServer(RESTServicePooler1.AuthenticationOptions.OptionParams).GetTokenEvent   := eTokenEvent.Text;
+                   TRDWAuthOptionBearerServer(RESTServicePooler1.AuthenticationOptions.OptionParams).TokenHash       := eTokenHash.Text;
+                   TRDWAuthOptionBearerServer(RESTServicePooler1.AuthenticationOptions.OptionParams).ServerSignature := eServerSignature.Text;
+                   TRDWAuthOptionBearerServer(RESTServicePooler1.AuthenticationOptions.OptionParams).LifeCycle       := StrToInt(eLifeCycle.Text);
+                  End
+                 Else
+                  Begin
+                   TRDWAuthOptionTokenServer(RESTServicePooler1.AuthenticationOptions.OptionParams).TokenType       := GetTokenType;
+                   TRDWAuthOptionTokenServer(RESTServicePooler1.AuthenticationOptions.OptionParams).GetTokenEvent   := eTokenEvent.Text;
+                   TRDWAuthOptionTokenServer(RESTServicePooler1.AuthenticationOptions.OptionParams).TokenHash       := eTokenHash.Text;
+                   TRDWAuthOptionTokenServer(RESTServicePooler1.AuthenticationOptions.OptionParams).ServerSignature := eServerSignature.Text;
+                   TRDWAuthOptionTokenServer(RESTServicePooler1.AuthenticationOptions.OptionParams).LifeCycle       := StrToInt(eLifeCycle.Text);
+                  End;
+                End;
+   Else
+    RESTServicePooler1.AuthenticationOptions.AuthorizationOption := rdwAONone;
+  End;
+  RESTServicePooler1.ServicePort           := StrToInt(EdPortaDW.Text);
+  RESTServicePooler1.SSLPrivateKeyFile     := EPrivKeyFile.Text;
+  RESTServicePooler1.SSLPrivateKeyPassword := EPrivKeyPass.Text;
+  RESTServicePooler1.SSLCertFile           := ECertFile.Text;
+  RESTServicePooler1.SSLRootCertFile       := eHostCertFile.Text;
+  RESTServicePooler1.ForceWelcomeAccess    := cbForceWelcome.Checked;
+  RESTServicePooler1.Active                := True;
+  If Not RESTServicePooler1.Active Then
     Exit;
-   PageControl1.ActivePage := tsLogs;
-   HideApplication;
-   tupdatelogs.Enabled     := True;
-  End;
- If RESTServicePooler1.Secure Then
-  Begin
-   lSeguro.Font.Color := clBlue;
-   lSeguro.Caption    := 'Seguro : Sim';
-  End
- Else
-  Begin
-   lSeguro.Font.Color := clRed;
-   lSeguro.Caption    := 'Seguro : Não';
-  End;
-end;
+  PageControl1.ActivePage := TsLogs;
+  HideApplication;
+  Tupdatelogs.Enabled := cbUpdateLog.Checked;
+ End;
+If RESTServicePooler1.Secure Then
+ Begin
+  LSeguro.Font.Color := ClBlue;
+  LSeguro.Caption    := 'Seguro : Sim';
+ End
+Else
+ Begin
+  LSeguro.Font.Color := ClRed;
+  LSeguro.Caption    := 'Seguro : Não';
+ End;
+End;
 
 procedure TRestDWForm.tupdatelogsTimer(Sender: TObject);
 Var

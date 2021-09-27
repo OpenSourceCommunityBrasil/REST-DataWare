@@ -1,5 +1,4 @@
 package RestDatawareCORE;
-
 {$R *.res}
 {$R *.dres}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -31,15 +30,15 @@ package RestDatawareCORE;
 requires
   rtl,
   designide,
+  dcldb,
   dbrtl,
   soaprtl,
   IndySystem,
   IndyProtocols,
   IndyCore,
-  FireDAC,
-  FireDACCommonDriver,
-  FireDACCommon,
-  dsnap;
+  fmx,
+  vcl,
+  vcldb;
 
 contains
   uDWPoolerMethod in '..\..\..\Source\uDWPoolerMethod.pas',
@@ -55,6 +54,25 @@ contains
   uDWJSONObject in '..\..\..\Source\libs\uDWJSONObject.pas',
   uDWJSONTools in '..\..\..\Source\libs\uDWJSONTools.pas',
   uzliblaz in '..\..\..\Source\libs\uzliblaz.pas',
-  uDWJSON in '..\..\..\Source\libs\JSON\uDWJSON.pas';
+  uDWJSON in '..\..\..\Source\libs\JSON\uDWJSON.pas',
+  uDWMassiveBuffer in '..\..\..\Source\libs\uDWMassiveBuffer.pas',
+  StringBuilderUnit in '..\..\..\Source\libs\StringBuilderUnit.pas',
+  uRESTDWServerEvents in '..\..\..\Source\uRESTDWServerEvents.pas',
+  uDWJSONInterface in '..\..\..\Source\libs\JSON\uDWJSONInterface.pas',
+  uDWDataSync in '..\..\..\Source\libs\uDWDataSync.pas',
+  uDWDataset in '..\..\..\Source\Memdataset\uDWDataset.pas',
+  uDWSqlEditor in '..\..\..\Source\uDWSqlEditor.pas' {FrmDWSqlEditor},
+  uDWAbout in '..\..\..\Source\uDWAbout.pas',
+  uAboutForm in '..\..\..\Source\uAboutForm.pas' {frm_About},
+  uDWResponseTranslator in '..\..\..\Source\uDWResponseTranslator.pas',
+  uSystemEvents in '..\..\..\Source\libs\uSystemEvents.pas',
+  uRESTDWServerContext in '..\..\..\Source\uRESTDWServerContext.pas',
+  dwCGIRunner in '..\..\..\Source\dwCGIRunner.pas',
+  dwISAPIRunner in '..\..\..\Source\dwISAPIRunner.pas',
+  uDWFieldSourceEditor in '..\..\..\Source\uDWFieldSourceEditor.pas' {fMasterDetailRelation},
+  uDWReqParamsEditor in '..\..\..\Source\uDWReqParamsEditor.pas' {fParamsEditor},
+  uDWRequestDBG in '..\..\..\Source\uDWRequestDBG.pas' {fRequestDebbug};
 
 end.
+
+

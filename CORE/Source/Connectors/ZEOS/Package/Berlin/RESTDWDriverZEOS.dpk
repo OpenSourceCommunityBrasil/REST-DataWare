@@ -26,6 +26,7 @@ package RESTDWDriverZEOS;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'REST Dataware CORE - Driver ZEOS'}
 {$IMPLICITBUILD OFF}
 
 requires
@@ -36,11 +37,12 @@ requires
   IndySystem,
   IndyProtocols,
   IndyCore,
-  FireDAC,
-  FireDACCommonDriver,
-  FireDACCommon,
-  dsnap,
-  RestDatawareCORE;
+  RestDatawareCORE,
+  ZComponent,
+  ZDbc,
+  ZPlain,
+  ZCore,
+  ZParseSql;
 
 contains
   uRestDWDriverZEOS in '..\..\uRestDWDriverZEOS.pas';

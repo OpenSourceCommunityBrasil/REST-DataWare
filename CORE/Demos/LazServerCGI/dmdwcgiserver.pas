@@ -1,26 +1,24 @@
 unit dmdwcgiserver;
 
 {$mode objfpc}{$H+}
+{$DEFINE APACHE}
 
 interface
 
 uses
-  SysUtils, Classes, uRESTDWBase, httpdefs, fpHTTP, fpWeb, uConsts;
+  SysUtils, Classes, uRESTDWBase,
+  fpHTTP, HTTPDefs, fpWeb;
 
-type
-
-  { TdwCGIService }
-
+ Type
   TdwCGIService = class(TFPWebModule)
     RESTServiceCGI1: TRESTServiceCGI;
     constructor CreateNew(AOwner: TComponent; CreateMode: Integer); override;
     procedure DataModuleCreate(Sender: TObject);
-  private
-   procedure Request(Sender: TObject; ARequest: TRequest;
+ Private
+  Procedure Request(Sender: TObject; ARequest: TRequest;
                      AResponse: TResponse; var Handled: Boolean);
-  public
-
-  end;
+ Public
+ End;
 
 var
   dwCGIService: TdwCGIService;
@@ -46,11 +44,12 @@ end;
 
 procedure TdwCGIService.DataModuleCreate(Sender: TObject);
 begin
+ RESTServiceCGI1.RootPath := '.\';
  RESTServiceCGI1.ServerMethodClass := TServerMethodDM;
 end;
 
 
-initialization
+Initialization
   RegisterHTTPModule('', TdwCGIService);
 end.
 

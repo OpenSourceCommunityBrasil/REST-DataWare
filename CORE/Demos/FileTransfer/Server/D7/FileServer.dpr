@@ -3,7 +3,7 @@ program FileServer;
 uses
   Forms,
   uPrincipal in 'uPrincipal.pas' {fServer},
-  SMDWCore in 'SMDWCore.pas';
+  uDMFileServer in 'uDMFileServer.pas' {dmFileServer: TServerMethodDataModule};
 
 {$R *.res}
 

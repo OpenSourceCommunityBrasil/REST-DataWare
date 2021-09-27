@@ -33,11 +33,15 @@ USES
   FireDAC.Stan.StorageJSON,
   URESTDWPoolerDB,
   URestDWDriverFD,
+  uSystemEvents,
   FireDAC.Phys.MSSQLDef,
   FireDAC.Phys.ODBCBase,
   FireDAC.Phys.MSSQL,
   uDWConsts, uRESTDWServerEvents, FireDAC.Stan.Param, FireDAC.DatS,
-  FireDAC.DApt.Intf, FireDAC.Comp.DataSet;
+  FireDAC.DApt.Intf, FireDAC.Comp.DataSet, uDWAbout, uRESTDWServerContext;
+
+Const
+ Const404Page  = 'www\404.html';
 
 TYPE
   TServerMethodDM = CLASS(TServerMethodDataModule)
@@ -50,7 +54,9 @@ TYPE
     FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink;
     FDTransaction1: TFDTransaction;
     FDQuery1: TFDQuery;
-    PROCEDURE ServerMethodDataModuleReplyEvent(SendType: TSendEvent; Context: STRING; VAR Params: TDWParams; VAR Result: STRING);
+    DWServerContext1: TDWServerContext;
+    dwcrEmployee: TDWContextRules;
+    FDQLogin: TFDQuery;
     PROCEDURE ServerMethodDataModuleCreate(Sender: TObject);
     PROCEDURE Server_FDConnectionBeforeConnect(Sender: TObject);
     procedure ServerMethodDataModuleMassiveProcess(
@@ -63,6 +69,30 @@ TYPE
       var Params: TDWParams; var Result: string);
     procedure DWServerEvents1EventsgetemployeeReplyEvent(var Params: TDWParams;
       var Result: string);
+    procedure DWServerEvents1EventshelloworldReplyEvent(var Params: TDWParams;
+      var Result: string);
+    procedure DWServerContext1ContextListangularReplyRequest(
+      const Params: TDWParams; var ContentType, Result: string;
+      const RequestType: TRequestType);
+    procedure DWServerContext1ContextListopenfileReplyRequestStream(
+      const Params: TDWParams; var ContentType: string;
+      var Result: TMemoryStream; const RequestType: TRequestType);
+    procedure DWServerContext1ContextListinitReplyRequest(
+      const Params: TDWParams; var ContentType, Result: string;
+      const RequestType: TRequestType);
+    procedure DWServerContext1ContextListindexReplyRequest(
+      const Params: TDWParams; var ContentType, Result: string;
+      const RequestType: TRequestType);
+    procedure dwcrEmployeeItemsdatatableRequestExecute(const Params: TDWParams;
+      var ContentType, Result: string);
+    procedure ServerMethodDataModuleGetToken(Welcomemsg, AccessTag: string;
+      Params: TDWParams; AuthOptions: TRDWAuthTokenParam;
+      var ErrorCode: Integer; var ErrorMessage, TokenID: string;
+      var Accept: Boolean);
+    procedure ServerMethodDataModuleUserTokenAuth(Welcomemsg, AccessTag: string;
+      Params: TDWParams; AuthOptions: TRDWAuthTokenParam;
+      var ErrorCode: Integer; var ErrorMessage, TokenID: string;
+      var Accept: Boolean);
   PRIVATE
     { Private declarations }
     vIDVenda : Integer;
@@ -80,7 +110,7 @@ IMPLEMENTATION
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
 
-uses uConsts;
+uses uConsts, uDWJSONTools;
 
 FUNCTION TServerMethodDM.ConsultaBanco(VAR Params: TDWParams): STRING;
 VAR
@@ -114,6 +144,137 @@ BEGIN
   END;
 END;
 
+procedure TServerMethodDM.dwcrEmployeeItemsdatatableRequestExecute(
+  const Params: TDWParams; var ContentType, Result: string);
+Var
+ JSONValue :  TJSONValue;
+begin
+ JSONValue := TJSONValue.Create;
+ Try
+  FDQuery1.Close;
+  FDQuery1.SQL.Clear;
+  FDQuery1.SQL.Add('select * from employee');
+  If Params.ItemsString['codcli'] <> Nil Then
+   FDQuery1.SQL.Add('where emp_no = ' + Params.ItemsString['codcli'].AsString);
+  Try
+   FDQuery1.Open;
+   JSONValue.JsonMode := jmPureJSON;
+   JSONValue.Encoding := Encoding;
+   JSONValue.LoadFromDataset('', FDQuery1, False,  JSONValue.JsonMode, 'dd/mm/yyyy', '.');
+   Result := JSONValue.ToJson;
+  Except
+   On E : Exception Do
+    Begin
+     Result := Format('{"Error":"%s"}', [E.Message]);
+    End;
+  End;
+ Finally
+  JSONValue.Free;
+ End;
+end;
+
+procedure TServerMethodDM.DWServerContext1ContextListangularReplyRequest(
+  const Params: TDWParams; var ContentType, Result: string;
+  const RequestType: TRequestType);
+var
+ s : TStringlist;
+begin
+ s := TStringlist.Create;
+ Try
+  s.LoadFromFile('.\www\dw_angular.html');
+  Result := s.Text;
+ Finally
+  s.Free;
+ End;
+end;
+
+procedure TServerMethodDM.DWServerContext1ContextListindexReplyRequest(
+  const Params: TDWParams; var ContentType, Result: string;
+  const RequestType: TRequestType);
+var
+ s : TStringlist;
+begin
+ s := TStringlist.Create;
+ Try
+  s.LoadFromFile('.\www\index.html');
+  Result := s.Text;
+ Finally
+  s.Free;
+ End;
+end;
+
+procedure TServerMethodDM.DWServerContext1ContextListinitReplyRequest(
+  const Params: TDWParams; var ContentType, Result: string;
+  const RequestType: TRequestType);
+begin
+ Result := '<!DOCTYPE html> ' +
+           '<html>' +
+           '  <head>' +
+           '    <meta charset="utf-8">' +
+           '    <title>My test page</title>' +
+           '    <link href=''http://fonts.googleapis.com/css?family=Open+Sans'' rel=''stylesheet'' type=''text/css''>' +
+           '  </head>' +
+           '  <body>' +
+           '    <h1>REST Dataware is cool</h1>' +
+           '    <img src="http://www.resteasyobjects.com.br/myimages/LogoDW.png" alt="The REST Dataware logo: Powerfull Web Service.">' +
+           '  ' +
+           '  ' +
+           '    <p>working together to keep the Internet alive and accessible, help us to help you. Be free.</p>' +
+           ' ' +
+           '    <p><a href="http://www.restdw.com.br/">REST Dataware site</a> to learn and help us.</p>' +
+           '  </body>' +
+           '</html>';
+end;
+
+procedure TServerMethodDM.DWServerContext1ContextListopenfileReplyRequestStream(
+  const Params: TDWParams; var ContentType: string; var Result: TMemoryStream;
+  const RequestType: TRequestType);
+Var
+ vNotFound   : Boolean;
+ vFileName   : String;
+ vStringStream : TStringStream;
+begin
+ vNotFound := True;
+ Result    := TMemoryStream.Create;
+ If Params.ItemsString['filename'] <> Nil Then
+  Begin
+   vFileName := '.\www\' + DecodeStrings(Params.ItemsString['filename'].AsString);
+   vNotFound := Not FileExists(vFileName);
+   If Not vNotFound Then
+    Begin
+     Try
+      Result.LoadFromFile(vFileName);
+      ContentType := GetMIMEType(vFileName);
+     Finally
+     End;
+    End;
+  End;
+ If vNotFound Then
+  Begin
+   vStringStream := TStringStream.Create('<!DOCTYPE html> ' +
+                                         '<html>' +
+                                         '  <head>' +
+                                         '    <meta charset="utf-8">' +
+                                         '    <title>My test page</title>' +
+                                         '    <link href=''http://fonts.googleapis.com/css?family=Open+Sans'' rel=''stylesheet'' type=''text/css''>' +
+                                         '  </head>' +
+                                         '  <body>' +
+                                         '    <h1>REST Dataware</h1>' +
+                                         '    <img src="http://www.resteasyobjects.com.br/myimages/LogoDW.png" alt="The REST Dataware logo: Powerfull Web Service.">' +
+                                         '  ' +
+                                         '  ' +
+                                         '    <p>File not Found.</p>' +
+                                         '  </body>' +
+                                         '</html>');
+   Try
+    vStringStream.Position := 0;
+    Result.CopyFrom(vStringStream, vStringStream.Size);
+   Finally
+    vStringStream.Free;
+   End;
+  End;
+end;
+
 procedure TServerMethodDM.DWServerEvents1EventsgetemployeeReplyEvent(
   var Params: TDWParams; var Result: string);
 Var
@@ -124,26 +285,37 @@ begin
   FDQuery1.Close;
   FDQuery1.SQL.Clear;
   FDQuery1.SQL.Add('select * from employee');
+  If Params.ItemsString['id'].AsInteger > 0 Then
+   FDQuery1.SQL.Add('Where emp_no = ' + intTostr(Params.ItemsString['id'].AsInteger));
+
   Try
    FDQuery1.Open;
    JSONValue.JsonMode := Params.JsonMode;
    JSONValue.Encoding := Encoding;
-   JSONValue.LoadFromDataset('employee', FDQuery1, False,  Params.JsonMode, '');
-   Params.ItemsString['result'].AsString := JSONValue.ToJSON;
-   Params.ItemsString['segundoparam'].AsString := 'teste de array';
+   JSONValue.LoadFromDataset('employee', FDQuery1, False,  Params.JsonMode);
+   Params.ItemsString['result'].AsObject := JSONValue.ToJSON;
   Except
-
+   On E : Exception Do
+    Begin
+     Result := Format('{"Error":"%s"}', [E.Message]);
+    End;
   End;
  Finally
   JSONValue.Free;
  End;
 end;
 
+procedure TServerMethodDM.DWServerEvents1EventshelloworldReplyEvent(
+  var Params: TDWParams; var Result: string);
+begin
+ Result := Format('{"Message":"%s"}', [Params.ItemsString['entrada'].AsString]);
+end;
+
 procedure TServerMethodDM.DWServerEvents1EventsloaddataseteventReplyEvent(
   var Params: TDWParams; var Result: string);
 Var
  JSONValue: TJSONValue;
-BEGIN
+Begin
  If Params.ItemsString['sql'] <> Nil Then
   Begin
    JSONValue          := TJSONValue.Create;
@@ -185,6 +357,75 @@ PROCEDURE TServerMethodDM.ServerMethodDataModuleCreate(Sender: TObject);
 BEGIN
   RESTDWPoolerDB1.Active := ActivePooler;
 END;
+
+procedure TServerMethodDM.ServerMethodDataModuleGetToken(Welcomemsg,
+  AccessTag: string; Params: TDWParams; AuthOptions: TRDWAuthTokenParam;
+  var ErrorCode: Integer; var ErrorMessage, TokenID: string;
+  var Accept: Boolean);
+Var
+ vMyClient,
+ vMyPass    : String;
+ Function RejectURL : String;
+ Var
+  v404Error  : TStringList;
+ Begin
+  v404Error  := TStringList.Create;
+  Try
+   {$IFDEF APPWIN}
+   v404Error.LoadFromFile(RestDWForm.RESTServicePooler1.RootPath + Const404Page);
+   {$ELSE}
+   v404Error.LoadFromFile('.\www\' + Const404Page);
+   {$ENDIF}
+   Result := v404Error.Text;
+  Finally
+   v404Error.Free;
+  End;
+ End;
+begin
+ vMyClient  := '';
+ vMyPass    := vMyClient;
+ If (Params.ItemsString['username'] <> Nil) And
+    (Params.ItemsString['password'] <> Nil) Then
+  Begin
+   vMyClient  := Params.ItemsString['username'].AsString;
+   vMyPass    := Params.ItemsString['password'].AsString;
+  End
+ Else
+  Begin
+   vMyClient  := Copy(Welcomemsg, InitStrPos, Pos('|', Welcomemsg) -1);
+   Delete(Welcomemsg, InitStrPos, Pos('|', Welcomemsg));
+   vMyPass    := Trim(Welcomemsg);
+  End;
+ Accept     := Not ((vMyClient = '') Or
+                    (vMyPass   = ''));
+ If Accept Then
+  Begin
+   FDQLogin.Close;
+   FDQLogin.SQL.Clear;
+   FDQLogin.SQL.Add('select * from TB_USUARIO where Upper(NM_LOGIN) = Upper(:NM_LOGIN) and Upper(DS_SENHA) = Upper(:DS_SENHA)');
+   Try
+    FDQLogin.ParamByName('NM_LOGIN').AsString := vMyClient;
+    FDQLogin.ParamByName('DS_SENHA').AsString := vMyPass;
+    FDQLogin.Open;
+   Finally
+    Accept     := Not(FDQLogin.EOF);
+    If Not Accept Then
+     Begin
+      ErrorMessage := cInvalidAuth;
+      ErrorCode  := 404;
+     End
+    Else
+     TokenID := AuthOptions.GetToken(Format('{"id":"%s", "login":"%s"}', [FDQLogin.FindField('ID_PESSOA').AsString,
+                                                                          FDQLogin.FindField('NM_LOGIN').AsString]));
+    FDQLogin.Close;
+   End;
+  End
+ Else
+  Begin
+   ErrorMessage := cInvalidAuth;
+   ErrorCode  := 404;
+  End;
+end;
 
 Function TServerMethodDM.GetGenID(GenName  : String): Integer;
 Var
@@ -237,26 +478,17 @@ begin
   End;
 end;
 
-PROCEDURE TServerMethodDM.ServerMethodDataModuleReplyEvent(SendType: TSendEvent; Context: STRING; VAR Params: TDWParams; VAR Result: STRING);
-VAR
-  JSONObject: TJSONObject;
-BEGIN
-  JSONObject := TJSONObject.Create;
-  CASE SendType OF
-    SePOST:
-      BEGIN
-        IF UpperCase(Context) = UpperCase('EMPLOYEE') THEN
-          Result := ConsultaBanco(Params)
-        ELSE
-        BEGIN
-          JSONObject.AddPair(TJSONPair.Create('STATUS', 'NOK'));
-          JSONObject.AddPair(TJSONPair.Create('MENSAGEM', 'Método não encontrado'));
-          Result := JSONObject.ToJSON;
-        END;
-      END;
-  END;
-  JSONObject.Free;
-END;
+procedure TServerMethodDM.ServerMethodDataModuleUserTokenAuth(Welcomemsg,
+  AccessTag: string; Params: TDWParams; AuthOptions: TRDWAuthTokenParam;
+  var ErrorCode: Integer; var ErrorMessage, TokenID: string;
+  var Accept: Boolean);
+begin
+ //Novo código para validação
+ Accept := True;
+// AuthOptions.BeginTime
+// AuthOptions.EndTime
+// AuthOptions.Secrets
+end;
 
 PROCEDURE TServerMethodDM.Server_FDConnectionBeforeConnect(Sender: TObject);
 VAR

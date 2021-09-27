@@ -1,16 +1,16 @@
 [Stats]
-EditorSecs=20632
+EditorSecs=21975
 <<<<<<< .mine
-DesignerSecs=453
+DesignerSecs=488
 ||||||| .r1082
 DesignerSecs=374
 =======
 DesignerSecs=384
 >>>>>>> .r1101
-InspectorSecs=74
-CompileSecs=1344559
+InspectorSecs=89
+CompileSecs=1367485
 <<<<<<< .mine
-OtherSecs=3751
+OtherSecs=3824
 ||||||| .r1082
 OtherSecs=3384
 =======
@@ -19,4 +19,4 @@ OtherSecs=3387
 StartTime=16/10/2017 19:38:50
 RealKeys=0
 EffectiveKeys=0
-DebugSecs=21429
+DebugSecs=22216

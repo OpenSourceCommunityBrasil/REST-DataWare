@@ -1124,6 +1124,7 @@ object Form9: TForm9
     StrsEmpty2Null = False
     StrsTrim2Len = True
     ParamCreate = True
+    ClientConnectionDefs.Active = False
     Left = 163
     Top = 106
   end
@@ -1150,7 +1151,6 @@ object Form9: TForm9
     UpdateOptions.AutoCommitUpdates = True
     StoreDefs = True
     MasterCascadeDelete = True
-    Inactive = False
     Datapacks = -1
     DataCache = False
     Params = <>
@@ -1160,6 +1160,7 @@ object Form9: TForm9
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = False
+    ActionCursor = crSQLWait
     Left = 191
     Top = 106
     object dwSQLEmployeeEMP_NO: TSmallintField
@@ -1185,7 +1186,6 @@ object Form9: TForm9
     UpdateOptions.AutoCommitUpdates = True
     StoreDefs = True
     MasterCascadeDelete = True
-    Inactive = False
     Datapacks = -1
     DataCache = False
     Params = <>
@@ -1198,6 +1198,7 @@ object Form9: TForm9
     AutoCommitData = False
     AutoRefreshAfterCommit = False
     MassiveCache = DWMassiveCache1
+    ActionCursor = crSQLWait
     Left = 186
     Top = 148
     object dwSQLVendasID_VENDA: TIntegerField
@@ -1263,7 +1264,6 @@ object Form9: TForm9
     StoreDefs = True
     MasterDataSet = dwSQLVendas
     MasterCascadeDelete = True
-    Inactive = False
     Datapacks = -1
     DataCache = False
     Params = <
@@ -1282,6 +1282,7 @@ object Form9: TForm9
     AutoCommitData = False
     AutoRefreshAfterCommit = False
     MassiveCache = DWMassiveCache1
+    ActionCursor = crSQLWait
     Left = 186
     Top = 193
     object dwSQLItemsID_ITEMS: TSmallintField

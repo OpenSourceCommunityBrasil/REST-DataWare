@@ -15,10 +15,11 @@ Type
    { Public declarations }
    Constructor Create    (aOwner : TComponent); Override;
    Destructor  Destroy; Override;
-   Procedure   vReplyEvent(SendType   : TSendEvent;
-                           Context    : String;
-                           Var Params : TDWParams;
-                           Var Result : String);
+   Procedure   vReplyEvent(SendType           : TSendEvent;
+                           Context            : String;
+                           Var Params         : TDWParams;
+                           Var Result         : String;
+                           AccessTag          : String);
   End;
 {$METHODINFO OFF}
 
@@ -41,7 +42,8 @@ End;
 Procedure TServerMethodsComp.vReplyEvent(SendType   : TSendEvent;
                                          Context    : String;
                                          Var Params : TDWParams;
-                                         Var Result : String);
+                                         Var Result : String;
+                                         AccessTag  : String);
 Begin
  Case SendType Of
   sePOST   :

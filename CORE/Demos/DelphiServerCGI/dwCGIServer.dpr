@@ -15,6 +15,6 @@ begin
   Application.Initialize;
   Application.WebModuleClass := TdwCGIService;
 //  Application.WebModuleClass              := Nil;
-//  Application.CreateForm(TdwCGIService, dwCGIService);
+  Application.CreateForm(TdwCGIService, dwCGIService);
   Application.Run;
 end.

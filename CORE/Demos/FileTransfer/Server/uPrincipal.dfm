@@ -1057,6 +1057,7 @@ object fServer: TfServer
     ServerContext = 'restdataware'
     SSLVerifyMode = []
     SSLVerifyDepth = 0
+    ForceWelcomeAccess = False
     Left = 200
     Top = 160
   end

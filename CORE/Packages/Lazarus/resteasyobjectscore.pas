@@ -10,7 +10,12 @@ interface
 uses
   ServerUtils, SysTypes, uDWConsts, uDWJSONObject, uDWJSONTools, uRESTDWBase, 
   uRESTDWReg, uRESTDWMasterDetailData, uRESTDWPoolerDB, uZlibLaz, 
-  uDWPoolerMethod, uDWDatamodule, uDWJSON, uDWMassiveBuffer, LazarusPackageIntf;
+  uDWPoolerMethod, uDWDatamodule, uDWJSON, uDWMassiveBuffer, uDWDataset, 
+  uDWSqlEditor, uAboutForm, uDWAbout, uDWConstsData, uDWJSONViewer, 
+  DWDCPbase64, DWDCPblockciphers, DWDCPconst, DWDCPcrypt2, DWDCPtypes, 
+  DWDCPcast256, DWDCPrijndael, DWDCPsha256, uDWUpdSqlEditor, utemplateproglaz, 
+  uRESTDWFileBuffer, uDWResponseTranslator, uDWFieldSourceEditor, 
+  LazarusPackageIntf;
 
 implementation
 

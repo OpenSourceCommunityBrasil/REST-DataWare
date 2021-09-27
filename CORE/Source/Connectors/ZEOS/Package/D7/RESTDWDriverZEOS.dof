@@ -88,7 +88,7 @@ RemoteSymbols=0
 MinStackSize=16384
 MaxStackSize=1048576
 ImageBase=4194304
-ExeDescription=
+ExeDescription=REST Dataware CORE - Driver ZEOS
 [Directories]
 OutputDir=
 UnitOutputDir=

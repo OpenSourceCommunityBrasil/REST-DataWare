@@ -64,6 +64,7 @@ type
     procedure btnapllyClick(Sender: TObject);
     procedure TakePhotoFromLibraryAction1DidFinishTaking(Image: TBitmap);
     procedure btndelClick(Sender: TObject);
+    procedure btnpostClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -129,7 +130,6 @@ var
 begin
   if not RESTDWClientSQL1.ApplyUpdates(vError) then
     ShowMessageOKCancel(vError);
-
 end;
 
 procedure TForm1.btncancelarClick(Sender: TObject);
@@ -161,5 +161,10 @@ begin
   RESTDWClientSQL1.active := true;
 end;
 
+
+procedure TForm1.btnpostClick(Sender: TObject);
+begin
+ RESTDWClientSQL1.post;
+end;
 
 end.

@@ -4,18 +4,25 @@ object dwCGIService: TdwCGIService
   Actions = <>
   CreateSession = False
   Kind = wkOneShot
-  Height = 150
-  HorizontalOffset = 256
-  VerticalOffset = 127
-  Width = 150
-  PPI = 96
+  Height = 244
+  HorizontalOffset = 509
+  VerticalOffset = 130
+  Width = 243
   object RESTServiceCGI1: TRESTServiceCGI
-    ServerParams.HasAuthentication = True
-    ServerParams.UserName = 'testserver'
-    ServerParams.Password = 'testserver'
+    CORS = False
+    CORS_CustomHeaders.Strings = (
+      'Access-Control-Allow-Origin=*'
+      'Access-Control-Allow-Methods=GET, POST, PATCH, PUT, DELETE, OPTIONS'
+      'Access-Control-Allow-Headers=Content-Type, Origin, Accept, Authorization, X-CUSTOM-HEADER'
+    )
+    AuthenticationOptions.AuthorizationOption = rdwAONone
     Encoding = esUtf8
-    ServerContext = 'cgieflex/dwCGIServer.exe'
-    left = 88
-    top = 40
+    ForceWelcomeAccess = False
+    RootPath = '/'
+    CriptOptions.Use = False
+    CriptOptions.Key = 'RDWBASEKEY256'
+    DatabaseCharSet = csUndefined
+    Left = 96
+    Top = 80
   end
 end

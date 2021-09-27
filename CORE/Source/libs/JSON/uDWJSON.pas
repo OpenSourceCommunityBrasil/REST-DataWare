@@ -31,21 +31,29 @@
 
 unit uDWJSON;
 
+{$I uRESTDW.inc}
+
 Interface
 
 Uses
  {$IFDEF FPC}
-   Lcl,
+  {$IFNDEF LAMW}
+   LCL,
+  {$ENDIF}
  {$ELSE}
   {$IFDEF WINDOWS}
    Windows,
+  {$ENDIF}
  {$ENDIF}
- {$ENDIF}
-   SysUtils, Classes, TypInfo;
+  SysUtils, Classes, TypInfo;
 
 Type
+
+ { TStringListJSON }
+
  TStringListJSON = Class(TStringList)
  Public
+  Constructor Create;
   Destructor Destroy;Override;
 End;
 
@@ -188,6 +196,7 @@ Type
     function getBoolean   (key   : string)           : Boolean;
     function getDouble    (key   : string)           : Double;
     function getInt       (key   : string)           : Integer;
+    function getInt64     (key   : string)           : Int64;
     function getJSONArray (key   : string)           : TJSONArray;
     function getJSONObject(key   : string)           : TJSONObject;
     function getString    (key   : string)           : String;
@@ -254,6 +263,8 @@ Type
     function optDouble (key : string; defaultValue : double): double; overload;
     function optInt (key : string): integer; overload;
     function optInt (key : string; defaultValue : integer): integer; overload;
+    function optInt64 (key : string): Int64; overload;
+    function optInt64 (key : string; defaultValue : Int64): Int64; overload;
     function optString (key : string): string; overload;
     function optString (key : string; defaultValue : string): string; overload;
 
@@ -263,6 +274,7 @@ Type
     function put (key : string; value : boolean): TJSONObject; overload;
     function put (key : string; value : double): TJSONObject; overload;
     function put (key : string; value : integer): TJSONObject; overload;
+    function put (key : string; value : Int64): TJSONObject; overload;
     function put (key : string; value : string): TJSONObject; overload;
 
     (**
@@ -288,6 +300,7 @@ Type
     *)
     function putOpt (key : string; value : TZAbstractObject): TJSONObject;
     class function quote (s : string): string;
+    class function convertUTF8String(s: string): string;
     function remove (key : string): TZAbstractObject;
     procedure assignTo(json: TJSONObject);
 
@@ -312,6 +325,7 @@ Type
     function getBoolean (index : integer) : boolean;
     function getDouble (index : integer) : double;
     function getInt (index : integer): integer;
+    function getInt64 (index : integer): Int64;
     {
       Get the TJSONArray associated with an index.
       @param(index The index must be between 0 and length() - 1.)
@@ -331,6 +345,8 @@ Type
     function optDouble (index : integer; defaultValue :double ) : double ; overload;
     function optInt (index : integer) : integer; overload;
     function optInt (index : integer; defaultValue : integer) : integer; overload;
+    function optInt64 (index : integer) : int64; overload;
+    function optInt64 (index : integer; defaultValue : int64) : int64; overload;
     function optJSONArray (index : integer) : TJSONArray ; overload;
     function optJSONObject (index : integer) : TJSONObject ; overload;
     function optString (index : integer) : string; overload;
@@ -338,11 +354,13 @@ Type
     function put ( value : boolean) : TJSONArray; overload ;
     function put ( value : double ) : TJSONArray;   overload ;
     function put ( value : integer) : TJSONArray;   overload ;
+    function put ( value : int64) : TJSONArray;   overload ;
     function put ( value : TZAbstractObject) : TJSONArray;  overload ;
     function put ( value: string): TJSONArray; overload;
     function put ( index : integer ; value : boolean): TJSONArray;  overload ;
     function put ( index : integer ; value : double) : TJSONArray;  overload ;
     function put ( index : integer ; value : integer) : TJSONArray;  overload ;
+    function put ( index : integer ; value : int64) : TJSONArray;  overload ;
     function put ( index : integer ; value : TZAbstractObject) : TJSONArray;  overload ;
     function put ( index: integer; value: string): TJSONArray; overload;
     function toJSONObject (names  :TJSONArray ) : TJSONObject ;  overload ;
@@ -358,6 +376,7 @@ Type
   _Number =  class (TZAbstractObject)
      function doubleValue : double; virtual; abstract;
      function intValue : integer; virtual; abstract;
+     function int64Value : Int64; virtual; abstract;
   end;
 
   (** @abstract(wrapper da classe Boolean do java) *)
@@ -374,11 +393,13 @@ Type
 
   (** @abstract(wrapper da classe Double do java) *)
   _Double = class (_Number)
+   Public
      constructor create (s : string); overload;
      constructor create (s : _String); overload;
      constructor create (d : double); overload;
      function doubleValue : double; override;
      function intValue : integer;  override;
+     function int64Value : int64;  override;
      function toString () : string ; override;
      class function NaN : double;
      function clone :TZAbstractObject; override;
@@ -388,6 +409,7 @@ Type
 
   (** @abstract(wrapper da classe Integer do java) *)
   _Integer = class (_Number)
+  Public
     class function parseInt (s : string; i : integer): integer; overload;
     class function parseInt (s : _String): integer; overload;
     class function toHexString (c : char) : string;
@@ -401,11 +423,26 @@ Type
     fvalue : integer;
   end;
 
+  _Int64 = class (_Number)
+  Public
+    class function parseInt (s : string; i : Int64): Int64; overload;
+    class function parseInt (s : _String): Int64; overload;
+    class function toHexString (c : char) : string;
+    constructor create (i : Int64); overload;
+    constructor create (s : string); overload;
+    function doubleValue : double; override;
+    function intValue : Int64;  overload;
+    function toString () : string; override;
+     function clone :TZAbstractObject; override;
+  private
+    fvalue : Int64;
+  end;
+
   (** @abstract(wrapper da classe String do java) *)
   _String = class (TZAbstractObject)
    constructor create (s : string);
    function equalsIgnoreCase (s: string) : boolean;
-   function Equals(const Value: TZAbstractObject): Boolean; override; 
+   function Equals(const Value: TZAbstractObject): Boolean; override;
    function toString() : string; override;
    function clone :TZAbstractObject; override;
   private
@@ -426,8 +463,10 @@ var
 
 implementation
 
+uses uDWConsts;
+
 const
-  CROTINA_NAO_IMPLEMENTADA :string = 'Rotina Não Implementada';
+  CROTINA_NAO_IMPLEMENTADA : String = 'Command not implemented';
 
 procedure newNotImplmentedFeature () ;
 begin
@@ -452,7 +491,7 @@ begin
  result := f;
  result.DecimalSeparator := '.';
  result.ThousandSeparator := ',';
- result.CurrencyDecimals := 2;
+// result.CurrencyDecimals := 2;
 end;
 
 
@@ -486,6 +525,22 @@ begin
   end;
 end;
 
+function HexToInt64(Hex: string): int64;
+var
+  i: integer;
+  HexValues: String;
+begin
+  HexValues:= '0123456789ABCDEF';
+  Result := 0;
+  case Length(Hex) of
+    0: Result := 0;
+    1..16: for i:=1 to Length(Hex) do
+      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
+    else for i:=1 to 16 do
+      Result := 16*Result + Pos(Upcase(Hex[i]), HexValues)-1;
+  end;
+end;
+
 
 
 { JSONTokener }
@@ -493,13 +548,8 @@ end;
 
 constructor JSONTokener.create(s: string);
 begin
-{$IFDEF ANDROID} //Android}
-  self.myIndex := 0;
-  self.mySource := s;
-{$ELSE}
-self.myIndex := 1;
-self.mySource := s;
-{$ENDIF}
+ myIndex := 1;
+ mySource := s;
 end;
 
 
@@ -544,11 +594,7 @@ end;
 *)
 function JSONTokener.more: boolean;
 begin
-{$IFDEF ANDROID} //ANDROID}
- result := self.myIndex <= System.length(self.mySource);
-{$ELSE}
  result := self.myIndex <= System.length(self.mySource)+1;
-{$ENDIF}
 end;
 
 function JSONTokener.next: char;
@@ -722,8 +768,8 @@ var
   sb : string;
   c : char;
 begin
-  c := #0;
   sb := '';
+  c  := #0;
   while (true) do begin
             c := next();
             if ((c = d) or (c = #0) or (c = #10) or (c = #13)) then begin
@@ -858,26 +904,42 @@ begin
                       end;
                     end;
                 end else begin
-                    try
-                        result := _Integer.create(_Integer.parseInt(s,
+                          If Not((Pos(',', s) > 0) or (Pos('.', s) > 0)) Then
+                           Begin
+                            try
+                                result := _Integer.create(_Integer.parseInt(s,
                                                             8));
-                        exit;
-                    Except
+                                exit;
+                            Except
+                                    on e:Exception do begin
+                                      ///* Ignore the error */
+                                    end;
+                            end;
+                           End;
+                          try
+                              result := _Double.create(s);
+                              exit;
+                          Except
+                                  on e:Exception do begin
+                                    ///* Ignore the error */
+                                  end;
+                          end;
+                end;
+            end;
+            If Not((Pos(',', s) > 0) or (Pos('.', s) > 0)) Then
+             Begin
+              try
+                  if Length(s) < 10 then
+                   result := _Integer.create(s)
+                  else
+                   result := _Int64.create(s);
+                  exit;
+              Except
                       on e:Exception do begin
                         ///* Ignore the error */
                       end;
-                    end;
-                end;
-            end;
-            try
-                result := _Integer.create(s);
-                exit;
-            Except
-                    on e:Exception do begin
-                      ///* Ignore the error */
-                    end;
-            end;
-
+              end;
+             End;
             try
                 result := _Double.create(s);
                 exit;
@@ -942,7 +1004,7 @@ end;
      *)
 function JSONTokener.syntaxError(_message: string): ParseException;
 begin
- result := ParseException.create (_message + toString()+' próximo a : '
+ result := ParseException.create (_message + toString()+' next to : '
  + copy (toString(),self.myIndex,10), self.myIndex);
 end;
 
@@ -1224,9 +1286,21 @@ begin
         end else begin
            result :=  Round(getDouble(key));
         end;
-       
+
 end;
 
+
+function TJSONObject.getInt64(key: string): Int64;
+var
+  o : TZAbstractObject;
+begin
+        o := get(key);
+        if (o is _Number) then begin
+           result :=  _Number(o).int64Value();
+        end else begin
+           result :=  Round(getDouble(key));
+        end;
+end;
 
 (**
      * Get the TJSONArray value associated with a key.
@@ -1304,8 +1378,13 @@ end;
      *  the value is the TJSONObject.NULL object.
      *)
 function TJSONObject.isNull(key: string): boolean;
+var
+ o : TZAbstractObject;
 begin
-   result := NULL.equals(opt(key));
+ o := opt(key);
+ result := NULL.equals(o);
+ If Not result Then
+  result := o = cnull;
 end;
 
 function TJSONObject.keys: TStringList;
@@ -1521,6 +1600,33 @@ end;
 
 
 
+function TJSONObject.optInt64(key: string; defaultValue: Int64): Int64;
+var
+  o : TZAbstractObject;
+begin
+  o := opt(key);
+  if (o <> null) then begin
+      if (o is _Number) then begin
+          result :=  (_Number(o)).int64Value();
+          exit;
+      end;
+      try
+          result := _Int64.parseInt(_String(o));
+          exit;
+        except on e:Exception  do begin
+          result := defaultValue;
+          exit;
+        end;
+      end;
+  end;
+  result := defaultValue;
+end;
+
+function TJSONObject.optInt64(key: string): Int64;
+begin
+  result := optInt64 (key, 0);
+end;
+
 (**
      * Get an optional TJSONArray associated with a key.
      * It returns null if there is no such key, or if its value is not a
@@ -1635,6 +1741,11 @@ begin
    result := self;
 end;
 
+function TJSONObject.put(key: string; value: Int64): TJSONObject;
+begin
+   put(key, _Int64.create(value));
+   result := self;
+end;
 
 (**
      * Put a key/value pair in the TJSONObject. If the value is null,
@@ -1693,68 +1804,61 @@ end;
      * @return  A String correctly formatted for insertion in a JSON message.
      *)
 class function TJSONObject.quote(s: string): string;
+begin
+ Result := Format('"%s"', [TJSONObject.convertUTF8String(s)]);
+end;
+
+class function TJSONObject.convertUTF8String(s : string): string;
 var
    b,c : char;
    i, len : integer;
    sb, t : string;
-const
-  NoConversion = ['A'..'Z','a'..'z','*','@','.','_','-',
-                  '0'..'9','$','!','''','(',')'];
+Const
+ NoConversion = ['A'..'Z','a'..'z','*','@','.','_','-',
+                 '0'..'9','$','!','''','(',')'];
 begin
-        if ((s = '') or (System.Length(s) = 0)) then begin
-            result :=  '""';
-        end;
-
-        b := #0;
-        c := #0;
-        i := 0;
-        len := System.length(s);
-        //SetLength (s, len+4);
-        t := '';
-
-        sb := sb +'"';
-        for i := 1 to len do begin
-            b := c;
-            c := s[i];
-            case (c) of
-            '\', '"': begin
-                sb := sb + '\';
-                sb := sb + c;
-            end;
-            '/': begin
-                if (b = '<') then begin
-                    sb := sb + '\';
-                end;
-                sb := sb + c;
-            end;
-            #8:  begin
-                sb := sb + '\b';
-            end;
-            #9:  begin
-                sb := sb + '\t';
-            end;
-            #10:  begin
-                sb := sb + '\n';
-            end;
-            #12:  begin
-                sb := sb + '\f';
-            end;
-            #13:  begin
-                sb := sb + '\r';
-            end;
-            else begin
-                if (not (c in NoConversion)) then begin
-                    t := '000' + _Integer.toHexString(c);
-                    sb := sb + '\u' + copy (t,System.length(t)-3,4);
-                end else begin
-                    sb := sb + c;
-                end;
-            end;
-            end;
-        end;
-        sb := sb + '"';
-        result := sb;
-end;
+ Result :=  '';
+ If ((s = '') or (System.Length(s) = 0)) Then
+  Exit;
+ b := #0;
+ c := #0;
+ i := 0;
+ len := System.length(s);
+ t := '';
+ sb := '';
+ For i := 1 To len Do
+  Begin
+   b := c;
+   c := s[i];
+   Case (c) Of
+    '\',
+    '"' : Begin
+           sb := sb + '\';
+           sb := sb + c;
+          End;
+    '/' : Begin
+           If (b = '<') Then
+            sb := sb + '\';
+           sb := sb + c;
+          End;
+    #8  : sb := sb + '\b';
+    #9  : sb := sb + '\t';
+    #10 : sb := sb + '\n';
+    #12 : sb := sb + '\f';
+    #13 : sb := sb + '\r';
+    Else Begin
+          If (not (c in NoConversion)) Then
+           Begin
+            t := '000' + _Integer.toHexString(c);
+            sb := sb + '\u' + copy (t,System.length(t)-3,4);
+           End
+          Else
+           sb := sb + c;
+         End;
+   End;
+  End;
+ Result := sb;
+End;
 
 (**
      * Remove a name and its value, if present.
@@ -2076,10 +2180,7 @@ end;
 
 constructor _Integer.create(s: string);
 begin
- If Length(s) < 5 Then
-  fvalue := strToInt(s)
- Else
-  fvalue := strToInt64(s);
+  fvalue := strToInt(s);
 end;
 
 function _Integer.doubleValue: double;
@@ -2096,7 +2197,6 @@ end;
 
 class function _Integer.parseInt(s: string; i: integer): integer;
 begin
-
   case i of
   10: begin
     result := strToInt (s);
@@ -2109,7 +2209,7 @@ begin
          result := 0
        end else begin
         newNotImplmentedFeature () ;
-       end; 
+       end;
   end;
   end;
 end;
@@ -2160,6 +2260,11 @@ begin
   result := fvalue;
 end;
 
+function _Double.int64Value: int64;
+begin
+  result := trunc (fvalue);
+end;
+
 function _Double.intValue: integer;
 begin
   result := trunc (fvalue);
@@ -2170,10 +2275,11 @@ begin
   result := 3.6e-4951;
 end;
 
-
+// Alteração feito por Ico Menezes (realizar parse dos pontos flutuantes do openJson) 26/10/2019
 function _Double.toString: string;
 begin
-  result := '"'+StringReplace(formatFloat('######0.00',fvalue),',','.',[rfReplaceAll])+'"';
+//  result := '"' + StringReplace(FloatToStr(fvalue), ',', '.', [rfReplaceAll]) + '"';
+  result := StringReplace(FloatToStr(fvalue), ',', '.', [rfReplaceAll]);
 end;
 
 { TJSONArray }
@@ -2275,8 +2381,9 @@ var
 begin
   while myArrayList.Count > 0 do begin
     obj := TObject(myArrayList[0]);
-    if (obj <> CONST_FALSE)
+    if    (obj <> CONST_FALSE)
       and (obj <> CONST_TRUE)
+      and (obj <> CNULL)
       and (Assigned(obj)) then
      Begin
 //      {$IFNDEF FPC}
@@ -2396,6 +2503,18 @@ begin
 end;
 
 
+function TJSONArray.getInt64(index: integer): Int64;
+var
+  o : TZAbstractObject;
+begin
+  o := get(index);
+  if (o is _Number) then begin
+    result := _Number(o).int64Value();
+  end else begin
+    result := trunc (getDouble (index));
+  end;
+end;
+
 {
      * Get the TJSONArray associated with an index.
      * @param index The index must be between 0 and length() - 1.
@@ -2463,8 +2582,10 @@ function TJSONArray.isNull(index: integer): boolean;
 var
  o : TZAbstractObject;
 begin
-    o := opt(index);
-    result := (o = nil) or (o.equals(nil));
+ o := opt(index);
+ result := (o = nil) or (o.equals(nil));
+ If Not result Then
+  result := o = cnull;
 end;
 
 (**
@@ -2653,6 +2774,33 @@ begin
 end;
 
 
+function TJSONArray.optInt64(index: integer; defaultValue: int64): int64;
+var
+  o : TZAbstractObject;
+begin
+  o := opt(index);
+  if (o <> nil) then begin
+      if (o is _Number) then begin
+          result :=  (_Number(o)).int64Value();
+          exit;
+      end;
+      try
+        result := _Int64.parseInt(_String(o));
+        exit;
+      except on e: exception do begin
+        result := defaultValue;
+        exit;
+      end;
+      end;
+  end;
+  result := defaultValue;
+end;
+
+function TJSONArray.optInt64(index: integer): int64;
+begin
+  result := optInt64(index, 0);
+end;
+
 (**
  * Get the optional TJSONArray associated with an index.
  * @param index subscript
@@ -2817,6 +2965,18 @@ Begin
  put(index,_String.create (value));
  Result := self;
 End;
+
+function TJSONArray.put(index: integer; value: int64): TJSONArray;
+begin
+ put(index, _Int64.create(value));
+ Result := self;
+end;
+
+function TJSONArray.put(value: int64): TJSONArray;
+begin
+ put(_Int64.create(value));
+ Result := self;
+end;
 
 (**
      * Put or replace an object value in the TJSONArray.
@@ -3000,6 +3160,9 @@ Begin
 End;
 
 Procedure TJSONObject.clean;
+Var
+ vTempString : String;
+ vTempStringSize : Integer;
 begin
  If Assigned(myHashMap) Then
   Begin
@@ -3010,7 +3173,22 @@ begin
         (Assigned(myHashMap.Objects[0]))      Then
       Begin
        Try
-        myHashMap.Objects[0].Free;
+        If (UpperCase(myHashMap.Objects[0].classname) <> 'NULL') And
+           (myHashMap.Objects[0] <> CNULL) Then
+         Begin
+          If UpperCase(myHashMap.Objects[0].classname) = 'TJSONARRAY' Then
+           Begin
+            vTempString     := TJSONArray(myHashMap.Objects[0]).toString;
+            vTempStringSize := StrDWLength(vTempString);
+            If ((vTempString[InitStrPos] = '[') or
+                (vTempString[InitStrPos] = '{')) And
+               ((vTempString[vTempStringSize - FinalStrPos] = ']') or
+                (vTempString[vTempStringSize - FinalStrPos] = '}')) Then
+              myHashMap.Objects[0].Free;
+           End
+          Else
+           myHashMap.Objects[0].Free;
+         End;
        Except
 
        End;
@@ -3055,7 +3233,12 @@ End;
 
 { TStringListJSON }
 
-Destructor TStringListJSON.Destroy;
+Constructor TStringListJSON.Create;
+Begin
+  inherited Create;
+End;
+
+destructor TStringListJSON.Destroy;
 Var
  I : Integer;
 Begin
@@ -3071,6 +3254,67 @@ Begin
  Inherited;
 End;
 
+{ _Int64 }
+
+function _Int64.clone: TZAbstractObject;
+begin
+  result := _Int64.create (self.fvalue);
+end;
+
+constructor _Int64.create(i: Int64);
+begin
+  fvalue := i;
+end;
+
+constructor _Int64.create(s: string);
+begin
+  fvalue := StrToInt64(s);
+end;
+
+function _Int64.doubleValue: double;
+begin
+  result := fvalue;
+end;
+
+function _Int64.intValue: Int64;
+begin
+  result := fvalue;
+end;
+
+class function _Int64.parseInt(s: _String): Int64;
+begin
+  result := _Int64.parseInt (s.toString, 19);
+end;
+
+class function _Int64.parseInt(s: string; i: Int64): Int64;
+begin
+  case i of
+  10: begin
+    result := StrToInt64 (s);
+  end;
+  16: begin
+   result := HexToInt64 (s);
+  end;
+  8: begin
+       if (s = '0') then begin
+         result := 0
+       end else begin
+        newNotImplmentedFeature () ;
+       end;
+  end;
+  end;
+end;
+
+class function _Int64.toHexString(c: char): string;
+begin
+  result := IntToHex(ord(c),2);
+end;
+
+function _Int64.toString: string;
+begin
+  result := intToStr(fvalue);
+end;
+
 Initialization
   CONST_FALSE := _Boolean.Create(false);
   CONST_TRUE  := _Boolean.Create(true);
@@ -3082,3 +3326,4 @@ Finalization
   CNULL.free;
 
 End.
+

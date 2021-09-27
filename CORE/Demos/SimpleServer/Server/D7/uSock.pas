@@ -1,10 +1,82 @@
 Unit uSock;
+{$IFDEF FPC}
+{$IFDEF Linux}
+  {$mode objfpc}{$H+}
+{$ELSE}
+{$MODE Delphi}
+{$ENDIF}
+{$ENDIF}
 
 Interface
 
-Uses Windows, Winsock;
+{$IFDEF Linux}
 
+ uses sockets, baseunix, unix;
+const
+  IPPROTO_IP = 0;
+  IF_NAMESIZE = 16;
+  SIOCGIFCONF = $8912;
 
+type
+{$packrecords c}
+  tifr_ifrn = record
+    case integer of
+      0: (ifrn_name: array [0..IF_NAMESIZE - 1] of char);
+  end;
+
+  tifmap = record
+    mem_start: PtrUInt;
+    mem_end: PtrUInt;
+    base_addr: word;
+    irq: byte;
+    dma: byte;
+    port: byte;
+  end;
+
+  PIFrec = ^TIFrec;
+
+  TIFrec = record
+    ifr_ifrn: tifr_ifrn;
+    case integer of
+      0: (ifru_addr: TSockAddr);
+      1: (ifru_dstaddr: TSockAddr);
+      2: (ifru_broadaddr: TSockAddr);
+      3: (ifru_netmask: TSockAddr);
+      4: (ifru_hwaddr: TSockAddr);
+      5: (ifru_flags: word);
+      6: (ifru_ivalue: longint);
+      7: (ifru_mtu: longint);
+      8: (ifru_map: tifmap);
+      9: (ifru_slave: array[0..IF_NAMESIZE - 1] of char);
+      10: (ifru_newname: array[0..IF_NAMESIZE - 1] of char);
+      11: (ifru_data: pointer);
+  end;
+
+  TIFConf = record
+    ifc_len: longint;
+    case integer of
+      0: (ifcu_buf: pointer);
+      1: (ifcu_req: ^tifrec);
+  end;
+
+  
+     tNetworkInterface     = Record
+                               ComputerName          : String;
+                               AddrIP                : String;
+                               SubnetMask            : String;
+                               AddrNet               : String;
+                               AddrLimitedBroadcast  : String;
+                               AddrDirectedBroadcast : String;
+                               IsInterfaceUp         : Boolean;
+                               BroadcastSupport      : Boolean;
+                               IsLoopback            : Boolean;
+                             end;
+
+     tNetworkInterfaceList = Array of tNetworkInterface;
+
+  Function GetNetworkInterfaces (Var aNetworkInterfaceList : tNetworkInterfaceList): Boolean;
+{$ELSE}
+  Uses Windows, Winsock;
 { Unit to identify the network interfaces
   This code requires at least Win98/ME/2K, 95 OSR 2 or NT service pack #3
   as WinSock 2 is used (WS2_32.DLL) }
@@ -57,9 +129,59 @@ Function WSAIoctl (aSocket              : TSocket;
                    lpOverLappedRoutine  : Pointer) : Integer; stdcall; external 'WS2_32.DLL';
 
 Function GetNetworkInterfaces (Var aNetworkInterfaceList : tNetworkInterfaceList): Boolean;
+{$ENDIF}
 
 
 implementation
+
+
+{$IFDEF LINUX}
+
+function GetNetworkInterfaces(var aNetworkInterfaceList: tNetworkInterfaceList
+  ): Boolean;
+var
+  i, n, nr,Sd: integer;
+  buf: array[0..1023] of byte;
+  ifc: TIfConf;
+  ifp: PIFRec;
+  names: string;
+begin
+  sd := fpSocket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
+  //Result := '';
+  if (sd < 0) then
+    exit;
+  try
+    ifc.ifc_len := Sizeof(Buf);
+    ifc.ifcu_buf := @buf;
+    if fpioctl(sd, SIOCGIFCONF, @ifc) < 0 then
+      Exit;
+    n := ifc.ifc_len;
+    i := 0;
+    names := '';
+    nr:= trunc((n/sizeof(TIFrec)));
+    SetLength(aNetworkInterfaceList,nr);
+    nr:=0;
+    while (i < n) do
+    begin
+      ifp := PIFRec(PByte(ifc.ifcu_buf) + i);
+      names := names + ifp^.ifr_ifrn.ifrn_name + ' ';
+     // if i > 0 then
+        //Begin
+        aNetworkInterfaceList[nr].AddrIP:=NetAddrToStr(ifp^.ifru_addr.sin_addr);
+       // end;
+        //Result := Result + ',';
+      //Result := Result + ifp^.ifr_ifrn.ifrn_name +' : '+NetAddrToStr(ifp^.ifru_addr.sin_addr)+' aa: '+NetAddrToStr(ifp^.ifru_netmask.sin_addr);
+      i := i + sizeof(TIFrec);
+      inc(nr);
+    end;
+     result:=true;
+  finally
+    //fileClose(sd);
+  end;
+
+end;
+
+{$ELSE}
 
 
 Function GetNetworkInterfaces (Var aNetworkInterfaceList : tNetworkInterfaceList): Boolean;
@@ -162,5 +284,6 @@ Begin
   WSACleanUp;
   Result := True;
 end;
+{$ENDIF}
 
 end.

@@ -13,7 +13,7 @@ uses
   FireDAC.Stan.StorageJSON, FireDAC.Phys.IBBase, FireDAC.Comp.Client,
   FireDAC.Comp.UI, Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls, Vcl.Imaging.pngimage,
   FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt,
-  FireDAC.Comp.DataSet, IniFiles, uSock;
+  FireDAC.Comp.DataSet, IniFiles, uSock, uDWJSONInterface;
 
 type
   TForm1 = class(TForm)

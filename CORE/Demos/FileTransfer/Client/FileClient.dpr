@@ -1,6 +1,11 @@
 program FileClient;
 
 uses
+  madExcept,
+  madLinkDisAsm,
+  madListHardware,
+  madListProcesses,
+  madListModules,
   Vcl.Forms,
   uFileClient in 'uFileClient.pas' {Form4};
 

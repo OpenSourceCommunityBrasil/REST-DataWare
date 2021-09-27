@@ -2,22 +2,21 @@ program dwCGIServer;
 
 {$mode objfpc}{$H+}
 
-{.$DEFINE APACHE}
+{$DEFINE APACHE}
 
 
 uses
-  fpCGI, fpWeb, HTTPDefs, fpHTTP,
+  fpCGI,
   {$IFNDEF APACHE}
-  fpHTTPApp,
+  HTTPDefs, fpHTTP, fpWeb, fpHTTPApp,
   {$ENDIF}
-  dmdwcgiserver, uDmService, uConsts;
+  uConsts, dmdwcgiserver, uDmService;
 
 begin
   {$IFNDEF APACHE}
-   Application.Title:='dwCGIServer';
    Application.Port:= serverPort;
   {$ENDIF}
-  Application.Initialize;
+  Application.CreateForm(TdwCGIService, dwCGIService);
   Application.Run;
 end.
 

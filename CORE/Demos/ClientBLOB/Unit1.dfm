@@ -1147,18 +1147,15 @@ object Form5: TForm5
     FieldDefs = <
       item
         Name = 'ID_PESSOA'
-        Attributes = [faRequired]
         DataType = ftInteger
       end
       item
         Name = 'NM_LOGIN'
-        Attributes = [faRequired]
         DataType = ftString
         Size = 30
       end
       item
         Name = 'DS_SENHA'
-        Attributes = [faRequired]
         DataType = ftString
         Size = 30
       end
@@ -1183,18 +1180,7 @@ object Form5: TForm5
         Name = 'DT_ALTERACAO'
         DataType = ftTimeStamp
       end>
-    IndexDefs = <>
-    MasterFields = ''
-    FetchOptions.AssignedValues = [evMode]
-    FetchOptions.Mode = fmAll
-    ResourceOptions.AssignedValues = [rvSilentMode]
-    ResourceOptions.SilentMode = True
-    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
-    UpdateOptions.CheckRequired = False
-    UpdateOptions.AutoCommitUpdates = True
-    StoreDefs = True
     MasterCascadeDelete = True
-    Inactive = False
     Datapacks = -1
     DataCache = False
     Params = <>
@@ -1204,22 +1190,18 @@ object Form5: TForm5
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = False
-    InBlockEvents = False
     Left = 291
     Top = 23
     object RESTDWClientSQL1ID_PESSOA: TIntegerField
       FieldName = 'ID_PESSOA'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
-      Required = True
     end
     object RESTDWClientSQL1NM_LOGIN: TStringField
       FieldName = 'NM_LOGIN'
-      Required = True
       Size = 30
     end
     object RESTDWClientSQL1DS_SENHA: TStringField
       FieldName = 'DS_SENHA'
-      Required = True
       Size = 30
     end
     object RESTDWClientSQL1DS_FOTO: TBlobField
@@ -1241,12 +1223,14 @@ object Form5: TForm5
     object RESTDWClientSQL1CALCFIELD: TIntegerField
       FieldKind = fkCalculated
       FieldName = 'CALCFIELD'
+      ReadOnly = True
       Calculated = True
     end
   end
   object RESTDWDataBase1: TRESTDWDataBase
     Active = False
     Compression = True
+    MyIP = '0.0.0.0'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False

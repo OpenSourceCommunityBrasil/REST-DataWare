@@ -1897,12 +1897,18 @@ object fServer: TfServer
   end
   object rspServerFiles: TRESTServicePooler
     Active = False
-    DataCompression = False
     ServicePort = 0
     ProxyOptions.Port = 8888
-    SSLVersion = sslvSSLv2
+    ServerParams.HasAuthentication = True
+    ServerParams.UserName = 'testserver'
+    ServerParams.Password = 'testserver'
+    SSLMethod = sslvSSLv2
+    SSLVersions = []
     Encoding = esASCII
     ServerContext = 'restdataware'
+    SSLVerifyMode = []
+    SSLVerifyDepth = 0
+    ForceWelcomeAccess = False
     Left = 200
     Top = 160
   end

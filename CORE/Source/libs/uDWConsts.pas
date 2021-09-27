@@ -1,72 +1,226 @@
-unit uDWConsts;
+Unit uDWConsts;
+
 {$I uRESTDW.inc}
+
 Interface
 
 Uses
-    {$IFDEF FPC}
-     SysUtils, DB, Classes, IdGlobal, IdCoderMIME, uZlibLaz, base64, uDWConstsData;
-    {$ELSE}
-     {$if CompilerVersion > 21} // Delphi 2010 pra cima
-      System.SysUtils, IdGlobal, uZlibLaz, EncdDecd,
-      Data.DB, System.Classes, IdCoderMIME, uDWConstsData;
-     {$ELSE}
-      SysUtils, IdGlobal, uZlibLaz, EncdDecd,
-      DB, Classes, IdCoderMIME, uDWConstsData;
-     {$IFEND}
-    {$ENDIF}
+ uDWConstsCharset, DWDCPcrypt2, DWDCPrijndael, DWDCPsha256, ZLib, //DWDCPtypes,
+ {$IFDEF FPC}
+  zstream,
+  {$IFNDEF LAMW}
+   LCL,
+  {$ENDIF}
+  SysUtils,  DB, Classes, IdGlobal, IdCoderMIME, IdGlobalProtocols, IdMessageCoderMIME, uZlibLaz, base64;
+ {$ELSE}
+  IdGlobal,  IdCoderMIME, IdGlobalProtocols, IdMessageCoderMIME,
+  {$if CompilerVersion > 24} // Delphi 2010 pra cima
+   System.SysUtils, uZlibLaz, EncdDecd,
+   {$IFDEF POSIX}
+    Posix.Unistd,
+   {$ENDIF}
+   Data.DB,  System.Classes;
+  {$ELSE}
+   SysUtils, uZlibLaz, EncdDecd,
+   DB,       Classes;
+  {$IFEND}
+ {$ENDIF}
+
+Var
+ InitStrPos,
+ FinalStrPos               : Integer;
 
 Const
-{$IFDEF POSIX}
-  {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
-   InitStrPos            = 0;
-   FinalStrPos           = 1;
+ tScriptsDetected          : Array[0..1] of string = ('.map', '.webdwpc');
+ cCompressionLevel         = clFastest;
+ TDecimalChar              = 'D';
+ TNullString               = #0;
+ TTagParams                = '<#%s#>';
+ TSepParams                = '|xxx|xxx|%';
+ TFormdataParamName        = 'content-disposition: form-data; name';
+ TValueFormatJSON          = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":[%s]}';
+ TDatasetRequestJSON       = '{"SQL":"%s", "PARAMS":"%s", "BinaryRequest":%s, "Metadata":%s, "BinaryCompatibleMode":%s}';
+ TMassiveFormatJSON        = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":[%s], ' +
+                             '"reflectionchanges":"%s", "sequencename":"%s", "sequencefield":"%s", "mycomptag":"%s", ' +
+                             '"mastercomptag":"%s", "mastercompfields":"%s"}';
+ TValueDisp                = '{"PARAMS":[%s], "RESULT":[%s]}';
+ TValueArrayJSON           = '[%s]';
+ TValueFormatJSONValueS    = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s"}';
+ TValueFormatJSONValue     = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":%s}';
+ TJsonDatasetHeader        = '{"Field":"%s", "Type":"%s", "Primary":"%s", "Required":"%s", "Size":%d, "Precision":%d, "ReadOnly":"%s", "Autogeneration":"%s"}';
+ TJsonValueFormat          = '%s';
+ TJsonStringValue          = '"%s"';
+ cNullvalue                = 'null';
+ cTablenameTAG             = 'TABLENAME';
+ cUndefined                = 'undefined';
+ cRDWDetailField           = 'rdwdetailfield';
+ cNullvalueTag             = '"null"';
+ cBlanckStringJSON         = '""';
+ TSepValueMemString        = '\\';
+ TQuotedValueMemString     = '\"';
+ TReplyOK                  = '{"MESSAGE":"OK",  "RESULT":"OK"}';
+ TReplyNOK                 = '{"MESSAGE":"NOK", "RESULT":"NOK"}';
+ TReplyTagError            = '{"MESSAGE":"NOK", "RESULT":"Invalid Access tag..."}';
+ TReplyInvalidPooler       = '{"MESSAGE":"NOK", "RESULT":"Invalid Pooler Name..."}';
+ TReplyInvalidWelcome      = '{"MESSAGE":"NOK", "RESULT":"Invalid welcomemessage..."}';
+ TReplyError               = '{"MESSAGE":"NOK", "RESULT":"%s"}';
+ TServerStatusHTML         = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>' +
+                             '<title>REST Dataware - CORE</title></head><body>'   +
+                             '<h1>REST Dataware - CORE</h1>'                      +
+                             '<h2>Server Status - Online</h2></body></html>';
+ TServerStatusSynHTML      = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>' +
+                             '<title>REST Dataware - CORE - Synopse</title></head><body>'   +
+                             '<h1>REST Dataware - CORE</h1>'                      +
+                             '<h2>Server Status - Online</h2></body></html>';
+ TServerStatusHTMLQX       = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>' +
+                             '<title>REST Dataware - CORE - QuickX</title></head><body>'   +
+                             '<h1>REST Dataware - CORE</h1>'                      +
+                             '<h2>Server Status - Online</h2></body></html>';
+ AuthRealm                 = 'WWW-Authenticate: %s realm="%s", %s charset="UTF-8"';
+ UrlBase                   = '%s://%s:%d/%s';
+ UrlBaseA                  = '%s://%s:%d/%s%s';
+ UrlBaseB                  = '%s://%s:%d/%s%s%s';
+ ByteBuffer                = 1024 * 8; //8kb
+ CompressBuffer            = 1024 * 2;
+ UnixDate                  = 0;      {Date1900}
+ SecondsInDay              = 86400;  {Number of seconds in a day}
+ SecondsInHour             = 3600;   {Number of seconds in an hour}
+ SecondsInMinute           = 60;     {Number of seconds in a minute}
+ HoursInDay                = 24;     {Number of hours in a day}
+ MinutesInHour             = 60;     {Number of minutes in an hour}
+ MinutesInDay              = 1440;   {Number of minutes in a day}
+ AssyncCommandMSG          = '{"status":"OK", "assyncmsg":"AssyncCommand Executed"}';
+ DWDialogoTitulo           = 'DW REST DataWare Components';
+ DWSobreTitulo             = 'DW VCL';
+ DWSobreDescricao          = 'DW VCL http://www.restdw.com.br/' + sLineBreak +
+                             'Components REST DataWare Core' + sLineBreak +
+                             'CORE Version';
+ DWSobreLicencaStatus      = 'Open Source - Free Version';
+ DWVersionINFO             = '1.4.3.';
+ DWRelease                 = '2850';
+ DwParamsHeaderVersion     = 6;
+ DWCodeProject             = 'Cadillacs and Dinosaurs';
+ DWVersao                  = DWVersionINFO + DWRelease + '(' + DWCodeProject + ')';
+ DWFieldBookmark           = 'DWFIELDBOOKMARK';
+ rsLazarusDWPackage        = 'REST Dataware - Tools';
+ rsDwRequestDBGName        = 'REST Dataware - Request Debbuger';
+ cValueKey                 = '{"serverinforequest":"%s", "inforequest":"%s", "lifecycle":"%s"}';
+ cValueKeyToken            = '{"secrets":"%s", "md5":"%s"}';
+ cValueToken               = '{%s"exp":"%s", "iat":"%s", "secrets":"%s"}';
+ cValueTokenNoLife         = '{%s"iat":"%s", "secrets":"%s"}';
+ cTokenStringRDWTS         = '{"token":"%s"}';
+ cInvalidBinaryRequest     = 'Invalid Binary Request. Resource unsupported. %s';
+ cInvalidEvent             = 'Invalid Event Name';
+ cInvalidContextName       = 'Invalid Context Name';
+ cInvalidCustomFieldName   = 'Invalid Custom Field Name';
+ cInvalidFieldName         = 'Invalid Field Name';
+ cInvalidParamName         = 'Invalid Param Name';
+ cInvalidDWParam           = 'Invalid DWParam';
+ cInvalidDWParams          = 'Invalid DWParams';
+ cInvalidPoolerName        = 'Invalid Pooler Name...';
+ cInvalidContextRule       = 'Invalid ContextRule Name';
+ cServerEventNotFound      = 'ServerEvent not found...';
+ cInvalidServerEventName   = 'Invalid ServerEvent name';
+ cInvalidDriverConnection  = 'CustomConnection undefined on server driver selected';
+ cInvalidRDWServer         = 'Invalid REST Dataware Server...';
+ cInvalidConnectionName    = 'Invalid ConnectionName';
+ cPoolerNotFound           = 'Pooler not found';
+ cRequestRejectedMethods   = 'Request rejected. Acceptable HTTP methods: ';
+ cRequestAcceptableMethods = 'Acceptable HTTP methods not defined on server';
+ cRequestRejected          = 'The Requested URL was Rejected';
+ cInvalidRequest           = 'Invalid request url.';
+ cNotWorkYet               = 'It doesn''''t work yet';
+ cAuthenticationError      = 'Error : ' + #13 + 'Authentication Error...';
+ cInvalidConnection        = 'Invalid connection. The server maybe offline...';
+ cInvalidDataToApply       = 'No data to "Applyupdates"...';
+ cEmptyDBName              = 'Empty Database Property';
+ cErrorDatabaseNotFound    = 'Database not found...';
+ cErrorOpenDataset         = 'Error when try open Dataset...';
+ cErrorNoFieldsDataset     = 'No Fields to add on Dataset...';
+ cExprIncorrect            = 'Incorrectly formed filter expression';
+ cExprExpected             = 'Expression expected but %s found';
+ cInvalidBufferPosition    = 'Invalid Buffer Position';
+ cFieldNotFound            = 'Field ''%s'' not found';
+ cInvalidStream            = 'Invalid Stream...';
+ cCannotWriteBuffer        = 'Cannot Write Buffer';
+ cCannotReadBuffer         = 'Cannot Read Buffer';
+ cCreatedToken             = '201 Created';
+ cEventNotFound            = 'HTTP/1.1 404 Url Not Found';
+ cInvalidAuth              = 'HTTP/1.1 401 Unauthorized';
+ cInvalidInternalError     = 'Internal Server Error';
+ cInvalidMessageTo         = 'Invalid Sendmessage %s to user %s, error %s';
+ cWelcomeUser              = 'Welcome user %s';
+ cUserAgent                = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36';
+ cParamDetails             = '%s|%s|%d|%d';
+ cParamsCount              = 1;
+ cServerStream             = 'SERVERSTREAM';
+ cUserStream               = 'USERSTREAM';
+ cConnectionRename         = 'CONNECTIONRENAME';
+ cServerMessage            = 'SERVERMESSAGE';
+ cUserMessage              = 'USERMESSAGE';
+ cPing                     = 'PING';
+ cPong                     = 'PONG';
+ cQuit                     = 'QUIT';
+ cApplicationJSON          = 'application/json';
+
+ Type
+ {$IFNDEF FPC}
+  {$IF Defined(HAS_FMX)}
+   {$IF Defined(HAS_UTF8)}
+    TDWString = String;
    {$ELSE}
-   InitStrPos            = 1;
-   FinalStrPos           = 0;
+    TDWString = AnsiString;
    {$IFEND}
+  {$ELSE}
+   TDWString = AnsiString;
+  {$IFEND}
  {$ELSE}
- InitStrPos            = 1;
- FinalStrPos           = 0;
+  TDWString = AnsiString;
  {$ENDIF}
- TDecimalChar          = 'D';
- TSepParams            = '|xxx|xxx|%';
- TValueFormatJSON      = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":[%s]}';
- TDatasetRequestJSON   = '{"SQL":"%s", "PARAMS":"%s"}';
- TMassiveFormatJSON    = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":[%s]}';
- TValueDisp            = '{"PARAMS":[%s], "RESULT":[%s]}';
- TValueArrayJSON       = '[%s]';
- TValueFormatJSONValueS = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s"}';
- TValueFormatJSONValue  = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":%s}';
- TJsonDatasetHeader    = '{"Field":"%s", "Type":"%s", "Primary":"%s", "Required":"%s", "Size":%d, "Precision":%d, "ReadOnly":"%s", "Autogeneration":"%s"}';
- TJsonValueFormat      = '%s';
- TJsonStringValue      = '"%s"';
- TSepValueMemString    = '\\';
- TQuotedValueMemString = '\"';
- TReplyOK              = '{"MESSAGE":"OK",  "RESULT":"OK"}';
- TReplyNOK             = '{"MESSAGE":"NOK", "RESULT":"NOK"}';
- TReplyTagError        = '{"MESSAGE":"NOK", "RESULT":"Invalid Access tag..."}';
- TReplyInvalidPooler   = '{"MESSAGE":"NOK", "RESULT":"Invalid Pooler Name..."}';
- TReplyInvalidWelcome  = '{"MESSAGE":"NOK", "RESULT":"Invalid welcomemessage..."}';
- AuthRealm             = 'Provide Authentication';
- UrlBase               = '%s://%s:%d/%s';
- ByteBuffer            = 1024 * 8; //8kb
- CompressBuffer        = 1024 * 2;
-
- Date1900 {: LongInt} = $0001AC05;  {Julian day count for 01/01/1900 -- TDateTime Start Date}
- Date1970 {: LongInt} = $00020FE4;  {Julian day count for 01/01/1970 -- Unix Start Date}
- Unix0Date: TDateTime = 25568;      {Date1970 - Date1900}
-
- SecondsInDay    = 86400;  {Number of seconds in a day}
- SecondsInHour   =  3600;  {Number of seconds in an hour}
- SecondsInMinute =    60;  {Number of seconds in a minute}
- HoursInDay      =    24;  {Number of hours in a day}
- MinutesInHour   =    60;  {Number of minutes in an hour}
- MinutesInDay    =  1440;  {Number of minutes in a day}
 
 Type
- TJsonMode        = (jmDataware, jmPureJSON, jmMongoDB);
- TMassiveMode     = (mmInactive, mmBrowse, mmInsert, mmUpdate, mmDelete);
- TMassiveSQLMode  = (msqlQuery, msqlExecute);
+ TRESTDWUriOptions     = Class
+ Private
+  vBaseServer,
+  vDataUrl,
+  vServerEvent,
+  vEventName           : String;
+  Procedure SetEventName  (Value : String);
+  Procedure SetServerEvent(Value : String);
+  Procedure SetBaseServer (Value : String);
+  Procedure SetDataUrl    (Value : String);
+ Public
+  Constructor Create;
+  Property BaseServer  : String Read vBaseServer  Write SetBaseServer;
+  Property DataUrl     : String Read vDataUrl     Write SetDataUrl;
+  Property ServerEvent : String Read vServerEvent Write SetServerEvent;
+  Property EventName   : String Read vEventName   Write SetEventName;
+End;
+
+Type
+ TCripto = Class(TPersistent)
+ Private
+  vKeyString : String;
+  vUseCripto : Boolean;
+ Public
+  Constructor Create; //Cria o Componente
+  Destructor  Destroy; Override;//Destroy a Classe
+  Procedure   Assign(Source : TPersistent); Override;
+  Function    Encrypt(Value : String) : String;
+  Function    Decrypt(Value : String) : String;
+ Published
+  Property Use : Boolean Read vUseCripto Write vUseCripto;
+  Property Key : String  Read vKeyString Write vKeyString;
+End;
+
+Type
+ TDWRoute         = (crAll, crGet, crPost, crPut, crPatch, crDelete);
+ TDWRoutes        = Set of TDWRoute;
+ TRequestType     = (rtGet, rtPost, rtPut, rtPatch, rtDelete);
+ TResquestMode    = (rtOnlyFields, rtOnlyData, rtJSONAll);
+ TJsonMode        = (jmDataware,  jmPureJSON, jmUndefined);
+ TMassiveMode     = (mmInactive,  mmBrowse, mmInsert, mmUpdate, mmDelete, mmExec);
+ TMassiveSQLMode  = (msqlQuery,   msqlExecute);
  TTypeObject      = (toDataset,   toParam, toMassive,
                      toVariable,  toObject);
  TObjectValue     = (ovUnknown,         ovString,       ovSmallint,         ovInteger,    ovWord,                            // 0..4
@@ -80,125 +234,413 @@ Type
                      ovTimeStampOffset, ovObject,       ovSingle);                                                           //49..51
  TDatasetType     = (dtReflection,      dtFull,         dtDiff);
  {$IFNDEF FPC}
- {$if CompilerVersion > 21}
- Function  GetEncoding              (Avalue          : TEncodeSelect)             : TEncoding;       Overload;
+ {$if CompilerVersion > 24}
+ Function  GetEncoding              (Avalue             : TEncodeSelect)             : TEncoding;    Overload;
  {$IFEND}
  {$ENDIF}
- Function  GetEncodingID            (Avalue          : TEncodeSelect)             : IIdTextEncoding; Overload;
- Function  GetObjectName            (TypeObject      : TTypeObject)               : String;          Overload;
- Function  GetJSONModeName          (TypeObject      : TJsonMode)                 : String;          Overload;
- Function  GetJSONModeName          (TypeObject      : String)                    : TJsonMode;       Overload;
- Function  GetObjectName            (TypeObject      : String)                    : TTypeObject;     Overload;
- Function  GetDirectionName         (ObjectDirection : TObjectDirection)          : String;          Overload;
- Function  GetDirectionName         (ObjectDirection : String)                    : TObjectDirection;Overload;
- Function  GetBooleanFromString     (Value           : String)                    : Boolean;
- Function  GetStringFromBoolean     (Value           : Boolean)                   : String;
- Function  GetValueType             (ObjectValue     : TObjectValue)              : String;          Overload;
- Function  GetValueType             (ObjectValue     : String)                    : TObjectValue;    Overload;
- Function  GetFieldType             (FieldType       : TFieldType)                : String;          Overload;
- Function  GetFieldType             (FieldType       : String)                    : TFieldType;      Overload;
- Function  StringToBoolean          (aValue          : String)                    : Boolean;
- Function  BooleanToString          (aValue          : Boolean)                   : String;
- Function  StringFloat              (aValue          : String)                    : String;
- Function  GenerateStringFromStream (Stream          : TStream
+ Function  GetEncodingID            (Avalue             : TEncodeSelect)             : {$IFNDEF FPC}
+                                                                                        {$IF (DEFINED(OLDINDY))}
+                                                                                         TIdTextEncoding
+                                                                                        {$ELSE}
+                                                                                         IIdTextEncoding
+                                                                                        {$IFEND}
+                                                                                       {$ELSE}
+                                                                                        IIdTextEncoding
+                                                                                       {$ENDIF};     Overload;
+ Function  GetObjectName            (TypeObject         : TTypeObject)            : String;          Overload;
+ Function  GetJSONModeName          (TypeObject         : TJsonMode)              : String;          Overload;
+ Function  GetJSONModeName          (TypeObject         : String)                 : TJsonMode;       Overload;
+ Function  GetObjectName            (TypeObject         : String)                 : TTypeObject;     Overload;
+ Function  GetDirectionName         (ObjectDirection    : TObjectDirection)       : String;          Overload;
+ Function  GetDirectionName         (ObjectDirection    : String)                 : TObjectDirection;Overload;
+ Function  GetBooleanFromString     (Value              : String)                 : Boolean;
+ Function  GetStringFromBoolean     (Value              : Boolean)                : String;
+ Function  GetValueType             (ObjectValue        : TObjectValue)           : String;          Overload;
+ Function  GetValueType             (ObjectValue        : String)                 : TObjectValue;    Overload;
+ // criando em 18/02/2020 - Ico Menezes
+ Function  GetValueTypeTranslator   (ObjectValue        : String)                 : TObjectValue;
+ Function  GetFieldType             (FieldType          : TFieldType)             : String;          Overload;
+ Function  GetFieldType             (FieldType          : String)                 : TFieldType;      Overload;
+ Function  GetFieldTypeB            (FieldType          : TFieldType)             : String;
+ Function  StringToBoolean          (aValue             : String)                 : Boolean;
+ Function  BooleanToString          (aValue             : Boolean)                : String;
+ Function  StringFloat              (aValue             : String)                 : String;
+ Function  MassiveSQLMode           (aValue             : TMassiveSQLMode)        : String;          Overload;
+ Function  MassiveSQLMode           (aValue             : String)                 : TMassiveSQLMode; Overload;
+ Function  GenerateStringFromStream (Stream             : TStream
                                     {$IFNDEF FPC}{$if CompilerVersion > 21};
-                                     AEncoding       : TEncoding{$IFEND}{$ENDIF}) : String;Overload;
- Function  FileToStr                (Const FileName  : String) : String;
+                                     AEncoding          : TEncoding{$IFEND}{$ENDIF}) : String;Overload;
+ Function  FileToStr                (Const FileName     : String) : String;
  Procedure StrToFile                (Const FileName,
-                                     SourceString    : String);
- Function  StreamToHex              (Stream          : TStream;
-                                     QQuoted         : Boolean = True)            : String;
- Procedure HexToStream              (Str             : String;
-                                     Stream          : TStream);
- Function  StreamToBytes            (Stream          : TMemoryStream)             : tidBytes;
- Procedure CopyStream               (Const Source    : TStream;
-                                     Dest            : TStream);
- Function  ZDecompressStr           (Const S         : String;
-                                     Var Value       : String)                    : Boolean;
- Function  ZDecompressStreamD       (Const S         : TStringStream;
-                                     Var Value       : TStringStream)             : Boolean;
- Function  ZCompressStr             (Const s         : String;
-                                     Var Value       : String)                    : Boolean;
- Function  BytesArrToString         (aValue          : tIdBytes;         IdEncode : IIdTextEncoding = Nil) : String;
- Function  ObjectValueToFieldType   (TypeObject      : TObjectValue)              : TFieldType;
- Function  FieldTypeToObjectValue   (FieldType       : TFieldType)                : TObjectValue;
- Function  DatasetStateToMassiveType(DatasetState    : TDatasetState)             : TMassiveMode;
- Function  MassiveModeToString      (MassiveMode     : TMassiveMode)              : String;
- Function  StringToMassiveMode      (Value           : String)                    : TMassiveMode;
- Function  DatasetRequestToJSON     (Value           : TRESTDWClientSQLBase)      : String;
- Function  DateTimeToUnix           (ConvDate        : TDateTime)                 : Int64;
- Function  UnixToDateTime           (USec            : Int64)                     : TDateTime;
- Function  BuildFloatString         (Value           : String)                    : String;
- Function  BuildStringFloat         (Value           : String)                    : String;
+                                     SourceString       : String);
+ Function  StreamToHex              (Stream             : TStream;
+                                     QQuoted            : Boolean = True)         : String;
+ Function  PCharToHex               (Data               : PChar;
+                                     Size               : Integer;
+                                     QQuoted            : Boolean = True)         : String;
+ Procedure HexToPChar               (HexString          : String;
+                                     Var Data           : PChar);
+ Procedure HexToStream              (Str                : String;
+                                     Stream             : TStream);
+ Function  StreamToBytes            (Stream             : TMemoryStream)          : tidBytes;
+ Procedure CopyStream               (Const Source       : TStream;
+                                     Dest               : TStream);
+ Function  ZDecompressStreamNew     (Const S            : TStream)                : TStringStream;
+ Function  ZDecompressStr           (Const S            : String;
+                                     Var Value          : String)                 : Boolean;
+ Function  ZDecompressStreamD       (Const S            : TStringStream;
+                                     Var Value          : TStringStream)          : Boolean;
+ Function  ZCompressStreamNew       (Const s            : String)                 : TStream;
+ Function  ZCompressStreamSS        (Const s            : String)                 : TStringStream;
+ Function  ZCompressStr             (Const s            : String;
+                                     Var Value          : String)                 : Boolean;
+ Function  ZCompressStreamD         (S                  : TStringStream;
+                                     Var Value          : TStringStream)          : Boolean;
+ Function  BytesArrToString         (aValue             : tIdBytes;
+                                     IdEncode           : {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}
+                                                         TIdTextEncoding
+                                                        {$ELSE}
+                                                         IIdTextEncoding
+                                                        {$IFEND}
+                                                        {$ELSE}
+                                                         IIdTextEncoding
+                                                        {$ENDIF} = Nil)           : String;
+ Function  ObjectValueToFieldType   (TypeObject         : TObjectValue)           : TFieldType;
+ Function  FieldTypeToObjectValue   (FieldType          : TFieldType)             : TObjectValue;
+ Function  DatasetStateToMassiveType(DatasetState       : TDatasetState)          : TMassiveMode;
+ Function  MassiveModeToString      (MassiveMode        : TMassiveMode)           : String;
+ Function  StringToMassiveMode      (Value              : String)                 : TMassiveMode;
+ Function  DateTimeToUnix           (ConvDate           : TDateTime)              : Int64;
+ Function  UnixToDateTime           (USec               : Int64)                  : TDateTime;
+ Function  BuildFloatString         (Value              : String)                 : String;
+ Function  BuildStringFloat         (Value              : String;
+                                     JsonModeD          : TJsonMode = jmDataware;
+                                     FloatDecimalFormat : String = '')            : String;
+ Function  GetMIMEType              (sFile              : TFileName)              : string;
+ Function  Scripttags               (Value              : String)                 : Boolean;
+ Function  DWFileExists             (sFile,
+                                     BaseFilePath       : String)                 : Boolean;
+ Function  SystemProtectFiles       (sFile              : String) : Boolean;
+ Function  RequestTypeToRoute       (RequestType        : TRequestType)           : TDWRoute;
+ Procedure DeleteStr                (Var Value          : String;
+                                     InitPos,
+                                     FinalPos           : Integer);
+ Function  RandomString             (strLen             : Integer)                : String;
+ Function  StrDWLength              (Value              : String)                 : Integer;
+ Function  RequestTypeToString      (RequestType        : TRequestType)           : String;
+ Function  EncryptSHA256            (Key, Text          : TDWString;
+                                     Encrypt            : Boolean)                : String;
+ Function  EncodeURIComponent       (Const ASrc         : String)                 : String;
+ Function  iif                      (ATest              : Boolean;
+                                     Const ATrue        : Integer;
+                                     Const AFalse       : Integer)                : Integer;{$IFDEF USE_INLINE}Inline;{$ENDIF}Overload;
+ Function  iif                      (ATest              : Boolean;
+                                     Const ATrue        : String;
+                                     Const AFalse       : String)                 : String; {$IFDEF USE_INLINE}Inline;{$ENDIF}Overload;
+ Function  iif                      (ATest              : Boolean;
+                                     Const ATrue        : Boolean;
+                                     Const AFalse       : Boolean)                : Boolean;{$IFDEF USE_INLINE}Inline;{$ENDIF}Overload;
 
 Var
  DecimalLocal : Char;
 
 implementation
 
-Uses uRESTDWPoolerDB, uDWJSONObject, uDWJSONTools;
+Uses uDWJSONObject, uDWJSONTools;
 
-
-Function DateTimeToUnix(ConvDate: TDateTime): int64;
-{ convert Delphi TDateTime to unix date }
-var
-  Hrs, Mins, Secs, MSecs : Word;
-  Dt, Tm : TDateTime;
-begin
-  Dt := Trunc(ConvDate);
-  Tm := ConvDate - Dt;
-  if Dt < Unix0Date then
-    Result := 0
-  else
-    Result := Trunc(Dt - Unix0Date) * SecondsInDay;
-  DecodeTime(Tm, Hrs, Mins, Secs, MSecs);
-  Result := Result + (Hrs * SecondsInHour) + (Mins * SecondsInMinute) + Secs;
-end;
-
-Function UnixToDateTime(USec: int64): TDateTime;
-var
-  Hrs, Mins, Secs : Word;
-  TodaysSecs : int64;
-begin
-  TodaysSecs := USec mod SecondsInDay;
-  Hrs := TodaysSecs div SecondsInHour;
-  TodaysSecs := TodaysSecs - (Hrs * SecondsInHour);
-  Mins := TodaysSecs div SecondsInMinute;
-  Secs := TodaysSecs - (Mins * SecondsInMinute);
-  If (SecondsInDay > 0) Then
-   Result := Unix0Date + (USec div SecondsInDay) +
-             EncodeTime(Hrs, Mins, Secs, 0);
-end;
-
-Function DatasetRequestToJSON(Value : TRESTDWClientSQLBase) : String;
-Var
- vDWParams    : TDWParams;
- vTempLineParams,
- vTempLineSQL : String;
+Function iif(ATest       : Boolean;
+             Const ATrue  : Integer;
+             Const AFalse : Integer) : Integer;{$IFDEF USE_INLINE}Inline;{$ENDIF}
 Begin
- vTempLineParams := '';
- vTempLineSQL    := vTempLineParams;
- Result          := vTempLineSQL;
- If Value <> Nil Then
+ If ATest Then
+  Result := ATrue
+ Else
+  Result := AFalse;
+End;
+
+Function iif(ATest        : Boolean;
+             Const ATrue  : String;
+             Const AFalse : String)  : String;{$IFDEF USE_INLINE}Inline;{$ENDIF}
+Begin
+ If ATest Then
+  Result := ATrue
+ Else
+  Result := AFalse;
+End;
+
+Function iif(ATest        : Boolean;
+             Const ATrue  : Boolean;
+             Const AFalse : Boolean) : Boolean;{$IFDEF USE_INLINE}Inline;{$ENDIF}
+Begin
+ If ATest Then
+  Result := ATrue
+ Else
+  Result := AFalse;
+End;
+
+Function EncodeURIComponent(Const ASrc: String) : String;
+Const
+ HexMap : String = '0123456789ABCDEF';
+ Function IsSafeChar(ch: Integer): Boolean;
+ Begin
+  If      (ch >= 48) And (ch <= 57)  Then Result := True // 0-9
+  Else If (ch >= 65) And (ch <= 90)  Then Result := True // A-Z
+  Else If (ch >= 97) And (ch <= 122) Then Result := True // a-z
+  Else If (ch = 33)  Then Result := True // !
+  Else If (ch >= 39) And (ch <= 42)  Then Result := True // '()*
+  Else If (ch >= 45) And (ch <= 46)  Then Result := True // -.
+  Else If (ch = 95)  Then Result := True // _
+  Else If (ch = 126) Then Result := True // ~
+  Else Result := False;
+ End;
+Var
+ I, J     : Integer;
+ ASrcUTF8 : String;
+Begin
+ Result := '';    {Do not Localize}
+ ASrcUTF8 := ASrc;
+ // UTF8Encode call not strictly necessary but
+ // prevents implicit conversion warning
+ I := 1; J := 1;
+ SetLength(Result, Length(ASrcUTF8) * 3); // space to %xx encode every byte
+ While I <= Length(ASrcUTF8) Do
   Begin
-   TRESTDWClientSQL(Value).DWParams(vDWParams);
-   If vDWParams <> Nil Then
+   If IsSafeChar(Ord(ASrcUTF8[I])) then
     Begin
-     {$IFDEF FPC}
-     vTempLineParams := EncodeStrings(vDWParams.ToJSON, TRESTDWClientSQL(Value).DataBase.DatabaseCharSet);
-     {$ELSE}
-     vTempLineParams := EncodeStrings(vDWParams.ToJSON);
-     {$ENDIF}
-     FreeAndNil(vDWParams);
+     Result[J] := ASrcUTF8[I];
+     Inc(J);
+    End
+   Else
+    Begin
+     Result[J] := '%';
+     Result[J+1] := HexMap[(Ord(ASrcUTF8[I]) shr 4) + 1];
+     Result[J+2] := HexMap[(Ord(ASrcUTF8[I]) and 15) + 1];
+     Inc(J,3);
     End;
-   {$IFDEF FPC}
-   vTempLineSQL      := EncodeStrings(TRESTDWClientSQL(Value).SQL.Text, TRESTDWClientSQL(Value).DataBase.DatabaseCharSet);
-   {$ELSE}
-   vTempLineSQL      := EncodeStrings(TRESTDWClientSQL(Value).SQL.Text);
-   {$ENDIF}
-   Result            := Format(TDatasetRequestJSON, [vTempLineSQL, vTempLineParams]);
+   Inc(I);
+  End;
+ SetLength(Result, J-1);
+End;
+
+Function EncryptSHA256(Key, Text : TDWString;
+                       Encrypt   : Boolean) : String;
+Var
+ Cipher : TDWDCP_rijndael;
+Begin
+ Result := '';
+ Cipher := TDWDCP_rijndael.Create(Nil);
+ Try
+  Cipher.InitStr(Key, TDWDCP_sha256);
+  If Encrypt Then
+   Result := Cipher.EncryptString(Text)
+  Else
+   Result := Cipher.DecryptString(Text);
+ Finally
+  Cipher.Burn;
+  Cipher.Free;
+ End;
+End;
+
+Procedure TRESTDWUriOptions.SetBaseServer (Value : String);
+Begin
+ vBaseServer := Lowercase(Value);
+End;
+
+Procedure TRESTDWUriOptions.SetDataUrl    (Value : String);
+Begin
+ vDataUrl := Lowercase(Value);
+End;
+
+Procedure TRESTDWUriOptions.SetServerEvent(Value : String);
+Begin
+ vServerEvent := Lowercase(Value);
+ If vServerEvent <> '' Then
+  If vServerEvent[InitStrPos] = '/' then
+   Delete(vServerEvent, InitStrPos, 1);
+End;
+
+Procedure TRESTDWUriOptions.SetEventName(Value : String);
+Begin
+ vEventName := Lowercase(Value);
+ If vEventName <> '' Then
+  If vEventName[InitStrPos] = '/' then
+   Delete(vEventName, InitStrPos, 1);
+End;
+
+Constructor TRESTDWUriOptions.Create;
+Begin
+ vBaseServer  := '';
+ vDataUrl     := '';
+ vServerEvent := '';
+ vEventName   := '';
+End;
+
+Constructor TCripto.Create;
+Begin
+ Inherited;
+ vKeyString := 'RDWBASEKEY256';
+ vUseCripto := False;
+End;
+
+Destructor  TCripto.Destroy;
+Begin
+ Inherited;
+End;
+
+Function  TCripto.Encrypt(Value : String) : String;
+Var
+ vDWString : TDWString;
+Begin
+ vDWString := Value;
+ Result := EncryptSHA256(vKeyString, vDWString, True);
+End;
+
+Function  TCripto.Decrypt(Value : String) : String;
+Var
+ vDWString : TDWString;
+Begin
+ vDWString := Value;
+ Result := EncryptSHA256(vKeyString, vDWString, False);
+End;
+
+Procedure TCripto.Assign(Source: TPersistent);
+Var
+ Src : TCripto;
+Begin
+ If Source is TCripto Then
+  Begin
+   Src        := TCripto(Source);
+   vKeyString := Src.vKeyString;
+   vUseCripto := Src.vUseCripto;
+  End
+ Else
+  Inherited;
+End;
+
+Function  RequestTypeToString(RequestType : TRequestType) : String;
+Begin
+ Result := '';
+ case RequestType Of
+  rtGet  : Result := 'GET';
+  rtPost : Result := 'POST';
+  rtPut  : Result := 'PUT';
+  rtPatch : Result := 'PATCH';
+  rtDelete : Result := 'DELETE';
+ End;
+End;
+
+Function StrDWLength(Value : String) : Integer;
+Begin
+ Result := Length(Value);
+End;
+
+Procedure DeleteStr(Var Value : String; InitPos, FinalPos : Integer);
+Begin
+ Delete(Value, InitPos, FinalPos);
+End;
+
+Function  RequestTypeToRoute(RequestType  : TRequestType) : TDWRoute;
+Begin
+ Result    := crAll;
+ Case RequestType Of
+  rtGet    : Result := crGet;
+  rtPost   : Result := crPost;
+  rtPut    : Result := crPut;
+  rtPatch  : Result := crPatch;
+  rtDelete : Result := crDelete;
+ End;
+End;
+
+Function  DWFileExists(sFile, BaseFilePath : String) : Boolean;
+Var
+ vTempFilename : String;
+Begin
+ vTempFilename := sFile;
+ Result        := (Pos('.', vTempFilename) > 0);
+ If Result Then
+  Begin
+   Result := FileExists(vTempFilename);
+   If Not Result Then
+    Result := FileExists(BaseFilePath + vTempFilename);
   End;
 End;
+
+Function SystemProtectFiles(sFile : String) : Boolean;
+Const
+ cProtectFiles : array[0..1] of string = ('\winnt\', '\windows\');
+Var
+ I : Integer;
+Begin
+ Result := False;
+ For I := 0 to Length(cProtectFiles) -1 Do
+  Begin
+   Result := Pos(cProtectFiles[I], lowercase(sFile)) > 0;
+   If Result Then
+    Break;
+  End;
+End;
+
+Function GetMIMEType(sFile: TFileName) : string;
+Var
+ aMIMEMap : TIdMIMETable;
+Begin
+ If (Pos('.HTML', UpperCase(sFile)) > 0) Then
+  Result := 'text/html'
+ Else If (Pos('.PHP', UpperCase(sFile)) > 0) Then
+  Result := 'text/php'
+ Else If (Pos('.PNG', UpperCase(sFile)) > 0) Then
+  Result := 'image/png'
+ Else If (Pos('.BMP', UpperCase(sFile)) > 0) Then
+  Result := 'image/bmp'
+ Else If (Pos('.ICO', UpperCase(sFile)) > 0) Then
+  Result := 'image/ico'
+ Else If (Pos('.GIF', UpperCase(sFile)) > 0) Then
+  Result := 'image/gif'
+ Else If (Pos('.JPG', UpperCase(sFile)) > 0) Then
+  Result := 'image/jpg'
+ Else If (Pos('.JS',  UpperCase(sFile)) > 0) Then
+  Result := 'application/javascript'
+ Else If (Pos('.PDF', UpperCase(sFile)) > 0) Then
+  Result := 'application/pdf'
+ Else If (Pos('.ZIP', UpperCase(sFile)) > 0) Then
+  Result := 'application/zip'
+ Else If (Pos('.RAR', UpperCase(sFile)) > 0) Then
+  Result := 'application/rar'
+ Else If (Pos('.CSS', UpperCase(sFile)) > 0) Then
+  Result := 'text/css'
+ Else
+  Begin
+   aMIMEMap := TIdMIMETable.Create(true);
+   Try
+    Result := aMIMEMap.GetFileMIMEType(sFile);
+   Finally
+    aMIMEMap.Free;
+   End;
+  End;
+End;
+
+Function scripttags(Value: String): Boolean;
+var
+ I : Integer;
+Begin
+ Result := False;
+ For I := 0 To Length(tScriptsDetected) -1 Do
+  Begin
+   Result := pos(tScriptsDetected[I], value) > 0;
+   If Result Then
+    Break;
+  End;
+End;
+
+Function DateTimeToUnix(ConvDate: TDateTime): Int64;
+begin
+ Result := Round((ConvDate - UnixDate) * 86400);
+end;
+
+Function UnixToDateTime(USec: Int64): TDateTime;
+begin
+ Result := (USec / 86400) + UnixDate;
+end;
 
 Function MassiveModeToString(MassiveMode : TMassiveMode) : String;
 Begin
@@ -208,6 +650,7 @@ Begin
   mmInsert   : Result := 'mmInsert';
   mmUpdate   : Result := 'mmUpdate';
   mmDelete   : Result := 'mmDelete';
+  mmExec     : Result := 'mmExec';
  End;
 End;
 
@@ -221,7 +664,9 @@ Begin
  Else If LowerCase(Value) = LowerCase('mmUpdate') Then
   Result := mmUpdate
  Else If LowerCase(Value) = LowerCase('mmDelete') Then
-  Result := mmDelete;
+  Result := mmDelete
+ Else If LowerCase(Value) = LowerCase('mmExec') Then
+  Result := mmExec;
 End;
 
 Function DatasetStateToMassiveType(DatasetState : TDatasetState) : TMassiveMode;
@@ -235,37 +680,196 @@ Begin
  End;
 End;
 
-Function BytesArrToString(aValue : tIdBytes;IdEncode : IIdTextEncoding = Nil) : String;
+Function BytesArrToString(aValue : tIdBytes;IdEncode :  {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}
+                                                         TIdTextEncoding
+                                                        {$ELSE}
+                                                         IIdTextEncoding
+                                                        {$IFEND}
+                                                        {$ELSE}
+                                                         IIdTextEncoding
+                                                        {$ENDIF} = Nil) : String;
 Begin
  Result   := BytesToString(aValue, IdEncode);
+End;
+
+Function  ZCompressStreamD(S         : TStringStream;
+                           Var Value : TStringStream) : Boolean;
+Var
+ {$IFDEF FPC}
+  Utf8Stream   : TStringStream;
+ {$ELSE}
+  {$if CompilerVersion > 24} // Delphi 2010 pra cima
+   Utf8Stream   : TStringStream;
+  {$ELSE}
+   Utf8Stream   : TMemoryStream;
+  {$IFEND}
+ {$ENDIF}
+Begin
+ Result := False;
+ Try
+ {$IFDEF FPC}
+  Utf8Stream := TStringStream.Create('');
+  Utf8Stream.CopyFrom(S, S.Size);
+ {$ELSE}
+  {$if CompilerVersion > 24} // Delphi 2010 pra cima
+   Utf8Stream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+   Utf8Stream.CopyFrom(S, S.Size);
+  {$ELSE} // Delphi 2010 pra cima
+   Utf8Stream := TMemoryStream.Create;
+   Utf8Stream.Write(AnsiString(S.Datastring)[InitStrPos], S.Size);
+  {$IFEND} // Delphi 2010 pra cima
+ {$ENDIF}
+ {$IFNDEF FPC}
+  Value := TStringStream.Create('');
+ {$ELSE}
+  Value := TStringStream.Create('');
+ {$ENDIF}
+  Try
+   ZCompressStream(Utf8Stream, Value, cCompressionLevel);
+   Value.Position := 0;
+   Result := True;
+  Finally
+
+  End;
+ Finally
+  {$IFNDEF FPC}Utf8Stream.Size := 0;{$ENDIF}
+  Utf8Stream.Free;
+  If Value.Size = 0 Then
+   Begin
+    Result := False;
+    FreeAndNil(Value);
+   End;
+ End;
+End;
+
+Function ZCompressStreamSS(Const s : String)  : TStringStream;
+Var
+ {$IFDEF FPC}
+  Utf8Stream   : TStringStream;
+ {$ELSE}
+  {$if CompilerVersion > 24} // Delphi 2010 pra cima
+   Utf8Stream   : TStringStream;
+  {$ELSE}
+   Utf8Stream   : TMemoryStream;
+  {$IFEND}
+ {$ENDIF}
+Begin
+ Try
+ {$IFDEF FPC}
+  Utf8Stream := TStringStream.Create(S);
+ {$ELSE}
+  {$if CompilerVersion > 24} // Delphi 2010 pra cima
+   Utf8Stream := TStringStream.Create(S{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+  {$ELSE} // Delphi 2010 pra cima
+   Utf8Stream := TMemoryStream.Create;
+   Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
+  {$IFEND} // Delphi 2010 pra cima
+ {$ENDIF}
+ {$IFNDEF FPC}
+  Result := TStringStream.Create('');
+ {$ELSE}
+  Result := TStringStream.Create('');
+ {$ENDIF}
+  Try
+   ZCompressStream(Utf8Stream, Result, cCompressionLevel);
+   Result.Position := 0;
+  Finally
+
+  End;
+ Finally
+  {$IFNDEF FPC}Utf8Stream.Size := 0;{$ENDIF}
+  Utf8Stream.Free;
+  If Result.Size = 0 Then
+   FreeAndNil(Result);
+ End;
+End;
+
+Function ZCompressStreamNew(Const s : String) : TStream;
+Var
+ {$IFDEF FPC}
+  Utf8Stream   : TStringStream;
+ {$ELSE}
+  {$if CompilerVersion > 24} // Delphi 2010 pra cima
+   Utf8Stream   : TStringStream;
+  {$ELSE}
+   Utf8Stream   : TMemoryStream;
+  {$IFEND}
+ {$ENDIF}
+Begin
+ Try
+ {$IFDEF FPC}
+  Utf8Stream := TStringStream.Create(S);
+ {$ELSE}
+  {$if CompilerVersion > 24} // Delphi 2010 pra cima
+   Utf8Stream := TStringStream.Create(S{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+  {$ELSE} // Delphi 2010 pra cima
+   Utf8Stream := TMemoryStream.Create;
+   Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
+  {$IFEND} // Delphi 2010 pra cima
+ {$ENDIF}
+ {$IFNDEF FPC}
+  Result := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+ {$ELSE}
+  Result := TStringStream.Create('');
+ {$ENDIF}
+  Try
+   ZCompressStream(Utf8Stream, Result, cCompressionLevel);
+   Result.Position := 0;
+  Finally
+
+  End;
+ Finally
+  {$IFNDEF FPC}Utf8Stream.Size := 0;{$ENDIF}
+  Utf8Stream.Free;
+  If Result.Size = 0 Then
+   FreeAndNil(Result);
+ End;
 End;
 
 Function ZCompressStr(Const s   : String;
                       Var Value : String) : Boolean;
 Var
- Utf8Stream   : TStringStream;
- Compressed   : TMemoryStream;
-Begin
- Result := False;
  {$IFDEF FPC}
+  Utf8Stream   : TStringStream;
+ {$ELSE}
+  {$if CompilerVersion > 24} // Delphi 2010 pra cima
+   Utf8Stream   : TStringStream;
+  {$ELSE}
+   Utf8Stream   : TMemoryStream;
+  {$IFEND}
+ {$ENDIF}
+Compressed   : TMemoryStream;
+Begin
+ {$IFDEF FPC}
+  Result := False;
   Utf8Stream := TStringStream.Create(S);
  {$ELSE}
-  Utf8Stream := TStringStream.Create(S{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+  {$if CompilerVersion > 24} // Delphi 2010 pra cima
+   Utf8Stream := TStringStream.Create(S{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+  {$ELSE} // Delphi 2010 pra cima
+   Utf8Stream := TMemoryStream.Create;
+   Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
+  {$IFEND} // Delphi 2010 pra cima
  {$ENDIF}
  Try
   Compressed := TMemoryStream.Create;
   Try
-    ZCompressStream(Utf8Stream, Compressed);
+    ZCompressStream(Utf8Stream, Compressed, cCompressionLevel);
     Compressed.Position := 0;
    Try
     Value := StreamToHex(Compressed, False);
+//    Value := Encodeb64Stream(Compressed{$IFDEF FPC}, csUndefined{$ENDIF});
     Result := True;
    Finally
    End;
   Finally
    {$IFNDEF FPC}
     {$if CompilerVersion > 21}
+    {$IFDEF LINUXFMX}
+     Compressed := Nil;
+    {$ELSE}
     Compressed.Clear;
+    {$ENDIF}
     {$IFEND}
     FreeAndNil(Compressed);
    {$ELSE}
@@ -293,7 +897,7 @@ Begin
   Base64Stream.CopyFrom(S, 0);
   Base64Stream.Position   := 0;
  {$ELSE}
-  Base64Stream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.Utf8{$IFEND});
+  Base64Stream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
   S.Position   := 0;
   Base64Stream.CopyFrom(S, S.Size);
   Base64Stream.Position   := 0;
@@ -302,7 +906,7 @@ Begin
   {$IFDEF FPC}
   Value := TStringStream.Create('');
   {$ELSE}
-  Value := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.Utf8{$IFEND});
+  Value := TStringStream.Create(''); //{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
   {$ENDIF}
   Try
    Try
@@ -313,7 +917,7 @@ Begin
      ZDecompressStream(Utf8Stream, Value);
      Value.position := 0;
     {$ELSE}
-     Utf8Stream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.Utf8{$IFEND});
+     Utf8Stream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
      HexToStream(Base64Stream.DataString, Utf8Stream);
      Utf8Stream.position := 0;
      ZDecompressStream(Utf8Stream, Value);
@@ -333,6 +937,18 @@ Begin
  End;
 End;
 
+Function ZDecompressStreamNew(Const S   : TStream) : TStringStream;
+Begin
+ {$IFDEF FPC}
+  Result := TStringStream.Create('');
+ {$ELSE}
+  Result := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+ {$ENDIF}
+ S.Position := 0;
+ ZDecompressStream(S, Result);
+ Result.position := 0;
+End;
+
 Function ZDecompressStr(Const S   : String;
                         Var Value : String) : Boolean;
 Var
@@ -343,11 +959,11 @@ Var
   Encoder     : TBase64DecodingStream;
  {$ENDIF}
 Begin
- Result := False;
  {$IFDEF FPC}
+  Result := False;
   Base64Stream := TStringStream.Create(S);
  {$ELSE}
-  Base64Stream := TStringStream.Create(S{$if CompilerVersion > 21}, TEncoding.ASCII{$IFEND});
+  Base64Stream := TStringStream.Create(S{$if CompilerVersion > 22}, TEncoding.ANSI{$IFEND});
  {$ENDIF}
  Try
   Compressed := TStringStream.Create('');
@@ -423,6 +1039,46 @@ Begin
   End;
 End;
 
+Procedure HexToPChar(HexString : String;
+                     Var Data  : PChar);
+Var
+ {$IFDEF POSIX} //Android}
+ bytes: TBytes;
+ {$ENDIF}
+ Stream : TMemoryStream;
+Begin
+ LimpaLixoHex(HexString);
+ Stream := TMemoryStream.Create;
+ Try
+  {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
+   SetLength(bytes, Length(HexString) div 2);
+   HexToBin(PChar(HexString), 0, bytes, 0, Length(bytes));
+   stream.WriteBuffer(bytes[0], length(bytes));
+  {$ELSE}
+    TMemoryStream(Stream).Size := Length(HexString) Div 2;
+    {$IFDEF FPC}
+    HexToBin(PChar(HexString), TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
+    {$ELSE}
+     {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+     {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
+      SetLength(bytes, Length(HexString) div 2);
+      HexToBin(PChar(HexString), 0, bytes, 0, Length(bytes));
+      stream.WriteBuffer(bytes[0], length(bytes));
+     {$ELSE}
+      HexToBin(PWideChar (HexString),   TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
+     {$IFEND}
+     {$ELSE}
+      HexToBin(PChar (HexString),   TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
+     {$IFEND}
+    {$ENDIF}
+  {$IFEND}
+  Stream.Position := 0;
+ Finally
+  Stream.Read(Data, Stream.Size);
+  FreeAndNil(Stream);
+ End;
+End;
+
 Procedure HexToStream(Str    : String;
                       Stream : TStream);
 {$IFDEF POSIX} //Android}
@@ -437,7 +1093,7 @@ Begin
  {$ELSE}
    TMemoryStream(Stream).Size := Length(Str) Div 2;
    {$IFDEF FPC}
-   HexToBin(PChar (Str), TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
+   HexToBin(PChar(Str), TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
    {$ELSE}
     {$IF CompilerVersion > 21} // Delphi 2010 pra cima
     {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
@@ -478,6 +1134,39 @@ begin
   end;
 end;
 {$IFend}
+
+Function PCharToHex(Data : PChar; Size : Integer; QQuoted : Boolean = True) : String;
+Var
+ Stream : TMemoryStream;
+{$IFDEF POSIX} //Android}
+ bytes, bytes2: TBytes;
+{$ENDIF}
+Begin
+ Stream := TMemoryStream.Create;
+ Try
+  Stream.Write(Data, Size);
+  Stream.Position := 0;
+ {$IFNDEF FPC}
+  {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
+   Result := abbintohexstring(stream);
+  {$ELSE}
+   {$IFDEF LINUX} // Android}
+    Result := abbintohexstring(stream); // BytesToString(bytes2);  // TEncoding.UTF8.GetString(bytes2);
+   {$ELSE}
+    SetLength     (Result, Stream.Size * 2);
+    BinToHex      (TMemoryStream(Stream).Memory, PChar(Result), Stream.Size);
+   {$ENDIF}
+  {$IFEND}
+ {$ELSE}
+  SetLength     (Result, Stream.Size * 2);
+  BinToHex      (TMemoryStream(Stream).Memory, PChar(Result), Stream.Size);
+ {$ENDIF}
+ Finally
+  FreeAndNil(Stream);
+  If QQuoted Then
+   Result := '"' + Result + '"';
+ End;
+End;
 
 Function StreamToHex(Stream  : TStream; QQuoted : Boolean = True) : String;
 {$IFDEF POSIX} //Android}
@@ -599,6 +1288,26 @@ Begin
   Result := 'false';
 End;
 
+Function  MassiveSQLMode(aValue : TMassiveSQLMode) : String;
+Begin
+ Result := 'msUnknow';
+ Case aValue Of
+  msqlQuery   : Result := 'msqlQuery';
+  msqlExecute : Result := 'msqlExecute';
+ End;
+End;
+
+Function  MassiveSQLMode(aValue : String) : TMassiveSQLMode;
+Var
+ aData : String;
+Begin
+ aData := lowercase(aValue);
+ If aData = lowercase('msqlQuery') Then
+  Result := msqlQuery
+ Else If aData = lowercase('msqlExecute') Then
+  Result := msqlExecute;
+End;
+
 Function StringFloat     (aValue          : String)           : String;
 Begin
  Result := StringReplace(aValue, '.', '', [rfReplaceall]);
@@ -627,9 +1336,9 @@ Function GetJSONModeName(TypeObject      : TJsonMode)       : String;
 Begin
  Result := 'jmDataware';
  Case TypeObject Of
-  jmDataware : Result := 'jmDataware';
-  jmPureJSON : Result := 'jmPureJSON';
-  jmMongoDB  : Result := 'jmMongoDB';
+  jmDataware  : Result := 'jmDataware';
+  jmPureJSON  : Result := 'jmPureJSON';
+  jmUndefined : Result := 'jmUndefined';
   Else
    Result := 'jmDataware';
  End;
@@ -787,8 +1496,8 @@ Begin
   Result := jmDataware
  Else If vTypeObject = Uppercase('jmPureJSON') Then
   Result := jmPureJSON
- Else If vTypeObject = Uppercase('jmMongoDB') Then
-  Result := jmMongoDB;
+ Else If vTypeObject = Uppercase('jmUndefined') Then
+  Result := jmUndefined;
 End;
 
 Function GetDirectionName(ObjectDirection : TObjectDirection) : String;
@@ -993,6 +1702,124 @@ Begin
   Result := ovSingle;
 End;
 
+Function GetValueTypeTranslator (ObjectValue : String) : TObjectValue;
+Var
+ vObjectValue : String;
+Begin
+ Result := ovString;
+ vObjectValue := Uppercase(ObjectValue);
+ If vObjectValue      = Uppercase('_Unknown')         Then
+  Result := ovUnknown
+ Else If vObjectValue = Uppercase('_String')          Then
+  Result := ovString
+ Else If vObjectValue = Uppercase('_Smallint')        Then
+  Result := ovSmallint
+ Else If vObjectValue = Uppercase('_Integer')         Then
+  Result := ovInteger
+ Else If vObjectValue = Uppercase('_Word')            Then
+  Result := ovWord
+ Else If vObjectValue = Uppercase('_Boolean')         Then
+  Result := ovBoolean
+ Else If vObjectValue = Uppercase('_Float')           Then
+  Result := ovFloat
+ Else If vObjectValue = Uppercase('_Currency')        Then
+  Result := ovCurrency
+ Else If vObjectValue = Uppercase('_BCD')             Then
+  Result := ovBCD
+ Else If vObjectValue = Uppercase('_Date')            Then
+  Result := ovDate
+ Else If vObjectValue = Uppercase('_Time')            Then
+  Result := ovTime
+ Else If vObjectValue = Uppercase('_DateTime')        Then
+  Result := ovDateTime
+ Else If vObjectValue = Uppercase('_Bytes')           Then
+  Result := ovBytes
+ Else If vObjectValue = Uppercase('_VarBytes')        Then
+  Result := ovVarBytes
+ Else If vObjectValue = Uppercase('_AutoInc')         Then
+  Result := ovAutoInc
+ Else If vObjectValue = Uppercase('_Blob')            Then
+  Result := ovBlob
+ Else If vObjectValue = Uppercase('_Memo')            Then
+  Result := ovMemo
+ Else If vObjectValue = Uppercase('_Graphic')         Then
+  Result := ovGraphic
+ Else If vObjectValue = Uppercase('_FmtMemo')         Then
+  Result := ovFmtMemo
+ Else If vObjectValue = Uppercase('_ParadoxOle')      Then
+  Result := ovParadoxOle
+ Else If vObjectValue = Uppercase('_DBaseOle')        Then
+  Result := ovDBaseOle
+ Else If vObjectValue = Uppercase('_TypedBinary')     Then
+  Result := ovTypedBinary
+ Else If vObjectValue = Uppercase('_Cursor')          Then
+  Result := ovCursor
+ Else If vObjectValue = Uppercase('_FixedChar')       Then
+  Result := ovFixedChar
+ Else If vObjectValue = Uppercase('_WideString')      Then
+  Result := ovWideString
+ Else If vObjectValue = Uppercase('_Largeint')        Then
+  Result := ovLargeint
+ Else If vObjectValue = Uppercase('_ADT')             Then
+  Result := ovADT
+ Else If vObjectValue = Uppercase('-Array')           Then
+  Result := ovArray
+ Else If vObjectValue = Uppercase('_Reference')       Then
+  Result := ovReference
+ Else If vObjectValue = Uppercase('_DataSet')         Then
+  Result := ovDataSet
+ Else If vObjectValue = Uppercase('-OraBlob')         Then
+  Result := ovOraBlob
+ Else If vObjectValue = Uppercase('_OraClob')         Then
+  Result := ovOraClob
+ Else If vObjectValue = Uppercase('_Variant')         Then
+  Result := ovVariant
+ Else If vObjectValue = Uppercase('_Interface')       Then
+  Result := ovInterface
+ Else If vObjectValue = Uppercase('_IDispatch')       Then
+  Result := ovIDispatch
+ Else If vObjectValue = Uppercase('_Guid')            Then
+  Result := ovGuid
+ Else If vObjectValue = Uppercase('_TimeStamp')       Then
+  Result := ovTimeStamp
+ Else If vObjectValue = Uppercase('_FMTBcd')          Then
+  Result := ovFMTBcd
+ Else If vObjectValue = Uppercase('_FixedWideChar')   Then
+  Result := ovFixedWideChar
+ Else If vObjectValue = Uppercase('_WideMemo')        Then
+  Result := ovWideMemo
+ Else If vObjectValue = Uppercase('_OraTimeStamp')    Then
+  Result := ovOraTimeStamp
+ Else If vObjectValue = Uppercase('_OraInterval')     Then
+  Result := ovOraInterval
+ Else If vObjectValue = Uppercase('_LongWord')        Then
+  Result := ovLongWord
+ Else If vObjectValue = Uppercase('_Shortint')        Then
+  Result := ovShortint
+ Else If vObjectValue = Uppercase('_Byte')            Then
+  Result := ovByte
+ Else If vObjectValue = Uppercase('_Extended')        Then
+  Result := ovExtended
+ Else If vObjectValue = Uppercase('_Connection')      Then
+  Result := ovConnection
+ Else If vObjectValue = Uppercase('_Params')          Then
+  Result := ovParams
+ Else If vObjectValue = Uppercase('_Stream')          Then
+  Result := ovStream
+ Else If vObjectValue = Uppercase('_TimeStampOffset') Then
+  Result := ovTimeStampOffset
+ Else If vObjectValue = Uppercase('-Object')          Then
+  Result := ovObject
+ Else If vObjectValue = Uppercase('_Single')          Then
+  Result := ovSingle;
+End;
+
+
+Function GetFieldTypeB(FieldType     : TFieldType)     : String;
+Begin
+ Result := GetFieldType(FieldType);
+End;
+
 Function GetFieldType (FieldType     : TFieldType)     : String;
 Begin
  Result := 'ftUnknown';
@@ -1020,8 +1847,17 @@ Begin
   ftDBaseOle        : Result := 'ftDBaseOle';
   ftTypedBinary     : Result := 'ftTypedBinary';
   ftCursor          : Result := 'ftCursor';
-  ftFixedChar       : Result := 'ftFixedChar';
-  ftWideString      : Result := 'ftWideString';
+  ftFixedChar       :
+  {$IFNDEF FPC}
+   {$if CompilerVersion > 21} // Delphi 2010 pra cima
+    Result := 'ftFixedChar';
+   {$ELSE}
+    Result := 'ftString';
+   {$IFEND}
+  {$ELSE}
+   Result := 'ftString';
+  {$ENDIF}
+  ftWideString      : Result := 'ftString';
   ftLargeint        : Result := 'ftLargeint';
   ftADT             : Result := 'ftADT';
   ftArray           : Result := 'ftArray';
@@ -1037,21 +1873,24 @@ Begin
   ftFMTBcd          : Result := 'ftFMTBcd';
   {$IFNDEF FPC}
    {$if CompilerVersion > 21}
-    ftFixedWideChar   : Result := 'ftFixedWideChar';
+    ftSingle          : Result := 'ftSingle';
     ftWideMemo        : Result := 'ftWideMemo';
+    ftFixedWideChar   : Result := 'ftFixedWideChar';
     ftOraTimeStamp    : Result := 'ftOraTimeStamp';
     ftOraInterval     : Result := 'ftOraInterval';
     ftLongWord        : Result := 'ftLongWord';
     ftShortint        : Result := 'ftShortint';
+    ftExtended        : Result := 'ftFloat';
     ftByte            : Result := 'ftByte';
-    ftExtended        : Result := 'ftExtended';
     ftConnection      : Result := 'ftConnection';
     ftParams          : Result := 'ftParams';
-    ftStream          : Result := 'ftStream';
-    ftTimeStampOffset : Result := 'ftTimeStampOffset';
+    ftStream          : Result := 'ftBlob';
+    ftTimeStampOffset : Result := 'ftTimeStamp';
     ftObject          : Result := 'ftObject';
-    ftSingle          : Result := 'ftSingle';
    {$IFEND}
+  {$ELSE}
+   ftWideMemo         : Result := 'ftWideMemo';
+   ftFixedWideChar    : Result := 'ftFixedWideChar';
   {$ENDIF}
  End;
 End;
@@ -1079,7 +1918,7 @@ Begin
  Else If vFieldType = Uppercase('ftCurrency')        Then
   Result := ftCurrency
  Else If vFieldType = Uppercase('ftBCD')             Then
-  Result := ftBCD
+  Result := ftFmtBCD
  Else If vFieldType = Uppercase('ftDate')            Then
   Result := ftDate
  Else If vFieldType = Uppercase('ftTime')            Then
@@ -1097,12 +1936,11 @@ Begin
  Else If vFieldType = Uppercase('ftMemo')            Then
   Result := ftMemo
 {$IFNDEF FPC}
- {$if CompilerVersion =15} // delphi 7   compatibilidade enter Sever no XE e Client no D7
+ {$if CompilerVersion < 18} // delphi 7   compatibilidade enter Sever no XE e Client no D7
  Else If vFieldType = Uppercase('ftWideMemo')        Then
   Result := ftMemo
 {$IFEND}
 {$ENDIF}
-
  Else If vFieldType = Uppercase('ftGraphic')         Then
   Result := ftGraphic
  Else If vFieldType = Uppercase('ftFmtMemo')         Then
@@ -1118,7 +1956,15 @@ Begin
  Else If vFieldType = Uppercase('ftFixedChar')       Then
   Result := ftFixedChar
  Else If vFieldType = Uppercase('ftWideString')      Then
-  Result := ftWideString
+  {$IFNDEF FPC}
+   {$if CompilerVersion > 21} // Delphi 2010 pra cima
+    Result := ftWideString
+   {$ELSE}
+    Result := ftString
+   {$IFEND}
+  {$ELSE}
+   Result := ftString
+  {$ENDIF}
  Else If vFieldType = Uppercase('ftLargeint')        Then
   Result := ftLargeint
  Else If vFieldType = Uppercase('ftADT')             Then
@@ -1142,13 +1988,27 @@ Begin
  Else If vFieldType = Uppercase('ftGuid')            Then
   Result := ftGuid
  Else If vFieldType = Uppercase('ftTimeStamp')       Then
+  Begin
   {$IFNDEF FPC}
-  Result := ftTimeStamp
+   Result := ftTimeStamp;
   {$ELSE}
-  Result := ftDateTime
+   Result := ftDateTime;
   {$ENDIF}
+  End
+ Else If vFieldType = Uppercase('ftSingle')       Then
+  Begin
+  {$IFNDEF FPC}
+   {$if CompilerVersion > 21} // Delphi 2010 pra cima
+    Result := ftSingle;
+   {$ELSE}
+    Result := ftFloat;
+   {$IFEND}
+  {$ELSE}
+   Result := ftFloat;
+  {$ENDIF}
+  End
  Else If vFieldType = Uppercase('ftFMTBcd')          Then
-  Result := ftFMTBcd
+   Result := ftFMTBcd
   {$IFNDEF FPC}
    {$if CompilerVersion > 21}
     Else If vFieldType = Uppercase('ftFixedWideChar')   Then
@@ -1177,8 +2037,6 @@ Begin
      Result := ftTimeStampOffset
     Else If vFieldType = Uppercase('ftObject')          Then
      Result := ftObject
-    Else If vFieldType = Uppercase('ftSingle')          Then
-     Result := ftSingle
    {$IFEND}
   (* {$if CompilerVersion =15}
    Else If vFieldType = Uppercase('ftWideMemo')   Then
@@ -1189,39 +2047,80 @@ Begin
 End;
 
 {$IFNDEF FPC}
-{$if CompilerVersion > 21}
+{$if CompilerVersion > 22}
 Function GetEncoding(Avalue  : TEncodeSelect) : TEncoding;
 Begin
  Result := TEncoding.utf8;
  Case Avalue of
   esUtf8  : Result := TEncoding.Unicode;
+  esANSI  : Result := TEncoding.ANSI;
   esASCII : Result := TEncoding.ASCII;
  End;
 End;
 {$IFEND}
 {$ENDIF}
 
-Function GetEncodingID(Avalue  : TEncodeSelect) : IIdTextEncoding;
+Function GetEncodingID(Avalue  : TEncodeSelect) :  {$IFNDEF FPC}
+                                                    {$IF (DEFINED(OLDINDY))}
+                                                     TIdTextEncoding
+                                                    {$ELSE}
+                                                     IIdTextEncoding
+                                                    {$IFEND}
+                                                   {$ELSE}
+                                                    IIdTextEncoding
+                                                   {$ENDIF};
 Begin
+{$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}
+ Result := enDefault;
+{$ELSE}
  Result := IndyTextEncoding(encIndyDefault);
+{$IFEND}
+{$ENDIF}
  Case Avalue of
-  esUtf8  : Result := IndyTextEncoding(encUTF8);
-  esASCII : Result := IndyTextEncoding(encASCII);
+  esUtf8  : {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}
+             Result := enUTF8;
+            {$ELSE}
+             Result := IndyTextEncoding(encUTF8);
+            {$IFEND}
+            {$ELSE}
+             Result := IndyTextEncoding(encUTF8);
+            {$ENDIF}
+  esANSI,
+  esASCII :  {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}
+             Result := en8Bit;
+            {$ELSE}
+             Result := IndyTextEncoding(encASCII);
+            {$IFEND}
+            {$ELSE}
+             Result := IndyTextEncoding(encASCII);
+            {$ENDIF}
  End;
 End;
 
-Function BuildStringFloat(Value : String) : String;
+Function BuildStringFloat(Value: String; JsonModeD: TJsonMode = jmDataware; FloatDecimalFormat : String = ''): String;
 Begin
  {$IFDEF FPC}
- DecimalLocal := DecimalSeparator;
+  DecimalLocal := DecimalSeparator;
  {$ELSE}
- {$if CompilerVersion > 21} // Delphi 2010 pra cima
- DecimalLocal := FormatSettings.DecimalSeparator;
- {$ELSE}
- DecimalLocal := DecimalSeparator;
- {$IFEND}
+  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+  DecimalLocal := FormatSettings.DecimalSeparator;
+  {$ELSE}
+  DecimalLocal := DecimalSeparator;
+  {$IFEND}
  {$ENDIF}
- Result := StringReplace(Value, DecimalLocal, TDecimalChar, [rfReplaceAll]);
+ Case JsonModeD Of
+  jmDataware,
+  jmUndefined : Result := StringReplace(Value, DecimalLocal, TDecimalChar, [rfReplaceall]);
+  jmPureJSON  : Begin
+                 If FloatDecimalFormat = '' Then
+                  Result := Value
+                 Else
+                  If DecimalLocal <> FloatDecimalFormat Then
+                   Result := StringReplace(Value, DecimalLocal, FloatDecimalFormat, [rfReplaceall])
+                  Else
+                   Result := Value;
+                End;
+ End;
 End;
 
 Function BuildFloatString(Value : String) : String;
@@ -1238,4 +2137,54 @@ Begin
  Result := StringReplace(Value, TDecimalChar, DecimalLocal, [rfReplaceAll]);
 End;
 
+Function RandomString(strLen : Integer) : String;
+Var
+ str : String;
+Begin
+ Randomize;
+ str := 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW XYZ';
+ Result := '';
+ Repeat
+  Result := Result + str[Random(Length(str) - FinalStrPos) + 1];
+ Until (Length(Result) = strLen)
+End;
+
+Procedure InitializeStrings;
+{$IFNDEF FPC}
+ {$if CompilerVersion > 24} // Delphi 2010 pra cima
+ Var
+  s : String;
+ {$IFEND}
+{$ENDIF}
+Begin
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 24} // Delphi 2010 pra cima
+   s := '0';
+   If Low(s) = 0 Then
+    Begin
+     InitStrPos  := 0;
+     FinalStrPos := 1;
+    End
+   Else
+    Begin
+     InitStrPos  := 1;
+     FinalStrPos := 0;
+    End;
+  {$ELSE}
+   InitStrPos  := 1;
+   FinalStrPos := 0;
+  {$IFEND}
+ {$ELSE}
+  InitStrPos  := 1;
+  FinalStrPos := 0;
+ {$ENDIF}
+End;
+
+Initialization
+ InitializeStrings;
+
+Finalization
+
 end.
+
+

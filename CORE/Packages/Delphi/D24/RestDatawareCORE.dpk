@@ -1,5 +1,4 @@
 package RestDatawareCORE;
-
 {$R *.res}
 {$R *.dres}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -31,16 +30,19 @@ package RestDatawareCORE;
 requires
   rtl,
   designide,
+  dcldb,
   dbrtl,
   soaprtl,
   IndySystem,
   IndyProtocols,
   IndyCore,
+  fmx,
+  vcl,
+  vcldb,
+  dsnap,
   FireDAC,
   FireDACCommonDriver,
-  FireDACCommon,
-  dsnap,
-  dcldb;
+  FireDACCommon;
 
 contains
   uDWPoolerMethod in '..\..\..\Source\uDWPoolerMethod.pas',
@@ -59,6 +61,43 @@ contains
   uDWJSON in '..\..\..\Source\libs\JSON\uDWJSON.pas',
   uDWMassiveBuffer in '..\..\..\Source\libs\uDWMassiveBuffer.pas',
   StringBuilderUnit in '..\..\..\Source\libs\StringBuilderUnit.pas',
-  uRESTDWServerEvents in '..\..\..\Source\uRESTDWServerEvents.pas';
+  uRESTDWServerEvents in '..\..\..\Source\uRESTDWServerEvents.pas',
+  uDWJSONInterface in '..\..\..\Source\libs\JSON\uDWJSONInterface.pas',
+  uDWDataSync in '..\..\..\Source\libs\uDWDataSync.pas',
+  uDWDataset in '..\..\..\Source\Memdataset\uDWDataset.pas',
+  uDWSqlEditor in '..\..\..\Source\uDWSqlEditor.pas' {FrmDWSqlEditor},
+  uDWAbout in '..\..\..\Source\uDWAbout.pas',
+  uAboutForm in '..\..\..\Source\uAboutForm.pas' {frm_About},
+  uDWResponseTranslator in '..\..\..\Source\uDWResponseTranslator.pas',
+  uSystemEvents in '..\..\..\Source\libs\uSystemEvents.pas',
+  uRESTDWServerContext in '..\..\..\Source\uRESTDWServerContext.pas',
+  dwCGIRunner in '..\..\..\Source\dwCGIRunner.pas',
+  dwISAPIRunner in '..\..\..\Source\dwISAPIRunner.pas',
+  uDWFieldSourceEditor in '..\..\..\Source\uDWFieldSourceEditor.pas' {fMasterDetailRelation},
+  uDWReqParamsEditor in '..\..\..\Source\uDWReqParamsEditor.pas' {fParamsEditor},
+  uDWRequestDBG in '..\..\..\Source\uDWRequestDBG.pas' {fRequestDebbug},
+  PropertyPersist in '..\..\..\Source\PropertyPersist.pas',
+  DWDCPbase64 in '..\..\..\Source\DCP\DWDCPbase64.pas',
+  DWDCPblockciphers in '..\..\..\Source\DCP\DWDCPblockciphers.pas',
+  DWDCPconst in '..\..\..\Source\DCP\DWDCPconst.pas',
+  DWDCPcrypt2 in '..\..\..\Source\DCP\DWDCPcrypt2.pas',
+  uDWJSONViewer in '..\..\..\Source\uDWJSONViewer.pas' {fDWJSONViewer},
+  DWDCPcast256 in '..\..\..\Source\DCP\Ciphers\DWDCPcast256.pas',
+  DWDCPrijndael in '..\..\..\Source\DCP\Ciphers\DWDCPrijndael.pas',
+  DWDCPsha256 in '..\..\..\Source\DCP\Hashes\DWDCPsha256.pas',
+  uDWUpdSqlEditor in '..\..\..\Source\uDWUpdSqlEditor.pas' {FrmDWUpdSqlEditor},
+  uDWConstsCharset in '..\..\..\Source\libs\uDWConstsCharset.pas',
+  uDWExprParser in '..\..\..\Source\Memdataset\uDWExprParser.pas',
+  uRESTDWFileBuffer in '..\..\..\Source\uRESTDWFileBuffer.pas',
+  uRESTDWDynamic in '..\..\..\Source\libs\uRESTDWDynamic.pas',
+  uRESTDWSynBase in '..\..\..\Source\libs\uRESTDWSynBase.pas',
+  uDWConst404HTML in '..\..\..\Source\libs\uDWConst404HTML.pas',
+  uRESTDWQuickX in '..\..\..\Source\uRESTDWQuickX.pas',
+  uRESTDWBaseIDQX in '..\..\..\Source\uRESTDWBaseIDQX.pas',
+  uRESTDWBufferDb in '..\..\..\Source\uRESTDWBufferDb.pas',
+  uRESTDWProcessThread in '..\..\..\Source\uRESTDWProcessThread.pas';
 
 end.
+
+
+

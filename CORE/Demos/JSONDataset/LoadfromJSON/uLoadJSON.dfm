@@ -1047,21 +1047,10 @@ object Form3: TForm3
     Caption = 'Usar HTTPS'
     TabOrder = 8
   end
-  object FDMemTable1: TFDMemTable
-    FetchOptions.AssignedValues = [evMode]
-    FetchOptions.Mode = fmAll
-    ResourceOptions.AssignedValues = [rvSilentMode]
-    ResourceOptions.SilentMode = True
-    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
-    UpdateOptions.CheckRequired = False
-    UpdateOptions.AutoCommitUpdates = True
-    Left = 88
-    Top = 136
-  end
   object DataSource1: TDataSource
-    DataSet = FDMemTable1
-    Left = 128
-    Top = 136
+    DataSet = DWMemtable1
+    Left = 100
+    Top = 160
   end
   object ActionList1: TActionList
     Left = 48
@@ -1120,8 +1109,8 @@ object Form3: TForm3
         JsonMode = jmDataware
         Name = 'loaddatasetevent'
       end>
-    Left = 125
-    Top = 213
+    Left = 99
+    Top = 205
   end
   object RESTClientPooler1: TRESTClientPooler
     DataCompression = True
@@ -1136,7 +1125,12 @@ object Form3: TForm3
     ThreadRequest = False
     AllowCookies = False
     HandleRedirects = False
-    Left = 65
-    Top = 213
+    Left = 71
+    Top = 205
+  end
+  object DWMemtable1: TDWMemtable
+    FieldDefs = <>
+    Left = 72
+    Top = 160
   end
 end

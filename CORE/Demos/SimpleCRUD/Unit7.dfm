@@ -1171,19 +1171,20 @@ object Form7: TForm7
     Top = 40
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    FieldDefs = <>
-    IndexDefs = <>
-    MasterFields = ''
-    FetchOptions.AssignedValues = [evMode]
-    FetchOptions.Mode = fmAll
-    ResourceOptions.AssignedValues = [rvSilentMode]
-    ResourceOptions.SilentMode = True
-    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
-    UpdateOptions.CheckRequired = False
-    UpdateOptions.AutoCommitUpdates = True
-    StoreDefs = True
+    FieldDefs = <
+      item
+        Name = 'ID'
+        DataType = ftInteger
+      end
+      item
+        Name = 'BLOBIMAGE'
+        DataType = ftBlob
+      end
+      item
+        Name = 'BLOBTEXT'
+        DataType = ftMemo
+      end>
     MasterCascadeDelete = False
-    Inactive = False
     Datapacks = -1
     DataCache = True
     Params = <>
@@ -1195,25 +1196,20 @@ object Form7: TForm7
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = True
-    InBlockEvents = False
     Left = 240
     Top = 48
     object RESTDWClientSQL1ID: TIntegerField
       FieldName = 'ID'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
-      Required = True
     end
     object RESTDWClientSQL1BLOBIMAGE: TBlobField
       FieldName = 'BLOBIMAGE'
     end
-    object RESTDWClientSQL1DESCRICAO: TStringField
-      FieldName = 'DESCRICAO'
-      Size = 100
-    end
   end
   object RESTDWDataBase1: TRESTDWDataBase
-    Active = False
+    Active = True
     Compression = True
+    MyIP = '127.0.0.1'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False

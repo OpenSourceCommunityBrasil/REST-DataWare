@@ -14,7 +14,7 @@ object Form4: TForm4
   Font.Name = 'Tahoma'
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.8.0.5'
+  LCLVersion = '2.0.2.0'
   object Label4: TLabel
     Left = 13
     Height = 13
@@ -1085,7 +1085,8 @@ object Form4: TForm4
   end
   object RESTClientPooler1: TRESTClientPooler
     DataCompression = False
-    Encoding = esASCII
+    Encoding = esUtf8
+    hEncodeStrings = True
     Host = 'localhost'
     UserName = 'testserver'
     Password = 'testserver'
@@ -1098,6 +1099,12 @@ object Form4: TForm4
     OnWork = RESTClientPooler1Work
     OnWorkBegin = RESTClientPooler1WorkBegin
     OnWorkEnd = RESTClientPooler1WorkEnd
+    FailOver = False
+    FailOverConnections = <>
+    FailOverReplaceDefaults = False
+    CriptOptions.Use = False
+    CriptOptions.Key = 'RDWBASEKEY256'
+    DatabaseCharSet = csUndefined
     left = 77
     top = 41
   end
@@ -1105,5 +1112,80 @@ object Form4: TForm4
     Title = 'Arquivo a enviar'
     left = 184
     top = 200
+  end
+  object DWClientEvents1: TDWClientEvents
+    CriptOptions.Use = False
+    CriptOptions.Key = 'RDWBASEKEY256'
+    RESTClientPooler = RESTClientPooler1
+    Events = <    
+      item
+        Routes = [crAll]
+        DWParams = <        
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovBlob
+            ParamName = 'result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'FileList'
+      end    
+      item
+        Routes = [crAll]
+        DWParams = <        
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'Arquivo'
+            Encoded = True
+          end        
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'Diretorio'
+            Encoded = True
+          end        
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovBlob
+            ParamName = 'FileSend'
+            Encoded = True
+          end        
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovBoolean
+            ParamName = 'Result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'SendReplicationFile'
+      end    
+      item
+        Routes = [crAll]
+        DWParams = <        
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'Arquivo'
+            Encoded = True
+          end        
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovBlob
+            ParamName = 'Result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'DownloadFile'
+      end>
+    left = 105
+    top = 41
   end
 end

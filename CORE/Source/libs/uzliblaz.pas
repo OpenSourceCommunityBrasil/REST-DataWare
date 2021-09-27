@@ -6,52 +6,47 @@ Uses
  SysUtils, Classes, zlib{$IFDEF FPC}, zstream{$ENDIF};
 
   //Funções de Compressão e descompressão de Stream com ZLib
-  Procedure ZCompressStream  (inStream, outStream : TStream);
-  Procedure ZDecompressStream(inStream, outStream : TStream);
+  Procedure ZCompressStream  (inStream,
+                              outStream        : TStream;
+                              CompressionLevel : TCompressionLevel = clDefault);
+  Procedure ZDecompressStream(inStream,
+                              outStream : TStream);
 
 
 implementation
 
 Uses
- uDWConsts;
+ uDWConsts, ServerUtils;
 
-Procedure ZCompressStream  (inStream, outStream : TStream);
+Procedure ZCompressStream  (inStream,
+                            outStream        : TStream;
+                            CompressionLevel : TCompressionLevel = clDefault);
 Var
  DS        : TCompressionStream;
- Size      : Longint;
+ Size      : DWInt64;
 Begin
- inStream.Position := 0; // goto start of input stream
- DS := TCompressionstream.Create(clDefault, outStream);
+ inStream.Position := 0; // Goto Start of input stream
+ DS := TCompressionstream.Create(CompressionLevel, outStream);
  Try
   Size              := inStream.Size;
   inStream.Position := 0;
-  DS.Write(Size, 4); //SizeOf(Size));
+  DS.Write(Size, SizeOf(DWInt64));
   DS.CopyFrom(inStream, inStream.Size);
  Finally
   DS.Free;
  End;
 End;
 
-
-Function ReadDWord(Value : TStream) : Cardinal;
-Var
- d    : Cardinal;
-Begin
- Value.Position := 0;
- Value.ReadBuffer(d, 4);
- ReadDWord := d;
-End;
-
 {$IFDEF FPC}
 Procedure ZDecompressStream(inStream, outStream : TStream);
 Var
- D : TDecompressionstream;
- B : Array[1..CompressBuffer] of Byte;
- R : Integer;
- Size : Longint;
+ D    : TDecompressionstream;
+ B    : Array[1..CompressBuffer] of Byte;
+ R    : Integer;
+ Size : DWInt64;
 Begin
  d := TDecompressionstream.Create(inStream);
- d.Read(Size, 4); //SizeOf(Size));
+ d.Read(Size, SizeOf(DWInt64));
  While True Do
   Begin
    R := d.Read(B, sizeof(B));
@@ -64,16 +59,16 @@ Begin
  FreeAndNil(d);
 End;
 {$ELSE}
-
-Procedure ZDecompressStream(inStream, outStream : TStream);
+Procedure ZDecompressStream(inStream,
+                            outStream : TStream);
 Var
  D    : TDecompressionstream;
  B    : Array[1..CompressBuffer] of Byte;
  R    : Integer;
- Size : Longint;
+ Size : DWInt64;
 Begin
  d := TDecompressionstream.Create(inStream);
- d.Read(Size, 4); //SizeOf(Size));
+ d.Read(Size, SizeOf(DWInt64));
  inStream.Position := SizeOf(Size);
  Try
   Repeat
@@ -89,7 +84,6 @@ Begin
   d.Free;
  End;
 End;
-
 {$ENDIF}
 
 end.

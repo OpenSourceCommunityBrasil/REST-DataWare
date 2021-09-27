@@ -1026,9 +1026,9 @@ object fPrincipal: TfPrincipal
     TabOrder = 4
   end
   object chkhttps: TCheckBox
-    Left = 208
+    Left = 200
     Top = 50
-    Width = 97
+    Width = 84
     Height = 17
     Caption = 'Usar HTTPS'
     TabOrder = 5
@@ -1105,16 +1105,31 @@ object fPrincipal: TfPrincipal
     TabOrder = 9
     OnClick = Button2Click
   end
+  object rgUpdType: TRadioGroup
+    Left = 276
+    Top = 35
+    Width = 100
+    Height = 55
+    Caption = 'Update Type'
+    ItemIndex = 0
+    Items.Strings = (
+      'MassiveCache'
+      'UpdateSQL')
+    TabOrder = 10
+    OnClick = rgUpdTypeClick
+  end
   object RESTDWDataBase1: TRESTDWDataBase
     Active = False
     Compression = True
+    CriptOptions.Use = False
+    CriptOptions.Key = 'RDWBASEKEY256'
     Login = 'testserver'
     Password = 'testserver'
     Proxy = False
     ProxyOptions.Port = 8888
     PoolerService = '127.0.0.1'
     PoolerPort = 8082
-    PoolerName = 'TServerMethodDM.RESTDWPoolerDB1'
+    PoolerName = 'TServerMethodDM.RESTDWPoolerFD'
     StateConnection.AutoCheck = False
     StateConnection.InTime = 1000
     RequestTimeOut = 9999999
@@ -1124,24 +1139,16 @@ object fPrincipal: TfPrincipal
     StrsEmpty2Null = False
     StrsTrim2Len = True
     ParamCreate = True
-    Left = 232
-    Top = 49
+    FailOver = False
+    FailOverConnections = <>
+    FailOverReplaceDefaults = False
+    ClientConnectionDefs.Active = False
+    Left = 88
+    Top = 185
   end
   object rdwSQLStringTable: TRESTDWClientSQL
-    FieldDefs = <
-      item
-        Name = 'ID'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 10
-      end
-      item
-        Name = 'DESC'
-        DataType = ftString
-        Size = 100
-      end>
+    FieldDefs = <>
     IndexDefs = <>
-    MasterFields = ''
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
     ResourceOptions.AssignedValues = [rvSilentMode]
@@ -1151,7 +1158,7 @@ object fPrincipal: TfPrincipal
     UpdateOptions.AutoCommitUpdates = True
     StoreDefs = True
     MasterCascadeDelete = False
-    Inactive = False
+    BinaryRequest = True
     Datapacks = -1
     DataCache = True
     Params = <>
@@ -1162,11 +1169,15 @@ object fPrincipal: TfPrincipal
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = True
+    RaiseErrors = True
     MassiveCache = DWMassiveCache1
-    Left = 192
-    Top = 120
+    ActionCursor = crSQLWait
+    ReflectChanges = False
+    Left = 176
+    Top = 160
     object rdwSQLStringTableID: TStringField
       FieldName = 'ID'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
       Required = True
       Size = 10
     end
@@ -1177,18 +1188,17 @@ object fPrincipal: TfPrincipal
   end
   object dsSQLStringTable: TDataSource
     DataSet = rdwSQLStringTable
-    Left = 264
-    Top = 120
+    Left = 217
+    Top = 160
   end
   object dsSQLEmployee: TDataSource
     DataSet = rdwSQLEmployee
-    Left = 264
+    Left = 216
     Top = 216
   end
   object rdwSQLEmployee: TRESTDWClientSQL
     FieldDefs = <>
     IndexDefs = <>
-    MasterFields = ''
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
     ResourceOptions.AssignedValues = [rvSilentMode]
@@ -1198,7 +1208,7 @@ object fPrincipal: TfPrincipal
     UpdateOptions.AutoCommitUpdates = True
     StoreDefs = True
     MasterCascadeDelete = False
-    Inactive = False
+    BinaryRequest = True
     Datapacks = -1
     DataCache = True
     Params = <>
@@ -1209,8 +1219,11 @@ object fPrincipal: TfPrincipal
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = True
+    RaiseErrors = True
     MassiveCache = DWMassiveCache1
-    Left = 192
+    ActionCursor = crSQLWait
+    ReflectChanges = False
+    Left = 176
     Top = 216
     object rdwSQLEmployeeEMP_NO: TSmallintField
       FieldName = 'EMP_NO'
@@ -1264,7 +1277,48 @@ object fPrincipal: TfPrincipal
     end
   end
   object DWMassiveCache1: TDWMassiveCache
-    Left = 232
-    Top = 168
+    ReflectChanges = False
+    Left = 277
+    Top = 188
+  end
+  object rdwUpdSQLStringTable: TRESTDWUpdateSQL
+    Encoding = esUtf8
+    DeleteSQL.Strings = (
+      'delete from stringtable Where ID = :ID')
+    InsertSQL.Strings = (
+      'insert into stringtable (ID, "DESC") values (:ID, :DESC)')
+    FetchRowSQL.Strings = (
+      'select * from stringtable Where ID = :ID')
+    ModifySQL.Strings = (
+      'update stringtable set "DESC" = :DESC WHERE ID = :ID')
+    Left = 139
+    Top = 160
+  end
+  object rdwUpdSQLEmployee: TRESTDWUpdateSQL
+    Encoding = esUtf8
+    DeleteSQL.Strings = (
+      'delete from employee where emp_no = :emp_no')
+    InsertSQL.Strings = (
+      
+        'insert into EMPLOYEE (EMP_NO, FIRST_NAME, LAST_NAME, PHONE_EXT, ' +
+        'HIRE_DATE, DEPT_NO, JOB_CODE, JOB_GRADE, JOB_COUNTRY, SALARY) VA' +
+        'LUES'
+      
+        '                     (:EMP_NO, :FIRST_NAME, :LAST_NAME, :PHONE_E' +
+        'XT, :HIRE_DATE, :DEPT_NO, :JOB_CODE, :JOB_GRADE, :JOB_COUNTRY, :' +
+        'SALARY)')
+    FetchRowSQL.Strings = (
+      'select * from employee where emp_no = :emp_no')
+    ModifySQL.Strings = (
+      
+        'update EMPLOYEE Set FIRST_NAME = :FIRST_NAME, LAST_NAME = :LAST_' +
+        'NAME, PHONE_EXT = :PHONE_EXT, HIRE_DATE = :HIRE_DATE,'
+      
+        '                     DEPT_NO = :DEPT_NO, JOB_CODE = :JOB_CODE, J' +
+        'OB_GRADE = :JOB_GRADE, JOB_COUNTRY = :JOB_COUNTRY, SALARY = :SAL' +
+        'ARY'
+      'where EMP_NO = :EMP_NO')
+    Left = 137
+    Top = 216
   end
 end

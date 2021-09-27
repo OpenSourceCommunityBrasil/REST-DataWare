@@ -156,10 +156,6 @@
         <DCCReference Include="RestDWServerFormU.pas">
             <Form>RestDWForm</Form>
         </DCCReference>
-        <DCCReference Include="ServerMethodsUnit1.pas">
-            <Form>ServerMethods1</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
         <DCCReference Include="uDmService.pas">
             <Form>DataModule1</Form>
             <FormType>dfm</FormType>

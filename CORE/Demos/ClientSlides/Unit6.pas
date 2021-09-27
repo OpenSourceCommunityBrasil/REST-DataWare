@@ -8,7 +8,7 @@ uses
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, uRESTDWPoolerDB, Data.DB, FireDAC.Comp.DataSet,
   FireDAC.Comp.Client, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Imaging.pngimage,
-  Vcl.DBCtrls, Vcl.ExtDlgs, uDWConstsData;
+  Vcl.DBCtrls, Vcl.ExtDlgs, uDWConstsData, uDWAbout, uDWDataset;
 
 type
   TForm6 = class(TForm)

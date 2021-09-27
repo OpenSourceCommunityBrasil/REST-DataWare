@@ -1936,7 +1936,8 @@ object Form4: TForm4
   end
   object RESTClientPooler1: TRESTClientPooler
     DataCompression = True
-    Encoding = esASCII
+    Encoding = esUtf8
+    hEncodeStrings = True
     Host = 'localhost'
     UserName = 'testserver'
     Password = 'testserver'
@@ -1956,5 +1957,75 @@ object Form4: TForm4
     Title = 'Arquivo a enviar'
     Left = 184
     Top = 200
+  end
+  object DWClientEvents1: TDWClientEvents
+    RESTClientPooler = RESTClientPooler1
+    Events = <
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovBlob
+            ParamName = 'result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'FileList'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'Arquivo'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'Diretorio'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovBlob
+            ParamName = 'FileSend'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovBoolean
+            ParamName = 'Result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'SendReplicationFile'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'Arquivo'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovBlob
+            ParamName = 'Result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'DownloadFile'
+      end>
+    Left = 106
+    Top = 41
   end
 end

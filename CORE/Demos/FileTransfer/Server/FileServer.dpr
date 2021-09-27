@@ -3,7 +3,7 @@ program FileServer;
 uses
   Vcl.Forms,
   uPrincipal in 'uPrincipal.pas' {fServer},
-  SMDWCore in 'SMDWCore.pas';
+  uDMFileServer in 'uDMFileServer.pas' {dmFileServer: TDataModule};
 
 {$R *.res}
 

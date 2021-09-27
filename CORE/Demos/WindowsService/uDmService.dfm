@@ -1,5 +1,6 @@
 object ServerMethodDM: TServerMethodDM
   OldCreateOrder = False
+  Encoding = esUtf8
   OnReplyEvent = ServerMethodDataModuleReplyEvent
   Height = 220
   Width = 366

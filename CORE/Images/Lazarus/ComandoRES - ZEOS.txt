@@ -1,1 +1,3 @@
 c:\lazarus\tools\lazres.exe restdwdriverzeos.lrs TRESTDWDriverZEOS.png
+
+pause

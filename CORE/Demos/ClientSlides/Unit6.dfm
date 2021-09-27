@@ -1074,7 +1074,6 @@ object Form6: TForm6
     Top = 56
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    AutoCalcFields = False
     FieldDefs = <
       item
         Name = 'ID'
@@ -1089,18 +1088,7 @@ object Form6: TForm6
         Name = 'BLOBTEXT'
         DataType = ftMemo
       end>
-    IndexDefs = <>
-    MasterFields = ''
-    FetchOptions.AssignedValues = [evMode]
-    FetchOptions.Mode = fmAll
-    ResourceOptions.AssignedValues = [rvSilentMode]
-    ResourceOptions.SilentMode = True
-    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
-    UpdateOptions.CheckRequired = False
-    UpdateOptions.AutoCommitUpdates = True
-    StoreDefs = True
     MasterCascadeDelete = False
-    Inactive = False
     Datapacks = -1
     DataCache = True
     Params = <>
@@ -1112,7 +1100,6 @@ object Form6: TForm6
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = False
-    InBlockEvents = False
     Left = 280
     Top = 32
     object RESTDWClientSQL1ID: TIntegerField

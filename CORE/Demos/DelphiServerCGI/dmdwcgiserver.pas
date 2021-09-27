@@ -9,7 +9,7 @@ uses
   SysUtils, Classes, HTTPApp, WSDLPub, SOAPPasInv, SOAPHTTPPasInv,
   SOAPHTTPDisp, WebBrokerSOAP, Soap.InvokeRegistry, Soap.WSDLIntf,
   System.TypInfo, Soap.WebServExp, Soap.WSDLBind, Xml.XMLSchema,
-  uRESTDWBase, uDmService, uConsts;
+  uRESTDWBase, uDmService, uConsts, uDWAbout;
 
 type
   TdwCGIService = class(TWebModule)
@@ -42,6 +42,7 @@ end;
 
 procedure TdwCGIService.WebModuleCreate(Sender: TObject);
 begin
+ RESTServiceCGI1.RootPath := '.\';
  RESTServiceCGI1.ServerMethodClass := TServerMethodDM;
 end;
 

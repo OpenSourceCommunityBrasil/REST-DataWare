@@ -33,8 +33,6 @@ requires
   rtl,
   DbxCommonDriver,
   dbrtl,
-  DataSnapClient,
-  DataSnapCommon,
   DbxClientDriver,
   CustomIPTransport,
   soaprtl,
@@ -48,11 +46,8 @@ requires
   FireDACCommon,
   bindengine,
   bindcomp,
-  dsnap,
   dbexpress,
   dbxcds,
-  DataSnapServer,
-  DataSnapFireDAC,
   RestDatawareCORE;
 
 contains
