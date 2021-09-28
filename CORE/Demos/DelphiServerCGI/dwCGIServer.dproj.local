@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject>
-	<Transactions>
-    <Transaction>1899/12/30 00:00:00.000.758,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\dwCGIServer.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\EchoService_CGI.dproj</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.499,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\dmdwcgiserver.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\WebModule_U.dfm</Transaction>
-    <Transaction>1899/12/30 00:00:00.000.499,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\dmdwcgiserver.pas=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Samples\DelphiServerCGI\WebModule_U.pas</Transaction>
-  </Transactions>
-</BorlandProject>

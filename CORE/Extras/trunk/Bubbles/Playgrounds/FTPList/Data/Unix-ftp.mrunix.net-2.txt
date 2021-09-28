@@ -1,3 +1,0 @@
-drwxr-xr-x   2 root     110          4096 Sep 27  2000 oracle
-dr-xr-xr-x   2 root     wheel        4096 Sep 12 17:55 unix-stuff
-dr-xr-xr-x   6 root     wheel        4096 May  8 06:59 webalizer
