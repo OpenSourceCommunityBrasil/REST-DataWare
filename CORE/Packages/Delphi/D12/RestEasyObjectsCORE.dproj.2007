@@ -1,0 +1,149 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{9399EB0A-537A-4A78-A6E6-52CD04ADE2C0}</ProjectGuid>
+			<MainSource>RestEasyObjectsCORE.dpk</MainSource>
+			<Config Condition="'$(Config)'==''">Debug</Config>
+			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\RestEasyObjectsCORE.bpl</DCC_DependencyCheckOutputName>
+			<DCC_Optimize>false</DCC_Optimize>
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+			<DCC_Description>Rest Dataware - CORE Objects</DCC_Description>
+			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+			<GenPackage>true</GenPackage>
+			<GenDll>true</GenDll>
+			<DCC_DebugInformation>false</DCC_DebugInformation>
+			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DCC_Platform>x86</DCC_Platform>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DCC_DebugInformation>false</DCC_DebugInformation>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="RestEasyObjectsCORE.dpk">
+				<MainSource>MainSource</MainSource>
+			</DelphiCompile>
+			<DCCReference Include="rtl.dcp"/>
+			<DCCReference Include="soaprtl.dcp"/>
+			<DCCReference Include="IndyCore70.dcp"/>
+			<DCCReference Include="IndySystem70.dcp"/>
+			<DCCReference Include="IndyProtocols70.dcp"/>
+			<DCCReference Include="inet.dcp"/>
+			<DCCReference Include="DesignIDE.dcp"/>
+			<DCCReference Include="vcljpg.dcp"/>
+			<DCCReference Include="Jcl.dcp"/>
+			<DCCReference Include="JvCore.dcp"/>
+			<DCCReference Include="JvDB.dcp"/>
+			<DCCReference Include="dcldb.dcp"/>
+			<DCCReference Include="bdertl.dcp"/>
+			<DCCReference Include="vcl.dcp"/>
+			<DCCReference Include="dbrtl.dcp"/>
+			<DCCReference Include="vclactnband.dcp"/>
+			<DCCReference Include="vclx.dcp"/>
+			<DCCReference Include="vcldb.dcp"/>
+			<DCCReference Include="..\..\..\Source\uRESTDWBase.pas"/>
+			<DCCReference Include="..\..\..\Source\uRESTDWReg.pas"/>
+			<DCCReference Include="..\..\..\Source\libs\ServerUtils.pas"/>
+			<DCCReference Include="..\..\..\Source\libs\StringBuilderUnit.pas"/>
+			<DCCReference Include="..\..\..\Source\libs\SysTypes.pas"/>
+			<DCCReference Include="..\..\..\Source\libs\uDWConsts.pas"/>
+			<DCCReference Include="..\..\..\Source\libs\uDWJSONTools.pas"/>
+			<DCCReference Include="..\..\..\Source\libs\uDWJSONObject.pas"/>
+			<DCCReference Include="..\..\..\Source\uRESTDWPoolerDB.pas"/>
+			<DCCReference Include="..\..\..\Source\uRESTDWMasterDetailData.pas"/>
+			<DCCReference Include="..\..\..\Source\libs\uzliblaz.pas"/>
+			<DCCReference Include="..\..\..\Source\DmDados\uDWDatamodule.pas">
+				<Form>ServerMethodDataModule</Form>
+				<DesignClass>TDataModule</DesignClass>
+			</DCCReference>
+			<DCCReference Include="..\..\..\Source\libs\JSON\uDWJSON.pas"/>
+			<DCCReference Include="..\..\..\Source\Memdataset\uDWDataset.pas"/>
+			<DCCReference Include="..\..\..\Source\uDWSqlEditor.pas">
+				<Form>FrmDWSqlEditor</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\..\Source\uAboutForm.pas">
+				<Form>frm_About</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\..\Source\uDWAbout.pas"/>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_2</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Release">
+				<Key>Cfg_1</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<ProjectExtensions>
+			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
+			<Borland.ProjectType>Package</Borland.ProjectType>
+			<BorlandProject>
+				<Delphi.Personality>
+					<Source>
+						<Source Name="MainSource">RestEasyObjectsCORE.dpk</Source>
+					</Source>
+					<Parameters>
+						<Parameters Name="UseLauncher">False</Parameters>
+						<Parameters Name="LoadAllSymbols">True</Parameters>
+						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+					</Parameters>
+					<Language>
+						<Language Name="RootDir">D:\ACBR\RESTDW\CORE\Packages\Delphi\D7\</Language>
+					</Language>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
+						<VersionInfo Name="MajorVer">1</VersionInfo>
+						<VersionInfo Name="MinorVer">0</VersionInfo>
+						<VersionInfo Name="Release">1</VersionInfo>
+						<VersionInfo Name="Build">4</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">1033</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName">XyberPower Desenvolvimento</VersionInfoKeys>
+						<VersionInfoKeys Name="FileDescription">RestEasyObjectsCORE</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.0.1.4</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName">REST Dataware CORE Version</VersionInfoKeys>
+						<VersionInfoKeys Name="LegalCopyright">REST Dataware CORE Version</VersionInfoKeys>
+						<VersionInfoKeys Name="LegalTrademarks">REST Dataware</VersionInfoKeys>
+						<VersionInfoKeys Name="OriginalFilename"/>
+						<VersionInfoKeys Name="ProductName">RestEasyObjectsCORE</VersionInfoKeys>
+						<VersionInfoKeys Name="ProductVersion">1.0.1</VersionInfoKeys>
+						<VersionInfoKeys Name="ProgramID">com.embarcadero.RestEasyObjectsCORE</VersionInfoKeys>
+					</VersionInfoKeys>
+				</Delphi.Personality>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>

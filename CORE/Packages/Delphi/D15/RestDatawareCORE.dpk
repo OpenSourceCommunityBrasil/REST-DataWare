@@ -1,0 +1,76 @@
+package RestDatawareCORE;
+{$R *.res}
+{$R *.dres}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  designide,
+  dcldb,
+  dbrtl,
+  soaprtl,
+  IndySystem,
+  IndyProtocols,
+  IndyCore,
+  vcl,
+  vcldb,
+  dsnap,
+  bdertl;
+
+contains
+  uDWPoolerMethod in '..\..\..\Source\uDWPoolerMethod.pas',
+  uRESTDWBase in '..\..\..\Source\uRESTDWBase.pas',
+  uRESTDWMasterDetailData in '..\..\..\Source\uRESTDWMasterDetailData.pas',
+  uRESTDWPoolerDB in '..\..\..\Source\uRESTDWPoolerDB.pas',
+  uRESTDWReg in '..\..\..\Source\uRESTDWReg.pas',
+  uDWDatamodule in '..\..\..\Source\DmDados\uDWDatamodule.pas' {ServerMethodDataModule: TDataModule},
+  ServerUtils in '..\..\..\Source\libs\ServerUtils.pas',
+  SysTypes in '..\..\..\Source\libs\SysTypes.pas',
+  uDWConsts in '..\..\..\Source\libs\uDWConsts.pas',
+  uDWConstsData in '..\..\..\Source\libs\uDWConstsData.pas',
+  uDWJSONObject in '..\..\..\Source\libs\uDWJSONObject.pas',
+  uDWJSONTools in '..\..\..\Source\libs\uDWJSONTools.pas',
+  uzliblaz in '..\..\..\Source\libs\uzliblaz.pas',
+  uDWJSON in '..\..\..\Source\libs\JSON\uDWJSON.pas',
+  uDWMassiveBuffer in '..\..\..\Source\libs\uDWMassiveBuffer.pas',
+  StringBuilderUnit in '..\..\..\Source\libs\StringBuilderUnit.pas',
+  uRESTDWServerEvents in '..\..\..\Source\uRESTDWServerEvents.pas',
+  uDWJSONInterface in '..\..\..\Source\libs\JSON\uDWJSONInterface.pas',
+  uDWDataSync in '..\..\..\Source\libs\uDWDataSync.pas',
+  uDWDataset in '..\..\..\Source\Memdataset\uDWDataset.pas',
+  uDWSqlEditor in '..\..\..\Source\uDWSqlEditor.pas' {FrmDWSqlEditor},
+  uDWAbout in '..\..\..\Source\uDWAbout.pas',
+  uAboutForm in '..\..\..\Source\uAboutForm.pas' {frm_About},
+  uDWResponseTranslator in '..\..\..\Source\uDWResponseTranslator.pas',
+  uSystemEvents in '..\..\..\Source\libs\uSystemEvents.pas',
+  uRESTDWServerContext in '..\..\..\Source\uRESTDWServerContext.pas',
+  dwCGIRunner in '..\..\..\Source\dwCGIRunner.pas',
+  dwISAPIRunner in '..\..\..\Source\dwISAPIRunner.pas',
+  uDWFieldSourceEditor in '..\..\..\Source\uDWFieldSourceEditor.pas' {fMasterDetailRelation},
+  uDWReqParamsEditor in '..\..\..\Source\uDWReqParamsEditor.pas' {fParamsEditor},
+  uDWRequestDBG in '..\..\..\Source\uDWRequestDBG.pas' {fRequestDebbug};
+
+end.
+
+

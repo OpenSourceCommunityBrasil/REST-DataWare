@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2020/08/09 14:51:28.000.167,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\Connectors\ApolloDB\Package\Berlin\RESTDWDriverZEOS.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\Connectors\ApolloDB\Package\Berlin\RESTDWDriverApolloDB.dproj</Transaction>
+    <Transaction>2020/08/09 14:52:09.000.103,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\Connectors\ApolloDB\uRESTDWDriverZEOS.pas=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Source\Connectors\ApolloDB\uRestDWDriverApolloDB.pas</Transaction>
+  </Transactions>
+</BorlandProject>

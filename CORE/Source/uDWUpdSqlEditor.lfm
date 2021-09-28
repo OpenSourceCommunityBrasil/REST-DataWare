@@ -1,0 +1,361 @@
+object FrmDWUpdSqlEditor: TFrmDWUpdSqlEditor
+  Left = 472
+  Height = 756
+  Top = 153
+  Width = 1079
+  BorderWidth = 5
+  Caption = 'RESTDWClientSQL Editor'
+  ClientHeight = 756
+  ClientWidth = 1079
+  Color = clBtnFace
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnResize = FormResize
+  Position = poScreenCenter
+  LCLVersion = '2.0.10.0'
+  object PnlSQL: TPanel
+    Left = 5
+    Height = 705
+    Top = 5
+    Width = 1069
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 705
+    ClientWidth = 1069
+    TabOrder = 0
+    object pSQLEditor: TPanel
+      Left = 0
+      Height = 705
+      Top = 0
+      Width = 209
+      Align = alLeft
+      BevelOuter = bvNone
+      ClientHeight = 705
+      ClientWidth = 209
+      TabOrder = 0
+      object labSql: TLabel
+        Left = 0
+        Height = 23
+        Top = 0
+        Width = 209
+        Align = alTop
+        AutoSize = False
+        Caption = ' .: TABLES'
+        Color = clGrayText
+        Font.Color = clWhite
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+        Transparent = False
+      end
+      object Label2: TLabel
+        Left = 0
+        Height = 23
+        Top = 153
+        Width = 209
+        Align = alTop
+        AutoSize = False
+        Caption = ' .: SQL TYPE'
+        Color = clGrayText
+        Font.Color = clWhite
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+        Transparent = False
+      end
+      object lbTables: TListBox
+        Left = 0
+        Height = 130
+        Top = 23
+        Width = 209
+        Align = alTop
+        BorderStyle = bsNone
+        DragMode = dmAutomatic
+        ItemHeight = 0
+        OnClick = lbTablesClick
+        OnKeyUp = lbTablesKeyUp
+        TabOrder = 0
+      end
+      object pSQLTypes: TPanel
+        Left = 0
+        Height = 81
+        Top = 176
+        Width = 209
+        Align = alTop
+        BevelOuter = bvNone
+        ClientHeight = 81
+        ClientWidth = 209
+        TabOrder = 1
+        object rbFetchRowSQL: TRadioButton
+          Left = 88
+          Height = 19
+          Top = 56
+          Width = 68
+          Caption = 'FetchRow'
+          OnClick = rbFetchRowSQLClick
+          TabOrder = 0
+        end
+        object rbUnLockSQL: TRadioButton
+          Left = 8
+          Height = 19
+          Top = 56
+          Width = 51
+          Caption = 'Unlock'
+          OnClick = rbUnLockSQLClick
+          TabOrder = 1
+        end
+        object rbDeleteSQL: TRadioButton
+          Left = 8
+          Height = 19
+          Top = 32
+          Width = 51
+          Caption = 'Delete'
+          OnClick = rbDeleteSQLClick
+          TabOrder = 2
+        end
+        object rbLockSQL: TRadioButton
+          Left = 88
+          Height = 19
+          Top = 32
+          Width = 41
+          Caption = 'Lock'
+          OnClick = rbLockSQLClick
+          TabOrder = 3
+        end
+        object rbModifySQL: TRadioButton
+          Left = 88
+          Height = 19
+          Top = 8
+          Width = 52
+          Caption = 'Modify'
+          OnClick = rbModifySQLClick
+          TabOrder = 4
+        end
+        object rbInsertSQL: TRadioButton
+          Left = 8
+          Height = 19
+          Top = 8
+          Width = 49
+          Caption = 'Insert'
+          Checked = True
+          OnClick = rbInsertSQLClick
+          TabOrder = 5
+          TabStop = True
+        end
+      end
+      object lbFields: TListBox
+        Left = 0
+        Height = 257
+        Top = 448
+        Width = 209
+        Align = alClient
+        BorderStyle = bsNone
+        DragMode = dmAutomatic
+        ItemHeight = 0
+        MultiSelect = True
+        TabOrder = 2
+      end
+      object Label3: TLabel
+        Left = 0
+        Height = 23
+        Top = 425
+        Width = 209
+        Align = alTop
+        AutoSize = False
+        Caption = ' .: FIELDS'
+        Color = clGrayText
+        Font.Color = clWhite
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+        Transparent = False
+      end
+      object lbKeyFields: TListBox
+        Left = 0
+        Height = 145
+        Top = 280
+        Width = 209
+        Align = alTop
+        BorderStyle = bsNone
+        DragMode = dmAutomatic
+        ItemHeight = 0
+        MultiSelect = True
+        TabOrder = 3
+      end
+      object Label1: TLabel
+        Left = 0
+        Height = 23
+        Top = 257
+        Width = 209
+        Align = alTop
+        AutoSize = False
+        Caption = ' .: KEY(S)'
+        Color = clGrayText
+        Font.Color = clWhite
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+        Transparent = False
+      end
+    end
+    object PageControl: TPageControl
+      Left = 209
+      Height = 705
+      Top = 0
+      Width = 860
+      ActivePage = tsInsertSQL
+      Align = alClient
+      TabIndex = 0
+      TabOrder = 1
+      OnChange = PageControlChange
+      object tsInsertSQL: TTabSheet
+        BorderWidth = 5
+        Caption = 'Insert'
+        ClientHeight = 679
+        ClientWidth = 852
+        object mInsertSQL: TMemo
+          Left = 0
+          Height = 679
+          Top = 0
+          Width = 852
+          Align = alClient
+          OnDragDrop = mInsertSQLDragDrop
+          OnDragOver = mInsertSQLDragOver
+          ScrollBars = ssBoth
+          TabOrder = 0
+        end
+      end
+      object tsModifySQL: TTabSheet
+        Caption = 'Modify'
+        ClientHeight = 679
+        ClientWidth = 852
+        ImageIndex = 1
+        object mModifySQL: TMemo
+          Left = 0
+          Height = 679
+          Top = 0
+          Width = 852
+          Align = alClient
+          OnDragDrop = mInsertSQLDragDrop
+          OnDragOver = mInsertSQLDragOver
+          ScrollBars = ssBoth
+          TabOrder = 0
+        end
+      end
+      object tsDeleteSQL: TTabSheet
+        Caption = 'Delete'
+        ClientHeight = 679
+        ClientWidth = 852
+        ImageIndex = 2
+        object mDeleteSQL: TMemo
+          Left = 0
+          Height = 679
+          Top = 0
+          Width = 852
+          Align = alClient
+          OnDragDrop = mInsertSQLDragDrop
+          OnDragOver = mInsertSQLDragOver
+          ScrollBars = ssBoth
+          TabOrder = 0
+        end
+      end
+      object tsLockSQL: TTabSheet
+        Caption = 'Lock'
+        ClientHeight = 679
+        ClientWidth = 852
+        ImageIndex = 3
+        object mLockSQL: TMemo
+          Left = 0
+          Height = 679
+          Top = 0
+          Width = 852
+          Align = alClient
+          OnDragDrop = mInsertSQLDragDrop
+          OnDragOver = mInsertSQLDragOver
+          ScrollBars = ssBoth
+          TabOrder = 0
+        end
+      end
+      object tsUnlockSQL: TTabSheet
+        Caption = 'Unlock'
+        ClientHeight = 679
+        ClientWidth = 852
+        ImageIndex = 4
+        object mUnlockSQL: TMemo
+          Left = 0
+          Height = 679
+          Top = 0
+          Width = 852
+          Align = alClient
+          OnDragDrop = mInsertSQLDragDrop
+          OnDragOver = mInsertSQLDragOver
+          ScrollBars = ssBoth
+          TabOrder = 0
+        end
+      end
+      object tsFetchRowSQL: TTabSheet
+        Caption = 'FetchRow'
+        ClientHeight = 679
+        ClientWidth = 852
+        ImageIndex = 5
+        object mFetchRowSQL: TMemo
+          Left = 0
+          Height = 679
+          Top = 0
+          Width = 852
+          Align = alClient
+          OnDragDrop = mInsertSQLDragDrop
+          OnDragOver = mInsertSQLDragOver
+          ScrollBars = ssBoth
+          TabOrder = 0
+        end
+      end
+    end
+  end
+  object PnlAction: TPanel
+    Left = 5
+    Height = 41
+    Top = 710
+    Width = 1069
+    Align = alBottom
+    BevelOuter = bvNone
+    ClientHeight = 41
+    ClientWidth = 1069
+    TabOrder = 1
+    object BtnOk: TButton
+      Left = 905
+      Height = 25
+      Top = 8
+      Width = 75
+      Anchors = [akTop, akRight]
+      Caption = 'Ok'
+      Default = True
+      ModalResult = 1
+      OnClick = BtnOkClick
+      TabOrder = 0
+    end
+    object BtnCancelar: TButton
+      Left = 986
+      Height = 25
+      Top = 8
+      Width = 75
+      Anchors = [akTop, akRight]
+      Cancel = True
+      Caption = 'Cancel'
+      ModalResult = 2
+      OnClick = BtnCancelarClick
+      TabOrder = 1
+    end
+  end
+end

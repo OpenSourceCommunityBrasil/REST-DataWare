@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="10"/>
+    <BuildModes Active="Default"/>
+    <Units Count="4">
+      <Unit0>
+        <Filename Value="GetBlucosmos.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="20"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="uprincipal.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UPrincipal"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="34"/>
+        <CursorPos X="28" Y="46"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="23" Y="9"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSONInterface.pas"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="383"/>
+        <CursorPos X="12" Y="390"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit3>
+    </Units>
+    <JumpHistory Count="7" HistoryIndex="6">
+      <Position1>
+        <Filename Value="..\..\..\..\Source\libs\uDWJSONObject.pas"/>
+        <Caret Line="9" Column="23"/>
+      </Position1>
+      <Position2>
+        <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSONInterface.pas"/>
+      </Position2>
+      <Position3>
+        <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSONInterface.pas"/>
+        <Caret Line="242" Column="40" TopLine="227"/>
+      </Position3>
+      <Position4>
+        <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSONInterface.pas"/>
+        <Caret Line="250" Column="40" TopLine="235"/>
+      </Position4>
+      <Position5>
+        <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSONInterface.pas"/>
+        <Caret Line="285" Column="18" TopLine="269"/>
+      </Position5>
+      <Position6>
+        <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSONInterface.pas"/>
+        <Caret Line="330" Column="23" TopLine="314"/>
+      </Position6>
+      <Position7>
+        <Filename Value="..\..\..\..\Source\libs\JSON\uDWJSONInterface.pas"/>
+        <Caret Line="357" Column="23" TopLine="342"/>
+      </Position7>
+    </JumpHistory>
+  </ProjectSession>
+</CONFIG>

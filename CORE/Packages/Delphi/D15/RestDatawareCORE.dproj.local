@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<ActiveMobileDevice>
+		<NoProfile iOSSimulator="iPhone5" Android=""/>
+	</ActiveMobileDevice>
+	<Transactions>
+    <Transaction>2019/05/21 10:59:06.022,=bdertl.dcp</Transaction>
+  </Transactions>
+</BorlandProject>

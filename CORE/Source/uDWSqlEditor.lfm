@@ -1,0 +1,273 @@
+object FrmDWSqlEditor: TFrmDWSqlEditor
+  Left = 639
+  Height = 756
+  Top = 125
+  Width = 1079
+  BorderWidth = 5
+  Caption = 'RESTDWClientSQL Editor'
+  ClientHeight = 756
+  ClientWidth = 1079
+  Color = clBtnFace
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnResize = FormResize
+  OnShow = FormShow
+  Position = poScreenCenter
+  LCLVersion = '2.0.10.0'
+  object PnlSQL: TPanel
+    Left = 5
+    Height = 415
+    Top = 5
+    Width = 1069
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 415
+    ClientWidth = 1069
+    TabOrder = 0
+    object PnlButton: TPanel
+      Left = 974
+      Height = 415
+      Top = 0
+      Width = 95
+      Align = alRight
+      BevelOuter = bvNone
+      ClientHeight = 415
+      ClientWidth = 95
+      TabOrder = 0
+      object BtnExecute: TButton
+        Left = 8
+        Height = 25
+        Top = 20
+        Width = 80
+        Caption = 'Execute'
+        OnClick = BtnExecuteClick
+        TabOrder = 0
+      end
+    end
+    object PageControl: TPageControl
+      Left = 216
+      Height = 377
+      Top = 0
+      Width = 583
+      ActivePage = TabSheetSQL
+      TabIndex = 0
+      TabOrder = 1
+      object TabSheetSQL: TTabSheet
+        BorderWidth = 5
+        Caption = 'SQL Command'
+        ClientHeight = 351
+        ClientWidth = 575
+        object Memo: TMemo
+          Left = 0
+          Height = 351
+          Top = 0
+          Width = 575
+          Align = alClient
+          OnDragDrop = MemoDragDrop
+          OnDragOver = MemoDragOver
+          ScrollBars = ssBoth
+          TabOrder = 0
+        end
+      end
+    end
+    object pSQLEditor: TPanel
+      Left = 0
+      Height = 415
+      Top = 0
+      Width = 209
+      Align = alLeft
+      BevelOuter = bvNone
+      ClientHeight = 415
+      ClientWidth = 209
+      TabOrder = 2
+      object labSql: TLabel
+        Left = 0
+        Height = 23
+        Top = 0
+        Width = 209
+        Align = alTop
+        AutoSize = False
+        Caption = ' .: TABLES'
+        Color = clGrayText
+        Font.Color = clWhite
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+        Transparent = False
+      end
+      object Label1: TLabel
+        Left = 0
+        Height = 23
+        Top = 232
+        Width = 209
+        Align = alTop
+        AutoSize = False
+        Caption = ' .: FIELDS'
+        Color = clGrayText
+        Font.Color = clWhite
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+        Transparent = False
+      end
+      object Label2: TLabel
+        Left = 0
+        Height = 23
+        Top = 153
+        Width = 209
+        Align = alTop
+        AutoSize = False
+        Caption = ' .: SQL TYPE'
+        Color = clGrayText
+        Font.Color = clWhite
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+        Transparent = False
+      end
+      object lbTables: TListBox
+        Left = 0
+        Height = 130
+        Top = 23
+        Width = 209
+        Align = alTop
+        BorderStyle = bsNone
+        DragMode = dmAutomatic
+        ItemHeight = 0
+        OnClick = lbTablesClick
+        OnKeyUp = lbTablesKeyUp
+        TabOrder = 0
+      end
+      object lbFields: TListBox
+        Left = 0
+        Height = 160
+        Top = 255
+        Width = 209
+        Align = alClient
+        BorderStyle = bsNone
+        DragMode = dmAutomatic
+        ItemHeight = 0
+        MultiSelect = True
+        TabOrder = 1
+      end
+      object pSQLTypes: TPanel
+        Left = 0
+        Height = 56
+        Top = 176
+        Width = 209
+        Align = alTop
+        BevelOuter = bvNone
+        ClientHeight = 56
+        ClientWidth = 209
+        TabOrder = 2
+        object rbInsert: TRadioButton
+          Left = 88
+          Height = 19
+          Top = 8
+          Width = 49
+          Caption = 'Insert'
+          TabOrder = 0
+        end
+        object rbSelect: TRadioButton
+          Left = 8
+          Height = 19
+          Top = 8
+          Width = 49
+          Caption = 'Select'
+          Checked = True
+          TabOrder = 1
+          TabStop = True
+        end
+        object rbDelete: TRadioButton
+          Left = 88
+          Height = 19
+          Top = 32
+          Width = 51
+          Caption = 'Delete'
+          TabOrder = 2
+        end
+        object rbUpdate: TRadioButton
+          Left = 8
+          Height = 19
+          Top = 32
+          Width = 55
+          Caption = 'Update'
+          TabOrder = 3
+        end
+      end
+    end
+  end
+  object PnlAction: TPanel
+    Left = 5
+    Height = 41
+    Top = 710
+    Width = 1069
+    Align = alBottom
+    BevelOuter = bvNone
+    ClientHeight = 41
+    ClientWidth = 1069
+    TabOrder = 1
+    object BtnOk: TButton
+      Left = 905
+      Height = 25
+      Top = 8
+      Width = 75
+      Anchors = [akTop, akRight]
+      Caption = 'Ok'
+      Default = True
+      ModalResult = 1
+      OnClick = BtnOkClick
+      TabOrder = 0
+    end
+    object BtnCancelar: TButton
+      Left = 986
+      Height = 25
+      Top = 8
+      Width = 75
+      Anchors = [akTop, akRight]
+      Cancel = True
+      Caption = 'Cancel'
+      ModalResult = 2
+      OnClick = BtnCancelarClick
+      TabOrder = 1
+    end
+  end
+  object PageControlResult: TPageControl
+    Left = 5
+    Height = 290
+    Top = 420
+    Width = 1069
+    ActivePage = TabSheetTable
+    Align = alBottom
+    TabIndex = 0
+    TabOrder = 2
+    object TabSheetTable: TTabSheet
+      BorderWidth = 5
+      Caption = 'RecordSet'
+      ClientHeight = 264
+      ClientWidth = 1061
+      object DBGridRecord: TDBGrid
+        Left = 0
+        Height = 264
+        Top = 0
+        Width = 1061
+        Align = alClient
+        Color = clWindow
+        Columns = <>
+        TabOrder = 0
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+      end
+    end
+  end
+end

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2018/09/09 10:33:19.000.255,D:\Meus Dados\Genesis\Archive\Projetos\clinux\Web\webpascal\DicomVIX\TempCGI\DicomVixISAPI.dproj=D:\Meus Dados\Genesis\Archive\Projetos\clinux\Web\webpascal\DicomVIX\TempCGI\RestDWServerISAPI.dproj</Transaction>
+    <Transaction>2018/09/09 10:33:55.000.690,D:\Meus Dados\Genesis\Archive\Projetos\clinux\Web\webpascal\DicomVIX\uDmService.pas=</Transaction>
+    <Transaction>2018/09/09 10:34:03.000.453,=D:\Meus Dados\Genesis\Archive\Projetos\clinux\Web\webpascal\DicomVIX\uDmService.pas</Transaction>
+    <Transaction>2018/09/09 10:39:29.000.841,D:\Meus Dados\Genesis\Archive\Projetos\clinux\Web\webpascal\DicomVIX\TempCGI\DicomVixi.dproj=D:\Meus Dados\Genesis\Archive\Projetos\clinux\Web\webpascal\DicomVIX\TempCGI\DicomVixISAPI.dproj</Transaction>
+    <Transaction>2018/09/09 10:39:38.000.535,D:\Meus Dados\Genesis\Archive\Projetos\clinux\Web\webpascal\DicomVIX\TempCGI\dicomvixisapi.dproj=D:\Meus Dados\Genesis\Archive\Projetos\clinux\Web\webpascal\DicomVIX\TempCGI\DicomVixi.dproj</Transaction>
+    <Transaction>2018/10/09 09:52:30.000.983,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\Webpascal\Server\ISAPI\dicomvixisapi.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\Webpascal\Server\ISAPI\webpascalisapi.dproj</Transaction>
+  </Transactions>
+</BorlandProject>

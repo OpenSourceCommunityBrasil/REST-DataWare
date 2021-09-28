@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2020/10/14 05:01:56.165,=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit13.pas</Transaction>
+    <Transaction>2020/10/14 05:02:37.182,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\DWTable\Unit13.pas=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit13.pas</Transaction>
+    <Transaction>2020/10/14 05:02:37.182,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\DWTable\Unit13.dfm=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit13.dfm</Transaction>
+    <Transaction>2020/10/14 05:02:44.880,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\DWTable\DwTableSample.dproj=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+  </Transactions>
+</BorlandProject>

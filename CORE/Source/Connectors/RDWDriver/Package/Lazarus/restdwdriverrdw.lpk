@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="4">
+    <PathDelim Value="\"/>
+    <Name Value="RESTDWDriverRDW"/>
+    <Type Value="RunAndDesignTime"/>
+    <Author Value="Gilberto Rocha da Silva"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="..\..\..\..;..\..\..\..\libs\Synopse;..\..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
+        <Libraries Value="..\..\..\..\libs\Synopse;..\..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
+        <OtherUnitFiles Value="..\..;..\..\..\..\libs;..\..\..\..;..\..\..\..\libs\JSON;..\..\..\..\DmDados;..\..\..\..\DCP;..\..\..\..\DCP\Ciphers;..\..\..\..\DCP\Hashes;..\..\..\..\Memdataset;..\..\..\..\libs\Synopse"/>
+        <UnitOutputDirectory Value="..\..\..\.."/>
+      </SearchPaths>
+    </CompilerOptions>
+    <Description Value="The proposal was fulfilled. REST DW was created to facilitate the creation of CRUDs in the same model that we created applications for Client / Server Database. Today, being able to write data to a bank via WebService is too complex for simple operations, making scheduling of simple screens time-consuming. With REST Dataware, you no longer have to worry about creating SQL Insertion, Deletion, Read, and Execution methods via Webservice; Simply add a RESTDataBase connection component and add a RESTClientSQL component that will already have your SQL solution fully functional as you did back in the day and with all the power of modern REST / JSON technology with data compression and everything the language can offer. Have fun.
+"/>
+    <License Value="GPL- 3.0"/>
+    <Version Major="1" Minor="4" Release="4" Build="8"/>
+    <Files Count="4">
+      <Item1>
+        <Filename Value="..\..\uRESTDWDriverRDW.pas"/>
+        <UnitName Value="uRESTDWDriverRDW"/>
+      </Item1>
+      <Item2>
+        <Filename Value="uRESTDWDriverRDWReg.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="uRESTDWDriverRDWReg"/>
+      </Item2>
+      <Item3>
+        <Filename Value="restdwdriverrdw.lrs"/>
+        <Type Value="LRS"/>
+      </Item3>
+      <Item4>
+        <Filename Value="..\..\..\..\uRESTDW.inc"/>
+        <Type Value="Include"/>
+      </Item4>
+    </Files>
+    <RequiredPkgs Count="2">
+      <Item1>
+        <PackageName Value="indylaz"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="FCL"/>
+      </Item2>
+    </RequiredPkgs>
+    <UsageOptions>
+      <LibraryPath Value="..\..\..\..\libs\Synopse;..\..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

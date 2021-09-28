@@ -1,0 +1,24 @@
+[Stats]
+<<<<<<< .mine
+EditorSecs=36473
+||||||| .r863
+EditorSecs=8268
+=======
+EditorSecs=8274
+>>>>>>> .r882
+DesignerSecs=595
+InspectorSecs=1095
+<<<<<<< .mine
+CompileSecs=2393025
+OtherSecs=8992
+||||||| .r863
+CompileSecs=276158
+OtherSecs=1076
+=======
+CompileSecs=277672
+OtherSecs=1105
+>>>>>>> .r882
+StartTime=19/10/2017 16:25:34
+RealKeys=0
+EffectiveKeys=0
+DebugSecs=20

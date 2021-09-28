@@ -1,0 +1,24 @@
+object dwCGIService: TdwCGIService
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  Actions = <>
+  CreateSession = False
+  Kind = wkOneShot
+  Height = 150
+  HorizontalOffset = 256
+  VerticalOffset = 127
+  Width = 150
+  PPI = 96
+  object RESTServiceCGI1: TRESTServiceCGI
+    CORS = False
+    ServerParams.HasAuthentication = False
+    ServerParams.UserName = 'testserver'
+    ServerParams.Password = 'testserver'
+    Encoding = esUtf8
+    ForceWelcomeAccess = False
+    ServerContext = 'cgi-gin/webpascalcgi.cgi'
+    RootPath = '/'
+    left = 64
+    top = 48
+  end
+end

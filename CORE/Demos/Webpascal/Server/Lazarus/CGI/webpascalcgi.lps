@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="10"/>
+    <BuildModes Active="Default"/>
+    <Units Count="21">
+      <Unit0>
+        <Filename Value="webpascalcgi.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="2"/>
+        <UsageCount Value="99"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="dmdwcgiserver.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="dwCGIService"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="DataModule"/>
+        <TopLine Value="38"/>
+        <CursorPos X="33" Y="49"/>
+        <UsageCount Value="99"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="uConsts.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="8"/>
+        <CursorPos X="94" Y="16"/>
+        <UsageCount Value="99"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="..\uDmService.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ServerMethodDM"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="DataModule"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="7"/>
+        <CursorPos X="23" Y="19"/>
+        <UsageCount Value="33"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="uDmService.pas"/>
+        <ComponentName Value="ServerMethodDM"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="DataModule"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="125"/>
+        <CursorPos X="24" Y="131"/>
+        <UsageCount Value="85"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="..\..\Source\uRESTDWBase.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="30"/>
+        <CursorPos X="92" Y="39"/>
+        <UsageCount Value="39"/>
+        <Bookmarks Count="3">
+          <Item0 X="28" Y="2877" ID="3"/>
+          <Item1 X="53" Y="883" ID="2"/>
+          <Item2 X="56" Y="1215" ID="1"/>
+        </Bookmarks>
+      </Unit5>
+      <Unit6>
+        <Filename Value="..\..\Source\libs\SysTypes.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="157"/>
+        <CursorPos X="30" Y="165"/>
+        <UsageCount Value="20"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="..\..\Source\libs\uDWJSONObject.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="869"/>
+        <CursorPos Y="869"/>
+        <UsageCount Value="37"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\..\Source\libs\uDWConsts.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="63"/>
+        <CursorPos X="42" Y="70"/>
+        <UsageCount Value="34"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="..\..\Source\libs\uzliblaz.pas"/>
+        <UnitName Value="uZlibLaz"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="48"/>
+        <CursorPos X="17" Y="48"/>
+        <UsageCount Value="12"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-web\src\base\httpdefs.pp"/>
+        <UnitName Value="HTTPDefs"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="966"/>
+        <CursorPos X="3" Y="976"/>
+        <UsageCount Value="9"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="..\..\Source\libs\uDWMassiveBuffer.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="719"/>
+        <CursorPos X="68" Y="722"/>
+        <UsageCount Value="5"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="..\..\Source\libs\uDWConstsData.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="50"/>
+        <CursorPos X="33" Y="58"/>
+        <UsageCount Value="8"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="..\..\Source\libs\uDWJSONTools.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="539"/>
+        <CursorPos Y="547"/>
+        <UsageCount Value="6"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="C:\Users\XyberX\AppData\Local\lazarus\onlinepackagemanager\packages\Indy10\source\IdURI.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="303"/>
+        <CursorPos Y="318"/>
+        <UsageCount Value="6"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="..\..\Source\uRESTServerEvents.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="290"/>
+        <CursorPos Y="293"/>
+        <UsageCount Value="5"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="..\..\Source\uRESTDWServerEvents.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="794"/>
+        <CursorPos X="23" Y="802"/>
+        <UsageCount Value="5"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="..\..\Source\uRESTDWReg.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="23"/>
+        <CursorPos X="36" Y="32"/>
+        <UsageCount Value="5"/>
+        <Bookmarks Count="2">
+          <Item0 X="36" Y="32" ID="1"/>
+          <Item1 X="81" Y="8" ID="2"/>
+        </Bookmarks>
+      </Unit17>
+      <Unit18>
+        <Filename Value="..\..\Source\libs\JSON\uDWJSON.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1095"/>
+        <CursorPos Y="1105"/>
+        <UsageCount Value="7"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="C:\lazarus\lcl\lresources.pp"/>
+        <UnitName Value="LResources"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3149"/>
+        <CursorPos X="38" Y="3154"/>
+        <UsageCount Value="6"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="..\..\Source\uDWResponseTranslator.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="30"/>
+        <CursorPos X="19" Y="34"/>
+        <UsageCount Value="24"/>
+      </Unit20>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="113" TopLine="98"/>
+      </Position1>
+      <Position2>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="65" Column="3" TopLine="58"/>
+      </Position2>
+      <Position3>
+        <Filename Value="..\uDmService.pas"/>
+      </Position3>
+      <Position4>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="116" Column="11" TopLine="114"/>
+      </Position4>
+      <Position5>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="92" Column="3" TopLine="89"/>
+      </Position5>
+      <Position6>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="84" TopLine="74"/>
+      </Position6>
+      <Position7>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="102" Column="48" TopLine="102"/>
+      </Position7>
+      <Position8>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="94" Column="12" TopLine="86"/>
+      </Position8>
+      <Position9>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="107" Column="50" TopLine="98"/>
+      </Position9>
+      <Position10>
+        <Filename Value="..\uDmService.pas"/>
+      </Position10>
+      <Position11>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="27" Column="27" TopLine="11"/>
+      </Position11>
+      <Position12>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="28" Column="27" TopLine="12"/>
+      </Position12>
+      <Position13>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="29" Column="40"/>
+      </Position13>
+      <Position14>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="184" Column="31" TopLine="178"/>
+      </Position14>
+      <Position15>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="214" Column="67" TopLine="203"/>
+      </Position15>
+      <Position16>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="181" TopLine="166"/>
+      </Position16>
+      <Position17>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="201" TopLine="201"/>
+      </Position17>
+      <Position18>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="177" TopLine="177"/>
+      </Position18>
+      <Position19>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="34" Column="21" TopLine="28"/>
+      </Position19>
+      <Position20>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="8" Column="66"/>
+      </Position20>
+      <Position21>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Column="16"/>
+      </Position21>
+      <Position22>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="210" TopLine="205"/>
+      </Position22>
+      <Position23>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="15" Column="58"/>
+      </Position23>
+      <Position24>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Column="16"/>
+      </Position24>
+      <Position25>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="210" TopLine="199"/>
+      </Position25>
+      <Position26>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="35" Column="46" TopLine="21"/>
+      </Position26>
+      <Position27>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="210" Column="4" TopLine="207"/>
+      </Position27>
+      <Position28>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="224" Column="17" TopLine="213"/>
+      </Position28>
+      <Position29>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="215" Column="57" TopLine="207"/>
+      </Position29>
+      <Position30>
+        <Filename Value="..\uDmService.pas"/>
+        <Caret Line="19" Column="23" TopLine="7"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectSession>
+  <Debugging>
+    <BreakPoints Count="2">
+      <Item1>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\Source\uRESTDWBase.pas"/>
+        <Line Value="901"/>
+      </Item1>
+      <Item2>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\Source\uRESTDWBase.pas"/>
+        <Line Value="1154"/>
+      </Item2>
+    </BreakPoints>
+  </Debugging>
+</CONFIG>

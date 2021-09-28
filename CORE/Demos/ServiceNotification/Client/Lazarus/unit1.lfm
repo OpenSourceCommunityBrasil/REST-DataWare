@@ -1,0 +1,98 @@
+object Form1: TForm1
+  Left = 272
+  Height = 312
+  Top = 145
+  Width = 657
+  Caption = 'Form1'
+  ClientHeight = 312
+  ClientWidth = 657
+  LCLVersion = '2.2.0.1'
+  object Button1: TButton
+    Left = 101
+    Height = 25
+    Top = 32
+    Width = 99
+    Caption = 'Connect'
+    OnClick = Button1Click
+    TabOrder = 0
+  end
+  object Button2: TButton
+    Left = 101
+    Height = 25
+    Top = 56
+    Width = 99
+    Caption = 'Disconnect'
+    OnClick = Button2Click
+    TabOrder = 1
+  end
+  object ePorta: TEdit
+    Left = 232
+    Height = 23
+    Top = 58
+    Width = 121
+    TabOrder = 2
+    Text = '9092'
+  end
+  object eHost: TEdit
+    Left = 232
+    Height = 23
+    Top = 32
+    Width = 121
+    TabOrder = 3
+    Text = '127.0.0.1'
+  end
+  object Memo1: TMemo
+    Left = 232
+    Height = 185
+    Top = 115
+    Width = 385
+    TabOrder = 4
+  end
+  object Button3: TButton
+    Left = 101
+    Height = 25
+    Top = 82
+    Width = 99
+    Caption = 'SendToServer'
+    OnClick = Button3Click
+    TabOrder = 5
+  end
+  object eConnectionName: TEdit
+    Left = 232
+    Height = 23
+    Top = 86
+    Width = 177
+    TabOrder = 6
+  end
+  object Button4: TButton
+    Left = 415
+    Height = 21
+    Top = 86
+    Width = 122
+    Caption = 'Rename Connection'
+    OnClick = Button4Click
+    TabOrder = 7
+  end
+  object RESTDWClientNotification1: TRESTDWClientNotification
+    Active = False
+    AcceptUserMessage = True
+    AcceptStream = True
+    AcceptFileStream = True
+    Host = 'localhost'
+    AuthenticationOptions.AuthorizationOption = rdwAONone
+    ProxyOptions.BasicAuthentication = False
+    ProxyOptions.ProxyPort = 0
+    RequestTimeOut = 10000
+    ConnectTimeOut = 3000
+    Encoding = esUtf8
+    CriptOptions.Use = False
+    CriptOptions.Key = 'RDWBASEKEY256'
+    DatabaseCharSet = csUndefined
+    OnReceiveMessage = RESTDWClientNotification1ReceiveMessage
+    OnBeforeConnect = RESTDWClientNotification1BeforeConnect
+    OnConnect = RESTDWClientNotification1Connect
+    OnDisconnect = RESTDWClientNotification1Disconnect
+    Left = 116
+    Top = 172
+  end
+end

@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>LoadFromFile Method</TITLE>
+<link rel="stylesheet" type="text/css" href="help.css">
+</HEAD>
+
+<BODY class="v114">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="LoadFromFile">
+</OBJECT>
+
+<H1><A NAME="loadfromfile_method"></A><B>LoadFromFile Method</B></H1>
+<HR>
+
+<H2 class="AppliesTo">Applies to</H2>
+<P><A HREF="thtmlviewer_component.htm">THtmlViewer</A>, <A HREF="tframeviewer_component.htm">TFrameViewer</A>, and <A HREF="tframebrowser_component.htm">TFrameBrowser</A> components</P>
+
+<H2 class="Declaration">Declaration</H2>
+
+<P>procedure LoadFromFile(const FileName: <A href="type_thtstring.htm">ThtString</A>; DocType: <A href="type_thtmlfiletype.htm">THtmlFileType</A> = HtmlType);</P>
+
+<H2 class="Description">Description</H2>
+
+<P>The LoadFromFile method loads a document of the given type for viewing, where Filename is the name and DocType the type of the file to be loaded.</P>
+
+<P>Filename may optionally contain a document position identifier separated from the actual filename by a <B>#</B> sign.</P>
+
+<H2 class="Example">Example</H2>
+<PRE>
+Viewer.LoadFromFile('MyHTML.htm#Contents');
+</PRE>
+
+<P>would load MyHTML.htm and position the view to the location where the "Contents" target was defined.</P>
+
+<H2 class"SeeAlso">See also</H2>
+<UL class="SeeAlso">
+<LI><A HREF="loadfromdocument_method.htm">LoadFromDocument Method</A>
+<LI><A HREF="loadfromstream_method.htm">LoadFromStream Method</A>
+<LI><A HREF="loadfromstring_method.htm">LoadFromString Method</A>
+</UL>
+
+</BODY>
+</HTML>

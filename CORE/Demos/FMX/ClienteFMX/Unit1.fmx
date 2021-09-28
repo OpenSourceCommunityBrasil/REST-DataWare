@@ -1,0 +1,665 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 566
+  ClientWidth = 427
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object tbc1: TTabControl
+    Align = Client
+    Size.Width = 427.000000000000000000
+    Size.Height = 566.000000000000000000
+    Size.PlatformDefault = False
+    TabHeight = 49.000000000000000000
+    TabIndex = 0
+    TabOrder = 10
+    TabPosition = None
+    Sizes = (
+      427s
+      566s
+      427s
+      566s)
+    object tablista: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 8.000000000000000000
+      Size.Height = 8.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 't1'
+      ExplicitSize.cx = 8.000000000000000000
+      ExplicitSize.cy = 8.000000000000000000
+      object Layout1: TLayout
+        Align = Client
+        Size.Width = 427.000000000000000000
+        Size.Height = 566.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object tlb1: TToolBar
+          Size.Width = 427.000000000000000000
+          Size.Height = 48.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          object Text1: TText
+            Align = Client
+            Size.Width = 305.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'RESTDataware Core Version'
+            TextSettings.Font.Size = 20.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+          end
+          object btn1: TButton
+            Align = Right
+            Position.X = 379.000000000000000000
+            Size.Width = 48.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            StyleLookup = 'refreshtoolbutton'
+            TabOrder = 1
+            Text = 'btn1'
+            OnClick = btn1Click
+          end
+          object img1: TImage
+            MultiResBitmap.Height = 36
+            MultiResBitmap.Width = 36
+            MultiResBitmap = <
+              item
+                Width = 36
+                Height = 36
+                PNG = {
+                  89504E470D0A1A0A0000000D4948445200000024000000240806000000E10098
+                  98000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                  0AE3494441545847C5576B6C93E7157E6C7FBE3BB173B14370807029A1E51220
+                  B4140A25504D555BA6AEA04A1489A2B6DAFA63AAB46A1AEAAA4AAD34EDCFB46A
+                  62FBB71F5D8744416AF76F95A64AEB1863DC4A80B0845C489C98C409B11D5F12
+                  DFAF7BCE6BC72403A16ED3B4231F7D9FBFCB799FF79CE75C3E1DFE437102AE27
+                  81CE1DC0937B80DD5920FF77E0C23740CF30D03B0324AB8FFE5BF2AD017500ED
+                  9B816DCF70F11D26D3539BDADA3A5D4D4D4ED8EDB44233E5724553290483C1F0
+                  ED60B0F79B74FACA25E02241DE9C040255538F948702F2002D04B0B613D8DAA5
+                  694F6DF77ABB3A9CCE4DE65289AEA16FEAEB315328209849231E8B233DC9E578
+                  CFBABC154E57033C361B5A340D482480580C5391487ECA62E9BB1108F4F4E472
+                  577BE9413FE09B06C2D5256BA2003DC1DF5EE0992EE0A96D75753B562F5FFE78
+                  5363A3198E3AC06040B15444707E1ED170182982C887C2286532CA80819AA716
+                  A9362A7DA4546F3241F3B861375BE06A20486E44475B28F2C9741AA170387527
+                  14BADD1B8D5EEB01AE5E67A86F00030AD0694DFBC3D1CD9B0F61D932E5F60C5F
+                  9AE3EE529108F29301949209D0374AE4280B9618263926F87C940BC2E3816D68
+                  081E5E17A33A5E17B07A39AF1EF5562B0CCBBDB03535C2E170C02C5E1423F118
+                  70EB16D665328F29403F71BB3FFA4577F78733172FC2706F06E562E1FEC2D4A2
+                  5EAF3C5010E542722EF7323C1FE2D1FBD96778E2A59770DEE5C2325E6BAA8232
+                  F068E491CB2A708672895A054715C9B7B4A0A9BB1BB7AF5D2B3E373AEA54D76F
+                  C7E3FD181B8335108085E1B1D2B566AA463510CCC2CB8BA5C885C903640E1FC6
+                  A6D75E8387BC5AFBE9A7B8CB6B59DE5BA0A79C89E8F9DFA0A73DDA348A7D7AC7
+                  A219609999816E6404E148E4A664A65ACB9FCB8D158C46686EB772B5489161CB
+                  8A92AC45AA0AC322A593A13F7204BBBEF802641A235DC696D75FC7DA1327AA4C
+                  2DD73C21CF0B0F850AA205AA884E9622D760B1E06E2C3626D714A0096074BA58
+                  CC99EAEAD48EC478B6B919B9175E4066FF7ECCF25AA40A4C4FEB2501CD6757F2
+                  FEFCA953080F0FAB77FACF9C41FDCE9DB0F35DF160054849BD2B2033070EA0F8
+                  E28B28926FA55299D42038E11F9FF595CB237CA402280E44C7B3599FC69AA200
+                  8932FEA5C646E8BAF7C179FA348CEFBF0F2637E66848E3BD06664AF2F8715CA4
+                  064747A16768AF1D3D0A1F4358CF8430EAF44811C838DFD1BDF71E1ACE9E857E
+                  5F374A0450E6B3B28AACA3CA084BC81D6050FE0ADF944C64B36370D837C8433A
+                  1A338742C813488AFF8BDBB7A3E9D727D170EC186E6CDD0A7D360B178D38788F
+                  7949664AE2036E92DAC5BA936649B8C7FFF35C78F3F5EBB013FCEC3BEF407FED
+                  9A7A47659F514399800DCC3CE47260BC7C62437948643C991C85C158CD2EA62C
+                  89E7A0BAE90D138DF6EFD98B0453734BEF4D64F6EE85E1955730CFD84B35CACF
+                  CD291BA9781CF37C3EF5FCF39861E81EE37B06BF1F7DBB764123183701D6D1A6
+                  248B8458D6B29043090216DA888D1A205F3C3EC434A8B87191E8B8401DD5CE17
+                  27BEFC122B3B36E0D0F9F328AC6EC7757A82D516A9D959657C868BF45163E4C8
+                  AB972F63636727E25F7D053B813B244CB4B320C23079C7C864F2C76201029A92
+                  EBF701CDCD2997E9E84271A58880937C28D2101D8B2C773CC4D41649F0E646F2
+                  6AC7C71FC3B36BB7CACA8D274FA2F3C30F61646D91FAE3FBFC7304CF9D839921
+                  153B15EFDF17B50A6D4FA6E6D5DA22350EB1F3F99204A29174C5290556891890
+                  8258649C8BF4843F9B4191356BDD071FA091A4CFF181987F0C83FDFD58F7F6DB
+                  B09ACD88CF4670737010536CB4459B55A5799E1E62822B7BCA4FBC5662B51619
+                  9B4FA90C13A9798823836FA2508859ABA9BF20B28B348196D897365CBA02EFB1
+                  E348B197A5A7A611E8EB47884012B351245369440708E2662FE6C6FD48044368
+                  E9DE0FEF854BC8EFD9A332AE527D2A22A543B2589A32D79682AFA40688920B64
+                  326306ABE5FE2E2892FEE2A1ACD50683CD82D2C424D2D91C478C106658656766
+                  826CE87136F624CF43B8C7D613628626D359846F0F221D8DA0CC822B79B878A3
+                  223A195D184E9606456891C580C05A340AA36949AC251BE43C954C22CD90B57A
+                  5BD947DD2C1FF5B012A49052D4CC5059B9193B17A9A3975D2E2756AD5905779D
+                  0339D625D954859915119B1AC95E261588E6E18046E7E69869AC0FD5FF0B2772
+                  D033554B746F963548631FB292FC26935057A60916C9A4542C1DBB8099E3521D
+                  9AD8D11BC847039FFD57328BC835C9DCE0E4649699CABA58912580D84F7C92FA
+                  355171AB74EE020BA11875B2F809A00C53BE02248948248A3067A538C708099D
+                  DC13CF3A384FC9B3B289C50B891D0124B56E52D3C6434C5A7583B2D44312321A
+                  D2B39C4B9F51A23A205448A6A7A771F5EA15040293AA55D86C76152287A372B4
+                  7152143599CCE4550C972E5DC4DF58B38ADC4CC597D53D720D196924E5FDD168
+                  2D5C224B00D16F77427CD9442F088C1AB1ABC765AC2F3242F8FD77D1D7F70F0C
+                  0CDCE6D4E253E48E44C224F4347CBE51DEBB45EDC32C39B766F56A3531E6AA36
+                  44A4CE951A986104369CCF33C9EECB1240ECEA535385C29495BBAC49B902ABC0
+                  6C30994DE8DAB1037BD93AD6AC594BE2BA94672C24A7A8DDEE207F9CF07ADBB0
+                  7BF76E1C3C7810AB57AD429EC45DD8544D383F492D5A9C61224B0089B0C9FA0C
+                  345ECB08864C2049DD107EC8AE44640475BB3D246FB3E28AD96C535927209D4E
+                  97CA3C4D33622E95E47B09D55017442C1864D3DC24D1D4082DF200A0D1647298
+                  D6D44B8B77251E90FAF2F5D77F61587C6CD039F2484735548F9C084952F95F92
+                  8F8260105FB2F79DE3F3026E3120D9AC99252247F2335E8F06743791F0716B35
+                  0FE91832012629DFDEDECEDD3B19D70006D91A44C7C72B1C8A4667C9A129F57F
+                  707000434383CCAE0CBABABA54660A871673D24E90D3D1689C23AF4CBD3579D0
+                  4391C888B05F475052D617FCA467A864A7DBB66DC53E0E5A1D1D1D68E66428E1
+                  121E097FA4204AED696F5F8D3D1C575E7EF97B686B6D5559B6206A73549922C6
+                  3319E961F76F521E00E42B95EEC81C6D609F915A220F08C5239C79E6F339D4B3
+                  98E5D83A8CACE8B2B8A81449030BAAC5625500E5BF78D4C630CBBC748F1E9436
+                  AA16E3F5224B88F86B34165B122E910743464CD3CC3529EB6A0EA4012B7753CF
+                  02F8AB777F8C4FD85073F524749B172DFC8E938E2F446EE0176B535393BAE6F1
+                  7A617237E38FE36338F1A37791ECE9A97C1A31ABE4332A4B8F82197BB75C5E92
+                  61220B615D22FE152BE6567676D64DF213797E7C1C0516399987CE53CFBA1AD1
+                  B8EF59781E7F1C164F0B347A4306798EDAEAF3A6442F66597F22A32398BA7001
+                  0708EA30DF93B818A544AC5F8F152B5702B4FD464FCF5B9CAE3EE1AD9A3C14D0
+                  778183EF35377FB07BC3869DDC3666980D630466E697A990B39F2AC3BB7C8D64
+                  99DA45F62F3165905A4522BBF8AF8DBA99DA4C4DB26679D6AFC34A5676F61784
+                  8686664F4D4E7EFA33E0E7F281C1476AF250400BF21DE0C0714D7BE319AFF748
+                  FBA64D5A9A1EE867FB98EBED8591692FED40482A4D460CC9B4271C9050E71922
+                  FBF66D58DFB602F53C672AE26A6FEFE5DFA752A7CEF2EB3DC20F183EF6803C12
+                  D08278B9E1B780E38756AC78B5B3A3A393551077F8DDCF59189981811A10098B
+                  992169A5579FE00C249F37FEE1E1893F8F8CFCE91470EAAFC005B1F728F95680
+                  16CB7340F7F7ADD637F7BA5C47966FD9624C92FC3D1C79CBFC74EA5CDE0A17C3
+                  8689099CF3F9BEFA6D22F1BB33C0E77C6DF1B0F8BF11F1DA47C04FC7DCEEC1F2
+                  D34F97CBCF3E5B0E2F5B16F80DF0CB6DC096EA63FF1F791338F643E0073C1576
+                  FF1702FC13F3C0E8B6479E89920000000049454E44AE426082}
+                FileName = 
+                  'C:\CompXE_10_2\RestDW\CORE\Samples\SimpleServer\CienteFMX\Artwor' +
+                  'k\Android\FM_LauncherIcon_36x36.png'
+              end>
+            Align = Left
+            Size.Width = 74.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+          end
+        end
+        object Layout2: TLayout
+          Align = Client
+          Size.Width = 427.000000000000000000
+          Size.Height = 518.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          object Layout3: TLayout
+            Align = Client
+            Size.Width = 427.000000000000000000
+            Size.Height = 224.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+            object StringGrid1: TStringGrid
+              OnTap = StringGrid1Tap
+              Align = Client
+              CanFocus = True
+              ClipChildren = True
+              Size.Width = 427.000000000000000000
+              Size.Height = 224.000000000000000000
+              Size.PlatformDefault = False
+              TabOrder = 0
+              RowCount = 0
+              Viewport.Width = 423.000000000000000000
+              Viewport.Height = 199.000000000000000000
+            end
+          end
+          object Layout4: TLayout
+            Align = Top
+            Size.Width = 427.000000000000000000
+            Size.Height = 131.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 1
+            object lst1: TListBox
+              Align = Top
+              Size.Width = 427.000000000000000000
+              Size.Height = 131.000000000000000000
+              Size.PlatformDefault = False
+              TabOrder = 0
+              DisableFocusEffect = True
+              ItemHeight = 40.000000000000000000
+              DefaultItemStyles.ItemStyle = ''
+              DefaultItemStyles.GroupHeaderStyle = ''
+              DefaultItemStyles.GroupFooterStyle = ''
+              Viewport.Width = 423.000000000000000000
+              Viewport.Height = 127.000000000000000000
+              object ListBoxItem1: TListBoxItem
+                Size.Width = 423.000000000000000000
+                Size.Height = 40.000000000000000000
+                Size.PlatformDefault = False
+                TabOrder = 0
+                Text = 'Ip do Servidor'
+                object edtip: TEdit
+                  Touch.InteractiveGestures = [LongTap, DoubleTap]
+                  Align = Right
+                  TabOrder = 0
+                  Text = '192.168.25.5'
+                  TextSettings.HorzAlign = Center
+                  Position.X = 262.000000000000000000
+                  Position.Y = 3.000000000000000000
+                  Margins.Left = 3.000000000000000000
+                  Margins.Top = 3.000000000000000000
+                  Margins.Right = 5.000000000000000000
+                  Margins.Bottom = 3.000000000000000000
+                  Size.Width = 156.000000000000000000
+                  Size.Height = 34.000000000000000000
+                  Size.PlatformDefault = False
+                end
+              end
+              object ListBoxItem2: TListBoxItem
+                Position.Y = 40.000000000000000000
+                Size.Width = 423.000000000000000000
+                Size.Height = 40.000000000000000000
+                Size.PlatformDefault = False
+                TabOrder = 1
+                Text = 'Porta do Servidor'
+                object edtporta: TEdit
+                  Touch.InteractiveGestures = [LongTap, DoubleTap]
+                  Align = Right
+                  TabOrder = 0
+                  Text = '8082'
+                  TextSettings.HorzAlign = Center
+                  Position.X = 262.000000000000000000
+                  Position.Y = 3.000000000000000000
+                  Margins.Left = 3.000000000000000000
+                  Margins.Top = 3.000000000000000000
+                  Margins.Right = 5.000000000000000000
+                  Margins.Bottom = 3.000000000000000000
+                  Size.Width = 156.000000000000000000
+                  Size.Height = 34.000000000000000000
+                  Size.PlatformDefault = False
+                end
+              end
+              object ListBoxItem3: TListBoxItem
+                Position.Y = 80.000000000000000000
+                Size.Width = 423.000000000000000000
+                Size.Height = 40.000000000000000000
+                Size.PlatformDefault = False
+                TabOrder = 2
+                Text = 'Tempo de Resposta:'
+                object bServerTime: TButton
+                  Align = Right
+                  Position.X = 262.000000000000000000
+                  Size.Width = 161.000000000000000000
+                  Size.Height = 40.000000000000000000
+                  Size.PlatformDefault = False
+                  TabOrder = 0
+                  Text = 'Server Time'
+                  OnClick = bServerTimeClick
+                end
+              end
+            end
+          end
+          object Layout5: TLayout
+            Align = Top
+            Position.Y = 131.000000000000000000
+            Size.Width = 427.000000000000000000
+            Size.Height = 163.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 2
+            object mmo1: TMemo
+              Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+              DataDetectorTypes = []
+              Lines.Strings = (
+                'select * from employee')
+              Align = Client
+              Size.Width = 427.000000000000000000
+              Size.Height = 163.000000000000000000
+              Size.PlatformDefault = False
+              TabOrder = 0
+              Viewport.Width = 423.000000000000000000
+              Viewport.Height = 159.000000000000000000
+            end
+          end
+        end
+      end
+    end
+    object tabaltera: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 8.000000000000000000
+      Size.Height = 8.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 't2'
+      ExplicitSize.cx = 8.000000000000000000
+      ExplicitSize.cy = 8.000000000000000000
+      object edtnome: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 0
+        Position.X = 16.000000000000000000
+        Position.Y = 102.000000000000000000
+        Size.Width = 289.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object edtnome2: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 1
+        Position.X = 16.000000000000000000
+        Position.Y = 166.000000000000000000
+        Size.Width = 289.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object tlb2: TToolBar
+        Size.Width = 427.000000000000000000
+        Size.Height = 48.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        object btngrava: TButton
+          Align = Right
+          Margins.Left = 5.000000000000000000
+          Margins.Top = 5.000000000000000000
+          Margins.Right = 5.000000000000000000
+          Margins.Bottom = 5.000000000000000000
+          Position.X = 320.000000000000000000
+          Position.Y = 5.000000000000000000
+          Size.Width = 102.000000000000000000
+          Size.Height = 38.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'donetoolbutton'
+          TabOrder = 0
+          Text = 'Gravar'
+          OnClick = btngravaClick
+        end
+      end
+    end
+  end
+  object RESTDWDataBase1: TRESTDWDataBase
+    Active = False
+    Compression = True
+    Login = 'testserver'
+    Password = 'testserver'
+    Proxy = False
+    ProxyOptions.Port = 8888
+    PoolerService = '192.168.25.5'
+    PoolerPort = 8082
+    PoolerName = 'TServerMethodDM.RESTDWPoolerDB1'
+    StateConnection.AutoCheck = False
+    StateConnection.InTime = 1000
+    RequestTimeOut = 10000
+    EncodeStrings = False
+    Encoding = esUtf8
+    StrsTrim = False
+    StrsEmpty2Null = False
+    StrsTrim2Len = True
+    ParamCreate = True
+    ClientConnectionDefs.Active = False
+    Left = 32
+    Top = 72
+  end
+  object DataSource1: TDataSource
+    DataSet = RESTDWClientSQL1
+    Left = 128
+    Top = 160
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 84
+    Top = 69
+    object LinkGridToDataSourceBindSourceDB12: TLinkGridToDataSource
+      Category = 'Quick Bindings'
+      DataSource = BindSourceDB1
+      GridControl = StringGrid1
+      Columns = <>
+    end
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BindSourceDB1
+      FieldName = 'FIRST_NAME'
+      Control = edtnome
+      Track = False
+    end
+    object LinkControlToField2: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BindSourceDB1
+      FieldName = 'LAST_NAME'
+      Control = edtnome2
+      Track = False
+    end
+  end
+  object RESTDWClientSQL1: TRESTDWClientSQL
+    FieldDefs = <
+      item
+        Name = 'EMP_NO'
+        DataType = ftSmallint
+      end
+      item
+        Name = 'FIRST_NAME'
+        DataType = ftString
+        Size = 15
+      end
+      item
+        Name = 'LAST_NAME'
+        DataType = ftString
+        Size = 20
+      end
+      item
+        Name = 'PHONE_EXT'
+        DataType = ftString
+        Size = 4
+      end
+      item
+        Name = 'HIRE_DATE'
+        DataType = ftDateTime
+      end
+      item
+        Name = 'DEPT_NO'
+        DataType = ftString
+        Size = 3
+      end
+      item
+        Name = 'JOB_CODE'
+        DataType = ftString
+        Size = 5
+      end
+      item
+        Name = 'JOB_GRADE'
+        DataType = ftSmallint
+      end
+      item
+        Name = 'JOB_COUNTRY'
+        DataType = ftString
+        Size = 15
+      end
+      item
+        Name = 'SALARY'
+        DataType = ftFloat
+        Precision = 15
+      end
+      item
+        Name = 'FULL_NAME'
+        DataType = ftString
+        Size = 37
+      end>
+    MasterCascadeDelete = True
+    Datapacks = -1
+    DataCache = False
+    Params = <>
+    DataBase = RESTDWDataBase1
+    SQL.Strings = (
+      'select * from employee')
+    UpdateTableName = 'employee'
+    CacheUpdateRecords = True
+    AutoCommitData = True
+    AutoRefreshAfterCommit = False
+    Left = 40
+    Top = 153
+  end
+  object BindSourceDB1: TBindSourceDB
+    DataSet = RESTDWClientSQL1
+    ScopeMappings = <>
+    Left = 200
+    Top = 224
+  end
+  object actlst1: TActionList
+    Left = 200
+    Top = 272
+    object ChangeTabaltera: TChangeTabAction
+      Category = 'Tab'
+      Tab = tabaltera
+    end
+    object ChangeTablista: TChangeTabAction
+      Category = 'Tab'
+      Tab = tablista
+    end
+  end
+  object RESTClientPooler1: TRESTClientPooler
+    DataCompression = True
+    Encoding = esUtf8
+    hEncodeStrings = False
+    Host = 'localhost'
+    UserName = 'testserver'
+    Password = 'testserver'
+    ProxyOptions.BasicAuthentication = False
+    ProxyOptions.ProxyPort = 0
+    RequestTimeOut = 10000
+    ThreadRequest = False
+    AllowCookies = False
+    HandleRedirects = False
+    Left = 207
+    Top = 133
+  end
+  object DWClientEvents1: TDWClientEvents
+    ServerEventName = 'TServerMethodDM.DWServerEvents1'
+    RESTClientPooler = RESTClientPooler1
+    Events = <
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovDateTime
+            ParamName = 'result'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'inputdata'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odINOUT
+            ObjectValue = ovString
+            ParamName = 'resultstring'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'servertime'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'teste'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovString
+            ParamName = 'sql'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'loaddatasetevent'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = False
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'segundoparam'
+            Encoded = False
+          end>
+        JsonMode = jmPureJSON
+        Name = 'getemployee'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovString
+            ParamName = 'result'
+            Encoded = False
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odINOUT
+            ObjectValue = ovString
+            ParamName = 'segundoparam'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'getemployeeDW'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovInteger
+            ParamName = 'mynumber'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovInteger
+            ParamName = 'result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'eventint'
+      end
+      item
+        DWParams = <
+          item
+            TypeObject = toParam
+            ObjectDirection = odIN
+            ObjectValue = ovDateTime
+            ParamName = 'mydatetime'
+            Encoded = True
+          end
+          item
+            TypeObject = toParam
+            ObjectDirection = odOUT
+            ObjectValue = ovDateTime
+            ParamName = 'result'
+            Encoded = True
+          end>
+        JsonMode = jmDataware
+        Name = 'eventdatetime'
+      end>
+    Left = 207
+    Top = 165
+  end
+end

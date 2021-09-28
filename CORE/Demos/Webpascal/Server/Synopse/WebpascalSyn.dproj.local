@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2020/10/30 08:01:54.936,=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit14.pas</Transaction>
+    <Transaction>2020/10/30 08:02:44.254,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\Webpascal\Server\Synopse\Log.pas=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit14.pas</Transaction>
+    <Transaction>2020/10/30 08:02:44.254,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\Webpascal\Server\Synopse\Log.dfm=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit14.dfm</Transaction>
+    <Transaction>2020/10/30 08:03:02.959,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\Webpascal\Server\Synopse\WebpascalSyn.dproj=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2020/10/30 08:03:18.058,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\Webpascal\Server\Synopse\Log.pas=</Transaction>
+    <Transaction>2020/10/30 08:04:09.303,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\Webpascal\Server\Synopse\RestDWServerFormU.pas</Transaction>
+    <Transaction>2020/10/30 08:04:33.934,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\Webpascal\Server\uDmService.pas</Transaction>
+  </Transactions>
+</BorlandProject>

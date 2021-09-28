@@ -1,0 +1,1 @@
+"C:\Program Files (x86)\Borland\Delphi7\Bin\BRCC32.EXE" RESTDWDriverUNIDAC.rc -foRESTDWDriverUNIDAC.dcr

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/10/19 16:53:03.000.212,=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2018/04/09 10:33:57.000.081,=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2018/05/03 17:42:25.000.514,=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2018/05/25 13:50:02.000.929,=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2018/06/26 14:54:27.000.912,=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit10.pas</Transaction>
+    <Transaction>2018/06/26 14:55:23.000.532,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit10.pas=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\JSONString\uPrincipal.pas</Transaction>
+    <Transaction>2018/06/26 14:55:23.000.532,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Unit10.dfm=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\JSONString\uPrincipal.dfm</Transaction>
+    <Transaction>2018/06/26 14:55:55.000.204,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\JSONString\JSONStringSample.dproj</Transaction>
+  </Transactions>
+	<ActiveMobileDevice>
+		<NoProfile iOSSimulator="iPhone5"/>
+	</ActiveMobileDevice>
+</BorlandProject>

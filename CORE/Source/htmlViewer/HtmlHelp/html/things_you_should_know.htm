@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Things You Should Know</TITLE>
+<link rel="stylesheet" type="text/css" href="help.css">
+</HEAD>
+
+<BODY class="v115">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="Compile Options">
+	<PARAM NAME="Keyword" VALUE="DLL">
+	<PARAM NAME="Keyword" VALUE="GdiPlus">
+	<PARAM NAME="Keyword" VALUE="NoGdiPlus">
+	<PARAM NAME="Keyword" VALUE="NoMetaFile">
+	<PARAM NAME="Keyword" VALUE="NoTabLink">
+	<PARAM NAME="Keyword" VALUE="FastRadio">
+	<PARAM NAME="Keyword" VALUE="Images">
+	<PARAM NAME="Keyword" VALUE="Active Images">
+	<PARAM NAME="Keyword" VALUE="Mouseover images">
+	<PARAM NAME="Keyword" VALUE="UseGlobalObjectId">
+	<PARAM NAME="Keyword" VALUE="Options">
+	<PARAM NAME="Keyword" VALUE="Things You Should Know">
+</OBJECT>
+
+<H1><A NAME="things_you_should_know"></A><B>Things You Should Know</B></H1>
+<HR>
+
+<H2><A name="Compile_Options"></A>Compile Time Options</H2>
+
+<P>Several compile time options are controlled by defining symbols. You can find these in the HTMLCONS.INC file. Most of these symbols are initially not defined. To make any one (or all) of these symbols active, remove the "." from the {$.Define XXXX} sequence and recompile the code. </P>
+
+<H3><A name="GdiPlus"></A>GdiPlus.dll Support</H3>
+
+<p>The GdiPlus.dll provides support for PNG, TIFF, JPEG, ICO, EMF, WMF, EXIF, and BMP images.</p>
+
+<p>Defining <b>NoGdiPlus</b> will remove support for TIFF, ICO, EMF, WMF, and EXIF images entirely.  If the GdiPlus.dll is not present or <b>NoGdiPlus</b> is defined most images will still be displayed but less nice than with GdiPlus.dll. Complied with <b>NoGdiPlus</b> by Delphi does not support PNG images.</P>
+
+<P>The GdiPlus.dll is present on all WinXP systems and has often been loaded on other systems by other applications. If it is not present on your system, it can be downloaded (at no charge) at http://www.microsoft.com/downloads/.</P>
+
+<H3><A name ="NoMetaFile"></A>Metafile support</H3>
+
+<P>Metafile display and some printing operations are incompatible with Win95/98/ME.  For applications running on these systems define <b>NoMetaFile</b></P>
+
+<H3><A name="NoTabLink"></A>Ability to Tab between Links</H3>
+
+<P>To eliminate tabbing between links, define <b>NoTabLink</b>.  For documents with hundreds of links, tabbing may not be desirable and also may cause delays in loading.  Even when NoTabLink is not defined, there is another constant, MaxTab, which eliminates tabbing to MaxTab links.  MaxTab is defined in readhtml.pas</P>
+
+<H3><A name="FastRadio"></A>FastRadio</H3>
+
+<p>if you have a form with a great many radio buttons, you may want to define FastRadio to help speed the action.  Note that this option changes the way tabbing works.  With FastRadio off, tabs move only to the next control that is visible.  With FastRadio on, tabs move to the next control even if it is not visible.</p>  
+
+<H3>Quirks</H3>
+
+<P>Quirks mode makes changes which simulate some of the quirks of other browsers.  The HTML components now support a property <a href="prop_thtmlviewer_quirksmode.htm">QuirksMode</a> that replaces and enhances the previous compiler symbol.</P>
+
+<H3><A name="OpOnChange"></A>OpOnChange</H3>
+
+<P>Without this definition, the &lt;select&gt; form controls (TListbox and TCombobox) will issue the OnObjectChange event only when the control loses the focus which is according to HTML specs.   Defining OpOnChange simulates the way IExplorer does it, issuing the OnChange event immediately when a change is made.</P>
+
+<H3><A NAME="active_images"><A NAME="mouseover_images"><A NAME="images"></A>Mouseover Images</H3>
+
+<P>A <B><I>Mouseover Image</I></B> is one that changes when the mouse passes over it. The HTML components use a special syntax to implement mouseover images. It's done with the <B>&lt;img&gt;</B> tag as follows: </P>
+
+<P><IMG SRC="../images/bm3.gif" ALT="" BORDER=0>the SRC="..." attribute should specify an animated GIF image </P>
+
+<P><IMG SRC="../images/bm3.gif" ALT="" BORDER=0>Add an <B>Active</B> attribute </P>
+
+<P>With the <B>Active</B> attribute, the GIF will normally just display the first frame. When the mouse passes over or is clicked, it will display the second or third frame respecively if there are 2 or 3 frames or will animate if there are more than 3 frames. </P>
+
+<H3><a name="UseGlobalObjectId"></a>Global Object Id</H3>
+
+<p>Defining <b>UseGlobalObjectId</b> gives each HTML element an application wide unique ID even if there is no ID or NAME attribute given in the HTML document. The unique ID is composed of 'GOID-' and a consecutive number starting with 1</p>
+
+<H3>Legacy Style Type Names</H3>
+<p>Style types have been renamed to Tht.. to meet the Delphi style guide that types should start with a 'T'. As long as you did not change your code accordingly you can define <b>UseOldStyleTypes</b>.</p>
+
+<H2 class="SeeAlso">See Also:</H2>
+
+<P><A HREF="replaceimage_method.htm">ReplaceImage Method</A></P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,84 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{6FE7FEDB-3C0E-45CC-A75C-FDC7A25FC64B}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="RestDatawareCORE.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Source\Connectors\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Source\Connectors\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Source\htmlViewer\dwpackage\Delphi\D24\DWhtmlEditor.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="RestDatawareCORE">
+        <MSBuild Projects="RestDatawareCORE.dproj"/>
+    </Target>
+    <Target Name="RestDatawareCORE:Clean">
+        <MSBuild Projects="RestDatawareCORE.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDatawareCORE:Make">
+        <MSBuild Projects="RestDatawareCORE.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDriverUNIDAC">
+        <MSBuild Projects="..\..\..\Source\Connectors\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj"/>
+    </Target>
+    <Target Name="RESTDWDriverUNIDAC:Clean">
+        <MSBuild Projects="..\..\..\Source\Connectors\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDriverUNIDAC:Make">
+        <MSBuild Projects="..\..\..\Source\Connectors\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDriverZEOS">
+        <MSBuild Projects="..\..\..\Source\Connectors\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj"/>
+    </Target>
+    <Target Name="RESTDWDriverZEOS:Clean">
+        <MSBuild Projects="..\..\..\Source\Connectors\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDriverZEOS:Make">
+        <MSBuild Projects="..\..\..\Source\Connectors\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DWhtmlEditor">
+        <MSBuild Projects="..\..\..\Source\htmlViewer\dwpackage\Delphi\D24\DWhtmlEditor.dproj"/>
+    </Target>
+    <Target Name="DWhtmlEditor:Clean">
+        <MSBuild Projects="..\..\..\Source\htmlViewer\dwpackage\Delphi\D24\DWhtmlEditor.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DWhtmlEditor:Make">
+        <MSBuild Projects="..\..\..\Source\htmlViewer\dwpackage\Delphi\D24\DWhtmlEditor.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDriverFD">
+        <MSBuild Projects="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj"/>
+    </Target>
+    <Target Name="RESTDWDriverFD:Clean">
+        <MSBuild Projects="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDriverFD:Make">
+        <MSBuild Projects="..\..\..\Source\Connectors\FireDAC\Package\Berlin\RESTDWDriverFD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="RestDatawareCORE;RESTDWDriverUNIDAC;RESTDWDriverZEOS;DWhtmlEditor;RESTDWDriverFD"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="RestDatawareCORE:Clean;RESTDWDriverUNIDAC:Clean;RESTDWDriverZEOS:Clean;DWhtmlEditor:Clean;RESTDWDriverFD:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="RestDatawareCORE:Make;RESTDWDriverUNIDAC:Make;RESTDWDriverZEOS:Make;DWhtmlEditor:Make;RESTDWDriverFD:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2019/06/11 20:36:50.000.038,=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2019/07/01 17:39:04.000.326,=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2019/07/09 07:55:57.000.487,=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit7.pas</Transaction>
+    <Transaction>2019/07/09 07:56:31.000.883,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\OpenGLRDW\uOpenGLDemo.pas=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit7.pas</Transaction>
+    <Transaction>2019/07/09 07:56:31.000.883,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\OpenGLRDW\uOpenGLDemo.dfm=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit7.dfm</Transaction>
+    <Transaction>2019/07/09 07:56:40.000.275,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\OpenGLRDW\OpenGLDEMO.dproj=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+  </Transactions>
+	<ActiveMobileDevice>
+		<NoProfile iOSSimulator="iPhone5" Android="ANDROID_TEST"/>
+	</ActiveMobileDevice>
+</BorlandProject>

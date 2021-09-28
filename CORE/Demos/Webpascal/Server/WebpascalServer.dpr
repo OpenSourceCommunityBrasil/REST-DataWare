@@ -1,0 +1,15 @@
+program WebpascalServer;
+{$APPTYPE GUI}
+
+uses
+  Vcl.Forms,
+  RestDWServerFormU in 'RestDWServerFormU.pas' {RestDWForm},
+  uDmService in 'uDmService.pas' {ServerMethodDM: TDataModule};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.CreateForm(TRestDWForm, RestDWForm);
+  Application.Run;
+end.

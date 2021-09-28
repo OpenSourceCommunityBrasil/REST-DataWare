@@ -1,0 +1,72 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{88E9A5B0-7E68-4CA0-89E5-384397000369}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="WebpascalServer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="webpascalcgi.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ISAPI\webpascalisapi.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\Packages\Delphi\D24\RestDatawareCORE.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="WebpascalServer">
+        <MSBuild Projects="WebpascalServer.dproj"/>
+    </Target>
+    <Target Name="WebpascalServer:Clean">
+        <MSBuild Projects="WebpascalServer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WebpascalServer:Make">
+        <MSBuild Projects="WebpascalServer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="webpascalcgi">
+        <MSBuild Projects="webpascalcgi.dproj"/>
+    </Target>
+    <Target Name="webpascalcgi:Clean">
+        <MSBuild Projects="webpascalcgi.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="webpascalcgi:Make">
+        <MSBuild Projects="webpascalcgi.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="webpascalisapi">
+        <MSBuild Projects="ISAPI\webpascalisapi.dproj"/>
+    </Target>
+    <Target Name="webpascalisapi:Clean">
+        <MSBuild Projects="ISAPI\webpascalisapi.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="webpascalisapi:Make">
+        <MSBuild Projects="ISAPI\webpascalisapi.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDatawareCORE">
+        <MSBuild Projects="..\..\..\Packages\Delphi\D24\RestDatawareCORE.dproj"/>
+    </Target>
+    <Target Name="RestDatawareCORE:Clean">
+        <MSBuild Projects="..\..\..\Packages\Delphi\D24\RestDatawareCORE.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDatawareCORE:Make">
+        <MSBuild Projects="..\..\..\Packages\Delphi\D24\RestDatawareCORE.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="WebpascalServer;webpascalcgi;webpascalisapi;RestDatawareCORE"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="WebpascalServer:Clean;webpascalcgi:Clean;webpascalisapi:Clean;RestDatawareCORE:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="WebpascalServer:Make;webpascalcgi:Make;webpascalisapi:Make;RestDatawareCORE:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

@@ -1,0 +1,36 @@
+object restdwcgiwebmodule: Trestdwcgiwebmodule
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  Actions = <>
+  CreateSession = False
+  Kind = wkOneShot
+  Height = 244
+  HorizontalOffset = 256
+  VerticalOffset = 127
+  Width = 243
+  PPI = 96
+  object RESTServiceCGI1: TRESTServiceCGI
+    CORS = False
+    CORS_CustomHeaders.Strings = (
+      'Access-Control-Allow-Origin=*'
+      'Access-Control-Allow-Methods=GET, POST, PATCH, PUT, DELETE, OPTIONS'
+      'Access-Control-Allow-Headers=Content-Type, Origin, Accept, Authorization, X-CUSTOM-HEADER'
+    )
+    ServerParams.HasAuthentication = False
+    ServerParams.UserName = 'testserver'
+    ServerParams.Password = 'testserver'
+    Encoding = esUtf8
+    ForceWelcomeAccess = False
+    ServerContext = 'cgieflex/dwCGIServer.exe'
+    RootPath = '/'
+    CriptOptions.Use = False
+    CriptOptions.Key = 'RDWBASEKEY256'
+    TokenOptions.Active = False
+    TokenOptions.ServerRequest = 'RESTDWServer01'
+    TokenOptions.TokenHash = 'RDWTS_HASH'
+    TokenOptions.LifeCycle = 30
+    DatabaseCharSet = csUndefined
+    left = 96
+    top = 88
+  end
+end

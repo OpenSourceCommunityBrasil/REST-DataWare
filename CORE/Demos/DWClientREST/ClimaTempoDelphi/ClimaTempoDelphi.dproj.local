@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2018/06/07 10:55:38.000.113,=\\Mac\Home\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2018/06/07 10:56:42.000.208,C:\Componentes\dw\CORE\Demos\DWClientREST\ClimaTempoDelphi\uClimaTempo.pas=\\Mac\Home\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2018/06/07 10:56:42.000.208,C:\Componentes\dw\CORE\Demos\DWClientREST\ClimaTempoDelphi\uClimaTempo.dfm=\\Mac\Home\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2018/06/07 10:56:48.000.590,C:\Componentes\dw\CORE\Demos\DWClientREST\ClimaTempoDelphi\ClimaTempoDelphi.dproj=\\Mac\Home\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2018/06/08 04:50:17.000.947,=C:\Componentes\lkJSON-1.07\uLkJSON.pas</Transaction>
+  </Transactions>
+</BorlandProject>

@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2020/12/17 08:23:00.000.295,=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2021/01/07 10:31:48.000.228,=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2021/01/29 08:17:29.000.229,=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2021/05/25 10:00:59.124,=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2021/05/25 10:01:14.830,C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\WebpascalRetaguarda.dproj=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2021/05/25 10:01:49.587,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\WebpascalRetaguarda\Server\RestDWServerFormU.pas</Transaction>
+    <Transaction>2021/05/25 10:01:49.656,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\WebpascalRetaguarda\Server\uConsts.pas</Transaction>
+    <Transaction>2021/05/25 10:01:50.024,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\WebpascalRetaguarda\Server\uDmService.pas</Transaction>
+    <Transaction>2021/05/25 10:01:50.089,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\WebpascalRetaguarda\Server\uSock.pas</Transaction>
+    <Transaction>2021/05/25 10:02:06.460,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\CORE\Demos\WebpascalRetaguarda\Server\WebpascalRetaguarda.dproj=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\WebpascalRetaguarda.dproj</Transaction>
+  </Transactions>
+</BorlandProject>

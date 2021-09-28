@@ -1,0 +1,421 @@
+object frmGetCEP: TfrmGetCEP
+  Left = 283
+  Height = 154
+  Top = 220
+  Width = 670
+  Caption = 'Consulta CEP'
+  ClientHeight = 154
+  ClientWidth = 670
+  Font.CharSet = ANSI_CHARSET
+  Font.Height = -13
+  Font.Name = 'Arial'
+  Font.Pitch = fpVariable
+  Font.Quality = fqDraft
+  Font.Style = [fsBold]
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.5'
+  object btConsultaCEP: TSpeedButton
+    Left = 91
+    Height = 20
+    Hint = 'Consultar CEP'
+    Top = 28
+    Width = 20
+    Flat = True
+    Glyph.Data = {
+      36040000424D3604000000000000360000002800000010000000100000000100
+      20000000000000040000640000006400000000000000000000003C3D379F3F3E
+      39FF9E9D946F0000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000000000007A786CFF8888
+      7EFF929086FF9E9D955F00000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000000000006E6B5DCFC4C5
+      C0FF86867CFF929086FF9E9D955F000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000000000005753430F6E6B
+      5DCFC4C5C0FF86867CFF929086FF9E9D955F0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000005753
+      430F6E6B5DCFC4C5C0FF86867CFF929086FF99978E6F7A776B9F87857AEF8987
+      7CFF868478FF7D7A6DEF5D5A4A9F5A56461F0000000000000000000000000000
+      00005753430F6E6B5DCFC4C5C0FF89897FFF959389FFC1C0BBFFD8D8D5FFD2D1
+      CEFFD9D8D5FFEAEAE9FFCFCECAFF7C786CEF5A56462F00000000000000000000
+      0000000000005753430F787568CFA2A098FFD1D1CEFFBCB5A3F9BC9945E1D098
+      1CD6D69F2FDBCEAD6EEBDDD7CCFBF1F1EFFF7A776AEF5A56461F000000000000
+      000000000000000000009C9A909FC7C6C2FFB8B4A4FAC9A93FD3CDAF3ECDCEAE
+      3CCDCEA631D0D09C23D5D7A647E1D8D3C7FCC8C7C1FF5D5A4A9F000000000000
+      00000000000000000000ADACA5EFD5D4D2FFB4A769E2D8CE7FD3CCC764C6CCC5
+      61C6CCBC52C9CEAC3BCED09C23D5CEAD6DECDFDEDBFF7A776AEF000000000000
+      00000000000000000000B6B5AEFFC3C2BEFFD6CF7DD1DEE2A7D3E0E5AFCCD5DB
+      8FBFCCCF72C3CCBC52CACEA631D1D69F2FDCCDCCC8FF827F74FF000000000000
+      00000000000000000000BCBBB5FFC6C5C0FFE1E1AADADFE4ADC4F4F6E4D2EFF2
+      D7CCD7DD96C2CCC561C7CEAE3CCFD29D27D9C5C3BEFF858276FF000000000000
+      00000000000000000000BFBEB8EFE5E5E3FFB6B794E8E9ECC6CEF4F5E2C3F6F7
+      E7D6EBEECBDBDCD996D6D6BC5ED5BC9945E2C5C4BFFF838075EF000000000000
+      00000000000000000000B8B7B19FE5E5E3FFC3C2B6F9E1E4C3E2E7EAC0CAE6EA
+      BECEE9ECC6E0E8E3B4E3E2D2A0E9B5B0A3FCB0AFA8FF7A776B9F000000000000
+      00000000000000000000BCBBB51FC7C6C1EFF7F6F6FFBFBFB3F9B9B99AEAD3D4
+      83CBDED796D9C3BC9BEFAFAC9FFCBDBCB6FF908E84EF807D721F000000000000
+      0000000000000000000000000000BCBBB52FC5C4BFEFDEDDDAFFD9D9D5FFBBB9
+      B3FFB6B5AEFFC2C1BCFFB6B5AFFF9A988EEF8B887E2F00000000000000000000
+      000000000000000000000000000000000000BCBBB51FB8B7B19FBCBBB5EFB8B7
+      B0FFB1B0A9FFA9A8A0EF9C9A909F96948A1F0000000000000000
+    }
+    OnClick = btConsultaCEPClick
+    ShowHint = True
+    ParentShowHint = False
+  end
+  object lbUF: TLabel
+    Left = 612
+    Height = 16
+    Top = 104
+    Width = 17
+    Caption = 'UF'
+    Font.CharSet = ANSI_CHARSET
+    Font.Height = -13
+    Font.Name = 'Arial'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object cbUF: TComboBox
+    Left = 612
+    Height = 23
+    Hint = '3'
+    Top = 122
+    Width = 50
+    ItemHeight = 16
+    Items.Strings = (
+      'AC'
+      'AL'
+      'AM'
+      'AP'
+      'BA'
+      'CE'
+      'DF'
+      'ES'
+      'GO'
+      'MA'
+      'MG'
+      'MS'
+      'MT'
+      'PA'
+      'PB'
+      'PE'
+      'PI'
+      'PR'
+      'RJ'
+      'RN'
+      'RO'
+      'RR'
+      'RS'
+      'SC'
+      'SE'
+      'SP'
+      'TO'
+    )
+    Style = csDropDownList
+    TabOrder = 6
+  end
+  object edCEP: TLabeledEdit
+    Left = 3
+    Height = 24
+    Top = 27
+    Width = 80
+    EditLabel.AnchorSideLeft.Control = edCEP
+    EditLabel.AnchorSideRight.Control = edCEP
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = edCEP
+    EditLabel.Left = 3
+    EditLabel.Height = 15
+    EditLabel.Top = 9
+    EditLabel.Width = 80
+    EditLabel.Caption = 'CEP'
+    EditLabel.ParentColor = False
+    EditLabel.ParentFont = False
+    EditLabel.Font.Style = [fsBold]
+    TabOrder = 0
+    OnKeyDown = edCEPKeyDown
+    OnKeyPress = edCEPKeyPress
+  end
+  object edLogradouro: TLabeledEdit
+    Left = 117
+    Height = 24
+    Top = 27
+    Width = 451
+    EditLabel.AnchorSideLeft.Control = edLogradouro
+    EditLabel.AnchorSideRight.Control = edLogradouro
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = edLogradouro
+    EditLabel.Left = 117
+    EditLabel.Height = 15
+    EditLabel.Top = 9
+    EditLabel.Width = 451
+    EditLabel.Caption = 'Logradouro'
+    EditLabel.ParentColor = False
+    EditLabel.ParentFont = False
+    EditLabel.Font.Style = [fsBold]
+    TabOrder = 1
+  end
+  object edNumero: TLabeledEdit
+    Left = 573
+    Height = 24
+    Top = 27
+    Width = 89
+    EditLabel.AnchorSideLeft.Control = edNumero
+    EditLabel.AnchorSideRight.Control = edNumero
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = edNumero
+    EditLabel.Left = 573
+    EditLabel.Height = 15
+    EditLabel.Top = 9
+    EditLabel.Width = 89
+    EditLabel.Caption = 'Número'
+    EditLabel.ParentColor = False
+    EditLabel.ParentFont = False
+    EditLabel.Font.Style = [fsBold]
+    TabOrder = 2
+  end
+  object edComplemento: TLabeledEdit
+    Left = 3
+    Height = 24
+    Top = 71
+    Width = 659
+    EditLabel.AnchorSideLeft.Control = edComplemento
+    EditLabel.AnchorSideRight.Control = edComplemento
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = edComplemento
+    EditLabel.Left = 3
+    EditLabel.Height = 15
+    EditLabel.Top = 53
+    EditLabel.Width = 659
+    EditLabel.Caption = 'Complemento'
+    EditLabel.ParentColor = False
+    EditLabel.ParentFont = False
+    TabOrder = 3
+  end
+  object edBairro: TLabeledEdit
+    Left = 3
+    Height = 24
+    Top = 122
+    Width = 299
+    EditLabel.AnchorSideLeft.Control = edBairro
+    EditLabel.AnchorSideRight.Control = edBairro
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = edBairro
+    EditLabel.Left = 3
+    EditLabel.Height = 15
+    EditLabel.Top = 104
+    EditLabel.Width = 299
+    EditLabel.Caption = 'Bairro'
+    EditLabel.ParentColor = False
+    EditLabel.ParentFont = False
+    EditLabel.Font.Style = [fsBold]
+    TabOrder = 4
+  end
+  object edCidade: TLabeledEdit
+    Left = 306
+    Height = 24
+    Top = 122
+    Width = 299
+    EditLabel.AnchorSideLeft.Control = edCidade
+    EditLabel.AnchorSideRight.Control = edCidade
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = edCidade
+    EditLabel.Left = 306
+    EditLabel.Height = 15
+    EditLabel.Top = 104
+    EditLabel.Width = 299
+    EditLabel.Caption = 'Cidade'
+    EditLabel.ParentColor = False
+    EditLabel.ParentFont = False
+    EditLabel.Font.Style = [fsBold]
+    ParentBidiMode = False
+    TabOrder = 5
+  end
+  object DWClientRESTCEP: TDWClientREST
+    UseSSL = False
+    SSLVersions = []
+    UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
+    ContentType = 'application/json'
+    RequestCharset = esUtf8
+    ProxyOptions.BasicAuthentication = False
+    ProxyOptions.ProxyPort = 0
+    RequestTimeOut = 10000
+    AllowCookies = False
+    HandleRedirects = False
+    VerifyCert = False
+    AuthOptions.HasAuthentication = False
+    AccessControlAllowOrigin = '*'
+    OnBeforeGet = DWClientRESTCEPBeforeGet
+    left = 224
+    top = 8
+  end
+  object DWResponseTranslatorCEP: TDWResponseTranslator
+    ElementAutoReadRootIndex = True
+    ElementRootBaseIndex = -1
+    RequestOpen = rtGet
+    RequestInsert = rtPost
+    RequestEdit = rtPost
+    RequestDelete = rtDelete
+    RequestOpenUrl = 'https://viacep.com.br/ws/01001000/json/'
+    FieldDefs = <    
+      item
+        FieldName = 'cep'
+        ElementName = 'cep'
+        ElementIndex = 0
+        FieldSize = 9
+        Precision = 0
+        DataType = ovString
+        Required = False
+      end    
+      item
+        FieldName = 'logradouro'
+        ElementName = 'logradouro'
+        ElementIndex = 1
+        FieldSize = 200
+        Precision = 0
+        DataType = ovString
+        Required = False
+      end    
+      item
+        FieldName = 'complemento'
+        ElementName = 'complemento'
+        ElementIndex = 2
+        FieldSize = 100
+        Precision = 0
+        DataType = ovString
+        Required = False
+      end    
+      item
+        FieldName = 'bairro'
+        ElementName = 'bairro'
+        ElementIndex = 3
+        FieldSize = 100
+        Precision = 0
+        DataType = ovString
+        Required = False
+      end    
+      item
+        FieldName = 'localidade'
+        ElementName = 'localidade'
+        ElementIndex = 4
+        FieldSize = 100
+        Precision = 0
+        DataType = ovString
+        Required = False
+      end    
+      item
+        FieldName = 'uf'
+        ElementName = 'uf'
+        ElementIndex = 5
+        FieldSize = 2
+        Precision = 0
+        DataType = ovString
+        Required = False
+      end    
+      item
+        FieldName = 'unidade'
+        ElementName = 'unidade'
+        ElementIndex = 6
+        FieldSize = 100
+        Precision = 0
+        DataType = ovString
+        Required = False
+      end    
+      item
+        FieldName = 'ibge'
+        ElementName = 'ibge'
+        ElementIndex = 7
+        FieldSize = 10
+        Precision = 0
+        DataType = ovString
+        Required = False
+      end    
+      item
+        FieldName = 'gia'
+        ElementName = 'gia'
+        ElementIndex = 8
+        FieldSize = 10
+        Precision = 0
+        DataType = ovString
+        Required = False
+      end>
+    ClientREST = DWClientRESTCEP
+    left = 256
+    top = 8
+  end
+  object dwGetCEP: TRESTDWClientSQL
+    Active = False
+    FieldDefs = <    
+      item
+        Name = 'cep'
+        DataType = ftString
+        Precision = -1
+        Size = 9
+      end    
+      item
+        Name = 'logradouro'
+        DataType = ftString
+        Precision = -1
+        Size = 200
+      end    
+      item
+        Name = 'complemento'
+        DataType = ftString
+        Precision = -1
+        Size = 100
+      end    
+      item
+        Name = 'bairro'
+        DataType = ftString
+        Precision = -1
+        Size = 100
+      end    
+      item
+        Name = 'localidade'
+        DataType = ftString
+        Precision = -1
+        Size = 100
+      end    
+      item
+        Name = 'uf'
+        DataType = ftString
+        Precision = -1
+        Size = 2
+      end    
+      item
+        Name = 'unidade'
+        DataType = ftString
+        Precision = -1
+        Size = 100
+      end    
+      item
+        Name = 'ibge'
+        DataType = ftString
+        Precision = -1
+        Size = 10
+      end    
+      item
+        Name = 'gia'
+        DataType = ftString
+        Precision = -1
+        Size = 10
+      end>
+    MasterCascadeDelete = True
+    Datapacks = -1
+    DataCache = False
+    Params = <>
+    CacheUpdateRecords = True
+    AutoCommitData = False
+    AutoRefreshAfterCommit = False
+    Filtered = False
+    DWResponseTranslator = DWResponseTranslatorCEP
+    left = 288
+    top = 8
+  end
+  object dsGetCEP: TDataSource
+    DataSet = dwGetCEP
+    left = 320
+    top = 8
+  end
+end

@@ -1,0 +1,111 @@
+object fClientREST: TfClientREST
+  Left = 256
+  Height = 339
+  Top = 127
+  Width = 704
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'Client REST'
+  ClientHeight = 339
+  ClientWidth = 704
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.5'
+  object Label1: TLabel
+    Left = 24
+    Height = 15
+    Top = 30
+    Width = 27
+    Caption = 'CNPJ'
+    ParentColor = False
+  end
+  object Button1: TButton
+    Left = 192
+    Height = 25
+    Top = 25
+    Width = 107
+    Caption = 'Get for Events'
+    OnClick = Button1Click
+    TabOrder = 0
+  end
+  object Button2: TButton
+    Left = 321
+    Height = 25
+    Top = 25
+    Width = 107
+    Caption = 'Get for Command'
+    OnClick = Button2Click
+    TabOrder = 1
+  end
+  object DBGrid1: TDBGrid
+    Left = 0
+    Height = 260
+    Top = 79
+    Width = 704
+    Align = alBottom
+    Color = clWindow
+    Columns = <>
+    DataSource = DataSource1
+    TabOrder = 2
+    TitleFont.Color = clWindowText
+    TitleFont.Height = -11
+    TitleFont.Name = 'Tahoma'
+  end
+  object edCNPJ: TEdit
+    Left = 55
+    Height = 23
+    Top = 27
+    Width = 121
+    TabOrder = 3
+    Text = '00000000000191'
+  end
+  object DWClientREST1: TDWClientREST
+    UseSSL = False
+    SSLVersions = []
+    UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
+    ContentType = 'application/json'
+    RequestCharset = esUtf8
+    ProxyOptions.BasicAuthentication = False
+    ProxyOptions.ProxyPort = 0
+    RequestTimeOut = 10000
+    AllowCookies = False
+    HandleRedirects = False
+    VerifyCert = False
+    AuthOptions.HasAuthentication = False
+    OnBeforeGet = DWClientREST1BeforeGet
+    left = 108
+    top = 124
+  end
+  object DWResponseTranslator1: TDWResponseTranslator
+    ElementAutoReadRootIndex = True
+    ElementRootBaseIndex = -1
+    RequestOpen = rtGet
+    RequestInsert = rtPost
+    RequestEdit = rtPost
+    RequestDelete = rtDelete
+    RequestOpenUrl = 'http://jsonplaceholder.typicode.com/albums'
+    FieldDefs = <>
+    ClientREST = DWClientREST1
+    left = 140
+    top = 124
+  end
+  object RESTDWClientSQL1: TRESTDWClientSQL
+    Active = False
+    FieldDefs = <>
+    MasterCascadeDelete = True
+    Datapacks = -1
+    DataCache = False
+    Params = <>
+    CacheUpdateRecords = True
+    AutoCommitData = False
+    AutoRefreshAfterCommit = False
+    Filtered = False
+    DWResponseTranslator = DWResponseTranslator1
+    left = 172
+    top = 124
+  end
+  object DataSource1: TDataSource
+    DataSet = RESTDWClientSQL1
+    left = 204
+    top = 124
+  end
+end
