@@ -17,7 +17,7 @@ Type
  TMassiveType = (mtMassiveCache, mtMassiveObject);
 
 Type
- TMassiveValue = Class
+ TMassiveValue = Class(TObject)
  Private
   vIsNull,
   vModified,
@@ -72,7 +72,7 @@ Type
 End;
 
 Type
- TMassiveField = Class
+ TMassiveField = Class(TObject)
  Private
   vMassiveFields : TList;
   vOldValue      : Variant;
@@ -130,7 +130,7 @@ Type
 End;
 
 Type
- TMassiveLine = Class
+ TMassiveLine = Class(TObject)
  Private
   vMassiveValues  : TMassiveValues;
   vPrimaryValues  : TMassiveValues;
@@ -175,7 +175,7 @@ End;
 //Massive reply queue
 Type
  PMassiveReplyValue = ^TMassiveReplyValue;
- TMassiveReplyValue = Class
+ TMassiveReplyValue = Class(TObject)
  Private
   vOldNewValue,
   vOldValue     : Variant;
@@ -675,8 +675,9 @@ Procedure TMassiveFields.ClearAll;
 Var
  I : Integer;
 Begin
- For I := TList(Self).Count -1 DownTo 0 Do
+ For I := Count -1 DownTo 0 Do
   Delete(I);
+ Self.Clear;
 End;
 
 Constructor TMassiveFields.Create(MassiveDataset: TMassiveDataset);
@@ -877,8 +878,9 @@ Procedure TMassiveValues.ClearAll;
 Var
  I : Integer;
 Begin
- For I := TList(Self).Count -1 DownTo 0 Do
+ For I := Count -1 DownTo 0 Do
   Self.Delete(I);
+ Self.Clear;
 End;
 
 Procedure TMassiveValues.Delete(Index: Integer);
@@ -1006,8 +1008,9 @@ Procedure TMassiveBuffer.ClearAll;
 Var
  I : Integer;
 Begin
- For I := TList(Self).Count -1 DownTo 0 Do
+ For I := Count -1 DownTo 0 Do
   Self.Delete(I);
+ Self.Clear;
 End;
 
 Procedure TMassiveBuffer.Delete(Index: Integer);
@@ -2508,8 +2511,9 @@ procedure TDWMassiveCacheList.ClearAll;
 Var
  I : Integer;
 Begin
- For I := TList(Self).Count -1 DownTo 0 Do
+ For I := Count -1 DownTo 0 Do
   Self.Delete(I);
+ Self.Clear;
 End;
 
 procedure TDWMassiveCacheList.Delete(Index: Integer);
@@ -3436,8 +3440,9 @@ Procedure TMassiveReplyCache.ClearAll;
 Var
  I : Integer;
 Begin
- For I := TList(Self).Count -1 DownTo 0 Do
+ For I := Count -1 DownTo 0 Do
   Self.Delete(I);
+ Self.Clear;
 End;
 
 Constructor TMassiveReplyCache.Create;
@@ -3611,8 +3616,9 @@ procedure TMassiveReply.ClearAll;
 Var
  I : Integer;
 Begin
- For I := TList(Self).Count -1 DownTo 0 Do
+ For I := Count -1 DownTo 0 Do
   Self.Delete(I);
+ Self.Clear;
 End;
 
 Procedure TMassiveReply.Delete(Index : Integer);
@@ -3710,8 +3716,9 @@ procedure TDWMassiveCacheDatasetList.ClearAll;
 Var
  I : Integer;
 Begin
- For I := TList(Self).Count -1 DownTo 0 Do
+ For I := Count -1 DownTo 0 Do
   Self.Delete(I);
+ Self.Clear;
 End;
 
 Function TDWMassiveCacheDatasetList.DatasetExists(Value : TMassiveCacheDataset) : Integer;

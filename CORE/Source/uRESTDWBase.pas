@@ -1000,15 +1000,14 @@ Type
   vRedirectMaximum,
   vErrorCode,
   vPort                : Integer;
+  vPropThreadRequest,
   vHandleRedirects,
   vBinaryRequest,
   vFailOver,
   vFailOverReplaceDefaults,
   vEncodeStrings,
   vDatacompress,
-  vThreadRequest,
-  vAuthentication,
-  vThreadExecuting     : Boolean;
+  vAuthentication      : Boolean;
   vTransparentProxy    : TIdProxyConnectionInfo;
   vRequestTimeOut      : Integer;
   vConnectTimeOut      : Integer;
@@ -1041,11 +1040,11 @@ Type
                            EventType        : TSendEvent = sePOST;
                            JsonMode         : TJsonMode  = jmDataware;
                            ServerEventName  : String     = '';
-                           Assyncexec       : Boolean    = False;
-                           CallBack         : TCallBack  = Nil) : String;Overload;
+                           Assyncexec       : Boolean    = False) : String;Overload;
   Procedure   SetAuthOptionParams(Value     : TRDWClientAuthOptionParams);
   Constructor Create      (AOwner           : TComponent);Override;
   Destructor  Destroy;Override;
+  Procedure   Abort;
   Property    ErrorCode            : Integer                    Read vErrorCode;
  Published
   //Métodos e Propriedades
@@ -1056,13 +1055,13 @@ Type
   Property Encoding                : TEncodeSelect              Read vRSCharset               Write vRSCharset;
   Property hEncodeStrings          : Boolean                    Read vEncodeStrings           Write vEncodeStrings;
   Property TypeRequest             : TTypeRequest               Read vTypeRequest             Write vTypeRequest         Default trHttp;
+  Property ThreadRequest           : Boolean                    Read vPropThreadRequest       Write vPropThreadRequest;
   Property Host                    : String                     Read vHost                    Write vHost;
   Property Port                    : Integer                    Read vPort                    Write vPort                Default 8082;
   Property AuthenticationOptions   : TRDWClientAuthOptionParams Read vAuthOptionParams        Write SetAuthOptionParams;
   Property ProxyOptions            : TIdProxyConnectionInfo     Read vTransparentProxy        Write vTransparentProxy;
   Property RequestTimeOut          : Integer                    Read vRequestTimeOut          Write vRequestTimeOut;
   Property ConnectTimeOut          : Integer                    Read vConnectTimeOut          Write vConnectTimeOut;
-  Property ThreadRequest           : Boolean                    Read vThreadRequest           Write vThreadRequest;
   Property AllowCookies            : Boolean                    Read GetAllowCookies          Write SetAllowCookies;
   Property RedirectMaximum         : Integer                    Read vRedirectMaximum         Write vRedirectMaximum;
   Property HandleRedirects         : Boolean                    Read GetHandleRedirects       Write SetHandleRedirects;
@@ -1221,6 +1220,7 @@ Var
  JsonMode            : TJsonMode;
  DWParamsD,
  DWParams            : TDWParams;
+ vFileName,
  vObjectName,
  vOldMethod,
  vBasePath,
@@ -1233,6 +1233,7 @@ Var
  vReplyStringResult,
  vTempCmd,
  vCORSOption,
+ vTempText,
  Cmd, vmark,
 // UrlMethod,
 // urlContext,
@@ -1517,6 +1518,8 @@ Var
        DWParams.Add(JSONParam);
       End;
     End;
+   If Assigned(DWParams) Then
+    DWParams.RequestHeaders.Input.Assign(Value);
   End;
   {$ENDIF}
  begin
@@ -1654,6 +1657,8 @@ Var
       End;
     End;
   Finally
+   If Assigned(DWParams) Then
+    DWParams.RequestHeaders.Input.Assign(ARequest.CustomHeaders);
    tmp := '';
   End;
   {$ELSE}
@@ -1913,11 +1918,11 @@ Begin
      AResponse.SetCustomHeader('Access-Control-Allow-Origin', '*');
    End;
  {$ENDIF}
- sCharSet := '';
- vContentStringStream := Nil;
- Cmd := ClearRequestType(Cmd);
- If Cmd <> '' Then
-  TServerUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vUriOptions, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+  sCharSet := '';
+  vContentStringStream := Nil;
+  Cmd := ClearRequestType(Cmd);
+  If Cmd <> '' Then
+   TServerUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vUriOptions, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
  {$IFNDEF FPC}
   If ARequest.ContentLength > 0 Then
    Begin
@@ -1975,21 +1980,50 @@ Begin
                                        DWParams, aParamsCount, 'POST', vContentType);
     End;
   End;
-
-  // Try colocado mais acima - Eloy
-
   {$IFNDEF FPC}
    Cmd := Trim(lowercase(ARequest.PathInfo));
+   If DefaultBaseContext <> '' Then
+    Begin
+     sFile     := RemoveBackslashCommands(Cmd);
+     vTempText := IncludeTrailingPathDelimiter(DefaultBaseContext);
+     {$IFDEF MSWINDOWS}
+      vTempText := StringReplace(vTempText, '\', '/', [rfReplaceAll]);
+      vTempText := StringReplace(vTempText, '//', '/', [rfReplaceAll]);
+     {$ENDIF}
+     If Pos(vTempText, sFile) >= InitStrPos Then
+      Delete(sFile, Pos(vTempText, sFile) - FinalStrPos, Length(vTempText));
+     vFileName := FRootPath + vTempText + sFile;
+    End
+   Else
+    vFileName := FRootPath + Trim(Cmd);
   {$ELSE}
    Cmd := Trim(lowercase(ARequest.PathInfo));
    If Cmd = ''  Then
     Cmd := Trim(lowercase(ARequest.HeaderLine));
+   If DefaultBaseContext <> '' Then
+    Begin
+     sFile     := RemoveBackslashCommands(Cmd);
+     vTempText := IncludeTrailingPathDelimiter(DefaultBaseContext);
+     {$IFDEF MSWINDOWS}
+      vTempText := StringReplace(vTempText, '\', '/', [rfReplaceAll]);
+      vTempText := StringReplace(vTempText, '//', '/', [rfReplaceAll]);
+     {$ENDIF}
+     If Pos(vTempText, sFile) >= InitStrPos Then
+      Delete(sFile, Pos(vTempText, sFile) - FinalStrPos, Length(vTempText));
+     vFileName := FRootPath + vTempText + sFile;
+    End
+   Else
+    vFileName := FRootPath + Trim(Cmd);
+  {$ENDIF}
+  {$IFDEF MSWINDOWS}
+   vFileName := StringReplace(vFileName, '/', '\', [rfReplaceAll]);
+   vFileName := StringReplace(vFileName, '\\', '\', [rfReplaceAll]);
   {$ENDIF}
   vCompareContext := CompareBaseURL(Cmd);
   If (vPathTraversalRaiseError)            And
      ((TravertalPathFind(Trim(Cmd)))       Or
-     ((DWFileExists(Trim(Cmd), FRootPath)) And
-      (SystemProtectFiles(Trim(Cmd)))))    Then
+     ((DWFileExists(ExtractFileName(vFileName), ExtractFilePath(vFileName))) And
+      (SystemProtectFiles(Trim(vFileName)))))    Then
    Begin
     vErrorCode                   := 404;
     {$IFNDEF FPC}
@@ -2047,14 +2081,10 @@ Begin
      FreeAndNil(mb);
     Exit;
    End
-  Else If ((DWFileExists(Trim(Cmd), FRootPath)) And
+  Else If ((DWFileExists(ExtractFileName(vFileName), ExtractFilePath(vFileName))) And
            Not(SystemProtectFiles(Trim(Cmd))))  Then
    Begin
-    sFile  := FRootPath + Trim(Cmd);
-    {$IFDEF MSWINDOWS}
-     sFile := StringReplace(sFile, '/', '\', [rfReplaceAll]);
-     sFile := StringReplace(sFile, '\\', '\', [rfReplaceAll]);
-    {$ENDIF}
+    sFile  := vFileName;
     vErrorCode                   := 200;
     {$IFNDEF FPC}
      AResponse.StatusCode        := vErrorCode;
@@ -2096,7 +2126,6 @@ Begin
     {$ENDIF}
     Exit;
    End;
-  //SaveLog('new command : ' + Cmd);
     If Not (vBinaryevent) Then
      If (Trim(ARequest.Content) = '') And (Cmd = '') then
       Exit;
@@ -3945,6 +3974,18 @@ Begin
                 AResponse.ContentStream.Position := 0;
                 AResponse.ContentLength          := AResponse.ContentStream.Size;
                End;
+              If Assigned(DWParams) Then
+               Begin
+                If DWParams.RequestHeaders.Output.Count > 0 Then
+                 Begin
+                  For I := 0 To DWParams.RequestHeaders.Output.Count -1 Do
+                   AResponse.CustomHeaders.Add(DWParams.RequestHeaders.Output[I]);
+                 End;
+               End;
+              If Assigned(DWParams) And
+                (Pos(DWParams.Url_Redirect, Cmd) = 0) And
+                (DWParams.Url_Redirect <> '') Then
+               AResponse.SendRedirect(DWParams.Url_Redirect);
               {$IFNDEF FPC}
                AResponse.StatusCode            := vErrorCode;
               {$ELSE}
@@ -6298,6 +6339,15 @@ begin
  inherited Destroy;
 end;
 
+Procedure TRESTClientPooler.Abort;
+Begin
+ Try
+  HttpRequest.DisconnectNotifyPeer;
+  Raise Exception.Create('Request Abort...');
+ Except
+ End;
+End;
+
 Constructor TRESTClientPooler.Create(AOwner: TComponent);
 Begin
  Inherited;
@@ -6320,7 +6370,6 @@ Begin
  vRequestTimeOut                       := 10000;
  vConnectTimeOut                       := 3000;
  vRedirectMaximum                      := 0;
- vThreadRequest                        := False;
  vDatacompress                         := True;
  vEncodeStrings                        := True;
  vBinaryRequest                        := False;
@@ -6331,6 +6380,7 @@ Begin
  vFailOver                             := False;
  vFailOverReplaceDefaults              := False;
  vHandleRedirects                      := False;
+ vPropThreadRequest                    := False;
  vFailOverConnections                  := TFailOverConnections.Create(Self, TRESTDWConnectionServerCP);
 End;
 
@@ -6377,8 +6427,7 @@ Function TRESTClientPooler.SendEvent(EventData       : String;
                                      EventType       : TSendEvent = sePOST;
                                      JsonMode        : TJsonMode  = jmDataware;
                                      ServerEventName : String     = '';
-                                     Assyncexec      : Boolean    = False;
-                                     CallBack        : TCallBack  = Nil) : String; //Código original VCL e LCL
+                                     Assyncexec      : Boolean    = False) : String; //Código original VCL e LCL
 Var
  vErrorMessage,
  vErrorMessageA,
@@ -6830,54 +6879,44 @@ Var
       vURL := Format('%s&%s', [vURL, GetParamsValues(Params{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})]);
       If Assigned(vCripto) Then
        vURL := vURL + BuildValue('dwusecript',       BooleanToString(vCripto.Use));
-      If Not vThreadRequest Then
+      {$IFDEF FPC}
+       aStringStream := TStringStream.Create('');
+      {$ELSE}
+       aStringStream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+      {$ENDIF}
+      Case EventType Of
+       seGET    : HttpRequest.Get(vURL, aStringStream);
+       seDELETE : Begin
+                   {$IFDEF FPC}
+                    HttpRequest.Delete(vURL, aStringStream);
+                   {$ELSE}
+                    {$IFDEF OLDINDY}
+                     HttpRequest.Delete(vURL);
+                    {$ELSE}
+                     //HttpRequest.Delete(AUrl, atempResponse);
+                     TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, vURL, SendParams, aStringStream, []);
+                    {$ENDIF}
+                   {$ENDIF}
+                  End;
+      End;
+      If Not Assyncexec Then
        Begin
-        {$IFDEF FPC}
-         aStringStream := TStringStream.Create('');
-        {$ELSE}
-         aStringStream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
-        {$ENDIF}
-        Case EventType Of
-         seGET    : HttpRequest.Get(vURL, aStringStream);
-         seDELETE : Begin
-                     {$IFDEF FPC}
-                      HttpRequest.Delete(vURL, aStringStream);
-                     {$ELSE}
-                      {$IFDEF OLDINDY}
-                       HttpRequest.Delete(vURL);
-                      {$ELSE}
-                       //HttpRequest.Delete(AUrl, atempResponse);
-                       TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, vURL, SendParams, aStringStream, []);
-                      {$ENDIF}
-                     {$ENDIF}
-                    End;
-        End;
-        If Not Assyncexec Then
+        If vDatacompress Then
          Begin
-          If vDatacompress Then
+          If Assigned(aStringStream) Then
            Begin
-            If Assigned(aStringStream) Then
-             Begin
-              If aStringStream.Size > 0 Then
-               StringStream := ZDecompressStreamNew(aStringStream);
-              FreeAndNil(aStringStream);
-              ResultData := StringStream.DataString;
-              FreeAndNil(StringStream);
-             End;
-           End
-          Else
-           Begin
-            ResultData := aStringStream.DataString;
+            If aStringStream.Size > 0 Then
+             StringStream := ZDecompressStreamNew(aStringStream);
             FreeAndNil(aStringStream);
+            ResultData := StringStream.DataString;
+            FreeAndNil(StringStream);
            End;
+         End
+        Else
+         Begin
+          ResultData := aStringStream.DataString;
+          FreeAndNil(aStringStream);
          End;
-       End
-      Else
-       Begin
-        SResult    := HttpRequest.Get(vURL);
-        ResultData := SResult;
-        If Assigned(CallBack) Then
-         CallBack(SResult, Params);
        End;
       If vRSCharset = esUtf8 Then
        ResultData := Utf8Decode(ResultData);
@@ -7121,41 +7160,22 @@ Var
          Begin
           StringStream.Position := 0;
           vDataPack := StringStream.DataString;
-          If not vThreadRequest Then
+          {$IFNDEF FPC}
+           {$IF CompilerVersion > 21}
+            StringStream.Clear;
+           {$IFEND}
+           StringStream.Size := 0;
+          {$ENDIF}
+          FreeAndNil(StringStream);
+          If BinaryRequest Then
            Begin
-            {$IFNDEF FPC}
-             {$IF CompilerVersion > 21}
-              StringStream.Clear;
-             {$IFEND}
-             StringStream.Size := 0;
-            {$ENDIF}
-            FreeAndNil(StringStream);
-            If BinaryRequest Then
-             Begin
-              If Pos(TReplyNOK, vDataPack) > 0 Then
-               SetData(vDataPack, Params, ResultData)
-              Else
-               ResultData := vDataPack
-             End
+            If Pos(TReplyNOK, vDataPack) > 0 Then
+             SetData(vDataPack, Params, ResultData)
             Else
-             SetData(vDataPack, Params, ResultData);
+             ResultData := vDataPack
            End
           Else
-           Begin
-            {$IFNDEF FPC}
-             {$IF CompilerVersion > 21}
-             StringStream.Clear;
-             {$IFEND}
-            StringStream.Size := 0;
-            {$ENDIF}
-            FreeAndNil(StringStream);
-            If BinaryRequest Then
-             ResultData := vDataPack
-            Else
-             SetData(vDataPack, Params, SResult);
-            If Assigned(CallBack) Then
-             CallBack(SResult, Params);
-           End;
+           SetData(vDataPack, Params, ResultData);
          End;
        End;
      End;
@@ -7206,7 +7226,6 @@ Var
        End;
       End;
      {Todo: Acrescentado}
-     HttpRequest.Disconnect;
      If Assigned(MemoryStream) Then
       FreeAndNil(MemoryStream);
      If Assigned(aStringStream) Then
@@ -7223,6 +7242,9 @@ Var
       FreeAndNil(StringStream);
      If Assigned(aStringStream) then
       FreeAndNil(aStringStream);
+     If Assigned(HttpRequest) Then
+      If HttpRequest.Connected Then
+       HttpRequest.Disconnect;
      If Not vFailOver then
       Begin
       {$IFNDEF FPC}
@@ -7241,16 +7263,8 @@ Var
    On E : Exception Do
     Begin
      Result := False;
-     If Not vThreadRequest Then
-      ResultData := GetPairJSON('NOK', cPoolerNotFound)
-     Else
-      Begin
-       SResult := GetPairJSON('NOK', cPoolerNotFound);
-       If Assigned(CallBack) Then
-        CallBack(SResult, Params);
-      End;
+     ResultData := GetPairJSON('NOK', cPoolerNotFound);
      {Todo: Acrescentado}
-     HttpRequest.Disconnect;
      If Assigned(SendParams) then
       FreeAndNil(SendParams);
      //Alexandre Magno - 24/11/2018
@@ -7265,6 +7279,9 @@ Var
       FreeAndNil(aStringStream);
      If Assigned(MemoryStream) Then
       FreeAndNil(MemoryStream);
+     If Assigned(HttpRequest) Then
+      If HttpRequest.Connected Then
+       HttpRequest.Disconnect;
      If Not vFailOver then
       Begin
        ErrorMessage := E.Message;
@@ -7412,7 +7429,6 @@ Begin
      End;
    End;
  Finally
-  vThreadExecuting := False;
   If (vErrorMessage <> '') Then
    Begin
     Result := vErrorMessage;
@@ -10465,6 +10481,7 @@ Var
  aurlContext,
  tmp, JSONStr,
  ReturnObject,
+ vTempText,
  sFile,
  sContentType,
  vContentType,
@@ -10678,6 +10695,8 @@ Var
       End;
     End;
   Finally
+   If ARequestInfo.RawHeaders <> Nil Then
+    DWParams.RequestHeaders.Input.Assign(ARequestInfo.RawHeaders);
    tmp := '';
   End;
  end;
@@ -10961,9 +10980,35 @@ Begin
      sContentType:='text/css';
     {$IFNDEF FPC}
      {$if CompilerVersion > 21}
-      sFile := FRootPath + RemoveBackslashCommands(ARequestInfo.URI);
+      If DefaultBaseContext <> '' Then
+       Begin
+        sFile := RemoveBackslashCommands(ARequestInfo.URI);
+        vTempText := IncludeTrailingPathDelimiter(DefaultBaseContext);
+        {$IFDEF MSWINDOWS}
+         vTempText := StringReplace(vTempText, '\', '/', [rfReplaceAll]);
+         vTempText := StringReplace(vTempText, '//', '/', [rfReplaceAll]);
+        {$ENDIF}
+        If Pos(vTempText, sFile) >= InitStrPos Then
+         Delete(sFile, Pos(vTempText, sFile) - FinalStrPos, Length(vTempText));
+        sFile := FRootPath + vTempText + sFile;
+       End
+      Else
+       sFile := FRootPath + RemoveBackslashCommands(ARequestInfo.URI);
      {$ELSE}
-      sFile := FRootPath + RemoveBackslashCommands(ARequestInfo.Command);
+      If DefaultBaseContext <> '' Then
+       Begin
+        sFile := RemoveBackslashCommands(ARequestInfo.Command);
+        vTempText := IncludeTrailingPathDelimiter(DefaultBaseContext);
+        {$IFDEF MSWINDOWS}
+         vTempText := StringReplace(vTempText, '\', '/', [rfReplaceAll]);
+         vTempText := StringReplace(vTempText, '//', '/', [rfReplaceAll]);
+        {$ENDIF}
+        If Pos(vTempText, sFile) >= InitStrPos Then
+         Delete(sFile, Pos(vTempText, sFile) - FinalStrPos, Length(vTempText));
+        sFile := FRootPath + vTempText + sFile;
+       End
+      Else
+       sFile := FRootPath + RemoveBackslashCommands(ARequestInfo.Command);
      {$IFEND}
     {$ELSE}
      sFile := FRootPath  + RemoveBackslashCommands(ARequestInfo.URI);
@@ -12893,7 +12938,19 @@ Begin
                   vReplyString := JSONStr;
                 End;
               End;
+             If Assigned(DWParams) Then
+              Begin
+               If DWParams.RequestHeaders.Output.Count > 0 Then
+                Begin
+                 For I := 0 To DWParams.RequestHeaders.Output.Count -1 Do
+                  AResponseInfo.CustomHeaders.Add(DWParams.RequestHeaders.Output[I]);
+                End;
+              End;
              AResponseInfo.ResponseNo                 := vErrorCode;
+             If Assigned(DWParams) And
+               (Pos(DWParams.Url_Redirect, Cmd) = 0) And
+               (DWParams.Url_Redirect <> '') Then
+              AResponseInfo.Redirect(DWParams.Url_Redirect);
              If compresseddata Then
               Begin
                If vBinaryEvent Then
@@ -13767,6 +13824,7 @@ Var
   aStream.Position := 0;
  End;
 Begin
+ ProcessMessages;
  vReplyStr := '';
   {$IFNDEF FPC}
    {$IF (DEFINED(OLDINDY))}
@@ -13892,6 +13950,7 @@ Begin
                   End;
     End;
    End;
+  ProcessMessages;
  Except
   On E : EIdSocketError Do
    Begin

@@ -41,17 +41,17 @@ Uses {$IFDEF FPC}
  Type
   TDWPoolerMethodClient  = Class(TComponent)
   Private
-   vOnWork               : TOnWork;
-   vOnWorkBegin          : TOnWorkBegin;
-   vOnWorkEnd            : TOnWorkEnd;
-   vOnStatus             : TOnStatus;
+   vOnWork                 : TOnWork;
+   vOnWorkBegin            : TOnWorkBegin;
+   vOnWorkEnd              : TOnWorkEnd;
+   vOnStatus               : TOnStatus;
    vHandleRedirects,
    vBinaryRequest,
    vEncodeStrings,
-   vCompression          : Boolean;
-   vEncoding             : TEncodeSelect;
+   vCompression            : Boolean;
+   vEncoding               : TEncodeSelect;
    {$IFDEF FPC}
-   vDatabaseCharSet      : TDatabaseCharSet;
+   vDatabaseCharSet        : TDatabaseCharSet;
    {$ENDIF}
    vDataRoute,
    vServerContext,
@@ -59,15 +59,16 @@ Uses {$IFDEF FPC}
    vPoolerURL,
    vAccessTag,
    vWelcomeMessage,
-   vHost                 : String;
+   vHost                   : String;
    vTimeOut,
    vConnectTimeOut,
-   vPort                 : Integer;
-   vCripto               : TCripto;
-   vTypeRequest          : TtypeRequest;
-   vAuthOptionParams     : TRDWClientAuthOptionParams;
-   vRedirectMaximum      : Integer;
-   vOnBeforeGetToken     : TOnBeforeGetToken;
+   vPort                   : Integer;
+   vCripto                 : TCripto;
+   vTypeRequest            : TtypeRequest;
+   vAuthOptionParams       : TRDWClientAuthOptionParams;
+   vRedirectMaximum        : Integer;
+   vOnBeforeGetToken       : TOnBeforeGetToken;
+   vActualClientPoolerExec : TRESTClientPooler;
    Procedure SetOnWork     (Value : TOnWork);
    Procedure SetOnWorkBegin(Value : TOnWorkBegin);
    Procedure SetOnWorkEnd  (Value : TOnWorkEnd);
@@ -80,6 +81,7 @@ Uses {$IFDEF FPC}
   Public
    Constructor Create(AOwner: TComponent);Override;
    Destructor  Destroy;Override;
+   Procedure   Abort;
    Function GetPoolerList         (Method_Prefix           : String;
                                    TimeOut                 : Integer = 3000;
                                    ConnectTimeOut          : Integer = 3000;
@@ -382,6 +384,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
@@ -570,6 +573,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
@@ -930,6 +934,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
@@ -1076,6 +1081,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -1254,6 +1260,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.WelcomeMessage  := vWelcomeMessage;
  RESTClientPoolerExec.HandleRedirects := vHandleRedirects;
@@ -1369,6 +1376,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent          := vUserAgent;
  RESTClientPoolerExec.RequestTimeOut     := TimeOut;
@@ -1466,6 +1474,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -1658,6 +1667,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -1854,6 +1864,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -2056,6 +2067,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -2251,6 +2263,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -2471,6 +2484,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -2626,6 +2640,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -2783,6 +2798,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -2964,6 +2980,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.WelcomeMessage  := vWelcomeMessage;
  RESTClientPoolerExec.Host            := Host;
@@ -3070,6 +3087,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -3202,6 +3220,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -3349,6 +3368,7 @@ Begin
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
+ vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -3460,6 +3480,12 @@ Begin
  End;
 End;
 
+Procedure TDWPoolerMethodClient.Abort;
+Begin
+ If Assigned(vActualClientPoolerExec) Then
+  vActualClientPoolerExec.Abort;
+End;
+
 Function TDWPoolerMethodClient.ApplyUpdates(LinesDataset,
                                             Pooler,
                                             Method_Prefix    : String;
@@ -3490,6 +3516,7 @@ Begin
      vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
      vtyperequest         := RESTClientPoolerExec.TypeRequest;
     End;
+   vActualClientPoolerExec               := RESTClientPoolerExec;
    RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
    RESTClientPoolerExec.UserAgent        := vUserAgent;
    RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -3637,6 +3664,7 @@ Begin
      vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
      vtyperequest         := RESTClientPoolerExec.TypeRequest;
     End;
+   vActualClientPoolerExec := RESTClientPoolerExec;
    RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
    RESTClientPoolerExec.UserAgent        := vUserAgent;
    RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;

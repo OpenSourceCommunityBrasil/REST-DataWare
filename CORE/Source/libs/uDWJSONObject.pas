@@ -402,11 +402,21 @@ Type
 End;
 
 Type
+ TRESTDWHeaders = Class(TObject)
+  Input,
+  Output : TStringList;
+  Constructor Create;
+  Destructor Destroy;Override;
+End;
+
+Type
  TDWParams = Class(TList)
  Private
-  vJsonMode : TJsonMode;
-  vEncoding : TEncodeSelect;
-  vCripto   : TCripto;
+  vJsonMode     : TJsonMode;
+  vEncoding     : TEncodeSelect;
+  vCripto       : TCripto;
+  vHeaders      : TRESTDWHeaders;
+  vUrl_Redirect : String;
   {$IFDEF FPC}
   vEncodingLazarus : TEncoding;
   vDatabaseCharSet : TDatabaseCharSet;
@@ -442,12 +452,14 @@ Type
   Procedure   LoadFromParams(Params : TParams);
   Procedure   SetCriptOptions(Use   : Boolean;
                               Key   : String);
-  Property    Items      [Index     : Integer]    : TJSONParam Read GetRec     Write PutRec; Default;
-  Property    ItemsString[Index     : String]     : TJSONParam Read GetRecName Write PutRecName;
-  Property    RawBody               : TJSONParam               Read GetRawBody Write PutRawBody;
-  Property    JsonMode              : TJsonMode                Read vJsonMode  Write vJsonMode;
-  Property    Encoding              : TEncodeSelect            Read vEncoding  Write vEncoding;
-  Property    CriptOptions          : TCripto                  Read vCripto    Write vCripto;
+  Property    Items      [Index     : Integer]    : TJSONParam Read GetRec        Write PutRec; Default;
+  Property    ItemsString[Index     : String]     : TJSONParam Read GetRecName    Write PutRecName;
+  Property    RawBody               : TJSONParam               Read GetRawBody    Write PutRawBody;
+  Property    JsonMode              : TJsonMode                Read vJsonMode     Write vJsonMode;
+  Property    Encoding              : TEncodeSelect            Read vEncoding     Write vEncoding;
+  Property    CriptOptions          : TCripto                  Read vCripto       Write vCripto;
+  Property    RequestHeaders        : TRESTDWHeaders           Read vHeaders      Write vHeaders;
+  Property    Url_Redirect          : String                   Read vUrl_Redirect Write vUrl_Redirect;
   {$IFDEF FPC}
   Property DatabaseCharSet          : TDatabaseCharSet Read vDatabaseCharSet    Write vDatabaseCharSet;
   {$ENDIF}
@@ -707,17 +719,26 @@ Begin
                   vTempValue := Value;
                   If vTempValue <> '' Then
                    Begin
-                    {$IFDEF FPC}
-                      If StrToInt64(vTempValue) > 0 Then
-                       Field.AsDateTime := UnixToDateTime(StrToInt64(vTempValue));
-                    {$ELSE}
-                      If StrToInt64(vTempValue) > 0 Then
-                      {$IF CompilerVersion < 22}
-                       Field.AsDateTime := UnixToDateTime(StrToInt64(vTempValue));
+                    If (Pos('.', vTempValue) > 0) Or
+                       (Pos(':', vTempValue) > 0) Or
+                       (Pos('/', vTempValue) > 0) Or
+                       (Pos('\', vTempValue) > 0) Or
+                       (Pos('-', vTempValue) > 0) Then
+                     Field.AsDateTime := StrToDateTime(vTempValue)
+                    Else
+                     Begin
+                      {$IFDEF FPC}
+                       If StrToInt64(vTempValue) > 0 Then
+                        Field.AsDateTime := UnixToDateTime(StrToInt64(vTempValue));
                       {$ELSE}
-                       Field.AsDateTime := UnixToDateTime(StrToInt64(vTempValue));
-                     {$IFEND}
-                    {$ENDIF}
+                       If StrToInt64(vTempValue) > 0 Then
+                       {$IF CompilerVersion < 22}
+                        Field.AsDateTime := UnixToDateTime(StrToInt64(vTempValue));
+                       {$ELSE}
+                        Field.AsDateTime := UnixToDateTime(StrToInt64(vTempValue));
+                       {$IFEND}
+                      {$ENDIF}
+                     End;
                    End;
                  End;
  End;
@@ -1526,8 +1547,10 @@ End;
 Constructor TDWParams.Create;
 Begin
  Inherited;
- vCripto   := TCripto.Create;
- vJsonMode := jmDataware;
+ vCripto       := TCripto.Create;
+ vJsonMode     := jmDataware;
+ vHeaders      := TRESTDWHeaders.Create;
+ vUrl_Redirect := '';
  {$IFNDEF FPC}
   {$IF CompilerVersion > 21}
    vEncoding := esUtf8;
@@ -1712,6 +1735,7 @@ Destructor TDWParams.Destroy;
 Begin
  ClearList;
  FreeAndNil(vCripto);
+ FreeAndNil(vHeaders);
  Inherited;
 End;
 
@@ -2229,7 +2253,7 @@ Begin
       (Lowercase(Result) <> 'null') Then
     Begin
      If (Pos('/', Result) = 0) And
-        (Pos('-', Result) = 0) Then
+        (Pos('-', Result) <= 1) Then
       Result := UnixToDateTime(StrToInt64(Result));
     End
    Else
@@ -6739,6 +6763,22 @@ Procedure TStringStreamList.PutRec(Index : Integer;
 Begin
  If (Index < Self.Count) And (Index > -1) Then
   TStringStream(TList(Self).Items[Index]^) := Item;
+End;
+
+{ TRESTDWHeaders }
+
+Constructor TRESTDWHeaders.Create;
+Begin
+ Inherited;
+ Input  := TStringList.Create;
+ Output := TStringList.Create;
+End;
+
+Destructor TRESTDWHeaders.Destroy;
+Begin
+ FreeAndNil(Input);
+ FreeAndNil(Output);
+ Inherited;
 End;
 
 End.
