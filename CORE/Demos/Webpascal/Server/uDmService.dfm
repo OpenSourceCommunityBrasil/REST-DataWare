@@ -120,8 +120,8 @@ object ServerMethodDM: TServerMethodDM
     BaseContext = 'www'
     RootContext = 'login'
     OnBeforeRenderer = dwsCrudServerBeforeRenderer
-    Left = 112
-    Top = 169
+    Left = 136
+    Top = 161
   end
   object FDPhysPgDriverLink1: TFDPhysPgDriverLink
     Left = 201
@@ -524,7 +524,7 @@ object ServerMethodDM: TServerMethodDM
         OnBeforeRendererContextItem = dwcrIndexItemsdwframeBeforeRendererContextItem
       end>
     OnBeforeRenderer = dwcrIndexBeforeRenderer
-    Left = 188
+    Left = 204
     Top = 129
   end
   object dwcrLogin: TDWContextRules
@@ -675,8 +675,8 @@ object ServerMethodDM: TServerMethodDM
         OnBeforeRendererContextItem = dwcrLoginItemsmeuloginnameBeforeRendererContextItem
       end>
     OnBeforeRenderer = dwcrLoginBeforeRenderer
-    Left = 184
-    Top = 176
+    Left = 208
+    Top = 208
   end
   object rOpenSecrets: TRESTDWClientSQL
     FieldDefs = <>
@@ -699,6 +699,7 @@ object ServerMethodDM: TServerMethodDM
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = False
+    ThreadRequest = False
     RaiseErrors = True
     ActionCursor = crSQLWait
     ReflectChanges = False

@@ -69,7 +69,6 @@ type
     Label18: TLabel;
     RESTServicePooler1: TRESTServicePooler;
     Tupdatelogs: TTimer;
-    RESTDWServiceNotification1: TRESTDWServiceNotification;
     paTopo: TPanel;
     Image2: TImage;
     paPortugues: TPanel;

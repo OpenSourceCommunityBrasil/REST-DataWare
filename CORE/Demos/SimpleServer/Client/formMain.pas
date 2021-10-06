@@ -84,6 +84,7 @@ Uses
     EdUserNameAuth: TEdit;
     Label5: TLabel;
     Button2: TButton;
+    cbThreadrequest: TCheckBox;
    Procedure btnOpenClick            (Sender            : TObject);
    Procedure btnExecuteClick         (Sender            : TObject);
    Procedure RESTDWDataBase1WorkBegin(ASender           : TObject;
@@ -195,6 +196,7 @@ Begin
  RESTDWClientSQL1.SQL.Clear;
  RESTDWClientSQL1.SQL.Add(MComando.Text);
  RESTDWClientSQL1.UpdateTableName  := Trim(eUpdateTableName.Text);
+ RESTDWClientSQL1.ThreadRequest    := cbThreadrequest.Checked;
  Try
   RESTDWClientSQL1.Active          := True;
  Except
@@ -219,6 +221,7 @@ End;
 
 Procedure TForm2.btnExecuteClick(Sender: TObject);
 Var
+ vErrorResult : Boolean;
  VError : String;
 Begin
  RESTDWDataBase1.Close;
@@ -239,10 +242,18 @@ Begin
  RESTDWClientSQL1.Close;
  RESTDWClientSQL1.SQL.Clear;
  RESTDWClientSQL1.SQL.Add(MComando.Text);
- If Not RESTDWClientSQL1.ExecSQL(VError) Then
-  Application.MessageBox(PChar('Erro executando o comando ' + RESTDWClientSQL1.SQL.Text), 'Erro...', Mb_IconError + Mb_Ok)
+ If RESTDWClientSQL1.MassiveType = mtMassiveCache Then
+  Begin
+   If Not RESTDWClientSQL1.ExecSQL(VError) Then
+    Application.MessageBox(PChar('Erro executando o comando ' + RESTDWClientSQL1.SQL.Text), 'Erro...', Mb_IconError + Mb_Ok)
+   Else
+    Application.MessageBox(PChar(Format('Comando executado com sucesso...Linhas Afetadas %d', [RESTDWClientSQL1.RowsAffected])), 'Informação !!!', Mb_iconinformation + Mb_Ok);
+  End
  Else
-  Application.MessageBox(PChar(Format('Comando executado com sucesso...Linhas Afetadas %d', [RESTDWClientSQL1.RowsAffected])), 'Informação !!!', Mb_iconinformation + Mb_Ok);
+  Begin
+   RESTDWClientSQL1.ExecSQL;
+   RESTDWDataBase1.ApplyUpdates(DWMassiveCache1, vErrorResult, vError); // RESTDWClientSQL1.ApplyUpdates;
+  End;
  RESTDWClientSQL1.Active := Not RESTDWClientSQL1.Active;
  If RESTDWClientSQL1.Active Then
   Setkeys;
@@ -562,9 +573,12 @@ end;
 procedure TForm2.RESTDWClientSQL1WriterProcess(DataSet: TDataSet; RecNo,
   RecordCount: Integer; var AbortProcess: Boolean);
 begin
- ProgressBar1.Min      := 0;
- ProgressBar1.Position := RecNo;
- ProgressBar1.Max      := RecordCount;
+ If Assigned(ProgressBar1) Then
+  Begin
+   ProgressBar1.Min      := 0;
+   ProgressBar1.Position := RecNo;
+   ProgressBar1.Max      := RecordCount;
+  End;
 end;
 
 Procedure TForm2.RESTDWDataBase1BeforeConnect(Sender: TComponent);
@@ -661,33 +675,45 @@ End;
 
 Procedure TForm2.RESTDWDataBase1Work(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
 Begin
- If FBytesToTransfer = 0 Then // No Update File
-  Exit;
- ProgressBar1.Position := AWorkCount;
- ProgressBar1.Update;
+ If Assigned(ProgressBar1) Then
+  Begin
+   If FBytesToTransfer = 0 Then // No Update File
+    Exit;
+   ProgressBar1.Position := AWorkCount;
+   ProgressBar1.Update;
+  End;
 End;
 
 Procedure TForm2.RESTDWDataBase1WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
 Begin
- FBytesToTransfer      := AWorkCountMax;
- ProgressBar1.Max      := FBytesToTransfer;
- ProgressBar1.Position := 0;
- ProgressBar1.Update;
+ If Assigned(ProgressBar1) Then
+  Begin
+   FBytesToTransfer      := AWorkCountMax;
+   ProgressBar1.Max      := FBytesToTransfer;
+   ProgressBar1.Position := 0;
+   ProgressBar1.Update;
+  End;
 End;
 
 Procedure TForm2.RESTDWDataBase1WorkEnd(ASender: TObject; AWorkMode: TWorkMode);
 Begin
- ProgressBar1.Position := FBytesToTransfer;
- Application.ProcessMessages;
- FBytesToTransfer := 0;
+ If Assigned(ProgressBar1) Then
+  Begin
+   ProgressBar1.Position := FBytesToTransfer;
+   Application.ProcessMessages;
+   FBytesToTransfer := 0;
+  End;
 End;
 
 procedure TForm2.RESTDWTable1WriterProcess(DataSet: TDataSet; RecNo,
   RecordCount: Integer; var AbortProcess: Boolean);
 begin
- ProgressBar1.Min      := 0;
- ProgressBar1.Position := RecNo;
- ProgressBar1.Max      := RecordCount;
+ If Assigned(ProgressBar1) Then
+  Begin
+   ProgressBar1.Min      := 0;
+   ProgressBar1.Position := RecNo;
+   ProgressBar1.Max      := RecordCount;
+  End;
 end;
 
 End.

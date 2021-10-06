@@ -248,7 +248,7 @@ object Form2: TForm2
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    Text = 'localhost'
+    Text = '127.0.0.1'
   end
   object ePort: TEdit
     Left = 147
@@ -2017,14 +2017,12 @@ object Form2: TForm2
     Width = 120
     Height = 19
     Caption = 'Binary Compatible'
-    Checked = True
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
     ParentFont = False
-    State = cbChecked
     TabOrder = 21
   end
   object eUpdateTableName: TEdit
@@ -2248,6 +2246,22 @@ object Form2: TForm2
       OnClick = Button2Click
     end
   end
+  object cbThreadrequest: TCheckBox
+    Left = 350
+    Top = 183
+    Width = 120
+    Height = 19
+    Caption = 'Threadrequest'
+    Checked = True
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+    State = cbChecked
+    TabOrder = 26
+  end
   object DataSource1: TDataSource
     DataSet = RESTDWClientSQL1
     Left = 224
@@ -2256,44 +2270,27 @@ object Form2: TForm2
   object RESTDWDataBase1: TRESTDWDataBase
     OnConnection = RESTDWDataBase1Connection
     OnBeforeConnect = RESTDWDataBase1BeforeConnect
-    Active = True
+    Active = False
     Compression = True
     CriptOptions.Use = False
     CriptOptions.Key = 'RDWBASEKEY256'
-    MyIP = '127.0.0.1'
-    AuthenticationOptions.AuthorizationOption = rdwAOToken
+    AuthenticationOptions.AuthorizationOption = rdwAOBasic
     AuthenticationOptions.OptionParams.AuthDialog = True
     AuthenticationOptions.OptionParams.CustomDialogAuthMessage = 'Protected Space...'
     AuthenticationOptions.OptionParams.Custom404TitleMessage = '(404) The address you are looking for does not exist'
     AuthenticationOptions.OptionParams.Custom404BodyMessage = '404'
     AuthenticationOptions.OptionParams.Custom404FooterMessage = 'Take me back to <a href="./">Home REST Dataware'
-    AuthenticationOptions.OptionParams.TokenType = rdwJWT
-    AuthenticationOptions.OptionParams.TokenRequestType = rdwtRequest
-    AuthenticationOptions.OptionParams.GetTokenEvent = 'GetToken'
-    AuthenticationOptions.OptionParams.Key = 'token'
-    AuthenticationOptions.OptionParams.Token = 
-      'eyJhbGciOiAiQUVTMjU2IiwgInR5cCI6ICJKV1QifV==.eyJpc3MiOiJjd3pGclV' +
-      'lSXJnZ2dYRExJdEdZSCIsICJleHAiOiIxNjAwNjkwMzEyIiwgImlhdCI6IjE2MDA' +
-      '2ODg1MTIiLCAic2VjcmV0cyI6ImV5SnpaV055WlhSeklqb2laWGxLY0ZwRFNUWkp' +
-      'ha2xwVEVOQmFXSkhPVzVoVnpScFQybEtkMWxZVm5OaWVVbzVJaXdnSW0xa05TSTZ' +
-      'JalEyUkRFeFFrSXdNRVU1TmtZek5rRTBSRFpFUmprd056Y3lSVEUwTVVNeUluMD0' +
-      'ifT==.WttI9Af/wG7WdGd6KfDM/Vb39FcC0/zcNwXlHlpcevw2BvPzuFfM7RJJ5l' +
-      'a0fnmtP8vPuJ6jCaBTzVrbWFwM7ctY4whgUDF9eXIv5pfPwG1RdxjeaBAbwlDvxT' +
-      'OKUedhA1JWLVXhgsAObbMqRc37x/EvvnVUM/VZwFd3WPAwdWIqZ1ua0dX5TpEhqB' +
-      'L5WPMe+Idh43Ogex9BidXw0sWnJF+4zDQGJhnNmf2MM/se2uWJw3KF+XhPZzoDQH' +
-      '17N3jEqfhitqrT/sCdWPmRx/NjsIz41tNuwPG2nPIQLLSEPHtE/48qiw7Skh75Zd' +
-      'rcrebpG+830SgCJFKFDioPIT7hmPFUprh5/0Y+lRBYGbLwBJaXhczKDGFaC7UY28' +
-      '1GptCFW/JyerDnLza/AP7Y+M8sA4Pjifuf91ccieyDnMfACV/FZI5Gtw=='
-    AuthenticationOptions.OptionParams.AutoGetToken = False
-    AuthenticationOptions.OptionParams.AutoRenewToken = False
+    AuthenticationOptions.OptionParams.Username = 'testserver'
+    AuthenticationOptions.OptionParams.Password = 'testserver'
     Proxy = False
     ProxyOptions.Port = 8888
-    PoolerService = 'localhost'
+    PoolerService = '127.0.0.1'
     PoolerPort = 8082
     PoolerName = 'TServerMethodDM.RESTDWPoolerFD'
     StateConnection.AutoCheck = False
     StateConnection.InTime = 1000
     RequestTimeOut = 100000
+    ConnectTimeOut = 3000
     EncodeStrings = True
     Encoding = esUtf8
     StrsTrim = False
@@ -2612,7 +2609,7 @@ object Form2: TForm2
     ProxyOptions.BasicAuthentication = False
     ProxyOptions.ProxyPort = 0
     RequestTimeOut = 10000
-    ThreadRequest = False
+    ConnectTimeOut = 3000
     AllowCookies = False
     RedirectMaximum = 0
     HandleRedirects = False
@@ -2630,11 +2627,76 @@ object Form2: TForm2
     Top = 401
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
-    FieldDefs = <>
+    FieldDefs = <
+      item
+        Name = 'EMP_NO'
+        Attributes = [faRequired]
+        DataType = ftSmallint
+      end
+      item
+        Name = 'FIRST_NAME'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 15
+      end
+      item
+        Name = 'LAST_NAME'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 20
+      end
+      item
+        Name = 'PHONE_EXT'
+        DataType = ftString
+        Size = 4
+      end
+      item
+        Name = 'HIRE_DATE'
+        Attributes = [faRequired]
+        DataType = ftTimeStamp
+      end
+      item
+        Name = 'DEPT_NO'
+        Attributes = [faRequired, faFixed]
+        DataType = ftFixedChar
+        Size = 3
+      end
+      item
+        Name = 'JOB_CODE'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 5
+      end
+      item
+        Name = 'JOB_GRADE'
+        Attributes = [faRequired]
+        DataType = ftSmallint
+      end
+      item
+        Name = 'JOB_COUNTRY'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 15
+      end
+      item
+        Name = 'SALARY'
+        Attributes = [faRequired]
+        DataType = ftFloat
+        Precision = 16
+      end
+      item
+        Name = 'FULL_NAME'
+        DataType = ftString
+        Size = 37
+      end
+      item
+        Name = 'TIMEC'
+        DataType = ftTime
+      end>
     IndexDefs = <>
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
-    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.AssignedValues = [rvStoreItems, rvSilentMode]
     ResourceOptions.SilentMode = True
     UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
@@ -2645,10 +2707,10 @@ object Form2: TForm2
     SequenceField = 'EMP_NO'
     OnWriterProcess = RESTDWClientSQL1WriterProcess
     MasterCascadeDelete = False
-    BinaryRequest = False
+    BinaryRequest = True
     Datapacks = -1
     DataCache = False
-    MassiveType = mtMassiveCache
+    MassiveType = mtMassiveObject
     Params = <>
     DataBase = RESTDWDataBase1
     SQL.Strings = (
@@ -2657,7 +2719,9 @@ object Form2: TForm2
     CacheUpdateRecords = True
     AutoCommitData = False
     AutoRefreshAfterCommit = False
+    ThreadRequest = True
     RaiseErrors = True
+    MassiveCache = DWMassiveCache1
     ActionCursor = crSQLWait
     ReflectChanges = True
     Left = 195

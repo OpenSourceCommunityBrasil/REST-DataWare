@@ -3242,16 +3242,24 @@ object RestDWForm: TRestDWForm
     Active = False
     CORS = False
     CORS_CustomHeaders.Strings = (
+      'Access-Control-Allow-Origin=*'
       
         'Access-Control-Allow-Methods=GET, POST, PATCH, PUT, DELETE, OPTI' +
         'ONS'
       
         'Access-Control-Allow-Headers=Content-Type, Origin, Accept, Autho' +
         'rization, X-CUSTOM-HEADER')
+    DefaultBaseContext = '/www'
+    PathTraversalRaiseError = True
     RequestTimeout = -1
     ServicePort = 8082
     ProxyOptions.Port = 8888
     AuthenticationOptions.AuthorizationOption = rdwAOToken
+    AuthenticationOptions.OptionParams.AuthDialog = True
+    AuthenticationOptions.OptionParams.CustomDialogAuthMessage = 'Protected Space...'
+    AuthenticationOptions.OptionParams.Custom404TitleMessage = '(404) The address you are looking for does not exist'
+    AuthenticationOptions.OptionParams.Custom404BodyMessage = '404'
+    AuthenticationOptions.OptionParams.Custom404FooterMessage = 'Take me back to <a href="./">Home REST Dataware'
     AuthenticationOptions.OptionParams.TokenType = rdwJWT
     AuthenticationOptions.OptionParams.CryptType = rdwAES256
     AuthenticationOptions.OptionParams.Key = 'token'
@@ -3265,15 +3273,13 @@ object RestDWForm: TRestDWForm
     OnLastRequest = RESTServicePooler1LastRequest
     OnLastResponse = RESTServicePooler1LastResponse
     Encoding = esUtf8
-    ServerContext = 'restdataware'
-    RootPath = '/'
+    RootPath = '/www/'
     SSLVerifyMode = [sslvrfPeer]
     SSLVerifyDepth = 2
     ForceWelcomeAccess = False
-    RESTServiceNotification = RESTDWServiceNotification1
     CriptOptions.Use = True
     CriptOptions.Key = 'RDWBASEKEY256'
-    MultiCORE = True
+    MultiCORE = False
     Left = 434
     Top = 270
   end
@@ -3282,11 +3288,5 @@ object RestDWForm: TRestDWForm
     OnTimer = tupdatelogsTimer
     Left = 546
     Top = 288
-  end
-  object RESTDWServiceNotification1: TRESTDWServiceNotification
-    GarbageTime = 60000
-    QueueNotifications = 50
-    Left = 382
-    Top = 270
   end
 end
