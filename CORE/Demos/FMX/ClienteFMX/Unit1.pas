@@ -13,8 +13,7 @@ uses
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Comp.DataSet, FireDAC.Comp.Client, system.diagnostics,
   System.TimeSpan, IdComponent, uDWConstsData, IdSSLOpenSSL,system.ioutils,IdSSLOpenSSLHeaders,
-  FMX.TabControl, System.Actions, FMX.ActnList, uDWDataset, uDWAbout,
-  uRESTDWServerEvents, uRESTDWBase, UDWJSONObject;
+  FMX.TabControl, System.Actions, FMX.ActnList;
 
 type
   TForm1 = class(TForm)
@@ -43,6 +42,17 @@ type
     LinkGridToDataSourceBindSourceDB12: TLinkGridToDataSource;
     tbc1: TTabControl;
     tablista: TTabItem;
+    RESTDWClientSQL1EMP_NO: TSmallintField;
+    RESTDWClientSQL1FIRST_NAME: TWideStringField;
+    RESTDWClientSQL1LAST_NAME: TWideStringField;
+    RESTDWClientSQL1PHONE_EXT: TWideStringField;
+    RESTDWClientSQL1HIRE_DATE: TSQLTimeStampField;
+    RESTDWClientSQL1DEPT_NO: TWideStringField;
+    RESTDWClientSQL1JOB_CODE: TWideStringField;
+    RESTDWClientSQL1JOB_GRADE: TSmallintField;
+    RESTDWClientSQL1JOB_COUNTRY: TWideStringField;
+    RESTDWClientSQL1SALARY: TFloatField;
+    RESTDWClientSQL1FULL_NAME: TWideStringField;
     tabaltera: TTabItem;
     actlst1: TActionList;
     ChangeTabaltera: TChangeTabAction;
@@ -53,15 +63,11 @@ type
     btngrava: TButton;
     LinkControlToField1: TLinkControlToField;
     LinkControlToField2: TLinkControlToField;
-    RESTClientPooler1: TRESTClientPooler;
-    DWClientEvents1: TDWClientEvents;
-    bServerTime: TButton;
     procedure btn1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure StringGrid1Tap(Sender: TObject; const Point: TPointF);
     procedure btngravaClick(Sender: TObject);
     procedure StringGrid1CellClick(const Column: TColumn; const Row: Integer);
-    procedure bServerTimeClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -75,36 +81,6 @@ var
 implementation
 
 {$R *.fmx}
-
-procedure TForm1.bServerTimeClick(Sender: TObject);
-Var
- dwParams      : TDWParams;
- vErrorMessage : String;
- vResult       : Boolean;
-begin
- RESTClientPooler1.Host            := edtip.Text;
- RESTClientPooler1.Port            := StrToInt(edtporta.Text);
- RESTClientPooler1.UserName        := 'testserver';
- RESTClientPooler1.Password        := 'testserver';
- RESTClientPooler1.DataCompression := True;
-// RESTClientPooler1.AccessTag       := eAccesstag.Text;
-// RESTClientPooler1.WelcomeMessage  := eWelcomemessage.Text;
- RESTClientPooler1.TypeRequest := TTyperequest.trHttp;
- vResult := DWClientEvents1.GetEvents;
- DWClientEvents1.CreateDWParams('servertime', dwParams);
- dwParams.ItemsString['inputdata'].AsString := 'teste de string';
- DWClientEvents1.SendEvent('servertime', dwParams, vErrorMessage);
- If vErrorMessage = '' Then
-  Begin
-   If dwParams.ItemsString['result'].AsString <> '' Then
-    Showmessage('Server Date/Time is : ' + DateTimeToStr(dwParams.ItemsString['result'].Value))
-   Else
-    Showmessage(vErrorMessage);
-  End
- Else
-  Showmessage(vErrorMessage);
- dwParams.Free;
-end;
 
 procedure TForm1.btn1Click(Sender: TObject);
 var
@@ -128,10 +104,15 @@ begin
 end;
 
 procedure TForm1.btngravaClick(Sender: TObject);
+var serro: string;
 begin
- if RESTDWClientSQL1.State in [dsEdit,dsInsert] then
+if RESTDWClientSQL1.State in [dsEdit,dsInsert] then
   RESTDWClientSQL1.Post;
- ChangeTablista.Execute;
+
+RESTDWClientSQL1.ApplyUpdates(serro);
+if Length(Trim(serro))>0 then
+    showmessage(serro);
+ChangeTablista.Execute;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -141,11 +122,13 @@ begin
  formatsettings.DateSeparator:='-';
  formatsettings.DecimalSeparator:='.';
  formatsettings.ThousandSeparator:=',';
+ RESTDWDataBase1.DecimalSeparator:=formatsettings.DecimalSeparator;
  {$ELSE}
  formatsettings.ShortDateFormat:='dd-mm-yyyy';
  formatsettings.DateSeparator:='-';
  formatsettings.DecimalSeparator:='.';
  formatsettings.ThousandSeparator:=',';
+ RESTDWDataBase1.DecimalSeparator:=formatsettings.DecimalSeparator;
  {$IFEND}
 end;
 
