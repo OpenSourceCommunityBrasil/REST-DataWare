@@ -1,7 +1,7 @@
 ---
 name: Erro
 about: Enviar o bug para que possa ser corrigido
-title: "[Bug]"
+title: "[Bug] descrição resumida do bug aqui"
 labels: Erro
 assignees: ''
 
