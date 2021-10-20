@@ -1333,7 +1333,7 @@ Begin
         Ctxt.InContentType  := ARequestInfo.ContentType;
         Ctxt.OutContentType := Ctxt.InContentType;
         Ctxt.UserAgent      := ARequestInfo.UserAgent;
-        ExecProcess(Ctxt);
+        ExecProcess(Ctxt, AContext);
         JSONStr             := Ctxt.OutContent;
         For I := 0 To CORS_CustomHeaders.Count -1 Do
          AResponseInfo.CustomHeaders.AddValue(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);

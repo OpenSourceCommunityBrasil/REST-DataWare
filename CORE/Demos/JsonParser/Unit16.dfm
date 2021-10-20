@@ -66,7 +66,6 @@ object Form16: TForm16
     Color = 2763306
     ParentBackground = False
     TabOrder = 4
-    ExplicitWidth = 614
     DesignSize = (
       898
       58)
@@ -388,7 +387,6 @@ object Form16: TForm16
       ParentBackground = False
       ShowCaption = False
       TabOrder = 0
-      ExplicitLeft = 408
       object Image3: TImage
         AlignWithMargins = True
         Left = 2
@@ -776,7 +774,6 @@ object Form16: TForm16
       ParentBackground = False
       ShowCaption = False
       TabOrder = 1
-      ExplicitLeft = 476
       object Image4: TImage
         AlignWithMargins = True
         Left = 2
@@ -1123,7 +1120,6 @@ object Form16: TForm16
       ParentBackground = False
       ShowCaption = False
       TabOrder = 2
-      ExplicitLeft = 544
       object Image2: TImage
         AlignWithMargins = True
         Left = 2

@@ -23,7 +23,7 @@ interface
 
 Uses
  uDWJSONTools, uDWJSONObject, ServerUtils, SysTypes,
- uDWConsts, uDWConstsCharset, uDWConst404HTML,
+ uDWConsts, uDWConstsCharset, uDWConst404HTML, IdContext,
  {$IFDEF FPC}
   SysUtils,  Classes, LConvEncoding;
  {$ELSE}
@@ -358,7 +358,8 @@ Type
   Procedure   SetActive              (Value                   : Boolean);Virtual;Abstract;
   Procedure   Bind                   (Port                    : Integer = 9092;
                                       ConsoleMode             : Boolean = True);Virtual;
-  Function    ExecProcess            (Ctxt                    : TRESTDWComponent) : Cardinal;
+  Function    ExecProcess            (Ctxt                    : TRESTDWComponent;
+                                      AContext                : TIdContext) : Cardinal;
   Procedure   ClearDataRoute;
   Function    FindRoute              (Url                     : String;
                                       Var ParamsUrl           : String) : TRESTDWQXDataRoute;
@@ -903,7 +904,8 @@ Begin
  Result := Format('%s%s%s', [Name, Value, Separator]);
 End;
 
-Function  TRESTDWQXBasePooler.ExecProcess(Ctxt: TRESTDWComponent) : Cardinal;
+Function  TRESTDWQXBasePooler.ExecProcess(Ctxt     : TRESTDWComponent;
+                                          AContext : TIdContext) : Cardinal;
 Var
  I                  : Integer;
  DWParamsD,
@@ -1428,7 +1430,31 @@ Begin
                            vToken         := DWParams.ItemsString[TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).Key].AsString
                           Else
                            Begin
+                          {$IFNDEF FPC}
+                           {$IF Defined(HAS_FMX)}
+                            {$IFDEF HAS_UTF8}
+                             If Assigned({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}) Then
+                              vToken       := TRDWAuthRequest({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}).Token
+                             Else
+                              vToken       := Ctxt.InHeaders.Values['Authorization'];
+                            {$ELSE}
+                             If Assigned(AContext.Data) Then
+                              vToken       := TRDWAuthRequest(AContext.Data).Token
+                             Else
+                              vToken       := Ctxt.InHeaders.Values['Authorization'];
+                            {$ENDIF}
+                           {$ELSE}
+                            If Assigned(AContext.Data) Then
+                             vToken       := TRDWAuthRequest(AContext.Data).Token
+                            Else
+                             vToken       := Ctxt.InHeaders.Values['Authorization'];
+                           {$IFEND}
+                          {$ELSE}
+                           If Assigned(AContext.Data) Then
+                            vToken       := TRDWAuthRequest(AContext.Data).Token
+                           Else
                             vToken       := Ctxt.InHeaders.Values['Authorization'];
+                          {$ENDIF}
                             If Trim(vToken) <> '' Then
                              Begin
                               aToken      := GetTokenString(vToken);

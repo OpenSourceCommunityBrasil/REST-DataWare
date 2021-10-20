@@ -431,12 +431,14 @@ Begin
        Begin
         If Pos('=', vTempData) > 0 Then
          Begin
+          aNewParam := False;
           If Copy(vTempData, 1, Pos('=', vTempData) - 1) <> '' Then
            JSONParam := Result.ItemsString[Copy(vTempData, 1, Pos('=', vTempData) - 1)]
           Else
            JSONParam := Result.ItemsString[cUndefined];
           If JSONParam = Nil Then
            Begin
+            aNewParam := True;
             JSONParam := TJSONParam.Create(Result.Encoding);
             JSONParam.ObjectDirection := odIN;
             JSONParam.ParamName := Copy(vTempData, 1, Pos('=', vTempData) - 1);
@@ -456,12 +458,16 @@ Begin
             {$ENDIF}
             JSONParam.SetValue(vTempData);
            End;
+          If aNewParam Then
+           Result.Add(JSONParam);
          End
         Else
          Begin
+          aNewParam := False;
           JSONParam := Result.ItemsString[cUndefined];
           If JSONParam = Nil Then
            Begin
+            aNewParam := True;
             JSONParam := TJSONParam.Create(Result.Encoding);
             JSONParam.ParamName := cUndefined;//Format('PARAM%d', [0]);
             JSONParam.ObjectDirection := odIN;
@@ -469,6 +475,8 @@ Begin
            End;
           JSONParam.SetValue(vTempData);
          End;
+        If aNewParam Then
+         Result.Add(JSONParam);
        End;
      Delete(vArrayValues, 1, IBar2);
     End;
