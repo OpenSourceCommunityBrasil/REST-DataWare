@@ -1,4 +1,4 @@
-REST DW was created to facilitate the creation of CRUDs in the same model that we created applications for Client / Server Database.
-Today to be able to write data in a Bank via WebService is very complex for simple operations, making scheduling of simple screens time-consuming.
-With REST DW, you no longer have to worry about creating SQL Insertion, Deletion, Read and Execution methods via Webservice; Simply add a RESTDataBase connection component and add a RESTClientSQL component that will already have your SQL solution fully functional as it did back in the day and with all the power of modern REST / JSON technology with data compression and everything the language can offer,
-Use it and have fun.
+REST DW foi criado para facilitar a criação de CRUDs no mesmo modelo que criamos aplicações para Cliente / Servidor.
+Hoje, para ser capaz de gravar dados em um SGBD via WebService é um processo muito complexo para operações simples, tornando o agendamento de simples telas muito demorado.
+Com REST DW você não precisa mais se preocupar em criar em SQL Inserções, Deleções, Leituras e Execuções via WebService; Simplesmente adicione um componente de conexão RESTDataBase e adicione um componente RESTClientSQL que já fará sua solução SQL 100% funcional como era antigamente com todo o poder das tecnologias modernas de REST / JSON, compressão de dados e tudo mais que a linguagem tem a oferecer.
+Use-o e divirta-se.
