@@ -14,9 +14,10 @@ uses
 
 begin
   Application.Initialize;
-  {$IFDEF ANDROID}
-  IdOpenSSLSetLibPath(TPath.GetDocumentsPath);
-  {$ENDIF}
+//  {$IFDEF ANDROID}
+//  IdOpenSSLSetLibPath(TPath.GetDocumentsPath);
+//  {$ENDIF}
   Application.CreateForm(TForm1, Form1);
   Application.Run;
 end.
+
