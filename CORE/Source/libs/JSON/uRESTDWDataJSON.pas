@@ -1310,15 +1310,27 @@ End;
 Function TRESTDWJSONBase.SaveToFile(Filename : String): Boolean;
 Var
  vStringStream : TStringStream;
+ vMemStream    : TMemoryStream;
 Begin
  Result        := False;
  vStringStream := TStringStream.Create(ToJSON);
- Try
-  vStringStream.SaveToFile(Filename);
-  Result        := True;
- Except
+ If vStringStream.Size > 0 Then
+  Begin
+   vMemStream    := TMemoryStream.Create;
+   Try
+    vStringStream.Position := 0;
+    vMemStream.CopyFrom(vStringStream, vStringStream.Size);
+    vMemStream.Position := 0;
+    vMemStream.SaveToFile(Filename);
+    Result        := True;
+   Except
 
- End;
+   End;
+   If Assigned(vMemStream) Then
+    FreeAndNil(vMemStream);
+  End;
+ If Assigned(vStringStream) Then
+  FreeAndNil(vStringStream);
 End;
 
 Constructor TRESTDWJSONObject.Create(JSON: String);
