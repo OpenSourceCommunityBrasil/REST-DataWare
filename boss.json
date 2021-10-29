@@ -1,9 +1,11 @@
 {
 	"name": "RESTDataWare",
 	"description": "The REST Dataware is a powerful communications suite available as a package of components for Delphi.",
-	"version": "1.4.3.2869",
+	"version": "1.4.3-2869",
 	"homepage": "resteasyobjects.com.br",
 	"mainsrc": "CORE/Source",
-	"projects": [],
+	"projects": [
+		"CORE/Packages/Delphi/D24/RestDatawareCORE.dproj"
+	],
 	"dependencies": {}
 }
