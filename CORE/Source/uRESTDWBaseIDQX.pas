@@ -587,7 +587,8 @@ Begin
      (UpperCase(Copy (Cmd, 1, 4)) = 'POST')   OR
      (UpperCase(Copy (Cmd, 1, 3)) = 'PUT')    OR
      (UpperCase(Copy (Cmd, 1, 4)) = 'DELE')   OR
-     (UpperCase(Copy (Cmd, 1, 4)) = 'PATC')   Then
+     (UpperCase(Copy (Cmd, 1, 4)) = 'PATC')   OR
+     (UpperCase(Copy (Cmd, 1, 3)) = 'OPT' )   Then
    Begin
     RequestType := rtGet;
     If (UpperCase(Copy (Cmd, 1, 4))      = 'POST') Then
@@ -608,6 +609,17 @@ Begin
       Exit;
     {$ENDIF}
     ReadRawHeaders;
+    AResponseInfo.CustomHeaders.Clear;
+    If CORS Then
+     Begin
+      If CORS_CustomHeaders.Count > 0 Then
+       Begin
+        For I := 0 To CORS_CustomHeaders.Count -1 Do
+         AResponseInfo.CustomHeaders.AddValue(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
+       End
+      Else
+       AResponseInfo.CustomHeaders.AddValue('Access-Control-Allow-Origin','*');
+     End;
     Ctxt.URL := ClearRequestType(Cmd);
     If Ctxt.URL <> '' Then
      Begin
@@ -1335,8 +1347,8 @@ Begin
         Ctxt.UserAgent      := ARequestInfo.UserAgent;
         ExecProcess(Ctxt, AContext);
         JSONStr             := Ctxt.OutContent;
-        For I := 0 To CORS_CustomHeaders.Count -1 Do
-         AResponseInfo.CustomHeaders.AddValue(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
+//        For I := 0 To CORS_CustomHeaders.Count -1 Do
+//         AResponseInfo.CustomHeaders.AddValue(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
         For I := 0 To Ctxt.OutHeaders.Count -1 Do
          AResponseInfo.CustomHeaders.AddValue(Ctxt.OutHeaders.Names[I], Ctxt.OutHeaders.ValueFromIndex[I]);
         If Encoding = esUtf8 Then

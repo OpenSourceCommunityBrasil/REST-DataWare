@@ -2,7 +2,7 @@ unit uRESTDWDataJSON;
 
 {$I uRESTDW.inc}
 
-interface
+Interface
 
 Uses
   uDWJSONInterface, uDWConstsCharset, uDWConsts,
@@ -35,6 +35,7 @@ Type
   Procedure   SetValue    (aValue : Variant);
  Public
   Constructor Create(aElementType : TRESTDWJSONElementType);
+  Destructor  Destroy;Override;
   Procedure   Clear;
   Function    ToJSON              : String;Virtual;
   Property    ElementType         : TRESTDWJSONElementType Read VElementType Write VElementType;
@@ -56,6 +57,7 @@ Type
 End;
 
 Type
+ PRESTDWJSONString = ^TRESTDWJSONString;
  TRESTDWJSONString = Class(TRESTDWJSONBaseObjectClass)
  Private
   vSpecialChars         : Boolean;
@@ -67,6 +69,7 @@ Type
 End;
 
 Type
+ PRESTDWJSONNumeric = ^TRESTDWJSONNumeric;
  TRESTDWJSONNumeric = Class(TRESTDWJSONBaseObjectClass)
  Private
  Public
@@ -76,6 +79,7 @@ Type
 End;
 
 Type
+ PRESTDWJSONInteger = ^TRESTDWJSONInteger;
  TRESTDWJSONInteger = Class(TRESTDWJSONBaseObjectClass)
  Private
  Public
@@ -85,6 +89,7 @@ Type
 End;
 
 Type
+ PRESTDWJSONBoolean = ^TRESTDWJSONBoolean;
  TRESTDWJSONBoolean = Class(TRESTDWJSONBaseObjectClass)
  Private
  Public
@@ -95,6 +100,7 @@ End;
 
 Type
  TRESTDWDateTimeFormat = (dtfFloatValue, dtfString, dtfISO8601, dtfMask);
+ PRESTDWJSONDateTime   = ^TRESTDWJSONDateTime;
  TRESTDWJSONDateTime   = Class(TRESTDWJSONBaseObjectClass)
  Private
   vMaskDateTime           : String;
@@ -108,6 +114,7 @@ Type
 End;
 
 Type
+ PRESTDWJSONBlob = ^TRESTDWJSONBlob;
  TRESTDWJSONBlob = Class(TRESTDWJSONBaseObjectClass)
  Private
  Public
@@ -134,21 +141,25 @@ Type
   Function  BuildJson   (aObjectType : TRESTDWJSONObjectType) : String;
   Function  GetRecNameIndex(Index    : String) : Integer;
   Procedure ReadJSON(JSON : String);
-  Function  AddFloat(Key             : String;
-                     Value           : Real)          : Integer;
  Public
   Constructor Create(aObjectType                   : TRESTDWJSONObjectType);Overload;
   Constructor Create(JSON                          : String);Overload;
   Destructor  Destroy; Override;
-  Function    AddNull(Key         : String;
-                      ElementType : TRESTDWJSONElementType = etString) : Integer;
-  Function    Add(Key,
-                  Value           : String;
-                  SpecialChars    : Boolean = True)  : Integer;Overload;
-  Function    Add(Key             : String;
-                  Value           : Integer)         : Integer;Overload;
-  Function    Add(Key             : String;
-                  Value           : Real)            : Integer;Overload;
+  Function    AddFloat (Key             : String;
+                        Value           : Real)            : Integer;
+  Function    AddDateTime(Key             : String;
+                          Value           : TDateTime;
+                          aDateTimeFormat : TRESTDWDateTimeFormat = dtfString;
+                          aFormatMask     : String = '')     : Integer;
+  Function    AddNull  (Key             : String;
+                        ElementType     : TRESTDWJSONElementType = etString) : Integer;
+  Function    Add      (Key,
+                        Value           : String;
+                        SpecialChars    : Boolean = True)  : Integer;Overload;
+  Function    Add      (Key             : String;
+                        Value           : Integer)         : Integer;Overload;
+  Function    Add      (Key             : String;
+                        Value           : Real)            : Integer;Overload;
   Function    Add(Key             : String;
                   Value           : Boolean)         : Integer;Overload;
   Function    Add(Key             : String;
@@ -424,8 +435,8 @@ Begin
  Result                        := vList.Add(BaseObjectClass);
 End;
 
-Function TRESTDWJSONBase.AddFloat(Key             : String;
-                                  Value           : Real)          : Integer;
+Function TRESTDWJSONBase.AddFloat(Key        : String;
+                                  Value      : Real) : Integer;
 Var
  BaseObjectClass : ^TRESTDWJSONNumeric;
 Begin
@@ -436,10 +447,16 @@ Begin
  Result                       := vList.Add(BaseObjectClass);
 End;
 
-Function TRESTDWJSONBase.Add(Key   : String;
-                             Value : Real)          : Integer;
+Function TRESTDWJSONBase.Add(Key             : String;
+                             Value           : Real)          : Integer;
+Var
+ BaseObjectClass : ^TRESTDWJSONNumeric;
 Begin
- AddFloat(Key, Value);
+ New(BaseObjectClass);
+ BaseObjectClass^             := TRESTDWJSONNumeric.Create;
+ BaseObjectClass^.ElementName := Key;
+ BaseObjectClass^.Value       := Value;
+ Result                       := vList.Add(BaseObjectClass);
 End;
 
 Function TRESTDWJSONBase.Add(Key   : String;
@@ -452,6 +469,22 @@ Begin
  BaseObjectClass^.ElementName := Key;
  BaseObjectClass^.Value       := Value;
  Result                       := vList.Add(BaseObjectClass);
+End;
+
+Function TRESTDWJSONBase.AddDateTime(Key             : String;
+                                     Value           : TDateTime;
+                                     aDateTimeFormat : TRESTDWDateTimeFormat = dtfString;
+                                     aFormatMask     : String = '')     : Integer;
+Var
+ BaseObjectClass : ^TRESTDWJSONDateTime;
+Begin
+ New(BaseObjectClass);
+ BaseObjectClass^                := TRESTDWJSONDateTime.Create;
+ BaseObjectClass^.ElementName    := Key;
+ BaseObjectClass^.Value          := Value;
+ BaseObjectClass^.DateTimeFormat := aDateTimeFormat;
+ BaseObjectClass^.FormatMask     := aFormatMask;
+ Result                          := vList.Add(BaseObjectClass);
 End;
 
 Function TRESTDWJSONBase.Add(Key             : String;
@@ -633,17 +666,66 @@ Begin
    Try
     If Assigned(vList.Items[Index])  Then
      Begin
-      {$IFDEF FPC}
-      FreeAndNil(vList.Items[Index]^);
-      {$ELSE}
-       {$IF CompilerVersion > 33}
-        FreeAndNil(TRESTDWJSONBaseObjectClass(vList.Items[Index]^));
-       {$ELSE}
-        FreeAndNil(vList.Items[Index]^);
-       {$IFEND}
-      {$ENDIF}
-      Dispose(PRESTDWJSONBaseObjectClass(vList.Items[Index]));
-     End;
+      Case TRESTDWJSONBaseObjectClass(vList.Items[Index]^).ElementType Of
+       etString   : Begin
+                     {$IFDEF FPC}
+                      FreeAndNil(vList.Items[Index]^);
+                     {$ELSE}
+                      FreeAndNil(TRESTDWJSONString(vList.Items[Index]^));
+                     {$ENDIF}
+                     Dispose(PRESTDWJSONString(vList.Items[Index]));
+                    End;
+       etNumeric  : Begin
+                     {$IFDEF FPC}
+                      FreeAndNil(vList.Items[Index]^);
+                     {$ELSE}
+                      FreeAndNil(TRESTDWJSONNumeric(vList.Items[Index]^));
+                     {$ENDIF}
+                     Dispose(PRESTDWJSONNumeric(vList.Items[Index]));
+                    End;
+       etInteger  : Begin
+                     {$IFDEF FPC}
+                      FreeAndNil(vList.Items[Index]^);
+                     {$ELSE}
+                      FreeAndNil(TRESTDWJSONInteger(vList.Items[Index]^));
+                     {$ENDIF}
+                     Dispose(PRESTDWJSONInteger(vList.Items[Index]));
+                    End;
+       etBoolean  : Begin
+                     {$IFDEF FPC}
+                      FreeAndNil(vList.Items[Index]^);
+                     {$ELSE}
+                      FreeAndNil(TRESTDWJSONBoolean(vList.Items[Index]^));
+                     {$ENDIF}
+                     Dispose(PRESTDWJSONBoolean(vList.Items[Index]));
+                    End;
+       etDateTime : Begin
+                     {$IFDEF FPC}
+                      FreeAndNil(vList.Items[Index]^);
+                     {$ELSE}
+                      FreeAndNil(TRESTDWJSONDateTime(vList.Items[Index]^));
+                     {$ENDIF}
+                     Dispose(PRESTDWJSONDateTime(vList.Items[Index]));
+                    End;
+       etBlob     : Begin
+                     {$IFDEF FPC}
+                      FreeAndNil(vList.Items[Index]^);
+                     {$ELSE}
+                      FreeAndNil(TRESTDWJSONBlob(vList.Items[Index]^));
+                     {$ENDIF}
+                     Dispose(PRESTDWJSONBlob(vList.Items[Index]));
+                    End;
+       Else
+        Begin
+         {$IFDEF FPC}
+          FreeAndNil(vList.Items[Index]^);
+         {$ELSE}
+          FreeAndNil(TRESTDWJSONBaseObjectClass(vList.Items[Index]^));
+         {$ENDIF}
+         Dispose(PRESTDWJSONBaseObjectClass(vList.Items[Index]));
+        End;
+      End;
+    End;
    Except
    End;
    vList.Delete(Index);
@@ -989,6 +1071,12 @@ Procedure TRESTDWJSONBaseClass.Clear;
 Begin
  vValue  := varNull;
  vIsNull := True;
+End;
+
+Destructor  TRESTDWJSONBaseClass.Destroy;
+Begin
+ vValue := '';
+ Inherited;
 End;
 
 Constructor TRESTDWJSONBaseClass.Create(aElementType : TRESTDWJSONElementType);
