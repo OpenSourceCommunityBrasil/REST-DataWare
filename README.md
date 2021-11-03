@@ -5,3 +5,9 @@ Hoje, para ser capaz de gravar dados em um SGBD via WebService é um processo mu
 Com REST DW você não precisa mais se preocupar em criar em SQL Inserções, Deleções, Leituras e Execuções via WebService; Simplesmente adicione um componente de conexão RESTDataBase e adicione um componente RESTClientSQL que já fará sua solução SQL 100% funcional como era antigamente com todo o poder das tecnologias modernas de REST / JSON, compressão de dados e tudo mais que a linguagem tem a oferecer.
 
 Use-o e divirta-se.
+
+Wiki com instruções de instalação e uso:
+https://oneclicksistemas.ddns.net
+
+telegram oficial:
+https://t.me/restdataware
