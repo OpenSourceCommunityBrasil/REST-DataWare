@@ -1161,9 +1161,12 @@ constructor TJSONObject.create(s: string);
 var
   token : JSOnTokener;
 begin
-  token :=  JSONTokener.create(s);
+ token :=  JSONTokener.create(s);
+ Try
   create (token);
+ Finally
   FreeAndNil(token);
+ End;
 end;
 
 
