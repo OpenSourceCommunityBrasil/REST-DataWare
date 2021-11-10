@@ -7,7 +7,8 @@ Com REST DW você não precisa mais se preocupar em criar em SQL Inserções, De
 Use-o e divirta-se.
 
 Wiki com instruções de instalação e uso:
-https://oneclicksistemas.ddns.net
+Site: https://oneclicksistemas.ddns.net
+Fontes: https://github.com/mobius1qwe/RDWWiki
 
 telegram oficial:
 https://t.me/restdataware
