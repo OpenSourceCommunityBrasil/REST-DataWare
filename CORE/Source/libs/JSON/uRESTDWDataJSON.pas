@@ -167,7 +167,7 @@ Type
                   aDateTimeFormat : TRESTDWDateTimeFormat = dtfString;
                   aFormatMask     : String = '')     : Integer;Overload;
   Function    Add(Key             : String;
-                  Value           : TMemoryStream)   : Integer;Overload;
+                  Const Value     : TStream)   : Integer;Overload;
   Function    Add(Key             : String;
                   Value           : TRESTDWJSONBase) : Integer;Overload;
   Function    Add(Value           : String)          : Integer;Overload;
@@ -177,7 +177,7 @@ Type
   Function    Add(Value           : TDateTime;
                   aDateTimeFormat : TRESTDWDateTimeFormat = dtfString;
                   aFormatMask     : String = '')     : Integer;Overload;
-  Function    Add(Value           : TMemoryStream)   : Integer;Overload;
+  Function    Add(Const Value     : TStream)         : Integer;Overload;
   Function    Add(Value           : TRESTDWJSONBase) : Integer;Overload;
   Procedure   Delete(Index        : Integer);Overload;
   Procedure   Delete(aElement     : String); Overload;
@@ -503,8 +503,8 @@ Begin
  Result                          := vList.Add(BaseObjectClass);
 End;
 
-Function TRESTDWJSONBase.Add(Key   : String;
-                                 Value : TMemoryStream) : Integer;
+Function TRESTDWJSONBase.Add(Key         : String;
+                             Const Value : TStream) : Integer;
 Var
  BaseObjectClass : ^TRESTDWJSONBlob;
 Begin
@@ -633,7 +633,7 @@ Begin
  Result                       := vList.Add(BaseObjectClass);
 End;
 
-Function TRESTDWJSONBase.Add(Value : TMemoryStream) : Integer;
+Function TRESTDWJSONBase.Add(Const Value : TStream) : Integer;
 Var
  BaseObjectClass : ^TRESTDWJSONBlob;
 Begin
@@ -783,7 +783,7 @@ Begin
  Result := Nil;
  If (Index < vList.Count) And (Index > -1) Then
   Begin
-   If TRESTDWJSONBaseObjectClass(vList.Items[Index]^).InheritsFrom(TRESTDWJSONBase) Then
+   If TRESTDWJSONBase(vList.Items[Index]^).InheritsFrom(TRESTDWJSONBase) Then
     Begin
      If vJSONObjectType = jtobject Then
       Result := TRESTDWJSONBaseObjectClass(TRESTDWJSONObject(vList.Items[Index]^))
@@ -821,27 +821,57 @@ Begin
  Result    := Nil;
  If Assigned(Self) And (Lowercase(Index) <> '') Then
   Begin
-   For i := 0 To vList.Count - 1 Do
+   For I := 0 To vList.Count - 1 Do
     Begin
-     If (Uppercase(Index) = Uppercase(TRESTDWJSONBaseObjectClass(vList.Items[i]^).vElementName)) Then
+     If TRESTDWJSONBase(vList.Items[I]^).InheritsFrom(TRESTDWJSONBase) Then
       Begin
-       Case TRESTDWJSONBaseObjectClass(vList.Items[I]^).VElementType Of
-        etString   : Result := TRESTDWJSONString(vList.Items[I]^);
-        etNumeric  : Result := TRESTDWJSONNumeric(vList.Items[I]^);
-        etInteger  : Result := TRESTDWJSONInteger(vList.Items[I]^);
-        etBoolean  : Result := TRESTDWJSONBoolean(vList.Items[I]^);
-        etDateTime : Result := TRESTDWJSONDateTime(vList.Items[I]^);
-        etBlob     : Result := TRESTDWJSONBlob(vList.Items[I]^);
-        etUnknow   : Begin
-                      If vJSONObjectType = jtobject Then
-                       Result := TRESTDWJSONBaseObjectClass(TRESTDWJSONObject(vList.Items[I]^))
-                      Else If vJSONObjectType = jtArray Then
-                       Result := TRESTDWJSONBaseObjectClass(TRESTDWJSONArray(vList.Items[I]^))
-                      Else If vJSONObjectType = jtValue Then
-                       Result := TRESTDWJSONBaseObjectClass(TRESTDWJSONValue(vList.Items[I]^));
-                     End;
-       End;
-       Break;
+       If vJSONObjectType = jtobject Then
+        Begin
+         If Uppercase(TRESTDWJSONObject(vList.Items[I]^).ElementName) = Uppercase(Index)  Then
+          Begin
+           Result := TRESTDWJSONBaseObjectClass(TRESTDWJSONObject(vList.Items[I]^));
+           Break;
+          End;
+        End
+       Else If vJSONObjectType = jtArray Then
+        Begin
+         If Uppercase(TRESTDWJSONArray(vList.Items[I]^).ElementName) = Uppercase(Index)  Then
+          Begin
+           Result := TRESTDWJSONBaseObjectClass(TRESTDWJSONArray(vList.Items[I]^));
+           Break;
+          End;
+        End
+       Else If vJSONObjectType = jtValue Then
+        Begin
+         If Uppercase(TRESTDWJSONValue(vList.Items[I]^).ElementName) = Uppercase(Index)  Then
+          Begin
+           Result := TRESTDWJSONBaseObjectClass(TRESTDWJSONValue(vList.Items[I]^));
+           Break;
+          End;
+        End;
+      End
+     Else
+      Begin
+       If (Uppercase(Index) = Uppercase(TRESTDWJSONBaseObjectClass(vList.Items[i]^).vElementName)) Then
+        Begin
+         Case TRESTDWJSONBaseObjectClass(vList.Items[I]^).VElementType Of
+          etString   : Result := TRESTDWJSONString(vList.Items[I]^);
+          etNumeric  : Result := TRESTDWJSONNumeric(vList.Items[I]^);
+          etInteger  : Result := TRESTDWJSONInteger(vList.Items[I]^);
+          etBoolean  : Result := TRESTDWJSONBoolean(vList.Items[I]^);
+          etDateTime : Result := TRESTDWJSONDateTime(vList.Items[I]^);
+          etBlob     : Result := TRESTDWJSONBlob(vList.Items[I]^);
+          etUnknow   : Begin
+                        If vJSONObjectType = jtobject Then
+                         Result := TRESTDWJSONBaseObjectClass(TRESTDWJSONObject(vList.Items[I]^))
+                        Else If vJSONObjectType = jtArray Then
+                         Result := TRESTDWJSONBaseObjectClass(TRESTDWJSONArray(vList.Items[I]^))
+                        Else If vJSONObjectType = jtValue Then
+                         Result := TRESTDWJSONBaseObjectClass(TRESTDWJSONValue(vList.Items[I]^));
+                       End;
+         End;
+         Break;
+        End;
       End;
     End;
   End;
@@ -1422,10 +1452,19 @@ Begin
 End;
 
 Constructor TRESTDWJSONObject.Create(JSON: String);
+Var
+ vValue : String;
 Begin
- Inherited Create(jtobject);
- If JSON <> '' Then
-  ReadJSON(JSON);
+ vValue := Trim(JSON);
+ If vValue <> '' Then
+  Begin
+   If vValue[InitStrPos] = '[' Then
+    Inherited Create(jtArray)
+   Else
+    Inherited Create(jtobject);
+   If JSON <> '' Then
+    ReadJSON(JSON);
+  End;
 End;
 
 Function TRESTDWJSONObject.ToJSON : String;

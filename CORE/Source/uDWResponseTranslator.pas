@@ -220,6 +220,11 @@ Type
   Function   Get       (AUrl            : String         = '';
                         CustomHeaders   : TStringList    = Nil;
                         IgnoreEvents    : Boolean        = False):String; Overload;
+  Function   Get       (AUrl            : String;
+                        var AResponseText : String;
+                        CustomHeaders   : TStringList    = Nil;
+                        Const AResponse : TStringStream  = Nil;
+                        IgnoreEvents    : Boolean        = False):Integer;Overload;
   Function   Post      (AUrl            : String         = '';
                         CustomHeaders   : TStringList    = Nil;
                         Const AResponse : TStringStream  = Nil;
@@ -243,11 +248,23 @@ Type
                         Const AResponse : TStringStream  = Nil;
                         IgnoreEvents    : Boolean        = False;
                         RawHeaders      : Boolean        = False):Integer;Overload;
+  Function   Post      (AUrl            : String;
+                        var AResponseText : String;
+                        CustomHeaders   : TStringList    = Nil;
+                        Const AResponse : TStringStream  = Nil;
+                        IgnoreEvents    : Boolean        = False;
+                        RawHeaders      : Boolean        = False):Integer;Overload;
   Function   Put       (AUrl            : String         = '';
                         CustomHeaders   : TStringList    = Nil;
                         Const AResponse : TStringStream  = Nil;
                         IgnoreEvents    : Boolean        = False):Integer;Overload;
   Function   Put       (AUrl            : String         = '';
+                        CustomHeaders   : TStringList    = Nil;
+                        CustomBody      : TStringList    = Nil;
+                        Const AResponse : TStringStream  = Nil;
+                        IgnoreEvents    : Boolean        = False):Integer;Overload;
+  Function   Put       (AUrl            : String;
+                        var AResponseText : String;
                         CustomHeaders   : TStringList    = Nil;
                         CustomBody      : TStringList    = Nil;
                         Const AResponse : TStringStream  = Nil;
@@ -259,12 +276,22 @@ Type
   Function   Patch     (AUrl            : String         = '';
                         CustomHeaders   : TStringList    = Nil;
                         CustomBody      : TStringList    = Nil;
+                        Const AResponse : TStringStream  = Nil;
+                        IgnoreEvents    : Boolean        = False):Integer;Overload;
+  Function   Patch     (AUrl            : String;
+                        var AResponseText : String;
+                        CustomHeaders   : TStringList    = Nil;
                         Const AResponse : TStringStream  = Nil;
                         IgnoreEvents    : Boolean        = False):Integer;Overload;
   Function   Delete    (AUrl            : String         = '';
                         CustomHeaders   : TStringList    = Nil;
                         Const AResponse : TStringStream  = Nil;
-                        IgnoreEvents    : Boolean        = False):Integer;
+                        IgnoreEvents    : Boolean        = False):Integer; Overload;
+  Function   Delete    (AUrl              : String;
+                        var AResponseText : String;
+                        CustomHeaders     : TStringList    = Nil;
+                        Const AResponse   : TStringStream  = Nil;
+                        IgnoreEvents      : Boolean        = False):Integer; Overload;
  Published
   Property UseSSL                   : Boolean                     Read vUseSSL                   Write vUseSSL;
   Property CertMode                 : TIdSSLMode                  Read vCertMode                 Write vCertMode;
@@ -595,7 +622,7 @@ Begin
  HttpRequest.Request.UserAgent   := vUserAgent;
  HttpRequest.Request.ContentType := vContentType;
  HttpRequest.AllowCookies        := False;
- HttpRequest.HTTPOptions         := [hoKeepOrigProtocol]; //, hoNoProtocolErrorException{$IFNDEF FPC}{$if CompilerVersion > 30}, hoWantProtocolErrorContent{$IFEND}{$ELSE}, hoWantProtocolErrorContent{$ENDIF}];
+ HttpRequest.HTTPOptions         := [hoKeepOrigProtocol, hoNoProtocolErrorException]; //, hoNoProtocolErrorException{$IFNDEF FPC}{$if CompilerVersion > 30}, hoWantProtocolErrorContent{$IFEND}{$ELSE}, hoWantProtocolErrorContent{$ENDIF}];
  vTransparentProxy               := TIdProxyConnectionInfo.Create;
  vAuthOptionParams               := TRDWClientAuthOptionParams.Create(Self);
  vAuthOptionParams.AuthorizationOption := rdwAONone;
@@ -791,6 +818,8 @@ Begin
     vOnAfterRequest(AUrl, rtDelete, tempResponse);
   Finally
    vTempHeaders.Free;
+   If Assigned(SendParams) Then
+    SendParams.Free;
    If Assigned(tempResponse) Then
     tempResponse.Free;
    If Assigned(atempResponse) Then
@@ -814,6 +843,112 @@ Begin
    End;
  End;
 End;
+
+function TDWClientREST.Delete(AUrl: String;
+                              var AResponseText: String;
+                              CustomHeaders    : TStringList   = Nil;
+                              const AResponse  : TStringStream = Nil;
+                              IgnoreEvents     : Boolean       = False): Integer;
+Var
+ Temp         : TStringStream;
+ vTempHeaders : TStringList;
+ atempResponse,
+ tempResponse : TStringStream;
+ SendParams   : TStringStream;
+Begin
+ Result:= 200;
+ Try
+  tempResponse := Nil;
+  SendParams   := Nil;
+  SetParams(HttpRequest);
+  SetUseSSL(vUseSSL);
+  vTempHeaders := TStringList.Create;
+  {$IFDEF FPC}
+   atempResponse  := TStringStream.Create('');
+  {$ELSE}
+   {$IF CompilerVersion < 21}
+    atempResponse := TStringStream.Create('');
+   {$ELSE}
+    atempResponse := TStringStream.Create;
+   {$IFEND}
+  {$ENDIF}
+  If Not Assigned(AResponse) Then
+   Begin
+    {$IFDEF FPC}
+     tempResponse  := TStringStream.Create('');
+    {$ELSE}
+     {$IF CompilerVersion < 21}
+      tempResponse := TStringStream.Create('');
+     {$ELSE}
+      tempResponse := TStringStream.Create;
+     {$IFEND}
+    {$ENDIF}
+   End;
+  vAUrl := AUrl;
+  Try
+   //Copy Custom Headers
+  // CopyStringList(TStringList(vDefaultCustomHeader), vTempHeaders);
+   SetHeaders(TStringList(vDefaultCustomHeader));
+   If Not IgnoreEvents Then
+   If Assigned(vOnBeforeDelete) then
+    If Not Assigned(CustomHeaders) Then
+     vOnBeforeDelete(AUrl, vTempHeaders)
+    Else
+     vOnBeforeDelete(AUrl, CustomHeaders);
+   //Copy New Headers
+   CopyStringList(CustomHeaders, vTempHeaders);
+   SendParams := TStringStream.Create(vTempHeaders.Text);
+   //SetHeaders(vTempHeaders, SendParams);
+   //SetRawHeaders(vTempHeaders, SendParams);
+   {$IFDEF FPC}
+    HttpRequest.Delete(AUrl, atempResponse);
+   {$ELSE}
+    {$IFDEF OLDINDY}
+     HttpRequest.Delete(AUrl);
+    {$ELSE}
+     //HttpRequest.Delete(AUrl, atempResponse);
+     TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, AUrl, SendParams, atempResponse, []);
+    {$ENDIF}
+   {$ENDIF}
+   Result:= HttpRequest.ResponseCode;
+   AResponseText := HttpRequest.ResponseText;
+   If Assigned(atempResponse) Then
+    atempResponse.Position := 0;
+   If vRSCharset = esUtf8 Then
+     AResponse.WriteString(utf8Decode(atempResponse.DataString))
+   Else
+     AResponse.WriteString(atempResponse.DataString);
+   FreeAndNil(atempResponse);
+   If Not IgnoreEvents Then
+   If Assigned(vOnAfterRequest) then
+    vOnAfterRequest(AUrl, rtDelete, tempResponse);
+  Finally
+   vTempHeaders.Free;
+   If Assigned(SendParams) Then
+    SendParams.Free;
+   If Assigned(tempResponse) Then
+    tempResponse.Free;
+   If Assigned(atempResponse) Then
+    atempResponse.Free;
+  End;
+ Except
+  On E: EIdHTTPProtocolException Do
+   Begin
+    If (Length(E.ErrorMessage) > 0) or (E.ErrorCode <> 0) Then
+     Begin
+      Result:= E.ErrorCode;
+      temp := TStringStream.Create(E.ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+      AResponse.CopyFrom(temp, temp.Size);
+      Temp.Free;
+     End;
+   End;
+  On E : EIdSocketError do
+   Begin
+    HttpRequest.Disconnect(false);
+    Raise
+   End;
+ End;
+end;
 
 Destructor TDWClientREST.Destroy;
 Begin
@@ -1001,12 +1136,6 @@ Begin
     Raise Exception.Create(E.Message);
     HttpRequest.Disconnect(false);
    End;
-  {
-  On E : Exception do
-   Begin
-    Exception.Create(E.Message);  //Raise;
-   End;
-  } // Exception anterior!
  End;
 End;
 
@@ -2503,5 +2632,487 @@ Begin
     End;
   End;
 End;
+
+function TDWClientREST.Post(AUrl : String; var AResponseText: String;
+     CustomHeaders: TStringList; const AResponse: TStringStream;
+                              IgnoreEvents,  RawHeaders: Boolean): Integer;
+Var
+ temp         : TStringStream;
+ vTempHeaders : TStringList;
+ atempResponse,
+ tempResponse : TStringStream;
+ SendParams   : TIdMultipartFormDataStream;
+ sResponse    : string;
+Begin
+ Result:= 200;
+ AResponseText := '';
+
+ SendParams   := TIdMultipartFormDataStream.Create;
+ Try
+  tempResponse := Nil;
+  SetParams(HttpRequest);
+  SetUseSSL(vUseSSL);
+  vTempHeaders := TStringList.Create;
+  {$IFDEF FPC}
+   atempResponse  := TStringStream.Create('');
+  {$ELSE}
+   {$IF CompilerVersion < 21}
+    atempResponse := TStringStream.Create('');
+   {$ELSE}
+    atempResponse := TStringStream.Create;
+   {$IFEND}
+  {$ENDIF}
+  If Not Assigned(AResponse) Then
+   Begin
+    {$IFDEF FPC}
+     tempResponse  := TStringStream.Create('');
+    {$ELSE}
+     {$IF CompilerVersion < 21}
+      tempResponse := TStringStream.Create('');
+     {$ELSE}
+      tempResponse := TStringStream.Create;
+     {$IFEND}
+    {$ENDIF}
+   End;
+  vAUrl := AUrl;
+
+
+  Try
+   //Copy Custom Headers
+//   CopyStringList(TStringList(vDefaultCustomHeader), vTempHeaders);
+   SetHeaders(TStringList(vDefaultCustomHeader));
+   If Not IgnoreEvents Then
+   If Assigned(vOnBeforePost) then
+    If Not Assigned(CustomHeaders) Then
+     vOnBeforePost(AUrl, vTempHeaders)
+    Else
+     vOnBeforePost(AUrl, CustomHeaders);
+   //Copy New Headers
+   CopyStringList(CustomHeaders, vTempHeaders);
+   SetRawHeaders(vTempHeaders, SendParams);
+   If Not Assigned(AResponse) Then
+    Begin
+     HttpRequest.Post(AUrl, SendParams, atempResponse);
+     Result:= HttpRequest.ResponseCode;
+     AResponseText := HttpRequest.ResponseText;
+     if Assigned(vOnHeadersAvailable) then
+      vOnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
+     atempResponse.Position := 0;
+     If vRSCharset = esUtf8 Then
+      tempResponse.WriteString(utf8Decode(atempResponse.DataString))
+     Else
+      tempResponse.WriteString(atempResponse.DataString);
+     FreeAndNil(atempResponse);
+     tempResponse.Position := 0;
+     If Not IgnoreEvents Then
+     If Assigned(vOnAfterRequest) then
+      vOnAfterRequest(AUrl, rtPost, tempResponse);
+    End
+   Else
+    Begin
+      temp := Nil;
+      //If Assigned(CustomHeaders) Then
+      //temp         := TStringStream.Create(CustomHeaders.Text);
+      //HttpRequest.Post(AUrl, temp, atempResponse);
+
+     // ** alteração Ico Menezes - 15/07/2020 - Gerar os paramentros para x-www-urlencode
+     sResponse:= HttpRequest.Post(AUrl, CustomHeaders);
+     // ** alteração Ico Menezes - 15/07/2020 - Resquest anterior
+     Result:= HttpRequest.ResponseCode;
+     AResponseText := HttpRequest.ResponseText;
+     if Assigned(vOnHeadersAvailable) then
+      vOnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
+//     HttpRequest.Post(AUrl, SendParams, atempResponse);
+     If vRSCharset = esUtf8 Then
+      AResponse.WriteString(utf8Decode(sResponse))
+     Else
+      AResponse.WriteString(sResponse);
+     AResponse.Position := 0;
+     If Not IgnoreEvents Then
+     If Assigned(vOnAfterRequest) then
+      vOnAfterRequest(AUrl, rtPost, AResponse);
+    End;
+  Finally
+   vTempHeaders.Free;
+   If Assigned(tempResponse) Then
+    FreeAndNil(tempResponse);
+   If Assigned(atempResponse) Then
+    FreeAndNil(atempResponse);
+   SendParams.Free;
+   If Assigned(temp) Then
+    FreeAndNil(temp);
+  End;
+ Except
+  On E: EIdHTTPProtocolException do
+   Begin
+    If (Length(E.ErrorMessage) > 0) Or (E.ErrorCode > 0) then
+     Begin
+      Result:= E.ErrorCode;
+      If E.ErrorMessage <> '' Then
+       temp := TStringStream.Create(E.ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF})
+      Else
+       temp := TStringStream.Create(E.Message{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+      AResponse.CopyFrom(temp, temp.Size);
+      temp.Free;
+     End;
+   End;
+  On E: EIdSocketError do
+   Begin
+    HttpRequest.Disconnect(false);
+    Raise;
+   End;
+ End;
+end;
+
+function TDWClientREST.Get(AUrl: String; var AResponseText: String;
+  CustomHeaders: TStringList; const AResponse: TStringStream;
+  IgnoreEvents: Boolean): Integer;
+Var
+ temp         : TStringStream;
+ vTempHeaders : TStringList;
+ atempResponse,
+ tempResponse : TStringStream;
+ SendParams   : TIdMultipartFormDataStream;
+Begin
+ Result:= 200;     // o novo metodo recebe sempre 200 como code inicial;
+ AResponseText := '';
+
+ Try
+  AUrl  := StringReplace(AUrl, #012, '', [rfReplaceAll]);
+  vAUrl := AUrl;
+  tempResponse := Nil;
+  SendParams   := Nil;
+  SetParams(HttpRequest);
+  SetUseSSL(vUseSSL);
+  vTempHeaders := TStringList.Create;
+  {$IFDEF FPC}
+   atempResponse  := TStringStream.Create('');
+  {$ELSE}
+   {$IF CompilerVersion < 21}
+    atempResponse := TStringStream.Create('');
+   {$ELSE}
+    atempResponse := TStringStream.Create;
+   {$IFEND}
+  {$ENDIF}
+  If Not Assigned(AResponse) Then
+   Begin
+    {$IFDEF FPC}
+     tempResponse  := TStringStream.Create('');
+    {$ELSE}
+     {$IF CompilerVersion < 21}
+      tempResponse := TStringStream.Create('');
+     {$ELSE}
+      tempResponse := TStringStream.Create;
+     {$IFEND}
+    {$ENDIF}
+   End;
+  Try
+   //Copy Custom Headers
+//   CopyStringList(TStringList(vDefaultCustomHeader), vTempHeaders);
+   SetHeaders(TStringList(vDefaultCustomHeader));
+   If Not IgnoreEvents Then
+   If Assigned(vOnBeforeGet) then
+    If Not Assigned(CustomHeaders) Then
+     vOnBeforeGet(AUrl, vTempHeaders)
+    Else
+     vOnBeforeGet(AUrl, CustomHeaders);
+   //Copy New Headers
+   CopyStringList(CustomHeaders, vTempHeaders);
+   SetHeaders(vTempHeaders, SendParams);
+   If Not Assigned(AResponse) Then
+    Begin
+     HttpRequest.Get(AUrl, atempResponse);
+     Result:= HttpRequest.ResponseCode;
+     AResponseText := HttpRequest.ResponseText;
+     if Assigned(vOnHeadersAvailable) then
+      vOnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
+     atempResponse.Position := 0;
+     If vRSCharset = esUtf8 Then
+      tempResponse.WriteString(utf8Decode(atempResponse.DataString))
+     Else
+      tempResponse.WriteString(atempResponse.DataString);
+     FreeAndNil(atempResponse);
+     tempResponse.Position := 0;
+     If Not IgnoreEvents Then
+     If Assigned(vOnAfterRequest) then
+      vOnAfterRequest(AUrl, rtGet, tempResponse);
+    End
+   Else
+    Begin
+     HttpRequest.Get(AUrl, atempResponse); // AResponse);
+     Result:= HttpRequest.ResponseCode;
+     AResponseText := HttpRequest.ResponseText;
+     if Assigned(vOnHeadersAvailable) then
+      vOnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
+     atempResponse.Position := 0;
+     If vRSCharset = esUtf8 Then
+      AResponse.WriteString(utf8Decode(atempResponse.DataString))
+     Else
+      AResponse.WriteString(atempResponse.DataString);
+     FreeAndNil(atempResponse);
+     AResponse.Position := 0;
+     If Not IgnoreEvents Then
+     If Assigned(vOnAfterRequest) then
+      vOnAfterRequest(AUrl, rtGet, AResponse);
+    End;
+  Finally
+   vTempHeaders.Free;
+   If Assigned(tempResponse) Then
+    tempResponse.Free;
+   If Assigned(atempResponse) Then
+    atempResponse.Free;
+  End;
+ Except
+   { Ico - receber erros do servidor no verbo GET }
+  On E: EIdHTTPProtocolException Do
+   Begin
+    If (Length(E.ErrorMessage) > 0) or (E.ErrorCode <> 0) Then
+     Begin
+      Result:= E.ErrorCode;         // tratamos o status dentro do except da requisicao
+      temp := TStringStream.Create(E.ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+      AResponse.CopyFrom(temp, temp.Size);
+      temp.Free;
+     End;
+   End;
+  On E: EIdSocketError Do
+   Begin
+    Raise Exception.Create(E.Message);
+    HttpRequest.Disconnect(false);
+   End;
+ End;
+end;
+
+function TDWClientREST.Put(AUrl: String; var AResponseText: String;
+  CustomHeaders, CustomBody: TStringList; const AResponse: TStringStream;
+  IgnoreEvents: Boolean): Integer;
+Var
+ temp         : TStringStream;
+ vTempHeaders : TStringList;
+ atempResponse,
+ tempResponse,
+ SendParams   : TStringStream;
+Begin
+ Result:= 200;
+ AResponseText := '';
+
+ Try
+  tempResponse := Nil;
+  SendParams   := Nil;
+  SetParams(HttpRequest);
+  SetUseSSL(vUseSSL);
+  vTempHeaders := TStringList.Create;
+  {$IFDEF FPC}
+   atempResponse  := TStringStream.Create('');
+  {$ELSE}
+   {$IF CompilerVersion < 21}
+    atempResponse := TStringStream.Create('');
+   {$ELSE}
+    atempResponse := TStringStream.Create;
+   {$IFEND}
+  {$ENDIF}
+  If Not Assigned(AResponse) Then
+   Begin
+    {$IFDEF FPC}
+     tempResponse  := TStringStream.Create('');
+    {$ELSE}
+     {$IF CompilerVersion < 21}
+      tempResponse := TStringStream.Create('');
+     {$ELSE}
+      tempResponse := TStringStream.Create;
+     {$IFEND}
+    {$ENDIF}
+   End;
+  vAUrl := AUrl;
+  Try
+   //Copy Custom Headers
+//   CopyStringList(TStringList(vDefaultCustomHeader), vTempHeaders);
+   SetHeaders(TStringList(vDefaultCustomHeader));
+   If Not IgnoreEvents Then
+   If Assigned(vOnBeforePut) then
+    If Not Assigned(CustomHeaders) Then
+     vOnBeforePut(AUrl, vTempHeaders)
+    Else
+     vOnBeforePut(AUrl, CustomHeaders);
+   //Copy New Headers
+   CopyStringList(CustomHeaders, vTempHeaders);
+   SendParams := TStringStream.Create(vTempHeaders.Text);
+ //  SetHeaders(vTempHeaders, SendParams);
+//   SetRawHeaders(vTempHeaders, SendParams);
+   If Not Assigned(AResponse) Then
+    Begin
+     HttpRequest.Put(AUrl, SendParams, atempResponse);
+     Result:= HttpRequest.ResponseCode;
+     AResponseText := HttpRequest.ResponseText;
+     atempResponse.Position := 0;
+     If vRSCharset = esUtf8 Then
+      tempResponse.WriteString(utf8Decode(atempResponse.DataString))
+     Else
+      tempResponse.WriteString(atempResponse.DataString);
+     FreeAndNil(atempResponse);
+     tempResponse.Position := 0;
+     If Not IgnoreEvents Then
+     If Assigned(vOnAfterRequest) then
+      vOnAfterRequest(AUrl, rtPut, tempResponse);
+    End
+   Else
+    Begin
+     HttpRequest.Put(AUrl, SendParams, atempResponse);
+     Result:= HttpRequest.ResponseCode;
+     AResponseText := HttpRequest.ResponseText;
+     atempResponse.Position := 0;
+     If vRSCharset = esUtf8 Then
+      AResponse.WriteString(utf8Decode(atempResponse.DataString))
+     Else
+      AResponse.WriteString(atempResponse.DataString);
+     FreeAndNil(atempResponse);
+     AResponse.Position := 0;
+     If Not IgnoreEvents Then
+     If Assigned(vOnAfterRequest) then
+      vOnAfterRequest(AUrl, rtPut, AResponse);
+    End;
+  Finally
+   vTempHeaders.Free;
+   If Assigned(tempResponse) Then
+    tempResponse.Free;
+   If Assigned(atempResponse) Then
+    atempResponse.Free;
+   If Assigned(SendParams) Then
+    FreeAndNil(SendParams);
+  End;
+ Except
+  On E: EIdHTTPProtocolException Do
+   Begin
+    If (Length(E.ErrorMessage) > 0) or (E.ErrorCode <> 0) Then
+     Begin
+      Result:= E.ErrorCode;
+      temp := TStringStream.Create(E.ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+      AResponse.CopyFrom(temp, temp.Size);
+      temp.Free;
+     End;
+   End;
+  On E: EIdSocketError Do
+   Begin
+    HttpRequest.Disconnect(false);
+    Raise;
+   End;
+ End;
+end;
+
+function TDWClientREST.Patch(AUrl: String; var AResponseText: String;
+  CustomHeaders: TStringList; const AResponse: TStringStream;
+  IgnoreEvents: Boolean): Integer;
+Var
+ temp         : TStringStream;
+ vTempHeaders : TStringList;
+ atempResponse,
+ tempResponse,
+ SendParams   : TStringStream;
+Begin
+ Result:= 200;
+ AResponseText := '';
+
+ Try
+  tempResponse := Nil;
+  SendParams   := Nil;
+  SetParams(HttpRequest);
+  SetUseSSL(vUseSSL);
+  vTempHeaders := TStringList.Create;
+  {$IFDEF FPC}
+   atempResponse  := TStringStream.Create('');
+  {$ELSE}
+   {$IF CompilerVersion < 21}
+    atempResponse := TStringStream.Create('');
+   {$ELSE}
+    atempResponse := TStringStream.Create;
+   {$IFEND}
+  {$ENDIF}
+  If Not Assigned(AResponse) Then
+   Begin
+    {$IFDEF FPC}
+     tempResponse  := TStringStream.Create('');
+    {$ELSE}
+     {$IF CompilerVersion < 21}
+      tempResponse := TStringStream.Create('');
+     {$ELSE}
+      tempResponse := TStringStream.Create;
+     {$IFEND}
+    {$ENDIF}
+   End;
+  vAUrl := AUrl;
+  Try
+   //Copy Custom Headers
+//   CopyStringList(TStringList(vDefaultCustomHeader), vTempHeaders);
+   SetHeaders(TStringList(vDefaultCustomHeader));
+   If Not IgnoreEvents Then
+   If Assigned(vOnBeforePut) then
+    If Not Assigned(CustomHeaders) Then
+     vOnBeforePut(AUrl, vTempHeaders)
+    Else
+     vOnBeforePut(AUrl, CustomHeaders);
+   //Copy New Headers
+   CopyStringList(CustomHeaders, vTempHeaders);
+   SendParams := TStringStream.Create(vTempHeaders.Text);
+ //  SetHeaders(vTempHeaders, SendParams);
+//   SetRawHeaders(vTempHeaders, SendParams);
+   If Not Assigned(AResponse) Then
+    Begin
+     HttpRequest.Put(AUrl, SendParams, atempResponse);
+     Result:= HttpRequest.ResponseCode;
+     AResponseText := HttpRequest.ResponseText;
+     atempResponse.Position := 0;
+     If vRSCharset = esUtf8 Then
+      tempResponse.WriteString(utf8Decode(atempResponse.DataString))
+     Else
+      tempResponse.WriteString(atempResponse.DataString);
+     FreeAndNil(atempResponse);
+     tempResponse.Position := 0;
+     If Not IgnoreEvents Then
+     If Assigned(vOnAfterRequest) then
+      vOnAfterRequest(AUrl, rtPut, tempResponse);
+    End
+   Else
+    Begin
+     HttpRequest.Put(AUrl, SendParams, atempResponse);
+     Result:= HttpRequest.ResponseCode;
+     AResponseText := HttpRequest.ResponseText;
+     atempResponse.Position := 0;
+     If vRSCharset = esUtf8 Then
+      AResponse.WriteString(utf8Decode(atempResponse.DataString))
+     Else
+      AResponse.WriteString(atempResponse.DataString);
+     FreeAndNil(atempResponse);
+     AResponse.Position := 0;
+     If Not IgnoreEvents Then
+     If Assigned(vOnAfterRequest) then
+      vOnAfterRequest(AUrl, rtPut, AResponse);
+    End;
+  Finally
+   vTempHeaders.Free;
+   If Assigned(tempResponse) Then
+    tempResponse.Free;
+   If Assigned(atempResponse) Then
+    atempResponse.Free;
+   If Assigned(SendParams) Then
+    FreeAndNil(SendParams);
+  End;
+ Except
+  On E: EIdHTTPProtocolException Do
+   Begin
+    If (Length(E.ErrorMessage) > 0) or (E.ErrorCode <> 0) Then
+     Begin
+      Result:= E.ErrorCode;
+      temp := TStringStream.Create(E.ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+      AResponse.CopyFrom(temp, temp.Size);
+      temp.Free;
+     End;
+   End;
+  On E: EIdSocketError Do
+   Begin
+    HttpRequest.Disconnect(false);
+    Raise;
+   End;
+ End;
+
+end;
 
 end.
