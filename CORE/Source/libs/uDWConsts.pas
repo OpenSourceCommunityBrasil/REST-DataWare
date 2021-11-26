@@ -93,11 +93,11 @@ Const
  DWDialogoTitulo           = 'DW REST DataWare Components';
  DWSobreTitulo             = 'DW VCL';
  DWSobreDescricao          = 'DW VCL http://www.restdw.com.br/' + sLineBreak +
-                             'Components REST DataWare Core' + sLineBreak +
+                             'Components REST Dataware Core' + sLineBreak +
                              'CORE Version';
  DWSobreLicencaStatus      = 'Open Source - Free Version';
  DWVersionINFO             = '1.4.3.';
- DWRelease                 = '2874';
+ DWRelease                 = '2876';
  DwParamsHeaderVersion     = 6;
  DWCodeProject             = 'Cadillacs and Dinosaurs';
  DWVersao                  = DWVersionINFO + DWRelease + '(' + DWCodeProject + ')';

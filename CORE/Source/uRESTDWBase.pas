@@ -11326,6 +11326,8 @@ Begin
          Begin
           Try
            Repeat
+//            If Assigned(decoder) Then //Observacao de Memleak XyberX
+//             FreeAndNil(decoder);
             decoder := TIdMessageDecoderMIME.Create(nil);
             TIdMessageDecoderMIME(decoder).MIMEBoundary := boundary;
             decoder.SourceStream := ARequestInfo.PostStream;

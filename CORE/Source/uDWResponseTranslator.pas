@@ -130,53 +130,53 @@ Type
   HttpRequest          : TIdHTTP;
   vRSCharset           : TEncodeSelect;
   vRedirectMaximum     : Integer;
-  Procedure SetParams      (Const aHttpRequest : TIdHTTP);
-  Procedure SetOnWork      (Value              : TOnWork);
-  Procedure SetOnWorkBegin (Value              : TOnWorkBegin);
-  Procedure SetOnWorkEnd   (Value              : TOnWorkEnd);
-  Procedure SetOnStatus    (Value              : TOnStatus);
-  Function  GetAllowCookies                    : Boolean;
-  Procedure SetAllowCookies(Value              : Boolean);
-  Function  GetHandleRedirects                 : Boolean;
-  Procedure SetHandleRedirects(Value           : Boolean);
+  Procedure SetParams         (Const aHttpRequest : TIdHTTP);
+  Procedure SetOnWork         (Value              : TOnWork);
+  Procedure SetOnWorkBegin    (Value              : TOnWorkBegin);
+  Procedure SetOnWorkEnd      (Value              : TOnWorkEnd);
+  Procedure SetOnStatus       (Value              : TOnStatus);
+  Function  GetAllowCookies                       : Boolean;
+  Procedure SetAllowCookies   (Value              : Boolean);
+  Function  GetHandleRedirects                    : Boolean;
+  Procedure SetHandleRedirects(Value              : Boolean);
  Private
   //Variáveis, Procedures e Funções Privadas
   vDefaultCustomHeader : TStrings;
-  aSSLMethod        : TIdSSLVersion;
-  vSSLVersions      : TIdSSLVersions;
-  ssl               : TIdSSLIOHandlerSocketOpenSSL;
-  vOnWork           : TOnWork;
-  vOnWorkBegin      : TOnWorkBegin;
-  vOnWorkEnd        : TOnWorkEnd;
-  vOnStatus         : TOnStatus;
-  vAuthOptionParams : TRDWClientAuthOptionParams;
-  vMaxAuthRetries   : Integer;
+  aSSLMethod           : TIdSSLVersion;
+  vSSLVersions         : TIdSSLVersions;
+  ssl                  : TIdSSLIOHandlerSocketOpenSSL;
+  vOnWork              : TOnWork;
+  vOnWorkBegin         : TOnWorkBegin;
+  vOnWorkEnd           : TOnWorkEnd;
+  vOnStatus            : TOnStatus;
+  vAuthOptionParams    : TRDWClientAuthOptionParams;
+  vMaxAuthRetries      : Integer;
   vAUrl,
   vContentEncoding,
   vAccept,
   vAccessControlAllowOrigin,
   vUserAgent,
   vAcceptEncoding,
-  vContentType      : String;
+  vContentType         : String;
   vUseSSL,
-  vVerifyCert       : Boolean;
-  vTransparentProxy : TIdProxyConnectionInfo;
+  vVerifyCert          : Boolean;
+  vTransparentProxy    : TIdProxyConnectionInfo;
   vConnectTimeOut,
-  vRequestTimeOut   : Integer;
-  vOnBeforeGet      : TPrepareGet;
+  vRequestTimeOut      : Integer;
+  vOnBeforeGet         : TPrepareGet;
   vOnBeforePost,
   vOnBeforePut,
   vOnBeforeDelete,
-  vOnBeforePatch    : TPrepareEvent;
-  vOnAfterRequest   : TAfterRequest;
-  vOnHeadersAvailable : TOnHeadersAvailable;
+  vOnBeforePatch       : TPrepareEvent;
+  vOnAfterRequest      : TAfterRequest;
+  vOnHeadersAvailable  : TOnHeadersAvailable;
   vCertFile,
   vKeyFile,
   vRootCertFile,
-  vHostCert           : String;
-  vPortCert           : Integer;
-  vOnGetpassword      : TOnGetpassword;
-  vCertMode           : TIdSSLMode;
+  vHostCert            : String;
+  vPortCert            : Integer;
+  vOnGetpassword       : TOnGetpassword;
+  vCertMode            : TIdSSLMode;
   Procedure SetCertOptions;
   Procedure Getpassword  (Var Password : String);
   Function  GetVerifyCert              : Boolean;
