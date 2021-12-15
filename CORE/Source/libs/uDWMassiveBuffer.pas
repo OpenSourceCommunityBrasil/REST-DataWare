@@ -1001,7 +1001,7 @@ Var
 Begin
  New(vItem);
  vItem^ := Item;
- Result := TList(Self).Add(vItem);
+ Result := Inherited Add(vItem);
 End;
 
 Procedure TMassiveBuffer.ClearAll;

@@ -1377,12 +1377,17 @@ begin
          (Lowercase(bJsonValue.pairs[I].classname) = Lowercase('TDWJSONArray'))  Then
        Begin
         JSONBase     := TRESTDWJSONBase.Create(bJsonValue.pairs[I].Value);
-        If bJsonValue.pairs[I].Name <> '' Then
-         Add(bJsonValue.pairs[I].Name, JSONBase);
+//        If bJsonValue.pairs[I].Name <> '' Then
+        If Assigned(JSONBase) Then
+         If bJsonValue.pairs[I].Name <> '' Then
+          Add(bJsonValue.pairs[I].Name, JSONBase)
+         Else
+          Add(JSONBase);
        End
       Else
        Begin
-        If Lowercase(bJsonValue.pairs[I].classname) = '_string' Then
+        If (Lowercase(bJsonValue.pairs[I].classname) = '_string')     Or
+           (Lowercase(bJsonValue.pairs[I].classname) = 'tjsonstring') Then
          Begin
           If (bJsonValue.pairs[I].Value <> cNullvalue)    And
              (bJsonValue.pairs[I].Value <> cNullvalueTag) Then
@@ -1390,7 +1395,9 @@ begin
           Else
            AddNull(bJsonValue.pairs[I].Name);
          End
-        Else If Lowercase(bJsonValue.pairs[I].classname) = '_integer' Then
+        Else If (Lowercase(bJsonValue.pairs[I].classname) = '_integer')     Or
+                (Lowercase(bJsonValue.pairs[I].classname) = 'tjsonnumber')  And
+                (Pos('.', bJsonValue.pairs[I].Value) = 0)                   Then
          Begin
           If (bJsonValue.pairs[I].Value <> cNullvalue)    And
              (bJsonValue.pairs[I].Value <> cNullvalueTag) Then
@@ -1398,7 +1405,9 @@ begin
           Else
            AddNull(bJsonValue.pairs[I].Name, etInteger);
          End
-        Else If Lowercase(bJsonValue.pairs[I].classname) = '_double' Then
+        Else If (Lowercase(bJsonValue.pairs[I].classname) = '_double')     Or
+                (Lowercase(bJsonValue.pairs[I].classname) = 'tjsonnumber') And
+                (Pos('.', bJsonValue.pairs[I].Value) > 0)                  Then
          Begin
           If (bJsonValue.pairs[I].Value <> cNullvalue)    And
              (bJsonValue.pairs[I].Value <> cNullvalueTag) Then
@@ -1409,7 +1418,8 @@ begin
           Else
            AddNull(bJsonValue.pairs[I].Name, etNumeric);
          End
-        Else If Lowercase(bJsonValue.pairs[I].classname) = '_boolean' Then
+        Else If (Lowercase(bJsonValue.pairs[I].classname) = '_boolean')     Or
+                (Lowercase(bJsonValue.pairs[I].classname) = 'tjsonboolean') Then
          Begin
           If (bJsonValue.pairs[I].Value <> cNullvalue)    And
              (bJsonValue.pairs[I].Value <> cNullvalueTag) Then
