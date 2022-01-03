@@ -1676,6 +1676,7 @@ Var
  vTempHeaders : TStringList;
  atempResponse,
  tempResponse : TStringStream;
+ sResponse    : String;
  SendParams   : TIdMultipartFormDataStream;
 Begin
  Result:= 200;
@@ -1749,14 +1750,16 @@ Begin
      temp := Nil;
      If Assigned(CustomBody) Then
       temp         := TStringStream.Create(CustomBody.Text);
-     HttpRequest.Post(AUrl, temp, atempResponse);
+     sResponse := HttpRequest.Post(AUrl, temp);
+//     HttpRequest.Post(AUrl, temp, atempResponse);
      Result:= HttpRequest.ResponseCode;
      if Assigned(vOnHeadersAvailable) then
       vOnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
-     atempResponse.Position := 0;
-     If atempResponse.Size = 0 Then
+     If Length(sResponse) = 0 Then
       Begin
-       If vRSCharset = esUtf8 Then
+       If Length(HttpRequest.ResponseText) > 0 Then
+        AResponse.WriteString(utf8Decode(HttpRequest.ResponseText))
+       Else If vRSCharset = esUtf8 Then
         AResponse.WriteString(utf8Decode(HttpRequest.Response.RawHeaders.Text))
        Else
         AResponse.WriteString(HttpRequest.Response.RawHeaders.Text);
@@ -1764,11 +1767,11 @@ Begin
      Else
       Begin
        If vRSCharset = esUtf8 Then
-        AResponse.WriteString(utf8Decode(atempResponse.DataString))
+        AResponse.WriteString(utf8Decode(sResponse))
        Else
-        AResponse.WriteString(atempResponse.DataString);
+        AResponse.WriteString(sResponse);
       End;
-     FreeAndNil(atempResponse);
+//     FreeAndNil(atempResponse);
      AResponse.Position := 0;
      If Not IgnoreEvents Then
      If Assigned(vOnAfterRequest) then
@@ -1881,11 +1884,13 @@ Begin
       //If Assigned(CustomHeaders) Then
       //temp         := TStringStream.Create(CustomHeaders.Text);
       //HttpRequest.Post(AUrl, temp, atempResponse);
-
      // ** alteração Ico Menezes - 15/07/2020 - Gerar os paramentros para x-www-urlencode
-     sResponse:= HttpRequest.Post(AUrl, CustomHeaders);
+     sResponse := HttpRequest.Post(AUrl, CustomHeaders);
      // ** alteração Ico Menezes - 15/07/2020 - Resquest anterior
      Result:= HttpRequest.ResponseCode;
+     If (HttpRequest.ResponseCode > 299) Then
+      If Trim(sResponse) = '' Then
+       sResponse := HttpRequest.ResponseText;
      if Assigned(vOnHeadersAvailable) then
       vOnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
 //     HttpRequest.Post(AUrl, SendParams, atempResponse);

@@ -4,7 +4,14 @@ interface
 
 Uses
   SysUtils, Classes, SysTypes, uSystemEvents, uDWJSONObject, uDWConstsData, uDWConstsCharset, uRESTDWServerEvents,
-  ServerUtils, uDWMassiveBuffer;
+  ServerUtils, uDWMassiveBuffer
+ {$IFNDEF FPC}
+  {$IF CompilerVersion <= 22}
+   ,EncdDecd, SyncObjs
+  {$ELSE}
+   ,System.SyncObjs
+  {$IFEND}
+ {$ENDIF};
 
 Type
  TUserBasicAuth  =             Procedure(Welcomemsg, AccessTag,
@@ -53,6 +60,7 @@ Type
  Type
   TServerMethodDataModule = Class(TDataModule)
   Private
+   vQueuedRequest        : Boolean;
    vClientWelcomeMessage : String;
    vReplyEvent           : TDWReplyEvent;
    vWelcomeMessage       : TWelcomeMessage;
@@ -69,6 +77,7 @@ Type
    vEncoding             : TEncodeSelect;
    vRESTDWClientInfo     : TRESTDWClientInfo;
    vServerAuthOptions    : TRDWAuthOptionParam;
+//   Procedure Loaded; Override;
   Public
    Procedure   SetClientWelcomeMessage(Value : String);
    Procedure   SetClientInfo(ip, ipVersion,
@@ -94,6 +103,7 @@ Type
    Property OnUserBasicAuth                : TUserBasicAuth      Read vUserBasicAuth                  Write vUserBasicAuth;
    Property OnUserTokenAuth                : TUserTokenAuth      Read vUserTokenAuth                  Write vUserTokenAuth;
    Property OnGetToken                     : TOnGetToken         Read vOnGetToken                     Write vOnGetToken;
+   Property QueuedRequest                  : Boolean             Read vQueuedRequest                  Write vQueuedRequest;
  End;
 
 implementation

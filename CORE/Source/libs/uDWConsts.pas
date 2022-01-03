@@ -97,7 +97,7 @@ Const
                              'CORE Version';
  DWSobreLicencaStatus      = 'Open Source - Free Version';
  DWVersionINFO             = '1.4.3.';
- DWRelease                 = '2877';
+ DWRelease                 = '2881';
  DwParamsHeaderVersion     = 6;
  DWCodeProject             = 'Cadillacs and Dinosaurs';
  DWVersao                  = DWVersionINFO + DWRelease + '(' + DWCodeProject + ')';
