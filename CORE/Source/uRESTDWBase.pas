@@ -13470,9 +13470,6 @@ Begin
    If Assigned(vCriticalSection) Then
     FreeAndNil(vCriticalSection);
   {$IFEND}
- {$ELSE}
-  If Assigned(vCriticalSection) Then
-   FreeAndNil(vCriticalSection);
  {$ENDIF}
  HTTPServer.Active := False;
  FreeAndNil(vProxyOptions);
