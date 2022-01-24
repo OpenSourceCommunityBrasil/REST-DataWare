@@ -706,7 +706,7 @@ Begin
     If ((ARequestInfo.Params.Count > 0) And (RequestType In [rtGet, rtPost, rtDelete])) Then
      Begin
       TServerUtils.ParseWebFormsParams(DWParams, ARequestInfo.Params, Encoding
-                                       {$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, RequestTypeToString(RequestType));
+                                       {$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, RequestType);
       If DWParams <> Nil Then
        Begin
         If (DWParams.ItemsString['dwwelcomemessage']     <> Nil)    Then

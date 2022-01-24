@@ -122,7 +122,6 @@ Type
   vCORSCustomHeaders,
   vDefaultPage         : TStringList;
   vPathTraversalRaiseError,
-  vMultiCORE,
   vForceWelcomeAccess,
   vUseSSL,
   vCORS,
@@ -350,7 +349,6 @@ Type
   Property ForceWelcomeAccess      : Boolean                    Read vForceWelcomeAccess      Write vForceWelcomeAccess;
   Property OnBeforeUseCriptKey     : TBeforeUseCriptKey         Read vBeforeUseCriptKey       Write vBeforeUseCriptKey;
   Property CriptOptions            : TCripto                    Read vCripto                  Write vCripto;
-  Property MultiCORE               : Boolean                    Read vMultiCORE               Write vMultiCORE;
   {$IFDEF FPC}
   Property DatabaseCharSet         : TDatabaseCharSet           Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
@@ -1710,23 +1708,45 @@ Begin
       If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
        vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
       Try
-       {$IFDEF FPC}
-        InitCriticalSection(vCriticalSection);
-        EnterCriticalSection(vCriticalSection);
-       {$ENDIF}
+//       {$IFDEF FPC}
+//        InitCriticalSection(vCriticalSection);
+//        EnterCriticalSection(vCriticalSection);
+//       {$ENDIF}
        vTempServerMethods  := vServerMethod.Create(Nil);
       Finally
-       {$IFDEF FPC}
-        Try
-         LeaveCriticalSection(vCriticalSection);
-         DoneCriticalSection(vCriticalSection);
-        Except
-        End;
-       {$ENDIF}
+//       {$IFDEF FPC}
+//        Try
+//         LeaveCriticalSection(vCriticalSection);
+//         DoneCriticalSection(vCriticalSection);
+//        Except
+//        End;
+//       {$ENDIF}
       End;
       If (vTempServerMethods.ClassType = TServerMethodDatamodule)             Or
          (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule)) Then
        Begin
+        If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
+         Begin
+          {$IFNDEF FPC}
+           {$IF CompilerVersion > 21}
+            {$IFDEF WINDOWS}
+             InitializeCriticalSection(vCriticalSection);
+             EnterCriticalSection(vCriticalSection);
+            {$ELSE}
+             If Not Assigned(vCriticalSection) Then
+              vCriticalSection := TCriticalSection.Create;
+             vCriticalSection.Acquire;
+            {$ENDIF}
+           {$ELSE}
+            If Not Assigned(vCriticalSection)  Then
+             vCriticalSection := TCriticalSection.Create;
+            vCriticalSection.Acquire;
+           {$IFEND}
+          {$ELSE}
+           InitCriticalSection(vCriticalSection);
+           EnterCriticalSection(vCriticalSection);
+          {$ENDIF}
+         End;
         vServerAuthOptions.CopyServerAuthParams(vRDWAuthOptionParam);
         TServerMethodDatamodule(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
         vIPVersion := 'undefined';
@@ -2246,64 +2266,8 @@ Begin
    End;
   If Assigned(vLastRequest) Then
    Begin
-    If Not vMultiCORE Then
-     Begin
-      {$IFNDEF FPC}
-       {$IF CompilerVersion > 21}
-        {$IFDEF WINDOWS}
-         if Not Assigned(vCriticalSection) Then
-          vCriticalSection := TCriticalSection.Create;
-         InitializeCriticalSection(vCriticalSection);
-         EnterCriticalSection(vCriticalSection);
-        {$ELSE}
-         if Not Assigned(vCriticalSection) Then
-          vCriticalSection := TCriticalSection.Create;
-         vCriticalSection.Acquire;
-        {$ENDIF}
-       {$ELSE}
-       if Not Assigned(vCriticalSection) Then
-        vCriticalSection := TCriticalSection.Create;
-       vCriticalSection.Acquire;
-       {$IFEND}
-      {$ELSE}
-       InitCriticalSection(vCriticalSection);
-       EnterCriticalSection(vCriticalSection);
-      {$ENDIF}
-     End;
-    Try
-     If Assigned(vLastRequest) Then
-      vLastRequest(vRequestHeader.Values['User-Agent'] + sLineBreak + Ctxt.URL);
-    Finally
-    If Not vMultiCORE Then
-     Begin
-      {$IFNDEF FPC}
-       {$IF CompilerVersion > 21}
-        {$IFDEF WINDOWS}
-         If Assigned(vCriticalSection) Then
-          Begin
-           LeaveCriticalSection(vCriticalSection);
-           DeleteCriticalSection(vCriticalSection);
-          End;
-        {$ELSE}
-         If Assigned(vCriticalSection) Then
-          Begin
-           vCriticalSection.Release;
-           FreeAndNil(vCriticalSection);
-          End;
-        {$ENDIF}
-       {$ELSE}
-        If Assigned(vCriticalSection) Then
-         Begin
-          vCriticalSection.Release;
-          FreeAndNil(vCriticalSection);
-         End;
-       {$IFEND}
-      {$ELSE}
-       LeaveCriticalSection(vCriticalSection);
-       DoneCriticalSection(vCriticalSection);
-      {$ENDIF}
-     End;
-    End;
+    If Assigned(vLastRequest) Then
+     vLastRequest(vRequestHeader.Values['User-Agent'] + sLineBreak + Ctxt.URL);
    End;
   If Assigned(vServerMethod) Then
    Begin
@@ -2589,54 +2553,7 @@ Begin
      End;
    End;
   If Assigned(vLastResponse) Then
-   Begin
-    If Not vMultiCORE Then
-     Begin
-      {$IFNDEF FPC}
-       {$IF CompilerVersion > 21}
-        {$IFDEF WINDOWS}
-         InitializeCriticalSection(vCriticalSection);
-         EnterCriticalSection(vCriticalSection);
-        {$ELSE}
-         If Not Assigned(vCriticalSection) Then
-          vCriticalSection := TCriticalSection.Create;
-         vCriticalSection.Acquire;
-        {$ENDIF}
-       {$ELSE}
-        If Not Assigned(vCriticalSection)  Then
-         vCriticalSection := TCriticalSection.Create;
-        vCriticalSection.Acquire;
-       {$IFEND}
-      {$ELSE}
-       InitCriticalSection(vCriticalSection);
-       EnterCriticalSection(vCriticalSection);
-      {$ENDIF}
-     End;
-    Try
-     vLastResponse(vReplyString);
-    Finally
-     If Not vMultiCORE Then
-      Begin
-       {$IFNDEF FPC}
-        {$IF CompilerVersion > 21}
-         {$IFDEF WINDOWS}
-          LeaveCriticalSection(vCriticalSection);
-          DeleteCriticalSection(vCriticalSection);
-         {$ELSE}
-          vCriticalSection.Release;
-          FreeAndNil(vCriticalSection);
-         {$ENDIF}
-        {$ELSE}
-          vCriticalSection.Release;
-          FreeAndNil(vCriticalSection);
-        {$IFEND}
-       {$ELSE}
-        LeaveCriticalSection(vCriticalSection);
-        DoneCriticalSection(vCriticalSection);
-       {$ENDIF}
-      End;
-    End;
-   End;
+   vLastResponse(vReplyString);
  Finally
   If Assigned(vServerMethod) Then
    If Assigned(vTempServerMethods) Then
@@ -3048,7 +2965,6 @@ Begin
  vServerThreadPoolCount          := 32;
  vForceWelcomeAccess             := False;
  vCORS                           := False;
- vMultiCORE                      := False;
  vPathTraversalRaiseError        := True;
  FRootPath                       := '/';
  vRootUser                       := 'root';

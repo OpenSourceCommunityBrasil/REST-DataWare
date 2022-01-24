@@ -37,7 +37,7 @@ Type
                                          {$ENDIF}
                                          Var Result         : TDWParams;
                                          ParamsCount        : Integer;
-                                         MethodType         : String = 'POST';
+                                         MethodType         : TRequestType = rtPost;
                                          ContentType        : String = 'application/json'); Overload;
     Class Procedure ParseWebFormsParams (Var DWParams       : TDWParams;
                                          Params             : TStrings;
@@ -50,14 +50,14 @@ Type
                                           DatabaseCharSet   : TDatabaseCharSet;
                                          {$ENDIF}
                                          ParamsCount        : Integer;
-                                         MethodType         : String = 'POST');Overload;
+                                         MethodType         : TRequestType = rtPost);Overload;
     Class Procedure ParseWebFormsParams (Var DWParams       : TDWParams;
                                          WebParams          : TStrings;
                                          vEncoding          : TEncodeSelect
                                          {$IFDEF FPC}
                                          ;DatabaseCharSet   : TDatabaseCharSet
                                          {$ENDIF};
-                                         MethodType         : String = 'POST');Overload;
+                                         MethodType         : TRequestType = rtPost);Overload;
     Class Function ParseDWParamsURL     (Const Cmd          : String;
                                          vEncoding          : TEncodeSelect;
                                          Var ResultPR       : TDWParams{$IFDEF FPC}
@@ -790,7 +790,7 @@ Class Procedure TServerUtils.ParseWebFormsParams (Var DWParams     : TDWParams;
                                                   {$IFDEF FPC}
                                                   ;DatabaseCharSet : TDatabaseCharSet
                                                   {$ENDIF};
-                                                  MethodType       : String = 'POST');
+                                                  MethodType       : TRequestType = rtPost);
 Var
  I          : Integer;
  JSONParam  : TJSONParam;
@@ -847,7 +847,7 @@ Class Procedure TServerUtils.ParseWebFormsParams (Var DWParams       : TDWParams
                                                    DatabaseCharSet   : TDatabaseCharSet;
                                                   {$ENDIF}
                                                   ParamsCount        : Integer;
-                                                  MethodType         : String = 'POST');
+                                                  MethodType         : TRequestType = rtPost);
 Var
  aParamsCount,
  aParamsIndex,
@@ -1008,7 +1008,7 @@ Begin
     End;
   End;
   // Extrai Parametros
- If (Params.Count > 0) And (MethodType = 'POST') Then
+ If (Params.Count > 0) And (MethodType = rtPost) Then
   Begin
    Params.Text := TIdURI.URLDecode(Params.Text);
    For I := 0 To Params.Count - 1 Do
@@ -1047,7 +1047,7 @@ Begin
    {$IFNDEF FPC}{$if CompilerVersion > 21}vParams.StrictDelimiter := true;{$IFEND}{$ENDIF}
    If pos(UriOptions.EventName + '/', Cmd) > 0 Then
     Cmd := StringReplace(UriOptions.EventName + '/', Cmd, '', [rfReplaceAll]);
-   If (MethodType = 'GET') Then
+   If (MethodType = rtGet) Then
     Begin
      If ((Params.Count > 0) And (Pos('?', URL) = 0)) And (Query = '') then
       Cmd := Cmd + Params.Text
@@ -1102,7 +1102,7 @@ Class Procedure TServerUtils.ParseWebFormsParams(Params             : TStrings;
                                                  {$ENDIF}
                                                  Var Result         : TDWParams;
                                                  ParamsCount        : Integer;
-                                                 MethodType         : String = 'POST';
+                                                 MethodType         : TRequestType = rtPost;
                                                  ContentType        : String = 'application/json');
 Var
  aParamsCount,
@@ -1266,7 +1266,7 @@ Begin
     End;
   End;
   // Extrai Parametros
-  If (Params.Count > 0) And (MethodType = 'POST') Then
+  If (Params.Count > 0) And (MethodType = rtPost) Then
    Begin
     If ContentType <> cApplicationJSON then
      Begin
@@ -1364,12 +1364,25 @@ Begin
    End
   Else
    Begin
+    If (MethodType In [rtGet, rtDelete]) Then
+     Begin
+      If ((UriOptions.BaseServer = '')   And
+          (UriOptions.DataUrl    = ''))  And
+         ((UriOptions.ServerEvent <> '') And
+          (UriOptions.EventName <> ''))  And
+          (Trim(Query) = '') Then
+       Begin
+        Cmd                    := UriOptions.EventName;
+        UriOptions.EventName   := UriOptions.ServerEvent;
+        UriOptions.ServerEvent := '';
+       End;
+     End;
     vParams := TStringList.Create;
     vParams.Delimiter := '&';
     {$IFNDEF FPC}{$if CompilerVersion > 21}vParams.StrictDelimiter := true;{$IFEND}{$ENDIF}
     If pos(UriOptions.EventName + '/', Cmd) > 0 Then
      Cmd := StringReplace(UriOptions.EventName + '/', Cmd, '', [rfReplaceAll]);
-    If (MethodType = 'GET') Then
+    If (MethodType = rtGet) Then
      Begin
       If ((Params.Count > 0) And (Pos('?', URL) = 0)) And (Query = '') then
        Cmd := Cmd + Params.Text
@@ -1402,8 +1415,17 @@ Begin
           Begin
            JSONParam                 := TJSONParam.Create(Result.Encoding);
            JSONParam.ObjectDirection := odIN;
-           JSONParam.ParamName       := Trim(Copy(vParams[I], 1, Pos('=', vParams[I]) - 1));
-           JSONParam.AsString        := Trim(Copy(vParams[I],    Pos('=', vParams[I]) + 1, Length(vParams[I])));
+           If (vParams.names[I] <> '') And
+              (Trim(Query)      <> '') Then
+            Begin
+             JSONParam.ParamName       := Trim(Copy(vParams[I], 1, Pos('=', vParams[I]) - 1));
+             JSONParam.AsString        := Trim(Copy(vParams[I],    Pos('=', vParams[I]) + 1, Length(vParams[I])));
+            End
+           Else
+            Begin
+             JSONParam.ParamName       := IntToStr(I);
+             JSONParam.AsString        := vParams[I];
+            End;
            {$IFDEF FPC}
            JSONParam.DatabaseCharSet := DatabaseCharSet;
            {$ENDIF}

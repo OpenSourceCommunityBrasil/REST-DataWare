@@ -1490,7 +1490,7 @@ Var
          If vDataRouteList.Count > 0 Then
           Inc(aParamsCount);
          TServerUtils.ParseWebFormsParams (ARequest.ContentFields, Cmd, ARequest.Query,
-                                           vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+                                           vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
          If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then
           vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
          If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
@@ -1627,7 +1627,7 @@ Var
            If vDataRouteList.Count > 0 Then
             Inc(aParamsCount);
            TServerUtils.ParseWebFormsParams (ARequest.ContentFields, Cmd, ARequest.Query,
-                                             vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+                                             vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
            If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then
             vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
            If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
@@ -2000,7 +2000,7 @@ Begin
      vContentType := ARequest.ContentType;
      TServerUtils.ParseWebFormsParams (vRequestHeader, Cmd, ARequest.Query,
                                        vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF},
-                                       DWParams, aParamsCount, 'POST', vContentType);
+                                       DWParams, aParamsCount, rtPost, vContentType);
     End;
   End;
   {$IFNDEF FPC}
@@ -2178,7 +2178,7 @@ Begin
         If vDataRouteList.Count > 0 Then
          Inc(aParamsCount);
         TServerUtils.ParseWebFormsParams (ARequest.ContentFields, Cmd, ARequest.Query,
-                                          vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+                                          vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
         If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then
          vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
         If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
@@ -2234,7 +2234,7 @@ Begin
        TServerUtils.ParseWebFormsParams (ARequest.QueryFields, vTempCmd,
                                          ARequest.Query,
                                          vUriOptions, vmark, vEncoding,
-                                         DWParams, aParamsCount, ARequest.Method);
+                                         DWParams, aParamsCount, RequestType);
        If ARequest.Query <> '' Then
         Begin
          vTempCmd := vTempCmd + '?' + ARequest.Query;
@@ -2296,7 +2296,7 @@ Begin
        vRequestHeader.Add(Cmd);
        vRequestHeader.Add(ARequest.Query);
        TServerUtils.ParseWebFormsParams (ARequest.ContentFields, Cmd, ARequest.Query,
-                                         vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+                                         vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
 //       SaveLog; //For Debbug Vars
        If DWParams <> Nil Then
         Begin
@@ -2370,7 +2370,8 @@ Begin
            Inc(aParamsCount);
           TServerUtils.ParseRESTURL (RemoveBackslashCommands(ARequest.PathInfo) + ARequest.Query, vEncoding, vUriOptions, vmark, DWParams, aParamsCount);
           {$ENDIF}
-          If (vUriOptions.ServerEvent = '') And (aurlContext <> '') Then
+          If ((vUriOptions.ServerEvent = '') And (aurlContext <> '')) And
+              (Not (RequestType In [rtGet, rtDelete])) Then
            vUriOptions.ServerEvent := aurlContext;
           vOldMethod := vUriOptions.EventName;
           If DWParams <> Nil Then
@@ -3245,19 +3246,19 @@ Begin
           If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
            vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
           Try
-           {$IFDEF FPC}
-            InitCriticalSection(vCriticalSection);
-            EnterCriticalSection(vCriticalSection);
-           {$ENDIF}
+//           {$IFDEF FPC}
+//            InitCriticalSection(vCriticalSection);
+//            EnterCriticalSection(vCriticalSection);
+//           {$ENDIF}
            vTempServerMethods  := vServerMethod.Create(Nil);
           Finally
-           {$IFDEF FPC}
-            Try
-             LeaveCriticalSection(vCriticalSection);
-             DoneCriticalSection(vCriticalSection);
-            Except
-            End;
-           {$ENDIF}
+//           {$IFDEF FPC}
+//            Try
+//             LeaveCriticalSection(vCriticalSection);
+//             DoneCriticalSection(vCriticalSection);
+//            Except
+//            End;
+//           {$ENDIF}
           End;
           If (vTempServerMethods.ClassType = TServerMethodDatamodule)             Or
                   (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule)) Then
@@ -10739,7 +10740,7 @@ Var
                                                                                                {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                                                                {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF},
                                             ARequestInfo.QueryParams,
-                                            vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+                                            vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
          try
           JSONParam                 := TJSONParam.Create(DWParams.Encoding);
           JSONParam.ObjectDirection := odIN;
@@ -11214,7 +11215,7 @@ Begin
                                                                                                     {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                                                                     {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF},
                                        ARequestInfo.QueryParams,
-                                       vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, aParamsCount, RequestTypeToString(RequestType));
+                                       vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, aParamsCount, RequestType);
       If DWParams <> Nil Then
        Begin
         If (DWParams.ItemsString['dwwelcomemessage']     <> Nil)    Then
@@ -11258,7 +11259,7 @@ Begin
      Begin
       If (RequestType In [rtGet, rtDelete]) Then
        Begin
-        aurlContext := vUriOptions.ServerEvent;
+        aurlContext  := vUriOptions.ServerEvent;
         aParamsCount := cParamsCount;
         If ServerContext <> '' Then
          Inc(aParamsCount);
@@ -11269,6 +11270,19 @@ Begin
                                                                   {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                                   {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF}, vEncoding, vUriOptions, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
         vOldMethod := vUriOptions.EventName;
+        If ((vUriOptions.BaseServer = '')   And
+            (vUriOptions.DataUrl    = ''))  And
+           ((vUriOptions.ServerEvent <> '') And
+            (vUriOptions.EventName = ''))   Then
+         vUriOptions.BaseServer := vUriOptions.ServerEvent
+        Else If ((vUriOptions.BaseServer <> '') And
+                 (vUriOptions.DataUrl    = '')) And
+                (vUriOptions.ServerEvent <> '') And
+                 (vServerContext = '')  Then
+         Begin
+          vUriOptions.DataUrl    := vUriOptions.BaseServer;
+          vUriOptions.BaseServer := vUriOptions.ServerEvent;
+         End;
         If DWParams <> Nil Then
          Begin
           If DWParams.ItemsString['dwwelcomemessage']      <> Nil  Then
@@ -11425,7 +11439,7 @@ Begin
                                                                                                        {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                                                                        {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF},
                                                     ARequestInfo.QueryParams,
-                                                    vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+                                                    vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
                 End;
                JSONParam    := TJSONParam.Create(DWParams.Encoding);
                JSONParam.ObjectDirection := odIN;
@@ -11669,7 +11683,7 @@ Begin
                                                                                                    {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                                                                    {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF},
                                                 ARequestInfo.QueryParams,
-                                                vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+                                                vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
              {Alteração feita por Tiago IStuque - 28/12/2018}
              If Assigned(DWParams.ItemsString['dwReadBodyRaw']) And (DWParams.ItemsString['dwReadBodyRaw'].AsString='1') Then
               TServerUtils.ParseBodyRawToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
@@ -11733,7 +11747,7 @@ Begin
                                                                                                              {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                                                                              {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF},
                                                           ARequestInfo.QueryParams,
-                                                          vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+                                                          vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
                       End;
                      JSONParam    := TJSONParam.Create(DWParams.Encoding);
                      JSONParam.ObjectDirection := odIN;
@@ -12054,11 +12068,12 @@ Begin
                                                              {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                              {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF});
             vRequestHeader.Add(ARequestInfo.QueryParams);
+
             TServerUtils.ParseWebFormsParams (ARequestInfo.Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}RemoveBackslashCommands(ARequestInfo.Command)
                                                                                                  {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                                                                  {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF},
                                               ARequestInfo.QueryParams,
-                                              vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+                                              vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
            End;
           {$ELSE}
           If ARequestInfo.FormParams <> '' Then
@@ -12096,7 +12111,7 @@ Begin
                                                                                                    {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                                                                    {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF},
                                                 ARequestInfo.QueryParams,
-                                                vUriOptions, vmark, vEncoding, DWParams, aParamsCount);
+                                                vUriOptions, vmark, vEncoding, DWParams, aParamsCount, RequestType);
             End;
           {$ENDIF}
           If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
@@ -12114,7 +12129,7 @@ Begin
                                                                                                 {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                                                                 {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF},
                                              ARequestInfo.QueryParams,
-                                             vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+                                             vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
           {$ELSE}
            vRequestHeader.Add(ARequestInfo.Params.Text);
            vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}RemoveBackslashCommands(ARequestInfo.Command)
@@ -12126,10 +12141,11 @@ Begin
                                                                                                  {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                                                                  {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF},
                                               ARequestInfo.QueryParams,
-                                              vUriOptions, vmark, vEncoding, DWParams, aParamsCount);
+                                              vUriOptions, vmark, vEncoding, DWParams, aParamsCount, RequestType);
           {$ENDIF}
          End;
-        If (vUriOptions.ServerEvent = '') And (aurlContext <> '') Then
+        If ((vUriOptions.ServerEvent = '') And (aurlContext <> '')) And
+            (Not (RequestType In [rtGet, rtDelete])) Then
          vUriOptions.ServerEvent := aurlContext;
        End;
      End;
@@ -12211,19 +12227,19 @@ Begin
          If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
           vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
          Try
-          {$IFDEF FPC}
-           InitCriticalSection(vCriticalSection);
-           EnterCriticalSection(vCriticalSection);
-          {$ENDIF}
+//          {$IFDEF FPC}
+//           InitCriticalSection(vCriticalSection);
+//           EnterCriticalSection(vCriticalSection);
+//          {$ENDIF}
           vTempServerMethods  := vServerMethod.Create(Nil);
          Finally
-          {$IFDEF FPC}
-           Try
-            LeaveCriticalSection(vCriticalSection);
-            DoneCriticalSection(vCriticalSection);
-           Except
-           End;
-          {$ENDIF}
+//          {$IFDEF FPC}
+//           Try
+//            LeaveCriticalSection(vCriticalSection);
+//            DoneCriticalSection(vCriticalSection);
+//           Except
+//           End;
+//          {$ENDIF}
          End;
          If (vTempServerMethods.ClassType = TServerMethodDatamodule)             Or
             (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule)) Then
@@ -12256,6 +12272,22 @@ Begin
             vIPVersion := 'ipv6';
            TServerMethodDatamodule(vTempServerMethods).SetClientInfo(AContext.Connection.Socket.Binding.PeerIP, vIPVersion,
                                                                      ARequestInfo.UserAgent, vUriOptions.EventName, vUriOptions.ServerEvent, AContext.Connection.Socket.Binding.PeerPort);
+           If (RequestType In [rtGet, rtDelete]) Then
+            Begin
+             If ((vUriOptions.BaseServer = '')   And
+                 (vUriOptions.DataUrl    = ''))  And
+                ((vUriOptions.ServerEvent <> '') And
+                 (vUriOptions.EventName = ''))   Then
+              vUriOptions.BaseServer := vUriOptions.ServerEvent
+             Else If ((vUriOptions.BaseServer <> '') And
+                      (vUriOptions.DataUrl    = '')) And
+                     (vUriOptions.ServerEvent <> '') And
+                      (vServerContext = '')  Then
+              Begin
+               vUriOptions.DataUrl    := vUriOptions.BaseServer;
+               vUriOptions.BaseServer := vUriOptions.ServerEvent;
+              End;
+            End;
            //Novo Lugar para Autenticação
            If ((vCORS) And (vCORSOption <> 'OPTIONS')) Or
                (vServerAuthOptions.AuthorizationOption in [rdwAOBasic, rdwAOBearer, rdwAOToken]) Then
