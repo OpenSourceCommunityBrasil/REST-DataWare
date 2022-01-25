@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt" ng-app="AppRestDw">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<link rel="icon" href="https://getbootstrap.com/favicon.ico">
+
+	<title>Consumindo Servidor RestDataware</title>
+
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/dashboard.css" rel="stylesheet">
+
+	<script type="text/javascript" src="js/angular.min.js"></script>
+  <script type="text/javascript" src="js/EmployeeCtrl.js"></script>
+
+</head>
+
+<body>
+	<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+		<a class="navbar-brand col-sm-3 col-md-2 mr-0" href="index.html">
+			<img src="imgs/logodw.png" alt="RestDataware" title="RestDataware"/>
+		</a>
+		<h4 class="white margLeft">Angular JS com RestDataware</h4>
+	</nav>
+
+	<div class="container-fluid">
+		<div class="row">
+			<nav class="col-md-2 d-none d-md-block bg-light sidebar">
+				<div class="sidebar-sticky">
+					<ul class="nav flex-column">
+						<li class="nav-pessoa">
+							<a class="nav-link active" href="dw_angular.html">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+								Home <span class="sr-only">(current)</span>
+							</a>
+						</li>
+						<li class="nav-pessoa">
+							<a class="nav-link" href="http://www.restdw.com.br/" target="_blank">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-cart"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+								Site Oficial do RW
+							</a>
+						</li>
+						<li class="nav-pessoa">
+							<a class="nav-link" href="dw_angular.html">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+								Employees
+							</a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+
+			<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4" ng-controller="EmployeeCtrl">
+				<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-pessoas-center pb-2 mb-3 border-bottom">
+					<h5 class="">Employees List</h5>
+				</div>
+
+				<input class="form-control form-control-gray w-100" type="search" name="search" ng-model="termo" autofocus placeholder="Filter Employees..." aria-label="Search">
+				<br>
+
+				<h5 style="color: Red" ng-if="msg">{{msg}}</h5>
+
+				<div class="table-responsive">
+
+					<form ng-if="showForm">
+						<div class="form-group">
+							<label for="firstName">First Name</label>
+							<input type="text" class="form-control" ng-model="employee.FIRST_NAME" id="firstName" placeholder="Enter First Name">
+						</div>
+						<div class="form-group">
+							<label for="lastName">Last Name</label>
+							<input type="text" class="form-control" ng-model="employee.LAST_NAME" id="lastName" placeholder="Enter Last Name">
+						</div>
+						<div class="form-group">
+							<label for="phoneExt">Phone Ext</label>
+							<input type="text" class="col-sm-3 form-control" ng-model="employee.PHONE_EXT" id="phoneExt" placeholder="Enter Phone Ext">
+						</div>
+						<div class="form-group">
+							<label for="salary">Salary</label>
+							<input type="text" class="col-sm-3 form-control" ng-model="employee.SALARY" id="salary" placeholder="Enter Salary">
+						</div>
+						<button ng-click="showHideForm(false)" class="btn btn-primary">Cancel</button>
+						<button ng-click="saveEmployee()" class="btn btn-primary">Salvar</button>
+					</form>
+
+
+					<div ng-if="!showForm">
+						<button ng-click="showHideForm(true)" class="btn btn-primary">New</button>
+						<br>
+					</div>
+
+					<br>
+
+					<table class="table table-striped table-sm">
+						<thead>
+							<tr class="bgTR">
+								<th class="text-center"><a href="#" ng-click="ordem = 'EMP_NO'; invertido = !invertido">Emp. No</a></th>
+								<th class="text-center"><a href="#" ng-click="ordem = 'FIRST_NAME'; invertido = !invertido">First Name</a></th>
+								<th><a href="#" ng-click="ordem = 'LAST_NAME'; invertido = !invertido">Last Name</a></th>
+								<th><a href="#" ng-click="ordem = 'HIRE_DATE'; invertido = !invertido">Hire Date</a></th>
+								<th class="text-center"><a href="#" ng-click="ordem = 'JOB_COUNTRY'; invertido = !invertido">Job Country</a></th>
+								<th class="text-center"><a href="#" ng-click="ordem = 'SALARY'; invertido = !invertido">Salary</a></th>
+								<th class="text-center"><a href="#" ng-click="ordem = 'FULL_NAME'; invertido = !invertido">Full Name</a></th>
+								<th class="text-center">Action</a></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="employee in employees | filter:termo | orderBy:ordem:invertido">
+								<td class="text-center">{{employee.EMP_NO}}</td>
+								<td class="text-center">{{employee.FIRST_NAME}}</td>
+								<td>{{employee.LAST_NAME}}</td>
+								<td>{{employee.HIRE_DATE}}</td>
+								<td class="text-center">{{employee.JOB_COUNTRY}}</td>
+								<td class="text-center">{{employee.SALARY}}</td>
+								<td class="text-center">{{employee.FULL_NAME}}</td>
+								<td class="text-center">
+									<a href="#" title="Edit" ng-click="loadEmployeeById(employee.EMP_NO)"><span data-feather="edit"></span></a>
+									<a href="#" title="Delete" ng-click="deleteEmployee(employee.EMP_NO)"><span data-feather="delete"></span></a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</main>
+		</div>
+	</div>
+	<script src="js/feather.min.js"></script>
+	<script>
+		feather.replace()
+	</script>
+</body>
+</html>
