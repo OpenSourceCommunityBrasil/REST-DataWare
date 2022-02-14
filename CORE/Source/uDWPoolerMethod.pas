@@ -53,6 +53,7 @@ Uses {$IFDEF FPC}
    {$IFDEF FPC}
    vDatabaseCharSet        : TDatabaseCharSet;
    {$ENDIF}
+   vPoolerNotFoundMessage,
    vDataRoute,
    vServerContext,
    vUserAgent,
@@ -318,33 +319,34 @@ Uses {$IFDEF FPC}
                                    ConnectTimeOut          : Integer = 3000;
                                    ConnectionDefs          : TObject           = Nil;
                                    RESTClientPooler        : TRESTClientPooler = Nil)  : Boolean;
-   Property Compression           : Boolean                    Read vCompression      Write vCompression;
-   Property BinaryRequest         : Boolean                    Read vBinaryRequest    Write vBinaryRequest;
-   Property HandleRedirects       : Boolean                    Read vHandleRedirects  Write vHandleRedirects;
-   Property RedirectMaximum       : Integer                    Read vRedirectMaximum  Write vRedirectMaximum;
-   Property Encoding              : TEncodeSelect              Read vEncoding         Write vEncoding;
-   Property EncodeStrings         : Boolean                    Read vEncodeStrings    Write vEncodeStrings;
-   Property PoolerURL             : String                     Read vPoolerURL        Write vPoolerURL;
-   Property Host                  : String                     Read vHost             Write vHost;
-   Property Port                  : Integer                    Read vPort             Write vPort;
-   Property RequestTimeOut        : Integer                    Read vTimeOut          Write vTimeOut;           //Timeout da Requisição
-   Property ConnectTimeOut        : Integer                    Read vConnectTimeOut   Write vConnectTimeOut;
-   Property WelcomeMessage        : String                     Read vWelcomeMessage   Write vWelcomeMessage;
-   Property OnWork                : TOnWork                    Read vOnWork           Write SetOnWork;
-   Property OnWorkBegin           : TOnWorkBegin               Read vOnWorkBegin      Write SetOnWorkBegin;
-   Property OnWorkEnd             : TOnWorkEnd                 Read vOnWorkEnd        Write SetOnWorkEnd;
-   Property OnStatus              : TOnStatus                  Read vOnStatus         Write SetOnStatus;
+   Property Compression           : Boolean                    Read vCompression           Write vCompression;
+   Property BinaryRequest         : Boolean                    Read vBinaryRequest         Write vBinaryRequest;
+   Property HandleRedirects       : Boolean                    Read vHandleRedirects       Write vHandleRedirects;
+   Property RedirectMaximum       : Integer                    Read vRedirectMaximum       Write vRedirectMaximum;
+   Property Encoding              : TEncodeSelect              Read vEncoding              Write vEncoding;
+   Property EncodeStrings         : Boolean                    Read vEncodeStrings         Write vEncodeStrings;
+   Property PoolerURL             : String                     Read vPoolerURL             Write vPoolerURL;
+   Property Host                  : String                     Read vHost                  Write vHost;
+   Property Port                  : Integer                    Read vPort                  Write vPort;
+   Property RequestTimeOut        : Integer                    Read vTimeOut               Write vTimeOut;           //Timeout da Requisição
+   Property ConnectTimeOut        : Integer                    Read vConnectTimeOut        Write vConnectTimeOut;
+   Property WelcomeMessage        : String                     Read vWelcomeMessage        Write vWelcomeMessage;
+   Property OnWork                : TOnWork                    Read vOnWork                Write SetOnWork;
+   Property OnWorkBegin           : TOnWorkBegin               Read vOnWorkBegin           Write SetOnWorkBegin;
+   Property OnWorkEnd             : TOnWorkEnd                 Read vOnWorkEnd             Write SetOnWorkEnd;
+   Property OnStatus              : TOnStatus                  Read vOnStatus              Write SetOnStatus;
    {$IFDEF FPC}
-   Property DatabaseCharSet       : TDatabaseCharSet           Read vDatabaseCharSet  Write vDatabaseCharSet;
+   Property DatabaseCharSet       : TDatabaseCharSet           Read vDatabaseCharSet       Write vDatabaseCharSet;
    {$ENDIF}
-   Property TypeRequest           : TTypeRequest               Read vTypeRequest      Write vTypeRequest Default trHttp;
-   Property AccessTag             : String                     Read vAccessTag        Write vAccessTag;
-   Property CriptOptions          : TCripto                    Read vCripto           Write vCripto;
-   Property UserAgent             : String                     Read vUserAgent        Write vUserAgent;
-   Property DataRoute             : String                     Read vDataRoute        Write vDataRoute;
-   Property ServerContext         : String                     Read vServerContext    Write vServerContext;
-   Property AuthenticationOptions : TRDWClientAuthOptionParams Read vAuthOptionParams Write SetAuthOptionParams;
-   Property OnBeforeGetToken      : TOnBeforeGetToken          Read vOnBeforeGetToken Write vOnBeforeGetToken;
+   Property TypeRequest           : TTypeRequest               Read vTypeRequest           Write vTypeRequest Default trHttp;
+   Property AccessTag             : String                     Read vAccessTag             Write vAccessTag;
+   Property CriptOptions          : TCripto                    Read vCripto                Write vCripto;
+   Property UserAgent             : String                     Read vUserAgent             Write vUserAgent;
+   Property DataRoute             : String                     Read vDataRoute             Write vDataRoute;
+   Property ServerContext         : String                     Read vServerContext         Write vServerContext;
+   Property AuthenticationOptions : TRDWClientAuthOptionParams Read vAuthOptionParams      Write SetAuthOptionParams;
+   Property OnBeforeGetToken      : TOnBeforeGetToken          Read vOnBeforeGetToken      Write vOnBeforeGetToken;
+   Property PoolerNotFoundMessage : String                     Read vPoolerNotFoundMessage Write vPoolerNotFoundMessage;
   End;
 
 implementation
@@ -385,6 +387,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
@@ -574,6 +577,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
@@ -935,6 +939,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
@@ -1082,6 +1087,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -1211,6 +1217,7 @@ Begin
  vConnectTimeOut  := 3000;
  vBinaryRequest   := False;
  vEncoding        := esUtf8;
+ vPoolerNotFoundMessage := cPoolerNotFound;
  {$IFNDEF FPC}
   {$if CompilerVersion < 21}
    vEncoding      := esASCII;
@@ -1261,6 +1268,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.WelcomeMessage  := vWelcomeMessage;
  RESTClientPoolerExec.HandleRedirects := vHandleRedirects;
@@ -1377,6 +1385,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent          := vUserAgent;
  RESTClientPoolerExec.RequestTimeOut     := TimeOut;
@@ -1475,6 +1484,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -1668,6 +1678,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -1865,6 +1876,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -2068,6 +2080,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -2264,6 +2277,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -2485,6 +2499,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -2641,6 +2656,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -2799,6 +2815,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -2981,6 +2998,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.WelcomeMessage  := vWelcomeMessage;
  RESTClientPoolerExec.Host            := Host;
@@ -3088,6 +3106,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -3221,6 +3240,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -3369,6 +3389,7 @@ Begin
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
+ RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -3517,6 +3538,7 @@ Begin
      vtyperequest         := RESTClientPoolerExec.TypeRequest;
     End;
    vActualClientPoolerExec               := RESTClientPoolerExec;
+   RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
    RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
    RESTClientPoolerExec.UserAgent        := vUserAgent;
    RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
@@ -3665,6 +3687,7 @@ Begin
      vtyperequest         := RESTClientPoolerExec.TypeRequest;
     End;
    vActualClientPoolerExec := RESTClientPoolerExec;
+   RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
    RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
    RESTClientPoolerExec.UserAgent        := vUserAgent;
    RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;

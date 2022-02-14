@@ -10,7 +10,6 @@ object RestDWForm: TRestDWForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   PopupMenu = pmMenu
   Position = poScreenCenter
   OnCloseQuery = FormCloseQuery
@@ -3052,6 +3051,7 @@ object RestDWForm: TRestDWForm
   object RESTDWServiceSynPooler1: TRESTDWServiceSynPooler
     Active = False
     ServerThreadPoolCount = 32
+    PathTraversalRaiseError = True
     CORS = False
     CORS_CustomHeaders.Strings = (
       'Access-Control-Allow-Origin=*'
@@ -3066,16 +3066,21 @@ object RestDWForm: TRestDWForm
     ServicePort = 8082
     ProxyOptions.Port = 8888
     AuthenticationOptions.AuthorizationOption = rdwAOBasic
+    AuthenticationOptions.OptionParams.AuthDialog = True
+    AuthenticationOptions.OptionParams.CustomDialogAuthMessage = 'Protected Space...'
+    AuthenticationOptions.OptionParams.Custom404TitleMessage = '(404) The address you are looking for does not exist'
+    AuthenticationOptions.OptionParams.Custom404BodyMessage = '404'
+    AuthenticationOptions.OptionParams.Custom404FooterMessage = 'Take me back to <a href="./">Home REST Dataware'
     AuthenticationOptions.OptionParams.Username = 'testserver'
     AuthenticationOptions.OptionParams.Password = 'testserver'
     OnLastRequest = RESTDWServiceSynPooler1LastRequest
     OnLastResponse = RESTDWServiceSynPooler1LastResponse
     Encoding = esUtf8
     RootPath = '/'
+    RootUser = 'root'
     ForceWelcomeAccess = False
     CriptOptions.Use = False
     CriptOptions.Key = 'RDWBASEKEY256'
-    MultiCORE = False
     Left = 256
     Top = 272
   end

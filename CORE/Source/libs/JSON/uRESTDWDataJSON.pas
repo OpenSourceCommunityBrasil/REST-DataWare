@@ -917,7 +917,7 @@ Function TRESTDWJSONBase.Count : Integer;
 Begin
  Result := -1;
  If Assigned(vList) Then
-  Result := vList.Count;
+  Result := TList(vList).Count;
 End;
 
 Constructor TRESTDWJSONBase.Create(JSON : String);
@@ -1014,89 +1014,91 @@ Begin
  vLine := '';
  Case aObjectType Of
   jtobject : Begin
-                   Result := '';
-                   For I := 0 To vList.Count -1 Do
-                    Begin
-                     Case GetItemJSONClass(TRESTDWJSONBaseObjectClass(vList.Items[I]^)) of
-                      etUnknow   : Begin
-                                    If TRESTDWJSONBase(vList.Items[I]^).ObjectType In [jtobject,
-                                                                                           jtArray,
-                                                                                           jtValue] Then
-                                     vLine := TRESTDWJSONBase(vList.Items[I]^).ToJSON;
-                                   End;
-                      etString   : vLine := TRESTDWJSONString  (vList.Items[I]^).ToJSON;
-                      etNumeric  : vLine := TRESTDWJSONNumeric (vList.Items[I]^).ToJSON;
-                      etInteger  : vLine := TRESTDWJSONInteger (vList.Items[I]^).ToJSON;
-                      etBoolean  : vLine := TRESTDWJSONBoolean (vList.Items[I]^).ToJSON;
-                      etDateTime : vLine := TRESTDWJSONDateTime(vList.Items[I]^).ToJSON;
-                      etBlob     : vLine := TRESTDWJSONBlob    (vList.Items[I]^).ToJSON;
-                     End;
-                     If Result = '' Then
-                      Result := vLine
-                     Else
-                      Result := Result + ', ' + vLine;
-                     vLine := '';
-                    End;
-                   If elementname <> '' Then
-                    Result := Format('{"%s":%s}', [elementname, Result])
-                   Else
-                    Result := '{' + Result + '}';
-                  End;
+              Result := '';
+              For I := 0 To vList.Count -1 Do
+               Begin
+                Case GetItemJSONClass(TRESTDWJSONBaseObjectClass(vList.Items[I]^)) of
+                 etUnknow   : Begin
+                               Case TRESTDWJSONBase(vList.Items[I]^).ObjectType Of
+                                jtobject : vLine := TRESTDWJSONObject(vList.Items[I]^).ToJSON;
+                                jtArray  : vLine := TRESTDWJSONArray(vList.Items[I]^).ToJSON;
+                                jtValue  : vLine := TRESTDWJSONBase(vList.Items[I]^).ToJSON;
+                               End;
+                              End;
+                 etString   : vLine := TRESTDWJSONString  (vList.Items[I]^).ToJSON;
+                 etNumeric  : vLine := TRESTDWJSONNumeric (vList.Items[I]^).ToJSON;
+                 etInteger  : vLine := TRESTDWJSONInteger (vList.Items[I]^).ToJSON;
+                 etBoolean  : vLine := TRESTDWJSONBoolean (vList.Items[I]^).ToJSON;
+                 etDateTime : vLine := TRESTDWJSONDateTime(vList.Items[I]^).ToJSON;
+                 etBlob     : vLine := TRESTDWJSONBlob    (vList.Items[I]^).ToJSON;
+                End;
+                If Result = '' Then
+                 Result := vLine
+                Else
+                 Begin
+                  If elementname <> '' Then
+                   vLine := Format('"%s":%s', [elementname, vLine]);
+                  Result := Result + ', ' + vLine;
+                 End;
+                vLine := '';
+               End;
+              Result := '{' + Result + '}';
+             End;
   jtArray  : Begin
-                   vLine := '';
-                   For I := 0 To vList.Count -1 Do
-                    Begin
-                     Case TRESTDWJSONBase(vList.Items[I]^).ObjectType Of
-                      jtobject : Begin
-                                       If vLine = '' Then
-                                        vLine := TRESTDWJSONObject(vList.Items[I]^).ToJSON
-                                       Else
-                                        vLine := vLine + ', ' + TRESTDWJSONObject(vList.Items[I]^).ToJSON;
-                                      End;
-                      jtArray  : Begin
-                                       If vLine = '' Then
-                                        vLine := TRESTDWJSONArray(vList.Items[I]^).ToJSON
-                                       Else
-                                        vLine := vLine + ', ' + TRESTDWJSONArray(vList.Items[I]^).ToJSON;
-                                      End;
-                      jtValue  : Begin
-                                       If vLine = '' Then
-                                        vLine := TRESTDWJSONValue(vList.Items[I]^).ToJSON
-                                       Else
-                                        vLine := vLine + ', ' + TRESTDWJSONValue(vList.Items[I]^).ToJSON;
-                                      End;
-                     End;
-                    End;
-                   If elementname <> '' Then
-                    Result := Format('["%s":%s]', [elementname, vLine])
-                   Else
-                    Result := '[' + vLine + ']';
-                  End;
+              vLine := '';
+              For I := 0 To Count -1 Do
+               Begin
+                Case TRESTDWJSONBase(vList.Items[I]^).ObjectType Of
+                 jtobject : Begin
+                             If vLine = '' Then
+                              vLine := TRESTDWJSONObject(vList.Items[I]^).ToJSON
+                             Else
+                              vLine := vLine + ', ' + TRESTDWJSONObject(vList.Items[I]^).ToJSON;
+                            End;
+                 jtArray  : Begin
+                             If vLine = '' Then
+                              vLine := TRESTDWJSONArray(vList.Items[I]^).ToJSON
+                             Else
+                              vLine := vLine + ', ' + TRESTDWJSONArray(vList.Items[I]^).ToJSON;
+                            End;
+                 jtValue  : Begin
+                             If vLine = '' Then
+                              vLine := TRESTDWJSONValue(vList.Items[I]^).ToJSON
+                             Else
+                              vLine := vLine + ', ' + TRESTDWJSONValue(vList.Items[I]^).ToJSON;
+                            End;
+                End;
+               End;
+              If elementname <> '' Then
+               Result := Format('["%s":%s]', [elementname, vLine])
+              Else
+               Result := '[' + vLine + ']';
+             End;
   jtValue  : Begin
-                   Result := '';
-                   For I := 0 To vList.Count -1 Do
-                    Begin
-                     Case GetItemJSONClass(TRESTDWJSONBaseObjectClass(vList.Items[I]^)) of
-                      etUnknow   : Begin
-                                    If TRESTDWJSONBase(vList.Items[I]^).ObjectType In [jtobject,
-                                                                                           jtArray,
-                                                                                           jtValue] Then
-                                     vLine := TRESTDWJSONBase(vList.Items[I]^).ToJSON;
-                                   End;
-                      etString   : vLine := TRESTDWJSONString  (vList.Items[I]^).ToJSON;
-                      etNumeric  : vLine := TRESTDWJSONNumeric (vList.Items[I]^).ToJSON;
-                      etInteger  : vLine := TRESTDWJSONInteger (vList.Items[I]^).ToJSON;
-                      etBoolean  : vLine := TRESTDWJSONBoolean (vList.Items[I]^).ToJSON;
-                      etDateTime : vLine := TRESTDWJSONDateTime(vList.Items[I]^).ToJSON;
-                      etBlob     : vLine := TRESTDWJSONBlob    (vList.Items[I]^).ToJSON;
-                     End;
-                     If Result = '' Then
-                      Result := vLine
-                     Else
-                      Result := Result + ', ' + vLine;
-                     vLine := '';
-                    End;
-                  End;
+              Result := '';
+              For I := 0 To vList.Count -1 Do
+               Begin
+                Case GetItemJSONClass(TRESTDWJSONBaseObjectClass(vList.Items[I]^)) of
+                 etUnknow   : Begin
+                               If TRESTDWJSONBase(vList.Items[I]^).ObjectType In [jtobject,
+                                                                                      jtArray,
+                                                                                      jtValue] Then
+                                vLine := TRESTDWJSONBase(vList.Items[I]^).ToJSON;
+                              End;
+                 etString   : vLine := TRESTDWJSONString  (vList.Items[I]^).ToJSON;
+                 etNumeric  : vLine := TRESTDWJSONNumeric (vList.Items[I]^).ToJSON;
+                 etInteger  : vLine := TRESTDWJSONInteger (vList.Items[I]^).ToJSON;
+                 etBoolean  : vLine := TRESTDWJSONBoolean (vList.Items[I]^).ToJSON;
+                 etDateTime : vLine := TRESTDWJSONDateTime(vList.Items[I]^).ToJSON;
+                 etBlob     : vLine := TRESTDWJSONBlob    (vList.Items[I]^).ToJSON;
+                End;
+                If Result = '' Then
+                 Result := vLine
+                Else
+                 Result := Result + ', ' + vLine;
+                vLine := '';
+               End;
+             End;
   jtunknow : Raise Exception.Create('Invalid Unknow Object');
  End;
 End;

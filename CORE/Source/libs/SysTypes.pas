@@ -458,8 +458,6 @@ Begin
             {$ENDIF}
             JSONParam.SetValue(vTempData);
            End;
-          If aNewParam Then
-           Result.Add(JSONParam);
          End
         Else
          Begin

@@ -402,6 +402,7 @@ Type
   vEncoding            : TEncodeSelect;              //Enconding se usar CORS usar UTF8 - Alexandre Abade
   vSSLVerifyMode       : TIdSSLVerifyModeSet;
   vSSLVerifyDepth      : Integer;
+  vSSLMode             : TIdSSLMode;
   vOnCreate            : TOnCreate;
   Procedure SetServerContext(Value : String);
   Procedure SetCORSCustomHeader (Value : TStringList);
@@ -629,6 +630,7 @@ Type
   Property SSLRootCertFile         : String                     Read vaSSLRootCertFile        Write vaSSLRootCertFile;
   property SSLVerifyMode           : TIdSSLVerifyModeSet        Read vSSLVerifyMode           Write vSSLVerifyMode;
   property SSLVerifyDepth          : Integer                    Read vSSLVerifyDepth          Write vSSLVerifyDepth;
+  property SSLMode                 : TIdSSLMode                 Read vSSLMode                 Write vSSLMode;
   Property ForceWelcomeAccess      : Boolean                    Read vForceWelcomeAccess      Write vForceWelcomeAccess;
   Property OnBeforeUseCriptKey     : TBeforeUseCriptKey         Read vBeforeUseCriptKey       Write vBeforeUseCriptKey;
   Property CriptOptions            : TCripto                    Read vCripto                  Write vCripto;
@@ -1011,6 +1013,7 @@ Type
   vUserAgent,
   vAccessTag,
   vWelcomeMessage,
+  vPoolerNotFoundMessage,
   vServerContext,
   vUrlPath,
   vHost                : String;
@@ -1098,6 +1101,7 @@ Type
   Property BinaryRequest           : Boolean                    Read vBinaryRequest           Write vBinaryRequest;
   Property CriptOptions            : TCripto                    Read vCripto                  Write vCripto;
   Property UserAgent               : String                     Read vUserAgent               Write vUserAgent;
+  Property PoolerNotFoundMessage   : String                     Read vPoolerNotFoundMessage   Write vPoolerNotFoundMessage;
   {$IFDEF FPC}
   Property DatabaseCharSet         : TDatabaseCharSet           Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
@@ -6457,6 +6461,7 @@ Begin
  vHandleRedirects                      := False;
  vPropThreadRequest                    := False;
  vFailOverConnections                  := TFailOverConnections.Create(Self, TRESTDWConnectionServerCP);
+ vPoolerNotFoundMessage                := cPoolerNotFound;
 End;
 
 Destructor  TRESTClientPooler.Destroy;
@@ -7338,7 +7343,7 @@ Var
    On E : Exception Do
     Begin
      Result := False;
-     ResultData := GetPairJSON('NOK', cPoolerNotFound);
+     ResultData := GetPairJSON('NOK', vPoolerNotFoundMessage);
      {Todo: Acrescentado}
      If Assigned(SendParams) then
       FreeAndNil(SendParams);
@@ -7362,12 +7367,12 @@ Var
        ErrorMessage := E.Message;
       {$IFNDEF FPC}
        {$IF Defined(HAS_FMX)}
-        ErrorMessage := cPoolerNotFound;
+        ErrorMessage := vPoolerNotFoundMessage;
        {$ELSE}
-        Raise Exception.Create(cPoolerNotFound);
+        Raise Exception.Create(vPoolerNotFoundMessage);
        {$IFEND}
       {$ELSE}
-       Raise Exception.Create(cPoolerNotFound);
+       Raise Exception.Create(vPoolerNotFoundMessage);
       {$ENDIF}
       End
      Else
@@ -13471,6 +13476,8 @@ Begin
  HTTPServer.OnConnect            := CustomOnConnect;
  HTTPServer.OnCreatePostStream   := CreatePostStream;
  HTTPServer.OnParseAuthentication := OnParseAuthentication;
+
+
  {$ENDIF}
  vServerAuthOptions              := TRDWServerAuthOptionParams.Create(Self);
  vActive                         := False;
@@ -13560,13 +13567,15 @@ Begin
       lHandler.SSLOptions.VerifyMode            := vSSLVerifyMode;
       lHandler.SSLOptions.VerifyDepth           := vSSLVerifyDepth;
       lHandler.SSLOptions.RootCertFile          := vASSLRootCertFile;
+      lHandler.SSLOptions.Mode                  := vSSLMode;
+      lHandler.SSLOptions.CipherList            := 'TLSv1:TLSv1.2:SSLv3:!RC4:!NULL-MD5:!NULL-SHA:!NULL-SHA256:!DES-CBC-SHA:!DES-CBC3-SHA:!IDEA-CBC-SHA';
       HTTPServer.IOHandler := lHandler;
      End
     Else
      HTTPServer.IOHandler  := Nil;
     If HTTPServer.Bindings.Count > 0 Then
      HTTPServer.Bindings.Clear;
-    HTTPServer.Bindings.DefaultPort := vServicePort;
+    HTTPServer.Bindings.DefaultPort := ServicePort;
     HTTPServer.DefaultPort          := vServicePort;
     HTTPServer.Active               := True;
    Except

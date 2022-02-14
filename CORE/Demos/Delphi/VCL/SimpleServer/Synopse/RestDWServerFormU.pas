@@ -337,7 +337,6 @@ begin
  RESTDWServiceSynPooler1.RootPath          := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
  PageControl1.ActivePage              := TsConfigs;
 end;
-
 procedure TRestDWForm.FormShow(Sender: TObject);
 var
   Ini:               TIniFile;
@@ -450,9 +449,12 @@ end;
 
 Function TRestDWForm.OnRequest(Ctxt: THttpServerRequest): cardinal;
 Var
- Params : TDWParams;
-Begin
- Result := 200;
+
+ Params : TDWParams;
+
+Begin
+
+ Result := 200;
  Ctxt.OutContentType := 'text/html; charset=UTF-8';
 // Ctxt.URL
  If lowercase(Ctxt.URL) = '/api/servertime' Then

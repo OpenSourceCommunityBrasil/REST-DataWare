@@ -299,8 +299,7 @@ Type
   vAccessTag,
   vWelcomeMessage,
   vDataRoute,
-//  vLogin,                                          //Login do Usuário caso haja autenticação
-//  vPassword,                                       //Senha do Usuário caso haja autenticação
+  vPoolerNotFoundMessage,
   vRestWebService,                                   //Rest WebService para consultas
   vRestURL,                                          //URL do WebService REST
   vMyIP,                                             //Meu IP vindo do Servidor
@@ -466,6 +465,7 @@ Type
   Property StrsTrim                : Boolean                    Read vStrsTrim                Write vStrsTrim;
   Property StrsEmpty2Null          : Boolean                    Read vStrsEmpty2Null          Write vStrsEmpty2Null;
   Property StrsTrim2Len            : Boolean                    Read vStrsTrim2Len            Write vStrsTrim2Len;
+  Property PoolerNotFoundMessage   : String                     Read vPoolerNotFoundMessage   Write vPoolerNotFoundMessage;
   Property WelcomeMessage          : String                     Read vWelcomeMessage          Write vWelcomeMessage;
   Property HandleRedirects         : Boolean                    Read vHandleRedirects         Write vHandleRedirects;
   Property RedirectMaximum         : Integer                    Read vRedirectMaximum         Write vRedirectMaximum;
@@ -1233,6 +1233,7 @@ Type
   vDataRoute,
   vServerContext,
   vRestWebService,                                   //Rest WebService para consultas
+  vPoolerNotFoundMessage,
   vRestURL             : String;                     //Qual o Pooler de Conexão do DataSet
   vTimeOut,
   vConnectTimeOut,
@@ -1276,6 +1277,7 @@ Type
   Property AccessTag             : String                     Read vAccessTag          Write vAccessTag;
   Property Encoding              : TEncodeSelect              Read vEncoding           Write vEncoding;          //Encoding da string
   Property UserAgent             : String                     Read vUserAgent          Write vUserAgent;
+  Property PoolerNotFoundMessage : String                     Read vPoolerNotFoundMessage Write vPoolerNotFoundMessage;
   Property TypeRequest           : TTypeRequest               Read vTypeRequest        Write vTypeRequest       Default trHttp;
  End;
 
@@ -1973,6 +1975,7 @@ Begin
  RESTClientPoolerExec         := Nil;
  vConnection                  := TDWPoolerMethodClient.Create(Nil);
  PoolerMethodClient           := vConnection;
+ vConnection.PoolerNotFoundMessage := PoolerNotFoundMessage;
  vConnection.HandleRedirects  := vHandleRedirects;
  vConnection.RedirectMaximum  := vRedirectMaximum;
  vConnection.UserAgent        := vUserAgent;
@@ -2060,6 +2063,7 @@ Begin
               vOnFailOverExecute(vFailOverConnections[I]);
              If Not Assigned(RESTClientPoolerExec) Then
               RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+             RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
              ReconfigureConnection(vConnection,
                                    RESTClientPoolerExec,
                                    vFailOverConnections[I].vTypeRequest,
@@ -2162,6 +2166,7 @@ Begin
               vOnFailOverExecute(vFailOverConnections[I]);
              If Not Assigned(RESTClientPoolerExec) Then
               RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+             RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
              ReconfigureConnection(vConnection,
                                    RESTClientPoolerExec,
                                    vFailOverConnections[I].vTypeRequest,
@@ -2333,6 +2338,7 @@ Begin
  ParseParams;
  vRESTConnectionDB                 := TDWPoolerMethodClient.Create(Nil);
  PoolerMethodClient                := vRESTConnectionDB;
+ vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
  vRESTConnectionDB.AuthenticationOptions.Assign(vAuthOptionParams);
  vRESTConnectionDB.HandleRedirects := vHandleRedirects;
  vRESTConnectionDB.RedirectMaximum := vRedirectMaximum;
@@ -2423,6 +2429,7 @@ Begin
          vOnFailOverExecute(vFailOverConnections[I]);
         If Not Assigned(RESTClientPoolerExec) Then
          RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+        RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
         ReconfigureConnection(vRESTConnectionDB,
                               RESTClientPoolerExec,
                               vFailOverConnections[I].vTypeRequest,
@@ -2566,6 +2573,7 @@ Begin
  ParseParams;
  vRESTConnectionDB                 := TDWPoolerMethodClient.Create(Nil);
  PoolerMethodClient                := vRESTConnectionDB;
+ vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
  vRESTConnectionDB.AuthenticationOptions.Assign(vAuthOptionParams);
  vRESTConnectionDB.HandleRedirects := vHandleRedirects;
  vRESTConnectionDB.RedirectMaximum := vRedirectMaximum;
@@ -2656,6 +2664,7 @@ Begin
          vOnFailOverExecute(vFailOverConnections[I]);
         If Not Assigned(RESTClientPoolerExec) Then
          RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+        RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
         ReconfigureConnection(vRESTConnectionDB,
                               RESTClientPoolerExec,
                               vFailOverConnections[I].vTypeRequest,
@@ -2794,6 +2803,7 @@ Begin
  ParseParams;
  vRESTConnectionDB                  := TDWPoolerMethodClient.Create(Nil);
  PoolerMethodClient                 := vRESTConnectionDB;
+ vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
  vRESTConnectionDB.UserAgent        := vUserAgent;
  vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
  vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
@@ -2887,6 +2897,7 @@ Begin
          vOnFailOverExecute(vFailOverConnections[I]);
         If Not Assigned(RESTClientPoolerExec) Then
          RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+        RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
         ReconfigureConnection(vRESTConnectionDB,
                               RESTClientPoolerExec,
                               vFailOverConnections[I].vTypeRequest,
@@ -3010,10 +3021,11 @@ Begin
   SetConnection(True);
  If vConnected Then
   Begin
-   vRESTConnectionDB                  := TDWPoolerMethodClient.Create(Nil);
-   vRESTConnectionDB.UserAgent        := vUserAgent;
-   vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
-   vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
+   vRESTConnectionDB                       := TDWPoolerMethodClient.Create(Nil);
+   vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
+   vRESTConnectionDB.UserAgent             := vUserAgent;
+   vRESTConnectionDB.HandleRedirects       := vHandleRedirects;
+   vRESTConnectionDB.RedirectMaximum       := vRedirectMaximum;
    vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
    vRESTConnectionDB.Host             := vRestWebService;
    vRESTConnectionDB.Port             := vPoolerPort;
@@ -3067,6 +3079,7 @@ Begin
            vOnFailOverExecute(vFailOverConnections[I]);
           If Not Assigned(RESTClientPoolerExec) Then
            RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+          RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
           ReconfigureConnection(vRESTConnectionDB,
                                 RESTClientPoolerExec,
                                 vFailOverConnections[I].vTypeRequest,
@@ -3133,6 +3146,7 @@ Begin
  If vConnected Then
   Begin
    vRESTConnectionDB                  := TDWPoolerMethodClient.Create(Nil);
+   vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
    vRESTConnectionDB.UserAgent        := vUserAgent;
    vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
    vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
@@ -3189,6 +3203,7 @@ Begin
            vOnFailOverExecute(vFailOverConnections[I]);
           If Not Assigned(RESTClientPoolerExec) Then
            RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+          RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
           ReconfigureConnection(vRESTConnectionDB,
                                 RESTClientPoolerExec,
                                 vFailOverConnections[I].vTypeRequest,
@@ -3255,6 +3270,7 @@ Begin
  If vConnected Then
   Begin
    vRESTConnectionDB                  := TDWPoolerMethodClient.Create(Nil);
+   vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
    vRESTConnectionDB.UserAgent        := vUserAgent;
    vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
    vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
@@ -3312,6 +3328,7 @@ Begin
            vOnFailOverExecute(vFailOverConnections[I]);
           If Not Assigned(RESTClientPoolerExec) Then
            RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+          RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
           ReconfigureConnection(vRESTConnectionDB,
                                 RESTClientPoolerExec,
                                 vFailOverConnections[I].vTypeRequest,
@@ -3438,6 +3455,7 @@ Begin
  If Not vConnected Then
   SetConnection(True);
  vRESTConnectionDB                  := TDWPoolerMethodClient.Create(Nil);
+ vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
  vRESTConnectionDB.UserAgent        := vUserAgent;
  vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
  vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
@@ -3524,6 +3542,7 @@ Begin
          vOnFailOverExecute(vFailOverConnections[I]);
         If Not Assigned(RESTClientPoolerExec) Then
          RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+        RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
         ReconfigureConnection(vRESTConnectionDB,
                               RESTClientPoolerExec,
                               vFailOverConnections[I].vTypeRequest,
@@ -3725,6 +3744,7 @@ Begin
  ParseParams;
  vRESTConnectionDB                  := TDWPoolerMethodClient.Create(Nil);
  PoolerMethodClient                 := vRESTConnectionDB;
+ vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
  vRESTConnectionDB.UserAgent        := vUserAgent;
  vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
  vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
@@ -3795,6 +3815,7 @@ Begin
          vOnFailOverExecute(vFailOverConnections[I]);
         If Not Assigned(RESTClientPoolerExec) Then
          RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+        RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
         ReconfigureConnection(vRESTConnectionDB,
                               RESTClientPoolerExec,
                               vFailOverConnections[I].vTypeRequest,
@@ -3981,6 +4002,7 @@ Begin
  ParseParams;
  vRESTConnectionDB                  := TDWPoolerMethodClient.Create(Nil);
  PoolerMethodClient                 := vRESTConnectionDB;
+ vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
  vRESTConnectionDB.UserAgent        := vUserAgent;
  vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
  vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
@@ -4055,6 +4077,7 @@ Begin
             vLocalClient := True;
             RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
            End;
+          RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
           ReconfigureConnection(vRESTConnectionDB,
                                 RESTClientPoolerExec,
                                 vFailOverConnections[I].vTypeRequest,
@@ -4204,6 +4227,7 @@ Var
 Begin
  Result                       := TStringList.Create;
  vConnection                  := TDWPoolerMethodClient.Create(Nil);
+ vConnection.PoolerNotFoundMessage := PoolerNotFoundMessage;
  vConnection.UserAgent        := vUserAgent;
  vConnection.HandleRedirects  := vHandleRedirects;
  vConnection.RedirectMaximum  := vRedirectMaximum;
@@ -4253,6 +4277,7 @@ Var
  I           : Integer;
 Begin
  vConnection                  := TDWPoolerMethodClient.Create(Nil);
+ vConnection.PoolerNotFoundMessage := PoolerNotFoundMessage;
  vConnection.UserAgent        := vUserAgent;
  vConnection.HandleRedirects  := vHandleRedirects;
  vConnection.RedirectMaximum  := vRedirectMaximum;
@@ -4300,6 +4325,7 @@ Begin
  Inherited;
  vDataRoute        := '';
  vServerContext    := '';
+ vPoolerNotFoundMessage := cPoolerNotFound;
  vPoolerPort       := 8082;
  vTimeOut          := 3000;
  vConnectTimeOut   := 3000;
@@ -4322,6 +4348,7 @@ Begin
  vHandleRedirects          := False;
  vRedirectMaximum          := 0;
  vConnected                := False;
+ vPoolerNotFoundMessage    := cPoolerNotFound;
  vAuthOptionParams         := TRDWClientAuthOptionParams.Create(Self);
  vAuthOptionParams.AuthorizationOption := rdwAONone;
  vDataRoute                := '';
@@ -4410,6 +4437,7 @@ Begin
    If vConnected Then
     Begin
      vRESTConnectionDB                  := TDWPoolerMethodClient.Create(Nil);
+     vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
      vRESTConnectionDB.UserAgent        := vUserAgent;
      vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
      vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
@@ -4496,6 +4524,7 @@ Begin
              vOnFailOverExecute(vFailOverConnections[I]);
             If Not Assigned(RESTClientPoolerExec) Then
              RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+            RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
             ReconfigureConnection(vRESTConnectionDB,
                                   RESTClientPoolerExec,
                                   vFailOverConnections[I].vTypeRequest,
@@ -4572,6 +4601,7 @@ Begin
    If vConnected Then
     Begin
      vRESTConnectionDB                  := TDWPoolerMethodClient.Create(Nil);
+     vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
      vRESTConnectionDB.UserAgent        := vUserAgent;
      vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
      vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
@@ -4658,6 +4688,7 @@ Begin
              vOnFailOverExecute(vFailOverConnections[I]);
             If Not Assigned(RESTClientPoolerExec) Then
              RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+            RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
             ReconfigureConnection(vRESTConnectionDB,
                                   RESTClientPoolerExec,
                                   vFailOverConnections[I].vTypeRequest,
@@ -4747,6 +4778,7 @@ Begin
  if vRestPooler = '' then
   Exit;
  vRESTConnectionDB                  := TDWPoolerMethodClient.Create(Nil);
+ vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
  vRESTConnectionDB.UserAgent        := vUserAgent;
  vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
  vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
@@ -4832,6 +4864,7 @@ Begin
          vOnFailOverExecute(vFailOverConnections[I]);
         If Not Assigned(RESTClientPoolerExec) Then
          RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+        RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
         ReconfigureConnection(vRESTConnectionDB,
                               RESTClientPoolerExec,
                               vFailOverConnections[I].vTypeRequest,
@@ -5003,6 +5036,7 @@ Begin
    If vConnected Then
     Begin
      vRESTConnectionDB                  := TDWPoolerMethodClient.Create(Nil);
+     vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
      vRESTConnectionDB.UserAgent        := vUserAgent;
      vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
      vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
@@ -5093,6 +5127,7 @@ Begin
               vLocalClient := True;
               RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
              End;
+            RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
             ReconfigureConnection(vRESTConnectionDB,
                                   RESTClientPoolerExec,
                                   vFailOverConnections[I].vTypeRequest,
@@ -5163,6 +5198,7 @@ Var
  I           : Integer;
 Begin
  vConnection                  := TDWPoolerMethodClient.Create(Nil);
+ vConnection.PoolerNotFoundMessage := PoolerNotFoundMessage;
  vConnection.UserAgent        := vUserAgent;
  vConnection.HandleRedirects  := vHandleRedirects;
  vConnection.RedirectMaximum  := vRedirectMaximum;
@@ -5284,6 +5320,7 @@ Begin
  vMessageError                := '';
  RESTClientPoolerExec         := Nil;
  vConnection                  := TDWPoolerMethodClient.Create(Nil);
+ vConnection.PoolerNotFoundMessage := PoolerNotFoundMessage;
  vConnection.UserAgent        := vUserAgent;
  vConnection.HandleRedirects  := vHandleRedirects;
  vConnection.RedirectMaximum  := vRedirectMaximum;
@@ -5364,6 +5401,7 @@ Begin
             vOnFailOverExecute(vFailOverConnections[I]);
            If Not Assigned(RESTClientPoolerExec) Then
             RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+           RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
            ReconfigureConnection(vConnection,
                                  RESTClientPoolerExec,
                                  vFailOverConnections[I].vTypeRequest,
@@ -5462,6 +5500,7 @@ Begin
             vOnFailOverExecute(vFailOverConnections[I]);
            If Not Assigned(RESTClientPoolerExec) Then
             RESTClientPoolerExec := TRESTClientPooler.Create(Nil);
+           RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
            ReconfigureConnection(vConnection,
                                  RESTClientPoolerExec,
                                  vFailOverConnections[I].vTypeRequest,

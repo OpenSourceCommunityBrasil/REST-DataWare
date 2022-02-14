@@ -622,7 +622,7 @@ Begin
  HttpRequest.Request.UserAgent   := vUserAgent;
  HttpRequest.Request.ContentType := vContentType;
  HttpRequest.AllowCookies        := False;
- HttpRequest.HTTPOptions         := [hoKeepOrigProtocol, hoNoProtocolErrorException]; //, hoNoProtocolErrorException{$IFNDEF FPC}{$if CompilerVersion > 30}, hoWantProtocolErrorContent{$IFEND}{$ELSE}, hoWantProtocolErrorContent{$ENDIF}];
+ HttpRequest.HTTPOptions         := [hoKeepOrigProtocol]; //, hoNoProtocolErrorException{$IFNDEF FPC}{$if CompilerVersion > 30}, hoWantProtocolErrorContent{$IFEND}{$ELSE}, hoWantProtocolErrorContent{$ENDIF}];
  vTransparentProxy               := TIdProxyConnectionInfo.Create;
  vAuthOptionParams               := TRDWClientAuthOptionParams.Create(Self);
  vAuthOptionParams.AuthorizationOption := rdwAONone;
