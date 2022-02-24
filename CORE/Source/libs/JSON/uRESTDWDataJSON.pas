@@ -554,12 +554,13 @@ Var
 Begin
  New(BaseObjectClass);
  BaseObjectClass^ := Value;
- If vJSONObjectType = jtArray Then
-  ElementName     := ''
- Else
-  ElementName     := Key;
+ {$IFDEF FPC}
+  BaseObjectClass^.ElementName  := Key;
+ {$ELSE}
+  BaseObjectClass.ElementName   := Key;
+ {$ENDIF}
  BaseObjectClass^.SpecialChars := vSpecialChars;
- Result           := vList.Add(BaseObjectClass);
+ Result                        := vList.Add(BaseObjectClass);
 End;
 
 Function TRESTDWJSONBase.Add(Value : TRESTDWJSONBase) : Integer;

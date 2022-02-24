@@ -854,6 +854,7 @@ Var
  vTempValue,
  vTempData,
  Cmd        : String;
+ vNewParam,
  aNewParam  : Boolean;
  JSONParam  : TJSONParam;
  vParams    : TStringList;
@@ -869,60 +870,69 @@ Begin
    {$ENDIF}
   End;
  JSONParam := Nil;
- UriOptions.BaseServer  := '';
- UriOptions.DataUrl     := '';
- UriOptions.ServerEvent := '';
- UriOptions.EventName   := '';
- aParamsCount           := ParamsCount;
- aParamsIndex           := 0;
- Cmd                    := URL;
- If Pos('?', Cmd) > 0 Then
+ If (UriOptions.BaseServer  = '') And
+    (UriOptions.DataUrl     = '') And
+    (UriOptions.ServerEvent = '') And
+    (UriOptions.EventName   = '') Then
   Begin
-   I := Pos('?', Cmd);
-   Cmd := Copy(Cmd, InitStrPos, I - FinalStrPos);
-  End;
- If Cmd <> '' Then
-  Begin
-   If Cmd[Length(Cmd) - FinalStrPos] <> '/' Then
-    Cmd := URL + '/';
-  End;
- If (CountExpression(Cmd, '/') > 1) Then
-  Begin
-   If Cmd[InitStrPos] <> '/' then
-    Cmd := '/' + Cmd
-   Else
-    Cmd := Copy(Cmd, 2, Length(Cmd));
-   If Cmd[Length(Cmd) - FinalStrPos] <> '/' Then
-    Cmd := Cmd + '/';
-   ArraySize := CountExpression(Cmd, '/');
-   For I := 0 to ArraySize - 1 Do
+   aParamsCount           := ParamsCount;
+   aParamsIndex           := 0;
+   Cmd                    := URL;
+   If Pos('?', Cmd) > 0 Then
     Begin
-     IBar     := Pos('/', Cmd);
-     {$IFNDEF FPC}
-      {$IF (DEFINED(OLDINDY))}
-       vTempData := TIdURI.URLDecode(Copy(Cmd, 1, IBar - 1));
-      {$ELSE}
-       vTempData := TIdURI.URLDecode(Copy(Cmd, 1, IBar - 1), GetEncodingID(vEncoding));
-      {$IFEND}
-     {$ELSE}
-      vTempData := TIdURI.URLDecode(Copy(Cmd, 1, IBar - 1), GetEncodingID(vEncoding));
-     {$ENDIF}
-     If I <= aParamsCount Then
+     I := Pos('?', Cmd);
+     Cmd := Copy(Cmd, InitStrPos, I - FinalStrPos);
+    End;
+   If Cmd <> '' Then
+    Begin
+     If Cmd[Length(Cmd) - FinalStrPos] <> '/' Then
+      Cmd := URL + '/';
+    End;
+   If (CountExpression(Cmd, '/') > 1) Then
+    Begin
+     If Cmd[InitStrPos] <> '/' then
+      Cmd := '/' + Cmd
+     Else
+      Cmd := Copy(Cmd, 2, Length(Cmd));
+     If Cmd[Length(Cmd) - FinalStrPos] <> '/' Then
+      Cmd := Cmd + '/';
+     ArraySize := CountExpression(Cmd, '/');
+     For I := 0 to ArraySize - 1 Do
       Begin
-       If (UriOptions.EventName = '')  Or (aParamsCount = cParamsCount) Then
+       IBar     := Pos('/', Cmd);
+       {$IFNDEF FPC}
+        {$IF (DEFINED(OLDINDY))}
+         vTempData := TIdURI.URLDecode(Copy(Cmd, 1, IBar - 1));
+        {$ELSE}
+         vTempData := TIdURI.URLDecode(Copy(Cmd, 1, IBar - 1), GetEncodingID(vEncoding));
+        {$IFEND}
+       {$ELSE}
+        vTempData := TIdURI.URLDecode(Copy(Cmd, 1, IBar - 1), GetEncodingID(vEncoding));
+       {$ENDIF}
+       If I <= aParamsCount Then
         Begin
-         If (vTempData <> '') Then
+         If (UriOptions.EventName = '')  Or (aParamsCount = cParamsCount) Then
           Begin
-           If (aParamsCount = cParamsCount) Then
+           If (vTempData <> '') Then
             Begin
-             If ArraySize <= cParamsCount Then
+             If (aParamsCount = cParamsCount) Then
               Begin
-               If ArraySize < cParamsCount Then
+               If ArraySize <= cParamsCount Then
                 Begin
-                 If (UriOptions.EventName = '') Then
-                  UriOptions.EventName    := vTempData
+                 If ArraySize < cParamsCount Then
+                  Begin
+                   If (UriOptions.EventName = '') Then
+                    UriOptions.EventName    := vTempData
+                   Else
+                    UriOptions.ServerEvent  := vTempData;
+                  End
                  Else
-                  UriOptions.ServerEvent  := vTempData;
+                  Begin
+                   If (UriOptions.ServerEvent <> '') Then
+                    UriOptions.EventName    := vTempData
+                   Else
+                    UriOptions.ServerEvent  := vTempData;
+                  End;
                 End
                Else
                 Begin
@@ -939,70 +949,63 @@ Begin
                Else
                 UriOptions.ServerEvent  := vTempData;
               End;
-            End
-           Else
-            Begin
-             If (UriOptions.ServerEvent <> '') Then
-              UriOptions.EventName    := vTempData
-             Else
-              UriOptions.ServerEvent  := vTempData;
             End;
-          End;
-        End
-       Else If (UriOptions.EventName <> '') Then
-        Begin
-         If (vTempData <> '') then
+          End
+         Else If (UriOptions.EventName <> '') Then
           Begin
-           If UriOptions.BaseServer <> '' Then
+           If (vTempData <> '') then
             Begin
-             If (UriOptions.DataUrl     <> '') And
-                (UriOptions.ServerEvent <> '') Then
+             If UriOptions.BaseServer <> '' Then
               Begin
-               If (UriOptions.DataUrl <> UriOptions.ServerEvent) then
-                UriOptions.BaseServer := UriOptions.DataUrl
+               If (UriOptions.DataUrl     <> '') And
+                  (UriOptions.ServerEvent <> '') Then
+                Begin
+                 If (UriOptions.DataUrl <> UriOptions.ServerEvent) then
+                  UriOptions.BaseServer := UriOptions.DataUrl
+                 Else
+                  UriOptions.ServerEvent := UriOptions.EventName;
+                End
                Else
-                UriOptions.ServerEvent := UriOptions.EventName;
+                Begin
+    //             UriOptions.DataUrl     := UriOptions.ServerEvent;
+                 UriOptions.ServerEvent := UriOptions.EventName;
+                End;
+               UriOptions.EventName   := vTempData;
               End
              Else
               Begin
-  //             UriOptions.DataUrl     := UriOptions.ServerEvent;
-               UriOptions.ServerEvent := UriOptions.EventName;
+               UriOptions.BaseServer  := UriOptions.ServerEvent;
+               UriOptions.DataUrl     := UriOptions.EventName;
+               UriOptions.ServerEvent := UriOptions.DataUrl;
+               UriOptions.EventName   := vTempData;
               End;
-             UriOptions.EventName   := vTempData;
-            End
-           Else
-            Begin
-             UriOptions.BaseServer  := UriOptions.ServerEvent;
-             UriOptions.DataUrl     := UriOptions.EventName;
-             UriOptions.ServerEvent := UriOptions.DataUrl;
-             UriOptions.EventName   := vTempData;
             End;
           End;
-        End;
-      End
-     Else
-      Begin
-       aNewParam   := False;
-       JSONParam                 := DWParams.ItemsString[IntToStr(aParamsIndex)];
-       If JSONParam = Nil Then
+        End
+       Else
         Begin
-         aNewParam := True;
-         JSONParam := TJSONParam.Create(DWParams.Encoding);
-         JSONParam.ParamName     := IntToStr(aParamsIndex);
+         aNewParam   := False;
+         JSONParam                 := DWParams.ItemsString[IntToStr(aParamsIndex)];
+         If JSONParam = Nil Then
+          Begin
+           aNewParam := True;
+           JSONParam := TJSONParam.Create(DWParams.Encoding);
+           JSONParam.ParamName     := IntToStr(aParamsIndex);
+          End;
+         JSONParam.ObjectDirection := odIN;
+         JSONParam.AsString        := vTempData;
+         If aNewParam Then
+          DWParams.Add(JSONParam);
+         Inc(aParamsIndex);
+         aNewParam := False;
         End;
-       JSONParam.ObjectDirection := odIN;
-       JSONParam.AsString        := vTempData;
-       If aNewParam Then
-        DWParams.Add(JSONParam);
-       Inc(aParamsIndex);
-       aNewParam := False;
+       Cmd := Copy(Cmd, IBar +1, Length(Cmd));
       End;
-     Cmd := Copy(Cmd, IBar +1, Length(Cmd));
-    End;
-   If (UriOptions.ServerEvent <> '') And (UriOptions.EventName = '') Then
-    Begin
-     UriOptions.EventName   := UriOptions.ServerEvent;
-     UriOptions.ServerEvent := '';
+     If (UriOptions.ServerEvent <> '') And (UriOptions.EventName = '') Then
+      Begin
+       UriOptions.EventName   := UriOptions.ServerEvent;
+       UriOptions.ServerEvent := '';
+      End;
     End;
   End;
   // Extrai Parametros
@@ -1076,11 +1079,18 @@ Begin
        Begin
         If vParams[I] <> '' Then
          Begin
-          JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+          vNewParam := False;
+          JSONParam                 := DWParams.ItemsString[Trim(Copy(vParams[I], 1, Pos('=', vParams[I]) - 1))];
+          If JSONParam = Nil Then
+           Begin
+            vNewParam := True;
+            JSONParam               := TJSONParam.Create(DWParams.Encoding);
+           End;
           JSONParam.ObjectDirection := odIN;
           JSONParam.ParamName       := Trim(Copy(vParams[I], 1, Pos('=', vParams[I]) - 1));
           JSONParam.AsString        := Trim(Copy(vParams[I],    Pos('=', vParams[I]) + 1, Length(vParams[I])));
-          DWParams.Add(JSONParam);
+          If vNewParam Then
+           DWParams.Add(JSONParam);
          End;
        End;
      End;
@@ -1112,8 +1122,10 @@ Var
  JSONParam  : TJSONParam;
  vParams    : TStringList;
  Uri        : TIdURI;
+ vParamName,
  vTempData,
  vValue     : String;
+ vNewParam,
  vCreateParam,
  aNewParam  : Boolean;
 Begin
@@ -1409,9 +1421,20 @@ Begin
         mark := Copy(vParams[I], Pos('dwmark:', vParams[I]) + 7, Length(vParams[I]))
        Else
         Begin
+         vNewParam := False;
          If vParams[I] <> '' Then
           Begin
-           JSONParam                 := TJSONParam.Create(Result.Encoding);
+           If (vParams.names[I] <> '') And
+              (Trim(Query)      <> '') Then
+            vParamName := Trim(Copy(vParams[I], 1, Pos('=', vParams[I]) - 1))
+           Else
+            vParamName := IntToStr(I);
+           JSONParam                 := Result.ItemsString[vParamName];
+           If JSONParam = Nil Then
+            Begin
+             vNewParam := True;
+             JSONParam               := TJSONParam.Create(Result.Encoding);
+            End;
            JSONParam.ObjectDirection := odIN;
            If (vParams.names[I] <> '') And
               (Trim(Query)      <> '') Then
@@ -1427,7 +1450,8 @@ Begin
            {$IFDEF FPC}
            JSONParam.DatabaseCharSet := DatabaseCharSet;
            {$ENDIF}
-           Result.Add(JSONParam);
+           If vNewParam Then
+            Result.Add(JSONParam);
           End;
         End;
       End;

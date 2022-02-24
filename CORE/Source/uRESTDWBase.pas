@@ -392,6 +392,7 @@ Type
   lHandler             : TIdServerIOHandlerSSLOpenSSL;
   aSSLMethod           : TIdSSLVersion;
   aSSLVersions         : TIdSSLVersions;
+  vCipherList,
   vASSLRootCertFile,
   vServerContext,
   ASSLPrivateKeyFile,
@@ -634,6 +635,7 @@ Type
   Property ForceWelcomeAccess      : Boolean                    Read vForceWelcomeAccess      Write vForceWelcomeAccess;
   Property OnBeforeUseCriptKey     : TBeforeUseCriptKey         Read vBeforeUseCriptKey       Write vBeforeUseCriptKey;
   Property CriptOptions            : TCripto                    Read vCripto                  Write vCripto;
+  Property CipherList              : String                     Read vCipherList              Write vCipherList;
   {$IFDEF FPC}
   Property DatabaseCharSet         : TDatabaseCharSet           Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
@@ -11187,13 +11189,6 @@ Begin
      If RemoveBackslashCommands(ARequestInfo.URI) = '/favicon.ico' Then
       Exit;
     {$ENDIF}
-    // Tiago Istuque - 28/12/2018
-    // Acredito ser correto chamar aqui a funçao ReadRawReader criada para ler dados do Header
-    // Dessa forma obtemos cabeçalhos contendo mais informação sobre o conteúdo da entidade,
-    // como o tamanho do conteúdo ou o seu MIME-type
-//    If ((ClearRequestType(Cmd) = '')   Or
-//        (ClearRequestType(Cmd) = '/')) And
-//       (aDefaultUrl <> '')  Then
     Cmd := ClearRequestType(Cmd);
     If (Cmd <> '/') And (Cmd <> '') Then
      ReadRawHeaders;
@@ -13476,9 +13471,8 @@ Begin
  HTTPServer.OnConnect            := CustomOnConnect;
  HTTPServer.OnCreatePostStream   := CreatePostStream;
  HTTPServer.OnParseAuthentication := OnParseAuthentication;
-
-
  {$ENDIF}
+ vCipherList                     := '';//'TLSv1:TLSv1.2:SSLv3:!RC4:!NULL-MD5:!NULL-SHA:!NULL-SHA256:!DES-CBC-SHA:!DES-CBC3-SHA:!IDEA-CBC-SHA';
  vServerAuthOptions              := TRDWServerAuthOptionParams.Create(Self);
  vActive                         := False;
  vServerAuthOptions.AuthorizationOption                        := rdwAOBasic;
@@ -13568,7 +13562,7 @@ Begin
       lHandler.SSLOptions.VerifyDepth           := vSSLVerifyDepth;
       lHandler.SSLOptions.RootCertFile          := vASSLRootCertFile;
       lHandler.SSLOptions.Mode                  := vSSLMode;
-      lHandler.SSLOptions.CipherList            := 'TLSv1:TLSv1.2:SSLv3:!RC4:!NULL-MD5:!NULL-SHA:!NULL-SHA256:!DES-CBC-SHA:!DES-CBC3-SHA:!IDEA-CBC-SHA';
+      lHandler.SSLOptions.CipherList            := vCipherList;
       HTTPServer.IOHandler := lHandler;
      End
     Else

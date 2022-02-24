@@ -96,7 +96,10 @@ Type
  TOnFiltered              = Procedure (Var Filtered       : Boolean;
                                        Var Filter         : String)          Of Object;
  TOnAfterScroll           = Procedure (DataSet            : TDataSet)        Of Object;
+ TOnBeforeRefresh         = Procedure (DataSet            : TDataSet)        Of Object;
+ TOnAfterRefresh          = Procedure (DataSet            : TDataSet)        Of Object;
  TOnAfterOpen             = Procedure (DataSet            : TDataSet)        Of Object;
+ TOnBeforeClose           = Procedure (DataSet            : TDataSet)        Of Object;
  TOnAfterClose            = Procedure (DataSet            : TDataSet)        Of Object;
  TOnCalcFields            = Procedure (DataSet            : TDataSet)        Of Object;
  TOnAfterCancel           = Procedure (DataSet            : TDataSet)        Of Object;
@@ -571,7 +574,10 @@ Type
   vOnFiltered           : TOnFiltered;
   vOnAfterScroll        : TOnAfterScroll;
   vOnAfterOpen          : TOnAfterOpen;
+  vOnBeforeClose        : TOnBeforeClose;
   vOnAfterClose         : TOnAfterClose;
+  vOnBeforeRefresh      : TOnBeforeRefresh;
+  vOnAfterRefresh       : TOnAfterRefresh;
   vOnCalcFields         : TDatasetEvents;
   vThreadRequest        : TRESTDwThreadRequest;
   vNewRecord,
@@ -621,6 +627,7 @@ Type
   vAutoCommitData,
   vAutoRefreshAfterCommit,
   vPropThreadRequest,
+  vInRefreshData,
   vInBlockEvents        : Boolean;
   vRelationFields,
   vSQL                  : TStringList;                       //SQL a ser utilizado na conexão
@@ -694,7 +701,10 @@ Type
   Procedure   ProcAfterScroll    (DataSet   : TDataSet);
   Procedure   ProcBeforeOpen     (DataSet   : TDataSet);
   Procedure   ProcAfterOpen      (DataSet   : TDataSet);
+  Procedure   ProcBeforeClose    (DataSet   : TDataSet);
   Procedure   ProcAfterClose     (DataSet   : TDataSet);
+  Procedure   ProcBeforeRefresh  (DataSet   : TDataSet);
+  Procedure   ProcAfterRefresh   (DataSet   : TDataSet);
   Procedure   ProcBeforeInsert   (DataSet   : TDataSet);
   Procedure   ProcAfterInsert    (DataSet   : TDataSet);
   Procedure   ProcNewRecord      (DataSet   : TDataSet);
@@ -819,7 +829,10 @@ Type
   Property OnGetDataError          : TOnEventConnection    Read vOnGetDataError           Write vOnGetDataError;         //Recebe os Erros de ExecSQL ou de GetData
   Property AfterScroll             : TOnAfterScroll        Read vOnAfterScroll            Write vOnAfterScroll;
   Property AfterOpen               : TOnAfterOpen          Read vOnAfterOpen              Write vOnAfterOpen;
+  Property BeforeClose             : TOnBeforeClose        Read vOnBeforeClose            Write vOnBeforeClose;
   Property AfterClose              : TOnAfterClose         Read vOnAfterClose             Write vOnAfterClose;
+  Property BeforeRefresh           : TOnBeforeRefresh      Read vOnBeforeRefresh          Write vOnBeforeRefresh;
+  Property AfterRefresh            : TOnAfterRefresh       Read vOnAfterRefresh           Write vOnAfterRefresh;
   Property OnFiltered              : TOnFiltered           Read vOnFiltered               Write vOnFiltered;
   Property Active                  : Boolean               Read vActive                   Write SetActiveDB;             //Estado do Dataset
   Property DataCache               : Boolean               Read vDataCache                Write vDataCache;              //Diz se será salvo o último Stream do Dataset
@@ -874,7 +887,10 @@ Type
   vOnFiltered           : TOnFiltered;
   vOnAfterScroll        : TOnAfterScroll;
   vOnAfterOpen          : TOnAfterOpen;
+  vOnBeforeClose        : TOnBeforeClose;
   vOnAfterClose         : TOnAfterClose;
+  vOnBeforeRefresh      : TOnBeforeRefresh;
+  vOnAfterRefresh       : TOnAfterRefresh;
   vOnCalcFields         : TDatasetEvents;
   vMassiveMode          : TMassiveType;
   vNewRecord,
@@ -920,6 +936,7 @@ Type
   vInDesignEvents,
   vAutoCommitData,
   vAutoRefreshAfterCommit,
+  vInRefreshData,
   vInBlockEvents        : Boolean;
   vRelationFields       : TStringList;                       //SQL a ser utilizado na conexão
   vParams               : TParams;                           //Parametros de Dataset
@@ -945,7 +962,10 @@ Type
   Procedure   ProcAfterScroll    (DataSet   : TDataSet);
   Procedure   ProcBeforeOpen     (DataSet   : TDataSet);
   Procedure   ProcAfterOpen      (DataSet   : TDataSet);
+  Procedure   ProcBeforeClose    (DataSet   : TDataSet);
   Procedure   ProcAfterClose     (DataSet   : TDataSet);
+  Procedure   ProcBeforeRefresh  (DataSet   : TDataSet);
+  Procedure   ProcAfterRefresh   (DataSet   : TDataSet);
   Procedure   ProcBeforeInsert   (DataSet   : TDataSet);
   Procedure   ProcAfterInsert    (DataSet   : TDataSet);
   Procedure   ProcNewRecord      (DataSet   : TDataSet);
@@ -1057,7 +1077,10 @@ Type
   Property OnGetDataError          : TOnEventConnection    Read vOnGetDataError           Write vOnGetDataError;         //Recebe os Erros de ExecSQL ou de GetData
   Property AfterScroll             : TOnAfterScroll        Read vOnAfterScroll            Write vOnAfterScroll;
   Property AfterOpen               : TOnAfterOpen          Read vOnAfterOpen              Write vOnAfterOpen;
+  Property BeforeClose             : TOnBeforeClose        Read vOnBeforeClose            Write vOnBeforeClose;
   Property AfterClose              : TOnAfterClose         Read vOnAfterClose             Write vOnAfterClose;
+  Property BeforeRefresh           : TOnBeforeRefresh      Read vOnBeforeRefresh          Write vOnBeforeRefresh;
+  Property AfterRefresh            : TOnAfterRefresh       Read vOnAfterRefresh           Write vOnAfterRefresh;
   Property OnFiltered              : TOnFiltered           Read vOnFiltered               Write vOnFiltered;
   Property Active                  : Boolean               Read vActive                   Write SetActiveDB;             //Estado do Dataset
   Property DataCache               : Boolean               Read vDataCache                Write vDataCache;              //Diz se será salvo o último Stream do Dataset
@@ -6242,7 +6265,10 @@ Begin
  TDataset(Self).BeforeScroll       := @ProcBeforeScroll;
  TDataset(Self).BeforeOpen         := @ProcBeforeOpen;
  TDataset(Self).AfterOpen          := @ProcAfterOpen;
+ TDataset(Self).BeforeClose        := @ProcBeforeClose;
  TDataset(Self).AfterClose         := @ProcAfterClose;
+ TDataset(Self).BeforeRefresh      := @ProcBeforeRefresh;
+ TDataset(Self).AfterRefresh       := @ProcAfterRefresh;
  TDataset(Self).BeforeInsert       := @ProcBeforeInsert;
  TDataset(Self).AfterInsert        := @ProcAfterInsert;
  TDataset(Self).BeforeEdit         := @ProcBeforeEdit;
@@ -6260,7 +6286,10 @@ Begin
  TDataset(Self).BeforeScroll       := ProcBeforeScroll;
  TDataset(Self).BeforeOpen         := ProcBeforeOpen;
  TDataset(Self).AfterOpen          := ProcAfterOpen;
+ TDataset(Self).BeforeClose        := ProcBeforeClose;
  TDataset(Self).AfterClose         := ProcAfterClose;
+ TDataset(Self).BeforeRefresh      := ProcBeforeRefresh;
+ TDataset(Self).AfterRefresh       := ProcAfterRefresh;
  TDataset(Self).BeforeInsert       := ProcBeforeInsert;
  TDataset(Self).AfterInsert        := ProcAfterInsert;
  TDataset(Self).BeforeEdit         := ProcBeforeEdit;
@@ -6274,7 +6303,7 @@ Begin
  Inherited AfterDelete             := OldAfterDelete;
  {$ENDIF}
  vMassiveDataset                   := TMassiveDatasetBuffer.Create(Self);
- vActionCursor                     := crSQLWait;
+ vActionCursor                     := crHourGlass;
  vUpdateSQL                        := Nil;
  SetComponentTAG;
 End;
@@ -6337,7 +6366,10 @@ Begin
  TDataset(Self).BeforeScroll       := @ProcBeforeScroll;
  TDataset(Self).BeforeOpen         := @ProcBeforeOpen;
  TDataset(Self).AfterOpen          := @ProcAfterOpen;
+ TDataset(Self).BeforeClose        := @ProcBeforeClose;
  TDataset(Self).AfterClose         := @ProcAfterClose;
+ TDataset(Self).BeforeRefresh      := @ProcBeforeRefresh;
+ TDataset(Self).AfterRefresh       := @ProcAfterRefresh;
  TDataset(Self).BeforeInsert       := @ProcBeforeInsert;
  TDataset(Self).AfterInsert        := @ProcAfterInsert;
  TDataset(Self).BeforeEdit         := @ProcBeforeEdit;
@@ -6355,7 +6387,10 @@ Begin
  TDataset(Self).BeforeScroll       := ProcBeforeScroll;
  TDataset(Self).BeforeOpen         := ProcBeforeOpen;
  TDataset(Self).AfterOpen          := ProcAfterOpen;
+ TDataset(Self).BeforeClose        := ProcBeforeClose;
  TDataset(Self).AfterClose         := ProcAfterClose;
+ TDataset(Self).BeforeRefresh      := ProcBeforeRefresh;
+ TDataset(Self).AfterRefresh       := ProcAfterRefresh;
  TDataset(Self).BeforeInsert       := ProcBeforeInsert;
  TDataset(Self).AfterInsert        := ProcAfterInsert;
  TDataset(Self).BeforeEdit         := ProcBeforeEdit;
@@ -6369,7 +6404,7 @@ Begin
  Inherited AfterDelete             := OldAfterDelete;
  {$ENDIF}
  vMassiveDataset                   := TMassiveDatasetBuffer.Create(Self);
- vActionCursor                     := crSQLWait;
+ vActionCursor                     := crHourGlass;
  vUpdateSQL                        := Nil;
  SetComponentTAG;
 End;
@@ -7134,7 +7169,7 @@ End;
 Procedure TRESTDWTable.ProcBeforeOpen(DataSet: TDataSet);
 Begin
  MasterFields := '';
- If Not((vInBlockEvents) or (vInitDataset)) Then
+ If Not((vInBlockEvents) or (vInitDataset) or (vInRefreshData)) Then
   Begin
    If Assigned(vBeforeOpen) Then
    vBeforeOpen(Dataset);
@@ -7144,7 +7179,7 @@ End;
 procedure TRESTDWClientSQL.ProcBeforeOpen(DataSet: TDataSet);
 Begin
  MasterFields := '';
- If Not((vInBlockEvents) or (vInitDataset)) Then
+ If Not((vInBlockEvents) or (vInitDataset) or (vInRefreshData)) Then
   Begin
    If Assigned(vBeforeOpen) Then
    vBeforeOpen(Dataset);
@@ -7420,7 +7455,9 @@ Var
 Begin
  Cursor := 0;
  If Active then
-  Begin
+  Try
+   ProcBeforeRefresh(Self);
+   vInRefreshData := True;
    If RecordCount > 0 then
     Cursor := Self.CurrentRecord;
    Close;
@@ -7430,6 +7467,9 @@ Begin
      If RecordCount > 0 Then
       MoveBy(Cursor);
     End;
+   ProcAfterRefresh(Self);
+  Finally
+    vInRefreshData := False;
   End;
 End;
 
@@ -7449,13 +7489,19 @@ begin
  vInBlockEvents := False;
 end;
 
+procedure TRESTDWTable.ProcBeforeClose(DataSet: TDataSet);
+Begin
+ If (Assigned(vOnBeforeClose) and not vInBlockEvents and not vInRefreshData) then
+  vOnBeforeClose(Dataset);
+End;
+
 procedure TRESTDWTable.ProcAfterClose(DataSet: TDataSet);
 Var
  I : Integer;
  vDetailClient : TRESTDWClientSQLBase;
 Begin
  vActualJSON   := '';
- If Assigned(vOnAfterClose) then
+ If (Assigned(vOnAfterClose) and not vInBlockEvents and not vInRefreshData) then
   vOnAfterClose(Dataset);
  For I := 0 To vMasterDetailList.Count -1 Do
   Begin
@@ -7466,13 +7512,31 @@ Begin
   End;
 End;
 
+procedure TRESTDWTable.ProcBeforeRefresh(DataSet: TDataSet);
+Begin
+  If (Assigned(vOnBeforeRefresh) and not vInBlockEvents) Then
+   vOnBeforeRefresh(DataSet);
+End;
+
+procedure TRESTDWTable.ProcAfterRefresh(DataSet: TDataSet);
+Begin
+  If (Assigned(vOnAfterRefresh) and not vInBlockEvents) Then
+   vOnAfterRefresh(DataSet);
+End;
+
+procedure TRESTDWClientSQL.ProcBeforeClose(DataSet: TDataSet);
+Begin
+ If (Assigned(vOnBeforeClose) and not vInBlockEvents and not vInRefreshData) then
+  vOnBeforeClose(Dataset);
+End;
+
 procedure TRESTDWClientSQL.ProcAfterClose(DataSet: TDataSet);
 Var
  I : Integer;
  vDetailClient : TRESTDWClientSQL;
 Begin
  vActualJSON   := '';
- If Assigned(vOnAfterClose) then
+ If (Assigned(vOnAfterClose) and not vInBlockEvents and not vInRefreshData) then
   vOnAfterClose(Dataset);
  For I := 0 To vMasterDetailList.Count -1 Do
   Begin
@@ -7481,6 +7545,18 @@ Begin
    If vDetailClient <> Nil Then
     vDetailClient.Close;
   End;
+End;
+
+procedure TRESTDWClientSQL.ProcBeforeRefresh(DataSet: TDataSet);
+Begin
+  If (Assigned(vOnBeforeRefresh) and not vInBlockEvents) Then
+   vOnBeforeRefresh(DataSet);
+End;
+
+procedure TRESTDWClientSQL.ProcAfterRefresh(DataSet: TDataSet);
+Begin
+  If (Assigned(vOnAfterRefresh) and not vInBlockEvents) Then
+   vOnAfterRefresh(DataSet);
 End;
 
 Procedure TRESTDWTable.ProcAfterEdit(DataSet: TDataSet);
@@ -7634,7 +7710,7 @@ End;
 
 procedure TRESTDWTable.ProcAfterOpen(DataSet: TDataSet);
 Begin
- If Not ((vInBlockEvents) or (vInitDataset)) Then
+ If Not ((vInBlockEvents) or (vInitDataset) or (vInRefreshData)) Then
   Begin
    If Assigned(vOnAfterOpen) Then
     vOnAfterOpen(Dataset);
@@ -7643,7 +7719,7 @@ End;
 
 procedure TRESTDWClientSQL.ProcAfterOpen(DataSet: TDataSet);
 Begin
- If Not ((vInBlockEvents) or (vInitDataset)) Then
+ If Not ((vInBlockEvents) or (vInitDataset) or (vInRefreshData)) Then
   Begin
    If Assigned(vOnAfterOpen) Then
     vOnAfterOpen(Dataset);
@@ -10825,7 +10901,7 @@ Begin
           TRESTDWClientSQLBase(Self).EnableControls;
           SetInBlockEvents(False);
           If Active Then
-           If Not (vInBlockEvents) and not vBinaryRequest Then
+           If Not (vInBlockEvents) and not vBinaryRequest and not vInRefreshData Then
             Begin
              If Assigned(vOnAfterOpen) Then
               vOnAfterOpen(Self);
@@ -11150,7 +11226,7 @@ Begin
           TRESTDWClientSQLBase(Self).EnableControls;
           SetInBlockEvents(False);
           If Active Then
-           If Not (vInBlockEvents) and not vBinaryRequest Then
+           If Not (vInBlockEvents) and not vBinaryRequest and not vInRefreshData Then
             Begin
              If Assigned(vOnAfterOpen) Then
               vOnAfterOpen(Self);
@@ -11407,7 +11483,7 @@ Begin
   GetNewData     := Filtered;
   vActive        := (GetData) And Not(vInDesignEvents);
   GetNewData     := Not vActive;
-  If Not (vInBlockEvents) Then
+  If Not (vInBlockEvents) and not vInRefreshData Then
    Begin
     If Assigned(vOnAfterOpen) Then
      vOnAfterOpen(Self);
@@ -11485,7 +11561,7 @@ Begin
        GetNewData     := Filtered;
        vActive        := (GetData) And Not(vInDesignEvents);
        GetNewData     := Not vActive;
-       If Not (vInBlockEvents) Then
+       If Not (vInBlockEvents) and not vInRefreshData Then
         Begin
          If Assigned(vOnAfterOpen) Then
           vOnAfterOpen(Self);

@@ -515,7 +515,7 @@ Begin
  Result := Nil;
  For I := 0 To Self.Count - 1 Do
   Begin
-   If (Uppercase(Index) = Uppercase(Self.Items[I].FName)) Then
+   If (Uppercase(Index) = Uppercase(TDWEvent(Items[I]).EventName)) Then
     Begin
      Result := TDWEvent(Self.Items[I]);
      Break;
@@ -537,7 +537,7 @@ Begin
   Begin
    For I := 0 To Self.Count - 1 Do
     Begin
-     If (Uppercase(Index) = Uppercase(Self.Items[I].FName)) Then
+     If (Uppercase(Index) = Uppercase(TDWEvent(Items[I]).EventName)) Then
       Begin
        Self.Items[I] := Item;
        Break;
@@ -561,7 +561,7 @@ Begin
   Begin
    vParamLine2  := Format('"needauth":"%s", "onlypredefparams":"%s"', [BooleanToString(Items[I].NeedAuthorization),
                                                                        BooleanToString(Items[I].OnlyPreDefinedParams)]);
-   vTagEvent    := Format('{"eventname":"%s"', [Items[I].FName]);
+   vTagEvent    := Format('{"eventname":"%s"', [TDWEvent(Items[I]).EventName]);
    vTagEvent    := vTagEvent + Format(', "jsonmode":"%s"', [GetJSONModeName(Items[I].vJsonMode)]);
    vTagEvent    := vTagEvent + ', "params":[%s], ' + vParamLine2 + '}';
    vParamsLines := '';
