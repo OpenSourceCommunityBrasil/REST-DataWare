@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Package Version="4">
+  <Package Version="5">
     <PathDelim Value="\"/>
     <Name Value="resteasyobjectscore"/>
     <Type Value="RunAndDesignTime"/>
@@ -28,7 +28,7 @@
     <Description Value="The proposal was fulfilled. REST DW was created to facilitate the creation of CRUDs in the same model that we created applications for Client / Server Database. Today, being able to write data to a bank via WebService is too complex for simple operations, making scheduling of simple screens time-consuming. With REST Dataware, you no longer have to worry about creating SQL Insertion, Deletion, Read, and Execution methods via Webservice; Simply add a RESTDataBase connection component and add a RESTClientSQL component that will already have your SQL solution fully functional as you did back in the day and with all the power of modern REST / JSON technology with data compression and everything the language can offer. Have fun."/>
     <License Value="GPL- 3.0"/>
     <Version Major="1" Minor="9" Release="6" Build="9"/>
-    <Files Count="35">
+    <Files Count="37">
       <Item1>
         <Filename Value="..\..\Source\libs\ServerUtils.pas"/>
         <UnitName Value="ServerUtils"/>
@@ -170,7 +170,16 @@
         <Filename Value="..\..\Source\uDWFieldSourceEditor.pas"/>
         <UnitName Value="uDWFieldSourceEditor"/>
       </Item35>
+      <Item36>
+        <Filename Value="..\..\Source\libs\JSON\uRESTDWDataJSON.pas"/>
+        <UnitName Value="uRESTDWDataJSON"/>
+      </Item36>
+      <Item37>
+        <Filename Value="..\..\Source\libs\JSON\uRESTDWSerialize.pas"/>
+        <UnitName Value="uRESTDWSerialize"/>
+      </Item37>
     </Files>
+    <CompatibilityMode Value="True"/>
     <RequiredPkgs Count="2">
       <Item1>
         <PackageName Value="indylaz"/>

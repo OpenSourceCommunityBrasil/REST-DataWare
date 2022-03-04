@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2018/06/18 15:59:19.008,=soaprtl.dcp</Transaction>
+    <Transaction>2018/06/18 15:59:19.068,=inet.dcp</Transaction>
+    <Transaction>2018/06/18 15:59:19.126,=IndyCore.dcp</Transaction>
+    <Transaction>2018/06/18 15:59:19.187,=IndySystem.dcp</Transaction>
+    <Transaction>2018/06/18 15:59:19.252,=IndyProtocols.dcp</Transaction>
+    <Transaction>2018/06/18 15:59:19.312,=RestEasyObjectsCORE.dcp</Transaction>
+    <Transaction>2018/06/18 15:59:27.563,=RestEasyObjectsCORE.dcp</Transaction>
+    <Transaction>2018/06/18 16:02:39.187,=RestEasyObjectsCORE.dcp</Transaction>
+    <Transaction>2018/06/18 16:06:36.424,C:\Componentes\dw\CORE\Source\Connectors\ZEOS\uRestDWDriverZEOS.pas=</Transaction>
+    <Transaction>2018/06/18 16:07:00.431,=C:\Componentes\dw\CORE\Source\Connectors\ZEOS\uRESTDWDriverZEOS.pas</Transaction>
+  </Transactions>
+</BorlandProject>

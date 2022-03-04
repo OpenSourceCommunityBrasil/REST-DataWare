@@ -1,0 +1,72 @@
+package RestDatawareCORE;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'REST Dataware CORE Base'}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  designide,
+  dcldb,
+  dbrtl,
+  soaprtl,
+  dsnap,
+  FireDAC,
+  FireDACCommonDriver,
+  FireDACCommon;
+
+contains
+  uRESTDWAboutForm in '..\..\Source\Basic\Dialogs\uRESTDWAboutForm.pas' {frm_About},
+  DataUtils in '..\..\Source\Basic\Mechanics\DataUtils.pas',
+  PropertyPersist in '..\..\Source\Basic\PropertyPersist.pas',
+  uRESTDWAbout in '..\..\Source\Basic\uRESTDWAbout.pas',
+  uRESTDWBasic in '..\..\Source\Basic\uRESTDWBasic.pas',
+  uRESTDWBasicDB in '..\..\Source\Basic\uRESTDWBasicDB.pas',
+  uRESTDWBasicTypes in '..\..\Source\Basic\uRESTDWBasicTypes.pas',
+  uRESTDWComponentEvents in '..\..\Source\Basic\uRESTDWComponentEvents.pas',
+  uRESTDWMasterDetailData in '..\..\Source\Basic\uRESTDWMasterDetailData.pas',
+  uRESTDWParams in '..\..\Source\Basic\uRESTDWParams.pas',
+  uRESTDWPoolermethod in '..\..\Source\Basic\uRESTDWPoolermethod.pas',
+  uRESTDWReg in '..\..\Source\Basic\uRESTDWReg.pas',
+  uRESTDWServerContext in '..\..\Source\Basic\uRESTDWServerContext.pas',
+  uRESTDWServerEvents in '..\..\Source\Basic\uRESTDWServerEvents.pas',
+  uRESTDWConsts in '..\..\Source\Consts\uRESTDWConsts.pas',
+  StringBuilderUnit in '..\..\Source\Libs\StringBuilderUnit.pas',
+  uRESTDWCharset in '..\..\Source\Libs\uRESTDWCharset.pas',
+  uRESTDWJSONObject in '..\..\Source\Libs\uRESTDWJSONObject.pas',
+  uRESTDWMD5 in '..\..\Source\Libs\uRESTDWMD5.pas',
+  uRESTDWTools in '..\..\Source\Libs\uRESTDWTools.pas',
+  uzliblaz in '..\..\Source\Libs\uzliblaz.pas',
+  uRESTDWDatamodule in '..\..\Source\Plugins\DMDados\uRESTDWDatamodule.pas' {ServerMethodDataModule: TDataModule},
+  uRESTDWMassiveBuffer in '..\..\Source\Libs\uRESTDWMassiveBuffer.pas',
+  uRESTDWDataJSON in '..\..\Source\Libs\JSON\uRESTDWDataJSON.pas',
+  uRESTDWJSON in '..\..\Source\Libs\JSON\uRESTDWJSON.pas',
+  uRESTDWJSONInterface in '..\..\Source\Libs\JSON\uRESTDWJSONInterface.pas',
+  uRESTDWDataset in '..\..\Source\Plugins\Memdataset\uRESTDWDataset.pas',
+  uRESTDWExprParser in '..\..\Source\Plugins\Memdataset\uRESTDWExprParser.pas';
+
+End.

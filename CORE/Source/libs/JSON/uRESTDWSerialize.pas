@@ -1,6 +1,6 @@
 Unit uRESTDWSerialize;
 
-{$I uRESTDW.inc}
+{$I ..\..\Includes\uRESTDWPlataform.inc}
 
 Interface
 
@@ -40,7 +40,7 @@ Type
 
 Implementation
 
-Uses uDWJSONTools;
+Uses uRESTDWTools;
 
 Function VarToObj(Const Value  : Variant;
                   AClass       : TClass;
@@ -275,7 +275,7 @@ Begin
                               If aTypeData^.ClassType.InheritsFrom(TStream) Then //Classes baseadas em Stream
                                Begin
                                 vStream    := TStream(aTypeData^.ClassType.Create);
-                                vStreamb   := Decodeb64Stream(aValue);
+                                vStreamb   := DecodeStream(aValue);
                                 If Assigned(vStreamb) Then
                                  vStream.CopyFrom(vStreamb, vStreamb.Size);
 //                                vStream.Position := 0;
@@ -536,7 +536,7 @@ Begin
                                  aValue := JSONObject.Elements[A].Value;
                                  If aTypeData^.ClassType.InheritsFrom(TStream) Then //Classes baseadas em Stream
                                   Begin
-                                   vStream    := Decodeb64Stream(aValue); //TStream(aTypeData^.ClassType.Create);
+                                   vStream    := DecodeStream(aValue); //TStream(aTypeData^.ClassType.Create);
                                    vStream.Position := 0;
                                    SetObjectProp(TObject(Result), aPropInfo, vStream);
                                   End;

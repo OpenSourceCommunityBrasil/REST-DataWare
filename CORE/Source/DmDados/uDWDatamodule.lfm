@@ -1,7 +1,0 @@
-object ServerMethodDataModule: TServerMethodDataModule
-  OldCreateOrder = False
-  Height = 253
-  HorizontalOffset = 952
-  VerticalOffset = 226
-  Width = 297
-end

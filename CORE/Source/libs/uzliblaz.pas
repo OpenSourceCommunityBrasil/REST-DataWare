@@ -16,7 +16,7 @@ Uses
 implementation
 
 Uses
- uDWConsts, ServerUtils;
+ uRESTDWConsts, DataUtils;
 
 Procedure ZCompressStream  (inStream,
                             outStream        : TStream;

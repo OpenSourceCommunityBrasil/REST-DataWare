@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{6FE7FEDB-3C0E-45CC-A75C-FDC7A25FC64B}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="RestDatawareCORE.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Connectors\Indy\RestDatawareIndySockets.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="RestDatawareCORE">
+        <MSBuild Projects="RestDatawareCORE.dproj"/>
+    </Target>
+    <Target Name="RestDatawareCORE:Clean">
+        <MSBuild Projects="RestDatawareCORE.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDatawareCORE:Make">
+        <MSBuild Projects="RestDatawareCORE.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDatawareIndySockets">
+        <MSBuild Projects="Connectors\Indy\RestDatawareIndySockets.dproj"/>
+    </Target>
+    <Target Name="RestDatawareIndySockets:Clean">
+        <MSBuild Projects="Connectors\Indy\RestDatawareIndySockets.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDatawareIndySockets:Make">
+        <MSBuild Projects="Connectors\Indy\RestDatawareIndySockets.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="RestDatawareCORE;RestDatawareIndySockets"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="RestDatawareCORE:Clean;RestDatawareIndySockets:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="RestDatawareCORE:Make;RestDatawareIndySockets:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

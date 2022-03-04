@@ -15,7 +15,7 @@ uses
   DWDCPbase64, DWDCPblockciphers, DWDCPconst, DWDCPcrypt2, DWDCPtypes, 
   DWDCPcast256, DWDCPrijndael, DWDCPsha256, uDWUpdSqlEditor, utemplateproglaz, 
   uRESTDWFileBuffer, uDWResponseTranslator, uDWFieldSourceEditor, 
-  LazarusPackageIntf;
+  uRESTDWDataJSON, uRESTDWSerialize, LazarusPackageIntf;
 
 implementation
 
