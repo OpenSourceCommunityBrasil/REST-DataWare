@@ -705,7 +705,7 @@ End;
 
 Procedure TDWAboutDialogProperty.Edit;
 Begin
- DWAboutDialog;
+ RESTDWAboutDialog;
 End;
 
 Function TDWAboutDialogProperty.GetAttributes: TPropertyAttributes;

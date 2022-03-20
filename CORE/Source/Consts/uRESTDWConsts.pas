@@ -26,7 +26,7 @@ Unit uRESTDWConsts;
 Interface
 
 Uses
- uRESTDWCharset, uRESTDWBasicTypes, ZLib,
+ uRESTDWCharset, ZLib,
  {$IFDEF FPC}
   zstream,
   {$IFNDEF RESTDWLAMW}
@@ -49,6 +49,15 @@ Uses
 Var
  InitStrPos,
  FinalStrPos                : Integer;
+
+Type
+ TRESTDWAboutInfo = (RESTDWAbout);
+ TMassiveDataset  = Class
+End;
+
+Type
+ TObjectDirection          = (odIN, odOUT, odINOUT);
+ TEncodeSelect             = (esASCII,     esUtf8, esANSI);
 
 Const
  tScriptsDetected           : Array[0..1] of string = ('.map', '.webdwpc');
@@ -78,6 +87,7 @@ Const
  cTablenameTAG              = 'TABLENAME';
  cUndefined                 = 'undefined';
  cRDWDetailField            = 'rdwdetailfield';
+ cMethodNotImplemented      = 'Method not implemented...';
  cNullvalueTag              = '"null"';
  cBlanckStringJSON          = '""';
  TSepValueMemString         = '\\';
@@ -121,7 +131,7 @@ Const
                               'CORE Version';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
  RESTDWVersionINFO          = '1.4.3.';
- RESTDWRelease              = '2917';
+ RESTDWRelease              = '2922';
  RESTDWParamsHeaderVersion  = 6;
  RESTDWCodeProject          = 'Dark Souls';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
@@ -144,6 +154,7 @@ Const
  cInvalidPoolerName         = 'Invalid Pooler Name...';
  cInvalidContextRule        = 'Invalid ContextRule Name';
  cServerEventNotFound       = 'ServerEvent not found...';
+ cStreamReadError           = 'Stream Error %s %s';
  cInvalidServerEventName    = 'Invalid ServerEvent name';
  cInvalidDriverConnection   = 'CustomConnection undefined on server driver selected';
  cInvalidRDWServer          = 'Invalid REST Dataware Server...';
@@ -158,6 +169,8 @@ Const
  cInvalidConnection         = 'Invalid connection. The server maybe offline...';
  cInvalidDataToApply        = 'No data to "Applyupdates"...';
  cEmptyDBName               = 'Empty Database Property';
+ cMIMETypeEmpty             = 'Mimetype is Empty...';
+ cMIMETypeAlreadyExists     = 'Mimetype Already Exists...';
  cErrorDatabaseNotFound     = 'Database not found...';
  cErrorOpenDataset          = 'Error when try open Dataset...';
  cErrorNoFieldsDataset      = 'No Fields to add on Dataset...';
@@ -186,11 +199,6 @@ Const
  cPong                      = 'PONG';
  cQuit                      = 'QUIT';
  cApplicationJSON           = 'application/json';
-
-Type
- TRESTDWAboutInfo = (RESTDWAbout);
- TMassiveDataset  = Class
-End;
 
  Type
  {$IFNDEF FPC}
@@ -592,45 +600,6 @@ Begin
     Break;
   End;
 End;
-
-//Function GetMIMEType(sFile: TFileName) : string;
-//Var
-// aMIMEMap : TIdMIMETable;
-//Begin
-// If (Pos('.HTML', UpperCase(sFile)) > 0) Then
-//  Result := 'text/html'
-// Else If (Pos('.PHP', UpperCase(sFile)) > 0) Then
-//  Result := 'text/php'
-// Else If (Pos('.PNG', UpperCase(sFile)) > 0) Then
-//  Result := 'image/png'
-// Else If (Pos('.BMP', UpperCase(sFile)) > 0) Then
-//  Result := 'image/bmp'
-// Else If (Pos('.ICO', UpperCase(sFile)) > 0) Then
-//  Result := 'image/ico'
-// Else If (Pos('.GIF', UpperCase(sFile)) > 0) Then
-//  Result := 'image/gif'
-// Else If (Pos('.JPG', UpperCase(sFile)) > 0) Then
-//  Result := 'image/jpg'
-// Else If (Pos('.JS',  UpperCase(sFile)) > 0) Then
-//  Result := 'application/javascript'
-// Else If (Pos('.PDF', UpperCase(sFile)) > 0) Then
-//  Result := 'application/pdf'
-// Else If (Pos('.ZIP', UpperCase(sFile)) > 0) Then
-//  Result := 'application/zip'
-// Else If (Pos('.RAR', UpperCase(sFile)) > 0) Then
-//  Result := 'application/rar'
-// Else If (Pos('.CSS', UpperCase(sFile)) > 0) Then
-//  Result := 'text/css'
-// Else
-//  Begin
-//   aMIMEMap := TIdMIMETable.Create(true);
-//   Try
-//    Result := aMIMEMap.GetFileMIMEType(sFile);
-//   Finally
-//    aMIMEMap.Free;
-//   End;
-//  End;
-//End;
 
 Function scripttags(Value: String): Boolean;
 var

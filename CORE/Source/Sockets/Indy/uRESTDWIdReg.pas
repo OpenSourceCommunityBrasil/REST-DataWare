@@ -52,6 +52,14 @@ Type
   Procedure Edit;                                 Override;
 End;
 
+Type
+ TRESTDWAboutDialogProperty = class({$IFDEF FPC}TClassPropertyEditor{$ELSE}TPropertyEditor{$ENDIF})
+Public
+ Procedure Edit; override;
+ Function  GetAttributes : TPropertyAttributes; Override;
+ Function  GetValue      : String;              Override;
+End;
+
 Procedure Register;
 
 Implementation
@@ -98,7 +106,7 @@ Begin
  RegisterComponents('REST Dataware - Service',     [TRESTDWIdServicePooler,
                                                     TRESTDWIdServiceCGI]);
 
- RegisterComponents('REST Dataware - Client''s',   [//TRESTDWIdClientREST,
+ RegisterComponents('REST Dataware - Client''s',   [TRESTDWIdClientREST,
                                                     TRESTDWIdClientPooler]);
 //                                                    TRESTDWIdClientNotification]);
 
@@ -106,6 +114,11 @@ Begin
  RegisterPropertyEditor(TypeInfo(String),           TRESTDWIdDatabase,     'PoolerName',      TPoolersList);
 // RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionServer,   'PoolerName',      TPoolersListCDF);
 // RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionParams,   'PoolerName',      TPoolersListCDF);
+ {$IFNDEF FPC}
+  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TRESTDWAboutDialogProperty);
+ {$ELSE}
+  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TRESTDWAboutDialogProperty);
+ {$ENDIF}
 End;
 
 {$IFDEF FPC}
@@ -118,6 +131,21 @@ End;
      RegisterPropertyEditor (pi^.PropType, ComponentClass, PropertyName, PropEdits.THiddenPropertyEditor);
  end;
 {$ENDIF}
+
+Procedure TRESTDWAboutDialogProperty.Edit;
+Begin
+ RESTDWAboutDialog;
+End;
+
+Function TRESTDWAboutDialogProperty.GetAttributes: TPropertyAttributes;
+Begin
+ Result := [paDialog, paReadOnly];
+End;
+
+Function TRESTDWAboutDialogProperty.GetValue: String;
+Begin
+ Result := 'Version : '+ RESTDWVERSAO;
+End;
 
 initialization
 

@@ -291,15 +291,15 @@ Type
   //Variáveis, Procedures e  Funções Protegidas
   vCripto           : TCripto;
   Procedure SetOnWork      (Value             : TOnWork);
-  Procedure SetOnWorkBegin (Value             : TOnWorkBegin);
+  Procedure SetOnWorkBegin (Value             : TOnWork);
   Procedure SetOnWorkEnd   (Value             : TOnWorkEnd);
   Procedure SetOnStatus    (Value             : TOnStatus);
   Function  GetAllowCookies                   : Boolean;
   Procedure SetAllowCookies(Value             : Boolean);
  Private
   //Variáveis, Procedures e Funções Privadas
+  vOnWorkBegin,
   vOnWork              : TOnWork;
-  vOnWorkBegin         : TOnWorkBegin;
   vOnWorkEnd           : TOnWorkEnd;
   vOnStatus            : TOnStatus;
   vOnFailOverExecute   : TOnFailOverExecute;
@@ -384,7 +384,7 @@ Type
   Property WelcomeMessage          : String                        Read vWelcomeMessage          Write vWelcomeMessage;
   Property AccessTag               : String                        Read vAccessTag               Write vAccessTag;
   Property OnWork                  : TOnWork                       Read vOnWork                  Write SetOnWork;
-  Property OnWorkBegin             : TOnWorkBegin                  Read vOnWorkBegin             Write SetOnWorkBegin;
+  Property OnWorkBegin             : TOnWork                       Read vOnWorkBegin             Write SetOnWorkBegin;
   Property OnWorkEnd               : TOnWorkEnd                    Read vOnWorkEnd               Write SetOnWorkEnd;
   Property OnStatus                : TOnStatus                     Read vOnStatus                Write SetOnStatus;
   Property OnFailOverExecute       : TOnFailOverExecute            Read vOnFailOverExecute       Write vOnFailOverExecute;
@@ -487,7 +487,6 @@ End;
 Type
  TRESTServiceBase = Class(TRESTDWComponent)
  Protected
-  procedure Notification(AComponent: TComponent; Operation: TOperation); override;
  Private
   {$IFDEF FPC}
    vCriticalSection    : TRTLCriticalSection;
@@ -522,14 +521,13 @@ Type
   vServerContext,
   FRootPath,
   aDefaultUrl          : String;
-  vEncoding            : TEncodeSelect;              //Enconding se usar CORS usar UTF8 - Alexandre Abade
+  vEncoding            : TEncodeSelect;
   vOnCreate            : TOnCreate;
   Procedure SetServerContext(Value : String);
   Procedure SetCORSCustomHeader (Value : TStringList);
   Procedure SetDefaultPage (Value : TStringList);
-  Procedure SetActive      (Value                     : Boolean);Virtual;Abstract;
   Procedure SetServerMethod(Value                     : TComponentClass);
-  Procedure Loaded; Override;
+//  Procedure Loaded; Override;
   Procedure GetTableNames            (ServerMethodsClass      : TComponent;
                                       Var Pooler              : String;
                                       Var DWParams            : TRESTDWParams;
@@ -688,46 +686,51 @@ Type
                                       Var ErrorCode           : Integer) : Boolean;
   Procedure   SetServerAuthOptions   (AuthenticationOptions   : TRESTDWServerAuthOptionParams);
  Public
-  Procedure   CommandExec  (AContext      : TObject;
-                            ARequestInfo  : TObject;
-                            AResponseInfo : TObject);Virtual;Abstract;
+  Procedure   SetActive    (Value               : Boolean);Virtual;
+  Function    CommandExec  (Url,
+                            RawHTTPCommand,
+                            ContentType         : String;
+                            RawHeaders,
+                            Params              : TStrings;
+                            QueryParams         : String;
+                            ContentStringStream : TStream;
+                            Var sCharSet,
+                            ErrorMessage        : String;
+                            Var StatusCode      : Integer;
+                            Const ResultStream  : TStream) : Boolean;
   Procedure   ClearDataRoute;
-  Procedure   AddDataRoute(DataRoute : String; MethodClass : TComponentClass);
-  Constructor Create       (AOwner : TComponent);Override; //Cria o Componente
-  Destructor  Destroy; Override;                      //Destroy a Classe
+  Procedure   AddDataRoute (DataRoute           : String; MethodClass : TComponentClass);
+  Constructor Create       (AOwner              : TComponent);Override;//Cria o Componente
+  Destructor  Destroy; Override;//Destroy a Classe
  Published
-  Property Active                  : Boolean                    Read vActive                  Write SetActive;
-  Property CORS                    : Boolean                    Read vCORS                    Write vCORS;
-  Property CORS_CustomHeaders      : TStringList                Read vCORSCustomHeaders       Write SetCORSCustomHeader;
-  Property DefaultPage             : TStringList                Read vDefaultPage             Write SetDefaultPage;
-  Property DefaultBaseContext      : String                     Read aDefaultUrl              Write aDefaultUrl;
-  Property PathTraversalRaiseError : Boolean                    Read vPathTraversalRaiseError Write vPathTraversalRaiseError;
-  Property RequestTimeout          : Integer                    Read vServiceTimeout          Write vServiceTimeout;
-  Property ServicePort             : Integer                    Read vServicePort             Write vServicePort;  //A Porta do Serviço do DataSet
-  Property ProxyOptions            : TProxyOptions              Read vProxyOptions            Write vProxyOptions; //Se tem Proxy diz quais as opções
+  Property Active                  : Boolean                       Read vActive                  Write SetActive;
+  Property CORS                    : Boolean                       Read vCORS                    Write vCORS;
+  Property CORS_CustomHeaders      : TStringList                   Read vCORSCustomHeaders       Write SetCORSCustomHeader;
+  Property DefaultPage             : TStringList                   Read vDefaultPage             Write SetDefaultPage;
+  Property DefaultBaseContext      : String                        Read aDefaultUrl              Write aDefaultUrl;
+  Property PathTraversalRaiseError : Boolean                       Read vPathTraversalRaiseError Write vPathTraversalRaiseError;
+  Property RequestTimeout          : Integer                       Read vServiceTimeout          Write vServiceTimeout;
+  Property ServicePort             : Integer                       Read vServicePort             Write vServicePort;  //A Porta do Serviço do DataSet
+  Property ProxyOptions            : TProxyOptions                 Read vProxyOptions            Write vProxyOptions; //Se tem Proxy diz quais as opções
   Property AuthenticationOptions   : TRESTDWServerAuthOptionParams Read vServerAuthOptions       Write SetServerAuthOptions;
-  Property ServerMethodClass       : TComponentClass            Read aServerMethod            Write SetServerMethod;
-  Property OnLastRequest           : TLastRequest               Read vLastRequest             Write vLastRequest;
-  Property OnLastResponse          : TLastResponse              Read vLastResponse            Write vLastResponse;
-  Property Encoding                : TEncodeSelect              Read vEncoding                Write vEncoding;          //Encoding da string
-  Property ServerContext           : String                     Read vServerContext           Write SetServerContext;
-  Property RootPath                : String                     Read FRootPath                Write FRootPath;
-  Property ForceWelcomeAccess      : Boolean                    Read vForceWelcomeAccess      Write vForceWelcomeAccess;
-  Property OnBeforeUseCriptKey     : TBeforeUseCriptKey         Read vBeforeUseCriptKey       Write vBeforeUseCriptKey;
-  Property CriptOptions            : TCripto                    Read vCripto                  Write vCripto;
+  Property ServerMethodClass       : TComponentClass               Read aServerMethod            Write SetServerMethod;
+  Property OnLastRequest           : TLastRequest                  Read vLastRequest             Write vLastRequest;
+  Property OnLastResponse          : TLastResponse                 Read vLastResponse            Write vLastResponse;
+  Property Encoding                : TEncodeSelect                 Read vEncoding                Write vEncoding;          //Encoding da string
+  Property ServerContext           : String                        Read vServerContext           Write SetServerContext;
+  Property RootPath                : String                        Read FRootPath                Write FRootPath;
+  Property ForceWelcomeAccess      : Boolean                       Read vForceWelcomeAccess      Write vForceWelcomeAccess;
+  Property OnBeforeUseCriptKey     : TBeforeUseCriptKey            Read vBeforeUseCriptKey       Write vBeforeUseCriptKey;
+  Property CriptOptions            : TCripto                       Read vCripto                  Write vCripto;
   {$IFDEF FPC}
-  Property DatabaseCharSet         : TDatabaseCharSet           Read vDatabaseCharSet         Write vDatabaseCharSet;
+  Property DatabaseCharSet         : TDatabaseCharSet              Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
-  Property OnCreate                : TOnCreate                  Read vOnCreate                Write vOnCreate;
+  Property OnCreate                : TOnCreate                     Read vOnCreate                Write vOnCreate;
 End;
 
 //Heranças para Servidores Standalone
 Type
- TRESTServicePoolerBase = Class(TRESTServiceBase)
- Protected
- Private
- Public
- Published
+ TRESTServicePoolerBase   = Class(TRESTServiceBase)
 End;
 
 //Heranças para Servidores CGI/Isapi
@@ -737,10 +740,8 @@ Type
   Property ServicePort;
   Property ProxyOptions;
   Property Active;
- Private
  Public
   Constructor Create(AOwner: TComponent);Override;
- Published
 End;
 
 //PoolerDB Control
@@ -804,6 +805,173 @@ Type
   Property    PoolerOffMessage : String        Read vMessagePoolerOff Write vMessagePoolerOff;
   Property    AccessTag        : String        Read vAccessTag        Write vAccessTag;
   Property    ParamCreate      : Boolean       Read vParamCreate      Write vParamCreate;
+End;
+
+Type
+ TRESTDWClientRESTBase = Class(TRESTDWComponent) //Novo Componente de Acesso a Requisições REST para o Servidores Diversos
+ Private
+  //Variáveis, Procedures e Funções Privadas
+  vRSCharset           : TEncodeSelect;
+  vRedirectMaximum     : Integer;
+  vDefaultCustomHeader : TStrings;
+  vOnWorkBegin,
+  vOnWork              : TOnWork;
+  vOnWorkEnd           : TOnWorkEnd;
+  vOnStatus            : TOnStatus;
+  vAuthOptionParams    : TRESTDWClientAuthOptionParams;
+  vMaxAuthRetries      : Integer;
+  vAUrl,
+  vContentEncoding,
+  vAccept,
+  vAccessControlAllowOrigin,
+  vUserAgent,
+  vAcceptEncoding,
+  vUrl,
+  vContentType         : String;
+  vUseSSL              : Boolean;
+  vConnectTimeOut,
+  vRequestTimeOut      : Integer;
+  vOnBeforeGet         : TPrepareGet;
+  vOnBeforePost,
+  vOnBeforePut,
+  vOnBeforeDelete,
+  vOnBeforePatch       : TPrepareEvent;
+  vOnAfterRequest      : TAfterRequest;
+  vOnHeadersAvailable  : TOnHeadersAvailable;
+  Procedure SetAuthOptionParams(Value    : TRESTDWClientAuthOptionParams);
+  Procedure SetDefaultCustomHeader(Value : TStrings);
+  Function  GetUseSSL                    : Boolean;
+ Public
+  Procedure SetHeaders (AHeaders         : TStringList); Virtual;
+  Procedure SetUseSSL  (Value            : Boolean);     Virtual;
+  Procedure SetOnWork          (Value    : TOnWork);     Virtual;
+  Procedure SetOnWorkBegin     (Value    : TOnWork);     Virtual;
+  Procedure SetOnWorkEnd       (Value    : TOnWorkEnd);  Virtual;
+  Procedure SetOnStatus        (Value    : TOnStatus);   Virtual;
+  Constructor Create           (AOwner   : TComponent);Override;
+  Destructor  Destroy;Override;
+  Function   Get       (AUrl            : String         = '';
+                        CustomHeaders   : TStringList    = Nil;
+                        Const AResponse : TStream        = Nil;
+                        IgnoreEvents    : Boolean        = False):Integer;Overload;Virtual;
+  Function   Get       (AUrl            : String         = '';
+                        CustomHeaders   : TStringList    = Nil;
+                        IgnoreEvents    : Boolean        = False):String; Overload;Virtual;
+  Function   Post      (AUrl             : String         = '';
+                        CustomHeaders    : TStringList    = Nil;
+                        Const CustomBody : TStream        = Nil;
+                        IgnoreEvents     : Boolean        = False;
+                        RawHeaders       : Boolean        = False):Integer;Overload;Virtual;
+  Function   Post      (AUrl            : String         = '';
+                        CustomHeaders   : TStringList    = Nil;
+                        FileName        : String         = '';
+                        FileStream      : TStream        = Nil;
+                        Const AResponse : TStream        = Nil;
+                        IgnoreEvents    : Boolean        = False;
+                        RawHeaders      : Boolean        = False):Integer;Overload;Virtual;
+  Function   Post      (AUrl            : String;
+                        var AResponseText : String;
+                        CustomHeaders   : TStringList    = Nil;
+                        CustomParams    : TStringList    = Nil;
+                        Const CustomBody : TStream        = Nil;
+                        Const AResponse : TStream        = Nil;
+                        IgnoreEvents    : Boolean        = False;
+                        RawHeaders      : Boolean        = False):Integer;Overload;Virtual;
+  Function   Post      (AUrl            : String;
+                        CustomHeaders   : TStringList    = Nil;
+                        CustomParams    : TStringList    = Nil;
+                        FileName        : String         = '';
+                        FileStream      : TStream        = Nil;
+                        Const AResponse : TStream        = Nil;
+                        IgnoreEvents    : Boolean        = False;
+                        RawHeaders      : Boolean        = False):Integer;Overload;Virtual;
+  Function   Put       (AUrl            : String         = '';
+                        CustomHeaders   : TStringList    = Nil;
+                        Const AResponse : TStream        = Nil;
+                        IgnoreEvents    : Boolean        = False):Integer;Overload;Virtual;
+  Function   Put       (AUrl            : String         = '';
+                        CustomHeaders    : TStringList    = Nil;
+                        Const CustomBody : TStream        = Nil;
+                        Const AResponse  : TStream        = Nil;
+                        IgnoreEvents     : Boolean        = False):Integer;Overload;Virtual;
+  Function   Put       (AUrl             : String         = '';
+                        CustomHeaders    : TStringList    = Nil;
+                        FileName         : String         = '';
+                        FileStream       : TStream        = Nil;
+                        Const AResponse  : TStream        = Nil;
+                        IgnoreEvents     : Boolean        = False):Integer;Overload;Virtual;
+  Function   Put       (AUrl            : String         = '';
+                        CustomHeaders    : TStringList    = Nil;
+                        CustomParams     : TStringList    = Nil;
+                        Const CustomBody : TStream        = Nil;
+                        Const AResponse  : TStream        = Nil;
+                        IgnoreEvents     : Boolean        = False):Integer;Overload;Virtual;
+  Function   Put       (AUrl            : String         = '';
+                        CustomHeaders    : TStringList    = Nil;
+                        CustomParams     : TStringList    = Nil;
+                        FileName         : String         = '';
+                        FileStream       : TStream        = Nil;
+                        Const AResponse  : TStream        = Nil;
+                        IgnoreEvents     : Boolean        = False):Integer;Overload;Virtual;
+  Function   Patch     (AUrl            : String         = '';
+                        CustomHeaders   : TStringList    = Nil;
+                        Const AResponse : TStream        = Nil;
+                        IgnoreEvents    : Boolean        = False):Integer;Overload;Virtual;
+  Function   Patch     (AUrl            : String         = '';
+                        CustomHeaders   : TStringList    = Nil;
+                        CustomBody      : TStream        = Nil;
+                        Const AResponse : TStream        = Nil;
+                        IgnoreEvents    : Boolean        = False):Integer;Overload;Virtual;
+  Function   Patch     (AUrl            : String         = '';
+                        CustomHeaders   : TStringList    = Nil;
+                        CustomParams    : TStringList    = Nil;
+                        CustomBody      : TStream        = Nil;
+                        Const AResponse : TStream        = Nil;
+                        IgnoreEvents    : Boolean        = False):Integer;Overload;Virtual;
+  Function   Patch     (AUrl            : String         = '';
+                        CustomHeaders   : TStringList    = Nil;
+                        CustomParams    : TStringList    = Nil;
+                        FileName        : String         = '';
+                        FileStream      : TStream        = Nil;
+                        Const AResponse : TStream        = Nil;
+                        IgnoreEvents    : Boolean        = False):Integer;Overload;Virtual;
+  Function   Delete    (AUrl            : String         = '';
+                        CustomHeaders   : TStringList    = Nil;
+                        Const AResponse : TStream        = Nil;
+                        IgnoreEvents    : Boolean        = False):Integer;Overload;Virtual;
+  Function   Delete    (AUrl              : String;
+                        CustomHeaders     : TStringList  = Nil;
+                        CustomParams      : TStringList  = Nil;
+                        Const AResponse   : TStream      = Nil;
+                        IgnoreEvents      : Boolean      = False):Integer;Overload;Virtual;
+  Property ActiveRequest            : String                      Read vUrl                      Write vUrl;
+ Published
+  Property UseSSL                   : Boolean                     Read GetUseSSL                 Write SetUseSSL;
+  Property UserAgent                : String                      Read vUserAgent                Write vUserAgent;
+  Property Accept                   : String                      Read vAccept                   Write vAccept;
+  Property AcceptEncoding           : String                      Read vAcceptEncoding           Write vAcceptEncoding;
+  Property ContentEncoding          : String                      Read vContentEncoding          Write vContentEncoding;
+  Property MaxAuthRetries           : Integer                     Read vMaxAuthRetries           Write vMaxAuthRetries;
+  Property ContentType              : String                      Read vContentType              Write vContentType;
+  Property RequestCharset           : TEncodeSelect               Read vRSCharset                Write vRSCharset;
+  Property DefaultCustomHeader      : TStrings                    Read vDefaultCustomHeader      Write SetDefaultCustomHeader;
+  Property RequestTimeOut           : Integer                     Read vRequestTimeOut           Write vRequestTimeOut;
+  Property ConnectTimeOut           : Integer                     Read vConnectTimeOut           Write vConnectTimeOut;
+  Property RedirectMaximum          : Integer                     Read vRedirectMaximum          Write vRedirectMaximum;
+  Property AuthenticationOptions    : TRESTDWClientAuthOptionParams Read vAuthOptionParams      Write SetAuthOptionParams;
+  Property AccessControlAllowOrigin : String                      Read vAccessControlAllowOrigin Write vAccessControlAllowOrigin;
+  Property OnWork                   : TOnWork                     Read vOnWork                   Write SetOnWork;
+  Property OnWorkBegin              : TOnWork                     Read vOnWorkBegin              Write SetOnWorkBegin;
+  Property OnWorkEnd                : TOnWorkEnd                  Read vOnWorkEnd                Write SetOnWorkEnd;
+  Property OnStatus                 : TOnStatus                   Read vOnStatus                 Write SetOnStatus;
+  Property OnBeforeGet              : TPrepareGet                 Read vOnBeforeGet              Write vOnBeforeGet;
+  Property OnBeforePost             : TPrepareEvent               Read vOnBeforePost             Write vOnBeforePost;
+  Property OnBeforePut              : TPrepareEvent               Read vOnBeforePut              Write vOnBeforePut;
+  Property OnBeforeDelete           : TPrepareEvent               Read vOnBeforeDelete           Write vOnBeforeDelete;
+  Property OnBeforePatch            : TPrepareEvent               Read vOnBeforePatch            Write vOnBeforePatch;
+  Property OnAfterRequest           : TAfterRequest               Read vOnAfterRequest           Write vOnAfterRequest;
+  // Add event OnHeaders - Ico Menezes
+  Property OnHeadersAvailable       : TOnHeadersAvailable         Read vOnHeadersAvailable       Write vOnHeadersAvailable;
 End;
 
 Implementation
@@ -1077,7 +1245,7 @@ Begin
  {$ENDIF}
 End;
 
-Procedure TRESTClientPoolerBase.SetOnWorkBegin(Value : TOnWorkBegin);
+Procedure TRESTClientPoolerBase.SetOnWorkBegin(Value : TOnWork);
 Begin
  {$IFDEF FPC}
   vOnWorkBegin            := Value;
@@ -1560,6 +1728,2664 @@ Begin
  vServerContext := LowerCase(Value);
 End;
 
+Function TRESTServiceBase.CommandExec(Url,
+                                      RawHTTPCommand,
+                                      ContentType         : String;
+                                      RawHeaders,
+                                      Params              : TStrings;
+                                      QueryParams         : String;
+                                      ContentStringStream : TStream;
+                                      Var sCharSet,
+                                      ErrorMessage        : String;
+                                      Var StatusCode      : Integer;
+                                      Const ResultStream  : TStream) : Boolean;
+Var
+ aParamsCount,
+ I, vErrorCode      : Integer;
+ JsonMode           : TJsonMode;
+ DWParamsD,
+ DWParams           : TRESTDWParams;
+ vOldMethod,
+ vBasePath,
+ vObjectName,
+ vAccessTag,
+ vWelcomeMessage,
+ boundary,
+ startboundary,
+ vReplyString,
+ vReplyStringResult,
+ vUrlToken,
+ baseEventUnit,
+ serverEventsName,
+ Cmd, vmark,
+ aurlContext,
+ tmp, JSONStr,
+ ReturnObject,
+ vTempText,
+ sFile,
+ sContentType,
+ vContentType,
+ LocalDoc,
+ vIPVersion,
+ vErrorMessage,
+ aToken,
+ vToken,
+ vDataBuff,
+ vCORSOption,
+ vAuthenticationString : String;
+ vAuthTokenParam       : TRESTDWAuthTokenParam;
+ vdwConnectionDefs     : TConnectionDefs;
+ vTempServerMethods    : TObject;
+// newdecoder,
+// Decoder             : TIdMessageDecoder;
+ vRDWAuthOptionParam   : TRESTDWAuthOptionParam;
+ JSONParam             : TJSONParam;
+ JSONValue             : TJSONValue;
+ vAcceptAuth,
+ vMetadata,
+ vBinaryCompatibleMode,
+ vBinaryEvent,
+ dwassyncexec,
+ vFileExists,
+ vSpecialServer,
+ vServerContextCall,
+ vTagReply,
+ WelcomeAccept,
+ encodestrings,
+ compresseddata,
+ vdwCriptKey,
+ vGettoken,
+ vTokenValidate,
+ vNeedAuthorization,
+ vCompareContext,
+ msgEnd              : Boolean;
+ vServerBaseMethod   : TComponentClass;
+ vServerMethod       : TComponentClass;
+ vUriOptions         : TRESTDWUriOptions;
+ ServerContextStream : TMemoryStream;
+ mb,
+ mb2,
+ ms                  : TStringStream;
+ RequestType         : TRequestType;
+ vRequestHeader,
+ vDecoderHeaderList  : TStringList;
+ vTempContext        : TRESTDWContext;
+ vTempEvent          : TDWEvent;
+ Function ExcludeTag(Value : String) : String;
+ Begin
+  Result := Value;
+  If (UpperCase(Copy (Value, InitStrPos, 3)) = 'GET')    or
+     (UpperCase(Copy (Value, InitStrPos, 4)) = 'POST')   or
+     (UpperCase(Copy (Value, InitStrPos, 3)) = 'PUT')    or
+     (UpperCase(Copy (Value, InitStrPos, 6)) = 'DELETE') or
+     (UpperCase(Copy (Value, InitStrPos, 5)) = 'PATCH')  Then
+   Begin
+    While (Result <> '') And (Result[InitStrPos] <> '/') Do
+     Delete(Result, 1, 1);
+   End;
+  If Result <> '' Then
+   If Result[InitStrPos] = '/' Then
+    Delete(Result, 1, 1);
+  Result := Trim(Result);
+ End;
+ Function GetFileOSDir(Value : String) : String;
+ Begin
+  {$IF Defined(ANDROID) Or Defined(IOS)}
+  Result := System.IOUtils.TPath.Combine(System.IOUtils.TPath.GetDocumentsPath, Value);
+  {$ELSE}
+  Result := vBasePath + Value;
+  {$IFEND}
+  {$IFDEF MSWINDOWS}
+   Result := StringReplace(Result, '/', '\', [rfReplaceAll]);
+  {$ENDIF}
+ End;
+ Function GetLastMethod(Value : String) : String;
+ Var
+  I : Integer;
+ Begin
+  Result := '';
+  If Value <> '' Then
+   Begin
+    If Value[Length(Value) - FinalStrPos] <> '/' Then
+     Begin
+      For I := (Length(Value) - FinalStrPos) Downto InitStrPos Do
+       Begin
+        If Value[I] <> '/' Then
+         Result := Value[I] + Result
+        Else
+         Break;
+       End;
+     End;
+   End;
+ End;
+ procedure ReadRawHeaders;
+ var
+  I: Integer;
+  JSONParam : TJSONParam;
+ begin
+  If RawHeaders = Nil Then
+   Exit;
+  Try
+   If RawHeaders.Count > 0 Then
+    Begin
+     vRequestHeader.Add(RawHeaders.Text);
+     For I := 0 To RawHeaders.Count -1 Do
+      Begin
+       tmp := RawHeaders.Names[I];
+       If pos('dwwelcomemessage', lowercase(tmp)) > 0 Then
+        vWelcomeMessage := DecodeStrings(RawHeaders.Values[tmp]{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+       Else If pos('dwaccesstag', lowercase(tmp)) > 0 Then
+        vAccessTag := DecodeStrings(RawHeaders.Values[tmp]{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+       Else If pos('datacompression', lowercase(tmp)) > 0 Then
+        compresseddata := StringToBoolean(RawHeaders.Values[tmp])
+       Else If pos('dwencodestrings', lowercase(tmp)) > 0 Then
+        encodestrings  := StringToBoolean(RawHeaders.Values[tmp])
+       Else If pos('dwusecript', lowercase(tmp)) > 0 Then
+        vdwCriptKey    := StringToBoolean(RawHeaders.Values[tmp])
+       Else If (pos('dwassyncexec', lowercase(tmp)) > 0) And (Not (dwassyncexec)) Then
+        dwassyncexec   := StringToBoolean(RawHeaders.Values[tmp])
+       Else if pos('binaryrequest', lowercase(tmp)) > 0 Then
+        vBinaryEvent   := StringToBoolean(RawHeaders.Values[tmp])
+       Else If pos('dwconnectiondefs', lowercase(tmp)) > 0 Then
+        Begin
+         vdwConnectionDefs   := TConnectionDefs.Create;
+         JSONValue           := TJSONValue.Create;
+         Try
+          JSONValue.Encoding  := vEncoding;
+          JSONValue.Encoded  := True;
+          JSONValue.LoadFromJSON(RawHeaders.Values[tmp]);
+          vdwConnectionDefs.LoadFromJSON(JSONValue.Value);
+         Finally
+          FreeAndNil(JSONValue);
+         End;
+        End
+       Else If pos('dwservereventname', lowercase(tmp)) > 0  Then
+        Begin
+         JSONValue           := TJSONValue.Create;
+         Try
+          JSONValue.Encoding  := vEncoding;
+          JSONValue.Encoded  := True;
+          {$IFDEF FPC}
+          JSONValue.DatabaseCharSet := vDatabaseCharSet;
+          {$ENDIF}
+          JSONValue.LoadFromJSON(RawHeaders.Values[tmp]);
+          If ((vUriOptions.BaseServer = '')  And
+              (vUriOptions.DataUrl    = '')) And
+             (vUriOptions.ServerEvent <> '') Then
+           vUriOptions.BaseServer := vUriOptions.ServerEvent
+          Else If ((vUriOptions.BaseServer <> '') And
+                   (vUriOptions.DataUrl    = '')) And
+                  (vUriOptions.ServerEvent <> '') And
+                   (vServerContext = '')          Then
+           Begin
+            vUriOptions.DataUrl    := vUriOptions.BaseServer;
+            vUriOptions.BaseServer := vUriOptions.ServerEvent;
+           End;
+          vUriOptions.ServerEvent := JSONValue.Value;
+          If Pos('.', vUriOptions.ServerEvent) > 0 Then
+           Begin
+            baseEventUnit := Copy(vUriOptions.ServerEvent, InitStrPos, Pos('.', vUriOptions.ServerEvent) - 1 - FinalStrPos);
+            vUriOptions.ServerEvent    := Copy(vUriOptions.ServerEvent, Pos('.', vUriOptions.ServerEvent) + 1, Length(vUriOptions.ServerEvent));
+           End;
+         Finally
+          FreeAndNil(JSONValue);
+         End;
+        End
+       Else
+        Begin
+         aParamsCount := cParamsCount;
+         If ServerContext <> '' Then
+          Inc(aParamsCount);
+         If vDataRouteList.Count > 0 Then
+          Inc(aParamsCount);
+         If Not Assigned(DWParams) Then
+          TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                                               {$ELSE}Url{$IFEND}
+                                                                                               {$ELSE}Url{$ENDIF},
+                                            QueryParams,
+                                            vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
+         try
+          JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+          JSONParam.ObjectDirection := odIN;
+          JSONParam.ParamName       := lowercase(tmp);
+          {$IFDEF FPC}
+          JSONParam.DatabaseCharSet := vDatabaseCharSet;
+          {$ENDIF}
+          tmp                       := RawHeaders.Values[tmp];
+          If (Pos(LowerCase('{"ObjectType":"toParam", "Direction":"'), LowerCase(tmp)) > 0) Then
+           JSONParam.FromJSON(tmp)
+          Else
+           JSONParam.AsString  := tmp;
+          DWParams.Add(JSONParam);
+         Finally
+         End;
+        End;
+      End;
+    End;
+  Finally
+   If RawHeaders <> Nil Then
+    DWParams.RequestHeaders.Input.Assign(RawHeaders);
+   tmp := '';
+  End;
+ end;
+// Procedure MyDecodeAndSetParams(ARequestInfo: TIdHTTPRequestInfo);
+// Var
+//  i, j      : Integer;
+//  value, s  : String;
+//  {$IFNDEF FPC}
+//    {$IF (DEFINED(OLDINDY))}
+//     LEncoding : TIdTextEncoding
+//    {$ELSE}
+//     LEncoding : IIdTextEncoding
+//    {$IFEND}
+//  {$ELSE}
+//   LEncoding : IIdTextEncoding
+//  {$ENDIF};
+// Begin
+//  If CharSet <> '' Then
+//   LEncoding := CharsetToEncoding(CharSet)
+//  Else
+//  {$IFNDEF FPC}
+//    {$IF (DEFINED(OLDINDY))}
+//     LEncoding := enDefault;
+//    {$ELSE}
+//     LEncoding := IndyTextEncoding_UTF8;
+//    {$IFEND}
+//  {$ELSE}
+//   LEncoding := IndyTextEncoding_UTF8;
+//  {$ENDIF};
+//  value := RawHeaders.Text;
+//  Try
+//   i := 1;
+//   While i <= Length(value) Do
+//    Begin
+//     j := i;
+//     While (j <= Length(value)) And (value[j] <> '&') Do
+//      Inc(j);
+//     s := StringReplace(Copy(value, i, j-i), '+', ' ', [rfReplaceAll]);
+//     Params.Add(TIdURI.URLDecode(s{$IFNDEF FPC}{$IF Not(DEFINED(OLDINDY))}, LEncoding{$IFEND}{$ELSE}, LEncoding{$ENDIF}));
+//     i := j + 1;
+//    End;
+//  Finally
+//  End;
+// End;
+ Procedure DestroyComponents;
+ Begin
+  If Assigned(DWParams) Then
+   FreeAndNil(DWParams);
+  If Assigned(vUriOptions) Then
+   FreeAndNil(vUriOptions);
+  If Assigned(vdwConnectionDefs) Then
+   FreeAndNil(vdwConnectionDefs);
+  If Assigned(vRequestHeader)    Then
+   FreeAndNil(vRequestHeader);
+  If Assigned(vAuthTokenParam)   Then
+   FreeAndNil(vAuthTokenParam);
+  If Assigned(vRDWAuthOptionParam) Then
+   FreeAndNil(vRDWAuthOptionParam);
+  If Assigned(vAuthTokenParam) Then
+   FreeAndNil(vAuthTokenParam);
+  If Assigned(vServerMethod) Then
+   If Assigned(vTempServerMethods) Then
+    Begin
+     Try
+      {$IFDEF POSIX} //no linux nao precisa libertar porque é [weak]
+      {$ELSE}
+      FreeAndNil(vTempServerMethods); //.free;
+      {$ENDIF}
+     Except
+     End;
+    End;
+ End;
+ Function ReturnEventValidation(ServerMethodsClass : TComponent;
+                                Pooler,
+                                urlContext         : String) : TDWEvent;
+ Var
+  vTagService : Boolean;
+  I           : Integer;
+ Begin
+  Result        := Nil;
+  vTagService   := False;
+  If ServerMethodsClass <> Nil Then
+   Begin
+    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+     Begin
+      If ServerMethodsClass.Components[i] is TRESTDWServerEvents Then
+       Begin
+        If (LowerCase(urlContext) = LowerCase(TRESTDWServerEvents(ServerMethodsClass.Components[i]).ContextName)) Or
+           (LowerCase(urlContext) = LowerCase(ServerMethodsClass.Components[i].Name))  Or
+           (LowerCase(urlContext) = LowerCase(ServerMethodsClass.classname + '.' +
+                                              ServerMethodsClass.Components[i].Name))  Then
+         vTagService := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler] <> Nil;
+        If vTagService Then
+         Begin
+          Result   := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler];
+          Break;
+         End;
+       End;
+     End;
+   End;
+ End;
+ Function ReturnContextValidation(ServerMethodsClass : TComponent;
+                                  Var UriOptions     : TRESTDWUriOptions) : TRESTDWContext;
+ Var
+  I            : Integer;
+  vTagService  : Boolean;
+  aEventName,
+  aServerEvent,
+  vRootContext : String;
+ Begin
+  Result        := Nil;
+  vRootContext  := '';
+  aEventName    := UriOptions.EventName;
+  aServerEvent  := UriOptions.ServerEvent;
+  If (aEventName <> '') And (aServerEvent = '') Then
+   Begin
+    aServerEvent := aEventName;
+    aEventName   := '';
+   End;
+  If ServerMethodsClass <> Nil Then
+   Begin
+    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+     Begin
+      If ServerMethodsClass.Components[i] is TRESTDWServerContext Then
+       Begin
+        If ((LowerCase(aServerEvent) = LowerCase(TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseContext))) Or
+           ((Trim(TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseContext) = '') And (aEventName = '')      And
+            (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aServerEvent] <> Nil))   Then
+         Begin
+          vRootContext := TRESTDWServerContext(ServerMethodsClass.Components[i]).RootContext;
+          If ((aEventName = '')    And (vRootContext <> '')) Then
+           aEventName := vRootContext;
+          vTagService := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aEventName] <> Nil;
+          If vTagService Then
+           Begin
+            Result := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aEventName];
+            Break;
+           End;
+         End;
+       End;
+     End;
+   End;
+ End;
+ Function ClearRequestType(Value : String) : String;
+ Begin
+  Result := Value;
+  If (Pos('GET ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'GET ', '', [rfReplaceAll, rfIgnoreCase])
+  Else If (Pos('POST ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'POST ', '', [rfReplaceAll, rfIgnoreCase])
+  Else If (Pos('PUT ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'PUT ', '', [rfReplaceAll, rfIgnoreCase])
+  Else If (Pos('DELETE ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'DELETE ', '', [rfReplaceAll, rfIgnoreCase])
+  Else If (Pos('PATCH ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'PATCH ', '', [rfReplaceAll, rfIgnoreCase]);
+ End;
+ Function CompareBaseURL(Var Value : String) : Boolean;
+ Var
+  vTempValue : String;
+ Begin
+  Result := False;
+  If aDefaultUrl <> '' Then
+   Begin
+    If Value = '/' Then
+     Value := aDefaultUrl
+    Else
+     Begin
+      vTempValue := Copy(Value, InitStrPos, Length(aDefaultUrl));
+      If Lowercase(vTempValue) <> Lowercase(aDefaultUrl) Then
+       Begin
+        Value  := aDefaultUrl + Value;
+        Result := True;
+       End;
+     End;
+   End;
+ End;
+Begin
+ Result                := False;
+ vRDWAuthOptionParam   := Nil;
+ mb2                   := Nil;
+ mb                    := Nil;
+ ms                    := Nil;
+ vAuthTokenParam       := Nil;
+ tmp                   := '';
+ vIPVersion            := 'ipv4';
+ JsonMode              := jmDataware;
+ baseEventUnit         := '';
+ vAccessTag            := '';
+ vErrorMessage         := '';
+ vServerMethod         := Nil;
+ aParamsCount          := cParamsCount;
+ vUriOptions           := TRESTDWUriOptions.Create;
+ {$IF Defined(ANDROID) Or Defined(IOS)}
+ vBasePath             := System.IOUtils.TPath.Combine(System.IOUtils.TPath.GetDocumentsPath, '/');
+ {$ELSE}
+ vBasePath             := ExtractFilePath(ParamStr(0));
+ {$IFEND}
+ vContentType          := vContentType;
+ vdwConnectionDefs     := Nil;
+ vTempServerMethods    := Nil;
+ DWParams              := Nil;
+ ServerContextStream   := Nil;
+ mb                    := Nil;
+ compresseddata        := False;
+ encodestrings         := False;
+ vTagReply             := False;
+ vServerContextCall    := False;
+ dwassyncexec          := False;
+ vBinaryEvent          := False;
+ vBinaryCompatibleMode := False;
+ vMetadata             := False;
+ vdwCriptKey           := False;
+ vGettoken             := False;
+ vTokenValidate        := False;
+ vErrorCode            := 200;
+ vToken                := '';
+ vDataBuff             := '';
+ vRequestHeader        := TStringList.Create;
+ vCompareContext       := False;
+ Cmd                   := RemoveBackslashCommands(Trim(RawHTTPCommand));
+// MyDecodeAndSetParams(ARequestInfo);
+
+ {Try tranferido para este ponto - remoção memory Leaks - Eloy}
+
+ Try
+  sCharSet := '';
+  If (UpperCase(Copy (Cmd, 1, 3)) = 'GET')    Then
+   Begin
+    If     (Pos('.HTML', UpperCase(Cmd)) > 0) Then
+     Begin
+      sContentType:='text/html';
+      sCharSet := 'utf-8';
+     End
+    Else If (Pos('.PNG', UpperCase(Cmd)) > 0) Then
+     sContentType := 'image/png'
+    Else If (Pos('.ICO', UpperCase(Cmd)) > 0) Then
+     sContentType := 'image/ico'
+    Else If (Pos('.GIF', UpperCase(Cmd)) > 0) Then
+     sContentType := 'image/gif'
+    Else If (Pos('.JPG', UpperCase(Cmd)) > 0) Then
+     sContentType := 'image/jpg'
+    Else If (Pos('.JS',  UpperCase(Cmd)) > 0) Then
+     sContentType := 'application/javascript'
+    Else If (Pos('.PDF', UpperCase(Cmd)) > 0) Then
+     sContentType := 'application/pdf'
+    Else If (Pos('.CSS', UpperCase(Cmd)) > 0) Then
+     sContentType:='text/css';
+    {$IFNDEF FPC}
+     {$if CompilerVersion > 21}
+      If DefaultBaseContext <> '' Then
+       Begin
+        sFile := Url;
+        vTempText := IncludeTrailingPathDelimiter(DefaultBaseContext);
+        {$IFDEF MSWINDOWS}
+         vTempText := StringReplace(vTempText, '\', '/', [rfReplaceAll]);
+         vTempText := StringReplace(vTempText, '//', '/', [rfReplaceAll]);
+        {$ENDIF}
+        If Pos(vTempText, sFile) >= InitStrPos Then
+         Delete(sFile, Pos(vTempText, sFile) - FinalStrPos, Length(vTempText));
+        sFile := FRootPath + vTempText + sFile;
+       End
+      Else
+       sFile := FRootPath + Url;
+     {$ELSE}
+      If DefaultBaseContext <> '' Then
+       Begin
+        sFile := Url;
+        vTempText := IncludeTrailingPathDelimiter(DefaultBaseContext);
+        {$IFDEF MSWINDOWS}
+         vTempText := StringReplace(vTempText, '\', '/', [rfReplaceAll]);
+         vTempText := StringReplace(vTempText, '//', '/', [rfReplaceAll]);
+        {$ENDIF}
+        If Pos(vTempText, sFile) >= InitStrPos Then
+         Delete(sFile, Pos(vTempText, sFile) - FinalStrPos, Length(vTempText));
+        sFile := FRootPath + vTempText + sFile;
+       End
+      Else
+       sFile := FRootPath + Url;
+     {$IFEND}
+    {$ELSE}
+     sFile := FRootPath  + Url;
+    {$ENDIF}
+    {$IFDEF MSWINDOWS}
+     sFile := StringReplace(sFile, '/', '\', [rfReplaceAll]);
+     sFile := StringReplace(sFile, '\\', '\', [rfReplaceAll]);
+    {$ENDIF}
+    If (vPathTraversalRaiseError) And
+       (RESTDWFileExists(sFile, FRootPath)) And
+       (SystemProtectFiles(sFile)) Then
+     Begin
+      StatusCode               := 404;
+      If compresseddata Then
+       mb                                  := TStringStream(ZCompressStreamNew(cEventNotFound))
+      Else
+       mb                                  := TStringStream.Create(cEventNotFound{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+      mb.Position                          := 0;
+      ResultStream.CopyFrom(mb, mb.Size);
+      FreeAndNil(mb);
+      DestroyComponents;
+      Exit;
+     End;
+    If RESTDWFileExists(sFile, FRootPath) then
+     Begin
+      ContentType   := GetMIMEType(sFile);
+      ServerContextStream := TMemoryStream.Create;
+      ServerContextStream.LoadFromFile(sFile);
+      ServerContextStream.Position := 0;
+      ResultStream.CopyFrom(ServerContextStream, ServerContextStream.Size);
+      FreeAndNil(ServerContextStream);
+      DestroyComponents;
+      Exit;
+     End;
+   End;
+  If (vPathTraversalRaiseError) And (TravertalPathFind(Trim(RawHTTPCommand))) Then
+   Begin
+    StatusCode                            := 404;
+    If compresseddata Then
+     mb                                  := TStringStream(ZCompressStreamNew(cEventNotFound))
+    Else
+     mb                                  := TStringStream.Create(cEventNotFound{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+    mb.Position                          := 0;
+    ResultStream.CopyFrom(mb, mb.Size);
+    FreeAndNil(mb);
+    DestroyComponents;
+    Exit;
+   End;
+  Cmd := RemoveBackslashCommands(Trim(RawHTTPCommand));
+  vRequestHeader.Add(Cmd);
+  Cmd := StringReplace(Cmd, ' HTTP/1.0', '', [rfReplaceAll]);
+  Cmd := StringReplace(Cmd, ' HTTP/1.1', '', [rfReplaceAll]);
+  Cmd := StringReplace(Cmd, ' HTTP/2.0', '', [rfReplaceAll]);
+  Cmd := StringReplace(Cmd, ' HTTP/2.1', '', [rfReplaceAll]);
+  vCORSOption := UpperCase(Copy(Cmd, 1, 7));
+  If (UpperCase(Copy (Cmd, 1, 3)) = 'GET' )   OR
+     (UpperCase(Copy (Cmd, 1, 4)) = 'POST')   OR
+     (UpperCase(Copy (Cmd, 1, 3)) = 'PUT')    OR
+     (UpperCase(Copy (Cmd, 1, 4)) = 'DELE')   OR
+     (UpperCase(Copy (Cmd, 1, 4)) = 'PATC')   Then
+   Begin
+    RequestType := rtGet;
+    If (UpperCase(Copy (Cmd, 1, 4))      = 'POST') Then
+     RequestType := rtPost
+    Else If (UpperCase(Copy (Cmd, 1, 3)) = 'PUT')  Then
+     RequestType := rtPut
+    Else If (UpperCase(Copy (Cmd, 1, 4)) = 'DELE') Then
+     RequestType := rtDelete
+    Else If (UpperCase(Copy (Cmd, 1, 4)) = 'PATC') Then
+     RequestType := rtPatch;
+    {$IFNDEF FPC}
+     If {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                      {$ELSE}Url{$IFEND}
+                                      {$ELSE}Url{$ENDIF} = '/favicon.ico' Then
+      Exit;
+    {$ELSE}
+     If Url = '/favicon.ico' Then
+      Exit;
+    {$ENDIF}
+    Cmd := ClearRequestType(Cmd);
+    If (Cmd <> '/') And (Cmd <> '') Then
+     ReadRawHeaders;
+    vCompareContext := CompareBaseURL(Cmd); // := aDefaultUrl;
+    If Cmd <> '' Then
+     TDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vUriOptions, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+    If ((Params.Count > 0) And (RequestType In [rtGet, rtDelete])) Then
+     Begin
+      {$IFNDEF FPC}
+       vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                        {$ELSE}Url{$IFEND}
+                                                        {$ELSE}Url{$ENDIF});
+      {$ELSE}
+       vRequestHeader.Add(Url);
+      {$ENDIF}
+      vRequestHeader.Add(Params.Text);
+      vRequestHeader.Add(QueryParams);
+      aParamsCount := cParamsCount;
+      If ServerContext <> '' Then
+       Inc(aParamsCount);
+      If vDataRouteList.Count > 0 Then
+       Inc(aParamsCount);
+      TDataUtils.ParseWebFormsParams(Params, Url, QueryParams,
+                                     vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
+      If DWParams <> Nil Then
+       Begin
+        If (DWParams.ItemsString['dwwelcomemessage']     <> Nil)    Then
+         vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+        If (DWParams.ItemsString['dwaccesstag']          <> Nil)    Then
+         vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+        If (DWParams.ItemsString['datacompression']      <> Nil)    Then
+         compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+        If (DWParams.ItemsString['dwencodestrings']      <> Nil)    Then
+         encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+        If (DWParams.ItemsString['dwusecript']           <> Nil)    Then
+         vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
+        If (DWParams.ItemsString['BinaryCompatibleMode'] <> Nil)    Then
+         vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
+        If (DWParams.ItemsString['dwservereventname']    <> Nil)    Then
+         Begin
+          If (vUriOptions.ServerEvent <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString))) Then
+           Begin
+//            vUriOptions.ServerEvent := '';
+            If Not (DWParams.ItemsString['dwservereventname'].IsNull) Then
+             Begin
+              If ((vUriOptions.BaseServer = '')  And
+                  (vUriOptions.DataUrl    = '')) And
+                 (vUriOptions.ServerEvent <> '') Then
+               vUriOptions.BaseServer := vUriOptions.ServerEvent
+              Else If ((vUriOptions.BaseServer <> '') And
+                       (vUriOptions.DataUrl    = '')) And
+                      (vUriOptions.ServerEvent <> '') And
+                       (vServerContext = '')          Then
+               Begin
+                vUriOptions.DataUrl    := vUriOptions.BaseServer;
+                vUriOptions.BaseServer := vUriOptions.ServerEvent;
+               End;
+              vUriOptions.ServerEvent := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+             End;
+           End;
+         End;
+       End;
+     End
+    Else
+     Begin
+      If (RequestType In [rtGet, rtDelete]) Then
+       Begin
+        aurlContext  := vUriOptions.ServerEvent;
+        aParamsCount := cParamsCount;
+        If ServerContext <> '' Then
+         Inc(aParamsCount);
+        If vDataRouteList.Count > 0 Then
+         Inc(aParamsCount);
+        If Not Assigned(DWParams) Then
+         TDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                  {$ELSE}Url{$IFEND}
+                                                                  {$ELSE}Url{$ENDIF}, vEncoding, vUriOptions, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+        vOldMethod := vUriOptions.EventName;
+        If ((vUriOptions.BaseServer = '')   And
+            (vUriOptions.DataUrl    = ''))  And
+           ((vUriOptions.ServerEvent <> '') And
+            (vUriOptions.EventName = ''))   Then
+         vUriOptions.BaseServer := vUriOptions.ServerEvent
+        Else If ((vUriOptions.BaseServer <> '') And
+                 (vUriOptions.DataUrl    = '')) And
+                (vUriOptions.ServerEvent <> '') And
+                 (vServerContext = '')  Then
+         Begin
+          vUriOptions.DataUrl    := vUriOptions.BaseServer;
+          vUriOptions.BaseServer := vUriOptions.ServerEvent;
+         End;
+        If DWParams <> Nil Then
+         Begin
+          If DWParams.ItemsString['dwwelcomemessage']      <> Nil  Then
+           vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+          If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
+           vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+          If (DWParams.ItemsString['datacompression']      <> Nil) Then
+           compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+          If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
+           encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+          If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
+           Begin
+            If (vUriOptions.ServerEvent <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString))) Then
+             Begin
+              If ((vUriOptions.BaseServer = '')  And
+                  (vUriOptions.DataUrl    = '')) And
+                 (vUriOptions.ServerEvent <> '') Then
+               vUriOptions.BaseServer := vUriOptions.ServerEvent
+              Else If ((vUriOptions.BaseServer <> '') And
+                       (vUriOptions.DataUrl    = '')) And
+                      (vUriOptions.ServerEvent <> '') And
+                       (vServerContext = '')          Then
+               Begin
+                vUriOptions.DataUrl    := vUriOptions.BaseServer;
+                vUriOptions.BaseServer := vUriOptions.ServerEvent;
+               End;
+              vUriOptions.ServerEvent   := DWParams.ItemsString['dwservereventname'].AsString;
+             End;
+           End;
+          If (DWParams.ItemsString['dwusecript']           <> Nil) Then
+           vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
+          If (DWParams.ItemsString['dwassyncexec']         <> Nil) And (Not (dwassyncexec)) Then
+           dwassyncexec          := StringToBoolean(DWParams.ItemsString['dwassyncexec'].AsString);
+          If (DWParams.ItemsString['BinaryCompatibleMode'] <> Nil) Then
+           vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
+         End;
+        If (vUriOptions.ServerEvent = '') And (aurlContext <> '') Then
+         vUriOptions.ServerEvent := aurlContext;
+       End;
+      If (RequestType In [rtPut, rtPatch, rtDelete]) Then //New Code to Put
+       Begin
+        If QueryParams <> '' Then
+         Begin
+          TDataUtils.ParseFormParamsToDWParam(QueryParams, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+          If (DWParams.ItemsString['dwwelcomemessage']     <> Nil) Then
+           vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+          If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
+           vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+          If (DWParams.ItemsString['datacompression']      <> Nil) Then
+           compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+          If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
+           encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+          If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
+           Begin
+            If (vUriOptions.ServerEvent <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString))) Then
+             Begin
+              If ((vUriOptions.BaseServer = '')  And
+                  (vUriOptions.DataUrl    = '')) And
+                 (vUriOptions.ServerEvent <> '') Then
+               vUriOptions.BaseServer := vUriOptions.ServerEvent
+              Else If ((vUriOptions.BaseServer <> '') And
+                       (vUriOptions.DataUrl    = '')) And
+                      (vUriOptions.ServerEvent <> '') And
+                       (vServerContext = '')          Then
+               Begin
+                vUriOptions.DataUrl    := vUriOptions.BaseServer;
+                vUriOptions.BaseServer := vUriOptions.ServerEvent;
+               End;
+              vUriOptions.ServerEvent   := DWParams.ItemsString['dwservereventname'].AsString;
+             End;
+           End;
+          If (DWParams.ItemsString['dwusecript']           <> Nil) Then
+           vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
+          If (DWParams.ItemsString['dwassyncexec']         <> Nil) And (Not (dwassyncexec)) Then
+           dwassyncexec          := StringToBoolean(DWParams.ItemsString['dwassyncexec'].AsString);
+          If (DWParams.ItemsString['BinaryCompatibleMode'] <> Nil) Then
+           vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
+         End;
+       End;
+      If Assigned(ContentStringStream) Then
+       Begin
+         ContentStringStream.Position := 0;
+         If Not vBinaryEvent Then
+          Begin
+           Try
+            mb := TStringStream.Create(''); //{$IFNDEF FPC}{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+            try
+             mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
+             ContentStringStream.Position := 0;
+             mb.Position := 0;
+             If (pos('--', mb.DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+              Begin
+               msgEnd   := False;
+               boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
+               startboundary := '--' + boundary;
+               Repeat
+                tmp := ReadLnFromStream(ContentStringStream, -1, True);
+               Until tmp = startboundary;
+              End;
+            finally
+             if Assigned(mb) then
+              FreeAndNil(mb);
+            end;
+           Except
+           End;
+          End;
+        If (ContentStringStream.Size > 0) And (boundary <> '') Then
+         Begin
+          Try
+           Repeat
+            decoder := TIdMessageDecoderMIME.Create(nil);
+            TIdMessageDecoderMIME(decoder).MIMEBoundary := boundary;
+            decoder.SourceStream := ContentStringStream;
+            decoder.FreeSourceStream := False;
+            decoder.ReadHeader;
+            Inc(I);
+            Case Decoder.PartType of
+             mcptAttachment:
+              Begin
+               ms := TStringStream.Create('');
+               ms.Position := 0;
+               NewDecoder := Decoder.ReadBody(ms, MsgEnd);
+               vDecoderHeaderList := TStringList.Create;
+               vDecoderHeaderList.Assign(Decoder.Headers);
+               sFile := ExtractFileName(Decoder.FileName);
+               FreeAndNil(Decoder);
+               Decoder := NewDecoder;
+               If Decoder <> Nil Then
+                TIdMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
+               aParamsCount := cParamsCount;
+               If ServerContext <> '' Then
+                Inc(aParamsCount);
+               If vDataRouteList.Count > 0 Then
+                Inc(aParamsCount);
+               If Not Assigned(DWParams) Then
+                Begin
+                 If (Params.Count = 0) Then
+                  Begin
+                   DWParams           := TRESTDWParams.Create;
+                   DWParams.Encoding  := vEncoding;
+                  End
+                 Else
+                  TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                                                       {$ELSE}Url{$IFEND}
+                                                                                                       {$ELSE}Url{$ENDIF},
+                                                    QueryParams,
+                                                    vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
+                End;
+               JSONParam    := TJSONParam.Create(DWParams.Encoding);
+               JSONParam.ObjectDirection := odIN;
+               vObjectName  := '';
+               sContentType := '';
+               For I := 0 To vDecoderHeaderList.Count - 1 Do
+                Begin
+                 tmp := vDecoderHeaderList.Strings[I];
+                 If Pos('; name="', lowercase(tmp)) > 0 Then
+                  Begin
+                   vObjectName := Copy(lowercase(tmp),
+                                       Pos('; name="', lowercase(tmp)) + length('; name="'),
+                                       length(lowercase(tmp)));
+                   vObjectName := Copy(vObjectName, InitStrPos, Pos('"', vObjectName) -1);
+                  End;
+                 If Pos('content-type=', lowercase(tmp)) > 0 Then
+                  Begin
+                   sContentType := Copy(lowercase(tmp),
+                                       Pos('content-type=', lowercase(tmp)) + length('content-type='),
+                                       length(lowercase(tmp)));
+                  End;
+                End;
+                // Correção de FORM-DATA / FILE criar parametros automaticos: ICO 20-09-2019
+               If (vObjectName <> '') Then
+                JSONParam.ParamName        := vObjectName
+               Else
+                Begin
+                 vObjectName := 'dwfilename';
+                 JSONParam.ParamName       := vObjectName
+                End;
+               If (sContentType =  '') And
+                  (sFile        <> '') Then
+                vObjectName := GetMIMEType(sFile);
+               JSONParam.ParamName        := vObjectName;
+               JSONParam.ParamFileName    := sFile;
+               JSONParam.ParamContentType := sContentType;
+               ms.Position := 0;
+               If (sFile <> '') Then
+                JSONParam.LoadFromStream(ms)
+               Else If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(ms.DataString)) > 0) Then
+                JSONParam.FromJSON(ms.DataString)
+               Else
+                JSONParam.AsString := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
+               DWParams.Add(JSONParam);
+               //Fim da correção - ICO
+               ms.Free;
+               vDecoderHeaderList.Free;
+              End;
+             mcptText :
+              Begin
+               {$IFDEF FPC}
+               ms := TStringStream.Create('');
+               {$ELSE}
+               ms := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+               {$ENDIF}
+               ms.Position := 0;
+               newdecoder  := Decoder.ReadBody(ms, msgEnd);
+               tmp         := Decoder.Headers.Text;
+               FreeAndNil(Decoder);
+               Decoder     := newdecoder;
+               vObjectName := '';
+               If Decoder <> Nil Then
+                TIdMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
+               If pos('dwwelcomemessage', lowercase(tmp)) > 0      Then
+                vWelcomeMessage := DecodeStrings(ms.DataString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+               Else If pos('dwaccesstag', lowercase(tmp)) > 0      Then
+                vAccessTag := DecodeStrings(ms.DataString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+               Else If Pos('dwusecript', lowercase(tmp)) > 0       Then
+                vdwCriptKey  := StringToBoolean(ms.DataString)
+               Else If pos('datacompression', lowercase(tmp)) > 0  Then
+                compresseddata := StringToBoolean(ms.DataString)
+               Else If pos('dwencodestrings', lowercase(tmp)) > 0  Then
+                encodestrings  := StringToBoolean(ms.DataString)
+               Else If (Pos('dwassyncexec', lowercase(tmp)) > 0) And (Not (dwassyncexec)) Then
+                dwassyncexec := StringToBoolean(ms.DataString)
+               Else If Pos('binaryrequest', lowercase(tmp)) > 0    Then
+                vBinaryEvent := StringToBoolean(ms.DataString)
+               Else If pos('dwconnectiondefs', lowercase(tmp)) > 0 Then
+                Begin
+                 vdwConnectionDefs   := TConnectionDefs.Create;
+                 JSONValue           := TJSONValue.Create;
+                 Try
+                  JSONValue.Encoding  := vEncoding;
+                  JSONValue.Encoded  := True;
+                  JSONValue.LoadFromJSON(ms.DataString);
+                  vdwConnectionDefs.LoadFromJSON(JSONValue.Value);
+                 Finally
+                  FreeAndNil(JSONValue);
+                 End;
+                End
+               Else If pos('dwservereventname', lowercase(tmp)) > 0  Then
+                Begin
+                 JSONValue           := TJSONValue.Create;
+                 Try
+                  JSONValue.Encoding := vEncoding;
+                  JSONValue.Encoded  := True;
+                  JSONValue.LoadFromJSON(ms.DataString);
+                  If ((vUriOptions.BaseServer = '')  And
+                      (vUriOptions.DataUrl    = '')) And
+                     (vUriOptions.ServerEvent <> '') Then
+                   vUriOptions.BaseServer := vUriOptions.ServerEvent
+                  Else If ((vUriOptions.BaseServer <> '') And
+                           (vUriOptions.DataUrl    = '')) And
+                          (vUriOptions.ServerEvent <> '') And
+                           (vServerContext = '')  Then
+                   Begin
+                    vUriOptions.DataUrl    := vUriOptions.BaseServer;
+                    vUriOptions.BaseServer := vUriOptions.ServerEvent;
+                   End;
+                  vUriOptions.ServerEvent := JSONValue.Value;
+                  If Pos('.', vUriOptions.ServerEvent) > 0 Then
+                   Begin
+                    baseEventUnit       := Copy(vUriOptions.ServerEvent, InitStrPos, Pos('.', vUriOptions.ServerEvent) - 1 - FinalStrPos);
+                    vUriOptions.ServerEvent := Copy(vUriOptions.ServerEvent, Pos('.', vUriOptions.ServerEvent) + 1, Length(vUriOptions.ServerEvent));
+                   End;
+                 Finally
+                  FreeAndNil(JSONValue);
+                 End;
+                End
+               Else
+                Begin
+                 If DWParams = Nil Then
+                  Begin
+                   DWParams           := TRESTDWParams.Create;
+                   DWParams.Encoding  := vEncoding;
+                  End;
+                 If (lowercase(vObjectName) = 'binarydata') then
+                  Begin
+                   DWParams.LoadFromStream(ms);
+                   If Assigned(JSONParam) Then
+                    FreeAndNil(JSONParam);
+                   {$IFNDEF FPC}ms.Size := 0;{$ENDIF}
+                   FreeAndNil(ms);
+                   If DWParams <> Nil Then
+                    Begin
+                     If (DWParams.ItemsString['dwwelcomemessage']     <> Nil) Then
+                      vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                     If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
+                      vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                     If (DWParams.ItemsString['datacompression']      <> Nil) Then
+                      compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+                     If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
+                      encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+                     If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
+                      Begin
+                       If (vUriOptions.ServerEvent <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString))) Then
+                        Begin
+                         If ((vUriOptions.BaseServer = '')  And
+                             (vUriOptions.DataUrl    = '')) And
+                            (vUriOptions.ServerEvent <> '') Then
+                          vUriOptions.BaseServer := vUriOptions.ServerEvent
+                         Else If ((vUriOptions.BaseServer <> '') And
+                                  (vUriOptions.DataUrl    = '')) And
+                                 (vUriOptions.ServerEvent <> '') And
+                                  (vServerContext = '')          Then
+                          Begin
+                           vUriOptions.DataUrl    := vUriOptions.BaseServer;
+                           vUriOptions.BaseServer := vUriOptions.ServerEvent;
+                          End;
+                         vUriOptions.ServerEvent   := DWParams.ItemsString['dwservereventname'].AsString;
+                        End;
+                      End;
+                     If (DWParams.ItemsString['dwusecript']           <> Nil) Then
+                      vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
+                     If (DWParams.ItemsString['dwassyncexec']         <> Nil) And (Not (dwassyncexec)) Then
+                      dwassyncexec          := StringToBoolean(DWParams.ItemsString['dwassyncexec'].AsString);
+                     If (DWParams.ItemsString['binaryrequest']        <> Nil) Then
+                      vBinaryEvent          := StringToBoolean(DWParams.ItemsString['binaryrequest'].AsString);
+                     If (DWParams.ItemsString['BinaryCompatibleMode'] <> Nil) Then
+                      vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
+                    End;
+                   If Assigned(decoder) Then
+                    FreeAndNil(decoder);
+                   Continue;
+                  End;
+                 vObjectName := Copy(lowercase(tmp), Pos('; name="', lowercase(tmp)) + length('; name="'),  length(lowercase(tmp)));
+                 vObjectName := Copy(vObjectName, InitStrPos, Pos('"', vObjectName) -1);
+                 JSONParam   := TJSONParam.Create(DWParams.Encoding);
+                 JSONParam.ObjectDirection := odIN;
+                 If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(ms.DataString)) > 0) Then
+                  JSONParam.FromJSON(ms.DataString)
+                 Else
+                  JSONParam.AsString := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
+                 JSONParam.ParamName := vObjectName;
+                 DWParams.Add(JSONParam);
+                End;
+               {$IFNDEF FPC}ms.Size := 0;{$ENDIF}
+               FreeAndNil(ms);
+               If Assigned(Newdecoder)  Then
+                FreeAndNil(Newdecoder);
+              End;
+             mcptIgnore :
+              Begin
+               Try
+                If decoder <> Nil Then
+                 FreeAndNil(decoder);
+                decoder := TIdMessageDecoderMIME.Create(Nil);
+                TIdMessageDecoderMIME(decoder).MIMEBoundary := boundary;
+               Finally
+               End;
+              End;
+            {$IFNDEF FPC}
+             {$IF Not(DEFINED(OLDINDY))}
+             mcptEOF:
+              Begin
+               FreeAndNil(decoder);
+               msgEnd := True
+              End;
+             {$IFEND}
+            {$ELSE}
+             mcptEOF:
+              Begin
+               FreeAndNil(decoder);
+               msgEnd := True
+              End;
+            {$ENDIF}
+            End;
+           Until (Decoder = Nil) Or (msgEnd);
+          Finally
+           If Assigned(decoder) then
+            FreeAndNil(decoder);
+          End;
+         End
+        Else
+         Begin
+          If (ContentStringStream.Size > 0) And (boundary = '') Then
+           Begin
+            mb       := TStringStream.Create('');
+            Try
+             ContentStringStream.Position := 0;
+             mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
+             ContentStringStream.Position := 0;
+             mb.Position  := 0;
+             aParamsCount := cParamsCount;
+             If ServerContext <> '' Then
+              Inc(aParamsCount);
+             If vDataRouteList.Count > 0 Then
+              Inc(aParamsCount);
+             If Not Assigned(DWParams) Then
+              TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                                                   {$ELSE}Url{$IFEND}
+                                                                                                   {$ELSE}Url{$ENDIF},
+                                                QueryParams,
+                                                vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
+             {Alteração feita por Tiago IStuque - 28/12/2018}
+             If Assigned(DWParams.ItemsString['dwReadBodyRaw']) And (DWParams.ItemsString['dwReadBodyRaw'].AsString='1') Then
+              TDataUtils.ParseBodyRawToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+             Else If (Assigned(DWParams.ItemsString['dwReadBodyBin']) And
+                     (DWParams.ItemsString['dwReadBodyBin'].AsString='1')) Then
+              TDataUtils.ParseBodyBinToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+             Else If (vBinaryEvent) Then
+              Begin
+               If (pos('--', mb.DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+                Begin
+                 msgEnd   := False;
+                 {$IFNDEF FPC}
+                  {$IF (DEFINED(OLDINDY))}
+                   boundary := ExtractHeaderSubItem(ContentType, 'boundary');
+                  {$ELSE}
+                   boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
+                  {$IFEND}
+                 {$ELSE}
+                  boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
+                 {$ENDIF}
+                 startboundary := '--' + boundary;
+                 Repeat
+                  tmp := ReadLnFromStream(ContentStringStream, -1, True);
+                 Until tmp = startboundary;
+                End;
+                Try
+                 Repeat
+                  decoder := TIdMessageDecoderMIME.Create(nil);
+                  TIdMessageDecoderMIME(decoder).MIMEBoundary := boundary;
+                  decoder.SourceStream := ContentStringStream;
+                  decoder.FreeSourceStream := False;
+                  decoder.ReadHeader;
+                  Inc(I);
+                  Case Decoder.PartType of
+                   mcptAttachment:
+                    Begin
+                     ms := TStringStream.Create('');
+                     ms.Position := 0;
+                     NewDecoder := Decoder.ReadBody(ms, MsgEnd);
+                     vDecoderHeaderList := TStringList.Create;
+                     vDecoderHeaderList.Assign(Decoder.Headers);
+                     sFile := ExtractFileName(Decoder.FileName);
+                     FreeAndNil(Decoder);
+                     Decoder := NewDecoder;
+                     If Decoder <> Nil Then
+                      TIdMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
+                     aParamsCount := cParamsCount;
+                     If ServerContext <> '' Then
+                      Inc(aParamsCount);
+                     If vDataRouteList.Count > 0 Then
+                      Inc(aParamsCount);
+                     If Not Assigned(DWParams) Then
+                      Begin
+                       If (Params.Count = 0) Then
+                        Begin
+                         DWParams           := TRESTDWParams.Create;
+                         DWParams.Encoding  := vEncoding;
+                        End
+                       Else
+                        TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                                                             {$ELSE}Url{$IFEND}
+                                                                                                             {$ELSE}Url{$ENDIF},
+                                                          QueryParams,
+                                                          vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
+                      End;
+                     JSONParam    := TJSONParam.Create(DWParams.Encoding);
+                     JSONParam.ObjectDirection := odIN;
+                     vObjectName  := '';
+                     sContentType := '';
+                     for I := 0 to vDecoderHeaderList.Count - 1 do
+                      begin
+                       tmp := vDecoderHeaderList.Strings[I];
+                       if Pos('; name="', lowercase(tmp)) > 0 then
+                        begin
+                         vObjectName := Copy(lowercase(tmp),
+                                             Pos('; name="', lowercase(tmp)) + length('; name="'),
+                                             length(lowercase(tmp)));
+                         vObjectName := Copy(vObjectName, InitStrPos, Pos('"', vObjectName) -1);
+                        end;
+                       if Pos('content-type=', lowercase(tmp)) > 0 then
+                        begin
+                         sContentType := Copy(lowercase(tmp),
+                                             Pos('content-type=', lowercase(tmp)) + length('content-type='),
+                                             length(lowercase(tmp)));
+                        end;
+                      end;
+                      // Correção de FORM-DATA / FILE criar parametros automaticos: ICO 20-09-2019
+                      If (lowercase(vObjectName) = 'binarydata') then
+                       Begin
+                        DWParams.LoadFromStream(ms);
+                        If Assigned(JSONParam) Then
+                         FreeAndNil(JSONParam);
+                        If (DWParams.ItemsString['dwwelcomemessage']     <> Nil) Then
+                         vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                        If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
+                         vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                        If (DWParams.ItemsString['datacompression']      <> Nil) Then
+                         compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+                        If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
+                         encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+                        If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
+                         Begin
+                          If (vUriOptions.ServerEvent <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString))) Then
+                           Begin
+                            If ((vUriOptions.BaseServer = '')  And
+                                (vUriOptions.DataUrl    = '')) And
+                               (vUriOptions.ServerEvent <> '') Then
+                             vUriOptions.BaseServer := vUriOptions.ServerEvent
+                            Else If ((vUriOptions.BaseServer <> '') And
+                                     (vUriOptions.DataUrl    = '')) And
+                                    (vUriOptions.ServerEvent <> '') And
+                                     (vServerContext = '')          Then
+                             Begin
+                              vUriOptions.DataUrl    := vUriOptions.BaseServer;
+                              vUriOptions.BaseServer := vUriOptions.ServerEvent;
+                             End;
+                            vUriOptions.ServerEvent := DWParams.ItemsString['dwservereventname'].AsString;
+                           End;
+                         End;
+                        If (DWParams.ItemsString['dwusecript']           <> Nil) Then
+                         vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
+                        If (DWParams.ItemsString['dwassyncexec']         <> Nil) And (Not (dwassyncexec)) Then
+                         dwassyncexec          := StringToBoolean(DWParams.ItemsString['dwassyncexec'].AsString);
+                        If (DWParams.ItemsString['binaryrequest']        <> Nil) Then
+                         vBinaryEvent          := StringToBoolean(DWParams.ItemsString['binaryrequest'].AsString);
+                        If (DWParams.ItemsString['BinaryCompatibleMode'] <> Nil) Then
+                         vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
+                        if DWParams.ItemsString['dwConnectionDefs'] <> Nil then
+                        begin
+                         if not Assigned(vdwConnectionDefs) then
+                          vdwConnectionDefs := TConnectionDefs.Create;
+                         JSONValue           := TJSONValue.Create;
+                         Try
+                          JSONValue.Encoding := vEncoding;
+                          JSONValue.Encoded  := True;
+                          JSONValue.LoadFromJSON(DWParams.ItemsString['dwConnectionDefs'].ToJSON);
+                          vdwConnectionDefs.LoadFromJSON(JSONValue.Value);
+                         Finally
+                          FreeAndNil(JSONValue);
+                         End;
+                        end;
+                        If Assigned(vDecoderHeaderList) Then
+                         FreeAndNil(vDecoderHeaderList);
+                        If Assigned(ms) Then
+                         FreeAndNil(ms);
+                        FreeAndNil(Decoder);
+                        Continue;
+                       End
+                      Else If (vObjectName <> '') Then
+                       Begin
+                        JSONParam.ParamName        := vObjectName;
+                        tmp := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);//ms.DataString;
+                        If Copy(tmp, Length(tmp) -1, 2) = sLineBreak Then
+                         Delete(tmp, Length(tmp) -1, 2);
+                        If vEncoding = esUtf8 Then
+                         JSONParam.SetValue(utf8decode(tmp), JSONParam.Encoded)
+                        Else
+                         JSONParam.SetValue(tmp, JSONParam.Encoded);
+                       End
+                      Else
+                       Begin
+                        vObjectName := 'dwfilename';
+                        If (sContentType = '') and (sFile <> '') then
+                         vObjectName := GetMIMEType(sFile);
+                        JSONParam.ParamName        := vObjectName;
+                        JSONParam.ParamFileName    := sFile;
+                        JSONParam.ParamContentType := sContentType;
+                        If vEncoding = esUtf8 Then
+                         JSONParam.SetValue(utf8decode(ms.DataString), JSONParam.Encoded)
+                        Else If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(ms.DataString)) > 0) Then
+                         JSONParam.FromJSON(ms.DataString)
+                        Else
+                         JSONParam.SetValue(ms.DataString, JSONParam.Encoded);
+                       End;
+                      DWParams.Add(JSONParam);
+                     FreeAndNil(ms);
+                     FreeAndNil(vDecoderHeaderList);
+                    End;
+                   mcptText :
+                    begin
+                     {$IFDEF FPC}
+                     ms := TStringStream.Create('');
+                     {$ELSE}
+                     ms := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+                     {$ENDIF}
+                     ms.Position := 0;
+                     newdecoder  := Decoder.ReadBody(ms, msgEnd);
+                     tmp         := Decoder.Headers.Text;
+                     FreeAndNil(Decoder);
+                     Decoder     := newdecoder;
+                     vObjectName := '';
+                     If Decoder <> Nil Then
+                      TIdMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
+                     If pos('dwwelcomemessage', lowercase(tmp)) > 0      Then
+                      vWelcomeMessage := DecodeStrings(ms.DataString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                     Else If pos('dwaccesstag', lowercase(tmp)) > 0      Then
+                      vAccessTag := DecodeStrings(ms.DataString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                     Else If Pos('dwusecript', lowercase(tmp)) > 0       Then
+                      vdwCriptKey  := StringToBoolean(ms.DataString)
+                     Else If pos('datacompression', lowercase(tmp)) > 0  Then
+                      compresseddata := StringToBoolean(ms.DataString)
+                     Else If pos('dwencodestrings', lowercase(tmp)) > 0  Then
+                      encodestrings  := StringToBoolean(ms.DataString)
+                     Else If Pos('binaryrequest', lowercase(tmp)) > 0    Then
+                      vBinaryEvent := StringToBoolean(ms.DataString)
+                     Else If (Pos('dwassyncexec', lowercase(tmp)) > 0) And (Not (dwassyncexec)) Then
+                      dwassyncexec := StringToBoolean(ms.DataString)
+                     Else If pos('dwconnectiondefs', lowercase(tmp)) > 0 Then
+                      Begin
+                       vdwConnectionDefs   := TConnectionDefs.Create;
+                       JSONValue           := TJSONValue.Create;
+                       Try
+                        JSONValue.Encoding  := vEncoding;
+                        JSONValue.Encoded  := True;
+                        JSONValue.LoadFromJSON(ms.DataString);
+                        vdwConnectionDefs.LoadFromJSON(JSONValue.Value);
+                       Finally
+                        FreeAndNil(JSONValue);
+                       End;
+                      End
+                     Else If (Pos('dwassyncexec', lowercase(tmp)) > 0) And (Not (dwassyncexec)) Then
+                      dwassyncexec := StringToBoolean(ms.DataString)
+                     Else If pos('dwservereventname', lowercase(tmp)) > 0  Then
+                      Begin
+                       JSONValue            := TJSONValue.Create;
+                       Try
+                        JSONValue.Encoding  := vEncoding;
+                        JSONValue.Encoded   := True;
+                        JSONValue.LoadFromJSON(ms.DataString);
+                        If ((vUriOptions.BaseServer = '')  And
+                            (vUriOptions.DataUrl    = '')) And
+                           (vUriOptions.ServerEvent <> '') Then
+                         vUriOptions.BaseServer := vUriOptions.ServerEvent
+                        Else If ((vUriOptions.BaseServer <> '') And
+                                 (vUriOptions.DataUrl    = '')) And
+                                (vUriOptions.ServerEvent <> '') And
+                                 (vServerContext = '')          Then
+                         Begin
+                          vUriOptions.DataUrl    := vUriOptions.BaseServer;
+                          vUriOptions.BaseServer := vUriOptions.ServerEvent;
+                         End;
+                        vUriOptions.ServerEvent := JSONValue.Value;
+                        If Pos('.', vUriOptions.ServerEvent) > 0 Then
+                         Begin
+                          baseEventUnit       := Copy(vUriOptions.ServerEvent, InitStrPos, Pos('.', vUriOptions.ServerEvent) - 1 - FinalStrPos);
+                          vUriOptions.ServerEvent := Copy(vUriOptions.ServerEvent, Pos('.', vUriOptions.ServerEvent) + 1, Length(vUriOptions.ServerEvent));
+                         End;
+                       Finally
+                        FreeAndNil(JSONValue);
+                       End;
+                      End
+                     Else
+                      Begin
+                       If DWParams = Nil Then
+                        Begin
+                         DWParams           := TRESTDWParams.Create;
+                         DWParams.Encoding  := vEncoding;
+                        End;
+                       vObjectName := Copy(lowercase(tmp), Pos('; name="', lowercase(tmp)) + length('; name="'),  length(lowercase(tmp)));
+                       vObjectName := Copy(vObjectName, InitStrPos, Pos('"', vObjectName) -1);
+                       JSONParam   := TJSONParam.Create(DWParams.Encoding);
+                       JSONParam.ObjectDirection := odIN;
+                       If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(ms.DataString)) > 0) Then
+                        JSONParam.FromJSON(ms.DataString)
+                       Else
+                        JSONParam.AsString := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
+                       JSONParam.ParamName := vObjectName;
+                       DWParams.Add(JSONParam);
+                      End;
+                     {$IFNDEF FPC}ms.Size := 0;{$ENDIF}
+                     FreeAndNil(ms);
+                     FreeAndNil(newdecoder);
+                    end;
+                   mcptIgnore :
+                    Begin
+                     Try
+                      If decoder <> Nil Then
+                       FreeAndNil(decoder);
+                     Finally
+                     End;
+                    End;
+                   {$IFNDEF FPC}
+                    {$IF Not(DEFINED(OLDINDY))}
+                    mcptEOF:
+                     Begin
+                      FreeAndNil(decoder);
+                      msgEnd := True
+                     End;
+                    {$IFEND}
+                   {$ELSE}
+                   mcptEOF:
+                    Begin
+                     FreeAndNil(decoder);
+                     msgEnd := True
+                    End;
+                   {$ENDIF}
+                  End;
+                 Until (Decoder = Nil) Or (msgEnd);
+                Finally
+                 If decoder <> nil then
+                  FreeAndNil(decoder);
+                End;
+              End
+             Else If (Params.Count = 0)
+                      {$IFNDEF FPC}
+                       {$If Not(DEFINED(OLDINDY))}
+                        {$If (CompilerVersion > 23)}
+                         And (QueryParams.Length = 0)
+                        {$IFEND}
+                       {$ELSE}
+                        And (Length(QueryParams) = 0)
+                       {$IFEND}
+                      {$ELSE}
+                       And (QueryParams.Length = 0)
+                      {$ENDIF}Then
+              Begin
+               If vEncoding = esUtf8 Then
+                TDataUtils.ParseBodyRawToDWParam(utf8decode(mb.DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+               Else
+                TDataUtils.ParseBodyRawToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+              End
+             Else
+              Begin
+               If vEncoding = esUtf8 Then
+                Begin
+                 TDataUtils.ParseDWParamsURL(utf8decode(mb.DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                 if DWParams.ItemsString['undefined'] = nil then
+                  TDataUtils.ParseBodyRawToDWParam(utf8decode(mb.DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                End
+               Else
+                Begin
+                 TDataUtils.ParseDWParamsURL(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                 if DWParams.ItemsString['undefined'] = nil then
+                  TDataUtils.ParseBodyRawToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                End;
+              End;
+             {Fim alteração feita por Tiago Istuque - 28/12/2018}
+            Finally
+             mb.Free;
+            End;
+           End;
+         End;
+       End
+      Else
+       Begin
+        aurlContext := vUriOptions.ServerEvent;
+        If Not (RequestType In [rtPut, rtPatch, rtDelete]) Then
+         Begin
+          aParamsCount := cParamsCount;
+          If ServerContext <> '' Then
+           Inc(aParamsCount);
+          If vDataRouteList.Count > 0 Then
+           Inc(aParamsCount);
+          {$IFDEF FPC}
+          If QueryParams <> '' Then
+           Begin
+            If Trim(QueryParams) <> '' Then
+             Begin
+              vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                               {$ELSE}Url{$IFEND}
+                                                               {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams);
+              TDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                       {$ELSE}Url{$IFEND}
+                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams, vEncoding, vUriOptions, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+             End
+            Else
+             Begin
+              vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                               {$ELSE}Url{$IFEND}
+                                                               {$ELSE}Url{$ENDIF} + '?' + QueryParams);
+              TDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                       {$ELSE}Url{$IFEND}
+                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams, vEncoding, vUriOptions, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+              If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then  // Ico Menezes - Post Receber WelcomeMessage   - 20-12-2018
+               vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+             End;
+           End
+          Else
+           Begin
+            vRequestHeader.Add(Params.Text);
+            vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                             {$ELSE}Url{$IFEND}
+                                                             {$ELSE}Url{$ENDIF});
+            vRequestHeader.Add(QueryParams);
+
+            TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                                                 {$ELSE}Url{$IFEND}
+                                                                                                 {$ELSE}Url{$ENDIF},
+                                              QueryParams,
+                                              vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
+           End;
+          {$ELSE}
+          If QueryParams <> '' Then
+           Begin
+            If Trim(QueryParams) <> '' Then
+             Begin
+              vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                               {$ELSE}Url{$IFEND}
+                                                               {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams);
+              TDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                       {$ELSE}Url{$IFEND}
+                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams, vEncoding, vUriOptions, vmark, DWParams, aParamsCount);
+             End
+            Else
+             Begin
+              vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                               {$ELSE}Url{$IFEND}
+                                                               {$ELSE}Url{$ENDIF} + '?' + QueryParams);
+              TDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                       {$ELSE}Url{$IFEND}
+                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams, vEncoding, vUriOptions, vmark, DWParams, aParamsCount);
+              If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then  // Ico Menezes - Post Receber WelcomeMessage   - 20-12-2018
+               vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+             End;
+           End
+           Else
+            Begin
+             vRequestHeader.Add(Params.Text);
+             vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                              {$ELSE}Url{$IFEND}
+                                                              {$ELSE}Url{$ENDIF});
+             vRequestHeader.Add(QueryParams);
+             If Not Assigned(DWParams) Then
+              TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                                                   {$ELSE}Url{$IFEND}
+                                                                                                   {$ELSE}Url{$ENDIF},
+                                                QueryParams,
+                                                vUriOptions, vmark, vEncoding, DWParams, aParamsCount, RequestType);
+            End;
+          {$ENDIF}
+          If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
+           vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+         End
+        Else
+         Begin
+          {$IFDEF FPC}
+           vRequestHeader.Add(Params.Text);
+           vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                            {$ELSE}Url{$IFEND}
+                                                            {$ELSE}Url{$ENDIF});
+           vRequestHeader.Add(QueryParams);
+           TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                                                {$ELSE}Url{$IFEND}
+                                                                                                {$ELSE}Url{$ENDIF},
+                                             QueryParams,
+                                             vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
+          {$ELSE}
+           vRequestHeader.Add(Params.Text);
+           vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                            {$ELSE}Url{$IFEND}
+                                                            {$ELSE}Url{$ENDIF});
+           vRequestHeader.Add(QueryParams);
+           If Not Assigned(DWParams) Then
+            TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                                                 {$ELSE}Url{$IFEND}
+                                                                                                 {$ELSE}Url{$ENDIF},
+                                              QueryParams,
+                                              vUriOptions, vmark, vEncoding, DWParams, aParamsCount, RequestType);
+          {$ENDIF}
+         End;
+        If ((vUriOptions.ServerEvent = '') And (aurlContext <> '')) And
+            (Not (RequestType In [rtGet, rtDelete])) Then
+         vUriOptions.ServerEvent := aurlContext;
+       End;
+     End;
+     WelcomeAccept         := True;
+     tmp                   := '';
+     vAuthenticationString := '';
+     vToken                := '';
+     vGettoken             := False;
+     vAcceptAuth           := False;
+     If (vDataRouteList.Count > 0) Then
+      Begin
+       If (vUriOptions.BaseServer = '') And (vUriOptions.DataUrl = '') Then
+        vUriOptions.BaseServer := vUriOptions.ServerEvent
+      End;
+     If (vServerContext <> '') Then
+      Begin
+       If (vUriOptions.BaseServer = '') And (vUriOptions.ServerEvent <> '') Then
+        Begin
+         vUriOptions.BaseServer  := vUriOptions.ServerEvent;
+         vUriOptions.ServerEvent := '';
+        End;
+      End;
+     If (vDataRouteList.Count > 0) Then
+      Begin
+       If (vServerContext = '') Then
+        Begin
+         If vDataRouteList.RouteExists(vUriOptions.BaseServer) Then
+          Begin
+           vUriOptions.DataUrl    := vUriOptions.BaseServer;
+           vUriOptions.BaseServer := '';
+          End;
+        End;
+      End;
+     If ((vUriOptions.BaseServer <> vServerContext) And (vServerContext <> '')) Or
+          ((vUriOptions.BaseServer <> '') And (vUriOptions.BaseServer <> vUriOptions.ServerEvent) And
+         (vServerContext = '')) Then
+      Begin
+       vErrorCode := 400;
+       JSONStr    := GetPairJSON(-5, 'Invalid Server Context');
+      End
+     Else
+      Begin
+       If vDataRouteList.Count > 0 Then
+        Begin
+         If ((vUriOptions.BaseServer <> '') And (vUriOptions.DataUrl = '') And (vServerContext <> '')) or
+            ((vServerContext = '') And (vUriOptions.BaseServer <> vUriOptions.ServerEvent) And (vUriOptions.BaseServer <> '')) Then
+          Begin
+           If Not vDataRouteList.GetServerMethodClass(vUriOptions.BaseServer, vServerMethod) Then
+            Begin
+             vErrorCode := 400;
+             JSONStr    := GetPairJSON(-5, 'Invalid Data Context');
+            End;
+          End
+         Else
+          Begin
+           If Not vDataRouteList.GetServerMethodClass(vUriOptions.DataUrl, vServerMethod) Then
+            Begin
+             vErrorCode := 400;
+             JSONStr    := GetPairJSON(-5, 'Invalid Data Context');
+            End;
+          End;
+        End
+       Else
+        Begin
+         If (((vUriOptions.BaseServer = '')                     And
+              (vServerContext = ''))                            Or
+              (vUriOptions.BaseServer = vServerContext))        And
+            ((vUriOptions.DataUrl = '')                         Or
+             (vUriOptions.DataUrl = vUriOptions.ServerEvent))   Or
+            ((vServerContext = '')                              And
+             (vUriOptions.BaseServer = vUriOptions.ServerEvent) And
+             (vUriOptions.ServerEvent <> ''))                   Then
+          vServerMethod := aServerMethod;
+        End;
+       If Assigned(vServerMethod) Then
+        Begin
+         If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then
+          vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+         If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
+          vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+         Try
+//          {$IFDEF FPC}
+//           InitCriticalSection(vCriticalSection);
+//           EnterCriticalSection(vCriticalSection);
+//          {$ENDIF}
+          vTempServerMethods  := vServerMethod.Create(Nil);
+         Finally
+//          {$IFDEF FPC}
+//           Try
+//            LeaveCriticalSection(vCriticalSection);
+//            DoneCriticalSection(vCriticalSection);
+//           Except
+//           End;
+//          {$ENDIF}
+         End;
+         If (vTempServerMethods.ClassType = TServerMethodDatamodule)             Or
+            (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule)) Then
+          Begin
+           If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
+            Begin
+             {$IFNDEF FPC}
+              {$IF CompilerVersion > 21}
+               {$IFDEF WINDOWS}
+                InitializeCriticalSection(vCriticalSection);
+                EnterCriticalSection(vCriticalSection);
+               {$ELSE}
+                If Not Assigned(vCriticalSection) Then
+                 vCriticalSection := TCriticalSection.Create;
+                vCriticalSection.Acquire;
+               {$ENDIF}
+              {$ELSE}
+               If Not Assigned(vCriticalSection)  Then
+                vCriticalSection := TCriticalSection.Create;
+               vCriticalSection.Acquire;
+              {$IFEND}
+             {$ELSE}
+              InitCriticalSection(vCriticalSection);
+              EnterCriticalSection(vCriticalSection);
+             {$ENDIF}
+            End;
+           vServerAuthOptions.CopyServerAuthParams(vRDWAuthOptionParam);
+           TServerMethodDatamodule(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
+           If AContext.Connection.Socket.Binding.IPVersion = Id_IPv6 Then
+            vIPVersion := 'ipv6';
+           TServerMethodDatamodule(vTempServerMethods).SetClientInfo(AContext.Connection.Socket.Binding.PeerIP, vIPVersion,
+                                                                     UserAgent, vUriOptions.EventName, vUriOptions.ServerEvent, AContext.Connection.Socket.Binding.PeerPort);
+           If (RequestType In [rtGet, rtDelete]) Then
+            Begin
+             If ((vUriOptions.BaseServer = '')   And
+                 (vUriOptions.DataUrl    = ''))  And
+                ((vUriOptions.ServerEvent <> '') And
+                 (vUriOptions.EventName = ''))   Then
+              vUriOptions.BaseServer := vUriOptions.ServerEvent
+             Else If ((vUriOptions.BaseServer <> '') And
+                      (vUriOptions.DataUrl    = '')) And
+                     (vUriOptions.ServerEvent <> '') And
+                      (vServerContext = '')  Then
+              Begin
+               vUriOptions.DataUrl    := vUriOptions.BaseServer;
+               vUriOptions.BaseServer := vUriOptions.ServerEvent;
+              End;
+            End;
+           //Novo Lugar para Autenticação
+           If ((vCORS) And (vCORSOption <> 'OPTIONS')) Or
+               (vServerAuthOptions.AuthorizationOption in [rdwAOBasic, rdwAOBearer, rdwAOToken]) Then
+            Begin
+             vAcceptAuth           := False;
+             vErrorCode            := 401;
+             vErrorMessage         := cInvalidAuth;
+             Case vServerAuthOptions.AuthorizationOption Of
+              rdwAOBasic  : Begin
+                             vNeedAuthorization := False;
+                             vTempEvent   := ReturnEventValidation(TServerMethodDatamodule(vTempServerMethods), vUriOptions.EventName, vUriOptions.ServerEvent);
+                             If vTempEvent = Nil Then
+                              Begin
+                               vTempContext := ReturnContextValidation(TServerMethodDatamodule(vTempServerMethods), vUriOptions);
+                               If vTempContext <> Nil Then
+                                vNeedAuthorization := vTempContext.NeedAuthorization
+                               Else
+                                vNeedAuthorization := True;
+                              End
+                             Else
+                              vNeedAuthorization := vTempEvent.NeedAuthorization;
+                             If vNeedAuthorization Then
+                              Begin
+                               vAuthenticationString := RawHeaders.Values['Authorization']; //Authentication.Authentication;// RawHeaders.Values['Authorization'];
+                               If Assigned(TServerMethodDatamodule(vTempServerMethods).OnUserBasicAuth) Then
+                                Begin
+                                 TServerMethodDatamodule(vTempServerMethods).OnUserBasicAuth(vWelcomeMessage, vAccessTag,
+                                                                                             AuthUsername,
+                                                                                             AuthPassword,
+                                                                                             DWParams, vErrorCode, vErrorMessage, vAcceptAuth);
+                                 If Not vAcceptAuth Then
+                                  Begin
+                                   AuthRealm    := AuthRealm;
+                                   WriteError;
+                                   DestroyComponents;
+                                   Exit;
+                                  End;
+                                End
+                               Else If Not ((AuthUsername = TRDWAuthOptionBasic(vServerAuthOptions.OptionParams).Username) And
+                                            (AuthPassword = TRDWAuthOptionBasic(vServerAuthOptions.OptionParams).Password)) Then
+                                Begin
+                                 AuthRealm := AuthRealm;
+                                 WriteError;
+                                 DestroyComponents;
+                                 Exit;
+                                End;
+                              End;
+                            End;
+              rdwAOBearer : Begin
+                             vUrlToken := Lowercase(vUriOptions.EventName);
+                             If vUrlToken =
+                                Lowercase(TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).GetTokenEvent) Then
+                              Begin
+                               vGettoken     := True;
+                               vErrorCode    := 404;
+                               vErrorMessage := cEventNotFound;
+                               If (RequestTypeToRoute(RequestType) In TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).GetTokenRoutes) Or
+                                  (crAll in TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).GetTokenRoutes) Then
+                                Begin
+                                 If Assigned(TServerMethodDatamodule(vTempServerMethods).OnGetToken) Then
+                                  Begin
+                                   vTokenValidate := True;
+                                   vAuthTokenParam := TRDWAuthOptionTokenServer.Create;
+                                   vAuthTokenParam.Assign(TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams));
+                                  {$IFNDEF FPC}
+                                   {$IF Defined(HAS_FMX)}
+                                    {$IFDEF HAS_UTF8}
+                                     If Assigned({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}) Then
+                                      vToken       := TRDWAuthRequest({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}).Token
+                                     Else
+                                      vToken       := RawHeaders.Values['Authorization'];
+                                    {$ELSE}
+                                     If Assigned(AContext.Data) Then
+                                      vToken       := TRDWAuthRequest(AContext.Data).Token
+                                     Else
+                                      vToken       := RawHeaders.Values['Authorization'];
+                                    {$ENDIF}
+                                   {$ELSE}
+                                    If Assigned(AContext.Data) Then
+                                     vToken       := TRDWAuthRequest(AContext.Data).Token
+                                    Else
+                                     vToken       := RawHeaders.Values['Authorization'];
+                                   {$IFEND}
+                                  {$ELSE}
+                                   If Assigned(AContext.Data) Then
+                                    vToken       := TRDWAuthRequest(AContext.Data).Token
+                                   Else
+                                    vToken       := RawHeaders.Values['Authorization'];
+                                  {$ENDIF}
+                                   If DWParams.ItemsString['RDWParams'] <> Nil Then
+                                    Begin
+                                     DWParamsD := TRESTDWParams.Create;
+                                     DWParamsD.FromJSON(DWParams.ItemsString['RDWParams'].Value);
+                                     TServerMethodDatamodule(vTempServerMethods).OnGetToken(vWelcomeMessage, vAccessTag, DWParamsD,
+                                                                                            TRDWAuthOptionTokenServer(vAuthTokenParam),
+                                                                                            vErrorCode, vErrorMessage, vToken, vAcceptAuth);
+                                     FreeAndNil(DWParamsD);
+                                    End
+                                   Else
+                                    TServerMethodDatamodule(vTempServerMethods).OnGetToken(vWelcomeMessage, vAccessTag, DWParams,
+                                                                                           TRDWAuthOptionTokenServer(vAuthTokenParam),
+                                                                                           vErrorCode, vErrorMessage, vToken, vAcceptAuth);
+                                   If Not vAcceptAuth Then
+                                    Begin
+                                     WriteError;
+                                     DestroyComponents;
+                                     Exit;
+                                    End;
+                                  End
+                                 Else
+                                  Begin
+                                   WriteError;
+                                   DestroyComponents;
+                                   Exit;
+                                  End;
+                                End
+                               Else
+                                Begin
+                                 WriteError;
+                                 DestroyComponents;
+                                 Exit;
+                                End;
+                              End
+                             Else
+                              Begin
+                               vErrorCode      := 401;
+                               vErrorMessage   := cInvalidAuth;
+                               vTokenValidate  := True;
+                               vNeedAuthorization := False;
+                               vTempEvent   := ReturnEventValidation(TServerMethodDatamodule(vTempServerMethods), vUriOptions.EventName, vUriOptions.ServerEvent);
+                               If vTempEvent = Nil Then
+                                Begin
+                                 vTempContext := ReturnContextValidation(TServerMethodDatamodule(vTempServerMethods), vUriOptions);
+                                 If vTempContext <> Nil Then
+                                  vNeedAuthorization := vTempContext.NeedAuthorization
+                                 Else
+                                  vNeedAuthorization := True;
+                                End
+                               Else
+                                vNeedAuthorization := vTempEvent.NeedAuthorization;
+                               If vNeedAuthorization Then
+                                Begin
+                                 vAuthTokenParam := TRDWAuthOptionTokenServer.Create;
+                                 vAuthTokenParam.Assign(TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams));
+                                 If DWParams.ItemsString[TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).Key] <> Nil Then
+                                  vToken         := DWParams.ItemsString[TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).Key].AsString
+                                 Else
+                                  Begin
+                                  {$IFNDEF FPC}
+                                   {$IF Defined(HAS_FMX)}
+                                    {$IFDEF HAS_UTF8}
+                                     If Assigned({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}) Then
+                                      vToken       := TRDWAuthRequest({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}).Token
+                                     Else
+                                      vToken       := RawHeaders.Values['Authorization'];
+                                     If Trim(vToken) <> '' Then
+                                      Begin
+                                       aToken      := GetTokenString(vToken);
+                                       If aToken = '' Then
+                                        aToken     := GetBearerString(vToken);
+                                       vToken      := aToken;
+                                      End;
+                                    {$ELSE}
+                                     If Assigned(AContext.DataObject) Then
+                                      vToken       := TRDWAuthRequest(AContext.DataObject).Token
+                                     Else
+                                      vToken       := RawHeaders.Values['Authorization'];
+                                     If Trim(vToken) <> '' Then
+                                      Begin
+                                       aToken      := GetTokenString(vToken);
+                                       If aToken = '' Then
+                                        aToken     := GetBearerString(vToken);
+                                       vToken      := aToken;
+                                      End;
+                                    {$ENDIF}
+                                   {$ELSE}
+                                    If Assigned(AContext.Data) Then
+                                     vToken       := TRDWAuthRequest(AContext.Data).Token
+                                    Else
+                                     vToken       := RawHeaders.Values['Authorization'];
+                                    If Trim(vToken) <> '' Then
+                                     Begin
+                                      aToken      := GetTokenString(vToken);
+                                      If aToken = '' Then
+                                       aToken     := GetBearerString(vToken);
+                                      vToken      := aToken;
+                                     End;
+                                   {$IFEND}
+                                  {$ELSE}
+                                   If Assigned(AContext.Data) Then
+                                    vToken       := TRDWAuthRequest(AContext.Data).Token
+                                   Else
+                                    vToken       := RawHeaders.Values['Authorization'];
+                                   If Trim(vToken) <> '' Then
+                                    Begin
+                                     aToken      := GetTokenString(vToken);
+                                     If aToken = '' Then
+                                      aToken     := GetBearerString(vToken);
+                                     vToken      := aToken;
+                                    End;
+                                  {$ENDIF}
+                                  End;
+                                 If Not vAuthTokenParam.FromToken(vToken) Then
+                                  Begin
+                                   WriteError;
+                                   DestroyComponents;
+                                   Exit;
+                                  End
+                                 Else
+                                  vTokenValidate := False;
+                                 If Assigned(TServerMethodDatamodule(vTempServerMethods).OnUserTokenAuth) Then
+                                  Begin
+                                   TServerMethodDatamodule(vTempServerMethods).OnUserTokenAuth(vWelcomeMessage, vAccessTag, DWParams,
+                                                                                               TRDWAuthOptionTokenServer(vAuthTokenParam),
+                                                                                               vErrorCode, vErrorMessage, vToken, vAcceptAuth);
+                                   vTokenValidate := Not(vAcceptAuth);
+                                   If Not vAcceptAuth Then
+                                    Begin
+                                     WriteError;
+                                     DestroyComponents;
+                                     Exit;
+                                    End;
+                                  End;
+                                End
+                               Else
+                                vTokenValidate := False;
+                              End;
+                            End;
+              rdwAOToken  : Begin
+                             vUrlToken := Lowercase(vUriOptions.EventName);
+                             If vUrlToken =
+                                Lowercase(TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).GetTokenEvent) Then
+                              Begin
+                               vGettoken      := True;
+                               vErrorCode     := 404;
+                               vErrorMessage  := cEventNotFound;
+                               If (RequestTypeToRoute(RequestType) In TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).GetTokenRoutes) Or
+                                  (crAll in TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).GetTokenRoutes) Then
+                                Begin
+                                 If Assigned(TServerMethodDatamodule(vTempServerMethods).OnGetToken) Then
+                                  Begin
+                                   vTokenValidate := True;
+                                   vAuthTokenParam := TRDWAuthOptionTokenServer.Create;
+                                   vAuthTokenParam.Assign(TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams));
+                                  {$IFNDEF FPC}
+                                   {$IF Defined(HAS_FMX)}
+                                    {$IFDEF HAS_UTF8}
+                                     If Assigned({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}) Then
+                                      vToken       := TRDWAuthRequest({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}).Token
+                                     Else
+                                      vToken       := RawHeaders.Values['Authorization'];
+                                    {$ELSE}
+                                     If Assigned(AContext.Data) Then
+                                      vToken       := TRDWAuthRequest(AContext.Data).Token
+                                     Else
+                                      vToken       := RawHeaders.Values['Authorization'];
+                                    {$ENDIF}
+                                   {$ELSE}
+                                    If Assigned(AContext.Data) Then
+                                     vToken       := TRDWAuthRequest(AContext.Data).Token
+                                    Else
+                                     vToken       := RawHeaders.Values['Authorization'];
+                                   {$IFEND}
+                                  {$ELSE}
+                                   If Assigned(AContext.Data) Then
+                                    vToken       := TRDWAuthRequest(AContext.Data).Token
+                                   Else
+                                    vToken       := RawHeaders.Values['Authorization'];
+                                  {$ENDIF}
+                                   If DWParams.ItemsString['RDWParams'] <> Nil Then
+                                    Begin
+                                     DWParamsD := TRESTDWParams.Create;
+                                     DWParamsD.FromJSON(DWParams.ItemsString['RDWParams'].Value);
+                                     TServerMethodDatamodule(vTempServerMethods).OnGetToken(vWelcomeMessage, vAccessTag, DWParamsD,
+                                                                                            TRDWAuthOptionTokenServer(vAuthTokenParam),
+                                                                                            vErrorCode, vErrorMessage, vToken, vAcceptAuth);
+                                     FreeAndNil(DWParamsD);
+                                    End
+                                   Else
+                                    TServerMethodDatamodule(vTempServerMethods).OnGetToken(vWelcomeMessage, vAccessTag, DWParams,
+                                                                                           TRDWAuthOptionTokenServer(vAuthTokenParam),
+                                                                                           vErrorCode, vErrorMessage, vToken, vAcceptAuth);
+                                   If Not vAcceptAuth Then
+                                    Begin
+                                     WriteError;
+                                     DestroyComponents;
+                                     Exit;
+                                    End;
+                                  End
+                                 Else
+                                  Begin
+                                   WriteError;
+                                   DestroyComponents;
+                                   Exit;
+                                  End;
+                                End
+                               Else
+                                Begin
+                                 WriteError;
+                                 DestroyComponents;
+                                 Exit;
+                                End;
+                              End
+                             Else
+                              Begin
+                               vErrorCode      := 401;
+                               vErrorMessage   := cInvalidAuth;
+                               vTokenValidate  := True;
+                               vNeedAuthorization := False;
+                               vTempEvent   := ReturnEventValidation(TServerMethodDatamodule(vTempServerMethods), vUriOptions.EventName, vUriOptions.ServerEvent);
+                               If vTempEvent = Nil Then
+                                Begin
+                                 vTempContext := ReturnContextValidation(TServerMethodDatamodule(vTempServerMethods), vUriOptions);
+                                 If vTempContext <> Nil Then
+                                  vNeedAuthorization := vTempContext.NeedAuthorization
+                                 Else
+                                  vNeedAuthorization := True;
+                                End
+                               Else
+                                vNeedAuthorization := vTempEvent.NeedAuthorization;
+                               If vNeedAuthorization Then
+                                Begin
+                                 vAuthTokenParam := TRDWAuthOptionTokenServer.Create;
+                                 vAuthTokenParam.Assign(TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams));
+                                 If DWParams.ItemsString[TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).Key] <> Nil Then
+                                  vToken         := DWParams.ItemsString[TRDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).Key].AsString
+                                 Else
+                                  Begin
+                                  {$IFNDEF FPC}
+                                   {$IF Defined(HAS_FMX)}
+                                    {$IFDEF HAS_UTF8}
+                                     If Assigned({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}) Then
+                                      vToken       := TRDWAuthRequest({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}).Token
+                                     Else
+                                      vToken       := RawHeaders.Values['Authorization'];
+                                     If Trim(vToken) <> '' Then
+                                      Begin
+                                       aToken      := GetTokenString(vToken);
+                                       If aToken = '' Then
+                                        aToken     := GetBearerString(vToken);
+                                       vToken      := aToken;
+                                      End;
+                                    {$ELSE}
+                                     If Assigned(AContext.DataObject) Then
+                                      vToken       := TRDWAuthRequest(AContext.DataObject).Token
+                                     Else
+                                      vToken       := RawHeaders.Values['Authorization'];
+                                     If Trim(vToken) <> '' Then
+                                      Begin
+                                       aToken      := GetTokenString(vToken);
+                                       If aToken = '' Then
+                                        aToken     := GetBearerString(vToken);
+                                       vToken      := aToken;
+                                      End;
+                                    {$ENDIF}
+                                   {$ELSE}
+                                    If Assigned(AContext.Data) Then
+                                     vToken       := TRDWAuthRequest(AContext.Data).Token
+                                    Else
+                                     vToken       := RawHeaders.Values['Authorization'];
+                                    If Trim(vToken) <> '' Then
+                                     Begin
+                                      aToken      := GetTokenString(vToken);
+                                      If aToken = '' Then
+                                       aToken     := GetBearerString(vToken);
+                                      vToken      := aToken;
+                                     End;
+                                   {$IFEND}
+                                  {$ELSE}
+                                   If Assigned(AContext.Data) Then
+                                    vToken       := TRDWAuthRequest(AContext.Data).Token
+                                   Else
+                                    vToken       := RawHeaders.Values['Authorization'];
+                                   If Trim(vToken) <> '' Then
+                                    Begin
+                                     aToken      := GetTokenString(vToken);
+                                     If aToken = '' Then
+                                      aToken     := GetBearerString(vToken);
+                                     vToken      := aToken;
+                                    End;
+                                  {$ENDIF}
+                                  End;
+                                 If Not vAuthTokenParam.FromToken(vToken) Then
+                                  Begin
+                                   WriteError;
+                                   DestroyComponents;
+                                   Exit;
+                                  End
+                                 Else
+                                  vTokenValidate := False;
+                                 If Assigned(TServerMethodDatamodule(vTempServerMethods).OnUserTokenAuth) Then
+                                  Begin
+                                   TServerMethodDatamodule(vTempServerMethods).OnUserTokenAuth(vWelcomeMessage, vAccessTag, DWParams,
+                                                                                               TRDWAuthOptionTokenServer(vAuthTokenParam),
+                                                                                               vErrorCode, vErrorMessage, vToken, vAcceptAuth);
+                                   vTokenValidate := Not(vAcceptAuth);
+                                   If Not vAcceptAuth Then
+                                    Begin
+                                     WriteError;
+                                     DestroyComponents;
+                                     Exit;
+                                    End;
+                                  End;
+                                End
+                               Else
+                                vTokenValidate := False;
+                              End;
+                            End;
+             End;
+             vErrorCode            := 200;
+             vErrorMessage         := '';
+            End;
+           If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
+            TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
+          End;
+        End
+       Else
+        Begin
+         If vErrorCode <> 400 Then
+          Begin
+           vErrorCode := 401;
+           JSONStr    := GetPairJSON(-5, 'Server Methods Cannot Assigned');
+          End;
+        End;
+      End;
+     Try
+      If Assigned(vLastRequest) Then
+       Begin
+        Try
+         If Assigned(vLastRequest) Then
+          vLastRequest(UserAgent + sLineBreak +
+                      RawHTTPCommand);
+        Finally
+        End;
+       End;
+      If Assigned(vServerMethod) Then
+       Begin
+        If vUriOptions.EventName = '' Then
+         Begin
+          If {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                           {$ELSE}Url{$IFEND}
+                                           {$ELSE}Url{$ENDIF} <> '' Then
+           Begin
+            vUriOptions.EventName := Trim({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                            {$ELSE}Url{$IFEND}
+                                                            {$ELSE}Url{$ENDIF});
+            If Pos('/', vUriOptions.EventName) > 0 then
+             Begin
+              vUriOptions.ServerEvent   := Copy(vUriOptions.EventName, 1, Pos('/', vUriOptions.EventName) -1);
+              vUriOptions.EventName := Copy(vUriOptions.EventName, Pos('/', vUriOptions.EventName) +1, Length(vUriOptions.EventName));
+             End;
+           End
+          Else
+           Begin
+            While (Length(vUriOptions.EventName) > 0) Do
+             Begin
+              If Pos('/', vUriOptions.EventName) > 0 then
+               vUriOptions.EventName := Copy(vUriOptions.EventName, InitStrPos +1, Length(vUriOptions.EventName))
+              Else
+               Begin
+                vUriOptions.EventName := Trim(vUriOptions.EventName);
+                Break;
+               End;
+             End;
+           End;
+         End;
+        If (vUriOptions.EventName = '') And (vUriOptions.ServerEvent = '') Then
+         vUriOptions.EventName := vOldMethod;
+        vSpecialServer := False;
+        If vTempServerMethods <> Nil Then
+         Begin
+          ContentType   := 'application/json'; //'text';//'application/octet-stream';
+          If (vUriOptions.EventName = '') And (vUriOptions.ServerEvent = '') Then
+           Begin
+            If vDefaultPage.Count > 0 Then
+             vReplyString  := vDefaultPage.Text
+            Else
+             vReplyString  := TServerStatusHTML;
+            vErrorCode   := 200;
+            ContentType := 'text/html';
+           End
+          Else
+           Begin
+            If vEncoding = esUtf8 Then
+             ContentEncoding       := 'utf-8'
+            Else
+             ContentEncoding       := 'ansi';
+            If DWParams <> Nil Then
+             Begin
+              If (DWParams.ItemsString['dwassyncexec'] <> Nil) And (Not (dwassyncexec)) Then
+               dwassyncexec := DWParams.ItemsString['dwassyncexec'].AsBoolean;
+              If DWParams.ItemsString['dwusecript'] <> Nil Then
+               vdwCriptKey  := DWParams.ItemsString['dwusecript'].AsBoolean;
+             End;
+            If dwassyncexec Then
+             Begin
+              ResponseNo               := 200;
+              vReplyString                           := AssyncCommandMSG;
+              {$IFNDEF FPC}
+               If compresseddata Then
+                mb                                  := TStringStream(ZCompressStreamNew(vReplyString))
+               Else
+                mb                                  := TStringStream.Create(vReplyString{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+               mb.Position                          := 0;
+               FreeContentStream      := True;
+               ContentStream          := mb;
+               ContentStream.Position := 0;
+               ContentLength          := mb.Size;
+               WriteContent;
+              {$ELSE}
+               If compresseddata Then
+                mb                                  := TStringStream(ZCompressStreamNew(vReplyString)) //TStringStream.Create(Utf8Encode(vReplyStringResult))
+               Else
+                mb                                  := TStringStream.Create(vReplyString);
+               mb.Position                          := 0;
+               FreeContentStream      := True;
+               ContentStream          := mb;
+               ContentStream.Position := 0;
+               ContentLength          := -1;//mb.Size;
+               WriteContent;
+              {$ENDIF}
+             End;
+            If DWParams.itemsstring['binaryRequest']        <> Nil Then
+             vBinaryEvent := DWParams.itemsstring['binaryRequest'].Value;
+            If DWParams.itemsstring['BinaryCompatibleMode'] <> Nil Then
+             vBinaryCompatibleMode := DWParams.itemsstring['BinaryCompatibleMode'].Value;
+            If DWParams.itemsstring['MetadataRequest']      <> Nil Then
+             vMetadata := DWParams.itemsstring['MetadataRequest'].value;
+            If (Assigned(DWParams)) And (Assigned(vCripto))        Then
+             DWParams.SetCriptOptions(vdwCriptKey, vCripto.Key);
+            If (vTempServerMethods.ClassType = TServerMethodDatamodule)             Or
+               (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule)) Then
+             Begin
+              vServerAuthOptions.CopyServerAuthParams(vRDWAuthOptionParam);
+              If AContext.Connection.Socket.Binding.IPVersion = Id_IPv6 Then
+               vIPVersion := 'ipv6';
+              TServerMethodDatamodule(vTempServerMethods).SetClientInfo(AContext.Connection.Socket.Binding.PeerIP, vIPVersion,
+                                                                        UserAgent, vUriOptions.EventName, vUriOptions.ServerEvent, AContext.Connection.Socket.Binding.PeerPort);
+             End;
+            If (Not (vGettoken)) And (Not (vTokenValidate)) Then
+             Begin
+              If Not ServiceMethods(TComponent(vTempServerMethods), AContext, vUriOptions, DWParams,
+                                    JSONStr, JsonMode, vErrorCode,  vContentType, vServerContextCall, ServerContextStream,
+                                    vdwConnectionDefs,  EncodeStrings, vAccessTag, WelcomeAccept, RequestType, vMark,
+                                    vRequestHeader, vBinaryEvent, vMetadata, vBinaryCompatibleMode, vCompareContext) Or (lowercase(vContentType) = 'application/php') Then
+               Begin
+                If Not dwassyncexec Then
+                 Begin
+                  {$IFNDEF FPC}
+                   {$IF Defined(HAS_FMX)}
+                    {$IFDEF MSWINDOWS}
+                     If Assigned(CGIRunner) Then
+                      Begin
+                       If Pos('.php', UrlMethod) <> 0 then
+                        Begin
+                         vContentType := 'text/html';
+                         LocalDoc := CGIRunner.PHPIniPath + CGIRunner.PHPModule;
+                        End;
+                       For I := 0 To CGIRunner.CGIExtensions.Count -1 Do
+                        Begin
+                         If Pos(LowerCase(CGIRunner.CGIExtensions[I]), LowerCase(Document)) <> 0 then
+                          Begin
+                           LocalDoc := ExpandFilename(FRootPath + Document);
+                           Break;
+                          End;
+                        End;
+                       If LocalDoc <> '' then
+                        Begin
+                         vSpecialServer := True;
+                         If RESTDWFileExists(LocalDoc) Then
+                          Begin
+                           CGIRunner.Execute(LocalDoc, AContext, aRequestInfo, aResponseInfo, FRootPath, JSONStr);
+                           vTagReply := True;
+                          End
+                         Else
+                          Begin
+                           ContentText := '<H1><center>Script not found</center></H1>';
+                           ResponseNo := 404; // Not found
+                          End;
+                        End;
+                       End;
+                    {$ENDIF}
+                   {$ELSE}
+                    If Assigned(CGIRunner) Then
+                     Begin
+                      If Pos('.php', vUriOptions.EventName) <> 0 then
+                       Begin
+                        vContentType := 'text/html';
+                        LocalDoc := CGIRunner.PHPIniPath + CGIRunner.PHPModule;
+                       End;
+                      For I := 0 To CGIRunner.CGIExtensions.Count -1 Do
+                       Begin
+                        If Pos(LowerCase(CGIRunner.CGIExtensions[I]), LowerCase(Document)) <> 0 then
+                         Begin
+                          LocalDoc := ExpandFilename(FRootPath + Document);
+                          Break;
+                         End;
+                       End;
+                      If (LocalDoc <> '') or (lowercase(vContentType) = 'application/php') then
+                       Begin
+                        vSpecialServer := True;
+                        If RESTDWFileExists(LocalDoc, FRootPath) or (lowercase(vContentType) = 'application/php') Then
+                         Begin
+                          CGIRunner.Execute(LocalDoc, AContext, aRequestInfo, aResponseInfo, FRootPath, JSONStr);
+                          vTagReply := True;
+                         End
+                        Else
+                         Begin
+                          ContentText := '<H1><center>Script not found</center></H1>';
+                          ResponseNo := 404; // Not found
+                         End;
+                       End;
+                      End;
+                   {$IFEND}
+                  {$ENDIF}
+                  If Not vSpecialServer Then
+                   Begin
+                    If {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                     {$ELSE}Url{$IFEND}
+                                                     {$ELSE}Url{$ENDIF} <> '' Then
+                     sFile := GetFileOSDir(ExcludeTag(tmp + {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                                          {$ELSE}Url{$IFEND}
+                                                                                          {$ELSE}Url{$ENDIF}))
+                    Else
+                     sFile := GetFileOSDir(ExcludeTag(Cmd));
+                    vFileExists := RESTDWFileExists(sFile, FRootPath);
+                    If Not vFileExists Then
+                     Begin
+                      tmp := '';
+                      If Referer <> '' Then
+                       tmp := GetLastMethod(Referer);
+                      If {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                       {$ELSE}Url{$IFEND}
+                                                       {$ELSE}Url{$ENDIF} <> '' Then
+                       sFile := GetFileOSDir(ExcludeTag(tmp + {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                                                                                            {$ELSE}Url{$IFEND}
+                                                                                            {$ELSE}Url{$ENDIF}))
+                      Else
+                       sFile := GetFileOSDir(ExcludeTag(Cmd));
+                      vFileExists := RESTDWFileExists(sFile, FRootPath);
+                     End;
+                    vTagReply := vFileExists or scripttags(ExcludeTag(Cmd));
+                    If vTagReply Then
+                     Begin
+                      FreeContentStream      := True;
+                      ContentType            := GetMIMEType(sFile);
+                      If scripttags(ExcludeTag(Cmd)) and Not vFileExists Then
+                       ContentStream         := TMemoryStream.Create
+                      Else
+                       ContentStream         := TIdReadFileExclusiveStream.Create(sFile);
+                      ContentStream.Position := 0;
+                      ResponseNo             := 200;
+                      WriteContent;
+                     End;
+                   End;
+                 End;
+               End;
+             End
+            Else
+             Begin
+              JSONStr    := vToken;
+              JsonMode   := jmPureJSON;
+              vErrorCode := 200;
+             End;
+           End;
+         End;
+       End;
+      Try
+       If Assigned(vRequestHeader) Then
+        Begin
+         vRequestHeader.Clear;
+         FreeAndNil(vRequestHeader);
+        End;
+       If Assigned(vServerMethod) Then
+        If Assigned(vTempServerMethods) Then
+         Begin
+          If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
+           Begin
+            {$IFNDEF FPC}
+             {$IF CompilerVersion > 21}
+              {$IFDEF WINDOWS}
+               If Assigned(vCriticalSection) Then
+                Begin
+                 LeaveCriticalSection(vCriticalSection);
+                 DeleteCriticalSection(vCriticalSection);
+                End;
+              {$ELSE}
+               If Assigned(vCriticalSection) Then
+                Begin
+                 vCriticalSection.Release;
+//                 FreeAndNil(vCriticalSection);
+                End;
+              {$ENDIF}
+             {$ELSE}
+              If Assigned(vCriticalSection) Then
+               Begin
+                vCriticalSection.Release;
+                FreeAndNil(vCriticalSection);
+               End;
+             {$IFEND}
+            {$ELSE}
+             LeaveCriticalSection(vCriticalSection);
+             DoneCriticalSection(vCriticalSection);
+            {$ENDIF}
+           End;
+          Try
+           {$IFDEF POSIX} //no linux nao precisa libertar porque é [weak]
+           vTempServerMethods.free;
+           {$ELSE}
+           vTempServerMethods.free;
+           {$ENDIF}
+           vTempServerMethods := Nil;
+          Except
+          End;
+         End;
+       If Not dwassyncexec Then
+        Begin
+         If (Not (vTagReply)) Then
+          Begin
+           If vEncoding = esUtf8 Then
+            Charset := 'utf-8'
+           Else
+            Charset := 'ansi';
+           If vContentType <> '' Then
+            ContentType := vContentType;
+           If Not vServerContextCall Then
+            Begin
+             If (vUriOptions.EventName <> '') Then
+              Begin
+               If JsonMode in [jmDataware, jmUndefined] Then
+                Begin
+                 If Trim(JSONStr) <> '' Then
+                  Begin
+                   If Not(((Pos('{', JSONStr) > 0)   And
+                           (Pos('}', JSONStr) > 0))  Or
+                          ((Pos('[', JSONStr) > 0)   And
+                           (Pos(']', JSONStr) > 0))) Then
+                    Begin
+                     If Not (WelcomeAccept) And (vErrorMessage <> '') Then
+                       JSONStr := escape_chars(vErrorMessage)
+                     Else If Not((JSONStr[InitStrPos] = '"')  And
+                            (JSONStr[Length(JSONStr)] = '"')) Then
+                      JSONStr := '"' + JSONStr + '"';
+                    End;
+                  End;
+                 If vBinaryEvent Then
+                  Begin
+                   vReplyString := JSONStr;
+                   vErrorCode   := 200;
+                  End
+                 Else
+                  Begin
+                   If Not (WelcomeAccept) And (vErrorMessage <> '') Then
+                    vReplyString := escape_chars(vErrorMessage)
+                   Else
+                    vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
+                  End;
+                End
+               Else If JsonMode = jmPureJSON Then
+                Begin
+                 If (Trim(JSONStr) = '') And (WelcomeAccept) Then
+                  vReplyString := '{}'
+                 Else If Not (WelcomeAccept) And (vErrorMessage <> '') Then
+                  vReplyString := escape_chars(vErrorMessage)
+                 Else
+                  vReplyString := JSONStr;
+                End;
+              End;
+             If Assigned(DWParams) Then
+              Begin
+               If DWParams.RequestHeaders.Output.Count > 0 Then
+                Begin
+                 For I := 0 To DWParams.RequestHeaders.Output.Count -1 Do
+                  CustomHeaders.Add(DWParams.RequestHeaders.Output[I]);
+                End;
+              End;
+             ResponseNo                 := vErrorCode;
+             If Assigned(DWParams) And
+               (Pos(DWParams.Url_Redirect, Cmd) = 0) And
+               (DWParams.Url_Redirect <> '') Then
+              Redirect(DWParams.Url_Redirect);
+             If compresseddata Then
+              Begin
+               If vBinaryEvent Then
+                Begin
+                 ms := TStringStream.Create('');
+                 If vGettoken Then
+                  Begin
+                   DWParams.Clear;
+                   DWParams.CreateParam('token', vReplyString);
+                  End;
+                 Try
+                  DWParams.SaveToStream(ms, tdwpxt_OUT);
+                  ZCompressStreamD(ms, mb2);
+                 Finally
+                  FreeAndNil(ms);
+                 End;
+                End
+               Else
+                mb2                                   := TStringStream(ZCompressStreamNew(vReplyString));
+               If vErrorCode <> 200 Then
+                Begin
+                 If Assigned(mb2) Then
+                  FreeAndNil(mb2);
+                 ResponseText           := escape_chars(vReplyString);
+                End
+               Else
+                Begin
+                 FreeContentStream      := True;
+                 mb2.Position := 0;
+                 ContentStream          := mb2; //mb;
+                End;
+               If Assigned(ContentStream) Then
+                Begin
+                 ContentStream.Position := 0;
+                 ContentLength          := ContentStream.Size;
+                End
+               Else
+                ContentLength           := 0;
+              End
+             Else
+              Begin
+               {$IFNDEF FPC}
+                {$IF CompilerVersion > 21}
+                 If vBinaryEvent Then
+                  Begin
+                   mb := TStringStream.Create('');
+                   Try
+                    DWParams.SaveToStream(mb, tdwpxt_OUT);
+                   Finally
+                   End;
+                  End
+                 Else
+                  mb                                  := TStringStream.Create(vReplyString{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+                 mb.Position                          := 0;
+                 FreeContentStream      := True;
+                 ContentStream          := mb;
+                 ContentStream.Position := 0;
+                 ContentLength          := mb.Size;
+                {$ELSE}
+                 If vBinaryEvent Then
+                  Begin
+                   mb := TStringStream.Create('');
+                   Try
+                    DWParams.SaveToStream(mb, tdwpxt_OUT);
+                   Finally
+                   End;
+                   FreeContentStream      := True;
+                   ContentStream          := mb;
+                   ContentStream.Position := 0;
+                   ContentLength          := mb.Size;
+                  End
+                 Else
+                  Begin
+                   ContentLength          := -1;
+                   ContentText            := vReplyString;
+                   WriteHeader;
+                  End;
+                {$IFEND}
+               {$ELSE}
+                If vBinaryEvent Then
+                 Begin
+                  mb := TStringStream.Create('');
+                  Try
+                   DWParams.SaveToStream(mb, tdwpxt_OUT);
+                  Finally
+                  End;
+                  FreeContentStream       := True;
+                  ContentStream           := mb;
+                  ContentStream.Position  := 0;
+                  ContentLength           := mb.Size;
+                 End
+                Else
+                 Begin
+                  If vEncoding = esUtf8 Then
+                   mb                                   := TStringStream.Create(Utf8Encode(vReplyString))
+                  Else
+                   mb                                   := TStringStream.Create(vReplyString);
+                  mb.Position                           := 0;
+                  FreeContentStream       := True;
+                  ContentStream           := mb;
+                  ContentStream.Position  := 0;
+                  ContentLength           := mb.Size;
+                  WriteHeader;
+                 End;
+               {$ENDIF}
+              End;
+            End
+           Else
+            Begin
+             LocalDoc := '';
+             If TEncodeSelect(vEncoding) = esUtf8 Then
+              Charset := 'utf-8'
+              Else If TEncodeSelect(vEncoding) in [esANSI, esASCII] Then
+              Charset := 'ansi';
+             If Not vSpecialServer Then
+              Begin
+               ResponseNo             := vErrorCode;
+               If ServerContextStream <> Nil Then
+                Begin
+                 FreeContentStream        := True;
+                 ContentStream            := ServerContextStream;
+                 ContentStream.Position   := 0;
+                 ContentLength            := ServerContextStream.Size;
+                End
+               Else
+                Begin
+                 {$IFDEF FPC}
+                   If vEncoding = esUtf8 Then
+                    mb                                  := TStringStream.Create(Utf8Encode(JSONStr))
+                   Else
+                    mb                                  := TStringStream.Create(JSONStr);
+                  mb.Position                           := 0;
+                  FreeContentStream       := True;
+                  ContentStream           := mb;
+                  ContentStream.Position  := 0;
+                  ContentLength           := -1;//mb.Size;
+                 {$ELSE}
+                  {$IF CompilerVersion > 21}
+                   mb                                   := TStringStream.Create(JSONStr{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+                   mb.Position                          := 0;
+                   FreeContentStream      := True;
+                   ContentStream          := mb;
+                   ContentStream.Position := 0;
+                   ContentLength          := mb.Size;
+                  {$ELSE}
+                   ContentLength          := -1;
+                   ContentText            := JSONStr;
+                  {$IFEND}
+                 {$ENDIF}
+                End;
+              End;
+            End;
+            If Not HeaderHasBeenWritten Then
+             If CustomHeaders.Count > 0 Then
+              WriteHeader;
+            If Not (vBinaryEvent) Then
+             If (Assigned(ContentStream)) Then
+              If ContentStream.size > 0   Then
+               WriteContent;
+          End;
+        End;
+      Finally
+//        FreeAndNil(mb);
+      End;
+      If Assigned(vLastResponse) Then
+       Begin
+        Try
+         vLastResponse(vReplyString);
+        Finally
+        End;
+       End;
+     Finally
+      If Assigned(vServerMethod) Then
+       If Assigned(vTempServerMethods) Then
+        Begin
+         Try
+          {$IFDEF POSIX} //no linux nao precisa libertar porque é [weak]
+          {$ELSE}
+          FreeAndNil(vTempServerMethods); //.free;
+          {$ENDIF}
+          vTempServerMethods := Nil;
+         Except
+         End;
+        End;
+     End;
+   End;
+ Finally
+  DestroyComponents;
+ End;
+End;
+
+Procedure TRESTServiceBase.SetActive(Value : Boolean);
+Begin
+ vActive := Value;
+End;
+
 Procedure TRESTServiceBase.SetCORSCustomHeader (Value : TStringList);
 Var
  I : Integer;
@@ -1591,25 +4417,25 @@ Begin
  {$ENDIF}
 End;
 
-Procedure TRESTServiceBase.Loaded;
-Begin
- Inherited;
- If Assigned(vOnCreate) Then
-  vOnCreate(Self);
-End;
+//Procedure TRESTServiceBase.Loaded;
+//Begin
+// Inherited;
+// If Assigned(vOnCreate) Then
+//  vOnCreate(Self);
+//End;
 
-procedure TRESTServiceBase.Notification(AComponent: TComponent;
-  Operation: TOperation);
-begin
- If (Operation = opRemove) then
-  Begin
-  End;
- Inherited Notification(AComponent, Operation);
-end;
+//procedure TRESTServiceBase.Notification(AComponent: TComponent;
+//  Operation: TOperation);
+//begin
+// If (Operation = opRemove) then
+//  Begin
+//  End;
+// Inherited Notification(AComponent, Operation);
+//end;
 
 Procedure TRESTServiceBase.GetTableNames(ServerMethodsClass   : TComponent;
                                            Var Pooler           : String;
-                                           Var DWParams         : TRESTDWParams;
+                                           Var DWParams         : TRESTRESTDWParams;
                                            ConnectionDefs       : TConnectionDefs;
                                            hEncodeStrings       : Boolean;
                                            AccessTag            : String);
@@ -2107,7 +4933,7 @@ end;
 
 Procedure TRESTServiceBase.GetFieldNames(ServerMethodsClass   : TComponent;
                                            Var Pooler           : String;
-                                           Var DWParams         : TRESTDWParams;
+                                           Var DWParams         : TRESTRESTDWParams;
                                            ConnectionDefs       : TConnectionDefs;
                                            hEncodeStrings       : Boolean;
                                            AccessTag            : String);
@@ -2180,7 +5006,7 @@ End;
 
 Procedure TRESTServiceBase.GetKeyFieldNames(ServerMethodsClass      : TComponent;
                                               Var Pooler              : String;
-                                              Var DWParams            : TRESTDWParams;
+                                              Var DWParams            : TRESTRESTDWParams;
                                               ConnectionDefs          : TConnectionDefs;
                                               hEncodeStrings          : Boolean;
                                               AccessTag               : String);
@@ -2278,26 +5104,26 @@ Begin
 End;
 
 Function TRESTServiceBase.ServiceMethods(BaseObject              : TComponent;
-                                           AContext                : TComponent;
-                                           Var UriOptions          : TRESTDWUriOptions;
-                                           Var DWParams            : TRESTDWParams;
-                                           Var JSONStr             : String;
-                                           Var JsonMode            : TJsonMode;
-                                           Var ErrorCode           : Integer;
-                                           Var ContentType         : String;
-                                           Var ServerContextCall   : Boolean;
-                                           Var ServerContextStream : TMemoryStream;
-                                           ConnectionDefs          : TConnectionDefs;
-                                           hEncodeStrings          : Boolean;
-                                           AccessTag               : String;
-                                           WelcomeAccept           : Boolean;
-                                           Const RequestType       : TRequestType;
-                                           mark                    : String;
-                                           RequestHeader           : TStringList;
-                                           BinaryEvent             : Boolean;
-                                           Metadata                : Boolean;
-                                           BinaryCompatibleMode    : Boolean;
-                                           CompareContext          : Boolean) : Boolean;
+                                         AContext                : TComponent;
+                                         Var UriOptions          : TRESTDWUriOptions;
+                                         Var DWParams            : TRESTRESTDWParams;
+                                         Var JSONStr             : String;
+                                         Var JsonMode            : TJsonMode;
+                                         Var ErrorCode           : Integer;
+                                         Var ContentType         : String;
+                                         Var ServerContextCall   : Boolean;
+                                         Var ServerContextStream : TMemoryStream;
+                                         ConnectionDefs          : TConnectionDefs;
+                                         hEncodeStrings          : Boolean;
+                                         AccessTag               : String;
+                                         WelcomeAccept           : Boolean;
+                                         Const RequestType       : TRequestType;
+                                         mark                    : String;
+                                         RequestHeader           : TStringList;
+                                         BinaryEvent             : Boolean;
+                                         Metadata                : Boolean;
+                                         BinaryCompatibleMode    : Boolean;
+                                         CompareContext          : Boolean) : Boolean;
 Var
  vJsonMSG,
  vResult,
@@ -2705,7 +5531,7 @@ End;
 
 Procedure TRESTServiceBase.ExecuteCommandPureJSON(ServerMethodsClass   : TComponent;
                                                     Var Pooler           : String;
-                                                    Var DWParams         : TRESTDWParams;
+                                                    Var DWParams         : TRESTRESTDWParams;
                                                     ConnectionDefs       : TConnectionDefs;
                                                     hEncodeStrings       : Boolean;
                                                     AccessTag            : String;
@@ -2802,7 +5628,7 @@ End;
 
 Procedure TRESTServiceBase.ExecuteCommandPureJSONTB(ServerMethodsClass   : TComponent;
                                                       Var Pooler           : String;
-                                                      Var DWParams         : TRESTDWParams;
+                                                      Var DWParams         : TRESTRESTDWParams;
                                                       ConnectionDefs       : TConnectionDefs;
                                                       hEncodeStrings       : Boolean;
                                                       AccessTag            : String;
@@ -2898,7 +5724,7 @@ End;
 
 Procedure TRESTServiceBase.ExecuteCommandJSON(ServerMethodsClass   : TComponent;
                                                 Var Pooler           : String;
-                                                Var DWParams         : TRESTDWParams;
+                                                Var DWParams         : TRESTRESTDWParams;
                                                 ConnectionDefs       : TConnectionDefs;
                                                 hEncodeStrings       : Boolean;
                                                 AccessTag            : String;
@@ -2912,7 +5738,7 @@ Var
  vExecute      : Boolean;
  vTempJSON,
  vMessageError : String;
- DWParamsD     : TRESTDWParams;
+ DWParamsD     : TRESTRESTDWParams;
  BinaryBlob    : TMemoryStream;
 Begin
  DWParamsD     := Nil;
@@ -2948,7 +5774,7 @@ Begin
             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.StrsTrim2Len      := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).StrsTrim2Len;
             If DWParams.ItemsString['Params'] <> Nil Then
              Begin
-              DWParamsD := TRESTDWParams.Create;
+              DWParamsD := TRESTRESTDWParams.Create;
               DWParamsD.FromJSON(DWParams.ItemsString['Params'].Value);
              End;
             Try
@@ -3010,7 +5836,7 @@ End;
 
 Procedure TRESTServiceBase.ExecuteCommandJSONTB(ServerMethodsClass   : TComponent;
                                                   Var Pooler           : String;
-                                                  Var DWParams         : TRESTDWParams;
+                                                  Var DWParams         : TRESTRESTDWParams;
                                                   ConnectionDefs       : TConnectionDefs;
                                                   hEncodeStrings       : Boolean;
                                                   AccessTag            : String;
@@ -3024,7 +5850,7 @@ Var
  vTempJSON,
  vTablename,
  vMessageError : String;
- DWParamsD     : TRESTDWParams;
+ DWParamsD     : TRESTRESTDWParams;
  BinaryBlob    : TMemoryStream;
 Begin
  DWParamsD     := Nil;
@@ -3060,7 +5886,7 @@ Begin
             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.StrsTrim2Len      := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).StrsTrim2Len;
             If DWParams.ItemsString['Params'] <> Nil Then
              Begin
-              DWParamsD := TRESTDWParams.Create;
+              DWParamsD := TRESTRESTDWParams.Create;
               DWParamsD.FromJSON(DWParams.ItemsString['Params'].Value);
              End;
             Try
@@ -3120,7 +5946,7 @@ End;
 
 Procedure TRESTServiceBase.InsertMySQLReturnID(ServerMethodsClass : TComponent;
                                                  Var Pooler         : String;
-                                                 Var DWParams       : TRESTDWParams;
+                                                 Var DWParams       : TRESTRESTDWParams;
                                                  ConnectionDefs     : TConnectionDefs;
                                                  hEncodeStrings     : Boolean;
                                                  AccessTag          : String);
@@ -3129,7 +5955,7 @@ Var
  vTempJSON     : Integer;
  vError        : Boolean;
  vMessageError : String;
- DWParamsD     : TRESTDWParams;
+ DWParamsD     : TRESTRESTDWParams;
 Begin
  DWParamsD := Nil;
  If ServerMethodsClass <> Nil Then
@@ -3159,7 +5985,7 @@ Begin
            TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.StrsTrim2Len      := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).StrsTrim2Len;
            If DWParams.ItemsString['Params'] <> Nil Then
             Begin
-             DWParamsD := TRESTDWParams.Create;
+             DWParamsD := TRESTRESTDWParams.Create;
              DWParamsD.FromJSON(DWParams.ItemsString['Params'].Value);
             End;
            Try
@@ -3206,7 +6032,7 @@ End;
 
 Procedure TRESTServiceBase.ApplyUpdatesJSON(ServerMethodsClass : TComponent;
                                               Var Pooler         : String;
-                                              Var DWParams       : TRESTDWParams;
+                                              Var DWParams       : TRESTRESTDWParams;
                                               ConnectionDefs     : TConnectionDefs;
                                               hEncodeStrings     : Boolean;
                                               AccessTag          : String);
@@ -3217,7 +6043,7 @@ Var
  vError        : Boolean;
  vSQL,
  vMessageError : String;
- DWParamsD     : TRESTDWParams;
+ DWParamsD     : TRESTRESTDWParams;
 Begin
  DWParamsD     := Nil;
  vTempJSON     := Nil;
@@ -3249,7 +6075,7 @@ Begin
            TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.StrsTrim2Len      := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).StrsTrim2Len;
            If DWParams.ItemsString['Params'] <> Nil Then
             Begin
-             DWParamsD := TRESTDWParams.Create;
+             DWParamsD := TRESTRESTDWParams.Create;
              DWParamsD.FromJSON(DWParams.ItemsString['Params'].Value);
             End;
            If DWParams.ItemsString['SQL'] <> Nil Then
@@ -3299,7 +6125,7 @@ End;
 
 Procedure TRESTServiceBase.ApplyUpdatesJSONTB(ServerMethodsClass : TComponent;
                                                 Var Pooler         : String;
-                                                Var DWParams       : TRESTDWParams;
+                                                Var DWParams       : TRESTRESTDWParams;
                                                 ConnectionDefs     : TConnectionDefs;
                                                 hEncodeStrings     : Boolean;
                                                 AccessTag          : String);
@@ -3310,7 +6136,7 @@ Var
  vError        : Boolean;
  vSQL,
  vMessageError : String;
- DWParamsD     : TRESTDWParams;
+ DWParamsD     : TRESTRESTDWParams;
 Begin
  DWParamsD     := Nil;
  vTempJSON     := Nil;
@@ -3342,7 +6168,7 @@ Begin
            TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.StrsTrim2Len      := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).StrsTrim2Len;
            If DWParams.ItemsString['Params'] <> Nil Then
             Begin
-             DWParamsD := TRESTDWParams.Create;
+             DWParamsD := TRESTRESTDWParams.Create;
              DWParamsD.FromJSON(DWParams.ItemsString['Params'].Value);
             End;
            If DWParams.ItemsString['SQL'] <> Nil Then
@@ -3391,7 +6217,7 @@ End;
 
 Procedure TRESTServiceBase.OpenDatasets(ServerMethodsClass   : TComponent;
                                           Var Pooler           : String;
-                                          Var DWParams         : TRESTDWParams;
+                                          Var DWParams         : TRESTRESTDWParams;
                                           ConnectionDefs       : TConnectionDefs;
                                           hEncodeStrings       : Boolean;
                                           AccessTag            : String;
@@ -3491,7 +6317,7 @@ End;
 
 Procedure TRESTServiceBase.ApplyUpdates_MassiveCache(ServerMethodsClass : TComponent;
                                                        Var Pooler         : String;
-                                                       Var DWParams       : TRESTDWParams;
+                                                       Var DWParams       : TRESTRESTDWParams;
                                                        ConnectionDefs     : TConnectionDefs;
                                                        hEncodeStrings     : Boolean;
                                                        AccessTag          : String);
@@ -3566,7 +6392,7 @@ End;
 
 Procedure TRESTServiceBase.ApplyUpdates_MassiveCacheTB(ServerMethodsClass : TComponent;
                                                          Var Pooler         : String;
-                                                         Var DWParams       : TRESTDWParams;
+                                                         Var DWParams       : TRESTRESTDWParams;
                                                          ConnectionDefs     : TConnectionDefs;
                                                          hEncodeStrings     : Boolean;
                                                          AccessTag          : String);
@@ -3641,7 +6467,7 @@ End;
 
 Procedure TRESTServiceBase.ProcessMassiveSQLCache(ServerMethodsClass      : TComponent;
                                                     Var Pooler              : String;
-                                                    Var DWParams            : TRESTDWParams;
+                                                    Var DWParams            : TRESTRESTDWParams;
                                                     ConnectionDefs          : TConnectionDefs;
                                                     hEncodeStrings          : Boolean;
                                                     AccessTag               : String);
@@ -3719,7 +6545,7 @@ End;
 Procedure TRESTServiceBase.GetEvents(ServerMethodsClass : TComponent;
                                        Pooler,
                                        urlContext         : String;
-                                       Var DWParams       : TRESTDWParams);
+                                       Var DWParams       : TRESTRESTDWParams);
 Var
  I         : Integer;
  vError    : Boolean;
@@ -3732,18 +6558,18 @@ Begin
    iContSE := 0;
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
     Begin
-     If ((ServerMethodsClass.Components[i].InheritsFrom(TRESTDWServerEvents)) Or
-         (ServerMethodsClass.Components[i] is TRESTDWServerEvents)) Then
+     If ((ServerMethodsClass.Components[i].InheritsFrom(TRESTRESTDWServerEvents)) Or
+         (ServerMethodsClass.Components[i] is TRESTRESTDWServerEvents)) Then
       Begin
        iContSE := iContSE + 1;
-       If (LowerCase(urlContext) = LowerCase(TRESTDWServerEvents(ServerMethodsClass.Components[i]).ContextName)) or
+       If (LowerCase(urlContext) = LowerCase(TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).ContextName)) or
           (LowerCase(urlContext) = LowerCase(ServerMethodsClass.Components[i].Name)) Or
           (LowerCase(urlContext) = LowerCase(Format('%s.%s', [ServerMethodsClass.Classname, ServerMethodsClass.Components[i].Name])))  Then
         Begin
          If vTempJSON = '' Then
-          vTempJSON := Format('%s', [TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.ToJSON])
+          vTempJSON := Format('%s', [TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.ToJSON])
          Else
-          vTempJSON := vTempJSON + Format(', %s', [TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.ToJSON]);
+          vTempJSON := vTempJSON + Format(', %s', [TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.ToJSON]);
          Break;
         End;
       End;
@@ -3771,7 +6597,7 @@ Function TRESTServiceBase.ReturnEvent(ServerMethodsClass : TComponent;
                                         Pooler,
                                         urlContext          : String;
                                         Var vResult         : String;
-                                        Var DWParams        : TRESTDWParams;
+                                        Var DWParams        : TRESTRESTDWParams;
                                         Var JsonMode        : TJsonMode;
                                         Var ErrorCode       : Integer;
                                         Var ContentType,
@@ -3794,20 +6620,20 @@ Begin
   Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
     Begin
-     If ServerMethodsClass.Components[i] is TRESTDWServerEvents Then
+     If ServerMethodsClass.Components[i] is TRESTRESTDWServerEvents Then
       Begin
-       If (LowerCase(urlContext) = LowerCase(TRESTDWServerEvents(ServerMethodsClass.Components[i]).ContextName)) Or
+       If (LowerCase(urlContext) = LowerCase(TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).ContextName)) Or
           (LowerCase(urlContext) = LowerCase(ServerMethodsClass.Components[i].Name)) or
           (LowerCase(urlContext) = LowerCase(ServerMethodsClass.classname + '.' +
                                              ServerMethodsClass.Components[i].Name)) Then
-        vTagService := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler] <> Nil;
+        vTagService := TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler] <> Nil;
        If vTagService Then
         Begin
          Result   := True;
          JsonMode := jmPureJSON;
-         If Trim(TRESTDWServerEvents(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+         If Trim(TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
           Begin
-           If TRESTDWServerEvents(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+           If TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
              If DWParams.ItemsString['dwencodestrings'] <> Nil Then
               vResult := EncodeStrings('Invalid Access tag...'{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
@@ -3818,24 +6644,24 @@ Begin
              Break;
             End;
           End;
-         If (RequestTypeToRoute(RequestType) In TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes) Or
-            (crAll in TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes) Then
+         If (RequestTypeToRoute(RequestType) In TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes) Or
+            (crAll in TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes) Then
           Begin
            vResult := '';
-           TRESTDWServerEvents(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, DWParams);
-           If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest) Then
-            TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest(DWParams, vRejected, vErrorMessage, ErrorCode, RequestHeader);
+           TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, DWParams);
+           If Assigned(TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest) Then
+            TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest(DWParams, vRejected, vErrorMessage, ErrorCode, RequestHeader);
            If Not vRejected Then
             Begin
-             TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].CompareParams(DWParams);
+             TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].CompareParams(DWParams);
              Try
-              If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnBeforeExecute) Then
-               TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnBeforeExecute(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler]);
-              If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEventByType) Then
-               TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEventByType(DWParams, vResult, RequestType, ErrorCode, RequestHeader)
-              Else If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent) Then
-               TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent(DWParams, vResult);
-              JsonMode := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].JsonMode;
+              If Assigned(TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnBeforeExecute) Then
+               TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnBeforeExecute(TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler]);
+              If Assigned(TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEventByType) Then
+               TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEventByType(DWParams, vResult, RequestType, ErrorCode, RequestHeader)
+              Else If Assigned(TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent) Then
+               TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent(DWParams, vResult);
+              JsonMode := TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].JsonMode;
              Except
               On E : Exception Do
                Begin
@@ -3871,7 +6697,7 @@ Begin
          Else
           Begin
            vStrAcceptedRoutes := '';
-           vDWRoutes := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes;
+           vDWRoutes := TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes;
            If crGet in vDWRoutes Then
             Begin
              If vStrAcceptedRoutes <> '' Then
@@ -3943,11 +6769,11 @@ Begin
   Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
     Begin
-     If ServerMethodsClass.Components[i] is TRESTDWServerEvents Then
+     If ServerMethodsClass.Components[i] is TRESTRESTDWServerEvents Then
       Begin
-       If Trim(TRESTDWServerEvents(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+       If Trim(TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
         Begin
-         If TRESTDWServerEvents(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+         If TRESTRESTDWServerEvents(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
           Continue;
         End;
        If ServerEventsList = '' then
@@ -3966,7 +6792,7 @@ Function TRESTServiceBase.ReturnContext(ServerMethodsClass      : TComponent;
                                           ContentType             : String;
                                           Var ServerContextStream : TMemoryStream;
                                           Var Error               : Boolean;
-                                          Var   DWParams          : TRESTDWParams;
+                                          Var   DWParams          : TRESTRESTDWParams;
                                           Const RequestType       : TRequestType;
                                           mark                    : String;
                                           RequestHeader           : TStringList;
@@ -3998,16 +6824,16 @@ Begin
   Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
     Begin
-     If ServerMethodsClass.Components[i] is TRESTDWServerContext Then
+     If ServerMethodsClass.Components[i] is TRESTRESTDWServerContext Then
       Begin
-       If ((LowerCase(urlContext) = LowerCase(TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseContext))) Or
-          ((Trim(TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseContext) = '') And (Pooler = '')        And
-           (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[urlContext] <> Nil))   Then
+       If ((LowerCase(urlContext) = LowerCase(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).BaseContext))) Or
+          ((Trim(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).BaseContext) = '') And (Pooler = '')        And
+           (TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[urlContext] <> Nil))   Then
         Begin
-         vRootContext := TRESTDWServerContext(ServerMethodsClass.Components[i]).RootContext;
+         vRootContext := TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).RootContext;
          If ((Pooler = '')    And (vRootContext <> '')) Then
           Pooler := vRootContext;
-         vTagService := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler] <> Nil;
+         vTagService := TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler] <> Nil;
          If Not vTagService Then
           Begin
            Error   := True;
@@ -4017,60 +6843,60 @@ Begin
        If vTagService Then
         Begin
          Result   := False;
-         If (RequestTypeToRoute(RequestType) In TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].Routes) Or
-            (crAll in TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].Routes) Then
+         If (RequestTypeToRoute(RequestType) In TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].Routes) Or
+            (crAll in TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].Routes) Then
           Begin
-           If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).OnBeforeRenderer) Then
-            TRESTDWServerContext(ServerMethodsClass.Components[i]).OnBeforeRenderer(ServerMethodsClass.Components[i]);
-           If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnAuthRequest) Then
-            TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnAuthRequest(DWParams, vRejected, vErrorMessage, ErrorCode, RequestHeader);
+           If Assigned(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).OnBeforeRenderer) Then
+            TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).OnBeforeRenderer(ServerMethodsClass.Components[i]);
+           If Assigned(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnAuthRequest) Then
+            TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnAuthRequest(DWParams, vRejected, vErrorMessage, ErrorCode, RequestHeader);
            If Not vRejected Then
             Begin
              Result  := True;
              vResult := '';
-             TRESTDWServerContext(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, DWParams);
-             TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].CompareParams(DWParams);
+             TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, DWParams);
+             TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].CompareParams(DWParams);
              Try
-              ContentType := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContentType;
+              ContentType := TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContentType;
               If mark <> '' Then
                Begin
                 vResult    := '';
-                Result     := Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules);
+                Result     := Assigned(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules);
                 If Result Then
                  Begin
-                  Result   := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark] <> Nil;
+                  Result   := TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark] <> Nil;
                   If Result Then
                    Begin
-                    Result := Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark].OnRequestExecute);
+                    Result := Assigned(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark].OnRequestExecute);
                     If Result Then
                      Begin
                       ContentType := 'application/json';
-                      TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark].OnRequestExecute(DWParams, ContentType, vResult);
+                      TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark].OnRequestExecute(DWParams, ContentType, vResult);
 //                      vResult := utf8Encode(vResult);
                      End;
                    End;
                  End;
                End
-              Else If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules) Then
+              Else If Assigned(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules) Then
                Begin
                 vBaseHeader := '';
-                ContentType := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.ContentType;
-                vResult := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.BuildContext(TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader,
-                                                                                                                                          TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].IgnoreBaseHeader);
+                ContentType := TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.ContentType;
+                vResult := TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.BuildContext(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader,
+                                                                                                                                          TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].IgnoreBaseHeader);
                End
               Else
                Begin
-                If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeCall) Then
-                 TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeCall(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler]);
-                vDefaultPageB := Not Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequest);
+                If Assigned(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeCall) Then
+                 TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeCall(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler]);
+                vDefaultPageB := Not Assigned(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequest);
                 If Not vDefaultPageB Then
-                 TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequest(DWParams, ContentType, vResult, RequestType);
-                If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequestStream) Then
+                 TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequest(DWParams, ContentType, vResult, RequestType);
+                If Assigned(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequestStream) Then
                  Begin
                   vDefaultPageB := False;
                   ServerContextStream := TMemoryStream.Create;
                   Try
-                   TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequestStream(DWParams, ContentType, ServerContextStream, RequestType, ErrorCode);
+                   TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequestStream(DWParams, ContentType, ServerContextStream, RequestType, ErrorCode);
                   Finally
                    If ServerContextStream.Size = 0 Then
                     FreeAndNil(ServerContextStream);
@@ -4079,11 +6905,11 @@ Begin
                 If vDefaultPageB Then
                  Begin
                   vBaseHeader := '';
-                  If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader) Then
-                   vBaseHeader := TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader.Text;
-                  vResult := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].DefaultHtml.Text;
-                  If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeRenderer) Then
-                   TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeRenderer(vBaseHeader, ContentType, vResult, RequestType);
+                  If Assigned(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader) Then
+                   vBaseHeader := TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader.Text;
+                  vResult := TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].DefaultHtml.Text;
+                  If Assigned(TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeRenderer) Then
+                   TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeRenderer(vBaseHeader, ContentType, vResult, RequestType);
                  End;
                End;
              Except
@@ -4115,7 +6941,7 @@ Begin
          Else
           Begin
            vStrAcceptedRoutes := '';
-           vDWRoutes := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].Routes;
+           vDWRoutes := TRESTRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].Routes;
            If crGet in vDWRoutes Then
             Begin
              If vStrAcceptedRoutes <> '' Then
@@ -4171,7 +6997,7 @@ End;
 
 Procedure TRESTServiceBase.SetServerAuthOptions(AuthenticationOptions : TRESTDWServerAuthOptionParams);
 Begin
- If AuthenticationOptions <> Nil Then
+ If Assigned(AuthenticationOptions) Then
   vServerAuthOptions := AuthenticationOptions;
 End;
 
@@ -4193,47 +7019,44 @@ End;
 Constructor TRESTServiceBase.Create(AOwner: TComponent);
 Begin
  Inherited;
- vProxyOptions                   := TProxyOptions.Create;
- vDefaultPage                    := TStringList.Create;
- vCORSCustomHeaders              := TStringList.Create;
- vDataRouteList                  := TRESTDWDataRouteList.Create;
+ vProxyOptions                          := TProxyOptions.Create;
+ vDefaultPage                           := TStringList.Create;
+ vCORSCustomHeaders                     := TStringList.Create;
+ vDataRouteList                         := TRESTDWDataRouteList.Create;
  vCORSCustomHeaders.Add('Access-Control-Allow-Origin=*');
  vCORSCustomHeaders.Add('Access-Control-Allow-Methods=GET, POST, PATCH, PUT, DELETE, OPTIONS');
  vCORSCustomHeaders.Add('Access-Control-Allow-Headers=Content-Type, Origin, Accept, Authorization, X-CUSTOM-HEADER');
- vCripto                         := TCripto.Create;
+ vCripto                                := TCripto.Create;
  {$IFDEF FPC}
- vDatabaseCharSet                := csUndefined;
+ vDatabaseCharSet                       := csUndefined;
  {$ELSE}
  {$ENDIF}
- vServerAuthOptions              := TRESTDWServerAuthOptionParams.Create(Self);
- vActive                         := False;
- vServerAuthOptions.AuthorizationOption                        := rdwAOBasic;
- TRESTDWAuthOptionBasic(vServerAuthOptions.OptionParams).Username := 'testserver';
- TRESTDWAuthOptionBasic(vServerAuthOptions.OptionParams).Password := 'testserver';
- vServerContext                  := '';
- vEncoding                       := esUtf8;
- vServicePort                    := 8082;
- vForceWelcomeAccess             := False;
- vCORS                           := False;
- vPathTraversalRaiseError        := True;
- FRootPath                       := '/';
- aDefaultUrl                     := '';
- vServiceTimeout                 := -1;
+ vServerAuthOptions                     := TRESTDWServerAuthOptionParams.Create(Self);
+// vServerAuthOptions.AuthorizationOption := rdwAONone;
+ vActive                                := False;
+ vServerContext                         := '';
+ vEncoding                              := esUtf8;
+ vServicePort                           := 8082;
+ vForceWelcomeAccess                    := False;
+ vCORS                                  := False;
+ vPathTraversalRaiseError               := True;
+ FRootPath                              := '/';
+ aDefaultUrl                            := '';
+ vServiceTimeout                        := -1;
 End;
 
 Destructor TRESTServiceBase.Destroy;
 Begin
- {$IFNDEF FPC}
-  {$IF CompilerVersion > 21}
-   If Assigned(vCriticalSection) Then
-    FreeAndNil(vCriticalSection);
-  {$IFEND}
- {$ENDIF}
- FreeAndNil(vProxyOptions);
- FreeAndNil(vCripto);
- FreeAndNil(vDefaultPage);
- FreeAndNil(vCORSCustomHeaders);
- FreeAndNil(vDataRouteList);
+ If Assigned(vProxyOptions) Then
+  FreeAndNil(vProxyOptions);
+ If Assigned(vCripto) Then
+  FreeAndNil(vCripto);
+ If Assigned(vDefaultPage) Then
+  FreeAndNil(vDefaultPage);
+ If Assigned(vCORSCustomHeaders) Then
+  FreeAndNil(vCORSCustomHeaders);
+ If Assigned(vDataRouteList) Then
+  FreeAndNil(vDataRouteList);
  If Assigned(vServerAuthOptions) Then
   FreeAndNil(vServerAuthOptions);
  Inherited;
@@ -4286,7 +7109,7 @@ Begin
 End;
 
 Function TRESTDWPoolerDB.ExecuteCommand(SQL              : String;
-                                        Params           : TRESTDWParams;
+                                        Params           : TRESTRESTDWParams;
                                         Var Error        : Boolean;
                                         Var MessageError : String;
                                         Var BinaryBlob   : TMemoryStream;
@@ -4312,7 +7135,7 @@ Begin
 End;
 
 Procedure TRESTDWPoolerDB.ExecuteProcedure(ProcName       : String;
-                                         Params           : TRESTDWParams;
+                                         Params           : TRESTRESTDWParams;
                                          Var Error        : Boolean;
                                          Var MessageError : String);
 Begin
@@ -4377,7 +7200,7 @@ Begin
 End;
 
 Function TRESTDWPoolerDB.InsertMySQLReturnID(SQL            : String;
-                                           Params           : TRESTDWParams;
+                                           Params           : TRESTRESTDWParams;
                                            Var Error        : Boolean;
                                            Var MessageError : String) : Integer;
 Begin
@@ -4441,6 +7264,265 @@ Begin
  Inherited;
  Active      := True;
  ServicePort := 0;
+End;
+
+Procedure TRESTDWClientRESTBase.SetOnWork(Value : TOnWork);
+Begin
+ {$IFDEF FPC}
+  vOnWork            := Value;
+ {$ELSE}
+  vOnWork            := Value;
+ {$ENDIF}
+End;
+
+Procedure TRESTDWClientRESTBase.SetOnWorkBegin(Value: TOnWork);
+Begin
+ {$IFDEF FPC}
+  vOnWorkBegin            := Value;
+ {$ELSE}
+  vOnWorkBegin            := Value;
+ {$ENDIF}
+End;
+
+procedure TRESTDWClientRESTBase.SetOnWorkEnd(Value: TOnWorkEnd);
+begin
+ {$IFDEF FPC}
+  vOnWorkEnd            := Value;
+ {$ELSE}
+  vOnWorkEnd            := Value;
+ {$ENDIF}
+end;
+
+procedure TRESTDWClientRESTBase.SetOnStatus(Value: TOnStatus);
+begin
+ {$IFDEF FPC}
+  vOnStatus            := Value;
+ {$ELSE}
+  vOnStatus            := Value;
+ {$ENDIF}
+end;
+
+Procedure TRESTDWClientRESTBase.SetAuthOptionParams(Value : TRESTDWClientAuthOptionParams);
+Begin
+ vAuthOptionParams.Assign(Value);
+End;
+
+Procedure TRESTDWClientRESTBase.SetDefaultCustomHeader(Value: TStrings);
+Begin
+ vDefaultCustomHeader.Assign(value);
+End;
+
+Procedure TRESTDWClientRESTBase.SetUseSSL(Value     : Boolean);
+Begin
+ vUseSSL := Value;
+End;
+
+Function TRESTDWClientRESTBase.GetUseSSL : Boolean;
+Begin
+ Result := vUseSSL;
+End;
+
+Procedure TRESTDWClientRESTBase.SetHeaders(AHeaders : TStringList);
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Constructor TRESTDWClientRESTBase.Create(AOwner: TComponent);
+Begin
+ Inherited;
+ vContentType                    := 'application/json';
+ vContentEncoding                := 'multipart/form-data';
+ vAccept                         := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+ vAcceptEncoding                 := 'gzip, deflate, br';
+ vMaxAuthRetries                 := 0;
+ vUserAgent                      := cUserAgent;
+ vAuthOptionParams               := TRESTDWClientAuthOptionParams.Create(Self);
+ vAuthOptionParams.AuthorizationOption := rdwAONone;
+ vAccessControlAllowOrigin       := '*';
+ vAUrl                           := '';
+ vRedirectMaximum                := 1;
+ vDefaultCustomHeader            := TStringList.Create;
+ {$IFDEF FPC}
+  vRSCharset                     := esUtf8;
+ {$ELSE}
+   {$IF CompilerVersion < 21}
+    vRSCharset                   := esAnsi;
+   {$ELSE}
+    vRSCharset                   := esUtf8;
+   {$IFEND}
+ {$ENDIF}
+ vRequestTimeOut                 := 5000;
+ vConnectTimeOut                 := 5000;
+End;
+
+Function TRESTDWClientRESTBase.Delete(AUrl            : String;
+                                      CustomHeaders   : TStringList;
+                                      Const AResponse : TStream;
+                                      IgnoreEvents    : Boolean): Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Delete(AUrl            : String;
+                                      CustomHeaders,
+                                      CustomParams    : TStringList;
+                                      Const AResponse : TStream;
+                                      IgnoreEvents    : Boolean): Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Destructor TRESTDWClientRESTBase.Destroy;
+Begin
+ FreeAndNil(vDefaultCustomHeader);
+ If Assigned(vAuthOptionParams) Then
+  FreeAndNil(vAuthOptionParams);
+ Inherited;
+End;
+
+Function TRESTDWClientRESTBase.Get(AUrl            : String;
+                                   CustomHeaders   : TStringList;
+                                   Const AResponse : TStream;
+                                   IgnoreEvents    : Boolean) : Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Get(AUrl          : String;
+                                   CustomHeaders : TStringList;
+                                   IgnoreEvents  : Boolean): String;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Patch(AUrl            : String;
+                                     CustomHeaders,
+                                     CustomParams    : TStringList;
+                                     FileName        : String;
+                                     FileStream      : TStream;
+                                     Const AResponse : TStream;
+                                     IgnoreEvents    : Boolean) : Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Patch(AUrl            : String;
+                                     CustomHeaders   : TStringList;
+                                     Const AResponse : TStream;
+                                     IgnoreEvents    : Boolean) : Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Patch(AUrl            : String;
+                                     CustomHeaders   : TStringList;
+                                     CustomBody      : TStream;
+                                     Const AResponse : TStream;
+                                     IgnoreEvents    : Boolean): Integer;
+Begin
+
+End;
+
+Function TRESTDWClientRESTBase.Patch(AUrl            : String;
+                                     CustomHeaders,
+                                     CustomParams    : TStringList;
+                                     CustomBody      : TStream;
+                                     Const AResponse : TStream;
+                                     IgnoreEvents    : Boolean): Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Post(AUrl             : String;
+                                    CustomHeaders    : TStringList;
+                                    Const CustomBody : TStream;
+                                    IgnoreEvents,
+                                    RawHeaders       : Boolean) : Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Post(AUrl              : String;
+                                    Var AResponseText : String;
+                                    CustomHeaders     : TStringList    = Nil;
+                                    CustomParams      : TStringList    = Nil;
+                                    Const CustomBody  : TStream        = Nil;
+                                    Const AResponse   : TStream        = Nil;
+                                    IgnoreEvents      : Boolean        = False;
+                                    RawHeaders        : Boolean        = False):Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Post(AUrl            : String;
+                                    CustomHeaders   : TStringList;
+                                    FileName        : String;
+                                    FileStream      : TStream;
+                                    Const AResponse : TStream;
+                                    IgnoreEvents,
+                                    RawHeaders      : Boolean) : Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Post(AUrl            : String;
+                                    CustomHeaders,
+                                    CustomParams    : TStringList;
+                                    FileName        : String;
+                                    FileStream      : TStream;
+                                    Const AResponse : TStream;
+                                    IgnoreEvents,
+                                    RawHeaders      : Boolean): Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Put(AUrl              : String;
+                                   CustomHeaders,
+                                   CustomParams      : TStringList;
+                                   Const CustomBody,
+                                   AResponse         : TStream;
+                                   IgnoreEvents      : Boolean): Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Put(AUrl            : String;
+                                   CustomHeaders,
+                                   CustomParams    : TStringList;
+                                   FileName        : String;
+                                   FileStream      : TStream;
+                                   Const AResponse : TStream;
+                                   IgnoreEvents    : Boolean) : Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Put(AUrl            : String;
+                                   CustomHeaders   : TStringList;
+                                   FileName        : String;
+                                   FileStream      : TStream;
+                                   Const AResponse : TStream;
+                                   IgnoreEvents    : Boolean): Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Put(AUrl            : String;
+                                   CustomHeaders   : TStringList;
+                                   Const AResponse : TStream;
+                                   IgnoreEvents    : Boolean): Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Put(AUrl              : String;
+                                   CustomHeaders     : TStringList;
+                                   Const CustomBody,
+                                   AResponse         : TStream;
+                                   IgnoreEvents      : Boolean): Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
 End;
 
 end.

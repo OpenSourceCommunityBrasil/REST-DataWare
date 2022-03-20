@@ -344,8 +344,8 @@ End;
 Type
  TRESTDWDatabasebaseBase = Class(TRESTDWComponent)
  Private
+  vOnWorkBegin,
   vOnWork              : TOnWork;
-  vOnWorkBegin         : TOnWorkBegin;
   vOnWorkEnd           : TOnWorkEnd;
   vOnStatus            : TOnStatus;
   vOnFailOverExecute   : TOnFailOverExecute;
@@ -393,7 +393,7 @@ Type
                                      Var Error              : Boolean;
                                      Var MessageError       : String) : String;
   Procedure SetOnWork               (Value                  : TOnWork);
-  Procedure SetOnWorkBegin          (Value                  : TOnWorkBegin);
+  Procedure SetOnWorkBegin          (Value                  : TOnWork);
   Procedure SetOnWorkEnd            (Value                  : TOnWorkEnd);
   Procedure SetOnStatus             (Value                  : TOnStatus);
   Procedure SetConnection           (Value                  : Boolean);          //Seta o Estado da Conexão
@@ -530,7 +530,7 @@ Type
   Property HandleRedirects         : Boolean                    Read vHandleRedirects         Write vHandleRedirects;
   Property RedirectMaximum         : Integer                    Read vRedirectMaximum         Write vRedirectMaximum;
   Property OnWork                  : TOnWork                    Read vOnWork                  Write SetOnWork;
-  Property OnWorkBegin             : TOnWorkBegin               Read vOnWorkBegin             Write SetOnWorkBegin;
+  Property OnWorkBegin             : TOnWork                    Read vOnWorkBegin             Write SetOnWorkBegin;
   Property OnWorkEnd               : TOnWorkEnd                 Read vOnWorkEnd               Write SetOnWorkEnd;
   Property OnStatus                : TOnStatus                  Read vOnStatus                Write SetOnStatus;
   Property OnFailOverExecute       : TOnFailOverExecute         Read vOnFailOverExecute       Write vOnFailOverExecute;
@@ -2353,7 +2353,7 @@ Begin
  {$ENDIF}
 End;
 
-Procedure TRESTDWDatabasebaseBase.SetOnWorkBegin(Value : TOnWorkBegin);
+Procedure TRESTDWDatabasebaseBase.SetOnWorkBegin(Value : TOnWork);
 Begin
  {$IFDEF FPC}
   vOnWorkBegin            := Value;

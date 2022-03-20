@@ -4,7 +4,7 @@ interface
 
 Uses
   SysUtils, Classes, uRESTDWCharset, uRESTDWParams, DataUtils, uRESTDWComponentEvents,
-  uRESTDWBasicTypes, uRESTDWJSONObject;
+  uRESTDWBasicTypes, uRESTDWConsts, uRESTDWJSONObject;
 
 Type
  TUserBasicAuth  =             Procedure(Welcomemsg, AccessTag,

@@ -9,7 +9,7 @@
 interface
 
 Uses
- SysConst, TypInfo, {$IFNDEF FPC}DBConsts, SqlTimSt, {$ELSE}Masks, {$ENDIF}IniFiles, DateUtils, Math, FMTBcd,
+ SysConst, TypInfo, uRESTDWConsts, {$IFNDEF FPC}DBConsts, SqlTimSt, {$ELSE}Masks, {$ENDIF}IniFiles, DateUtils, Math, FMTBcd,
  StrUtils, Types, Variants,
  {$IFDEF FPC}
   Graphics, Db, contnrs, LConvEncoding,
@@ -1214,7 +1214,7 @@ Function GetFieldTypeB(FieldType : TFieldType) : String;    overload;
 
 Implementation
 
-uses uRESTDWConsts, uRESTDWTools;
+uses uRESTDWTools;
 
 Const
  HeaderVersion      = 15;

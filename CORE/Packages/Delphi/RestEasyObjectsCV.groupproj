@@ -9,6 +9,9 @@
         <Projects Include="Connectors\Indy\RestDatawareIndySockets.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +38,23 @@
     <Target Name="RestDatawareIndySockets:Make">
         <MSBuild Projects="Connectors\Indy\RestDatawareIndySockets.dproj" Targets="Make"/>
     </Target>
+    <Target Name="RestDWServerProject">
+        <MSBuild Projects="..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj"/>
+    </Target>
+    <Target Name="RestDWServerProject:Clean">
+        <MSBuild Projects="..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWServerProject:Make">
+        <MSBuild Projects="..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="RestDatawareCORE;RestDatawareIndySockets"/>
+        <CallTarget Targets="RestDatawareCORE;RestDatawareIndySockets;RestDWServerProject"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RestDatawareCORE:Clean;RestDatawareIndySockets:Clean"/>
+        <CallTarget Targets="RestDatawareCORE:Clean;RestDatawareIndySockets:Clean;RestDWServerProject:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RestDatawareCORE:Make;RestDatawareIndySockets:Make"/>
+        <CallTarget Targets="RestDatawareCORE:Make;RestDatawareIndySockets:Make;RestDWServerProject:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

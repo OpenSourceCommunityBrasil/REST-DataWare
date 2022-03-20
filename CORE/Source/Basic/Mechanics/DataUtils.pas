@@ -32,7 +32,8 @@ Uses
   Classes,  SysUtils,
   StringBuilderUnit,
   {$ENDIF} uRESTDWTools, uRESTDWConsts,
-  DateUtils, uRESTDWMD5;
+  DateUtils, uRESTDWMD5, uRESTDWBasicTypes,
+  uRESTDWParams;
 
 Type
  TRESTDWAuthOptionTypes = (rdwOATBasic, rdwOATBearer, rdwOATToken);
@@ -367,12 +368,148 @@ Type
   Property Token : String Read vToken Write vToken;
 End;
 
+ Type
+  TDataUtils = Class
+  Public
+   Class Procedure ParseRESTURL        (Const Cmd          : String;
+                                        Encoding           : TEncodeSelect;
+                                        Var UriOptions     : TRESTDWUriOptions;
+                                        Var mark           : String
+                                        {$IFDEF FPC};
+                                         DatabaseCharSet   : TDatabaseCharSet
+                                        {$ENDIF};
+                                        Var Result         : TRESTDWParams;
+                                        ParamsCount        : Integer);Overload;
+   Class Procedure ParseRESTURL        (UriParams          : String;
+                                        Encoding           : TEncodeSelect;
+                                        {$IFDEF FPC}
+                                        DatabaseCharSet    : TDatabaseCharSet;
+                                        {$ENDIF}
+                                        Var Result         : TRESTDWParams);Overload;
+   Class Function  Result2JSON          (wsResult          : TResultErro)     : String;
+   Class Procedure ParseWebFormsParams (Params             : TStrings;
+                                        Const URL,
+                                        Query              : String;
+                                        Var UriOptions     : TRESTDWUriOptions;
+                                        Var mark           : String;
+                                        Encoding           : TEncodeSelect;
+                                        {$IFDEF FPC}
+                                         DatabaseCharSet   : TDatabaseCharSet;
+                                        {$ENDIF}
+                                        Var Result         : TRESTDWParams;
+                                        ParamsCount        : Integer;
+                                        MethodType         : TRequestType = rtPost;
+                                        ContentType        : String = 'application/json'); Overload;
+   Class Procedure ParseWebFormsParams (Var DWParams       : TRESTDWParams;
+                                        WebParams          : TStrings;
+                                        Encoding           : TEncodeSelect
+                                        {$IFDEF FPC}
+                                        ;DatabaseCharSet   : TDatabaseCharSet
+                                        {$ENDIF};
+                                        MethodType         : TRequestType = rtPost);Overload;
+   Class Function ParseDWParamsURL     (Const Cmd          : String;
+                                        Encoding           : TEncodeSelect;
+                                        Var ResultPR       : TRESTDWParams{$IFDEF FPC}
+                                        ;DatabaseCharSet   : TDatabaseCharSet
+                                        {$ENDIF})          : Boolean;
+   Class Function ParseBodyRawToDWParam(Const BodyRaw      : String;
+                                        Encoding           : TEncodeSelect;
+                                        Var ResultPR       : TRESTDWParams
+                                        {$IFDEF FPC}
+                                        ;DatabaseCharSet   : TDatabaseCharSet
+                                        {$ENDIF})          : Boolean;
+   Class Function ParseBodyBinToDWParam(Const BodyBin      : String;
+                                        Encoding           : TEncodeSelect;
+                                        Var ResultPR       : TRESTDWParams
+                                        {$IFDEF FPC}
+                                        ;DatabaseCharSet   : TDatabaseCharSet
+                                        {$ENDIF})          : Boolean;
+   Class Function ParseFormParamsToDWParam(Const FormParams : String;
+                                           Encoding         : TEncodeSelect;
+                                           Var ResultPR     : TRESTDWParams
+                                           {$IFDEF FPC}
+                                           ;DatabaseCharSet : TDatabaseCharSet
+                                           {$ENDIF})        : Boolean;
+ End;
+
+
+
 Function GettokenValue(Value : String) : String;
 Function GetTokenType (Value : String) : TRESTDWTokenType;
+Function GetMIMEType  (Value : String) : String;
+
+Var
+ MimeTable : TMimeTable;
 
 implementation
 
 Uses uRESTDWCharset, uRESTDWJSONInterface;
+
+
+Function GetMIMEType(Value : String) : String;
+Begin
+ Result := MimeTable.GetFileMIMEType(Value);
+End;
+
+Function URLDecode(Const s : String) : String;
+Var
+ sAnsi,
+ sUtf8    : String;
+ sWide    : WideString;
+ i, len   : Cardinal;
+ ESC      : String[2];
+ CharCode : Integer;
+ c        : Char;
+Begin
+ sAnsi := PChar(s);
+ SetLength(sUtf8, Length(sAnsi));
+ i   := InitStrPos;
+ len := InitStrPos;
+ While (i <= Cardinal(Length(sAnsi))) Do
+  Begin
+   If (sAnsi[i] <> '%') Then
+    Begin
+     If (sAnsi[i] = '+') Then
+      c := ' '
+     Else
+      c := sAnsi[i];
+     sUtf8[len] := c;
+     Inc(len);
+    End
+   Else
+    Begin
+     Inc(i);
+     ESC := Copy(sAnsi, i, 2);
+     Inc(i, 1);
+     Try
+      CharCode := StrToInt('$' + ESC);
+      c := Char(CharCode);
+      sUtf8[len] := c;
+      Inc(len);
+     Except
+     End;
+    End;
+   Inc(i);
+  End;
+ Dec(len);
+ SetLength(sUtf8, len);
+ sWide := UTF8Decode(sUtf8);
+ len := Length(sWide);
+ Result := sWide;
+End;
+
+Function CountExpression(Value      : String;
+                         Expression : Char): Integer;
+Var
+ I : Integer;
+Begin
+ Result := 0;
+ For I := InitStrPos To Length(Value) - FinalStrPos Do
+  Begin
+   If Value[I] = Expression Then
+    Inc(Result);
+  End;
+End;
 
 Function GetTokenType (Value : String) : TRESTDWTokenType;
 Begin
@@ -1480,6 +1617,989 @@ Begin
  For I := 0 To Value.Count -1 do
   vCustomAuthErrorPage.Add(Value[I]);
 End;
+
+Class Procedure TDataUtils.ParseRESTURL(Const Cmd         : String;
+                                        Encoding          : TEncodeSelect;
+                                        Var UriOptions    : TRESTDWUriOptions;
+                                        Var mark          : String
+                                        {$IFDEF FPC};
+                                        DatabaseCharSet    : TDatabaseCharSet
+                                        {$ENDIF};
+                                        Var Result         : TRESTDWParams;
+                                        ParamsCount        : Integer);
+Var
+ vTempData,
+ NewCmd,
+ vArrayValues : String;
+ ArraySize,
+ aParamsCount,
+ aParamsIndex,
+ iBar1,
+ IBar2, Count : Integer;
+ aNewParam    : Boolean;
+ JSONParam    : TJSONParam;
+Begin
+ JSONParam    := Nil;
+ vArrayValues := '';
+ UriOptions.BaseServer  := '';
+ UriOptions.DataUrl     := '';
+ UriOptions.ServerEvent := '';
+ UriOptions.EventName   := '';
+ aParamsCount           := ParamsCount;
+ aParamsIndex           := 0;
+ If Pos('?', Cmd) > 0 Then
+  Begin
+   vArrayValues := Copy(Cmd, Pos('?', Cmd) + 1, Length(Cmd));
+   NewCmd       := Copy(Cmd, 1, Pos('?', Cmd) - 1);
+  End
+ Else
+  NewCmd     := Cmd;
+ If NewCmd <> '' Then
+  Begin
+   If NewCmd[Length(NewCmd) - FinalStrPos] <> '/' Then
+    NewCmd := NewCmd + '/';
+  End;
+ If Not Assigned(Result) Then
+  Begin
+   Result := TRESTDWParams.Create;
+   Result.Encoding := Encoding;
+   {$IFDEF FPC}
+   Result.DatabaseCharSet := DatabaseCharSet;
+   {$ENDIF}
+  End;
+ If (CountExpression(NewCmd, '/') > 1) Then
+  Begin
+   If NewCmd[InitStrPos] <> '/' then
+    NewCmd := '/' + NewCmd
+   Else
+    NewCmd := Copy(NewCmd, 2, Length(NewCmd));
+   If NewCmd[Length(NewCmd) - FinalStrPos] <> '/' Then
+    NewCmd := NewCmd + '/';
+   ArraySize := CountExpression(NewCmd, '/');
+   For Count := 0 to ArraySize - 1 Do
+    Begin
+     IBar2     := Pos('/', NewCmd);
+     vTempData := URLDecode(Copy(NewCmd, 1, IBar2 - 1));
+     If Count <= aParamsCount Then
+      Begin
+       If (UriOptions.EventName = '') Or (aParamsCount = cParamsCount) Then
+        Begin
+         If (vTempData <> '') then
+          Begin
+           If (aParamsCount = cParamsCount) Then
+            Begin
+             If ArraySize <= cParamsCount Then
+              Begin
+               If ArraySize < cParamsCount Then
+                Begin
+                 If (UriOptions.EventName = '') Then
+                  UriOptions.EventName    := vTempData
+                 Else
+                  UriOptions.ServerEvent  := vTempData;
+                End
+               Else
+                Begin
+                 If (UriOptions.ServerEvent <> '') Then
+                  UriOptions.EventName    := vTempData
+                 Else
+                  UriOptions.ServerEvent  := vTempData;
+                End;
+              End
+             Else
+              Begin
+               If (UriOptions.ServerEvent <> '') Then
+                UriOptions.EventName    := vTempData
+               Else
+                UriOptions.ServerEvent  := vTempData;
+              End;
+            End
+           Else
+            Begin
+             If (UriOptions.ServerEvent <> '') Then
+              UriOptions.EventName    := vTempData
+             Else
+              UriOptions.ServerEvent  := vTempData;
+            End;
+          End;
+        End
+       Else If (UriOptions.EventName <> '') Then
+        Begin
+         If (vTempData <> '') then
+          Begin
+           If UriOptions.BaseServer <> '' Then
+            Begin
+             If (UriOptions.DataUrl     <> '') And
+                (UriOptions.ServerEvent <> '') Then
+              Begin
+               If (UriOptions.DataUrl <> UriOptions.ServerEvent) then
+                UriOptions.BaseServer := UriOptions.DataUrl
+               Else
+                UriOptions.ServerEvent := UriOptions.EventName;
+              End
+             Else
+              Begin
+  //             UriOptions.DataUrl     := UriOptions.ServerEvent;
+               UriOptions.ServerEvent := UriOptions.EventName;
+              End;
+             UriOptions.EventName   := vTempData;
+            End
+           Else
+            Begin
+             UriOptions.BaseServer  := UriOptions.ServerEvent;
+             UriOptions.DataUrl     := UriOptions.EventName;
+             UriOptions.ServerEvent := UriOptions.DataUrl;
+             UriOptions.EventName   := vTempData;
+            End;
+          End;
+        End;
+      End
+     Else
+      Begin
+       aNewParam   := False;
+       JSONParam                 := Result.ItemsString[IntToStr(aParamsIndex)];
+       If JSONParam = Nil Then
+        Begin
+         aNewParam := True;
+         JSONParam := TJSONParam.Create(Result.Encoding);
+         JSONParam.ParamName     := IntToStr(aParamsIndex);
+        End;
+       JSONParam.ObjectDirection := odIN;
+       JSONParam.AsString        := vTempData;
+       If aNewParam Then
+        Result.Add(JSONParam);
+       Inc(aParamsIndex);
+       aNewParam := False;
+      End;
+     NewCmd := Copy(NewCmd, IBar2 +1, Length(NewCmd));
+    End;
+   If (UriOptions.ServerEvent <> '') And (UriOptions.EventName = '') Then
+    Begin
+     UriOptions.EventName   := UriOptions.ServerEvent;
+     UriOptions.ServerEvent := '';
+    End;
+   ArraySize := CountExpression(vArrayValues, '&');
+   If ArraySize = 0 Then
+    Begin
+     If Length(vArrayValues) > 0 Then
+      ArraySize := 1;
+    End
+   Else
+    ArraySize := ArraySize + 1;
+   For Count := 0 to ArraySize - 1 Do
+    Begin
+     IBar2     := Pos('&', vArrayValues);
+     If IBar2 = 0 Then
+      Begin
+       IBar2    := Length(vArrayValues);
+       vTempData := Copy(vArrayValues, 1, IBar2);
+      End
+     Else
+      vTempData := Copy(vArrayValues, 1, IBar2 - 1);
+      If Pos('dwmark:', vTempData) > 0 Then
+       mark := Copy(vTempData, Pos('dwmark:', vTempData) + 7, Length(vTempData))
+      Else
+       Begin
+        If Pos('=', vTempData) > 0 Then
+         Begin
+          aNewParam := False;
+          If Copy(vTempData, 1, Pos('=', vTempData) - 1) <> '' Then
+           JSONParam := Result.ItemsString[Copy(vTempData, 1, Pos('=', vTempData) - 1)]
+          Else
+           JSONParam := Result.ItemsString[cUndefined];
+          If JSONParam = Nil Then
+           Begin
+            aNewParam := True;
+            JSONParam := TJSONParam.Create(Result.Encoding);
+            JSONParam.ObjectDirection := odIN;
+            JSONParam.ParamName := Copy(vTempData, 1, Pos('=', vTempData) - 1);
+            Delete(vTempData, 1, Pos('=', vTempData));
+            vTempData          := URLDecode(vTempData);
+            JSONParam.SetValue(vTempData);
+           End;
+         End
+        Else
+         Begin
+          aNewParam := False;
+          JSONParam := Result.ItemsString[cUndefined];
+          If JSONParam = Nil Then
+           Begin
+            aNewParam := True;
+            JSONParam := TJSONParam.Create(Result.Encoding);
+            JSONParam.ParamName := cUndefined;//Format('PARAM%d', [0]);
+            JSONParam.ObjectDirection := odIN;
+            Result.Add(JSONParam);
+           End;
+          JSONParam.SetValue(vTempData);
+         End;
+        If aNewParam Then
+         Result.Add(JSONParam);
+       End;
+     Delete(vArrayValues, 1, IBar2);
+    End;
+  End;
+End;
+
+Class Procedure TDataUtils.ParseRESTURL(UriParams          : String;
+                                        Encoding           : TEncodeSelect;
+                                        {$IFDEF FPC}
+                                        DatabaseCharSet    : TDatabaseCharSet;
+                                        {$ENDIF}
+                                        Var Result         : TRESTDWParams);
+Var
+ vValue,
+ vTempdata : String;
+ A, I,
+ IndexS,
+ Count     : Integer;
+ JSONParam : TJSONParam;
+Begin
+ JSONParam    := Nil;
+ A            := 0;
+ If Not Assigned(Result) Then
+  Begin
+   Result := TRESTDWParams.Create;
+   Result.Encoding := Encoding;
+   {$IFDEF FPC}
+   Result.DatabaseCharSet := DatabaseCharSet;
+   {$ENDIF}
+  End;
+ vTempdata := UriParams;
+ IndexS    := InitStrPos;
+ Count     := Length(vTempdata);
+ vValue    := '';
+ For I := IndexS To Count - FinalStrPos Do
+  Begin
+   If (Trim(vValue) <> '')        And
+      ((vTempData[I] = '/')       Or
+       (vTempData[I] = '?')       Or
+       (vTempData[I] = '&')       Or
+       (I = Count - FinalStrPos)) Then
+    Begin
+     If (I = Count - FinalStrPos) Then
+      vValue := vValue + vTempData[I];
+     If Pos('=', vValue) > 0 Then
+      Begin
+       JSONParam := TJSONParam.Create(Result.Encoding);
+       JSONParam.ObjectDirection := odIN;
+       JSONParam.ParamName := Copy(vValue, InitStrPos, Pos('=', vValue) - 1);
+       Delete(vValue, 1, Pos('=', vValue));
+       vValue            := URLDecode(vValue);
+       JSONParam.SetValue(vValue);
+      End
+     Else
+      Begin
+       JSONParam := Result.ItemsString[IntToStr(A)];
+       If JSONParam = Nil Then
+        Begin
+         JSONParam := TJSONParam.Create(Result.Encoding);
+         JSONParam.ParamName := IntToStr(A);
+         JSONParam.ObjectDirection := odIN;
+         Result.Add(JSONParam);
+        End;
+       JSONParam.SetValue(vValue);
+       Inc(A);
+      End;
+     vValue := '';
+    End
+   Else
+    vValue := vValue + vTempData[I];
+   // Adicionado para URIParams que vem com o tamanho da string 1 (Exemplo: http://localhost:9092/helloworld/1)
+   If (Count = 1) then
+    Begin
+     JSONParam := Result.ItemsString[IntToStr(A)];
+     If JSONParam = Nil Then
+      Begin
+       JSONParam := TJSONParam.Create(Result.Encoding);
+       JSONParam.ParamName := IntToStr(A);
+       JSONParam.ObjectDirection := odIN;
+       Result.Add(JSONParam);
+      End;
+     JSONParam.SetValue(vValue);
+     Inc(A);
+     vValue := '';
+    End;
+  End;
+End;
+
+Class Function TDataUtils.Result2JSON(wsResult : TResultErro) : String;
+Begin
+ Result := '{"STATUS":"' + wsResult.Status + '","MENSSAGE":"' + wsResult.MessageText + '"}';
+End;
+
+Class Procedure TDataUtils.ParseWebFormsParams(Params             : TStrings;
+                                               Const URL,
+                                               Query              : String;
+                                               Var UriOptions     : TRESTDWUriOptions;
+                                               Var mark           : String;
+                                               Encoding           : TEncodeSelect;
+                                               {$IFDEF FPC}
+                                                DatabaseCharSet   : TDatabaseCharSet;
+                                               {$ENDIF}
+                                               Var Result         : TRESTDWParams;
+                                               ParamsCount        : Integer;
+                                               MethodType         : TRequestType = rtPost;
+                                               ContentType        : String = 'application/json');
+Var
+ aParamsCount,
+ aParamsIndex,
+ I, IBar,
+ ArraySize  : Integer;
+ JSONParam  : TJSONParam;
+ vParams    : TStringList;
+ vTempValue,
+ Cmd,
+ vParamName,
+ vTempData,
+ vValue     : String;
+ vNewParam,
+ vCreateParam,
+ aNewParam  : Boolean;
+Begin
+  // Extrai nome do ServerMethod
+ If Not Assigned(Result) Then
+  Begin
+   Result := TRESTDWParams.Create;
+   Result.Encoding := Encoding;
+   {$IFDEF FPC}
+   Result.DatabaseCharSet := DatabaseCharSet;
+   {$ENDIF}
+  End;
+ JSONParam := Nil;
+ UriOptions.BaseServer  := '';
+ UriOptions.DataUrl     := '';
+ UriOptions.ServerEvent := '';
+ UriOptions.EventName   := '';
+ Cmd := URL;
+ aParamsCount := ParamsCount;
+ aParamsIndex := 0;
+ If Pos('?', Cmd) > 0 Then
+  Begin
+   I := Pos('?', Cmd);
+   Cmd := Copy(Cmd, InitStrPos, I - FinalStrPos);
+  End;
+ If Cmd <> '' Then
+  Begin
+   If Cmd[Length(Cmd) - FinalStrPos] <> '/' Then
+    Cmd := URL + '/';
+  End;
+ If (CountExpression(Cmd, '/') > 1) Then
+  Begin
+   If Cmd[InitStrPos] <> '/' then
+    Cmd := '/' + Cmd
+   Else
+    Cmd := Copy(Cmd, 2, Length(Cmd));
+   If Cmd[Length(Cmd) - FinalStrPos] <> '/' Then
+    Cmd := Cmd + '/';
+   ArraySize := CountExpression(Cmd, '/');
+   For I := 0 to ArraySize - 1 Do
+    Begin
+     IBar      := Pos('/', Cmd);
+     vTempData := URLDecode(Copy(Cmd, 1, IBar - 1));
+     If I <= aParamsCount Then
+      Begin
+       If (UriOptions.EventName = '') Or (aParamsCount = cParamsCount) Then
+        Begin
+         If (vTempData <> '') then
+          Begin
+           If (aParamsCount = cParamsCount) Then
+            Begin
+             If ArraySize <= cParamsCount Then
+              Begin
+               If ArraySize < cParamsCount Then
+                Begin
+                 If (UriOptions.EventName = '') Then
+                  UriOptions.EventName    := vTempData
+                 Else
+                  UriOptions.ServerEvent  := vTempData;
+                End
+               Else
+                Begin
+                 If (UriOptions.ServerEvent <> '') Then
+                  UriOptions.EventName    := vTempData
+                 Else
+                  UriOptions.ServerEvent  := vTempData;
+                End;
+              End
+             Else
+              Begin
+               If (UriOptions.ServerEvent <> '') Then
+                UriOptions.EventName    := vTempData
+               Else
+                UriOptions.ServerEvent  := vTempData;
+              End;
+            End
+           Else
+            Begin
+             If (UriOptions.ServerEvent <> '') Then
+              UriOptions.EventName    := vTempData
+             Else
+              UriOptions.ServerEvent  := vTempData;
+            End;
+          End;
+        End
+       Else If (UriOptions.EventName <> '') Then
+        Begin
+         If (vTempData <> '') then
+          Begin
+           If UriOptions.BaseServer <> '' Then
+            Begin
+             If (UriOptions.DataUrl     <> '') And
+                (UriOptions.ServerEvent <> '') Then
+              Begin
+               If (UriOptions.DataUrl <> UriOptions.ServerEvent) then
+                UriOptions.BaseServer := UriOptions.DataUrl
+               Else
+                UriOptions.ServerEvent := UriOptions.EventName;
+              End
+             Else
+              Begin
+  //             UriOptions.DataUrl     := UriOptions.ServerEvent;
+               UriOptions.ServerEvent := UriOptions.EventName;
+              End;
+             UriOptions.EventName   := vTempData;
+            End
+           Else
+            Begin
+             UriOptions.BaseServer  := UriOptions.ServerEvent;
+             UriOptions.DataUrl     := UriOptions.EventName;
+             UriOptions.ServerEvent := UriOptions.DataUrl;
+             UriOptions.EventName   := vTempData;
+            End;
+          End;
+        End;
+      End
+     Else
+      Begin
+       aNewParam   := False;
+       JSONParam                 := Result.ItemsString[IntToStr(aParamsIndex)];
+       If JSONParam = Nil Then
+        Begin
+         aNewParam := True;
+         JSONParam := TJSONParam.Create(Result.Encoding);
+         JSONParam.ParamName     := IntToStr(aParamsIndex);
+        End;
+       JSONParam.ObjectDirection := odIN;
+       JSONParam.AsString        := vTempData;
+       If aNewParam Then
+        Result.Add(JSONParam);
+       Inc(aParamsIndex);
+       aNewParam := False;
+      End;
+     Cmd := Copy(Cmd, IBar +1, Length(Cmd));
+    End;
+   If (UriOptions.ServerEvent <> '') And (UriOptions.EventName = '') Then
+    Begin
+     UriOptions.EventName   := UriOptions.ServerEvent;
+     UriOptions.ServerEvent := '';
+    End;
+  End;
+  // Extrai Parametros
+  If (Params.Count > 0) And (MethodType = rtPost) Then
+   Begin
+    If ContentType <> cApplicationJSON then
+     Params.Text := URLDecode(Params.Text);
+    For I := 0 To Params.Count - 1 Do
+     Begin
+      vCreateParam := False;
+      If Pos('dwmark:', Params[I]) > 0 Then
+       mark := Copy(Params[I], Pos('dwmark:', Params[I]) + 7, Length(Params[I]))
+      Else
+       Begin
+        If Pos('{"ObjectType":"toParam", "Direction":"', Params[I]) > 0 Then
+         Begin
+          vCreateParam := True;
+          JSONParam := TJSONParam.Create(Result.Encoding);
+          {$IFDEF FPC}
+          JSONParam.DatabaseCharSet := DatabaseCharSet;
+          {$ENDIF}
+          JSONParam.ObjectDirection := odIN;
+          If Pos('=', Params[I]) > 0 Then
+           JSONParam.FromJSON(Trim(Copy(Params[I], Pos('=', Params[I]) + 1, Length(Params[I]))))
+          Else
+           JSONParam.FromJSON(Params[I]);
+         End
+        Else
+         Begin
+          If ((Copy(Params[I], 1, Pos('=', Params[I]) - 1) = '')) And
+             (ContentType = cApplicationJSON) Then
+           Begin
+            JSONParam := Result.ItemsString[cUndefined];
+            If JSONParam = Nil Then
+             Begin
+              vCreateParam := True;
+              JSONParam := TJSONParam.Create(Result.Encoding);
+              {$IFDEF FPC}
+              JSONParam.DatabaseCharSet := DatabaseCharSet;
+              {$ENDIF}
+              JSONParam.ObjectDirection := odIN;
+              JSONParam.ParamName       := cUndefined;
+             End;
+           End
+          Else
+           Begin
+            If Copy(Params[I], 1, Pos('=', Params[I]) - 1) <> '' Then
+             JSONParam := Result.ItemsString[Copy(Params[I], 1, Pos('=', Params[I]) - 1)]
+            Else
+             JSONParam := Result.ItemsString[cUndefined];
+            If JSONParam = Nil Then
+             Begin
+              vCreateParam := True;
+              JSONParam := TJSONParam.Create(Result.Encoding);
+              {$IFDEF FPC}
+              JSONParam.DatabaseCharSet := DatabaseCharSet;
+              {$ENDIF}
+              JSONParam.ObjectDirection := odIN;
+              If Copy(Params[I], 1, Pos('=', Params[I]) - 1) <> '' Then
+               JSONParam.ParamName := Copy(Params[I], 1, Pos('=', Params[I]) - 1)
+              Else
+               JSONParam.ParamName := cUndefined;
+             End;
+           End;
+          If JSONParam.IsNull Then
+           Begin
+            If ContentType <> cApplicationJSON Then
+             Begin
+              vValue  := Trim(Copy(Params[I], Pos('=', Params[I]) + 1, Length(Params[I])));
+              {$IFNDEF FPC}
+               If Result.Encoding = esUtf8 then
+                vValue   := Utf8Encode(vValue);
+              {$ENDIF}
+             End
+            Else
+             Begin
+              If Copy(Params[I], 1, Pos('=', Params[I]) - 1) <> '' Then
+               vValue  := Trim(Copy(Params[I], Pos('=', Params[I]) + 1, Length(Params[I])))
+              Else
+               vValue  := Params[I];
+             End;
+            JSONParam.AsString   := vValue;
+            If JSONParam.AsString = '' Then
+             JSONParam.Encoded   := False;
+           End;
+         End;
+        If vCreateParam Then
+         Result.Add(JSONParam);
+       End;
+     End;
+   End
+  Else
+   Begin
+    If (MethodType In [rtGet, rtDelete]) Then
+     Begin
+      If ((UriOptions.BaseServer = '')   And
+          (UriOptions.DataUrl    = ''))  And
+         ((UriOptions.ServerEvent <> '') And
+          (UriOptions.EventName <> ''))  And
+          (Trim(Query) = '') Then
+       Begin
+        Cmd                    := UriOptions.EventName;
+        UriOptions.EventName   := UriOptions.ServerEvent;
+        UriOptions.ServerEvent := '';
+       End;
+     End;
+    vParams := TStringList.Create;
+    vParams.Delimiter := '&';
+    {$IFNDEF FPC}{$if CompilerVersion > 21}vParams.StrictDelimiter := true;{$IFEND}{$ENDIF}
+    If pos(UriOptions.EventName + '/', Cmd) > 0 Then
+     Cmd := StringReplace(UriOptions.EventName + '/', Cmd, '', [rfReplaceAll]);
+    If (MethodType = rtGet) Then
+     Begin
+      If ((Params.Count > 0) And (Pos('?', URL) = 0)) And (Query = '') then
+       Cmd := Cmd + Params.Text
+      Else
+       Cmd := Cmd + URLDecode(Query);
+     End
+    Else
+     Begin
+      If ((Params.Count > 0) And (Pos('?', URL) = 0)) And (Query = '') then
+       Cmd := Cmd + URLDecode(Params.Text)
+      Else
+       Cmd := Cmd + URLDecode(Query);
+     End;
+//    Uri := TIdURI.Create(Cmd);
+    Try
+     vParams.Delimiter := '&';
+     vParams.Text := Cmd;
+     If vParams.count = 0 Then
+      If Trim(Cmd) <> '' Then
+       vParams.DelimitedText := StringReplace(Cmd, sLineBreak, '&', [rfReplaceAll]); //Alterações enviadas por "joaoantonio19"
+       //vParams.Add(Cmd);
+    Finally
+     For I := 0 To vParams.Count - 1 Do
+      Begin
+       If Pos('dwmark:', vParams[I]) > 0 Then
+        mark := Copy(vParams[I], Pos('dwmark:', vParams[I]) + 7, Length(vParams[I]))
+       Else
+        Begin
+         vNewParam := False;
+         If vParams[I] <> '' Then
+          Begin
+           If (vParams.names[I] <> '') And
+              (Trim(Query)      <> '') Then
+            vParamName := Trim(Copy(vParams[I], 1, Pos('=', vParams[I]) - 1))
+           Else
+            vParamName := IntToStr(I);
+           JSONParam                 := Result.ItemsString[vParamName];
+           If JSONParam = Nil Then
+            Begin
+             vNewParam := True;
+             JSONParam               := TJSONParam.Create(Result.Encoding);
+            End;
+           JSONParam.ObjectDirection := odIN;
+           If (vParams.names[I] <> '') And
+              (Trim(Query)      <> '') Then
+            Begin
+             JSONParam.ParamName       := Trim(Copy(vParams[I], 1, Pos('=', vParams[I]) - 1));
+             JSONParam.AsString        := Trim(Copy(vParams[I],    Pos('=', vParams[I]) + 1, Length(vParams[I])));
+            End
+           Else
+            Begin
+             JSONParam.ParamName       := IntToStr(I);
+             JSONParam.AsString        := vParams[I];
+            End;
+           {$IFDEF FPC}
+           JSONParam.DatabaseCharSet := DatabaseCharSet;
+           {$ENDIF}
+           If vNewParam Then
+            Result.Add(JSONParam);
+          End;
+        End;
+      End;
+     vParams.Free;
+    End;
+   End;
+End;
+
+Class Procedure TDataUtils.ParseWebFormsParams (Var DWParams      : TRESTDWParams;
+                                                WebParams         : TStrings;
+                                                Encoding          : TEncodeSelect
+                                                {$IFDEF FPC}
+                                                 ;DatabaseCharSet : TDatabaseCharSet
+                                                {$ENDIF};
+                                                MethodType        : TRequestType = rtPost);
+Var
+ I          : Integer;
+ JSONParam  : TJSONParam;
+ vParams    : TStringList;
+ vParamName : String;
+Begin
+ JSONParam := Nil;
+ vParams   := Nil;
+ If (WebParams.Count > 0) Then
+  Begin
+   WebParams.Text := URLDecode(WebParams.Text);
+   For I := 0 To WebParams.Count - 1 Do
+    Begin
+     If Pos('{"ObjectType":"toParam", "Direction":"', WebParams[I]) > 0 Then
+      Begin
+       JSONParam := TJSONParam.Create(DWParams.Encoding);
+       JSONParam.ObjectDirection := odIN;
+       If Pos('=', WebParams[I]) > 0 Then
+        JSONParam.FromJSON(Trim(Copy(WebParams[I], Pos('=', WebParams[I]) + 1, Length(WebParams[I]))))
+       Else
+        JSONParam.FromJSON(WebParams[I]);
+      End
+     Else
+      Begin
+       vParamName := Copy(WebParams[I], 1, Pos('=', WebParams[I]) - 1);
+       JSONParam  := DWParams.ItemsString[vParamName];
+       If Not Assigned(JSONParam) Then
+        JSONParam := TJSONParam.Create(DWParams.Encoding)
+       Else
+        Continue;
+       JSONParam.ObjectDirection := odIN;
+       JSONParam.ParamName := vParamName;
+       If DWParams.Encoding = esUtf8 then
+        JSONParam.AsString  := Utf8Encode(Trim(Copy(WebParams[I], Pos('=', WebParams[I]) + 1, Length(WebParams[I]))))
+       Else
+        JSONParam.AsString  := Trim(Copy(WebParams[I], Pos('=', WebParams[I]) + 1, Length(WebParams[I])));
+       If JSONParam.AsString = '' Then
+        JSONParam.Encoded         := False;
+      End;
+     If Assigned(JSONParam) Then
+      DWParams.Add(JSONParam);
+    End;
+  End;
+End;
+
+Class Function TDataUtils.ParseDWParamsURL(Const Cmd        : String;
+                                           Encoding         : TEncodeSelect;
+                                           Var ResultPR     : TRESTDWParams{$IFDEF FPC}
+                                           ;DatabaseCharSet : TDatabaseCharSet
+                                           {$ENDIF})        : Boolean;
+Var
+ vTempData,
+ vArrayValues : String;
+ ArraySize,
+ IBar2, Cont  : Integer;
+ JSONParam    : TJSONParam;
+ vParamList   : TStringList;
+Begin
+ vArrayValues         := Cmd;
+ vParamList           := TStringList.Create;
+ vParamList.Text      := StringReplace(vArrayValues, '&', #13, [rfReplaceAll]);
+ If vParamList.Count < 1 Then
+  Begin
+   Result := Pos('=', vArrayValues) > 0;
+   If Result Then
+    Begin
+     If Not Assigned(ResultPR) Then
+      Begin
+       ResultPR := TRESTDWParams.Create;
+       ResultPR.Encoding := Encoding;
+       {$IFDEF FPC}
+       ResultPR.DatabaseCharSet := DatabaseCharSet;
+       {$ENDIF}
+      End;
+     JSONParam  := Nil;
+     ArraySize := CountExpression(vArrayValues, '&');
+     If ArraySize = 0 Then
+      Begin
+       If Length(vArrayValues) > 0 Then
+        ArraySize := 1;
+      End
+     Else
+      ArraySize := ArraySize + 1;
+     For Cont := 0 to ArraySize - 1 Do
+      Begin
+       IBar2     := Pos('&', vArrayValues);
+       If IBar2 = 0 Then
+        Begin
+         IBar2    := Length(vArrayValues);
+         vTempData := Copy(vArrayValues, 1, IBar2);
+        End
+       Else
+        vTempData := Copy(vArrayValues, 1, IBar2 - 1);
+       If Pos('=', vTempData) > 0 Then
+        Begin
+         JSONParam := TJSONParam.Create(ResultPR.Encoding);
+         JSONParam.ObjectDirection := odIN;
+         JSONParam.ParamName := Copy(vTempData, 1, Pos('=', vTempData) - 1);
+         Delete(vTempData, 1, Pos('=', vTempData));
+         JSONParam.SetValue(URLDecode(StringReplace(vTempData, '+', ' ', [rfReplaceAll])));
+        End
+       Else
+        Begin
+         JSONParam := ResultPR.ItemsString[cUndefined];
+         If JSONParam = Nil Then
+          Begin
+           JSONParam := TJSONParam.Create(ResultPR.Encoding);
+           JSONParam.ObjectDirection := odIN;
+           JSONParam.ParamName := cUndefined;//Format('PARAM%d', [0]);
+          End;
+         JSONParam.SetValue(URLDecode(StringReplace(vTempData, '+', ' ', [rfReplaceAll])));
+        End;
+       ResultPR.Add(JSONParam);
+       Delete(vArrayValues, 1, IBar2);
+      End;
+    End;
+  End
+ Else
+  Begin
+   Result   := True;
+   vArrayValues := StringReplace(Trim(vArrayValues), #239#187#191, '', [rfReplaceAll]);
+   vArrayValues := StringReplace(vArrayValues, sLineBreak,   '', [rfReplaceAll]);
+   If (vArrayValues[InitStrPos] = '[') or (vArrayValues[InitStrPos] = '{') then
+    Begin
+     JSONParam := TJSONParam.Create(ResultPR.Encoding);
+     JSONParam.ParamName       := cUndefined;
+     JSONParam.ObjectDirection := odIN;
+     JSONParam.SetValue(vArrayValues, True);
+     ResultPR.Add(JSONParam);
+    End
+   Else
+    Begin
+     For Cont := 0 to vParamList.Count - 1 Do
+      Begin
+       If vParamList.Names[cont] = '' Then
+        Begin
+         JSONParam := ResultPR.ItemsString[cUndefined];
+         If JSONParam = Nil Then
+          Begin
+           JSONParam := TJSONParam.Create(ResultPR.Encoding);
+           JSONParam.ParamName := cUndefined;
+           JSONParam.ObjectDirection := odIN;
+          End;
+         JSONParam.SetValue(vParamList[cont]);
+        End
+       Else
+        Begin
+         JSONParam := ResultPR.ItemsString[vParamList.Names[cont]];
+         If JSONParam = Nil Then
+          Begin
+           JSONParam := TJSONParam.Create(ResultPR.Encoding);
+           JSONParam.ObjectDirection := odIN;
+           JSONParam.ParamName := vParamList.Names[cont];
+          End;
+         JSONParam.SetValue(vParamList.Values[vParamList.Names[cont]]);
+        End;
+       ResultPR.Add(JSONParam);
+      End;
+    End;
+  End;
+ vParamList.Free;
+End;
+
+Class Function TDataUtils.ParseBodyRawToDWParam(Const BodyRaw    : String;
+                                                Encoding         : TEncodeSelect;
+                                                Var ResultPR     : TRESTDWParams
+                                                {$IFDEF FPC}
+                                                ;DatabaseCharSet : TDatabaseCharSet
+                                                {$ENDIF})        : Boolean;
+Var
+ JSONParam: TJSONParam;
+Begin
+ If (BodyRaw <> EmptyStr) Then
+  Begin
+   If Not Assigned(ResultPR) Then
+    Begin
+     ResultPR := TRESTDWParams.Create;
+     ResultPR.Encoding := Encoding;
+     {$IFDEF FPC}
+     ResultPR.DatabaseCharSet := DatabaseCharSet;
+     {$ENDIF}
+    End;
+   JSONParam                 := TJSONParam.Create(ResultPR.Encoding);
+   JSONParam.ObjectDirection := odIN;
+   If Assigned(ResultPR.ItemsString['dwNameParamBody']) And (ResultPR.ItemsString['dwNameParamBody'].AsString<>'') Then
+    JSONParam.ParamName       := ResultPR.ItemsString['dwNameParamBody'].AsString
+   Else
+    JSONParam.ParamName       := 'UNDEFINED';
+   JSONParam.SetValue(BodyRaw, True);
+   ResultPR.Add(JSONParam);
+  End;
+End;
+
+Class Function TDataUtils.ParseBodyBinToDWParam(Const BodyBin    : String;
+                                                Encoding         : TEncodeSelect;
+                                                Var ResultPR     : TRESTDWParams
+                                                {$IFDEF FPC}
+                                                ;DatabaseCharSet : TDatabaseCharSet
+                                                {$ENDIF})        : Boolean;
+Var
+ JSONParam    : TJSONParam;
+ vContentType : String;
+Begin
+ If (BodyBin <> EmptyStr) then
+  Begin
+   If Not Assigned(ResultPR) Then
+    Begin
+     ResultPR := TRESTDWParams.Create;
+     ResultPR.Encoding := Encoding;
+     {$IFDEF FPC}
+     ResultPR.DatabaseCharSet := DatabaseCharSet;
+     {$ENDIF}
+    End;
+   JSONParam                 := TJSONParam.Create(ResultPR.Encoding);
+   JSONParam.ObjectDirection := odIN;
+   If Assigned(ResultPR.ItemsString['dwParamNameBody']) And (ResultPR.ItemsString['dwParamNameBody'].AsString<>'') Then
+    JSONParam.ParamName       := ResultPR.ItemsString['dwParamNameBody'].AsString
+   Else
+    JSONParam.ParamName       := 'UNDEFINED';
+   JSONParam.SetValue(BodyBin, True);
+   ResultPR.Add(JSONParam);
+   If Assigned(ResultPR.ItemsString['dwFileNameBody']) And (ResultPR.ItemsString['dwFileNameBody'].AsString<>'') Then
+    Begin
+     JSONParam   := TJSONParam.Create(ResultPR.Encoding);
+     JSONParam.ObjectDirection := odIN;
+     JSONParam.ParamName := 'dwfilename';
+     JSONParam.SetValue(ResultPR.ItemsString['dwFileNameBody'].AsString, JSONParam.Encoded);
+     ResultPR.Add(JSONParam);
+     If Not Assigned(ResultPR.ItemsString['Content-Type']) then
+      Begin
+       vContentType:= GetMIMEType(ResultPR.ItemsString['dwFileNameBody'].AsString);
+       If vContentType <> '' then
+        Begin
+         JSONParam   := TJSONParam.Create(ResultPR.Encoding);
+         JSONParam.ObjectDirection := odIN;
+         JSONParam.ParamName := 'Content-Type';
+         JSONParam.SetValue(vContentType, JSONParam.Encoded);
+         ResultPR.Add(JSONParam);
+        End;
+      End;
+    End;
+  End;
+End;
+
+Class Function TDataUtils.ParseFormParamsToDWParam(Const FormParams : String;
+                                                   Encoding         : TEncodeSelect;
+                                                   Var ResultPR     : TRESTDWParams
+                                                   {$IFDEF FPC}
+                                                   ;DatabaseCharSet : TDatabaseCharSet
+                                                   {$ENDIF})        : Boolean;
+Var
+ JSONParam: TJSONParam;
+ i            : Integer;
+ vTempValue,
+ vObjectName,
+ vArrayValues : String;
+ vParamList   : TStringList;
+ Function FindValue(ParamList   : TStringList; Var IndexValue : Integer) : String;
+ Var
+  vFlagnew : Boolean;
+ Begin
+  vFlagnew := False;
+  Result := '';
+  While IndexValue <= ParamList.Count -1 Do
+   Begin
+    If vFlagnew Then
+     Begin
+      Result := ParamList[IndexValue];
+      Break;
+     End
+    Else
+     vFlagnew := ParamList[IndexValue] = '';
+    Inc(IndexValue);
+   End;
+ End;
+begin
+ vArrayValues := StringReplace(FormParams, '=' + sLineBreak,   '', [rfReplaceAll]);
+ vParamList      := TStringList.Create;
+ Try
+  If (vArrayValues <> EmptyStr) Then
+   Begin
+    vParamList.Text := vArrayValues;
+    I := 0;
+    While I <= vParamList.Count -1 Do
+     Begin
+      If Not Assigned(ResultPR) Then
+       Begin
+        ResultPR := TRESTDWParams.Create;
+        ResultPR.Encoding := Encoding;
+        {$IFDEF FPC}
+        ResultPR.DatabaseCharSet := DatabaseCharSet;
+        {$ENDIF}
+       End;
+      vObjectName := Copy(lowercase(vParamList[I]), Pos('; name="', lowercase(vParamList[I])) + length('; name="'),  length(lowercase(vParamList[I])));
+      vObjectName := Copy(vObjectName, InitStrPos, Pos('"', vObjectName) -1);
+      If vObjectName = '' Then
+       Begin
+        Inc(I);
+        Continue;
+       End;
+      JSONParam                 := TJSONParam.Create(ResultPR.Encoding);
+      JSONParam.ObjectDirection := odIN;
+      JSONParam.ParamName       := vObjectName;
+      vTempValue := FindValue(vParamList, I);
+      If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(vTempValue)) > 0) Or
+         (Pos(Lowercase('{"ObjectType":"toObject", "Direction":"'), lowercase(vTempValue)) > 0) Then
+       JSONParam.FromJSON(vTempValue)
+      Else
+       JSONParam.SetValue(vTempValue, True);
+      ResultPR.Add(JSONParam);
+      Inc(I);
+     End;
+   End;
+ Finally
+  FreeAndNil(vParamList);
+ End;
+End;
+
+Initialization
+ MimeTable := TMimeTable.Create;
+
+Finalization
+ FreeAndNil(MimeTable);
 
 end.
 

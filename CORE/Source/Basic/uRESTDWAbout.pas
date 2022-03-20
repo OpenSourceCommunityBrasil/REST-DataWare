@@ -4,13 +4,12 @@ unit uRESTDWAbout;
 
 interface
 
-uses Classes, SysUtils, uRESTDWCharset{$IFDEF FPC}, lclversion{$ENDIF};
+uses Classes, SysUtils, uRESTDWCharset, uRESTDWConsts{$IFDEF FPC}, lclversion{$ENDIF};
 
 Type
- TRESTDWAboutInfo = (RESTDWAboutInfo);
- TRESTDWComponent = Class(TComponent)
+ TRESTDWComponent       = Class(TComponent)
  Private
-  fsAbout: TRESTDWAboutInfo;
+  fsAbout : TRESTDWAboutInfo;
   Function GetVersionInfo : String;
  Public
   Property VersionInfo : String Read GetVersionInfo;
@@ -21,16 +20,16 @@ Type
 Type
  TRESTDWOwnedCollection = Class(TOwnedCollection)
  Private
-  fsAbout: TRESTDWAboutInfo;
+  fsAbout : TRESTDWAboutInfo;
  Published
   Property AboutInfo : TRESTDWAboutInfo Read fsAbout Write fsAbout Stored False;
  End;
 
-Procedure DWAboutDialog;
+Procedure RESTDWAboutDialog;
 
 Implementation
 
-uses uRESTDWConsts{$IFNDEF RESTDWLAMW}, uRESTDWAboutForm{$ENDIF};
+uses {$IFNDEF RESTDWLAMW}uRESTDWAboutForm{$ENDIF};
 
 {$IFNDEF FPC}
 Function GetDelphiVersion : String;
@@ -115,7 +114,7 @@ Begin
  Result := Format('%s%s', [RESTDWVersionINFO, RESTDWRelease]);
 End;
 
-Procedure DWAboutDialog;
+Procedure RESTDWAboutDialog;
 Var
  Msg : String;
  {$IFNDEF RESTDWLAMW}

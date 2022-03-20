@@ -30,7 +30,10 @@ package RestDatawareIndySockets;
 
 requires
   rtl,
-  RestDatawareCORE;
+  RestDatawareCORE,
+  IndySystem,
+  IndyProtocols,
+  IndyCore;
 
 contains
   uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas',

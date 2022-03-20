@@ -37,25 +37,536 @@ Uses
 
  Const
   B64Table      = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  QuoteSpecials : Array[TQuotingType] Of String = ('', '()<>@,;:\"./', '()<>@,;:\"/[]?=', '()<>@,;:\"/[]?={} '#9);
+  LF            = #10;
+  CR            = #13;
 
- Function EncodeStrings    (Value     : String
-                           {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : String;
- Function DecodeStrings    (Value     : String
-                           {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : String;
- Function EncodeStream     (Value     : TStream)        : String;
- Function DecodeStream     (Value     : String)         : TMemoryStream;
- Function BytesToString    (Const bin : TRESTDWBytes)   : String;
- Function StringToBytes    (AStr      : String)         : TRESTDWBytes;
- Function StreamToBytes    (Stream    : TMemoryStream)  : TRESTDWBytes;
- Function StringToFieldType(Const S   : String)         : Integer;
- Function Escape_chars     (s         : String)         : String;
- Function Unescape_chars   (s         : String)         : String;
- Function HexToBookmark    (Value     : String)         : TRESTDWBytes;
- Function BookmarkToHex    (Value     : TRESTDWBytes)   : String;
+ Function  EncodeStrings          (Value              : String
+                                  {$IFDEF FPC};DatabaseCharSet          : TDatabaseCharSet{$ENDIF}) : String;
+ Function  DecodeStrings          (Value              : String
+                                  {$IFDEF FPC};DatabaseCharSet          : TDatabaseCharSet{$ENDIF}) : String;
+ Function  EncodeStream           (Value              : TStream)        : String;
+ Function  DecodeStream           (Value              : String)         : TMemoryStream;
+ Function  BytesToString          (Const bin          : TRESTDWBytes)   : String;Overload;
+ Function  BytesToString          (Const AValue       : TRESTDWBytes;
+                                   Const AStartIndex  : Integer;
+                                   Const ALength      : Integer = -1)   : String;Overload;
+ Function  restdwLength           (Const ABuffer      : String;
+                                   Const ALength      : Integer = -1;
+                                   Const AIndex       : Integer = 1)    : Integer;Overload;
+ Function  restdwLength           (Const ABuffer      : TRESTDWBytes;
+                                   Const ALength      : Integer = -1;
+                                   Const AIndex       : Integer = 0)    : Integer;Overload;
+ Function  StringToBytes          (AStr               : String)         : TRESTDWBytes;
+ Function  StreamToBytes          (Stream             : TMemoryStream)  : TRESTDWBytes;
+ Function  StringToFieldType      (Const S            : String)         : Integer;
+ Function  Escape_chars           (s                  : String)         : String;
+ Function  Unescape_chars         (s                  : String)         : String;
+ Function  HexToBookmark          (Value              : String)         : TRESTDWBytes;
+ Function  BookmarkToHex          (Value              : TRESTDWBytes)   : String;
+ Procedure CopyStringList         (Const Source,
+                                   Dest               : TStringList);
+ Function  RemoveBackslashCommands(Value              : String)          : String;
+ Function  RESTDWFileExists       (sFile,
+                                   BaseFilePath       : String)          : Boolean;
+ Function  TravertalPathFind      (Value              : String)          : Boolean;
+ Function  GetEventName           (Value              : String)          : String;
+ Function  ExtractHeaderSubItem   (Const AHeaderLine,
+                                   ASubItem           : String;
+                                   QuotingType        : TQuotingType)    : String;
+ Function  ReadLnFromStream       (AStream            : TStream;
+                                   Var VLine          : String;
+                                   AMaxLineLength     : Integer = -1)    : Boolean; Overload;
+ Function  ReadLnFromStream       (AStream            : TStream;
+                                   AMaxLineLength     : Integer = -1;
+                                   AExceptionIfEOF    : Boolean = False) : String; Overload;
 
 Implementation
 
 Uses uRESTDWConsts;
+
+Function ReadLnFromStream(AStream        : TStream;
+                          Var VLine      : String;
+                          AMaxLineLength : Integer = -1) : Boolean;
+Const
+ LBUFMAXSIZE = 2048;
+Var
+ LStringLen,
+ LResultLen,
+ LBufSize       : Integer;
+ LBuf,
+ LLine          : TRESTDWBytes;
+ LStrmPos,
+ LStrmSize      : TRESTDWStreamSize;
+ LCrEncountered : Boolean;
+ Function FindEOL(Const ABuf         : TRESTDWBytes;
+                  Var VLineBufSize   : Integer;
+                  Var VCrEncountered : Boolean) : Integer;
+ Var
+  i : Integer;
+ Begin
+  Result := VLineBufSize; //EOL not found => use all
+  i := 0;
+  While i < VLineBufSize Do
+   Begin
+    Case ABuf[i] Of
+     Ord(LF) :
+      Begin
+       Result         := i;
+       VCrEncountered := True;
+       VLineBufSize   := i+1;
+       Break;
+      End;
+     Ord(CR) :
+      Begin
+       Result := i;
+       VCrEncountered := True;
+       Inc(i);
+       If (i < VLineBufSize)  And
+          (ABuf[i] = Ord(LF)) Then
+        VLineBufSize := i+1
+       Else
+        VLineBufSize := i;
+       Break;
+      End;
+    End;
+    Inc(i);
+   End;
+ End;
+ Function ReadBytes(Const AStream : TStream;
+                    Var   VBytes  : TRESTDWBytes;
+                    Const ACount,
+                    AOffset       : Integer) : Integer;
+ Var
+  LActual : Integer;
+ Begin
+  Assert(AStream <> Nil);
+  Result := 0;
+  If VBytes = Nil Then
+   SetLength(VBytes, 0);
+  LActual := ACount;
+  If LActual < 0 Then
+   LActual := AStream.Size - AStream.Position;
+  If LActual = 0 Then Exit;
+  If Length(VBytes) < (AOffset+LActual) Then
+   SetLength(VBytes, AOffset+LActual);
+  Assert(VBytes <> nil);
+  Result := AStream.Read(VBytes[AOffset], LActual);
+ End;
+ Function restdwMin(Const AValueOne,
+                    AValueTwo        : Int64) : Int64;
+ Begin
+  If AValueOne > AValueTwo Then
+   Result := AValueTwo
+  Else
+  Result := AValueOne;
+ End;
+ Procedure CopyRESTDWBytes(Const ASource      : TRESTDWBytes;
+                           Const ASourceIndex : Integer;
+                           Var VDest          : TRESTDWBytes;
+                           Const ADestIndex,
+                           ALength            : Integer);
+ Begin
+  Assert(ASourceIndex >= 0);
+  Assert((ASourceIndex+ALength) <= Length(ASource));
+  Move  (ASource[ASourceIndex], VDest[ADestIndex], ALength);
+ End;
+Begin
+ Assert(AStream <> Nil);
+ VLine := '';
+ SetLength(LLine, 0);
+ If AMaxLineLength < 0 Then
+  AMaxLineLength := MaxInt;
+ LStrmPos := AStream.Position;
+ LStrmSize := AStream.Size;
+ If LStrmPos >= LStrmSize Then
+  Begin
+   Result := False;
+   Exit;
+  End;
+ SetLength(LBuf, LBUFMAXSIZE);
+ LCrEncountered := False;
+ Repeat
+  LBufSize := ReadBytes(AStream, LBuf, restdwMin(LStrmSize - LStrmPos, LBUFMAXSIZE), 0);
+  If LBufSize < 1 Then
+   Break;
+  LStringLen := FindEOL(LBuf, LBufSize, LCrEncountered);
+  Inc(LStrmPos, LBufSize);
+  LResultLen := Length(VLine);
+  If (LResultLen + LStringLen) > AMaxLineLength Then
+   Begin
+    LStringLen := AMaxLineLength - LResultLen;
+    LCrEncountered := True;
+    Dec(LStrmPos, LBufSize);
+    Inc(LStrmPos, LStringLen);
+   End;
+  If LStringLen > 0 Then
+   Begin
+    LBufSize := Length(LLine);
+    SetLength(LLine, LBufSize+LStringLen);
+    CopyRESTDWBytes(LBuf, 0, LLine, LBufSize, LStringLen);
+   End;
+ Until (LStrmPos >= LStrmSize) or LCrEncountered;
+ AStream.Position := LStrmPos;
+ VLine := BytesToString(LLine, 0, -1);
+ Result := True;
+End;
+
+Function restdwPos(Const Substr, S : String) : Integer;
+Begin
+ Result := Pos(Substr, S);
+End;
+
+Function restdwMax(Const AValueOne,
+                   AValueTwo        : Int64) : Int64;
+Begin
+ If AValueOne < AValueTwo Then
+  Result := AValueTwo
+ Else
+  Result := AValueOne;
+End;
+
+Function restdwMin(Const AValueOne,
+                   AValueTwo        : Int64) : Int64;
+Begin
+ If AValueOne > AValueTwo Then
+  Result := AValueTwo
+ Else
+ Result := AValueOne;
+End;
+
+Function restdwLength(Const ABuffer : String;
+                      Const ALength : Integer = -1;
+                      Const AIndex  : Integer = 1) : Integer;
+Var
+ LAvailable: Integer;
+Begin
+ Assert(AIndex >= 1);
+ LAvailable := restdwMax(Length(ABuffer)-AIndex+1, 0);
+ If ALength < 0 Then
+  Result := LAvailable
+ Else
+  Result := restdwMin(LAvailable, ALength);
+End;
+
+Function restdwLength(Const ABuffer : TRESTDWBytes;
+                      Const ALength : Integer = -1;
+                      Const AIndex  : Integer = 0) : Integer;
+Var
+ LAvailable : Integer;
+Begin
+ Assert(AIndex >= 0);
+ LAvailable := restdwMax(Length(ABuffer)-AIndex, 0);
+ If ALength < 0 Then
+  Result := LAvailable
+ Else
+  Result := restdwMin(LAvailable, ALength);
+End;
+
+Function restdwValueFromIndex(AStrings     : TStrings;
+                              Const AIndex : Integer)  : String;
+Var
+ LTmp : String;
+ LPos : Integer;
+Begin
+ Result := '';
+ If AIndex >= 0 Then
+  Begin
+   LTmp := AStrings.Strings[AIndex];
+   LPos := Pos('=', LTmp); {do not localize}
+   If LPos > 0 Then
+    Begin
+     Result := Copy(LTmp, LPos+1, MaxInt);
+     Exit;
+    End;
+  End;
+End;
+
+Function Fetch(Var AInput           : String;
+               Const ADelim         : String  = '';
+               Const ADelete        : Boolean = True;
+               Const ACaseSensitive : Boolean = True) : String;{$IFDEF USE_INLINE}Inline;{$ENDIF}
+Var
+ LPos : Integer;
+ Function FetchCaseInsensitive(Var AInput    : String;
+                               Const ADelim  : String;
+                               Const ADelete : Boolean) : String;
+ Var
+  LPos : Integer;
+ Begin
+  If ADelim = #0 Then
+   LPos := Pos(ADelim, AInput)
+  Else
+   LPos := restdwPos(UpperCase(ADelim), UpperCase(AInput));
+  If LPos = 0 Then
+   Begin
+    Result := AInput;
+    if ADelete Then
+     AInput := '';
+   End
+  Else
+   Begin
+    Result := Copy(AInput, 1, LPos - 1);
+    If ADelete Then
+     AInput := Copy(AInput, LPos + Length(ADelim), MaxInt);
+   End;
+ End;
+Begin
+ If ACaseSensitive Then
+  Begin
+   If ADelim = #0 Then
+    LPos := Pos(ADelim, AInput)
+   Else
+    LPos := restdwPos(ADelim, AInput);
+   If LPos = 0 Then
+    Begin
+     Result := AInput;
+     If ADelete Then
+      AInput := '';    {Do not Localize}
+    End
+   Else
+    Begin
+     Result := Copy(AInput, 1, LPos - 1);
+     If ADelete Then
+      AInput := Copy(AInput, LPos + Length(ADelim), MaxInt);
+    End;
+  End
+ Else
+  Result := FetchCaseInsensitive(AInput, ADelim, ADelete);
+End;
+
+Procedure SplitHeaderSubItems(AHeaderLine : String;
+                              AItems      : TStrings;
+                              QuotingType : TQuotingType);
+Var
+ LName,
+ LValue,
+ LSep    : String;
+ LQuoted : Boolean;
+ I       : Integer;
+ Function TextStartsWith(Const S , SubS : String) : Boolean;
+ Var
+  LLen  : Integer;
+  P1,
+  P2    : PChar;
+ Begin
+  LLen := Length(SubS);
+  Result := LLen <= Length(S);
+  If Result then
+   Begin
+    P1 := PChar(S);
+    P2 := PChar(SubS);
+    Result := AnsiCompareText(Copy(S, 1, LLen), SubS) = 0;
+   End;
+ End;
+ Function FetchQuotedString(Var vHeaderLine : String) : String;
+ Begin
+  Result := '';
+  Delete(VHeaderLine, 1, 1);
+  I := 1;
+  While I <= Length(VHeaderLine) Do
+   Begin
+    If vHeaderLine[I] = '\' Then
+     Begin
+      If I < Length(VHeaderLine) Then
+       Delete(VHeaderLine, I, 1);
+     End
+    Else If VHeaderLine[I] = '"' Then
+     Begin
+      Result := Copy(VHeaderLine, 1, I-1);
+      VHeaderLine := Copy(VHeaderLine, I+1, MaxInt);
+      Break;
+     End;
+    Inc(I);
+   End;
+  Fetch(VHeaderLine, ';');
+ End;
+ Function FindFirstOf(Const AFind,
+                      AText           : String;
+                      Const ALength   : Integer = -1;
+                      Const AStartPos : Integer = 1) : Integer;
+ Var
+  I,
+  LLength,
+  LPos     : Integer;
+ Begin
+  Result := 0;
+  If Length(AFind) > 0 then begin
+    LLength := restdwLength(AText, ALength, AStartPos);
+    if LLength > 0 then begin
+      for I := 0 to LLength-1 do begin
+        LPos := AStartPos + I;
+        if restdwPos(AText[LPos], AFind) <> 0 then begin
+          Result := LPos;
+          Exit;
+        end;
+      end;
+    end;
+  end;
+ End;
+
+ Function CharRange(Const AMin,
+                    AMax         : Char;
+                    QuotingType  : TQuotingType) : String;
+ Var
+  I : Char;
+ Begin
+  SetLength(Result, Ord(AMax) - Ord(AMin) + 1);
+  For i := AMin to AMax Do
+   Result[Ord(i) - Ord(AMin) + 1] := i;
+ End;
+Begin
+  Fetch(AHeaderLine, ';'); {do not localize}
+  LSep := CharRange(#0, #32, QuotingType) + QuoteSpecials[QuotingType] + #127;
+  while AHeaderLine <> '' do
+  begin
+    AHeaderLine := TrimLeft(AHeaderLine);
+    if AHeaderLine = '' then begin
+      Exit;
+    end;
+    LName := Trim(Fetch(AHeaderLine, '=')); {do not localize}
+    AHeaderLine := TrimLeft(AHeaderLine);
+    LQuoted := TextStartsWith(AHeaderLine, '"'); {do not localize}
+    if LQuoted then
+    begin
+      LValue := FetchQuotedString(AHeaderLine);
+    end else begin
+      I := FindFirstOf(LSep, AHeaderLine);
+      if I <> 0 then
+      begin
+        LValue := Copy(AHeaderLine, 1, I-1);
+        if AHeaderLine[I] = ';' then begin {do not localize}
+          Inc(I);
+        end;
+        Delete(AHeaderLine, 1, I-1);
+      end else begin
+        LValue := AHeaderLine;
+        AHeaderLine := '';
+      end;
+    end;
+    if (LName <> '') and ((LValue <> '') or LQuoted) then begin
+      {$IFDEF USE_OBJECT_ARC}
+      AItems.Add(TIdHeaderNameValueItem.Create(LName, LValue, LQuoted));
+      {$ELSE}
+      AItems.AddObject(LName + '=' + LValue, TObject(LQuoted));
+      {$ENDIF}
+    end;
+  end;
+end;
+
+Function TextIsSame(Const A1, A2 : String) : Boolean;
+Begin
+ {$IFDEF DOTNET}
+  Result := System.String.Compare(A1, A2, True) = 0;
+ {$ELSE}
+  Result := AnsiCompareText(A1, A2) = 0;
+ {$ENDIF}
+End;
+
+Function InternalrestdwIndexOfName(AStrings             : TStrings;
+                                   Const AStr           : String;
+                                   Const ACaseSensitive : Boolean = False) : Integer;
+Var
+ I : Integer;
+Begin
+ Result := -1;
+ For I := 0 To AStrings.Count - 1 Do
+  Begin
+   If ACaseSensitive Then
+    Begin
+     If AStrings.Names[I] = AStr Then
+      Begin
+       Result := I;
+       Exit;
+      End;
+    End
+   Else
+    Begin
+     If TextIsSame(AStrings.Names[I], AStr) Then
+      Begin
+       Result := I;
+       Exit;
+      End;
+    End;
+  End;
+End;
+
+Function restdwIndexOfName(AStrings             : TStrings;
+                           Const AStr           : String;
+                           Const ACaseSensitive : Boolean = False) : Integer;
+Begin
+ Result := InternalrestdwIndexOfName(AStrings, AStr, ACaseSensitive);
+End;
+
+Function ExtractHeaderSubItem(Const AHeaderLine,
+                              ASubItem           : String;
+                              QuotingType        : TQuotingType) : String;
+Var
+ LItems  : TStringList;
+ I       : Integer;
+Begin
+ Result := '';
+ LItems := TStringList.Create;
+ Try
+  SplitHeaderSubItems(AHeaderLine, LItems, QuotingType);
+  I := restdwIndexOfName(LItems, ASubItem);
+  If I <> -1 Then
+  Result := restdwValueFromIndex(LItems, I);
+ Finally
+  LItems.Free;
+ End;
+End;
+
+Function ReadLnFromStream(AStream         : TStream;
+                          AMaxLineLength  : Integer = -1;
+                          AExceptionIfEOF : Boolean = False) : String; overload;
+Begin
+ If (Not ReadLnFromStream(AStream, Result, AMaxLineLength)) and AExceptionIfEOF then
+  Raise Exception.Create(Format(cStreamReadError, ['ReadLnFromStream', AStream.Position]));
+end;
+
+Function RemoveBackslashCommands(Value : String) : String;
+Begin
+ Result := StringReplace(Value, '../', '', [rfReplaceAll]);
+ Result := StringReplace(Result, '..\', '', [rfReplaceAll]);
+End;
+
+Function TravertalPathFind(Value : String) : Boolean;
+Begin
+ Result := Pos('../', Value) > 0;
+ If Not Result Then
+  Result := Pos('..\', Value) > 0;
+End;
+
+Function GetEventName  (Value : String) : String;
+Begin
+ Result := Value;
+ If Pos('.', Result) > 0 Then
+  Result := Copy(Result, Pos('.', Result) + 1, Length(Result));
+End;
+
+Function RESTDWFileExists(sFile, BaseFilePath : String) : Boolean;
+Var
+ vTempFilename : String;
+Begin
+ vTempFilename := sFile;
+ Result        := (Pos('.', vTempFilename) > 0);
+ If Result Then
+  Begin
+   Result := FileExists(vTempFilename);
+   If Not Result Then
+    Result := FileExists(BaseFilePath + vTempFilename);
+  End;
+End;
+
+Procedure CopyStringList(Const Source, Dest : TStringList);
+Var
+ I : Integer;
+Begin
+ If Assigned(Source) And Assigned(Dest) Then
+  For I := 0 To Source.Count -1 Do
+   Dest.Add(Source[I]);
+End;
 
 Function HexToBookmark(Value : String) : TRESTDWBytes;
 {$IFDEF POSIX} //Android
@@ -405,6 +916,29 @@ begin
    {$IFEND}
   End;
 end;
+
+Function BytesToString(Const AValue      : TRESTDWBytes;
+                       Const AStartIndex : Integer;
+                       Const ALength: Integer = -1)      : String;
+Var
+ LLength : Integer;
+ LBytes  : TRESTDWBytes;
+Begin
+ {$IFDEF STRING_IS_ANSI}
+  LBytes := nil; // keep the compiler happy
+ {$ENDIF}
+ LLength := restdwLength(AValue, ALength, AStartIndex);
+ If LLength > 0 Then
+  Begin
+   If (AStartIndex = 0)          And
+      (LLength = Length(AValue)) Then
+    LBytes := AValue
+   Else
+    LBytes := Copy(AValue, AStartIndex, LLength);
+   SetString(Result, PAnsiChar(LBytes), Length(LBytes));
+  End;
+ Result := '';
+End;
 
 Function BytesToString(Const bin : TRESTDWBytes) : String;
 Const HexSymbols = '0123456789ABCDEF';

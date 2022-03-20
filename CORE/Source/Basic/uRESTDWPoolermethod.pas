@@ -43,8 +43,8 @@ Uses {$IFDEF FPC}
  Type
   TRESTDWPoolerMethodClient  = Class(TComponent)
   Private
+   vOnWorkBegin,
    vOnWork                 : TOnWork;
-   vOnWorkBegin            : TOnWorkBegin;
    vOnWorkEnd              : TOnWorkEnd;
    vOnStatus               : TOnStatus;
    vHandleRedirects,
@@ -73,7 +73,7 @@ Uses {$IFDEF FPC}
    vOnBeforeGetToken       : TOnBeforeGetToken;
    vActualClientPoolerExec : TRESTClientPoolerBase;
    Procedure SetOnWork     (Value : TOnWork);
-   Procedure SetOnWorkBegin(Value : TOnWorkBegin);
+   Procedure SetOnWorkBegin(Value : TOnWork);
    Procedure SetOnWorkEnd  (Value : TOnWorkEnd);
    Procedure SetOnStatus   (Value : TOnStatus);
    Procedure SetAuthOptionParams(Value : TRESTDWClientAuthOptionParams);
@@ -334,7 +334,7 @@ Uses {$IFDEF FPC}
    Property ConnectTimeOut        : Integer                    Read vConnectTimeOut        Write vConnectTimeOut;
    Property WelcomeMessage        : String                     Read vWelcomeMessage        Write vWelcomeMessage;
    Property OnWork                : TOnWork                    Read vOnWork                Write SetOnWork;
-   Property OnWorkBegin           : TOnWorkBegin               Read vOnWorkBegin           Write SetOnWorkBegin;
+   Property OnWorkBegin           : TOnWork                    Read vOnWorkBegin           Write SetOnWorkBegin;
    Property OnWorkEnd             : TOnWorkEnd                 Read vOnWorkEnd             Write SetOnWorkEnd;
    Property OnStatus              : TOnStatus                  Read vOnStatus              Write SetOnStatus;
    {$IFDEF FPC}
@@ -894,7 +894,7 @@ Begin
  {$ENDIF}
 End;
 
-Procedure TRESTDWPoolerMethodClient.SetOnWorkBegin(Value : TOnWorkBegin);
+Procedure TRESTDWPoolerMethodClient.SetOnWorkBegin(Value : TOnWork);
 Begin
  {$IFDEF FPC}
   vOnWorkBegin            := Value;
