@@ -555,9 +555,15 @@ Begin
  New(BaseObjectClass);
  BaseObjectClass^ := Value;
  {$IFDEF FPC}
-  BaseObjectClass^.ElementName  := Key;
+  If BaseObjectClass^.ObjectType = jtArray Then
+   ElementName   := Key
+  Else
+   BaseObjectClass^.ElementName  := Key;
  {$ELSE}
-  BaseObjectClass.ElementName   := Key;
+  If BaseObjectClass^.ObjectType = jtArray Then
+   ElementName   := Key
+  Else
+   BaseObjectClass^.ElementName  := Key;
  {$ENDIF}
  BaseObjectClass^.SpecialChars := vSpecialChars;
  Result                        := vList.Add(BaseObjectClass);
