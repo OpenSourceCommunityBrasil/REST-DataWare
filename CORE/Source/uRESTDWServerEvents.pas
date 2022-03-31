@@ -76,6 +76,8 @@ Type
   vDefaultValue,
   vParamName       : String;
   vEncoded         : Boolean;
+  vDescription     : TStrings;    //uhmano
+  Procedure SetDescription     (Strings  : TStrings);    //uhmano
  Public
   Function    GetDisplayName             : String;       Override;
   Procedure   SetDisplayName(Const Value : String);      Override;
@@ -89,6 +91,7 @@ Type
   Property Alias           : String           Read vAlias           Write vAlias;
   Property Encoded         : Boolean          Read vEncoded         Write vEncoded;
   Property DefaultValue    : String           Read vDefaultValue    Write vDefaultValue;
+  Property Description     : TStrings         Read vDescription     Write SetDescription;    //uhmano
 End;
 
 Type
@@ -197,6 +200,8 @@ Type
   vAccessTag,
   vServerContext       : String;
   vOnCreate            : TObjectEvent;
+  vDescription         : TStrings;    //uhmano
+  Procedure SetDescription     (Strings  : TStrings);   //uhmano
  Public
   Destructor  Destroy; Override;
   Constructor Create(AOwner : TComponent);Override; //Cria o Componente
@@ -208,6 +213,7 @@ Type
   Property    AccessTag           : String       Read vAccessTag           Write vAccessTag;
   Property    ContextName         : String       Read vServerContext       Write vServerContext;
   Property    OnCreate            : TObjectEvent Read vOnCreate            Write vOnCreate;
+  Property    Description         : TStrings     Read vDescription         Write SetDescription;    //uhmano
 End;
 
 Type
@@ -221,6 +227,8 @@ Type
   vRESTClientPooler : TRESTClientPooler;
   vOnBeforeSend     : TOnBeforeSend;
   vCripto           : TCripto;
+  vDescription      : TStrings;   //uhmano
+  Procedure SetDescription     (Strings  : TStrings);   // Ma
   Procedure GetOnlineEvents         (Value  : Boolean);
   Procedure SetEventList            (aValue : TDWEventList);
   Function  GetRESTClientPooler             : TRESTClientPooler;
@@ -248,6 +256,7 @@ Type
   Property    RESTClientPooler : TRESTClientPooler Read GetRESTClientPooler Write SetRESTClientPooler;
   Property    Events           : TDWEventList      Read vEventList          Write SetEventList;
   Property    OnBeforeSend     : TOnBeforeSend     Read vOnBeforeSend       Write vOnBeforeSend; // Add Evento por Ico Menezes
+  Property    Description      : TStrings          Read vDescription        Write SetDescription;    //uhmano
 End;
 
 implementation
@@ -654,12 +663,18 @@ Begin
  vIgnoreInvalidParams := False;
  If Assigned(vOnCreate) Then
   vOnCreate(Self);
+ vDescription          := TStringList.Create;   //uhmano
 End;
 
 Destructor TDWServerEvents.Destroy;
 Begin
  vEventList.Free;
  Inherited;
+End;
+
+Procedure TDWServerEvents.SetDescription(Strings : TStrings);    //uhmano
+Begin
+ vDescription.Assign(Strings);
 End;
 
 procedure TDWParamsMethods.ClearList;
@@ -760,6 +775,7 @@ Begin
  vEncoded         := True;
  vDefaultValue    := '';
  vAlias           := '';
+ vDescription     := TStringList.Create;    //uhmano
 End;
 
 Destructor TDWParamMethod.Destroy;
@@ -783,6 +799,11 @@ begin
   End;
 end;
 
+Procedure TDWParamMethod.SetDescription(Strings : TStrings);    //uhmano
+Begin
+ vDescription.Assign(Strings);
+End;
+
 { TDWClientEvents }
 
 constructor TDWClientEvents.Create(AOwner: TComponent);
@@ -792,6 +813,7 @@ begin
  vCripto        := TCripto.Create;
  vGetEvents     := False;
  vEditParamList := True;
+ vDescription   := TStringList.Create;		//uhmano
 end;
 
 procedure TDWClientEvents.CreateDWParams(EventName: String;
@@ -803,6 +825,7 @@ Var
  vFound     : Boolean;
 Begin
  vParamName := '';
+ vDescription          := TStringList.Create;   //uhmano
  If vEventList.EventByName[EventName] <> Nil Then
   Begin
 //   If (Not Assigned(DWParams)) or (dwParams = nil) Then
@@ -1197,6 +1220,11 @@ begin
   if vRESTClientPooler <> nil then
     vRESTClientPooler.FreeNotification(Self);
 end;
+
+Procedure TDWClientEvents.SetDescription(Strings : TStrings);    //uhmano
+Begin
+ vDescription.Assign(Strings);
+End;
 
 Initialization
  RegisterClass(TDWServerEvents);
