@@ -9714,6 +9714,15 @@ Begin
                    TDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeRenderer(vBaseHeader, ContentType, vResult, RequestType);
                  End;
                End;
+
+               //uhmano -- inicio
+               if DWParams.ItemsString['ContentType'] <> nil then
+                   ContentType := DWParams.ItemsString['ContentType'].asString;
+
+               if DWParams.ItemsString['StatusCode'] <> nil then
+                   ErrorCode := DWParams.ItemsString['StatusCode'].asInteger;
+               //uhmano -- final
+
              Except
               On E : Exception Do
                Begin
