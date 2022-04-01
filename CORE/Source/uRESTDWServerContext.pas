@@ -98,6 +98,8 @@ Type
   vDefaultValue,
   vParamName       : String;
   vEncoded         : Boolean;
+  vDescription     : TStrings;    //uhmano
+  Procedure SetDescription     (Strings  : TStrings);   //uhmano
  Public
   Function    GetDisplayName             : String;       Override;
   Procedure   SetDisplayName(Const Value : String);      Override;
@@ -110,6 +112,7 @@ Type
   Property ParamName       : String           Read GetDisplayName   Write SetDisplayName;
   Property Encoded         : Boolean          Read vEncoded         Write vEncoded;
   Property DefaultValue    : String           Read vDefaultValue    Write vDefaultValue;
+  Property Description     : TStrings         Read vDescription     Write SetDescription;    //uhmano
 End;
 
 Type
@@ -330,6 +333,8 @@ Type
   vServerContext,
   vRootContext         : String;
   vOnBeforeRenderer    : TObjectEvent;
+  vDescription         : TStrings;    //uhmano
+  Procedure SetDescription     (Strings  : TStrings);   //uhmano
   Procedure SetBaseHeader(Value : TStrings);
 //  Procedure AfterConstruction; override;
   Procedure SetOnBeforeRenderer(Value : TObjectEvent);
@@ -346,6 +351,7 @@ Type
   Property    BaseHeader          : TStrings       Read vBaseHeader          Write SetBaseHeader;
   Property    RootContext         : String         Read vRootContext         Write vRootContext;
   Property    OnBeforeRenderer    : TObjectEvent   Read vOnBeforeRenderer    Write SetOnBeforeRenderer;
+  Property    Description         : TStrings       Read vDescription         Write SetDescription;    //uhmano
 End;
 
 implementation
@@ -760,7 +766,13 @@ Begin
  vEventList := TDWContextList.Create(Self, TDWContext);
  vIgnoreInvalidParams := False;
  vBaseHeader := TStringList.Create;
+ vDescription         := TStringList.Create;		//uhmano
 End;
+
+Procedure TDWServerContext.SetDescription(Strings   : TStrings);
+begin
+ vDescription.Assign(Strings);
+end;
 
 Destructor TDWServerContext.Destroy;
 Begin
@@ -925,6 +937,7 @@ Begin
  vEncoded         := True;
  vDefaultValue    := '';
  vAlias           := '';
+ vDescription     := TStringList.Create;    //uhmano
 End;
 
 function TDWParamMethod.GetDisplayName: String;
@@ -942,6 +955,11 @@ begin
    Inherited;
   End;
 end;
+
+Procedure TDWParamMethod.SetDescription(Strings : TStrings);    //uhmano
+Begin
+ vDescription.Assign(Strings);
+End;
 
 { TDWContextRules }
 
