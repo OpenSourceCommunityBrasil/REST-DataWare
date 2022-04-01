@@ -9866,15 +9866,6 @@ Begin
               Else If Assigned(TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent) Then
                TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent(DWParams, vResult);
               JsonMode := TDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].JsonMode;
-
-              //uhmano -- inicio
-              if DWParams.ItemsString['ContentType'] <> nil then
-                  ContentType := DWParams.ItemsString['ContentType'].asString;
-
-              if DWParams.ItemsString['StatusCode'] <> nil then
-                  ErrorCode := DWParams.ItemsString['StatusCode'].asInteger;
-              //uhmano -- final
-
              Except
               On E : Exception Do
                Begin
@@ -10780,20 +10771,6 @@ Var
     DWParams.RequestHeaders.Input.Assign(ARequestInfo.RawHeaders);
    tmp := '';
   End;
-
-          //uhmano
-          // remoteIP
-          JSONParam                 := TJSONParam.Create(DWParams.Encoding);
-          JSONParam.ObjectDirection := odIN;
-          JSONParam.ParamName       := 'RemoteIP';
-          {$IFDEF FPC}
-          JSONParam.DatabaseCharSet := vDatabaseCharSet;
-          {$ENDIF}
-          JSONParam.AsString        := ARequestInfo.RemoteIP;
-          DWParams.Add(JSONParam);
-		  //uhmano - final
-
-
  end;
  Procedure MyDecodeAndSetParams(ARequestInfo: TIdHTTPRequestInfo);
  Var
