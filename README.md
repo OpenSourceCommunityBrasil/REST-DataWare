@@ -12,21 +12,3 @@ Wiki com instruções de instalação e uso:
 
 Telegram oficial:
 * https://t.me/restdataware
-
-
-
---------
-contribuições deste repo:
-
-// uRESTDWServerContext
-- propriedades Description ausentes para TDWParamMethod e TDWServerContext
-
-// uRESTDWServerEvents
-- propriedades Description ausentes para TDWParamMethod, TDWServerEvents e TDWClientEvents
-
-// uRESTDWBase
-- após um ReplyRequest ou ReplyEvent, tratamento se o Params tiver algum com nome 'ContentType' ou 'StatusCode': atualiza as variáveis locais ContentType ou ErrorCode, respectivamente.
-objetivo: modificar no retorno para o client, o ContentType e StatusCode
-Exemplo: de 'application/json' para 'text/html' e 200 para 500 (Erro interno), para informar que houve um erro no servidor.
-
-- novo parâmetro nome 'RemoteIP' (gerado dinâmicamente) para passar para um ReplyRequest ou ReplyEvent qual o IP do client remoto.
