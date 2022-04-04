@@ -104,6 +104,7 @@ Type
   Function    GetDisplayName             : String;       Override;
   Procedure   SetDisplayName(Const Value : String);      Override;
   Constructor Create        (aCollection : TCollection); Override;
+  Destructor  Destroy; Override;    //uhmano
  Published
   Property TypeObject      : TTypeObject      Read vTypeObject      Write vTypeObject;
   Property ObjectDirection : TObjectDirection Read vObjectDirection Write vObjectDirection;
@@ -778,6 +779,7 @@ Destructor TDWServerContext.Destroy;
 Begin
  vEventList.Free;
  vBaseHeader.Free;
+ vDescription.Free;		//uhmano
  Inherited;
 End;
 
@@ -959,6 +961,12 @@ end;
 Procedure TDWParamMethod.SetDescription(Strings : TStrings);    //uhmano
 Begin
  vDescription.Assign(Strings);
+End;
+
+Destructor TDWParamMethod.Destroy;		//uhmano
+Begin
+ vDescription.Free;
+ Inherited;
 End;
 
 { TDWContextRules }

@@ -669,6 +669,7 @@ End;
 Destructor TDWServerEvents.Destroy;
 Begin
  vEventList.Free;
+ vDescription.Free;		//uhmano
  Inherited;
 End;
 
@@ -780,6 +781,7 @@ End;
 
 Destructor TDWParamMethod.Destroy;
 Begin
+ vDescription.Free;		//uhmano
  Inherited;
 End;
 
@@ -867,6 +869,7 @@ End;
 destructor TDWClientEvents.Destroy;
 begin
  vEventList.Free;
+ vDescription.Free;		//uhmano
  FreeAndNil(vCripto);
  Inherited;
 end;
