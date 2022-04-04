@@ -8,7 +8,6 @@ Use-o e divirta-se.
 
 Wiki com instruções de instalação e uso:
 * Site: https://github.com/mobius1qwe/REST-DataWare/wiki
-* Fontes: https://github.com/mobius1qwe/RDWWiki
 
 Telegram oficial:
 * https://t.me/restdataware
