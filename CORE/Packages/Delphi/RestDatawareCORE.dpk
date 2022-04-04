@@ -67,6 +67,23 @@ contains
   uRESTDWJSON in '..\..\Source\Libs\JSON\uRESTDWJSON.pas',
   uRESTDWJSONInterface in '..\..\Source\Libs\JSON\uRESTDWJSONInterface.pas',
   uRESTDWDataset in '..\..\Source\Plugins\Memdataset\uRESTDWDataset.pas',
-  uRESTDWExprParser in '..\..\Source\Plugins\Memdataset\uRESTDWExprParser.pas';
+  uRESTDWExprParser in '..\..\Source\Plugins\Memdataset\uRESTDWExprParser.pas',
+  uRESTDWMessageCoderMIME in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderMIME.pas',
+  uRESTDWException in '..\..\Source\Basic\Mechanics\uRESTDWException.pas',
+  uRESTDWMessage in '..\..\Source\Basic\Mechanics\uRESTDWMessage.pas',
+  uRESTDWMessageCoder in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoder.pas',
+  uRESTDWAttachment in '..\..\Source\Basic\Mechanics\uRESTDWAttachment.pas',
+  uRESTDWAttachmentFile in '..\..\Source\Basic\Mechanics\uRESTDWAttachmentFile.pas',
+  uRESTDWMessageParts in '..\..\Source\Basic\Mechanics\uRESTDWMessageParts.pas',
+  uRESTDWHeaderList in '..\..\Source\Basic\Mechanics\uRESTDWHeaderList.pas',
+  uRESTDWCoder in '..\..\Source\Basic\Mechanics\uRESTDWCoder.pas',
+  uRESTDWCoderMIME in '..\..\Source\Basic\Mechanics\uRESTDWCoderMIME.pas',
+  uRESTDWCoder3to4 in '..\..\Source\Basic\Mechanics\uRESTDWCoder3to4.pas',
+  uRESTDWMessageCoderQuotedPrintable in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderQuotedPrintable.pas',
+  uRESTDWCoderQuotedPrintable in '..\..\Source\Basic\Mechanics\uRESTDWCoderQuotedPrintable.pas',
+  uRESTDWCoderBinHex4 in '..\..\Source\Basic\Mechanics\uRESTDWCoderBinHex4.pas',
+  uRESTDWCoderHeader in '..\..\Source\Basic\Mechanics\uRESTDWCoderHeader.pas',
+  uRESTDWHeaderCoderBase in '..\..\Source\Basic\Mechanics\uRESTDWHeaderCoderBase.pas',
+  uRESTDWBuffer in '..\..\Source\Basic\Mechanics\uRESTDWBuffer.pas';
 
 End.

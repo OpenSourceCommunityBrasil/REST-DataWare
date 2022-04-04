@@ -49,7 +49,7 @@ Uses
    {$ENDIF}
    , uRESTDWConsts
   {$IFEND}
- {$ENDIF};
+ {$ENDIF}, uRESTDWMessageCoderMIME;
 
  Type
   TServerMethodClass = Class(TComponent)
@@ -1803,6 +1803,7 @@ Var
  vServerMethod       : TComponentClass;
  vUriOptions         : TRESTDWUriOptions;
  ServerContextStream : TMemoryStream;
+ decoder             : TRESTDWMessageDecoderMIME;
  mb,
  mb2,
  ms                  : TStringStream;
@@ -2145,6 +2146,7 @@ Var
 Begin
  Result                := False;
  vRDWAuthOptionParam   := Nil;
+ decoder               := Nil;
  mb2                   := Nil;
  mb                    := Nil;
  ms                    := Nil;
@@ -2524,7 +2526,7 @@ Begin
          Begin
           Try
            Repeat
-            decoder := TIdMessageDecoderMIME.Create(nil);
+            decoder := TRESTDWMessageDecoderMIME.Create(nil);
             TIdMessageDecoderMIME(decoder).MIMEBoundary := boundary;
             decoder.SourceStream := ContentStringStream;
             decoder.FreeSourceStream := False;

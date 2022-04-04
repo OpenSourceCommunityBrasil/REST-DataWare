@@ -79,6 +79,7 @@ Uses
 
  Const
   dwftColor       = Integer(255);
+  RESTDWHexPrefix = '0x';
  {$IFDEF COMPILER10_UP}
   FieldTypeIdents : Array[dwftColor..dwftColor] Of TIdentMapEntry = ((Value: dwftColor; Name: 'ftColor'));
  {$ELSE}
@@ -96,17 +97,50 @@ Uses
  {$IFDEF FPC}
   DWInteger       = Longint;
   DWInt64         = Int64;
+  DWInt32         = Int32;
   DWFloat         = Real;
   DWFieldTypeSize = Longint;
   DWBufferSize    = Longint;
  {$ELSE}
   DWInteger       = Integer;
   DWInt64         = Int64;
+  DWInt32         = Int32;
   DWFloat         = Real;
   DWFieldTypeSize = Integer;
   DWBufferSize    = Longint;
  {$ENDIF}
+ PDWInt32         = ^DWInt32;
  PDWInt64         = ^DWInt64;
+ PDWUInt32        = ^DWInt32;
+ {$IFDEF HAS_UInt64}
+  {$DEFINE UInt64_IS_NATIVE}
+  {$IFNDEF BROKEN_UINT64_HPPEMIT}
+  Type
+   TRESTDWUInt64 = UInt64;
+  {$ENDIF}
+ {$ELSE}
+  {$IFDEF HAS_QWord}
+   {$DEFINE UInt64_IS_NATIVE}
+   Type
+    UInt64 = QWord;
+    {$NODEFINE UInt64}
+    TRESTDWUInt64 = QWord;
+    {$ELSE}
+    Type
+     UInt64 = Int64;
+     TRESTDWUInt64 = UInt64;
+    {$NODEFINE UInt64}
+   {$ENDIF}
+ {$ENDIF}
+ TRESTDWIPv6Address = Array [0..7] Of UInt16;
+ {$IFDEF STRING_IS_UNICODE}
+  PDWWideChar = PChar;
+  DWWideChar  = Char;
+ {$ELSE}
+  DWWideChar  = WideChar;
+  PDWWideChar = PWideChar;
+ {$ENDIF}
+ TRESTDWWideChars = Array Of DWWideChar;
  {$IFNDEF FPC}
   {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
    {$IF Defined(HAS_FMX)}
@@ -198,33 +232,31 @@ Uses
  End;
 
  Type
-  TQuotingType = (QuotePlain, QuoteRFC822, QuoteMIME, QuoteHTTP);
-
- Type
-  RESTDWArrayError          = Class (Exception);
-  RESTDWTableError          = Class (Exception);
-  RESTDWDatabaseError       = Class (Exception);
-  TFieldsList               = Array of TFieldDefinition;
-  TConnStatus               = (hsResolving, hsConnecting, hsConnected,
-                               hsDisconnecting, hsDisconnected, hsStatusText);
-  TRESTDWClientStage        = (csNone, csLoggedIn, csRejected);
-  TDataAttributes           = Set of (dwCalcField,    dwNotNull, dwLookup,
-                                      dwInternalCalc, dwAggregate);
-
-  TSendEvent                = (seGET,       sePOST,
-                               sePUT,       seDELETE,
-                               sePatch);
-  TTypeRequest              = (trHttp,      trHttps);
-  TDatasetEvents            = Procedure (DataSet: TDataSet) Of Object;
-  TRESTDwSessionData        = Class(TCollectionItem);
-  TRESTDWDatabaseType       = (dbtUndefined, dbtAccess, dbtDbase, dbtFirebird, dbtInterbase, dbtMySQL,
-                               dbtSQLLite,   dbtOracle, dbtMsSQL, dbtODBC,     dbtParadox,  dbtPostgreSQL,
-                               dbtAdo);
-  TWideChars                = Array of WideChar;
-  TRESTDWBytes              = Array of Byte;
-  TOnWriterProcess          = Procedure(DataSet               : TDataSet;
-                                        RecNo, RecordCount    : Integer;
-                                        Var AbortProcess      : Boolean) Of Object;
+  TRESTDWHeaderQuotingType    = (QuotePlain, QuoteRFC822, QuoteMIME, QuoteHTTP);
+  TRESTDWMessageCoderPartType = (mcptText, mcptAttachment, mcptIgnore, mcptEOF);
+  RESTDWArrayError            = Class (Exception);
+  RESTDWTableError            = Class (Exception);
+  RESTDWDatabaseError         = Class (Exception);
+  TFieldsList                 = Array of TFieldDefinition;
+  TConnStatus                 = (hsResolving, hsConnecting, hsConnected,
+                                 hsDisconnecting, hsDisconnected, hsStatusText);
+  TRESTDWClientStage          = (csNone, csLoggedIn, csRejected);
+  TDataAttributes             = Set of (dwCalcField,    dwNotNull, dwLookup,
+                                        dwInternalCalc, dwAggregate);
+  TSendEvent                  = (seGET,       sePOST,
+                                 sePUT,       seDELETE,
+                                 sePatch);
+  TTypeRequest                = (trHttp,      trHttps);
+  TDatasetEvents              = Procedure (DataSet : TDataSet) Of Object;
+  TRESTDwSessionData          = Class(TCollectionItem);
+  TRESTDWDatabaseType         = (dbtUndefined, dbtAccess, dbtDbase, dbtFirebird, dbtInterbase, dbtMySQL,
+                                 dbtSQLLite,   dbtOracle, dbtMsSQL, dbtODBC,     dbtParadox,  dbtPostgreSQL,
+                                 dbtAdo);
+  TWideChars                  = Array of WideChar;
+  TRESTDWBytes                = Array of Byte;
+  TOnWriterProcess            = Procedure(DataSet               : TDataSet;
+                                          RecNo, RecordCount    : Integer;
+                                          Var AbortProcess      : Boolean) Of Object;
 
  Type
   TProxyOptions = Class(TPersistent)
@@ -321,6 +353,40 @@ Uses
  End;
 
  Type
+  TRESTDWAppendFileStream           = Class(TFileStream)
+ Public
+  Constructor Create(Const AFile    : String);
+ End;
+  TRESTDWReadFileExclusiveStream    = Class(TFileStream)
+ Public
+  Constructor Create(Const AFile    : String);
+ End;
+  TRESTDWReadFileNonExclusiveStream = Class(TFileStream)
+ Public
+  Constructor Create(Const AFile    : String);
+ End;
+  TRESTDWFileCreateStream           = Class(TFileStream)
+ Public
+  Constructor Create(Const AFile    : String);
+ End;
+
+ Type
+  TRESTDWStreamHelper = Class
+ Public
+  Class Function ReadBytes(Const AStream : TStream;
+                           Var   VBytes  : TRESTDWBytes;
+                           Const ACount  : Integer = -1;
+                           Const AOffset : Integer = 0) : Integer;
+  Class Function Write    (Const AStream : TStream;
+                           Const ABytes  : TRESTDWBytes;
+                           Const ACount  : Integer = -1;
+                           Const AOffset : Integer = 0) : Integer;
+  Class Function Seek     (Const AStream : TStream;
+                           Const AOffset : TRESTDWStreamSize;
+                           Const AOrigin : TSeekOrigin) : TRESTDWStreamSize;
+ End;
+
+ Type
   {$IFDEF FPC}
    {$IFDEF RESTDWLAZDRIVER}
     TRESTDWClientSQLBase   = Class(TMemDataset)                   //Classe com as funcionalidades de um DBQuery
@@ -407,9 +473,79 @@ Uses
 Type
  TRESTDWDatasetArray = Array of TRESTDWClientSQLBase;
 
-implementation
+Var
+ RESTDWHexDigits   : Array [0..15] Of Char = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F');
+ RESTDWOctalDigits : Array [0..7]  Of Char = ('0', '1', '2', '3', '4', '5', '6', '7');
+
+Implementation
 
 Uses uRESTDWTools, uRESTDWDataJSON, uRESTDWJSONInterface, uRESTDWBasicDB;
+
+Class Function TRESTDWStreamHelper.ReadBytes(Const AStream : TStream;
+                                             Var   VBytes  : TRESTDWBytes;
+                                             Const ACount,
+                                             AOffset       : Integer): Integer;
+Var
+ LActual : Integer;
+Begin
+ Assert(AStream<>nil);
+ Result := 0;
+ If VBytes = Nil Then
+  SetLength(VBytes, 0);
+ LActual := ACount;
+ If LActual < 0 Then
+  LActual := AStream.Size - AStream.Position;
+ If LActual = 0 Then
+  Exit;
+ If Length(VBytes) < (AOffset+LActual) Then
+  SetLength(VBytes, AOffset+LActual);
+ Assert(VBytes<>nil);
+ Result := AStream.Read(VBytes[AOffset], LActual);
+End;
+
+Class Function TRESTDWStreamHelper.Write(Const AStream : TStream;
+                                         Const ABytes  : TRESTDWBytes;
+                                         Const ACount  : Integer;
+                                         Const AOffset : Integer) : Integer;
+Var
+ LActual : Integer;
+Begin
+ Result := 0;
+ Assert(AStream<>nil);
+ If ABytes <> Nil Then
+  Begin
+   LActual := Length(ABytes, ACount, AOffset);
+   If LActual > 0 Then
+    Result := AStream.Write(ABytes[AOffset], LActual);
+  End;
+End;
+
+Class Function TRESTDWStreamHelper.Seek(Const AStream : TStream;
+                                        Const AOffset : TRESTDWStreamSize;
+                                        Const AOrigin : TSeekOrigin) : TRESTDWStreamSize;
+{$IFNDEF STREAM_SIZE_64}
+Const
+ cOrigins: array[TSeekOrigin] of Word = (soFromBeginning, soFromCurrent, soFromEnd);
+{$ENDIF}
+Begin
+ {$IFDEF STREAM_SIZE_64}
+  Result := AStream.Seek(AOffset, AOrigin);
+ {$ELSE}
+  Result := AStream.Seek(AOffset, cOrigins[AOrigin]);
+ {$ENDIF}
+End;
+
+Constructor TRESTDWAppendFileStream.Create(Const AFile : String);
+Var
+ LFlags : Word;
+Begin
+ LFlags := fmOpenReadWrite or fmShareDenyWrite;
+ If Not FileExists(AFile) Then
+  LFlags := LFLags or fmCreate;
+ Inherited Create(AFile, LFlags);
+ If (LFlags and fmCreate) = 0 Then
+  TRESTDWStreamHelper.Seek(Self, 0, soEnd);
+End;
 
 Constructor TConnectionDefs.Create;
 Begin

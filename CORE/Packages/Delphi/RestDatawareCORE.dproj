@@ -237,6 +237,23 @@
         <DCCReference Include="..\..\Source\Libs\JSON\uRESTDWJSONInterface.pas"/>
         <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWDataset.pas"/>
         <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWExprParser.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWMessageCoderMIME.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWException.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWMessage.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWMessageCoder.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWAttachment.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWAttachmentFile.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWMessageParts.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWHeaderList.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWCoder.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWCoderMIME.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWCoder3to4.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWMessageCoderQuotedPrintable.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWCoderQuotedPrintable.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWCoderBinHex4.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWCoderHeader.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWHeaderCoderBase.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWBuffer.pas"/>
         <RcCompile Include="RestDatawareCORE.rc">
             <Form>RestDatawareCORE.res</Form>
         </RcCompile>

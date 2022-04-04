@@ -63,7 +63,11 @@ Const
  tScriptsDetected           : Array[0..1] of string = ('.map', '.webdwpc');
  cCompressionLevel          = clFastest;
  MAXSHORT                   = 32767;
- TSpecialChars              : Array [0 .. 7] Of Char = ('\', '"', '/', #8, #9, #10, #12, #13);
+ TSpecialChars              : Array [0 .. 7]  Of Char   = ('\', '"', '/', #8, #9, #10, #12, #13);
+ wdays                      : Array [1 .. 7]  Of String = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'); {do not localize}
+ monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
+                                                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
+ GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
  SCorruptedFileHeader       = 'Corrupted File Header';
  SCorruptedDefinitions      = 'Corrupted Table Definitions, or Illegal Login';
  TDecimalChar               = 'D';
@@ -131,7 +135,7 @@ Const
                               'CORE Version';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
  RESTDWVersionINFO          = '1.4.3.';
- RESTDWRelease              = '2922';
+ RESTDWRelease              = '2924';
  RESTDWParamsHeaderVersion  = 6;
  RESTDWCodeProject          = 'Dark Souls';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
@@ -199,6 +203,25 @@ Const
  cPong                      = 'PONG';
  cQuit                      = 'QUIT';
  cApplicationJSON           = 'application/json';
+ cMessagePartCreate         = 'MessagePart can not be created. Use descendant classes.';
+ cMessageDecoderNotFound    = 'Decoder not found';
+ cMessageEncoderNotFound    = 'Encoder not found';
+ Resourcestring
+ cCharIndexOutOfBounds      = 'Character index out of bounds (%d)';
+ cInvalidCharCount          = 'Invalid count (%d)';
+ cHeaderEncodeError         = 'Could not encode header data using charset "%s"';
+ cHeaderDecodeError         = 'Could not decode header data using charset "%s"';
+ cNotEnoughDataInBuffer     = 'Not enough data in buffer. (%d/%d)';
+ cTooMuchDataInBuffer       = 'Too much data in buffer.';
+ cCapacityTooSmall          = 'Capacity cannot be smaller than Size.';
+ cBufferIsEmpty             = 'No bytes in buffer.';
+ cBufferRangeError          = 'Index out of bounds.';
+ cBufferMissingTerminator   = 'Buffer terminator must be specified.';
+ cBufferInvalidStartPos     = 'Buffer start position is invalid.';
+ cMessageErrorSavingAttachment  = 'Error saving attachment.';
+ cMessageErrorAttachmentBlocked = 'Attachment %s is blocked.';
+ cFailedTimeZoneInfo            = 'Failed attempting to retrieve time zone information.';
+
 
  Type
  {$IFNDEF FPC}
