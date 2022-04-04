@@ -83,6 +83,7 @@ Const
   FContentDisposition,
   FReferences,
   FUID,
+  FText,
   FXProgram                 : String;
   FDate                     : TDateTime;
   FExtraHeaders             : TRESTDWHeaderList;
@@ -146,6 +147,7 @@ Const
   Property MIMEBoundary                    : TRESTDWMIMEBoundary          Read FMIMEBoundary;
   Property UID                             : String                       Read FUID                           Write FUID;
   Property IsMsgSinglePartMime             : Boolean                      Read FIsMsgSinglePartMime           Write FIsMsgSinglePartMime;
+  Property Text                            : String                       Read FText                          Write FText;
  Published
   Property AttachmentEncoding              : String                       Read GetAttachmentEncoding          Write SetAttachmentEncoding;
   Property Body                            : TStrings                     Read FBody                          Write SetBody;
@@ -188,6 +190,7 @@ Uses
  uRESTDWAttachmentFile,
  uRESTDWTools,
  uRESTDWBasicTypes,
+ uRESTDWConsts,
  SysUtils;
 
 Const
@@ -260,6 +263,7 @@ Procedure TRESTDWMessage.Clear;
 Begin
  ClearHeader;
  ClearBody;
+ FText := '';
 End;
 
 Procedure TRESTDWMessage.ClearBody;
@@ -303,6 +307,7 @@ Begin
  NoDecode                      := RESTDW_MSG_NODECODE;
  FMIMEBoundary                 := TRESTDWMIMEBoundary.Create;
  FLastGeneratedHeaders         := TRESTDWHeaderList.Create(QuoteRFC822);
+ FText                         := '';
  Clear;
  FEncoding := meDefault;
 End;
@@ -510,10 +515,9 @@ Begin
   ContentTransferEncoding := Headers.Values['Content-Transfer-Encoding']; {do not localize}
   ContentDisposition := Headers.Values['Content-Disposition'];  {do not localize}
   MsgId := Headers.Values['Message-Id']; {do not localize}
-  InReplyTo := Headers.Values['In-Reply-To']; {do not localize}
   References := Headers.Values['References']; {do not localize}
-  Date := GMTToLocalDateTime(Headers.Values['Date']); {do not localize}
-  Sender.Text := Headers.Values['Sender']; {do not localize}
+  Date  := GMTToLocalDateTime(Headers.Values['Date']); {do not localize}
+  FText := Headers.Values['Sender']; {do not localize}
   If Length(Headers.Values['X-Priority']) > 0 Then
    Priority := GetMsgPriority(Headers.Values['X-Priority'])
   Else If Length(Headers.Values['Priority']) > 0 Then

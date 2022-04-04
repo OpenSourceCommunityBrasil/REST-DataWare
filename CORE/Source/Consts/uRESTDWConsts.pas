@@ -221,6 +221,7 @@ Const
  cMessageErrorSavingAttachment  = 'Error saving attachment.';
  cMessageErrorAttachmentBlocked = 'Attachment %s is blocked.';
  cFailedTimeZoneInfo            = 'Failed attempting to retrieve time zone information.';
+ cMessageCannotLoad             = 'Cannot load message from file %s';
 
 
  Type

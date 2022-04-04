@@ -41,6 +41,8 @@ Uses
  {$IFDEF UNIX}
   eRESTDWNonBlockingNotSupported        = Class(eRESTDWException);
  {$ENDIF}
+ eRESTDWMessageException                = Class(eRESTDWException);
+ eRESTDWMessageCannotLoad               = Class(eRESTDWMessageException);
  eRESTDWPackageSizeTooBig               = Class(eRESTDWSocketHandleError);
  eRESTDWNotAllBytesSent                 = Class(eRESTDWSocketHandleError);
  eRESTDWCouldNotBindSocket              = Class(eRESTDWSocketHandleError);

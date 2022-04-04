@@ -84,6 +84,7 @@ contains
   uRESTDWCoderBinHex4 in '..\..\Source\Basic\Mechanics\uRESTDWCoderBinHex4.pas',
   uRESTDWCoderHeader in '..\..\Source\Basic\Mechanics\uRESTDWCoderHeader.pas',
   uRESTDWHeaderCoderBase in '..\..\Source\Basic\Mechanics\uRESTDWHeaderCoderBase.pas',
-  uRESTDWBuffer in '..\..\Source\Basic\Mechanics\uRESTDWBuffer.pas';
+  uRESTDWBuffer in '..\..\Source\Basic\Mechanics\uRESTDWBuffer.pas',
+  uRESTDWMessageClient in '..\..\Source\Basic\Mechanics\uRESTDWMessageClient.pas';
 
 End.
