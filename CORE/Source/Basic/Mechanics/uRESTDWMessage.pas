@@ -191,6 +191,7 @@ Uses
  uRESTDWTools,
  uRESTDWBasicTypes,
  uRESTDWConsts,
+ uRESTDWMessageClient,
  SysUtils;
 
 Const

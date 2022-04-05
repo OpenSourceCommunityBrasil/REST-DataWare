@@ -255,6 +255,8 @@
         <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWHeaderCoderBase.pas"/>
         <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWBuffer.pas"/>
         <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWMessageClient.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWIOHandlerStream.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWIOHandler.pas"/>
         <RcCompile Include="RestDatawareCORE.rc">
             <Form>RestDatawareCORE.res</Form>
         </RcCompile>

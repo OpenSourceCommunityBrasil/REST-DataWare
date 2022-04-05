@@ -38,30 +38,22 @@ Uses
  Type
   TRESTDWIOHandlerStreamMsg = Class(TRESTDWIOHandlerStream)
  Protected
-  FTerminatorWasRead: Boolean;
-  FEscapeLines: Boolean;
-  FUnescapeLines: Boolean;
-  FLastByteRecv: Byte;
-  function ReadDataFromSource(var VBuffer: TRESTDWBytes): Integer; override;
-  public
-    constructor Create(
-      AOwner: TComponent;
-      AReceiveStream: TStream;
-      ASendStream: TStream = nil
-    ); override;  //Should this be reintroduce instead of override?
-    function Readable(AMSec: Integer = IdTimeoutDefault): Boolean; override;
-    function ReadLn(ATerminator: string; ATimeout: Integer = IdTimeoutDefault;
-      AMaxLineLength: Integer = -1; AByteEncoding: IIdTextEncoding = nil
-      {$IFDEF STRING_IS_ANSI}; ADestEncoding: IIdTextEncoding = nil{$ENDIF}
-      ): string; override;
-    procedure WriteLn(const AOut: string; AByteEncoding: IIdTextEncoding = nil
-      {$IFDEF STRING_IS_ANSI}; ASrcEncoding: IIdTextEncoding = nil{$ENDIF}
-      ); override;
-    property EscapeLines: Boolean read FEscapeLines write FEscapeLines;
-    property UnescapeLines: Boolean read FUnescapeLines write FUnescapeLines;
-  published
-    property MaxLineLength default MaxInt;
-  end;
+  FMaxLineLength     : Integer;
+  FTerminatorWasRead,
+  FEscapeLines,
+  FUnescapeLines     : Boolean;
+  FLastByteRecv      : Byte;
+  Function ReadDataFromSource(Var VBuffer : TRESTDWBytes): Integer;
+ Public
+  Constructor Create (AOwner         : TComponent;
+                      AReceiveStream : TStream;
+                      ASendStream    : TStream = Nil); Override;  //Should this be reintroduce instead of override?
+  Procedure   WriteLn(Const AOut     : String); Override;
+  Property    EscapeLines   : Boolean Read FEscapeLines   Write FEscapeLines;
+  property    UnescapeLines : Boolean Read FUnescapeLines Write FUnescapeLines;
+ Published
+  Property MaxLineLength : Integer Read FMaxLineLength Write FMaxLineLength Default MaxInt;
+ End;
 
   TRESTDWMessageClient = class(TRESTDWExplicitTLSClient)
   protected
@@ -162,30 +154,17 @@ end;
 // TRESTDWIOHandlerStreamMsg
 ////////////////////////
 
-constructor TRESTDWIOHandlerStreamMsg.Create(
-  AOwner: TComponent;
-  AReceiveStream: TStream;
-  ASendStream: TStream = nil
-  );
-begin
-  inherited Create(AOwner, AReceiveStream, ASendStream);
-  FTerminatorWasRead := False;
-  FEscapeLines := False; // do not set this to True! This is for users to set manually...
-  FUnescapeLines := False; // do not set this to True! This is for users to set manually...
-  FLastByteRecv := 0;
-  MaxLineLength := MaxInt;
-end;
-
-function TRESTDWIOHandlerStreamMsg.Readable(AMSec: integer = IdTimeoutDefault): Boolean;
-begin
-  if not FTerminatorWasRead then begin
-    Result := inherited Readable(AMSec);
-    if Result then begin
-      Exit;
-    end;
-  end;
-  Result := ReceiveStream <> nil;
-end;
+Constructor TRESTDWIOHandlerStreamMsg.Create(AOwner         : TComponent;
+                                             AReceiveStream : TStream;
+                                             ASendStream    : TStream = Nil);
+Begin
+ Inherited Create(AOwner, AReceiveStream, ASendStream);
+ FTerminatorWasRead := False;
+ FEscapeLines       := False; // do not set this to True! This is for users to set manually...
+ FUnescapeLines     := False; // do not set this to True! This is for users to set manually...
+ FLastByteRecv      := 0;
+ FMaxLineLength     := MaxInt;
+End;
 
 function TRESTDWIOHandlerStreamMsg.ReadDataFromSource(var VBuffer: TRESTDWBytes): Integer;
 var
@@ -235,17 +214,15 @@ begin
   end;
 end;
 
-procedure TRESTDWIOHandlerStreamMsg.WriteLn(const AOut: string; AByteEncoding: IIdTextEncoding = nil
-  {$IFDEF STRING_IS_ANSI}; ASrcEncoding: IIdTextEncoding = nil{$ENDIF}
-  );
-var
-  LOut: String;
-begin
-  LOut := AOut;
-  if FUnescapeLines and TextStartsWith(LOut, '..') then begin {Do not Localize}
-    IdDelete(LOut, 1, 1);
-  end;
-  inherited WriteLn(LOut, AByteEncoding{$IFDEF STRING_IS_ANSI}, ASrcEncoding{$ENDIF});
+procedure TRESTDWIOHandlerStreamMsg.WriteLn(Const AOut: String);
+Var
+ LOut : String;
+Begin
+ LOut := AOut;
+ If FUnescapeLines And
+    TextStartsWith(LOut, '..') Then
+  RDWDelete(LOut, 1, 1);
+ Inherited WriteLn(LOut);
 end;
 
 ///////////////////

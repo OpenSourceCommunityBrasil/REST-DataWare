@@ -85,6 +85,8 @@ contains
   uRESTDWCoderHeader in '..\..\Source\Basic\Mechanics\uRESTDWCoderHeader.pas',
   uRESTDWHeaderCoderBase in '..\..\Source\Basic\Mechanics\uRESTDWHeaderCoderBase.pas',
   uRESTDWBuffer in '..\..\Source\Basic\Mechanics\uRESTDWBuffer.pas',
-  uRESTDWMessageClient in '..\..\Source\Basic\Mechanics\uRESTDWMessageClient.pas';
+  uRESTDWMessageClient in '..\..\Source\Basic\Mechanics\uRESTDWMessageClient.pas',
+  uRESTDWIOHandlerStream in '..\..\Source\Basic\Mechanics\uRESTDWIOHandlerStream.pas',
+  uRESTDWIOHandler in '..\..\Source\Basic\Mechanics\uRESTDWIOHandler.pas';
 
 End.

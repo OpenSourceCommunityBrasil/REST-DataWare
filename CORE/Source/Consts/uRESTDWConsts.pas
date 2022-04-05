@@ -58,6 +58,9 @@ End;
 Type
  TObjectDirection          = (odIN, odOUT, odINOUT);
  TEncodeSelect             = (esASCII,     esUtf8, esANSI);
+ TRESTDWMaxLineAction      = (maException, maSplit);
+ TRESTDWOSType             = (otUnknown, otUnix, otWindows, otDotNet);
+ TRESTDWIPVersion          = (Id_IPv4, Id_IPv6);
 
 Const
  tScriptsDetected           : Array[0..1] of string = ('.map', '.webdwpc');
