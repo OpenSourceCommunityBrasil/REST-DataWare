@@ -8,7 +8,7 @@ USES
   FireDAC.UI.Intf, FireDAC.VCLUI.Wait, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Error, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool,
   FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.FB, Data.DB, FireDAC.Comp.Client,
-  FireDAC.Comp.UI, FireDAC.Phys.IBBase, FireDAC.Stan.StorageJSON, RestDWServerFormU,
+  FireDAC.Comp.UI, FireDAC.Phys.IBBase, FireDAC.Stan.StorageJSON,
   URESTDWPoolerDB, URestDWDriverFD, FireDAC.Phys.MSSQLDef, FireDAC.Phys.ODBCBase,
   FireDAC.Phys.MSSQL, uDWConsts, uRESTDWServerEvents, uSystemEvents, FireDAC.Stan.Param,
   FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.Comp.DataSet, uDWAbout, FireDAC.Phys.MySQLDef,
@@ -120,7 +120,7 @@ IMPLEMENTATION
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
-uses uDWJSONTools;
+uses uDWJSONTools, uFullRDWServerIndy;
 {$R *.dfm}
 
 

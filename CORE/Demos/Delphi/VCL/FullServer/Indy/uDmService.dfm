@@ -1,10 +1,10 @@
 object ServerMethodDM: TServerMethodDM
-  OldCreateOrder = False
   OnCreate = ServerMethodDataModuleCreate
   Encoding = esUtf8
   OnMassiveProcess = ServerMethodDataModuleMassiveProcess
   OnUserTokenAuth = ServerMethodDataModuleUserTokenAuth
   OnGetToken = ServerMethodDataModuleGetToken
+  QueuedRequest = False
   Height = 252
   Width = 328
   object RESTDWPoolerFD: TRESTDWPoolerDB
@@ -344,8 +344,8 @@ object ServerMethodDM: TServerMethodDM
         OnlyPreDefinedParams = False
       end>
     ContextName = 'SE1'
-    Left = 191
-    Top = 108
+    Left = 31
+    Top = 188
   end
   object FDQuery1: TFDQuery
     AfterScroll = FDQuery1AfterScroll
