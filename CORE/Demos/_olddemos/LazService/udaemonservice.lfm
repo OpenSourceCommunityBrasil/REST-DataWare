@@ -1,6 +1,0 @@
-object DaemonMapper1: TDaemonMapper1
-  DaemonDefs = <>
-  OnRun = DaemonMapper1Run
-  Left = 256
-  Top = 145
-end

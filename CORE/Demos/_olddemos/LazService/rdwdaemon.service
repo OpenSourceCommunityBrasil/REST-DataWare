@@ -1,9 +1,0 @@
-[Unit]
-Description=REST Dataware Service Sample
-
-[Service]
-Type=simple
-ExecStart=/rdwdaemon/rdwdaemon -r
-
-[Install]
-WantedBy=multi-user.target

@@ -1,2 +1,0 @@
-inherited frameLstBaseMov: TframeLstBaseMov
-end
