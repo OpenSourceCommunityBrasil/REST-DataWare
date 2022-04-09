@@ -97,9 +97,9 @@ Const
                              'CORE Version';
  DWSobreLicencaStatus      = 'Open Source - Free Version';
  DWVersionINFO             = '1.4.3.';
- DWRelease                 = '2900';
+ DWRelease                 = '2901';
  DwParamsHeaderVersion     = 6;
- DWCodeProject             = 'Dark Souls';
+ DWCodeProject             = 'Dark Souls - Git';
  DWVersao                  = DWVersionINFO + DWRelease + '(' + DWCodeProject + ')';
  DWFieldBookmark           = 'DWFIELDBOOKMARK';
  rsLazarusDWPackage        = 'REST Dataware - Tools';
