@@ -87,6 +87,8 @@ contains
   uRESTDWBuffer in '..\..\Source\Basic\Mechanics\uRESTDWBuffer.pas',
   uRESTDWMessageClient in '..\..\Source\Basic\Mechanics\uRESTDWMessageClient.pas',
   uRESTDWIOHandlerStream in '..\..\Source\Basic\Mechanics\uRESTDWIOHandlerStream.pas',
-  uRESTDWIOHandler in '..\..\Source\Basic\Mechanics\uRESTDWIOHandler.pas';
+  uRESTDWIOHandler in '..\..\Source\Basic\Mechanics\uRESTDWIOHandler.pas',
+  uRESTDWMessageCoderBinHex4 in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderBinHex4.pas';
 
 End.
+

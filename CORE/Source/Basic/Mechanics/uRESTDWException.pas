@@ -49,6 +49,8 @@ Uses
  eRESTDWCanNotBindPortInRange           = Class(eRESTDWSocketHandleError);
  eRESTDWInvalidPortRange                = Class(eRESTDWSocketHandleError);
  eRESTDWCannotSetIPVersionWhenConnected = Class(eRESTDWSocketHandleError);
+ eRESTDWReadTimeout                     = Class(eRESTDWException);
+ eRESTDWReadLnWaitMaxAttemptsExceeded   = Class(eRESTDWException);
 
 Implementation
 

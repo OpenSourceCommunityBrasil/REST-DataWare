@@ -117,7 +117,7 @@ Const
                               '<title>REST Dataware - CORE - QuickX</title></head><body>'   +
                               '<h1>REST Dataware - CORE</h1>'                      +
                               '<h2>Server Status - Online</h2></body></html>';
- AuthRealm                  = 'WWW-Authenticate: %s realm="%s", %s charset="UTF-8"';
+ cAuthRealm                 = 'WWW-Authenticate: %s realm="%s", %s charset="UTF-8"';
  UrlBase                    = '%s://%s:%d/%s';
  UrlBaseA                   = '%s://%s:%d/%s%s';
  UrlBaseB                   = '%s://%s:%d/%s%s%s';
@@ -138,7 +138,7 @@ Const
                               'CORE Version';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
  RESTDWVersionINFO          = '1.4.3.';
- RESTDWRelease              = '2924';
+ RESTDWRelease              = '2931';
  RESTDWParamsHeaderVersion  = 6;
  RESTDWCodeProject          = 'Dark Souls';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
@@ -209,6 +209,11 @@ Const
  cMessagePartCreate         = 'MessagePart can not be created. Use descendant classes.';
  cMessageDecoderNotFound    = 'Decoder not found';
  cMessageEncoderNotFound    = 'Encoder not found';
+ cIOHandler_MaxCapturedLines = -1;
+ cTimeoutDefault             = -1;
+ cMaxLineLengthDefault       = 16 * 1024;
+ cRecvBufferSizeDefault      = 32 * 1024;
+ cSendBufferSizeDefault      = 32 * 1024;
  Resourcestring
  cCharIndexOutOfBounds      = 'Character index out of bounds (%d)';
  cInvalidCharCount          = 'Invalid count (%d)';
@@ -225,6 +230,13 @@ Const
  cMessageErrorAttachmentBlocked = 'Attachment %s is blocked.';
  cFailedTimeZoneInfo            = 'Failed attempting to retrieve time zone information.';
  cMessageCannotLoad             = 'Cannot load message from file %s';
+ cIOHandlerCannotChange         = 'Cannot change a connected IOHandler.';
+ cIOHandlerTypeNotInstalled     = 'No IOHandler of type %s is installed.';
+ cInvalidDestinationIndex       = 'Invalid destination index (%d)';
+ cInvalidDestinationArray       = 'Invalid destination array';
+ cInvalidSourceArray            = 'Invalid source array';
+ cReadTimeout                   = 'Read timed out.';
+ cReadLnWaitMaxAttemptsExceeded = 'Max line read attempts exceeded.';
 
 
  Type

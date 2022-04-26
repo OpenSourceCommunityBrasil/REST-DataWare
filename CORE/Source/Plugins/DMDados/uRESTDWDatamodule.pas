@@ -26,13 +26,12 @@ Type
   TRESTDWClientInfo = Class(TObject)
  Private
   vip,
-  vipVersion,
   vUserAgent,
   vBaseRequest,
   vRequest,
   vToken         : String;
   vport          : Integer;
-  Procedure  SetClientInfo(ip, ipVersion,
+  Procedure  SetClientInfo(ip,
                            UserAgent,
                            BaseRequest, Request : String;
                            port                 : Integer);
@@ -72,7 +71,7 @@ Type
 //   Procedure Loaded; Override;
   Public
    Procedure   SetClientWelcomeMessage(Value : String);
-   Procedure   SetClientInfo(ip, ipVersion,
+   Procedure   SetClientInfo(ip,
                              UserAgent,
                              BaseRequest, Request : String;
                              port                 : Integer);
@@ -116,12 +115,12 @@ Begin
  Inherited;
 End;
 
-Procedure TServerMethodDataModule.SetClientInfo(ip, ipVersion,
+Procedure TServerMethodDataModule.SetClientInfo(ip,
                                                 UserAgent,
                                                 BaseRequest, Request : String;
                                                 port                 : Integer);
 Begin
- vRESTDWClientInfo.SetClientInfo(Trim(ip), ipVersion, Trim(UserAgent), BaseRequest, Request, Port);
+ vRESTDWClientInfo.SetClientInfo(Trim(ip), Trim(UserAgent), BaseRequest, Request, Port);
 End;
 
 Constructor TServerMethodDataModule.Create(Sender: TComponent);
@@ -153,19 +152,17 @@ Begin
  vUserAgent   := 'Undefined';
  vport        := 0;
  vToken       := '';
- vipVersion   := '';
  vBaseRequest := '';
  vRequest     := '';
 End;
 
-Procedure TRESTDWClientInfo.SetClientInfo(ip, ipVersion,
+Procedure TRESTDWClientInfo.SetClientInfo(ip,
                                           UserAgent,
                                           BaseRequest, Request : String;
                                           port                 : Integer);
 Begin
  vip          := Trim(ip);
  vUserAgent   := Trim(UserAgent);
- vipVersion   := Trim(ipVersion);
  vport        := Port;
  vBaseRequest := Request;
  vRequest     := BaseRequest;

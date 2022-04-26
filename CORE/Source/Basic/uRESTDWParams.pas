@@ -663,7 +663,7 @@ Begin
    Result := Null;
    Exit;
   End;
- If Length(aValue) = 0 Then
+ If restdwLength(aValue) = 0 Then
   Exit;
  vTempString := BytesToString(aValue);
  If Length(vTempString) > 0 Then

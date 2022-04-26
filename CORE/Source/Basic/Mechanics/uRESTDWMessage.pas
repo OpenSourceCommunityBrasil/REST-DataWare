@@ -114,7 +114,6 @@ Const
   Procedure SetEncoding               (Const AValue         : TRESTDWMessageEncoding);
   Procedure SetExtraHeaders           (Const AValue         : TRESTDWHeaderList);
   Procedure SetHeaders                (Const AValue         : TRESTDWHeaderList);
-  Procedure SetMsgID                  (Const AValue         : String);
   Procedure SetUseNowForDate          (Const AValue         : Boolean);
  Public
   Constructor Create                   (AOwner              : TComponent); Override;
@@ -124,24 +123,13 @@ Const
   Procedure   ClearBody;
   Procedure   ClearHeader;
   Procedure   GenerateHeader;
-  Procedure   InitializeISO            (Var VHeaderEncoding : Char;
-                                        Var VCharSet        : String);
   Function    IsBodyEncodingRequired             : Boolean;
   Function    IsBodyEmpty                        : Boolean;
-  Procedure   LoadFromFile             (Const AFileName     : String;
-                                        Const AHeadersOnly  : Boolean = False);
-  Procedure   LoadFromStream           (AStream             : TStream;
-                                        Const AHeadersOnly  : Boolean = False);
   Procedure   ProcessHeaders;
-  Procedure   SaveToFile               (Const AFileName     : String;
-                                        Const AHeadersOnly  : Boolean = False);
-  Procedure   SaveToStream             (AStream             : TStream;
-                                        Const AHeadersOnly  : Boolean = False);
   procedure   DoCreateAttachment       (Const AHeaders      : TStrings;
                                         Var VAttachment     : TRESTDWAttachment); Virtual;
   Property Flags                           : TRESTDWMessageFlagsSet       Read FFlags                         Write FFlags;
   Property IsEncoded                       : Boolean                      Read FIsEncoded                     Write FIsEncoded;
-  Property MsgId                           : String                       Read FMsgId                         Write SetMsgID;
   Property Headers                         : TRESTDWHeaderList            Read FHeaders                       Write SetHeaders;
   Property MessageParts                    : TRESTDWMessageParts          Read FMessageParts;
   Property MIMEBoundary                    : TRESTDWMIMEBoundary          Read FMIMEBoundary;
@@ -287,7 +275,6 @@ Begin
  FMIMEBoundary.Clear;
 //  UseNowForDate := RESTDW_MSG_USENOWFORDATE;
  Flags := [];
- MsgId := '';
  UID := '';
  FLastGeneratedHeaders.Clear;
  FEncoding := meDefault; {CC3: Changed initial encoding from meMIME to meDefault}
@@ -404,7 +391,6 @@ Begin
     End;
    TRESTDWMessageEncoderInfo(MessageParts.MessageEncoderInfo).InitializeHeaders(Self);
   End;
- InitializeISO(HeaderEncoding, ISOCharSet);
  FLastGeneratedHeaders.Assign(FHeaders);
  FIsMsgSinglePartMime := (Encoding = meMIME) and (MessageParts.Count = 1) and IsBodyEmpty;
  If Encoding = meMIME Then
@@ -464,10 +450,6 @@ Begin
    FLastGeneratedHeaders.Values['X-Priority'] := '';    {do not localize}
    FLastGeneratedHeaders.Values['Importance'] := '';    {do not localize}
   End;
- If Not FSavingToFile Then
-  FLastGeneratedHeaders.Values['Message-Id'] := ''
- Else
-  FLastGeneratedHeaders.Values['Message-Id'] := MsgId;
  If (FExtraHeaders.Count > 0) Then
   FLastGeneratedHeaders.AddStrings(FExtraHeaders);
 End;
@@ -515,7 +497,6 @@ Begin
 
   ContentTransferEncoding := Headers.Values['Content-Transfer-Encoding']; {do not localize}
   ContentDisposition := Headers.Values['Content-Disposition'];  {do not localize}
-  MsgId := Headers.Values['Message-Id']; {do not localize}
   References := Headers.Values['References']; {do not localize}
   Date  := GMTToLocalDateTime(Headers.Values['Date']); {do not localize}
   FText := Headers.Values['Sender']; {do not localize}
@@ -612,104 +593,11 @@ Begin
   AttachmentEncoding := 'UUE';    {do not localize}
 End;
 
-Procedure TRESTDWMessage.LoadFromFile(Const AFileName    : String;
-                                      Const AHeadersOnly : Boolean = False);
-Var
- LStream : TRESTDWReadFileExclusiveStream;
-Begin
- If Not FileExists(AFilename) Then
-  Raise eRESTDWMessageCannotLoad.CreateFmt(cMessageCannotLoad, [AFilename]);
- LStream := TRESTDWReadFileExclusiveStream.Create(AFilename);
- Try
-  LoadFromStream(LStream, AHeadersOnly);
- Finally
-  FreeAndNil(LStream);
- End;
-End;
-
-Procedure TRESTDWMessage.LoadFromStream(AStream            : TStream;
-                                        Const AHeadersOnly : Boolean = False);
-Var
- LMsgClient : TRESTDWMessageClient;
-begin
- Clear;
- LMsgClient := TRESTDWMessageClient.Create;
- Try
-  LMsgClient.ProcessMessage(Self, AStream, AHeadersOnly);
- Finally
-  LMsgClient.Free;
- End;
-End;
-
-procedure TRESTDWMessage.SaveToFile(const AFileName: string; const AHeadersOnly: Boolean = False);
-Var
- LStream : TFileStream;
-Begin
- LStream := TRESTDWFileCreateStream.Create(AFileName);
- Try
-  FSavingToFile := True;
-  Try
-   SaveToStream(LStream, AHeadersOnly);
-  Finally
-   FSavingToFile := False;
-  End;
- Finally
-  FreeAndNil(LStream);
- End;
-End;
-
-Procedure TRESTDWMessage.SaveToStream(AStream            : TStream;
-                                      Const AHeadersOnly : Boolean = False);
-Var
- LMsgClient : TRESTDWMessageClient;
- LIOHandler : TRESTDWIOHandlerStream;
-Begin
- LMsgClient := TRESTDWMessageClient.Create  (nil);
- Try
-  LIOHandler := TRESTDWIOHandlerStream.Create(nil, nil, AStream);
-  Try
-   LIOHandler.FreeStreams := False;
-   LMsgClient.IOHandler := LIOHandler;
-   LMsgClient.SendMsg(Self, AHeadersOnly);
-   If Not AHeadersOnly Then
-    LMsgClient.IOHandler.WriteLn('.');  {do not localize}
-  Finally
-   FreeAndNil(LIOHandler);
-  End;
- Finally
-  FreeAndNil(LMsgClient);
- End;
-End;
-
 Procedure TRESTDWMessage.DoInitializeISO(Var VHeaderEncoding : Char;
                                          Var VCharSet        : String);
 Begin
  If Assigned(FOnInitializeISO) Then
   FOnInitializeISO(VHeaderEncoding, VCharSet);//APR
-End;
-
-Procedure TRESTDWMessage.InitializeISO(Var VHeaderEncoding : Char;
-                                       Var VCharSet        : String);
-Var
- LDefCharset : TRESTDWCharSet;
-Begin
- LDefCharset := IdGetDefaultCharSet;
- Case LDefCharset Of
-    idcs_ISO_8859_1 : Begin
-                       VHeaderEncoding := 'Q';     { quoted-printable }    {Do not Localize}
-                       VCharSet := IdCharsetNames[LDefCharset];
-                      End;
-    idcs_UNICODE_1_1 : Begin
-                         VHeaderEncoding := 'B';     { base64 }    {Do not Localize}
-                         VCharSet := IdCharsetNames[idcs_UTF_8];
-                       End;
-    Else
-      Begin
-       VHeaderEncoding := 'B';     { base64 }    {Do not Localize}
-       VCharSet := IdCharsetNames[LDefCharset];
-      End;
- End;
- DoInitializeISO(VHeaderEncoding, VCharSet);
 End;
 
 Procedure TRESTDWMessage.DoCreateAttachment(Const AHeaders  : TStrings;
@@ -741,11 +629,6 @@ Begin
       End;
     End;
   End;
-End;
-
-Procedure TRESTDWMessage.SetMsgID(const AValue : String);
-Begin
- FMsgId := EnsureMsgIDBrackets(AValue);
 End;
 
 Procedure TRESTDWMessage.SetAttachmentTempDirectory(Const Value: string);

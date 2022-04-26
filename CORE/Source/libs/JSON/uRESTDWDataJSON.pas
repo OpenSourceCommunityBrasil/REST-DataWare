@@ -5,19 +5,16 @@ unit uRESTDWDataJSON;
 Interface
 
 Uses
-  uRESTDWJSONInterface, uRESTDWCharset, uRESTDWConsts,
-  Variants, DataUtils,
-  {$IFDEF FPC}
-   SysUtils, Classes, DB,
-   memds, LConvEncoding, math
-  {$ELSE}
-   {$IF CompilerVersion > 22} // Delphi 2010 pra cima
-    System.SysUtils, System.Classes, System.IOUtils
-   {$ELSE}
-    SysUtils, Classes, DbClient
-   {$IFEND}
+ {$IFDEF FPC}
+  {$IFNDEF RESTDWLAMW}
+   LCL,
   {$ENDIF}
-  , uRESTDWJSON, uRESTDWTools;
+ {$ELSE}
+  {$IFDEF RESTDWWINDOWS}
+   Windows,
+  {$ENDIF}
+ {$ENDIF}
+  SysUtils, DataUtils, Classes, TypInfo, Variants, uRESTDWConsts;
 
 Type
  TRESTDWJSONObjectType  = (jtObject, jtArray, jtValue, jtUnknow);
@@ -225,6 +222,8 @@ Function escape_chars       (s     : String)    : String;
 Function unescape_chars     (s     : String)    : String;
 
 Implementation
+
+Uses uRESTDWTools, uRESTDWJSON, uRESTDWJSONInterface;
 
 Function TrashRemove(Value : String) : String;
 Begin
@@ -926,35 +925,35 @@ End;
 
 Constructor TRESTDWJSONBase.Create(JSON : String);
 Var
- bJsonValue  : TJSONBaseClass;
+ bJsonValue  : TRESTDWJSONBaseClass;
  bJsonArrayB : TRESTDWJSONArray;
 begin
  If JSON = '' Then
   Exit;
  {$IFNDEF FPC}
-//  {$IF Defined(HAS_FMX)}
-//   If JSON[InitStrPos] = '[' then
-//    bJsonValue  := TJSONBaseClass(TJSONObject.ParseJSONValue(JSON) as TJsonArray)
-//   Else If JSON[InitStrPos] = '{' then
-//    bJsonValue  := TJSONBaseClass(TJSONObject.ParseJSONValue(JSON) as TJsonObject)
-//   Else
-//    bJsonValue  := TJSONBaseClass(TJSONObject.ParseJSONValue('{}') as TJsonObject);
-//  {$ELSE}
+  {$IF Defined(HAS_FMX)}
    If JSON[InitStrPos] = '[' then
-    bJsonValue  := TJSONBaseClass(TJSONArray.Create(JSON))
+    bJsonValue  := TRESTDWJSONBaseClass(TJSONObject.ParseJSONValue(JSON) as TJsonArray)
    Else If JSON[InitStrPos] = '{' then
-    bJsonValue  := TJSONBaseClass(TJSONObject.Create(JSON))
+    bJsonValue  := TRESTDWJSONBaseClass(TJSONObject.ParseJSONValue(JSON) as TJsonObject)
    Else
-    bJsonValue  := TJSONBaseClass(TJSONObject.Create('{}'));
-//  {$IFEND}
+    bJsonValue  := TRESTDWJSONBaseClass(TJSONObject.ParseJSONValue('{}') as TJsonObject);
+  {$ELSE}
+   If JSON[InitStrPos] = '[' then
+    bJsonValue  := TRESTDWJSONBaseClass(TRESTDWJSONArray.Create(JSON))
+   Else If JSON[InitStrPos] = '{' then
+    bJsonValue  := TRESTDWJSONBaseClass(TRESTDWJSONObject.Create(JSON))
+   Else
+    bJsonValue  := TRESTDWJSONBaseClass(TRESTDWJSONObject.Create('{}'));
+  {$IFEND}
  {$ELSE}
   Try
    If JSON[InitStrPos] = '[' then
-    bJsonValue  := TJSONBaseClass(TJSONArray.Create(JSON))
+    bJsonValue  := TRESTDWJSONBaseClass(TJSONArray.Create(JSON))
    Else If JSON[InitStrPos] = '{' then
-    bJsonValue  := TJSONBaseClass(TJSONObject.Create(JSON))
+    bJsonValue  := TRESTDWJSONBaseClass(TJSONObject.Create(JSON))
    Else
-    bJsonValue  := TJSONBaseClass(TJSONObject.Create('{}'));
+    bJsonValue  := TRESTDWJSONBaseClass(TJSONObject.Create('{}'));
   Except
    bJsonValue  := Nil;
   End;
@@ -1036,14 +1035,22 @@ Begin
                  etDateTime : vLine := TRESTDWJSONDateTime(vList.Items[I]^).ToJSON;
                  etBlob     : vLine := TRESTDWJSONBlob    (vList.Items[I]^).ToJSON;
                 End;
+                If (GetItemJSONClass(TRESTDWJSONBaseObjectClass(vList.Items[I]^)) = etUnknow) And
+                   (TRESTDWJSONBase(vList.Items[I]^).ObjectType in [jtobject, jtArray]) Then
+                 Begin
+                  If (elementname <> '') Then
+                   vLine := Format('"%s":%s', [elementname, vLine])
+                  Else
+                   Begin
+                    If TRESTDWJSONBase(vList.Items[I]^).ObjectType = jtobject Then
+                     if TRESTDWJSONObject(vList.Items[I]^).ElementName <> '' Then
+                     vLine := Format('"%s":%s', [TRESTDWJSONObject(vList.Items[I]^).ElementName, vLine]);
+                   End;
+                 End;
                 If Result = '' Then
                  Result := vLine
                 Else
-                 Begin
-                  If elementname <> '' Then
-                   vLine := Format('"%s":%s', [elementname, vLine]);
-                  Result := Result + ', ' + vLine;
-                 End;
+                 Result := Result + ', ' + vLine;
                 vLine := '';
                End;
               Result := '{' + Result + '}';

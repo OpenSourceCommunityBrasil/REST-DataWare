@@ -44,7 +44,7 @@ Uses
 Implementation
 
 Uses
-  uRESTDWCoder, uRESTDWCoderMIME, uRESTDWException, SysUtils;
+  uRESTDWCoder, uRESTDWCoderMIME, uRESTDWCoderQuotedPrintable, uRESTDWException, SysUtils;
 
 Constructor TRESTDWMessageEncoderInfoQuotedPrintable.Create;
 Begin

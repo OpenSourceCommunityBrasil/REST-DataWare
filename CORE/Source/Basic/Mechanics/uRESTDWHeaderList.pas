@@ -98,124 +98,121 @@ Begin
   End;
 End;
 
-procedure TRESTDWHeaderList.AddValue(const AName, AValue: string);
-var
-  I: Integer;
-begin
-  if (AName <> '') and (AValue <> '') then begin  {Do not Localize}
-    I := Add('');    {Do not Localize}
-    if FFoldLines then begin
-      FoldAndInsert(AName + FNameValueSeparator + AValue, I);
-    end else begin
-      Put(I, AName + FNameValueSeparator + AValue);
-    end;
-  end;
-end;
+Procedure TRESTDWHeaderList.AddValue(const AName, AValue: string);
+Var
+ I : Integer;
+Begin
+ If (AName <> '')  And
+    (AValue <> '') Then
+  Begin  {Do not Localize}
+   I := Add('');    {Do not Localize}
+   If FFoldLines Then
+    FoldAndInsert(AName + FNameValueSeparator + AValue, I)
+   Else
+    Put(I, AName + FNameValueSeparator + AValue);
+  End;
+End;
 
-procedure TRESTDWHeaderList.AddStrings(Strings: TStrings);
-begin
-  if Strings is TRESTDWHeaderList then begin
-    inherited AddStrings(Strings);
-  end else begin
-    AddStdValues(Strings);
-  end;
-end;
+Procedure TRESTDWHeaderList.AddStrings(Strings: TStrings);
+Begin
+ If Strings Is TRESTDWHeaderList Then
+  Inherited AddStrings(Strings)
+ Else
+  AddStdValues(Strings);
+End;
 
-procedure TRESTDWHeaderList.AssignTo(Dest: TPersistent);
-begin
-  if (Dest is TStrings) and not (Dest is TRESTDWHeaderList) then begin
-    ConvertToStdValues(TStrings(Dest));
-  end else begin
-    inherited AssignTo(Dest);
-  end;
-end;
+Procedure TRESTDWHeaderList.AssignTo(Dest: TPersistent);
+Begin
+ If (Dest Is TStrings)              And
+    Not (Dest Is TRESTDWHeaderList) Then
+  ConvertToStdValues(TStrings(Dest))
+ Else
+  Inherited AssignTo(Dest);
+End;
 
-procedure TRESTDWHeaderList.ConvertToStdValues(ADest: TStrings);
-var
-  idx: Integer;
-  LName, LValue: string;
-begin
-  ADest.BeginUpdate;
-  try
+Procedure TRESTDWHeaderList.ConvertToStdValues(ADest: TStrings);
+Var
+ idx    : Integer;
+ LName,
+ LValue : String;
+Begin
+ ADest.BeginUpdate;
+ Try
+  idx := 0;
+  While idx < Count Do
+   Begin
+    LName  := GetName(idx);
+    LValue := GetValueFromLine(idx);
+    ADest.Add(LName + '=' + LValue); {do not localize}
+   End;
+ Finally
+  ADest.EndUpdate;
+ End;
+End;
+
+Constructor TRESTDWHeaderList.Create(AQuoteType: TRESTDWHeaderQuotingType);
+Begin
+ Inherited Create;
+ FNameValueSeparator := ': ';    {Do not Localize}
+ FUnfoldLines := True;
+ FFoldLines := True;
+ FFoldLinesLength := iif(AQuoteType = QuoteHTTP, MaxInt, 78);
+ FQuoteType := AQuoteType;
+End;
+
+Procedure TRESTDWHeaderList.DeleteFoldedLines(Index: Integer);
+Begin
+ Inc(Index);  {skip the current line}
+ If Index < Count Then
+  Begin
+   While (Index < Count) And
+         CharIsInSet(Get(Index), 1, LWS) Do
+    Delete(Index);
+  End;
+End;
+
+Procedure TRESTDWHeaderList.Extract(const AName: string; ADest: TStrings);
+Var
+ idx : Integer;
+Begin
+ If Assigned(ADest) Then
+  Begin
+   ADest.BeginUpdate;
+   Try
     idx := 0;
-    while idx < Count do
-    begin
-      LName := GetName(idx);
-      LValue := GetValueFromLine(idx);
-                                                                        
-      ADest.Add(LName + '=' + LValue); {do not localize}
-    end;
-  finally
+    While idx < Count Do
+     Begin
+      If TextIsSame(AName, GetName(idx)) Then
+       ADest.Add(GetValueFromLine(idx))
+      Else
+       SkipValueAtLine(idx);
+     End;
+   Finally
     ADest.EndUpdate;
-  end;
-end;
+   End;
+  End;
+End;
 
-constructor TRESTDWHeaderList.Create(AQuoteType: TRESTDWHeaderQuotingType);
-begin
-  inherited Create;
-  FNameValueSeparator := ': ';    {Do not Localize}
-  FUnfoldLines := True;
-  FFoldLines := True;
-  { 78 was specified by a message draft available at
-    http://www.imc.org/draft-ietf-drums-msg-fmt }
-  // HTTP does not technically have a limitation on line lengths
-  FFoldLinesLength := iif(AQuoteType = QuoteHTTP, MaxInt, 78);
-  FQuoteType := AQuoteType;
-end;
-
-procedure TRESTDWHeaderList.DeleteFoldedLines(Index: Integer);
-begin
-  Inc(Index);  {skip the current line}
-  if Index < Count then begin
-    while (Index < Count) and CharIsInSet(Get(Index), 1, LWS) do begin {Do not Localize}
-      Delete(Index);
-    end;
-  end;
-end;
-
-procedure TRESTDWHeaderList.Extract(const AName: string; ADest: TStrings);
-var
-  idx : Integer;
-begin
-  if Assigned(ADest) then begin
-    ADest.BeginUpdate;
-    try
-      idx := 0;
-      while idx < Count do
-      begin
-        if TextIsSame(AName, GetName(idx)) then begin
-          ADest.Add(GetValueFromLine(idx));
-        end else begin
-          SkipValueAtLine(idx);
-        end;
-      end;
-    finally
-      ADest.EndUpdate;
-    end;
-  end;
-end;
-
-procedure TRESTDWHeaderList.FoldAndInsert(AString : String; Index: Integer);
-var
-  LStrs : TStrings;
-  idx : Integer;
-begin
-  LStrs := TStringList.Create;
-  try
-    FoldLineToList(AString, LStrs);
-    idx := LStrs.Count - 1;
-    Put(Index, LStrs[idx]);
-    {We decrement by one because we put the last string into the HeaderList}
+Procedure TRESTDWHeaderList.FoldAndInsert(AString : String; Index: Integer);
+Var
+ LStrs : TStrings;
+ idx   : Integer;
+Begin
+ LStrs := TStringList.Create;
+ Try
+  FoldLineToList(AString, LStrs);
+  idx := LStrs.Count - 1;
+  Put(Index, LStrs[idx]);
+  Dec(idx);
+  While idx > -1 Do
+   Begin
+    Insert(Index, LStrs[idx]);
     Dec(idx);
-    while idx > -1 do
-    begin
-      Insert(Index, LStrs[idx]);
-      Dec(idx);
-    end;
-  finally
-    FreeAndNil(LStrs);
-  end;  //finally
-end;
+   End;
+ Finally
+  FreeAndNil(LStrs);
+ End;  //finally
+End;
 
 Function TRESTDWHeaderList.FoldLine(AString : String) : TStrings;
 Begin
@@ -233,17 +230,18 @@ Var
  s : String;
 Begin
  s := WrapText(AString, EOL+' ', LWS+',', FFoldLinesLength);    {Do not Localize}
-  if s <> '' then begin
-    ALines.BeginUpdate;
-    try
-      repeat
-        ALines.Add(TrimRight(Fetch(s, EOL)));
-      until s = '';  {Do not Localize};
-    finally
-      ALines.EndUpdate;
-    end;
-  end;
-end;
+ If s <> '' Then
+  Begin
+   ALines.BeginUpdate;
+   Try
+    Repeat
+     ALines.Add(TrimRight(Fetch(s, EOL)));
+    Until s = '';  {Do not Localize};
+   Finally
+    ALines.EndUpdate;
+   End;
+  End;
+End;
 
 Function TRESTDWHeaderList.GetName(Index: Integer) : String;
 Var
@@ -328,101 +326,101 @@ Begin
                      If PosInStrArray(AName, ['Content-Type', 'Content-Disposition'], False) <> -1 Then
                       LQuoteType := QuoteMIME;
                     End;
-      QuoteMIME: begin
-        if PosInStrArray(AName, ['Content-Type', 'Content-Disposition'], False) = -1 then begin {Do not Localize}
-          LQuoteType := QuoteRFC822;
-        end;
-      end;
-    end;
-    Result := ExtractHeaderSubItem(s, AParam, LQuoteType);
-  end else begin
-    Result := '';
-  end;
-end;
+      QuoteMIME   : Begin
+                     If PosInStrArray(AName, ['Content-Type', 'Content-Disposition'], False) = -1 Then
+                      LQuoteType := QuoteRFC822;
+                    End;
+   End;
+   Result := ExtractHeaderSubItem(s, AParam, LQuoteType);
+  End
+ Else
+  Result := '';
+End;
 
-function TRESTDWHeaderList.GetAllParams(const AName: string): string;
-var
-  s: string;
-begin
-  s := Values[AName];
-  if s <> '' then begin
-    Fetch(s, ';'); {do not localize}
-    Result := Trim(s);
-  end else begin
-    Result := '';
-  end;
-end;
+Function TRESTDWHeaderList.GetAllParams(const AName: string): string;
+Var
+ s : String;
+Begin
+ s := Values[AName];
+ If s <> '' Then
+  Begin
+   Fetch(s, ';'); {do not localize}
+   Result := Trim(s);
+  End
+ Else
+  Result := '';
+End;
 
-function TRESTDWHeaderList.IndexOfName(const AName: string): Integer;
-var
-  i: Integer;
-begin
-  Result := -1;
-  for i := 0 to Count - 1 do begin
-    if TextIsSame(GetName(i), AName) then begin
-      Result := i;
-      Exit;
+Function TRESTDWHeaderList.IndexOfName(const AName: string): Integer;
+Var
+ i : Integer;
+Begin
+ Result := -1;
+ For i := 0 To Count - 1 Do
+  Begin
+   If TextIsSame(GetName(i), AName) Then
+    Begin
+     Result := i;
+     Exit;
     end;
-  end;
-end;
+  End;
+End;
 
-procedure TRESTDWHeaderList.SetValue(const AName, AValue: string);
-var
-  I: Integer;
-begin
-  I := IndexOfName(AName);
-  if AValue <> '' then begin  {Do not Localize}
-    if I < 0 then begin
-      I := Add('');    {Do not Localize}
-    end;
-    if FFoldLines then begin
-      DeleteFoldedLines(I);
-      FoldAndInsert(AName + FNameValueSeparator + AValue, I);
-    end else begin
-      Put(I, AName + FNameValueSeparator + AValue);
-    end;
-  end
-  else if I >= 0 then begin
-    if FFoldLines then begin
-      DeleteFoldedLines(I);
-    end;
-    Delete(I);
-  end;
-end;
+Procedure TRESTDWHeaderList.SetValue(const AName, AValue: string);
+Var
+ I : Integer;
+Begin
+ I := IndexOfName(AName);
+ If AValue <> '' Then
+  Begin  {Do not Localize}
+   If I < 0 Then
+    I := Add('');    {Do not Localize}
+   If FFoldLines Then
+    Begin
+     DeleteFoldedLines(I);
+     FoldAndInsert(AName + FNameValueSeparator + AValue, I);
+    End
+   Else
+    Put(I, AName + FNameValueSeparator + AValue);
+  End
+ Else if I >= 0 Then
+  Begin
+   If FFoldLines Then
+    DeleteFoldedLines(I);
+   Delete(I);
+  End;
+End;
 
-procedure TRESTDWHeaderList.SetParam(const AName, AParam, AValue: string);
-var
-  LQuoteType: TRESTDWHeaderQuotingType;
-begin
-  LQuoteType := FQuoteType;
-  case LQuoteType of
-    QuoteRFC822: begin
-      if PosInStrArray(AName, ['Content-Type', 'Content-Disposition'], False) <> -1 then begin {Do not Localize}
-        LQuoteType := QuoteMIME;
-      end;
-    end;
-    QuoteMIME: begin
-      if PosInStrArray(AName, ['Content-Type', 'Content-Disposition'], False) = -1 then begin {Do not Localize}
-        LQuoteType := QuoteRFC822;
-      end;
-    end;
-  end;
-  Values[AName] := ReplaceHeaderSubItem(Values[AName], AParam, AValue, LQuoteType);
-end;
+Procedure TRESTDWHeaderList.SetParam(const AName, AParam, AValue: string);
+Var
+ LQuoteType : TRESTDWHeaderQuotingType;
+Begin
+ LQuoteType := FQuoteType;
+ Case LQuoteType Of
+  QuoteRFC822 : Begin
+                 If PosInStrArray(AName, ['Content-Type', 'Content-Disposition'], False) <> -1 Then
+                  LQuoteType := QuoteMIME;
+                End;
+  QuoteMIME   : Begin
+                 If PosInStrArray(AName, ['Content-Type', 'Content-Disposition'], False) = -1 Then
+                  LQuoteType := QuoteRFC822;
+                End;
+ End;
+ Values[AName] := ReplaceHeaderSubItem(Values[AName], AParam, AValue, LQuoteType);
+End;
 
-procedure TRESTDWHeaderList.SetAllParams(const AName, AValue: string);
-var
-  LValue: string;
-begin
-  LValue := Values[AName];
-  if LValue <> '' then
-  begin
-    LValue := ExtractHeaderItem(LValue);
-    if AValue <> '' then begin
-      LValue := LValue + '; ' + AValue; {do not localize}
-    end;
-    Values[AName] := LValue;
-  end;
-end;
+Procedure TRESTDWHeaderList.SetAllParams(const AName, AValue: string);
+Var
+ LValue : String;
+Begin
+ LValue := Values[AName];
+ If LValue <> '' Then
+  Begin
+   LValue := ExtractHeaderItem(LValue);
+   If AValue <> '' Then
+    LValue := LValue + '; ' + AValue; {do not localize}
+   Values[AName] := LValue;
+  End;
+End;
 
 end.

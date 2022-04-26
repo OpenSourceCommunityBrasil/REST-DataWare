@@ -101,6 +101,8 @@ Uses
   DWFloat         = Real;
   DWFieldTypeSize = Longint;
   DWBufferSize    = Longint;
+  DWUInt16        = Word;
+  DWWideChar      = Char;
  {$ELSE}
   DWInteger       = Integer;
   DWInt64         = Int64;
@@ -108,10 +110,16 @@ Uses
   DWFloat         = Real;
   DWFieldTypeSize = Integer;
   DWBufferSize    = Longint;
+  DWUInt16        = Word;
+  DWWideChar      = WideChar;
  {$ENDIF}
+ TEncodeSelect    = (esASCII, esUtf8, esANSI);
  PDWInt32         = ^DWInt32;
  PDWInt64         = ^DWInt64;
  PDWUInt32        = ^DWInt32;
+ PDWUInt16        = ^DWUInt16;
+ PDWInt16         = ^DWUInt16;
+ TRESTDWWideChars = Array Of DWWideChar;
  {$IFDEF HAS_UInt64}
   {$DEFINE UInt64_IS_NATIVE}
   {$IFNDEF BROKEN_UINT64_HPPEMIT}
@@ -135,12 +143,9 @@ Uses
  TRESTDWIPv6Address = Array [0..7] Of UInt16;
  {$IFDEF STRING_IS_UNICODE}
   PDWWideChar = PChar;
-  DWWideChar  = Char;
  {$ELSE}
-  DWWideChar  = WideChar;
   PDWWideChar = PWideChar;
  {$ENDIF}
- TRESTDWWideChars = Array Of DWWideChar;
  {$IFNDEF FPC}
   {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
    {$IF Defined(HAS_FMX)}
@@ -514,7 +519,7 @@ Begin
  Assert(AStream<>nil);
  If ABytes <> Nil Then
   Begin
-   LActual := Length(ABytes, ACount, AOffset);
+   LActual := restdwLength(ABytes, ACount, AOffset);
    If LActual > 0 Then
     Result := AStream.Write(ABytes[AOffset], LActual);
   End;
@@ -535,9 +540,14 @@ Begin
  {$ENDIF}
 End;
 
-Constructor TRESTDWAppendFileStream.Create(Const AFile : String);
+Constructor TRESTDWFileCreateStream.Create(const AFile : String);
+Begin
+ Inherited Create(AFile, fmCreate or fmOpenReadWrite or fmShareDenyWrite);
+End;
+
+Constructor TRESTDWAppendFileStream.Create(const AFile : String);
 Var
- LFlags : Word;
+ LFlags: Word;
 Begin
  LFlags := fmOpenReadWrite or fmShareDenyWrite;
  If Not FileExists(AFile) Then
@@ -545,6 +555,16 @@ Begin
  Inherited Create(AFile, LFlags);
  If (LFlags and fmCreate) = 0 Then
   TRESTDWStreamHelper.Seek(Self, 0, soEnd);
+End;
+
+Constructor TRESTDWReadFileNonExclusiveStream.Create(const AFile : String);
+Begin
+ Inherited Create(AFile, fmOpenRead or fmShareDenyNone);
+End;
+
+Constructor TRESTDWReadFileExclusiveStream.Create(Const AFile : String);
+Begin
+ Inherited Create(AFile, fmOpenRead or fmShareDenyWrite);
 End;
 
 Constructor TConnectionDefs.Create;

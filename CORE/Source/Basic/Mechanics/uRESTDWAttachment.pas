@@ -31,101 +31,76 @@ Uses
 
  Type
   TRESTDWAttachment = Class(TRESTDWMessagePart)
-  public
-    // here the methods you have to override...
+ Public
+  Function  OpenLoadStream    : TStream; Virtual; Abstract;
+  Procedure CloseLoadStream;             Virtual; Abstract;
+  Function  PrepareTempStream : TStream; Virtual; Abstract;
+  Procedure FinishTempStream;            Virtual; Abstract;
+  Procedure LoadFromFile(Const FileName : String); Virtual;
+  Procedure LoadFromStream(AStream: TStream);      Virtual;
+  Procedure SaveToFile  (Const FileName : String); Virtual;
+  Procedure SaveToStream(AStream : TStream);       Virtual;
+  Class Function PartType : TRESTDWMessagePartType; Override;
+ End;
+ TRESTDWAttachmentClass = Class Of TRESTDWAttachment;
 
-    // for open handling
-    // works like this:
-    //  1) you create an attachment - and do whatever it takes to put data in it
-    //  2) you send the message
-    //  3) this will be called - first OpenLoadStream, to get a stream
-    //  4) when the message is fully encoded, CloseLoadStream is called
-    //     to close the stream. The Attachment implementation decides what to do
-    function OpenLoadStream: TStream; virtual; abstract;
-    procedure CloseLoadStream; virtual; abstract;
+Implementation
 
-    // for save handling
-    // works like this:
-    //  1) new attachment is created
-    //  2) PrepareTempStream is called
-    //  3) stuff is loaded
-    //  4) FinishTempStream is called of the newly created attachment
-    function  PrepareTempStream: TStream; virtual; abstract;
-    procedure FinishTempStream; virtual; abstract;
+Uses
+ uRESTDWBasicTypes, uRESTDWTools, uRESTDWConsts, SysUtils;
 
-    procedure LoadFromFile(const FileName: String); virtual;
-    procedure LoadFromStream(AStream: TStream); virtual;
-    procedure SaveToFile(const FileName: String); virtual;
-    procedure SaveToStream(AStream: TStream); virtual;
-    
-    class function PartType: TRESTDWMessagePartType; override;
-  end;
+Class Function TRESTDWAttachment.PartType: TRESTDWMessagePartType;
+Begin
+ Result := mptAttachment;
+End;
 
-  TRESTDWAttachmentClass = class of TRESTDWAttachment;
+Procedure TRESTDWAttachment.LoadFromFile(const FileName: String);
+Var
+ LStrm : TRESTDWReadFileExclusiveStream;
+Begin
+ LStrm := TRESTDWReadFileExclusiveStream.Create(FileName);
+ Try
+  LoadFromStream(LStrm);
+ Finally
+  FreeAndNil(LStrm);
+ End;
+End;
 
-implementation
+Procedure TRESTDWAttachment.LoadFromStream(AStream: TStream);
+Var
+ LStrm : TStream;
+Begin
+ LStrm := PrepareTempStream;
+ Try
+  LStrm.CopyFrom(AStream, 0);
+ Finally
+  FinishTempStream;
+ End;
+End;
 
-uses
-  IdGlobal, IdGlobalProtocols, IdCoderHeader,
-  SysUtils;
+Procedure TRESTDWAttachment.SaveToFile(const FileName: String);
+Var
+ LStrm : TRESTDWFileCreateStream;
+Begin
+ LStrm := TRESTDWFileCreateStream.Create(FileName);
+ Try
+  SaveToStream(LStrm);
+ Finally
+  FreeAndNil(LStrm);
+ End;
+End;
 
-{ TRESTDWAttachment }
+Procedure TRESTDWAttachment.SaveToStream(AStream: TStream);
+Var
+ LStrm : TStream;
+Begin
+ LStrm := OpenLoadStream;
+ Try
+  AStream.CopyFrom(LStrm, 0);
+ Finally
+  CloseLoadStream;
+ End;
+End;
 
-class function TRESTDWAttachment.PartType: TRESTDWMessagePartType;
-begin
-  Result := mptAttachment;
-end;
-
-procedure TRESTDWAttachment.LoadFromFile(const FileName: String);
-var
-  LStrm: TIdReadFileExclusiveStream;
-begin
-  LStrm := TIdReadFileExclusiveStream.Create(FileName); try
-    LoadFromStream(LStrm);
-  finally
-    FreeAndNil(LStrm);
-  end;
-end;
-
-procedure TRESTDWAttachment.LoadFromStream(AStream: TStream);
-var
-  LStrm: TStream;
-begin
-  LStrm := PrepareTempStream;
-  try
-                                                                           
-    // CopyFrom() if (AStream.Size-AStream.Position) is <= 0.  Passing 0 to
-    // CopyFrom() tells it to seek AStream to Position=0 and then copy the
-    // entire stream, which is fine for the stream provided by LoadFromFile(),
-    // but may not always be desirable for user-provided streams...
-    LStrm.CopyFrom(AStream, 0);
-  finally
-    FinishTempStream;
-  end;
-end;
-
-procedure TRESTDWAttachment.SaveToFile(const FileName: String);
-var
-  LStrm: TIdFileCreateStream;
-begin
-  LStrm := TIdFileCreateStream.Create(FileName); try
-    SaveToStream(LStrm);
-  finally
-    FreeAndNil(LStrm);
-  end;
-end;
-
-procedure TRESTDWAttachment.SaveToStream(AStream: TStream);
-var
-  LStrm: TStream;
-begin
-  LStrm := OpenLoadStream;
-  try
-    AStream.CopyFrom(LStrm, 0);
-  finally
-    CloseLoadStream;
-  end;
-end;
-
-end.
+End.
 

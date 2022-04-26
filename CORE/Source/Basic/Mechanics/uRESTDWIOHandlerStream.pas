@@ -89,7 +89,7 @@ End;
 
 Constructor TRESTDWIOHandlerStream.Create(AOwner : TComponent);
 Begin
- Inherited Create(AOwner);
+ Inherited Create;
  FFreeStreams := True;
  FStreamType := stReadWrite;
 End;
@@ -98,7 +98,7 @@ Constructor TRESTDWIOHandlerStream.Create(AOwner         : TComponent;
                                           AReceiveStream : TStream;
                                           ASendStream    : TStream = Nil);
 begin
- Inherited Create(AOwner);
+ Inherited Create;
  FFreeStreams   := True;
  FReceiveStream := AReceiveStream;
  FSendStream    := ASendStream;
