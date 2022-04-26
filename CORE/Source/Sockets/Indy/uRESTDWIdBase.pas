@@ -28,14 +28,14 @@ interface
 Uses
  {$IFDEF FPC}
  SysUtils,      Classes, Db, Variants, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
- uRESTDWBasic, uRESTDWBasicDB, uRESTDWConsts, DataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
+ uRESTDWBasic, uRESTDWBasicDB, uRESTDWConsts, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
  uRESTDWParams, uRESTDWAbout
  {$ELSE}
   {$IF CompilerVersion <= 22}
-   SysUtils, Classes, Db, Variants, EncdDecd, SyncObjs, DataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
+   SysUtils, Classes, Db, Variants, EncdDecd, SyncObjs, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
    uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWAbout
   {$ELSE}
-   System.SysUtils, System.Classes, Data.Db, Variants, system.SyncObjs, DataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
+   System.SysUtils, System.Classes, Data.Db, Variants, system.SyncObjs, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
    uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWAbout,
    {$IF Defined(RESTDWFMX)}{$IFNDEF RESTDWAndroidService}FMX.Forms,{$ENDIF}
    {$ELSE}
@@ -50,7 +50,7 @@ Uses
    , uRESTDWConsts
   {$IFEND}
  {$ENDIF}
- ,IdContext, IdHeaderList,   IdTCPConnection,     IdHTTPServer,       IdCustomHTTPServer, IdSSLOpenSSL,  IdSSL,
+ ,DataUtils, IdContext, IdHeaderList,   IdTCPConnection,     IdHTTPServer,       IdCustomHTTPServer, IdSSLOpenSSL,  IdSSL,
  IdAuthentication,           IdTCPClient,         IdHTTPHeaderInfo,   IdComponent,        IdBaseComponent,
  IdHTTP,                     IdMultipartFormData, IdMessageCoder,     IdMessage,          IdGlobalProtocols,
  IdGlobal,  IdStack;
@@ -875,11 +875,16 @@ Procedure TRESTDWIdServicePooler.aCommandGet(AContext      : TIdContext;
                                              AResponseInfo : TIdHTTPResponseInfo);
 Var
  sCharSet,
- ErrorMessage  : String;
+ vToken,
+ ErrorMessage,
+ vAuthRealm,
+ vResponseString : String;
  I,
- StatusCode    : Integer;
- ResultStream  : TMemoryStream;
- mb            : TStringStream;
+ StatusCode      : Integer;
+ ResultStream    : TMemoryStream;
+ vResponseHeader : TStringList;
+ mb              : TStringStream;
+ vRedirect       : TRedirect;
  Procedure WriteError;
  Begin
   AResponseInfo.ResponseNo              := StatusCode;
@@ -901,50 +906,125 @@ Var
    AResponseInfo.WriteContent;
   {$ENDIF}
  End;
+ Procedure DestroyComponents;
+ Begin
+  If Assigned(vResponseHeader) Then
+   FreeAndNil(vResponseHeader);
+ End;
+ Procedure Redirect(Url : String);
+ Begin
+  AResponseInfo.Redirect(Url);
+ End;
 Begin
- ResultStream := TMemoryStream.Create;
- If CORS Then
-  Begin
-   If CORS_CustomHeaders.Count > 0 Then
-    Begin
-     For I := 0 To CORS_CustomHeaders.Count -1 Do
-      AResponseInfo.CustomHeaders.AddValue(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
-    End
-   Else
-    AResponseInfo.CustomHeaders.AddValue('Access-Control-Allow-Origin','*');
-  End;
- If CommandExec  (RemoveBackslashCommands(ARequestInfo.URI),
-                  ARequestInfo.RawHTTPCommand,
-                  ARequestInfo.ContentType,
-                  ARequestInfo.RawHeaders,
-                  ARequestInfo.Params,
-                  ARequestInfo.QueryParams,
-                  ARequestInfo.PostStream,
-                  sCharSet,
-                  ErrorMessage,
-                  StatusCode,
-                  ResultStream) Then
-  Begin
-   {$IFNDEF FPC}
-    {$if CompilerVersion > 21}
-     If (sCharSet <> '') Then
-      AResponseInfo.CharSet := sCharSet;
-    {$IFEND}
-   {$ENDIF}
-   AResponseInfo.ResponseNo             := StatusCode;
-   AResponseInfo.FreeContentStream      := True;
-   AResponseInfo.ContentStream          := ResultStream;
-   AResponseInfo.ContentStream.Position := 0;
-   {$IFNDEF FPC}
-    AResponseInfo.ContentLength         := ResultStream.Size;
+ ResultStream    := TMemoryStream.Create;
+ vResponseHeader := TStringList.Create;
+ vResponseString := '';
+ @vRedirect      := @Redirect;
+ Try
+  If CORS Then
+   Begin
+    If CORS_CustomHeaders.Count > 0 Then
+     Begin
+      For I := 0 To CORS_CustomHeaders.Count -1 Do
+       AResponseInfo.CustomHeaders.AddValue(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
+     End
+    Else
+     AResponseInfo.CustomHeaders.AddValue('Access-Control-Allow-Origin','*');
+   End;
+  {$IFNDEF FPC}
+   {$IF Defined(HAS_FMX)}
+    {$IFDEF HAS_UTF8}
+     If Assigned({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}) Then
+      vToken       := TRESTDWAuthRequest({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}).Token;
+    {$ELSE}
+     If Assigned(AContext.Data) Then
+      vToken       := TRESTDWAuthRequest(AContext.Data).Token;
+    {$ENDIF}
    {$ELSE}
-    AResponseInfo.ContentLength         := -1;
-   {$ENDIF}
-   AResponseInfo.WriteContent;
-  End
- Else //Tratamento de Erros.
-  Begin
-  End;
+    If Assigned(AContext.Data) Then
+     vToken       := TRESTDWAuthRequest(AContext.Data).Token;
+   {$IFEND}
+  {$ELSE}
+   If Assigned(AContext.Data) Then
+    vToken       := TRESTDWAuthRequest(AContext.Data).Token;
+  {$ENDIF}
+  vAuthRealm := AResponseInfo.AuthRealm;
+  If CommandExec  (RemoveBackslashCommands(ARequestInfo.URI),
+                   ARequestInfo.RawHTTPCommand,
+                   ARequestInfo.ContentType,
+                   AContext.Binding.PeerIP,
+                   ARequestInfo.UserAgent,
+                   ARequestInfo.Username,
+                   ARequestInfo.Password,
+                   vToken,
+                   ARequestInfo.CustomHeaders,
+                   AContext.Binding.PeerPort,
+                   ARequestInfo.RawHeaders,
+                   ARequestInfo.Params,
+                   ARequestInfo.QueryParams,
+                   ARequestInfo.PostStream,
+                   vAuthRealm,
+                   sCharSet,
+                   ErrorMessage,
+                   StatusCode,
+                   vResponseHeader,
+                   vResponseString,
+                   ResultStream,
+                   vRedirect) Then
+   Begin
+    AResponseInfo.AuthRealm   := vAuthRealm;
+    {$IFNDEF FPC}
+     {$if CompilerVersion > 21}
+      If (sCharSet <> '') Then
+       AResponseInfo.CharSet := sCharSet;
+     {$IFEND}
+    {$ENDIF}
+    AResponseInfo.ResponseNo               := StatusCode;
+    If (vResponseString <> '') Or
+       (ErrorMessage    <> '') Then
+     Begin
+      If Assigned(ResultStream) Then
+       FreeAndNil(ResultStream);
+      AResponseInfo.ContentLength          := -1;
+      If ErrorMessage <> '' Then
+       AResponseInfo.ResponseText          := ErrorMessage
+      Else
+       AResponseInfo.ResponseText          := vResponseString;
+     End
+    Else
+     Begin
+      AResponseInfo.FreeContentStream        := True;
+      AResponseInfo.ContentStream          := ResultStream;
+      AResponseInfo.ContentStream.Position := 0;
+      {$IFNDEF FPC}
+       AResponseInfo.ContentLength         := ResultStream.Size;
+      {$ELSE}
+       AResponseInfo.ContentLength         := -1;
+      {$ENDIF}
+     End;
+    For I := 0 To vResponseHeader.Count -1 Do
+     AResponseInfo.CustomHeaders.AddValue(vResponseHeader.Names [I],
+                                          vResponseHeader.Values[vResponseHeader.Names[I]]);
+    If vResponseHeader.Count > 0 Then
+     AResponseInfo.WriteHeader;
+    AResponseInfo.WriteContent;
+   End
+  Else //Tratamento de Erros.
+   Begin
+    AResponseInfo.AuthRealm := vAuthRealm;
+    {$IFNDEF FPC}
+     {$if CompilerVersion > 21}
+      If (sCharSet <> '') Then
+       AResponseInfo.CharSet := sCharSet;
+     {$IFEND}
+    {$ENDIF}
+    AResponseInfo.ResponseNo               := StatusCode;
+    If ErrorMessage <> '' Then
+     AResponseInfo.ResponseText            := ErrorMessage;
+   End;
+ Finally
+  DestroyComponents;
+ End;
 End;
 
 Procedure TRESTDWIdServicePooler.aCommandOther(AContext      : TIdContext;

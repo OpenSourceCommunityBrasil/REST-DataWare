@@ -57,7 +57,6 @@ End;
 
 Type
  TObjectDirection          = (odIN, odOUT, odINOUT);
- TEncodeSelect             = (esASCII,     esUtf8, esANSI);
  TRESTDWMaxLineAction      = (maException, maSplit);
  TRESTDWOSType             = (otUnknown, otUnix, otWindows, otDotNet);
  TRESTDWIPVersion          = (Id_IPv4, Id_IPv6);
@@ -106,8 +105,8 @@ Const
  TReplyInvalidWelcome       = '{"MESSAGE":"NOK", "RESULT":"Invalid welcomemessage..."}';
  TReplyError                = '{"MESSAGE":"NOK", "RESULT":"%s"}';
  TServerStatusHTML          = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>' +
-                              '<title>REST Dataware - CORE</title></head><body>'   +
-                              '<h1>REST Dataware - CORE</h1>'                      +
+                              '<title>REST Dataware - CORE (Refactor Edition)</title></head><body>'   +
+                              '<h1>REST Dataware - CORE (Refactor Edition)</h1>'                      +
                               '<h2>Server Status - Online</h2></body></html>';
  TServerStatusSynHTML       = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>' +
                               '<title>REST Dataware - CORE - Synopse</title></head><body>'   +
@@ -407,6 +406,8 @@ Var
  DecimalLocal : Char;
 
 implementation
+
+Uses uRESTDWBasicTypes;
 
 Function iif(ATest       : Boolean;
              Const ATrue  : Integer;

@@ -52,7 +52,7 @@ Uses
  {$ENDIF}, uRESTDWMessageCoderMIME;
 
  Type
-  TRedirect = Procedure (Url : String) Of Object;
+  TRedirect = Procedure(Const AURL : String) Of Object;
 
  Type
   TServerMethodClass = Class(TComponent)
@@ -2236,7 +2236,7 @@ Var
    End;
  End;
 Begin
- Result                := False;
+ Result                := True;
  vRDWAuthOptionParam   := Nil;
  decoder               := Nil;
  mb2                   := Nil;
@@ -2279,10 +2279,6 @@ Begin
  vRequestHeader        := TStringList.Create;
  vCompareContext       := False;
  Cmd                   := RemoveBackslashCommands(Trim(RawHTTPCommand));
-// MyDecodeAndSetParams(ARequestInfo);
-
- {Try tranferido para este ponto - remoção memory Leaks - Eloy}
-
  Try
   sCharSet := '';
   If (UpperCase(Copy (Cmd, 1, 3)) = 'GET')    Then
@@ -3441,19 +3437,8 @@ Begin
          If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
           vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
          Try
-//          {$IFDEF FPC}
-//           InitCriticalSection(vCriticalSection);
-//           EnterCriticalSection(vCriticalSection);
-//          {$ENDIF}
           vTempServerMethods  := vServerMethod.Create(Nil);
          Finally
-//          {$IFDEF FPC}
-//           Try
-//            LeaveCriticalSection(vCriticalSection);
-//            DoneCriticalSection(vCriticalSection);
-//           Except
-//           End;
-//          {$ENDIF}
          End;
          If (vTempServerMethods.ClassType = TServerMethodDatamodule)             Or
             (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule)) Then
@@ -4036,6 +4021,7 @@ Begin
                                     vdwConnectionDefs,  EncodeStrings, vAccessTag, WelcomeAccept, RequestType, vMark,
                                     vRequestHeader, vBinaryEvent, vMetadata, vBinaryCompatibleMode, vCompareContext) Or (lowercase(vContentType) = 'application/php') Then
                Begin
+                Result := False;
                 If Not dwassyncexec Then
                  Begin
                   If Not vSpecialServer Then
@@ -4076,6 +4062,7 @@ Begin
                       StatusCode             := 200;
                       WriteStream(mb, ResultStream);
                       FreeAndNil(mb);
+                      Result                 := True;
                      End;
                    End;
                  End;
@@ -4086,6 +4073,7 @@ Begin
               JSONStr    := vToken;
               JsonMode   := jmPureJSON;
               vErrorCode := 200;
+              Result     := True;
              End;
            End;
          End;

@@ -40,7 +40,6 @@ requires
   FireDACCommon;
 
 contains
-  uRESTDWAboutForm in '..\..\Source\Basic\Dialogs\uRESTDWAboutForm.pas' {frm_About},
   DataUtils in '..\..\Source\Basic\Mechanics\DataUtils.pas',
   PropertyPersist in '..\..\Source\Basic\PropertyPersist.pas',
   uRESTDWAbout in '..\..\Source\Basic\uRESTDWAbout.pas',
@@ -88,7 +87,8 @@ contains
   uRESTDWMessageClient in '..\..\Source\Basic\Mechanics\uRESTDWMessageClient.pas',
   uRESTDWIOHandlerStream in '..\..\Source\Basic\Mechanics\uRESTDWIOHandlerStream.pas',
   uRESTDWIOHandler in '..\..\Source\Basic\Mechanics\uRESTDWIOHandler.pas',
-  uRESTDWMessageCoderBinHex4 in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderBinHex4.pas';
+  uRESTDWMessageCoderBinHex4 in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderBinHex4.pas',
+  uRESTDWAboutForm in '..\..\Source\Basic\Dialogs\uRESTDWAboutForm.pas' {frm_About};
 
 End.
 
