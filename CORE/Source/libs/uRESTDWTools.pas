@@ -336,6 +336,12 @@ Uses
                                    Const ALength        : Integer = -1);Overload;
  Function  GetTokenString         (Value                : String) : String;
  Function  GetBearerString        (Value                : String) : String;
+ Function  GetPairJSONStr         (Status,
+                                   MessageText          : String;
+                                   Encoding             : TEncodeSelect = esUtf8) : String;
+ Function  GetPairJSONInt         (Status               : Integer;
+                                   MessageText          : String;
+                                   Encoding             : TEncodeSelect = esUtf8) : String;
 
 Implementation
 
@@ -358,6 +364,33 @@ Begin
  LOldLen := restdwLength(VBytes);
  SetLength(VBytes, LOldLen + 1);
  VBytes[LOldLen] := AByte;
+End;
+
+Function Result2JSON(wsResult: TResultErro): String;
+Begin
+ Result := '{"STATUS":"' + wsResult.Status + '","MENSSAGE":"' + wsResult.MessageText + '"}';
+End;
+
+Function GetPairJSONInt(Status      : Integer;
+                        MessageText : String;
+                        Encoding    : TEncodeSelect = esUtf8) : String;
+Var
+ WSResult : TResultErro;
+Begin
+ WSResult.STATUS      := IntToStr(Status);
+ WSResult.MessageText := MessageText;
+ Result               := Result2JSON(WSResult); //EncodeStrings(TServerUtils.Result2JSON(WSResult){$IFDEF FPC}, csUndefined{$ENDIF});
+End;
+
+Function GetPairJSONStr(Status,
+                        MessageText : String;
+                        Encoding    : TEncodeSelect = esUtf8) : String;
+Var
+ WSResult : TResultErro;
+Begin
+ WSResult.STATUS      := Status;
+ WSResult.MessageText := MessageText;
+ Result               := Result2JSON(WSResult); //EncodeStrings(TServerUtils.Result2JSON(WSResult){$IFDEF FPC}, csUndefined{$ENDIF});
 End;
 
 Function BytesToUInt16(Const AValue : TRESTDWBytes;

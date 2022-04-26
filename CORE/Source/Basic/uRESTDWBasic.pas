@@ -1017,22 +1017,6 @@ Begin
   Result := 'null';
 End;
 
-Function Result2JSON(wsResult: TResultErro): String;
-Begin
- Result := '{"STATUS":"' + wsResult.Status + '","MENSSAGE":"' + wsResult.MessageText + '"}';
-End;
-
-Function GetPairJSONInt(Status      : Integer;
-                        MessageText : String;
-                        Encoding    : TEncodeSelect = esUtf8) : String;
-Var
- WSResult : TResultErro;
-Begin
- WSResult.STATUS      := IntToStr(Status);
- WSResult.MessageText := MessageText;
- Result               := Result2JSON(WSResult); //EncodeStrings(TServerUtils.Result2JSON(WSResult){$IFDEF FPC}, csUndefined{$ENDIF});
-End;
-
 Procedure TRESTDWServiceNotificationBase.ProcessMessages;
 Begin
  {$IFNDEF FPC}
