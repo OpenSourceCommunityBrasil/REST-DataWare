@@ -216,8 +216,8 @@ Uses
                                    Const ABytes         : TRESTDWBytes;
                                    Const ASize          : Integer = -1;
                                    Const AIndex         : Integer = 0);
- Procedure WriteStringToStream    (AStream              : TStream;
-                                   Const AStr           : String);Overload;
+ Procedure StringToStream         (AStream              : TStream;
+                                   Const AStr           : String);
  procedure WriteStringToStream    (AStream              : TStream;
                                    Const AStr           : String;
                                    Const ALength        : Integer = -1;
@@ -1337,9 +1337,8 @@ Begin
  Result := BytesToString(LBytes, 0, ASize);
 End;
 
-Procedure WriteStringToStream(AStream    : TStream;
-                              Const AStr : String);
-                              {$IFDEF USE_INLINE}Inline;{$ENDIF}
+Procedure StringToStream(AStream    : TStream;
+                         Const AStr : String);{$IFDEF USE_INLINE}Inline;{$ENDIF}
 Begin
  WriteStringToStream(AStream, AStr, -1, 1);
 End;
