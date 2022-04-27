@@ -1393,11 +1393,21 @@ End;
 Function RawToBytes(Const AValue : String;
                     Const ASize  : Integer) : TRESTDWBytes;
 Var
- vString : String;
+ vSizeChar : Integer;
+ vString   : String;
 Begin
- SetLength(Result, ASize);
+ vSizeChar := 1;
+ If SizeOf(WideChar) > 1 Then
+  vSizeChar := 2;
+ SetLength(Result, ASize * vSizeChar);
  If ASize > 0 Then
-  Move(AValue, Result[0], ASize);
+  Begin
+   If vSizeChar = 2 Then
+    Move(AValue[InitStrPos], PRESTDWBytes(Result)^, Length(Result))
+   Else
+    Move(AnsiString(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result));
+  End;
+//  Move(PAnsiChar(AValue)^, PRESTDWBytes(Result)^, ASize);
 End;
 
 Function ToBytes(Const AValue : String) : TRESTDWBytes;
@@ -1417,7 +1427,7 @@ Begin
  {$ENDIF}
  LLength := restdwLength(AValue, ALength, AIndex);
  If LLength > 0 Then
-  Result := RawToBytes(AValue[AIndex], LLength)
+  Result := RawToBytes(AValue, LLength)
  Else
   SetLength(Result, 0);
 End;

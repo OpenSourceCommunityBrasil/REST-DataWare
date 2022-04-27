@@ -259,6 +259,7 @@ Uses
                                  dbtAdo);
   TWideChars                  = Array of WideChar;
   TRESTDWBytes                = Array of Byte;
+  PRESTDWBytes                = ^TRESTDWBytes;
   TOnWriterProcess            = Procedure(DataSet               : TDataSet;
                                           RecNo, RecordCount    : Integer;
                                           Var AbortProcess      : Boolean) Of Object;
@@ -527,12 +528,7 @@ Begin
   Begin
    LActual := restdwLength(ABytes, ACount, AOffset);
    If LActual > 0 Then
-    Begin
-     If AOffset <= 0 Then
-      Result := AStream.Write(ABytes[1], LActual)
-     Else
-      Result := AStream.Write(ABytes[AOffset], LActual);
-    End;
+    Result := AStream.Write(ABytes[AOffset], LActual);
   End;
 End;
 

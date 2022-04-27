@@ -390,6 +390,7 @@ begin
  HttpRequest.Request.ContentType               := ContentType;
  HttpRequest.Request.Accept                    := Accept;
  HttpRequest.Request.ContentEncoding           := ContentEncoding;
+ HttpRequest.Request.AcceptEncoding            := AcceptEncoding;
  HttpRequest.Request.UserAgent                 := UserAgent;
  HttpRequest.MaxAuthRetries                    := MaxAuthRetries;
 End;
@@ -864,7 +865,7 @@ Begin
    Else
     Begin
      temp := Nil;
-     sResponse := HttpRequest.Post(AUrl, CustomHeaders);
+     HttpRequest.Post(AUrl, CustomHeaders, AResponse);
      Result:= HttpRequest.ResponseCode;
      If (HttpRequest.ResponseCode > 299) Then
       If Trim(sResponse) = '' Then
@@ -875,7 +876,7 @@ Begin
       aString := utf8Decode(sResponse)
      Else
       aString := sResponse;
-     StringToStream(AResponse, aString);
+//     StringToStream(AResponse, aString);
      AResponse.Position := 0;
      If Not IgnoreEvents Then
      If Assigned(OnAfterRequest) then
@@ -2809,7 +2810,7 @@ Var
  vResponseString : String;
  I,
  StatusCode      : Integer;
- ResultStream    : TMemoryStream;
+ ResultStream    : TStream;
  vResponseHeader : TStringList;
  mb              : TStringStream;
  vRedirect       : TRedirect;
@@ -2844,7 +2845,7 @@ Var
   AResponseInfo.Redirect(Url);
  End;
 Begin
- ResultStream    := TMemoryStream.Create;
+ ResultStream    := TStringStream.Create('');
  vResponseHeader := TStringList.Create;
  vResponseString := '';
  @vRedirect      := @Redirect;
@@ -2921,7 +2922,7 @@ Begin
      End
     Else
      Begin
-      AResponseInfo.FreeContentStream        := True;
+      AResponseInfo.FreeContentStream      := True;
       AResponseInfo.ContentStream          := ResultStream;
       AResponseInfo.ContentStream.Position := 0;
       {$IFNDEF FPC}
@@ -3207,6 +3208,7 @@ Procedure TRESTDWIdClientPooler.SetParams(TransparentProxy    : TProxyConnection
                                           AuthorizationParams : TRESTDWClientAuthOptionParams);
 Begin
  HttpRequest.DefaultCustomHeader.Clear;
+ HttpRequest.AcceptEncoding              := AcceptEncoding;
  HttpRequest.AuthenticationOptions       := AuthorizationParams;
  HttpRequest.ProxyOptions.ProxyUsername  := TransparentProxy.ProxyUsername;
  HttpRequest.ProxyOptions.ProxyServer    := TransparentProxy.ProxyServer;
@@ -3925,7 +3927,7 @@ Var
          End
         Else
          Begin
-          StringStream   := TStringStream.Create('');
+          StringStream   := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
           Case EventType Of
            sePUT    : HttpRequest.Put   (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, StringStream);
            sePATCH  : Begin

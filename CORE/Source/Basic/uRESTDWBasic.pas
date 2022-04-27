@@ -315,6 +315,7 @@ Type
   vTypeRequest         : TTypeRequest;
   vRSCharset           : TEncodeSelect;
   vAuthOptionParams    : TRESTDWClientAuthOptionParams;
+  vAcceptEncoding,
   vDataRoute,
   vUserAgent,
   vAccessTag,
@@ -379,6 +380,7 @@ Type
   Property    LastErrorCode        : Integer                       Read vErrorCode               Write vErrorCode;
  Published
   //Métodos e Propriedades
+  Property AcceptEncoding          : String                        Read vAcceptEncoding          Write vAcceptEncoding;
   Property DataCompression         : Boolean                       Read vDatacompress            Write vDatacompress;
   Property ContentType             : String                        Read vContentType             Write vContentType;
   Property UrlPath                 : String                        Read vUrlPath                 Write SetUrlPath;
@@ -1750,6 +1752,7 @@ Begin
  vHandleRedirects                      := False;
  vUserAgent                            := cUserAgent;
  vLastErrorMessage                     := '';
+ vAcceptEncoding                       := 'gzip2, deflate, br';
  {$IFDEF FPC}
  vDatabaseCharSet                      := csUndefined;
  {$ENDIF}
@@ -7307,7 +7310,7 @@ Begin
  vContentType                    := 'application/json';
  vContentEncoding                := 'multipart/form-data';
  vAccept                         := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
- vAcceptEncoding                 := 'gzip, deflate, br';
+ vAcceptEncoding                 := 'gzip2, deflate, br';
  vCharset                        := 'utf8';
  vMaxAuthRetries                 := 0;
  vUserAgent                      := cUserAgent;
