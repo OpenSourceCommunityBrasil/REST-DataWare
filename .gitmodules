@@ -1,3 +1,4 @@
 [submodule "CORE/Demos"]
 	path = CORE/Demos
-	url = https://github.com/mobius1qwe/RDWDemos
+	url = https://github.com/mobius1qwe/RDWDemos.git
+	branch = main
