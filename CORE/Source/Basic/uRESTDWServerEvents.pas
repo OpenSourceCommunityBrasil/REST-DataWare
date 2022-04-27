@@ -231,23 +231,28 @@ Type
   procedure Notification(AComponent: TComponent; Operation: TOperation); override;
  Public
   Destructor  Destroy; Override;
-  Constructor Create        (AOwner    : TComponent);Override; //Cria o Componente
-  Procedure   CreateDWParams(EventName  : String; Var DWParams     : TRESTDWParams);
-  Function    SendEvent     (EventName  : String; Var DWParams     : TRESTDWParams;
-                             Var Error  : String; EventType        : TSendEvent = sePOST;
-                             Assyncexec : Boolean = False)         : Boolean; Overload;
-  Function    SendEvent     (EventName  : String; Var DWParams     : TRESTDWParams;
-                             Var Error  : String; Var NativeResult : String;
-                             EventType  : TSendEvent = sePOST;
-                             Assyncexec : Boolean = False) : Boolean; Overload;
+  Constructor Create        (AOwner           : TComponent);Override; //Cria o Componente
+  Procedure   CreateDWParams(EventName        : String;
+                             Var DWParams     : TRESTDWParams);
+  Function    SendEvent     (EventName        : String;
+                             Var DWParams     : TRESTDWParams;
+                             Var Error        : String;
+                             EventType        : TSendEvent = sePOST;
+                             Assyncexec       : Boolean = False) : Boolean; Overload;
+  Function    SendEvent     (EventName        : String;
+                             Var DWParams     : TRESTDWParams;
+                             Var Error        : String;
+                             Var NativeResult : String;
+                             EventType        : TSendEvent = sePOST;
+                             Assyncexec       : Boolean = False) : Boolean; Overload;
   Procedure   ClearEvents;
-  Property    GetEvents        : Boolean           Read vGetEvents          Write GetOnlineEvents;
+  Property    GetEvents        : Boolean               Read vGetEvents              Write GetOnlineEvents;
  Published
-  Property    ServerEventName  : String            Read vServerEventName    Write vServerEventName;
-  Property    CriptOptions     : TCripto           Read vCripto             Write vCripto;
+  Property    ServerEventName  : String                Read vServerEventName        Write vServerEventName;
+  Property    CriptOptions     : TCripto               Read vCripto                 Write vCripto;
   Property    RESTClientPooler : TRESTClientPoolerBase Read GeTRESTClientPoolerBase Write SeTRESTClientPoolerBase;
-  Property    Events           : TDWEventList      Read vEventList          Write SetEventList;
-  Property    OnBeforeSend     : TOnBeforeSend     Read vOnBeforeSend       Write vOnBeforeSend; // Add Evento por Ico Menezes
+  Property    Events           : TDWEventList          Read vEventList              Write SetEventList;
+  Property    OnBeforeSend     : TOnBeforeSend         Read vOnBeforeSend           Write vOnBeforeSend; // Add Evento por Ico Menezes
 End;
 
 implementation

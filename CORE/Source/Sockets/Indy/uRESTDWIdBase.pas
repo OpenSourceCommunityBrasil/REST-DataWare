@@ -129,8 +129,7 @@ Type
   vSSLVersions     : TIdSSLVersions;
   ssl              : TIdSSLIOHandlerSocketOpenSSL;
   vCertMode        : TIdSSLMode;
-  vTransparentProxy                               : TProxyConnectionInfo;
-  Procedure SetParams         (Const aHttpRequest : TIdHTTP);
+  Procedure SetParams;
   Procedure SetUseSSL         (Value              : Boolean);Override;
   Procedure SetHeaders        (AHeaders           : TStringList);Overload;Override;
   Procedure SetHeaders        (AHeaders           : TStringList;
@@ -152,10 +151,7 @@ Type
                                Const AStatus      : TIdStatus;
                                Const AStatusText  : String);
   Procedure SetOnStatus       (Value              : TOnStatus); Override;
-  Function  GetAllowCookies                       : Boolean;
-  Procedure SetAllowCookies   (Value              : Boolean);
-  Function  GetHandleRedirects                    : Boolean;
-  Procedure SetHandleRedirects(Value              : Boolean);
+  Procedure DestroyClient;Override;
   Procedure SetCertOptions;
   Procedure Getpassword       (Var Password       : String);
   Function  GetVerifyCert                         : Boolean;
@@ -271,8 +267,6 @@ Type
                         Const AResponse   : TStream        = Nil;
                         IgnoreEvents      : Boolean        = False):Integer;Overload;Override;
  Published
-  Property AllowCookies             : Boolean                     Read GetAllowCookies           Write SetAllowCookies;
-  Property HandleRedirects          : Boolean                     Read GetHandleRedirects        Write SetHandleRedirects;
   Property VerifyCert               : Boolean                     Read GetVerifyCert             Write SetVerifyCert;
   Property SSLVersions              : TIdSSLVersions              Read vSSLVersions              Write vSSLVersions;
   Property CertMode                 : TIdSSLMode                  Read vCertMode                 Write vCertMode;
@@ -342,47 +336,62 @@ Uses uRESTDWJSONInterface;
 Destructor TRESTDWIdClientREST.Destroy;
 Begin
  FreeAndNil(HttpRequest);
- FreeAndNil(vTransparentProxy);
  Inherited;
 End;
 
-Procedure TRESTDWIdClientREST.SetParams(Const aHttpRequest: TIdHTTP);
-begin
- If aHttpRequest.Request.BasicAuthentication Then
+Procedure TRESTDWIdClientREST.DestroyClient;
+Begin
+ Inherited;
+ If Not Assigned(HttpRequest) Then
   Begin
-   If aHttpRequest.Request.Authentication = Nil Then
-    aHttpRequest.Request.Authentication         := TIdBasicAuthentication.Create;
+   Try
+    If HttpRequest.Connected Then
+     HttpRequest.Disconnect(False);
+   Finally
+    FreeAndNil(HttpRequest);
+   End;
   End;
- aHttpRequest.ProxyParams.ProxyUsername         := vTransparentProxy.ProxyUsername;
- aHttpRequest.ProxyParams.ProxyServer           := vTransparentProxy.ProxyServer;
- aHttpRequest.ProxyParams.ProxyPassword         := vTransparentProxy.ProxyPassword;
- aHttpRequest.ProxyParams.ProxyPort             := vTransparentProxy.ProxyPort;
- aHttpRequest.ReadTimeout                       := RequestTimeout;
- aHttpRequest.Request.ContentType               := HttpRequest.Request.ContentType;
- aHttpRequest.AllowCookies                      := HttpRequest.AllowCookies;
- aHttpRequest.HandleRedirects                   := HttpRequest.HandleRedirects;
- aHttpRequest.RedirectMaximum                   := RedirectMaximum;
- aHttpRequest.HTTPOptions                       := HttpRequest.HTTPOptions;
+End;
+
+Procedure TRESTDWIdClientREST.SetParams;
+begin
+ If Not Assigned(HttpRequest) Then
+  HttpRequest := TIdHTTP.Create;
+ If HttpRequest.Request.BasicAuthentication Then
+  Begin
+   If HttpRequest.Request.Authentication = Nil Then
+    HttpRequest.Request.Authentication         := TIdBasicAuthentication.Create;
+  End;
+ HttpRequest.ProxyParams.ProxyUsername         := ProxyOptions.ProxyUsername;
+ HttpRequest.ProxyParams.ProxyServer           := ProxyOptions.ProxyServer;
+ HttpRequest.ProxyParams.ProxyPassword         := ProxyOptions.ProxyPassword;
+ HttpRequest.ProxyParams.ProxyPort             := ProxyOptions.ProxyPort;
+ HttpRequest.ReadTimeout                       := RequestTimeout;
+ HttpRequest.Request.ContentType               := HttpRequest.Request.ContentType;
+ HttpRequest.AllowCookies                      := HttpRequest.AllowCookies;
+ HttpRequest.HandleRedirects                   := HttpRequest.HandleRedirects;
+ HttpRequest.RedirectMaximum                   := RedirectMaximum;
+ HttpRequest.HTTPOptions                       := HttpRequest.HTTPOptions;
  If RequestCharset = esUtf8 Then
   Begin
-   aHttpRequest.Request.Charset                  := 'utf-8';
-   aHttpRequest.Request.AcceptCharSet            := aHttpRequest.Request.Charset;
+   HttpRequest.Request.Charset                  := 'utf-8';
+   HttpRequest.Request.AcceptCharSet            := HttpRequest.Request.Charset;
   End
  Else If RequestCharset = esASCII Then
   Begin
-   aHttpRequest.Request.Charset                  := 'ascii';
-   aHttpRequest.Request.AcceptCharSet            := aHttpRequest.Request.Charset;
+   HttpRequest.Request.Charset                  := 'ascii';
+   HttpRequest.Request.AcceptCharSet            := HttpRequest.Request.Charset;
   End
  Else If RequestCharset = esANSI Then
   Begin
-   aHttpRequest.Request.Charset                  := 'ansi';
-   aHttpRequest.Request.AcceptCharSet            := aHttpRequest.Request.Charset;
+   HttpRequest.Request.Charset                  := 'ansi';
+   HttpRequest.Request.AcceptCharSet            := HttpRequest.Request.Charset;
   End;
- aHttpRequest.Request.ContentType               := ContentType;
- aHttpRequest.Request.Accept                    := Accept;
- aHttpRequest.Request.ContentEncoding           := ContentEncoding;
- aHttpRequest.Request.UserAgent                 := UserAgent;
- aHttpRequest.MaxAuthRetries                    := MaxAuthRetries;
+ HttpRequest.Request.ContentType               := ContentType;
+ HttpRequest.Request.Accept                    := Accept;
+ HttpRequest.Request.ContentEncoding           := ContentEncoding;
+ HttpRequest.Request.UserAgent                 := UserAgent;
+ HttpRequest.MaxAuthRetries                    := MaxAuthRetries;
 End;
 
 Function TRESTDWIdClientREST.Get(AUrl            : String         = '';
@@ -403,7 +412,7 @@ Begin
   vAUrl := AUrl;
   tempResponse := Nil;
   SendParams   := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -500,6 +509,7 @@ Begin
     HttpRequest.Disconnect(false);
    End;
  End;
+ DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Get(AUrl            : String         = '';
@@ -515,7 +525,7 @@ Begin
   vAUrl := AUrl;
   Result       := '';
   SendParams   := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   Try
@@ -549,6 +559,7 @@ Begin
     Raise;
    End;
  End;
+ DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Post(AUrl             : String         = '';
@@ -569,7 +580,7 @@ Begin
  SendParams   := TIdMultipartFormDataStream.Create;
  Try
   tempResponse := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -645,6 +656,7 @@ Begin
     Raise;
    End;
  End;
+ DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Post(AUrl            : String         = '';
@@ -666,7 +678,7 @@ Begin
  SendParams   := TIdMultipartFormDataStream.Create;
  Try
   tempResponse := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -772,6 +784,7 @@ Begin
     Raise;
    End;
  End;
+ DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Post(AUrl            : String;
@@ -795,7 +808,7 @@ Begin
  SendParams   := TIdMultipartFormDataStream.Create;
  Try
   tempResponse := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -898,6 +911,7 @@ Begin
     Raise;
    End;
  End;
+ DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Post(AUrl            : String;
@@ -920,7 +934,7 @@ Begin
  SendParams   := TIdMultipartFormDataStream.Create;
  Try
   tempResponse := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -1026,6 +1040,7 @@ Begin
     Raise;
    End;
  End;
+ DestroyClient;
 End;
 
 Function  TRESTDWIdClientREST.Put(AUrl            : String         = '';
@@ -1044,7 +1059,7 @@ Begin
  Try
   tempResponse := Nil;
   SendParams   := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -1137,6 +1152,7 @@ Begin
     Raise;
    End;
  End;
+ DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Put(AUrl            : String         = '';
@@ -1157,7 +1173,7 @@ Begin
   temp         := Nil;
   tempResponse := Nil;
   SendParams   := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -1242,6 +1258,7 @@ Begin
     Raise;
    End;
  End;
+ DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Put(AUrl             : String         = '';
@@ -1262,7 +1279,7 @@ Begin
  SendParams   := TIdMultipartFormDataStream.Create;
  Try
   tempResponse := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -1368,6 +1385,7 @@ Begin
     Raise;
    End;
  End;
+ DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Put(AUrl             : String         = '';
@@ -1388,7 +1406,7 @@ Begin
  Try
   tempResponse := Nil;
   SendParams   := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -1481,7 +1499,8 @@ Begin
     Raise;
    End;
  End;
-end;
+ DestroyClient;
+End;
 
 Function   TRESTDWIdClientREST.Put(AUrl             : String         = '';
                                    CustomHeaders    : TStringList    = Nil;
@@ -1502,7 +1521,7 @@ Begin
  SendParams   := TIdMultipartFormDataStream.Create;
  Try
   tempResponse := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -1608,6 +1627,7 @@ Begin
     Raise;
    End;
  End;
+ DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Patch(AUrl            : String         = '';
@@ -1626,7 +1646,7 @@ Begin
  Try
   tempResponse := Nil;
   SendParams   := Nil;//TIdMultipartFormDataStream.Create;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -1777,6 +1797,7 @@ Begin
     Raise;
    End;
  End;
+ DestroyClient;
 End;
 
 Function  TRESTDWIdClientREST.Patch(AUrl            : String         = '';
@@ -1796,7 +1817,7 @@ Begin
  Try
   tempResponse := Nil;
   SendParams   := Nil;//TIdMultipartFormDataStream.Create;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -1949,6 +1970,7 @@ Begin
     Raise;
    End;
  End;
+ DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Patch(AUrl            : String         = '';
@@ -1969,7 +1991,7 @@ Begin
  Try
   tempResponse := Nil;
   SendParams   := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -2062,6 +2084,7 @@ Begin
     Raise;
    End;
  End;
+ DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Patch(AUrl            : String         = '';
@@ -2083,7 +2106,7 @@ Begin
  SendParams   := TIdMultipartFormDataStream.Create;
  Try
   tempResponse := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -2109,8 +2132,6 @@ Begin
    End;
   vAUrl := AUrl;
   Try
-   //Copy Custom Headers
-//   If Assigned(CustomHeaders) Then
    SetHeaders(CustomHeaders);
    If Not IgnoreEvents Then
    If Assigned(OnBeforePost) then
@@ -2189,6 +2210,7 @@ Begin
     Raise;
    End;
  End;
+ DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Delete(AUrl            : String         = '';
@@ -2207,7 +2229,7 @@ Begin
  Try
   tempResponse := Nil;
   SendParams   := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -2290,6 +2312,7 @@ Begin
     Raise
    End;
  End;
+ DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Delete(AUrl              : String;
@@ -2309,7 +2332,7 @@ Begin
  Try
   tempResponse := Nil;
   SendParams   := Nil;
-  SetParams(HttpRequest);
+  SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
   {$IFDEF FPC}
@@ -2392,7 +2415,8 @@ Begin
     Raise
    End;
  End;
-end;
+ DestroyClient;
+End;
 
 Constructor TRESTDWIdClientREST.Create(AOwner: TComponent);
 Begin
@@ -2441,26 +2465,6 @@ Procedure TRESTDWIdClientREST.pOnWork(ASender    : TObject;
                                       AWorkCount : Int64);
 Begin
  OnWork(ASender, AWorkCount);
-End;
-
-Function TRESTDWIdClientREST.GetAllowCookies : Boolean;
-Begin
- Result := HttpRequest.AllowCookies;
-End;
-
-Function TRESTDWIdClientREST.GetHandleRedirects : Boolean;
-begin
- Result := HttpRequest.HandleRedirects;
-End;
-
-Procedure TRESTDWIdClientREST.SetAllowCookies(Value: Boolean);
-Begin
- HttpRequest.AllowCookies    := Value;
-End;
-
-Procedure TRESTDWIdClientREST.SetHandleRedirects(Value: Boolean);
-Begin
- HttpRequest.HandleRedirects := Value;
 End;
 
 Procedure TRESTDWIdClientREST.Getpassword(Var Password : String);
@@ -4159,6 +4163,9 @@ Begin
  if Not aBinaryRequest then
   aBinaryRequest  := BinaryRequest;
  vURL  := BuildUrl(TypeRequest, Host, UrlPath,  DataRoute, ServerContext, Port);
+ If Assigned(HttpRequest) Then
+  FreeAndNil(HttpRequest);
+ HttpRequest      := TRESTDWIdClientREST.Create(Nil);
  If (TypeRequest = trHttps) Then
   HttpRequest.SSLVersions := SSLVersions;
  HttpRequest.UserAgent := UserAgent;
@@ -4252,6 +4259,8 @@ Begin
     Result := vErrorMessage;
     Raise Exception.Create(Result);
    End;
+  If Assigned(HttpRequest) Then
+   FreeAndNil(HttpRequest);
  End;
 End;
 

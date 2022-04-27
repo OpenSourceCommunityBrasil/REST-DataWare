@@ -238,7 +238,7 @@ Implementation
 // {$IFEND}
 //{$ENDIF}
 
-uses uRESTDWConsts, uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
+uses uRESTDWConsts, uRESTDWPoolermethod, uRESTDWBasic, uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
 
 {$IFNDEF FPC}
 {$IFDEF  RTL240_UP}
@@ -811,7 +811,7 @@ Begin
 // RegisterPropertyEditor(TypeInfo(String),       TRESTDWTable,              'Tablename',       TTableList);
 // RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionServer,   'PoolerName',      TPoolersListCDF);
 // RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionParams,   'PoolerName',      TPoolersListCDF);
-// RegisterPropertyEditor(TypeInfo(String),       TDWClientEvents,           'ServerEventName', TServerEventsList);
+ RegisterPropertyEditor(TypeInfo(String),       TRESTDWClientEvents,           'ServerEventName', TServerEventsList);
 // RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionServerCP, 'ServerEventName', TServerEventsListCV);
 // RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'SQL',             TDWSQLEditor);
 // RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'RelationFields',  TDWFieldsRelationEditor);
@@ -966,62 +966,64 @@ procedure TServerEventsList.GetValues(Proc: TGetStrProc);
 Var
  vLista : TStringList;
  I      : Integer;
-// Function GetRestPoolers : TStringList;
-// Var
-//  vTempList     : TStringList;
-//  vConnection   : TDWPoolerMethodClient;
-//  I             : Integer;
-//  vRESTClientPooler : TRESTClientPooler;
-// Begin
-//  Result := Nil;
-//  If TDWClientEvents(GetComponent(0)).RESTClientPooler <> Nil Then
-//   Begin
-//    vRESTClientPooler                     := TDWClientEvents(GetComponent(0)).RESTClientPooler;
-//    vConnection                           := TDWPoolerMethodClient.Create(Nil);
-//    vConnection.WelcomeMessage            := vRESTClientPooler.WelcomeMessage;
-//    vConnection.Host                      := vRESTClientPooler.Host;
-//    vConnection.Port                      := vRESTClientPooler.Port;
-//    vConnection.Compression               := vRESTClientPooler.DataCompression;
-//    vConnection.TypeRequest               := vRESTClientPooler.TypeRequest;
-//    vConnection.AccessTag                 := vRESTClientPooler.AccessTag;
-//    vConnection.CriptOptions.Use          := vRESTClientPooler.CriptOptions.Use;
-//    vConnection.CriptOptions.Key          := vRESTClientPooler.CriptOptions.Key;
-//    vConnection.DataRoute                 := vRESTClientPooler.DataRoute;
-//    vConnection.ServerContext             := vRESTClientPooler.ServerContext;
-//    vConnection.AuthenticationOptions.Assign(vRESTClientPooler.AuthenticationOptions);
-//    Result := TStringList.Create;
-//    Try
-//     vTempList := vConnection.GetServerEvents(vRESTClientPooler.UrlPath,
-//                                              vRESTClientPooler.RequestTimeOut);
-//     Try
-//      For I := 0 To vTempList.Count -1 do
-//       Result.Add(vTempList[I]);
-//     Finally
-//      If Assigned(vTempList) Then
-//       vTempList.Free;
-//     End;
-//    Except
-//     On E : Exception do
-//      Begin
-//       Raise Exception.Create(E.Message);
-//      End;
-//    End;
-//    FreeAndNil(vConnection);
-//   End;
-// End;
+ Function GetRestPoolers : TStringList;
+ Var
+  vTempList         : TStringList;
+  vConnection       : TRESTDWPoolerMethodClient;
+  I                 : Integer;
+  vRESTClientPooler : TRESTClientPoolerBase;
+ Begin
+  Result := Nil;
+  If TRESTDWClientEvents(GetComponent(0)).RESTClientPooler <> Nil Then
+   Begin
+    vRESTClientPooler                     := TRESTDWClientEvents(GetComponent(0)).RESTClientPooler;
+    vConnection                           := TRESTDWPoolerMethodClient.Create(Nil);
+    vConnection.WelcomeMessage            := vRESTClientPooler.WelcomeMessage;
+    vConnection.Host                      := vRESTClientPooler.Host;
+    vConnection.Port                      := vRESTClientPooler.Port;
+    vConnection.Compression               := vRESTClientPooler.DataCompression;
+    vConnection.TypeRequest               := vRESTClientPooler.TypeRequest;
+    vConnection.AccessTag                 := vRESTClientPooler.AccessTag;
+    vConnection.CriptOptions.Use          := vRESTClientPooler.CriptOptions.Use;
+    vConnection.CriptOptions.Key          := vRESTClientPooler.CriptOptions.Key;
+    vConnection.DataRoute                 := vRESTClientPooler.DataRoute;
+    vConnection.ServerContext             := vRESTClientPooler.ServerContext;
+    vConnection.AuthenticationOptions.Assign(vRESTClientPooler.AuthenticationOptions);
+    Result := TStringList.Create;
+    Try
+     vTempList := vConnection.GetServerEvents(vRESTClientPooler.UrlPath,
+                                              vRESTClientPooler.RequestTimeOut,
+                                              vRESTClientPooler.ConnectTimeOut,
+                                              vRESTClientPooler);
+     Try
+      For I := 0 To vTempList.Count -1 do
+       Result.Add(vTempList[I]);
+     Finally
+      If Assigned(vTempList) Then
+       vTempList.Free;
+     End;
+    Except
+     On E : Exception do
+      Begin
+       Raise Exception.Create(E.Message);
+      End;
+    End;
+    FreeAndNil(vConnection);
+   End;
+ End;
 Begin
  //Provide a list of Poolers
  vLista := Nil;
-// With TDWClientEvents(GetComponent(0)) Do
-//  Begin
-//   vLista := GetRestPoolers;
-//   Try
-//    For I := 0 To vLista.Count -1 Do
-//     Proc (vLista[I]);
-//   Except
-//   End;
-//   FreeAndNil(vLista);
-//  End;
+ With TRESTDWClientEvents(GetComponent(0)) Do
+  Begin
+   vLista := GetRestPoolers;
+   Try
+    For I := 0 To vLista.Count -1 Do
+     Proc (vLista[I]);
+   Except
+   End;
+   FreeAndNil(vLista);
+  End;
 End;
 
 { TDWFieldsList }

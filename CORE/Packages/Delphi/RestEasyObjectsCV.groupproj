@@ -30,6 +30,9 @@
         <Projects Include="..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\Demos\SimpleServer\Client\RestDWClientProject.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -119,14 +122,23 @@
     <Target Name="RestDWServerProject:Make">
         <MSBuild Projects="..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj" Targets="Make"/>
     </Target>
+    <Target Name="RestDWClientProject">
+        <MSBuild Projects="..\..\Demos\SimpleServer\Client\RestDWClientProject.dproj"/>
+    </Target>
+    <Target Name="RestDWClientProject:Clean">
+        <MSBuild Projects="..\..\Demos\SimpleServer\Client\RestDWClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWClientProject:Make">
+        <MSBuild Projects="..\..\Demos\SimpleServer\Client\RestDWClientProject.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="RestDatawareCORE;RestDatawareIndySockets;RESTDWDriverFD;RESTDWDriverAD;RESTDWDriverApolloDB;RESTDWDriverMYDAC;RESTDWDriverUNIDAC;RESTDWDriverZEOS;RestDWServerProject"/>
+        <CallTarget Targets="RestDatawareCORE;RestDatawareIndySockets;RESTDWDriverFD;RESTDWDriverAD;RESTDWDriverApolloDB;RESTDWDriverMYDAC;RESTDWDriverUNIDAC;RESTDWDriverZEOS;RestDWServerProject;RestDWClientProject"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RestDatawareCORE:Clean;RestDatawareIndySockets:Clean;RESTDWDriverFD:Clean;RESTDWDriverAD:Clean;RESTDWDriverApolloDB:Clean;RESTDWDriverMYDAC:Clean;RESTDWDriverUNIDAC:Clean;RESTDWDriverZEOS:Clean;RestDWServerProject:Clean"/>
+        <CallTarget Targets="RestDatawareCORE:Clean;RestDatawareIndySockets:Clean;RESTDWDriverFD:Clean;RESTDWDriverAD:Clean;RESTDWDriverApolloDB:Clean;RESTDWDriverMYDAC:Clean;RESTDWDriverUNIDAC:Clean;RESTDWDriverZEOS:Clean;RestDWServerProject:Clean;RestDWClientProject:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RestDatawareCORE:Make;RestDatawareIndySockets:Make;RESTDWDriverFD:Make;RESTDWDriverAD:Make;RESTDWDriverApolloDB:Make;RESTDWDriverMYDAC:Make;RESTDWDriverUNIDAC:Make;RESTDWDriverZEOS:Make;RestDWServerProject:Make"/>
+        <CallTarget Targets="RestDatawareCORE:Make;RestDatawareIndySockets:Make;RESTDWDriverFD:Make;RESTDWDriverAD:Make;RESTDWDriverApolloDB:Make;RESTDWDriverMYDAC:Make;RESTDWDriverUNIDAC:Make;RESTDWDriverZEOS:Make;RestDWServerProject:Make;RestDWClientProject:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

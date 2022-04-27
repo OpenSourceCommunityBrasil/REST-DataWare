@@ -264,23 +264,6 @@ Uses
                                           Var AbortProcess      : Boolean) Of Object;
 
  Type
-  TProxyOptions = Class(TPersistent)
-  Private
-   vServer,                  //Servidor Proxy na Rede
-   vLogin,                   //Login do Servidor Proxy
-   vPassword     : String;   //Senha do Servidor Proxy
-   vPort         : Integer;  //Porta do Servidor Proxy
-  Public
-   Constructor Create;
-   Procedure   Assign(Source : TPersistent); Override;
-  Published
-   Property Server        : String  Read vServer   Write vServer;   //Servidor Proxy na Rede
-   Property Port          : Integer Read vPort     Write vPort;     //Porta do Servidor Proxy
-   Property Login         : String  Read vLogin    Write vLogin;    //Login do Servidor
-   Property Password      : String  Read vPassword Write vPassword; //Senha do Servidor
- End;
-
- Type
   TProxyConnectionInfo = Class(TPersistent)
  Protected
   FPassword,
@@ -335,9 +318,9 @@ Uses
    Property Username     : String          Read vUsername       Write vUsername;
    Property Password     : String          Read vPassword       Write vPassword;
    Property Protocol     : String          Read vProtocol       Write vProtocol;
-   Property dbPort       : Integer         Read vdbPort         Write vdbPort;
+   Property DBPort       : Integer         Read vdbPort         Write vdbPort;
    Property DataSource   : String          Read vDataSource     Write vDataSource;
-   Property otherDetails : String          Read votherDetails   Write votherDetails;
+   Property OtherDetails : String          Read votherDetails   Write votherDetails;
   End;
 
   Type
@@ -544,7 +527,12 @@ Begin
   Begin
    LActual := restdwLength(ABytes, ACount, AOffset);
    If LActual > 0 Then
-    Result := AStream.Write(ABytes[AOffset], LActual);
+    Begin
+     If AOffset <= 0 Then
+      Result := AStream.Write(ABytes[1], LActual)
+     Else
+      Result := AStream.Write(ABytes[AOffset], LActual);
+    End;
   End;
 End;
 
@@ -708,7 +696,7 @@ Var
 Begin
  If Source is TConnectionDefs Then
   Begin
-   Src := TConnectionDefs(Source);
+   Src           := TConnectionDefs(Source);
    votherDetails := Src.votherDetails;
    vDatabaseName := Src.vDatabaseName;
    vHostName     := Src.vHostName;
@@ -767,31 +755,6 @@ Begin
  Finally
   FreeAndNil(bJsonValue);
  End;
-End;
-
-Constructor TProxyOptions.Create;
-Begin
- Inherited;
- vServer   := '';
- vLogin    := vServer;
- vPassword := vLogin;
- vPort     := 8888;
-End;
-
-Procedure TProxyOptions.Assign(Source: TPersistent);
-Var
- Src : TProxyOptions;
-Begin
- If Source is TProxyOptions Then
-  Begin
-   Src := TProxyOptions(Source);
-   vServer := Src.Server;
-   vLogin  := Src.Login;
-   vPassword := Src.Password;
-   vPort     := Src.Port;
-  End
- Else
-  Inherited;
 End;
 
 Function RPos(const Substr, S: string): Integer;

@@ -136,7 +136,7 @@ Uses
                                    AValueTwo            : Int64)                    : Int64;  {$IFDEF USE_INLINE}Inline;{$ENDIF}
  Function  Min                    (Const AValueOne,
                                    AValueTwo            : Int64)                    : Int64;  {$IFDEF USE_INLINE}Inline;{$ENDIF}
- Function  RawToBytes             (Const AValue;
+ Function  RawToBytes             (Const AValue         : String;
                                    Const ASize          : Integer)                  : TRESTDWBytes;
  Procedure CopyBytes              (Const ASource        : TRESTDWBytes;
                                    Const ASourceIndex   : Integer;
@@ -1390,8 +1390,10 @@ Begin
  Move(ASource[ASourceIndex], VDest[ADestIndex], ALength);
 End;
 
-Function RawToBytes(Const AValue;
-                    Const ASize : Integer) : TRESTDWBytes;
+Function RawToBytes(Const AValue : String;
+                    Const ASize  : Integer) : TRESTDWBytes;
+Var
+ vString : String;
 Begin
  SetLength(Result, ASize);
  If ASize > 0 Then
@@ -1415,10 +1417,7 @@ Begin
  {$ENDIF}
  LLength := restdwLength(AValue, ALength, AIndex);
  If LLength > 0 Then
-  Begin
-   LBytes := RawToBytes(AValue[AIndex], LLength);
-   Result := LBytes;
-  End
+  Result := RawToBytes(AValue[AIndex], LLength)
  Else
   SetLength(Result, 0);
 End;
@@ -2429,7 +2428,7 @@ Var
  LAvailable : Integer;
 Begin
  Assert(AIndex >= 0);
- LAvailable := restdwMax(restdwLength(ABuffer)-AIndex, 0);
+ LAvailable := restdwMax(Length(ABuffer)-AIndex, 0);
  If ALength < 0 Then
   Result := LAvailable
  Else
@@ -2976,10 +2975,12 @@ End;
 Function BytesToString(Const bin : TRESTDWBytes) : String;
 Const HexSymbols = '0123456789ABCDEF';
 Var
- i : Integer;
+ i,
+ vSize : Integer;
 Begin
- SetLength(Result, 2* restdwLength(bin));
- For i :=  0 To restdwLength(bin)-1 Do
+ vSize := restdwLength(bin);
+ SetLength(Result, 2 * vSize);
+ For i :=  0 To vSize-1 Do
   Begin
    Result[1 + 2*i + 0] := HexSymbols[1 + bin[i] shr 4];
    Result[1 + 2*i + 1] := HexSymbols[1 + bin[i] and $0F];

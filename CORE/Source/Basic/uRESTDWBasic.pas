@@ -331,6 +331,7 @@ Type
   vRedirectMaximum,
   vErrorCode,
   vPort                : Integer;
+  vAllowCookies,
   vHandleRedirects,
   vPropThreadRequest,
   vBinaryRequest,
@@ -441,7 +442,7 @@ End;
    vOnConnectionRename            : TConnectionRename;
    vEncoding                      : TEncodeSelect;
    vCripto                        : TCripto;
-   vProxyOptions                  : TProxyOptions;
+   vProxyOptions                  : TProxyConnectionInfo;
    vAccessTag                     : String;
    vGarbageTime                   : Integer;
    vNotifyWelcomeMessage          : TNotifyWelcomeMessage;
@@ -485,7 +486,7 @@ End;
    Property MultiCORE             : Boolean                    Read vMultiCORE             Write vMultiCORE;
    Property RequestTimeout        : Integer                    Read vServiceTimeout        Write vServiceTimeout;
    Property ServicePort           : Integer                    Read vServicePort           Write vServicePort;  //A Porta do Serviço do DataSet
-   Property ProxyOptions          : TProxyOptions              Read vProxyOptions          Write vProxyOptions; //Se tem Proxy diz quais as opções
+   Property ProxyOptions          : TProxyConnectionInfo       Read vProxyOptions          Write vProxyOptions; //Se tem Proxy diz quais as opções
    Property GarbageTime           : Integer                    Read vGarbageTime           Write vGarbageTime;
    Property AccessTag             : String                     Read vAccessTag             Write vAccessTag;
    Property LoginMessage          : String                     Read vLoginMessage          Write vLoginMessage;
@@ -526,7 +527,7 @@ Type
   vForceWelcomeAccess,
   vCORS,
   vActive              : Boolean;
-  vProxyOptions        : TProxyOptions;
+  vProxyOptions        : TProxyConnectionInfo;
   vServiceTimeout,
   vServicePort         : Integer;
   vCripto              : TCripto;
@@ -739,7 +740,7 @@ Type
   Property PathTraversalRaiseError : Boolean                       Read vPathTraversalRaiseError Write vPathTraversalRaiseError;
   Property RequestTimeout          : Integer                       Read vServiceTimeout          Write vServiceTimeout;
   Property ServicePort             : Integer                       Read vServicePort             Write vServicePort;  //A Porta do Serviço do DataSet
-  Property ProxyOptions            : TProxyOptions                 Read vProxyOptions            Write vProxyOptions; //Se tem Proxy diz quais as opções
+  Property ProxyOptions            : TProxyConnectionInfo          Read vProxyOptions            Write vProxyOptions; //Se tem Proxy diz quais as opções
   Property AuthenticationOptions   : TRESTDWServerAuthOptionParams Read vServerAuthOptions       Write SetServerAuthOptions;
   Property ServerMethodClass       : TComponentClass               Read aServerMethod            Write SetServerMethod;
   Property OnLastRequest           : TLastRequest                  Read vLastRequest             Write vLastRequest;
@@ -859,6 +860,8 @@ Type
   vAcceptEncoding,
   vContentType         : String;
   vTransparentProxy    : TProxyConnectionInfo;
+  vAllowCookies,
+  vHandleRedirects,
   vUseSSL              : Boolean;
   vConnectTimeOut,
   vRequestTimeOut      : Integer;
@@ -872,14 +875,19 @@ Type
   Procedure SetAuthOptionParams(Value    : TRESTDWClientAuthOptionParams);
   Procedure SetDefaultCustomHeader(Value : TStrings);
   Function  GetUseSSL                    : Boolean;
+  Function  GetAllowCookies              : Boolean;
+  Procedure SetAllowCookies   (Value     : Boolean);
+  Function  GetHandleRedirects           : Boolean;
+  Procedure SetHandleRedirects(Value     : Boolean);
  Public
-  Procedure SetHeaders (AHeaders         : TStringList); Virtual;
+  Procedure SetHeaders (AHeaders         : TStringList); Virtual;Abstract;
   Procedure SetUseSSL  (Value            : Boolean);     Virtual;
   Procedure SetOnWork          (Value    : TOnWork);     Virtual;
   Procedure SetOnWorkBegin     (Value    : TOnWork);     Virtual;
   Procedure SetOnWorkEnd       (Value    : TOnWorkEnd);  Virtual;
   Procedure SetOnStatus        (Value    : TOnStatus);   Virtual;
-  Constructor Create           (AOwner   : TComponent);Override;
+  Procedure DestroyClient;                               Virtual;Abstract;
+  Constructor Create           (AOwner   : TComponent);  Override;
   Destructor  Destroy;Override;
   Function   Get       (AUrl            : String         = '';
                         CustomHeaders   : TStringList    = Nil;
@@ -992,6 +1000,8 @@ Type
   Property RequestTimeOut           : Integer                       Read vRequestTimeOut           Write vRequestTimeOut;
   Property ConnectTimeOut           : Integer                       Read vConnectTimeOut           Write vConnectTimeOut;
   Property RedirectMaximum          : Integer                       Read vRedirectMaximum          Write vRedirectMaximum;
+  Property AllowCookies             : Boolean                       Read GetAllowCookies           Write SetAllowCookies;
+  Property HandleRedirects          : Boolean                       Read GetHandleRedirects        Write SetHandleRedirects;
   Property AuthenticationOptions    : TRESTDWClientAuthOptionParams Read vAuthOptionParams         Write SetAuthOptionParams;
   Property AccessControlAllowOrigin : String                        Read vAccessControlAllowOrigin Write vAccessControlAllowOrigin;
   Property ProxyOptions             : TProxyConnectionInfo          Read vTransparentProxy         Write vTransparentProxy;
@@ -1341,12 +1351,12 @@ End;
 
 Function TRESTClientPoolerBase.GetAllowCookies: Boolean;
 Begin
-// Result := HttpRequest.AllowCookies;
+ Result := vAllowCookies;
 End;
 
 Procedure TRESTClientPoolerBase.SetAllowCookies(Value: Boolean);
 Begin
-// HttpRequest.AllowCookies    := Value;
+ vAllowCookies := Value;
 End;
 
 Procedure TRESTClientPoolerBase.SetUrlPath(Value : String);
@@ -1735,6 +1745,7 @@ Begin
  vRedirectMaximum                      := 0;
  vDatacompress                         := True;
  vEncodeStrings                        := True;
+ vAllowCookies                         := False;
  vBinaryRequest                        := False;
  vHandleRedirects                      := False;
  vUserAgent                            := cUserAgent;
@@ -6977,7 +6988,7 @@ End;
 Constructor TRESTServiceBase.Create(AOwner: TComponent);
 Begin
  Inherited;
- vProxyOptions                          := TProxyOptions.Create;
+ vProxyOptions                          := TProxyConnectionInfo.Create;
  vDefaultPage                           := TStringList.Create;
  vCORSCustomHeaders                     := TStringList.Create;
  vDataRouteList                         := TRESTDWDataRouteList.Create;
@@ -7260,6 +7271,11 @@ begin
  {$ENDIF}
 end;
 
+Procedure TRESTDWClientRESTBase.SetAllowCookies(Value : Boolean);
+Begin
+ vAllowCookies := Value;
+End;
+
 Procedure TRESTDWClientRESTBase.SetAuthOptionParams(Value : TRESTDWClientAuthOptionParams);
 Begin
  vAuthOptionParams.Assign(Value);
@@ -7280,9 +7296,9 @@ Begin
  Result := vUseSSL;
 End;
 
-Procedure TRESTDWClientRESTBase.SetHeaders(AHeaders : TStringList);
+Procedure TRESTDWClientRESTBase.SetHandleRedirects(Value : Boolean);
 Begin
- Raise Exception.Create(cMethodNotImplemented);
+ vHandleRedirects := Value;
 End;
 
 Constructor TRESTDWClientRESTBase.Create(AOwner: TComponent);
@@ -7356,6 +7372,16 @@ Function TRESTDWClientRESTBase.Get(AUrl          : String;
                                    IgnoreEvents  : Boolean): String;
 Begin
  Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.GetAllowCookies : Boolean;
+Begin
+ Result := vAllowCookies;
+End;
+
+Function TRESTDWClientRESTBase.GetHandleRedirects : Boolean;
+Begin
+ Result := vHandleRedirects;
 End;
 
 Function TRESTDWClientRESTBase.Patch(AUrl            : String;

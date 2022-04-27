@@ -2973,9 +2973,9 @@ Begin
 End;
 
 Function TRESTDWPoolerMethodClient.GetServerEvents(Method_Prefix    : String;
-                                               TimeOut          : Integer;
-                                               ConnectTimeOut   : Integer;
-                                               RESTClientPooler : TRESTClientPoolerBase) : TStringList;
+                                                   TimeOut          : Integer;
+                                                   ConnectTimeOut   : Integer;
+                                                   RESTClientPooler : TRESTClientPoolerBase) : TStringList;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  vTempString,
