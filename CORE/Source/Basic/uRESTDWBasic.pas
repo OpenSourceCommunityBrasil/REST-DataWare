@@ -205,6 +205,7 @@ End;
 Type
  TRESTDWConnectionServerCP = Class(TCollectionItem)
  Private
+  vTransparentProxy     : TProxyConnectionInfo;
   vAuthentication,
   vEncodeStrings,
   vCompression,
@@ -235,28 +236,29 @@ Type
   Constructor Create        (aCollection : TCollection);Override;
   Destructor  Destroy;Override;//Destroy a Classe
  Published
-  Property Active                : Boolean                    Read vActive               Write vActive;            //Seta o Estado da Conexão
-  Property Compression           : Boolean                    Read vCompression          Write vCompression;       //Compressão de Dados
-  Property CriptOptions          : TCripto                    Read vCripto               Write SetCripto;
+  Property Active                : Boolean                       Read vActive               Write vActive;            //Seta o Estado da Conexão
+  Property Compression           : Boolean                       Read vCompression          Write vCompression;       //Compressão de Dados
+  Property CriptOptions          : TCripto                       Read vCripto               Write SetCripto;
   Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams     Write vAuthOptionParams;
-  Property Authentication        : Boolean                    Read vAuthentication       Write vAuthentication      Default True;
-  Property Host                  : String                     Read vRestWebService       Write vRestWebService;    //Host do WebService REST
-  Property UrlPath               : String                     Read vRestURL              Write vRestURL;           //URL do WebService REST
-  Property Port                  : Integer                    Read vPoolerPort           Write vPoolerPort;        //A Porta do Pooler do DataSet
-  Property RequestTimeOut        : Integer                    Read vTimeOut              Write vTimeOut;           //Timeout da Requisição
-  Property ConnectTimeOut        : Integer                    Read vConnectTimeOut       Write vConnectTimeOut;
-  Property hEncodeStrings        : Boolean                    Read vEncodeStrings        Write vEncodeStrings;
-  Property Encoding              : TEncodeSelect              Read vEncoding             Write vEncoding;          //Encoding da string
-  Property WelcomeMessage        : String                     Read vWelcomeMessage       Write vWelcomeMessage;
+  Property Authentication        : Boolean                       Read vAuthentication       Write vAuthentication      Default True;
+  Property Host                  : String                        Read vRestWebService       Write vRestWebService;    //Host do WebService REST
+  Property UrlPath               : String                        Read vRestURL              Write vRestURL;           //URL do WebService REST
+  Property Port                  : Integer                       Read vPoolerPort           Write vPoolerPort;        //A Porta do Pooler do DataSet
+  Property RequestTimeOut        : Integer                       Read vTimeOut              Write vTimeOut;           //Timeout da Requisição
+  Property ConnectTimeOut        : Integer                       Read vConnectTimeOut       Write vConnectTimeOut;
+  Property hEncodeStrings        : Boolean                       Read vEncodeStrings        Write vEncodeStrings;
+  Property Encoding              : TEncodeSelect                 Read vEncoding             Write vEncoding;          //Encoding da string
+  Property WelcomeMessage        : String                        Read vWelcomeMessage       Write vWelcomeMessage;
+  Property ProxyOptions          : TProxyConnectionInfo          Read vTransparentProxy     Write vTransparentProxy;
   {$IFDEF FPC}
-  Property DatabaseCharSet       : TDatabaseCharSet           Read vDatabaseCharSet      Write vDatabaseCharSet;
+  Property DatabaseCharSet       : TDatabaseCharSet              Read vDatabaseCharSet      Write vDatabaseCharSet;
   {$ENDIF}
-  Property Name                  : String                     Read vListName             Write vListName;
-  Property AccessTag             : String                     Read vAccessTag            Write vAccessTag;
-  Property TypeRequest           : TTypeRequest               Read vTypeRequest          Write vTypeRequest       Default trHttp;
-  Property ServerEventName       : String                     Read vServerEventName      Write vServerEventName;
-  Property DataRoute             : String                     Read vDataRoute            Write vDataRoute;
-  Property ServerContext         : String                     Read vServerContext        Write vServerContext;
+  Property Name                  : String                        Read vListName             Write vListName;
+  Property AccessTag             : String                        Read vAccessTag            Write vAccessTag;
+  Property TypeRequest           : TTypeRequest                  Read vTypeRequest          Write vTypeRequest       Default trHttp;
+  Property ServerEventName       : String                        Read vServerEventName      Write vServerEventName;
+  Property DataRoute             : String                        Read vDataRoute            Write vDataRoute;
+  Property ServerContext         : String                        Read vServerContext        Write vServerContext;
 End;
 
 Type
@@ -301,6 +303,7 @@ Type
   Procedure SetAllowCookies(Value             : Boolean);
  Private
   //Variáveis, Procedures e Funções Privadas
+  vTransparentProxy    : TProxyConnectionInfo;
   vOnWorkBegin,
   vOnWork              : TOnWork;
   vOnWorkEnd           : TOnWorkEnd;
@@ -319,58 +322,66 @@ Type
   vPoolerNotFoundMessage,
   vServerContext,
   vUrlPath,
+  vLastErrorMessage,
+  vContentType,
+  vCharset,
   vHost                : String;
+  vRequestTimeOut,
+  vConnectTimeOut,
   vRedirectMaximum,
   vErrorCode,
   vPort                : Integer;
+  vHandleRedirects,
   vPropThreadRequest,
   vBinaryRequest,
   vFailOver,
   vFailOverReplaceDefaults,
   vEncodeStrings,
   vDatacompress,
+  vUseSSL,
   vAuthentication      : Boolean;
-  vRequestTimeOut      : Integer;
-  vConnectTimeOut      : Integer;
   {$IFDEF FPC}
   vDatabaseCharSet     : TDatabaseCharSet;
   {$ENDIF}
   vFailOverConnections : TFailOverConnections;
-  Procedure SetUrlPath (Value : String);
-  Procedure ReconfigureConnection(Var Connection        : TRESTClientPoolerBase;
-                                  TypeRequest           : Ttyperequest;
-                                  WelcomeMessage,
-                                  Host                  : String;
-                                  Port                  : Integer;
-                                  Compression,
-                                  EncodeStrings         : Boolean;
-                                  Encoding              : TEncodeSelect;
-                                  AccessTag             : String;
-                                  AuthenticationOptions : TRESTDWClientAuthOptionParams);
+  Procedure   SetUrlPath  (Value            : String);
+  Function    SendEvent   (EventData        : String)          : String;Overload;
  Public
   //Métodos, Propriedades, Variáveis, Procedures e Funções Publicas
+  Procedure   ReconfigureConnection(Var Connection        : TRESTClientPoolerBase;
+                                    TypeRequest           : Ttyperequest;
+                                    WelcomeMessage,
+                                    Host                  : String;
+                                    Port                  : Integer;
+                                    Compression,
+                                    EncodeStrings         : Boolean;
+                                    Encoding              : TEncodeSelect;
+                                    AccessTag             : String;
+                                    AuthenticationOptions : TRESTDWClientAuthOptionParams);Virtual;Abstract;
   Procedure   NewToken;
   Function    RenewToken  (Var Params       : TRESTDWParams;
                            Var Error        : Boolean;
                            Var MessageError : String) : String;
   Procedure   SetAccessTag(Value            : String);
   Function    GetAccessTag                  : String;
-  Function    SendEvent   (EventData        : String)          : String;Overload;
   Function    SendEvent   (EventData        : String;
                            Var Params       : TRESTDWParams;
                            EventType        : TSendEvent = sePOST;
                            JsonMode         : TJsonMode  = jmDataware;
                            ServerEventName  : String     = '';
-                           Assyncexec       : Boolean    = False) : String;Overload;
+                           Assyncexec       : Boolean    = False) : String;Overload;Virtual;Abstract;
   Procedure   SetAuthOptionParams(Value     : TRESTDWClientAuthOptionParams);
   Constructor Create      (AOwner           : TComponent);Override;
   Destructor  Destroy;Override;
   Procedure   Abort;Virtual;Abstract;
-  Property    ErrorCode            : Integer                    Read vErrorCode;
+  Property    LastErrorMessage     : String                        Read vLastErrorMessage        Write vLastErrorMessage;
+  Property    LastErrorCode        : Integer                       Read vErrorCode               Write vErrorCode;
  Published
   //Métodos e Propriedades
   Property DataCompression         : Boolean                       Read vDatacompress            Write vDatacompress;
+  Property ContentType             : String                        Read vContentType             Write vContentType;
   Property UrlPath                 : String                        Read vUrlPath                 Write SetUrlPath;
+  Property Charset                 : String                        Read vCharset                 Write vCharset;
   Property ServerContext           : String                        Read vServerContext           Write vServerContext;
   Property DataRoute               : String                        Read vDataRoute               Write vDataRoute;
   Property Encoding                : TEncodeSelect                 Read vRSCharset               Write vRSCharset;
@@ -384,8 +395,10 @@ Type
   Property ConnectTimeOut          : Integer                       Read vConnectTimeOut          Write vConnectTimeOut;
   Property AllowCookies            : Boolean                       Read GetAllowCookies          Write SetAllowCookies;
   Property RedirectMaximum         : Integer                       Read vRedirectMaximum         Write vRedirectMaximum;
+  Property HandleRedirects         : Boolean                       Read vHandleRedirects         Write vHandleRedirects;
   Property WelcomeMessage          : String                        Read vWelcomeMessage          Write vWelcomeMessage;
   Property AccessTag               : String                        Read vAccessTag               Write vAccessTag;
+  Property ProxyOptions            : TProxyConnectionInfo          Read vTransparentProxy        Write vTransparentProxy;
   Property OnWork                  : TOnWork                       Read vOnWork                  Write SetOnWork;
   Property OnWorkBegin             : TOnWork                       Read vOnWorkBegin             Write SetOnWorkBegin;
   Property OnWorkEnd               : TOnWorkEnd                    Read vOnWorkEnd               Write SetOnWorkEnd;
@@ -395,6 +408,7 @@ Type
   Property OnBeforeExecute         : TOnBeforeExecute              Read vOnBeforeExecute         Write vOnBeforeExecute;
   Property OnBeforeGetToken        : TOnBeforeGetToken             Read vOnBeforeGetToken        Write vOnBeforeGetToken;
   Property FailOver                : Boolean                       Read vFailOver                Write vFailOver;
+  Property UseSSL                  : Boolean                       Read vUseSSL                  Write vUseSSL;
   Property FailOverConnections     : TFailOverConnections          Read vFailOverConnections     Write vFailOverConnections;
   Property FailOverReplaceDefaults : Boolean                       Read vFailOverReplaceDefaults Write vFailOverReplaceDefaults;
   Property BinaryRequest           : Boolean                       Read vBinaryRequest           Write vBinaryRequest;
@@ -826,6 +840,7 @@ Type
  Private
   //Variáveis, Procedures e Funções Privadas
   vRSCharset           : TEncodeSelect;
+  vLastErrorCode,
   vRedirectMaximum     : Integer;
   vDefaultCustomHeader : TStrings;
   vOnWorkBegin,
@@ -834,14 +849,16 @@ Type
   vOnStatus            : TOnStatus;
   vAuthOptionParams    : TRESTDWClientAuthOptionParams;
   vMaxAuthRetries      : Integer;
+  vLastErrorMessage,
+  vCharset,
   vAUrl,
   vContentEncoding,
   vAccept,
   vAccessControlAllowOrigin,
   vUserAgent,
   vAcceptEncoding,
-  vUrl,
   vContentType         : String;
+  vTransparentProxy    : TProxyConnectionInfo;
   vUseSSL              : Boolean;
   vConnectTimeOut,
   vRequestTimeOut      : Integer;
@@ -958,34 +975,37 @@ Type
                         CustomParams      : TStringList  = Nil;
                         Const AResponse   : TStream      = Nil;
                         IgnoreEvents      : Boolean      = False):Integer;Overload;Virtual;
-  Property ActiveRequest            : String                      Read vUrl                      Write vUrl;
+  Property ActiveRequest            : String                        Read vAUrl                     Write vAUrl;
+  Property LastErrorMessage         : String                        Read vLastErrorMessage         Write vLastErrorMessage;
+  Property LastErrorCode            : Integer                       Read vLastErrorCode            Write vLastErrorCode;
  Published
-  Property UseSSL                   : Boolean                     Read GetUseSSL                 Write SetUseSSL;
-  Property UserAgent                : String                      Read vUserAgent                Write vUserAgent;
-  Property Accept                   : String                      Read vAccept                   Write vAccept;
-  Property AcceptEncoding           : String                      Read vAcceptEncoding           Write vAcceptEncoding;
-  Property ContentEncoding          : String                      Read vContentEncoding          Write vContentEncoding;
-  Property MaxAuthRetries           : Integer                     Read vMaxAuthRetries           Write vMaxAuthRetries;
-  Property ContentType              : String                      Read vContentType              Write vContentType;
-  Property RequestCharset           : TEncodeSelect               Read vRSCharset                Write vRSCharset;
-  Property DefaultCustomHeader      : TStrings                    Read vDefaultCustomHeader      Write SetDefaultCustomHeader;
-  Property RequestTimeOut           : Integer                     Read vRequestTimeOut           Write vRequestTimeOut;
-  Property ConnectTimeOut           : Integer                     Read vConnectTimeOut           Write vConnectTimeOut;
-  Property RedirectMaximum          : Integer                     Read vRedirectMaximum          Write vRedirectMaximum;
-  Property AuthenticationOptions    : TRESTDWClientAuthOptionParams Read vAuthOptionParams      Write SetAuthOptionParams;
-  Property AccessControlAllowOrigin : String                      Read vAccessControlAllowOrigin Write vAccessControlAllowOrigin;
-  Property OnWork                   : TOnWork                     Read vOnWork                   Write SetOnWork;
-  Property OnWorkBegin              : TOnWork                     Read vOnWorkBegin              Write SetOnWorkBegin;
-  Property OnWorkEnd                : TOnWorkEnd                  Read vOnWorkEnd                Write SetOnWorkEnd;
-  Property OnStatus                 : TOnStatus                   Read vOnStatus                 Write SetOnStatus;
-  Property OnBeforeGet              : TPrepareGet                 Read vOnBeforeGet              Write vOnBeforeGet;
-  Property OnBeforePost             : TPrepareEvent               Read vOnBeforePost             Write vOnBeforePost;
-  Property OnBeforePut              : TPrepareEvent               Read vOnBeforePut              Write vOnBeforePut;
-  Property OnBeforeDelete           : TPrepareEvent               Read vOnBeforeDelete           Write vOnBeforeDelete;
-  Property OnBeforePatch            : TPrepareEvent               Read vOnBeforePatch            Write vOnBeforePatch;
-  Property OnAfterRequest           : TAfterRequest               Read vOnAfterRequest           Write vOnAfterRequest;
-  // Add event OnHeaders - Ico Menezes
-  Property OnHeadersAvailable       : TOnHeadersAvailable         Read vOnHeadersAvailable       Write vOnHeadersAvailable;
+  Property UseSSL                   : Boolean                       Read GetUseSSL                 Write SetUseSSL;
+  Property UserAgent                : String                        Read vUserAgent                Write vUserAgent;
+  Property Accept                   : String                        Read vAccept                   Write vAccept;
+  Property Charset                  : String                        Read vCharset                  Write vCharset;
+  Property AcceptEncoding           : String                        Read vAcceptEncoding           Write vAcceptEncoding;
+  Property ContentEncoding          : String                        Read vContentEncoding          Write vContentEncoding;
+  Property MaxAuthRetries           : Integer                       Read vMaxAuthRetries           Write vMaxAuthRetries;
+  Property ContentType              : String                        Read vContentType              Write vContentType;
+  Property RequestCharset           : TEncodeSelect                 Read vRSCharset                Write vRSCharset;
+  Property DefaultCustomHeader      : TStrings                      Read vDefaultCustomHeader      Write SetDefaultCustomHeader;
+  Property RequestTimeOut           : Integer                       Read vRequestTimeOut           Write vRequestTimeOut;
+  Property ConnectTimeOut           : Integer                       Read vConnectTimeOut           Write vConnectTimeOut;
+  Property RedirectMaximum          : Integer                       Read vRedirectMaximum          Write vRedirectMaximum;
+  Property AuthenticationOptions    : TRESTDWClientAuthOptionParams Read vAuthOptionParams         Write SetAuthOptionParams;
+  Property AccessControlAllowOrigin : String                        Read vAccessControlAllowOrigin Write vAccessControlAllowOrigin;
+  Property ProxyOptions             : TProxyConnectionInfo          Read vTransparentProxy         Write vTransparentProxy;
+  Property OnWork                   : TOnWork                       Read vOnWork                   Write SetOnWork;
+  Property OnWorkBegin              : TOnWork                       Read vOnWorkBegin              Write SetOnWorkBegin;
+  Property OnWorkEnd                : TOnWorkEnd                    Read vOnWorkEnd                Write SetOnWorkEnd;
+  Property OnStatus                 : TOnStatus                     Read vOnStatus                 Write SetOnStatus;
+  Property OnBeforeGet              : TPrepareGet                   Read vOnBeforeGet              Write vOnBeforeGet;
+  Property OnBeforePost             : TPrepareEvent                 Read vOnBeforePost             Write vOnBeforePost;
+  Property OnBeforePut              : TPrepareEvent                 Read vOnBeforePut              Write vOnBeforePut;
+  Property OnBeforeDelete           : TPrepareEvent                 Read vOnBeforeDelete           Write vOnBeforeDelete;
+  Property OnBeforePatch            : TPrepareEvent                 Read vOnBeforePatch            Write vOnBeforePatch;
+  Property OnAfterRequest           : TAfterRequest                 Read vOnAfterRequest           Write vOnAfterRequest;
+  Property OnHeadersAvailable       : TOnHeadersAvailable           Read vOnHeadersAvailable       Write vOnHeadersAvailable;
 End;
 
 Implementation
@@ -1147,6 +1167,7 @@ Begin
   FreeAndNil(vAuthOptionParams);
  If Assigned(vCripto) Then
   FreeAndNil(vCripto);
+ FreeAndNil(vTransparentProxy);
  Inherited;
 End;
 
@@ -1163,6 +1184,7 @@ Begin
   vEncoding         := esUtf8;
   vDatabaseCharSet  := csUndefined;
  {$ENDIF}
+ vTransparentProxy  := TProxyConnectionInfo.Create;
  vListName          :=  Format('server(%d)', [aCollection.Count]);
  vRestWebService    := '127.0.0.1';
  vCompression       := True;
@@ -1333,20 +1355,6 @@ Begin
  If Length(vUrlPath) > 0 Then
   If vUrlPath[Length(vUrlPath)] <> '/' Then
    vUrlPath := vUrlPath + '/';
-End;
-
-Procedure TRESTClientPoolerBase.ReconfigureConnection(Var Connection        : TRESTClientPoolerBase;
-                                                  TypeRequest           : Ttyperequest;
-                                                  WelcomeMessage,
-                                                  Host                  : String;
-                                                  Port                  : Integer;
-                                                  Compression,
-                                                  EncodeStrings         : Boolean;
-                                                  Encoding              : TEncodeSelect;
-                                                  AccessTag             : String;
-                                                  AuthenticationOptions : TRESTDWClientAuthOptionParams);
-Begin
-
 End;
 
 Procedure TRESTClientPoolerBase.NewToken;
@@ -1697,16 +1705,6 @@ Begin
  End;
 End;
 
-Function TRESTClientPoolerBase.SendEvent(EventData        : String;
-                                     Var Params       : TRESTDWParams;
-                                     EventType        : TSendEvent = sePOST;
-                                     JsonMode         : TJsonMode  = jmDataware;
-                                     ServerEventName  : String     = '';
-                                     Assyncexec       : Boolean    = False) : String;
-Begin
- //
-End;
-
 Procedure TRESTClientPoolerBase.SetAuthOptionParams(Value : TRESTDWClientAuthOptionParams);
 Begin
  vAuthOptionParams.Assign(Value);
@@ -1727,8 +1725,10 @@ Begin
  vDataRoute                            := '';
  vPort                                 := 8082;
  vAuthOptionParams                     := TRESTDWClientAuthOptionParams.Create(Self);
+ vTransparentProxy                     := TProxyConnectionInfo.Create;
  vAuthOptionParams.AuthorizationOption := rdwAONone;
  vRSCharset                            := esUtf8;
+ vCharset                              := 'utf8';
  vAuthentication                       := True;
  vRequestTimeOut                       := 10000;
  vConnectTimeOut                       := 3000;
@@ -1736,13 +1736,16 @@ Begin
  vDatacompress                         := True;
  vEncodeStrings                        := True;
  vBinaryRequest                        := False;
+ vHandleRedirects                      := False;
  vUserAgent                            := cUserAgent;
+ vLastErrorMessage                     := '';
  {$IFDEF FPC}
  vDatabaseCharSet                      := csUndefined;
  {$ENDIF}
  vFailOver                             := False;
  vFailOverReplaceDefaults              := False;
  vPropThreadRequest                    := False;
+ vUseSSL                               := False;
  vFailOverConnections                  := TFailOverConnections.Create(Self, TRESTDWConnectionServerCP);
  vPoolerNotFoundMessage                := cPoolerNotFound;
 End;
@@ -1757,6 +1760,7 @@ Begin
 // FreeAndNil(HttpRequest);
  FreeAndNil(vFailOverConnections);
  FreeAndNil(vCripto);
+ FreeAndNil(vTransparentProxy);
  If Assigned(vAuthOptionParams) Then
   FreeAndNil(vAuthOptionParams);
  Inherited;
@@ -7288,14 +7292,18 @@ Begin
  vContentEncoding                := 'multipart/form-data';
  vAccept                         := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
  vAcceptEncoding                 := 'gzip, deflate, br';
+ vCharset                        := 'utf8';
  vMaxAuthRetries                 := 0;
  vUserAgent                      := cUserAgent;
  vAuthOptionParams               := TRESTDWClientAuthOptionParams.Create(Self);
+ vTransparentProxy               := TProxyConnectionInfo.Create;
  vAuthOptionParams.AuthorizationOption := rdwAONone;
  vAccessControlAllowOrigin       := '*';
  vAUrl                           := '';
  vRedirectMaximum                := 1;
  vDefaultCustomHeader            := TStringList.Create;
+ vLastErrorCode                  := 0;
+ vLastErrorMessage               := '';
  {$IFDEF FPC}
   vRSCharset                     := esUtf8;
  {$ELSE}
@@ -7329,6 +7337,7 @@ End;
 Destructor TRESTDWClientRESTBase.Destroy;
 Begin
  FreeAndNil(vDefaultCustomHeader);
+ FreeAndNil(vTransparentProxy);
  If Assigned(vAuthOptionParams) Then
   FreeAndNil(vAuthOptionParams);
  Inherited;

@@ -187,8 +187,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Build>78</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.78;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Build>81</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.81;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <ItemGroup>
@@ -259,6 +259,11 @@
             <Form>frm_About</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPtypes.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPbase64.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPblockciphers.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPconst.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPcrypt2.pas"/>
         <RcCompile Include="RestDatawareCORE.rc">
             <Form>RestDatawareCORE.res</Form>
         </RcCompile>

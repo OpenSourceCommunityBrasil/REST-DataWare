@@ -281,6 +281,29 @@ Uses
  End;
 
  Type
+  TProxyConnectionInfo = Class(TPersistent)
+ Protected
+  FPassword,
+  FServer,
+  FUsername : String;
+  FPort     : Integer;
+  Procedure AssignTo      (Destination : TPersistent); Override;
+  Procedure SetProxyPort  (Const Value : Integer);
+  Procedure SetProxyServer(Const Value : String);
+ Public
+  Procedure   AfterConstruction; Override;
+  Constructor Create;
+  Procedure   Clear;
+  Destructor  Destroy; Override;
+ Published
+  property ProxyPassword : String  Read FPassword Write FPassword;
+  property ProxyPort     : Integer Read FPort     Write SetProxyPort;
+  property ProxyServer   : String  Read FServer   Write SetProxyServer;
+  property ProxyUsername : String  Read FUsername Write FUserName;
+ End;
+
+
+ Type
   TConnectionDefs = Class(TPersistent)
   Private
    votherDetails,
@@ -538,6 +561,56 @@ Begin
  {$ELSE}
   Result := AStream.Seek(AOffset, cOrigins[AOrigin]);
  {$ENDIF}
+End;
+
+Procedure TProxyConnectionInfo.SetProxyPort(Const Value : Integer);
+Begin
+ FPort := Value;
+End;
+
+Procedure TProxyConnectionInfo.SetProxyServer(Const Value : String);
+Begin
+ FServer := Value;
+End;
+
+Procedure TProxyConnectionInfo.AssignTo(Destination : TPersistent);
+Var
+ LDest : TProxyConnectionInfo;
+Begin
+ If Destination Is TProxyConnectionInfo Then
+  Begin
+   LDest := TProxyConnectionInfo(Destination);
+   LDest.FPassword := FPassword;
+   LDest.FPort := FPort;
+   LDest.FServer := FServer;
+   LDest.FUsername := FUsername;
+  End
+ Else
+  Inherited AssignTo(Destination);
+End;
+
+Procedure TProxyConnectionInfo.Clear;
+Begin
+ FServer := '';
+ FUsername := '';
+ FPassword := '';
+ FPort := 0;
+End;
+
+Constructor TProxyConnectionInfo.Create;
+Begin
+ Inherited Create;
+End;
+
+Procedure TProxyConnectionInfo.AfterConstruction;
+Begin
+ Inherited AfterConstruction;
+ Clear;
+End;
+
+Destructor TProxyConnectionInfo.Destroy;
+Begin
+ Inherited Destroy;
 End;
 
 Constructor TRESTDWFileCreateStream.Create(const AFile : String);

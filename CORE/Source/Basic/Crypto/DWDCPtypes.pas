@@ -13,7 +13,7 @@ type
   Pword = ^word;
   Pdword = ^dword;
   Pint64 = ^int64;
-  dword = longword;
+  dword = Uint32;
   Pwordarray = ^Twordarray;
   Twordarray = array [0..19383] of word;
   Pdwordarray = ^Tdwordarray;

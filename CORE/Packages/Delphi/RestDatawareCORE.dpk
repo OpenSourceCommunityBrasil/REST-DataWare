@@ -88,7 +88,12 @@ contains
   uRESTDWIOHandlerStream in '..\..\Source\Basic\Mechanics\uRESTDWIOHandlerStream.pas',
   uRESTDWIOHandler in '..\..\Source\Basic\Mechanics\uRESTDWIOHandler.pas',
   uRESTDWMessageCoderBinHex4 in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderBinHex4.pas',
-  uRESTDWAboutForm in '..\..\Source\Basic\Dialogs\uRESTDWAboutForm.pas' {frm_About};
+  uRESTDWAboutForm in '..\..\Source\Basic\Dialogs\uRESTDWAboutForm.pas' {frm_About},
+  DWDCPtypes in '..\..\Source\Basic\Crypto\DWDCPtypes.pas',
+  DWDCPbase64 in '..\..\Source\Basic\Crypto\DWDCPbase64.pas',
+  DWDCPblockciphers in '..\..\Source\Basic\Crypto\DWDCPblockciphers.pas',
+  DWDCPconst in '..\..\Source\Basic\Crypto\DWDCPconst.pas',
+  DWDCPcrypt2 in '..\..\Source\Basic\Crypto\DWDCPcrypt2.pas';
 
 End.
 

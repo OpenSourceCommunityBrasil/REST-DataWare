@@ -325,6 +325,9 @@ Uses
                                    Const AIndex         : Integer = 0) : TRESTDWUInt64;
  Function  BytesToUInt32          (Const AValue         : TRESTDWBytes;
                                    Const AIndex         : Integer = 0) : UInt32;
+ Procedure DeleteInvalidChar      (Var   Value          : String);
+ Function  BooleanToString        (aValue               : Boolean) : String;
+ Function  StringToBoolean        (aValue               : String)  : Boolean;
  Procedure CopyRDWString          (Const ASource        : String;
                                    Var VDest            : TRESTDWBytes;
                                    Const ADestIndex     : Integer;
@@ -2503,6 +2506,29 @@ Function restdwValueFromIndex(AStrings     : TStrings;
                               Const AIndex : Integer) : String;
 Begin
  ValueFromIndex(AStrings, AIndex);
+End;
+
+Procedure DeleteInvalidChar(Var Value : String);
+Begin
+ If Length(Value) > 0 Then
+  If Value[InitStrPos] <> '{' then
+   Delete(Value, 1, 1);
+ If Length(Value) > 0 Then
+  If Value[Length(Value) - FinalStrPos] <> '{' then
+   Delete(Value, Length(Value), 1);
+End;
+
+Function StringToBoolean(aValue : String) : Boolean;
+Begin
+ Result := lowercase(trim(aValue)) = 'true';
+End;
+
+Function BooleanToString(aValue : Boolean) : String;
+Begin
+ If aValue Then
+  Result := 'true'
+ Else
+  Result := 'false';
 End;
 
 Function ExtractHeaderSubItem(Const AHeaderLine,

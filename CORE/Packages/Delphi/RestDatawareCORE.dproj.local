@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-	</Transactions>
+    <Transaction>2022/04/27 11:03:57.270,=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\branch\unstable\CORE\Source\Basic\Crypto\DWDCPbase64.pas</Transaction>
+  </Transactions>
 	<ActiveMobileDevice>
 		<NoProfile iOSSimulator="iPhone5" Android="Android"/>
 	</ActiveMobileDevice>

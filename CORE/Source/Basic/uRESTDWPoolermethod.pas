@@ -2369,9 +2369,6 @@ Begin
   End
  Else
   JSONParam.ObjectValue          := ovBlob;
-// JSONParam.ObjectValue           := ovString;
-// JSONParam.Encoded               := True;
-// JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
  JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'RowsAffected';
