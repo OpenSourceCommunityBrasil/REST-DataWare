@@ -13,4 +13,4 @@ Use-o e divirta-se.
 https://github.com/mobius1qwe/RDWDemos
 
 ## Telegram oficial:
-* https://t.me/restdataware
+* https://t.me/restdatawareoficial
