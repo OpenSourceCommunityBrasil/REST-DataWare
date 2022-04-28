@@ -3379,6 +3379,11 @@ Begin
          vUriOptions.BaseServer  := vUriOptions.ServerEvent;
          vUriOptions.ServerEvent := '';
         End;
+      End
+     Else
+      Begin
+       If (vUriOptions.BaseServer <> '') Then
+        vUriOptions.BaseServer := '';
       End;
      If (vDataRouteList.Count > 0) Then
       Begin
