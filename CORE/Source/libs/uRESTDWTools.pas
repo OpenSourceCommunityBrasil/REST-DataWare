@@ -29,7 +29,7 @@ Uses
  {$IFDEF FPC}
  Classes,  SysUtils, uRESTDWBasicTypes, LConvEncoding, lazutf8, Db
  {$ELSE}
- Classes,  SysUtils, uRESTDWBasicTypes, Db
+ Classes,  SysUtils, uRESTDWBasicTypes, Db, EncdDecd
  {$IF Defined(RESTDWFMX)}
   , System.NetEncoding
  {$IFEND}
@@ -2983,18 +2983,26 @@ Begin
 End;
 
 Function BytesToString(Const bin : TRESTDWBytes) : String;
-Const HexSymbols = '0123456789ABCDEF';
 Var
- i,
- vSize : Integer;
+ I : Integer;
 Begin
- vSize := restdwLength(bin);
- SetLength(Result, 2 * vSize);
- For i :=  0 To vSize-1 Do
-  Begin
-   Result[1 + 2*i + 0] := HexSymbols[1 + bin[i] shr 4];
-   Result[1 + 2*i + 1] := HexSymbols[1 + bin[i] and $0F];
-  End;
+//Const HexSymbols = '0123456789ABCDEF';
+//Var
+// i,
+// vSize : Integer;
+//Begin
+// vSize := restdwLength(bin);
+// SetLength(Result, 2 * vSize);
+// For i :=  0 To vSize-1 Do
+//  Begin
+//   Result[1 + 2*i + 0] := HexSymbols[1 + bin[i] shr 4];
+//   Result[1 + 2*i + 1] := HexSymbols[1 + bin[i] and $0F];
+//  End;
+//End;
+// Move(bin[0], Result, Length(bin));
+ I := restdwLength(bin);
+ If I > 0 Then
+  SetString(Result, PAnsiChar(bin), I);
 End;
 
 Function EncodeStream (Value : TStream) : String;
@@ -3034,77 +3042,12 @@ End;
 
 Function Base64Decode(const S: string): string;
 Var
- OutBuf : array[0..2] of Byte;
- InBuf  : array[0..3] of Byte;
- iI,
- iJ     : Integer;
  sa     : String;
 Begin
  sa := Trim(StringReplace(S, '#$D#$A', '', [rfReplaceAll, rfIgnoreCase]));
  If Length(sa) Mod 4 <> 0 Then
   Raise Exception.Create('Base64: Incorrect string format');
- SetLength(Result, ((Length(sa) div 4) - 1) * 3);
- For iI := 1 to (Length(sa) div 4) - 1 Do
-  Begin
-   Move(sa[(iI - 1) * 4 + 1], InBuf, 4);
-    for iJ := 0 to 3 do
-      case InBuf[iJ] of
-        43: InBuf[iJ] := 62;
-        48..57: Inc(InBuf[iJ], 4);
-        65..90: Dec(InBuf[iJ], 65);
-        97..122: Dec(InBuf[iJ], 71);
-      else
-        InBuf[iJ] := 63;
-      end;
-    OutBuf[0] := (InBuf[0] shl 2) or ((InBuf[1] shr 4) and $3);
-    OutBuf[1] := (InBuf[1] shl 4) or ((InBuf[2] shr 2) and $F);
-    OutBuf[2] := (InBuf[2] shl 6) or (InBuf[3] and $3F);
-    Move(OutBuf, Result[(iI - 1) * 3 + 1], 3);
-  End;
- If Length(sa) <> 0 Then
-  Begin
-    Move(sa[Length(sa) - 3], InBuf, 4);
-    if InBuf[2] = 61 then begin
-      for iJ := 0 to 1 do
-        case InBuf[iJ] of
-          43: InBuf[iJ] := 62;
-          48..57: Inc(InBuf[iJ], 4);
-          65..90: Dec(InBuf[iJ], 65);
-          97..122: Dec(InBuf[iJ], 71);
-        else
-          InBuf[iJ] := 63;
-        end;
-      OutBuf[0] := (InBuf[0] shl 2) or ((InBuf[1] shr 4) and $3);
-      Result := Result + Char(OutBuf[0]);
-    end else if InBuf[3] = 61 then begin
-      for iJ := 0 to 2 do
-        case InBuf[iJ] of
-          43: InBuf[iJ] := 62;
-          48..57: Inc(InBuf[iJ], 4);
-          65..90: Dec(InBuf[iJ], 65);
-          97..122: Dec(InBuf[iJ], 71);
-        else
-          InBuf[iJ] := 63;
-        end;
-      OutBuf[0] := (InBuf[0] shl 2) or ((InBuf[1] shr 4) and $3);
-      OutBuf[1] := (InBuf[1] shl 4) or ((InBuf[2] shr 2) and $F);
-      Result := Result + Char(OutBuf[0]) + Char(OutBuf[1]);
-    end else begin
-      for iJ := 0 to 3 do
-        case InBuf[iJ] of
-          43: InBuf[iJ] := 62;
-          48..57: Inc(InBuf[iJ], 4);
-          65..90: Dec(InBuf[iJ], 65);
-          97..122: Dec(InBuf[iJ], 71);
-        else
-          InBuf[iJ] := 63;
-        end;
-      OutBuf[0] := (InBuf[0] shl 2) or ((InBuf[1] shr 4) and $3);
-      OutBuf[1] := (InBuf[1] shl 4) or ((InBuf[2] shr 2) and $F);
-      OutBuf[2] := (InBuf[2] shl 6) or (InBuf[3] and $3F);
-      Result := Result + Char(OutBuf[0]) + Char(OutBuf[1]) + Char(OutBuf[2]);
-    end;
-  End;
+ Result := EncdDecd.DecodeString(sa);
 End;
 
 Function Decode64(const S: string): string;
@@ -3164,51 +3107,32 @@ Begin
  Result := vValue;
 End;
 
-Function Base64Encode(const S: string): string;
-Var
- InBuf  : array[0..2] of Byte;
- OutBuf : array[0..3] of Char;
- iI     : Integer;
-begin
-  SetLength(Result, ((Length(S) + 2) div 3) * 4);
-  for iI := 1 to ((Length(S) + 2) div 3) do begin
-    if Length(S) < (iI * 3) then
-      Move(S[(iI - 1) * 3 + 1], InBuf, Length(S) - (iI - 1) * 3)
-    else
-      Move(S[(iI - 1) * 3 + 1], InBuf, 3);
-    OutBuf[0] := B64Table[((InBuf[0] and $FC) shr 2) + 1];
-    OutBuf[1] := B64Table[(((InBuf[0] and $3) shl 4) or ((InBuf[1] and $F0) shr 4)) + 1];
-    OutBuf[2] := B64Table[(((InBuf[1] and $F) shl 2) or ((InBuf[2] and $C0) shr 6)) + 1];
-    OutBuf[3] := B64Table[(InBuf[2] and $3F) + 1];
-    Move(OutBuf, Result[(iI - 1) * 4 + 1], 4);
-  end;
-  if Length(S) mod 3 = 1 then begin
-    Result[Length(Result) - 1] := '=';
-    Result[Length(Result)] := '=';
-  end else if Length(S) mod 3 = 2 then
-    Result[Length(Result)] := '=';
-end;
-
-Function Encode64(const S: string) : String;
-Var
- sa : String;
-{$IFNDEF FPC}
-{$IF Defined(ANDROID) OR Defined(IOS)}
- ne : TBase64Encoding;
-{$IFEND}
-{$ENDIF}
+Function Base64Encode(Const S : String): String;
+ Function Encode_Byte(b: Byte): char;
+ Const
+  Base64Code: String[64] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+ Begin
+  Result := Char(Base64Code[(b and $3F)+1]);
+ End;
+var
+  i: Integer;
 Begin
- {$IFDEF FPC}
-  Result := Base64Encode(S);
- {$ELSE}
-  {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
-   ne := TBase64Encoding.Create(-1);
-   Result := ne.Encode(S);
-   ne.Free;
-  {$ELSE}
-   Result := Base64Encode(S);
-  {$IFEND}
- {$ENDIF}
+ i := 1;
+ Result := '';
+ While i <= Length(S) do
+  Begin
+   Result := Result + Encode_Byte(Byte(S[i]) shr 2);
+   Result := Result + Encode_Byte((Byte(S[i]) shl 4) or (Byte(S[i+1]) shr 4));
+   If i+1 <= Length(S) Then
+    Result := Result + Encode_Byte((Byte(S[i+1]) shl 2) or (Byte(S[i+2]) shr 6))
+   Else
+    Result := Result + '=';
+   If i+2 <= Length(S) Then
+    Result := Result + Encode_Byte(Byte(S[i+2]))
+   Else
+    Result := Result + '=';
+   Inc(i, 3);
+  End;
 End;
 
 {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
@@ -3241,7 +3165,7 @@ Begin
    csISO_8859_2 : vValue := ISO_8859_2ToUTF8(vValue);
  End;
  {$ENDIF}
- Result := Encode64(vValue);
+ Result := Base64Encode(vValue);
 End;
 
 Function EncodeStrings(Value : String

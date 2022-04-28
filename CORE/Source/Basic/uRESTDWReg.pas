@@ -826,7 +826,7 @@ Begin
 // RegisterComponentEditor(TRESTDWUpdateSQL,      TDWUpdateSQLEditor);
 //
 // RegisterComponentEditor(TDWServerEvents,       TDWServerEventsEditor);
-// RegisterComponentEditor(TDWClientEvents,       TDWClientEventsEditor);
+  RegisterComponentEditor(TRESTDWClientEvents,    TDWClientEventsEditor);
 // RegisterComponentEditor(TDWResponseTranslator, TDWJSONViewer);
 // RegisterComponentEditor(TDWServerContext,      TRESTDWServerContextEditor);
 // RegisterComponentEditor(TDWContextRules,       TRESTDWContextRulesEditor);
@@ -868,17 +868,17 @@ end;
 Procedure TDWClientEventsEditor.ExecuteVerb(Index: Integer);
 Begin
  Inherited;
-// Case Index of
-//   0 : Begin
-//        {$IFNDEF FPC}
-//         ShowCollectionEditor(Designer, Component, TDWClientEvents(Component).Events, 'Events');
-//        {$ELSE}
-//         TCollectionPropertyEditor.ShowCollectionEditor(TDWClientEvents(Component).Events,Component, 'Events');
-//        {$ENDIF}
-//       End;
-//   1 : (Component as TDWClientEvents).GetEvents := True;
-//   2 : (Component as TDWClientEvents).ClearEvents;
-// End;
+ Case Index of
+   0 : Begin
+        {$IFNDEF FPC}
+         ShowCollectionEditor(Designer, Component, TRESTDWClientEvents(Component).Events, 'Events');
+        {$ELSE}
+         TCollectionPropertyEditor.ShowCollectionEditor(TRESTDWClientEvents(Component).Events,Component, 'Events');
+        {$ENDIF}
+       End;
+   1 : (Component as TRESTDWClientEvents).GetEvents := True;
+   2 : (Component as TRESTDWClientEvents).ClearEvents;
+ End;
 End;
 
 Function TDWClientEventsEditor.GetVerb(Index: Integer): string;
