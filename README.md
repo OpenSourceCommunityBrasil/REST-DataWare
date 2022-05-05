@@ -12,5 +12,5 @@ Use-o e divirta-se.
 ## Repositório dos novos demos:
 https://github.com/mobius1qwe/RDWDemos
 
-## Telegram oficial:
-* https://t.me/restdatawareoficial
+## Canais oficiais do componente:
+* [Links e Mídias Externas](https://github.com/mobius1qwe/REST-DataWare/wiki/Links-e-M%C3%ADdias-Externas)
