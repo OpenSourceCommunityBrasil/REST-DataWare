@@ -10,13 +10,11 @@ object Form2: TForm2
   Font.Height = -11
   Font.Name = 'Segoe UI'
   Font.Style = []
-  OldCreateOrder = True
   Position = poDesktopCenter
   OnCreate = FormCreate
   DesignSize = (
     873
     600)
-  PixelsPerInch = 96
   TextHeight = 13
   object labHost: TLabel
     Left = 8
@@ -2296,6 +2294,7 @@ object Form2: TForm2
     StrsTrim = False
     StrsEmpty2Null = False
     StrsTrim2Len = False
+    PoolerNotFoundMessage = 'Pooler not found'
     HandleRedirects = True
     RedirectMaximum = 2
     OnWork = RESTDWDataBase1Work
@@ -2593,6 +2592,7 @@ object Form2: TForm2
     DataCompression = True
     Encoding = esUtf8
     hEncodeStrings = False
+    ThreadRequest = False
     Host = 'localhost'
     AuthenticationOptions.AuthorizationOption = rdwAOToken
     AuthenticationOptions.OptionParams.AuthDialog = True
@@ -2623,10 +2623,13 @@ object Form2: TForm2
     UserAgent = 
       'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, l' +
       'ike Gecko) Chrome/41.0.2227.0 Safari/537.36'
+    PoolerNotFoundMessage = 'Pooler not found'
     Left = 504
     Top = 401
   end
   object RESTDWClientSQL1: TRESTDWClientSQL
+    Active = False
+    Filtered = False
     FieldDefs = <
       item
         Name = 'EMP_NO'
