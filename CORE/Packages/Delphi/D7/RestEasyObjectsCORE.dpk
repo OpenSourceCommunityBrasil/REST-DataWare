@@ -68,6 +68,7 @@ contains
   uRESTDWServerContext in '..\..\..\Source\uRESTDWServerContext.pas',
   uRESTDWServerEvents in '..\..\..\Source\uRESTDWServerEvents.pas',
   uDWUpdSqlEditor in '..\..\..\Source\uDWUpdSqlEditor.pas' {FrmDWUpdSqlEditor},
-  uRESTDWFileBuffer in '..\..\..\Source\uRESTDWFileBuffer.pas';
+  uRESTDWFileBuffer in '..\..\..\Source\uRESTDWFileBuffer.pas',
+  uRESTDWDataJSON in '..\..\..\Source\libs\JSON\uRESTDWDataJSON.pas';
 
 end.
