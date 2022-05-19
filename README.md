@@ -13,10 +13,10 @@ Principais funcionalidades:
 * ... e muito mais
 
 ## Wiki com instruções de instalação e uso:
-* Site: https://github.com/mobius1qwe/REST-DataWare/wiki
+* Site: https://github.com/OpenSourceCommunityBrasil/REST-DataWare/wiki
 
 ## Repositório dos novos demos:
-https://github.com/mobius1qwe/RDWDemos
+https://github.com/OpenSourceCommunityBrasil/RDWDemos
 
 ## Canais oficiais do componente:
 * [Links e Mídias Externas](https://github.com/mobius1qwe/REST-DataWare/wiki/Links-e-M%C3%ADdias-Externas)
