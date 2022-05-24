@@ -9458,7 +9458,6 @@ End;
 Procedure TRESTDWClientSQL.ThreadDestroy;
 Begin
  Try
-  vThreadRequest.Kill;
   {$IFDEF FPC}
    WaitForThreadTerminate(vThreadRequest.Handle, INFINITE);
   {$ELSE}
