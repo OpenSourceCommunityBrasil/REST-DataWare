@@ -1,4 +1,4 @@
-![dwBanner](https://github.com/mobius1qwe/REST-DataWare/blob/master/CORE/Images/RDW_Banner_Alpha.png)
+![dwBanner](https://user-images.githubusercontent.com/26689802/170095987-9dbc6fd3-a3a1-4514-9027-e0954b43a22a.png)
 
 REST DataWare é uma suite de componentes criado para facilitar o desenvolvimento de aplicações 3 camadas com tudo que o RAD tem pra oferecer.
 Funcionando desde o Delphi 7 e também no Lazarus, o RDW como normalmente chamamos, é uma ferramenta completa para aplicações desktop, web e multiplataforma!
