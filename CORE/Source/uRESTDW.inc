@@ -1,12 +1,12 @@
 //dwInc de Configurações
 {$IFNDEF FPC}
- {$if CompilerVersion >= 26}
+ {$if CompilerVersion > 18}
   {$LEGACYIFEND ON}
  {$IFEND}
 {$ENDIF}
 
 {$IFNDEF FPC}
- {$IF DECLARED(FireMonkeyVersion)}
+{$IF not(Defined(FPC) or Defined(CONSOLE))}
   {$DEFINE HAS_FMX}
  {$ELSE}
   {$IFDEF ANDROID}
