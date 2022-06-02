@@ -1,12 +1,12 @@
 //dwInc de Configurações
 {$IFNDEF FPC}
- {$if CompilerVersion > 18}
+ {$IF COMPILERVERSION > 18}
   {$LEGACYIFEND ON}
  {$IFEND}
 {$ENDIF}
 
-{$IFNDEF FPC}
-{$IF not(Defined(FPC) or Defined(CONSOLE))}
+{$IF NOT (DEFINED(FPC) OR DEFINED(CONSOLE))}
+ {$IF DECLARED(FireMonkeyVersion)}
   {$DEFINE HAS_FMX}
  {$ELSE}
   {$IFDEF ANDROID}
@@ -92,7 +92,7 @@
  {.$DEFINE LAZDRIVER}
  {.$DEFINE UNIDACMEM}
  {$DEFINE DWMEMTABLE}
-{$ENDIF}
+{$IFEND}
 
 {$DEFINE RDWSYNOPSE}
 
