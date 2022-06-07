@@ -9611,7 +9611,7 @@ Var
  vDWRoutes: TDWRoutes;
 Begin
  Result        := False;
- vDefaultPageB  := False;
+ vDefaultPageB := False;
  vRejected     := False;
  Error         := False;
  vTagService   := Result;

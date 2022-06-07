@@ -13,20 +13,24 @@ type
   Pword = ^word;
   Pdword = ^dword;
   Pint64 = ^int64;
-  dword = longword;
   Pwordarray = ^Twordarray;
   Twordarray = array [0..19383] of word;
   Pdwordarray = ^Tdwordarray;
-  Tdwordarray = array [0..8191] of dword;
 {$IFNDEF SUPPORTS_UNICODE_STRING}
   RawByteString = AnsiString;
 {$ENDIF}
 {$IFNDEF COMPILER11_UP}
   TBytes = array of Byte;
 {$ENDIF ~COMPILER11_UP}
+{$IFNDEF SUPPORTS_UINT32}
+  UInt32 = Integer;
+{$ENDIF ~SUPPORTS_UINT32}
 {$IFNDEF SUPPORTS_UINT64}
   UInt64 = Int64;
 {$ENDIF ~SUPPORTS_UINT64}
+ dword = UInt32;
+ Tdwordarray = array [0..8191] of dword;
+
 
 type
 {$IFNDEF COMPILER16_UP}

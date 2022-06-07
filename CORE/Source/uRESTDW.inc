@@ -1,11 +1,11 @@
 //dwInc de Configurações
 {$IFNDEF FPC}
- {$if CompilerVersion >= 26}
+ {$IF COMPILERVERSION > 18}
   {$LEGACYIFEND ON}
  {$IFEND}
 {$ENDIF}
 
-{$IFNDEF FPC}
+{$IF NOT (DEFINED(FPC) OR DEFINED(CONSOLE))}
  {$IF DECLARED(FireMonkeyVersion)}
   {$DEFINE HAS_FMX}
  {$ELSE}
@@ -92,7 +92,7 @@
  {.$DEFINE LAZDRIVER}
  {.$DEFINE UNIDACMEM}
  {$DEFINE DWMEMTABLE}
-{$ENDIF}
+{$IFEND}
 
 {$DEFINE RDWSYNOPSE}
 

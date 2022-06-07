@@ -97,7 +97,7 @@ Const
                              'CORE Version';
  DWSobreLicencaStatus      = 'Open Source - Free Version';
  DWVersionINFO             = '1.4.3.';
- DWRelease                 = '2901';
+ DWRelease                 = '2904';
  DwParamsHeaderVersion     = 6;
  DWCodeProject             = 'Dark Souls - Git';
  DWVersao                  = DWVersionINFO + DWRelease + '(' + DWCodeProject + ')';
@@ -1229,9 +1229,9 @@ Var
  Const
   MaxBufSize = $F000;
 Begin
- { ** Criando a instância do objeto TMemoryStream para retorno do método ** }
+ { ** Criando a instÃ¢ncia do objeto TMemoryStream para retorno do mÃ©todo ** }
  Dest := TMemoryStream.Create;
- { ** Reposicionando o stream para o seu início ** }
+ { ** Reposicionando o stream para o seu inÃ­cio ** }
  source.Seek(0, soBeginning);
  source.Position := 0;
  GetMem(Buffer, MaxBufSize);
@@ -1241,7 +1241,7 @@ Begin
   If BytesRead > 0 then
    Dest.WriteBuffer(Buffer^, BytesRead);
  Until MaxBufSize > BytesRead;
- { ** Reposicionando o stream de retorno para o seu início ** }
+ { ** Reposicionando o stream de retorno para o seu inÃ­cio ** }
  Dest.Seek(0, soBeginning);
 End;
 

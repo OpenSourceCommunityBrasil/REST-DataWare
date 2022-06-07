@@ -95,7 +95,9 @@ contains
   uRESTDWQuickX in '..\..\..\Source\uRESTDWQuickX.pas',
   uRESTDWBaseIDQX in '..\..\..\Source\uRESTDWBaseIDQX.pas',
   uRESTDWBufferDb in '..\..\..\Source\uRESTDWBufferDb.pas',
-  uRESTDWProcessThread in '..\..\..\Source\uRESTDWProcessThread.pas';
+  uRESTDWProcessThread in '..\..\..\Source\uRESTDWProcessThread.pas',
+  uRESTDWDataJSON in '..\..\..\Source\libs\JSON\uRESTDWDataJSON.pas',
+  DWDCPtypes in '..\..\..\Source\DCP\DWDCPtypes.pas';
 
 end.
 
