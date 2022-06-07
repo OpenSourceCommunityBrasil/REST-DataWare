@@ -9620,7 +9620,7 @@ Begin
  If (Pooler <> '') And (urlContext = '') Then
   Begin
    urlContext := Pooler;
-   Pooler     := '';
+   //uhmano   Pooler     := '';
   End;
  If ServerMethodsClass <> Nil Then
   Begin
@@ -9629,7 +9629,7 @@ Begin
      If ServerMethodsClass.Components[i] is TDWServerContext Then
       Begin
        If ((LowerCase(urlContext) = LowerCase(TDWServerContext(ServerMethodsClass.Components[i]).BaseContext))) Or
-          ((Trim(TDWServerContext(ServerMethodsClass.Components[i]).BaseContext) = '') And (Pooler = '')        And
+          ((Trim(TDWServerContext(ServerMethodsClass.Components[i]).BaseContext) = '')  {//uhmano And (Pooler = '')}  And
            (TDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[urlContext] <> Nil))   Then
         Begin
          vRootContext := TDWServerContext(ServerMethodsClass.Components[i]).RootContext;
@@ -10800,7 +10800,38 @@ Var
           {$ENDIF}
           JSONParam.AsString        := ARequestInfo.RemoteIP;
           DWParams.Add(JSONParam);
-		  //uhmano - final
+
+          // URI
+          JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+          JSONParam.ObjectDirection := odIN;
+          JSONParam.ParamName       := 'URI';
+          {$IFDEF FPC}
+          JSONParam.DatabaseCharSet := vDatabaseCharSet;
+          {$ENDIF}
+          JSONParam.AsString        := ARequestInfo.URI;
+          DWParams.Add(JSONParam);
+
+          // Document
+          JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+          JSONParam.ObjectDirection := odIN;
+          JSONParam.ParamName       := 'Document';
+          {$IFDEF FPC}
+          JSONParam.DatabaseCharSet := vDatabaseCharSet;
+          {$ENDIF}
+          JSONParam.AsString        := ARequestInfo.Document;
+          DWParams.Add(JSONParam);
+
+          // AuthUsername
+          JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+          JSONParam.ObjectDirection := odIN;
+          JSONParam.ParamName       := 'AuthUsername';
+          {$IFDEF FPC}
+          JSONParam.DatabaseCharSet := vDatabaseCharSet;
+          {$ENDIF}
+          JSONParam.AsString        := ARequestInfo.AuthUsername;
+          DWParams.Add(JSONParam);
+
+    		  //uhmano - final
 
 
  end;
@@ -12101,6 +12132,7 @@ Begin
                                                              {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF});
             vRequestHeader.Add(ARequestInfo.QueryParams);
 
+            If Not Assigned(DWParams) Then  //uhmano
             TServerUtils.ParseWebFormsParams (ARequestInfo.Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}RemoveBackslashCommands(ARequestInfo.Command)
                                                                                                  {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                                                                  {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF},
@@ -12157,6 +12189,7 @@ Begin
                                                             {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                             {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF});
            vRequestHeader.Add(ARequestInfo.QueryParams);
+           If Not Assigned(DWParams) Then  //uhmano
            TServerUtils.ParseWebFormsParams (ARequestInfo.Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}RemoveBackslashCommands(ARequestInfo.Command)
                                                                                                 {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$IFEND}
                                                                                                 {$ELSE}RemoveBackslashCommands(ARequestInfo.URI){$ENDIF},
