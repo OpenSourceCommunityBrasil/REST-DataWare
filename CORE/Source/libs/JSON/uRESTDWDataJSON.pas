@@ -1039,14 +1039,22 @@ Begin
                  etDateTime : vLine := TRESTDWJSONDateTime(vList.Items[I]^).ToJSON;
                  etBlob     : vLine := TRESTDWJSONBlob    (vList.Items[I]^).ToJSON;
                 End;
+                If (GetItemJSONClass(TRESTDWJSONBaseObjectClass(vList.Items[I]^)) = etUnknow) And
+                   (TRESTDWJSONBase(vList.Items[I]^).ObjectType in [jtobject, jtArray]) Then
+                 Begin
+                  If (elementname <> '') Then
+                   vLine := Format('"%s":%s', [elementname, vLine])
+                  Else
+                   Begin
+                    If TRESTDWJSONBase(vList.Items[I]^).ObjectType = jtobject Then
+                     if TRESTDWJSONObject(vList.Items[I]^).ElementName <> '' Then
+                     vLine := Format('"%s":%s', [TRESTDWJSONObject(vList.Items[I]^).ElementName, vLine]);
+                   End;
+                 End;
                 If Result = '' Then
                  Result := vLine
                 Else
-                 Begin
-                  If elementname <> '' Then
-                   vLine := Format('"%s":%s', [elementname, vLine]);
-                  Result := Result + ', ' + vLine;
-                 End;
+                 Result := Result + ', ' + vLine;
                 vLine := '';
                End;
               Result := '{' + Result + '}';
@@ -1423,8 +1431,7 @@ begin
            AddNull(bJsonValue.pairs[I].Name);
          End
         Else If (Lowercase(bJsonValue.pairs[I].classname) = '_integer')     Or
-                (Lowercase(bJsonValue.pairs[I].classname) = 'tjsonnumber')  And
-                (Pos('.', bJsonValue.pairs[I].Value) = 0)                   Then
+                (Lowercase(bJsonValue.pairs[I].classname) = 'tjsoninteger') Then
          Begin
           If (bJsonValue.pairs[I].Value <> cNullvalue)    And
              (bJsonValue.pairs[I].Value <> cNullvalueTag) Then
@@ -1433,8 +1440,7 @@ begin
            AddNull(bJsonValue.pairs[I].Name, etInteger);
          End
         Else If (Lowercase(bJsonValue.pairs[I].classname) = '_double')     Or
-                (Lowercase(bJsonValue.pairs[I].classname) = 'tjsonnumber') And
-                (Pos('.', bJsonValue.pairs[I].Value) > 0)                  Then
+                (Lowercase(bJsonValue.pairs[I].classname) = 'tjsonnumber') Then
          Begin
           If (bJsonValue.pairs[I].Value <> cNullvalue)    And
              (bJsonValue.pairs[I].Value <> cNullvalueTag) Then
