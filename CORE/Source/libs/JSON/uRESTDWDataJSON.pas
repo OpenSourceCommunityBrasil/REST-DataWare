@@ -1427,8 +1427,7 @@ begin
            AddNull(bJsonValue.pairs[I].Name);
          End
         Else If (Lowercase(bJsonValue.pairs[I].classname) = '_integer')     Or
-                (Lowercase(bJsonValue.pairs[I].classname) = 'tjsonnumber')  And
-                (Pos('.', bJsonValue.pairs[I].Value) = 0)                   Then
+                (Lowercase(bJsonValue.pairs[I].classname) = 'tjsoninteger') Then
          Begin
           If (bJsonValue.pairs[I].Value <> cNullvalue)    And
              (bJsonValue.pairs[I].Value <> cNullvalueTag) Then
@@ -1437,8 +1436,7 @@ begin
            AddNull(bJsonValue.pairs[I].Name, etInteger);
          End
         Else If (Lowercase(bJsonValue.pairs[I].classname) = '_double')     Or
-                (Lowercase(bJsonValue.pairs[I].classname) = 'tjsonnumber') And
-                (Pos('.', bJsonValue.pairs[I].Value) > 0)                  Then
+                (Lowercase(bJsonValue.pairs[I].classname) = 'tjsonnumber') Then
          Begin
           If (bJsonValue.pairs[I].Value <> cNullvalue)    And
              (bJsonValue.pairs[I].Value <> cNullvalueTag) Then
