@@ -10800,7 +10800,38 @@ Var
           {$ENDIF}
           JSONParam.AsString        := ARequestInfo.RemoteIP;
           DWParams.Add(JSONParam);
-		  //uhmano - final
+
+          // URI
+          JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+          JSONParam.ObjectDirection := odIN;
+          JSONParam.ParamName       := 'URI';
+          {$IFDEF FPC}
+          JSONParam.DatabaseCharSet := vDatabaseCharSet;
+          {$ENDIF}
+          JSONParam.AsString        := ARequestInfo.URI;
+          DWParams.Add(JSONParam);
+
+          // Document
+          JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+          JSONParam.ObjectDirection := odIN;
+          JSONParam.ParamName       := 'Document';
+          {$IFDEF FPC}
+          JSONParam.DatabaseCharSet := vDatabaseCharSet;
+          {$ENDIF}
+          JSONParam.AsString        := ARequestInfo.Document;
+          DWParams.Add(JSONParam);
+
+          // AuthUsername
+          JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+          JSONParam.ObjectDirection := odIN;
+          JSONParam.ParamName       := 'AuthUsername';
+          {$IFDEF FPC}
+          JSONParam.DatabaseCharSet := vDatabaseCharSet;
+          {$ENDIF}
+          JSONParam.AsString        := ARequestInfo.AuthUsername;
+          DWParams.Add(JSONParam);
+
+    		  //uhmano - final
 
 
  end;
