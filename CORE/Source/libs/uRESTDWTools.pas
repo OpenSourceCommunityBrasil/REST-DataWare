@@ -2514,7 +2514,7 @@ End;
 Function restdwValueFromIndex(AStrings     : TStrings;
                               Const AIndex : Integer) : String;
 Begin
- ValueFromIndex(AStrings, AIndex);
+ Result := ValueFromIndex(AStrings, AIndex);
 End;
 
 Procedure DeleteInvalidChar(Var Value : String);
@@ -2553,7 +2553,7 @@ Begin
   SplitHeaderSubItems(AHeaderLine, LItems, QuotingType);
   I := restdwIndexOfName(LItems, ASubItem);
   If I <> -1 Then
-  Result := restdwValueFromIndex(LItems, I);
+   Result := restdwValueFromIndex(LItems, I);
  Finally
   LItems.Free;
  End;
@@ -2966,6 +2966,7 @@ Var
  LLength : Integer;
  LBytes  : TRESTDWBytes;
 Begin
+ Result := '';
  {$IFDEF STRING_IS_ANSI}
   LBytes := nil; // keep the compiler happy
  {$ENDIF}
@@ -2979,7 +2980,6 @@ Begin
     LBytes := Copy(AValue, AStartIndex, LLength);
    SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
   End;
- Result := '';
 End;
 
 Function BytesToString(Const bin : TRESTDWBytes) : String;

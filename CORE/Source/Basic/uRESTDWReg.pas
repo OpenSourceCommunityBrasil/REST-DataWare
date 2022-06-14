@@ -29,10 +29,10 @@ uses
   {$IFDEF FPC}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
     LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb,
-    uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWAbout;
+    uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWSqlEditor, uRESTDWAbout;
   {$ELSE}
    Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWAbout, uRESTDWDatamodule, uRESTDWServerEvents,
-   uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, RTLConsts, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
+   uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, RTLConsts, uRESTDWSqlEditor, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
    {$IFDEF COMPILER16_UP}
    UITypes,
    {$ENDIF}
@@ -813,7 +813,7 @@ Begin
 // RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionParams,   'PoolerName',      TPoolersListCDF);
  RegisterPropertyEditor(TypeInfo(String),       TRESTDWClientEvents,           'ServerEventName', TServerEventsList);
 // RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionServerCP, 'ServerEventName', TServerEventsListCV);
-// RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'SQL',             TDWSQLEditor);
+ RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'SQL',             TRESTDWSQLEditor);
 // RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'RelationFields',  TDWFieldsRelationEditor);
 // RegisterPropertyEditor(TypeInfo(String),       TRESTDWClientSQL,          'SequenceField',   TDWFieldsList);
 //
@@ -831,7 +831,7 @@ Begin
 // RegisterComponentEditor(TDWServerContext,      TRESTDWServerContextEditor);
 // RegisterComponentEditor(TDWContextRules,       TRESTDWContextRulesEditor);
  {$IFNDEF FPC}
-// RegisterComponentEditor(TRESTDWClientSQL,      TRESTDWClientSQLEditor);
+  RegisterComponentEditor(TRESTDWClientSQL,      TRESTDWClientSQLEditor);
 // RegisterComponentEditor(TDWServerContext,      TRESTDWServerContextEditor);
 // RegisterComponentEditor(TDWContextRules,       TRESTDWContextRulesEditor);
  {$ENDIF}

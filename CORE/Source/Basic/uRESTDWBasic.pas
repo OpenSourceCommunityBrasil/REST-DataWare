@@ -380,10 +380,10 @@ Type
   Property    LastErrorCode        : Integer                       Read vErrorCode               Write vErrorCode;
  Published
   //Métodos e Propriedades
-  Property AcceptEncoding          : String                        Read vAcceptEncoding          Write vAcceptEncoding;
   Property DataCompression         : Boolean                       Read vDatacompress            Write vDatacompress;
-  Property ContentType             : String                        Read vContentType             Write vContentType;
   Property UrlPath                 : String                        Read vUrlPath                 Write SetUrlPath;
+  Property AcceptEncoding          : String                        Read vAcceptEncoding          Write vAcceptEncoding;
+  Property ContentType             : String                        Read vContentType             Write vContentType;
   Property Charset                 : String                        Read vCharset                 Write vCharset;
   Property ServerContext           : String                        Read vServerContext           Write vServerContext;
   Property DataRoute               : String                        Read vDataRoute               Write vDataRoute;

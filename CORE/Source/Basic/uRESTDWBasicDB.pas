@@ -354,6 +354,11 @@ Type
   vCripto              : TCripto;
   vRestPoolers         : TStringList;
   vAuthOptionParams    : TRESTDWClientAuthOptionParams;
+  vCharset,
+  vContentEncoding,
+  vAccept,
+  vAcceptEncoding,
+  vContentType,
   vContentex,
   vUserAgent,
   vAccessTag,
@@ -388,6 +393,7 @@ Type
   vParamCreate         : Boolean;
   vTypeRequest         : Ttyperequest;
   vFailOverConnections : TListDefConnections;
+  vRESTClientPooler    : TRESTClientPoolerBase;
   Function  RenewToken              (Var PoolerMethodClient : TRESTDWPoolerMethodClient;
                                      Var Params             : TRESTDWParams;
                                      Var Error              : Boolean;
@@ -418,6 +424,7 @@ Type
    //Magno
   Procedure Loaded; override;
  Public
+  Procedure DestroyClientPooler;
   Procedure ExecuteCommand          (Var PoolerMethodClient : TRESTDWPoolerMethodClient;
                                      Var SQL                : TStringList;
                                      Var Params             : TParams;
@@ -501,7 +508,13 @@ Type
   Procedure   OpenDatasets          (Datasets               : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF});Overload;
   Property    Connected            : Boolean                    Read GetStateDB               Write SetConnection;
   Property    PoolerList           : TStringList                Read GetRestPoolers;
+  Property    RESTClientPooler     : TRESTClientPoolerBase      Read vRESTClientPooler        Write vRESTClientPooler;
  Published
+  Property Accept                  : String                     Read vAccept                  Write vAccept;
+  Property AcceptEncoding          : String                     Read vAcceptEncoding          Write vAcceptEncoding;
+  Property ContentType             : String                     Read vContentType             Write vContentType;
+  Property Charset                 : String                     Read vCharset                 Write vCharset;
+  Property ContentEncoding         : String                     Read vContentEncoding         Write vContentEncoding;
   Property OnConnection            : TOnEventConnection         Read vOnEventConnection       Write vOnEventConnection; //Evento relativo a tudo que acontece quando tenta conectar ao Servidor
   Property OnBeforeConnect         : TOnEventBeforeConnection   Read vOnBeforeConnection      Write vOnBeforeConnection; //Evento antes de Connectar o Database
   Property Active                  : Boolean                    Read vConnected               Write SetConnection;      //Seta o Estado da Conexão
@@ -4328,7 +4341,7 @@ Begin
  Try
   If Assigned(vRestPoolers) Then
    FreeAndNil(vRestPoolers);
-  vRestPoolers := vConnection.GetPoolerList(vRestURL, vTimeOut, vConnectTimeOut);
+  vRestPoolers := vConnection.GetPoolerList(vRestURL, vTimeOut, vConnectTimeOut, vRESTClientPooler);
   Try
    If Assigned(vRestPoolers) Then
     Begin
@@ -4427,6 +4440,7 @@ End;
 Constructor TRESTDWDatabasebaseBase.Create(AOwner : TComponent);
 Begin
  Inherited;
+ vRESTClientPooler         := Nil;
  vHandleRedirects          := False;
  vRedirectMaximum          := 0;
  vConnected                := False;
@@ -4453,8 +4467,13 @@ Begin
  vAutoCheckData.vAutoCheck := False;
  vAutoCheckData.vInTime    := 1000;
  vTimeOut                  := 10000;
- vConnectTimeOut                  := 3000;
+ vConnectTimeOut           := 3000;
  vUserAgent                := cUserAgent;
+ vContentType              := 'application/json';
+ vContentEncoding          := 'multipart/form-data';
+ vAccept                   := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+ vAcceptEncoding           := 'gzip2, deflate, br';
+ vCharset                  := 'utf8';
  {$IFNDEF FPC}
  {$IF CompilerVersion > 21}
   vEncoding                := esUtf8;
@@ -4494,6 +4513,12 @@ Begin
   FreeAndNil(vAuthOptionParams);
  FreeAndNil(vCripto);
  Inherited;
+End;
+
+Procedure TRESTDWDatabasebaseBase.DestroyClientPooler;
+Begin
+ If Assigned(vRESTClientPooler) Then
+  FreeAndNil(vRESTClientPooler);
 End;
 
 Procedure TRESTDWDatabasebaseBase.ProcessMassiveSQLCache(Var MassiveSQLCache    : TRESTDWMassiveCacheSQLList;
@@ -5436,7 +5461,7 @@ Begin
   Try
    TokenValidade;
    If Not(vErrorBoolean) Then
-    vTempSend  := vConnection.EchoPooler(vRestURL, vRestPooler, vTimeOut, vConnectTimeOut);
+    vTempSend  := vConnection.EchoPooler(vRestURL, vRestPooler, vTimeOut, vConnectTimeOut, vRESTClientPooler);
    Result      := Trim(vTempSend) <> '';
    If Result Then
     vMyIP       := vTempSend

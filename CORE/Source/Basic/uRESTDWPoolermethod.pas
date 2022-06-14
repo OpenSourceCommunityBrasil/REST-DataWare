@@ -1379,6 +1379,14 @@ Begin
  Else
   Begin
    RESTClientPoolerExec := RESTClientPooler;
+   RESTClientPoolerExec.Host             := Host;
+   RESTClientPoolerExec.Port             := Port;
+   RESTClientPoolerExec.DataCompression  := vCompression;
+   RESTClientPoolerExec.TypeRequest      := vtyperequest;
+   RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
+   RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
+   RESTClientPoolerExec.SetAccessTag(vAccessTag);
+   RESTClientPoolerExec.Encoding         := vEncoding;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);

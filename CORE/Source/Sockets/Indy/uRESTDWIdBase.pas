@@ -186,6 +186,12 @@ Type
                         RawHeaders        : Boolean        = False):Integer;Overload;Override;
   Function   Post      (AUrl              : String         = '';
                         CustomHeaders     : TStringList    = Nil;
+                        Const CustomBody  : TIdMultipartFormDataStream = Nil;
+                        Const AResponse   : TStream        = Nil;
+                        IgnoreEvents      : Boolean        = False;
+                        RawHeaders        : Boolean        = False):Integer;Overload;
+  Function   Post      (AUrl              : String         = '';
+                        CustomHeaders     : TStringList    = Nil;
                         FileName          : String         = '';
                         FileStream        : TStream        = Nil;
                         Const AResponse   : TStream        = Nil;
@@ -284,6 +290,24 @@ End;
 
 Type
  TRESTDWIdDatabase = Class(TRESTDWDatabasebaseBase)
+ Private
+  vCipherList                      : String;
+  aSSLMethod                       : TIdSSLVersion;
+  aSSLVersions                     : TIdSSLVersions;
+  HttpRequest                      : TRESTDWIdClientREST;
+  vSSLVersions                     : TIdSSLVersions;
+  vSSLMode                         : TIdSSLMode;
+  Procedure   SetParams            (TransparentProxy      : TProxyConnectionInfo;
+                                    RequestTimeout,
+                                    ConnectTimeout        : Integer;
+                                    AuthorizationParams   : TRESTDWClientAuthOptionParams);
+ Public
+  Constructor Create               (AOwner  : TComponent);Override;
+  Destructor  Destroy;Override;
+ Published
+  Property SSLMode                 : TIdSSLMode          Read vSSLMode                 Write vSSLMode;
+  Property SSLVersions             : TIdSSLVersions      Read vSSLVersions             Write vSSLVersions;
+  Property CipherList              : String              Read vCipherList              Write vCipherList;
 End;
 
 Type
@@ -660,6 +684,134 @@ Begin
  DestroyClient;
 End;
 
+Function   TRESTDWIdClientREST.Post(AUrl              : String                     = '';
+                                    CustomHeaders     : TStringList                = Nil;
+                                    Const CustomBody  : TIdMultipartFormDataStream = Nil;
+                                    Const AResponse   : TStream                    = Nil;
+                                    IgnoreEvents      : Boolean                    = False;
+                                    RawHeaders        : Boolean                    = False) : Integer;
+Var
+ temp           : TStringStream;
+ vTempHeaders   : TStringList;
+ atempResponse,
+ tempResponse   : TStringStream;
+ SendParams     : TIdMultipartFormDataStream;
+ aString,
+ sResponse      : String;
+Begin
+ Result:= 200;
+ SendParams   := TIdMultipartFormDataStream.Create;
+ Try
+  tempResponse := Nil;
+  SetParams;
+  SetUseSSL(UseSSL);
+  vTempHeaders := TStringList.Create;
+  {$IFDEF FPC}
+   atempResponse  := TStringStream.Create('');
+  {$ELSE}
+   {$IF CompilerVersion < 21}
+    atempResponse := TStringStream.Create('');
+   {$ELSE}
+    atempResponse := TStringStream.Create;
+   {$IFEND}
+  {$ENDIF}
+  If Not Assigned(AResponse) Then
+   Begin
+    {$IFDEF FPC}
+     tempResponse  := TStringStream.Create('');
+    {$ELSE}
+     {$IF CompilerVersion < 21}
+      tempResponse := TStringStream.Create('');
+     {$ELSE}
+      tempResponse := TStringStream.Create;
+     {$IFEND}
+    {$ENDIF}
+   End;
+  vAUrl := AUrl;
+  Try
+   SetHeaders(TStringList(DefaultCustomHeader));
+   If Not IgnoreEvents Then
+   If Assigned(OnBeforePost) then
+    If Not Assigned(CustomHeaders) Then
+     OnBeforePost(AUrl, vTempHeaders)
+    Else
+     OnBeforePost(AUrl, CustomHeaders);
+   CopyStringList(CustomHeaders, vTempHeaders);
+   If Not Assigned(CustomBody) Then
+    SetRawHeaders(vTempHeaders, SendParams);
+   If Not Assigned(AResponse) Then
+    Begin
+     HttpRequest.Post(AUrl, SendParams, atempResponse);
+     Result:= HttpRequest.ResponseCode;
+     if Assigned(OnHeadersAvailable) then
+      OnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
+     atempResponse.Position := 0;
+     If RequestCharset = esUtf8 Then
+      aString := utf8Decode(atempResponse.DataString)
+     Else
+      aString := tempResponse.DataString;
+     StringToStream(tempResponse, aString);
+     FreeAndNil(atempResponse);
+     tempResponse.Position := 0;
+     If Not IgnoreEvents Then
+     If Assigned(OnAfterRequest) then
+      OnAfterRequest(AUrl, rtPost, tempResponse);
+    End
+   Else
+    Begin
+     If Assigned(CustomBody) Then
+      HttpRequest.Post(AUrl, CustomBody, AResponse)
+     Else if Assigned(SendParams) Then
+      HttpRequest.Post(AUrl, SendParams, AResponse)
+     Else
+      HttpRequest.Post(AUrl, CustomHeaders, AResponse);
+     Result:= HttpRequest.ResponseCode;
+     If (HttpRequest.ResponseCode > 299) Then
+      If Trim(sResponse) = '' Then
+       sResponse := HttpRequest.ResponseText;
+     if Assigned(OnHeadersAvailable) then
+      OnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
+     If RequestCharset = esUtf8 Then
+      aString := utf8Decode(sResponse)
+     Else
+      aString := sResponse;
+//     StringToStream(AResponse, aString);
+     AResponse.Position := 0;
+     If Not IgnoreEvents Then
+     If Assigned(OnAfterRequest) then
+      OnAfterRequest(AUrl, rtPost, AResponse);
+    End;
+  Finally
+   vTempHeaders.Free;
+   If Assigned(tempResponse) Then
+    FreeAndNil(tempResponse);
+   If Assigned(atempResponse) Then
+    FreeAndNil(atempResponse);
+   SendParams.Free;
+  End;
+ Except
+  On E: EIdHTTPProtocolException do
+   Begin
+    If (Length(E.ErrorMessage) > 0) Or (E.ErrorCode > 0) then
+     Begin
+      Result:= E.ErrorCode;
+      If E.ErrorMessage <> '' Then
+       temp := TStringStream.Create(E.ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF})
+      Else
+       temp := TStringStream.Create(E.Message{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+      AResponse.CopyFrom(temp, temp.Size);
+      temp.Free;
+     End;
+   End;
+  On E: EIdSocketError do
+   Begin
+    HttpRequest.Disconnect(false);
+    Raise;
+   End;
+ End;
+ DestroyClient;
+End;
+
 Function   TRESTDWIdClientREST.Post(AUrl            : String         = '';
                                     CustomHeaders   : TStringList    = Nil;
                                     FileName        : String         = '';
@@ -788,16 +940,16 @@ Begin
  DestroyClient;
 End;
 
-Function   TRESTDWIdClientREST.Post(AUrl            : String;
+Function   TRESTDWIdClientREST.Post(AUrl              : String;
                                     Var AResponseText : String;
-                                    CustomHeaders   : TStringList    = Nil;
-                                    CustomParams    : TStringList    = Nil;
-                                    Const CustomBody : TStream       = Nil;
-                                    Const AResponse : TStream        = Nil;
-                                    IgnoreEvents    : Boolean        = False;
-                                    RawHeaders      : Boolean        = False):Integer;
+                                    CustomHeaders     : TStringList    = Nil;
+                                    CustomParams      : TStringList    = Nil;
+                                    Const CustomBody  : TStream       = Nil;
+                                    Const AResponse   : TStream        = Nil;
+                                    IgnoreEvents      : Boolean        = False;
+                                    RawHeaders        : Boolean        = False) : Integer;
 Var
- temp         : TStringStream;
+ temp         : TMemoryStream;
  vTempHeaders : TStringList;
  atempResponse,
  tempResponse : TStringStream;
@@ -807,6 +959,7 @@ Var
 Begin
  Result:= 200;
  SendParams   := TIdMultipartFormDataStream.Create;
+ temp         := Nil;
  Try
   tempResponse := Nil;
   SetParams;
@@ -843,9 +996,24 @@ Begin
     Else
      OnBeforePost(AUrl, CustomHeaders);
    CopyStringList(CustomHeaders, vTempHeaders);
-   SetRawHeaders(vTempHeaders, SendParams);
+   If Assigned(CustomBody) Then
+    Begin
+     SendParams.Clear;
+     SendParams.Write(CustomBody, CustomBody.Size);
+    End
+   Else
+    SetRawHeaders(vTempHeaders, SendParams);
+//   If Assigned(CustomBody) Then
+//    Begin
+//     temp         := TMemoryStream.Create;
+//     temp.CopyFrom(CustomBody, CustomBody.Size - CustomBody.Position);
+//     temp.Position := 0;
+//    End;
    If Not Assigned(AResponse) Then
     Begin
+//     If Assigned(temp) Then
+//      HttpRequest.Post(AUrl, Temp, atempResponse)
+//     Else
      HttpRequest.Post(AUrl, SendParams, atempResponse);
      Result:= HttpRequest.ResponseCode;
      if Assigned(OnHeadersAvailable) then
@@ -864,8 +1032,10 @@ Begin
     End
    Else
     Begin
-     temp := Nil;
-     HttpRequest.Post(AUrl, CustomHeaders, AResponse);
+     If Assigned(CustomBody) Then
+      HttpRequest.Post(AUrl, SendParams, AResponse)
+     Else
+      HttpRequest.Post(AUrl, CustomHeaders, AResponse);
      Result:= HttpRequest.ResponseCode;
      If (HttpRequest.ResponseCode > 299) Then
       If Trim(sResponse) = '' Then
@@ -3939,7 +4109,7 @@ Var
                         {$ENDIF}
                        {$ENDIF}
                       End;
-           sePOST   : HttpRequest.Post  (URL, vResponse, TStringList(HttpRequest.DefaultCustomHeader), Nil, SendParams, StringStream);
+           sePOST   : HttpRequest.Post  (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, StringStream);
           end;
          End;
         If SendParams <> Nil Then
@@ -4264,6 +4434,45 @@ Begin
   If Assigned(HttpRequest) Then
    FreeAndNil(HttpRequest);
  End;
+End;
+
+{ TRESTDWIdDatabase }
+
+Constructor TRESTDWIdDatabase.Create(AOwner: TComponent);
+Begin
+ Inherited;
+ HttpRequest            := Nil;
+ vCipherList            := '';
+ RESTClientPooler       := TRESTDWIdClientPooler.Create(Self);
+End;
+
+Destructor TRESTDWIdDatabase.Destroy;
+Begin
+ If Assigned(HttpRequest) Then
+  FreeAndNil(HttpRequest);
+ DestroyClientPooler;
+ Inherited;
+End;
+
+Procedure TRESTDWIdDatabase.SetParams(TransparentProxy    : TProxyConnectionInfo;
+                                      RequestTimeout      : Integer;
+                                      ConnectTimeout      : Integer;
+                                      AuthorizationParams : TRESTDWClientAuthOptionParams);
+Begin
+ HttpRequest.DefaultCustomHeader.Clear;
+ HttpRequest.AcceptEncoding              := AcceptEncoding;
+ HttpRequest.AuthenticationOptions       := AuthorizationParams;
+ HttpRequest.ProxyOptions.ProxyUsername  := TransparentProxy.ProxyUsername;
+ HttpRequest.ProxyOptions.ProxyServer    := TransparentProxy.ProxyServer;
+ HttpRequest.ProxyOptions.ProxyPassword  := TransparentProxy.ProxyPassword;
+ HttpRequest.ProxyOptions.ProxyPort      := TransparentProxy.ProxyPort;
+ HttpRequest.RequestTimeout              := RequestTimeout;
+ HttpRequest.ConnectTimeout              := ConnectTimeout;
+ HttpRequest.ContentType                 := ContentType;
+// HttpRequest.AllowCookies                := AllowCookies;
+ HttpRequest.HandleRedirects             := HandleRedirects;
+ HttpRequest.Charset                     := Charset;
+ HttpRequest.UserAgent                   := UserAgent;
 End;
 
 End.

@@ -12,12 +12,12 @@ EditorSecs=2729
 EditorSecs=2709
 >>>>>>> .r1079
 >>>>>>> .r967
-DesignerSecs=1385
+DesignerSecs=1387
 <<<<<<< .mine
 InspectorSecs=126
 <<<<<<< .mine
-CompileSecs=573649
-OtherSecs=4077
+CompileSecs=576448
+OtherSecs=4029
 ||||||| .r863
 CompileSecs=304727
 OtherSecs=1518

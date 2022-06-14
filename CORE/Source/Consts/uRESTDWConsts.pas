@@ -136,10 +136,10 @@ Const
                               'Components REST Dataware Core' + sLineBreak +
                               'CORE Version';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
- RESTDWVersionINFO          = '1.5.0.';
+ RESTDWVersionINFO          = '1.4.3.';
  RESTDWRelease              = '2948';
  RESTDWParamsHeaderVersion  = 6;
- RESTDWCodeProject          = 'Dark Souls - GitHub';
+ RESTDWCodeProject          = 'Dark Souls';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  RESTDWFieldBookmark        = 'DWFIELDBOOKMARK';
  rsLazarusDWPackage         = 'REST Dataware - Tools';
