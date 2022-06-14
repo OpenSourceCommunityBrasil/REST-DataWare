@@ -590,11 +590,6 @@ Type
                                       Metadata                : Boolean;
                                       BinaryCompatibleMode    : Boolean;
                                       CompareContext          : Boolean) : Boolean;
-  Procedure EchoPooler               (ServerMethodsClass      : TComponent;
-                                      AContext                : TComponent;
-                                      Var Pooler, MyIP        : String;
-                                      AccessTag               : String;
-                                      Var InvalidTag          : Boolean);Virtual;Abstract;
   Procedure ExecuteCommandPureJSON   (ServerMethodsClass      : TComponent;
                                       Var Pooler              : String;
                                       Var DWParams            : TRESTDWParams;
@@ -706,8 +701,14 @@ Type
                                       Var ErrorCode           : Integer) : Boolean;
   Procedure   SetServerAuthOptions   (AuthenticationOptions   : TRESTDWServerAuthOptionParams);
  Public
+  Procedure EchoPooler               (ServerMethodsClass      : TComponent;
+                                      AContext                : TComponent;
+                                      Var Pooler, MyIP        : String;
+                                      AccessTag               : String;
+                                      Var InvalidTag          : Boolean);Virtual;Abstract;
   Procedure   SetActive    (Value               : Boolean);Virtual;
-  Function    CommandExec  (Url,
+  Function    CommandExec  (Const AContext : TComponent;
+                            Url,
                             RawHTTPCommand,
                             ContentType,
                             ClientIP,
@@ -1785,7 +1786,8 @@ Begin
  vServerContext := LowerCase(Value);
 End;
 
-Function TRESTServiceBase.CommandExec(Url,
+Function TRESTServiceBase.CommandExec(Const AContext : TComponent;
+                                      Url,
                                       RawHTTPCommand,
                                       ContentType,
                                       ClientIP,
@@ -4023,7 +4025,7 @@ Begin
              End;
             If (Not (vGettoken)) And (Not (vTokenValidate)) Then
              Begin
-              If Not ServiceMethods(TComponent(vTempServerMethods), Nil, vUriOptions, DWParams,
+              If Not ServiceMethods(TComponent(vTempServerMethods), AContext, vUriOptions, DWParams,
                                     JSONStr, JsonMode, vErrorCode,  vContentType, vServerContextCall, ServerContextStream,
                                     vdwConnectionDefs,  EncodeStrings, vAccessTag, WelcomeAccept, RequestType, vMark,
                                     vRequestHeader, vBinaryEvent, vMetadata, vBinaryCompatibleMode, vCompareContext) Or (lowercase(vContentType) = 'application/php') Then

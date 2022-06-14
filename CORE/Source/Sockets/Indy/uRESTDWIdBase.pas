@@ -100,6 +100,11 @@ Type
                                                         {$ELSE}
                                                          String
                                                         {$ENDIF});
+  Procedure EchoPooler               (ServerMethodsClass      : TComponent;
+                                      AContext                : TComponent;
+                                      Var Pooler, MyIP        : String;
+                                      AccessTag               : String;
+                                      Var InvalidTag          : Boolean);Override;
  Public
   Constructor Create                (AOwner           : TComponent);Override;
   Destructor  Destroy;
@@ -3048,7 +3053,8 @@ Begin
     vToken       := TRESTDWAuthRequest(AContext.Data).Token;
   {$ENDIF}
   vAuthRealm := AResponseInfo.AuthRealm;
-  If CommandExec  (RemoveBackslashCommands(ARequestInfo.URI),
+  If CommandExec  (TComponent(AContext),
+                   RemoveBackslashCommands(ARequestInfo.URI),
                    ARequestInfo.RawHTTPCommand,
                    ARequestInfo.ContentType,
                    AContext.Binding.PeerIP,
@@ -3179,6 +3185,45 @@ Begin
  FreeAndNil(lHandler);
  FreeAndNil(HTTPServer);
  Inherited;
+End;
+
+Procedure TRESTDWIdServicePooler.EchoPooler(ServerMethodsClass,
+                                            AContext            : TComponent;
+                                            Var Pooler,
+                                            MyIP                : String;
+                                            AccessTag           : String;
+                                            Var InvalidTag      : Boolean);
+Var
+ I : Integer;
+Begin
+ Inherited;
+ InvalidTag := False;
+ MyIP       := '';
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If (ServerMethodsClass.Components[i].ClassType  = TRESTDWPoolerDB)  Or
+        (ServerMethodsClass.Components[i].InheritsFrom(TRESTDWPoolerDB)) Or
+        (UpperCase(ServerMethodsClass.Components[i].ClassName) = 'TRESTDWPOOLERDB') Then
+      Begin
+       If Pooler = Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name]) Then
+        Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             InvalidTag := True;
+             Exit;
+            End;
+          End;
+         If AContext <> Nil Then
+          MyIP := TIdContext(AContext).Connection.Socket.Binding.PeerIP;
+         Break;
+        End;
+      End;
+    End;
+  End;
 End;
 
 Procedure TRESTDWIdServicePooler.CreatePostStream(AContext        : TIdContext;

@@ -324,8 +324,7 @@ end;
 Function TRESTDWBuffer.IndexOf(Const ABytes : TRESTDWBytes;
                                AStartPos    : Integer = 0) : Integer;
 Var
- i,
- j,
+ i, j,
  LEnd,
  BytesLen : Integer;
  LFound   : Boolean;
@@ -333,11 +332,12 @@ Begin
  Result := -1;
  If Size > 0 Then
   Begin
-   If restdwLength(ABytes) = 0 Then
+   If Length(ABytes) = 0  Then
     Raise eRESTDWException.Create(cBufferMissingTerminator);
-   If (AStartPos < 0) Or (AStartPos >= Size) Then
+   If (AStartPos < 0) Or
+      (AStartPos >= Size) Then
     Raise eRESTDWException.Create(cBufferInvalidStartPos);
-   BytesLen := restdwLength(ABytes);
+   BytesLen := Length(ABytes);
    LEnd := FHeadIndex + Size;
    For i := FHeadIndex + AStartPos To LEnd - BytesLen Do
     Begin

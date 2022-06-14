@@ -93,7 +93,9 @@ contains
   DWDCPbase64 in '..\..\Source\Basic\Crypto\DWDCPbase64.pas',
   DWDCPblockciphers in '..\..\Source\Basic\Crypto\DWDCPblockciphers.pas',
   DWDCPconst in '..\..\Source\Basic\Crypto\DWDCPconst.pas',
-  DWDCPcrypt2 in '..\..\Source\Basic\Crypto\DWDCPcrypt2.pas';
+  DWDCPcrypt2 in '..\..\Source\Basic\Crypto\DWDCPcrypt2.pas',
+  uRESTDWSqlEditor in '..\..\Source\Plugins\SQLEditor\uRESTDWSqlEditor.pas' {FrmDWSqlEditor},
+  uRESTDWUpdSqlEditor in '..\..\Source\Plugins\SQLEditor\uRESTDWUpdSqlEditor.pas' {FrmDWUpdSqlEditor};
 
 End.
 

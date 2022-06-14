@@ -1399,12 +1399,13 @@ Begin
  vSizeChar := 1;
  If SizeOf(WideChar) > 1 Then
   vSizeChar := 2;
- SetLength(Result, ASize * vSizeChar);
+// SetLength(Result, ASize * vSizeChar);
+ SetLength(Result, ASize);
  If ASize > 0 Then
   Begin
-   If vSizeChar = 2 Then
-    Move(AValue[InitStrPos], PRESTDWBytes(Result)^, Length(Result))
-   Else
+//   If vSizeChar = 2 Then
+//    Move(AValue[InitStrPos], PRESTDWBytes(Result)^, Length(Result))
+//   Else
     Move(AnsiString(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result));
   End;
 //  Move(PAnsiChar(AValue)^, PRESTDWBytes(Result)^, ASize);
