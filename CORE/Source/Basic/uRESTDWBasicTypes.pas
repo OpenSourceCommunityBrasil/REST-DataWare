@@ -23,7 +23,7 @@ unit uRESTDWBasicTypes;
  Roniery                    - Devel.
 }
 
-interface
+Interface
 
 Uses
  FMTBcd, uRESTDWConsts,

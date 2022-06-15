@@ -11170,7 +11170,7 @@ Begin
       For I := 0 To 1 Do
        Begin
         vRESTDataBase.ExecuteCommand(vActualPoolerMethodClient, vSQL, vParams, vError, vMessageError, LDataSetList,
-                                     vRowsAffected, False, BinaryRequest,  BinaryCompatibleMode, Fields.Count = 0, Nil);
+                                     vRowsAffected, False, BinaryRequest,  BinaryCompatibleMode, Fields.Count = 0, vRESTDataBase.RESTClientPooler);
         If Not(vError) or (vMessageError <> cInvalidAuth) Then
          Break
         Else

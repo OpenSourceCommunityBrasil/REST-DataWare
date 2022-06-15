@@ -348,7 +348,7 @@ Uses
 
 Implementation
 
-Uses uRESTDWConsts, uRESTDWException{$IFDEF RESTDWWINDOWS}, Windows{$ENDIF};
+Uses uRESTDWConsts, uRESTDWBase64, uRESTDWException{$IFDEF RESTDWWINDOWS}, Windows{$ENDIF};
 
 Function restdwMin(Const AValueOne,
                    AValueTwo        : Int64) : Int64;
@@ -3041,14 +3041,9 @@ Begin
  End;
 End;
 
-Function Base64Decode(const S: string): string;
-Var
- sa     : String;
+Function Base64Decode(const AInput : String) : TRESTDWBytes;
 Begin
- sa := Trim(StringReplace(S, '#$D#$A', '', [rfReplaceAll, rfIgnoreCase]));
- If Length(sa) Mod 4 <> 0 Then
-  Raise Exception.Create('Base64: Incorrect string format');
- Result := EncdDecd.DecodeString(sa);
+ Result := TRESTDWBase64.Decode(ToBytes(AInput));
 End;
 
 Function Decode64(const S: string): string;
@@ -3070,7 +3065,7 @@ Begin
    SA := S;
    If Pos(sLineBreak, SA) > 0 Then
     SA := StringReplace(SA, sLineBreak, '', [rfReplaceAll]);
-   Result := Base64Decode(SA);
+   Result := BytesToString(Base64Decode(SA));
   {$IFEND}
  {$ENDIF}
 End;

@@ -194,7 +194,7 @@ end;
 procedure TFrmDWSqlEditor.FormCreate(Sender: TObject);
 begin
  RESTDWClientSQLB          := TRESTDWClientSQL.Create(Self);
- RESTDWDatabase            := TRESTDWDatabasebaseBase(RESTDWDatabase.ClassType.Create);
+ RESTDWDatabase            := TRESTDWDatabasebaseBase.Create(Self);
  RESTDWClientSQLB.DataBase := RESTDWDatabase;
  vLastSelect               := '';
 end;

@@ -55,6 +55,10 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       object TabSheetSQL: TTabSheet
         BorderWidth = 5
         Caption = 'SQL Command'
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Memo: TMemo
           Left = 0
           Top = 0
@@ -250,6 +254,10 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
     object TabSheetTable: TTabSheet
       BorderWidth = 5
       Caption = 'RecordSet'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object DBGridRecord: TDBGrid
         Left = 0
         Top = 0

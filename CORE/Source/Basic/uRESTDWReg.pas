@@ -452,21 +452,21 @@ procedure TRESTDWClientSQLEditor.Edit;
 Begin
  {$IFNDEF FPC}
   {$IF CompilerVersion > 21}
-//   TRESTDWClientSQL(Component).SetInDesignEvents(True);
+   TRESTDWClientSQL(Component).SetInDesignEvents(True);
   {$IFEND}
  {$ENDIF}
  Try
   {$IFNDEF FPC}
    {$IF CompilerVersion < 21}
-//    TRESTDWClientSQL(Component).Close;
-//    TRESTDWClientSQL(Component).CreateDatasetFromList;
+    TRESTDWClientSQL(Component).Close;
+    TRESTDWClientSQL(Component).CreateDatasetFromList;
    {$IFEND}
   {$ENDIF}
-//  ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TDSDesignerDW);
+  ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TDSDesignerDW);
  Finally
   {$IFNDEF FPC}
    {$IF CompilerVersion > 21}
-//   TRESTDWClientSQL(Component).SetInDesignEvents(False);
+   TRESTDWClientSQL(Component).SetInDesignEvents(False);
    {$IFEND}
   {$ENDIF}
  End;
@@ -477,11 +477,11 @@ procedure TRESTDWClientSQLEditor.ExecuteVerb(Index: Integer);
  begin
   {$IFNDEF FPC}
    {$IF CompilerVersion < 21}
-//    TRESTDWClientSQL(DataSet).Close;
-//    TRESTDWClientSQL(DataSet).CreateDatasetFromList;
+    TRESTDWClientSQL(DataSet).Close;
+    TRESTDWClientSQL(DataSet).CreateDatasetFromList;
    {$IFEND}
   {$ENDIF}
-//  ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TDSDesignerDW);
+  ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TDSDesignerDW);
  End;
 Begin
  Case Index of
@@ -509,46 +509,46 @@ Function  TDSDesignerDW.DoCreateField(const FieldName: String; Origin: string): 
 Var
   F: TField;
   I: Integer;
-//  vDWClientSQL : TRESTDWClientSQL;
+  vDWClientSQL : TRESTDWClientSQL;
 Begin
  Result := Nil;
  Try
-//  If TRESTDWClientSQL(DataSet).FieldListCount > 0 Then
-//   Begin
-//    Try
-//     TRESTDWClientSQL(DataSet).Close;
-//     TRESTDWClientSQL(DataSet).CreateDatasetFromList;
-//    Finally
-//    End;
-//    If TRESTDWClientSQL.FieldDefExist(DataSet, FieldName) <> Nil Then
-//     Result := Inherited DoCreateField(FieldName, Origin);
-//   End;
+  If TRESTDWClientSQL(DataSet).FieldListCount > 0 Then
+   Begin
+    Try
+     TRESTDWClientSQL(DataSet).Close;
+     TRESTDWClientSQL(DataSet).CreateDatasetFromList;
+    Finally
+    End;
+    If TRESTDWClientSQL.FieldDefExist(DataSet, FieldName) <> Nil Then
+     Result := Inherited DoCreateField(FieldName, Origin);
+   End;
  Finally
  End;
-// If TRESTDWClientSQL(DataSet).FieldListCount = TRESTDWClientSQL(DataSet).FieldCount then
-//  Begin
-//   vDWClientSQL := TRESTDWClientSQL.Create(nil);
-//   Try
-//    With vDWClientSQL Do
-//     Begin
-//      DisableControls;
-//      DataBase := TRESTDWClientSQL(DataSet).DataBase;
-//      SQL.Text := TRESTDWClientSQL(DataSet).SQL.Text;
-//      Open;
-//      For I := 0 to Fields.Count - 1 do
-//       Begin
-//        F := Fields.Fields[I];
-//        If (pfInKey in F.ProviderFlags) Then
-//         TRESTDWClientSQL(DataSet).Fields.FieldByName(F.FieldName).ProviderFlags := F.ProviderFlags;
-//       End;
-//      Close;
-//      EnableControls;
-//     End;
-//   Finally
-//    FreeAndNil(vDWClientSQL);
-//   End;
-//   TRESTDWClientSQL(DataSet).Active := False;
-//  End;
+ If TRESTDWClientSQL(DataSet).FieldListCount = TRESTDWClientSQL(DataSet).FieldCount then
+  Begin
+   vDWClientSQL := TRESTDWClientSQL.Create(nil);
+   Try
+    With vDWClientSQL Do
+     Begin
+      DisableControls;
+      DataBase := TRESTDWClientSQL(DataSet).DataBase;
+      SQL.Text := TRESTDWClientSQL(DataSet).SQL.Text;
+      Open;
+      For I := 0 to Fields.Count - 1 do
+       Begin
+        F := Fields.Fields[I];
+        If (pfInKey in F.ProviderFlags) Then
+         TRESTDWClientSQL(DataSet).Fields.FieldByName(F.FieldName).ProviderFlags := F.ProviderFlags;
+       End;
+      Close;
+      EnableControls;
+     End;
+   Finally
+    FreeAndNil(vDWClientSQL);
+   End;
+   TRESTDWClientSQL(DataSet).Active := False;
+  End;
 End;
 
 Function TDSDesignerDW.SupportsAggregates: Boolean;
