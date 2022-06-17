@@ -2293,7 +2293,7 @@ Begin
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+ RESTClientPoolerExec.BinaryRequest    := BinaryRequest;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;

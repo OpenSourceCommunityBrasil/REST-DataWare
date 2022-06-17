@@ -5575,13 +5575,15 @@ Var
  I : Integer;
 Begin
  Result := False;
- If Assigned(Self) Then  //Alexandre Magno - 13/11/2018 (quando enviava sem parametro)
+ If Assigned(Self) Then
+  Begin
    For i := 0 To Self.Count - 1 Do
     Begin
      Result := Items[i].vObjectDirection In [odOUT, odINOUT];
      If Result Then
       Break;
     End;
+  End;
 End;
 
 Function TRESTDWParams.CountOutParams : Integer;

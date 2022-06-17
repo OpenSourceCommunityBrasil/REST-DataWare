@@ -2845,6 +2845,7 @@ Begin
  DWParams    := Nil;
  HttpRequest.Request.AcceptEncoding := AcceptEncoding;
  HttpRequest.Request.CustomHeaders.Clear;
+ HttpRequest.Request.CustomHeaders.NameValueSeparator := cNameValueSeparator;
  If Assigned(AHeaders) Then
   If AHeaders.Count > 0 Then
    HttpRequest.Request.CustomHeaders.FoldLines := False;
@@ -3423,6 +3424,7 @@ Procedure TRESTDWIdClientPooler.SetParams(TransparentProxy    : TProxyConnection
                                           AuthorizationParams : TRESTDWClientAuthOptionParams);
 Begin
  HttpRequest.DefaultCustomHeader.Clear;
+ HttpRequest.DefaultCustomHeader.NameValueSeparator := cNameValueSeparator;
  HttpRequest.AcceptEncoding              := AcceptEncoding;
  HttpRequest.AuthenticationOptions       := AuthorizationParams;
  HttpRequest.ProxyOptions.ProxyUsername  := TransparentProxy.ProxyUsername;
@@ -3632,7 +3634,6 @@ Var
              ParamsData.ItemsString[JSONParam.ParamName].SetValue(vValue, JSONParam.Encoded);
            Finally
             FreeAndNil(JSONParam);
-            //Magno - 28/08/2018
             FreeAndNil(bJsonOBJ);
            End;
           End;
@@ -3882,6 +3883,7 @@ Var
   vAccessURL,
   vWelcomeMessage,
   vUrl             : String;
+  A                : Integer;
   Function BuildValue(Name, Value : String) : String;
   Begin
    If vURL = URL + '?' Then
@@ -4015,10 +4017,17 @@ Var
          JSONValue.SetValue(ServerEventName, JSONValue.Encoded);
         Finally
          SendParams.AddFormField('dwservereventname', JSONValue.ToJSON);
-         //Magno - 28/08/2018
          FreeAndNil(JSONValue);
         End;
        End;
+//      Else
+//       Begin
+//        If Assigned(Params) Then
+//         Begin
+//          For A := 0 To Params.Count -1 Do
+//           SendParams.AddFormField(Params[A].ParamName, Params[A].AsString);
+//         End;
+//       End;
       SendParams.AddFormField('datacompression',   BooleanToString(Datacompress));
       SendParams.AddFormField('dwassyncexec',      BooleanToString(Assyncexec));
       SendParams.AddFormField('dwencodestrings',   BooleanToString(EncodedStrings));
@@ -4389,6 +4398,7 @@ Begin
  SetCharsetRequest(HttpRequest, Encoding);
  SetParams(ProxyOptions, RequestTimeout, ConnectTimeout, AuthenticationOptions);
  HttpRequest.MaxAuthRetries := 0;
+ HttpRequest.DefaultCustomHeader.NameValueSeparator := cNameValueSeparator;
  If BinaryRequest Then
   If HttpRequest.DefaultCustomHeader.IndexOfName('binaryrequest') = -1 Then
    HttpRequest.DefaultCustomHeader.AddPair('binaryrequest', 'true');

@@ -4187,7 +4187,6 @@ Begin
              Except
               On E : Exception Do
                Begin
-                 //Alexandre Magno - 22/01/2019
                 If DWParams.ItemsString['dwencodestrings'] <> Nil Then
                  vResult := EncodeStrings(e.Message{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                 Else
@@ -4339,16 +4338,14 @@ Begin
              Except
               On E : Exception Do
                Begin
-                 //Alexandre Magno - 22/01/2019
-                 If DWParams.ItemsString['dwencodestrings'] <> Nil Then
-                  vResult := EncodeStrings(e.Message{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
-                 Else
-                  vResult := e.Message;
+                If DWParams.ItemsString['dwencodestrings'] <> Nil Then
+                 vResult := EncodeStrings(e.Message{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                Else
+                 vResult := e.Message;
                 Result  := True;
                 If (ErrorCode <= 0)  Or
                    (ErrorCode = 200) Then
                  ErrorCode := 500;
-//                Exit;
                End;
              End;
             End

@@ -421,7 +421,6 @@ Type
                                      AuthenticationOptions : TRESTDWClientAuthOptionParams);
   Function    GetRestPoolers : TStringList;          //Retorna a Lista de DataSet Sources do Pooler
  Protected
-   //Magno
   Procedure Loaded; override;
  Public
   Procedure DestroyClientPooler;
@@ -934,9 +933,8 @@ Type
   Property UpdateSQL               : TRESTDWUpdateSQL      Read GetUpdateSQL              Write SetUpdateSQL;
   Property OnCalcFields            : TDatasetEvents        Read vOnCalcFields             Write vOnCalcFields;
   Property OnNewRecord             : TDatasetEvents        Read vNewRecord                Write vNewRecord;
-  Property MassiveCache            : TRESTDWMassiveCache       Read GetMassiveCache           Write SetMassiveCache;
+  Property MassiveCache            : TRESTDWMassiveCache   Read GetMassiveCache           Write SetMassiveCache;
   Property Filtered                : Boolean               Read vFiltered                 Write SetFilteredB;
-//  Property DWResponseTranslator    : TDWResponseTranslator Read GetDWResponseTranslator   Write SetDWResponseTranslator;
   Property ActionCursor            : TCursor               Read vActionCursor             Write vActionCursor;
   Property ReflectChanges          : Boolean               Read vReflectChanges           Write SetReflectChanges;
 End;
@@ -1740,11 +1738,10 @@ End;
 
 Procedure TRESTDWPoolerDB.SetConnection(Value : TRESTDWDriver);
 Begin
-  //Alexandre Magno - 25/11/2018
-  if vRESTDriver <> Value then
-    vRESTDriver := Value;
-  if vRESTDriver <> nil then
-    vRESTDriver.FreeNotification(Self);
+ If vRESTDriver <> Value Then
+  vRESTDriver := Value;
+ If vRESTDriver <> Nil   Then
+  vRESTDriver.FreeNotification(Self);
 End;
 
 Function TRESTDWPoolerDB.InsertMySQLReturnID(SQL              : String;
@@ -1792,15 +1789,13 @@ Begin
   End;
 End;
 
-procedure TRESTDWPoolerDB.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  //Alexandre Magno - 25/11/2018
-  if (Operation = opRemove) and (AComponent = vRESTDriver) then
-  begin
-    vRESTDriver := nil;
-  end;
-  inherited Notification(AComponent, Operation);
-end;
+Procedure TRESTDWPoolerDB.Notification(AComponent: TComponent; Operation: TOperation);
+Begin
+ If (Operation  = opRemove)    And
+    (AComponent = vRESTDriver) Then
+  vRESTDriver := Nil;
+ Inherited Notification(AComponent, Operation);
+End;
 
 Function TRESTDWPoolerDB.ExecuteCommand(SQL              : String;
                                         Var Error        : Boolean;
@@ -3148,7 +3143,7 @@ Begin
    Try
     Result := vRESTConnectionDB.GetTableNames(vRestPooler, vRestURL, TableNames,
                                               Result,      MessageError, SocketError, vTimeOut, vConnectTimeOut,
-                                              vClientConnectionDefs.vConnectionDefs);
+                                              vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     If SocketError Then
      Begin
       If vFailOver Then
@@ -3272,7 +3267,7 @@ Begin
    Try
     Result := vRESTConnectionDB.GetFieldNames(vRestPooler, vRestURL, TableName, FieldNames,
                                               Result,      MessageError, SocketError, vTimeOut, vConnectTimeOut,
-                                              vClientConnectionDefs.vConnectionDefs);
+                                              vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     If SocketError Then
      Begin
       If vFailOver Then
@@ -3397,7 +3392,7 @@ Begin
     FieldNames.Clear;
     Result := vRESTConnectionDB.GetKeyFieldNames(vRestPooler, vRestURL, TableName, FieldNames,
                                                  Result,      MessageError, SocketError, vTimeOut, vConnectTimeOut,
-                                                 vClientConnectionDefs.vConnectionDefs);
+                                                 vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     If SocketError Then
      Begin
       If vFailOver Then
@@ -3584,7 +3579,7 @@ Begin
    Begin
     vLinesDS := vRESTConnectionDB.OpenDatasets(vLinesDS, vRestPooler,  vRestURL,
                                                Error,    MessageError, SocketError, vTimeOut, vConnectTimeOut,
-                                               vClientConnectionDefs.vConnectionDefs);
+                                               vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     If Not(Error) or (MessageError <> cInvalidAuth) Then
      Break
     Else
@@ -3700,7 +3695,7 @@ Begin
        vJsonCount  := 0;
        vJSONValue  := TJSONValue.Create;
        vJSONValue.Utf8SpecialChars := True;
-       Try //Alexandre Magno - 21/01/2019 - Add Try Finally para remover memoryleaks
+       Try
         vJSONValue.Encoding := vEncoding;
         If Not TRESTDWClientSQL(Datasets[I]).BinaryRequest Then
          Begin
@@ -4390,7 +4385,7 @@ Begin
  vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
  Result := TStringList.Create;
  Try
-  vTempList := vConnection.GetServerEvents(vRestURL, vTimeOut, vConnectTimeOut);
+  vTempList := vConnection.GetServerEvents(vRestURL, vTimeOut, vConnectTimeOut, vRESTClientPooler);
   Try
    If Assigned(vTempList) Then
     For I := 0 To vTempList.Count -1 do
@@ -4577,7 +4572,7 @@ Begin
        Begin
         ResultData := vRESTConnectionDB.ProcessMassiveSQLCache(vUpdateLine, vRestPooler,  vRestURL,
                                                                Error,       MessageError, SocketError, vTimeOut, vConnectTimeOut,
-                                                               vClientConnectionDefs.vConnectionDefs);
+                                                               vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
         If Not(Error) or (MessageError <> cInvalidAuth) Then
          Break
         Else
@@ -4741,7 +4736,7 @@ Begin
        Begin
         ResultData := vRESTConnectionDB.ProcessMassiveSQLCache(vUpdateLine, vRestPooler,  vRestURL,
                                                                Error,       MessageError, SocketError, vTimeOut, vConnectTimeOut,
-                                                               vClientConnectionDefs.vConnectionDefs);
+                                                               vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
         If Not(Error) or (MessageError <> cInvalidAuth) Then
          Break
         Else
@@ -4918,7 +4913,7 @@ Begin
    Begin
     vLinesDS := vRESTConnectionDB.ApplyUpdates(vLinesDS, vRestPooler,  vRestURL,
                                                Error,    MessageError, SocketError, vTimeOut, vConnectTimeOut,
-                                               vClientConnectionDefs.vConnectionDefs);
+                                               vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     If Not(Error) or (MessageError <> cInvalidAuth) Then
      Break
     Else
@@ -5177,7 +5172,7 @@ Begin
         ResultData := vRESTConnectionDB.ApplyUpdates_MassiveCache(vUpdateLine, vRestPooler,  vRestURL,
                                                                   Error,       MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                                   vClientConnectionDefs.vConnectionDefs,
-                                                                  MassiveCache.ReflectChanges);
+                                                                  MassiveCache.ReflectChanges, vRESTClientPooler);
         If Not(Error) or (MessageError <> cInvalidAuth) Then
          Break
         Else
@@ -5351,21 +5346,21 @@ Begin
  Connection.EncodeStrings             := EncodeStrings;
  Connection.Encoding                  := Encoding;
  Connection.AccessTag                 := AccessTag;
- if assigned(ConnectionExec) then  //Leandro 11/08/2020
-  begin
-    ConnectionExec.Host                  := Connection.Host;
-    ConnectionExec.Port                  := Connection.Port;
-    ConnectionExec.DataCompression       := Connection.Compression;
-    ConnectionExec.TypeRequest           := Connection.TypeRequest;
-    ConnectionExec.WelcomeMessage        := Connection.WelcomeMessage;
-    ConnectionExec.EncodedStrings        := Connection.EncodeStrings;
-    ConnectionExec.SetAccessTag(Connection.AccessTag);
-    ConnectionExec.Encoding              := Connection.Encoding;
-    ConnectionExec.AuthenticationOptions.Assign(AuthenticationOptions);
-    {$IFDEF FPC}
-     ConnectionExec.DatabaseCharSet := csUndefined;
-    {$ENDIF}
-  end;
+ If assigned(ConnectionExec) then  //Leandro 11/08/2020
+  Begin
+   ConnectionExec.Host                  := Connection.Host;
+   ConnectionExec.Port                  := Connection.Port;
+   ConnectionExec.DataCompression       := Connection.Compression;
+   ConnectionExec.TypeRequest           := Connection.TypeRequest;
+   ConnectionExec.WelcomeMessage        := Connection.WelcomeMessage;
+   ConnectionExec.EncodedStrings        := Connection.EncodeStrings;
+   ConnectionExec.SetAccessTag(Connection.AccessTag);
+   ConnectionExec.Encoding              := Connection.Encoding;
+   ConnectionExec.AuthenticationOptions.Assign(AuthenticationOptions);
+   {$IFDEF FPC}
+    ConnectionExec.DatabaseCharSet := csUndefined;
+   {$ENDIF}
+  End;
 End;
 
 Function  TRESTDWDatabasebaseBase.TryConnect : Boolean;
@@ -7176,8 +7171,7 @@ Begin
      Begin
       vReadData := False;
       Abort;
-     End; //Correção enviada por Endrigo Rodriguez
-     //Alexande Magno - 28/11/2018 - Pedido do Magnele
+     End;
     On E : Exception do
      begin
       vReadData := False;
@@ -7880,117 +7874,116 @@ Begin
         For A := 0 To bJsonArray.ElementCount -1 Do
          Begin
           bJsonValueC := bJsonArray.GetObject(A);
-          //Alexandre Magno - 20/01/2019 - ADD Try Finally
-          try
-            If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name) <> Nil Then
-             Begin
-              vOldReadOnly := Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly;
-              Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly := False;
-              If (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value = 'null') Or
-                 (Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly) Then
-               Begin
-                If Not (Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly) Then
-                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-                Continue;
-               End;
-              If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
-                                                                        ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                                        ftString,    ftWideString,
-                                                                        ftMemo, ftFmtMemo {$IFNDEF FPC}
-                                                                                {$IF CompilerVersion > 21}
-                                                                                        , ftWideMemo
-                                                                                 {$IFEND}
-                                                                                {$ENDIF}]    Then
-               Begin
-                If (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value <> Null) And
-                   (Trim(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value) <> 'null') Then
-                 Begin
-                  vValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}); //TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value;
-                  {$IFNDEF FPC}{$IF CompilerVersion < 18}
-                  vValue := utf8Decode(vValue);
-                  {$IFEND}{$ENDIF}
-                  If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Size > 0 Then
-                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsString := Copy(vValue, 1, Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Size)
-                  Else
-                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsString := vValue;
-                 End
-                Else
-                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-               End
-              Else
-               Begin
-                If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF} ftLargeint] Then
-                 Begin
-                  If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
-                   Begin
-                    If TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value <> Null Then
-                     Begin
-                      If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
-                       Begin
-                        {$IFNDEF FPC}
-                         {$IF CompilerVersion > 21}Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-                         {$ELSE} Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger                    := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-                         {$IFEND}
-                        {$ELSE}
-                         Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-                        {$ENDIF}
-                       End
-                      Else
-                       Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger  := StrToInt(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-                     End;
-                   End
-                  Else
-                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-                 End
-                Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd{$IFNDEF FPC}{$IF CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
-                 Begin
-                  If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
-                   Begin
-                    {$IFNDEF FPC}
-                     Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value   := StrToFloat(BuildFloatString(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
-                    {$ELSE}
-                     Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsFloat := StrToFloat(BuildFloatString(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
-                    {$ENDIF}
-                   End
-                  Else
-                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-                 End
-                Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
-                 Begin
-                  If (Not (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull)) Then
-                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsDateTime  := UnixToDateTime(StrToInt64(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value))
-                  Else
-                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-                 End  //Tratar Blobs de Parametros...
-                Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftBytes, ftVarBytes, ftBlob,
-                                                                               ftGraphic, ftOraBlob, ftOraClob] Then
-                 Begin
-                  Try
-                   If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
+          Try
+           If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name) <> Nil Then
+            Begin
+             vOldReadOnly := Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly;
+             Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly := False;
+             If (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value = 'null') Or
+                (Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly) Then
+              Begin
+               If Not (Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly) Then
+                Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+               Continue;
+              End;
+             If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                                                                       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                                                       ftString,    ftWideString,
+                                                                       ftMemo, ftFmtMemo {$IFNDEF FPC}
+                                                                               {$IF CompilerVersion > 21}
+                                                                                       , ftWideMemo
+                                                                                {$IFEND}
+                                                                               {$ENDIF}]    Then
+              Begin
+               If (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value <> Null) And
+                  (Trim(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value) <> 'null') Then
+                Begin
+                 vValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}); //TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value;
+                 {$IFNDEF FPC}{$IF CompilerVersion < 18}
+                 vValue := utf8Decode(vValue);
+                 {$IFEND}{$ENDIF}
+                 If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Size > 0 Then
+                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsString := Copy(vValue, 1, Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Size)
+                 Else
+                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsString := vValue;
+                End
+               Else
+                Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+              End
+             Else
+              Begin
+               If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF} ftLargeint] Then
+                Begin
+                 If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
+                  Begin
+                   If TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value <> Null Then
                     Begin
-                     vStringStream := DecodeStream(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value);
-                     vStringStream.Position := 0;
-                     TBlobfield(Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name)).LoadFromStream(vStringStream);
-                    End
-                   Else
-                    Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-                  Finally
-                   If Assigned(vStringStream) Then
-                    FreeAndNil(vStringStream);
-                  End;
-                 End
-                Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftBoolean] Then
-                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsBoolean := StringToBoolean(vValue)
-                Else If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
-                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF})
-                Else
-                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-               End;
-              Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly := vOldReadOnly;
-             End;
-          finally
-            FreeAndNil(bJsonValueC);
-          end;
+                     If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+                      Begin
+                       {$IFNDEF FPC}
+                        {$IF CompilerVersion > 21}Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+                        {$ELSE} Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger                    := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+                        {$IFEND}
+                       {$ELSE}
+                        Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+                       {$ENDIF}
+                      End
+                     Else
+                      Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger  := StrToInt(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+                    End;
+                  End
+                 Else
+                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+                End
+               Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd{$IFNDEF FPC}{$IF CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
+                Begin
+                 If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
+                  Begin
+                   {$IFNDEF FPC}
+                    Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value   := StrToFloat(BuildFloatString(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
+                   {$ELSE}
+                    Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsFloat := StrToFloat(BuildFloatString(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
+                   {$ENDIF}
+                  End
+                 Else
+                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+                End
+               Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+                Begin
+                 If (Not (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull)) Then
+                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsDateTime  := UnixToDateTime(StrToInt64(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value))
+                 Else
+                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+                End  //Tratar Blobs de Parametros...
+               Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftBytes, ftVarBytes, ftBlob,
+                                                                              ftGraphic, ftOraBlob, ftOraClob] Then
+                Begin
+                 Try
+                  If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
+                   Begin
+                    vStringStream := DecodeStream(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value);
+                    vStringStream.Position := 0;
+                    TBlobfield(Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name)).LoadFromStream(vStringStream);
+                   End
+                  Else
+                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+                 Finally
+                  If Assigned(vStringStream) Then
+                   FreeAndNil(vStringStream);
+                 End;
+                End
+               Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftBoolean] Then
+                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsBoolean := StringToBoolean(vValue)
+               Else If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
+                Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF})
+               Else
+                Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+              End;
+             Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly := vOldReadOnly;
+            End;
+          Finally
+           FreeAndNil(bJsonValueC);
+          End;
          End;
         Self.Post;
        End;
@@ -8067,117 +8060,116 @@ Begin
         For A := 0 To bJsonArray.ElementCount -1 Do
          Begin
           bJsonValueC := bJsonArray.GetObject(A);
-          //Alexandre Magno - 20/01/2019 - ADD Try Finally
-          try
-            If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name) <> Nil Then
-             Begin
-              vOldReadOnly := Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly;
-              Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly := False;
-              If (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value = 'null') Or
-                 (Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly) Then
-               Begin
-                If Not (Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly) Then
-                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-                Continue;
-               End;
-              If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
-                                                                        ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                                        ftString,    ftWideString,
-                                                                        ftMemo, ftFmtMemo {$IFNDEF FPC}
-                                                                                {$IF CompilerVersion > 21}
-                                                                                        , ftWideMemo
-                                                                                 {$IFEND}
-                                                                                {$ENDIF}]    Then
-               Begin
-                If (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value <> Null) And
-                   (Trim(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value) <> 'null') Then
-                 Begin
-                  vValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}); //TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value;
-                  {$IFNDEF FPC}{$IF CompilerVersion < 18}
-                  vValue := utf8Decode(vValue);
-                  {$IFEND}{$ENDIF}
-                  If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Size > 0 Then
-                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsString := Copy(vValue, 1, Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Size)
-                  Else
-                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsString := vValue;
-                 End
-                Else
-                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-               End
-              Else
-               Begin
-                If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF} ftLargeint] Then
-                 Begin
-                  If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
-                   Begin
-                    If TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value <> Null Then
-                     Begin
-                      If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
-                       Begin
-                        {$IFNDEF FPC}
-                         {$IF CompilerVersion > 21}Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-                         {$ELSE} Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger                    := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-                         {$IFEND}
-                        {$ELSE}
-                         Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-                        {$ENDIF}
-                       End
-                      Else
-                       Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger  := StrToInt(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-                     End;
-                   End
-                  Else
-                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-                 End
-                Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd{$IFNDEF FPC}{$IF CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
-                 Begin
-                  If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
-                   Begin
-                    {$IFNDEF FPC}
-                     Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value   := StrToFloat(BuildFloatString(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
-                    {$ELSE}
-                     Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsFloat := StrToFloat(BuildFloatString(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
-                    {$ENDIF}
-                   End
-                  Else
-                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-                 End
-                Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
-                 Begin
-                  If (Not (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull)) Then
-                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsDateTime  := UnixToDateTime(StrToInt64(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value))
-                  Else
-                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-                 End  //Tratar Blobs de Parametros...
-                Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftBytes, ftVarBytes, ftBlob,
-                                                                               ftGraphic, ftOraBlob, ftOraClob] Then
-                 Begin
-                  Try
-                   If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
+          Try
+           If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name) <> Nil Then
+            Begin
+             vOldReadOnly := Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly;
+             Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly := False;
+             If (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value = 'null') Or
+                (Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly) Then
+              Begin
+               If Not (Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly) Then
+                Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+               Continue;
+              End;
+             If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
+                                                                       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                                                       ftString,    ftWideString,
+                                                                       ftMemo, ftFmtMemo {$IFNDEF FPC}
+                                                                               {$IF CompilerVersion > 21}
+                                                                                       , ftWideMemo
+                                                                                {$IFEND}
+                                                                               {$ENDIF}]    Then
+              Begin
+               If (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value <> Null) And
+                  (Trim(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value) <> 'null') Then
+                Begin
+                 vValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}); //TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value;
+                 {$IFNDEF FPC}{$IF CompilerVersion < 18}
+                 vValue := utf8Decode(vValue);
+                 {$IFEND}{$ENDIF}
+                 If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Size > 0 Then
+                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsString := Copy(vValue, 1, Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Size)
+                 Else
+                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsString := vValue;
+                End
+               Else
+                Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+              End
+             Else
+              Begin
+               If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF} ftLargeint] Then
+                Begin
+                 If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
+                  Begin
+                   If TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value <> Null Then
                     Begin
-                     vStringStream := DecodeStream(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value);
-                     vStringStream.Position := 0;
-                     TBlobfield(Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name)).LoadFromStream(vStringStream);
-                    End
-                   Else
-                    Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-                  Finally
-                   If Assigned(vStringStream) Then
-                    FreeAndNil(vStringStream);
-                  End;
-                 End
-                Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftBoolean] Then
-                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsBoolean := StringToBoolean(vValue)
-                Else If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
-                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF})
-                Else
-                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
-               End;
-              Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly := vOldReadOnly;
-             End;
-          finally
-            FreeAndNil(bJsonValueC);
-          end;
+                     If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+                      Begin
+                       {$IFNDEF FPC}
+                        {$IF CompilerVersion > 21}Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+                        {$ELSE} Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger                    := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+                        {$IFEND}
+                       {$ELSE}
+                        Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+                       {$ENDIF}
+                      End
+                     Else
+                      Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger  := StrToInt(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+                    End;
+                  End
+                 Else
+                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+                End
+               Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd{$IFNDEF FPC}{$IF CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
+                Begin
+                 If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
+                  Begin
+                   {$IFNDEF FPC}
+                    Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value   := StrToFloat(BuildFloatString(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
+                   {$ELSE}
+                    Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsFloat := StrToFloat(BuildFloatString(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
+                   {$ENDIF}
+                  End
+                 Else
+                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+                End
+               Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+                Begin
+                 If (Not (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull)) Then
+                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsDateTime  := UnixToDateTime(StrToInt64(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value))
+                 Else
+                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+                End  //Tratar Blobs de Parametros...
+               Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftBytes, ftVarBytes, ftBlob,
+                                                                              ftGraphic, ftOraBlob, ftOraClob] Then
+                Begin
+                 Try
+                  If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
+                   Begin
+                    vStringStream := DecodeStream(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value);
+                    vStringStream.Position := 0;
+                    TBlobfield(Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name)).LoadFromStream(vStringStream);
+                   End
+                  Else
+                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+                 Finally
+                  If Assigned(vStringStream) Then
+                   FreeAndNil(vStringStream);
+                 End;
+                End
+               Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftBoolean] Then
+                Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsBoolean := StringToBoolean(vValue)
+               Else If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
+                Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF})
+               Else
+                Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
+              End;
+             Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).ReadOnly := vOldReadOnly;
+            End;
+          Finally
+           FreeAndNil(bJsonValueC);
+          End;
          End;
         Self.Post;
        End;
@@ -8275,7 +8267,7 @@ Begin
              End
             Else If State = dsInactive Then
              PrepareDetails(False);
-            vInBlockEvents := False; //Alexandre Magno - 09/10/2018
+            vInBlockEvents := False;
            Except
             On E : Exception do
              Begin
@@ -8405,7 +8397,7 @@ Begin
              End
             Else If State = dsInactive Then
              PrepareDetails(False);
-            vInBlockEvents := False; //Alexandre Magno - 09/10/2018
+            vInBlockEvents := False;
            Except
             On E : Exception do
              Begin
@@ -8441,7 +8433,6 @@ Begin
             End
            Else If State = dsInactive Then
             PrepareDetails(False);
-  //         vInBlockEvents := False; //Alexandre Magno - 09/10/2018
           End
          Else
           Begin
@@ -9490,7 +9481,7 @@ Begin
       Raise Exception.Create(vError)
      Else
       Begin
-       If Assigned(vAfterDelete) Then  //Alexandre Magno
+       If Assigned(vAfterDelete) Then
         vAfterDelete(Self);
        ProcAfterScroll(Dataset);
       End;
@@ -10359,9 +10350,8 @@ Begin
    vDetailClient        := TRESTDWClientSQL(vMasterDetailList.Items[I].DataSet);
    If vDetailClient <> Nil Then
     Begin
-     for J := 0 to vDetailClient.Params.Count -1 do //Alexandre Magno - 09/10/2018 - Limpa parametros
-       vDetailClient.Params[J].Clear;
-
+     For J := 0 to vDetailClient.Params.Count -1 do
+      vDetailClient.Params[J].Clear;
      If vDetailClient.Active Then
       Begin
        vOldInBlock   := vDetailClient.GetInBlockEvents;
@@ -10544,8 +10534,8 @@ Begin
    If vDetailClient <> Nil Then
     Begin
      vDetailClient.vInactive := False;
-     for J := 0 to vDetailClient.Params.Count -1 do //Alexandre Magno - 09/10/2018 - Limpa parametros
-       vDetailClient.Params[J].Clear;
+     For J := 0 to vDetailClient.Params.Count -1 Do
+      vDetailClient.Params[J].Clear;
      If CloneDetails(vDetailClient) Then
       Begin
        vDetailClient.Active := False;
@@ -11007,14 +10997,13 @@ Begin
         End;
        Result := True;
       Except
-        //Alexandre Magno - 16/01/2019
-        On E: Exception Do
-         Begin
-          If Assigned(vStream) Then
-           FreeAndNil(vStream);
-          If Assigned(LDataSetList) Then
-           FreeAndNil(LDataSetList);
-          Raise Exception.Create(E.Message);
+       On E: Exception Do
+        Begin
+         If Assigned(vStream) Then
+          FreeAndNil(vStream);
+         If Assigned(LDataSetList) Then
+          FreeAndNil(LDataSetList);
+         Raise Exception.Create(E.Message);
         End;
       End;
      End;
@@ -11333,19 +11322,17 @@ Begin
         End;
        Result := True;
       Except
-        //Alexandre Magno - 16/01/2019
-        On E: Exception Do
-         Begin
-          If Assigned(vStream) Then
-           FreeAndNil(vStream);
-          If Assigned(LDataSetList) Then
-           FreeAndNil(LDataSetList);
-          Raise Exception.Create(E.Message);
+       On E: Exception Do
+        Begin
+         If Assigned(vStream) Then
+          FreeAndNil(vStream);
+         If Assigned(LDataSetList) Then
+          FreeAndNil(LDataSetList);
+         Raise Exception.Create(E.Message);
         End;
       End;
      End;
    Except
-     //Alexandre Magno - 16/01/2019
     On E: Exception Do
      Raise Exception.Create(E.Message);
    End;
@@ -11724,27 +11711,18 @@ Begin
      End;
     Exit;
    End;
-  If (vActive) Then//And (Assigned(vDWResponseTranslator)) Then
+  If (vActive) Then
    vActive := False;
-//  If Assigned(vDWResponseTranslator) Then
-//   Begin
-//    If vDWResponseTranslator.FieldDefs.Count <> FieldDefs.Count Then
-//     FieldDefs.Clear;
-//   End;
-//  If ((vDWResponseTranslator <> Nil) Or (vRESTDataBase <> Nil)) And (Value) Then
   If ((vRESTDataBase <> Nil)) And (Value) Then
    Begin
-//    If Not Assigned(vDWResponseTranslator) Then
-//     Begin
-      If vRESTDataBase <> Nil Then
-       If Not vRESTDataBase.Active Then
-        vRESTDataBase.Active := True;
-      If Not vRESTDataBase.Active then
-       Begin
-        vActive := False;
-        Exit;
-       End;
-//     End;
+    If vRESTDataBase <> Nil Then
+     If Not vRESTDataBase.Active Then
+      vRESTDataBase.Active := True;
+    If Not vRESTDataBase.Active then
+     Begin
+      vActive := False;
+      Exit;
+     End;
     Try
      If (Not(vActive) And (Value)) Or (GetNewData) Or (vInDesignEvents) Then
       Begin
@@ -11792,18 +11770,22 @@ Begin
   Else
    Begin
     vInDesignEvents := False;
+    Self.Close;
     If Not InLoadFromStream Then
      Begin
       vActive := False;
-      Close;
       If Not (csLoading in ComponentState) And
          Not (csReading in ComponentState) Then
-       If Value Then
-        If vRESTDataBase = Nil Then
+       Begin
+        If Value Then
          Begin
-          If (vRaiseError) Then
-           Raise Exception.Create(PChar(cEmptyDBName));
+          If vRESTDataBase = Nil Then
+           Begin
+            If (vRaiseError) Then
+             Raise Exception.Create(PChar(cEmptyDBName));
+           End;
          End;
+       End;
      End;
    End;
  Finally

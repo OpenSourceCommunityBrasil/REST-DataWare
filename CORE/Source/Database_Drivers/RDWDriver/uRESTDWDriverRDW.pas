@@ -527,7 +527,6 @@ End;
 
 Procedure TRESTDWDriverRDW.Notification(AComponent: TComponent; Operation: TOperation);
 Begin
- //Alexandre Magno - 25/11/2018
  If (Operation  = opRemove)      And
     (AComponent = vFDConnection) Then
   vFDConnection := Nil;
@@ -728,7 +727,6 @@ End;
 
 Procedure TRESTDWDriverRDW.SetConnection(Value : TRESTDWDataBase);
 Begin
- //Alexandre Magno - 25/11/2018
  If vFDConnection <> Value Then vFDConnection := Value;
  If vFDConnection <> Nil   Then vFDConnection.FreeNotification(Self);
 End;

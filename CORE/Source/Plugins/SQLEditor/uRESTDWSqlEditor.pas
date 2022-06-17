@@ -90,9 +90,12 @@ Const
   vOldSQL            : String;
   Procedure SetFields;
   Function  BuildSQL : String;
+  Procedure SetDatabase(Value : TRESTDWDatabasebaseBase);
  Public
   { Public declarations }
   Procedure SetClientSQL(Value : TRESTDWClientSQL);
+  Property  Database : TRESTDWDatabasebaseBase Read RESTDWDatabase Write SetDatabase;
+
  End;
 
  Type
@@ -128,9 +131,9 @@ Begin
  FrmDWSqlEditor := TFrmDWSqlEditor.Create(Application);
  Try
   objObj        := TRESTDWClientSQL(GetComponent(0));
+//  FrmDWSqlEditor.Database := objObj.DataBase;
   FrmDWSqlEditor.SetClientSQL(objObj);
   FrmDWSqlEditor.ShowModal;
-  {ELOY}
   objObj        := Nil;
   FrmDWSqlEditor.Free;
  Except
@@ -175,12 +178,11 @@ begin
    {$IFNDEF FPC}Action:={$ELSE}CloseAction:={$ENDIF}caNone;
    Exit;
   End;
- {ELOY}
  {$IFNDEF FPC}
  RESTDWClientSQLB.Active := False;
  FreeAndNil(RESTDWClientSQLB);
- RESTDWDatabase.Active   := False;
- FreeAndNil(RESTDWDatabase);
+ If Assigned(RESTDWDatabase) Then
+  RESTDWDatabase.Active   := False;
  FreeAndNil(DataSource);
  Release;
  {$ENDIF}
@@ -193,10 +195,8 @@ end;
 
 procedure TFrmDWSqlEditor.FormCreate(Sender: TObject);
 begin
- RESTDWClientSQLB          := TRESTDWClientSQL.Create(Self);
- RESTDWDatabase            := TRESTDWDatabasebaseBase.Create(Self);
- RESTDWClientSQLB.DataBase := RESTDWDatabase;
- vLastSelect               := '';
+ RESTDWClientSQLB := TRESTDWClientSQL.Create(Self);
+ vLastSelect      := '';
 end;
 
 procedure TFrmDWSqlEditor.FormShow(Sender: TObject);
@@ -244,44 +244,31 @@ Begin
  RESTDWClientSQL           := Value;
  vOldSQL                   := RESTDWClientSQL.SQL.Text;
  Memo.Lines.Text           := vOldSQL;
- If RESTDWClientSQL.DataBase <> Nil Then
+ If Assigned(RESTDWClientSQL) Then
   Begin
-   RESTDWDatabase.AccessTag             := RESTDWClientSQL.DataBase.AccessTag;
-   RESTDWDatabase.Encoding              := RESTDWClientSQL.DataBase.Encoding;
-   RESTDWDatabase.Context               := RESTDWClientSQL.DataBase.Context;
-   RESTDWDatabase.EncodedStrings        := RESTDWClientSQL.DataBase.EncodedStrings;
-   RESTDWDatabase.Compression           := RESTDWClientSQL.DataBase.Compression;
-   RESTDWDatabase.ParamCreate           := RESTDWClientSQL.DataBase.ParamCreate;
-   RESTDWDatabase.PoolerName            := RESTDWClientSQL.DataBase.PoolerName;
-   RESTDWDatabase.PoolerPort            := RESTDWClientSQL.DataBase.PoolerPort;
-   RESTDWDatabase.PoolerService         := RESTDWClientSQL.DataBase.PoolerService;
-   RESTDWDatabase.PoolerURL             := RESTDWClientSQL.DataBase.PoolerURL;
-   RESTDWDatabase.Proxy                 := RESTDWClientSQL.DataBase.Proxy;
-   RESTDWDatabase.ProxyOptions.Server   := RESTDWClientSQL.DataBase.ProxyOptions.Server;
-   RESTDWDatabase.ProxyOptions.Port     := RESTDWClientSQL.DataBase.ProxyOptions.Port;
-   RESTDWDatabase.ProxyOptions.Login    := RESTDWClientSQL.DataBase.ProxyOptions.Login;
-   RESTDWDatabase.ProxyOptions.Password := RESTDWClientSQL.DataBase.ProxyOptions.Password;
-   RESTDWDatabase.RequestTimeOut        := RESTDWClientSQL.DataBase.RequestTimeOut;
-   RESTDWDatabase.TypeRequest           := RESTDWClientSQL.DataBase.TypeRequest;
-   RESTDWDatabase.WelcomeMessage        := RESTDWClientSQL.DataBase.WelcomeMessage;
-   RESTDWDatabase.CriptOptions.Use      := RESTDWClientSQL.DataBase.CriptOptions.Use;
-   RESTDWDatabase.CriptOptions.Key      := RESTDWClientSQL.DataBase.CriptOptions.Key;
-   RESTDWDatabase.DataRoute             := RESTDWClientSQL.DataBase.DataRoute;
-   RESTDWDatabase.ServerContext         := RESTDWClientSQL.DataBase.ServerContext;
-   RESTDWDatabase.AuthenticationOptions.Assign(RESTDWClientSQL.DataBase.AuthenticationOptions);
-   vMemString                           := TStringList.Create;
-   Try
-    RESTDWDatabase.GetTableNames(vMemString);
-    lbTables.Items.Text                 := vMemString.Text;
-    If lbTables.Count > 0 Then
-     Begin
-      lbTables.ItemIndex                 := 0;
-      SetFields;
+   RESTDWDatabase            := RESTDWClientSQL.DataBase;
+   RESTDWClientSQLB.DataBase := RESTDWDatabase;
+   If RESTDWClientSQL.DataBase <> Nil Then
+    Begin
+     vMemString                           := TStringList.Create;
+     Try
+      RESTDWDatabase.GetTableNames(vMemString);
+      lbTables.Items.Text                 := vMemString.Text;
+      If lbTables.Count > 0 Then
+       Begin
+        lbTables.ItemIndex                 := 0;
+        SetFields;
+       End;
+     Finally
+      FreeAndNil(vMemString);
      End;
-   Finally
-    FreeAndNil(vMemString);
-   End;
+    End;
   End;
+End;
+
+Procedure TFrmDWSqlEditor.SetDatabase(Value : TRESTDWDatabasebaseBase);
+Begin
+ RESTDWClientSQLB.DataBase := Value;
 End;
 
 procedure TFrmDWSqlEditor.FormResize(Sender: TObject);

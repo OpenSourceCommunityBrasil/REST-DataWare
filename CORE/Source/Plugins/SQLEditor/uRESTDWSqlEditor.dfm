@@ -27,6 +27,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitTop = -6
     object PnlButton: TPanel
       Left = 958
       Top = 0
@@ -35,6 +36,8 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 0
+      ExplicitLeft = 961
+      ExplicitTop = -6
       object BtnExecute: TButton
         Left = 8
         Top = 20
@@ -48,27 +51,25 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
     object PageControl: TPageControl
       Left = 216
       Top = 0
-      Width = 583
+      Width = 748
       Height = 377
       ActivePage = TabSheetSQL
       TabOrder = 1
       object TabSheetSQL: TTabSheet
         BorderWidth = 5
         Caption = 'SQL Command'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
+        ExplicitWidth = 575
         object Memo: TMemo
           Left = 0
           Top = 0
-          Width = 565
+          Width = 730
           Height = 339
           Align = alClient
           ScrollBars = ssBoth
           TabOrder = 0
           OnDragDrop = MemoDragDrop
           OnDragOver = MemoDragOver
+          ExplicitWidth = 565
         end
       end
     end
@@ -254,10 +255,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
     object TabSheetTable: TTabSheet
       BorderWidth = 5
       Caption = 'RecordSet'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DBGridRecord: TDBGrid
         Left = 0
         Top = 0

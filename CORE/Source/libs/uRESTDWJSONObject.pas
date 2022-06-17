@@ -1410,14 +1410,6 @@ Var
     End;
     If Not bValue.Fields[i].IsNull then
      Begin
-      // -Incluido os tipos ftSmallInt, ftInteger
-      // -Verifica se vai ter tipagem, se tiver remove as ' "" ' dos valores
-      // Tiago Istuque - Por Nemi Vieira - 29/01/2019
-//      If bValue.Fields[i].DataType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,{$IFEND}{$ENDIF}
-//                                       ftSmallint, ftInteger, ftLargeint, ftFloat, ftCurrency, ftFMTBcd, ftBCD] Then
-//       vTempValue := Format(iif(vDataType,'%s%s','%s"%s"'), [vTempField, BuildStringFloat(FloatToStr(bValue.Fields[i].AsFloat), JsonModeD, FloatDecimalFormat)])
-
-      //Anterior Acima - Alterado por Alexandre Magno - 21/10/2019 - Tratamento de Int64
       If bValue.Fields[i].DataType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftShortint, {$IFEND}{$ENDIF}
                                        ftSmallint, ftInteger, ftLargeint, ftAutoInc] Then
        Begin

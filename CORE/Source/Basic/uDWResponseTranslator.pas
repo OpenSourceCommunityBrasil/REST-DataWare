@@ -487,17 +487,15 @@ End;
 Procedure TDWResponseTranslator.ReadData(Value : String);
 Begin
  aValue := Value;
-
 End;
 
-procedure TDWResponseTranslator.SetDWClientREST(const Value: TDWClientREST);
-begin
-  //Alexandre Magno - 14/08/2019
-  if vDWClientREST <> Value then
-    vDWClientREST := Value;
-  if vDWClientREST <> nil then
-    vDWClientREST.FreeNotification(Self);
-end;
+Procedure TDWResponseTranslator.SetDWClientREST(const Value: TDWClientREST);
+Begin
+ If vDWClientREST <> Value Then
+  vDWClientREST := Value;
+ If vDWClientREST <> nil then
+  vDWClientREST.FreeNotification(Self);
+End;
 
 procedure TDWResponseTranslator.SetJSONEditor(const Value: TStringList);
 Var

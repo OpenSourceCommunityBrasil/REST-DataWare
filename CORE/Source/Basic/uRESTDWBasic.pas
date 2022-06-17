@@ -1940,6 +1940,7 @@ Var
   Try
    If RawHeaders.Count > 0 Then
     Begin
+     RawHeaders.NameValueSeparator := ':';
      vRequestHeader.Add(RawHeaders.Text);
      For I := 0 To RawHeaders.Count -1 Do
       Begin
@@ -2696,8 +2697,18 @@ Begin
                Else If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(ms.DataString)) > 0) Then
                 JSONParam.FromJSON(ms.DataString)
                Else
-                JSONParam.AsString := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
-               DWParams.Add(JSONParam);
+                Begin
+                 If vBinaryEvent Then
+                  Begin
+                   DWParams.Clear;
+                   DWParams.LoadFromStream(ms);
+                  End
+                 Else
+                  Begin
+                   JSONParam.AsString := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
+                   DWParams.Add(JSONParam);
+                  End;
+                End;
                //Fim da correção - ICO
                ms.Free;
                vDecoderHeaderList.Free;
@@ -6644,16 +6655,14 @@ Begin
              Except
               On E : Exception Do
                Begin
-                 //Alexandre Magno - 22/01/2019
-                 If DWParams.ItemsString['dwencodestrings'] <> Nil Then
-                  vResult := EncodeStrings(e.Message{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
-                 Else
-                  vResult := e.Message;
+                If DWParams.ItemsString['dwencodestrings'] <> Nil Then
+                 vResult := EncodeStrings(e.Message{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                Else
+                 vResult := e.Message;
                 Result  := True;
                 If (ErrorCode <= 0)  Or
                    (ErrorCode = 200) Then
                  ErrorCode := 500;
-//                Exit;
                End;
              End;
             End
@@ -6894,7 +6903,6 @@ Begin
              Except
               On E : Exception Do
                Begin
-                 //Alexandre Magno - 22/01/2019
                 If DWParams.ItemsString['dwencodestrings'] <> Nil Then
                  vResult := EncodeStrings(e.Message{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                 Else

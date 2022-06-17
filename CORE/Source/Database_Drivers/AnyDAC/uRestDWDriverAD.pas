@@ -344,7 +344,6 @@ Var
                                 Begin
                                  If (Not (vDWParams[I].IsNull)) Then
                                   Begin
-                                   // Alterado por: Alexandre Magno - 04/11/2017
                                    If vTempQuery.Params[I].DataType in [ftLongWord, ftLargeint] Then
                                     vTempQuery.Params[I].AsLargeInt := StrToInt64(vDWParams[I].Value)
                                    Else If vTempQuery.Params[I].DataType = ftSmallInt Then
@@ -755,13 +754,12 @@ Var
               End;
              If (MassiveReplyValue = Nil) And (Not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) Then
               Begin
-                // Alterado por: Alexandre Magno - 04/11/2017
-                If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftLongWord, ftLargeint] Then
-                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsLargeInt := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-                else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
-                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-                Else
-                 Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+               If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftLongWord, ftLargeint] Then
+                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsLargeInt := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+               Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
+                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+               Else
+                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
               End;
             End
            Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD,ftFMTBcd, ftSingle] Then
@@ -837,7 +835,6 @@ Var
          Begin
           If (Not (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull)) Then
            Begin
-            // Alterado por: Alexandre Magno - 04/11/2017
             If Query.Params[I].DataType in [ftLongWord, ftLargeint] Then
              Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
             Else If Query.Params[I].DataType = ftSmallInt           Then
@@ -1743,7 +1740,6 @@ Begin
             Begin
              If (Not (Params[I].IsNull)) Then
               Begin
-               // Alterado por: Alexandre Magno - 04/11/2017
                If vTempQuery.Params[I].DataType in [ftLongWord, ftLargeint] Then
                 vTempQuery.Params[I].AsLargeInt := StrToInt64(Params[I].Value)
                Else If vTempQuery.Params[I].DataType = ftSmallInt Then
@@ -2292,13 +2288,12 @@ Var
               End;
              If (MassiveReplyValue = Nil) And (Not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) Then
               Begin
-                // Alterado por: Alexandre Magno - 04/11/2017
-                If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftLongWord, ftLargeint] Then
-                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsLargeInt := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-                else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
-                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-                Else
-                 Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+               If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftLongWord, ftLargeint] Then
+                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsLargeInt := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+               Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
+                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+               Else
+                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
               End;
             End
            Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD,ftFMTBcd, ftSingle] Then
@@ -2374,7 +2369,6 @@ Var
          Begin
           If (Not (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull)) Then
            Begin
-            // Alterado por: Alexandre Magno - 04/11/2017
             If Query.Params[I].DataType in [ftLongWord, ftLargeint] Then
              Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
             Else If Query.Params[I].DataType = ftSmallInt           Then
@@ -3242,7 +3236,6 @@ Begin
      MessageError   := E.Message;
      If aResult = Nil Then
       aResult        := TJSONValue.Create;
-     //Alexandre Magno 18/01/2018 - Add Try finally
      Try
       aResult.Encoded := True;
       aResult.SetValue(GetPairJSON('NOK', MessageError));
@@ -3346,19 +3339,12 @@ Begin
              Begin
               If Trim(Params[I].Value) <> '' Then
                Begin
-                 // Alterado por: Alexandre Magno - 04/11/2017
-                 If ADCommand.Params[A].DataType in [ftLongWord, ftLargeint] Then
-                   ADCommand.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
-                 else If ADCommand.Params[A].DataType = ftSmallInt Then
-                   ADCommand.Params[A].AsSmallInt := StrToInt(Params[I].Value)
-                 Else
-                   ADCommand.Params[A].AsInteger  := StrToInt(Params[I].Value);
-
-                 // Como estava Anteriormente
-                 //If ADCommand.Params[A].DataType = ftSmallInt Then
-                 //  ADCommand.Params[A].AsSmallInt := StrToInt(Params[I].Value)
-                 //Else
-                 //  ADCommand.Params[A].AsInteger  := StrToInt(Params[I].Value);
+                If ADCommand.Params[A].DataType in [ftLongWord, ftLargeint] Then
+                 ADCommand.Params[A].AsLargeInt := StrToInt64(Params[I].Value)
+                Else If ADCommand.Params[A].DataType = ftSmallInt Then
+                 ADCommand.Params[A].AsSmallInt := StrToInt(Params[I].Value)
+                Else
+                 ADCommand.Params[A].AsInteger  := StrToInt(Params[I].Value);
                End;
              End
             Else If ADCommand.Params[A].DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd, ftSingle] Then
@@ -3435,15 +3421,13 @@ Begin
  FreeAndNil(oTab);
 End;
 
-procedure TRESTDWDriverAD.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  //Alexandre Magno - 25/11/2018
-  if (Operation = opRemove) and (AComponent = vADConnection) then
-  begin
-    vADConnection := nil;
-  end;
-  inherited Notification(AComponent, Operation);
-end;
+Procedure TRESTDWDriverAD.Notification(AComponent: TComponent; Operation: TOperation);
+Begin
+ If (Operation  = opRemove)      And
+    (AComponent = vADConnection) Then
+  vADConnection := nil;
+ Inherited Notification(AComponent, Operation);
+End;
 
 Procedure TRESTDWDriverAD.GetTableNames(Var TableNames       : TStringList;
                                         Var Error            : Boolean;
@@ -4132,13 +4116,12 @@ Var
               End;
              If (MassiveReplyValue = Nil) And (Not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) Then
               Begin
-                // Alterado por: Alexandre Magno - 04/11/2017
-                If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [{$IFNDEF FPC}{$IF CompilerVersion >= 22}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
-                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]){$IFNDEF FPC}{$IF CompilerVersion >= 22}.AsLargeInt{$ELSE}.AsInteger{$IFEND}{$ELSE}.AsLargeInt{$ENDIF} := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-                else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
-                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-                Else
-                 Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+               If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [{$IFNDEF FPC}{$IF CompilerVersion >= 22}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]){$IFNDEF FPC}{$IF CompilerVersion >= 22}.AsLargeInt{$ELSE}.AsInteger{$IFEND}{$ELSE}.AsLargeInt{$ENDIF} := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+               Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
+                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+               Else
+                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
               End;
             End
            Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd{$IFNDEF FPC}{$IF CompilerVersion >= 22}, ftSingle{$IFEND}{$ENDIF}] Then
@@ -4869,7 +4852,6 @@ End;
 
 Procedure TRESTDWDriverAD.SetConnection(Value: TADConnection);
 Begin
- //Alexandre Magno - 25/11/2018
  If vADConnection <> Value Then
   vADConnection := Value;
  If vADConnection <> Nil   Then

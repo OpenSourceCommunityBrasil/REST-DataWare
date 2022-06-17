@@ -807,7 +807,7 @@ Begin
   {$IFDEF RESTKBMMEMTABLE}
    Tkbmmemtable(Self).Close;
   {$ENDIF}
-  {$IFDEF RESTFDMEMTABLE}
+  {$IFDEF RESTDWFDMEMTABLE}
    TFDmemtable(Self).Close;
   {$ENDIF}
   {$IFDEF RESTADMEMTABLE}
@@ -844,7 +844,7 @@ Begin
   {$IFDEF RESTKBMMEMTABLE}
    TKbmmemtable(Self).Open;
   {$ENDIF}
-  {$IFDEF RESTFDMEMTABLE}
+  {$IFDEF RESTDWFDMEMTABLE}
    TFDmemtable(Self).Open;
   {$ENDIF}
   {$IFDEF RESTADMEMTABLE}
@@ -2057,7 +2057,7 @@ Begin
      EnableControls;
     End;
    {$ENDIF}
-   {$IFDEF RESTFDMEMTABLE}
+   {$IFDEF RESTDWFDMEMTABLE}
     DisableControls;
     Close;
     Try

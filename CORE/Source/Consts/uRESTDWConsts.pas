@@ -130,6 +130,7 @@ Const
  MinutesInHour              = 60;     {Number of minutes in an hour}
  MinutesInDay               = 1440;   {Number of minutes in a day}
  AssyncCommandMSG           = '{"status":"OK", "assyncmsg":"AssyncCommand Executed"}';
+ cNameValueSeparator        = '=';
  RESTDWDialogoTitulo        = 'DW REST DataWare Components';
  RESTDWSobreTitulo          = 'DW VCL';
  RESTDWSobreDescricao       = 'DW VCL http://www.restdw.com.br/' + sLineBreak +
@@ -137,7 +138,7 @@ Const
                               'CORE Version';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
  RESTDWVersionINFO          = '1.5.0.';
- RESTDWRelease              = '2955';
+ RESTDWRelease              = '2959';
  RESTDWParamsHeaderVersion  = 6;
  RESTDWCodeProject          = 'Dark Souls - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
