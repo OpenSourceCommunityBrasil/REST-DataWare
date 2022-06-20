@@ -434,7 +434,9 @@ Type
   Procedure   Delete     (Param     : TJSONParam); Overload;
   Function    Add        (Item      : TJSONParam) : Integer; Overload;
   Procedure   SaveToStream  (Stream : TStream; Output : TDWParamExpType = tdwpxt_All);
-  Procedure   LoadFromStream(Stream : TStream; Input  : TDWParamExpType = tdwpxt_All);
+  Procedure   LoadFromStream(Stream         : TStream;
+                             ValidateHeader : Boolean = False;
+                             Input          : TDWParamExpType = tdwpxt_All);
   Procedure   LoadFromParams(Params : TParams);
   Procedure   SetCriptOptions(Use   : Boolean;
                               Key   : String);
@@ -6167,8 +6169,9 @@ Begin
 // Stream.Position := 0;
 End;
 
-Procedure TRESTDWParams.LoadFromStream(Stream : TStream;
-                                       Input  : TDWParamExpType = tdwpxt_All);
+Procedure TRESTDWParams.LoadFromStream(Stream         : TStream;
+                                       ValidateHeader : Boolean = False;
+                                       Input          : TDWParamExpType = tdwpxt_All);
 Var
  ParamsHeader   : TRESTDWParamsHeader;
  VersionNumber,
@@ -6384,8 +6387,16 @@ Begin
  DataSize        := ParamsHeader.DataSize;
  StartPos        := Stream.Position;
  aSize           := Stream.Size;
- If DataSize <>  aSize - StartPos Then
-  Raise Exception.Create(cInvalidStream)
+ If ValidateHeader Then
+  Begin
+   If DataSize <>  aSize - StartPos Then
+    Raise Exception.Create(cInvalidStream)
+   Else
+    Begin
+     If ParamsCount > 0 Then
+      CreateDWParamsFromStream;
+    End;
+  End
  Else
   Begin
    If ParamsCount > 0 Then

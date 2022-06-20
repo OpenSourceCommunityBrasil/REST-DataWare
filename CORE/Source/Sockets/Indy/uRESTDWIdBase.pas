@@ -776,10 +776,13 @@ Begin
        sResponse := HttpRequest.ResponseText;
      if Assigned(OnHeadersAvailable) then
       OnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
-     If RequestCharset = esUtf8 Then
-      aString := utf8Decode(sResponse)
-     Else
-      aString := sResponse;
+     If Trim(sResponse) <> '' Then
+      Begin
+       If RequestCharset = esUtf8 Then
+        aString := utf8Decode(sResponse)
+       Else
+        aString := sResponse;
+      End;
 //     StringToStream(AResponse, aString);
      AResponse.Position := 0;
      If Not IgnoreEvents Then
@@ -4137,7 +4140,7 @@ Var
                         {$ENDIF}
                        {$ENDIF}
                       End;
-           sePOST   : HttpRequest.Post  (URL, vResponse, TStringList(HttpRequest.DefaultCustomHeader), Nil, SendParams, aStringStream);
+           sePOST   : HttpRequest.Post  (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, aStringStream);
           end;
           If Not Assyncexec Then
            Begin
@@ -4227,7 +4230,10 @@ Var
         If Not Assyncexec Then
          Begin
           StringStream.Position := 0;
-          vDataPack := TStringStream(StringStream).DataString;
+          If Datacompress Then
+           vDataPack := BytesToString(StreamToBytes(TMemoryStream(StringStream)))
+          Else
+           vDataPack := TStringStream(StringStream).DataString;
           {$IFNDEF FPC}
            {$IF CompilerVersion > 21}
             TStringStream(StringStream).Clear;

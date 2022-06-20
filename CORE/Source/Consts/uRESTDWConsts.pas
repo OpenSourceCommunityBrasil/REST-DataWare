@@ -138,7 +138,7 @@ Const
                               'CORE Version';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
  RESTDWVersionINFO          = '1.5.0.';
- RESTDWRelease              = '2959';
+ RESTDWRelease              = '2960';
  RESTDWParamsHeaderVersion  = 6;
  RESTDWCodeProject          = 'Dark Souls - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
@@ -357,7 +357,7 @@ Type
  Function  ZCompressStr             (Const s            : String;
                                      Var Value          : String)                 : Boolean;
  Function  ZCompressStreamD         (S                  : TStringStream;
-                                     Var Value          : TStringStream)          : Boolean;
+                                     Var Value          : TStream)               : Boolean;
 // Function  BytesArrToString         (aValue             : tIdBytes;
 //                                     IdEncode           : {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}
 //                                                         TIdTextEncoding
@@ -408,7 +408,7 @@ Var
 
 implementation
 
-Uses uRESTDWBasicTypes;
+Uses uRESTDWBasicTypes, uRESTDWTools;
 
 Function iif(ATest       : Boolean;
              Const ATrue  : Integer;
@@ -715,17 +715,13 @@ End;
 // Result   := BytesToString(aValue, IdEncode);
 //End;
 
-Function  ZCompressStreamD(S         : TStringStream;
-                           Var Value : TStringStream) : Boolean;
+Function  ZCompressStreamD(S           : TStringStream;
+                           Var Value   : TStream) : Boolean;
 Var
  {$IFDEF FPC}
   Utf8Stream   : TStringStream;
  {$ELSE}
-  {$if CompilerVersion > 24} // Delphi 2010 pra cima
-   Utf8Stream   : TStringStream;
-  {$ELSE}
-   Utf8Stream   : TMemoryStream;
-  {$IFEND}
+  Utf8Stream   : TStream;
  {$ENDIF}
 Begin
  Result := False;
@@ -760,6 +756,7 @@ Begin
   If Value.Size = 0 Then
    Begin
     Result := False;
+    Value.Size := 0;
     FreeAndNil(Value);
    End;
  End;
@@ -963,9 +960,9 @@ End;
 Function ZDecompressStreamNew(Const S   : TStream) : TStringStream;
 Begin
  {$IFDEF FPC}
-  Result := TStringStream.Create('');
+  Result  := TStringStream.Create('');
  {$ELSE}
-  Result := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+  Result  := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
  {$ENDIF}
  S.Position := 0;
  ZDecompressStream(S, Result);
@@ -1001,9 +998,9 @@ Begin
     ZDecompressStream(Utf8Stream, Compressed);
    {$ELSE}
     Utf8Stream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
-    DecodeStream(Base64Stream, Utf8Stream);
-    Utf8Stream.position := 0;
-    ZDecompressStream(Utf8Stream, Compressed);
+//    DecodeStream(Base64Stream, Utf8Stream);
+//    Utf8Stream.position := 0;
+    ZDecompressStream(Base64Stream, Compressed);
     Compressed.Position := 0;
    {$ENDIF}
    Try

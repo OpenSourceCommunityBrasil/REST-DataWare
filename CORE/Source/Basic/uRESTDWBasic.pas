@@ -728,7 +728,7 @@ Type
                             Var StatusCode      : Integer;
                             Var ResponseHeaders : TStringList;
                             Var ResponseString  : String;
-                            Const ResultStream  : TStream;
+                            Var ResultStream  : TStream;
                             Redirect            : TRedirect) : Boolean;
   Procedure   ClearDataRoute;
   Procedure   AddDataRoute (DataRoute           : String; MethodClass : TComponentClass);
@@ -1024,7 +1024,8 @@ End;
 Implementation
 
 Uses uRESTDWDatamodule,   uRESTDWPoolermethod,  uRESTDWTools,
-     uRESTDWServerEvents, uRESTDWServerContext, uRESTDWMessageCoder;
+     uRESTDWServerEvents, uRESTDWServerContext, uRESTDWMessageCoder,
+     ZLib;
 
 Function GetParamsReturn(Params : TRESTDWParams) : String;
 Var
@@ -1807,7 +1808,7 @@ Function TRESTServiceBase.CommandExec(Const AContext : TComponent;
                                       Var StatusCode      : Integer;
                                       Var ResponseHeaders : TStringList;
                                       Var ResponseString  : String;
-                                      Const ResultStream  : TStream;
+                                      Var ResultStream    : TStream;
                                       Redirect            : TRedirect) : Boolean;
 Var
  aParamsCount,
@@ -4225,24 +4226,24 @@ Begin
                   End;
                  Try
                   DWParams.SaveToStream(ms, tdwpxt_OUT);
-                  ZCompressStreamD(ms, mb2);
+                  ZCompressStream(ms, ResultStream, cCompressionLevel);
                  Finally
                   FreeAndNil(ms);
                  End;
                 End
                Else
-                mb2                                   := TStringStream(ZCompressStreamNew(vReplyString));
+                ResultStream              := TStringStream(ZCompressStreamNew(vReplyString));
                If vErrorCode <> 200 Then
                 Begin
-                 If Assigned(mb2) Then
-                  FreeAndNil(mb2);
+//                 If Assigned(mb2) Then
+//                  FreeAndNil(mb2);
                  ResponseString           := escape_chars(vReplyString);
-                End
-               Else
-                Begin
-                 WriteStream(mb2, ResultStream);
-                 FreeAndNil(mb2);
                 End;
+//               Else
+//                Begin
+//                 WriteStream(mb2, ResultStream);
+//                 FreeAndNil(mb2);
+//                End;
               End
              Else
               Begin
