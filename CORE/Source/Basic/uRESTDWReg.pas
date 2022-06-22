@@ -29,10 +29,12 @@ uses
   {$IFDEF FPC}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
     LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb,
-    uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWSqlEditor, uRESTDWAbout;
+    uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWSqlEditor,
+    uRESTDWFieldSourceEditor, uRESTDWBufferDb, uRESTDWResponseTranslator, uRESTDWJSONViewer, uRESTDWAbout;
   {$ELSE}
    Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWAbout, uRESTDWDatamodule, uRESTDWServerEvents,
-   uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, RTLConsts, uRESTDWSqlEditor, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
+   uRESTDWBasicClass, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWBufferDb,
+   RTLConsts, uRESTDWFieldSourceEditor, uRESTDWResponseTranslator, uRESTDWSqlEditor, uRESTDWJSONViewer, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
    {$IFDEF COMPILER16_UP}
    UITypes,
    {$ENDIF}
@@ -66,11 +68,17 @@ Type
  TAddFields = Procedure (All: Boolean) of Object;
 
 Type
- TDWFieldsList = Class(TStringProperty)
+ TRESTDWFieldsList = Class(TStringProperty)
  Public
   Function  GetAttributes  : TPropertyAttributes; Override;
   Procedure GetValues(Proc : TGetStrProc);        Override;
   Procedure Edit;                                 Override;
+End;
+
+Type
+ TRESTDWClientRESTList = Class(TComponentProperty)
+ Public
+  Procedure GetValues(Proc : TGetStrProc);        Override;
 End;
 
 Type
@@ -114,14 +122,14 @@ Type
 End;
 
 type
- TDWServerEventsEditor = Class(TComponentEditor)
+ TRESTDWServerEventsEditor = Class(TComponentEditor)
   Function  GetVerbCount       : Integer;  Override;
   Function  GetVerb     (Index : Integer): String; Override;
   Procedure ExecuteVerb(Index  : Integer); Override;
 End;
 
 Type
- TDWClientEventsEditor = Class(TComponentEditor)
+ TRESTDWClientEventsEditor = Class(TComponentEditor)
   Function  GetVerbCount      : Integer;  Override;
   Function  GetVerb    (Index : Integer): String; Override;
   Procedure ExecuteVerb(Index : Integer); Override;
@@ -662,18 +670,18 @@ Var
 Begin
  //Provide a list of Tables
  vLista := Nil;
-// With GetComponent(0) as TRESTDWTable Do
-//  Begin
-//   Try
-//    If TRESTDWTable(GetComponent(0)).DataBase <> Nil Then
-//     Begin
-//      TRESTDWTable(GetComponent(0)).DataBase.GetTableNames(vLista);
-//      For I := 0 To vLista.Count -1 Do
-//       Proc (vLista[I]);
-//     End;
-//   Except
-//   End;
-//  End;
+ With GetComponent(0) as TRESTDWTable Do
+  Begin
+   Try
+    If TRESTDWTable(GetComponent(0)).DataBase <> Nil Then
+     Begin
+      TRESTDWTable(GetComponent(0)).DataBase.GetTableNames(vLista);
+      For I := 0 To vLista.Count -1 Do
+       Proc (vLista[I]);
+     End;
+   Except
+   End;
+  End;
 End;
 
 Procedure TPoolersList.GetValues(Proc : TGetStrProc);
@@ -720,24 +728,24 @@ End;
 
 procedure TRESTDWServerContextEditor.ExecuteVerb(Index: Integer);
 Begin
-// Case Index of
-//  0 : {$IFNDEF FPC}
-//       ShowCollectionEditor(Designer, Component, TDWServerContext(Component).ContextList, 'ContextList');
-//      {$ELSE}
-//       TCollectionPropertyEditor.ShowCollectionEditor(TDWServerContext(Component).ContextList, Component, 'ContextList');
-//      {$ENDIF}
-// End;
+ Case Index of
+  0 : {$IFNDEF FPC}
+       ShowCollectionEditor(Designer, Component, TRESTDWServerContext(Component).ContextList, 'ContextList');
+      {$ELSE}
+       TCollectionPropertyEditor.ShowCollectionEditor(TRESTServerContext(Component).ContextList, Component, 'ContextList');
+      {$ENDIF}
+ End;
 end;
 
 procedure TRESTDWContextRulesEditor.ExecuteVerb(Index: Integer);
 Begin
-// Case Index of
-//  0 : {$IFNDEF FPC}
-//       ShowCollectionEditor(Designer, Component, TDWContextRules(Component).Items, 'Items');
-//      {$ELSE}
-//       TCollectionPropertyEditor.ShowCollectionEditor(TDWContextRules(Component).Items, Component, 'Items');
-//      {$ENDIF}
-// End;
+ Case Index of
+  0 : {$IFNDEF FPC}
+       ShowCollectionEditor(Designer, Component, TRESTDWContextRules(Component).Items, 'Items');
+      {$ELSE}
+       TCollectionPropertyEditor.ShowCollectionEditor(TDWContextRules(Component).Items, Component, 'Items');
+      {$ENDIF}
+ End;
 end;
 
 Function TRESTDWServerContextEditor.GetVerb(Index: Integer): string;
@@ -791,7 +799,7 @@ Begin
 //                                                    TRESTDWServiceNotification]);
   RegisterComponents('REST Dataware - Client''s',   [TRESTDWClientEvents]);
   RegisterComponents('REST Dataware - API',         [TRESTDWServerEvents, TRESTDWServerContext, TRESTDWContextRules]);
-// RegisterComponents('REST Dataware - Tools',      [TDWResponseTranslator, TRESTDWBufferDB]);
+  RegisterComponents('REST Dataware - Tools',       [TRESTDWResponseTranslator, TRESTDWBufferDB]);
 
 // RegisterComponents('REST Dataware - CORE - DB',   [TRESTDWPoolerDB,    TRESTDWDataBase,    TRESTDWClientSQL,  TRESTDWTable,      TRESTDWUpdateSQL,
 //                                                    TDWMemtable,        TDWMassiveSQLCache, TRESTDWStoredProc, TRESTDWPoolerList, TDWMassiveCache,  TRESTDWBatchMove]);
@@ -807,15 +815,14 @@ Begin
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
 //  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
  {$ENDIF}
-//  RegisterPropertyEditor(TypeInfo(String),       TRESTDWDatabaseBase,           'PoolerName',      TPoolersList);
-// RegisterPropertyEditor(TypeInfo(String),       TRESTDWTable,              'Tablename',       TTableList);
+ RegisterPropertyEditor(TypeInfo(String),       TRESTDWTable,              'Tablename',       TTableList);
 // RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionServer,   'PoolerName',      TPoolersListCDF);
 // RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionParams,   'PoolerName',      TPoolersListCDF);
  RegisterPropertyEditor(TypeInfo(String),       TRESTDWClientEvents,           'ServerEventName', TServerEventsList);
 // RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionServerCP, 'ServerEventName', TServerEventsListCV);
  RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'SQL',             TRESTDWSQLEditor);
-// RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'RelationFields',  TDWFieldsRelationEditor);
-// RegisterPropertyEditor(TypeInfo(String),       TRESTDWClientSQL,          'SequenceField',   TDWFieldsList);
+ RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'RelationFields',  TRESTDWFieldsRelationEditor);
+ RegisterPropertyEditor(TypeInfo(String),       TRESTDWClientSQL,          'SequenceField',   TRESTDWFieldsList);
 //
 // RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWUpdateSQL,          'DeleteSQL',       TDWUpdSQLEditorDelete);
 // RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWUpdateSQL,          'InsertSQL',       TDWUpdSQLEditorInsert);
@@ -825,47 +832,48 @@ Begin
 // RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWUpdateSQL,          'ModifySQL',       TDWUpdSQLEditorModify);
 // RegisterComponentEditor(TRESTDWUpdateSQL,      TDWUpdateSQLEditor);
 //
-// RegisterComponentEditor(TDWServerEvents,       TDWServerEventsEditor);
-  RegisterComponentEditor(TRESTDWClientEvents,    TDWClientEventsEditor);
-// RegisterComponentEditor(TDWResponseTranslator, TDWJSONViewer);
-// RegisterComponentEditor(TDWServerContext,      TRESTDWServerContextEditor);
-// RegisterComponentEditor(TDWContextRules,       TRESTDWContextRulesEditor);
+  RegisterComponentEditor(TRESTDWServerEvents,        TRESTDWServerEventsEditor);
+  RegisterComponentEditor(TRESTDWClientEvents,        TRESTDWClientEventsEditor);
+  RegisterComponentEditor(TRESTDWResponseTranslator,  TRESTDWJSONViewer);
+  RegisterPropertyEditor (TypeInfo(TRESTDWComponent), TRESTDWResponseTranslator, 'ClientREST', TRESTDWClientRESTList);
+  RegisterComponentEditor(TRESTDWServerContext,       TRESTDWServerContextEditor);
+  RegisterComponentEditor(TRESTDWContextRules,        TRESTDWContextRulesEditor);
  {$IFNDEF FPC}
-  RegisterComponentEditor(TRESTDWClientSQL,      TRESTDWClientSQLEditor);
-// RegisterComponentEditor(TDWServerContext,      TRESTDWServerContextEditor);
-// RegisterComponentEditor(TDWContextRules,       TRESTDWContextRulesEditor);
+  RegisterComponentEditor(TRESTDWClientSQL,         TRESTDWClientSQLEditor);
+  RegisterComponentEditor(TRESTDWServerContext,     TRESTDWServerContextEditor);
+  RegisterComponentEditor(TRESTDWContextRules,      TRESTDWContextRulesEditor);
  {$ENDIF}
 End;
 
-{ TDWServerEventsEditor }
+{ TRESTDWServerEventsEditor }
 
-procedure TDWServerEventsEditor.ExecuteVerb(Index: Integer);
+procedure TRESTDWServerEventsEditor.ExecuteVerb(Index: Integer);
 begin
  Inherited;
-// Case Index of
-//  0 : Begin
-//       {$IFNDEF FPC}
-//        ShowCollectionEditor(Designer, Component, (Component as TDWServerEvents).Events, 'Events');
-//       {$ELSE}
-//        TCollectionPropertyEditor.ShowCollectionEditor(TDWServerEvents(Component).Events, Component, 'Events');
-//       {$ENDIF}
-//      End;
-// End;
+ Case Index of
+  0 : Begin
+       {$IFNDEF FPC}
+        ShowCollectionEditor(Designer, Component, (Component as TRESTDWServerEvents).Events, 'Events');
+       {$ELSE}
+        TCollectionPropertyEditor.ShowCollectionEditor(TRESTDWServerEvents(Component).Events, Component, 'Events');
+       {$ENDIF}
+      End;
+ End;
 End;
 
-Function TDWServerEventsEditor.GetVerb(Index: Integer): String;
+Function TRESTDWServerEventsEditor.GetVerb(Index: Integer): String;
 Begin
  Case Index of
   0 : Result := 'Events &List';
  End;
 End;
 
-function TDWServerEventsEditor.GetVerbCount: Integer;
+function TRESTDWServerEventsEditor.GetVerbCount: Integer;
 begin
   Result := 1;
 end;
 
-Procedure TDWClientEventsEditor.ExecuteVerb(Index: Integer);
+Procedure TRESTDWClientEventsEditor.ExecuteVerb(Index: Integer);
 Begin
  Inherited;
  Case Index of
@@ -881,7 +889,7 @@ Begin
  End;
 End;
 
-Function TDWClientEventsEditor.GetVerb(Index: Integer): string;
+Function TRESTDWClientEventsEditor.GetVerb(Index: Integer): string;
 Begin
  Case Index of
   0 : Result := 'Events &List';
@@ -890,7 +898,7 @@ Begin
  End;
 End;
 
-Function TDWClientEventsEditor.GetVerbCount: Integer;
+Function TRESTDWClientEventsEditor.GetVerbCount: Integer;
 Begin
  Result := 3;
 End;
@@ -1026,9 +1034,9 @@ Begin
   End;
 End;
 
-{ TDWFieldsList }
+{ TRESTDWFieldsList }
 
-procedure TDWFieldsList.Edit;
+procedure TRESTDWFieldsList.Edit;
 Var
  vTempData : String;
 Begin
@@ -1040,33 +1048,33 @@ Begin
  End;
 End;
 
-Function TDWFieldsList.GetAttributes : TPropertyAttributes;
+Function TRESTDWFieldsList.GetAttributes : TPropertyAttributes;
 Begin
   // editor, sorted list, multiple selection
  Result := [paValueList, paSortList];
 End;
 
-procedure TDWFieldsList.GetValues(Proc: TGetStrProc);
+procedure TRESTDWFieldsList.GetValues(Proc: TGetStrProc);
 Var
  I      : Integer;
 Begin
  //Provide a list of Poolers
-// With GetComponent(0) as TRESTDWClientSQL Do
-//  Begin
-//   Try
-//    If TRESTDWClientSQL(GetComponent(0)).Fields.Count > 0 Then
-//     Begin
-//      For I := 0 To TRESTDWClientSQL(GetComponent(0)).Fields.Count -1 Do
-//       Proc (TRESTDWClientSQL(GetComponent(0)).Fields[I].FieldName);
-//     End
-//    Else
-//     Begin
-//      For I := 0 To TRESTDWClientSQL(GetComponent(0)).FieldDefs.Count -1 Do
-//       Proc (TRESTDWClientSQL(GetComponent(0)).FieldDefs[I].Name);
-//     End;
-//   Except
-//   End;
-//  End;
+ With GetComponent(0) as TRESTDWClientSQL Do
+  Begin
+   Try
+    If TRESTDWClientSQL(GetComponent(0)).Fields.Count > 0 Then
+     Begin
+      For I := 0 To TRESTDWClientSQL(GetComponent(0)).Fields.Count -1 Do
+       Proc (TRESTDWClientSQL(GetComponent(0)).Fields[I].FieldName);
+     End
+    Else
+     Begin
+      For I := 0 To TRESTDWClientSQL(GetComponent(0)).FieldDefs.Count -1 Do
+       Proc (TRESTDWClientSQL(GetComponent(0)).FieldDefs[I].Name);
+     End;
+   Except
+   End;
+  End;
 End;
 
 {$IFDEF FPC}
@@ -1079,6 +1087,34 @@ End;
      RegisterPropertyEditor (pi^.PropType, ComponentClass, PropertyName, PropEdits.THiddenPropertyEditor);
  end;
 {$ENDIF}
+
+{ TRESTDWClientRESTList }
+
+procedure TRESTDWClientRESTList.GetValues(Proc: TGetStrProc);
+Var
+ I         : Integer;
+ COwner,
+ Component : TComponent;
+ PropClass : TClass;
+ Finded    : Boolean;
+Begin
+// {$IFDEF VERSION5}
+  COwner := Designer.GetRoot;
+// {$ELSE}
+//  COwner := Designer.Form;
+// {$ENDIF}
+ PropClass := TRESTDWClientRESTBase;
+ For I := 0 to COwner.ComponentCount - 1 Do
+  Begin
+   Component := COwner.Components[I];
+   Finded := (Component.ClassType = TRESTDWClientRESTBase) Or
+             (Component.InheritsFrom(TRESTDWClientRESTBase));
+   If (Component Is PropClass) And
+      (Component.Name <> '')   And
+      (Finded)                 Then
+    Proc(Component.Name);
+  End;
+End;
 
 initialization
  {$IFNDEF FPC}

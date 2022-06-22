@@ -95,7 +95,12 @@ contains
   DWDCPconst in '..\..\Source\Basic\Crypto\DWDCPconst.pas',
   DWDCPcrypt2 in '..\..\Source\Basic\Crypto\DWDCPcrypt2.pas',
   uRESTDWSqlEditor in '..\..\Source\Plugins\SQLEditor\uRESTDWSqlEditor.pas' {FrmDWSqlEditor},
-  uRESTDWUpdSqlEditor in '..\..\Source\Plugins\SQLEditor\uRESTDWUpdSqlEditor.pas' {FrmDWUpdSqlEditor};
+  uRESTDWUpdSqlEditor in '..\..\Source\Plugins\SQLEditor\uRESTDWUpdSqlEditor.pas' {FrmDWUpdSqlEditor},
+  uRESTDWFieldSourceEditor in '..\..\Source\Plugins\SQLEditor\uRESTDWFieldSourceEditor.pas' {fMasterDetailRelation},
+  uRESTDWBufferDb in '..\..\Source\Basic\uRESTDWBufferDb.pas',
+  uRESTDWResponseTranslator in '..\..\Source\Basic\uRESTDWResponseTranslator.pas',
+  uRESTDWJSONViewer in '..\..\Source\Plugins\JSONViewer\uRESTDWJSONViewer.pas' {fDWJSONViewer},
+  uRESTDWBasicClass in '..\..\Source\Basic\uRESTDWBasicClass.pas';
 
 End.
 

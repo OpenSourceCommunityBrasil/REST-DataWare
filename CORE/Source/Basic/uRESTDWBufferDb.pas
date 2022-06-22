@@ -1,12 +1,33 @@
 unit uRESTDWBufferDb;
 
-{$I uRESTDW.inc}
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+
+{
+  REST Dataware versão CORE.
+  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+ Pascal e com compatibilidade entre sistemas operacionais.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+
+ Membros do Grupo :
+
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do CORE do pacote.
+ Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Flávio Motta               - Member Tester and DEMO Developer.
+ Mobius One                 - Devel, Tester and Admin.
+ Gustavo                    - Criptografia and Devel.
+ Eloy                       - Devel.
+ Roniery                    - Devel.
+}
 
 interface
 
 uses
- Messages, SysUtils, Variants, TypInfo, Classes, uRESTDWFileBuffer, Db, uDWConsts, uDWConstsCharset,
- uDWJSONTools, uDWAbout;
+ Messages, SysUtils, Variants, TypInfo, Classes, uRESTDWFileBuffer, Db, uRESTDWConsts,
+ uRESTDWTools, uRESTDWBasicTypes, uRESTDWAbout;
 
 Const                                      // \b  \t  \n   \f   \r
  TSpecialChars     : Array [0 .. 7] Of Char = ('\', '"', '/', #8, #9, #10, #12, #13);
@@ -118,7 +139,7 @@ Type
 End;
 
 Type
- TCustomFieldDefs = Class(TDWOwnedCollection)
+ TCustomFieldDefs = Class(TRESTDWOwnedCollection)
  Protected
   vEditable   : Boolean;
   Function    GetOwner          : TPersistent;                       Override;
@@ -261,7 +282,7 @@ Type
 
 Implementation
 
-Uses uDWJSONObject;
+Uses uRESTDWJSONObject;
 
 Function InsertChar(Value,
                     CharIn   : String;
@@ -1513,7 +1534,7 @@ Var
             End;
           End
          Else
-          Result := Format('%s%s', [Encodeb64Stream(vBlobStreamFile), vFileOptions.vSeparator]);
+          Result := Format('%s%s', [EncodeStream(vBlobStreamFile), vFileOptions.vSeparator]);
         Except
          On E : Exception Do
           Begin

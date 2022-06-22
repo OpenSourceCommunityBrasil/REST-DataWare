@@ -29,7 +29,7 @@ Uses
  {$IFDEF FPC}
   SysUtils,  Classes, Db, SyncObjs, Variants, DataUtils, uRESTDWAbout, uRESTDWBasicTypes,
   uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
-  uRESTDWMassiveBuffer, {$IFNDEF RESTDWLAMW}Forms, {$ENDIF}uRESTDWMasterDetailData
+  uRESTDWMassiveBuffer, uRESTDWResponseTranslator, uRESTDWBasicClass, {$IFNDEF RESTDWLAMW}Forms, {$ENDIF}uRESTDWMasterDetailData
   {$IFDEF RESTDWWINDOWS}, Windows{$ENDIF}
  {$ELSE}
   {$IF Defined(RESTDWFMX)}
@@ -40,12 +40,12 @@ Uses
   {$IFDEF RESTDWWINDOWS}Windows, {$ENDIF}
   {$if CompilerVersion > 24} // Delphi 2010 acima
    System.SysUtils, System.Classes, Db, SyncObjs, DataUtils, uRESTDWAbout, uRESTDWBasicTypes,
-   uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
-   uRESTDWMassiveBuffer, uRESTDWMasterDetailData
+   uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
+   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWMasterDetailData
   {$ELSE}
    SysUtils, Classes, Db, SyncObjs, DataUtils, uRESTDWAbout, uRESTDWBasicTypes,
-   uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
-   uRESTDWMassiveBuffer, uRESTDWMasterDetailData
+   uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
+   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWMasterDetailData
   {$IFEND}
  {$ENDIF}
  {$IFDEF FPC}
@@ -635,7 +635,7 @@ Type
   {$IFNDEF RESTDWAndroidService}
   vActionCursor         : TCursor;
   {$ENDIF}
-//  vDWResponseTranslator : TRESTDWResponseTranslator;
+  vDWResponseTranslator : TRESTDWResponseTranslator;
   vUpdateSQL            : TRESTDWUpdateSQL;
   vMasterDetailItem     : TMasterDetailItem;
   vFieldsList           : TFieldsList;
@@ -799,8 +799,8 @@ Type
   Function    ProcessChanges   (MassiveJSON : String): Boolean;
   function    GetMassiveCache: TRESTDWMassiveCache;
   procedure   SetMassiveCache(const Value: TRESTDWMassiveCache);
-//  function    GetDWResponseTranslator: TDWResponseTranslator;
-//  procedure   SetDWResponseTranslator(const Value: TDWResponseTranslator);
+  Function    GetDWResponseTranslator: TRESTDWResponseTranslator;
+  Procedure   SetDWResponseTranslator(const Value: TRESTDWResponseTranslator);
   Function    GetReadData                   : Boolean;
   Property    MasterFields                  : String   Read vMasterFields  Write vMasterFields;
 //  Procedure   InternalDeferredPost;override; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
@@ -909,7 +909,8 @@ Type
   Property DataCache               : Boolean               Read vDataCache                Write vDataCache;              //Diz se será salvo o último Stream do Dataset
   Property MassiveType             : TMassiveType          Read vMassiveMode              Write vMassiveMode;
   Property Params                  : TParams               Read vParams                   Write SetParams;                 //Parametros de Dataset
-  Property DataBase                : TRESTDWDatabasebaseBase       Read vRESTDataBase             Write SetDataBase;             //Database REST do Dataset
+  Property DataBase                : TRESTDWDatabasebaseBase   Read vRESTDataBase             Write SetDataBase;             //Database REST do Dataset
+  Property ResponseTranslator      : TRESTDWResponseTranslator Read GetDWResponseTranslator   Write SetDWResponseTranslator;
   Property SQL                     : TStringList           Read vSQL                      Write SetSQL;                  //SQL a ser Executado
   Property RelationFields          : TStringList           Read vRelationFields           Write vRelationFields;
   Property UpdateTableName         : String                Read vUpdateTableName          Write SetUpdateTableName;      //Tabela que será usada para Reflexão de Dados
@@ -947,7 +948,7 @@ Type
   vOldState             : TDatasetState;
   vOldCursor,
   vActionCursor         : TCursor;
-//  vDWResponseTranslator : TDWResponseTranslator;
+  vDWResponseTranslator : TRESTDWResponseTranslator;
   vUpdateSQL            : TRESTDWUpdateSQL;
   vMasterDetailItem     : TMasterDetailItem;
   vFieldsList           : TFieldsList;
@@ -1057,8 +1058,8 @@ Type
   Function    ProcessChanges   (MassiveJSON : String): Boolean;
   Function    GetMassiveCache: TRESTDWMassiveCache;
   Procedure   SetMassiveCache(const Value: TRESTDWMassiveCache);
-//  function    GetDWResponseTranslator: TDWResponseTranslator;
-//  procedure   SetDWResponseTranslator(const Value: TDWResponseTranslator);
+  Function    GetDWResponseTranslator: TRESTDWResponseTranslator;
+  Procedure   SetDWResponseTranslator(const Value: TRESTDWResponseTranslator);
   Property    MasterFields                  : String   Read vMasterFields  Write vMasterFields;
 //  Procedure   InternalDeferredPost;override; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
   Procedure   SetTablename(Value : String);
@@ -1179,7 +1180,7 @@ Type
   Property OnNewRecord             : TDatasetEvents        Read vNewRecord                Write vNewRecord;
   Property MassiveCache            : TRESTDWMassiveCache       Read GetMassiveCache           Write SetMassiveCache;
   Property Filtered                : Boolean               Read vFiltered                 Write SetFilteredB;
-//  Property DWResponseTranslator    : TDWResponseTranslator Read GetDWResponseTranslator   Write SetDWResponseTranslator;
+  Property ResponseTranslator      : TRESTDWResponseTranslator Read GetDWResponseTranslator   Write SetDWResponseTranslator;
   Property ActionCursor            : TCursor               Read vActionCursor             Write vActionCursor;
 End;
 
@@ -5786,14 +5787,22 @@ Begin
  Result := vReadData;
 End;
 
-//Procedure TRESTDWClientSQL.SetDWResponseTranslator(Const Value : TDWResponseTranslator);
-//Begin
-// If vDWResponseTranslator <> Value then
-//  vDWResponseTranslator := Value;
-// If vDWResponseTranslator <> nil then
-//  vDWResponseTranslator.FreeNotification(Self);
-//End;
-//
+Procedure TRESTDWClientSQL.SetDWResponseTranslator(Const Value : TRESTDWResponseTranslator);
+Begin
+ If vDWResponseTranslator <> Value then
+  vDWResponseTranslator := Value;
+ If vDWResponseTranslator <> nil then
+  vDWResponseTranslator.FreeNotification(Self);
+End;
+
+Procedure TRESTDWTable.SetDWResponseTranslator(Const Value : TRESTDWResponseTranslator);
+Begin
+ If vDWResponseTranslator <> Value then
+  vDWResponseTranslator := Value;
+ If vDWResponseTranslator <> nil then
+  vDWResponseTranslator.FreeNotification(Self);
+End;
+
 Procedure TRESTDWTable.SetFilteredB(aValue: Boolean);
 Var
  vFilter   : String;
@@ -9198,7 +9207,7 @@ Begin
     Else If Not (csDesigning in ComponentState) Then
      Raise Exception.Create(Name + ': ' + cErrorOpenDataset);
    End
-  Else If (((vRESTDataBase <> Nil)) And // Or (Assigned(vDWResponseTranslator))) And
+  Else If (((vRESTDataBase <> Nil)) Or (Assigned(vDWResponseTranslator)) And
            ((Self.FieldDefs.Count > 0)) Or (BinaryLoadRequest))          And
           (Not(OnLoadStream))                                            Then
    Begin
@@ -9289,7 +9298,7 @@ Begin
     Else If Not (csDesigning in ComponentState) Then
      Raise Exception.Create(Name + ': ' + cErrorOpenDataset);
    End
-  Else If (((vRESTDataBase <> Nil)) And // Or (Assigned(vDWResponseTranslator))) And
+  Else If (((vRESTDataBase <> Nil)) Or (Assigned(vDWResponseTranslator)) And
            ((Self.FieldDefs.Count > 0)) Or (BinaryLoadRequest))          And
           (Not(OnLoadStream))                                            Then
    Begin
@@ -9854,9 +9863,9 @@ Begin
  If (Operation    = opRemove)              And
     (AComponent   = vMassiveCache)         Then
   vMassiveCache := Nil;
-// If (Operation    = opRemove)              And
-//    (AComponent   = vDWResponseTranslator) Then
-//  vDWResponseTranslator := Nil;
+ If (Operation    = opRemove)              And
+    (AComponent   = vDWResponseTranslator) Then
+  vDWResponseTranslator := Nil;
  If (Operation    = opRemove)              And
     (AComponent   = vUpdateSQL)            Then
   vUpdateSQL      := Nil;
@@ -9872,9 +9881,9 @@ Begin
  If (Operation    = opRemove)              And
     (AComponent   = vMassiveCache)         Then
    vMassiveCache := Nil;
-// If (Operation    = opRemove)              And
-//    (AComponent   = vDWResponseTranslator) Then
-//   vDWResponseTranslator := Nil;
+ If (Operation    = opRemove)              And
+    (AComponent   = vDWResponseTranslator) Then
+   vDWResponseTranslator := Nil;
  If (Operation    = opRemove)              And
     (AComponent   = vUpdateSQL)            Then
   vUpdateSQL      := Nil;
@@ -10580,21 +10589,21 @@ Function TRESTDWTable.OpenJson(JsonValue              : String = '';
 Var
  LDataSetList  : TJSONValue;
  vMessageError : String;
-// oDWResponseTranslator: TDWResponseTranslator;
+ oDWResponseTranslator: TRESTDWResponseTranslator;
  vBool: Boolean;
 Begin
   Result       := False;
   vBool := False;
   LDataSetList := Nil;
   Close;
-//  oDWResponseTranslator := vDWResponseTranslator;
-//  vBool := Not Assigned(vDWResponseTranslator);
-//  If vBool Then
-//   Begin
-//    oDWResponseTranslator := TDWResponseTranslator.Create(Self);
-//    oDWResponseTranslator.ElementRootBaseName := ElementRoot;
-//    Self.DWResponseTranslator := oDWResponseTranslator;
-//   End;
+  oDWResponseTranslator := vDWResponseTranslator;
+  vBool := Not Assigned(vDWResponseTranslator);
+  If vBool Then
+   Begin
+    oDWResponseTranslator := TRESTDWResponseTranslator.Create(Self);
+    oDWResponseTranslator.ElementRootBaseName := ElementRoot;
+    Self.ResponseTranslator := oDWResponseTranslator;
+   End;
   LDataSetList := TJSONValue.Create;
   Try
    If JsonValue <> '' Then
@@ -10634,7 +10643,7 @@ Begin
      Try
       LDataSetList.OnWriterProcess := OnWriterProcess;
       LDataSetList.Utf8SpecialChars := True;
-//      LDataSetList.WriteToDataset(JsonValue, Self, oDWResponseTranslator, rtJSONAll);
+      LDataSetList.WriteToDataset(JsonValue, Self, oDWResponseTranslator, rtJSONAll);
       Result := True;
      Except
       On E : Exception Do
@@ -10646,11 +10655,11 @@ Begin
   Finally
    If (LDataSetList <> Nil) Then
     FreeAndNil(LDataSetList);
-//   If (oDWResponseTranslator <> nil) And (vBool) Then
-//    Begin
-//     FreeAndNil(oDWResponseTranslator);
-//     DWResponseTranslator := Nil;
-//    End;
+   If (oDWResponseTranslator <> nil) And (vBool) Then
+    Begin
+     FreeAndNil(oDWResponseTranslator);
+     ResponseTranslator := Nil;
+    End;
    vInBlockEvents  := False;
   End;
 End;
@@ -10662,21 +10671,21 @@ Function TRESTDWClientSQL.OpenJson(JsonValue              : String = '';
 Var
  LDataSetList  : TJSONValue;
  vMessageError : String;
-// oDWResponseTranslator: TDWResponseTranslator;
+ oDWResponseTranslator: TRESTDWResponseTranslator;
  vBool: Boolean;
 Begin
   Result       := False;
   vBool := False;
   LDataSetList := Nil;
   Close;
-//  oDWResponseTranslator := vDWResponseTranslator;
-//  vBool := Not Assigned(vDWResponseTranslator);
-//  If vBool Then
-//   Begin
-//    oDWResponseTranslator := TDWResponseTranslator.Create(Self);
-//    oDWResponseTranslator.ElementRootBaseName := ElementRoot;
-//    Self.DWResponseTranslator := oDWResponseTranslator;
-//   End;
+  oDWResponseTranslator := vDWResponseTranslator;
+  vBool := Not Assigned(vDWResponseTranslator);
+  If vBool Then
+   Begin
+    oDWResponseTranslator := TRESTDWResponseTranslator.Create(Self);
+    oDWResponseTranslator.ElementRootBaseName := ElementRoot;
+    Self.ResponseTranslator := oDWResponseTranslator;
+   End;
   LDataSetList := TJSONValue.Create;
   Try
    If JsonValue <> '' Then
@@ -10718,7 +10727,7 @@ Begin
      Try
       LDataSetList.OnWriterProcess := OnWriterProcess;
       LDataSetList.Utf8SpecialChars := True;
-//      LDataSetList.WriteToDataset(JsonValue, Self, oDWResponseTranslator, rtJSONAll);
+      LDataSetList.WriteToDataset(JsonValue, Self, oDWResponseTranslator, rtJSONAll);
       Result := True;
      Except
       On E : Exception Do
@@ -10730,11 +10739,11 @@ Begin
   Finally
    If (LDataSetList <> Nil) Then
     FreeAndNil(LDataSetList);
-//   If (oDWResponseTranslator <> nil) And (vBool) Then
-//    Begin
-//     FreeAndNil(oDWResponseTranslator);
-//     DWResponseTranslator := Nil;
-//    End;
+   If (oDWResponseTranslator <> nil) And (vBool) Then
+    Begin
+     FreeAndNil(oDWResponseTranslator);
+     ResponseTranslator := Nil;
+    End;
    vInBlockEvents  := False;
   End;
 End;
@@ -10792,72 +10801,71 @@ Begin
  vStream       := Nil;
  vRowsAffected := 0;
  Self.Close;
-// If Assigned(vDWResponseTranslator) Then
-//  Begin
-//   LDataSetList          := TJSONValue.Create;
-//   Try
-//    LDataSetList.Encoded  := False;
-//    If Assigned(vDWResponseTranslator.ClientREST) Then
-//     LDataSetList.Encoding := vDWResponseTranslator.ClientREST.RequestCharset;
-//    Try
-//     vValue := vDWResponseTranslator.Open(vDWResponseTranslator.RequestOpen,
-//                                          vDWResponseTranslator.RequestOpenUrl);
-//    Except
-//     Self.Close;
-//    End;
-//    If vValue = '[]' Then
-//     vValue := '';
-//    {$IFDEF FPC}
-//     vValue := StringReplace(vValue, #10, '', [rfReplaceAll]);
-//    {$ELSE}
-//     vValue := StringReplace(vValue, #$A, '', [rfReplaceAll]);
-//    {$ENDIF}
-//    vError := vValue = '';
-//    If (Assigned(LDataSetList)) And (Not (vError)) Then
-//     Begin
-//      Try
-//       LDataSetList.ServerFieldList := ServerFieldList;
-//       {$IFDEF FPC}
-//        LDataSetList.DatabaseCharSet := DatabaseCharSet;
-//        LDataSetList.NewFieldList    := @NewFieldList;
-//        LDataSetList.CreateDataSet   := @CreateDataSet;
-//        LDataSetList.NewDataField    := @NewDataField;
-//        LDataSetList.SetInitDataset  := @SetInitDataset;
-//        LDataSetList.SetRecordCount     := @SetRecordCount;
-//        LDataSetList.Setnotrepage       := @Setnotrepage;
-//        LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
-//        LDataSetList.SetInBlockEvents   := @SetInBlockEvents;
-//        LDataSetList.FieldListCount     := @FieldListCount;
-//        LDataSetList.GetInDesignEvents  := @GetInDesignEvents;
-//        LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
-//        LDataSetList.PrepareDetails     := @PrepareDetails;
-//       {$ELSE}
-//        LDataSetList.NewFieldList    := NewFieldList;
-//        LDataSetList.CreateDataSet   := CreateDataSet;
-//        LDataSetList.NewDataField    := NewDataField;
-//        LDataSetList.SetInitDataset  := SetInitDataset;
-//        LDataSetList.SetRecordCount     := SetRecordCount;
-//        LDataSetList.Setnotrepage       := Setnotrepage;
-//        LDataSetList.SetInDesignEvents  := SetInDesignEvents;
-//        LDataSetList.SetInBlockEvents   := SetInBlockEvents;
-//        LDataSetList.FieldListCount     := FieldListCount;
-//        LDataSetList.GetInDesignEvents  := GetInDesignEvents;
-//        LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
-//        LDataSetList.PrepareDetails     := PrepareDetails;
-//       {$ENDIF}
-//       LDataSetList.OnWriterProcess := OnWriterProcess;
-//       LDataSetList.Utf8SpecialChars := True;
-//       LDataSetList.WriteToDataset(vValue, Self, vDWResponseTranslator, rtJSONAll);
-//       Result := True;
-//      Except
-//      End;
-//     End;
-//   Finally
-//    LDataSetList.Free;
-//   End;
-//  End
-// Else If Assigned(vRESTDataBase) Then
- If Assigned(vRESTDataBase) Then
+ If Assigned(vDWResponseTranslator) Then
+  Begin
+   LDataSetList          := TJSONValue.Create;
+   Try
+    LDataSetList.Encoded  := False;
+    If Assigned(vDWResponseTranslator.ClientREST) Then
+     LDataSetList.Encoding := TRESTDWClientRESTBase(vDWResponseTranslator.ClientREST).RequestCharset;
+    Try
+     vValue := vDWResponseTranslator.Open(vDWResponseTranslator.RequestOpen,
+                                          vDWResponseTranslator.RequestOpenUrl);
+    Except
+     Self.Close;
+    End;
+    If vValue = '[]' Then
+     vValue := '';
+    {$IFDEF FPC}
+     vValue := StringReplace(vValue, #10, '', [rfReplaceAll]);
+    {$ELSE}
+     vValue := StringReplace(vValue, #$A, '', [rfReplaceAll]);
+    {$ENDIF}
+    vError := vValue = '';
+    If (Assigned(LDataSetList)) And (Not (vError)) Then
+     Begin
+      Try
+       LDataSetList.ServerFieldList := ServerFieldList;
+       {$IFDEF FPC}
+        LDataSetList.DatabaseCharSet := DatabaseCharSet;
+        LDataSetList.NewFieldList    := @NewFieldList;
+        LDataSetList.CreateDataSet   := @CreateDataSet;
+        LDataSetList.NewDataField    := @NewDataField;
+        LDataSetList.SetInitDataset  := @SetInitDataset;
+        LDataSetList.SetRecordCount     := @SetRecordCount;
+        LDataSetList.Setnotrepage       := @Setnotrepage;
+        LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
+        LDataSetList.SetInBlockEvents   := @SetInBlockEvents;
+        LDataSetList.FieldListCount     := @FieldListCount;
+        LDataSetList.GetInDesignEvents  := @GetInDesignEvents;
+        LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
+        LDataSetList.PrepareDetails     := @PrepareDetails;
+       {$ELSE}
+        LDataSetList.NewFieldList    := NewFieldList;
+        LDataSetList.CreateDataSet   := CreateDataSet;
+        LDataSetList.NewDataField    := NewDataField;
+        LDataSetList.SetInitDataset  := SetInitDataset;
+        LDataSetList.SetRecordCount     := SetRecordCount;
+        LDataSetList.Setnotrepage       := Setnotrepage;
+        LDataSetList.SetInDesignEvents  := SetInDesignEvents;
+        LDataSetList.SetInBlockEvents   := SetInBlockEvents;
+        LDataSetList.FieldListCount     := FieldListCount;
+        LDataSetList.GetInDesignEvents  := GetInDesignEvents;
+        LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
+        LDataSetList.PrepareDetails     := PrepareDetails;
+       {$ENDIF}
+       LDataSetList.OnWriterProcess := OnWriterProcess;
+       LDataSetList.Utf8SpecialChars := True;
+       LDataSetList.WriteToDataset(vValue, Self, vDWResponseTranslator, rtJSONAll);
+       Result := True;
+      Except
+      End;
+     End;
+   Finally
+    LDataSetList.Free;
+   End;
+  End
+ Else If Assigned(vRESTDataBase) Then
   Begin
    Try
     If DataSet = Nil Then
@@ -11084,74 +11092,74 @@ Begin
  vStream       := Nil;
  vRowsAffected := 0;
  Self.Close;
-// If Assigned(vDWResponseTranslator) Then
-//  Begin
-//   LDataSetList          := TJSONValue.Create;
-//   Try
-//    LDataSetList.Encoded  := False;
-//    If Assigned(vDWResponseTranslator.ClientREST) Then
-//     LDataSetList.Encoding := vDWResponseTranslator.ClientREST.RequestCharset;
-//    Try
-//     vValue := vDWResponseTranslator.Open(vDWResponseTranslator.RequestOpen,
-//                                          vDWResponseTranslator.RequestOpenUrl);
-//    Except
-//     Self.Close;
-//    End;
-//    If vValue = '[]' Then
-//     vValue := '';
-//    {$IFDEF FPC}
-//     vValue := StringReplace(vValue, #10, '', [rfReplaceAll]);
-//    {$ELSE}
-//     vValue := StringReplace(vValue, #$A, '', [rfReplaceAll]);
-//    {$ENDIF}
-//    vError := vValue = '';
-//    If (Assigned(LDataSetList)) And (Not (vError)) Then
-//     Begin
-//      Try
-//       LDataSetList.ServerFieldList := ServerFieldList;
-//       {$IFDEF FPC}
-//        LDataSetList.DatabaseCharSet := DatabaseCharSet;
-//        LDataSetList.NewFieldList    := @NewFieldList;
-//        LDataSetList.CreateDataSet   := @CreateDataSet;
-//        LDataSetList.NewDataField    := @NewDataField;
-//        LDataSetList.SetInitDataset  := @SetInitDataset;
-//        LDataSetList.SetRecordCount     := @SetRecordCount;
-//        LDataSetList.Setnotrepage       := @Setnotrepage;
-//        LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
-//        LDataSetList.SetInBlockEvents   := @SetInBlockEvents;
-//        LDataSetList.SetInactive        := @SetInactive;
-//        LDataSetList.FieldListCount     := @FieldListCount;
-//        LDataSetList.GetInDesignEvents  := @GetInDesignEvents;
-//        LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
-//        LDataSetList.PrepareDetails     := @PrepareDetails;
-//       {$ELSE}
-//        LDataSetList.NewFieldList    := NewFieldList;
-//        LDataSetList.CreateDataSet   := CreateDataSet;
-//        LDataSetList.NewDataField    := NewDataField;
-//        LDataSetList.SetInitDataset  := SetInitDataset;
-//        LDataSetList.SetRecordCount     := SetRecordCount;
-//        LDataSetList.Setnotrepage       := Setnotrepage;
-//        LDataSetList.SetInDesignEvents  := SetInDesignEvents;
-//        LDataSetList.SetInBlockEvents   := SetInBlockEvents;
-//        LDataSetList.SetInactive        := SetInactive;
-//        LDataSetList.FieldListCount     := FieldListCount;
-//        LDataSetList.GetInDesignEvents  := GetInDesignEvents;
-//        LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
-//        LDataSetList.PrepareDetails     := PrepareDetails;
-//       {$ENDIF}
-//       LDataSetList.OnWriterProcess := OnWriterProcess;
-//       LDataSetList.Utf8SpecialChars := True;
-//       LDataSetList.WriteToDataset(vValue, Self, vDWResponseTranslator, rtJSONAll);
-//       Result := True;
-//      Except
-//      End;
-//     End;
-//   Finally
-//    LDataSetList.Free;
-//   End;
-//  End
-// Else If Assigned(vRESTDataBase) Then
- If Assigned(vRESTDataBase) Then
+ If Assigned(vDWResponseTranslator) Then
+  Begin
+   LDataSetList          := TJSONValue.Create;
+   Try
+    LDataSetList.Encoded  := False;
+    If Assigned(vDWResponseTranslator.ClientREST) Then
+     LDataSetList.Encoding := TRESTDWClientRESTBase(vDWResponseTranslator.ClientREST).RequestCharset;
+    Try
+     vValue := vDWResponseTranslator.Open(vDWResponseTranslator.RequestOpen,
+                                          vDWResponseTranslator.RequestOpenUrl);
+    Except
+     Self.Close;
+    End;
+    If vValue = '[]' Then
+     vValue := '';
+    {$IFDEF FPC}
+     vValue := StringReplace(vValue, #10, '', [rfReplaceAll]);
+    {$ELSE}
+     vValue := StringReplace(vValue, #$A, '', [rfReplaceAll]);
+    {$ENDIF}
+    vError := vValue = '';
+    If (Assigned(LDataSetList)) And (Not (vError)) Then
+     Begin
+      Try
+       LDataSetList.ServerFieldList := ServerFieldList;
+       {$IFDEF FPC}
+        LDataSetList.DatabaseCharSet := DatabaseCharSet;
+        LDataSetList.NewFieldList    := @NewFieldList;
+        LDataSetList.CreateDataSet   := @CreateDataSet;
+        LDataSetList.NewDataField    := @NewDataField;
+        LDataSetList.SetInitDataset  := @SetInitDataset;
+        LDataSetList.SetRecordCount     := @SetRecordCount;
+        LDataSetList.Setnotrepage       := @Setnotrepage;
+        LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
+        LDataSetList.SetInBlockEvents   := @SetInBlockEvents;
+        LDataSetList.SetInactive        := @SetInactive;
+        LDataSetList.FieldListCount     := @FieldListCount;
+        LDataSetList.GetInDesignEvents  := @GetInDesignEvents;
+        LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
+        LDataSetList.PrepareDetails     := @PrepareDetails;
+       {$ELSE}
+        LDataSetList.NewFieldList    := NewFieldList;
+        LDataSetList.CreateDataSet   := CreateDataSet;
+        LDataSetList.NewDataField    := NewDataField;
+        LDataSetList.SetInitDataset  := SetInitDataset;
+        LDataSetList.SetRecordCount     := SetRecordCount;
+        LDataSetList.Setnotrepage       := Setnotrepage;
+        LDataSetList.SetInDesignEvents  := SetInDesignEvents;
+        LDataSetList.SetInBlockEvents   := SetInBlockEvents;
+        LDataSetList.SetInactive        := SetInactive;
+        LDataSetList.FieldListCount     := FieldListCount;
+        LDataSetList.GetInDesignEvents  := GetInDesignEvents;
+        LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
+        LDataSetList.PrepareDetails     := PrepareDetails;
+       {$ENDIF}
+       LDataSetList.OnWriterProcess := OnWriterProcess;
+       LDataSetList.Utf8SpecialChars := True;
+       LDataSetList.WriteToDataset(vValue, Self, vDWResponseTranslator, rtJSONAll);
+       Result := True;
+      Except
+      End;
+     End;
+   Finally
+    LDataSetList.Free;
+   End;
+  End
+ Else If Assigned(vRESTDataBase) Then
+// If Assigned(vRESTDataBase) Then
   Begin
    Try
     If DataSet = Nil Then
@@ -11355,15 +11363,15 @@ Begin
   Raise Exception.Create(PChar(cEmptyDBName));
 End;
 
-//Function TRESTDWTable.GetDWResponseTranslator: TDWResponseTranslator;
-//Begin
-// Result := vDWResponseTranslator;
-//End;
-//
-//function TRESTDWClientSQL.GetDWResponseTranslator: TDWResponseTranslator;
-//begin
-//  Result := vDWResponseTranslator;
-//end;
+Function TRESTDWTable.GetDWResponseTranslator: TRESTDWResponseTranslator;
+Begin
+ Result := vDWResponseTranslator;
+End;
+
+function TRESTDWClientSQL.GetDWResponseTranslator: TRESTDWResponseTranslator;
+begin
+  Result := vDWResponseTranslator;
+end;
 
 Function TRESTDWTable.GetFieldListByName(aName: String): TFieldDefinition;
 Var

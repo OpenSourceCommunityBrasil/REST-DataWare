@@ -28,12 +28,12 @@ interface
 
 Uses
  {$IFDEF FPC}
-  SysUtils,  Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWTools;
+  SysUtils,  Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWTools, uRESTDWResponseTranslator;
  {$ELSE}
   {$if CompilerVersion > 24} // Delphi 2010 acima
-   System.SysUtils, System.Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWTools;
+   System.SysUtils, System.Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWTools, uRESTDWResponseTranslator;
   {$ELSE}
-   SysUtils, Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWTools;
+   SysUtils, Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWTools, uRESTDWResponseTranslator;
   {$IFEND}
  {$ENDIF}
 
@@ -180,15 +180,15 @@ Type
                             {$ENDIF}
                             DataType         : Boolean = False;
                             HeaderLowercase  : Boolean = False);Overload;
-//  Procedure WriteToFieldDefs(JSONValue                : String;
-//                             Const ResponseTranslator : TDWResponseTranslator);
+  Procedure WriteToFieldDefs(JSONValue                : String;
+                             Const ResponseTranslator : TRESTDWResponseTranslator);
   procedure WriteToDataset2(JSONValue: String; DestDS: TDataset);
   Procedure WriteToDataset (JSONValue          : String;
                             Const DestDS       : TDataset);Overload;
-//  Procedure WriteToDataset (JSONValue          : String;
-//                            Const DestDS       : TDataset;
-//                            ResponseTranslator : TDWResponseTranslator;
-//                            ResquestMode       : TResquestMode);Overload;
+  Procedure WriteToDataset (JSONValue          : String;
+                            Const DestDS       : TDataset;
+                            ResponseTranslator : TRESTDWResponseTranslator;
+                            ResquestMode       : TResquestMode);Overload;
   Procedure WriteToDataset (DatasetType      : TDatasetType;
                             JSONValue        : String;
                             Const DestDS     : TDataset;
@@ -1998,86 +1998,86 @@ Begin
  vNullValue       := Length(aValue) = 0;
 End;
 
-//Procedure TJSONValue.WriteToFieldDefs(JSONValue                : String;
-//                                      Const ResponseTranslator : TDWResponseTranslator);
-// Function ReadFieldDefs(JSONObject,
-//                        ElementRoot      : String;
-//                        ElementRootIndex : Integer) : String;
-// Var
-//  bJsonValueB,
-//  bJsonValue   : TDWJSONObject;
-//  A            : Integer;
-//  vDWFieldDef  : TDWFieldDef;
-//  vStringData,
-//  vStringDataB : String;
-// Begin
-//  Result     := '';
-//  bJsonValue := TDWJSONObject.Create(JSONObject);
-//  Try
-//   If bJsonValue.PairCount > 0 Then
-//    Begin
-//     Result := JSONObject;
-//     If ResponseTranslator.FieldDefs.Count = 0 Then
-//      Begin
-//       For A := 0 To bJsonValue.PairCount -1 Do
-//        Begin
-//         If (ElementRoot <> '') or (JSONObject[InitStrPos] = '[') Then
-//          Begin
-//           If (UpperCase(ElementRoot) = UpperCase(bJsonValue.pairs[A].Name)) or
-//              (JSONObject[InitStrPos] = '[') Then
-//            Begin
-//             vStringData  := bJsonValue.pairs[A].Value;
-//             bJsonValueB := TDWJSONObject.Create(vStringData);
-//             If (JSONObject[InitStrPos] <> '[') Then
-//              vStringDataB := vStringData
-//             Else
-//              vStringDataB := JSONObject;
-//             While bJsonValueB.ClassType = TDWJSONArray Do
-//              Begin
-//               vStringData := bJsonValueB.Pairs[0].Value;
-//               bJsonValueB.Free;
-//               bJsonValueB := TDWJSONObject.Create(vStringData);
-//               If bJsonValueB.ClassType = TDWJSONArray Then
-//                vStringDataB := vStringData;
-//              End;
-//             bJsonValueB.Free;
-//             Result := vStringDataB;
-//             ReadFieldDefs(vStringData, '', -1);
-//             Exit;
-//            End;
-//          End
-//         Else
-//          Begin
-//           If ResponseTranslator.FieldDefs.FieldDefByName[bJsonValue.pairs[A].Name] = Nil Then
-//            Begin
-//             vDWFieldDef              := TDWFieldDef(ResponseTranslator.FieldDefs.Add);
-//             vDWFieldDef.ElementName  := bJsonValue.pairs[A].Name;
-//             vDWFieldDef.ElementIndex := A;
-//             vDWFieldDef.FieldName    := vDWFieldDef.ElementName;
-//             vDWFieldDef.FieldSize    := Length(bJsonValue.pairs[A].Value);
-//             vDWFieldDef.DataType     := ovString;
-//            End;
-//          End;
-//        End;
-//      End;
-//    End;
-//  Finally
-//   bJsonValue.Free;
-//  End;
-// End;
-//Var
-// bJsonValue : TDWJSONObject;
-//Begin
-// bJsonValue := TDWJSONObject.Create(JSONValue);
-// Try
-//  If bJsonValue.PairCount > 0 Then
-//   ReadFieldDefs(JSONValue,
-//                 ResponseTranslator.ElementRootBaseName,
-//                 ResponseTranslator.ElementRootBaseIndex);
-// Finally
-//  FreeAndNil(bJsonValue);
-// End;
-//End;
+Procedure TJSONValue.WriteToFieldDefs(JSONValue                : String;
+                                      Const ResponseTranslator : TRESTDWResponseTranslator);
+ Function ReadFieldDefs(JSONObject,
+                        ElementRoot      : String;
+                        ElementRootIndex : Integer) : String;
+ Var
+  bJsonValueB,
+  bJsonValue   : TRESTDWJSONInterfaceObject;
+  A            : Integer;
+  vDWFieldDef  : TRESTDWFieldDef;
+  vStringData,
+  vStringDataB : String;
+ Begin
+  Result     := '';
+  bJsonValue := TRESTDWJSONInterfaceObject.Create(JSONObject);
+  Try
+   If bJsonValue.PairCount > 0 Then
+    Begin
+     Result := JSONObject;
+     If ResponseTranslator.FieldDefs.Count = 0 Then
+      Begin
+       For A := 0 To bJsonValue.PairCount -1 Do
+        Begin
+         If (ElementRoot <> '') or (JSONObject[InitStrPos] = '[') Then
+          Begin
+           If (UpperCase(ElementRoot) = UpperCase(bJsonValue.pairs[A].Name)) or
+              (JSONObject[InitStrPos] = '[') Then
+            Begin
+             vStringData  := bJsonValue.pairs[A].Value;
+             bJsonValueB := TRESTDWJSONInterfaceObject.Create(vStringData);
+             If (JSONObject[InitStrPos] <> '[') Then
+              vStringDataB := vStringData
+             Else
+              vStringDataB := JSONObject;
+             While bJsonValueB.ClassType = TRESTDWJSONInterfaceArray Do
+              Begin
+               vStringData := bJsonValueB.Pairs[0].Value;
+               bJsonValueB.Free;
+               bJsonValueB := TRESTDWJSONInterfaceObject.Create(vStringData);
+               If bJsonValueB.ClassType = TRESTDWJSONInterfaceArray Then
+                vStringDataB := vStringData;
+              End;
+             bJsonValueB.Free;
+             Result := vStringDataB;
+             ReadFieldDefs(vStringData, '', -1);
+             Exit;
+            End;
+          End
+         Else
+          Begin
+           If ResponseTranslator.FieldDefs.FieldDefByName[bJsonValue.pairs[A].Name] = Nil Then
+            Begin
+             vDWFieldDef              := TRESTDWFieldDef(ResponseTranslator.FieldDefs.Add);
+             vDWFieldDef.ElementName  := bJsonValue.pairs[A].Name;
+             vDWFieldDef.ElementIndex := A;
+             vDWFieldDef.FieldName    := vDWFieldDef.ElementName;
+             vDWFieldDef.FieldSize    := Length(bJsonValue.pairs[A].Value);
+             vDWFieldDef.DataType     := ovString;
+            End;
+          End;
+        End;
+      End;
+    End;
+  Finally
+   bJsonValue.Free;
+  End;
+ End;
+Var
+ bJsonValue : TRESTDWJSONInterfaceObject;
+Begin
+ bJsonValue := TRESTDWJSONInterfaceObject.Create(JSONValue);
+ Try
+  If bJsonValue.PairCount > 0 Then
+   ReadFieldDefs(JSONValue,
+                 ResponseTranslator.ElementRootBaseName,
+                 ResponseTranslator.ElementRootBaseIndex);
+ Finally
+  FreeAndNil(bJsonValue);
+ End;
+End;
 
 procedure TJSONValue.WriteToDataset2(JSONValue: String; DestDS: TDataset);
 Var
@@ -2621,602 +2621,602 @@ Begin
  End;
 End;
 
-//Procedure TJSONValue.WriteToDataset(JSONValue          : String;
-//                                    Const DestDS       : TDataset;
-//                                    ResponseTranslator : TDWResponseTranslator;
-//                                    ResquestMode       : TResquestMode);
-//Var
-// FieldValidate     : TFieldNotifyEvent;
-// //vFieldDefinition : TFieldDefinition;
-// bJsonValue,
-// bJsonValueB,
-// bJsonValueC       : TRESTDWJSONInterfaceObject;
-// bJsonArrayB       : TRESTDWJSONInterfaceArray;
-// ListFields        : TStringList;
-// A, J, I, Z        : Integer;
-// vBlobStream       : TMemoryStream;
-// vTempValueJSONB,
-// vTempValueJSON,
-// vTempValue        : String;
-// FieldDef          : TFieldDef;
-// Field             : TField;
-// AbortProcess,
-// vOldReadOnly,
-// vFindFlag         : Boolean;
-// bJsonOBJB,
-// bJsonOBJ          : TRESTDWJSONInterfaceBase;
-// vLocSetInBlockEvents : TSetInitDataset;
-// vLocNewDataField     : TNewDataField;
-// vLocFieldExist       : TFieldExist;
-// vLocSetRecordCount   : TSetRecordCount;
-// vLocSetInitDataset   : TSetInitDataset;
-// vLocNewFieldList,
-// vLocCreateDataset    : TProcedureEvent;
-// vLocFieldListCount   : TFieldListCount;
-// Function ReadFieldDefs(Var vResult      : String;
-//                        JSONObject,
-//                        ElementRoot      : String;
-//                        ElementRootIndex : Integer;
-//                        InLoop           : Boolean = False;
-//                        IgnoreRules      : Boolean = False) : Boolean;
-// Var
-//  bJsonValueB,
-//  bJsonValue   : TRESTDWJSONInterfaceObject;
-//  A, I         : Integer;
-//  vFieldDefsCreate,
-//  vFindIndex   : Boolean;
-//  vDWFieldDef  : TDWFieldDef;
-//  vStringData,
-//  vStringDataB,
-//  vStringDataTemp : String;
-// Begin
-//  bJsonValueB := Nil;
-//  bJsonValue  := Nil;
-//  Result     := False;
-//  If JSONObject <> '' Then
-//   Begin
-//    bJsonValue  := TRESTDWJSONInterfaceObject.Create(JSONObject);
-//    vFindIndex  := False;
-//    Try
-//     If bJsonValue.PairCount > 0 Then
-//      Begin
-//  //     vResult          := JSONObject;
-//       vFieldDefsCreate := ResponseTranslator.FieldDefs.Count = 0;
-//       If Not vFieldDefsCreate Then
-//        vFieldDefsCreate := InLoop;
-//       For A := 0 To bJsonValue.PairCount -1 Do
-//        Begin
-//         If (((ElementRoot <> '') or (JSONObject[InitStrPos] = '[')) And Not(IgnoreRules)) or (Not (vFieldDefsCreate)) Then
-//          Begin
-//           vResult    := '';
-//           If (UpperCase(ElementRoot) = UpperCase(bJsonValue.pairs[A].Name)) or
-//              (JSONObject[InitStrPos] = '[') Then
-//            Begin
-//             vFindIndex   := UpperCase(ElementRoot) = UpperCase(bJsonValue.pairs[A].Name);
-//             vStringData  := bJsonValue.pairs[A].Value;
-//             If (JSONObject[InitStrPos] <> '[') Then
-//              vStringDataB    := vStringData
-//             Else
-//              vStringDataB    := JSONObject;
-//             If (vStringData = 'null') Or (vStringData = '') Then
-//              Begin
-//               vStringData := '';
-//               If (vStringDataB = 'null') Or (vStringDataB = '') Then
-//                vStringDataB := '';
-//               vResult := vStringDataB;
-//              End
-//             Else
-//              Begin
-//               vStringDataTemp := vStringDataB;
-//               bJsonValueB := TRESTDWJSONInterfaceObject.Create(vStringDataTemp);
-//               I := 0;
-//               While (bJsonValueB <> Nil) And (bJsonValueB.ClassType = TRESTDWJSONInterfaceArray) And
-//                     ((bJsonValueB.PairCount > 0) And (I <= bJsonValueB.PairCount))  Do
-//                Begin
-//                 vStringData := bJsonValueB.Pairs[I].Value;
-//                 FreeAndNil(bJsonValueB);
-//                 If (vStringData[InitStrPos] = '{') Or
-//                    (vStringData[InitStrPos] = '[') Then
-//                  bJsonValueB := TRESTDWJSONInterfaceObject.Create(vStringData)
-//                 Else
-//                  Begin
-//                   vStringData := vStringDataTemp;
-//                   IgnoreRules := True;
-//                   Break;
-//                  End;
-//                 Inc(I);
-//                End;
-//               If Assigned(bJsonValueB) Then
-//                bJsonValueB.Free;
-//               vResult := vStringDataTemp;
-//              End;
-//  //           vResult := vStringDataB;
-//             If Not Result Then
-//              Begin
-//               If vFindIndex Then
-//                Begin
-//                 vResult := vStringDataTemp;
-//                 Result := ReadFieldDefs(vResult, vStringData, '', -1, vFindIndex, IgnoreRules);
-//                End
-//               Else
-//                Begin
-//                 Result := ReadFieldDefs(vResult, vStringData, ElementRoot, -1, vFindIndex, IgnoreRules);
-//  //               vResult := vStringDataTemp;
-//                End;
-//              End;
-//             Exit;
-//            End;
-//          End
-//         Else If vFieldDefsCreate Then
-//          Begin
-//           Result     := True;
-//           vFindIndex := True;
-//           If ResponseTranslator.FieldDefs.FieldDefByName[bJsonValue.pairs[A].Name] = Nil Then
-//            Begin
-//             vDWFieldDef              := TDWFieldDef(ResponseTranslator.FieldDefs.Add);
-//             vDWFieldDef.ElementName  := bJsonValue.pairs[A].Name;
-//             vDWFieldDef.ElementIndex := A;
-//             vDWFieldDef.FieldName    := vDWFieldDef.ElementName;
-//             vDWFieldDef.FieldSize    := Length(bJsonValue.pairs[A].Value);
-//             If vDWFieldDef.FieldSize = 0 Then
-//              vDWFieldDef.FieldSize   := 10;
-//             vDWFieldDef.DataType     := ovString;
-//            End;
-//          End;
-//        End;
-//       If (ElementRoot <> '') Then
-//       If Not(vFindIndex) Then
-//        Begin
-//         For A := 0 To bJsonValue.PairCount -1 Do
-//          Begin
-//           vStringDataTemp := bJsonValue.pairs[A].Value;
-//           Result := ReadFieldDefs(vResult, vStringDataTemp, ElementRoot, -1);
-//           If Result Then
-//            Break;
-//          End;
-//        End;
-//      End;
-//    Finally
-//     bJsonValue.Free;
-//     If Not Result Then
-//      If vResult = '' Then
-//       vResult := JSONValue;
-//    End;
-//   End;
-// End;
-//Begin
-// vFieldDefinition  := Nil;
-// bJsonValue        := Nil;
-// bJsonValueB       := Nil;
-// bJsonValueC       := Nil;
-// bJsonArrayB       := Nil;
-// bJsonOBJB         := Nil;
-// bJsonOBJ          := Nil;
-// vBlobStream       := Nil;
-// AbortProcess      := False;
-// vLocSetInBlockEvents := SetInBlockEvents;
-// vLocNewDataField     := NewDataField;
-// vLocFieldExist       := FieldExist;
-// vLocFieldListCount   := FieldListCount;
-// vLocNewFieldList     := NewFieldList;
-// vLocCreateDataSet    := CreateDataSet;
-// vLocSetRecordCount   := SetRecordCount;
-// vLocSetInitDataset   := SetInitDataset;
-// If (Trim(JSONValue) = '') or (Trim(JSONValue) = '{}') or (Trim(JSONValue) = '[]') Then // Ico Menezes - Tratar Erros de JsonVazio
-//  Exit;
-// ListFields  := TStringList.Create;
-// bJsonValueB := Nil;
-// bJsonValue  := TRESTDWJSONInterfaceObject.Create(JSONValue);
-// Try
-//  If bJsonValue.PairCount > 0 Then
-//   Begin
-//    vLocSetInBlockEvents(True);
-//    DestDS.DisableControls;
-//    If DestDS.Active Then
-//     DestDS.Close;
-//    vTempValueJSON := JSONValue;
-//    If (ResquestMode = rtOnlyFields) Or
-//      (((ResponseTranslator.ElementAutoReadRootIndex)    Or
-//        (ResponseTranslator.ElementRootBaseName <> '')   Or
-//        (ResponseTranslator.ElementRootBaseIndex > -1))) Then
-//     ReadFieldDefs(vTempValueJSON, JSONValue,
-//                   ResponseTranslator.ElementRootBaseName,
-//                   ResponseTranslator.ElementRootBaseIndex);
-//    vLocNewFieldList;
-//    vFieldDefinition := TFieldDefinition.Create;
-//    If DestDS.Fields.Count = 0 Then
-//     DestDS.FieldDefs.Clear;
-//    //Removendo campos inválidos
-//    For J := DestDS.Fields.Count - 1 DownTo 0 Do
-//     Begin
-//      If DestDS.Fields[J].FieldKind = fkData Then
-//       If ResponseTranslator.FieldDefs.FieldDefByName[DestDS.Fields[J].FieldName] = Nil Then
-//        DestDS.Fields.Remove(DestDS.Fields[J]);
-//     End;
-//    For J := 0 To DestDS.Fields.Count - 1 Do
-//     Begin
-//      vFieldDefinition.FieldName := DestDS.Fields[J].FieldName;
-//      vFieldDefinition.DataType  := DestDS.Fields[J].DataType;
-//      If (vFieldDefinition.DataType <> ftFloat) Then
-//       vFieldDefinition.Size     := DestDS.Fields[J].Size
-//      Else
-//       vFieldDefinition.Size     := 0;
-//      If (vFieldDefinition.DataType In [ftCurrency, ftBCD,
-//                                        {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-//                                        {$IFEND}{$ENDIF} ftFMTBcd]) Then
-//       vFieldDefinition.Precision := TBCDField(DestDS.Fields[J]).Precision
-//      Else If (vFieldDefinition.DataType = ftFloat) Then
-//       vFieldDefinition.Precision := TFloatField(DestDS.Fields[J]).Precision;
-//      vFieldDefinition.Required   := DestDS.Fields[J].Required;
-//      vLocNewDataField(vFieldDefinition);
-//     End;
-//    For J := 0 To ResponseTranslator.FieldDefs.Count - 1 Do
-//     Begin
-//      vTempValue := Trim(ResponseTranslator.FieldDefs[J].FieldName);
-//      If Trim(vTempValue) <> '' Then
-//       Begin
-//        FieldDef := FieldDefExist(DestDS, vTempValue);
-//        If (FieldDef = Nil) Then
-//         Begin
-//          If (vLocFieldExist(DestDS, vTempValue) = Nil) Then
-//           Begin
-//            vFieldDefinition.FieldName  := vTempValue;
-//            vFieldDefinition.DataType   := ObjectValueToFieldType(ResponseTranslator.FieldDefs[J].DataType);
-//            If (vFieldDefinition.DataType <> ftFloat) Then
-//             vFieldDefinition.Size     := ResponseTranslator.FieldDefs[J].FieldSize
-//            Else
-//             vFieldDefinition.Size         := 0;
-//            If (vFieldDefinition.DataType In [ftFloat, ftCurrency, ftBCD,
-//                                              {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-//                                              {$IFEND}{$ENDIF} ftFMTBcd]) Then
-//             vFieldDefinition.Precision := ResponseTranslator.FieldDefs[J].Precision
-//            Else If (vFieldDefinition.DataType = ftFloat) Then
-//             vFieldDefinition.Precision := ResponseTranslator.FieldDefs[J].Precision;
-//            vFieldDefinition.Required   := ResponseTranslator.FieldDefs[J].Required;
-//            vLocNewDataField(vFieldDefinition);
-//           End;
-//          FieldDef          := DestDS.FieldDefs.AddFieldDef;
-//          If vEncoding = esUtf8 Then
-//           Begin
-//           {$IFDEF FPC}
-//            FieldDef.Name   := vTempValue;
-//           {$ELSE}
-//            FieldDef.Name   := UTF8Encode(vTempValue);
-//           {$ENDIF}
-//           End
-//          Else
-//           FieldDef.Name    := vTempValue;
-////            FieldDef.Name     := vTempValue;
-//          FieldDef.DataType := ObjectValueToFieldType(ResponseTranslator.FieldDefs[J].DataType);
-//          If FieldDef.DataType in [ftString, ftWideString] Then
-//           FieldDef.Size := 255;
-//          If Not (FieldDef.DataType in [ftFloat,ftCurrency
-//                                        {$IFNDEF FPC}{$IF CompilerVersion > 21},ftExtended,ftSingle
-//                                        {$IFEND}{$ENDIF}]) Then
-//           Begin
-//            If (FieldDef.Size > ResponseTranslator.FieldDefs[J].FieldSize) then // ajuste em 20/12/2018 Thiago Pedro
-//             ResponseTranslator.FieldDefs[J].FieldSize := FieldDef.Size
-//            Else
-//             FieldDef.Size     := ResponseTranslator.FieldDefs[J].FieldSize;
-//            If FieldDef.DataType in [ftString, ftWideString] Then
-//             If FieldDef.Size > 4000 Then
-//              Begin
-//               ResponseTranslator.FieldDefs[J].DataType := ovMemo;
-//               FieldDef.DataType := ObjectValueToFieldType(ResponseTranslator.FieldDefs[J].DataType);
-//              End;
-//           End;
-//          If (FieldDef.DataType In [ftFloat, ftCurrency, ftBCD,
-//                                    {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-//                                    {$IFEND}{$ENDIF} ftFMTBcd]) Then
-//           FieldDef.Precision := ResponseTranslator.FieldDefs[J].Precision;
-//         End;
-//       End;
-//     End;
-//    if Assigned(vFieldDefinition) then
-//      FreeAndNil(vFieldDefinition);
-//    DestDS.FieldDefs.EndUpdate;
-//    Try
-//     vLocSetInBlockEvents(True);
-//     Inactive := True;
-//     If Assigned(vLocCreateDataSet) Then
-//      vLocCreateDataSet();
-//     If Not DestDS.Active Then
-//      DestDS.Open;
-//     If Not DestDS.Active Then
-//      Begin
-//       FreeAndNil(bJsonValue);
-//       FreeAndNil(ListFields);
-//       Raise Exception.Create('Error on Parse JSON Data...');
-//       Exit;
-//      End;
-//     //Add Set PK Fields
-//     For J := 0 To ResponseTranslator.FieldDefs.Count - 1 Do
-//      Begin
-//       If ResponseTranslator.FieldDefs[J].Required Then
-//        Begin
-//         Field := DestDS.FindField(ResponseTranslator.FieldDefs[J].FieldName);
-//         If Field <> Nil Then
-//          Begin
-//           If Field.FieldKind = fkData Then
-//            Field.ProviderFlags := [pfInUpdate, pfInWhere, pfInKey]
-//           Else
-//            Field.ProviderFlags := [];
-//          End;
-//        End;
-//      End;
-//     bJsonValueB := TRESTDWJSONInterfaceObject.Create(vTempValueJSON);
-//     For A := 0 To DestDS.Fields.Count - 1 Do // ADICIONA REGISTRO
-//      Begin
-//       vFindFlag := False;
-//       If DestDS.FindField(DestDS.Fields[A].FieldName) <> Nil Then
-//        If DestDS.FindField(DestDS.Fields[A].FieldName).FieldKind = fkData Then
-//         Begin
-//          If bJsonValueB.ClassType = TRESTDWJSONInterfaceObject Then
-//           Begin
-//            For J := 0 To bJsonValueB.PairCount - 1 Do
-//             Begin
-//              vFindFlag := Uppercase(Trim(bJsonValueB.pairs[J].Name)) = Uppercase(DestDS.Fields[A].FieldName);
-//              If vFindFlag Then
-//               Begin
-//                ListFields.Add(inttostr(J));
-//                Break;
-//               End;
-////              FreeAndNil(bJsonOBJ);
-//             End;
-//           End
-//          Else If bJsonValueB.ClassType = TRESTDWJSONInterfaceArray Then //Enviado poir Rylan (Genesys Sistemas)
-//           Begin
-//            bJsonValueC := Nil;
-//            For Z := 0 to TRESTDWJSONInterfaceObject(bJsonValueB).PairCount -1 do
-//             Begin
-//              vTempValueJSONB := TRESTDWJSONInterfaceObject(bJsonValueB).pairs[Z].Value;
-//              If (vTempValueJSONB[InitStrPos] = '{') Or (vTempValueJSONB[InitStrPos] = '[') Then
-//               bJsonValueC := TRESTDWJSONInterfaceObject.Create(vTempValueJSONB);
-//              If Assigned(bJsonValueC) Then
-//               If bJsonValueC.PairCount = DestDS.Fields.Count Then
-//                Break;
-//              vTempValueJSONB := EmptyStr;
-//             End;
-//            If Assigned(bJsonValueC) Then
-//             FreeAndNil(bJsonValueC);
-//            If vTempValueJSONB = EmptyStr then
-//             vTempValueJSONB := TRESTDWJSONInterfaceObject(bJsonValueB).pairs[0].Value;
-//            If (vTempValueJSONB[InitStrPos] = '{') Or
-//               (vTempValueJSONB[InitStrPos] = '[') Then
-//             Begin
-//              bJsonValueB.Free;
-//              bJsonValueB := TRESTDWJSONInterfaceObject.Create(vTempValueJSONB);
-//             End;
-//            For J := 0 To bJsonValueB.PairCount - 1 Do
-//             Begin
-//              If Trim(bJsonValueB.pairs[J].Name) <> '' Then
-//               Begin
-//                vFindFlag := Uppercase(Trim(bJsonValueB.pairs[J].Name)) = Uppercase(DestDS.Fields[A].FieldName);
-//                If vFindFlag Then
-//                 Begin
-//                  ListFields.Add(inttostr(J));
-//                  Break;
-//                 End;
-//                End;
+Procedure TJSONValue.WriteToDataset(JSONValue          : String;
+                                    Const DestDS       : TDataset;
+                                    ResponseTranslator : TRESTDWResponseTranslator;
+                                    ResquestMode       : TResquestMode);
+Var
+ FieldValidate     : TFieldNotifyEvent;
+ //vFieldDefinition : TFieldDefinition;
+ bJsonValue,
+ bJsonValueB,
+ bJsonValueC       : TRESTDWJSONInterfaceObject;
+ bJsonArrayB       : TRESTDWJSONInterfaceArray;
+ ListFields        : TStringList;
+ A, J, I, Z        : Integer;
+ vBlobStream       : TMemoryStream;
+ vTempValueJSONB,
+ vTempValueJSON,
+ vTempValue        : String;
+ FieldDef          : TFieldDef;
+ Field             : TField;
+ AbortProcess,
+ vOldReadOnly,
+ vFindFlag         : Boolean;
+ bJsonOBJB,
+ bJsonOBJ          : TRESTDWJSONInterfaceBase;
+ vLocSetInBlockEvents : TSetInitDataset;
+ vLocNewDataField     : TNewDataField;
+ vLocFieldExist       : TFieldExist;
+ vLocSetRecordCount   : TSetRecordCount;
+ vLocSetInitDataset   : TSetInitDataset;
+ vLocNewFieldList,
+ vLocCreateDataset    : TProcedureEvent;
+ vLocFieldListCount   : TFieldListCount;
+ Function ReadFieldDefs(Var vResult      : String;
+                        JSONObject,
+                        ElementRoot      : String;
+                        ElementRootIndex : Integer;
+                        InLoop           : Boolean = False;
+                        IgnoreRules      : Boolean = False) : Boolean;
+ Var
+  bJsonValueB,
+  bJsonValue   : TRESTDWJSONInterfaceObject;
+  A, I         : Integer;
+  vFieldDefsCreate,
+  vFindIndex   : Boolean;
+  vDWFieldDef  : TRESTDWFieldDef;
+  vStringData,
+  vStringDataB,
+  vStringDataTemp : String;
+ Begin
+  bJsonValueB := Nil;
+  bJsonValue  := Nil;
+  Result     := False;
+  If JSONObject <> '' Then
+   Begin
+    bJsonValue  := TRESTDWJSONInterfaceObject.Create(JSONObject);
+    vFindIndex  := False;
+    Try
+     If bJsonValue.PairCount > 0 Then
+      Begin
+  //     vResult          := JSONObject;
+       vFieldDefsCreate := ResponseTranslator.FieldDefs.Count = 0;
+       If Not vFieldDefsCreate Then
+        vFieldDefsCreate := InLoop;
+       For A := 0 To bJsonValue.PairCount -1 Do
+        Begin
+         If (((ElementRoot <> '') or (JSONObject[InitStrPos] = '[')) And Not(IgnoreRules)) or (Not (vFieldDefsCreate)) Then
+          Begin
+           vResult    := '';
+           If (UpperCase(ElementRoot) = UpperCase(bJsonValue.pairs[A].Name)) or
+              (JSONObject[InitStrPos] = '[') Then
+            Begin
+             vFindIndex   := UpperCase(ElementRoot) = UpperCase(bJsonValue.pairs[A].Name);
+             vStringData  := bJsonValue.pairs[A].Value;
+             If (JSONObject[InitStrPos] <> '[') Then
+              vStringDataB    := vStringData
+             Else
+              vStringDataB    := JSONObject;
+             If (vStringData = 'null') Or (vStringData = '') Then
+              Begin
+               vStringData := '';
+               If (vStringDataB = 'null') Or (vStringDataB = '') Then
+                vStringDataB := '';
+               vResult := vStringDataB;
+              End
+             Else
+              Begin
+               vStringDataTemp := vStringDataB;
+               bJsonValueB := TRESTDWJSONInterfaceObject.Create(vStringDataTemp);
+               I := 0;
+               While (bJsonValueB <> Nil) And (bJsonValueB.ClassType = TRESTDWJSONInterfaceArray) And
+                     ((bJsonValueB.PairCount > 0) And (I <= bJsonValueB.PairCount))  Do
+                Begin
+                 vStringData := bJsonValueB.Pairs[I].Value;
+                 FreeAndNil(bJsonValueB);
+                 If (vStringData[InitStrPos] = '{') Or
+                    (vStringData[InitStrPos] = '[') Then
+                  bJsonValueB := TRESTDWJSONInterfaceObject.Create(vStringData)
+                 Else
+                  Begin
+                   vStringData := vStringDataTemp;
+                   IgnoreRules := True;
+                   Break;
+                  End;
+                 Inc(I);
+                End;
+               If Assigned(bJsonValueB) Then
+                bJsonValueB.Free;
+               vResult := vStringDataTemp;
+              End;
+  //           vResult := vStringDataB;
+             If Not Result Then
+              Begin
+               If vFindIndex Then
+                Begin
+                 vResult := vStringDataTemp;
+                 Result := ReadFieldDefs(vResult, vStringData, '', -1, vFindIndex, IgnoreRules);
+                End
+               Else
+                Begin
+                 Result := ReadFieldDefs(vResult, vStringData, ElementRoot, -1, vFindIndex, IgnoreRules);
+  //               vResult := vStringDataTemp;
+                End;
+              End;
+             Exit;
+            End;
+          End
+         Else If vFieldDefsCreate Then
+          Begin
+           Result     := True;
+           vFindIndex := True;
+           If ResponseTranslator.FieldDefs.FieldDefByName[bJsonValue.pairs[A].Name] = Nil Then
+            Begin
+             vDWFieldDef              := TRESTDWFieldDef(ResponseTranslator.FieldDefs.Add);
+             vDWFieldDef.ElementName  := bJsonValue.pairs[A].Name;
+             vDWFieldDef.ElementIndex := A;
+             vDWFieldDef.FieldName    := vDWFieldDef.ElementName;
+             vDWFieldDef.FieldSize    := Length(bJsonValue.pairs[A].Value);
+             If vDWFieldDef.FieldSize = 0 Then
+              vDWFieldDef.FieldSize   := 10;
+             vDWFieldDef.DataType     := ovString;
+            End;
+          End;
+        End;
+       If (ElementRoot <> '') Then
+       If Not(vFindIndex) Then
+        Begin
+         For A := 0 To bJsonValue.PairCount -1 Do
+          Begin
+           vStringDataTemp := bJsonValue.pairs[A].Value;
+           Result := ReadFieldDefs(vResult, vStringDataTemp, ElementRoot, -1);
+           If Result Then
+            Break;
+          End;
+        End;
+      End;
+    Finally
+     bJsonValue.Free;
+     If Not Result Then
+      If vResult = '' Then
+       vResult := JSONValue;
+    End;
+   End;
+ End;
+Begin
+ vFieldDefinition  := Nil;
+ bJsonValue        := Nil;
+ bJsonValueB       := Nil;
+ bJsonValueC       := Nil;
+ bJsonArrayB       := Nil;
+ bJsonOBJB         := Nil;
+ bJsonOBJ          := Nil;
+ vBlobStream       := Nil;
+ AbortProcess      := False;
+ vLocSetInBlockEvents := SetInBlockEvents;
+ vLocNewDataField     := NewDataField;
+ vLocFieldExist       := FieldExist;
+ vLocFieldListCount   := FieldListCount;
+ vLocNewFieldList     := NewFieldList;
+ vLocCreateDataSet    := CreateDataSet;
+ vLocSetRecordCount   := SetRecordCount;
+ vLocSetInitDataset   := SetInitDataset;
+ If (Trim(JSONValue) = '') or (Trim(JSONValue) = '{}') or (Trim(JSONValue) = '[]') Then // Ico Menezes - Tratar Erros de JsonVazio
+  Exit;
+ ListFields  := TStringList.Create;
+ bJsonValueB := Nil;
+ bJsonValue  := TRESTDWJSONInterfaceObject.Create(JSONValue);
+ Try
+  If bJsonValue.PairCount > 0 Then
+   Begin
+    vLocSetInBlockEvents(True);
+    DestDS.DisableControls;
+    If DestDS.Active Then
+     DestDS.Close;
+    vTempValueJSON := JSONValue;
+    If (ResquestMode = rtOnlyFields) Or
+      (((ResponseTranslator.ElementAutoReadRootIndex)    Or
+        (ResponseTranslator.ElementRootBaseName <> '')   Or
+        (ResponseTranslator.ElementRootBaseIndex > -1))) Then
+     ReadFieldDefs(vTempValueJSON, JSONValue,
+                   ResponseTranslator.ElementRootBaseName,
+                   ResponseTranslator.ElementRootBaseIndex);
+    vLocNewFieldList;
+    vFieldDefinition := TFieldDefinition.Create;
+    If DestDS.Fields.Count = 0 Then
+     DestDS.FieldDefs.Clear;
+    //Removendo campos inválidos
+    For J := DestDS.Fields.Count - 1 DownTo 0 Do
+     Begin
+      If DestDS.Fields[J].FieldKind = fkData Then
+       If ResponseTranslator.FieldDefs.FieldDefByName[DestDS.Fields[J].FieldName] = Nil Then
+        DestDS.Fields.Remove(DestDS.Fields[J]);
+     End;
+    For J := 0 To DestDS.Fields.Count - 1 Do
+     Begin
+      vFieldDefinition.FieldName := DestDS.Fields[J].FieldName;
+      vFieldDefinition.DataType  := DestDS.Fields[J].DataType;
+      If (vFieldDefinition.DataType <> ftFloat) Then
+       vFieldDefinition.Size     := DestDS.Fields[J].Size
+      Else
+       vFieldDefinition.Size     := 0;
+      If (vFieldDefinition.DataType In [ftCurrency, ftBCD,
+                                        {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
+                                        {$IFEND}{$ENDIF} ftFMTBcd]) Then
+       vFieldDefinition.Precision := TBCDField(DestDS.Fields[J]).Precision
+      Else If (vFieldDefinition.DataType = ftFloat) Then
+       vFieldDefinition.Precision := TFloatField(DestDS.Fields[J]).Precision;
+      vFieldDefinition.Required   := DestDS.Fields[J].Required;
+      vLocNewDataField(vFieldDefinition);
+     End;
+    For J := 0 To ResponseTranslator.FieldDefs.Count - 1 Do
+     Begin
+      vTempValue := Trim(ResponseTranslator.FieldDefs[J].FieldName);
+      If Trim(vTempValue) <> '' Then
+       Begin
+        FieldDef := FieldDefExist(DestDS, vTempValue);
+        If (FieldDef = Nil) Then
+         Begin
+          If (vLocFieldExist(DestDS, vTempValue) = Nil) Then
+           Begin
+            vFieldDefinition.FieldName  := vTempValue;
+            vFieldDefinition.DataType   := ObjectValueToFieldType(ResponseTranslator.FieldDefs[J].DataType);
+            If (vFieldDefinition.DataType <> ftFloat) Then
+             vFieldDefinition.Size     := ResponseTranslator.FieldDefs[J].FieldSize
+            Else
+             vFieldDefinition.Size         := 0;
+            If (vFieldDefinition.DataType In [ftFloat, ftCurrency, ftBCD,
+                                              {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
+                                              {$IFEND}{$ENDIF} ftFMTBcd]) Then
+             vFieldDefinition.Precision := ResponseTranslator.FieldDefs[J].Precision
+            Else If (vFieldDefinition.DataType = ftFloat) Then
+             vFieldDefinition.Precision := ResponseTranslator.FieldDefs[J].Precision;
+            vFieldDefinition.Required   := ResponseTranslator.FieldDefs[J].Required;
+            vLocNewDataField(vFieldDefinition);
+           End;
+          FieldDef          := DestDS.FieldDefs.AddFieldDef;
+          If vEncoding = esUtf8 Then
+           Begin
+           {$IFDEF FPC}
+            FieldDef.Name   := vTempValue;
+           {$ELSE}
+            FieldDef.Name   := UTF8Encode(vTempValue);
+           {$ENDIF}
+           End
+          Else
+           FieldDef.Name    := vTempValue;
+//            FieldDef.Name     := vTempValue;
+          FieldDef.DataType := ObjectValueToFieldType(ResponseTranslator.FieldDefs[J].DataType);
+          If FieldDef.DataType in [ftString, ftWideString] Then
+           FieldDef.Size := 255;
+          If Not (FieldDef.DataType in [ftFloat,ftCurrency
+                                        {$IFNDEF FPC}{$IF CompilerVersion > 21},ftExtended,ftSingle
+                                        {$IFEND}{$ENDIF}]) Then
+           Begin
+            If (FieldDef.Size > ResponseTranslator.FieldDefs[J].FieldSize) then // ajuste em 20/12/2018 Thiago Pedro
+             ResponseTranslator.FieldDefs[J].FieldSize := FieldDef.Size
+            Else
+             FieldDef.Size     := ResponseTranslator.FieldDefs[J].FieldSize;
+            If FieldDef.DataType in [ftString, ftWideString] Then
+             If FieldDef.Size > 4000 Then
+              Begin
+               ResponseTranslator.FieldDefs[J].DataType := ovMemo;
+               FieldDef.DataType := ObjectValueToFieldType(ResponseTranslator.FieldDefs[J].DataType);
+              End;
+           End;
+          If (FieldDef.DataType In [ftFloat, ftCurrency, ftBCD,
+                                    {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
+                                    {$IFEND}{$ENDIF} ftFMTBcd]) Then
+           FieldDef.Precision := ResponseTranslator.FieldDefs[J].Precision;
+         End;
+       End;
+     End;
+    if Assigned(vFieldDefinition) then
+      FreeAndNil(vFieldDefinition);
+    DestDS.FieldDefs.EndUpdate;
+    Try
+     vLocSetInBlockEvents(True);
+     Inactive := True;
+     If Assigned(vLocCreateDataSet) Then
+      vLocCreateDataSet();
+     If Not DestDS.Active Then
+      DestDS.Open;
+     If Not DestDS.Active Then
+      Begin
+       FreeAndNil(bJsonValue);
+       FreeAndNil(ListFields);
+       Raise Exception.Create('Error on Parse JSON Data...');
+       Exit;
+      End;
+     //Add Set PK Fields
+     For J := 0 To ResponseTranslator.FieldDefs.Count - 1 Do
+      Begin
+       If ResponseTranslator.FieldDefs[J].Required Then
+        Begin
+         Field := DestDS.FindField(ResponseTranslator.FieldDefs[J].FieldName);
+         If Field <> Nil Then
+          Begin
+           If Field.FieldKind = fkData Then
+            Field.ProviderFlags := [pfInUpdate, pfInWhere, pfInKey]
+           Else
+            Field.ProviderFlags := [];
+          End;
+        End;
+      End;
+     bJsonValueB := TRESTDWJSONInterfaceObject.Create(vTempValueJSON);
+     For A := 0 To DestDS.Fields.Count - 1 Do // ADICIONA REGISTRO
+      Begin
+       vFindFlag := False;
+       If DestDS.FindField(DestDS.Fields[A].FieldName) <> Nil Then
+        If DestDS.FindField(DestDS.Fields[A].FieldName).FieldKind = fkData Then
+         Begin
+          If bJsonValueB.ClassType = TRESTDWJSONInterfaceObject Then
+           Begin
+            For J := 0 To bJsonValueB.PairCount - 1 Do
+             Begin
+              vFindFlag := Uppercase(Trim(bJsonValueB.pairs[J].Name)) = Uppercase(DestDS.Fields[A].FieldName);
+              If vFindFlag Then
+               Begin
+                ListFields.Add(inttostr(J));
+                Break;
+               End;
 //              FreeAndNil(bJsonOBJ);
-//             End;
-//           End;
-//         End;
-//       If Not vFindFlag Then
-//        ListFields.Add('-1');
-//      End;
-//     bJsonValueB.Free;
-//     bJsonValueB := TRESTDWJSONInterfaceObject.Create(vTempValueJSON);
-//     If bJsonValueB.ClassType = TRESTDWJSONInterfaceObject Then
-//      Begin
-//       vLocSetInBlockEvents(True);
-//       vLocSetRecordCount(1, 1);
-//       DestDS.Append;
-//       Try
-//        For i := 0 To DestDS.Fields.Count - 1 Do
-//         Begin
-//          vOldReadOnly                := DestDS.Fields[i].ReadOnly;
-//          FieldValidate               := DestDS.Fields[i].OnValidate;
-//          DestDS.Fields[i].OnValidate := Nil;
-//          DestDS.Fields[i].ReadOnly   := False;
-//          If DestDS.Fields[i].FieldKind = fkLookup Then
-//           Begin
-//            DestDS.Fields[i].ReadOnly := vOldReadOnly;
-//            DestDS.Fields[i].OnValidate := FieldValidate;
-//            Continue;
-//           End;
-//          If (i >= ListFields.Count) Then
-//           Begin
-//            DestDS.Fields[i].ReadOnly := vOldReadOnly;
-//            DestDS.Fields[i].OnValidate := FieldValidate;
-//            Continue;
-//           End;
-//          If (StrToInt(ListFields[i])       = -1)     Or
-//             Not(DestDS.Fields[i].FieldKind = fkData) Or
-//             (StrToInt(ListFields[i]) = -1)           Then
-//           Begin
-//            DestDS.Fields[i].ReadOnly := vOldReadOnly;
-//            DestDS.Fields[i].OnValidate := FieldValidate;
-//            Continue;
-//           End;
-////          FreeAndNil(bJsonOBJB);
-//          vTempValue := bJsonValueB.Pairs[StrToInt(ListFields[i])].Value;
-//          If DestDS.Fields[i].DataType In [ftGraphic, ftParadoxOle, ftDBaseOle, ftTypedBinary, ftCursor,
-//                                           ftDataSet, ftBlob, ftOraBlob, ftOraClob{$IFNDEF FPC}{$IF CompilerVersion > 21},
-//                                           ftParams, ftStream{$IFEND}{$ENDIF}] Then
-//           Begin
-//            If (vTempValue <> 'null') And (vTempValue <> '') Then
-//             Begin
-//              //HexStringToStream(vTempValue, vBlobStream);
-//              vBlobStream := Decodeb64Stream(vTempValue);
-//              Try
-//               vBlobStream.Position := 0;
-//               TBlobField(DestDS.Fields[i]).LoadFromStream(vBlobStream);
-//              Finally
-//               {$IFNDEF FPC}
-//                {$IF CompilerVersion > 21}
-//                 vBlobStream.Clear;
-//                {$IFEND}
-//               {$ENDIF}
-//               FreeAndNil(vBlobStream);
-//              End;
-//             End;
-//           End
-//          Else
-//           Begin
-//            If (Lowercase(vTempValue) <> 'null') Then
-//             Begin
-//              If DestDS.Fields[i].DataType in [ftString, ftWideString,
-//                                               {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,
-//                                               {$IFEND}{$ELSE}ftWideMemo,{$ENDIF}ftMemo, ftFmtMemo, ftFixedChar] Then
-//               Begin
-//                If vTempValue = '' Then
-//                 DestDS.Fields[i].AsString := ''
-//                Else
-//                 Begin
-////                  If vEncoded Then
-////                   DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
-////                  Else
-//                  If vUtf8SpecialChars Then
-//                   vTempValue := Unescape_chars(vTempValue);
-//                  vTempValue  := {$IFDEF FPC}GetStringDecode(vTempValue, vDatabaseCharSet){$ELSE}vTempValue{$ENDIF};
-//                  DestDS.Fields[i].AsString := vTempValue;
-//                 End;
-//               End
-//              Else If (vTempValue <> '') then
-//               SetValueA(DestDS.Fields[i], vTempValue);
-//             End;
-//           End;
-//          DestDS.Fields[i].ReadOnly := vOldReadOnly;
-//          DestDS.Fields[i].OnValidate := FieldValidate;
-//         End;
-//       Finally
-//        vTempValue := '';
-//       End;
-//       DestDS.Post;
-//       If Assigned(vOnWriterProcess) Then
-//        vOnWriterProcess(DestDS, 1, 1, AbortProcess);
-//       If AbortProcess Then
-//        Exit;
-//      End
-//     Else
-//      Begin
-//       bJsonArrayB := TRESTDWJSONInterfaceArray(bJsonValueB);
-//       vLocSetInBlockEvents(True);
-//       vLocSetRecordCount(bJsonArrayB.ElementCount, bJsonArrayB.ElementCount);
-//       For J := 0 To bJsonArrayB.ElementCount - 1 Do
-//        Begin
-//         bJsonOBJB := TRESTDWJSONInterfaceArray(bJsonArrayB).GetObject(J);
-//         DestDS.Append;
-//         Try
-//          For i := 0 To DestDS.Fields.Count - 1 Do
-//           Begin
-//            vOldReadOnly                := DestDS.Fields[i].ReadOnly;
-//            FieldValidate               := DestDS.Fields[i].OnValidate;
-//            DestDS.Fields[i].OnValidate := Nil;
-//            DestDS.Fields[i].ReadOnly   := False;
-//            If DestDS.Fields[i].FieldKind = fkLookup Then
-//             Begin
-//              DestDS.Fields[i].ReadOnly := vOldReadOnly;
-//              DestDS.Fields[i].OnValidate := FieldValidate;
-//              Continue;
-//             End;
-//            If (i >= ListFields.Count) Then
-//             Begin
-//              DestDS.Fields[i].ReadOnly := vOldReadOnly;
-//              DestDS.Fields[i].OnValidate := FieldValidate;
-//              Continue;
-//             End;
-//            If (StrToInt(ListFields[i])       = -1)     Or
-//               Not(DestDS.Fields[i].FieldKind = fkData) Or
-//               (StrToInt(ListFields[i]) = -1)           Then
-//             Begin
-//              DestDS.Fields[i].ReadOnly := vOldReadOnly;
-//              DestDS.Fields[i].OnValidate := FieldValidate;
-//              Continue;
-//             End;
-////            FreeAndNil(bJsonOBJB);
-//            If Not TRESTDWJSONInterfaceObject(bJsonOBJB).pairs[StrToInt(ListFields[i])].isnull Then
-//             vTempValue := TRESTDWJSONInterfaceObject(bJsonOBJB).pairs[StrToInt(ListFields[i])].Value // bJsonOBJTemp.get().ToString;
-//            Else
-//             Continue;
-//            If DestDS.Fields[i].DataType In [ftGraphic, ftParadoxOle, ftDBaseOle, ftTypedBinary, ftCursor,
-//                                             ftDataSet, ftBlob, ftOraBlob, ftOraClob{$IFNDEF FPC}{$IF CompilerVersion > 21},
-//                                             ftParams, ftStream{$IFEND}{$ENDIF}] Then
-//             Begin
-//              If (vTempValue <> 'null') And (vTempValue <> '') Then
-//               Begin
-////                HexStringToStream(vTempValue, vBlobStream);
-//                vBlobStream := Decodeb64Stream(vTempValue);
-//                Try
-//                 vBlobStream.Position := 0;
-//                 TBlobField(DestDS.Fields[i]).LoadFromStream(vBlobStream);
-//                Finally
-//                 {$IFNDEF FPC}
-//                  {$IF CompilerVersion > 21}
-//                   vBlobStream.Clear;
-//                  {$IFEND}
-//                 {$ENDIF}
-//                 FreeAndNil(vBlobStream);
-//                End;
-//               End;
-//             End
-//            Else
-//             Begin
-//              If (Lowercase(vTempValue) <> 'null') Then
-//               Begin
-//                If DestDS.Fields[i].DataType in [ftString, ftWideString,
-//                                                 {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,
-//                                                 {$IFEND}{$ELSE}ftWideMemo,{$ENDIF}ftMemo, ftFmtMemo, ftFixedChar] Then
-//                 Begin
-//                  If vTempValue = '' Then
-//                   DestDS.Fields[i].AsString := ''
+             End;
+           End
+          Else If bJsonValueB.ClassType = TRESTDWJSONInterfaceArray Then //Enviado poir Rylan (Genesys Sistemas)
+           Begin
+            bJsonValueC := Nil;
+            For Z := 0 to TRESTDWJSONInterfaceObject(bJsonValueB).PairCount -1 do
+             Begin
+              vTempValueJSONB := TRESTDWJSONInterfaceObject(bJsonValueB).pairs[Z].Value;
+              If (vTempValueJSONB[InitStrPos] = '{') Or (vTempValueJSONB[InitStrPos] = '[') Then
+               bJsonValueC := TRESTDWJSONInterfaceObject.Create(vTempValueJSONB);
+              If Assigned(bJsonValueC) Then
+               If bJsonValueC.PairCount = DestDS.Fields.Count Then
+                Break;
+              vTempValueJSONB := EmptyStr;
+             End;
+            If Assigned(bJsonValueC) Then
+             FreeAndNil(bJsonValueC);
+            If vTempValueJSONB = EmptyStr then
+             vTempValueJSONB := TRESTDWJSONInterfaceObject(bJsonValueB).pairs[0].Value;
+            If (vTempValueJSONB[InitStrPos] = '{') Or
+               (vTempValueJSONB[InitStrPos] = '[') Then
+             Begin
+              bJsonValueB.Free;
+              bJsonValueB := TRESTDWJSONInterfaceObject.Create(vTempValueJSONB);
+             End;
+            For J := 0 To bJsonValueB.PairCount - 1 Do
+             Begin
+              If Trim(bJsonValueB.pairs[J].Name) <> '' Then
+               Begin
+                vFindFlag := Uppercase(Trim(bJsonValueB.pairs[J].Name)) = Uppercase(DestDS.Fields[A].FieldName);
+                If vFindFlag Then
+                 Begin
+                  ListFields.Add(inttostr(J));
+                  Break;
+                 End;
+                End;
+              FreeAndNil(bJsonOBJ);
+             End;
+           End;
+         End;
+       If Not vFindFlag Then
+        ListFields.Add('-1');
+      End;
+     bJsonValueB.Free;
+     bJsonValueB := TRESTDWJSONInterfaceObject.Create(vTempValueJSON);
+     If bJsonValueB.ClassType = TRESTDWJSONInterfaceObject Then
+      Begin
+       vLocSetInBlockEvents(True);
+       vLocSetRecordCount(1, 1);
+       DestDS.Append;
+       Try
+        For i := 0 To DestDS.Fields.Count - 1 Do
+         Begin
+          vOldReadOnly                := DestDS.Fields[i].ReadOnly;
+          FieldValidate               := DestDS.Fields[i].OnValidate;
+          DestDS.Fields[i].OnValidate := Nil;
+          DestDS.Fields[i].ReadOnly   := False;
+          If DestDS.Fields[i].FieldKind = fkLookup Then
+           Begin
+            DestDS.Fields[i].ReadOnly := vOldReadOnly;
+            DestDS.Fields[i].OnValidate := FieldValidate;
+            Continue;
+           End;
+          If (i >= ListFields.Count) Then
+           Begin
+            DestDS.Fields[i].ReadOnly := vOldReadOnly;
+            DestDS.Fields[i].OnValidate := FieldValidate;
+            Continue;
+           End;
+          If (StrToInt(ListFields[i])       = -1)     Or
+             Not(DestDS.Fields[i].FieldKind = fkData) Or
+             (StrToInt(ListFields[i]) = -1)           Then
+           Begin
+            DestDS.Fields[i].ReadOnly := vOldReadOnly;
+            DestDS.Fields[i].OnValidate := FieldValidate;
+            Continue;
+           End;
+//          FreeAndNil(bJsonOBJB);
+          vTempValue := bJsonValueB.Pairs[StrToInt(ListFields[i])].Value;
+          If DestDS.Fields[i].DataType In [ftGraphic, ftParadoxOle, ftDBaseOle, ftTypedBinary, ftCursor,
+                                           ftDataSet, ftBlob, ftOraBlob, ftOraClob{$IFNDEF FPC}{$IF CompilerVersion > 21},
+                                           ftParams, ftStream{$IFEND}{$ENDIF}] Then
+           Begin
+            If (vTempValue <> 'null') And (vTempValue <> '') Then
+             Begin
+              //HexStringToStream(vTempValue, vBlobStream);
+              vBlobStream := DecodeStream(vTempValue);
+              Try
+               vBlobStream.Position := 0;
+               TBlobField(DestDS.Fields[i]).LoadFromStream(vBlobStream);
+              Finally
+               {$IFNDEF FPC}
+                {$IF CompilerVersion > 21}
+                 vBlobStream.Clear;
+                {$IFEND}
+               {$ENDIF}
+               FreeAndNil(vBlobStream);
+              End;
+             End;
+           End
+          Else
+           Begin
+            If (Lowercase(vTempValue) <> 'null') Then
+             Begin
+              If DestDS.Fields[i].DataType in [ftString, ftWideString,
+                                               {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,
+                                               {$IFEND}{$ELSE}ftWideMemo,{$ENDIF}ftMemo, ftFmtMemo, ftFixedChar] Then
+               Begin
+                If vTempValue = '' Then
+                 DestDS.Fields[i].AsString := ''
+                Else
+                 Begin
+//                  If vEncoded Then
+//                   DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
 //                  Else
-//                   Begin
-//                    if vEncoded then
-//                     DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
-//                    Else
-//                     Begin
-//                      If vUtf8SpecialChars Then
-//                       vTempValue := unescape_chars(vTempValue);
-//                      vTempValue := {$IFDEF FPC}GetStringDecode(vTempValue, vDatabaseCharSet){$ELSE}vTempValue{$ENDIF};
-//                      DestDS.Fields[i].AsString := vTempValue;
-//                     End;
-//                   End;
-//                 End
-//                Else If (vTempValue <> '') then
-//                 SetValueA(DestDS.Fields[i], vTempValue);
-//               End;
-//             End;
-//            DestDS.Fields[i].ReadOnly := vOldReadOnly;
-//            DestDS.Fields[i].OnValidate := FieldValidate;
-//           End;
-//         Finally
-//          vTempValue := '';
-//         End;
-//         FreeAndNil(bJsonOBJB);
-//         DestDS.Post;
-//         If Assigned(vOnWriterProcess) Then
-//          vOnWriterProcess(DestDS, J +1, bJsonArrayB.ElementCount, AbortProcess);
-//         If AbortProcess Then
-//          Break;
-//        End;
-//      End;
-//    Except
-//    End;
-//   End;
-// Finally
-//  If Assigned(ListFields) Then
-//   FreeAndNil(ListFields);
-//  If DestDS.Active Then
-//   DestDS.First;
-//  DestDS.EnableControls;
-//  If Assigned(bJsonValue) Then
-//   FreeAndNil(bJsonValue);
-//  If Assigned(bJsonValueB) Then
-//   FreeAndNil(bJsonValueB);
-// End;
-//End;
+                  If vUtf8SpecialChars Then
+                   vTempValue := Unescape_chars(vTempValue);
+                  vTempValue  := {$IFDEF FPC}GetStringDecode(vTempValue, vDatabaseCharSet){$ELSE}vTempValue{$ENDIF};
+                  DestDS.Fields[i].AsString := vTempValue;
+                 End;
+               End
+              Else If (vTempValue <> '') then
+               SetValueA(DestDS.Fields[i], vTempValue);
+             End;
+           End;
+          DestDS.Fields[i].ReadOnly := vOldReadOnly;
+          DestDS.Fields[i].OnValidate := FieldValidate;
+         End;
+       Finally
+        vTempValue := '';
+       End;
+       DestDS.Post;
+       If Assigned(vOnWriterProcess) Then
+        vOnWriterProcess(DestDS, 1, 1, AbortProcess);
+       If AbortProcess Then
+        Exit;
+      End
+     Else
+      Begin
+       bJsonArrayB := TRESTDWJSONInterfaceArray(bJsonValueB);
+       vLocSetInBlockEvents(True);
+       vLocSetRecordCount(bJsonArrayB.ElementCount, bJsonArrayB.ElementCount);
+       For J := 0 To bJsonArrayB.ElementCount - 1 Do
+        Begin
+         bJsonOBJB := TRESTDWJSONInterfaceArray(bJsonArrayB).GetObject(J);
+         DestDS.Append;
+         Try
+          For i := 0 To DestDS.Fields.Count - 1 Do
+           Begin
+            vOldReadOnly                := DestDS.Fields[i].ReadOnly;
+            FieldValidate               := DestDS.Fields[i].OnValidate;
+            DestDS.Fields[i].OnValidate := Nil;
+            DestDS.Fields[i].ReadOnly   := False;
+            If DestDS.Fields[i].FieldKind = fkLookup Then
+             Begin
+              DestDS.Fields[i].ReadOnly := vOldReadOnly;
+              DestDS.Fields[i].OnValidate := FieldValidate;
+              Continue;
+             End;
+            If (i >= ListFields.Count) Then
+             Begin
+              DestDS.Fields[i].ReadOnly := vOldReadOnly;
+              DestDS.Fields[i].OnValidate := FieldValidate;
+              Continue;
+             End;
+            If (StrToInt(ListFields[i])       = -1)     Or
+               Not(DestDS.Fields[i].FieldKind = fkData) Or
+               (StrToInt(ListFields[i]) = -1)           Then
+             Begin
+              DestDS.Fields[i].ReadOnly := vOldReadOnly;
+              DestDS.Fields[i].OnValidate := FieldValidate;
+              Continue;
+             End;
+//            FreeAndNil(bJsonOBJB);
+            If Not TRESTDWJSONInterfaceObject(bJsonOBJB).pairs[StrToInt(ListFields[i])].isnull Then
+             vTempValue := TRESTDWJSONInterfaceObject(bJsonOBJB).pairs[StrToInt(ListFields[i])].Value // bJsonOBJTemp.get().ToString;
+            Else
+             Continue;
+            If DestDS.Fields[i].DataType In [ftGraphic, ftParadoxOle, ftDBaseOle, ftTypedBinary, ftCursor,
+                                             ftDataSet, ftBlob, ftOraBlob, ftOraClob{$IFNDEF FPC}{$IF CompilerVersion > 21},
+                                             ftParams, ftStream{$IFEND}{$ENDIF}] Then
+             Begin
+              If (vTempValue <> 'null') And (vTempValue <> '') Then
+               Begin
+//                HexStringToStream(vTempValue, vBlobStream);
+                vBlobStream := DecodeStream(vTempValue);
+                Try
+                 vBlobStream.Position := 0;
+                 TBlobField(DestDS.Fields[i]).LoadFromStream(vBlobStream);
+                Finally
+                 {$IFNDEF FPC}
+                  {$IF CompilerVersion > 21}
+                   vBlobStream.Clear;
+                  {$IFEND}
+                 {$ENDIF}
+                 FreeAndNil(vBlobStream);
+                End;
+               End;
+             End
+            Else
+             Begin
+              If (Lowercase(vTempValue) <> 'null') Then
+               Begin
+                If DestDS.Fields[i].DataType in [ftString, ftWideString,
+                                                 {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,
+                                                 {$IFEND}{$ELSE}ftWideMemo,{$ENDIF}ftMemo, ftFmtMemo, ftFixedChar] Then
+                 Begin
+                  If vTempValue = '' Then
+                   DestDS.Fields[i].AsString := ''
+                  Else
+                   Begin
+                    if vEncoded then
+                     DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                    Else
+                     Begin
+                      If vUtf8SpecialChars Then
+                       vTempValue := unescape_chars(vTempValue);
+                      vTempValue := {$IFDEF FPC}GetStringDecode(vTempValue, vDatabaseCharSet){$ELSE}vTempValue{$ENDIF};
+                      DestDS.Fields[i].AsString := vTempValue;
+                     End;
+                   End;
+                 End
+                Else If (vTempValue <> '') then
+                 SetValueA(DestDS.Fields[i], vTempValue);
+               End;
+             End;
+            DestDS.Fields[i].ReadOnly := vOldReadOnly;
+            DestDS.Fields[i].OnValidate := FieldValidate;
+           End;
+         Finally
+          vTempValue := '';
+         End;
+         FreeAndNil(bJsonOBJB);
+         DestDS.Post;
+         If Assigned(vOnWriterProcess) Then
+          vOnWriterProcess(DestDS, J +1, bJsonArrayB.ElementCount, AbortProcess);
+         If AbortProcess Then
+          Break;
+        End;
+      End;
+    Except
+    End;
+   End;
+ Finally
+  If Assigned(ListFields) Then
+   FreeAndNil(ListFields);
+  If DestDS.Active Then
+   DestDS.First;
+  DestDS.EnableControls;
+  If Assigned(bJsonValue) Then
+   FreeAndNil(bJsonValue);
+  If Assigned(bJsonValueB) Then
+   FreeAndNil(bJsonValueB);
+ End;
+End;
 
 Procedure TJSONValue.WriteToDataset(DatasetType   : TDatasetType;
                                     JSONValue     : String;

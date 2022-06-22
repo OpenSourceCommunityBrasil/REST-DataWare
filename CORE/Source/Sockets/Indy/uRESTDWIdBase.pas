@@ -29,14 +29,14 @@ Uses
  {$IFDEF FPC}
  SysUtils,      Classes, Db, Variants, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
  uRESTDWBasic, uRESTDWBasicDB, uRESTDWConsts, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
- uRESTDWParams, uRESTDWAbout
+ uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout
  {$ELSE}
   {$IF CompilerVersion <= 22}
    SysUtils, Classes, Db, Variants, EncdDecd, SyncObjs, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWAbout
+   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass, uRESTDWAbout
   {$ELSE}
    System.SysUtils, System.Classes, Data.Db, Variants, system.SyncObjs, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWAbout,
+   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
    {$IF Defined(RESTDWFMX)}{$IFNDEF RESTDWAndroidService}FMX.Forms,{$ENDIF}
    {$ELSE}
     {$IF CompilerVersion <= 22}Forms,
@@ -2611,6 +2611,7 @@ Begin
  RedirectMaximum                := 1;
  RequestTimeOut                 := 5000;
  ConnectTimeOut                 := 5000;
+ ssl                            := Nil;
 End;
 
 {$IFNDEF FPC}
@@ -2804,7 +2805,8 @@ End;
 Procedure TRESTDWIdClientREST.SetUseSSL(Value : Boolean);
 Begin
  Inherited;
- HttpRequest.IOHandler := Nil;
+ If Assigned(HttpRequest) Then
+  HttpRequest.IOHandler := Nil;
  If Value Then
   Begin
    If ssl = Nil Then

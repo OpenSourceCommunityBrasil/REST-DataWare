@@ -28,24 +28,13 @@ interface
 Uses
  {$IFDEF FPC}
  SysUtils,      DataUtils, Classes,     {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
- uRESTDWConsts, uRESTDWAbout, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, Db;
+ uRESTDWConsts, uRESTDWParams, uRESTDWBasicTypes, Db;
  {$ELSE}
   {$IF CompilerVersion <= 22}
-   SysUtils, DataUtils, Classes, EncdDecd, SyncObjs, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, Db,
+   SysUtils, DataUtils, Classes, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, uRESTDWConsts, Db
   {$ELSE}
-   System.SysUtils, DataUtils, System.Classes, system.SyncObjs, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, Db,
-   {$IF Defined(RESTDWFMX)}{$IFNDEF RESTDWAndroidService} FMX.Forms,{$ENDIF}
-   {$ELSE}
-    {$IF CompilerVersion <= 22}Forms,
-     {$ELSE}VCL.Forms,
-    {$IFEND}
-   {$IFEND}
-   uRESTDWAbout, uRESTDWCharset
-   {$IFDEF RESTDWWINDOWS}
-    , Windows
-   {$ENDIF}
-   , uRESTDWConsts;
-  {$IFEND}
+   System.SysUtils, DataUtils, System.Classes, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, uRESTDWConsts, Db
+  {$IFEND};
  {$ENDIF}
 
  Type
