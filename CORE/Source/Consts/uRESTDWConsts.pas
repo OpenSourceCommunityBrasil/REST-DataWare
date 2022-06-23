@@ -27,6 +27,7 @@ Interface
 
 Uses
  uRESTDWCharset, ZLib,
+ DWDCPrijndael, DWDCPsha256,
  {$IFDEF FPC}
   zstream,
   {$IFNDEF RESTDWLAMW}
@@ -138,7 +139,7 @@ Const
                               'CORE Version';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
  RESTDWVersionINFO          = '1.5.0.';
- RESTDWRelease              = '2965';
+ RESTDWRelease              = '2966';
  RESTDWParamsHeaderVersion  = 6;
  RESTDWCodeProject          = 'Dark Souls - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
@@ -390,8 +391,8 @@ Type
  Function  RandomString             (strLen             : Integer)                : String;
  Function  StrDWLength              (Value              : String)                 : Integer;
  Function  RequestTypeToString      (RequestType        : TRequestType)           : String;
-// Function  EncryptSHA256            (Key, Text          : TRESTDWString;
-//                                     Encrypt            : Boolean)                : String;
+ Function  EncryptSHA256            (Key, Text          : TRESTDWString;
+                                     Encrypt            : Boolean)                : String;
  Function  EncodeURIComponent       (Const ASrc         : String)                 : String;
  Function  iif                      (ATest              : Boolean;
                                      Const ATrue        : Integer;
@@ -484,24 +485,24 @@ Begin
  SetLength(Result, J-1);
 End;
 
-//Function EncryptSHA256(Key, Text : TRESTDWString;
-//                       Encrypt   : Boolean) : String;
-//Var
-// Cipher : TRESTDWDCP_rijndael;
-//Begin
-// Result := '';
-// Cipher := TRESTDWDCP_rijndael.Create(Nil);
-// Try
-//  Cipher.InitStr(Key, TRESTDWDCP_sha256);
-//  If Encrypt Then
-//   Result := Cipher.EncryptString(Text)
-//  Else
-//   Result := Cipher.DecryptString(Text);
-// Finally
-//  Cipher.Burn;
-//  Cipher.Free;
-// End;
-//End;
+Function EncryptSHA256(Key, Text : TRESTDWString;
+                       Encrypt   : Boolean) : String;
+Var
+ Cipher : TRESTDWDCP_rijndael;
+Begin
+ Result := '';
+ Cipher := TRESTDWDCP_rijndael.Create(Nil);
+ Try
+  Cipher.InitStr(Key, TRESTDWDCP_sha256);
+  If Encrypt Then
+   Result := Cipher.EncryptString(Text)
+  Else
+   Result := Cipher.DecryptString(Text);
+ Finally
+  Cipher.Burn;
+  Cipher.Free;
+ End;
+End;
 
 Procedure TRESTDWUriOptions.SetBaseServer (Value : String);
 Begin
@@ -554,7 +555,7 @@ Var
  vDWString : TRESTDWString;
 Begin
  vDWString := Value;
-// Result := EncryptSHA256(vKeyString, vDWString, True);
+ Result := EncryptSHA256(vKeyString, vDWString, True);
 End;
 
 Function  TCripto.Decrypt(Value : String) : String;
@@ -562,7 +563,7 @@ Var
  vDWString : TRESTDWString;
 Begin
  vDWString := Value;
-// Result := EncryptSHA256(vKeyString, vDWString, False);
+ Result := EncryptSHA256(vKeyString, vDWString, False);
 End;
 
 Procedure TCripto.Assign(Source: TPersistent);

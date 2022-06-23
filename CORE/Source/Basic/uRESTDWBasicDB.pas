@@ -405,7 +405,7 @@ Type
   Procedure SetConnection           (Value                  : Boolean);          //Seta o Estado da Conexão
   Procedure SetRestPooler           (Value                  : String);           //Seta o Restpooler a ser utilizado
   Procedure SetPoolerPort           (Value                  : Integer);          //Seta a Porta do Pooler a ser usada
-  Function  TryConnect : Boolean;                    //Tenta Conectar o Servidor para saber se posso executar comandos
+  Function  TryConnect(Connection  : TRESTDWPoolerMethodClient) : Boolean;                    //Tenta Conectar o Servidor para saber se posso executar comandos
   Function  GetStateDB : Boolean;
   Procedure SetMyIp(Value : String);
   Procedure ReconfigureConnection   (Var Connection        : TRESTDWPoolerMethodClient;
@@ -2047,25 +2047,17 @@ Begin
 End;
 
 Function  TRESTDWDatabasebaseBase.RenewToken(Var PoolerMethodClient : TRESTDWPoolerMethodClient;
-                                     Var Params             : TRESTDWParams;
-                                     Var Error              : Boolean;
-                                     Var MessageError       : String) : String;
+                                             Var Params             : TRESTDWParams;
+                                             Var Error              : Boolean;
+                                             Var MessageError       : String) : String;
 Var
  I                    : Integer;
  vTempSend            : String;
  vConnection          : TRESTDWPoolerMethodClient;
- RESTClientPoolerExec : TRESTClientPoolerBase;
- Procedure DestroyComponents;
- Begin
-  If Assigned(RESTClientPoolerExec) Then
-   FreeAndNil(RESTClientPoolerExec);
- End;
 Begin
  //Atualização de Token na autenticação
  Result                       := '';
- RESTClientPoolerExec         := Nil;
- vConnection                  := TRESTDWPoolerMethodClient.Create(Nil);
- PoolerMethodClient           := vConnection;
+ vConnection                  := PoolerMethodClient;
  vConnection.PoolerNotFoundMessage := PoolerNotFoundMessage;
  vConnection.HandleRedirects  := vHandleRedirects;
  vConnection.RedirectMaximum  := vRedirectMaximum;
@@ -2098,7 +2090,7 @@ Begin
                                                        Params,       Error,
                                                        MessageError, vTimeOut,
                                                        vConnectTimeOut, Nil,
-                                                       RESTClientPoolerExec);
+                                                       vRESTClientPooler);
                      vTempSend                                           := GettokenValue(vTempSend);
                      TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                     End;
@@ -2107,7 +2099,7 @@ Begin
                                                        Params,          Error,
                                                        MessageError,    vTimeOut,
                                                        vConnectTimeOut, Nil,
-                                                       RESTClientPoolerExec);
+                                                       vRESTClientPooler);
                      vTempSend                                          := GettokenValue(vTempSend);
                      TRESTDWAuthOptionTokenClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                     End;
@@ -2152,11 +2144,8 @@ Begin
               End;
              If Assigned(vOnFailOverExecute) Then
               vOnFailOverExecute(vFailOverConnections[I]);
-             If Not Assigned(RESTClientPoolerExec) Then
-              RESTClientPoolerExec := TRESTClientPoolerBase.Create(Nil);
-             RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
              ReconfigureConnection(vConnection,
-                                   RESTClientPoolerExec,
+                                   vRESTClientPooler,
                                    vFailOverConnections[I].vTypeRequest,
                                    vFailOverConnections[I].vWelcomeMessage,
                                    vFailOverConnections[I].vRestWebService,
@@ -2172,7 +2161,7 @@ Begin
                               vTempSend := vConnection.GetToken(vFailOverConnections[I].vRestURL, '',
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut,vConnectTimeOut,
-                                                                Nil, RESTClientPoolerExec);
+                                                                Nil, vRESTClientPooler);
                               vTempSend                                          := GettokenValue(vTempSend);
                               TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                              End;
@@ -2180,7 +2169,7 @@ Begin
                               vTempSend := vConnection.GetToken(vFailOverConnections[I].vRestURL, '',
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut,vConnectTimeOut,
-                                                                Nil,          RESTClientPoolerExec);
+                                                                Nil,          vRESTClientPooler);
                               vTempSend                                         := GettokenValue(vTempSend);
                               TRESTDWAuthOptionTokenClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                              End;
@@ -2229,7 +2218,7 @@ Begin
     Except
      On E : Exception do
       Begin
-       DestroyComponents;
+       //DestroyComponents;
        If vFailOver Then
         Begin
          If vFailOverConnections.Count > 0 Then
@@ -2237,7 +2226,7 @@ Begin
            If Assigned(vFailOverConnections) Then
            For I := 0 To vFailOverConnections.Count -1 Do
             Begin
-             DestroyComponents;
+             //DestroyComponents;
              If I = 0 Then
               Begin
                If ((vFailOverConnections[I].vTypeRequest    = vConnection.TypeRequest)    And
@@ -2255,11 +2244,8 @@ Begin
               End;
              If Assigned(vOnFailOverExecute) Then
               vOnFailOverExecute(vFailOverConnections[I]);
-             If Not Assigned(RESTClientPoolerExec) Then
-              RESTClientPoolerExec := TRESTClientPoolerBase.Create(Nil);
-             RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
              ReconfigureConnection(vConnection,
-                                   RESTClientPoolerExec,
+                                   vRESTClientPooler,
                                    vFailOverConnections[I].vTypeRequest,
                                    vFailOverConnections[I].vWelcomeMessage,
                                    vFailOverConnections[I].vRestWebService,
@@ -2275,7 +2261,7 @@ Begin
                               vTempSend := vConnection.GetToken(vFailOverConnections[I].vRestURL, '',
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut,vConnectTimeOut,
-                                                                Nil, RESTClientPoolerExec);
+                                                                Nil, vRESTClientPooler);
                               vTempSend                                          := GettokenValue(vTempSend);
                               TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                              End;
@@ -2283,7 +2269,7 @@ Begin
                               vTempSend := vConnection.GetToken(vFailOverConnections[I].vRestURL, '',
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut,vConnectTimeOut,
-                                                                Nil, RESTClientPoolerExec);
+                                                                Nil, vRESTClientPooler);
                               vTempSend                                         := GettokenValue(vTempSend);
                               TRESTDWAuthOptionTokenClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                              End;
@@ -2346,9 +2332,7 @@ Begin
       End;
     End;
    Finally
-    DestroyComponents;
-    If vConnection <> Nil Then
-     FreeAndNil(vConnection);
+    //DestroyComponents;
    End;
   End;
 End;
@@ -2478,7 +2462,7 @@ Begin
                         If (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).AutoGetToken) And
                            (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token <> '')  Then
                          TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token := '';
-                        TryConnect;
+                        TryConnect(vRESTConnectionDB);
                        End;
                      End;
        rdwAOToken  : Begin
@@ -2487,7 +2471,7 @@ Begin
                         If (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).AutoGetToken)  And
                            (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token  <> '')  Then
                          TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token := '';
-                        TryConnect;
+                        TryConnect(vRESTConnectionDB);
                        End;
                      End;
       End;
@@ -2713,7 +2697,7 @@ Begin
                         If (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).AutoGetToken) And
                            (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token <> '')  Then
                          TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token := '';
-                        TryConnect;
+                        TryConnect(vRESTConnectionDB);
                        End;
                      End;
        rdwAOToken  : Begin
@@ -2722,7 +2706,7 @@ Begin
                         If (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).AutoGetToken)  And
                            (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token  <> '')  Then
                          TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token := '';
-                        TryConnect;
+                        TryConnect(vRESTConnectionDB);
                        End;
                      End;
       End;
@@ -2947,7 +2931,7 @@ Begin
                         If (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).AutoGetToken) And
                            (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token <> '')  Then
                          TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token := '';
-                        TryConnect;
+                        TryConnect(vRESTConnectionDB);
                        End;
                      End;
        rdwAOToken  : Begin
@@ -2956,7 +2940,7 @@ Begin
                         If (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).AutoGetToken)  And
                            (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token  <> '')  Then
                          TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token := '';
-                        TryConnect;
+                        TryConnect(vRESTConnectionDB);
                        End;
                      End;
       End;
@@ -3592,7 +3576,7 @@ Begin
                         If (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).AutoGetToken) And
                            (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token <> '')  Then
                          TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token := '';
-                        TryConnect;
+                        TryConnect(vRESTConnectionDB);
                        End;
                      End;
        rdwAOToken  : Begin
@@ -3601,7 +3585,7 @@ Begin
                         If (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).AutoGetToken)  And
                            (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token  <> '')  Then
                          TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token := '';
-                        TryConnect;
+                        TryConnect(vRESTConnectionDB);
                        End;
                      End;
       End;
@@ -4585,7 +4569,7 @@ Begin
                             If (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).AutoGetToken) And
                                (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token <> '')  Then
                              TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token := '';
-                            TryConnect;
+                            TryConnect(vRESTConnectionDB);
                            End;
                          End;
            rdwAOToken  : Begin
@@ -4594,7 +4578,7 @@ Begin
                             If (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).AutoGetToken)  And
                                (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token  <> '')  Then
                              TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token := '';
-                            TryConnect;
+                            TryConnect(vRESTConnectionDB);
                            End;
                          End;
           End;
@@ -4749,7 +4733,7 @@ Begin
                             If (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).AutoGetToken) And
                                (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token <> '')  Then
                              TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token := '';
-                            TryConnect;
+                            TryConnect(vRESTConnectionDB);
                            End;
                          End;
            rdwAOToken  : Begin
@@ -4758,7 +4742,7 @@ Begin
                             If (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).AutoGetToken)  And
                                (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token  <> '')  Then
                              TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token := '';
-                            TryConnect;
+                            TryConnect(vRESTConnectionDB);
                            End;
                          End;
           End;
@@ -4926,7 +4910,7 @@ Begin
                         If (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).AutoGetToken) And
                            (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token <> '')  Then
                          TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token := '';
-                        TryConnect;
+                        TryConnect(vRESTConnectionDB);
                        End;
                      End;
        rdwAOToken  : Begin
@@ -4935,7 +4919,7 @@ Begin
                         If (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).AutoGetToken)  And
                            (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token  <> '')  Then
                          TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token := '';
-                        TryConnect;
+                        TryConnect(vRESTConnectionDB);
                        End;
                      End;
       End;
@@ -5185,7 +5169,7 @@ Begin
                             If (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).AutoGetToken) And
                                (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token <> '')  Then
                              TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token := '';
-                            TryConnect;
+                            TryConnect(vRESTConnectionDB);
                            End;
                          End;
            rdwAOToken  : Begin
@@ -5194,7 +5178,7 @@ Begin
                             If (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).AutoGetToken)  And
                                (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token  <> '')  Then
                              TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token := '';
-                            TryConnect;
+                            TryConnect(vRESTConnectionDB);
                            End;
                          End;
           End;
@@ -5364,55 +5348,49 @@ Begin
   End;
 End;
 
-Function  TRESTDWDatabasebaseBase.TryConnect : Boolean;
+Function  TRESTDWDatabasebaseBase.TryConnect(Connection  : TRESTDWPoolerMethodClient) : Boolean;
 Var
  vErrorBoolean        : Boolean;
  I                    : Integer;
  vMessageError,
  vToken,
  vTempSend            : String;
- vConnectionB,
- vConnection          : TRESTDWPoolerMethodClient;
- RESTClientPoolerExec : TRESTClientPoolerBase;
  DWParams             : TRESTDWParams;
- Procedure DestroyComponents;
- Begin
-  If Assigned(RESTClientPoolerExec) Then
-   FreeAndNil(RESTClientPoolerExec);
- End;
  Procedure TokenValidade;
  Begin
   DWParams := TRESTDWParams.Create;
   Try
    DWParams.Encoding := Encoding;
-   If vConnection.AuthenticationOptions.AuthorizationOption in [rdwAOBearer, rdwAOToken] Then
+   If Connection.AuthenticationOptions.AuthorizationOption in [rdwAOBearer, rdwAOToken] Then
     Begin
-     Case vConnection.AuthenticationOptions.AuthorizationOption Of
+     Case Connection.AuthenticationOptions.AuthorizationOption Of
       rdwAOBearer : Begin
-                     If (TRESTDWAuthOptionBearerClient(vConnection.AuthenticationOptions.OptionParams).AutoGetToken) And
-                        (TRESTDWAuthOptionBearerClient(vConnection.AuthenticationOptions.OptionParams).Token = '') Then
+                     If (TRESTDWAuthOptionBearerClient(Connection.AuthenticationOptions.OptionParams).AutoGetToken) And
+                        (TRESTDWAuthOptionBearerClient(Connection.AuthenticationOptions.OptionParams).Token = '') Then
                       Begin
                        If Assigned(OnBeforeGetToken) Then
-                        OnBeforeGetToken(vConnection.WelcomeMessage,
-                                         vConnection.AccessTag, DWParams);
-                       vToken :=  RenewToken(vConnectionB, DWParams, vErrorBoolean, vMessageError);
+                        OnBeforeGetToken(Connection.WelcomeMessage,
+                                         Connection.AccessTag, DWParams);
+                       vToken :=  RenewToken(Connection, DWParams, vErrorBoolean, vMessageError);
                        If Not vErrorBoolean Then
-                        TRESTDWAuthOptionBearerClient(vConnection.AuthenticationOptions.OptionParams).Token := vToken;
+                        TRESTDWAuthOptionBearerClient(Connection.AuthenticationOptions.OptionParams).Token := vToken;
                       End;
                     End;
       rdwAOToken  : Begin
-                     If (TRESTDWAuthOptionTokenClient(vConnection.AuthenticationOptions.OptionParams).AutoGetToken) And
-                        (TRESTDWAuthOptionTokenClient(vConnection.AuthenticationOptions.OptionParams).Token = '') Then
+                     If (TRESTDWAuthOptionTokenClient(Connection.AuthenticationOptions.OptionParams).AutoGetToken) And
+                        (TRESTDWAuthOptionTokenClient(Connection.AuthenticationOptions.OptionParams).Token = '') Then
                       Begin
                        If Assigned(OnBeforeGetToken) Then
-                        OnBeforeGetToken(vConnection.WelcomeMessage,
-                                         vConnection.AccessTag, DWParams);
-                       vToken :=  RenewToken(vConnectionB, DWParams, vErrorBoolean, vMessageError);
+                        OnBeforeGetToken(Connection.WelcomeMessage,
+                                         Connection.AccessTag, DWParams);
+                       vToken :=  RenewToken(Connection, DWParams, vErrorBoolean, vMessageError);
                        If Not vErrorBoolean Then
-                        TRESTDWAuthOptionTokenClient(vConnection.AuthenticationOptions.OptionParams).Token := vToken;
+                        TRESTDWAuthOptionTokenClient(Connection.AuthenticationOptions.OptionParams).Token := vToken;
                       End;
                     End;
      End;
+     If Assigned(vRESTClientPooler) Then
+      vRESTClientPooler.AuthenticationOptions.Assign(AuthenticationOptions);
     End;
   Finally
    FreeAndNil(DWParams);
@@ -5421,43 +5399,13 @@ Var
 Begin
  vErrorBoolean                := False;
  vMessageError                := '';
- RESTClientPoolerExec         := Nil;
- vConnection                  := TRESTDWPoolerMethodClient.Create(Nil);
- vConnection.PoolerNotFoundMessage := PoolerNotFoundMessage;
- vConnection.UserAgent        := vUserAgent;
- vConnection.HandleRedirects  := vHandleRedirects;
- vConnection.RedirectMaximum  := vRedirectMaximum;
- vConnection.TypeRequest      := vTypeRequest;
- vConnection.WelcomeMessage   := vWelcomeMessage;
- vConnection.Host             := vRestWebService;
- vConnection.Port             := vPoolerPort;
- vConnection.Compression      := vCompression;
- vConnection.EncodeStrings    := EncodedStrings;
- vConnection.Encoding         := Encoding;
- vConnection.AccessTag        := vAccessTag;
- vConnection.CriptOptions.Use := vCripto.Use;
- vConnection.CriptOptions.Key := vCripto.Key;
- vConnection.DataRoute        := DataRoute;
- vConnection.ServerContext    := ServerContext;
- vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
- {$IFNDEF FPC}
-  vConnection.OnWork        := vOnWork;
-  vConnection.OnWorkBegin   := vOnWorkBegin;
-  vConnection.OnWorkEnd     := vOnWorkEnd;
-  vConnection.OnStatus      := vOnStatus;
-  vConnection.Encoding      := vEncoding;
- {$ELSE}
-  vConnection.OnWork          := vOnWork;
-  vConnection.OnWorkBegin     := vOnWorkBegin;
-  vConnection.OnWorkEnd       := vOnWorkEnd;
-  vConnection.OnStatus        := vOnStatus;
-  vConnection.DatabaseCharSet := csUndefined;
- {$ENDIF}
  Try
   Try
+   If Assigned(vRESTClientPooler) Then
+    vRESTClientPooler.AuthenticationOptions.Assign(AuthenticationOptions);
    TokenValidade;
    If Not(vErrorBoolean) Then
-    vTempSend  := vConnection.EchoPooler(vRestURL, vRestPooler, vTimeOut, vConnectTimeOut, vRESTClientPooler);
+    vTempSend  := Connection.EchoPooler(vRestURL, vRestPooler, vTimeOut, vConnectTimeOut, vRESTClientPooler);
    Result      := Trim(vTempSend) <> '';
    If Result Then
     vMyIP       := vTempSend
@@ -5487,14 +5435,14 @@ Begin
           Begin
            If I = 0 Then
             Begin
-             If ((vFailOverConnections[I].vTypeRequest    = vConnection.TypeRequest)    And
-                 (vFailOverConnections[I].vWelcomeMessage = vConnection.WelcomeMessage) And
-                 (vFailOverConnections[I].vRestWebService = vConnection.Host)           And
-                 (vFailOverConnections[I].vPoolerPort     = vConnection.Port)           And
-                 (vFailOverConnections[I].vCompression    = vConnection.Compression)    And
-                 (vFailOverConnections[I].EncodeStrings   = vConnection.EncodeStrings)  And
-                 (vFailOverConnections[I].Encoding        = vConnection.Encoding)       And
-                 (vFailOverConnections[I].vAccessTag      = vConnection.AccessTag)      And
+             If ((vFailOverConnections[I].vTypeRequest    = Connection.TypeRequest)    And
+                 (vFailOverConnections[I].vWelcomeMessage = Connection.WelcomeMessage) And
+                 (vFailOverConnections[I].vRestWebService = Connection.Host)           And
+                 (vFailOverConnections[I].vPoolerPort     = Connection.Port)           And
+                 (vFailOverConnections[I].vCompression    = Connection.Compression)    And
+                 (vFailOverConnections[I].EncodeStrings   = Connection.EncodeStrings)  And
+                 (vFailOverConnections[I].Encoding        = Connection.Encoding)       And
+                 (vFailOverConnections[I].vAccessTag      = Connection.AccessTag)      And
                  (vFailOverConnections[I].vRestPooler     = vRestPooler)                And
                  (vFailOverConnections[I].vRestURL        = vRestURL))                  Or
                (Not (vFailOverConnections[I].Active))                                   Then
@@ -5502,11 +5450,8 @@ Begin
             End;
            If Assigned(vOnFailOverExecute) Then
             vOnFailOverExecute(vFailOverConnections[I]);
-           If Not Assigned(RESTClientPoolerExec) Then
-            RESTClientPoolerExec := TRESTClientPoolerBase.Create(Nil);
-           RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
-           ReconfigureConnection(vConnection,
-                                 RESTClientPoolerExec,
+           ReconfigureConnection(Connection,
+                                 vRESTClientPooler,
                                  vFailOverConnections[I].vTypeRequest,
                                  vFailOverConnections[I].vWelcomeMessage,
                                  vFailOverConnections[I].vRestWebService,
@@ -5519,25 +5464,25 @@ Begin
            Try
             TokenValidade;
             If Not(vErrorBoolean) Then
-             vTempSend   := vConnection.EchoPooler(vFailOverConnections[I].vRestURL,
-                                                   vFailOverConnections[I].vRestPooler,
-                                                   vFailOverConnections[I].vTimeOut,
-                                                   vFailOverConnections[I].vConnectTimeOut,
-                                                   RESTClientPoolerExec);
+             vTempSend   := Connection.EchoPooler(vFailOverConnections[I].vRestURL,
+                                                  vFailOverConnections[I].vRestPooler,
+                                                  vFailOverConnections[I].vTimeOut,
+                                                  vFailOverConnections[I].vConnectTimeOut,
+                                                  vRESTClientPooler);
             Result      := Trim(vTempSend) <> '';
             If Result Then
              Begin
               vMyIP     := vTempSend;
               If vFailOverReplaceDefaults Then
                Begin
-                vTypeRequest    := vConnection.TypeRequest;
-                vWelcomeMessage := vConnection.WelcomeMessage;
-                vRestWebService := vConnection.Host;
-                vPoolerPort     := vConnection.Port;
-                vCompression    := vConnection.Compression;
-                vEncodeStrings  := vConnection.EncodeStrings;
-                vEncoding       := vConnection.Encoding;
-                vAccessTag      := vConnection.AccessTag;
+                vTypeRequest    := Connection.TypeRequest;
+                vWelcomeMessage := Connection.WelcomeMessage;
+                vRestWebService := Connection.Host;
+                vPoolerPort     := Connection.Port;
+                vCompression    := Connection.Compression;
+                vEncodeStrings  := Connection.EncodeStrings;
+                vEncoding       := Connection.Encoding;
+                vAccessTag      := Connection.AccessTag;
                 vRestURL        := vFailOverConnections[I].vRestURL;
                 vRestPooler     := vFailOverConnections[I].vRestPooler;
                 vTimeOut        := vFailOverConnections[I].vTimeOut;
@@ -5575,7 +5520,7 @@ Begin
   Except
    On E : Exception do
     Begin
-     DestroyComponents;
+//     DestroyComponents;
      If vFailOver Then
       Begin
        If vFailOverConnections.Count > 0 Then
@@ -5583,17 +5528,17 @@ Begin
          If Assigned(vFailOverConnections) Then
          For I := 0 To vFailOverConnections.Count -1 Do
           Begin
-           DestroyComponents;
+           //DestroyComponents;
            If I = 0 Then
             Begin
-             If ((vFailOverConnections[I].vTypeRequest    = vConnection.TypeRequest)    And
-                 (vFailOverConnections[I].vWelcomeMessage = vConnection.WelcomeMessage) And
-                 (vFailOverConnections[I].vRestWebService = vConnection.Host)           And
-                 (vFailOverConnections[I].vPoolerPort     = vConnection.Port)           And
-                 (vFailOverConnections[I].vCompression    = vConnection.Compression)    And
-                 (vFailOverConnections[I].EncodeStrings   = vConnection.EncodeStrings)  And
-                 (vFailOverConnections[I].Encoding        = vConnection.Encoding)       And
-                 (vFailOverConnections[I].vAccessTag      = vConnection.AccessTag)      And
+             If ((vFailOverConnections[I].vTypeRequest    = Connection.TypeRequest)    And
+                 (vFailOverConnections[I].vWelcomeMessage = Connection.WelcomeMessage) And
+                 (vFailOverConnections[I].vRestWebService = Connection.Host)           And
+                 (vFailOverConnections[I].vPoolerPort     = Connection.Port)           And
+                 (vFailOverConnections[I].vCompression    = Connection.Compression)    And
+                 (vFailOverConnections[I].EncodeStrings   = Connection.EncodeStrings)  And
+                 (vFailOverConnections[I].Encoding        = Connection.Encoding)       And
+                 (vFailOverConnections[I].vAccessTag      = Connection.AccessTag)      And
                  (vFailOverConnections[I].vRestPooler     = vRestPooler)                And
                  (vFailOverConnections[I].vRestURL        = vRestURL))                  Or
                  (Not (vFailOverConnections[I].Active))                                 Then
@@ -5601,11 +5546,8 @@ Begin
             End;
            If Assigned(vOnFailOverExecute) Then
             vOnFailOverExecute(vFailOverConnections[I]);
-           If Not Assigned(RESTClientPoolerExec) Then
-            RESTClientPoolerExec := TRESTClientPoolerBase.Create(Nil);
-           RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
-           ReconfigureConnection(vConnection,
-                                 RESTClientPoolerExec,
+           ReconfigureConnection(Connection,
+                                 vRESTClientPooler,
                                  vFailOverConnections[I].vTypeRequest,
                                  vFailOverConnections[I].vWelcomeMessage,
                                  vFailOverConnections[I].vRestWebService,
@@ -5618,25 +5560,25 @@ Begin
            Try
             TokenValidade;
             If Not(vErrorBoolean) Then
-             vTempSend   := vConnection.EchoPooler(vFailOverConnections[I].vRestURL,
+             vTempSend   := Connection.EchoPooler(vFailOverConnections[I].vRestURL,
                                                    vFailOverConnections[I].vRestPooler,
                                                    vFailOverConnections[I].vTimeOut,
                                                    vFailOverConnections[I].vConnectTimeOut,
-                                                   RESTClientPoolerExec);
+                                                   vRESTClientPooler);
             Result      := Trim(vTempSend) <> '';
             If Result Then
              Begin
               vMyIP       := vTempSend;
               If vFailOverReplaceDefaults Then
                Begin
-                vTypeRequest    := vConnection.TypeRequest;
-                vWelcomeMessage := vConnection.WelcomeMessage;
-                vRestWebService := vConnection.Host;
-                vPoolerPort     := vConnection.Port;
-                vCompression    := vConnection.Compression;
-                vEncodeStrings  := vConnection.EncodeStrings;
-                vEncoding       := vConnection.Encoding;
-                vAccessTag      := vConnection.AccessTag;
+                vTypeRequest    := Connection.TypeRequest;
+                vWelcomeMessage := Connection.WelcomeMessage;
+                vRestWebService := Connection.Host;
+                vPoolerPort     := Connection.Port;
+                vCompression    := Connection.Compression;
+                vEncodeStrings  := Connection.EncodeStrings;
+                vEncoding       := Connection.Encoding;
+                vAccessTag      := Connection.AccessTag;
                 vRestURL        := vFailOverConnections[I].vRestURL;
                 vRestPooler     := vFailOverConnections[I].vRestPooler;
                 vTimeOut        := vFailOverConnections[I].vTimeOut;
@@ -5690,13 +5632,13 @@ Begin
     End;
   End;
  Finally
-  DestroyComponents;
-  If vConnection <> Nil Then
-   FreeAndNil(vConnection);
+//  DestroyComponents;
  End;
 End;
 
 Procedure TRESTDWDatabasebaseBase.SetConnection(Value : Boolean);
+Var
+ vRESTConnectionDB : TRESTDWPoolerMethodClient;
 Begin
  If (csLoading in ComponentState) then
   Value := False;
@@ -5706,7 +5648,37 @@ Begin
  If Not(vConnected) And (Value) Then
   Begin
    If Value then
-    vConnected := TryConnect
+    Begin
+     vRESTConnectionDB                 := TRESTDWPoolerMethodClient.Create(Nil);
+     vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
+     vRESTConnectionDB.AuthenticationOptions.Assign(vAuthOptionParams);
+     vRESTConnectionDB.HandleRedirects := vHandleRedirects;
+     vRESTConnectionDB.RedirectMaximum := vRedirectMaximum;
+     vRESTConnectionDB.UserAgent       := vUserAgent;
+     vRESTConnectionDB.WelcomeMessage := vWelcomeMessage;
+     vRESTConnectionDB.Host           := vRestWebService;
+     vRESTConnectionDB.Port           := vPoolerPort;
+     vRESTConnectionDB.Compression    := vCompression;
+     vRESTConnectionDB.TypeRequest    := VtypeRequest;
+     vRESTConnectionDB.BinaryRequest  := False;
+     vRESTConnectionDB.Encoding       := vEncoding;
+     vRESTConnectionDB.EncodeStrings  := EncodedStrings;
+     vRESTConnectionDB.OnWork         := vOnWork;
+     vRESTConnectionDB.OnWorkBegin    := vOnWorkBegin;
+     vRESTConnectionDB.OnWorkEnd      := vOnWorkEnd;
+     vRESTConnectionDB.OnStatus       := vOnStatus;
+     vRESTConnectionDB.AccessTag      := vAccessTag;
+     vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
+     vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
+     vRESTConnectionDB.DataRoute        := DataRoute;
+     vRESTConnectionDB.ServerContext    := ServerContext;
+     {$IFDEF FPC}
+      vRESTConnectionDB.DatabaseCharSet := csUndefined;
+     {$ENDIF}
+     vConnected := TryConnect(vRESTConnectionDB);
+     If Assigned(vRESTConnectionDB) Then
+      FreeAndNil(vRESTConnectionDB);
+    End
    Else
     vMyIP := '';
   End
@@ -11169,30 +11141,7 @@ Begin
         vRESTDataBase.ExecuteCommand(vActualPoolerMethodClient, vSQL, vParams, vError, vMessageError, LDataSetList,
                                      vRowsAffected, False, BinaryRequest,  BinaryCompatibleMode, Fields.Count = 0, vRESTDataBase.RESTClientPooler);
         If Not(vError) or (vMessageError <> cInvalidAuth) Then
-         Break
-        Else
-         Begin
-          Case vRESTDataBase.AuthenticationOptions.AuthorizationOption Of
-           rdwAOBearer : Begin
-                          If (TRESTDWAuthOptionBearerClient(vRESTDataBase.AuthenticationOptions.OptionParams).AutoRenewToken) Then
-                           Begin
-                            If (TRESTDWAuthOptionBearerClient(vRESTDataBase.AuthenticationOptions.OptionParams).AutoGetToken) And
-                               (TRESTDWAuthOptionBearerClient(vRESTDataBase.AuthenticationOptions.OptionParams).Token <> '')  Then
-                             TRESTDWAuthOptionBearerClient(vRESTDataBase.AuthenticationOptions.OptionParams).Token := '';
-                            vRESTDataBase.TryConnect;
-                           End;
-                         End;
-           rdwAOToken  : Begin
-                          If (TRESTDWAuthOptionTokenClient(vRESTDataBase.AuthenticationOptions.OptionParams).AutoRenewToken) Then
-                           Begin
-                            If (TRESTDWAuthOptionTokenClient(vRESTDataBase.AuthenticationOptions.OptionParams).AutoGetToken)  And
-                               (TRESTDWAuthOptionTokenClient(vRESTDataBase.AuthenticationOptions.OptionParams).Token  <> '')  Then
-                             TRESTDWAuthOptionTokenClient(vRESTDataBase.AuthenticationOptions.OptionParams).Token := '';
-                            vRESTDataBase.TryConnect;
-                           End;
-                         End;
-          End;
-         End;
+         Break;
        End;
       If LDataSetList <> Nil Then
        Begin

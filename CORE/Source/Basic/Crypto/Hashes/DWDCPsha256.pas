@@ -31,7 +31,7 @@ uses
   Classes, Sysutils, DWDCPtypes, DWDCPcrypt2, DWDCPconst;
 
 type
-  TDWDCP_sha256= class(TDWDCP_hash)
+  TRESTDWDCP_sha256= class(TDWDCP_hash)
   protected
     LenHi, LenLo: longword;
     Index: DWord;
@@ -59,7 +59,7 @@ begin
   Result:= ((a and $FF) shl 24) or ((a and $FF00) shl 8) or ((a and $FF0000) shr 8) or ((a and $FF000000) shr 24);
 end;
 
-procedure TDWDCP_sha256.Compress;
+procedure TRESTDWDCP_sha256.Compress;
 var
   a, b, c, d, e, f, g, h, t1, t2: DWord;
   W: array[0..63] of DWord;
@@ -165,22 +165,22 @@ Non-optimised version
   FillChar(HashBuffer,Sizeof(HashBuffer),0);
 end;
 
-class function TDWDCP_sha256.GetAlgorithm: string;
+class function TRESTDWDCP_sha256.GetAlgorithm: string;
 begin
   Result:= 'SHA256';
 end;
 
-class function TDWDCP_sha256.GetId: integer;
+class function TRESTDWDCP_sha256.GetId: integer;
 begin
   Result:= DWDCP_sha256;
 end;
 
-class function TDWDCP_sha256.GetHashSize: integer;
+class function TRESTDWDCP_sha256.GetHashSize: integer;
 begin
   Result:= 256;
 end;
 
-Class Function TDWDCP_sha256.SelfTest: boolean;
+Class Function TRESTDWDCP_sha256.SelfTest: boolean;
 const
   Test1Out: array[0..31] of byte=
     ($ba,$78,$16,$bf,$8f,$01,$cf,$ea,$41,$41,$40,$de,$5d,$ae,$22,$23,
@@ -189,11 +189,11 @@ const
     ($24,$8d,$6a,$61,$d2,$06,$38,$b8,$e5,$c0,$26,$93,$0c,$3e,$60,$39,
      $a3,$3c,$e4,$59,$64,$ff,$21,$67,$f6,$ec,$ed,$d4,$19,$db,$06,$c1);
 var
-  TestHash: TDWDCP_sha256;
+  TestHash: TRESTDWDCP_sha256;
   TestOut: array[0..31] of byte;
 begin
   FillChar(TestOut, SizeOf(TestOut), 0);
-  TestHash:= TDWDCP_sha256.Create(nil);
+  TestHash:= TRESTDWDCP_sha256.Create(nil);
   TestHash.Init;
   {$IFDEF FPC}
    TestHash.UpdateStr(AnsiString('abc'));
@@ -221,7 +221,7 @@ begin
   TestHash.Free;
 end;
 
-procedure TDWDCP_sha256.Init;
+procedure TRESTDWDCP_sha256.Init;
 begin
   Burn;
   CurrentHash[0]:= $6a09e667;
@@ -235,7 +235,7 @@ begin
   fInitialized:= true;
 end;
 
-procedure TDWDCP_sha256.Burn;
+procedure TRESTDWDCP_sha256.Burn;
 begin
   LenHi:= 0; LenLo:= 0;
   Index:= 0;
@@ -244,7 +244,7 @@ begin
   fInitialized:= false;
 end;
 
-procedure TDWDCP_sha256.Update(const Buffer; Size: longword);
+procedure TRESTDWDCP_sha256.Update(const Buffer; Size: longword);
 var
   PBuf: ^byte;
 begin
@@ -275,7 +275,7 @@ begin
   end;
 end;
 
-procedure TDWDCP_sha256.Final(var Digest);
+procedure TRESTDWDCP_sha256.Final(var Digest);
 begin
   if not fInitialized then
     raise EDWDCP_hash.Create('Hash not initialized');

@@ -371,13 +371,13 @@ End;
 Procedure TRESTDWIdClientREST.DestroyClient;
 Begin
  Inherited;
- If Not Assigned(HttpRequest) Then
+ If Assigned(HttpRequest) Then
   Begin
    Try
     If HttpRequest.Connected Then
      HttpRequest.Disconnect(False);
    Finally
-    FreeAndNil(HttpRequest);
+//    FreeAndNil(HttpRequest);
    End;
   End;
 End;

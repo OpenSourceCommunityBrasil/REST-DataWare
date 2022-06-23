@@ -35,7 +35,7 @@ const
   MAXROUNDS= 14;
 
 type
-  TDWDCP_rijndael= class(TDWDCP_blockcipher128)
+  TRESTDWDCP_rijndael= class(TDWDCP_blockcipher128)
   protected
     numrounds: longword;
     rk, drk: array[0..MAXROUNDS,0..7] of DWord;
@@ -61,22 +61,22 @@ implementation
   {$POINTERMATH ON}
 {$ENDIF}
 
-class function TDWDCP_rijndael.GetMaxKeySize: integer;
+class function TRESTDWDCP_rijndael.GetMaxKeySize: integer;
 begin
   Result:= 256;
 end;
 
-class function TDWDCP_rijndael.GetId: integer;
+class function TRESTDWDCP_rijndael.GetId: integer;
 begin
   Result:= DWDCP_rijndael;
 end;
 
-class function TDWDCP_rijndael.GetAlgorithm: string;
+class function TRESTDWDCP_rijndael.GetAlgorithm: string;
 begin
   Result:= 'Rijndael';
 end;
 
-class function TDWDCP_rijndael.SelfTest: boolean;
+class function TRESTDWDCP_rijndael.SelfTest: boolean;
 const
   Key1: array[0..15] of byte=
     ($00,$01,$02,$03,$05,$06,$07,$08,$0A,$0B,$0C,$0D,$0F,$10,$11,$12);
@@ -100,10 +100,10 @@ const
     ($E8,$B7,$2B,$4E,$8B,$E2,$43,$43,$8C,$9F,$FF,$1F,$0E,$20,$58,$72);
 var
   Block: array[0..15] of byte;
-  Cipher: TDWDCP_rijndael;
+  Cipher: TRESTDWDCP_rijndael;
 begin
   FillChar(Block, SizeOf(Block), 0);
-  Cipher:= TDWDCP_rijndael.Create(nil);
+  Cipher:= TRESTDWDCP_rijndael.Create(nil);
   Cipher.Init(Key1,Sizeof(Key1)*8,nil);
   Cipher.EncryptECB(InData1,Block);
   Result:= boolean(CompareMem(@Block,@OutData1,16));
@@ -136,7 +136,7 @@ begin
                        PDWord(@U4[a^[j*4+3]])^;
 end;
 
-procedure TDWDCP_rijndael.InitKey(const Key; Size: longword);
+procedure TRESTDWDCP_rijndael.InitKey(const Key; Size: longword);
 var
   KC, ROUNDS, j, r, t, rconpointer: longword;
   tk: array[0..MAXKC-1,0..3] of byte;
@@ -224,7 +224,7 @@ begin
     InvMixColumn(@drk[r],BC);
 end;
 
-procedure TDWDCP_rijndael.Burn;
+procedure TRESTDWDCP_rijndael.Burn;
 begin
   numrounds:= 0;
   FillChar(rk,Sizeof(rk),0);
@@ -232,7 +232,7 @@ begin
   inherited Burn;
 end;
 
-procedure TDWDCP_rijndael.EncryptECB(const InData; var OutData);
+procedure TRESTDWDCP_rijndael.EncryptECB(const InData; var OutData);
 var
   r: longword;
   tempb: array[0..MAXBC-1,0..3] of byte;
@@ -298,7 +298,7 @@ begin
   PDword(PointerToInt(@OutData)+12)^:= PDword(@a[3,0])^;
 end;
 
-procedure TDWDCP_rijndael.DecryptECB(const InData; var OutData);
+procedure TRESTDWDCP_rijndael.DecryptECB(const InData; var OutData);
 var
   r: longword;
   tempb: array[0..MAXBC-1,0..3] of byte;

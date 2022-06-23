@@ -1351,10 +1351,10 @@ Begin
 End;
 
 Function TRESTDWPoolerMethodClient.EchoPooler(Method_Prefix,
-                                          Pooler                  : String;
-                                          TimeOut                 : Integer = 3000;
-                                          ConnectTimeOut          : Integer = 3000;
-                                          RESTClientPooler        : TRESTClientPoolerBase = Nil) : String;
+                                              Pooler                  : String;
+                                              TimeOut                 : Integer = 3000;
+                                              ConnectTimeOut          : Integer = 3000;
+                                              RESTClientPooler        : TRESTClientPoolerBase = Nil) : String;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse            : String;
@@ -3100,45 +3100,7 @@ Var
  DWParams             : TRESTDWParams;
 Begin
  Result := '';
- If Not Assigned(RESTClientPooler) Then
-  RESTClientPoolerExec  := TRESTClientPoolerBase.Create(Nil)
- Else
-  Begin
-   RESTClientPoolerExec := RESTClientPooler;
-   DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
-   AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
-   vtyperequest         := RESTClientPoolerExec.TypeRequest;
-  End;
- vActualClientPoolerExec := RESTClientPoolerExec;
- RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
- RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
- RESTClientPoolerExec.UserAgent        := vUserAgent;
- RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
- RESTClientPoolerExec.Host             := Host;
- RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
- RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
- RESTClientPoolerExec.RequestTimeOut   := TimeOut;
- RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Pooler;
- RESTClientPoolerExec.DataCompression  := vCompression;
- RESTClientPoolerExec.TypeRequest      := vtyperequest;
- RESTClientPoolerExec.OnWork           := vOnWork;
- RESTClientPoolerExec.OnWorkBegin      := vOnWorkBegin;
- RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
- RESTClientPoolerExec.OnStatus         := vOnStatus;
- RESTClientPoolerExec.Encoding         := vEncoding;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
- RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
- RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF FPC}
- RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
- {$ENDIF}
+ RESTClientPoolerExec            := RESTClientPooler;
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
  JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
@@ -3211,8 +3173,6 @@ Begin
     End;
   End;
  Finally
-  If Not Assigned(RESTClientPooler) Then
-   FreeAndNil(RESTClientPoolerExec);
   FreeAndNil(DWParams);
  End;
 End;

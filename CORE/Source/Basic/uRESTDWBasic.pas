@@ -2059,6 +2059,12 @@ Var
      End;
    End;
  End;
+ Procedure PrepareBasicAuth(AuthenticationString : String; Var AuthUsername, AuthPassword : String);
+ Begin
+  AuthUsername := Copy(AuthenticationString, InitStrPos, Pos(':', AuthenticationString) -1);
+  Delete(AuthenticationString, InitStrPos, Pos(':', AuthenticationString));
+  AuthPassword := AuthenticationString;
+ End;
 Begin
  Result                := True;
  vRDWAuthOptionParam   := Nil;
@@ -3346,7 +3352,9 @@ Begin
                               vNeedAuthorization := vTempEvent.NeedAuthorization;
                              If vNeedAuthorization Then
                               Begin
-                               vAuthenticationString := RawHeaders.Values['Authorization']; //Authentication.Authentication;// RawHeaders.Values['Authorization'];
+                               vAuthenticationString := DecodeStrings(StringReplace(RawHeaders.Values['Authorization'], 'Basic ', '', [rfReplaceAll]){$IFDEF FPC}, vDatabaseCharSet{$ENDIF});; //Authentication.Authentication;// RawHeaders.Values['Authorization'];
+                               If vAuthenticationString <> '' Then
+                                PrepareBasicAuth(vAuthenticationString, AuthUsername, AuthPassword);
                                If Assigned(TServerMethodDatamodule(vTempServerMethods).OnUserBasicAuth) Then
                                 Begin
                                  TServerMethodDatamodule(vTempServerMethods).OnUserBasicAuth(vWelcomeMessage, vAccessTag,

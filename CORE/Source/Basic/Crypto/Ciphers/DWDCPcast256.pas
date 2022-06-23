@@ -31,7 +31,7 @@ uses
   Classes, Sysutils, DWDCPtypes, DWDCPcrypt2, DWDCPconst, DWDCPblockciphers;
 
 type
-  TDWDCP_cast256= class(TDWDCP_blockcipher128)
+  TRESTDWDCP_cast256= class(TDWDCP_blockcipher128)
   protected
     Kr, Km: array[0..11,0..3] of DWord;
     procedure InitKey(const Key; Size: longword); override;
@@ -88,22 +88,22 @@ begin
   Result:= ((S1[t shr 24] + S2[(t shr 16) and $FF]) xor S3[(t shr 8) and $FF]) - S4[t and $FF];
 end;
 
-class function TDWDCP_cast256.GetMaxKeySize: integer;
+class function TRESTDWDCP_cast256.GetMaxKeySize: integer;
 begin
   Result:= 256;
 end;
 
-class function TDWDCP_cast256.GetId: integer;
+class function TRESTDWDCP_cast256.GetId: integer;
 begin
   Result:= DWDCP_cast256;
 end;
 
-class function TDWDCP_cast256.GetAlgorithm: string;
+class function TRESTDWDCP_cast256.GetAlgorithm: string;
 begin
   Result:= 'Cast256';
 end;
 
-class function TDWDCP_cast256.SelfTest: boolean;
+class function TRESTDWDCP_cast256.SelfTest: boolean;
 const
   Key1: array[0..15] of byte=
     ($23,$42,$bb,$9e,$fa,$38,$54,$2c,$0a,$f7,$56,$47,$f2,$9f,$61,$5d);
@@ -125,10 +125,10 @@ const
     ($1e,$2e,$bc,$6c,$9f,$2e,$43,$8e,$1d,$90,$d9,$b9,$c6,$85,$32,$86);
 var
   Block: array[0..15] of byte;
-  Cipher: TDWDCP_cast256;
+  Cipher: TRESTDWDCP_cast256;
 begin
   FillChar(Block, SizeOf(Block), 0);
-  Cipher:= TDWDCP_cast256.Create(nil);
+  Cipher:= TRESTDWDCP_cast256.Create(nil);
   Cipher.Init(Key1,Sizeof(Key1)*8,nil);
   Cipher.EncryptECB(InBlock1,Block);
   Result:= boolean(CompareMem(@Block,@OutBlock1,8));
@@ -150,7 +150,7 @@ begin
   Cipher.Free;
 end;
 
-procedure TDWDCP_cast256.InitKey(const Key; Size: longword);
+procedure TRESTDWDCP_cast256.InitKey(const Key; Size: longword);
 var
   x: array[0..7] of DWord;
   cm, cr: DWord;
@@ -212,14 +212,14 @@ begin
   FillChar(x,Sizeof(x),$FF);
 end;
 
-procedure TDWDCP_cast256.Burn;
+procedure TRESTDWDCP_cast256.Burn;
 begin
   FillChar(Kr,Sizeof(Kr),$FF);
   FillChar(Km,Sizeof(Km),$FF);
   inherited Burn;
 end;
 
-procedure TDWDCP_cast256.EncryptECB(const InData; var OutData);
+procedure TRESTDWDCP_cast256.EncryptECB(const InData; var OutData);
 var
   A: array[0..3] of DWord;
 begin
@@ -294,7 +294,7 @@ begin
   PDWord(PointerToInt(@OutData)+12)^:= A[3];
 end;
 
-procedure TDWDCP_cast256.DecryptECB(const InData; var OutData);
+procedure TRESTDWDCP_cast256.DecryptECB(const InData; var OutData);
 var
   A: array[0..3] of DWord;
 begin
