@@ -3,7 +3,5 @@
 	<Transactions>
     <Transaction>2021/04/05 17:05:27.000.526,C:\Componentes\RDW\CORE\Source\Connectors\AnyDAC\Package\Berlin\RESTDWDriverAD.dproj=C:\Componentes\RDW\CORE\Source\Connectors\AnyDAC\Package\Berlin\RESTDWDriverFD.dproj</Transaction>
     <Transaction>2021/04/05 17:05:34.000.524,C:\Componentes\RDW\CORE\Source\Connectors\AnyDAC\uRestDWDriverAD.pas=C:\Componentes\RDW\CORE\Source\Connectors\AnyDAC\uRESTDWDriverFD.pas</Transaction>
-    <Transaction>2022/04/26 16:45:41.000.463,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\branch\unstable\CORE\Images\Delphi\TRESTDWDriverFD.bmp=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\branch\unstable\CORE\Images\Delphi\TRESTDWDriverAD.bmp</Transaction>
-    <Transaction>2022/04/26 16:45:45.000.890,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\branch\unstable\CORE\Images\Delphi\TRESTDWDriverFD16.bmp=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\branch\unstable\CORE\Images\Delphi\TRESTDWDriverAD16.bmp</Transaction>
   </Transactions>
 </BorlandProject>

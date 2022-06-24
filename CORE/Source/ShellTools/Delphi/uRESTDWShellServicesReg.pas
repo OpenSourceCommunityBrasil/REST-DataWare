@@ -1,4 +1,4 @@
-unit uRESTDWIdReg;
+unit uRESTDWShellServicesReg;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -27,10 +27,10 @@ interface
 
 uses
   {$IFDEF FPC}
-    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWIdBase,
+    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWShellServices,
     LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb, uRESTDWAbout;
   {$ELSE}
-   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWIdBase, uRESTDWAbout,
+   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWShellServices, uRESTDWAbout,
    RTLConsts,
    {$IFDEF COMPILER16_UP}
    UITypes,
@@ -43,14 +43,6 @@ uses
     Classes, Db, DbTables, DSDesign, ColnEdit;
    {$IFEND}
   {$ENDIF}
-
-Type
- TPoolersList = Class(TStringProperty)
- Public
-  Function  GetAttributes  : TPropertyAttributes; Override;
-  Procedure GetValues(Proc : TGetStrProc);        Override;
-  Procedure Edit;                                 Override;
-End;
 
 Type
  TRESTDWAboutDialogProperty = class({$IFDEF FPC}TClassPropertyEditor{$ELSE}TPropertyEditor{$ENDIF})
@@ -66,57 +58,17 @@ Implementation
 
 uses uRESTDWConsts, uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
 
-Function TPoolersList.GetAttributes : TPropertyAttributes;
-Begin
-  // editor, sorted list, multiple selection
- Result := [paValueList, paSortList];
-End;
-
-Procedure TPoolersList.Edit;
-Var
- vTempData : String;
-Begin
- Inherited Edit;
- Try
-  vTempData := GetValue;
-  SetValue(vTempData);
- Finally
- End;
-end;
-
-Procedure TPoolersList.GetValues(Proc : TGetStrProc);
-Var
- vLista : TStringList;
- I      : Integer;
-Begin
- //Provide a list of Poolers
- With GetComponent(0) as TRESTDWIdDatabase Do
-  Begin
-   Try
-    vLista := TRESTDWIdDatabase(GetComponent(0)).PoolerList;
-    For I := 0 To vLista.Count -1 Do
-     Proc (vLista[I]);
-   Except
-   End;
-  End;
-End;
-
 Procedure Register;
 Begin
- RegisterComponents('REST Dataware - Service',     [TRESTDWIdServicePooler]);
- RegisterComponents('REST Dataware - Client''s',   [TRESTDWIdClientREST,
-                                                    TRESTDWIdClientPooler]);
-//                                                    TRESTDWIdClientNotification]);
-
- RegisterComponents('REST Dataware - CORE - DB',   [TRESTDWIdDataBase]);
- RegisterPropertyEditor(TypeInfo(String),           TRESTDWIdDatabase,     'PoolerName',      TPoolersList);
-// RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionServer,   'PoolerName',      TPoolersListCDF);
-// RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionParams,   'PoolerName',      TPoolersListCDF);
+ RegisterComponents('REST Dataware - Service',     [TRESTDWShellService]);
  {$IFNDEF FPC}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TRESTDWAboutDialogProperty);
  {$ELSE}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TRESTDWAboutDialogProperty);
  {$ENDIF}
+ UnlistPublishedProperty(TRESTDWShellService,  'Active');
+ UnlistPublishedProperty(TRESTDWShellService,  'ServicePort');
+ UnlistPublishedProperty(TRESTDWShellService,  'RequestTimeOut');
 End;
 
 {$IFDEF FPC}

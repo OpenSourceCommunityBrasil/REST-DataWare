@@ -179,26 +179,17 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployClass Name="DependencyModule">
-                    <Platform Name="Win32">
-                        <Operation>0</Operation>
-                        <Extensions>.dll;.bpl</Extensions>
-                    </Platform>
-                    <Platform Name="OSX32">
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="iPhone_LaunchDark3x">
-                    <Platform Name="iOSDevice64">
-                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                <DeployClass Name="Android_NotificationIcon36">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="iOSSimulator">
-                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="ProjectOSXDebug"/>
                 <DeployClass Name="AndroidClassesDexFile">
                     <Platform Name="Android">
                         <RemoteDir>classes</RemoteDir>
@@ -230,10 +221,15 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="ProjectOSXDebug"/>
                 <DeployClass Name="ProjectOSXResource">
                     <Platform Name="OSX32">
                         <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon36">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-ldpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -301,11 +297,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="AndroidSplashStylesV21">
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\values-v21</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\values-v21</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -327,11 +323,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_NotificationIcon48">
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\drawable-xhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-xhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -399,11 +395,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_Colors">
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\values</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\values</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -438,11 +434,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_NotificationIcon96">
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -569,11 +565,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="AndroidFileProvider">
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\xml</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\xml</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -680,11 +676,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_Strings">
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\values</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\values</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -702,11 +698,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_NotificationIcon24">
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\drawable-mdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-mdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -722,11 +718,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_NotificationIcon72">
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\drawable-xxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-xxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -808,6 +804,16 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="iPhone_LaunchDark3x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="AndroidServiceOutput_Android32">
                     <Platform Name="Android64">
                         <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
@@ -824,20 +830,14 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="Android_NotificationIcon36">
-                    <Platform Name="Android64">
-                        <RemoteDir>res\drawable-hdpi</RemoteDir>
-                        <Operation>1</Operation>
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
                     </Platform>
-                    <Platform Name="Android">
-                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                    <Platform Name="OSX32">
                         <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="Android_LauncherIcon36">
-                    <Platform Name="Android">
-                        <RemoteDir>res\drawable-ldpi</RemoteDir>
-                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>

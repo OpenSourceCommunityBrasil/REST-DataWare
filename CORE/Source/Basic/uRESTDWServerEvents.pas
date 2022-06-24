@@ -115,13 +115,14 @@ Type
 End;
 
 Type
- TDWEvent = Class;
- TDWEvent = Class(TCollectionItem)
+ TRESTDWEvent = Class;
+ TRESTDWEvent = Class(TCollectionItem)
  Protected
  Private
   vDescription                           : TStrings;
   vDWRoutes                              : TRESTDWRoutes;
   vJsonMode                              : TJsonMode;
+  vFullPath,
   vEventName,
   FName                                  : String;
   vDWParams                              : TRESTDWParamsMethods;
@@ -146,35 +147,36 @@ Type
   Function    GetNamePath  : String;                     Override;
   Destructor  Destroy; Override;
  Published
-  Property    Routes               : TRESTDWRoutes       Read vDWRoutes             Write vDWRoutes;
-  Property    NeedAuthorization    : Boolean             Read vNeedAuthorization    Write vNeedAuthorization;
-  Property    DWParams             : TRESTDWParamsMethods Read vDWParams             Write vDWParams;
-  Property    JsonMode             : TJsonMode           Read vJsonMode             Write vJsonMode;
-  Property    Name                 : String              Read GetDisplayName        Write SetDisplayName;
-  Property    EventName            : String              Read vEventName            Write vEventName;
-  Property    Description          : TStrings            Read vDescription          Write SetDescription;
-  Property    OnlyPreDefinedParams : Boolean             Read vOnlyPreDefinedParams Write vOnlyPreDefinedParams;
-  Property    OnReplyEvent         : TDWReplyEvent       Read GetReplyEvent         Write SetReplyEvent;
-  Property    OnReplyEventByType   : TDWReplyEventByType Read GetReplyEventByType   Write SetReplyEventByType;
-  Property    OnAuthRequest        : TDWAuthRequest      Read GetAuthRequest        Write SetAuthRequest;
-  Property    OnBeforeExecute      : TObjectExecute      Read vBeforeExecute        Write vBeforeExecute;
+  Property    Routes               : TRESTDWRoutes        Read vDWRoutes             Write vDWRoutes;
+  Property    NeedAuthorization    : Boolean              Read vNeedAuthorization    Write vNeedAuthorization;
+  Property    Params               : TRESTDWParamsMethods Read vDWParams             Write vDWParams;
+  Property    JsonMode             : TJsonMode            Read vJsonMode             Write vJsonMode;
+  Property    Name                 : String               Read GetDisplayName        Write SetDisplayName;
+  Property    EventName            : String               Read vEventName            Write vEventName;
+  Property    BaseURI              : String               Read vFullPath             Write vFullPath;
+  Property    Description          : TStrings             Read vDescription          Write SetDescription;
+  Property    OnlyPreDefinedParams : Boolean              Read vOnlyPreDefinedParams Write vOnlyPreDefinedParams;
+  Property    OnReplyEvent         : TDWReplyEvent        Read GetReplyEvent         Write SetReplyEvent;
+  Property    OnReplyEventByType   : TDWReplyEventByType  Read GetReplyEventByType   Write SetReplyEventByType;
+  Property    OnAuthRequest        : TDWAuthRequest       Read GetAuthRequest        Write SetAuthRequest;
+  Property    OnBeforeExecute      : TObjectExecute       Read vBeforeExecute        Write vBeforeExecute;
 End;
 
 Type
- TDWEventList = Class;
- TDWEventList = Class(TRESTDWOwnedCollection)
+ TRESTDWEventList = Class;
+ TRESTDWEventList = Class(TRESTDWOwnedCollection)
  Protected
   vEditable   : Boolean;
   Function    GetOwner: TPersistent; override;
  Private
   fOwner      : TPersistent;
-  Function    GetRec    (Index       : Integer) : TDWEvent;       Overload;
+  Function    GetRec    (Index       : Integer) : TRESTDWEvent;       Overload;
   Procedure   PutRec    (Index       : Integer;
-                         Item        : TDWEvent);                 Overload;
+                         Item        : TRESTDWEvent);                 Overload;
   Procedure   ClearList;
-  Function    GetRecName(Index       : String)  : TDWEvent;       Overload;
+  Function    GetRecName(Index       : String)  : TRESTDWEvent;       Overload;
   Procedure   PutRecName(Index       : String;
-                         Item        : TDWEvent);                 Overload;
+                         Item        : TRESTDWEvent);                 Overload;
 //  Procedure   Editable  (Value : Boolean);
  Public
   Function    Add    : TCollectionItem;
@@ -184,8 +186,8 @@ Type
   Function    ToJSON : String;
   Procedure   FromJSON   (Value      : String );
   Procedure   Delete     (Index      : Integer);                  Overload;
-  Property    Items      [Index      : Integer]  : TDWEvent       Read GetRec     Write PutRec; Default;
-  Property    EventByName[Index      : String ]  : TDWEvent       Read GetRecName Write PutRecName;
+  Property    Items      [Index      : Integer]  : TRESTDWEvent       Read GetRec     Write PutRec; Default;
+  Property    EventByName[Index      : String ]  : TRESTDWEvent       Read GetRecName Write PutRecName;
 End;
 
 Type
@@ -193,7 +195,7 @@ Type
  Protected
  Private
   vIgnoreInvalidParams : Boolean;
-  vEventList           : TDWEventList;
+  vEventList           : TRESTDWEventList;
   vAccessTag,
   vServerContext       : String;
   vOnCreate            : TObjectEvent;
@@ -204,7 +206,7 @@ Type
                              Var DWParams : TRESTDWParams);
  Published
   Property    IgnoreInvalidParams : Boolean      Read vIgnoreInvalidParams Write vIgnoreInvalidParams;
-  Property    Events              : TDWEventList Read vEventList           Write vEventList;
+  Property    Events              : TRESTDWEventList Read vEventList           Write vEventList;
   Property    AccessTag           : String       Read vAccessTag           Write vAccessTag;
   Property    ContextName         : String       Read vServerContext       Write vServerContext;
   Property    OnCreate            : TObjectEvent Read vOnCreate            Write vOnCreate;
@@ -217,12 +219,12 @@ Type
   vServerEventName  : String;
   vEditParamList,
   vGetEvents        : Boolean;
-  vEventList        : TDWEventList;
+  vEventList        : TRESTDWEventList;
   vRESTClientPooler : TRESTClientPoolerBase;
   vOnBeforeSend     : TOnBeforeSend;
   vCripto           : TCripto;
   Procedure GetOnlineEvents         (Value  : Boolean);
-  Procedure SetEventList            (aValue : TDWEventList);
+  Procedure SetEventList            (aValue : TRESTDWEventList);
   Function  GeTRESTClientPoolerBase             : TRESTClientPoolerBase;
   Procedure SeTRESTClientPoolerBase(Const Value : TRESTClientPoolerBase);
   Procedure TokenValidade(Var DWParams : TRESTDWParams;
@@ -251,22 +253,22 @@ Type
   Property    ServerEventName  : String                Read vServerEventName        Write vServerEventName;
   Property    CriptOptions     : TCripto               Read vCripto                 Write vCripto;
   Property    RESTClientPooler : TRESTClientPoolerBase Read GeTRESTClientPoolerBase Write SeTRESTClientPoolerBase;
-  Property    Events           : TDWEventList          Read vEventList              Write SetEventList;
+  Property    Events           : TRESTDWEventList      Read vEventList              Write SetEventList;
   Property    OnBeforeSend     : TOnBeforeSend         Read vOnBeforeSend           Write vOnBeforeSend; // Add Evento por Ico Menezes
 End;
 
 implementation
 
-{ TDWEvent }
+{ TRESTDWEvent }
 
 Uses DataUtils;
 
-Function TDWEvent.GetNamePath: String;
+Function TRESTDWEvent.GetNamePath: String;
 Begin
  Result := vOwnerCollection.GetNamePath + FName;
 End;
 
-constructor TDWEvent.Create(aCollection: TCollection);
+constructor TRESTDWEvent.Create(aCollection: TCollection);
 begin
  Inherited;
  vDWParams             := TRESTDWParamsMethods.Create(aCollection, TDWParamMethod);
@@ -278,11 +280,12 @@ begin
  vNeedAuthorization    := True;
  vOnlyPreDefinedParams := False;
  vEventName            := '';
+ vFullPath             := '';
  vDescription          := TStringList.Create;
  vDWRoutes             := [crAll];
 end;
 
-Destructor TDWEvent.Destroy;
+Destructor TRESTDWEvent.Destroy;
 Begin
  vDWParams.Free;
  DWReplyEventData.Free;
@@ -290,50 +293,50 @@ Begin
  Inherited;
 End;
 
-Function TDWEvent.GetAuthRequest: TDWAuthRequest;
+Function TRESTDWEvent.GetAuthRequest: TDWAuthRequest;
 Begin
  Result := DWReplyEventData.OnAuthRequest;
 End;
 
-Function TDWEvent.GetDisplayName: String;
+Function TRESTDWEvent.GetDisplayName: String;
 Begin
  Result := DWReplyEventData.Name;
 End;
 
-Procedure TDWEvent.Assign(Source: TPersistent);
+Procedure TRESTDWEvent.Assign(Source: TPersistent);
 begin
- If Source is TDWEvent then
+ If Source is TRESTDWEvent then
   Begin
-   FName       := TDWEvent(Source).Name;
-   vDWParams   := TDWEvent(Source).DWParams;
-   DWReplyEventData.OnBeforeExecute := TDWEvent(Source).OnBeforeExecute;
-   DWReplyEventData.OnReplyEvent := TDWEvent(Source).OnReplyEvent;
+   FName       := TRESTDWEvent(Source).Name;
+   vDWParams   := TRESTDWEvent(Source).Params;
+   DWReplyEventData.OnBeforeExecute := TRESTDWEvent(Source).OnBeforeExecute;
+   DWReplyEventData.OnReplyEvent := TRESTDWEvent(Source).OnReplyEvent;
   End
  Else
   Inherited;
 End;
 
-Function TDWEvent.GetReplyEvent: TDWReplyEvent;
+Function TRESTDWEvent.GetReplyEvent: TDWReplyEvent;
 Begin
  Result := DWReplyEventData.OnReplyEvent;
 End;
 
-Function TDWEvent.GetReplyEventByType : TDWReplyEventByType;
+Function TRESTDWEvent.GetReplyEventByType : TDWReplyEventByType;
 Begin
  Result := DWReplyEventData.OnReplyEventByType;
 End;
 
-Procedure TDWEvent.SetDescription(Strings : TStrings);
+Procedure TRESTDWEvent.SetDescription(Strings : TStrings);
 Begin
  vDescription.Assign(Strings);
 End;
 
-Procedure TDWEvent.SetAuthRequest(Value   : TDWAuthRequest);
+Procedure TRESTDWEvent.SetAuthRequest(Value   : TDWAuthRequest);
 Begin
  DWReplyEventData.OnAuthRequest := Value;
 End;
 
-Procedure TDWEvent.SetDisplayName(Const Value: String);
+Procedure TRESTDWEvent.SetDisplayName(Const Value: String);
 Begin
  If Trim(Value) = '' Then
   Raise Exception.Create(cInvalidEvent)
@@ -347,17 +350,17 @@ Begin
   End;
 End;
 
-procedure TDWEvent.SetReplyEvent(Value: TDWReplyEvent);
+procedure TRESTDWEvent.SetReplyEvent(Value: TDWReplyEvent);
 begin
  DWReplyEventData.OnReplyEvent := Value;
 end;
 
-Procedure TDWEvent.SetReplyEventByType(Value: TDWReplyEventByType);
+Procedure TRESTDWEvent.SetReplyEventByType(Value: TDWReplyEventByType);
 Begin
  DWReplyEventData.OnReplyEventByType := Value;
 End;
 
-Procedure TDWEvent.CompareParams(Var Dest : TRESTDWParams);
+Procedure TRESTDWEvent.CompareParams(Var Dest : TRESTDWParams);
 Var
  I : Integer;
 Begin
@@ -376,14 +379,14 @@ Begin
   End;
 End;
 
-Function TDWEventList.Add : TCollectionItem;
+Function TRESTDWEventList.Add : TCollectionItem;
 Begin
  Result := Nil;
  If vEditable Then
-  Result := TDWEvent(Inherited Add);
+  Result := TRESTDWEvent(Inherited Add);
 End;
 
-procedure TDWEventList.ClearList;
+procedure TRESTDWEventList.ClearList;
 Var
  I : Integer;
  vOldEditable : Boolean;
@@ -399,27 +402,27 @@ Begin
  End;
 End;
 
-Constructor TDWEventList.Create(AOwner     : TPersistent;
+Constructor TRESTDWEventList.Create(AOwner     : TPersistent;
                                 aItemClass : TCollectionItemClass);
 Begin
- Inherited Create(AOwner, TDWEvent);
+ Inherited Create(AOwner, TRESTDWEvent);
  Self.fOwner := AOwner;
  vEditable   := True;
 End;
 
-procedure TDWEventList.Delete(Index: Integer);
+procedure TRESTDWEventList.Delete(Index: Integer);
 begin
  If (Index < Self.Count) And (Index > -1) And (vEditable) Then
   TOwnedCollection(Self).Delete(Index);
 end;
 
-destructor TDWEventList.Destroy;
+destructor TRESTDWEventList.Destroy;
 begin
  ClearList;
  inherited;
 end;
 
-Procedure TDWEventList.FromJSON(Value : String);
+Procedure TRESTDWEventList.FromJSON(Value : String);
 Var
  bJsonOBJBase   : TRESTDWJSONInterfaceBase;
  bJsonOBJ,
@@ -429,7 +432,7 @@ Var
  bJsonArrayB,
  bJsonArrayC    : TRESTDWJSONInterfaceArray;
  I, X, Y        : Integer;
- vDWEvent       : TDWEvent;
+ vDWEvent       : TRESTDWEvent;
  vDWParamMethod : TDWParamMethod;
  vEventName,
  vJsonMode,
@@ -455,7 +458,7 @@ Begin
        vneedauth  := StringToBoolean(bJsonOBJb.Pairs[3].Value); //params
        vonlypredefparams := StringToBoolean(bJsonOBJb.Pairs[4].Value); //params
        If EventByName[vEventName] = Nil Then
-        vDWEvent  := TDWEvent(Self.Add)
+        vDWEvent  := TRESTDWEvent(Self.Add)
        Else
         vDWEvent  := EventByName[vEventName];
        vDWEvent.Name := vEventName;
@@ -503,38 +506,38 @@ Begin
  End;
 End;
 
-Function TDWEventList.GetOwner: TPersistent;
+Function TRESTDWEventList.GetOwner: TPersistent;
 Begin
  Result:= fOwner;
 End;
 
-function TDWEventList.GetRec(Index: Integer): TDWEvent;
+function TRESTDWEventList.GetRec(Index: Integer): TRESTDWEvent;
 begin
- Result := TDWEvent(Inherited GetItem(Index));
+ Result := TRESTDWEvent(Inherited GetItem(Index));
 end;
 
-function TDWEventList.GetRecName(Index: String): TDWEvent;
+function TRESTDWEventList.GetRecName(Index: String): TRESTDWEvent;
 Var
  I : Integer;
 Begin
  Result := Nil;
  For I := 0 To Self.Count - 1 Do
   Begin
-   If (Uppercase(Index) = Uppercase(TDWEvent(Items[I]).EventName)) Then
+   If (Uppercase(Index) = Uppercase(TRESTDWEvent(Items[I]).EventName)) Then
     Begin
-     Result := TDWEvent(Self.Items[I]);
+     Result := TRESTDWEvent(Self.Items[I]);
      Break;
     End;
   End;
 End;
 
-procedure TDWEventList.PutRec(Index: Integer; Item: TDWEvent);
+procedure TRESTDWEventList.PutRec(Index: Integer; Item: TRESTDWEvent);
 begin
  If (Index < Self.Count) And (Index > -1) And (vEditable) Then
   SetItem(Index, Item);
 end;
 
-procedure TDWEventList.PutRecName(Index: String; Item: TDWEvent);
+procedure TRESTDWEventList.PutRecName(Index: String; Item: TRESTDWEvent);
 Var
  I : Integer;
 Begin
@@ -542,7 +545,7 @@ Begin
   Begin
    For I := 0 To Self.Count - 1 Do
     Begin
-     If (Uppercase(Index) = Uppercase(TDWEvent(Items[I]).EventName)) Then
+     If (Uppercase(Index) = Uppercase(TRESTDWEvent(Items[I]).EventName)) Then
       Begin
        Self.Items[I] := Item;
        Break;
@@ -551,7 +554,7 @@ Begin
   End;
 End;
 
-Function TDWEventList.ToJSON: String;
+Function TRESTDWEventList.ToJSON: String;
 Var
  A, I : Integer;
  vTagEvent,
@@ -566,7 +569,7 @@ Begin
   Begin
    vParamLine2  := Format('"needauth":"%s", "onlypredefparams":"%s"', [BooleanToString(Items[I].NeedAuthorization),
                                                                        BooleanToString(Items[I].OnlyPreDefinedParams)]);
-   vTagEvent    := Format('{"eventname":"%s"', [TDWEvent(Items[I]).EventName]);
+   vTagEvent    := Format('{"eventname":"%s"', [TRESTDWEvent(Items[I]).EventName]);
    vTagEvent    := vTagEvent + Format(', "jsonmode":"%s"', [GetJSONModeName(Items[I].vJsonMode)]);
    vTagEvent    := vTagEvent + ', "params":[%s], ' + vParamLine2 + '}';
    vParamsLines := '';
@@ -655,7 +658,7 @@ End;
 Constructor TRESTDWServerEvents.Create(AOwner : TComponent);
 Begin
  Inherited;
- vEventList := TDWEventList.Create(Self, TDWEvent);
+ vEventList := TRESTDWEventList.Create(Self, TRESTDWEvent);
  vIgnoreInvalidParams := False;
  If Assigned(vOnCreate) Then
   vOnCreate(Self);
@@ -793,7 +796,7 @@ end;
 constructor TRESTDWClientEvents.Create(AOwner: TComponent);
 begin
  Inherited;
- vEventList     := TDWEventList.Create(Self, TDWEvent);
+ vEventList     := TRESTDWEventList.Create(Self, TRESTDWEvent);
  vCripto        := TCripto.Create;
  vGetEvents     := False;
  vEditParamList := True;
@@ -1188,7 +1191,7 @@ begin
  vEventList.ClearList;
 end;
 
-procedure TRESTDWClientEvents.SetEventList(aValue : TDWEventList);
+procedure TRESTDWClientEvents.SetEventList(aValue : TRESTDWEventList);
 begin
  If vEditParamList Then
   vEventList := aValue;

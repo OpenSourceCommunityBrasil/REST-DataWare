@@ -290,10 +290,6 @@ Type
 End;
 
 Type
- TRESTDWIdServiceCGI = Class(TRESTServiceShareBase)
-End;
-
-Type
  TRESTDWIdDatabase = Class(TRESTDWDatabasebaseBase)
  Private
   vCipherList                      : String;

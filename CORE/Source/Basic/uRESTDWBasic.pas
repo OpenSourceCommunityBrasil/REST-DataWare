@@ -765,6 +765,29 @@ Type
  TRESTServicePoolerBase   = Class(TRESTServiceBase)
 End;
 
+Type
+ TRESTShellServicesBase   = Class(TRESTServiceBase)
+ Private
+  vOnCreate : TOnCreate;
+  Procedure Loaded; Override;
+ Protected
+  Procedure Notification              (AComponent            : TComponent;
+                                       Operation             : TOperation); Override;
+ Public
+  Procedure EchoPooler               (ServerMethodsClass     : TComponent;
+                                      AContext               : TComponent;
+                                      Var Pooler, MyIP       : String;
+                                      AccessTag              : String;
+                                      Var InvalidTag         : Boolean);Virtual;Abstract;
+  Procedure Command                   (ARequest              : TComponent;
+                                       AResponse             : TComponent;
+                                       Var Handled           : Boolean);Virtual;Abstract;
+  Constructor Create                  (AOwner                : TComponent); Override; //Cria o Componente
+  Destructor  Destroy;Override;
+ Published
+  Property    OnCreate : TOnCreate     Read vOnCreate        Write vOnCreate;
+End;
+
 //Heranças para Servidores CGI/Isapi
 Type
  TRESTServiceShareBase    = Class(TRESTServiceBase)
@@ -1701,7 +1724,7 @@ Var
  vRequestHeader,
  vDecoderHeaderList  : TStringList;
  vTempContext        : TRESTDWContext;
- vTempEvent          : TDWEvent;
+ vTempEvent          : TRESTDWEvent;
  Function ExcludeTag(Value : String) : String;
  Begin
   Result := Value;
@@ -1956,7 +1979,7 @@ Var
  End;
  Function ReturnEventValidation(ServerMethodsClass : TComponent;
                                 Pooler,
-                                urlContext         : String) : TDWEvent;
+                                urlContext         : String) : TRESTDWEvent;
  Var
   vTagService : Boolean;
   I           : Integer;
@@ -7062,11 +7085,34 @@ End;
 
 { TRESTServiceShareBase }
 
-Constructor TRESTServiceShareBase.Create(AOwner: TComponent);
+Constructor TRESTServiceShareBase.Create(AOwner  : TComponent);
 Begin
  Inherited;
  Active      := True;
  ServicePort := 0;
+End;
+
+Constructor TRESTShellServicesBase.Create(AOwner : TComponent);
+Begin
+ Inherited Create(AOwner);
+End;
+
+Destructor TRESTShellServicesBase.Destroy;
+Begin
+ Inherited Destroy;
+End;
+
+Procedure TRESTShellServicesBase.Loaded;
+Begin
+ Inherited;
+ If Assigned(vOnCreate) Then
+  vOnCreate(Self);
+End;
+
+Procedure TRESTShellServicesBase.Notification(AComponent : TComponent;
+                                              Operation  : TOperation);
+Begin
+ Inherited Notification(AComponent, Operation);
 End;
 
 end.
