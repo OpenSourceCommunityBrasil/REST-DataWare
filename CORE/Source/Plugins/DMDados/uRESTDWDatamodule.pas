@@ -28,20 +28,18 @@ Type
   vip,
   vUserAgent,
   vBaseRequest,
-  vRequest,
   vToken         : String;
   vport          : Integer;
   Procedure  SetClientInfo(ip,
                            UserAgent,
-                           BaseRequest, Request : String;
-                           port                 : Integer);
+                           BaseRequest : String;
+                           port        : Integer);
  Protected
  Public
   Constructor Create;
 //  Procedure   Assign(Source : TPersistent); Override;
  Published
   Property BaseRequest : String  Read vBaseRequest;
-  Property Request     : String  Read vRequest;
   Property ip          : String  Read vip;
   Property UserAgent   : String  Read vUserAgent;
   Property port        : Integer Read vport;
@@ -73,8 +71,8 @@ Type
    Procedure   SetClientWelcomeMessage(Value : String);
    Procedure   SetClientInfo(ip,
                              UserAgent,
-                             BaseRequest, Request : String;
-                             port                 : Integer);
+                             BaseRequest : String;
+                             port        : Integer);
    Constructor Create(Sender : TComponent);Override;
    Destructor  Destroy;override;
    Property ServerAuthOptions              : TRESTDWAuthOptionParam Read vServerAuthOptions              Write vServerAuthOptions;
@@ -117,10 +115,10 @@ End;
 
 Procedure TServerMethodDataModule.SetClientInfo(ip,
                                                 UserAgent,
-                                                BaseRequest, Request : String;
-                                                port                 : Integer);
+                                                BaseRequest   : String;
+                                                port          : Integer);
 Begin
- vRESTDWClientInfo.SetClientInfo(Trim(ip), Trim(UserAgent), BaseRequest, Request, Port);
+ vRESTDWClientInfo.SetClientInfo(Trim(ip), Trim(UserAgent), BaseRequest, Port);
 End;
 
 Constructor TServerMethodDataModule.Create(Sender: TComponent);
@@ -153,19 +151,17 @@ Begin
  vport        := 0;
  vToken       := '';
  vBaseRequest := '';
- vRequest     := '';
 End;
 
 Procedure TRESTDWClientInfo.SetClientInfo(ip,
                                           UserAgent,
-                                          BaseRequest, Request : String;
-                                          port                 : Integer);
+                                          BaseRequest : String;
+                                          port        : Integer);
 Begin
  vip          := Trim(ip);
  vUserAgent   := Trim(UserAgent);
  vport        := Port;
- vBaseRequest := Request;
- vRequest     := BaseRequest;
+ vBaseRequest := BaseRequest;
 End;
 
 end.

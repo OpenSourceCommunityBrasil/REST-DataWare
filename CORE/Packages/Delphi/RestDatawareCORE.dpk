@@ -100,7 +100,10 @@ contains
   uRESTDWBufferDb in '..\..\Source\Basic\uRESTDWBufferDb.pas',
   uRESTDWResponseTranslator in '..\..\Source\Basic\uRESTDWResponseTranslator.pas',
   uRESTDWJSONViewer in '..\..\Source\Plugins\JSONViewer\uRESTDWJSONViewer.pas' {fDWJSONViewer},
-  uRESTDWBasicClass in '..\..\Source\Basic\uRESTDWBasicClass.pas';
+  uRESTDWBasicClass in '..\..\Source\Basic\uRESTDWBasicClass.pas',
+  DWDCPrijndael in '..\..\Source\Basic\Crypto\Ciphers\DWDCPrijndael.pas',
+  DWDCPcast256 in '..\..\Source\Basic\Crypto\Ciphers\DWDCPcast256.pas',
+  DWDCPsha256 in '..\..\Source\Basic\Crypto\Hashes\DWDCPsha256.pas';
 
 End.
 

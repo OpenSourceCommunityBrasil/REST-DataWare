@@ -243,6 +243,7 @@ Type
  Private
   vDescription,
   vDefaultHtml                           : TStrings;
+  vBaseURL,
   vContextName,
   FName,
   vContentType                           : String;
@@ -265,6 +266,7 @@ Type
   Procedure SetDescription    (Strings   : TStrings);
   Function  GetBeforeRenderer            : TRESTDWBeforeRenderer;
   Procedure SetBeforeRenderer (Value     : TRESTDWBeforeRenderer);
+  Procedure SetBaseURL(Value : String);
  Public
   Function    GetDisplayName             : String;       Override;
   Procedure   SetDisplayName(Const Value : String);      Override;
@@ -275,21 +277,22 @@ Type
   Destructor  Destroy; Override;
  Published
   Property    DWParams                   : TRESTDWParamsMethods       Read vDWParams              Write vDWParams;
-  Property    ContentType                : String                 Read vContentType           Write vContentType;
-  Property    Name                       : String                 Read GetDisplayName         Write SetDisplayName;
-  Property    ContextName                : String                 Read vContextName           Write vContextName;
-  Property    DefaultHtml                : TStrings               Read vDefaultHtml           Write SetDefaultPage;
-  Property    Description                : TStrings               Read vDescription           Write SetDescription;
+  Property    ContentType                : String                     Read vContentType           Write vContentType;
+  Property    Name                       : String                     Read GetDisplayName         Write SetDisplayName;
+  Property    BaseURL                    : String                     Read vBaseURL               Write SetBaseURL;
+  Property    ContextName                : String                     Read vContextName           Write vContextName;
+  Property    DefaultHtml                : TStrings                   Read vDefaultHtml           Write SetDefaultPage;
+  Property    Description                : TStrings                   Read vDescription           Write SetDescription;
   Property    Routes                     : TRESTDWRoutes              Read vDWRoutes              Write vDWRoutes;
   Property    ContextRules               : TRESTDWContextRules        Read vDWContextRules        Write vDWContextRules;
-  Property    OnlyPreDefinedParams       : Boolean                Read vOnlyPreDefinedParams  Write vOnlyPreDefinedParams;
-  Property    IgnoreBaseHeader           : Boolean                Read vignorebaseheader      Write vignorebaseheader;
-  Property    NeedAuthorization          : Boolean                Read vNeedAuthorization     Write vNeedAuthorization;
+  Property    OnlyPreDefinedParams       : Boolean                    Read vOnlyPreDefinedParams  Write vOnlyPreDefinedParams;
+  Property    IgnoreBaseHeader           : Boolean                    Read vignorebaseheader      Write vignorebaseheader;
+  Property    NeedAuthorization          : Boolean                    Read vNeedAuthorization     Write vNeedAuthorization;
   Property    OnAuthRequest              : TRESTDWAuthRequest         Read vAuthRequest           Write vAuthRequest;
   Property    OnReplyRequest             : TRESTDWReplyRequest        Read GetReplyRequest        Write SetReplyRequest;
   Property    OnReplyRequestStream       : TRESTDWReplyRequestStream  Read GetReplyRequestStream  Write SetReplyRequestStream;
   Property    OnBeforeRenderer           : TRESTDWBeforeRenderer      Read GetBeforeRenderer      Write SetBeforeRenderer;
-  Property    OnBeforeCall               : TObjectExecute         Read vOnBeforeCall          Write vOnBeforeCall;
+  Property    OnBeforeCall               : TObjectExecute             Read vOnBeforeCall          Write vOnBeforeCall;
 End;
 
 Type
@@ -327,8 +330,8 @@ Type
   vBaseHeader          : TStrings;
   vIgnoreInvalidParams : Boolean;
   vEventList           : TRESTDWContextList;
+  vDefaultContext,
   vAccessTag,
-  vServerContext,
   vRootContext         : String;
   vOnBeforeRenderer    : TObjectEvent;
   Procedure SetBaseHeader(Value : TStrings);
@@ -341,11 +344,10 @@ Type
   Constructor Create(AOwner : TComponent);Override; //Cria o Componente
  Published
   Property    IgnoreInvalidParams : Boolean        Read vIgnoreInvalidParams Write vIgnoreInvalidParams;
-  Property    ContextList         : TRESTDWContextList Read vEventList           Write vEventList;
+  Property    ContextList         : TRESTDWContextList Read vEventList       Write vEventList;
   Property    AccessTag           : String         Read vAccessTag           Write vAccessTag;
-  Property    BaseContext         : String         Read vServerContext       Write vServerContext;
   Property    BaseHeader          : TStrings       Read vBaseHeader          Write SetBaseHeader;
-  Property    RootContext         : String         Read vRootContext         Write vRootContext;
+  Property    DefaultContext      : String         Read vDefaultContext      Write vDefaultContext;
   Property    OnBeforeRenderer    : TObjectEvent   Read vOnBeforeRenderer    Write SetOnBeforeRenderer;
 End;
 
@@ -367,6 +369,7 @@ begin
  vOwnerCollection        := aCollection;
  FName                   := 'dwcontext' + IntToStr(aCollection.Count);
  vContextName            := '';
+ vBaseURL                := '/';
  DWReplyRequestData.Name := FName;
  vNeedAuthorization      := True;
  vDWRoutes               := [crAll];
@@ -435,6 +438,23 @@ End;
 Function TRESTDWContext.GetReplyRequest: TRESTDWReplyRequest;
 Begin
  Result := DWReplyRequestData.OnReplyRequest;
+End;
+
+Procedure TRESTDWContext.SetBaseURL(Value : String);
+Var
+ vTempValue : String;
+Begin
+ vTempValue := Value;
+ If Trim(vTempValue) = '' Then
+  vBaseURL := '/'
+ Else
+  Begin
+   If Copy(vTempValue, 1, 1) <> '/' Then
+    vTempValue := '/' + vTempValue;
+   If Copy(vTempValue, Length(vTempValue), 1) <> '/' Then
+    vTempValue := vTempValue + '/';
+   vBaseURL := vTempValue;
+  End;
 End;
 
 Procedure TRESTDWContext.SetBeforeRenderer(Value: TRESTDWBeforeRenderer);
@@ -761,6 +781,7 @@ Begin
  vEventList := TRESTDWContextList.Create(Self, TRESTDWContext);
  vIgnoreInvalidParams := False;
  vBaseHeader := TStringList.Create;
+ vDefaultContext := '';
 End;
 
 Destructor TRESTDWServerContext.Destroy;

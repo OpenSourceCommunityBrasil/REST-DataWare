@@ -2836,12 +2836,10 @@ End;
 Procedure TRESTDWIdClientREST.SetHeaders(AHeaders : TStringList);
 Var
  I           : Integer;
- vUriOptions : TRESTDWUriOptions;
  vmark       : String;
  DWParams    : TRESTDWParams;
 Begin
  Inherited;
- vUriOptions := TRESTDWUriOptions.Create;
  vmark       := '';
  DWParams    := Nil;
  HttpRequest.Request.AcceptEncoding := AcceptEncoding;
@@ -2906,29 +2904,29 @@ Begin
                     End;
                    ActiveRequest := Stringreplace(lowercase(ActiveRequest), 'http://', '', [rfReplaceAll]);
                    ActiveRequest := Stringreplace(lowercase(ActiveRequest), 'https://', '', [rfReplaceAll]);
-                   TDataUtils.ParseRESTURL(ActiveRequest, RequestCharset, vUriOptions, vmark{$IFDEF FPC}, csUndefined{$ENDIF}, DWParams, 2);
+                   TDataUtils.ParseRESTURL(ActiveRequest, RequestCharset, vmark{$IFDEF FPC}, csUndefined{$ENDIF}, DWParams);
                    If Assigned(DWParams) Then
                     FreeAndNil(DWParams);
-                   If (Lowercase(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).GetTokenEvent)  = Lowercase(vUriOptions.EventName))   Or
-                      (Lowercase(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).GetTokenEvent)  = Lowercase(vUriOptions.ServerEvent))  Or
-                      (Lowercase(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).GrantCodeEvent) = Lowercase(vUriOptions.EventName))  Or
-                      (Lowercase(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).GrantCodeEvent) = Lowercase(vUriOptions.ServerEvent)) Then
-                    Begin
-                     If (Lowercase(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).GetTokenEvent)  = Lowercase(vUriOptions.EventName))  Or
-                        (Lowercase(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).GetTokenEvent)  = Lowercase(vUriOptions.ServerEvent)) Then
-                      Begin
-                       If TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).AutoBuildHex Then
-                        HttpRequest.Request.CustomHeaders.Add(Format('Authorization: Basic %s', [EncodeStrings(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientID + ':' +
-                                                                                                               TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientSecret
-                                                                                                               {$IFDEF FPC}, csUndefined{$ENDIF})]))
-                       Else
-                        HttpRequest.Request.CustomHeaders.Add(Format('Authorization: Basic %s', [EncodeStrings(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientID + ':' +
-                                                                                                               TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientSecret
-                                                                                                              {$IFDEF FPC}, csUndefined{$ENDIF})]));
-                      End;
-                    End
-                   Else
-                    Begin
+//                   If (Lowercase(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).GetTokenEvent)  = Lowercase(UriOptions.EventName))   Or
+//                      (Lowercase(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).GetTokenEvent)  = Lowercase(vUriOptions.ServerEvent))  Or
+//                      (Lowercase(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).GrantCodeEvent) = Lowercase(vUriOptions.EventName))  Or
+//                      (Lowercase(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).GrantCodeEvent) = Lowercase(vUriOptions.ServerEvent)) Then
+//                    Begin
+//                     If (Lowercase(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).GetTokenEvent)  = Lowercase(vUriOptions.EventName))  Or
+//                        (Lowercase(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).GetTokenEvent)  = Lowercase(vUriOptions.ServerEvent)) Then
+//                      Begin
+//                       If TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).AutoBuildHex Then
+//                        HttpRequest.Request.CustomHeaders.Add(Format('Authorization: Basic %s', [EncodeStrings(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientID + ':' +
+//                                                                                                               TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientSecret
+//                                                                                                               {$IFDEF FPC}, csUndefined{$ENDIF})]))
+//                       Else
+//                        HttpRequest.Request.CustomHeaders.Add(Format('Authorization: Basic %s', [EncodeStrings(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientID + ':' +
+//                                                                                                               TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientSecret
+//                                                                                                              {$IFDEF FPC}, csUndefined{$ENDIF})]));
+//                      End;
+//                    End
+//                   Else
+//                    Begin
                      Case TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).TokenType Of
                       rdwOATBasic  : Begin
                                       If TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).AutoBuildHex Then
@@ -2943,13 +2941,10 @@ Begin
                       rdwOATBearer : HttpRequest.Request.CustomHeaders.Add('Authorization: Bearer ' + TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).Token);
                       rdwOATToken  : HttpRequest.Request.CustomHeaders.Add('Authorization: Token ' + Format('token="%s"', [TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).Token]));
                      End;
-                    End;
+//                    End;
                   End;
    End;
   End;
-//  HttpRequest.Request.CustomHeaders.Values['Authorization'] := vServerParams.Authentication;
- If Assigned(vUriOptions) Then
-  FreeAndnil(vUriOptions);
 End;
 
 Procedure TRESTDWIdClientREST.SetOnStatus(Value : TOnStatus);
@@ -3127,7 +3122,18 @@ Begin
     {$ENDIF}
     AResponseInfo.ResponseNo               := StatusCode;
     If ErrorMessage <> '' Then
-     AResponseInfo.ResponseText            := ErrorMessage;
+     AResponseInfo.ResponseText            := ErrorMessage
+    Else
+     Begin
+      AResponseInfo.FreeContentStream      := True;
+      AResponseInfo.ContentStream          := ResultStream;
+      AResponseInfo.ContentStream.Position := 0;
+      {$IFNDEF FPC}
+       AResponseInfo.ContentLength         := ResultStream.Size;
+      {$ELSE}
+       AResponseInfo.ContentLength         := -1;
+      {$ENDIF}
+     End;
    End;
  Finally
   DestroyComponents;
@@ -4392,7 +4398,7 @@ Begin
   aBinaryCompatibleMode := Params.ItemsString['BinaryCompatibleMode'].AsBoolean And aBinaryRequest;
  if Not aBinaryRequest then
   aBinaryRequest  := BinaryRequest;
- vURL  := BuildUrl(TypeRequest, Host, UrlPath,  DataRoute, ServerContext, Port);
+ vURL  := BuildUrl(TypeRequest, Host, UrlPath,  DataRoute, '', Port);
  If Assigned(HttpRequest) Then
   FreeAndNil(HttpRequest);
  HttpRequest      := TRESTDWIdClientREST.Create(Nil);
@@ -4438,7 +4444,7 @@ Begin
                           FailOverConnections[I].Host,
                           FailOverConnections[I].UrlPath,
                           FailOverConnections[I].DataRoute,
-                          FailOverConnections[I].ServerContext,
+                          '',
                           FailOverConnections[I].Port); //LowerCase(Format(UrlBase, [vTpRequest, vHost, vPort, vUrlPath])) + EventData;
         SetCharsetRequest(HttpRequest, FailOverConnections[I].Encoding);
         SetParams(FailOverConnections[I].ProxyOptions,
@@ -4469,7 +4475,6 @@ Begin
             RequestTimeout  := FailOverConnections[I].RequestTimeOut;
             ConnectTimeout  := FailOverConnections[I].ConnectTimeOut;
             DataRoute       := FailOverConnections[I].DataRoute;
-            ServerContext   := FailOverConnections[I].ServerContext;
            End;
           Break;
          End

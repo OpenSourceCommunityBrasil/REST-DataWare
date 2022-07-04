@@ -1,0 +1,4 @@
+DW BITMAP "..\..\Images\Delphi\dwIcon.bmp"
+TRESTDWShellService BITMAP "..\..\Images\Delphi\TRESTDWServiceCGI.bmp"
+TRESTDWShellService16 BITMAP "..\..\Images\Delphi\TRESTDWServiceCGI16.bmp"
+

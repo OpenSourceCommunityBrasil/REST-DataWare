@@ -122,7 +122,7 @@ Type
   vDescription                           : TStrings;
   vDWRoutes                              : TRESTDWRoutes;
   vJsonMode                              : TJsonMode;
-  vFullPath,
+  vBaseURL,
   vEventName,
   FName                                  : String;
   vDWParams                              : TRESTDWParamsMethods;
@@ -138,6 +138,7 @@ Type
   Function  GetAuthRequest               : TDWAuthRequest;
   Procedure SetAuthRequest     (Value    : TDWAuthRequest);
   Procedure SetDescription     (Strings  : TStrings);
+  Procedure SetBaseUrl(Value : String);
  Public
   Function    GetDisplayName             : String;       Override;
   Procedure   SetDisplayName(Const Value : String);      Override;
@@ -153,7 +154,7 @@ Type
   Property    JsonMode             : TJsonMode            Read vJsonMode             Write vJsonMode;
   Property    Name                 : String               Read GetDisplayName        Write SetDisplayName;
   Property    EventName            : String               Read vEventName            Write vEventName;
-  Property    BaseURI              : String               Read vFullPath             Write vFullPath;
+  Property    BaseURL              : String               Read vBaseURL              Write SetBaseURL;
   Property    Description          : TStrings             Read vDescription          Write SetDescription;
   Property    OnlyPreDefinedParams : Boolean              Read vOnlyPreDefinedParams Write vOnlyPreDefinedParams;
   Property    OnReplyEvent         : TDWReplyEvent        Read GetReplyEvent         Write SetReplyEvent;
@@ -196,8 +197,8 @@ Type
  Private
   vIgnoreInvalidParams : Boolean;
   vEventList           : TRESTDWEventList;
-  vAccessTag,
-  vServerContext       : String;
+  vDefaultEvent,
+  vAccessTag           : String;
   vOnCreate            : TObjectEvent;
  Public
   Destructor  Destroy; Override;
@@ -208,7 +209,7 @@ Type
   Property    IgnoreInvalidParams : Boolean      Read vIgnoreInvalidParams Write vIgnoreInvalidParams;
   Property    Events              : TRESTDWEventList Read vEventList           Write vEventList;
   Property    AccessTag           : String       Read vAccessTag           Write vAccessTag;
-  Property    ContextName         : String       Read vServerContext       Write vServerContext;
+  Property    DefaultEvent        : String       Read vDefaultEvent        Write vDefaultEvent;
   Property    OnCreate            : TObjectEvent Read vOnCreate            Write vOnCreate;
 End;
 
@@ -280,7 +281,7 @@ begin
  vNeedAuthorization    := True;
  vOnlyPreDefinedParams := False;
  vEventName            := '';
- vFullPath             := '';
+ vBaseURL              := '/';
  vDescription          := TStringList.Create;
  vDWRoutes             := [crAll];
 end;
@@ -334,6 +335,23 @@ End;
 Procedure TRESTDWEvent.SetAuthRequest(Value   : TDWAuthRequest);
 Begin
  DWReplyEventData.OnAuthRequest := Value;
+End;
+
+Procedure TRESTDWEvent.SetBaseUrl(Value : String);
+Var
+ vTempValue : String;
+Begin
+ vTempValue := Value;
+ If Trim(vTempValue) = '' Then
+  vBaseURL := '/'
+ Else
+  Begin
+   If Copy(vTempValue, 1, 1) <> '/' Then
+    vTempValue := '/' + vTempValue;
+   If Copy(vTempValue, Length(vTempValue), 1) <> '/' Then
+    vTempValue := vTempValue + '/';
+   vBaseURL := vTempValue;
+  End;
 End;
 
 Procedure TRESTDWEvent.SetDisplayName(Const Value: String);
@@ -660,6 +678,7 @@ Begin
  Inherited;
  vEventList := TRESTDWEventList.Create(Self, TRESTDWEvent);
  vIgnoreInvalidParams := False;
+ vDefaultEvent := '';
  If Assigned(vOnCreate) Then
   vOnCreate(Self);
 End;

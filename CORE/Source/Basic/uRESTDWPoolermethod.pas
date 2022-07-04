@@ -57,7 +57,6 @@ Uses {$IFDEF FPC}
    {$ENDIF}
    vPoolerNotFoundMessage,
    vDataRoute,
-   vServerContext,
    vUserAgent,
    vPoolerURL,
    vAccessTag,
@@ -345,7 +344,6 @@ Uses {$IFDEF FPC}
    Property CriptOptions          : TCripto                    Read vCripto                Write vCripto;
    Property UserAgent             : String                     Read vUserAgent             Write vUserAgent;
    Property DataRoute             : String                     Read vDataRoute             Write vDataRoute;
-   Property ServerContext         : String                     Read vServerContext         Write vServerContext;
    Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams      Write SetAuthOptionParams;
    Property OnBeforeGetToken      : TOnBeforeGetToken          Read vOnBeforeGetToken      Write vOnBeforeGetToken;
    Property PoolerNotFoundMessage : String                     Read vPoolerNotFoundMessage Write vPoolerNotFoundMessage;
@@ -382,7 +380,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -411,7 +408,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -572,7 +568,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -601,7 +596,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -777,7 +771,6 @@ Begin
  vConnection.CriptOptions.Use := vCripto.Use;
  vConnection.CriptOptions.Key := vCripto.Key;
  vConnection.DataRoute        := DataRoute;
- vConnection.ServerContext    := ServerContext;
  vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
  {$IFNDEF FPC}
   vConnection.Encoding      := vEncoding;
@@ -934,7 +927,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -963,7 +955,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -1082,7 +1073,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -1111,7 +1101,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -1263,7 +1252,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -1292,7 +1280,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use:= vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key:= vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
@@ -1388,7 +1375,6 @@ Begin
    RESTClientPoolerExec.SetAccessTag(vAccessTag);
    RESTClientPoolerExec.Encoding         := vEncoding;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -1410,7 +1396,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use   := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key   := vCripto.Key;
  RESTClientPoolerExec.DataRoute          := DataRoute;
- RESTClientPoolerExec.ServerContext      := ServerContext;
  DWParams                                := TRESTDWParams.Create;
  DWParams.Encoding                       := RESTClientPoolerExec.Encoding;
  JSONParam                               := TJSONParam.Create(RESTClientPoolerExec.Encoding);
@@ -1487,7 +1472,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -1516,7 +1500,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -1681,7 +1664,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -1711,7 +1693,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -1879,7 +1860,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -1909,7 +1889,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -2083,7 +2062,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -2112,7 +2090,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -2280,7 +2257,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -2309,7 +2285,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -2499,7 +2474,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -2528,7 +2502,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -2656,7 +2629,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -2685,7 +2657,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -2815,7 +2786,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -2844,7 +2814,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -2998,7 +2967,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -3025,7 +2993,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use:= vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key:= vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  TokenValidade;
@@ -3200,7 +3167,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -3228,7 +3194,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -3349,7 +3314,6 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
-   ServerContext        := RESTClientPoolerExec.ServerContext;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -3378,7 +3342,6 @@ Begin
  RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
- RESTClientPoolerExec.ServerContext    := ServerContext;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -3498,7 +3461,6 @@ Begin
     Begin
      RESTClientPoolerExec := RESTClientPooler;
      DataRoute            := RESTClientPoolerExec.DataRoute;
-     ServerContext        := RESTClientPoolerExec.ServerContext;
      AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
      vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
      vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -3528,7 +3490,6 @@ Begin
    RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
    RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
    RESTClientPoolerExec.DataRoute        := DataRoute;
-   RESTClientPoolerExec.ServerContext    := ServerContext;
    RESTClientPoolerExec.SetAccessTag(vAccessTag);
    {$IFDEF FPC}
    RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
@@ -3647,7 +3608,6 @@ Begin
     Begin
      RESTClientPoolerExec := RESTClientPooler;
      DataRoute            := RESTClientPoolerExec.DataRoute;
-     ServerContext        := RESTClientPoolerExec.ServerContext;
      AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
      vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
      vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -3677,7 +3637,6 @@ Begin
    RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
    RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
    RESTClientPoolerExec.DataRoute        := DataRoute;
-   RESTClientPoolerExec.ServerContext    := ServerContext;
    RESTClientPoolerExec.SetAccessTag(vAccessTag);
    {$IFDEF FPC}
    RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;

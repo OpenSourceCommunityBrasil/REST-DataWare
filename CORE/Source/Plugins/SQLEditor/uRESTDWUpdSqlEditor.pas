@@ -680,7 +680,6 @@ Begin
        RESTDWDatabase.CriptOptions.Use      := RESTDWStoredProc.DataBase.CriptOptions.Use;
        RESTDWDatabase.CriptOptions.Key      := RESTDWStoredProc.DataBase.CriptOptions.Key;
        RESTDWDatabase.DataRoute             := RESTDWStoredProc.DataBase.DataRoute;
-       RESTDWDatabase.ServerContext         := RESTDWStoredProc.DataBase.ServerContext;
        RESTDWDatabase.AuthenticationOptions.Assign(RESTDWStoredProc.DataBase.AuthenticationOptions);
        vMemString                           := TStringList.Create;
        Try
@@ -725,7 +724,6 @@ Begin
        RESTDWDatabase.CriptOptions.Use      := RESTDWClientSQL.DataBase.CriptOptions.Use;
        RESTDWDatabase.CriptOptions.Key      := RESTDWClientSQL.DataBase.CriptOptions.Key;
        RESTDWDatabase.DataRoute             := RESTDWClientSQL.DataBase.DataRoute;
-       RESTDWDatabase.ServerContext         := RESTDWClientSQL.DataBase.ServerContext;
        RESTDWDatabase.AuthenticationOptions.Assign(RESTDWClientSQL.DataBase.AuthenticationOptions);
        vMemString                           := TStringList.Create;
        Try

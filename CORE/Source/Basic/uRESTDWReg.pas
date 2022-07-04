@@ -995,7 +995,6 @@ Var
     vConnection.CriptOptions.Use          := vRESTClientPooler.CriptOptions.Use;
     vConnection.CriptOptions.Key          := vRESTClientPooler.CriptOptions.Key;
     vConnection.DataRoute                 := vRESTClientPooler.DataRoute;
-    vConnection.ServerContext             := vRESTClientPooler.ServerContext;
     vConnection.AuthenticationOptions.Assign(vRESTClientPooler.AuthenticationOptions);
     Result := TStringList.Create;
     Try

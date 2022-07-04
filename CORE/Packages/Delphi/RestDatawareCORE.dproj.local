@@ -17,6 +17,11 @@
     <File Path="..\..\Source"/>
     <File Path="..\..\Source\Basic"/>
     <File Path="..\..\Source\Basic\Crypto"/>
+    <File Path="..\..\Source\Basic\Crypto\Ciphers"/>
+    <File Path="..\..\Source\Basic\Crypto\Ciphers\DWDCPcast256.pas"/>
+    <File Path="..\..\Source\Basic\Crypto\Ciphers\DWDCPrijndael.pas"/>
+    <File Path="..\..\Source\Basic\Crypto\Hashes"/>
+    <File Path="..\..\Source\Basic\Crypto\Hashes\DWDCPsha256.pas"/>
     <File Path="..\..\Source\Basic\Crypto\DWDCPbase64.pas"/>
     <File Path="..\..\Source\Basic\Crypto\DWDCPblockciphers.pas"/>
     <File Path="..\..\Source\Basic\Crypto\DWDCPconst.pas"/>

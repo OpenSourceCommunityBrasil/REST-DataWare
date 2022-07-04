@@ -265,7 +265,6 @@ Type
   vPoolerList           : TStringList;
   vAuthOptionParams     : TRESTDWClientAuthOptionParams;
   vDataRoute,
-  vServerContext,
   vListName,
   vAccessTag,
   vWelcomeMessage,
@@ -303,7 +302,6 @@ Type
   Property Encoding              : TEncodeSelect              Read vEncoding             Write vEncoding;          //Encoding da string
   Property WelcomeMessage        : String                     Read vWelcomeMessage       Write vWelcomeMessage;
   Property DataRoute             : String                     Read vDataRoute            Write vDataRoute;
-  Property ServerContext         : String                     Read vServerContext        Write vServerContext;
   {$IFDEF FPC}
   Property DatabaseCharSet      : TDatabaseCharSet            Read vDatabaseCharSet      Write vDatabaseCharSet;
   {$ENDIF}
@@ -368,7 +366,6 @@ Type
   vRestWebService,                                   //Rest WebService para consultas
   vRestURL,                                          //URL do WebService REST
   vMyIP,                                             //Meu IP vindo do Servidor
-  vServerContext,
   vRestPooler           : String;                    //Qual o Pooler de Conexão do DataSet
   vRedirectMaximum,
   vPoolerPort           : Integer;                   //A Porta do Pooler
@@ -556,7 +553,6 @@ Type
   Property FailOverReplaceDefaults : Boolean                    Read vFailOverReplaceDefaults Write vFailOverReplaceDefaults;
   Property ClientConnectionDefs    : TClientConnectionDefs      Read vClientConnectionDefs    Write vClientConnectionDefs;
   Property UserAgent               : String                     Read vUserAgent               Write vUserAgent;
-  Property ServerContext           : String                     Read vServerContext           Write vServerContext;
 End;
 
 Type
@@ -1325,7 +1321,6 @@ Type
   vWelcomeMessage,
   vPoolerPrefix,                                     //Prefixo do WS
   vDataRoute,
-  vServerContext,
   vRestWebService,                                   //Rest WebService para consultas
   vPoolerNotFoundMessage,
   vRestURL             : String;                     //Qual o Pooler de Conexão do DataSet
@@ -1357,7 +1352,6 @@ Type
   Property DataRoute             : String                     Read vDataRoute          Write vDataRoute;
   Property RequestTimeOut        : Integer                    Read vTimeOut            Write vTimeOut;           //Timeout da Requisição
   Property ConnectTimeOut        : Integer                    Read vConnectTimeOut     Write vConnectTimeOut;
-  Property ServerContext         : String                     Read vServerContext      Write vServerContext;
   Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams   Write vAuthOptionParams;
   Property CriptOptions          : TCripto                    Read vCripto             Write vCripto;
   Property ProxyOptions          : TProxyOptions              Read vProxyOptions       Write vProxyOptions;      //Se tem Proxy diz quais as opções
@@ -2073,7 +2067,6 @@ Begin
  vConnection.CriptOptions.Use := vCripto.Use;
  vConnection.CriptOptions.Key := vCripto.Key;
  vConnection.DataRoute        := DataRoute;
- vConnection.ServerContext    := ServerContext;
  vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
  {$IFNDEF FPC}
   vConnection.Encoding      := vEncoding;
@@ -2434,7 +2427,6 @@ Begin
  vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
  vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
  vRESTConnectionDB.DataRoute        := DataRoute;
- vRESTConnectionDB.ServerContext    := ServerContext;
  {$IFDEF FPC}
   vRESTConnectionDB.DatabaseCharSet := csUndefined;
  {$ENDIF}
@@ -2669,7 +2661,6 @@ Begin
  vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
  vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
  vRESTConnectionDB.DataRoute        := DataRoute;
- vRESTConnectionDB.ServerContext    := ServerContext;
  {$IFDEF FPC}
   vRESTConnectionDB.DatabaseCharSet := csUndefined;
  {$ENDIF}
@@ -2896,7 +2887,6 @@ Begin
  vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
  vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
  vRESTConnectionDB.DataRoute        := DataRoute;
- vRESTConnectionDB.ServerContext    := ServerContext;
  {$IFDEF FPC}
   vRESTConnectionDB.DatabaseCharSet := csUndefined;
  {$ENDIF}
@@ -3111,7 +3101,6 @@ Begin
    vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
    vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
    vRESTConnectionDB.DataRoute        := DataRoute;
-   vRESTConnectionDB.ServerContext    := ServerContext;
    vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
    {$IFNDEF FPC}
    vRESTConnectionDB.OnWork           := vOnWork;
@@ -3235,7 +3224,6 @@ Begin
    vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
    vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
    vRESTConnectionDB.DataRoute        := DataRoute;
-   vRESTConnectionDB.ServerContext    := ServerContext;
    vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
    {$IFNDEF FPC}
    vRESTConnectionDB.OnWork           := vOnWork;
@@ -3359,7 +3347,6 @@ Begin
    vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
    vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
    vRESTConnectionDB.DataRoute        := DataRoute;
-   vRESTConnectionDB.ServerContext    := ServerContext;
    vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
    {$IFNDEF FPC}
    vRESTConnectionDB.OnWork           := vOnWork;
@@ -3544,7 +3531,6 @@ Begin
  vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
  vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
  vRESTConnectionDB.DataRoute        := DataRoute;
- vRESTConnectionDB.ServerContext    := ServerContext;
  vRESTConnectionDB.BinaryRequest    := BinaryRequest;
  vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
  {$IFNDEF FPC}
@@ -3838,7 +3824,6 @@ Begin
  vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
  vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
  vRESTConnectionDB.DataRoute        := DataRoute;
- vRESTConnectionDB.ServerContext    := ServerContext;
  vRESTConnectionDB.BinaryRequest    := BinaryRequest;
  vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
  {$IFDEF FPC}
@@ -4096,7 +4081,6 @@ Begin
  vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
  vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
  vRESTConnectionDB.DataRoute        := DataRoute;
- vRESTConnectionDB.ServerContext    := ServerContext;
  vRESTConnectionDB.BinaryRequest    := BinaryRequest;
  vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
  {$IFDEF FPC}
@@ -4316,7 +4300,6 @@ Begin
  vConnection.CriptOptions.Use := VCripto.Use;
  vConnection.CriptOptions.Key := VCripto.Key;
  vConnection.DataRoute        := DataRoute;
- vConnection.ServerContext    := ServerContext;
  vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
  Try
   If Assigned(vRestPoolers) Then
@@ -4366,7 +4349,6 @@ Begin
  vConnection.CriptOptions.Use := VCripto.Use;
  vConnection.CriptOptions.Key := VCripto.Key;
  vConnection.DataRoute        := DataRoute;
- vConnection.ServerContext    := ServerContext;
  vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
  Result := TStringList.Create;
  Try
@@ -4399,7 +4381,6 @@ Constructor TRESTDWPoolerList.Create(AOwner : TComponent);
 Begin
  Inherited;
  vDataRoute        := '';
- vServerContext    := '';
  vPoolerNotFoundMessage := cPoolerNotFound;
  vPoolerPort       := 8082;
  vTimeOut          := 3000;
@@ -4428,7 +4409,6 @@ Begin
  vAuthOptionParams         := TRESTDWClientAuthOptionParams.Create(Self);
  vAuthOptionParams.AuthorizationOption := rdwAONone;
  vDataRoute                := '';
- vServerContext            := '';
  vMyIP                     := '0.0.0.0';
  vRestWebService           := '127.0.0.1';
  vCompression              := True;
@@ -4538,7 +4518,6 @@ Begin
      vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
      vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
      vRESTConnectionDB.DataRoute        := DataRoute;
-     vRESTConnectionDB.ServerContext    := ServerContext;
      vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
      {$IFNDEF FPC}
      vRESTConnectionDB.OnWork          := vOnWork;
@@ -4702,7 +4681,6 @@ Begin
      vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
      vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
      vRESTConnectionDB.DataRoute        := DataRoute;
-     vRESTConnectionDB.ServerContext    := ServerContext;
      vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
      {$IFNDEF FPC}
      vRESTConnectionDB.OnWork          := vOnWork;
@@ -4879,7 +4857,6 @@ Begin
  vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
  vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
  vRESTConnectionDB.DataRoute        := DataRoute;
- vRESTConnectionDB.ServerContext    := ServerContext;
  vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
  {$IFNDEF FPC}
   vRESTConnectionDB.OnWork          := vOnWork;
@@ -5137,7 +5114,6 @@ Begin
      vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
      vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
      vRESTConnectionDB.DataRoute        := DataRoute;
-     vRESTConnectionDB.ServerContext    := ServerContext;
      vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
      {$IFNDEF FPC}
      vRESTConnectionDB.OnWork           := vOnWork;
@@ -5299,7 +5275,6 @@ Begin
  vConnection.CriptOptions.Use := VCripto.Use;
  vConnection.CriptOptions.Key := VCripto.Key;
  vConnection.DataRoute        := DataRoute;
- vConnection.ServerContext    := ServerContext;
  vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
  Try
   vPoolerList.Clear;
@@ -5671,7 +5646,6 @@ Begin
      vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
      vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
      vRESTConnectionDB.DataRoute        := DataRoute;
-     vRESTConnectionDB.ServerContext    := ServerContext;
      {$IFDEF FPC}
       vRESTConnectionDB.DatabaseCharSet := csUndefined;
      {$ENDIF}
@@ -10001,7 +9975,6 @@ Begin
   vTempDatabase.Compression            := vCompression;
   vTempDatabase.TypeRequest            := vTypeRequest;
   vTempDatabase.DataRoute              := DataRoute;
-  vTempDatabase.ServerContext          := ServerContext;
   vTempDatabase.AuthenticationOptions.Assign(AuthenticationOptions);
   vTempDatabase.Proxy                  := vProxy;             //Diz se tem servidor Proxy
   vTempDatabase.ProxyOptions.vServer   := vProxyOptions.vServer;      //Se tem Proxy diz quais as opções
@@ -10060,7 +10033,6 @@ Begin
  vConnectTimeOut      := 3000;
  vActive              := True;
  vDataRoute           := '';
- vServerContext       := '';
 End;
 
 Function TListDefConnections.Add: TCollectionItem;
