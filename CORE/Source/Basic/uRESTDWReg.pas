@@ -998,7 +998,7 @@ Var
     vConnection.AuthenticationOptions.Assign(vRESTClientPooler.AuthenticationOptions);
     Result := TStringList.Create;
     Try
-     vTempList := vConnection.GetServerEvents(vRESTClientPooler.UrlPath,
+     vTempList := vConnection.GetServerEvents(vRESTClientPooler.DataRoute,
                                               vRESTClientPooler.RequestTimeOut,
                                               vRESTClientPooler.ConnectTimeOut,
                                               vRESTClientPooler);

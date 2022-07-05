@@ -668,7 +668,6 @@ Begin
        RESTDWDatabase.PoolerName            := RESTDWStoredProc.DataBase.PoolerName;
        RESTDWDatabase.PoolerPort            := RESTDWStoredProc.DataBase.PoolerPort;
        RESTDWDatabase.PoolerService         := RESTDWStoredProc.DataBase.PoolerService;
-       RESTDWDatabase.PoolerURL             := RESTDWStoredProc.DataBase.PoolerURL;
        RESTDWDatabase.Proxy                 := RESTDWStoredProc.DataBase.Proxy;
        RESTDWDatabase.ProxyOptions.Server   := RESTDWStoredProc.DataBase.ProxyOptions.Server;
        RESTDWDatabase.ProxyOptions.Port     := RESTDWStoredProc.DataBase.ProxyOptions.Port;
@@ -712,7 +711,6 @@ Begin
        RESTDWDatabase.PoolerName            := RESTDWClientSQL.DataBase.PoolerName;
        RESTDWDatabase.PoolerPort            := RESTDWClientSQL.DataBase.PoolerPort;
        RESTDWDatabase.PoolerService         := RESTDWClientSQL.DataBase.PoolerService;
-       RESTDWDatabase.PoolerURL             := RESTDWClientSQL.DataBase.PoolerURL;
        RESTDWDatabase.Proxy                 := RESTDWClientSQL.DataBase.Proxy;
        RESTDWDatabase.ProxyOptions.Server   := RESTDWClientSQL.DataBase.ProxyOptions.Server;
        RESTDWDatabase.ProxyOptions.Port     := RESTDWClientSQL.DataBase.ProxyOptions.Port;

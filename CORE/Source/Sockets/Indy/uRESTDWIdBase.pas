@@ -3837,11 +3837,10 @@ Var
      End;
    End;
  End;
- Function BuildUrl(TpRequest     : TTypeRequest;
-                   Host, UrlPath,
-                   aDataRoute,
-                   aServerContext : String;
-                   Port           : Integer) : String;
+ Function BuildUrl(TpRequest  : TTypeRequest;
+                   Host,
+                   aDataRoute : String;
+                   Port       : Integer) : String;
  Var
   vTpRequest : String;
  Begin
@@ -3850,20 +3849,10 @@ Var
    vTpRequest := 'http'
   Else If TpRequest = trHttps Then
    vTpRequest := 'https';
-  If (aDataRoute = '') And (aServerContext = '') Then
-   Result := LowerCase(Format(UrlBase, [vTpRequest, Host, Port, UrlPath])) + EventData
+  If (aDataRoute = '') Then
+   Result := LowerCase(Format(UrlBaseA, [vTpRequest, Host, Port, '/'])) + EventData
   Else
-   Begin
-    If (aDataRoute = '') And (aServerContext <> '') Then
-     Result := LowerCase(Format(UrlBase,  [vTpRequest, Host, Port, aServerContext + '/', UrlPath])) + EventData
-    Else If (aDataRoute <> '') And (aServerContext = '') Then
-     Result := LowerCase(Format(UrlBaseA, [vTpRequest, Host, Port, aDataRoute + '/', UrlPath])) + EventData
-    Else
-     Result := LowerCase(Format(UrlBaseB, [vTpRequest, Host, Port,
-                                           aServerContext + '/',
-                                           aDataRoute     + '/',
-                                           UrlPath])) + EventData
-   End;
+   Result := LowerCase(Format(UrlBaseA, [vTpRequest, Host, Port, aDataRoute])) + EventData
  End;
  Procedure SetCharsetRequest(Var HttpRequest : TRESTDWIdClientREST;
                              Charset         : TEncodeSelect);
@@ -4398,7 +4387,7 @@ Begin
   aBinaryCompatibleMode := Params.ItemsString['BinaryCompatibleMode'].AsBoolean And aBinaryRequest;
  if Not aBinaryRequest then
   aBinaryRequest  := BinaryRequest;
- vURL  := BuildUrl(TypeRequest, Host, UrlPath,  DataRoute, '', Port);
+ vURL  := BuildUrl(TypeRequest, Host, DataRoute, Port);
  If Assigned(HttpRequest) Then
   FreeAndNil(HttpRequest);
  HttpRequest      := TRESTDWIdClientREST.Create(Nil);
@@ -4434,7 +4423,7 @@ Begin
               (FailOverConnections[I].hEncodeStrings  = EncodedStrings)  And
               (FailOverConnections[I].Encoding        = Encoding)        And
               (FailOverConnections[I].AccessTag       = AccessTag)       And
-              (FailOverConnections[I].UrlPath         = UrlPath))        Or
+              (FailOverConnections[I].DataRoute       = DataRoute))        Or
              (Not (FailOverConnections[I].Active)) Then
           Continue;
          End;
@@ -4442,9 +4431,7 @@ Begin
          OnFailOverExecute(FailOverConnections[I]);
         vURL  := BuildUrl(FailOverConnections[I].TypeRequest,
                           FailOverConnections[I].Host,
-                          FailOverConnections[I].UrlPath,
                           FailOverConnections[I].DataRoute,
-                          '',
                           FailOverConnections[I].Port); //LowerCase(Format(UrlBase, [vTpRequest, vHost, vPort, vUrlPath])) + EventData;
         SetCharsetRequest(HttpRequest, FailOverConnections[I].Encoding);
         SetParams(FailOverConnections[I].ProxyOptions,
@@ -4471,7 +4458,6 @@ Begin
             EncodedStrings  := FailOverConnections[I].hEncodeStrings;
             Encoding        := FailOverConnections[I].Encoding;
             AccessTag       := FailOverConnections[I].AccessTag;
-            UrlPath         := FailOverConnections[I].UrlPath;
             RequestTimeout  := FailOverConnections[I].RequestTimeOut;
             ConnectTimeout  := FailOverConnections[I].ConnectTimeOut;
             DataRoute       := FailOverConnections[I].DataRoute;

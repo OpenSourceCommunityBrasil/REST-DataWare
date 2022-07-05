@@ -208,7 +208,7 @@ Type
   vAccessTag,
   vWelcomeMessage,
   vRestPooler,
-  vRestURL,
+  vDataRoute,
   vRestWebService,
   vPassword,
   vLogin                : String;
@@ -235,7 +235,7 @@ Type
   Property Proxy                 : Boolean                    Read vProxy                Write vProxy;             //Diz se tem servidor Proxy
   Property ProxyOptions          : TProxyOptions              Read vProxyOptions         Write vProxyOptions;      //Se tem Proxy diz quais as opções
   Property PoolerService         : String                     Read vRestWebService       Write vRestWebService;    //Host do WebService REST
-  Property PoolerURL             : String                     Read vRestURL              Write vRestURL;           //URL do WebService REST
+  Property DataRoute             : String                     Read vDataRoute            Write vDataRoute;           //URL do WebService REST
   Property PoolerPort            : Integer                    Read vPoolerPort           Write vPoolerPort;        //A Porta do Pooler do DataSet
   Property PoolerName            : String                     Read vRestPooler           Write vRestPooler;        //Qual o Pooler de Conexão ligado ao componente
   Property RequestTimeOut        : Integer                    Read vTimeOut              Write vTimeOut;           //Timeout da Requisição
@@ -269,7 +269,6 @@ Type
   vAccessTag,
   vWelcomeMessage,
   vRestPooler,
-  vRestURL,
   vRestWebService       : String;
   vProxyOptions         : TProxyOptions;
   vEncoding             : TEncodeSelect;
@@ -293,7 +292,6 @@ Type
   Property Proxy                 : Boolean                    Read vProxy                Write vProxy;             //Diz se tem servidor Proxy
   Property ProxyOptions          : TProxyOptions              Read vProxyOptions         Write vProxyOptions;      //Se tem Proxy diz quais as opções
   Property PoolerService         : String                     Read vRestWebService       Write vRestWebService;    //Host do WebService REST
-  Property PoolerURL             : String                     Read vRestURL              Write vRestURL;           //URL do WebService REST
   Property PoolerPort            : Integer                    Read vPoolerPort           Write vPoolerPort;        //A Porta do Pooler do DataSet
   Property PoolerName            : String                     Read vRestPooler           Write vRestPooler;        //Qual o Pooler de Conexão ligado ao componente
   Property RequestTimeOut        : Integer                    Read vTimeOut              Write vTimeOut;           //Timeout da Requisição
@@ -301,7 +299,7 @@ Type
   Property EncodeStrings         : Boolean                    Read vEncodeStrings        Write vEncodeStrings;
   Property Encoding              : TEncodeSelect              Read vEncoding             Write vEncoding;          //Encoding da string
   Property WelcomeMessage        : String                     Read vWelcomeMessage       Write vWelcomeMessage;
-  Property DataRoute             : String                     Read vDataRoute            Write vDataRoute;
+  Property DataRoute             : String                     Read vDataRoute            Write vDataRoute;         //URL do WebService REST
   {$IFDEF FPC}
   Property DatabaseCharSet      : TDatabaseCharSet            Read vDatabaseCharSet      Write vDatabaseCharSet;
   {$ENDIF}
@@ -361,10 +359,9 @@ Type
   vUserAgent,
   vAccessTag,
   vWelcomeMessage,
-  vDataRoute,
+  vDataRoute,                                        //URL do WebService REST
   vPoolerNotFoundMessage,
   vRestWebService,                                   //Rest WebService para consultas
-  vRestURL,                                          //URL do WebService REST
   vMyIP,                                             //Meu IP vindo do Servidor
   vRestPooler           : String;                    //Qual o Pooler de Conexão do DataSet
   vRedirectMaximum,
@@ -417,6 +414,7 @@ Type
                                      AccessTag             : String;
                                      AuthenticationOptions : TRESTDWClientAuthOptionParams);
   Function    GetRestPoolers : TStringList;          //Retorna a Lista de DataSet Sources do Pooler
+  Procedure   SetDataRoute(Value : String);
  Protected
   Procedure Loaded; override;
  Public
@@ -516,13 +514,12 @@ Type
   Property Active                  : Boolean                    Read vConnected               Write SetConnection;      //Seta o Estado da Conexão
   Property Compression             : Boolean                    Read vCompression             Write vCompression;       //Compressão de Dados
   Property CriptOptions            : TCripto                    Read vCripto                  Write vCripto;
-  Property DataRoute               : String                     Read vDataRoute               Write vDataRoute;
+  Property DataRoute               : String                     Read vDataRoute               Write SetDataRoute;
   Property MyIP                    : String                     Read vMyIP                    Write SetMyIp;
-  Property AuthenticationOptions   : TRESTDWClientAuthOptionParams Read vAuthOptionParams        Write vAuthOptionParams;
+  Property AuthenticationOptions   : TRESTDWClientAuthOptionParams Read vAuthOptionParams     Write vAuthOptionParams;
   Property Proxy                   : Boolean                    Read vProxy                   Write vProxy;             //Diz se tem servidor Proxy
   Property ProxyOptions            : TProxyOptions              Read vProxyOptions            Write vProxyOptions;      //Se tem Proxy diz quais as opções
   Property PoolerService           : String                     Read vRestWebService          Write vRestWebService;    //Host do WebService REST
-  Property PoolerURL               : String                     Read vRestURL                 Write vRestURL;           //URL do WebService REST
   Property PoolerPort              : Integer                    Read vPoolerPort              Write SetPoolerPort;      //A Porta do Pooler do DataSet
   Property PoolerName              : String                     Read vRestPooler              Write SetRestPooler;      //Qual o Pooler de Conexão ligado ao componente
   Property StateConnection         : TAutoCheckData             Read vAutoCheckData           Write vAutoCheckData;     //Autocheck da Conexão
@@ -2079,7 +2076,7 @@ Begin
     Try
      Case vAuthOptionParams.AuthorizationOption Of
       rdwAOBearer : Begin
-                     vTempSend := vConnection.GetToken(vRestURL,     '',
+                     vTempSend := vConnection.GetToken(vDataRoute,
                                                        Params,       Error,
                                                        MessageError, vTimeOut,
                                                        vConnectTimeOut, Nil,
@@ -2088,7 +2085,7 @@ Begin
                      TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                     End;
       rdwAOToken  : Begin
-                     vTempSend := vConnection.GetToken(vRestURL,        '',
+                     vTempSend := vConnection.GetToken(vDataRoute,
                                                        Params,          Error,
                                                        MessageError,    vTimeOut,
                                                        vConnectTimeOut, Nil,
@@ -2131,7 +2128,7 @@ Begin
                    (vFailOverConnections[I].Encoding        = vConnection.Encoding)       And
                    (vFailOverConnections[I].vAccessTag      = vConnection.AccessTag)      And
                    (vFailOverConnections[I].vRestPooler     = vRestPooler)                And
-                   (vFailOverConnections[I].vRestURL        = vRestURL))                  Or
+                   (vFailOverConnections[I].vDataRoute      = vDataRoute))                Or
                  (Not (vFailOverConnections[I].Active))                                   Then
                Continue;
               End;
@@ -2151,7 +2148,7 @@ Begin
              Try
               Case vAuthOptionParams.AuthorizationOption Of
                rdwAOBearer : Begin
-                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vRestURL, '',
+                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vDataRoute,
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut,vConnectTimeOut,
                                                                 Nil, vRESTClientPooler);
@@ -2159,7 +2156,7 @@ Begin
                               TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                              End;
                rdwAOToken  : Begin
-                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vRestURL, '',
+                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vDataRoute,
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut,vConnectTimeOut,
                                                                 Nil,          vRESTClientPooler);
@@ -2180,7 +2177,7 @@ Begin
                   vEncodeStrings    := vConnection.EncodeStrings;
                   vEncoding         := vConnection.Encoding;
                   vAccessTag        := vConnection.AccessTag;
-                  vRestURL          := vFailOverConnections[I].vRestURL;
+                  vDataRoute        := vFailOverConnections[I].vDataRoute;
                   vRestPooler       := vFailOverConnections[I].vRestPooler;
                   vTimeOut          := vFailOverConnections[I].vTimeOut;
                   vConnectTimeOut   := vFailOverConnections[I].vConnectTimeOut;
@@ -2231,7 +2228,7 @@ Begin
                    (vFailOverConnections[I].Encoding        = vConnection.Encoding)       And
                    (vFailOverConnections[I].vAccessTag      = vConnection.AccessTag)      And
                    (vFailOverConnections[I].vRestPooler     = vRestPooler)                And
-                   (vFailOverConnections[I].vRestURL        = vRestURL))                  Or
+                   (vFailOverConnections[I].vDataRoute      = vDataRoute))                Or
                    (Not (vFailOverConnections[I].Active))                                 Then
                Continue;
               End;
@@ -2251,7 +2248,7 @@ Begin
              Try
               Case vAuthOptionParams.AuthorizationOption Of
                rdwAOBearer : Begin
-                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vRestURL, '',
+                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vDataRoute,
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut,vConnectTimeOut,
                                                                 Nil, vRESTClientPooler);
@@ -2259,7 +2256,7 @@ Begin
                               TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                              End;
                rdwAOToken  : Begin
-                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vRestURL, '',
+                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vDataRoute,
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut,vConnectTimeOut,
                                                                 Nil, vRESTClientPooler);
@@ -2280,7 +2277,7 @@ Begin
                   vEncodeStrings    := vConnection.EncodeStrings;
                   vEncoding         := vConnection.Encoding;
                   vAccessTag        := vConnection.AccessTag;
-                  vRestURL          := vFailOverConnections[I].vRestURL;
+                  vDataRoute        := vFailOverConnections[I].vDataRoute;
                   vRestPooler       := vFailOverConnections[I].vRestPooler;
                   vTimeOut          := vFailOverConnections[I].vTimeOut;
                   vConnectTimeOut   := vFailOverConnections[I].vConnectTimeOut;
@@ -2438,7 +2435,7 @@ Begin
   For I := 0 To 1 Do
    Begin
     LDataSetList := vRESTConnectionDB.ApplyUpdatesTB(Massive,      vRestPooler,
-                                                     vRestURL,
+                                                     vDataRoute,
                                                      DWParams,     Error,
                                                      MessageError, SocketError, RowsAffected, vTimeOut, vConnectTimeOut, '',
                                                      vClientConnectionDefs.vConnectionDefs,
@@ -2488,7 +2485,7 @@ Begin
               (vFailOverConnections[I].Encoding        = vRESTConnectionDB.Encoding)       And
               (vFailOverConnections[I].vAccessTag      = vRESTConnectionDB.AccessTag)      And
               (vFailOverConnections[I].vRestPooler     = vRestPooler)                      And
-              (vFailOverConnections[I].vRestURL        = vRestURL))                        Or
+              (vFailOverConnections[I].vDataRoute      = vDataRoute))                      Or
              (Not (vFailOverConnections[I].Active))                                        Then
           Continue;
          End;
@@ -2510,7 +2507,7 @@ Begin
                               vFailOverConnections[I].AuthenticationOptions);
         LDataSetList := vRESTConnectionDB.ApplyUpdatesTB(Massive,
                                                          vFailOverConnections[I].vRestPooler,
-                                                         vFailOverConnections[I].vRestURL,
+                                                         vFailOverConnections[I].vDataRoute,
                                                          DWParams,     Error,
                                                          MessageError, SocketError, RowsAffected, vTimeOut, vConnectTimeOut, '',
                                                          vClientConnectionDefs.vConnectionDefs,
@@ -2527,7 +2524,7 @@ Begin
             vEncodeStrings  := vRESTConnectionDB.EncodeStrings;
             vEncoding       := vRESTConnectionDB.Encoding;
             vAccessTag      := vRESTConnectionDB.AccessTag;
-            vRestURL        := vFailOverConnections[I].vRestURL;
+            vDataRoute      := vFailOverConnections[I].vDataRoute;
             vRestPooler     := vFailOverConnections[I].vRestPooler;
             vTimeOut        := vFailOverConnections[I].vTimeOut;
             vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -2672,7 +2669,7 @@ Begin
   For I := 0 To 1 Do
    Begin
     LDataSetList := vRESTConnectionDB.ApplyUpdates(Massive,      vRestPooler,
-                                                   vRestURL,  GetLineSQL(SQL),
+                                                   vDataRoute,   GetLineSQL(SQL),
                                                    DWParams,     Error,
                                                    MessageError, SocketError, RowsAffected, vTimeOut, vConnectTimeOut, '',
                                                    vClientConnectionDefs.vConnectionDefs,
@@ -2722,7 +2719,7 @@ Begin
               (vFailOverConnections[I].Encoding        = vRESTConnectionDB.Encoding)       And
               (vFailOverConnections[I].vAccessTag      = vRESTConnectionDB.AccessTag)      And
               (vFailOverConnections[I].vRestPooler     = vRestPooler)                      And
-              (vFailOverConnections[I].vRestURL        = vRestURL))                        Or
+              (vFailOverConnections[I].vDataRoute      = vDataRoute))                      Or
              (Not (vFailOverConnections[I].Active))                                        Then
           Continue;
          End;
@@ -2744,7 +2741,7 @@ Begin
                               vFailOverConnections[I].AuthenticationOptions);
         LDataSetList := vRESTConnectionDB.ApplyUpdates(Massive,
                                                        vFailOverConnections[I].vRestPooler,
-                                                       vFailOverConnections[I].vRestURL,
+                                                       vFailOverConnections[I].vDataRoute,
                                                        GetLineSQL(SQL), DWParams,     Error,
                                                        MessageError, SocketError, RowsAffected, vTimeOut, vConnectTimeOut, '',
                                                        vClientConnectionDefs.vConnectionDefs,
@@ -2761,7 +2758,7 @@ Begin
             vEncodeStrings  := vRESTConnectionDB.EncodeStrings;
             vEncoding       := vRESTConnectionDB.Encoding;
             vAccessTag      := vRESTConnectionDB.AccessTag;
-            vRestURL        := vFailOverConnections[I].vRestURL;
+            vDataRoute      := vFailOverConnections[I].vDataRoute;
             vRestPooler     := vFailOverConnections[I].vRestPooler;
             vTimeOut        := vFailOverConnections[I].vTimeOut;
             vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -2898,7 +2895,7 @@ Begin
      Begin
       DWParams     := GeTRESTDWParams(Params, vEncoding);
       LDataSetList := vRESTConnectionDB.InsertValue(vRestPooler,
-                                                    vRestURL, GetLineSQL(SQL),
+                                                    vDataRoute, GetLineSQL(SQL),
                                                     DWParams, Error,
                                                     MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                     vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
@@ -2906,7 +2903,7 @@ Begin
      End
     Else
      LDataSetList := vRESTConnectionDB.InsertValuePure (vRestPooler,
-                                                        vRestURL,
+                                                        vDataRoute,
                                                         GetLineSQL(SQL), Error,
                                                         MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                         vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
@@ -2954,7 +2951,7 @@ Begin
               (vFailOverConnections[I].Encoding        = vRESTConnectionDB.Encoding)       And
               (vFailOverConnections[I].vAccessTag      = vRESTConnectionDB.AccessTag)      And
               (vFailOverConnections[I].vRestPooler     = vRestPooler)                      And
-              (vFailOverConnections[I].vRestURL        = vRestURL))                        Or
+              (vFailOverConnections[I].vDataRoute      = vDataRoute))                      Or
              (Not (vFailOverConnections[I].Active))                                        Then
           Continue;
          End;
@@ -2978,7 +2975,7 @@ Begin
          Begin
           DWParams     := GeTRESTDWParams(Params, vEncoding);
           LDataSetList := vRESTConnectionDB.InsertValue(vFailOverConnections[I].vRestPooler,
-                                                        vFailOverConnections[I].vRestURL, GetLineSQL(SQL),
+                                                        vFailOverConnections[I].vDataRoute, GetLineSQL(SQL),
                                                         DWParams, Error,
                                                         MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                         vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
@@ -2986,7 +2983,7 @@ Begin
          End
         Else
          LDataSetList := vRESTConnectionDB.InsertValuePure (vFailOverConnections[I].vRestPooler,
-                                                            vFailOverConnections[I].vRestURL,
+                                                            vFailOverConnections[I].vDataRoute,
                                                             GetLineSQL(SQL), Error,
                                                             MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                             vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
@@ -3002,7 +2999,7 @@ Begin
             vEncodeStrings  := vRESTConnectionDB.EncodeStrings;
             vEncoding       := vRESTConnectionDB.Encoding;
             vAccessTag      := vRESTConnectionDB.AccessTag;
-            vRestURL        := vFailOverConnections[I].vRestURL;
+            vDataRoute      := vFailOverConnections[I].vDataRoute;
             vRestPooler     := vFailOverConnections[I].vRestPooler;
             vTimeOut        := vFailOverConnections[I].vTimeOut;
             vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -3115,7 +3112,7 @@ Begin
    vRESTConnectionDB.DatabaseCharSet  := csUndefined;
    {$ENDIF}
    Try
-    Result := vRESTConnectionDB.GetTableNames(vRestPooler, vRestURL, TableNames,
+    Result := vRESTConnectionDB.GetTableNames(vRestPooler, vDataRoute, TableNames,
                                               Result,      MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                               vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     If SocketError Then
@@ -3135,7 +3132,7 @@ Begin
                 (vFailOverConnections[I].Encoding        = vRESTConnectionDB.Encoding)       And
                 (vFailOverConnections[I].vAccessTag      = vRESTConnectionDB.AccessTag)      And
                 (vFailOverConnections[I].vRestPooler     = vRestPooler)                      And
-                (vFailOverConnections[I].vRestURL        = vRestURL))                        Or
+                (vFailOverConnections[I].vDataRoute      = vDataRoute))                      Or
                 (Not (vFailOverConnections[I].Active))                                       Then
             Continue;
            End;
@@ -3156,7 +3153,7 @@ Begin
                                 vFailOverConnections[I].vAccessTag,
                                 vFailOverConnections[I].AuthenticationOptions);
           Result := vRESTConnectionDB.GetTableNames(vFailOverConnections[I].vRestPooler,
-                                                    vFailOverConnections[I].vRestURL, TableNames,
+                                                    vFailOverConnections[I].vDataRoute, TableNames,
                                                     Result,      MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                     vClientConnectionDefs.vConnectionDefs);
           If Not SocketError Then
@@ -3171,7 +3168,7 @@ Begin
               vEncodeStrings  := vRESTConnectionDB.EncodeStrings;
               vEncoding       := vRESTConnectionDB.Encoding;
               vAccessTag      := vRESTConnectionDB.AccessTag;
-              vRestURL        := vFailOverConnections[I].vRestURL;
+              vDataRoute      := vFailOverConnections[I].vDataRoute;
               vRestPooler     := vFailOverConnections[I].vRestPooler;
               vTimeOut        := vFailOverConnections[I].vTimeOut;
               vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -3238,7 +3235,7 @@ Begin
    vRESTConnectionDB.DatabaseCharSet  := csUndefined;
    {$ENDIF}
    Try
-    Result := vRESTConnectionDB.GetFieldNames(vRestPooler, vRestURL, TableName, FieldNames,
+    Result := vRESTConnectionDB.GetFieldNames(vRestPooler, vDataRoute, TableName, FieldNames,
                                               Result,      MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                               vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     If SocketError Then
@@ -3258,7 +3255,7 @@ Begin
                 (vFailOverConnections[I].Encoding        = vRESTConnectionDB.Encoding)       And
                 (vFailOverConnections[I].vAccessTag      = vRESTConnectionDB.AccessTag)      And
                 (vFailOverConnections[I].vRestPooler     = vRestPooler)                      And
-                (vFailOverConnections[I].vRestURL        = vRestURL))                        Or
+                (vFailOverConnections[I].vDataRoute      = vDataRoute))                      Or
                 (Not (vFailOverConnections[I].Active))                                       Then
             Continue;
            End;
@@ -3279,7 +3276,7 @@ Begin
                                 vFailOverConnections[I].vAccessTag,
                                 vFailOverConnections[I].AuthenticationOptions);
           Result := vRESTConnectionDB.GetFieldNames(vFailOverConnections[I].vRestPooler,
-                                                    vFailOverConnections[I].vRestURL, TableName, FieldNames,
+                                                    vFailOverConnections[I].vDataRoute, TableName, FieldNames,
                                                     Result,      MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                     vClientConnectionDefs.vConnectionDefs);
           If Not SocketError Then
@@ -3294,7 +3291,7 @@ Begin
               vEncodeStrings  := vRESTConnectionDB.EncodeStrings;
               vEncoding       := vRESTConnectionDB.Encoding;
               vAccessTag      := vRESTConnectionDB.AccessTag;
-              vRestURL        := vFailOverConnections[I].vRestURL;
+              vDataRoute      := vFailOverConnections[I].vDataRoute;
               vRestPooler     := vFailOverConnections[I].vRestPooler;
               vTimeOut        := vFailOverConnections[I].vTimeOut;
               vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -3362,7 +3359,7 @@ Begin
    {$ENDIF}
    Try
     FieldNames.Clear;
-    Result := vRESTConnectionDB.GetKeyFieldNames(vRestPooler, vRestURL, TableName, FieldNames,
+    Result := vRESTConnectionDB.GetKeyFieldNames(vRestPooler, vDataRoute, TableName, FieldNames,
                                                  Result,      MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                  vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     If SocketError Then
@@ -3382,7 +3379,7 @@ Begin
                 (vFailOverConnections[I].Encoding        = vRESTConnectionDB.Encoding)       And
                 (vFailOverConnections[I].vAccessTag      = vRESTConnectionDB.AccessTag)      And
                 (vFailOverConnections[I].vRestPooler     = vRestPooler)                      And
-                (vFailOverConnections[I].vRestURL        = vRestURL))                        Or
+                (vFailOverConnections[I].vDataRoute      = vDataRoute))                      Or
                 (Not (vFailOverConnections[I].Active))                                       Then
             Continue;
            End;
@@ -3403,7 +3400,7 @@ Begin
                                 vFailOverConnections[I].vAccessTag,
                                 vFailOverConnections[I].AuthenticationOptions);
           Result := vRESTConnectionDB.GetKeyFieldNames(vFailOverConnections[I].vRestPooler,
-                                                       vFailOverConnections[I].vRestURL, TableName, FieldNames,
+                                                       vFailOverConnections[I].vDataRoute, TableName, FieldNames,
                                                        Result,      MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                        vClientConnectionDefs.vConnectionDefs);
           If Not SocketError Then
@@ -3418,7 +3415,7 @@ Begin
               vEncodeStrings  := vRESTConnectionDB.EncodeStrings;
               vEncoding       := vRESTConnectionDB.Encoding;
               vAccessTag      := vRESTConnectionDB.AccessTag;
-              vRestURL        := vFailOverConnections[I].vRestURL;
+              vDataRoute      := vFailOverConnections[I].vDataRoute;
               vRestPooler     := vFailOverConnections[I].vRestPooler;
               vTimeOut        := vFailOverConnections[I].vTimeOut;
               vConnectTimeOut        := vFailOverConnections[I].vConnectTimeOut;
@@ -3548,7 +3545,7 @@ Begin
  Try
   For I := 0 To 1 Do
    Begin
-    vLinesDS := vRESTConnectionDB.OpenDatasets(vLinesDS, vRestPooler,  vRestURL,
+    vLinesDS := vRESTConnectionDB.OpenDatasets(vLinesDS, vRestPooler,  vDataRoute,
                                                Error,    MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     If Not(Error) or (MessageError <> cInvalidAuth) Then
@@ -3595,7 +3592,7 @@ Begin
               (vFailOverConnections[I].Encoding        = vRESTConnectionDB.Encoding)       And
               (vFailOverConnections[I].vAccessTag      = vRESTConnectionDB.AccessTag)      And
               (vFailOverConnections[I].vRestPooler     = vRestPooler)                      And
-              (vFailOverConnections[I].vRestURL        = vRestURL))                        Or
+              (vFailOverConnections[I].vDataRoute      = vDataRoute))                      Or
              (Not (vFailOverConnections[I].Active))                                        Then
           Continue;
          End;
@@ -3615,7 +3612,7 @@ Begin
                               vFailOverConnections[I].Encoding,
                               vFailOverConnections[I].vAccessTag,
                               vFailOverConnections[I].AuthenticationOptions);
-        vLinesDS := vRESTConnectionDB.OpenDatasets(vLinesDS, vFailOverConnections[I].vRestPooler,  vFailOverConnections[I].vRestURL,
+        vLinesDS := vRESTConnectionDB.OpenDatasets(vLinesDS, vFailOverConnections[I].vRestPooler,  vFailOverConnections[I].vDataRoute,
                                                    Error,    MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                    vClientConnectionDefs.vConnectionDefs);
         If Not SocketError Then
@@ -3630,7 +3627,7 @@ Begin
             vEncodeStrings  := vRESTConnectionDB.EncodeStrings;
             vEncoding       := vRESTConnectionDB.Encoding;
             vAccessTag      := vRESTConnectionDB.AccessTag;
-            vRestURL        := vFailOverConnections[I].vRestURL;
+            vDataRoute      := vFailOverConnections[I].vDataRoute;
             vRestPooler     := vFailOverConnections[I].vRestPooler;
             vTimeOut        := vFailOverConnections[I].vTimeOut;
             vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -3834,7 +3831,7 @@ Begin
    Begin
     DWParams     := GeTRESTDWParams(Params, vEncoding);
     LDataSetList := vRESTConnectionDB.ExecuteCommandJSONTB(vRestPooler,
-                                                           vRestURL,
+                                                           vDataRoute,
                                                            Tablename,
                                                            DWParams, Error,
                                                            MessageError, SocketError, RowsAffected, BinaryRequest, BinaryCompatibleMode,
@@ -3843,7 +3840,7 @@ Begin
    End
   Else
    LDataSetList := vRESTConnectionDB.ExecuteCommandPureJSONTB(vRestPooler,
-                                                              vRestURL,
+                                                              vDataRoute,
                                                               Tablename,
                                                               Error,
                                                               MessageError, SocketError, RowsAffected, BinaryRequest, BinaryCompatibleMode,
@@ -3867,7 +3864,7 @@ Begin
               (vFailOverConnections[I].Encoding        = vRESTConnectionDB.Encoding)       And
               (vFailOverConnections[I].vAccessTag      = vRESTConnectionDB.AccessTag)      And
               (vFailOverConnections[I].vRestPooler     = vRestPooler)                      And
-              (vFailOverConnections[I].vRestURL        = vRestURL))                        Or
+              (vFailOverConnections[I].vDataRoute      = vDataRoute))                      Or
              (Not (vFailOverConnections[I].Active))                                        Then
           Continue;
          End;
@@ -3891,7 +3888,7 @@ Begin
          Begin
           DWParams     := GeTRESTDWParams(Params, vEncoding);
           LDataSetList := vRESTConnectionDB.ExecuteCommandJSONTB(vFailOverConnections[I].vRestPooler,
-                                                                 vFailOverConnections[I].vRestURL,
+                                                                 vFailOverConnections[I].vDataRoute,
                                                                  Tablename,
                                                                  DWParams, Error,
                                                                  MessageError, SocketError, RowsAffected, BinaryRequest, BinaryCompatibleMode,
@@ -3900,7 +3897,7 @@ Begin
          End
         Else
          LDataSetList := vRESTConnectionDB.ExecuteCommandPureJSONTB(vFailOverConnections[I].vRestPooler,
-                                                                    vFailOverConnections[I].vRestURL,
+                                                                    vFailOverConnections[I].vDataRoute,
                                                                     Tablename,
                                                                     Error,
                                                                     MessageError, SocketError, RowsAffected, BinaryRequest, BinaryCompatibleMode,
@@ -3917,7 +3914,7 @@ Begin
             vEncodeStrings  := vRESTConnectionDB.EncodeStrings;
             vEncoding       := vRESTConnectionDB.Encoding;
             vAccessTag      := vRESTConnectionDB.AccessTag;
-            vRestURL        := vFailOverConnections[I].vRestURL;
+            vDataRoute      := vFailOverConnections[I].vDataRoute;
             vRestPooler     := vFailOverConnections[I].vRestPooler;
             vTimeOut        := vFailOverConnections[I].vTimeOut;
             vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -4094,7 +4091,7 @@ Begin
      Begin
       DWParams     := GeTRESTDWParams(Params, vEncoding);
       LDataSetList := vRESTConnectionDB.ExecuteCommandJSON(vRestPooler,
-                                                           vRestURL, vSQL,
+                                                           vDataRoute, vSQL,
                                                            DWParams, Error,
                                                            MessageError, SocketError, RowsAffected, Execute, BinaryRequest, BinaryCompatibleMode,
                                                            Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
@@ -4102,7 +4099,7 @@ Begin
      End
     Else
      LDataSetList := vRESTConnectionDB.ExecuteCommandPureJSON(vRestPooler,
-                                                              vRestURL,
+                                                              vDataRoute,
                                                               vSQL, Error,
                                                               MessageError, SocketError, RowsAffected, Execute, BinaryRequest, BinaryCompatibleMode,
                                                               Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
@@ -4125,7 +4122,7 @@ Begin
                 (vFailOverConnections[I].Encoding        = vRESTConnectionDB.Encoding)       And
                 (vFailOverConnections[I].vAccessTag      = vRESTConnectionDB.AccessTag)      And
                 (vFailOverConnections[I].vRestPooler     = vRestPooler)                      And
-                (vFailOverConnections[I].vRestURL        = vRestURL))                        Or
+                (vFailOverConnections[I].vDataRoute      = vDataRoute))                      Or
                (Not (vFailOverConnections[I].Active))                                        Then
             Continue;
            End;
@@ -4152,7 +4149,7 @@ Begin
            Begin
             DWParams     := GeTRESTDWParams(Params, vEncoding);
             LDataSetList := vRESTConnectionDB.ExecuteCommandJSON(vFailOverConnections[I].vRestPooler,
-                                                                 vFailOverConnections[I].vRestURL, GetLineSQL(SQL),
+                                                                 vFailOverConnections[I].vDataRoute, GetLineSQL(SQL),
                                                                  DWParams, Error,
                                                                  MessageError, SocketError, RowsAffected, Execute, BinaryRequest, BinaryCompatibleMode,
                                                                  Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
@@ -4160,7 +4157,7 @@ Begin
            End
           Else
            LDataSetList := vRESTConnectionDB.ExecuteCommandPureJSON(vFailOverConnections[I].vRestPooler,
-                                                                    vFailOverConnections[I].vRestURL,
+                                                                    vFailOverConnections[I].vDataRoute,
                                                                     GetLineSQL(SQL), Error,
                                                                     MessageError, SocketError, RowsAffected, Execute, BinaryRequest, BinaryCompatibleMode,
                                                                     Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
@@ -4176,7 +4173,7 @@ Begin
               vEncodeStrings  := vRESTConnectionDB.EncodeStrings;
               vEncoding       := vRESTConnectionDB.Encoding;
               vAccessTag      := vRESTConnectionDB.AccessTag;
-              vRestURL        := vFailOverConnections[I].vRestURL;
+              vDataRoute      := vFailOverConnections[I].vDataRoute;
               vRestPooler     := vFailOverConnections[I].vRestPooler;
               vTimeOut        := vFailOverConnections[I].vTimeOut;
               vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -4304,7 +4301,7 @@ Begin
  Try
   If Assigned(vRestPoolers) Then
    FreeAndNil(vRestPoolers);
-  vRestPoolers := vConnection.GetPoolerList(vRestURL, vTimeOut, vConnectTimeOut, vRESTClientPooler);
+  vRestPoolers := vConnection.GetPoolerList(vDataRoute, vTimeOut, vConnectTimeOut, vRESTClientPooler);
   Try
    If Assigned(vRestPoolers) Then
     Begin
@@ -4352,7 +4349,7 @@ Begin
  vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
  Result := TStringList.Create;
  Try
-  vTempList := vConnection.GetServerEvents(vRestURL, vTimeOut, vConnectTimeOut, vRESTClientPooler);
+  vTempList := vConnection.GetServerEvents(vDataRoute, vTimeOut, vConnectTimeOut, vRESTClientPooler);
   Try
    If Assigned(vTempList) Then
     For I := 0 To vTempList.Count -1 do
@@ -4534,7 +4531,7 @@ Begin
      Try
       For I := 0 To 1 Do
        Begin
-        ResultData := vRESTConnectionDB.ProcessMassiveSQLCache(vUpdateLine, vRestPooler,  vRestURL,
+        ResultData := vRESTConnectionDB.ProcessMassiveSQLCache(vUpdateLine, vRestPooler,  vDataRoute,
                                                                Error,       MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                                vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
         If Not(Error) or (MessageError <> cInvalidAuth) Then
@@ -4582,7 +4579,7 @@ Begin
                   (vFailOverConnections[I].Encoding        = vRESTConnectionDB.Encoding)       And
                   (vFailOverConnections[I].vAccessTag      = vRESTConnectionDB.AccessTag)      And
                   (vFailOverConnections[I].vRestPooler     = vRestPooler)                      And
-                  (vFailOverConnections[I].vRestURL        = vRestURL))                        Or
+                  (vFailOverConnections[I].vDataRoute      = vDataRoute))                      Or
                   (Not (vFailOverConnections[I].Active))                                       Then
               Continue;
              End;
@@ -4604,7 +4601,7 @@ Begin
                                   vFailOverConnections[I].AuthenticationOptions);
             ResultData := vRESTConnectionDB.ProcessMassiveSQLCache(vUpdateLine,
                                                                    vFailOverConnections[I].vRestPooler,
-                                                                   vFailOverConnections[I].vRestURL,
+                                                                   vFailOverConnections[I].vDataRoute,
                                                                    Error,       MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                                    vClientConnectionDefs.vConnectionDefs);
             If Not SocketError Then
@@ -4619,7 +4616,7 @@ Begin
                 vEncodeStrings  := vRESTConnectionDB.EncodeStrings;
                 vEncoding       := vRESTConnectionDB.Encoding;
                 vAccessTag      := vRESTConnectionDB.AccessTag;
-                vRestURL        := vFailOverConnections[I].vRestURL;
+                vDataRoute      := vFailOverConnections[I].vDataRoute;
                 vRestPooler     := vFailOverConnections[I].vRestPooler;
                 vTimeOut        := vFailOverConnections[I].vTimeOut;
                 vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -4697,7 +4694,7 @@ Begin
      Try
       For I := 0 To 1 Do
        Begin
-        ResultData := vRESTConnectionDB.ProcessMassiveSQLCache(vUpdateLine, vRestPooler,  vRestURL,
+        ResultData := vRESTConnectionDB.ProcessMassiveSQLCache(vUpdateLine, vRestPooler,  vDataRoute,
                                                                Error,       MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                                vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
         If Not(Error) or (MessageError <> cInvalidAuth) Then
@@ -4745,7 +4742,7 @@ Begin
                   (vFailOverConnections[I].Encoding        = vRESTConnectionDB.Encoding)       And
                   (vFailOverConnections[I].vAccessTag      = vRESTConnectionDB.AccessTag)      And
                   (vFailOverConnections[I].vRestPooler     = vRestPooler)                      And
-                  (vFailOverConnections[I].vRestURL        = vRestURL))                        Or
+                  (vFailOverConnections[I].vDataRoute      = vDataRoute))                      Or
                   (Not (vFailOverConnections[I].Active))                                       Then
               Continue;
              End;
@@ -4767,7 +4764,7 @@ Begin
                                   vFailOverConnections[I].AuthenticationOptions);
             ResultData := vRESTConnectionDB.ProcessMassiveSQLCache(vUpdateLine,
                                                                    vFailOverConnections[I].vRestPooler,
-                                                                   vFailOverConnections[I].vRestURL,
+                                                                   vFailOverConnections[I].vDataRoute,
                                                                    Error,       MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                                    vClientConnectionDefs.vConnectionDefs);
             If Not SocketError Then
@@ -4782,7 +4779,7 @@ Begin
                 vEncodeStrings  := vRESTConnectionDB.EncodeStrings;
                 vEncoding       := vRESTConnectionDB.Encoding;
                 vAccessTag      := vRESTConnectionDB.AccessTag;
-                vRestURL        := vFailOverConnections[I].vRestURL;
+                vDataRoute      := vFailOverConnections[I].vDataRoute;
                 vRestPooler     := vFailOverConnections[I].vRestPooler;
                 vTimeOut        := vFailOverConnections[I].vTimeOut;
                 vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -4873,7 +4870,7 @@ Begin
  Try
   For I := 0 To 1 Do
    Begin
-    vLinesDS := vRESTConnectionDB.ApplyUpdates(vLinesDS, vRestPooler,  vRestURL,
+    vLinesDS := vRESTConnectionDB.ApplyUpdates(vLinesDS, vRestPooler,  vDataRoute,
                                                Error,    MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     If Not(Error) or (MessageError <> cInvalidAuth) Then
@@ -4920,7 +4917,7 @@ Begin
               (vFailOverConnections[I].Encoding        = vRESTConnectionDB.Encoding)       And
               (vFailOverConnections[I].vAccessTag      = vRESTConnectionDB.AccessTag)      And
               (vFailOverConnections[I].vRestPooler     = vRestPooler)                      And
-              (vFailOverConnections[I].vRestURL        = vRestURL))                        Or
+              (vFailOverConnections[I].vDataRoute      = vDataRoute))                        Or
              (Not (vFailOverConnections[I].Active))                                        Then
           Continue;
          End;
@@ -4940,7 +4937,7 @@ Begin
                               vFailOverConnections[I].Encoding,
                               vFailOverConnections[I].vAccessTag,
                               vFailOverConnections[I].AuthenticationOptions);
-        vLinesDS := vRESTConnectionDB.ApplyUpdates(vLinesDS, vFailOverConnections[I].vRestPooler,  vFailOverConnections[I].vRestURL,
+        vLinesDS := vRESTConnectionDB.ApplyUpdates(vLinesDS, vFailOverConnections[I].vRestPooler,  vFailOverConnections[I].vDataRoute,
                                                    Error,    MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                    vClientConnectionDefs.vConnectionDefs);
         If Not SocketError Then
@@ -4955,7 +4952,7 @@ Begin
             vEncodeStrings  := vRESTConnectionDB.EncodeStrings;
             vEncoding       := vRESTConnectionDB.Encoding;
             vAccessTag      := vRESTConnectionDB.AccessTag;
-            vRestURL        := vFailOverConnections[I].vRestURL;
+            vDataRoute      := vFailOverConnections[I].vDataRoute;
             vRestPooler     := vFailOverConnections[I].vRestPooler;
             vTimeOut        := vFailOverConnections[I].vTimeOut;
             vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -5130,7 +5127,7 @@ Begin
      Try
       For I := 0 To 1 Do
        Begin
-        ResultData := vRESTConnectionDB.ApplyUpdates_MassiveCache(vUpdateLine, vRestPooler,  vRestURL,
+        ResultData := vRESTConnectionDB.ApplyUpdates_MassiveCache(vUpdateLine, vRestPooler,  vDataRoute,
                                                                   Error,       MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                                   vClientConnectionDefs.vConnectionDefs,
                                                                   MassiveCache.ReflectChanges, vRESTClientPooler);
@@ -5179,7 +5176,7 @@ Begin
                   (vFailOverConnections[I].Encoding        = vRESTConnectionDB.Encoding)       And
                   (vFailOverConnections[I].vAccessTag      = vRESTConnectionDB.AccessTag)      And
                   (vFailOverConnections[I].vRestPooler     = vRestPooler)                      And
-                  (vFailOverConnections[I].vRestURL        = vRestURL))                        Or
+                  (vFailOverConnections[I].vDataRoute      = vDataRoute))                      Or
                   (Not (vFailOverConnections[I].Active))                                       Then
               Continue;
              End;
@@ -5206,7 +5203,7 @@ Begin
              FreeAndNil(ResultData);
             ResultData := vRESTConnectionDB.ApplyUpdates_MassiveCache(vUpdateLine,
                                                                       vFailOverConnections[I].vRestPooler,
-                                                                      vFailOverConnections[I].vRestURL,
+                                                                      vFailOverConnections[I].vDataRoute,
                                                                       Error,       MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                                       vClientConnectionDefs.vConnectionDefs,
                                                                       MassiveCache.ReflectChanges);
@@ -5222,7 +5219,7 @@ Begin
                 vEncodeStrings  := vRESTConnectionDB.EncodeStrings;
                 vEncoding       := vRESTConnectionDB.Encoding;
                 vAccessTag      := vRESTConnectionDB.AccessTag;
-                vRestURL        := vFailOverConnections[I].vRestURL;
+                vDataRoute      := vFailOverConnections[I].vDataRoute;
                 vRestPooler     := vFailOverConnections[I].vRestPooler;
                 vTimeOut        := vFailOverConnections[I].vTimeOut;
                 vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -5380,7 +5377,7 @@ Begin
     vRESTClientPooler.AuthenticationOptions.Assign(AuthenticationOptions);
    TokenValidade;
    If Not(vErrorBoolean) Then
-    vTempSend  := Connection.EchoPooler(vRestURL, vRestPooler, vTimeOut, vConnectTimeOut, vRESTClientPooler);
+    vTempSend  := Connection.EchoPooler(vDataRoute, vRestPooler, vTimeOut, vConnectTimeOut, vRESTClientPooler);
    Result      := Trim(vTempSend) <> '';
    If Result Then
     vMyIP       := vTempSend
@@ -5418,9 +5415,9 @@ Begin
                  (vFailOverConnections[I].EncodeStrings   = Connection.EncodeStrings)  And
                  (vFailOverConnections[I].Encoding        = Connection.Encoding)       And
                  (vFailOverConnections[I].vAccessTag      = Connection.AccessTag)      And
-                 (vFailOverConnections[I].vRestPooler     = vRestPooler)                And
-                 (vFailOverConnections[I].vRestURL        = vRestURL))                  Or
-               (Not (vFailOverConnections[I].Active))                                   Then
+                 (vFailOverConnections[I].vRestPooler     = vRestPooler)               And
+                 (vFailOverConnections[I].vDataRoute      = vDataRoute))               Or
+               (Not (vFailOverConnections[I].Active))                                  Then
              Continue;
             End;
            If Assigned(vOnFailOverExecute) Then
@@ -5439,7 +5436,7 @@ Begin
            Try
             TokenValidade;
             If Not(vErrorBoolean) Then
-             vTempSend   := Connection.EchoPooler(vFailOverConnections[I].vRestURL,
+             vTempSend   := Connection.EchoPooler(vFailOverConnections[I].vDataRoute,
                                                   vFailOverConnections[I].vRestPooler,
                                                   vFailOverConnections[I].vTimeOut,
                                                   vFailOverConnections[I].vConnectTimeOut,
@@ -5458,7 +5455,7 @@ Begin
                 vEncodeStrings  := Connection.EncodeStrings;
                 vEncoding       := Connection.Encoding;
                 vAccessTag      := Connection.AccessTag;
-                vRestURL        := vFailOverConnections[I].vRestURL;
+                vDataRoute      := vFailOverConnections[I].vDataRoute;
                 vRestPooler     := vFailOverConnections[I].vRestPooler;
                 vTimeOut        := vFailOverConnections[I].vTimeOut;
                 vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -5514,9 +5511,9 @@ Begin
                  (vFailOverConnections[I].EncodeStrings   = Connection.EncodeStrings)  And
                  (vFailOverConnections[I].Encoding        = Connection.Encoding)       And
                  (vFailOverConnections[I].vAccessTag      = Connection.AccessTag)      And
-                 (vFailOverConnections[I].vRestPooler     = vRestPooler)                And
-                 (vFailOverConnections[I].vRestURL        = vRestURL))                  Or
-                 (Not (vFailOverConnections[I].Active))                                 Then
+                 (vFailOverConnections[I].vRestPooler     = vRestPooler)               And
+                 (vFailOverConnections[I].vDataRoute      = vDataRoute))               Or
+                 (Not (vFailOverConnections[I].Active))                                Then
              Continue;
             End;
            If Assigned(vOnFailOverExecute) Then
@@ -5535,7 +5532,7 @@ Begin
            Try
             TokenValidade;
             If Not(vErrorBoolean) Then
-             vTempSend   := Connection.EchoPooler(vFailOverConnections[I].vRestURL,
+             vTempSend   := Connection.EchoPooler(vFailOverConnections[I].vDataRoute,
                                                    vFailOverConnections[I].vRestPooler,
                                                    vFailOverConnections[I].vTimeOut,
                                                    vFailOverConnections[I].vConnectTimeOut,
@@ -5554,7 +5551,7 @@ Begin
                 vEncodeStrings  := Connection.EncodeStrings;
                 vEncoding       := Connection.Encoding;
                 vAccessTag      := Connection.AccessTag;
-                vRestURL        := vFailOverConnections[I].vRestURL;
+                vDataRoute      := vFailOverConnections[I].vDataRoute;
                 vRestPooler     := vFailOverConnections[I].vRestPooler;
                 vTimeOut        := vFailOverConnections[I].vTimeOut;
                 vConnectTimeOut := vFailOverConnections[I].vConnectTimeOut;
@@ -5667,6 +5664,20 @@ Begin
       rdwAOToken  : TRESTDWAuthOptionTokenClient (vAuthOptionParams.OptionParams).Token := '';
      End;
     End;
+  End;
+End;
+
+Procedure TRESTDWDatabasebaseBase.SetDataRoute(Value: String);
+Begin
+ vDataRoute := Value;
+ If Trim(vDataRoute) = '' Then
+  vDataRoute := '/'
+ Else
+  Begin
+   If Copy(vDataRoute, 1, 1) <> '/' Then
+    vDataRoute := '/' + vDataRoute;
+   If Copy(vDataRoute, Length(vDataRoute), 1) <> '/' Then
+    vDataRoute := vDataRoute + '/';
   End;
 End;
 
@@ -9982,7 +9993,7 @@ Begin
   vTempDatabase.ProxyOptions.vPassword := vProxyOptions.vPassword;      //Se tem Proxy diz quais as opções
   vTempDatabase.ProxyOptions.vPort     := vProxyOptions.vPort;      //Se tem Proxy diz quais as opções
   vTempDatabase.PoolerService          := vRestWebService;    //Host do WebService REST
-  vTempDatabase.PoolerURL              := vRestURL;           //URL do WebService REST
+  vTempDatabase.DataRoute              := vDataRoute;         //URL do WebService REST
   vTempDatabase.PoolerPort             := vPoolerPort;        //A Porta do Pooler do DataSet
 //  vTempDatabase.PoolerName           := vRestPooler;        //Qual o Pooler de Conexão ligado ao componente
   vTempDatabase.RequestTimeOut         := vTimeOut;           //Timeout da Requisição
@@ -12623,7 +12634,7 @@ Begin
   vTempDatabase.ProxyOptions.Password  := vProxyOptions.vPassword;      //Se tem Proxy diz quais as opções
   vTempDatabase.ProxyOptions.Port      := vProxyOptions.vPort;      //Se tem Proxy diz quais as opções
   vTempDatabase.PoolerService          := vRestWebService;    //Host do WebService REST
-  vTempDatabase.PoolerURL              := vRestURL;           //URL do WebService REST
+  vTempDatabase.DataRoute              := vDataRoute;           //URL do WebService REST
   vTempDatabase.PoolerPort             := vPoolerPort;        //A Porta do Pooler do DataSet
 //  vTempDatabase.PoolerName           := vRestPooler;        //Qual o Pooler de Conexão ligado ao componente
   vTempDatabase.RequestTimeOut         := vTimeOut;           //Timeout da Requisição

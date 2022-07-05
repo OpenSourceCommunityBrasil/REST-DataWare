@@ -329,9 +329,10 @@ Uses
    Private
     vDataRoute         : String;
     vServerMethodClass : TComponentClass;
+    Procedure SetDataRoute(Value : String);
    Public
     Constructor Create;
-    Property DataRoute         : String           Read vDataRoute         Write vDataRoute;
+    Property DataRoute         : String           Read vDataRoute         Write SetDataRoute;
     Property ServerMethodClass : TComponentClass  Read vServerMethodClass Write vServerMethodClass;
   End;
 
@@ -346,10 +347,10 @@ Uses
     Procedure ClearList;
     Constructor Create;
     Destructor  Destroy; Override;
-    Function    RouteExists(Value : String) : Boolean;
+    Function    RouteExists(Var Value : String) : Boolean;
     Procedure   Delete(Index : Integer); Overload;
     Function    Add   (Item  : TRESTDWDataRoute) : Integer; Overload;
-    Function    GetServerMethodClass(DataRoute             : String;
+    Function    GetServerMethodClass(Var DataRoute         : String;
                                      Var ServerMethodClass : TComponentClass) : Boolean;
     Property    Items [Index : Integer] : TRESTDWDataRoute Read GetRec Write PutRec; Default;
   End;
@@ -2170,6 +2171,20 @@ Begin
   Post;
 End;
 
+Procedure TRESTDWDataRoute.SetDataRoute(Value : String);
+Begin
+ vDataRoute := Value;
+ If Trim(vDataRoute) = '' Then
+  vDataRoute := '/'
+ Else
+  Begin
+   If Copy(vDataRoute, 1, 1) <> '/' Then
+    vDataRoute := '/' + vDataRoute;
+   If Copy(vDataRoute, Length(vDataRoute), 1) <> '/' Then
+    vDataRoute := vDataRoute + '/';
+  End;
+End;
+
 Constructor TRESTDWDataRoute.Create;
 Begin
  vDataRoute         := '';
@@ -2204,14 +2219,20 @@ Begin
  Inherited;
 End;
 
-Function   TRESTDWDataRouteList.RouteExists(Value : String) : Boolean;
+Function   TRESTDWDataRouteList.RouteExists(Var Value : String) : Boolean;
 Var
- I : Integer;
+ I          : Integer;
+ vTempRoute,
+ vTempValue : String;
 Begin
  Result := False;
+ If Length(Value) = 0 Then
+  Exit;
  For I := 0 To Count -1 Do
   Begin
-   Result := Lowercase(Items[I].DataRoute) = Lowercase(Value);
+   vTempRoute := Lowercase(Items[I].DataRoute);
+   vTempValue := Lowercase(Value);
+   Result     := vTempRoute = Copy(vTempValue, 1, Length(vTempRoute));
    If Result Then
     Break;
   End;
@@ -2248,19 +2269,27 @@ Begin
   End;
 End;
 
-Function TRESTDWDataRouteList.GetServerMethodClass(DataRoute             : String;
+Function TRESTDWDataRouteList.GetServerMethodClass(Var DataRoute         : String;
                                                    Var ServerMethodClass : TComponentClass) : Boolean;
 Var
- I : Integer;
+ I           : Integer;
+ vTempRoute,
+ vTempValue  : String;
 Begin
  Result            := False;
  ServerMethodClass := Nil;
+ Result := False;
+ If Length(DataRoute) = 0 Then
+  Exit;
  For I := 0 To Self.Count -1 Do
   Begin
-   Result := Lowercase(DataRoute) = Lowercase(TRESTDWDataRoute(TList(Self).Items[I]^).DataRoute);
+   vTempRoute := Lowercase(TRESTDWDataRoute(TList(Self).Items[I]^).DataRoute);
+   vTempValue := Lowercase(DataRoute);
+   Result     := vTempRoute = Copy(vTempValue, 1, Length(vTempRoute));
    If (Result) Then
     Begin
      ServerMethodClass := TRESTDWDataRoute(TList(Self).Items[I]^).ServerMethodClass;
+     DataRoute         := Copy(vTempValue, Length(vTempRoute), Length(DataRoute) - (Length(vTempRoute) -1));
      Break;
     End;
   End;

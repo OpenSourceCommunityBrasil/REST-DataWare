@@ -218,7 +218,6 @@ Type
   vListName,
   vAccessTag,
   vWelcomeMessage,
-  vRestURL,
   vRestWebService       : String;
   vAuthOptionParams     : TRESTDWClientAuthOptionParams;
   vEncoding             : TEncodeSelect;
@@ -241,7 +240,6 @@ Type
   Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams     Write vAuthOptionParams;
   Property Authentication        : Boolean                       Read vAuthentication       Write vAuthentication      Default True;
   Property Host                  : String                        Read vRestWebService       Write vRestWebService;    //Host do WebService REST
-  Property UrlPath               : String                        Read vRestURL              Write vRestURL;           //URL do WebService REST
   Property Port                  : Integer                       Read vPoolerPort           Write vPoolerPort;        //A Porta do Pooler do DataSet
   Property RequestTimeOut        : Integer                       Read vTimeOut              Write vTimeOut;           //Timeout da Requisição
   Property ConnectTimeOut        : Integer                       Read vConnectTimeOut       Write vConnectTimeOut;
@@ -319,7 +317,6 @@ Type
   vAccessTag,
   vWelcomeMessage,
   vPoolerNotFoundMessage,
-  vUrlPath,
   vLastErrorMessage,
   vContentType,
   vCharset,
@@ -343,8 +340,8 @@ Type
   vDatabaseCharSet     : TDatabaseCharSet;
   {$ENDIF}
   vFailOverConnections : TFailOverConnections;
-  Procedure   SetUrlPath  (Value            : String);
   Function    SendEvent   (EventData        : String)          : String;Overload;
+  Procedure   SetDataRoute(Value : String);
  Public
   //Métodos, Propriedades, Variáveis, Procedures e Funções Publicas
   Procedure   ReconfigureConnection(Var Connection        : TRESTClientPoolerBase;
@@ -378,11 +375,10 @@ Type
  Published
   //Métodos e Propriedades
   Property DataCompression         : Boolean                       Read vDatacompress            Write vDatacompress;
-  Property UrlPath                 : String                        Read vUrlPath                 Write SetUrlPath;
   Property AcceptEncoding          : String                        Read vAcceptEncoding          Write vAcceptEncoding;
   Property ContentType             : String                        Read vContentType             Write vContentType;
   Property Charset                 : String                        Read vCharset                 Write vCharset;
-  Property DataRoute               : String                        Read vDataRoute               Write vDataRoute;
+  Property DataRoute               : String                        Read vDataRoute               Write SetDataRoute;
   Property Encoding                : TEncodeSelect                 Read vRSCharset               Write vRSCharset;
   Property EncodedStrings          : Boolean                       Read vEncodeStrings           Write vEncodeStrings;
   Property TypeRequest             : TTypeRequest                  Read vTypeRequest             Write vTypeRequest         Default trHttp;
@@ -977,7 +973,7 @@ Begin
   vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
   Result := TStringList.Create;
   Try
-   vTempList := vConnection.GetServerEvents(vRestURL, vTimeOut);
+   vTempList := vConnection.GetServerEvents(vDataRoute, vTimeOut);
    Try
     For I := 0 To vTempList.Count -1 do
      Result.Add(vTempList[I]);
@@ -1195,14 +1191,6 @@ Begin
  vAllowCookies := Value;
 End;
 
-Procedure TRESTClientPoolerBase.SetUrlPath(Value : String);
-Begin
- vUrlPath := Value;
- If Length(vUrlPath) > 0 Then
-  If vUrlPath[Length(vUrlPath)] <> '/' Then
-   vUrlPath := vUrlPath + '/';
-End;
-
 Procedure TRESTClientPoolerBase.NewToken;
 Var
  DWParams       : TRESTDWParams;
@@ -1290,7 +1278,7 @@ Begin
     Try
      Case vAuthOptionParams.AuthorizationOption Of
       rdwAOBearer : Begin
-                     vTempSend := vConnection.GetToken(vUrlPath,     '',
+                     vTempSend := vConnection.GetToken(vDataRoute,
                                                        Params,       Error,
                                                        MessageError, vRequestTimeOut, vConnectTimeOut,
                                                        Nil,          RESTClientPoolerExec);
@@ -1298,7 +1286,7 @@ Begin
                      TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                     End;
       rdwAOToken  : Begin
-                     vTempSend := vConnection.GetToken(vUrlPath,     '',
+                     vTempSend := vConnection.GetToken(vDataRoute,
                                                        Params,       Error,
                                                        MessageError, vRequestTimeOut, vConnectTimeOut,
                                                        Nil,          RESTClientPoolerExec);
@@ -1335,8 +1323,7 @@ Begin
                    (vFailOverConnections[I].hEncodeStrings  = vConnection.EncodeStrings)  And
                    (vFailOverConnections[I].Encoding        = vConnection.Encoding)       And
                    (vFailOverConnections[I].vAccessTag      = vConnection.AccessTag)      And
-//                   (vFailOverConnections[I].vRestURL        = vRestPooler)                And
-                   (vFailOverConnections[I].vRestURL        = vHost))                  Or
+                   (vFailOverConnections[I].vDataRoute      = vConnection.DataRoute))     Or
                  (Not (vFailOverConnections[I].Active))                                   Then
                Continue;
               End;
@@ -1357,7 +1344,7 @@ Begin
              Try
               Case vAuthOptionParams.AuthorizationOption Of
                rdwAOBearer : Begin
-                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vRestURL, '',
+                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vDataRoute,
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut, vFailOverConnections[I].vConnectTimeOut,
                                                                 Nil,          RESTClientPoolerExec);
@@ -1365,7 +1352,7 @@ Begin
                               TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                              End;
                rdwAOToken  : Begin
-                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vRestURL, '',
+                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vDataRoute,
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut, vFailOverConnections[I].vConnectTimeOut,
                                                                 Nil,          RESTClientPoolerExec);
@@ -1387,7 +1374,7 @@ Begin
                   vEncodeStrings    := vConnection.EncodeStrings;
                   vRSCharset        := vConnection.Encoding;
                   vAccessTag        := vConnection.AccessTag;
-                  vUrlPath          := vFailOverConnections[I].vRestURL;
+                  vDataRoute        := vFailOverConnections[I].vDataRoute;
                   vRequestTimeOut   := vFailOverConnections[I].vTimeOut;
                   vConnectTimeOut   := vFailOverConnections[I].vConnectTimeOut;
                   vAuthOptionParams := vFailOverConnections[I].AuthenticationOptions;
@@ -1431,8 +1418,7 @@ Begin
                    (vFailOverConnections[I].hEncodeStrings  = vConnection.EncodeStrings)  And
                    (vFailOverConnections[I].Encoding        = vConnection.Encoding)       And
                    (vFailOverConnections[I].vAccessTag      = vConnection.AccessTag)      And
-//                   (vFailOverConnections[I].vRestPooler     = vRestPooler)                And
-                   (vFailOverConnections[I].vRestURL        = vHost))                  Or
+                   (vFailOverConnections[I].vDataRoute      = vConnection.DataRoute))     Or
                    (Not (vFailOverConnections[I].Active))                                 Then
                Continue;
               End;
@@ -1453,7 +1439,7 @@ Begin
              Try
               Case vAuthOptionParams.AuthorizationOption Of
                rdwAOBearer : Begin
-                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vRestURL, '',
+                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vDataRoute,
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut, vFailOverConnections[I].vConnectTimeOut,
                                                                 Nil,          RESTClientPoolerExec);
@@ -1461,7 +1447,7 @@ Begin
                               TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                              End;
                rdwAOToken  : Begin
-                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vRestURL, '',
+                              vTempSend := vConnection.GetToken(vFailOverConnections[I].vDataRoute,
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut,  vFailOverConnections[I].vConnectTimeOut,
                                                                 Nil,          RESTClientPoolerExec);
@@ -1482,7 +1468,7 @@ Begin
                   vEncodeStrings    := vConnection.EncodeStrings;
                   vRSCharset        := vConnection.Encoding;
                   vAccessTag        := vConnection.AccessTag;
-                  vUrlPath          := vFailOverConnections[I].vRestURL;
+                  vDataRoute        := vFailOverConnections[I].vDataRoute;
                   vRequestTimeOut   := vFailOverConnections[I].vTimeOut;
                   vConnectTimeOut   := vFailOverConnections[I].vConnectTimeOut;
                   vAuthOptionParams := vFailOverConnections[I].AuthenticationOptions;
@@ -1553,6 +1539,20 @@ End;
 Procedure TRESTClientPoolerBase.SetAuthOptionParams(Value : TRESTDWClientAuthOptionParams);
 Begin
  vAuthOptionParams.Assign(Value);
+End;
+
+Procedure TRESTClientPoolerBase.SetDataRoute(Value: String);
+Begin
+ vDataRoute := Value;
+ If Trim(vDataRoute) = '' Then
+  vDataRoute := '/'
+ Else
+  Begin
+   If Copy(vDataRoute, 1, 1) <> '/' Then
+    vDataRoute := '/' + vDataRoute;
+   If Copy(vDataRoute, Length(vDataRoute), 1) <> '/' Then
+    vDataRoute := vDataRoute + '/';
+  End;
 End;
 
 Constructor TRESTClientPoolerBase.Create(AOwner: TComponent);
@@ -3015,24 +3015,28 @@ Begin
      vAcceptAuth           := False;
      If (vDataRouteList.Count > 0) Then
       Begin
-       If vDataRouteList.RouteExists(vUrlToExec) Then
+       If Not vDataRouteList.RouteExists(vUrlToExec) Then
         Begin
-         //TODO
-        End;
-       If (vUrlToExec <> '') Then
-        Begin
-         If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vServerMethod) Then
-          Begin
-           vErrorCode := 400;
-           JSONStr    := GetPairJSONInt(-5, 'Invalid Data Context');
-          End;
+         vErrorCode := 400;
+         JSONStr    := GetPairJSONInt(-5, 'Invalid Request');
         End
        Else
         Begin
-         If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vServerMethod) Then
+         If (vUrlToExec <> '') Then
           Begin
-           vErrorCode := 400;
-           JSONStr    := GetPairJSONInt(-5, 'Invalid Data Context');
+           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vServerMethod) Then
+            Begin
+             vErrorCode := 400;
+             JSONStr    := GetPairJSONInt(-5, 'Invalid Data Context');
+            End;
+          End
+         Else
+          Begin
+           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vServerMethod) Then
+            Begin
+             vErrorCode := 400;
+             JSONStr    := GetPairJSONInt(-5, 'Invalid Data Context');
+            End;
           End;
         End;
       End
@@ -4677,8 +4681,9 @@ Var
          vUrlMethod := vTempString[I] + vUrlMethod
         Else
          Begin
-          vBaseUrl := vTempString[I];
-          vEvent   := False;
+          vUrlMethod := UpperCase(vUrlMethod);
+          vBaseUrl   := vTempString[I];
+          vEvent     := False;
          End;
        End
       Else

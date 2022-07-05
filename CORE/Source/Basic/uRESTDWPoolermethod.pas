@@ -98,7 +98,7 @@ Uses {$IFDEF FPC}
                                    ConnectTimeOut          : Integer = 3000;
                                    RESTClientPooler        : TRESTClientPoolerBase = Nil)   : String;
    //GetToken Function
-   Function GetToken              (Pooler, Method_Prefix   : String;
+   Function GetToken              (Pooler                  : String;
                                    Params                  : TRESTDWParams;
                                    Var Error               : Boolean;
                                    Var MessageError        : String;
@@ -353,7 +353,7 @@ implementation
 
 Uses uRESTDWBasicDB, uRESTDWJSONInterface;
 
-Function TRESTDWPoolerMethodClient.ApplyUpdatesTB(Massive                 : TMassiveDatasetBuffer;
+Function TRESTDWPoolerMethodClient.ApplyUpdatesTB(Massive             : TMassiveDatasetBuffer;
                                               Pooler, Method_Prefix   : String;
                                               Params                  : TRESTDWParams;
                                               Var Error               : Boolean;
@@ -380,6 +380,14 @@ Begin
   Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
@@ -396,7 +404,6 @@ Begin
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
  RESTClientPoolerExec.OnWork           := vOnWork;
@@ -572,6 +579,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -584,7 +599,6 @@ Begin
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
  RESTClientPoolerExec.OnWork           := vOnWork;
@@ -783,7 +797,7 @@ Begin
     Try
      Case vAuthOptionParams.AuthorizationOption Of
       rdwAOBearer : Begin
-                     vTempSend := vConnection.GetToken(vPoolerURL,  '',
+                     vTempSend := vConnection.GetToken(vPoolerURL,
                                                        Params,      Error,
                                                        MessageError,vTimeOut,vConnectTimeout,
                                                        Nil,         RESTClientPoolerExec);
@@ -791,7 +805,7 @@ Begin
                      TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                     End;
       rdwAOToken  : Begin
-                     vTempSend := vConnection.GetToken(vPoolerURL,  '',
+                     vTempSend := vConnection.GetToken(vPoolerURL,
                                                        Params,       Error,
                                                        MessageError, vTimeOut,vConnectTimeout,
                                                        Nil,          RESTClientPoolerExec);
@@ -931,6 +945,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -943,7 +965,6 @@ Begin
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
  RESTClientPoolerExec.OnWork           := vOnWork;
@@ -1077,6 +1098,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -1089,7 +1118,6 @@ Begin
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
  RESTClientPoolerExec.OnWork           := vOnWork;
@@ -1256,6 +1284,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -1267,7 +1303,6 @@ Begin
  RESTClientPoolerExec.Port            := Port;
  RESTClientPoolerExec.RequestTimeOut  := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath         := Method_Prefix;
  RESTClientPoolerExec.DataCompression := Compression;
  RESTClientPoolerExec.TypeRequest     := vtyperequest;
  RESTClientPoolerExec.OnWork          := vOnWork;
@@ -1379,6 +1414,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -1388,7 +1431,6 @@ Begin
  RESTClientPoolerExec.ConnectTimeOut     := ConnectTimeOut;
 // RESTClientPoolerExec.HandleRedirects    := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum    := vRedirectMaximum;
- RESTClientPoolerExec.UrlPath            := Method_Prefix;
  RESTClientPoolerExec.OnWork             := vOnWork;
  RESTClientPoolerExec.OnWorkBegin        := vOnWorkBegin;
  RESTClientPoolerExec.OnWorkEnd          := vOnWorkEnd;
@@ -1476,6 +1518,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -1488,7 +1538,6 @@ Begin
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
  RESTClientPoolerExec.OnWork           := vOnWork;
@@ -1668,6 +1717,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -1680,7 +1737,6 @@ Begin
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
@@ -1864,6 +1920,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -1876,7 +1940,6 @@ Begin
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
@@ -2066,6 +2129,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -2078,7 +2149,6 @@ Begin
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
  RESTClientPoolerExec.OnWork           := vOnWork;
@@ -2261,6 +2331,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -2273,7 +2351,6 @@ Begin
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
  RESTClientPoolerExec.OnWork           := vOnWork;
@@ -2478,6 +2555,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -2490,7 +2575,6 @@ Begin
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
  RESTClientPoolerExec.OnWork           := vOnWork;
@@ -2633,6 +2717,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -2645,7 +2737,6 @@ Begin
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
  RESTClientPoolerExec.OnWork           := vOnWork;
@@ -2790,6 +2881,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -2802,7 +2901,6 @@ Begin
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
  RESTClientPoolerExec.OnWork           := vOnWork;
@@ -2971,6 +3069,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -2980,7 +3086,6 @@ Begin
  RESTClientPoolerExec.Port            := Port;
  RESTClientPoolerExec.RequestTimeOut  := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath         := Method_Prefix;
 // RESTClientPoolerExec.HandleRedirects := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum := vRedirectMaximum;
  RESTClientPoolerExec.DataCompression := Compression;
@@ -3052,14 +3157,14 @@ Begin
  End;
 End;
 
-Function TRESTDWPoolerMethodClient.GetToken(Pooler, Method_Prefix   : String;
-                                        Params                  : TRESTDWParams;
-                                        Var Error               : Boolean;
-                                        Var MessageError        : String;
-                                        TimeOut                 : Integer = 3000;
-                                        ConnectTimeOut          : Integer = 3000;
-                                        ConnectionDefs          : TObject           = Nil;
-                                        RESTClientPooler        : TRESTClientPoolerBase = Nil)   : String;
+Function TRESTDWPoolerMethodClient.GetToken(Pooler           : String;
+                                            Params           : TRESTDWParams;
+                                            Var Error        : Boolean;
+                                            Var MessageError : String;
+                                            TimeOut          : Integer = 3000;
+                                            ConnectTimeOut   : Integer = 3000;
+                                            ConnectionDefs   : TObject           = Nil;
+                                            RESTClientPooler : TRESTClientPoolerBase = Nil)   : String;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse            : String;
@@ -3079,9 +3184,9 @@ Begin
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
- JSONParam.ParamName             := 'Method_Prefix';
+ JSONParam.ParamName             := 'DataRoute';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.AsString              := Method_Prefix;
+ JSONParam.AsString              := vDataRoute;
  DWParams.Add(JSONParam);
  JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'RDWParams';
@@ -3171,6 +3276,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -3183,7 +3296,6 @@ Begin
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
  RESTClientPoolerExec.OnWork           := vOnWork;
@@ -3318,6 +3430,14 @@ Begin
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
+   If Trim(DataRoute) = '' Then
+    Begin
+     If Trim(Method_Prefix) <> '' Then
+      Begin
+       RESTClientPoolerExec.DataRoute := Method_Prefix;
+       DataRoute                      := Method_Prefix;
+      End;
+    End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -3330,7 +3450,6 @@ Begin
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
- RESTClientPoolerExec.UrlPath          := Method_Prefix;
  RESTClientPoolerExec.DataCompression  := vCompression;
  RESTClientPoolerExec.TypeRequest      := vtyperequest;
  RESTClientPoolerExec.OnWork           := vOnWork;
@@ -3465,6 +3584,14 @@ Begin
      vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
      vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
      vtyperequest         := RESTClientPoolerExec.TypeRequest;
+     If Trim(DataRoute) = '' Then
+      Begin
+       If Trim(Method_Prefix) <> '' Then
+        Begin
+         RESTClientPoolerExec.DataRoute := Method_Prefix;
+         DataRoute                      := Method_Prefix;
+        End;
+      End;
     End;
    vActualClientPoolerExec               := RESTClientPoolerExec;
    RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -3477,7 +3604,6 @@ Begin
    RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
    RESTClientPoolerExec.RequestTimeOut   := TimeOut;
    RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
-   RESTClientPoolerExec.UrlPath          := Method_Prefix;
    RESTClientPoolerExec.DataCompression  := vCompression;
    RESTClientPoolerExec.TypeRequest      := vtyperequest;
    RESTClientPoolerExec.TypeRequest      := vtyperequest;
@@ -3612,6 +3738,14 @@ Begin
      vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
      vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
      vtyperequest         := RESTClientPoolerExec.TypeRequest;
+     If Trim(DataRoute) = '' Then
+      Begin
+       If Trim(Method_Prefix) <> '' Then
+        Begin
+         RESTClientPoolerExec.DataRoute := Method_Prefix;
+         DataRoute                      := Method_Prefix;
+        End;
+      End;
     End;
    vActualClientPoolerExec := RESTClientPoolerExec;
    RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
@@ -3624,7 +3758,6 @@ Begin
    RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
    RESTClientPoolerExec.RequestTimeOut   := TimeOut;
    RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
-   RESTClientPoolerExec.UrlPath          := Method_Prefix;
    RESTClientPoolerExec.DataCompression  := vCompression;
    RESTClientPoolerExec.TypeRequest      := vtyperequest;
    RESTClientPoolerExec.TypeRequest      := vtyperequest;

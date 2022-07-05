@@ -119,8 +119,7 @@ Const
                               '<h2>Server Status - Online</h2></body></html>';
  cAuthRealm                 = 'WWW-Authenticate: %s realm="%s", %s charset="UTF-8"';
  UrlBase                    = '%s://%s:%d/%s';
- UrlBaseA                   = '%s://%s:%d/%s%s';
- UrlBaseB                   = '%s://%s:%d/%s%s%s';
+ UrlBaseA                   = '%s://%s:%d%s';
  ByteBuffer                 = 1024 * 8; //8kb
  CompressBuffer             = 1024 * 2;
  UnixDate                   = 0;      {Date1900}
