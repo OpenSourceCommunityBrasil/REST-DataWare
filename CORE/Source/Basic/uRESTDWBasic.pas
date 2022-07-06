@@ -1667,6 +1667,7 @@ Var
  vDataBuff,
  vCORSOption,
  vUrlToExec,
+ vOldRequest,
  vAuthenticationString : String;
  vAuthTokenParam       : TRESTDWAuthTokenParam;
  vdwConnectionDefs     : TConnectionDefs;
@@ -2188,6 +2189,7 @@ Begin
     If Not vIsQueryParam Then
      vIsQueryParam := (Pos('?', Lowercase(RawHTTPCommand)) > 0) And
                       (Pos('=', Lowercase(RawHTTPCommand)) > 0);
+    vOldRequest    := Cmd;
     If vIsQueryParam Then
      vUrlToExec    := Url
     Else
@@ -2987,7 +2989,7 @@ Begin
                                                                                                 {$ELSE}Url{$IFEND}
                                                                                                 {$ELSE}Url{$ENDIF},
                                              QueryParams,
-                                             vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
+                                             vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
           {$ELSE}
            vRequestHeader.Add(Params.Text);
            vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
@@ -3024,7 +3026,7 @@ Begin
         Begin
          If (vUrlToExec <> '') Then
           Begin
-           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vServerMethod) Then
+           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
             Begin
              vErrorCode := 400;
              JSONStr    := GetPairJSONInt(-5, 'Invalid Data Context');
@@ -3032,7 +3034,7 @@ Begin
           End
          Else
           Begin
-           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vServerMethod) Then
+           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
             Begin
              vErrorCode := 400;
              JSONStr    := GetPairJSONInt(-5, 'Invalid Data Context');
@@ -3050,6 +3052,8 @@ Begin
         vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
        Try
         vTempServerMethods  := vServerMethod.Create(Nil);
+        TServerMethodDataModule(vTempServerMethods).GetAction(vOldRequest, DWParams);
+        vUrlToExec := vOldRequest;
        Finally
        End;
        If (vTempServerMethods.ClassType = TServerMethodDatamodule)             Or

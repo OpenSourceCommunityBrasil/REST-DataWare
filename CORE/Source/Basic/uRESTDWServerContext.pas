@@ -88,53 +88,6 @@ Type
 End;
 
 Type
- TRESTDWParamMethod = Class;
- PDWParamMethod = ^TRESTDWParamMethod;
- TRESTDWParamMethod = Class(TCollectionItem)
- Private
-  vTypeObject      : TTypeObject;
-  vObjectDirection : TObjectDirection;
-  vObjectValue     : TObjectValue;
-  vAlias,
-  vDefaultValue,
-  vParamName       : String;
-  vEncoded         : Boolean;
- Public
-  Function    GetDisplayName             : String;       Override;
-  Procedure   SetDisplayName(Const Value : String);      Override;
-  Constructor Create        (aCollection : TCollection); Override;
- Published
-  Property TypeObject      : TTypeObject      Read vTypeObject      Write vTypeObject;
-  Property ObjectDirection : TObjectDirection Read vObjectDirection Write vObjectDirection;
-  Property ObjectValue     : TObjectValue     Read vObjectValue     Write vObjectValue;
-  Property Alias           : String           Read vAlias           Write vAlias;
-  Property ParamName       : String           Read GetDisplayName   Write SetDisplayName;
-  Property Encoded         : Boolean          Read vEncoded         Write vEncoded;
-  Property DefaultValue    : String           Read vDefaultValue    Write vDefaultValue;
-End;
-
-Type
- TRESTDWParamsMethods = Class;
- TRESTDWParamsMethods = Class(TOwnedCollection)
- Private
-  fOwner      : TPersistent;
-  Function    GetRec    (Index       : Integer) : TRESTDWParamMethod;  Overload;
-  Procedure   PutRec    (Index       : Integer;
-                         Item        : TRESTDWParamMethod);            Overload;
-  Procedure   ClearList;
-  Function    GetRecName(Index       : String)  : TRESTDWParamMethod;  Overload;
-  Procedure   PutRecName(Index       : String;
-                         Item        : TRESTDWParamMethod);            Overload;
- Public
-  Constructor Create     (AOwner     : TPersistent;
-                          aItemClass : TCollectionItemClass);
-  Destructor  Destroy; Override;
-  Procedure   Delete     (Index      : Integer);                   Overload;
-  Property    Items      [Index      : Integer]   : TRESTDWParamMethod Read GetRec     Write PutRec; Default;
-  Property    ParamByName[Index      : String ]   : TRESTDWParamMethod Read GetRecName Write PutRecName;
-End;
-
-Type
  TRESTDWContextRule = Class;
  PDWContextRule = ^TRESTDWContextRule;
  TRESTDWContextRule = Class(TCollectionItem)
@@ -276,7 +229,7 @@ Type
   Constructor Create        (aCollection : TCollection); Override;
   Destructor  Destroy; Override;
  Published
-  Property    DWParams                   : TRESTDWParamsMethods       Read vDWParams              Write vDWParams;
+  Property    Params                     : TRESTDWParamsMethods       Read vDWParams              Write vDWParams;
   Property    ContentType                : String                     Read vContentType           Write vContentType;
   Property    Name                       : String                     Read GetDisplayName         Write SetDisplayName;
   Property    BaseURL                    : String                     Read vBaseURL               Write SetBaseURL;
@@ -423,7 +376,7 @@ begin
  If Source is TRESTDWContext then
   Begin
    FName       := TRESTDWContext(Source).ContextName;
-   vDWParams   := TRESTDWContext(Source).DWParams;
+   vDWParams   := TRESTDWContext(Source).Params;
    DWReplyRequestData.OnReplyRequest := TRESTDWContext(Source).OnReplyRequest;
   End
  Else
@@ -746,12 +699,12 @@ Begin
    For A := 0 To Items[I].vDWParams.Count -1 Do
     Begin
      vParamLine := Format(TServerEventsConst,
-                          [GetObjectName(Items[I].vDWParams[A].vTypeObject),
-                           GetDirectionName(Items[I].vDWParams[A].vObjectDirection),
-                           GetValueType(Items[I].vDWParams[A].vObjectValue),
-                           Items[I].vDWParams[A].vParamName,
-                           BooleanToString(Items[I].vDWParams[A].vEncoded),
-                           EncodeStrings(Items[I].vDWParams[A].vDefaultValue{$IFDEF FPC}, csUndefined{$ENDIF})]);
+                          [GetObjectName(Items[I].vDWParams[A].TypeObject),
+                           GetDirectionName(Items[I].vDWParams[A].ObjectDirection),
+                           GetValueType(Items[I].vDWParams[A].ObjectValue),
+                           Items[I].vDWParams[A].ParamName,
+                           BooleanToString(Items[I].vDWParams[A].Encoded),
+                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF FPC}, csUndefined{$ENDIF})]);
      If vParamsLines = '' Then
       vParamsLines := vParamLine
      Else
@@ -860,110 +813,6 @@ Procedure TRESTDWServerContext.SetOnBeforeRenderer(Value: TObjectEvent);
 Begin
  vOnBeforeRenderer := Value;
 End;
-
-procedure TRESTDWParamsMethods.ClearList;
-Var
- I : Integer;
-Begin
- For I := Count - 1 Downto 0 Do
-  Delete(I);
- Self.Clear;
-End;
-
-constructor TRESTDWParamsMethods.Create(AOwner     : TPersistent;
-                                    aItemClass : TCollectionItemClass);
-begin
- Inherited Create(AOwner, TRESTDWParamMethod);
- Self.fOwner := AOwner;
-end;
-
-procedure TRESTDWParamsMethods.Delete(Index: Integer);
-begin
- If (Index < Self.Count) And (Index > -1) Then
-  TOwnedCollection(Self).Delete(Index);
-end;
-
-destructor TRESTDWParamsMethods.Destroy;
-begin
- ClearList;
- Inherited;
-end;
-
-Function TRESTDWParamsMethods.GetRec(Index: Integer): TRESTDWParamMethod;
-Begin
- Result := TRESTDWParamMethod(inherited GetItem(Index));
-End;
-
-function TRESTDWParamsMethods.GetRecName(Index: String): TRESTDWParamMethod;
-Var
- I : Integer;
-Begin
- Result := Nil;
- If Lowercase(Index) <> '' Then
-  Begin
-   For I := 0 To Self.Count - 1 Do
-    Begin
-     If (Lowercase(Index) = Lowercase(Self.Items[I].vParamName)) Or
-        (Lowercase(Index) = Lowercase(Self.Items[I].vAlias))     Then
-      Begin
-       Result := TRESTDWParamMethod(Self.Items[I]);
-       Break;
-      End;
-    End;
-  End;
-End;
-
-procedure TRESTDWParamsMethods.PutRec(Index: Integer; Item: TRESTDWParamMethod);
-begin
- If (Index < Self.Count) And (Index > -1) Then
-  SetItem(Index, Item);
-end;
-
-procedure TRESTDWParamsMethods.PutRecName(Index: String; Item: TRESTDWParamMethod);
-Var
- I : Integer;
-Begin
- If Lowercase(Index) <> '' Then
-  Begin
-   For I := 0 To Self.Count - 1 Do
-    Begin
-     If (Uppercase(Index) = Uppercase(Self.Items[I].vParamName)) Or
-        (Lowercase(Index) = Lowercase(Self.Items[I].vAlias))     Then
-      Begin
-       Self.Items[I] := Item;
-       Break;
-      End;
-    End;
-  End;
-End;
-
-Constructor TRESTDWParamMethod.Create(aCollection: TCollection);
-Begin
- Inherited;
- vTypeObject      := toParam;
- vObjectDirection := odINOUT;
- vObjectValue     := ovString;
- vParamName       :=  'dwparam' + IntToStr(aCollection.Count);
- vEncoded         := True;
- vDefaultValue    := '';
- vAlias           := '';
-End;
-
-function TRESTDWParamMethod.GetDisplayName: String;
-begin
- Result := vParamName;
-end;
-
-procedure TRESTDWParamMethod.SetDisplayName(const Value: String);
-begin
- If Trim(Value) = '' Then
-  Raise Exception.Create(cInvalidParamName)
- Else
-  Begin
-   vParamName := Trim(Value);
-   Inherited;
-  End;
-end;
 
 { TRESTDWContextRules }
 

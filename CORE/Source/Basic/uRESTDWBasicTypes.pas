@@ -350,7 +350,8 @@ Uses
     Function    RouteExists(Var Value : String) : Boolean;
     Procedure   Delete(Index : Integer); Overload;
     Function    Add   (Item  : TRESTDWDataRoute) : Integer; Overload;
-    Function    GetServerMethodClass(Var DataRoute         : String;
+    Function    GetServerMethodClass(Var DataRoute,
+                                     FullRequest           : String;
                                      Var ServerMethodClass : TComponentClass) : Boolean;
     Property    Items [Index : Integer] : TRESTDWDataRoute Read GetRec Write PutRec; Default;
   End;
@@ -2269,7 +2270,8 @@ Begin
   End;
 End;
 
-Function TRESTDWDataRouteList.GetServerMethodClass(Var DataRoute         : String;
+Function TRESTDWDataRouteList.GetServerMethodClass(Var DataRoute,
+                                                   FullRequest           : String;
                                                    Var ServerMethodClass : TComponentClass) : Boolean;
 Var
  I           : Integer;
@@ -2289,7 +2291,8 @@ Begin
    If (Result) Then
     Begin
      ServerMethodClass := TRESTDWDataRoute(TList(Self).Items[I]^).ServerMethodClass;
-     DataRoute         := Copy(vTempValue, Length(vTempRoute), Length(DataRoute) - (Length(vTempRoute) -1));
+     DataRoute         := Copy(vTempValue,  Length(vTempRoute), Length(DataRoute) - (Length(vTempRoute) -1));
+     FullRequest       := Copy(FullRequest, Length(vTempRoute), Length(FullRequest) - (Length(vTempRoute) -1));
      Break;
     End;
   End;

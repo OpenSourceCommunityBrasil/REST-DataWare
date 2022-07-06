@@ -252,6 +252,53 @@ Type
 End;
 
 Type
+ TRESTDWParamMethod = Class;
+ PDWParamMethod = ^TRESTDWParamMethod;
+ TRESTDWParamMethod = Class(TCollectionItem)
+ Private
+  vTypeObject      : TTypeObject;
+  vObjectDirection : TObjectDirection;
+  vObjectValue     : TObjectValue;
+  vAlias,
+  vDefaultValue,
+  vParamName       : String;
+  vEncoded         : Boolean;
+ Public
+  Function    GetDisplayName             : String;       Override;
+  Procedure   SetDisplayName(Const Value : String);      Override;
+  Constructor Create        (aCollection : TCollection); Override;
+ Published
+  Property TypeObject      : TTypeObject      Read vTypeObject      Write vTypeObject;
+  Property ObjectDirection : TObjectDirection Read vObjectDirection Write vObjectDirection;
+  Property ObjectValue     : TObjectValue     Read vObjectValue     Write vObjectValue;
+  Property Alias           : String           Read vAlias           Write vAlias;
+  Property ParamName       : String           Read GetDisplayName   Write SetDisplayName;
+  Property Encoded         : Boolean          Read vEncoded         Write vEncoded;
+  Property DefaultValue    : String           Read vDefaultValue    Write vDefaultValue;
+End;
+
+Type
+ TRESTDWParamsMethods = Class;
+ TRESTDWParamsMethods = Class(TOwnedCollection)
+ Private
+  fOwner      : TPersistent;
+  Function    GetRec    (Index       : Integer) : TRESTDWParamMethod;  Overload;
+  Procedure   PutRec    (Index       : Integer;
+                         Item        : TRESTDWParamMethod);            Overload;
+  Function    GetRecName(Index       : String)  : TRESTDWParamMethod;  Overload;
+  Procedure   PutRecName(Index       : String;
+                         Item        : TRESTDWParamMethod);            Overload;
+ Public
+  Procedure   ClearList;
+  Constructor Create     (AOwner     : TPersistent;
+                          aItemClass : TCollectionItemClass);
+  Destructor  Destroy; Override;
+  Procedure   Delete     (Index      : Integer);                   Overload;
+  Property    Items      [Index      : Integer]   : TRESTDWParamMethod Read GetRec     Write PutRec; Default;
+  Property    ParamByName[Index      : String ]   : TRESTDWParamMethod Read GetRecName Write PutRecName;
+End;
+
+Type
  PJSONParam = ^TJSONParam;
  TJSONParam = Class(TObject)
  Private
@@ -332,7 +379,8 @@ Type
   Procedure   FromJSON    (json        : String);
   Function    ToJSON  : String;
   Procedure   SaveToFile  (FileName       : String);
-  Procedure   CopyFrom    (JSONParam   : TJSONParam);
+  Procedure   CopyFrom    (JSONParam   : TJSONParam);Overload;
+  Procedure   CopyFrom    (JSONParam   : TRESTDWParamMethod);Overload;
   Procedure   SetVariantValue(Value    : Variant);
   Procedure   SetDataValue   (Value    : Variant;
                               DataType : TObjectValue);
@@ -639,6 +687,110 @@ Begin
  Result := OriginalString;
  For I := 0 To Length(TSpecialChars) - 1 Do
   Result := StringReplace(Result, TSpecialChars[i], NewChar(TSpecialChars[i]), [rfReplaceAll]);
+End;
+
+Constructor TRESTDWParamMethod.Create(aCollection: TCollection);
+Begin
+ Inherited;
+ vTypeObject      := toParam;
+ vObjectDirection := odINOUT;
+ vObjectValue     := ovString;
+ vParamName       :=  'dwparam' + IntToStr(aCollection.Count);
+ vEncoded         := True;
+ vDefaultValue    := '';
+ vAlias           := '';
+End;
+
+function TRESTDWParamMethod.GetDisplayName: String;
+begin
+ Result := vParamName;
+end;
+
+procedure TRESTDWParamMethod.SetDisplayName(const Value: String);
+begin
+ If Trim(Value) = '' Then
+  Raise Exception.Create(cInvalidParamName)
+ Else
+  Begin
+   vParamName := Trim(Value);
+   Inherited;
+  End;
+end;
+
+procedure TRESTDWParamsMethods.ClearList;
+Var
+ I : Integer;
+Begin
+ For I := Count - 1 Downto 0 Do
+  Delete(I);
+ Self.Clear;
+End;
+
+constructor TRESTDWParamsMethods.Create(AOwner     : TPersistent;
+                                    aItemClass : TCollectionItemClass);
+begin
+ Inherited Create(AOwner, TRESTDWParamMethod);
+ Self.fOwner := AOwner;
+end;
+
+procedure TRESTDWParamsMethods.Delete(Index: Integer);
+begin
+ If (Index < Self.Count) And (Index > -1) Then
+  TOwnedCollection(Self).Delete(Index);
+end;
+
+destructor TRESTDWParamsMethods.Destroy;
+begin
+ ClearList;
+ Inherited;
+end;
+
+Function TRESTDWParamsMethods.GetRec(Index: Integer): TRESTDWParamMethod;
+Begin
+ Result := TRESTDWParamMethod(inherited GetItem(Index));
+End;
+
+function TRESTDWParamsMethods.GetRecName(Index: String): TRESTDWParamMethod;
+Var
+ I : Integer;
+Begin
+ Result := Nil;
+ If Lowercase(Index) <> '' Then
+  Begin
+   For I := 0 To Self.Count - 1 Do
+    Begin
+     If (Lowercase(Index) = Lowercase(Self.Items[I].vParamName)) Or
+        (Lowercase(Index) = Lowercase(Self.Items[I].vAlias))     Then
+      Begin
+       Result := TRESTDWParamMethod(Self.Items[I]);
+       Break;
+      End;
+    End;
+  End;
+End;
+
+procedure TRESTDWParamsMethods.PutRec(Index: Integer; Item: TRESTDWParamMethod);
+begin
+ If (Index < Self.Count) And (Index > -1) Then
+  SetItem(Index, Item);
+end;
+
+procedure TRESTDWParamsMethods.PutRecName(Index: String; Item: TRESTDWParamMethod);
+Var
+ I : Integer;
+Begin
+ If Lowercase(Index) <> '' Then
+  Begin
+   For I := 0 To Self.Count - 1 Do
+    Begin
+     If (Uppercase(Index) = Uppercase(Self.Items[I].vParamName)) Or
+        (Lowercase(Index) = Lowercase(Self.Items[I].vAlias))     Then
+      Begin
+       Self.Items[I] := Item;
+       Break;
+      End;
+    End;
+  End;
 End;
 
 Constructor TRESTDWHeaders.Create;
@@ -4691,6 +4843,21 @@ Begin
  End;
 End;
 
+Procedure TJSONParam.CopyFrom(JSONParam : TRESTDWParamMethod);
+Begin
+ If TestNilParam Then
+  Exit;
+ Try
+  Self.vTypeObject      := JSONParam.vTypeObject;
+  Self.vObjectDirection := JSONParam.vObjectDirection;
+  Self.vEncoded         := JSONParam.vEncoded;
+  Self.vObjectValue     := JSONParam.vObjectValue;
+  Self.vAlias           := JSONParam.vAlias;
+  Self.vParamName       := JSONParam.vParamName;
+ Finally
+ End;
+End;
+
 Procedure TJSONParam.CopyFrom(JSONParam : TJSONParam);
 Var
  vValue  : String;
@@ -4704,6 +4871,7 @@ Begin
   Self.vEncoded         := JSONParam.vEncoded;
   Self.vObjectValue     := JSONParam.vObjectValue;
   Self.vParamName       := JSONParam.vParamName;
+  Self.vAlias           := JSONParam.vAlias;
   If JSONParam.ObjectValue in [ovBytes, ovVarBytes, ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob] Then
    Begin
     vStream := TMemoryStream.Create;

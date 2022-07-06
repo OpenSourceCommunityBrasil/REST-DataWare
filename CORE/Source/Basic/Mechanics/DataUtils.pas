@@ -430,9 +430,11 @@ End;
 
 
 
-Function GettokenValue(Value : String) : String;
-Function GetTokenType (Value : String) : TRESTDWTokenType;
-Function GetMIMEType  (Value : String) : String;
+Function GettokenValue  (Value      : String) : String;
+Function GetTokenType   (Value      : String) : TRESTDWTokenType;
+Function GetMIMEType    (Value      : String) : String;
+Function CountExpression(Value      : String;
+                         Expression : Char)   : Integer;
 
 Var
  MimeTable : TMimeTable;

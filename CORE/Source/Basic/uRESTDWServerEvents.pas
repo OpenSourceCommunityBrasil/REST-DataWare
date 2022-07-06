@@ -66,55 +66,6 @@ Type
 End;
 
 Type
- TDWParamMethod = Class;
- TDWParamMethod = Class(TCollectionItem)
- Private
-  vTypeObject      : TTypeObject;
-  vObjectDirection : TObjectDirection;
-  vObjectValue     : TObjectValue;
-  vAlias,
-  vDefaultValue,
-  vParamName       : String;
-  vEncoded         : Boolean;
- Public
-  Function    GetDisplayName             : String;       Override;
-  Procedure   SetDisplayName(Const Value : String);      Override;
-  Constructor Create        (aCollection : TCollection); Override;
-  Destructor  Destroy;                                   Override;
- Published
-  Property TypeObject      : TTypeObject      Read vTypeObject      Write vTypeObject;
-  Property ObjectDirection : TObjectDirection Read vObjectDirection Write vObjectDirection;
-  Property ObjectValue     : TObjectValue     Read vObjectValue     Write vObjectValue;
-  Property ParamName       : String           Read GetDisplayName   Write SetDisplayName;
-  Property Alias           : String           Read vAlias           Write vAlias;
-  Property Encoded         : Boolean          Read vEncoded         Write vEncoded;
-  Property DefaultValue    : String           Read vDefaultValue    Write vDefaultValue;
-End;
-
-Type
- TRESTDWParamsMethods = Class;
- TRESTDWParamsMethods = Class(TOwnedCollection)
- Private
-  fOwner      : TPersistent;
-  vAlias      : String;
-  Function    GetRec    (Index       : Integer) : TDWParamMethod;  Overload;
-  Procedure   PutRec    (Index       : Integer;
-                         Item        : TDWParamMethod);            Overload;
-  Procedure   ClearList;
-  Function    GetRecName(Index       : String)  : TDWParamMethod;  Overload;
-  Procedure   PutRecName(Index       : String;
-                         Item        : TDWParamMethod);            Overload;
- Public
-  Constructor Create     (AOwner     : TPersistent;
-                          aItemClass : TCollectionItemClass);
-  Destructor  Destroy; Override;
-  Procedure   Delete     (Index      : Integer);                   Overload;
-  Function    Add        (Item       : TDWParamMethod) : Integer;  Overload;
-  Property    Items      [Index      : Integer]   : TDWParamMethod Read GetRec     Write PutRec; Default;
-  Property    ParamByName[Index      : String ]   : TDWParamMethod Read GetRecName Write PutRecName;
-End;
-
-Type
  TRESTDWEvent = Class;
  TRESTDWEvent = Class(TCollectionItem)
  Protected
@@ -272,7 +223,7 @@ End;
 constructor TRESTDWEvent.Create(aCollection: TCollection);
 begin
  Inherited;
- vDWParams             := TRESTDWParamsMethods.Create(aCollection, TDWParamMethod);
+ vDWParams             := TRESTDWParamsMethods.Create(aCollection, TRESTDWParamMethod);
  vJsonMode             := jmDataware;
  DWReplyEventData      := TDWReplyEventData.Create(Nil);
  vOwnerCollection      := aCollection;
@@ -451,7 +402,7 @@ Var
  bJsonArrayC    : TRESTDWJSONInterfaceArray;
  I, X, Y        : Integer;
  vDWEvent       : TRESTDWEvent;
- vDWParamMethod : TDWParamMethod;
+ vDWParamMethod : TRESTDWParamMethod;
  vEventName,
  vJsonMode,
  vparams,
@@ -492,7 +443,7 @@ Begin
             bJsonOBJc                      := TRESTDWJSONInterfaceObject(bJsonArrayC.GetObject(Y));
             vparamname                     := bJsonOBJc.Pairs[3].Value; // .get('paramname').toString;
             If vDWEvent.vDWParams.ParamByName[vparamname] = Nil Then
-             vDWParamMethod                := TDWParamMethod(vDWEvent.vDWParams.Add)
+             vDWParamMethod                := TRESTDWParamMethod(vDWEvent.vDWParams.Add)
             Else
              vDWParamMethod                := vDWEvent.vDWParams.ParamByName[vparamname];
             vDWParamMethod.TypeObject      := GetObjectName(bJsonOBJc.Pairs[0].Value); // GetObjectName(bJsonOBJc.get('typeobject').toString);
@@ -594,12 +545,12 @@ Begin
    For A := 0 To Items[I].vDWParams.Count -1 Do
     Begin
      vParamLine := Format(TServerEventsConst,
-                          [GetObjectName(Items[I].vDWParams[A].vTypeObject),
-                           GetDirectionName(Items[I].vDWParams[A].vObjectDirection),
-                           GetValueType(Items[I].vDWParams[A].vObjectValue),
-                           Items[I].vDWParams[A].vParamName,
-                           BooleanToString(Items[I].vDWParams[A].vEncoded),
-                           EncodeStrings(Items[I].vDWParams[A].vDefaultValue{$IFDEF FPC}, csUndefined{$ENDIF})]);
+                          [GetObjectName(Items[I].vDWParams[A].TypeObject),
+                           GetDirectionName(Items[I].vDWParams[A].ObjectDirection),
+                           GetValueType(Items[I].vDWParams[A].ObjectValue),
+                           Items[I].vDWParams[A].ParamName,
+                           BooleanToString(Items[I].vDWParams[A].Encoded),
+                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF FPC}, csUndefined{$ENDIF})]);
      If vParamsLines = '' Then
       vParamsLines := vParamLine
      Else
@@ -688,127 +639,6 @@ Begin
  vEventList.Free;
  Inherited;
 End;
-
-procedure TRESTDWParamsMethods.ClearList;
-Var
- I : Integer;
-Begin
- For I := Count - 1 Downto 0 Do
-  Begin
-   Delete(I);
-  End;
- Self.Clear;
-End;
-
-constructor TRESTDWParamsMethods.Create(AOwner     : TPersistent;
-                                    aItemClass : TCollectionItemClass);
-begin
- Inherited Create(AOwner, TDWParamMethod);
- Self.fOwner := AOwner;
- vAlias      := '';
-end;
-
-Function TRESTDWParamsMethods.Add(Item : TDWParamMethod): Integer;
-Var
- vItem : ^TDWParamMethod;
-Begin
- New(vItem);
- vItem^ := Item;
- Result := TList(Self).Add(vItem);
-End;
-
-procedure TRESTDWParamsMethods.Delete(Index: Integer);
-begin
- If (Index < Self.Count) And (Index > -1) Then
-  TOwnedCollection(Self).Delete(Index);
-end;
-
-destructor TRESTDWParamsMethods.Destroy;
-begin
- ClearList;
- Inherited;
-end;
-
-Function TRESTDWParamsMethods.GetRec(Index: Integer): TDWParamMethod;
-Begin
- Result := TDWParamMethod(inherited GetItem(Index));
-End;
-
-function TRESTDWParamsMethods.GetRecName(Index: String): TDWParamMethod;
-Var
- I : Integer;
-Begin
- Result := Nil;
- If Uppercase(Index) <> '' Then
-  Begin
-   For I := 0 To Self.Count - 1 Do
-    Begin
-     If (Uppercase(Index) = Uppercase(Self.Items[I].vParamName)) Or
-        (Uppercase(Index) = Uppercase(Self.Items[I].vAlias))     Then
-      Begin
-       Result := TDWParamMethod(Self.Items[I]);
-       Break;
-      End;
-    End;
-  End;
-End;
-
-procedure TRESTDWParamsMethods.PutRec(Index: Integer; Item: TDWParamMethod);
-begin
- If (Index < Self.Count) And (Index > -1) Then
-  SetItem(Index, Item);
-end;
-
-procedure TRESTDWParamsMethods.PutRecName(Index: String; Item: TDWParamMethod);
-Var
- I : Integer;
-Begin
- If Uppercase(Index) <> '' Then
-  Begin
-   For I := 0 To Self.Count - 1 Do
-    Begin
-     If (Uppercase(Index) = Uppercase(Self.Items[I].vParamName)) Or
-        (Uppercase(Index) = Uppercase(Self.Items[I].vAlias))     Then
-      Begin
-       Self.Items[I] := Item;
-       Break;
-      End;
-    End;
-  End;
-End;
-
-Constructor TDWParamMethod.Create(aCollection: TCollection);
-Begin
- Inherited;
- vTypeObject      := toParam;
- vObjectDirection := odINOUT;
- vObjectValue     := ovString;
- vParamName       := 'dwparam' + IntToStr(aCollection.Count);
- vEncoded         := True;
- vDefaultValue    := '';
- vAlias           := '';
-End;
-
-Destructor TDWParamMethod.Destroy;
-Begin
- Inherited;
-End;
-
-function TDWParamMethod.GetDisplayName: String;
-begin
- Result := vParamName;
-end;
-
-procedure TDWParamMethod.SetDisplayName(const Value: String);
-begin
- If Trim(Value) = '' Then
-  Raise Exception.Create(cInvalidParamName)
- Else
-  Begin
-   vParamName := Trim(Value);
-   Inherited;
-  End;
-end;
 
 { TRESTDWClientEvents }
 
