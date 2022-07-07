@@ -35,7 +35,6 @@ Uses
   System.NetEncoding,
   {$ELSE}
   SysUtils,
-  NetEncoding,
   {$IFEND}
  {$ENDIF}
  uRESTDWBasicTypes;
@@ -61,7 +60,7 @@ Uses uRESTDWTools;
    2 : (a : array[0..3] of Byte);
   End;
 
-Function DecodeBase64(Const AInput : String) : TBytes;
+Function DecodeBase64(Const AInput : String) : TRESTDWBytes;
 Const
  DECODE_TABLE: array[#0..#127] of Integer = (
     Byte('='), 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
@@ -113,7 +112,7 @@ begin
   SetLength(Result, LLen);
 end;
 
-function EncodeBase64(const AInput: TBytes): string;
+function EncodeBase64(const AInput: TRESTDWBytes): string;
 const
   ENCODE_TABLE: array[0..63] of Char =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
@@ -174,7 +173,7 @@ begin
   {$IF CompilerVersion >= 28}
   Result := TRESTDWBytes(TNetEncoding.Base64.Decode(TBytes(ASource)));
   {$ELSE}
-  Result := DecodeBase64(ASource.AsString);
+  Result := DecodeBase64(BytesToString(ASource));
   {$IFEND}
 end;
 
@@ -183,7 +182,7 @@ begin
   {$IF CompilerVersion >= 28}
   Result := TRESTDWBytes(TNetEncoding.Base64.Encode(TBytes(ASource)));
   {$ELSE}
-  Result := EncodeBase64(ASource.AsBytes);
+  Result := StringToBytes(EncodeBase64(ASource));
   {$IFEND}
 end;
 
@@ -207,7 +206,8 @@ begin
   LBase64Str := StringReplace(LBase64Str, #13#10, '', [rfReplaceAll]);
   LBase64Str := StringReplace(LBase64Str, #13, '', [rfReplaceAll]);
   LBase64Str := StringReplace(LBase64Str, #10, '', [rfReplaceAll]);
-  LBase64Str := LBase64Str.TrimRight(['=']);
+//  LBase64Str := LBase64Str.TrimRight(['=']);
+  LBase64Str := StringReplace(LBase64Str, ' ', '=', [rfReplaceAll]);
 
   LBase64Str := StringReplace(LBase64Str, '+', '-', [rfReplaceAll]);
   LBase64Str := StringReplace(LBase64Str, '/', '_', [rfReplaceAll]);

@@ -47,8 +47,8 @@ Uses
    {$IFDEF RESTDWWINDOWS}
     , Windows
    {$ENDIF}
-   , uRESTDWConsts
   {$IFEND}
+   , uRESTDWConsts, uRESTDWEncodeClass
  {$ENDIF}
  ,DataUtils, IdContext, IdHeaderList,        IdTCPConnection,  IdHTTPServer, IdCustomHTTPServer, IdSSLOpenSSL,  IdSSL,
  IdAuthentication,      IdTCPClient,         IdHTTPHeaderInfo, IdComponent,  IdBaseComponent,
@@ -953,7 +953,7 @@ Function   TRESTDWIdClientREST.Post(AUrl              : String;
                                     IgnoreEvents      : Boolean        = False;
                                     RawHeaders        : Boolean        = False) : Integer;
 Var
- temp         : TMemoryStream;
+ temp         : TStream;
  vTempHeaders : TStringList;
  atempResponse,
  tempResponse : TStringStream;
@@ -4400,10 +4400,30 @@ Begin
  HttpRequest.DefaultCustomHeader.NameValueSeparator := cNameValueSeparator;
  If BinaryRequest Then
   If HttpRequest.DefaultCustomHeader.IndexOfName('binaryrequest') = -1 Then
-   HttpRequest.DefaultCustomHeader.AddPair('binaryrequest', 'true');
+   Begin
+    {$IFNDEF FPC}
+     {$if CompilerVersion > 30}
+      HttpRequest.DefaultCustomHeader.AddPair('binaryrequest', 'true');
+     {$ELSE}
+      HttpRequest.DefaultCustomHeader.Add('binaryrequest=true');
+     {$IFEND}
+    {$ELSE}
+    HttpRequest.DefaultCustomHeader.AddPair('binaryrequest', 'true');
+    {$ENDIF}
+   End;
  If aBinaryCompatibleMode Then
   If HttpRequest.DefaultCustomHeader.IndexOfName('BinaryCompatibleMode') = -1 Then
-   HttpRequest.DefaultCustomHeader.AddPair('BinaryCompatibleMode', 'true');
+   Begin
+    {$IFNDEF FPC}
+     {$if CompilerVersion > 30}
+      HttpRequest.DefaultCustomHeader.AddPair('BinaryCompatibleMode', 'true');
+     {$ELSE}
+      HttpRequest.DefaultCustomHeader.Add('BinaryCompatibleMode=true');
+     {$IFEND}
+    {$ELSE}
+     HttpRequest.DefaultCustomHeader.AddPair('BinaryCompatibleMode', 'true');
+    {$ENDIF}
+   End;
  LastErrorMessage := '';
  LastErrorCode    := -1;
  Try

@@ -27,7 +27,7 @@ Interface
 
 Uses
   uRESTDWJSONInterface, uRESTDWCharset, uRESTDWConsts,
-  uRESTDWTools, Variants, uRESTDWBasicTypes, DataUtils,
+  uRESTDWTools, Variants, uRESTDWBasicTypes, uRESTDWEncodeClass, DataUtils,
   {$IFDEF FPC}
    SysUtils, Classes, DB,
    LConvEncoding, math
@@ -37,7 +37,6 @@ Uses
     System.Rtti, Data.DB
    {$ELSE}
     SysUtils, Classes, DB
-    DbClient
   {$IFEND}
   {$ENDIF}, uRESTDWResponseTranslator;
 

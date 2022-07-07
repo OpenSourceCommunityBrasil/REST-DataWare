@@ -28,15 +28,15 @@ interface
 Uses
  {$IFDEF FPC}
  SysUtils,      Classes, Db, Variants, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
- uRESTDWConsts, DataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
- uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWAbout
+ DataUtils,     uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
+ uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWAbout
  {$ELSE}
   {$IF CompilerVersion <= 22}
    SysUtils, Classes, Db, Variants, EncdDecd, SyncObjs, DataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWAbout
+   uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWAbout
   {$ELSE}
    System.SysUtils, System.Classes, Data.Db, Variants, system.SyncObjs, DataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWAbout,
+   uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWAbout,
    {$IF Defined(RESTDWFMX)}{$IFNDEF RESTDWAndroidService}FMX.Forms,{$ENDIF}
    {$ELSE}
     {$IF CompilerVersion <= 22}Forms,
@@ -47,8 +47,8 @@ Uses
    {$IFDEF RESTDWWINDOWS}
     , Windows
    {$ENDIF}
-   , uRESTDWConsts
   {$IFEND}
+   , uRESTDWConsts
  {$ENDIF}, uRESTDWMessageCoderMIME;
 
  Type
@@ -2090,10 +2090,10 @@ Begin
       Else
        sFile := FRootPath + Url;
      {$ELSE}
-      If DefaultBaseContext <> '' Then
+      If aDefaultUrl <> '' Then
        Begin
         sFile := Url;
-        vTempText := IncludeTrailingPathDelimiter(DefaultBaseContext);
+        vTempText := IncludeTrailingPathDelimiter(aDefaultUrl);
         {$IFDEF MSWINDOWS}
          vTempText := StringReplace(vTempText, '\', '/', [rfReplaceAll]);
          vTempText := StringReplace(vTempText, '//', '/', [rfReplaceAll]);
@@ -3775,7 +3775,15 @@ Begin
                   End;
                  Try
                   DWParams.SaveToStream(ms, tdwpxt_OUT);
-                  ZCompressStream(ms, ResultStream, cCompressionLevel);
+                 {$IFNDEF FPC}
+                  {$IF CompilerVersion > 21}
+                   ZCompressStream(ms, ResultStream, cCompressionLevel);
+                  {$ELSE}
+                   ZCompressStreamD(ms, ResultStream);
+                  {$IFEND}
+                 {$ELSE}
+                   ZCompressStream(ms, ResultStream, cCompressionLevel);
+                 {$ENDIF}
                  Finally
                   FreeAndNil(ms);
                  End;

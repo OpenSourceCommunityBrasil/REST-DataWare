@@ -33,7 +33,8 @@ Uses
  {$IF Defined(RESTDWFMX)}
   , System.NetEncoding
  {$IFEND}
- {$ENDIF};
+ {$ENDIF},
+ uRESTDWEncodeClass;
 
  Const
   B64Table      = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
@@ -148,13 +149,6 @@ Uses
                                    Const ASet           : TRESTDWBytes)             : Boolean;{$IFDEF USE_INLINE}Inline;{$ENDIF}
  Function  ToBytes                (Const AValue         : String)                   : TRESTDWBytes; Overload;
  Function  ToBytes                (Const AValue         : Char)                     : TRESTDWBytes; Overload;
- Function  ToBytes                (Const AValue         : Int8)                     : TRESTDWBytes; Overload;
- Function  ToBytes                (Const AValue         : UInt8)                    : TRESTDWBytes; Overload;
- Function  ToBytes                (Const AValue         : Int16)                    : TRESTDWBytes; Overload;
- Function  ToBytes                (Const AValue         : UInt16)                   : TRESTDWBytes; Overload;
- Function  ToBytes                (Const AValue         : Int32)                    : TRESTDWBytes; Overload;
- Function  ToBytes                (Const AValue         : UInt32)                   : TRESTDWBytes; Overload;
- Function  ToBytes                (Const AValue         : Int64)                    : TRESTDWBytes; Overload;
  Function  ToBytes                (Const AValue         : String;
                                    Const ALength        : Integer;
                                    Const AIndex         : Integer = 1)              : TRESTDWBytes; Overload;
@@ -262,7 +256,7 @@ Uses
                                    AMediaType           : String)                   : Boolean;
  Function  PosRDW                 (Const ASubStr,
                                    AStr                 : String;
-                                   AStartPos            : UInt32): UInt32;
+                                   AStartPos            : DWInt32): DWInt32;
  Function  RDWStrToInt            (Const S              : String;
                                    ADefault             : Integer = 0) : Integer;{$IFDEF USE_INLINE}inline;{$ENDIF}
  Procedure RDWDelete              (Var s                : String;
@@ -313,18 +307,12 @@ Uses
                                    AEntry               : String;
                                    Var VOld             : String;
                                    AQuoteType           : TRESTDWHeaderQuotingType) : String; overload;
- Function  BytesToUInt16          (Const AValue         : TRESTDWBytes;
-                                   Const AIndex         : Integer = 0) : UInt16;
  Function  BytesToInt16           (Const AValue         : TRESTDWBytes;
-                                   Const AIndex         : Integer = 0) : Int16;
+                                   Const AIndex         : Integer = 0) : DWInt32;
  Function  BytesToInt32           (Const AValue         : TRESTDWBytes;
-                                   Const AIndex         : Integer = 0) : Int32;
+                                   Const AIndex         : Integer = 0) : DWInt32;
  Function  BytesToInt64           (Const AValue         : TRESTDWBytes;
-                                   Const AIndex         : Integer = 0) : Int64;
- Function  BytesToUInt64          (Const AValue         : TRESTDWBytes;
-                                   Const AIndex         : Integer = 0) : TRESTDWUInt64;
- Function  BytesToUInt32          (Const AValue         : TRESTDWBytes;
-                                   Const AIndex         : Integer = 0) : UInt32;
+                                   Const AIndex         : Integer = 0) : DWInt64;
  Procedure DeleteInvalidChar      (Var   Value          : String);
  Function  BooleanToString        (aValue               : Boolean) : String;
  Function  StringToBoolean        (aValue               : String)  : Boolean;
@@ -348,7 +336,7 @@ Uses
 
 Implementation
 
-Uses uRESTDWConsts, uRESTDWBase64, uRESTDWException{$IFDEF RESTDWWINDOWS}, Windows{$ENDIF};
+Uses uRESTDWConsts, uRESTDWBase64, uRESTDWException{$IFNDEF HAS_FMX}, Windows{$ENDIF};
 
 Function restdwMin(Const AValueOne,
                    AValueTwo        : Int64) : Int64;
@@ -396,18 +384,25 @@ Begin
  Result               := Result2JSON(WSResult); //EncodeStrings(TServerUtils.Result2JSON(WSResult){$IFDEF FPC}, csUndefined{$ENDIF});
 End;
 
-Function BytesToUInt16(Const AValue : TRESTDWBytes;
-                       Const AIndex : Integer = 0) : UInt16;{$IFDEF USE_INLINE}Inline;{$ENDIF}
+Function BytesToInt16(Const AValue : TRESTDWBytes;
+                      Const AIndex : Integer = 0): DWInt32;{$IFDEF USE_INLINE}inline;{$ENDIF}
 Begin
- Assert(Length(AValue) >= (AIndex+SizeOf(UInt16)));
- Result := PDWUInt16(@AValue[AIndex])^;
+ Assert(Length(AValue) >= (AIndex+SizeOf(DWInt32)));
+ Result := PDWInt32(@AValue[AIndex])^;
 End;
 
-Function BytesToInt16(Const AValue : TRESTDWBytes;
-                      Const AIndex : Integer = 0): Int16;{$IFDEF USE_INLINE}inline;{$ENDIF}
+Function BytesToInt32(Const AValue : TRESTDWBytes;
+                      Const AIndex : Integer = 0) : DWInt32;{$IFDEF USE_INLINE}inline;{$ENDIF}
 Begin
- Assert(Length(AValue) >= (AIndex+SizeOf(Int16)));
- Result := PDWInt16(@AValue[AIndex])^;
+ Assert(Length(AValue) >= (AIndex+SizeOf(DWInt32)));
+ Result := PDWInt32(@AValue[AIndex])^;
+End;
+
+Function BytesToInt64(Const AValue : TRESTDWBytes;
+                      Const AIndex : Integer = 0) : DWInt64;{$IFDEF USE_INLINE}inline;{$ENDIF}
+Begin
+ Assert(Length(AValue) >= (AIndex+SizeOf(DWInt64)));
+ Result := PDWInt64(@AValue[AIndex])^;
 End;
 
 Function RemoveHeaderEntry(Const AHeader,
@@ -729,11 +724,11 @@ End;
 
 Function PosRDW(Const ASubStr,
                 AStr          : String;
-                AStartPos     : UInt32) : UInt32;
+                AStartPos     : DWInt32) : DWInt32;
  Function FindStr(ALStartPos,
-                  EndPos      : UInt32;
+                  EndPos      : DWUInt32;
                   StartChar   : Char;
-                  Const ALStr : String) : UInt32;
+                  Const ALStr : String) : DWUInt32;
   Begin
    For Result := ALStartPos To EndPos Do
     Begin
@@ -742,7 +737,7 @@ Function PosRDW(Const ASubStr,
     End;
    Result := 0;
   End;
- Function FindNextStr(ALStartPos, EndPos: UInt32; const ALStr, ALSubStr: string): UInt32;
+ Function FindNextStr(ALStartPos, EndPos: DWUInt32; const ALStr, ALSubStr: string): DWUInt32;
  Begin
   For Result := ALStartPos + 1 To EndPos Do
    Begin
@@ -755,7 +750,7 @@ Var
  StartChar : Char;
  LenSubStr,
  LenStr,
- EndPos    : UInt32;
+ EndPos    : DWUInt32;
 Begin
  If AStartPos = 0 Then
   AStartPos := 1;
@@ -933,7 +928,7 @@ Begin
  Result := restdwMin(ACharCount, AByteCount);
  For i := 1 To Result Do
   Begin
-   If UInt16(P^) > $007F Then
+   If DWUInt16(P^) > $007F Then
     ABytes^ := Byte(Ord('?'))
    Else
     ABytes^ := Byte(P^);
@@ -1045,40 +1040,12 @@ Begin
  For i := 1 To Result Do
   Begin
    If P^ > $7F Then
-    UInt16(AChars^) := $FFFD
+    DWUInt16(AChars^) := $FFFD
    Else
-    UInt16(AChars^) := P^;
+    DWUInt16(AChars^) := P^;
    Inc(AChars);
    Inc(P);
   End;
-End;
-
-Function BytesToInt32(Const AValue : TRESTDWBytes;
-                      Const AIndex : Integer = 0) : Int32;{$IFDEF USE_INLINE}inline;{$ENDIF}
-Begin
- Assert(Length(AValue) >= (AIndex+SizeOf(Int32)));
- Result := PDWInt32(@AValue[AIndex])^;
-End;
-
-Function BytesToInt64(Const AValue : TRESTDWBytes;
-                      Const AIndex : Integer = 0) : Int64;{$IFDEF USE_INLINE}inline;{$ENDIF}
-Begin
- Assert(Length(AValue) >= (AIndex+SizeOf(Int64)));
- Result := PInt64(@AValue[AIndex])^;
-End;
-
-Function BytesToUInt64(Const AValue : TRESTDWBytes;
-                       Const AIndex : Integer = 0): TRESTDWUInt64;{$IFDEF USE_INLINE}inline;{$ENDIF}
-Begin
- Assert(Length(AValue) >= (AIndex+SizeOf(TRESTDWUInt64)));
- Result := PUInt64(@AValue[AIndex])^;
-End;
-
-Function BytesToUInt32(Const AValue : TRESTDWBytes;
-                       Const AIndex : Integer = 0) : UInt32;{$IFDEF USE_INLINE}inline;{$ENDIF}
-Begin
- Assert(Length(AValue) >= (AIndex+SizeOf(UInt32)));
- Result := PDWUInt32(@AValue[AIndex])^;
 End;
 
 Procedure CopyRDWString(Const ASource    : String;
@@ -1183,15 +1150,6 @@ Begin
  SetLength(Result, 2);
  Result[1] := RESTDWHexDigits[(AByte And $F0) Shr 4];
  Result[2] := RESTDWHexDigits[AByte  And $F];
-End;
-
-Function UInt32ToHex(Const ALongWord : UInt32) : String;
-                     {$IFDEF USE_INLINE}inline;{$ENDIF}
-Begin
- Result := ByteToHex((ALongWord and $FF000000) shr 24)
-         + ByteToHex((ALongWord and $00FF0000) shr 16)
-         + ByteToHex((ALongWord and $0000FF00) shr 8)
-         + ByteToHex(ALongWord and $000000FF);
 End;
 
 Procedure ExpandBytes(Var VBytes      : TRESTDWBytes;
@@ -1439,48 +1397,6 @@ Var
 Begin
  LBytes := RawToBytes(AValue, 1);
  Result := LBytes;
-End;
-
-Function ToBytes(Const AValue : Int8) : TRESTDWBytes;
-Begin
- SetLength(Result, SizeOf(Int8));
- Result[0] := Byte(AValue);
-End;
-
-Function ToBytes(Const AValue : UInt8) : TRESTDWBytes;
-Begin
- SetLength(Result, SizeOf(UInt8));
- Result[0] := AValue;
-End;
-
-Function ToBytes(Const AValue : Int16) : TRESTDWBytes;
-Begin
- SetLength(Result, SizeOf(Int16));
- PDWInt64(@Result[0])^ := AValue;
-End;
-
-Function ToBytes(Const AValue : UInt16) : TRESTDWBytes;
-Begin
- SetLength(Result, SizeOf(UInt16));
- PDWInt64(@Result[0])^ := AValue;
-End;
-
-Function ToBytes(Const AValue : Int32)  : TRESTDWBytes;
-Begin
- SetLength(Result, SizeOf(Int32));
- PDWInt32(@Result[0])^ := AValue;
-End;
-
-Function ToBytes(Const AValue : UInt32) : TRESTDWBytes;
-Begin
- SetLength(Result, SizeOf(UInt32));
- PDWUInt32(@Result[0])^ := AValue;
-End;
-
-Function ToBytes(Const AValue : Int64)  : TRESTDWBytes;
-Begin
- SetLength(Result, SizeOf(Int64));
- PInt64(@Result[0])^ := AValue;
 End;
 
 Function ToBytes(Const AValue : TRESTDWBytes;
@@ -2627,7 +2543,11 @@ begin
   {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
    HexToBin(PWideChar(value), Result, restdwLength(Result));
   {$ELSE}
-   HexToBin(PChar(Value), Result, restdwLength(Result));
+   {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+    HexToBin(PChar(Value), Result, restdwLength(Result));
+   {$ELSE}
+    HexToBin(PChar(Value), @Result, restdwLength(Result));
+   {$IFEND}
   {$IFEND}
  {$IFEND}
 End;

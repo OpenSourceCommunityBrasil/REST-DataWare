@@ -28,12 +28,12 @@ interface
 
 Uses
  {$IFDEF FPC}
-  SysUtils,  Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWTools, uRESTDWResponseTranslator;
+  SysUtils,  Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWTools, uRESTDWResponseTranslator;
  {$ELSE}
   {$if CompilerVersion > 24} // Delphi 2010 acima
-   System.SysUtils, System.Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWTools, uRESTDWResponseTranslator;
+   System.SysUtils, System.Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWTools, uRESTDWResponseTranslator;
   {$ELSE}
-   SysUtils, Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWTools, uRESTDWResponseTranslator;
+   SysUtils, Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWTools, uRESTDWResponseTranslator;
   {$IFEND}
  {$ENDIF}
 
@@ -6258,7 +6258,7 @@ Begin
     StartPos := Stream.Position;
     With ParamsHeader Do
      Begin
-      VersionNumber := DwParamsHeaderVersion;
+      VersionNumber := RESTDwParamsHeaderVersion;
       DataSize      := 0;
       RecordCount   := 0;
       ParamsCount   := Count;
@@ -6272,7 +6272,7 @@ Begin
     //Rewrite init Header
     Stream.Position := 0;
     aStream.Position := 0;
-    Stream.WriteBuffer(ParamsHeader, SizeOf(TDWParamsHeader));
+    Stream.WriteBuffer(ParamsHeader, SizeOf(TRESTDWParamsHeader));
     Stream.CopyFrom(aStream, aStream.Size);
     Stream.Position := 0;
    Finally

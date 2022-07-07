@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-	</Transactions>
+    <Transaction>2022/07/07 09:45:32.844,=FireDACCommonDriver.dcp</Transaction>
+    <Transaction>2022/07/07 09:45:32.874,=FireDACCommon.dcp</Transaction>
+  </Transactions>
 	<ActiveMobileDevice>
 		<NoProfile iOSSimulator="iPhone5" Android="Android"/>
 	</ActiveMobileDevice>
@@ -68,6 +70,7 @@
     <File Path="..\..\Source\Basic\uRESTDWResponseTranslator.pas"/>
     <File Path="..\..\Source\Basic\uRESTDWServerContext.pas"/>
     <File Path="..\..\Source\Basic\uRESTDWServerEvents.pas"/>
+    <File Path="..\..\Source\Basic\uRESTDWEncodeClass.pas"/>
     <File Path="..\..\Source\Consts"/>
     <File Path="..\..\Source\Consts\uRESTDWConsts.pas"/>
     <File Path="..\..\Source\Includes"/>

@@ -26,12 +26,12 @@ unit uRESTDWBasicTypes;
 Interface
 
 Uses
- FMTBcd, uRESTDWConsts,
+ FMTBcd, uRESTDWConsts, uRESTDWEncodeClass,
  {$IFDEF FPC}
   SysUtils,  Classes, Db, uRESTDWAbout, uRESTDWConsts, DbTables
  {$ELSE}
   {$if CompilerVersion > 24} // Delphi 2010 pra cima
-   System.SysUtils, System.Classes, Db, uRESTDWAbout
+   System.SysUtils, System.Classes, Data.DB, uRESTDWAbout
   {$ELSE}
    SysUtils, Classes, Db, DbTables, uRESTDWAbout
   {$IFEND}
@@ -44,6 +44,9 @@ Uses
   , DADump, UniDump, VirtualTable, MemDS
   {$ENDIF};
  {$ELSE}
+   {$IFDEF RESTDWMEMTABLE}
+    , uRESTDWDataset
+   {$ENDIF}
    {$IFDEF RESTDWCLIENTDATASET}
     ,  DBClient
    {$ENDIF}
@@ -80,6 +83,83 @@ Uses
  Const
   dwftColor       = Integer(255);
   RESTDWHexPrefix = '0x';
+{Supported types}
+  dwftString          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftString);
+  dwftSmallint        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftSmallint);
+  dwftInteger         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftInteger);
+  dwftWord            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftWord);
+  dwftBoolean         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftBoolean);
+  dwftFloat           = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftFloat);
+  dwftCurrency        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftCurrency);
+  dwftBCD             = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftBCD);
+  dwftDate            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftDate);
+  dwftTime            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftTime);
+  dwftDateTime        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftDateTime);
+  dwftBytes           = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftBytes);
+  dwftVarBytes        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftVarBytes);
+  dwftAutoInc         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftAutoInc);
+  dwftBlob            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftBlob);
+  dwftMemo            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftMemo);
+  dwftGraphic         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftGraphic);
+  dwftFmtMemo         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftFmtMemo);
+  dwftParadoxOle      = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftParadoxOle);
+  dwftDBaseOle        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftDBaseOle);
+  dwftTypedBinary     = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftTypedBinary);
+  dwftFixedChar       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftFixedChar);
+  dwftWideString      = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftWideString);
+  dwftLargeint        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftLargeint);
+  dwftOraBlob         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftOraBlob);
+  dwftOraClob         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftOraClob);
+  dwftVariant         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftVariant);
+  dwftInterface       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftInterface);
+  dwftIDispatch       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftIDispatch);
+  dwftGuid            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftGuid);
+  dwftTimeStamp       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftTimeStamp);
+  dwftFMTBcd          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftFMTBcd);
+  {$IFDEF COMPILER10_UP}
+  dwftFixedWideChar   = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftFixedWideChar);
+  dwftWideMemo        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftWideMemo);
+  dwftOraTimeStamp    = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftOraTimeStamp);
+  dwftOraInterval     = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftOraInterval);
+  {$ELSE}
+  dwftFixedWideChar   = Integer(38);
+  dwftWideMemo        = Integer(39);
+  dwftOraTimeStamp    = Integer(40);
+  dwftOraInterval     = Integer(41);
+  {$ENDIF}
+  {$IFDEF COMPILER14_UP}
+  dwftLongWord        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftLongWord); //42
+  dwftShortint        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftShortint); //43
+  dwftByte            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftByte); //44
+  dwftExtended        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftExtended); //45
+  dwftStream          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftStream); //48
+  dwftTimeStampOffset = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftTimeStampOffset); //49
+  dwftSingle          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftSingle); //51
+  {$ELSE}
+  dwftLongWord        = Integer(42);
+  dwftShortint        = Integer(43);
+  dwftByte            = Integer(44);
+  dwftExtended        = Integer(45);
+  dwftStream          = Integer(48);
+  dwftTimeStampOffset = Integer(49);
+  dwftSingle          = Integer(51);
+  {$ENDIF}
+
+  {Unsupported types}
+  dwftUnknown         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftUnknown);
+  dwftCursor          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftCursor);
+  dwftADT             = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftADT);
+  dwftArray           = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftArray);
+  dwftReference       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftReference);
+  dwftDataSet         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftDataSet);
+  {Unknown newest types for support in future}
+
+  {$IFDEF COMPILER14_UP}
+  dwftConnection      = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftConnection); //46
+  dwftParams          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftParams); //47
+  dwftObject          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftObject); //50
+  {$ENDIF}
+  {$IFDEF REGION}{$ENDREGION}{$ENDIF}
  {$IFDEF COMPILER10_UP}
   FieldTypeIdents : Array[dwftColor..dwftColor] Of TIdentMapEntry = ((Value: dwftColor; Name: 'ftColor'));
  {$ELSE}
@@ -96,24 +176,29 @@ Uses
  Type
  {$IFDEF FPC}
   DWInteger       = Longint;
+  DWInt16         = Integer;
   DWInt64         = Int64;
   DWInt32         = Int32;
   DWFloat         = Real;
   DWFieldTypeSize = Longint;
   DWBufferSize    = Longint;
   DWUInt16        = Word;
+  DWUInt32        = LongWord;
   DWWideChar      = Char;
  {$ELSE}
   DWInteger       = Integer;
+  DWInt16         = Integer;
   DWInt64         = Int64;
-  DWInt32         = Int32;
+  DWInt32         = Longint;
   DWFloat         = Real;
   DWFieldTypeSize = Integer;
   DWBufferSize    = Longint;
   DWUInt16        = Word;
+  DWUInt32        = LongWord;
   DWWideChar      = WideChar;
  {$ENDIF}
- TEncodeSelect    = (esASCII, esUtf8, esANSI);
+ DWInt8           = Integer;
+ DWUInt8          = DWInt8;
  PDWInt32         = ^DWInt32;
  PDWInt64         = ^DWInt64;
  PDWUInt32        = ^DWInt32;
@@ -140,7 +225,7 @@ Uses
     {$NODEFINE UInt64}
    {$ENDIF}
  {$ENDIF}
- TRESTDWIPv6Address = Array [0..7] Of UInt16;
+ TRESTDWIPv6Address = Array [0..7] Of DWUInt16;
  {$IFDEF STRING_IS_UNICODE}
   PDWWideChar = PChar;
  {$ELSE}
@@ -181,7 +266,7 @@ Uses
  {$IFDEF STREAM_SIZE_64}
   TRESTDWStreamSize = Int64;
  {$ELSE}
-  TRESTDWStreamSize = Int32;
+  TRESTDWStreamSize = DWInt32;
  {$ENDIF}
 
  Type
@@ -409,7 +494,7 @@ Uses
     TRESTDWClientSQLBase   = Class(TVirtualTable)
    {$ENDIF}
    {$IFDEF RESTDWMEMTABLE}
-    TRESTDWClientSQLBase   = Class(TDWMemtable)                 //Classe com as funcionalidades de um DBQuery
+    TRESTDWClientSQLBase   = Class(TRESTDWMemtable)                 //Classe com as funcionalidades de um DBQuery
    {$ENDIF}
   {$ELSE}
    {$IFDEF RESTDWCLIENTDATASET}
@@ -428,7 +513,7 @@ Uses
     TRESTDWClientSQLBase   = Class(TADMemtable)                 //Classe com as funcionalidades de um DBQuery
    {$ENDIF}
    {$IFDEF RESTDWMEMTABLE}
-    TRESTDWClientSQLBase   = Class(TDWMemtable)                 //Classe com as funcionalidades de um DBQuery
+    TRESTDWClientSQLBase   = Class(TRESTDWMemtable)             //Classe com as funcionalidades de um DBQuery
    {$ENDIF}
   {$ENDIF}
   Private
@@ -791,7 +876,7 @@ Procedure TRESTDWClientSQLBase.BaseClose;
 Begin
   {$IFDEF FPC}
    {$IFDEF RESTDWMEMTABLE}
-    TDWMemtable(Self).Close;
+    TRESTDWMemtable(Self).Close;
    {$ENDIF}
    {$IFDEF UNIDACMEM}
     TVirtualTable(Self).Close;
@@ -816,7 +901,7 @@ Begin
    TADmemtable(Self).Close;
   {$ENDIF}
   {$IFDEF RESTDWMEMTABLE}
-   TDWMemtable(Self).Close;
+   TRESTDWMemtable(Self).Close;
   {$ENDIF}
   {$IFDEF UNIDACMEM}
    TVirtualTable(Self).Close;
@@ -828,7 +913,7 @@ Procedure TRESTDWClientSQLBase.BaseOpen;
 Begin
   {$IFDEF FPC}
    {$IFDEF RESTDWMEMTABLE}
-    TDWMemtable(Self).Open;
+    TRESTDWMemtable(Self).Open;
    {$ENDIF}
    {$IFDEF UNIDACMEM}
     TVirtualTable(Self).Open;
@@ -853,7 +938,7 @@ Begin
    TADmemtable(Self).Open;
   {$ENDIF}
   {$IFDEF RESTDWMEMTABLE}
-   TDWMemtable(Self).Open;
+   TRESTDWMemtable(Self).Open;
   {$ENDIF}
   {$IFDEF UNIDACMEM}
    TVirtualTable(Self).Open;
@@ -891,7 +976,7 @@ Procedure TRESTDWClientSQLBase.SetDatabaseCharSet(Value : TDatabaseCharSet);
 Begin
  vDatabaseCharSet := Value;
  {$IFDEF RESTDWMEMTABLE}
-  TDWMemtable(Self).DatabaseCharSet := Value; //Classe com as funcionalidades de um DBQuery
+  TRESTDWMemtable(Self).DatabaseCharSet := Value; //Classe com as funcionalidades de um DBQuery
  {$ENDIF}
 End;
 {$ENDIF}
@@ -1268,7 +1353,7 @@ Begin
      StartPos := StreamValue.Position;
      With ParamsHeader Do
       Begin
-       VersionNumber := DwParamsHeaderVersion;
+       VersionNumber := RESTDWParamsHeaderVersion;
        DataSize      := 0;
        ParamsCount   := Dataset.FieldCount;
        RecordCount   := Dataset.RecordCount;
@@ -1979,12 +2064,12 @@ Begin
      Value.Position := 0;
      If Not vBinaryCompatibleMode Then
       Begin
-       TdwMemtable(Self).Encoding        := TRESTDWClientSQL(Self).Encoding;
-       TdwMemtable(Self).OnWriterProcess := vOnWriterProcess;
+       TRESTDWMemtable(Self).Encoding        := TRESTDWClientSQL(Self).Encoding;
+       TRESTDWMemtable(Self).OnWriterProcess := vOnWriterProcess;
        If Value.Size > 0 Then
         Begin
-         TdwMemtable(Self).LoadFromStream(Value);
-         TdwMemtable(Self).Active := True;
+         TRESTDWMemtable(Self).LoadFromStream(Value);
+         TRESTDWMemtable(Self).Active := True;
         End;
       End
      Else
@@ -2122,12 +2207,12 @@ Begin
      Value.Position := 0;
      If Not vBinaryCompatibleMode Then
       Begin
-       TdwMemtable(Self).Encoding        := TRESTDWClientSQL(Self).Encoding;
-       TdwMemtable(Self).OnWriterProcess := vOnWriterProcess;
+       TRESTDWMemtable(Self).Encoding        := TRESTDWClientSQL(Self).Encoding;
+       TRESTDWMemtable(Self).OnWriterProcess := vOnWriterProcess;
        If Value.Size > 0 Then
         Begin
-         TdwMemtable(Self).LoadFromStream(Value);
-         TdwMemtable(Self).Active := True;
+         TRESTDWMemtable(Self).LoadFromStream(Value);
+         TRESTDWMemtable(Self).Active := True;
         End;
       End
      Else

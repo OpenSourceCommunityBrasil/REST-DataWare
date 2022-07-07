@@ -15,6 +15,7 @@ object fDWJSONViewer: TfDWJSONViewer
   OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
@@ -170,48 +171,7 @@ object fDWJSONViewer: TfDWJSONViewer
   end
   object DataSource1: TDataSource
     AutoEdit = False
-    DataSet = RESTDWClientSQL1
     Left = 376
     Top = 368
-  end
-  object RESTDWClientSQL1: TRESTDWClientSQL
-    FieldDefs = <>
-    IndexDefs = <>
-    FetchOptions.AssignedValues = [evMode]
-    FetchOptions.Mode = fmAll
-    ResourceOptions.AssignedValues = [rvSilentMode]
-    ResourceOptions.SilentMode = True
-    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
-    UpdateOptions.CheckRequired = False
-    UpdateOptions.AutoCommitUpdates = True
-    StoreDefs = True
-    BinaryCompatibleMode = False
-    MasterCascadeDelete = True
-    BinaryRequest = False
-    Datapacks = -1
-    DataCache = False
-    MassiveType = mtMassiveCache
-    Params = <>
-    ResponseTranslator = RESTDWResponseTranslator1
-    CacheUpdateRecords = True
-    AutoCommitData = False
-    AutoRefreshAfterCommit = False
-    ThreadRequest = False
-    RaiseErrors = True
-    ActionCursor = crSQLWait
-    ReflectChanges = False
-    Left = 344
-    Top = 368
-  end
-  object RESTDWResponseTranslator1: TRESTDWResponseTranslator
-    ElementAutoReadRootIndex = True
-    ElementRootBaseIndex = -1
-    RequestOpen = rtGet
-    RequestInsert = rtPost
-    RequestEdit = rtPost
-    RequestDelete = rtDelete
-    FieldDefs = <>
-    Left = 312
-    Top = 328
   end
 end

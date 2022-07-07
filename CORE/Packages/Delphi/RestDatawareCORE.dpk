@@ -103,7 +103,8 @@ contains
   uRESTDWBasicClass in '..\..\Source\Basic\uRESTDWBasicClass.pas',
   DWDCPrijndael in '..\..\Source\Basic\Crypto\Ciphers\DWDCPrijndael.pas',
   DWDCPcast256 in '..\..\Source\Basic\Crypto\Ciphers\DWDCPcast256.pas',
-  DWDCPsha256 in '..\..\Source\Basic\Crypto\Hashes\DWDCPsha256.pas';
+  DWDCPsha256 in '..\..\Source\Basic\Crypto\Hashes\DWDCPsha256.pas',
+  uRESTDWEncodeClass in '..\..\Source\Basic\uRESTDWEncodeClass.pas';
 
 End.
 

@@ -28,7 +28,7 @@ Interface
 Uses {$IFDEF FPC}
      SysUtils,   uSystemEvents, Classes, SysTypes,   DataUtils, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
      uRESTDWConsts, uRESTDWBasic, uRESTDWTools,      uRESTDWMassiveBuffer,  uRESTDWComponentEvents, uRESTDWBasicTypes,
-     uRESTDWJSONObject, uRESTDWCharset, uRESTDWParams;
+     uRESTDWJSONObject, uRESTDWCharset, uRESTDWEncodeClass, uRESTDWParams;
      {$ELSE}
      {$IF CompilerVersion <= 22}
      SysUtils, Classes,
@@ -36,7 +36,7 @@ Uses {$IFDEF FPC}
      System.SysUtils, System.Classes,
      {$IFEND}
      DataUtils, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
-     uRESTDWConsts, uRESTDWBasic, uRESTDWTools,      uRESTDWMassiveBuffer,  uRESTDWComponentEvents, uRESTDWBasicTypes,
+     uRESTDWConsts, uRESTDWEncodeClass, uRESTDWBasic, uRESTDWTools,      uRESTDWMassiveBuffer,  uRESTDWComponentEvents, uRESTDWBasicTypes,
      uRESTDWJSONObject, uRESTDWCharset, uRESTDWParams;
      {$ENDIF}
 

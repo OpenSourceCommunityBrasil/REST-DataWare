@@ -10,9 +10,7 @@ uses
   uRESTDWJSONInterface, uRESTDWConsts, uRESTDWResponseTranslator, DB,
   uRESTDWDataset, uRESTDWBasicDB, uRESTDWAbout, Grids{$IFNDEF DEBBUGRDW},
   {$IFDEF FPC}ComponentEditors, FormEditingIntf, PropEdits, lazideintf{$ELSE}DesignWindows, DesignEditors,
-  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
-  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client, uRESTDWBasicTypes{$ENDIF}{$ENDIF};
+  uRESTDWBasicTypes{$ENDIF}{$ENDIF};
 
 Type
  PDWJsonParserItem = ^TDWJsonParserItem;
@@ -39,14 +37,15 @@ Type
     Label3: TLabel;
     DataSource1: TDataSource;
     DBGrid1: TDBGrid;
-    RESTDWClientSQL1: TRESTDWClientSQL;
-    RESTDWResponseTranslator1: TRESTDWResponseTranslator;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure TreeView1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
-   vBaseTranslator : TRESTDWResponseTranslator;
+   RESTDWClientSQL1            : TRESTDWClientSQL;
+   RESTDWResponseTranslator1,
+   vBaseTranslator             : TRESTDWResponseTranslator;
    Procedure LoadItem;
    Procedure ClearTree;
     { Private declarations }
@@ -275,9 +274,19 @@ end;
 procedure TfDWJSONViewer.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
+ FreeAndNil(RESTDWClientSQL1);
+ FreeAndNil(RESTDWResponseTranslator1);
  ClearTree;
  fDWJSONViewer := Nil;
  Release;
+end;
+
+procedure TfDWJSONViewer.FormCreate(Sender: TObject);
+begin
+ RESTDWClientSQL1 := TRESTDWClientSQL.Create(Self);
+ RESTDWResponseTranslator1 := TRESTDWResponseTranslator.Create(Self);
+ RESTDWClientSQL1.ResponseTranslator := RESTDWResponseTranslator1;
+ DataSource1.DataSet := RESTDWClientSQL1;
 end;
 
 Procedure TfDWJSONViewer.LoadItem;

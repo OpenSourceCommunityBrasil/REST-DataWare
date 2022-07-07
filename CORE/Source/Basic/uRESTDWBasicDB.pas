@@ -29,23 +29,22 @@ Uses
  {$IFDEF FPC}
   SysUtils,  Classes, Db, SyncObjs, Variants, DataUtils, uRESTDWAbout, uRESTDWBasicTypes,
   uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
-  uRESTDWMassiveBuffer, uRESTDWResponseTranslator, uRESTDWBasicClass, {$IFNDEF RESTDWLAMW}Forms, {$ENDIF}uRESTDWMasterDetailData
-  {$IFDEF RESTDWWINDOWS}, Windows{$ENDIF}
+  uRESTDWMassiveBuffer, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWEncodeClass, {$IFNDEF RESTDWLAMW}Forms, {$ENDIF}uRESTDWMasterDetailData
+  {$IFNDEF UNIX}, Windows{$ENDIF}
  {$ELSE}
   {$IF Defined(RESTDWFMX)}
    {$IFNDEF RESTDWAndroidService}System.UITypes, FMX.Forms, {$ENDIF}
   {$ELSE}
-   {$IF CompilerVersion <= 22}Forms, Controls, {$ELSE}VCL.Forms, VCL.Controls, {$IFEND}
+   {$IF CompilerVersion <= 22}Windows, Forms, Controls, {$ELSE}VCL.Forms, VCL.Controls, Windows, {$IFEND}
   {$IFEND}
-  {$IFDEF RESTDWWINDOWS}Windows, {$ENDIF}
   {$if CompilerVersion > 24} // Delphi 2010 acima
    System.SysUtils, System.Classes, Db, SyncObjs, DataUtils, uRESTDWAbout, uRESTDWBasicTypes,
    uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
-   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWMasterDetailData
+   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData
   {$ELSE}
    SysUtils, Classes, Db, SyncObjs, DataUtils, uRESTDWAbout, uRESTDWBasicTypes,
    uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
-   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWMasterDetailData
+   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData
   {$IFEND}
  {$ENDIF}
  {$IFDEF FPC}
@@ -56,6 +55,9 @@ Uses
   , DADump, UniDump, VirtualTable, MemDS
   {$ENDIF};
  {$ELSE}
+   {$IFDEF RESTDWMEMTABLE}
+    , uRESTDWDataset
+   {$ENDIF}
    {$IFDEF RESTDWCLIENTDATASET}
     ,  DBClient
    {$ENDIF}
@@ -711,8 +713,8 @@ Type
                                   aSelf   : TMemDataset);
   {$ENDIF}
   {$IFDEF RESTDWMEMTABLE}
-  Procedure CloneDefinitions     (Source  : TDWMemtable;
-                                  aSelf   : TDWMemtable); //Fields em Definições
+  Procedure CloneDefinitions     (Source  : TRESTDWMemtable;
+                                  aSelf   : TRESTDWMemtable); //Fields em Definições
   {$ENDIF}
   {$IFDEF RESTDWUNIDACMEM}
   Procedure CloneDefinitions     (Source  : TVirtualTable;
@@ -741,8 +743,8 @@ Type
   Property CommandText;
   {$ENDIF}
   {$IFDEF RESTDWMEMTABLE}
-  Procedure  CloneDefinitions    (Source  : TDWMemtable;
-                                  aSelf   : TDWMemtable); //Fields em Definições
+  Procedure  CloneDefinitions    (Source  : TRESTDWMemtable;
+                                  aSelf   : TRESTDWMemtable); //Fields em Definições
   {$ENDIF}
   {$ENDIF}
   Procedure   OnChangingSQL      (Sender  : TObject);       //Quando Altera o SQL da Lista
@@ -1619,7 +1621,7 @@ Uses uRESTDWJSONInterface, uRESTDWTools;
 
 Function GeTRESTDWParams(Params : TParams; Encondig : TEncodeSelect) : TRESTDWParams;
 Var
- I         : Integer;
+ I, A      : Integer;
  JSONParam : TJSONParam;
 Begin
  Result := Nil;
@@ -8687,8 +8689,8 @@ Begin
    {$IFDEF ZEOSDRIVER} //TODO
    {$ENDIF}
    {$IFDEF DWMEMTABLE}
-    TDWMemtable(Self).Close;
-    TDWMemtable(Self).Open;
+    TRESTDWMemtable(Self).Close;
+    TRESTDWMemtable(Self).Open;
    {$ENDIF}
    {$IFDEF LAZDRIVER}
     TMemDataset(Self).CreateTable;
@@ -8720,8 +8722,8 @@ Begin
    TADmemtable(Self).Open;
   {$ENDIF}
   {$IFDEF DWMEMTABLE}
-   TDWMemtable(Self).Close;
-   TDWMemtable(Self).Open;
+   TRESTDWMemtable(Self).Close;
+   TRESTDWMemtable(Self).Open;
    {$ENDIF}
   {$ENDIF}
   vCreateDS := False;
@@ -8744,8 +8746,8 @@ Begin
    {$IFDEF ZEOSDRIVER} //TODO
    {$ENDIF}
    {$IFDEF DWMEMTABLE}
-    TDWMemtable(Self).Close;
-    TDWMemtable(Self).Open;
+    TRESTDWMemtable(Self).Close;
+    TRESTDWMemtable(Self).Open;
    {$ENDIF}
    {$IFDEF LAZDRIVER}
     TMemDataset(Self).CreateTable;
@@ -8777,8 +8779,8 @@ Begin
    TADmemtable(Self).Open;
   {$ENDIF}
   {$IFDEF DWMEMTABLE}
-   TDWMemtable(Self).Close;
-   TDWMemtable(Self).Open;
+   TRESTDWMemtable(Self).Close;
+   TRESTDWMemtable(Self).Open;
    {$ENDIF}
   {$ENDIF}
   vCreateDS := False;
@@ -8791,11 +8793,11 @@ Class Procedure TRESTDWTable.CreateEmptyDataset(Const Dataset : TDataset);
 Begin
  Try
   {$IFDEF RESTDWMEMTABLE}
-  If (Dataset.ClassParent = TDWMemtable) Or
-     (Dataset.ClassType   = TDWMemtable) Then
+  If (Dataset.ClassParent = TRESTDWMemtable) Or
+     (Dataset.ClassType   = TRESTDWMemtable) Then
    Begin
-    TDWMemtable(Dataset).Close;
-    TDWMemtable(Dataset).Open;
+    TRESTDWMemtable(Dataset).Close;
+    TRESTDWMemtable(Dataset).Open;
    End;
   {$ENDIF}
   {$IFDEF FPC}
@@ -8852,11 +8854,11 @@ Class Procedure TRESTDWClientSQL.CreateEmptyDataset(Const Dataset : TDataset);
 Begin
  Try
   {$IFDEF RESTDWMEMTABLE}
-  If (Dataset.ClassParent = TDWMemtable) Or
-     (Dataset.ClassType   = TDWMemtable) Then
+  If (Dataset.ClassParent = TRESTDWMemtable) Or
+     (Dataset.ClassType   = TRESTDWMemtable) Then
    Begin
-    TDWMemtable(Dataset).Close;
-    TDWMemtable(Dataset).Open;
+    TRESTDWMemtable(Dataset).Close;
+    TRESTDWMemtable(Dataset).Open;
    End;
   {$ENDIF}
   {$IFDEF FPC}
@@ -9760,8 +9762,8 @@ Begin
   {$IFDEF ZEOSDRIVER} //TODO
   {$ELSE}
    {$IFDEF DWMEMTABLE} //TODO
-    TDWMemtable(Self).Close;
-    TDWMemtable(Self).Open;
+    TRESTDWMemtable(Self).Close;
+    TRESTDWMemtable(Self).Open;
    {$ELSE}
     {$IFNDEF UNIDACMEM}
      If Self is TMemDataset Then
@@ -9791,8 +9793,8 @@ Begin
   {$IFDEF ZEOSDRIVER} //TODO
   {$ELSE}
    {$IFDEF DWMEMTABLE} //TODO
-    TDWMemtable(Self).Close;
-    TDWMemtable(Self).Open;
+    TRESTDWMemtable(Self).Close;
+    TRESTDWMemtable(Self).Open;
    {$ELSE}
     {$IFNDEF UNIDACMEM}
      If Self is TMemDataset Then
@@ -10203,8 +10205,8 @@ procedure TRESTDWClientSQL.CloneDefinitions(Source  : TMemDataset;
                                             aSelf   : TMemDataset);
 {$ENDIF}
 {$IFDEF RESTDWMEMTABLE}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source  : TDWMemtable;
-                                            aSelf   : TDWMemtable); //Fields em Definições
+Procedure TRESTDWClientSQL.CloneDefinitions(Source  : TRESTDWMemtable;
+                                            aSelf   : TRESTDWMemtable); //Fields em Definições
 {$ENDIF}
 {$IFDEF RESTDWUNIDACMEM}
 Procedure TRESTDWClientSQL.CloneDefinitions(Source : TVirtualTable; aSelf : TVirtualTable);
@@ -10226,8 +10228,8 @@ Procedure TRESTDWClientSQL.CloneDefinitions(Source : TFDmemtable; aSelf : TFDmem
 Procedure TRESTDWClientSQL.CloneDefinitions(Source : TADmemtable; aSelf : TADmemtable);
 {$ENDIF}
 {$IFDEF RESTDWMEMTABLE}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source  : TDWMemtable;
-                                            aSelf   : TDWMemtable); //Fields em Definições
+Procedure TRESTDWClientSQL.CloneDefinitions(Source  : TRESTDWMemtable;
+                                            aSelf   : TRESTDWMemtable); //Fields em Definições
 {$ENDIF}
 {$ENDIF}
 Var

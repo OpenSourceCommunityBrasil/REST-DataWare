@@ -104,16 +104,16 @@ Const
                          AByteCount         : Integer;
                          AAppend            : Boolean = True);
   Function  ReadString  (ABytes     : Integer)        : String;
-  Function  ReadInt16   (AConvert   : Boolean = True) : Int16;
-  Function  ReadUInt16  (AConvert   : Boolean = True) : UInt16;
-  Function  ReadInt32   (AConvert   : Boolean = True) : Int32;
-  Function  ReadUInt32  (AConvert   : Boolean = True) : UInt32;
+  Function  ReadInt16   (AConvert   : Boolean = True) : DWInt16;
+  Function  ReadUInt16  (AConvert   : Boolean = True) : DWUInt16;
+  Function  ReadInt32   (AConvert   : Boolean = True) : DWInt32;
+  Function  ReadUInt32  (AConvert   : Boolean = True) : DWUInt32;
   Function  ReadInt64   (AConvert   : Boolean = True) : Int64;
   Function  ReadUInt64  (AConvert   : Boolean = True) : TRESTDWUInt64;
-  Function  ReadSmallInt(AConvert   : Boolean = True) : Int16; {$IFDEF HAS_DEPRECATED}deprecated{$IFDEF HAS_DEPRECATED_MSG} 'Use ReadInt16()'{$ENDIF};{$ENDIF}
-  Function  ReadWord    (AConvert   : Boolean = True) : UInt16; {$IFDEF HAS_DEPRECATED}deprecated{$IFDEF HAS_DEPRECATED_MSG} 'Use ReadUInt16()'{$ENDIF};{$ENDIF}
-  Function  ReadLongInt (AConvert   : Boolean = True) : Int32;  {$IFDEF HAS_DEPRECATED}deprecated{$IFDEF HAS_DEPRECATED_MSG} 'Use ReadInt32()'{$ENDIF};{$ENDIF}
-  Function  ReadLongWord(AConvert   : Boolean = True) : UInt32; {$IFDEF HAS_DEPRECATED}deprecated{$IFDEF HAS_DEPRECATED_MSG} 'Use ReadUInt32()'{$ENDIF};{$ENDIF}
+  Function  ReadSmallInt(AConvert   : Boolean = True) : DWInt16; {$IFDEF HAS_DEPRECATED}deprecated{$IFDEF HAS_DEPRECATED_MSG} 'Use ReadInt16()'{$ENDIF};{$ENDIF}
+  Function  ReadWord    (AConvert   : Boolean = True) : DWUInt16; {$IFDEF HAS_DEPRECATED}deprecated{$IFDEF HAS_DEPRECATED_MSG} 'Use ReadUInt16()'{$ENDIF};{$ENDIF}
+  Function  ReadLongInt (AConvert   : Boolean = True) : DWInt32;  {$IFDEF HAS_DEPRECATED}deprecated{$IFDEF HAS_DEPRECATED_MSG} 'Use ReadInt32()'{$ENDIF};{$ENDIF}
+  Function  ReadLongWord(AConvert   : Boolean = True) : DWUInt32; {$IFDEF HAS_DEPRECATED}deprecated{$IFDEF HAS_DEPRECATED_MSG} 'Use ReadUInt32()'{$ENDIF};{$ENDIF}
   Procedure ReadStrings (ADest                : TStrings;
                          AReadLinesCount      : Integer = -1);
   Procedure WriteBufferCancel; Virtual;
@@ -313,33 +313,34 @@ Begin
   ADest.Add(ReadLn);
 End;
 
-Function TRESTDWIOHandler.ReadUInt16(AConvert : Boolean = True): UInt16;
+Function TRESTDWIOHandler.ReadUInt16(AConvert : Boolean = True): DWUInt16;
 Var
  LBytes : TRESTDWBytes;
 Begin
- ReadBytes(LBytes, SizeOf(UInt16), False);
- Result := BytesToUInt16(LBytes);
+ ReadBytes(LBytes, SizeOf(DWUInt16), False);
+ //TODO
+// Result := BytesToUInt16(LBytes);
 // If AConvert Then
 //    Result := GStack.NetworkToHost(Result);
 End;
 
-Function TRESTDWIOHandler.ReadWord(AConvert: Boolean = True): UInt16;
+Function TRESTDWIOHandler.ReadWord(AConvert: Boolean = True): DWUInt16;
 {$IFDEF USE_CLASSINLINE}inline;{$ENDIF}
 Begin
  Result := ReadUInt16(AConvert);
 End;
 
-Function TRESTDWIOHandler.ReadInt16(AConvert: Boolean = True): Int16;
+Function TRESTDWIOHandler.ReadInt16(AConvert: Boolean = True): DWInt16;
 Var
  LBytes : TRESTDWBytes;
 Begin
- ReadBytes(LBytes, SizeOf(Int16), False);
+ ReadBytes(LBytes, SizeOf(DWInt16), False);
  Result := BytesToInt16(LBytes);
 // If AConvert Then
 //    Result := Int16(GStack.NetworkToHost(UInt16(Result)));
 end;
 
-Function TRESTDWIOHandler.ReadSmallInt(AConvert: Boolean = True): Int16;{$IFDEF USE_CLASSINLINE}inline;{$ENDIF}
+Function TRESTDWIOHandler.ReadSmallInt(AConvert: Boolean = True): DWInt16;{$IFDEF USE_CLASSINLINE}inline;{$ENDIF}
 Begin
  Result := ReadInt16(AConvert);
 End;
@@ -352,7 +353,15 @@ Var
  NumBytes : Integer;
  LBytes   : TRESTDWBytes;
  LChars   : TRESTDWWideChars;
+ {$IFDEF FPC}
  LWTmp    : UnicodeString;
+ {$ELSE}
+  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+   LWTmp    : UnicodeString;
+  {$ELSE}
+   LWTmp    : Utf8String;
+  {$IFEND}
+ {$ENDIF}
  LATmp    : TRESTDWBytes;
 Begin
  NumBytes := FinalStrPos * 2;
@@ -393,17 +402,17 @@ Begin
  Result := LBytes[0];
 End;
 
-Function TRESTDWIOHandler.ReadInt32(AConvert: Boolean): Int32;
+Function TRESTDWIOHandler.ReadInt32(AConvert: Boolean): DwInt32;
 Var
  LBytes : TRESTDWBytes;
 Begin
- ReadBytes(LBytes, SizeOf(Int32), False);
+ ReadBytes(LBytes, SizeOf(DwInt32), False);
  Result := BytesToInt32(LBytes);
 // If AConvert Then
 //    Result := Int32(GStack.NetworkToHost(UInt32(Result)));
 End;
 
-Function TRESTDWIOHandler.ReadLongInt(AConvert: Boolean): Int32;{$IFDEF USE_CLASSINLINE}inline;{$ENDIF}
+Function TRESTDWIOHandler.ReadLongInt(AConvert: Boolean): DwInt32;{$IFDEF USE_CLASSINLINE}inline;{$ENDIF}
 Begin
  Result := ReadInt32(AConvert);
 End;
@@ -421,22 +430,24 @@ Var
  LBytes : TRESTDWBytes;
 Begin
  ReadBytes(LBytes, SizeOf(TRESTDWUInt64), False);
- Result := BytesToUInt64(LBytes);
+ //TODO
+// Result := BytesToUInt64(LBytes);
 // If AConvert Then
 //    Result := GStack.NetworkToHost(Result);
 End;
 
-Function TRESTDWIOHandler.ReadUInt32(AConvert: Boolean): UInt32;
+Function TRESTDWIOHandler.ReadUInt32(AConvert: Boolean): DwUInt32;
 Var
  LBytes : TRESTDWBytes;
 Begin
- ReadBytes(LBytes, SizeOf(UInt32), False);
- Result := BytesToUInt32(LBytes);
+ ReadBytes(LBytes, SizeOf(DwUInt32), False);
+ //TODO
+ //Result := BytesToUInt32(LBytes);
 // If AConvert Then
 //    Result := GStack.NetworkToHost(Result);
 End;
 
-Function TRESTDWIOHandler.ReadLongWord(AConvert: Boolean): UInt32;
+Function TRESTDWIOHandler.ReadLongWord(AConvert: Boolean): DwUInt32;
 {$IFDEF USE_CLASSINLINE}inline;{$ENDIF}
 Begin
  Result := ReadUInt32(AConvert);

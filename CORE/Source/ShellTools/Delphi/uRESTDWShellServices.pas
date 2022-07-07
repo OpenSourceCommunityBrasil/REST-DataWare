@@ -78,15 +78,23 @@ Var
   AResponse.StatusCode              := StatusCode;
   mb                               := TStringStream.Create(ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
   mb.Position                      := 0;
-  AResponse.FreeContentStream      := True;
+  {$IFNDEF FPC}
+   {$IF CompilerVersion > 21}
+    AResponse.FreeContentStream      := True;
+   {$IFEND}
+  {$ENDIF}
   AResponse.ContentStream          := mb;
   AResponse.ContentStream.Position := 0;
   AResponse.ContentLength          := mb.Size;
   Handled := True;
-  {$IFNDEF FPC}
+  {$IFDEF FPC}
    AResponse.SendResponse;
   {$ELSE}
    AResponse.SendResponse;
+   {$IF CompilerVersion < 21}
+    If Assigned(mb) Then
+     FreeAndNil(mb);
+   {$IFEND}
   {$ENDIF}
  End;
  Procedure DestroyComponents;
@@ -113,28 +121,74 @@ Begin
     If CORS_CustomHeaders.Count > 0 Then
      Begin
       For I := 0 To CORS_CustomHeaders.Count -1 Do
-       AResponse.CustomHeaders.AddPair(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
+       Begin
+        {$IFDEF FPC}
+         AResponse.CustomHeaders.AddPair(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
+        {$ELSE}
+         {$IF CompilerVersion > 21}
+         AResponse.CustomHeaders.AddPair(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
+         {$ELSE}
+         AResponse.CustomHeaders.Add(CORS_CustomHeaders.Names[I] + '=' + CORS_CustomHeaders.ValueFromIndex[I]);
+         {$IFEND}
+        {$ENDIF}
+       End;
      End
     Else
-     AResponse.CustomHeaders.AddPair('Access-Control-Allow-Origin','*');
+     Begin
+      {$IFDEF FPC}
+       AResponse.CustomHeaders.AddPair('Access-Control-Allow-Origin','*');
+      {$ELSE}
+       {$IF CompilerVersion > 21}
+       AResponse.CustomHeaders.AddPair('Access-Control-Allow-Origin','*');
+       {$ELSE}
+       AResponse.CustomHeaders.Add('Access-Control-Allow-Origin=*');
+       {$IFEND}
+      {$ENDIF}
+     End;
    End;
   vAuthRealm := AResponse.Realm;
   vToken     := ARequest.Authorization;
   //ARequest.Connection
   vStream    := TMemoryStream.Create;
+ {$IFNDEF FPC}
   If ARequest.ContentLength > 0 Then
    Begin
     {$IF CompilerVersion > 29}
      ARequest.ReadTotalContent;
+     vStream.Write(TBytes(ARequest.RawContent), Length(ARequest.RawContent));
+    {$ELSE}
+    If (Trim(ARequest.Content) <> '') Then
+     Begin
+      If vStream = Nil Then
+       vStream := TStringStream.Create(ARequest.Content);
+      vStream.Position := 0;
+     End;
     {$IFEND}
-    vStream.Write(TBytes(ARequest.RawContent), Length(ARequest.RawContent));
    End;
+ {$ELSE}
+  If (Trim(ARequest.Content) <> '') Then
+   Begin
+    If vStream = Nil Then
+     vStream := TStringStream.Create(ARequest.Content);
+    vStream.Position := 0;
+   End;
+ {$ENDIF}
   vStream.Position := 0;
   If CommandExec  (TComponent(AResponse),
                    RemoveBackslashCommands(ARequest.PathInfo),
-                   ARequest.Method + ' ' + ARequest.RawPathInfo,
+                   ARequest.Method + ' ' + ARequest.{$IFNDEF FPC}{$IF CompilerVersion < 21}PathInfo
+                                                        {$ELSE}RawPathInfo
+                                                        {$IFEND}
+                                           {$ELSE}
+                                            RawPathInfo
+                                           {$ENDIF},
                    ARequest.ContentType,
-                   ARequest.RemoteIP,
+                   ARequest.{$IFNDEF FPC}{$IF CompilerVersion < 21}RemoteAddr
+                                          {$ELSE}RemoteIP
+                                          {$IFEND}
+                            {$ELSE}
+                             RemoteIP
+                            {$ENDIF},
                    ARequest.UserAgent,
                    '',
                    '',
@@ -192,13 +246,26 @@ Begin
       {$IFEND}
      End;
     For I := 0 To vResponseHeader.Count -1 Do
-     AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
-                                     vResponseHeader.Values[vResponseHeader.Names[I]]);
-//    If vResponseHeader.Count > 0 Then
-//     AResponse.HTTPRequest.WriteHeaders()
+     Begin
+      {$IFNDEF FPC}
+       {$IF CompilerVersion < 21}
+        AResponse.CustomHeaders.Add(vResponseHeader.Names [I] + '=' + vResponseHeader.Values[vResponseHeader.Names[I]]);
+       {$ELSE}
+        AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
+                                        vResponseHeader.Values[vResponseHeader.Names[I]]);
+       {$IFEND}
+      {$ELSE}
+       AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
+                                       vResponseHeader.Values[vResponseHeader.Names[I]]);
+      {$ENDIF}
+     End;
     Handled := True;
     {$IFNDEF FPC}
      AResponse.SendResponse;
+     {$IF CompilerVersion < 21}
+      If Assigned(ResultStream) Then
+       FreeAndNil(ResultStream);
+     {$IFEND}
     {$ELSE}
      AResponse.SendResponse;
     {$ENDIF}

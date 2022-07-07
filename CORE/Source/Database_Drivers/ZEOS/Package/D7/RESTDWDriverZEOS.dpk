@@ -44,12 +44,12 @@ requires
   IndyProtocols70,
   IndyCore70,
   IndySystem70,
-  RestEasyObjectsCORE,
   ZCore,
   ZParseSql,
   ZPlain,
   ZDbc,
-  ZComponent;
+  ZComponent,
+  RestDatawareCORE;
 
 contains
   uRestDWDriverZEOS in '..\..\uRestDWDriverZEOS.pas';

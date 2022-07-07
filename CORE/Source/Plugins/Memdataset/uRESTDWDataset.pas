@@ -1,4 +1,4 @@
-﻿unit uRESTDWDataset;
+unit uRESTDWDataset;
 
 {$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 {$IFDEF FPC}
@@ -20,7 +20,7 @@ Uses
          System.VarCmplx, DBCommon, Data.Db,
         {$IFEND}
  {$ENDIF}
- SysUtils, Classes, uRESTDWBasicTypes, uRESTDWCharset, uZlibLaz;
+ SysUtils, Classes, uRESTDWCharset, uRESTDWEncodeClass, uZlibLaz;
 
 {$IFDEF REGION}
 {$REGION ' For init '}
@@ -33,7 +33,6 @@ Const
  DWDB_VERSION_INFO = '3.50';
  NTAVersion        = 0;
  MAXSHORT          = 32767;
-
 {Supported types}
   dwftString          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftString);
   dwftSmallint        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftSmallint);
@@ -135,8 +134,8 @@ const
  SNotSupportFieldType = 'Field type is not supported.';
 
 Type
- TOnWriterProcess  = Procedure (DataSet : TDataSet; RecNo, RecordCount : Integer; Var AbortProcess : Boolean) Of Object;
- TRESTDWBRSourceSide   = (dwDelphi, dwLazarus);
+ TOnWriterProcess    = Procedure (DataSet : TDataSet; RecNo, RecordCount : Integer; Var AbortProcess : Boolean) Of Object;
+ TRESTDWBRSourceSide = (dwDelphi, dwLazarus);
 
 Type
  {$IFDEF FPC}
