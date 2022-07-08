@@ -59,7 +59,7 @@ Uses
   Function  GetValueFromLine (Var VLine   : Integer) : String;
   procedure SkipValueAtLine  (Var VLine   : Integer);
  Public
-  Procedure AddStrings       (Strings     : TStrings); Override;
+  Procedure AddStrings       (aStrings    : TStrings); Override;
   Procedure AddStdValues     (ASrc        : TStrings);
   Procedure AddValue         (Const AName,
                               AValue       : String);
@@ -113,12 +113,12 @@ Begin
   End;
 End;
 
-Procedure TRESTDWHeaderList.AddStrings(Strings: TStrings);
+Procedure TRESTDWHeaderList.AddStrings(aStrings: TStrings);
 Begin
- If Strings Is TRESTDWHeaderList Then
-  Inherited AddStrings(Strings)
+ If aStrings Is TRESTDWHeaderList Then
+  Inherited AddStrings(aStrings)
  Else
-  AddStdValues(Strings);
+  AddStdValues(aStrings);
 End;
 
 Procedure TRESTDWHeaderList.AssignTo(Dest: TPersistent);

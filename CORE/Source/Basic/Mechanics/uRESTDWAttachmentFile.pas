@@ -39,14 +39,14 @@ Uses
   FFileIsTempFile: Boolean;
   FAttachmentBlocked: Boolean;
  Public
-  Constructor Create(Collection      : TRESTDWMessageParts;
+  Constructor Create(aCollection     : TRESTDWMessageParts;
                      Const AFileName : String = ''); Reintroduce;
   Destructor  Destroy; Override;
   Function    OpenLoadStream    : TStream; Override;
   Procedure   CloseLoadStream;             Override;
   Function    PrepareTempStream : TStream; Override;
   Procedure   FinishTempStream;            Override;
-  Procedure   SaveToFile(Const FileName : String); Override;
+  Procedure   SaveToFile(Const aFileName : String); Override;
   Property    FileIsTempFile    : Boolean Read FFileIsTempFile    Write FFileIsTempFile;
   Property    StoredPathName    : String  Read FStoredPathName    Write FStoredPathName;
   Property    AttachmentBlocked : Boolean Read FAttachmentBlocked;
@@ -72,10 +72,10 @@ Begin
  FreeAndNil(FTempFileStream);
 End;
 
-Constructor TRESTDWAttachmentFile.Create(Collection      : TRESTDWMessageParts;
+Constructor TRESTDWAttachmentFile.Create(aCollection      : TRESTDWMessageParts;
                                          Const AFileName : String = '');
 Begin
- Inherited Create(Collection);
+ Inherited Create(aCollection);
  FFilename := ExtractFileName(AFilename);
  FTempFileStream := nil;
  FStoredPathName := AFileName;
@@ -128,9 +128,9 @@ begin
   Result := FTempFileStream;
 end;
 
-procedure TRESTDWAttachmentFile.SaveToFile(const FileName: String);
+procedure TRESTDWAttachmentFile.SaveToFile(const aFileName: String);
 Begin
- If Not CopyFileTo(StoredPathname, FileName) Then
+ If Not CopyFileTo(StoredPathname, aFileName) Then
   Raise eRESTDWException.Create(cMessageErrorSavingAttachment);
 End;
 

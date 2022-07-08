@@ -181,7 +181,7 @@ Begin
  Inherited Create;
 End;
 
-Constructor TRESTDWMessageDecoder.Create;
+Constructor TRESTDWMessageDecoder.Create(AOwner : TComponent);
 Begin
  Inherited;
  FFreeSourceStream := True;

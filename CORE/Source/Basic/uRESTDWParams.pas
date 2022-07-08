@@ -28,12 +28,13 @@ interface
 
 Uses
  {$IFDEF FPC}
-  SysUtils,  Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWTools, uRESTDWResponseTranslator;
+  SysUtils,  Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWTools, uRESTDWResponseTranslator,
+  LConvEncoding;
  {$ELSE}
   {$if CompilerVersion > 24} // Delphi 2010 acima
-   System.SysUtils, System.Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWTools, uRESTDWResponseTranslator;
+   System.SysUtils, System.Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWTools, uRESTDWResponseTranslator;
   {$ELSE}
-   SysUtils, Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWTools, uRESTDWResponseTranslator;
+   SysUtils, Classes, Db, Variants, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWTools, uRESTDWResponseTranslator;
   {$IFEND}
  {$ENDIF}
 
@@ -944,7 +945,7 @@ Begin
        If vEncoding = esUtf8 Then
         aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
        Else
-        aValue := StringToBytes(Format(TJsonStringValue, [bValue]), GetEncodingID(vEncoding))
+        aValue := StringToBytes(Format(TJsonStringValue, [bValue]))
       End
      Else
       Begin
@@ -6258,7 +6259,7 @@ Begin
     StartPos := Stream.Position;
     With ParamsHeader Do
      Begin
-      VersionNumber := RESTDwParamsHeaderVersion;
+      VersionNumber := RESTDWParamsHeaderVersion;
       DataSize      := 0;
       RecordCount   := 0;
       ParamsCount   := Count;
@@ -6315,21 +6316,21 @@ Begin
  StartPos := Stream.Position;
  With ParamsHeader Do
   Begin
-   VersionNumber := DwParamsHeaderVersion;
+   VersionNumber := RESTDWParamsHeaderVersion;
    DataSize      := 0;
    RecordCount   := 0;
    ParamsCount   := Count;
   End;
- Stream.WriteBuffer(ParamsHeader, SizeOf(TDWParamsHeader));
+ Stream.WriteBuffer(ParamsHeader, SizeOf(TRESTDWParamsHeader));
  //Write dwParamsBinList
  SaveParamsToStream(Stream);
  //Remap Bin size
  EndPos := Stream.Position;
- ParamsHeader.DataSize    := EndPos - StartPos - SizeOf(TDWParamsHeader);
+ ParamsHeader.DataSize    := EndPos - StartPos - SizeOf(TRESTDWParamsHeader);
  ParamsHeader.ParamsCount := aCount;
  //Rewrite init Header
  Stream.Position := StartPos;
- Stream.WriteBuffer(ParamsHeader, SizeOf(TDWParamsHeader));
+ Stream.WriteBuffer(ParamsHeader, SizeOf(TRESTDWParamsHeader));
  Stream.Position := 0;
  {$ENDIF}
 // SetLength(vTempString, Stream.Size);

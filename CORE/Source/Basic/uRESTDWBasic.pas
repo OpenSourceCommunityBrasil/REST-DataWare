@@ -29,7 +29,8 @@ Uses
  {$IFDEF FPC}
  SysUtils,      Classes, Db, Variants, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
  DataUtils,     uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
- uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWAbout
+ uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWCharset, uRESTDWEncodeClass, uRESTDWConsts,
+ syncobjs, uRESTDWAbout, uzliblaz
  {$ELSE}
   {$IF CompilerVersion <= 22}
    SysUtils, Classes, Db, Variants, EncdDecd, SyncObjs, DataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
@@ -757,7 +758,7 @@ End;
 Type
  TRESTShellServicesBase   = Class(TRESTServiceBase)
  Private
-  vOnCreate : TOnCreate;
+//  vOnCreate : TOnCreate;
   Procedure Loaded; Override;
  Protected
   Procedure Notification              (AComponent            : TComponent;
@@ -2907,7 +2908,7 @@ Begin
                                                                {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams);
               TDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                        {$ELSE}Url{$IFEND}
-                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams, vEncoding, vUriOptions, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams, vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
              End
             Else
              Begin
@@ -2916,7 +2917,7 @@ Begin
                                                                {$ELSE}Url{$ENDIF} + '?' + QueryParams);
               TDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                        {$ELSE}Url{$IFEND}
-                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams, vEncoding, vUriOptions, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount);
+                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams, vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
               If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then  // Ico Menezes - Post Receber WelcomeMessage   - 20-12-2018
                vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
              End;
@@ -2933,7 +2934,7 @@ Begin
                                                                                                  {$ELSE}Url{$IFEND}
                                                                                                  {$ELSE}Url{$ENDIF},
                                               QueryParams,
-                                              vUriOptions, vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, aParamsCount, RequestType);
+                                              vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
            End;
           {$ELSE}
           If QueryParams <> '' Then

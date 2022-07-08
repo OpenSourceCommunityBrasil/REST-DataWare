@@ -34,7 +34,7 @@ Uses
   , System.NetEncoding
  {$IFEND}
  {$ENDIF},
- uRESTDWEncodeClass;
+ uRESTDWEncodeClass, uRESTDWCharset;
 
  Const
   B64Table      = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
@@ -333,10 +333,72 @@ Uses
  Function  GetPairJSONInt         (Status               : Integer;
                                    MessageText          : String;
                                    Encoding             : TEncodeSelect = esUtf8) : String;
+ {$IFDEF FPC}
+ Function  GetStringUnicode(Value : String) : String;
+ Function  GetStringEncode (Value : String; DatabaseCharSet : TDatabaseCharSet) : String;
+ Function  GetStringDecode (Value : String; DatabaseCharSet : TDatabaseCharSet) : String;
+ {$ENDIF}
 
 Implementation
 
 Uses uRESTDWConsts, uRESTDWBase64, uRESTDWException{$IFNDEF HAS_FMX}, Windows{$ENDIF};
+
+
+{$IFDEF FPC}
+Function  GetStringUnicode(Value : String) : String;
+Var
+ Unicode,
+ Charlen : Integer;
+ P       : PChar;
+Begin
+ P := PChar(Value);
+ Result := '';
+ Repeat
+  Unicode := UTF8CharacterToUnicode(P, Charlen);
+  Result  := Result + UTF8Copy(p, 1, 1);
+  Inc(P, Charlen);
+ Until (Charlen = 0) or (Unicode = 0);
+ Result := P;
+End;
+
+Function  GetStringEncode(Value : String;DatabaseCharSet : TDatabaseCharSet) : String;
+Begin
+ Result := Value;
+ Case DatabaseCharSet Of
+   csWin1250    : Result := CP1250ToUTF8(Value);
+   csWin1251    : Result := CP1251ToUTF8(Value);
+   csWin1252    : Result := CP1252ToUTF8(Value);
+   csWin1253    : Result := CP1253ToUTF8(Value);
+   csWin1254    : Result := CP1254ToUTF8(Value);
+   csWin1255    : Result := CP1255ToUTF8(Value);
+   csWin1256    : Result := CP1256ToUTF8(Value);
+   csWin1257    : Result := CP1257ToUTF8(Value);
+   csWin1258    : Result := CP1258ToUTF8(Value);
+   csUTF8       : Result := UTF8ToUTF8BOM(Value);
+   csISO_8859_1 : Result := ISO_8859_1ToUTF8(Value);
+   csISO_8859_2 : Result := ISO_8859_2ToUTF8(Value);
+ End;
+End;
+
+Function  GetStringDecode(Value : String;DatabaseCharSet : TDatabaseCharSet) : String;
+Begin
+ Result := Value;
+ Case DatabaseCharSet Of
+   csWin1250    : Result := UTF8ToCP1250(Value);
+   csWin1251    : Result := UTF8ToCP1251(Value);
+   csWin1252    : Result := UTF8ToCP1252(Value);
+   csWin1253    : Result := UTF8ToCP1253(Value);
+   csWin1254    : Result := UTF8ToCP1254(Value);
+   csWin1255    : Result := UTF8ToCP1255(Value);
+   csWin1256    : Result := UTF8ToCP1256(Value);
+   csWin1257    : Result := UTF8ToCP1257(Value);
+   csWin1258    : Result := UTF8ToCP1258(Value);
+   csUTF8       : Result := UTF8BOMToUTF8(Value);
+   csISO_8859_1 : Result := UTF8ToISO_8859_1(Value);
+   csISO_8859_2 : Result := UTF8ToISO_8859_2(Value);
+ End;
+End;
+{$ENDIF}
 
 Function restdwMin(Const AValueOne,
                    AValueTwo        : Int64) : Int64;
@@ -437,7 +499,7 @@ Var
 {$ENDIF}
 Begin
  {$IFDEF FPC}
-  Result := GetTempFileName(APath, 'restdw'); {Do not Localize}
+  Result := SysUtils.GetTempFileName(APath, 'restdw'); {Do not Localize}
  {$ELSE}
   lPath := APath;
   lExt := {$IFDEF UNIX}''{$ELSE}'.tmp'{$ENDIF}; {Do not Localize}
@@ -476,7 +538,7 @@ Begin
   LPrefix := APrefix;
   If LPrefix = '' Then
    LPrefix := 'restdw'; {Do not localize}
-  Result := GetTempFileName(APath, LPrefix);
+  Result := Sysutils.GetTempFileName(APath, LPrefix);
   {$ELSE}
   LFQE := AExt;
   If LFQE <> '' Then
@@ -1522,6 +1584,7 @@ Var
  LValue,
  LSep    : String;
  LQuoted : Boolean;
+ vObject : TObject;
  I       : Integer;
  Function FetchQuotedString(Var VHeaderLine : String) : String;
  Begin
@@ -1575,8 +1638,15 @@ Begin
       End;
     End;
    If (LName <> '')   And
-      ((LValue <> '') Or   LQuoted) Then
-    AItems.AddObject(LName + '=' + LValue, TObject(LQuoted));
+      ((LValue <> '') Or LQuoted) Then
+    Begin
+     {$IFDEF FPC}
+      vObject := TObject(PtrUint(LQuoted));
+     {$ELSE}
+      vObject := TObject(LQuoted);
+     {$ENDIF}
+     AItems.AddObject(LName + '=' + LValue, vObject);
+    End;
   End;
 End;
 
@@ -2039,7 +2109,8 @@ Function ReplaceHeaderSubItem(Const AHeaderLine,
 Var
  LItems : TStringList;
  I      : Integer;
- LValue : string;
+ LValue : String;
+ vValidate : Boolean;
  Function QuoteString(Const S            : String;
                       Const AForceQuotes : Boolean) : String;
  Var
@@ -2105,7 +2176,14 @@ Begin
   If Result <> '' Then
    Begin
     For I := 0 To LItems.Count -1 Do
-     Result := Result + '; ' + LItems.Names[I] + '=' + QuoteString(ValueFromIndex(LItems, I), Boolean(LItems.Objects[I])); {do not localize}
+     Begin
+     {$IFDEF FPC}
+      vValidate := Boolean(PtrUint(LItems.Objects[I]));
+     {$ELSE}
+      vValidate := Boolean(LItems.Objects[I]);
+     {$ENDIF}
+      Result := Result + '; ' + LItems.Names[I] + '=' + QuoteString(ValueFromIndex(LItems, I), vValidate); {do not localize}
+     End;
    End;
  Finally
   LItems.Free;
@@ -2543,11 +2621,12 @@ begin
   {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
    HexToBin(PWideChar(value), Result, restdwLength(Result));
   {$ELSE}
-   {$IF CompilerVersion > 21} // Delphi 2010 pra cima
-    HexToBin(PChar(Value), Result, restdwLength(Result));
-   {$ELSE}
-    HexToBin(PChar(Value), @Result, restdwLength(Result));
-   {$IFEND}
+   HexToBin(PChar(Value), PAnsiChar(Result), restdwLength(Result));
+   //{$IF CompilerVersion > 21} // Delphi 2010 pra cima
+   // HexToBin(PChar(Value), Result, restdwLength(Result));
+   //{$ELSE}
+   // HexToBin(PChar(Value), @Result, restdwLength(Result));
+   //{$IFEND}
   {$IFEND}
  {$IFEND}
 End;
@@ -2974,7 +3053,11 @@ Var
 {$IFEND}
 Begin
  {$IFDEF FPC}
-  Result := DecodeStringBase64(S);
+   SA := S;
+   If Pos(sLineBreak, SA) > 0 Then
+    SA := StringReplace(SA, sLineBreak, '', [rfReplaceAll]);
+   Result := BytesToString(Base64Decode(SA));
+//  Result := DecodeStringBase64(S);
  {$ELSE}
   {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
    //Result := TNetEncoding.Base64.Decode(S);//UTF8Decode(TIdDecoderMIME.DecodeString(S, IndyTextEncoding_utf8));

@@ -28,7 +28,6 @@ Interface
 Uses
  {$IFDEF FPC}
   SysUtils,
-  NetEncoding,
  {$ELSE}
   {$IF CompilerVersion >= 28}
   System.SysUtils,
@@ -37,6 +36,9 @@ Uses
   SysUtils,
   {$IFEND}
  {$ENDIF}
+ uRESTDWTools,
+ uRESTDWEncodeClass,
+ uRESTDWCharset,
  uRESTDWBasicTypes;
 
  Type
@@ -49,8 +51,7 @@ Uses
 
 Implementation
 
-Uses uRESTDWTools;
-
+{$IFNDEF FPC}
 {$IF CompilerVersion <= 27}
  Type
   TPacket = Packed Record
@@ -165,25 +166,36 @@ begin
   end;
 end;
 {$IFEND}
+{$ENDIF}
+
+
 
 { TRESTDWBase64 }
 
 class function TRESTDWBase64.Decode(const ASource: TRESTDWBytes): TRESTDWBytes;
 begin
+ {$IFNDEF FPC}
   {$IF CompilerVersion >= 28}
   Result := TRESTDWBytes(TNetEncoding.Base64.Decode(TBytes(ASource)));
   {$ELSE}
   Result := DecodeBase64(BytesToString(ASource));
   {$IFEND}
+ {$ELSE}
+  Result := StringToBytes(DecodeStrings(BytesToString(ASource), csUndefined));
+ {$ENDIF}
 end;
 
 class function TRESTDWBase64.Encode(const ASource: TRESTDWBytes): TRESTDWBytes;
 begin
+ {$IFNDEF FPC}
   {$IF CompilerVersion >= 28}
   Result := TRESTDWBytes(TNetEncoding.Base64.Encode(TBytes(ASource)));
   {$ELSE}
   Result := StringToBytes(EncodeBase64(ASource));
   {$IFEND}
+ {$ELSE}
+  Result := StringToBytes(EncodeStrings(BytesToString(ASource), csUndefined));
+ {$ENDIF}
 end;
 
 class function TRESTDWBase64.URLDecode(const ASource: TRESTDWBytes): TRESTDWBytes;

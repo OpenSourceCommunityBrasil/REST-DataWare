@@ -30,7 +30,7 @@ interface
 
 Uses uRESTDWAbout,
      {$IFDEF FPC}
-      ServerUtils, uRESTDWConsts, SysUtils, Classes
+      uRESTDWConsts, SysUtils, Classes
      {$ELSE}
      {$IF CompilerVersion <= 22}
       SysUtils, Classes,

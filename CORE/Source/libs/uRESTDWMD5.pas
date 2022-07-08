@@ -209,35 +209,35 @@ Begin
  a := a + b;
 End;
 
-procedure MD5Encode(Output: PByteArray; Input: PUINT4Array; Len: LongWord);
-var
- i, j: LongWord;
-Begin
- j:=0;
- i:=0;
- while j < Len do  Begin
-  output[j] := Byte(input[i] and $ff);
-  output[j+1] := Byte((input[i] shr 8) and $ff);
-  output[j+2] := Byte((input[i] shr 16) and $ff);
-  output[j+3] := Byte((input[i] shr 24) and $ff);
-  Inc(j, 4);
-  Inc(i);
- End;
-End;
-
-procedure MD5Decode(Output: PUINT4Array; Input: PByteArray; Len: LongWord);
-var
- i, j: LongWord;
-Begin
- j:=0;
- i:=0;
- while j < Len do Begin
-  Output[i] := UINT4(input[j]) or (UINT4(input[j+1]) shl 8) or
-   (UINT4(input[j+2]) shl 16) or ( UINT4(input[j+3]) shl 24);
-  Inc(j, 4);
-  Inc(i);
- End;
-End;
+//procedure MD5Encode(Output: PByteArray; Input: PUINT4Array; Len: LongWord);
+//var
+// i, j: LongWord;
+//Begin
+// j:=0;
+// i:=0;
+// while j < Len do  Begin
+//  output[j] := Byte(input[i] and $ff);
+//  output[j+1] := Byte((input[i] shr 8) and $ff);
+//  output[j+2] := Byte((input[i] shr 16) and $ff);
+//  output[j+3] := Byte((input[i] shr 24) and $ff);
+//  Inc(j, 4);
+//  Inc(i);
+// End;
+//End;
+//
+//procedure MD5Decode(Output: PUINT4Array; Input: PByteArray; Len: LongWord);
+//var
+// i, j: LongWord;
+//Begin
+// j:=0;
+// i:=0;
+// while j < Len do Begin
+//  Output[i] := UINT4(input[j]) or (UINT4(input[j+1]) shl 8) or
+//   (UINT4(input[j+2]) shl 16) or ( UINT4(input[j+3]) shl 24);
+//  Inc(j, 4);
+//  Inc(i);
+// End;
+//End;
 
 procedure MD5_memcpy(Output: PByteArray; Input: PByteArray; Len: LongWord);
 Begin
@@ -249,90 +249,90 @@ Begin
  FillChar(Output^, Len, Byte(Value));
 End;
 
-procedure MD5Transform(State: PArray4UINT4; Buffer: PArray64Byte);
-var
- a, b, c, d: UINT4;
- x : array[0..15] of UINT4;
-Begin
- a:=State[0]; b:=State[1]; c:=State[2]; d:=State[3];
- MD5Decode(PUINT4Array(@x), PByteArray(Buffer), 64);
-
- FF (a, b, c, d, x[ 0], S11, $d76aa478);
- FF (d, a, b, c, x[ 1], S12, $e8c7b756);
- FF (c, d, a, b, x[ 2], S13, $242070db);
- FF (b, c, d, a, x[ 3], S14, $c1bdceee);
- FF (a, b, c, d, x[ 4], S11, $f57c0faf);
- FF (d, a, b, c, x[ 5], S12, $4787c62a);
- FF (c, d, a, b, x[ 6], S13, $a8304613);
- FF (b, c, d, a, x[ 7], S14, $fd469501);
- FF (a, b, c, d, x[ 8], S11, $698098d8);
- FF (d, a, b, c, x[ 9], S12, $8b44f7af);
- FF (c, d, a, b, x[10], S13, $ffff5bb1);
- FF (b, c, d, a, x[11], S14, $895cd7be);
- FF (a, b, c, d, x[12], S11, $6b901122);
- FF (d, a, b, c, x[13], S12, $fd987193);
- FF (c, d, a, b, x[14], S13, $a679438e);
- FF (b, c, d, a, x[15], S14, $49b40821);
-
- GG (a, b, c, d, x[ 1], S21, $f61e2562);
- GG (d, a, b, c, x[ 6], S22, $c040b340);
- GG (c, d, a, b, x[11], S23, $265e5a51);
- GG (b, c, d, a, x[ 0], S24, $e9b6c7aa);
- GG (a, b, c, d, x[ 5], S21, $d62f105d);
- GG (d, a, b, c, x[10], S22,  $2441453);
- GG (c, d, a, b, x[15], S23, $d8a1e681);
- GG (b, c, d, a, x[ 4], S24, $e7d3fbc8);
- GG (a, b, c, d, x[ 9], S21, $21e1cde6);
- GG (d, a, b, c, x[14], S22, $c33707d6);
- GG (c, d, a, b, x[ 3], S23, $f4d50d87);
-
- GG (b, c, d, a, x[ 8], S24, $455a14ed);
- GG (a, b, c, d, x[13], S21, $a9e3e905);
- GG (d, a, b, c, x[ 2], S22, $fcefa3f8);
- GG (c, d, a, b, x[ 7], S23, $676f02d9);
- GG (b, c, d, a, x[12], S24, $8d2a4c8a);
-
- HH (a, b, c, d, x[ 5], S31, $fffa3942);
- HH (d, a, b, c, x[ 8], S32, $8771f681);
- HH (c, d, a, b, x[11], S33, $6d9d6122);
- HH (b, c, d, a, x[14], S34, $fde5380c);
- HH (a, b, c, d, x[ 1], S31, $a4beea44);
- HH (d, a, b, c, x[ 4], S32, $4bdecfa9);
- HH (c, d, a, b, x[ 7], S33, $f6bb4b60);
- HH (b, c, d, a, x[10], S34, $bebfbc70);
- HH (a, b, c, d, x[13], S31, $289b7ec6);
- HH (d, a, b, c, x[ 0], S32, $eaa127fa);
- HH (c, d, a, b, x[ 3], S33, $d4ef3085);
- HH (b, c, d, a, x[ 6], S34,  $4881d05);
- HH (a, b, c, d, x[ 9], S31, $d9d4d039);
- HH (d, a, b, c, x[12], S32, $e6db99e5);
- HH (c, d, a, b, x[15], S33, $1fa27cf8);
- HH (b, c, d, a, x[ 2], S34, $c4ac5665);
-
- II (a, b, c, d, x[ 0], S41, $f4292244);
- II (d, a, b, c, x[ 7], S42, $432aff97);
- II (c, d, a, b, x[14], S43, $ab9423a7);
- II (b, c, d, a, x[ 5], S44, $fc93a039);
- II (a, b, c, d, x[12], S41, $655b59c3);
- II (d, a, b, c, x[ 3], S42, $8f0ccc92);
- II (c, d, a, b, x[10], S43, $ffeff47d);
- II (b, c, d, a, x[ 1], S44, $85845dd1);
- II (a, b, c, d, x[ 8], S41, $6fa87e4f);
- II (d, a, b, c, x[15], S42, $fe2ce6e0);
- II (c, d, a, b, x[ 6], S43, $a3014314);
- II (b, c, d, a, x[13], S44, $4e0811a1);
- II (a, b, c, d, x[ 4], S41, $f7537e82);
- II (d, a, b, c, x[11], S42, $bd3af235);
- II (c, d, a, b, x[ 2], S43, $2ad7d2bb);
- II (b, c, d, a, x[ 9], S44, $eb86d391);
-
- Inc(State[0], a);
- Inc(State[1], b);
- Inc(State[2], c);
- Inc(State[3], d);
-
- MD5_memset (PByteArray(@x), 0, SizeOf (x));
-End;
+//procedure MD5Transform(State: PArray4UINT4; Buffer: PArray64Byte);
+//var
+// a, b, c, d: UINT4;
+// x : array[0..15] of UINT4;
+//Begin
+// a:=State[0]; b:=State[1]; c:=State[2]; d:=State[3];
+// MD5Decode(PUINT4Array(@x), PByteArray(Buffer), 64);
+//
+// FF (a, b, c, d, x[ 0], S11, $d76aa478);
+// FF (d, a, b, c, x[ 1], S12, $e8c7b756);
+// FF (c, d, a, b, x[ 2], S13, $242070db);
+// FF (b, c, d, a, x[ 3], S14, $c1bdceee);
+// FF (a, b, c, d, x[ 4], S11, $f57c0faf);
+// FF (d, a, b, c, x[ 5], S12, $4787c62a);
+// FF (c, d, a, b, x[ 6], S13, $a8304613);
+// FF (b, c, d, a, x[ 7], S14, $fd469501);
+// FF (a, b, c, d, x[ 8], S11, $698098d8);
+// FF (d, a, b, c, x[ 9], S12, $8b44f7af);
+// FF (c, d, a, b, x[10], S13, $ffff5bb1);
+// FF (b, c, d, a, x[11], S14, $895cd7be);
+// FF (a, b, c, d, x[12], S11, $6b901122);
+// FF (d, a, b, c, x[13], S12, $fd987193);
+// FF (c, d, a, b, x[14], S13, $a679438e);
+// FF (b, c, d, a, x[15], S14, $49b40821);
+//
+// GG (a, b, c, d, x[ 1], S21, $f61e2562);
+// GG (d, a, b, c, x[ 6], S22, $c040b340);
+// GG (c, d, a, b, x[11], S23, $265e5a51);
+// GG (b, c, d, a, x[ 0], S24, $e9b6c7aa);
+// GG (a, b, c, d, x[ 5], S21, $d62f105d);
+// GG (d, a, b, c, x[10], S22,  $2441453);
+// GG (c, d, a, b, x[15], S23, $d8a1e681);
+// GG (b, c, d, a, x[ 4], S24, $e7d3fbc8);
+// GG (a, b, c, d, x[ 9], S21, $21e1cde6);
+// GG (d, a, b, c, x[14], S22, $c33707d6);
+// GG (c, d, a, b, x[ 3], S23, $f4d50d87);
+//
+// GG (b, c, d, a, x[ 8], S24, $455a14ed);
+// GG (a, b, c, d, x[13], S21, $a9e3e905);
+// GG (d, a, b, c, x[ 2], S22, $fcefa3f8);
+// GG (c, d, a, b, x[ 7], S23, $676f02d9);
+// GG (b, c, d, a, x[12], S24, $8d2a4c8a);
+//
+// HH (a, b, c, d, x[ 5], S31, $fffa3942);
+// HH (d, a, b, c, x[ 8], S32, $8771f681);
+// HH (c, d, a, b, x[11], S33, $6d9d6122);
+// HH (b, c, d, a, x[14], S34, $fde5380c);
+// HH (a, b, c, d, x[ 1], S31, $a4beea44);
+// HH (d, a, b, c, x[ 4], S32, $4bdecfa9);
+// HH (c, d, a, b, x[ 7], S33, $f6bb4b60);
+// HH (b, c, d, a, x[10], S34, $bebfbc70);
+// HH (a, b, c, d, x[13], S31, $289b7ec6);
+// HH (d, a, b, c, x[ 0], S32, $eaa127fa);
+// HH (c, d, a, b, x[ 3], S33, $d4ef3085);
+// HH (b, c, d, a, x[ 6], S34,  $4881d05);
+// HH (a, b, c, d, x[ 9], S31, $d9d4d039);
+// HH (d, a, b, c, x[12], S32, $e6db99e5);
+// HH (c, d, a, b, x[15], S33, $1fa27cf8);
+// HH (b, c, d, a, x[ 2], S34, $c4ac5665);
+//
+// II (a, b, c, d, x[ 0], S41, $f4292244);
+// II (d, a, b, c, x[ 7], S42, $432aff97);
+// II (c, d, a, b, x[14], S43, $ab9423a7);
+// II (b, c, d, a, x[ 5], S44, $fc93a039);
+// II (a, b, c, d, x[12], S41, $655b59c3);
+// II (d, a, b, c, x[ 3], S42, $8f0ccc92);
+// II (c, d, a, b, x[10], S43, $ffeff47d);
+// II (b, c, d, a, x[ 1], S44, $85845dd1);
+// II (a, b, c, d, x[ 8], S41, $6fa87e4f);
+// II (d, a, b, c, x[15], S42, $fe2ce6e0);
+// II (c, d, a, b, x[ 6], S43, $a3014314);
+// II (b, c, d, a, x[13], S44, $4e0811a1);
+// II (a, b, c, d, x[ 4], S41, $f7537e82);
+// II (d, a, b, c, x[11], S42, $bd3af235);
+// II (c, d, a, b, x[ 2], S43, $2ad7d2bb);
+// II (b, c, d, a, x[ 9], S44, $eb86d391);
+//
+// Inc(State[0], a);
+// Inc(State[1], b);
+// Inc(State[2], c);
+// Inc(State[3], d);
+//
+// MD5_memset (PByteArray(@x), 0, SizeOf (x));
+//End;
 
 
 procedure MD5Init(var Context: TMD5Context);
@@ -349,22 +349,22 @@ var
  i, index, partLen: LongWord;
 
 Begin
- index := LongWord( (context.count[0] shr 3) and $3F);
- Inc(Context.count[0], UINT4(InputLen) shl 3);
- if Context.count[0] < UINT4(InputLen) shl 3 then Inc(Context.count[1]);
- Inc(Context.count[1], UINT4(InputLen) shr 29);
- partLen := 64 - index;
- if inputLen >= partLen then Begin
-  MD5_memcpy(PByteArray(@Context.buffer[index]), Input, PartLen);
-  MD5Transform(@Context.state, @Context.buffer);
-  i := partLen;
-  while i + 63 < inputLen do Begin
-   MD5Transform(@Context.state, PArray64Byte(@Input[i]));
-   Inc(i, 64);
-  End;
-  index := 0;
- end else i:=0;
- MD5_memcpy(PByteArray(@Context.buffer[index]), PByteArray(@Input[i]), inputLen - i);
+ //index := LongWord( (context.count[0] shr 3) and $3F);
+ //Inc(Context.count[0], UINT4(InputLen) shl 3);
+ //if Context.count[0] < UINT4(InputLen) shl 3 then Inc(Context.count[1]);
+ //Inc(Context.count[1], UINT4(InputLen) shr 29);
+ //partLen := 64 - index;
+ //if inputLen >= partLen then Begin
+ // MD5_memcpy(PByteArray(@Context.buffer[index]), Input, PartLen);
+ // MD5Transform(@Context.state, @Context.buffer);
+ // i := partLen;
+ // while i + 63 < inputLen do Begin
+ //  MD5Transform(@Context.state, PArray64Byte(@Input[i]));
+ //  Inc(i, 64);
+ // End;
+ // index := 0;
+ //end else i:=0;
+ //MD5_memcpy(PByteArray(@Context.buffer[index]), PByteArray(@Input[i]), inputLen - i);
 End;
 
 
@@ -373,13 +373,13 @@ var
  bits: array [0..7] of Byte;
  index, padLen: LongWord;
 Begin
- MD5Encode(PByteArray(@bits), PUINT4Array(@Context.count), 8);
- index := LongWord( (Context.count[0] shr 3) and $3F);
- if index < 56 then padLen := 56 - index else padLen := 120 - index;
- MD5Update(Context, PByteArray(@PADDING), padLen);
- MD5Update(Context, PByteArray(@Bits), 8);
- MD5Encode(PByteArray(@Digest), PUINT4Array(@Context.state), 16);
- MD5_memset(PByteArray(@Context), 0, SizeOf(Context));
+ //MD5Encode(PByteArray(@bits), PUINT4Array(@Context.count), 8);
+ //index := LongWord( (Context.count[0] shr 3) and $3F);
+ //if index < 56 then padLen := 56 - index else padLen := 120 - index;
+ //MD5Update(Context, PByteArray(@PADDING), padLen);
+ //MD5Update(Context, PByteArray(@Bits), 8);
+ //MD5Encode(PByteArray(@Digest), PUINT4Array(@Context.state), 16);
+ //MD5_memset(PByteArray(@Context), 0, SizeOf(Context));
 End;
 
 Function MD5DigestToStr(const Digest: TRESTDWMD5Digest): string;

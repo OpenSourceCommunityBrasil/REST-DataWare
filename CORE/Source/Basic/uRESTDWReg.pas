@@ -28,7 +28,7 @@ interface
 uses
   {$IFDEF FPC}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
-    LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb,
+    LResources, LazFileUtils, SysUtils, Classes, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, fpWeb,
     uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWSqlEditor,
     uRESTDWFieldSourceEditor, uRESTDWBufferDb, uRESTDWResponseTranslator, uRESTDWJSONViewer, uRESTDWAbout;
   {$ELSE}
@@ -189,18 +189,18 @@ Type
   Function    InitProject     (AProject : TLazProject) : TModalResult; Override;
   Function    CreateStartFiles(AProject : TLazProject) : TModalResult; Override;
  End;
- TRESTDWCGIDatamodule = Class(TFileDescPascalUnitWithResource)
- Public
-  Constructor Create; Override;
-  Function    GetInterfaceUsesSection : String; Override;
-  Function    GetInterfaceSource(const Filename, SourceName,
-                                 ResourceName : String) : String; Override;
-  Function    GetLocalizedName        : String; Override;
-  Function    GetLocalizedDescription : String; Override;
-  Function    GetImplementationSource(Const Filename,
-                                      SourceName,
-                                      ResourceName : String) : String;Override;
- End;
+ //TRESTDWCGIDatamodule = Class(TFileDescPascalUnitWithResource)
+ //Public
+ // Constructor Create; Override;
+ // Function    GetInterfaceUsesSection : String; Override;
+ // Function    GetInterfaceSource(const Filename, SourceName,
+ //                                ResourceName : String) : String; Override;
+ // Function    GetLocalizedName        : String; Override;
+ // Function    GetLocalizedDescription : String; Override;
+ // Function    GetImplementationSource(Const Filename,
+ //                                     SourceName,
+ //                                     ResourceName : String) : String;Override;
+ //End;
  TRESTDWDatamodule    = Class(TFileDescPascalUnitWithResource)
  Public
   Constructor Create;Override;
@@ -232,7 +232,7 @@ Resourcestring
 
 Var
  PDRESTDWCGIApplication : TRESTDWCGIApplicationDescriptor;
- PDRESTDWCGIDatamodule  : TRESTDWCGIDatamodule;
+// PDRESTDWCGIDatamodule  : TRESTDWCGIDatamodule;
  PDRESTDWDatamodule     : TRESTDWDatamodule;
 {$ENDIF}
 
@@ -293,13 +293,13 @@ Begin
  Name  := 'REST Dataware - CGI Application';
 End;
 
-Constructor TRESTDWCGIDatamodule.Create;
-Begin
- Inherited Create;
- Name                    := 'RESTDWCGIWebModule';
- ResourceClass           := Trestdwcgiwebmodule;
- UseCreateFormStatements := True;
-End;
+//Constructor TRESTDWCGIDatamodule.Create;
+//Begin
+// Inherited Create;
+// Name                    := 'RESTDWCGIWebModule';
+// ResourceClass           := Trestdwcgiwebmodule;
+// UseCreateFormStatements := True;
+//End;
 
 Constructor TRESTDWDatamodule.Create;
 Var
@@ -330,10 +330,10 @@ Begin
  Result := rsRESTDWDatamodule;
 End;
 
-Function TRESTDWCGIDatamodule.GetLocalizedName : String;
-Begin
- Result := rsRESTDWCGIDatamodule;
-End;
+//Function TRESTDWCGIDatamodule.GetLocalizedName : String;
+//Begin
+// Result := rsRESTDWCGIDatamodule;
+//End;
 
 Function TRESTDWDatamodule.GetInterfaceUsesSection : String;
 Begin
@@ -342,13 +342,13 @@ Begin
  Result  := Result + '  uRESTDWCharset, uRESTDWParams, DataUtils, uRESTDWComponentEvents, uRESTDWDatamodule';
 End;
 
-Function TRESTDWCGIDatamodule.GetInterfaceUsesSection : String;
-Begin
- Result  := 'SysUtils, Classes';
- If GetResourceType = rtLRS Then
-  Result :=  Result+ ', LResources, ';
- Result  := Result + ', uRESTDWBase, httpdefs, fpHTTP, fpWeb, dmdwcgiserver, unit2';
-End;
+//Function TRESTDWCGIDatamodule.GetInterfaceUsesSection : String;
+//Begin
+// Result  := 'SysUtils, Classes';
+// If GetResourceType = rtLRS Then
+//  Result :=  Result+ ', LResources, ';
+// Result  := Result + ', uRESTDWBase, httpdefs, fpHTTP, fpWeb, dmdwcgiserver, unit2';
+//End;
 
 Function TRESTDWDatamodule.GetInterfaceSource(Const Filename, SourceName, ResourceName : String) : String;
 Const
@@ -367,22 +367,22 @@ Begin
                    + '  ' + ResourceName + ': T' + ResourceName + ';' + LE + LE;
 End;
 
-Function TRESTDWCGIDatamodule.GetInterfaceSource(Const Filename, SourceName, ResourceName : String) : String;
-Const
- LE = LineEnding;
-Begin
- Result := 'Type'+ LE
-         + '  T'+ResourceName+' = class(Trestdwcgiwebmodule)'+LE
-         + '  Private'+LE
-         + LE
-         + '  Public'+LE
-         + LE
-         + ' End;'+LE
-         + LE;
- If DeclareClassVariable Then
-  Result := Result + 'Var' + LE
-                   + '  ' + ResourceName + ': T' + ResourceName + ';' + LE + LE;
-End;
+//Function TRESTDWCGIDatamodule.GetInterfaceSource(Const Filename, SourceName, ResourceName : String) : String;
+//Const
+// LE = LineEnding;
+//Begin
+// Result := 'Type'+ LE
+//         + '  T'+ResourceName+' = class(Trestdwcgiwebmodule)'+LE
+//         + '  Private'+LE
+//         + LE
+//         + '  Public'+LE
+//         + LE
+//         + ' End;'+LE
+//         + LE;
+// If DeclareClassVariable Then
+//  Result := Result + 'Var' + LE
+//                   + '  ' + ResourceName + ': T' + ResourceName + ';' + LE + LE;
+//End;
 
 Function TRESTDWCGIApplicationDescriptor.GetLocalizedDescription : String;
 Begin
@@ -394,10 +394,10 @@ Begin
  Result := Format(rsRESTDWDatamoduleADa, [#13#13]);
 End;
 
-Function TRESTDWCGIDatamodule.GetLocalizedDescription : String;
-Begin
- Result := Format(rsRESTDWCGIDatamoduleADa, [#13#13]);
-End;
+//Function TRESTDWCGIDatamodule.GetLocalizedDescription : String;
+//Begin
+// Result := Format(rsRESTDWCGIDatamoduleADa, [#13#13]);
+//End;
 
 Function TRESTDWCGIApplicationDescriptor.InitProject(AProject : TLazProject) : TModalResult;
 Var
@@ -429,26 +429,26 @@ Begin
  Result := Inherited GetImplementationSource(FileName, SourceName, ResourceName);
 End;
 
-Function TRESTDWCGIDatamodule.GetImplementationSource(const Filename, SourceName, ResourceName : String) : String;
-Var
- ResourceFilename: String;
-Begin
- Case GetResourceType Of
-  rtLRS :
-   Begin
-    ResourceFilename := TrimFilename(ExtractFilenameOnly(Filename) + DefaultResFileExt);
-    Result           := 'Initialization' + LineEnding + '  {$I ' + ResourceFilename + '}' + LineEnding + LineEnding;
-   End;
-  rtRes : Result := '{$R *.lfm}' + LineEnding + LineEnding;
-  Else    Result := '';
- End;
- Result := Result + 'Initialization' + LineEnding + ' RegisterHTTPModule('''', T' + ResourceName + ');' + LineEnding;
-End;
+//Function TRESTDWCGIDatamodule.GetImplementationSource(const Filename, SourceName, ResourceName : String) : String;
+//Var
+// ResourceFilename: String;
+//Begin
+// Case GetResourceType Of
+//  rtLRS :
+//   Begin
+//    ResourceFilename := TrimFilename(ExtractFilenameOnly(Filename) + DefaultResFileExt);
+//    Result           := 'Initialization' + LineEnding + '  {$I ' + ResourceFilename + '}' + LineEnding + LineEnding;
+//   End;
+//  rtRes : Result := '{$R *.lfm}' + LineEnding + LineEnding;
+//  Else    Result := '';
+// End;
+// Result := Result + 'Initialization' + LineEnding + ' RegisterHTTPModule('''', T' + ResourceName + ');' + LineEnding;
+//End;
 
 Function TRESTDWCGIApplicationDescriptor.CreateStartFiles(AProject : TLazProject): TModalResult;
 Begin
- LazarusIDE.DoNewEditorFile(PDRESTDWCGIDatamodule, '', '',
-                            [nfIsPartOfProject, nfOpenInEditor, nfCreateDefaultSrc]);
+ //LazarusIDE.DoNewEditorFile(PDRESTDWCGIDatamodule, '', '',
+ //                           [nfIsPartOfProject, nfOpenInEditor, nfCreateDefaultSrc]);
  LazarusIDE.DoNewEditorFile(PDRESTDWDatamodule, '', '',
                             [nfIsPartOfProject, nfOpenInEditor, nfCreateDefaultSrc]);
  Result:= mrOK;
@@ -732,7 +732,7 @@ Begin
   0 : {$IFNDEF FPC}
        ShowCollectionEditor(Designer, Component, TRESTDWServerContext(Component).ContextList, 'ContextList');
       {$ELSE}
-       TCollectionPropertyEditor.ShowCollectionEditor(TRESTServerContext(Component).ContextList, Component, 'ContextList');
+       TCollectionPropertyEditor.ShowCollectionEditor(TRESTDWServerContext(Component).ContextList, Component, 'ContextList');
       {$ENDIF}
  End;
 end;
@@ -743,7 +743,7 @@ Begin
   0 : {$IFNDEF FPC}
        ShowCollectionEditor(Designer, Component, TRESTDWContextRules(Component).Items, 'Items');
       {$ELSE}
-       TCollectionPropertyEditor.ShowCollectionEditor(TDWContextRules(Component).Items, Component, 'Items');
+       TCollectionPropertyEditor.ShowCollectionEditor(TRESTDWContextRules(Component).Items, Component, 'Items');
       {$ENDIF}
  End;
 end;
@@ -832,12 +832,12 @@ Begin
 // RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWUpdateSQL,          'ModifySQL',       TDWUpdSQLEditorModify);
 // RegisterComponentEditor(TRESTDWUpdateSQL,      TDWUpdateSQLEditor);
 //
-  RegisterComponentEditor(TRESTDWServerEvents,        TRESTDWServerEventsEditor);
-  RegisterComponentEditor(TRESTDWClientEvents,        TRESTDWClientEventsEditor);
-  RegisterComponentEditor(TRESTDWResponseTranslator,  TRESTDWJSONViewer);
+  RegisterComponentEditor(TRESTDWServerEvents,        TComponentEditorClass(TRESTDWServerEventsEditor));
+  RegisterComponentEditor(TRESTDWClientEvents,        TComponentEditorClass(TRESTDWClientEventsEditor));
+  RegisterComponentEditor(TRESTDWResponseTranslator,  TComponentEditorClass(TRESTDWJSONViewer));
   RegisterPropertyEditor (TypeInfo(TRESTDWComponent), TRESTDWResponseTranslator, 'ClientREST', TRESTDWClientRESTList);
-  RegisterComponentEditor(TRESTDWServerContext,       TRESTDWServerContextEditor);
-  RegisterComponentEditor(TRESTDWContextRules,        TRESTDWContextRulesEditor);
+  RegisterComponentEditor(TRESTDWServerContext,       TComponentEditorClass(TRESTDWServerContextEditor));
+  RegisterComponentEditor(TRESTDWContextRules,        TComponentEditorClass(TRESTDWContextRulesEditor));
  {$IFNDEF FPC}
   RegisterComponentEditor(TRESTDWClientSQL,         TRESTDWClientSQLEditor);
   RegisterComponentEditor(TRESTDWServerContext,     TRESTDWServerContextEditor);
@@ -1097,11 +1097,12 @@ Var
  PropClass : TClass;
  Finded    : Boolean;
 Begin
-// {$IFDEF VERSION5}
-  COwner := Designer.GetRoot;
-// {$ELSE}
-//  COwner := Designer.Form;
-// {$ENDIF}
+// COwner := FormEditor.FormDesigner.GetRoot;
+ {$IFDEF FPC}
+ COwner := TComponent(GetComponent(0)).GetParentComponent;
+ {$ELSE}
+ COwner := Designer.GetRoot;
+ {$ENDIF}
  PropClass := TRESTDWClientRESTBase;
  For I := 0 to COwner.ComponentCount - 1 Do
   Begin
@@ -1121,6 +1122,9 @@ initialization
  	RegisterAboutBox;
    AddSplash;
   {$ENDIF}
+ {$ENDIF}
+ {$IFDEF FPC}
+  {$I resteasyobjectscore.lrs}
  {$ENDIF}
 // UnlistPublishedProperty(TRESTDWClientSQL,  'FieldDefs');
 // UnlistPublishedProperty(TRESTDWClientSQL,  'Options');

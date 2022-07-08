@@ -25,14 +25,15 @@ unit uRESTDWBasicClass;
 
 interface
 
-Uses uRESTDWAbout, uRESTDWConsts,{$IFDEF FPC}
-      DataUtils, SysUtils, Classes
-     {$ELSE}
-     {$IF CompilerVersion <= 22}
+Uses uRESTDWAbout, uRESTDWConsts,
+     {$IFDEF FPC}
       SysUtils, Classes
      {$ELSE}
-      System.SysUtils, System.Classes
-     {$IFEND}
+      {$IF CompilerVersion <= 22}
+       SysUtils, Classes
+      {$ELSE}
+       System.SysUtils, System.Classes
+      {$IFEND}
      {$ENDIF}, DataUtils, uRESTDWComponentEvents, uRESTDWEncodeClass, uRESTDWBasicTypes;
 
 Type

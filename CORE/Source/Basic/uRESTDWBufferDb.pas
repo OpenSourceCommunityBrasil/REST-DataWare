@@ -27,7 +27,7 @@ interface
 
 uses
  Messages, SysUtils, Variants, TypInfo, Classes, uRESTDWFileBuffer, Db, uRESTDWConsts,
- uRESTDWTools, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWAbout;
+ uRESTDWTools, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWAbout;
 
 Const                                      // \b  \t  \n   \f   \r
  TSpecialChars     : Array [0 .. 7] Of Char = ('\', '"', '/', #8, #9, #10, #12, #13);

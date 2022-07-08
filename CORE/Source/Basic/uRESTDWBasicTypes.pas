@@ -26,9 +26,9 @@ unit uRESTDWBasicTypes;
 Interface
 
 Uses
- FMTBcd, uRESTDWConsts, uRESTDWEncodeClass,
+ FMTBcd, uRESTDWConsts, uRESTDWEncodeClass, uRESTDWCharset,
  {$IFDEF FPC}
-  SysUtils,  Classes, Db, uRESTDWAbout, uRESTDWConsts, DbTables
+  SysUtils,  Classes, Db, uRESTDWAbout
  {$ELSE}
   {$if CompilerVersion > 24} // Delphi 2010 pra cima
    System.SysUtils, System.Classes, Data.DB, uRESTDWAbout
@@ -37,12 +37,15 @@ Uses
   {$IFEND}
  {$ENDIF}
  {$IFDEF FPC}
+  {$IFDEF RESTDWMEMTABLE}
+   , uRESTDWDataset
+  {$ENDIF}
   {$IFDEF RESTDWLAZDRIVER}
    , memds
   {$ENDIF}
   {$IFDEF RESTDWUNIDACMEM}
   , DADump, UniDump, VirtualTable, MemDS
-  {$ENDIF};
+  {$ENDIF}
  {$ELSE}
    {$IFDEF RESTDWMEMTABLE}
     , uRESTDWDataset
@@ -77,8 +80,8 @@ Uses
       {$IFEND}
      {$ENDIF}
     {$ENDIF}
-   {$IFEND};
- {$ENDIF}
+   {$IFEND}
+ {$ENDIF};
 
  Const
   dwftColor       = Integer(255);
@@ -1446,7 +1449,7 @@ Begin
   StartPos := StreamValue.Position;
   With ParamsHeader Do
    Begin
-    VersionNumber := DwParamsHeaderVersion;
+    VersionNumber := RESTDWParamsHeaderVersion;
     DataSize      := 0;
     ParamsCount   := Dataset.FieldCount;
     RecordCount   := Dataset.RecordCount;
@@ -2523,12 +2526,14 @@ Var
  LKeys : TStringList;
  Procedure FillMimeTable(Const AMIMEList   : TStrings;
                          Const ALoadFromOS : Boolean = True);
+ {$IFNDEF FPC}
  {$IFDEF WINDOWS}
  Var
   reg     : TRegistry;
   KeyList : TStringList;
   i       : Integer;
   s, LExt : String;
+ {$ENDIF}
  {$ENDIF}
  Begin
   If Not Assigned(AMIMEList) Then
@@ -2931,6 +2936,7 @@ Var
   AMIMEList.Add('.mht=message/rfc822');    {Do not Localize}
   If not ALoadFromOS Then
    Exit;
+  {$IFNDEF FPC}
   {$IFDEF WINDOWS}
   // Build the file type/MIME type map
   Reg := TRegistry.Create;
@@ -2985,6 +2991,7 @@ Var
   Finally
    Reg.Free;
   End;
+  {$ENDIF}
   {$ENDIF}
   {$IFDEF UNIX}
    LoadMIME('/etc/mime.types', AMIMEList);                   {do not localize}

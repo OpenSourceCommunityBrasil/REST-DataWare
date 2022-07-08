@@ -38,7 +38,7 @@ Uses
  Type
   TRESTDWIOHandlerStreamMsg = Class(TRESTDWIOHandlerStream)
  Protected
-  FMaxLineLength     : Integer;
+//  FMaxLineLength     : Integer;
   FTerminatorWasRead,
   FEscapeLines,
   FUnescapeLines     : Boolean;
@@ -52,7 +52,6 @@ Uses
                       ATimeout       : Integer = cTimeoutDefault;
                       AMaxLineLength : Integer = -1) : String;
   Procedure   WriteLn(Const AOut     : String);
-//  procedure   ReceiveBody(AMsg : TRESTDWMessage; const ADelim: string = '.');   {do not localize}
   Property    EscapeLines   : Boolean Read FEscapeLines   Write FEscapeLines;
   property    UnescapeLines : Boolean Read FUnescapeLines Write FUnescapeLines;
  Published

@@ -51,6 +51,7 @@ Uses
  eRESTDWCannotSetIPVersionWhenConnected = Class(eRESTDWSocketHandleError);
  eRESTDWReadTimeout                     = Class(eRESTDWException);
  eRESTDWReadLnWaitMaxAttemptsExceeded   = Class(eRESTDWException);
+ eRESTDWFailedToRetreiveTimeZoneInfo    = Class(eRESTDWException);
 
 Implementation
 

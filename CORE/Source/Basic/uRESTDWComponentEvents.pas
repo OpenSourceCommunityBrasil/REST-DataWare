@@ -28,7 +28,7 @@ interface
 Uses
  {$IFDEF FPC}
  SysUtils,      DataUtils, Classes,     {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
- uRESTDWConsts, uRESTDWParams, uRESTDWBasicTypes, Db;
+ uRESTDWConsts, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, Db;
  {$ELSE}
   {$IF CompilerVersion <= 22}
    SysUtils, DataUtils, Classes, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, uRESTDWConsts, Db

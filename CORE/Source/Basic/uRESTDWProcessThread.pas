@@ -17,7 +17,7 @@ Interface
 
 Uses
  {$IFDEF FPC}
- SysUtils,          Classes,      ServerUtils, {$IFDEF WINDOWS}Windows, {$ENDIF}
+ SysUtils,          Classes,      DataUtils, {$IFDEF WINDOWS}Windows, {$ENDIF}
  IdContext,         IdTCPClient,  IdComponent,       IdBaseComponent,     uDWConsts,
  uDWConstsData,                   IdMessageCoder,    IdHashMessageDigest, IdHash, IdMessage, uDWJSON,
  IdHeaderList,                    uDWJSONObject,     IdGlobal,            IdGlobalProtocols,

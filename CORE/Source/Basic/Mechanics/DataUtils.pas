@@ -33,7 +33,7 @@ Uses
   StringBuilderUnit,
   {$ENDIF} uRESTDWTools, uRESTDWConsts,
   DateUtils, uRESTDWMD5, uRESTDWBasicTypes,
-  uRESTDWEncodeClass, uRESTDWParams;
+  uRESTDWEncodeClass, uRESTDWCharset, uRESTDWParams;
 
 Type
  TRESTDWAuthOptionTypes = (rdwOATBasic, rdwOATBearer, rdwOATToken);
@@ -441,7 +441,7 @@ Var
 
 implementation
 
-Uses uRESTDWCharset, uRESTDWJSONInterface;
+Uses uRESTDWJSONInterface;
 
 
 Function GetMIMEType(Value : String) : String;

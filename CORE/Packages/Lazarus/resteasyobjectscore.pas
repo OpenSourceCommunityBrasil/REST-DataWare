@@ -8,14 +8,26 @@ unit resteasyobjectscore;
 interface
 
 uses
-  ServerUtils, SysTypes, uDWConsts, uDWJSONObject, uDWJSONTools, uRESTDWBase, 
-  uRESTDWReg, uRESTDWMasterDetailData, uRESTDWPoolerDB, uZlibLaz, 
-  uDWPoolerMethod, uDWDatamodule, uDWJSON, uDWMassiveBuffer, uDWDataset, 
-  uDWSqlEditor, uAboutForm, uDWAbout, uDWConstsData, uDWJSONViewer, 
-  DWDCPbase64, DWDCPblockciphers, DWDCPconst, DWDCPcrypt2, DWDCPtypes, 
-  DWDCPcast256, DWDCPrijndael, DWDCPsha256, uDWUpdSqlEditor, utemplateproglaz, 
-  uRESTDWFileBuffer, uDWResponseTranslator, uDWFieldSourceEditor, 
-  uRESTDWDataJSON, uRESTDWSerialize, LazarusPackageIntf;
+  uZlibLaz, utemplateproglaz, uRESTDWDataJSON, uRESTDWAbout, uRESTDWBasic, 
+  uRESTDWBasicClass, uRESTDWBasicDB, uRESTDWBasicTypes, uRESTDWBufferDb, 
+  uRESTDWComponentEvents, uRESTDWEncodeClass, uRESTDWFileBuffer, 
+  uRESTDWMasterDetailData, uRESTDWParams, uRESTDWPoolermethod, uRESTDWReg, 
+  uRESTDWResponseTranslator, uRESTDWServerContext, uRESTDWServerEvents, 
+  PropertyPersist, DWDCPblockciphers, DWDCPconst, DWDCPcrypt2, DWDCPtypes, 
+  DWDCPbase64, DWDCPcast256, DWDCPrijndael, DWDCPsha256, uRESTDWAboutForm, 
+  uRESTDWMessageClient, uRESTDWMessageCoder, uRESTDWMessageCoderBinHex4, 
+  uRESTDWMessageCoderMIME, uRESTDWMessageCoderQuotedPrintable, 
+  uRESTDWMessageParts, DataUtils, uRESTDWAttachment, uRESTDWAttachmentFile, 
+  uRESTDWBuffer, uRESTDWCoder, uRESTDWCoder3to4, uRESTDWCoderBinHex4, 
+  uRESTDWCoderHeader, uRESTDWCoderMIME, uRESTDWCoderQuotedPrintable, 
+  uRESTDWException, uRESTDWHeaderCoderBase, uRESTDWHeaderList, 
+  uRESTDWIOHandler, uRESTDWIOHandlerStream, uRESTDWMessage, uRESTDWConsts, 
+  uRESTDWCharset, uRESTDWDynamic, uRESTDWJSONObject, uRESTDWMassiveBuffer, 
+  uRESTDWMD5, uRESTDWTools, StringBuilderUnit, uDWConst404HTML, uRESTDWBase64, 
+  uRESTDWDynArray, uRESTDWJSON, uRESTDWJSONInterface, uRESTDWSerialize, 
+  uRESTDWDatamodule, uRESTDWJSONViewer, uRESTDWDataset, uRESTDWExprParser, 
+  uRESTDWSqlEditor, uRESTDWUpdSqlEditor, uRESTDWFieldSourceEditor, 
+  LazarusPackageIntf;
 
 implementation
 

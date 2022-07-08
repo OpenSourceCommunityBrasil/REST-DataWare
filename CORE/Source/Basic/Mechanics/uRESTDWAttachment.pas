@@ -36,9 +36,9 @@ Uses
   Procedure CloseLoadStream;             Virtual; Abstract;
   Function  PrepareTempStream : TStream; Virtual; Abstract;
   Procedure FinishTempStream;            Virtual; Abstract;
-  Procedure LoadFromFile(Const FileName : String); Virtual;
+  Procedure LoadFromFile(Const aFileName : String); Virtual;
   Procedure LoadFromStream(AStream: TStream);      Virtual;
-  Procedure SaveToFile  (Const FileName : String); Virtual;
+  Procedure SaveToFile  (Const aFileName : String); Virtual;
   Procedure SaveToStream(AStream : TStream);       Virtual;
   Class Function PartType : TRESTDWMessagePartType; Override;
  End;
@@ -54,11 +54,11 @@ Begin
  Result := mptAttachment;
 End;
 
-Procedure TRESTDWAttachment.LoadFromFile(const FileName: String);
+Procedure TRESTDWAttachment.LoadFromFile(const aFileName: String);
 Var
  LStrm : TRESTDWReadFileExclusiveStream;
 Begin
- LStrm := TRESTDWReadFileExclusiveStream.Create(FileName);
+ LStrm := TRESTDWReadFileExclusiveStream.Create(aFileName);
  Try
   LoadFromStream(LStrm);
  Finally
@@ -78,11 +78,11 @@ Begin
  End;
 End;
 
-Procedure TRESTDWAttachment.SaveToFile(const FileName: String);
+Procedure TRESTDWAttachment.SaveToFile(const aFileName: String);
 Var
  LStrm : TRESTDWFileCreateStream;
 Begin
- LStrm := TRESTDWFileCreateStream.Create(FileName);
+ LStrm := TRESTDWFileCreateStream.Create(aFileName);
  Try
   SaveToStream(LStrm);
  Finally

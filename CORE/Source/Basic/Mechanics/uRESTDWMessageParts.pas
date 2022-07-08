@@ -37,7 +37,7 @@ Uses
    Procedure SetContentDescription(Const Value : String); Virtual;
    Procedure SetContentLocation   (Const Value : String); Virtual;
   Public
-   Constructor Create(Collection : TCollection); Override;
+   Constructor Create(aCollection : TCollection); Override;
    Destructor Destroy; Override;
    Procedure  Assign            (Source       : TPersistent); Override;
    Function   GetCharSet        (AHeader      : String) : String;
@@ -116,7 +116,7 @@ Begin
   Inherited Assign(Source);
 End;
 
-Constructor TRESTDWMessagePart.Create(Collection: TCollection);
+Constructor TRESTDWMessagePart.Create(aCollection: TCollection);
 Begin
  Inherited;
  If ClassType = TRESTDWMessagePart Then

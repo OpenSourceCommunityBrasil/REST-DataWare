@@ -1126,13 +1126,7 @@ Begin
   Else
    Begin
     If Length(vTempString) = 0 Then
-     Begin
-      {$IFDEF FPC}
-       vTempString := BytesToString(aValue, GetEncodingID(vEncoding)); //vEncodingLazarus.GetString(aValue);
-      {$ELSE}
-       vTempString := BytesToString(aValue{$IFDEF INDY_NEW}, GetEncodingID(vEncoding){$ENDIF});
-      {$ENDIF}
-     End;
+     vTempString := BytesToString(aValue); //vEncodingLazarus.GetString(aValue);
    End;
   If vObjectValue = ovString Then
    Begin
@@ -1849,8 +1843,7 @@ Begin
  If vEncoding = esUtf8 Then
   vTempValue := vEncodingLazarus.GetString(aValue)
  Else
-  vTempValue := BytesToString(aValue, GetEncodingID(vEncoding));
-//  vTempValue := FormatValue(vEncodingLazarus.GetString(aValue))
+  vTempValue := BytesToString(aValue);
  If vTempValue = '' Then
   Begin
    If vNullValue Then
@@ -4275,25 +4268,25 @@ Begin
      If vEncoded Then
       Begin
        If vEncoding = esUtf8 Then
-        aValue := TIdBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
+        aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
        Else
-        aValue := ToBytes(Format(TJsonStringValue, [bValue]), GetEncodingID(vEncoding))
+        aValue := StringToBytes(Format(TJsonStringValue, [bValue]))
       End
      Else
       Begin
        If ((JsonMode = jmDataware) And (vEncoded)) Or Not(vObjectValue = ovObject) Then
         Begin
          If vEncoding = esUtf8 Then
-          aValue := TIdBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
+          aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
          Else
-          aValue := ToBytes(Format(TJsonStringValue, [bValue]), GetEncodingID(vEncoding));
+          aValue := StringToBytes(Format(TJsonStringValue, [bValue]));
         End
        Else
         Begin
          If vEncoding = esUtf8 Then
-          aValue := TIdBytes(vEncodingLazarus.GetBytes(bValue))
+          aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(bValue))
          Else
-          aValue := ToBytes(String(bValue), GetEncodingID(vEncoding));
+          aValue := StringToBytes(String(bValue));
         End;
       End;
      {$ELSE}

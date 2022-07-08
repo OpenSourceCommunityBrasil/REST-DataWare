@@ -29,7 +29,8 @@ Uses
  {$IFDEF FPC}
   SysUtils,  Classes, Db, SyncObjs, Variants, DataUtils, uRESTDWAbout, uRESTDWBasicTypes,
   uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
-  uRESTDWMassiveBuffer, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWEncodeClass, {$IFNDEF RESTDWLAMW}Forms, {$ENDIF}uRESTDWMasterDetailData
+  uRESTDWMassiveBuffer, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWConsts,
+ {$IFNDEF RESTDWLAMW}Controls, Forms, memds, BufDataset, {$ENDIF}uRESTDWMasterDetailData
   {$IFNDEF UNIX}, Windows{$ENDIF}
  {$ELSE}
   {$IF Defined(RESTDWFMX)}
@@ -48,6 +49,9 @@ Uses
   {$IFEND}
  {$ENDIF}
  {$IFDEF FPC}
+  {$IFDEF RESTDWMEMTABLE}
+   , uRESTDWDataset
+  {$ENDIF}
   {$IFDEF RESTDWLAZDRIVER}
    , memds
   {$ENDIF}
@@ -860,7 +864,7 @@ Type
                             InText  : Boolean;
                             AndOrOR : String);
   {$IFNDEF FPC}
-   {$IFDEF DWMEMTABLE}
+   {$IFDEF RESTDWMEMTABLE}
    Property    Encoding;
    {$ENDIF}
   {$ENDIF}
@@ -1110,7 +1114,7 @@ Type
                             InText  : Boolean;
                             AndOrOR : String);
   {$IFNDEF FPC}
-   {$IFDEF DWMEMTABLE}
+   {$IFDEF RESTDWMEMTABLE}
    Property    Encoding;
    {$ENDIF}
   {$ENDIF}
@@ -1555,7 +1559,7 @@ Type
  TRESTDWPoolerDBP = ^TRESTDWComponent;
  TRESTDWPoolerDB  = Class(TRESTDWComponent)
  Private
-  FLock          : TCriticalSection;
+//  FLock          : TCriticalSection;
   vRESTDriver    : TRESTDWDriver;
   vActive,
   vStrsTrim,
@@ -1888,8 +1892,10 @@ End;
 Constructor TRESTDWPoolerDB.Create(AOwner : TComponent);
 Begin
  Inherited;
- FLock             := TCriticalSection.Create;
- FLock.Acquire;
+ //{$IFNDEF FPC}
+ //FLock             := TCriticalSection.Create;
+ //FLock.Acquire;
+ //{$ENDIF}
  vCompression      := True;
  vStrsTrim         := False;
  vStrsEmpty2Null   := False;
@@ -1910,13 +1916,13 @@ End;
 
 Destructor  TRESTDWPoolerDB.Destroy;
 Begin
- If Assigned(FLock) Then
-  Begin
-   {.$IFNDEF POSIX}
-   FLock.Release;
-   {.$ENDIF}
-   FreeAndNil(FLock);
-  End;
+ //If Assigned(FLock) Then
+ // Begin
+ //  {.$IFNDEF POSIX}
+ //  FLock.Release;
+ //  {.$ENDIF}
+ //  FreeAndNil(FLock);
+ // End;
  Inherited;
 End;
 
@@ -1927,14 +1933,14 @@ Begin
  vInTime    := 1000;
  vEvent     := Nil;
  Timer      := Nil;
- FLock      := TCriticalSection.Create;
+// FLock      := TCriticalSection.Create;
 End;
 
 Destructor  TAutoCheckData.Destroy;
 Begin
  SetState(False);
- FLock.Release;
- FLock.Free;
+ //FLock.Release;
+ //FLock.Free;
  Inherited;
 End;
 
@@ -1985,12 +1991,12 @@ Begin
  While Not Terminated do
   Begin
    Sleep(FValue);
-   If Assigned(FLock) then
-    FLock.Acquire;
+   //If Assigned(FLock) then
+   // FLock.Acquire;
    if Assigned(vEvent) then
     vEvent;
-   If Assigned(FLock) then
-    FLock.Release;
+   //If Assigned(FLock) then
+   // FLock.Release;
   End;
 End;
 
@@ -3713,7 +3719,7 @@ Begin
         Else
          Begin
           vStream := DecodeStream(TRESTDWJSONInterfaceObject(vJsonValueB).pairs[0].value);
-          {$IFNDEF DWMEMTABLE}
+          {$IFNDEF RESTDWMEMTABLE}
           TRESTDWClientSQLBase(Datasets[I]).BinaryCompatibleMode := TRESTDWClientSQL(Datasets[I]).BinaryCompatibleMode;
           {$ENDIF}
           TRESTDWClientSQLBase(Datasets[I]).SetInBlockEvents(True);
@@ -8688,7 +8694,7 @@ Begin
   {$IFDEF FPC}
    {$IFDEF ZEOSDRIVER} //TODO
    {$ENDIF}
-   {$IFDEF DWMEMTABLE}
+   {$IFDEF RESTDWMEMTABLE}
     TRESTDWMemtable(Self).Close;
     TRESTDWMemtable(Self).Open;
    {$ENDIF}
@@ -8721,7 +8727,7 @@ Begin
    TADmemtable(Self).CreateDataSet;
    TADmemtable(Self).Open;
   {$ENDIF}
-  {$IFDEF DWMEMTABLE}
+  {$IFDEF RESTDWMEMTABLE}
    TRESTDWMemtable(Self).Close;
    TRESTDWMemtable(Self).Open;
    {$ENDIF}
@@ -8745,7 +8751,7 @@ Begin
   {$IFDEF FPC}
    {$IFDEF ZEOSDRIVER} //TODO
    {$ENDIF}
-   {$IFDEF DWMEMTABLE}
+   {$IFDEF RESTDWMEMTABLE}
     TRESTDWMemtable(Self).Close;
     TRESTDWMemtable(Self).Open;
    {$ENDIF}
@@ -8778,7 +8784,7 @@ Begin
    TADmemtable(Self).CreateDataSet;
    TADmemtable(Self).Open;
   {$ENDIF}
-  {$IFDEF DWMEMTABLE}
+  {$IFDEF RESTDWMEMTABLE}
    TRESTDWMemtable(Self).Close;
    TRESTDWMemtable(Self).Open;
    {$ENDIF}
@@ -9638,7 +9644,7 @@ Begin
  vInBlockEvents := True;
  Try
   Stream.Position := 0;
-  {$IFNDEF DWMEMTABLE}
+  {$IFNDEF RESTDWMEMTABLE}
   BinaryCompatibleMode := False;
   {$ENDIF}
   TRESTDWClientSQLBase(Self).LoadFromStream(Stream);
@@ -9657,7 +9663,7 @@ begin
  vInBlockEvents := True;
  Try
   Stream.Position := 0;
-  {$IFNDEF DWMEMTABLE}
+  {$IFNDEF RESTDWMEMTABLE}
   BinaryCompatibleMode := False;
   {$ENDIF}
   TRESTDWClientSQLBase(Self).LoadFromStream(Stream);
@@ -9761,7 +9767,7 @@ Begin
  {$ELSE}
   {$IFDEF ZEOSDRIVER} //TODO
   {$ELSE}
-   {$IFDEF DWMEMTABLE} //TODO
+   {$IFDEF RESTDWMEMTABLE} //TODO
     TRESTDWMemtable(Self).Close;
     TRESTDWMemtable(Self).Open;
    {$ELSE}
@@ -9792,7 +9798,7 @@ Begin
  {$ELSE}
   {$IFDEF ZEOSDRIVER} //TODO
   {$ELSE}
-   {$IFDEF DWMEMTABLE} //TODO
+   {$IFDEF RESTDWMEMTABLE} //TODO
     TRESTDWMemtable(Self).Close;
     TRESTDWMemtable(Self).Open;
    {$ELSE}

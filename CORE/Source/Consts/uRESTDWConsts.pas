@@ -30,7 +30,7 @@ Uses
  DWDCPrijndael, DWDCPsha256,
  uRESTDWEncodeClass,
  {$IFDEF FPC}
-  zstream,
+  zstream, uzliblaz,
   {$IFNDEF RESTDWLAMW}
    LCL,
   {$ENDIF}
@@ -67,6 +67,8 @@ Const
  tScriptsDetected           : Array[0..1] of string = ('.map', '.webdwpc');
  cCompressionLevel          = clFastest;
  MAXSHORT                   = 32767;
+ MaxFloatLaz                = 15;
+ LazDigitsSize              = 6;
  TSpecialChars              : Array [0 .. 7]  Of Char   = ('\', '"', '/', #8, #9, #10, #12, #13);
  wdays                      : Array [1 .. 7]  Of String = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'); {do not localize}
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
@@ -139,9 +141,9 @@ Const
                               'CORE Version';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
  RESTDWVersionINFO          = '1.5.0.';
- RESTDWRelease              = '2974';
+ RESTDWRelease              = '2975';
  RESTDWParamsHeaderVersion  = 6;
- RESTDWCodeProject          = 'Dark Souls - GitHub';
+ RESTDWCodeProject          = 'Dark Souls - SourceForge';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  RESTDWFieldBookmark        = 'DWFIELDBOOKMARK';
  rsLazarusDWPackage         = 'REST Dataware - Tools';
@@ -974,11 +976,15 @@ Begin
   Result  := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
  {$ENDIF}
  S.Position := 0;
- {$if CompilerVersion > 21}
- ZDecompressStream(S, Result);
+ {$IFNDEF FPC}
+  {$if CompilerVersion > 21}
+  ZDecompressStream(S, Result);
+  {$ELSE}
+  ZDecompressStreamD(TStringStream(S), Result);
+  {$IFEND}
  {$ELSE}
- ZDecompressStreamD(TStringStream(S), Result);
- {$IFEND}
+  ZDecompressStream(S, Result);
+ {$ENDIF}
  Result.position := 0;
 End;
 
