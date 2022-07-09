@@ -9,9 +9,8 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <IncludeFiles Value="..\..\Source;..\..\Source\libs\Synopse;..\..\Source\static\$(TargetCPU)-$(TargetOS);..\..\Source\Basic\Crypto\Ciphers;..\..\Source\Includes;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\SQLEditor"/>
-        <Libraries Value="..\..\Source\libs\Synopse;..\..\Source\static\$(TargetCPU)-$(TargetOS)"/>
-        <OtherUnitFiles Value="..\..\Source;..\..\Source\libs;..\..\Source\libs\JSON;..\..\Source\libs\Synopse;..\..\Source\DmDados;..\..\Source\Memdataset;..\..\Source\DCP;..\..\Source\DCP\Ciphers;..\..\Source\DCP\Hashes;..\..\Source\Wizards\lazarus;..\..\Source\static\$(TargetCPU)-$(TargetOS);..\..\Source\Basic;..\..\Source\Basic\Crypto;..\..\Source\Basic\Crypto\Ciphers;..\..\Source\Basic\Crypto\Hashes;..\..\Source\Basic\Dialogs;..\..\Source\Basic\Mechanics;..\..\Source\Consts;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\Memdataset;..\..\Source\Plugins\SQLEditor"/>
+        <IncludeFiles Value="..\..\Source;..\..\Source\static\$(TargetCPU)-$(TargetOS);..\..\Source\Basic\Crypto\Ciphers;..\..\Source\Includes;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\SQLEditor"/>
+        <OtherUnitFiles Value="..\..\Source;..\..\Source\libs;..\..\Source\libs\JSON;..\..\Source\Wizards\lazarus;..\..\Source\static\$(TargetCPU)-$(TargetOS);..\..\Source\Basic;..\..\Source\Basic\Crypto;..\..\Source\Basic\Crypto\Ciphers;..\..\Source\Basic\Crypto\Hashes;..\..\Source\Basic\Dialogs;..\..\Source\Basic\Mechanics;..\..\Source\Consts;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\Memdataset;..\..\Source\Plugins\SQLEditor"/>
         <UnitOutputDirectory Value="..\..\Source"/>
       </SearchPaths>
       <CodeGeneration>

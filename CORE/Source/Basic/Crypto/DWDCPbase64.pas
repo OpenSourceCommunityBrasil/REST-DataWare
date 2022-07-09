@@ -24,9 +24,8 @@
 {******************************************************************************}
 unit DWDCPbase64;
 
-{$INCLUDE 'uRESTDW.inc'}
-
 interface
+
 uses
   DWDCPtypes, Sysutils;
 

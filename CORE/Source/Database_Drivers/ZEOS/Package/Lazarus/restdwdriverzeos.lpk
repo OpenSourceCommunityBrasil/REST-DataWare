@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Package Version="4">
+  <Package Version="5">
     <PathDelim Value="\"/>
     <Name Value="RESTDWDriverZEOS"/>
     <Type Value="RunAndDesignTime"/>
@@ -9,10 +9,10 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <IncludeFiles Value="..\..\..\..;..\..\..\..\libs\Synopse"/>
-        <Libraries Value="..\..\..\..\libs\Synopse;..\..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
-        <OtherUnitFiles Value="..\..;..\..\..\..\libs;..\..\..\..;..\..\..\..\libs\JSON;..\..\..\..\DmDados;..\..\..\..\DCP;..\..\..\..\DCP\Ciphers;..\..\..\..\DCP\Hashes;..\..\..\..\Memdataset;..\..\..\..\libs\Synopse"/>
-        <UnitOutputDirectory Value="..\..\..\..\"/>
+        <IncludeFiles Value="..\..\..\..;..\..\..\..\Includes"/>
+        <Libraries Value="..\..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
+        <OtherUnitFiles Value="..\..\libs;..\..;..\..\libs\JSON"/>
+        <UnitOutputDirectory Value="..\.."/>
       </SearchPaths>
       <CodeGeneration>
         <Optimizations>
@@ -39,23 +39,26 @@
         <Type Value="LRS"/>
       </Item3>
       <Item4>
-        <Filename Value="..\..\..\..\uRESTDW.inc"/>
+        <Filename Value="..\..\..\..\Includes\uRESTDWPlataform.inc"/>
         <Type Value="Include"/>
       </Item4>
     </Files>
-    <RequiredPkgs Count="3">
+    <CompatibilityMode Value="True"/>
+    <RequiredPkgs Count="4">
       <Item1>
-        <PackageName Value="LR_ZeosDB"/>
+        <PackageName Value="resteasyobjectscore"/>
       </Item1>
       <Item2>
-        <PackageName Value="indylaz"/>
+        <PackageName Value="LR_ZeosDB"/>
       </Item2>
       <Item3>
-        <PackageName Value="FCL"/>
+        <PackageName Value="indylaz"/>
       </Item3>
+      <Item4>
+        <PackageName Value="FCL"/>
+      </Item4>
     </RequiredPkgs>
     <UsageOptions>
-      <LibraryPath Value="..\..\..\..\libs\Synopse;..\..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
       <UnitPath Value="$(PkgOutDir)"/>
     </UsageOptions>
     <PublishOptions>

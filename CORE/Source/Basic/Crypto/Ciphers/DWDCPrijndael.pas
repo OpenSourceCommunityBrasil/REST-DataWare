@@ -24,8 +24,6 @@
 {******************************************************************************}
 unit DWDCPrijndael;
 
-{$INCLUDE 'uRESTDW.inc'}
-
 interface
 uses
   Classes, Sysutils, DWDCPtypes, DWDCPcrypt2, DWDCPconst, DWDCPblockciphers;

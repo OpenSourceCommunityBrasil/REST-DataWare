@@ -1,7 +1,5 @@
 unit DWDCPcrypt2;
 
-{$INCLUDE 'uRESTDW.inc'}
-
 interface
 
 uses

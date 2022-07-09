@@ -1,7 +1,5 @@
 unit DWDCPtypes;
 
-{$INCLUDE 'uRESTDW.inc'}
-
 interface
 
 { ************************************ }

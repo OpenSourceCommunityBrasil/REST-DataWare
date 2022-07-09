@@ -2,13 +2,16 @@ unit uRestDWLazDriver;
 
 interface
 
-uses SysUtils, Classes, DB, sqldb,       mssqlconn,     pqconnection,
+uses SysUtils,  Classes, DB, lconvencoding, uRESTDWCharset,
+     sqldb,       mssqlconn,     pqconnection,
      oracleconnection,  odbcconn,        mysql40conn,   mysql41conn,
      mysql50conn,       mysql51conn,     mysql55conn,   mysql56conn,
-     mysql57conn,       sqlite3conn,     ibconnection,  uDWConsts,
-     uDWConstsData,     uRESTDWPoolerDB, uDWJSONObject, uDWMassiveBuffer,
-     uDWJSON,           SysTypes,        uDWDatamodule, Variants,
-     uDWJSONInterface,  uSystemEvents,   uDWDataset,    uDWConstsCharset;
+     mysql57conn,       sqlite3conn,     ibconnection,  uRESTDWConsts,
+     DataUtils,           uRESTDWBasicDB,
+     uRESTDWJSONInterface, uRESTDWDataJSON,     uRESTDWMassiveBuffer,
+     Variants,             uRESTDWDatamodule,   uRESTDWDataset,
+     uRESTDWJSONObject,    uRESTDWParams,       uRESTDWBasicTypes,
+     uRESTDWTools;
 
 Type
  TRESTDWLazDriver   = Class(TRESTDWDriver)
@@ -23,7 +26,7 @@ Type
   Function GetGenID                 (Query                : TComponent;
                                      GenName              : String)        : Integer;Override;
   Function ApplyUpdatesTB           (Massive              : String;
-                                     Params               : TDWParams;
+                                     Params               : TRESTDWParams;
                                      Var Error            : Boolean;
                                      Var MessageError     : String;
                                      Var RowsAffected     : Integer)        : TJSONValue;Override;
@@ -36,7 +39,7 @@ Type
                                    MetaData             : Boolean = False;
                                    BinaryCompatibleMode : Boolean = False)  : String;Overload;Override;
   Function ExecuteCommandTB       (Tablename            : String;
-                                   Params               : TDWParams;
+                                   Params               : TRESTDWParams;
                                    Var Error            : Boolean;
                                    Var MessageError     : String;
                                    Var BinaryBlob       : TMemoryStream;
@@ -46,7 +49,7 @@ Type
                                    BinaryCompatibleMode : Boolean = False)  : String;Overload;Override;
   Function ApplyUpdates           (Massive,
                                    SQL                  : String;
-                                   Params               : TDWParams;
+                                   Params               : TRESTDWParams;
                                    Var Error            : Boolean;
                                    Var MessageError     : String;
                                    Var RowsAffected     : Integer)          : TJSONValue;Override;
@@ -66,7 +69,7 @@ Type
                                    MetaData             : Boolean = False;
                                    BinaryCompatibleMode : Boolean = False) : String;Overload;Override;
   Function ExecuteCommand         (SQL                  : String;
-                                   Params               : TDWParams;
+                                   Params               : TRESTDWParams;
                                    Var Error            : Boolean;
                                    Var MessageError     : String;
                                    Var BinaryBlob       : TMemoryStream;
@@ -79,11 +82,11 @@ Type
                                    Var Error            : Boolean;
                                    Var MessageError     : String)          : Integer;Overload;Override;
   Function InsertMySQLReturnID    (SQL                  : String;
-                                   Params               : TDWParams;
+                                   Params               : TRESTDWParams;
                                    Var Error            : Boolean;
                                    Var MessageError     : String)          : Integer;Overload;Override;
   Procedure ExecuteProcedure      (ProcName             : String;
-                                   Params               : TDWParams;
+                                   Params               : TRESTDWParams;
                                    Var Error            : Boolean;
                                    Var MessageError     : String);Override;
   Procedure ExecuteProcedurePure  (ProcName             : String;
@@ -122,8 +125,6 @@ End;
 Procedure Register;
 
 implementation
-
-Uses uDWJSONTools;
 
 Procedure Register;
 Begin
@@ -176,7 +177,7 @@ Begin
 End;
 
 Function TRESTDWLazDriver.ExecuteCommand(SQL                  : String;
-                                         Params               : TDWParams;
+                                         Params               : TRESTDWParams;
                                          Var Error            : Boolean;
                                          Var MessageError     : String;
                                          Var BinaryBlob       : TMemoryStream;
@@ -193,7 +194,7 @@ Var
  vStringStream  : TMemoryStream;
  DataBase       : TDatabase;
  aResult        : TJSONValue;
- vDWMemtable1   : TDWMemtable;
+ vDWMemtable1   : TRESTDWMemtable;
  vStateResource : Boolean;
  Function GetParamIndex(Params : TParams; ParamName : String) : Integer;
  Var
@@ -363,7 +364,7 @@ Begin
         Begin
          If Not Assigned(BinaryBlob) Then
           BinaryBlob  := TMemoryStream.Create;
-         vDWMemtable1 := tDWMemtable.Create(Nil);
+         vDWMemtable1 := TRESTDWMemtable.Create(Nil);
          Try
           vDWMemtable1.Assign(vTempQuery);
           vDWMemtable1.SaveToStream(BinaryBlob);
@@ -403,7 +404,7 @@ Begin
      aResult.Encoded         := True;
      aResult.Encoding        := Encoding;
      aResult.DatabaseCharSet := DatabaseCharSet;
-     aResult.SetValue(GetPairJSON('NOK', MessageError));
+     aResult.SetValue(GetPairJSONStr('NOK', MessageError));
      Result := aResult.ToJSON;
      ATransaction.Rollback;
      TDatabase(vConnection).Connected := False;
@@ -419,7 +420,7 @@ Begin
 End;
 
 Procedure TRESTDWLazDriver.ExecuteProcedure(ProcName         : String;
-                                            Params           : TDWParams;
+                                            Params           : TRESTDWParams;
                                             Var Error        : Boolean;
                                             Var MessageError : String);
 Begin
@@ -444,11 +445,11 @@ Var
  vMetaData,
  vBinaryEvent,
  vCompatibleMode : Boolean;
- DWParams        : TDWParams;
- bJsonArray      : TDWJSONArray;
- bJsonValue      : TDWJSONObject;
+ DWParams        : TRESTDWParams;
+ bJsonArray      : TRESTDWJSONInterfaceArray;
+ bJsonValue      : TRESTDWJSONInterfaceObject;
  vStream         : TMemoryStream;
- vDWMemtable1    : tDWMemtable;
+ vDWMemtable1    : TRESTDWMemtable;
  ATransaction    : TSQLTransaction;
 Begin
  {$IFNDEF FPC}Inherited;{$ENDIF}
@@ -475,21 +476,21 @@ Begin
     FreeAndNil(vTempQuery);
     Exit;
    End;
-  bJsonValue  := TDWJSONObject.Create(DatasetsLine);
+  bJsonValue  := TRESTDWJSONInterfaceObject.Create(DatasetsLine);
   For I := 0 To bJsonValue.PairCount - 1 Do
    Begin
     bJsonArray  := bJsonValue.OpenArray(I);
     vTempQuery.Close;
     vTempQuery.SQL.Clear;
-    vTempQuery.SQL.Add(DecodeStrings(TDWJSONObject(bJsonArray).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-    vBinaryEvent    := StringToBoolean(TDWJSONObject(bJsonArray).Pairs[2].Value);
-    vMetaData       := StringToBoolean(TDWJSONObject(bJsonArray).Pairs[3].Value);
-    vCompatibleMode := StringToBoolean(TDWJSONObject(bJsonArray).Pairs[4].Value);
+    vTempQuery.SQL.Add(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+    vBinaryEvent    := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[2].Value);
+    vMetaData       := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[3].Value);
+    vCompatibleMode := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[4].Value);
     If bJsonArray.ElementCount > 1 Then
      Begin
-      DWParams := TDWParams.Create;
+      DWParams := TRESTDWParams.Create;
       Try
-       DWParams.FromJSON(DecodeStrings(TDWJSONObject(bJsonArray).Pairs[1].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+       DWParams.FromJSON(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[1].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
        For X := 0 To DWParams.Count -1 Do
         Begin
          If vTempQuery.ParamByName(DWParams[X].ParamName) <> Nil Then
@@ -532,9 +533,9 @@ Begin
      Else
       Begin
        If Length(vJSONLine) = 0 Then
-        vJSONLine := Format('{"BinaryRequest":"%s"}', [Encodeb64Stream(vStream)])
+        vJSONLine := Format('{"BinaryRequest":"%s"}', [EncodeStream(vStream)])
        Else
-        vJSONLine := vJSONLine + Format(', {"BinaryRequest":"%s"}', [Encodeb64Stream(vStream)]);
+        vJSONLine := vJSONLine + Format(', {"BinaryRequest":"%s"}', [EncodeStream(vStream)]);
        If Assigned(vStream) Then
         FreeAndNil(vStream);
       End;
@@ -550,7 +551,7 @@ Begin
     Try
      Error          := True;
      MessageError   := E.Message;
-     vJSONLine      := GetPairJSON('NOK', MessageError);
+     vJSONLine      := GetPairJSONStr('NOK', MessageError);
      TDatabase(vConnection).Connected := False;
     Except
     End;
@@ -903,7 +904,7 @@ Begin
 End;
 
 Function TRESTDWLazDriver.ExecuteCommandTB(Tablename            : String;
-                                           Params               : TDWParams;
+                                           Params               : TRESTDWParams;
                                            Var Error            : Boolean;
                                            Var MessageError     : String;
                                            Var BinaryBlob       : TMemoryStream;
@@ -928,7 +929,7 @@ Begin
 End;
 
 Function TRESTDWLazDriver.ApplyUpdatesTB(Massive          : String;
-                                         Params           : TDWParams;
+                                         Params           : TRESTDWParams;
                                          Var Error        : Boolean;
                                          Var MessageError : String;
                                          Var RowsAffected : Integer): TJSONValue;
@@ -938,7 +939,7 @@ End;
 
 Function TRESTDWLazDriver.ApplyUpdates(Massive,
                                        SQL              : String;
-                                       Params           : TDWParams;
+                                       Params           : TRESTDWParams;
                                        Var Error        : Boolean;
                                        Var MessageError : String;
                                        Var RowsAffected : Integer): TJSONValue;
@@ -985,9 +986,9 @@ Var
   ReflectionChanges := '%s';
   vReflectionLine   := '';
   vFieldChanged     := False;
-  If MassiveDataset.Fields.FieldByName(DWFieldBookmark) <> Nil Then
+  If MassiveDataset.Fields.FieldByName(RESTDWFieldBookmark) <> Nil Then
    Begin
-    vReflectionLines  := Format('{"dwbookmark":"%s"%s}', [MassiveDataset.Fields.FieldByName(DWFieldBookmark).Value, ', "reflectionlines":[%s]']);
+    vReflectionLines  := Format('{"dwbookmark":"%s"%s}', [MassiveDataset.Fields.FieldByName(RESTDWFieldBookmark).Value, ', "reflectionlines":[%s]']);
     For I := 0 To Query.Fields.Count -1 Do
      Begin
       MassiveField := MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName);
@@ -1020,7 +1021,7 @@ Var
                                         TBlobfield(Query.Fields[I]).SaveToStream(vStringStream);
                                         vStringStream.Position := 0;
   //                                      vFieldChanged := StreamToHex(vStringStream) <> MassiveField.Value;
-                                        vFieldChanged := Encodeb64Stream(vStringStream) <> MassiveField.Value;
+                                        vFieldChanged := EncodeStream(vStringStream) <> MassiveField.Value;
                                        Finally
                                         FreeAndNil(vStringStream);
                                        End;
@@ -1103,10 +1104,10 @@ Var
                  Begin
                   If vReflectionLine = '' Then
                    vReflectionLine := Format('{"%s":"%s"}', [MassiveField.FieldName,
-                                                             Encodeb64Stream(vStringStream)]) // StreamToHex(vStringStream)])
+                                                             EncodeStream(vStringStream)]) // StreamToHex(vStringStream)])
                   Else
                    vReflectionLine := vReflectionLine + Format(', {"%s":"%s"}', [MassiveField.FieldName,
-                                                                                 Encodeb64Stream(vStringStream)]); // StreamToHex(vStringStream)]);
+                                                                                 EncodeStream(vStringStream)]); // StreamToHex(vStringStream)]);
                  End
                 Else
                  Begin
@@ -1360,7 +1361,7 @@ Var
                        (Not(MassiveDataset.ReflectChanges)))               Or
                       ((MassiveDataset.ReflectChanges) And
                        (((MassiveDataset.Fields.Items[I].ReadOnly) And (Not MassiveDataset.Fields.Items[I].AutoGenerateValue)) Or
-                        (Lowercase(MassiveDataset.Fields.Items[I].FieldName) = Lowercase(DWFieldBookmark)))) Then
+                        (Lowercase(MassiveDataset.Fields.Items[I].FieldName) = Lowercase(RESTDWFieldBookmark)))) Then
                     Continue;
                   If vFields = '' Then
                    Begin
@@ -1404,7 +1405,7 @@ Var
                  Begin
                   For I := 0 To MassiveDataset.AtualRec.UpdateFieldChanges.Count -1 Do
                    Begin
-                    If Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(DWFieldBookmark) Then // Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(DWFieldBookmark) Then
+                    If Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(RESTDWFieldBookmark) Then // Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(RESTDWFieldBookmark) Then
                      Begin
                       If vFields = '' Then
                        vFields  := MassiveDataset.AtualRec.UpdateFieldChanges[I] + ' = :' + MassiveDataset.AtualRec.UpdateFieldChanges[I]
@@ -1417,7 +1418,7 @@ Var
                  Begin
                   For I := 0 To MassiveDataset.Fields.Count -1 Do
                    Begin
-                    If Lowercase(MassiveDataset.Fields.Items[I].FieldName) <> Lowercase(DWFieldBookmark) Then // Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(DWFieldBookmark) Then
+                    If Lowercase(MassiveDataset.Fields.Items[I].FieldName) <> Lowercase(RESTDWFieldBookmark) Then // Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(RESTDWFieldBookmark) Then
                      Begin
                       If ((((MassiveDataset.Fields.Items[I].AutoGenerateValue) And
                             (MassiveDataset.AtualRec.MassiveMode = mmInsert)   And
@@ -1426,7 +1427,7 @@ Var
                            (Not(MassiveDataset.ReflectChanges)))               Or
                           ((MassiveDataset.ReflectChanges) And
                            (((MassiveDataset.Fields.Items[I].ReadOnly) And (Not MassiveDataset.Fields.Items[I].AutoGenerateValue)) Or
-                            (Lowercase(MassiveDataset.Fields.Items[I].FieldName) = Lowercase(DWFieldBookmark)))) Then
+                            (Lowercase(MassiveDataset.Fields.Items[I].FieldName) = Lowercase(RESTDWFieldBookmark)))) Then
                         Continue;
                       If vFields = '' Then
                        vFields     := MassiveDataset.Fields.Items[I].FieldName//MassiveDataset.AtualRec.UpdateFieldChanges[I]
@@ -2048,7 +2049,7 @@ Begin
           {$IFDEF FPC}
            Result.DatabaseCharSet := DatabaseCharSet;
           {$ENDIF}
-          Result.SetValue(GetPairJSON('NOK', MessageError));
+          Result.SetValue(GetPairJSONStr('NOK', MessageError));
           ATransaction.Rollback;
           InTransaction := False;
           TDatabase(vConnection).Connected := False;
@@ -2114,14 +2115,14 @@ Var
   vParamsString,
   vBookmark,
   vParamName      : String;
-  vDWParams       : TDWParams;
+  vDWParams       : TRESTDWParams;
   vBinaryRequest  : Boolean;
-  bJsonValueB     : TDWJSONBase;
-  bJsonValue      : TDWJSONObject;
-  bJsonArray      : TDWJSONArray;
+  bJsonValueB     : TRESTDWJSONInterfaceBase;
+  bJsonValue      : TRESTDWJSONInterfaceObject;
+  bJsonArray      : TRESTDWJSONInterfaceArray;
  Begin
-  bJsonValue     := TDWJSONObject.Create(MassiveSQLCache);
-  bJsonArray     := TDWJSONArray(bJsonValue);
+  bJsonValue     := TRESTDWJSONInterfaceObject.Create(MassiveSQLCache);
+  bJsonArray     := TRESTDWJSONInterfaceArray(bJsonValue);
   Result         := False;
   Try
    For X := 0 To bJsonArray.ElementCount -1 Do
@@ -2132,15 +2133,15 @@ Var
        ATransaction.StartTransaction;
        InTransaction := True;
       End;
-     vDWParams          := TDWParams.Create;
+     vDWParams          := TRESTDWParams.Create;
      vDWParams.Encoding := Encoding;
      Try
-//      TDWJSONObject(bJsonValueB).ToJSON;
-      vMassiveSQLMode := MassiveSQLMode(TDWJSONObject(bJsonValueB).pairs[0].Value);
-      vSQL            := DecodeStrings(TDWJSONObject(bJsonValueB).pairs[1].Value{$IFDEF FPC}, csUndefined{$ENDIF});
-      vParamsString   := DecodeStrings(TDWJSONObject(bJsonValueB).pairs[2].Value{$IFDEF FPC}, csUndefined{$ENDIF});
-      vBookmark       := TDWJSONObject(bJsonValueB).pairs[3].Value;
-      vBinaryRequest  := StringToBoolean(TDWJSONObject(bJsonValueB).pairs[4].Value);
+//      TRESTDWJSONInterfaceObject(bJsonValueB).ToJSON;
+      vMassiveSQLMode := MassiveSQLMode(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[0].Value);
+      vSQL            := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[1].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+      vParamsString   := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[2].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+      vBookmark       := TRESTDWJSONInterfaceObject(bJsonValueB).pairs[3].Value;
+      vBinaryRequest  := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[4].Value);
       If Not vBinaryRequest Then
        vDWParams.FromJSON(vParamsString)
       Else
@@ -2369,9 +2370,9 @@ Var
   {$IFDEF FPC}
   vFieldChanged     := False;
   {$ENDIF}
-  If MassiveDataset.Fields.FieldByName(DWFieldBookmark) <> Nil Then
+  If MassiveDataset.Fields.FieldByName(RESTDWFieldBookmark) <> Nil Then
    Begin
-    vReflectionLines  := Format('{"dwbookmark":"%s"%s, "mycomptag":"%s"}', [MassiveDataset.Fields.FieldByName(DWFieldBookmark).Value, ', "reflectionlines":[%s]', MassiveDataset.MyCompTag]);
+    vReflectionLines  := Format('{"dwbookmark":"%s"%s, "mycomptag":"%s"}', [MassiveDataset.Fields.FieldByName(RESTDWFieldBookmark).Value, ', "reflectionlines":[%s]', MassiveDataset.MyCompTag]);
     For I := 0 To Query.Fields.Count -1 Do
      Begin
       MassiveField := MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName);
@@ -2492,9 +2493,9 @@ Var
                 If vStringStream.Size > 0 Then
                  Begin
                   If vReflectionLine = '' Then
-                   vReflectionLine := Format('{"%s":"%s"}', [MassiveField.FieldName, Encodeb64Stream(vStringStream)])
+                   vReflectionLine := Format('{"%s":"%s"}', [MassiveField.FieldName, EncodeStream(vStringStream)])
                   Else
-                   vReflectionLine := vReflectionLine + Format(', {"%s":"%s"}', [MassiveField.FieldName, Encodeb64Stream(vStringStream)]);
+                   vReflectionLine := vReflectionLine + Format(', {"%s":"%s"}', [MassiveField.FieldName, EncodeStream(vStringStream)]);
                  End
                 Else
                  Begin
@@ -2524,9 +2525,9 @@ Var
   MassiveDataset : TMassiveDatasetBuffer;
   A, X           : Integer;
 //  bJsonArray     : udwjson.TJsonArray;
-  bJsonValueB    : TDWJSONBase;
-  bJsonValue     : TDWJSONObject;
-  bJsonArray     : TDWJSONArray;
+  bJsonValueB    : TRESTDWJSONInterfaceBase;
+  bJsonValue     : TRESTDWJSONInterfaceObject;
+  bJsonArray     : TRESTDWJSONInterfaceArray;
   Procedure PrepareData(Var Query      : TSQLQuery;
                         MassiveDataset : TMassiveDatasetBuffer;
                         Var vError     : Boolean;
@@ -2751,7 +2752,7 @@ Var
                        (Not(MassiveDataset.ReflectChanges)))               Or
                       ((MassiveDataset.ReflectChanges) And
                        (((MassiveDataset.Fields.Items[I].ReadOnly) And (Not MassiveDataset.Fields.Items[I].AutoGenerateValue)) Or
-                        (Lowercase(MassiveDataset.Fields.Items[I].FieldName) = Lowercase(DWFieldBookmark)))) Then
+                        (Lowercase(MassiveDataset.Fields.Items[I].FieldName) = Lowercase(RESTDWFieldBookmark)))) Then
                     Continue;
                   If vFields = '' Then
                    Begin
@@ -2795,7 +2796,7 @@ Var
                  Begin
                   For I := 0 To MassiveDataset.AtualRec.UpdateFieldChanges.Count -1 Do
                    Begin
-                    If Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(DWFieldBookmark) Then // Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(DWFieldBookmark) Then
+                    If Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(RESTDWFieldBookmark) Then // Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(RESTDWFieldBookmark) Then
                      Begin
                       If vFields = '' Then
                        vFields  := MassiveDataset.AtualRec.UpdateFieldChanges[I] + ' = :' + MassiveDataset.AtualRec.UpdateFieldChanges[I]
@@ -2808,7 +2809,7 @@ Var
                  Begin
                   For I := 0 To MassiveDataset.Fields.Count -1 Do
                    Begin
-                    If Lowercase(MassiveDataset.Fields.Items[I].FieldName) <> Lowercase(DWFieldBookmark) Then // Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(DWFieldBookmark) Then
+                    If Lowercase(MassiveDataset.Fields.Items[I].FieldName) <> Lowercase(RESTDWFieldBookmark) Then // Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(RESTDWFieldBookmark) Then
                      Begin
                       If ((((MassiveDataset.Fields.Items[I].AutoGenerateValue) And
                             (MassiveDataset.AtualRec.MassiveMode = mmInsert)   And
@@ -2817,7 +2818,7 @@ Var
                            (Not(MassiveDataset.ReflectChanges)))               Or
                           ((MassiveDataset.ReflectChanges) And
                            (((MassiveDataset.Fields.Items[I].ReadOnly) And (Not MassiveDataset.Fields.Items[I].AutoGenerateValue)) Or
-                            (Lowercase(MassiveDataset.Fields.Items[I].FieldName) = Lowercase(DWFieldBookmark)))) Then
+                            (Lowercase(MassiveDataset.Fields.Items[I].FieldName) = Lowercase(RESTDWFieldBookmark)))) Then
                         Continue;
                       If vFields = '' Then
                        vFields     := MassiveDataset.Fields.Items[I].FieldName//MassiveDataset.AtualRec.UpdateFieldChanges[I]
@@ -3151,8 +3152,8 @@ Var
   End;
  Begin
   MassiveDataset := TMassiveDatasetBuffer.Create(Nil);
-  bJsonValue     := TDWJSONObject.Create(MassiveCache);
-  bJsonArray     := TDWJSONArray(bJsonValue);
+  bJsonValue     := TRESTDWJSONInterfaceObject.Create(MassiveCache);
+  bJsonArray     := TRESTDWJSONInterfaceArray(bJsonValue);
   Result         := False;
   Try
    For x := 0 To bJsonArray.ElementCount -1 Do
@@ -3169,7 +3170,7 @@ Var
         End;
       End;
      Try
-      MassiveDataset.FromJSON(TDWJSONObject(bJsonValueB).ToJSON);
+      MassiveDataset.FromJSON(TRESTDWJSONInterfaceObject(bJsonValueB).ToJSON);
       MassiveDataset.First;
       If Self.Owner      Is TServerMethodDataModule Then
        Begin
@@ -3316,7 +3317,7 @@ Var
  vTempQuery     : TSQLQuery;
  ATransaction   : TSQLTransaction;
  aResult        : TJSONValue;
- vDWMemtable1   : TDWMemtable;
+ vDWMemtable1   : TRESTDWMemtable;
  vStateResource : Boolean;
 Begin
  Result := '';
@@ -3360,7 +3361,7 @@ Begin
         Begin
          If Not Assigned(BinaryBlob) Then
           BinaryBlob  := TMemoryStream.Create;
-         vDWMemtable1 := tDWMemtable.Create(Nil);
+         vDWMemtable1 := TRESTDWMemtable.Create(Nil);
          Try
           vDWMemtable1.Assign(vTempQuery);
           vDWMemtable1.SaveToStream(BinaryBlob);
@@ -3410,7 +3411,7 @@ Begin
      {$IFDEF FPC}
       aResult.DatabaseCharSet := DatabaseCharSet;
      {$ENDIF}
-     aResult.SetValue(GetPairJSON('NOK', MessageError));
+     aResult.SetValue(GetPairJSONStr('NOK', MessageError));
      Result                  := aResult.ToJSON;
      FreeAndNil(aResult);
      ATransaction.Rollback;
@@ -3430,7 +3431,7 @@ Begin
  Result := vConnectionBack;
 End;
 
-function TRESTDWLazDriver.InsertMySQLReturnID(SQL: String; Params: TDWParams;
+function TRESTDWLazDriver.InsertMySQLReturnID(SQL: String; Params: TRESTDWParams;
   var Error: Boolean; var MessageError: String): Integer;
 Var
  vTempQuery     : TSQLQuery;

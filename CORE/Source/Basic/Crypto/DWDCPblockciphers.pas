@@ -24,8 +24,6 @@
 {******************************************************************************}
 unit DWDCPblockciphers;
 
-{$INCLUDE 'uRESTDW.inc'}
-
 interface
 uses
   Classes, Sysutils, DWDCPtypes, DWDCPcrypt2;

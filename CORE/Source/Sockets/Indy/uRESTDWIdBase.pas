@@ -29,7 +29,7 @@ Uses
  {$IFDEF FPC}
  SysUtils,      Classes, Db, Variants, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
  uRESTDWBasic, uRESTDWBasicDB, uRESTDWConsts, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
- uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout
+ uRESTDWParams, uRESTDWBasicClass, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWAbout
  {$ELSE}
   {$IF CompilerVersion <= 22}
    SysUtils, Classes, Db, Variants, EncdDecd, SyncObjs, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
@@ -299,8 +299,8 @@ Type
   vSSLVersions                     : TIdSSLVersions;
   vSSLMode                         : TIdSSLMode;
   Procedure   SetParams            (TransparentProxy      : TProxyConnectionInfo;
-                                    RequestTimeout,
-                                    ConnectTimeout        : Integer;
+                                    aRequestTimeout,
+                                    aConnectTimeout       : Integer;
                                     AuthorizationParams   : TRESTDWClientAuthOptionParams);
  Public
   Constructor Create               (AOwner  : TComponent);Override;
@@ -320,29 +320,29 @@ Type
   HttpRequest                      : TRESTDWIdClientREST;
   vSSLVersions                     : TIdSSLVersions;
   vSSLMode                         : TIdSSLMode;
-  Function    SendEvent            (EventData             : String;
-                                    Var Params            : TRESTDWParams;
-                                    EventType             : TSendEvent = sePOST;
-                                    JsonMode              : TJsonMode  = jmDataware;
-                                    ServerEventName       : String     = '';
-                                    Assyncexec            : Boolean    = False) : String;Override;
-  Procedure   SetParams            (TransparentProxy      : TProxyConnectionInfo;
-                                    RequestTimeout,
-                                    ConnectTimeout        : Integer;
-                                    AuthorizationParams   : TRESTDWClientAuthOptionParams);
+  Function    SendEvent            (EventData              : String;
+                                    Var Params             : TRESTDWParams;
+                                    EventType              : TSendEvent = sePOST;
+                                    JsonMode               : TJsonMode  = jmDataware;
+                                    ServerEventName        : String     = '';
+                                    Assyncexec             : Boolean    = False) : String;Override;
+  Procedure   SetParams            (TransparentProxy       : TProxyConnectionInfo;
+                                    aRequestTimeout,
+                                    aConnectTimeout        : Integer;
+                                    AuthorizationParams    : TRESTDWClientAuthOptionParams);
  Public
-  Constructor Create               (AOwner                : TComponent);Override;
+  Constructor Create               (AOwner                 : TComponent);Override;
   Destructor  Destroy;Override;
-  Procedure   ReconfigureConnection(Var Connection        : TRESTClientPoolerBase;
-                                    TypeRequest           : Ttyperequest;
-                                    WelcomeMessage,
-                                    Host                  : String;
-                                    Port                  : Integer;
+  Procedure   ReconfigureConnection(Var Connection         : TRESTClientPoolerBase;
+                                    aTypeRequest           : Ttyperequest;
+                                    aWelcomeMessage,
+                                    aHost                  : String;
+                                    aPort                  : Integer;
                                     Compression,
-                                    EncodeStrings         : Boolean;
-                                    Encoding              : TEncodeSelect;
-                                    AccessTag             : String;
-                                    AuthenticationOptions : TRESTDWClientAuthOptionParams);Override;
+                                    EncodeStrings          : Boolean;
+                                    aEncoding              : TEncodeSelect;
+                                    aAccessTag             : String;
+                                    aAuthenticationOptions : TRESTDWClientAuthOptionParams);Override;
  Published
   Property SSLMode                 : TIdSSLMode          Read vSSLMode                 Write vSSLMode;
   Property SSLVersions             : TIdSSLVersions      Read vSSLVersions             Write vSSLVersions;
@@ -366,7 +366,9 @@ End;
 
 Procedure TRESTDWIdClientREST.DestroyClient;
 Begin
+ {$IFNDEF FPC}
  Inherited;
+ {$ENDIF}
  If Assigned(HttpRequest) Then
   Begin
    Try
@@ -2839,7 +2841,9 @@ Var
  vmark       : String;
  DWParams    : TRESTDWParams;
 Begin
+ {$IFNDEF FPC}
  Inherited;
+ {$ENDIF}
  vmark       := '';
  DWParams    := Nil;
  HttpRequest.Request.AcceptEncoding := AcceptEncoding;
@@ -2949,26 +2953,42 @@ End;
 
 Procedure TRESTDWIdClientREST.SetOnStatus(Value : TOnStatus);
 Begin
+ {$IFDEF FPC}
+ HttpRequest.OnStatus := @pOnStatus;
+ {$ELSE}
  Inherited;
  HttpRequest.OnStatus := pOnStatus;
+ {$ENDIF}
 End;
 
 Procedure TRESTDWIdClientREST.SetOnWork  (Value : TOnWork);
 Begin
+ {$IFDEF FPC}
+ HttpRequest.OnWork := @pOnWork;
+ {$ELSE}
  Inherited;
  HttpRequest.OnWork := pOnWork;
+ {$ENDIF}
 End;
 
 Procedure TRESTDWIdClientREST.SetOnWorkBegin(Value : TOnWork);
 Begin
+ {$IFDEF FPC}
+ HttpRequest.OnWorkBegin := @pOnWorkBegin;
+ {$ELSE}
  Inherited;
  HttpRequest.OnWorkBegin := pOnWorkBegin;
+ {$ENDIF}
 End;
 
 Procedure TRESTDWIdClientREST.SetOnWorkEnd  (Value : TOnWorkEnd);
 Begin
+ {$IFDEF FPC}
+ HttpRequest.OnWorkEnd := @pOnWorkEnd;
+ {$ELSE}
  Inherited;
  HttpRequest.OnWorkEnd := pOnWorkEnd;
+ {$ENDIF}
 End;
 
 Procedure TRESTDWIdServicePooler.aCommandGet(AContext      : TIdContext;
@@ -3020,7 +3040,11 @@ Begin
  ResultStream    := TStringStream.Create('');
  vResponseHeader := TStringList.Create;
  vResponseString := '';
- @vRedirect      := @Redirect;
+ {$IFNDEF FPC}
+  @vRedirect     := @Redirect;
+ {$ELSE}
+  vRedirect      := TRedirect(@Redirect);
+ {$ENDIF}
  Try
   If CORS Then
    Begin
@@ -3170,7 +3194,7 @@ Begin
  HTTPServer.OnConnect            := @CustomOnConnect;
  HTTPServer.OnCreatePostStream   := @CreatePostStream;
  HTTPServer.OnParseAuthentication := @OnParseAuthentication;
- vDatabaseCharSet                := csUndefined;
+ DatabaseCharSet                 := csUndefined;
  {$ELSE}
  HTTPServer.OnQuerySSLPort       := IdHTTPServerQuerySSLPort;
  HTTPServer.OnCommandGet         := aCommandGet;
@@ -3204,7 +3228,9 @@ Procedure TRESTDWIdServicePooler.EchoPooler(ServerMethodsClass,
 Var
  I : Integer;
 Begin
+ {$IFNDEF FPC}
  Inherited;
+ {$ENDIF}
  InvalidTag := False;
  MyIP       := '';
  If ServerMethodsClass <> Nil Then
@@ -3308,7 +3334,7 @@ Begin
        (Lowercase(AAuthType) = Lowercase('token'))  And
        ({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}  = Nil) Then
      Begin
-      vAuthValue          := TRESTDWAuthRequest.Create;
+      vAuthValue          := TRESTDWAuthOAuth.Create;
       vAuthValue.Token    := AAuthType + ' ' + AAuthData;
       {$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}       := vAuthValue;
       VHandled            := AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken];
@@ -3318,7 +3344,7 @@ Begin
        (Lowercase(AAuthType) = Lowercase('token'))  And
        (AContext.DataObject  = Nil) Then
      Begin
-      vAuthValue          := TRESTDWAuthRequest.Create;
+      vAuthValue          := TRESTDWAuthOAuth.Create;
       vAuthValue.Token    := AAuthType + ' ' + AAuthData;
       AContext.DataObject := vAuthValue;
       VHandled            := AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken];
@@ -3330,7 +3356,7 @@ Begin
       (Lowercase(AAuthType) = Lowercase('token'))  And
       (AContext.Data        = Nil) Then
     Begin
-     vAuthValue       := TRESTDWAuthRequest.Create;
+     vAuthValue       := TRESTDWAuthOAuth.Create;
      vAuthValue.Token := AAuthType + ' ' + AAuthData;
      AContext.Data    := vAuthValue;
      VHandled         := AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken];
@@ -3426,8 +3452,8 @@ End;
 { TRESTDWIdClientPooler }
 
 Procedure TRESTDWIdClientPooler.SetParams(TransparentProxy    : TProxyConnectionInfo;
-                                          RequestTimeout      : Integer;
-                                          ConnectTimeout      : Integer;
+                                          aRequestTimeout      : Integer;
+                                          aConnectTimeout      : Integer;
                                           AuthorizationParams : TRESTDWClientAuthOptionParams);
 Begin
  HttpRequest.DefaultCustomHeader.Clear;
@@ -3438,8 +3464,8 @@ Begin
  HttpRequest.ProxyOptions.ProxyServer    := TransparentProxy.ProxyServer;
  HttpRequest.ProxyOptions.ProxyPassword  := TransparentProxy.ProxyPassword;
  HttpRequest.ProxyOptions.ProxyPort      := TransparentProxy.ProxyPort;
- HttpRequest.RequestTimeout              := RequestTimeout;
- HttpRequest.ConnectTimeout              := ConnectTimeout;
+ HttpRequest.RequestTimeout              := aRequestTimeout;
+ HttpRequest.ConnectTimeout              := aConnectTimeout;
  HttpRequest.ContentType                 := ContentType;
  HttpRequest.AllowCookies                := AllowCookies;
  HttpRequest.HandleRedirects             := HandleRedirects;
@@ -3462,17 +3488,19 @@ Begin
 End;
 
 Procedure TRESTDWIdClientPooler.ReconfigureConnection(Var Connection        : TRESTClientPoolerBase;
-                                                      TypeRequest           : Ttyperequest;
-                                                      WelcomeMessage,
-                                                      Host                  : String;
-                                                      Port                  : Integer;
+                                                      aTypeRequest           : Ttyperequest;
+                                                      aWelcomeMessage,
+                                                      aHost                  : String;
+                                                      aPort                  : Integer;
                                                       Compression,
                                                       EncodeStrings         : Boolean;
-                                                      Encoding              : TEncodeSelect;
-                                                      AccessTag             : String;
-                                                      AuthenticationOptions : TRESTDWClientAuthOptionParams);
+                                                      aEncoding              : TEncodeSelect;
+                                                      aAccessTag             : String;
+                                                      aAuthenticationOptions : TRESTDWClientAuthOptionParams);
 Begin
+ {$IFNDEF FPC}
  Inherited;
+ {$ENDIF}
  If (UseSSL) Then
   Begin
    HttpRequest.CertMode              := vSSLMode;
@@ -3605,7 +3633,7 @@ Var
               If (JSONParam.Encoded) Then
                Begin
                 {$IFDEF FPC}
-                 vValue := DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                 vValue := DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF FPC}, DatabaseCharSet{$ENDIF});
                 {$ELSE}
                  vValue := DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                  {$if CompilerVersion < 21}
@@ -3910,9 +3938,9 @@ Var
       HttpRequest.ContentType := 'application/json';
       vURL := URL + '?';
       If WelcomeMessage <> '' Then
-       vURL := vURL + BuildValue('dwwelcomemessage', EncodeStrings(WelcomeMessage{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}));
+       vURL := vURL + BuildValue('dwwelcomemessage', EncodeStrings(WelcomeMessage{$IFDEF FPC}, DatabaseCharSet{$ENDIF}));
       If (AccessTag <> '') Then
-       vURL := vURL + BuildValue('dwaccesstag',      EncodeStrings(AccessTag{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}));
+       vURL := vURL + BuildValue('dwaccesstag',      EncodeStrings(AccessTag{$IFDEF FPC}, DatabaseCharSet{$ENDIF}));
       If AuthenticationOptions.AuthorizationOption    <> rdwAONone Then
        Begin
         Case AuthenticationOptions.AuthorizationOption Of
@@ -3934,7 +3962,7 @@ Var
       vURL := vURL + BuildValue('binaryrequest',     BooleanToString(BinaryRequest));
       If aBinaryCompatibleMode Then
        vURL := vURL + BuildValue('BinaryCompatibleMode', BooleanToString(aBinaryCompatibleMode));
-      vURL := Format('%s&%s', [vURL, GetParamsValues(Params{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})]);
+      vURL := Format('%s&%s', [vURL, GetParamsValues(Params{$IFDEF FPC}, DatabaseCharSet{$ENDIF})]);
       If Assigned(vCripto) Then
        vURL := vURL + BuildValue('dwusecript',       BooleanToString(vCripto.Use));
       {$IFDEF FPC}
@@ -3946,7 +3974,7 @@ Var
        seGET    : HttpRequest.Get(vURL, TStringList(HttpRequest.DefaultCustomHeader), aStringStream);
        seDELETE : Begin
                    {$IFDEF FPC}
-                    HttpRequest.Delete(vURL, aStringStream);
+                    TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, vURL, SendParams, aStringStream, []);
                    {$ELSE}
                     {$IFDEF OLDINDY}
                      HttpRequest.Delete(vURL);
@@ -3985,9 +4013,9 @@ Var
      Begin;
       SendParams := TIdMultiPartFormDataStream.Create;
       If WelcomeMessage <> '' Then
-       SendParams.AddFormField('dwwelcomemessage', EncodeStrings(WelcomeMessage{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}));
+       SendParams.AddFormField('dwwelcomemessage', EncodeStrings(WelcomeMessage{$IFDEF FPC}, DatabaseCharSet{$ENDIF}));
       If AccessTag <> '' Then
-       SendParams.AddFormField('dwaccesstag',      EncodeStrings(AccessTag{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}));
+       SendParams.AddFormField('dwaccesstag',      EncodeStrings(AccessTag{$IFDEF FPC}, DatabaseCharSet{$ENDIF}));
       If ServerEventName <> '' Then
        Begin
         If Assigned(Params) Then
@@ -4147,7 +4175,11 @@ Var
          End
         Else
          Begin
-          StringStream   := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+          {$IFDEF FPC}
+           StringStream := TStringStream.Create('');
+          {$ELSE}
+           StringStream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
+          {$ENDIF}
           Case EventType Of
            sePUT    : HttpRequest.Put   (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, StringStream);
            sePATCH  : Begin
@@ -4525,8 +4557,8 @@ Begin
 End;
 
 Procedure TRESTDWIdDatabase.SetParams(TransparentProxy    : TProxyConnectionInfo;
-                                      RequestTimeout      : Integer;
-                                      ConnectTimeout      : Integer;
+                                      aRequestTimeout      : Integer;
+                                      aConnectTimeout      : Integer;
                                       AuthorizationParams : TRESTDWClientAuthOptionParams);
 Begin
  HttpRequest.DefaultCustomHeader.Clear;

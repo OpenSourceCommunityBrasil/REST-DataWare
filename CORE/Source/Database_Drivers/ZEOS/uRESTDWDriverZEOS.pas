@@ -4,7 +4,7 @@ interface
 
 uses
  {$IFDEF FPC}
- SysUtils,  Classes, DB, lconvencoding, uDWConstsCharset,
+ SysUtils,  Classes, DB, lconvencoding, uRESTDWCharset,
  {$ELSE}
  {$IF CompilerVersion < 23}
  SysUtils,          Classes, DB,

@@ -141,7 +141,7 @@ Const
                               'CORE Version';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
  RESTDWVersionINFO          = '1.5.0.';
- RESTDWRelease              = '2975';
+ RESTDWRelease              = '2980';
  RESTDWParamsHeaderVersion  = 6;
  RESTDWCodeProject          = 'Dark Souls - SourceForge';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';

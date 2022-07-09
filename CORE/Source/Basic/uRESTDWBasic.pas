@@ -53,7 +53,7 @@ Uses
  {$ENDIF}, uRESTDWMessageCoderMIME;
 
  Type
-  TRedirect = Procedure(Const AURL : String) Of Object;
+  TRedirect = Procedure(Const AURL : String) {$IFNDEF FPC}Of Object{$ENDIF};
 
  Type
   TServerMethodClass = Class(TComponent)

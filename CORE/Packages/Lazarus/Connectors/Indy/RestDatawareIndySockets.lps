@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="10"/>
+    <Units Count="2">
+      <Unit0>
+        <Filename Value="..\..\Source\uRESTDWReg.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <CursorPos X="93" Y="18"/>
+        <UsageCount Value="10"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="resteasyobjectscore.pas"/>
+        <UnitName Value="RestEasyObjectsCORE"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="93" Y="17"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit1>
+    </Units>
+    <JumpHistory HistoryIndex="-1"/>
+  </ProjectSession>
+  <Debugging>
+    <BreakPoints Count="13">
+      <Item1>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="C:\lazarus\fpc\3.0.2\source\packages\fcl-json\src\fpjson.pp"/>
+        <Line Value="2986"/>
+      </Item1>
+      <Item2>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\..\..\..\..\..\Importante\LazarusREST\Project\RestClient\urestrequest.pas"/>
+        <Line Value="56"/>
+      </Item2>
+      <Item3>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\Source\libs\uKBDynamic.pas"/>
+        <Line Value="525"/>
+      </Item3>
+      <Item4>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\Source\libs\uKBDynamic.pas"/>
+        <Line Value="548"/>
+      </Item4>
+      <Item5>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\Source\libs\uKBDynamic.pas"/>
+        <Line Value="805"/>
+      </Item5>
+      <Item6>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\Source\libs\uKBDynamic.pas"/>
+        <Line Value="820"/>
+      </Item6>
+      <Item7>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\Source\libs\uKBDynamic.pas"/>
+        <Line Value="831"/>
+      </Item7>
+      <Item8>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\Source\libs\uKBDynamic.pas"/>
+        <Line Value="884"/>
+      </Item8>
+      <Item9>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\Source\libs\uKBDynamic.pas"/>
+        <Line Value="1155"/>
+      </Item9>
+      <Item10>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\Source\libs\uKBDynamic.pas"/>
+        <Line Value="1170"/>
+      </Item10>
+      <Item11>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\Source\libs\uKBDynamic.pas"/>
+        <Line Value="1223"/>
+      </Item11>
+      <Item12>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\Source\libs\uKBDynamic.pas"/>
+        <Line Value="1435"/>
+      </Item12>
+      <Item13>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\..\Source\libs\uKBDynamic.pas"/>
+        <Line Value="1442"/>
+      </Item13>
+    </BreakPoints>
+  </Debugging>
+</CONFIG>

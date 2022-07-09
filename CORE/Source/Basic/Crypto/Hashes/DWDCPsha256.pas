@@ -24,8 +24,6 @@
 {******************************************************************************}
 unit DWDCPsha256;
 
-{$INCLUDE 'uRESTDW.inc'}
-
 interface
 uses
   Classes, Sysutils, DWDCPtypes, DWDCPcrypt2, DWDCPconst;
