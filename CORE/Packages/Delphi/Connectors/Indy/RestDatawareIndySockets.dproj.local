@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>2022/03/04 09:11:45.000.080,D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\branch\unstable\CORE\Packages\Delphi\Connectors\Indy\RestDatawareIndySockets.dproj=C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Package1.dproj</Transaction>
+    <Transaction>2022/03/04 09:11:45.000.080,C:\Users\xyderx\Documents\Embarcadero\Studio\Projects\Package1.dproj=D:\Meus Dados\Projetos\SUGV\Componentes\XyberPower\REST_Controls\branch\unstable\CORE\Packages\Delphi\Connectors\Indy\RestDatawareIndySockets.dproj</Transaction>
   </Transactions>
 	<ActiveMobileDevice>
-		<NoProfile iOSSimulator="iPhone5" Android="Android"/>
+		<NoProfile iOSSimulator="iPhone5" Android="" Android64=""/>
 	</ActiveMobileDevice>
 </BorlandProject>

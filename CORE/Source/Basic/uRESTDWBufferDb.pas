@@ -26,7 +26,7 @@ unit uRESTDWBufferDb;
 interface
 
 uses
- Messages, SysUtils, Variants, TypInfo, Classes, uRESTDWFileBuffer, Db, uRESTDWConsts,
+ SysUtils, Variants, TypInfo, Classes, uRESTDWFileBuffer, Db, uRESTDWConsts,
  uRESTDWTools, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWAbout;
 
 Const                                      // \b  \t  \n   \f   \r
@@ -1612,14 +1612,9 @@ Begin
    vLineTag := vFileOptions.vLineTag + vFileOptions.vSeparator;
   If vStop Then
    Exit;
-  {$IFDEF  POSIX}
-  For A := 0 To vDataset.Recordcount -1 Do
+  While Not vDataset.Eof Do
    Begin
     vAccept := True;
-    If Assigned(vOnReadData) Then
-     vOnReadData(vAccept);
-    If Not (vAccept) Then
-     Continue;
     vLine   := vLineTag + GenerateLine;
     If vLine <> '' Then
      Begin
@@ -1631,28 +1626,8 @@ Begin
     Inc(vLineNo);
     If vStop Then
      Break;
-    If DWJSONType <> TDWJSONArrayType Then
-     Break;
     vDataset.Next;
    End;
-  {$ELSE}
-   While Not vDataset.Eof Do
-    Begin
-     vAccept := True;
-     vLine   := vLineTag + GenerateLine;
-     If vLine <> '' Then
-      Begin
-       If vLine[InitStrPos] = vFileOptions.vSeparator Then
-        Delete(vLine, 1, 1);
-      End;
-     If (vAccept) And (Not(vStop)) Then
-      WriteLn(vLine);
-     Inc(vLineNo);
-     If vStop Then
-      Break;
-     vDataset.Next;
-    End;
-  {$ENDIF}
  Finally
   vDataset.First;
   vDataset.EnableControls;

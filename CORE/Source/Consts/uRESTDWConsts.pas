@@ -141,9 +141,9 @@ Const
                               'CORE Version';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
  RESTDWVersionINFO          = '1.5.0.';
- RESTDWRelease              = '2980';
+ RESTDWRelease              = '2983';
  RESTDWParamsHeaderVersion  = 6;
- RESTDWCodeProject          = 'Dark Souls - SourceForge';
+ RESTDWCodeProject          = 'Dark Souls - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  RESTDWFieldBookmark        = 'DWFIELDBOOKMARK';
  rsLazarusDWPackage         = 'REST Dataware - Tools';

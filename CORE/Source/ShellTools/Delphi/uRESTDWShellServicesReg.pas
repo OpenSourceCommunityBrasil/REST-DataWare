@@ -27,7 +27,7 @@ interface
 
 uses
   {$IFDEF FPC}
-    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWShellServices,
+    StdCtrls, ComCtrls, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWShellServices,
     LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb, uRESTDWAbout;
   {$ELSE}
    Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWShellServices, uRESTDWAbout,
@@ -36,10 +36,10 @@ uses
    UITypes,
    {$ENDIF}
    {$if CompilerVersion > 22}
-    ToolsApi, vcl.Graphics, DesignWindows, DesignEditors, DBReg, DSDesign,
+    ToolsApi, DesignWindows, DesignEditors, DBReg, DSDesign,
     DesignIntf, ExptIntf, Classes, Db, ColnEdit;
    {$ELSE}
-    ToolsApi, Graphics, DesignWindows, DesignEditors, DBReg, DesignIntf,
+    ToolsApi, DesignWindows, DesignEditors, DBReg, DesignIntf,
     Classes, Db, DbTables, DSDesign, ColnEdit;
    {$IFEND}
   {$ENDIF}

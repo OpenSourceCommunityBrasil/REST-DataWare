@@ -39,7 +39,7 @@ uses
    UITypes,
    {$ENDIF}
    {$if CompilerVersion > 22}
-    ToolsApi, vcl.Graphics, DesignWindows, DesignEditors, DBReg, DSDesign,
+    ToolsApi, Graphics, DesignWindows, DesignEditors, DBReg, DSDesign,
     DesignIntf, ExptIntf, Classes, Db, ColnEdit;
    {$ELSE}
     ToolsApi, Graphics, DesignWindows, DesignEditors, DBReg, DesignIntf,
@@ -232,7 +232,6 @@ Resourcestring
 
 Var
  PDRESTDWCGIApplication : TRESTDWCGIApplicationDescriptor;
-// PDRESTDWCGIDatamodule  : TRESTDWCGIDatamodule;
  PDRESTDWDatamodule     : TRESTDWDatamodule;
 {$ENDIF}
 
@@ -260,9 +259,15 @@ Var
 Begin
  Supports(BorlandIDEServices,IOTAAboutBoxServices, AboutBoxServices);
  Assert(Assigned(AboutBoxServices), '');
- ProductImage  := LoadBitmap(FindResourceHInstance(HInstance), 'DW');
- AboutBoxIndex := AboutBoxServices.AddPluginInfo(RESTDWSobreTitulo , RESTDWSobreDescricao,
-                                                 ProductImage, False, RESTDWSobreLicencaStatus);
+ Try
+ If LoadBitmap(FindResourceHInstance(HInstance), 'DW') > 0 Then
+  Begin
+   ProductImage  := LoadBitmap(FindResourceHInstance(HInstance), 'DW');
+   AboutBoxIndex := AboutBoxServices.AddPluginInfo(RESTDWSobreTitulo , RESTDWSobreDescricao,
+                                                   ProductImage, False, RESTDWSobreLicencaStatus);
+  End;
+ Except
+ End;
 End;
 
 procedure UnregisterAboutBox;
@@ -280,8 +285,11 @@ Var
  bmp : TBitmap;
 Begin
  bmp := TBitmap.Create;
- bmp.LoadFromResourceName(HInstance, 'DW');
- SplashScreenServices.AddPluginBitmap(RESTDWDialogoTitulo, bmp.Handle, false, RESTDWSobreLicencaStatus, '');
+ Try
+  bmp.LoadFromResourceName(HInstance, 'DW');
+  SplashScreenServices.AddPluginBitmap(RESTDWDialogoTitulo, bmp.Handle, false, RESTDWSobreLicencaStatus, '');
+ Except
+ End;
  bmp.Free;
 End;
 {$ENDIF}
@@ -1126,45 +1134,45 @@ initialization
  {$IFDEF FPC}
   {$I resteasyobjectscore.lrs}
  {$ENDIF}
-// UnlistPublishedProperty(TRESTDWClientSQL,  'FieldDefs');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'Options');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceName');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceField');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'OnWriterProcess');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'FieldDefs');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'Options');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'CachedUpdates');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'MasterSource');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'MasterFields');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'DetailFields');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'ActiveStoredUsage');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'Adapter');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'ChangeAlerter');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'ChangeAlertName');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'DataSetField');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'FetchOptions');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'ObjectView');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'ResourceOptions');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'StoreDefs');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'UpdateOptions');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'LocalSQL');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'FieldOptions');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'Constraints');
-// UnlistPublishedProperty(TRESTDWClientSQL,  'ConstraintsEnabled');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'StoreDefs');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceName');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceField');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'OnWriterProcess');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'UpdateOptions');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'FetchOptions');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'ObjectView');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'ResourceOptions');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'CachedUpdates');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'MasterSource');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'MasterFields');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'DetailFields');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'ActiveStoredUsage');
-// UnlistPublishedProperty(TRESTDWStoredProc, 'Adapter');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'FieldDefs');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'Options');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceName');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceField');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'OnWriterProcess');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'FieldDefs');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'Options');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'CachedUpdates');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'MasterSource');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'MasterFields');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'DetailFields');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'ActiveStoredUsage');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'Adapter');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'ChangeAlerter');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'ChangeAlertName');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'DataSetField');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'FetchOptions');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'ObjectView');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'ResourceOptions');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'StoreDefs');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'UpdateOptions');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'LocalSQL');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'FieldOptions');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'Constraints');
+ UnlistPublishedProperty(TRESTDWClientSQL,  'ConstraintsEnabled');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'StoreDefs');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceName');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceField');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'OnWriterProcess');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'UpdateOptions');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'FetchOptions');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'ObjectView');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'ResourceOptions');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'CachedUpdates');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'MasterSource');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'MasterFields');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'DetailFields');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'ActiveStoredUsage');
+ UnlistPublishedProperty(TRESTDWStoredProc, 'Adapter');
 
 Finalization
  {$IFNDEF FPC}

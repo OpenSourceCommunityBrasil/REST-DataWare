@@ -154,10 +154,7 @@ Function TRESTDWDriverFD.ProcessMassiveSQLCache(MassiveSQLCache      : String;
 Var
  vTempQuery        : TFDQuery;
  vStringStream     : TMemoryStream;
- bPrimaryKeys      : TStringList;
- vFieldType        : TFieldType;
- vStateResource,
- vMassiveLine      : Boolean;
+ vStateResource    : Boolean;
  vResultReflection : String;
  Function GetParamIndex(Params : TFDParams; ParamName : String) : Integer;
  Var
@@ -2866,8 +2863,8 @@ Var
   End;
  Begin
   MassiveDataset := TMassiveDatasetBuffer.Create(Nil);
+  Result         := False;
   Try
-   Result         := False;
    MassiveDataset.FromJSON(Massive);
    MassiveDataset.First;
    If Self.Owner      Is TServerMethodDataModule Then
@@ -3190,8 +3187,6 @@ Function TRESTDWDriverFD.ExecuteCommand(SQL                  : String;
 Var
  vTempQuery   : TFDQuery;
  aResult      : TJSONValue;
-// vStream      : TMemoryStream;
- vDWMemtable1 : TRESTDWMemtable;
  vStateResource : Boolean;
 Begin
  Inherited;
@@ -3632,7 +3627,6 @@ Var
  bJsonArray      : TRESTDWJSONInterfaceArray;
  bJsonValue      : TRESTDWJSONInterfaceObject;
  vStream         : TMemoryStream;
- vDWMemtable1    : TRESTDWMemtable;
 Begin
  Inherited;
  Error           := False;
@@ -3945,7 +3939,6 @@ Var
  vParamName     : String;
  vStringStream  : TMemoryStream;
  bPrimaryKeys   : TStringList;
- vFieldType     : TFieldType;
  vMassiveLine   : Boolean;
  vValueKeys     : TRESTDWValueKeys;
  Function GetFieldIndex(Params : TFields; ParamName : String) : Integer;
@@ -4436,8 +4429,8 @@ Var
   End;
  Begin
   MassiveDataset := TMassiveDatasetBuffer.Create(Nil);
+  Result         := False;
   Try
-   Result         := False;
    MassiveDataset.FromJSON(Massive);
    MassiveDataset.First;
    If Self.Owner      Is TServerMethodDataModule Then
@@ -4759,15 +4752,12 @@ Function TRESTDWDriverFD.ExecuteCommandTB(Tablename            : String;
                                           BinaryCompatibleMode : Boolean = False)  : String;
 Var
  vTempQuery     : TFDTable;
- A, I           : Integer;
- vParamName     : String;
  vStringStream  : TMemoryStream;
  aResult        : TJSONValue;
  vStateResource : Boolean;
 Begin
  {$IFNDEF FPC}Inherited;{$ENDIF}
  Error  := False;
- vStringStream  := Nil;
  aResult := TJSONValue.Create;
  vTempQuery               := TFDTable.Create(Owner);
  Try

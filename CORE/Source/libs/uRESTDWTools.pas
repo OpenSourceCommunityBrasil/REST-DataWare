@@ -30,9 +30,9 @@ Uses
  Classes,  SysUtils, uRESTDWBasicTypes, LConvEncoding, lazutf8, Db
  {$ELSE}
  Classes,  SysUtils, uRESTDWBasicTypes, Db, EncdDecd
- {$IF Defined(RESTDWFMX)}
-  , System.NetEncoding
- {$IFEND}
+  {$IF Defined(RESTDWFMX)}
+   , System.NetEncoding, IOUtils
+  {$IFEND}
  {$ENDIF},
  uRESTDWEncodeClass, uRESTDWCharset;
 
@@ -519,7 +519,20 @@ End;
 Function CopyFileTo(Const Source,
                     Destination : TFileName): Boolean;
 Begin
+ {$IFDEF FPC}
  Result := CopyFile(PChar(Source), PChar(Destination), False);
+ {$ELSE}
+  {$IF Defined(RESTDWFMX)}
+   Result := False;
+   Try
+    TFile.Copy(Source, Destination, True);
+    Result := True;
+   Except
+   End;
+  {$ELSE}
+   Result := CopyFile(PChar(Source), PChar(Destination), False);
+  {$IFEND}
+ {$ENDIF}
 End;
 
 Function GetUniqueFileName(Const APath,
@@ -2643,7 +2656,7 @@ Begin
    SetLength(Result, restdwLength(Value) * SizeOf(Char));
    {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
     SetLength(bytes, restdwLength(value) div 2);
-    HexToBin(PwideChar(value), 0, bytes, 0, restdwLength(bytes));
+    HexToBin(PwideChar(value), 0, bytes, 0, Length(bytes));
     Result := TEncoding.UTF8.GetString(bytes);
    {$ELSE}
     {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
@@ -3173,11 +3186,7 @@ Begin
  Result := '';
  If Value = '' Then
   Exit;
-{$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
- Result := Encode64(Value); //TIdencoderMIME.EncodeString(Value, nil);
-{$ELSE}
  Result := EncodeBase64(Value{$IFDEF FPC}, DatabaseCharSet{$ENDIF});
-{$IFEND}
 End;
 
 Function DecodeStrings(Value : String

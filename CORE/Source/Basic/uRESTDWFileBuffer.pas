@@ -27,7 +27,7 @@ unit uRESTDWFileBuffer;
 interface
 
 uses
-  Messages, SysUtils, Types, Variants, Classes, StdCtrls, uRESTDWConsts,
+  SysUtils, Types, Variants, Classes, uRESTDWConsts,
   uRESTDWDynamic, uRESTDWTools, uRESTDWBasicTypes, uRESTDWAbout;
 
 Const

@@ -38,7 +38,9 @@ Uses
   {$ELSE}
    System.SysUtils, System.Classes, Data.Db, Variants, system.SyncObjs, DataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
    uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWAbout,
-   {$IF Defined(RESTDWFMX)}{$IFNDEF RESTDWAndroidService}FMX.Forms,{$ENDIF}
+   {$IF Defined(RESTDWFMX)}
+    System.IOUtils,
+    {$IFNDEF RESTDWAndroidService}FMX.Forms,{$ENDIF}
    {$ELSE}
     {$IF CompilerVersion <= 22}Forms,
      {$ELSE}VCL.Forms,

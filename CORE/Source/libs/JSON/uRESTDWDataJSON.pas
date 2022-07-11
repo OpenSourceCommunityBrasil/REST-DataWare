@@ -223,7 +223,8 @@ Function unescape_chars     (s     : String)    : String;
 
 Implementation
 
-Uses uRESTDWTools, uRESTDWJSON, uRESTDWJSONInterface;
+Uses uRESTDWTools, uRESTDWJSON, uRESTDWJSONInterface
+     {$IFNDEF FPC}{$IF Defined(RESTDWFMX)}, system.json{$IFEND}{$ENDIF};
 
 Function TrashRemove(Value : String) : String;
 Begin
