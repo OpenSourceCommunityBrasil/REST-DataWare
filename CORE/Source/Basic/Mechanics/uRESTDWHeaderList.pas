@@ -1,6 +1,6 @@
 unit uRESTDWHeaderList;
 
-{$I ..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware versão CORE.
