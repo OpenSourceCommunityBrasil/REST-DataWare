@@ -140,7 +140,7 @@ Begin
   Msg := {$IFDEF FPC}'Lazarus/FPC ' + Format('%d.%d.%d', [lcl_major, lcl_minor, lcl_release]){$ELSE}GetDelphiVersion{$ENDIF}+sLineBreak+
          'Rest Dataware Componentes'+sLineBreak+
          'http://www.restdw.com.br'+sLineBreak+sLineBreak+
-         'Version : '+ DWVERSAO;
+         'Version : '+ RESTDWVERSAO;
   Msg := DWStr(Msg);
   Writeln( Msg )
  {$ELSE}

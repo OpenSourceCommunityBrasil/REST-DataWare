@@ -26,7 +26,7 @@ unit uRESTDWBasicTypes;
 Interface
 
 Uses
- FMTBcd, uRESTDWConsts, uRESTDWEncodeClass, uRESTDWCharset,
+ uRESTDWConsts, FMTBcd, uRESTDWEncodeClass, uRESTDWCharset,
  {$IFDEF FPC}
   SysUtils,  Classes, Db, uRESTDWAbout
  {$ELSE}
@@ -2401,6 +2401,7 @@ Var
  I, P   : Integer;
  S, Ext : String;
 Begin
+InitializeStrings;
  Assert(AStrings <> nil);
  FFileExt.Clear;
  FMIMEList.Clear;

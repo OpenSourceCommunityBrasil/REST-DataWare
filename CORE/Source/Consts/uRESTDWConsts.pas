@@ -52,6 +52,8 @@ Var
  InitStrPos,
  FinalStrPos                : Integer;
 
+ Procedure InitializeStrings;
+
 Type
  TRESTDWAboutInfo = (RESTDWAbout);
  TMassiveDataset  = Class
@@ -141,7 +143,7 @@ Const
                               'CORE Version';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
  RESTDWVersionINFO          = '1.5.0.';
- RESTDWRelease              = '2985';
+ RESTDWRelease              = '2986';
  RESTDWParamsHeaderVersion  = 6;
  RESTDWCodeProject          = 'Dark Souls - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
