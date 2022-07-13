@@ -12,15 +12,6 @@
         <Projects Include="..\..\Source\Database_Drivers\FireDAC\Package\Berlin\RESTDWDriverFD.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\..\Source\Database_Drivers\AnyDAC\Package\Berlin\RESTDWDriverAD.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\Source\Database_Drivers\ApolloDB\Package\Berlin\RESTDWDriverApolloDB.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\Source\Database_Drivers\MyDAC\Package\Berlin\RESTDWDriverMYDAC.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="..\..\Source\Database_Drivers\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj">
             <Dependencies/>
         </Projects>
@@ -28,6 +19,18 @@
             <Dependencies/>
         </Projects>
         <Projects Include="ShellTools\RestDatawareShellservices.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Demos\DelphiServerCGI\dwCGIServer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Demos\DelphiServerCGI\TempCGI\RestDWServerISAPI.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Demos\SimpleServer\Client\RestDWClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -65,33 +68,6 @@
     <Target Name="RESTDWDriverFD:Make">
         <MSBuild Projects="..\..\Source\Database_Drivers\FireDAC\Package\Berlin\RESTDWDriverFD.dproj" Targets="Make"/>
     </Target>
-    <Target Name="RESTDWDriverAD">
-        <MSBuild Projects="..\..\Source\Database_Drivers\AnyDAC\Package\Berlin\RESTDWDriverAD.dproj"/>
-    </Target>
-    <Target Name="RESTDWDriverAD:Clean">
-        <MSBuild Projects="..\..\Source\Database_Drivers\AnyDAC\Package\Berlin\RESTDWDriverAD.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="RESTDWDriverAD:Make">
-        <MSBuild Projects="..\..\Source\Database_Drivers\AnyDAC\Package\Berlin\RESTDWDriverAD.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="RESTDWDriverApolloDB">
-        <MSBuild Projects="..\..\Source\Database_Drivers\ApolloDB\Package\Berlin\RESTDWDriverApolloDB.dproj"/>
-    </Target>
-    <Target Name="RESTDWDriverApolloDB:Clean">
-        <MSBuild Projects="..\..\Source\Database_Drivers\ApolloDB\Package\Berlin\RESTDWDriverApolloDB.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="RESTDWDriverApolloDB:Make">
-        <MSBuild Projects="..\..\Source\Database_Drivers\ApolloDB\Package\Berlin\RESTDWDriverApolloDB.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="RESTDWDriverMYDAC">
-        <MSBuild Projects="..\..\Source\Database_Drivers\MyDAC\Package\Berlin\RESTDWDriverMYDAC.dproj"/>
-    </Target>
-    <Target Name="RESTDWDriverMYDAC:Clean">
-        <MSBuild Projects="..\..\Source\Database_Drivers\MyDAC\Package\Berlin\RESTDWDriverMYDAC.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="RESTDWDriverMYDAC:Make">
-        <MSBuild Projects="..\..\Source\Database_Drivers\MyDAC\Package\Berlin\RESTDWDriverMYDAC.dproj" Targets="Make"/>
-    </Target>
     <Target Name="RESTDWDriverUNIDAC">
         <MSBuild Projects="..\..\Source\Database_Drivers\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj"/>
     </Target>
@@ -119,14 +95,50 @@
     <Target Name="RestDatawareShellservices:Make">
         <MSBuild Projects="ShellTools\RestDatawareShellservices.dproj" Targets="Make"/>
     </Target>
+    <Target Name="dwCGIServer">
+        <MSBuild Projects="..\..\Demos\DelphiServerCGI\dwCGIServer.dproj"/>
+    </Target>
+    <Target Name="dwCGIServer:Clean">
+        <MSBuild Projects="..\..\Demos\DelphiServerCGI\dwCGIServer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dwCGIServer:Make">
+        <MSBuild Projects="..\..\Demos\DelphiServerCGI\dwCGIServer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWServerISAPI">
+        <MSBuild Projects="..\..\Demos\DelphiServerCGI\TempCGI\RestDWServerISAPI.dproj"/>
+    </Target>
+    <Target Name="RestDWServerISAPI:Clean">
+        <MSBuild Projects="..\..\Demos\DelphiServerCGI\TempCGI\RestDWServerISAPI.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWServerISAPI:Make">
+        <MSBuild Projects="..\..\Demos\DelphiServerCGI\TempCGI\RestDWServerISAPI.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWClientProject">
+        <MSBuild Projects="..\..\Demos\SimpleServer\Client\RestDWClientProject.dproj"/>
+    </Target>
+    <Target Name="RestDWClientProject:Clean">
+        <MSBuild Projects="..\..\Demos\SimpleServer\Client\RestDWClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWClientProject:Make">
+        <MSBuild Projects="..\..\Demos\SimpleServer\Client\RestDWClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RestDWServerProject">
+        <MSBuild Projects="..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj"/>
+    </Target>
+    <Target Name="RestDWServerProject:Clean">
+        <MSBuild Projects="..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RestDWServerProject:Make">
+        <MSBuild Projects="..\..\Demos\SimpleServer\Server\RestDWServerProject.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="RestDatawareCORE;RestDatawareIndySockets;RESTDWDriverFD;RESTDWDriverAD;RESTDWDriverApolloDB;RESTDWDriverMYDAC;RESTDWDriverUNIDAC;RESTDWDriverZEOS;RestDatawareShellservices"/>
+        <CallTarget Targets="RestDatawareCORE;RestDatawareIndySockets;RESTDWDriverFD;RESTDWDriverUNIDAC;RESTDWDriverZEOS;RestDatawareShellservices;dwCGIServer;RestDWServerISAPI;RestDWClientProject;RestDWServerProject"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RestDatawareCORE:Clean;RestDatawareIndySockets:Clean;RESTDWDriverFD:Clean;RESTDWDriverAD:Clean;RESTDWDriverApolloDB:Clean;RESTDWDriverMYDAC:Clean;RESTDWDriverUNIDAC:Clean;RESTDWDriverZEOS:Clean;RestDatawareShellservices:Clean"/>
+        <CallTarget Targets="RestDatawareCORE:Clean;RestDatawareIndySockets:Clean;RESTDWDriverFD:Clean;RESTDWDriverUNIDAC:Clean;RESTDWDriverZEOS:Clean;RestDatawareShellservices:Clean;dwCGIServer:Clean;RestDWServerISAPI:Clean;RestDWClientProject:Clean;RestDWServerProject:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RestDatawareCORE:Make;RestDatawareIndySockets:Make;RESTDWDriverFD:Make;RESTDWDriverAD:Make;RESTDWDriverApolloDB:Make;RESTDWDriverMYDAC:Make;RESTDWDriverUNIDAC:Make;RESTDWDriverZEOS:Make;RestDatawareShellservices:Make"/>
+        <CallTarget Targets="RestDatawareCORE:Make;RestDatawareIndySockets:Make;RESTDWDriverFD:Make;RESTDWDriverUNIDAC:Make;RESTDWDriverZEOS:Make;RestDatawareShellservices:Make;dwCGIServer:Make;RestDWServerISAPI:Make;RestDWClientProject:Make;RestDWServerProject:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

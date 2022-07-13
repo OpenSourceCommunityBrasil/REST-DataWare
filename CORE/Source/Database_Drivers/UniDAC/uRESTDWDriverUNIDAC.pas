@@ -8,7 +8,7 @@ uses SysUtils,  Classes,   DB, Uni, UniScript,    DADump,
      uRESTDWBasicDB,          uRESTDWJSONInterface,    uRESTDWDataJSON,
      uRESTDWMassiveBuffer,    Variants,                uRESTDWDatamodule,
      uRESTDWDataset,          uRESTDWJSONObject,       uRESTDWParams,
-     uRESTDWBasicTypes,       uRESTDWTools;
+     uRESTDWBasicTypes,       uRESTDWBasic,            uRESTDWTools;
 
 Type
 

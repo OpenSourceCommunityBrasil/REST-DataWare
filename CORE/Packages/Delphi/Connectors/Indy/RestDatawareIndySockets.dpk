@@ -30,15 +30,16 @@ package RestDatawareIndySockets;
 
 requires
   rtl,
-  RestDatawareCORE,
   IndySystem,
   IndyProtocols,
-  IndyCore;
+  IndyCore,
+  designide,
+  dcldb,
+  soaprtl,
+  RestDatawareCORE;
 
 contains
-  uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas'
-  {$IFDEF WIN32}
-  , uRESTDWIdReg in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdReg.pas'
-  {$ENDIF};
+  uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas' {$IFDEF WIN32},
+  uRESTDWIdReg in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdReg.pas' {$ENDIF};
 
 end.

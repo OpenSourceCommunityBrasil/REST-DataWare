@@ -2,6 +2,6 @@
 <BorlandProject>
 	<Transactions/>
 	<ActiveMobileDevice>
-		<NoProfile iOSSimulator="iPhone5" Android="" Android64=""/>
+		<NoProfile iOSSimulator="iPhone5" Android="Android"/>
 	</ActiveMobileDevice>
 </BorlandProject>

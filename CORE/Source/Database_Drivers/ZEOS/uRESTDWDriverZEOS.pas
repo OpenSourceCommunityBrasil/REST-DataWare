@@ -19,7 +19,7 @@ uses
  uRESTDWJSONInterface, uRESTDWDataJSON,     uRESTDWMassiveBuffer,
  Variants,             uRESTDWDatamodule,   uRESTDWDataset,
  uRESTDWJSONObject,    uRESTDWParams,       uRESTDWBasicTypes,
- uRESTDWTools;
+ uRESTDWBasic,         uRESTDWTools;
 
 Type
  TRESTDWDriverZeos   = Class(TRESTDWDriver)

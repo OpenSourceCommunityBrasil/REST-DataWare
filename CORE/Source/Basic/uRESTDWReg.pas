@@ -823,23 +823,11 @@ Begin
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
 //  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
  {$ENDIF}
- RegisterPropertyEditor(TypeInfo(String),       TRESTDWTable,              'Tablename',       TTableList);
-// RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionServer,   'PoolerName',      TPoolersListCDF);
-// RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionParams,   'PoolerName',      TPoolersListCDF);
- RegisterPropertyEditor(TypeInfo(String),       TRESTDWClientEvents,           'ServerEventName', TServerEventsList);
-// RegisterPropertyEditor(TypeInfo(String),       TRESTDWConnectionServerCP, 'ServerEventName', TServerEventsListCV);
- RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'SQL',             TRESTDWSQLEditor);
- RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'RelationFields',  TRESTDWFieldsRelationEditor);
- RegisterPropertyEditor(TypeInfo(String),       TRESTDWClientSQL,          'SequenceField',   TRESTDWFieldsList);
-//
-// RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWUpdateSQL,          'DeleteSQL',       TDWUpdSQLEditorDelete);
-// RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWUpdateSQL,          'InsertSQL',       TDWUpdSQLEditorInsert);
-// RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWUpdateSQL,          'LockSQL',         TDWUpdSQLEditorLock);
-// RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWUpdateSQL,          'UnlockSQL',       TDWUpdSQLEditorUnlock);
-// RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWUpdateSQL,          'FetchRowSQL',     TDWUpdSQLEditorFetchRow);
-// RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWUpdateSQL,          'ModifySQL',       TDWUpdSQLEditorModify);
-// RegisterComponentEditor(TRESTDWUpdateSQL,      TDWUpdateSQLEditor);
-//
+  RegisterPropertyEditor(TypeInfo(String),       TRESTDWTable,              'Tablename',       TTableList);
+  RegisterPropertyEditor(TypeInfo(String),       TRESTDWClientEvents,           'ServerEventName', TServerEventsList);
+  RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'SQL',             TRESTDWSQLEditor);
+  RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'RelationFields',  TRESTDWFieldsRelationEditor);
+  RegisterPropertyEditor(TypeInfo(String),       TRESTDWClientSQL,          'SequenceField',   TRESTDWFieldsList);
   RegisterComponentEditor(TRESTDWServerEvents,        TComponentEditorClass(TRESTDWServerEventsEditor));
   RegisterComponentEditor(TRESTDWClientEvents,        TComponentEditorClass(TRESTDWClientEventsEditor));
   RegisterComponentEditor(TRESTDWResponseTranslator,  TComponentEditorClass(TRESTDWJSONViewer));

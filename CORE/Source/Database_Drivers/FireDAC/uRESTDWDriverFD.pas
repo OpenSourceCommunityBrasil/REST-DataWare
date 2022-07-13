@@ -14,10 +14,10 @@ uses System.SysUtils,          System.Classes,      Data.DBXJSON,
       {$IFEND}
      {$ENDIF}
      FireDAC.Phys.Intf,       Data.DB, uRESTDWConsts,  DataUtils,
-     uRESTDWBasicDB,          uRESTDWJSONInterface,    uRESTDWDataJSON,
+     uRESTDWBasicDB,          uRESTDWBasic,            uRESTDWJSONInterface,
      uRESTDWMassiveBuffer,    Variants,                uRESTDWDatamodule,
      uRESTDWDataset,          uRESTDWJSONObject,       uRESTDWParams,
-     uRESTDWBasicTypes,       uRESTDWTools;
+     uRESTDWBasicTypes,       uRESTDWDataJSON,         uRESTDWTools;
 
 Type
  TFDCustomTableRDW = class(TFDTable)

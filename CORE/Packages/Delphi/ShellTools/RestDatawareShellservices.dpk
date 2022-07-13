@@ -32,9 +32,7 @@ requires
   RestDatawareCORE;
 
 contains
-  uRESTDWShellServices in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServices.pas'
-  {$IFDEF WIN32}
-  , uRESTDWShellServicesReg in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServicesReg.pas'
-  {$ENDIF};
+  uRESTDWShellServices in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServices.pas' {$IFDEF WIN32},
+  uRESTDWShellServicesReg in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServicesReg.pas' {$ENDIF};
 
 end.

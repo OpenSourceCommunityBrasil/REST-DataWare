@@ -11,7 +11,7 @@ uses SysUtils,  Classes, DB, lconvencoding, uRESTDWCharset,
      uRESTDWJSONInterface, uRESTDWDataJSON,     uRESTDWMassiveBuffer,
      Variants,             uRESTDWDatamodule,   uRESTDWDataset,
      uRESTDWJSONObject,    uRESTDWParams,       uRESTDWBasicTypes,
-     uRESTDWTools;
+     uRESTDWBasic,         uRESTDWTools;
 
 Type
  TRESTDWLazDriver   = Class(TRESTDWDriver)
