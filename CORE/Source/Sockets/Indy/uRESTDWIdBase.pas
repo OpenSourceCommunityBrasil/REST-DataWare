@@ -3186,7 +3186,7 @@ Constructor TRESTDWIdServicePooler.Create(AOwner: TComponent);
 Begin
  Inherited;
  HTTPServer                      := TIdHTTPServer.Create(Nil);
- lHandler                        := TIdServerIOHandlerSSLOpenSSL.Create;
+ lHandler                        := TIdServerIOHandlerSSLOpenSSL.Create(Nil);
  {$IFDEF FPC}
  HTTPServer.OnQuerySSLPort       := @IdHTTPServerQuerySSLPort;
  HTTPServer.OnCommandGet         := @aCommandGet;
@@ -3214,8 +3214,13 @@ Begin
  Except
 
  End;
- FreeAndNil(lHandler);
- FreeAndNil(HTTPServer);
+ {$IF Defined(HAS_FMX)}
+ lHandler.DisposeOf;
+ HTTPServer.DisposeOf;
+ {$ELSE}
+   FreeAndNil(lHandler);
+   FreeAndNil(HTTPServer);
+{$IFEND}
  Inherited;
 End;
 
@@ -3238,8 +3243,7 @@ Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
     Begin
      If (ServerMethodsClass.Components[i].ClassType  = TRESTDWPoolerDB)  Or
-        (ServerMethodsClass.Components[i].InheritsFrom(TRESTDWPoolerDB)) Or
-        (UpperCase(ServerMethodsClass.Components[i].ClassName) = 'TRESTDWPOOLERDB') Then
+        (ServerMethodsClass.Components[i].InheritsFrom(TRESTDWPoolerDB)) Then
       Begin
        If Pooler = Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name]) Then
         Begin
