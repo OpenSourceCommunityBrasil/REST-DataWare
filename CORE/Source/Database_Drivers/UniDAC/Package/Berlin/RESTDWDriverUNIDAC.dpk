@@ -39,7 +39,7 @@ requires
   IndyIPClient,
   bindengine,
   bindcomp,
-  RestDatawareCORE,
+  RESTDWCore,
   unidac240,
   dac240;
 

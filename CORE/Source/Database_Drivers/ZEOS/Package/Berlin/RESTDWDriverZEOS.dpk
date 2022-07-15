@@ -37,7 +37,7 @@ requires
   IndySystem,
   IndyProtocols,
   IndyCore,
-  RestDatawareCORE,
+  RESTDWCore,
   ZComponent,
   ZDbc,
   ZPlain,

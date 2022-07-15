@@ -48,7 +48,8 @@ requires
   bindcomp,
   dbexpress,
   dbxcds,
-  RestDatawareCORE;
+  vcl,
+  RESTDWCore;
 
 contains
   uRestDWDriverFD in '..\..\uRestDWDriverFD.pas';

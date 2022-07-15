@@ -1,4 +1,4 @@
-package RestDatawareShellservices;
+package RESTDWSocketIndy;
 
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -25,14 +25,21 @@ package RestDatawareShellservices;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'REST Dataware Indy Sockets'}
 {$IMPLICITBUILD ON}
 
 requires
   rtl,
-  RestDatawareCORE;
+  IndySystem,
+  IndyProtocols,
+  IndyCore,
+  designide,
+  dcldb,
+  soaprtl,
+  RESTDWCore;
 
 contains
-  uRESTDWShellServices in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServices.pas' {$IFDEF WIN32},
-  uRESTDWShellServicesReg in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServicesReg.pas' {$ENDIF};
+  uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas' {$IFDEF WIN32},
+  uRESTDWIdReg in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdReg.pas' {$ENDIF};
 
 end.

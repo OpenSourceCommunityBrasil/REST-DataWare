@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject>
-	<Transactions/>
-	<ActiveMobileDevice>
-		<NoProfile iOSSimulator="iPhone5" Android="Android"/>
-	</ActiveMobileDevice>
-</BorlandProject>

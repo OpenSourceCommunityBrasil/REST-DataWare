@@ -1,0 +1,156 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{6FE7FEDB-3C0E-45CC-A75C-FDC7A25FC64B}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="RESTDWCore.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ShellTools\RESTDWShellServices.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Connectors\Indy\RESTDWSocketIndy.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Source\Database_Drivers\AnyDAC\Package\Berlin\RESTDWDriverAD.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Source\Database_Drivers\ApolloDB\Package\Berlin\RESTDWDriverApolloDB.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Source\Database_Drivers\FireDAC\Package\Berlin\RESTDWDriverFD.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Source\Database_Drivers\MyDAC\Package\Berlin\RESTDWDriverMYDAC.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Source\Database_Drivers\RDWDriver\Package\Berlin\RESTDWDriverRDW.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Source\Database_Drivers\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Source\Database_Drivers\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Source\Wizards\RESTDWWizards.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="RESTDWCore">
+        <MSBuild Projects="RESTDWCore.dproj"/>
+    </Target>
+    <Target Name="RESTDWCore:Clean">
+        <MSBuild Projects="RESTDWCore.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWCore:Make">
+        <MSBuild Projects="RESTDWCore.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWShellServices">
+        <MSBuild Projects="ShellTools\RESTDWShellServices.dproj"/>
+    </Target>
+    <Target Name="RESTDWShellServices:Clean">
+        <MSBuild Projects="ShellTools\RESTDWShellServices.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWShellServices:Make">
+        <MSBuild Projects="ShellTools\RESTDWShellServices.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWSocketIndy">
+        <MSBuild Projects="Connectors\Indy\RESTDWSocketIndy.dproj"/>
+    </Target>
+    <Target Name="RESTDWSocketIndy:Clean">
+        <MSBuild Projects="Connectors\Indy\RESTDWSocketIndy.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWSocketIndy:Make">
+        <MSBuild Projects="Connectors\Indy\RESTDWSocketIndy.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDriverAD">
+        <MSBuild Projects="..\..\Source\Database_Drivers\AnyDAC\Package\Berlin\RESTDWDriverAD.dproj"/>
+    </Target>
+    <Target Name="RESTDWDriverAD:Clean">
+        <MSBuild Projects="..\..\Source\Database_Drivers\AnyDAC\Package\Berlin\RESTDWDriverAD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDriverAD:Make">
+        <MSBuild Projects="..\..\Source\Database_Drivers\AnyDAC\Package\Berlin\RESTDWDriverAD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDriverApolloDB">
+        <MSBuild Projects="..\..\Source\Database_Drivers\ApolloDB\Package\Berlin\RESTDWDriverApolloDB.dproj"/>
+    </Target>
+    <Target Name="RESTDWDriverApolloDB:Clean">
+        <MSBuild Projects="..\..\Source\Database_Drivers\ApolloDB\Package\Berlin\RESTDWDriverApolloDB.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDriverApolloDB:Make">
+        <MSBuild Projects="..\..\Source\Database_Drivers\ApolloDB\Package\Berlin\RESTDWDriverApolloDB.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDriverFD">
+        <MSBuild Projects="..\..\Source\Database_Drivers\FireDAC\Package\Berlin\RESTDWDriverFD.dproj"/>
+    </Target>
+    <Target Name="RESTDWDriverFD:Clean">
+        <MSBuild Projects="..\..\Source\Database_Drivers\FireDAC\Package\Berlin\RESTDWDriverFD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDriverFD:Make">
+        <MSBuild Projects="..\..\Source\Database_Drivers\FireDAC\Package\Berlin\RESTDWDriverFD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDriverMYDAC">
+        <MSBuild Projects="..\..\Source\Database_Drivers\MyDAC\Package\Berlin\RESTDWDriverMYDAC.dproj"/>
+    </Target>
+    <Target Name="RESTDWDriverMYDAC:Clean">
+        <MSBuild Projects="..\..\Source\Database_Drivers\MyDAC\Package\Berlin\RESTDWDriverMYDAC.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDriverMYDAC:Make">
+        <MSBuild Projects="..\..\Source\Database_Drivers\MyDAC\Package\Berlin\RESTDWDriverMYDAC.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDriverRDW">
+        <MSBuild Projects="..\..\Source\Database_Drivers\RDWDriver\Package\Berlin\RESTDWDriverRDW.dproj"/>
+    </Target>
+    <Target Name="RESTDWDriverRDW:Clean">
+        <MSBuild Projects="..\..\Source\Database_Drivers\RDWDriver\Package\Berlin\RESTDWDriverRDW.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDriverRDW:Make">
+        <MSBuild Projects="..\..\Source\Database_Drivers\RDWDriver\Package\Berlin\RESTDWDriverRDW.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDriverUNIDAC">
+        <MSBuild Projects="..\..\Source\Database_Drivers\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj"/>
+    </Target>
+    <Target Name="RESTDWDriverUNIDAC:Clean">
+        <MSBuild Projects="..\..\Source\Database_Drivers\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDriverUNIDAC:Make">
+        <MSBuild Projects="..\..\Source\Database_Drivers\UniDAC\Package\Berlin\RESTDWDriverUNIDAC.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDriverZEOS">
+        <MSBuild Projects="..\..\Source\Database_Drivers\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj"/>
+    </Target>
+    <Target Name="RESTDWDriverZEOS:Clean">
+        <MSBuild Projects="..\..\Source\Database_Drivers\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDriverZEOS:Make">
+        <MSBuild Projects="..\..\Source\Database_Drivers\ZEOS\Package\Berlin\RESTDWDriverZEOS.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWWizards">
+        <MSBuild Projects="..\..\Source\Wizards\RESTDWWizards.dproj"/>
+    </Target>
+    <Target Name="RESTDWWizards:Clean">
+        <MSBuild Projects="..\..\Source\Wizards\RESTDWWizards.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWWizards:Make">
+        <MSBuild Projects="..\..\Source\Wizards\RESTDWWizards.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="RESTDWCore;RESTDWShellServices;RESTDWSocketIndy;RESTDWDriverAD;RESTDWDriverApolloDB;RESTDWDriverFD;RESTDWDriverMYDAC;RESTDWDriverRDW;RESTDWDriverUNIDAC;RESTDWDriverZEOS;RESTDWWizards"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="RESTDWCore:Clean;RESTDWShellServices:Clean;RESTDWSocketIndy:Clean;RESTDWDriverAD:Clean;RESTDWDriverApolloDB:Clean;RESTDWDriverFD:Clean;RESTDWDriverMYDAC:Clean;RESTDWDriverRDW:Clean;RESTDWDriverUNIDAC:Clean;RESTDWDriverZEOS:Clean;RESTDWWizards:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="RESTDWCore:Make;RESTDWShellServices:Make;RESTDWSocketIndy:Make;RESTDWDriverAD:Make;RESTDWDriverApolloDB:Make;RESTDWDriverFD:Make;RESTDWDriverMYDAC:Make;RESTDWDriverRDW:Make;RESTDWDriverUNIDAC:Make;RESTDWDriverZEOS:Make;RESTDWWizards:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

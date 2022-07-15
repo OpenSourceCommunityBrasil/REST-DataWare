@@ -37,7 +37,7 @@ requires
   IndySystem,
   IndyProtocols,
   IndyCore,
-  RestDatawareCORE;
+  RESTDWCore;
 
 contains
   uRestDWDriverRDW in '..\..\uRestDWDriverRDW.pas';

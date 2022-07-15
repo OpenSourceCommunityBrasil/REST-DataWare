@@ -40,7 +40,7 @@ requires
   bindcomp,
   dbexpress,
   dbxcds,
-  RestDatawareCORE;
+  RESTDWCore;
 
 contains
   uRestDWDriverAD in '..\..\uRestDWDriverAD.pas';
