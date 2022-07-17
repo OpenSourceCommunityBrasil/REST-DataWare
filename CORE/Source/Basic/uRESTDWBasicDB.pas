@@ -6436,64 +6436,67 @@ begin
   End;
 End;
 
-Function ScanParams(SQL : String) : TStringList;
-Var
- vTemp        : String;
- FCurrentPos  : PChar;
- vOldChar     : Char;
- vParamName   : String;
- Function GetParamName : String;
- Begin
-  Result := '';
-  If FCurrentPos^ = ':' Then
-   Begin
+function ScanParams(SQL : string) : TStringList;
+var
+  FCurrentPos : PChar;
+  vParamName  : String;
+  bEscape1,
+  bEscape2,
+  bParam     : boolean;
+  vOldChar   : Char;
+
+const
+  endParam : set of Char = ['=','>','<',' ',',','(',')','-','+','/','*','!',
+                            '''','"','|',#0..#31,#127..#255];
+
+  procedure AddParamSQL;
+  begin
+    vParamName := Trim(vParamName);
+    if vParamName <> '' then begin
+      if Result.IndexOf(vParamName) < 0 then
+        Result.Add(vParamName);
+    end;
+    bParam := False;
+    vParamName := '';
+  end;
+begin
+  Result := TStringList.Create;
+  FCurrentPos := PChar(SQL);
+  bEscape1 := False;
+  bEscape2 := False;
+  bParam := False;
+  while not (FCurrentPos^ = #0) do begin
+    if (FCurrentPos^ = '''') and (not bEscape2) and
+       (not (bEscape1 and (vOldChar = '\'))) then begin
+      // caso bParam = True e vParamName <> ''
+      // ex:  codigo = :codigo'nome' (sql incorreto??)
+      AddParamSQL;
+      bEscape1 := not bEscape1;
+    end
+    else if (FCurrentPos^ = '"') and (not bEscape1) and
+            (not (bEscape2 and (vOldChar = '\'))) then begin
+      // caso bParam = True e vParamName <> ''
+      // ex:  codigo = :codigo"nome" (sql incorreto??)
+      AddParamSQL;
+      bEscape2 := not bEscape2;
+    end
+    else if (FCurrentPos^ = ':') and (not bEscape1) and (not bEscape2) then begin
+      // caso bParam = True e vParamName <> ''
+      // ex:  codigo = :codigo:nome (sql incorreto??)
+      AddParamSQL;
+      bParam := vOldChar in endParam;
+    end
+    else if (bParam) then begin
+      if (not (FCurrentPos^ in endParam)) then
+        vParamName := vParamName + FCurrentPos^
+      else
+        AddParamSQL;
+    end;
+    vOldChar := FCurrentPos^;
     Inc(FCurrentPos);
-    If vOldChar in [' ', ',', '=', '-', '+', '<', '>', '(', ')', ':', '|'] Then //Correção postada por José no Forum.
-//    if vOldChar in [' ', '=', '-', '+', '<', '>', '(', ')', ':', '|'] then
-     Begin
-      While Not (FCurrentPos^ = #0) Do
-       Begin
-        if FCurrentPos^ in ['0'..'9', 'A'..'Z','a'..'z', '_'] then
-
-         Result := Result + FCurrentPos^
-        Else
-         Break;
-        Inc(FCurrentPos);
-       End;
-     End;
-   End
-  Else
-   Inc(FCurrentPos);
-  vOldChar := FCurrentPos^;
- End;
-Begin
- Result := TStringList.Create;
- vTemp  := SQL;
- FCurrentPos := PChar(vTemp);
- While Not (FCurrentPos^ = #0) do
-  Begin
-   If Not (FCurrentPos^ in [#0..' ', ',',
-                           '''', '"',
-                           '0'..'9', 'A'..'Z',
-                           'a'..'z', '_',
-                           '$', #127..#255]) Then
-
-
-    Begin
-     vParamName := GetParamName;
-     If Trim(vParamName) <> '' Then
-      Begin
-       Result.Add(vParamName);
-       Inc(FCurrentPos);
-      End;
-    End
-   Else
-    Begin
-     vOldChar := FCurrentPos^;
-     Inc(FCurrentPos);
-    End;
-  End;
-End;
+  end;
+  AddParamSQL;
+end;
 
 Function ReturnParams(SQL : String) : TStringList;
 Begin
