@@ -107,7 +107,7 @@ Type
                                       Var InvalidTag          : Boolean);Override;
  Public
   Constructor Create                (AOwner           : TComponent);Override;
-  Destructor  Destroy;
+  Destructor  Destroy; override;
  Published
   Property SSLPrivateKeyFile       : String              Read aSSLPrivateKeyFile       Write aSSLPrivateKeyFile;
   Property SSLPrivateKeyPassword   : String              Read aSSLPrivateKeyPassword   Write aSSLPrivateKeyPassword;
