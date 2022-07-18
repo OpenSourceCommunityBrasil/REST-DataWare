@@ -132,8 +132,8 @@ Type
   Function  GetRec(Index : Integer) : TRESTDWDataRoute; Overload;
   Procedure PutRec(Index : Integer;
                    Item  : TRESTDWDataRoute); Overload;
-  Procedure ClearList;
  Public
+  Procedure ClearList;
   Constructor Create;
   Destructor  Destroy; Override;
   Function    RouteExists(Value : String) : Boolean;
@@ -10800,38 +10800,7 @@ Var
           {$ENDIF}
           JSONParam.AsString        := ARequestInfo.RemoteIP;
           DWParams.Add(JSONParam);
-
-          // URI
-          JSONParam                 := TJSONParam.Create(DWParams.Encoding);
-          JSONParam.ObjectDirection := odIN;
-          JSONParam.ParamName       := 'URI';
-          {$IFDEF FPC}
-          JSONParam.DatabaseCharSet := vDatabaseCharSet;
-          {$ENDIF}
-          JSONParam.AsString        := ARequestInfo.URI;
-          DWParams.Add(JSONParam);
-
-          // Document
-          JSONParam                 := TJSONParam.Create(DWParams.Encoding);
-          JSONParam.ObjectDirection := odIN;
-          JSONParam.ParamName       := 'Document';
-          {$IFDEF FPC}
-          JSONParam.DatabaseCharSet := vDatabaseCharSet;
-          {$ENDIF}
-          JSONParam.AsString        := ARequestInfo.Document;
-          DWParams.Add(JSONParam);
-
-          // AuthUsername
-          JSONParam                 := TJSONParam.Create(DWParams.Encoding);
-          JSONParam.ObjectDirection := odIN;
-          JSONParam.ParamName       := 'AuthUsername';
-          {$IFDEF FPC}
-          JSONParam.DatabaseCharSet := vDatabaseCharSet;
-          {$ENDIF}
-          JSONParam.AsString        := ARequestInfo.AuthUsername;
-          DWParams.Add(JSONParam);
-
-    		  //uhmano - final
+		  //uhmano - final
 
 
  end;
@@ -12232,6 +12201,11 @@ Begin
          vUriOptions.BaseServer  := vUriOptions.ServerEvent;
          vUriOptions.ServerEvent := '';
         End;
+      End
+     Else
+      Begin
+       If (vUriOptions.BaseServer <> '') Then
+        vUriOptions.BaseServer := '';
       End;
      If (vDataRouteList.Count > 0) Then
       Begin
@@ -13291,8 +13265,11 @@ Begin
               AResponseInfo.WriteHeader;
             If Not (vBinaryEvent) Then
              If (Assigned(AResponseInfo.ContentStream)) Then
-              If AResponseInfo.ContentStream.size > 0   Then
+              If AResponseInfo.ContentStream.size > 0   Then begin
                AResponseInfo.WriteContent;
+               Sleep(500); // tempo para a resposta ser processada pelo clinete //João Carlos - V Soluções
+              End;
+
           End;
         End;
       Finally
