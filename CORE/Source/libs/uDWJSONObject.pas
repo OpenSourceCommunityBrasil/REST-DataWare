@@ -1625,10 +1625,16 @@ Begin
        JSONParam.ObjectDirection := GetDirectionName(bJsonOBJ.Pairs[1].Value);
        JSONParam.ObjectValue     := GetValueType(bJsonOBJ.Pairs[3].Value);
        JSONParam.Encoded         := GetBooleanFromString(bJsonOBJ.Pairs[2].Value);
-       If (JSONParam.ObjectValue in [ovString, ovGuid, ovWideString]) And (JSONParam.Encoded) Then
-        JSONParam.SetValue(DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF FPC}, csUndefined{$ENDIF}))
-       Else
-        JSONParam.SetValue(bJsonOBJ.Pairs[4].Value, JSONParam.Encoded);
+       // fernando not is null
+       if not bJsonOBJ.Pairs[4].isnull then begin
+         If (JSONParam.ObjectValue in [ovString, ovGuid, ovWideString]) And (JSONParam.Encoded) Then
+          JSONParam.SetValue(DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF FPC}, csUndefined{$ENDIF}))
+         Else
+          JSONParam.SetValue(bJsonOBJ.Pairs[4].Value, JSONParam.Encoded);
+       end
+       else begin
+          JSONParam.SetValue('null', JSONParam.Encoded);
+       end;
 //       Add(JSONParam);
       Finally
        bJsonOBJ.Free;
@@ -5343,12 +5349,21 @@ Begin
    vNullValue := False;
    If ((bValue = '') or (bValue = 'null')) Then
     Begin
+     // fernando pergunta
+     // na condicao abaixo nao devia ser tratado, ovWideString, ovFixedChar, ovFixedWideChar?
      If Not vNullValue Then
-      vNullValue := Not(vObjectValue in [ovString, ovGuid, ovMemo, ovWideMemo, ovFmtMemo]);
+      // fernando
+      // vNullValue := Not(vObjectValue in [ovString, ovGuid, ovMemo, ovWideMemo, ovFmtMemo]);
+      vNullValue := Not(vObjectValue in [ovWideString, ovString, ovGuid, ovMemo,
+                                         ovWideMemo, ovFmtMemo, ovFixedChar,
+                                         ovFixedWideChar]);
      Exit;
     End
    Else
     vNullValue := False;
+
+   // fernando pergunta
+   // no if abaixo nao deve ser tratado, ovWideString, ovFixedChar, ovFixedWideChar?
    If vObjectValue in [ovString, ovGuid, ovMemo, ovWideMemo, ovFmtMemo, ovObject, ovDataset] Then
     Begin
      {$IFDEF FPC}
@@ -5552,10 +5567,14 @@ Begin
  If TestNilParam Then
   Exit;
  MemoryStream := Nil;
+ // fernando
+ vNullValue := False; // nao existia a linha
  If Param.IsNull Then
   Begin
    vNullValue := True;
-   SetValue('');
+   // fernando
+//   SetValue('');
+   SetValue('null');
   End
  Else If Param.DataType in [ftString, ftWideString, ftMemo, ftGuid,
                       {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,{$IFEND}{$ELSE}ftWideMemo,{$ENDIF}
@@ -6151,7 +6170,9 @@ Begin
  vJSONValue.vEncoded := vEncoded;
  vBinary := vObjectValue in [ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob];
  vJSONValue.ObjectValue := vObjectValue;
- If (vNullValue) And ((aValue = '') Or (aValue = cNullvalue)) Then
+ // fernando
+ // If (vNullValue) and ((aValue = '') or (aValue = cNullvalue)) Then
+ If (vNullValue) And (aValue = cNullvalue) Then
   WriteValue(Null)
  Else
   Begin

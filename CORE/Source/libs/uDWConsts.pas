@@ -1,4 +1,4 @@
-Unit uDWConsts;
+﻿Unit uDWConsts;
 
 {$I uRESTDW.inc}
 
@@ -634,12 +634,12 @@ End;
 
 Function DateTimeToUnix(ConvDate: TDateTime): Int64;
 begin
- Result := Round((ConvDate - UnixDate) * 86400);
+ Result := Round((ConvDate - UnixDate) * 86400000);
 end;
 
 Function UnixToDateTime(USec: Int64): TDateTime;
 begin
- Result := (USec / 86400) + UnixDate;
+ Result := (USec / 86400000) + UnixDate;
 end;
 
 Function MassiveModeToString(MassiveMode : TMassiveMode) : String;
