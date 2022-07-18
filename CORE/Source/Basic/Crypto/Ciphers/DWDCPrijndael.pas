@@ -1,28 +1,27 @@
-{******************************************************************************}
-{* DCPcrypt v2.1 written by David Barton (crypto@cityinthesky.co.uk) **********}
-{******************************************************************************}
-{* A binary compatible implementation of Rijndael *****************************}
-{******************************************************************************}
-{* Copyright (c) 1999-2002 David Barton                                       *}
-{* Permission is hereby granted, free of charge, to any person obtaining a    *}
-{* copy of this software and associated documentation files (the "Software"), *}
-{* to deal in the Software without restriction, including without limitation  *}
-{* the rights to use, copy, modify, merge, publish, distribute, sublicense,   *}
-{* and/or sell copies of the Software, and to permit persons to whom the      *}
-{* Software is furnished to do so, subject to the following conditions:       *}
-{*                                                                            *}
-{* The above copyright notice and this permission notice shall be included in *}
-{* all copies or substantial portions of the Software.                        *}
-{*                                                                            *}
-{* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR *}
-{* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,   *}
-{* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL    *}
-{* THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER *}
-{* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING    *}
-{* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *}
-{* DEALINGS IN THE SOFTWARE.                                                  *}
-{******************************************************************************}
 unit DWDCPrijndael;
+
+{$I ..\..\..\Includes\uRESTDWPlataform.inc}
+
+{
+  REST Dataware versão CORE.
+  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+ Pascal e com compatibilidade entre sistemas operacionais.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+
+ Membros do Grupo :
+
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do CORE do pacote.
+ Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Flávio Motta               - Member Tester and DEMO Developer.
+ Mobius One                 - Devel, Tester and Admin.
+ Gustavo                    - Criptografia and Devel.
+ Eloy                       - Devel.
+ Roniery                    - Devel.
+}
 
 interface
 uses

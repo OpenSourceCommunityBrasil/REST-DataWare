@@ -453,9 +453,9 @@ Function URLDecode(Const s : String) : String;
 Var
  sAnsi,
  sUtf8    : String;
- sWide    : WideString;
+ sWide    : DWString;
  i, len   : Cardinal;
- ESC      : String[2];
+ ESC      : String;
  CharCode : Integer;
  c        : Char;
 Begin

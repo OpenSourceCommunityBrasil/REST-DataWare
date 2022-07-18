@@ -33,10 +33,12 @@ requires
   IndySystem,
   IndyProtocols,
   IndyCore,
+  {$IFDEF WIN32}
   designide,
   dcldb,
-  soaprtl,
-  RESTDWCore;
+  RESTDWCore,
+  {$ENDIF}
+  soaprtl;
 
 contains
   uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas' {$IFDEF WIN32},

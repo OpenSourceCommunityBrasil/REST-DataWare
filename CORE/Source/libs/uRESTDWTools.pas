@@ -927,7 +927,17 @@ Var
 Begin
  LLength := restdwLength(AValue, ALength, AStartIndex);
  If LLength > 0 Then
-  SetString(Result, PAnsiChar(@AValue[AStartIndex]), LLength)
+  Begin
+  {$IFDEF FPC}
+   SetString(Result, PAnsiChar(@AValue[AStartIndex]), LLength);
+  {$ELSE}
+   {$IFDEF LINUXFMX}
+    SetString(Result, PChar(@AValue[AStartIndex]), LLength);
+   {$ELSE}
+    SetString(Result, PAnsiChar(@AValue[AStartIndex]), LLength);
+   {$ENDIF}
+  {$ENDIF}
+  End
  Else
   Result := '';
 End;
@@ -1436,12 +1446,16 @@ Begin
  SetLength(Result, ASize);
  If ASize > 0 Then
   Begin
-//   If vSizeChar = 2 Then
-//    Move(AValue[InitStrPos], PRESTDWBytes(Result)^, Length(Result))
-//   Else
+  {$IFDEF FPC}
+   Move(AnsiString(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result));
+  {$ELSE}
+   {$IFDEF LINUXFMX}
+    Move(Utf8String(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result));
+   {$ELSE}
     Move(AnsiString(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result));
+   {$ENDIF}
+  {$ENDIF}
   End;
-//  Move(PAnsiChar(AValue)^, PRESTDWBytes(Result)^, ASize);
 End;
 
 Function ToBytes(Const AValue : String) : TRESTDWBytes;
@@ -2991,7 +3005,15 @@ Begin
     LBytes := AValue
    Else
     LBytes := Copy(AValue, AStartIndex, LLength);
+  {$IFDEF FPC}
    SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
+  {$ELSE}
+   {$IFDEF LINUXFMX}
+    SetString(Result, PChar(LBytes), restdwLength(LBytes));
+   {$ELSE}
+    SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
+   {$ENDIF}
+  {$ENDIF}
   End;
 End;
 
@@ -2999,23 +3021,19 @@ Function BytesToString(Const bin : TRESTDWBytes) : String;
 Var
  I : Integer;
 Begin
-//Const HexSymbols = '0123456789ABCDEF';
-//Var
-// i,
-// vSize : Integer;
-//Begin
-// vSize := restdwLength(bin);
-// SetLength(Result, 2 * vSize);
-// For i :=  0 To vSize-1 Do
-//  Begin
-//   Result[1 + 2*i + 0] := HexSymbols[1 + bin[i] shr 4];
-//   Result[1 + 2*i + 1] := HexSymbols[1 + bin[i] and $0F];
-//  End;
-//End;
-// Move(bin[0], Result, Length(bin));
  I := restdwLength(bin);
  If I > 0 Then
-  SetString(Result, PAnsiChar(bin), I);
+  Begin
+  {$IFDEF FPC}
+   SetString(Result, PAnsiChar(bin), I);
+  {$ELSE}
+   {$IFDEF LINUXFMX}
+    SetString(Result, PChar(bin), I);
+   {$ELSE}
+    SetString(Result, PAnsiChar(bin), I);
+   {$ENDIF}
+  {$ENDIF}
+  End;
 End;
 
 Function EncodeStream (Value : TStream) : String;
@@ -3121,10 +3139,8 @@ End;
 
 Function Base64Encode(Const S : String): String;
  Function Encode_Byte(b: Byte): char;
- Const
-  Base64Code: String[64] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
  Begin
-  Result := Char(Base64Code[(b and $3F)+1]);
+  Result := Char(B64Table[(b and $3F)+1]);
  End;
 var
   i: Integer;

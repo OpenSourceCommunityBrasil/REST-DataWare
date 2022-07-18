@@ -28,8 +28,8 @@ package RESTDWShellServices;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl,
-  RESTDWCore;
+  rtl
+  {$IFDEF WIN32},RESTDWCore{$ENDIF};
 
 contains
   uRESTDWShellServices in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServices.pas' {$IFDEF WIN32},
