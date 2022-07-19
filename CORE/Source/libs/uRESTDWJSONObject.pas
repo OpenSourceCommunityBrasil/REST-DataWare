@@ -3867,7 +3867,9 @@ Begin
     vObjectDirection := odINOUT;
     vObjectValue     := ovString;
     vtagName         := 'jsonpure';
-    vNullValue       := ((bValue = '') or (bValue= 'null'));
+    //fernando
+    // vNullValue       := ((bValue = '') or (bValue= 'null'));
+    vNullValue      := (bValue= 'null');
     SetValue(bValue, vEncoded);
    End;
  Finally
@@ -4255,11 +4257,12 @@ Begin
    If ((bValue = '') or (bValue = 'null')) Then
     Begin
      If Not vNullValue Then
-      vNullValue := Not(vObjectValue in [ovString, ovGuid, ovMemo, ovWideMemo, ovFmtMemo]);
+      vNullValue := Not(vObjectValue in [ovWideString, ovString, ovGuid, ovMemo,
+                                         ovWideMemo, ovFmtMemo, ovFixedChar,
+                                         ovFixedWideChar]);
      Exit;
-    End
-   Else
-    vNullValue := False;
+    End;
+
    If vObjectValue in [ovString, ovGuid, ovMemo, ovWideMemo, ovFmtMemo, ovObject, ovDataset] Then
     Begin
      {$IFDEF FPC}
@@ -4454,10 +4457,12 @@ Begin
  If TestNilParam Then
   Exit;
  MemoryStream := Nil;
+ // fernando
+ vNullValue := False; // nao existia a linha
  If Param.IsNull Then
   Begin
    vNullValue := True;
-   SetValue('');
+   SetValue('null');
   End
  Else If Param.DataType in [ftString, ftWideString, ftMemo, ftGuid,
                       {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,{$IFEND}{$ELSE}ftWideMemo,{$ENDIF}
@@ -5053,7 +5058,9 @@ Begin
  vJSONValue.vEncoded := vEncoded;
  vBinary := vObjectValue in [ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob];
  vJSONValue.ObjectValue := vObjectValue;
- If (vNullValue) And ((aValue = '') Or (aValue = cNullvalue)) Then
+ // fernando
+ // If (vNullValue) and ((aValue = '') or (aValue = cNullvalue)) Then
+ If (vNullValue) And (aValue = cNullvalue) Then
   WriteValue(Null)
  Else
   Begin
