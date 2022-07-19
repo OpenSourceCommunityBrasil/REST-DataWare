@@ -13291,8 +13291,10 @@ Begin
               AResponseInfo.WriteHeader;
             If Not (vBinaryEvent) Then
              If (Assigned(AResponseInfo.ContentStream)) Then
-              If AResponseInfo.ContentStream.size > 0   Then
+              If AResponseInfo.ContentStream.size > 0   Then Begin
                AResponseInfo.WriteContent;
+			         Sleep(500); //jcariasbr
+			        End;
           End;
         End;
       Finally
