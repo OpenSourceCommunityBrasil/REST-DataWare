@@ -236,10 +236,16 @@ Var
                                                                        {$IF CompilerVersion > 22}Data.{$IFEND}DB.ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
                                                                        ftString,    ftWideString]    Then
                                   Begin
-                                   If vTempQuery.Params[A].Size > 0 Then
-                                    vTempQuery.Params[A].Value := Copy(vDWParams[I].Value, 1, vTempQuery.Params[A].Size)
-                                   Else
-                                    vTempQuery.Params[A].Value := vDWParams[I].Value;
+                                   // fernando is not null protection
+                                   if not vDWParams[I].IsNull then begin
+                                     If vTempQuery.Params[A].Size > 0 Then
+                                      vTempQuery.Params[A].Value := Copy(vDWParams[I].Value, 1, vTempQuery.Params[A].Size)
+                                     Else
+                                      vTempQuery.Params[A].Value := vDWParams[I].Value;
+                                   end
+                                   else begin
+                                     vTempQuery.Params[A].Clear;
+                                   end;
                                   End
                                  Else
                                   Begin
@@ -309,7 +315,9 @@ Var
                                                                                      {$IFEND}
                                                                                     {$ENDIF}]    Then
                                     Begin
-                                     If (Trim(vDWParams[I].Value) <> '') Then
+                                     // fernando
+                                     //If (Trim(vDWParams[I].Value) <> '') Then
+                                     if not vDWParams[I].IsNull then
                                       vTempQuery.Params[A].AsString := vDWParams[I].Value
                                      Else
                                       vTempQuery.Params[A].Clear;

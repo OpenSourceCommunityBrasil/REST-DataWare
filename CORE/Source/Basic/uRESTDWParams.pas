@@ -3990,7 +3990,9 @@ Begin
     vObjectDirection := odINOUT;
     vObjectValue     := ovString;
     vtagName         := 'jsonpure';
-    vNullValue       := ((bValue = '') or (bValue= 'null'));
+    // fernando
+    //vNullValue       := ((bValue = '') or (bValue= 'null'));
+    vNullValue       := bValue = 'null';
     SetValue(bValue, vEncoded);
    End;
  Finally
@@ -5856,10 +5858,16 @@ Begin
        JSONParam.ObjectDirection := GetDirectionName(bJsonOBJ.Pairs[1].Value);
        JSONParam.ObjectValue     := GetValueType(bJsonOBJ.Pairs[3].Value);
        JSONParam.Encoded         := GetBooleanFromString(bJsonOBJ.Pairs[2].Value);
-       If (JSONParam.ObjectValue in [ovString, ovGuid, ovWideString]) And (JSONParam.Encoded) Then
-        JSONParam.SetValue(DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF FPC}, csUndefined{$ENDIF}))
-       Else
-        JSONParam.SetValue(bJsonOBJ.Pairs[4].Value, JSONParam.Encoded);
+       // fernando not is null
+       if not bJsonOBJ.Pairs[4].isnull then begin
+         If (JSONParam.ObjectValue in [ovString, ovGuid, ovWideString]) And (JSONParam.Encoded) Then
+          JSONParam.SetValue(DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF FPC}, csUndefined{$ENDIF}))
+         Else
+          JSONParam.SetValue(bJsonOBJ.Pairs[4].Value, JSONParam.Encoded);
+       end
+       else begin
+         JSONParam.SetValue('null',JSONParam.Encoded);
+       end;
 //       Add(JSONParam);
       Finally
        bJsonOBJ.Free;
