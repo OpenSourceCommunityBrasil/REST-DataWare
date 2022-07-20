@@ -472,6 +472,7 @@ Type
   Procedure   CreateParam(ParamName : String;
                           Value     : String = '');
   Destructor  Destroy; Override;
+  Procedure   Clear;   Override;
   Function    ParamsReturn          : Boolean;
   Function    CountOutParams        : Integer;
   Function    CountInParams         : Integer;
@@ -5686,18 +5687,23 @@ Begin
   End;
 End;
 
+Procedure TRESTDWParams.Clear;
+Begin
+ ClearList;
+ Inherited Clear;
+End;
+
 Procedure TRESTDWParams.ClearList;
 Var
  I : Integer;
 Begin
  For I := Count - 1 Downto 0 Do
   Delete(i);
- Self.Clear;
 End;
 
 Destructor TRESTDWParams.Destroy;
 Begin
- ClearList;
+ Clear;
  FreeAndNil(vCripto);
  FreeAndNil(vHeaders);
  Inherited;

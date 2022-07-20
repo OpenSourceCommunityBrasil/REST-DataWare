@@ -1498,13 +1498,8 @@ End;
 Constructor TRESTClientPoolerBase.Create(AOwner: TComponent);
 Begin
  Inherited;
-// HttpRequest                           := TIdHTTP.Create(Nil);
  vCripto                               := TCripto.Create;
-// HttpRequest.Request.ContentType       := 'application/json';
-// HttpRequest.AllowCookies              := False;
  vErrorCode                            := -1;
-// HttpRequest.HTTPOptions               := [hoKeepOrigProtocol];
-// vTransparentProxy                     := TIdProxyConnectionInfo.Create;
  vHost                                 := 'localhost';
  vDataRoute                            := '';
  vPort                                 := 8082;
@@ -1762,19 +1757,26 @@ Var
                                                                                                {$ELSE}Url{$ENDIF},
                                           QueryParams,
                                           vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
-         try
-          JSONParam                 := TJSONParam.Create(DWParams.Encoding);
-          JSONParam.ObjectDirection := odIN;
-          JSONParam.ParamName       := lowercase(tmp);
-          {$IFDEF FPC}
-          JSONParam.DatabaseCharSet := vDatabaseCharSet;
-          {$ENDIF}
-          tmp                       := RawHeaders.Values[tmp];
-          If (Pos(LowerCase('{"ObjectType":"toParam", "Direction":"'), LowerCase(tmp)) > 0) Then
-           JSONParam.FromJSON(tmp)
-          Else
-           JSONParam.AsString  := tmp;
-          DWParams.Add(JSONParam);
+         Try
+          If Trim(lowercase(tmp)) <> '' Then
+           Begin
+            JSONParam                 := DWParams.ItemsString[lowercase(tmp)];
+            If JSONParam = Nil Then
+             Begin
+              JSONParam := TJSONParam.Create(DWParams.Encoding);
+              JSONParam.ObjectDirection := odIN;
+              JSONParam.ParamName       := lowercase(tmp);
+              {$IFDEF FPC}
+              JSONParam.DatabaseCharSet := vDatabaseCharSet;
+              {$ENDIF}
+              tmp                       := RawHeaders.Values[tmp];
+              If (Pos(LowerCase('{"ObjectType":"toParam", "Direction":"'), LowerCase(tmp)) > 0) Then
+               JSONParam.FromJSON(tmp)
+              Else
+               JSONParam.AsString  := tmp;
+              DWParams.Add(JSONParam);
+             End;
+           End;
          Finally
          End;
         End;
@@ -2342,6 +2344,8 @@ Begin
                 Begin
                  If vBinaryEvent Then
                   Begin
+                   If Assigned(JSONParam) Then
+                    FreeAndNil(JSONParam);
                    DWParams.Clear;
                    DWParams.LoadFromStream(ms);
                   End
@@ -3735,7 +3739,11 @@ Begin
                  End;
                 End
                Else
-                ResultStream              := TStringStream(ZCompressStreamNew(vReplyString));
+                Begin
+                 If Assigned(ResultStream) Then
+                  FreeAndNil(ResultStream);
+                 ResultStream            := TStringStream(ZCompressStreamNew(vReplyString));
+                End;
                If vErrorCode <> 200 Then
                 ResponseString           := escape_chars(vReplyString)
               End

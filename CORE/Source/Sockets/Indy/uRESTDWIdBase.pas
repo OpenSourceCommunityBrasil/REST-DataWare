@@ -176,7 +176,7 @@ Type
                                                   AError      : Integer) : Boolean;Overload;
  Public
   Constructor Create(AOwner : TComponent);Override;
-  Destructor  Destroy;
+  Destructor  Destroy;Override;
   Function   Get       (AUrl              : String         = '';
                         CustomHeaders     : TStringList    = Nil;
                         Const AResponse   : TStream        = Nil;
