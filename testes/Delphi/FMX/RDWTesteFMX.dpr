@@ -3,8 +3,10 @@ program RDWTesteFMX;
 uses
   System.StartUpCopy,
   FMX.Forms,
-  uPrincipal in 'uPrincipal.pas' {fPrincipal},
-  uRESTDAO in 'uRESTDAO.pas';
+  uPrincipal in 'src\Telas\uPrincipal.pas' {fPrincipal},
+  uRESTDAO in 'src\DAO\uRESTDAO.pas',
+  uRDWDBWareDAO in 'src\DAO\uRDWDBWareDAO.pas',
+  uRDWRESTDAO in 'src\DAO\uRDWRESTDAO.pas';
 
 {$R *.res}
 

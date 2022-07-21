@@ -248,11 +248,13 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="uPrincipal.pas">
+        <DCCReference Include="src\Telas\uPrincipal.pas">
             <Form>fPrincipal</Form>
             <FormType>fmx</FormType>
         </DCCReference>
-        <DCCReference Include="uRESTDAO.pas"/>
+        <DCCReference Include="src\DAO\uRESTDAO.pas"/>
+        <DCCReference Include="src\DAO\uRDWDBWareDAO.pas"/>
+        <DCCReference Include="src\DAO\uRDWRESTDAO.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

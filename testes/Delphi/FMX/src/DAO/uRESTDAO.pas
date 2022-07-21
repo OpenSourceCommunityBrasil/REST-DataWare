@@ -19,7 +19,6 @@ type
     constructor Create(aServer, aPort: string);
     destructor Destroy; override;
     procedure SetBasicAuth(user, password: string);
-    function StatusServer: boolean;
     function TesteEndpointGET(aEndpoint: string): boolean;
     function TesteEndpointPOST(aEndpoint: string): boolean;
     function TesteEndpointPUT(aEndpoint: string): boolean;
@@ -70,20 +69,6 @@ begin
   FBasicAuth.Username := user;
   FBasicAuth.password := password;
   FClientAPI.Authenticator := FBasicAuth;
-end;
-
-function TRESTDAO.StatusServer: boolean;
-begin
-  Result := false;
-  FRESTAPI.Response := nil;
-  FRESTAPI.Resource := 'status';
-  FRESTAPI.Method := rmGET;
-  try
-    FRESTAPI.Execute;
-    Result := FRESTAPI.Response.StatusCode = 200;
-  except
-    Result := false;
-  end;
 end;
 
 function TRESTDAO.TesteAssyncEndpoint(aEndpoint: string;
