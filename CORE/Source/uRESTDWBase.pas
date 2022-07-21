@@ -12445,7 +12445,10 @@ Begin
                                    If DWParams.ItemsString['RDWParams'] <> Nil Then
                                     Begin
                                      DWParamsD := TDWParams.Create;
-                                     DWParamsD.FromJSON(DWParams.ItemsString['RDWParams'].Value);
+                                     if vCripto.Use then
+                                       DWParamsD.FromJSON(vCripto.Decrypt(DWParams.ItemsString['RDWParams'].Value))
+                                     else
+                                       DWParamsD.FromJSON(DWParams.ItemsString['RDWParams'].Value);
                                      TServerMethodDatamodule(vTempServerMethods).OnGetToken(vWelcomeMessage, vAccessTag, DWParamsD,
                                                                                             TRDWAuthOptionTokenServer(vAuthTokenParam),
                                                                                             vErrorCode, vErrorMessage, vToken, vAcceptAuth);
@@ -12625,7 +12628,10 @@ Begin
                                    If DWParams.ItemsString['RDWParams'] <> Nil Then
                                     Begin
                                      DWParamsD := TDWParams.Create;
-                                     DWParamsD.FromJSON(DWParams.ItemsString['RDWParams'].Value);
+                                     if vCripto.Use then
+                                       DWParamsD.FromJSON(vCripto.Decrypt(DWParams.ItemsString['RDWParams'].Value))
+                                     else
+                                       DWParamsD.FromJSON(DWParams.ItemsString['RDWParams'].Value);
                                      TServerMethodDatamodule(vTempServerMethods).OnGetToken(vWelcomeMessage, vAccessTag, DWParamsD,
                                                                                             TRDWAuthOptionTokenServer(vAuthTokenParam),
                                                                                             vErrorCode, vErrorMessage, vToken, vAcceptAuth);
