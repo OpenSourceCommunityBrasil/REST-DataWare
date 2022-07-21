@@ -31,6 +31,7 @@ type
     Label6: TLabel;
     Button1: TButton;
     ComboBox1: TComboBox;
+    Layout2: TLayout;
     procedure IniciarClick(Sender: TObject);
   private
     { Private declarations }
@@ -55,7 +56,7 @@ procedure TfPrincipal.IniciarClick(Sender: TObject);
 begin
   inicio := now;
   Memo1.Lines.Clear;
-  LogMessage(Memo1, 'Testes iniciados às' + TimeToStr(inicio));
+  LogMessage(Memo1, 'Testes iniciados às ' + TimeToStr(inicio));
   REST := TRESTDAO.Create(eServidor.Text, ePorta.Text);
   if (ComboBox1.ItemIndex = 1) and
     ((eUsuario.Text <> EmptyStr) and (eSenha.Text <> EmptyStr)) then
@@ -68,8 +69,9 @@ begin
       // TesteDBWare(Memo1);
 
       fim := now;
-      LogMessage(Memo1, 'Teste finalizado após ' + MinutesBetween(fim, inicio)
-        .ToString + ' minutos');
+      LogMessage(Memo1, '=======================================');
+      LogMessage(Memo1, 'Testes finalizados após ' + FormatDateTime('nn:ss:zzz',
+        (fim - inicio)) + ' (min:seg:mil)');
     end).Start;
 end;
 
@@ -97,11 +99,14 @@ procedure TfPrincipal.TesteRequest(aMemo: TMemo);
 var
   I: integer;
   thread: TThread;
+  pass, fail: integer;
 
   procedure TesteEndpoint(metodo: string; count: integer);
   var
     I: integer;
+    ini, fim: Double;
   begin
+    ini := now;
     if pos('GET', metodo) > 0 then
     begin
       LogMessage(aMemo, 'Testando ' + count.ToString + ' requisições...');
@@ -110,10 +115,16 @@ var
         begin
           LogMessage(aMemo, 'Método GET falhou após ' + I.ToString +
             ' requisições');
-          abort;
+          inc(fail);
+          break;
         end;
+      fim := now;
+      inc(pass);
+      LogMessage(aMemo, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
+        (fim - ini)) + ' (min:seg:mil)');
     end;
 
+    ini := now;
     if pos('POST', metodo) > 0 then
     begin
       LogMessage(aMemo, 'Testando ' + count.ToString + ' requisições...');
@@ -122,10 +133,16 @@ var
         begin
           LogMessage(aMemo, 'Método POST falhou após ' + I.ToString +
             ' requisições');
-          abort;
+          inc(fail);
+          break;
         end;
+      fim := now;
+      inc(pass);
+      LogMessage(aMemo, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
+        (fim - ini)) + ' (min:seg:mil)');
     end;
 
+    ini := now;
     if pos('PUT', metodo) > 0 then
     begin
       LogMessage(aMemo, 'Testando ' + count.ToString + ' requisições...');
@@ -134,10 +151,16 @@ var
         begin
           LogMessage(aMemo, 'Método PUT falhou após ' + I.ToString +
             ' requisições');
-          abort;
+          inc(fail);
+          break;
         end;
+      fim := now;
+      inc(pass);
+      LogMessage(aMemo, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
+        (fim - ini)) + ' (min:seg:mil)');
     end;
 
+    ini := now;
     if pos('PATCH', metodo) > 0 then
     begin
       LogMessage(aMemo, 'Testando ' + count.ToString + ' requisições...');
@@ -146,10 +169,16 @@ var
         begin
           LogMessage(aMemo, 'Método PATCH falhou após ' + I.ToString +
             ' requisições');
-          abort;
+          inc(fail);
+          break;
         end;
+      fim := now;
+      inc(pass);
+      LogMessage(aMemo, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
+        (fim - ini)) + ' (min:seg:mil)');
     end;
 
+    ini := now;
     if pos('DELETE', metodo) > 0 then
     begin
       LogMessage(aMemo, 'Testando ' + count.ToString + ' requisições...');
@@ -158,12 +187,19 @@ var
         begin
           LogMessage(aMemo, 'Método DELETE falhou após ' + I.ToString +
             ' requisições');
-          abort;
+          inc(fail);
+          break;
         end;
+      fim := now;
+      inc(pass);
+      LogMessage(aMemo, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
+        (fim - ini)) + ' (min:seg:mil)');
     end;
   end;
 
 begin
+  pass := 0;
+  fail := 0;
   LogMessage(aMemo, 'Realizando testes de Requisição com REST nativos...');
   if (eServidor.Text = EmptyStr) or (ePorta.Text = EmptyStr) then
   begin
@@ -173,7 +209,10 @@ begin
   else
   begin
     if not REST.TesteEndpointGET(eEndpoint.Text) then
-      LogMessage(aMemo, 'Teste método GET falhou!')
+    begin
+      LogMessage(aMemo, 'Teste método GET falhou!');
+      inc(fail);
+    end
     else
     begin
       LogMessage(aMemo, 'Método GET disponível');
@@ -196,7 +235,10 @@ begin
     end;
 
     if not REST.TesteEndpointPOST(eEndpoint.Text) then
-      LogMessage(aMemo, 'Teste método POST falhou!')
+    begin
+      LogMessage(aMemo, 'Teste método POST falhou!');
+      inc(fail);
+    end
     else
     begin
       LogMessage(aMemo, 'Método POST disponível');
@@ -219,7 +261,10 @@ begin
     end;
 
     if not REST.TesteEndpointPUT(eEndpoint.Text) then
-      LogMessage(aMemo, 'Teste método PUT falhou!')
+    begin
+      LogMessage(aMemo, 'Teste método PUT falhou!');
+      inc(fail);
+    end
     else
     begin
       LogMessage(aMemo, 'Método PUT disponível');
@@ -242,7 +287,10 @@ begin
     end;
 
     if not REST.TesteEndpointPATCH(eEndpoint.Text) then
-      LogMessage(aMemo, 'Teste método PATCH falhou!')
+    begin
+      LogMessage(aMemo, 'Teste método PATCH falhou!');
+      inc(fail);
+    end
     else
     begin
       LogMessage(aMemo, 'Método PATCH disponível');
@@ -265,7 +313,10 @@ begin
     end;
 
     if not REST.TesteEndpointDELETE(eEndpoint.Text) then
-      aMemo.Lines.Add('Teste método DELETE falhou!')
+    begin
+      aMemo.Lines.Add('Teste método DELETE falhou!');
+      inc(fail);
+    end
     else
     begin
       LogMessage(aMemo, 'Método DELETE disponível');
@@ -288,6 +339,9 @@ begin
       LogMessage(aMemo, 'Teste DELETE concluído');
     end;
   end;
+  LogMessage(aMemo, 'Fim de testes de Requisição com REST nativos...');
+  LogMessage(aMemo, Format('Testes realizados: %d, Sucesso: %d, Falhas: %d',
+    [pass + fail, pass, fail]));
 end;
 
 end.
