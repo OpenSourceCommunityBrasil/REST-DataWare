@@ -3,7 +3,7 @@ unit uRESTDWCoderHeader;
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
-  REST Dataware versão CORE.
+  REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
@@ -13,7 +13,7 @@ unit uRESTDWCoderHeader;
 
  Membros do Grupo :
 
- XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do CORE do pacote.
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.

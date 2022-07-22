@@ -134,7 +134,7 @@ Uses uDWJSONTools, uDWConstsCharset;
 
 Procedure Register;
 Begin
- RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWDriverRDW]);
+ RegisterComponents('REST Dataware - Drivers', [TRESTDWDriverRDW]);
 End;
 
 Function TRESTDWDriverRDW.ProcessMassiveSQLCache(MassiveSQLCache  : String;

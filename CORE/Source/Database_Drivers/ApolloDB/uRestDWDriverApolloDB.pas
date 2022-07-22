@@ -142,7 +142,7 @@ Uses uDWJSONTools;
 
 Procedure Register;
 Begin
- RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWDriverApolloDB]);
+ RegisterComponents('REST Dataware - Drivers', [TRESTDWDriverApolloDB]);
 End;
 
 Function TRESTDWDriverApolloDB.ProcessMassiveSQLCache(MassiveSQLCache      : String;

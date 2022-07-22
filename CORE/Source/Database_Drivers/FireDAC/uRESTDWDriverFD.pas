@@ -145,7 +145,7 @@ implementation
 
 Procedure Register;
 Begin
- RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWDriverFD]);
+ RegisterComponents('REST Dataware - Drivers', [TRESTDWDriverFD]);
 End;
 
 Function TRESTDWDriverFD.ProcessMassiveSQLCache(MassiveSQLCache      : String;
@@ -4760,7 +4760,6 @@ Function TRESTDWDriverFD.ExecuteCommandTB(Tablename            : String;
                                           BinaryCompatibleMode : Boolean = False)  : String;
 Var
  vTempQuery     : TFDTable;
- vStringStream  : TMemoryStream;
  aResult        : TJSONValue;
  vStateResource : Boolean;
 Begin

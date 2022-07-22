@@ -12,7 +12,7 @@ implementation
 
 Procedure Register;
 Begin
- RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWDriverZEOS]);
+ RegisterComponents('REST Dataware - Drivers', [TRESTDWDriverZEOS]);
 End;
 
 initialization

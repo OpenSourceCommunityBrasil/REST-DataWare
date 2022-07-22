@@ -143,7 +143,7 @@ implementation
 
 Procedure Register;
 Begin
- RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWDriverMYDAC]);
+ RegisterComponents('REST Dataware - Drivers', [TRESTDWDriverMYDAC]);
 End;
 
 Function TRESTDWDriverMYDAC.ProcessMassiveSQLCache(MassiveSQLCache      : String;

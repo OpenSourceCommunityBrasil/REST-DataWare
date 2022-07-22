@@ -144,7 +144,7 @@ implementation
 
 Procedure Register;
 Begin
- RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWDriverZeos]);
+ RegisterComponents('REST Dataware - Drivers', [TRESTDWDriverZeos]);
 End;
 
 Function TRESTDWDriverZeos.ProcessMassiveSQLCache(MassiveSQLCache      : String;

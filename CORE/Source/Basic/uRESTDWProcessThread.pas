@@ -3,14 +3,14 @@ unit uRESTDWProcessThread;
 {$I uRESTDW.inc}
 
 {
-  REST Dataware versão CORE.
+  REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
   Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
- XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do CORE do pacote.
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
 }
 
 Interface

@@ -88,22 +88,22 @@ Begin
  {$IFDEF ver290} // delphi xe8
   Result := 'Delphi XE8 (VCL/FMX)';
  {$ENDIF}
- {$IFDEF ver300} // delphi xe10
+ {$IFDEF ver300} // delphi 10
   Result := 'Delphi 10 Seattle (VCL/FMX)';
  {$ENDIF}
- {$IFDEF ver310} // delphi xe10.1
+ {$IFDEF ver310} // delphi 10.1
   Result := 'Delphi 10.1 Berlin (VCL/FMX)';
  {$ENDIF}
- {$IFDEF ver320} // delphi xe10.2
+ {$IFDEF ver320} // delphi 10.2
   Result := 'Delphi 10.2 Tokyo (VCL/FMX)';
  {$ENDIF}
- {$IFDEF ver330} // delphi xe10.3
+ {$IFDEF ver330} // delphi 10.3
   Result := 'Delphi 10.3 Rio (VCL/FMX)';
  {$ENDIF}
- {$IFDEF ver340} // delphi xe10.3
+ {$IFDEF ver340} // delphi 10.4
   Result := 'Delphi 10.4 Sydney (VCL/FMX)';
  {$ENDIF}
- {$IFDEF ver350} // delphi xe10.3
+ {$IFDEF ver350} // delphi 11
   Result := 'Delphi 11 Alexandria (VCL/FMX)';
  {$ENDIF}
 End;
@@ -139,14 +139,14 @@ Begin
  {$IFDEF NOGUI}
   Msg := {$IFDEF FPC}'Lazarus/FPC ' + Format('%d.%d.%d', [lcl_major, lcl_minor, lcl_release]){$ELSE}GetDelphiVersion{$ENDIF}+sLineBreak+
          'Rest Dataware Componentes'+sLineBreak+
-         'http://www.restdw.com.br'+sLineBreak+sLineBreak+
+         'https://github.com/OpenSourceCommunityBrasil/REST-DataWare' +sLineBreak+sLineBreak+
          'Version : '+ RESTDWVERSAO;
   Msg := DWStr(Msg);
   Writeln( Msg )
  {$ELSE}
    Msg := {$IFDEF FPC}'Lazarus/FPC ' + Format('%d.%d.%d', [lcl_major, lcl_minor, lcl_release]){$ELSE}GetDelphiVersion{$ENDIF}+sLineBreak+
-          'Rest Dataware Componentes'+sLineBreak+sLineBreak+
-          'http://www.restdw.com.br'+sLineBreak+sLineBreak+
+          'Rest Dataware Componentes' +sLineBreak+sLineBreak+
+          'https://github.com/OpenSourceCommunityBrasil/REST-DataWare' +sLineBreak+sLineBreak+
           'Version : '+ RESTDWVERSAO;
    Msg := DWStr(Msg);
   {$IFNDEF RESTDWLAMW}

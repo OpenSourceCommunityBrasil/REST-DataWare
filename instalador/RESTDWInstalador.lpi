@@ -28,6 +28,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="src\funcoes"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -66,26 +67,29 @@
       <Unit>
         <Filename Value="RESTDWInstalador.lpr"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="restdwinstalador"/>
       </Unit>
       <Unit>
-        <Filename Value="src\uprincipal.pas"/>
+        <Filename Value="src\telas\uprincipal.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="fPrincipal"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="uPrincipal"/>
       </Unit>
       <Unit>
-        <Filename Value="src\udetectide.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="src\ufrideitem.pas"/>
+        <Filename Value="src\telas\frames\ufrideitem.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frIDEItem"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <UnitName Value="ufrIDEItem"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\udetectide.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\uidefunctions.pas"/>
+        <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
   </ProjectOptions>
@@ -97,6 +101,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="src\funcoes"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>

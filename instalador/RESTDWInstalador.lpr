@@ -11,8 +11,8 @@ uses
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms,
-  uPrincipal in 'src\uprincipal.pas' {fPrincipal},
-  ufrIDEItem in 'src\ufrideitem.pas' {frIDEItem}
+  uPrincipal in 'src\telas\uprincipal.pas' {fPrincipal},
+  ufrIDEItem in 'src\telas\frames\ufrideitem.pas', unit1 {frIDEItem}
   { you can add units after this };
 
 {$R *.res}

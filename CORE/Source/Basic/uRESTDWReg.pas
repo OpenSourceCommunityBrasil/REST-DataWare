@@ -3,7 +3,7 @@ unit uRESTDWReg;
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
-  REST Dataware versão CORE.
+  REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
@@ -13,7 +13,7 @@ unit uRESTDWReg;
 
  Membros do Grupo :
 
- XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do CORE do pacote.
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
@@ -240,7 +240,7 @@ Implementation
 //{$IFNDEF FPC}
 // {$if CompilerVersion < 22}
 //  {$if CompilerVersion > 15}
-//   {$R .\RestEasyObjectsCORE.dcr}
+//   {$R .\RestDataWareComponents.dcr}
 //  {$IFEND}
 // {$IFEND}
 //{$ENDIF}
@@ -319,7 +319,7 @@ Begin
  DeclareClassVariable    := True;
  UseCreateFormStatements := True;
  AddToProject            := True;
- RequiredPackages        := 'resteasyobjectscore';
+ RequiredPackages        := 'restdatawarecomponents';
  If LazarusIDE.ActiveProject <> Nil Then
   Begin
    LazarusIDE.ActiveProject.AddPackageDependency(RequiredPackages);
@@ -420,7 +420,7 @@ Begin
  // create program source
  NewSource                := cRESTDWcgiproject;
  AProject.MainFile.SetSourceText(NewSource);
- AProject.AddPackageDependency('resteasyobjectscore');
+ AProject.AddPackageDependency('restdatawarecomponents');
  AProject.AddPackageDependency('WebLaz');
  // compiler options
  AProject.LazCompilerOptions.Win32GraphicApp := False;
@@ -809,10 +809,10 @@ Begin
   RegisterComponents('REST Dataware - API',         [TRESTDWServerEvents, TRESTDWServerContext, TRESTDWContextRules]);
   RegisterComponents('REST Dataware - Tools',       [TRESTDWResponseTranslator, TRESTDWBufferDB]);
 
-// RegisterComponents('REST Dataware - CORE - DB',   [TRESTDWPoolerDB,    TRESTDWDataBase,    TRESTDWClientSQL,  TRESTDWTable,      TRESTDWUpdateSQL,
+// RegisterComponents('REST Dataware - DB',   [TRESTDWPoolerDB,    TRESTDWDataBase,    TRESTDWClientSQL,  TRESTDWTable,      TRESTDWUpdateSQL,
 //                                                    TDWMemtable,        TDWMassiveSQLCache, TRESTDWStoredProc, TRESTDWPoolerList, TDWMassiveCache,  TRESTDWBatchMove]);
 
- RegisterComponents('REST Dataware - CORE - DB',   [TRESTDWPoolerDB,        TRESTDWClientSQL,  TRESTDWMemtable, TRESTDWTable,      TRESTDWUpdateSQL,
+ RegisterComponents('REST Dataware - DB',   [TRESTDWPoolerDB,        TRESTDWClientSQL,  TRESTDWMemtable, TRESTDWTable,      TRESTDWUpdateSQL,
                                                     TRESTDWMassiveSQLCache, TRESTDWStoredProc, TRESTDWPoolerList, TRESTDWMassiveCache,  TRESTDWBatchMove]);
 // AddIDEMenu;//Menu do REST Debugger
  {$IFNDEF FPC}
@@ -1120,7 +1120,7 @@ initialization
   {$ENDIF}
  {$ENDIF}
  {$IFDEF FPC}
-  {$I resteasyobjectscore.lrs}
+  {$I restdatawarecomponents.lrs}
  {$ENDIF}
  UnlistPublishedProperty(TRESTDWClientSQL,  'FieldDefs');
  UnlistPublishedProperty(TRESTDWClientSQL,  'Options');

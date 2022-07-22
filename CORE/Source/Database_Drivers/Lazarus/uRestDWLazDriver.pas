@@ -128,7 +128,7 @@ implementation
 
 Procedure Register;
 Begin
- RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWLazDriver]);
+ RegisterComponents('REST Dataware - Drivers', [TRESTDWLazDriver]);
 End;
 
 { TConnection }

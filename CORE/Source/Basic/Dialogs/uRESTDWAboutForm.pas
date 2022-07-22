@@ -32,7 +32,8 @@ uses
      {$ENDIF};
      {$ELSE}
      SysUtils, Variants, Classes, Vcl.Graphics, Vcl.Controls, Vcl.StdCtrls,
-     Vcl.ExtCtrls, Vcl.Forms, StdCtrls, Controls, ExtCtrls, Graphics;
+     Vcl.ExtCtrls, Vcl.Forms, StdCtrls, Controls, ExtCtrls, Graphics,
+  Vcl.Imaging.pngimage;
      {$IFEND}
     {$IFEND}
    {$IFEND}

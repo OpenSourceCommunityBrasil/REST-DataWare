@@ -71,7 +71,7 @@ Begin
     '  ' +
     '    <p>working together to keep the Internet alive and accessible, help us to help you. Be free.</p>' +
     ' ' +
-    '    <p><a href="http://www.restdw.com.br/">REST Dataware site</a> to learn and help us.</p>' +
+    '    <p><a href="https://github.com/OpenSourceCommunityBrasil/REST-DataWare/">REST Dataware site</a> to learn and help us.</p>' +
     '  </body>' +
     '</html>';
 End;

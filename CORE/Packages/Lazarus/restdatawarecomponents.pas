@@ -2,7 +2,7 @@
   This source is only used to compile and install the package.
  }
 
-unit resteasyobjectscore;
+unit restdatawarecomponents;
 
 {$warn 5023 off : no warning about unused units}
 interface
@@ -37,5 +37,5 @@ begin
 end;
 
 initialization
-  RegisterPackage('resteasyobjectscore', @Register);
+  RegisterPackage('restdatawarecomponents', @Register);
 end.

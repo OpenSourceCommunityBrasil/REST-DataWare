@@ -8,10 +8,80 @@
       <Unit>
         <Filename Value="RESTDWInstalador.lpr"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="restdwinstalador"/>
+        <CursorPos X="26"/>
+        <UsageCount Value="26"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\telas\uprincipal.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="fPrincipal"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="23"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\telas\frames\ufrideitem.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frIDEItem"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="23"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\udetectide.pas"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="60" Y="15"/>
+        <TopLine Value="174"/>
+        <CursorPos X="26" Y="185"/>
+        <FoldState Value=" T3oI0N4A"/>
         <UsageCount Value="23"/>
         <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\uidefunctions.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="22"/>
+        <CursorPos X="13" Y="42"/>
+        <UsageCount Value="23"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\uprincipal.pas"/>
+        <ComponentName Value="fPrincipal"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="uPrincipal"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="36" Y="82"/>
+        <UsageCount Value="23"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\udetectide.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="25"/>
+        <CursorPos X="17" Y="37"/>
+        <UsageCount Value="23"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\ufrideitem.pas"/>
+        <ComponentName Value="frIDEItem"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <UnitName Value="ufrIDEItem"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="23"/>
       </Unit>
       <Unit>
         <Filename Value="uprincipal.pas"/>
@@ -38,87 +108,8 @@
         <CursorPos X="16"/>
         <UsageCount Value="20"/>
       </Unit>
-      <Unit>
-        <Filename Value="src\uprincipal.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="fPrincipal"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="uPrincipal"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="73"/>
-        <CursorPos X="36" Y="82"/>
-        <UsageCount Value="23"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="src\udetectide.pas"/>
-        <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="25"/>
-        <CursorPos X="17" Y="37"/>
-        <UsageCount Value="23"/>
-        <Loaded Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="src\ufrideitem.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="frIDEItem"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Frame"/>
-        <UnitName Value="ufrIDEItem"/>
-        <EditorIndex Value="2"/>
-        <UsageCount Value="23"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
-      </Unit>
     </Units>
-    <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="62" Column="3" TopLine="42"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="59" Column="3" TopLine="39"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="60" Column="3" TopLine="39"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="62" Column="3" TopLine="41"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="63" Column="3" TopLine="42"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="64" Column="3" TopLine="43"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="63" Column="3" TopLine="42"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="64" Column="3" TopLine="43"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="70" Column="39" TopLine="51"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="75" Column="39" TopLine="49"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="70" Column="25" TopLine="56"/>
-      </Position>
+    <JumpHistory HistoryIndex="13">
       <Position>
         <Filename Value="RESTDWInstalador.lpr"/>
         <Caret Line="14" Column="22" TopLine="2"/>
@@ -164,36 +155,16 @@
         <Caret Line="15" Column="49" TopLine="2"/>
       </Position>
       <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="20" Column="20" TopLine="9"/>
+        <Filename Value="src\funcoes\uidefunctions.pas"/>
+        <Caret Line="26" Column="42" TopLine="7"/>
       </Position>
       <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="19" Column="28" TopLine="9"/>
+        <Filename Value="src\funcoes\uidefunctions.pas"/>
+        <Caret Line="42" Column="12" TopLine="22"/>
       </Position>
       <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="67" Column="41" TopLine="53"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="68" Column="41" TopLine="54"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="70" Column="41" TopLine="56"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="75" Column="35" TopLine="56"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="86" Column="3" TopLine="64"/>
-      </Position>
-      <Position>
-        <Filename Value="src\uprincipal.pas"/>
-        <Caret Line="77" Column="36" TopLine="61"/>
+        <Filename Value="src\funcoes\udetectide.pas"/>
+        <Caret Line="511" Column="19" TopLine="497"/>
       </Position>
     </JumpHistory>
     <RunParams>

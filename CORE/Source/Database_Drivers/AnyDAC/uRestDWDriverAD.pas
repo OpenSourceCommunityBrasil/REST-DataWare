@@ -147,7 +147,7 @@ Uses uDWJSONTools;
 
 Procedure Register;
 Begin
- RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWDriverAD]);
+ RegisterComponents('REST Dataware - Drivers', [TRESTDWDriverAD]);
 End;
 
 Function TRESTDWDriverAD.ProcessMassiveSQLCache(MassiveSQLCache      : String;

@@ -1,7 +1,7 @@
 unit uRESTDWServerEvents;
 
 {
-  REST Dataware versão CORE.
+  REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
@@ -11,10 +11,10 @@ unit uRESTDWServerEvents;
 
  Membros do Grupo :
 
- XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do CORE do pacote.
- Ivan Cesar                 - Admin - Administrador do CORE do pacote.
- Joanan Mendonça Jr. (jlmj) - Admin - Administrador do CORE do pacote.
- Giovani da Cruz            - Admin - Administrador do CORE do pacote.
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
+ Ivan Cesar                 - Admin - Administrador  do pacote.
+ Joanan Mendonça Jr. (jlmj) - Admin - Administrador  do pacote.
+ Giovani da Cruz            - Admin - Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
  Alexandre Souza            - Admin - Administrador do Grupo de Organização.
  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos

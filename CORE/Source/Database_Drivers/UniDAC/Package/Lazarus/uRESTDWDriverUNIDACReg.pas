@@ -12,7 +12,7 @@ implementation
 
 Procedure Register;
 Begin
- RegisterComponents('REST Dataware - CORE - Drivers', [TRESTDWDriverUniDAC]);
+ RegisterComponents('REST Dataware - Drivers', [TRESTDWDriverUniDAC]);
 End;
 
 initialization

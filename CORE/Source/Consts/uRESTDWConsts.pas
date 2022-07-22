@@ -3,7 +3,7 @@ Unit uRESTDWConsts;
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
-  REST Dataware versão CORE.
+  REST Dataware.
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
@@ -13,7 +13,7 @@ Unit uRESTDWConsts;
 
  Membros do Grupo :
 
- XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do CORE do pacote.
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
@@ -75,6 +75,10 @@ Const
  wdays                      : Array [1 .. 7]  Of String = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'); {do not localize}
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
+ RESTDWVersionINFO          = 'v2.0.0-';
+ RESTDWRelease              = '2999';
+ RESTDWCodeProject          = 'Dark Souls - GitHub';
+ RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
  SCorruptedFileHeader       = 'Corrupted File Header';
  SCorruptedDefinitions      = 'Corrupted Table Definitions, or Illegal Login';
@@ -105,22 +109,20 @@ Const
  TSepValueMemString         = '\\';
  TQuotedValueMemString      = '\"';
  TReplyOK                   = '{"MESSAGE":"OK",  "RESULT":"OK"}';
- TReplyNOK                  = '{"MESSAGE":"NOK", "RESULT":"NOK"}';
- TReplyTagError             = '{"MESSAGE":"NOK", "RESULT":"Invalid Access tag..."}';
- TReplyInvalidPooler        = '{"MESSAGE":"NOK", "RESULT":"Invalid Pooler Name..."}';
- TReplyInvalidWelcome       = '{"MESSAGE":"NOK", "RESULT":"Invalid welcomemessage..."}';
- TReplyError                = '{"MESSAGE":"NOK", "RESULT":"%s"}';
+ TReplyNOK                  = '{"MESSAGE":"FAIL", "RESULT":"FAIL"}';
+ TReplyTagError             = '{"MESSAGE":"ERROR", "RESULT":"Invalid Access tag..."}';
+ TReplyInvalidPooler        = '{"MESSAGE":"ERROR", "RESULT":"Invalid Pooler Name..."}';
+ TReplyInvalidWelcome       = '{"MESSAGE":"ERROR", "RESULT":"Invalid welcomemessage..."}';
+ TReplyError                = '{"MESSAGE":"ERROR", "RESULT":"%s"}';
  TServerStatusHTML          = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>' +
-                              '<title>REST Dataware - CORE (Refactor Edition)</title></head><body>'   +
-                              '<h1>REST Dataware - CORE (Refactor Edition)</h1>'                      +
+                              '<title>REST Dataware '+ RESTDWVersao +' </title></head><body>'   +
                               '<h2>Server Status - Online</h2></body></html>';
  TServerStatusSynHTML       = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>' +
-                              '<title>REST Dataware - CORE - Synopse</title></head><body>'   +
-                              '<h1>REST Dataware - CORE</h1>'                      +
+                              '<title>REST Dataware - Synopse '+ RESTDWVersao +' </title></head><body>'   +
                               '<h2>Server Status - Online</h2></body></html>';
  TServerStatusHTMLQX        = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>' +
-                              '<title>REST Dataware - CORE - QuickX</title></head><body>'   +
-                              '<h1>REST Dataware - CORE</h1>'                      +
+                              '<title>REST Dataware - QuickX</title></head><body>'   +
+                              '<h1>REST Dataware</h1>'                      +
                               '<h2>Server Status - Online</h2></body></html>';
  cAuthRealm                 = 'WWW-Authenticate: %s realm="%s", %s charset="UTF-8"';
  UrlBase                    = '%s://%s:%d/%s';
@@ -136,17 +138,12 @@ Const
  MinutesInDay               = 1440;   {Number of minutes in a day}
  AssyncCommandMSG           = '{"status":"OK", "assyncmsg":"AssyncCommand Executed"}';
  cNameValueSeparator        = '=';
- RESTDWDialogoTitulo        = 'DW REST DataWare Components';
- RESTDWSobreTitulo          = 'DW VCL';
- RESTDWSobreDescricao       = 'DW VCL http://www.restdw.com.br/' + sLineBreak +
-                              'Components REST Dataware Core' + sLineBreak +
-                              'CORE Version';
+ RESTDWDialogoTitulo        = 'REST DataWare Components';
+ RESTDWSobreTitulo          = 'REST DataWare '+ RESTDWVersao;
+ RESTDWSobreDescricao       = 'https://github.com/OpenSourceCommunityBrasil/REST-DataWare' + sLineBreak +
+                              'Components REST Dataware';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
- RESTDWVersionINFO          = '2.0.0.';
- RESTDWRelease              = '2996';
  RESTDWParamsHeaderVersion  = 6;
- RESTDWCodeProject          = 'Dark Souls - GitHub';
- RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  RESTDWFieldBookmark        = 'DWFIELDBOOKMARK';
  rsLazarusDWPackage         = 'REST Dataware - Tools';
  rsDwRequestDBGName         = 'REST Dataware - Request Debbuger';

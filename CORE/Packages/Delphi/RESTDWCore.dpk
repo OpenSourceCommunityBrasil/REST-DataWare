@@ -25,7 +25,7 @@ package RESTDWCore;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'REST Dataware CORE Base'}
+{$DESCRIPTION 'REST Dataware Base'}
 {$IMPLICITBUILD ON}
 
 requires
@@ -111,4 +111,5 @@ contains
   uRESTDWEncodeClass in '..\..\Source\Basic\uRESTDWEncodeClass.pas';
 
 End.
+
 

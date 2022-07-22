@@ -3,7 +3,7 @@ unit uRESTDWBasic;
 {$I ..\Includes\uRESTDWPlataform.inc}
 
 {
-  REST Dataware versão CORE.
+  REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
@@ -13,7 +13,7 @@ unit uRESTDWBasic;
 
  Membros do Grupo :
 
- XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do CORE do pacote.
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
@@ -564,7 +564,8 @@ Type
                                       AccessTag               : String);
   Function  ServiceMethods           (BaseObject              : TComponent;
                                       AContext                : TComponent;
-                                      UrlToExec               : String;
+                                      UrlToExec,
+                                      Poolername              : String;
                                       Var DWParams            : TRESTDWParams;
                                       Var JSONStr             : String;
                                       Var JsonMode            : TJsonMode;
@@ -1603,6 +1604,7 @@ Var
  vCORSOption,
  vUrlToExec,
  vOldRequest,
+ vdwservereventname,
  vAuthenticationString : String;
  vAuthTokenParam       : TRESTDWAuthTokenParam;
  vdwConnectionDefs     : TConnectionDefs;
@@ -1744,7 +1746,7 @@ Var
           JSONValue.DatabaseCharSet := vDatabaseCharSet;
           {$ENDIF}
           JSONValue.LoadFromJSON(RawHeaders.Values[tmp]);
-
+          vdwservereventname := JSONValue.AsString;
          Finally
           FreeAndNil(JSONValue);
          End;
@@ -2170,8 +2172,8 @@ Begin
          vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
         If (DWParams.ItemsString['dwservereventname']    <> Nil)    Then
          Begin
-          If vUrlToExec <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
-           vUrlToExec := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+          If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
+           vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
          End;
        End;
      End
@@ -2197,8 +2199,8 @@ Begin
            encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
           If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
            Begin
-            If vUrlToExec <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
-             vUrlToExec := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+            If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
+             vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
            End;
           If (DWParams.ItemsString['dwusecript']           <> Nil) Then
            vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
@@ -2225,8 +2227,8 @@ Begin
            encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
           If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
            Begin
-            If vUrlToExec <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
-             vUrlToExec := DWParams.ItemsString['dwservereventname'].AsString;
+            If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
+             vdwservereventname := DWParams.ItemsString['dwservereventname'].AsString;
            End;
           If (DWParams.ItemsString['dwusecript']           <> Nil) Then
            vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
@@ -2408,11 +2410,11 @@ Begin
                   JSONValue.Encoding := vEncoding;
                   JSONValue.Encoded  := True;
                   JSONValue.LoadFromJSON(ms.DataString);
-                  vUrlToExec := JSONValue.Value;
-                  If Pos('.', vUrlToExec) > 0 Then
+                  vdwservereventname := JSONValue.Value;
+                  If Pos('.', vdwservereventname) > 0 Then
                    Begin
-                    baseEventUnit       := Copy(vUrlToExec, InitStrPos, Pos('.', vUrlToExec) - 1 - FinalStrPos);
-                    vUrlToExec := Copy(vUrlToExec, Pos('.', vUrlToExec) + 1, Length(vUrlToExec));
+                    baseEventUnit       := Copy(vdwservereventname, InitStrPos, Pos('.', vdwservereventname) - 1 - FinalStrPos);
+                    vdwservereventname := Copy(vdwservereventname, Pos('.', vdwservereventname) + 1, Length(vdwservereventname));
                    End;
                  Finally
                   FreeAndNil(JSONValue);
@@ -2444,8 +2446,8 @@ Begin
                       encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
                      If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
                       Begin
-                       If (vUrlToExec <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString))) Then
-                        vUrlToExec := DWParams.ItemsString['dwservereventname'].AsString;
+                       If (vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString))) Then
+                        vdwservereventname := DWParams.ItemsString['dwservereventname'].AsString;
                       End;
                      If (DWParams.ItemsString['dwusecript']           <> Nil) Then
                       vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
@@ -2621,8 +2623,8 @@ Begin
                          encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
                         If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
                          Begin
-                          If (vUrlToExec <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString))) Then
-                           vUrlToExec := DWParams.ItemsString['dwservereventname'].AsString;
+                          If (vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString))) Then
+                           vdwservereventname := DWParams.ItemsString['dwservereventname'].AsString;
                          End;
                         If (DWParams.ItemsString['dwusecript']           <> Nil) Then
                          vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
@@ -2734,11 +2736,11 @@ Begin
                         JSONValue.Encoding  := vEncoding;
                         JSONValue.Encoded   := True;
                         JSONValue.LoadFromJSON(ms.DataString);
-                        vUrlToExec := JSONValue.Value;
-                        If Pos('.', vUrlToExec) > 0 Then
+                        vdwservereventname := JSONValue.Value;
+                        If Pos('.', vdwservereventname) > 0 Then
                          Begin
-                          baseEventUnit       := Copy(vUrlToExec, InitStrPos, Pos('.', vUrlToExec) - 1 - FinalStrPos);
-                          vUrlToExec := Copy(vUrlToExec, Pos('.', vUrlToExec) + 1, Length(vUrlToExec));
+                          baseEventUnit       := Copy(vdwservereventname, InitStrPos, Pos('.', vdwservereventname) - 1 - FinalStrPos);
+                          vdwservereventname := Copy(vUrlToExec, Pos('.', vdwservereventname) + 1, Length(vdwservereventname));
                          End;
                        Finally
                         FreeAndNil(JSONValue);
@@ -3537,7 +3539,7 @@ Begin
            End;
           If (Not (vGettoken)) And (Not (vTokenValidate)) Then
            Begin
-            If Not ServiceMethods(TComponent(vTempServerMethods), AContext, vUrlToExec, DWParams,
+            If Not ServiceMethods(TComponent(vTempServerMethods), AContext, vUrlToExec, vdwservereventname, DWParams,
                                   JSONStr, JsonMode, vErrorCode,  vContentType, vServerContextCall, ServerContextStream,
                                   vdwConnectionDefs,  EncodeStrings, vAccessTag, WelcomeAccept, RequestType, vMark,
                                   vRequestHeader, vBinaryEvent, vMetadata, vBinaryCompatibleMode, vCompareContext) Or (lowercase(vContentType) = 'application/php') Then
@@ -4596,7 +4598,8 @@ End;
 
 Function TRESTServiceBase.ServiceMethods(BaseObject              : TComponent;
                                          AContext                : TComponent;
-                                         UrlToExec               : String;
+                                         UrlToExec,
+                                         Poolername              : String;
                                          Var DWParams            : TRESTDWParams;
                                          Var JSONStr             : String;
                                          Var JsonMode            : TJsonMode;
@@ -4888,7 +4891,7 @@ Begin
        JSONParam.ObjectDirection := odOut;
        DWParams.Add(JSONParam);
       End;
-     GetEvents(BaseObject, vResult, UrlToExec, DWParams);
+     GetEvents(BaseObject, Poolername, UrlToExec, DWParams);
      If Not(DWParams.ItemsString['Error'].AsBoolean) Then
       JSONStr    := TReplyOK
      Else
@@ -4910,6 +4913,8 @@ Begin
        vOldServerEvent := UrlToExec;
        UrlToExec       := '';
       End;
+     If PoolerName <> '' Then
+      vBaseUrl := PoolerName;
      If ReturnEvent(BaseObject, vUrlMethod, vBaseUrl, vResult, DWParams, JsonMode, ErrorCode, ContentType, Accesstag, RequestType, RequestHeader) Then
       Begin
        JSONStr := vResult;
@@ -6087,8 +6092,8 @@ Begin
       Begin
        iContSE := iContSE + 1;
        If (LowerCase(urlContext) = LowerCase(TRESTDWServerEvents(ServerMethodsClass.Components[i]).DefaultEvent)) or
-          (LowerCase(urlContext) = LowerCase(ServerMethodsClass.Components[i].Name)) Or
-          (LowerCase(urlContext) = LowerCase(Format('%s.%s', [ServerMethodsClass.Classname, ServerMethodsClass.Components[i].Name])))  Then
+          (LowerCase(Pooler)     = LowerCase(ServerMethodsClass.Components[i].Name)) Or
+          (LowerCase(Pooler)     = LowerCase(Format('%s.%s', [ServerMethodsClass.Classname, ServerMethodsClass.Components[i].Name])))  Then
         Begin
          If vTempJSON = '' Then
           vTempJSON := Format('%s', [TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.ToJSON])
