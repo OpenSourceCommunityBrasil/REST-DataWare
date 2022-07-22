@@ -97,7 +97,7 @@ Const
                              'CORE Version';
  DWSobreLicencaStatus      = 'Open Source - Free Version';
  DWVersionINFO             = '1.4.3.';
- DWRelease                 = '2905';
+ DWRelease                 = '2906';
  DwParamsHeaderVersion     = 6;
  DWCodeProject             = 'Dark Souls - Git';
  DWVersao                  = DWVersionINFO + DWRelease + '(' + DWCodeProject + ')';
