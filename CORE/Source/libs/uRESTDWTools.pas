@@ -3142,6 +3142,7 @@ Function Base64Encode(Const S : String): String;
  Begin
   Result := Char(B64Table[(b and $3F)+1]);
  End;
+ {$R-}
 var
   i: Integer;
 Begin

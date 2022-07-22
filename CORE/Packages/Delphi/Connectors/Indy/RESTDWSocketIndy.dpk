@@ -30,15 +30,16 @@ package RESTDWSocketIndy;
 
 requires
   rtl,
+  designide,
+  dcldb,
+  soaprtl,
   IndySystem,
   IndyProtocols,
   IndyCore,
-  {$IFDEF WIN32}
-  designide,
-  dcldb,
-  RESTDWCore,
-  {$ENDIF}
-  soaprtl;
+  FireDAC,
+  FireDACCommonDriver,
+  FireDACCommon,
+  RESTDWCore;
 
 contains
   uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas' {$IFDEF WIN32},

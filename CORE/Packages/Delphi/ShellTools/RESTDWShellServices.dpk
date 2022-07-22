@@ -28,8 +28,14 @@ package RESTDWShellServices;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl
-  {$IFDEF WIN32},RESTDWCore{$ENDIF};
+  rtl,
+  dcldb,
+  soaprtl,
+  inet,
+  FireDAC,
+  FireDACCommonDriver,
+  FireDACCommon,
+  RESTDWCore;
 
 contains
   uRESTDWShellServices in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServices.pas' {$IFDEF WIN32},

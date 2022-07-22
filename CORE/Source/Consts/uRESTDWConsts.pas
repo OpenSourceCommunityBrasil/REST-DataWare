@@ -48,12 +48,6 @@ Uses
   {$IFEND}
  {$ENDIF}
 
-Var
- InitStrPos,
- FinalStrPos                : Integer;
-
- Procedure InitializeStrings;
-
 Type
  TRESTDWAboutInfo = (RESTDWAbout);
  TMassiveDataset  = Class
@@ -76,8 +70,8 @@ Const
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
  RESTDWVersionINFO          = 'v2.0.0-';
- RESTDWRelease              = '2999';
- RESTDWCodeProject          = 'Dark Souls - GitHub';
+ RESTDWRelease              = '3000';
+ RESTDWCodeProject          = 'Savage Reign - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
  SCorruptedFileHeader       = 'Corrupted File Header';
@@ -292,8 +286,8 @@ Type
 End;
 
 Type
- TRESTDWRoute         = (crAll, crGet, crPost, crPut, crPatch, crDelete);
- TRESTDWRoutes        = Set of TRESTDWRoute;
+ TRESTDWRoute     = (crAll, crGet, crPost, crPut, crPatch, crDelete);
+ TRESTDWRoutes    = Set of TRESTDWRoute;
  TRequestType     = (rtGet, rtPost, rtPut, rtPatch, rtDelete);
  TResquestMode    = (rtOnlyFields, rtOnlyData, rtJSONAll);
  TJsonMode        = (jmDataware,  jmPureJSON, jmUndefined);
@@ -404,8 +398,11 @@ Type
  Function  iif                      (ATest              : Boolean;
                                      Const ATrue        : Boolean;
                                      Const AFalse       : Boolean)                : Boolean;{$IFDEF USE_INLINE}Inline;{$ENDIF}Overload;
+ Procedure InitializeStrings;
 
 Var
+ InitStrPos,
+ FinalStrPos                : Integer;
  DecimalLocal : Char;
 
 implementation

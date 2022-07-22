@@ -28,9 +28,9 @@ interface
 uses
   {$IFDEF FPC}
     StdCtrls, ComCtrls, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWShellServices,
-    LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb, uRESTDWAbout;
+    LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb;
   {$ELSE}
-   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWShellServices, uRESTDWAbout,
+   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWShellServices,
    RTLConsts,
    {$IFDEF COMPILER16_UP}
    UITypes,
@@ -44,28 +44,15 @@ uses
    {$IFEND}
   {$ENDIF}
 
-Type
- TRESTDWAboutDialogProperty = class({$IFDEF FPC}TClassPropertyEditor{$ELSE}TPropertyEditor{$ENDIF})
-Public
- Procedure Edit; override;
- Function  GetAttributes : TPropertyAttributes; Override;
- Function  GetValue      : String;              Override;
-End;
-
 Procedure Register;
 
 Implementation
 
-uses uRESTDWConsts, uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
+uses uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
 
 Procedure Register;
 Begin
  RegisterComponents('REST Dataware - Service',     [TRESTDWShellService]);
- {$IFNDEF FPC}
-  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TRESTDWAboutDialogProperty);
- {$ELSE}
-  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TRESTDWAboutDialogProperty);
- {$ENDIF}
  UnlistPublishedProperty(TRESTDWShellService,  'Active');
  UnlistPublishedProperty(TRESTDWShellService,  'ServicePort');
  UnlistPublishedProperty(TRESTDWShellService,  'RequestTimeOut');
@@ -81,21 +68,6 @@ End;
      RegisterPropertyEditor (pi^.PropType, ComponentClass, PropertyName, PropEdits.THiddenPropertyEditor);
  end;
 {$ENDIF}
-
-Procedure TRESTDWAboutDialogProperty.Edit;
-Begin
- RESTDWAboutDialog;
-End;
-
-Function TRESTDWAboutDialogProperty.GetAttributes: TPropertyAttributes;
-Begin
- Result := [paDialog, paReadOnly];
-End;
-
-Function TRESTDWAboutDialogProperty.GetValue: String;
-Begin
- Result := 'Version : '+ RESTDWVERSAO;
-End;
 
 initialization
 

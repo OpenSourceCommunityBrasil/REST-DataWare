@@ -26,14 +26,12 @@ package RESTDWCore;
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
 {$DESCRIPTION 'REST Dataware Base'}
-{$IMPLICITBUILD ON}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  {$IFDEF WIN32}
   designide,
   dcldb,
-  {$ENDIF}
   dbrtl,
   soaprtl,
   dsnap,
@@ -52,14 +50,12 @@ contains
   uRESTDWMasterDetailData in '..\..\Source\Basic\uRESTDWMasterDetailData.pas',
   uRESTDWParams in '..\..\Source\Basic\uRESTDWParams.pas',
   uRESTDWPoolermethod in '..\..\Source\Basic\uRESTDWPoolermethod.pas',
-  {$IFDEF WIN32}
   uRESTDWReg in '..\..\Source\Basic\uRESTDWReg.pas',
   uRESTDWSqlEditor in '..\..\Source\Plugins\SQLEditor\uRESTDWSqlEditor.pas' {FrmDWSqlEditor},
   uRESTDWUpdSqlEditor in '..\..\Source\Plugins\SQLEditor\uRESTDWUpdSqlEditor.pas' {FrmDWUpdSqlEditor},
   uRESTDWFieldSourceEditor in '..\..\Source\Plugins\SQLEditor\uRESTDWFieldSourceEditor.pas' {fMasterDetailRelation},
   uRESTDWJSONViewer in '..\..\Source\Plugins\JSONViewer\uRESTDWJSONViewer.pas' {fDWJSONViewer},
   uRESTDWExprParser in '..\..\Source\Plugins\Memdataset\uRESTDWExprParser.pas',
-  {$ENDIF}
   uRESTDWServerContext in '..\..\Source\Basic\uRESTDWServerContext.pas',
   uRESTDWServerEvents in '..\..\Source\Basic\uRESTDWServerEvents.pas',
   uRESTDWConsts in '..\..\Source\Consts\uRESTDWConsts.pas',

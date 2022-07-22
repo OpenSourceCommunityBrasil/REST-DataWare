@@ -28,9 +28,9 @@ interface
 uses
   {$IFDEF FPC}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWIdBase,
-    LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb, uRESTDWAbout;
+    LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb;
   {$ELSE}
-   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWIdBase, uRESTDWAbout,
+   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWIdBase,
    RTLConsts,
    {$IFDEF COMPILER16_UP}
    UITypes,
@@ -52,19 +52,11 @@ Type
   Procedure Edit;                                 Override;
 End;
 
-Type
- TRESTDWAboutDialogProperty = class({$IFDEF FPC}TClassPropertyEditor{$ELSE}TPropertyEditor{$ENDIF})
-Public
- Procedure Edit; override;
- Function  GetAttributes : TPropertyAttributes; Override;
- Function  GetValue      : String;              Override;
-End;
-
 Procedure Register;
 
 Implementation
 
-uses uRESTDWConsts, uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
+uses uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
 
 Function TPoolersList.GetAttributes : TPropertyAttributes;
 Begin
@@ -106,39 +98,8 @@ Begin
  RegisterComponents('REST Dataware - Service',     [TRESTDWIdServicePooler]);
  RegisterComponents('REST Dataware - Client''s',   [TRESTDWIdClientREST,
                                                     TRESTDWIdClientPooler]);
- RegisterComponents('REST Dataware - DB',   [TRESTDWIdDataBase]);
+ RegisterComponents('REST Dataware - DB',          [TRESTDWIdDataBase]);
  RegisterPropertyEditor(TypeInfo(String),           TRESTDWIdDatabase,     'PoolerName',      TPoolersList);
- {$IFNDEF FPC}
-  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TRESTDWAboutDialogProperty);
- {$ELSE}
-  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TRESTDWAboutDialogProperty);
- {$ENDIF}
-End;
-
-{$IFDEF FPC}
- Procedure UnlistPublishedProperty (ComponentClass:TPersistentClass; const PropertyName:String);
- var
-   pi :PPropInfo;
- begin
-   pi := TypInfo.GetPropInfo (ComponentClass, PropertyName);
-   if (pi <> nil) then
-     RegisterPropertyEditor (pi^.PropType, ComponentClass, PropertyName, PropEdits.THiddenPropertyEditor);
- end;
-{$ENDIF}
-
-Procedure TRESTDWAboutDialogProperty.Edit;
-Begin
- RESTDWAboutDialog;
-End;
-
-Function TRESTDWAboutDialogProperty.GetAttributes: TPropertyAttributes;
-Begin
- Result := [paDialog, paReadOnly];
-End;
-
-Function TRESTDWAboutDialogProperty.GetValue: String;
-Begin
- Result := 'Version : '+ RESTDWVERSAO;
 End;
 
 initialization
