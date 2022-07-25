@@ -6379,7 +6379,7 @@ Var
   B       : Boolean;
   VE      : Extended;
   vItem   : TJSONParam;
-  vStream : TMemoryStream;
+  vStream : TStream;
  Begin
   For I := 0 To ParamsCount -1 Do
    Begin
@@ -6535,11 +6535,14 @@ Var
                   Stream.ReadBuffer(J, Sizeof(DWInt64));
                   If J > 0 Then
                    Begin
-                    vStream := TMemoryStream.Create;
+                    vStream := TStringStream.Create('');
                     Try
                      vStream.CopyFrom(Stream, J);
                      vStream.position := 0;
-                     vItem.LoadFromStream(vStream);
+                     Try
+                      vItem.LoadFromStream(TStringStream(vStream));
+                     Except
+                     End;
                     Finally
                      vStream.Free;
                     End;

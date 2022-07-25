@@ -1,6 +1,6 @@
 Unit uRESTDWMessageCoderMIME;
 
-{$I ..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
