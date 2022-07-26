@@ -33,11 +33,7 @@ requires
   designide,
   dcldb,
   dbrtl,
-  soaprtl,
-  dsnap,
-  FireDAC,
-  FireDACCommonDriver,
-  FireDACCommon;
+  soaprtl;
 
 contains
   DataUtils in '..\..\Source\Basic\Mechanics\DataUtils.pas',

@@ -36,9 +36,6 @@ requires
   IndySystem,
   IndyProtocols,
   IndyCore,
-  FireDAC,
-  FireDACCommonDriver,
-  FireDACCommon,
   RESTDWCore;
 
 contains
