@@ -52,6 +52,6 @@ requires
   RESTDWCore;
 
 contains
-  uRestDWDriverFD in '..\..\uRestDWDriverFD.pas';
+  uRESTDWDriverFD in 'uRESTDWDriverFD.pas';
 
 end.

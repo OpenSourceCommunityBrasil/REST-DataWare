@@ -145,6 +145,9 @@
         <DCCReference Include="dcldb.dcp"/>
         <DCCReference Include="dbrtl.dcp"/>
         <DCCReference Include="soaprtl.dcp"/>
+        <DCCReference Include="FireDAC.dcp"/>
+        <DCCReference Include="FireDACCommonDriver.dcp"/>
+        <DCCReference Include="FireDACCommon.dcp"/>
         <DCCReference Include="..\..\Source\Basic\Mechanics\DataUtils.pas"/>
         <DCCReference Include="..\..\Source\Basic\PropertyPersist.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWAbout.pas"/>
@@ -223,9 +226,14 @@
         <DCCReference Include="..\..\Source\Basic\Crypto\Ciphers\DWDCPcast256.pas"/>
         <DCCReference Include="..\..\Source\Basic\Crypto\Hashes\DWDCPsha256.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWEncodeClass.pas"/>
+        <DCCReference Include="..\..\Source\libs\uRESTDWBase64.pas"/>
+        <DCCReference Include="..\..\Source\Basic\uRESTDWFileBuffer.pas"/>
+        <DCCReference Include="..\..\Source\libs\uRESTDWDynamic.pas"/>
         <RcCompile Include="RESTDWCore.rc">
             <Form>RESTDWCore.res</Form>
         </RcCompile>
+        <None Include="..\..\Source\Includes\uRESTDWPlataform.inc"/>
+        <None Include="..\..\Source\Includes\uRESTDW.inc"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
