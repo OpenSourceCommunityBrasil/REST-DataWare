@@ -467,6 +467,38 @@ Begin
  Result := PDWInt64(@AValue[AIndex])^;
 End;
 
+Function Base64Decode(const AInput : String) : TRESTDWBytes;
+Begin
+ Result := TRESTDWBase64.Decode(ToBytes(AInput));
+End;
+
+Function Base64Encode(Const S : String): String;
+ Function Encode_Byte(b: Byte): char;
+ Begin
+  Result := Char(B64Table[(b and $3F)+1]);
+ End;
+ {$R-}
+var
+  i: Integer;
+Begin
+ i := 1;
+ Result := '';
+ While i <= Length(S) do
+  Begin
+   Result := Result + Encode_Byte(Byte(S[i]) shr 2);
+   Result := Result + Encode_Byte((Byte(S[i]) shl 4) or (Byte(S[i+1]) shr 4));
+   If i+1 <= Length(S) Then
+    Result := Result + Encode_Byte((Byte(S[i+1]) shl 2) or (Byte(S[i+2]) shr 6))
+   Else
+    Result := Result + '=';
+   If i+2 <= Length(S) Then
+    Result := Result + Encode_Byte(Byte(S[i+2]))
+   Else
+    Result := Result + '=';
+   Inc(i, 3);
+  End;
+End;
+
 Function RemoveHeaderEntry(Const AHeader,
                            AEntry         : String;
                            AQuoteType     : TRESTDWHeaderQuotingType) : String;
@@ -3010,7 +3042,7 @@ Begin
   {$ELSE}
    {$IFDEF LINUXFMX}
     //SetString(Result, PChar(@LBytes[0]), restdwLength(LBytes) * SizeOf(Char));
-    Result := TEncoding.Utf8.GetString(TBytes(LBytes));
+    Result := TEncoding.ANSI.GetString(TBytes(LBytes));
    {$ELSE}
     SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
    {$ENDIF}
@@ -3029,9 +3061,7 @@ Begin
    SetString(Result, PAnsiChar(bin), I);
   {$ELSE}
    {$IFDEF LINUXFMX}
-//   SetString(vTempValue, PChar(@aValue[0]), SizeOfString);
-    Result := TEncoding.Utf8.GetString(TBytes(bin));
-//    SetString(Result, PChar(@bin[0]), I * SizeOf(Char));
+    Result := TEncoding.ANSI.GetString(TBytes(bin));
    {$ELSE}
     SetString(Result, PAnsiChar(bin), I);
    {$ENDIF}
@@ -3060,6 +3090,20 @@ Function EncodeStream (Value : TStream) : String;
      StreamDecoded.Free;
     End;
    End;
+  {$ELSE}
+   Function EncodeBase64(AValue : TStream) : String;
+   Var
+    outstream : TStringStream;
+   Begin
+    outstream := TStringStream.Create('');
+    Try
+     outstream.CopyFrom(AValue, AValue.Size);
+     outstream.Position := 0;
+     Result := EncodeStrings(outstream.Datastring{$IFDEF FPC}, csUndefined{$ENDIF});
+    Finally
+     FreeAndNil(outstream);
+    End;
+   End;
   {$ENDIF}
  {$ELSE}
   Function EncodeBase64(AValue : TStream) : String;
@@ -3086,58 +3130,17 @@ End;
 
 Function DecodeStream(Value : String) : TMemoryStream;
 Var
- outstream : TStringStream;
+ vRESTDWBytes : TRESTDWBytes;
 Begin
- outstream := Nil;
- Result    := TMemoryStream.Create;
+ If Trim(Value) = '' Then
+  Exit;
+ vRESTDWBytes := Base64Decode(Value);
+ Result       := TMemoryStream.Create;
  Try
-  Try
-   outstream := TStringStream.Create(DecodeStrings(Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-  Except
-  End;
-  If Assigned(outstream) Then
-   If outstream.Size > 0 Then
-    Begin
-     outstream.Position := 0;
-     Result.CopyFrom(outstream, outstream.Size);
-     Result.Position := 0;
-    End;
- Finally
-  If Assigned(outstream) Then
-   FreeAndNil(outstream);
+  Result.Write(vRESTDWBytes[0], Length(vRESTDWBytes));
+  Result.Position := 0;
+ Except
  End;
-End;
-
-Function Base64Decode(const AInput : String) : TRESTDWBytes;
-Begin
- Result := TRESTDWBase64.Decode(ToBytes(AInput));
-End;
-
-Function Base64Encode(Const S : String): String;
- Function Encode_Byte(b: Byte): char;
- Begin
-  Result := Char(B64Table[(b and $3F)+1]);
- End;
- {$R-}
-var
-  i: Integer;
-Begin
- i := 1;
- Result := '';
- While i <= Length(S) do
-  Begin
-   Result := Result + Encode_Byte(Byte(S[i]) shr 2);
-   Result := Result + Encode_Byte((Byte(S[i]) shl 4) or (Byte(S[i+1]) shr 4));
-   If i+1 <= Length(S) Then
-    Result := Result + Encode_Byte((Byte(S[i+1]) shl 2) or (Byte(S[i+2]) shr 6))
-   Else
-    Result := Result + '=';
-   If i+2 <= Length(S) Then
-    Result := Result + Encode_Byte(Byte(S[i+2]))
-   Else
-    Result := Result + '=';
-   Inc(i, 3);
-  End;
 End;
 
 Function Encode64(Const S : String) : String;
@@ -3256,7 +3259,7 @@ Begin
  End;
  {$ENDIF}
  {$IFDEF FPC}
-  Result := Base64Encode(Value, DatabaseCharSet);
+  Result := Base64Encode(Value);
  {$ELSE}
   {$IF Defined(ANDROID) OR Defined(IOS)}
    Result := Encode64(Value);

@@ -46,7 +46,7 @@
     <CompatibilityMode Value="True"/>
     <RequiredPkgs Count="4">
       <Item1>
-        <PackageName Value="resteasyobjectscore"/>
+        <PackageName Value="restdatawarecomponents"/>
       </Item1>
       <Item2>
         <PackageName Value="LR_ZeosDB"/>

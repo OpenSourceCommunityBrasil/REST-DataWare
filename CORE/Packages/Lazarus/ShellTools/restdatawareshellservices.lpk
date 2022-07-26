@@ -29,10 +29,10 @@
     </Files>
     <RequiredPkgs>
       <Item>
-        <PackageName Value="weblaz"/>
+        <PackageName Value="restdatawarecomponents"/>
       </Item>
       <Item>
-        <PackageName Value="resteasyobjectscore"/>
+        <PackageName Value="weblaz"/>
       </Item>
       <Item>
         <PackageName Value="FCL"/>
