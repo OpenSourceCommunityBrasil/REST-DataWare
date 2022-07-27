@@ -25,7 +25,7 @@ package RESTDWCore;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'REST Dataware CORE Base'}
+{$DESCRIPTION 'REST Dataware Base'}
 {$IMPLICITBUILD OFF}
 
 requires
@@ -33,10 +33,15 @@ requires
   designide,
   dcldb,
   dbrtl,
-  soaprtl,
-  FireDAC,
-  FireDACCommonDriver,
-  FireDACCommon;
+  soaprtl
+  {$IFDEF VER150}
+  , bdertl
+  {$ELSE}
+  , FireDAC
+  , FireDACCommonDriver
+  , FireDACCommon
+  {$ENDIF}
+  ;
 
 contains
   DataUtils in '..\..\Source\Basic\Mechanics\DataUtils.pas',
@@ -100,13 +105,13 @@ contains
   uRESTDWBufferDb in '..\..\Source\Basic\uRESTDWBufferDb.pas',
   uRESTDWResponseTranslator in '..\..\Source\Basic\uRESTDWResponseTranslator.pas',
   uRESTDWBasicClass in '..\..\Source\Basic\uRESTDWBasicClass.pas',
-  DWDCPrijndael in '..\..\Source\Basic\Crypto\Ciphers\DWDCPrijndael.pas',
-  DWDCPcast256 in '..\..\Source\Basic\Crypto\Ciphers\DWDCPcast256.pas',
-  DWDCPsha256 in '..\..\Source\Basic\Crypto\Hashes\DWDCPsha256.pas',
   uRESTDWEncodeClass in '..\..\Source\Basic\uRESTDWEncodeClass.pas',
   uRESTDWBase64 in '..\..\Source\libs\uRESTDWBase64.pas',
   uRESTDWFileBuffer in '..\..\Source\Basic\uRESTDWFileBuffer.pas',
-  uRESTDWDynamic in '..\..\Source\libs\uRESTDWDynamic.pas';
+  uRESTDWDynamic in '..\..\Source\libs\uRESTDWDynamic.pas',
+  DWDCPrijndael in '..\..\Source\Basic\Crypto\DWDCPrijndael.pas',
+  DWDCPsha256 in '..\..\Source\Basic\Crypto\DWDCPsha256.pas',
+  DWDCPcast256 in '..\..\Source\Basic\Crypto\DWDCPcast256.pas';
 
 End.
 

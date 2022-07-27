@@ -33,9 +33,15 @@ requires
   designide,
   dcldb,
   soaprtl,
+  {$IFDEF VER150}
+  IndySystem70,
+  IndyProtocols70,
+  IndyCore70,
+  {$ELSE}
   IndySystem,
   IndyProtocols,
   IndyCore,
+  {$ENDIF}
   RESTDWCore;
 
 contains

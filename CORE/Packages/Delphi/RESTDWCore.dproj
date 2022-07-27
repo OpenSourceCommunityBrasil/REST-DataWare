@@ -135,6 +135,7 @@
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
         <VerInfo_Release>5</VerInfo_Release>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
+        <DCC_Description>REST Dataware Base</DCC_Description>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -222,18 +223,16 @@
         <DCCReference Include="..\..\Source\Basic\uRESTDWBufferDb.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWResponseTranslator.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasicClass.pas"/>
-        <DCCReference Include="..\..\Source\Basic\Crypto\Ciphers\DWDCPrijndael.pas"/>
-        <DCCReference Include="..\..\Source\Basic\Crypto\Ciphers\DWDCPcast256.pas"/>
-        <DCCReference Include="..\..\Source\Basic\Crypto\Hashes\DWDCPsha256.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWEncodeClass.pas"/>
         <DCCReference Include="..\..\Source\libs\uRESTDWBase64.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWFileBuffer.pas"/>
         <DCCReference Include="..\..\Source\libs\uRESTDWDynamic.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPrijndael.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPsha256.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPcast256.pas"/>
         <RcCompile Include="RESTDWCore.rc">
             <Form>RESTDWCore.res</Form>
         </RcCompile>
-        <None Include="..\..\Source\Includes\uRESTDWPlataform.inc"/>
-        <None Include="..\..\Source\Includes\uRESTDW.inc"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -255,8 +254,8 @@
                     <Source Name="MainSource">RESTDWCore.dpk</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\RestDatawareShellservices.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\RestDatawareShellservices.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\aseprovider240.bpl">UniDAC ASE Provider</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>
