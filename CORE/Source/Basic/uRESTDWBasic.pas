@@ -703,8 +703,8 @@ Type
   Procedure   SetActive    (Value               : Boolean);Virtual;
   Function    CommandExec  (Const AContext : TComponent;
                             Url,
-                            RawHTTPCommand,
-                            ContentType,
+                            RawHTTPCommand      : String;
+                            Var ContentType     : String;
                             ClientIP,
                             UserAgent,
                             AuthUsername,
@@ -1550,8 +1550,8 @@ End;
 
 Function TRESTServiceBase.CommandExec(Const AContext : TComponent;
                                       Url,
-                                      RawHTTPCommand,
-                                      ContentType,
+                                      RawHTTPCommand      : String;
+                                      Var ContentType     : String;
                                       ClientIP,
                                       UserAgent,
                                       AuthUsername,
@@ -3479,14 +3479,15 @@ Begin
       If vTempServerMethods <> Nil Then
        Begin
         ContentType   := 'application/json'; //'text';//'application/octet-stream';
-        If (vUrlToExec = '') Then
+        If (vUrlToExec = '')  Or
+           (vUrlToExec = '/') Then
          Begin
           If vDefaultPage.Count > 0 Then
            vReplyString  := vDefaultPage.Text
           Else
            vReplyString  := TServerStatusHTML;
           vErrorCode   := 200;
-          ContentType := 'text/html';
+          ContentType  := 'text/html';
          End
         Else
          Begin
@@ -3685,10 +3686,11 @@ Begin
                   End
                  Else
                   Begin
-                   If Not (WelcomeAccept) And (vErrorMessage <> '') Then
-                    vReplyString := escape_chars(vErrorMessage)
-                   Else
-                    vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
+                   If Not(((vUrlToExec = '') Or (vUrlToExec = '/')) And (RequestType = rtGet)) Then
+                    If Not (WelcomeAccept) And (vErrorMessage <> '') Then
+                     vReplyString := escape_chars(vErrorMessage)
+                    Else
+                     vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
                   End;
                 End
                Else If JsonMode = jmPureJSON Then

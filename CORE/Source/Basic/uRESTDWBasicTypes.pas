@@ -1261,30 +1261,31 @@ Class Procedure TRESTDWClientSQLBase.SaveToStreamFromDataset(Dataset           :
                                                              Const StreamValue : TMemoryStream);
 Var
  ParamsHeader : TRESTDWParamsHeader;
+
  {$IFNDEF FPC}
   {$if CompilerVersion < 21}
    aStream    : TMemoryStream;
   {$IFEND}
  {$ENDIF}
- I, Temp      : Integer;
+ I, X, Temp      : DWInteger;
  EndPos,
  StartPos     : Int64;
  {$IFNDEF FPC}
   {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
    {$IF Defined(HAS_FMX)}
-    S, W : String;
+    S, W, vTempString : String;
    {$ELSE}
-    S, W : Utf8String;
+    S, W, vTempString : Utf8String;
    {$IFEND}
   {$ELSE}
    {$IF Defined(HAS_FMX)}
-    S, W : Utf8String;
+    S, W, vTempString : Utf8String;
    {$ELSE}
-    S, W : AnsiString;
+    S, W, vTempString : AnsiString;
    {$IFEND}
   {$IFEND}
  {$ELSE}
-  S, W   : AnsiString;
+  S, W, vTempString : AnsiString;
  {$ENDIF}
  {$IFDEF FPC}
  Function GetDefinitions(Dataset : TDataset) : AnsiString;
@@ -1361,31 +1362,31 @@ Begin
        ParamsCount   := Dataset.FieldCount;
        RecordCount   := Dataset.RecordCount;
       End;
-     //Write dwParamsBinList
+     StreamValue.WriteBuffer(ParamsHeader, SizeOf(TRESTDWParamsHeader)); 
      {$IFNDEF FPC}
       {$IF Defined(HAS_FMX)}
        {$IF Defined(HAS_UTF8)} //TODO
-        S := String(GetDefinitions(Dataset));
+        vTempString := String(GetDefinitions(Dataset));
        {$ELSE}
-        S := AnsiString(GetDefinitions(Dataset));
+        vTempString := AnsiString(GetDefinitions(Dataset));
        {$IFEND}
       {$ELSE}
-       S := AnsiString(GetDefinitions(Dataset));
+       vTempString := AnsiString(GetDefinitions(Dataset));
       {$IFEND}
      {$ELSE}
-      S := AnsiString(GetDefinitions(Dataset));
+      vTempString := AnsiString(GetDefinitions(Dataset));
      {$ENDIF}
     // SwapString(S);
-     I := Length(S);
-     StreamValue.WriteBuffer(I, SizeOf(I));
-     StreamValue.WriteBuffer(S[InitStrPos], I);
+     X := Length(vTempString);
+     StreamValue.WriteBuffer(X, SizeOf(DWInteger));
+     StreamValue.WriteBuffer(vTempString[InitStrPos], X);
      For I := 0 To ParamsHeader.RecordCount - 1 Do
       Begin
-       SaveRecordToStream(Dataset, StreamValue);
+       SaveRecordToStream(Dataset, aStream);
        Dataset.Next;
       End;
      //Remap Bin size
-     EndPos := aStream.Size;
+     EndPos := aStream.size;
      ParamsHeader.DataSize    := EndPos;
      ParamsHeader.ParamsCount := Dataset.FieldCount;
      ParamsHeader.RecordCount := Dataset.RecordCount;
@@ -1393,6 +1394,8 @@ Begin
      StreamValue.Position := 0;
      aStream.Position := 0;
      StreamValue.WriteBuffer(ParamsHeader, SizeOf(ParamsHeader));
+     StreamValue.WriteBuffer(X, SizeOf(DWInteger));
+     StreamValue.WriteBuffer(vTempString[InitStrPos], X);
      StreamValue.CopyFrom(aStream, aStream.Size);
      StreamValue.Position := 0;
     Finally
@@ -1504,7 +1507,7 @@ Var
  I, VersionNumber,
  RecordsCount,
  ParamsCount,
- L              : Integer;
+ L              : DWInteger;
  S              : DWString;
  vAllListFields,
  vFieldList     : TStringList;
@@ -1970,7 +1973,7 @@ Begin
    StartPos        := StreamValue.Position;
    aSize           := StreamValue.Size;
    S := '';
-   StreamValue.ReadBuffer(I, SizeOf(I));
+   StreamValue.ReadBuffer(I, SizeOf(DWInteger));
    If (I > ParamsHeader.DataSize) Or
       (I > MAXSHORT)              Or
       (I < 0)                     Then

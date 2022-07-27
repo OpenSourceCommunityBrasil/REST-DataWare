@@ -2999,6 +2999,7 @@ Var
  vToken,
  ErrorMessage,
  vAuthRealm,
+ vContentType,
  vResponseString : String;
  I,
  StatusCode      : Integer;
@@ -3073,11 +3074,12 @@ Begin
    If Assigned(AContext.Data) Then
     vToken       := TRESTDWAuthRequest(AContext.Data).Token;
   {$ENDIF}
-  vAuthRealm := AResponseInfo.AuthRealm;
+  vAuthRealm   := AResponseInfo.AuthRealm;
+  vContentType := ARequestInfo.ContentType;
   If CommandExec  (TComponent(AContext),
                    RemoveBackslashCommands(ARequestInfo.URI),
                    ARequestInfo.RawHTTPCommand,
-                   ARequestInfo.ContentType,
+                   vContentType,
                    AContext.Binding.PeerIP,
                    ARequestInfo.UserAgent,
                    ARequestInfo.Username,
@@ -3099,6 +3101,7 @@ Begin
                    vRedirect) Then
    Begin
     AResponseInfo.AuthRealm   := vAuthRealm;
+    AResponseInfo.ContentType := vContentType;
     {$IFNDEF FPC}
      {$if CompilerVersion > 21}
       If (sCharSet <> '') Then
@@ -3111,23 +3114,19 @@ Begin
      Begin
       If Assigned(ResultStream) Then
        FreeAndNil(ResultStream);
-      AResponseInfo.ContentLength          := -1;
-      If ErrorMessage <> '' Then
-       AResponseInfo.ResponseText          := ErrorMessage
+      If (vResponseString <> '') Then
+       ResultStream  := TStringStream.Create(vResponseString)
       Else
-       AResponseInfo.ResponseText          := vResponseString;
-     End
-    Else
-     Begin
-      AResponseInfo.FreeContentStream      := True;
-      AResponseInfo.ContentStream          := ResultStream;
-      AResponseInfo.ContentStream.Position := 0;
-      {$IFNDEF FPC}
-       AResponseInfo.ContentLength         := ResultStream.Size;
-      {$ELSE}
-       AResponseInfo.ContentLength         := -1;
-      {$ENDIF}
+       ResultStream  := TStringStream.Create(ErrorMessage);
      End;
+    AResponseInfo.FreeContentStream      := True;
+    AResponseInfo.ContentStream          := ResultStream;
+    AResponseInfo.ContentStream.Position := 0;
+    {$IFNDEF FPC}
+     AResponseInfo.ContentLength         := ResultStream.Size;
+    {$ELSE}
+     AResponseInfo.ContentLength         := -1;
+    {$ENDIF}
     For I := 0 To vResponseHeader.Count -1 Do
      AResponseInfo.CustomHeaders.AddValue(vResponseHeader.Names [I],
                                           vResponseHeader.Values[vResponseHeader.Names[I]]);

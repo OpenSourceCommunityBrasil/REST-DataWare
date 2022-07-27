@@ -29,8 +29,9 @@ Uses
  uRESTDWCharset, ZLib,
  DWDCPrijndael, DWDCPsha256,
  uRESTDWEncodeClass,
+ uzliblaz,
  {$IFDEF FPC}
-  zstream, uzliblaz,
+  zstream,
   {$IFNDEF RESTDWLAMW}
    LCL,
   {$ENDIF}
@@ -70,7 +71,7 @@ Const
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
  RESTDWVersionINFO          = 'v2.0.0-';
- RESTDWRelease              = '3003';
+ RESTDWRelease              = '3008';
  RESTDWCodeProject          = 'Savage Reign - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
@@ -739,15 +740,7 @@ Begin
   Value := TStringStream.Create('');
  {$ENDIF}
   Try
-   {$IFNDEF FPC}
-    {$IF CompilerVersion > 21}
-     ZCompressStream(Utf8Stream, Value, cCompressionLevel);
-    {$ELSE}
-     ZCompressStreamD(Utf8Stream, Value);
-    {$IFEND}
-   {$ELSE}
-    ZCompressStream(Utf8Stream, Value, cCompressionLevel);
-   {$ENDIF}
+   ZCompressStream(Utf8Stream, Value, cCompressionLevel);
    Value.Position := 0;
    Result := True;
   Finally
@@ -786,15 +779,7 @@ Begin
   Result := TStringStream.Create('');
  {$ENDIF}
   Try
-   {$IFNDEF FPC}
-    {$IF CompilerVersion > 21}
-     ZCompressStream(Utf8Stream, Result, cCompressionLevel);
-    {$ELSE}
-     ZCompressStreamD(Utf8Stream, TStream(Result));
-    {$IFEND}
-   {$ELSE}
-    ZCompressStream(Utf8Stream, Result, cCompressionLevel);
-   {$ENDIF}
+   ZCompressStream(Utf8Stream, Result, cCompressionLevel);
    Result.Position := 0;
   Finally
 
@@ -828,15 +813,7 @@ Begin
   Result := TStringStream.Create('');
  {$ENDIF}
   Try
-   {$IFNDEF FPC}
-    {$IF CompilerVersion > 21}
-    ZCompressStream(Utf8Stream, Result, cCompressionLevel);
-    {$ELSE}
-     ZCompressStreamD(Utf8Stream, Result);
-    {$IFEND}
-   {$ELSE}
-    ZCompressStream(Utf8Stream, Result, cCompressionLevel);
-   {$ENDIF}
+   ZCompressStream(Utf8Stream, Result, cCompressionLevel);
    Result.Position := 0;
   Finally
 
@@ -869,15 +846,7 @@ Begin
  Try
   Compressed := TMemoryStream.Create;
   Try
-   {$IFNDEF FPC}
-    {$IF CompilerVersion > 21}
-     ZCompressStream(Utf8Stream, Compressed, cCompressionLevel);
-    {$ELSE}
-     ZCompressStreamD(Utf8Stream, TStream(Compressed));
-    {$IFEND}
-   {$ELSE}
-     ZCompressStream(Utf8Stream, Compressed, cCompressionLevel);
-   {$ENDIF}
+    ZCompressStream(Utf8Stream, Compressed, cCompressionLevel);
     Compressed.Position := 0;
    Try
     Value := StreamToHex(Compressed, False);
@@ -943,11 +912,7 @@ Begin
      Utf8Stream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
      HexToStream(Base64Stream.DataString, Utf8Stream);
      Utf8Stream.position := 0;
-     {$if CompilerVersion > 21}
      ZDecompressStream(Utf8Stream, Value);
-     {$ELSE}
-     ZDecompressStreamD(Utf8Stream, Value);
-     {$IFEND}
      Value.Position := 0;
     {$ENDIF}
     Result := True;
@@ -972,15 +937,7 @@ Begin
   Result  := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
  {$ENDIF}
  S.Position := 0;
- {$IFNDEF FPC}
-  {$if CompilerVersion > 21}
-  ZDecompressStream(S, Result);
-  {$ELSE}
-  ZDecompressStreamD(TStringStream(S), Result);
-  {$IFEND}
- {$ELSE}
-  ZDecompressStream(S, Result);
- {$ENDIF}
+ ZDecompressStream(S, Result);
  Result.position := 0;
 End;
 
@@ -1013,13 +970,7 @@ Begin
     ZDecompressStream(Utf8Stream, Compressed);
    {$ELSE}
     Utf8Stream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
-//    DecodeStream(Base64Stream, Utf8Stream);
-//    Utf8Stream.position := 0;
-   {$if CompilerVersion > 21}
-   ZDecompressStream(Base64Stream, Compressed);
-   {$ELSE}
-   ZDecompressStreamD(Base64Stream, Compressed);
-   {$IFEND}
+    ZDecompressStream(Base64Stream, Compressed);
     Compressed.Position := 0;
    {$ENDIF}
    Try

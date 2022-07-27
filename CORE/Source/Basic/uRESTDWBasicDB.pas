@@ -30,6 +30,7 @@ Uses
   SysUtils,  Classes, Db, SyncObjs, Variants, DataUtils, uRESTDWAbout, uRESTDWBasicTypes,
   uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
   uRESTDWMassiveBuffer, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWConsts,
+  uRESTDWDataset,
  {$IFNDEF RESTDWLAMW}Controls, Forms, memds, BufDataset, {$ENDIF}uRESTDWMasterDetailData
   {$IFNDEF UNIX}, Windows{$ENDIF}
  {$ELSE}
@@ -41,17 +42,14 @@ Uses
   {$if CompilerVersion > 24} // Delphi 2010 acima
    System.SysUtils, System.Classes, Db, SyncObjs, DataUtils, uRESTDWAbout, uRESTDWBasicTypes,
    uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
-   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData
+   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData, uRESTDWDataset
   {$ELSE}
    SysUtils, Classes, Db, SyncObjs, DataUtils, uRESTDWAbout, uRESTDWBasicTypes,
    uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
-   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData
+   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData, uRESTDWDataset
   {$IFEND}
  {$ENDIF}
  {$IFDEF FPC}
-  {$IFDEF RESTDWMEMTABLE}
-   , uRESTDWDataset
-  {$ENDIF}
   {$IFDEF RESTDWLAZDRIVER}
    , memds
   {$ENDIF}
@@ -59,9 +57,6 @@ Uses
   , DADump, UniDump, VirtualTable, MemDS
   {$ENDIF};
  {$ELSE}
-   {$IFDEF RESTDWMEMTABLE}
-    , uRESTDWDataset
-   {$ENDIF}
    {$IFDEF RESTDWCLIENTDATASET}
     ,  DBClient
    {$ENDIF}
@@ -8582,7 +8577,7 @@ Begin
    Tkbmmemtable(Self).Close;
    Tkbmmemtable(Self).open;
   {$ENDIF}
-  {$IFDEF RESTFDMEMTABLE}
+  {$IFDEF RESTDWFDMEMTABLE}
    TFDmemtable(Self).CreateDataSet;
    TFDmemtable(Self).Open;
   {$ENDIF}
@@ -8627,29 +8622,29 @@ Begin
     TVirtualTable(Self).Open;
    {$ENDIF}
   {$ELSE}
-  {$IFDEF CLIENTDATASET}
-   TClientDataset(Self).CreateDataSet;
-   TClientDataset(Self).Open;
-  {$ENDIF}
-  {$IFDEF UNIDACMEM}
-   TVirtualTable(Self).Close;
-   TVirtualTable(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTKBMMEMTABLE}
-   Tkbmmemtable(Self).Close;
-   Tkbmmemtable(Self).open;
-  {$ENDIF}
-  {$IFDEF RESTFDMEMTABLE}
-   TFDmemtable(Self).CreateDataSet;
-   TFDmemtable(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTADMEMTABLE}
-   TADmemtable(Self).CreateDataSet;
-   TADmemtable(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTDWMEMTABLE}
-   TRESTDWMemtable(Self).Close;
-   TRESTDWMemtable(Self).Open;
+   {$IFDEF CLIENTDATASET}
+    TClientDataset(Self).CreateDataSet;
+    TClientDataset(Self).Open;
+   {$ENDIF}
+   {$IFDEF UNIDACMEM}
+    TVirtualTable(Self).Close;
+    TVirtualTable(Self).Open;
+   {$ENDIF}
+   {$IFDEF RESTKBMMEMTABLE}
+    Tkbmmemtable(Self).Close;
+    Tkbmmemtable(Self).open;
+   {$ENDIF}
+   {$IFDEF RESTDWFDMEMTABLE}
+    TFDmemtable(Self).CreateDataSet;
+    TFDmemtable(Self).Open;
+   {$ENDIF}
+   {$IFDEF RESTADMEMTABLE}
+    TADmemtable(Self).CreateDataSet;
+    TADmemtable(Self).Open;
+   {$ENDIF}
+   {$IFDEF RESTDWMEMTABLE}
+    TRESTDWMemtable(Self).Close;
+    TRESTDWMemtable(Self).Open;
    {$ENDIF}
   {$ENDIF}
   vCreateDS := False;

@@ -3009,7 +3009,8 @@ begin
      Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(AStr));
     {$ELSE}
      {$IF CompilerVersion < 25}
-      Move(Pointer(@AStr[InitStrPos])^, Result, Length(AStr));
+      SetLength(Result, Length(AStr));
+      Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
      {$ELSE}
       Result :=  TRESTDWBytes(TEncoding.ANSI.GetBytes(AStr));
      {$IFEND}

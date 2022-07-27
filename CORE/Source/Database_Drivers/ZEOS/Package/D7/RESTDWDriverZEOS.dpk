@@ -49,7 +49,7 @@ requires
   ZPlain,
   ZDbc,
   ZComponent,
-  RestDatawareCORE;
+  RESTDWCore;
 
 contains
   uRestDWDriverZEOS in '..\..\uRestDWDriverZEOS.pas';

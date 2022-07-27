@@ -1438,7 +1438,6 @@ Function TRESTDWDriverZeos.ExecuteCommandTB(Tablename            : String;
                                             BinaryCompatibleMode : Boolean = False)  : String;
 Var
  vTempQuery     : TZTable;
- A, I           : Integer;
  vParamName     : String;
  vStateResource : Boolean;
  vStringStream  : TMemoryStream;
@@ -1447,7 +1446,7 @@ Var
 Begin
  {$IFNDEF FPC}Inherited;{$ENDIF}
  Error  := False;
- vStringStream  := Nil;
+// vStringStream  := Nil;
  aResult := TJSONValue.Create;
  vTempQuery               := TZTable.Create(Owner);
  Try

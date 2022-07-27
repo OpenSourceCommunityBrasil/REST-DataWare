@@ -59,6 +59,7 @@ Var
  vToken,
  ErrorMessage,
  vAuthRealm,
+ vContentType,
  vResponseString : String;
  I,
  StatusCode      : Integer;
@@ -119,6 +120,7 @@ Begin
     vStream.Position := 0;
    End;
   vStream.Position := 0;
+  vContentType     := ARequest.ContentType;
   If CommandExec  (TComponent(AResponse),
                    RemoveBackslashCommands(ARequest.PathInfo),
                    ARequest.Method + ' ' + ARequest.{$IFNDEF FPC}{$IF CompilerVersion < 21}PathInfo
@@ -127,7 +129,7 @@ Begin
                                            {$ELSE}
                                             PathInfo
                                            {$ENDIF},
-                   ARequest.ContentType,
+                   vContentType,
                    ARequest.{$IFNDEF FPC}{$IF CompilerVersion < 21}RemoteAddr
                                           {$ELSE}RemoteIP
                                           {$IFEND}
@@ -154,6 +156,7 @@ Begin
                    vRedirect) Then
    Begin
     //AResponse.Realm   := vAuthRealm;
+    AResponse.ContentType := vContentType;
      If (sCharSet <> '') Then
       Begin
        If Pos('utf8', Lowercase(sCharSet)) > 0 Then
