@@ -4,6 +4,7 @@
     <PathDelim Value="\"/>
     <Name Value="RestDatawareShellservices"/>
     <Type Value="RunAndDesignTime"/>
+    <Author Value="Gilberto Rocha da Silva"/>
     <CompilerOptions>
       <Version Value="11"/>
       <PathDelim Value="\"/>
@@ -12,6 +13,8 @@
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
+    <License Value="GPL-2.0"/>
+    <Version Major="2"/>
     <Files>
       <Item>
         <Filename Value="RestDatawareShellservices.lrs"/>
