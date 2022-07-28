@@ -28,15 +28,15 @@ interface
 Uses
  {$IFDEF FPC}
  SysUtils,      Classes, Db, Variants, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
- DataUtils,     uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
+ uRESTDWDataUtils,     uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
  uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWCharset, uRESTDWEncodeClass, uRESTDWConsts,
  syncobjs, uRESTDWAbout, uzliblaz
  {$ELSE}
   {$IF CompilerVersion <= 22}
-   SysUtils, Classes, Db, Variants, EncdDecd, SyncObjs, DataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
+   SysUtils, Classes, Db, Variants, EncdDecd, SyncObjs, uRESTDWDataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
    uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWAbout
   {$ELSE}
-   System.SysUtils, System.Classes, Data.Db, Variants, system.SyncObjs, DataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
+   System.SysUtils, System.Classes, Data.Db, Variants, system.SyncObjs, uRESTDWDataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
    uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWAbout,
    {$IF Defined(RESTDWFMX)}
     System.IOUtils,
@@ -1754,7 +1754,7 @@ Var
        Else
         Begin
          If Not Assigned(DWParams) Then
-          TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+          TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                                                {$ELSE}Url{$IFEND}
                                                                                                {$ELSE}Url{$ENDIF},
                                           QueryParams,
@@ -2142,7 +2142,7 @@ Begin
      ReadRawHeaders;
     vCompareContext := CompareBaseURL(Cmd); // := aDefaultUrl;
     If Cmd <> '' Then
-     TDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
+     TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
     If ((Params.Count > 0) And (RequestType In [rtGet, rtDelete])) Then
      Begin
       {$IFNDEF FPC}
@@ -2154,7 +2154,7 @@ Begin
       {$ENDIF}
       vRequestHeader.Add(Params.Text);
       vRequestHeader.Add(QueryParams);
-      TDataUtils.ParseWebFormsParams(Params, Url, QueryParams,
+      TRESTDWDataUtils.ParseWebFormsParams(Params, Url, QueryParams,
                                      vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
       If DWParams <> Nil Then
        Begin
@@ -2183,7 +2183,7 @@ Begin
        Begin
         aurlContext  := vUrlToExec;
         If Not Assigned(DWParams) Then
-         TDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+         TRESTDWDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                   {$ELSE}Url{$IFEND}
                                                                   {$ELSE}Url{$ENDIF}, vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
         vOldMethod := vUrlToExec;
@@ -2216,7 +2216,7 @@ Begin
        Begin
         If QueryParams <> '' Then
          Begin
-          TDataUtils.ParseFormParamsToDWParam(QueryParams, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+          TRESTDWDataUtils.ParseFormParamsToDWParam(QueryParams, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
           If (DWParams.ItemsString['dwwelcomemessage']     <> Nil) Then
            vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
           If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
@@ -2296,7 +2296,7 @@ Begin
                    DWParams.Encoding  := vEncoding;
                   End
                  Else
-                  TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                  TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                                                        {$ELSE}Url{$IFEND}
                                                                                                        {$ELSE}Url{$ENDIF},
                                                     QueryParams,
@@ -2521,17 +2521,17 @@ Begin
              ContentStringStream.Position := 0;
              mb.Position  := 0;
              If Not Assigned(DWParams) Then
-              TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+              TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                                                    {$ELSE}Url{$IFEND}
                                                                                                    {$ELSE}Url{$ENDIF},
                                                 QueryParams,
                                                 vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
              {Alteração feita por Tiago IStuque - 28/12/2018}
              If Assigned(DWParams.ItemsString['dwReadBodyRaw']) And (DWParams.ItemsString['dwReadBodyRaw'].AsString='1') Then
-              TDataUtils.ParseBodyRawToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+              TRESTDWDataUtils.ParseBodyRawToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
              Else If (Assigned(DWParams.ItemsString['dwReadBodyBin']) And
                      (DWParams.ItemsString['dwReadBodyBin'].AsString='1')) Then
-              TDataUtils.ParseBodyBinToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+              TRESTDWDataUtils.ParseBodyBinToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
              Else If (vBinaryEvent) Then
               Begin
                If (pos('--', mb.DataString) > 0) and (pos('boundary', ContentType) > 0) Then
@@ -2580,7 +2580,7 @@ Begin
                          DWParams.Encoding  := vEncoding;
                         End
                        Else
-                        TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+                        TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                                                              {$ELSE}Url{$IFEND}
                                                                                                              {$ELSE}Url{$ENDIF},
                                                           QueryParams,
@@ -2812,23 +2812,23 @@ Begin
                       {$ENDIF}Then
               Begin
                If vEncoding = esUtf8 Then
-                TDataUtils.ParseBodyRawToDWParam(utf8decode(mb.DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(mb.DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                Else
-                TDataUtils.ParseBodyRawToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                TRESTDWDataUtils.ParseBodyRawToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
               End
              Else
               Begin
                If vEncoding = esUtf8 Then
                 Begin
-                 TDataUtils.ParseDWParamsURL(utf8decode(mb.DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                 TRESTDWDataUtils.ParseDWParamsURL(utf8decode(mb.DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                  if DWParams.ItemsString['undefined'] = nil then
-                  TDataUtils.ParseBodyRawToDWParam(utf8decode(mb.DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                  TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(mb.DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End
                Else
                 Begin
-                 TDataUtils.ParseDWParamsURL(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                 TRESTDWDataUtils.ParseDWParamsURL(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                  if DWParams.ItemsString['undefined'] = nil then
-                  TDataUtils.ParseBodyRawToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                  TRESTDWDataUtils.ParseBodyRawToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End;
               End;
              {Fim alteração feita por Tiago Istuque - 28/12/2018}
@@ -2851,7 +2851,7 @@ Begin
               vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                {$ELSE}Url{$IFEND}
                                                                {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams);
-              TDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+              TRESTDWDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                        {$ELSE}Url{$IFEND}
                                                                        {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams, vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
              End
@@ -2860,7 +2860,7 @@ Begin
               vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                {$ELSE}Url{$IFEND}
                                                                {$ELSE}Url{$ENDIF} + '?' + QueryParams);
-              TDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+              TRESTDWDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                        {$ELSE}Url{$IFEND}
                                                                        {$ELSE}Url{$ENDIF} + '?' + QueryParams, vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
               If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then  // Ico Menezes - Post Receber WelcomeMessage   - 20-12-2018
@@ -2875,7 +2875,7 @@ Begin
                                                              {$ELSE}Url{$ENDIF});
             vRequestHeader.Add(QueryParams);
 
-            TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+            TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                                                  {$ELSE}Url{$IFEND}
                                                                                                  {$ELSE}Url{$ENDIF},
                                               QueryParams,
@@ -2889,7 +2889,7 @@ Begin
               vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                {$ELSE}Url{$IFEND}
                                                                {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams);
-              TDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+              TRESTDWDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                        {$ELSE}Url{$IFEND}
                                                                        {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams, vEncoding, vmark, DWParams);
              End
@@ -2898,7 +2898,7 @@ Begin
               vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                {$ELSE}Url{$IFEND}
                                                                {$ELSE}Url{$ENDIF} + '?' + QueryParams);
-              TDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+              TRESTDWDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                        {$ELSE}Url{$IFEND}
                                                                        {$ELSE}Url{$ENDIF} + '?' + QueryParams, vEncoding, vmark, DWParams);
               If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then  // Ico Menezes - Post Receber WelcomeMessage   - 20-12-2018
@@ -2913,7 +2913,7 @@ Begin
                                                               {$ELSE}Url{$ENDIF});
              vRequestHeader.Add(QueryParams);
              If Not Assigned(DWParams) Then
-              TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+              TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                                                    {$ELSE}Url{$IFEND}
                                                                                                    {$ELSE}Url{$ENDIF},
                                                 QueryParams,
@@ -2931,7 +2931,7 @@ Begin
                                                             {$ELSE}Url{$IFEND}
                                                             {$ELSE}Url{$ENDIF});
            vRequestHeader.Add(QueryParams);
-           TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+           TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                                                 {$ELSE}Url{$IFEND}
                                                                                                 {$ELSE}Url{$ENDIF},
                                              QueryParams,
@@ -2943,7 +2943,7 @@ Begin
                                                             {$ELSE}Url{$ENDIF});
            vRequestHeader.Add(QueryParams);
            If Not Assigned(DWParams) Then
-            TDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
+            TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                                                  {$ELSE}Url{$IFEND}
                                                                                                  {$ELSE}Url{$ENDIF},
                                               QueryParams,

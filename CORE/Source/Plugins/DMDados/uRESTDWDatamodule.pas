@@ -3,7 +3,7 @@ unit uRESTDWDatamodule;
 interface
 
 Uses
-  SysUtils, Classes, uRESTDWCharset, DataUtils, uRESTDWComponentEvents,
+  SysUtils, Classes, uRESTDWCharset, uRESTDWDataUtils, uRESTDWComponentEvents,
   uRESTDWBasicTypes, uRESTDWConsts, uRESTDWJSONObject, uRESTDWEncodeClass, uRESTDWParams;
 
 Type

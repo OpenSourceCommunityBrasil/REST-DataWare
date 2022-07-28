@@ -347,7 +347,7 @@ Function TRESTDWDatamodule.GetInterfaceUsesSection : String;
 Begin
  Result  := Inherited GetInterfaceUsesSection;
  Result  := Result + ', SysTypes, uRESTDWBasicTypes, uRESTDWJSONObject,' + LineEnding;
- Result  := Result + '  uRESTDWCharset, uRESTDWParams, DataUtils, uRESTDWComponentEvents, uRESTDWDatamodule';
+ Result  := Result + '  uRESTDWCharset, uRESTDWParams, uRESTDWDataUtils, uRESTDWComponentEvents, uRESTDWDatamodule';
 End;
 
 //Function TRESTDWCGIDatamodule.GetInterfaceUsesSection : String;

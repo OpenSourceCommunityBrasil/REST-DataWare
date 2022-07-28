@@ -50,7 +50,7 @@ Uses
   {$IFEND}
    , uRESTDWConsts, uRESTDWEncodeClass
  {$ENDIF}
- ,DataUtils, IdContext, IdHeaderList,        IdTCPConnection,  IdHTTPServer, IdCustomHTTPServer, IdSSLOpenSSL,  IdSSL,
+ ,uRESTDWDataUtils, IdContext, IdHeaderList,        IdTCPConnection,  IdHTTPServer, IdCustomHTTPServer, IdSSLOpenSSL,  IdSSL,
  IdAuthentication,      IdTCPClient,         IdHTTPHeaderInfo, IdComponent,  IdBaseComponent,
  IdHTTP,                IdMultipartFormData, IdMessageCoder,   IdMessage,    IdGlobalProtocols,
  IdGlobal,              IdStack,             uRESTDWTools;
@@ -2908,7 +2908,7 @@ Begin
                     End;
                    ActiveRequest := Stringreplace(lowercase(ActiveRequest), 'http://', '', [rfReplaceAll]);
                    ActiveRequest := Stringreplace(lowercase(ActiveRequest), 'https://', '', [rfReplaceAll]);
-                   TDataUtils.ParseRESTURL(ActiveRequest, RequestCharset, vmark{$IFDEF FPC}, csUndefined{$ENDIF}, DWParams);
+                   TRESTDWDataUtils.ParseRESTURL(ActiveRequest, RequestCharset, vmark{$IFDEF FPC}, csUndefined{$ENDIF}, DWParams);
                    If Assigned(DWParams) Then
                     FreeAndNil(DWParams);
 //                   If (Lowercase(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).GetTokenEvent)  = Lowercase(UriOptions.EventName))   Or

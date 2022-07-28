@@ -505,7 +505,7 @@ End;
 
 implementation
 
-Uses uRESTDWJSONInterface, DataUtils, PropertyPersist;
+Uses uRESTDWJSONInterface, uRESTDWDataUtils, PropertyPersist;
 
 Function CopyValue(Var bValue : String): String;
 Var

@@ -154,11 +154,11 @@
         <DCCReference Include="uRESTDWDriverFD.pas"/>
         <RcItem Include="..\..\..\Images\icons\components\TRESTDWDriverFD.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>Bitmap_1</ResourceId>
+            <ResourceId>TRESTDWDriverFD</ResourceId>
         </RcItem>
         <RcItem Include="..\..\..\Images\icons\components\TRESTDWDriverFD16.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>Bitmap_2</ResourceId>
+            <ResourceId>TRESTDWDriverFD16</ResourceId>
         </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

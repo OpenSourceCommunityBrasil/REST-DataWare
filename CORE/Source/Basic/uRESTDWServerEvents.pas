@@ -213,7 +213,7 @@ implementation
 
 { TRESTDWEvent }
 
-Uses DataUtils;
+Uses uRESTDWDataUtils;
 
 Function TRESTDWEvent.GetNamePath: String;
 Begin

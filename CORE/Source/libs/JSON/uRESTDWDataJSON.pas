@@ -14,7 +14,7 @@ Uses
    Windows,
   {$ENDIF}
  {$ENDIF}
-  SysUtils, DataUtils, Classes, TypInfo, Variants, uRESTDWConsts;
+  SysUtils, uRESTDWDataUtils, Classes, TypInfo, Variants, uRESTDWConsts;
 
 Type
  TRESTDWJSONObjectType  = (jtObject, jtArray, jtValue, jtUnknow);

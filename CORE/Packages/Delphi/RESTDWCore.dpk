@@ -44,7 +44,6 @@ requires
   ;
 
 contains
-  DataUtils in '..\..\Source\Basic\Mechanics\DataUtils.pas',
   PropertyPersist in '..\..\Source\Basic\PropertyPersist.pas',
   uRESTDWAbout in '..\..\Source\Basic\uRESTDWAbout.pas',
   uRESTDWBasic in '..\..\Source\Basic\uRESTDWBasic.pas',
@@ -111,7 +110,8 @@ contains
   uRESTDWDynamic in '..\..\Source\libs\uRESTDWDynamic.pas',
   DWDCPrijndael in '..\..\Source\Basic\Crypto\DWDCPrijndael.pas',
   DWDCPsha256 in '..\..\Source\Basic\Crypto\DWDCPsha256.pas',
-  DWDCPcast256 in '..\..\Source\Basic\Crypto\DWDCPcast256.pas';
+  DWDCPcast256 in '..\..\Source\Basic\Crypto\DWDCPcast256.pas',
+  uRESTDWDataUtils in '..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas';
 
 End.
 

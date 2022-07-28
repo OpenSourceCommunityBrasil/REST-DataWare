@@ -34,7 +34,7 @@ Uses uRESTDWAbout, uRESTDWConsts,
       {$ELSE}
        System.SysUtils, System.Classes
       {$IFEND}
-     {$ENDIF}, DataUtils, uRESTDWComponentEvents, uRESTDWEncodeClass, uRESTDWBasicTypes;
+     {$ENDIF}, uRESTDWDataUtils, uRESTDWComponentEvents, uRESTDWEncodeClass, uRESTDWBasicTypes;
 
 Type
  TRESTDWClientRESTBase = Class(TRESTDWComponent) //Novo Componente de Acesso a Requisições REST para o Servidores Diversos

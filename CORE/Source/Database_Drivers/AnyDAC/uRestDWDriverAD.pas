@@ -13,7 +13,7 @@ uses System.SysUtils,          System.Classes,      Data.DBXJSON,
       AnyDAC.Stan.StorageBin,
       {$IFEND}
      {$ENDIF}
-     uADPhysIntf,             Data.DB, uRESTDWConsts,  DataUtils,
+     uADPhysIntf,             Data.DB, uRESTDWConsts,  uRESTDWDataUtils,
      uRESTDWBasicDB,          uRESTDWJSONInterface,    uRESTDWDataJSON,
      uRESTDWMassiveBuffer,    Variants,                uRESTDWDatamodule,
      uRESTDWDataset,          uRESTDWJSONObject,       uRESTDWParams,

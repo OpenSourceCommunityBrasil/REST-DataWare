@@ -149,7 +149,6 @@
         <DCCReference Include="FireDAC.dcp"/>
         <DCCReference Include="FireDACCommonDriver.dcp"/>
         <DCCReference Include="FireDACCommon.dcp"/>
-        <DCCReference Include="..\..\Source\Basic\Mechanics\DataUtils.pas"/>
         <DCCReference Include="..\..\Source\Basic\PropertyPersist.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWAbout.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasic.pas"/>
@@ -230,6 +229,7 @@
         <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPrijndael.pas"/>
         <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPsha256.pas"/>
         <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPcast256.pas"/>
+        <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas"/>
         <RcCompile Include="RESTDWCore.rc">
             <Form>RESTDWCore.res</Form>
         </RcCompile>

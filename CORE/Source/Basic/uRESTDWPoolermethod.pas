@@ -26,7 +26,7 @@ unit uRESTDWPoolermethod;
 Interface
 
 Uses {$IFDEF FPC}
-     SysUtils,  Classes, DataUtils, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
+     SysUtils,  Classes, uRESTDWDataUtils, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
      uRESTDWConsts, uRESTDWBasic, uRESTDWTools,      uRESTDWMassiveBuffer,  uRESTDWComponentEvents, uRESTDWBasicTypes,
      uRESTDWJSONObject, uRESTDWCharset, uRESTDWEncodeClass, uRESTDWParams;
      {$ELSE}
@@ -35,7 +35,7 @@ Uses {$IFDEF FPC}
      {$ELSE}
      System.SysUtils, System.Classes,
      {$IFEND}
-     DataUtils, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
+     uRESTDWDataUtils, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
      uRESTDWConsts, uRESTDWEncodeClass, uRESTDWBasic, uRESTDWTools,      uRESTDWMassiveBuffer,  uRESTDWComponentEvents, uRESTDWBasicTypes,
      uRESTDWJSONObject, uRESTDWCharset, uRESTDWParams;
      {$ENDIF}

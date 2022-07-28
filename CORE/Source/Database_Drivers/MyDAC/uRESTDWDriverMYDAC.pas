@@ -4,7 +4,7 @@ interface
 
 uses SysUtils,  Classes,   DB, MyClasses, MyAccess,  MyScript,    DADump,
      MyDump,   VirtualTable,  MemDS, DBAccess,
-     uRESTDWConsts,  DataUtils,
+     uRESTDWConsts,  uRESTDWDataUtils,
      uRESTDWBasicDB,          uRESTDWJSONInterface,    uRESTDWDataJSON,
      uRESTDWMassiveBuffer,    Variants,                uRESTDWDatamodule,
      uRESTDWDataset,          uRESTDWJSONObject,       uRESTDWParams,

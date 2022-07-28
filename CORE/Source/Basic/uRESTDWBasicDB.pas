@@ -27,7 +27,7 @@ interface
 
 Uses
  {$IFDEF FPC}
-  SysUtils,  Classes, Db, SyncObjs, Variants, DataUtils, uRESTDWAbout, uRESTDWBasicTypes,
+  SysUtils,  Classes, Db, SyncObjs, Variants, uRESTDWDataUtils, uRESTDWAbout, uRESTDWBasicTypes,
   uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
   uRESTDWMassiveBuffer, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWConsts,
   uRESTDWDataset,
@@ -40,11 +40,11 @@ Uses
    {$IF CompilerVersion <= 22}Windows, Forms, Controls, {$ELSE}VCL.Forms, VCL.Controls, Windows, {$IFEND}
   {$IFEND}
   {$if CompilerVersion > 24} // Delphi 2010 acima
-   System.SysUtils, System.Classes, Db, SyncObjs, DataUtils, uRESTDWAbout, uRESTDWBasicTypes,
+   System.SysUtils, System.Classes, Db, SyncObjs, uRESTDWDataUtils, uRESTDWAbout, uRESTDWBasicTypes,
    uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
    uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData, uRESTDWDataset
   {$ELSE}
-   SysUtils, Classes, Db, SyncObjs, DataUtils, uRESTDWAbout, uRESTDWBasicTypes,
+   SysUtils, Classes, Db, SyncObjs, uRESTDWDataUtils, uRESTDWAbout, uRESTDWBasicTypes,
    uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
    uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData, uRESTDWDataset
   {$IFEND}

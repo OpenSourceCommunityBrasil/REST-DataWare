@@ -573,7 +573,7 @@ Var
 
 Implementation
 
-Uses uRESTDWTools, uRESTDWDataJSON, uRESTDWJSONInterface, uRESTDWBasicDB, DataUtils;
+Uses uRESTDWTools, uRESTDWDataJSON, uRESTDWJSONInterface, uRESTDWBasicDB, uRESTDWDataUtils;
 
 Class Function TRESTDWStreamHelper.ReadBytes(Const AStream : TStream;
                                              Var   VBytes  : TRESTDWBytes;

@@ -13,7 +13,7 @@ uses System.SysUtils,          System.Classes,      Data.DBXJSON,
       FireDAC.Stan.StorageBin,
       {$IFEND}
      {$ENDIF}
-     FireDAC.Phys.Intf,       Data.DB, uRESTDWConsts,  DataUtils,
+     FireDAC.Phys.Intf,       Data.DB, uRESTDWConsts,  uRESTDWDataUtils,
      uRESTDWBasicDB,          uRESTDWBasic,            uRESTDWJSONInterface,
      uRESTDWMassiveBuffer,    Variants,                uRESTDWDatamodule,
      uRESTDWDataset,          uRESTDWJSONObject,       uRESTDWParams,

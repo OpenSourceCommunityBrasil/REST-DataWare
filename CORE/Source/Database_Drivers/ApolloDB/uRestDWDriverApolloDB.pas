@@ -12,7 +12,7 @@ uses
  System.SysUtils,   System.Classes, Data.DB,
  {$IFEND}
  {$ENDIF}
- uRESTDWConsts,  DataUtils,
+ uRESTDWConsts,  uRESTDWDataUtils,
  uRESTDWBasicDB,          uRESTDWJSONInterface,    uRESTDWDataJSON,
  uRESTDWMassiveBuffer,    Variants,                uRESTDWDatamodule,
  uRESTDWDataset,          uRESTDWJSONObject,       uRESTDWParams,

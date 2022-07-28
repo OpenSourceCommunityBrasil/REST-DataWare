@@ -1,4 +1,4 @@
-unit DataUtils;
+unit uRESTDWDataUtils;
 
 {$I ..\..\Includes\uRESTDWPlataform.inc}
 
@@ -369,7 +369,7 @@ Type
 End;
 
  Type
-  TDataUtils = Class
+  TRESTDWDataUtils = Class
   Public
    Class Procedure ParseRESTURL        (Const Cmd          : String;
                                         Encoding           : TEncodeSelect;
@@ -1616,7 +1616,7 @@ Begin
   vCustomAuthErrorPage.Add(Value[I]);
 End;
 
-Class Procedure TDataUtils.ParseRESTURL(Const Cmd         : String;
+Class Procedure TRESTDWDataUtils.ParseRESTURL(Const Cmd         : String;
                                         Encoding          : TEncodeSelect;
                                         Var mark          : String
                                         {$IFDEF FPC};
@@ -1724,7 +1724,7 @@ Begin
   End;
 End;
 
-Class Procedure TDataUtils.ParseRESTURL(UriParams          : String;
+Class Procedure TRESTDWDataUtils.ParseRESTURL(UriParams          : String;
                                         Encoding           : TEncodeSelect;
                                         {$IFDEF FPC}
                                         DatabaseCharSet    : TDatabaseCharSet;
@@ -1806,12 +1806,12 @@ Begin
   End;
 End;
 
-Class Function TDataUtils.Result2JSON(wsResult : TResultErro) : String;
+Class Function TRESTDWDataUtils.Result2JSON(wsResult : TResultErro) : String;
 Begin
  Result := '{"STATUS":"' + wsResult.Status + '","MENSSAGE":"' + wsResult.MessageText + '"}';
 End;
 
-Class Procedure TDataUtils.ParseWebFormsParams(Params             : TStrings;
+Class Procedure TRESTDWDataUtils.ParseWebFormsParams(Params             : TStrings;
                                                Const URL,
                                                Query              : String;
                                                Var mark           : String;
@@ -2022,7 +2022,7 @@ Begin
   End;
 End;
 
-Class Procedure TDataUtils.ParseWebFormsParams (Var DWParams      : TRESTDWParams;
+Class Procedure TRESTDWDataUtils.ParseWebFormsParams (Var DWParams      : TRESTDWParams;
                                                 WebParams         : TStrings;
                                                 Encoding          : TEncodeSelect
                                                 {$IFDEF FPC}
@@ -2074,7 +2074,7 @@ Begin
   End;
 End;
 
-Class Function TDataUtils.ParseDWParamsURL(Const Cmd        : String;
+Class Function TRESTDWDataUtils.ParseDWParamsURL(Const Cmd        : String;
                                            Encoding         : TEncodeSelect;
                                            Var ResultPR     : TRESTDWParams{$IFDEF FPC}
                                            ;DatabaseCharSet : TDatabaseCharSet
@@ -2199,7 +2199,7 @@ Begin
  vParamList.Free;
 End;
 
-Class Function TDataUtils.ParseBodyRawToDWParam(Const BodyRaw    : String;
+Class Function TRESTDWDataUtils.ParseBodyRawToDWParam(Const BodyRaw    : String;
                                                 Encoding         : TEncodeSelect;
                                                 Var ResultPR     : TRESTDWParams
                                                 {$IFDEF FPC}
@@ -2229,7 +2229,7 @@ Begin
   End;
 End;
 
-Class Function TDataUtils.ParseBodyBinToDWParam(Const BodyBin    : String;
+Class Function TRESTDWDataUtils.ParseBodyBinToDWParam(Const BodyBin    : String;
                                                 Encoding         : TEncodeSelect;
                                                 Var ResultPR     : TRESTDWParams
                                                 {$IFDEF FPC}
@@ -2280,7 +2280,7 @@ Begin
   End;
 End;
 
-Class Function TDataUtils.ParseFormParamsToDWParam(Const FormParams : String;
+Class Function TRESTDWDataUtils.ParseFormParamsToDWParam(Const FormParams : String;
                                                    Encoding         : TEncodeSelect;
                                                    Var ResultPR     : TRESTDWParams
                                                    {$IFDEF FPC}

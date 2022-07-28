@@ -27,13 +27,13 @@ interface
 
 Uses
  {$IFDEF FPC}
- SysUtils,      DataUtils, Classes,     {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
+ SysUtils,      uRESTDWDataUtils, Classes,     {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
  uRESTDWConsts, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, Db;
  {$ELSE}
   {$IF CompilerVersion <= 22}
-   SysUtils, DataUtils, Classes, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, uRESTDWConsts, Db
+   SysUtils, uRESTDWDataUtils, Classes, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, uRESTDWConsts, Db
   {$ELSE}
-   System.SysUtils, DataUtils, System.Classes, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, uRESTDWConsts, Db
+   System.SysUtils, uRESTDWDataUtils, System.Classes, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, uRESTDWConsts, Db
   {$IFEND};
  {$ENDIF}
 

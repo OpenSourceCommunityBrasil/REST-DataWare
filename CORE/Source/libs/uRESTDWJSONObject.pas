@@ -27,7 +27,7 @@ Interface
 
 Uses
   uRESTDWJSONInterface, uRESTDWCharset, uRESTDWConsts,
-  uRESTDWTools, Variants, uRESTDWBasicTypes, uRESTDWEncodeClass, DataUtils,
+  uRESTDWTools, Variants, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWDataUtils,
   {$IFDEF FPC}
    SysUtils, Classes, DB,
    LConvEncoding, math

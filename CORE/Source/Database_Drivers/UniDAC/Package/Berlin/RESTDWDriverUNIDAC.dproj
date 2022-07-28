@@ -183,11 +183,14 @@
         <DCCReference Include="unidac240.dcp"/>
         <DCCReference Include="dac240.dcp"/>
         <DCCReference Include="..\..\uRESTDWDriverUNIDAC.pas"/>
-        <RcItem Include="..\..\..\..\..\Images\Delphi\TRESTDWDriverUNIDAC.bmp">
+        <RcCompile Include="RESTDWDriverUNIDACResource.rc">
+            <Form>RESTDWDriverUNIDACResource.res</Form>
+        </RcCompile>
+        <RcItem Include="..\..\..\..\..\Images\icons\components\TRESTDWDriverUNIDAC.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTDWDriverUNIDAC</ResourceId>
         </RcItem>
-        <RcItem Include="..\..\..\..\..\Images\Delphi\TRESTDWDriverUNIDAC16.bmp">
+        <RcItem Include="..\..\..\..\..\Images\icons\components\TRESTDWDriverUNIDAC16.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTDWDriverUNIDAC16</ResourceId>
         </RcItem>
@@ -257,7 +260,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\RESTDWDriverUNIDAC.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\..\..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWDriverUNIDAC.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>RESTDWDriverUNIDAC.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
