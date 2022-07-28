@@ -3082,8 +3082,8 @@ Begin
                    vContentType,
                    AContext.Binding.PeerIP,
                    ARequestInfo.UserAgent,
-                   ARequestInfo.Username,
-                   ARequestInfo.Password,
+                   ARequestInfo.AuthUsername,
+                   ARequestInfo.AuthPassword,
                    vToken,
                    ARequestInfo.CustomHeaders,
                    AContext.Binding.PeerPort,
@@ -3184,16 +3184,16 @@ End;
 Constructor TRESTDWIdServicePooler.Create(AOwner: TComponent);
 Begin
  Inherited;
- HTTPServer                      := TIdHTTPServer.Create(Nil);
- lHandler                        := TIdServerIOHandlerSSLOpenSSL.Create(Nil);
+ HTTPServer                       := TIdHTTPServer.Create(Nil);
+ lHandler                         := TIdServerIOHandlerSSLOpenSSL.Create(Nil);
  {$IFDEF FPC}
- HTTPServer.OnQuerySSLPort       := @IdHTTPServerQuerySSLPort;
- HTTPServer.OnCommandGet         := @aCommandGet;
- HTTPServer.OnCommandOther       := @aCommandOther;
- HTTPServer.OnConnect            := @CustomOnConnect;
- HTTPServer.OnCreatePostStream   := @CreatePostStream;
+ HTTPServer.OnQuerySSLPort        := @IdHTTPServerQuerySSLPort;
+ HTTPServer.OnCommandGet          := @aCommandGet;
+ HTTPServer.OnCommandOther        := @aCommandOther;
+ HTTPServer.OnConnect             := @CustomOnConnect;
+ HTTPServer.OnCreatePostStream    := @CreatePostStream;
  HTTPServer.OnParseAuthentication := @OnParseAuthentication;
- DatabaseCharSet                 := csUndefined;
+ DatabaseCharSet                  := csUndefined;
  {$ELSE}
  HTTPServer.OnQuerySSLPort       := IdHTTPServerQuerySSLPort;
  HTTPServer.OnCommandGet         := aCommandGet;
@@ -3211,15 +3211,14 @@ Begin
   If HTTPServer.Active Then
    HTTPServer.Active := False;
  Except
-
  End;
  {$IF Defined(HAS_FMX)}
- lHandler.DisposeOf;
- HTTPServer.DisposeOf;
+  lHandler.DisposeOf;
+  HTTPServer.DisposeOf;
  {$ELSE}
-   FreeAndNil(lHandler);
-   FreeAndNil(HTTPServer);
-{$IFEND}
+  FreeAndNil(lHandler);
+  FreeAndNil(HTTPServer);
+ {$IFEND}
  Inherited;
 End;
 

@@ -786,7 +786,7 @@ Begin
   RegisterNoIcon([TServerMethodDataModule]);
   RegisterCustomModule(TServerMethodDataModule, TCustomModule);
  {$ELSE}
-//  FormEditingHook.RegisterDesignerBaseClass(TServerMethodDataModule);
+  FormEditingHook.RegisterDesignerBaseClass(TServerMethodDataModule);
 //  PDRESTDWCGIApplication    := TRESTDWCGIApplicationDescriptor.Create;
 //  RegisterProjectDescriptor (PDRESTDWCGIApplication);
 //  PDRESTDWCGIDatamodule     := TRESTDWCGIDatamodule.Create;
@@ -794,26 +794,13 @@ Begin
 //  RegisterProjectFileDescriptor(PDRESTDWDatamodule);
 //  FormEditingHook.RegisterDesignerBaseClass(TServerMethodDataModule);
  {$ENDIF}
-// RegisterComponents('REST Dataware - Service',     [TRESTServicePooler,
-//                                                    {$IFDEF FPC}
-//                                                    {$IFDEF RESTDWSYNOPSE}TRESTDWServiceSynPooler,{$ENDIF}
-//                                                    {$ELSE}
-//                                                    {$IFDEF RESTDWSYNOPSE}TRESTDWServiceSynPooler,{$ENDIF}
-//                                                     TDWISAPIRunner,
-//                                                     TDWCGIRunner,
-//                                                    {$ENDIF}
-//                                                    TRESTServiceCGI,
-//                                                    TDWServerEvents,
-//                                                    TRESTDWServiceNotification]);
-  RegisterComponents('REST Dataware - Client''s',   [TRESTDWClientEvents]);
-  RegisterComponents('REST Dataware - API',         [TRESTDWServerEvents, TRESTDWServerContext, TRESTDWContextRules]);
-  RegisterComponents('REST Dataware - Tools',       [TRESTDWResponseTranslator, TRESTDWBufferDB]);
+// RegisterComponents('REST Dataware - Service',     [TRESTDWServiceNotification]);
+ RegisterComponents('REST Dataware - Client''s',   [TRESTDWClientEvents]);
+ RegisterComponents('REST Dataware - API',         [TRESTDWServerEvents, TRESTDWServerContext, TRESTDWContextRules]);
+ RegisterComponents('REST Dataware - Tools',       [TRESTDWResponseTranslator, TRESTDWBufferDB]);
 
-// RegisterComponents('REST Dataware - DB',   [TRESTDWPoolerDB,    TRESTDWDataBase,    TRESTDWClientSQL,  TRESTDWTable,      TRESTDWUpdateSQL,
-//                                                    TDWMemtable,        TDWMassiveSQLCache, TRESTDWStoredProc, TRESTDWPoolerList, TDWMassiveCache,  TRESTDWBatchMove]);
-
- RegisterComponents('REST Dataware - DB',   [TRESTDWPoolerDB,        TRESTDWClientSQL,  TRESTDWMemtable, TRESTDWTable,      TRESTDWUpdateSQL,
-                                                    TRESTDWMassiveSQLCache, TRESTDWStoredProc, TRESTDWPoolerList, TRESTDWMassiveCache,  TRESTDWBatchMove]);
+ RegisterComponents('REST Dataware - DB',          [TRESTDWPoolerDB,        TRESTDWClientSQL,  TRESTDWMemtable, TRESTDWTable,      TRESTDWUpdateSQL,
+                                                   TRESTDWMassiveSQLCache, TRESTDWStoredProc, TRESTDWPoolerList, TRESTDWMassiveCache,  TRESTDWBatchMove]);
 // AddIDEMenu;//Menu do REST Debugger
  {$IFNDEF FPC}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
@@ -823,11 +810,11 @@ Begin
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
 //  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
  {$ENDIF}
-  RegisterPropertyEditor(TypeInfo(String),       TRESTDWTable,              'Tablename',       TTableList);
-  RegisterPropertyEditor(TypeInfo(String),       TRESTDWClientEvents,           'ServerEventName', TServerEventsList);
-  RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'SQL',             TRESTDWSQLEditor);
-  RegisterPropertyEditor(TypeInfo(TStrings),     TRESTDWClientSQL,          'RelationFields',  TRESTDWFieldsRelationEditor);
-  RegisterPropertyEditor(TypeInfo(String),       TRESTDWClientSQL,          'SequenceField',   TRESTDWFieldsList);
+  RegisterPropertyEditor(TypeInfo(String),            TRESTDWTable,              'Tablename',       TTableList);
+  RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientEvents,       'ServerEventName', TServerEventsList);
+  RegisterPropertyEditor(TypeInfo(TStrings),          TRESTDWClientSQL,          'SQL',             TRESTDWSQLEditor);
+  RegisterPropertyEditor(TypeInfo(TStrings),          TRESTDWClientSQL,          'RelationFields',  TRESTDWFieldsRelationEditor);
+  RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientSQL,          'SequenceField',   TRESTDWFieldsList);
   RegisterComponentEditor(TRESTDWServerEvents,        TComponentEditorClass(TRESTDWServerEventsEditor));
   RegisterComponentEditor(TRESTDWClientEvents,        TComponentEditorClass(TRESTDWClientEventsEditor));
   RegisterComponentEditor(TRESTDWResponseTranslator,  TComponentEditorClass(TRESTDWJSONViewer));

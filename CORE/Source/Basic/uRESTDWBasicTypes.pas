@@ -289,14 +289,6 @@ Uses
  End;
 
  Type
-  TRESTDWParamsHeader = Packed Record
-   VersionNumber,
-   RecordCount,
-   ParamsCount    : DWInteger; //new for ver15
-   DataSize       : DWInt64; //new for ver15
- End;
-
- Type
   TMimeTable = Class(TObject)
   Protected
    FLoadTypesFromOS : Boolean;
@@ -581,7 +573,7 @@ Var
 
 Implementation
 
-Uses uRESTDWTools, uRESTDWDataJSON, uRESTDWJSONInterface, uRESTDWBasicDB;
+Uses uRESTDWTools, uRESTDWDataJSON, uRESTDWJSONInterface, uRESTDWBasicDB, DataUtils;
 
 Class Function TRESTDWStreamHelper.ReadBytes(Const AStream : TStream;
                                              Var   VBytes  : TRESTDWBytes;

@@ -3679,11 +3679,9 @@ Begin
                       JSONStr := '"' + JSONStr + '"';
                     End;
                   End;
+                 vErrorCode   := 200;
                  If vBinaryEvent Then
-                  Begin
-                   vReplyString := JSONStr;
-                   vErrorCode   := 200;
-                  End
+                  vReplyString := JSONStr
                  Else
                   Begin
                    If Not(((vUrlToExec = '') Or (vUrlToExec = '/')) And (RequestType = rtGet)) Then
@@ -3729,15 +3727,7 @@ Begin
                   End;
                  Try
                   DWParams.SaveToStream(ms, tdwpxt_OUT);
-                 {$IFNDEF FPC}
-                  {$IF CompilerVersion > 21}
-                   ZCompressStream(ms, ResultStream, cCompressionLevel);
-                  {$ELSE}
-                   ZCompressStreamD(ms, ResultStream);
-                  {$IFEND}
-                 {$ELSE}
-                   ZCompressStream(ms, ResultStream, cCompressionLevel);
-                 {$ENDIF}
+                  ZCompressStreamD(ms, ResultStream);
                  Finally
                   FreeAndNil(ms);
                  End;
