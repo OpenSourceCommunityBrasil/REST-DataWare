@@ -4,12 +4,12 @@ interface
 
 uses
   System.SysUtils,
-  uRESTDWPoolerDB, ServerUtils;
+  uRESTDWIdBase, uRESTDWBasicDB, uRESTDWDataUtils;
 
 type
   TRDWDBWareDAO = class
   private
-    FRDWDB: TRESTDWDataBase;
+    FRDWDB: TRESTDWIdDatabase;
     FRDWSQL: TRESTDWClientSQL;
   public
     constructor Create(aServer, aPort: string);
@@ -23,9 +23,9 @@ implementation
 
 constructor TRDWDBWareDAO.Create(aServer, aPort: string);
 begin
-  FRDWDB := TRESTDWDataBase.Create(nil);
-  FRDWDB.AuthenticationOptions := TRDWClientAuthOptionParams(rdwAONone);
-  FRDWDB.PoolerURL := aServer;
+  FRDWDB := TRESTDWIdDatabase.Create(nil);
+  FRDWDB.AuthenticationOptions := TRESTDWClientAuthOptionParams(rdwAONone);
+  // FRDWDB.PoolerURL := aServer;
   FRDWDB.PoolerPort := StrToInt(aPort);
   FRDWDB.PoolerName := FRDWDB.PoolerList[0];
   FRDWDB.Active := true;
@@ -46,9 +46,9 @@ end;
 procedure TRDWDBWareDAO.SetBasicAuth(user, password: string);
 begin
   FRDWDB.AuthenticationOptions.AuthorizationOption := rdwAOBasic;
-  TRDWAuthOptionBasic(FRDWDB.AuthenticationOptions.OptionParams)
+  TRESTDWAuthOptionBasic(FRDWDB.AuthenticationOptions.OptionParams)
     .Username := user;
-  TRDWAuthOptionBasic(FRDWDB.AuthenticationOptions.OptionParams).password
+  TRESTDWAuthOptionBasic(FRDWDB.AuthenticationOptions.OptionParams).password
     := password;
 end;
 

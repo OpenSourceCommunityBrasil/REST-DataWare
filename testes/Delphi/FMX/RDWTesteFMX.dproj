@@ -255,6 +255,7 @@
         <DCCReference Include="src\DAO\uRESTDAO.pas"/>
         <DCCReference Include="src\DAO\uRDWDBWareDAO.pas"/>
         <DCCReference Include="src\DAO\uRDWRESTDAO.pas"/>
+        <DCCReference Include="src\DAO\uRDWBinaryEventsDAO.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

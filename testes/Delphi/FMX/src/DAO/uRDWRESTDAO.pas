@@ -4,12 +4,12 @@ interface
 
 uses
   System.Classes,
-  ServerUtils, uDWResponseTranslator;
+  uRESTDWDataUtils, uRESTDWResponseTranslator, uRESTDWIdBase;
 
 type
   TRDWRESTDAO = Class
   private
-    FRESTClient: TDWClientREST;
+    FRESTClient: TRESTDWIdClientREST;
     FServer: String;
     FStream: TStringStream;
   public
@@ -30,7 +30,7 @@ implementation
 constructor TRDWRESTDAO.Create(aServer, aPort: string);
 begin
   FServer := aServer + ':' + aPort;
-  FRESTClient := TDWClientREST.Create(nil);
+  FRESTClient := TRESTDWIdClientREST.Create(nil);
   FRESTClient.UserAgent := 'RDWTestFMX Tool v1.0';
   FRESTClient.AuthenticationOptions.AuthorizationOption := rdwAONone;
 end;
@@ -45,10 +45,10 @@ end;
 procedure TRDWRESTDAO.SetBasicAuth(user, password: string);
 begin
   FRESTClient.AuthenticationOptions.AuthorizationOption := rdwAOBasic;
-  TRDWAuthOptionBasic(FRESTClient.AuthenticationOptions.OptionParams)
+  TRESTDWAuthOptionBasic(FRESTClient.AuthenticationOptions.OptionParams)
     .Username := user;
-  TRDWAuthOptionBasic(FRESTClient.AuthenticationOptions.OptionParams).password
-    := password;
+  TRESTDWAuthOptionBasic(FRESTClient.AuthenticationOptions.OptionParams)
+    .password := password;
 end;
 
 function TRDWRESTDAO.TesteEndpointDELETE(aEndpoint: string): boolean;
@@ -86,7 +86,7 @@ begin
   URL := FServer + '\' + aEndpoint;
   FStream := TStringStream.Create;
   try
-    Result := FRESTClient.Patch(URL, nil, nil, FStream) = 201;
+    Result := FRESTClient.Patch(URL, nil, FStream, false) = 201;
     FStream.Free;
   except
     Result := false;
@@ -114,7 +114,7 @@ begin
   URL := FServer + '\' + aEndpoint;
   FStream := TStringStream.Create;
   try
-    Result := FRESTClient.Put(URL, nil, nil, FStream) = 201;
+    Result := FRESTClient.Put(URL, nil, FStream, false) = 201;
     FStream.Free;
   except
     Result := false;
