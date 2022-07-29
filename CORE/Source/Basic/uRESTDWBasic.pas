@@ -366,7 +366,7 @@ Type
   Function    SendEvent   (EventData        : String;
                            Var Params       : TRESTDWParams;
                            EventType        : TSendEvent = sePOST;
-                           JsonMode         : TJsonMode  = jmDataware;
+                           DataMode         : TDataMode  = dmDataware;
                            ServerEventName  : String     = '';
                            Assyncexec       : Boolean    = False) : String;Overload;Virtual;Abstract;
   Procedure   SetAuthOptionParams(Value     : TRESTDWClientAuthOptionParams);
@@ -568,7 +568,7 @@ Type
                                       Poolername              : String;
                                       Var DWParams            : TRESTDWParams;
                                       Var JSONStr             : String;
-                                      Var JsonMode            : TJsonMode;
+                                      Var DataMode            : TDataMode;
                                       Var ErrorCode           : Integer;
                                       Var ContentType         : String;
                                       Var ServerContextCall   : Boolean;
@@ -672,7 +672,7 @@ Type
                                       urlContext              : String;
                                       Var vResult             : String;
                                       Var DWParams            : TRESTDWParams;
-                                      Var JsonMode            : TJsonMode;
+                                      Var DataMode            : TDataMode;
                                       Var ErrorCode           : Integer;
                                       Var ContentType,
                                       AccessTag               : String;
@@ -1573,7 +1573,7 @@ Function TRESTServiceBase.CommandExec(Const AContext : TComponent;
                                       Redirect            : TRedirect) : Boolean;
 Var
  I, vErrorCode      : Integer;
- JsonMode           : TJsonMode;
+ DataMode           : TDataMode;
  DWParamsD,
  DWParams           : TRESTDWParams;
  vOldMethod,
@@ -1959,7 +1959,7 @@ Begin
  ms                    := Nil;
  vAuthTokenParam       := Nil;
  tmp                   := '';
- JsonMode              := jmDataware;
+ DataMode              := dmDataware;
  baseEventUnit         := '';
  vAccessTag            := '';
  vErrorMessage         := '';
@@ -3478,7 +3478,7 @@ Begin
       vSpecialServer := False;
       If vTempServerMethods <> Nil Then
        Begin
-        ContentType   := 'application/json'; //'text';//'application/octet-stream';
+        ContentType   := cDefaultContentType; //'text';//'application/octet-stream';
         If (vUrlToExec = '')  Or
            (vUrlToExec = '/') Then
          Begin
@@ -3541,7 +3541,7 @@ Begin
           If (Not (vGettoken)) And (Not (vTokenValidate)) Then
            Begin
             If Not ServiceMethods(TComponent(vTempServerMethods), AContext, vUrlToExec, vdwservereventname, DWParams,
-                                  JSONStr, JsonMode, vErrorCode,  vContentType, vServerContextCall, ServerContextStream,
+                                  JSONStr, DataMode, vErrorCode,  vContentType, vServerContextCall, ServerContextStream,
                                   vdwConnectionDefs,  EncodeStrings, vAccessTag, WelcomeAccept, RequestType, vMark,
                                   vRequestHeader, vBinaryEvent, vMetadata, vBinaryCompatibleMode, vCompareContext) Or (lowercase(vContentType) = 'application/php') Then
              Begin
@@ -3595,7 +3595,7 @@ Begin
           Else
            Begin
             JSONStr    := vToken;
-            JsonMode   := jmPureJSON;
+            DataMode   := dmRAW;
             vErrorCode := 200;
             Result     := True;
            End;
@@ -3663,7 +3663,7 @@ Begin
             Begin
              If (vUrlToExec <> '') Then
               Begin
-               If JsonMode in [jmDataware, jmUndefined] Then
+               If DataMode in [dmDataware] Then
                 Begin
                  If Trim(JSONStr) <> '' Then
                   Begin
@@ -3691,7 +3691,7 @@ Begin
                      vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
                   End;
                 End
-               Else If JsonMode = jmPureJSON Then
+               Else If DataMode = dmRAW Then
                 Begin
                  If (Trim(JSONStr) = '') And (WelcomeAccept) Then
                   vReplyString := '{}'
@@ -4594,7 +4594,7 @@ Function TRESTServiceBase.ServiceMethods(BaseObject              : TComponent;
                                          Poolername              : String;
                                          Var DWParams            : TRESTDWParams;
                                          Var JSONStr             : String;
-                                         Var JsonMode            : TJsonMode;
+                                         Var DataMode            : TDataMode;
                                          Var ErrorCode           : Integer;
                                          Var ContentType         : String;
                                          Var ServerContextCall   : Boolean;
@@ -4907,7 +4907,7 @@ Begin
       End;
      If PoolerName <> '' Then
       vBaseUrl := PoolerName;
-     If ReturnEvent(BaseObject, vUrlMethod, vBaseUrl, vResult, DWParams, JsonMode, ErrorCode, ContentType, Accesstag, RequestType, RequestHeader) Then
+     If ReturnEvent(BaseObject, vUrlMethod, vBaseUrl, vResult, DWParams, DataMode, ErrorCode, ContentType, Accesstag, RequestType, RequestHeader) Then
       Begin
        JSONStr := vResult;
        Result  := JSONStr <> '';
@@ -4920,9 +4920,9 @@ Begin
        Result  := ReturnContext(BaseObject, vUrlMethod, vBaseUrl, vResult, ContentType, ServerContextStream, vError, DWParams, RequestType, Mark, RequestHeader, ErrorCode);
        If Not (Result) Or (vError) Then
         Begin
+         DataMode    := dmRAW;
          If Not WelcomeAccept Then
           Begin
-           JsonMode    := jmPureJSON;
            JSONStr     := TReplyInvalidWelcome;
            If (ErrorCode <= 0) Or
               (ErrorCode = 200) Then
@@ -4930,7 +4930,6 @@ Begin
           End
          Else
           Begin
-           JsonMode   := jmPureJSON;
            JSONStr    := vResult;
            If (ErrorCode <= 0) Or
               (ErrorCode = 200) Then
@@ -4940,7 +4939,7 @@ Begin
        Else
         Begin
          ServerContextCall := True;
-         JsonMode  := jmPureJSON;
+         DataMode  := dmRAW;
          JSONStr   := vResult;
         End;
       End;
@@ -4990,7 +4989,7 @@ Begin
     JSONStr := TReplyInvalidWelcome
    Else
     Begin
-     If ReturnEvent(BaseObject, vUrlMethod, UrlToExec, vResult, DWParams, JsonMode, ErrorCode, ContentType, Accesstag, RequestType, RequestHeader) Then
+     If ReturnEvent(BaseObject, vUrlMethod, UrlToExec, vResult, DWParams, DataMode, ErrorCode, ContentType, Accesstag, RequestType, RequestHeader) Then
       Begin
        JSONStr := vResult;
        Result  := JSONStr <> '';
@@ -5001,9 +5000,9 @@ Begin
        Result  := ReturnContext(BaseObject, vUrlMethod, UrlToExec, vResult, ContentType, ServerContextStream, vError, DWParams, RequestType, Mark, RequestHeader, ErrorCode);
        If Not (Result) Or (vError) Then
         Begin
+         DataMode   := dmRAW;
          If Not WelcomeAccept Then
           Begin
-           JsonMode   := jmPureJSON;
            JSONStr    := TReplyInvalidWelcome;
            If (ErrorCode <= 0) Or
               (ErrorCode = 200) Then
@@ -5011,7 +5010,6 @@ Begin
           End
          Else
           Begin
-           JsonMode   := jmPureJSON;
            JSONStr := vResult;
            If (ErrorCode <= 0) Or
               (ErrorCode = 200) Then
@@ -5021,7 +5019,7 @@ Begin
         End
        Else
         Begin
-         JsonMode  := jmPureJSON;
+         DataMode  := dmRAW;
          JSONStr   := vResult;
          If (ErrorCode <= 0)  Or
             (ErrorCode > 299) Then
@@ -6119,7 +6117,7 @@ Function TRESTServiceBase.ReturnEvent(ServerMethodsClass : TComponent;
                                       urlContext          : String;
                                       Var vResult         : String;
                                       Var DWParams        : TRESTDWParams;
-                                      Var JsonMode        : TJsonMode;
+                                      Var DataMode        : TDataMode;
                                       Var ErrorCode       : Integer;
                                       Var ContentType,
                                       AccessTag           : String;
@@ -6162,7 +6160,7 @@ Begin
        If vTagService Then
         Begin
          Result   := True;
-         JsonMode := jmPureJSON;
+         DataMode := dmRAW;
          If Trim(TRESTDWServerEvents(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
           Begin
            If TRESTDWServerEvents(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
@@ -6193,7 +6191,10 @@ Begin
                TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEventByType(DWParams, vResult, RequestType, ErrorCode, RequestHeader)
               Else If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent) Then
                TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent(DWParams, vResult);
-              JsonMode := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].JsonMode;
+              DataMode := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].DataMode;
+              ContentType := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].defaultcontenttype;
+              If Trim(ContentType) = '' Then
+               ContentType := cDefaultContentType;
              Except
               On E : Exception Do
                Begin
@@ -6408,7 +6409,7 @@ Begin
                     Result := Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark].OnRequestExecute);
                     If Result Then
                      Begin
-                      ContentType := 'application/json';
+                      ContentType := cDefaultContentType;
                       TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark].OnRequestExecute(DWParams, ContentType, vResult);
 //                      vResult := utf8Encode(vResult);
                      End;

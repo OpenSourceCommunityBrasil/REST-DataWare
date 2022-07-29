@@ -15,7 +15,7 @@ uses
  ZSqlUpdate,           ZAbstractRODataset,  ZAbstractDataset,
  ZDataset,             ZConnection,         ZStoredProcedure,
  ZSqlProcessor,        ZSequence,           ZSqlMetadata,
- uRESTDWConsts,        DataUtils,           uRESTDWBasicDB,
+ uRESTDWConsts,        uRESTDWDataUtils,           uRESTDWBasicDB,
  uRESTDWJSONInterface, uRESTDWDataJSON,     uRESTDWMassiveBuffer,
  Variants,             uRESTDWDatamodule,   uRESTDWDataset,
  uRESTDWJSONObject,    uRESTDWParams,       uRESTDWBasicTypes,

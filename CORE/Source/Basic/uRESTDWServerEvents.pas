@@ -72,12 +72,14 @@ Type
  Private
   vDescription                           : TStrings;
   vDWRoutes                              : TRESTDWRoutes;
-  vJsonMode                              : TJsonMode;
+  vDataMode                              : TDataMode;
   vBaseURL,
   vEventName,
+  vContentType,
   FName                                  : String;
   vDWParams                              : TRESTDWParamsMethods;
   vOwnerCollection                       : TCollection;
+  vCallbackEvent,
   vOnlyPreDefinedParams,
   vNeedAuthorization                     : Boolean;
   DWReplyEventData                       : TDWReplyEventData;
@@ -89,7 +91,9 @@ Type
   Function  GetAuthRequest               : TDWAuthRequest;
   Procedure SetAuthRequest     (Value    : TDWAuthRequest);
   Procedure SetDescription     (Strings  : TStrings);
-  Procedure SetBaseUrl(Value : String);
+  Procedure SetBaseUrl    (Value : String);
+  Procedure SetContentType(Value : String);
+  Procedure SetDataMode   (Value : TDataMode);
  Public
   Function    GetDisplayName             : String;       Override;
   Procedure   SetDisplayName(Const Value : String);      Override;
@@ -102,10 +106,12 @@ Type
   Property    Routes               : TRESTDWRoutes        Read vDWRoutes             Write vDWRoutes;
   Property    NeedAuthorization    : Boolean              Read vNeedAuthorization    Write vNeedAuthorization;
   Property    Params               : TRESTDWParamsMethods Read vDWParams             Write vDWParams;
-  Property    JsonMode             : TJsonMode            Read vJsonMode             Write vJsonMode;
+  Property    DataMode             : TDataMode            Read vDataMode             Write SetDataMode;
   Property    Name                 : String               Read GetDisplayName        Write SetDisplayName;
   Property    EventName            : String               Read vEventName            Write vEventName;
   Property    BaseURL              : String               Read vBaseURL              Write SetBaseURL;
+  Property    DefaultContentType   : String               Read vContentType          Write SetContentType;
+  Property    CallbackEvent        : Boolean              Read vCallbackEvent        Write vCallbackEvent;
   Property    Description          : TStrings             Read vDescription          Write SetDescription;
   Property    OnlyPreDefinedParams : Boolean              Read vOnlyPreDefinedParams Write vOnlyPreDefinedParams;
   Property    OnReplyEvent         : TDWReplyEvent        Read GetReplyEvent         Write SetReplyEvent;
@@ -224,7 +230,7 @@ constructor TRESTDWEvent.Create(aCollection: TCollection);
 begin
  Inherited;
  vDWParams             := TRESTDWParamsMethods.Create(aCollection, TRESTDWParamMethod);
- vJsonMode             := jmDataware;
+ vDataMode             := dmDataware;
  DWReplyEventData      := TDWReplyEventData.Create(Nil);
  vOwnerCollection      := aCollection;
  FName                 := 'dwevent' + IntToStr(aCollection.Count);
@@ -235,6 +241,8 @@ begin
  vBaseURL              := '/';
  vDescription          := TStringList.Create;
  vDWRoutes             := [crAll];
+ vContentType          := cDefaultContentType;
+ vCallbackEvent        := False;
 end;
 
 Destructor TRESTDWEvent.Destroy;
@@ -286,6 +294,23 @@ End;
 Procedure TRESTDWEvent.SetAuthRequest(Value   : TDWAuthRequest);
 Begin
  DWReplyEventData.OnAuthRequest := Value;
+End;
+
+Procedure TRESTDWEvent.SetDataMode   (Value : TDataMode);
+Begin
+ vDataMode := Value;
+ If vDataMode = dmDataware Then
+  vContentType := cDefaultContentType;
+End;
+
+Procedure TRESTDWEvent.SetContentType(Value : String);
+Begin
+ If vDataMode = dmDataware Then
+  vContentType := cDefaultContentType
+ Else
+  vContentType := Value;
+ If Trim(vContentType) = '' Then
+  vContentType := cDefaultContentType;
 End;
 
 Procedure TRESTDWEvent.SetBaseUrl(Value : String);
@@ -404,9 +429,10 @@ Var
  vDWEvent       : TRESTDWEvent;
  vDWParamMethod : TRESTDWParamMethod;
  vEventName,
- vJsonMode,
+ vDataMode,
  vparams,
- vparamname     : String;
+ vparamname,
+ vContentType      : String;
  vneedauth,
  vonlypredefparams : Boolean;
 Begin
@@ -422,16 +448,18 @@ Begin
       Begin
        bJsonOBJb  := TRESTDWJSONInterfaceObject(bJsonArrayB.GetObject(X));
        vEventName := bJsonOBJb.Pairs[0].Value; //eventname
-       vJsonMode  := bJsonOBJb.Pairs[1].Value; //jsonmode
+       vDataMode  := bJsonOBJb.Pairs[1].Value; //DataMode
        vparams    := bJsonOBJb.Pairs[2].Value; //params
        vneedauth  := StringToBoolean(bJsonOBJb.Pairs[3].Value); //params
        vonlypredefparams := StringToBoolean(bJsonOBJb.Pairs[4].Value); //params
+       vContentType := DecodeStrings(bJsonOBJb.Pairs[5].Value); //Final
        If EventByName[vEventName] = Nil Then
         vDWEvent  := TRESTDWEvent(Self.Add)
        Else
         vDWEvent  := EventByName[vEventName];
+       vDWEvent.DataMode := GetDataModeName(vDataMode);
+       vDWEvent.DefaultContentType := vContentType;
        vDWEvent.Name := vEventName;
-       vDWEvent.JsonMode := GetJSONModeName(vJsonMode);
        vDWEvent.NeedAuthorization    := vneedauth;
        vDWEvent.OnlyPreDefinedParams := vonlypredefparams;
        If vparams <> '' Then
@@ -536,10 +564,11 @@ Begin
  vEventsLines := '';
  For I := 0 To Count -1 Do
   Begin
-   vParamLine2  := Format('"needauth":"%s", "onlypredefparams":"%s"', [BooleanToString(Items[I].NeedAuthorization),
-                                                                       BooleanToString(Items[I].OnlyPreDefinedParams)]);
+   vParamLine2  := Format('"needauth":"%s", "onlypredefparams":"%s", "ContentType":"%s"', [BooleanToString(Items[I].NeedAuthorization),
+                                                                                           BooleanToString(Items[I].OnlyPreDefinedParams),
+                                                                                           EncodeStrings(Items[I].DefaultContentType)]);
    vTagEvent    := Format('{"eventname":"%s"', [TRESTDWEvent(Items[I]).EventName]);
-   vTagEvent    := vTagEvent + Format(', "jsonmode":"%s"', [GetJSONModeName(Items[I].vJsonMode)]);
+   vTagEvent    := vTagEvent + Format(', "DataMode":"%s"', [GetDataModeName(Items[I].vDataMode)]);
    vTagEvent    := vTagEvent + ', "params":[%s], ' + vParamLine2 + '}';
    vParamsLines := '';
    For A := 0 To Items[I].vDWParams.Count -1 Do
@@ -578,7 +607,7 @@ Begin
   Begin
    If Not Assigned(DWParams) Then
     DWParams := TRESTDWParams.Create;
-   DWParams.JsonMode := vEventList.EventByName[EventName].JsonMode;
+   DWParams.DataMode := vEventList.EventByName[EventName].DataMode;
    For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
     Begin
      vParamNameS := '';
@@ -599,7 +628,7 @@ Begin
        dwParam.ObjectDirection := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectDirection;
        dwParam.ObjectValue     := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectValue;
        dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
-       dwParam.JsonMode        := DWParams.JsonMode;
+       dwParam.DataMode        := DWParams.DataMode;
        If (vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '')  And
           (Trim(dwParam.AsString) = '') Then
         dwParam.Value          := vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue;
@@ -686,7 +715,7 @@ Begin
      dwParam.ObjectDirection := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectDirection;
      dwParam.ObjectValue     := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectValue;
      dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
-     dwParam.JsonMode        := jmDataware;
+     dwParam.DataMode        := dmDataware;
      If (vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '') And
         (Trim(dwParam.AsString) = '') Then
       dwParam.Value           := vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue;
@@ -756,7 +785,7 @@ Begin
  Try
   Try
    RESTClientPoolerExec.NewToken;
-   lResponse := RESTClientPoolerExec.SendEvent('GetEvents', DWParams);
+   lResponse := RESTClientPoolerExec.SendEvent('GetEvents', DWParams, sePOST, dmDataware, vServerEventName);
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
@@ -832,7 +861,7 @@ Function TRESTDWClientEvents.SendEvent(EventName        : String;
                                    EventType        : TSendEvent = sePOST;
                                    Assyncexec       : Boolean = False): Boolean;
 Var
- vJsonMode : TJsonMode;
+ vDataMode : TDataMode;
 Begin
  Error := '';
  Result := False;
@@ -849,10 +878,10 @@ Begin
      Exit
     End;
    TokenValidade(DWParams, Error);
-   vJsonMode    := vEventList.EventByName[EventName].vJsonMode;
+   vDataMode    := vEventList.EventByName[EventName].vDataMode;
    Try
     Error        := '';
-    NativeResult := vRESTClientPooler.SendEvent(EventName, DWParams, EventType, vJsonMode, vServerEventName);
+    NativeResult := vRESTClientPooler.SendEvent(EventName, DWParams, EventType, vDataMode, vServerEventName);
     Result       := (NativeResult = TReplyOK) Or (NativeResult = AssyncCommandMSG);
    Except
     On E : Exception Do
@@ -905,7 +934,7 @@ Begin
  If Not(Assigned(DWParams)) Then
   Begin
    DWParams                  := TRESTDWParams.Create;
-   DWParams.JsonMode         := jmDataware;
+   DWParams.DataMode         := dmDataware;
    DWParams.Encoding         := vRESTClientPooler.Encoding;
    JSONParam                 := TJSONParam.Create(vRESTClientPooler.Encoding);
    JSONParam.ParamName       := 'BinaryRequest';
@@ -956,7 +985,7 @@ Function TRESTDWClientEvents.SendEvent(EventName    : String;
                                    EventType    : TSendEvent = sePOST;
                                    Assyncexec   : Boolean = False): Boolean;
 Var
- vJsonMode     : TJsonMode;
+ vDataMode     : TDataMode;
  I,
  vErrorCode    : Integer;
  vRenewTokenData,
@@ -982,11 +1011,11 @@ Begin
      Exit
     End;
    TokenValidade(DWParams, Error);
-   vJsonMode := vEventList.EventByName[EventName].vJsonMode;
+   vDataMode := vEventList.EventByName[EventName].vDataMode;
    For I := 0 To 1 Do
     Begin
      If Error = '' Then
-      Error    := vRESTClientPooler.SendEvent(EventName, DWParams, EventType, vJsonMode, vServerEventName, Assyncexec);
+      Error    := vRESTClientPooler.SendEvent(EventName, DWParams, EventType, vDataMode, vServerEventName, Assyncexec);
      Result    := (Error = TReplyOK) Or (Error = AssyncCommandMSG);
      If Result Then
       Begin

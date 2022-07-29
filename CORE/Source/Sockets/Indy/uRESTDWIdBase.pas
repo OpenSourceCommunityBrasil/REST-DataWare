@@ -323,7 +323,7 @@ Type
   Function    SendEvent            (EventData              : String;
                                     Var Params             : TRESTDWParams;
                                     EventType              : TSendEvent = sePOST;
-                                    JsonMode               : TJsonMode  = jmDataware;
+                                    DataMode               : TDataMode  = dmDataware;
                                     ServerEventName        : String     = '';
                                     Assyncexec             : Boolean    = False) : String;Override;
   Procedure   SetParams            (TransparentProxy       : TProxyConnectionInfo;
@@ -3519,7 +3519,7 @@ End;
 Function TRESTDWIdClientPooler.SendEvent(EventData       : String;
                                          Var Params      : TRESTDWParams;
                                          EventType       : TSendEvent;
-                                         JsonMode        : TJsonMode;
+                                         DataMode        : TDataMode;
                                          ServerEventName : String;
                                          Assyncexec      : Boolean) : String;
 Var
@@ -4580,3 +4580,4 @@ Begin
 End;
 
 End.
+

@@ -59,7 +59,7 @@ Uses
   TCallSendEvent          = Function (EventData             : String;
                                       Var Params            : TRESTDWParams;
                                       EventType             : TSendEvent = sePOST;
-                                      JsonMode              : TJsonMode  = jmDataware;
+                                      DataMode              : TDataMode  = dmDataware;
                                       ServerEventName       : String     = '';
                                       Assyncexec            : Boolean    = False;
                                       CallBack              : TCallBack  = Nil) : String Of Object;

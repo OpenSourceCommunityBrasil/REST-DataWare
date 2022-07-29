@@ -763,7 +763,7 @@ Begin
   Begin
    If Not Assigned(DWParams) Then
     DWParams := TRESTDWParams.Create;
-   DWParams.JsonMode := jmPureJSON;
+   DWParams.DataMode := dmRAW;
    For I := 0 To vEventList.ContextByName[ContextName].vDWParams.Count -1 Do
     Begin
      vParamName := '';
@@ -784,7 +784,7 @@ Begin
        dwParam.ObjectDirection := vEventList.ContextByName[ContextName].vDWParams.Items[I].ObjectDirection;
        dwParam.ObjectValue     := vEventList.ContextByName[ContextName].vDWParams.Items[I].ObjectValue;
        dwParam.Encoded         := vEventList.ContextByName[ContextName].vDWParams.Items[I].Encoded;
-       dwParam.JsonMode        := DWParams.JsonMode;
+       dwParam.DataMode        := DWParams.DataMode;
        If (vEventList.ContextByName[ContextName].vDWParams.Items[I].DefaultValue <> '')  And
           (Trim(dwParam.AsString) = '') Then
         dwParam.Value           := vEventList.ContextByName[ContextName].vDWParams.Items[I].DefaultValue;

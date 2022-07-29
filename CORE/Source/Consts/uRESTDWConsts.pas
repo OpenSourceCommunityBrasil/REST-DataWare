@@ -71,7 +71,7 @@ Const
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
  RESTDWVersionINFO          = 'v2.0.0-';
- RESTDWRelease              = '3012';
+ RESTDWRelease              = '3019';
  RESTDWCodeProject          = 'Savage Reign - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
@@ -142,6 +142,7 @@ Const
  RESTDWFieldBookmark        = 'DWFIELDBOOKMARK';
  rsLazarusDWPackage         = 'REST Dataware - Tools';
  rsDwRequestDBGName         = 'REST Dataware - Request Debbuger';
+ cDefaultContentType        = 'application/json';
  cValueKey                  = '{"serverinforequest":"%s", "inforequest":"%s", "lifecycle":"%s"}';
  cValueKeyToken             = '{"secrets":"%s", "md5":"%s"}';
  cValueToken                = '{%s"exp":"%s", "iat":"%s", "secrets":"%s"}';
@@ -291,7 +292,7 @@ Type
  TRESTDWRoutes    = Set of TRESTDWRoute;
  TRequestType     = (rtGet, rtPost, rtPut, rtPatch, rtDelete);
  TResquestMode    = (rtOnlyFields, rtOnlyData, rtJSONAll);
- TJsonMode        = (jmDataware,  jmPureJSON, jmUndefined);
+ TDataMode        = (dmDataware,  dmRAW);
  TMassiveMode     = (mmInactive,  mmBrowse, mmInsert, mmUpdate, mmDelete, mmExec);
  TMassiveSQLMode  = (msqlQuery,   msqlExecute);
  TTypeObject      = (toDataset,   toParam, toMassive,
@@ -307,8 +308,8 @@ Type
                      ovTimeStampOffset, ovObject,       ovSingle);                                                           //49..51
  TDatasetType     = (dtReflection,      dtFull,         dtDiff);
  Function  GetObjectName            (TypeObject         : TTypeObject)            : String;          Overload;
- Function  GetJSONModeName          (TypeObject         : TJsonMode)              : String;          Overload;
- Function  GetJSONModeName          (TypeObject         : String)                 : TJsonMode;       Overload;
+ Function  GetDataModeName          (TypeObject         : TDataMode)              : String;          Overload;
+ Function  GetDataModeName          (TypeObject         : String)                 : TDataMode;       Overload;
  Function  GetObjectName            (TypeObject         : String)                 : TTypeObject;     Overload;
  Function  GetDirectionName         (ObjectDirection    : TObjectDirection)       : String;          Overload;
  Function  GetDirectionName         (ObjectDirection    : String)                 : TObjectDirection;Overload;
@@ -373,7 +374,7 @@ Type
  Function  UnixToDateTime           (USec               : Int64)                  : TDateTime;
  Function  BuildFloatString         (Value              : String)                 : String;
  Function  BuildStringFloat         (Value              : String;
-                                     JsonModeD          : TJsonMode = jmDataware;
+                                     DataModeD          : TDataMode = dmDataware;
                                      FloatDecimalFormat : String = '')            : String;
 // Function  GetMIMEType              (sFile              : TFileName)              : string;
  Function  Scripttags               (Value              : String)                 : Boolean;
@@ -1322,15 +1323,15 @@ Begin
  End;
 End;
 
-Function GetJSONModeName(TypeObject      : TJsonMode)       : String;
+Function GetDataModeName(TypeObject      : TDataMode)       : String;
 Begin
- Result := 'jmDataware';
+ Result := 'dmDataware';
  Case TypeObject Of
-  jmDataware  : Result := 'jmDataware';
-  jmPureJSON  : Result := 'jmPureJSON';
-  jmUndefined : Result := 'jmUndefined';
+  dmDataware  : Result := 'dmDataware';
+  dmRAW       : Result := 'dmRAW';
+//  jmUndefined : Result := 'jmUndefined';
   Else
-   Result := 'jmDataware';
+   Result := 'dmDataware';
  End;
 End;
 
@@ -1476,18 +1477,16 @@ Begin
   Result := toMassive;
 End;
 
-Function GetJSONModeName   (TypeObject      : String) : TJsonMode;
+Function GetDataModeName   (TypeObject      : String) : TDataMode;
 Var
  vTypeObject : String;
 Begin
- Result := jmDataware;
+ Result := dmDataware;
  vTypeObject := Uppercase(TypeObject);
- If vTypeObject = Uppercase('jmDataware') Then
-  Result := jmDataware
- Else If vTypeObject = Uppercase('jmPureJSON') Then
-  Result := jmPureJSON
- Else If vTypeObject = Uppercase('jmUndefined') Then
-  Result := jmUndefined;
+ If vTypeObject = Uppercase('dmDataware') Then
+  Result := dmDataware
+ Else If vTypeObject = Uppercase('dmRAW') Then
+  Result := dmRAW;
 End;
 
 Function GetDirectionName(ObjectDirection : TObjectDirection) : String;
@@ -2087,7 +2086,7 @@ End;
 // End;
 //End;
 
-Function BuildStringFloat(Value: String; JsonModeD: TJsonMode = jmDataware; FloatDecimalFormat : String = ''): String;
+Function BuildStringFloat(Value: String; DataModeD: TDataMode = dmDataware; FloatDecimalFormat : String = ''): String;
 Begin
  {$IFDEF FPC}
   DecimalLocal := DecimalSeparator;
@@ -2098,10 +2097,9 @@ Begin
   DecimalLocal := DecimalSeparator;
   {$IFEND}
  {$ENDIF}
- Case JsonModeD Of
-  jmDataware,
-  jmUndefined : Result := StringReplace(Value, DecimalLocal, TDecimalChar, [rfReplaceall]);
-  jmPureJSON  : Begin
+ Case DataModeD Of
+  dmDataware  : Result := StringReplace(Value, DecimalLocal, TDecimalChar, [rfReplaceall]);
+  dmRAW       : Begin
                  If FloatDecimalFormat = '' Then
                   Result := Value
                  Else

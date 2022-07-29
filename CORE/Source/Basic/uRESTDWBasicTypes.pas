@@ -2990,9 +2990,13 @@ Var
   {$ENDIF}
   {$ENDIF}
   {$IFDEF UNIX}
+  {$IFNDEF FPC}
+    //Aqui codigo se for compilado Linux no Delphi
+  {$ELSE}
    LoadMIME('/etc/mime.types', AMIMEList);                   {do not localize}
    LoadMIME('/etc/htdig/mime.types', AMIMEList);             {do not localize}
    LoadMIME('/etc/usr/share/webmin/mime.types', AMIMEList);  {do not localize}
+   {$ENDIF}
   {$ENDIF}
  End;
 Begin

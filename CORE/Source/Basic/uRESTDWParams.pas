@@ -81,7 +81,7 @@ Type
   vSetInDesignEvents : TSetInitDataset;
   vPrepareDetailsNew : TProcedureEvent;
   vPrepareDetails    : TPrepareDetails;
-  vJsonMode        : TJsonMode;
+  vDataMode        : TDataMode;
   vInBlockEvents,
   vInactive,
   vNullValue,
@@ -107,7 +107,7 @@ Type
   Function  GetValueJSON (bValue             : String) : String;
   Function  DatasetValues(bValue             : TDataset;
                           DateTimeFormat     : String = '';
-                          JsonModeD          : TJsonMode = jmDataware;
+                          DataModeD          : TDataMode = dmDataware;
                           FloatDecimalFormat : String = '';
                           HeaderLowercase    : Boolean = False;
                           VirtualValue       : String = '';
@@ -159,7 +159,7 @@ Type
   Procedure LoadFromDataset(TableName        : String;
                             bValue           : TDataset;
                             EncodedValue     : Boolean = True;
-                            JsonModeD        : TJsonMode = jmDataware;
+                            DataModeD        : TDataMode = dmDataware;
                             DateTimeFormat   : String = '';
                             DelimiterFormat  : String = '';
                             {$IFDEF FPC}
@@ -173,7 +173,7 @@ Type
                             DetailType       : TDWJSONType = TDWJSONArrayType;
                             DetailElementName: String      = 'detail';
                             EncodedValue     : Boolean = True;
-                            JsonModeD        : TJsonMode = jmDataware;
+                            DataModeD        : TDataMode = dmDataware;
                             DateTimeFormat   : String = '';
                             DelimiterFormat  : String = '';
                             {$IFDEF FPC}
@@ -205,7 +205,7 @@ Type
                             CharSet          : TDatabaseCharSet = csUndefined{$ENDIF});Overload;
   Procedure LoadFromJSON   (bValue           : String);Overload;
   Procedure LoadFromJSON   (bValue           : String;
-                            JsonModeD        : TJsonMode);Overload;
+                            DataModeD        : TDataMode);Overload;
   Procedure LoadFromStream (Stream           : TMemoryStream;
                             Encode           : Boolean = True);
   Procedure SaveToStream   (Const Stream     : TMemoryStream;
@@ -243,7 +243,7 @@ Type
   Property Encoding           : TEncodeSelect      Read vEncoding           Write SetEncoding;
   Property Tagname            : String             Read vtagName            Write vtagName;
   Property Encoded            : Boolean            Read vEncoded            Write vEncoded;
-  Property JsonMode           : TJsonMode          Read vJsonMode           Write vJsonMode;
+  Property DataMode           : TDataMode          Read vDataMode           Write vDataMode;
   Property FloatDecimalFormat : String             Read vFloatDecimalFormat Write vFloatDecimalFormat;
   {$IFDEF FPC}
   Property DatabaseCharSet    : TDatabaseCharSet   Read vDatabaseCharSet    Write vDatabaseCharSet;
@@ -304,7 +304,7 @@ Type
  TJSONParam = Class(TObject)
  Private
   vJSONValue       : TJSONValue;
-  vJsonMode        : TJsonMode;
+  vDataMode        : TDataMode;
   vEncoding        : TEncodeSelect;
   vTypeObject      : TTypeObject;
   vObjectDirection : TObjectDirection;
@@ -412,7 +412,7 @@ Type
   Property ParamContentType   : String           Read vParamContentType   Write SetParamContentType;
   Property Encoded            : Boolean          Read vEncoded            Write SetEncoded;
   Property Binary             : Boolean          Read vBinary;
-  Property JsonMode           : TJsonMode        Read vJsonMode           Write vJsonMode;
+  Property DataMode           : TDataMode        Read vDataMode           Write vDataMode;
   Property FloatDecimalFormat : String           Read vFloatDecimalFormat Write vFloatDecimalFormat;
   // Propriedades Novas
   Property Value              : Variant          Read GetVariantValue     Write SetVariantValue;
@@ -447,7 +447,7 @@ End;
 Type
  TRESTDWParams = Class(TList)
  Private
-  vJsonMode     : TJsonMode;
+  vDataMode     : TDataMode;
   vEncoding     : TEncodeSelect;
   vCripto       : TCripto;
   vHeaders      : TRESTDWHeaders;
@@ -493,7 +493,7 @@ Type
   Property    Items      [Index     : Integer]    : TJSONParam Read GetRec        Write PutRec; Default;
   Property    ItemsString[Index     : String]     : TJSONParam Read GetRecName    Write PutRecName;
   Property    RawBody               : TJSONParam               Read GetRawBody    Write PutRawBody;
-  Property    JsonMode              : TJsonMode                Read vJsonMode     Write vJsonMode;
+  Property    DataMode              : TDataMode                Read vDataMode     Write vDataMode;
   Property    Encoding              : TEncodeSelect            Read vEncoding     Write vEncoding;
   Property    CriptOptions          : TCripto                  Read vCripto       Write vCripto;
   Property    RequestHeaders        : TRESTDWHeaders           Read vHeaders      Write vHeaders;
@@ -864,7 +864,7 @@ Begin
    If vObjectValue In [ovSingle, ovFloat, ovCurrency, ovBCD, ovFMTBcd, ovExtended] Then
     If (vTempString <> '')                And
        (Lowercase(vTempString) <> 'null') Then
-     Result := BuildStringFloat(vTempString, vJsonMode)
+     Result := BuildStringFloat(vTempString, vDataMode)
     Else
      Result := 0;
    Exit;
@@ -950,7 +950,7 @@ Begin
       End
      Else
       Begin
-       If ((JsonMode = jmDataware) And (vEncoded)) Or Not(vObjectValue = ovObject) Then
+       If ((DataMode = dmDataware) And (vEncoded)) Or Not(vObjectValue = ovObject) Then
         Begin
          If vEncoding = esUtf8 Then
           aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
@@ -970,7 +970,7 @@ Begin
       aValue := StringToBytes(Format(TJsonStringValue, [bValue]))
      Else
       Begin
-       If ((JsonMode = jmDataware) And (vEncoded)) Or
+       If ((DataMode = dmDataware) And (vEncoded)) Or
           Not(vObjectValue = ovObject) Then
         aValue := StringToBytes(Format(TJsonStringValue, [bValue]))
        Else
@@ -1052,7 +1052,7 @@ Begin
   aResult := cNullvalue
  Else If ((Trim(aResult) = '') or (Trim(bValue) = cNullvalueTag)) And vInsertTag Then
   aResult := cBlanckStringJSON;
- If JsonMode = jmDataware Then
+ If DataMode = dmDataware Then
   Begin
    If (vTypeObject  = toDataset) Then
     Result := Format(TValueFormatJSON, ['ObjectType',  GetObjectName(vTypeObject), 'Direction',
@@ -1087,7 +1087,7 @@ Begin
        Result := Format(TValueFormatJSONValueS, ['ObjectType', GetObjectName(vTypeObject), 'Direction',
                                                  GetDirectionName(vObjectDirection),       'Encoded',
                                                  EncodedString, 'ValueType', GetValueType(vObjectValue),
-                                                 vtagName, GetValueJSON(BuildStringFloat(aResult, JsonMode, vFloatDecimalFormat))]);
+                                                 vtagName, GetValueJSON(BuildStringFloat(aResult, DataMode, vFloatDecimalFormat))]);
       End
      Else
       Begin
@@ -1135,7 +1135,7 @@ End;
 
 Function TJSONValue.DatasetValues(bValue             : TDataset;
                                   DateTimeFormat     : String      = '';
-                                  JsonModeD          : TJsonMode   = jmDataware;
+                                  DataModeD          : TDataMode   = dmDataware;
                                   FloatDecimalFormat : String      = '';
                                   HeaderLowercase    : Boolean     = False;
                                   VirtualValue       : String      = '';
@@ -1330,11 +1330,10 @@ Var
  Begin
   For i := 0 To bValue.Fields.Count - 1 Do
    Begin
-    Case JsonModeD Of
-     jmDataware,
-     jmUndefined : Begin
+    Case DataModeD Of
+     dmDataware  : Begin
                    End;
-     jmPureJSON  : Begin
+     dmRaw       : Begin
                     If HeaderLowercase Then
                      vTempField := Format('"%s": ', [Lowercase(bValue.Fields[i].FieldName)])
                     Else
@@ -1371,17 +1370,17 @@ Var
        End
       Else If bValue.Fields[i].DataType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,{$IFEND}{$ENDIF}ftFloat, ftCurrency, ftFMTBcd, ftBCD] Then
        Begin
-        vValueMask  := BuildStringFloat(FloatToStr(bValue.Fields[i].AsFloat), JsonModeD, '.');
+        vValueMask  := BuildStringFloat(FloatToStr(bValue.Fields[i].AsFloat), DataModeD, '.');
         If ((FloatDecimalFormat <> '') And (FloatDecimalFormat <> '.')) Then
-         vValueMask  := BuildStringFloat(FloatToStr(bValue.Fields[i].AsFloat), JsonModeD, FloatDecimalFormat);
+         vValueMask  := BuildStringFloat(FloatToStr(bValue.Fields[i].AsFloat), DataModeD, FloatDecimalFormat);
         If vDataType or ((FloatDecimalFormat = '') or (FloatDecimalFormat = '.')) Then
          vFormatMask := '%s%s'
         Else
          vFormatMask := '%s"%s"';
         If bValue.Fields[i].IsNull Then
          vTempValue := Format('%s%s', [vTempField, cNullvalue])
-        Else if JsonModeD = jmDataware then
-         vTempValue := Format('%s"%s"', [vTempField, BuildStringFloat(FloatToStr(bValue.Fields[i].AsFloat), JsonModeD, FloatDecimalFormat)])
+        Else if DataModeD = dmDataware then
+         vTempValue := Format('%s"%s"', [vTempField, BuildStringFloat(FloatToStr(bValue.Fields[i].AsFloat), DataModeD, FloatDecimalFormat)])
         Else
          vTempValue := Format(vFormatMask, [vTempField, vValueMask]);
        End
@@ -1424,7 +1423,7 @@ Var
             If (vEncoded) Or (bValue.Fields[i].DataType in [ftMemo, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,{$IFEND}{$ELSE}ftWideMemo,{$ENDIF}
                                                             ftFmtMemo]) Then
              Begin
-              If JsonModeD = jmPureJSON Then
+              If DataModeD = dmRaw Then
                Begin
                 If (vEncoded) Then
                  Begin
@@ -1528,7 +1527,7 @@ Var
       If bDetail.Eof Then
        Result := Result + VirtualValue + '[]'
       Else
-       Result := Result + VirtualValue + DatasetValues(bDetail, DateTimeFormat, JsonModeD, FloatDecimalFormat, HeaderLowercase, '', DWJSONType);
+       Result := Result + VirtualValue + DatasetValues(bDetail, DateTimeFormat, DataModeD, FloatDecimalFormat, HeaderLowercase, '', DWJSONType);
      End
     Else
      Result := Result + VirtualValue + '[]';
@@ -1545,10 +1544,9 @@ Begin
   {$ELSE}
   vBuildSide := 'D';
   {$ENDIF}
-  Case JsonModeD Of
-   jmDataware,
-   jmUndefined : Result := '{"fields":[' + GenerateHeader + '], "buildside":"' + vBuildSide + '"}, {"lines":[%s]}';
-   jmPureJSON  : Begin
+  Case DataModeD Of
+   dmDataware  : Result := '{"fields":[' + GenerateHeader + '], "buildside":"' + vBuildSide + '"}, {"lines":[%s]}';
+   dmRaw       : Begin
                  End;
   End;
   A := 0;
@@ -1556,8 +1554,8 @@ Begin
   {$IFDEF  POSIX}  // aqui para linux tem que ser diferente o rastrwio da query
   For A := 0 To bValue.Recordcount -1 Do
    Begin
-    Case JsonModeD Of
-     jmDataware,
+    Case DataModeD Of
+     dmDataware,
      jmUndefined : Begin
                     If vRecNo = 1 Then //pr-19/08/2020
                      vLines := Format('{"line%d":[%s]}',            [A, GenerateLine])
@@ -1579,16 +1577,15 @@ Begin
   {$ELSE}
    While Not bValue.Eof Do
     Begin
-     Case JsonModeD Of
-      jmDataware,
-      jmUndefined : Begin
-                    If vRecNo = 1 Then //pr-19/08/2020
+     Case DataModeD Of
+      dmDataware  : Begin
+                     If vRecNo = 1 Then //pr-19/08/2020
                       vLines := Format('{"line%d":[%s]}', [A, GenerateLine])
                      Else
                       vLines := vLines + Format(', {"line%d":[%s]}', [A, GenerateLine]);
                     End;
-      jmPureJSON  : Begin
-                    If vRecNo = 1 Then //pr-19/08/2020
+      dmRaw       : Begin
+                     If vRecNo = 1 Then //pr-19/08/2020
                       vLines := Format('{%s}', [GenerateLine])
                      Else
                       vLines := vLines + Format(', {%s}', [GenerateLine]);
@@ -1601,9 +1598,8 @@ Begin
      Inc(vRecNo); //pr-19/08/2020
     End;
   {$ENDIF}
-  Case JsonModeD Of
-   jmDataware,
-   jmUndefined : Begin
+  Case DataModeD Of
+   dmDataware  : Begin
                   If vEncoding = esUtf8 Then
                    Result := Format(Result, [vLines])
                   Else
@@ -1613,7 +1609,7 @@ Begin
                    Result := Format(Result, [AnsiString(vLines)]);
                   {$IFEND}
                  End;
-   jmPureJSON  : Begin
+   dmRaw       : Begin
                   If vtagName <> '' Then
                    Result := Format('{"%s": [%s]}', [vtagName, vLines])
                   Else
@@ -2027,7 +2023,7 @@ End;
 Procedure TJSONValue.LoadFromDataset(TableName        : String;
                                      bValue           : TDataset;
                                      EncodedValue     : Boolean = True;
-                                     JsonModeD        : TJsonMode = jmDataware;
+                                     DataModeD        : TDataMode = dmDataware;
                                      DateTimeFormat   : String = '';
                                      DelimiterFormat  : String = '';
                                      {$IFDEF FPC}
@@ -2050,14 +2046,14 @@ Begin
  vObjectDirection := odINOUT;
  vObjectValue     := ovDataSet;
  vEncoded         := EncodedValue;
- If (JsonModeD = jmDataware) And (trim(TableName) = '') Then
+ If (DataModeD = dmDataware) And (trim(TableName) = '') Then
   TableName := 'rdwtable';
  vtagName         := Lowercase(TableName);
  {$IFDEF FPC}
   If CharSet <> csUndefined Then
    DatabaseCharSet := CharSet;
  {$ENDIF}
- vTagGeral        := DatasetValues(bValue, DateTimeFormat, JsonModeD, DelimiterFormat, HeaderLowercase);
+ vTagGeral        := DatasetValues(bValue, DateTimeFormat, DataModeD, DelimiterFormat, HeaderLowercase);
  {$IFDEF FPC}
   If vEncodingLazarus = Nil Then
    SetEncoding(vEncoding);
@@ -2076,7 +2072,7 @@ Begin
    move(AnsiString(vTagGeral)[InitStrPos], pByteArray(aValue)^, Length(vTagGeral) * vSizeChar);
   {$IFEND}
  {$ENDIF}
- vJsonMode        := JsonModeD;
+ vDataMode        := DataModeD;
  vNullValue       := Length(aValue) = 0;
 End;
 
@@ -2086,7 +2082,7 @@ Procedure TJSONValue.LoadFromDataset(TableName        : String;
                                      DetailType       : TDWJSONType = TDWJSONArrayType;
                                      DetailElementName: String      = 'detail';
                                      EncodedValue     : Boolean     = True;
-                                     JsonModeD        : TJsonMode   = jmDataware;
+                                     DataModeD        : TDataMode   = dmDataware;
                                      DateTimeFormat   : String = '';
                                      DelimiterFormat  : String = '';
                                      {$IFDEF FPC}
@@ -2110,7 +2106,7 @@ Begin
  vObjectDirection := odINOUT;
  vObjectValue     := ovDataSet;
  vEncoded         := EncodedValue;
- If (JsonModeD = jmDataware) And (trim(TableName) = '') Then
+ If (DataModeD = dmDataware) And (trim(TableName) = '') Then
   TableName := 'rdwtable';
  vtagName         := Lowercase(TableName);
  {$IFDEF FPC}
@@ -2121,7 +2117,7 @@ Begin
   vVirtualValue := Format('"%s":', [DetailElementName])
  Else
   vVirtualValue := Format('"%s":', [DetailElementName]);
- vTagGeral     := DatasetValues(bValue, DateTimeFormat, JsonModeD, DelimiterFormat, HeaderLowercase, vVirtualValue, DetailType, bDetail);
+ vTagGeral     := DatasetValues(bValue, DateTimeFormat, DataModeD, DelimiterFormat, HeaderLowercase, vVirtualValue, DetailType, bDetail);
  {$IFDEF FPC}
   If vEncodingLazarus = Nil Then
    SetEncoding(vEncoding);
@@ -2148,7 +2144,7 @@ Begin
 //   aValue          := StringToBytes(vTagGeral);
   {$IFEND}
  {$ENDIF}
- vJsonMode        := JsonModeD;
+ vDataMode        := DataModeD;
  vNullValue       := Length(aValue) = 0;
 End;
 
@@ -3979,7 +3975,7 @@ Begin
 End;
 
 Procedure TJSONValue.LoadFromJSON(bValue         : String;
-                                  JsonModeD      : TJsonMode);
+                                  DataModeD      : TDataMode);
 Var
  bJsonValue    : TRESTDWJSONInterfaceObject;
 Begin
@@ -4280,7 +4276,7 @@ Begin
  vBinary            := True;
  vUtf8SpecialChars  := True; //Adicionado por padrão para special Chars
  vNullValue         := vBinary;
- vJsonMode          := jmDataware;
+ vDataMode          := dmDataware;
  vOnWriterProcess   := Nil;
  vInactive          := False;
  vInBlockEvents     := False;
@@ -4670,7 +4666,7 @@ Constructor TJSONParam.Create(Encoding : TEncodeSelect);
 Begin
  vJSONValue          := TJSONValue.Create;
  vCripto             := TCripto.Create;
- vJsonMode           := jmDataware;
+ vDataMode           := dmDataware;
  vEncoding           := Encoding;
  vTypeObject         := toParam;
  ObjectDirection     := odINOUT;
@@ -4761,9 +4757,9 @@ Begin
  If Source Is TJSONParam Then
   Begin
    Src                    := TJSONParam(Source);
-   vJsonMode              := Src.JsonMode;
+   vDataMode              := Src.DataMode;
    vEncoded               := Src.Encoded;
-   vJSONValue.JsonMode    := Src.vJsonMode;
+   vJSONValue.DataMode    := Src.vDataMode;
    vJSONValue.vEncoded    := Src.vEncoded;
    vBinary                := Src.vObjectValue in [ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob];
    vJSONValue.ObjectValue := Src.vObjectValue;
@@ -4790,12 +4786,12 @@ Begin
  If TestNilParam Then
   Exit;
  vJSONValue.Encoded      := vEncoded;
- vJSONValue.JsonMode     := vJsonMode;
+ vJSONValue.DataMode     := vDataMode;
  vJSONValue.TypeObject   := vTypeObject;
  vJSONValue.vtagName     := vParamName;
  vJSONValue.vObjectValue := vObjectValue;
  Result := vJSONValue.ToJSON;
- If vJsonMode = jmPureJSON Then
+ If vDataMode = dmRaw Then
   Begin
    If Not(((Pos('{', Result) > 0)   And
            (Pos('}', Result) > 0))  Or
@@ -4994,7 +4990,7 @@ Begin
   ovExtended        : Begin
                        vEncoded     := False;
                        vObjectValue := ovFloat;
-                       SetValue(BuildStringFloat(FloatToStr(Value), JsonMode, vFloatDecimalFormat), vEncoded);
+                       SetValue(BuildStringFloat(FloatToStr(Value), DataMode, vFloatDecimalFormat), vEncoded);
                       End;
   ovDate,
   ovTime,
@@ -5376,7 +5372,7 @@ Begin
  If TestNilParam Then
   Exit;
  vEncoded := Encode;
- vJSONValue.JsonMode := vJsonMode;
+ vJSONValue.DataMode := vDataMode;
  vJSONValue.vEncoded := vEncoded;
  vBinary := vObjectValue in [ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob];
  vJSONValue.ObjectValue := vObjectValue;
@@ -5402,7 +5398,7 @@ Procedure TJSONParam.ToBytes  (Value  : String;
 Begin
  If TestNilParam Then
   Exit;
- vJSONValue.JsonMode := vJsonMode;
+ vJSONValue.DataMode := vDataMode;
  vObjectValue        := ovBlob;
  vBinary             := vObjectValue in [ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob];
  If vBinary Then
@@ -5501,7 +5497,7 @@ Begin
  Else If Param.DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongword, ftExtended, ftSingle,{$IFEND}{$ENDIF}
                             ftAutoInc, ftInteger, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftShortint, {$IFEND}{$ENDIF}
                             ftSmallint, ftLargeint, ftFloat, ftCurrency, ftFMTBcd, ftBCD] Then
-  SetValue(BuildStringFloat(Param.AsString, JsonMode, vFloatDecimalFormat), False)
+  SetValue(BuildStringFloat(Param.AsString, DataMode, vFloatDecimalFormat), False)
  Else If Param.DataType In [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
   Begin
    MemoryStream := TMemoryStream.Create;
@@ -5713,7 +5709,7 @@ Constructor TRESTDWParams.Create;
 Begin
  Inherited;
  vCripto       := TCripto.Create;
- vJsonMode     := jmDataware;
+ vDataMode     := dmDataware;
  vHeaders      := TRESTDWHeaders.Create;
  vUrl_Redirect := '';
  {$IFNDEF FPC}
@@ -5800,7 +5796,7 @@ Begin
     Begin
      If TJSONParam(TList(Self).Items[i]^).vObjectValue <> ovUnknown Then
       Begin
-       TJSONParam(TList(Self).Items[i]^).JsonMode := JsonMode;
+       TJSONParam(TList(Self).Items[i]^).DataMode := DataMode;
        If I = 0 Then
         Result := TJSONParam(TList(Self).Items[i]^).ToJSON
        Else
@@ -5968,7 +5964,7 @@ Begin
  New(vItem);
  vItem^                  := Item;
  vItem^.vEncoding        := vEncoding;
- vItem^.JsonMode         := vJsonMode;
+ vItem^.DataMode         := vDataMode;
  vItem^.CriptOptions.Use := vCripto.Use;
  vItem^.CriptOptions.Key := vCripto.Key;
  {$IFDEF FPC}
@@ -6040,8 +6036,8 @@ Var
     //Encoded
     B := aParam.Encoded;
     Stream.Write(B, Sizeof(WordBool));
-    //JsonMode
-    T := DWFieldTypeSize(aParam.JsonMode);
+    //DataMode
+    T := DWFieldTypeSize(aParam.DataMode);
     Stream.Write(T, Sizeof(DWFieldTypeSize));
     //TypeObject
     T := DWFieldTypeSize(aParam.vTypeObject);
@@ -6409,9 +6405,9 @@ Var
     //Encoded
     Stream.ReadBuffer(B, Sizeof(WordBool));
     vItem.Encoded := B;
-    //JsonMode
+    //DataMode
     Stream.ReadBuffer(T, Sizeof(DWFieldTypeSize));
-    vItem.JsonMode := TJsonMode(T);
+    vItem.DataMode := TDataMode(T);
     //TypeObject
     Stream.ReadBuffer(T, Sizeof(DWFieldTypeSize));
     vItem.vTypeObject := TTypeObject(T);
