@@ -1555,14 +1555,13 @@ Begin
   For A := 0 To bValue.Recordcount -1 Do
    Begin
     Case DataModeD Of
-     dmDataware,
-     jmUndefined : Begin
+     dmDataware : Begin
                     If vRecNo = 1 Then //pr-19/08/2020
                      vLines := Format('{"line%d":[%s]}',            [A, GenerateLine])
                     Else
                      vLines := vLines + Format(', {"line%d":[%s]}', [A, GenerateLine]);
                    End;
-     jmPureJSON : Begin
+     dmRaw : Begin
                     If vRecNo = 1 Then //pr-19/08/2020
                     vLines := Format('{%s}', [GenerateLine])
                    Else
