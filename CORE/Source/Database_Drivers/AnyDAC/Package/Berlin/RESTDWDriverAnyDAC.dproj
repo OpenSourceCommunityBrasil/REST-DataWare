@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{6CA2600B-3957-4234-A053-9A1513F4ED37}</ProjectGuid>
-        <MainSource>RESTDWDriverAD.dpk</MainSource>
+        <MainSource>RESTDWDriverAnyDAC.dpk</MainSource>
         <ProjectVersion>19.4</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
@@ -69,7 +69,7 @@
         <GenPackage>true</GenPackage>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <GenDll>true</GenDll>
-        <SanitizedProjectName>RESTDWDriverAD</SanitizedProjectName>
+        <SanitizedProjectName>RESTDWDriverAnyDAC</SanitizedProjectName>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
@@ -184,7 +184,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">RESTDWDriverAD.dpk</Source>
+                    <Source Name="MainSource">RESTDWDriverAnyDAC.dpk</Source>
                 </Source>
                 <Excluded_Packages/>
                 <VersionInfo>
@@ -246,9 +246,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\RESTDWDriverAD.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\..\..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWDriverAnyDAC.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>RESTDWDriverAD.bpl</RemoteName>
+                        <RemoteName>RESTDWDriverAnyDAC.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

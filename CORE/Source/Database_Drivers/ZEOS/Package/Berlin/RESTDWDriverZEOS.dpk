@@ -25,7 +25,7 @@ package RESTDWDriverZEOS;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'REST Dataware CORE - Driver ZEOS'}
+{$DESCRIPTION 'REST Dataware - Driver ZEOS'}
 {$IMPLICITBUILD ON}
 
 requires
@@ -44,6 +44,6 @@ requires
   ZParseSql;
 
 contains
-  uRestDWDriverZEOS in '..\..\uRestDWDriverZEOS.pas';
+  uRESTDWDriverZEOS in '..\..\uRESTDWDriverZEOS.pas';
 
 end.

@@ -134,9 +134,6 @@
         <DCCReference Include="..\..\..\Source\ShellTools\Delphi\uRESTDWShellServicesReg.pas">
             <Form>$ENDIF</Form>
         </DCCReference>
-        <RcCompile Include="RESTDWShellServices.rc">
-            <Form>RESTDWShellServices.res</Form>
-        </RcCompile>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

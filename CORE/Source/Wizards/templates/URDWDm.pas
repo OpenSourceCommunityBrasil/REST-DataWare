@@ -3,25 +3,17 @@ Unit %0:s;
 Interface
 
 Uses
-  SysUtils,
-  Classes,
-  SysTypes,
-  UDWDatamodule,
-  UDWJSONObject,
-  Dialogs,
-  ServerUtils,
-  UDWConstsData,
-  URESTDWPoolerDB,
-  uDWConsts, uRESTDWServerEvents,
-  uSystemEvents, uDWAbout,
-  uRESTDWServerContext,
-  DB;
+  SysUtils, Classes,
+  uRESTDWAbout, uRESTDWServerEvents, uRESTDWDatamodule, uRESTDWParams,
+  uRESTDWConsts;
 
 Type
   T%1:s = class(%2:s)
-    RESTDWPoolerDB1: TRESTDWPoolerDB;
-    procedure DWServerEvents1EventshelloworldReplyEvent(var Params: TDWParams;
-      var Result: string);
+    RESTDWServerEvents1: TRESTDWServerEvents;
+    procedure RESTDWServerEvents1EventstesteReplyEventByType
+      (var Params: TRESTDWParams; var Result: string;
+      const RequestType: TRequestType; var StatusCode: Integer;
+      RequestHeader: TStringList);
   Private
     { Private declarations }
   Public
@@ -35,10 +27,17 @@ Implementation
 
 {$R *.dfm}
 
-procedure T%1:s.DWServerEvents1EventshelloworldReplyEvent(
-  var Params: TDWParams; var Result: string);
+procedure T%1:s.RESTDWServerEvents1EventstesteReplyEventByType
+  (var Params: TRESTDWParams; var Result: string;
+  const RequestType: TRequestType; var StatusCode: Integer;
+  RequestHeader: TStringList);
 begin
- Result := '{"Message":"Hello World...RDW Online..."}';
+  case RequestType of
+    rtGet, rtDelete:
+      StatusCode := 200;
+    rtPost, rtPut, rtPatch:
+      StatusCode := 201;
+  end;
 end;
 
 End.

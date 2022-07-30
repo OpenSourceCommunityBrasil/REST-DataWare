@@ -33,19 +33,20 @@ requires
   designide,
   dcldb,
   soaprtl,
-  {$IFDEF VER150}
+{$IFDEF VER150}
   IndySystem70,
   IndyProtocols70,
   IndyCore70,
-  {$ELSE}
+{$ELSE}
   IndySystem,
   IndyProtocols,
   IndyCore,
-  {$ENDIF}
+{$ENDIF}
   RESTDWCore;
 
 contains
-  uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas' {$IFDEF WIN32},
+  uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas'
+  {$IFDEF WIN32},
   uRESTDWIdReg in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdReg.pas' {$ENDIF};
 
 end.
