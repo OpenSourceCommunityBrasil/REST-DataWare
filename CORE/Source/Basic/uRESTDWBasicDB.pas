@@ -27,24 +27,21 @@ interface
 
 Uses
  {$IFDEF FPC}
-  SysUtils,  Classes, Db, SyncObjs, Variants, uRESTDWDataUtils, uRESTDWAbout, uRESTDWBasicTypes,
+  SysUtils,  Classes, Db, SyncObjs, Variants, uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes,
   uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
   uRESTDWMassiveBuffer, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWConsts,
   uRESTDWDataset,
- {$IFNDEF RESTDWLAMW}Controls, Forms, memds, BufDataset, {$ENDIF}uRESTDWMasterDetailData
-  {$IFNDEF UNIX}, Windows{$ENDIF}
+ {$IFNDEF RESTDWLAMW}memds, BufDataset, {$ENDIF}uRESTDWMasterDetailData
  {$ELSE}
   {$IF Defined(RESTDWFMX)}
-   {$IFNDEF RESTDWAndroidService}System.UITypes, FMX.Forms, {$ENDIF}
-  {$ELSE}
-   {$IF CompilerVersion <= 22}Windows, Forms, Controls, {$ELSE}VCL.Forms, VCL.Controls, Windows, {$IFEND}
+   {$IFNDEF RESTDWAndroidService}System.UITypes, {$ENDIF}
   {$IFEND}
   {$if CompilerVersion > 24} // Delphi 2010 acima
-   System.SysUtils, System.Classes, Db, SyncObjs, uRESTDWDataUtils, uRESTDWAbout, uRESTDWBasicTypes,
+   System.SysUtils, System.Classes, Db, SyncObjs, uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes,
    uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
    uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData, uRESTDWDataset
   {$ELSE}
-   SysUtils, Classes, Db, SyncObjs, uRESTDWDataUtils, uRESTDWAbout, uRESTDWBasicTypes,
+   SysUtils, Classes, Db, SyncObjs, uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes,
    uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
    uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData, uRESTDWDataset
   {$IFEND}
@@ -626,9 +623,9 @@ Type
   vActualPoolerMethodClient : TRESTDWPoolerMethodClient;
   vOldState             : TDatasetState;
   vOldCursor,
-  {$IFNDEF RESTDWAndroidService}
-  vActionCursor         : TCursor;
-  {$ENDIF}
+//  {$IFNDEF RESTDWAndroidService}
+//  vActionCursor         : TCursor;
+//  {$ENDIF}
   vDWResponseTranslator : TRESTDWResponseTranslator;
   vUpdateSQL            : TRESTDWUpdateSQL;
   vMasterDetailItem     : TMasterDetailItem;
@@ -783,10 +780,10 @@ Type
   procedure   CreateMassiveDataset;
   procedure   SetParams(const Value: TParams);
   Procedure   CleanFieldList;
-  Procedure   GetTmpCursor;
-  Procedure   SetCursor;
-  Procedure   SetOldCursor;
-  Procedure   ChangeCursor(OldCursor : Boolean = False);
+//  Procedure   GetTmpCursor;
+//  Procedure   SetCursor;
+//  Procedure   SetOldCursor;
+//  Procedure   ChangeCursor(OldCursor : Boolean = False);
   Procedure   SetDatapacks(Value : Integer);
   Procedure   SetReflectChanges(Value       : Boolean);
   Procedure   SetAutoRefreshAfterCommit(Value : Boolean);
@@ -930,7 +927,7 @@ Type
   Property OnNewRecord             : TDatasetEvents        Read vNewRecord                Write vNewRecord;
   Property MassiveCache            : TRESTDWMassiveCache   Read GetMassiveCache           Write SetMassiveCache;
   Property Filtered                : Boolean               Read vFiltered                 Write SetFilteredB;
-  Property ActionCursor            : TCursor               Read vActionCursor             Write vActionCursor;
+//  Property ActionCursor            : TCursor               Read vActionCursor             Write vActionCursor;
   Property ReflectChanges          : Boolean               Read vReflectChanges           Write SetReflectChanges;
 End;
 
@@ -940,8 +937,8 @@ Type
  Private
   vActualPoolerMethodClient : TRESTDWPoolerMethodClient;
   vOldState             : TDatasetState;
-  vOldCursor,
-  vActionCursor         : TCursor;
+//  vOldCursor,
+//  vActionCursor         : TCursor;
   vDWResponseTranslator : TRESTDWResponseTranslator;
   vUpdateSQL            : TRESTDWUpdateSQL;
   vMasterDetailItem     : TMasterDetailItem;
@@ -1043,10 +1040,10 @@ Type
   procedure   CreateMassiveDataset;
   procedure   SetParams(const Value: TParams);
   Procedure   CleanFieldList;
-  Procedure   GetTmpCursor;
-  Procedure   SetCursor;
-  Procedure   SetOldCursor;
-  Procedure   ChangeCursor(OldCursor : Boolean = False);
+//  Procedure   GetTmpCursor;
+//  Procedure   SetCursor;
+//  Procedure   SetOldCursor;
+//  Procedure   ChangeCursor(OldCursor : Boolean = False);
   Procedure   SetDatapacks(Value : Integer);
   Procedure   SetAutoRefreshAfterCommit(Value : Boolean);
   Function    ProcessChanges   (MassiveJSON : String): Boolean;
@@ -1175,7 +1172,7 @@ Type
   Property MassiveCache            : TRESTDWMassiveCache       Read GetMassiveCache           Write SetMassiveCache;
   Property Filtered                : Boolean               Read vFiltered                 Write SetFilteredB;
   Property ResponseTranslator      : TRESTDWResponseTranslator Read GetDWResponseTranslator   Write SetDWResponseTranslator;
-  Property ActionCursor            : TCursor               Read vActionCursor             Write vActionCursor;
+//  Property ActionCursor            : TCursor               Read vActionCursor             Write vActionCursor;
 End;
 
 
@@ -6041,53 +6038,53 @@ Begin
  vNotRepage := Value;
 End;
 
-Procedure TRESTDWTable.SetOldCursor;
-{$IFNDEF FPC}
-{$IFDEF WINFMX}
-Var
- CS: IFMXCursorService;
-{$ENDIF}
-{$ENDIF}
-Begin
-{$IFNDEF FPC}
- {$IFDEF WINFMX}
-  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
-   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
-  If Assigned(CS) then
-   CS.SetCursor(vOldCursor);
- {$ELSE}
-  {$IFNDEF HAS_FMX}
-   Screen.Cursor := vOldCursor;
-  {$ENDIF}
- {$ENDIF}
-{$ELSE}
- Screen.Cursor := vOldCursor;
-{$ENDIF}
-End;
-
-Procedure TRESTDWClientSQL.SetOldCursor;
-{$IFNDEF FPC}
-{$IFDEF WINFMX}
-Var
- CS: IFMXCursorService;
-{$ENDIF}
-{$ENDIF}
-Begin
-{$IFNDEF FPC}
- {$IFDEF WINFMX}
-  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
-   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
-  If Assigned(CS) then
-   CS.SetCursor(vOldCursor);
- {$ELSE}
-  {$IFNDEF HAS_FMX}
-   Screen.Cursor := vOldCursor;
-  {$ENDIF}
- {$ENDIF}
-{$ELSE}
- Screen.Cursor := vOldCursor;
-{$ENDIF}
-End;
+//Procedure TRESTDWTable.SetOldCursor;
+//{$IFNDEF FPC}
+//{$IFDEF WINFMX}
+//Var
+// CS: IFMXCursorService;
+//{$ENDIF}
+//{$ENDIF}
+//Begin
+//{$IFNDEF FPC}
+// {$IFDEF WINFMX}
+//  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
+//   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
+//  If Assigned(CS) then
+//   CS.SetCursor(vOldCursor);
+// {$ELSE}
+//  {$IFNDEF HAS_FMX}
+//   Screen.Cursor := vOldCursor;
+//  {$ENDIF}
+// {$ENDIF}
+//{$ELSE}
+// Screen.Cursor := vOldCursor;
+//{$ENDIF}
+//End;
+//
+//Procedure TRESTDWClientSQL.SetOldCursor;
+//{$IFNDEF FPC}
+//{$IFDEF WINFMX}
+//Var
+// CS: IFMXCursorService;
+//{$ENDIF}
+//{$ENDIF}
+//Begin
+//{$IFNDEF FPC}
+// {$IFDEF WINFMX}
+//  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
+//   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
+//  If Assigned(CS) then
+//   CS.SetCursor(vOldCursor);
+// {$ELSE}
+//  {$IFNDEF HAS_FMX}
+//   Screen.Cursor := vOldCursor;
+//  {$ENDIF}
+// {$ENDIF}
+//{$ELSE}
+// Screen.Cursor := vOldCursor;
+//{$ENDIF}
+//End;
 
 Procedure TRESTDWTable.SetParams(const Value: TParams);
 begin
@@ -6204,7 +6201,7 @@ Begin
  Inherited AfterDelete             := OldAfterDelete;
  {$ENDIF}
  vMassiveDataset                   := TMassiveDatasetBuffer.Create(Self);
- vActionCursor                     := crHourGlass;
+// vActionCursor                     := crHourGlass;
  vUpdateSQL                        := Nil;
  SetComponentTAG;
 End;
@@ -6305,7 +6302,7 @@ Begin
  Inherited AfterDelete             := OldAfterDelete;
  {$ENDIF}
  vMassiveDataset                   := TMassiveDatasetBuffer.Create(Self);
- vActionCursor                     := crHourGlass;
+// vActionCursor                     := crHourGlass;
  vUpdateSQL                        := Nil;
  SetComponentTAG;
 End;
@@ -8465,7 +8462,7 @@ Begin
  vResult       := Nil;
  vRowsAffected := 0;
  Try
-  ChangeCursor;
+//  ChangeCursor;
   Result := False;
   If MassiveType = mtMassiveObject Then
    Begin
@@ -8503,7 +8500,7 @@ Begin
     End;
    End;
  Finally
-  ChangeCursor(True);
+//  ChangeCursor(True);
  End;
 End;
 
@@ -8833,27 +8830,27 @@ Begin
  CreateDataset;
 End;
 
-Procedure TRESTDWTable.ChangeCursor(OldCursor : Boolean = False);
-Begin
- If Not OldCursor Then
-  Begin
-   GetTmpCursor;
-   SetCursor;
-  End
- Else
-  SetOldCursor;
-End;
+//Procedure TRESTDWTable.ChangeCursor(OldCursor : Boolean = False);
+//Begin
+// If Not OldCursor Then
+//  Begin
+//   GetTmpCursor;
+//   SetCursor;
+//  End
+// Else
+//  SetOldCursor;
+//End;
 
-Procedure TRESTDWClientSQL.ChangeCursor(OldCursor : Boolean = False);
-Begin
- If Not OldCursor Then
-  Begin
-   GetTmpCursor;
-   SetCursor;
-  End
- Else
-  SetOldCursor;
-End;
+//Procedure TRESTDWClientSQL.ChangeCursor(OldCursor : Boolean = False);
+//Begin
+// If Not OldCursor Then
+//  Begin
+//   GetTmpCursor;
+//   SetCursor;
+//  End
+// Else
+//  SetOldCursor;
+//End;
 
 procedure TRESTDWTable.CleanFieldList;
 Var
@@ -9363,13 +9360,13 @@ Procedure TRESTDWClientSQL.ThreadDestroy;
 Begin
  Try
   vThreadRequest.Kill;
-  {$IFDEF FPC}
-   WaitForThreadTerminate(vThreadRequest.Handle, INFINITE);
-  {$ELSE}
-   {$IF Not Defined(RESTDWFMX)}
-    WaitForSingleObject  (vThreadRequest.Handle, INFINITE);
-   {$IFEND}
-  {$ENDIF}
+//  {$IFDEF FPC}
+//   WaitForThreadTerminate(vThreadRequest.Handle, INFINITE);
+//  {$ELSE}
+//   {$IF Not Defined(RESTDWFMX)}
+//    WaitForSingleObject  (vThreadRequest.Handle, INFINITE);
+//   {$IFEND}
+//  {$ENDIF}
  Except
  End;
  FreeAndNil(vThreadRequest);
@@ -10057,10 +10054,10 @@ End;
 
 Procedure TRESTDWThreadRequest.ProcessMessages;
 Begin
- {$IFNDEF FPC}
-  {$IF Defined(HAS_FMX)}{$IF Not Defined(HAS_UTF8)}FMX.Forms.TApplication.ProcessMessages;{$IFEND}
-  {$ELSE}Application.Processmessages;{$IFEND}
- {$ENDIF}
+// {$IFNDEF FPC}
+//  {$IF Defined(HAS_FMX)}{$IF Not Defined(HAS_UTF8)}FMX.Forms.TApplication.ProcessMessages;{$IFEND}
+//  {$ELSE}Application.Processmessages;{$IFEND}
+// {$ENDIF}
 End;
 
 {$IFDEF FPC}
@@ -11247,63 +11244,63 @@ Begin
   Result := Inherited GetRecordCount;
 End;
 
-Procedure TRESTDWTable.GetTmpCursor;
-{$IFNDEF FPC}
-{$IFDEF WINFMX}
-Var
- CS: IFMXCursorService;
-{$ENDIF}
-{$ENDIF}
-Begin
-{$IFNDEF FPC}
- {$IFDEF WINFMX}
-  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
-   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
-  If Assigned(CS) then
-   Begin
-    If CS.GetCursor <> vActionCursor Then
-     vOldCursor := CS.GetCursor;
-   End;
- {$ELSE}
-  {$IFNDEF HAS_FMX}
-  If Screen.Cursor <> vActionCursor Then
-   vOldCursor := Screen.Cursor;
-  {$ENDIF}
- {$ENDIF}
-{$ELSE}
- If Screen.Cursor <> vActionCursor Then
-  vOldCursor := Screen.Cursor;
-{$ENDIF}
-End;
-
-Procedure TRESTDWClientSQL.GetTmpCursor;
-{$IFNDEF FPC}
-{$IFDEF WINFMX}
-Var
- CS: IFMXCursorService;
-{$ENDIF}
-{$ENDIF}
-Begin
-{$IFNDEF FPC}
- {$IFDEF WINFMX}
-  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
-   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
-  If Assigned(CS) then
-   Begin
-    If CS.GetCursor <> vActionCursor Then
-     vOldCursor := CS.GetCursor;
-   End;
- {$ELSE}
-  {$IFNDEF HAS_FMX}
-  If Screen.Cursor <> vActionCursor Then
-   vOldCursor := Screen.Cursor;
-  {$ENDIF}
- {$ENDIF}
-{$ELSE}
- If Screen.Cursor <> vActionCursor Then
-  vOldCursor := Screen.Cursor;
-{$ENDIF}
-End;
+//Procedure TRESTDWTable.GetTmpCursor;
+//{$IFNDEF FPC}
+//{$IFDEF WINFMX}
+//Var
+// CS: IFMXCursorService;
+//{$ENDIF}
+//{$ENDIF}
+//Begin
+//{$IFNDEF FPC}
+// {$IFDEF WINFMX}
+//  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
+//   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
+//  If Assigned(CS) then
+//   Begin
+//    If CS.GetCursor <> vActionCursor Then
+//     vOldCursor := CS.GetCursor;
+//   End;
+// {$ELSE}
+//  {$IFNDEF HAS_FMX}
+//  If Screen.Cursor <> vActionCursor Then
+//   vOldCursor := Screen.Cursor;
+//  {$ENDIF}
+// {$ENDIF}
+//{$ELSE}
+// If Screen.Cursor <> vActionCursor Then
+//  vOldCursor := Screen.Cursor;
+//{$ENDIF}
+//End;
+//
+//Procedure TRESTDWClientSQL.GetTmpCursor;
+//{$IFNDEF FPC}
+//{$IFDEF WINFMX}
+//Var
+// CS: IFMXCursorService;
+//{$ENDIF}
+//{$ENDIF}
+//Begin
+//{$IFNDEF FPC}
+// {$IFDEF WINFMX}
+//  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
+//   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
+//  If Assigned(CS) then
+//   Begin
+//    If CS.GetCursor <> vActionCursor Then
+//     vOldCursor := CS.GetCursor;
+//   End;
+// {$ELSE}
+//  {$IFNDEF HAS_FMX}
+//  If Screen.Cursor <> vActionCursor Then
+//   vOldCursor := Screen.Cursor;
+//  {$ENDIF}
+// {$ENDIF}
+//{$ELSE}
+// If Screen.Cursor <> vActionCursor Then
+//  vOldCursor := Screen.Cursor;
+//{$ENDIF}
+//End;
 
 Procedure TRESTDWTable.SaveToStream(Var Stream : TMemoryStream);
 Begin
@@ -11391,7 +11388,7 @@ End;
 Procedure TRESTDWTable.SetActiveDB(Value: Boolean);
 Begin
  Try
-  ChangeCursor;
+//  ChangeCursor;
   If (vInactive) And Not(vInDesignEvents) Then
    Begin
     vActive := (Value) And Not(vInDesignEvents);
@@ -11497,14 +11494,14 @@ Begin
      End;
    End;
  Finally
-  ChangeCursor(True);
+//  ChangeCursor(True);
  End;
 End;
 
 procedure TRESTDWClientSQL.SetActiveDB(Value: Boolean);
 Begin
  Try
-  ChangeCursor;
+//  ChangeCursor;
   If (vInactive) And Not(vInDesignEvents) Then
    Begin
     vActive := (Value) And Not(vInDesignEvents);
@@ -11595,7 +11592,7 @@ Begin
      End;
    End;
  Finally
-  ChangeCursor(True);
+//  ChangeCursor(True);
  End;
 End;
 
@@ -11621,69 +11618,69 @@ Begin
  vCacheUpdateRecords := Value;
 End;
 
-Procedure TRESTDWTable.SetCursor;
-{$IFNDEF FPC}
-{$IFDEF WINFMX}
-Var
- CS: IFMXCursorService;
-{$ENDIF}
-{$ENDIF}
-Begin
-{$IFNDEF FPC}
- {$IFDEF WINFMX}
-  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
-   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
-  If Assigned(CS) then
-   Begin
-    If vActionCursor <> crNone Then
-     If CS.GetCursor <> vActionCursor Then
-      CS.SetCursor(vActionCursor);
-   End;
- {$ELSE}
-  {$IFNDEF HAS_FMX}
-  If vActionCursor <> crNone Then
-   If Screen.Cursor <> vActionCursor Then
-    Screen.Cursor := vActionCursor;
-  {$ENDIF}
- {$ENDIF}
-{$ELSE}
- If vActionCursor <> crNone Then
-  If Screen.Cursor <> vActionCursor Then
-   Screen.Cursor := vActionCursor;
-{$ENDIF}
-End;
-
-Procedure TRESTDWClientSQL.SetCursor;
-{$IFNDEF FPC}
-{$IFDEF WINFMX}
-Var
- CS: IFMXCursorService;
-{$ENDIF}
-{$ENDIF}
-Begin
-{$IFNDEF FPC}
- {$IFDEF WINFMX}
-  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
-   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
-  If Assigned(CS) then
-   Begin
-    If vActionCursor <> crNone Then
-     If CS.GetCursor <> vActionCursor Then
-      CS.SetCursor(vActionCursor);
-   End;
- {$ELSE}
-  {$IFNDEF HAS_FMX}
-  If vActionCursor <> crNone Then
-   If Screen.Cursor <> vActionCursor Then
-    Screen.Cursor := vActionCursor;
-  {$ENDIF}
- {$ENDIF}
-{$ELSE}
- If vActionCursor <> crNone Then
-  If Screen.Cursor <> vActionCursor Then
-   Screen.Cursor := vActionCursor;
-{$ENDIF}
-End;
+//Procedure TRESTDWTable.SetCursor;
+//{$IFNDEF FPC}
+//{$IFDEF WINFMX}
+//Var
+// CS: IFMXCursorService;
+//{$ENDIF}
+//{$ENDIF}
+//Begin
+//{$IFNDEF FPC}
+// {$IFDEF WINFMX}
+//  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
+//   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
+//  If Assigned(CS) then
+//   Begin
+//    If vActionCursor <> crNone Then
+//     If CS.GetCursor <> vActionCursor Then
+//      CS.SetCursor(vActionCursor);
+//   End;
+// {$ELSE}
+//  {$IFNDEF HAS_FMX}
+//  If vActionCursor <> crNone Then
+//   If Screen.Cursor <> vActionCursor Then
+//    Screen.Cursor := vActionCursor;
+//  {$ENDIF}
+// {$ENDIF}
+//{$ELSE}
+// If vActionCursor <> crNone Then
+//  If Screen.Cursor <> vActionCursor Then
+//   Screen.Cursor := vActionCursor;
+//{$ENDIF}
+//End;
+//
+//Procedure TRESTDWClientSQL.SetCursor;
+//{$IFNDEF FPC}
+//{$IFDEF WINFMX}
+//Var
+// CS: IFMXCursorService;
+//{$ENDIF}
+//{$ENDIF}
+//Begin
+//{$IFNDEF FPC}
+// {$IFDEF WINFMX}
+//  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
+//   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
+//  If Assigned(CS) then
+//   Begin
+//    If vActionCursor <> crNone Then
+//     If CS.GetCursor <> vActionCursor Then
+//      CS.SetCursor(vActionCursor);
+//   End;
+// {$ELSE}
+//  {$IFNDEF HAS_FMX}
+//  If vActionCursor <> crNone Then
+//   If Screen.Cursor <> vActionCursor Then
+//    Screen.Cursor := vActionCursor;
+//  {$ENDIF}
+// {$ENDIF}
+//{$ELSE}
+// If vActionCursor <> crNone Then
+//  If Screen.Cursor <> vActionCursor Then
+//   Screen.Cursor := vActionCursor;
+//{$ENDIF}
+//End;
 
 constructor TRESTDWStoredProc.Create(AOwner: TComponent);
 begin

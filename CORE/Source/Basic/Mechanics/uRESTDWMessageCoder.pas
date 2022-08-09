@@ -26,7 +26,7 @@ unit uRESTDWMessageCoder;
 Interface
 
 uses
-  Classes, SysUtils, uRESTDWAbout, uRESTDWMessage, uRESTDWTools, uRESTDWConsts, uRESTDWException;
+  Classes, SysUtils, uRESTDWComponentBase, uRESTDWMessage, uRESTDWTools, uRESTDWConsts, uRESTDWException;
 
   Type
    TRESTDWMessageCoderPartType = (mcptText, mcptAttachment, mcptIgnore, mcptEOF);

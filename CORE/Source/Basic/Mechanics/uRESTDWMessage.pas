@@ -30,7 +30,7 @@ Uses
  uRESTDWAttachment,
  uRESTDWHeaderList,
  uRESTDWMessageParts,
- uRESTDWAbout,
+ uRESTDWComponentBase,
  uRESTDWException;
 
 Type

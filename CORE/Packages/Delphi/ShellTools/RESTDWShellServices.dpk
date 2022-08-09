@@ -32,20 +32,13 @@ requires
   dcldb,
   soaprtl,
   inet,
-{$IFDEF VER150}
-  bdertl,
-{$ELSE}
-  FireDAC, FireDACCommonDriver, FireDACCommon,
-{$ENDIF}
-  RESTDWCore
-
-    ;
+  RESTDWCore,
+  FireDAC,
+  FireDACCommonDriver,
+  FireDACCommon;
 
 contains
-  uRESTDWShellServices
-    in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServices.pas'
-{$IFDEF WIN32},
-  uRESTDWShellServicesReg
-    in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServicesReg.pas' {$ENDIF};
+  uRESTDWShellServices in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServices.pas' {$IFDEF WIN32},
+  uRESTDWShellServicesReg in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServicesReg.pas' {$ENDIF};
 
 end.

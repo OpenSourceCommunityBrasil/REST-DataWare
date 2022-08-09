@@ -30,7 +30,7 @@ Uses
  SysUtils,
  uRESTDWBasicTypes,
  uRESTDWException,
- uRESTDWAbout,
+ uRESTDWComponentBase,
  uRESTDWMessage,
  uRESTDWTools,
  uRESTDWCoder,

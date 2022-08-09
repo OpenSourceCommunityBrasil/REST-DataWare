@@ -28,12 +28,12 @@ Interface
 Uses
  uRESTDWConsts, FMTBcd, uRESTDWEncodeClass, uRESTDWCharset,
  {$IFDEF FPC}
-  SysUtils,  Classes, Db, uRESTDWAbout
+  SysUtils,  Classes, Db, uRESTDWComponentBase
  {$ELSE}
   {$if CompilerVersion > 24} // Delphi 2010 pra cima
-   System.SysUtils, System.Classes, Data.DB, uRESTDWAbout
+   System.SysUtils, System.Classes, Data.DB, uRESTDWComponentBase
   {$ELSE}
-   SysUtils, Classes, Db, DbTables, uRESTDWAbout
+   SysUtils, Classes, Db, DbTables, uRESTDWComponentBase
   {$IFEND}
  {$ENDIF}
  {$IFDEF FPC}
@@ -2993,9 +2993,9 @@ Var
   {$IFNDEF FPC}
     //Aqui codigo se for compilado Linux no Delphi
   {$ELSE}
-   LoadMIME('/etc/mime.types', AMIMEList);                   {do not localize}
-   LoadMIME('/etc/htdig/mime.types', AMIMEList);             {do not localize}
-   LoadMIME('/etc/usr/share/webmin/mime.types', AMIMEList);  {do not localize}
+//   LoadMIME('/etc/mime.types', AMIMEList);                   {do not localize}
+//   LoadMIME('/etc/htdig/mime.types', AMIMEList);             {do not localize}
+//   LoadMIME('/etc/usr/share/webmin/mime.types', AMIMEList);  {do not localize}
    {$ENDIF}
   {$ENDIF}
  End;

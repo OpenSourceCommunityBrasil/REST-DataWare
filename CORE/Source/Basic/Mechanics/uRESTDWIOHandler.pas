@@ -31,7 +31,7 @@ Uses
  uRESTDWBuffer,
  uRESTDWBasicTypes,
  uRESTDWTools,
- uRESTDWAbout,
+ uRESTDWComponentBase,
  uRESTDWConsts;
 
 Const

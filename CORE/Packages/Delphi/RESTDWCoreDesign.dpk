@@ -1,6 +1,5 @@
-package RESTDWSocketIndy;
+package RESTDWCoreDesign;
 
-{$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -25,24 +24,24 @@ package RESTDWSocketIndy;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'REST Dataware Indy Sockets'}
-{$IMPLICITBUILD ON}
+{$DESCRIPTION 'REST Dataware Design'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+{$IFNDEF FPC}
+{$IFDEF VER150 or VER160 or VER170 or VER180 or VER185 or VER190 or VER200 or VER210 orVER220}
+{$R RESTDWCoreDesign.res RESTDWCoreDesign.rc}
+{$ELSE}
+{$R *.res}
+{$R *.dres}
+{$IFEND}
+{$ENDIF}
 
 requires
   rtl,
-  designide,
-  dcldb,
-  soaprtl,
-  RESTDWCore,
-  IndySystem,
-  IndyProtocols,
-  IndyCore,
-  FireDAC,
-  FireDACCommonDriver,
-  FireDACCommon;
+  RESTDWCore;
 
-//contains
-//  uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas' {$IFDEF WIN32},
-//  uRESTDWIdReg in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdReg.pas' {$ENDIF};
+contains
+  uRESTDWDesignReg in 'uRESTDWDesignReg.pas';
 
 end.

@@ -27,7 +27,7 @@ interface
 
 Uses
    SysUtils, Classes, Db, HTTPDefs, LConvEncoding, Variants, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass, uRESTDWAbout, uRESTDWTools;
+   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass, uRESTDWComponentBase, uRESTDWTools;
 
 Type
  TRESTDWShellService = Class(TRESTShellServicesBase)

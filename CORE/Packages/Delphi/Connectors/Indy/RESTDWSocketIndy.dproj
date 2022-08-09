@@ -106,11 +106,11 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <VerInfo_Build>90</VerInfo_Build>
+        <VerInfo_Build>92</VerInfo_Build>
         <DCC_Description>REST Dataware Indy Sockets</DCC_Description>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=1.0.1.90;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.1;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=1.0.1.92;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.1;Comments=</VerInfo_Keys>
         <VerInfo_Release>1</VerInfo_Release>
         <VerInfo_Locale>1046</VerInfo_Locale>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
@@ -129,16 +129,13 @@
         <DCCReference Include="designide.dcp"/>
         <DCCReference Include="dcldb.dcp"/>
         <DCCReference Include="soaprtl.dcp"/>
+        <DCCReference Include="RESTDWCore.dcp"/>
         <DCCReference Include="IndySystem.dcp"/>
         <DCCReference Include="IndyProtocols.dcp"/>
         <DCCReference Include="IndyCore.dcp"/>
-        <DCCReference Include="RESTDWCore.dcp"/>
-        <DCCReference Include="..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas">
-            <Form>$IFDEF WIN32</Form>
-        </DCCReference>
-        <DCCReference Include="..\..\..\..\Source\Sockets\Indy\uRESTDWIdReg.pas">
-            <Form>$ENDIF</Form>
-        </DCCReference>
+        <DCCReference Include="FireDAC.dcp"/>
+        <DCCReference Include="FireDACCommonDriver.dcp"/>
+        <DCCReference Include="FireDACCommon.dcp"/>
         <RcCompile Include="RESTDWSocketIndy.rc">
             <Form>RestDatawareIndySockets.res</Form>
         </RcCompile>
@@ -188,7 +185,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWSocketIndy.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\RESTDWSocketIndy.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>RESTDWSocketIndy.bpl</RemoteName>
                         <Overwrite>true</Overwrite>

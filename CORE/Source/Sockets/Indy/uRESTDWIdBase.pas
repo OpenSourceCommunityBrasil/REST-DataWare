@@ -29,14 +29,14 @@ Uses
  {$IFDEF FPC}
  SysUtils,      Classes, Db, Variants, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
  uRESTDWBasic, uRESTDWBasicDB, uRESTDWConsts, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
- uRESTDWParams, uRESTDWBasicClass, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWAbout
+ uRESTDWParams, uRESTDWBasicClass, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWComponentBase
  {$ELSE}
   {$IF CompilerVersion <= 22}
    SysUtils, Classes, Db, Variants, EncdDecd, SyncObjs, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass, uRESTDWAbout
+   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass, uRESTDWComponentBase
   {$ELSE}
    System.SysUtils, System.Classes, Data.Db, Variants, system.SyncObjs, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
+   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWComponentBase,
    {$IF Defined(RESTDWFMX)}{$IFNDEF RESTDWAndroidService}FMX.Forms,{$ENDIF}
    {$ELSE}
     {$IF CompilerVersion <= 22}Forms,
@@ -394,11 +394,13 @@ begin
  HttpRequest.ProxyParams.ProxyPassword         := ProxyOptions.ProxyPassword;
  HttpRequest.ProxyParams.ProxyPort             := ProxyOptions.ProxyPort;
  HttpRequest.ReadTimeout                       := RequestTimeout;
- HttpRequest.Request.ContentType               := HttpRequest.Request.ContentType;
- HttpRequest.AllowCookies                      := HttpRequest.AllowCookies;
- HttpRequest.HandleRedirects                   := HttpRequest.HandleRedirects;
+ HttpRequest.Request.ContentType               := ContentType;
+ HttpRequest.Request.Accept                    := Accept;
+ HttpRequest.Request.AcceptEncoding            := AcceptEncoding;
+ HttpRequest.AllowCookies                      := AllowCookies;
+ HttpRequest.HandleRedirects                   := HandleRedirects;
  HttpRequest.RedirectMaximum                   := RedirectMaximum;
- HttpRequest.HTTPOptions                       := HttpRequest.HTTPOptions;
+ HttpRequest.HTTPOptions                       := [hoKeepOrigProtocol];
  If RequestCharset = esUtf8 Then
   Begin
    HttpRequest.Request.Charset                  := 'utf-8';

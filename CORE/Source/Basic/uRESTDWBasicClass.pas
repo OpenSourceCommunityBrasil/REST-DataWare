@@ -25,7 +25,7 @@ unit uRESTDWBasicClass;
 
 interface
 
-Uses uRESTDWAbout, uRESTDWConsts,
+Uses uRESTDWComponentBase, uRESTDWConsts,
      {$IFDEF FPC}
       SysUtils, Classes
      {$ELSE}

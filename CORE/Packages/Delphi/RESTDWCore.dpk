@@ -1,6 +1,5 @@
 package RESTDWCore;
 
-{$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -25,25 +24,36 @@ package RESTDWCore;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'REST Dataware Base'}
+{$DESCRIPTION 'REST Dataware Base Runtime'}
+{$RUNONLY}
 {$IMPLICITBUILD OFF}
 
+{$IFNDEF FPC}
+{$IFDEF VER150 or VER160 or VER170 or VER180 or VER185 or VER190 or VER200 or VER210 orVER220}
+{$R RESTDWCoreDesign.res RESTDWCoreDesign.rc}
+{$ELSE}
+{$R *.res}
+{$R *.dres}
+{$IFEND}
+{$ENDIF}
+
 requires
-  rtl,
-  designide,
+{$IFDEF VER150 or VER160 or VER170 or VER180 or VER185 or VER190 or VER200 or VER210 orVER220}
+  bdertl,
+{$ELSE}
+  FireDAC, FireDACCommonDriver, FireDACCommon,
+{$ENDIF}
+{$IFDEF WIN32}
   dcldb,
+  designide,
+{$ENDIF}
+  rtl,
   dbrtl,
   soaprtl
-{$IFDEF VER150}
-    , bdertl
-{$ELSE}
-    , FireDAC, FireDACCommonDriver, FireDACCommon
-{$ENDIF}
     ;
 
 contains
   PropertyPersist in '..\..\Source\Basic\PropertyPersist.pas',
-  uRESTDWAbout in '..\..\Source\Basic\uRESTDWAbout.pas',
   uRESTDWBasic in '..\..\Source\Basic\uRESTDWBasic.pas',
   uRESTDWBasicDB in '..\..\Source\Basic\uRESTDWBasicDB.pas',
   uRESTDWBasicTypes in '..\..\Source\Basic\uRESTDWBasicTypes.pas',
@@ -51,16 +61,6 @@ contains
   uRESTDWMasterDetailData in '..\..\Source\Basic\uRESTDWMasterDetailData.pas',
   uRESTDWParams in '..\..\Source\Basic\uRESTDWParams.pas',
   uRESTDWPoolermethod in '..\..\Source\Basic\uRESTDWPoolermethod.pas',
-  uRESTDWReg in '..\..\Source\Basic\uRESTDWReg.pas',
-  uRESTDWSqlEditor
-    in '..\..\Source\Plugins\SQLEditor\uRESTDWSqlEditor.pas' { FrmDWSqlEditor } ,
-  uRESTDWUpdSqlEditor
-    in '..\..\Source\Plugins\SQLEditor\uRESTDWUpdSqlEditor.pas' { FrmDWUpdSqlEditor } ,
-  uRESTDWFieldSourceEditor
-    in '..\..\Source\Plugins\SQLEditor\uRESTDWFieldSourceEditor.pas' { fMasterDetailRelation } ,
-  uRESTDWJSONViewer
-    in '..\..\Source\Plugins\JSONViewer\uRESTDWJSONViewer.pas' { fDWJSONViewer } ,
-  uRESTDWExprParser in '..\..\Source\Plugins\Memdataset\uRESTDWExprParser.pas',
   uRESTDWServerContext in '..\..\Source\Basic\uRESTDWServerContext.pas',
   uRESTDWServerEvents in '..\..\Source\Basic\uRESTDWServerEvents.pas',
   uRESTDWConsts in '..\..\Source\Consts\uRESTDWConsts.pas',
@@ -70,52 +70,40 @@ contains
   uRESTDWMD5 in '..\..\Source\Libs\uRESTDWMD5.pas',
   uRESTDWTools in '..\..\Source\Libs\uRESTDWTools.pas',
   uzliblaz in '..\..\Source\Libs\uzliblaz.pas',
-  uRESTDWDatamodule
-    in '..\..\Source\Plugins\DMDados\uRESTDWDatamodule.pas' { ServerMethodDataModule: TDataModule } ,
+  uRESTDWDatamodule in '..\..\Source\Plugins\DMDados\uRESTDWDatamodule.pas' {ServerMethodDataModule: TDataModule},
   uRESTDWMassiveBuffer in '..\..\Source\Libs\uRESTDWMassiveBuffer.pas',
   uRESTDWDataJSON in '..\..\Source\Libs\JSON\uRESTDWDataJSON.pas',
   uRESTDWJSON in '..\..\Source\Libs\JSON\uRESTDWJSON.pas',
   uRESTDWJSONInterface in '..\..\Source\Libs\JSON\uRESTDWJSONInterface.pas',
   uRESTDWDataset in '..\..\Source\Plugins\Memdataset\uRESTDWDataset.pas',
-  uRESTDWMessageCoderMIME
-    in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderMIME.pas',
+  uRESTDWMessageCoderMIME in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderMIME.pas',
   uRESTDWException in '..\..\Source\Basic\Mechanics\uRESTDWException.pas',
   uRESTDWMessage in '..\..\Source\Basic\Mechanics\uRESTDWMessage.pas',
   uRESTDWMessageCoder in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoder.pas',
   uRESTDWAttachment in '..\..\Source\Basic\Mechanics\uRESTDWAttachment.pas',
-  uRESTDWAttachmentFile
-    in '..\..\Source\Basic\Mechanics\uRESTDWAttachmentFile.pas',
+  uRESTDWAttachmentFile in '..\..\Source\Basic\Mechanics\uRESTDWAttachmentFile.pas',
   uRESTDWMessageParts in '..\..\Source\Basic\Mechanics\uRESTDWMessageParts.pas',
   uRESTDWHeaderList in '..\..\Source\Basic\Mechanics\uRESTDWHeaderList.pas',
   uRESTDWCoder in '..\..\Source\Basic\Mechanics\uRESTDWCoder.pas',
   uRESTDWCoderMIME in '..\..\Source\Basic\Mechanics\uRESTDWCoderMIME.pas',
   uRESTDWCoder3to4 in '..\..\Source\Basic\Mechanics\uRESTDWCoder3to4.pas',
-  uRESTDWMessageCoderQuotedPrintable
-    in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderQuotedPrintable.pas',
-  uRESTDWCoderQuotedPrintable
-    in '..\..\Source\Basic\Mechanics\uRESTDWCoderQuotedPrintable.pas',
+  uRESTDWMessageCoderQuotedPrintable in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderQuotedPrintable.pas',
+  uRESTDWCoderQuotedPrintable in '..\..\Source\Basic\Mechanics\uRESTDWCoderQuotedPrintable.pas',
   uRESTDWCoderBinHex4 in '..\..\Source\Basic\Mechanics\uRESTDWCoderBinHex4.pas',
   uRESTDWCoderHeader in '..\..\Source\Basic\Mechanics\uRESTDWCoderHeader.pas',
-  uRESTDWHeaderCoderBase
-    in '..\..\Source\Basic\Mechanics\uRESTDWHeaderCoderBase.pas',
+  uRESTDWHeaderCoderBase in '..\..\Source\Basic\Mechanics\uRESTDWHeaderCoderBase.pas',
   uRESTDWBuffer in '..\..\Source\Basic\Mechanics\uRESTDWBuffer.pas',
-  uRESTDWMessageClient
-    in '..\..\Source\Basic\Mechanics\uRESTDWMessageClient.pas',
-  uRESTDWIOHandlerStream
-    in '..\..\Source\Basic\Mechanics\uRESTDWIOHandlerStream.pas',
+  uRESTDWMessageClient in '..\..\Source\Basic\Mechanics\uRESTDWMessageClient.pas',
+  uRESTDWIOHandlerStream in '..\..\Source\Basic\Mechanics\uRESTDWIOHandlerStream.pas',
   uRESTDWIOHandler in '..\..\Source\Basic\Mechanics\uRESTDWIOHandler.pas',
-  uRESTDWMessageCoderBinHex4
-    in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderBinHex4.pas',
-  uRESTDWAboutForm
-    in '..\..\Source\Basic\Dialogs\uRESTDWAboutForm.pas' { frm_About } ,
+  uRESTDWMessageCoderBinHex4 in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderBinHex4.pas',
   DWDCPtypes in '..\..\Source\Basic\Crypto\DWDCPtypes.pas',
   DWDCPbase64 in '..\..\Source\Basic\Crypto\DWDCPbase64.pas',
   DWDCPblockciphers in '..\..\Source\Basic\Crypto\DWDCPblockciphers.pas',
   DWDCPconst in '..\..\Source\Basic\Crypto\DWDCPconst.pas',
   DWDCPcrypt2 in '..\..\Source\Basic\Crypto\DWDCPcrypt2.pas',
   uRESTDWBufferDb in '..\..\Source\Basic\uRESTDWBufferDb.pas',
-  uRESTDWResponseTranslator
-    in '..\..\Source\Basic\uRESTDWResponseTranslator.pas',
+  uRESTDWResponseTranslator in '..\..\Source\Basic\uRESTDWResponseTranslator.pas',
   uRESTDWBasicClass in '..\..\Source\Basic\uRESTDWBasicClass.pas',
   uRESTDWEncodeClass in '..\..\Source\Basic\uRESTDWEncodeClass.pas',
   uRESTDWBase64 in '..\..\Source\libs\uRESTDWBase64.pas',
@@ -124,6 +112,8 @@ contains
   DWDCPrijndael in '..\..\Source\Basic\Crypto\DWDCPrijndael.pas',
   DWDCPsha256 in '..\..\Source\Basic\Crypto\DWDCPsha256.pas',
   DWDCPcast256 in '..\..\Source\Basic\Crypto\DWDCPcast256.pas',
-  uRESTDWDataUtils in '..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas';
+  uRESTDWDataUtils in '..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas',
+  uRESTDWBasicComponent in '..\..\Source\Basic\uRESTDWBasicComponent.pas',
+  uRESTDWComponentBase in '..\..\Source\Basic\uRESTDWComponentBase.pas';
 
 End.

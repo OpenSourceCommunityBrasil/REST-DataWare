@@ -12,9 +12,9 @@ Uses
  SysConst, TypInfo, uRESTDWConsts, {$IFNDEF FPC}DBConsts, SqlTimSt, {$ELSE}Masks, {$ENDIF}IniFiles, DateUtils, Math, FMTBcd,
  StrUtils, Types, Variants,
  {$IFDEF FPC}
-  Graphics, Db, contnrs, LConvEncoding,
+  Db, Graphics, contnrs, LConvEncoding,
  {$ELSE}{$IF CompilerVersion <= 22}
-         contnrs, Graphics, DBCommon, Db,
+         contnrs, DBCommon, Db, Graphics,
         {$ELSE}
          System.UIConsts, System.UITypes, System.Generics.Collections,
          System.VarCmplx, DBCommon, Data.Db,

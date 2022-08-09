@@ -27,29 +27,21 @@ interface
 
 Uses
  {$IFDEF FPC}
- SysUtils,      Classes, Db, Variants, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
+ SysUtils,      Classes, Db, Variants,
  uRESTDWDataUtils,     uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
  uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWCharset, uRESTDWEncodeClass, uRESTDWConsts,
- syncobjs, uRESTDWAbout, uzliblaz
+ syncobjs, uRESTDWComponentBase, uzliblaz
  {$ELSE}
   {$IF CompilerVersion <= 22}
    SysUtils, Classes, Db, Variants, EncdDecd, SyncObjs, uRESTDWDataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWAbout
+   uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWComponentBase
   {$ELSE}
    System.SysUtils, System.Classes, Data.Db, Variants, system.SyncObjs, uRESTDWDataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWAbout,
+   uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWComponentBase,
    {$IF Defined(RESTDWFMX)}
     System.IOUtils,
-    {$IFNDEF RESTDWAndroidService}FMX.Forms,{$ENDIF}
-   {$ELSE}
-    {$IF CompilerVersion <= 22}Forms,
-     {$ELSE}VCL.Forms,
-    {$IFEND}
    {$IFEND}
    uRESTDWCharset
-   {$IFDEF RESTDWWINDOWS}
-    , Windows
-   {$ENDIF}
   {$IFEND}
    , uRESTDWConsts
  {$ENDIF}, uRESTDWMessageCoderMIME;
@@ -824,13 +816,13 @@ End;
 
 Procedure TRESTDWServiceNotificationBase.ProcessMessages;
 Begin
- {$IFNDEF FPC}
-  {$IF Defined(RESTDWFMX)}
-   {$IF Defined(RESTDWWINDOWS)}
-    FMX.Forms.TApplication.ProcessMessages;
-   {$IFEND}
-  {$ELSE}{$IF Defined(RESTDWWINDOWS)}Application.Processmessages;{$IFEND}{$IFEND}
- {$ENDIF}
+// {$IFNDEF FPC}
+//  {$IF Defined(RESTDWFMX)}
+//   {$IF Defined(RESTDWWINDOWS)}
+//    FMX.Forms.TApplication.ProcessMessages;
+//   {$IFEND}
+//  {$ELSE}{$IF Defined(RESTDWWINDOWS)}Application.Processmessages;{$IFEND}{$IFEND}
+// {$ENDIF}
  Sleep(1);
 End;
 

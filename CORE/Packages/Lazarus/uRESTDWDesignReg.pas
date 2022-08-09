@@ -1,4 +1,4 @@
-unit uRESTDWReg;
+unit uRESTDWDesignReg;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -236,14 +236,6 @@ Var
 {$ENDIF}
 
 Implementation
-
-//{$IFNDEF FPC}
-// {$if CompilerVersion < 22}
-//  {$if CompilerVersion > 15}
-//   {$R .\RestDataWareComponents.dcr}
-//  {$IFEND}
-// {$IFEND}
-//{$ENDIF}
 
 uses uRESTDWConsts, uRESTDWPoolermethod, uRESTDWBasic, uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
 

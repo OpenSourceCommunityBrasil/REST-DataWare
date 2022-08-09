@@ -28,7 +28,7 @@ unit uRESTDWServerContext;
 interface
 
 Uses
- SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts, uRESTDWAbout,
+ SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts, uRESTDWComponentBase,
  uRESTDWCharset, uRESTDWParams,
  uRESTDWBasic, uRESTDWBasicTypes,
  uRESTDWTools{$IFNDEF FPC}

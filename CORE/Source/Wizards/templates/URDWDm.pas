@@ -4,7 +4,7 @@ Interface
 
 Uses
   SysUtils, Classes,
-  uRESTDWAbout, uRESTDWServerEvents, uRESTDWDatamodule, uRESTDWParams,
+  uRESTDWComponentBase, uRESTDWServerEvents, uRESTDWDatamodule, uRESTDWParams,
   uRESTDWConsts;
 
 Type

@@ -1,10 +1,10 @@
 object FrmDWSqlEditor: TFrmDWSqlEditor
   Left = 488
   Top = 163
+  Width = 1079
+  Height = 756
   BorderWidth = 5
   Caption = 'RESTDWClientSQL Editor'
-  ClientHeight = 707
-  ClientWidth = 1053
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -27,7 +27,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitTop = -6
     object PnlButton: TPanel
       Left = 958
       Top = 0
@@ -36,8 +35,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 0
-      ExplicitLeft = 961
-      ExplicitTop = -6
       object BtnExecute: TButton
         Left = 8
         Top = 20
@@ -58,7 +55,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       object TabSheetSQL: TTabSheet
         BorderWidth = 5
         Caption = 'SQL Command'
-        ExplicitWidth = 575
         object Memo: TMemo
           Left = 0
           Top = 0
@@ -69,7 +65,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
           TabOrder = 0
           OnDragDrop = MemoDragDrop
           OnDragOver = MemoDragOver
-          ExplicitWidth = 565
         end
       end
     end

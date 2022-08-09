@@ -1,2 +1,2 @@
-Bitmap_1 BITMAP "..\\..\\..\\Images\\icons\\components\\TRESTDWDriverFD.bmp"
-Bitmap_2 BITMAP "..\\..\\..\\Images\\icons\\components\\TRESTDWDriverFD16.bmp"
+TRESTDWDriverFD BITMAP "..\..\..\Images\icons\components\TRESTDWDriverFD.bmp"
+TRESTDWDriverFD16 BITMAP "..\..\..\Images\icons\components\TRESTDWDriverFD16.bmp"

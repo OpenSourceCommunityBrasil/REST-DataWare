@@ -28,9 +28,9 @@ interface
 uses
   {$IFDEF FPC}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWShellServices,
-    LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb, uRESTDWAbout;
+    LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb, uRESTDWComponentBase;
   {$ELSE}
-   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWShellServices, uRESTDWAbout,
+   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWShellServices, uRESTDWComponentBase,
    RTLConsts,
    {$IFDEF COMPILER16_UP}
    UITypes,

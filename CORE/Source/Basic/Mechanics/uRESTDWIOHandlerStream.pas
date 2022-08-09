@@ -31,7 +31,7 @@ Uses
  uRESTDWTools,
  uRESTDWConsts,
  uRESTDWIOHandler,
- uRESTDWAbout;
+ uRESTDWComponentBase;
 
  Type
   TRESTDWIOHandlerStream     = Class;

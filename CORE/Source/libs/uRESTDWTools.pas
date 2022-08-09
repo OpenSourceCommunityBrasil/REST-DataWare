@@ -341,7 +341,7 @@ Uses
 
 Implementation
 
-Uses uRESTDWConsts, uRESTDWBase64, uRESTDWException{$IFNDEF HAS_FMX}, Windows{$ENDIF};
+Uses uRESTDWConsts, uRESTDWBase64, uRESTDWException{$IFNDEF HAS_FMX}{$IFNDEF UNIX}, Windows{$ENDIF}{$ENDIF};
 
 
 {$IFDEF FPC}
@@ -552,7 +552,7 @@ Function CopyFileTo(Const Source,
                     Destination : TFileName): Boolean;
 Begin
  {$IFDEF FPC}
- Result := CopyFile(PChar(Source), PChar(Destination), False);
+ Result := CopyFileTo(PChar(Source), PChar(Destination));
  {$ELSE}
   {$IF Defined(RESTDWFMX)}
    Result := False;

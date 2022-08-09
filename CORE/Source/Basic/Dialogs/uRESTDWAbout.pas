@@ -29,7 +29,7 @@ Procedure RESTDWAboutDialog;
 
 Implementation
 
-uses {$IFNDEF RESTDWLAMW}uRESTDWAboutForm{$ENDIF};
+//uses {$IFNDEF RESTDWLAMW}uRESTDWAboutForm{$ENDIF};
 
 {$IFNDEF FPC}
 Function GetDelphiVersion : String;
@@ -119,7 +119,7 @@ Var
  Msg : String;
  {$IFNDEF RESTDWLAMW}
   {$IFNDEF RESTDWFMX}
-  frm : Tfrm_About;
+//  frm : Tfrm_About;
   {$ENDIF}
  {$ENDIF}
  // funcao para converter compatibilidade
@@ -151,18 +151,18 @@ Begin
    Msg := DWStr(Msg);
   {$IFNDEF RESTDWLAMW}
    {$IFNDEF LINUXFMX}
-    frm := Tfrm_About.Create(nil);
-    {$IFNDEF FPC}
-     {$IF Defined(RESTDWFMX)}
-      frm.lbl_msg.Text := Msg;
-     {$ELSE}
-      frm.lbl_msg.Caption:= Msg;
-     {$IFEND}
-    {$ELSE}
-    frm.lbl_msg.Caption:= Msg;
-    {$ENDIF}
-    frm.ShowModal;
-    {$ENDIF}
+//    frm := Tfrm_About.Create(nil);
+//    {$IFNDEF FPC}
+//     {$IF Defined(RESTDWFMX)}
+//      frm.lbl_msg.Text := Msg;
+//     {$ELSE}
+//      frm.lbl_msg.Caption:= Msg;
+//     {$IFEND}
+//    {$ELSE}
+//    frm.lbl_msg.Caption:= Msg;
+//    {$ENDIF}
+//    frm.ShowModal;
+   {$ENDIF}
   {$ENDIF}
  {$ENDIF}
 End;

@@ -27,7 +27,7 @@ interface
 
 uses
   Classes,
-  uRESTDWAbout,
+  uRESTDWComponentBase,
   uRESTDWBasicTypes,
   uRESTDWTools;
 

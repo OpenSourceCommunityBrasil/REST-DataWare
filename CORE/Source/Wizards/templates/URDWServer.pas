@@ -6,7 +6,7 @@ uses
   Windows, Messages, 
   SysUtils, Variants, Classes, 
   Graphics, Controls, Forms, Dialogs, WinXCtrls,
-  uRESTDWAbout, uRESTDWBasic, uRESTDWIdBase;
+  uRESTDWComponentBase, uRESTDWBasic, uRESTDWIdBase;
 
 type
   T%1:s = class(%2:s)

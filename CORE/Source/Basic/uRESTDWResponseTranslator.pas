@@ -28,7 +28,7 @@ unit uRESTDWResponseTranslator;
 
 interface
 
-Uses uRESTDWAbout,
+Uses uRESTDWComponentBase,
      {$IFDEF FPC}
       uRESTDWConsts, SysUtils, Classes
      {$ELSE}

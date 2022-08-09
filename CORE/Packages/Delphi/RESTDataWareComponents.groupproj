@@ -6,6 +6,9 @@
         <Projects Include="RESTDWCore.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="RESTDWCoreDesign.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="ShellTools\RESTDWShellServices.dproj">
             <Dependencies/>
         </Projects>
@@ -46,6 +49,15 @@
     </Target>
     <Target Name="RESTDWCore:Make">
         <MSBuild Projects="RESTDWCore.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWCoreDesign">
+        <MSBuild Projects="RESTDWCoreDesign.dproj"/>
+    </Target>
+    <Target Name="RESTDWCoreDesign:Clean">
+        <MSBuild Projects="RESTDWCoreDesign.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWCoreDesign:Make">
+        <MSBuild Projects="RESTDWCoreDesign.dproj" Targets="Make"/>
     </Target>
     <Target Name="RESTDWShellServices">
         <MSBuild Projects="ShellTools\RESTDWShellServices.dproj"/>
@@ -120,13 +132,13 @@
         <MSBuild Projects="..\..\Source\Wizards\RESTDWWizards.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="RESTDWCore;RESTDWShellServices;RESTDWSocketIndy;RESTDWDriverFD;RESTDWDriverApolloDB;RESTDWDriverMYDAC;RESTDWDriverUNIDAC;RESTDWDriverZEOS;RESTDWWizards"/>
+        <CallTarget Targets="RESTDWCore;RESTDWCoreDesign;RESTDWShellServices;RESTDWSocketIndy;RESTDWDriverFD;RESTDWDriverApolloDB;RESTDWDriverMYDAC;RESTDWDriverUNIDAC;RESTDWDriverZEOS;RESTDWWizards"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RESTDWCore:Clean;RESTDWShellServices:Clean;RESTDWSocketIndy:Clean;RESTDWDriverFD:Clean;RESTDWDriverApolloDB:Clean;RESTDWDriverMYDAC:Clean;RESTDWDriverUNIDAC:Clean;RESTDWDriverZEOS:Clean;RESTDWWizards:Clean"/>
+        <CallTarget Targets="RESTDWCore:Clean;RESTDWCoreDesign:Clean;RESTDWShellServices:Clean;RESTDWSocketIndy:Clean;RESTDWDriverFD:Clean;RESTDWDriverApolloDB:Clean;RESTDWDriverMYDAC:Clean;RESTDWDriverUNIDAC:Clean;RESTDWDriverZEOS:Clean;RESTDWWizards:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RESTDWCore:Make;RESTDWShellServices:Make;RESTDWSocketIndy:Make;RESTDWDriverFD:Make;RESTDWDriverApolloDB:Make;RESTDWDriverMYDAC:Make;RESTDWDriverUNIDAC:Make;RESTDWDriverZEOS:Make;RESTDWWizards:Make"/>
+        <CallTarget Targets="RESTDWCore:Make;RESTDWCoreDesign:Make;RESTDWShellServices:Make;RESTDWSocketIndy:Make;RESTDWDriverFD:Make;RESTDWDriverApolloDB:Make;RESTDWDriverMYDAC:Make;RESTDWDriverUNIDAC:Make;RESTDWDriverZEOS:Make;RESTDWWizards:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -28,7 +28,7 @@ unit uRESTDWServerEvents;
 interface
 
 Uses
- SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts, uRESTDWAbout,
+ SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts, uRESTDWComponentBase,
  uRESTDWBasic, uRESTDWBasicTypes, uRESTDWTools, uRESTDWCharset, uRESTDWParams, uRESTDWJSONInterface;
 
 Const
@@ -452,7 +452,7 @@ Begin
        vparams    := bJsonOBJb.Pairs[2].Value; //params
        vneedauth  := StringToBoolean(bJsonOBJb.Pairs[3].Value); //params
        vonlypredefparams := StringToBoolean(bJsonOBJb.Pairs[4].Value); //params
-       vContentType := DecodeStrings(bJsonOBJb.Pairs[5].Value); //Final
+       vContentType := DecodeStrings(bJsonOBJb.Pairs[5].Value{$IFDEF FPC}, csUndefined{$ENDIF}); //Final
        If EventByName[vEventName] = Nil Then
         vDWEvent  := TRESTDWEvent(Self.Add)
        Else
@@ -566,7 +566,7 @@ Begin
   Begin
    vParamLine2  := Format('"needauth":"%s", "onlypredefparams":"%s", "ContentType":"%s"', [BooleanToString(Items[I].NeedAuthorization),
                                                                                            BooleanToString(Items[I].OnlyPreDefinedParams),
-                                                                                           EncodeStrings(Items[I].DefaultContentType)]);
+                                                                                           EncodeStrings(Items[I].DefaultContentType{$IFDEF FPC}, csUndefined{$ENDIF})]);
    vTagEvent    := Format('{"eventname":"%s"', [TRESTDWEvent(Items[I]).EventName]);
    vTagEvent    := vTagEvent + Format(', "DataMode":"%s"', [GetDataModeName(Items[I].vDataMode)]);
    vTagEvent    := vTagEvent + ', "params":[%s], ' + vParamLine2 + '}';

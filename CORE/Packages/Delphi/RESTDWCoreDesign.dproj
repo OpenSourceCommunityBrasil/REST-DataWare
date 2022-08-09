@@ -1,13 +1,13 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{EADFFC95-BEC1-4CAE-AAFE-AEEE50783690}</ProjectGuid>
-        <MainSource>RESTDWShellServices.dpk</MainSource>
+        <ProjectGuid>{B229AD56-6CAC-4419-8C33-A144BCAD1177}</ProjectGuid>
+        <MainSource>RESTDWCoreDesign.dpk</MainSource>
         <ProjectVersion>19.4</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
-        <TargetedPlatforms>1043</TargetedPlatforms>
+        <TargetedPlatforms>37907</TargetedPlatforms>
         <AppType>Package</AppType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -18,8 +18,18 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Android64' and '$(Base)'=='true') or '$(Base_Android64)'!=''">
+        <Base_Android64>true</Base_Android64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Base)'=='true') or '$(Base_iOSDevice64)'!=''">
         <Base_iOSDevice64>true</Base_iOSDevice64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='OSX64' and '$(Base)'=='true') or '$(Base_OSX64)'!=''">
+        <Base_OSX64>true</Base_OSX64>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
@@ -50,11 +60,13 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <SanitizedProjectName>RESTDWShellServices</SanitizedProjectName>
+        <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
+        <DesignOnlyPackage>true</DesignOnlyPackage>
         <GenDll>true</GenDll>
-        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <GenPackage>true</GenPackage>
+        <SanitizedProjectName>RESTDWCoreDesign</SanitizedProjectName>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_E>false</DCC_E>
@@ -64,38 +76,56 @@
         <DCC_K>false</DCC_K>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
-        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+        <DCC_UsePackage>rtl;fmx;soaprtl;FireDAC;FireDACCommonDriver;FireDACCommon;dbrtl;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
         <BT_BuildType>Debug</BT_BuildType>
         <EnabledSysJars>android-support-v4.dex.jar;cloud-messaging.dex.jar;fmx.dex.jar;google-analytics-v2.dex.jar;google-play-billing.dex.jar;google-play-licensing.dex.jar;google-play-services.dex.jar</EnabledSysJars>
-        <DCC_UsePackage>rtl;soaprtl;inet;FireDAC;FireDACCommonDriver;FireDACCommon;$(DCC_UsePackage)</DCC_UsePackage>
+        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+        <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Android64)'!=''">
+        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+        <BT_BuildType>Debug</BT_BuildType>
+        <Base_Android>true</Base_Android>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+        <DCC_UsePackage>rtl;fmx;soaprtl;FireDAC;FireDACCommonDriver;FireDACCommon;dbrtl;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
+        <EnabledSysJars>android-support-v4.dex.jar;cloud-messaging.dex.jar;fmx.dex.jar;google-analytics-v2.dex.jar;google-play-billing.dex.jar;google-play-licensing.dex.jar;google-play-services.dex.jar</EnabledSysJars>
         <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSDevice64)'!=''">
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
-        <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
         <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
-        <DCC_UsePackage>rtl;soaprtl;inet;FireDAC;FireDACCommonDriver;FireDACCommon;$(DCC_UsePackage)</DCC_UsePackage>
-        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
+        <DCC_UsePackage>rtl;fmx;soaprtl;FireDAC;FireDACCommonDriver;FireDACCommon;dbrtl;$(DCC_UsePackage)</DCC_UsePackage>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=1.0.0;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&apos;s speech recognition servers</VerInfo_Keys>
+        <BT_BuildType>Debug</BT_BuildType>
         <iOS_AppStore1024>$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png</iOS_AppStore1024>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_UsePackage>rtl;RestDatawareCORE;RESTDWCore;soaprtl;inet;FireDAC;FireDACCommonDriver;FireDACCommon;$(DCC_UsePackage)</DCC_UsePackage>
+    <PropertyGroup Condition="'$(Base_OSX64)'!=''">
         <BT_BuildType>Debug</BT_BuildType>
+        <Base_OSX32>true</Base_OSX32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+        <DCC_UsePackage>rtl;fmx;soaprtl;FireDAC;FireDACCommonDriver;FireDACCommon;dbrtl;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_UsePackage>rtl;vcl;fmx;soaprtl;FireDAC;FireDACCommonDriver;FireDACCommon;dbrtl;RESTDWCore;$(DCC_UsePackage)</DCC_UsePackage>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <BT_BuildType>Debug</BT_BuildType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_UsePackage>rtl;vcl;fmx;soaprtl;FireDAC;FireDACCommonDriver;FireDACCommon;dbrtl;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_UsePackage>rtl;soaprtl;inet;FireDAC;FireDACCommonDriver;FireDACCommon;$(DCC_UsePackage)</DCC_UsePackage>
-        <BT_BuildType>Debug</BT_BuildType>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <BT_BuildType>Debug</BT_BuildType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -106,6 +136,8 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_MapFile>3</DCC_MapFile>
+        <DCC_Description>REST Dataware Design</DCC_Description>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
@@ -121,19 +153,188 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
-        <DCCReference Include="dcldb.dcp"/>
-        <DCCReference Include="soaprtl.dcp"/>
-        <DCCReference Include="inet.dcp"/>
         <DCCReference Include="RESTDWCore.dcp"/>
-        <DCCReference Include="FireDAC.dcp"/>
-        <DCCReference Include="FireDACCommonDriver.dcp"/>
-        <DCCReference Include="FireDACCommon.dcp"/>
-        <DCCReference Include="..\..\..\Source\ShellTools\Delphi\uRESTDWShellServices.pas">
-            <Form>$IFDEF WIN32</Form>
-        </DCCReference>
-        <DCCReference Include="..\..\..\Source\ShellTools\Delphi\uRESTDWShellServicesReg.pas">
-            <Form>$ENDIF</Form>
-        </DCCReference>
+        <DCCReference Include="uRESTDWDesignReg.pas"/>
+        <RcItem Include="..\..\Images\icons\dwIcon.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>DW</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWBatchMove.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWBatchMove</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWBatchMove16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWBatchMove16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWClientEvents.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWClientEvents</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWClientEvents16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWClientEvents16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWClientNotification.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWClientNotification</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWClientNotification16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWClientNotification16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWClientPooler.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWClientPooler</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWClientPooler16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWClientPooler16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWClientREST.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWClientREST</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWClientRest16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWClientREST16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWClientSQL.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWClientSQL</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWClientSql16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWClientSQL16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWContextRules.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWContextRules</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWContextRules16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWContextRules16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWDataBase.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWDataBase</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWDataBase16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWDataBase16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWMassiveCache.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWMassiveCache</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWMassiveCache16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWMassiveCache16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWMassiveSQLCache.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWMassiveSQLCache</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWMassiveSQLCache16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWMassiveSQLCache16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWMemtable.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWMemtable</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWMemTable16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWMemtable16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWPoolerDB.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWPoolerDB</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWPoolerDB16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWPoolerDB16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWPoolerList.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWPoolerList</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWPoolerList16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWPoolerList16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWResponseTranslator.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWResponseTranslator</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWResponseTranslator16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWResponseTranslator16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWServerContext.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWServerContext</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWServerContext16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWServerContext16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWServerEvents.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWServerEvents</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWServerEvents16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWServerEvents16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWServiceNotification.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWServiceNotification</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWServiceNotification16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWServiceNotification16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWServicePooler.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWServicePooler</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWServicePooler16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWServicePooler16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWServiceSynPooler.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWServiceSynPooler</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWServiceSynPooler16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWServiceSynPooler16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWStoredProc.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWStoredProc</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWStoredProc16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWStoredProc16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWTable.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWTable</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWTable16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWTable16</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWUpdateSQL.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWUpdateSQL</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\Images\icons\components\TRESTDWUpdateSQL16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWUpdateSQL16</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -152,7 +353,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">RESTDWShellServices.dpk</Source>
+                    <Source Name="MainSource">RESTDWCoreDesign.dpk</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k240.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -180,9 +381,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWShellServices.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\RESTDWCoreDesign.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>RESTDWShellServices.bpl</RemoteName>
+                        <RemoteName>RESTDWCoreDesign.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -988,7 +1189,9 @@
             </Deployment>
             <Platforms>
                 <Platform value="Android">True</Platform>
+                <Platform value="Android64">True</Platform>
                 <Platform value="iOSDevice64">True</Platform>
+                <Platform value="OSX64">True</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">True</Platform>
             </Platforms>
