@@ -237,7 +237,9 @@ Var
 
 Implementation
 
-uses uRESTDWConsts, uRESTDWPoolermethod, uRESTDWBasic, uRESTDWResponseTranslator, uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
+uses uRESTDWConsts, uRESTDWPoolermethod, uRESTDWBasic, uRESTDWResponseTranslator,
+     uRESTDWFieldSourceEditor, uRESTDWSqlEditor, uRESTDWUpdSqlEditor,
+     uRESTDWJSONViewer, uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
 
 {$IFNDEF FPC}
 {$IFDEF  RTL240_UP}
@@ -713,7 +715,7 @@ End;
 
 Procedure TDWAboutDialogProperty.Edit;
 Begin
-// RESTDWAboutDialog;
+ RESTDWAboutDialog;
 End;
 
 Function TDWAboutDialogProperty.GetAttributes: TPropertyAttributes;
@@ -795,21 +797,21 @@ Begin
                                                    TRESTDWMassiveSQLCache, TRESTDWStoredProc, TRESTDWPoolerList, TRESTDWMassiveCache,  TRESTDWBatchMove]);
 // AddIDEMenu;//Menu do REST Debugger
  {$IFNDEF FPC}
-//  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
-//  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
+  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
+  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
 //  RegisterPackageWizard(TCustomMenuItemDW.Create);//Request Debbuger
  {$ELSE}
-//  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
-//  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
+  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
+  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
  {$ENDIF}
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWTable,              'Tablename',       TTableList);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientEvents,       'ServerEventName', TServerEventsList);
-//  RegisterPropertyEditor(TypeInfo(TStrings),          TRESTDWClientSQL,          'SQL',             TRESTDWSQLEditor);
-//  RegisterPropertyEditor(TypeInfo(TStrings),          TRESTDWClientSQL,          'RelationFields',  TRESTDWFieldsRelationEditor);
+  RegisterPropertyEditor(TypeInfo(TStrings),          TRESTDWClientSQL,          'SQL',             TRESTDWSQLEditor);
+  RegisterPropertyEditor(TypeInfo(TStrings),          TRESTDWClientSQL,          'RelationFields',  TRESTDWFieldsRelationEditor);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientSQL,          'SequenceField',   TRESTDWFieldsList);
   RegisterComponentEditor(TRESTDWServerEvents,        TComponentEditorClass(TRESTDWServerEventsEditor));
   RegisterComponentEditor(TRESTDWClientEvents,        TComponentEditorClass(TRESTDWClientEventsEditor));
-//  RegisterComponentEditor(TRESTDWResponseTranslator,  TComponentEditorClass(TRESTDWJSONViewer));
+  RegisterComponentEditor(TRESTDWResponseTranslator,  TComponentEditorClass(TRESTDWJSONViewer));
   RegisterPropertyEditor (TypeInfo(TRESTDWComponent), TRESTDWResponseTranslator, 'ClientREST', TRESTDWClientRESTList);
   RegisterComponentEditor(TRESTDWServerContext,       TComponentEditorClass(TRESTDWServerContextEditor));
   RegisterComponentEditor(TRESTDWContextRules,        TComponentEditorClass(TRESTDWContextRulesEditor));

@@ -1,13 +1,13 @@
-package RESTDWSocketIndy;
+package RESTDWSocketIndyDesign;
 
 {$IFNDEF FPC}
  {$IFDEF VER150 or VER160 or VER170 or VER180 or
           VER185 or VER190 or VER200 or VER210 or
           VER220}
-  {$R RESTDWSocketIndy.res  RESTDWSocketIndy.rc}
+  {$R RESTDWSocketIndyDesign.res  RESTDWSocketIndyDesign.rc}
  {$ELSE}
-  {$R RESTDWSocketIndy.res  RESTDWSocketIndy.rc}
-  {$R RESTDWSocketIndy.dres RESTDWSocketIndy.rc}
+  {$R RESTDWSocketIndyDesign.res  RESTDWSocketIndyDesign.rc}
+  {$R RESTDWSocketIndyDesign.dres RESTDWSocketIndyDesign.rc}
   {$R *.res}
   {$R *.dres}
  {$IFEND}
@@ -24,8 +24,8 @@ package RESTDWSocketIndy;
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
 {$OPTIMIZATION OFF}
-{$OVERFLOWCHECKS ON}
-{$RANGECHECKS ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
 {$REFERENCEINFO ON}
 {$SAFEDIVIDE OFF}
 {$STACKFRAMES ON}
@@ -36,16 +36,14 @@ package RESTDWSocketIndy;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$RUNONLY}
+{$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
-  IndySystem,
-  IndyProtocols,
-  IndyCore,
-  RESTDWCore;
+  rtl,
+  RESTDWSocketIndy;
 
 contains
-  uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas';
+  uRESTDWIdReg in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdReg.pas';
 
 end.

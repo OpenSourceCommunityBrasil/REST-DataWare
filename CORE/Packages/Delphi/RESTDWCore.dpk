@@ -1,5 +1,17 @@
 package RESTDWCore;
 
+{$IFNDEF FPC}
+ {$IFDEF VER150 or VER160 or VER170 or VER180 or
+         VER185 or VER190 or VER200 or VER210 or
+         VER220}
+  {$R RESTDWCore.res  RESTDWCore.rc}
+ {$ELSE}
+  {$R RESTDWCore.res  RESTDWCore.rc}
+  {$R RESTDWCore.dres RESTDWCore.rc}
+  {$R *.res}
+  {$R *.dres}
+ {$IFEND}
+{$ENDIF}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -28,29 +40,19 @@ package RESTDWCore;
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
 
-{$IFNDEF FPC}
-{$IFDEF VER150 or VER160 or VER170 or VER180 or VER185 or VER190 or VER200 or VER210 or VER220}
-{$R RESTDWCoreDesign.res RESTDWCoreDesign.rc}
-{$ELSE}
-{$R *.res}
-{$R *.dres}
-{$IFEND}
-{$ENDIF}
-
 requires
-{$IFDEF VER150 or VER160 or VER170 or VER180 or VER185 or VER190 or VER200 or VER210 orVER220}
-  bdertl,
-{$ELSE}
-  FireDAC, FireDACCommonDriver, FireDACCommon,
-{$ENDIF}
-{$IFDEF WIN32}
-  dcldb,
-  designide,
-{$ENDIF}
+  {$IFDEF VER150 or VER160 or VER170 or VER180 or VER185 or VER190 or VER200 or VER210 orVER220}
+   bdertl,
+  {$ELSE}
+   FireDAC, FireDACCommonDriver, FireDACCommon,
+  {$ENDIF}
+  {$IFDEF WIN32}
+   dcldb,
+   designide,
+  {$ENDIF}
   rtl,
   dbrtl,
-  soaprtl
-    ;
+  soaprtl;
 
 contains
   PropertyPersist in '..\..\Source\Basic\PropertyPersist.pas',

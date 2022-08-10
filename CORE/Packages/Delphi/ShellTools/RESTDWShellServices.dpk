@@ -1,5 +1,17 @@
 package RESTDWShellServices;
 
+{$IFNDEF FPC}
+ {$IFDEF VER150 or VER160 or VER170 or VER180 or
+          VER185 or VER190 or VER200 or VER210 or
+          VER220}
+  {$R RESTDWShellServices.res  RESTDWShellServices.rc}
+ {$ELSE}
+  {$R RESTDWShellServices.res  RESTDWShellServices.rc}
+  {$R RESTDWShellServices.dres RESTDWShellServices.rc}
+  {$R *.res}
+  {$R *.dres}
+ {$IFEND}
+{$ENDIF}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -12,8 +24,8 @@ package RESTDWShellServices;
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
 {$OPTIMIZATION OFF}
-{$OVERFLOWCHECKS ON}
-{$RANGECHECKS ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
 {$REFERENCEINFO ON}
 {$SAFEDIVIDE OFF}
 {$STACKFRAMES ON}
@@ -27,21 +39,15 @@ package RESTDWShellServices;
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
 
-{$IFNDEF FPC}
-{$IFDEF VER150 or VER160 or VER170 or VER180 or VER185 or VER190 or VER200 or VER210 or VER220}
-{$R RESTDWShellServicesDesign.res RESTDWShellServicesDesign.rc}
-{$ELSE}
-{$R *.res}
-{$R *.dres}
-{$IFEND}
-{$ENDIF}
-
 requires
+  rtl,
+  soaprtl,
   inet,
   RESTDWCore;
 
 contains
-  uRESTDWShellServices
-    in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServices.pas';
+  uRESTDWShellServices in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServices.pas';
 
 end.
+
+

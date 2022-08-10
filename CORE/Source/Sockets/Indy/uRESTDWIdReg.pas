@@ -38,7 +38,7 @@ uses
   UITypes,
 {$ENDIF}
 {$IF CompilerVersion > 22}
-  ToolsApi, vcl.Graphics, DesignWindows, DesignEditors, DBReg, DSDesign,
+  ToolsApi, DesignWindows, DesignEditors, DBReg, DSDesign,
   DesignIntf, ExptIntf, Classes, Db, ColnEdit;
 {$ELSE}
 ToolsApi, Graphics, DesignWindows, DesignEditors, DBReg, DesignIntf,

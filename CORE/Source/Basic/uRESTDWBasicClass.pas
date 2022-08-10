@@ -292,7 +292,7 @@ Begin
  vContentType                    := 'application/json';
  vContentEncoding                := 'multipart/form-data';
  vAccept                         := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
- vAcceptEncoding                 := 'gzip2, deflate, br';
+ vAcceptEncoding                 := '';
  vCharset                        := 'utf8';
  vMaxAuthRetries                 := 0;
  vUserAgent                      := cUserAgent;

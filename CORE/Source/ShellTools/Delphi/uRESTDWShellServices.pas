@@ -198,7 +198,7 @@ Begin
                    vResponseHeader,
                    -1,
                    Nil,
-                   ARequest.ContentFields,
+                   ARequest.QueryFields,
                    ARequest.QueryFields.Text,
                    vStream,
                    vAuthRealm,

@@ -2603,7 +2603,8 @@ Begin
  ContentType                    := 'application/json';
  ContentEncoding                := 'multipart/form-data';
  Accept                         := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
- AcceptEncoding                 := 'gzip, deflate, br';
+// AcceptEncoding                 := 'gzip, deflate, br';
+ AcceptEncoding                 := '';
  MaxAuthRetries                 := 0;
  UserAgent                      := cUserAgent;
  AccessControlAllowOrigin       := '*';
@@ -2828,7 +2829,8 @@ Begin
     {$IFEND}
    {$ENDIF}
    SetCertOptions;
-   HttpRequest.IOHandler := ssl;
+   If Assigned(HttpRequest) Then
+    HttpRequest.IOHandler := ssl;
   End
  Else
   Begin
