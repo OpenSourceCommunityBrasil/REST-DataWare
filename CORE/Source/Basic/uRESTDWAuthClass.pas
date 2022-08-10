@@ -31,9 +31,10 @@ Uses
   {$ELSE}
   Classes,  SysUtils,
   StringBuilderUnit,
-  {$ENDIF} uRESTDWTools, uRESTDWConsts,
-  DateUtils, uRESTDWBasicTypes,
-  uRESTDWEncodeClass, uRESTDWCharset;
+  {$ENDIF}
+  DateUtils,
+  uRESTDWTools, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWCharset,
+  uRESTDWDataUtils;
 
 Type
  TRESTDWAuthOptionTypes = (rdwOATBasic, rdwOATBearer, rdwOATToken);
@@ -329,7 +330,7 @@ Function GetTokenType   (Value      : String) : TRESTDWTokenType;
 
 implementation
 
-Uses uRESTDWMD5, uRESTDWDataUtils, uRESTDWJSONInterface;
+Uses uRESTDWMD5, uRESTDWJSONInterface;
 
 Class Function TTokenValue.GetMD5(Const Value : String) : String;
 Begin

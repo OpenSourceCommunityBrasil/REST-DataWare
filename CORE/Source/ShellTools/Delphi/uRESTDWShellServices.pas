@@ -45,6 +45,8 @@ Type
                                       Var InvalidTag          : Boolean);Override;
   Property Active;
  Public
+  Procedure Redirect(Url       : String;
+                     AResponse : TObject);
   Procedure Command                   (ARequest               : TWebRequest;
                                        AResponse              : TWebResponse;
                                        Var Handled            : Boolean);
@@ -56,6 +58,13 @@ End;
 Implementation
 
 Uses uRESTDWJSONInterface;
+
+Procedure TRESTDWShellService.Redirect(Url : String;
+                                       AResponse   : TObject);
+Begin
+ If Trim(Url) <> '' Then
+  TWebResponse(AResponse).SendRedirect(Url);
+End;
 
 Procedure TRESTDWShellService.Command(ARequest    : TWebRequest;
                                       AResponse   : TWebResponse;
@@ -105,17 +114,12 @@ Var
   If Assigned(vStream) Then
    FreeAndNil(vStream);
  End;
- Procedure Redirect(Url : String);
- Begin
-  If Trim(Url) <> '' Then
-   AResponse.SendRedirect(Url);
- End;
 Begin
  ResultStream    := TStringStream.Create('');
  vResponseHeader := TStringList.Create;
  vResponseString := '';
  vStream         := Nil;
- @vRedirect      := @Redirect;
+ vRedirect       := Redirect;
  Try
   If CORS Then
    Begin

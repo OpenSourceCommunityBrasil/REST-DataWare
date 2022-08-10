@@ -10,7 +10,7 @@ package RESTDWSocketIndy;
   {$R RESTDWSocketIndy.dres RESTDWSocketIndy.rc}
   {$R *.res}
   {$R *.dres}
- {$IFEND}
+ {$ENDIF}
 {$ENDIF}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}

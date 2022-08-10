@@ -189,7 +189,6 @@ Type
   Property    LifeCycle         : Integer       Read vLifeCycle       Write vLifeCycle;
 End;
 
-
 Type
  TRESTDWAuthOptionBasic = Class(TRESTDWAuthOptionParam)
  Private
@@ -435,6 +434,7 @@ Function GetTokenType   (Value      : String) : TRESTDWTokenType;
 Function GetMIMEType    (Value      : String) : String;
 Function CountExpression(Value      : String;
                          Expression : Char)   : Integer;
+Function GetSecretsValue(Value      : String) : String;
 
 Var
  MimeTable : TMimeTable;

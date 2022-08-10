@@ -46,8 +46,9 @@ Uses
    , uRESTDWConsts
  {$ENDIF}, uRESTDWMessageCoderMIME;
 
- Type
-  TRedirect = Procedure(Const AURL : String) {$IFNDEF FPC}Of Object{$ENDIF};
+ type
+  TRedirect = Procedure(Url : String;
+                     AResponse   : TObject) {$IFNDEF FPC}Of Object{$ENDIF};
 
  Type
   TServerMethodClass = Class(TComponent)
@@ -1597,6 +1598,7 @@ Var
  vUrlToExec,
  vOldRequest,
  vdwservereventname,
+ vUrlRedirect,
  vAuthenticationString : String;
  vAuthTokenParam       : TRESTDWAuthTokenParam;
  vdwConnectionDefs     : TConnectionDefs;
@@ -2239,7 +2241,7 @@ Begin
             mb := TStringStream.Create(''); //{$IFNDEF FPC}{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
             try
              mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
-             ContentStringStream.Position := 0;
+               ContentStringStream.Position := 0;
              mb.Position := 0;
              If (pos('--', mb.DataString) > 0) and (pos('boundary', ContentType) > 0) Then
               Begin
@@ -3705,8 +3707,11 @@ Begin
              If Assigned(DWParams) And
                (Pos(DWParams.Url_Redirect, Cmd) = 0) And
                (DWParams.Url_Redirect <> '') Then
-              If Assigned(Redirect) Then
-               Redirect(DWParams.Url_Redirect);
+              Begin
+               vUrlRedirect := DWParams.Url_Redirect;
+               If Assigned(Redirect) Then
+                Redirect(vUrlRedirect, AContext);
+              End;
              If compresseddata Then
               Begin
                If vBinaryEvent Then

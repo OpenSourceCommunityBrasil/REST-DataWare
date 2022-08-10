@@ -10,7 +10,7 @@ package RESTDWCoreDesign;
   {$R RESTDWCoreDesign.dres RESTDWCoreDesign.rc}
   {$R *.res}
   {$R *.dres}
- {$IFEND}
+ {$ENDIF}
 {$ENDIF}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
