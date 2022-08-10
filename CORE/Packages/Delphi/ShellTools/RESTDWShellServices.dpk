@@ -1,6 +1,5 @@
 package RESTDWShellServices;
 
-{$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -13,8 +12,8 @@ package RESTDWShellServices;
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
 {$OPTIMIZATION OFF}
-{$OVERFLOWCHECKS OFF}
-{$RANGECHECKS OFF}
+{$OVERFLOWCHECKS ON}
+{$RANGECHECKS ON}
 {$REFERENCEINFO ON}
 {$SAFEDIVIDE OFF}
 {$STACKFRAMES ON}
@@ -25,20 +24,24 @@ package RESTDWShellServices;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$IMPLICITBUILD ON}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+{$IFNDEF FPC}
+{$IFDEF VER150 or VER160 or VER170 or VER180 or VER185 or VER190 or VER200 or VER210 or VER220}
+{$R RESTDWShellServicesDesign.res RESTDWShellServicesDesign.rc}
+{$ELSE}
+{$R *.res}
+{$R *.dres}
+{$IFEND}
+{$ENDIF}
 
 requires
-  rtl,
-  dcldb,
-  soaprtl,
   inet,
-  RESTDWCore,
-  FireDAC,
-  FireDACCommonDriver,
-  FireDACCommon;
+  RESTDWCore;
 
 contains
-  uRESTDWShellServices in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServices.pas' {$IFDEF WIN32},
-  uRESTDWShellServicesReg in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServicesReg.pas' {$ENDIF};
+  uRESTDWShellServices
+    in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServices.pas';
 
 end.
