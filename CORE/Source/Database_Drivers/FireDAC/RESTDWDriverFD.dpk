@@ -1,6 +1,14 @@
 package RESTDWDriverFD;
 
-{$R *.res}
+ {$IFNDEF VER150 or VER160 or VER170 or VER180 or
+          VER185 or VER190 or VER200 or VER210 or
+          VER220}
+  {$R RESTDWDriverFD.res  RESTDWDriverFD.rc}
+  {$R RESTDWDriverFD.dres RESTDWDriverFD.rc}
+  {$R *.res}
+  {$R *.dres}
+ {$ENDIF}
+
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -30,24 +38,6 @@ package RESTDWDriverFD;
 
 requires
   rtl,
-  DbxCommonDriver,
-  dbrtl,
-  DbxClientDriver,
-  CustomIPTransport,
-  soaprtl,
-  IndyIPCommon,
-  IndySystem,
-  IndyProtocols,
-  IndyCore,
-  IndyIPClient,
-  FireDAC,
-  FireDACCommonDriver,
-  FireDACCommon,
-  bindengine,
-  bindcomp,
-  dbexpress,
-  dbxcds,
-  vcl,
   RESTDWCore;
 
 contains

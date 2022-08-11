@@ -2,17 +2,15 @@ unit uRestDWDriverFD;
 
 interface
 
-uses System.SysUtils,          System.Classes,      Data.DBXJSON,
+uses System.SysUtils,          System.Classes,
      FireDAC.Stan.Intf,        FireDAC.Stan.Option, FireDAC.Stan.Param,
      FireDAC.Stan.Error,       FireDAC.DatS,        FireDAC.Stan.Async,
      FireDAC.DApt,             FireDAC.UI.Intf,     FireDAC.Stan.Def,
      FireDAC.Stan.Pool,        FireDAC.Comp.Client, FireDAC.Comp.UI,
      FireDAC.Comp.DataSet,     FireDAC.DApt.Intf,
-     {$IFNDEF FPC}
       {$IF CompilerVersion > 26} // Delphi XE6 pra cima
       FireDAC.Stan.StorageBin,
       {$IFEND}
-     {$ENDIF}
      FireDAC.Phys.Intf,       Data.DB, uRESTDWConsts,  uRESTDWDataUtils,
      uRESTDWBasicDB,          uRESTDWBasic,            uRESTDWJSONInterface,
      uRESTDWMassiveBuffer,    Variants,                uRESTDWDatamodule,
@@ -136,8 +134,6 @@ Type
  Published
   Property Connection : TFDConnection Read GetConnection Write SetConnection;
 End;
-
-
 
 Procedure Register;
 
