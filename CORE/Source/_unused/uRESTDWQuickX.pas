@@ -22,8 +22,8 @@ unit uRESTDWQuickX;
 interface
 
 Uses
- uDWJSONTools, uDWJSONObject, ServerUtils, SysTypes,
- uDWConsts, uDWConstsCharset, uDWConst404HTML, IdContext,
+ uRESTDWJSONTools, uRESTDWJSONObject, ServerUtils, SysTypes,
+ uRESTDWConsts, uRESTDWConstsCharset, uDWConst404HTML, IdContext,
  {$IFDEF FPC}
   SysUtils,  Classes, LConvEncoding;
  {$ELSE}

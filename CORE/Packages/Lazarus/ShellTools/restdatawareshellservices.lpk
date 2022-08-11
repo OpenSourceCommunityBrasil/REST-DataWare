@@ -10,10 +10,10 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <OtherUnitFiles Value="..\..\..\Source\ShellTools\Lazarus"/>
-        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+        <UnitOutputDirectory Value="..\..\..\Source\compiledlaz"/>
       </SearchPaths>
     </CompilerOptions>
-    <License Value="GPL-2.0"/>
+    <License Value="GPL - 3.0"/>
     <Version Major="2"/>
     <Files>
       <Item>

@@ -1,6 +1,6 @@
 unit uRESTDWAuthClass;
 
-{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -83,6 +83,9 @@ Type
 End;
 
 Type
+
+ { TRESTDWAuthOptionParam }
+
  TRESTDWAuthOptionParam = Class(TPersistent)
  Private
   vCustom404TitleMessage,
@@ -107,6 +110,9 @@ Type
 End;
 
 Type
+
+ { TRESTDWAuthTokenParam }
+
  TRESTDWAuthTokenParam = Class(TRESTDWAuthOptionParam)
  Private
   vInitRequest,
@@ -148,6 +154,9 @@ End;
 
 
 Type
+
+ { TRESTDWAuthOptionBasic }
+
  TRESTDWAuthOptionBasic = Class(TRESTDWAuthOptionParam)
  Private
   vUserName,
@@ -162,6 +171,9 @@ Type
 End;
 
 Type
+
+ { TRESTDWAuthOAuth }
+
  TRESTDWAuthOAuth = Class(TRESTDWAuthOptionParam)
  Private
   vRedirectURI,
@@ -194,6 +206,9 @@ Type
 End;
 
 Type
+
+ { TRESTDWAuthOptionBearerClient }
+
  TRESTDWAuthOptionBearerClient = Class(TRESTDWAuthOptionParam)
  Private
   vGetTokenName,
@@ -227,6 +242,9 @@ Type
 End;
 
 Type
+
+ { TRESTDWAuthOptionTokenClient }
+
  TRESTDWAuthOptionTokenClient = Class(TRESTDWAuthOptionParam)
  Private
   vSecrets,
@@ -260,6 +278,9 @@ Type
 End;
 
 Type
+
+ { TRESTDWAuthOptionBearerServer }
+
  TRESTDWAuthOptionBearerServer = Class(TRESTDWAuthTokenParam)
  Private
  Protected
@@ -278,6 +299,9 @@ Type
 End;
 
 Type
+
+ { TRESTDWServerAuthOptionParams }
+
  TRESTDWServerAuthOptionParams = Class(TPersistent)
  Private
   FOwner                          : TPersistent;
@@ -298,6 +322,9 @@ Type
 End;
 
 Type
+
+ { TRESTDWClientAuthOptionParams }
+
  TRESTDWClientAuthOptionParams = Class(TPersistent)
  Private
   FOwner                          : TPersistent;
@@ -317,6 +344,9 @@ Type
 End;
 
 Type
+
+ { TRESTDWAuthRequest }
+
  TRESTDWAuthRequest = Class
  Private
   vToken : String;
@@ -331,6 +361,164 @@ Function GetTokenType   (Value      : String) : TRESTDWTokenType;
 implementation
 
 Uses uRESTDWMD5, uRESTDWJSONInterface;
+
+function GettokenValue(Value: String): String;
+begin
+
+end;
+
+function GetTokenType(Value: String): TRESTDWTokenType;
+begin
+
+end;
+
+{ TRESTDWServerAuthOptionParams }
+
+procedure TRESTDWServerAuthOptionParams.DestroyParam;
+begin
+
+end;
+
+procedure TRESTDWServerAuthOptionParams.SetAuthOption(Value: TRESTDWAuthOption);
+begin
+
+end;
+
+function TRESTDWServerAuthOptionParams.GetOwner: TPersistent;
+begin
+  Result := inherited GetOwner;
+end;
+
+constructor TRESTDWServerAuthOptionParams.Create(AOwner: TPersistent);
+begin
+
+end;
+
+procedure TRESTDWServerAuthOptionParams.Assign(Source: TPersistent);
+begin
+  inherited Assign(Source);
+end;
+
+destructor TRESTDWServerAuthOptionParams.Destroy;
+begin
+  inherited Destroy;
+end;
+
+procedure TRESTDWServerAuthOptionParams.CopyServerAuthParams(var
+  Value: TRESTDWAuthOptionParam);
+begin
+
+end;
+
+{ TRESTDWAuthOptionBearerServer }
+
+function TRESTDWAuthOptionBearerServer.GetToken(aSecrets: String): String;
+begin
+
+end;
+
+function TRESTDWAuthOptionBearerServer.FromToken(Value: String): Boolean;
+begin
+
+end;
+
+{ TRESTDWClientAuthOptionParams }
+
+procedure TRESTDWClientAuthOptionParams.DestroyParam;
+begin
+
+end;
+
+procedure TRESTDWClientAuthOptionParams.SetAuthOption(Value: TRESTDWAuthOption);
+begin
+
+end;
+
+function TRESTDWClientAuthOptionParams.GetOwner: TPersistent;
+begin
+  Result := inherited GetOwner;
+end;
+
+constructor TRESTDWClientAuthOptionParams.Create(AOwner: TPersistent);
+begin
+
+end;
+
+procedure TRESTDWClientAuthOptionParams.Assign(Source: TPersistent);
+begin
+  inherited Assign(Source);
+end;
+
+destructor TRESTDWClientAuthOptionParams.Destroy;
+begin
+  inherited Destroy;
+end;
+
+{ TRESTDWAuthRequest }
+
+constructor TRESTDWAuthRequest.Create;
+begin
+
+end;
+
+{ TRESTDWAuthTokenParam }
+
+procedure TRESTDWAuthTokenParam.SetTokenHash(Token: String);
+begin
+
+end;
+
+procedure TRESTDWAuthTokenParam.SetGetTokenName(Value: String);
+begin
+
+end;
+
+procedure TRESTDWAuthTokenParam.SetCryptType(Value: TRESTDWCryptType);
+begin
+
+end;
+
+function TRESTDWAuthTokenParam.GetTokenType(Value: String): TRESTDWTokenType;
+begin
+
+end;
+
+function TRESTDWAuthTokenParam.GetCryptType(Value: String): TRESTDWCryptType;
+begin
+
+end;
+
+constructor TRESTDWAuthTokenParam.Create;
+begin
+
+end;
+
+destructor TRESTDWAuthTokenParam.Destroy;
+begin
+  inherited Destroy;
+end;
+
+procedure TRESTDWAuthTokenParam.Assign(Source: TPersistent);
+begin
+  inherited Assign(Source);
+end;
+
+{ TRESTDWAuthOptionParam }
+
+procedure TRESTDWAuthOptionParam.SetCustomAuthErrorPage(Value: TStringList);
+begin
+
+end;
+
+constructor TRESTDWAuthOptionParam.Create;
+begin
+
+end;
+
+destructor TRESTDWAuthOptionParam.Destroy;
+begin
+  inherited Destroy;
+end;
 
 Class Function TTokenValue.GetMD5(Const Value : String) : String;
 Begin
@@ -508,17 +696,22 @@ Begin
  vCripto.Key := vTokenHash;
 End;
 
-Procedure TRESTDWAuthOAuth.GetGetToken;
+procedure TRESTDWAuthOAuth.GetGetToken;
 Begin
 
 End;
 
-Procedure TRESTDWAuthOAuth.GetGrantCode;
+procedure TRESTDWAuthOAuth.GetGrantCode;
 Begin
 
 End;
 
-Procedure TRESTDWAuthOAuth.Assign(Source: TPersistent);
+constructor TRESTDWAuthOAuth.Create;
+begin
+
+end;
+
+procedure TRESTDWAuthOAuth.Assign(Source: TPersistent);
 Var
  Src : TRESTDWAuthOAuth;
 Begin
@@ -535,7 +728,12 @@ Begin
   Inherited Assign(Source);
 End;
 
-Procedure TRESTDWAuthOptionBasic.Assign(Source: TPersistent);
+constructor TRESTDWAuthOptionBasic.Create;
+begin
+
+end;
+
+procedure TRESTDWAuthOptionBasic.Assign(Source: TPersistent);
 Var
  Src : TRESTDWAuthOptionBasic;
 Begin
@@ -549,7 +747,7 @@ Begin
   Inherited Assign(Source);
 End;
 
-Procedure TRESTDWAuthOptionTokenClient.FromToken(TokenValue : String);
+procedure TRESTDWAuthOptionTokenClient.FromToken(TokenValue: String);
 Var
  bJsonValue : TRESTDWJSONInterfaceObject;
  vHeader,
@@ -603,7 +801,22 @@ Begin
  End;
 End;
 
-Procedure TRESTDWAuthOptionTokenClient.Assign(Source: TPersistent);
+procedure TRESTDWAuthOptionTokenClient.ClearToken;
+begin
+
+end;
+
+procedure TRESTDWAuthOptionTokenClient.SetToken(Value: String);
+begin
+
+end;
+
+constructor TRESTDWAuthOptionTokenClient.Create;
+begin
+
+end;
+
+procedure TRESTDWAuthOptionTokenClient.Assign(Source: TPersistent);
 Var
  Src : TRESTDWAuthOptionTokenClient;
 Begin
@@ -753,7 +966,27 @@ Begin
  End;
 End;
 
-Procedure TRESTDWAuthOptionBearerClient.FromToken(TokenValue : String);
+procedure TRESTDWAuthOptionBearerClient.ClearToken;
+begin
+
+end;
+
+procedure TRESTDWAuthOptionBearerClient.SetToken(Value: String);
+begin
+
+end;
+
+constructor TRESTDWAuthOptionBearerClient.Create;
+begin
+
+end;
+
+procedure TRESTDWAuthOptionBearerClient.Assign(Source: TPersistent);
+begin
+  inherited Assign(Source);
+end;
+
+procedure TRESTDWAuthOptionBearerClient.FromToken(TokenValue: String);
 Var
  bJsonValue : TRESTDWJSONInterfaceObject;
  vHeader,
