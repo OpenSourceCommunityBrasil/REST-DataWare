@@ -1850,10 +1850,11 @@ Var
      Begin
       If ServerMethodsClass.Components[i] is TRESTDWServerEvents Then
        Begin
-        If (LowerCase(urlContext) = LowerCase(ServerMethodsClass.Components[i].Name))  Or
-           (LowerCase(urlContext) = LowerCase(ServerMethodsClass.classname + '.' +
-                                              ServerMethodsClass.Components[i].Name))  Then
-         vTagService := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler] <> Nil;
+        Pooler := StringReplace(urlContext, '/', '', [rfReplaceAll]);
+        //If (LowerCase(urlContext) = LowerCase(ServerMethodsClass.Components[i].Name))  Or
+        //   (LowerCase(urlContext) = LowerCase(ServerMethodsClass.classname + '.' +
+        //                                      ServerMethodsClass.Components[i].Name))  Then
+        vTagService := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler] <> Nil;
         If vTagService Then
          Begin
           Result   := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler];
@@ -1876,9 +1877,9 @@ Var
   vRootContext  := '';
 //  aEventName    := UriOptions.EventName;
 //  aServerEvent  := UriOptions.ServerEvent;
-  If (aEventName <> '') And (aServerEvent = '') Then
+  If (aServerEvent = '') Then
    Begin
-    aServerEvent := aEventName;
+    aServerEvent := StringReplace(urlContext, '/', '', [rfReplaceAll]);
     aEventName   := '';
    End;
   If ServerMethodsClass <> Nil Then
@@ -1891,12 +1892,10 @@ Var
             (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aServerEvent] <> Nil))   Then
          Begin
           vRootContext := TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext;
-          If ((aEventName = '')    And (vRootContext <> '')) Then
-           aEventName := vRootContext;
-          vTagService := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aEventName] <> Nil;
+          vTagService  := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aServerEvent] <> Nil;
           If vTagService Then
            Begin
-            Result := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aEventName];
+            Result := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aServerEvent];
             Break;
            End;
          End;
@@ -3049,7 +3048,8 @@ Begin
                            If vNeedAuthorization Then
                             Begin
                              vAuthenticationString := DecodeStrings(StringReplace(RawHeaders.Values['Authorization'], 'Basic ', '', [rfReplaceAll]){$IFDEF FPC}, vDatabaseCharSet{$ENDIF});; //Authentication.Authentication;// RawHeaders.Values['Authorization'];
-                             If vAuthenticationString <> '' Then
+                             If (vAuthenticationString <> '') And
+                                ((AuthUsername = '') And (AuthPassword = '')) Then
                               PrepareBasicAuth(vAuthenticationString, AuthUsername, AuthPassword);
                              If Assigned(TServerMethodDatamodule(vTempServerMethods).OnUserBasicAuth) Then
                               Begin
