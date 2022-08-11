@@ -58,6 +58,12 @@ Procedure Register;
 
 Implementation
 
+{$IFNDEF FPC}
+ {$if CompilerVersion < 23}
+  {$R .\RESTDWSocketIndyDesign.dcr}
+ {$IFEND}
+{$ENDIF}
+
 uses uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
 
 Function TPoolersList.GetAttributes: TPropertyAttributes;

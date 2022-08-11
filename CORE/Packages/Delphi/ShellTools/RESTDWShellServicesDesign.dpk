@@ -1,11 +1,9 @@
 package RESTDWShellServicesDesign;
 
 {$IFNDEF FPC}
- {$IFDEF VER150 or VER160 or VER170 or VER180 or
+ {$IFNDEF VER150 or VER160 or VER170 or VER180 or
           VER185 or VER190 or VER200 or VER210 or
           VER220}
-  {$R RESTDWShellServicesDesign.res  RESTDWShellServicesDesign.rc}
- {$ELSE}
   {$R RESTDWShellServicesDesign.res  RESTDWShellServicesDesign.rc}
   {$R RESTDWShellServicesDesign.dres RESTDWShellServicesDesign.rc}
   {$R *.res}

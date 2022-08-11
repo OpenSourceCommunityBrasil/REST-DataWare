@@ -1,11 +1,9 @@
 package RESTDWCoreDesign;
 
 {$IFNDEF FPC}
- {$IFDEF VER150 or VER160 or VER170 or VER180 or
-         VER185 or VER190 or VER200 or VER210 or
-         VER220}
-  {$R RESTDWCoreDesign.res  RESTDWCoreDesign.rc}
- {$ELSE}
+ {$IFNDEF VER150 or VER160 or VER170 or VER180 or
+          VER185 or VER190 or VER200 or VER210 or
+          VER220}
   {$R RESTDWCoreDesign.res  RESTDWCoreDesign.rc}
   {$R RESTDWCoreDesign.dres RESTDWCoreDesign.rc}
   {$R *.res}

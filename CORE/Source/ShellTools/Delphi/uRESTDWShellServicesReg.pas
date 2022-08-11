@@ -48,6 +48,12 @@ Procedure Register;
 
 Implementation
 
+{$IFNDEF FPC}
+ {$if CompilerVersion < 23}
+  {$R .\RESTDWShellServicesDesign.dcr}
+ {$IFEND}
+{$ENDIF}
+
 uses uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
 
 Procedure Register;

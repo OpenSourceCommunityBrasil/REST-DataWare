@@ -1,11 +1,9 @@
 package RESTDWSocketIndyDesign;
 
 {$IFNDEF FPC}
- {$IFDEF VER150 or VER160 or VER170 or VER180 or
+ {$IFNDEF VER150 or VER160 or VER170 or VER180 or
           VER185 or VER190 or VER200 or VER210 or
           VER220}
-  {$R RESTDWSocketIndyDesign.res  RESTDWSocketIndyDesign.rc}
- {$ELSE}
   {$R RESTDWSocketIndyDesign.res  RESTDWSocketIndyDesign.rc}
   {$R RESTDWSocketIndyDesign.dres RESTDWSocketIndyDesign.rc}
   {$R *.res}

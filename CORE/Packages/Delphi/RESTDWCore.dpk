@@ -1,11 +1,9 @@
 package RESTDWCore;
 
 {$IFNDEF FPC}
- {$IFDEF VER150 or VER160 or VER170 or VER180 or
+ {$IFNDEF VER150 or VER160 or VER170 or VER180 or
          VER185 or VER190 or VER200 or VER210 or
          VER220}
-  {$R RESTDWCore.res  RESTDWCore.rc}
- {$ELSE}
   {$R RESTDWCore.res  RESTDWCore.rc}
   {$R RESTDWCore.dres RESTDWCore.rc}
   {$R *.res}

@@ -139,178 +139,6 @@
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="RESTDWShellServices.dcp"/>
         <DCCReference Include="..\..\..\Source\ShellTools\Delphi\uRESTDWShellServicesReg.pas"/>
-        <RcItem Include="..\..\..\Images\icons\dwIcon.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>DW</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWBatchMove.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWBatchMove</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWBatchMove16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWBatchMove16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWCGIRunner.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWCGIRunner</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWCGIRunner16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWCGIRunner16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWClientEvents.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientEvents</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWClientEvents16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientEvents16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWClientNotification.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientNotification</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWClientNotification16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientNotification16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWClientPooler.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientPooler</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWClientPooler16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientPooler16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWClientREST.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientREST</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWClientRest16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientREST16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWClientSQL.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientSQL</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWClientSql16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientSQL16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWContextRules.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWContextRules</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWContextRules16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWContextRules16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWDataBase.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWDataBase</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWDataBase16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWDataBase16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWMassiveCache.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWMassiveCache</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWMassiveCache16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWMassiveCache16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWMassiveSQLCache.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWMassiveSQLCache</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWMassiveSQLCache16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWMassiveSQLCache16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWMemtable.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWMemTable</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWMemTable16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWMemTable16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWPoolerDB.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWPoolerDB</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWPoolerDB16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWPoolerDB16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWPoolerList.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWPoolerList</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWPoolerList16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWPoolerList16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWResponseTranslator.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWResponseTranslator</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWResponseTranslator16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWResponseTranslator16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWServerContext.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServerContext</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWServerContext16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServerContext16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWServerEvents.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServerEvents</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWServerEvents16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServerEvents16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWServiceNotification.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServiceNotification</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWServiceNotification16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServiceNotification16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWStoredProc.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWStoredProc</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWStoredProc16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWStoredProc16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWUpdateSQL.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWUpdateSQL</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWUpdateSQL16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWUpdateSQL16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWServiceCGI.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWShellService</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWServiceCGI16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWShellService16</ResourceId>
-        </RcItem>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -368,13 +196,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployClass Name="Android_NotificationIcon36">
-                    <Platform Name="Android64">
-                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                <DeployClass Name="iPad_Notification40">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android">
-                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -997,16 +825,6 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="iPad_Setting58">
-                    <Platform Name="iOSDevice64">
-                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
                 <DeployClass Name="iPhone_LaunchDark3x">
                     <Platform Name="iOSDevice64">
                         <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
@@ -1017,13 +835,23 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="Android_NotificationIcon36">
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="Android_LauncherIcon36">
                     <Platform Name="Android">
                         <RemoteDir>res\drawable-ldpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="iPad_Notification40">
+                <DeployClass Name="iPad_Setting58">
                     <Platform Name="iOSDevice64">
                         <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
                         <Operation>1</Operation>

@@ -1,11 +1,9 @@
 package RESTDWSocketIndy;
 
 {$IFNDEF FPC}
- {$IFDEF VER150 or VER160 or VER170 or VER180 or
+ {$IFNDEF VER150 or VER160 or VER170 or VER180 or
           VER185 or VER190 or VER200 or VER210 or
           VER220}
-  {$R RESTDWSocketIndy.res  RESTDWSocketIndy.rc}
- {$ELSE}
   {$R RESTDWSocketIndy.res  RESTDWSocketIndy.rc}
   {$R RESTDWSocketIndy.dres RESTDWSocketIndy.rc}
   {$R *.res}
@@ -40,9 +38,15 @@ package RESTDWSocketIndy;
 {$IMPLICITBUILD OFF}
 
 requires
+  {$IFNDEF VER150}
   IndySystem,
   IndyProtocols,
   IndyCore,
+  {$ELSE}
+  IndySystem70,
+  IndyProtocols70,
+  IndyCore70,
+  {$ENDIF}
   RESTDWCore;
 
 contains
