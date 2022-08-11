@@ -12,7 +12,7 @@ uses
 
   uRESTDWAbout, uRESTDWBasicClass, uRESTDWConsts,
 
-  uRESTDAO, uRDWRESTDAO, uRESTDWServerEvents, uRESTDWBasic, uRESTDWIdBase;
+  uRESTDAO, uRDWRESTDAO;
 
 type
   TfPrincipal = class(TForm)
@@ -39,24 +39,26 @@ type
     FlowLayout3: TFlowLayout;
     lVersao: TLabel;
     Button3: TButton;
-    RESTDWIdClientPooler1: TRESTDWIdClientPooler;
-    RESTDWClientEvents1: TRESTDWClientEvents;
+    StyleBook1: TStyleBook;
     procedure IniciarClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure Rectangle1MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Single);
+    procedure Rectangle2Click(Sender: TObject);
   private
     { Private declarations }
     REST: TRESTDAO;
-    RDWREST: TRDWRESTDAO;
+    RDWREST, RDWBinary: TRDWRESTDAO;
     inicio, fim: Double;
     pass, fail: integer;
-    procedure TesteAB(aMemo: TMemo);
     procedure TesteRESTRequest(aMemo: TMemo);
     procedure TesteRDWRequest(aMemo: TMemo);
     procedure LogMessage(aMemo: TMemo; aMessage: string);
     procedure TesteEndpointREST(metodo: string; count: integer);
-    procedure TesteEndpointRDW(metodo: string; count: integer);
+    procedure TesteEndpointRDW(metodo: TRequestMethod; count: integer);
+    procedure TesteEndpointRDWBinary(metodo: TRequestMethod; count: integer);
   public
     { Public declarations }
   end;
@@ -72,15 +74,18 @@ procedure TfPrincipal.Button2Click(Sender: TObject);
 begin
   inicio := now;
   Memo1.Lines.Clear;
-  LogMessage(Memo1, 'Teste de 1000 requests iniciados às ' + TimeToStr(inicio));
+  LogMessage(Memo1, 'Teste de 1000 requests sequenciais iniciados às ' + TimeToStr(inicio));
   REST := TRESTDAO.Create(eServidor.Text, ePorta.Text);
-  RDWREST := TRDWRESTDAO.Create(eServidor.Text, ePorta.Text);
+  RDWREST := TRDWRESTDAO.Create(eServidor.Text, ePorta.Text, false);
+  RDWBinary := TRDWRESTDAO.Create(eServidor.Text, ePorta.Text, true);
   if (ComboBox1.ItemIndex = 1) and
     ((eUsuario.Text <> EmptyStr) and (eSenha.Text <> EmptyStr)) then
   begin
     REST.SetBasicAuth(eUsuario.Text, eSenha.Text);
     RDWREST.SetBasicAuth(eUsuario.Text, eSenha.Text);
+    RDWBinary.SetBasicAuth(eUsuario.Text, eSenha.Text);
   end;
+
   TThread.CreateAnonymousThread(
     procedure
     begin
@@ -88,8 +93,10 @@ begin
       fail := 0;
       LogMessage(Memo1, 'Iniciando testes com REST Nativos...');
       TesteEndpointREST('GET', 1000);
-      LogMessage(Memo1, 'Iniciando testes com RDW ClientREST....');
-      TesteEndpointRDW('GET', 1000);
+      LogMessage(Memo1, 'Iniciando testes com RDW ClientREST...');
+      TesteEndpointRDW(rmGET, 1000);
+      LogMessage(Memo1, 'Iniciando testes binários com RDW ClientREST...');
+      TesteEndpointRDWBinary(rmGET, 1000);
 
       fim := now;
       LogMessage(Memo1, '=======================================');
@@ -97,8 +104,10 @@ begin
         FormatDateTime('hh:nn:ss:zzz', (fim - inicio)) + ' (hor:min:seg:mil)');
       LogMessage(Memo1, Format(' - Total: %d, Sucesso: %d, Falha: %d',
         [pass + fail, pass, fail]));
+
       REST.Free;
       RDWREST.Free;
+      RDWBinary.Free;
     end).Start;
 end;
 
@@ -114,21 +123,15 @@ var
   I: integer;
 begin
   lVersao.Text := Format('Versão componentes: %s', [RESTDWVERSAO]);
-  for I := 0 to pred(ComponentCount) do
-    if Components[I] is TLabel then
-    begin
-      (Components[I] as TLabel).StyledSettings := [];
-      (Components[I] as TLabel).TextSettings.FontColor := $FFC7C7C7;
-    end;
 end;
 
 procedure TfPrincipal.IniciarClick(Sender: TObject);
 begin
   inicio := now;
   Memo1.Lines.Clear;
-  LogMessage(Memo1, 'Testes iniciados às ' + TimeToStr(inicio));
+  LogMessage(Memo1, 'Testes sequenciais iniciados às ' + TimeToStr(inicio));
   REST := TRESTDAO.Create(eServidor.Text, ePorta.Text);
-  RDWREST := TRDWRESTDAO.Create(eServidor.Text, ePorta.Text);
+  RDWREST := TRDWRESTDAO.Create(eServidor.Text, ePorta.Text, false);
   if (ComboBox1.ItemIndex = 1) and
     ((eUsuario.Text <> EmptyStr) and (eSenha.Text <> EmptyStr)) then
   begin
@@ -138,7 +141,6 @@ begin
   TThread.CreateAnonymousThread(
     procedure
     begin
-      // TesteAB(Memo1);
       TesteRESTRequest(Memo1);
       TesteRDWRequest(Memo1);
 
@@ -159,9 +161,15 @@ begin
     end);
 end;
 
-procedure TfPrincipal.TesteAB(aMemo: TMemo);
+procedure TfPrincipal.Rectangle1MouseDown(Sender: TObject; Button: TMouseButton;
+Shift: TShiftState; X, Y: Single);
 begin
-  LogMessage(aMemo, 'Realizando testes A/B...');
+  StartWindowDrag;
+end;
+
+procedure TfPrincipal.Rectangle2Click(Sender: TObject);
+begin
+  Self.Close;
 end;
 
 procedure TfPrincipal.TesteEndpointREST(metodo: string; count: integer);
@@ -185,10 +193,8 @@ begin
     inc(pass);
     LogMessage(Memo1, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
       (fim - ini)) + ' (min:seg:mil)');
-  end;
-
-  ini := now;
-  if pos('POST', metodo) > 0 then
+  end
+  else if pos('POST', metodo) > 0 then
   begin
     LogMessage(Memo1, 'Testando ' + count.ToString + ' requisições...');
     for I := 0 to count do
@@ -203,10 +209,8 @@ begin
     inc(pass);
     LogMessage(Memo1, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
       (fim - ini)) + ' (min:seg:mil)');
-  end;
-
-  ini := now;
-  if pos('PUT', metodo) > 0 then
+  end
+  else if pos('PUT', metodo) > 0 then
   begin
     LogMessage(Memo1, 'Testando ' + count.ToString + ' requisições...');
     for I := 0 to count do
@@ -221,10 +225,8 @@ begin
     inc(pass);
     LogMessage(Memo1, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
       (fim - ini)) + ' (min:seg:mil)');
-  end;
-
-  ini := now;
-  if pos('PATCH', metodo) > 0 then
+  end
+  else if pos('PATCH', metodo) > 0 then
   begin
     LogMessage(Memo1, 'Testando ' + count.ToString + ' requisições...');
     for I := 0 to count do
@@ -239,10 +241,8 @@ begin
     inc(pass);
     LogMessage(Memo1, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
       (fim - ini)) + ' (min:seg:mil)');
-  end;
-
-  ini := now;
-  if pos('DELETE', metodo) > 0 then
+  end
+  else if pos('DELETE', metodo) > 0 then
   begin
     LogMessage(Memo1, 'Testando ' + count.ToString + ' requisições...');
     for I := 0 to count do
@@ -260,106 +260,131 @@ begin
   end;
 end;
 
-procedure TfPrincipal.TesteEndpointRDW(metodo: string; count: integer);
+procedure TfPrincipal.TesteEndpointRDW(metodo: TRequestMethod; count: integer);
 var
   I: integer;
   ini, fim: Double;
 begin
   ini := now;
-  if pos('GET', metodo) > 0 then
-  begin
-    LogMessage(Memo1, 'Testando ' + count.ToString + ' requisições...');
-    for I := 0 to count do
-      if not RDWREST.TesteEndpointGET(eEndpoint.Text) then
-      begin
-        LogMessage(Memo1, 'Método GET falhou após ' + I.ToString +
-          ' requisições');
-        inc(fail);
-        break;
-      end;
-    fim := now;
-    inc(pass);
-    LogMessage(Memo1, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
-      (fim - ini)) + ' (min:seg:mil)');
-  end;
+  LogMessage(Memo1, 'Testando ' + count.ToString + ' requisições...');
+  case metodo of
+    rmGET:
 
-  ini := now;
-  if pos('POST', metodo) > 0 then
-  begin
-    LogMessage(Memo1, 'Testando ' + count.ToString + ' requisições...');
-    for I := 0 to count do
-      if not RDWREST.TesteEndpointPOST(eEndpoint.Text) then
-      begin
-        LogMessage(Memo1, 'Método POST falhou após ' + I.ToString +
-          ' requisições');
-        inc(fail);
-        break;
-      end;
-    fim := now;
-    inc(pass);
-    LogMessage(Memo1, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
-      (fim - ini)) + ' (min:seg:mil)');
-  end;
+      for I := 0 to pred(count) do
+        if not RDWREST.TesteEndpoint(eEndpoint.Text, rmGET) then
+        begin
+          LogMessage(Memo1, 'Método GET falhou após ' + I.ToString +
+            ' requisições');
+          inc(fail);
+          break;
+        end;
 
-  ini := now;
-  if pos('PUT', metodo) > 0 then
-  begin
-    LogMessage(Memo1, 'Testando ' + count.ToString + ' requisições...');
-    for I := 0 to count do
-      if not RDWREST.TesteEndpointPUT(eEndpoint.Text) then
-      begin
-        LogMessage(Memo1, 'Método PUT falhou após ' + I.ToString +
-          ' requisições');
-        inc(fail);
-        break;
-      end;
-    fim := now;
-    inc(pass);
-    LogMessage(Memo1, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
-      (fim - ini)) + ' (min:seg:mil)');
+    rmPOST:
+      for I := 0 to count do
+        if not RDWREST.TesteEndpoint(eEndpoint.Text, rmPOST) then
+        begin
+          LogMessage(Memo1, 'Método POST falhou após ' + I.ToString +
+            ' requisições');
+          inc(fail);
+          break;
+        end;
+    rmPUT:
+      for I := 0 to count do
+        if not RDWREST.TesteEndpoint(eEndpoint.Text, rmPUT) then
+        begin
+          LogMessage(Memo1, 'Método PUT falhou após ' + I.ToString +
+            ' requisições');
+          inc(fail);
+          break;
+        end;
+    rmPATCH:
+      for I := 0 to count do
+        if not RDWREST.TesteEndpoint(eEndpoint.Text, rmPATCH) then
+        begin
+          LogMessage(Memo1, 'Método PATCH falhou após ' + I.ToString +
+            ' requisições');
+          inc(fail);
+          break;
+        end;
+    rmDELETE:
+      for I := 0 to count do
+        if not RDWREST.TesteEndpoint(eEndpoint.Text, rmDELETE) then
+        begin
+          LogMessage(Memo1, 'Método DELETE falhou após ' + I.ToString +
+            ' requisições');
+          inc(fail);
+          break;
+        end;
   end;
+  fim := now;
+  inc(pass);
+  LogMessage(Memo1, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
+    (fim - ini)) + ' (min:seg:mil)');
+end;
 
+procedure TfPrincipal.TesteEndpointRDWBinary(metodo: TRequestMethod;
+count: integer);
+var
+  I: integer;
+  ini, fim: Double;
+begin
   ini := now;
-  if pos('PATCH', metodo) > 0 then
-  begin
-    LogMessage(Memo1, 'Testando ' + count.ToString + ' requisições...');
-    for I := 0 to count do
-      if not RDWREST.TesteEndpointPATCH(eEndpoint.Text) then
-      begin
-        LogMessage(Memo1, 'Método PATCH falhou após ' + I.ToString +
-          ' requisições');
-        inc(fail);
-        break;
-      end;
-    fim := now;
-    inc(pass);
-    LogMessage(Memo1, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
-      (fim - ini)) + ' (min:seg:mil)');
-  end;
+  LogMessage(Memo1, 'Testando ' + count.ToString + ' requisições...');
+  case metodo of
+    rmGET:
+      for I := 0 to pred(count) do
+        if not RDWBinary.TesteEndpoint(eEndpoint.Text, rmGET) then
+        begin
+          LogMessage(Memo1, 'Método GET falhou após ' + I.ToString +
+            ' requisições');
+          inc(fail);
+          break;
+        end;
 
-  ini := now;
-  if pos('DELETE', metodo) > 0 then
-  begin
-    LogMessage(Memo1, 'Testando ' + count.ToString + ' requisições...');
-    for I := 0 to count do
-      if not RDWREST.TesteEndpointDELETE(eEndpoint.Text) then
-      begin
-        LogMessage(Memo1, 'Método DELETE falhou após ' + I.ToString +
-          ' requisições');
-        inc(fail);
-        break;
-      end;
-    fim := now;
-    inc(pass);
-    LogMessage(Memo1, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
-      (fim - ini)) + ' (min:seg:mil)');
+    rmPOST:
+      for I := 0 to count do
+        if not RDWBinary.TesteEndpoint(eEndpoint.Text, rmPOST) then
+        begin
+          LogMessage(Memo1, 'Método POST falhou após ' + I.ToString +
+            ' requisições');
+          inc(fail);
+          break;
+        end;
+    rmPUT:
+      for I := 0 to count do
+        if not RDWBinary.TesteEndpoint(eEndpoint.Text, rmPUT) then
+        begin
+          LogMessage(Memo1, 'Método PUT falhou após ' + I.ToString +
+            ' requisições');
+          inc(fail);
+          break;
+        end;
+    rmPATCH:
+      for I := 0 to count do
+        if not RDWBinary.TesteEndpoint(eEndpoint.Text, rmPATCH) then
+        begin
+          LogMessage(Memo1, 'Método PATCH falhou após ' + I.ToString +
+            ' requisições');
+          inc(fail);
+          break;
+        end;
+    rmDELETE:
+      for I := 0 to count do
+        if not RDWBinary.TesteEndpoint(eEndpoint.Text, rmDELETE) then
+        begin
+          LogMessage(Memo1, 'Método DELETE falhou após ' + I.ToString +
+            ' requisições');
+          inc(fail);
+          break;
+        end;
   end;
+  fim := now;
+  inc(pass);
+  LogMessage(Memo1, ' - finalizado após ' + FormatDateTime('nn:ss:zzz',
+    (fim - ini)) + ' (min:seg:mil)');
 end;
 
 procedure TfPrincipal.TesteRDWRequest(aMemo: TMemo);
-var
-  I: integer;
-  thread: TThread;
 begin
   pass := 0;
   fail := 0;
@@ -371,7 +396,7 @@ begin
   end
   else
   begin
-    if not RDWREST.TesteEndpointGET(eEndpoint.Text) then
+    if not RDWREST.TesteEndpoint(eEndpoint.Text, rmGET) then
     begin
       LogMessage(aMemo, 'Teste método GET falhou!');
       inc(fail);
@@ -379,9 +404,9 @@ begin
     else
     begin
       LogMessage(aMemo, 'Método GET disponível');
-      TesteEndpointRDW('GET', 100);
-      TesteEndpointRDW('GET', 1000);
-      TesteEndpointRDW('GET', 10000);
+      TesteEndpointRDW(rmGET, 100);
+      TesteEndpointRDW(rmGET, 1000);
+      TesteEndpointRDW(rmGET, 10000);
 
       // LogMessage(aMemo, 'Teste de requisições GET concorrentes...');
       // if not REST.TesteAssyncEndpoint(eEndpoint.Text, rmGET, 1000) then
@@ -397,7 +422,7 @@ begin
       LogMessage(aMemo, 'Teste GET concluído');
     end;
 
-    if not RDWREST.TesteEndpointPOST(eEndpoint.Text) then
+    if not RDWREST.TesteEndpoint(eEndpoint.Text, rmPOST) then
     begin
       LogMessage(aMemo, 'Teste método POST falhou!');
       inc(fail);
@@ -405,9 +430,9 @@ begin
     else
     begin
       LogMessage(aMemo, 'Método POST disponível');
-      TesteEndpointRDW('POST', 100);
-      TesteEndpointRDW('POST', 1000);
-      TesteEndpointRDW('POST', 10000);
+      TesteEndpointRDW(rmPOST, 100);
+      TesteEndpointRDW(rmPOST, 1000);
+      TesteEndpointRDW(rmPOST, 10000);
 
       // LogMessage(aMemo, 'Teste de requisições POST concorrentes...');
       // if not REST.TesteAssyncEndpoint(eEndpoint.Text, rmPOST, 1000) then
@@ -423,7 +448,7 @@ begin
       LogMessage(aMemo, 'Teste POST concluído');
     end;
 
-    if not RDWREST.TesteEndpointPUT(eEndpoint.Text) then
+    if not RDWREST.TesteEndpoint(eEndpoint.Text, rmPUT) then
     begin
       LogMessage(aMemo, 'Teste método PUT falhou!');
       inc(fail);
@@ -431,9 +456,9 @@ begin
     else
     begin
       LogMessage(aMemo, 'Método PUT disponível');
-      TesteEndpointRDW('PUT', 100);
-      TesteEndpointRDW('PUT', 1000);
-      TesteEndpointRDW('PUT', 10000);
+      TesteEndpointRDW(rmPUT, 100);
+      TesteEndpointRDW(rmPUT, 1000);
+      TesteEndpointRDW(rmPUT, 10000);
 
       // LogMessage(aMemo, 'Teste de requisições PUT concorrentes...');
       // if not REST.TesteAssyncEndpoint(eEndpoint.Text, rmPUT, 1000) then
@@ -449,7 +474,7 @@ begin
       LogMessage(aMemo, 'Teste PUT concluído');
     end;
 
-    if not RDWREST.TesteEndpointPATCH(eEndpoint.Text) then
+    if not RDWREST.TesteEndpoint(eEndpoint.Text, rmPATCH) then
     begin
       LogMessage(aMemo, 'Teste método PATCH falhou!');
       inc(fail);
@@ -457,9 +482,9 @@ begin
     else
     begin
       LogMessage(aMemo, 'Método PATCH disponível');
-      TesteEndpointRDW('PATCH', 100);
-      TesteEndpointRDW('PATCH', 1000);
-      TesteEndpointRDW('PATCH', 10000);
+      TesteEndpointRDW(rmPATCH, 100);
+      TesteEndpointRDW(rmPATCH, 1000);
+      TesteEndpointRDW(rmPATCH, 10000);
 
       // LogMessage(aMemo, 'Teste de requisições PATCH concorrentes...');
       // if not REST.TesteAssyncEndpoint(eEndpoint.Text, rmPATCH, 1000) then
@@ -475,7 +500,7 @@ begin
       LogMessage(aMemo, 'Teste PATCH concluído');
     end;
 
-    if not RDWREST.TesteEndpointDELETE(eEndpoint.Text) then
+    if not RDWREST.TesteEndpoint(eEndpoint.Text, rmDELETE) then
     begin
       aMemo.Lines.Add('Teste método DELETE falhou!');
       inc(fail);
@@ -483,9 +508,9 @@ begin
     else
     begin
       LogMessage(aMemo, 'Método DELETE disponível');
-      TesteEndpointRDW('DELETE', 100);
-      TesteEndpointRDW('DELETE', 1000);
-      TesteEndpointRDW('DELETE', 10000);
+      TesteEndpointRDW(rmDELETE, 100);
+      TesteEndpointRDW(rmDELETE, 1000);
+      TesteEndpointRDW(rmDELETE, 10000);
 
       // LogMessage(aMemo, 'Teste de requisições DELETE concorrentes...');
       // if not REST.TesteAssyncEndpoint(eEndpoint.Text, rmDELETE, 1000) then
@@ -508,9 +533,6 @@ begin
 end;
 
 procedure TfPrincipal.TesteRESTRequest(aMemo: TMemo);
-var
-  I: integer;
-  thread: TThread;
 begin
   pass := 0;
   fail := 0;

@@ -7,32 +7,43 @@ uses
   uRESTDWDataUtils, uRESTDWResponseTranslator, uRESTDWIdBase;
 
 type
+  TRequestMethod = (rmGET, rmPOST, rmPUT, rmPATCH, rmDELETE);
+
   TRDWRESTDAO = Class
   private
     FRESTClient: TRESTDWIdClientREST;
     FServer: String;
     FStream: TStringStream;
+    FDefaultHeader: TStringList;
+    FURL: string;
   public
-    constructor Create(aServer, aPort: string);
+    constructor Create(aServer, aPort: string; binary: boolean);
     destructor Destroy; override;
     procedure SetBasicAuth(user, password: string);
-    function TesteEndpointGET(aEndpoint: string): boolean;
-    function TesteEndpointPOST(aEndpoint: string): boolean;
-    function TesteEndpointPUT(aEndpoint: string): boolean;
-    function TesteEndpointPATCH(aEndpoint: string): boolean;
-    function TesteEndpointDELETE(aEndpoint: string): boolean;
+    function TesteEndpoint(aEndpoint: string; aMethod: TRequestMethod): boolean;
+    function TesteConcorrente(aEndpoint: string; aMethod: TRequestMethod;
+      cRepeat, cRequests: integer): boolean;
   End;
 
 implementation
 
 { TRESTDAO }
 
-constructor TRDWRESTDAO.Create(aServer, aPort: string);
+constructor TRDWRESTDAO.Create(aServer, aPort: string; binary: boolean);
 begin
   FServer := aServer + ':' + aPort;
   FRESTClient := TRESTDWIdClientREST.Create(nil);
   FRESTClient.UserAgent := 'RDWTestFMX Tool v1.0';
   FRESTClient.AuthenticationOptions.AuthorizationOption := rdwAONone;
+
+  if binary then
+  begin
+    FDefaultHeader := TStringList.Create;
+    FDefaultHeader.AddPair('BinaryRequest', 'true');
+    FDefaultHeader.AddPair('DataCompression', 'true');
+  end
+  else
+    FDefaultHeader := nil;
 end;
 
 destructor TRDWRESTDAO.Destroy;
@@ -51,70 +62,63 @@ begin
     .password := password;
 end;
 
-function TRDWRESTDAO.TesteEndpointDELETE(aEndpoint: string): boolean;
+function TRDWRESTDAO.TesteConcorrente(aEndpoint: string;
+  aMethod: TRequestMethod; cRepeat, cRequests: integer): boolean;
 var
-  URL: String;
+  I: integer;
+  teste: boolean;
 begin
-  URL := FServer + '\' + aEndpoint;
-  FStream := TStringStream.Create;
-  try
-    Result := FRESTClient.Delete(URL, nil, FStream) = 200;
-    FStream.Free;
-  except
-    Result := false;
-  end;
+  FURL := FServer + '/' + aEndpoint;
+  for I := 0 to pred(cRepeat) do
+    TThread.CreateAnonymousThread(
+      procedure
+      begin
+        FStream := TStringStream.Create;
+        try
+          try
+            case aMethod of
+              rmGET:
+                teste := FRESTClient.Get(FURL, FDefaultHeader, FStream) = 200;
+              rmPOST:
+                teste := FRESTClient.Post(FURL, FDefaultHeader, FStream) = 201;
+              rmPUT:
+                teste := FRESTClient.Put(FURL, FDefaultHeader, FStream,
+                  false) = 201;
+              rmPATCH:
+                teste := FRESTClient.Patch(FURL, FDefaultHeader, FStream,
+                  false) = 201;
+              rmDELETE:
+                teste := FRESTClient.Delete(FURL, FDefaultHeader,
+                  FStream) = 200;
+            end;
+          finally
+            FStream.Free;
+          end;
+        except
+          teste := false;
+        end;
+      end).Start;
+  Result := teste;
 end;
 
-function TRDWRESTDAO.TesteEndpointGET(aEndpoint: string): boolean;
-var
-  URL: String;
+function TRDWRESTDAO.TesteEndpoint(aEndpoint: string;
+aMethod: TRequestMethod): boolean;
 begin
-  URL := FServer + '\' + aEndpoint;
+  FURL := FServer + '/' + aEndpoint;
   FStream := TStringStream.Create;
   try
-    Result := FRESTClient.Get(URL, nil, FStream) = 200;
-    FStream.Free;
-  except
-    Result := false;
-  end;
-end;
-
-function TRDWRESTDAO.TesteEndpointPATCH(aEndpoint: string): boolean;
-var
-  URL: String;
-begin
-  URL := FServer + '\' + aEndpoint;
-  FStream := TStringStream.Create;
-  try
-    Result := FRESTClient.Patch(URL, nil, FStream, false) = 201;
-    FStream.Free;
-  except
-    Result := false;
-  end;
-end;
-
-function TRDWRESTDAO.TesteEndpointPOST(aEndpoint: string): boolean;
-var
-  URL: String;
-begin
-  URL := FServer + '\' + aEndpoint;
-  FStream := TStringStream.Create;
-  try
-    Result := FRESTClient.Post(URL, nil, nil, FStream) = 201;
-    FStream.Free;
-  except
-    Result := false;
-  end;
-end;
-
-function TRDWRESTDAO.TesteEndpointPUT(aEndpoint: string): boolean;
-var
-  URL: String;
-begin
-  URL := FServer + '\' + aEndpoint;
-  FStream := TStringStream.Create;
-  try
-    Result := FRESTClient.Put(URL, nil, FStream, false) = 201;
+    case aMethod of
+      rmGET:
+        Result := FRESTClient.Get(FURL, FDefaultHeader, FStream) = 200;
+      rmPOST:
+        Result := FRESTClient.Post(FURL, FDefaultHeader, FStream) = 201;
+      rmPUT:
+        Result := FRESTClient.Put(FURL, FDefaultHeader, FStream, false) = 201;
+      rmPATCH:
+        Result := FRESTClient.Patch(FURL, FDefaultHeader, FStream, false) = 201;
+      rmDELETE:
+        Result := FRESTClient.Delete(FURL, FDefaultHeader, FStream) = 200;
+    end;
     FStream.Free;
   except
     Result := false;

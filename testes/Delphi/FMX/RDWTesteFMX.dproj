@@ -198,6 +198,8 @@
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+        <Icon_MainIcon>RDWTesteFMX_Icon.ico</Icon_MainIcon>
+        <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <DCC_UsePackage>vclwinx;DataSnapServer;fmx;emshosting;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;DBXMSSQLDriver;FireDACCommonODBC;emsclient;FireDACCommonDriver;appanalytics;IndyProtocols;vclx;IndyIPClient;dbxcds;vcledge;bindcompvclwinx;FmxTeeUI;RESTDWDriverFD;emsedge;bindcompfmx;DBXFirebirdDriver;inetdb;FireDACSqliteDriver;DbxClientDriver;FireDACASADriver;Tee;soapmidas;vclactnband;TeeUI;fmxFireDAC;dbexpress;FireDACInfxDriver;DBXMySQLDriver;VclSmp;inet;DataSnapCommon;vcltouch;fmxase;DBXOdbcDriver;dbrtl;FireDACDBXDriver;FireDACOracleDriver;fmxdae;TeeDB;FireDACMSAccDriver;CustomIPTransport;FireDACMSSQLDriver;DataSnapIndy10ServerTransport;DataSnapConnectors;vcldsnap;DBXInterBaseDriver;FireDACMongoDBDriver;IndySystem;FireDACTDataDriver;vcldb;vclFireDAC;bindcomp;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;emsserverresource;IndyCore;RESTBackendComponents;bindcompdbx;rtl;FireDACMySQLDriver;FireDACADSDriver;RESTComponents;DBXSqliteDriver;vcl;IndyIPServer;dsnapxml;dsnapcon;DataSnapClient;DataSnapProviderClient;adortl;DBXSybaseASEDriver;DBXDb2Driver;vclimg;DataSnapFireDAC;emsclientfiredac;FireDACPgDriver;FireDAC;FireDACDSDriver;inetdbxpress;xmlrtl;tethering;bindcompvcl;dsnap;CloudService;DBXSybaseASADriver;DBXOracleDriver;FireDACDb2Driver;DBXInformixDriver;fmxobj;bindcompvclsmp;DataSnapNativeClient;FMXTee;RestDatawareCORE;DatasnapConnectorsFreePascal;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
@@ -210,6 +212,8 @@
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+        <Icon_MainIcon>RDWTesteFMX_Icon.ico</Icon_MainIcon>
+        <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -225,6 +229,9 @@
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Icon_MainIcon>RDWTesteFMX_Icon.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -255,7 +262,6 @@
         <DCCReference Include="src\DAO\uRESTDAO.pas"/>
         <DCCReference Include="src\DAO\uRDWDBWareDAO.pas"/>
         <DCCReference Include="src\DAO\uRDWRESTDAO.pas"/>
-        <DCCReference Include="src\DAO\uRDWBinaryEventsDAO.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -276,6 +282,10 @@
                 <Source>
                     <Source Name="MainSource">RDWTesteFMX.dpr</Source>
                 </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
