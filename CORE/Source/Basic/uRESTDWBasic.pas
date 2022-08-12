@@ -1796,6 +1796,8 @@ Var
   {$ENDIF}
   mb.Position                      := 0;
   StatusCode                       := vErrorCode;
+  If Not (Assigned(ResultStream)) Then
+   ResultStream := TStringStream.Create('');
   ResultStream.Position            := 0;
   ResultStream.CopyFrom(mb, mb.Size);
   ResultStream.Position := 0;
@@ -2059,6 +2061,8 @@ Begin
       Else
        mb                                  := TStringStream.Create(cEventNotFound{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
       mb.Position                          := 0;
+      If Not (Assigned(ResultStream)) Then
+       ResultStream := TStringStream.Create('');
       ResultStream.CopyFrom(mb, mb.Size);
       FreeAndNil(mb);
       DestroyComponents;
@@ -2070,6 +2074,8 @@ Begin
       ServerContextStream := TMemoryStream.Create;
       ServerContextStream.LoadFromFile(sFile);
       ServerContextStream.Position := 0;
+      If Not (Assigned(ResultStream)) Then
+       ResultStream := TStringStream.Create('');
       ResultStream.CopyFrom(ServerContextStream, ServerContextStream.Size);
       FreeAndNil(ServerContextStream);
       DestroyComponents;
@@ -2084,6 +2090,8 @@ Begin
     Else
      mb                                  := TStringStream.Create(cEventNotFound{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
     mb.Position                          := 0;
+    If Not (Assigned(ResultStream)) Then
+     ResultStream := TStringStream.Create('');
     ResultStream.CopyFrom(mb, mb.Size);
     FreeAndNil(mb);
     DestroyComponents;
@@ -3506,6 +3514,8 @@ Begin
              Else
               mb                                  := TStringStream.Create(vReplyString{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
              mb.Position                          := 0;
+             If Not (Assigned(ResultStream)) Then
+              ResultStream := TStringStream.Create('');
              WriteStream(mb, ResultStream);
              FreeAndNil(mb);
             {$ELSE}
@@ -3514,6 +3524,8 @@ Begin
              Else
               mb                                  := TStringStream.Create(vReplyString);
              mb.Position                          := 0;
+             If Not (Assigned(ResultStream)) Then
+              ResultStream := TStringStream.Create('');
              WriteStream(mb, ResultStream);
              FreeAndNil(mb);
             {$ENDIF}
@@ -3578,6 +3590,8 @@ Begin
                      ContentStream         := TRESTDWReadFileExclusiveStream.Create(sFile);
                     ContentStream.Position := 0;
                     StatusCode             := 200;
+                    If Not (Assigned(ResultStream)) Then
+                     ResultStream := TStringStream.Create('');
                     WriteStream(mb, ResultStream);
                     FreeAndNil(mb);
                     Result                 := True;
@@ -3753,6 +3767,8 @@ Begin
                  Else
                   mb                                  := TStringStream.Create(vReplyString{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
                  mb.Position                          := 0;
+                 If Not (Assigned(ResultStream)) Then
+                  ResultStream := TStringStream.Create('');
                  WriteStream(mb, ResultStream);
                  FreeAndNil(mb);
                 {$ELSE}
@@ -3763,6 +3779,8 @@ Begin
                     DWParams.SaveToStream(mb, tdwpxt_OUT);
                    Finally
                    End;
+                   If Not (Assigned(ResultStream)) Then
+                    ResultStream := TStringStream.Create('');
                    WriteStream(mb, ResultStream);
                    FreeAndNil(mb);
                   End
@@ -3777,6 +3795,8 @@ Begin
                    DWParams.SaveToStream(mb, tdwpxt_OUT);
                   Finally
                   End;
+                  If Not (Assigned(ResultStream)) Then
+                   ResultStream := TStringStream.Create('');
                   WriteStream(mb, ResultStream);
                   FreeAndNil(mb);
                  End
@@ -3787,6 +3807,8 @@ Begin
                   Else
                    mb                                   := TStringStream.Create(vReplyString);
                   mb.Position                           := 0;
+                  If Not (Assigned(ResultStream)) Then
+                   ResultStream := TStringStream.Create('');
                   WriteStream(mb, ResultStream);
                   FreeAndNil(mb);
                  End;

@@ -5506,9 +5506,12 @@ Begin
      {$IFDEF FPC}
       vRESTConnectionDB.DatabaseCharSet := csUndefined;
      {$ENDIF}
-     vConnected := TryConnect(vRESTConnectionDB);
-     If Assigned(vRESTConnectionDB) Then
-      FreeAndNil(vRESTConnectionDB);
+     Try
+      vConnected := TryConnect(vRESTConnectionDB);
+     Finally
+      If Assigned(vRESTConnectionDB) Then
+       FreeAndNil(vRESTConnectionDB);
+     End;
     End
    Else
     vMyIP := '';

@@ -696,15 +696,16 @@ Function   TRESTDWIdClientREST.Post(AUrl              : String                  
                                     IgnoreEvents      : Boolean                    = False;
                                     RawHeaders        : Boolean                    = False) : Integer;
 Var
- temp           : TStringStream;
  vTempHeaders   : TStringList;
  atempResponse,
+ temp,
  tempResponse   : TStringStream;
  SendParams     : TIdMultipartFormDataStream;
  aString,
  sResponse      : String;
 Begin
  Result:= 200;
+ Temp := Nil;
  SendParams   := TIdMultipartFormDataStream.Create;
  Try
   tempResponse := Nil;
@@ -790,12 +791,12 @@ Begin
       OnAfterRequest(AUrl, rtPost, AResponse);
     End;
   Finally
-   vTempHeaders.Free;
+   FreeAndNil(vTempHeaders);
    If Assigned(tempResponse) Then
     FreeAndNil(tempResponse);
    If Assigned(atempResponse) Then
     FreeAndNil(atempResponse);
-   SendParams.Free;
+   FreeAndNil(SendParams);
   End;
  Except
   On E: EIdHTTPProtocolException do
@@ -808,16 +809,19 @@ Begin
       Else
        temp := TStringStream.Create(E.Message{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
       AResponse.CopyFrom(temp, temp.Size);
-      temp.Free;
+      FreeAndNil(temp);
+      DestroyClient;
      End;
    End;
   On E: EIdSocketError do
    Begin
+    if Assigned(temp) then
+     FreeAndNil(temp);
     HttpRequest.Disconnect(false);
+    DestroyClient;
     Raise;
    End;
  End;
- DestroyClient;
 End;
 
 Function   TRESTDWIdClientREST.Post(AUrl            : String         = '';
@@ -3042,7 +3046,7 @@ Var
   AResponseInfo.Redirect(Url);
  End;
 Begin
- ResultStream    := TStringStream.Create('');
+// ResultStream    := TStringStream.Create('');
  vResponseHeader := TStringList.Create;
  vResponseString := '';
  {$IFNDEF FPC}
