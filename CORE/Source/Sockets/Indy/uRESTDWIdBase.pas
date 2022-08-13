@@ -3127,9 +3127,12 @@ Begin
       Else
        ResultStream  := TStringStream.Create(ErrorMessage);
      End;
-    AResponseInfo.FreeContentStream      := True;
-    AResponseInfo.ContentStream          := ResultStream;
-    AResponseInfo.ContentStream.Position := 0;
+    if Assigned(ResultStream)  then    //anderson
+    begin
+      AResponseInfo.FreeContentStream      := True;
+      AResponseInfo.ContentStream          := ResultStream;
+      AResponseInfo.ContentStream.Position := 0;
+    end;
     {$IFNDEF FPC}
      AResponseInfo.ContentLength         := ResultStream.Size;
     {$ELSE}

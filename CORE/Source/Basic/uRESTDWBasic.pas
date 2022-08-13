@@ -1946,6 +1946,7 @@ Var
   AuthPassword := AuthenticationString;
  End;
 Begin
+ ResultStream          := Nil;
  Result                := True;
  vRDWAuthOptionParam   := Nil;
  decoder               := Nil;
@@ -3827,6 +3828,8 @@ Begin
                StatusCode             := vErrorCode;
                If ServerContextStream <> Nil Then
                 Begin
+                 If Not (Assigned(ResultStream)) Then
+                   ResultStream := TStringStream.Create('');  //Anderson
                  WriteStream(ServerContextStream, ResultStream);
                  FreeAndNil(ServerContextStream);
                 End

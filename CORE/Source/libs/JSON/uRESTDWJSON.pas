@@ -1,6 +1,6 @@
 unit uRESTDWJSON;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 
 Interface
 

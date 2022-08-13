@@ -71,7 +71,7 @@ Const
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
  RESTDWVersionINFO          = 'v2.0.0-';
- RESTDWRelease              = '3048';
+ RESTDWRelease              = '3050';
  RESTDWCodeProject          = 'Savage Reign - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
@@ -376,7 +376,7 @@ Type
  Function  BuildStringFloat         (Value              : String;
                                      DataModeD          : TDataMode = dmDataware;
                                      FloatDecimalFormat : String = '')            : String;
-// Function  GetMIMEType              (sFile              : TFileName)              : string;
+ Function  GetMIMEType              (sFile              : TFileName)              : string;
  Function  Scripttags               (Value              : String)                 : Boolean;
  Function  RESTDWFileExists             (sFile,
                                      BaseFilePath       : String)                 : Boolean;
@@ -641,6 +641,19 @@ Begin
    If Result Then
     Break;
   End;
+End;
+
+Function GetMIMEType(sFile: TFileName): string;
+Var
+ Mime : TMimeTable;
+Begin
+ Mime := nil;
+ Mime := TMimeTable.Create();
+ try
+   Result := Mime.GetFileMIMEType(sFile);
+ finally
+   FreeAndNil(Mime);
+ end;
 End;
 
 Function scripttags(Value: String): Boolean;

@@ -9,10 +9,10 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <IncludeFiles Value="..\..\..\..;..\..\..\..\Includes;..\..\..\..\Source\Includes"/>
+        <IncludeFiles Value="..\..\..\..;..\..\..\..\Includes"/>
         <Libraries Value="..\..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
         <OtherUnitFiles Value="..\..\libs;..\..;..\..\libs\JSON;..\..\..\..\Source\Database_Drivers"/>
-        <UnitOutputDirectory Value="..\..\..\..\Source\compiledlaz"/>
+        <UnitOutputDirectory Value="..\..\..\..\compiledlaz"/>
       </SearchPaths>
       <CodeGeneration>
         <Optimizations>
@@ -26,12 +26,13 @@
     <Version Major="2"/>
     <Files Count="3">
       <Item1>
-        <Filename Value="restdwdriverzeos.lrs"/>
-        <Type Value="LRS"/>
+        <Filename Value="uRESTDWDriverZEOSReg.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="uRESTDWDriverZEOSReg"/>
       </Item1>
       <Item2>
-        <Filename Value="..\..\..\..\Source\Includes\uRESTDWPlataform.inc"/>
-        <Type Value="Include"/>
+        <Filename Value="restdwdriverzeos.lrs"/>
+        <Type Value="LRS"/>
       </Item2>
       <Item3>
         <Filename Value="..\..\..\..\Source\Database_Drivers\uRESTDWDriverZEOS.pas"/>
@@ -40,7 +41,7 @@
       </Item3>
     </Files>
     <CompatibilityMode Value="True"/>
-    <RequiredPkgs Count="3">
+    <RequiredPkgs Count="4">
       <Item1>
         <PackageName Value="restdatawarecomponents"/>
       </Item1>
@@ -48,8 +49,11 @@
         <PackageName Value="LR_ZeosDB"/>
       </Item2>
       <Item3>
-        <PackageName Value="FCL"/>
+        <PackageName Value="indylaz"/>
       </Item3>
+      <Item4>
+        <PackageName Value="FCL"/>
+      </Item4>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>
