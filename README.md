@@ -1,22 +1,16 @@
-![dwBanner](https://user-images.githubusercontent.com/26689802/170095987-9dbc6fd3-a3a1-4514-9027-e0954b43a22a.png)
+REST DW foi criado para facilitar a criação de CRUDs no mesmo modelo que criamos aplicações para Cliente / Servidor.
 
-REST DataWare é uma suite de componentes criado para facilitar o desenvolvimento de aplicações 3 camadas com tudo que o RAD tem pra oferecer.
-Funcionando desde o Delphi 7 e também no Lazarus, o RDW como normalmente chamamos, é uma ferramenta completa para aplicações desktop, web e multiplataforma!
+Hoje, para ser capaz de gravar dados em um SGBD via WebService é um processo muito complexo para operações simples, tornando o agendamento de simples telas muito demorado.
 
-Principais funcionalidades:
-* RAD
-* Possibilidade de criação facilitada de aplicações em 3 camadas
-* Servidor de APIs
-* WebService
-* Chat e Sistema de notificações
-* Multiplataforma: Desktop, web e mobile
-* ... e muito mais
+Com REST DW você não precisa mais se preocupar em criar em SQL Inserções, Deleções, Leituras e Execuções via WebService; Simplesmente adicione um componente de conexão RESTDataBase e adicione um componente RESTClientSQL que já fará sua solução SQL 100% funcional como era antigamente com todo o poder das tecnologias modernas de REST / JSON, compressão de dados e tudo mais que a linguagem tem a oferecer.
+
+Use-o e divirta-se.
 
 ## Wiki com instruções de instalação e uso:
-* Site: https://github.com/OpenSourceCommunityBrasil/REST-DataWare/wiki
+* Site: https://github.com/mobius1qwe/REST-DataWare/wiki
 
 ## Repositório dos novos demos:
-https://github.com/OpenSourceCommunityBrasil/RDWDemos
+https://github.com/mobius1qwe/RDWDemos
 
-## Canais oficiais do componente:
-* [Links e Mídias Externas](https://github.com/mobius1qwe/REST-DataWare/wiki/Links-e-M%C3%ADdias-Externas)
+## Telegram oficial:
+* https://t.me/restdataware

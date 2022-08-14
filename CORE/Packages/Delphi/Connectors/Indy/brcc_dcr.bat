@@ -1,0 +1,2 @@
+"C:\Program Files (x86)\Borland\Delphi7\Bin\brcc32.exe" -fo "RESTDWSocketIndy.dcr" "RESTDWSocketIndy.rc"
+"C:\Program Files (x86)\Borland\Delphi7\Bin\brcc32.exe" -fo "RESTDWSocketIndyDesign.dcr" "RESTDWSocketIndyDesign.rc"

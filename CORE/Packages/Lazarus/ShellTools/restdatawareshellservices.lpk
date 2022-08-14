@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <PathDelim Value="\"/>
+    <Name Value="RestDatawareShellservices"/>
+    <Type Value="RunAndDesignTime"/>
+    <Author Value="Gilberto Rocha da Silva"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <OtherUnitFiles Value="..\..\..\Source\ShellTools\Lazarus"/>
+        <UnitOutputDirectory Value="..\..\..\Source\compiledlaz"/>
+      </SearchPaths>
+    </CompilerOptions>
+    <License Value="GPL - 3.0"/>
+    <Version Major="2"/>
+    <Files>
+      <Item>
+        <Filename Value="RestDatawareShellservices.lrs"/>
+        <Type Value="LRS"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\..\Source\ShellTools\Lazarus\uRESTDWShellServices.pas"/>
+        <UnitName Value="uRESTDWShellServices"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\..\Source\ShellTools\Lazarus\uRESTDWShellServicesReg.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="uRESTDWShellServicesReg"/>
+      </Item>
+    </Files>
+    <RequiredPkgs>
+      <Item>
+        <PackageName Value="restdatawarecomponents"/>
+      </Item>
+      <Item>
+        <PackageName Value="weblaz"/>
+      </Item>
+      <Item>
+        <PackageName Value="FCL"/>
+      </Item>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

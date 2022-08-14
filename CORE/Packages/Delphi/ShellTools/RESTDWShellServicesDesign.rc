@@ -1,0 +1,4 @@
+DW BITMAP "..\..\..\Images\icons\dwIcon.bmp"
+TRESTDWShellService BITMAP "..\..\..\Images\icons\components\TRESTDWServiceCGI.bmp"
+TRESTDWShellService16 BITMAP "..\..\..\Images\icons\components\TRESTDWServiceCGI16.bmp"
+

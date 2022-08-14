@@ -1,0 +1,205 @@
+object fDWJSONViewer: TfDWJSONViewer
+  Left = 376
+  Height = 569
+  Top = 83
+  Width = 920
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsSingle
+  Caption = 'JSON Viewer'
+  ClientHeight = 569
+  ClientWidth = 920
+  Color = clBtnFace
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnClose = FormClose
+  Position = poScreenCenter
+  LCLVersion = '2.0.2.0'
+  object Panel1: TPanel
+    Left = 0
+    Height = 329
+    Top = 0
+    Width = 481
+    BevelOuter = bvNone
+    ClientHeight = 329
+    ClientWidth = 481
+    TabOrder = 0
+    object Label2: TLabel
+      Left = 4
+      Height = 13
+      Top = 3
+      Width = 70
+      Caption = 'JSON String'
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object Memo1: TMemo
+      Left = 2
+      Height = 267
+      Top = 19
+      Width = 481
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentFont = False
+      ScrollBars = ssVertical
+      TabOrder = 0
+    end
+    object Button1: TButton
+      Left = 0
+      Height = 24
+      Top = 304
+      Width = 144
+      Caption = 'Read JSON'
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      OnClick = Button1Click
+      ParentFont = False
+      TabOrder = 1
+    end
+  end
+  object Panel2: TPanel
+    Left = 481
+    Height = 329
+    Top = 0
+    Width = 439
+    BevelOuter = bvNone
+    ClientHeight = 329
+    ClientWidth = 439
+    TabOrder = 1
+    object Label1: TLabel
+      Left = 4
+      Height = 13
+      Top = 3
+      Width = 89
+      Caption = 'JSON Treeview'
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object TreeView1: TTreeView
+      Left = 0
+      Height = 267
+      Top = 19
+      Width = 439
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      Indent = 19
+      ParentFont = False
+      TabOrder = 0
+      OnClick = TreeView1Click
+    end
+    object Button2: TButton
+      Left = 0
+      Height = 24
+      Top = 304
+      Width = 144
+      Caption = 'Build Fielddefs'
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      OnClick = Button2Click
+      ParentFont = False
+      TabOrder = 1
+    end
+    object chk_datatype: TCheckBox
+      Left = 165
+      Height = 19
+      Top = 304
+      Width = 107
+      Caption = 'Define typed fields'
+      TabOrder = 2
+    end
+  end
+  object Panel3: TPanel
+    Left = 0
+    Height = 241
+    Top = 328
+    Width = 920
+    Align = alBottom
+    BevelOuter = bvNone
+    ClientHeight = 241
+    ClientWidth = 920
+    TabOrder = 2
+    object Label3: TLabel
+      Left = 4
+      Height = 13
+      Top = 3
+      Width = 85
+      Caption = 'Result Dataset'
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object DBGrid1: TDBGrid
+      Left = 0
+      Height = 221
+      Top = 20
+      Width = 920
+      Align = alBottom
+      BorderStyle = bsNone
+      Color = clWindow
+      Columns = <>
+      DataSource = DataSource1
+      Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs]
+      TabOrder = 0
+      TitleFont.Color = clWindowText
+      TitleFont.Height = -11
+      TitleFont.Name = 'MS Sans Serif'
+    end
+  end
+  object DataSource1: TDataSource
+    AutoEdit = False
+    DataSet = RESTDWClientSQL1
+    left = 376
+    top = 368
+  end
+  object RESTDWClientSQL1: TRESTDWClientSQL
+    Active = False
+    Encoding = esUtf8
+    DatabaseCharSet = csUndefined
+    FieldDefs = <>
+    MasterCascadeDelete = True
+    BinaryRequest = False
+    Datapacks = -1
+    DataCache = False
+    Params = <>
+    CacheUpdateRecords = True
+    AutoCommitData = False
+    AutoRefreshAfterCommit = False
+    RaiseErrors = True
+    Filtered = False
+    DWResponseTranslator = DWResponseTranslator1
+    ActionCursor = crSQLWait
+    ReflectChanges = False
+    left = 344
+    top = 368
+  end
+  object DWResponseTranslator1: TDWResponseTranslator
+    ElementAutoReadRootIndex = True
+    ElementRootBaseIndex = -1
+    RequestOpen = rtGet
+    RequestInsert = rtPost
+    RequestEdit = rtPost
+    RequestDelete = rtDelete
+    FieldDefs = <>
+    left = 312
+    top = 368
+  end
+end

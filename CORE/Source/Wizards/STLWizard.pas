@@ -395,6 +395,9 @@ Begin
  {$IFDEF ver340} // delphi xe10.4
   Result := '\Software\Embarcadero\BDS\21.0\Globals';
  {$ENDIF}
+ {$IFDEF ver350} // delphi 11
+  Result := '\Software\Embarcadero\BDS\22.0\Globals';
+ {$ENDIF}
 End;
 
 Function Getideprojectpath: String;
@@ -730,42 +733,6 @@ Begin
 End;
 
 // ------------------------------------------------------------------------------
-{
-  function TSTLFrmWizard.GetOwner: IOTAModule;
-  var
-  I: Integer;
-  ModServ: IOTAModuleServices;
-  Module: IOTAModule;
-  ProjGrp: IOTAProjectGroup;
-  begin
-  Result := nil;
-  ModServ := BorlandIDEServices as IOTAModuleServices;
-  for I := 0 to ModServ.ModuleCount - 1 do
-  begin
-  Module := ModSErv.Modules[I];
-  // find current project group
-  if CompareText(ExtractFileExt(Module.FileName), '.bpg') = 0 then
-  if Module.QueryInterface(IOTAProjectGroup, ProjGrp) = S_OK then
-  begin
-  // return active project of group
-  Result := ProjGrp.GetActiveProject;
-  Exit;
-  end;
-  end;
-  end;
-
-  //------------------------------------------------------------------------------
-
-  function TSTLFrmWizard.GetImplFileName: string;
-  var
-  CurrDir: array[0..MAX_PATH] of char;
-  begin
-  // Note: full path name required!
-  GetCurrentDirectory(SizeOf(CurrDir), CurrDir);
-  Result := Format('%s\%s.pas', [CurrDir, FUnitIdent, '.pas']);
-  end;
-}
-// ------------------------------------------------------------------------------
 
 { tstlunitcreator }
 
@@ -845,13 +812,7 @@ Begin
     Includetrailingpathdelim(Projectdir);
 
 {$IFDEF delphi9_lvl}
-  If Not Fismainform Then
-  Begin
-    // result := projectoptions.formfile;
-
-    // result := ffilename;
-  End
-  Else
+  If Fismainform Then
   Begin
     Result := Makefilename(Projectdir,
       Funitident, 'pas');
@@ -1244,10 +1205,6 @@ Begin
   '{$R *.res}' + #13#10 + #13#10 + 'begin' +
     #13#10 + '  Application.Initialize;'
     + #13#10 +
-{$IFDEF DELPHI2006_LVL}
-{$ELSE}
-  // '  application.createform(t'+fformclass+', '+fformclass+');' + #13#10 +
-{$ENDIF}
   '  Application.Run;' + #13#10 + 'end.';
 End;
 
@@ -1342,15 +1299,11 @@ Begin
     .Getnewmoduleandclassname('RDWForm',
     Funitident, Fclassname, Ffilename);
 {$ENDIF}
-  // (borlandideservices as iotamoduleservices).createmodule(self);
   Lproj := Getcurrentproject;
-  //If Lproj <> Nil Then
-  //Begin
     (Borlandideservices As Iotamoduleservices)
       .Createmodule
       (Tstlrdwdatamodule.Createa(Lproj,
       Funitident, Fclassname, Ffilename));
- // End;
 End;
 
 Procedure Tstlrdwdatamodule.Formcreated
@@ -1443,13 +1396,7 @@ Begin
     Includetrailingpathdelim(Projectdir);
 
 {$IFDEF delphi9_lvl}
-  If Not Fismainform Then
-  Begin
-    // result := projectoptions.formfile;
-
-    // result := ffilename;
-  End
-  Else
+  If Fismainform Then
   Begin
     Result := Makefilename(Projectdir, Funitident, 'pas');
   End;

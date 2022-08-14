@@ -1,26 +1,20 @@
 unit uRESTDWDataJSON;
 
-{$I uRESTDW.inc}
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 Interface
 
 Uses
-  uDWJSONInterface, uDWConstsCharset, uDWConsts,
-  uDWJSONTools, Variants, ServerUtils, IdURI,
-  {$IFDEF FPC}
-   SysUtils, Classes, DB,
-   memds, LConvEncoding, math
-  {$ELSE}
-   {$IF CompilerVersion > 22} // Delphi 2010 pra cima
-    System.SysUtils, System.Classes, System.IOUtils,
-    IdGlobal, Soap.EncdDecd
-   {$ELSE}
-    SysUtils, Classes, EncdDecd,
-    DbClient, IdGlobal
-  {$IFEND}
+ {$IFDEF FPC}
+  {$IFNDEF RESTDWLAMW}
+   LCL,
   {$ENDIF}
-  ,{$IFNDEF FPC}{$IF Defined(HAS_FMX)}system.json{$ELSE}
-   uDWJSON{$IFEND}{$ELSE}uDWJSON{$ENDIF};
+ {$ELSE}
+  {$IFDEF RESTDWWINDOWS}
+   Windows,
+  {$ENDIF}
+ {$ENDIF}
+  SysUtils, uRESTDWDataUtils, Classes, TypInfo, Variants, uRESTDWConsts;
 
 Type
  TRESTDWJSONObjectType  = (jtObject, jtArray, jtValue, jtUnknow);
@@ -228,6 +222,9 @@ Function escape_chars       (s     : String)    : String;
 Function unescape_chars     (s     : String)    : String;
 
 Implementation
+
+Uses uRESTDWTools, uRESTDWJSON, uRESTDWJSONInterface
+     {$IFNDEF FPC}{$IF Defined(RESTDWFMX)}, system.json{$IFEND}{$ENDIF};
 
 Function TrashRemove(Value : String) : String;
 Begin
@@ -519,7 +516,7 @@ Begin
  BaseObjectClass^              := TRESTDWJSONBlob.Create;
  BaseObjectClass^.SpecialChars := vSpecialChars;
  BaseObjectClass^.ElementName  := Key;
- BaseObjectClass^.Value        := Encodeb64Stream(Value);
+ BaseObjectClass^.Value        := EncodeStream(Value);
  Result                        := vList.Add(BaseObjectClass);
 End;
 
@@ -662,7 +659,7 @@ Begin
  BaseObjectClass^              := TRESTDWJSONBlob.Create;
  BaseObjectClass^.SpecialChars := vSpecialChars;
  BaseObjectClass^.ElementName  := '';
- BaseObjectClass^.Value        := Encodeb64Stream(Value);
+ BaseObjectClass^.Value        := EncodeStream(Value);
  Result                        := vList.Add(BaseObjectClass);
 End;
 
@@ -929,41 +926,41 @@ End;
 
 Constructor TRESTDWJSONBase.Create(JSON : String);
 Var
- bJsonValue  : TJSONBaseClass;
- bJsonArrayB : TDWJSONArray;
+ bJsonValue  : TRESTDWJSONBaseClass;
+ bJsonArrayB : TRESTDWJSONArray;
 begin
  If JSON = '' Then
   Exit;
  {$IFNDEF FPC}
   {$IF Defined(HAS_FMX)}
    If JSON[InitStrPos] = '[' then
-    bJsonValue  := TJSONBaseClass(TJSONObject.ParseJSONValue(JSON) as TJsonArray)
+    bJsonValue  := TRESTDWJSONBaseClass(TJSONObject.ParseJSONValue(JSON) as TJsonArray)
    Else If JSON[InitStrPos] = '{' then
-    bJsonValue  := TJSONBaseClass(TJSONObject.ParseJSONValue(JSON) as TJsonObject)
+    bJsonValue  := TRESTDWJSONBaseClass(TJSONObject.ParseJSONValue(JSON) as TJsonObject)
    Else
-    bJsonValue  := TJSONBaseClass(TJSONObject.ParseJSONValue('{}') as TJsonObject);
+    bJsonValue  := TRESTDWJSONBaseClass(TJSONObject.ParseJSONValue('{}') as TJsonObject);
   {$ELSE}
    If JSON[InitStrPos] = '[' then
-    bJsonValue  := TJSONBaseClass(TJSONArray.Create(JSON))
+    bJsonValue  := TRESTDWJSONBaseClass(TRESTDWJSONArray.Create(JSON))
    Else If JSON[InitStrPos] = '{' then
-    bJsonValue  := TJSONBaseClass(TJSONObject.Create(JSON))
+    bJsonValue  := TRESTDWJSONBaseClass(TRESTDWJSONObject.Create(JSON))
    Else
-    bJsonValue  := TJSONBaseClass(TJSONObject.Create('{}'));
+    bJsonValue  := TRESTDWJSONBaseClass(TRESTDWJSONObject.Create('{}'));
   {$IFEND}
  {$ELSE}
   Try
    If JSON[InitStrPos] = '[' then
-    bJsonValue  := TJSONBaseClass(TJSONArray.Create(JSON))
+    bJsonValue  := TRESTDWJSONBaseClass(TJSONArray.Create(JSON))
    Else If JSON[InitStrPos] = '{' then
-    bJsonValue  := TJSONBaseClass(TJSONObject.Create(JSON))
+    bJsonValue  := TRESTDWJSONBaseClass(TJSONObject.Create(JSON))
    Else
-    bJsonValue  := TJSONBaseClass(TJSONObject.Create('{}'));
+    bJsonValue  := TRESTDWJSONBaseClass(TJSONObject.Create('{}'));
   Except
    bJsonValue  := Nil;
   End;
  {$ENDIF}
  Try
-  If (bJsonValue.ClassType = TDWJSONObject) Or
+  If (bJsonValue.ClassType = TRESTDWJSONObject) Or
      (bJsonValue.ClassType = TJSONObject)   Then
    Begin
     Create(jtObject);
@@ -1321,7 +1318,7 @@ Var
  vStringStream : TMemoryStream;
 Begin
  Result        := False;
- vStringStream := Decodeb64Stream(vValue);
+ vStringStream := DecodeStream(vValue);
  Try
   If Assigned(vStringStream) Then
    Begin
@@ -1338,7 +1335,7 @@ End;
 Function TRESTDWJSONBlob.SaveToStream(Var aStream : TStream) : Boolean;
 Begin
  Result  := False;
- aStream := Decodeb64Stream(vValue);
+ aStream := DecodeStream(vValue);
  Try
   Result := Assigned(aStream);
   If Result Then
@@ -1385,7 +1382,7 @@ Procedure TRESTDWJSONBase.ReadJSON(JSON : String);
 Var
  I            : Integer;
  vReal        : Real;
- bJsonValue   : TDWJSONObject;
+ bJsonValue   : TRESTDWJSONInterfaceObject;
  JSONBase     : TRESTDWJSONBase;
  DecimalLocal : String;
 begin
@@ -1398,7 +1395,7 @@ begin
   DecimalLocal := DecimalSeparator;
   {$IFEND}
  {$ENDIF}
- bJsonValue  := TDWJSONObject.Create(TrashRemove(JSON));
+ bJsonValue  := TRESTDWJSONInterfaceObject.Create(TrashRemove(JSON));
  Try
   If Assigned(vList) Then
    Clear;

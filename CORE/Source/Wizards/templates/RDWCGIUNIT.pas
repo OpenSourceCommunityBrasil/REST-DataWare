@@ -9,7 +9,7 @@ uses
   SysUtils, Classes, HTTPApp, WSDLPub, SOAPPasInv, SOAPHTTPPasInv,
   SOAPHTTPDisp, WebBrokerSOAP, Soap.InvokeRegistry, Soap.WSDLIntf,
   System.TypInfo, Soap.WebServExp, Soap.WSDLBind, Xml.XMLSchema,
-  uRESTDWBase, uDWAbout,%4:s;
+  uRESTDWBase, uRESTDWComponentBase,%4:s;
 
 type
   T%1:s = class(%2:s)
