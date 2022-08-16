@@ -1,43 +1,36 @@
 Unit %0:s;
 
-Interface
+interface
 
-Uses
-  SysUtils, Classes,
-  uRESTDWComponentBase, uRESTDWServerEvents, uRESTDWDatamodule, uRESTDWParams,
-  uRESTDWConsts;
+uses
+  uRESTDWComponentBase,
+  uRESTDWParams,
+  uRESTDWServerEvents,
+  uRESTDWDatamodule,
+  System.Classes,
+  System.SysUtils;
 
-Type
+type
   T%1:s = class(%2:s)
     RESTDWServerEvents1: TRESTDWServerEvents;
-    procedure RESTDWServerEvents1EventstesteReplyEventByType
-      (var Params: TRESTDWParams; var Result: string;
-      const RequestType: TRequestType; var StatusCode: Integer;
-      RequestHeader: TStringList);
-  Private
+    procedure RESTDWServerEvents1EventshelloworldReplyEvent(
+      var Params: TRESTDWParams; var Result: string);
+  private
     { Private declarations }
-  Public
+  public
     { Public declarations }
-  End;
+  end;
 
-Var
- %1:s: T%1:s;
+var
+  %1:s: T%1:s;
 
-Implementation
+implementation
+
 
 {$R *.dfm}
 
-procedure T%1:s.RESTDWServerEvents1EventstesteReplyEventByType
-  (var Params: TRESTDWParams; var Result: string;
-  const RequestType: TRequestType; var StatusCode: Integer;
-  RequestHeader: TStringList);
+procedure T%1:s.RESTDWServerEvents1EventshelloworldReplyEvent(
+  var Params: TRESTDWParams; var Result: string);
 begin
-  case RequestType of
-    rtGet, rtDelete:
-      StatusCode := 200;
-    rtPost, rtPut, rtPatch:
-      StatusCode := 201;
-  end;
+  Result := ('{"Message":"'+Params.Itemsstring['entrada'].Asstring+'"}');
 end;
-
-End.
