@@ -36,7 +36,7 @@ end;
 procedure T%1:s.WebModuleCreate(Sender: TObject);
 begin
   RESTDWShellService1.RootPath := '.\';
-  RESTDWShellService1.ServerMethodClass := T%1:s;
+  RESTDWShellService1.ServerMethodClass := T%3:s;;
 end;
 
 end.
