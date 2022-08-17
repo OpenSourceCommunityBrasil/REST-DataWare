@@ -307,6 +307,8 @@ Type
   vTypeRequest         : TTypeRequest;
   vRSCharset           : TEncodeSelect;
   vAuthOptionParams    : TRESTDWClientAuthOptionParams;
+  vAccept,
+  vContentEncoding,
   vAcceptEncoding,
   vDataRoute,
   vUserAgent,
@@ -371,7 +373,9 @@ Type
  Published
   //Métodos e Propriedades
   Property DataCompression         : Boolean                       Read vDatacompress            Write vDatacompress;
+  Property Accept                  : String                        Read vAccept                  Write vAccept;
   Property AcceptEncoding          : String                        Read vAcceptEncoding          Write vAcceptEncoding;
+  Property ContentEncoding         : String                        Read vContentEncoding         Write vContentEncoding;
   Property ContentType             : String                        Read vContentType             Write vContentType;
   Property Charset                 : String                        Read vCharset                 Write vCharset;
   Property DataRoute               : String                        Read vDataRoute               Write SetDataRoute;
@@ -1513,10 +1517,13 @@ Begin
  vHandleRedirects                      := False;
  vUserAgent                            := cUserAgent;
  vLastErrorMessage                     := '';
- vAcceptEncoding                       := 'gzip2, deflate, br';
  {$IFDEF FPC}
  vDatabaseCharSet                      := csUndefined;
  {$ENDIF}
+ vContentType                          := 'application/json';
+ vContentEncoding                      := 'multipart/form-data';
+ vAccept                               := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+ vAcceptEncoding                       := '';
  vFailOver                             := False;
  vFailOverReplaceDefaults              := False;
  vPropThreadRequest                    := False;

@@ -386,6 +386,8 @@ Type
   vTypeRequest         : Ttyperequest;
   vFailOverConnections : TListDefConnections;
   vRESTClientPooler    : TRESTClientPoolerBase;
+  Procedure CopyParams(ConnectionDB         : TRESTDWPoolerMethodClient;
+                       Var RESTClientPooler : TRESTClientPoolerBase);
   Function  RenewToken              (Var PoolerMethodClient : TRESTDWPoolerMethodClient;
                                      Var Params             : TRESTDWParams;
                                      Var Error              : Boolean;
@@ -4128,10 +4130,10 @@ Begin
 End;
 
 Procedure TRESTDWDatabasebaseBase.ExecuteProcedure(Var PoolerMethodClient : TRESTDWPoolerMethodClient;
-                                           ProcName               : String;
-                                           Params                 : TParams;
-                                           Var Error              : Boolean;
-                                           Var MessageError       : String);
+                                                   ProcName               : String;
+                                                   Params                 : TParams;
+                                                   Var Error              : Boolean;
+                                                   Var MessageError       : String);
 Begin
 
 End;
@@ -4144,20 +4146,34 @@ Begin
  Result                       := TStringList.Create;
  vConnection                  := TRESTDWPoolerMethodClient.Create(Nil);
  vConnection.PoolerNotFoundMessage := PoolerNotFoundMessage;
- vConnection.UserAgent        := vUserAgent;
- vConnection.HandleRedirects  := vHandleRedirects;
- vConnection.RedirectMaximum  := vRedirectMaximum;
- vConnection.WelcomeMessage   := vWelcomeMessage;
- vConnection.Host             := vRestWebService;
- vConnection.Port             := vPoolerPort;
- vConnection.Compression      := vCompression;
- vConnection.TypeRequest      := VtypeRequest;
- vConnection.AccessTag        := vAccessTag;
- vConnection.Encoding         := Encoding;
- vConnection.CriptOptions.Use := VCripto.Use;
- vConnection.CriptOptions.Key := VCripto.Key;
- vConnection.DataRoute        := DataRoute;
  vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
+ vConnection.HandleRedirects  := HandleRedirects;
+ vConnection.RedirectMaximum  := RedirectMaximum;
+ vConnection.UserAgent        := UserAgent;
+ vConnection.WelcomeMessage   := WelcomeMessage;
+ vConnection.Host             := PoolerService;
+ vConnection.Port             := PoolerPort;
+ vConnection.Compression      := Compression;
+ vConnection.TypeRequest      := TypeRequest;
+ vConnection.BinaryRequest    := False;
+ vConnection.Encoding         := Encoding;
+ vConnection.EncodeStrings    := EncodedStrings;
+ vConnection.OnWork           := OnWork;
+ vConnection.OnWorkBegin      := OnWorkBegin;
+ vConnection.OnWorkEnd        := OnWorkEnd;
+ vConnection.OnStatus         := OnStatus;
+ vConnection.AccessTag        := AccessTag;
+ vConnection.CriptOptions.Use := CriptOptions.Use;
+ vConnection.CriptOptions.Key := CriptOptions.Key;
+ vConnection.DataRoute        := DataRoute;
+ vConnection.Accept           := Accept;
+ vConnection.AcceptEncoding   := AcceptEncoding;
+ vConnection.ContentType      := ContentType;
+ vConnection.ContentEncoding  := ContentEncoding;
+ {$IFDEF FPC}
+  vConnection.DatabaseCharSet := csUndefined;
+ {$ENDIF}
+ CopyParams(vConnection, vRESTClientPooler);
  Try
   If Assigned(vRestPoolers) Then
    FreeAndNil(vRestPoolers);
@@ -4289,7 +4305,7 @@ Begin
  vContentType              := 'application/json';
  vContentEncoding          := 'multipart/form-data';
  vAccept                   := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
- vAcceptEncoding           := 'gzip2, deflate, br';
+ vAcceptEncoding           := '';
  vCharset                  := 'utf8';
  {$IFNDEF FPC}
  {$IF CompilerVersion > 21}
@@ -5468,6 +5484,20 @@ Begin
  End;
 End;
 
+Procedure TRESTDWDatabasebaseBase.CopyParams(ConnectionDB         : TRESTDWPoolerMethodClient;
+                                             Var RESTClientPooler : TRESTClientPoolerBase);
+Begin
+ If Assigned(RESTClientPooler) And
+    Assigned(ConnectionDB)     Then
+  Begin
+   RESTClientPooler.Accept          := ConnectionDB.Accept;
+   RESTClientPooler.AcceptEncoding  := ConnectionDB.AcceptEncoding;
+   RESTClientPooler.ContentType     := ConnectionDB.ContentType;
+   RESTClientPooler.ContentEncoding := ConnectionDB.ContentEncoding;
+   RESTClientPooler.AuthenticationOptions.Assign(ConnectionDB.AuthenticationOptions);
+  End;
+End;
+
 Procedure TRESTDWDatabasebaseBase.SetConnection(Value : Boolean);
 Var
  vRESTConnectionDB : TRESTDWPoolerMethodClient;
@@ -5483,30 +5513,35 @@ Begin
     Begin
      vRESTConnectionDB                 := TRESTDWPoolerMethodClient.Create(Nil);
      vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
-     vRESTConnectionDB.AuthenticationOptions.Assign(vAuthOptionParams);
-     vRESTConnectionDB.HandleRedirects := vHandleRedirects;
-     vRESTConnectionDB.RedirectMaximum := vRedirectMaximum;
-     vRESTConnectionDB.UserAgent       := vUserAgent;
-     vRESTConnectionDB.WelcomeMessage := vWelcomeMessage;
-     vRESTConnectionDB.Host           := vRestWebService;
-     vRESTConnectionDB.Port           := vPoolerPort;
-     vRESTConnectionDB.Compression    := vCompression;
-     vRESTConnectionDB.TypeRequest    := VtypeRequest;
-     vRESTConnectionDB.BinaryRequest  := False;
-     vRESTConnectionDB.Encoding       := vEncoding;
-     vRESTConnectionDB.EncodeStrings  := EncodedStrings;
-     vRESTConnectionDB.OnWork         := vOnWork;
-     vRESTConnectionDB.OnWorkBegin    := vOnWorkBegin;
-     vRESTConnectionDB.OnWorkEnd      := vOnWorkEnd;
-     vRESTConnectionDB.OnStatus       := vOnStatus;
-     vRESTConnectionDB.AccessTag      := vAccessTag;
-     vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
-     vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
+     vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
+     vRESTConnectionDB.HandleRedirects  := HandleRedirects;
+     vRESTConnectionDB.RedirectMaximum  := RedirectMaximum;
+     vRESTConnectionDB.UserAgent        := UserAgent;
+     vRESTConnectionDB.WelcomeMessage   := WelcomeMessage;
+     vRESTConnectionDB.Host             := PoolerService;
+     vRESTConnectionDB.Port             := PoolerPort;
+     vRESTConnectionDB.Compression      := Compression;
+     vRESTConnectionDB.TypeRequest      := TypeRequest;
+     vRESTConnectionDB.BinaryRequest    := False;
+     vRESTConnectionDB.Encoding         := Encoding;
+     vRESTConnectionDB.EncodeStrings    := EncodedStrings;
+     vRESTConnectionDB.OnWork           := OnWork;
+     vRESTConnectionDB.OnWorkBegin      := OnWorkBegin;
+     vRESTConnectionDB.OnWorkEnd        := OnWorkEnd;
+     vRESTConnectionDB.OnStatus         := OnStatus;
+     vRESTConnectionDB.AccessTag        := AccessTag;
+     vRESTConnectionDB.CriptOptions.Use := CriptOptions.Use;
+     vRESTConnectionDB.CriptOptions.Key := CriptOptions.Key;
      vRESTConnectionDB.DataRoute        := DataRoute;
+     vRESTConnectionDB.Accept           := Accept;
+     vRESTConnectionDB.AcceptEncoding   := AcceptEncoding;
+     vRESTConnectionDB.ContentType      := ContentType;
+     vRESTConnectionDB.ContentEncoding  := ContentEncoding;
      {$IFDEF FPC}
       vRESTConnectionDB.DatabaseCharSet := csUndefined;
      {$ENDIF}
      Try
+      CopyParams(vRESTConnectionDB, vRESTClientPooler);
       vConnected := TryConnect(vRESTConnectionDB);
      Finally
       If Assigned(vRESTConnectionDB) Then

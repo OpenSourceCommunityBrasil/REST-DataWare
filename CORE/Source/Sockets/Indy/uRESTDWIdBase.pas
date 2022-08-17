@@ -672,12 +672,11 @@ Begin
    Begin
     If (Length(E.ErrorMessage) > 0) Or (E.ErrorCode > 0) then
      Begin
-      Result:= E.ErrorCode;
+      Result := E.ErrorCode;
       If E.ErrorMessage <> '' Then
-       temp := TStringStream.Create(E.ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF})
+       Raise Exception.Create(E.ErrorMessage)
       Else
-       temp := TStringStream.Create(E.Message{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
-      temp.Free;
+       Raise Exception.Create(E.Message);
      End;
    End;
   On E: EIdSocketError do
@@ -784,7 +783,6 @@ Begin
        Else
         aString := sResponse;
       End;
-//     StringToStream(AResponse, aString);
      AResponse.Position := 0;
      If Not IgnoreEvents Then
      If Assigned(OnAfterRequest) then
@@ -799,13 +797,19 @@ Begin
    FreeAndNil(SendParams);
   End;
  Except
-  On E: EIdHTTPProtocolException do
+  On E: EIdHTTPProtocolException Do
    Begin
-    If (Length(E.ErrorMessage) > 0) Or (E.ErrorCode > 0) then
+    If (Length(E.ErrorMessage) > 0) Or
+       (E.ErrorCode            > 0) Then
      Begin
-      Result:= E.ErrorCode;
+      Result := E.ErrorCode;
       If E.ErrorMessage <> '' Then
-       temp := TStringStream.Create(E.ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF})
+       Begin
+        If E.Message <> '' Then
+         temp := TStringStream.Create(E.Message + ' - ' + E.ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF})
+        Else
+         temp := TStringStream.Create(E.ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+       End
       Else
        temp := TStringStream.Create(E.Message{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
       AResponse.CopyFrom(temp, temp.Size);
@@ -815,7 +819,7 @@ Begin
    End;
   On E: EIdSocketError do
    Begin
-    if Assigned(temp) then
+    If Assigned(temp) Then
      FreeAndNil(temp);
     HttpRequest.Disconnect(false);
     DestroyClient;
@@ -3471,6 +3475,7 @@ Procedure TRESTDWIdClientPooler.SetParams(TransparentProxy    : TProxyConnection
 Begin
  HttpRequest.DefaultCustomHeader.Clear;
  HttpRequest.DefaultCustomHeader.NameValueSeparator := cNameValueSeparator;
+ HttpRequest.Accept                      := Accept;
  HttpRequest.AcceptEncoding              := AcceptEncoding;
  HttpRequest.AuthenticationOptions       := AuthorizationParams;
  HttpRequest.ProxyOptions.ProxyUsername  := TransparentProxy.ProxyUsername;
@@ -3480,6 +3485,7 @@ Begin
  HttpRequest.RequestTimeout              := aRequestTimeout;
  HttpRequest.ConnectTimeout              := aConnectTimeout;
  HttpRequest.ContentType                 := ContentType;
+ HttpRequest.ContentEncoding             := ContentEncoding;
  HttpRequest.AllowCookies                := AllowCookies;
  HttpRequest.HandleRedirects             := HandleRedirects;
  HttpRequest.Charset                     := Charset;
@@ -3540,6 +3546,7 @@ Var
  SResult, vURL,
  vResponse,
  vTpRequest       : String;
+ vErrorCode,
  I                : Integer;
  vDWParam         : TJSONParam;
  MemoryStream,
@@ -3900,8 +3907,10 @@ Var
  Begin
   If Charset = esUtf8 Then
    Begin
-    HttpRequest.ContentType := 'application/json;charset=utf-8';
-    HttpRequest.Charset := 'utf-8';
+    If HttpRequest.ContentType = '' Then
+     HttpRequest.ContentType := 'application/json;charset=utf-8';
+    If HttpRequest.Charset = '' Then
+     HttpRequest.Charset := 'utf-8';
    End
   Else If Charset in [esANSI, esASCII] Then
    HttpRequest.Charset := 'ansi';
@@ -3984,16 +3993,18 @@ Var
        aStringStream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
       {$ENDIF}
       Case EventType Of
-       seGET    : HttpRequest.Get(vURL, TStringList(HttpRequest.DefaultCustomHeader), aStringStream);
+       seGET    : vErrorCode := HttpRequest.Get(vURL, TStringList(HttpRequest.DefaultCustomHeader), aStringStream);
        seDELETE : Begin
                    {$IFDEF FPC}
                     TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, vURL, SendParams, aStringStream, []);
+                    vErrorCode := TIdHTTPAccess(HttpRequest).ResponseCode;
                    {$ELSE}
                     {$IFDEF OLDINDY}
-                     HttpRequest.Delete(vURL);
+                     vErrorCode := HttpRequest.Delete(vURL);
                     {$ELSE}
                      //HttpRequest.Delete(AUrl, atempResponse);
                      TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, vURL, SendParams, aStringStream, []);
+                     vErrorCode := TIdHTTPAccess(HttpRequest).ResponseCode;
                     {$ENDIF}
                    {$ENDIF}
                   End;
@@ -4142,9 +4153,14 @@ Var
        SetParamsValues(Params, SendParams);
       If (Params <> Nil) Or (WelcomeMessage <> '') Or (Datacompress) Then
        Begin
-        HttpRequest.Accept          := 'application/json';
-        HttpRequest.ContentType     := 'application/x-www-form-urlencoded';
-        HttpRequest.ContentEncoding := 'multipart/form-data';
+        If HttpRequest.Accept = '' Then
+         HttpRequest.Accept         := 'application/json';
+        If HttpRequest.AcceptEncoding = '' Then
+         HttpRequest.AcceptEncoding := AcceptEncoding;
+        If HttpRequest.ContentType = '' Then
+         HttpRequest.ContentType     := 'application/x-www-form-urlencoded';
+        If HttpRequest.ContentEncoding = '' Then
+         HttpRequest.ContentEncoding := 'multipart/form-data';
         If TEncodeSelect(Encoding) = esUtf8 Then
          HttpRequest.Charset        := 'Utf-8'
         Else If TEncodeSelect(Encoding) in [esANSI, esASCII] Then
@@ -4164,24 +4180,27 @@ Var
            aStringStream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
           {$ENDIF}
           Case EventType Of
-           sePUT    : HttpRequest.Put   (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, aStringStream);
+           sePUT    : vErrorCode := HttpRequest.Put   (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, aStringStream);
            sePATCH  : Begin
                        {$IFNDEF OLDINDY}
                         {$IFDEF INDY_NEW}
                          {$IF CompilerVersion > 26} // Delphi XE6 pra cima
-                          HttpRequest.Patch (URL, SendParams, aStringStream);
+                          vErrorCode := HttpRequest.Patch (URL, SendParams, aStringStream);
                          {$IFEND}
                         {$ENDIF}
                        {$ENDIF}
                       End;
-           sePOST   : HttpRequest.Post  (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, aStringStream);
+           sePOST   : vErrorCode := HttpRequest.Post  (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, aStringStream);
           end;
           If Not Assyncexec Then
            Begin
             If Assigned(aStringStream) Then
              Begin
-              If aStringStream.Size > 0 Then
-               StringStream := ZDecompressStreamNew(aStringStream);
+              If (aStringStream.Size > 0) And
+                 (vErrorCode = 200)       Then
+               StringStream := ZDecompressStreamNew(aStringStream)
+              Else
+               StringStream := TStringStream.Create(TStringStream(aStringStream).DataString);
               FreeAndNil(aStringStream);
              End;
            End;
@@ -4194,17 +4213,17 @@ Var
            StringStream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
           {$ENDIF}
           Case EventType Of
-           sePUT    : HttpRequest.Put   (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, StringStream);
+           sePUT    : vErrorCode := HttpRequest.Put   (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, StringStream);
            sePATCH  : Begin
                        {$IFNDEF OLDINDY}
                         {$IFDEF INDY_NEW}
                          {$IF CompilerVersion > 26} // Delphi XE6 pra cima
-                          HttpRequest.Patch (URL, SendParams, StringStream);
+                          vErrorCode := HttpRequest.Patch (URL, SendParams, StringStream);
                          {$IFEND}
                         {$ENDIF}
                        {$ENDIF}
                       End;
-           sePOST   : HttpRequest.Post  (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, StringStream);
+           sePOST   : vErrorCode := HttpRequest.Post  (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, StringStream);
           end;
          End;
         If SendParams <> Nil Then
@@ -4251,40 +4270,53 @@ Var
        Begin
         If Not Assyncexec Then
          Begin
-          StringStream.Position := 0;
-          Params.LoadFromStream(StringStream);
-          {$IFNDEF FPC}
-           {$IF CompilerVersion > 21}
-            TStringStream(StringStream).Clear;
-           {$IFEND}
-           StringStream.Size := 0;
-          {$ENDIF}
+          If (vErrorCode = 200) Then
+           Begin
+            StringStream.Position := 0;
+            Params.LoadFromStream(StringStream);
+            {$IFNDEF FPC}
+             {$IF CompilerVersion > 21}
+              TStringStream(StringStream).Clear;
+             {$IFEND}
+             StringStream.Size := 0;
+            {$ENDIF}
+            ResultData := TReplyOK;
+           End
+          Else
+           Begin
+            ErrorMessage := TStringStream(StringStream).DataString;
+            ResultData   := TReplyNOK;
+           End;
           FreeAndNil(StringStream);
          End;
-        ResultData := TReplyOK;
        End
       Else
        Begin
         If Not Assyncexec Then
          Begin
-          StringStream.Position := 0;
-          If Datacompress Then
-           vDataPack := BytesToString(StreamToBytes(TMemoryStream(StringStream)))
-          Else
-           vDataPack := TStringStream(StringStream).DataString;
-          {$IFNDEF FPC}
-           {$IF CompilerVersion > 21}
-            TStringStream(StringStream).Clear;
-           {$IFEND}
-           StringStream.Size := 0;
-          {$ENDIF}
-          FreeAndNil(StringStream);
-          If BinaryRequest Then
+          If Assigned(StringStream) Then
            Begin
-            If Pos(TReplyNOK, vDataPack) > 0 Then
-             SetData(vDataPack, Params, ResultData)
+            StringStream.Position := 0;
+            If Datacompress Then
+             vDataPack := BytesToString(StreamToBytes(TMemoryStream(StringStream)))
             Else
-             ResultData := vDataPack
+             vDataPack := TStringStream(StringStream).DataString;
+            {$IFNDEF FPC}
+             {$IF CompilerVersion > 21}
+              TStringStream(StringStream).Clear;
+             {$IFEND}
+             StringStream.Size := 0;
+            {$ENDIF}
+            FreeAndNil(StringStream);
+            If BinaryRequest Then
+             Begin
+              If Pos(TReplyNOK, vDataPack) > 0 Then
+               SetData(vDataPack, Params, ResultData)
+              Else
+               ResultData := vDataPack
+             End
+            Else
+             SetData(vDataPack, Params, ResultData);
            End
           Else
            SetData(vDataPack, Params, ResultData);
