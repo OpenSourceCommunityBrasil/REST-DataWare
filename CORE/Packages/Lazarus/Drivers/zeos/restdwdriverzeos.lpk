@@ -24,21 +24,16 @@
 "/>
     <License Value="GPL- 3.0"/>
     <Version Major="2"/>
-    <Files Count="3">
+    <Files Count="2">
       <Item1>
-        <Filename Value="uRESTDWDriverZEOSReg.pas"/>
-        <HasRegisterProc Value="True"/>
-        <UnitName Value="uRESTDWDriverZEOSReg"/>
-      </Item1>
-      <Item2>
         <Filename Value="restdwdriverzeos.lrs"/>
         <Type Value="LRS"/>
-      </Item2>
-      <Item3>
+      </Item1>
+      <Item2>
         <Filename Value="..\..\..\..\Source\Database_Drivers\uRESTDWDriverZEOS.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="uRESTDWDriverZEOS"/>
-      </Item3>
+      </Item2>
     </Files>
     <CompatibilityMode Value="True"/>
     <RequiredPkgs Count="4">

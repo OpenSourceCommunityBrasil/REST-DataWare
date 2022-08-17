@@ -55,6 +55,11 @@ Uses {$IFDEF FPC}
    {$IFDEF FPC}
    vDatabaseCharSet        : TDatabaseCharSet;
    {$ENDIF}
+   vAccept,
+   vAcceptEncoding,
+   vContentType,
+   vCharset,
+   vContentEncoding,
    vPoolerNotFoundMessage,
    vDataRoute,
    vUserAgent,
@@ -320,6 +325,11 @@ Uses {$IFDEF FPC}
                                    ConnectTimeOut          : Integer = 3000;
                                    ConnectionDefs          : TObject           = Nil;
                                    RESTClientPooler        : TRESTClientPoolerBase = Nil)  : Boolean;
+   Property Accept                : String                     Read vAccept                Write vAccept;
+   Property AcceptEncoding        : String                     Read vAcceptEncoding        Write vAcceptEncoding;
+   Property ContentType           : String                     Read vContentType           Write vContentType;
+   Property Charset               : String                     Read vCharset               Write vCharset;
+   Property ContentEncoding       : String                     Read vContentEncoding       Write vContentEncoding;
    Property Compression           : Boolean                    Read vCompression           Write vCompression;
    Property BinaryRequest         : Boolean                    Read vBinaryRequest         Write vBinaryRequest;
    Property HandleRedirects       : Boolean                    Read vHandleRedirects       Write vHandleRedirects;
@@ -1275,7 +1285,10 @@ Var
 Begin
  Result := Nil;
  If Not Assigned(RESTClientPooler) Then
-  RESTClientPoolerExec  := TRESTClientPoolerBase.Create(Nil)
+  Begin
+   RESTClientPoolerExec  := TRESTClientPoolerBase.Create(Nil);
+   RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
+  End
  Else
   Begin
    RESTClientPoolerExec := RESTClientPooler;
@@ -1295,7 +1308,6 @@ Begin
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
- RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.WelcomeMessage  := vWelcomeMessage;
 // RESTClientPoolerExec.HandleRedirects := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum := vRedirectMaximum;

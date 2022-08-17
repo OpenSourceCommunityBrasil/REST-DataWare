@@ -29,7 +29,7 @@ implementation
 
 procedure Register;
 begin
-  RegisterPackageWizard(TSTLApplicationWizard.Create);
+  //RegisterPackageWizard(TSTLApplicationWizard.Create);
   RegisterPackageWizard(TSTLRDWDataModule.Create);
   RegisterPackageWizard(TCGIApplicationWizard.Create);
 end;

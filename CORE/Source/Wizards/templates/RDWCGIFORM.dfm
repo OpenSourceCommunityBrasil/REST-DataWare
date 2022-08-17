@@ -1,39 +1,36 @@
 object %0:s: T%0:s
-  OldCreateOrder = False
   OnCreate = WebModuleCreate
   Actions = <
     item
       Default = True
       Name = 'DefaultHandler'
       PathInfo = '/'
-      OnAction = dwCGIServiceDefaultHandlerAction
+      OnAction = WebModule1DefaultHandlerAction
     end>
-  Height = 240
-  Width = 290
-  object RESTServiceCGI1: TRESTServiceCGI
+  Height = 230
+  Width = 415
+  object RESTDWShellService1: TRESTDWShellService
+    Active = False
     CORS = False
     CORS_CustomHeaders.Strings = (
       'Access-Control-Allow-Origin=*'
-      
+
         'Access-Control-Allow-Methods=GET, POST, PATCH, PUT, DELETE, OPTI' +
         'ONS'
       
         'Access-Control-Allow-Headers=Content-Type, Origin, Accept, Autho' +
         'rization, X-CUSTOM-HEADER')
-    ServerParams.HasAuthentication = True
-    ServerParams.UserName = 'testserver'
-    ServerParams.Password = 'testserver'
+    PathTraversalRaiseError = True
+    RequestTimeout = -1
+    ServicePort = 8082
+    ProxyOptions.ProxyPort = 0
+    AuthenticationOptions.AuthorizationOption = rdwAONone
     Encoding = esUtf8
-    ForceWelcomeAccess = False
-    ServerContext = 'restdataware'
     RootPath = '/'
+    ForceWelcomeAccess = False
     CriptOptions.Use = False
     CriptOptions.Key = 'RDWBASEKEY256'
-    TokenOptions.Active = False
-    TokenOptions.ServerRequest = 'RESTDWServer01'
-    TokenOptions.TokenHash = 'RDWTS_HASH'
-    TokenOptions.LifeCycle = 30
-    Left = 120
-    Top = 112
+    Left = 176
+    Top = 72
   end
 end

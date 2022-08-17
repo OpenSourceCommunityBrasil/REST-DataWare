@@ -19,8 +19,10 @@ Uses
 
 Type
   Tstlapplicationwizard = Class(Tnotifierobject, Iotawizard, Iotaprojectwizard,
-      Iotarepositorywizard, Iunknown
-{$IFDEF DELPHI2006_LVL}, Iotarepositorywizard80{$ENDIF})
+      Iotarepositorywizard, Iunknown, Iotarepositorywizard80
+   {$IF COMPILERVERSION > 29},IOTARepositoryWizard160 {$IFEND}
+   {$IF COMPILERVERSION > 31}, IOTARepositoryWizard190{$IFEND}
+   {$IF COMPILERVERSION > 32}, IOTARepositoryWizard260{$IFEND})
   Private
     Funitident: String;
     Fclassname: String;
@@ -39,11 +41,34 @@ Type
     Function Getglyph: Cardinal;
     Procedure Execute;
     // iotarepositorywizard80
-{$IFDEF DELPHI2006_LVL}
+
     Function Getgallerycategory: Iotagallerycategory;
     Function Getpersonality: String;
     Function Getdesigner: String;
-{$ENDIF}
+
+
+//160
+   {$IF COMPILERVERSION > 29}
+     function GetFrameworkTypes: TArray<string>;
+    { Return the platform keys for the platforms this wizard supports }
+    function GetPlatforms: TArray<string>;
+
+    property FrameworkTypes: TArray<string> read GetFrameworkTypes;
+    property Platforms: TArray<string> read GetPlatforms;
+    {$ENDIF}
+
+    //190
+    {$IF COMPILERVERSION > 31}
+    function GetSupportedPlatforms: TArray<string>;
+    {$ENDIF}
+
+    // 260
+    {$IF COMPILERVERSION > 32}
+    function GetGalleryCategories: TArray<IOTAGalleryCategory>;
+
+    { GalleryCategories allow register a wizard under several caregories }
+    property GalleryCategories: TArray<IOTAGalleryCategory> read GetGalleryCategories;
+    {$ENDIF}
   Protected
   End;
 
@@ -152,7 +177,10 @@ Type
 
   Tstlrdwdatamodule = Class(Tnotifierobject, Iotawizard, Iotarepositorywizard,
       Iotacreator, Iotamodulecreator, IOTAFormWizard
-{$IFNDEF ver180}, Iotaformwizard100{$ENDIF}{$IFDEF DELPHI2006_LVL} ,Iotarepositorywizard80{$ENDIF}, Iunknown)
+{$IFNDEF ver180}, Iotaformwizard100{$ENDIF},Iotarepositorywizard80
+   {$IF COMPILERVERSION > 29},IOTARepositoryWizard160 {$IFEND}
+   {$IF COMPILERVERSION > 31}, IOTARepositoryWizard190{$IFEND}
+   {$IF COMPILERVERSION > 32}, IOTARepositoryWizard260{$IFEND}, Iunknown)
   Private
     Funitident: String;
     Fclassname: String;
@@ -176,12 +204,41 @@ Type
     Property Designer: String Read Getdesigner;
     // 80
 
-  {$IFDEF DELPHI2006_LVL}
-    Function Getgallerycategory: Iotagallerycategory;
-    Function Getpersonality: String;
-    Property Gallerycategory: Iotagallerycategory Read Getgallerycategory;
-    Property Personality: String Read Getpersonality;
+
+    function GetGalleryCategory: IOTAGalleryCategory;
+    function GetPersonality: string;
+
+    { GalleryCategory takes precedence over the result from GetPage.
+      If a wizard doesn't implement IOTARepositoryWizard80, it is
+      put under the Delphi personality's default section, and creates a
+      sub area named by the result of "GetPage". }
+    property GalleryCategory: IOTAGalleryCategory read GetGalleryCategory;
+    property Personality: string read GetPersonality;
+
+
+   //160
+   {$IF COMPILERVERSION > 29}
+     function GetFrameworkTypes: TArray<string>;
+    { Return the platform keys for the platforms this wizard supports }
+    function GetPlatforms: TArray<string>;
+
+    property FrameworkTypes: TArray<string> read GetFrameworkTypes;
+    property Platforms: TArray<string> read GetPlatforms;
     {$ENDIF}
+
+    //190
+    {$IF COMPILERVERSION > 31}
+    function GetSupportedPlatforms: TArray<string>;
+    {$ENDIF}
+
+    // 260
+    {$IF COMPILERVERSION > 32}
+    function GetGalleryCategories: TArray<IOTAGalleryCategory>;
+
+    { GalleryCategories allow register a wizard under several caregories }
+    property GalleryCategories: TArray<IOTAGalleryCategory> read GetGalleryCategories;
+    {$ENDIF}
+
 {$IFNDEF ver180}
     Function Isvisible(Project: Iotaproject): Boolean;
 {$ENDIF}
@@ -265,7 +322,10 @@ Var
 Implementation
 
 Uses
-  Forms, Sysutils, Designintf, Registry, Shlobj;
+  Forms, Sysutils, Designintf, Registry, Shlobj
+  {$IF COMPILERVERSION > 29}
+  ,PlatformAPI
+{$ENDIF};
 
 Const
   Sauthor = 'abritolda.com';
@@ -635,10 +695,11 @@ Begin
 {$IFDEF DELPHI2006_LVL}
   (Borlandideservices As Iotamoduleservices).Getnewmoduleandclassname('', Funitident,
     Fclassname, Ffilename);
-  Fclassname := 'RDWForm' + Copy(Funitident, 5, Length(Funitident));
+  Fclassname := 'RDWUnit' + Copy(Funitident, 8, Length(Funitident));
 {$ELSE}
   (Borlandideservices As Iotamoduleservices).Getnewmoduleandclassname('RDWForm',
     Funitident, Fclassname, Ffilename);
+    Fclassname := 'RDWDMUnit' + Copy(Funitident, 8, Length(Funitident));
 {$ENDIF}
   // (borlandideservices as iotamoduleservices).createmodule(self);
   Lproj := Getcurrentproject;
@@ -660,6 +721,8 @@ Begin
 {$ELSE}
   (Borlandideservices As Iotamoduleservices).Getnewmoduleandclassname('RDWForm',
     Funitident, Fclassname, Ffilename);
+    Fclassname := 'RDWForm' +
+    Copy(Funitident, 8, Length(Funitident));
 {$ENDIF}
   // (borlandideservices as iotamoduleservices).createmodule(self);
   Lproj := Getcurrentproject;
@@ -917,13 +980,17 @@ Begin
 {$IFDEF DELPHI2006_LVL}
   Lmoduleservices.Getnewmoduleandclassname('',
     Funitident, Fclassname, Ffilename);
-  Fclassname := 'RDWDatam' +
-    Copy(Funitident, 5, Length(Funitident));
+  Fclassname := 'RDWForm' +
+    Copy(Funitident, 8, Length(Funitident));
 {$ELSE}
   Lmoduleservices.Getnewmoduleandclassname
-    ('RDWDatam', Funitident, Fclassname,
+    ('RDWForm', Funitident, Fclassname,
     Ffilename);
+    Fclassname := 'RDWForm' +
+    Copy(Funitident, 8, Length(Funitident));
 {$ENDIF}
+Fclassname := 'RDWForm' +
+    Copy(Funitident, 8, Length(Funitident));
   Lmoduleservices.Createmodule
     (Tstlprojectcreator.Create(Fprojectname,
     Projectdir, Funitident, Fclassname,
@@ -946,8 +1013,6 @@ End;
 
 // ------------------------------------------------------------------------------
 
-{$IFDEF DELPHI2006_LVL}
-
 Function Tstlapplicationwizard.Getgallerycategory
   : Iotagallerycategory;
 Begin
@@ -957,21 +1022,69 @@ End;
 
 // ------------------------------------------------------------------------------
 
-Function Tstlapplicationwizard.
-  Getpersonality: String;
+Function Tstlapplicationwizard.Getpersonality: String;
 Begin
   Result := Sdelphipersonality;
 End;
 
 // ------------------------------------------------------------------------------
 
-Function Tstlapplicationwizard.
-  Getdesigner: String;
+Function Tstlapplicationwizard.Getdesigner: String;
 Begin
   Result := Dvcl;
 End;
-{$ENDIF}
+
 // ------------------------------------------------------------------------------
+
+{$IF COMPILERVERSION > 29}
+function Tstlapplicationwizard.GetFrameworkTypes: TArray<string>;
+begin
+  SetLength(Result, 2);
+  Result[0] := sFrameworkTypeVCL;
+  Result[1] := sFrameworkTypeFMX;
+end;
+
+
+{ Return the platform keys for the platforms this wizard supports }
+function Tstlapplicationwizard.GetPlatforms: TArray<string>;
+begin
+  SetLength(Result, 8);
+  Result[0] := cWin32Platform;
+  Result[1] := cWin64Platform;
+  Result[2] := cLinux64Platform;
+  Result[3] := cAndroidArm32Platform;
+  Result[4] := cAndroidArm64Platform;
+  Result[5] := cOSX64Platform;
+  Result[6] := ciOSSimulator64Platform;
+  Result[7] := ciOSDevice64Platform;
+end;
+ {$ENDIF}
+
+{$IF COMPILERVERSION > 31}
+function Tstlapplicationwizard.GetSupportedPlatforms: TArray<string>;
+begin
+  SetLength(Result, 8);
+  Result[0] := cWin32Platform;
+  Result[1] := cWin64Platform;
+  Result[2] := cLinux64Platform;
+  Result[3] := cAndroidArm32Platform;
+  Result[4] := cAndroidArm64Platform;
+  Result[5] := cOSX64Platform;
+  Result[6] := ciOSSimulator64Platform;
+  Result[7] := ciOSDevice64Platform;
+end;
+{$ENDIF}
+
+{$IF COMPILERVERSION > 32}
+function Tstlapplicationwizard.GetGalleryCategories: TArray<IOTAGalleryCategory>;
+begin
+  Result:=nil;
+end;
+
+{$ENDIF}
+
+
+
 
 Function Tstlapplicationwizard.Getglyph: Cardinal;
 Begin
@@ -1292,12 +1405,14 @@ Begin
   (Borlandideservices As Iotamoduleservices)
     .Getnewmoduleandclassname('', Funitident,
     Fclassname, Ffilename);
-  Fclassname := 'RDWForm' +
-    Copy(Funitident, 5, Length(Funitident));
+  Fclassname := 'RDWDatam' +
+    Copy(Funitident, 8, Length(Funitident));
 {$ELSE}
   (Borlandideservices As Iotamoduleservices)
-    .Getnewmoduleandclassname('RDWForm',
+    .Getnewmoduleandclassname('RDWUnitDM',
     Funitident, Fclassname, Ffilename);
+   Fclassname := 'RDWDatam' +
+    Copy(Funitident, 10, Length(Funitident));
 {$ENDIF}
   Lproj := Getcurrentproject;
     (Borlandideservices As Iotamoduleservices)
@@ -1362,13 +1477,13 @@ Function Tstlrdwdatamodule.Getformname: String;
 Begin
   Result := Fclassname;
 End;
-{$IFDEF DELPHI2006_LVL}
+
 Function Tstlrdwdatamodule.Getgallerycategory
   : Iotagallerycategory;
 Begin
   Result := Nil;
 End;
- {$ENDIF}
+
 Function Tstlrdwdatamodule.Getglyph: Cardinal;
 Begin
   Result := 0; // use standard icon
@@ -1435,12 +1550,14 @@ Function Tstlrdwdatamodule.Getpage: String;
 Begin
   Result := Spage;
 End;
-{$IFDEF DELPHI2006_LVL}
-Function Tstlrdwdatamodule.Getpersonality: String;
+
+
+
+Function Tstlrdwdatamodule.Getpersonality: string;
 Begin
   Result := Sdelphipersonality;
 End;
-{$ENDIF}
+
 
 // ------------------------------------------------------------------------------
 
@@ -1467,6 +1584,54 @@ Function Tstlrdwdatamodule.Getunnamed: Boolean;
 Begin
   Result := True;
 End;
+
+{$IF COMPILERVERSION > 29}
+function Tstlrdwdatamodule.GetFrameworkTypes: TArray<string>;
+begin
+  SetLength(Result, 2);
+  Result[0] := sFrameworkTypeVCL;
+  Result[1] := sFrameworkTypeFMX;
+end;
+
+
+{ Return the platform keys for the platforms this wizard supports }
+function Tstlrdwdatamodule.GetPlatforms: TArray<string>;
+begin
+  SetLength(Result, 8);
+  Result[0] := cWin32Platform;
+  Result[1] := cWin64Platform;
+  Result[2] := cLinux64Platform;
+  Result[3] := cAndroidArm32Platform;
+  Result[4] := cAndroidArm64Platform;
+  Result[5] := cOSX64Platform;
+  Result[6] := ciOSSimulator64Platform;
+  Result[7] := ciOSDevice64Platform;
+end;
+ {$ENDIF}
+
+{$IF COMPILERVERSION > 31}
+function Tstlrdwdatamodule.GetSupportedPlatforms: TArray<string>;
+begin
+  SetLength(Result, 8);
+  Result[0] := cWin32Platform;
+  Result[1] := cWin64Platform;
+  Result[2] := cLinux64Platform;
+  Result[3] := cAndroidArm32Platform;
+  Result[4] := cAndroidArm64Platform;
+  Result[5] := cOSX64Platform;
+  Result[6] := ciOSSimulator64Platform;
+  Result[7] := ciOSDevice64Platform;
+end;
+{$ENDIF}
+
+{$IF COMPILERVERSION > 32}
+function Tstlrdwdatamodule.GetGalleryCategories: TArray<IOTAGalleryCategory>;
+begin
+  Result:=nil;
+end;
+
+{$ENDIF}
+
 
 {$IFNDEF ver180}
 Function Tstlrdwdatamodule.Isvisible(Project: Iotaproject): Boolean;

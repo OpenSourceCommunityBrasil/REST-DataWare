@@ -19,8 +19,10 @@ Uses
 
 Type
   TCGIapplicationwizard = Class(Tnotifierobject, Iotawizard, Iotaprojectwizard,
-      Iotarepositorywizard, Iunknown
-{$IFDEF DELPHI2006_LVL}, Iotarepositorywizard80{$ENDIF})
+      Iotarepositorywizard, Iunknown, Iotarepositorywizard80
+      {$IF COMPILERVERSION > 29},IOTARepositoryWizard160 {$IFEND}
+   {$IF COMPILERVERSION > 31}, IOTARepositoryWizard190{$IFEND}
+   {$IF COMPILERVERSION > 32}, IOTARepositoryWizard260{$IFEND})
   Private
     Funitident: String;
     Fclassname: String;
@@ -39,11 +41,33 @@ Type
     Function Getglyph: Cardinal;
     Procedure Execute;
     // iotarepositorywizard80
-{$IFDEF DELPHI2006_LVL}
+    //160
+   {$IF COMPILERVERSION > 29}
+     function GetFrameworkTypes: TArray<string>;
+    { Return the platform keys for the platforms this wizard supports }
+    function GetPlatforms: TArray<string>;
+
+    property FrameworkTypes: TArray<string> read GetFrameworkTypes;
+    property Platforms: TArray<string> read GetPlatforms;
+    {$ENDIF}
+
+    //190
+    {$IF COMPILERVERSION > 31}
+    function GetSupportedPlatforms: TArray<string>;
+    {$ENDIF}
+
+    // 260
+    {$IF COMPILERVERSION > 32}
+    function GetGalleryCategories: TArray<IOTAGalleryCategory>;
+
+    { GalleryCategories allow register a wizard under several caregories }
+    property GalleryCategories: TArray<IOTAGalleryCategory> read GetGalleryCategories;
+    {$ENDIF}
+
     Function Getgallerycategory: Iotagallerycategory;
     Function Getpersonality: String;
     Function Getdesigner: String;
-{$ENDIF}
+
   Protected
   End;
 
@@ -240,7 +264,10 @@ var
 Implementation
 
 Uses
-  Forms, Sysutils, Designintf, Registry, Shlobj;
+  Forms, Sysutils, Designintf, Registry, Shlobj
+  {$IF COMPILERVERSION > 29}
+  ,PlatformAPI
+{$ENDIF};
 
 Const
   Sauthor = 'abritolda.com';
@@ -917,8 +944,10 @@ Begin
   Fclassname := 'RDWCGIDatam' +
     Copy(Funitident, 5, Length(Funitident));
 {$ELSE}
-  Lmoduleservices.Getnewmoduleandclassname('RDWCGIDatam', Funitident, Fclassname,
+  Lmoduleservices.Getnewmoduleandclassname('RDWunitDM', Funitident, Fclassname,
     Ffilename);
+    Fclassname := 'RDWCGIDatam' +
+    Copy(Funitident, 10, Length(Funitident));
 {$ENDIF}
   Lmoduleservices.Createmodule(TCGIprojectcreator.Create(Fprojectname,
     Projectdir, Funitident, Fclassname, Ffilename));
@@ -940,7 +969,6 @@ End;
 
 // ------------------------------------------------------------------------------
 
-{$IFDEF DELPHI2006_LVL}
 
 Function TCGIapplicationwizard.Getgallerycategory
   : Iotagallerycategory;
@@ -964,7 +992,7 @@ Function TCGIapplicationwizard.
 Begin
   Result := Dvcl;
 End;
-{$ENDIF}
+
 // ------------------------------------------------------------------------------
 
 Function TCGIapplicationwizard.Getglyph: Cardinal;
@@ -1001,6 +1029,53 @@ Function TCGIapplicationwizard.Getstate
 Begin
   Result := [Wsenabled];
 End;
+
+{$IF COMPILERVERSION > 29}
+function TCGIapplicationwizard.GetFrameworkTypes: TArray<string>;
+begin
+  SetLength(Result, 2);
+  Result[0] := sFrameworkTypeVCL;
+  Result[1] := sFrameworkTypeFMX;
+end;
+
+
+{ Return the platform keys for the platforms this wizard supports }
+function TCGIapplicationwizard.GetPlatforms: TArray<string>;
+begin
+  SetLength(Result, 8);
+  Result[0] := cWin32Platform;
+  Result[1] := cWin64Platform;
+  Result[2] := cLinux64Platform;
+  Result[3] := cAndroidArm32Platform;
+  Result[4] := cAndroidArm64Platform;
+  Result[5] := cOSX64Platform;
+  Result[6] := ciOSSimulator64Platform;
+  Result[7] := ciOSDevice64Platform;
+end;
+ {$ENDIF}
+
+{$IF COMPILERVERSION > 31}
+function TCGIapplicationwizard.GetSupportedPlatforms: TArray<string>;
+begin
+  SetLength(Result, 8);
+  Result[0] := cWin32Platform;
+  Result[1] := cWin64Platform;
+  Result[2] := cLinux64Platform;
+  Result[3] := cAndroidArm32Platform;
+  Result[4] := cAndroidArm64Platform;
+  Result[5] := cOSX64Platform;
+  Result[6] := ciOSSimulator64Platform;
+  Result[7] := ciOSDevice64Platform;
+end;
+{$ENDIF}
+
+{$IF COMPILERVERSION > 32}
+function TCGIapplicationwizard.GetGalleryCategories: TArray<IOTAGalleryCategory>;
+begin
+  Result:=nil;
+end;
+
+{$ENDIF}
 
 // ------------------------------------------------------------------------------
 
@@ -1117,12 +1192,14 @@ Begin
   (Borlandideservices As Iotamoduleservices)
     .Getnewmoduleandclassname('', Funitname,
     Fformclass, Ffilename);
-  Fformclass := 'RDWCGIForm' +
+  Fformclass := 'RDWCGIFormSrv' +
     Copy(Funitname, 5, Length(Funitname));
 {$ELSE}
   (Borlandideservices As Iotamoduleservices)
-    .Getnewmoduleandclassname('RDWCGIForm',
+    .Getnewmoduleandclassname('RDWDmUnSrv',
     Funitname, Fformclass, Ffilename);
+    Fformclass := 'RDWCGIFormSrv' +
+    Copy(Funitname, 11, Length(Funitname));
 {$ENDIF}
   // (borlandideservices as iotamoduleservices).createmodule(self);
   Lproj := Getcurrentproject;
@@ -1198,7 +1275,7 @@ Begin
   '{$R *.res}' + #13#10 + #13#10 + 'begin' +
     #13#10 + '  Application.Initialize;'
     + #13#10 +
-    '  Application.WebModuleClass := TRDWCGIForm2;' + #13#10
+    '  Application.WebModuleClass := WebModuleClass;' + #13#10
     + #13#10 +
 {$IFDEF DELPHI2006_LVL}
 {$ELSE}
