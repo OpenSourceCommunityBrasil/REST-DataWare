@@ -1,5 +1,9 @@
 package RESTDWDriverFireDAC;
 
+{$R RESTDWDriverFireDAC.res RESTDWDriverFireDAC.rc}
+{$R RESTDWDriverFireDAC.dres RESTDWDriverFireDAC.rc}
+{$R *.res}
+{$R *.dres}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
