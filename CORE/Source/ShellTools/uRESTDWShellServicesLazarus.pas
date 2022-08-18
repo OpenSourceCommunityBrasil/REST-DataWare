@@ -1,4 +1,4 @@
-unit uRESTDWShellServices;
+unit uRESTDWShellServicesLazarus;
 
 {$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 

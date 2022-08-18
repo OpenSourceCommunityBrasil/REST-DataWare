@@ -8,13 +8,14 @@ unit RESTDWDriverZEOS;
 interface
 
 uses
-  uRESTDWDriverZEOS, LazarusPackageIntf;
+  uRESTDWDriverZEOS, uRESTDWDriverZEOSReg, LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
   RegisterUnit('uRESTDWDriverZEOS', @uRESTDWDriverZEOS.Register);
+  RegisterUnit('uRESTDWDriverZEOSReg', @uRESTDWDriverZEOSReg.Register);
 end;
 
 initialization

@@ -8,13 +8,13 @@ unit RestDatawareShellservices;
 interface
 
 uses
-  uRESTDWShellServices, uRESTDWShellServicesReg, LazarusPackageIntf;
+  uRESTDWShellServicesLazarus, uRESTDWShellServicesRegLazarus, 
+  LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
-  RegisterUnit('uRESTDWShellServicesReg', @uRESTDWShellServicesReg.Register);
 end;
 
 initialization

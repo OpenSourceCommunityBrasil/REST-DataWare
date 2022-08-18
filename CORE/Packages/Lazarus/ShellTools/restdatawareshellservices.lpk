@@ -9,7 +9,7 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <OtherUnitFiles Value="..\..\..\Source\ShellTools\Lazarus"/>
+        <OtherUnitFiles Value="..\..\..\Source\ShellTools\Lazarus;..\..\..\Source\ShellTools"/>
         <UnitOutputDirectory Value="..\..\..\Source\compiledlaz"/>
       </SearchPaths>
     </CompilerOptions>
@@ -21,12 +21,11 @@
         <Type Value="LRS"/>
       </Item>
       <Item>
-        <Filename Value="..\..\..\Source\ShellTools\Lazarus\uRESTDWShellServices.pas"/>
+        <Filename Value="..\..\..\Source\ShellTools\uRESTDWShellServicesLazarus.pas"/>
         <UnitName Value="uRESTDWShellServices"/>
       </Item>
       <Item>
-        <Filename Value="..\..\..\Source\ShellTools\Lazarus\uRESTDWShellServicesReg.pas"/>
-        <HasRegisterProc Value="True"/>
+        <Filename Value="..\..\..\Source\ShellTools\uRESTDWShellServicesRegLazarus.pas"/>
         <UnitName Value="uRESTDWShellServicesReg"/>
       </Item>
     </Files>
