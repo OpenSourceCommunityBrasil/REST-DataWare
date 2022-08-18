@@ -21,13 +21,13 @@
         <Projects Include="Connectors\Indy\RESTDWSocketIndyDesign.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\..\Source\Wizards\RESTDWWizards.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="Drivers\FireDAC\RESTDWDriverFireDAC.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="Drivers\Zeos\RESTDWDriverZEOS.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Wizards\RESTDWWizards.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -92,15 +92,6 @@
     <Target Name="RESTDWSocketIndyDesign:Make">
         <MSBuild Projects="Connectors\Indy\RESTDWSocketIndyDesign.dproj" Targets="Make"/>
     </Target>
-    <Target Name="RESTDWWizards">
-        <MSBuild Projects="..\..\Source\Wizards\RESTDWWizards.dproj"/>
-    </Target>
-    <Target Name="RESTDWWizards:Clean">
-        <MSBuild Projects="..\..\Source\Wizards\RESTDWWizards.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="RESTDWWizards:Make">
-        <MSBuild Projects="..\..\Source\Wizards\RESTDWWizards.dproj" Targets="Make"/>
-    </Target>
     <Target Name="RESTDWDriverFireDAC">
         <MSBuild Projects="Drivers\FireDAC\RESTDWDriverFireDAC.dproj"/>
     </Target>
@@ -119,14 +110,23 @@
     <Target Name="RESTDWDriverZEOS:Make">
         <MSBuild Projects="Drivers\Zeos\RESTDWDriverZEOS.dproj" Targets="Make"/>
     </Target>
+    <Target Name="RESTDWWizards">
+        <MSBuild Projects="Wizards\RESTDWWizards.dproj"/>
+    </Target>
+    <Target Name="RESTDWWizards:Clean">
+        <MSBuild Projects="Wizards\RESTDWWizards.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWWizards:Make">
+        <MSBuild Projects="Wizards\RESTDWWizards.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="RESTDWCore;RESTDWShellServices;RESTDWSocketIndy;RESTDWCoreDesign;RESTDWShellServicesDesign;RESTDWSocketIndyDesign;RESTDWWizards;RESTDWDriverFireDAC;RESTDWDriverZEOS"/>
+        <CallTarget Targets="RESTDWCore;RESTDWShellServices;RESTDWSocketIndy;RESTDWCoreDesign;RESTDWShellServicesDesign;RESTDWSocketIndyDesign;RESTDWDriverFireDAC;RESTDWDriverZEOS;RESTDWWizards"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RESTDWCore:Clean;RESTDWShellServices:Clean;RESTDWSocketIndy:Clean;RESTDWCoreDesign:Clean;RESTDWShellServicesDesign:Clean;RESTDWSocketIndyDesign:Clean;RESTDWWizards:Clean;RESTDWDriverFireDAC:Clean;RESTDWDriverZEOS:Clean"/>
+        <CallTarget Targets="RESTDWCore:Clean;RESTDWShellServices:Clean;RESTDWSocketIndy:Clean;RESTDWCoreDesign:Clean;RESTDWShellServicesDesign:Clean;RESTDWSocketIndyDesign:Clean;RESTDWDriverFireDAC:Clean;RESTDWDriverZEOS:Clean;RESTDWWizards:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RESTDWCore:Make;RESTDWShellServices:Make;RESTDWSocketIndy:Make;RESTDWCoreDesign:Make;RESTDWShellServicesDesign:Make;RESTDWSocketIndyDesign:Make;RESTDWWizards:Make;RESTDWDriverFireDAC:Make;RESTDWDriverZEOS:Make"/>
+        <CallTarget Targets="RESTDWCore:Make;RESTDWShellServices:Make;RESTDWSocketIndy:Make;RESTDWCoreDesign:Make;RESTDWShellServicesDesign:Make;RESTDWSocketIndyDesign:Make;RESTDWDriverFireDAC:Make;RESTDWDriverZEOS:Make;RESTDWWizards:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
