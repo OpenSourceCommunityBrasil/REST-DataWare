@@ -3123,26 +3123,29 @@ Begin
      {$IFEND}
     {$ENDIF}
     AResponseInfo.ResponseNo               := StatusCode;
-    If (vResponseString <> '') Or
-       (ErrorMessage    <> '') Then
+    If (vResponseString <> '')   Or
+       (ErrorMessage    <> '')   Then
      Begin
-      If Assigned(ResultStream) Then
+      If Assigned(ResultStream)  Then
        FreeAndNil(ResultStream);
       If (vResponseString <> '') Then
        ResultStream  := TStringStream.Create(vResponseString)
       Else
        ResultStream  := TStringStream.Create(ErrorMessage);
      End;
-    if Assigned(ResultStream)  then    //anderson
-    begin
+    If Assigned(ResultStream)    Then
+     Begin
       AResponseInfo.FreeContentStream      := True;
       AResponseInfo.ContentStream          := ResultStream;
       AResponseInfo.ContentStream.Position := 0;
-    end;
+     End;
     {$IFNDEF FPC}
-     AResponseInfo.ContentLength         := ResultStream.Size;
+     if Assigned(ResultStream) Then
+      AResponseInfo.ContentLength          := ResultStream.Size
+     Else
+      AResponseInfo.ContentLength          := -1;
     {$ELSE}
-     AResponseInfo.ContentLength         := -1;
+     AResponseInfo.ContentLength           := -1;
     {$ENDIF}
     For I := 0 To vResponseHeader.Count -1 Do
      AResponseInfo.CustomHeaders.AddValue(vResponseHeader.Names [I],
