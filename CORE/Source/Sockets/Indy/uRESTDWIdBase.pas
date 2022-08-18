@@ -116,6 +116,8 @@ Type
   Property SSLVerifyMode           : TIdSSLVerifyModeSet Read vSSLVerifyMode           Write vSSLVerifyMode;
   Property SSLVerifyDepth          : Integer             Read vSSLVerifyDepth          Write vSSLVerifyDepth;
   Property SSLMode                 : TIdSSLMode          Read vSSLMode                 Write vSSLMode;
+  Property SSLMethod               : TIdSSLVersion       Read aSSLMethod               Write aSSLMethod;
+  Property SSLVersions             : TIdSSLVersions      Read aSSLVersions             Write aSSLVersions;
   Property CipherList              : String              Read vCipherList              Write vCipherList;
 End;
 
@@ -3475,7 +3477,7 @@ Procedure TRESTDWIdClientPooler.SetParams(TransparentProxy    : TProxyConnection
 Begin
  HttpRequest.DefaultCustomHeader.Clear;
  HttpRequest.DefaultCustomHeader.NameValueSeparator := cNameValueSeparator;
- HttpRequest.Accept                      := Accept;
+// HttpRequest.Accept                      := Accept;
  HttpRequest.AcceptEncoding              := AcceptEncoding;
  HttpRequest.AuthenticationOptions       := AuthorizationParams;
  HttpRequest.ProxyOptions.ProxyUsername  := TransparentProxy.ProxyUsername;
@@ -3485,7 +3487,7 @@ Begin
  HttpRequest.RequestTimeout              := aRequestTimeout;
  HttpRequest.ConnectTimeout              := aConnectTimeout;
  HttpRequest.ContentType                 := ContentType;
- HttpRequest.ContentEncoding             := ContentEncoding;
+// HttpRequest.ContentEncoding             := ContentEncoding;
  HttpRequest.AllowCookies                := AllowCookies;
  HttpRequest.HandleRedirects             := HandleRedirects;
  HttpRequest.Charset                     := Charset;
