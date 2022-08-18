@@ -1044,7 +1044,6 @@ begin
   Result[1] := sFrameworkTypeFMX;
 end;
 
-
 { Return the platform keys for the platforms this wizard supports }
 function Tstlapplicationwizard.GetPlatforms: TArray<string>;
 begin
@@ -1052,11 +1051,11 @@ begin
   Result[0] := cWin32Platform;
   Result[1] := cWin64Platform;
   Result[2] := cLinux64Platform;
-  Result[3] := cAndroidArm32Platform;
-  Result[4] := cAndroidArm64Platform;
-  Result[5] := cOSX64Platform;
-  Result[6] := ciOSSimulator64Platform;
-  Result[7] := ciOSDevice64Platform;
+//  Result[3] := cAndroidPlatform;
+//  Result[4] := cAndroidPlatform;
+//  Result[5] := cOSX64Platform;
+//  Result[6] := ciOSSimulator64Platform;
+//  Result[7] := ciOSDevice64Platform;
 end;
  {$ENDIF}
 
@@ -1067,11 +1066,11 @@ begin
   Result[0] := cWin32Platform;
   Result[1] := cWin64Platform;
   Result[2] := cLinux64Platform;
-  Result[3] := cAndroidArm32Platform;
-  Result[4] := cAndroidArm64Platform;
-  Result[5] := cOSX64Platform;
-  Result[6] := ciOSSimulator64Platform;
-  Result[7] := ciOSDevice64Platform;
+  Result[3] := cOSX64Platform;
+  Result[4] := ciOSSimulator64Platform;
+  Result[5] := ciOSDevice64Platform;
+//  Result[6] := cAndroidArm32Platform;
+//  Result[7] := cAndroidArm64Platform;
 end;
 {$ENDIF}
 
@@ -1080,11 +1079,7 @@ function Tstlapplicationwizard.GetGalleryCategories: TArray<IOTAGalleryCategory>
 begin
   Result:=nil;
 end;
-
 {$ENDIF}
-
-
-
 
 Function Tstlapplicationwizard.Getglyph: Cardinal;
 Begin
@@ -1597,30 +1592,30 @@ end;
 { Return the platform keys for the platforms this wizard supports }
 function Tstlrdwdatamodule.GetPlatforms: TArray<string>;
 begin
-  SetLength(Result, 8);
+  SetLength(Result, 4);
   Result[0] := cWin32Platform;
   Result[1] := cWin64Platform;
   Result[2] := cLinux64Platform;
-  Result[3] := cAndroidArm32Platform;
-  Result[4] := cAndroidArm64Platform;
-  Result[5] := cOSX64Platform;
-  Result[6] := ciOSSimulator64Platform;
-  Result[7] := ciOSDevice64Platform;
+  Result[3] := ciOSDevice64Platform;
+//  Result[3] := cAndroidArm32Platform;
+//  Result[4] := cAndroidArm64Platform;
+//  Result[5] := cOSX64Platform;
+//  Result[6] := ciOSSimulator64Platform;
 end;
  {$ENDIF}
 
 {$IF COMPILERVERSION > 31}
 function Tstlrdwdatamodule.GetSupportedPlatforms: TArray<string>;
 begin
-  SetLength(Result, 8);
+  SetLength(Result, 6);
   Result[0] := cWin32Platform;
   Result[1] := cWin64Platform;
   Result[2] := cLinux64Platform;
-  Result[3] := cAndroidArm32Platform;
-  Result[4] := cAndroidArm64Platform;
-  Result[5] := cOSX64Platform;
-  Result[6] := ciOSSimulator64Platform;
-  Result[7] := ciOSDevice64Platform;
+  Result[3] := cOSX64Platform;
+  Result[4] := ciOSSimulator64Platform;
+  Result[5] := ciOSDevice64Platform;
+//  Result[6] := cAndroidArm32Platform;
+//  Result[7] := cAndroidArm64Platform;
 end;
 {$ENDIF}
 

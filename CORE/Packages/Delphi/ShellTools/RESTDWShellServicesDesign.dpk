@@ -42,6 +42,6 @@ requires
   RESTDWShellServices;
 
 contains
-  uRESTDWShellServicesReg in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServicesReg.pas';
+  uRESTDWShellServicesRegDelphi in '..\..\..\Source\ShellTools\uRESTDWShellServicesRegDelphi.pas';
 
 end.

@@ -1,4 +1,4 @@
-unit uRESTDWShellServices;
+unit uRESTDWShellServicesDelphi;
 
 {$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 

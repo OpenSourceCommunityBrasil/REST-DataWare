@@ -138,9 +138,11 @@ Procedure Register;
 
 implementation
 
-{$IFNDEF FPC}{$if CompilerVersion < 23}
-{$R .\Package\D7\RESTDWDriverZEOS.dcr}
-{$IFEND}{$ENDIF}
+{$IFNDEF FPC}
+ {$if CompilerVersion < 23}
+  {$R .\RESTDWDriverZEOS.dcr}
+ {$IFEND}
+{$ENDIF}
 
 Procedure Register;
 Begin
