@@ -2078,6 +2078,7 @@ Begin
      End;
     If RESTDWFileExists(sFile, FRootPath) then
      Begin
+      StatusCode    := 200;
       ContentType   := GetMIMEType(sFile);
       ServerContextStream := TMemoryStream.Create;
       ServerContextStream.LoadFromFile(sFile);
@@ -3828,7 +3829,7 @@ Begin
              LocalDoc := '';
              If TEncodeSelect(vEncoding) = esUtf8 Then
               sCharset := 'utf-8'
-              Else If TEncodeSelect(vEncoding) in [esANSI, esASCII] Then
+             Else If TEncodeSelect(vEncoding) in [esANSI, esASCII] Then
               sCharset := 'ansi';
              If Not vSpecialServer Then
               Begin
@@ -3836,7 +3837,7 @@ Begin
                If ServerContextStream <> Nil Then
                 Begin
                  If Not (Assigned(ResultStream)) Then
-                   ResultStream := TStringStream.Create('');  //Anderson
+                  ResultStream := TStringStream.Create('');
                  WriteStream(ServerContextStream, ResultStream);
                  FreeAndNil(ServerContextStream);
                 End
@@ -3854,6 +3855,8 @@ Begin
                   {$IF CompilerVersion > 21}
                    mb                                   := TStringStream.Create(JSONStr{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
                    mb.Position                          := 0;
+                   If Not (Assigned(ResultStream)) Then
+                    ResultStream := TStringStream.Create('');
                    WriteStream(mb, ResultStream);
                    FreeAndNil(mb);
                   {$ELSE}
@@ -6387,12 +6390,14 @@ Begin
        vTagService := False;
        For B := 0 To TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.Count -1 Do
         Begin
-         If ((LowerCase(urlContext) = LowerCase(TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext))) Or
-            ((Trim(TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext) = '') And (Pooler = '')        And
-             (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[urlContext] <> Nil))      Then
+         If ((LowerCase(Pooler) = LowerCase(TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext))) Or
+            ((Trim(TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext) = '')                      And
+             ((urlContext = '') or (urlContext = '/')))                                                              Then
+          vTagService := (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler] <> Nil);
+         If vTagService Then
           Begin
            vRootContext := TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext;
-           If ((Pooler = '')    And (vRootContext <> '')) Then
+           If (((urlContext = '') or (urlContext = '/')) And (vRootContext <> '')) And (Pooler = '') Then
             Pooler := vRootContext;
           End
          Else

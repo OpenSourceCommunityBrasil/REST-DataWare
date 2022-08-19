@@ -1047,7 +1047,7 @@ end;
 { Return the platform keys for the platforms this wizard supports }
 function Tstlapplicationwizard.GetPlatforms: TArray<string>;
 begin
-  SetLength(Result, 8);
+  SetLength(Result, 3);
   Result[0] := cWin32Platform;
   Result[1] := cWin64Platform;
   Result[2] := cLinux64Platform;
@@ -1062,7 +1062,7 @@ end;
 {$IF COMPILERVERSION > 31}
 function Tstlapplicationwizard.GetSupportedPlatforms: TArray<string>;
 begin
-  SetLength(Result, 8);
+  SetLength(Result, 6);
   Result[0] := cWin32Platform;
   Result[1] := cWin64Platform;
   Result[2] := cLinux64Platform;
