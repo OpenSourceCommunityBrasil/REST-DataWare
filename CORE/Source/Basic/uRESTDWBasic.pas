@@ -2141,8 +2141,7 @@ Begin
     vIsQueryParam := (Pos('?', Lowercase(Url)) > 0) And
                      (Pos('=', Lowercase(Url)) > 0);
     If Not vIsQueryParam Then
-     vIsQueryParam := (Pos('?', Lowercase(RawHTTPCommand)) > 0) And
-                      (Pos('=', Lowercase(RawHTTPCommand)) > 0);
+     vIsQueryParam := (Pos('?', Lowercase(RawHTTPCommand)) > 0);
     vOldRequest    := Cmd;
     If vIsQueryParam Then
      vUrlToExec    := Url
@@ -2898,10 +2897,10 @@ Begin
              Begin
               vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                {$ELSE}Url{$IFEND}
-                                                               {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams);
+                                                               {$ELSE}Url{$ENDIF} + '?' + QueryParams);
               TRESTDWDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                        {$ELSE}Url{$IFEND}
-                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams, vEncoding, vmark, DWParams);
+                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams, vEncoding, vmark, DWParams);
              End
             Else
              Begin
@@ -3874,7 +3873,10 @@ Begin
       If Assigned(vLastResponse) Then
        Begin
         Try
-         vLastResponse(vReplyString);
+         If vReplyString = '' Then
+          vLastResponse(JSONStr)
+         Else
+          vLastResponse(vReplyString);
         Finally
         End;
        End;
@@ -4664,7 +4666,8 @@ Var
   vTempString  := UrlToExec;
   If Length(vTempString) > 0 Then
    Begin
-    If Copy(vTempString, Length(vTempString), 1) = '/' Then
+    If (Copy(vTempString, Length(vTempString), 1) = '/') Or
+       (Copy(vTempString, Length(vTempString), 1) = '?') Then
      vTempString := Copy(vTempString, 1, Length(vTempString) -1);
     For I := Length(vTempString) - FinalStrPos Downto InitStrPos Do
      Begin

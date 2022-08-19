@@ -3072,7 +3072,6 @@ End;
 
 Function EncodeStream (Value : TStream) : String;
  {$IFNDEF FPC}
-  {$IFDEF LINUXFMX}
    Function EncodeBase64(AValue : TStream) : String;
    Var
     StreamDecoded : TMemoryStream;
@@ -3081,31 +3080,15 @@ Function EncodeStream (Value : TStream) : String;
     StreamDecoded := TMemoryStream.Create;
     StreamEncoded := TStringStream.Create('');
     Try
-//     StreamDecoded.WriteBuffer(AValue[0], Length(AValue));
      StreamDecoded.CopyFrom(AValue, AValue.Size);
      StreamDecoded.Position := 0;
      EncdDecd.EncodeStream(StreamDecoded, StreamEncoded);
-     Result := StreamEncoded.DataString;
+     Result := StringReplace(StreamEncoded.DataString, sLineBreak, '', [rfReplaceAll]);
     Finally
      StreamEncoded.Free;
      StreamDecoded.Free;
     End;
    End;
-  {$ELSE}
-   Function EncodeBase64(AValue : TStream) : String;
-   Var
-    outstream : TStringStream;
-   Begin
-    outstream := TStringStream.Create('');
-    Try
-     outstream.CopyFrom(AValue, AValue.Size);
-     outstream.Position := 0;
-     Result := EncodeStrings(outstream.Datastring{$IFDEF FPC}, csUndefined{$ENDIF});
-    Finally
-     FreeAndNil(outstream);
-    End;
-   End;
-  {$ENDIF}
  {$ELSE}
   Function EncodeBase64(AValue : TStream) : String;
   Var

@@ -1,7 +1,7 @@
 package RESTDWWizards;
 
 {$R *.res}
-{$R 'RDWSERVER.res'}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
@@ -23,9 +23,10 @@ package RESTDWWizards;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'REST DataWare Wizards'}
-{$IMPLICITBUILD OFF}
 {$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'REST Dataware Wizards'}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl,
@@ -35,9 +36,7 @@ requires
   vclactnband,
   vclx;
 
-{%RC 'templates\RDWSERVER.RC'}
-
 contains
-  STLWizardreg in 'STLWizardreg.pas';
+  STLWizardreg in '..\..\..\Source\Wizards\STLWizardreg.pas';
 
 end.
