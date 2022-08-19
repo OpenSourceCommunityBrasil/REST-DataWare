@@ -652,7 +652,8 @@ Begin
  try
    Result := Mime.GetFileMIMEType(sFile);
  finally
-   FreeAndNil(Mime);
+  Mime.Free
+//   FreeAndNil(Mime);
  end;
 End;
 

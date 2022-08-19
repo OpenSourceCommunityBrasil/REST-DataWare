@@ -3600,8 +3600,8 @@ Begin
                     StatusCode             := 200;
                     If Not (Assigned(ResultStream)) Then
                      ResultStream := TStringStream.Create('');
-                    WriteStream(mb, ResultStream);
-                    FreeAndNil(mb);
+                    WriteStream(ContentStream, ResultStream);
+                    FreeAndNil(ContentStream);
                     Result                 := True;
                    End;
                  End;
