@@ -88,7 +88,7 @@ RemoteSymbols=0
 MinStackSize=16384
 MaxStackSize=1048576
 ImageBase=4194304
-ExeDescription=RDW Dataware Wizards
+ExeDescription=REST Dataware Wizards
 [Directories]
 OutputDir=
 UnitOutputDir=

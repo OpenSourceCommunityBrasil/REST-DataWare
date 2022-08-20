@@ -19,7 +19,7 @@ Uses
 
 Type
   TCGIapplicationwizard = Class(Tnotifierobject, Iotawizard, Iotaprojectwizard,
-      Iotarepositorywizard, Iunknown, Iotarepositorywizard80
+      Iotarepositorywizard, Iunknown
       {$IF COMPILERVERSION > 29},IOTARepositoryWizard160 {$IFEND}
    {$IF COMPILERVERSION > 31}, IOTARepositoryWizard190{$IFEND}
    {$IF COMPILERVERSION > 32}, IOTARepositoryWizard260{$IFEND})
@@ -49,12 +49,12 @@ Type
 
     property FrameworkTypes: TArray<string> read GetFrameworkTypes;
     property Platforms: TArray<string> read GetPlatforms;
-    {$ENDIF}
+    {$IFEND}
 
     //190
     {$IF COMPILERVERSION > 31}
     function GetSupportedPlatforms: TArray<string>;
-    {$ENDIF}
+    {$IFEND}
 
     // 260
     {$IF COMPILERVERSION > 32}
@@ -62,10 +62,12 @@ Type
 
     { GalleryCategories allow register a wizard under several caregories }
     property GalleryCategories: TArray<IOTAGalleryCategory> read GetGalleryCategories;
-    {$ENDIF}
+    {$IFEND}
 
+    {$IF COMPILERVERSION > 18}
     Function Getgallerycategory: Iotagallerycategory;
     Function Getpersonality: String;
+    {$IFEND}
     Function Getdesigner: String;
 
   Protected
@@ -267,7 +269,7 @@ Uses
   Forms, Sysutils, Designintf, Registry, Shlobj
   {$IF COMPILERVERSION > 29}
   ,PlatformAPI
-{$ENDIF};
+{$IFEND};
 
 Const
   Sauthor = 'abritolda.com';
@@ -970,20 +972,23 @@ End;
 // ------------------------------------------------------------------------------
 
 
+{$IF COMPILERVERSION > 18}
 Function TCGIapplicationwizard.Getgallerycategory
   : Iotagallerycategory;
 Begin
   Result := Nil;
-
 End;
+{$IFEND}
 
 // ------------------------------------------------------------------------------
 
+{$IF COMPILERVERSION > 18}
 Function TCGIapplicationwizard.
   Getpersonality: String;
 Begin
   Result := Sdelphipersonality;
 End;
+{$IFEND}
 
 // ------------------------------------------------------------------------------
 
@@ -1052,7 +1057,7 @@ begin
 //  Result[5] := cOSX64Platform;
 //  Result[6] := ciOSSimulator64Platform;
 end;
- {$ENDIF}
+ {$IFEND}
 
 {$IF COMPILERVERSION > 31}
 function TCGIapplicationwizard.GetSupportedPlatforms: TArray<string>;
@@ -1067,7 +1072,7 @@ begin
 //  Result[3] := cAndroidArm32Platform;
 //  Result[4] := cAndroidArm64Platform;
 end;
-{$ENDIF}
+{$IFEND}
 
 {$IF COMPILERVERSION > 32}
 function TCGIapplicationwizard.GetGalleryCategories: TArray<IOTAGalleryCategory>;
@@ -1075,7 +1080,7 @@ begin
   Result:=nil;
 end;
 
-{$ENDIF}
+{$IFEND}
 
 // ------------------------------------------------------------------------------
 
