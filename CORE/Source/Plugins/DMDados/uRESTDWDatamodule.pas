@@ -187,7 +187,8 @@ Var
        Begin
         If Pos('/', vTempParams) > 0 Then
          Begin
-          Delete(vTempParams, 1, Pos('/', vTempParams));
+          If vTempParams[InitStrPos] = '/' Then
+           Delete(vTempParams, 1, 1);
           vTempValue := Copy(vTempParams, 1, Pos('/', vTempParams) - 1);
           Delete(vTempParams, 1, Pos('/', vTempParams));
          End
@@ -199,10 +200,13 @@ Var
           JSONParam := TJSONParam.Create(Params.Encoding);
           JSONParam.ParamName := vParamName;
           JSONParam.ObjectDirection := odIN;
-          JSONParam.SetValue(vTempValue);
+          If (vTempValue <> '') Then
+           JSONParam.SetValue(vTempValue);
           Params.Add(JSONParam);
          End
-        Else
+        Else If Not(vIsQuery)         And
+                   (JSONParam.IsNull) And
+                   (vTempValue <> '') Then
          JSONParam.SetValue(vTempValue);
        End;
      End;
