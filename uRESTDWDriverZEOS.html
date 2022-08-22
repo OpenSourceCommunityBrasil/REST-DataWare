@@ -4,37 +4,41 @@
 <title>REST DataWare: uRESTDWDriverZEOS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="PasDoc 0.16.0">
-<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="tipuesearch/tipuesearch.css">
+
 <link rel="StyleSheet" type="text/css" href="pasdoc.css">
 </head>
 <body>
 <div class="container"><div class="navigation">
-<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">VariÃ¡veis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">FunÃ§Ãµes e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li><li><form class="search-form" action="tipue_results.html"><div class="search-input"><input type="text" name="q" id="tipue_search_input" pattern=".{3,}" title="At least 3 characters" required><div class="search-button"><input type="button" id="tipue_search_button" onclick="this.form.submit();"></div></div></form>
+<div style="clear: both"></div>
+</li></ul></div><div class="content">
 <h1 class="unit">Unit uRESTDWDriverZEOS</h1>
 <div class="sections">
-<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Uses">Uses</a></div><div class="one_section"><a class="section" href="#PasDoc-Classes">Classes, Interfaces, Objetos e Registros</a></div><div class="one_section"><a class="section" href="#PasDoc-FuncsProcs">Funções e Procedimentos</a></div><div class="one_section">Tipos</div><div class="one_section">Constantes</div><div class="one_section">Variáveis</div></div>
-<span id="PasDoc-Description"></span><h2 class="description">Descrição</h2>
+<div class="one_section"><a class="section" href="#PasDoc-Description">DescriÃ§Ã£o</a></div><div class="one_section"><a class="section" href="#PasDoc-Uses">Uses</a></div><div class="one_section"><a class="section" href="#PasDoc-Classes">Classes, Interfaces, Objetos e Registros</a></div><div class="one_section"><a class="section" href="#PasDoc-FuncsProcs">FunÃ§Ãµes e Procedimentos</a></div><div class="one_section">Tipos</div><div class="one_section">Constantes</div><div class="one_section">VariÃ¡veis</div></div>
+<span id="PasDoc-Description"></span><h2 class="description">DescriÃ§Ã£o</h2>
 &nbsp;<span id="PasDoc-Uses"></span><h2 class="uses">Uses</h2>
-<ul class="useslist"><li>SysUtils</li><li>Classes</li><li>DB</li><li>lconvencoding</li><li><a href="uRESTDWCharset.html">uRESTDWCharset</a></li><li>ZSqlUpdate</li><li>ZAbstractRODataset</li><li>ZAbstractDataset</li><li>ZDataset</li><li>ZConnection</li><li>ZStoredProcedure</li><li>ZSqlProcessor</li><li>ZSequence</li><li>ZSqlMetadata</li><li><a href="uRESTDWConsts.html">uRESTDWConsts</a></li><li><a href="uRESTDWDataUtils.html">uRESTDWDataUtils</a></li><li><a href="uRESTDWBasicDB.html">uRESTDWBasicDB</a></li><li><a href="uRESTDWJSONInterface.html">uRESTDWJSONInterface</a></li><li><a href="uRESTDWDataJSON.html">uRESTDWDataJSON</a></li><li><a href="uRESTDWMassiveBuffer.html">uRESTDWMassiveBuffer</a></li><li>Variants</li><li><a href="uRESTDWDatamodule.html">uRESTDWDatamodule</a></li><li><a href="uRESTDWDataset.html">uRESTDWDataset</a></li><li><a href="uRESTDWJSONObject.html">uRESTDWJSONObject</a></li><li><a href="uRESTDWParams.html">uRESTDWParams</a></li><li><a href="uRESTDWBasicTypes.html">uRESTDWBasicTypes</a></li><li><a href="uRESTDWBasic.html">uRESTDWBasic</a></li><li><a href="uRESTDWTools.html">uRESTDWTools</a></li></ul><h2 class="overview">Visão Geral</h2>
+<ul class="useslist"><li>SysUtils</li><li>Classes</li><li>DB</li><li>lconvencoding</li><li><a href="uRESTDWCharset.html">uRESTDWCharset</a></li><li>ZSqlUpdate</li><li>ZAbstractRODataset</li><li>ZAbstractDataset</li><li>ZDataset</li><li>ZConnection</li><li>ZStoredProcedure</li><li>ZSqlProcessor</li><li>ZSequence</li><li>ZSqlMetadata</li><li><a href="uRESTDWConsts.html">uRESTDWConsts</a></li><li><a href="uRESTDWDataUtils.html">uRESTDWDataUtils</a></li><li><a href="uRESTDWBasicDB.html">uRESTDWBasicDB</a></li><li><a href="uRESTDWJSONInterface.html">uRESTDWJSONInterface</a></li><li><a href="uRESTDWDataJSON.html">uRESTDWDataJSON</a></li><li><a href="uRESTDWMassiveBuffer.html">uRESTDWMassiveBuffer</a></li><li>Variants</li><li><a href="uRESTDWDatamodule.html">uRESTDWDatamodule</a></li><li><a href="uRESTDWDataset.html">uRESTDWDataset</a></li><li><a href="uRESTDWJSONObject.html">uRESTDWJSONObject</a></li><li><a href="uRESTDWParams.html">uRESTDWParams</a></li><li><a href="uRESTDWBasicTypes.html">uRESTDWBasicTypes</a></li><li><a href="uRESTDWBasic.html">uRESTDWBasic</a></li><li><a href="uRESTDWTools.html">uRESTDWTools</a></li></ul><h2 class="overview">VisÃ£o Geral</h2>
 <span id="PasDoc-Classes"></span><h3 class="cio">Classes, Interfaces, Objetos e Registros</h3>
 <table class="classestable wide_list">
 <tr class="listheader">
 <th class="itemname">Nome</th>
-<th class="itemdesc">Descrição</th>
+<th class="itemdesc">DescriÃ§Ã£o</th>
 </tr>
 <tr class="list">
 <td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDriverZEOS.TRESTDWDriverZeos.html"><code>TRESTDWDriverZeos</code></a></td>
 <td class="itemdesc">&nbsp;</td>
 </tr>
 </table>
-<span id="PasDoc-FuncsProcs"></span><h3 class="summary">Funções e Procedimentos</h3>
+<span id="PasDoc-FuncsProcs"></span><h3 class="summary">FunÃ§Ãµes e Procedimentos</h3>
 <table class="summary wide_list">
 <tr class="list">
 <td class="itemcode"><code>Procedure <strong><a href="uRESTDWDriverZEOS.html#Register">Register</a></strong>;</code></td>
 </tr>
 </table>
-<h2 class="description">Descrição</h2>
-<h3 class="detail">Funções e Procedimentos</h3>
+<h2 class="description">DescriÃ§Ã£o</h2>
+<h3 class="detail">FunÃ§Ãµes e Procedimentos</h3>
 <table class="detail wide_list">
 <tr class="list">
 <td class="itemcode"><span id="Register"></span><code>Procedure <strong>Register</strong>;</code></td>
