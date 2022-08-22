@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWServerEvents</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<h1 class="unit">Unit uRESTDWServerEvents</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Uses">Uses</a></div><div class="one_section"><a class="section" href="#PasDoc-Classes">Classes, Interfaces, Objetos e Registros</a></div><div class="one_section">Funções e Procedimentos</div><div class="one_section"><a class="section" href="#PasDoc-Types">Tipos</a></div><div class="one_section"><a class="section" href="#PasDoc-Constants">Constantes</a></div><div class="one_section">Variáveis</div></div>
+<span id="PasDoc-Description"></span><h2 class="description">Descrição</h2>
+&nbsp;<span id="PasDoc-Uses"></span><h2 class="uses">Uses</h2>
+<ul class="useslist"><li>SysUtils</li><li>Classes</li><li><a href="uRESTDWJSONObject.html">uRESTDWJSONObject</a></li><li><a href="uRESTDWConsts.html">uRESTDWConsts</a></li><li><a href="uRESTDWComponentBase.html">uRESTDWComponentBase</a></li><li><a href="uRESTDWBasic.html">uRESTDWBasic</a></li><li><a href="uRESTDWBasicTypes.html">uRESTDWBasicTypes</a></li><li><a href="uRESTDWTools.html">uRESTDWTools</a></li><li><a href="uRESTDWCharset.html">uRESTDWCharset</a></li><li><a href="uRESTDWParams.html">uRESTDWParams</a></li><li><a href="uRESTDWJSONInterface.html">uRESTDWJSONInterface</a></li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Classes"></span><h3 class="cio">Classes, Interfaces, Objetos e Registros</h3>
+<table class="classestable wide_list">
+<tr class="listheader">
+<th class="itemname">Nome</th>
+<th class="itemdesc">Descrição</th>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWServerEvents.TDWReplyEventData.html"><code>TDWReplyEventData</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWServerEvents.TRESTDWEvent.html"><code>TRESTDWEvent</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWServerEvents.TRESTDWEventList.html"><code>TRESTDWEventList</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWServerEvents.TRESTDWServerEvents.html"><code>TRESTDWServerEvents</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWServerEvents.TRESTDWClientEvents.html"><code>TRESTDWClientEvents</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+</table>
+<span id="PasDoc-Types"></span><h3 class="summary">Tipos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWServerEvents.html#TDWReplyEvent">TDWReplyEvent</a></strong> = Procedure(Var Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Result : String) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWServerEvents.html#TDWReplyEventByType">TDWReplyEventByType</a></strong> = Procedure(Var Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Result : String; Const RequestType : <a href="uRESTDWConsts.html#TRequestType">TRequestType</a>; Var StatusCode : Integer; RequestHeader : TStringList) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWServerEvents.html#TDWAuthRequest">TDWAuthRequest</a></strong> = Procedure(Const Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Rejected : Boolean; Var ResultError : String; Var StatusCode : Integer; RequestHeader : TStringList) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWServerEvents.html#TObjectEvent">TObjectEvent</a></strong> = Procedure(aSelf : TComponent) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWServerEvents.html#TObjectExecute">TObjectExecute</a></strong> = Procedure(Const aSelf : TCollectionItem) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWServerEvents.html#TOnBeforeSend">TOnBeforeSend</a></strong> = Procedure(aSelf : TComponent) Of Object;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Constants"></span><h3 class="summary">Constantes</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWServerEvents.html#TServerEventsConst">TServerEventsConst</a></strong> = '{&quot;typeobject&quot;:&quot;%s&quot;, &quot;objectdirection&quot;:&quot;%s&quot;, &quot;objectvalue&quot;:&quot;%s&quot;, &quot;paramname&quot;:&quot;%s&quot;, &quot;encoded&quot;:&quot;%s&quot;, &quot;default&quot;:&quot;%s&quot;}';</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Tipos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TDWReplyEvent"></span><code><strong>TDWReplyEvent</strong> = Procedure(Var Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Result : String) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TDWReplyEventByType"></span><code><strong>TDWReplyEventByType</strong> = Procedure(Var Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Result : String; Const RequestType : <a href="uRESTDWConsts.html#TRequestType">TRequestType</a>; Var StatusCode : Integer; RequestHeader : TStringList) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TDWAuthRequest"></span><code><strong>TDWAuthRequest</strong> = Procedure(Const Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Rejected : Boolean; Var ResultError : String; Var StatusCode : Integer; RequestHeader : TStringList) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TObjectEvent"></span><code><strong>TObjectEvent</strong> = Procedure(aSelf : TComponent) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TObjectExecute"></span><code><strong>TObjectExecute</strong> = Procedure(Const aSelf : TCollectionItem) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnBeforeSend"></span><code><strong>TOnBeforeSend</strong> = Procedure(aSelf : TComponent) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Constantes</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TServerEventsConst"></span><code><strong>TServerEventsConst</strong> = '{&quot;typeobject&quot;:&quot;%s&quot;, &quot;objectdirection&quot;:&quot;%s&quot;, &quot;objectvalue&quot;:&quot;%s&quot;, &quot;paramname&quot;:&quot;%s&quot;, &quot;encoded&quot;:&quot;%s&quot;, &quot;default&quot;:&quot;%s&quot;}';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

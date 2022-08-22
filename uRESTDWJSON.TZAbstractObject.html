@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWJSON: Classe TZAbstractObject</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<span id="TZAbstractObject"></span><h1 class="cio">Classe TZAbstractObject</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarquia</a></div><div class="one_section">Campos</div><div class="one_section"><a class="section" href="#PasDoc-Methods">Métodos</a></div><div class="one_section">Properties</div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a href="uRESTDWJSON.html">uRESTDWJSON</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TZAbstractObject = class(TObject)</code></p>
+<h2 class="description">Descrição</h2>
+<p>
+Classe pai de todas as classes em uJSON , resolve o problema de impedância entre a classe java Object e a classe delphi TObject</p>
+<span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="thisitem">TZAbstractObject</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Methods"></span><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <strong><a href="uRESTDWJSON.TZAbstractObject.html#equals">equals</a></strong>(const Value: <a href="uRESTDWJSON.TZAbstractObject.html">TZAbstractObject</a>): Boolean; virtual;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <strong><a href="uRESTDWJSON.TZAbstractObject.html#hash">hash</a></strong>: LongInt;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <strong><a href="uRESTDWJSON.TZAbstractObject.html#Clone">Clone</a></strong>: <a href="uRESTDWJSON.TZAbstractObject.html">TZAbstractObject</a>; virtual;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <strong><a href="uRESTDWJSON.TZAbstractObject.html#toString">toString</a></strong>: string; virtual;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <strong><a href="uRESTDWJSON.TZAbstractObject.html#instanceOf">instanceOf</a></strong>(const Value: <a href="uRESTDWJSON.TZAbstractObject.html">TZAbstractObject</a>): Boolean;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="equals"></span><code>function <strong>equals</strong>(const Value: <a href="uRESTDWJSON.TZAbstractObject.html">TZAbstractObject</a>): Boolean; virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+retorna true se value é igual ao objeto</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="hash"></span><code>function <strong>hash</strong>: LongInt;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+código hash do objeto , usa-se o endereço de memória</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Clone"></span><code>function <strong>Clone</strong>: <a href="uRESTDWJSON.TZAbstractObject.html">TZAbstractObject</a>; virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+clona o objeto </p>
+<h6 class="description_section">Retornos</h6>
+<p class="return">( um TZAbstractObject )</p></td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="toString"></span><code>function <strong>toString</strong>: string; virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+retorna a representação com string do objeto </p>
+<h6 class="description_section">Retornos</h6>
+<p class="return">(uma string)</p></td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="instanceOf"></span><code>function <strong>instanceOf</strong>(const Value: <a href="uRESTDWJSON.TZAbstractObject.html">TZAbstractObject</a>): Boolean;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+retorna true se o parâmetro Value é uma instância de TZAbstractObject</p>
+</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWBasicTypes: Classe TRESTDWClientSQLBase</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<span id="TRESTDWClientSQLBase"></span><h1 class="cio">Classe TRESTDWClientSQLBase</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarquia</a></div><div class="one_section">Campos</div><div class="one_section"><a class="section" href="#PasDoc-Methods">Métodos</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Properties</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a href="uRESTDWBasicTypes.html">uRESTDWBasicTypes</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TRESTDWClientSQLBase = class(<a class="normal" href="uRESTDWDataset.TRESTDWMemtable.html">TRESTDWMemtable</a>)</code></p>
+<h2 class="description">Descrição</h2>
+<div class="nodescription">No description available, ancestor TRESTDWMemtable description follows</div><div class="nodescription">No description available, ancestor TRESTDWCustomDataSet description follows</div><span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TDataSet</li>
+<li class="ancestor"><a class="normal" href="uRESTDWDataset.TRESTDWCustomDataSet.html">TRESTDWCustomDataSet</a></li>
+<li class="ancestor"><a class="normal" href="uRESTDWDataset.TRESTDWMemtable.html">TRESTDWMemtable</a></li>
+<li class="thisitem">TRESTDWClientSQLBase</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Methods"></span><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#BaseOpen">BaseOpen</a></strong>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#BaseClose">BaseClose</a></strong>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#ForceInternalCalc">ForceInternalCalc</a></strong>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#SetComponentTAG">SetComponentTAG</a></strong>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#SaveToStream">SaveToStream</a></strong>(Var Value : TMemoryStream); Overload;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Class Procedure <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#SaveToStream">SaveToStream</a></strong>(Dataset : TDataset; Var Value : TMemoryStream); Overload;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#LoadFromStream">LoadFromStream</a></strong>(Value : TMemoryStream; DataType : <a href="uRESTDWBasicTypes.html#TStreamType">TStreamType</a> = <a href="uRESTDWBasicTypes.html#stAll">stAll</a>);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#SetInDesignEvents">SetInDesignEvents</a></strong>(Const Value : Boolean); Virtual; Abstract;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#SetInBlockEvents">SetInBlockEvents</a></strong>(Const Value : Boolean); Virtual; Abstract;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#SetInitDataset">SetInitDataset</a></strong>(Const Value : Boolean); Virtual; Abstract;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#PrepareDetailsNew">PrepareDetailsNew</a></strong>; Virtual; Abstract;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#PrepareDetails">PrepareDetails</a></strong>(ActiveMode : Boolean); Virtual; Abstract;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Constructor <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#Create">Create</a></strong>(AOwner: TComponent); Override;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Properties</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#InLoadFromStream">InLoadFromStream</a></strong>  : Boolean       Read vLoadFromStream;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#BinaryLoadRequest">BinaryLoadRequest</a></strong> : Boolean       Read vBinaryLoadRequest;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#OnLoadStream">OnLoadStream</a></strong>      : Boolean       Read vOnLoadStream       Write vOnLoadStream;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#Componenttag">Componenttag</a></strong>      : String        Read vComponentTag;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#DatabaseCharSet">DatabaseCharSet</a></strong>      : <a href="uRESTDWCharset.html#TDatabaseCharSet">TDatabaseCharSet</a> Read GetDatabaseCharSet Write SetDatabaseCharSet;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#BinaryCompatibleMode">BinaryCompatibleMode</a></strong> : Boolean          Read vBinaryCompatibleMode  Write vBinaryCompatibleMode;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#SequenceName">SequenceName</a></strong>      : String           Read vSequenceName          Write vSequenceName;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#SequenceField">SequenceField</a></strong>     : String           Read vSequenceField         Write vSequenceField;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#OnWriterProcess">OnWriterProcess</a></strong>   : <a href="uRESTDWBasicTypes.html#TOnWriterProcess">TOnWriterProcess</a> Read vOnWriterProcess       Write vOnWriterProcess;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html#AboutInfo">AboutInfo</a></strong>         : <a href="uRESTDWConsts.html#TRESTDWAboutInfo">TRESTDWAboutInfo</a> Read fsAbout                Write fsAbout Stored False;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="BaseOpen"></span><code>Procedure <strong>BaseOpen</strong>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="BaseClose"></span><code>Procedure <strong>BaseClose</strong>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ForceInternalCalc"></span><code>Procedure <strong>ForceInternalCalc</strong>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="SetComponentTAG"></span><code>Procedure <strong>SetComponentTAG</strong>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="SaveToStream"></span><code>Procedure <strong>SaveToStream</strong>(Var Value : TMemoryStream); Overload;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="SaveToStream"></span><code>Class Procedure <strong>SaveToStream</strong>(Dataset : TDataset; Var Value : TMemoryStream); Overload;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="LoadFromStream"></span><code>Procedure <strong>LoadFromStream</strong>(Value : TMemoryStream; DataType : <a href="uRESTDWBasicTypes.html#TStreamType">TStreamType</a> = <a href="uRESTDWBasicTypes.html#stAll">stAll</a>);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="SetInDesignEvents"></span><code>Procedure <strong>SetInDesignEvents</strong>(Const Value : Boolean); Virtual; Abstract;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="SetInBlockEvents"></span><code>Procedure <strong>SetInBlockEvents</strong>(Const Value : Boolean); Virtual; Abstract;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="SetInitDataset"></span><code>Procedure <strong>SetInitDataset</strong>(Const Value : Boolean); Virtual; Abstract;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="PrepareDetailsNew"></span><code>Procedure <strong>PrepareDetailsNew</strong>; Virtual; Abstract;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="PrepareDetails"></span><code>Procedure <strong>PrepareDetails</strong>(ActiveMode : Boolean); Virtual; Abstract;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Create"></span><code>Constructor <strong>Create</strong>(AOwner: TComponent); Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Properties</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="InLoadFromStream"></span><code>property <strong>InLoadFromStream</strong>  : Boolean       Read vLoadFromStream;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="BinaryLoadRequest"></span><code>property <strong>BinaryLoadRequest</strong> : Boolean       Read vBinaryLoadRequest;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="OnLoadStream"></span><code>property <strong>OnLoadStream</strong>      : Boolean       Read vOnLoadStream       Write vOnLoadStream;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Componenttag"></span><code>property <strong>Componenttag</strong>      : String        Read vComponentTag;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DatabaseCharSet"></span><code>property <strong>DatabaseCharSet</strong>      : <a href="uRESTDWCharset.html#TDatabaseCharSet">TDatabaseCharSet</a> Read GetDatabaseCharSet Write SetDatabaseCharSet;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="BinaryCompatibleMode"></span><code>property <strong>BinaryCompatibleMode</strong> : Boolean          Read vBinaryCompatibleMode  Write vBinaryCompatibleMode;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="SequenceName"></span><code>property <strong>SequenceName</strong>      : String           Read vSequenceName          Write vSequenceName;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="SequenceField"></span><code>property <strong>SequenceField</strong>     : String           Read vSequenceField         Write vSequenceField;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="OnWriterProcess"></span><code>property <strong>OnWriterProcess</strong>   : <a href="uRESTDWBasicTypes.html#TOnWriterProcess">TOnWriterProcess</a> Read vOnWriterProcess       Write vOnWriterProcess;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="AboutInfo"></span><code>property <strong>AboutInfo</strong>         : <a href="uRESTDWConsts.html#TRESTDWAboutInfo">TRESTDWAboutInfo</a> Read fsAbout                Write fsAbout Stored False;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

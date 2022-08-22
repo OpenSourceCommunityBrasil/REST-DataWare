@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWAuthClass: Classe TRESTDWAuthOAuth</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<span id="TRESTDWAuthOAuth"></span><h1 class="cio">Classe TRESTDWAuthOAuth</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarquia</a></div><div class="one_section">Campos</div><div class="one_section"><a class="section" href="#PasDoc-Methods">Métodos</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Properties</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a href="uRESTDWAuthClass.html">uRESTDWAuthClass</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TRESTDWAuthOAuth = class(<a class="normal" href="uRESTDWAuthClass.TRESTDWAuthOptionParam.html">TRESTDWAuthOptionParam</a>)</code></p>
+<h2 class="description">Descrição</h2>
+<p>
+TRESTDWAuthOAuth</p>
+<span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="ancestor">TPersistent</li>
+<li class="ancestor"><a class="normal" href="uRESTDWAuthClass.TRESTDWAuthOptionParam.html">TRESTDWAuthOptionParam</a></li>
+<li class="thisitem">TRESTDWAuthOAuth</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Methods"></span><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Constructor <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#Create">Create</a></strong>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#Assign">Assign</a></strong>(Source : TPersistent); Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#GetGrantCode">GetGrantCode</a></strong>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#GetGetToken">GetGetToken</a></strong>;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Properties</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#TokenType">TokenType</a></strong>      : <a href="uRESTDWAuthClass.html#TRESTDWAuthOptionTypes">TRESTDWAuthOptionTypes</a> Read vRDWTokenType  Write vRDWTokenType;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#AutoBuildHex">AutoBuildHex</a></strong>   : Boolean             Read vAutoBuildHex  Write vAutoBuildHex;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#Token">Token</a></strong>          : String              Read vToken         Write vToken;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#GrantCodeEvent">GrantCodeEvent</a></strong> : String              Read vGrantCodeName Write vGrantCodeName;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#GrantType">GrantType</a></strong>      : String              Read vGrantType     Write vGrantType;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#GetTokenEvent">GetTokenEvent</a></strong>  : String              Read vGetTokenName  Write vGetTokenName;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#ClientID">ClientID</a></strong>       : String              Read vClientID      Write vClientID;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#ClientSecret">ClientSecret</a></strong>   : String              Read vClientSecret  Write vClientSecret;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#RedirectURI">RedirectURI</a></strong>    : String              Read vRedirectURI   Write vRedirectURI;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWAuthClass.TRESTDWAuthOAuth.html#Expires_in">Expires_in</a></strong>     : TDateTime           Read vExpiresin;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Create"></span><code>Constructor <strong>Create</strong>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Assign"></span><code>Procedure <strong>Assign</strong>(Source : TPersistent); Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="GetGrantCode"></span><code>Procedure <strong>GetGrantCode</strong>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="GetGetToken"></span><code>Procedure <strong>GetGetToken</strong>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Properties</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="TokenType"></span><code>property <strong>TokenType</strong>      : <a href="uRESTDWAuthClass.html#TRESTDWAuthOptionTypes">TRESTDWAuthOptionTypes</a> Read vRDWTokenType  Write vRDWTokenType;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="AutoBuildHex"></span><code>property <strong>AutoBuildHex</strong>   : Boolean             Read vAutoBuildHex  Write vAutoBuildHex;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="Token"></span><code>property <strong>Token</strong>          : String              Read vToken         Write vToken;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="GrantCodeEvent"></span><code>property <strong>GrantCodeEvent</strong> : String              Read vGrantCodeName Write vGrantCodeName;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="GrantType"></span><code>property <strong>GrantType</strong>      : String              Read vGrantType     Write vGrantType;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="GetTokenEvent"></span><code>property <strong>GetTokenEvent</strong>  : String              Read vGetTokenName  Write vGetTokenName;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="ClientID"></span><code>property <strong>ClientID</strong>       : String              Read vClientID      Write vClientID;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="ClientSecret"></span><code>property <strong>ClientSecret</strong>   : String              Read vClientSecret  Write vClientSecret;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="RedirectURI"></span><code>property <strong>RedirectURI</strong>    : String              Read vRedirectURI   Write vRedirectURI;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="Expires_in"></span><code>property <strong>Expires_in</strong>     : TDateTime           Read vExpiresin;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

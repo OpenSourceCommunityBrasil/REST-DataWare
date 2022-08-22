@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWBufferDb</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<h1 class="unit">Unit uRESTDWBufferDb</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Uses">Uses</a></div><div class="one_section"><a class="section" href="#PasDoc-Classes">Classes, Interfaces, Objetos e Registros</a></div><div class="one_section">Funções e Procedimentos</div><div class="one_section"><a class="section" href="#PasDoc-Types">Tipos</a></div><div class="one_section"><a class="section" href="#PasDoc-Constants">Constantes</a></div><div class="one_section">Variáveis</div></div>
+<span id="PasDoc-Description"></span><h2 class="description">Descrição</h2>
+&nbsp;<span id="PasDoc-Uses"></span><h2 class="uses">Uses</h2>
+<ul class="useslist"><li>SysUtils</li><li>Variants</li><li>TypInfo</li><li>Classes</li><li><a href="uRESTDWFileBuffer.html">uRESTDWFileBuffer</a></li><li>Db</li><li><a href="uRESTDWConsts.html">uRESTDWConsts</a></li><li><a href="uRESTDWTools.html">uRESTDWTools</a></li><li><a href="uRESTDWBasicTypes.html">uRESTDWBasicTypes</a></li><li><a href="uRESTDWEncodeClass.html">uRESTDWEncodeClass</a></li><li><a href="uRESTDWCharset.html">uRESTDWCharset</a></li><li><a href="uRESTDWComponentBase.html">uRESTDWComponentBase</a></li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Classes"></span><h3 class="cio">Classes, Interfaces, Objetos e Registros</h3>
+<table class="classestable wide_list">
+<tr class="listheader">
+<th class="itemname">Nome</th>
+<th class="itemdesc">Descrição</th>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBufferDb.TMaskOptions.html"><code>TMaskOptions</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBufferDb.TCustomFieldDef.html"><code>TCustomFieldDef</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBufferDb.TCustomFieldDefs.html"><code>TCustomFieldDefs</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBufferDb.TFileOptions.html"><code>TFileOptions</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBufferDb.TFieldImport.html"><code>TFieldImport</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBufferDb.TFieldsImport.html"><code>TFieldsImport</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBufferDb.TRESTDWBufferDB.html"><code>TRESTDWBufferDB</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+</table>
+<span id="PasDoc-Types"></span><h3 class="summary">Tipos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#TFileType">TFileType</a></strong> = (...);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#TOnGetLineValue">TOnGetLineValue</a></strong> = Procedure (LineNumber : Integer; Line : String; Var Accept : Boolean) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#TOnSetLineValue">TOnSetLineValue</a></strong> = Procedure (LineNumber : Integer; Var Line : String; Var Accept, Stop : Boolean) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#TOnReadData">TOnReadData</a></strong> = Procedure (Var Accept : Boolean) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#TOnWriteData">TOnWriteData</a></strong> = Procedure (Line : String; Var Accept : Boolean) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#TOnGetFieldValue">TOnGetFieldValue</a></strong> = Procedure (Self : TObject; Var Value : String) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#TOnError">TOnError</a></strong> = Procedure (LineNumber : Integer; Error : String) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#TBeginProcess">TBeginProcess</a></strong> = Procedure (LineNumber : Integer) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#TEndProcess">TEndProcess</a></strong> = Procedure Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#PCustomFieldDef">PCustomFieldDef</a></strong> = &circ;<a href="uRESTDWBufferDb.TCustomFieldDef.html">TCustomFieldDef</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#PFieldImport">PFieldImport</a></strong>  = &circ;<a href="uRESTDWBufferDb.TFieldImport.html">TFieldImport</a>;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Constants"></span><h3 class="summary">Constantes</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#TSpecialChars">TSpecialChars</a></strong>     : Array [0 .. 7] Of Char = ('\', '&quot;', '/', #8, #9, #10, #12, #13);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#cReplaceLineBreak">cReplaceLineBreak</a></strong> = '&lt;|#%30#|&gt;';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#cReplaceSeparator">cReplaceSeparator</a></strong> = '&lt;|#%20#|&gt;';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBufferDb.html#TTagFile">TTagFile</a></strong>          = '&lt;|#' + <a href="uRESTDWConsts.html#cTablenameTAG">cTablenameTAG</a> + '#|&gt;';</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Tipos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TFileType"></span><code><strong>TFileType</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="ftbFixedText">ftbFixedText</span></li>
+<li>
+<span id="ftbCSVFile">ftbCSVFile</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnGetLineValue"></span><code><strong>TOnGetLineValue</strong> = Procedure (LineNumber : Integer; Line : String; Var Accept : Boolean) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnSetLineValue"></span><code><strong>TOnSetLineValue</strong> = Procedure (LineNumber : Integer; Var Line : String; Var Accept, Stop : Boolean) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnReadData"></span><code><strong>TOnReadData</strong> = Procedure (Var Accept : Boolean) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnWriteData"></span><code><strong>TOnWriteData</strong> = Procedure (Line : String; Var Accept : Boolean) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnGetFieldValue"></span><code><strong>TOnGetFieldValue</strong> = Procedure (Self : TObject; Var Value : String) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnError"></span><code><strong>TOnError</strong> = Procedure (LineNumber : Integer; Error : String) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TBeginProcess"></span><code><strong>TBeginProcess</strong> = Procedure (LineNumber : Integer) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TEndProcess"></span><code><strong>TEndProcess</strong> = Procedure Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PCustomFieldDef"></span><code><strong>PCustomFieldDef</strong> = &circ;<a href="uRESTDWBufferDb.TCustomFieldDef.html">TCustomFieldDef</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PFieldImport"></span><code><strong>PFieldImport</strong>  = &circ;<a href="uRESTDWBufferDb.TFieldImport.html">TFieldImport</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Constantes</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TSpecialChars"></span><code><strong>TSpecialChars</strong>     : Array [0 .. 7] Of Char = ('\', '&quot;', '/', #8, #9, #10, #12, #13);</code></td>
+</tr>
+<tr><td colspan="1">
+<p>
+\b \t \n \f \r</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="cReplaceLineBreak"></span><code><strong>cReplaceLineBreak</strong> = '&lt;|#%30#|&gt;';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="cReplaceSeparator"></span><code><strong>cReplaceSeparator</strong> = '&lt;|#%20#|&gt;';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TTagFile"></span><code><strong>TTagFile</strong>          = '&lt;|#' + <a href="uRESTDWConsts.html#cTablenameTAG">cTablenameTAG</a> + '#|&gt;';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

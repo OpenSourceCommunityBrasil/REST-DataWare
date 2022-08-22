@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWCoder3to4: Classe TRESTDWDecoder4to3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<span id="TRESTDWDecoder4to3"></span><h1 class="cio">Classe TRESTDWDecoder4to3</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarquia</a></div><div class="one_section"><a class="section" href="#PasDoc-Fields">Campos</a></div><div class="one_section"><a class="section" href="#PasDoc-Methods">Métodos</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Properties</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a href="uRESTDWCoder3to4.html">uRESTDWCoder3to4</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TRESTDWDecoder4to3 = class(<a class="normal" href="uRESTDWCoder.TRESTDWDecoder.html">TRESTDWDecoder</a>)</code></p>
+<h2 class="description">Descrição</h2>
+<div class="nodescription">No description available, ancestor TRESTDWDecoder description follows</div><div class="nodescription">No description available, ancestor TRESTDWComponent description follows</div><span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="ancestor">TPersistent</li>
+<li class="ancestor">TComponent</li>
+<li class="ancestor"><a class="normal" href="uRESTDWComponentBase.TRESTDWComponent.html">TRESTDWComponent</a></li>
+<li class="ancestor"><a class="normal" href="uRESTDWCoder.TRESTDWDecoder.html">TRESTDWDecoder</a></li>
+<li class="thisitem">TRESTDWDecoder4to3</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Fields"></span><h3 class="summary">Campos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code><strong><a href="uRESTDWCoder3to4.TRESTDWDecoder4to3.html#FCodingTable">FCodingTable</a></strong>: <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code><strong><a href="uRESTDWCoder3to4.TRESTDWDecoder4to3.html#FDecodeTable">FDecodeTable</a></strong>: <a href="uRESTDWCoder3to4.html#TRESTDWDecodeTable">TRESTDWDecodeTable</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code><strong><a href="uRESTDWCoder3to4.TRESTDWDecoder4to3.html#FFillChar">FFillChar</a></strong>: Char;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Methods"></span><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWCoder3to4.TRESTDWDecoder4to3.html#InternalDecode">InternalDecode</a></strong>(Const ABuffer : <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>; Const AIgnoreFiller : Boolean = False) : <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Class Procedure <strong><a href="uRESTDWCoder3to4.TRESTDWDecoder4to3.html#ConstructDecodeTable">ConstructDecodeTable</a></strong>(Const ACodingTable : String; Var ADecodeArray : <a href="uRESTDWCoder3to4.html#TRESTDWDecodeTable">TRESTDWDecodeTable</a>);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWCoder3to4.TRESTDWDecoder4to3.html#Decode">Decode</a></strong>(ASrcStream : TStream; Const ABytes : Integer = -1); Override;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Properties</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWCoder3to4.TRESTDWDecoder4to3.html#FillChar">FillChar</a></strong>: Char read <a href="uRESTDWCoder3to4.TRESTDWDecoder4to3.html#FFillChar">FFillChar</a> write <a href="uRESTDWCoder3to4.TRESTDWDecoder4to3.html#FFillChar">FFillChar</a>;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Campos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="FCodingTable"></span><code><strong>FCodingTable</strong>: <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="FDecodeTable"></span><code><strong>FDecodeTable</strong>: <a href="uRESTDWCoder3to4.html#TRESTDWDecodeTable">TRESTDWDecodeTable</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="FFillChar"></span><code><strong>FFillChar</strong>: Char;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="InternalDecode"></span><code>Function <strong>InternalDecode</strong>(Const ABuffer : <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>; Const AIgnoreFiller : Boolean = False) : <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ConstructDecodeTable"></span><code>Class Procedure <strong>ConstructDecodeTable</strong>(Const ACodingTable : String; Var ADecodeArray : <a href="uRESTDWCoder3to4.html#TRESTDWDecodeTable">TRESTDWDecodeTable</a>);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Decode"></span><code>Procedure <strong>Decode</strong>(ASrcStream : TStream; Const ABytes : Integer = -1); Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Properties</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="FillChar"></span><code>property <strong>FillChar</strong>: Char read <a href="uRESTDWCoder3to4.TRESTDWDecoder4to3.html#FFillChar">FFillChar</a> write <a href="uRESTDWCoder3to4.TRESTDWDecoder4to3.html#FFillChar">FFillChar</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWDataset</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<h1 class="unit">Unit uRESTDWDataset</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Uses">Uses</a></div><div class="one_section"><a class="section" href="#PasDoc-Classes">Classes, Interfaces, Objetos e Registros</a></div><div class="one_section"><a class="section" href="#PasDoc-FuncsProcs">Funções e Procedimentos</a></div><div class="one_section"><a class="section" href="#PasDoc-Types">Tipos</a></div><div class="one_section"><a class="section" href="#PasDoc-Constants">Constantes</a></div><div class="one_section"><a class="section" href="#PasDoc-Variables">Variáveis</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="description">Descrição</h2>
+&nbsp;<span id="PasDoc-Uses"></span><h2 class="uses">Uses</h2>
+<ul class="useslist"><li>SysConst</li><li>TypInfo</li><li><a href="uRESTDWConsts.html">uRESTDWConsts</a></li><li>Masks</li><li>IniFiles</li><li>DateUtils</li><li>Math</li><li>FMTBcd</li><li>StrUtils</li><li>Types</li><li>Variants</li><li>Db</li><li>Graphics</li><li>contnrs</li><li>LConvEncoding</li><li>SysUtils</li><li>Classes</li><li><a href="uRESTDWCharset.html">uRESTDWCharset</a></li><li><a href="uRESTDWEncodeClass.html">uRESTDWEncodeClass</a></li><li><a href="uZlibLaz.html">uZlibLaz</a></li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Classes"></span><h3 class="cio">Classes, Interfaces, Objetos e Registros</h3>
+<table class="classestable wide_list">
+<tr class="listheader">
+<th class="itemname">Nome</th>
+<th class="itemdesc">Descrição</th>
+</tr>
+<tr class="list">
+<td class="itemname">Packed Record&nbsp;<a class="bold" href="uRESTDWDataset.TRESTDWDbTableHeader.html"><code>TRESTDWDbTableHeader</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Packed Record&nbsp;<a class="bold" href="uRESTDWDataset.TVariantArrayField.html"><code>TVariantArrayField</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.TVariantArray.html"><code>TVariantArray</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.TRESTDWTableStorage.html"><code>TRESTDWTableStorage</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.TIndexList.html"><code>TIndexList</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.TCustomIndexList.html"><code>TCustomIndexList</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.TDataSetIndexList.html"><code>TDataSetIndexList</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.TBufferedStream.html"><code>TBufferedStream</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.DwArrayError.html"><code>DwArrayError</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.DwTableError.html"><code>DwTableError</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.DwDatabaseError.html"><code>DwDatabaseError</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.TExtendedField.html"><code>TExtendedField</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.TStreamField.html"><code>TStreamField</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.TColorField.html"><code>TColorField</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Record&nbsp;<a class="bold" href="uRESTDWDataset.TVarRecInfo.html"><code>TVarRecInfo</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.TRESTDWCustomDataSet.html"><code>TRESTDWCustomDataSet</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataset.TRESTDWMemtable.html"><code>TRESTDWMemtable</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+</table>
+<span id="PasDoc-FuncsProcs"></span><h3 class="summary">Funções e Procedimentos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataset.html#FieldTypeToString">FieldTypeToString</a></strong>(AValue : TFieldType) : String;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataset.html#StringToFieldType">StringToFieldType</a></strong>(const S : string) : Integer;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataset.html#GetFieldTypeB">GetFieldTypeB</a></strong>(FieldType : String) : TFieldType; overload;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataset.html#GetFieldTypeB">GetFieldTypeB</a></strong>(FieldType : TFieldType) : String; overload;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Types"></span><h3 class="summary">Tipos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TOnWriterProcess">TOnWriterProcess</a></strong> = Procedure (DataSet : TDataSet; RecNo, RecordCount : Integer; Var AbortProcess : Boolean) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TRESTDWBRSourceSide">TRESTDWBRSourceSide</a></strong> = (...);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#DWInteger">DWInteger</a></strong>       = Longint;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#DWInt64">DWInt64</a></strong>         = Int64;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#DWString">DWString</a></strong>        = String;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#DWFloat">DWFloat</a></strong>         = Real;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#DWFieldTypeSize">DWFieldTypeSize</a></strong> = Longint;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TRESTDWAboutInfoDS">TRESTDWAboutInfoDS</a></strong> = (...);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#pdwAnsiString">pdwAnsiString</a></strong>            = &circ;AnsiString;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TDataAttributes">TDataAttributes</a></strong>          = Set of (dwCalcField,    dwNotNull, dwLookup,
+                                    dwInternalCalc, dwAggregate);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TRestrictLength">TRestrictLength</a></strong>          = Set of (dwRangeChecking, dwRestrict);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TIndexDataSortCompare">TIndexDataSortCompare</a></strong> = Function(Item1, Item2 : Integer) : Integer;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TVariantArraySortCompare">TVariantArraySortCompare</a></strong> = Function(Const Value1, Value2 : Variant) : Integer;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#PVariantArray">PVariantArray</a></strong>            = &circ;<a href="uRESTDWDataset.TVariantArray.html">TVariantArray</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#PArrayData">PArrayData</a></strong>    = &circ;<a href="uRESTDWDataset.html#TArrayData">TArrayData</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TArrayData">TArrayData</a></strong>    = Array of Variant;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TRESTDWTableStorageClass">TRESTDWTableStorageClass</a></strong> = class of <a href="uRESTDWDataset.TRESTDWTableStorage.html">TRESTDWTableStorage</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#PIndexDataList">PIndexDataList</a></strong>      = &circ;<a href="uRESTDWDataset.html#TIndexDataList">TIndexDataList</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TIndexDataList">TIndexDataList</a></strong>      = Array[0..<a href="uRESTDWDataset.html#MaxIndexDataListSize">MaxIndexDataListSize</a> - 1] of Integer;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TIndexListOptions">TIndexListOptions</a></strong>   = Set Of (iloUnique = 0, iloInactive = 1);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TRESTDWcolorOptions">TRESTDWcolorOptions</a></strong> = Set Of (dwcoAllowedSharp, dwcoShowWebSharp, dwcoSysColors);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TRESTDWMemtableState">TRESTDWMemtableState</a></strong>   = Set Of (dwsOpening,      dwsOpen,
+                               dwsConvertError, dwsCheckFilter);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TRESTDWMemtableOptions">TRESTDWMemtableOptions</a></strong> = Set Of (dwoCanConvert,   dwoFileReadOnly, dwoShowWaitForm);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#PVarRecInfo">PVarRecInfo</a></strong>  = &circ;<a href="uRESTDWDataset.TVarRecInfo.html">TVarRecInfo</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TBytes">TBytes</a></strong>        = Array of Byte;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#NativeInt">NativeInt</a></strong> = PtrInt;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TRESTDWMemtableOptionD">TRESTDWMemtableOptionD</a></strong> = (...);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TRESTDWMemtableOptionsD">TRESTDWMemtableOptionsD</a></strong> = Set Of <a href="uRESTDWDataset.html#TRESTDWMemtableOptionD">TRESTDWMemtableOptionD</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#TUpdateKinds">TUpdateKinds</a></strong> = set of TUpdateKind;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Constants"></span><h3 class="summary">Constantes</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#MaxFloatLaz">MaxFloatLaz</a></strong>       = 15;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#LazDigitsSize">LazDigitsSize</a></strong>     = 6;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#sDate_dwdb">sDate_dwdb</a></strong>        = 41941.5705324074;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#DWDB_VERSION_INFO">DWDB_VERSION_INFO</a></strong> = '3.50';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#NTAVersion">NTAVersion</a></strong>        = 0;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#MAXSHORT">MAXSHORT</a></strong>          = 32767;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftString">dwftString</a></strong>          = Integer(DB.ftString);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftSmallint">dwftSmallint</a></strong>        = Integer(DB.ftSmallint);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftInteger">dwftInteger</a></strong>         = Integer(DB.ftInteger);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftWord">dwftWord</a></strong>            = Integer(DB.ftWord);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftBoolean">dwftBoolean</a></strong>         = Integer(DB.ftBoolean);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftFloat">dwftFloat</a></strong>           = Integer(DB.ftFloat);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftCurrency">dwftCurrency</a></strong>        = Integer(DB.ftCurrency);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftBCD">dwftBCD</a></strong>             = Integer(DB.ftBCD);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftDate">dwftDate</a></strong>            = Integer(DB.ftDate);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftTime">dwftTime</a></strong>            = Integer(DB.ftTime);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftDateTime">dwftDateTime</a></strong>        = Integer(DB.ftDateTime);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftBytes">dwftBytes</a></strong>           = Integer(DB.ftBytes);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftVarBytes">dwftVarBytes</a></strong>        = Integer(DB.ftVarBytes);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftAutoInc">dwftAutoInc</a></strong>         = Integer(DB.ftAutoInc);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftBlob">dwftBlob</a></strong>            = Integer(DB.ftBlob);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftMemo">dwftMemo</a></strong>            = Integer(DB.ftMemo);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftGraphic">dwftGraphic</a></strong>         = Integer(DB.ftGraphic);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftFmtMemo">dwftFmtMemo</a></strong>         = Integer(DB.ftFmtMemo);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftParadoxOle">dwftParadoxOle</a></strong>      = Integer(DB.ftParadoxOle);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftDBaseOle">dwftDBaseOle</a></strong>        = Integer(DB.ftDBaseOle);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftTypedBinary">dwftTypedBinary</a></strong>     = Integer(DB.ftTypedBinary);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftFixedChar">dwftFixedChar</a></strong>       = Integer(DB.ftFixedChar);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftWideString">dwftWideString</a></strong>      = Integer(DB.ftWideString);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftLargeint">dwftLargeint</a></strong>        = Integer(DB.ftLargeint);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftOraBlob">dwftOraBlob</a></strong>         = Integer(DB.ftOraBlob);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftOraClob">dwftOraClob</a></strong>         = Integer(DB.ftOraClob);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftVariant">dwftVariant</a></strong>         = Integer(DB.ftVariant);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftInterface">dwftInterface</a></strong>       = Integer(DB.ftInterface);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftIDispatch">dwftIDispatch</a></strong>       = Integer(DB.ftIDispatch);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftGuid">dwftGuid</a></strong>            = Integer(DB.ftGuid);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftTimeStamp">dwftTimeStamp</a></strong>       = Integer(DB.ftTimeStamp);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftFMTBcd">dwftFMTBcd</a></strong>          = Integer(DB.ftFMTBcd);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftFixedWideChar">dwftFixedWideChar</a></strong>   = Integer(38);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftWideMemo">dwftWideMemo</a></strong>        = Integer(39);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftOraTimeStamp">dwftOraTimeStamp</a></strong>    = Integer(40);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftOraInterval">dwftOraInterval</a></strong>     = Integer(41);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftLongWord">dwftLongWord</a></strong>        = Integer(42);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftShortint">dwftShortint</a></strong>        = Integer(43);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftByte">dwftByte</a></strong>            = Integer(44);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftExtended">dwftExtended</a></strong>        = Integer(45);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftStream">dwftStream</a></strong>          = Integer(48);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftTimeStampOffset">dwftTimeStampOffset</a></strong> = Integer(49);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftSingle">dwftSingle</a></strong>          = Integer(51);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftUnknown">dwftUnknown</a></strong>         = Integer(DB.ftUnknown);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftCursor">dwftCursor</a></strong>          = Integer(DB.ftCursor);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftADT">dwftADT</a></strong>             = Integer(DB.ftADT);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftArray">dwftArray</a></strong>           = Integer(DB.ftArray);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftReference">dwftReference</a></strong>       = Integer(DB.ftReference);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftDataSet">dwftDataSet</a></strong>         = Integer(DB.ftDataSet);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#dwftColor">dwftColor</a></strong>           = Integer(255);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#MarkerSize">MarkerSize</a></strong>           = SizeOf(Integer);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#smEOF">smEOF</a></strong>                = 0;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#smFieldDefs">smFieldDefs</a></strong>          = 1;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#smData">smData</a></strong>               = 2;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#stkAutoInc">stkAutoInc</a></strong>           = 0;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#stkIndexes">stkIndexes</a></strong>           = 1;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#stkLookupInf">stkLookupInf</a></strong>         = 2;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#stkForeignKey">stkForeignKey</a></strong>        = 3;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#MaxIndexDataListSize">MaxIndexDataListSize</a></strong> = MaxInt div 16;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SupportFieldTypes">SupportFieldTypes</a></strong>    = [ftString, ftWideString,    ftBoolean, ftSmallint, ftInteger,   ftLargeint,  ftWord, ftAutoInc,
+                         ftFloat,  ftCurrency,      ftDate,    ftTime,     ftDateTime,  ftTimeStamp, ftBlob, ftMemo,
+                         ftGuid,   ftBCD,           ftFmtBcd,  ftBytes,    ftVarBytes,  ftVariant,   ftFixedChar
+                         ];</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SNotSupportFieldType">SNotSupportFieldType</a></strong> = 'Field type is not supported.';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SForeignKeyIndexMustExists">SForeignKeyIndexMustExists</a></strong> = 'FOREIGN KEY index must exists on field &quot;%s&quot;.';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SIntListCapacityError">SIntListCapacityError</a></strong>      = 'IntList capacity out of bounds (%d)';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SIntListCountError">SIntListCountError</a></strong>         = 'IntList count out of bounds (%d)';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SIntListIndexError">SIntListIndexError</a></strong>         = 'IntList index out of bounds (%d)';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SDuplicateFieldName">SDuplicateFieldName</a></strong>        = 'A field named ''%s'' already exists';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SInvalidColor">SInvalidColor</a></strong>              = '''%s'' is not a valid color value';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SMoveBytesError">SMoveBytesError</a></strong>            = 'Stream move butes error';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SIllegalFileVersion">SIllegalFileVersion</a></strong>        = 'Illegal File Version';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SCorruptedFileHeader">SCorruptedFileHeader</a></strong>       = 'Corrupted File Header';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SCorruptedDefinitions">SCorruptedDefinitions</a></strong>      = 'Corrupted Table Definitions, or Illegal Login';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SFileSAlreadyExists">SFileSAlreadyExists</a></strong>        = 'File %s already exists';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SIsDatafileReadOnly">SIsDatafileReadOnly</a></strong>        = 'Is Datafile Read only';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SIsDatafileHasStream">SIsDatafileHasStream</a></strong>       = 'Datafile has stream event';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SWarnNextDefinitions">SWarnNextDefinitions</a></strong>       = 'Warning! Next table definitions.';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SInvalidRecord">SInvalidRecord</a></strong>             = 'GetRecord: Invalid record';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SNotSupported">SNotSupported</a></strong>              = 'AddRecord: not supported';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SBookmarkDNotFound">SBookmarkDNotFound</a></strong>         = 'Bookmark %d not found';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SUnsupportedTypeField">SUnsupportedTypeField</a></strong>      = '%s: unsupported type of field %s';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SDbIsCurrentlyOpen">SDbIsCurrentlyOpen</a></strong>         = 'Cannot perform operation -- Db is currently open';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SCantAssingOpenTable">SCantAssingOpenTable</a></strong>       = 'Cannot assing an open table to a new file';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SFieldsMustUnique">SFieldsMustUnique</a></strong>          = 'Fields ''%s'' must have a unique value';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SIsTableOpened">SIsTableOpened</a></strong>             = 'Is Table opened';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#STableNotExists">STableNotExists</a></strong>            = 'Table not exists';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SDifferentDbOrNotAssigned">SDifferentDbOrNotAssigned</a></strong>  = 'Different Database or not assigned';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#STableAlreadyExists">STableAlreadyExists</a></strong>        = 'Table already exists';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SIllegalLogin">SIllegalLogin</a></strong>              = 'Illegal Login';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SIllegalLoginFmt">SIllegalLoginFmt</a></strong>           = 'Illegal Login %s';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SZerroFieldCount">SZerroFieldCount</a></strong>           = 'InitFieldsDefs: 0 fields?';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SInitFieldsDefsNoType">SInitFieldsDefsNoType</a></strong>      = 'InitFieldsDefs: No type for field %d';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SInitFieldsDefsNoName">SInitFieldsDefsNoName</a></strong>      = 'InitFieldsDefs: No name for field %d';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SStructureOfIndexBroken">SStructureOfIndexBroken</a></strong>    = 'Structure of index is broken, it is required automatic a recreation of an index';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#STheTableDontHaveName">STheTableDontHaveName</a></strong>      = 'The table dont have name.';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#STheTableHaveIllegal">STheTableHaveIllegal</a></strong>       = 'The table have illegal symbol of name.';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SLengthOutOfBounds">SLengthOutOfBounds</a></strong>         = 'Length out of bounds (%d)';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SIndexNamedAlredyExists">SIndexNamedAlredyExists</a></strong>    = 'Index named &quot;%s&quot; already exists.';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SEmptyIndexName">SEmptyIndexName</a></strong>            = 'Empty index name';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SViolationOfForeignKey">SViolationOfForeignKey</a></strong>     = 'Violation of FOREIGN KEY constraint on field &quot;' +
+                              '%s&quot;.' + sLineBreak + 'Foreign key references are present for the record.';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SViolationOfForeignKey2">SViolationOfForeignKey2</a></strong>    = 'Violation of FOREIGN KEY constraint on field &quot;' +
+                              '%s&quot;.' + sLineBreak + 'Foreign key reference target does not exist.';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SErrInvalidDataStream">SErrInvalidDataStream</a></strong>      = 'Error in data stream at position %d';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#SErrInvalidMarkerAtPos">SErrInvalidMarkerAtPos</a></strong>     = 'Wrong data stream marker at position %d. Got %d, expected %d';</code></td>
+</tr>
+</table>
+<span id="PasDoc-Variables"></span><h3 class="summary">Variáveis</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#DefaultFieldClasses">DefaultFieldClasses</a></strong>: Array[TFieldType] Of TFieldClass = (nil,                      
+                                                           TStringField,             
+                                                           TSmallintField,           
+                                                           TIntegerField,            
+                                                           TWordField,               
+                                                           TBooleanField,            
+                                                           TFloatField,              
+                                                           TCurrencyField,           
+                                                           TBCDField,                
+                                                           TDateField,               
+                                                           TTimeField,               
+                                                           TDateTimeField,           
+                                                           TBytesField,              
+                                                           TVarBytesField,           
+                                                           TAutoIncField,            
+                                                           TBlobField,               
+                                                           TMemoField,               
+                                                           TGraphicField,            
+                                                           TBlobField,               
+                                                           TBlobField,               
+                                                           TBlobField,               
+                                                           TBlobField,               
+                                                           nil,                      
+                                                           TStringField,             
+                                                           TWideStringField,         
+                                                           TLargeIntField,           
+                                                           Nil,
+                                                           Nil,
+                                                           Nil,
+                                                           Nil,
+                                                           TBlobField,               
+                                                           TMemoField,               
+                                                           TVariantField,            
+                                                           Nil,
+                                                           Nil,
+                                                           TGuidField,
+                                                           Nil,
+                                                           TFMTBcdField              
+                                                           ,
+                                                           TStringField              
+                                                           
+                                                           ,
+                                                           <a href="uRESTDWDataset.TStreamField.html">TStreamField</a>              
+                                                           
+                                                           );</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataset.html#vTableStorage">vTableStorage</a></strong>: <a href="uRESTDWDataset.TRESTDWTableStorage.html">TRESTDWTableStorage</a> = nil;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Funções e Procedimentos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="FieldTypeToString"></span><code>Function <strong>FieldTypeToString</strong>(AValue : TFieldType) : String;</code></td>
+</tr>
+<tr><td colspan="1">
+<p>
+ftStream</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="StringToFieldType"></span><code>Function <strong>StringToFieldType</strong>(const S : string) : Integer;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="GetFieldTypeB"></span><code>Function <strong>GetFieldTypeB</strong>(FieldType : String) : TFieldType; overload;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="GetFieldTypeB"></span><code>Function <strong>GetFieldTypeB</strong>(FieldType : TFieldType) : String; overload;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Tipos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnWriterProcess"></span><code><strong>TOnWriterProcess</strong> = Procedure (DataSet : TDataSet; RecNo, RecordCount : Integer; Var AbortProcess : Boolean) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWBRSourceSide"></span><code><strong>TRESTDWBRSourceSide</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="dwDelphi">dwDelphi</span></li>
+<li>
+<span id="dwLazarus">dwLazarus</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DWInteger"></span><code><strong>DWInteger</strong>       = Longint;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DWInt64"></span><code><strong>DWInt64</strong>         = Int64;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DWString"></span><code><strong>DWString</strong>        = String;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DWFloat"></span><code><strong>DWFloat</strong>         = Real;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DWFieldTypeSize"></span><code><strong>DWFieldTypeSize</strong> = Longint;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWAboutInfoDS"></span><code><strong>TRESTDWAboutInfoDS</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="DWAboutDS">DWAboutDS</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="pdwAnsiString"></span><code><strong>pdwAnsiString</strong>            = &circ;AnsiString;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TDataAttributes"></span><code><strong>TDataAttributes</strong>          = Set of (dwCalcField,    dwNotNull, dwLookup,
+                                    dwInternalCalc, dwAggregate);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRestrictLength"></span><code><strong>TRestrictLength</strong>          = Set of (dwRangeChecking, dwRestrict);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TIndexDataSortCompare"></span><code><strong>TIndexDataSortCompare</strong> = Function(Item1, Item2 : Integer) : Integer;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TVariantArraySortCompare"></span><code><strong>TVariantArraySortCompare</strong> = Function(Const Value1, Value2 : Variant) : Integer;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PVariantArray"></span><code><strong>PVariantArray</strong>            = &circ;<a href="uRESTDWDataset.TVariantArray.html">TVariantArray</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PArrayData"></span><code><strong>PArrayData</strong>    = &circ;<a href="uRESTDWDataset.html#TArrayData">TArrayData</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+<p>
+TVariantArray</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TArrayData"></span><code><strong>TArrayData</strong>    = Array of Variant;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWTableStorageClass"></span><code><strong>TRESTDWTableStorageClass</strong> = class of <a href="uRESTDWDataset.TRESTDWTableStorage.html">TRESTDWTableStorage</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PIndexDataList"></span><code><strong>PIndexDataList</strong>      = &circ;<a href="uRESTDWDataset.html#TIndexDataList">TIndexDataList</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TIndexDataList"></span><code><strong>TIndexDataList</strong>      = Array[0..<a href="uRESTDWDataset.html#MaxIndexDataListSize">MaxIndexDataListSize</a> - 1] of Integer;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TIndexListOptions"></span><code><strong>TIndexListOptions</strong>   = Set Of (iloUnique = 0, iloInactive = 1);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWcolorOptions"></span><code><strong>TRESTDWcolorOptions</strong> = Set Of (dwcoAllowedSharp, dwcoShowWebSharp, dwcoSysColors);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWMemtableState"></span><code><strong>TRESTDWMemtableState</strong>   = Set Of (dwsOpening,      dwsOpen,
+                               dwsConvertError, dwsCheckFilter);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWMemtableOptions"></span><code><strong>TRESTDWMemtableOptions</strong> = Set Of (dwoCanConvert,   dwoFileReadOnly, dwoShowWaitForm);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PVarRecInfo"></span><code><strong>PVarRecInfo</strong>  = &circ;<a href="uRESTDWDataset.TVarRecInfo.html">TVarRecInfo</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TBytes"></span><code><strong>TBytes</strong>        = Array of Byte;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="NativeInt"></span><code><strong>NativeInt</strong> = PtrInt;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWMemtableOptionD"></span><code><strong>TRESTDWMemtableOptionD</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="dwPersistentData">dwPersistentData</span></li>
+<li>
+<span id="dwStored">dwStored</span></li>
+<li>
+<span id="dwSetEmptyStrToNull">dwSetEmptyStrToNull</span></li>
+<li>
+<span id="dwSkipUnSupportedFieldTypes">dwSkipUnSupportedFieldTypes</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWMemtableOptionsD"></span><code><strong>TRESTDWMemtableOptionsD</strong> = Set Of <a href="uRESTDWDataset.html#TRESTDWMemtableOptionD">TRESTDWMemtableOptionD</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TUpdateKinds"></span><code><strong>TUpdateKinds</strong> = set of TUpdateKind;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Constantes</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="MaxFloatLaz"></span><code><strong>MaxFloatLaz</strong>       = 15;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="LazDigitsSize"></span><code><strong>LazDigitsSize</strong>     = 6;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="sDate_dwdb"></span><code><strong>sDate_dwdb</strong>        = 41941.5705324074;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DWDB_VERSION_INFO"></span><code><strong>DWDB_VERSION_INFO</strong> = '3.50';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="NTAVersion"></span><code><strong>NTAVersion</strong>        = 0;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="MAXSHORT"></span><code><strong>MAXSHORT</strong>          = 32767;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftString"></span><code><strong>dwftString</strong>          = Integer(DB.ftString);</code></td>
+</tr>
+<tr><td colspan="1">
+<p>
+Supported types</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftSmallint"></span><code><strong>dwftSmallint</strong>        = Integer(DB.ftSmallint);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftInteger"></span><code><strong>dwftInteger</strong>         = Integer(DB.ftInteger);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftWord"></span><code><strong>dwftWord</strong>            = Integer(DB.ftWord);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftBoolean"></span><code><strong>dwftBoolean</strong>         = Integer(DB.ftBoolean);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftFloat"></span><code><strong>dwftFloat</strong>           = Integer(DB.ftFloat);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftCurrency"></span><code><strong>dwftCurrency</strong>        = Integer(DB.ftCurrency);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftBCD"></span><code><strong>dwftBCD</strong>             = Integer(DB.ftBCD);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftDate"></span><code><strong>dwftDate</strong>            = Integer(DB.ftDate);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftTime"></span><code><strong>dwftTime</strong>            = Integer(DB.ftTime);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftDateTime"></span><code><strong>dwftDateTime</strong>        = Integer(DB.ftDateTime);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftBytes"></span><code><strong>dwftBytes</strong>           = Integer(DB.ftBytes);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftVarBytes"></span><code><strong>dwftVarBytes</strong>        = Integer(DB.ftVarBytes);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftAutoInc"></span><code><strong>dwftAutoInc</strong>         = Integer(DB.ftAutoInc);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftBlob"></span><code><strong>dwftBlob</strong>            = Integer(DB.ftBlob);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftMemo"></span><code><strong>dwftMemo</strong>            = Integer(DB.ftMemo);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftGraphic"></span><code><strong>dwftGraphic</strong>         = Integer(DB.ftGraphic);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftFmtMemo"></span><code><strong>dwftFmtMemo</strong>         = Integer(DB.ftFmtMemo);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftParadoxOle"></span><code><strong>dwftParadoxOle</strong>      = Integer(DB.ftParadoxOle);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftDBaseOle"></span><code><strong>dwftDBaseOle</strong>        = Integer(DB.ftDBaseOle);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftTypedBinary"></span><code><strong>dwftTypedBinary</strong>     = Integer(DB.ftTypedBinary);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftFixedChar"></span><code><strong>dwftFixedChar</strong>       = Integer(DB.ftFixedChar);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftWideString"></span><code><strong>dwftWideString</strong>      = Integer(DB.ftWideString);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftLargeint"></span><code><strong>dwftLargeint</strong>        = Integer(DB.ftLargeint);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftOraBlob"></span><code><strong>dwftOraBlob</strong>         = Integer(DB.ftOraBlob);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftOraClob"></span><code><strong>dwftOraClob</strong>         = Integer(DB.ftOraClob);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftVariant"></span><code><strong>dwftVariant</strong>         = Integer(DB.ftVariant);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftInterface"></span><code><strong>dwftInterface</strong>       = Integer(DB.ftInterface);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftIDispatch"></span><code><strong>dwftIDispatch</strong>       = Integer(DB.ftIDispatch);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftGuid"></span><code><strong>dwftGuid</strong>            = Integer(DB.ftGuid);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftTimeStamp"></span><code><strong>dwftTimeStamp</strong>       = Integer(DB.ftTimeStamp);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftFMTBcd"></span><code><strong>dwftFMTBcd</strong>          = Integer(DB.ftFMTBcd);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftFixedWideChar"></span><code><strong>dwftFixedWideChar</strong>   = Integer(38);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftWideMemo"></span><code><strong>dwftWideMemo</strong>        = Integer(39);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftOraTimeStamp"></span><code><strong>dwftOraTimeStamp</strong>    = Integer(40);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftOraInterval"></span><code><strong>dwftOraInterval</strong>     = Integer(41);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftLongWord"></span><code><strong>dwftLongWord</strong>        = Integer(42);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftShortint"></span><code><strong>dwftShortint</strong>        = Integer(43);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftByte"></span><code><strong>dwftByte</strong>            = Integer(44);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftExtended"></span><code><strong>dwftExtended</strong>        = Integer(45);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftStream"></span><code><strong>dwftStream</strong>          = Integer(48);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftTimeStampOffset"></span><code><strong>dwftTimeStampOffset</strong> = Integer(49);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftSingle"></span><code><strong>dwftSingle</strong>          = Integer(51);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftUnknown"></span><code><strong>dwftUnknown</strong>         = Integer(DB.ftUnknown);</code></td>
+</tr>
+<tr><td colspan="1">
+<p>
+Unsupported types</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftCursor"></span><code><strong>dwftCursor</strong>          = Integer(DB.ftCursor);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftADT"></span><code><strong>dwftADT</strong>             = Integer(DB.ftADT);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftArray"></span><code><strong>dwftArray</strong>           = Integer(DB.ftArray);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftReference"></span><code><strong>dwftReference</strong>       = Integer(DB.ftReference);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftDataSet"></span><code><strong>dwftDataSet</strong>         = Integer(DB.ftDataSet);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="dwftColor"></span><code><strong>dwftColor</strong>           = Integer(255);</code></td>
+</tr>
+<tr><td colspan="1">
+<p>
+Unknown newest types for support in future</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="MarkerSize"></span><code><strong>MarkerSize</strong>           = SizeOf(Integer);</code></td>
+</tr>
+<tr><td colspan="1">
+<p>
+Stream Markers.</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="smEOF"></span><code><strong>smEOF</strong>                = 0;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="smFieldDefs"></span><code><strong>smFieldDefs</strong>          = 1;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="smData"></span><code><strong>smData</strong>               = 2;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="stkAutoInc"></span><code><strong>stkAutoInc</strong>           = 0;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="stkIndexes"></span><code><strong>stkIndexes</strong>           = 1;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="stkLookupInf"></span><code><strong>stkLookupInf</strong>         = 2;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="stkForeignKey"></span><code><strong>stkForeignKey</strong>        = 3;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="MaxIndexDataListSize"></span><code><strong>MaxIndexDataListSize</strong> = MaxInt div 16;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SupportFieldTypes"></span><code><strong>SupportFieldTypes</strong>    = [ftString, ftWideString,    ftBoolean, ftSmallint, ftInteger,   ftLargeint,  ftWord, ftAutoInc,
+                         ftFloat,  ftCurrency,      ftDate,    ftTime,     ftDateTime,  ftTimeStamp, ftBlob, ftMemo,
+                         ftGuid,   ftBCD,           ftFmtBcd,  ftBytes,    ftVarBytes,  ftVariant,   ftFixedChar
+                         ];</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SNotSupportFieldType"></span><code><strong>SNotSupportFieldType</strong> = 'Field type is not supported.';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SForeignKeyIndexMustExists"></span><code><strong>SForeignKeyIndexMustExists</strong> = 'FOREIGN KEY index must exists on field &quot;%s&quot;.';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SIntListCapacityError"></span><code><strong>SIntListCapacityError</strong>      = 'IntList capacity out of bounds (%d)';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SIntListCountError"></span><code><strong>SIntListCountError</strong>         = 'IntList count out of bounds (%d)';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SIntListIndexError"></span><code><strong>SIntListIndexError</strong>         = 'IntList index out of bounds (%d)';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SDuplicateFieldName"></span><code><strong>SDuplicateFieldName</strong>        = 'A field named ''%s'' already exists';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SInvalidColor"></span><code><strong>SInvalidColor</strong>              = '''%s'' is not a valid color value';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SMoveBytesError"></span><code><strong>SMoveBytesError</strong>            = 'Stream move butes error';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SIllegalFileVersion"></span><code><strong>SIllegalFileVersion</strong>        = 'Illegal File Version';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SCorruptedFileHeader"></span><code><strong>SCorruptedFileHeader</strong>       = 'Corrupted File Header';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SCorruptedDefinitions"></span><code><strong>SCorruptedDefinitions</strong>      = 'Corrupted Table Definitions, or Illegal Login';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SFileSAlreadyExists"></span><code><strong>SFileSAlreadyExists</strong>        = 'File %s already exists';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SIsDatafileReadOnly"></span><code><strong>SIsDatafileReadOnly</strong>        = 'Is Datafile Read only';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SIsDatafileHasStream"></span><code><strong>SIsDatafileHasStream</strong>       = 'Datafile has stream event';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SWarnNextDefinitions"></span><code><strong>SWarnNextDefinitions</strong>       = 'Warning! Next table definitions.';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SInvalidRecord"></span><code><strong>SInvalidRecord</strong>             = 'GetRecord: Invalid record';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SNotSupported"></span><code><strong>SNotSupported</strong>              = 'AddRecord: not supported';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SBookmarkDNotFound"></span><code><strong>SBookmarkDNotFound</strong>         = 'Bookmark %d not found';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SUnsupportedTypeField"></span><code><strong>SUnsupportedTypeField</strong>      = '%s: unsupported type of field %s';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SDbIsCurrentlyOpen"></span><code><strong>SDbIsCurrentlyOpen</strong>         = 'Cannot perform operation -- Db is currently open';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SCantAssingOpenTable"></span><code><strong>SCantAssingOpenTable</strong>       = 'Cannot assing an open table to a new file';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SFieldsMustUnique"></span><code><strong>SFieldsMustUnique</strong>          = 'Fields ''%s'' must have a unique value';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SIsTableOpened"></span><code><strong>SIsTableOpened</strong>             = 'Is Table opened';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="STableNotExists"></span><code><strong>STableNotExists</strong>            = 'Table not exists';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SDifferentDbOrNotAssigned"></span><code><strong>SDifferentDbOrNotAssigned</strong>  = 'Different Database or not assigned';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="STableAlreadyExists"></span><code><strong>STableAlreadyExists</strong>        = 'Table already exists';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SIllegalLogin"></span><code><strong>SIllegalLogin</strong>              = 'Illegal Login';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SIllegalLoginFmt"></span><code><strong>SIllegalLoginFmt</strong>           = 'Illegal Login %s';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SZerroFieldCount"></span><code><strong>SZerroFieldCount</strong>           = 'InitFieldsDefs: 0 fields?';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SInitFieldsDefsNoType"></span><code><strong>SInitFieldsDefsNoType</strong>      = 'InitFieldsDefs: No type for field %d';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SInitFieldsDefsNoName"></span><code><strong>SInitFieldsDefsNoName</strong>      = 'InitFieldsDefs: No name for field %d';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SStructureOfIndexBroken"></span><code><strong>SStructureOfIndexBroken</strong>    = 'Structure of index is broken, it is required automatic a recreation of an index';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="STheTableDontHaveName"></span><code><strong>STheTableDontHaveName</strong>      = 'The table dont have name.';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="STheTableHaveIllegal"></span><code><strong>STheTableHaveIllegal</strong>       = 'The table have illegal symbol of name.';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SLengthOutOfBounds"></span><code><strong>SLengthOutOfBounds</strong>         = 'Length out of bounds (%d)';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SIndexNamedAlredyExists"></span><code><strong>SIndexNamedAlredyExists</strong>    = 'Index named &quot;%s&quot; already exists.';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SEmptyIndexName"></span><code><strong>SEmptyIndexName</strong>            = 'Empty index name';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SViolationOfForeignKey"></span><code><strong>SViolationOfForeignKey</strong>     = 'Violation of FOREIGN KEY constraint on field &quot;' +
+                              '%s&quot;.' + sLineBreak + 'Foreign key references are present for the record.';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SViolationOfForeignKey2"></span><code><strong>SViolationOfForeignKey2</strong>    = 'Violation of FOREIGN KEY constraint on field &quot;' +
+                              '%s&quot;.' + sLineBreak + 'Foreign key reference target does not exist.';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SErrInvalidDataStream"></span><code><strong>SErrInvalidDataStream</strong>      = 'Error in data stream at position %d';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SErrInvalidMarkerAtPos"></span><code><strong>SErrInvalidMarkerAtPos</strong>     = 'Wrong data stream marker at position %d. Got %d, expected %d';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Variáveis</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DefaultFieldClasses"></span><code><strong>DefaultFieldClasses</strong>: Array[TFieldType] Of TFieldClass = (nil,                      
+                                                           TStringField,             
+                                                           TSmallintField,           
+                                                           TIntegerField,            
+                                                           TWordField,               
+                                                           TBooleanField,            
+                                                           TFloatField,              
+                                                           TCurrencyField,           
+                                                           TBCDField,                
+                                                           TDateField,               
+                                                           TTimeField,               
+                                                           TDateTimeField,           
+                                                           TBytesField,              
+                                                           TVarBytesField,           
+                                                           TAutoIncField,            
+                                                           TBlobField,               
+                                                           TMemoField,               
+                                                           TGraphicField,            
+                                                           TBlobField,               
+                                                           TBlobField,               
+                                                           TBlobField,               
+                                                           TBlobField,               
+                                                           nil,                      
+                                                           TStringField,             
+                                                           TWideStringField,         
+                                                           TLargeIntField,           
+                                                           Nil,
+                                                           Nil,
+                                                           Nil,
+                                                           Nil,
+                                                           TBlobField,               
+                                                           TMemoField,               
+                                                           TVariantField,            
+                                                           Nil,
+                                                           Nil,
+                                                           TGuidField,
+                                                           Nil,
+                                                           TFMTBcdField              
+                                                           ,
+                                                           TStringField              
+                                                           
+                                                           ,
+                                                           <a href="uRESTDWDataset.TStreamField.html">TStreamField</a>              
+                                                           
+                                                           );</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="vTableStorage"></span><code><strong>vTableStorage</strong>: <a href="uRESTDWDataset.TRESTDWTableStorage.html">TRESTDWTableStorage</a> = nil;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

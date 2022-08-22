@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWParams: Classe TRESTDWParams</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<span id="TRESTDWParams"></span><h1 class="cio">Classe TRESTDWParams</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarquia</a></div><div class="one_section">Campos</div><div class="one_section"><a class="section" href="#PasDoc-Methods">Métodos</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Properties</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a href="uRESTDWParams.html">uRESTDWParams</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TRESTDWParams = class(TList)</code></p>
+<h2 class="description">Descrição</h2>
+<span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="ancestor">TList</li>
+<li class="thisitem">TRESTDWParams</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Methods"></span><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Constructor <strong><a href="uRESTDWParams.TRESTDWParams.html#Create">Create</a></strong>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWParams.TRESTDWParams.html#CreateParam">CreateParam</a></strong>(ParamName : String; Value : String = '');</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Destructor <strong><a href="uRESTDWParams.TRESTDWParams.html#Destroy">Destroy</a></strong>; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWParams.TRESTDWParams.html#Clear">Clear</a></strong>; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWParams.TRESTDWParams.html#ParamsReturn">ParamsReturn</a></strong>: Boolean;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWParams.TRESTDWParams.html#CountOutParams">CountOutParams</a></strong>: Integer;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWParams.TRESTDWParams.html#CountInParams">CountInParams</a></strong>: Integer;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWParams.TRESTDWParams.html#ToJSON">ToJSON</a></strong>: String;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWParams.TRESTDWParams.html#SaveToFile">SaveToFile</a></strong>(FileName : String);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWParams.TRESTDWParams.html#FromJSON">FromJSON</a></strong>(json : String; BinaryRequest : Boolean = False);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWParams.TRESTDWParams.html#CopyFrom">CopyFrom</a></strong>(DWParams : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWParams.TRESTDWParams.html#Delete">Delete</a></strong>(Index : Integer); Overload;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWParams.TRESTDWParams.html#Delete">Delete</a></strong>(Param : <a href="uRESTDWParams.TJSONParam.html">TJSONParam</a>); Overload;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWParams.TRESTDWParams.html#Add">Add</a></strong>(Item : <a href="uRESTDWParams.TJSONParam.html">TJSONParam</a>) : Integer; Overload;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWParams.TRESTDWParams.html#SaveToStream">SaveToStream</a></strong>(Stream : TStream; Output : <a href="uRESTDWParams.html#TDWParamExpType">TDWParamExpType</a> = <a href="uRESTDWParams.html#tdwpxt_All">tdwpxt_All</a>);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWParams.TRESTDWParams.html#LoadFromStream">LoadFromStream</a></strong>(Stream : TStream; ValidateHeader : Boolean = False; Input : <a href="uRESTDWParams.html#TDWParamExpType">TDWParamExpType</a> = <a href="uRESTDWParams.html#tdwpxt_All">tdwpxt_All</a>);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWParams.TRESTDWParams.html#LoadFromParams">LoadFromParams</a></strong>(Params : TParams);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWParams.TRESTDWParams.html#SetCriptOptions">SetCriptOptions</a></strong>(Use : Boolean; Key : String);</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Properties</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWParams.TRESTDWParams.html#Items">Items</a></strong>      [Index:Integer]: <a href="uRESTDWParams.TJSONParam.html">TJSONParam</a> Read GetRec        Write PutRec;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWParams.TRESTDWParams.html#ItemsString">ItemsString</a></strong>[Index:String]: <a href="uRESTDWParams.TJSONParam.html">TJSONParam</a> Read GetRecName    Write PutRecName;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWParams.TRESTDWParams.html#RawBody">RawBody</a></strong>               : <a href="uRESTDWParams.TJSONParam.html">TJSONParam</a>               Read GetRawBody    Write PutRawBody;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWParams.TRESTDWParams.html#DataMode">DataMode</a></strong>              : <a href="uRESTDWConsts.html#TDataMode">TDataMode</a>                Read vDataMode     Write vDataMode;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWParams.TRESTDWParams.html#Encoding">Encoding</a></strong>              : <a href="uRESTDWEncodeClass.html#TEncodeSelect">TEncodeSelect</a>            Read vEncoding     Write vEncoding;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWParams.TRESTDWParams.html#CriptOptions">CriptOptions</a></strong>          : <a href="uRESTDWConsts.TCripto.html">TCripto</a>                  Read vCripto       Write vCripto;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWParams.TRESTDWParams.html#RequestHeaders">RequestHeaders</a></strong>        : <a href="uRESTDWParams.TRESTDWHeaders.html">TRESTDWHeaders</a>           Read vHeaders      Write vHeaders;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWParams.TRESTDWParams.html#Url_Redirect">Url_Redirect</a></strong>          : String                   Read vUrl_Redirect Write vUrl_Redirect;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWParams.TRESTDWParams.html#DatabaseCharSet">DatabaseCharSet</a></strong>          : <a href="uRESTDWCharset.html#TDatabaseCharSet">TDatabaseCharSet</a> Read vDatabaseCharSet    Write vDatabaseCharSet;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Create"></span><code>Constructor <strong>Create</strong>;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Procedure Clear;Override;</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="CreateParam"></span><code>Procedure <strong>CreateParam</strong>(ParamName : String; Value : String = '');</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Destroy"></span><code>Destructor <strong>Destroy</strong>; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Clear"></span><code>Procedure <strong>Clear</strong>; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ParamsReturn"></span><code>Function <strong>ParamsReturn</strong>: Boolean;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="CountOutParams"></span><code>Function <strong>CountOutParams</strong>: Integer;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="CountInParams"></span><code>Function <strong>CountInParams</strong>: Integer;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ToJSON"></span><code>Function <strong>ToJSON</strong>: String;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="SaveToFile"></span><code>Procedure <strong>SaveToFile</strong>(FileName : String);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="FromJSON"></span><code>Procedure <strong>FromJSON</strong>(json : String; BinaryRequest : Boolean = False);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="CopyFrom"></span><code>Procedure <strong>CopyFrom</strong>(DWParams : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Delete"></span><code>Procedure <strong>Delete</strong>(Index : Integer); Overload;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Delete"></span><code>Procedure <strong>Delete</strong>(Param : <a href="uRESTDWParams.TJSONParam.html">TJSONParam</a>); Overload;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Add"></span><code>Function <strong>Add</strong>(Item : <a href="uRESTDWParams.TJSONParam.html">TJSONParam</a>) : Integer; Overload;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="SaveToStream"></span><code>Procedure <strong>SaveToStream</strong>(Stream : TStream; Output : <a href="uRESTDWParams.html#TDWParamExpType">TDWParamExpType</a> = <a href="uRESTDWParams.html#tdwpxt_All">tdwpxt_All</a>);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="LoadFromStream"></span><code>Procedure <strong>LoadFromStream</strong>(Stream : TStream; ValidateHeader : Boolean = False; Input : <a href="uRESTDWParams.html#TDWParamExpType">TDWParamExpType</a> = <a href="uRESTDWParams.html#tdwpxt_All">tdwpxt_All</a>);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="LoadFromParams"></span><code>Procedure <strong>LoadFromParams</strong>(Params : TParams);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="SetCriptOptions"></span><code>Procedure <strong>SetCriptOptions</strong>(Use : Boolean; Key : String);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Properties</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Items"></span><code>property <strong>Items</strong>      [Index:Integer]: <a href="uRESTDWParams.TJSONParam.html">TJSONParam</a> Read GetRec        Write PutRec;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ItemsString"></span><code>property <strong>ItemsString</strong>[Index:String]: <a href="uRESTDWParams.TJSONParam.html">TJSONParam</a> Read GetRecName    Write PutRecName;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="RawBody"></span><code>property <strong>RawBody</strong>               : <a href="uRESTDWParams.TJSONParam.html">TJSONParam</a>               Read GetRawBody    Write PutRawBody;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DataMode"></span><code>property <strong>DataMode</strong>              : <a href="uRESTDWConsts.html#TDataMode">TDataMode</a>                Read vDataMode     Write vDataMode;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Encoding"></span><code>property <strong>Encoding</strong>              : <a href="uRESTDWEncodeClass.html#TEncodeSelect">TEncodeSelect</a>            Read vEncoding     Write vEncoding;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="CriptOptions"></span><code>property <strong>CriptOptions</strong>          : <a href="uRESTDWConsts.TCripto.html">TCripto</a>                  Read vCripto       Write vCripto;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="RequestHeaders"></span><code>property <strong>RequestHeaders</strong>        : <a href="uRESTDWParams.TRESTDWHeaders.html">TRESTDWHeaders</a>           Read vHeaders      Write vHeaders;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Url_Redirect"></span><code>property <strong>Url_Redirect</strong>          : String                   Read vUrl_Redirect Write vUrl_Redirect;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DatabaseCharSet"></span><code>property <strong>DatabaseCharSet</strong>          : <a href="uRESTDWCharset.html#TDatabaseCharSet">TDatabaseCharSet</a> Read vDatabaseCharSet    Write vDatabaseCharSet;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

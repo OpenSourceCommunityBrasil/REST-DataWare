@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWDataUtils</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<h1 class="unit">Unit uRESTDWDataUtils</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Uses">Uses</a></div><div class="one_section"><a class="section" href="#PasDoc-Classes">Classes, Interfaces, Objetos e Registros</a></div><div class="one_section"><a class="section" href="#PasDoc-FuncsProcs">Funções e Procedimentos</a></div><div class="one_section"><a class="section" href="#PasDoc-Types">Tipos</a></div><div class="one_section">Constantes</div><div class="one_section"><a class="section" href="#PasDoc-Variables">Variáveis</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="description">Descrição</h2>
+&nbsp;<span id="PasDoc-Uses"></span><h2 class="uses">Uses</h2>
+<ul class="useslist"><li>Classes</li><li>SysUtils</li><li><a href="uRESTDWTools.html">uRESTDWTools</a></li><li><a href="uRESTDWConsts.html">uRESTDWConsts</a></li><li>DateUtils</li><li><a href="uRESTDWMD5.html">uRESTDWMD5</a></li><li><a href="uRESTDWBasicTypes.html">uRESTDWBasicTypes</a></li><li><a href="uRESTDWEncodeClass.html">uRESTDWEncodeClass</a></li><li><a href="uRESTDWCharset.html">uRESTDWCharset</a></li><li><a href="uRESTDWParams.html">uRESTDWParams</a></li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Classes"></span><h3 class="cio">Classes, Interfaces, Objetos e Registros</h3>
+<table class="classestable wide_list">
+<tr class="listheader">
+<th class="itemname">Nome</th>
+<th class="itemdesc">Descrição</th>
+</tr>
+<tr class="list">
+<td class="itemname">Packed Record&nbsp;<a class="bold" href="uRESTDWDataUtils.TRESTDWParamsHeader.html"><code>TRESTDWParamsHeader</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataUtils.TTokenValue.html"><code>TTokenValue</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataUtils.TRESTDWAuthOptionParam.html"><code>TRESTDWAuthOptionParam</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataUtils.TRESTDWAuthTokenParam.html"><code>TRESTDWAuthTokenParam</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataUtils.TRESTDWAuthOptionBasic.html"><code>TRESTDWAuthOptionBasic</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataUtils.TRESTDWAuthOAuth.html"><code>TRESTDWAuthOAuth</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataUtils.TRESTDWAuthOptionBearerClient.html"><code>TRESTDWAuthOptionBearerClient</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataUtils.TRESTDWAuthOptionTokenClient.html"><code>TRESTDWAuthOptionTokenClient</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataUtils.TRESTDWAuthOptionBearerServer.html"><code>TRESTDWAuthOptionBearerServer</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataUtils.TRESTDWAuthOptionTokenServer.html"><code>TRESTDWAuthOptionTokenServer</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataUtils.TRESTDWServerAuthOptionParams.html"><code>TRESTDWServerAuthOptionParams</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataUtils.TRESTDWClientAuthOptionParams.html"><code>TRESTDWClientAuthOptionParams</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataUtils.TRESTDWAuthRequest.html"><code>TRESTDWAuthRequest</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataUtils.TRESTDWDataUtils.html"><code>TRESTDWDataUtils</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+</table>
+<span id="PasDoc-FuncsProcs"></span><h3 class="summary">Funções e Procedimentos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataUtils.html#GettokenValue">GettokenValue</a></strong>(Value : String) : String;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataUtils.html#GetTokenType">GetTokenType</a></strong>(Value : String) : <a href="uRESTDWDataUtils.html#TRESTDWTokenType">TRESTDWTokenType</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataUtils.html#GetMIMEType">GetMIMEType</a></strong>(Value : String) : String;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataUtils.html#CountExpression">CountExpression</a></strong>(Value : String; Expression : Char) : Integer;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataUtils.html#GetSecretsValue">GetSecretsValue</a></strong>(Value : String) : String;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Types"></span><h3 class="summary">Tipos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#TRESTDWAuthOptionTypes">TRESTDWAuthOptionTypes</a></strong> = (...);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#TRESTDWAuthOption">TRESTDWAuthOption</a></strong> = (...);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#TRESTDWTokenType">TRESTDWTokenType</a></strong> = (...);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#TRESTDWAuthOptions">TRESTDWAuthOptions</a></strong>     = Set of <a href="uRESTDWDataUtils.html#TRESTDWAuthOption">TRESTDWAuthOption</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#TRESTDWCryptType">TRESTDWCryptType</a></strong> = (...);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#TRESTDWTokenRequest">TRESTDWTokenRequest</a></strong> = (...);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#DWInteger">DWInteger</a></strong>       = Longint;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#DWInt64">DWInt64</a></strong>         = Int64;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#DWFloat">DWFloat</a></strong>         = Real;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#DWFieldTypeSize">DWFieldTypeSize</a></strong> = Longint;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#DWBufferSize">DWBufferSize</a></strong>    = Longint;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#PDWInt64">PDWInt64</a></strong>         = &circ;<a href="uRESTDWDataUtils.html#DWInt64">DWInt64</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#DWString">DWString</a></strong>     = AnsiString;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#DWWideString">DWWideString</a></strong> = WideString;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Variables"></span><h3 class="summary">Variáveis</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataUtils.html#MimeTable">MimeTable</a></strong>: <a href="uRESTDWBasicTypes.TMimeTable.html">TMimeTable</a>;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Funções e Procedimentos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="GettokenValue"></span><code>Function <strong>GettokenValue</strong>(Value : String) : String;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="GetTokenType"></span><code>Function <strong>GetTokenType</strong>(Value : String) : <a href="uRESTDWDataUtils.html#TRESTDWTokenType">TRESTDWTokenType</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="GetMIMEType"></span><code>Function <strong>GetMIMEType</strong>(Value : String) : String;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="CountExpression"></span><code>Function <strong>CountExpression</strong>(Value : String; Expression : Char) : Integer;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="GetSecretsValue"></span><code>Function <strong>GetSecretsValue</strong>(Value : String) : String;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Tipos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWAuthOptionTypes"></span><code><strong>TRESTDWAuthOptionTypes</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="rdwOATBasic">rdwOATBasic</span></li>
+<li>
+<span id="rdwOATBearer">rdwOATBearer</span></li>
+<li>
+<span id="rdwOATToken">rdwOATToken</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWAuthOption"></span><code><strong>TRESTDWAuthOption</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="rdwAONone">rdwAONone</span></li>
+<li>
+<span id="rdwAOBasic">rdwAOBasic</span></li>
+<li>
+<span id="rdwAOBearer">rdwAOBearer</span></li>
+<li>
+<span id="rdwAOToken">rdwAOToken</span></li>
+<li>
+<span id="rdwOAuth">rdwOAuth</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWTokenType"></span><code><strong>TRESTDWTokenType</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="rdwTS">rdwTS</span></li>
+<li>
+<span id="rdwJWT">rdwJWT</span></li>
+<li>
+<span id="rdwPersonal">rdwPersonal</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWAuthOptions"></span><code><strong>TRESTDWAuthOptions</strong>     = Set of <a href="uRESTDWDataUtils.html#TRESTDWAuthOption">TRESTDWAuthOption</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWCryptType"></span><code><strong>TRESTDWCryptType</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="rdwAES256">rdwAES256</span></li>
+<li>
+<span id="rdwHSHA256">rdwHSHA256</span></li>
+<li>
+<span id="rdwRSA">rdwRSA</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWTokenRequest"></span><code><strong>TRESTDWTokenRequest</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="rdwtHeader">rdwtHeader</span></li>
+<li>
+<span id="rdwtRequest">rdwtRequest</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DWInteger"></span><code><strong>DWInteger</strong>       = Longint;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DWInt64"></span><code><strong>DWInt64</strong>         = Int64;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DWFloat"></span><code><strong>DWFloat</strong>         = Real;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DWFieldTypeSize"></span><code><strong>DWFieldTypeSize</strong> = Longint;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DWBufferSize"></span><code><strong>DWBufferSize</strong>    = Longint;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PDWInt64"></span><code><strong>PDWInt64</strong>         = &circ;<a href="uRESTDWDataUtils.html#DWInt64">DWInt64</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DWString"></span><code><strong>DWString</strong>     = AnsiString;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DWWideString"></span><code><strong>DWWideString</strong> = WideString;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Variáveis</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="MimeTable"></span><code><strong>MimeTable</strong>: <a href="uRESTDWBasicTypes.TMimeTable.html">TMimeTable</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

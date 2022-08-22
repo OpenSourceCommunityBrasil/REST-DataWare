@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWFileBuffer: Classe TRESTDWStreamBuffer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<span id="TRESTDWStreamBuffer"></span><h1 class="cio">Classe TRESTDWStreamBuffer</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarquia</a></div><div class="one_section">Campos</div><div class="one_section"><a class="section" href="#PasDoc-Methods">Métodos</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Properties</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a href="uRESTDWFileBuffer.html">uRESTDWFileBuffer</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TRESTDWStreamBuffer = class(<a class="normal" href="uRESTDWComponentBase.TRESTDWComponent.html">TRESTDWComponent</a>)</code></p>
+<h2 class="description">Descrição</h2>
+<div class="nodescription">No description available, ancestor TRESTDWComponent description follows</div><span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="ancestor">TPersistent</li>
+<li class="ancestor">TComponent</li>
+<li class="ancestor"><a class="normal" href="uRESTDWComponentBase.TRESTDWComponent.html">TRESTDWComponent</a></li>
+<li class="thisitem">TRESTDWStreamBuffer</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Methods"></span><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Constructor <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#Create">Create</a></strong>(AOwner : TComponent); Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Destructor <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#Destroy">Destroy</a></strong>; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#NewBuff">NewBuff</a></strong>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#CloseFile">CloseFile</a></strong>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#WriteBuffer">WriteBuffer</a></strong>(Const Buffer; Size : <a href="uRESTDWBasicTypes.html#DWBufferSize">DWBufferSize</a>);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#WriteLn">WriteLn</a></strong>(Value : <a href="uRESTDWBasicTypes.html#DWString">DWString</a>);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#ReadLn">ReadLn</a></strong>(InitFile : Boolean = False) : <a href="uRESTDWBasicTypes.html#DWString">DWString</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#ReadBuffer">ReadBuffer</a></strong>(Var Buffer; Size : <a href="uRESTDWBasicTypes.html#DWBufferSize">DWBufferSize</a>);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#ReadArray">ReadArray</a></strong>(Var Buffer; ElementClassType : Pointer);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#WriteArray">WriteArray</a></strong>(Var Buffer; ElementClassType : Pointer);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Class Function <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#StreamToFile">StreamToFile</a></strong>(Stream : TStream; Filename : String) : Boolean;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Properties</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#Bof">Bof</a></strong>            : Boolean           Read GetBof             Write SetBof;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#Eof">Eof</a></strong>            : Boolean           Read GetEof             Write SetEof;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#Size">Size</a></strong>           : <a href="uRESTDWBasicTypes.html#DWBufferSize">DWBufferSize</a>      Read GetBufferSize;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#Stream">Stream</a></strong>         : TStream           Read GetStreamObject;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#BufferSize">BufferSize</a></strong>        : Integer           Read vBufferSize        Write vBufferSize;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#StreamMode">StreamMode</a></strong>        : <a href="uRESTDWFileBuffer.html#TRESTDWStreamMode">TRESTDWStreamMode</a> Read vRESTDWStreamMode  Write SetStreamMode;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#CreateDirectories">CreateDirectories</a></strong> : Boolean           Read vCreateDirectories Write vCreateDirectories;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#FileName">FileName</a></strong>          : String            Read vFileName          Write vFileName;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#FileMode">FileMode</a></strong>          : <a href="uRESTDWFileBuffer.html#TRESTDWFileMode">TRESTDWFileMode</a>   Read vRESTDWFileMode    Write vRESTDWFileMode;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#RewriteFile">RewriteFile</a></strong>       : Boolean           Read vRewriteFile       Write vRewriteFile;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWFileBuffer.TRESTDWStreamBuffer.html#Position">Position</a></strong>          : <a href="uRESTDWBasicTypes.html#DWBufferSize">DWBufferSize</a>      Read vPosition          Write SetPosition;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Create"></span><code>Constructor <strong>Create</strong>(AOwner : TComponent); Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Destroy"></span><code>Destructor <strong>Destroy</strong>; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="NewBuff"></span><code>Procedure <strong>NewBuff</strong>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="CloseFile"></span><code>Procedure <strong>CloseFile</strong>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="WriteBuffer"></span><code>Procedure <strong>WriteBuffer</strong>(Const Buffer; Size : <a href="uRESTDWBasicTypes.html#DWBufferSize">DWBufferSize</a>);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="WriteLn"></span><code>Procedure <strong>WriteLn</strong>(Value : <a href="uRESTDWBasicTypes.html#DWString">DWString</a>);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ReadLn"></span><code>Function <strong>ReadLn</strong>(InitFile : Boolean = False) : <a href="uRESTDWBasicTypes.html#DWString">DWString</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ReadBuffer"></span><code>Procedure <strong>ReadBuffer</strong>(Var Buffer; Size : <a href="uRESTDWBasicTypes.html#DWBufferSize">DWBufferSize</a>);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ReadArray"></span><code>Procedure <strong>ReadArray</strong>(Var Buffer; ElementClassType : Pointer);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="WriteArray"></span><code>Procedure <strong>WriteArray</strong>(Var Buffer; ElementClassType : Pointer);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="StreamToFile"></span><code>Class Function <strong>StreamToFile</strong>(Stream : TStream; Filename : String) : Boolean;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Properties</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Bof"></span><code>property <strong>Bof</strong>            : Boolean           Read GetBof             Write SetBof;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Eof"></span><code>property <strong>Eof</strong>            : Boolean           Read GetEof             Write SetEof;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Size"></span><code>property <strong>Size</strong>           : <a href="uRESTDWBasicTypes.html#DWBufferSize">DWBufferSize</a>      Read GetBufferSize;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Stream"></span><code>property <strong>Stream</strong>         : TStream           Read GetStreamObject;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="BufferSize"></span><code>property <strong>BufferSize</strong>        : Integer           Read vBufferSize        Write vBufferSize;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="StreamMode"></span><code>property <strong>StreamMode</strong>        : <a href="uRESTDWFileBuffer.html#TRESTDWStreamMode">TRESTDWStreamMode</a> Read vRESTDWStreamMode  Write SetStreamMode;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="CreateDirectories"></span><code>property <strong>CreateDirectories</strong> : Boolean           Read vCreateDirectories Write vCreateDirectories;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="FileName"></span><code>property <strong>FileName</strong>          : String            Read vFileName          Write vFileName;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="FileMode"></span><code>property <strong>FileMode</strong>          : <a href="uRESTDWFileBuffer.html#TRESTDWFileMode">TRESTDWFileMode</a>   Read vRESTDWFileMode    Write vRESTDWFileMode;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="RewriteFile"></span><code>property <strong>RewriteFile</strong>       : Boolean           Read vRewriteFile       Write vRewriteFile;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="Position"></span><code>property <strong>Position</strong>          : <a href="uRESTDWBasicTypes.html#DWBufferSize">DWBufferSize</a>      Read vPosition          Write SetPosition;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

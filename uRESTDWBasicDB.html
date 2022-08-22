@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWBasicDB</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<h1 class="unit">Unit uRESTDWBasicDB</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Uses">Uses</a></div><div class="one_section"><a class="section" href="#PasDoc-Classes">Classes, Interfaces, Objetos e Registros</a></div><div class="one_section"><a class="section" href="#PasDoc-FuncsProcs">Funções e Procedimentos</a></div><div class="one_section"><a class="section" href="#PasDoc-Types">Tipos</a></div><div class="one_section">Constantes</div><div class="one_section">Variáveis</div></div>
+<span id="PasDoc-Description"></span><h2 class="description">Descrição</h2>
+&nbsp;<span id="PasDoc-Uses"></span><h2 class="uses">Uses</h2>
+<ul class="useslist"><li>SysUtils</li><li>Classes</li><li>Db</li><li>SyncObjs</li><li>Variants</li><li><a href="uRESTDWDataUtils.html">uRESTDWDataUtils</a></li><li><a href="uRESTDWComponentBase.html">uRESTDWComponentBase</a></li><li><a href="uRESTDWBasicTypes.html">uRESTDWBasicTypes</a></li><li><a href="uRESTDWPoolermethod.html">uRESTDWPoolermethod</a></li><li><a href="uRESTDWComponentEvents.html">uRESTDWComponentEvents</a></li><li><a href="uRESTDWJSONObject.html">uRESTDWJSONObject</a></li><li><a href="uRESTDWParams.html">uRESTDWParams</a></li><li><a href="uRESTDWBasic.html">uRESTDWBasic</a></li><li><a href="uRESTDWMassiveBuffer.html">uRESTDWMassiveBuffer</a></li><li><a href="uRESTDWResponseTranslator.html">uRESTDWResponseTranslator</a></li><li><a href="uRESTDWBasicClass.html">uRESTDWBasicClass</a></li><li><a href="uRESTDWEncodeClass.html">uRESTDWEncodeClass</a></li><li><a href="uRESTDWCharset.html">uRESTDWCharset</a></li><li><a href="uRESTDWConsts.html">uRESTDWConsts</a></li><li><a href="uRESTDWDataset.html">uRESTDWDataset</a></li><li>memds</li><li>BufDataset</li><li><a href="uRESTDWMasterDetailData.html">uRESTDWMasterDetailData</a></li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Classes"></span><h3 class="cio">Classes, Interfaces, Objetos e Registros</h3>
+<table class="classestable wide_list">
+<tr class="listheader">
+<th class="itemname">Nome</th>
+<th class="itemdesc">Descrição</th>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TTimerData.html"><code>TTimerData</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TAutoCheckData.html"><code>TAutoCheckData</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TProxyOptions.html"><code>TProxyOptions</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TClientConnectionDefs.html"><code>TClientConnectionDefs</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWConnectionParams.html"><code>TRESTDWConnectionParams</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWConnectionServer.html"><code>TRESTDWConnectionServer</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TListDefConnections.html"><code>TListDefConnections</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWDatabasebaseBase.html"><code>TRESTDWDatabasebaseBase</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWUpdateSQL.html"><code>TRESTDWUpdateSQL</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWThreadRequest.html"><code>TRESTDWThreadRequest</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWClientSQL.html"><code>TRESTDWClientSQL</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWTable.html"><code>TRESTDWTable</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWBatchFieldItem.html"><code>TRESTDWBatchFieldItem</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWBatchFieldsDefs.html"><code>TRESTDWBatchFieldsDefs</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWBatchMove.html"><code>TRESTDWBatchMove</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWStoredProc.html"><code>TRESTDWStoredProc</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWPoolerList.html"><code>TRESTDWPoolerList</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWValueKey.html"><code>TRESTDWValueKey</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWValueKeys.html"><code>TRESTDWValueKeys</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWBasicDB.TRESTDWPoolerDB.html"><code>TRESTDWPoolerDB</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+</table>
+<span id="PasDoc-FuncsProcs"></span><h3 class="summary">Funções e Procedimentos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWBasicDB.html#GeTRESTDWParams">GeTRESTDWParams</a></strong>(Params : TParams; Encondig : <a href="uRESTDWEncodeClass.html#TEncodeSelect">TEncodeSelect</a>) : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Types"></span><h3 class="summary">Tipos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnExecuteData">TOnExecuteData</a></strong> = Procedure Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnThreadRequestError">TOnThreadRequestError</a></strong> = Procedure (ErrorCode : Integer; MessageError : String) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnEventDB">TOnEventDB</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnFiltered">TOnFiltered</a></strong> = Procedure (Var Filtered : Boolean; Var Filter : String) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnAfterScroll">TOnAfterScroll</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnBeforeRefresh">TOnBeforeRefresh</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnAfterRefresh">TOnAfterRefresh</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnAfterOpen">TOnAfterOpen</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnBeforeClose">TOnBeforeClose</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnAfterClose">TOnAfterClose</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnCalcFields">TOnCalcFields</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnAfterCancel">TOnAfterCancel</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnAfterInsert">TOnAfterInsert</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnBeforeDelete">TOnBeforeDelete</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnBeforePost">TOnBeforePost</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnAfterPost">TOnAfterPost</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnAfterDelete">TOnAfterDelete</a></strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnEventConnection">TOnEventConnection</a></strong> = Procedure (Sucess : Boolean; Const Error : String) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnEventBeforeConnection">TOnEventBeforeConnection</a></strong> = Procedure (Sender : TComponent) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnEventTimer">TOnEventTimer</a></strong> = Procedure Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TBeforeGetRecords">TBeforeGetRecords</a></strong> = Procedure (Sender : TObject; Var OwnerData : OleVariant) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnPrepareConnection">TOnPrepareConnection</a></strong> = Procedure (Var ConnectionDefs : <a href="uRESTDWBasicTypes.TConnectionDefs.html">TConnectionDefs</a>) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnFieldGetValue">TOnFieldGetValue</a></strong> = Procedure (Value : Variant) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnTableBeforeOpen">TOnTableBeforeOpen</a></strong> = Procedure (Var Dataset : TDataset; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Tablename : String) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnQueryBeforeOpen">TOnQueryBeforeOpen</a></strong> = Procedure (Var Dataset : TDataset; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnQueryException">TOnQueryException</a></strong> = Procedure (Var Dataset : TDataset; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Error : String) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnFailOverExecute">TOnFailOverExecute</a></strong> = Procedure (ConnectionServer : <a href="uRESTDWBasicDB.TRESTDWConnectionServer.html">TRESTDWConnectionServer</a>) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnFailOverError">TOnFailOverError</a></strong> = Procedure (ConnectionServer : <a href="uRESTDWBasicDB.TRESTDWConnectionServer.html">TRESTDWConnectionServer</a>; MessageError : String) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TDWFieldKind">TDWFieldKind</a></strong> = (...);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TDWFieldType">TDWFieldType</a></strong>          = Set of <a href="uRESTDWBasicDB.html#TDWFieldKind">TDWFieldKind</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TRESTDWBatchMoveActionType">TRESTDWBatchMoveActionType</a></strong> = (...);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TRESTDWProcessSide">TRESTDWProcessSide</a></strong> = (...);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnLineProcess">TOnLineProcess</a></strong> = Procedure (Source : <a href="uRESTDWBasicDB.TRESTDWClientSQL.html">TRESTDWClientSQL</a>; Var Dest : <a href="uRESTDWBasicDB.TRESTDWClientSQL.html">TRESTDWClientSQL</a>) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnProcessError">TOnProcessError</a></strong> = Procedure (Connection : <a href="uRESTDWBasicDB.TRESTDWConnectionServer.html">TRESTDWConnectionServer</a>; ActualReg, RegsCount : Integer; Action : <a href="uRESTDWBasicDB.html#TRESTDWBatchMoveActionType">TRESTDWBatchMoveActionType</a>; Error : String) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnProcess">TOnProcess</a></strong> = Procedure (RegsCount : Integer) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TOnActProcess">TOnActProcess</a></strong> = Procedure (ActualReg, RegsCount : Integer) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#PRESTDWValueKey">PRESTDWValueKey</a></strong> = &circ;<a href="uRESTDWBasicDB.TRESTDWValueKey.html">TRESTDWValueKey</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWBasicDB.html#TRESTDWPoolerDBP">TRESTDWPoolerDBP</a></strong> = &circ;<a href="uRESTDWComponentBase.TRESTDWComponent.html">TRESTDWComponent</a>;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Funções e Procedimentos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="GeTRESTDWParams"></span><code>Function <strong>GeTRESTDWParams</strong>(Params : TParams; Encondig : <a href="uRESTDWEncodeClass.html#TEncodeSelect">TEncodeSelect</a>) : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Tipos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnExecuteData"></span><code><strong>TOnExecuteData</strong> = Procedure Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnThreadRequestError"></span><code><strong>TOnThreadRequestError</strong> = Procedure (ErrorCode : Integer; MessageError : String) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnEventDB"></span><code><strong>TOnEventDB</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnFiltered"></span><code><strong>TOnFiltered</strong> = Procedure (Var Filtered : Boolean; Var Filter : String) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnAfterScroll"></span><code><strong>TOnAfterScroll</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnBeforeRefresh"></span><code><strong>TOnBeforeRefresh</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnAfterRefresh"></span><code><strong>TOnAfterRefresh</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnAfterOpen"></span><code><strong>TOnAfterOpen</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnBeforeClose"></span><code><strong>TOnBeforeClose</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnAfterClose"></span><code><strong>TOnAfterClose</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnCalcFields"></span><code><strong>TOnCalcFields</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnAfterCancel"></span><code><strong>TOnAfterCancel</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnAfterInsert"></span><code><strong>TOnAfterInsert</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnBeforeDelete"></span><code><strong>TOnBeforeDelete</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnBeforePost"></span><code><strong>TOnBeforePost</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnAfterPost"></span><code><strong>TOnAfterPost</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnAfterDelete"></span><code><strong>TOnAfterDelete</strong> = Procedure (DataSet : TDataSet) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnEventConnection"></span><code><strong>TOnEventConnection</strong> = Procedure (Sucess : Boolean; Const Error : String) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnEventBeforeConnection"></span><code><strong>TOnEventBeforeConnection</strong> = Procedure (Sender : TComponent) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnEventTimer"></span><code><strong>TOnEventTimer</strong> = Procedure Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TBeforeGetRecords"></span><code><strong>TBeforeGetRecords</strong> = Procedure (Sender : TObject; Var OwnerData : OleVariant) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnPrepareConnection"></span><code><strong>TOnPrepareConnection</strong> = Procedure (Var ConnectionDefs : <a href="uRESTDWBasicTypes.TConnectionDefs.html">TConnectionDefs</a>) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnFieldGetValue"></span><code><strong>TOnFieldGetValue</strong> = Procedure (Value : Variant) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnTableBeforeOpen"></span><code><strong>TOnTableBeforeOpen</strong> = Procedure (Var Dataset : TDataset; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Tablename : String) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnQueryBeforeOpen"></span><code><strong>TOnQueryBeforeOpen</strong> = Procedure (Var Dataset : TDataset; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnQueryException"></span><code><strong>TOnQueryException</strong> = Procedure (Var Dataset : TDataset; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Error : String) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnFailOverExecute"></span><code><strong>TOnFailOverExecute</strong> = Procedure (ConnectionServer : <a href="uRESTDWBasicDB.TRESTDWConnectionServer.html">TRESTDWConnectionServer</a>) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnFailOverError"></span><code><strong>TOnFailOverError</strong> = Procedure (ConnectionServer : <a href="uRESTDWBasicDB.TRESTDWConnectionServer.html">TRESTDWConnectionServer</a>; MessageError : String) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TDWFieldKind"></span><code><strong>TDWFieldKind</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="dwfk_Keyfield">dwfk_Keyfield</span></li>
+<li>
+<span id="dwfk_Autoinc">dwfk_Autoinc</span></li>
+<li>
+<span id="dwfk_NotNull">dwfk_NotNull</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TDWFieldType"></span><code><strong>TDWFieldType</strong>          = Set of <a href="uRESTDWBasicDB.html#TDWFieldKind">TDWFieldKind</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWBatchMoveActionType"></span><code><strong>TRESTDWBatchMoveActionType</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="bmat_Insert">bmat_Insert</span></li>
+<li>
+<span id="bmat_Update">bmat_Update</span></li>
+<li>
+<span id="bmat_Delete">bmat_Delete</span></li>
+<li>
+<span id="bmat_InsertUpdate">bmat_InsertUpdate</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWProcessSide"></span><code><strong>TRESTDWProcessSide</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="psClient">psClient</span></li>
+<li>
+<span id="psServer">psServer</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnLineProcess"></span><code><strong>TOnLineProcess</strong> = Procedure (Source : <a href="uRESTDWBasicDB.TRESTDWClientSQL.html">TRESTDWClientSQL</a>; Var Dest : <a href="uRESTDWBasicDB.TRESTDWClientSQL.html">TRESTDWClientSQL</a>) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnProcessError"></span><code><strong>TOnProcessError</strong> = Procedure (Connection : <a href="uRESTDWBasicDB.TRESTDWConnectionServer.html">TRESTDWConnectionServer</a>; ActualReg, RegsCount : Integer; Action : <a href="uRESTDWBasicDB.html#TRESTDWBatchMoveActionType">TRESTDWBatchMoveActionType</a>; Error : String) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnProcess"></span><code><strong>TOnProcess</strong> = Procedure (RegsCount : Integer) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnActProcess"></span><code><strong>TOnActProcess</strong> = Procedure (ActualReg, RegsCount : Integer) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PRESTDWValueKey"></span><code><strong>PRESTDWValueKey</strong> = &circ;<a href="uRESTDWBasicDB.TRESTDWValueKey.html">TRESTDWValueKey</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWPoolerDBP"></span><code><strong>TRESTDWPoolerDBP</strong> = &circ;<a href="uRESTDWComponentBase.TRESTDWComponent.html">TRESTDWComponent</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+<p>
+PoolerDB Control</p>
+</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

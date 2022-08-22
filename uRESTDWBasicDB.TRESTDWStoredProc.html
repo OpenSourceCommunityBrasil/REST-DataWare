@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWBasicDB: Classe TRESTDWStoredProc</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<span id="TRESTDWStoredProc"></span><h1 class="cio">Classe TRESTDWStoredProc</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarquia</a></div><div class="one_section">Campos</div><div class="one_section"><a class="section" href="#PasDoc-Methods">Métodos</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Properties</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a href="uRESTDWBasicDB.html">uRESTDWBasicDB</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TRESTDWStoredProc = class(<a class="normal" href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html">TRESTDWClientSQLBase</a>)</code></p>
+<h2 class="description">Descrição</h2>
+<div class="nodescription">No description available, ancestor TRESTDWClientSQLBase description follows</div><div class="nodescription">No description available, ancestor TRESTDWMemtable description follows</div><div class="nodescription">No description available, ancestor TRESTDWCustomDataSet description follows</div><span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TDataSet</li>
+<li class="ancestor"><a class="normal" href="uRESTDWDataset.TRESTDWCustomDataSet.html">TRESTDWCustomDataSet</a></li>
+<li class="ancestor"><a class="normal" href="uRESTDWDataset.TRESTDWMemtable.html">TRESTDWMemtable</a></li>
+<li class="ancestor"><a class="normal" href="uRESTDWBasicTypes.TRESTDWClientSQLBase.html">TRESTDWClientSQLBase</a></li>
+<li class="thisitem">TRESTDWStoredProc</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Methods"></span><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Constructor <strong><a href="uRESTDWBasicDB.TRESTDWStoredProc.html#Create">Create</a></strong>(AOwner : TComponent); Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWBasicDB.TRESTDWStoredProc.html#ExecProc">ExecProc</a></strong>(Var Error : String) : Boolean;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Destructor <strong><a href="uRESTDWBasicDB.TRESTDWStoredProc.html#Destroy">Destroy</a></strong>; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWBasicDB.TRESTDWStoredProc.html#ParamByName">ParamByName</a></strong>(Value : String) : TParam;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Properties</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicDB.TRESTDWStoredProc.html#DataBase">DataBase</a></strong>            : <a href="uRESTDWBasicDB.TRESTDWDatabasebaseBase.html">TRESTDWDatabasebaseBase</a>     Read vRESTDataBase      Write SetDataBase;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicDB.TRESTDWStoredProc.html#Params">Params</a></strong>              : TParams             Read vParams            Write vParams;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicDB.TRESTDWStoredProc.html#UpdateSQL">UpdateSQL</a></strong>           : <a href="uRESTDWBasicDB.TRESTDWUpdateSQL.html">TRESTDWUpdateSQL</a>    Read GetUpdateSQL       Write SetUpdateSQL;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicDB.TRESTDWStoredProc.html#SchemaName">SchemaName</a></strong>          : String              Read vSchemaName        Write vSchemaName;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWBasicDB.TRESTDWStoredProc.html#StoredProcName">StoredProcName</a></strong>      : String              Read vProcName          Write vProcName;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Create"></span><code>Constructor <strong>Create</strong>(AOwner : TComponent); Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ExecProc"></span><code>Function <strong>ExecProc</strong>(Var Error : String) : Boolean;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Cria o Componente</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Destroy"></span><code>Destructor <strong>Destroy</strong>; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ParamByName"></span><code>Function <strong>ParamByName</strong>(Value : String) : TParam;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Destroy a Classe</p>
+</td></tr>
+</table>
+<h3 class="detail">Properties</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="DataBase"></span><code>property <strong>DataBase</strong>            : <a href="uRESTDWBasicDB.TRESTDWDatabasebaseBase.html">TRESTDWDatabasebaseBase</a>     Read vRESTDataBase      Write SetDataBase;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="Params"></span><code>property <strong>Params</strong>              : TParams             Read vParams            Write vParams;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Database REST do Dataset</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="UpdateSQL"></span><code>property <strong>UpdateSQL</strong>           : <a href="uRESTDWBasicDB.TRESTDWUpdateSQL.html">TRESTDWUpdateSQL</a>    Read GetUpdateSQL       Write SetUpdateSQL;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Parametros de Dataset</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="SchemaName"></span><code>property <strong>SchemaName</strong>          : String              Read vSchemaName        Write vSchemaName;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="StoredProcName"></span><code>property <strong>StoredProcName</strong>      : String              Read vProcName          Write vProcName;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+SchemaName</p>
+</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

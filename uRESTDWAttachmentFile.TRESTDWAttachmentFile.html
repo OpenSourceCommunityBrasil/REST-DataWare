@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWAttachmentFile: Classe TRESTDWAttachmentFile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<span id="TRESTDWAttachmentFile"></span><h1 class="cio">Classe TRESTDWAttachmentFile</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarquia</a></div><div class="one_section"><a class="section" href="#PasDoc-Fields">Campos</a></div><div class="one_section"><a class="section" href="#PasDoc-Methods">Métodos</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Properties</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a href="uRESTDWAttachmentFile.html">uRESTDWAttachmentFile</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TRESTDWAttachmentFile = class(<a class="normal" href="uRESTDWAttachment.TRESTDWAttachment.html">TRESTDWAttachment</a>)</code></p>
+<h2 class="description">Descrição</h2>
+<div class="nodescription">No description available, ancestor TRESTDWAttachment description follows</div><div class="nodescription">No description available, ancestor TRESTDWMessagePart description follows</div><span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="ancestor">TPersistent</li>
+<li class="ancestor">TCollectionItem</li>
+<li class="ancestor"><a class="normal" href="uRESTDWMessageParts.TRESTDWMessagePart.html">TRESTDWMessagePart</a></li>
+<li class="ancestor"><a class="normal" href="uRESTDWAttachment.TRESTDWAttachment.html">TRESTDWAttachment</a></li>
+<li class="thisitem">TRESTDWAttachmentFile</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Fields"></span><h3 class="summary">Campos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code><strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FTempFileStream">FTempFileStream</a></strong>: TFileStream;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code><strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FStoredPathName">FStoredPathName</a></strong>: String;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code><strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FFileIsTempFile">FFileIsTempFile</a></strong>: Boolean;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code><strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FAttachmentBlocked">FAttachmentBlocked</a></strong>: Boolean;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Methods"></span><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Constructor <strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#Create">Create</a></strong>(aCollection : <a href="uRESTDWMessageParts.TRESTDWMessageParts.html">TRESTDWMessageParts</a>; Const AFileName : String = ''); Reintroduce;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Destructor <strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#Destroy">Destroy</a></strong>; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#OpenLoadStream">OpenLoadStream</a></strong>: TStream; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#CloseLoadStream">CloseLoadStream</a></strong>; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#PrepareTempStream">PrepareTempStream</a></strong>: TStream; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FinishTempStream">FinishTempStream</a></strong>; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#SaveToFile">SaveToFile</a></strong>(Const aFileName : String); Override;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Properties</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FileIsTempFile">FileIsTempFile</a></strong>    : Boolean Read <a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FFileIsTempFile">FFileIsTempFile</a>    Write <a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FFileIsTempFile">FFileIsTempFile</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#StoredPathName">StoredPathName</a></strong>    : String  Read <a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FStoredPathName">FStoredPathName</a>    Write <a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FStoredPathName">FStoredPathName</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#AttachmentBlocked">AttachmentBlocked</a></strong> : Boolean Read <a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FAttachmentBlocked">FAttachmentBlocked</a>;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Campos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="FTempFileStream"></span><code><strong>FTempFileStream</strong>: TFileStream;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="FStoredPathName"></span><code><strong>FStoredPathName</strong>: String;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="FFileIsTempFile"></span><code><strong>FFileIsTempFile</strong>: Boolean;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="FAttachmentBlocked"></span><code><strong>FAttachmentBlocked</strong>: Boolean;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Create"></span><code>Constructor <strong>Create</strong>(aCollection : <a href="uRESTDWMessageParts.TRESTDWMessageParts.html">TRESTDWMessageParts</a>; Const AFileName : String = ''); Reintroduce;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Destroy"></span><code>Destructor <strong>Destroy</strong>; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="OpenLoadStream"></span><code>Function <strong>OpenLoadStream</strong>: TStream; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="CloseLoadStream"></span><code>Procedure <strong>CloseLoadStream</strong>; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="PrepareTempStream"></span><code>Function <strong>PrepareTempStream</strong>: TStream; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="FinishTempStream"></span><code>Procedure <strong>FinishTempStream</strong>; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="SaveToFile"></span><code>Procedure <strong>SaveToFile</strong>(Const aFileName : String); Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Properties</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="FileIsTempFile"></span><code>property <strong>FileIsTempFile</strong>    : Boolean Read <a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FFileIsTempFile">FFileIsTempFile</a>    Write <a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FFileIsTempFile">FFileIsTempFile</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="StoredPathName"></span><code>property <strong>StoredPathName</strong>    : String  Read <a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FStoredPathName">FStoredPathName</a>    Write <a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FStoredPathName">FStoredPathName</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="AttachmentBlocked"></span><code>property <strong>AttachmentBlocked</strong> : Boolean Read <a href="uRESTDWAttachmentFile.TRESTDWAttachmentFile.html#FAttachmentBlocked">FAttachmentBlocked</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWDataJSON</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<h1 class="unit">Unit uRESTDWDataJSON</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Uses">Uses</a></div><div class="one_section"><a class="section" href="#PasDoc-Classes">Classes, Interfaces, Objetos e Registros</a></div><div class="one_section"><a class="section" href="#PasDoc-FuncsProcs">Funções e Procedimentos</a></div><div class="one_section"><a class="section" href="#PasDoc-Types">Tipos</a></div><div class="one_section">Constantes</div><div class="one_section">Variáveis</div></div>
+<span id="PasDoc-Description"></span><h2 class="description">Descrição</h2>
+&nbsp;<span id="PasDoc-Uses"></span><h2 class="uses">Uses</h2>
+<ul class="useslist"><li>LCL</li><li>SysUtils</li><li><a href="uRESTDWDataUtils.html">uRESTDWDataUtils</a></li><li>Classes</li><li>TypInfo</li><li>Variants</li><li><a href="uRESTDWConsts.html">uRESTDWConsts</a></li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Classes"></span><h3 class="cio">Classes, Interfaces, Objetos e Registros</h3>
+<table class="classestable wide_list">
+<tr class="listheader">
+<th class="itemname">Nome</th>
+<th class="itemdesc">Descrição</th>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataJSON.TRESTDWJSONBaseClass.html"><code>TRESTDWJSONBaseClass</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataJSON.TRESTDWJSONBaseObjectClass.html"><code>TRESTDWJSONBaseObjectClass</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataJSON.TRESTDWJSONString.html"><code>TRESTDWJSONString</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataJSON.TRESTDWJSONNumeric.html"><code>TRESTDWJSONNumeric</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataJSON.TRESTDWJSONInteger.html"><code>TRESTDWJSONInteger</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataJSON.TRESTDWJSONBoolean.html"><code>TRESTDWJSONBoolean</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataJSON.TRESTDWJSONDateTime.html"><code>TRESTDWJSONDateTime</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataJSON.TRESTDWJSONBlob.html"><code>TRESTDWJSONBlob</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataJSON.TRESTDWJSONBase.html"><code>TRESTDWJSONBase</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataJSON.TRESTDWJSONObject.html"><code>TRESTDWJSONObject</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataJSON.TRESTDWJSONArray.html"><code>TRESTDWJSONArray</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWDataJSON.TRESTDWJSONValue.html"><code>TRESTDWJSONValue</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+</table>
+<span id="PasDoc-FuncsProcs"></span><h3 class="summary">Funções e Procedimentos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataJSON.html#GetItemJSONClass">GetItemJSONClass</a></strong>(Item : <a href="uRESTDWDataJSON.TRESTDWJSONBaseObjectClass.html">TRESTDWJSONBaseObjectClass</a>) : <a href="uRESTDWDataJSON.html#TRESTDWJSONElementType">TRESTDWJSONElementType</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataJSON.html#ISO8601FromDateTime">ISO8601FromDateTime</a></strong>(Value : TDateTime) : String;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataJSON.html#DateTimeFromISO8601">DateTimeFromISO8601</a></strong>(Value : String) : TDateTime;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataJSON.html#escape_chars">escape_chars</a></strong>(s : String) : String;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWDataJSON.html#unescape_chars">unescape_chars</a></strong>(s : String) : String;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Types"></span><h3 class="summary">Tipos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataJSON.html#TRESTDWJSONObjectType">TRESTDWJSONObjectType</a></strong> = (...);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataJSON.html#TRESTDWJSONElementType">TRESTDWJSONElementType</a></strong> = (...);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataJSON.html#PRESTDWJSONBaseObjectClass">PRESTDWJSONBaseObjectClass</a></strong> = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONBaseObjectClass.html">TRESTDWJSONBaseObjectClass</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataJSON.html#PRESTDWJSONString">PRESTDWJSONString</a></strong> = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONString.html">TRESTDWJSONString</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataJSON.html#PRESTDWJSONNumeric">PRESTDWJSONNumeric</a></strong> = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONNumeric.html">TRESTDWJSONNumeric</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataJSON.html#PRESTDWJSONInteger">PRESTDWJSONInteger</a></strong> = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONInteger.html">TRESTDWJSONInteger</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataJSON.html#PRESTDWJSONBoolean">PRESTDWJSONBoolean</a></strong> = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONBoolean.html">TRESTDWJSONBoolean</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataJSON.html#TRESTDWDateTimeFormat">TRESTDWDateTimeFormat</a></strong> = (...);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWDataJSON.html#PRESTDWJSONDateTime">PRESTDWJSONDateTime</a></strong>   = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONDateTime.html">TRESTDWJSONDateTime</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWDataJSON.html#PRESTDWJSONBlob">PRESTDWJSONBlob</a></strong> = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONBlob.html">TRESTDWJSONBlob</a>;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Funções e Procedimentos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="GetItemJSONClass"></span><code>Function <strong>GetItemJSONClass</strong>(Item : <a href="uRESTDWDataJSON.TRESTDWJSONBaseObjectClass.html">TRESTDWJSONBaseObjectClass</a>) : <a href="uRESTDWDataJSON.html#TRESTDWJSONElementType">TRESTDWJSONElementType</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="ISO8601FromDateTime"></span><code>Function <strong>ISO8601FromDateTime</strong>(Value : TDateTime) : String;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DateTimeFromISO8601"></span><code>Function <strong>DateTimeFromISO8601</strong>(Value : String) : TDateTime;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="escape_chars"></span><code>Function <strong>escape_chars</strong>(s : String) : String;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="unescape_chars"></span><code>Function <strong>unescape_chars</strong>(s : String) : String;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Tipos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWJSONObjectType"></span><code><strong>TRESTDWJSONObjectType</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="jtObject">jtObject</span></li>
+<li>
+<span id="jtArray">jtArray</span></li>
+<li>
+<span id="jtValue">jtValue</span></li>
+<li>
+<span id="jtUnknow">jtUnknow</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWJSONElementType"></span><code><strong>TRESTDWJSONElementType</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="etString">etString</span></li>
+<li>
+<span id="etNumeric">etNumeric</span></li>
+<li>
+<span id="etInteger">etInteger</span></li>
+<li>
+<span id="etBoolean">etBoolean</span></li>
+<li>
+<span id="etDateTime">etDateTime</span></li>
+<li>
+<span id="etBlob">etBlob</span></li>
+<li>
+<span id="etUnknow">etUnknow</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PRESTDWJSONBaseObjectClass"></span><code><strong>PRESTDWJSONBaseObjectClass</strong> = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONBaseObjectClass.html">TRESTDWJSONBaseObjectClass</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PRESTDWJSONString"></span><code><strong>PRESTDWJSONString</strong> = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONString.html">TRESTDWJSONString</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PRESTDWJSONNumeric"></span><code><strong>PRESTDWJSONNumeric</strong> = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONNumeric.html">TRESTDWJSONNumeric</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PRESTDWJSONInteger"></span><code><strong>PRESTDWJSONInteger</strong> = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONInteger.html">TRESTDWJSONInteger</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PRESTDWJSONBoolean"></span><code><strong>PRESTDWJSONBoolean</strong> = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONBoolean.html">TRESTDWJSONBoolean</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWDateTimeFormat"></span><code><strong>TRESTDWDateTimeFormat</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="dtfFloatValue">dtfFloatValue</span></li>
+<li>
+<span id="dtfString">dtfString</span></li>
+<li>
+<span id="dtfISO8601">dtfISO8601</span></li>
+<li>
+<span id="dtfMask">dtfMask</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PRESTDWJSONDateTime"></span><code><strong>PRESTDWJSONDateTime</strong>   = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONDateTime.html">TRESTDWJSONDateTime</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PRESTDWJSONBlob"></span><code><strong>PRESTDWJSONBlob</strong> = &circ;<a href="uRESTDWDataJSON.TRESTDWJSONBlob.html">TRESTDWJSONBlob</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

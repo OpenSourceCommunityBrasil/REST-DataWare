@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWHeaderCoderBase</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<h1 class="unit">Unit uRESTDWHeaderCoderBase</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Uses">Uses</a></div><div class="one_section"><a class="section" href="#PasDoc-Classes">Classes, Interfaces, Objetos e Registros</a></div><div class="one_section"><a class="section" href="#PasDoc-FuncsProcs">Funções e Procedimentos</a></div><div class="one_section"><a class="section" href="#PasDoc-Types">Tipos</a></div><div class="one_section">Constantes</div><div class="one_section"><a class="section" href="#PasDoc-Variables">Variáveis</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="description">Descrição</h2>
+&nbsp;<span id="PasDoc-Uses"></span><h2 class="uses">Uses</h2>
+<ul class="useslist"><li>Classes</li><li><a href="uRESTDWBasicTypes.html">uRESTDWBasicTypes</a></li><li><a href="uRESTDWException.html">uRESTDWException</a></li><li><a href="uRESTDWTools.html">uRESTDWTools</a></li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Classes"></span><h3 class="cio">Classes, Interfaces, Objetos e Registros</h3>
+<table class="classestable wide_list">
+<tr class="listheader">
+<th class="itemname">Nome</th>
+<th class="itemdesc">Descrição</th>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWHeaderCoderBase.TRESTDWHeaderCoder.html"><code>TRESTDWHeaderCoder</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWHeaderCoderBase.eRESTDWHeaderEncodeError.html"><code>eRESTDWHeaderEncodeError</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+</table>
+<span id="PasDoc-FuncsProcs"></span><h3 class="summary">Funções e Procedimentos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWHeaderCoderBase.html#HeaderCoderByCharSet">HeaderCoderByCharSet</a></strong>(Const ACharSet : String) : <a href="uRESTDWHeaderCoderBase.html#TRESTDWHeaderCoderClass">TRESTDWHeaderCoderClass</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWHeaderCoderBase.html#DecodeHeaderData">DecodeHeaderData</a></strong>(Const ACharSet : String; Const AData : <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>; Var VResult : String) : Boolean;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWHeaderCoderBase.html#EncodeHeaderData">EncodeHeaderData</a></strong>(Const ACharSet, AData : String): <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWHeaderCoderBase.html#RegisterHeaderCoder">RegisterHeaderCoder</a></strong>(Const ACoder : <a href="uRESTDWHeaderCoderBase.html#TRESTDWHeaderCoderClass">TRESTDWHeaderCoderClass</a>);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWHeaderCoderBase.html#UnregisterHeaderCoder">UnregisterHeaderCoder</a></strong>(Const ACoder : <a href="uRESTDWHeaderCoderBase.html#TRESTDWHeaderCoderClass">TRESTDWHeaderCoderClass</a>);</code></td>
+</tr>
+</table>
+<span id="PasDoc-Types"></span><h3 class="summary">Tipos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWHeaderCoderBase.html#TRESTDWHeaderDecodingNeededEvent">TRESTDWHeaderDecodingNeededEvent</a></strong> = Procedure(Const ACharSet : String; Const AData : <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>; Var VResult : String; Var VHandled : Boolean) Of object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWHeaderCoderBase.html#TRESTDWHeaderEncodingNeededEvent">TRESTDWHeaderEncodingNeededEvent</a></strong> = Procedure(Const ACharSet, AData : String; Var VResult : <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>; Var VHandled : Boolean) Of object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWHeaderCoderBase.html#TRESTDWHeaderCoderClass">TRESTDWHeaderCoderClass</a></strong> = class of <a href="uRESTDWHeaderCoderBase.TRESTDWHeaderCoder.html">TRESTDWHeaderCoder</a>;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Variables"></span><h3 class="summary">Variáveis</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWHeaderCoderBase.html#GHeaderEncodingNeeded">GHeaderEncodingNeeded</a></strong>: <a href="uRESTDWHeaderCoderBase.html#TRESTDWHeaderEncodingNeededEvent">TRESTDWHeaderEncodingNeededEvent</a> = nil;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWHeaderCoderBase.html#GHeaderDecodingNeeded">GHeaderDecodingNeeded</a></strong>: <a href="uRESTDWHeaderCoderBase.html#TRESTDWHeaderDecodingNeededEvent">TRESTDWHeaderDecodingNeededEvent</a> = nil;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Funções e Procedimentos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="HeaderCoderByCharSet"></span><code>Function <strong>HeaderCoderByCharSet</strong>(Const ACharSet : String) : <a href="uRESTDWHeaderCoderBase.html#TRESTDWHeaderCoderClass">TRESTDWHeaderCoderClass</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="DecodeHeaderData"></span><code>Function <strong>DecodeHeaderData</strong>(Const ACharSet : String; Const AData : <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>; Var VResult : String) : Boolean;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="EncodeHeaderData"></span><code>Function <strong>EncodeHeaderData</strong>(Const ACharSet, AData : String): <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="RegisterHeaderCoder"></span><code>Procedure <strong>RegisterHeaderCoder</strong>(Const ACoder : <a href="uRESTDWHeaderCoderBase.html#TRESTDWHeaderCoderClass">TRESTDWHeaderCoderClass</a>);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="UnregisterHeaderCoder"></span><code>Procedure <strong>UnregisterHeaderCoder</strong>(Const ACoder : <a href="uRESTDWHeaderCoderBase.html#TRESTDWHeaderCoderClass">TRESTDWHeaderCoderClass</a>);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Tipos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWHeaderDecodingNeededEvent"></span><code><strong>TRESTDWHeaderDecodingNeededEvent</strong> = Procedure(Const ACharSet : String; Const AData : <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>; Var VResult : String; Var VHandled : Boolean) Of object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWHeaderEncodingNeededEvent"></span><code><strong>TRESTDWHeaderEncodingNeededEvent</strong> = Procedure(Const ACharSet, AData : String; Var VResult : <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>; Var VHandled : Boolean) Of object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWHeaderCoderClass"></span><code><strong>TRESTDWHeaderCoderClass</strong> = class of <a href="uRESTDWHeaderCoderBase.TRESTDWHeaderCoder.html">TRESTDWHeaderCoder</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Variáveis</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="GHeaderEncodingNeeded"></span><code><strong>GHeaderEncodingNeeded</strong>: <a href="uRESTDWHeaderCoderBase.html#TRESTDWHeaderEncodingNeededEvent">TRESTDWHeaderEncodingNeededEvent</a> = nil;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="GHeaderDecodingNeeded"></span><code><strong>GHeaderDecodingNeeded</strong>: <a href="uRESTDWHeaderCoderBase.html#TRESTDWHeaderDecodingNeededEvent">TRESTDWHeaderDecodingNeededEvent</a> = nil;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWPoolermethod: Classe TRESTDWPoolerMethodClient</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<span id="TRESTDWPoolerMethodClient"></span><h1 class="cio">Classe TRESTDWPoolerMethodClient</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarquia</a></div><div class="one_section">Campos</div><div class="one_section"><a class="section" href="#PasDoc-Methods">Métodos</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Properties</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a href="uRESTDWPoolermethod.html">uRESTDWPoolermethod</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TRESTDWPoolerMethodClient = class(TComponent)</code></p>
+<h2 class="description">Descrição</h2>
+<span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="ancestor">TPersistent</li>
+<li class="ancestor">TComponent</li>
+<li class="thisitem">TRESTDWPoolerMethodClient</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Methods"></span><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Constructor <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#Create">Create</a></strong>(AOwner: TComponent); Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Destructor <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#Destroy">Destroy</a></strong>; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#Abort">Abort</a></strong>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#GetPoolerList">GetPoolerList</a></strong>(Method_Prefix : String; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : TStringList; Overload;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#GetServerEvents">GetServerEvents</a></strong>(Method_Prefix : String; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : TStringList; Overload;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#EchoPooler">EchoPooler</a></strong>(Method_Prefix, Pooler : String; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : String;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#GetToken">GetToken</a></strong>(Pooler : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : String;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#InsertValue">InsertValue</a></strong>(Pooler, Method_Prefix, SQL : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : Integer;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ExecuteCommand">ExecuteCommand</a></strong>(Pooler, Method_Prefix, SQL : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; Execute : Boolean; BinaryRequest : Boolean; BinaryCompatibleMode : Boolean; Metadata : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#OpenDatasets">OpenDatasets</a></strong>(LinesDataset, Pooler, Method_Prefix : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : String;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ApplyUpdates">ApplyUpdates</a></strong>(Massive : <a href="uRESTDWMassiveBuffer.TMassiveDatasetBuffer.html">TMassiveDatasetBuffer</a>; Pooler, Method_Prefix, SQL : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; MassiveBuffer : String = ''; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>; Overload;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ApplyUpdatesTB">ApplyUpdatesTB</a></strong>(Massive : <a href="uRESTDWMassiveBuffer.TMassiveDatasetBuffer.html">TMassiveDatasetBuffer</a>; Pooler, Method_Prefix : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; MassiveBuffer : String = ''; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>; Overload;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ApplyUpdates">ApplyUpdates</a></strong>(LinesDataset, Pooler, Method_Prefix : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : String; Overload;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ApplyUpdates_MassiveCache">ApplyUpdates_MassiveCache</a></strong>(MassiveCache, Pooler, Method_Prefix : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; ReflectChanges : Boolean = False; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ProcessMassiveSQLCache">ProcessMassiveSQLCache</a></strong>(MassiveSQLCache, Pooler, Method_Prefix : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ExecuteCommandJSON">ExecuteCommandJSON</a></strong>(Pooler, Method_Prefix, SQL : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; Execute : Boolean; BinaryRequest : Boolean; BinaryCompatibleMode : Boolean; Metadata : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ExecuteCommandJSONTB">ExecuteCommandJSONTB</a></strong>(Pooler, Method_Prefix, Tablename : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; BinaryRequest : Boolean; BinaryCompatibleMode : Boolean; Metadata : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#InsertValuePure">InsertValuePure</a></strong>(Pooler, Method_Prefix, SQL : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : Integer;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ExecuteCommandPureJSON">ExecuteCommandPureJSON</a></strong>(Pooler, Method_Prefix, SQL : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; Execute : Boolean; BinaryRequest : Boolean; BinaryCompatibleMode : Boolean; Metadata : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ExecuteCommandPureJSONTB">ExecuteCommandPureJSONTB</a></strong>(Pooler, Method_Prefix, Tablename : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; BinaryRequest : Boolean; BinaryCompatibleMode : Boolean; Metadata : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#GetPoolerList">GetPoolerList</a></strong>(Method_Prefix : String; Var PoolerList : TStringList; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil); Overload;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ExecuteProcedure">ExecuteProcedure</a></strong>(Pooler, Method_Prefix, ProcName : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ExecuteProcedurePure">ExecuteProcedurePure</a></strong>(Pooler, Method_Prefix, ProcName : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#GetTableNames">GetTableNames</a></strong>(Pooler, Method_Prefix : String; Var TableNames : TStringList; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : Boolean;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#GetFieldNames">GetFieldNames</a></strong>(Pooler, Method_Prefix, TableName : String; Var FieldNames : TStringList; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : Boolean;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#GetKeyFieldNames">GetKeyFieldNames</a></strong>(Pooler, Method_Prefix, TableName : String; Var FieldNames : TStringList; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : Boolean;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Properties</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#Accept">Accept</a></strong>                : String                     Read vAccept                Write vAccept;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#AcceptEncoding">AcceptEncoding</a></strong>        : String                     Read vAcceptEncoding        Write vAcceptEncoding;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ContentType">ContentType</a></strong>           : String                     Read vContentType           Write vContentType;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#Charset">Charset</a></strong>               : String                     Read vCharset               Write vCharset;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ContentEncoding">ContentEncoding</a></strong>       : String                     Read vContentEncoding       Write vContentEncoding;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#Compression">Compression</a></strong>           : Boolean                    Read vCompression           Write vCompression;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#BinaryRequest">BinaryRequest</a></strong>         : Boolean                    Read vBinaryRequest         Write vBinaryRequest;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#HandleRedirects">HandleRedirects</a></strong>       : Boolean                    Read vHandleRedirects       Write vHandleRedirects;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#RedirectMaximum">RedirectMaximum</a></strong>       : Integer                    Read vRedirectMaximum       Write vRedirectMaximum;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#Encoding">Encoding</a></strong>              : <a href="uRESTDWEncodeClass.html#TEncodeSelect">TEncodeSelect</a>              Read vEncoding              Write vEncoding;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#EncodeStrings">EncodeStrings</a></strong>         : Boolean                    Read vEncodeStrings         Write vEncodeStrings;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#PoolerURL">PoolerURL</a></strong>             : String                     Read vPoolerURL             Write vPoolerURL;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#Host">Host</a></strong>                  : String                     Read vHost                  Write vHost;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#Port">Port</a></strong>                  : Integer                    Read vPort                  Write vPort;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#RequestTimeOut">RequestTimeOut</a></strong>        : Integer                    Read vTimeOut               Write vTimeOut;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#ConnectTimeOut">ConnectTimeOut</a></strong>        : Integer                    Read vConnectTimeOut        Write vConnectTimeOut;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#WelcomeMessage">WelcomeMessage</a></strong>        : String                     Read vWelcomeMessage        Write vWelcomeMessage;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#OnWork">OnWork</a></strong>                : <a href="uRESTDWComponentEvents.html#TOnWork">TOnWork</a>                    Read vOnWork                Write SetOnWork;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#OnWorkBegin">OnWorkBegin</a></strong>           : <a href="uRESTDWComponentEvents.html#TOnWork">TOnWork</a>                    Read vOnWorkBegin           Write SetOnWorkBegin;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#OnWorkEnd">OnWorkEnd</a></strong>             : <a href="uRESTDWComponentEvents.html#TOnWorkEnd">TOnWorkEnd</a>                 Read vOnWorkEnd             Write SetOnWorkEnd;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#OnStatus">OnStatus</a></strong>              : <a href="uRESTDWComponentEvents.html#TOnStatus">TOnStatus</a>                  Read vOnStatus              Write SetOnStatus;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#DatabaseCharSet">DatabaseCharSet</a></strong>       : <a href="uRESTDWCharset.html#TDatabaseCharSet">TDatabaseCharSet</a>           Read vDatabaseCharSet       Write vDatabaseCharSet;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#TypeRequest">TypeRequest</a></strong>           : <a href="uRESTDWBasicTypes.html#TTypeRequest">TTypeRequest</a>               Read vTypeRequest           Write vTypeRequest Default <a href="uRESTDWBasicTypes.html#trHttp">trHttp</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#AccessTag">AccessTag</a></strong>             : String                     Read vAccessTag             Write vAccessTag;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#CriptOptions">CriptOptions</a></strong>          : <a href="uRESTDWConsts.TCripto.html">TCripto</a>                    Read vCripto                Write vCripto;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#UserAgent">UserAgent</a></strong>             : String                     Read vUserAgent             Write vUserAgent;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#DataRoute">DataRoute</a></strong>             : String                     Read vDataRoute             Write vDataRoute;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#AuthenticationOptions">AuthenticationOptions</a></strong> : <a href="uRESTDWDataUtils.TRESTDWClientAuthOptionParams.html">TRESTDWClientAuthOptionParams</a> Read vAuthOptionParams      Write SetAuthOptionParams;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#OnBeforeGetToken">OnBeforeGetToken</a></strong>      : <a href="uRESTDWComponentEvents.html#TOnBeforeGetToken">TOnBeforeGetToken</a>          Read vOnBeforeGetToken      Write vOnBeforeGetToken;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWPoolermethod.TRESTDWPoolerMethodClient.html#PoolerNotFoundMessage">PoolerNotFoundMessage</a></strong> : String                     Read vPoolerNotFoundMessage Write vPoolerNotFoundMessage;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Create"></span><code>Constructor <strong>Create</strong>(AOwner: TComponent); Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Destroy"></span><code>Destructor <strong>Destroy</strong>; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Abort"></span><code>Procedure <strong>Abort</strong>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="GetPoolerList"></span><code>Function <strong>GetPoolerList</strong>(Method_Prefix : String; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : TStringList; Overload;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="GetServerEvents"></span><code>Function <strong>GetServerEvents</strong>(Method_Prefix : String; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : TStringList; Overload;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="EchoPooler"></span><code>Function <strong>EchoPooler</strong>(Method_Prefix, Pooler : String; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : String;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="GetToken"></span><code>Function <strong>GetToken</strong>(Pooler : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : String;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+GetToken Function</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="InsertValue"></span><code>Function <strong>InsertValue</strong>(Pooler, Method_Prefix, SQL : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : Integer;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Roda Comando SQL</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ExecuteCommand"></span><code>Function <strong>ExecuteCommand</strong>(Pooler, Method_Prefix, SQL : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; Execute : Boolean; BinaryRequest : Boolean; BinaryCompatibleMode : Boolean; Metadata : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="OpenDatasets"></span><code>Function <strong>OpenDatasets</strong>(LinesDataset, Pooler, Method_Prefix : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : String;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ApplyUpdates"></span><code>Function <strong>ApplyUpdates</strong>(Massive : <a href="uRESTDWMassiveBuffer.TMassiveDatasetBuffer.html">TMassiveDatasetBuffer</a>; Pooler, Method_Prefix, SQL : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; MassiveBuffer : String = ''; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>; Overload;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ApplyUpdatesTB"></span><code>Function <strong>ApplyUpdatesTB</strong>(Massive : <a href="uRESTDWMassiveBuffer.TMassiveDatasetBuffer.html">TMassiveDatasetBuffer</a>; Pooler, Method_Prefix : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; MassiveBuffer : String = ''; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>; Overload;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ApplyUpdates"></span><code>Function <strong>ApplyUpdates</strong>(LinesDataset, Pooler, Method_Prefix : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : String; Overload;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ApplyUpdates_MassiveCache"></span><code>Function <strong>ApplyUpdates_MassiveCache</strong>(MassiveCache, Pooler, Method_Prefix : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; ReflectChanges : Boolean = False; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ProcessMassiveSQLCache"></span><code>Function <strong>ProcessMassiveSQLCache</strong>(MassiveSQLCache, Pooler, Method_Prefix : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ExecuteCommandJSON"></span><code>Function <strong>ExecuteCommandJSON</strong>(Pooler, Method_Prefix, SQL : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; Execute : Boolean; BinaryRequest : Boolean; BinaryCompatibleMode : Boolean; Metadata : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ExecuteCommandJSONTB"></span><code>Function <strong>ExecuteCommandJSONTB</strong>(Pooler, Method_Prefix, Tablename : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; BinaryRequest : Boolean; BinaryCompatibleMode : Boolean; Metadata : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="InsertValuePure"></span><code>Function <strong>InsertValuePure</strong>(Pooler, Method_Prefix, SQL : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : Integer;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ExecuteCommandPureJSON"></span><code>Function <strong>ExecuteCommandPureJSON</strong>(Pooler, Method_Prefix, SQL : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; Execute : Boolean; BinaryRequest : Boolean; BinaryCompatibleMode : Boolean; Metadata : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ExecuteCommandPureJSONTB"></span><code>Function <strong>ExecuteCommandPureJSONTB</strong>(Pooler, Method_Prefix, Tablename : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; Var RowsAffected : Integer; BinaryRequest : Boolean; BinaryCompatibleMode : Boolean; Metadata : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : <a href="uRESTDWJSONObject.TJSONValue.html">TJSONValue</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="GetPoolerList"></span><code>Procedure <strong>GetPoolerList</strong>(Method_Prefix : String; Var PoolerList : TStringList; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil); Overload;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Lista todos os Pooler's do Servidor</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ExecuteProcedure"></span><code>Procedure <strong>ExecuteProcedure</strong>(Pooler, Method_Prefix, ProcName : String; Params : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil);</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+StoredProc</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ExecuteProcedurePure"></span><code>Procedure <strong>ExecuteProcedurePure</strong>(Pooler, Method_Prefix, ProcName : String; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="GetTableNames"></span><code>Function <strong>GetTableNames</strong>(Pooler, Method_Prefix : String; Var TableNames : TStringList; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : Boolean;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="GetFieldNames"></span><code>Function <strong>GetFieldNames</strong>(Pooler, Method_Prefix, TableName : String; Var FieldNames : TStringList; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : Boolean;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="GetKeyFieldNames"></span><code>Function <strong>GetKeyFieldNames</strong>(Pooler, Method_Prefix, TableName : String; Var FieldNames : TStringList; Var Error : Boolean; Var MessageError : String; Var SocketError : Boolean; TimeOut : Integer = 3000; ConnectTimeOut : Integer = 3000; ConnectionDefs : TObject = Nil; RESTClientPooler : <a href="uRESTDWBasic.TRESTClientPoolerBase.html">TRESTClientPoolerBase</a> = Nil) : Boolean;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Properties</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Accept"></span><code>property <strong>Accept</strong>                : String                     Read vAccept                Write vAccept;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="AcceptEncoding"></span><code>property <strong>AcceptEncoding</strong>        : String                     Read vAcceptEncoding        Write vAcceptEncoding;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ContentType"></span><code>property <strong>ContentType</strong>           : String                     Read vContentType           Write vContentType;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Charset"></span><code>property <strong>Charset</strong>               : String                     Read vCharset               Write vCharset;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ContentEncoding"></span><code>property <strong>ContentEncoding</strong>       : String                     Read vContentEncoding       Write vContentEncoding;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Compression"></span><code>property <strong>Compression</strong>           : Boolean                    Read vCompression           Write vCompression;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="BinaryRequest"></span><code>property <strong>BinaryRequest</strong>         : Boolean                    Read vBinaryRequest         Write vBinaryRequest;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="HandleRedirects"></span><code>property <strong>HandleRedirects</strong>       : Boolean                    Read vHandleRedirects       Write vHandleRedirects;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="RedirectMaximum"></span><code>property <strong>RedirectMaximum</strong>       : Integer                    Read vRedirectMaximum       Write vRedirectMaximum;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Encoding"></span><code>property <strong>Encoding</strong>              : <a href="uRESTDWEncodeClass.html#TEncodeSelect">TEncodeSelect</a>              Read vEncoding              Write vEncoding;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="EncodeStrings"></span><code>property <strong>EncodeStrings</strong>         : Boolean                    Read vEncodeStrings         Write vEncodeStrings;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="PoolerURL"></span><code>property <strong>PoolerURL</strong>             : String                     Read vPoolerURL             Write vPoolerURL;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Host"></span><code>property <strong>Host</strong>                  : String                     Read vHost                  Write vHost;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Port"></span><code>property <strong>Port</strong>                  : Integer                    Read vPort                  Write vPort;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="RequestTimeOut"></span><code>property <strong>RequestTimeOut</strong>        : Integer                    Read vTimeOut               Write vTimeOut;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ConnectTimeOut"></span><code>property <strong>ConnectTimeOut</strong>        : Integer                    Read vConnectTimeOut        Write vConnectTimeOut;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Timeout da Requisição</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="WelcomeMessage"></span><code>property <strong>WelcomeMessage</strong>        : String                     Read vWelcomeMessage        Write vWelcomeMessage;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="OnWork"></span><code>property <strong>OnWork</strong>                : <a href="uRESTDWComponentEvents.html#TOnWork">TOnWork</a>                    Read vOnWork                Write SetOnWork;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="OnWorkBegin"></span><code>property <strong>OnWorkBegin</strong>           : <a href="uRESTDWComponentEvents.html#TOnWork">TOnWork</a>                    Read vOnWorkBegin           Write SetOnWorkBegin;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="OnWorkEnd"></span><code>property <strong>OnWorkEnd</strong>             : <a href="uRESTDWComponentEvents.html#TOnWorkEnd">TOnWorkEnd</a>                 Read vOnWorkEnd             Write SetOnWorkEnd;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="OnStatus"></span><code>property <strong>OnStatus</strong>              : <a href="uRESTDWComponentEvents.html#TOnStatus">TOnStatus</a>                  Read vOnStatus              Write SetOnStatus;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DatabaseCharSet"></span><code>property <strong>DatabaseCharSet</strong>       : <a href="uRESTDWCharset.html#TDatabaseCharSet">TDatabaseCharSet</a>           Read vDatabaseCharSet       Write vDatabaseCharSet;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="TypeRequest"></span><code>property <strong>TypeRequest</strong>           : <a href="uRESTDWBasicTypes.html#TTypeRequest">TTypeRequest</a>               Read vTypeRequest           Write vTypeRequest Default <a href="uRESTDWBasicTypes.html#trHttp">trHttp</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="AccessTag"></span><code>property <strong>AccessTag</strong>             : String                     Read vAccessTag             Write vAccessTag;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="CriptOptions"></span><code>property <strong>CriptOptions</strong>          : <a href="uRESTDWConsts.TCripto.html">TCripto</a>                    Read vCripto                Write vCripto;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="UserAgent"></span><code>property <strong>UserAgent</strong>             : String                     Read vUserAgent             Write vUserAgent;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DataRoute"></span><code>property <strong>DataRoute</strong>             : String                     Read vDataRoute             Write vDataRoute;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="AuthenticationOptions"></span><code>property <strong>AuthenticationOptions</strong> : <a href="uRESTDWDataUtils.TRESTDWClientAuthOptionParams.html">TRESTDWClientAuthOptionParams</a> Read vAuthOptionParams      Write SetAuthOptionParams;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="OnBeforeGetToken"></span><code>property <strong>OnBeforeGetToken</strong>      : <a href="uRESTDWComponentEvents.html#TOnBeforeGetToken">TOnBeforeGetToken</a>          Read vOnBeforeGetToken      Write vOnBeforeGetToken;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="PoolerNotFoundMessage"></span><code>property <strong>PoolerNotFoundMessage</strong> : String                     Read vPoolerNotFoundMessage Write vPoolerNotFoundMessage;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

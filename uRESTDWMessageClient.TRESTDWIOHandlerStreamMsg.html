@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWMessageClient: Classe TRESTDWIOHandlerStreamMsg</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<span id="TRESTDWIOHandlerStreamMsg"></span><h1 class="cio">Classe TRESTDWIOHandlerStreamMsg</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarquia</a></div><div class="one_section"><a class="section" href="#PasDoc-Fields">Campos</a></div><div class="one_section"><a class="section" href="#PasDoc-Methods">Métodos</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Properties</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a href="uRESTDWMessageClient.html">uRESTDWMessageClient</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TRESTDWIOHandlerStreamMsg = class(<a class="normal" href="uRESTDWIOHandlerStream.TRESTDWIOHandlerStream.html">TRESTDWIOHandlerStream</a>)</code></p>
+<h2 class="description">Descrição</h2>
+<div class="nodescription">No description available, ancestor TRESTDWIOHandlerStream description follows</div><div class="nodescription">No description available, ancestor TRESTDWIOHandler description follows</div><div class="nodescription">No description available, ancestor TRESTDWComponent description follows</div><span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="ancestor">TPersistent</li>
+<li class="ancestor">TComponent</li>
+<li class="ancestor"><a class="normal" href="uRESTDWComponentBase.TRESTDWComponent.html">TRESTDWComponent</a></li>
+<li class="ancestor"><a class="normal" href="uRESTDWIOHandler.TRESTDWIOHandler.html">TRESTDWIOHandler</a></li>
+<li class="ancestor"><a class="normal" href="uRESTDWIOHandlerStream.TRESTDWIOHandlerStream.html">TRESTDWIOHandlerStream</a></li>
+<li class="thisitem">TRESTDWIOHandlerStreamMsg</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Fields"></span><h3 class="summary">Campos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code><strong><a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#FTerminatorWasRead">FTerminatorWasRead</a></strong>: Boolean;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code><strong><a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#FEscapeLines">FEscapeLines</a></strong>: Boolean;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code><strong><a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#FUnescapeLines">FUnescapeLines</a></strong>: Boolean;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code><strong><a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#FLastByteRecv">FLastByteRecv</a></strong>: Byte;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Methods"></span><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#ReadDataFromSource">ReadDataFromSource</a></strong>(Var VBuffer : <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>): Integer;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Constructor <strong><a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#Create">Create</a></strong>(AOwner : TComponent; AReceiveStream : TStream; ASendStream : TStream = Nil); Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#ReadLn">ReadLn</a></strong>(ATerminator : String; ATimeout : Integer = <a href="uRESTDWConsts.html#cTimeoutDefault">cTimeoutDefault</a>; AMaxLineLength : Integer = -1) : String;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#WriteLn">WriteLn</a></strong>(Const AOut : String);</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Properties</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#EscapeLines">EscapeLines</a></strong>   : Boolean Read <a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#FEscapeLines">FEscapeLines</a>   Write <a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#FEscapeLines">FEscapeLines</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#UnescapeLines">UnescapeLines</a></strong> : Boolean Read <a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#FUnescapeLines">FUnescapeLines</a> Write <a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#FUnescapeLines">FUnescapeLines</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#MaxLineLength">MaxLineLength</a></strong> : Integer Read <a href="uRESTDWIOHandler.TRESTDWIOHandler.html#FMaxLineLength">FMaxLineLength</a> Write <a href="uRESTDWIOHandler.TRESTDWIOHandler.html#FMaxLineLength">FMaxLineLength</a> Default MaxInt;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Campos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="FTerminatorWasRead"></span><code><strong>FTerminatorWasRead</strong>: Boolean;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+FMaxLineLength : Integer;</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="FEscapeLines"></span><code><strong>FEscapeLines</strong>: Boolean;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+FMaxLineLength : Integer;</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="FUnescapeLines"></span><code><strong>FUnescapeLines</strong>: Boolean;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+FMaxLineLength : Integer;</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="FLastByteRecv"></span><code><strong>FLastByteRecv</strong>: Byte;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="ReadDataFromSource"></span><code>Function <strong>ReadDataFromSource</strong>(Var VBuffer : <a href="uRESTDWBasicTypes.html#TRESTDWBytes">TRESTDWBytes</a>): Integer;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Create"></span><code>Constructor <strong>Create</strong>(AOwner : TComponent; AReceiveStream : TStream; ASendStream : TStream = Nil); Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="ReadLn"></span><code>Function <strong>ReadLn</strong>(ATerminator : String; ATimeout : Integer = <a href="uRESTDWConsts.html#cTimeoutDefault">cTimeoutDefault</a>; AMaxLineLength : Integer = -1) : String;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Should this be reintroduce instead of override?</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="WriteLn"></span><code>Procedure <strong>WriteLn</strong>(Const AOut : String);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Properties</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="EscapeLines"></span><code>property <strong>EscapeLines</strong>   : Boolean Read <a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#FEscapeLines">FEscapeLines</a>   Write <a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#FEscapeLines">FEscapeLines</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="UnescapeLines"></span><code>property <strong>UnescapeLines</strong> : Boolean Read <a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#FUnescapeLines">FUnescapeLines</a> Write <a href="uRESTDWMessageClient.TRESTDWIOHandlerStreamMsg.html#FUnescapeLines">FUnescapeLines</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="MaxLineLength"></span><code>property <strong>MaxLineLength</strong> : Integer Read <a href="uRESTDWIOHandler.TRESTDWIOHandler.html#FMaxLineLength">FMaxLineLength</a> Write <a href="uRESTDWIOHandler.TRESTDWIOHandler.html#FMaxLineLength">FMaxLineLength</a> Default MaxInt;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

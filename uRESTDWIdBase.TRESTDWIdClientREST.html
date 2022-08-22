@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWIdBase: Classe TRESTDWIdClientREST</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<span id="TRESTDWIdClientREST"></span><h1 class="cio">Classe TRESTDWIdClientREST</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarquia</a></div><div class="one_section">Campos</div><div class="one_section"><a class="section" href="#PasDoc-Methods">Métodos</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Properties</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a href="uRESTDWIdBase.html">uRESTDWIdBase</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TRESTDWIdClientREST = class(<a class="normal" href="uRESTDWBasicClass.TRESTDWClientRESTBase.html">TRESTDWClientRESTBase</a>)</code></p>
+<h2 class="description">Descrição</h2>
+<div class="nodescription">No description available, ancestor TRESTDWClientRESTBase description follows</div><div class="nodescription">No description available, ancestor TRESTDWComponent description follows</div><span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="ancestor">TPersistent</li>
+<li class="ancestor">TComponent</li>
+<li class="ancestor"><a class="normal" href="uRESTDWComponentBase.TRESTDWComponent.html">TRESTDWComponent</a></li>
+<li class="ancestor"><a class="normal" href="uRESTDWBasicClass.TRESTDWClientRESTBase.html">TRESTDWClientRESTBase</a></li>
+<li class="thisitem">TRESTDWIdClientREST</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Methods"></span><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Constructor <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Create">Create</a></strong>(AOwner : TComponent); Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Destructor <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Destroy">Destroy</a></strong>; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Get">Get</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Get">Get</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; IgnoreEvents : Boolean = False):String; Overload; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Post">Post</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const CustomBody : TStream = Nil; IgnoreEvents : Boolean = False; RawHeaders : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Post">Post</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const CustomBody : TIdMultipartFormDataStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False; RawHeaders : Boolean = False):Integer; Overload;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Post">Post</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; FileName : String = ''; FileStream : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False; RawHeaders : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Post">Post</a></strong>(AUrl : String; var AResponseText : String; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; Const CustomBody : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False; RawHeaders : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Post">Post</a></strong>(AUrl : String; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; FileName : String = ''; FileStream : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False; RawHeaders : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Put">Put</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Put">Put</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const CustomBody : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Put">Put</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; FileName : String = ''; FileStream : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Put">Put</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; Const CustomBody : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Put">Put</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; FileName : String = ''; FileStream : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Patch">Patch</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Patch">Patch</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; CustomBody : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Patch">Patch</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; CustomBody : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Patch">Patch</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; FileName : String = ''; FileStream : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Delete">Delete</a></strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#Delete">Delete</a></strong>(AUrl : String; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Properties</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#VerifyCert">VerifyCert</a></strong>               : Boolean                     Read GetVerifyCert             Write SetVerifyCert;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#SSLVersions">SSLVersions</a></strong>              : TIdSSLVersions              Read vSSLVersions              Write vSSLVersions;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#CertMode">CertMode</a></strong>                 : TIdSSLMode                  Read vCertMode                 Write vCertMode;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#CertFile">CertFile</a></strong>                 : String                      Read vCertFile                 Write vCertFile;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#KeyFile">KeyFile</a></strong>                  : String                      Read vKeyFile                  Write vKeyFile;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#RootCertFile">RootCertFile</a></strong>             : String                      Read vRootCertFile             Write vRootCertFile;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#HostCert">HostCert</a></strong>                 : String                      Read vHostCert                 Write vHostCert;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#PortCert">PortCert</a></strong>                 : Integer                     Read vPortCert                 Write vPortCert;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWIdBase.TRESTDWIdClientREST.html#OnGetpassword">OnGetpassword</a></strong>            : <a href="uRESTDWComponentEvents.html#TOnGetpassword">TOnGetpassword</a>              Read vOnGetpassword            Write vOnGetpassword;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Create"></span><code>Constructor <strong>Create</strong>(AOwner : TComponent); Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Destroy"></span><code>Destructor <strong>Destroy</strong>; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Get"></span><code>Function <strong>Get</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Get"></span><code>Function <strong>Get</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; IgnoreEvents : Boolean = False):String; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Post"></span><code>Function <strong>Post</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const CustomBody : TStream = Nil; IgnoreEvents : Boolean = False; RawHeaders : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Post"></span><code>Function <strong>Post</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const CustomBody : TIdMultipartFormDataStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False; RawHeaders : Boolean = False):Integer; Overload;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Post"></span><code>Function <strong>Post</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; FileName : String = ''; FileStream : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False; RawHeaders : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Post"></span><code>Function <strong>Post</strong>(AUrl : String; var AResponseText : String; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; Const CustomBody : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False; RawHeaders : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Post"></span><code>Function <strong>Post</strong>(AUrl : String; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; FileName : String = ''; FileStream : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False; RawHeaders : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Put"></span><code>Function <strong>Put</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Put"></span><code>Function <strong>Put</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const CustomBody : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Put"></span><code>Function <strong>Put</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; FileName : String = ''; FileStream : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Put"></span><code>Function <strong>Put</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; Const CustomBody : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Put"></span><code>Function <strong>Put</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; FileName : String = ''; FileStream : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Patch"></span><code>Function <strong>Patch</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Patch"></span><code>Function <strong>Patch</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; CustomBody : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Patch"></span><code>Function <strong>Patch</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; CustomBody : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Patch"></span><code>Function <strong>Patch</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; FileName : String = ''; FileStream : TStream = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Delete"></span><code>Function <strong>Delete</strong>(AUrl : String = ''; CustomHeaders : TStringList = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Delete"></span><code>Function <strong>Delete</strong>(AUrl : String; CustomHeaders : TStringList = Nil; CustomParams : TStringList = Nil; Const AResponse : TStream = Nil; IgnoreEvents : Boolean = False):Integer; Overload; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Properties</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="VerifyCert"></span><code>property <strong>VerifyCert</strong>               : Boolean                     Read GetVerifyCert             Write SetVerifyCert;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="SSLVersions"></span><code>property <strong>SSLVersions</strong>              : TIdSSLVersions              Read vSSLVersions              Write vSSLVersions;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="CertMode"></span><code>property <strong>CertMode</strong>                 : TIdSSLMode                  Read vCertMode                 Write vCertMode;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="CertFile"></span><code>property <strong>CertFile</strong>                 : String                      Read vCertFile                 Write vCertFile;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="KeyFile"></span><code>property <strong>KeyFile</strong>                  : String                      Read vKeyFile                  Write vKeyFile;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="RootCertFile"></span><code>property <strong>RootCertFile</strong>             : String                      Read vRootCertFile             Write vRootCertFile;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="HostCert"></span><code>property <strong>HostCert</strong>                 : String                      Read vHostCert                 Write vHostCert;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="PortCert"></span><code>property <strong>PortCert</strong>                 : Integer                     Read vPortCert                 Write vPortCert;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="OnGetpassword"></span><code>property <strong>OnGetpassword</strong>            : <a href="uRESTDWComponentEvents.html#TOnGetpassword">TOnGetpassword</a>              Read vOnGetpassword            Write vOnGetpassword;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: DWDCPcrypt2: Classe TDWDCP_blockcipher</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<span id="TDWDCP_blockcipher"></span><h1 class="cio">Classe TDWDCP_blockcipher</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarquia</a></div><div class="one_section"><a class="section" href="#PasDoc-Fields">Campos</a></div><div class="one_section"><a class="section" href="#PasDoc-Methods">Métodos</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Properties</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a href="DWDCPcrypt2.html">DWDCPcrypt2</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TDWDCP_blockcipher = class(<a class="normal" href="DWDCPcrypt2.TDWDCP_cipher.html">TDWDCP_cipher</a>)</code></p>
+<h2 class="description">Descrição</h2>
+<div class="nodescription">No description available, ancestor TDWDCP_cipher description follows</div><span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="ancestor">TPersistent</li>
+<li class="ancestor">TComponent</li>
+<li class="ancestor"><a class="normal" href="DWDCPcrypt2.TDWDCP_cipher.html">TDWDCP_cipher</a></li>
+<li class="thisitem">TDWDCP_blockcipher</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Fields"></span><h3 class="summary">Campos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code><strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#fCipherMode">fCipherMode</a></strong>: <a href="DWDCPcrypt2.html#TDWDCP_ciphermode">TDWDCP_ciphermode</a>;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Methods"></span><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#InitKey">InitKey</a></strong>(const Key; Size: longword); virtual;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>class function <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#GetBlockSize">GetBlockSize</a></strong>: integer; virtual;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#SetIV">SetIV</a></strong>(const Value); virtual;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#GetIV">GetIV</a></strong>(var Value); virtual;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#Encrypt">Encrypt</a></strong>(const Indata; var Outdata; Size: longword); override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#Decrypt">Decrypt</a></strong>(const Indata; var Outdata; Size: longword); override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#EncryptString">EncryptString</a></strong>(const Str: <a href="DWDCPtypes.html#DWDCPRawString">DWDCPRawString</a>): <a href="DWDCPtypes.html#DWDCPRawString">DWDCPRawString</a>; overload; override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#DecryptString">DecryptString</a></strong>(const Str: <a href="DWDCPtypes.html#DWDCPRawString">DWDCPRawString</a>): <a href="DWDCPtypes.html#DWDCPRawString">DWDCPRawString</a>; overload; override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#EncryptString">EncryptString</a></strong>(const Str: <a href="DWDCPtypes.html#DWDCPUnicodeString">DWDCPUnicodeString</a>): <a href="DWDCPtypes.html#DWDCPUnicodeString">DWDCPUnicodeString</a>; overload; override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#DecryptString">DecryptString</a></strong>(const Str: <a href="DWDCPtypes.html#DWDCPUnicodeString">DWDCPUnicodeString</a>): <a href="DWDCPtypes.html#DWDCPUnicodeString">DWDCPUnicodeString</a>; overload; override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#EncryptECB">EncryptECB</a></strong>(const Indata; var Outdata); virtual;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#DecryptECB">DecryptECB</a></strong>(const Indata; var Outdata); virtual;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#EncryptCBC">EncryptCBC</a></strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#DecryptCBC">DecryptCBC</a></strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#EncryptCFB8bit">EncryptCFB8bit</a></strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#DecryptCFB8bit">DecryptCFB8bit</a></strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#EncryptCFBblock">EncryptCFBblock</a></strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#DecryptCFBblock">DecryptCFBblock</a></strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#EncryptOFB">EncryptOFB</a></strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#DecryptOFB">DecryptOFB</a></strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#EncryptCTR">EncryptCTR</a></strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#DecryptCTR">DecryptCTR</a></strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>constructor <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#Create">Create</a></strong>(AOwner: TComponent); override;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Properties</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#BlockSize">BlockSize</a></strong>: integer read _GetBlockSize write <a href="DWDCPcrypt2.TDWDCP_cipher.html#DeadInt">DeadInt</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="DWDCPcrypt2.TDWDCP_blockcipher.html#CipherMode">CipherMode</a></strong>: <a href="DWDCPcrypt2.html#TDWDCP_ciphermode">TDWDCP_ciphermode</a> read <a href="DWDCPcrypt2.TDWDCP_blockcipher.html#fCipherMode">fCipherMode</a> write <a href="DWDCPcrypt2.TDWDCP_blockcipher.html#fCipherMode">fCipherMode</a> default <a href="DWDCPcrypt2.html#cmCBC">cmCBC</a>;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Campos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="fCipherMode"></span><code><strong>fCipherMode</strong>: <a href="DWDCPcrypt2.html#TDWDCP_ciphermode">TDWDCP_ciphermode</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="InitKey"></span><code>procedure <strong>InitKey</strong>(const Key; Size: longword); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+The cipher mode the encrypt method uses</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="GetBlockSize"></span><code>class function <strong>GetBlockSize</strong>: integer; virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="SetIV"></span><code>procedure <strong>SetIV</strong>(const Value); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Get the block size of the cipher (in bits)</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="GetIV"></span><code>procedure <strong>GetIV</strong>(var Value); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Sets the IV to Value and performs a reset</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Encrypt"></span><code>procedure <strong>Encrypt</strong>(const Indata; var Outdata; Size: longword); override;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Returns the current chaining information, not the actual IV</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Decrypt"></span><code>procedure <strong>Decrypt</strong>(const Indata; var Outdata; Size: longword); override;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Encrypt size bytes of data and place in Outdata using CipherMode</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="EncryptString"></span><code>function <strong>EncryptString</strong>(const Str: <a href="DWDCPtypes.html#DWDCPRawString">DWDCPRawString</a>): <a href="DWDCPtypes.html#DWDCPRawString">DWDCPRawString</a>; overload; override;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Decrypt size bytes of data and place in Outdata using CipherMode</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DecryptString"></span><code>function <strong>DecryptString</strong>(const Str: <a href="DWDCPtypes.html#DWDCPRawString">DWDCPRawString</a>): <a href="DWDCPtypes.html#DWDCPRawString">DWDCPRawString</a>; overload; override;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Encrypt a string and return Base64 encoded</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="EncryptString"></span><code>function <strong>EncryptString</strong>(const Str: <a href="DWDCPtypes.html#DWDCPUnicodeString">DWDCPUnicodeString</a>): <a href="DWDCPtypes.html#DWDCPUnicodeString">DWDCPUnicodeString</a>; overload; override;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Decrypt a Base64 encoded string</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DecryptString"></span><code>function <strong>DecryptString</strong>(const Str: <a href="DWDCPtypes.html#DWDCPUnicodeString">DWDCPUnicodeString</a>): <a href="DWDCPtypes.html#DWDCPUnicodeString">DWDCPUnicodeString</a>; overload; override;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Encrypt a Unicode string and return Base64 encoded</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="EncryptECB"></span><code>procedure <strong>EncryptECB</strong>(const Indata; var Outdata); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Decrypt a Base64 encoded Unicode string</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DecryptECB"></span><code>procedure <strong>DecryptECB</strong>(const Indata; var Outdata); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Encrypt a block of data using the ECB method of encryption</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="EncryptCBC"></span><code>procedure <strong>EncryptCBC</strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Decrypt a block of data using the ECB method of decryption</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DecryptCBC"></span><code>procedure <strong>DecryptCBC</strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Encrypt size bytes of data using the CBC method of encryption</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="EncryptCFB8bit"></span><code>procedure <strong>EncryptCFB8bit</strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Decrypt size bytes of data using the CBC method of decryption</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DecryptCFB8bit"></span><code>procedure <strong>DecryptCFB8bit</strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Encrypt size bytes of data using the CFB (8 bit) method of encryption</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="EncryptCFBblock"></span><code>procedure <strong>EncryptCFBblock</strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Decrypt size bytes of data using the CFB (8 bit) method of decryption</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DecryptCFBblock"></span><code>procedure <strong>DecryptCFBblock</strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Encrypt size bytes of data using the CFB (block) method of encryption</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="EncryptOFB"></span><code>procedure <strong>EncryptOFB</strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Decrypt size bytes of data using the CFB (block) method of decryption</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DecryptOFB"></span><code>procedure <strong>DecryptOFB</strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Encrypt size bytes of data using the OFB method of encryption</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="EncryptCTR"></span><code>procedure <strong>EncryptCTR</strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Decrypt size bytes of data using the OFB method of decryption</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DecryptCTR"></span><code>procedure <strong>DecryptCTR</strong>(const Indata; var Outdata; Size: longword); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Encrypt size bytes of data using the CTR method of encryption</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Create"></span><code>constructor <strong>Create</strong>(AOwner: TComponent); override;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Decrypt size bytes of data using the CTR method of decryption</p>
+</td></tr>
+</table>
+<h3 class="detail">Properties</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="BlockSize"></span><code>property <strong>BlockSize</strong>: integer read _GetBlockSize write <a href="DWDCPcrypt2.TDWDCP_cipher.html#DeadInt">DeadInt</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="CipherMode"></span><code>property <strong>CipherMode</strong>: <a href="DWDCPcrypt2.html#TDWDCP_ciphermode">TDWDCP_ciphermode</a> read <a href="DWDCPcrypt2.TDWDCP_blockcipher.html#fCipherMode">fCipherMode</a> write <a href="DWDCPcrypt2.TDWDCP_blockcipher.html#fCipherMode">fCipherMode</a> default <a href="DWDCPcrypt2.html#cmCBC">cmCBC</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

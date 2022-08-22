@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWServerEvents: Classe TRESTDWEvent</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<span id="TRESTDWEvent"></span><h1 class="cio">Classe TRESTDWEvent</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarquia</a></div><div class="one_section">Campos</div><div class="one_section"><a class="section" href="#PasDoc-Methods">Métodos</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Properties</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a href="uRESTDWServerEvents.html">uRESTDWServerEvents</a></p>
+<h2 class="declaration">Declaração</h2>
+<p class="declaration">
+<code>type TRESTDWEvent = class(TCollectionItem)</code></p>
+<h2 class="description">Descrição</h2>
+<span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarquia</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="ancestor">TPersistent</li>
+<li class="ancestor">TCollectionItem</li>
+<li class="thisitem">TRESTDWEvent</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Methods"></span><h3 class="summary">Métodos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#GetDisplayName">GetDisplayName</a></strong>: String; Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#SetDisplayName">SetDisplayName</a></strong>(Const Value : String); Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#CompareParams">CompareParams</a></strong>(Var Dest : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#Assign">Assign</a></strong>(Source : TPersistent); Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Constructor <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#Create">Create</a></strong>(aCollection : TCollection); Override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Function <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#GetNamePath">GetNamePath</a></strong>: String; Override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Destructor <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#Destroy">Destroy</a></strong>; Override;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Properties</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#Routes">Routes</a></strong>               : <a href="uRESTDWConsts.html#TRESTDWRoutes">TRESTDWRoutes</a>        Read vDWRoutes             Write vDWRoutes;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#NeedAuthorization">NeedAuthorization</a></strong>    : Boolean              Read vNeedAuthorization    Write vNeedAuthorization;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#Params">Params</a></strong>               : <a href="uRESTDWParams.TRESTDWParamsMethods.html">TRESTDWParamsMethods</a> Read vDWParams             Write vDWParams;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#DataMode">DataMode</a></strong>             : <a href="uRESTDWConsts.html#TDataMode">TDataMode</a>            Read vDataMode             Write SetDataMode;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#Name">Name</a></strong>                 : String               Read <a href="uRESTDWServerEvents.TRESTDWEvent.html#GetDisplayName">GetDisplayName</a>        Write <a href="uRESTDWServerEvents.TRESTDWEvent.html#SetDisplayName">SetDisplayName</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#EventName">EventName</a></strong>            : String               Read vEventName            Write vEventName;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#BaseURL">BaseURL</a></strong>              : String               Read vBaseURL              Write SetBaseURL;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#DefaultContentType">DefaultContentType</a></strong>   : String               Read vContentType          Write SetContentType;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#CallbackEvent">CallbackEvent</a></strong>        : Boolean              Read vCallbackEvent        Write vCallbackEvent;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#Description">Description</a></strong>          : TStrings             Read vDescription          Write SetDescription;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#OnlyPreDefinedParams">OnlyPreDefinedParams</a></strong> : Boolean              Read vOnlyPreDefinedParams Write vOnlyPreDefinedParams;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#OnReplyEvent">OnReplyEvent</a></strong>         : <a href="uRESTDWServerEvents.html#TDWReplyEvent">TDWReplyEvent</a>        Read GetReplyEvent         Write SetReplyEvent;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#OnReplyEventByType">OnReplyEventByType</a></strong>   : <a href="uRESTDWServerEvents.html#TDWReplyEventByType">TDWReplyEventByType</a>  Read GetReplyEventByType   Write SetReplyEventByType;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#OnAuthRequest">OnAuthRequest</a></strong>        : <a href="uRESTDWServerEvents.html#TDWAuthRequest">TDWAuthRequest</a>       Read GetAuthRequest        Write SetAuthRequest;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><code>property <strong><a href="uRESTDWServerEvents.TRESTDWEvent.html#OnBeforeExecute">OnBeforeExecute</a></strong>      : <a href="uRESTDWServerEvents.html#TObjectExecute">TObjectExecute</a>       Read vBeforeExecute        Write vBeforeExecute;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Métodos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="GetDisplayName"></span><code>Function <strong>GetDisplayName</strong>: String; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="SetDisplayName"></span><code>Procedure <strong>SetDisplayName</strong>(Const Value : String); Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="CompareParams"></span><code>Procedure <strong>CompareParams</strong>(Var Dest : <a href="uRESTDWParams.TRESTDWParams.html">TRESTDWParams</a>);</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Assign"></span><code>Procedure <strong>Assign</strong>(Source : TPersistent); Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Create"></span><code>Constructor <strong>Create</strong>(aCollection : TCollection); Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="GetNamePath"></span><code>Function <strong>GetNamePath</strong>: String; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Destroy"></span><code>Destructor <strong>Destroy</strong>; Override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Properties</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="Routes"></span><code>property <strong>Routes</strong>               : <a href="uRESTDWConsts.html#TRESTDWRoutes">TRESTDWRoutes</a>        Read vDWRoutes             Write vDWRoutes;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="NeedAuthorization"></span><code>property <strong>NeedAuthorization</strong>    : Boolean              Read vNeedAuthorization    Write vNeedAuthorization;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="Params"></span><code>property <strong>Params</strong>               : <a href="uRESTDWParams.TRESTDWParamsMethods.html">TRESTDWParamsMethods</a> Read vDWParams             Write vDWParams;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="DataMode"></span><code>property <strong>DataMode</strong>             : <a href="uRESTDWConsts.html#TDataMode">TDataMode</a>            Read vDataMode             Write SetDataMode;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="Name"></span><code>property <strong>Name</strong>                 : String               Read <a href="uRESTDWServerEvents.TRESTDWEvent.html#GetDisplayName">GetDisplayName</a>        Write <a href="uRESTDWServerEvents.TRESTDWEvent.html#SetDisplayName">SetDisplayName</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="EventName"></span><code>property <strong>EventName</strong>            : String               Read vEventName            Write vEventName;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="BaseURL"></span><code>property <strong>BaseURL</strong>              : String               Read vBaseURL              Write SetBaseURL;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="DefaultContentType"></span><code>property <strong>DefaultContentType</strong>   : String               Read vContentType          Write SetContentType;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="CallbackEvent"></span><code>property <strong>CallbackEvent</strong>        : Boolean              Read vCallbackEvent        Write vCallbackEvent;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="Description"></span><code>property <strong>Description</strong>          : TStrings             Read vDescription          Write SetDescription;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="OnlyPreDefinedParams"></span><code>property <strong>OnlyPreDefinedParams</strong> : Boolean              Read vOnlyPreDefinedParams Write vOnlyPreDefinedParams;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="OnReplyEvent"></span><code>property <strong>OnReplyEvent</strong>         : <a href="uRESTDWServerEvents.html#TDWReplyEvent">TDWReplyEvent</a>        Read GetReplyEvent         Write SetReplyEvent;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="OnReplyEventByType"></span><code>property <strong>OnReplyEventByType</strong>   : <a href="uRESTDWServerEvents.html#TDWReplyEventByType">TDWReplyEventByType</a>  Read GetReplyEventByType   Write SetReplyEventByType;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="OnAuthRequest"></span><code>property <strong>OnAuthRequest</strong>        : <a href="uRESTDWServerEvents.html#TDWAuthRequest">TDWAuthRequest</a>       Read GetAuthRequest        Write SetAuthRequest;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a href="legend.html"><img  src="published.gif" alt="Published" title="Published"></a></td>
+<td class="itemcode"><span id="OnBeforeExecute"></span><code>property <strong>OnBeforeExecute</strong>      : <a href="uRESTDWServerEvents.html#TObjectExecute">TObjectExecute</a>       Read vBeforeExecute        Write vBeforeExecute;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

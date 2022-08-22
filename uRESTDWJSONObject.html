@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uRESTDWJSONObject</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<h1 class="unit">Unit uRESTDWJSONObject</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Uses">Uses</a></div><div class="one_section"><a class="section" href="#PasDoc-Classes">Classes, Interfaces, Objetos e Registros</a></div><div class="one_section"><a class="section" href="#PasDoc-FuncsProcs">Funções e Procedimentos</a></div><div class="one_section"><a class="section" href="#PasDoc-Types">Tipos</a></div><div class="one_section"><a class="section" href="#PasDoc-Constants">Constantes</a></div><div class="one_section">Variáveis</div></div>
+<span id="PasDoc-Description"></span><h2 class="description">Descrição</h2>
+&nbsp;<span id="PasDoc-Uses"></span><h2 class="uses">Uses</h2>
+<ul class="useslist"><li><a href="uRESTDWJSONInterface.html">uRESTDWJSONInterface</a></li><li><a href="uRESTDWCharset.html">uRESTDWCharset</a></li><li><a href="uRESTDWConsts.html">uRESTDWConsts</a></li><li><a href="uRESTDWTools.html">uRESTDWTools</a></li><li>Variants</li><li><a href="uRESTDWBasicTypes.html">uRESTDWBasicTypes</a></li><li><a href="uRESTDWEncodeClass.html">uRESTDWEncodeClass</a></li><li><a href="uRESTDWDataUtils.html">uRESTDWDataUtils</a></li><li>SysUtils</li><li>Classes</li><li>DB</li><li>LConvEncoding</li><li>math</li><li><a href="uRESTDWResponseTranslator.html">uRESTDWResponseTranslator</a></li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Classes"></span><h3 class="cio">Classes, Interfaces, Objetos e Registros</h3>
+<table class="classestable wide_list">
+<tr class="listheader">
+<th class="itemname">Nome</th>
+<th class="itemdesc">Descrição</th>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWJSONObject.TJSONBufferObject.html"><code>TJSONBufferObject</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWJSONObject.TDWParamsList.html"><code>TDWParamsList</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWJSONObject.TJSONValue.html"><code>TJSONValue</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWJSONObject.TJSONParam.html"><code>TJSONParam</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWJSONObject.TStringStreamList.html"><code>TStringStreamList</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWJSONObject.TRESTDWHeaders.html"><code>TRESTDWHeaders</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Classe&nbsp;<a class="bold" href="uRESTDWJSONObject.TDWDatalist.html"><code>TDWDatalist</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+</table>
+<span id="PasDoc-FuncsProcs"></span><h3 class="summary">Funções e Procedimentos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWJSONObject.html#StringToJsonString">StringToJsonString</a></strong>(OriginalString : String) : String;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWJSONObject.html#CopyValue">CopyValue</a></strong>(Var bValue : String) : String;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWJSONObject.html#unescape_chars">unescape_chars</a></strong>(s : String) : String;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWJSONObject.html#escape_chars">escape_chars</a></strong>(s : String) : String;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uRESTDWJSONObject.html#StringToGUID">StringToGUID</a></strong>(GUID : String) : TGUID;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Types"></span><h3 class="summary">Tipos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TOnWriterProcess">TOnWriterProcess</a></strong> = Procedure (DataSet : TDataSet; RecNo, RecordCount : Integer;Var AbortProcess : Boolean) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TRESTDWJSONType">TRESTDWJSONType</a></strong> = (...);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TRESTDWJSONTypes">TRESTDWJSONTypes</a></strong>   = Set of <a href="uRESTDWJSONObject.html#TRESTDWJSONType">TRESTDWJSONType</a>;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TDWParamExpType">TDWParamExpType</a></strong> = (...);</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TProcedureEvent">TProcedureEvent</a></strong> = Procedure Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TNewDataField">TNewDataField</a></strong> = Procedure (FieldDefinition : <a href="uRESTDWBasicTypes.TFieldDefinition.html">TFieldDefinition</a>) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TFieldExist">TFieldExist</a></strong> = Function (Const Dataset : TDataset; Value : String) : TField Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TSetInitDataset">TSetInitDataset</a></strong> = Procedure (Const Value : Boolean) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TSetRecordCount">TSetRecordCount</a></strong> = Procedure (aJsonCount, aRecordCount : Integer) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TSetnotrepage">TSetnotrepage</a></strong> = Procedure (Value : Boolean) Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TFieldListCount">TFieldListCount</a></strong> = Function : Integer Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TGetInDesignEvents">TGetInDesignEvents</a></strong> = Function : Boolean Of Object;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TPrepareDetails">TPrepareDetails</a></strong> = Procedure (ActiveMode : Boolean) Of Object;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#PJSONParam">PJSONParam</a></strong> = &circ;<a href="uRESTDWJSONObject.TJSONParam.html">TJSONParam</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#PStringStream">PStringStream</a></strong> = &circ;TStringStream;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Constants"></span><h3 class="summary">Constantes</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#TSpecialChars">TSpecialChars</a></strong> : Array [0 .. 7] Of Char = ('\', '&quot;', '/', #8, #9, #10, #12, #13);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#MaxFloatLaz">MaxFloatLaz</a></strong>       = 15;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWJSONObject.html#LazDigitsSize">LazDigitsSize</a></strong>     = 6;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Funções e Procedimentos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="StringToJsonString"></span><code>Function <strong>StringToJsonString</strong>(OriginalString : String) : String;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="CopyValue"></span><code>Function <strong>CopyValue</strong>(Var bValue : String) : String;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="unescape_chars"></span><code>Function <strong>unescape_chars</strong>(s : String) : String;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="escape_chars"></span><code>Function <strong>escape_chars</strong>(s : String) : String;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="StringToGUID"></span><code>Function <strong>StringToGUID</strong>(GUID : String) : TGUID;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Tipos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TOnWriterProcess"></span><code><strong>TOnWriterProcess</strong> = Procedure (DataSet : TDataSet; RecNo, RecordCount : Integer;Var AbortProcess : Boolean) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWJSONType"></span><code><strong>TRESTDWJSONType</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="TRESTDWJSONObjectType">TRESTDWJSONObjectType</span></li>
+<li>
+<span id="TRESTDWJSONArrayType">TRESTDWJSONArrayType</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWJSONTypes"></span><code><strong>TRESTDWJSONTypes</strong>   = Set of <a href="uRESTDWJSONObject.html#TRESTDWJSONType">TRESTDWJSONType</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TDWParamExpType"></span><code><strong>TDWParamExpType</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Values</h6>
+<ul>
+<li>
+<span id="tdwpxt_All">tdwpxt_All</span></li>
+<li>
+<span id="tdwpxt_IN">tdwpxt_IN</span></li>
+<li>
+<span id="tdwpxt_OUT">tdwpxt_OUT</span></li>
+<li>
+<span id="tdwpxt_INOUT">tdwpxt_INOUT</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TProcedureEvent"></span><code><strong>TProcedureEvent</strong> = Procedure Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TNewDataField"></span><code><strong>TNewDataField</strong> = Procedure (FieldDefinition : <a href="uRESTDWBasicTypes.TFieldDefinition.html">TFieldDefinition</a>) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TFieldExist"></span><code><strong>TFieldExist</strong> = Function (Const Dataset : TDataset; Value : String) : TField Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TSetInitDataset"></span><code><strong>TSetInitDataset</strong> = Procedure (Const Value : Boolean) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TSetRecordCount"></span><code><strong>TSetRecordCount</strong> = Procedure (aJsonCount, aRecordCount : Integer) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TSetnotrepage"></span><code><strong>TSetnotrepage</strong> = Procedure (Value : Boolean) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TFieldListCount"></span><code><strong>TFieldListCount</strong> = Function : Integer Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TGetInDesignEvents"></span><code><strong>TGetInDesignEvents</strong> = Function : Boolean Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TPrepareDetails"></span><code><strong>TPrepareDetails</strong> = Procedure (ActiveMode : Boolean) Of Object;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PJSONParam"></span><code><strong>PJSONParam</strong> = &circ;<a href="uRESTDWJSONObject.TJSONParam.html">TJSONParam</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="PStringStream"></span><code><strong>PStringStream</strong> = &circ;TStringStream;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Constantes</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TSpecialChars"></span><code><strong>TSpecialChars</strong> : Array [0 .. 7] Of Char = ('\', '&quot;', '/', #8, #9, #10, #12, #13);</code></td>
+</tr>
+<tr><td colspan="1">
+<p>
+\b \t \n \f \r</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="MaxFloatLaz"></span><code><strong>MaxFloatLaz</strong>       = 15;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="LazDigitsSize"></span><code><strong>LazDigitsSize</strong>     = 6;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>

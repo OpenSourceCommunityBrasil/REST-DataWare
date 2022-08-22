@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>REST DataWare: uSock</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.16.0">
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<div class="container"><div class="navigation">
+<h2><a href="index.html">REST DataWare</a></h2><ul><li><a href="AllUnits.html">Units</a></li><li><a href="ClassHierarchy.html">Hierarquia de Classes</a></li><li><a href="AllClasses.html">Classes, Interfaces, Objetos e Registros</a></li><li><a href="AllTypes.html">Tipos</a></li><li><a href="AllVariables.html">Variáveis</a></li><li><a href="AllConstants.html">Constantes</a></li><li><a href="AllFunctions.html">Funções e Procedimentos</a></li><li><a href="AllIdentifiers.html">Identificadores</a></li></ul></div><div class="content">
+<h1 class="unit">Unit uSock</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Descrição</a></div><div class="one_section"><a class="section" href="#PasDoc-Uses">Uses</a></div><div class="one_section"><a class="section" href="#PasDoc-Classes">Classes, Interfaces, Objetos e Registros</a></div><div class="one_section"><a class="section" href="#PasDoc-FuncsProcs">Funções e Procedimentos</a></div><div class="one_section"><a class="section" href="#PasDoc-Types">Tipos</a></div><div class="one_section"><a class="section" href="#PasDoc-Constants">Constantes</a></div><div class="one_section">Variáveis</div></div>
+<span id="PasDoc-Description"></span><h2 class="description">Descrição</h2>
+&nbsp;<span id="PasDoc-Uses"></span><h2 class="uses">Uses</h2>
+<ul class="useslist"><li>Windows</li><li>Winsock</li></ul><h2 class="overview">Visão Geral</h2>
+<span id="PasDoc-Classes"></span><h3 class="cio">Classes, Interfaces, Objetos e Registros</h3>
+<table class="classestable wide_list">
+<tr class="listheader">
+<th class="itemname">Nome</th>
+<th class="itemdesc">Descrição</th>
+</tr>
+<tr class="list">
+<td class="itemname">Packed Record&nbsp;<a class="bold" href="uSock.SockAddr_Gen.html"><code>SockAddr_Gen</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Record&nbsp;<a class="bold" href="uSock.Interface_Info.html"><code>Interface_Info</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Record&nbsp;<a class="bold" href="uSock.tNetworkInterface.html"><code>tNetworkInterface</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+</table>
+<span id="PasDoc-FuncsProcs"></span><h3 class="summary">Funções e Procedimentos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code>Function <strong><a href="uSock.html#WSAIoctl">WSAIoctl</a></strong>(aSocket : TSocket; aCommand : <a href="DWDCPtypes.html#dword">DWord</a>; lpInBuffer : Pointer; dwInBufferLen : <a href="DWDCPtypes.html#dword">DWord</a>; lpOutBuffer : Pointer; dwOutBufferLen : <a href="DWDCPtypes.html#dword">DWord</a>; lpdwOutBytesReturned : LPDWord; lpOverLapped : Pointer; lpOverLappedRoutine : Pointer) : Integer; stdcall; external 'WS2_32.DLL';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code>Function <strong><a href="uSock.html#GetNetworkInterfaces">GetNetworkInterfaces</a></strong>(Var aNetworkInterfaceList : <a href="uSock.html#tNetworkInterfaceList">tNetworkInterfaceList</a>): Boolean;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Types"></span><h3 class="summary">Tipos</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uSock.html#tNetworkInterfaceList">tNetworkInterfaceList</a></strong> = Array of <a href="uSock.tNetworkInterface.html">tNetworkInterface</a>;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Constants"></span><h3 class="summary">Constantes</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uSock.html#SIO_GET_INTERFACE_LIST">SIO_GET_INTERFACE_LIST</a></strong> = $4004747F;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uSock.html#IFF_UP">IFF_UP</a></strong>                 = $00000001;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uSock.html#IFF_BROADCAST">IFF_BROADCAST</a></strong>          = $00000002;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uSock.html#IFF_LOOPBACK">IFF_LOOPBACK</a></strong>           = $00000004;</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uSock.html#IFF_POINTTOPOINT">IFF_POINTTOPOINT</a></strong>       = $00000008;</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uSock.html#IFF_MULTICAST">IFF_MULTICAST</a></strong>          = $00000010;</code></td>
+</tr>
+</table>
+<h2 class="description">Descrição</h2>
+<h3 class="detail">Funções e Procedimentos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="WSAIoctl"></span><code>Function <strong>WSAIoctl</strong>(aSocket : TSocket; aCommand : <a href="DWDCPtypes.html#dword">DWord</a>; lpInBuffer : Pointer; dwInBufferLen : <a href="DWDCPtypes.html#dword">DWord</a>; lpOutBuffer : Pointer; dwOutBufferLen : <a href="DWDCPtypes.html#dword">DWord</a>; lpdwOutBytesReturned : LPDWord; lpOverLapped : Pointer; lpOverLappedRoutine : Pointer) : Integer; stdcall; external 'WS2_32.DLL';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="GetNetworkInterfaces"></span><code>Function <strong>GetNetworkInterfaces</strong>(Var aNetworkInterfaceList : <a href="uSock.html#tNetworkInterfaceList">tNetworkInterfaceList</a>): Boolean;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Tipos</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="tNetworkInterfaceList"></span><code><strong>tNetworkInterfaceList</strong> = Array of <a href="uSock.tNetworkInterface.html">tNetworkInterface</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Constantes</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="SIO_GET_INTERFACE_LIST"></span><code><strong>SIO_GET_INTERFACE_LIST</strong> = $4004747F;</code></td>
+</tr>
+<tr><td colspan="1">
+<p>
+Constants found in manual on non-officially documented M$ Winsock functions</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="IFF_UP"></span><code><strong>IFF_UP</strong>                 = $00000001;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="IFF_BROADCAST"></span><code><strong>IFF_BROADCAST</strong>          = $00000002;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="IFF_LOOPBACK"></span><code><strong>IFF_LOOPBACK</strong>           = $00000004;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="IFF_POINTTOPOINT"></span><code><strong>IFF_POINTTOPOINT</strong>       = $00000008;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="IFF_MULTICAST"></span><code><strong>IFF_MULTICAST</strong>          = $00000010;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<hr><span class="appinfo"><em>Gerado por <a href="https://pasdoc.github.io/">PasDoc 0.16.0</a>. </em>
+</span>
+</div></div></body></html>
