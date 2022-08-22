@@ -413,7 +413,7 @@ Type
   {$IFDEF FPC}
   Property DatabaseCharSet         : TDatabaseCharSet              Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
-End;
+ End;
 
  Type
   TRESTDWServiceNotificationBase = Class(TRESTDWComponent)
@@ -2350,15 +2350,31 @@ Begin
                If (sFile <> '') Then
                 JSONParam.LoadFromStream(ms)
                Else If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(ms.DataString)) > 0) Then
-                JSONParam.FromJSON(ms.DataString)
+                Begin
+                 If vBinaryEvent Then
+                  Begin
+                   If Assigned(JSONParam) Then
+                    FreeAndNil(JSONParam);
+                   If ms.Size > 0 Then
+                    Begin
+                     DWParams.Clear;
+                     DWParams.LoadFromStream(ms);
+                    End;
+                  End
+                 Else
+                  JSONParam.FromJSON(ms.DataString);
+                End
                Else
                 Begin
                  If vBinaryEvent Then
                   Begin
                    If Assigned(JSONParam) Then
                     FreeAndNil(JSONParam);
-                   DWParams.Clear;
-                   DWParams.LoadFromStream(ms);
+                   If ms.Size > 0 Then
+                    Begin
+                     DWParams.Clear;
+                     DWParams.LoadFromStream(ms);
+                    End;
                   End
                  Else
                   Begin
