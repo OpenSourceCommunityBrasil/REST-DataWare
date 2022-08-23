@@ -142,7 +142,7 @@ Begin
                    vToken,
                    vResponseHeader,
                    -1,
-                   Nil,
+                   ARequest.CustomHeaders,
                    ARequest.ContentFields,
                    ARequest.QueryFields.Text,
                    vStream,

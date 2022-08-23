@@ -79,6 +79,7 @@ Var
  I,
  StatusCode      : Integer;
  ResultStream    : TStream;
+ vRawHeader,
  vResponseHeader : TStringList;
  mb              : TStringStream;
  vStream         : TStream;
@@ -113,6 +114,8 @@ Var
    FreeAndNil(vResponseHeader);
   If Assigned(vStream) Then
    FreeAndNil(vStream);
+  If Assigned(vRawHeader) Then
+   FreeAndNil(vRawHeader);
  End;
 Begin
  ResultStream    := TStringStream.Create('');
@@ -120,6 +123,7 @@ Begin
  vResponseString := '';
  vStream         := Nil;
  vRedirect       := Redirect;
+ ARequest.ReadTotalContent;
  Try
   If CORS Then
    Begin
@@ -155,6 +159,9 @@ Begin
   vToken     := ARequest.Authorization;
   //ARequest.Connection
   vStream    := TMemoryStream.Create;
+  vRawHeader := TStringList.Create;
+  If vToken <> '' Then
+   vRawHeader.Add('Authorization:' + vToken);
  {$IFNDEF FPC}
   If ARequest.ContentLength > 0 Then
    Begin
@@ -201,7 +208,7 @@ Begin
                    vToken,
                    vResponseHeader,
                    -1,
-                   Nil,
+                   vRawHeader,
                    ARequest.QueryFields,
                    ARequest.QueryFields.Text,
                    vStream,

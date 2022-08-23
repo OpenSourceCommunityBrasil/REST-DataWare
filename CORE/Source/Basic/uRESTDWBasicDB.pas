@@ -415,6 +415,7 @@ Type
                                      AuthenticationOptions : TRESTDWClientAuthOptionParams);
   Function    GetRestPoolers : TStringList;          //Retorna a Lista de DataSet Sources do Pooler
   Procedure   SetDataRoute(Value : String);
+  Function    BuildConnection(aBinaryRequest : Boolean) : TRESTDWPoolerMethodClient;
  Protected
   Procedure Loaded; override;
  Public
@@ -2263,32 +2264,9 @@ Begin
  if vRestPooler = '' then
   Exit;
  ParseParams;
- vRESTConnectionDB                 := TRESTDWPoolerMethodClient.Create(Nil);
- PoolerMethodClient                := vRESTConnectionDB;
- vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
- vRESTConnectionDB.AuthenticationOptions.Assign(vAuthOptionParams);
- vRESTConnectionDB.HandleRedirects := vHandleRedirects;
- vRESTConnectionDB.RedirectMaximum := vRedirectMaximum;
- vRESTConnectionDB.UserAgent       := vUserAgent;
- vRESTConnectionDB.WelcomeMessage := vWelcomeMessage;
- vRESTConnectionDB.Host           := vRestWebService;
- vRESTConnectionDB.Port           := vPoolerPort;
- vRESTConnectionDB.Compression    := vCompression;
- vRESTConnectionDB.TypeRequest    := VtypeRequest;
- vRESTConnectionDB.BinaryRequest  := hBinaryRequest;
- vRESTConnectionDB.Encoding       := vEncoding;
- vRESTConnectionDB.EncodeStrings  := EncodedStrings;
- vRESTConnectionDB.OnWork         := vOnWork;
- vRESTConnectionDB.OnWorkBegin    := vOnWorkBegin;
- vRESTConnectionDB.OnWorkEnd      := vOnWorkEnd;
- vRESTConnectionDB.OnStatus       := vOnStatus;
- vRESTConnectionDB.AccessTag      := vAccessTag;
- vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
- vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
- vRESTConnectionDB.DataRoute        := DataRoute;
- {$IFDEF FPC}
-  vRESTConnectionDB.DatabaseCharSet := csUndefined;
- {$ENDIF}
+ vRESTConnectionDB  := BuildConnection(hBinaryRequest);
+ PoolerMethodClient := vRESTConnectionDB;
+ CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
   If Params.Count > 0 Then
    DWParams     := GeTRESTDWParams(Params, vEncoding)
@@ -2301,7 +2279,7 @@ Begin
                                                      DWParams,     Error,
                                                      MessageError, SocketError, RowsAffected, vTimeOut, vConnectTimeOut, '',
                                                      vClientConnectionDefs.vConnectionDefs,
-                                                     RESTClientPooler);
+                                                     vRESTClientPooler);
     If Not(Error) or (MessageError <> cInvalidAuth) Then
      Break
     Else
@@ -2373,7 +2351,7 @@ Begin
                                                          DWParams,     Error,
                                                          MessageError, SocketError, RowsAffected, vTimeOut, vConnectTimeOut, '',
                                                          vClientConnectionDefs.vConnectionDefs,
-                                                         RESTClientPooler);
+                                                         vRESTClientPooler);
         If Not SocketError Then
          Begin
           If vFailOverReplaceDefaults Then
@@ -2491,38 +2469,14 @@ Var
     End;
  End;
 Begin
-// Result := Nil;
- SocketError := False; //Leandro 11/08/2020
- RESTClientPoolerExec := nil; //Leandro 11/08/2020
+ SocketError := False;
+ RESTClientPoolerExec := Nil;
  If vRestPooler = '' Then
   Exit;
  ParseParams;
- vRESTConnectionDB                 := TRESTDWPoolerMethodClient.Create(Nil);
- PoolerMethodClient                := vRESTConnectionDB;
- vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
- vRESTConnectionDB.AuthenticationOptions.Assign(vAuthOptionParams);
- vRESTConnectionDB.HandleRedirects := vHandleRedirects;
- vRESTConnectionDB.RedirectMaximum := vRedirectMaximum;
- vRESTConnectionDB.UserAgent       := vUserAgent;
- vRESTConnectionDB.WelcomeMessage  := vWelcomeMessage;
- vRESTConnectionDB.Host            := vRestWebService;
- vRESTConnectionDB.Port            := vPoolerPort;
- vRESTConnectionDB.Compression     := vCompression;
- vRESTConnectionDB.TypeRequest     := VtypeRequest;
- vRESTConnectionDB.BinaryRequest   := hBinaryRequest;
- vRESTConnectionDB.Encoding        := vEncoding;
- vRESTConnectionDB.EncodeStrings   := EncodedStrings;
- vRESTConnectionDB.OnWork          := vOnWork;
- vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
- vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
- vRESTConnectionDB.OnStatus        := vOnStatus;
- vRESTConnectionDB.AccessTag       := vAccessTag;
- vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
- vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
- vRESTConnectionDB.DataRoute        := DataRoute;
- {$IFDEF FPC}
-  vRESTConnectionDB.DatabaseCharSet := csUndefined;
- {$ENDIF}
+ vRESTConnectionDB  := BuildConnection(hBinaryRequest);
+ PoolerMethodClient := vRESTConnectionDB;
+ CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
   If Params.Count > 0 Then
    DWParams     := GeTRESTDWParams(Params, vEncoding)
@@ -2535,7 +2489,7 @@ Begin
                                                    DWParams,     Error,
                                                    MessageError, SocketError, RowsAffected, vTimeOut, vConnectTimeOut, '',
                                                    vClientConnectionDefs.vConnectionDefs,
-                                                   RESTClientPooler);
+                                                   vRESTClientPooler);
     If Not(Error) or (MessageError <> cInvalidAuth) Then
      Break
     Else
@@ -2607,7 +2561,7 @@ Begin
                                                        GetLineSQL(SQL), DWParams,     Error,
                                                        MessageError, SocketError, RowsAffected, vTimeOut, vConnectTimeOut, '',
                                                        vClientConnectionDefs.vConnectionDefs,
-                                                       RESTClientPooler);
+                                                       vRESTClientPooler);
         If Not SocketError Then
          Begin
           If vFailOverReplaceDefaults Then
@@ -2720,36 +2674,15 @@ Var
     End;
  End;
 Begin
- SocketError := False; //Leandro 11/08/2020
- RESTClientPoolerExec := nil; //Leandro 11/08/2020
+ SocketError := False;
+ RESTClientPoolerExec := Nil;
  Result := -1;
  if vRestPooler = '' then
   Exit;
  ParseParams;
- vRESTConnectionDB                  := TRESTDWPoolerMethodClient.Create(Nil);
- PoolerMethodClient                 := vRESTConnectionDB;
- vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
- vRESTConnectionDB.UserAgent        := vUserAgent;
- vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
- vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
- vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
- vRESTConnectionDB.Host             := vRestWebService;
- vRESTConnectionDB.Port             := vPoolerPort;
- vRESTConnectionDB.Compression      := vCompression;
- vRESTConnectionDB.TypeRequest      := VtypeRequest;
- vRESTConnectionDB.Encoding         := vEncoding;
- vRESTConnectionDB.OnWork           := vOnWork;
- vRESTConnectionDB.OnWorkBegin      := vOnWorkBegin;
- vRESTConnectionDB.OnWorkEnd        := vOnWorkEnd;
- vRESTConnectionDB.OnStatus         := vOnStatus;
- vRESTConnectionDB.AccessTag        := vAccessTag;
- vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
- vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
- vRESTConnectionDB.DataRoute        := DataRoute;
- {$IFDEF FPC}
-  vRESTConnectionDB.DatabaseCharSet := csUndefined;
- {$ENDIF}
- vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
+ vRESTConnectionDB  := BuildConnection(False);
+ PoolerMethodClient := vRESTConnectionDB;
+ CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
   For I := 0 To 1 Do
    Begin
@@ -2760,7 +2693,7 @@ Begin
                                                     vDataRoute, GetLineSQL(SQL),
                                                     DWParams, Error,
                                                     MessageError, SocketError, vTimeOut, vConnectTimeOut,
-                                                    vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
+                                                    vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
       FreeAndNil(DWParams);
      End
     Else
@@ -2768,7 +2701,7 @@ Begin
                                                         vDataRoute,
                                                         GetLineSQL(SQL), Error,
                                                         MessageError, SocketError, vTimeOut, vConnectTimeOut,
-                                                        vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
+                                                        vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     If Not(Error) or (MessageError <> cInvalidAuth) Then
      Break
     Else
@@ -2840,7 +2773,7 @@ Begin
                                                         vFailOverConnections[I].vDataRoute, GetLineSQL(SQL),
                                                         DWParams, Error,
                                                         MessageError, SocketError, vTimeOut, vConnectTimeOut,
-                                                        vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
+                                                        vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
           FreeAndNil(DWParams);
          End
         Else
@@ -2848,7 +2781,7 @@ Begin
                                                             vFailOverConnections[I].vDataRoute,
                                                             GetLineSQL(SQL), Error,
                                                             MessageError, SocketError, vTimeOut, vConnectTimeOut,
-                                                            vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
+                                                            vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
         If Not SocketError Then
          Begin
           If vFailOverReplaceDefaults Then
@@ -2934,8 +2867,8 @@ Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  SocketError          : Boolean;
 Begin
- SocketError := False; //Leandro 11/08/2020
- RESTClientPoolerExec := nil; //Leandro 11/08/2020
+ SocketError := False;
+ RESTClientPoolerExec := Nil;
  Result := False;
  If Not Assigned(TableNames) Then
   TableNames := TStringList.Create;
@@ -2945,34 +2878,8 @@ Begin
   SetConnection(True);
  If vConnected Then
   Begin
-   vRESTConnectionDB                       := TRESTDWPoolerMethodClient.Create(Nil);
-   vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
-   vRESTConnectionDB.UserAgent             := vUserAgent;
-   vRESTConnectionDB.HandleRedirects       := vHandleRedirects;
-   vRESTConnectionDB.RedirectMaximum       := vRedirectMaximum;
-   vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
-   vRESTConnectionDB.Host             := vRestWebService;
-   vRESTConnectionDB.Port             := vPoolerPort;
-   vRESTConnectionDB.Compression      := vCompression;
-   vRESTConnectionDB.TypeRequest      := VtypeRequest;
-   vRESTConnectionDB.Encoding         := vEncoding;
-   vRESTConnectionDB.AccessTag        := vAccessTag;
-   vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
-   vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
-   vRESTConnectionDB.DataRoute        := DataRoute;
-   vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
-   {$IFNDEF FPC}
-   vRESTConnectionDB.OnWork           := vOnWork;
-   vRESTConnectionDB.OnWorkBegin      := vOnWorkBegin;
-   vRESTConnectionDB.OnWorkEnd        := vOnWorkEnd;
-   vRESTConnectionDB.OnStatus         := vOnStatus;
-   {$ELSE}
-   vRESTConnectionDB.OnWork           := vOnWork;
-   vRESTConnectionDB.OnWorkBegin      := vOnWorkBegin;
-   vRESTConnectionDB.OnWorkEnd        := vOnWorkEnd;
-   vRESTConnectionDB.OnStatus         := vOnStatus;
-   vRESTConnectionDB.DatabaseCharSet  := csUndefined;
-   {$ENDIF}
+   vRESTConnectionDB  := BuildConnection(False);
+   CopyParams(vRESTConnectionDB, vRESTClientPooler);
    Try
     Result := vRESTConnectionDB.GetTableNames(vRestPooler, vDataRoute, TableNames,
                                               Result,      MessageError, SocketError, vTimeOut, vConnectTimeOut,
@@ -3048,7 +2955,7 @@ Begin
 End;
 
 Function TRESTDWDatabasebaseBase.GetFieldNames(TableName              : String;
-                                       Var FieldNames         : TStringList)  : Boolean;
+                                               Var FieldNames         : TStringList)  : Boolean;
 Var
  I                    : Integer;
  MessageError,
@@ -3057,8 +2964,8 @@ Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  SocketError          : Boolean;
 Begin
- SocketError := False; //Leandro 11/08/2020
- RESTClientPoolerExec := nil; //Leandro 11/08/2020
+ SocketError := False;
+ RESTClientPoolerExec := Nil;
  Result := False;
  If Not Assigned(FieldNames) Then
   FieldNames := TStringList.Create;
@@ -3068,34 +2975,8 @@ Begin
   SetConnection(True);
  If vConnected Then
   Begin
-   vRESTConnectionDB                  := TRESTDWPoolerMethodClient.Create(Nil);
-   vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
-   vRESTConnectionDB.UserAgent        := vUserAgent;
-   vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
-   vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
-   vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
-   vRESTConnectionDB.Host             := vRestWebService;
-   vRESTConnectionDB.Port             := vPoolerPort;
-   vRESTConnectionDB.Compression      := vCompression;
-   vRESTConnectionDB.TypeRequest      := VtypeRequest;
-   vRESTConnectionDB.Encoding         := vEncoding;
-   vRESTConnectionDB.AccessTag        := vAccessTag;
-   vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
-   vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
-   vRESTConnectionDB.DataRoute        := DataRoute;
-   vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
-   {$IFNDEF FPC}
-   vRESTConnectionDB.OnWork           := vOnWork;
-   vRESTConnectionDB.OnWorkBegin      := vOnWorkBegin;
-   vRESTConnectionDB.OnWorkEnd        := vOnWorkEnd;
-   vRESTConnectionDB.OnStatus         := vOnStatus;
-   {$ELSE}
-   vRESTConnectionDB.OnWork           := vOnWork;
-   vRESTConnectionDB.OnWorkBegin      := vOnWorkBegin;
-   vRESTConnectionDB.OnWorkEnd        := vOnWorkEnd;
-   vRESTConnectionDB.OnStatus         := vOnStatus;
-   vRESTConnectionDB.DatabaseCharSet  := csUndefined;
-   {$ENDIF}
+   vRESTConnectionDB  := BuildConnection(False);
+   CopyParams(vRESTConnectionDB, vRESTClientPooler);
    Try
     Result := vRESTConnectionDB.GetFieldNames(vRestPooler, vDataRoute, TableName, FieldNames,
                                               Result,      MessageError, SocketError, vTimeOut, vConnectTimeOut,
@@ -3171,7 +3052,7 @@ Begin
 End;
 
 Function TRESTDWDatabasebaseBase.GetKeyFieldNames(TableName              : String;
-                                          Var FieldNames         : TStringList)  : Boolean;
+                                                  Var FieldNames         : TStringList)  : Boolean;
 Var
  I                    : Integer;
  MessageError,
@@ -3180,8 +3061,8 @@ Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  SocketError          : Boolean;
 Begin
- SocketError := False; //Leandro 11/08/2020
- RESTClientPoolerExec := nil; //Leandro 11/08/2020
+ SocketError := False;
+ RESTClientPoolerExec := Nil;
  Result := False;
  If Not Assigned(FieldNames) Then
   FieldNames := TStringList.Create;
@@ -3191,34 +3072,8 @@ Begin
   SetConnection(True);
  If vConnected Then
   Begin
-   vRESTConnectionDB                  := TRESTDWPoolerMethodClient.Create(Nil);
-   vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
-   vRESTConnectionDB.UserAgent        := vUserAgent;
-   vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
-   vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
-   vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
-   vRESTConnectionDB.Host             := vRestWebService;
-   vRESTConnectionDB.Port             := vPoolerPort;
-   vRESTConnectionDB.Compression      := vCompression;
-   vRESTConnectionDB.TypeRequest      := VtypeRequest;
-   vRESTConnectionDB.Encoding         := vEncoding;
-   vRESTConnectionDB.AccessTag        := vAccessTag;
-   vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
-   vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
-   vRESTConnectionDB.DataRoute        := DataRoute;
-   vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
-   {$IFNDEF FPC}
-   vRESTConnectionDB.OnWork           := vOnWork;
-   vRESTConnectionDB.OnWorkBegin      := vOnWorkBegin;
-   vRESTConnectionDB.OnWorkEnd        := vOnWorkEnd;
-   vRESTConnectionDB.OnStatus         := vOnStatus;
-   {$ELSE}
-   vRESTConnectionDB.OnWork           := vOnWork;
-   vRESTConnectionDB.OnWorkBegin      := vOnWorkBegin;
-   vRESTConnectionDB.OnWorkEnd        := vOnWorkEnd;
-   vRESTConnectionDB.OnStatus         := vOnStatus;
-   vRESTConnectionDB.DatabaseCharSet  := csUndefined;
-   {$ENDIF}
+   vRESTConnectionDB  := BuildConnection(False);
+   CopyParams(vRESTConnectionDB, vRESTClientPooler);
    Try
     FieldNames.Clear;
     Result := vRESTConnectionDB.GetKeyFieldNames(vRestPooler, vDataRoute, TableName, FieldNames,
@@ -3354,9 +3209,8 @@ Var
    End;
  End;
 Begin
- SocketError := False; //Leandro 11/08/2020
- RESTClientPoolerExec := nil; //Leandro 11/08/2020
-
+ SocketError := False;
+ RESTClientPoolerExec := nil;
  vStream := Nil;
  vLinesDS := '';
  For I := 0 To Length(Datasets) -1 Do
@@ -3375,35 +3229,8 @@ Begin
   Exit;
  If Not vConnected Then
   SetConnection(True);
- vRESTConnectionDB                  := TRESTDWPoolerMethodClient.Create(Nil);
- vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
- vRESTConnectionDB.UserAgent        := vUserAgent;
- vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
- vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
- vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
- vRESTConnectionDB.Host             := vRestWebService;
- vRESTConnectionDB.Port             := vPoolerPort;
- vRESTConnectionDB.Compression      := vCompression;
- vRESTConnectionDB.TypeRequest      := VtypeRequest;
- vRESTConnectionDB.Encoding         := vEncoding;
- vRESTConnectionDB.AccessTag        := vAccessTag;
- vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
- vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
- vRESTConnectionDB.DataRoute        := DataRoute;
- vRESTConnectionDB.BinaryRequest    := BinaryRequest;
- vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
- {$IFNDEF FPC}
-  vRESTConnectionDB.OnWork          := vOnWork;
-  vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
-  vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
-  vRESTConnectionDB.OnStatus        := vOnStatus;
- {$ELSE}
-  vRESTConnectionDB.OnWork          := vOnWork;
-  vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
-  vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
-  vRESTConnectionDB.OnStatus        := vOnStatus;
-  vRESTConnectionDB.DatabaseCharSet := csUndefined;
- {$ENDIF}
+ vRESTConnectionDB  := BuildConnection(BinaryRequest);
+ CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
   For I := 0 To 1 Do
    Begin
@@ -3662,32 +3489,9 @@ Begin
  If vRestPooler = '' Then
   Exit;
  ParseParams;
- vRESTConnectionDB                  := TRESTDWPoolerMethodClient.Create(Nil);
- PoolerMethodClient                 := vRESTConnectionDB;
- vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
- vRESTConnectionDB.UserAgent        := vUserAgent;
- vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
- vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
- vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
- vRESTConnectionDB.Host             := vRestWebService;
- vRESTConnectionDB.Port             := vPoolerPort;
- vRESTConnectionDB.Compression      := vCompression;
- vRESTConnectionDB.TypeRequest      := VtypeRequest;
- vRESTConnectionDB.Encoding         := vEncoding;
- vRESTConnectionDB.EncodeStrings    := EncodedStrings;
- vRESTConnectionDB.OnWork           := vOnWork;
- vRESTConnectionDB.OnWorkBegin      := vOnWorkBegin;
- vRESTConnectionDB.OnWorkEnd        := vOnWorkEnd;
- vRESTConnectionDB.OnStatus         := vOnStatus;
- vRESTConnectionDB.AccessTag        := vAccessTag;
- vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
- vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
- vRESTConnectionDB.DataRoute        := DataRoute;
- vRESTConnectionDB.BinaryRequest    := BinaryRequest;
- vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
- {$IFDEF FPC}
-  vRESTConnectionDB.DatabaseCharSet := csUndefined;
- {$ENDIF}
+ vRESTConnectionDB  := BuildConnection(BinaryRequest);
+ PoolerMethodClient := vRESTConnectionDB;
+ CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
   If Params.Count > 0 Then
    Begin
@@ -3697,7 +3501,7 @@ Begin
                                                            Tablename,
                                                            DWParams, Error,
                                                            MessageError, SocketError, RowsAffected, BinaryRequest, BinaryCompatibleMode,
-                                                           Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
+                                                           Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     FreeAndNil(DWParams);
    End
   Else
@@ -3706,7 +3510,7 @@ Begin
                                                               Tablename,
                                                               Error,
                                                               MessageError, SocketError, RowsAffected, BinaryRequest, BinaryCompatibleMode,
-                                                              Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
+                                                              Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
   If SocketError Then
    Begin
     If vFailOver Then
@@ -3754,7 +3558,7 @@ Begin
                                                                  Tablename,
                                                                  DWParams, Error,
                                                                  MessageError, SocketError, RowsAffected, BinaryRequest, BinaryCompatibleMode,
-                                                                 Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
+                                                                 Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
           FreeAndNil(DWParams);
          End
         Else
@@ -3763,7 +3567,7 @@ Begin
                                                                     Tablename,
                                                                     Error,
                                                                     MessageError, SocketError, RowsAffected, BinaryRequest, BinaryCompatibleMode,
-                                                                    Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
+                                                                    Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
         If Not SocketError Then
          Begin
           If vFailOverReplaceDefaults Then
@@ -3914,38 +3718,14 @@ Var
 Begin
  LDataSetList         := Nil;
  RESTClientPoolerExec := Nil;
- SocketError          := False; //Leandro 11/08/2020
+ SocketError          := False;
  vLocalClient         := False;
  If vRestPooler = '' Then
   Exit;
  ParseParams;
- vRESTConnectionDB                  := TRESTDWPoolerMethodClient.Create(Nil);
- PoolerMethodClient                 := vRESTConnectionDB;
- vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
- vRESTConnectionDB.UserAgent        := vUserAgent;
- vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
- vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
- vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
- vRESTConnectionDB.Host             := vRestWebService;
- vRESTConnectionDB.Port             := vPoolerPort;
- vRESTConnectionDB.Compression      := vCompression;
- vRESTConnectionDB.TypeRequest      := VtypeRequest;
- vRESTConnectionDB.Encoding         := vEncoding;
- vRESTConnectionDB.EncodeStrings    := EncodedStrings;
- vRESTConnectionDB.OnWork           := vOnWork;
- vRESTConnectionDB.OnWorkBegin      := vOnWorkBegin;
- vRESTConnectionDB.OnWorkEnd        := vOnWorkEnd;
- vRESTConnectionDB.OnStatus         := vOnStatus;
- vRESTConnectionDB.AccessTag        := vAccessTag;
- vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
- vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
- vRESTConnectionDB.DataRoute        := DataRoute;
- vRESTConnectionDB.BinaryRequest    := BinaryRequest;
- vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
- {$IFDEF FPC}
-  vRESTConnectionDB.DatabaseCharSet := csUndefined;
- {$ENDIF}
- {Eloy - Adicionado mais um try para free de objects}
+ vRESTConnectionDB  := BuildConnection(BinaryRequest);
+ PoolerMethodClient := vRESTConnectionDB;
+ CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
    Try
     vSQL           := SQL.Text;
@@ -3956,7 +3736,7 @@ Begin
                                                            vDataRoute, vSQL,
                                                            DWParams, Error,
                                                            MessageError, SocketError, RowsAffected, Execute, BinaryRequest, BinaryCompatibleMode,
-                                                           Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
+                                                           Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
       FreeAndNil(DWParams);
      End
     Else
@@ -3964,7 +3744,7 @@ Begin
                                                               vDataRoute,
                                                               vSQL, Error,
                                                               MessageError, SocketError, RowsAffected, Execute, BinaryRequest, BinaryCompatibleMode,
-                                                              Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
+                                                              Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     If SocketError Then
      Begin
       If vFailOver Then
@@ -4014,7 +3794,7 @@ Begin
                                                                  vFailOverConnections[I].vDataRoute, GetLineSQL(SQL),
                                                                  DWParams, Error,
                                                                  MessageError, SocketError, RowsAffected, Execute, BinaryRequest, BinaryCompatibleMode,
-                                                                 Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
+                                                                 Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
             FreeAndNil(DWParams);
            End
           Else
@@ -4022,7 +3802,7 @@ Begin
                                                                     vFailOverConnections[I].vDataRoute,
                                                                     GetLineSQL(SQL), Error,
                                                                     MessageError, SocketError, RowsAffected, Execute, BinaryRequest, BinaryCompatibleMode,
-                                                                    Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, RESTClientPooler);
+                                                                    Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
           If Not SocketError Then
            Begin
             If vFailOverReplaceDefaults Then
@@ -4207,22 +3987,8 @@ Var
  vConnection : TRESTDWPoolerMethodClient;
  I           : Integer;
 Begin
- vConnection                  := TRESTDWPoolerMethodClient.Create(Nil);
- vConnection.PoolerNotFoundMessage := PoolerNotFoundMessage;
- vConnection.UserAgent        := vUserAgent;
- vConnection.HandleRedirects  := vHandleRedirects;
- vConnection.RedirectMaximum  := vRedirectMaximum;
- vConnection.WelcomeMessage   := vWelcomeMessage;
- vConnection.Host             := vRestWebService;
- vConnection.Port             := vPoolerPort;
- vConnection.Compression      := vCompression;
- vConnection.TypeRequest      := VtypeRequest;
- vConnection.AccessTag        := vAccessTag;
- vConnection.Encoding         := Encoding;
- vConnection.CriptOptions.Use := VCripto.Use;
- vConnection.CriptOptions.Key := VCripto.Key;
- vConnection.DataRoute        := DataRoute;
- vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
+ vConnection  := BuildConnection(False);
+ CopyParams(vConnection, vRESTClientPooler);
  Result := TStringList.Create;
  Try
   vTempList := vConnection.GetServerEvents(vDataRoute, vTimeOut, vConnectTimeOut, vRESTClientPooler);
@@ -4243,6 +4009,8 @@ Begin
      vOnEventConnection(False, E.Message);
    End;
  End;
+ If Assigned(vConnection) Then
+  FreeAndNil(vConnection);
 End;
 
 Function TRESTDWDatabasebaseBase.GetStateDB: Boolean;
@@ -4355,8 +4123,8 @@ Begin
 End;
 
 Procedure TRESTDWDatabasebaseBase.ProcessMassiveSQLCache(Var MassiveSQLCache    : TRESTDWMassiveCacheSQLList;
-                                                 Var Error              : Boolean;
-                                                 Var MessageError       : String);
+                                                         Var Error              : Boolean;
+                                                         Var MessageError       : String);
 Var
  I                    : Integer;
  vUpdateLine          : String;
@@ -4365,8 +4133,8 @@ Var
  ResultData           : TJSONValue;
  SocketError          : Boolean;
 Begin
- SocketError := False; //Leandro 11/08/2020
- RESTClientPoolerExec := nil; //Leandro 11/08/2020
+ SocketError := False;
+ RESTClientPoolerExec := nil;
  If MassiveSQLCache.Count > 0 Then
   Begin
    vUpdateLine := MassiveSQLCache.ToJSON;
@@ -4376,34 +4144,8 @@ Begin
     SetConnection(True);
    If vConnected Then
     Begin
-     vRESTConnectionDB                  := TRESTDWPoolerMethodClient.Create(Nil);
-     vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
-     vRESTConnectionDB.UserAgent        := vUserAgent;
-     vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
-     vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
-     vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
-     vRESTConnectionDB.Host             := vRestWebService;
-     vRESTConnectionDB.Port             := vPoolerPort;
-     vRESTConnectionDB.Compression      := vCompression;
-     vRESTConnectionDB.TypeRequest      := VtypeRequest;
-     vRESTConnectionDB.Encoding         := vEncoding;
-     vRESTConnectionDB.AccessTag        := vAccessTag;
-     vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
-     vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
-     vRESTConnectionDB.DataRoute        := DataRoute;
-     vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
-     {$IFNDEF FPC}
-     vRESTConnectionDB.OnWork          := vOnWork;
-     vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
-     vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
-     vRESTConnectionDB.OnStatus        := vOnStatus;
-     {$ELSE}
-     vRESTConnectionDB.OnWork          := vOnWork;
-     vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
-     vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
-     vRESTConnectionDB.OnStatus        := vOnStatus;
-     vRESTConnectionDB.DatabaseCharSet := csUndefined;
-     {$ENDIF}
+     vRESTConnectionDB  := BuildConnection(False);
+     CopyParams(vRESTConnectionDB, vRESTClientPooler);
      Try
       For I := 0 To 1 Do
        Begin
@@ -4518,8 +4260,8 @@ Begin
 End;
 
 Procedure TRESTDWDatabasebaseBase.ProcessMassiveSQLCache(Var MassiveSQLCache    : TRESTDWMassiveSQLCache;
-                                                 Var Error              : Boolean;
-                                                 Var MessageError       : String);
+                                                         Var Error              : Boolean;
+                                                         Var MessageError       : String);
 Var
  I                    : Integer;
  vUpdateLine          : String;
@@ -4528,8 +4270,8 @@ Var
  ResultData           : TJSONValue;
  SocketError          : Boolean;
 Begin
- SocketError := False; //Leandro 11/08/2020
- RESTClientPoolerExec := nil; //Leandro 11/08/2020
+ SocketError := False;
+ RESTClientPoolerExec := nil;
  If MassiveSQLCache.MassiveCount > 0 Then
   Begin
    vUpdateLine := MassiveSQLCache.ToJSON;
@@ -4539,34 +4281,8 @@ Begin
     SetConnection(True);
    If vConnected Then
     Begin
-     vRESTConnectionDB                  := TRESTDWPoolerMethodClient.Create(Nil);
-     vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
-     vRESTConnectionDB.UserAgent        := vUserAgent;
-     vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
-     vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
-     vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
-     vRESTConnectionDB.Host             := vRestWebService;
-     vRESTConnectionDB.Port             := vPoolerPort;
-     vRESTConnectionDB.Compression      := vCompression;
-     vRESTConnectionDB.TypeRequest      := VtypeRequest;
-     vRESTConnectionDB.Encoding         := vEncoding;
-     vRESTConnectionDB.AccessTag        := vAccessTag;
-     vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
-     vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
-     vRESTConnectionDB.DataRoute        := DataRoute;
-     vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
-     {$IFNDEF FPC}
-     vRESTConnectionDB.OnWork          := vOnWork;
-     vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
-     vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
-     vRESTConnectionDB.OnStatus        := vOnStatus;
-     {$ELSE}
-     vRESTConnectionDB.OnWork          := vOnWork;
-     vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
-     vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
-     vRESTConnectionDB.OnStatus        := vOnStatus;
-     vRESTConnectionDB.DatabaseCharSet := csUndefined;
-     {$ENDIF}
+     vRESTConnectionDB  := BuildConnection(False);
+     CopyParams(vRESTConnectionDB, vRESTClientPooler);
      Try
       For I := 0 To 1 Do
        Begin
@@ -4681,8 +4397,8 @@ Begin
 End;
 
 Procedure TRESTDWDatabasebaseBase.ApplyUpdates(Datasets               : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
-                                       Var Error              : Boolean;
-                                       Var MessageError       : String);
+                                               Var Error              : Boolean;
+                                               Var MessageError       : String);
 Var
  vJsonLine,
  vLinesDS             : String;
@@ -4715,34 +4431,8 @@ Begin
  vJsonLine := '';
  if vRestPooler = '' then
   Exit;
- vRESTConnectionDB                  := TRESTDWPoolerMethodClient.Create(Nil);
- vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
- vRESTConnectionDB.UserAgent        := vUserAgent;
- vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
- vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
- vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
- vRESTConnectionDB.Host             := vRestWebService;
- vRESTConnectionDB.Port             := vPoolerPort;
- vRESTConnectionDB.Compression      := vCompression;
- vRESTConnectionDB.TypeRequest      := VtypeRequest;
- vRESTConnectionDB.Encoding         := vEncoding;
- vRESTConnectionDB.AccessTag        := vAccessTag;
- vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
- vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
- vRESTConnectionDB.DataRoute        := DataRoute;
- vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
- {$IFNDEF FPC}
-  vRESTConnectionDB.OnWork          := vOnWork;
-  vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
-  vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
-  vRESTConnectionDB.OnStatus        := vOnStatus;
- {$ELSE}
-  vRESTConnectionDB.OnWork          := vOnWork;
-  vRESTConnectionDB.OnWorkBegin     := vOnWorkBegin;
-  vRESTConnectionDB.OnWorkEnd       := vOnWorkEnd;
-  vRESTConnectionDB.OnStatus        := vOnStatus;
-  vRESTConnectionDB.DatabaseCharSet := csUndefined;
- {$ENDIF}
+ vRESTConnectionDB  := BuildConnection(False);
+ CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
   For I := 0 To 1 Do
    Begin
@@ -4949,8 +4639,8 @@ Begin
 End;
 
 Procedure TRESTDWDatabasebaseBase.ApplyUpdates(Var MassiveCache       : TRESTDWMassiveCache;
-                                       Var Error              : Boolean;
-                                       Var MessageError       : String);
+                                               Var Error              : Boolean;
+                                               Var MessageError       : String);
 Var
  I                    : Integer;
  vUpdateLine          : String;
@@ -4961,8 +4651,8 @@ Var
  SocketError          : Boolean;
 Begin
  vLocalClient := False;
- SocketError := False; //Leandro 11/08/2020
- RESTClientPoolerExec := nil; //Leandro 11/08/2020
+ SocketError := False;
+ RESTClientPoolerExec := nil;
  If MassiveCache.MassiveCount > 0 Then
   Begin
    vUpdateLine := MassiveCache.ToJSON;
@@ -4972,34 +4662,8 @@ Begin
     SetConnection(True);
    If vConnected Then
     Begin
-     vRESTConnectionDB                  := TRESTDWPoolerMethodClient.Create(Nil);
-     vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
-     vRESTConnectionDB.UserAgent        := vUserAgent;
-     vRESTConnectionDB.HandleRedirects  := vHandleRedirects;
-     vRESTConnectionDB.RedirectMaximum  := vRedirectMaximum;
-     vRESTConnectionDB.WelcomeMessage   := vWelcomeMessage;
-     vRESTConnectionDB.Host             := vRestWebService;
-     vRESTConnectionDB.Port             := vPoolerPort;
-     vRESTConnectionDB.Compression      := vCompression;
-     vRESTConnectionDB.TypeRequest      := VtypeRequest;
-     vRESTConnectionDB.Encoding         := vEncoding;
-     vRESTConnectionDB.AccessTag        := vAccessTag;
-     vRESTConnectionDB.CriptOptions.Use := VCripto.Use;
-     vRESTConnectionDB.CriptOptions.Key := VCripto.Key;
-     vRESTConnectionDB.DataRoute        := DataRoute;
-     vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
-     {$IFNDEF FPC}
-     vRESTConnectionDB.OnWork           := vOnWork;
-     vRESTConnectionDB.OnWorkBegin      := vOnWorkBegin;
-     vRESTConnectionDB.OnWorkEnd        := vOnWorkEnd;
-     vRESTConnectionDB.OnStatus         := vOnStatus;
-     {$ELSE}
-     vRESTConnectionDB.OnWork           := vOnWork;
-     vRESTConnectionDB.OnWorkBegin      := vOnWorkBegin;
-     vRESTConnectionDB.OnWorkEnd        := vOnWorkEnd;
-     vRESTConnectionDB.OnStatus         := vOnStatus;
-     vRESTConnectionDB.DatabaseCharSet  := csUndefined;
-     {$ENDIF}
+     vRESTConnectionDB  := BuildConnection(False);
+     CopyParams(vRESTConnectionDB, vRESTClientPooler);
      Try
       For I := 0 To 1 Do
        Begin
@@ -5179,7 +4843,7 @@ Begin
  Connection.EncodeStrings             := EncodeStrings;
  Connection.Encoding                  := Encoding;
  Connection.AccessTag                 := AccessTag;
- If assigned(ConnectionExec) then  //Leandro 11/08/2020
+ If assigned(ConnectionExec) Then
   Begin
    ConnectionExec.Host                  := Connection.Host;
    ConnectionExec.Port                  := Connection.Port;
@@ -5498,6 +5162,39 @@ Begin
   End;
 End;
 
+Function TRESTDWDatabasebaseBase.BuildConnection(aBinaryRequest : Boolean) : TRESTDWPoolerMethodClient;
+Begin
+ Result                       := TRESTDWPoolerMethodClient.Create(Nil);
+ Result.PoolerNotFoundMessage := PoolerNotFoundMessage;
+ Result.AuthenticationOptions.Assign(AuthenticationOptions);
+ Result.HandleRedirects       := HandleRedirects;
+ Result.BinaryRequest         := aBinaryRequest;
+ Result.RedirectMaximum       := RedirectMaximum;
+ Result.UserAgent             := UserAgent;
+ Result.WelcomeMessage        := WelcomeMessage;
+ Result.Host                  := PoolerService;
+ Result.Port                  := PoolerPort;
+ Result.Compression           := Compression;
+ Result.TypeRequest           := TypeRequest;
+ Result.Encoding              := Encoding;
+ Result.EncodeStrings         := EncodedStrings;
+ Result.OnWork                := OnWork;
+ Result.OnWorkBegin           := OnWorkBegin;
+ Result.OnWorkEnd             := OnWorkEnd;
+ Result.OnStatus              := OnStatus;
+ Result.AccessTag             := AccessTag;
+ Result.CriptOptions.Use      := CriptOptions.Use;
+ Result.CriptOptions.Key      := CriptOptions.Key;
+ Result.DataRoute             := DataRoute;
+ Result.Accept                := Accept;
+ Result.AcceptEncoding        := AcceptEncoding;
+ Result.ContentType           := ContentType;
+ Result.ContentEncoding       := ContentEncoding;
+ {$IFDEF FPC}
+  Result.DatabaseCharSet      := csUndefined;
+ {$ENDIF}
+End;
+
 Procedure TRESTDWDatabasebaseBase.SetConnection(Value : Boolean);
 Var
  vRESTConnectionDB : TRESTDWPoolerMethodClient;
@@ -5511,36 +5208,8 @@ Begin
   Begin
    If Value then
     Begin
-     vRESTConnectionDB                 := TRESTDWPoolerMethodClient.Create(Nil);
-     vRESTConnectionDB.PoolerNotFoundMessage := PoolerNotFoundMessage;
-     vRESTConnectionDB.AuthenticationOptions.Assign(AuthenticationOptions);
-     vRESTConnectionDB.HandleRedirects  := HandleRedirects;
-     vRESTConnectionDB.RedirectMaximum  := RedirectMaximum;
-     vRESTConnectionDB.UserAgent        := UserAgent;
-     vRESTConnectionDB.WelcomeMessage   := WelcomeMessage;
-     vRESTConnectionDB.Host             := PoolerService;
-     vRESTConnectionDB.Port             := PoolerPort;
-     vRESTConnectionDB.Compression      := Compression;
-     vRESTConnectionDB.TypeRequest      := TypeRequest;
-     vRESTConnectionDB.BinaryRequest    := False;
-     vRESTConnectionDB.Encoding         := Encoding;
-     vRESTConnectionDB.EncodeStrings    := EncodedStrings;
-     vRESTConnectionDB.OnWork           := OnWork;
-     vRESTConnectionDB.OnWorkBegin      := OnWorkBegin;
-     vRESTConnectionDB.OnWorkEnd        := OnWorkEnd;
-     vRESTConnectionDB.OnStatus         := OnStatus;
-     vRESTConnectionDB.AccessTag        := AccessTag;
-     vRESTConnectionDB.CriptOptions.Use := CriptOptions.Use;
-     vRESTConnectionDB.CriptOptions.Key := CriptOptions.Key;
-     vRESTConnectionDB.DataRoute        := DataRoute;
-     vRESTConnectionDB.Accept           := Accept;
-     vRESTConnectionDB.AcceptEncoding   := AcceptEncoding;
-     vRESTConnectionDB.ContentType      := ContentType;
-     vRESTConnectionDB.ContentEncoding  := ContentEncoding;
-     {$IFDEF FPC}
-      vRESTConnectionDB.DatabaseCharSet := csUndefined;
-     {$ENDIF}
      Try
+      vRESTConnectionDB := BuildConnection(False);
       CopyParams(vRESTConnectionDB, vRESTClientPooler);
       vConnected := TryConnect(vRESTConnectionDB);
      Finally
