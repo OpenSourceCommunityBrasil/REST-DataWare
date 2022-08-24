@@ -2611,7 +2611,7 @@ Constructor TRESTDWIdClientREST.Create(AOwner: TComponent);
 Begin
  Inherited;
  ContentType                    := 'application/json';
- ContentEncoding                := 'multipart/form-data';
+ ContentEncoding                := 'application/x-www-form-urlencoded'; //'multipart/form-data';
  Accept                         := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
 // AcceptEncoding                 := 'gzip, deflate, br';
  AcceptEncoding                 := '';
