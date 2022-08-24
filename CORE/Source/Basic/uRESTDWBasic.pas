@@ -3103,10 +3103,9 @@ Begin
                             End;
                           End;
             rdwAOBearer : Begin
-                             if vUrlToExec[InitStrPos]='/' then
-                               vUrlToken := Lowercase(Copy(vUrlToExec,InitStrPos+1, Length(vUrlToExec)))
-                             else
-                              vUrlToken := Lowercase(vUrlToExec);
+                           vUrlToken := Lowercase(vUrlToExec);
+                           If Copy(vUrlToken, InitStrPos, 1) = '/' then
+                            Delete(vUrlToken, InitStrPos, 1);
                            If vUrlToken =
                               Lowercase(TRESTDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).GetTokenEvent) Then
                             Begin
@@ -3289,10 +3288,7 @@ Begin
                             End;
                           End;
             rdwAOToken  : Begin
-                           if vUrlToExec[InitStrPos]='/' then
-                               vUrlToken := Lowercase(Copy(vUrlToExec,InitStrPos+1, Length(vUrlToExec)))
-                           else
-                              vUrlToken := Lowercase(vUrlToExec);
+                           vUrlToken := Lowercase(vUrlToExec);
                            If vUrlToken =
                               Lowercase(TRESTDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).GetTokenEvent) Then
                             Begin
@@ -6624,7 +6620,6 @@ Begin
  {$ELSE}
  {$ENDIF}
  vServerAuthOptions                     := TRESTDWServerAuthOptionParams.Create(Self);
-// vServerAuthOptions.AuthorizationOption := rdwAONone;
  vActive                                := False;
  vEncoding                              := esUtf8;
  vServicePort                           := 8082;

@@ -3288,7 +3288,7 @@ Procedure TRESTDWIdServicePooler.CreatePostStream(AContext        : TIdContext;
 Var
  headerIndex : Integer;
  vValueAuth  : String;
- vAuthValue  : TRESTDWAuthOAuth;
+ vAuthValue  : TRESTDWAuthOptionTokenClient;
 Begin
  headerIndex := AHeaders.IndexOfName('Authorization');
  If (headerIndex = -1) Then
@@ -3313,7 +3313,7 @@ Begin
    vValueAuth  := AHeaders[headerIndex];
    If AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken] Then
     Begin
-     vAuthValue       := TRESTDWAuthOAuth.Create;
+     vAuthValue       := TRESTDWAuthOptionTokenClient.Create;
      vAuthValue.Token := vValueAuth;
      {$IFNDEF FPC}
       {$IF Not Defined(HAS_FMX)}

@@ -278,6 +278,8 @@ Begin
             Begin
              If Copy(vTempValue, Length(vTempValue), 1) = '/' Then
               Delete(vTempValue, Length(vTempValue), 1);
+             If Copy(URL, Length(URL), 1) = '/' Then
+              Delete(URL, Length(URL), 1);
             End;
            Break;
           End;
@@ -292,14 +294,14 @@ Begin
          If vIsQuery Then
           Begin
            vTempRoute := vTempRoute + '?';
-           If Copy(vTempValue, 1, Length(vTempValue)) <> '?' Then
+           If Copy(vTempValue, Length(vTempValue), 1) <> '?' Then
             vTempValue := vTempValue + '?';
           End
          Else
           Begin
            vTempRoute := vTempRoute + '/';
-           If Copy(vTempValue, 1, Length(vTempValue)) <> '/' Then
-            vTempValue := vTempValue + '/';
+           If Copy(vTempValue, Length(vTempValue), 1) <> '/' Then
+            vTempValue :=  vTempValue + '/';
           End;
          Result     := vTempRoute = Copy(vTempValue, 1, Length(vTempRoute));
          If Result Then
@@ -313,11 +315,15 @@ Begin
               Delete(vTempValue, 1, 1);
              If Copy(vTempValue, Length(vTempValue), 1) = '?' Then
               Delete(vTempValue, Length(vTempValue), 1);
+             If Copy(URL, Length(URL), 1) = '?' Then
+              Delete(URL, Length(URL), 1);
             End
            Else
             Begin
              If Copy(vTempValue, Length(vTempValue), 1) = '/' Then
               Delete(vTempValue, Length(vTempValue), 1);
+             If Copy(URL, Length(URL), 1) = '/' Then
+              Delete(URL, Length(URL), 1);
             End;
            Break;
           End;
