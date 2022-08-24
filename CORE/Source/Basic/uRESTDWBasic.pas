@@ -3073,6 +3073,7 @@ Begin
                             vNeedAuthorization := vTempEvent.NeedAuthorization;
                            If vNeedAuthorization Then
                             Begin
+
                              vAuthenticationString := DecodeStrings(StringReplace(RawHeaders.Values['Authorization'], 'Basic ', '', [rfReplaceAll]){$IFDEF FPC}, vDatabaseCharSet{$ENDIF});; //Authentication.Authentication;// RawHeaders.Values['Authorization'];
                              If (vAuthenticationString <> '') And
                                 ((AuthUsername = '') And (AuthPassword = '')) Then
@@ -3102,7 +3103,10 @@ Begin
                             End;
                           End;
             rdwAOBearer : Begin
-                           vUrlToken := Lowercase(vUrlToExec);
+                             if vUrlToExec[InitStrPos]='/' then
+                               vUrlToken := Lowercase(Copy(vUrlToExec,InitStrPos+1, Length(vUrlToExec)))
+                             else
+                              vUrlToken := Lowercase(vUrlToExec);
                            If vUrlToken =
                               Lowercase(TRESTDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).GetTokenEvent) Then
                             Begin
@@ -3285,7 +3289,10 @@ Begin
                             End;
                           End;
             rdwAOToken  : Begin
-                           vUrlToken := Lowercase(vUrlToExec);
+                           if vUrlToExec[InitStrPos]='/' then
+                               vUrlToken := Lowercase(Copy(vUrlToExec,InitStrPos+1, Length(vUrlToExec)))
+                           else
+                              vUrlToken := Lowercase(vUrlToExec);
                            If vUrlToken =
                               Lowercase(TRESTDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).GetTokenEvent) Then
                             Begin
