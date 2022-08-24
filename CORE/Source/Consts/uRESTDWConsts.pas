@@ -71,7 +71,7 @@ Const
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
  RESTDWVersionINFO          = 'v2.0.3-';
- RESTDWRelease              = '3088';
+ RESTDWRelease              = '3089';
  RESTDWCodeProject          = 'Savage Reign - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
@@ -292,6 +292,8 @@ Type
  TRESTDWRoutes    = Set of TRESTDWRoute;
  TRequestType     = (rtGet, rtPost, rtPut, rtPatch, rtDelete);
  TResquestMode    = (rtOnlyFields, rtOnlyData, rtJSONAll);
+ TRESTDWJSONType  = (TRESTDWJSONObjectType, TRESTDWJSONArrayType);
+ TRESTDWJSONTypes = Set of TRESTDWJSONType;
  TDataMode        = (dmDataware,  dmRAW);
  TMassiveMode     = (mmInactive,  mmBrowse, mmInsert, mmUpdate, mmDelete, mmExec);
  TMassiveSQLMode  = (msqlQuery,   msqlExecute);

@@ -47,8 +47,6 @@ Type
 End;
 
 Type
- TDWJSONType        = (TDWJSONObjectType, TDWJSONArrayType);
- TDWJSONTypes       = Set of TDWJSONType;
  TDWParamExpType    = (tdwpxt_All, tdwpxt_IN, tdwpxt_OUT, tdwpxt_INOUT);
  TProcedureEvent    = Procedure Of Object;
  TNewDataField      = Procedure (FieldDefinition : TFieldDefinition) Of Object;
@@ -111,7 +109,7 @@ Type
                           FloatDecimalFormat : String = '';
                           HeaderLowercase    : Boolean = False;
                           VirtualValue       : String = '';
-                          DWJSONType         : TDWJSONType = TDWJSONArrayType;
+                          DWJSONType         : TRESTDWJSONType = TRESTDWJSONArrayType;
                           bDetail            : TDataset    = Nil) : String;
   Function  EncodedString : String;
   Procedure SetEncoding  (bValue             : TEncodeSelect);
@@ -170,7 +168,7 @@ Type
   Procedure LoadFromDataset(TableName        : String;
                             bValue,
                             bDetail          : TDataset;
-                            DetailType       : TDWJSONType = TDWJSONArrayType;
+                            DetailType       : TRESTDWJSONType = TRESTDWJSONArrayType;
                             DetailElementName: String      = 'detail';
                             EncodedValue     : Boolean = True;
                             DataModeD        : TDataMode = dmDataware;
@@ -1139,7 +1137,7 @@ Function TJSONValue.DatasetValues(bValue             : TDataset;
                                   FloatDecimalFormat : String      = '';
                                   HeaderLowercase    : Boolean     = False;
                                   VirtualValue       : String      = '';
-                                  DWJSONType         : TDWJSONType = TDWJSONArrayType;
+                                  DWJSONType         : TRESTDWJSONType = TRESTDWJSONArrayType;
                                   bDetail            : TDataset    = Nil) : String;
 Var
  vLines,
@@ -1590,7 +1588,7 @@ Begin
                       vLines := vLines + Format(', {%s}', [GenerateLine]);
                     End;
      End;
-     If DWJSONType <> TDWJSONArrayType Then
+     If DWJSONType <> TRESTDWJSONArrayType Then
       Break;
      bValue.Next;
      Inc(A);
@@ -2078,7 +2076,7 @@ End;
 Procedure TJSONValue.LoadFromDataset(TableName        : String;
                                      bValue,
                                      bDetail          : TDataset;
-                                     DetailType       : TDWJSONType = TDWJSONArrayType;
+                                     DetailType       : TRESTDWJSONType = TRESTDWJSONArrayType;
                                      DetailElementName: String      = 'detail';
                                      EncodedValue     : Boolean     = True;
                                      DataModeD        : TDataMode   = dmDataware;
@@ -2112,7 +2110,7 @@ Begin
   If CharSet <> csUndefined Then
    DatabaseCharSet := CharSet;
  {$ENDIF}
- If DetailType   = TDWJSONArrayType Then
+ If DetailType   = TRESTDWJSONArrayType Then
   vVirtualValue := Format('"%s":', [DetailElementName])
  Else
   vVirtualValue := Format('"%s":', [DetailElementName]);

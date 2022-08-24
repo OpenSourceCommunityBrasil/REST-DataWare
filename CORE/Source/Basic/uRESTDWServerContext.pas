@@ -650,7 +650,8 @@ Begin
  Result := Nil;
  For I := 0 To Self.Count - 1 Do
   Begin
-   If (Uppercase(Index) = Uppercase(Self.Items[I].FName)) Then
+   If (Uppercase(Index) = Uppercase(Self.Items[I].ContextName))                          Or
+      (Uppercase(Index) = Uppercase(Self.Items[I].BaseURL + Self.Items[I].ContextName))  Then
     Begin
      Result := TRESTDWContext(Self.Items[I]);
      Break;

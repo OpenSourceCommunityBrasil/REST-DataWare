@@ -55,8 +55,6 @@ End;
 
 Type
  TOnWriterProcess   = Procedure (DataSet : TDataSet; RecNo, RecordCount : Integer;Var AbortProcess : Boolean) Of Object;
- TRESTDWJSONType    = (TRESTDWJSONObjectType, TRESTDWJSONArrayType);
- TRESTDWJSONTypes   = Set of TRESTDWJSONType;
  TDWParamExpType    = (tdwpxt_All, tdwpxt_IN, tdwpxt_OUT, tdwpxt_INOUT);
  TProcedureEvent    = Procedure Of Object;
  TNewDataField      = Procedure (FieldDefinition : TFieldDefinition) Of Object;
