@@ -71,7 +71,7 @@ Uses
  Function  restdwMin              (Const AValueOne,
                                    AValueTwo            : Int64)           : Int64;
  Function  StringToBytes          (AStr                 : String)          : TRESTDWBytes;
- Function  StreamToBytes          (Stream               : TMemoryStream)   : TRESTDWBytes;
+ Function  StreamToBytes          (Stream               : TStream)         : TRESTDWBytes;
  Function  StringToFieldType      (Const S              : String)          : Integer;
  Function  Escape_chars           (s                    : String)          : String;
  Function  Unescape_chars         (s                    : String)          : String;
@@ -2987,12 +2987,12 @@ Begin
   Result := Integer(ftString);
 End;
 
-Function StreamToBytes(Stream : TMemoryStream) : TRESTDWBytes;
+Function StreamToBytes(Stream : TStream) : TRESTDWBytes;
 Begin
  Try
   Stream.Position := 0;
   SetLength  (Result, Stream.Size);
-  Stream.Read(Result[0], Stream.Size);
+  Stream.Read(Pointer(Result)^, Stream.Size);
  Finally
  End;
 end;

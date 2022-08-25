@@ -3683,6 +3683,7 @@ Procedure TRESTDWDatabasebaseBase.ExecuteCommand(Var PoolerMethodClient : TRESTD
 Var
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  RESTClientPoolerExec : TRESTClientPoolerBase;
+ vStream              : TStream;
  LDataSetList         : TJSONValue;
  DWParams             : TRESTDWParams;
  vSQL,
@@ -3836,15 +3837,11 @@ Begin
        Begin
         If Not LDataSetList.IsNull Then
          vTempValue := LDataSetList.ToJSON;
-       End
-      Else
-       Begin
-        If Not LDataSetList.IsNull Then
-         vTempValue := LDataSetList.Value;
        End;
-      If (Trim(vTempValue) <> '{}') And
-         (Trim(vTempValue) <> '')    And
-         (Not (Error))                       Then
+      If ((Trim(vTempValue) <> '{}') And
+          (Trim(vTempValue) <> '')   And
+          (Not (Error)))             And
+           Not(BinaryRequest)        Then
        Begin
         Try
          {$IFDEF  ANDROID}
@@ -3871,6 +3868,16 @@ Begin
            End;
          {$ENDIF}
         Finally
+        End;
+       End
+      Else If BinaryRequest Then
+       Begin
+        vStream := TMemoryStream.Create;
+        Try
+         LDataSetList.SaveToStream(vStream);
+         Result.LoadFromStream(vStream);
+        Finally
+         vStream.Free;
         End;
        End;
       vTempValue := '';
@@ -10701,12 +10708,15 @@ Begin
         If BinaryRequest Then
          Begin
           If Not LDataSetList.IsNull Then
-           vValue := LDataSetList.Value;
-         End;
-        LDataSetList.Encoded  := vRESTDataBase.EncodedStrings;
-        LDataSetList.Encoding := DataBase.Encoding;
-        If Not BinaryRequest Then
+           Begin
+            vStream := TMemoryStream.Create;
+            LDataSetList.SaveToStream(vStream); //vValue := LDataSetList.Value;
+           End;
+         End
+        Else
          Begin
+          LDataSetList.Encoded  := vRESTDataBase.EncodedStrings;
+          LDataSetList.Encoding := DataBase.Encoding;
           If Not LDataSetList.IsNull Then
            vValue := LDataSetList.ToJSON;
          End;
@@ -10766,7 +10776,7 @@ Begin
         LDataSetList.WriteToDataset(dtFull, vValue, Self, vJsonCount, vDatapacks, vActualRec)
        Else
         Begin
-         vStream         := DecodeStream(vValue);
+//         vStream         := DecodeStream(vValue);
          If (csDesigning in ComponentState) Then //Clone end compare Fields
           Begin
            vStream.Position := 0;

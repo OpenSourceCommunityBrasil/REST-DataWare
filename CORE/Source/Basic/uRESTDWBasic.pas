@@ -2343,40 +2343,23 @@ Begin
                ms.Position := 0;
                If (sFile <> '') Then
                 JSONParam.LoadFromStream(ms)
-               Else If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(ms.DataString)) > 0) Then
+               Else If vBinaryEvent Then
                 Begin
-                 If vBinaryEvent Then
+                 If Assigned(JSONParam) Then
+                  FreeAndNil(JSONParam);
+                 If ms.Size > 0 Then
                   Begin
-                   If Assigned(JSONParam) Then
-                    FreeAndNil(JSONParam);
-                   If ms.Size > 0 Then
-                    Begin
-                     DWParams.Clear;
-                     DWParams.LoadFromStream(ms);
-                    End;
-                  End
-                 Else
-                  JSONParam.FromJSON(ms.DataString);
+                   DWParams.Clear;
+                   DWParams.LoadFromStream(ms);
+                  End;
                 End
+               Else If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(ms.DataString)) > 0) Then
+                JSONParam.FromJSON(ms.DataString)
                Else
                 Begin
-                 If vBinaryEvent Then
-                  Begin
-                   If Assigned(JSONParam) Then
-                    FreeAndNil(JSONParam);
-                   If ms.Size > 0 Then
-                    Begin
-                     DWParams.Clear;
-                     DWParams.LoadFromStream(ms);
-                    End;
-                  End
-                 Else
-                  Begin
-                   JSONParam.AsString := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
-                   DWParams.Add(JSONParam);
-                  End;
+                 JSONParam.AsString := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
+                 DWParams.Add(JSONParam);
                 End;
-               //Fim da correção - ICO
                ms.Free;
                vDecoderHeaderList.Free;
               End;
@@ -5175,7 +5158,7 @@ Begin
              Begin
               vEncoded := DWParams.ItemsString['Result'].Encoded;
               If (BinaryEvent) And (Not (vError)) Then
-               DWParams.ItemsString['Result'].LoadFromStream(BinaryBlob)
+               DWParams.ItemsString['Result'].LoadFromStream(TStream(BinaryBlob))
               Else If Not(vError) And (vTempJSON <> '') Then
                DWParams.ItemsString['Result'].SetValue(vTempJSON, vEncoded)
               Else
