@@ -396,9 +396,6 @@ begin
  HttpRequest.ProxyParams.ProxyPassword         := ProxyOptions.ProxyPassword;
  HttpRequest.ProxyParams.ProxyPort             := ProxyOptions.ProxyPort;
  HttpRequest.ReadTimeout                       := RequestTimeout;
- HttpRequest.Request.ContentType               := ContentType;
- HttpRequest.Request.Accept                    := Accept;
- HttpRequest.Request.AcceptEncoding            := AcceptEncoding;
  HttpRequest.AllowCookies                      := AllowCookies;
  HttpRequest.HandleRedirects                   := HandleRedirects;
  HttpRequest.RedirectMaximum                   := RedirectMaximum;
@@ -418,10 +415,10 @@ begin
    HttpRequest.Request.Charset                  := 'ansi';
    HttpRequest.Request.AcceptCharSet            := HttpRequest.Request.Charset;
   End;
- HttpRequest.Request.ContentType               := ContentType;
  HttpRequest.Request.Accept                    := Accept;
- HttpRequest.Request.ContentEncoding           := ContentEncoding;
  HttpRequest.Request.AcceptEncoding            := AcceptEncoding;
+ HttpRequest.Request.ContentType               := ContentType;
+ HttpRequest.Request.ContentEncoding           := ContentEncoding;
  HttpRequest.Request.UserAgent                 := UserAgent;
  HttpRequest.MaxAuthRetries                    := MaxAuthRetries;
 End;
@@ -2610,10 +2607,10 @@ End;
 Constructor TRESTDWIdClientREST.Create(AOwner: TComponent);
 Begin
  Inherited;
- ContentType                    := 'application/json';
- ContentEncoding                := 'application/x-www-form-urlencoded'; //'multipart/form-data';
+ //application/json
+ ContentType                    := cContentTypeFormUrl;
+ ContentEncoding                := cDefaultContentEncoding;
  Accept                         := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
-// AcceptEncoding                 := 'gzip, deflate, br';
  AcceptEncoding                 := '';
  MaxAuthRetries                 := 0;
  UserAgent                      := cUserAgent;
@@ -2770,7 +2767,6 @@ Procedure TRESTDWIdClientREST.SetRawHeaders(AHeaders       : TStringList;
 Var
  I : Integer;
 Begin
- HttpRequest.Request.AcceptEncoding := AcceptEncoding;
  HttpRequest.Request.RawHeaders.Clear;
 // HttpRequest.Request.CustomHeaders.Clear;
  If AccessControlAllowOrigin <> '' Then
@@ -2786,6 +2782,7 @@ Begin
      {$ELSE}
       SendParams.AddFormField('Access-Control-Allow-Origin',  AccessControlAllowOrigin);
      {$ENDIF}
+     HttpRequest.Request.ContentEncoding := cContentTypeMultiPart;
     End;
   End;
  If Assigned(AHeaders) Then
@@ -3502,6 +3499,8 @@ Begin
  Inherited;
  HttpRequest            := Nil;
  vCipherList            := '';
+ ContentType            := cContentTypeFormUrl;
+ ContentEncoding        := cDefaultContentEncoding;
 End;
 
 Destructor TRESTDWIdClientPooler.Destroy;
@@ -4596,6 +4595,8 @@ Begin
  HttpRequest            := Nil;
  vCipherList            := '';
  RESTClientPooler       := TRESTDWIdClientPooler.Create(Self);
+ ContentType            := cContentTypeFormUrl;
+ ContentEncoding        := cDefaultContentEncoding;
 End;
 
 Destructor TRESTDWIdDatabase.Destroy;

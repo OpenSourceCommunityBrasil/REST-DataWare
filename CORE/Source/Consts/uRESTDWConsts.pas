@@ -71,7 +71,7 @@ Const
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
  RESTDWVersionINFO          = 'v2.0.3-';
- RESTDWRelease              = '3091';
+ RESTDWRelease              = '3093';
  RESTDWCodeProject          = 'Savage Reign - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
@@ -143,6 +143,9 @@ Const
  rsLazarusDWPackage         = 'REST Dataware - Tools';
  rsDwRequestDBGName         = 'REST Dataware - Request Debbuger';
  cDefaultContentType        = 'application/json';
+ cContentTypeFormUrl        = 'application/x-www-form-urlencoded';
+ cContentTypeMultiPart      = 'multipart/form-data';
+ cDefaultContentEncoding    = 'gzip, identity';
  cValueKey                  = '{"serverinforequest":"%s", "inforequest":"%s", "lifecycle":"%s"}';
  cValueKeyToken             = '{"secrets":"%s", "md5":"%s"}';
  cValueToken                = '{%s"exp":"%s", "iat":"%s", "secrets":"%s"}';

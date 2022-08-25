@@ -123,7 +123,9 @@ Begin
  vResponseString := '';
  vStream         := Nil;
  vRedirect       := Redirect;
- ARequest.ReadTotalContent;
+ {$IF CompilerVersion > 21}
+  ARequest.ReadTotalContent;
+ {$IFEND}
  Try
   If CORS Then
    Begin
