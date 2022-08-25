@@ -9,30 +9,31 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <OtherUnitFiles Value="..\..\..\Source\ShellTools\Lazarus"/>
+        <OtherUnitFiles Value="..\..\..\Source\ShellTools\Lazarus;..\..\..\Source\ShellTools"/>
         <UnitOutputDirectory Value="..\..\..\Source\compiledlaz"/>
       </SearchPaths>
     </CompilerOptions>
     <License Value="GPL - 3.0"/>
-    <Version Major="2"/>
+    <Version Major="2" Release="3"/>
     <Files>
       <Item>
         <Filename Value="RestDatawareShellservices.lrs"/>
         <Type Value="LRS"/>
       </Item>
       <Item>
-        <Filename Value="..\..\..\Source\ShellTools\Lazarus\uRESTDWShellServices.pas"/>
-        <UnitName Value="uRESTDWShellServices"/>
+        <Filename Value="..\..\..\Source\ShellTools\uRESTDWShellServicesLazarus.pas"/>
+        <UnitName Value="uRESTDWShellServicesLazarus"/>
       </Item>
       <Item>
-        <Filename Value="..\..\..\Source\ShellTools\Lazarus\uRESTDWShellServicesReg.pas"/>
+        <Filename Value="..\..\..\Source\ShellTools\uRESTDWShellServicesRegLazarus.pas"/>
         <HasRegisterProc Value="True"/>
-        <UnitName Value="uRESTDWShellServicesReg"/>
+        <UnitName Value="uRESTDWShellServicesRegLazarus"/>
       </Item>
     </Files>
     <RequiredPkgs>
       <Item>
         <PackageName Value="restdatawarecomponents"/>
+        <MinVersion Major="2" Valid="True"/>
       </Item>
       <Item>
         <PackageName Value="weblaz"/>

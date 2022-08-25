@@ -44,7 +44,7 @@ requires
   RESTDWCore;
 
 contains
-  uRESTDWShellServices in '..\..\..\Source\ShellTools\Delphi\uRESTDWShellServices.pas';
+  uRESTDWShellServicesDelphi in '..\..\..\Source\ShellTools\uRESTDWShellServicesDelphi.pas';
 
 end.
 

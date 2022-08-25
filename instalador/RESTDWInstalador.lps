@@ -9,8 +9,9 @@
         <Filename Value="RESTDWInstalador.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="restdwinstalador"/>
-        <CursorPos X="26"/>
-        <UsageCount Value="26"/>
+        <TopLine Value="4"/>
+        <CursorPos X="41" Y="12"/>
+        <UsageCount Value="27"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -19,11 +20,13 @@
         <ComponentName Value="fPrincipal"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
-        <WindowIndex Value="-1"/>
-        <TopLine Value="-1"/>
-        <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="23"/>
+        <UnitName Value="uPrincipal"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="81"/>
+        <CursorPos X="3" Y="91"/>
+        <UsageCount Value="24"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="src\telas\frames\ufrideitem.pas"/>
@@ -35,26 +38,23 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="24"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\udetectide.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="174"/>
-        <CursorPos X="26" Y="185"/>
+        <EditorIndex Value="3"/>
+        <CursorPos X="14"/>
         <FoldState Value=" T3oI0N4A"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\uidefunctions.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="22"/>
+        <EditorIndex Value="4"/>
         <CursorPos X="13" Y="42"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -108,8 +108,33 @@
         <CursorPos X="16"/>
         <UsageCount Value="20"/>
       </Unit>
+      <Unit>
+        <Filename Value="..\..\..\unit1.pas"/>
+        <UnitName Value="Unit1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="32"/>
+        <CursorPos X="29" Y="67"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\ulazarusdetect.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="67" Y="11"/>
+        <UsageCount Value="20"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\ulazarusdetect.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="13"/>
+        <CursorPos X="27" Y="30"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+      </Unit>
     </Units>
-    <JumpHistory HistoryIndex="13">
+    <JumpHistory HistoryIndex="22">
       <Position>
         <Filename Value="RESTDWInstalador.lpr"/>
         <Caret Line="14" Column="22" TopLine="2"/>
@@ -166,10 +191,56 @@
         <Filename Value="src\funcoes\udetectide.pas"/>
         <Caret Line="511" Column="19" TopLine="497"/>
       </Position>
+      <Position>
+        <Filename Value="src\telas\uprincipal.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="src\telas\uprincipal.pas"/>
+        <Caret Line="83" Column="39" TopLine="74"/>
+      </Position>
+      <Position>
+        <Filename Value="src\telas\uprincipal.pas"/>
+        <Caret Line="85" Column="39" TopLine="76"/>
+      </Position>
+      <Position>
+        <Filename Value="src\telas\uprincipal.pas"/>
+        <Caret Line="90" Column="7" TopLine="76"/>
+      </Position>
+      <Position>
+        <Filename Value="src\telas\uprincipal.pas"/>
+        <Caret Line="9" Column="33"/>
+      </Position>
+      <Position>
+        <Filename Value="src\telas\uprincipal.pas"/>
+        <Caret Line="90" Column="8" TopLine="81"/>
+      </Position>
+      <Position>
+        <Filename Value="src\telas\uprincipal.pas"/>
+        <Caret Line="9" Column="33"/>
+      </Position>
+      <Position>
+        <Filename Value="src\funcoes\ulazarusdetect.pas"/>
+        <Caret Line="22" Column="35" TopLine="10"/>
+      </Position>
+      <Position>
+        <Filename Value="src\funcoes\ulazarusdetect.pas"/>
+        <Caret Line="16" Column="26" TopLine="13"/>
+      </Position>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode=""/>
     </RunParams>
   </ProjectSession>
+  <Debugging>
+    <BreakPoints>
+      <Item>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="src\telas\uprincipal.pas"/>
+        <Line Value="85"/>
+      </Item>
+    </BreakPoints>
+  </Debugging>
 </CONFIG>

@@ -1,4 +1,4 @@
-unit uRESTDWShellServicesReg;
+unit uRESTDWShellServicesRegDelphi;
 
 {$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -30,7 +30,7 @@ uses
     StdCtrls, ComCtrls, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWShellServices,
     LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb;
   {$ELSE}
-   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWShellServices,
+   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWShellServicesDelphi,
    RTLConsts,
    {$IFDEF COMPILER16_UP}
    UITypes,

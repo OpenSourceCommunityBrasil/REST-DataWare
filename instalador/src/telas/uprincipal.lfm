@@ -8344,6 +8344,25 @@ object fPrincipal: TfPrincipal
             BorderStyle = bsNone
             TabOrder = 0
           end
+          object Memo2: TMemo
+            Left = 296
+            Height = 232
+            Top = 0
+            Width = 278
+            Lines.Strings = (
+              'Memo2'
+            )
+            TabOrder = 1
+          end
+          object Button1: TButton
+            Left = 200
+            Height = 24
+            Top = 8
+            Width = 91
+            Caption = 'Detect Lazarus'
+            OnClick = Button1Click
+            TabOrder = 2
+          end
         end
         object Panel3: TPanel
           Left = 0

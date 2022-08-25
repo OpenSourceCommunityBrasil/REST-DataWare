@@ -154,7 +154,7 @@
         <DCCReference Include="RESTDWShellServicesDesign.dres"/>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="RESTDWShellServices.dcp"/>
-        <DCCReference Include="..\..\..\Source\ShellTools\Delphi\uRESTDWShellServicesReg.pas"/>
+        <DCCReference Include="..\..\..\Source\ShellTools\uRESTDWShellServicesRegDelphi.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

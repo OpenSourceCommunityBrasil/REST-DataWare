@@ -1970,8 +1970,8 @@ Begin
     Cmd := URLDecode(Query);
 //    Uri := TIdURI.Create(Cmd);
    Try
-    vParams.Delimiter := '&';
-    vParams.Text := Cmd;
+//    vParams.Delimiter := '|';
+    vParams.Text := StringReplace(Cmd, '&', sLineBreak, [rfReplaceAll]);
     If vParams.count = 0 Then
      If Trim(Cmd) <> '' Then
       vParams.DelimitedText := StringReplace(Cmd, sLineBreak, '&', [rfReplaceAll]); //Alterações enviadas por "joaoantonio19"

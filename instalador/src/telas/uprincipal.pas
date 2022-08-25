@@ -6,13 +6,14 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls, Buttons,
-  ComCtrls, CheckLst, ufrIDEItem;
+  ComCtrls, CheckLst, ufrideitem;
 
 type
 
   { TfPrincipal }
 
   TfPrincipal = class(TForm)
+    Button1: TButton;
     CheckListBox1: TCheckListBox;
     CheckListBox2: TCheckListBox;
     CheckListBox3: TCheckListBox;
@@ -27,6 +28,7 @@ type
     Label7: TLabel;
     Label8: TLabel;
     Memo1: TMemo;
+    Memo2: TMemo;
     PageControl1: TPageControl;
     Panel1: TPanel;
     Panel10: TPanel;
@@ -47,6 +49,7 @@ type
     tsIDE: TTabSheet;
     tsRecursos: TTabSheet;
     tsStatus: TTabSheet;
+    procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Panel14Click(Sender: TObject);
     procedure Panel15Click(Sender: TObject);
@@ -80,6 +83,12 @@ end;
 procedure TfPrincipal.FormCreate(Sender: TObject);
 begin
   PageControl1.ActivePage := tsIDE;
+end;
+
+procedure TfPrincipal.Button1Click(Sender: TObject);
+begin
+  memo2.Lines.Clear;
+
 end;
 
 procedure TfPrincipal.Panel15Click(Sender: TObject);

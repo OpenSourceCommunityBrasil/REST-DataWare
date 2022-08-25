@@ -138,9 +138,11 @@ Procedure Register;
 
 implementation
 
-{$IFNDEF FPC}{$if CompilerVersion < 23}
-{$R .\Package\D7\RESTDWDriverZEOS.dcr}
-{$IFEND}{$ENDIF}
+{$IFNDEF FPC}
+ {$if CompilerVersion < 23}
+  {$R .\RESTDWDriverZEOS.dcr}
+ {$IFEND}
+{$ENDIF}
 
 Procedure Register;
 Begin
@@ -296,7 +298,7 @@ Var
                                    If Not Assigned(vStringStream) Then
                                     vStringStream  := TMemoryStream.Create;
                                    Try
-                                    vDWParams[I].SaveToStream(vStringStream);
+                                    vDWParams[I].SaveToStream(TStream(vStringStream));
                                     vStringStream.Position := 0;
                                     If vStringStream.Size > 0 Then
                                      vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
@@ -1098,7 +1100,7 @@ Var
                  Try
                   If (Not(MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull)) Then
                    Begin
-                    MassiveDataset.Params.ItemsString[Query.Params[I].Name].SaveToStream(vStringStream);
+                    MassiveDataset.Params.ItemsString[Query.Params[I].Name].SaveToStream(TStream(vStringStream));
                     If vStringStream <> Nil Then
                      Begin
                       vStringStream.Position := 0;
@@ -1655,7 +1657,7 @@ Begin
                 If Not Assigned(vStringStream) Then
                  vStringStream  := TMemoryStream.Create;
                 Try
-                 Params[I].SaveToStream(vStringStream);
+                 Params[I].SaveToStream(TStream(vStringStream));
                  vStringStream.Position := 0;
                  If vStringStream.Size > 0 Then
                   vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
@@ -1781,7 +1783,7 @@ Begin
             If Not Assigned(vStringStream) Then
              vStringStream  := TMemoryStream.Create;
             Try
-             Params[I].SaveToStream(vStringStream);
+             Params[I].SaveToStream(TStream(vStringStream));
              vStringStream.Position := 0;
              If vStringStream.Size > 0 Then
               vTempQuery.Params[I].LoadFromStream(vStringStream, ftBlob);
@@ -2775,7 +2777,7 @@ Begin
                    If Not Assigned(vStringStream) Then
                     vStringStream  := TMemoryStream.Create;
                    Try
-                    Params[I].SaveToStream(vStringStream);
+                    Params[I].SaveToStream(TStream(vStringStream));
                     vStringStream.Position := 0;
                     If vStringStream.Size > 0 Then
                      TBlobField(vTempQuery.Fields[A]).LoadFromStream(vStringStream);
@@ -3544,7 +3546,7 @@ Var
                  Try
                   If (Not(MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull)) Then
                    Begin
-                    MassiveDataset.Params.ItemsString[Query.Params[I].Name].SaveToStream(vStringStream);
+                    MassiveDataset.Params.ItemsString[Query.Params[I].Name].SaveToStream(TStream(vStringStream));
                     If vStringStream <> Nil Then
                      Begin
                       vStringStream.Position := 0;
@@ -3950,7 +3952,7 @@ Begin
                    If Not Assigned(vStringStream) Then
                     vStringStream  := TMemoryStream.Create;
                    Try
-                    Params[I].SaveToStream(vStringStream);
+                    Params[I].SaveToStream(TStream(vStringStream));
                     vStringStream.Position := 0;
                     If vStringStream.Size > 0 Then
                      vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
@@ -4370,7 +4372,7 @@ Begin
              Begin
               //vStringStream := TMemoryStream.Create;
               Try
-               Params[I].SaveToStream(vStringStream);
+               Params[I].SaveToStream(TStream(vStringStream));
                vStringStream.Position := 0;
                If vStringStream.Size > 0 Then
                 ZCommand.Params[A].LoadFromStream(vStringStream, ftBlob);

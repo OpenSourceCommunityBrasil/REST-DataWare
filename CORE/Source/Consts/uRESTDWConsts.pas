@@ -70,8 +70,8 @@ Const
  wdays                      : Array [1 .. 7]  Of String = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'); {do not localize}
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
- RESTDWVersionINFO          = 'v2.0.1-';
- RESTDWRelease              = '3064';
+ RESTDWVersionINFO          = 'v2.0.4-';
+ RESTDWRelease              = '3097';
  RESTDWCodeProject          = 'Savage Reign - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
@@ -143,6 +143,9 @@ Const
  rsLazarusDWPackage         = 'REST Dataware - Tools';
  rsDwRequestDBGName         = 'REST Dataware - Request Debbuger';
  cDefaultContentType        = 'application/json';
+ cContentTypeFormUrl        = 'application/x-www-form-urlencoded';
+ cContentTypeMultiPart      = 'multipart/form-data';
+ cDefaultContentEncoding    = 'gzip, identity';
  cValueKey                  = '{"serverinforequest":"%s", "inforequest":"%s", "lifecycle":"%s"}';
  cValueKeyToken             = '{"secrets":"%s", "md5":"%s"}';
  cValueToken                = '{%s"exp":"%s", "iat":"%s", "secrets":"%s"}';
@@ -292,6 +295,8 @@ Type
  TRESTDWRoutes    = Set of TRESTDWRoute;
  TRequestType     = (rtGet, rtPost, rtPut, rtPatch, rtDelete);
  TResquestMode    = (rtOnlyFields, rtOnlyData, rtJSONAll);
+ TRESTDWJSONType  = (TRESTDWJSONObjectType, TRESTDWJSONArrayType);
+ TRESTDWJSONTypes = Set of TRESTDWJSONType;
  TDataMode        = (dmDataware,  dmRAW);
  TMassiveMode     = (mmInactive,  mmBrowse, mmInsert, mmUpdate, mmDelete, mmExec);
  TMassiveSQLMode  = (msqlQuery,   msqlExecute);
@@ -652,7 +657,8 @@ Begin
  try
    Result := Mime.GetFileMIMEType(sFile);
  finally
-   FreeAndNil(Mime);
+  Mime.Free
+//   FreeAndNil(Mime);
  end;
 End;
 

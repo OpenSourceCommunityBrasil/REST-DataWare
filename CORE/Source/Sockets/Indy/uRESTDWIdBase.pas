@@ -396,9 +396,6 @@ begin
  HttpRequest.ProxyParams.ProxyPassword         := ProxyOptions.ProxyPassword;
  HttpRequest.ProxyParams.ProxyPort             := ProxyOptions.ProxyPort;
  HttpRequest.ReadTimeout                       := RequestTimeout;
- HttpRequest.Request.ContentType               := ContentType;
- HttpRequest.Request.Accept                    := Accept;
- HttpRequest.Request.AcceptEncoding            := AcceptEncoding;
  HttpRequest.AllowCookies                      := AllowCookies;
  HttpRequest.HandleRedirects                   := HandleRedirects;
  HttpRequest.RedirectMaximum                   := RedirectMaximum;
@@ -418,10 +415,10 @@ begin
    HttpRequest.Request.Charset                  := 'ansi';
    HttpRequest.Request.AcceptCharSet            := HttpRequest.Request.Charset;
   End;
- HttpRequest.Request.ContentType               := ContentType;
  HttpRequest.Request.Accept                    := Accept;
- HttpRequest.Request.ContentEncoding           := ContentEncoding;
  HttpRequest.Request.AcceptEncoding            := AcceptEncoding;
+ HttpRequest.Request.ContentType               := ContentType;
+ HttpRequest.Request.ContentEncoding           := ContentEncoding;
  HttpRequest.Request.UserAgent                 := UserAgent;
  HttpRequest.MaxAuthRetries                    := MaxAuthRetries;
 End;
@@ -2610,10 +2607,10 @@ End;
 Constructor TRESTDWIdClientREST.Create(AOwner: TComponent);
 Begin
  Inherited;
- ContentType                    := 'application/json';
- ContentEncoding                := 'multipart/form-data';
+ //application/json
+ ContentType                    := cContentTypeFormUrl;
+ ContentEncoding                := cDefaultContentEncoding;
  Accept                         := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
-// AcceptEncoding                 := 'gzip, deflate, br';
  AcceptEncoding                 := '';
  MaxAuthRetries                 := 0;
  UserAgent                      := cUserAgent;
@@ -2770,7 +2767,6 @@ Procedure TRESTDWIdClientREST.SetRawHeaders(AHeaders       : TStringList;
 Var
  I : Integer;
 Begin
- HttpRequest.Request.AcceptEncoding := AcceptEncoding;
  HttpRequest.Request.RawHeaders.Clear;
 // HttpRequest.Request.CustomHeaders.Clear;
  If AccessControlAllowOrigin <> '' Then
@@ -2786,6 +2782,7 @@ Begin
      {$ELSE}
       SendParams.AddFormField('Access-Control-Allow-Origin',  AccessControlAllowOrigin);
      {$ENDIF}
+     HttpRequest.Request.ContentEncoding := cContentTypeMultiPart;
     End;
   End;
  If Assigned(AHeaders) Then
@@ -3075,18 +3072,18 @@ Begin
    {$IF Defined(HAS_FMX)}
     {$IFDEF HAS_UTF8}
      If Assigned({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}) Then
-      vToken       := TRESTDWAuthRequest({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}).Token;
+      vToken       := TRESTDWAuthOptionTokenClient({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}).Token;
     {$ELSE}
      If Assigned(AContext.Data) Then
-      vToken       := TRESTDWAuthRequest(AContext.Data).Token;
+      vToken       := TRESTDWAuthOptionTokenClient(AContext.Data).Token;
     {$ENDIF}
    {$ELSE}
     If Assigned(AContext.Data) Then
-     vToken       := TRESTDWAuthRequest(AContext.Data).Token;
+     vToken       := TRESTDWAuthOptionTokenClient(AContext.Data).token;
    {$IFEND}
   {$ELSE}
    If Assigned(AContext.Data) Then
-    vToken       := TRESTDWAuthRequest(AContext.Data).Token;
+    vToken       := TRESTDWAuthOptionTokenClient(AContext.Data).Token;
   {$ENDIF}
   vAuthRealm   := AResponseInfo.AuthRealm;
   vContentType := ARequestInfo.ContentType;
@@ -3123,26 +3120,29 @@ Begin
      {$IFEND}
     {$ENDIF}
     AResponseInfo.ResponseNo               := StatusCode;
-    If (vResponseString <> '') Or
-       (ErrorMessage    <> '') Then
+    If (vResponseString <> '')   Or
+       (ErrorMessage    <> '')   Then
      Begin
-      If Assigned(ResultStream) Then
+      If Assigned(ResultStream)  Then
        FreeAndNil(ResultStream);
       If (vResponseString <> '') Then
        ResultStream  := TStringStream.Create(vResponseString)
       Else
        ResultStream  := TStringStream.Create(ErrorMessage);
      End;
-    if Assigned(ResultStream)  then    //anderson
-    begin
+    If Assigned(ResultStream)    Then
+     Begin
       AResponseInfo.FreeContentStream      := True;
       AResponseInfo.ContentStream          := ResultStream;
       AResponseInfo.ContentStream.Position := 0;
-    end;
+     End;
     {$IFNDEF FPC}
-     AResponseInfo.ContentLength         := ResultStream.Size;
+     if Assigned(ResultStream) Then
+      AResponseInfo.ContentLength          := ResultStream.Size
+     Else
+      AResponseInfo.ContentLength          := -1;
     {$ELSE}
-     AResponseInfo.ContentLength         := -1;
+     AResponseInfo.ContentLength           := -1;
     {$ENDIF}
     For I := 0 To vResponseHeader.Count -1 Do
      AResponseInfo.CustomHeaders.AddValue(vResponseHeader.Names [I],
@@ -3285,7 +3285,7 @@ Procedure TRESTDWIdServicePooler.CreatePostStream(AContext        : TIdContext;
 Var
  headerIndex : Integer;
  vValueAuth  : String;
- vAuthValue  : TRESTDWAuthOAuth;
+ vAuthValue  : TRESTDWAuthOptionTokenClient;
 Begin
  headerIndex := AHeaders.IndexOfName('Authorization');
  If (headerIndex = -1) Then
@@ -3310,7 +3310,7 @@ Begin
    vValueAuth  := AHeaders[headerIndex];
    If AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken] Then
     Begin
-     vAuthValue       := TRESTDWAuthOAuth.Create;
+     vAuthValue       := TRESTDWAuthOptionTokenClient.Create;
      vAuthValue.Token := vValueAuth;
      {$IFNDEF FPC}
       {$IF Not Defined(HAS_FMX)}
@@ -3334,7 +3334,7 @@ Procedure TRESTDWIdServicePooler.OnParseAuthentication(AContext    : TIdContext;
                                                    Const AAuthType, AAuthData: String;
                                                    Var VUsername, VPassword: String; Var VHandled: Boolean);
 Var
- vAuthValue : TRESTDWAuthOAuth;
+ vAuthValue : TRESTDWAuthOptionTokenClient;
 Begin
   {$IFNDEF FPC}
    {$IF Not Defined(HAS_FMX)}
@@ -3342,7 +3342,7 @@ Begin
        (Lowercase(AAuthType) = Lowercase('token'))  And
        (AContext.Data        = Nil) Then
      Begin
-      vAuthValue       := TRESTDWAuthOAuth.Create;
+      vAuthValue       := TRESTDWAuthOptionTokenClient.Create;
       vAuthValue.Token := AAuthType + ' ' + AAuthData;
       AContext.Data    := vAuthValue;
       VHandled         := AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken];
@@ -3353,7 +3353,7 @@ Begin
        (Lowercase(AAuthType) = Lowercase('token'))  And
        ({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}  = Nil) Then
      Begin
-      vAuthValue          := TRESTDWAuthOAuth.Create;
+      vAuthValue          := TRESTDWAuthOptionTokenClient.Create;
       vAuthValue.Token    := AAuthType + ' ' + AAuthData;
       {$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}       := vAuthValue;
       VHandled            := AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken];
@@ -3363,7 +3363,7 @@ Begin
        (Lowercase(AAuthType) = Lowercase('token'))  And
        (AContext.DataObject  = Nil) Then
      Begin
-      vAuthValue          := TRESTDWAuthOAuth.Create;
+      vAuthValue          := TRESTDWAuthOptionTokenClient.Create;
       vAuthValue.Token    := AAuthType + ' ' + AAuthData;
       AContext.DataObject := vAuthValue;
       VHandled            := AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken];
@@ -3375,7 +3375,7 @@ Begin
       (Lowercase(AAuthType) = Lowercase('token'))  And
       (AContext.Data        = Nil) Then
     Begin
-     vAuthValue       := TRESTDWAuthOAuth.Create;
+     vAuthValue       := TRESTDWAuthOptionTokenClient.Create;
      vAuthValue.Token := AAuthType + ' ' + AAuthData;
      AContext.Data    := vAuthValue;
      VHandled         := AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken];
@@ -3499,6 +3499,8 @@ Begin
  Inherited;
  HttpRequest            := Nil;
  vCipherList            := '';
+ ContentType            := cContentTypeFormUrl;
+ ContentEncoding        := cDefaultContentEncoding;
 End;
 
 Destructor TRESTDWIdClientPooler.Destroy;
@@ -4593,6 +4595,8 @@ Begin
  HttpRequest            := Nil;
  vCipherList            := '';
  RESTClientPooler       := TRESTDWIdClientPooler.Create(Self);
+ ContentType            := cContentTypeFormUrl;
+ ContentEncoding        := cDefaultContentEncoding;
 End;
 
 Destructor TRESTDWIdDatabase.Destroy;

@@ -126,8 +126,9 @@ Var
  vTempValue  : String;
  Procedure ParseParams(ParamsURI : String);
  Var
+  vTempData,
   vTempParams : String;
-  I,
+  IBar, I,
   ArraySize   : Integer;
   JSONParam   : TJSONParam;
  Begin
@@ -152,29 +153,32 @@ Var
     JSONParam := Nil;
     If vIsQuery Then
      Begin
-      vParamName := Copy(vTempParams, 1, Pos('=', vTempParams) - 1);
-      If vParamName <> '' Then
+      IBar     := Pos('&', vTempParams);
+      If IBar = 0 Then
        Begin
-        Delete(vTempParams, 1, Pos('=', vTempParams));
-        If Pos('&', vTempParams) > 0 Then
+        IBar    := Length(vTempParams);
+        vTempData := Copy(vTempParams, 1, IBar);
+       End
+      Else
+       vTempData := Copy(vTempParams, 1, IBar - 1);
+      If Pos('dwmark:', vTempData) = 0 Then
+       Begin
+        vParamName := Copy(vTempData, 1, Pos('=', vTempData) - 1);
+        If vParamName <> '' Then
          Begin
-          vTempValue := Copy(vTempParams, 1, Pos('&', vTempParams) - 1);
-          Delete(vTempParams, 1, Pos('&', vTempParams));
-         End
-        Else
-         vTempValue := vTempParams;
-        JSONParam  := Params.ItemsString[vParamName];
-        If JSONParam = Nil Then
-         Begin
-          JSONParam := TJSONParam.Create(Params.Encoding);
-          JSONParam.ParamName := cUndefined;//Format('PARAM%d', [0]);
-          JSONParam.ObjectDirection := odIN;
-          JSONParam.SetValue(vTempValue);
-          Params.Add(JSONParam);
-         End
-        Else
-         JSONParam.SetValue(vTempValue);
+          JSONParam  := Params.ItemsString[vParamName];
+          If JSONParam = Nil Then
+           Begin
+            Delete(vTempData, 1, Pos('=', vTempData));
+            JSONParam := TJSONParam.Create(Params.Encoding);
+            JSONParam.ParamName := cUndefined;//Format('PARAM%d', [0]);
+            JSONParam.ObjectDirection := odIN;
+            JSONParam.SetValue(vTempValue);
+            Params.Add(JSONParam);
+           End;
+         End;
        End;
+      Delete(vTempParams, 1, IBar);
      End
     Else
      Begin
@@ -183,7 +187,8 @@ Var
        Begin
         If Pos('/', vTempParams) > 0 Then
          Begin
-          Delete(vTempParams, 1, Pos('/', vTempParams));
+          If vTempParams[InitStrPos] = '/' Then
+           Delete(vTempParams, 1, 1);
           vTempValue := Copy(vTempParams, 1, Pos('/', vTempParams) - 1);
           Delete(vTempParams, 1, Pos('/', vTempParams));
          End
@@ -195,10 +200,13 @@ Var
           JSONParam := TJSONParam.Create(Params.Encoding);
           JSONParam.ParamName := vParamName;
           JSONParam.ObjectDirection := odIN;
-          JSONParam.SetValue(vTempValue);
+          If (vTempValue <> '') Then
+           JSONParam.SetValue(vTempValue);
           Params.Add(JSONParam);
          End
-        Else
+        Else If Not(vIsQuery)         And
+                   (JSONParam.IsNull) And
+                   (vTempValue <> '') Then
          JSONParam.SetValue(vTempValue);
        End;
      End;
@@ -226,8 +234,8 @@ Begin
  Result   := False;
  If Length(URL) = 0 Then
   Exit;
- vTempValue := Lowercase(URL);
- vIsQuery   := (Pos('?', vTempValue) > 0) And (Pos('=', vTempValue) > 0);
+ vTempValue := URL;
+ vIsQuery   := (Pos('?', vTempValue) > 0);
  For I := 0 To ComponentCount -1 Do
   Begin
    If (Components[i] is TRESTDWServerEvents) Or
@@ -270,6 +278,8 @@ Begin
             Begin
              If Copy(vTempValue, Length(vTempValue), 1) = '/' Then
               Delete(vTempValue, Length(vTempValue), 1);
+             If Copy(URL, Length(URL), 1) = '/' Then
+              Delete(URL, Length(URL), 1);
             End;
            Break;
           End;
@@ -284,14 +294,14 @@ Begin
          If vIsQuery Then
           Begin
            vTempRoute := vTempRoute + '?';
-           If Copy(vTempValue, 1, Length(vTempValue)) <> '?' Then
+           If Copy(vTempValue, Length(vTempValue), 1) <> '?' Then
             vTempValue := vTempValue + '?';
           End
          Else
           Begin
            vTempRoute := vTempRoute + '/';
-           If Copy(vTempValue, 1, Length(vTempValue)) <> '/' Then
-            vTempValue := vTempValue + '/';
+           If Copy(vTempValue, Length(vTempValue), 1) <> '/' Then
+            vTempValue :=  vTempValue + '/';
           End;
          Result     := vTempRoute = Copy(vTempValue, 1, Length(vTempRoute));
          If Result Then
@@ -305,11 +315,15 @@ Begin
               Delete(vTempValue, 1, 1);
              If Copy(vTempValue, Length(vTempValue), 1) = '?' Then
               Delete(vTempValue, Length(vTempValue), 1);
+             If Copy(URL, Length(URL), 1) = '?' Then
+              Delete(URL, Length(URL), 1);
             End
            Else
             Begin
              If Copy(vTempValue, Length(vTempValue), 1) = '/' Then
               Delete(vTempValue, Length(vTempValue), 1);
+             If Copy(URL, Length(URL), 1) = '/' Then
+              Delete(URL, Length(URL), 1);
             End;
            Break;
           End;

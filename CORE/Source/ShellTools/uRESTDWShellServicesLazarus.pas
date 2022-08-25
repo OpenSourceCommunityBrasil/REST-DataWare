@@ -1,4 +1,4 @@
-unit uRESTDWShellServices;
+unit uRESTDWShellServicesLazarus;
 
 {$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -142,7 +142,7 @@ Begin
                    vToken,
                    vResponseHeader,
                    -1,
-                   Nil,
+                   ARequest.CustomHeaders,
                    ARequest.ContentFields,
                    ARequest.QueryFields.Text,
                    vStream,

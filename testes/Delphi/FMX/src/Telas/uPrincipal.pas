@@ -119,8 +119,6 @@ begin
 end;
 
 procedure TfPrincipal.FormCreate(Sender: TObject);
-var
-  I: integer;
 begin
   lVersao.Text := Format('Versão componentes: %s', [RESTDWVERSAO]);
 end;

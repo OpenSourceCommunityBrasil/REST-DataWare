@@ -413,7 +413,7 @@ Type
   {$IFDEF FPC}
   Property DatabaseCharSet         : TDatabaseCharSet              Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
-End;
+ End;
 
  Type
   TRESTDWServiceNotificationBase = Class(TRESTDWComponent)
@@ -1855,20 +1855,16 @@ Var
   vTagService   := False;
   If ServerMethodsClass <> Nil Then
    Begin
+    Pooler := urlContext;
+    If Pos('?', Pooler) > 0 Then
+     Pooler := Copy(Pooler, 1, Pos('?', Pooler) -1);
     For I := 0 To ServerMethodsClass.ComponentCount -1 Do
      Begin
       If ServerMethodsClass.Components[i] is TRESTDWServerEvents Then
        Begin
-        Pooler := StringReplace(urlContext, '/', '', [rfReplaceAll]);
-        //If (LowerCase(urlContext) = LowerCase(ServerMethodsClass.Components[i].Name))  Or
-        //   (LowerCase(urlContext) = LowerCase(ServerMethodsClass.classname + '.' +
-        //                                      ServerMethodsClass.Components[i].Name))  Then
-        vTagService := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler] <> Nil;
-        If vTagService Then
-         Begin
-          Result   := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler];
+        Result   := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler];
+        If Assigned(Result) Then
           Break;
-         End;
        End;
      End;
    End;
@@ -1884,11 +1880,12 @@ Var
  Begin
   Result        := Nil;
   vRootContext  := '';
-//  aEventName    := UriOptions.EventName;
-//  aServerEvent  := UriOptions.ServerEvent;
   If (aServerEvent = '') Then
    Begin
-    aServerEvent := StringReplace(urlContext, '/', '', [rfReplaceAll]);
+//    aServerEvent := StringReplace(urlContext, '/', '', [rfReplaceAll]);
+    aServerEvent := urlContext;
+    If Pos('?', aServerEvent) > 0 Then
+     aServerEvent := Copy(aServerEvent, 1, Pos('?', aServerEvent) -1);
     aEventName   := '';
    End;
   If ServerMethodsClass <> Nil Then
@@ -1901,12 +1898,9 @@ Var
             (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aServerEvent] <> Nil))   Then
          Begin
           vRootContext := TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext;
-          vTagService  := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aServerEvent] <> Nil;
-          If vTagService Then
-           Begin
-            Result := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aServerEvent];
-            Break;
-           End;
+          Result := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aServerEvent];
+          If Assigned(Result) Then
+           Break;
          End;
        End;
      End;
@@ -2078,6 +2072,7 @@ Begin
      End;
     If RESTDWFileExists(sFile, FRootPath) then
      Begin
+      StatusCode    := 200;
       ContentType   := GetMIMEType(sFile);
       ServerContextStream := TMemoryStream.Create;
       ServerContextStream.LoadFromFile(sFile);
@@ -2140,8 +2135,7 @@ Begin
     vIsQueryParam := (Pos('?', Lowercase(Url)) > 0) And
                      (Pos('=', Lowercase(Url)) > 0);
     If Not vIsQueryParam Then
-     vIsQueryParam := (Pos('?', Lowercase(RawHTTPCommand)) > 0) And
-                      (Pos('=', Lowercase(RawHTTPCommand)) > 0);
+     vIsQueryParam := (Pos('?', Lowercase(RawHTTPCommand)) > 0);
     vOldRequest    := Cmd;
     If vIsQueryParam Then
      vUrlToExec    := Url
@@ -2349,24 +2343,23 @@ Begin
                ms.Position := 0;
                If (sFile <> '') Then
                 JSONParam.LoadFromStream(ms)
+               Else If vBinaryEvent Then
+                Begin
+                 If Assigned(JSONParam) Then
+                  FreeAndNil(JSONParam);
+                 If ms.Size > 0 Then
+                  Begin
+                   DWParams.Clear;
+                   DWParams.LoadFromStream(ms);
+                  End;
+                End
                Else If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(ms.DataString)) > 0) Then
                 JSONParam.FromJSON(ms.DataString)
                Else
                 Begin
-                 If vBinaryEvent Then
-                  Begin
-                   If Assigned(JSONParam) Then
-                    FreeAndNil(JSONParam);
-                   DWParams.Clear;
-                   DWParams.LoadFromStream(ms);
-                  End
-                 Else
-                  Begin
-                   JSONParam.AsString := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
-                   DWParams.Add(JSONParam);
-                  End;
+                 JSONParam.AsString := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
+                 DWParams.Add(JSONParam);
                 End;
-               //Fim da correção - ICO
                ms.Free;
                vDecoderHeaderList.Free;
               End;
@@ -2897,10 +2890,10 @@ Begin
              Begin
               vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                {$ELSE}Url{$IFEND}
-                                                               {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams);
+                                                               {$ELSE}Url{$ENDIF} + '?' + QueryParams);
               TRESTDWDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                                                        {$ELSE}Url{$IFEND}
-                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams, vEncoding, vmark, DWParams);
+                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams, vEncoding, vmark, DWParams);
              End
             Else
              Begin
@@ -3063,6 +3056,7 @@ Begin
                             vNeedAuthorization := vTempEvent.NeedAuthorization;
                            If vNeedAuthorization Then
                             Begin
+
                              vAuthenticationString := DecodeStrings(StringReplace(RawHeaders.Values['Authorization'], 'Basic ', '', [rfReplaceAll]){$IFDEF FPC}, vDatabaseCharSet{$ENDIF});; //Authentication.Authentication;// RawHeaders.Values['Authorization'];
                              If (vAuthenticationString <> '') And
                                 ((AuthUsername = '') And (AuthPassword = '')) Then
@@ -3093,6 +3087,8 @@ Begin
                           End;
             rdwAOBearer : Begin
                            vUrlToken := Lowercase(vUrlToExec);
+                           If Copy(vUrlToken, InitStrPos, 1) = '/' then
+                            Delete(vUrlToken, InitStrPos, 1);
                            If vUrlToken =
                               Lowercase(TRESTDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).GetTokenEvent) Then
                             Begin
@@ -3600,8 +3596,8 @@ Begin
                     StatusCode             := 200;
                     If Not (Assigned(ResultStream)) Then
                      ResultStream := TStringStream.Create('');
-                    WriteStream(mb, ResultStream);
-                    FreeAndNil(mb);
+                    WriteStream(ContentStream, ResultStream);
+                    FreeAndNil(ContentStream);
                     Result                 := True;
                    End;
                  End;
@@ -3828,7 +3824,7 @@ Begin
              LocalDoc := '';
              If TEncodeSelect(vEncoding) = esUtf8 Then
               sCharset := 'utf-8'
-              Else If TEncodeSelect(vEncoding) in [esANSI, esASCII] Then
+             Else If TEncodeSelect(vEncoding) in [esANSI, esASCII] Then
               sCharset := 'ansi';
              If Not vSpecialServer Then
               Begin
@@ -3836,7 +3832,7 @@ Begin
                If ServerContextStream <> Nil Then
                 Begin
                  If Not (Assigned(ResultStream)) Then
-                   ResultStream := TStringStream.Create('');  //Anderson
+                  ResultStream := TStringStream.Create('');
                  WriteStream(ServerContextStream, ResultStream);
                  FreeAndNil(ServerContextStream);
                 End
@@ -3854,6 +3850,8 @@ Begin
                   {$IF CompilerVersion > 21}
                    mb                                   := TStringStream.Create(JSONStr{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
                    mb.Position                          := 0;
+                   If Not (Assigned(ResultStream)) Then
+                    ResultStream := TStringStream.Create('');
                    WriteStream(mb, ResultStream);
                    FreeAndNil(mb);
                   {$ELSE}
@@ -3871,7 +3869,10 @@ Begin
       If Assigned(vLastResponse) Then
        Begin
         Try
-         vLastResponse(vReplyString);
+         If vReplyString = '' Then
+          vLastResponse(JSONStr)
+         Else
+          vLastResponse(vReplyString);
         Finally
         End;
        End;
@@ -4661,7 +4662,8 @@ Var
   vTempString  := UrlToExec;
   If Length(vTempString) > 0 Then
    Begin
-    If Copy(vTempString, Length(vTempString), 1) = '/' Then
+    If (Copy(vTempString, Length(vTempString), 1) = '/') Or
+       (Copy(vTempString, Length(vTempString), 1) = '?') Then
      vTempString := Copy(vTempString, 1, Length(vTempString) -1);
     For I := Length(vTempString) - FinalStrPos Downto InitStrPos Do
      Begin
@@ -5156,7 +5158,7 @@ Begin
              Begin
               vEncoded := DWParams.ItemsString['Result'].Encoded;
               If (BinaryEvent) And (Not (vError)) Then
-               DWParams.ItemsString['Result'].LoadFromStream(BinaryBlob)
+               DWParams.ItemsString['Result'].LoadFromStream(TStream(BinaryBlob))
               Else If Not(vError) And (vTempJSON <> '') Then
                DWParams.ItemsString['Result'].SetValue(vTempJSON, vEncoded)
               Else
@@ -6387,12 +6389,14 @@ Begin
        vTagService := False;
        For B := 0 To TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.Count -1 Do
         Begin
-         If ((LowerCase(urlContext) = LowerCase(TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext))) Or
-            ((Trim(TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext) = '') And (Pooler = '')        And
-             (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[urlContext] <> Nil))      Then
+         If ((LowerCase(Pooler) = LowerCase(TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext))) Or
+            ((Trim(TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext) = '')                      And
+             ((urlContext = '') or (urlContext = '/')))                                                              Then
+          vTagService := (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler] <> Nil);
+         If vTagService Then
           Begin
            vRootContext := TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext;
-           If ((Pooler = '')    And (vRootContext <> '')) Then
+           If (((urlContext = '') or (urlContext = '/')) And (vRootContext <> '')) And (Pooler = '') Then
             Pooler := vRootContext;
           End
          Else
@@ -6599,7 +6603,6 @@ Begin
  {$ELSE}
  {$ENDIF}
  vServerAuthOptions                     := TRESTDWServerAuthOptionParams.Create(Self);
-// vServerAuthOptions.AuthorizationOption := rdwAONone;
  vActive                                := False;
  vEncoding                              := esUtf8;
  vServicePort                           := 8082;

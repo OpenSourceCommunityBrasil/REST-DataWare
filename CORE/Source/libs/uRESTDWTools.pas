@@ -71,7 +71,7 @@ Uses
  Function  restdwMin              (Const AValueOne,
                                    AValueTwo            : Int64)           : Int64;
  Function  StringToBytes          (AStr                 : String)          : TRESTDWBytes;
- Function  StreamToBytes          (Stream               : TMemoryStream)   : TRESTDWBytes;
+ Function  StreamToBytes          (Stream               : TStream)         : TRESTDWBytes;
  Function  StringToFieldType      (Const S              : String)          : Integer;
  Function  Escape_chars           (s                    : String)          : String;
  Function  Unescape_chars         (s                    : String)          : String;
@@ -2987,12 +2987,12 @@ Begin
   Result := Integer(ftString);
 End;
 
-Function StreamToBytes(Stream : TMemoryStream) : TRESTDWBytes;
+Function StreamToBytes(Stream : TStream) : TRESTDWBytes;
 Begin
  Try
   Stream.Position := 0;
   SetLength  (Result, Stream.Size);
-  Stream.Read(Result[0], Stream.Size);
+  Stream.Read(Pointer(Result)^, Stream.Size);
  Finally
  End;
 end;
@@ -3072,7 +3072,6 @@ End;
 
 Function EncodeStream (Value : TStream) : String;
  {$IFNDEF FPC}
-  {$IFDEF LINUXFMX}
    Function EncodeBase64(AValue : TStream) : String;
    Var
     StreamDecoded : TMemoryStream;
@@ -3081,31 +3080,15 @@ Function EncodeStream (Value : TStream) : String;
     StreamDecoded := TMemoryStream.Create;
     StreamEncoded := TStringStream.Create('');
     Try
-//     StreamDecoded.WriteBuffer(AValue[0], Length(AValue));
      StreamDecoded.CopyFrom(AValue, AValue.Size);
      StreamDecoded.Position := 0;
      EncdDecd.EncodeStream(StreamDecoded, StreamEncoded);
-     Result := StreamEncoded.DataString;
+     Result := StringReplace(StreamEncoded.DataString, sLineBreak, '', [rfReplaceAll]);
     Finally
      StreamEncoded.Free;
      StreamDecoded.Free;
     End;
    End;
-  {$ELSE}
-   Function EncodeBase64(AValue : TStream) : String;
-   Var
-    outstream : TStringStream;
-   Begin
-    outstream := TStringStream.Create('');
-    Try
-     outstream.CopyFrom(AValue, AValue.Size);
-     outstream.Position := 0;
-     Result := EncodeStrings(outstream.Datastring{$IFDEF FPC}, csUndefined{$ENDIF});
-    Finally
-     FreeAndNil(outstream);
-    End;
-   End;
-  {$ENDIF}
  {$ELSE}
   Function EncodeBase64(AValue : TStream) : String;
   Var

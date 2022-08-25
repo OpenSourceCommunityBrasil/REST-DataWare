@@ -1,4 +1,4 @@
-unit uRESTDWShellServicesReg;
+unit uRESTDWShellServicesRegLazarus;
 
 {$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -27,10 +27,10 @@ interface
 
 uses
   {$IFDEF FPC}
-    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWShellServices,
+    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWShellServicesLazarus,
     LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb, uRESTDWComponentBase;
   {$ELSE}
-   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWShellServices, uRESTDWComponentBase,
+   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWShellServicesLazarus, uRESTDWComponentBase,
    RTLConsts,
    {$IFDEF COMPILER16_UP}
    UITypes,
