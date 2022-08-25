@@ -100,8 +100,7 @@ Type
   {$ENDIF}
   vOnWriterProcess : TOnWriterProcess;
   Function  GetValue     (CanConvert         : Boolean = True)    : Variant;
-  Procedure WriteValue   (bValue             : TStream);Overload;
-  Procedure WriteValue   (bValue             : Variant);Overload;
+  Procedure WriteValue   (bValue             : Variant);
   Function  FormatValue  (bValue             : String) : String;
   Function  GetValueJSON (bValue             : String) : String;
   Function  DatasetValues(bValue             : TDataset;
@@ -205,8 +204,10 @@ Type
   Procedure LoadFromJSON   (bValue           : String);Overload;
   Procedure LoadFromJSON   (bValue           : String;
                             DataModeD        : TDataMode);Overload;
-  Procedure LoadFromStream (Stream           : TStream);
-  Procedure SaveToStream   (Const Stream     : TStream);
+  Procedure LoadFromStream (Stream           : TMemoryStream;
+                            Encode           : Boolean = True);
+  Procedure SaveToStream   (Const Stream     : TMemoryStream;
+                            Binary           : Boolean = False);
   Procedure SaveToFile     (FileName         : String);
   Procedure ToBytes        (Value            : String;
                             Encode           : Boolean = False);
@@ -214,7 +215,6 @@ Type
   Procedure SetValue       (Value            : Variant;
                             Encode           : Boolean = True);
   Function    Value           : Variant;
-  Function    AsBytes         : TRESTDWBytes;
   Constructor Create;
   Destructor  Destroy; Override;
   Function IsNull             : Boolean;
@@ -321,8 +321,7 @@ Type
   vEncodingLazarus : TEncoding;
   vDatabaseCharSet : TDatabaseCharSet;
   {$ENDIF}
-  Procedure WriteValue      (bValue     : Variant);Overload;
-  Procedure WriteValue      (bValue     : TStream);Overload;
+  Procedure WriteValue      (bValue     : Variant);
   Procedure SetParamName    (bValue     : String);
   Procedure SetParamFileName(bValue     : String);
   Function  GetAsString : String;
@@ -388,14 +387,14 @@ Type
   Function  GetNullValue     (Value    : TObjectValue) : Variant;
   Function  GetValue         (Value    : TObjectValue) : Variant;
   Procedure SetValue         (aValue   : String;
+                              Encode   : Boolean = True);
+  Procedure LoadFromStream   (Stream   : TMemoryStream;
                               Encode   : Boolean = True);Overload;
-  Procedure SetValue         (aValue   : TStream);Overload;
-  Procedure LoadFromStream   (Stream   : TMemoryStream);Overload;
-  Procedure LoadFromStream   (Stream   : TStream;
+  Procedure LoadFromStream   (Stream   : TStringStream;
                               Encode   : Boolean = True);Overload;
   Procedure ToBytes          (Value    : String;
                               Encode   : Boolean = False);
-  Procedure SaveToStream     (Var Stream   : TStream);      Overload;
+  Procedure SaveToStream     (Var Stream   : TMemoryStream);Overload;
   Procedure SaveToStream     (Var Stream   : TStringStream);Overload;
   Procedure LoadFromParam    (Param    : TParam);
   Procedure SaveFromParam    (Param    : TParam);
@@ -910,18 +909,6 @@ Begin
   End;
 End;
 
-Procedure TJSONValue.WriteValue(bValue : TStream);
-Begin
- vNullValue := False;
- If bValue.Size = 0 Then
-  Begin
-   vNullValue := True;
-   Exit;
-  End
- Else
-  aValue := StreamToBytes(bValue);
-End;
-
 Procedure TJSONValue.WriteValue(bValue : Variant);
 {$IFNDEF FPC}
 {$IF CompilerVersion < 26}
@@ -930,7 +917,6 @@ Var
 {$IFEND}
 {$ENDIF}
 Begin
- vNullValue := False;
  SetLength(aValue, 0);
  If VarIsNull(bValue) Then
   Begin
@@ -939,6 +925,7 @@ Begin
   End
  Else
   Begin
+   vNullValue := False;
    If ((bValue = '') or (bValue = 'null')) Then
     Begin
      If Not vNullValue Then
@@ -4007,32 +3994,35 @@ Begin
  End;
 End;
 
-Procedure TJSONValue.LoadFromStream(Stream : TStream);
+Procedure TJSONValue.LoadFromStream(Stream : TMemoryStream;
+                                    Encode : Boolean = True);
 Begin
  ObjectValue := ovBlob;
- vBinary     := True;
- vNullValue  := True;
- If (Stream <> Nil) Then
-  Begin
-   Stream.Position := 0;
-   If Stream.Size > 0 Then
-    Begin
-     Try
-      SetLength(aValue, Stream.Size);
-      Stream.Read(aValue[0], Stream.Size);
-      vNullValue  := False;
-     Except
-
-     End;
-    End;
-  End;
+ vBinary := True;
+ If Stream <> Nil Then
+  SetValue(EncodeStream(Stream), Encode); //StreamToHex(Stream), Encode);
 End;
 
-Procedure TJSONValue.SaveToStream(Const Stream : TStream);
+Procedure TJSONValue.SaveToStream(Const Stream : TMemoryStream;
+                                  Binary : Boolean = False);
+Var
+ vTempStream : TMemoryStream;
 Begin
  Try
-  If Length(aValue) > 0 Then
-   Stream.Write(aValue[0], Length(aValue));
+  If Not Binary Then
+   Stream.Write(aValue[0], Length(aValue))
+  Else
+   Begin
+    If Not VarIsNull(Value) Then
+     Begin
+      vTempStream := DecodeStream(Value);
+      If Assigned(vTempStream) Then
+       Begin
+        Stream.CopyFrom(vTempStream, vTempStream.Size);
+        FreeAndNil(vTempStream);
+       End;
+     End;
+   End;
  Finally
   If Assigned(Stream) Then
    Stream.Position := 0;
@@ -4240,11 +4230,6 @@ Begin
   End;
 End;
 
-Function TJSONValue.AsBytes : TRESTDWBytes;
-Begin
- Result := aValue;
-End;
-
 Function TJSONValue.Value : Variant;
 Begin
  Result := GetValue;
@@ -4315,20 +4300,6 @@ End;
 Function TJSONValue.IsNull : Boolean;
 Begin
  Result := vNullValue;
-End;
-
-Procedure TJSONParam.WriteValue(bValue : TStream);
-Begin
- If TestNilParam Then
-  Exit;
- vJSONValue.Encoding         := vEncoding;
- vJSONValue.vtagName         := vParamName;
- vJSONValue.vTypeObject      := vTypeObject;
- vJSONValue.vObjectDirection := vObjectDirection;
- vJSONValue.vObjectValue     := vObjectValue;
- vJSONValue.vEncoded         := False;
- vJSONValue.WriteValue(bValue);
- vNullValue                  := vJSONValue.vNullValue;
 End;
 
 Procedure TJSONParam.WriteValue(bValue : Variant);
@@ -4778,7 +4749,7 @@ End;
 Procedure TJSONParam.Assign(Source : TObject);
 Var
  Src     : TJSONParam;
- aStream : TStream;
+ aStream : TMemoryStream;
 Begin
  If Source Is TJSONParam Then
   Begin
@@ -4829,8 +4800,7 @@ End;
 
 Procedure TJSONParam.SaveToFile(FileName: String);
 Var
- vStringStream : TStream;
- aBytes        : TRESTDWBytes;
+ vStringStream : TStringStream;
  {$IFDEF FPC}
  vFileStream   : TFileStream;
  {$ELSE}
@@ -4841,11 +4811,7 @@ Var
 Begin
  If TestNilParam Then
   Exit;
- vStringStream := TMemoryStream.Create;
- aBytes        := vJSONValue.AsBytes;
- If Length(aBytes) > 0 Then
-  vStringStream.Write(aBytes[0], Length(aBytes));
- vStringStream.Position := 0;
+ vStringStream := TStringStream.Create(ToJSON);
  Try
   {$IFDEF FPC}
   vStringStream.Position := 0;
@@ -4858,7 +4824,7 @@ Begin
   {$ELSE}
    {$IF CompilerVersion > 21} // Delphi 2010 pra cima
     vStringStream.Position := 0;
-    TMemoryStream(vStringStream).SaveToFile(FileName);
+    vStringStream.SaveToFile(FileName);
    {$ELSE}
     vStringStream.Position := 0;
     vFileStream   := TFileStream.Create(FileName, fmCreate);
@@ -4892,7 +4858,7 @@ End;
 Procedure TJSONParam.CopyFrom(JSONParam : TJSONParam);
 Var
  vValue  : String;
- vStream : TStream;
+ vStream : TMemoryStream;
 Begin
  If TestNilParam Then
   Exit;
@@ -5181,7 +5147,7 @@ Begin
                         Begin
                          ms := TMemoryStream.Create;
                          Try
-                          vJSONValue.SaveToStream(ms);
+                          vJSONValue.SaveToStream(ms, vJSONValue.vBinary);
                           If ms.Size > 0 Then
                            Begin
                             ms.Position := 0;
@@ -5380,7 +5346,7 @@ Begin
   ovStream          : Begin
                        ms := TMemoryStream.Create;
                        Try
-                        vJSONValue.SaveToStream(ms);
+                        vJSONValue.SaveToStream(ms, vJSONValue.vBinary);
                         If ms.Size > 0 Then
                          Begin
                           Result   := VarArrayCreate([0, ms.Size - 1], VarByte);
@@ -5395,21 +5361,6 @@ Begin
                        End
                       End;
  End;
-End;
-
-Procedure TJSONParam.SetValue    (aValue   : TStream);
-Begin
- If TestNilParam Then
-  Exit;
- vJSONValue.DataMode := vDataMode;
- vJSONValue.vEncoded := False;
- vBinary := vObjectValue in [ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob];
- vJSONValue.ObjectValue := vObjectValue;
- If (vNullValue) And (aValue.Size = 0) Then
-  WriteValue(Null)
- Else
-  WriteValue(aValue);
- vJSONValue.vBinary := True;
 End;
 
 Procedure TJSONParam.SetValue    (aValue : String;
@@ -5453,54 +5404,69 @@ Begin
  vJSONValue.vEncoded := vEncoded;
 End;
 
-Procedure TJSONParam.LoadFromStream(Stream : TMemoryStream);
+Procedure TJSONParam.LoadFromStream(Stream : TMemoryStream;
+                                    Encode : Boolean);
 Begin
  If TestNilParam Then
   Exit;
  ObjectValue       := ovBlob;
- vEncoded          := False;
- SetValue(Stream);
+ vEncoded          := True;
+ SetValue(EncodeStream(Stream), vEncoded); // StreamToHex(Stream), vEncoded);
  vBinary           := True;
  vJSONValue.Binary := vBinary;
 End;
 
-Procedure TJSONParam.LoadFromStream   (Stream   : TStream;
+Procedure TJSONParam.LoadFromStream   (Stream   : TStringStream;
                                        Encode   : Boolean = True);
+Var
+ vStream : TMemoryStream;
 Begin
  If TestNilParam Then
   Exit;
+ vStream := TMemoryStream.Create;
  Try
   If Assigned(Stream) Then
-   LoadFromStream(TMemoryStream(Stream));
+   Begin
+    vStream.CopyFrom(Stream, Stream.Size);
+    vStream.Position := 0;
+    LoadFromStream(vStream, Encode);
+   End;
  Finally
+  vStream.Free;
  End;
 End;
 
-Procedure TJSONParam.SaveToStream(Var Stream: TStream);
-Var
- aValue : TRESTDWBytes;
+Procedure TJSONParam.SaveToStream(Var Stream: TMemoryStream);
 Begin
  If TestNilParam Then
   Exit;
- aValue := vJSONValue.AsBytes;
- If Not Assigned(Stream) Then
-  Stream := TMemoryStream.Create;
- Try
-  If Length(aValue) > 0 Then
-   Stream.Write(aValue[0], Length(aValue));
-  Stream.Position := 0;
- Except
-
- End;
+ If Assigned(Stream) Then
+  FreeAndNil(Stream);
+ Stream := DecodeStream(GetAsString); // HexToStream(GetAsString, Stream);
 End;
 
 Procedure TJSONParam.SaveToStream(Var Stream   : TStringStream);
+Var
+ vStream : TMemoryStream;
 Begin
  If TestNilParam Then
   Exit;
- If Not Assigned(Stream) Then
-  Stream := TStringStream.Create('');
- SaveToStream(TStream(Stream));
+ vStream := Nil;
+ SaveToStream(vStream);
+ Try
+  If Assigned(vStream) Then
+   Begin
+    If Assigned(Stream) Then
+     Begin
+      vStream.Position := 0;
+      Stream.CopyFrom(vStream, vStream.Size);
+      Stream.Position := 0;
+     End;
+   End;
+ Finally
+  If Assigned(vStream) Then
+   vStream.Free;
+ End;
 End;
 
 Procedure TJSONParam.LoadFromParam(Param : TParam);
@@ -5570,7 +5536,7 @@ End;
 
 Procedure TJSONParam.SaveFromParam(Param : TParam);
 Var
- ms : TStream;
+ ms : TMemoryStream;
 Begin
  If Not Assigned(Param) Then
   Exit;
@@ -6034,7 +6000,7 @@ Var
   Sing     : Single;
   WordData : Word;
   B        : Boolean;
-  P        : TStream;
+  P        : TMemoryStream;
   T        : DWFieldTypeSize;
   D        : TDateTime;
   aParam   : TJSONParam;
@@ -6562,12 +6528,12 @@ Var
                   Stream.ReadBuffer(J, Sizeof(DWInt64));
                   If J > 0 Then
                    Begin
-                    vStream := TMemoryStream.Create;
+                    vStream := TStringStream.Create('');
                     Try
                      vStream.CopyFrom(Stream, J);
                      vStream.position := 0;
                      Try
-                      vItem.LoadFromStream(vStream, False);
+                      vItem.LoadFromStream(TStringStream(vStream));
                      Except
                      End;
                     Finally

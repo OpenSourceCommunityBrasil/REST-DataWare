@@ -1913,10 +1913,9 @@ Function TRESTDWPoolerMethodClient.ExecuteCommandJSON(Pooler, Method_Prefix,
                                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TJSONValue;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
- lResponse            : String;
- JSONParam            : TJSONParam;
- DWParams             : TRESTDWParams;
- vStream              : TStream;
+ lResponse        : String;
+ JSONParam        : TJSONParam;
+ DWParams         : TRESTDWParams;
 Begin
  RowsAffected  := 0;
  SocketError   := False;
@@ -2073,20 +2072,12 @@ Begin
       RowsAffected  := DWParams.ItemsString['RowsAffected'].AsInteger;
      If DWParams.ItemsString['Result'] <> Nil Then
       Begin
-       If Not (DWParams.ItemsString['Result'].IsEmpty) Then
+       If DWParams.ItemsString['Result'].AsString <> '' Then
         Begin
          If Not BinaryRequest Then
           Result.LoadFromJSON(DWParams.ItemsString['Result'].AsString)
          Else
-          Begin
-           Try
-            DWParams.ItemsString['Result'].SaveToStream(vStream);
-            Result.LoadFromStream(TMemoryStream(vStream));
-           Finally
-            vStream.Free;
-           End;
-//           Result.SetValue(DWParams.ItemsString['Result'].AsString, False);
-          End;
+          Result.SetValue(DWParams.ItemsString['Result'].AsString, False);
         End
        Else
         Result.SetValue(lResponse, False);
@@ -2337,7 +2328,6 @@ Var
  lResponse        : String;
  JSONParam        : TJSONParam;
  DWParams         : TRESTDWParams;
- vStream          : TStream;
 Begin
  Result        := Nil;
  SocketError   := False;
@@ -2488,15 +2478,7 @@ Begin
          If Not BinaryRequest Then
           Result.LoadFromJSON(DWParams.ItemsString['Result'].AsString)
          Else
-          Begin
-           Try
-            DWParams.ItemsString['Result'].SaveToStream(vStream);
-            Result.LoadFromStream(TMemoryStream(vStream));
-           Finally
-            vStream.Free;
-           End;
-//           Result.SetValue(DWParams.ItemsString['Result'].AsString, False);
-          End;
+          Result.SetValue(DWParams.ItemsString['Result'].AsString, False);
         End
        Else
         Result.SetValue(lResponse, False);
