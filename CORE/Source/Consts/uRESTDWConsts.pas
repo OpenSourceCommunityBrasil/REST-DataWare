@@ -70,9 +70,9 @@ Const
  wdays                      : Array [1 .. 7]  Of String = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'); {do not localize}
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
- RESTDWVersionINFO          = 'v2.0.4-';
+ RESTDWVersionINFO          = 'v2.1.0-';
  RESTDWRelease              = '3097';
- RESTDWCodeProject          = 'Savage Reign - GitHub';
+ RESTDWCodeProject          = 'Galaga - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
  SCorruptedFileHeader       = 'Corrupted File Header';
