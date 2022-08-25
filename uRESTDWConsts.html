@@ -249,6 +249,12 @@
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#TResquestMode">TResquestMode</a></strong> = (...);</code></td>
 </tr>
 <tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWConsts.html#TRESTDWJSONType">TRESTDWJSONType</a></strong> = (...);</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWConsts.html#TRESTDWJSONTypes">TRESTDWJSONTypes</a></strong> = Set of <a href="uRESTDWConsts.html#TRESTDWJSONType">TRESTDWJSONType</a>;</code></td>
+</tr>
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#TDataMode">TDataMode</a></strong> = (...);</code></td>
 </tr>
 <tr class="list2">
@@ -298,7 +304,7 @@
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#RESTDWVersionINFO">RESTDWVersionINFO</a></strong>          = 'v2.0.3-';</code></td>
 </tr>
 <tr class="list2">
-<td class="itemcode"><code><strong><a href="uRESTDWConsts.html#RESTDWRelease">RESTDWRelease</a></strong>              = '3085';</code></td>
+<td class="itemcode"><code><strong><a href="uRESTDWConsts.html#RESTDWRelease">RESTDWRelease</a></strong>              = '3093';</code></td>
 </tr>
 <tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#RESTDWCodeProject">RESTDWCodeProject</a></strong>          = 'Savage Reign - GitHub';</code></td>
@@ -494,276 +500,285 @@
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cDefaultContentType">cDefaultContentType</a></strong>        = 'application/json';</code></td>
 </tr>
 <tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cContentTypeFormUrl">cContentTypeFormUrl</a></strong>        = 'application/x-www-form-urlencoded';</code></td>
+</tr>
+<tr class="list">
+<td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cContentTypeMultiPart">cContentTypeMultiPart</a></strong>      = 'multipart/form-data';</code></td>
+</tr>
+<tr class="list2">
+<td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cDefaultContentEncoding">cDefaultContentEncoding</a></strong>    = 'gzip, identity';</code></td>
+</tr>
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cValueKey">cValueKey</a></strong>                  = '{&quot;serverinforequest&quot;:&quot;%s&quot;, &quot;inforequest&quot;:&quot;%s&quot;, &quot;lifecycle&quot;:&quot;%s&quot;}';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cValueKeyToken">cValueKeyToken</a></strong>             = '{&quot;secrets&quot;:&quot;%s&quot;, &quot;md5&quot;:&quot;%s&quot;}';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cValueToken">cValueToken</a></strong>                = '{%s&quot;exp&quot;:&quot;%s&quot;, &quot;iat&quot;:&quot;%s&quot;, &quot;secrets&quot;:&quot;%s&quot;}';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cValueTokenNoLife">cValueTokenNoLife</a></strong>          = '{%s&quot;iat&quot;:&quot;%s&quot;, &quot;secrets&quot;:&quot;%s&quot;}';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cTokenStringRDWTS">cTokenStringRDWTS</a></strong>          = '{&quot;token&quot;:&quot;%s&quot;}';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidBinaryRequest">cInvalidBinaryRequest</a></strong>      = 'Invalid Binary Request. Resource unsupported. %s';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidEvent">cInvalidEvent</a></strong>              = 'Invalid Event Name';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidContextName">cInvalidContextName</a></strong>        = 'Invalid Context Name';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidCustomFieldName">cInvalidCustomFieldName</a></strong>    = 'Invalid Custom Field Name';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidFieldName">cInvalidFieldName</a></strong>          = 'Invalid Field Name';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidParamName">cInvalidParamName</a></strong>          = 'Invalid Param Name';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidDWParam">cInvalidDWParam</a></strong>            = 'Invalid RESTDWParam';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidDWParams">cInvalidDWParams</a></strong>           = 'Invalid RESTDWParams';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidPoolerName">cInvalidPoolerName</a></strong>         = 'Invalid Pooler Name...';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidContextRule">cInvalidContextRule</a></strong>        = 'Invalid ContextRule Name';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cServerEventNotFound">cServerEventNotFound</a></strong>       = 'ServerEvent not found...';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cStreamReadError">cStreamReadError</a></strong>           = 'Stream Error %s %s';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidServerEventName">cInvalidServerEventName</a></strong>    = 'Invalid ServerEvent name';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidDriverConnection">cInvalidDriverConnection</a></strong>   = 'CustomConnection undefined on server driver selected';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidRDWServer">cInvalidRDWServer</a></strong>          = 'Invalid REST Dataware Server...';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidConnectionName">cInvalidConnectionName</a></strong>     = 'Invalid ConnectionName';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cPoolerNotFound">cPoolerNotFound</a></strong>            = 'Pooler not found';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cRequestRejectedMethods">cRequestRejectedMethods</a></strong>    = 'Request rejected. Acceptable HTTP methods: ';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cRequestAcceptableMethods">cRequestAcceptableMethods</a></strong>  = 'Acceptable HTTP methods not defined on server';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cRequestRejected">cRequestRejected</a></strong>           = 'The Requested URL was Rejected';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidRequest">cInvalidRequest</a></strong>            = 'Invalid request url.';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cNotWorkYet">cNotWorkYet</a></strong>                = 'It doesn''''t work yet';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cAuthenticationError">cAuthenticationError</a></strong>       = 'Error : ' + #13 + 'Authentication Error...';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidConnection">cInvalidConnection</a></strong>         = 'Invalid connection. The server maybe offline...';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidDataToApply">cInvalidDataToApply</a></strong>        = 'No data to &quot;Applyupdates&quot;...';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cEmptyDBName">cEmptyDBName</a></strong>               = 'Empty Database Property';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cMIMETypeEmpty">cMIMETypeEmpty</a></strong>             = 'Mimetype is Empty...';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cMIMETypeAlreadyExists">cMIMETypeAlreadyExists</a></strong>     = 'Mimetype Already Exists...';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cErrorDatabaseNotFound">cErrorDatabaseNotFound</a></strong>     = 'Database not found...';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cErrorOpenDataset">cErrorOpenDataset</a></strong>          = 'Error when try open Dataset...';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cErrorNoFieldsDataset">cErrorNoFieldsDataset</a></strong>      = 'No Fields to add on Dataset...';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cExprIncorrect">cExprIncorrect</a></strong>             = 'Incorrectly formed filter expression';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cExprExpected">cExprExpected</a></strong>              = 'Expression expected but %s found';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidBufferPosition">cInvalidBufferPosition</a></strong>     = 'Invalid Buffer Position';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cFieldNotFound">cFieldNotFound</a></strong>             = 'Field ''%s'' not found';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidStream">cInvalidStream</a></strong>             = 'Invalid Stream...';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cCannotWriteBuffer">cCannotWriteBuffer</a></strong>         = 'Cannot Write Buffer';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cCannotReadBuffer">cCannotReadBuffer</a></strong>          = 'Cannot Read Buffer';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cCreatedToken">cCreatedToken</a></strong>              = '201 Created';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cEventNotFound">cEventNotFound</a></strong>             = 'HTTP/1.1 404 Url Not Found';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidAuth">cInvalidAuth</a></strong>               = 'HTTP/1.1 401 Unauthorized';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidInternalError">cInvalidInternalError</a></strong>      = 'Internal Server Error';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidMessageTo">cInvalidMessageTo</a></strong>          = 'Invalid Sendmessage %s to user %s, error %s';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cWelcomeUser">cWelcomeUser</a></strong>               = 'Welcome user %s';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cUserAgent">cUserAgent</a></strong>                 = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cParamDetails">cParamDetails</a></strong>              = '%s|%s|%d|%d';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cParamsCount">cParamsCount</a></strong>               = 1;</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cServerStream">cServerStream</a></strong>              = 'SERVERSTREAM';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cUserStream">cUserStream</a></strong>                = 'USERSTREAM';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cConnectionRename">cConnectionRename</a></strong>          = 'CONNECTIONRENAME';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cServerMessage">cServerMessage</a></strong>             = 'SERVERMESSAGE';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cUserMessage">cUserMessage</a></strong>               = 'USERMESSAGE';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cPing">cPing</a></strong>                      = 'PING';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cPong">cPong</a></strong>                      = 'PONG';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cQuit">cQuit</a></strong>                      = 'QUIT';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cApplicationJSON">cApplicationJSON</a></strong>           = 'application/json';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cMessagePartCreate">cMessagePartCreate</a></strong>         = 'MessagePart can not be created. Use descendant classes.';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cMessageDecoderNotFound">cMessageDecoderNotFound</a></strong>    = 'Decoder not found';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cMessageEncoderNotFound">cMessageEncoderNotFound</a></strong>    = 'Encoder not found';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cIOHandler_MaxCapturedLines">cIOHandler_MaxCapturedLines</a></strong> = -1;</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cTimeoutDefault">cTimeoutDefault</a></strong>             = -1;</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cMaxLineLengthDefault">cMaxLineLengthDefault</a></strong>       = 16 * 1024;</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cRecvBufferSizeDefault">cRecvBufferSizeDefault</a></strong>      = 32 * 1024;</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cSendBufferSizeDefault">cSendBufferSizeDefault</a></strong>      = 32 * 1024;</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cCharIndexOutOfBounds">cCharIndexOutOfBounds</a></strong>      = 'Character index out of bounds (%d)';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidCharCount">cInvalidCharCount</a></strong>          = 'Invalid count (%d)';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cHeaderEncodeError">cHeaderEncodeError</a></strong>         = 'Could not encode header data using charset &quot;%s&quot;';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cHeaderDecodeError">cHeaderDecodeError</a></strong>         = 'Could not decode header data using charset &quot;%s&quot;';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cNotEnoughDataInBuffer">cNotEnoughDataInBuffer</a></strong>     = 'Not enough data in buffer. (%d/%d)';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cTooMuchDataInBuffer">cTooMuchDataInBuffer</a></strong>       = 'Too much data in buffer.';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cCapacityTooSmall">cCapacityTooSmall</a></strong>          = 'Capacity cannot be smaller than Size.';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cBufferIsEmpty">cBufferIsEmpty</a></strong>             = 'No bytes in buffer.';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cBufferRangeError">cBufferRangeError</a></strong>          = 'Index out of bounds.';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cBufferMissingTerminator">cBufferMissingTerminator</a></strong>   = 'Buffer terminator must be specified.';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cBufferInvalidStartPos">cBufferInvalidStartPos</a></strong>     = 'Buffer start position is invalid.';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cMessageErrorSavingAttachment">cMessageErrorSavingAttachment</a></strong>  = 'Error saving attachment.';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cMessageErrorAttachmentBlocked">cMessageErrorAttachmentBlocked</a></strong> = 'Attachment %s is blocked.';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cFailedTimeZoneInfo">cFailedTimeZoneInfo</a></strong>            = 'Failed attempting to retrieve time zone information.';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cMessageCannotLoad">cMessageCannotLoad</a></strong>             = 'Cannot load message from file %s';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cIOHandlerCannotChange">cIOHandlerCannotChange</a></strong>         = 'Cannot change a connected IOHandler.';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cIOHandlerTypeNotInstalled">cIOHandlerTypeNotInstalled</a></strong>     = 'No IOHandler of type %s is installed.';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidDestinationIndex">cInvalidDestinationIndex</a></strong>       = 'Invalid destination index (%d)';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidDestinationArray">cInvalidDestinationArray</a></strong>       = 'Invalid destination array';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cInvalidSourceArray">cInvalidSourceArray</a></strong>            = 'Invalid source array';</code></td>
 </tr>
-<tr class="list">
+<tr class="list2">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cReadTimeout">cReadTimeout</a></strong>                   = 'Read timed out.';</code></td>
 </tr>
-<tr class="list2">
+<tr class="list">
 <td class="itemcode"><code><strong><a href="uRESTDWConsts.html#cReadLnWaitMaxAttemptsExceeded">cReadLnWaitMaxAttemptsExceeded</a></strong> = 'Max line read attempts exceeded.';</code></td>
 </tr>
 </table>
@@ -1342,6 +1357,27 @@ Function BytesArrToString (aValue : tIdBytes; IdEncode : {$IFNDEF FPC}{$IF (DEFI
 </table>
 <table class="detail wide_list">
 <tr class="list">
+<td class="itemcode"><span id="TRESTDWJSONType"></span><code><strong>TRESTDWJSONType</strong> = (...);</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;<h6 class="description_section">Valores</h6>
+<ul>
+<li>
+<span id="TRESTDWJSONObjectType">TRESTDWJSONObjectType</span></li>
+<li>
+<span id="TRESTDWJSONArrayType">TRESTDWJSONArrayType</span></li>
+</ul>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="TRESTDWJSONTypes"></span><code><strong>TRESTDWJSONTypes</strong> = Set of <a href="uRESTDWConsts.html#TRESTDWJSONType">TRESTDWJSONType</a>;</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
 <td class="itemcode"><span id="TDataMode"></span><code><strong>TDataMode</strong> = (...);</code></td>
 </tr>
 <tr><td colspan="1">
@@ -1613,7 +1649,7 @@ do not localize</p>
 </table>
 <table class="detail wide_list">
 <tr class="list">
-<td class="itemcode"><span id="RESTDWRelease"></span><code><strong>RESTDWRelease</strong>              = '3085';</code></td>
+<td class="itemcode"><span id="RESTDWRelease"></span><code><strong>RESTDWRelease</strong>              = '3093';</code></td>
 </tr>
 <tr><td colspan="1">
 &nbsp;</td></tr>
@@ -2067,6 +2103,27 @@ Number of minutes in a day</p>
 <table class="detail wide_list">
 <tr class="list">
 <td class="itemcode"><span id="cDefaultContentType"></span><code><strong>cDefaultContentType</strong>        = 'application/json';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="cContentTypeFormUrl"></span><code><strong>cContentTypeFormUrl</strong>        = 'application/x-www-form-urlencoded';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="cContentTypeMultiPart"></span><code><strong>cContentTypeMultiPart</strong>      = 'multipart/form-data';</code></td>
+</tr>
+<tr><td colspan="1">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="itemcode"><span id="cDefaultContentEncoding"></span><code><strong>cDefaultContentEncoding</strong>    = 'gzip, identity';</code></td>
 </tr>
 <tr><td colspan="1">
 &nbsp;</td></tr>
