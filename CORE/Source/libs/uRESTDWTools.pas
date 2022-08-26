@@ -2992,7 +2992,7 @@ Begin
  Try
   Stream.Position := 0;
   SetLength  (Result, Stream.Size);
-  Stream.Read(Pointer(Result)^, Stream.Size);
+  Stream.Read(Result[0], Stream.Size);
  Finally
  End;
 end;

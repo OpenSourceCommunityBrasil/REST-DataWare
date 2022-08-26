@@ -3907,12 +3907,11 @@ Begin
      End;
    End;
  Finally
-   {Eloy - Adicionado mais um try para free de objects}
-   If LDataSetList <> Nil Then
-    FreeAndNil(LDataSetList);
-   FreeAndNil(vRESTConnectionDB);
-   If Assigned(RESTClientPoolerExec) And (vLocalClient) Then
-    FreeAndNil(RESTClientPoolerExec);
+  If LDataSetList <> Nil Then
+   FreeAndNil(LDataSetList);
+  FreeAndNil(vRESTConnectionDB);
+  If Assigned(RESTClientPoolerExec) And (vLocalClient) Then
+   FreeAndNil(RESTClientPoolerExec);
  End;
 End;
 

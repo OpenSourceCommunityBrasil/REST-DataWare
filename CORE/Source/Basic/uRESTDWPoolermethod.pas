@@ -2601,7 +2601,6 @@ Begin
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;

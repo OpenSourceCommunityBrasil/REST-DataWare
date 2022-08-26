@@ -1642,7 +1642,7 @@ Var
  decoder             : TRESTDWMessageDecoderMIME;
  mb,
  mb2,
- ms                  : TStringStream;
+ ms                  : TStream;
  RequestType         : TRequestType;
  vRequestHeader,
  vDecoderHeaderList  : TStringList;
@@ -2250,9 +2250,9 @@ Begin
             mb := TStringStream.Create(''); //{$IFNDEF FPC}{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
             try
              mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
-               ContentStringStream.Position := 0;
+                         ContentStringStream.Position := 0;
              mb.Position := 0;
-             If (pos('--', mb.DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+             If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
               Begin
                msgEnd   := False;
                boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
@@ -2281,7 +2281,7 @@ Begin
             Case Decoder.PartType of
              mcptAttachment:
               Begin
-               ms := TStringStream.Create('');
+               ms := TMemoryStream.Create;
                ms.Position := 0;
                NewDecoder := Decoder.ReadBody(ms, MsgEnd);
                vDecoderHeaderList := TStringList.Create;
@@ -2353,11 +2353,11 @@ Begin
                    DWParams.LoadFromStream(ms);
                   End;
                 End
-               Else If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(ms.DataString)) > 0) Then
-                JSONParam.FromJSON(ms.DataString)
+               Else If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(TStringStream(ms).DataString)) > 0) Then
+                JSONParam.FromJSON(TStringStream(ms).DataString)
                Else
                 Begin
-                 JSONParam.AsString := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
+                 JSONParam.AsString := StringReplace(StringReplace(TStringStream(ms).DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
                  DWParams.Add(JSONParam);
                 End;
                ms.Free;
@@ -2379,19 +2379,19 @@ Begin
                If Decoder <> Nil Then
                 TRESTDWMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
                If pos('dwwelcomemessage', lowercase(tmp)) > 0      Then
-                vWelcomeMessage := DecodeStrings(ms.DataString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                vWelcomeMessage := DecodeStrings(TStringStream(ms).DataString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                Else If pos('dwaccesstag', lowercase(tmp)) > 0      Then
-                vAccessTag := DecodeStrings(ms.DataString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                vAccessTag := DecodeStrings(TStringStream(ms).DataString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                Else If Pos('dwusecript', lowercase(tmp)) > 0       Then
-                vdwCriptKey  := StringToBoolean(ms.DataString)
+                vdwCriptKey  := StringToBoolean(TStringStream(ms).DataString)
                Else If pos('datacompression', lowercase(tmp)) > 0  Then
-                compresseddata := StringToBoolean(ms.DataString)
+                compresseddata := StringToBoolean(TStringStream(ms).DataString)
                Else If pos('dwencodestrings', lowercase(tmp)) > 0  Then
-                encodestrings  := StringToBoolean(ms.DataString)
+                encodestrings  := StringToBoolean(TStringStream(ms).DataString)
                Else If (Pos('dwassyncexec', lowercase(tmp)) > 0) And (Not (dwassyncexec)) Then
-                dwassyncexec := StringToBoolean(ms.DataString)
+                dwassyncexec := StringToBoolean(TStringStream(ms).DataString)
                Else If Pos('binaryrequest', lowercase(tmp)) > 0    Then
-                vBinaryEvent := StringToBoolean(ms.DataString)
+                vBinaryEvent := StringToBoolean(TStringStream(ms).DataString)
                Else If pos('dwconnectiondefs', lowercase(tmp)) > 0 Then
                 Begin
                  vdwConnectionDefs   := TConnectionDefs.Create;
@@ -2399,7 +2399,7 @@ Begin
                  Try
                   JSONValue.Encoding  := vEncoding;
                   JSONValue.Encoded  := True;
-                  JSONValue.LoadFromJSON(ms.DataString);
+                  JSONValue.LoadFromJSON(TStringStream(ms).DataString);
                   vdwConnectionDefs.LoadFromJSON(JSONValue.Value);
                  Finally
                   FreeAndNil(JSONValue);
@@ -2411,7 +2411,7 @@ Begin
                  Try
                   JSONValue.Encoding := vEncoding;
                   JSONValue.Encoded  := True;
-                  JSONValue.LoadFromJSON(ms.DataString);
+                  JSONValue.LoadFromJSON(TStringStream(ms).DataString);
                   vdwservereventname := JSONValue.Value;
                   If Pos('.', vdwservereventname) > 0 Then
                    Begin
@@ -2468,10 +2468,10 @@ Begin
                  vObjectName := Copy(vObjectName, InitStrPos, Pos('"', vObjectName) -1);
                  JSONParam   := TJSONParam.Create(DWParams.Encoding);
                  JSONParam.ObjectDirection := odIN;
-                 If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(ms.DataString)) > 0) Then
-                  JSONParam.FromJSON(ms.DataString)
+                 If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(TStringStream(ms).DataString)) > 0) Then
+                  JSONParam.FromJSON(TStringStream(ms).DataString)
                  Else
-                  JSONParam.AsString := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
+                  JSONParam.AsString := StringReplace(StringReplace(TStringStream(ms).DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
                  JSONParam.ParamName := vObjectName;
                  DWParams.Add(JSONParam);
                 End;
@@ -2530,13 +2530,13 @@ Begin
                                                 vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
              {Alteração feita por Tiago IStuque - 28/12/2018}
              If Assigned(DWParams.ItemsString['dwReadBodyRaw']) And (DWParams.ItemsString['dwReadBodyRaw'].AsString='1') Then
-              TRESTDWDataUtils.ParseBodyRawToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+              TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
              Else If (Assigned(DWParams.ItemsString['dwReadBodyBin']) And
                      (DWParams.ItemsString['dwReadBodyBin'].AsString='1')) Then
-              TRESTDWDataUtils.ParseBodyBinToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+              TRESTDWDataUtils.ParseBodyBinToDWParam(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
              Else If (vBinaryEvent) Then
               Begin
-               If (pos('--', mb.DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+               If (pos('--', TStringStream(ms).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
                 Begin
                  msgEnd   := False;
                  {$IFNDEF FPC}
@@ -2564,7 +2564,7 @@ Begin
                   Case Decoder.PartType of
                    mcptAttachment:
                     Begin
-                     ms := TStringStream.Create('');
+                     ms := TMemoryStream.Create;
                      ms.Position := 0;
                      NewDecoder := Decoder.ReadBody(ms, MsgEnd);
                      vDecoderHeaderList := TStringList.Create;
@@ -2660,7 +2660,7 @@ Begin
                       Else If (vObjectName <> '') Then
                        Begin
                         JSONParam.ParamName        := vObjectName;
-                        tmp := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);//ms.DataString;
+                        tmp := StringReplace(StringReplace(TStringStream(ms).DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);//ms.DataString;
                         If Copy(tmp, Length(tmp) -1, 2) = sLineBreak Then
                          Delete(tmp, Length(tmp) -1, 2);
                         If vEncoding = esUtf8 Then
@@ -2677,11 +2677,11 @@ Begin
                         JSONParam.ParamFileName    := sFile;
                         JSONParam.ParamContentType := sContentType;
                         If vEncoding = esUtf8 Then
-                         JSONParam.SetValue(utf8decode(ms.DataString), JSONParam.Encoded)
-                        Else If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(ms.DataString)) > 0) Then
-                         JSONParam.FromJSON(ms.DataString)
+                         JSONParam.SetValue(utf8decode(TStringStream(ms).DataString), JSONParam.Encoded)
+                        Else If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(TStringStream(ms).DataString)) > 0) Then
+                         JSONParam.FromJSON(TStringStream(ms).DataString)
                         Else
-                         JSONParam.SetValue(ms.DataString, JSONParam.Encoded);
+                         JSONParam.SetValue(TStringStream(ms).DataString, JSONParam.Encoded);
                        End;
                       DWParams.Add(JSONParam);
                      FreeAndNil(ms);
@@ -2703,19 +2703,19 @@ Begin
                      If Decoder <> Nil Then
                       TRESTDWMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
                      If pos('dwwelcomemessage', lowercase(tmp)) > 0      Then
-                      vWelcomeMessage := DecodeStrings(ms.DataString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                      vWelcomeMessage := DecodeStrings(TStringStream(ms).DataString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                      Else If pos('dwaccesstag', lowercase(tmp)) > 0      Then
-                      vAccessTag := DecodeStrings(ms.DataString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                      vAccessTag := DecodeStrings(TStringStream(ms).DataString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                      Else If Pos('dwusecript', lowercase(tmp)) > 0       Then
-                      vdwCriptKey  := StringToBoolean(ms.DataString)
+                      vdwCriptKey  := StringToBoolean(TStringStream(ms).DataString)
                      Else If pos('datacompression', lowercase(tmp)) > 0  Then
-                      compresseddata := StringToBoolean(ms.DataString)
+                      compresseddata := StringToBoolean(TStringStream(ms).DataString)
                      Else If pos('dwencodestrings', lowercase(tmp)) > 0  Then
-                      encodestrings  := StringToBoolean(ms.DataString)
+                      encodestrings  := StringToBoolean(TStringStream(ms).DataString)
                      Else If Pos('binaryrequest', lowercase(tmp)) > 0    Then
-                      vBinaryEvent := StringToBoolean(ms.DataString)
+                      vBinaryEvent := StringToBoolean(TStringStream(ms).DataString)
                      Else If (Pos('dwassyncexec', lowercase(tmp)) > 0) And (Not (dwassyncexec)) Then
-                      dwassyncexec := StringToBoolean(ms.DataString)
+                      dwassyncexec := StringToBoolean(TStringStream(ms).DataString)
                      Else If pos('dwconnectiondefs', lowercase(tmp)) > 0 Then
                       Begin
                        vdwConnectionDefs   := TConnectionDefs.Create;
@@ -2723,21 +2723,21 @@ Begin
                        Try
                         JSONValue.Encoding  := vEncoding;
                         JSONValue.Encoded  := True;
-                        JSONValue.LoadFromJSON(ms.DataString);
+                        JSONValue.LoadFromJSON(TStringStream(ms).DataString);
                         vdwConnectionDefs.LoadFromJSON(JSONValue.Value);
                        Finally
                         FreeAndNil(JSONValue);
                        End;
                       End
                      Else If (Pos('dwassyncexec', lowercase(tmp)) > 0) And (Not (dwassyncexec)) Then
-                      dwassyncexec := StringToBoolean(ms.DataString)
+                      dwassyncexec := StringToBoolean(TStringStream(ms).DataString)
                      Else If pos('dwservereventname', lowercase(tmp)) > 0  Then
                       Begin
                        JSONValue            := TJSONValue.Create;
                        Try
                         JSONValue.Encoding  := vEncoding;
                         JSONValue.Encoded   := True;
-                        JSONValue.LoadFromJSON(ms.DataString);
+                        JSONValue.LoadFromJSON(TStringStream(ms).DataString);
                         vdwservereventname := JSONValue.Value;
                         If Pos('.', vdwservereventname) > 0 Then
                          Begin
@@ -2759,10 +2759,10 @@ Begin
                        vObjectName := Copy(vObjectName, InitStrPos, Pos('"', vObjectName) -1);
                        JSONParam   := TJSONParam.Create(DWParams.Encoding);
                        JSONParam.ObjectDirection := odIN;
-                       If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(ms.DataString)) > 0) Then
-                        JSONParam.FromJSON(ms.DataString)
+                       If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(TStringStream(ms).DataString)) > 0) Then
+                        JSONParam.FromJSON(TStringStream(ms).DataString)
                        Else
-                        JSONParam.AsString := StringReplace(StringReplace(ms.DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
+                        JSONParam.AsString := StringReplace(StringReplace(TStringStream(ms).DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
                        JSONParam.ParamName := vObjectName;
                        DWParams.Add(JSONParam);
                       End;
@@ -2814,23 +2814,23 @@ Begin
                       {$ENDIF}Then
               Begin
                If vEncoding = esUtf8 Then
-                TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(mb.DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(ms).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                Else
-                TRESTDWDataUtils.ParseBodyRawToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
               End
              Else
               Begin
                If vEncoding = esUtf8 Then
                 Begin
-                 TRESTDWDataUtils.ParseDWParamsURL(utf8decode(mb.DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                 TRESTDWDataUtils.ParseDWParamsURL(utf8decode(TStringStream(ms).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                  if DWParams.ItemsString['undefined'] = nil then
-                  TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(mb.DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                  TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(ms).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End
                Else
                 Begin
-                 TRESTDWDataUtils.ParseDWParamsURL(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                 TRESTDWDataUtils.ParseDWParamsURL(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                  if DWParams.ItemsString['undefined'] = nil then
-                  TRESTDWDataUtils.ParseBodyRawToDWParam(mb.DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                  TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End;
               End;
              {Fim alteração feita por Tiago Istuque - 28/12/2018}
@@ -3734,7 +3734,7 @@ Begin
               Begin
                If vBinaryEvent Then
                 Begin
-                 ms := TStringStream.Create('');
+                 ms := TMemoryStream.Create;
                  If vGettoken Then
                   Begin
                    DWParams.Clear;

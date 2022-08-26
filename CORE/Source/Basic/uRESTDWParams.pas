@@ -151,7 +151,10 @@ Type
   //Desacoplamento Finalizado
   Procedure SetFieldsList(Value : TFieldsList);
   Procedure ClearFieldList;
+  Function  GetBytes : TRESTDWBytes;
+  Procedure WriteBytes(bValue : TRESTDWBytes);
  Public
+  Procedure BeginBytes(DataSize : DWInt64);
   Function  AsString : String;
   Procedure Clear;
   Procedure ToStream       (Var bValue       : TMemoryStream);
@@ -214,7 +217,6 @@ Type
   Procedure SetValue       (Value            : Variant;
                             Encode           : Boolean = True);
   Function    Value           : Variant;
-  Function    AsBytes         : TRESTDWBytes;
   Constructor Create;
   Destructor  Destroy; Override;
   Function IsNull             : Boolean;
@@ -243,6 +245,7 @@ Type
   Property Encoded            : Boolean            Read vEncoded            Write vEncoded;
   Property DataMode           : TDataMode          Read vDataMode           Write vDataMode;
   Property FloatDecimalFormat : String             Read vFloatDecimalFormat Write vFloatDecimalFormat;
+  Property AsBytes            : TRESTDWBytes       Read GetBytes            Write WriteBytes;
   {$IFDEF FPC}
   Property DatabaseCharSet    : TDatabaseCharSet   Read vDatabaseCharSet    Write vDatabaseCharSet;
   {$ENDIF}
@@ -390,13 +393,16 @@ Type
   Procedure SetValue         (aValue   : String;
                               Encode   : Boolean = True);Overload;
   Procedure SetValue         (aValue   : TStream);Overload;
+  Procedure LoadFromStream   (Stream   : TStringStream);Overload;
   Procedure LoadFromStream   (Stream   : TMemoryStream);Overload;
-  Procedure LoadFromStream   (Stream   : TStream;
-                              Encode   : Boolean = True);Overload;
+  Procedure LoadFromStream   (Stream   : TStream);      Overload;
+  Procedure CopyFromStream   (Stream   : TStream;
+                              Count    : DWInt64);
   Procedure ToBytes          (Value    : String;
                               Encode   : Boolean = False);
   Procedure SaveToStream     (Var Stream   : TStream);      Overload;
   Procedure SaveToStream     (Var Stream   : TStringStream);Overload;
+  Procedure SaveToStream     (Var Stream   : TMemoryStream);Overload;
   Procedure LoadFromParam    (Param    : TParam);
   Procedure SaveFromParam    (Param    : TParam);
   Property  CriptOptions      : TCripto          Read vCripto             Write vCripto;
@@ -4240,7 +4246,24 @@ Begin
   End;
 End;
 
-Function TJSONValue.AsBytes : TRESTDWBytes;
+Procedure TJSONValue.BeginBytes(DataSize : DWInt64);
+Begin
+ vNullValue := True;
+ If Length(aValue) > 0 Then
+  SetLength(aValue, 0);
+ If Datasize > 0 Then
+  Begin
+   vNullValue := False;
+   SetLength(aValue, DataSize);
+  End;
+End;
+
+Procedure TJSONValue.WriteBytes(bValue : TRESTDWBytes);
+Begin
+ aValue := bValue;
+End;
+
+Function  TJSONValue.GetBytes : TRESTDWBytes;
 Begin
  Result := aValue;
 End;
@@ -5464,8 +5487,28 @@ Begin
  vJSONValue.Binary := vBinary;
 End;
 
-Procedure TJSONParam.LoadFromStream   (Stream   : TStream;
-                                       Encode   : Boolean = True);
+Procedure TJSONParam.LoadFromStream(Stream : TStringStream);
+Begin
+ If TestNilParam Then
+  Exit;
+ ObjectValue       := ovBlob;
+ vEncoded          := False;
+ SetValue(Stream);
+ vBinary           := True;
+ vJSONValue.Binary := vBinary;
+End;
+
+Procedure TJSONParam.CopyFromStream(Stream   : TStream;
+                                    Count    : DWInt64);
+Begin
+ If Stream.Size > 0 Then
+  Begin
+   vJSONValue.BeginBytes(Stream.Size);
+   Stream.Read(Pointer(vJSONValue.AsBytes)^, Stream.Size);
+  End;
+End;
+
+Procedure TJSONParam.LoadFromStream   (Stream   : TStream);
 Begin
  If TestNilParam Then
   Exit;
@@ -5500,6 +5543,15 @@ Begin
   Exit;
  If Not Assigned(Stream) Then
   Stream := TStringStream.Create('');
+ SaveToStream(TStream(Stream));
+End;
+
+Procedure TJSONParam.SaveToStream(Var Stream   : TMemoryStream);
+Begin
+ If TestNilParam Then
+  Exit;
+ If Not Assigned(Stream) Then
+  Stream := TMemoryStream.Create;
  SaveToStream(TStream(Stream));
 End;
 
@@ -6567,7 +6619,7 @@ Var
                      vStream.CopyFrom(Stream, J);
                      vStream.position := 0;
                      Try
-                      vItem.LoadFromStream(vStream, False);
+                      vItem.LoadFromStream(vStream);
                      Except
                      End;
                     Finally
