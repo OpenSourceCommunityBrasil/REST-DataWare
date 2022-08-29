@@ -7975,15 +7975,18 @@ Begin
            If vError Then
             Begin
              vInBlockEvents := False;
+
+             If Assigned(vOnGetDataError) Then
+              vOnGetDataError(False, vErrorMSG);
+             If vRaiseError Then
+              Raise Exception.Create(PChar(vErrorMSG));
+
              If ReleaseCache Then
               Begin
                TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
                RebuildMassiveDataset;
               End;
-             If Assigned(vOnGetDataError) Then
-              vOnGetDataError(False, vErrorMSG);
-             If vRaiseError Then
-              Raise Exception.Create(PChar(vErrorMSG));
+             
             End;
           End;
          If Assigned(vResult) Then
