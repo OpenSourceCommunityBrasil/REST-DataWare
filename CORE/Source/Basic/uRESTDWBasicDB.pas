@@ -494,7 +494,7 @@ Type
   Procedure   OpenDatasets          (Datasets               : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
                                      Var   Error            : Boolean;
                                      Var   MessageError     : String;
-                                     BinaryRequest          : Boolean = True);Overload;
+                                     BinaryRequest          : Boolean = True);Overload; virtual;
   Function    GetTableNames         (Var   TableNames       : TStringList)  : Boolean;
   Function    GetFieldNames         (TableName              : String;
                                      Var FieldNames         : TStringList)  : Boolean;
@@ -846,7 +846,7 @@ Type
   Function    ExecSQL          (Var Error : String) : Boolean;Overload;//Método ExecSQL que será utilizado no Componente
   Function    InsertMySQLReturnID : Integer;                     //Método de ExecSQL com retorno de Incremento
   Function    ParamByName          (Value : String) : TParam;    //Retorna o Parametro de Acordo com seu nome
-  Procedure   ApplyUpdates;Overload;
+  Procedure   ApplyUpdates;Overload; Virtual;
   Function    ApplyUpdates     (Var Error : String; ReleaseCache : Boolean = True) : Boolean;Overload;//Aplica Alterações no Banco de Dados
   Constructor Create              (AOwner : TComponent);Override;//Cria o Componente
   Destructor  Destroy;Override;                                  //Destroy a Classe
