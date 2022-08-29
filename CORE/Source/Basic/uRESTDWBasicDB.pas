@@ -494,7 +494,7 @@ Type
   Procedure   OpenDatasets          (Datasets               : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
                                      Var   Error            : Boolean;
                                      Var   MessageError     : String;
-                                     BinaryRequest          : Boolean = True);Overload;
+                                     BinaryRequest          : Boolean = True);Overload; virtual;
   Function    GetTableNames         (Var   TableNames       : TStringList)  : Boolean;
   Function    GetFieldNames         (TableName              : String;
                                      Var FieldNames         : TStringList)  : Boolean;
@@ -846,7 +846,7 @@ Type
   Function    ExecSQL          (Var Error : String) : Boolean;Overload;//Método ExecSQL que será utilizado no Componente
   Function    InsertMySQLReturnID : Integer;                     //Método de ExecSQL com retorno de Incremento
   Function    ParamByName          (Value : String) : TParam;    //Retorna o Parametro de Acordo com seu nome
-  Procedure   ApplyUpdates;Overload;
+  Procedure   ApplyUpdates;Overload; Virtual;
   Function    ApplyUpdates     (Var Error : String; ReleaseCache : Boolean = True) : Boolean;Overload;//Aplica Alterações no Banco de Dados
   Constructor Create              (AOwner : TComponent);Override;//Cria o Componente
   Destructor  Destroy;Override;                                  //Destroy a Classe
@@ -7975,15 +7975,18 @@ Begin
            If vError Then
             Begin
              vInBlockEvents := False;
+
+             If Assigned(vOnGetDataError) Then
+              vOnGetDataError(False, vErrorMSG);
+             If vRaiseError Then
+              Raise Exception.Create(PChar(vErrorMSG));
+
              If ReleaseCache Then
               Begin
                TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
                RebuildMassiveDataset;
               End;
-             If Assigned(vOnGetDataError) Then
-              vOnGetDataError(False, vErrorMSG);
-             If vRaiseError Then
-              Raise Exception.Create(PChar(vErrorMSG));
+             
             End;
           End;
          If Assigned(vResult) Then
@@ -8024,6 +8027,8 @@ Begin
      Break;
     End;
   End;
+  if Result = nil then 
+    raise Exception.Create('Parâmetro ''' + Value + ''' não encontrado.');
 End;
 
 Function TRESTDWClientSQL.ParamByName(Value: String): TParam;
@@ -8047,6 +8052,8 @@ Begin
      Break;
     End;
   End;
+  if Result = nil then 
+    raise Exception.Create('Parâmetro ''' + Value + ''' não encontrado.');
 End;
 
 Function TRESTDWTable.ParamCount: Integer;
