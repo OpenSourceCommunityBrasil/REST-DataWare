@@ -8047,6 +8047,8 @@ Begin
      Break;
     End;
   End;
+  if Result = nil then 
+    raise Exception.Create('Parâmetro ''' + Value + ''' não encontrado.');
 End;
 
 Function TRESTDWTable.ParamCount: Integer;
