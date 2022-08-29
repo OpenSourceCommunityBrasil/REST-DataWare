@@ -494,7 +494,7 @@ Type
   Procedure   OpenDatasets          (Datasets               : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
                                      Var   Error            : Boolean;
                                      Var   MessageError     : String;
-                                     BinaryRequest          : Boolean = True);Overload;
+                                     BinaryRequest          : Boolean = True);Overload; virtual;
   Function    GetTableNames         (Var   TableNames       : TStringList)  : Boolean;
   Function    GetFieldNames         (TableName              : String;
                                      Var FieldNames         : TStringList)  : Boolean;
@@ -846,7 +846,7 @@ Type
   Function    ExecSQL          (Var Error : String) : Boolean;Overload;//Método ExecSQL que será utilizado no Componente
   Function    InsertMySQLReturnID : Integer;                     //Método de ExecSQL com retorno de Incremento
   Function    ParamByName          (Value : String) : TParam;    //Retorna o Parametro de Acordo com seu nome
-  Procedure   ApplyUpdates;Overload;
+  Procedure   ApplyUpdates;Overload; Virtual;
   Function    ApplyUpdates     (Var Error : String; ReleaseCache : Boolean = True) : Boolean;Overload;//Aplica Alterações no Banco de Dados
   Constructor Create              (AOwner : TComponent);Override;//Cria o Componente
   Destructor  Destroy;Override;                                  //Destroy a Classe
@@ -3683,7 +3683,6 @@ Procedure TRESTDWDatabasebaseBase.ExecuteCommand(Var PoolerMethodClient : TRESTD
 Var
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  RESTClientPoolerExec : TRESTClientPoolerBase;
- vStream              : TStream;
  LDataSetList         : TJSONValue;
  DWParams             : TRESTDWParams;
  vSQL,
@@ -3837,11 +3836,15 @@ Begin
        Begin
         If Not LDataSetList.IsNull Then
          vTempValue := LDataSetList.ToJSON;
+       End
+      Else
+       Begin
+        If Not LDataSetList.IsNull Then
+         vTempValue := LDataSetList.Value;
        End;
-      If ((Trim(vTempValue) <> '{}') And
-          (Trim(vTempValue) <> '')   And
-          (Not (Error)))             And
-           Not(BinaryRequest)        Then
+      If (Trim(vTempValue) <> '{}') And
+         (Trim(vTempValue) <> '')    And
+         (Not (Error))                       Then
        Begin
         Try
          {$IFDEF  ANDROID}
@@ -3868,16 +3871,6 @@ Begin
            End;
          {$ENDIF}
         Finally
-        End;
-       End
-      Else If BinaryRequest Then
-       Begin
-        vStream := TMemoryStream.Create;
-        Try
-         LDataSetList.SaveToStream(vStream);
-         Result.LoadFromStream(vStream);
-        Finally
-         vStream.Free;
         End;
        End;
       vTempValue := '';
@@ -3907,11 +3900,12 @@ Begin
      End;
    End;
  Finally
-  If LDataSetList <> Nil Then
-   FreeAndNil(LDataSetList);
-  FreeAndNil(vRESTConnectionDB);
-  If Assigned(RESTClientPoolerExec) And (vLocalClient) Then
-   FreeAndNil(RESTClientPoolerExec);
+   {Eloy - Adicionado mais um try para free de objects}
+   If LDataSetList <> Nil Then
+    FreeAndNil(LDataSetList);
+   FreeAndNil(vRESTConnectionDB);
+   If Assigned(RESTClientPoolerExec) And (vLocalClient) Then
+    FreeAndNil(RESTClientPoolerExec);
  End;
 End;
 
@@ -7981,15 +7975,18 @@ Begin
            If vError Then
             Begin
              vInBlockEvents := False;
+
+             If Assigned(vOnGetDataError) Then
+              vOnGetDataError(False, vErrorMSG);
+             If vRaiseError Then
+              Raise Exception.Create(PChar(vErrorMSG));
+
              If ReleaseCache Then
               Begin
                TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
                RebuildMassiveDataset;
               End;
-             If Assigned(vOnGetDataError) Then
-              vOnGetDataError(False, vErrorMSG);
-             If vRaiseError Then
-              Raise Exception.Create(PChar(vErrorMSG));
+             
             End;
           End;
          If Assigned(vResult) Then
@@ -8030,6 +8027,8 @@ Begin
      Break;
     End;
   End;
+  if Result = nil then 
+    raise Exception.Create('Parâmetro ''' + Value + ''' não encontrado.');
 End;
 
 Function TRESTDWClientSQL.ParamByName(Value: String): TParam;
@@ -8053,6 +8052,8 @@ Begin
      Break;
     End;
   End;
+  if Result = nil then 
+    raise Exception.Create('Parâmetro ''' + Value + ''' não encontrado.');
 End;
 
 Function TRESTDWTable.ParamCount: Integer;
@@ -10707,15 +10708,12 @@ Begin
         If BinaryRequest Then
          Begin
           If Not LDataSetList.IsNull Then
-           Begin
-            vStream := TMemoryStream.Create;
-            LDataSetList.SaveToStream(vStream); //vValue := LDataSetList.Value;
-           End;
-         End
-        Else
+           vValue := LDataSetList.Value;
+         End;
+        LDataSetList.Encoded  := vRESTDataBase.EncodedStrings;
+        LDataSetList.Encoding := DataBase.Encoding;
+        If Not BinaryRequest Then
          Begin
-          LDataSetList.Encoded  := vRESTDataBase.EncodedStrings;
-          LDataSetList.Encoding := DataBase.Encoding;
           If Not LDataSetList.IsNull Then
            vValue := LDataSetList.ToJSON;
          End;
@@ -10775,7 +10773,7 @@ Begin
         LDataSetList.WriteToDataset(dtFull, vValue, Self, vJsonCount, vDatapacks, vActualRec)
        Else
         Begin
-//         vStream         := DecodeStream(vValue);
+         vStream         := DecodeStream(vValue);
          If (csDesigning in ComponentState) Then //Clone end compare Fields
           Begin
            vStream.Position := 0;
