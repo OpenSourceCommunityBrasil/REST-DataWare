@@ -8024,6 +8024,8 @@ Begin
      Break;
     End;
   End;
+  if Result = nil then 
+    raise Exception.Create('Parâmetro ''' + Value + ''' não encontrado.');
 End;
 
 Function TRESTDWClientSQL.ParamByName(Value: String): TParam;
