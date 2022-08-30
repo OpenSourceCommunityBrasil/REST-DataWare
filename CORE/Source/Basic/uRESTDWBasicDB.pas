@@ -5529,19 +5529,23 @@ Begin
  If Not Dataset.IsEmpty Then
   Begin
    vMassiveCacheSQLValue                   := TRESTDWMassiveCacheSQLValue(vMassiveCacheSQLList.Add);
-   vMassiveCacheSQLValue.MassiveSQLMode    := msqlExecute;
-   vMassiveCacheSQLValue.SQL.Text          := SQL;
-   If Not (DeleteCommand) Then
-    vMassiveCacheSQLValue.FetchRowSQL.Text := vSQLRefresh.Text
-   Else
-    vMassiveCacheSQLValue.FetchRowSQL.Text := '';
-   vMassiveCacheSQLValue.LockSQL.Text      := vSQLLock.Text;
-   vMassiveCacheSQLValue.UnlockSQL.Text    := vSQLUnlock.Text;
-   For I := 0 To vMassiveCacheSQLValue.Params.Count -1 Do
-    Begin
-     If TRESTDWClientSQL(Dataset).FindField(vMassiveCacheSQLValue.Params[I].Name) <> Nil Then
-      vMassiveCacheSQLValue.Params[I].AssignField(TRESTDWClientSQL(Dataset).FindField(vMassiveCacheSQLValue.Params[I].Name)); // .AssignValues(TRESTDWClientSQL(Dataset).Params);
-    End;
+    try
+     vMassiveCacheSQLValue.MassiveSQLMode    := msqlExecute;
+     vMassiveCacheSQLValue.SQL.Text          := SQL;
+     If Not (DeleteCommand) Then
+      vMassiveCacheSQLValue.FetchRowSQL.Text := vSQLRefresh.Text
+     Else
+      vMassiveCacheSQLValue.FetchRowSQL.Text := '';
+     vMassiveCacheSQLValue.LockSQL.Text      := vSQLLock.Text;
+     vMassiveCacheSQLValue.UnlockSQL.Text    := vSQLUnlock.Text;
+     For I := 0 To vMassiveCacheSQLValue.Params.Count -1 Do
+      Begin
+       If TRESTDWClientSQL(Dataset).FindField(vMassiveCacheSQLValue.Params[I].Name) <> Nil Then
+        vMassiveCacheSQLValue.Params[I].AssignField(TRESTDWClientSQL(Dataset).FindField(vMassiveCacheSQLValue.Params[I].Name)); // .AssignValues(TRESTDWClientSQL(Dataset).Params);
+      End;
+    finally
+      vMassiveCacheSQLValue.Free;
+    end;
   End;
 End;
 
