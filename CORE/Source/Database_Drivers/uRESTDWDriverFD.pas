@@ -1343,7 +1343,17 @@ Var
          If (Not (MassiveDataset.ReflectChanges))     Or
             ((MassiveDataset.ReflectChanges)          And
             (MassiveDataset.MassiveMode in [mmExec, mmDelete])) Then
-          Query.ExecSQL;
+          Begin   
+           Query.ExecSQL;
+
+           // Inclusão do método de after massive line process
+           If (Self.Owner.ClassType = TServerMethodDatamodule) Or
+             (Self.Owner.ClassType.InheritsFrom(TServerMethodDatamodule)) Then
+           Begin
+            If Assigned(TServerMethodDataModule(Self.Owner).OnAfterMassiveLineProcess) Then
+             TServerMethodDataModule(Self.Owner).OnAfterMassiveLineProcess(MassiveDataset, TDataset(Query));
+           End;
+         End;
         Except
          On E : Exception do
           Begin
