@@ -8,13 +8,13 @@ unit RESTDWLazDriver;
 interface
 
 uses
-  uRestDWLazDriver, LazarusPackageIntf;
+  uRestDWLazDriver, uRestDWLazDriverReg, LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
-  RegisterUnit('uRestDWLazDriver', @uRestDWLazDriver.Register);
+  RegisterUnit('uRestDWLazDriverReg', @uRestDWLazDriverReg.Register);
 end;
 
 initialization

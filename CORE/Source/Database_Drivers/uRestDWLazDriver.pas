@@ -122,14 +122,7 @@ Type
   Property Connection : TComponent Read GetConnection Write SetConnection;
 End;
 
-Procedure Register;
-
 implementation
-
-Procedure Register;
-Begin
- RegisterComponents('REST Dataware - Drivers', [TRESTDWLazDriver]);
-End;
 
 { TConnection }
 

@@ -132,10 +132,6 @@ Type
   Property Connection : TZConnection Read GetConnection Write SetConnection;
 End;
 
-
-
-Procedure Register;
-
 implementation
 
 {$IFNDEF FPC}
@@ -143,11 +139,6 @@ implementation
   {$R .\RESTDWDriverZEOS.dcr}
  {$IFEND}
 {$ENDIF}
-
-Procedure Register;
-Begin
- RegisterComponents('REST Dataware - Drivers', [TRESTDWDriverZeos]);
-End;
 
 Function TRESTDWDriverZeos.ProcessMassiveSQLCache(MassiveSQLCache      : String;
                                                     Var Error            : Boolean;

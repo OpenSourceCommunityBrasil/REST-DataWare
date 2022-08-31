@@ -19,7 +19,7 @@
 "/>
     <License Value="GPL- 3.0"/>
     <Version Major="2" Release="5"/>
-    <Files Count="3">
+    <Files Count="4">
       <Item1>
         <Filename Value="restdwlazdriver.lrs"/>
         <Type Value="LRS"/>
@@ -30,9 +30,13 @@
       </Item2>
       <Item3>
         <Filename Value="..\..\..\..\Source\Database_Drivers\uRestDWLazDriver.pas"/>
-        <HasRegisterProc Value="True"/>
         <UnitName Value="uRestDWLazDriver"/>
       </Item3>
+      <Item4>
+        <Filename Value="..\..\..\..\Source\Database_Drivers\uRestDWLazDriverReg.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="uRestDWLazDriverReg"/>
+      </Item4>
     </Files>
     <CompatibilityMode Value="True"/>
     <RequiredPkgs Count="2">

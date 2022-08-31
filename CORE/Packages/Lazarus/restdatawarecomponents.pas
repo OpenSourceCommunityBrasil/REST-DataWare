@@ -8,7 +8,7 @@ unit restdatawarecomponents;
 interface
 
 uses
-  uRESTDWDesignReg, PropertyPersist, uRESTDWAuthClass, uRESTDWBasic, uRESTDWBasicClass, 
+  uRESTDWDesignReg, PropertyPersist, uRESTDWBasic, uRESTDWBasicClass, 
   uRESTDWBasicComponent, uRESTDWBasicDB, uRESTDWBasicTypes, uRESTDWBufferDb, 
   uRESTDWComponentBase, uRESTDWComponentEvents, uRESTDWEncodeClass, uRESTDWFileBuffer, 
   uRESTDWMasterDetailData, uRESTDWParams, uRESTDWPoolermethod, 
