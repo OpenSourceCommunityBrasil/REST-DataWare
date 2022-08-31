@@ -8,7 +8,7 @@ unit restdwdriverunidac;
 interface
 
 uses
-  uRESTDWDriverUNIDACReg, uRESTDWDriverUNIDAC, LazarusPackageIntf;
+  uRESTDWDriverUNIDAC, uRESTDWDriverUNIDACReg, LazarusPackageIntf;
 
 implementation
 
