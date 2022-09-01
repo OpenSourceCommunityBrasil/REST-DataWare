@@ -296,7 +296,7 @@ Var
                                    If Not Assigned(vStringStream) Then
                                     vStringStream  := TMemoryStream.Create;
                                    Try
-                                    vDWParams[I].SaveToStream(TStream(vStringStream));
+                                    vDWParams[I].SaveToStream(vStringStream);
                                     vStringStream.Position := 0;
                                     If vStringStream.Size > 0 Then
                                      vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
@@ -1098,7 +1098,7 @@ Var
                  Try
                   If (Not(MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull)) Then
                    Begin
-                    MassiveDataset.Params.ItemsString[Query.Params[I].Name].SaveToStream(TStream(vStringStream));
+                    MassiveDataset.Params.ItemsString[Query.Params[I].Name].SaveToStream(vStringStream);
                     If vStringStream <> Nil Then
                      Begin
                       vStringStream.Position := 0;
@@ -1665,7 +1665,7 @@ Begin
                 If Not Assigned(vStringStream) Then
                  vStringStream  := TMemoryStream.Create;
                 Try
-                 Params[I].SaveToStream(TStream(vStringStream));
+                 Params[I].SaveToStream(vStringStream);
                  vStringStream.Position := 0;
                  If vStringStream.Size > 0 Then
                   vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
@@ -1791,7 +1791,7 @@ Begin
             If Not Assigned(vStringStream) Then
              vStringStream  := TMemoryStream.Create;
             Try
-             Params[I].SaveToStream(TStream(vStringStream));
+             Params[I].SaveToStream(vStringStream);
              vStringStream.Position := 0;
              If vStringStream.Size > 0 Then
               vTempQuery.Params[I].LoadFromStream(vStringStream, ftBlob);
@@ -2785,7 +2785,7 @@ Begin
                    If Not Assigned(vStringStream) Then
                     vStringStream  := TMemoryStream.Create;
                    Try
-                    Params[I].SaveToStream(TStream(vStringStream));
+                    Params[I].SaveToStream(vStringStream);
                     vStringStream.Position := 0;
                     If vStringStream.Size > 0 Then
                      TBlobField(vTempQuery.Fields[A]).LoadFromStream(vStringStream);
@@ -3554,7 +3554,7 @@ Var
                  Try
                   If (Not(MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull)) Then
                    Begin
-                    MassiveDataset.Params.ItemsString[Query.Params[I].Name].SaveToStream(TStream(vStringStream));
+                    MassiveDataset.Params.ItemsString[Query.Params[I].Name].SaveToStream(vStringStream);
                     If vStringStream <> Nil Then
                      Begin
                       vStringStream.Position := 0;
@@ -3960,7 +3960,7 @@ Begin
                    If Not Assigned(vStringStream) Then
                     vStringStream  := TMemoryStream.Create;
                    Try
-                    Params[I].SaveToStream(TStream(vStringStream));
+                    Params[I].SaveToStream(vStringStream);
                     vStringStream.Position := 0;
                     If vStringStream.Size > 0 Then
                      vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
@@ -4380,7 +4380,7 @@ Begin
              Begin
               //vStringStream := TMemoryStream.Create;
               Try
-               Params[I].SaveToStream(TStream(vStringStream));
+               Params[I].SaveToStream(vStringStream);
                vStringStream.Position := 0;
                If vStringStream.Size > 0 Then
                 ZCommand.Params[A].LoadFromStream(vStringStream, ftBlob);
