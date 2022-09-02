@@ -1,6 +1,6 @@
 unit uRESTDWShellServicesRegLazarus;
 
-{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -26,23 +26,8 @@ unit uRESTDWShellServicesRegLazarus;
 interface
 
 uses
-  {$IFDEF FPC}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWShellServicesLazarus,
     LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb, uRESTDWComponentBase;
-  {$ELSE}
-   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWShellServicesLazarus, uRESTDWComponentBase,
-   RTLConsts,
-   {$IFDEF COMPILER16_UP}
-   UITypes,
-   {$ENDIF}
-   {$if CompilerVersion > 22}
-    ToolsApi, vcl.Graphics, DesignWindows, DesignEditors, DBReg, DSDesign,
-    DesignIntf, ExptIntf, Classes, Db, ColnEdit;
-   {$ELSE}
-    ToolsApi, Graphics, DesignWindows, DesignEditors, DBReg, DesignIntf,
-    Classes, Db, DbTables, DSDesign, ColnEdit;
-   {$IFEND}
-  {$ENDIF}
 
 Type
  TRESTDWAboutDialogProperty = class({$IFDEF FPC}TClassPropertyEditor{$ELSE}TPropertyEditor{$ENDIF})
@@ -56,19 +41,14 @@ Procedure Register;
 
 Implementation
 
-uses uRESTDWConsts, uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
+uses uRESTDWConsts, uRESTDWCharset, utemplateproglaz;
 
 Procedure Register;
 Begin
  RegisterComponents('REST Dataware - Service',     [TRESTDWShellService]);
- {$IFNDEF FPC}
-  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TRESTDWAboutDialogProperty);
- {$ELSE}
-  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TRESTDWAboutDialogProperty);
- {$ENDIF}
+ RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TRESTDWAboutDialogProperty);
 End;
 
-{$IFDEF FPC}
  Procedure UnlistPublishedProperty (ComponentClass:TPersistentClass; const PropertyName:String);
  var
    pi :PPropInfo;
@@ -77,7 +57,6 @@ End;
    if (pi <> nil) then
      RegisterPropertyEditor (pi^.PropType, ComponentClass, PropertyName, PropEdits.THiddenPropertyEditor);
  end;
-{$ENDIF}
 
 Procedure TRESTDWAboutDialogProperty.Edit;
 Begin

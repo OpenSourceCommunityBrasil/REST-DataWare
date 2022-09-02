@@ -42,11 +42,12 @@
     <CompatibilityMode Value="True"/>
     <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="restdatawarecomponents"/>
-        <MinVersion Major="2" Valid="True"/>
+        <PackageName Value="zcomponent"/>
+        <MinVersion Major="7" Minor="2" Valid="True"/>
       </Item1>
       <Item2>
-        <PackageName Value="LR_ZeosDB"/>
+        <PackageName Value="restdatawarecomponents"/>
+        <MinVersion Major="2" Valid="True"/>
       </Item2>
       <Item3>
         <PackageName Value="FCL"/>

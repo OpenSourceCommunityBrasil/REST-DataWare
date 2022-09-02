@@ -1,6 +1,6 @@
 unit uRESTDWShellServicesRegDelphi;
 
-{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -26,35 +26,22 @@ unit uRESTDWShellServicesRegDelphi;
 interface
 
 uses
-  {$IFDEF FPC}
-    StdCtrls, ComCtrls, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWShellServices,
-    LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb;
-  {$ELSE}
-   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWShellServicesDelphi,
-   RTLConsts,
-   {$IFDEF COMPILER16_UP}
-   UITypes,
-   {$ENDIF}
-   {$if CompilerVersion > 22}
-    ToolsApi, DesignWindows, DesignEditors, DBReg, DSDesign,
-    DesignIntf, ExptIntf, Classes, Db, ColnEdit;
-   {$ELSE}
-    ToolsApi, DesignWindows, DesignEditors, DBReg, DesignIntf,
-    Classes, Db, DbTables, DSDesign, ColnEdit;
-   {$IFEND}
-  {$ENDIF}
+   {$IFDEF COMPILER16_UP} UITypes, {$ENDIF}
+   {$if CompilerVersion > 22}ExptIntf, {$ELSE} DbTables, {$IFEND}   
+   
+   Windows, SysUtils, Variants, StrEdit, TypInfo, RTLConsts, ToolsApi, Classes,
+   DesignWindows, DesignEditors, DBReg, DSDesign, ColnEdit, Db, DesignIntf,
+   uRESTDWShellServicesDelphi;
 
 Procedure Register;
 
 Implementation
 
-{$IFNDEF FPC}
  {$if CompilerVersion < 23}
   {$R .\RESTDWShellServicesDesign.dcr}
  {$IFEND}
-{$ENDIF}
 
-uses uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
+uses uRESTDWCharset;
 
 Procedure Register;
 Begin
@@ -63,17 +50,6 @@ Begin
  UnlistPublishedProperty(TRESTDWShellService,  'ServicePort');
  UnlistPublishedProperty(TRESTDWShellService,  'RequestTimeOut');
 End;
-
-{$IFDEF FPC}
- Procedure UnlistPublishedProperty (ComponentClass:TPersistentClass; const PropertyName:String);
- var
-   pi :PPropInfo;
- begin
-   pi := TypInfo.GetPropInfo (ComponentClass, PropertyName);
-   if (pi <> nil) then
-     RegisterPropertyEditor (pi^.PropType, ComponentClass, PropertyName, PropEdits.THiddenPropertyEditor);
- end;
-{$ENDIF}
 
 initialization
 
