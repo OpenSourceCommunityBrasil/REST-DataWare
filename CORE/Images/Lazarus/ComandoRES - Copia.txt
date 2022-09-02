@@ -1,3 +1,0 @@
-c:\lazarus\tools\lazres.exe resteasyobjectscore.lrs TRESTClientPooler.png TDWClientEvents.png TDWServerEvents.png TRESTServicePooler.png TRESTServiceCGI.png TRESTDWClientSQL.png TRESTDWDataBase.png TRESTDWPoolerList.png TRESTDWStoredProc.png TRESTDWPoolerDB.png TDWMassiveCache.png TDWMassiveSQLCache.png TDWMemtable.png TDWClientREST.png TDWResponseTranslator.png TDWServerContext.png TDWContextRules.png TRESTDWServiceNotification.png TRESTDWServiceSynPooler.png
-
-pause

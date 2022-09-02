@@ -1,0 +1,98 @@
+{
+  "PackageData0" : {
+    "Name" : "REST DataWare",
+    "DisplayName" : "REST DataWare",
+    "Category" : "DataControls, Networking",
+    "CommunityDescription" : "REST DataWare é uma suite de componentes criado para facilitar o desenvolvimento de aplicações 3 camadas com tudo que o RAD tem pra oferecer. Funcionando desde o Delphi 7 e também no Lazarus, o RDW como normalmente chamamos, é uma ferramenta completa para aplicações desktop, web e multiplataforma!\r\n\r\nPrincipais funcionalidades:\r\n\r\n- RAD\r\n- Possibilidade de criação facilitada de aplicações em 3 camadas\r\n- Servidor de APIs\r\n- WebService\r\n- Chat e Sistema de notificações\r\n- Multiplataforma: Desktop, web e mobile\r\n- ... e muito mais\r\n\r\nWiki com instruções de instalação e uso:\r\n\r\n- https://github.com/OpenSourceCommunityBrasil/REST-DataWare/wiki\r\n\r\nRepositório dos novos demos:\r\n\r\n- https://github.com/OpenSourceCommunityBrasil/RDWDemos",
+    "ExternalDependecies" : "",
+    "OrphanedPackage" : 0,
+    "RepositoryFileName" : "RESTDataWare.zip",
+    "RepositoryFileSize" : 34140315,
+    "RepositoryFileHash" : "68bede75b7129a67db24ba97735f0794",
+    "RepositoryDate" : 4.4806592702465277E+004,
+    "PackageBaseDir" : "CORE\\/",
+    "HomePageURL" : "",
+    "DownloadURL" : "",
+    "SVNURL" : ""
+  },
+  "PackageFiles0" : [
+    {
+      "Name" : "restdatawarecomponents.lpk",
+      "Description" : "The proposal was fulfilled. REST DW was created to facilitate the creation of CRUDs in the same model that we created applications for Client / Server Database. Today, being able to write data to a bank via WebService is too complex for simple operations, making scheduling of simple screens time-consuming. With REST Dataware, you no longer have to worry about creating SQL Insertion, Deletion, Read, and Execution methods via Webservice; Simply add a RESTDataBase connection component and add a RESTClientSQL component that will already have your SQL solution fully functional as you did back in the day and with all the power of modern REST / JSON technology with data compression and everything the language can offer. Have fun.",
+      "Author" : "Gilberto Rocha da Silva",
+      "License" : "GPL- 3.0",
+      "RelativeFilePath" : "Packages\\/Lazarus\\/",
+      "VersionAsString" : "2.0.5.0",
+      "LazCompatibility" : "2.0.0, 2.0.2, 2.0.4, 2.0.6, 2.0.8, 2.0.10, 2.0.12",
+      "FPCCompatibility" : "3.0.0, 3.0.2, 3.0.4, 3.2.0",
+      "SupportedWidgetSet" : "gtk2, win32/win64",
+      "PackageType" : 0,
+      "DependenciesAsString" : "IDEIntf, LCL, FCL"
+    },
+    {
+      "Name" : "RestDatawareIndySockets.lpk",
+      "Description" : "The proposal was fulfilled. REST DW was created to facilitate the creation of CRUDs in the same model that we created applications for Client / Server Database. Today, being able to write data to a bank via WebService is too complex for simple operations, making scheduling of simple screens time-consuming. With REST Dataware, you no longer have to worry about creating SQL Insertion, Deletion, Read, and Execution methods via Webservice; Simply add a RESTDataBase connection component and add a RESTClientSQL component that will already have your SQL solution fully functional as you did back in the day and with all the power of modern REST / JSON technology with data compression and everything the language can offer. Have fun.",
+      "Author" : "Gilberto Rocha da Silva",
+      "License" : "GPL- 3.0",
+      "RelativeFilePath" : "Packages\\/Lazarus\\/Connectors\\/Indy\\/",
+      "VersionAsString" : "2.0.5.0",
+      "LazCompatibility" : "2.0.0, 2.0.2, 2.0.4, 2.0.6, 2.0.8, 2.0.10, 2.0.12",
+      "FPCCompatibility" : "3.0.0, 3.0.2, 3.0.4, 3.2.0",
+      "SupportedWidgetSet" : "gtk2, win32/win64",
+      "PackageType" : 0,
+      "DependenciesAsString" : "restdatawarecomponents(2.0), indylaz, IDEIntf, LCL, FCL"
+    },
+    {
+      "Name" : "restdwlazdriver.lpk",
+      "Description" : "The proposal was fulfilled. REST DW was created to facilitate the creation of CRUDs in the same model that we created applications for Client / Server Database. Today, being able to write data to a bank via WebService is too complex for simple operations, making scheduling of simple screens time-consuming. With REST Dataware, you no longer have to worry about creating SQL Insertion, Deletion, Read, and Execution methods via Webservice; Simply add a RESTDataBase connection component and add a RESTClientSQL component that will already have your SQL solution fully functional as you did back in the day and with all the power of modern REST / JSON technology with data compression and everything the language can offer. Have fun.\r\n",
+      "Author" : "Gilberto Rocha da Silva",
+      "License" : "GPL- 3.0",
+      "RelativeFilePath" : "Packages\\/Lazarus\\/Drivers\\/lazdriver\\/",
+      "VersionAsString" : "2.0.5.0",
+      "LazCompatibility" : "2.0.0, 2.0.2, 2.0.4, 2.0.6, 2.0.8, 2.0.10, 2.0.12",
+      "FPCCompatibility" : "3.0.0, 3.0.2, 3.0.4, 3.2.0",
+      "SupportedWidgetSet" : "gtk2, win32/win64",
+      "PackageType" : 0,
+      "DependenciesAsString" : "restdatawarecomponents(2.0), FCL"
+    },
+    {
+      "Name" : "restdwdriverunidac.lpk",
+      "Description" : "The proposal was fulfilled. REST DW was created to facilitate the creation of CRUDs in the same model that we created applications for Client / Server Database. Today, being able to write data to a bank via WebService is too complex for simple operations, making scheduling of simple screens time-consuming. With REST Dataware, you no longer have to worry about creating SQL Insertion, Deletion, Read, and Execution methods via Webservice; Simply add a RESTDataBase connection component and add a RESTClientSQL component that will already have your SQL solution fully functional as you did back in the day and with all the power of modern REST / JSON technology with data compression and everything the language can offer. Have fun.\r\n",
+      "Author" : "Gilberto Rocha da Silva",
+      "License" : "GPL- 3.0",
+      "RelativeFilePath" : "Packages\\/Lazarus\\/Drivers\\/unidac\\/",
+      "VersionAsString" : "2.1.0.0",
+      "LazCompatibility" : "2.0.0, 2.0.2, 2.0.4, 2.0.6, 2.0.8, 2.0.10, 2.0.12",
+      "FPCCompatibility" : "3.0.0, 3.0.2, 3.0.4, 3.2.0",
+      "SupportedWidgetSet" : "gtk2, win32/win64",
+      "PackageType" : 0,
+      "DependenciesAsString" : "unidac10, restdatawarecomponents(2.0), FCL"
+    },
+    {
+      "Name" : "restdwdriverzeos.lpk",
+      "Description" : "The proposal was fulfilled. REST DW was created to facilitate the creation of CRUDs in the same model that we created applications for Client / Server Database. Today, being able to write data to a bank via WebService is too complex for simple operations, making scheduling of simple screens time-consuming. With REST Dataware, you no longer have to worry about creating SQL Insertion, Deletion, Read, and Execution methods via Webservice; Simply add a RESTDataBase connection component and add a RESTClientSQL component that will already have your SQL solution fully functional as you did back in the day and with all the power of modern REST / JSON technology with data compression and everything the language can offer. Have fun.\r\n",
+      "Author" : "Gilberto Rocha da Silva",
+      "License" : "GPL- 3.0",
+      "RelativeFilePath" : "Packages\\/Lazarus\\/Drivers\\/zeos\\/",
+      "VersionAsString" : "2.0.5.0",
+      "LazCompatibility" : "2.0.0, 2.0.2, 2.0.4, 2.0.6, 2.0.8, 2.0.10, 2.0.12",
+      "FPCCompatibility" : "3.0.0, 3.0.2, 3.0.4, 3.2.0",
+      "SupportedWidgetSet" : "gtk2, win32/win64",
+      "PackageType" : 0,
+      "DependenciesAsString" : "restdatawarecomponents(2.0), LR_ZeosDB, FCL"
+    },
+    {
+      "Name" : "restdatawareshellservices.lpk",
+      "Description" : "",
+      "Author" : "Gilberto Rocha da Silva",
+      "License" : "GPL - 3.0",
+      "RelativeFilePath" : "Packages\\/Lazarus\\/ShellTools\\/",
+      "VersionAsString" : "2.0.5.0",
+      "LazCompatibility" : "2.0.0, 2.0.2, 2.0.4, 2.0.6, 2.0.8, 2.0.10, 2.0.12",
+      "FPCCompatibility" : "3.0.0, 3.0.2, 3.0.4, 3.2.0",
+      "SupportedWidgetSet" : "gtk2, win32/win64",
+      "PackageType" : 0,
+      "DependenciesAsString" : ""
+    }
+  ]
+}
