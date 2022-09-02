@@ -3083,7 +3083,7 @@ Function EncodeStream (Value : TStream) : String;
      StreamDecoded.CopyFrom(AValue, AValue.Size);
      StreamDecoded.Position := 0;
      EncdDecd.EncodeStream(StreamDecoded, StreamEncoded);
-     Result := StringReplace(StreamEncoded.DataString, sLineBreak, '', [rfReplaceAll]);
+     Result := StreamEncoded.DataString; //StringReplace(StreamEncoded.DataString, sLineBreak, '', [rfReplaceAll]);
     Finally
      StreamEncoded.Free;
      StreamDecoded.Free;

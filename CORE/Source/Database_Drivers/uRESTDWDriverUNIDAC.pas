@@ -8,8 +8,7 @@ uses SysUtils,  Classes,   DB, Uni, UniScript,    DADump,
      uRESTDWBasicDB,          uRESTDWJSONInterface,    uRESTDWDataJSON,
      uRESTDWMassiveBuffer,    Variants,                uRESTDWDatamodule,
      uRESTDWDataset,          uRESTDWJSONObject,       uRESTDWParams,
-     uRESTDWBasicTypes,       uRESTDWBasic,            uRESTDWTools,
-     uRESTDWCharset;
+     uRESTDWBasicTypes,       uRESTDWBasic,            uRESTDWTools;
 
 Type
 
@@ -132,11 +131,18 @@ Type
   Property Connection : TUniConnection Read GetConnection Write SetConnection;
 End;
 
+Procedure Register;
+
 implementation
 
 {$IFNDEF FPC}{$if CompilerVersion < 21}
 {$R .\Package\D7\RESTDWDriverUNIDAC.dcr}
 {$IFEND}{$ENDIF}
+
+Procedure Register;
+Begin
+ RegisterComponents('REST Dataware - Drivers', [TRESTDWDriverUNIDAC]);
+End;
 
 Function TRESTDWDriverUNIDAC.ProcessMassiveSQLCache(MassiveSQLCache      : String;
                                                     Var Error            : Boolean;

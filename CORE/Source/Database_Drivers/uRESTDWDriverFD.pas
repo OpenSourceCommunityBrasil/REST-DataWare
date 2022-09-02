@@ -14,8 +14,9 @@ uses System.SysUtils,          System.Classes,
      FireDAC.Phys.Intf,       Data.DB, uRESTDWConsts,  uRESTDWDataUtils,
      uRESTDWBasicDB,          uRESTDWBasic,            uRESTDWJSONInterface,
      uRESTDWMassiveBuffer,    Variants,                uRESTDWDatamodule,
-     uRESTDWDataset,          uRESTDWJSONObject,       uRESTDWParams,
-     uRESTDWBasicTypes,       uRESTDWDataJSON,         uRESTDWTools;
+     uRESTDWMemtable,         uRESTDWJSONObject,       uRESTDWParams,
+     uRESTDWBasicTypes,       uRESTDWDataJSON,         uRESTDWTools,
+     DBClient,                Datasnap.Provider;
 
 Type
  TFDCustomTableRDW = class(TFDTable)
@@ -1346,7 +1347,7 @@ Var
           Begin   
            Query.ExecSQL;
 
-           // InclusÃ£o do mÃ©todo de after massive line process
+           // Inclusão do método de after massive line process
            If (Self.Owner.ClassType = TServerMethodDatamodule) Or
              (Self.Owner.ClassType.InheritsFrom(TServerMethodDatamodule)) Then
            Begin
@@ -1588,7 +1589,8 @@ Var
  vStateResource : Boolean;
  vStringStream  : TMemoryStream;
  aResult        : TJSONValue;
- vDWMemtable1   : TRESTDWMemtable;
+ vDwProvider    : TDatasetProvider;
+ vClientDS      : TClientDataset;
  Function GetParamIndex(Params : TFDParams; ParamName : String) : Integer;
  Var
   I : Integer;
@@ -1838,9 +1840,13 @@ Begin
    End;
   If Not Execute Then
    Begin
-     If Assigned(Self.OnQueryBeforeOpen) Then
-      Self.OnQueryBeforeOpen(TDataset(vTempQuery), Params);
-    vTempQuery.Open;
+   If Assigned(Self.OnQueryBeforeOpen) Then
+     Self.OnQueryBeforeOpen(TDataset(vTempQuery), Params);
+    If Not(BinaryCompatibleMode) Then
+     Begin
+      vTempQuery.Open;
+      vTempQuery.FetchAll;
+     End;
     {$IF CompilerVersion >= 30}
      If Not vFDConnection.UpdateOptions.AutoCommitUpdates Then
     {$IFEND}
@@ -1867,7 +1873,22 @@ Begin
        End;
       End
      Else
-      TRESTDWClientSQLBase.SaveToStream(vTempQuery, BinaryBlob);
+      Begin
+       If Not Assigned(BinaryBlob) Then
+        BinaryBlob := TMemoryStream.Create;
+       vDwProvider          := TDatasetProvider.Create(Nil);
+       vClientDS            := TClientDataset.Create(Nil);
+       Try
+        vClientDS.SetProvider(vDwProvider);
+        vDwProvider.DataSet  := vTempQuery;
+        vClientDS.Active     := True;
+        vClientDS.SaveToStream(BinaryBlob, dfBinary);
+        BinaryBlob.Position := 0;
+       Finally
+        vDwProvider.Free;
+        vClientDS.Free;
+       End;
+      End;
     Finally
     End;
    End
@@ -3199,9 +3220,11 @@ Function TRESTDWDriverFD.ExecuteCommand(SQL                  : String;
                                         MetaData             : Boolean = False;
                                         BinaryCompatibleMode : Boolean = False) : String;
 Var
- vTempQuery   : TFDQuery;
- aResult      : TJSONValue;
+ vTempQuery     : TFDQuery;
+ aResult        : TJSONValue;
  vStateResource : Boolean;
+ vDwProvider    : TDatasetProvider;
+ vClientDS      : TClientDataset;
 Begin
  Inherited;
  Result := '';
@@ -3231,13 +3254,16 @@ Begin
    Begin
     If Assigned(Self.OnQueryBeforeOpen) Then
      Self.OnQueryBeforeOpen(TDataset(vTempQuery), nil);
-    vTempQuery.Open;
+    If Not(BinaryCompatibleMode) Then
+     Begin
+      vTempQuery.Open;
+      vTempQuery.fetchall;
+     End;
     {$IF CompilerVersion >= 30}
      If Not vFDConnection.UpdateOptions.AutoCommitUpdates Then
     {$IFEND}
      If vFDConnection.InTransaction Then
       vFDConnection.Commit;
-    vTempQuery.fetchall;
     aResult         := TJSONValue.Create;
     aResult.Encoding := Encoding;
     Try
@@ -3258,7 +3284,22 @@ Begin
        End;
       End
      Else
-      TRESTDWClientSQLBase.SaveToStream(vTempQuery, BinaryBlob);
+      Begin
+       If Not Assigned(BinaryBlob) Then
+        BinaryBlob := TMemoryStream.Create;
+       vDwProvider          := TDatasetProvider.Create(Nil);
+       vClientDS            := TClientDataset.Create(Nil);
+       Try
+        vClientDS.SetProvider(vDwProvider);
+        vDwProvider.DataSet  := vTempQuery;
+        vClientDS.Active     := True;
+        vClientDS.SaveToStream(BinaryBlob, dfBinary);
+        BinaryBlob.Position := 0;
+       Finally
+        vDwProvider.Free;
+        vClientDS.Free;
+       End;
+      End;
      FreeAndNil(aResult);
      Error         := False;
     Finally

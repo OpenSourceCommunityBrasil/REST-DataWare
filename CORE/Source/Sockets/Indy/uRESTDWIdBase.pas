@@ -3277,6 +3277,8 @@ Begin
       End;
     End;
   End;
+ If MyIP = '' Then
+  Raise Exception.Create(cInvalidPoolerName);
 End;
 
 Procedure TRESTDWIdServicePooler.CreatePostStream(AContext        : TIdContext;

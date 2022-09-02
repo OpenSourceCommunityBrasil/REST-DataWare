@@ -30,7 +30,7 @@ Uses
   SysUtils,  Classes, Db, SyncObjs, Variants, uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes,
   uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
   uRESTDWMassiveBuffer, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWConsts,
-  uRESTDWDataset,
+  uRESTDWMemtable,
  {$IFNDEF RESTDWLAMW}memds, BufDataset, {$ENDIF}uRESTDWMasterDetailData
  {$ELSE}
   {$IF Defined(RESTDWFMX)}
@@ -39,11 +39,11 @@ Uses
   {$if CompilerVersion > 24} // Delphi 2010 acima
    System.SysUtils, System.Classes, Db, SyncObjs, uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes,
    uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
-   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData, uRESTDWDataset
+   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData, uRESTDWMemtable
   {$ELSE}
    SysUtils, Classes, Db, SyncObjs, uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes,
    uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
-   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData, uRESTDWDataset
+   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData, uRESTDWMemtable
   {$IFEND}
  {$ENDIF}
  {$IFDEF FPC}
@@ -858,11 +858,6 @@ Type
                             Value   : String;
                             InText  : Boolean;
                             AndOrOR : String);
-  {$IFNDEF FPC}
-   {$IFDEF RESTDWMEMTABLE}
-   Property    Encoding;
-   {$ENDIF}
-  {$ENDIF}
   Procedure   Refresh;
   Procedure   SaveToStream    (Var Stream : TMemoryStream);
   Procedure   LoadFromStream      (Stream : TMemoryStream);
@@ -1108,11 +1103,6 @@ Type
                             Value   : String;
                             InText  : Boolean;
                             AndOrOR : String);
-  {$IFNDEF FPC}
-   {$IFDEF RESTDWMEMTABLE}
-   Property    Encoding;
-   {$ENDIF}
-  {$ENDIF}
   Procedure   Refresh;
   Procedure   SaveToStream    (Var Stream : TMemoryStream);
   Procedure   LoadFromStream      (Stream : TMemoryStream);
@@ -3669,20 +3659,21 @@ Begin
 End;
 
 Procedure TRESTDWDatabasebaseBase.ExecuteCommand(Var PoolerMethodClient : TRESTDWPoolerMethodClient;
-                                         Var SQL                : TStringList;
-                                         Var Params             : TParams;
-                                         Var Error              : Boolean;
-                                         Var MessageError       : String;
-                                         Var Result             : TJSONValue;
-                                         Var RowsAffected       : Integer;
-                                         Execute                : Boolean = False;
-                                         BinaryRequest          : Boolean = False;
-                                         BinaryCompatibleMode   : Boolean = False;
-                                         Metadata               : Boolean = False;
-                                         RESTClientPooler       : TRESTClientPoolerBase     = Nil);
+                                                 Var SQL                : TStringList;
+                                                 Var Params             : TParams;
+                                                 Var Error              : Boolean;
+                                                 Var MessageError       : String;
+                                                 Var Result             : TJSONValue;
+                                                 Var RowsAffected       : Integer;
+                                                 Execute                : Boolean = False;
+                                                 BinaryRequest          : Boolean = False;
+                                                 BinaryCompatibleMode   : Boolean = False;
+                                                 Metadata               : Boolean = False;
+                                                 RESTClientPooler       : TRESTClientPoolerBase     = Nil);
 Var
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  RESTClientPoolerExec : TRESTClientPoolerBase;
+ vStream              : TStream;
  LDataSetList         : TJSONValue;
  DWParams             : TRESTDWParams;
  vSQL,
@@ -3828,7 +3819,6 @@ Begin
      End;
     If (LDataSetList <> Nil) Then
      Begin
-  //    If Not Assigned(Result) Then //Correção fornecida por romyllldo no Forum
       Result := TJSONValue.Create;
       Result.Encoding := vRESTConnectionDB.Encoding;
       Error  := Trim(MessageError) <> '';
@@ -3836,15 +3826,11 @@ Begin
        Begin
         If Not LDataSetList.IsNull Then
          vTempValue := LDataSetList.ToJSON;
-       End
-      Else
-       Begin
-        If Not LDataSetList.IsNull Then
-         vTempValue := LDataSetList.Value;
        End;
-      If (Trim(vTempValue) <> '{}') And
-         (Trim(vTempValue) <> '')    And
-         (Not (Error))                       Then
+      If ((Trim(vTempValue) <> '{}') And
+          (Trim(vTempValue) <> '')   And
+          (Not (Error)))             And
+           Not(BinaryRequest)        Then
        Begin
         Try
          {$IFDEF  ANDROID}
@@ -3871,6 +3857,16 @@ Begin
            End;
          {$ENDIF}
         Finally
+        End;
+       End
+      Else If BinaryRequest Then
+       Begin
+        vStream := TMemoryStream.Create;
+        Try
+         LDataSetList.SaveToStream(vStream);
+         Result.LoadFromStream(vStream);
+        Finally
+         vStream.Free;
         End;
        End;
       vTempValue := '';
@@ -3900,12 +3896,11 @@ Begin
      End;
    End;
  Finally
-   {Eloy - Adicionado mais um try para free de objects}
-   If LDataSetList <> Nil Then
-    FreeAndNil(LDataSetList);
-   FreeAndNil(vRESTConnectionDB);
-   If Assigned(RESTClientPoolerExec) And (vLocalClient) Then
-    FreeAndNil(RESTClientPoolerExec);
+  If LDataSetList <> Nil Then
+   FreeAndNil(LDataSetList);
+  FreeAndNil(vRESTConnectionDB);
+  If Assigned(RESTClientPoolerExec) And (vLocalClient) Then
+   FreeAndNil(RESTClientPoolerExec);
  End;
 End;
 
@@ -8405,12 +8400,22 @@ Begin
        TClientDataset(Dataset).CreateDataSet;
       End;
      {$ENDIF}
+     {$IFDEF RESTDWMEMTABLE}
+     If (Dataset.ClassParent = TRESTDWMemtable) Or
+        (Dataset.ClassType   = TRESTDWMemtable) Then
+      Begin
+       TRESTDWMemtable(Dataset).Close;
+       TRESTDWMemtable(Dataset).CreateDataSet;
+      End;
+     {$ENDIF}
+     {$IFDEF RESTDWFDMEMTABLE}
      If (Dataset.ClassParent = TFDmemtable) Or
         (Dataset.ClassType   = TFDmemtable) Then
       Begin
        TFDmemtable(Dataset).Close;
        TFDmemtable(Dataset).CreateDataSet;
       End;
+     {$ENDIF}
     {$ENDIF}
    {$ELSE}
     {$IFDEF RESTDWCLIENTDATASET}
@@ -8456,22 +8461,32 @@ Begin
   {$ELSE}
    {$IF CompilerVersion > 27} // Delphi XE7 pra cima
     {$IFNDEF HAS_FMX}  // Incluído inicialmente para iOS/Brito
-    {$IFDEF CLIENTDATASET}
-     If (Dataset.ClassParent = TCustomClientDataSet) Or
-        (Dataset.ClassType   = TCustomClientDataSet) Or
-        (Dataset.ClassParent = TClientDataSet)       Or
-        (Dataset.ClassType   = TClientDataSet)       Then
+     {$IFDEF CLIENTDATASET}
+      If (Dataset.ClassParent = TCustomClientDataSet) Or
+         (Dataset.ClassType   = TCustomClientDataSet) Or
+         (Dataset.ClassParent = TClientDataSet)       Or
+         (Dataset.ClassType   = TClientDataSet)       Then
+       Begin
+        TClientDataset(Dataset).Close;
+        TClientDataset(Dataset).CreateDataSet;
+       End;
+     {$ENDIF}
+     {$IFDEF RESTDWMEMTABLE}
+     If (Dataset.ClassParent = TRESTDWMemtable) Or
+        (Dataset.ClassType   = TRESTDWMemtable) Then
       Begin
-       TClientDataset(Dataset).Close;
-       TClientDataset(Dataset).CreateDataSet;
+       TRESTDWMemtable(Dataset).Close;
+       TRESTDWMemtable(Dataset).CreateDataSet;
       End;
-    {$ENDIF}
+     {$ENDIF}
+     {$IFDEF RESTDWFDMEMTABLE}
      If (Dataset.ClassParent = TFDmemtable) Or
         (Dataset.ClassType   = TFDmemtable) Then
       Begin
        TFDmemtable(Dataset).Close;
        TFDmemtable(Dataset).CreateDataSet;
       End;
+     {$ENDIF}
     {$ENDIF}
    {$ELSE}
     {$IFDEF CLIENTDATASET}
@@ -10578,6 +10593,7 @@ Function TRESTDWClientSQL.GetData(DataSet: TJSONValue): Boolean;
 Var
  I             : Integer;
  LDataSetList  : TJSONValue;
+ vMetadata,
  vError        : Boolean;
  vValue,
  vMessageError : String;
@@ -10700,10 +10716,13 @@ Begin
    Try
     If DataSet = Nil Then
      Begin
+      vMetaData := True;
+      If Assigned(FieldDefs) Then
+       vMetaData := FieldDefs.Count = 0;
       For I := 0 To 1 Do
        Begin
         vRESTDataBase.ExecuteCommand(vActualPoolerMethodClient, vSQL, vParams, vError, vMessageError, LDataSetList,
-                                     vRowsAffected, False, BinaryRequest,  BinaryCompatibleMode, Fields.Count = 0, vRESTDataBase.RESTClientPooler);
+                                     vRowsAffected, False, BinaryRequest,  BinaryCompatibleMode, vMetaData, vRESTDataBase.RESTClientPooler);
         If Not(vError) or (vMessageError <> cInvalidAuth) Then
          Break;
        End;
@@ -10711,13 +10730,16 @@ Begin
        Begin
         If BinaryRequest Then
          Begin
-          If Not LDataSetList.IsNull Then
-           vValue := LDataSetList.Value;
-         End;
-        LDataSetList.Encoded  := vRESTDataBase.EncodedStrings;
-        LDataSetList.Encoding := DataBase.Encoding;
-        If Not BinaryRequest Then
+         If Not LDataSetList.IsNull Then
+           Begin
+            vStream := TMemoryStream.Create;
+            LDataSetList.SaveToStream(vStream); //vValue := LDataSetList.Value;
+           End;
+         End
+        Else
          Begin
+          LDataSetList.Encoded  := vRESTDataBase.EncodedStrings;
+          LDataSetList.Encoding := DataBase.Encoding;
           If Not LDataSetList.IsNull Then
            vValue := LDataSetList.ToJSON;
          End;
@@ -10777,7 +10799,7 @@ Begin
         LDataSetList.WriteToDataset(dtFull, vValue, Self, vJsonCount, vDatapacks, vActualRec)
        Else
         Begin
-         vStream         := DecodeStream(vValue);
+//         vStream         := DecodeStream(vValue);
          If (csDesigning in ComponentState) Then //Clone end compare Fields
           Begin
            vStream.Position := 0;

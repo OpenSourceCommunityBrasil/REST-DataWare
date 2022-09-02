@@ -350,7 +350,7 @@ Type
 // Function  StreamToBytes            (Stream             : TMemoryStream)          : tidBytes;
  Procedure CopyStream               (Const Source       : TStream;
                                      Dest               : TStream);
- Function  ZDecompressStreamNew     (Const S            : TStream)                : TStringStream;
+ Function  ZDecompressStreamNew     (Const S            : TStream)                : TStream;
  Function  ZDecompressStr           (Const S            : String;
                                      Var Value          : String)                 : Boolean;
  Function  ZDecompressStreamD       (Const S            : TStringStream;
@@ -751,7 +751,7 @@ Begin
    Utf8Stream.CopyFrom(S, S.Size);
   {$ELSE} // Delphi 2010 pra cima
    Utf8Stream := TStringStream.Create('');
-   Utf8Stream.Write(AnsiString(S.Datastring)[InitStrPos], S.Size);
+   Utf8Stream.Write(AnsiString(TStringStream(S).Datastring)[InitStrPos], S.Size);
   {$IFEND} // Delphi 2010 pra cima
  {$ENDIF}
  {$IFNDEF FPC}
@@ -949,13 +949,9 @@ Begin
  End;
 End;
 
-Function ZDecompressStreamNew(Const S   : TStream) : TStringStream;
+Function ZDecompressStreamNew(Const S   : TStream) : TStream;
 Begin
- {$IFDEF FPC}
-  Result  := TStringStream.Create('');
- {$ELSE}
-  Result  := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
- {$ENDIF}
+ Result  := TMemoryStream.Create;
  S.Position := 0;
  ZDecompressStream(S, Result);
  Result.position := 0;

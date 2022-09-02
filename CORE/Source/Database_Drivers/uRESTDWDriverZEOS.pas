@@ -17,7 +17,7 @@ uses
  ZSqlProcessor,        ZSequence,           ZSqlMetadata,
  uRESTDWConsts,        uRESTDWDataUtils,           uRESTDWBasicDB,
  uRESTDWJSONInterface, uRESTDWDataJSON,     uRESTDWMassiveBuffer,
- Variants,             uRESTDWDatamodule,   uRESTDWDataset,
+ Variants,             uRESTDWDatamodule,   uRESTDWMemtable,
  uRESTDWJSONObject,    uRESTDWParams,       uRESTDWBasicTypes,
  uRESTDWBasic,         uRESTDWTools;
 
@@ -132,13 +132,16 @@ Type
   Property Connection : TZConnection Read GetConnection Write SetConnection;
 End;
 
+
+
+Procedure Register;
+
 implementation
 
-{$IFNDEF FPC}
- {$if CompilerVersion < 23}
-  {$R .\RESTDWDriverZEOS.dcr}
- {$IFEND}
-{$ENDIF}
+Procedure Register;
+Begin
+ RegisterComponents('REST Dataware - Drivers', [TRESTDWDriverZeos]);
+End;
 
 Function TRESTDWDriverZeos.ProcessMassiveSQLCache(MassiveSQLCache      : String;
                                                     Var Error            : Boolean;
@@ -1305,7 +1308,7 @@ Var
           Begin   
            Query.ExecSQL;
 
-           // InclusÃ£o do mÃ©todo de after massive line process
+           // Inclusão do método de after massive line process
            If (Self.Owner.ClassType = TServerMethodDatamodule) Or
              (Self.Owner.ClassType.InheritsFrom(TServerMethodDatamodule)) Then
            Begin
