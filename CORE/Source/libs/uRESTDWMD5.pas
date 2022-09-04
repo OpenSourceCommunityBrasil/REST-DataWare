@@ -421,14 +421,14 @@ Begin
  SavePos:=Stream.Position;
  TotalBytes:=0;
  try
-  Stream.Seek(0, soFromBeginning);
+  Stream.Position :=  0;  //Stream.Seek(0, soFromBeginning);   //Roniery-04/09/2022
   repeat
    ReadBytes:=Stream.Read(Buffer, SizeOf(Buffer));
    Inc(TotalBytes, ReadBytes);
    MD5Update(Context, @Buffer, ReadBytes);
   until (ReadBytes = 0) or (TotalBytes = Size);
  finally
-  Stream.Seek(SavePos, soFromBeginning);
+  Stream.Position :=  0;  //Stream.Seek(SavePos, soFromBeginning);  //Roniery-04/09/2022
  End;
  MD5Final(Result, Context);
 End;
