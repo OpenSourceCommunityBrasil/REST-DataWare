@@ -1786,11 +1786,13 @@ Var
       End;
     End;
   Finally
-   If RawHeaders <> Nil Then
-    DWParams.RequestHeaders.Input.Assign(RawHeaders);
+   If Assigned(RawHeaders) Then
+    If Trim(RawHeaders.Text) <> '' Then
+     DWParams.RequestHeaders.Input.Assign(RawHeaders);
    tmp := '';
   End;
  End;
+
  Procedure WriteError;
  Begin
   {$IFDEF FPC}
