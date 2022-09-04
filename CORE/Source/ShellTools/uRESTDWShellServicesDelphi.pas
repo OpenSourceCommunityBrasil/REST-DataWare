@@ -32,7 +32,7 @@ Uses
   {$ELSE}
    System.SysUtils, System.Classes, Data.Db, Variants, HTTPApp, system.SyncObjs, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
    uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWComponentBase,
-   uRESTDWCharset, uRESTDWConsts,
+   uRESTDWCharset,
   {$IFEND}uRESTDWTools, uRESTDWConsts;
 
 Type

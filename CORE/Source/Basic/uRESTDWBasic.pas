@@ -1700,7 +1700,7 @@ Var
   I: Integer;
   JSONParam : TJSONParam;
  begin
-  If RawHeaders = Nil Then
+  If Not Assigned(RawHeaders) Then
    Exit;
   Try
    If RawHeaders.Count > 0 Then
@@ -1787,7 +1787,8 @@ Var
     End;
   Finally
    If RawHeaders <> Nil Then
-    DWParams.RequestHeaders.Input.Assign(RawHeaders);
+    If RawHeaders.Text <> '' Then
+     DWParams.RequestHeaders.Input.Assign(RawHeaders);
    tmp := '';
   End;
  End;

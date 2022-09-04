@@ -8012,7 +8012,7 @@ Var
  vTempParam : String;
  Function CompareValue(Value1, Value2 : String) : Boolean;
  Begin
-   Result := Value1 = Value2;
+  Result := Value1 = Value2;
  End;
 Begin
  Result := Nil;
@@ -8026,8 +8026,8 @@ Begin
      Break;
     End;
   End;
-  if Result = nil then 
-    raise Exception.Create('Parâmetro ''' + Value + ''' não encontrado.');
+ If Not Assigned(Result) Then 
+  Raise Exception.Create(Format(cParamNotFound, [Value]));
 End;
 
 Function TRESTDWClientSQL.ParamByName(Value: String): TParam;
@@ -8051,8 +8051,8 @@ Begin
      Break;
     End;
   End;
-  if Result = nil then 
-    raise Exception.Create('Parâmetro ''' + Value + ''' não encontrado.');
+ If Not Assigned(Result) Then 
+  Raise Exception.Create(Format(cParamNotFound, [Value]));
 End;
 
 Function TRESTDWTable.ParamCount: Integer;
@@ -8191,7 +8191,8 @@ Begin
         vRESTDataBase.Active := True;
        If Not vRESTDataBase.Active then
         Exit;
-       vRESTDataBase.ExecuteCommand(vActualPoolerMethodClient, vSQL, vParams, vError, vMessageError, vResult, vRowsAffected, True, False, False, False, Nil);
+       vRESTDataBase.ExecuteCommand(vActualPoolerMethodClient, vSQL, vParams,   vError, vMessageError,
+                                    vResult, vRowsAffected, True, False, False, False,  vRESTDataBase.RESTClientPooler);
        Result := Not vError;
        Error  := vMessageError;
        If Assigned(vResult) Then

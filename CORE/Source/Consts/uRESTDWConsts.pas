@@ -71,7 +71,7 @@ Const
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
  RESTDWVersionINFO          = 'v2.1.0-';
- RESTDWRelease              = '3103';
+ RESTDWRelease              = '3127';
  RESTDWCodeProject          = 'Galaga - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
@@ -159,6 +159,7 @@ Const
  cInvalidParamName          = 'Invalid Param Name';
  cInvalidDWParam            = 'Invalid RESTDWParam';
  cInvalidDWParams           = 'Invalid RESTDWParams';
+ cParamNotFound             = 'Param %s not found...';
  cInvalidPoolerName         = 'Invalid Pooler Name...';
  cInvalidContextRule        = 'Invalid ContextRule Name';
  cServerEventNotFound       = 'ServerEvent not found...';

@@ -30,10 +30,10 @@ uses
   {$IFDEF FPC}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
     LResources, LazFileUtils, SysUtils, Classes, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, fpWeb,
-    uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWBufferDb;
+    uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWMemtable, uRESTDWBufferDb;
   {$ELSE}
    Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWDatamodule, uRESTDWServerEvents,
-   uRESTDWBasicClass, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWBufferDb,
+   uRESTDWBasicClass, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWMemtable, uRESTDWBufferDb,
    RTLConsts, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
    {$IFDEF COMPILER16_UP}
    UITypes,
@@ -889,9 +889,9 @@ End;
 {$IFNDEF FPC}
 Function TDWDSDesigner.DoCreateField(Const FieldName : {$IF CompilerVersion > 17}WideString{$ELSE}String{$IFEND}; Origin: string): TField;
 Begin
-// TDWCustomDataSet(DataSet).DesignNotify(FieldName, 0);
-// Result  := Inherited DoCreateField(FieldName, Origin);
-// TDWCustomDataSet(DataSet).DesignNotify(FieldName, 104);
+ TRESTDWCustomDataSet(DataSet).DesignNotify(FieldName, 0);
+ Result  := Inherited DoCreateField(FieldName, Origin);
+ TRESTDWCustomDataSet(DataSet).DesignNotify(FieldName, 104);
 End;
 {$ENDIF}
 
