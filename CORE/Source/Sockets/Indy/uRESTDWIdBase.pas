@@ -2859,7 +2859,7 @@ Begin
  DWParams    := Nil;
  HttpRequest.Request.AcceptEncoding := AcceptEncoding;
  HttpRequest.Request.CustomHeaders.Clear;
- HttpRequest.Request.CustomHeaders.NameValueSeparator := cNameValueSeparator;
+// HttpRequest.Request.CustomHeaders.NameValueSeparator := cNameValueSeparator;
  If Assigned(AHeaders) Then
   If AHeaders.Count > 0 Then
    HttpRequest.Request.CustomHeaders.FoldLines := False;

@@ -27,7 +27,8 @@ interface
 
 Uses
    SysUtils, Classes, Db, HTTPDefs, LConvEncoding, Variants, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass, uRESTDWComponentBase, uRESTDWTools;
+   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass, uRESTDWComponentBase, uRESTDWTools,
+   uRESTDWConsts;
 
 Type
  TRESTDWShellService = Class(TRESTShellServicesBase)
@@ -64,6 +65,7 @@ Var
  I,
  StatusCode      : Integer;
  ResultStream    : TStream;
+ vRawHeader,
  vResponseHeader : TStringList;
  mb              : TStringStream;
  vStream         : TStream;
@@ -84,6 +86,8 @@ Var
  Begin
   If Assigned(vResponseHeader) Then
    FreeAndNil(vResponseHeader);
+  If Assigned(vRawHeader) Then
+   FreeAndNil(vRawHeader);
   If Assigned(vStream) Then
    FreeAndNil(vStream);
  End;
@@ -111,7 +115,19 @@ Begin
    End;
   vAuthRealm := '';//AResponse.Realm;
   vToken     := ARequest.Authorization;
-  //ARequest.Connection
+  vRawHeader := Nil;
+  If Assigned(ARequest.CustomHeaders) Then
+   Begin
+    vRawHeader      := TStringList.Create;
+    vRawHeader.Text := ARequest.CustomHeaders.Text;
+   end;
+  If vToken <> '' Then
+   Begin
+    If Not Assigned(vRawHeader) Then
+     vRawHeader := TStringList.Create;
+    If vRawHeader.IndexOf('Authorization:') = -1 Then
+     vRawHeader.Add('Authorization:' + vToken);
+   End;
   vStream    := TMemoryStream.Create;
   If (Trim(ARequest.Content) <> '') Then
    Begin
@@ -142,7 +158,7 @@ Begin
                    vToken,
                    vResponseHeader,
                    -1,
-                   ARequest.CustomHeaders,
+                   vRawHeader,
                    ARequest.ContentFields,
                    ARequest.QueryFields.Text,
                    vStream,

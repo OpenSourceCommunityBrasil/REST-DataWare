@@ -159,6 +159,7 @@ Const
  cInvalidParamName          = 'Invalid Param Name';
  cInvalidDWParam            = 'Invalid RESTDWParam';
  cInvalidDWParams           = 'Invalid RESTDWParams';
+ cParamNotFound             = 'Param %s not found...';
  cInvalidPoolerName         = 'Invalid Pooler Name...';
  cInvalidContextRule        = 'Invalid ContextRule Name';
  cServerEventNotFound       = 'ServerEvent not found...';
