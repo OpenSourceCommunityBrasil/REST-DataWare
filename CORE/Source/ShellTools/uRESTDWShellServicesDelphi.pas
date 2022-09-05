@@ -29,12 +29,12 @@ Uses
   {$IF CompilerVersion <= 22}
    EncdDecd, uRESTDWMassiveBuffer,
   {$ELSE}
-     uRESTDWCharset, uRESTDWConsts,
+     uRESTDWCharset,
   {$IFEND}
   SysUtils, Classes, Db, Variants, HTTPApp, SyncObjs,
   uRESTDWBasic, uRESTDWJSONObject, uRESTDWBasicTypes, uRESTDWComponentEvents,
   uRESTDWComponentBase, uRESTDWBasicClass, uRESTDWParams, uRESTDWBasicDB,
-  uRESTDWTools;
+  uRESTDWTools, uRESTDWConsts;
 
 Type
  TRESTDWShellService = Class(TRESTShellServicesBase)
