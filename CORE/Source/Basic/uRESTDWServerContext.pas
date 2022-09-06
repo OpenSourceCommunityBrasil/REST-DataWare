@@ -290,6 +290,7 @@ Type
   Procedure SetBaseHeader(Value : TStrings);
 //  Procedure AfterConstruction; override;
   Procedure SetOnBeforeRenderer(Value : TObjectEvent);
+  Procedure SetDefaultContext(aValue : String);
  Public
   Procedure   CreateDWParams(ContextName  : String;
                              Var DWParams : TRESTDWParams);
@@ -300,7 +301,7 @@ Type
   Property    ContextList         : TRESTDWContextList Read vEventList       Write vEventList;
   Property    AccessTag           : String         Read vAccessTag           Write vAccessTag;
   Property    BaseHeader          : TStrings       Read vBaseHeader          Write SetBaseHeader;
-  Property    DefaultContext      : String         Read vDefaultContext      Write vDefaultContext;
+  Property    DefaultContext      : String         Read vDefaultContext      Write SetDefaultContext;
   Property    OnBeforeRenderer    : TObjectEvent   Read vOnBeforeRenderer    Write SetOnBeforeRenderer;
 End;
 
@@ -750,6 +751,19 @@ Begin
  vBaseHeader.Assign(Value);
 End;
 
+
+Procedure TRESTDWServerContext.SetDefaultContext(aValue : String);
+Var
+ vTempValue : String;
+Begin
+ vTempValue := aValue;
+ If Trim(vTempValue) <> '' Then
+  Begin
+   If Copy(vTempValue, 1, 1) <> '/' Then
+    vTempValue := '/' + vTempValue;
+   vDefaultContext := vTempValue;
+  End;
+End;
 
 Procedure TRESTDWServerContext.CreateDWParams(ContextName  : String;
                                           Var DWParams : TRESTDWParams);

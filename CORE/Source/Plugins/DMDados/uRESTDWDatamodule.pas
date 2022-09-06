@@ -303,6 +303,17 @@ Begin
            If Copy(vTempValue, Length(vTempValue), 1) <> '/' Then
             vTempValue :=  vTempValue + '/';
           End;
+         If ((vTempValue = '/') Or (vTempValue = '')) Then
+          Begin
+           If TRESTDWServerContext(Components[I]).DefaultContext <> '' Then
+            Begin
+             vTempValue := TRESTDWServerContext(Components[I]).DefaultContext;
+             If vTempValue[InitStrPos] <> '/' Then
+              vTempValue :=  '/' + vTempValue;
+             If Copy(vTempValue, Length(vTempValue), 1) <> '/' Then
+              vTempValue :=  vTempValue + '/';
+            End;
+          End;
          Result     := vTempRoute = Copy(vTempValue, 1, Length(vTempRoute));
          If Result Then
           Begin

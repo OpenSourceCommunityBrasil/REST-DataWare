@@ -2537,7 +2537,7 @@ Begin
               TRESTDWDataUtils.ParseBodyBinToDWParam(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
              Else If (vBinaryEvent) Then
               Begin
-               If (pos('--', TStringStream(ms).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+               If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
                 Begin
                  msgEnd   := False;
                  {$IFNDEF FPC}
