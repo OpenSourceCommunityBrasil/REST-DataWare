@@ -1923,6 +1923,7 @@ Begin
  Error         := False;
  MessageError  := '';
  Result        := Nil;
+ vStream       := Nil;
  If Not Assigned(RESTClientPooler) Then
   RESTClientPoolerExec  := TRESTClientPoolerBase.Create(Nil)
  Else
@@ -2340,6 +2341,7 @@ Var
  vStream          : TStream;
 Begin
  Result        := Nil;
+ vStream       := Nil;
  SocketError   := False;
  Error         := False;
  MessageError  := '';

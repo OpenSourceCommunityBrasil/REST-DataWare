@@ -758,17 +758,11 @@ End;
 Type
  TRESTShellServicesBase   = Class(TRESTServiceBase)
  Private
-//  vOnCreate : TOnCreate;
   Procedure Loaded; Override;
  Protected
   Procedure Notification              (AComponent            : TComponent;
                                        Operation             : TOperation); Override;
  Public
-  Procedure EchoPooler               (ServerMethodsClass     : TComponent;
-                                      AContext               : TComponent;
-                                      Var Pooler, MyIP       : String;
-                                      AccessTag              : String;
-                                      Var InvalidTag         : Boolean);Virtual;Abstract;
   Procedure Command                   (ARequest              : TComponent;
                                        AResponse             : TComponent;
                                        Var Handled           : Boolean);Virtual;Abstract;
@@ -3692,7 +3686,7 @@ Begin
                       JSONStr := '"' + JSONStr + '"';
                     End;
                   End;
-                 vErrorCode   := 200;
+//                 vErrorCode   := 200;
                  If vBinaryEvent Then
                   vReplyString := JSONStr
                  Else
@@ -4739,7 +4733,7 @@ Begin
         JSONStr    := TReplyTagError
        Else
         JSONStr    := TReplyInvalidPooler;
-       ErrorCode   := 405;
+       ErrorCode   := 500;
       End;
     End
    Else If vUrlMethod = UpperCase('ExecuteCommandPureJSON') Then

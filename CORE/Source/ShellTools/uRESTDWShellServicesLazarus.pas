@@ -27,7 +27,8 @@ interface
 
 Uses
    SysUtils, Classes, Db, HTTPDefs, LConvEncoding, Variants, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass, uRESTDWComponentBase, uRESTDWTools;
+   uRESTDWConsts, uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass, uRESTDWComponentBase,
+   uRESTDWTools;
 
 Type
  TRESTDWShellService = Class(TRESTShellServicesBase)
@@ -261,6 +262,38 @@ Begin
  {$IFNDEF FPC}
  Inherited
  {$ENDIF}
+ InvalidTag := False;
+ MyIP       := '';
+ If ServerMethodsClass <> Nil Then
+  Begin
+   For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+    Begin
+     If (ServerMethodsClass.Components[i].ClassType  = TRESTDWPoolerDB)  Or
+        (ServerMethodsClass.Components[i].InheritsFrom(TRESTDWPoolerDB)) Then
+      Begin
+       If Pooler = Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name]) Then
+        Begin
+         If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
+          Begin
+           If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
+            Begin
+             InvalidTag := True;
+             Exit;
+            End;
+          End;
+         If AContext <> Nil Then
+          Begin
+           MyIP := TRequest(AContext).RemoteAddr;
+           If MyIP = '' Then
+            MyIP := '127.0.0.1';
+          End;
+         Break;
+        End;
+      End;
+    End;
+  End;
+ If MyIP = '' Then
+  Raise Exception.Create(cInvalidPoolerName);
 End;
 
 End.
