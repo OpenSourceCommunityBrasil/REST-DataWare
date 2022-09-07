@@ -71,7 +71,7 @@ Uses
  Function  restdwMin              (Const AValueOne,
                                    AValueTwo            : Int64)           : Int64;
  Function  StringToBytes          (AStr                 : String)          : TRESTDWBytes;
- Function  StreamToBytes          (Stream               : TMemoryStream)   : TRESTDWBytes;
+ Function  StreamToBytes          (Stream               : TStream)         : TRESTDWBytes;
  Function  StringToFieldType      (Const S              : String)          : Integer;
  Function  Escape_chars           (s                    : String)          : String;
  Function  Unescape_chars         (s                    : String)          : String;
@@ -2987,7 +2987,7 @@ Begin
   Result := Integer(ftString);
 End;
 
-Function StreamToBytes(Stream : TMemoryStream) : TRESTDWBytes;
+Function StreamToBytes(Stream : TStream) : TRESTDWBytes;
 Begin
  Try
   Stream.Position := 0;
@@ -3083,7 +3083,7 @@ Function EncodeStream (Value : TStream) : String;
      StreamDecoded.CopyFrom(AValue, AValue.Size);
      StreamDecoded.Position := 0;
      EncdDecd.EncodeStream(StreamDecoded, StreamEncoded);
-     Result := StringReplace(StreamEncoded.DataString, sLineBreak, '', [rfReplaceAll]);
+     Result := StreamEncoded.DataString;
     Finally
      StreamEncoded.Free;
      StreamDecoded.Free;

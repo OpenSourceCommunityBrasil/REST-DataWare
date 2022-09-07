@@ -283,7 +283,11 @@ Begin
             End;
           End;
          If AContext <> Nil Then
-          MyIP := TRequest(AContext).RemoteAddr;
+          Begin
+           MyIP := TRequest(AContext).RemoteAddr;
+           If MyIP = '' Then
+            MyIP := '127.0.0.1';
+          End;
          Break;
         End;
       End;

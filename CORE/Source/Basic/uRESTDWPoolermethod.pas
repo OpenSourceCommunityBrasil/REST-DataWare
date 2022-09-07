@@ -1913,15 +1913,17 @@ Function TRESTDWPoolerMethodClient.ExecuteCommandJSON(Pooler, Method_Prefix,
                                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TJSONValue;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
- lResponse        : String;
- JSONParam        : TJSONParam;
- DWParams         : TRESTDWParams;
+ lResponse            : String;
+ JSONParam            : TJSONParam;
+ DWParams             : TRESTDWParams;
+ vStream              : TStream;
 Begin
  RowsAffected  := 0;
  SocketError   := False;
  Error         := False;
  MessageError  := '';
  Result        := Nil;
+ vStream       := Nil;
  If Not Assigned(RESTClientPooler) Then
   RESTClientPoolerExec  := TRESTClientPoolerBase.Create(Nil)
  Else
@@ -2072,12 +2074,20 @@ Begin
       RowsAffected  := DWParams.ItemsString['RowsAffected'].AsInteger;
      If DWParams.ItemsString['Result'] <> Nil Then
       Begin
-       If DWParams.ItemsString['Result'].AsString <> '' Then
+       If Not (DWParams.ItemsString['Result'].IsEmpty) Then
         Begin
          If Not BinaryRequest Then
           Result.LoadFromJSON(DWParams.ItemsString['Result'].AsString)
          Else
-          Result.SetValue(DWParams.ItemsString['Result'].AsString, False);
+          Begin
+           Try
+            DWParams.ItemsString['Result'].SaveToStream(vStream);
+            Result.LoadFromStream(TMemoryStream(vStream));
+           Finally
+            vStream.Free;
+           End;
+//           Result.SetValue(DWParams.ItemsString['Result'].AsString, False);
+          End;
         End
        Else
         Result.SetValue(lResponse, False);
@@ -2328,8 +2338,10 @@ Var
  lResponse        : String;
  JSONParam        : TJSONParam;
  DWParams         : TRESTDWParams;
+ vStream          : TStream;
 Begin
  Result        := Nil;
+ vStream       := Nil;
  SocketError   := False;
  Error         := False;
  MessageError  := '';
@@ -2478,7 +2490,15 @@ Begin
          If Not BinaryRequest Then
           Result.LoadFromJSON(DWParams.ItemsString['Result'].AsString)
          Else
-          Result.SetValue(DWParams.ItemsString['Result'].AsString, False);
+          Begin
+           Try
+            DWParams.ItemsString['Result'].SaveToStream(vStream);
+            Result.LoadFromStream(TMemoryStream(vStream));
+           Finally
+            vStream.Free;
+           End;
+//           Result.SetValue(DWParams.ItemsString['Result'].AsString, False);
+          End;
         End
        Else
         Result.SetValue(lResponse, False);
@@ -2583,7 +2603,6 @@ Begin
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;

@@ -37,9 +37,7 @@ Uses
   {$IFEND}
  {$ENDIF}
  {$IFDEF FPC}
-  {$IFDEF RESTDWMEMTABLE}
    , uRESTDWDataset
-  {$ENDIF}
   {$IFDEF RESTDWLAZDRIVER}
    , memds
   {$ENDIF}
@@ -47,9 +45,7 @@ Uses
   , DADump, UniDump, VirtualTable, MemDS
   {$ENDIF}
  {$ELSE}
-   {$IFDEF RESTDWMEMTABLE}
     , uRESTDWDataset
-   {$ENDIF}
    {$IFDEF RESTDWCLIENTDATASET}
     ,  DBClient
    {$ENDIF}
@@ -949,15 +945,6 @@ Begin
  vLoadFromStream       := False;
  {$IFDEF RESTDWMEMTABLE}
   vBinaryCompatibleMode := True;
-  {$IFNDEF FPC}
-   {$IF CompilerVersion > 21}
-    Encoding            := esUtf8;
-   {$ELSE}
-    Encoding            := esAscii;
-   {$IFEND}
-  {$ELSE}
-   Encoding             := esUtf8;
-  {$ENDIF}
  {$ENDIF}
 End;
 
@@ -1021,10 +1008,6 @@ Begin
    T := DWFieldTypeSize(Dataset.Fields[I].DataType);
    Stream.Write(T, Sizeof(DWFieldTypeSize));
    Case TFieldType(T) Of
-      ftMemo,
-      {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,{$IFEND}{$ELSE}
-         ftWideMemo,{$ENDIF}
-      ftFmtMemo,
       ftFixedChar,
       ftWideString,
       ftString : Begin
@@ -1187,6 +1170,14 @@ Begin
                   If L <> 0 Then Stream.Write(S[1], L);
                   {$ENDIF}
                  End;
+      ftMemo,
+      {$IFNDEF FPC}
+       {$IF CompilerVersion > 21}ftWideMemo,
+       {$IFEND}
+      {$ELSE}
+       ftWideMemo,
+      {$ENDIF}
+      ftFmtMemo,
       ftBlob,
       {$IFNDEF FPC}{$IF CompilerVersion > 21}ftStream,{$IFEND}{$ENDIF}
       ftBytes : Begin
@@ -1519,14 +1510,6 @@ Var
     Result := FieldDefs.IndexOf(Name);
     Exit;
    End;
-//  If (Fields.Count > 0) Then
-//   Begin
-//    If (FindField(Name) <> Nil) Then
-//     Begin
-//      Result := FieldByName(Name).Index;
-//      Exit;
-//     End;
-//   End;
   vFieldDef            := FieldDefs.AddFieldDef;
   vFieldDef.Name       := Name;
   vFieldDef.DataType   := ObjectValueToFieldType(TObjectValue(FieldDef));
@@ -1543,7 +1526,6 @@ Var
     vFieldDef.Required          := True;
    If dwInternalCalc in Attributes Then
     vFieldDef.InternalCalcField := True;
-//  vFieldDef.CreateField(Self);
  End;
  {$IFNDEF FPC}
  {$IF Defined(HAS_FMX)}
@@ -1696,12 +1678,7 @@ Var
     J := 0;
     vFieldName := vAllListFields.Names[I];
     Stream.ReadBuffer(T, Sizeof(DWFieldTypeSize));
-//    T := Integer(vField.DataType);
     Case TFieldType(T) Of
-      ftMemo,
-      {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,{$IFEND}{$ELSE}
-         ftWideMemo,{$ENDIF}
-      ftFmtMemo,
       ftFixedChar,
       ftWideString,
       ftString : Begin
@@ -1858,6 +1835,14 @@ Var
                      {$ENDIF}
                    End;
                  End;
+      ftMemo,
+      {$IFNDEF FPC}
+       {$IF CompilerVersion > 21}ftWideMemo,
+       {$IFEND}
+       {$ELSE}
+        ftWideMemo,
+       {$ENDIF}
+      ftFmtMemo,
       ftBlob,
       {$IFNDEF FPC}{$IF CompilerVersion > 21}ftStream,{$IFEND}{$ENDIF}
       ftBytes : Begin
@@ -2022,32 +2007,32 @@ Procedure TRESTDWClientSQLBase.LoadFromStream(Value    : TMemoryStream;
                                               DataType : TStreamType = stAll);
 Var
  I : Integer;
- //TODO XyberX
-//{$IFNDEF RESTDWMEMTABLE}
-// vMemBRequest :  TRESTDWMemtable;
-// Procedure CopyData;
-// Begin
-//  vMemBRequest.First;
-//  {$IFDEF UNIDACMEM}
-//   AssignDataSet(vMemBRequest);
-//  {$ELSE}
-//   {$IFDEF CLIENTDATASET}
-//    LoadFromStream(Value);
-//   {$ELSE}
-//    Try
-//     While Not vMemBRequest.Eof Do
-//      Begin
-//       Append;
-//       CopyRecord(vMemBRequest);
-//       Post;
-//       vMemBRequest.Next;
-//      End;
-//    Finally
-//    End;
-//   {$ENDIF}
-//  {$ENDIF}
-// End;
-//{$ENDIF}
+//TODO XyberX
+{$IFNDEF RESTDWMEMTABLE}
+ vMemBRequest :  TRESTDWMemtable;
+ Procedure CopyData;
+ Begin
+  vMemBRequest.First;
+  {$IFDEF UNIDACMEM}
+   AssignDataSet(vMemBRequest);
+  {$ELSE}
+   {$IFDEF CLIENTDATASET}
+    LoadFromStream(Value);
+   {$ELSE}
+    Try
+     While Not vMemBRequest.Eof Do
+      Begin
+       Append;
+       CopyRecord(vMemBRequest);
+       Post;
+       vMemBRequest.Next;
+      End;
+    Finally
+    End;
+   {$ENDIF}
+  {$ENDIF}
+ End;
+{$ENDIF}
 Begin
  vLoadFromStream := True;
  Try
@@ -2203,10 +2188,8 @@ Begin
     vBinaryLoadRequest := True;
     Try
      Value.Position := 0;
-     If Not vBinaryCompatibleMode Then
+     If vBinaryCompatibleMode Then
       Begin
-       TRESTDWMemtable(Self).Encoding        := TRESTDWClientSQL(Self).Encoding;
-       TRESTDWMemtable(Self).OnWriterProcess := vOnWriterProcess;
        If Value.Size > 0 Then
         Begin
          TRESTDWMemtable(Self).LoadFromStream(Value);
