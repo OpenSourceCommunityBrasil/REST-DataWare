@@ -3839,6 +3839,8 @@ Begin
                   Else
                    mb                                  := TStringStream.Create(JSONStr);
                   mb.Position                           := 0;
+                  If Not (Assigned(ResultStream)) Then
+                    ResultStream := TStringStream.Create('');
                   WriteStream(mb, ResultStream);
                   FreeAndNil(mb);
                  {$ELSE}
