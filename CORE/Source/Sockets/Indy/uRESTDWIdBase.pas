@@ -2654,7 +2654,7 @@ Begin
  MaxAuthRetries                 := 0;
  UserAgent                      := cUserAgent;
  AccessControlAllowOrigin       := '*';
- ActiveRequest                   := '';
+ ActiveRequest                  := '';
  RedirectMaximum                := 1;
  RequestTimeOut                 := 5000;
  ConnectTimeOut                 := 5000;

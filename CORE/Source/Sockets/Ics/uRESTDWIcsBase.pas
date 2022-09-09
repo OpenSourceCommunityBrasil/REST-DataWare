@@ -58,7 +58,8 @@ Uses
 Type
  TRESTDWIcsServicePooler = Class(TRESTServicePoolerBase)
  Private
-  HttpAppSrv : THttpAppSrv;
+  HttpAppSrv    : THttpAppSrv;
+  FSocketFamily : TSocketFamily;
   Procedure SetActive               (Value              : Boolean);Override;
   Procedure EchoPooler              (ServerMethodsClass : TComponent;
                                      AContext           : TComponent;
@@ -72,6 +73,7 @@ Type
   Constructor Create                (AOwner           : TComponent);Override;
   Destructor  Destroy; override;
  Published
+  Property SocketFamily : TSocketFamily Read FSocketFamily Write FSocketFamily;
 End;
 
 //Type
@@ -2955,6 +2957,7 @@ Begin
  HttpAppSrv := THttpAppSrv.Create(Nil);
  HttpAppSrv.SessionTimeout := -1;
  HttpAppSrv.MaxSessions := 0;
+ FSocketFamily := sfIPv4;
  {$IFDEF FPC}
   HttpAppSrv.OnGetDocument := @GetDocument;
   DatabaseCharSet          := csUndefined;
@@ -3170,6 +3173,22 @@ Begin
     If Not HttpAppSrv.ListenAllOK Then
      Begin
       HttpAppSrv.Port := IntToStr(ServicePort);
+      If AuthenticationOptions.AuthorizationOption <> rdwAONone Then
+       Begin
+        Case AuthenticationOptions.AuthorizationOption Of
+         rdwAOBasic  : HttpAppSrv.AuthTypes := [atBasic];
+         rdwAOBearer,
+         rdwAOToken,
+         rdwOAuth    : Begin
+//                        {$IFNDEF NO_DIGEST_AUTH}, atDigest {$ENDIF}
+//                                {$IFDEF USE_NTLM_AUTH}, atNtlm {$ENDIF}
+//                                {$IFNDEF NO_DIGEST_AUTH}, atDigestSha2 {$ENDIF}
+                        HttpAppSrv.AuthTypes := [atDigest];
+                       End;
+        End;
+       End
+      Else
+       HttpAppSrv.AuthTypes := [atNone];
       HttpAppSrv.Start;
      End;
    Except

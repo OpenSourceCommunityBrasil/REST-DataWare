@@ -92,7 +92,7 @@ Var
   mb                               := TStringStream.Create(ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
   mb.Position                      := 0;
   {$IFNDEF FPC}
-   {$IF CompilerVersion > 21}
+   {$IF CompilerVersion > 23}
     AResponse.FreeContentStream      := True;
    {$IFEND}
   {$ENDIF}
@@ -125,7 +125,7 @@ Begin
  vResponseString := '';
  vStream         := Nil;
  vRedirect       := Redirect;
- {$IF CompilerVersion > 21}
+ {$IF CompilerVersion > 23}
   ARequest.ReadTotalContent;
  {$IFEND}
  Try
@@ -138,10 +138,10 @@ Begin
         {$IFDEF FPC}
          AResponse.CustomHeaders.AddPair(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
         {$ELSE}
-         {$IF CompilerVersion > 21}
+         {$IF CompilerVersion > 23}
          AResponse.CustomHeaders.AddPair(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
          {$ELSE}
-         AResponse.CustomHeaders.Add(CORS_CustomHeaders.Names[I] + '=' + CORS_CustomHeaders.ValueFromIndex[I]);
+         AResponse.CustomHeaders.Add(CORS_CustomHeaders.Names[I] + cNameValueSeparator + CORS_CustomHeaders.ValueFromIndex[I]);
          {$IFEND}
         {$ENDIF}
        End;
@@ -151,10 +151,10 @@ Begin
       {$IFDEF FPC}
        AResponse.CustomHeaders.AddPair('Access-Control-Allow-Origin','*');
       {$ELSE}
-       {$IF CompilerVersion > 21}
+       {$IF CompilerVersion > 23}
        AResponse.CustomHeaders.AddPair('Access-Control-Allow-Origin','*');
        {$ELSE}
-       AResponse.CustomHeaders.Add('Access-Control-Allow-Origin=*');
+       AResponse.CustomHeaders.Add('Access-Control-Allow-Origin' + cNameValueSeparator '*');
        {$IFEND}
       {$ENDIF}
      End;
@@ -259,15 +259,15 @@ Begin
       AResponse.ContentStream          := ResultStream;
       AResponse.ContentStream.Position := 0;
       AResponse.ContentLength          := ResultStream.Size;
-      {$IF CompilerVersion > 21}
+      {$IF CompilerVersion > 23}
        AResponse.FreeContentStream      := True;
       {$IFEND}
      End;
     For I := 0 To vResponseHeader.Count -1 Do
      Begin
       {$IFNDEF FPC}
-       {$IF CompilerVersion < 21}
-        AResponse.CustomHeaders.Add(vResponseHeader.Names [I] + '=' + vResponseHeader.Values[vResponseHeader.Names[I]]);
+       {$IF CompilerVersion < 24}
+        AResponse.CustomHeaders.Add(vResponseHeader.Names[I] + cNameValueSeparator + vResponseHeader.Values[vResponseHeader.Names[I]]);
        {$ELSE}
         AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
                                         vResponseHeader.Values[vResponseHeader.Names[I]]);
