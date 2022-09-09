@@ -1,6 +1,9 @@
 package RESTDWDriverUNIDAC;
 
+{$R RESTDWDriverUniDAC.res RESTDWDriverUniDAC.rc}
+{$R RESTDWDriverUniDAC.dres RESTDWDriverUniDAC.rc}
 {$R *.res}
+{$R *.dres}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -25,24 +28,16 @@ package RESTDWDriverUNIDAC;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'REST Dataware CORE - Driver UNIDAC'}
+{$DESCRIPTION 'REST Dataware - Driver UNIDAC'}
 {$IMPLICITBUILD ON}
 
 requires
   rtl,
-  soaprtl,
-  IndyIPCommon,
-  IndySystem,
-  IndyProtocols,
-  IndyCore,
-  IndyIPClient,
-  bindengine,
-  bindcomp,
   RESTDWCore,
-  unidac240,
-  dac240;
+  unidac,
+  dac;
 
 contains
-  uRESTDWDriverUNIDAC in '..\..\uRESTDWDriverUNIDAC.pas';
+  uRESTDWDriverUNIDAC in '..\..\..\..\Source\Database_Drivers\uRESTDWDriverUNIDAC.pas';
 
 end.
