@@ -1,6 +1,7 @@
-unit uRESTDWIdReg;
+unit uRESTDWIcsReg;
 
 {$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
+
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -28,12 +29,12 @@ interface
 uses
 {$IFDEF FPC}
   StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
-  Variants, TypInfo, uRESTDWIdBase,
+  Variants, TypInfo, uRESTDWIcsBase,
   LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf,
   ProjectIntf, ComponentEditors, Classes, fpWeb;
 {$ELSE}
 {$IFDEF WINDOWS}Windows, {$ENDIF}SysUtils, Variants, StrEdit, TypInfo,
-  uRESTDWIdBase,
+  uRESTDWIcsBase,
   RTLConsts,
 {$IFDEF COMPILER16_UP}
   UITypes,
@@ -91,25 +92,25 @@ Var
   I: Integer;
 Begin
   // Provide a list of Poolers
-  With GetComponent(0) as TRESTDWIdDatabase Do
-  Begin
-    Try
-      vLista := TRESTDWIdDatabase(GetComponent(0)).PoolerList;
-      For I := 0 To vLista.Count - 1 Do
-        Proc(vLista[I]);
-    Except
-    End;
-  End;
+//  With GetComponent(0) as TRESTDWIcsDatabase Do
+//  Begin
+//    Try
+//      vLista := TRESTDWIcsDatabase(GetComponent(0)).PoolerList;
+//      For I := 0 To vLista.Count - 1 Do
+//        Proc(vLista[I]);
+//    Except
+//    End;
+//  End;
 End;
 
 Procedure Register;
 Begin
-  RegisterComponents('REST Dataware - Service', [TRESTDWIdServicePooler]);
-  RegisterComponents('REST Dataware - Client''s',
-    [TRESTDWIdClientREST, TRESTDWIdClientPooler]);
-  RegisterComponents('REST Dataware - DB', [TRESTDWIdDatabase]);
-  RegisterPropertyEditor(TypeInfo(String), TRESTDWIdDatabase, 'PoolerName',
-    TPoolersList);
+  RegisterComponents('REST Dataware - Service', [TRESTDWIcsServicePooler]);
+//  RegisterComponents('REST Dataware - Client''s',
+//    [TRESTDWIdClientREST, TRESTDWIdClientPooler]);
+//  RegisterComponents('REST Dataware - DB', [TRESTDWIdDatabase]);
+//  RegisterPropertyEditor(TypeInfo(String), TRESTDWIdDatabase, 'PoolerName',
+//    TPoolersList);
 End;
 
 initialization

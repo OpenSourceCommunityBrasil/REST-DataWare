@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{51492283-F4E3-4B42-AF62-715E4F0BADAF}</ProjectGuid>
-        <MainSource>RESTDWDriverFireDAC.dpk</MainSource>
+        <ProjectGuid>{A67F6316-69EF-47DE-B9B2-6F96F4AF1CEB}</ProjectGuid>
+        <MainSource>RESTDWSocketIcs.dpk</MainSource>
         <ProjectVersion>19.4</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
@@ -44,17 +44,19 @@
         <Cfg_1>true</Cfg_1>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
+        <Cfg_1_Win64>true</Cfg_1_Win64>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
         <Cfg_2>true</Cfg_2>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <GenPackage>true</GenPackage>
-        <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
-        <GenDll>true</GenDll>
-        <SanitizedProjectName>RESTDWDriverFireDAC</SanitizedProjectName>
-        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_E>false</DCC_E>
@@ -62,19 +64,21 @@
         <DCC_S>false</DCC_S>
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
+        <GenDll>true</GenDll>
+        <GenPackage>true</GenPackage>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
+        <RuntimeOnlyPackage>true</RuntimeOnlyPackage>
+        <SanitizedProjectName>RESTDWSocketIcs</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
-        <DCC_UsePackage>rtl;DbxCommonDriver;dbrtl;DataSnapClient;DataSnapCommon;DbxClientDriver;CustomIPTransport;soaprtl;IndyIPCommon;IndySystem;IndyProtocols;IndyCore;IndyIPClient;FireDAC;FireDACCommonDriver;FireDACCommon;bindengine;bindcomp;dsnap;dbexpress;dbxcds;DataSnapFireDAC;RESTComponents;RestEasyObjects;RestDatawareCORE;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
-        <EnabledSysJars>android-support-v4.dex.jar;cloud-messaging.dex.jar;fmx.dex.jar;google-analytics-v2.dex.jar;google-play-billing.dex.jar;google-play-licensing.dex.jar;google-play-services.dex.jar</EnabledSysJars>
-        <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
+        <EnabledSysJars>annotation-1.2.0.dex.jar;asynclayoutinflater-1.0.0.dex.jar;billing-4.0.0.dex.jar;browser-1.0.0.dex.jar;cloud-messaging.dex.jar;collection-1.0.0.dex.jar;coordinatorlayout-1.0.0.dex.jar;core-1.5.0-rc02.dex.jar;core-common-2.0.1.dex.jar;core-runtime-2.0.1.dex.jar;cursoradapter-1.0.0.dex.jar;customview-1.0.0.dex.jar;documentfile-1.0.0.dex.jar;drawerlayout-1.0.0.dex.jar;firebase-annotations-16.0.0.dex.jar;firebase-common-20.0.0.dex.jar;firebase-components-17.0.0.dex.jar;firebase-datatransport-18.0.0.dex.jar;firebase-encoders-17.0.0.dex.jar;firebase-encoders-json-18.0.0.dex.jar;firebase-iid-interop-17.1.0.dex.jar;firebase-installations-17.0.0.dex.jar;firebase-installations-interop-17.0.0.dex.jar;firebase-measurement-connector-19.0.0.dex.jar;firebase-messaging-22.0.0.dex.jar;fmx.dex.jar;fragment-1.0.0.dex.jar;google-play-licensing.dex.jar;interpolator-1.0.0.dex.jar;javax.inject-1.dex.jar;legacy-support-core-ui-1.0.0.dex.jar;legacy-support-core-utils-1.0.0.dex.jar;lifecycle-common-2.0.0.dex.jar;lifecycle-livedata-2.0.0.dex.jar;lifecycle-livedata-core-2.0.0.dex.jar;lifecycle-runtime-2.0.0.dex.jar;lifecycle-service-2.0.0.dex.jar;lifecycle-viewmodel-2.0.0.dex.jar;listenablefuture-1.0.dex.jar;loader-1.0.0.dex.jar;localbroadcastmanager-1.0.0.dex.jar;play-services-ads-20.1.0.dex.jar;play-services-ads-base-20.1.0.dex.jar;play-services-ads-identifier-17.0.0.dex.jar;play-services-ads-lite-20.1.0.dex.jar;play-services-base-17.5.0.dex.jar;play-services-basement-17.6.0.dex.jar;play-services-cloud-messaging-16.0.0.dex.jar;play-services-drive-17.0.0.dex.jar;play-services-games-21.0.0.dex.jar;play-services-location-18.0.0.dex.jar;play-services-maps-17.0.1.dex.jar;play-services-measurement-base-18.0.0.dex.jar;play-services-measurement-sdk-api-18.0.0.dex.jar;play-services-places-placereport-17.0.0.dex.jar;play-services-stats-17.0.0.dex.jar;play-services-tasks-17.2.0.dex.jar;print-1.0.0.dex.jar;room-common-2.1.0.dex.jar;room-runtime-2.1.0.dex.jar;slidingpanelayout-1.0.0.dex.jar;sqlite-2.0.1.dex.jar;sqlite-framework-2.0.1.dex.jar;swiperefreshlayout-1.0.0.dex.jar;transport-api-3.0.0.dex.jar;transport-backend-cct-3.0.0.dex.jar;transport-runtime-3.0.0.dex.jar;user-messaging-platform-1.0.0.dex.jar;versionedparcelable-1.1.1.dex.jar;viewpager-1.0.0.dex.jar;work-runtime-2.1.0.dex.jar</EnabledSysJars>
         <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
         <BT_BuildType>Debug</BT_BuildType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSDevice64)'!=''">
-        <DCC_UsePackage>rtl;DbxCommonDriver;dbrtl;DataSnapClient;DataSnapCommon;DbxClientDriver;CustomIPTransport;soaprtl;IndyIPCommon;IndySystem;IndyProtocols;IndyCore;IndyIPClient;FireDAC;FireDACCommonDriver;FireDACCommon;bindengine;bindcomp;dsnap;dbexpress;dbxcds;DataSnapFireDAC;RESTComponents;RestEasyObjects;RestDatawareCORE;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
-        <iOS_AppStore1024>$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png</iOS_AppStore1024>
         <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0;CFBundleShortVersionString=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSCameraUsageDescription=The reason for accessing the camera;NSFaceIDUsageDescription=The reason for accessing the face id;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&apos;s speech recognition servers</VerInfo_Keys>
         <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -82,20 +86,18 @@
         <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <DCC_UsePackage>rtl;DbxCommonDriver;dbrtl;DataSnapClient;DataSnapCommon;DbxClientDriver;CustomIPTransport;soaprtl;IndyIPCommon;IndySystem;IndyProtocols;IndyCore;IndyIPClient;FireDAC;FireDACCommonDriver;FireDACCommon;bindengine;bindcomp;dsnap;dbexpress;dbxcds;DataSnapServer;DataSnapFireDAC;RESTComponents;RestEasyObjects;RestEasyObjectsCORE;RestDatawareCORE;vcl;RESTDWCore;$(DCC_UsePackage)</DCC_UsePackage>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <DCC_UsePackage>rtl;DbxCommonDriver;dbrtl;DataSnapClient;DataSnapCommon;DbxClientDriver;CustomIPTransport;soaprtl;IndyIPCommon;IndySystem;IndyProtocols;IndyCore;IndyIPClient;FireDAC;FireDACCommonDriver;FireDACCommon;bindengine;bindcomp;dsnap;dbexpress;dbxcds;DataSnapServer;DataSnapFireDAC;RESTComponents;RestEasyObjects;RestDatawareCORE;vcl;$(DCC_UsePackage)</DCC_UsePackage>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -104,12 +106,18 @@
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
+        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+        <DCC_RangeChecking>true</DCC_RangeChecking>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
-        <DCC_Description>REST Dataware CORE - Driver FireDAC</DCC_Description>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_Description>REST Dataware Indy Sockets</DCC_Description>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -121,18 +129,27 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="RESTDWDriverFireDAC.res"/>
-        <DCCReference Include="RESTDWDriverFireDAC.dres"/>
-        <DCCReference Include="rtl.dcp"/>
+        <DCCReference Include="RESTDWSocketIcs.res"/>
+        <DCCReference Include="RESTDWSocketIcs.dres"/>
         <DCCReference Include="RESTDWCore.dcp"/>
-        <DCCReference Include="..\..\..\..\Source\Database_Drivers\uRESTDWDriverFD.pas"/>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWDriverFD.bmp">
+        <DCCReference Include="IcsCommonD101Run.dcp"/>
+        <DCCReference Include="IcsVclD101Run.dcp"/>
+        <DCCReference Include="..\..\..\..\Source\Sockets\Ics\uRESTDWIcsBase.pas"/>
+        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdClientPooler.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWDriverFD</ResourceId>
+            <ResourceId>TRESTDWIdClientPooler</ResourceId>
         </RcItem>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWDriverFD16.bmp">
+        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdClientREST.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWDriverFD16</ResourceId>
+            <ResourceId>TRESTDWIdClientREST</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdDataBase.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWIdDataBase</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdServicePooler.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWIdServicePooler</ResourceId>
         </RcItem>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
@@ -151,13 +168,13 @@
         <Borland.ProjectType>Package</Borland.ProjectType>
         <BorlandProject>
             <Delphi.Personality>
-                <Source>
-                    <Source Name="MainSource">RESTDWDriverFireDAC.dpk</Source>
-                </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\UDPSuperComponents.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\UDPSuperComponents.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\AVPackMobileDsgn.bpl">(untitled)</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k240.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp240.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
+                <Source>
+                    <Source Name="MainSource">RESTDWSocketIcs.dpk</Source>
+                </Source>
             </Delphi.Personality>
             <Deployment Version="3">
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
@@ -165,8 +182,15 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx64\libcgsqlite3.dylib" Class="DependencyModule">
-                    <Platform Name="OSX64">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\RESTDWSocketIcs.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>RESTDWSocketIcs.bpl</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\Win64\RESTDWSocketIcs.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win64">
+                        <RemoteName>RESTDWSocketIcs.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -190,19 +214,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\RESTDWDriverFireDAC.bpl" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>RESTDWDriverFireDAC.bpl</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployClass Name="iPad_Notification40">
-                    <Platform Name="iOSDevice64">
-                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                <DeployClass Name="AndroidServiceOutput_Android32">
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -244,14 +258,14 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="Android_NotificationIcon36">
-                    <Platform Name="Android">
-                        <RemoteDir>res\drawable-hdpi</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
+                <DeployClass Name="AndroidClasses">
                     <Platform Name="Android64">
-                        <RemoteDir>res\drawable-hdpi</RemoteDir>
-                        <Operation>1</Operation>
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>64</Operation>
+                    </Platform>
+                    <Platform Name="Android">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>64</Operation>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="iPhone_AppIcon180">
@@ -264,14 +278,10 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="DependencyModule">
-                    <Platform Name="Win32">
-                        <Operation>0</Operation>
-                        <Extensions>.dll;.bpl</Extensions>
-                    </Platform>
-                    <Platform Name="OSX32">
+                <DeployClass Name="Android_LauncherIcon36">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-ldpi</RemoteDir>
                         <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <DeployClass Required="true" Name="ProjectOutput">
@@ -328,11 +338,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="AndroidSplashStylesV21">
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\values-v21</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\values-v21</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -354,11 +364,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_NotificationIcon48">
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-xhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\drawable-xhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -426,11 +436,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_Colors">
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\values</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\values</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -458,11 +468,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_LauncherIcon192">
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -475,11 +485,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_NotificationIcon96">
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -600,11 +610,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="AndroidFileProvider">
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\xml</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\xml</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -711,11 +721,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_Strings">
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\values</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\values</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -733,11 +743,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_NotificationIcon24">
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-mdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\drawable-mdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -753,11 +763,11 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_NotificationIcon72">
-                    <Platform Name="Android">
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-xxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
-                    <Platform Name="Android64">
+                    <Platform Name="Android">
                         <RemoteDir>res\drawable-xxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -849,26 +859,34 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="AndroidServiceOutput_Android32">
-                    <Platform Name="Android64">
-                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                <DeployClass Name="iPad_Notification40">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="AndroidClasses">
-                    <Platform Name="Android">
-                        <RemoteDir>classes</RemoteDir>
-                        <Operation>64</Operation>
-                    </Platform>
+                <DeployClass Name="Android_NotificationIcon36">
                     <Platform Name="Android64">
-                        <RemoteDir>classes</RemoteDir>
-                        <Operation>64</Operation>
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="Android_LauncherIcon36">
-                    <Platform Name="Android">
-                        <RemoteDir>res\drawable-ldpi</RemoteDir>
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
                         <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>

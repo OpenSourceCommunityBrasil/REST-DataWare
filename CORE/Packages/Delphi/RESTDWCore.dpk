@@ -75,7 +75,7 @@ contains
   uRESTDWDataJSON in '..\..\Source\Libs\JSON\uRESTDWDataJSON.pas',
   uRESTDWJSON in '..\..\Source\Libs\JSON\uRESTDWJSON.pas',
   uRESTDWJSONInterface in '..\..\Source\Libs\JSON\uRESTDWJSONInterface.pas',
-  uRESTDWDataset in '..\..\Source\Plugins\Memdataset\uRESTDWDataset.pas',
+  uRESTDWMemtable in '..\..\Source\Plugins\Memdataset\uRESTDWMemtable.pas',
   uRESTDWMessageCoderMIME in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderMIME.pas',
   uRESTDWException in '..\..\Source\Basic\Mechanics\uRESTDWException.pas',
   uRESTDWMessage in '..\..\Source\Basic\Mechanics\uRESTDWMessage.pas',
