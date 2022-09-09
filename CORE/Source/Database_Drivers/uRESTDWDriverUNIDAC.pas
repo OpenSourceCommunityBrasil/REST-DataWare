@@ -132,11 +132,18 @@ Type
   Property Connection : TUniConnection Read GetConnection Write SetConnection;
 End;
 
+procedure Register;
+
 implementation
 
 {$IFNDEF FPC}{$if CompilerVersion < 21}
-{$R .\Package\D7\RESTDWDriverUNIDAC.dcr}
+{$R .\RESTDWDriverUNIDAC.dcr}
 {$IFEND}{$ENDIF}
+
+Procedure Register;
+Begin
+ RegisterComponents('REST Dataware - Drivers', [TRESTDWDriverUNIDAC]);
+End;
 
 Function TRESTDWDriverUNIDAC.ProcessMassiveSQLCache(MassiveSQLCache      : String;
                                                     Var Error            : Boolean;

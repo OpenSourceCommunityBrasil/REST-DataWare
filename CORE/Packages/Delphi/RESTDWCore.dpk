@@ -39,7 +39,8 @@ package RESTDWCore;
 {$IMPLICITBUILD OFF}
 
 requires
-  {$IFDEF VER150 or VER160 or VER170 or VER180 or VER185 or VER190 or VER200 or VER210 orVER220}
+  {$IFDEF VER150 or VER160 or VER170 or VER180 or VER185 or VER190 or VER200
+   or VER210 or VER220}
    bdertl,
   {$ELSE}
    FireDAC, FireDACCommonDriver, FireDACCommon,
