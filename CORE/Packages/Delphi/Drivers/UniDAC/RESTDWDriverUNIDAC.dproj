@@ -146,7 +146,7 @@
         <Cfg_2>true</Cfg_2>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <DCC_Description>REST Dataware CORE - Driver UNIDAC</DCC_Description>
+        <DCC_Description>REST Dataware - Driver UNIDAC</DCC_Description>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
@@ -165,6 +165,14 @@
         <RcCompile Include="RESTDWDriverUNIDACResource.rc">
             <Form>RESTDWDriverUNIDACResource.res</Form>
         </RcCompile>
+        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWDriverUNIDAC.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWDriverUNIDAC</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWDriverUNIDAC16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWDriverUNIDAC16</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -186,8 +194,9 @@
                     <Source Name="MainSource">RESTDWDriverUNIDAC.dpk</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\UDPSuperComponents.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\UDPSuperComponents.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\AVPackMobileDsgn.bpl">(untitled)</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="D:\IDE\fortesreport-ce\Binary\LibD28\dclfrce.bpl">Fortes Report Comunity Edition (design-time)</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>

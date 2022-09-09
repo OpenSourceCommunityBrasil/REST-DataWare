@@ -177,6 +177,7 @@ Type
                                                   AOk         : Boolean;
                                                   ADepth,
                                                   AError      : Integer) : Boolean;Overload;
+  Procedure SetInternalEvents;
  Public
   Constructor Create(AOwner : TComponent);Override;
   Destructor  Destroy;Override;
@@ -383,10 +384,47 @@ Begin
   End;
 End;
 
+Procedure TRESTDWIdClientREST.SetInternalEvents;
+Begin
+ If Assigned(OnWork) Then
+  Begin
+   {$IFDEF FPC}
+   HttpRequest.OnWork := @pOnWork;
+   {$ELSE}
+   HttpRequest.OnWork := pOnWork;
+   {$ENDIF}
+  End;
+ If Assigned(OnWorkBegin) Then
+  Begin
+   {$IFDEF FPC}
+   HttpRequest.OnWorkBegin := @pOnWorkBegin;
+   {$ELSE}
+   HttpRequest.OnWorkBegin := pOnWorkBegin;
+   {$ENDIF}
+  End;
+ If Assigned(OnWorkEnd) Then
+  Begin
+   {$IFDEF FPC}
+   HttpRequest.OnWorkEnd := @pOnWorkEnd;
+   {$ELSE}
+   HttpRequest.OnWorkEnd := pOnWorkEnd;
+   {$ENDIF}
+  End;
+ If Assigned(OnStatus) Then
+  Begin
+   {$IFDEF FPC}
+   HttpRequest.OnStatus := @pOnStatus;
+   {$ELSE}
+   HttpRequest.OnStatus := pOnStatus;
+   {$ENDIF}
+  End;
+End;
+
 Procedure TRESTDWIdClientREST.SetParams;
 begin
  If Not Assigned(HttpRequest) Then
   HttpRequest := TIdHTTP.Create;
+ SetInternalEvents;
  If HttpRequest.Request.BasicAuthentication Then
   Begin
    If HttpRequest.Request.Authentication = Nil Then
@@ -2965,42 +3003,22 @@ End;
 
 Procedure TRESTDWIdClientREST.SetOnStatus(Value : TOnStatus);
 Begin
- {$IFDEF FPC}
- HttpRequest.OnStatus := @pOnStatus;
- {$ELSE}
- Inherited;
- HttpRequest.OnStatus := pOnStatus;
- {$ENDIF}
+ Inherited SetOnStatus(Value);
 End;
 
 Procedure TRESTDWIdClientREST.SetOnWork  (Value : TOnWork);
 Begin
- {$IFDEF FPC}
- HttpRequest.OnWork := @pOnWork;
- {$ELSE}
- Inherited;
- HttpRequest.OnWork := pOnWork;
- {$ENDIF}
+ Inherited SetOnWork(Value);
 End;
 
 Procedure TRESTDWIdClientREST.SetOnWorkBegin(Value : TOnWork);
 Begin
- {$IFDEF FPC}
- HttpRequest.OnWorkBegin := @pOnWorkBegin;
- {$ELSE}
- Inherited;
- HttpRequest.OnWorkBegin := pOnWorkBegin;
- {$ENDIF}
+ Inherited SetOnWorkBegin(Value);
 End;
 
 Procedure TRESTDWIdClientREST.SetOnWorkEnd  (Value : TOnWorkEnd);
 Begin
- {$IFDEF FPC}
- HttpRequest.OnWorkEnd := @pOnWorkEnd;
- {$ELSE}
- Inherited;
- HttpRequest.OnWorkEnd := pOnWorkEnd;
- {$ENDIF}
+ Inherited SetOnWorkEnd(Value);
 End;
 
 Procedure TRESTDWIdServicePooler.aCommandGet(AContext      : TIdContext;
@@ -3479,7 +3497,7 @@ Procedure TRESTDWIdClientPooler.SetParams(TransparentProxy    : TProxyConnection
                                           AuthorizationParams : TRESTDWClientAuthOptionParams);
 Begin
  HttpRequest.DefaultCustomHeader.Clear;
- HttpRequest.DefaultCustomHeader.NameValueSeparator := cNameValueSeparator;
+// HttpRequest.DefaultCustomHeader.NameValueSeparator := cNameValueSeparator;
  HttpRequest.Accept                      := Accept;
  HttpRequest.AcceptEncoding              := AcceptEncoding;
  HttpRequest.AuthenticationOptions       := AuthorizationParams;
@@ -4481,7 +4499,7 @@ Begin
  SetCharsetRequest(HttpRequest, Encoding);
  SetParams(ProxyOptions, RequestTimeout, ConnectTimeout, AuthenticationOptions);
  HttpRequest.MaxAuthRetries := 0;
- HttpRequest.DefaultCustomHeader.NameValueSeparator := cNameValueSeparator;
+// HttpRequest.DefaultCustomHeader.NameValueSeparator := cNameValueSeparator;
  If BinaryRequest Then
   If HttpRequest.DefaultCustomHeader.IndexOfName('binaryrequest') = -1 Then
    Begin

@@ -8,7 +8,8 @@ uses SysUtils,  Classes,   DB, Uni, UniScript,    DADump,
      uRESTDWBasicDB,          uRESTDWJSONInterface,    uRESTDWDataJSON,
      uRESTDWMassiveBuffer,    Variants,                uRESTDWDatamodule,
      uRESTDWDataset,          uRESTDWJSONObject,       uRESTDWParams,
-     uRESTDWBasicTypes,       uRESTDWBasic,            uRESTDWTools;
+     uRESTDWBasicTypes,       uRESTDWBasic,            uRESTDWTools,
+     uRESTDWCharset;
 
 Type
 
@@ -131,12 +132,12 @@ Type
   Property Connection : TUniConnection Read GetConnection Write SetConnection;
 End;
 
-Procedure Register;
+procedure Register;
 
 implementation
 
 {$IFNDEF FPC}{$if CompilerVersion < 21}
-{$R .\Package\D7\RESTDWDriverUNIDAC.dcr}
+{$R .\RESTDWDriverUNIDAC.dcr}
 {$IFEND}{$ENDIF}
 
 Procedure Register;
