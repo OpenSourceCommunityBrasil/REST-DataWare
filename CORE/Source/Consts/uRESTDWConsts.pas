@@ -132,7 +132,7 @@ Const
  MinutesInHour              = 60;     {Number of minutes in an hour}
  MinutesInDay               = 1440;   {Number of minutes in a day}
  AssyncCommandMSG           = '{"status":"OK", "assyncmsg":"AssyncCommand Executed"}';
- cNameValueSeparator        = '=';
+ cNameValueSeparator        = ':';
  RESTDWDialogoTitulo        = 'REST DataWare Components';
  RESTDWSobreTitulo          = 'REST DataWare '+ RESTDWVersao;
  RESTDWSobreDescricao       = 'https://github.com/OpenSourceCommunityBrasil/REST-DataWare' + sLineBreak +

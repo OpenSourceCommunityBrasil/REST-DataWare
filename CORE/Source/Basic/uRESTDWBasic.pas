@@ -2523,12 +2523,11 @@ Begin
                                                                                                    {$ELSE}Url{$ENDIF},
                                                 QueryParams,
                                                 vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
-             {Alteração feita por Tiago IStuque - 28/12/2018}
              If Assigned(DWParams.ItemsString['dwReadBodyRaw']) And (DWParams.ItemsString['dwReadBodyRaw'].AsString='1') Then
-              TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+              TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
              Else If (Assigned(DWParams.ItemsString['dwReadBodyBin']) And
                      (DWParams.ItemsString['dwReadBodyBin'].AsString='1')) Then
-              TRESTDWDataUtils.ParseBodyBinToDWParam(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+              TRESTDWDataUtils.ParseBodyBinToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
              Else If (vBinaryEvent) Then
               Begin
                If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
