@@ -5,22 +5,23 @@ unit uRESTDWIdBase;
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
- de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
- Pascal e com compatibilidade entre sistemas operacionais.
+  Pascal e com compatibilidade entre sistemas operacionais.
   Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
- Membros do Grupo :
+  Membros do Grupo :
 
- XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
- Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
- Mobius One                 - Devel, Tester and Admin.
- Gustavo                    - Criptografia and Devel.
- Eloy                       - Devel.
- Roniery                    - Devel.
+  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
+  A. Brito                   - Admin - Administrador do desenvolvimento.
+  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+  Flávio Motta               - Member Tester and DEMO Developer.
+  Mobius One                 - Devel, Tester and Admin.
+  Gustavo                    - Criptografia and Devel.
+  Eloy                       - Devel.
+  Roniery                    - Devel.
 }
 
 interface
@@ -176,6 +177,7 @@ Type
                                                   AOk         : Boolean;
                                                   ADepth,
                                                   AError      : Integer) : Boolean;Overload;
+  Procedure SetInternalEvents;
  Public
   Constructor Create(AOwner : TComponent);Override;
   Destructor  Destroy;Override;
@@ -382,10 +384,47 @@ Begin
   End;
 End;
 
+Procedure TRESTDWIdClientREST.SetInternalEvents;
+Begin
+ If Assigned(OnWork) Then
+  Begin
+   {$IFDEF FPC}
+   HttpRequest.OnWork := @pOnWork;
+   {$ELSE}
+   HttpRequest.OnWork := pOnWork;
+   {$ENDIF}
+  End;
+ If Assigned(OnWorkBegin) Then
+  Begin
+   {$IFDEF FPC}
+   HttpRequest.OnWorkBegin := @pOnWorkBegin;
+   {$ELSE}
+   HttpRequest.OnWorkBegin := pOnWorkBegin;
+   {$ENDIF}
+  End;
+ If Assigned(OnWorkEnd) Then
+  Begin
+   {$IFDEF FPC}
+   HttpRequest.OnWorkEnd := @pOnWorkEnd;
+   {$ELSE}
+   HttpRequest.OnWorkEnd := pOnWorkEnd;
+   {$ENDIF}
+  End;
+ If Assigned(OnStatus) Then
+  Begin
+   {$IFDEF FPC}
+   HttpRequest.OnStatus := @pOnStatus;
+   {$ELSE}
+   HttpRequest.OnStatus := pOnStatus;
+   {$ENDIF}
+  End;
+End;
+
 Procedure TRESTDWIdClientREST.SetParams;
 begin
  If Not Assigned(HttpRequest) Then
   HttpRequest := TIdHTTP.Create;
+ SetInternalEvents;
  If HttpRequest.Request.BasicAuthentication Then
   Begin
    If HttpRequest.Request.Authentication = Nil Then
@@ -2615,7 +2654,7 @@ Begin
  MaxAuthRetries                 := 0;
  UserAgent                      := cUserAgent;
  AccessControlAllowOrigin       := '*';
- ActiveRequest                   := '';
+ ActiveRequest                  := '';
  RedirectMaximum                := 1;
  RequestTimeOut                 := 5000;
  ConnectTimeOut                 := 5000;
@@ -2964,42 +3003,22 @@ End;
 
 Procedure TRESTDWIdClientREST.SetOnStatus(Value : TOnStatus);
 Begin
- {$IFDEF FPC}
- HttpRequest.OnStatus := @pOnStatus;
- {$ELSE}
- Inherited;
- HttpRequest.OnStatus := pOnStatus;
- {$ENDIF}
+ Inherited SetOnStatus(Value);
 End;
 
 Procedure TRESTDWIdClientREST.SetOnWork  (Value : TOnWork);
 Begin
- {$IFDEF FPC}
- HttpRequest.OnWork := @pOnWork;
- {$ELSE}
- Inherited;
- HttpRequest.OnWork := pOnWork;
- {$ENDIF}
+ Inherited SetOnWork(Value);
 End;
 
 Procedure TRESTDWIdClientREST.SetOnWorkBegin(Value : TOnWork);
 Begin
- {$IFDEF FPC}
- HttpRequest.OnWorkBegin := @pOnWorkBegin;
- {$ELSE}
- Inherited;
- HttpRequest.OnWorkBegin := pOnWorkBegin;
- {$ENDIF}
+ Inherited SetOnWorkBegin(Value);
 End;
 
 Procedure TRESTDWIdClientREST.SetOnWorkEnd  (Value : TOnWorkEnd);
 Begin
- {$IFDEF FPC}
- HttpRequest.OnWorkEnd := @pOnWorkEnd;
- {$ELSE}
- Inherited;
- HttpRequest.OnWorkEnd := pOnWorkEnd;
- {$ENDIF}
+ Inherited SetOnWorkEnd(Value);
 End;
 
 Procedure TRESTDWIdServicePooler.aCommandGet(AContext      : TIdContext;
@@ -3277,6 +3296,8 @@ Begin
       End;
     End;
   End;
+ If MyIP = '' Then
+  Raise Exception.Create(cInvalidPoolerName);
 End;
 
 Procedure TRESTDWIdServicePooler.CreatePostStream(AContext        : TIdContext;
@@ -3476,7 +3497,7 @@ Procedure TRESTDWIdClientPooler.SetParams(TransparentProxy    : TProxyConnection
                                           AuthorizationParams : TRESTDWClientAuthOptionParams);
 Begin
  HttpRequest.DefaultCustomHeader.Clear;
- HttpRequest.DefaultCustomHeader.NameValueSeparator := cNameValueSeparator;
+// HttpRequest.DefaultCustomHeader.NameValueSeparator := cNameValueSeparator;
  HttpRequest.Accept                      := Accept;
  HttpRequest.AcceptEncoding              := AcceptEncoding;
  HttpRequest.AuthenticationOptions       := AuthorizationParams;
@@ -4478,7 +4499,7 @@ Begin
  SetCharsetRequest(HttpRequest, Encoding);
  SetParams(ProxyOptions, RequestTimeout, ConnectTimeout, AuthenticationOptions);
  HttpRequest.MaxAuthRetries := 0;
- HttpRequest.DefaultCustomHeader.NameValueSeparator := cNameValueSeparator;
+// HttpRequest.DefaultCustomHeader.NameValueSeparator := cNameValueSeparator;
  If BinaryRequest Then
   If HttpRequest.DefaultCustomHeader.IndexOfName('binaryrequest') = -1 Then
    Begin
