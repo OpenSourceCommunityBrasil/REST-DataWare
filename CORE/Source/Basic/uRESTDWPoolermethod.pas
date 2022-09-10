@@ -407,7 +407,7 @@ Begin
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
@@ -602,7 +602,7 @@ Begin
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
@@ -970,7 +970,7 @@ Begin
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
@@ -1124,7 +1124,7 @@ Begin
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
@@ -1309,7 +1309,7 @@ Begin
  vActualClientPoolerExec := RESTClientPoolerExec;
  RESTClientPoolerExec.PoolerNotFoundMessage := PoolerNotFoundMessage;
  RESTClientPoolerExec.WelcomeMessage  := vWelcomeMessage;
-// RESTClientPoolerExec.HandleRedirects := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum := vRedirectMaximum;
  RESTClientPoolerExec.Host            := Host;
  RESTClientPoolerExec.Port            := Port;
@@ -1441,7 +1441,7 @@ Begin
  RESTClientPoolerExec.UserAgent          := vUserAgent;
  RESTClientPoolerExec.RequestTimeOut     := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut     := ConnectTimeOut;
-// RESTClientPoolerExec.HandleRedirects    := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects    := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum    := vRedirectMaximum;
  RESTClientPoolerExec.OnWork             := vOnWork;
  RESTClientPoolerExec.OnWorkBegin        := vOnWorkBegin;
@@ -1546,7 +1546,7 @@ Begin
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
@@ -1745,7 +1745,7 @@ Begin
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
@@ -1950,7 +1950,7 @@ Begin
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
@@ -2167,7 +2167,7 @@ Begin
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
@@ -2764,7 +2764,7 @@ Begin
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
@@ -2928,7 +2928,7 @@ Begin
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
@@ -3116,8 +3116,8 @@ Begin
  RESTClientPoolerExec.Host            := Host;
  RESTClientPoolerExec.Port            := Port;
  RESTClientPoolerExec.RequestTimeOut  := TimeOut;
- RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
-// RESTClientPoolerExec.HandleRedirects := vHandleRedirects;
+ RESTClientPoolerExec.ConnectTimeOut  := ConnectTimeOut;
+ RESTClientPoolerExec.HandleRedirects := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum := vRedirectMaximum;
  RESTClientPoolerExec.DataCompression := Compression;
  RESTClientPoolerExec.TypeRequest     := vtyperequest;
@@ -3323,7 +3323,7 @@ Begin
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
@@ -3477,7 +3477,7 @@ Begin
  RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
  RESTClientPoolerExec.Host             := Host;
  RESTClientPoolerExec.Port             := Port;
-// RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+ RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
  RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
  RESTClientPoolerExec.RequestTimeOut   := TimeOut;
  RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
@@ -3631,7 +3631,7 @@ Begin
    RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
    RESTClientPoolerExec.Host             := Host;
    RESTClientPoolerExec.Port             := Port;
-//   RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+   RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
    RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
    RESTClientPoolerExec.RequestTimeOut   := TimeOut;
    RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
@@ -3785,7 +3785,7 @@ Begin
    RESTClientPoolerExec.WelcomeMessage   := vWelcomeMessage;
    RESTClientPoolerExec.Host             := Host;
    RESTClientPoolerExec.Port             := Port;
-//   RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
+   RESTClientPoolerExec.HandleRedirects  := vHandleRedirects;
    RESTClientPoolerExec.RedirectMaximum  := vRedirectMaximum;
    RESTClientPoolerExec.RequestTimeOut   := TimeOut;
    RESTClientPoolerExec.ConnectTimeOut   := ConnectTimeOut;
