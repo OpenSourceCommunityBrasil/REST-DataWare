@@ -783,11 +783,25 @@ Type
   Constructor Create(AOwner: TComponent);Override;
 End;
 
+ Procedure SaveLogData(Filename, Content : String);
+
 Implementation
 
 Uses uRESTDWDatamodule,   uRESTDWPoolermethod,  uRESTDWTools,
      uRESTDWServerEvents, uRESTDWServerContext, uRESTDWMessageCoder,
      uRESTDWBasicDB,      ZLib;
+
+Procedure SaveLogData(Filename, Content : String);
+Var
+ vFileData : TStringStream;
+Begin
+ vFileData := TStringStream.Create(Content);
+ Try
+  vFileData.SaveToFile(Filename);
+ Finally
+  FreeAndNil(vFileData);
+ End;
+End;
 
 Function GetParamsReturn(Params : TRESTDWParams) : String;
 Var
@@ -2238,31 +2252,28 @@ Begin
        End;
       If Assigned(ContentStringStream) Then
        Begin
-         ContentStringStream.Position := 0;
-         If Not vBinaryEvent Then
-          Begin
-           Try
-            mb := TStringStream.Create(''); //{$IFNDEF FPC}{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
-            try
-             mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
-                         ContentStringStream.Position := 0;
-             mb.Position := 0;
-             If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
-              Begin
-               msgEnd   := False;
-               boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
-               startboundary := '--' + boundary;
-               Repeat
-                tmp := ReadLnFromStream(ContentStringStream, -1, True);
-               Until tmp = startboundary;
-              End;
-            finally
-             if Assigned(mb) then
-              FreeAndNil(mb);
-            end;
-           Except
+        ContentStringStream.Position := 0;
+        Try
+         mb := TStringStream.Create(''); //{$IFNDEF FPC}{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+         Try
+          mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
+                      ContentStringStream.Position := 0;
+          mb.Position := 0;
+          If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+           Begin
+            msgEnd   := False;
+            boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
+            startboundary := '--' + boundary;
+            Repeat
+             tmp := ReadLnFromStream(ContentStringStream, -1, True);
+            Until tmp = startboundary;
            End;
-          End;
+         Finally
+          if Assigned(mb) then
+           FreeAndNil(mb);
+         End;
+        Except
+        End;
         If (ContentStringStream.Size > 0) And (boundary <> '') Then
          Begin
           Try
@@ -2530,7 +2541,7 @@ Begin
               TRESTDWDataUtils.ParseBodyBinToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
              Else If (vBinaryEvent) Then
               Begin
-               If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+               If (pos('--', TStringStream(ms).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
                 Begin
                  msgEnd   := False;
                  {$IFNDEF FPC}
@@ -4717,24 +4728,41 @@ Begin
    Else If (vUrlMethod = UpperCase('EchoPooler')) Then
     Begin
      vJsonMSG := TReplyNOK;
+     Result     := True;
      If DWParams.ItemsString['Pooler'] <> Nil Then
       Begin
+       vResult    := '';
        vResult    := DWParams.ItemsString['Pooler'].Value;
        EchoPooler(BaseObject, AContext, vResult, vResultIP, AccessTag, vInvalidTag);
        If DWParams.ItemsString['Result'] <> Nil Then
         DWParams.ItemsString['Result'].SetValue(vResultIP,
                                                 DWParams.ItemsString['Result'].Encoded);
+      End
+     Else
+      Begin
+       If DWParams.ItemsString['Error'] = Nil Then
+        Begin
+         JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+         JSONParam.ParamName       := 'Error';
+         JSONParam.ObjectDirection := odOut;
+         DWParams.Add(JSONParam);
+        End;
+       If DWParams.ItemsString['MessageError'] = Nil Then
+        Begin
+         JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+         JSONParam.ParamName       := 'MessageError';
+         JSONParam.ObjectDirection := odOut;
+         DWParams.Add(JSONParam);
+        End;
+       DWParams.ItemsString['MessageError'].AsString := 'Invalid Blank Poolername...';
+       DWParams.ItemsString['Error'].AsBoolean       := True;
       End;
-     Result     := vResultIP <> '';
-     If Result Then
+     If vResultIP <> '' Then
       JSONStr    := TReplyOK
      Else
       Begin
-       If vInvalidTag Then
-        JSONStr    := TReplyTagError
-       Else
-        JSONStr    := TReplyInvalidPooler;
-       ErrorCode   := 500;
+       JSONStr    := TReplyInvalidPooler;
+       ErrorCode   := 400;
       End;
     End
    Else If vUrlMethod = UpperCase('ExecuteCommandPureJSON') Then
