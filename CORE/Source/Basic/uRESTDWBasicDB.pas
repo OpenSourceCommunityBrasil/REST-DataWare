@@ -372,6 +372,7 @@ Type
   vTimeOut              : Integer;
   vConnectTimeOut       : Integer;
   vEncoding             : TEncodeSelect;             //Enconding se usar CORS usar UTF8 - Alexandre Abade
+  vUseSSL,
   vHandleRedirects,
   vFailOver,
   vProxy,                                            //Diz se tem servidor Proxy
@@ -550,6 +551,7 @@ Type
   Property FailOverConnections     : TListDefConnections        Read vFailOverConnections     Write vFailOverConnections;
   Property FailOverReplaceDefaults : Boolean                    Read vFailOverReplaceDefaults Write vFailOverReplaceDefaults;
   Property ClientConnectionDefs    : TClientConnectionDefs      Read vClientConnectionDefs    Write vClientConnectionDefs;
+  Property UseSSL                  : Boolean                    Read vUseSSL                  Write vUseSSL;
   Property UserAgent               : String                     Read vUserAgent               Write vUserAgent;
 End;
 
@@ -4038,6 +4040,7 @@ Constructor TRESTDWDatabasebaseBase.Create(AOwner : TComponent);
 Begin
  Inherited;
  vRESTClientPooler         := Nil;
+ vUseSSL                   := False;
  vHandleRedirects          := False;
  vRedirectMaximum          := 0;
  vConnected                := False;
@@ -5152,6 +5155,7 @@ Begin
    RESTClientPooler.Accept          := ConnectionDB.Accept;
    RESTClientPooler.AcceptEncoding  := ConnectionDB.AcceptEncoding;
    RESTClientPooler.ContentType     := ConnectionDB.ContentType;
+   RESTClientPooler.TypeRequest     := ConnectionDB.TypeRequest;
    RESTClientPooler.ContentEncoding := ConnectionDB.ContentEncoding;
    RESTClientPooler.AuthenticationOptions.Assign(ConnectionDB.AuthenticationOptions);
   End;
