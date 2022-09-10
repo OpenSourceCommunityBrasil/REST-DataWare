@@ -76,6 +76,7 @@ Uses {$IFDEF FPC}
    vRedirectMaximum        : Integer;
    vOnBeforeGetToken       : TOnBeforeGetToken;
    vActualClientPoolerExec : TRESTClientPoolerBase;
+   vSSLVersions            : TRESTDWSSLVersions;
    Procedure SetOnWork     (Value : TOnWork);
    Procedure SetOnWorkBegin(Value : TOnWork);
    Procedure SetOnWorkEnd  (Value : TOnWorkEnd);
@@ -357,6 +358,7 @@ Uses {$IFDEF FPC}
    Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams      Write SetAuthOptionParams;
    Property OnBeforeGetToken      : TOnBeforeGetToken          Read vOnBeforeGetToken      Write vOnBeforeGetToken;
    Property PoolerNotFoundMessage : String                     Read vPoolerNotFoundMessage Write vPoolerNotFoundMessage;
+   Property SSLVersions           : TRESTDWSSLVersions         Read vSSLVersions             Write vSSLVersions;
   End;
 
 implementation

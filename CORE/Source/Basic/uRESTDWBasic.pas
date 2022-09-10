@@ -338,6 +338,7 @@ Type
   vDatabaseCharSet     : TDatabaseCharSet;
   {$ENDIF}
   vFailOverConnections : TFailOverConnections;
+  vSSLVersions         : TRESTDWSSLVersions;
   Function    SendEvent   (EventData        : String)          : String;Overload;
   Procedure   SetDataRoute(Value : String);
  Public
@@ -410,6 +411,7 @@ Type
   Property CriptOptions            : TCripto                       Read vCripto                  Write vCripto;
   Property UserAgent               : String                        Read vUserAgent               Write vUserAgent;
   Property PoolerNotFoundMessage   : String                        Read vPoolerNotFoundMessage   Write vPoolerNotFoundMessage;
+  Property SSLVersions             : TRESTDWSSLVersions            Read vSSLVersions             Write vSSLVersions;
   {$IFDEF FPC}
   Property DatabaseCharSet         : TDatabaseCharSet              Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
@@ -534,6 +536,7 @@ Type
   aDefaultUrl          : String;
   vEncoding            : TEncodeSelect;
   vOnCreate            : TOnCreate;
+  vSSLVersions         : TRESTDWSSLVersions;
   Procedure SetCORSCustomHeader (Value : TStringList);
   Procedure SetDefaultPage (Value : TStringList);
   Procedure SetServerMethod(Value                     : TComponentClass);
@@ -748,6 +751,7 @@ Type
   Property DatabaseCharSet         : TDatabaseCharSet              Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
   Property OnCreate                : TOnCreate                     Read vOnCreate                Write vOnCreate;
+  Property SSLVersions             : TRESTDWSSLVersions            Read vSSLVersions             Write vSSLVersions;
 End;
 
 //Heranças para Servidores Standalone
