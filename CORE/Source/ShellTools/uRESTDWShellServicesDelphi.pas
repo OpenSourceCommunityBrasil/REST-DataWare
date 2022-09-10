@@ -1,6 +1,6 @@
 unit uRESTDWShellServicesDelphi;
 
-{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -89,26 +89,20 @@ Var
  Procedure WriteError;
  Begin
   AResponse.StatusCode              := StatusCode;
-  mb                               := TStringStream.Create(ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+  mb                               := TStringStream.Create(ErrorMessage{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
   mb.Position                      := 0;
-  {$IFNDEF FPC}
    {$IF CompilerVersion > 23}
     AResponse.FreeContentStream      := True;
    {$IFEND}
-  {$ENDIF}
   AResponse.ContentStream          := mb;
   AResponse.ContentStream.Position := 0;
   AResponse.ContentLength          := mb.Size;
   Handled := True;
-  {$IFDEF FPC}
-   AResponse.SendResponse;
-  {$ELSE}
    AResponse.SendResponse;
    {$IF CompilerVersion < 21}
     If Assigned(mb) Then
      FreeAndNil(mb);
    {$IFEND}
-  {$ENDIF}
  End;
  Procedure DestroyComponents;
  Begin
@@ -135,28 +129,20 @@ Begin
      Begin
       For I := 0 To CORS_CustomHeaders.Count -1 Do
        Begin
-        {$IFDEF FPC}
-         AResponse.CustomHeaders.AddPair(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
-        {$ELSE}
          {$IF CompilerVersion > 23}
          AResponse.CustomHeaders.AddPair(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
          {$ELSE}
          AResponse.CustomHeaders.Add(CORS_CustomHeaders.Names[I] + cNameValueSeparator + CORS_CustomHeaders.ValueFromIndex[I]);
          {$IFEND}
-        {$ENDIF}
        End;
      End
     Else
      Begin
-      {$IFDEF FPC}
-       AResponse.CustomHeaders.AddPair('Access-Control-Allow-Origin','*');
-      {$ELSE}
        {$IF CompilerVersion > 23}
        AResponse.CustomHeaders.AddPair('Access-Control-Allow-Origin','*');
        {$ELSE}
        AResponse.CustomHeaders.Add('Access-Control-Allow-Origin' + cNameValueSeparator '*');
        {$IFEND}
-      {$ENDIF}
      End;
    End;
   vAuthRealm := AResponse.Realm;
@@ -165,7 +151,6 @@ Begin
   vRawHeader := TStringList.Create;
   If vToken <> '' Then
    vRawHeader.Add('Authorization:' + vToken);
- {$IFNDEF FPC}
   If ARequest.ContentLength > 0 Then
    Begin
     {$IF CompilerVersion > 29}
@@ -181,31 +166,19 @@ Begin
      End;
     {$IFEND}
    End;
- {$ELSE}
-  If (Trim(ARequest.Content) <> '') Then
-   Begin
-    If vStream = Nil Then
-     vStream := TStringStream.Create(ARequest.Content);
-    vStream.Position := 0;
-   End;
- {$ENDIF}
   vStream.Position := 0;
   vContentType     := ARequest.ContentType;
   If CommandExec  (TComponent(AResponse),
                    RemoveBackslashCommands(ARequest.PathInfo),
-                   ARequest.Method + ' ' + ARequest.{$IFNDEF FPC}{$IF CompilerVersion < 21}PathInfo
+                   ARequest.Method + ' ' + ARequest.{$IF CompilerVersion < 21}PathInfo
                                                         {$ELSE}RawPathInfo
                                                         {$IFEND}
-                                           {$ELSE}
-                                            RawPathInfo
-                                           {$ENDIF},
+                                           ,
                    vContentType,
-                   ARequest.{$IFNDEF FPC}{$IF CompilerVersion < 21}RemoteAddr
+                   ARequest.{$IF CompilerVersion < 21}RemoteAddr
                                           {$ELSE}RemoteIP
                                           {$IFEND}
-                            {$ELSE}
-                             RemoteIP
-                            {$ENDIF},
+                            ,
                    ARequest.UserAgent,
                    '',
                    '',
@@ -265,28 +238,19 @@ Begin
      End;
     For I := 0 To vResponseHeader.Count -1 Do
      Begin
-      {$IFNDEF FPC}
        {$IF CompilerVersion < 24}
         AResponse.CustomHeaders.Add(vResponseHeader.Names[I] + cNameValueSeparator + vResponseHeader.Values[vResponseHeader.Names[I]]);
        {$ELSE}
         AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
                                         vResponseHeader.Values[vResponseHeader.Names[I]]);
        {$IFEND}
-      {$ELSE}
-       AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
-                                       vResponseHeader.Values[vResponseHeader.Names[I]]);
-      {$ENDIF}
      End;
     Handled := True;
-    {$IFNDEF FPC}
      AResponse.SendResponse;
      {$IF CompilerVersion < 21}
       If Assigned(ResultStream) Then
        FreeAndNil(ResultStream);
      {$IFEND}
-    {$ELSE}
-     AResponse.SendResponse;
-    {$ENDIF}
    End
   Else //Tratamento de Erros.
    Begin
@@ -341,9 +305,7 @@ Procedure TRESTDWShellService.EchoPooler(ServerMethodsClass,
 Var
  I : Integer;
 Begin
- {$IFNDEF FPC}
  Inherited;
- {$ENDIF}
  InvalidTag := False;
  MyIP       := '';
  If ServerMethodsClass <> Nil Then
