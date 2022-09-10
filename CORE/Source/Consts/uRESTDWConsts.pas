@@ -161,6 +161,7 @@ Const
  cInvalidDWParams           = 'Invalid RESTDWParams';
  cParamNotFound             = 'Param %s not found...';
  cInvalidPoolerName         = 'Invalid Pooler Name...';
+ cInvalidBlankPooler        = 'Invalid Pooler Name: Pooler is blank';
  cInvalidContextRule        = 'Invalid ContextRule Name';
  cServerEventNotFound       = 'ServerEvent not found...';
  cStreamReadError           = 'Stream Error %s %s';

@@ -4754,7 +4754,7 @@ Begin
          JSONParam.ObjectDirection := odOut;
          DWParams.Add(JSONParam);
         End;
-       DWParams.ItemsString['MessageError'].AsString := 'Invalid Blank Poolername...';
+       DWParams.ItemsString['MessageError'].AsString := cInvalidBlankPooler;
        DWParams.ItemsString['Error'].AsBoolean       := True;
       End;
      If vResultIP <> '' Then
