@@ -59,6 +59,9 @@ Type
  TRESTDWMaxLineAction      = (maException, maSplit);
  TRESTDWOSType             = (otUnknown, otUnix, otWindows, otDotNet);
  TRESTDWIPVersion          = (Id_IPv4, Id_IPv6);
+ TRESTDWSSLVersion         = (sslvSSLv2, sslvSSLv23,  sslvSSLv3,
+                              sslvTLSv1, sslvTLSv1_1, sslvTLSv1_2);
+ TRESTDWSSLVersions        = set of TRESTDWSSLVersion;
 
 Const
  tScriptsDetected           : Array[0..1] of string = ('.map', '.webdwpc');

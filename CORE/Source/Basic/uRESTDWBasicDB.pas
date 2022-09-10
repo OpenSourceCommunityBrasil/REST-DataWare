@@ -338,6 +338,7 @@ End;
 Type
  TRESTDWDatabasebaseBase = Class(TRESTDWComponent)
  Private
+  vSSLVersions         : TRESTDWSSLVersions;
   vOnWorkBegin,
   vOnWork              : TOnWork;
   vOnWorkEnd           : TOnWorkEnd;
@@ -552,6 +553,7 @@ Type
   Property FailOverReplaceDefaults : Boolean                    Read vFailOverReplaceDefaults Write vFailOverReplaceDefaults;
   Property ClientConnectionDefs    : TClientConnectionDefs      Read vClientConnectionDefs    Write vClientConnectionDefs;
   Property UseSSL                  : Boolean                    Read vUseSSL                  Write vUseSSL;
+  Property SSLVersions             : TRESTDWSSLVersions         Read vSSLVersions             Write vSSLVersions;
   Property UserAgent               : String                     Read vUserAgent               Write vUserAgent;
 End;
 
@@ -2258,6 +2260,7 @@ Begin
  ParseParams;
  vRESTConnectionDB  := BuildConnection(hBinaryRequest);
  PoolerMethodClient := vRESTConnectionDB;
+ vRESTConnectionDB.SSLVersions := SSLVersions;
  CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
   If Params.Count > 0 Then
@@ -2468,6 +2471,7 @@ Begin
  ParseParams;
  vRESTConnectionDB  := BuildConnection(hBinaryRequest);
  PoolerMethodClient := vRESTConnectionDB;
+ vRESTConnectionDB.SSLVersions := SSLVersions;
  CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
   If Params.Count > 0 Then
@@ -2674,6 +2678,7 @@ Begin
  ParseParams;
  vRESTConnectionDB  := BuildConnection(False);
  PoolerMethodClient := vRESTConnectionDB;
+ vRESTConnectionDB.SSLVersions := SSLVersions;
  CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
   For I := 0 To 1 Do
@@ -2871,6 +2876,7 @@ Begin
  If vConnected Then
   Begin
    vRESTConnectionDB  := BuildConnection(False);
+   vRESTConnectionDB.SSLVersions := SSLVersions;
    CopyParams(vRESTConnectionDB, vRESTClientPooler);
    Try
     Result := vRESTConnectionDB.GetTableNames(vRestPooler, vDataRoute, TableNames,
@@ -2968,6 +2974,7 @@ Begin
  If vConnected Then
   Begin
    vRESTConnectionDB  := BuildConnection(False);
+   vRESTConnectionDB.SSLVersions := SSLVersions;
    CopyParams(vRESTConnectionDB, vRESTClientPooler);
    Try
     Result := vRESTConnectionDB.GetFieldNames(vRestPooler, vDataRoute, TableName, FieldNames,
@@ -3065,6 +3072,7 @@ Begin
  If vConnected Then
   Begin
    vRESTConnectionDB  := BuildConnection(False);
+   vRESTConnectionDB.SSLVersions := SSLVersions;
    CopyParams(vRESTConnectionDB, vRESTClientPooler);
    Try
     FieldNames.Clear;
@@ -3222,6 +3230,7 @@ Begin
  If Not vConnected Then
   SetConnection(True);
  vRESTConnectionDB  := BuildConnection(BinaryRequest);
+ vRESTConnectionDB.SSLVersions := SSLVersions;
  CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
   For I := 0 To 1 Do
@@ -3483,6 +3492,7 @@ Begin
  ParseParams;
  vRESTConnectionDB  := BuildConnection(BinaryRequest);
  PoolerMethodClient := vRESTConnectionDB;
+ vRESTConnectionDB.SSLVersions := SSLVersions;
  CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
   If Params.Count > 0 Then
@@ -3718,6 +3728,7 @@ Begin
  ParseParams;
  vRESTConnectionDB  := BuildConnection(BinaryRequest);
  PoolerMethodClient := vRESTConnectionDB;
+ vRESTConnectionDB.SSLVersions := SSLVersions;
  CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
    Try
@@ -3985,6 +3996,7 @@ Var
  I           : Integer;
 Begin
  vConnection  := BuildConnection(False);
+ vConnection.SSLVersions := SSLVersions;
  CopyParams(vConnection, vRESTClientPooler);
  Result := TStringList.Create;
  Try
@@ -4143,6 +4155,7 @@ Begin
    If vConnected Then
     Begin
      vRESTConnectionDB  := BuildConnection(False);
+     vRESTConnectionDB.SSLVersions := SSLVersions;
      CopyParams(vRESTConnectionDB, vRESTClientPooler);
      Try
       For I := 0 To 1 Do
@@ -4280,6 +4293,7 @@ Begin
    If vConnected Then
     Begin
      vRESTConnectionDB  := BuildConnection(False);
+     vRESTConnectionDB.SSLVersions := SSLVersions;
      CopyParams(vRESTConnectionDB, vRESTClientPooler);
      Try
       For I := 0 To 1 Do
@@ -4430,6 +4444,7 @@ Begin
  if vRestPooler = '' then
   Exit;
  vRESTConnectionDB  := BuildConnection(False);
+ vRESTConnectionDB.SSLVersions := SSLVersions;
  CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
   For I := 0 To 1 Do
@@ -4661,6 +4676,7 @@ Begin
    If vConnected Then
     Begin
      vRESTConnectionDB  := BuildConnection(False);
+     vRESTConnectionDB.SSLVersions := SSLVersions;
      CopyParams(vRESTConnectionDB, vRESTClientPooler);
      Try
       For I := 0 To 1 Do
@@ -5158,6 +5174,8 @@ Begin
    RESTClientPooler.TypeRequest     := ConnectionDB.TypeRequest;
    RESTClientPooler.ContentEncoding := ConnectionDB.ContentEncoding;
    RESTClientPooler.AuthenticationOptions.Assign(ConnectionDB.AuthenticationOptions);
+   RESTClientPooler.SSLVersions     := ConnectionDB.SSLVersions;
+   RESTClientPooler.UseSSL          := UseSSL;
   End;
 End;
 
@@ -5209,6 +5227,7 @@ Begin
     Begin
      Try
       vRESTConnectionDB := BuildConnection(False);
+      vRESTConnectionDB.SSLVersions := SSLVersions;
       CopyParams(vRESTConnectionDB, vRESTClientPooler);
       vConnected := TryConnect(vRESTConnectionDB);
      Finally

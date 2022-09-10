@@ -57,6 +57,9 @@ Uses
  IdGlobal,              IdStack,             uRESTDWTools;
 
 Type
+ PIdSSLVersions = ^TIdSSLVersions;
+
+Type
  TRESTDWIdServicePooler = Class(TRESTServicePoolerBase)
  Private
   vCipherList,
@@ -65,7 +68,6 @@ Type
   ASSLPrivateKeyPassword,
   ASSLCertFile                     : String;
   aSSLMethod                       : TIdSSLVersion;
-  aSSLVersions                     : TIdSSLVersions;
   HTTPServer                       : TIdHTTPServer;
   lHandler                         : TIdServerIOHandlerSSLOpenSSL;
   vSSLVerifyMode                   : TIdSSLVerifyModeSet;
@@ -118,7 +120,6 @@ Type
   Property SSLVerifyDepth          : Integer             Read vSSLVerifyDepth          Write vSSLVerifyDepth;
   Property SSLMode                 : TIdSSLMode          Read vSSLMode                 Write vSSLMode;
   Property SSLMethod               : TIdSSLVersion       Read aSSLMethod               Write aSSLMethod;
-  Property SSLVersions             : TIdSSLVersions      Read aSSLVersions             Write aSSLVersions;
   Property CipherList              : String              Read vCipherList              Write vCipherList;
 End;
 
@@ -298,9 +299,7 @@ Type
  Private
   vCipherList                      : String;
   aSSLMethod                       : TIdSSLVersion;
-  aSSLVersions                     : TIdSSLVersions;
   HttpRequest                      : TRESTDWIdClientREST;
-  vSSLVersions                     : TIdSSLVersions;
   vSSLMode                         : TIdSSLMode;
   Procedure   SetParams            (TransparentProxy      : TProxyConnectionInfo;
                                     aRequestTimeout,
@@ -311,7 +310,6 @@ Type
   Destructor  Destroy;Override;
  Published
   Property SSLMode                 : TIdSSLMode          Read vSSLMode                 Write vSSLMode;
-  Property SSLVersions             : TIdSSLVersions      Read vSSLVersions             Write vSSLVersions;
   Property CipherList              : String              Read vCipherList              Write vCipherList;
 End;
 
@@ -320,9 +318,7 @@ Type
  Private
   vCipherList                      : String;
   aSSLMethod                       : TIdSSLVersion;
-  aSSLVersions                     : TIdSSLVersions;
   HttpRequest                      : TRESTDWIdClientREST;
-  vSSLVersions                     : TIdSSLVersions;
   vSSLMode                         : TIdSSLMode;
   Function    SendEvent            (EventData              : String;
                                     Var Params             : TRESTDWParams;
@@ -349,7 +345,6 @@ Type
                                     aAuthenticationOptions : TRESTDWClientAuthOptionParams);Override;
  Published
   Property SSLMode                 : TIdSSLMode          Read vSSLMode                 Write vSSLMode;
-  Property SSLVersions             : TIdSSLVersions      Read vSSLVersions             Write vSSLVersions;
   Property CipherList              : String              Read vCipherList              Write vCipherList;
 End;
 
@@ -2871,7 +2866,7 @@ Begin
     {$IF Not(DEFINED(OLDINDY))}
      ssl.SSLOptions.SSLVersions := vSSLVersions;
     {$ELSE}
-     ssl.SSLOptions.Method      := aSSLMethod;
+     ssl.SSLOptions.Method      := vSSLVersions;
     {$IFEND}
    {$ENDIF}
    SetCertOptions;
@@ -3428,12 +3423,12 @@ Begin
      Begin
       lHandler.SSLOptions.Method                := aSSLMethod;
       {$IFDEF FPC}
-      lHandler.SSLOptions.SSLVersions           := aSSLVersions;
+      lHandler.SSLOptions.SSLVersions           := PIdSSLVersions(@SSLVersions)^;
       lHandler.OnGetPassword                    := @GetSSLPassword;
       lHandler.OnVerifyPeer                     := @SSLVerifyPeer;
       {$ELSE}
        {$IF Not(DEFINED(OLDINDY))}
-        lHandler.SSLOptions.SSLVersions         := aSSLVersions;
+        lHandler.SSLOptions.SSLVersions         := PIdSSLVersions(@SSLVersions)^;
         lHandler.OnVerifyPeer                   := SSLVerifyPeer;
        {$IFEND}
       lHandler.OnGetPassword                    := GetSSLPassword;
@@ -3549,10 +3544,10 @@ Begin
   Begin
    HttpRequest.CertMode              := vSSLMode;
    {$IFDEF FPC}
-   HttpRequest.SSLVersions           := aSSLVersions;
+   HttpRequest.SSLVersions           := PIdSSLVersions(@SSLVersions)^;
    {$ELSE}
     {$IF Not(DEFINED(OLDINDY))}
-     HttpRequest.SSLVersions         := aSSLVersions;
+     HttpRequest.SSLVersions         := PIdSSLVersions(@SSLVersions)^;
     {$IFEND}
    {$ENDIF}
   End;
@@ -4494,7 +4489,7 @@ Begin
   FreeAndNil(HttpRequest);
  HttpRequest      := TRESTDWIdClientREST.Create(Nil);
  If (TypeRequest = trHttps) Then
-  HttpRequest.SSLVersions := SSLVersions;
+  HttpRequest.SSLVersions := PIdSSLVersions(@SSLVersions)^;
  HttpRequest.UserAgent := UserAgent;
  SetCharsetRequest(HttpRequest, Encoding);
  SetParams(ProxyOptions, RequestTimeout, ConnectTimeout, AuthenticationOptions);
