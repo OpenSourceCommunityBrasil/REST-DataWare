@@ -162,7 +162,6 @@ Begin
   vAuthRealm := AResponse.Realm;
   vToken     := ARequest.Authorization;
   //ARequest.Connection
-  vStream    := TMemoryStream.Create;
   vRawHeader := TStringList.Create;
   If vToken <> '' Then
    vRawHeader.Add('Authorization:' + vToken);
@@ -171,6 +170,7 @@ Begin
    Begin
     {$IF CompilerVersion > 29}
      ARequest.ReadTotalContent;
+     vStream    := TMemoryStream.Create;
      vStream.Write(TBytes(ARequest.RawContent), Length(ARequest.RawContent));
     {$ELSE}
     If (Trim(ARequest.Content) <> '') Then

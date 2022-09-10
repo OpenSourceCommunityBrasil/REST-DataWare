@@ -129,13 +129,14 @@ Begin
     If vRawHeader.IndexOf('Authorization:') = -1 Then
      vRawHeader.Add('Authorization:' + vToken);
    End;
-  vStream    := TMemoryStream.Create;
   If (Trim(ARequest.Content) <> '') Then
    Begin
     If vStream = Nil Then
      vStream := TStringStream.Create(ARequest.Content);
     vStream.Position := 0;
-   End;
+   End
+  Else
+   vStream    := TMemoryStream.Create;
   vStream.Position := 0;
   vContentType     := ARequest.ContentType;
   If CommandExec  (TComponent(AResponse),
