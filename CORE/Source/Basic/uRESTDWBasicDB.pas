@@ -26,66 +26,37 @@ unit uRESTDWBasicDB;
 interface
 
 Uses
+ {$IFDEF RESTDWUNIDACMEM}DADump, UniDump, VirtualTable, MemDS,{$ENDIF}
+ {$IFDEF RESTKBMMEMTABLE}kbmmemtable, {$ENDIF}
  {$IFDEF FPC}
-  SysUtils,  Classes, Db, SyncObjs, Variants, uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes,
-  uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
-  uRESTDWMassiveBuffer, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWConsts,
-  uRESTDWDataset,
- {$IFNDEF RESTDWLAMW}memds, BufDataset, {$ENDIF}uRESTDWMasterDetailData
+  {$IFNDEF RESTDWLAMW}memds, BufDataset, {$ENDIF}
+  {$IFDEF RESTDWLAZDRIVER}memds,{$ENDIF}
+  uRESTDWCharset,
  {$ELSE}
   {$IF Defined(RESTDWFMX)}
    {$IFNDEF RESTDWAndroidService}System.UITypes, {$ENDIF}
   {$IFEND}
-  {$if CompilerVersion > 24} // Delphi 2010 acima
-   System.SysUtils, System.Classes, Db, SyncObjs, uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes,
-   uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
-   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData, uRESTDWDataset
-  {$ELSE}
-   SysUtils, Classes, Db, SyncObjs, uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes,
-   uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
-   uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData, uRESTDWDataset
-  {$IFEND}
- {$ENDIF}
- {$IFDEF FPC}
-  {$IFDEF RESTDWLAZDRIVER}
-   , memds
-  {$ENDIF}
-  {$IFDEF RESTDWUNIDACMEM}
-  , DADump, UniDump, VirtualTable, MemDS
-  {$ENDIF};
- {$ELSE}
-   {$IFDEF RESTDWCLIENTDATASET}
-    ,  DBClient
-   {$ENDIF}
-   {$IFDEF RESTDWUNIDACMEM}
-   , DADump, UniDump, VirtualTable, MemDS
-   {$ENDIF}
-   {$IFDEF RESTKBMMEMTABLE}
-    , kbmmemtable
-   {$ENDIF}
+   {$IFDEF RESTDWCLIENTDATASET}DBClient, {$ENDIF}
    {$IF CompilerVersion > 22} // Delphi 2010 pra cima
     {$IFDEF RESTDWFDMEMTABLE}
-     , FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+     FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
      FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-     FireDAC.Comp.DataSet, FireDAC.Comp.Client
-     {$IFNDEF FPC}
-      {$IF CompilerVersion > 26} // Delphi XE6 pra cima
-       , FireDAC.Stan.StorageBin
-      {$IFEND}
-     {$ENDIF}
+     FireDAC.Comp.DataSet, FireDAC.Comp.Client,
+    {$IF CompilerVersion > 26}FireDAC.Stan.StorageBin,{$IFEND}
     {$ENDIF}
     {$IFDEF RESTDWADMEMTABLE}
-     , uADStanIntf, uADStanOption, uADStanParam,
-     uADStanError, uADPhysIntf, uADDAptIntf,
-     uADCompDataSet, uADCompClient
-     {$IFNDEF FPC}
-      {$IF CompilerVersion > 26} // Delphi XE6 pra cima
-       , uADStanStorageBin
-      {$IFEND}
-     {$ENDIF}
+     uADStanIntf, uADStanOption, uADStanParam, uADStanError, uADPhysIntf,
+     uADDAptIntf, uADCompDataSet, uADCompClient,
+      {$IF CompilerVersion > 26}uADStanStorageBin,{$IFEND}
     {$ENDIF}
-   {$IFEND}, Variants, uRESTDWBufferBase, uRESTDWConsts;
+   {$IFEND}
  {$ENDIF}
+ SysUtils,  Classes, Db, SyncObjs, Variants,
+ uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes, uRESTDWConsts,
+ uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator,
+ uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
+ uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData,
+ uRESTDWDataset, uRESTDWBufferBase;
 
 Type
  TOnExecuteData           = Procedure                                        Of Object;
