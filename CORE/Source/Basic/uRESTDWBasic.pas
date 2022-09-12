@@ -77,109 +77,115 @@ Type
   vOnQueryBeforeOpen   : TOnQueryBeforeOpen;
   vOnQueryException    : TOnQueryException;
  Public
-  Function  ConnectionSet                                   : Boolean;         Virtual;Abstract;
-  Function  GetGenID                  (Query                : TComponent;
-                                       GenName              : String): Integer;Virtual;Abstract;
-  Constructor Create                  (AOwner               : TComponent);Override; //Cria o Componente
+  Function  ConnectionSet                                    : Boolean;                   Virtual;Abstract;
+  Function  GetGenID                  (Query                 : TComponent;
+                                       GenName               : String): Integer;          Virtual;Abstract;
+  Constructor Create                  (AOwner                : TComponent);               Override; //Cria o Componente
   Function ApplyUpdates               (Massive,
-                                       SQL                  : String;
-                                       Params               : TRESTDWParams;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String;
-                                       Var RowsAffected     : Integer) : TJSONValue;     Virtual;Abstract;
-  Function ApplyUpdates_MassiveCache  (MassiveCache         : String;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String) : TJSONValue;     Virtual;Abstract;
-  Function ProcessMassiveSQLCache     (MassiveSQLCache      : String;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String) : TJSONValue;     Virtual;Abstract;
-  Function ApplyUpdatesTB             (Massive              : String;
-                                       Params               : TRESTDWParams;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String;
-                                       Var RowsAffected     : Integer) : TJSONValue;     Virtual;Abstract;
-  Function ApplyUpdates_MassiveCacheTB(MassiveCache         : String;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String) : TJSONValue;     Virtual;Abstract;
-  Function ExecuteCommandTB           (Tablename            : String;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String;
-                                       Var BinaryBlob       : TMemoryStream;
-                                       Var RowsAffected     : Integer;
-                                       BinaryEvent          : Boolean = False;
-                                       MetaData             : Boolean = False;
-                                       BinaryCompatibleMode : Boolean = False) : String;Overload;Virtual;Abstract;
-  Function ExecuteCommandTB           (Tablename            : String;
-                                       Params               : TRESTDWParams;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String;
-                                       Var BinaryBlob       : TMemoryStream;
-                                       Var RowsAffected     : Integer;
-                                       BinaryEvent          : Boolean = False;
-                                       MetaData             : Boolean = False;
-                                       BinaryCompatibleMode : Boolean = False) : String;Overload;Virtual;Abstract;
-  Function ExecuteCommand             (SQL                  : String;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String;
-                                       Var BinaryBlob       : TMemoryStream;
-                                       Var RowsAffected     : Integer;
-                                       Execute              : Boolean = False;
-                                       BinaryEvent          : Boolean = False;
-                                       MetaData             : Boolean = False;
-                                       BinaryCompatibleMode : Boolean = False) : String;Overload;Virtual;Abstract;
-  Function ExecuteCommand             (SQL                  : String;
-                                       Params               : TRESTDWParams;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String;
-                                       Var BinaryBlob       : TMemoryStream;
-                                       Var RowsAffected     : Integer;
-                                       Execute              : Boolean = False;
-                                       BinaryEvent          : Boolean = False;
-                                       MetaData             : Boolean = False;
-                                       BinaryCompatibleMode : Boolean = False) : String;Overload;Virtual;Abstract;
-  Function InsertMySQLReturnID        (SQL                  : String;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String)        : Integer;Overload;Virtual;Abstract;
-  Function InsertMySQLReturnID        (SQL                  : String;
-                                       Params               : TRESTDWParams;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String)        : Integer;Overload;Virtual;Abstract;
-  Procedure ExecuteProcedure          (ProcName             : String;
-                                       Params               : TRESTDWParams;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String);                  Virtual;Abstract;
-  Procedure ExecuteProcedurePure      (ProcName             : String;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String);                  Virtual;Abstract;
-  Function  OpenDatasets              (DatasetsLine         : String;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String;
-                                       Var BinaryBlob       : TMemoryStream) : TJSONValue; Virtual;Abstract;
-  Procedure GetTableNames             (Var TableNames       : TStringList;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String);                  Virtual;Abstract;
-  Procedure GetFieldNames             (TableName            : String;
-                                       Var FieldNames       : TStringList;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String);                  Virtual;Abstract;
-  Procedure GetKeyFieldNames          (TableName            : String;
-                                       Var FieldNames       : TStringList;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String);                  Virtual;Abstract;
-  Procedure GetProcNames              (Var ProcNames        : TStringList;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String);                  Virtual;Abstract;
-  Procedure GetProcParams             (ProcName             : String;
-                                       Var ParamNames       : TStringList;
-                                       Var Error            : Boolean;
-                                       Var MessageError     : String);                  Virtual;Abstract;
-  Class Procedure CreateConnection    (Const ConnectionDefs : TConnectionDefs;
-                                       Var Connection       : TObject);                 Virtual;Abstract;
-  Procedure PrepareConnection         (Var ConnectionDefs   : TConnectionDefs);         Virtual;Abstract;
+                                       SQL                   : String;
+                                       Params                : TRESTDWParams;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String;
+                                       Var RowsAffected      : Integer) : TJSONValue;     Virtual;Abstract;
+  Function ApplyUpdates_MassiveCache  (MassiveCache          : String;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String) : TJSONValue;      Virtual;Abstract;
+  Function ProcessMassiveSQLCache     (MassiveSQLCache       : String;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String) : TJSONValue;      Virtual;Abstract;
+  Function ApplyUpdatesTB             (Massive               : String;
+                                       Params                : TRESTDWParams;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String;
+                                       Var RowsAffected      : Integer) : TJSONValue;     Virtual;Abstract;
+  Function ApplyUpdates_MassiveCacheTB(MassiveCache          : String;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String) : TJSONValue;      Virtual;Abstract;
+  Function ExecuteCommandTB           (Tablename             : String;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String;
+                                       Var BinaryBlob        : TMemoryStream;
+                                       Var RowsAffected      : Integer;
+                                       BinaryEvent           : Boolean = False;
+                                       MetaData              : Boolean = False;
+                                       BinaryCompatibleMode  : Boolean = False) : String; Overload;Virtual;Abstract;
+  Function ExecuteCommandTB           (Tablename             : String;
+                                       Params                : TRESTDWParams;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String;
+                                       Var BinaryBlob        : TMemoryStream;
+                                       Var RowsAffected      : Integer;
+                                       BinaryEvent           : Boolean = False;
+                                       MetaData              : Boolean = False;
+                                       BinaryCompatibleMode  : Boolean = False) : String; Overload;Virtual;Abstract;
+  Function ExecuteCommand             (SQL                   : String;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String;
+                                       Var BinaryBlob        : TMemoryStream;
+                                       Var RowsAffected      : Integer;
+                                       Execute               : Boolean = False;
+                                       BinaryEvent           : Boolean = False;
+                                       MetaData              : Boolean = False;
+                                       BinaryCompatibleMode  : Boolean = False) : String; Overload;Virtual;Abstract;
+  Function ExecuteCommand             (SQL                   : String;
+                                       Params                : TRESTDWParams;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String;
+                                       Var BinaryBlob        : TMemoryStream;
+                                       Var RowsAffected      : Integer;
+                                       Execute               : Boolean = False;
+                                       BinaryEvent           : Boolean = False;
+                                       MetaData              : Boolean = False;
+                                       BinaryCompatibleMode  : Boolean = False) : String; Overload;Virtual;Abstract;
+  Function InsertMySQLReturnID        (SQL                   : String;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String)          : Integer;Overload;Virtual;Abstract;
+  Function InsertMySQLReturnID        (SQL                   : String;
+                                       Params                : TRESTDWParams;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String)          : Integer;Overload;Virtual;Abstract;
+  Procedure ExecuteProcedure          (ProcName              : String;
+                                       Params                : TRESTDWParams;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String);                   Virtual;Abstract;
+  Procedure ExecuteProcedurePure      (ProcName              : String;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String);                   Virtual;Abstract;
+  Function  OpenDatasets              (DatasetsLine          : String;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String;
+                                       Var BinaryBlob        : TMemoryStream) : TJSONValue;Overload;Virtual;Abstract;
+  Function  OpenDatasets              (DatapackStream        : TStream;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String;
+                                       Var BinaryBlob        : TMemoryStream;
+                                       aBinaryEvent          : Boolean = False;
+                                       aBinaryCompatibleMode : Boolean = False) : TStream; Overload;Virtual;Abstract;
+  Procedure GetTableNames             (Var TableNames        : TStringList;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String);         Virtual;Abstract;
+  Procedure GetFieldNames             (TableName             : String;
+                                       Var FieldNames        : TStringList;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String);         Virtual;Abstract;
+  Procedure GetKeyFieldNames          (TableName             : String;
+                                       Var FieldNames        : TStringList;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String);         Virtual;Abstract;
+  Procedure GetProcNames              (Var ProcNames         : TStringList;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String);         Virtual;Abstract;
+  Procedure GetProcParams             (ProcName              : String;
+                                       Var ParamNames        : TStringList;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String);         Virtual;Abstract;
+  Class Procedure CreateConnection    (Const ConnectionDefs  : TConnectionDefs;
+                                       Var Connection        : TObject);        Virtual;Abstract;
+  Procedure PrepareConnection         (Var ConnectionDefs    : TConnectionDefs);Virtual;Abstract;
   Procedure Close;Virtual;abstract;
-  Procedure BuildDatasetLine          (Var Query            : TDataset;
-                                       Massivedataset       : TMassivedatasetBuffer;
-                                       MassiveCache         : Boolean = False);
+  Procedure BuildDatasetLine          (Var Query             : TDataset;
+                                       Massivedataset        : TMassivedatasetBuffer;
+                                       MassiveCache          : Boolean = False);
   Property StrsTrim                  : Boolean              Read vStrsTrim              Write vStrsTrim;
   Property StrsEmpty2Null            : Boolean              Read vStrsEmpty2Null        Write vStrsEmpty2Null;
   Property StrsTrim2Len              : Boolean              Read vStrsTrim2Len          Write vStrsTrim2Len;
@@ -644,7 +650,8 @@ Type
                                       ConnectionDefs          : TConnectionDefs;
                                       hEncodeStrings          : Boolean;
                                       AccessTag               : String;
-                                      BinaryRequest           : Boolean);
+                                      BinaryRequest           : Boolean;
+                                      BinaryCompatible        : Boolean);
   Procedure ApplyUpdates_MassiveCache(ServerMethodsClass      : TComponent;
                                       Var Pooler              : String;
                                       Var DWParams            : TRESTDWParams;
@@ -2823,23 +2830,23 @@ Begin
                       {$ENDIF}Then
               Begin
                If vEncoding = esUtf8 Then
-                TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(ms).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                Else
-                TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
               End
              Else
               Begin
                If vEncoding = esUtf8 Then
                 Begin
-                 TRESTDWDataUtils.ParseDWParamsURL(utf8decode(TStringStream(ms).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                 TRESTDWDataUtils.ParseDWParamsURL(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                  if DWParams.ItemsString['undefined'] = nil then
-                  TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(ms).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                  TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End
                Else
                 Begin
-                 TRESTDWDataUtils.ParseDWParamsURL(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                 TRESTDWDataUtils.ParseDWParamsURL(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                  if DWParams.ItemsString['undefined'] = nil then
-                  TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                  TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End;
               End;
              {Fim alteração feita por Tiago Istuque - 28/12/2018}
@@ -4912,7 +4919,7 @@ Begin
    Else If vUrlMethod = UpperCase('OpenDatasets') Then
     Begin
      vResult     := DWParams.ItemsString['Pooler'].Value;
-     OpenDatasets(BaseObject, vResult, DWParams, ConnectionDefs, hEncodeStrings, AccessTag, BinaryEvent);
+     OpenDatasets(BaseObject, vResult, DWParams, ConnectionDefs, hEncodeStrings, AccessTag, BinaryEvent, BinaryCompatibleMode);
      Result      := True;
      If Not(DWParams.ItemsString['Error'].AsBoolean) Then
       JSONStr    := TReplyOK
@@ -5794,17 +5801,19 @@ Begin
 End;
 
 Procedure TRESTServiceBase.OpenDatasets(ServerMethodsClass   : TComponent;
-                                          Var Pooler           : String;
-                                          Var DWParams         : TRESTDWParams;
-                                          ConnectionDefs       : TConnectionDefs;
-                                          hEncodeStrings       : Boolean;
-                                          AccessTag            : String;
-                                          BinaryRequest        : Boolean);
+                                        Var Pooler           : String;
+                                        Var DWParams         : TRESTDWParams;
+                                        ConnectionDefs       : TConnectionDefs;
+                                        hEncodeStrings       : Boolean;
+                                        AccessTag            : String;
+                                        BinaryRequest        : Boolean;
+                                        BinaryCompatible     : Boolean);
 Var
  I             : Integer;
  vTempJSON     : TJSONValue;
  vError        : Boolean;
  vMessageError : String;
+ aDataPack     : TStream;
  BinaryBlob    : TMemoryStream;
 Begin
  BinaryBlob    := Nil;
@@ -5836,12 +5845,24 @@ Begin
             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.StrsEmpty2Null    := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).StrsEmpty2Null;
             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.StrsTrim2Len      := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).StrsTrim2Len;
             Try
-//             DWParams.ItemsString['LinesDataset'].CriptOptions.Use := False;
              If Not TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ConnectionSet Then
               Raise Exception.Create(cInvalidDriverConnection);
              TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.PrepareConnection(ConnectionDefs);
-             vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.OpenDatasets(DWParams.ItemsString['LinesDataset'].Value,
-                                                                                                    vError, vMessageError, BinaryBlob);
+             If Not BinaryRequest Then
+              vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.OpenDatasets(DWParams.ItemsString['LinesDataset'].Value,
+                                                                                                     vError, vMessageError, BinaryBlob)
+             Else
+              Begin
+               DWParams.ItemsString['DatasetStream'].SaveToStream(aDataPack);
+               BinaryBlob := TMemoryStream(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.OpenDatasets(aDataPack,  vError,        vMessageError,
+                                                                                                                     BinaryBlob, BinaryRequest, BinaryCompatible));
+               If Assigned(BinaryBlob) Then
+                DWParams.ItemsString['Result'].LoadFromStream(BinaryBlob)
+               Else
+                DWParams.ItemsString['Result'].SetValue('');
+               If Assigned(BinaryBlob) Then
+                FreeAndNil(BinaryBlob);
+              End;
             Except
              On E : Exception Do
               Begin
@@ -5857,26 +5878,13 @@ Begin
             DWParams.ItemsString['Error'].AsBoolean        := vError;
             If DWParams.ItemsString['Result'] <> Nil Then
              Begin
-              If BinaryRequest Then
-               Begin
-                If Not Assigned(BinaryBlob) Then
-                 BinaryBlob  := TMemoryStream.Create;
-                If Not vTempJSON.IsNull Then //vTempJSON <> Nil Then
-                 Begin
-                  vTempJSON.SaveToStream(BinaryBlob);
-                  DWParams.ItemsString['Result'].LoadFromStream(BinaryBlob);
-                  FreeAndNil(vTempJSON);
-                 End
-                Else
-                 DWParams.ItemsString['Result'].SetValue('');
-                FreeAndNil(BinaryBlob);
-               End
-              Else
+              If Not BinaryRequest Then
                Begin
                 If Not vTempJSON.IsNull Then //vTempJSON <> Nil Then
                  DWParams.ItemsString['Result'].SetValue(vTempJSON.ToJSON)
                 Else
                  DWParams.ItemsString['Result'].SetValue('');
+                FreeAndNil(vTempJSON);
                End;
              End;
            End;
