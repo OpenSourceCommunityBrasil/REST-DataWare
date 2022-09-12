@@ -60,7 +60,8 @@ Type
  TRESTDWOSType             = (otUnknown, otUnix, otWindows, otDotNet);
  TRESTDWIPVersion          = (Id_IPv4, Id_IPv6);
  TRESTDWSSLVersion         = (sslvSSLv2, sslvSSLv23,  sslvSSLv3,
-                              sslvTLSv1, sslvTLSv1_1, sslvTLSv1_2);
+                              sslvTLSv1, sslvTLSv1_1, sslvTLSv1_2,
+                              sslvTLSv1_3);
  TRESTDWSSLVersions        = set of TRESTDWSSLVersion;
 
 Const
@@ -74,7 +75,7 @@ Const
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
  RESTDWVersionINFO          = 'v2.1.0-';
- RESTDWRelease              = '3143';
+ RESTDWRelease              = '3164';
  RESTDWCodeProject          = 'Galaga - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
