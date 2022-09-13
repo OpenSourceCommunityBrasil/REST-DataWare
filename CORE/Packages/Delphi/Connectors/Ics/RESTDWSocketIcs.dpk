@@ -38,9 +38,7 @@ package RESTDWSocketIcs;
 {$IMPLICITBUILD OFF}
 
 requires
-  RESTDWCore,
-  IcsCommonD101Run,
-  IcsVclD101Run;
+  RESTDWCore;
 
 contains
   uRESTDWIcsBase in '..\..\..\..\Source\Sockets\Ics\uRESTDWIcsBase.pas';
