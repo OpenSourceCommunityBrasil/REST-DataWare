@@ -90,7 +90,7 @@ Var
  Procedure WriteError;
  Begin
   AResponse.StatusCode              := StatusCode;
-  mb                               := TStringStream.Create(ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+  mb                               := TStringStream.Create(ErrorMessage{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
   mb.Position                      := 0;
    {$IF CompilerVersion > 23}
     AResponse.FreeContentStream      := True;
@@ -171,15 +171,9 @@ Begin
   vContentType     := ARequest.ContentType;
   If CommandExec  (TComponent(AResponse),
                    RemoveBackslashCommands(ARequest.PathInfo),
-                   ARequest.Method + ' ' + ARequest.{$IF CompilerVersion < 21}PathInfo
-                                                        {$ELSE}RawPathInfo
-                                                        {$IFEND}
-                   ,
+                   ARequest.Method + ' ' + ARequest.{$IF CompilerVersion < 21}PathInfo{$ELSE}RawPathInfo{$IFEND},
                    vContentType,
-                   ARequest.{$IF CompilerVersion < 21}RemoteAddr
-                                          {$ELSE}RemoteIP
-                                          {$IFEND}
-                            ,
+                   ARequest.{$IF CompilerVersion < 21}RemoteAddr{$ELSE}RemoteIP{$IFEND},
                    ARequest.UserAgent,
                    '',
                    '',

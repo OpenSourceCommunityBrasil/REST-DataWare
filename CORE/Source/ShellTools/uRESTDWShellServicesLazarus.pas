@@ -5,22 +5,23 @@ unit uRESTDWShellServicesLazarus;
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
- de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
- Pascal e com compatibilidade entre sistemas operacionais.
+  Pascal e com compatibilidade entre sistemas operacionais.
   Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
- Membros do Grupo :
+  Membros do Grupo :
 
- XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
- Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
- Mobius One                 - Devel, Tester and Admin.
- Gustavo                    - Criptografia and Devel.
- Eloy                       - Devel.
- Roniery                    - Devel.
+  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
+  A. Brito                   - Admin - Administrador do desenvolvimento.
+  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+  Flávio Motta               - Member Tester and DEMO Developer.
+  Mobius One                 - Devel, Tester and Admin.
+  Gustavo                    - Criptografia and Devel.
+  Eloy                       - Devel.
+  Roniery                    - Devel.
 }
 
 interface
@@ -73,7 +74,7 @@ Var
  Procedure WriteError;
  Begin
   AResponse.Code                   := StatusCode;
-  mb                               := TStringStream.Create(ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+  mb                               := TStringStream.Create(ErrorMessage);
   mb.Position                      := 0;
   AResponse.FreeContentStream      := True;
   AResponse.ContentStream          := mb;
@@ -140,19 +141,9 @@ Begin
   vContentType     := ARequest.ContentType;
   If CommandExec  (TComponent(AResponse),
                    RemoveBackslashCommands(ARequest.PathInfo),
-                   ARequest.Method + ' ' + ARequest.{$IFNDEF FPC}{$IF CompilerVersion < 21}PathInfo
-                                                        {$ELSE}RawPathInfo
-                                                        {$IFEND}
-                                           {$ELSE}
-                                            PathInfo
-                                           {$ENDIF},
+                   ARequest.Method + ' ' + ARequest.PathInfo,
                    vContentType,
-                   ARequest.{$IFNDEF FPC}{$IF CompilerVersion < 21}RemoteAddr
-                                          {$ELSE}RemoteIP
-                                          {$IFEND}
-                            {$ELSE}
-                             RemoteAddr
-                            {$ENDIF},
+                   ARequest.RemoteAddr,
                    ARequest.UserAgent,
                    '',
                    '',
@@ -261,9 +252,6 @@ Procedure TRESTDWShellService.EchoPooler(ServerMethodsClass,
 Var
  I : Integer;
 Begin
- {$IFNDEF FPC}
- Inherited;
- {$ENDIF}
  InvalidTag := False;
  MyIP       := '';
  If ServerMethodsClass <> Nil Then
