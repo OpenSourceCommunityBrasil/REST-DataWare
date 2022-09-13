@@ -3,19 +3,43 @@
     {
       "ForceNotify" : false,
       "InternalVersion" : 1,
-      "Name" : "resteasyobjectscore.lpk",
-      "Version" : "1.9.6.9"
+      "Name" : "restdatawarecomponents.lpk",
+      "Version" : "2.0.5.0"
+    },
+    {
+      "ForceNotify" : false,
+      "InternalVersion" : 1,
+      "Name" : "RestDatawareIndySockets.lpk",
+      "Version" : "2.0.5.0"
     },
     {
       "ForceNotify" : false,
       "InternalVersion" : 1,
       "Name" : "restdwlazdriver.lpk",
-      "Version" : "1.4.4.8"
+      "Version" : "2.0.5.0"
+    },
+    {
+      "ForceNotify" : false,
+      "InternalVersion" : 1,
+      "Name" : "restdwdriverunidac.lpk",
+      "Version" : "2.0.5.0"
+    },
+    {
+      "ForceNotify" : false,
+      "InternalVersion" : 1,
+      "Name" : "restdwdriverzeos.lpk",
+      "Version" : "2.0.5.0"
+    },
+    {
+      "ForceNotify" : false,
+      "InternalVersion" : 1,
+      "Name" : "restdatawareshellservices.lpk",
+      "Version" : "2.0.5.0"
     }
   ],
   "UpdatePackageData" : {
     "DisableInOPM" : false,
-    "DownloadZipURL" : "",
-    "Name" : "REST Dataware"
+    "DownloadZipURL" : "https://github.com/OpenSourceCommunityBrasil/REST-DataWare/archive/refs/tags/v2.0.5.zip",
+    "Name" : "REST DataWare"
   }
 }

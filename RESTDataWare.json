@@ -3,15 +3,15 @@
     "Name" : "REST DataWare",
     "DisplayName" : "REST DataWare",
     "Category" : "DataControls, Networking",
-    "CommunityDescription" : "REST DataWare é uma suite de componentes criado para facilitar o desenvolvimento de aplicações 3 camadas com tudo que o RAD tem pra oferecer. Funcionando desde o Delphi 7 e também no Lazarus, o RDW como normalmente chamamos, é uma ferramenta completa para aplicações desktop, web e multiplataforma!\r\n\r\nPrincipais funcionalidades:\r\n\r\n- RAD\r\n- Possibilidade de criação facilitada de aplicações em 3 camadas\r\n- Servidor de APIs\r\n- WebService\r\n- Chat e Sistema de notificações\r\n- Multiplataforma: Desktop, web e mobile\r\n- ... e muito mais\r\n\r\nWiki com instruções de instalação e uso:\r\n\r\n- https://github.com/OpenSourceCommunityBrasil/REST-DataWare/wiki\r\n\r\nRepositório dos novos demos:\r\n\r\n- https://github.com/OpenSourceCommunityBrasil/RDWDemos",
+    "CommunityDescription" : "REST DataWare é uma suite de componentes criado para facilitar o desenvolvimento de aplicações 3 camadas com tudo que o RAD tem pra oferecer. Funcionando desde o Delphi 7 e também no Lazarus, o RDW como normalmente chamamos, é uma ferramenta completa para aplicações desktop, web e multiplataforma!\r\n\r\nPrincipais funcionalidades:\r\n\r\n- RAD\r\n- Possibilidade de criação facilitada de aplicações em 3 camadas\r\n- Servidor de APIs\r\n- WebService\r\n- Chat e Sistema de notificações\r\n- Multiplataforma: Desktop, web e mobile\r\n- ... e muito mais\r\n\r\nWiki com instruções de instalação e uso:\r\n\r\n - https://github.com/OpenSourceCommunityBrasil/REST-DataWare/wiki\r\n\r\nRepositório dos novos demos:\r\n\r\n - https://github.com/OpenSourceCommunityBrasil/RDWDemos",
     "ExternalDependecies" : "",
     "OrphanedPackage" : 0,
     "RepositoryFileName" : "RESTDataWare.zip",
-    "RepositoryFileSize" : 34140315,
-    "RepositoryFileHash" : "68bede75b7129a67db24ba97735f0794",
-    "RepositoryDate" : 4.4806592702465277E+004,
+    "RepositoryFileSize" : 35772656,
+    "RepositoryFileHash" : "04071e67f686cacc1bfc003d3af9e3c8",
+    "RepositoryDate" : 4.4812857347557867E+004,
     "PackageBaseDir" : "CORE\\/",
-    "HomePageURL" : "",
+    "HomePageURL" : "https://github.com/OpenSourceCommunityBrasil/REST-DataWare",
     "DownloadURL" : "",
     "SVNURL" : ""
   },
@@ -40,7 +40,7 @@
       "FPCCompatibility" : "3.0.0, 3.0.2, 3.0.4, 3.2.0",
       "SupportedWidgetSet" : "gtk2, win32/win64",
       "PackageType" : 0,
-      "DependenciesAsString" : "restdatawarecomponents(2.0), indylaz, IDEIntf, LCL, FCL"
+      "DependenciesAsString" : "restdatawarecomponents(2.0), indylaz(10.6), IDEIntf, LCL, FCL"
     },
     {
       "Name" : "restdwlazdriver.lpk",
@@ -61,7 +61,7 @@
       "Author" : "Gilberto Rocha da Silva",
       "License" : "GPL- 3.0",
       "RelativeFilePath" : "Packages\\/Lazarus\\/Drivers\\/unidac\\/",
-      "VersionAsString" : "2.1.0.0",
+      "VersionAsString" : "2.0.5.0",
       "LazCompatibility" : "2.0.0, 2.0.2, 2.0.4, 2.0.6, 2.0.8, 2.0.10, 2.0.12",
       "FPCCompatibility" : "3.0.0, 3.0.2, 3.0.4, 3.2.0",
       "SupportedWidgetSet" : "gtk2, win32/win64",
@@ -79,7 +79,7 @@
       "FPCCompatibility" : "3.0.0, 3.0.2, 3.0.4, 3.2.0",
       "SupportedWidgetSet" : "gtk2, win32/win64",
       "PackageType" : 0,
-      "DependenciesAsString" : "restdatawarecomponents(2.0), LR_ZeosDB, FCL"
+      "DependenciesAsString" : "zcomponent(7.2), restdatawarecomponents(2.0), FCL"
     },
     {
       "Name" : "restdatawareshellservices.lpk",
