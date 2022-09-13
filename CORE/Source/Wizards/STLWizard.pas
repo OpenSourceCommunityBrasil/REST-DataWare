@@ -10,7 +10,7 @@
 
 Unit Stlwizard;
 
-{$I RDWWIZ.inc}
+{$I ..\Includes\RDWWIZ.inc}
 
 Interface
 

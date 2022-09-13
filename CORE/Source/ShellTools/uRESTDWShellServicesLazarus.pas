@@ -1,6 +1,6 @@
 unit uRESTDWShellServicesLazarus;
 
-{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -259,9 +259,11 @@ Procedure TRESTDWShellService.EchoPooler(ServerMethodsClass,
                                          Var Pooler, MyIP     : String;
                                          AccessTag            : String;
                                          Var InvalidTag       : Boolean);
+Var
+ I : Integer;
 Begin
  {$IFNDEF FPC}
- Inherited
+ Inherited;
  {$ENDIF}
  InvalidTag := False;
  MyIP       := '';

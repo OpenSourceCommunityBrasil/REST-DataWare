@@ -1,6 +1,6 @@
 unit uRESTDWShellServicesRegDelphi;
 
-{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -50,13 +50,11 @@ Procedure Register;
 
 Implementation
 
-{$IFNDEF FPC}
  {$if CompilerVersion < 23}
   {$R .\RESTDWShellServicesDesign.dcr}
  {$IFEND}
-{$ENDIF}
 
-uses uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
+uses uRESTDWCharset;
 
 Procedure Register;
 Begin
@@ -65,17 +63,6 @@ Begin
  UnlistPublishedProperty(TRESTDWShellService,  'ServicePort');
  UnlistPublishedProperty(TRESTDWShellService,  'RequestTimeOut');
 End;
-
-{$IFDEF FPC}
- Procedure UnlistPublishedProperty (ComponentClass:TPersistentClass; const PropertyName:String);
- var
-   pi :PPropInfo;
- begin
-   pi := TypInfo.GetPropInfo (ComponentClass, PropertyName);
-   if (pi <> nil) then
-     RegisterPropertyEditor (pi^.PropType, ComponentClass, PropertyName, PropEdits.THiddenPropertyEditor);
- end;
-{$ENDIF}
 
 initialization
 

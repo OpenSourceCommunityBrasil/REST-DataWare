@@ -23,9 +23,9 @@ Descreva o que você espera que acontecesse e faça aqui suas sugestões de melh
 Fotos representando o problema se necessário.
 
 **Informações técnicas:**
- - OS: [e.g. iOS]
- - Versão do RDW
- - Plataforma de destino de compilação
+ - OS: [ex. iOS]
+ - Versão do RDW:
+ - IDE:
 
 **Informações Adicionais**
 Adicione alguma informação adicional ou observação se necessário nesse espaço aqui.

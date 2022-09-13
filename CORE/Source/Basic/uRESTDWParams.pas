@@ -1585,7 +1585,7 @@ Begin
                     vLines := vLines + Format(', {%s}', [GenerateLine]);
                   End;
     End;
-    If DWJSONType <> TDWJSONArrayType Then
+    If DWJSONType <> TRESTDWJSONArrayType Then //Roniery-04/09/2022
      Break;
     bValue.Next;
     Inc(vRecNo); //pr-19/08/2020
