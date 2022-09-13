@@ -3,7 +3,7 @@ unit uRESTDAO;
 interface
 
 uses
-  System.JSON,
+  System.JSON, uConsts,
   REST.Client, REST.Types, REST.Authenticator.Basic
 
     ;
@@ -19,13 +19,10 @@ type
     constructor Create(aServer, aPort: string);
     destructor Destroy; override;
     procedure SetBasicAuth(user, password: string);
-    function TesteEndpointGET(aEndpoint: string): boolean;
-    function TesteEndpointPOST(aEndpoint: string): boolean;
-    function TesteEndpointPUT(aEndpoint: string): boolean;
-    function TesteEndpointPATCH(aEndpoint: string): boolean;
-    function TesteEndpointDELETE(aEndpoint: string): boolean;
-    function TesteAssyncEndpoint(aEndpoint: string; aMethod: TRESTRequestMethod;
-      aCount: integer): boolean;
+    function TesteEndpoint(aEndpoint: string;
+      aMethod: TTestRequestMethod): boolean;
+    function TesteConcorrente(aEndpoint: string; aMethod: TTestRequestMethod;
+      cRepeat, cRequests: integer): boolean;
   End;
 
 implementation
@@ -71,110 +68,51 @@ begin
   FClientAPI.Authenticator := FBasicAuth;
 end;
 
-function TRESTDAO.TesteAssyncEndpoint(aEndpoint: string;
-  aMethod: TRESTRequestMethod; aCount: integer): boolean;
+function TRESTDAO.TesteConcorrente(aEndpoint: string;
+  aMethod: TTestRequestMethod; cRepeat, cRequests: integer): boolean;
+begin
+
+end;
+
+function TRESTDAO.TesteEndpoint(aEndpoint: string;
+  aMethod: TTestRequestMethod): boolean;
 var
-  Response: boolean;
-  fail, I: integer;
-  threads: Array of TThread;
+  expectedCode: integer;
 begin
-  fail := 0;
-  SetLength(threads, aCount);
-  for I := 0 to aCount do
-    TThread(threads[I]).CreateAnonymousThread(
-      procedure
+  Result := false;
+  FRESTAPI.Response := nil;
+  FRESTAPI.Resource := aEndpoint;
+  case aMethod of
+    rtmGET:
       begin
-        Response := false;
-        FRESTAPI.Response := nil;
-        FRESTAPI.Resource := aEndpoint;
-        FRESTAPI.Method := aMethod;
-        try
-          FRESTAPI.Execute;
-          case aMethod of
-            rmGET, rmDELETE:
-              begin
-                if FRESTAPI.Response.StatusCode <> 200 then
-                  inc(fail);
-              end;
-            rmPOST, rmPUT, rmPATCH:
-              begin
-                if FRESTAPI.Response.StatusCode <> 201 then
-                  inc(fail);
-              end;
-          end;
-        except
-          Response := false;
-        end;
-      end).Start;
-
-  Result := fail = 0;
-end;
-
-function TRESTDAO.TesteEndpointDELETE(aEndpoint: string): boolean;
-begin
-  Result := false;
-  FRESTAPI.Response := nil;
-  FRESTAPI.Resource := aEndpoint;
-  FRESTAPI.Method := rmDELETE;
-  try
-    FRESTAPI.Execute;
-    Result := FRESTAPI.Response.StatusCode = 200;
-  except
-    Result := false;
+        FRESTAPI.Method := rmGET;
+        expectedCode := 200;
+      end;
+    rtmPOST:
+      begin
+        FRESTAPI.Method := rmPOST;
+        expectedCode := 201;
+      end;
+    rtmPUT:
+      begin
+        FRESTAPI.Method := rmPUT;
+        expectedCode := 201;
+      end;
+    rtmPATCH:
+      begin
+        FRESTAPI.Method := rmPATCH;
+        expectedCode := 201;
+      end;
+    rtmDELETE:
+      begin
+        FRESTAPI.Method := rmDELETE;
+        expectedCode := 200;
+      end;
   end;
-end;
 
-function TRESTDAO.TesteEndpointGET(aEndpoint: string): boolean;
-begin
-  Result := false;
-  FRESTAPI.Response := nil;
-  FRESTAPI.Resource := aEndpoint;
-  FRESTAPI.Method := rmGET;
   try
     FRESTAPI.Execute;
-    Result := FRESTAPI.Response.StatusCode = 200;
-  except
-    Result := false;
-  end;
-end;
-
-function TRESTDAO.TesteEndpointPATCH(aEndpoint: string): boolean;
-begin
-  Result := false;
-  FRESTAPI.Response := nil;
-  FRESTAPI.Resource := aEndpoint;
-  FRESTAPI.Method := rmPATCH;
-  try
-    FRESTAPI.Execute;
-    Result := FRESTAPI.Response.StatusCode = 201;
-  except
-    Result := false;
-  end;
-end;
-
-function TRESTDAO.TesteEndpointPOST(aEndpoint: string): boolean;
-begin
-  Result := false;
-  FRESTAPI.Response := nil;
-  FRESTAPI.Resource := aEndpoint;
-  FRESTAPI.Method := rmPOST;
-  try
-    FRESTAPI.Execute;
-    Result := FRESTAPI.Response.StatusCode = 201;
-  except
-    Result := false;
-  end;
-end;
-
-function TRESTDAO.TesteEndpointPUT(aEndpoint: string): boolean;
-begin
-  Result := false;
-  FRESTAPI.Response := nil;
-  FRESTAPI.Resource := aEndpoint;
-  FRESTAPI.Method := rmPUT;
-  try
-    FRESTAPI.Execute;
-    Result := FRESTAPI.Response.StatusCode = 201;
+    Result := FRESTAPI.Response.StatusCode = expectedCode;
   except
     Result := false;
   end;

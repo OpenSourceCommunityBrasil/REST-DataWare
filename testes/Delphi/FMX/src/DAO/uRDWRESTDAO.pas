@@ -3,12 +3,10 @@ unit uRDWRESTDAO;
 interface
 
 uses
-  System.Classes,
+  System.Classes, uConsts,
   uRESTDWDataUtils, uRESTDWResponseTranslator, uRESTDWIdBase;
 
 type
-  TRequestMethod = (rmGET, rmPOST, rmPUT, rmPATCH, rmDELETE);
-
   TRDWRESTDAO = Class
   private
     FRESTClient: TRESTDWIdClientREST;
@@ -20,8 +18,9 @@ type
     constructor Create(aServer, aPort: string; binary: boolean);
     destructor Destroy; override;
     procedure SetBasicAuth(user, password: string);
-    function TesteEndpoint(aEndpoint: string; aMethod: TRequestMethod): boolean;
-    function TesteConcorrente(aEndpoint: string; aMethod: TRequestMethod;
+    function TesteEndpoint(aEndpoint: string;
+      aMethod: TTestRequestMethod): boolean;
+    function TesteConcorrente(aEndpoint: string; aMethod: TTestRequestMethod;
       cRepeat, cRequests: integer): boolean;
   End;
 
@@ -63,7 +62,7 @@ begin
 end;
 
 function TRDWRESTDAO.TesteConcorrente(aEndpoint: string;
-  aMethod: TRequestMethod; cRepeat, cRequests: integer): boolean;
+  aMethod: TTestRequestMethod; cRepeat, cRequests: integer): boolean;
 var
   I: integer;
   teste: boolean;
@@ -77,17 +76,17 @@ begin
         try
           try
             case aMethod of
-              rmGET:
+              rtmGET:
                 teste := FRESTClient.Get(FURL, FDefaultHeader, FStream) = 200;
-              rmPOST:
+              rtmPOST:
                 teste := FRESTClient.Post(FURL, FDefaultHeader, FStream) = 201;
-              rmPUT:
+              rtmPUT:
                 teste := FRESTClient.Put(FURL, FDefaultHeader, FStream,
                   false) = 201;
-              rmPATCH:
+              rtmPATCH:
                 teste := FRESTClient.Patch(FURL, FDefaultHeader, FStream,
                   false) = 201;
-              rmDELETE:
+              rtmDELETE:
                 teste := FRESTClient.Delete(FURL, FDefaultHeader,
                   FStream) = 200;
             end;
@@ -102,21 +101,21 @@ begin
 end;
 
 function TRDWRESTDAO.TesteEndpoint(aEndpoint: string;
-aMethod: TRequestMethod): boolean;
+aMethod: TTestRequestMethod): boolean;
 begin
   FURL := FServer + '/' + aEndpoint;
   FStream := TStringStream.Create;
   try
     case aMethod of
-      rmGET:
+      rtmGET:
         Result := FRESTClient.Get(FURL, FDefaultHeader, FStream) = 200;
-      rmPOST:
+      rtmPOST:
         Result := FRESTClient.Post(FURL, FDefaultHeader, FStream) = 201;
-      rmPUT:
+      rtmPUT:
         Result := FRESTClient.Put(FURL, FDefaultHeader, FStream, false) = 201;
-      rmPATCH:
+      rtmPATCH:
         Result := FRESTClient.Patch(FURL, FDefaultHeader, FStream, false) = 201;
-      rmDELETE:
+      rtmDELETE:
         Result := FRESTClient.Delete(FURL, FDefaultHeader, FStream) = 200;
     end;
     FStream.Free;
