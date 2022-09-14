@@ -3208,10 +3208,11 @@ Function TRESTDWPoolerMethodClient.GetToken(Pooler           : String;
                                             Var MessageError : String;
                                             TimeOut          : Integer = 3000;
                                             ConnectTimeOut   : Integer = 3000;
-                                            ConnectionDefs   : TObject           = Nil;
-                                            RESTClientPooler : TRESTClientPoolerBase = Nil)   : String;
+                                            ConnectionDefs   : TObject = Nil;
+                                            RESTClientPooler : TRESTClientPoolerBase = Nil) : String;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
+ vGetTokenEvent,
  lResponse            : String;
  JSONParam            : TJSONParam;
  DWParams             : TRESTDWParams;
@@ -3246,7 +3247,7 @@ Begin
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                     := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := MessageError;
@@ -3255,9 +3256,15 @@ Begin
   Try
    RESTClientPoolerExec.BinaryRequest := vBinaryRequest;
    If RESTClientPoolerExec.AuthenticationOptions.AuthorizationOption = rdwAOBearer Then
-    lResponse := RESTClientPoolerExec.SendEvent(TRESTDWAuthOptionBearerClient(RESTClientPoolerExec.AuthenticationOptions.OptionParams).GetTokenEvent, DWParams)
+    Begin
+     vGetTokenEvent := TRESTDWAuthOptionBearerClient(RESTClientPoolerExec.AuthenticationOptions.OptionParams).GetTokenEvent;
+     lResponse := RESTClientPoolerExec.SendEvent(vGetTokenEvent, DWParams);
+    End
    Else If RESTClientPoolerExec.AuthenticationOptions.AuthorizationOption = rdwAOToken Then
-    lResponse := RESTClientPoolerExec.SendEvent(TRESTDWAuthOptionTokenClient(RESTClientPoolerExec.AuthenticationOptions.OptionParams).GetTokenEvent, DWParams);
+    Begin
+     vGetTokenEvent := TRESTDWAuthOptionTokenClient(RESTClientPoolerExec.AuthenticationOptions.OptionParams).GetTokenEvent;
+     lResponse := RESTClientPoolerExec.SendEvent(vGetTokenEvent, DWParams);
+    End;
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin

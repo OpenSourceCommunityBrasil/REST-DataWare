@@ -5,25 +5,23 @@ unit uRESTDWDesignReg;
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
-  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
-  Pascal e com compatibilidade entre sistemas operacionais.
+ Pascal e com compatibilidade entre sistemas operacionais.
   Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
-  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
-  Membros do Grupo :
+ Membros do Grupo :
 
-  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
-  A. Brito                   - Admin - Administrador do desenvolvimento.
-  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
-  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
-  Flávio Motta               - Member Tester and DEMO Developer.
-  Mobius One                 - Devel, Tester and Admin.
-  Gustavo                    - Criptografia and Devel.
-  Eloy                       - Devel.
-  Roniery                    - Devel.
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
+ Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Flávio Motta               - Member Tester and DEMO Developer.
+ Mobius One                 - Devel, Tester and Admin.
+ Gustavo                    - Criptografia and Devel.
+ Eloy                       - Devel.
+ Roniery                    - Devel.
 }
-
 
 interface
 
@@ -32,10 +30,10 @@ uses
   {$IFDEF FPC}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
     LResources, LazFileUtils, SysUtils, Classes, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, fpWeb,
-    uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWMemtable, uRESTDWBufferDb;
+    uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWBufferDb;
   {$ELSE}
    Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWDatamodule, uRESTDWServerEvents,
-   uRESTDWBasicClass, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWMemtable, uRESTDWBufferDb,
+   uRESTDWBasicClass, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWBufferDb,
    RTLConsts, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
    {$IFDEF COMPILER16_UP}
    UITypes,
@@ -891,9 +889,9 @@ End;
 {$IFNDEF FPC}
 Function TDWDSDesigner.DoCreateField(Const FieldName : {$IF CompilerVersion > 17}WideString{$ELSE}String{$IFEND}; Origin: string): TField;
 Begin
- TRESTDWCustomDataSet(DataSet).DesignNotify(FieldName, 0);
- Result  := Inherited DoCreateField(FieldName, Origin);
- TRESTDWCustomDataSet(DataSet).DesignNotify(FieldName, 104);
+// TDWCustomDataSet(DataSet).DesignNotify(FieldName, 0);
+// Result  := Inherited DoCreateField(FieldName, Origin);
+// TDWCustomDataSet(DataSet).DesignNotify(FieldName, 104);
 End;
 {$ENDIF}
 

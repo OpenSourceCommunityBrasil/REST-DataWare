@@ -31,10 +31,12 @@ Uses
   {$IF CompilerVersion <= 22}
    EncdDecd, uRESTDWMassiveBuffer,
   {$ELSE}
-   System.SysUtils, System.Classes, Data.Db, Variants, HTTPApp, system.SyncObjs, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWComponentBase,
-   uRESTDWCharset,
-  {$IFEND}uRESTDWTools, uRESTDWConsts;
+     uRESTDWCharset,
+  {$IFEND}
+  SysUtils, Classes, Db, Variants, HTTPApp, SyncObjs,
+  uRESTDWBasic, uRESTDWJSONObject, uRESTDWBasicTypes, uRESTDWComponentEvents,
+  uRESTDWComponentBase, uRESTDWBasicClass, uRESTDWParams, uRESTDWBasicDB,
+  uRESTDWTools, uRESTDWConsts;
 
 Type
  TRESTDWShellService = Class(TRESTShellServicesBase)
@@ -169,15 +171,9 @@ Begin
   vContentType     := ARequest.ContentType;
   If CommandExec  (TComponent(AResponse),
                    RemoveBackslashCommands(ARequest.PathInfo),
-                   ARequest.Method + ' ' + ARequest.{$IF CompilerVersion < 21}PathInfo
-                                                        {$ELSE}RawPathInfo
-                                                        {$IFEND}
-                                           ,
+                   ARequest.Method + ' ' + ARequest.{$IF CompilerVersion < 21}PathInfo{$ELSE}RawPathInfo{$IFEND},
                    vContentType,
-                   ARequest.{$IF CompilerVersion < 21}RemoteAddr
-                                          {$ELSE}RemoteIP
-                                          {$IFEND}
-                            ,
+                   ARequest.{$IF CompilerVersion < 21}RemoteAddr{$ELSE}RemoteIP{$IFEND},
                    ARequest.UserAgent,
                    '',
                    '',

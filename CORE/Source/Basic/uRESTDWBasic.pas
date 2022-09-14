@@ -1192,23 +1192,16 @@ Begin
  End;
 End;
 
-Function  TRESTClientPoolerBase.RenewToken(Var Params       : TRESTDWParams;
-                                       Var Error        : Boolean;
-                                       Var MessageError : String) : String;
+Function  TRESTClientPoolerBase.RenewToken(Var Params             : TRESTDWParams;
+                                           Var Error              : Boolean;
+                                           Var MessageError       : String) : String;
 Var
  I                    : Integer;
  vTempSend            : String;
  vConnection          : TRESTDWPoolerMethodClient;
- RESTClientPoolerExec : TRESTClientPoolerBase;
- Procedure DestroyComponents;
- Begin
-  If Assigned(RESTClientPoolerExec) Then
-   FreeAndNil(RESTClientPoolerExec);
- End;
 Begin
  //Atualização de Token na autenticação
  Result                       := '';
- RESTClientPoolerExec         := Nil;
  vConnection                  := TRESTDWPoolerMethodClient.Create(Nil);
  vConnection.UserAgent        := vUserAgent;
  vConnection.TypeRequest      := vTypeRequest;
@@ -1238,15 +1231,15 @@ Begin
                      vTempSend := vConnection.GetToken(vDataRoute,
                                                        Params,       Error,
                                                        MessageError, vRequestTimeOut, vConnectTimeOut,
-                                                       Nil,          RESTClientPoolerExec);
-                     vTempSend                                           := GettokenValue(vTempSend);
+                                                       Nil,          Self);
+                     vTempSend := GettokenValue(vTempSend);
                      TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                     End;
       rdwAOToken  : Begin
                      vTempSend := vConnection.GetToken(vDataRoute,
                                                        Params,       Error,
                                                        MessageError, vRequestTimeOut, vConnectTimeOut,
-                                                       Nil,          RESTClientPoolerExec);
+                                                       Nil,          Self);
                      vTempSend                                          := GettokenValue(vTempSend);
                      TRESTDWAuthOptionTokenClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                     End;
@@ -1286,9 +1279,7 @@ Begin
               End;
              If Assigned(vOnFailOverExecute) Then
               vOnFailOverExecute(vFailOverConnections[I]);
-             If Not Assigned(RESTClientPoolerExec) Then
-              RESTClientPoolerExec := TRESTClientPoolerBase.Create(Nil);
-             ReconfigureConnection(RESTClientPoolerExec,
+             ReconfigureConnection(Self,
                                    vFailOverConnections[I].vTypeRequest,
                                    vFailOverConnections[I].vWelcomeMessage,
                                    vFailOverConnections[I].vRestWebService,
@@ -1304,7 +1295,7 @@ Begin
                               vTempSend := vConnection.GetToken(vFailOverConnections[I].vDataRoute,
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut, vFailOverConnections[I].vConnectTimeOut,
-                                                                Nil,          RESTClientPoolerExec);
+                                                                Nil,          Self);
                               vTempSend                                           := GettokenValue(vTempSend);
                               TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                              End;
@@ -1312,7 +1303,7 @@ Begin
                               vTempSend := vConnection.GetToken(vFailOverConnections[I].vDataRoute,
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut, vFailOverConnections[I].vConnectTimeOut,
-                                                                Nil,          RESTClientPoolerExec);
+                                                                Nil,          Self);
                               vTempSend                                          := GettokenValue(vTempSend);
                               TRESTDWAuthOptionTokenClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                              End;
@@ -1381,9 +1372,7 @@ Begin
               End;
              If Assigned(vOnFailOverExecute) Then
               vOnFailOverExecute(vFailOverConnections[I]);
-             If Not Assigned(RESTClientPoolerExec) Then
-              RESTClientPoolerExec := TRESTClientPoolerBase.Create(Nil);
-             ReconfigureConnection(RESTClientPoolerExec,
+             ReconfigureConnection(Self,
                                    vFailOverConnections[I].vTypeRequest,
                                    vFailOverConnections[I].vWelcomeMessage,
                                    vFailOverConnections[I].vRestWebService,
@@ -1399,7 +1388,7 @@ Begin
                               vTempSend := vConnection.GetToken(vFailOverConnections[I].vDataRoute,
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut, vFailOverConnections[I].vConnectTimeOut,
-                                                                Nil,          RESTClientPoolerExec);
+                                                                Nil,          Self);
                               vTempSend                                           := GettokenValue(vTempSend);
                               TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                              End;
@@ -1407,7 +1396,7 @@ Begin
                               vTempSend := vConnection.GetToken(vFailOverConnections[I].vDataRoute,
                                                                 Params,       Error,
                                                                 MessageError, vFailOverConnections[I].vTimeOut,  vFailOverConnections[I].vConnectTimeOut,
-                                                                Nil,          RESTClientPoolerExec);
+                                                                Nil,          Self);
                               vTempSend                                          := GettokenValue(vTempSend);
                               TRESTDWAuthOptionTokenClient(vAuthOptionParams.OptionParams).FromToken(vTempSend);
                              End;
@@ -1465,8 +1454,7 @@ Begin
       End;
     End;
    Finally
-    DestroyComponents;
-    If vConnection <> Nil Then
+    If Assigned(vConnection) Then
      FreeAndNil(vConnection);
    End;
   End;
@@ -3861,8 +3849,7 @@ Begin
                    mb                                  := TStringStream.Create(JSONStr);
                   mb.Position                           := 0;
                   If Not (Assigned(ResultStream)) Then
-                    ResultStream := TStringStream.Create('');
-                  WriteStream(mb, ResultStream);
+                   ResultStream := TStringStream.Create('');                  WriteStream(mb, ResultStream);
                   FreeAndNil(mb);
                  {$ELSE}
                   {$IF CompilerVersion > 21}

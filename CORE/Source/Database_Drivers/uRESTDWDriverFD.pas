@@ -1373,7 +1373,7 @@ Var
           Begin   
            Query.ExecSQL;
 
-           // Inclus√£o do m√©todo de after massive line process
+           // Inclus„o do mÈtodo de after massive line process
            If (Self.Owner.ClassType = TServerMethodDatamodule) Or
              (Self.Owner.ClassType.InheritsFrom(TServerMethodDatamodule)) Then
            Begin

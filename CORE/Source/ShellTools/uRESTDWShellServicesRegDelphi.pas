@@ -12,7 +12,7 @@ unit uRESTDWShellServicesRegDelphi;
   de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
   Membros do Grupo :
-
+  
   XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
   A. Brito                   - Admin - Administrador do desenvolvimento.
   Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
@@ -23,7 +23,6 @@ unit uRESTDWShellServicesRegDelphi;
   Eloy                       - Devel.
   Roniery                    - Devel.
 }
-
 
 interface
 
