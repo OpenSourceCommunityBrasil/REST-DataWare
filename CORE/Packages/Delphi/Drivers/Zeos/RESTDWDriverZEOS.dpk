@@ -1,6 +1,15 @@
 package RESTDWDriverZEOS;
 
-{$R *.res}
+{$IFNDEF FPC}
+ {$IFNDEF VER150 or VER160 or VER170 or VER180 or
+          VER185 or VER190 or VER200 or VER210 or
+          VER220}
+  {$R RESTDWDriverZEOS.res  RESTDWDriverZEOS.rc}
+  {$R RESTDWDriverZEOS.dres RESTDWDriverZEOS.rc}
+  {$R *.res}
+  {$R *.dres}
+ {$ENDIF}
+{$ENDIF}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -30,9 +39,6 @@ package RESTDWDriverZEOS;
 
 requires
   rtl,
-  dbrtl,
-  soaprtl,
-  inet,
   RESTDWCore,
   ZComponent,
   ZDbc,

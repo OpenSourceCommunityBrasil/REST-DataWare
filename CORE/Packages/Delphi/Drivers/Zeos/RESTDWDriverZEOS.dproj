@@ -106,6 +106,8 @@
         <DCC_K>false</DCC_K>
         <DCC_S>false</DCC_S>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=;CFBundleName=</VerInfo_Keys>
+        <DCC_DcpOutput>..\..\..\..\compiled</DCC_DcpOutput>
+        <DCC_DcuOutput>..\..\..\..\compiled</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
         <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
@@ -184,16 +186,15 @@
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_Description>REST Dataware CORE - Driver ZEOS</DCC_Description>
+        <DCC_Description>REST Dataware - Driver ZEOS</DCC_Description>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="RESTDWDriverZEOS.res"/>
+        <DCCReference Include="RESTDWDriverZEOS.dres"/>
         <DCCReference Include="rtl.dcp"/>
-        <DCCReference Include="dbrtl.dcp"/>
-        <DCCReference Include="soaprtl.dcp"/>
-        <DCCReference Include="inet.dcp"/>
         <DCCReference Include="RESTDWCore.dcp"/>
         <DCCReference Include="ZComponent.dcp"/>
         <DCCReference Include="ZDbc.dcp"/>
@@ -201,6 +202,14 @@
         <DCCReference Include="ZCore.dcp"/>
         <DCCReference Include="ZParseSql.dcp"/>
         <DCCReference Include="..\..\..\..\Source\Database_Drivers\uRESTDWDriverZEOS.pas"/>
+        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWDRIVERZEOS.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWDRIVERZEOS</ResourceId>
+        </RcItem>
+        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWDRIVERZEOS16.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>TRESTDWDRIVERZEOS16</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -222,8 +231,9 @@
                     <Source Name="MainSource">RESTDWDriverZEOS.dpk</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\UDPSuperComponents.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\UDPSuperComponents.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\AVPackMobileDsgn.bpl">(untitled)</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="D:\IDE\fortesreport-ce\Binary\LibD28\dclfrce.bpl">Fortes Report Comunity Edition (design-time)</Excluded_Packages>
                 </Excluded_Packages>
                 <VersionInfo>
                     <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
@@ -284,6 +294,12 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx64\libcgsqlite3.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="..\..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWDriverZEOS.bpl" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWDriverZEOS.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>RESTDWDriverZEOS.bpl</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="OSX32">
                         <Operation>1</Operation>

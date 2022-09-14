@@ -37,6 +37,8 @@ requires
   vclx;
 
 contains
-  STLWizardreg in '..\..\..\Source\Wizards\STLWizardreg.pas';
+  STLWizardreg in '..\..\..\Source\Wizards\STLWizardreg.pas',
+  STLWizard in '..\..\..\Source\Wizards\STLWizard.pas',
+  RDWCGIWizard in '..\..\..\Source\Wizards\RDWCGIWizard.pas';
 
 end.

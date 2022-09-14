@@ -85,6 +85,8 @@
         <DCC_E>false</DCC_E>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <DCC_Description>REST Dataware CORE - Driver FireDAC</DCC_Description>
+        <DCC_DcpOutput>..\..\..\..\compiled</DCC_DcpOutput>
+        <DCC_DcuOutput>..\..\..\..\compiled</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
         <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
