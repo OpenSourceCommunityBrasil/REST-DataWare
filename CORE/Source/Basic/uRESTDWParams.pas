@@ -6090,6 +6090,7 @@ Var
   T        : DWFieldTypeSize;
   D        : TDateTime;
   aParam   : TJSONParam;
+  vBytesString : TRESTDWBytes;
  Begin
   For I := 0 To Count - 1 do
    Begin
@@ -6147,11 +6148,9 @@ Var
                      L := Length(S);
                      Stream.Write(L, Sizeof(DWInt64));
                     End;
-                   {$IFNDEF FPC}
-                   If L <> 0 Then Stream.Write(S[InitStrPos], L);
-                   {$ELSE}
-                   If L <> 0 Then Stream.Write(S[1], L);
-                   {$ENDIF}
+                   If S <> '' Then
+                    vBytesString := StringToBytes(S);
+                   If L <> 0 Then Stream.Write(vBytesString[0], L);
                   End;
        ovSmallint : Begin
                      If aParam.isnull Then
@@ -6453,12 +6452,13 @@ Var
  StartPos       : Int64;
  Procedure CreateDWParamsFromStream;
  Var
-  I, T    : Integer;
-  J, L    : DWInt64;
-  B       : Boolean;
-  VE      : Extended;
-  vItem   : TJSONParam;
-  vStream : TStream;
+  I, T         : Integer;
+  J, L         : DWInt64;
+  B            : Boolean;
+  VE           : Extended;
+  vStringBytes : TRESTDWBytes;
+  vItem        : TJSONParam;
+  vStream      : TStream;
  Begin
   For I := 0 To ParamsCount -1 Do
    Begin
@@ -6512,10 +6512,14 @@ Var
                    SetLength(S, L);
                    Try
                     If L <> 0 Then
-                     Stream.Read(S[InitStrPos], L);
-                    {$IFDEF FPC}
-                     S := GetStringEncode(S, vDatabaseCharSet);
-                    {$ENDIF}
+                     Begin
+                      SetLength(vStringBytes, L);
+                      Stream.Read(vStringBytes[0], L);
+                      S := BytesToString(vStringBytes);
+                      {$IFDEF FPC}
+                       S := GetStringEncode(S, vDatabaseCharSet);
+                      {$ENDIF}
+                     End;
                    Finally
                    End;
 //                   If CriptOptions.Use Then
