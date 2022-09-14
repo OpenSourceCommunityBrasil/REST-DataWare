@@ -163,10 +163,11 @@ Begin
      Begin
       If vStream = Nil Then
        vStream := TStringStream.Create(ARequest.Content);
-      vStream.Position := 0;
      End;
     {$IFEND}
-   End;
+   End
+  Else
+   vStream         := TMemoryStream.Create;
   vStream.Position := 0;
   vContentType     := ARequest.ContentType;
   If CommandExec  (TComponent(AResponse),
