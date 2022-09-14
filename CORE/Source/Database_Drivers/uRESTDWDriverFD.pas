@@ -1731,6 +1731,8 @@ Begin
               Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob,
                                                         ftGraphic, ftOraBlob, ftOraClob] Then
                Begin
+                If (Not (Params[I].IsNull)) Then
+                Begin
                 If Not Assigned(vStringStream) Then
                  vStringStream  := TMemoryStream.Create;
                 Try
@@ -1742,6 +1744,9 @@ Begin
                  If Assigned(vStringStream) Then
                   FreeAndNil(vStringStream);
                 End;
+               End
+                Else
+                 vTempQuery.Params[A].Clear;
                End
               Else If vTempQuery.Params[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
                                                         ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
