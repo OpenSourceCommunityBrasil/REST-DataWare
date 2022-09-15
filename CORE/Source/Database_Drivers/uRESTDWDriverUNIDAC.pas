@@ -292,12 +292,12 @@ Var
                                    Else If vTempQuery.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob,
                                                         ftGraphic, ftOraBlob, ftOraClob] Then
                                    Begin
-                                    If (Not (Params[I].IsNull)) Then
+                                    If (Not (vDWParams[I].IsNull)) Then
                                     Begin
                                      If Not Assigned(vStringStream) Then
                                       vStringStream  := TMemoryStream.Create;
                                      Try
-                                      Params[I].SaveToStream(vStringStream);
+                                      vDWParams[I].SaveToStream(vStringStream);
                                       vStringStream.Position := 0;
                                       If vStringStream.Size > 0 Then
                                        vTempQuery.Params[A].LoadFromStream(vStringStream, ftBlob);
