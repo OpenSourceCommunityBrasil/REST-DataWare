@@ -5278,12 +5278,14 @@ Begin
   Begin
    RESTClientPooler.Accept          := ConnectionDB.Accept;
    RESTClientPooler.AcceptEncoding  := ConnectionDB.AcceptEncoding;
+   RESTClientPooler.AccessTag       := ConnectionDB.AccessTag;
    RESTClientPooler.ContentType     := ConnectionDB.ContentType;
    RESTClientPooler.TypeRequest     := ConnectionDB.TypeRequest;
    RESTClientPooler.ContentEncoding := ConnectionDB.ContentEncoding;
    RESTClientPooler.AuthenticationOptions.Assign(ConnectionDB.AuthenticationOptions);
    RESTClientPooler.SSLVersions     := ConnectionDB.SSLVersions;
    RESTClientPooler.UseSSL          := UseSSL;
+   RESTClientPooler.WelcomeMessage  := ConnectionDB.WelcomeMessage;
   End;
 End;
 

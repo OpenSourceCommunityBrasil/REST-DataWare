@@ -1031,7 +1031,7 @@ Var
 Begin
  For I := Count -1 DownTo 0 Do
   Self.Delete(I);
- Self.Clear;
+ Inherited Clear;
 End;
 
 Procedure TMassiveBuffer.Delete(Index: Integer);
@@ -1039,13 +1039,13 @@ Begin
  If (Index < Self.Count) And (Index > -1) Then
   Begin
    {$IFDEF FPC}
-   If (Index < Self.Count -1) Then
+   If (Index <= Self.Count -1) Then
    {$ENDIF}
    If Assigned(TList(Self).Items[Index]) Then
     Begin
      Try
       If Assigned(TMassiveLine(TList(Self).Items[Index]^)) Then
-       FreeAndNil(TMassiveLine(TList(Self).Items[Index]^));
+       FreeAndNil(PMassiveLine(TList(Self).Items[Index])^);
       {$IFDEF FPC}
        Dispose(PMassiveLine(TList(Self).Items[Index]));
       {$ELSE}
