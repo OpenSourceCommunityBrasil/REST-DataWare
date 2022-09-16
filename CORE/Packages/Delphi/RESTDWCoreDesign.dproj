@@ -3,7 +3,7 @@
         <ProjectGuid>{B229AD56-6CAC-4419-8C33-A144BCAD1177}</ProjectGuid>
         <MainSource>RESTDWCoreDesign.dpk</MainSource>
         <ProjectVersion>19.5</ProjectVersion>
-        <FrameworkType>VCL</FrameworkType>
+        <FrameworkType>None</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
