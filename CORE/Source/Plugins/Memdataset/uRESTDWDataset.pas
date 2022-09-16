@@ -1,6 +1,6 @@
-unit uRESTDWDataset;
+﻿unit uRESTDWDataset;
 
-{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDWPlataform.inc}
 {$IFDEF FPC}
 {$mode Delphi}
 {$ENDIF}
@@ -4762,8 +4762,14 @@ Begin
       ftTime,
       ftDateTime,
       ftTimeStamp: Begin
-                    Stream.Read(V5, Sizeof(V5));
-                    SetDataB(J, TDateTime(V5), I);
+                    V5 := 0;
+                    Stream.Read(V5, Sizeof(Double));
+                    If TFieldType(T) = ftDate Then
+                     SetDataB(J, TDate(V5), I)
+                    Else If TFieldType(T) = ftTime Then
+                     SetDataB(J, TTime(V5), I)
+                    Else
+                     SetDataB(J, TDateTime(V5), I);
                    End;
       ftLargeint : Begin
                     Stream.Read(V8, Sizeof(V8));
@@ -5441,7 +5447,12 @@ Begin
       ftTime,
       ftDateTime,
       ftTimeStamp : Begin
-                     D := PVarData(@FData[J]).VDate;
+                     If TFieldType(T) = ftDate Then
+                      D := PVarData(@FData[J]).VDate
+                     Else If TFieldType(T) = ftTime Then
+                      D := PVarData(@FData[J]).VInteger
+                     Else
+                      D := PVarData(@FData[J]).vdouble;
                      Stream.Write(D, Sizeof(TDateTime));
                     End;
       ftLargeint  : Stream.Write(PVarData(@FData[J]).VInt64, Sizeof(Int64));
@@ -5709,7 +5720,27 @@ begin
       ftTime,
       ftDate : Begin
                                    Case FFields[FieldIndex].FieldType of
-                                     ftDate: FData[I] := DateOf(AValue);
+                                     ftDate,
+                                     ftTime : Begin
+                                               If FFields[FieldIndex].FieldType = ftDate Then
+                                                Begin
+                                                 Try
+                                                  StrToDate(AValue);
+                                                  FData[I] := DateOf(AValue);
+                                                 Except
+                                                  FData[I] := Null;
+                                                 End
+                                                End
+                                               Else
+                                                Begin
+                                                 Try
+                                                  StrToTime(AValue);
+                                                  FData[I] := Integer(AValue);
+                                                 Except
+                                                  FData[I] := Null;
+                                                 End
+                                                End;
+                                              End
                                     Else
                                      FData[I] := Integer(AValue);
                                    End;
@@ -8333,8 +8364,13 @@ begin
           PSQLTimeStampOffset(Buffer)^ := DateTimeToSQLTimeStampOffset(D);
         end;
 {$ENDIF}
-        ftInteger, ftAutoInc, ftDate, ftTime:
-          PInteger(Buffer)^ := FArray.Data[I];
+        ftInteger, ftAutoInc,
+        ftDate,    ftTime: Begin
+                            If FArray.FieldType[I] In [ftInteger, ftAutoInc, ftTime] Then
+                             PInteger(Buffer)^ := FArray.Data[I]
+                            Else
+                             PDate(Buffer)^ := FArray.Data[I];
+                           End;
         ftWord:
           PWord(Buffer)^ := FArray.Data[I];
         ftBoolean:
