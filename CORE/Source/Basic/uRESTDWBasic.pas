@@ -1202,6 +1202,7 @@ Var
 Begin
  //Atualização de Token na autenticação
  Result                       := '';
+ MessageError                 := '';
  vConnection                  := TRESTDWPoolerMethodClient.Create(Nil);
  vConnection.UserAgent        := vUserAgent;
  vConnection.TypeRequest      := vTypeRequest;
