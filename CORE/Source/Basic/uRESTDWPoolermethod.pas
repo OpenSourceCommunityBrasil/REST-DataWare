@@ -2546,8 +2546,6 @@ Begin
   If Not Assigned(RESTClientPooler) Then
    FreeAndNil(RESTClientPoolerExec);
   FreeAndNil(DWParams);
-  If Assigned(Result) Then
-   FreeAndNil(Result);
  End;
 End;
 
