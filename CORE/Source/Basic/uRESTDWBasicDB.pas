@@ -3998,6 +3998,8 @@ Begin
        End
       Else
        Begin
+        If Assigned(Result) then
+          FreeAndNil(Result);
         If Assigned(vOnEventConnection) then
          vOnEventConnection(False, MessageError)
         Else
