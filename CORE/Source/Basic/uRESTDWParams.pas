@@ -4387,7 +4387,7 @@ Function TJSONParam.GetAsString   : String;
 Begin
  If TestNilParam Then
   Exit;
- Result := GetValue(ovString);
+ Result := trim(GetValue(ovString));
 End;
 
 Procedure TJSONParam.SetAsString  (Value : String);
