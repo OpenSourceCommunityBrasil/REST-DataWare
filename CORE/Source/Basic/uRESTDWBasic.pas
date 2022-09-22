@@ -2252,28 +2252,31 @@ Begin
        End;
       If Assigned(ContentStringStream) Then
        Begin
-        ContentStringStream.Position := 0;
-        Try
-         mb := TStringStream.Create(''); //{$IFNDEF FPC}{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
-         Try
-          mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
-                      ContentStringStream.Position := 0;
-          mb.Position := 0;
-          If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
-           Begin
-            msgEnd   := False;
-            boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
-            startboundary := '--' + boundary;
-            Repeat
-             tmp := ReadLnFromStream(ContentStringStream, -1, True);
-            Until tmp = startboundary;
+         ContentStringStream.Position := 0;
+         If Not vBinaryEvent Then
+          Begin
+           Try
+            mb := TStringStream.Create(''); //{$IFNDEF FPC}{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+            try
+             mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
+                         ContentStringStream.Position := 0;
+             mb.Position := 0;
+             If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+              Begin
+               msgEnd   := False;
+               boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
+               startboundary := '--' + boundary;
+               Repeat
+                tmp := ReadLnFromStream(ContentStringStream, -1, True);
+               Until tmp = startboundary;
+              End;
+            finally
+             if Assigned(mb) then
+              FreeAndNil(mb);
+            end;
+           Except
            End;
-         Finally
-          if Assigned(mb) then
-           FreeAndNil(mb);
-         End;
-        Except
-        End;
+          End;
         If (ContentStringStream.Size > 0) And (boundary <> '') Then
          Begin
           Try
@@ -2541,7 +2544,7 @@ Begin
               TRESTDWDataUtils.ParseBodyBinToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
              Else If (vBinaryEvent) Then
               Begin
-               If (pos('--', TStringStream(ms).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+               If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
                 Begin
                  msgEnd   := False;
                  {$IFNDEF FPC}
@@ -2819,23 +2822,23 @@ Begin
                       {$ENDIF}Then
               Begin
                If vEncoding = esUtf8 Then
-                TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(ms).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                Else
-                TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
               End
              Else
               Begin
                If vEncoding = esUtf8 Then
                 Begin
-                 TRESTDWDataUtils.ParseDWParamsURL(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                 TRESTDWDataUtils.ParseDWParamsURL(utf8decode(TStringStream(ms).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                  if DWParams.ItemsString['undefined'] = nil then
-                  TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                  TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(ms).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End
                Else
                 Begin
-                 TRESTDWDataUtils.ParseDWParamsURL(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                 TRESTDWDataUtils.ParseDWParamsURL(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                  if DWParams.ItemsString['undefined'] = nil then
-                  TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                  TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End;
               End;
              {Fim alteração feita por Tiago Istuque - 28/12/2018}
