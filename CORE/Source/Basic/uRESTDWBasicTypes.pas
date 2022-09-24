@@ -26,100 +26,74 @@ unit uRESTDWBasicTypes;
 Interface
 
 Uses
- uRESTDWConsts, FMTBcd, uRESTDWEncodeClass, uRESTDWCharset,
- {$IFDEF FPC}
-  SysUtils,  Classes, Db, uRESTDWComponentBase
- {$ELSE}
-  {$if CompilerVersion > 24} // Delphi 2010 pra cima
-   System.SysUtils, System.Classes, Data.DB, uRESTDWComponentBase
-  {$ELSE}
-   SysUtils, Classes, Db, DbTables, uRESTDWComponentBase
-  {$IFEND}
- {$ENDIF}
- {$IFDEF FPC}
-   , uRESTDWDataset
-  {$IFDEF RESTDWLAZDRIVER}
-   , memds
-  {$ENDIF}
-  {$IFDEF RESTDWUNIDACMEM}
-  , DADump, UniDump, VirtualTable, MemDS
-  {$ENDIF}
- {$ELSE}
-    , uRESTDWDataset
-   {$IFDEF RESTDWCLIENTDATASET}
-    ,  DBClient
-   {$ENDIF}
-   {$IFDEF RESTDWUNIDACMEM}
-   , DADump, UniDump, VirtualTable, MemDS
-   {$ENDIF}
-   {$IFDEF RESTKBMMEMTABLE}
-    , kbmmemtable
-   {$ENDIF}
+  {$IFDEF RESTDWLAZDRIVER}memds,{$ENDIF}
+  {$IFDEF RESTDWUNIDACMEM}DADump, UniDump, VirtualTable, MemDS,{$ENDIF}
+  {$IFDEF RESTDWCLIENTDATASET}DBClient,{$ENDIF}
+  {$IFDEF RESTKBMMEMTABLE}kbmmemtable,{$ENDIF}
+  {$IFNDEF FPC}
+  {$if CompilerVersion < 24}DbTables,{$IFEND}
    {$IF CompilerVersion > 22} // Delphi 2010 pra cima
     {$IFDEF RESTDWFDMEMTABLE}
-     , FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
-     FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-     FireDAC.Comp.DataSet, FireDAC.Comp.Client
-     {$IFNDEF FPC}
-      {$IF CompilerVersion > 26} // Delphi XE6 pra cima
-       , FireDAC.Stan.StorageBin
-      {$IFEND}
-     {$ENDIF}
+    FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+    FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+    FireDAC.Comp.DataSet, FireDAC.Comp.Client,
+    {$IF CompilerVersion > 26}FireDAC.Stan.StorageBin,{$IFEND}
     {$ENDIF}
     {$IFDEF RESTDWADMEMTABLE}
-     , uADStanIntf, uADStanOption, uADStanParam,
+     uADStanIntf, uADStanOption, uADStanParam,
      uADStanError, uADPhysIntf, uADDAptIntf,
-     uADCompDataSet, uADCompClient
-     {$IFNDEF FPC}
-      {$IF CompilerVersion > 26} // Delphi XE6 pra cima
-       , uADStanStorageBin
-      {$IFEND}
-     {$ENDIF}
+     uADCompDataSet, uADCompClient,
+    {$IF CompilerVersion > 26}uADStanStorageBin,{$IFEND}
     {$ENDIF}
    {$IFEND}
- {$ENDIF};
+  {$ENDIF}
+  SysUtils,  Classes, Db, FMTBcd,
+  uRESTDWComponentBase, uRESTDWDataset, uRESTDWConsts, uRESTDWEncodeClass,
+  uRESTDWCharset, uRESTDWMimeTypes
+
+ ;
 
  Const
   dwftColor       = Integer(255);
   RESTDWHexPrefix = '0x';
 {Supported types}
-  dwftString          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftString);
-  dwftSmallint        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftSmallint);
-  dwftInteger         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftInteger);
-  dwftWord            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftWord);
-  dwftBoolean         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftBoolean);
-  dwftFloat           = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftFloat);
-  dwftCurrency        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftCurrency);
-  dwftBCD             = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftBCD);
-  dwftDate            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftDate);
-  dwftTime            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftTime);
-  dwftDateTime        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftDateTime);
-  dwftBytes           = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftBytes);
-  dwftVarBytes        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftVarBytes);
-  dwftAutoInc         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftAutoInc);
-  dwftBlob            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftBlob);
-  dwftMemo            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftMemo);
-  dwftGraphic         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftGraphic);
-  dwftFmtMemo         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftFmtMemo);
-  dwftParadoxOle      = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftParadoxOle);
-  dwftDBaseOle        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftDBaseOle);
-  dwftTypedBinary     = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftTypedBinary);
-  dwftFixedChar       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftFixedChar);
-  dwftWideString      = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftWideString);
-  dwftLargeint        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftLargeint);
-  dwftOraBlob         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftOraBlob);
-  dwftOraClob         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftOraClob);
-  dwftVariant         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftVariant);
-  dwftInterface       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftInterface);
-  dwftIDispatch       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftIDispatch);
-  dwftGuid            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftGuid);
-  dwftTimeStamp       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftTimeStamp);
-  dwftFMTBcd          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftFMTBcd);
+  dwftString          = Integer(DB.ftString);
+  dwftSmallint        = Integer(DB.ftSmallint);
+  dwftInteger         = Integer(DB.ftInteger);
+  dwftWord            = Integer(DB.ftWord);
+  dwftBoolean         = Integer(DB.ftBoolean);
+  dwftFloat           = Integer(DB.ftFloat);
+  dwftCurrency        = Integer(DB.ftCurrency);
+  dwftBCD             = Integer(DB.ftBCD);
+  dwftDate            = Integer(DB.ftDate);
+  dwftTime            = Integer(DB.ftTime);
+  dwftDateTime        = Integer(DB.ftDateTime);
+  dwftBytes           = Integer(DB.ftBytes);
+  dwftVarBytes        = Integer(DB.ftVarBytes);
+  dwftAutoInc         = Integer(DB.ftAutoInc);
+  dwftBlob            = Integer(DB.ftBlob);
+  dwftMemo            = Integer(DB.ftMemo);
+  dwftGraphic         = Integer(DB.ftGraphic);
+  dwftFmtMemo         = Integer(DB.ftFmtMemo);
+  dwftParadoxOle      = Integer(DB.ftParadoxOle);
+  dwftDBaseOle        = Integer(DB.ftDBaseOle);
+  dwftTypedBinary     = Integer(DB.ftTypedBinary);
+  dwftFixedChar       = Integer(DB.ftFixedChar);
+  dwftWideString      = Integer(DB.ftWideString);
+  dwftLargeint        = Integer(DB.ftLargeint);
+  dwftOraBlob         = Integer(DB.ftOraBlob);
+  dwftOraClob         = Integer(DB.ftOraClob);
+  dwftVariant         = Integer(DB.ftVariant);
+  dwftInterface       = Integer(DB.ftInterface);
+  dwftIDispatch       = Integer(DB.ftIDispatch);
+  dwftGuid            = Integer(DB.ftGuid);
+  dwftTimeStamp       = Integer(DB.ftTimeStamp);
+  dwftFMTBcd          = Integer(DB.ftFMTBcd);
   {$IFDEF COMPILER10_UP}
-  dwftFixedWideChar   = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftFixedWideChar);
-  dwftWideMemo        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftWideMemo);
-  dwftOraTimeStamp    = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftOraTimeStamp);
-  dwftOraInterval     = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftOraInterval);
+  dwftFixedWideChar   = Integer(DB.ftFixedWideChar);
+  dwftWideMemo        = Integer(DB.ftWideMemo);
+  dwftOraTimeStamp    = Integer(DB.ftOraTimeStamp);
+  dwftOraInterval     = Integer(DB.ftOraInterval);
   {$ELSE}
   dwftFixedWideChar   = Integer(38);
   dwftWideMemo        = Integer(39);
@@ -127,13 +101,13 @@ Uses
   dwftOraInterval     = Integer(41);
   {$ENDIF}
   {$IFDEF COMPILER14_UP}
-  dwftLongWord        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftLongWord); //42
-  dwftShortint        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftShortint); //43
-  dwftByte            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftByte); //44
-  dwftExtended        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftExtended); //45
-  dwftStream          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftStream); //48
-  dwftTimeStampOffset = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftTimeStampOffset); //49
-  dwftSingle          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftSingle); //51
+  dwftLongWord        = Integer(DB.ftLongWord); //42
+  dwftShortint        = Integer(DB.ftShortint); //43
+  dwftByte            = Integer(DB.ftByte); //44
+  dwftExtended        = Integer(DB.ftExtended); //45
+  dwftStream          = Integer(DB.ftStream); //48
+  dwftTimeStampOffset = Integer(DB.ftTimeStampOffset); //49
+  dwftSingle          = Integer(DB.ftSingle); //51
   {$ELSE}
   dwftLongWord        = Integer(42);
   dwftShortint        = Integer(43);
@@ -145,18 +119,18 @@ Uses
   {$ENDIF}
 
   {Unsupported types}
-  dwftUnknown         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftUnknown);
-  dwftCursor          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftCursor);
-  dwftADT             = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftADT);
-  dwftArray           = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftArray);
-  dwftReference       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftReference);
-  dwftDataSet         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftDataSet);
+  dwftUnknown         = Integer(DB.ftUnknown);
+  dwftCursor          = Integer(DB.ftCursor);
+  dwftADT             = Integer(DB.ftADT);
+  dwftArray           = Integer(DB.ftArray);
+  dwftReference       = Integer(DB.ftReference);
+  dwftDataSet         = Integer(DB.ftDataSet);
   {Unknown newest types for support in future}
 
   {$IFDEF COMPILER14_UP}
-  dwftConnection      = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftConnection); //46
-  dwftParams          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftParams); //47
-  dwftObject          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 23}Data.{$IFEND}{$ENDIF}DB.ftObject); //50
+  dwftConnection      = Integer(DB.ftConnection); //46
+  dwftParams          = Integer(DB.ftParams); //47
+  dwftObject          = Integer(DB.ftObject); //50
   {$ENDIF}
   {$IFDEF REGION}{$ENDREGION}{$ENDIF}
  {$IFDEF COMPILER10_UP}
@@ -282,30 +256,6 @@ Uses
   TResultErro = Record
    Status,
    MessageText: String;
- End;
-
- Type
-  TMimeTable = Class(TObject)
-  Protected
-   FLoadTypesFromOS : Boolean;
-   FOnBuildCache    : TNotifyEvent;
-   FMIMEList,
-   FFileExt         : TStrings;
-   Procedure BuildDefaultCache;Virtual;
-  Public
-   Procedure BuildCache;       Virtual;
-   Procedure AddMimeType      (Const Ext, MIMEType : String;
-                               Const ARaiseOnError : Boolean = True);
-   Function  GetFileMIMEType  (Const AFileName     : String) : String;
-   Function  GetDefaultFileExt(Const MIMEType      : String) : String;
-   Procedure LoadFromStrings  (Const AStrings      : TStrings;
-                               Const MimeSeparator : Char    = '=');
-   Procedure SaveToStrings    (Const AStrings      : TStrings;
-                               Const MimeSeparator : Char    = '=');
-   Constructor Create         (Const AutoFill      : Boolean = True); Reintroduce; Virtual;
-   Destructor  Destroy;        Override;
-   Property    OnBuildCache    : TNotifyEvent Read FOnBuildCache    Write FOnBuildCache;
-   Property    LoadTypesFromOS : Boolean      Read FLoadTypesFromOS Write FLoadTypesFromOS;
  End;
 
  Type
@@ -2371,642 +2321,6 @@ Begin
  New(vItem);
  vItem^ := Item;
  Result := TList(Self).Add(vItem);
-End;
-
-Procedure TMimeTable.LoadFromStrings(Const AStrings      : TStrings;
-                                     Const MimeSeparator : Char = '=');    {Do not Localize}
-Var
- I, P   : Integer;
- S, Ext : String;
-Begin
-InitializeStrings;
- Assert(AStrings <> nil);
- FFileExt.Clear;
- FMIMEList.Clear;
- For I := 0 To AStrings.Count - 1 Do
-  Begin
-   S := AStrings[I];
-   For P := InitStrPos To Length(S) - FinalStrPos Do
-    Begin
-     If S[P] = MimeSeparator Then
-      Begin
-       Ext := LowerCase(Copy(S, 1, P - 1));
-       AddMimeType(Ext, Copy(S, P + 1, MaxInt), False);
-       Break;
-      End;
-    End;
-  End;
-End;
-
-Procedure TMimeTable.SaveToStrings(Const AStrings      : TStrings;
-                                   Const MimeSeparator : Char);
-Var
- I : Integer;
-Begin
- Assert(AStrings <> nil);
- AStrings.BeginUpdate;
- Try
-  AStrings.Clear;
-  For I := 0 To FFileExt.Count - 1 Do
-   AStrings.Add(FFileExt[I] + MimeSeparator + FMIMEList[I]);
- Finally
-  AStrings.EndUpdate;
- End;
-End;
-
-Function TMimeTable.GetDefaultFileExt(Const MIMEType : String) : String;
-Var
- Index     : Integer;
- LMimeType : String;
-Begin
- LMimeType := LowerCase(MIMEType);
- Index     := FMIMEList.IndexOf(LMimeType);
- If Index = -1 Then
-  Begin
-   BuildCache;
-   Index := FMIMEList.IndexOf(LMIMEType);
-  End;
- If Index <> -1 Then
-  Result := FFileExt[Index]
- Else
-  Result := '';    {Do not Localize}
-End;
-
-Function TMimeTable.GetFileMIMEType(Const AFileName : String) : String;
-Var
- Index : Integer;
- LExt  : String;
-Begin
- LExt  := LowerCase(ExtractFileExt(AFileName));
- Index := FFileExt.IndexOf(LExt);
- If Index = -1 Then
-  Begin
-   BuildCache;
-   Index := FFileExt.IndexOf(LExt);
-  End;
- If Index <> -1 Then
-  Result := FMIMEList[Index]
- Else
-  Result := 'application/octet-stream' {do not localize}
-End;
-
-Procedure TMimeTable.AddMimeType(Const Ext,
-                                 MIMEType            : String;
-                                 Const ARaiseOnError : Boolean = True);
-Var
- LExt,
- LMIMEType : String;
-Begin
- { Check and fix extension }
- LExt := Lowercase(Ext);
- If Length(LExt) = 0 Then
-  Begin
-   If ARaiseOnError Then
-    Raise Exception.Create(cMIMETypeEmpty);
-   Exit;
-  End;
-  { Check and fix MIMEType }
- LMIMEType := Lowercase(MIMEType);
- If Length(LMIMEType) = 0 Then
-  Begin
-   If ARaiseOnError Then
-    Raise Exception.Create(cMIMETypeEmpty);
-   Exit;
-  End;
- If LExt[1] <> '.' Then
-  LExt := '.' + LExt;      {do not localize}
- { Check list }
- If FFileExt.IndexOf(LExt) = -1 Then
-  Begin
-   FFileExt.Add(LExt);
-   FMIMEList.Add(LMIMEType);
-  End
- Else
-  Begin
-   If ARaiseOnError Then
-    Raise Exception.Create(cMIMETypeAlreadyExists);
-   Exit;
-  End;
-End;
-
-Procedure TMimeTable.BuildCache;
-Begin
- If Assigned(FOnBuildCache) Then
-  FOnBuildCache(Self)
- Else
-  Begin
-   If FFileExt.Count = 0 Then
-    BuildDefaultCache;
-  End;
-End;
-
-Procedure TMimeTable.BuildDefaultCache;
-Var
- LKeys : TStringList;
- Procedure FillMimeTable(Const AMIMEList   : TStrings;
-                         Const ALoadFromOS : Boolean = True);
- {$IFNDEF FPC}
- {$IFDEF WINDOWS}
- Var
-  reg     : TRegistry;
-  KeyList : TStringList;
-  i       : Integer;
-  s, LExt : String;
- {$ENDIF}
- {$ENDIF}
- Begin
-  If Not Assigned(AMIMEList) Then
-   Exit;
-  If AMIMEList.Count > 0     Then
-   Exit;
-  { Animation }
-  AMIMEList.Add('.nml=animation/narrative');    {Do not Localize}
-  { Audio }
-  AMIMEList.Add('.aac=audio/mp4');
-  AMIMEList.Add('.aif=audio/x-aiff');    {Do not Localize}
-  AMIMEList.Add('.aifc=audio/x-aiff');    {Do not Localize}
-  AMIMEList.Add('.aiff=audio/x-aiff');    {Do not Localize}
-  AMIMEList.Add('.au=audio/basic');    {Do not Localize}
-  AMIMEList.Add('.gsm=audio/x-gsm');    {Do not Localize}
-  AMIMEList.Add('.kar=audio/midi');    {Do not Localize}
-  AMIMEList.Add('.m3u=audio/mpegurl');    {Do not Localize}
-  AMIMEList.Add('.m4a=audio/x-mpg');    {Do not Localize}
-  AMIMEList.Add('.mid=audio/midi');    {Do not Localize}
-  AMIMEList.Add('.midi=audio/midi');    {Do not Localize}
-  AMIMEList.Add('.mpega=audio/x-mpg');    {Do not Localize}
-  AMIMEList.Add('.mp2=audio/x-mpg');    {Do not Localize}
-  AMIMEList.Add('.mp3=audio/x-mpg');    {Do not Localize}
-  AMIMEList.Add('.mpga=audio/x-mpg');    {Do not Localize}
-  AMIMEList.Add('.m3u=audio/x-mpegurl');    {Do not Localize}
-  AMIMEList.Add('.pls=audio/x-scpls');   {Do not Localize}
-  AMIMEList.Add('.qcp=audio/vnd.qcelp');    {Do not Localize}
-  AMIMEList.Add('.ra=audio/x-realaudio');    {Do not Localize}
-  AMIMEList.Add('.ram=audio/x-pn-realaudio');    {Do not Localize}
-  AMIMEList.Add('.rm=audio/x-pn-realaudio');    {Do not Localize}
-  AMIMEList.Add('.sd2=audio/x-sd2');    {Do not Localize}
-  AMIMEList.Add('.sid=audio/prs.sid');   {Do not Localize}
-  AMIMEList.Add('.snd=audio/basic');   {Do not Localize}
-  AMIMEList.Add('.wav=audio/x-wav');    {Do not Localize}
-  AMIMEList.Add('.wax=audio/x-ms-wax');    {Do not Localize}
-  AMIMEList.Add('.wma=audio/x-ms-wma');    {Do not Localize}
-  AMIMEList.Add('.mjf=audio/x-vnd.AudioExplosion.MjuiceMediaFile');    {Do not Localize}
-  { Image }
-  AMIMEList.Add('.art=image/x-jg');    {Do not Localize}
-  AMIMEList.Add('.bmp=image/bmp');    {Do not Localize}
-  AMIMEList.Add('.cdr=image/x-coreldraw');    {Do not Localize}
-  AMIMEList.Add('.cdt=image/x-coreldrawtemplate');    {Do not Localize}
-  AMIMEList.Add('.cpt=image/x-corelphotopaint');    {Do not Localize}
-  AMIMEList.Add('.djv=image/vnd.djvu');    {Do not Localize}
-  AMIMEList.Add('.djvu=image/vnd.djvu');    {Do not Localize}
-  AMIMEList.Add('.gif=image/gif');    {Do not Localize}
-  AMIMEList.Add('.ief=image/ief');    {Do not Localize}
-  AMIMEList.Add('.ico=image/x-icon');    {Do not Localize}
-  AMIMEList.Add('.jng=image/x-jng');    {Do not Localize}
-  AMIMEList.Add('.jpg=image/jpeg');    {Do not Localize}
-  AMIMEList.Add('.jpeg=image/jpeg');    {Do not Localize}
-  AMIMEList.Add('.jpe=image/jpeg');    {Do not Localize}
-  AMIMEList.Add('.pat=image/x-coreldrawpattern');   {Do not Localize}
-  AMIMEList.Add('.pcx=image/pcx');    {Do not Localize}
-  AMIMEList.Add('.pbm=image/x-portable-bitmap');    {Do not Localize}
-  AMIMEList.Add('.pgm=image/x-portable-graymap');    {Do not Localize}
-  AMIMEList.Add('.pict=image/x-pict');    {Do not Localize}
-  AMIMEList.Add('.png=image/x-png');    {Do not Localize}
-  AMIMEList.Add('.pnm=image/x-portable-anymap');    {Do not Localize}
-  AMIMEList.Add('.pntg=image/x-macpaint');    {Do not Localize}
-  AMIMEList.Add('.ppm=image/x-portable-pixmap');    {Do not Localize}
-  AMIMEList.Add('.psd=image/x-psd');    {Do not Localize}
-  AMIMEList.Add('.qtif=image/x-quicktime');    {Do not Localize}
-  AMIMEList.Add('.ras=image/x-cmu-raster');    {Do not Localize}
-  AMIMEList.Add('.rf=image/vnd.rn-realflash');    {Do not Localize}
-  AMIMEList.Add('.rgb=image/x-rgb');    {Do not Localize}
-  AMIMEList.Add('.rp=image/vnd.rn-realpix');    {Do not Localize}
-  AMIMEList.Add('.sgi=image/x-sgi');    {Do not Localize}
-  AMIMEList.Add('.svg=image/svg+xml');    {Do not Localize}
-  AMIMEList.Add('.svgz=image/svg+xml');    {Do not Localize}
-  AMIMEList.Add('.targa=image/x-targa');    {Do not Localize}
-  AMIMEList.Add('.tif=image/x-tiff');    {Do not Localize}
-  AMIMEList.Add('.wbmp=image/vnd.wap.wbmp');    {Do not Localize}
-  AMIMEList.Add('.webp=image/webp'); {Do not localize}
-  AMIMEList.Add('.xbm=image/xbm');    {Do not Localize}
-  AMIMEList.Add('.xbm=image/x-xbitmap');    {Do not Localize}
-  AMIMEList.Add('.xpm=image/x-xpixmap');    {Do not Localize}
-  AMIMEList.Add('.xwd=image/x-xwindowdump');    {Do not Localize}
-  { Text }
-  AMIMEList.Add('.323=text/h323');    {Do not Localize}
-  AMIMEList.Add('.xml=text/xml');    {Do not Localize}
-  AMIMEList.Add('.uls=text/iuls');    {Do not Localize}
-  AMIMEList.Add('.txt=text/plain');    {Do not Localize}
-  AMIMEList.Add('.rtx=text/richtext');    {Do not Localize}
-  AMIMEList.Add('.wsc=text/scriptlet');    {Do not Localize}
-  AMIMEList.Add('.rt=text/vnd.rn-realtext');    {Do not Localize}
-  AMIMEList.Add('.htt=text/webviewhtml');    {Do not Localize}
-  AMIMEList.Add('.htc=text/x-component');    {Do not Localize}
-  AMIMEList.Add('.vcf=text/x-vcard');    {Do not Localize}
-  { Video }
-  AMIMEList.Add('.asf=video/x-ms-asf');    {Do not Localize}
-  AMIMEList.Add('.asx=video/x-ms-asf');    {Do not Localize}
-  AMIMEList.Add('.avi=video/x-msvideo');    {Do not Localize}
-  AMIMEList.Add('.dl=video/dl');    {Do not Localize}
-  AMIMEList.Add('.dv=video/dv');  {Do not Localize}
-  AMIMEList.Add('.flc=video/flc');    {Do not Localize}
-  AMIMEList.Add('.fli=video/fli');    {Do not Localize}
-  AMIMEList.Add('.gl=video/gl');    {Do not Localize}
-  AMIMEList.Add('.lsf=video/x-la-asf');    {Do not Localize}
-  AMIMEList.Add('.lsx=video/x-la-asf');    {Do not Localize}
-  AMIMEList.Add('.mng=video/x-mng');    {Do not Localize}
-  AMIMEList.Add('.mp2=video/mpeg');    {Do not Localize}
-  AMIMEList.Add('.mp3=video/mpeg');    {Do not Localize}
-  AMIMEList.Add('.mp4=video/mpeg');    {Do not Localize}
-  AMIMEList.Add('.mpeg=video/x-mpeg2a');    {Do not Localize}
-  AMIMEList.Add('.mpa=video/mpeg');    {Do not Localize}
-  AMIMEList.Add('.mpe=video/mpeg');    {Do not Localize}
-  AMIMEList.Add('.mpg=video/mpeg');    {Do not Localize}
-  AMIMEList.Add('.ogv=video/ogg');    {Do not Localize}
-  AMIMEList.Add('.moov=video/quicktime');     {Do not Localize}
-  AMIMEList.Add('.mov=video/quicktime');    {Do not Localize}
-  AMIMEList.Add('.mxu=video/vnd.mpegurl');   {Do not Localize}
-  AMIMEList.Add('.qt=video/quicktime');    {Do not Localize}
-  AMIMEList.Add('.qtc=video/x-qtc'); {Do not loccalize}
-  AMIMEList.Add('.rv=video/vnd.rn-realvideo');    {Do not Localize}
-  AMIMEList.Add('.ivf=video/x-ivf');    {Do not Localize}
-  AMIMEList.Add('.webm=video/webm');    {Do not Localize}
-  AMIMEList.Add('.wm=video/x-ms-wm');    {Do not Localize}
-  AMIMEList.Add('.wmp=video/x-ms-wmp');    {Do not Localize}
-  AMIMEList.Add('.wmv=video/x-ms-wmv');    {Do not Localize}
-  AMIMEList.Add('.wmx=video/x-ms-wmx');    {Do not Localize}
-  AMIMEList.Add('.wvx=video/x-ms-wvx');    {Do not Localize}
-  AMIMEList.Add('.rms=video/vnd.rn-realvideo-secure');    {Do not Localize}
-  AMIMEList.Add('.asx=video/x-ms-asf-plugin');    {Do not Localize}
-  AMIMEList.Add('.movie=video/x-sgi-movie');    {Do not Localize}
-  { Application }
-  AMIMEList.Add('.7z=application/x-7z-compressed');   {Do not Localize}
-  AMIMEList.Add('.a=application/x-archive');   {Do not Localize}
-  AMIMEList.Add('.aab=application/x-authorware-bin');    {Do not Localize}
-  AMIMEList.Add('.aam=application/x-authorware-map');    {Do not Localize}
-  AMIMEList.Add('.aas=application/x-authorware-seg');    {Do not Localize}
-  AMIMEList.Add('.abw=application/x-abiword');    {Do not Localize}
-  AMIMEList.Add('.ace=application/x-ace-compressed');  {Do not Localize}
-  AMIMEList.Add('.ai=application/postscript');    {Do not Localize}
-  AMIMEList.Add('.alz=application/x-alz-compressed');    {Do not Localize}
-  AMIMEList.Add('.ani=application/x-navi-animation');   {Do not Localize}
-  AMIMEList.Add('.arj=application/x-arj');    {Do not Localize}
-  AMIMEList.Add('.asf=application/vnd.ms-asf');    {Do not Localize}
-  AMIMEList.Add('.bat=application/x-msdos-program');    {Do not Localize}
-  AMIMEList.Add('.bcpio=application/x-bcpio');    {Do not Localize}
-  AMIMEList.Add('.boz=application/x-bzip2');     {Do not Localize}
-  AMIMEList.Add('.bz=application/x-bzip');
-  AMIMEList.Add('.bz2=application/x-bzip2');    {Do not Localize}
-  AMIMEList.Add('.cab=application/vnd.ms-cab-compressed');    {Do not Localize}
-  AMIMEList.Add('.cat=application/vnd.ms-pki.seccat');    {Do not Localize}
-  AMIMEList.Add('.ccn=application/x-cnc');    {Do not Localize}
-  AMIMEList.Add('.cco=application/x-cocoa');    {Do not Localize}
-  AMIMEList.Add('.cdf=application/x-cdf');    {Do not Localize}
-  AMIMEList.Add('.cer=application/x-x509-ca-cert');    {Do not Localize}
-  AMIMEList.Add('.chm=application/vnd.ms-htmlhelp');    {Do not Localize}
-  AMIMEList.Add('.chrt=application/vnd.kde.kchart');    {Do not Localize}
-  AMIMEList.Add('.cil=application/vnd.ms-artgalry');    {Do not Localize}
-  AMIMEList.Add('.class=application/java-vm');    {Do not Localize}
-  AMIMEList.Add('.com=application/x-msdos-program');    {Do not Localize}
-  AMIMEList.Add('.clp=application/x-msclip');    {Do not Localize}
-  AMIMEList.Add('.cpio=application/x-cpio');    {Do not Localize}
-  AMIMEList.Add('.cpt=application/mac-compactpro');    {Do not Localize}
-  AMIMEList.Add('.cqk=application/x-calquick');    {Do not Localize}
-  AMIMEList.Add('.crd=application/x-mscardfile');    {Do not Localize}
-  AMIMEList.Add('.crl=application/pkix-crl');    {Do not Localize}
-  AMIMEList.Add('.csh=application/x-csh');    {Do not Localize}
-  AMIMEList.Add('.dar=application/x-dar');    {Do not Localize}
-  AMIMEList.Add('.dbf=application/x-dbase');    {Do not Localize}
-  AMIMEList.Add('.dcr=application/x-director');    {Do not Localize}
-  AMIMEList.Add('.deb=application/x-debian-package');    {Do not Localize}
-  AMIMEList.Add('.dir=application/x-director');    {Do not Localize}
-  AMIMEList.Add('.dist=vnd.apple.installer+xml');    {Do not Localize}
-  AMIMEList.Add('.distz=vnd.apple.installer+xml');    {Do not Localize}
-  AMIMEList.Add('.dll=application/x-msdos-program');    {Do not Localize}
-  AMIMEList.Add('.dmg=application/x-apple-diskimage');    {Do not Localize}
-  AMIMEList.Add('.doc=application/msword');    {Do not Localize}
-  AMIMEList.Add('.dot=application/msword');    {Do not Localize}
-  AMIMEList.Add('.dvi=application/x-dvi');    {Do not Localize}
-  AMIMEList.Add('.dxr=application/x-director');    {Do not Localize}
-  AMIMEList.Add('.ebk=application/x-expandedbook');    {Do not Localize}
-  AMIMEList.Add('.eps=application/postscript');    {Do not Localize}
-  AMIMEList.Add('.evy=application/envoy');    {Do not Localize}
-  AMIMEList.Add('.exe=application/x-msdos-program');    {Do not Localize}
-  AMIMEList.Add('.fdf=application/vnd.fdf');    {Do not Localize}
-  AMIMEList.Add('.fif=application/fractals');    {Do not Localize}
-  AMIMEList.Add('.flm=application/vnd.kde.kivio');    {Do not Localize}
-  AMIMEList.Add('.fml=application/x-file-mirror-list');    {Do not Localize}
-  AMIMEList.Add('.gzip=application/x-gzip');  {Do not Localize}
-  AMIMEList.Add('.gnumeric=application/x-gnumeric');    {Do not Localize}
-  AMIMEList.Add('.gtar=application/x-gtar');    {Do not Localize}
-  AMIMEList.Add('.gz=application/x-gzip');    {Do not Localize}
-  AMIMEList.Add('.hdf=application/x-hdf');    {Do not Localize}
-  AMIMEList.Add('.hlp=application/winhlp');    {Do not Localize}
-  AMIMEList.Add('.hpf=application/x-icq-hpf');    {Do not Localize}
-  AMIMEList.Add('.hqx=application/mac-binhex40');    {Do not Localize}
-  AMIMEList.Add('.hta=application/hta');    {Do not Localize}
-  AMIMEList.Add('.ims=application/vnd.ms-ims');    {Do not Localize}
-  AMIMEList.Add('.ins=application/x-internet-signup');    {Do not Localize}
-  AMIMEList.Add('.iii=application/x-iphone');    {Do not Localize}
-  AMIMEList.Add('.iso=application/x-iso9660-image');    {Do not Localize}
-  AMIMEList.Add('.jar=application/java-archive');    {Do not Localize}
-  AMIMEList.Add('.karbon=application/vnd.kde.karbon');    {Do not Localize}
-  AMIMEList.Add('.kfo=application/vnd.kde.kformula');    {Do not Localize}
-  AMIMEList.Add('.kon=application/vnd.kde.kontour');    {Do not Localize}
-  AMIMEList.Add('.kpr=application/vnd.kde.kpresenter');    {Do not Localize}
-  AMIMEList.Add('.kpt=application/vnd.kde.kpresenter');    {Do not Localize}
-  AMIMEList.Add('.kwd=application/vnd.kde.kword');    {Do not Localize}
-  AMIMEList.Add('.kwt=application/vnd.kde.kword');    {Do not Localize}
-  AMIMEList.Add('.latex=application/x-latex');    {Do not Localize}
-  AMIMEList.Add('.lha=application/x-lzh');    {Do not Localize}
-  AMIMEList.Add('.lcc=application/fastman');    {Do not Localize}
-  AMIMEList.Add('.lrm=application/vnd.ms-lrm');    {Do not Localize}
-  AMIMEList.Add('.lz=application/x-lzip');    {Do not Localize}
-  AMIMEList.Add('.lzh=application/x-lzh');    {Do not Localize}
-  AMIMEList.Add('.lzma=application/x-lzma');  {Do not Localize}
-  AMIMEList.Add('.lzo=application/x-lzop'); {Do not Localize}
-  AMIMEList.Add('.lzx=application/x-lzx');
-  AMIMEList.Add('.m13=application/x-msmediaview');    {Do not Localize}
-  AMIMEList.Add('.m14=application/x-msmediaview');    {Do not Localize}
-  AMIMEList.Add('.mpp=application/vnd.ms-project');    {Do not Localize}
-  AMIMEList.Add('.mvb=application/x-msmediaview');    {Do not Localize}
-  AMIMEList.Add('.man=application/x-troff-man');    {Do not Localize}
-  AMIMEList.Add('.mdb=application/x-msaccess');    {Do not Localize}
-  AMIMEList.Add('.me=application/x-troff-me');    {Do not Localize}
-  AMIMEList.Add('.ms=application/x-troff-ms');    {Do not Localize}
-  AMIMEList.Add('.msi=application/x-msi');    {Do not Localize}
-  AMIMEList.Add('.mpkg=vnd.apple.installer+xml');    {Do not Localize}
-  AMIMEList.Add('.mny=application/x-msmoney');    {Do not Localize}
-  AMIMEList.Add('.nix=application/x-mix-transfer');    {Do not Localize}
-  AMIMEList.Add('.o=application/x-object');    {Do not Localize}
-  AMIMEList.Add('.oda=application/oda');    {Do not Localize}
-  AMIMEList.Add('.odb=application/vnd.oasis.opendocument.database');    {Do not Localize}
-  AMIMEList.Add('.odc=application/vnd.oasis.opendocument.chart');    {Do not Localize}
-  AMIMEList.Add('.odf=application/vnd.oasis.opendocument.formula');    {Do not Localize}
-  AMIMEList.Add('.odg=application/vnd.oasis.opendocument.graphics');    {Do not Localize}
-  AMIMEList.Add('.odi=application/vnd.oasis.opendocument.image');    {Do not Localize}
-  AMIMEList.Add('.odm=application/vnd.oasis.opendocument.text-master');    {Do not Localize}
-  AMIMEList.Add('.odp=application/vnd.oasis.opendocument.presentation');    {Do not Localize}
-  AMIMEList.Add('.ods=application/vnd.oasis.opendocument.spreadsheet');    {Do not Localize}
-  AMIMEList.Add('.ogg=application/ogg');    {Do not Localize}
-  AMIMEList.Add('.odt=application/vnd.oasis.opendocument.text');    {Do not Localize}
-  AMIMEList.Add('.otg=application/vnd.oasis.opendocument.graphics-template');    {Do not Localize}
-  AMIMEList.Add('.oth=application/vnd.oasis.opendocument.text-web');    {Do not Localize}
-  AMIMEList.Add('.otp=application/vnd.oasis.opendocument.presentation-template');    {Do not Localize}
-  AMIMEList.Add('.ots=application/vnd.oasis.opendocument.spreadsheet-template');    {Do not Localize}
-  AMIMEList.Add('.ott=application/vnd.oasis.opendocument.text-template');    {Do not Localize}
-  AMIMEList.Add('.p10=application/pkcs10');    {Do not Localize}
-  AMIMEList.Add('.p12=application/x-pkcs12');    {Do not Localize}
-  AMIMEList.Add('.p7b=application/x-pkcs7-certificates');    {Do not Localize}
-  AMIMEList.Add('.p7m=application/pkcs7-mime');    {Do not Localize}
-  AMIMEList.Add('.p7r=application/x-pkcs7-certreqresp');    {Do not Localize}
-  AMIMEList.Add('.p7s=application/pkcs7-signature');    {Do not Localize}
-  AMIMEList.Add('.package=application/vnd.autopackage');    {Do not Localize}
-  AMIMEList.Add('.pfr=application/font-tdpfr');    {Do not Localize}
-  AMIMEList.Add('.pkg=vnd.apple.installer+xml');    {Do not Localize}
-  AMIMEList.Add('.pdf=application/pdf');    {Do not Localize}
-  AMIMEList.Add('.pko=application/vnd.ms-pki.pko');    {Do not Localize}
-  AMIMEList.Add('.pl=application/x-perl');    {Do not Localize}
-  AMIMEList.Add('.pnq=application/x-icq-pnq');    {Do not Localize}
-  AMIMEList.Add('.pot=application/mspowerpoint');    {Do not Localize}
-  AMIMEList.Add('.pps=application/mspowerpoint');    {Do not Localize}
-  AMIMEList.Add('.ppt=application/mspowerpoint');    {Do not Localize}
-  AMIMEList.Add('.ppz=application/mspowerpoint');    {Do not Localize}
-  AMIMEList.Add('.ps=application/postscript');    {Do not Localize}
-  AMIMEList.Add('.pub=application/x-mspublisher');    {Do not Localize}
-  AMIMEList.Add('.qpw=application/x-quattropro');    {Do not Localize}
-  AMIMEList.Add('.qtl=application/x-quicktimeplayer');    {Do not Localize}
-  AMIMEList.Add('.rar=application/rar');    {Do not Localize}
-  AMIMEList.Add('.rdf=application/rdf+xml');    {Do not Localize}
-  AMIMEList.Add('.rjs=application/vnd.rn-realsystem-rjs');    {Do not Localize}
-  AMIMEList.Add('.rm=application/vnd.rn-realmedia');    {Do not Localize}
-  AMIMEList.Add('.rmf=application/vnd.rmf');    {Do not Localize}
-  AMIMEList.Add('.rmp=application/vnd.rn-rn_music_package');    {Do not Localize}
-  AMIMEList.Add('.rmx=application/vnd.rn-realsystem-rmx');    {Do not Localize}
-  AMIMEList.Add('.rnx=application/vnd.rn-realplayer');    {Do not Localize}
-  AMIMEList.Add('.rpm=application/x-redhat-package-manager');
-  AMIMEList.Add('.rsml=application/vnd.rn-rsml');    {Do not Localize}
-  AMIMEList.Add('.rtsp=application/x-rtsp');    {Do not Localize}
-  AMIMEList.Add('.rss=application/rss+xml');    {Do not Localize}
-  AMIMEList.Add('.scm=application/x-icq-scm');    {Do not Localize}
-  AMIMEList.Add('.ser=application/java-serialized-object');    {Do not Localize}
-  AMIMEList.Add('.scd=application/x-msschedule');    {Do not Localize}
-  AMIMEList.Add('.sda=application/vnd.stardivision.draw');    {Do not Localize}
-  AMIMEList.Add('.sdc=application/vnd.stardivision.calc');    {Do not Localize}
-  AMIMEList.Add('.sdd=application/vnd.stardivision.impress');    {Do not Localize}
-  AMIMEList.Add('.sdp=application/x-sdp');    {Do not Localize}
-  AMIMEList.Add('.setpay=application/set-payment-initiation');    {Do not Localize}
-  AMIMEList.Add('.setreg=application/set-registration-initiation');    {Do not Localize}
-  AMIMEList.Add('.sh=application/x-sh');    {Do not Localize}
-  AMIMEList.Add('.shar=application/x-shar');    {Do not Localize}
-  AMIMEList.Add('.shw=application/presentations');    {Do not Localize}
-  AMIMEList.Add('.sit=application/x-stuffit');    {Do not Localize}
-  AMIMEList.Add('.sitx=application/x-stuffitx');  {Do not localize}
-  AMIMEList.Add('.skd=application/x-koan');    {Do not Localize}
-  AMIMEList.Add('.skm=application/x-koan');    {Do not Localize}
-  AMIMEList.Add('.skp=application/x-koan');    {Do not Localize}
-  AMIMEList.Add('.skt=application/x-koan');    {Do not Localize}
-  AMIMEList.Add('.smf=application/vnd.stardivision.math');    {Do not Localize}
-  AMIMEList.Add('.smi=application/smil');    {Do not Localize}
-  AMIMEList.Add('.smil=application/smil');    {Do not Localize}
-  AMIMEList.Add('.spl=application/futuresplash');    {Do not Localize}
-  AMIMEList.Add('.ssm=application/streamingmedia');    {Do not Localize}
-  AMIMEList.Add('.sst=application/vnd.ms-pki.certstore');    {Do not Localize}
-  AMIMEList.Add('.stc=application/vnd.sun.xml.calc.template');    {Do not Localize}
-  AMIMEList.Add('.std=application/vnd.sun.xml.draw.template');    {Do not Localize}
-  AMIMEList.Add('.sti=application/vnd.sun.xml.impress.template');    {Do not Localize}
-  AMIMEList.Add('.stl=application/vnd.ms-pki.stl');    {Do not Localize}
-  AMIMEList.Add('.stw=application/vnd.sun.xml.writer.template');    {Do not Localize}
-  AMIMEList.Add('.svi=application/softvision');    {Do not Localize}
-  AMIMEList.Add('.sv4cpio=application/x-sv4cpio');    {Do not Localize}
-  AMIMEList.Add('.sv4crc=application/x-sv4crc');    {Do not Localize}
-  AMIMEList.Add('.swf=application/x-shockwave-flash');    {Do not Localize}
-  AMIMEList.Add('.swf1=application/x-shockwave-flash');    {Do not Localize}
-  AMIMEList.Add('.sxc=application/vnd.sun.xml.calc');    {Do not Localize}
-  AMIMEList.Add('.sxi=application/vnd.sun.xml.impress');    {Do not Localize}
-  AMIMEList.Add('.sxm=application/vnd.sun.xml.math');    {Do not Localize}
-  AMIMEList.Add('.sxw=application/vnd.sun.xml.writer');    {Do not Localize}
-  AMIMEList.Add('.sxg=application/vnd.sun.xml.writer.global');    {Do not Localize}
-  AMIMEList.Add('.t=application/x-troff');    {Do not Localize}
-  AMIMEList.Add('.tar=application/x-tar');    {Do not Localize}
-  AMIMEList.Add('.tcl=application/x-tcl');    {Do not Localize}
-  AMIMEList.Add('.tex=application/x-tex');    {Do not Localize}
-  AMIMEList.Add('.texi=application/x-texinfo');    {Do not Localize}
-  AMIMEList.Add('.texinfo=application/x-texinfo');    {Do not Localize}
-  AMIMEList.Add('.tbz=application/x-bzip-compressed-tar');   {Do not Localize}
-  AMIMEList.Add('.tbz2=application/x-bzip-compressed-tar');   {Do not Localize}
-  AMIMEList.Add('.tgz=application/x-compressed-tar');    {Do not Localize}
-  AMIMEList.Add('.tlz=application/x-lzma-compressed-tar');    {Do not Localize}
-  AMIMEList.Add('.tr=application/x-troff');    {Do not Localize}
-  AMIMEList.Add('.trm=application/x-msterminal');    {Do not Localize}
-  AMIMEList.Add('.troff=application/x-troff');    {Do not Localize}
-  AMIMEList.Add('.tsp=application/dsptype');    {Do not Localize}
-  AMIMEList.Add('.torrent=application/x-bittorrent');    {Do not Localize}
-  AMIMEList.Add('.ttz=application/t-time');    {Do not Localize}
-  AMIMEList.Add('.txz=application/x-xz-compressed-tar'); {Do not localize}
-  AMIMEList.Add('.udeb=application/x-debian-package');    {Do not Localize}
-  AMIMEList.Add('.uin=application/x-icq');    {Do not Localize}
-  AMIMEList.Add('.urls=application/x-url-list');    {Do not Localize}
-  AMIMEList.Add('.ustar=application/x-ustar');    {Do not Localize}
-  AMIMEList.Add('.vcd=application/x-cdlink');    {Do not Localize}
-  AMIMEList.Add('.vor=application/vnd.stardivision.writer');    {Do not Localize}
-  AMIMEList.Add('.vsl=application/x-cnet-vsl');    {Do not Localize}
-  AMIMEList.Add('.wcm=application/vnd.ms-works');    {Do not Localize}
-  AMIMEList.Add('.wb1=application/x-quattropro');    {Do not Localize}
-  AMIMEList.Add('.wb2=application/x-quattropro');    {Do not Localize}
-  AMIMEList.Add('.wb3=application/x-quattropro');    {Do not Localize}
-  AMIMEList.Add('.wdb=application/vnd.ms-works');    {Do not Localize}
-  AMIMEList.Add('.wks=application/vnd.ms-works');    {Do not Localize}
-  AMIMEList.Add('.wmd=application/x-ms-wmd');    {Do not Localize}
-  AMIMEList.Add('.wms=application/x-ms-wms');    {Do not Localize}
-  AMIMEList.Add('.wmz=application/x-ms-wmz');    {Do not Localize}
-  AMIMEList.Add('.wp5=application/wordperfect5.1');    {Do not Localize}
-  AMIMEList.Add('.wpd=application/wordperfect');    {Do not Localize}
-  AMIMEList.Add('.wpl=application/vnd.ms-wpl');    {Do not Localize}
-  AMIMEList.Add('.wps=application/vnd.ms-works');    {Do not Localize}
-  AMIMEList.Add('.wri=application/x-mswrite');    {Do not Localize}
-  AMIMEList.Add('.xfdf=application/vnd.adobe.xfdf');    {Do not Localize}
-  AMIMEList.Add('.xls=application/x-msexcel');    {Do not Localize}
-  AMIMEList.Add('.xlb=application/x-msexcel');     {Do not Localize}
-  AMIMEList.Add('.xpi=application/x-xpinstall');    {Do not Localize}
-  AMIMEList.Add('.xps=application/vnd.ms-xpsdocument');    {Do not Localize}
-  AMIMEList.Add('.xsd=application/vnd.sun.xml.draw');    {Do not Localize}
-  AMIMEList.Add('.xul=application/vnd.mozilla.xul+xml');    {Do not Localize}
-  AMIMEList.Add('.z=application/x-compress');    {Do not Localize}
-  AMIMEList.Add('.zoo=application/x-zoo');    {Do not Localize}
-  AMIMEList.Add('.zip=application/x-zip-compressed');    {Do not Localize}
-  { WAP }
-  AMIMEList.Add('.wbmp=image/vnd.wap.wbmp');    {Do not Localize}
-  AMIMEList.Add('.wml=text/vnd.wap.wml');    {Do not Localize}
-  AMIMEList.Add('.wmlc=application/vnd.wap.wmlc');    {Do not Localize}
-  AMIMEList.Add('.wmls=text/vnd.wap.wmlscript');    {Do not Localize}
-  AMIMEList.Add('.wmlsc=application/vnd.wap.wmlscriptc');    {Do not Localize}
-  //of course, we have to add this :-).
-  AMIMEList.Add('.asm=text/x-asm');   {Do not Localize}
-  AMIMEList.Add('.p=text/x-pascal');    {Do not Localize}
-  AMIMEList.Add('.pas=text/x-pascal');    {Do not Localize}
-  AMIMEList.Add('.cs=text/x-csharp'); {Do not Localize}
-  AMIMEList.Add('.c=text/x-csrc');    {Do not Localize}
-  AMIMEList.Add('.c++=text/x-c++src');    {Do not Localize}
-  AMIMEList.Add('.cpp=text/x-c++src');    {Do not Localize}
-  AMIMEList.Add('.cxx=text/x-c++src');    {Do not Localize}
-  AMIMEList.Add('.cc=text/x-c++src');    {Do not Localize}
-  AMIMEList.Add('.h=text/x-chdr'); {Do not localize}
-  AMIMEList.Add('.h++=text/x-c++hdr');    {Do not Localize}
-  AMIMEList.Add('.hpp=text/x-c++hdr');    {Do not Localize}
-  AMIMEList.Add('.hxx=text/x-c++hdr');    {Do not Localize}
-  AMIMEList.Add('.hh=text/x-c++hdr');    {Do not Localize}
-  AMIMEList.Add('.java=text/x-java');    {Do not Localize}
-  { WEB }
-  AMIMEList.Add('.css=text/css');    {Do not Localize}
-  AMIMEList.Add('.js=text/javascript');    {Do not Localize}
-  AMIMEList.Add('.htm=text/html');    {Do not Localize}
-  AMIMEList.Add('.html=text/html');    {Do not Localize}
-  AMIMEList.Add('.xhtml=application/xhtml+xml'); {Do not localize}
-  AMIMEList.Add('.xht=application/xhtml+xml'); {Do not localize}
-  AMIMEList.Add('.rdf=application/rdf+xml'); {Do not localize}
-  AMIMEList.Add('.rss=application/rss+xml'); {Do not localize}
-  AMIMEList.Add('.ls=text/javascript');    {Do not Localize}
-  AMIMEList.Add('.mocha=text/javascript');    {Do not Localize}
-  AMIMEList.Add('.shtml=server-parsed-html');    {Do not Localize}
-  AMIMEList.Add('.xml=text/xml');    {Do not Localize}
-  AMIMEList.Add('.sgm=text/sgml');    {Do not Localize}
-  AMIMEList.Add('.sgml=text/sgml');    {Do not Localize}
-  { Message }
-  AMIMEList.Add('.mht=message/rfc822');    {Do not Localize}
-  If not ALoadFromOS Then
-   Exit;
-  {$IFNDEF FPC}
-  {$IFDEF WINDOWS}
-  // Build the file type/MIME type map
-  Reg := TRegistry.Create;
-  Try
-   KeyList := TStringList.create;
-   Try
-    Reg.RootKey := HKEY_CLASSES_ROOT;
-    If Reg.OpenKeyReadOnly('\') Then
-     Begin  {do not localize}
-      Reg.GetKeyNames(KeyList);
-      Reg.Closekey;
-     End;
-    // get a list of registered extentions
-    For i := 0 To KeyList.Count - 1 Do
-     Begin
-      LExt := KeyList[i];
-      If TextStartsWith(LExt, '.') Then
-       Begin  {do not localize}
-        If Reg.OpenKeyReadOnly(LExt) Then
-         Begin
-          s := Reg.ReadString('Content Type');  {do not localize}
-          If Length(s) > 0 Then
-           AMIMEList.Values[Lowercase(LExt)] := Lowercase(s);
-          Reg.CloseKey;
-         End;
-       End;
-      If Reg.OpenKeyReadOnly('\MIME\Database\Content Type') Then
-       Begin {do not localize}
-        // get a list of registered MIME types
-        KeyList.Clear;
-        Reg.GetKeyNames(KeyList);
-        Reg.CloseKey;
-        For i := 0 To KeyList.Count - 1 Do
-         Begin
-          If Reg.OpenKeyReadOnly('\MIME\Database\Content Type\' + KeyList[i]) Then
-           Begin {do not localize}
-            LExt := Lowercase(Reg.ReadString('Extension'));  {do not localize}
-            If Length(LExt) > 0 Then
-             Begin
-              If LExt[1] <> '.' Then
-               LExt := '.' + LExt; {do not localize}
-              AMIMEList.Values[LExt] := Lowercase(KeyList[i]);
-             End;
-            Reg.CloseKey;
-           End;
-         End;
-       End;
-     End;
-   Finally
-    KeyList.Free;
-   End;
-  Finally
-   Reg.Free;
-  End;
-  {$ENDIF}
-  {$ENDIF}
-  {$IFDEF UNIX}
-  {$IFNDEF FPC}
-    //Aqui codigo se for compilado Linux no Delphi
-  {$ELSE}
-//   LoadMIME('/etc/mime.types', AMIMEList);                   {do not localize}
-//   LoadMIME('/etc/htdig/mime.types', AMIMEList);             {do not localize}
-//   LoadMIME('/etc/usr/share/webmin/mime.types', AMIMEList);  {do not localize}
-   {$ENDIF}
-  {$ENDIF}
- End;
-Begin
- LKeys := TStringList.Create;
- Try
-  FillMIMETable(LKeys, LoadTypesFromOS);
-  LoadFromStrings(LKeys);
- Finally
-  FreeAndNil(LKeys);
- End;
-End;
-
-Constructor TMimeTable.Create(Const AutoFill : Boolean);
-Begin
- Inherited Create;
- FLoadTypesFromOS := True;
- FFileExt := TStringList.Create;
- FMIMEList := TStringList.Create;
- If AutoFill Then
-  BuildCache;
-End;
-
-Destructor TMimeTable.Destroy;
-Begin
- FreeAndNil(FMIMEList);
- FreeAndNil(FFileExt);
- Inherited Destroy;
 End;
 
 end.
