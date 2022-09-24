@@ -27,12 +27,14 @@ uses
   uRESTDWJSON, uRESTDWJSONInterface, uRESTDWSerialize, uRESTDWDatamodule, 
   uRESTDWJSONViewer, uRESTDWDataset, uRESTDWExprParser, 
   uRESTDWFieldSourceEditor, uRESTDWSqlEditor, uRESTDWUpdSqlEditor, 
-  utemplateproglaz, uRESTDWBufferBase, uRESTDWMimeTypes, LazarusPackageIntf;
+  utemplateproglaz, uRESTDWBufferBase, uRESTDWMimeTypes, uRESTDWDesignReg, 
+  LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
+  RegisterUnit('uRESTDWDesignReg', @uRESTDWDesignReg.Register);
 end;
 
 initialization
