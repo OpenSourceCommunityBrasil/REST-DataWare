@@ -115,6 +115,8 @@ contains
   DWDCPcast256 in '..\..\Source\Basic\Crypto\DWDCPcast256.pas',
   uRESTDWDataUtils in '..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas',
   uRESTDWBasicComponent in '..\..\Source\Basic\uRESTDWBasicComponent.pas',
-  uRESTDWComponentBase in '..\..\Source\Basic\uRESTDWComponentBase.pas';
+  uRESTDWComponentBase in '..\..\Source\Basic\uRESTDWComponentBase.pas',
+  uRESTDWMimeTypes in '..\..\Source\libs\uRESTDWMimeTypes.pas',
+  uRESTDWBufferBase in '..\..\Source\Basic\uRESTDWBufferBase.pas';
 
 End.

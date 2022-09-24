@@ -34,7 +34,7 @@ Uses
    , System.NetEncoding, IOUtils
   {$IFEND}
  {$ENDIF},
- uRESTDWEncodeClass, uRESTDWCharset;
+ uRESTDWEncodeClass, uRESTDWCharset, uRESTDWMimeTypes;
 
  Const
   B64Table      = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';

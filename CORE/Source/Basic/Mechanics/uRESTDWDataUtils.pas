@@ -33,7 +33,7 @@ Uses
   StringBuilderUnit,
   {$ENDIF} uRESTDWTools, uRESTDWConsts,
   DateUtils, uRESTDWMD5, uRESTDWBasicTypes,
-  uRESTDWEncodeClass, uRESTDWCharset, uRESTDWParams;
+  uRESTDWEncodeClass, uRESTDWCharset, uRESTDWParams, uRESTDWMimeTypes;
 
 Type
  TRESTDWAuthOptionTypes = (rdwOATBasic, rdwOATBearer, rdwOATToken);
