@@ -247,6 +247,8 @@
         <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasicComponent.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWComponentBase.pas"/>
+        <DCCReference Include="..\..\Source\libs\uRESTDWMimeTypes.pas"/>
+        <DCCReference Include="..\..\Source\Basic\uRESTDWBufferBase.pas"/>
         <RcItem Include="..\..\Images\icons\dwIcon.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>DW</ResourceId>
