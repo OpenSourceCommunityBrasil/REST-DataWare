@@ -14,7 +14,7 @@
       </SearchPaths>
     </CompilerOptions>
     <License Value="GPL - 3.0"/>
-    <Version Major="2" Release="6"/>
+    <Version Major="2" Release="7"/>
     <Files>
       <Item>
         <Filename Value="RestDatawareShellservices.lrs"/>
