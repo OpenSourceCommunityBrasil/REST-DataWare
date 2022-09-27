@@ -420,7 +420,7 @@ Var
 
 implementation
 
-Uses uRESTDWBasicTypes, uRESTDWTools, uRESTDWMimeTypes;
+Uses uRESTDWBasicTypes, uRESTDWTools;
 
 Function iif(ATest       : Boolean;
              Const ATrue  : Integer;

@@ -247,8 +247,6 @@
         <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasicComponent.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWComponentBase.pas"/>
-        <DCCReference Include="..\..\Source\libs\uRESTDWMimeTypes.pas"/>
-        <DCCReference Include="..\..\Source\Basic\uRESTDWBufferBase.pas"/>
         <RcItem Include="..\..\Images\icons\dwIcon.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>DW</ResourceId>
@@ -468,13 +466,8 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployClass Name="iPad_Notification40">
-                    <Platform Name="iOSDevice64">
-                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                <DeployClass Name="AdditionalDebugSymbols">
+                    <Platform Name="OSX32">
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
