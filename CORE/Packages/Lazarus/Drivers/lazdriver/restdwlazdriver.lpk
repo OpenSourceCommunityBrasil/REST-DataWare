@@ -10,8 +10,7 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\..\..\..\Source\Includes"/>
-        <Libraries Value="..\..\static\$(TargetCPU)-$(TargetOS)"/>
-        <OtherUnitFiles Value="..\..\..\..\Source\libs;..\..\..\..\Source\libs\JSON;..\..\..\..\Source\Database_Drivers"/>
+        <OtherUnitFiles Value="..\..\..\..\Source\Database_Drivers"/>
         <UnitOutputDirectory Value="..\..\..\..\Source\compiledlaz"/>
       </SearchPaths>
     </CompilerOptions>

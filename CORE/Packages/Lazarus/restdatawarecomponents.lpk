@@ -9,8 +9,8 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <IncludeFiles Value="..\..\Source;..\..\Source\static\$(TargetCPU)-$(TargetOS);..\..\Source\Basic\Crypto\Ciphers;..\..\Source\Includes;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\SQLEditor;..\..\Source\Basic\Crypto;..\..\Source\Wizards\lazarus"/>
-        <OtherUnitFiles Value="..\..\Source;..\..\Source\libs;..\..\Source\libs\JSON;..\..\Source\Wizards\lazarus;..\..\Source\static\$(TargetCPU)-$(TargetOS);..\..\Source\Basic;..\..\Source\Basic\Crypto;..\..\Source\Basic\Crypto\Ciphers;..\..\Source\Basic\Crypto\Hashes;..\..\Source\Basic\Dialogs;..\..\Source\Basic\Mechanics;..\..\Source\Consts;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\Memdataset;..\..\Source\Plugins\SQLEditor"/>
+        <IncludeFiles Value="..\..\Source;..\..\Source\Basic\Crypto;..\..\Source\Includes;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\SQLEditor;..\..\Source\Wizards\lazarus"/>
+        <OtherUnitFiles Value="..\..\Source;..\..\Source\Basic;..\..\Source\Basic\Crypto;..\..\Source\Basic\Dialogs;..\..\Source\Basic\Mechanics;..\..\Source\Consts;..\..\Source\utils;..\..\Source\utils\JSON;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\Memdataset;..\..\Source\Plugins\SQLEditor;..\..\Source\Wizards\lazarus"/>
         <UnitOutputDirectory Value="..\..\Source\compiledlaz"/>
       </SearchPaths>
       <CodeGeneration>
@@ -38,329 +38,329 @@
         <Type Value="LRS"/>
       </Item1>
       <Item2>
-        <Filename Value="uRESTDWDesignReg.pas"/>
-        <HasRegisterProc Value="True"/>
-        <UnitName Value="uRESTDWDesignReg"/>
-      </Item2>
-      <Item3>
         <Filename Value="..\..\Source\Basic\PropertyPersist.pas"/>
         <UnitName Value="PropertyPersist"/>
-      </Item3>
-      <Item4>
+      </Item2>
+      <Item3>
         <Filename Value="..\..\Source\Basic\uRESTDWBasic.pas"/>
         <UnitName Value="uRESTDWBasic"/>
-      </Item4>
-      <Item5>
+      </Item3>
+      <Item4>
         <Filename Value="..\..\Source\Basic\uRESTDWBasicClass.pas"/>
         <UnitName Value="uRESTDWBasicClass"/>
-      </Item5>
-      <Item6>
+      </Item4>
+      <Item5>
         <Filename Value="..\..\Source\Basic\uRESTDWBasicComponent.pas"/>
         <UnitName Value="uRESTDWBasicComponent"/>
-      </Item6>
-      <Item7>
+      </Item5>
+      <Item6>
         <Filename Value="..\..\Source\Basic\uRESTDWBasicDB.pas"/>
         <UnitName Value="uRESTDWBasicDB"/>
-      </Item7>
-      <Item8>
+      </Item6>
+      <Item7>
         <Filename Value="..\..\Source\Basic\uRESTDWBasicTypes.pas"/>
         <UnitName Value="uRESTDWBasicTypes"/>
-      </Item8>
-      <Item9>
+      </Item7>
+      <Item8>
         <Filename Value="..\..\Source\Basic\uRESTDWBufferDb.pas"/>
         <UnitName Value="uRESTDWBufferDb"/>
-      </Item9>
-      <Item10>
+      </Item8>
+      <Item9>
         <Filename Value="..\..\Source\Basic\uRESTDWComponentBase.pas"/>
         <UnitName Value="uRESTDWComponentBase"/>
-      </Item10>
-      <Item11>
+      </Item9>
+      <Item10>
         <Filename Value="..\..\Source\Basic\uRESTDWComponentEvents.pas"/>
         <UnitName Value="uRESTDWComponentEvents"/>
-      </Item11>
-      <Item12>
+      </Item10>
+      <Item11>
         <Filename Value="..\..\Source\Basic\uRESTDWEncodeClass.pas"/>
         <UnitName Value="uRESTDWEncodeClass"/>
-      </Item12>
-      <Item13>
+      </Item11>
+      <Item12>
         <Filename Value="..\..\Source\Basic\uRESTDWFileBuffer.pas"/>
         <UnitName Value="uRESTDWFileBuffer"/>
-      </Item13>
-      <Item14>
+      </Item12>
+      <Item13>
         <Filename Value="..\..\Source\Basic\uRESTDWMasterDetailData.pas"/>
         <UnitName Value="uRESTDWMasterDetailData"/>
-      </Item14>
-      <Item15>
+      </Item13>
+      <Item14>
         <Filename Value="..\..\Source\Basic\uRESTDWParams.pas"/>
         <UnitName Value="uRESTDWParams"/>
-      </Item15>
-      <Item16>
+      </Item14>
+      <Item15>
         <Filename Value="..\..\Source\Basic\uRESTDWPoolermethod.pas"/>
         <UnitName Value="uRESTDWPoolermethod"/>
-      </Item16>
-      <Item17>
+      </Item15>
+      <Item16>
         <Filename Value="..\..\Source\Basic\uRESTDWResponseTranslator.pas"/>
         <UnitName Value="uRESTDWResponseTranslator"/>
-      </Item17>
-      <Item18>
+      </Item16>
+      <Item17>
         <Filename Value="..\..\Source\Basic\uRESTDWServerContext.pas"/>
         <UnitName Value="uRESTDWServerContext"/>
-      </Item18>
-      <Item19>
+      </Item17>
+      <Item18>
         <Filename Value="..\..\Source\Basic\uRESTDWServerEvents.pas"/>
         <UnitName Value="uRESTDWServerEvents"/>
-      </Item19>
-      <Item20>
+      </Item18>
+      <Item19>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWAttachment.pas"/>
         <UnitName Value="uRESTDWAttachment"/>
-      </Item20>
-      <Item21>
+      </Item19>
+      <Item20>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWAttachmentFile.pas"/>
         <UnitName Value="uRESTDWAttachmentFile"/>
-      </Item21>
-      <Item22>
+      </Item20>
+      <Item21>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWBuffer.pas"/>
         <UnitName Value="uRESTDWBuffer"/>
-      </Item22>
-      <Item23>
+      </Item21>
+      <Item22>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWCoder.pas"/>
         <UnitName Value="uRESTDWCoder"/>
-      </Item23>
-      <Item24>
+      </Item22>
+      <Item23>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWCoder3to4.pas"/>
         <UnitName Value="uRESTDWCoder3to4"/>
-      </Item24>
-      <Item25>
+      </Item23>
+      <Item24>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWCoderBinHex4.pas"/>
         <UnitName Value="uRESTDWCoderBinHex4"/>
-      </Item25>
-      <Item26>
+      </Item24>
+      <Item25>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWCoderHeader.pas"/>
         <UnitName Value="uRESTDWCoderHeader"/>
-      </Item26>
-      <Item27>
+      </Item25>
+      <Item26>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWCoderMIME.pas"/>
         <UnitName Value="uRESTDWCoderMIME"/>
-      </Item27>
-      <Item28>
+      </Item26>
+      <Item27>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWCoderQuotedPrintable.pas"/>
         <UnitName Value="uRESTDWCoderQuotedPrintable"/>
-      </Item28>
-      <Item29>
+      </Item27>
+      <Item28>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas"/>
         <UnitName Value="uRESTDWDataUtils"/>
-      </Item29>
-      <Item30>
+      </Item28>
+      <Item29>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWException.pas"/>
         <UnitName Value="uRESTDWException"/>
-      </Item30>
-      <Item31>
+      </Item29>
+      <Item30>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWHeaderCoderBase.pas"/>
         <UnitName Value="uRESTDWHeaderCoderBase"/>
-      </Item31>
-      <Item32>
+      </Item30>
+      <Item31>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWHeaderList.pas"/>
         <UnitName Value="uRESTDWHeaderList"/>
-      </Item32>
-      <Item33>
+      </Item31>
+      <Item32>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWIOHandler.pas"/>
         <UnitName Value="uRESTDWIOHandler"/>
-      </Item33>
-      <Item34>
+      </Item32>
+      <Item33>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWIOHandlerStream.pas"/>
         <UnitName Value="uRESTDWIOHandlerStream"/>
-      </Item34>
-      <Item35>
+      </Item33>
+      <Item34>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWMessage.pas"/>
         <UnitName Value="uRESTDWMessage"/>
-      </Item35>
-      <Item36>
+      </Item34>
+      <Item35>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWMessageClient.pas"/>
         <UnitName Value="uRESTDWMessageClient"/>
-      </Item36>
-      <Item37>
+      </Item35>
+      <Item36>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWMessageCoder.pas"/>
         <UnitName Value="uRESTDWMessageCoder"/>
-      </Item37>
-      <Item38>
+      </Item36>
+      <Item37>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWMessageCoderBinHex4.pas"/>
         <UnitName Value="uRESTDWMessageCoderBinHex4"/>
-      </Item38>
-      <Item39>
+      </Item37>
+      <Item38>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWMessageCoderMIME.pas"/>
         <UnitName Value="uRESTDWMessageCoderMIME"/>
-      </Item39>
-      <Item40>
+      </Item38>
+      <Item39>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWMessageCoderQuotedPrintable.pas"/>
         <UnitName Value="uRESTDWMessageCoderQuotedPrintable"/>
-      </Item40>
-      <Item41>
+      </Item39>
+      <Item40>
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWMessageParts.pas"/>
         <UnitName Value="uRESTDWMessageParts"/>
-      </Item41>
-      <Item42>
+      </Item40>
+      <Item41>
         <Filename Value="..\..\Source\Basic\Crypto\DWDCPbase64.pas"/>
         <UnitName Value="DWDCPbase64"/>
-      </Item42>
-      <Item43>
+      </Item41>
+      <Item42>
         <Filename Value="..\..\Source\Basic\Crypto\DWDCPblockciphers.pas"/>
         <UnitName Value="DWDCPblockciphers"/>
-      </Item43>
-      <Item44>
+      </Item42>
+      <Item43>
         <Filename Value="..\..\Source\Basic\Crypto\DWDCPcast256.inc"/>
         <Type Value="Include"/>
-      </Item44>
-      <Item45>
+      </Item43>
+      <Item44>
         <Filename Value="..\..\Source\Basic\Crypto\DWDCPcast256.pas"/>
         <UnitName Value="DWDCPcast256"/>
-      </Item45>
-      <Item46>
+      </Item44>
+      <Item45>
         <Filename Value="..\..\Source\Basic\Crypto\DWDCPconst.pas"/>
         <UnitName Value="DWDCPconst"/>
-      </Item46>
-      <Item47>
+      </Item45>
+      <Item46>
         <Filename Value="..\..\Source\Basic\Crypto\DWDCPcrypt2.pas"/>
         <UnitName Value="DWDCPcrypt2"/>
-      </Item47>
-      <Item48>
+      </Item46>
+      <Item47>
         <Filename Value="..\..\Source\Basic\Crypto\DWDCPrijndael.inc"/>
         <Type Value="Include"/>
-      </Item48>
-      <Item49>
+      </Item47>
+      <Item48>
         <Filename Value="..\..\Source\Basic\Crypto\DWDCPrijndael.pas"/>
         <UnitName Value="DWDCPrijndael"/>
-      </Item49>
-      <Item50>
+      </Item48>
+      <Item49>
         <Filename Value="..\..\Source\Basic\Crypto\DWDCPsha256.pas"/>
         <UnitName Value="DWDCPsha256"/>
-      </Item50>
-      <Item51>
+      </Item49>
+      <Item50>
         <Filename Value="..\..\Source\Basic\Crypto\DWDCPtypes.pas"/>
         <UnitName Value="DWDCPtypes"/>
-      </Item51>
-      <Item52>
+      </Item50>
+      <Item51>
         <Filename Value="..\..\Source\Consts\uRESTDWConsts.pas"/>
         <UnitName Value="uRESTDWConsts"/>
+      </Item51>
+      <Item52>
+        <Filename Value="..\..\Source\Includes\uRESTDW.inc"/>
+        <Type Value="Include"/>
       </Item52>
       <Item53>
-        <Filename Value="..\..\Source\Includes\uRESTDW.inc"/>
+        <Filename Value="..\..\Source\Includes\uRESTDWPlataform.inc"/>
         <Type Value="Include"/>
       </Item53>
       <Item54>
-        <Filename Value="..\..\Source\Includes\uRESTDWPlataform.inc"/>
-        <Type Value="Include"/>
-      </Item54>
-      <Item55>
-        <Filename Value="..\..\Source\libs\StringBuilderUnit.pas"/>
-        <UnitName Value="StringBuilderUnit"/>
-      </Item55>
-      <Item56>
-        <Filename Value="..\..\Source\libs\uRESTDWBase64.pas"/>
-        <UnitName Value="uRESTDWBase64"/>
-      </Item56>
-      <Item57>
-        <Filename Value="..\..\Source\libs\uRESTDWCharset.pas"/>
-        <UnitName Value="uRESTDWCharset"/>
-      </Item57>
-      <Item58>
-        <Filename Value="..\..\Source\libs\uRESTDWDynamic.pas"/>
-        <UnitName Value="uRESTDWDynamic"/>
-      </Item58>
-      <Item59>
-        <Filename Value="..\..\Source\libs\uRESTDWJSONObject.pas"/>
-        <UnitName Value="uRESTDWJSONObject"/>
-      </Item59>
-      <Item60>
-        <Filename Value="..\..\Source\libs\uRESTDWMassiveBuffer.pas"/>
-        <UnitName Value="uRESTDWMassiveBuffer"/>
-      </Item60>
-      <Item61>
-        <Filename Value="..\..\Source\libs\uRESTDWMD5.pas"/>
-        <UnitName Value="uRESTDWMD5"/>
-      </Item61>
-      <Item62>
-        <Filename Value="..\..\Source\libs\uRESTDWTools.pas"/>
-        <UnitName Value="uRESTDWTools"/>
-      </Item62>
-      <Item63>
-        <Filename Value="..\..\Source\libs\uzliblaz.pas"/>
-        <UnitName Value="uZlibLaz"/>
-      </Item63>
-      <Item64>
-        <Filename Value="..\..\Source\libs\JSON\uRESTDWDataJSON.pas"/>
-        <UnitName Value="uRESTDWDataJSON"/>
-      </Item64>
-      <Item65>
-        <Filename Value="..\..\Source\libs\JSON\uRESTDWDynArray.pas"/>
-        <UnitName Value="uRESTDWDynArray"/>
-      </Item65>
-      <Item66>
-        <Filename Value="..\..\Source\libs\JSON\uRESTDWJSON.pas"/>
-        <UnitName Value="uRESTDWJSON"/>
-      </Item66>
-      <Item67>
-        <Filename Value="..\..\Source\libs\JSON\uRESTDWJSONInterface.pas"/>
-        <UnitName Value="uRESTDWJSONInterface"/>
-      </Item67>
-      <Item68>
-        <Filename Value="..\..\Source\libs\JSON\uRESTDWSerialize.pas"/>
-        <UnitName Value="uRESTDWSerialize"/>
-      </Item68>
-      <Item69>
         <Filename Value="..\..\Source\Plugins\DMDados\uRESTDWDatamodule.lfm"/>
         <Type Value="LFM"/>
-      </Item69>
-      <Item70>
+      </Item54>
+      <Item55>
         <Filename Value="..\..\Source\Plugins\DMDados\uRESTDWDatamodule.pas"/>
         <UnitName Value="uRESTDWDatamodule"/>
-      </Item70>
-      <Item71>
+      </Item55>
+      <Item56>
         <Filename Value="..\..\Source\Plugins\JSONViewer\uRESTDWJSONViewer.lfm"/>
         <Type Value="LFM"/>
-      </Item71>
-      <Item72>
+      </Item56>
+      <Item57>
         <Filename Value="..\..\Source\Plugins\JSONViewer\uRESTDWJSONViewer.pas"/>
         <UnitName Value="uRESTDWJSONViewer"/>
-      </Item72>
-      <Item73>
+      </Item57>
+      <Item58>
         <Filename Value="..\..\Source\Plugins\Memdataset\uRESTDWDataset.pas"/>
         <UnitName Value="uRESTDWDataset"/>
-      </Item73>
-      <Item74>
+      </Item58>
+      <Item59>
         <Filename Value="..\..\Source\Plugins\Memdataset\uRESTDWExprParser.pas"/>
         <UnitName Value="uRESTDWExprParser"/>
-      </Item74>
-      <Item75>
+      </Item59>
+      <Item60>
         <Filename Value="..\..\Source\Plugins\SQLEditor\uRESTDWFieldSourceEditor.lfm"/>
         <Type Value="LFM"/>
-      </Item75>
-      <Item76>
+      </Item60>
+      <Item61>
         <Filename Value="..\..\Source\Plugins\SQLEditor\uRESTDWFieldSourceEditor.pas"/>
         <UnitName Value="uRESTDWFieldSourceEditor"/>
-      </Item76>
-      <Item77>
+      </Item61>
+      <Item62>
         <Filename Value="..\..\Source\Plugins\SQLEditor\uRESTDWSqlEditor.lfm"/>
         <Type Value="LFM"/>
-      </Item77>
-      <Item78>
+      </Item62>
+      <Item63>
         <Filename Value="..\..\Source\Plugins\SQLEditor\uRESTDWSqlEditor.pas"/>
         <UnitName Value="uRESTDWSqlEditor"/>
-      </Item78>
-      <Item79>
+      </Item63>
+      <Item64>
         <Filename Value="..\..\Source\Plugins\SQLEditor\uRESTDWUpdSqlEditor.lfm"/>
         <Type Value="LFM"/>
-      </Item79>
-      <Item80>
+      </Item64>
+      <Item65>
         <Filename Value="..\..\Source\Plugins\SQLEditor\uRESTDWUpdSqlEditor.pas"/>
         <UnitName Value="uRESTDWUpdSqlEditor"/>
-      </Item80>
-      <Item81>
+      </Item65>
+      <Item66>
         <Filename Value="..\..\Source\Wizards\lazarus\utemplateproglaz.pas"/>
         <UnitName Value="utemplateproglaz"/>
-      </Item81>
-      <Item82>
+      </Item66>
+      <Item67>
         <Filename Value="..\..\Source\Basic\uRESTDWBufferBase.pas"/>
         <UnitName Value="uRESTDWBufferBase"/>
+      </Item67>
+      <Item68>
+        <Filename Value="..\..\Source\utils\StringBuilderUnit.pas"/>
+        <UnitName Value="StringBuilderUnit"/>
+      </Item68>
+      <Item69>
+        <Filename Value="..\..\Source\utils\uRESTDWBase64.pas"/>
+        <UnitName Value="uRESTDWBase64"/>
+      </Item69>
+      <Item70>
+        <Filename Value="..\..\Source\utils\uRESTDWCharset.pas"/>
+        <UnitName Value="uRESTDWCharset"/>
+      </Item70>
+      <Item71>
+        <Filename Value="..\..\Source\utils\uRESTDWDynamic.pas"/>
+        <UnitName Value="uRESTDWDynamic"/>
+      </Item71>
+      <Item72>
+        <Filename Value="..\..\Source\utils\uRESTDWJSONObject.pas"/>
+        <UnitName Value="uRESTDWJSONObject"/>
+      </Item72>
+      <Item73>
+        <Filename Value="..\..\Source\utils\uRESTDWMassiveBuffer.pas"/>
+        <UnitName Value="uRESTDWMassiveBuffer"/>
+      </Item73>
+      <Item74>
+        <Filename Value="..\..\Source\utils\uRESTDWMD5.pas"/>
+        <UnitName Value="uRESTDWMD5"/>
+      </Item74>
+      <Item75>
+        <Filename Value="..\..\Source\utils\uRESTDWTools.pas"/>
+        <UnitName Value="uRESTDWTools"/>
+      </Item75>
+      <Item76>
+        <Filename Value="..\..\Source\utils\uzliblaz.pas"/>
+        <UnitName Value="uZlibLaz"/>
+      </Item76>
+      <Item77>
+        <Filename Value="..\..\Source\utils\JSON\uRESTDWDataJSON.pas"/>
+        <UnitName Value="uRESTDWDataJSON"/>
+      </Item77>
+      <Item78>
+        <Filename Value="..\..\Source\utils\JSON\uRESTDWDynArray.pas"/>
+        <UnitName Value="uRESTDWDynArray"/>
+      </Item78>
+      <Item79>
+        <Filename Value="..\..\Source\utils\JSON\uRESTDWJSON.pas"/>
+        <UnitName Value="uRESTDWJSON"/>
+      </Item79>
+      <Item80>
+        <Filename Value="..\..\Source\utils\JSON\uRESTDWJSONInterface.pas"/>
+        <UnitName Value="uRESTDWJSONInterface"/>
+      </Item80>
+      <Item81>
+        <Filename Value="..\..\Source\utils\JSON\uRESTDWSerialize.pas"/>
+        <UnitName Value="uRESTDWSerialize"/>
+      </Item81>
+      <Item82>
+        <Filename Value="..\..\Source\Basic\uRESTDWDesignReg.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="uRESTDWDesignReg"/>
       </Item82>
     </Files>
     <CompatibilityMode Value="True"/>

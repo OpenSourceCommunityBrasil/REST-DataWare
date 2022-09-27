@@ -197,20 +197,10 @@
         <DCCReference Include="..\..\Source\Basic\uRESTDWServerContext.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWServerEvents.pas"/>
         <DCCReference Include="..\..\Source\Consts\uRESTDWConsts.pas"/>
-        <DCCReference Include="..\..\Source\Libs\StringBuilderUnit.pas"/>
-        <DCCReference Include="..\..\Source\Libs\uRESTDWCharset.pas"/>
-        <DCCReference Include="..\..\Source\Libs\uRESTDWJSONObject.pas"/>
-        <DCCReference Include="..\..\Source\Libs\uRESTDWMD5.pas"/>
-        <DCCReference Include="..\..\Source\Libs\uRESTDWTools.pas"/>
-        <DCCReference Include="..\..\Source\Libs\uzliblaz.pas"/>
         <DCCReference Include="..\..\Source\Plugins\DMDados\uRESTDWDatamodule.pas">
             <Form>ServerMethodDataModule</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\..\Source\Libs\uRESTDWMassiveBuffer.pas"/>
-        <DCCReference Include="..\..\Source\Libs\JSON\uRESTDWDataJSON.pas"/>
-        <DCCReference Include="..\..\Source\Libs\JSON\uRESTDWJSON.pas"/>
-        <DCCReference Include="..\..\Source\Libs\JSON\uRESTDWJSONInterface.pas"/>
         <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWDataset.pas"/>
         <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWMessageCoderMIME.pas"/>
         <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWException.pas"/>
@@ -242,15 +232,27 @@
         <DCCReference Include="..\..\Source\Basic\uRESTDWResponseTranslator.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasicClass.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWEncodeClass.pas"/>
-        <DCCReference Include="..\..\Source\libs\uRESTDWBase64.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWFileBuffer.pas"/>
-        <DCCReference Include="..\..\Source\libs\uRESTDWDynamic.pas"/>
         <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPrijndael.pas"/>
         <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPsha256.pas"/>
         <DCCReference Include="..\..\Source\Basic\Crypto\DWDCPcast256.pas"/>
         <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasicComponent.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWComponentBase.pas"/>
+        <DCCReference Include="..\..\Source\utils\StringBuilderUnit.pas"/>
+        <DCCReference Include="..\..\Source\utils\uRESTDWBase64.pas"/>
+        <DCCReference Include="..\..\Source\utils\uRESTDWCharset.pas"/>
+        <DCCReference Include="..\..\Source\utils\uRESTDWDynamic.pas"/>
+        <DCCReference Include="..\..\Source\utils\uRESTDWJSONObject.pas"/>
+        <DCCReference Include="..\..\Source\utils\uRESTDWMassiveBuffer.pas"/>
+        <DCCReference Include="..\..\Source\utils\uRESTDWMD5.pas"/>
+        <DCCReference Include="..\..\Source\utils\uRESTDWTools.pas"/>
+        <DCCReference Include="..\..\Source\utils\uzliblaz.pas"/>
+        <DCCReference Include="..\..\Source\utils\JSON\uRESTDWDataJSON.pas"/>
+        <DCCReference Include="..\..\Source\utils\JSON\uRESTDWDynArray.pas"/>
+        <DCCReference Include="..\..\Source\utils\JSON\uRESTDWJSON.pas"/>
+        <DCCReference Include="..\..\Source\utils\JSON\uRESTDWJSONInterface.pas"/>
+        <DCCReference Include="..\..\Source\utils\JSON\uRESTDWSerialize.pas"/>
         <RcItem Include="..\..\Images\icons\dwIcon.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>DW</ResourceId>
@@ -470,6 +472,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>RESTDWCore.bpl</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="OSX32">
                         <Operation>1</Operation>

@@ -9,9 +9,8 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <IncludeFiles Value="..\..\..\..;..\..\..\..\Includes;..\..\..\..\Images\icons\components"/>
-        <Libraries Value="..\..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
-        <OtherUnitFiles Value="..\..\libs;..\..;..\..\libs\JSON;..\..\..\..\Source\Database_Drivers"/>
+        <IncludeFiles Value="..\..\..\..\Images\icons\components"/>
+        <OtherUnitFiles Value="..\..\..\..\Source\Database_Drivers"/>
         <UnitOutputDirectory Value="..\..\..\..\Source\compiledlaz"/>
       </SearchPaths>
       <CodeGeneration>
