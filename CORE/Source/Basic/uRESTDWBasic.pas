@@ -2822,23 +2822,23 @@ Begin
                       {$ENDIF}Then
               Begin
                If vEncoding = esUtf8 Then
-                TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(ms).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                Else
-                TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
               End
              Else
               Begin
                If vEncoding = esUtf8 Then
                 Begin
-                 TRESTDWDataUtils.ParseDWParamsURL(utf8decode(TStringStream(ms).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                 TRESTDWDataUtils.ParseDWParamsURL(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                  if DWParams.ItemsString['undefined'] = nil then
-                  TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(ms).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                  TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End
                Else
                 Begin
-                 TRESTDWDataUtils.ParseDWParamsURL(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                 TRESTDWDataUtils.ParseDWParamsURL(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                  if DWParams.ItemsString['undefined'] = nil then
-                  TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(ms).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+                  TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End;
               End;
              {Fim alteração feita por Tiago Istuque - 28/12/2018}
