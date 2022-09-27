@@ -9,7 +9,7 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <OtherUnitFiles Value="..\..\..\Source\ShellTools\Lazarus;..\..\..\Source\ShellTools"/>
+        <OtherUnitFiles Value="..\..\..\Source\ShellTools"/>
         <UnitOutputDirectory Value="..\..\..\Source\compiledlaz"/>
       </SearchPaths>
     </CompilerOptions>
@@ -19,28 +19,29 @@
       <Item>
         <Filename Value="RestDatawareShellservices.lrs"/>
         <Type Value="LRS"/>
-      </Item>
-      <Item>
+      </Item1>
+      <Item2>
         <Filename Value="..\..\..\Source\ShellTools\uRESTDWShellServicesLazarus.pas"/>
         <UnitName Value="uRESTDWShellServicesLazarus"/>
-      </Item>
-      <Item>
+      </Item2>
+      <Item3>
         <Filename Value="..\..\..\Source\ShellTools\uRESTDWShellServicesRegLazarus.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="uRESTDWShellServicesRegLazarus"/>
-      </Item>
+      </Item3>
     </Files>
-    <RequiredPkgs>
-      <Item>
+    <CompatibilityMode Value="True"/>
+    <RequiredPkgs Count="3">
+      <Item1>
         <PackageName Value="restdatawarecomponents"/>
         <MinVersion Major="2" Valid="True"/>
-      </Item>
-      <Item>
+      </Item1>
+      <Item2>
         <PackageName Value="weblaz"/>
-      </Item>
-      <Item>
+      </Item2>
+      <Item3>
         <PackageName Value="FCL"/>
-      </Item>
+      </Item3>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>
