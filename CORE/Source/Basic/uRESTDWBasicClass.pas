@@ -103,6 +103,12 @@ Type
                         RawHeaders       : Boolean        = False):Integer;Overload;Virtual;
   Function   Post      (AUrl            : String         = '';
                         CustomHeaders   : TStringList    = Nil;
+                        CustomBody      : TStringList    = Nil;
+                        Const AResponse : TStringStream  = Nil;
+                        IgnoreEvents    : Boolean        = False;
+                        RawHeaders      : Boolean        = False):Integer;Overload;Virtual;
+  Function   Post      (AUrl            : String         = '';
+                        CustomHeaders   : TStringList    = Nil;
                         FileName        : String         = '';
                         FileStream      : TStream        = Nil;
                         Const AResponse : TStream        = Nil;
@@ -407,94 +413,104 @@ Begin
  Raise Exception.Create(cMethodNotImplemented);
 End;
 
-Function TRESTDWClientRESTBase.Post(AUrl             : String;
-                                    CustomHeaders    : TStringList;
-                                    Const CustomBody : TStream;
-                                    IgnoreEvents,
-                                    RawHeaders       : Boolean) : Integer;
+Function TRESTDWClientRESTBase.Post  (AUrl             : String;
+                                      CustomHeaders    : TStringList;
+                                      Const CustomBody : TStream;
+                                      IgnoreEvents,
+                                      RawHeaders       : Boolean) : Integer;
 Begin
  Raise Exception.Create(cMethodNotImplemented);
 End;
 
-Function TRESTDWClientRESTBase.Post(AUrl              : String;
-                                    Var AResponseText : String;
-                                    CustomHeaders     : TStringList    = Nil;
-                                    CustomParams      : TStringList    = Nil;
-                                    Const CustomBody  : TStream        = Nil;
-                                    Const AResponse   : TStream        = Nil;
-                                    IgnoreEvents      : Boolean        = False;
-                                    RawHeaders        : Boolean        = False):Integer;
+Function TRESTDWClientRESTBase.Post  (AUrl            : String         = '';
+                                      CustomHeaders   : TStringList    = Nil;
+                                      CustomBody      : TStringList    = Nil;
+                                      Const AResponse : TStringStream  = Nil;
+                                      IgnoreEvents    : Boolean        = False;
+                                      RawHeaders      : Boolean        = False):Integer;
 Begin
  Raise Exception.Create(cMethodNotImplemented);
 End;
 
-Function TRESTDWClientRESTBase.Post(AUrl            : String;
-                                    CustomHeaders   : TStringList;
-                                    FileName        : String;
-                                    FileStream      : TStream;
-                                    Const AResponse : TStream;
-                                    IgnoreEvents,
-                                    RawHeaders      : Boolean) : Integer;
+Function TRESTDWClientRESTBase.Post  (AUrl              : String;
+                                      Var AResponseText : String;
+                                      CustomHeaders     : TStringList    = Nil;
+                                      CustomParams      : TStringList    = Nil;
+                                      Const CustomBody  : TStream        = Nil;
+                                      Const AResponse   : TStream        = Nil;
+                                      IgnoreEvents      : Boolean        = False;
+                                      RawHeaders        : Boolean        = False):Integer;
 Begin
  Raise Exception.Create(cMethodNotImplemented);
 End;
 
-Function TRESTDWClientRESTBase.Post(AUrl            : String;
-                                    CustomHeaders,
-                                    CustomParams    : TStringList;
-                                    FileName        : String;
-                                    FileStream      : TStream;
-                                    Const AResponse : TStream;
-                                    IgnoreEvents,
-                                    RawHeaders      : Boolean): Integer;
+Function TRESTDWClientRESTBase.Post  (AUrl            : String;
+                                      CustomHeaders   : TStringList;
+                                      FileName        : String;
+                                      FileStream      : TStream;
+                                      Const AResponse : TStream;
+                                      IgnoreEvents,
+                                      RawHeaders      : Boolean) : Integer;
 Begin
  Raise Exception.Create(cMethodNotImplemented);
 End;
 
-Function TRESTDWClientRESTBase.Put(AUrl              : String;
-                                   CustomHeaders,
-                                   CustomParams      : TStringList;
-                                   Const CustomBody,
-                                   AResponse         : TStream;
-                                   IgnoreEvents      : Boolean): Integer;
+Function TRESTDWClientRESTBase.Post  (AUrl            : String;
+                                      CustomHeaders,
+                                      CustomParams    : TStringList;
+                                      FileName        : String;
+                                      FileStream      : TStream;
+                                      Const AResponse : TStream;
+                                      IgnoreEvents,
+                                      RawHeaders      : Boolean): Integer;
 Begin
  Raise Exception.Create(cMethodNotImplemented);
 End;
 
-Function TRESTDWClientRESTBase.Put(AUrl            : String;
-                                   CustomHeaders,
-                                   CustomParams    : TStringList;
-                                   FileName        : String;
-                                   FileStream      : TStream;
-                                   Const AResponse : TStream;
-                                   IgnoreEvents    : Boolean) : Integer;
+Function TRESTDWClientRESTBase.Put   (AUrl              : String;
+                                      CustomHeaders,
+                                      CustomParams      : TStringList;
+                                      Const CustomBody,
+                                      AResponse         : TStream;
+                                      IgnoreEvents      : Boolean): Integer;
 Begin
  Raise Exception.Create(cMethodNotImplemented);
 End;
 
-Function TRESTDWClientRESTBase.Put(AUrl            : String;
-                                   CustomHeaders   : TStringList;
-                                   FileName        : String;
-                                   FileStream      : TStream;
-                                   Const AResponse : TStream;
-                                   IgnoreEvents    : Boolean): Integer;
+Function TRESTDWClientRESTBase.Put   (AUrl            : String;
+                                      CustomHeaders,
+                                      CustomParams    : TStringList;
+                                      FileName        : String;
+                                      FileStream      : TStream;
+                                      Const AResponse : TStream;
+                                      IgnoreEvents    : Boolean) : Integer;
 Begin
  Raise Exception.Create(cMethodNotImplemented);
 End;
 
-Function TRESTDWClientRESTBase.Put(AUrl            : String;
-                                   CustomHeaders   : TStringList;
-                                   Const AResponse : TStream;
-                                   IgnoreEvents    : Boolean): Integer;
+Function TRESTDWClientRESTBase.Put   (AUrl            : String;
+                                      CustomHeaders   : TStringList;
+                                      FileName        : String;
+                                      FileStream      : TStream;
+                                      Const AResponse : TStream;
+                                      IgnoreEvents    : Boolean): Integer;
 Begin
  Raise Exception.Create(cMethodNotImplemented);
 End;
 
-Function TRESTDWClientRESTBase.Put(AUrl              : String;
-                                   CustomHeaders     : TStringList;
-                                   Const CustomBody,
-                                   AResponse         : TStream;
-                                   IgnoreEvents      : Boolean): Integer;
+Function TRESTDWClientRESTBase.Put   (AUrl            : String;
+                                      CustomHeaders   : TStringList;
+                                      Const AResponse : TStream;
+                                      IgnoreEvents    : Boolean): Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Put   (AUrl              : String;
+                                      CustomHeaders     : TStringList;
+                                      Const CustomBody,
+                                      AResponse         : TStream;
+                                      IgnoreEvents      : Boolean): Integer;
 Begin
  Raise Exception.Create(cMethodNotImplemented);
 End;
