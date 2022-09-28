@@ -142,7 +142,7 @@ Begin
        {$IF CompilerVersion > 23}
        AResponse.CustomHeaders.AddPair('Access-Control-Allow-Origin','*');
        {$ELSE}
-       AResponse.CustomHeaders.Add('Access-Control-Allow-Origin' + cNameValueSeparator '*');
+       AResponse.CustomHeaders.Add('Access-Control-Allow-Origin' + cNameValueSeparator + '*');
        {$IFEND}
      End;
    End;

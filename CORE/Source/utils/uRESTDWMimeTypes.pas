@@ -567,7 +567,7 @@ var
   KeyList: TStringList;
   I: integer;
   S, LExt: string;
-{$IFEND}
+{$ENDIF}
 begin
 {$IFNDEF MSWindows}
   Exit;
