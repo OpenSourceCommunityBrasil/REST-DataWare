@@ -803,15 +803,27 @@ Uses uRESTDWDatamodule,   uRESTDWPoolermethod,  uRESTDWTools,
      uRESTDWBasicDB,      ZLib;
 
 Procedure SaveLogData(Filename, Content : String);
+{$IF CompilerVersion < 21}
+Var
+  vFileData: TFileStream;
+Begin
+  vFileData := TFileStream.Create(Filename, fmCreate);
+  try
+    vFileData.WriteBuffer(Pointer(Content)^, Length(Content));
+  finally
+    FreeAndNil(vFileData);
+  end;
+{$ELSE}
 Var
  vFileData : TStringStream;
 Begin
  vFileData := TStringStream.Create(Content);
  Try
-  vFileData.SaveToFile(Filename);
+   vFileData.SaveToFile(Filename);
  Finally
   FreeAndNil(vFileData);
  End;
+{$IFEND}
 End;
 
 Function GetParamsReturn(Params : TRESTDWParams) : String;
