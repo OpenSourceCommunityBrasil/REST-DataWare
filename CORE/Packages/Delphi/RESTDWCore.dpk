@@ -117,6 +117,8 @@ contains
   uRESTDWDynArray in '..\..\Source\utils\JSON\uRESTDWDynArray.pas',
   uRESTDWJSON in '..\..\Source\utils\JSON\uRESTDWJSON.pas',
   uRESTDWJSONInterface in '..\..\Source\utils\JSON\uRESTDWJSONInterface.pas',
-  uRESTDWSerialize in '..\..\Source\utils\JSON\uRESTDWSerialize.pas';
+  uRESTDWSerialize in '..\..\Source\utils\JSON\uRESTDWSerialize.pas',
+  uRESTDWMimeTypes in '..\..\Source\utils\uRESTDWMimeTypes.pas',
+  uRESTDWBufferBase in '..\..\Source\Basic\uRESTDWBufferBase.pas';
 
 End.

@@ -158,8 +158,8 @@
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <DCC_DcuOutput>..\..\compiled</DCC_DcuOutput>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Build>284</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.3.5.284;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Build>289</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.3.5.289;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
@@ -249,6 +249,8 @@
         <DCCReference Include="..\..\Source\utils\JSON\uRESTDWJSON.pas"/>
         <DCCReference Include="..\..\Source\utils\JSON\uRESTDWJSONInterface.pas"/>
         <DCCReference Include="..\..\Source\utils\JSON\uRESTDWSerialize.pas"/>
+        <DCCReference Include="..\..\Source\utils\uRESTDWMimeTypes.pas"/>
+        <DCCReference Include="..\..\Source\Basic\uRESTDWBufferBase.pas"/>
         <RcItem Include="..\..\Images\icons\dwIcon.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>DW</ResourceId>
@@ -468,7 +470,7 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployFile LocalName="..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>RESTDWCore.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
