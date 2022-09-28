@@ -33,7 +33,7 @@ Uses
   StringBuilderUnit,
   {$ENDIF} uRESTDWTools, uRESTDWConsts,
   DateUtils, uRESTDWMD5, uRESTDWBasicTypes,
-  uRESTDWEncodeClass, uRESTDWCharset, uRESTDWParams;
+  uRESTDWEncodeClass, uRESTDWCharset, uRESTDWParams, uRESTDWMimeTypes;
 
 Type
  TRESTDWAuthOptionTypes = (rdwOATBasic, rdwOATBearer, rdwOATToken);
@@ -367,8 +367,8 @@ Type
   Property Token : String Read vToken Write vToken;
 End;
 
- Type
-  TRESTDWDataUtils = Class
+Type
+ TRESTDWDataUtils = Class
   Public
    Class Procedure ParseRESTURL        (Const Cmd          : String;
                                         Encoding           : TEncodeSelect;
@@ -431,23 +431,13 @@ End;
 
 Function GettokenValue  (Value      : String) : String;
 Function GetTokenType   (Value      : String) : TRESTDWTokenType;
-Function GetMIMEType    (Value      : String) : String;
 Function CountExpression(Value      : String;
                          Expression : Char)   : Integer;
 Function GetSecretsValue(Value      : String) : String;
 
-Var
- MimeTable : TMimeTable;
-
 implementation
 
 Uses uRESTDWJSONInterface;
-
-
-Function GetMIMEType(Value : String) : String;
-Begin
- Result := MimeTable.GetFileMIMEType(Value);
-End;
 
 Function URLDecode(Const s : String) : String;
 Var
@@ -2353,12 +2343,6 @@ begin
   FreeAndNil(vParamList);
  End;
 End;
-
-Initialization
- MimeTable := TMimeTable.Create;
-
-Finalization
- FreeAndNil(MimeTable);
 
 end.
 

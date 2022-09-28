@@ -28,7 +28,7 @@ uses
   uRESTDWCharset, uRESTDWDynamic, uRESTDWJSONObject, uRESTDWMassiveBuffer, 
   uRESTDWMD5, uRESTDWTools, uZlibLaz, uRESTDWDataJSON, uRESTDWDynArray, 
   uRESTDWJSON, uRESTDWJSONInterface, uRESTDWSerialize, uRESTDWDesignReg, 
-  uRESTDWAbout, LazarusPackageIntf;
+  uRESTDWAbout, uRESTDWMimeTypes, LazarusPackageIntf;
 
 implementation
 
