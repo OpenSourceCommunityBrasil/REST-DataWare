@@ -803,7 +803,7 @@ Uses uRESTDWDatamodule,   uRESTDWPoolermethod,  uRESTDWTools,
      uRESTDWBasicDB,      ZLib;
 
 Procedure SaveLogData(Filename, Content : String);
-{$IF CompilerVersion < 21}
+{$IF not(Defined(FPC)) AND (CompilerVersion < 21)}
 Var
   vFileData: TFileStream;
 Begin
