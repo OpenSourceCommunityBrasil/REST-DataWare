@@ -800,7 +800,7 @@ Implementation
 
 Uses uRESTDWDatamodule,   uRESTDWPoolermethod,  uRESTDWTools,
      uRESTDWServerEvents, uRESTDWServerContext, uRESTDWMessageCoder,
-     uRESTDWBasicDB,      ZLib;
+     uRESTDWBasicDB,      uRESTDWBufferBase,    ZLib;
 
 Procedure SaveLogData(Filename, Content : String);
 {$IF not(Defined(FPC)) AND (CompilerVersion < 21)}
@@ -4671,6 +4671,8 @@ Var
  vError,
  vInvalidTag     : Boolean;
  JSONParam       : TJSONParam;
+ vByteStream     : TRESTDWBytes;
+ aBinaryBlob     : TStream;
  Procedure ParseURL;
  Var
   I           : Integer;
@@ -4748,9 +4750,28 @@ Begin
        vResult    := '';
        vResult    := DWParams.ItemsString['Pooler'].Value;
        EchoPooler(BaseObject, AContext, vResult, vResultIP, AccessTag, vInvalidTag);
-       If DWParams.ItemsString['Result'] <> Nil Then
-        DWParams.ItemsString['Result'].SetValue(vResultIP,
-                                                DWParams.ItemsString['Result'].Encoded);
+       If BinaryEvent Then
+        Begin
+         vByteStream := StringToBytes(vResultIP);
+         BufferBase  := TRESTDWBufferBase.Create; //Cria Pacote Base
+         aBinaryBlob := TMemoryStream.Create;
+         Try
+          BufferBase.InputBytes(vByteStream);
+          SetLength(vByteStream, 0);
+          BufferBase.SaveToStream(aBinaryBlob);
+         Finally
+          FreeAndNil(BufferBase);
+          If DWParams.ItemsString['Result'] <> Nil Then
+           DWParams.ItemsString['Result'].LoadFromStream(aBinaryBlob);
+          FreeAndNil(aBinaryBlob);
+         End;
+        End
+       Else
+        Begin
+         If DWParams.ItemsString['Result'] <> Nil Then
+          DWParams.ItemsString['Result'].SetValue(vResultIP,
+                                                  DWParams.ItemsString['Result'].Encoded);
+        End;
       End
      Else
       Begin

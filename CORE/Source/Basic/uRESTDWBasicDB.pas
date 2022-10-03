@@ -309,17 +309,17 @@ End;
 Type
  TRESTDWDatabasebaseBase = Class(TRESTDWComponent)
  Private
-  vSSLVersions         : TRESTDWSSLVersions;
+  vSSLVersions          : TRESTDWSSLVersions;
   vOnWorkBegin,
-  vOnWork              : TOnWork;
-  vOnWorkEnd           : TOnWorkEnd;
-  vOnStatus            : TOnStatus;
-  vOnFailOverExecute   : TOnFailOverExecute;
-  vOnFailOverError     : TOnFailOverError;
-  vOnBeforeGetToken    : TOnBeforeGetToken;
-  vCripto              : TCripto;
-  vRestPoolers         : TStringList;
-  vAuthOptionParams    : TRESTDWClientAuthOptionParams;
+  vOnWork               : TOnWork;
+  vOnWorkEnd            : TOnWorkEnd;
+  vOnStatus             : TOnStatus;
+  vOnFailOverExecute    : TOnFailOverExecute;
+  vOnFailOverError      : TOnFailOverError;
+  vOnBeforeGetToken     : TOnBeforeGetToken;
+  vCripto               : TCripto;
+  vRestPoolers          : TStringList;
+  vAuthOptionParams     : TRESTDWClientAuthOptionParams;
   vCharset,
   vContentEncoding,
   vAccept,
@@ -355,12 +355,12 @@ Type
   vStrsTrim,
   vStrsEmpty2Null,
   vStrsTrim2Len,
-  vParamCreate         : Boolean;
-  vTypeRequest         : Ttyperequest;
-  vFailOverConnections : TListDefConnections;
-  vRESTClientPooler    : TRESTClientPoolerBase;
-  Procedure CopyParams(ConnectionDB         : TRESTDWPoolerMethodClient;
-                       Var RESTClientPooler : TRESTClientPoolerBase);
+  vParamCreate          : Boolean;
+  vTypeRequest          : Ttyperequest;
+  vFailOverConnections  : TListDefConnections;
+  vRESTClientPooler     : TRESTClientPoolerBase;
+  Procedure CopyParams              (ConnectionDB           : TRESTDWPoolerMethodClient;
+                                     Var RESTClientPooler   : TRESTClientPoolerBase);
   Function  RenewToken              (Var PoolerMethodClient : TRESTDWPoolerMethodClient;
                                      Var Params             : TRESTDWParams;
                                      Var Error              : Boolean;
@@ -369,29 +369,32 @@ Type
   Procedure SetOnWorkBegin          (Value                  : TOnWork);
   Procedure SetOnWorkEnd            (Value                  : TOnWorkEnd);
   Procedure SetOnStatus             (Value                  : TOnStatus);
-  Procedure SetConnection           (Value                  : Boolean);          //Seta o Estado da Conexão
-  Procedure SetRestPooler           (Value                  : String);           //Seta o Restpooler a ser utilizado
-  Procedure SetPoolerPort           (Value                  : Integer);          //Seta a Porta do Pooler a ser usada
-  Function  TryConnect(Connection  : TRESTDWPoolerMethodClient) : Boolean;                    //Tenta Conectar o Servidor para saber se posso executar comandos
+  Procedure SetRestPooler           (Value                  : String);                             //Seta o Restpooler a ser utilizado
+  Procedure SetPoolerPort           (Value                  : Integer);                            //Seta a Porta do Pooler a ser usada
+  Function  TryConnect              (Connection             : TRESTDWPoolerMethodClient;
+                                     aBinaryRequest         : Boolean = False) : Boolean;//Tenta Conectar o Servidor para saber se posso executar comandos
   Function  GetStateDB : Boolean;
   Procedure SetMyIp(Value : String);
-  Procedure ReconfigureConnection   (Var Connection        : TRESTDWPoolerMethodClient;
-                                     Var ConnectionExec    : TRESTClientPoolerBase;
-                                     TypeRequest           : Ttyperequest;
+  Procedure ReconfigureConnection   (Var Connection         : TRESTDWPoolerMethodClient;
+                                     Var ConnectionExec     : TRESTClientPoolerBase;
+                                     TypeRequest            : Ttyperequest;
                                      WelcomeMessage,
-                                     Host                  : String;
-                                     Port                  : Integer;
+                                     Host                   : String;
+                                     Port                   : Integer;
                                      Compression,
-                                     EncodeStrings         : Boolean;
-                                     Encoding              : TEncodeSelect;
-                                     AccessTag             : String;
-                                     AuthenticationOptions : TRESTDWClientAuthOptionParams);
-  Function    GetRestPoolers : TStringList;          //Retorna a Lista de DataSet Sources do Pooler
-  Procedure   SetDataRoute(Value : String);
-  Function    BuildConnection(aBinaryRequest : Boolean) : TRESTDWPoolerMethodClient;
+                                     EncodeStrings          : Boolean;
+                                     Encoding               : TEncodeSelect;
+                                     AccessTag              : String;
+                                     AuthenticationOptions  : TRESTDWClientAuthOptionParams);
+  Function  GetRestPoolers                                  : TStringList;          //Retorna a Lista de DataSet Sources do Pooler
+  Procedure SetDataRoute            (Value                  : String);
+  Function  BuildConnection         (aBinaryRequest         : Boolean) : TRESTDWPoolerMethodClient;
+  Procedure SetConnectionProp       (Value                  : Boolean);
  Protected
   Procedure Loaded; override;
  Public
+  Procedure SetConnection           (Value                  : Boolean;
+                                     aBinaryRequest         : Boolean = False);                    //Seta o Estado da Conexão
   Procedure DestroyClientPooler;
   Procedure ExecuteCommand          (Var PoolerMethodClient : TRESTDWPoolerMethodClient;
                                      Var SQL                : TStringList;
@@ -475,7 +478,7 @@ Type
   Function    GetKeyFieldNames      (TableName              : String;
                                      Var FieldNames         : TStringList)  : Boolean;
   Procedure   OpenDatasets          (Datasets               : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF});Overload;
-  Property    Connected            : Boolean                    Read GetStateDB               Write SetConnection;
+  Property    Connected            : Boolean                    Read GetStateDB               Write SetConnectionProp;
   Property    PoolerList           : TStringList                Read GetRestPoolers;
   Property    RESTClientPooler     : TRESTClientPoolerBase      Read vRESTClientPooler        Write vRESTClientPooler;
  Published
@@ -484,10 +487,10 @@ Type
   Property ContentType             : String                     Read vContentType             Write vContentType;
   Property Charset                 : String                     Read vCharset                 Write vCharset;
   Property ContentEncoding         : String                     Read vContentEncoding         Write vContentEncoding;
-  Property OnConnection            : TOnEventConnection         Read vOnEventConnection       Write vOnEventConnection; //Evento relativo a tudo que acontece quando tenta conectar ao Servidor
+  Property OnConnection            : TOnEventConnection         Read vOnEventConnection       Write vOnEventConnection;  //Evento relativo a tudo que acontece quando tenta conectar ao Servidor
   Property OnBeforeConnect         : TOnEventBeforeConnection   Read vOnBeforeConnection      Write vOnBeforeConnection; //Evento antes de Connectar o Database
-  Property Active                  : Boolean                    Read vConnected               Write SetConnection;      //Seta o Estado da Conexão
-  Property Compression             : Boolean                    Read vCompression             Write vCompression;       //Compressão de Dados
+  Property Active                  : Boolean                    Read vConnected               Write SetConnectionProp;   //Seta o Estado da Conexão
+  Property Compression             : Boolean                    Read vCompression             Write vCompression;        //Compressão de Dados
   Property CriptOptions            : TCripto                    Read vCripto                  Write vCripto;
   Property DataRoute               : String                     Read vDataRoute               Write SetDataRoute;
   Property MyIP                    : String                     Read vMyIP                    Write SetMyIp;
@@ -1439,6 +1442,9 @@ Type
 End;
 
  Function GeTRESTDWParams(Params : TParams; Encondig : TEncodeSelect) : TRESTDWParams;
+
+Var
+ BufferBase : TRESTDWBufferBase; //Pacote Saida
 
 implementation
 
@@ -3186,7 +3192,6 @@ Var
  Procedure DatasetRequestToStream(Value : TRESTDWClientSQLBase);
  Var
   vDWParams     : TRESTDWParams;
-  BufferBase    : TRESTDWBufferBase; //Pacote Saida
   vSqlStream    : TRESTDWBytes;      //SQL Stream
   vParamsStream,                     //Params Stream
   vPackStream   : TStream;           //Pacote do BufferBase de Saida
@@ -3245,20 +3250,19 @@ Begin
    vPackStream := TMemoryStream.Create;
    BufferStream.SaveToStream(vPackStream);     //Criando Stream do Pacote de Saida
    FreeAndNil(BufferStream);
-  End;
- If Not BinaryRequest Then
+   vLinesDS := '[]';
+  End
+ Else
   Begin
    If vLinesDS <> '' Then
     vLinesDS := Format('[%s]', [vLinesDS])
    Else
     vLinesDS := '[]';
-  End
- Else
-  vLinesDS := '[]';
+  End;
  If vRestPooler = '' Then
   Exit;
  If Not vConnected Then
-  SetConnection(True);
+  SetConnection(True, BinaryRequest);
  vRESTConnectionDB             := BuildConnection(BinaryRequest);
  vRESTConnectionDB.SSLVersions := SSLVersions;
  CopyParams(vRESTConnectionDB, vRESTClientPooler);
@@ -4984,7 +4988,8 @@ Begin
   End;
 End;
 
-Function  TRESTDWDatabasebaseBase.TryConnect(Connection  : TRESTDWPoolerMethodClient) : Boolean;
+Function  TRESTDWDatabasebaseBase.TryConnect(Connection     : TRESTDWPoolerMethodClient;
+                                             aBinaryRequest : Boolean = False) : Boolean;
 Var
  vErrorBoolean        : Boolean;
  I                    : Integer;
@@ -5039,6 +5044,8 @@ Begin
   Try
    If Assigned(vRESTClientPooler) Then
     vRESTClientPooler.AuthenticationOptions.Assign(AuthenticationOptions);
+   vRESTClientPooler.BinaryRequest := aBinaryRequest;
+   Connection.BinaryRequest        := vRESTClientPooler.BinaryRequest;
    TokenValidade;
    If Not(vErrorBoolean) Then
     vTempSend  := Connection.EchoPooler(vDataRoute, vRestPooler, vTimeOut, vConnectTimeOut, vRESTClientPooler);
@@ -5324,7 +5331,8 @@ Begin
  {$ENDIF}
 End;
 
-Procedure TRESTDWDatabasebaseBase.SetConnection(Value : Boolean);
+Procedure TRESTDWDatabasebaseBase.SetConnection(Value          : Boolean;
+                                                aBinaryRequest : Boolean = False);
 Var
  vRESTConnectionDB : TRESTDWPoolerMethodClient;
 Begin
@@ -5338,10 +5346,10 @@ Begin
    If Value then
     Begin
      Try
-      vRESTConnectionDB := BuildConnection(False);
+      vRESTConnectionDB := BuildConnection(aBinaryRequest);
       vRESTConnectionDB.SSLVersions := SSLVersions;
       CopyParams(vRESTConnectionDB, vRESTClientPooler);
-      vConnected := TryConnect(vRESTConnectionDB);
+      vConnected := TryConnect(vRESTConnectionDB, aBinaryRequest);
      Finally
       If Assigned(vRESTConnectionDB) Then
        FreeAndNil(vRESTConnectionDB);
@@ -5362,6 +5370,11 @@ Begin
      End;
     End;
   End;
+End;
+
+Procedure TRESTDWDatabasebaseBase.SetConnectionProp(Value : Boolean);
+Begin
+ SetConnection(Value, False);
 End;
 
 Procedure TRESTDWDatabasebaseBase.SetDataRoute(Value: String);

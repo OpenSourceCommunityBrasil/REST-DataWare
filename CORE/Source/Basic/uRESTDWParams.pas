@@ -6137,6 +6137,7 @@ Var
        ovWideString,
        ovString,
        ovObject : Begin
+                   SetLength(vBytesString, 0);
                    If aParam.isnull Then
                     Begin
                      L := vNull;
@@ -6145,12 +6146,13 @@ Var
                    Else
                     Begin
                      S := aParam.AsString;
-                     L := Length(S);
+                     If S <> '' Then
+                      vBytesString := StringToBytes(S);
+                     L := Length(vBytesString);
                      Stream.Write(L, Sizeof(DWInt64));
                     End;
-                   If S <> '' Then
-                    vBytesString := StringToBytes(S);
-                   If L <> 0 Then Stream.Write(vBytesString[0], L);
+                   If L <> 0 Then
+                    Stream.Write(vBytesString[0], L);
                   End;
        ovSmallint : Begin
                      If aParam.isnull Then
@@ -6509,6 +6511,7 @@ Var
                    Stream.ReadBuffer(L, Sizeof(DWInt64));
                    If (L = 0) Or (L > high(Sizeof(DWInt64))) Then
                     Continue;
+                   SetLength(vStringBytes, 0);
                    SetLength(S, L);
                    Try
                     If L <> 0 Then
@@ -6522,8 +6525,6 @@ Var
                      End;
                    Finally
                    End;
-//                   If CriptOptions.Use Then
-//                    S := CriptOptions.Decrypt(S);
                    vItem.AsString := S;
                    vItem.CriptOptions.Use := CriptOptions.Use;
                    vItem.CriptOptions.Key := CriptOptions.Key;

@@ -33,7 +33,7 @@ uses
     uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWBufferDb;
   {$ELSE}
    Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWDatamodule, uRESTDWServerEvents,
-   uRESTDWBasicClass, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWBufferDb,
+   uRESTDWBasicClass, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWMemtable, uRESTDWBufferDb,
    RTLConsts, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
    {$IFDEF COMPILER16_UP}
    UITypes,
@@ -804,11 +804,11 @@ Begin
 // AddIDEMenu;//Menu do REST Debugger
  {$IFNDEF FPC}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
-  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
+//  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
 //  RegisterPackageWizard(TCustomMenuItemDW.Create);//Request Debbuger
  {$ELSE}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
-  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
+//  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
  {$ENDIF}
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWTable,              'Tablename',       TTableList);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientEvents,       'ServerEventName', TServerEventsList);

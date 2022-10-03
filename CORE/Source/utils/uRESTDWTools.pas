@@ -2991,49 +2991,49 @@ Function StreamToBytes(Stream : TStream) : TRESTDWBytes;
 Begin
  Try
   Stream.Position := 0;
-  SetLength  (Result, Stream.Size);
-  Stream.Read(Result[0], Stream.Size);
+  SetLength        (Result, Stream.Size);
+  Stream.ReadBuffer(Result[0], Stream.Size);
  Finally
  End;
 end;
 
-Function StringToBytes(AStr : String): TRESTDWBytes;
-begin
+Function StringToBytes(AStr              : String)       : TRESTDWBytes;
+Begin
  SetLength(Result, 0);
  If AStr <> '' Then
   Begin
-   {$IF Defined(HAS_UTF8)}
-    Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(AStr));
+   {$IFDEF FPC}
+    Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(Utf8ToAnsi(Astr)));
    {$ELSE}
-    {$IFDEF FPC}
-     Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(AStr));
+    {$IF CompilerVersion < 25}
+     SetLength(Result, Length(AStr));
+     Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
     {$ELSE}
-     {$IF CompilerVersion < 25}
-      SetLength(Result, Length(AStr));
-      Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
+     {$IFDEF MSWINDOWS}
+      Result :=  TRESTDWBytes(TEncoding.ANSI.GetBytes((Astr)));
      {$ELSE}
-      Result :=  TRESTDWBytes(TEncoding.ANSI.GetBytes(AStr));
-     {$IFEND}
-    {$ENDIF}
-   {$IFEND}
+      Result :=  TRESTDWBytes(TEncoding.ANSI.GetBytes(Utf8ToAnsi(Astr)));
+     {$ENDIF}
+    {$IFEND}
+   {$ENDIF}
   End;
-end;
+End;
 
 Function BytesToString(Const AValue      : TRESTDWBytes;
                        Const AStartIndex : Integer;
-                       Const ALength: Integer = -1)      : String;
+                       Const ALength     : Integer = -1) : String;
 Var
  LLength : Integer;
  LBytes  : TRESTDWBytes;
 Begin
  Result := '';
  {$IFDEF STRING_IS_ANSI}
-  LBytes := nil; // keep the compiler happy
+  LBytes := Nil; // keep the compiler happy
  {$ENDIF}
  LLength := restdwLength(AValue, ALength, AStartIndex);
  If LLength > 0 Then
   Begin
-   If (AStartIndex = 0)          And
+   If (AStartIndex = 0)                And
       (LLength = restdwLength(AValue)) Then
     LBytes := AValue
    Else
@@ -3042,10 +3042,17 @@ Begin
    SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
   {$ELSE}
    {$IFDEF LINUXFMX}
-    //SetString(Result, PChar(@LBytes[0]), restdwLength(LBytes) * SizeOf(Char));
-    Result := TEncoding.ANSI.GetString(TBytes(LBytes));
+    Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(LBytes)));
    {$ELSE}
-    SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
+    {$IF CompilerVersion < 25}
+     SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
+    {$ELSE}
+     {$IFDEF MSWINDOWS}
+      Result := TEncoding.ANSI.GetString(TBytes(LBytes));
+     {$ELSE}
+      Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(LBytes)));
+     {$ENDIF}
+    {$IFEND}
    {$ENDIF}
   {$ENDIF}
   End;
@@ -3062,9 +3069,17 @@ Begin
    SetString(Result, PAnsiChar(bin), I);
   {$ELSE}
    {$IFDEF LINUXFMX}
-    Result := TEncoding.ANSI.GetString(TBytes(bin));
+    Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
    {$ELSE}
-    SetString(Result, PAnsiChar(bin), I);
+    {$IF CompilerVersion < 25}
+     SetString(Result, PAnsiChar(bin), I);
+    {$ELSE}
+     {$IFDEF MSWINDOWS}
+      Result := (TEncoding.ANSI.GetString(TBytes(bin)));
+     {$ELSE}
+      Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
+     {$ENDIF}
+    {$IFEND}
    {$ENDIF}
   {$ENDIF}
   End;
@@ -3121,7 +3136,7 @@ Begin
  vRESTDWBytes := Base64Decode(Value);
  Result       := TMemoryStream.Create;
  Try
-  Result.Write(vRESTDWBytes[0], Length(vRESTDWBytes));
+  Result.WriteBuffer(vRESTDWBytes[0], Length(vRESTDWBytes));
   Result.Position := 0;
  Except
  End;

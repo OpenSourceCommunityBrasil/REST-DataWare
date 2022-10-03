@@ -48,7 +48,7 @@ Uses
    {$IFEND}
   {$ENDIF}
   SysUtils,  Classes, Db, FMTBcd,
-  uRESTDWComponentBase, uRESTDWDataset, uRESTDWConsts, uRESTDWEncodeClass,
+  uRESTDWComponentBase, uRESTDWMemtable, uRESTDWConsts, uRESTDWEncodeClass,
   uRESTDWCharset, uRESTDWMimeTypes
 
  ;
