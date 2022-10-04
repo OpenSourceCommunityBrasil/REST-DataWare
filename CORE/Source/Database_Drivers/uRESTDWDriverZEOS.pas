@@ -19,7 +19,7 @@ uses
  uRESTDWJSONInterface, uRESTDWDataJSON,     uRESTDWMassiveBuffer,
  Variants,             uRESTDWDatamodule,   uRESTDWDataset,
  uRESTDWJSONObject,    uRESTDWParams,       uRESTDWBasicTypes,
- uRESTDWBasic,         uRESTDWTools;
+ uRESTDWBasic,         uRESTDWTools,        uRESTDWBufferBase;
 
 Type
  TRESTDWDriverZeos   = Class(TRESTDWDriver)
@@ -105,7 +105,13 @@ Type
   Function  OpenDatasets             (DatasetsLine         : String;
                                       Var Error            : Boolean;
                                       Var MessageError     : String;
-                                      Var BinaryBlob       : TMemoryStream)   : TJSONValue;Override;
+                                      Var BinaryBlob       : TMemoryStream)   : TJSONValue;Overload;Override;
+  Function  OpenDatasets             (DatapackStream        : TStream;
+                                      Var Error             : Boolean;
+                                      Var MessageError      : String;
+                                      Var BinaryBlob        : TMemoryStream;
+                                      aBinaryEvent          : Boolean = False;
+                                      aBinaryCompatibleMode : Boolean = False)   : TStream;Overload;Override;
   Procedure GetTableNames            (Var TableNames       : TStringList;
                                       Var Error            : Boolean;
                                       Var MessageError     : String);Override;
@@ -4601,6 +4607,114 @@ Begin
     vZConnection.Connected := False;
    End;
  End;
+End;
+
+Function TRESTDWDriverZeos.OpenDatasets(DatapackStream        : TStream;
+                                        Var Error             : Boolean;
+                                        Var MessageError      : String;
+                                        Var BinaryBlob        : TMemoryStream;
+                                        aBinaryEvent          : Boolean = False;
+                                        aBinaryCompatibleMode : Boolean = False) : TStream;
+Var
+ X               : Integer;
+ vTempQuery      : TZQuery;
+ vStateResource  : Boolean;
+ DWParams        : TRESTDWParams;
+ BufferOutStream,
+ BufferStream,
+ BufferInStream  : TRESTDWBufferBase;
+ vStream         : TMemoryStream;
+ vSqlStream      : TRESTDWBytes;
+ vBufferStream,
+ vParamsStream   : TStream;
+ vDWMemtable1    : TRESTDWMemtable;
+Begin
+ {$IFNDEF FPC}Inherited;{$ENDIF}
+ Result          := Nil;
+ Error           := False;
+ BufferInStream  := TRESTDWBufferBase.Create;
+ BufferOutStream := TRESTDWBufferBase.Create;
+ vTempQuery      := TZQuery.Create(Nil);
+ Try
+  BufferInStream.LoadToStream(DatapackStream);
+  vStateResource := vZConnection.Connected;
+  If Not vZConnection.Connected Then
+   vZConnection.Connected := True;
+  vTempQuery.Connection   := vZConnection;
+  While Not BufferInStream.Eof Do
+   Begin
+    vBufferStream := BufferInStream.ReadStream;
+    If Not Assigned(vBufferStream) Then
+     Continue;
+    BufferStream := TRESTDWBufferBase.Create;
+    BufferStream.LoadToStream(vBufferStream);
+    Try
+     vSqlStream    := BufferStream.ReadBytes;
+     vParamsStream := TMemoryStream(BufferStream.ReadStream);
+    Finally
+     FreeAndNil(BufferStream);
+    End;
+    vTempQuery.Close;
+    vTempQuery.SQL.Clear;
+    vTempQuery.SQL.Add(BytesToString(vSqlStream));
+    SetLength(vSqlStream, 0);
+    DWParams := TRESTDWParams.Create;
+    Try
+     DWParams.LoadFromStream(vParamsStream);
+     For X := 0 To DWParams.Count - 1 Do
+      Begin
+       If vTempQuery.ParamByName(DWParams[X].ParamName) <> Nil Then
+        Begin
+         vTempQuery.ParamByName(DWParams[X].ParamName).DataType := ObjectValueToFieldType(DWParams[X].ObjectValue);
+         vTempQuery.ParamByName(DWParams[X].ParamName).Value    := DWParams[X].Value;
+        End;
+      End;
+    Finally
+     DWParams.Free;
+     If Assigned(vParamsStream) Then
+      FreeAndNil(vParamsStream);
+    End;
+    vTempQuery.Open;
+    vStream := Nil;
+    If aBinaryCompatibleMode Then
+     TRESTDWClientSQLBase.SaveToStream(vTempQuery, vStream)
+    Else
+     Begin
+      vStream      := TMemoryStream.Create;
+      vDWMemtable1 := TRESTDWMemtable.Create(Nil);
+      Try
+       vDWMemtable1.Assign(vTempQuery);
+       vDWMemtable1.SaveToStream(vStream);
+       vStream.Position := 0;
+      Finally
+       FreeAndNil(vDWMemtable1);
+      End;
+     End;
+    //Gera o Binario
+    Try
+     BufferOutStream.InputStream(vStream);
+    Finally
+    If Assigned(vStream) Then
+     FreeAndNil(vStream);
+    End;
+   End;
+  vZConnection.Connected := vStateResource;
+ Except
+  On E : Exception do
+   Begin
+    vZConnection.Connected := False;
+    Try
+     Error          := True;
+     MessageError   := E.Message;
+    Except
+    End;
+   End;
+ End;
+ FreeAndNil(BufferInStream);
+ BufferOutStream.SaveToStream(Result);
+ FreeAndNil(BufferOutStream);
+ vTempQuery.Close;
+ vTempQuery.Free;
 End;
 
 Function TRESTDWDriverZeos.OpenDatasets     (DatasetsLine     : String;

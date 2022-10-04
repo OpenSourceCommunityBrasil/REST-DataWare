@@ -804,11 +804,11 @@ Begin
 // AddIDEMenu;//Menu do REST Debugger
  {$IFNDEF FPC}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
-  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
+//  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
 //  RegisterPackageWizard(TCustomMenuItemDW.Create);//Request Debbuger
  {$ELSE}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
-  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
+//  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
  {$ENDIF}
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWTable,              'Tablename',       TTableList);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientEvents,       'ServerEventName', TServerEventsList);

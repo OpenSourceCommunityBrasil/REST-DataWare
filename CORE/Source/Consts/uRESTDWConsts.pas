@@ -743,27 +743,21 @@ End;
 Function  ZCompressStreamD(S           : TStream;
                            Var Value   : TStream) : Boolean;
 Var
- Utf8Stream   : TStringStream;
+ Utf8Stream   : TStream;
 Begin
  Result := False;
  Try
+  Utf8Stream := TMemoryStream.Create;
  {$IFDEF FPC}
-  Utf8Stream := TStringStream.Create('');
   Utf8Stream.CopyFrom(S, S.Size);
  {$ELSE}
   {$if CompilerVersion > 24} // Delphi 2010 pra cima
-   Utf8Stream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
    Utf8Stream.CopyFrom(S, S.Size);
   {$ELSE} // Delphi 2010 pra cima
-   Utf8Stream := TStringStream.Create('');
    Utf8Stream.Write(AnsiString(TStringStream(S).Datastring)[InitStrPos], S.Size);
   {$IFEND} // Delphi 2010 pra cima
  {$ENDIF}
- {$IFNDEF FPC}
-  Value := TStringStream.Create('');
- {$ELSE}
-  Value := TStringStream.Create('');
- {$ENDIF}
+  Value := TMemoryStream.Create;
   Try
    ZCompressStream(Utf8Stream, Value, cCompressionLevel);
    Value.Position := 0;
@@ -817,26 +811,27 @@ Begin
  End;
 End;
 
+
 Function ZCompressStreamNew(Const s : String) : TStream;
 Var
- Utf8Stream   : TStringStream;
+ Utf8Stream   : TStream;
 Begin
  Try
+  Utf8Stream := TMemoryStream.Create;
  {$IFDEF FPC}
-  Utf8Stream := TStringStream.Create(S);
+  Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
  {$ELSE}
-  {$if CompilerVersion > 24} // Delphi 2010 pra cima
-   Utf8Stream := TStringStream.Create(S{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
-  {$ELSE} // Delphi 2010 pra cima
-   Utf8Stream := TStringStream.Create('');
+  {$if CompilerVersion < 25} // Delphi 2010 pra cima
    Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
+  {$ELSE} // Delphi 2010 pra cima
+   {$IFDEF MSWINDOWS}
+    Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
+   {$ELSE}
+    Utf8Stream.Write(S[1], Length(S));
+   {$ENDIF}
   {$IFEND} // Delphi 2010 pra cima
  {$ENDIF}
- {$IFNDEF FPC}
-  Result := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
- {$ELSE}
-  Result := TStringStream.Create('');
- {$ENDIF}
+  Result := TMemoryStream.Create;
   Try
    ZCompressStream(Utf8Stream, Result, cCompressionLevel);
    Result.Position := 0;

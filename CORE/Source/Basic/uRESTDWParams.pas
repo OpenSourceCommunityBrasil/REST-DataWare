@@ -488,7 +488,8 @@ Type
   Procedure   Delete     (Index     : Integer); Overload;
   Procedure   Delete     (Param     : TJSONParam); Overload;
   Function    Add        (Item      : TJSONParam) : Integer; Overload;
-  Procedure   SaveToStream  (Stream : TStream; Output : TDWParamExpType = tdwpxt_All);
+  Procedure   SaveToStream  (Var Stream     : TStream;
+                             Output         : TDWParamExpType = tdwpxt_All);
   Procedure   LoadFromStream(Stream         : TStream;
                              ValidateHeader : Boolean = False;
                              Input          : TDWParamExpType = tdwpxt_All);
@@ -5891,12 +5892,12 @@ End;
 
 Procedure TRESTDWParams.SaveToFile(FileName : String);
 Var
- vStringStream : TMemoryStream;
+ vStringStream : TStream;
 Begin
  SaveToStream(vStringStream);
  vStringStream.Position := 0;
  Try
-  vStringStream.SaveToFile(FileName);
+  TMemoryStream(vStringStream).SaveToFile(FileName);
  Finally
   vStringStream.Free;
  End;
@@ -5943,17 +5944,17 @@ Begin
        JSONParam.ObjectDirection := GetDirectionName(bJsonOBJ.Pairs[1].Value);
        JSONParam.ObjectValue     := GetValueType(bJsonOBJ.Pairs[3].Value);
        JSONParam.Encoded         := GetBooleanFromString(bJsonOBJ.Pairs[2].Value);
-       // fernando not is null
-       if not bJsonOBJ.Pairs[4].isnull then begin
+       If Not bJsonOBJ.Pairs[4].isnull Then
+        Begin
          If (JSONParam.ObjectValue in [ovString, ovGuid, ovWideString]) And (JSONParam.Encoded) Then
-          JSONParam.SetValue(DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF FPC}, csUndefined{$ENDIF}))
+          Begin
+           JSONParam.SetValue(DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+          End
          Else
           JSONParam.SetValue(bJsonOBJ.Pairs[4].Value, JSONParam.Encoded);
-       end
-       else begin
-         JSONParam.SetValue('null',JSONParam.Encoded);
-       end;
-//       Add(JSONParam);
+        End
+       Else
+        JSONParam.SetValue('null',JSONParam.Encoded);
       Finally
        bJsonOBJ.Free;
       End;
@@ -6056,8 +6057,8 @@ Begin
  Result                  := Inherited Add(vItem);
 End;
 
-Procedure TRESTDWParams.SaveToStream(Stream : TStream;
-                                     Output : TDWParamExpType = tdwpxt_All);
+Procedure TRESTDWParams.SaveToStream(Var Stream : TStream;
+                                     Output     : TDWParamExpType = tdwpxt_All);
 Var
  ParamsHeader : TRESTDWParamsHeader;
 // vTempString  : String;
@@ -6137,6 +6138,7 @@ Var
        ovWideString,
        ovString,
        ovObject : Begin
+                   SetLength(vBytesString, 0);
                    If aParam.isnull Then
                     Begin
                      L := vNull;
@@ -6145,12 +6147,13 @@ Var
                    Else
                     Begin
                      S := aParam.AsString;
-                     L := Length(S);
+                     If S <> '' Then
+                      vBytesString := StringToBytes(S);
+                     L := Length(vBytesString);
                      Stream.Write(L, Sizeof(DWInt64));
                     End;
-                   If S <> '' Then
-                    vBytesString := StringToBytes(S);
-                   If L <> 0 Then Stream.Write(vBytesString[0], L);
+                   If L <> 0 Then
+                    Stream.Write(vBytesString[0], L);
                   End;
        ovSmallint : Begin
                      If aParam.isnull Then
@@ -6509,6 +6512,7 @@ Var
                    Stream.ReadBuffer(L, Sizeof(DWInt64));
                    If (L = 0) Or (L > high(Sizeof(DWInt64))) Then
                     Continue;
+                   SetLength(vStringBytes, 0);
                    SetLength(S, L);
                    Try
                     If L <> 0 Then
@@ -6522,8 +6526,6 @@ Var
                      End;
                    Finally
                    End;
-//                   If CriptOptions.Use Then
-//                    S := CriptOptions.Decrypt(S);
                    vItem.AsString := S;
                    vItem.CriptOptions.Use := CriptOptions.Use;
                    vItem.CriptOptions.Key := CriptOptions.Key;

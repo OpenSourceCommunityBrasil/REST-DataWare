@@ -375,7 +375,7 @@ Uses {$IFDEF FPC}
 
 implementation
 
-Uses uRESTDWBasicDB, uRESTDWJSONInterface;
+Uses uRESTDWBasicDB, uRESTDWJSONInterface, uRESTDWBufferBase;
 
 Function TRESTDWPoolerMethodClient.ApplyUpdatesTB(Massive             : TMassiveDatasetBuffer;
                                               Pooler, Method_Prefix   : String;
@@ -1287,9 +1287,9 @@ Begin
 End;
 
 Function TRESTDWPoolerMethodClient.GetPoolerList(Method_Prefix    : String;
-                                             TimeOut          : Integer = 3000;
-                                             ConnectTimeOut   : Integer = 3000;
-                                             RESTClientPooler : TRESTClientPoolerBase = Nil)   : TStringList;
+                                                 TimeOut          : Integer = 3000;
+                                                 ConnectTimeOut   : Integer = 3000;
+                                                 RESTClientPooler : TRESTClientPoolerBase = Nil)   : TStringList;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  vTempString,
@@ -1405,6 +1405,9 @@ Function TRESTDWPoolerMethodClient.EchoPooler(Method_Prefix,
                                               RESTClientPooler        : TRESTClientPoolerBase = Nil) : String;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
+ BufferStream         : TRESTDWBufferBase;
+ vRESTDWBytes         : TRESTDWBytes;
+ vStream              : TStream;
  lResponse            : String;
  JSONParam            : TJSONParam;
  DWParams             : TRESTDWParams;
@@ -1487,7 +1490,28 @@ Begin
    lResponse := RESTClientPoolerExec.SendEvent('EchoPooler', DWParams);
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
-    Result   := DWParams.ItemsString['Result'].AsString
+    Begin
+     If BinaryRequest Then
+      Begin
+       BufferStream  := TRESTDWBufferBase.Create;
+       vStream       := TMemoryStream.Create;
+       Try
+        DWParams.ItemsString['Result'].SaveToStream(vStream);
+        BufferStream.LoadToStream(vStream);
+        FreeAndNil(vStream);
+        vRESTDWBytes := BufferStream.ReadBytes;
+        If Length(vRESTDWBytes) > 0 Then
+         Begin
+          Result := BytesToString(vRESTDWBytes);
+          SetLength(vRESTDWBytes, 0);
+         End;
+       Finally
+        FreeAndNil(BufferStream);
+       End;
+      End
+     Else
+      Result   := DWParams.ItemsString['Result'].AsString;
+    End
    Else
     Begin
      If (lResponse = '') Then

@@ -75,13 +75,12 @@ Var
  Begin
   AResponse.Code                   := StatusCode;
   mb                               := TStringStream.Create(ErrorMessage);
-  mb.Position                      := 0;
-  AResponse.FreeContentStream      := True;
   AResponse.ContentStream          := mb;
   AResponse.ContentStream.Position := 0;
-  AResponse.ContentLength          := mb.Size;
-  Handled := True;
+  AResponse.ContentLength          := ResultStream.Size;
+  AResponse.FreeContentStream      := True;
   AResponse.SendResponse;
+  Handled := True;
  End;
  Procedure DestroyComponents;
  Begin

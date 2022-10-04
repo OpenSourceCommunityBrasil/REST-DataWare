@@ -4,12 +4,12 @@ interface
 
 uses SysUtils,  Classes,   DB, Uni, UniScript,    DADump,
      UniDump,   VirtualTable,  MemDS, DBAccess,
-     uRESTDWConsts,  uRESTDWDataUtils,
+     uRESTDWConsts,           uRESTDWDataUtils,
      uRESTDWBasicDB,          uRESTDWJSONInterface,    uRESTDWDataJSON,
      uRESTDWMassiveBuffer,    Variants,                uRESTDWDatamodule,
      uRESTDWDataset,          uRESTDWJSONObject,       uRESTDWParams,
      uRESTDWBasicTypes,       uRESTDWBasic,            uRESTDWTools,
-     uRESTDWCharset;
+     uRESTDWCharset,          uRESTDWBufferBase;
 
 Type
 
@@ -105,7 +105,13 @@ Type
   Function  OpenDatasets             (DatasetsLine         : String;
                                       Var Error            : Boolean;
                                       Var MessageError     : String;
-                                      Var BinaryBlob       : TMemoryStream)          : TJSONValue;Override;
+                                      Var BinaryBlob       : TMemoryStream)   : TJSONValue;Overload;Override;
+  Function  OpenDatasets             (DatapackStream        : TStream;
+                                      Var Error             : Boolean;
+                                      Var MessageError      : String;
+                                      Var BinaryBlob        : TMemoryStream;
+                                      aBinaryEvent          : Boolean = False;
+                                      aBinaryCompatibleMode : Boolean = False)   : TStream;Overload;Override;
   Procedure GetTableNames            (Var TableNames       : TStringList;
                                       Var Error            : Boolean;
                                       Var MessageError     : String);Override;
@@ -4393,6 +4399,119 @@ Begin
     vFDConnection.Connected := False;
    End;
  End;
+End;
+
+Function TRESTDWDriverUNIDAC.OpenDatasets(DatapackStream        : TStream;
+                                          Var Error             : Boolean;
+                                          Var MessageError      : String;
+                                          Var BinaryBlob        : TMemoryStream;
+                                          aBinaryEvent          : Boolean = False;
+                                          aBinaryCompatibleMode : Boolean = False) : TStream;
+Var
+ X               : Integer;
+ vTempQuery      : TUniQuery;
+ vTable          : TVirtualTable;
+ vStateResource  : Boolean;
+ DWParams        : TRESTDWParams;
+ BufferOutStream,
+ BufferStream,
+ BufferInStream  : TRESTDWBufferBase;
+ vStream         : TMemoryStream;
+ vSqlStream      : TRESTDWBytes;
+ vBufferStream,
+ vParamsStream   : TStream;
+Begin
+ {$IFNDEF FPC}Inherited;{$ENDIF}
+ Result          := Nil;
+ Error           := False;
+ BufferInStream  := TRESTDWBufferBase.Create;
+ BufferOutStream := TRESTDWBufferBase.Create;
+ vTempQuery      := TUniQuery.Create(Nil);
+ Try
+  BufferInStream.LoadToStream(DatapackStream);
+  vStateResource := vFDConnection.Connected;
+  If Not vFDConnection.Connected Then
+   vFDConnection.Connected := True;
+  vTempQuery.Connection   := vFDConnection;
+  While Not BufferInStream.Eof Do
+   Begin
+    vBufferStream := BufferInStream.ReadStream;
+    If Not Assigned(vBufferStream) Then
+     Continue;
+    BufferStream := TRESTDWBufferBase.Create;
+    BufferStream.LoadToStream(vBufferStream);
+    Try
+     vSqlStream    := BufferStream.ReadBytes;
+     vParamsStream := TMemoryStream(BufferStream.ReadStream);
+    Finally
+     FreeAndNil(BufferStream);
+    End;
+    vTempQuery.Close;
+    vTempQuery.SQL.Clear;
+    vTempQuery.SQL.Add(BytesToString(vSqlStream));
+    SetLength(vSqlStream, 0);
+    DWParams := TRESTDWParams.Create;
+    Try
+     DWParams.LoadFromStream(vParamsStream);
+     For X := 0 To DWParams.Count - 1 Do
+      Begin
+       If vTempQuery.ParamByName(DWParams[X].ParamName) <> Nil Then
+        Begin
+         vTempQuery.ParamByName(DWParams[X].ParamName).DataType := ObjectValueToFieldType(DWParams[X].ObjectValue);
+         vTempQuery.ParamByName(DWParams[X].ParamName).Value    := DWParams[X].Value;
+        End;
+      End;
+    Finally
+     DWParams.Free;
+     If Assigned(vParamsStream) Then
+      FreeAndNil(vParamsStream);
+    End;
+    vTempQuery.Open;
+    vStream := Nil;
+    If aBinaryCompatibleMode Then
+     TRESTDWClientSQLBase.SaveToStream(vTempQuery, vStream)
+    Else
+     Begin
+      vStream := TMemoryStream.Create;
+      vTable  := TVirtualTable.Create(Nil);
+      Try
+       vTable.Assign(vTempQuery);
+       Try
+        vTable.SaveToStream(vStream);
+        vStream.Position := 0;
+       Finally
+        vTable.Free;
+       End;
+       vStream.Position := 0;
+      Finally
+       vTable.Free;
+      End;
+     End;
+    //Gera o Binario
+    Try
+     BufferOutStream.InputStream(vStream);
+    Finally
+    If Assigned(vStream) Then
+     FreeAndNil(vStream);
+    End;
+   End;
+  vFDConnection.Connected := vStateResource;
+ Except
+  On E : Exception do
+   Begin
+    vFDConnection.Connected := False;
+    Try
+     Error          := True;
+     MessageError   := E.Message;
+    Except
+    End;
+   End;
+ End;
+ FreeAndNil(BufferInStream);
+ BufferOutStream.SaveToStream(Result);
+ FreeAndNil(BufferOutStream);
+ vTempQuery.Close;
+ vTempQuery.Free;
 End;
 
 Function TRESTDWDriverUNIDAC.OpenDatasets   (DatasetsLine     : String;

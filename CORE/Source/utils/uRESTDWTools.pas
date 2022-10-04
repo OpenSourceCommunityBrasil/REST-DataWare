@@ -31,9 +31,12 @@ Uses
  {$ELSE}
  Classes,  SysUtils, uRESTDWBasicTypes, Db, EncdDecd
   {$IF Defined(RESTDWFMX)}
-   , System.NetEncoding, IOUtils
+   , IOUtils
   {$IFEND}
  {$ENDIF},
+ {$IF CompilerVersion > 24}
+  System.NetEncoding,
+ {$IFEND}
  uRESTDWEncodeClass, uRESTDWCharset, uRESTDWMimeTypes;
 
  Const
@@ -2991,49 +2994,49 @@ Function StreamToBytes(Stream : TStream) : TRESTDWBytes;
 Begin
  Try
   Stream.Position := 0;
-  SetLength  (Result, Stream.Size);
-  Stream.Read(Result[0], Stream.Size);
+  SetLength        (Result, Stream.Size);
+  Stream.ReadBuffer(Result[0], Stream.Size);
  Finally
  End;
 end;
 
-Function StringToBytes(AStr : String): TRESTDWBytes;
-begin
+Function StringToBytes(AStr              : String)       : TRESTDWBytes;
+Begin
  SetLength(Result, 0);
  If AStr <> '' Then
   Begin
-   {$IF Defined(HAS_UTF8)}
-    Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(AStr));
+   {$IFDEF FPC}
+    Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(Utf8ToAnsi(Astr)));
    {$ELSE}
-    {$IFDEF FPC}
-     Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(AStr));
+    {$IF CompilerVersion < 25}
+     SetLength(Result, Length(AStr));
+     Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
     {$ELSE}
-     {$IF CompilerVersion < 25}
-      SetLength(Result, Length(AStr));
-      Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
+     {$IFDEF MSWINDOWS}
+      Result :=  TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
      {$ELSE}
-      Result :=  TRESTDWBytes(TEncoding.ANSI.GetBytes(AStr));
-     {$IFEND}
-    {$ENDIF}
-   {$IFEND}
+      Result :=  TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
+     {$ENDIF}
+    {$IFEND}
+   {$ENDIF}
   End;
-end;
+End;
 
 Function BytesToString(Const AValue      : TRESTDWBytes;
                        Const AStartIndex : Integer;
-                       Const ALength: Integer = -1)      : String;
+                       Const ALength     : Integer = -1) : String;
 Var
  LLength : Integer;
  LBytes  : TRESTDWBytes;
 Begin
  Result := '';
  {$IFDEF STRING_IS_ANSI}
-  LBytes := nil; // keep the compiler happy
+  LBytes := Nil; // keep the compiler happy
  {$ENDIF}
  LLength := restdwLength(AValue, ALength, AStartIndex);
  If LLength > 0 Then
   Begin
-   If (AStartIndex = 0)          And
+   If (AStartIndex = 0)                And
       (LLength = restdwLength(AValue)) Then
     LBytes := AValue
    Else
@@ -3041,12 +3044,15 @@ Begin
   {$IFDEF FPC}
    SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
   {$ELSE}
-   {$IFDEF LINUXFMX}
-    //SetString(Result, PChar(@LBytes[0]), restdwLength(LBytes) * SizeOf(Char));
-    Result := TEncoding.ANSI.GetString(TBytes(LBytes));
-   {$ELSE}
+   {$IF CompilerVersion < 25}
     SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
-   {$ENDIF}
+   {$ELSE}
+    {$IFDEF MSWINDOWS}
+     Result := TEncoding.ANSI.GetString(TBytes(LBytes));
+    {$ELSE}
+     Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(LBytes)));
+    {$ENDIF}
+   {$IFEND}
   {$ENDIF}
   End;
 End;
@@ -3061,11 +3067,15 @@ Begin
   {$IFDEF FPC}
    SetString(Result, PAnsiChar(bin), I);
   {$ELSE}
-   {$IFDEF LINUXFMX}
-    Result := TEncoding.ANSI.GetString(TBytes(bin));
-   {$ELSE}
+   {$IF CompilerVersion < 25}
     SetString(Result, PAnsiChar(bin), I);
-   {$ENDIF}
+   {$ELSE}
+    {$IFDEF MSWINDOWS}
+     Result := TEncoding.ANSI.GetString(TBytes(bin));
+    {$ELSE}
+     Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
+    {$ENDIF}
+   {$IFEND}
   {$ENDIF}
   End;
 End;
@@ -3121,7 +3131,7 @@ Begin
  vRESTDWBytes := Base64Decode(Value);
  Result       := TMemoryStream.Create;
  Try
-  Result.Write(vRESTDWBytes[0], Length(vRESTDWBytes));
+  Result.WriteBuffer(vRESTDWBytes[0], Length(vRESTDWBytes));
   Result.Position := 0;
  Except
  End;
@@ -3152,30 +3162,32 @@ End;
 Function Decode64(const S: string): string;
 Var
  sa : String;
-{$IF Defined(RESTDWFMX)}
- ne : TBase64Encoding;
-{$IFEND}
+ {$IFNDEF FPC}
+  {$IF CompilerVersion > 24}
+   ne: TBase64Encoding;
+  {$IFEND}
+ {$ENDIF}
 Begin
  If (Trim(S) <> '')   And
     (Trim(S) <> '""') Then
   Begin
-//   {$IFDEF FPC}
-//     SA := S;
-//     If Pos(sLineBreak, SA) > 0 Then
-//      SA := StringReplace(SA, sLineBreak, '', [rfReplaceAll]);
-//     Result := BytesToString(Base64Decode(SA));
-//   {$ELSE}
-//    {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
-//     ne := TBase64Encoding.Create(-1);
-//     Result := ne.Decode(S);
-//     ne.Free;
-//    {$ELSE}
    SA := S;
    If Pos(sLineBreak, SA) > 0 Then
     SA := StringReplace(SA, sLineBreak, '', [rfReplaceAll]);
-   Result := BytesToString(Base64Decode(SA));
-//    {$IFEND}
-//   {$ENDIF}
+   {$IFDEF FPC}
+    Result := BytesToString(Base64Decode(SA));
+   {$ELSE}
+    {$IF CompilerVersion > 24}
+     ne     := TBase64Encoding.Create(-1);
+     Try
+      Result := ne.Decode(SA);
+     Finally
+      FreeAndNil(ne);
+     End;
+    {$ELSE}
+     Result := BytesToString(Base64Decode(SA));
+    {$IFEND}
+   {$ENDIF}
   End;
 End;
 
@@ -3245,8 +3257,9 @@ Begin
  {$IFDEF FPC}
   Result := Base64Encode(Value);
  {$ELSE}
-  {$IF Defined(ANDROID) OR Defined(IOS)}
-   Result := Encode64(Value);
+  {$IF CompilerVersion > 24}
+//   Result := Encode64(Value);
+   Result := TNetEncoding.Base64.Encode(Value);
   {$ELSE}
    Result := Base64Encode(Value);
   {$IFEND}
