@@ -349,8 +349,7 @@ Type
   Procedure   SetDataRoute(Value : String);
  Public
   //Métodos, Propriedades, Variáveis, Procedures e Funções Publicas
-  Procedure   ReconfigureConnection(Var Connection        : TRESTClientPoolerBase;
-                                    TypeRequest           : Ttyperequest;
+  Procedure   ReconfigureConnection(TypeRequest           : Ttyperequest;
                                     WelcomeMessage,
                                     Host                  : String;
                                     Port                  : Integer;
@@ -1292,8 +1291,7 @@ Begin
               End;
              If Assigned(vOnFailOverExecute) Then
               vOnFailOverExecute(vFailOverConnections[I]);
-             ReconfigureConnection(Self,
-                                   vFailOverConnections[I].vTypeRequest,
+             ReconfigureConnection(vFailOverConnections[I].vTypeRequest,
                                    vFailOverConnections[I].vWelcomeMessage,
                                    vFailOverConnections[I].vRestWebService,
                                    vFailOverConnections[I].vPoolerPort,
@@ -1385,8 +1383,7 @@ Begin
               End;
              If Assigned(vOnFailOverExecute) Then
               vOnFailOverExecute(vFailOverConnections[I]);
-             ReconfigureConnection(Self,
-                                   vFailOverConnections[I].vTypeRequest,
+             ReconfigureConnection(vFailOverConnections[I].vTypeRequest,
                                    vFailOverConnections[I].vWelcomeMessage,
                                    vFailOverConnections[I].vRestWebService,
                                    vFailOverConnections[I].vPoolerPort,
