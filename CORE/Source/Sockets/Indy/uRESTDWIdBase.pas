@@ -437,6 +437,7 @@ begin
  HttpRequest.ProxyParams.ProxyPassword         := ProxyOptions.ProxyPassword;
  HttpRequest.ProxyParams.ProxyPort             := ProxyOptions.ProxyPort;
  HttpRequest.ReadTimeout                       := RequestTimeout;
+ HttpRequest.ConnectTimeout                    := ConnectTimeOut;
  HttpRequest.AllowCookies                      := AllowCookies;
  HttpRequest.HandleRedirects                   := HandleRedirects;
  HttpRequest.RedirectMaximum                   := RedirectMaximum;
@@ -3715,8 +3716,8 @@ Var
  vErrorCode,
  I                : Integer;
  vDWParam         : TJSONParam;
- MemoryStream,
  vResultParams    : TStringStream;
+ MemoryStream,
  aStringStream,
  bStringStream,
  StringStream     : TStream;
@@ -3983,8 +3984,8 @@ Var
  End;
  Procedure SetParamsValues(DWParams : TRESTDWParams; SendParamsData : TIdMultipartFormDataStream);
  Var
-  I         : Integer;
-  vCharsset : String;
+  I            : Integer;
+  vCharsset    : String;
  Begin
   MemoryStream  := Nil;
   If DWParams   <> Nil Then
@@ -3993,11 +3994,6 @@ Var
      StringStreamList := TStringStreamList.Create;
     If BinaryRequest Then
      Begin
-      {$IFDEF FPC}
-       MemoryStream := TStringStream.Create('');
-      {$ELSE}
-       MemoryStream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
-      {$ENDIF}
       DWParams.SaveToStream(MemoryStream);
       Try
        If Assigned(MemoryStream) Then

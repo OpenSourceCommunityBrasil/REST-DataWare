@@ -488,7 +488,8 @@ Type
   Procedure   Delete     (Index     : Integer); Overload;
   Procedure   Delete     (Param     : TJSONParam); Overload;
   Function    Add        (Item      : TJSONParam) : Integer; Overload;
-  Procedure   SaveToStream  (Stream : TStream; Output : TDWParamExpType = tdwpxt_All);
+  Procedure   SaveToStream  (Var Stream     : TStream;
+                             Output         : TDWParamExpType = tdwpxt_All);
   Procedure   LoadFromStream(Stream         : TStream;
                              ValidateHeader : Boolean = False;
                              Input          : TDWParamExpType = tdwpxt_All);
@@ -5891,12 +5892,12 @@ End;
 
 Procedure TRESTDWParams.SaveToFile(FileName : String);
 Var
- vStringStream : TMemoryStream;
+ vStringStream : TStream;
 Begin
  SaveToStream(vStringStream);
  vStringStream.Position := 0;
  Try
-  vStringStream.SaveToFile(FileName);
+  TMemoryStream(vStringStream).SaveToFile(FileName);
  Finally
   vStringStream.Free;
  End;
@@ -5943,17 +5944,17 @@ Begin
        JSONParam.ObjectDirection := GetDirectionName(bJsonOBJ.Pairs[1].Value);
        JSONParam.ObjectValue     := GetValueType(bJsonOBJ.Pairs[3].Value);
        JSONParam.Encoded         := GetBooleanFromString(bJsonOBJ.Pairs[2].Value);
-       // fernando not is null
-       if not bJsonOBJ.Pairs[4].isnull then begin
+       If Not bJsonOBJ.Pairs[4].isnull Then
+        Begin
          If (JSONParam.ObjectValue in [ovString, ovGuid, ovWideString]) And (JSONParam.Encoded) Then
-          JSONParam.SetValue(DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF FPC}, csUndefined{$ENDIF}))
+          Begin
+           JSONParam.SetValue(DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+          End
          Else
           JSONParam.SetValue(bJsonOBJ.Pairs[4].Value, JSONParam.Encoded);
-       end
-       else begin
-         JSONParam.SetValue('null',JSONParam.Encoded);
-       end;
-//       Add(JSONParam);
+        End
+       Else
+        JSONParam.SetValue('null',JSONParam.Encoded);
       Finally
        bJsonOBJ.Free;
       End;
@@ -6056,8 +6057,8 @@ Begin
  Result                  := Inherited Add(vItem);
 End;
 
-Procedure TRESTDWParams.SaveToStream(Stream : TStream;
-                                     Output : TDWParamExpType = tdwpxt_All);
+Procedure TRESTDWParams.SaveToStream(Var Stream : TStream;
+                                     Output     : TDWParamExpType = tdwpxt_All);
 Var
  ParamsHeader : TRESTDWParamsHeader;
 // vTempString  : String;

@@ -3040,68 +3040,71 @@ Begin
  Inherited;
 End;
 
-function ScanParams(SQL : string) : TStringList;
-var
-  FCurrentPos : PChar;
-  vParamName  : String;
-  bEscape1,
-  bEscape2,
-  bParam     : boolean;
-  vOldChar   : Char;
-
-const
-  endParam : set of Char = ['=','>','<',' ',',','(',')','-','+','/','*','!',
+Function ScanParams(SQL : string) : TStringList;
+Var
+ FCurrentPos : PChar;
+ vParamName  : String;
+ bEscape1,
+ bEscape2,
+ bParam     : boolean;
+ vOldChar   : Char;
+ Const
+  endParam : set of Char = [';', '=','>','<',' ',',','(',')','-','+','/','*','!',
                             '''','"','|',#0..#31,#127..#255];
-
-  procedure AddParamSQL;
-  begin
-    vParamName := Trim(vParamName);
-    if vParamName <> '' then begin
-      if Result.IndexOf(vParamName) < 0 then
-        Result.Add(vParamName);
-    end;
-    bParam := False;
-    vParamName := '';
-  end;
-begin
-  Result := TStringList.Create;
-  FCurrentPos := PChar(SQL);
-  bEscape1 := False;
-  bEscape2 := False;
+ procedure AddParamSQL;
+ Begin
+  vParamName := Trim(vParamName);
+  If vParamName <> '' Then
+   Begin
+    If Result.IndexOf(vParamName) < 0 Then
+     Result.Add(vParamName);
+   End;
   bParam := False;
-  while not (FCurrentPos^ = #0) do begin
-    if (FCurrentPos^ = '''') and (not bEscape2) and
-       (not (bEscape1 and (vOldChar = '\'))) then begin
-      // caso bParam = True e vParamName <> ''
-      // ex:  codigo = :codigo'nome' (sql incorreto??)
+  vParamName := '';
+ End;
+Begin
+ Result := TStringList.Create;
+ FCurrentPos := PChar(SQL);
+ bEscape1 := False;
+ bEscape2 := False;
+ bParam := False;
+ While Not (FCurrentPos^ = #0) Do
+  Begin
+   If (FCurrentPos^ = '''')   And
+      (Not bEscape2)          And
+      (Not (bEscape1          And
+           (vOldChar = '\'))) Then
+    Begin
+     AddParamSQL;
+     bEscape1 := not bEscape1;
+    End
+   Else If (FCurrentPos^ = '"')    And
+           (Not bEscape1)          And
+           (Not (bEscape2          And
+                (vOldChar = '\'))) Then
+    Begin
+     AddParamSQL;
+     bEscape2 := not bEscape2;
+    End
+   Else If (FCurrentPos^ = ':')    And
+           (Not bEscape1)          And
+           (Not bEscape2)          Then
+    Begin
+     AddParamSQL;
+     bParam := vOldChar in endParam;
+    End
+   Else If (bParam) Then
+    Begin
+     If (Not (FCurrentPos^ In endParam)) Then
+      vParamName := vParamName + FCurrentPos^
+     Else
       AddParamSQL;
-      bEscape1 := not bEscape1;
-    end
-    else if (FCurrentPos^ = '"') and (not bEscape1) and
-            (not (bEscape2 and (vOldChar = '\'))) then begin
-      // caso bParam = True e vParamName <> ''
-      // ex:  codigo = :codigo"nome" (sql incorreto??)
-      AddParamSQL;
-      bEscape2 := not bEscape2;
-    end
-    else if (FCurrentPos^ = ':') and (not bEscape1) and (not bEscape2) then begin
-      // caso bParam = True e vParamName <> ''
-      // ex:  codigo = :codigo:nome (sql incorreto??)
-      AddParamSQL;
-      bParam := vOldChar in endParam;
-    end
-    else if (bParam) then begin
-      if (not (FCurrentPos^ in endParam)) then
-        vParamName := vParamName + FCurrentPos^
-      else
-        AddParamSQL;
-    end;
-    vOldChar := FCurrentPos^;
-    Inc(FCurrentPos);
-  end;
-  AddParamSQL;
-end;
-
+    End;
+   vOldChar := FCurrentPos^;
+   Inc(FCurrentPos);
+  End;
+ AddParamSQL;
+End;
 
 Function ReturnParams(SQL : String) : TStringList;
 Begin
@@ -3831,3 +3834,4 @@ Begin
 End;
 
 End.
+
