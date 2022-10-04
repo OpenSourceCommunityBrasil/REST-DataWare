@@ -3677,7 +3677,7 @@ Procedure TRESTDWIdClientPooler.ReconfigureConnection(aTypeRequest           : T
                                                       aHost                  : String;
                                                       aPort                  : Integer;
                                                       Compression,
-                                                      EncodeStrings         : Boolean;
+                                                      EncodeStrings          : Boolean;
                                                       aEncoding              : TEncodeSelect;
                                                       aAccessTag             : String;
                                                       aAuthenticationOptions : TRESTDWClientAuthOptionParams);

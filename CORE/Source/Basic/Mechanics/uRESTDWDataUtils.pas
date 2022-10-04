@@ -1300,8 +1300,8 @@ End;
 Constructor TRESTDWAuthOptionBasic.Create;
 Begin
  inherited;
- vUserName := 'testserver';
- vPassword := vUserName;
+ vUserName := cDefaultBasicAuthUser;
+ vPassword := cDefaultBasicAuthPassword;
 End;
 
 Constructor TRESTDWAuthOptionTokenClient.Create;
