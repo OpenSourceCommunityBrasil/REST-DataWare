@@ -3006,17 +3006,13 @@ Begin
  If AStr <> '' Then
   Begin
    {$IFDEF FPC}
-    Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(Utf8ToAnsi(Astr)));
+    Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
    {$ELSE}
     {$IF CompilerVersion < 25}
      SetLength(Result, Length(AStr));
      Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
     {$ELSE}
-     {$IFDEF MSWINDOWS}
-      Result :=  TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
-     {$ELSE}
-      Result :=  TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
-     {$ENDIF}
+     Result :=  TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
     {$IFEND}
    {$ENDIF}
   End;
@@ -3236,6 +3232,11 @@ Function EncodeBase64(Const Value : String) : String;
 {$IFEND}
 Var
  vValue : String;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion > 24}
+   Ne : TBase64Encoding;
+  {$IFEND}
+ {$ENDIF}
 Begin
  vValue := Value;
  {$IFDEF FPC}
@@ -3258,8 +3259,12 @@ Begin
   Result := Base64Encode(Value);
  {$ELSE}
   {$IF CompilerVersion > 24}
-//   Result := Encode64(Value);
-   Result := TNetEncoding.Base64.Encode(Value);
+   Ne      := TBase64Encoding.Create(-1, '');
+   Try
+    Result := Ne.Encode(Value);
+   Finally
+    FreeAndNil(Ne);
+   End;
   {$ELSE}
    Result := Base64Encode(Value);
   {$IFEND}

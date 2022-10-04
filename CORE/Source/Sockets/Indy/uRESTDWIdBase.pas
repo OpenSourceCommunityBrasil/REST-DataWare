@@ -340,8 +340,7 @@ Type
  Public
   Constructor Create               (AOwner                 : TComponent);Override;
   Destructor  Destroy;Override;
-  Procedure   ReconfigureConnection(Var Connection         : TRESTClientPoolerBase;
-                                    aTypeRequest           : Ttyperequest;
+  Procedure   ReconfigureConnection(aTypeRequest           : Ttyperequest;
                                     aWelcomeMessage,
                                     aHost                  : String;
                                     aPort                  : Integer;
@@ -3673,8 +3672,7 @@ Begin
  Inherited;
 End;
 
-Procedure TRESTDWIdClientPooler.ReconfigureConnection(Var Connection        : TRESTClientPoolerBase;
-                                                      aTypeRequest           : Ttyperequest;
+Procedure TRESTDWIdClientPooler.ReconfigureConnection(aTypeRequest           : Ttyperequest;
                                                       aWelcomeMessage,
                                                       aHost                  : String;
                                                       aPort                  : Integer;
