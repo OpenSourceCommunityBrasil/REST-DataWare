@@ -17,8 +17,8 @@ object restdwcgiwebmodule: Trestdwcgiwebmodule
       'Access-Control-Allow-Headers=Content-Type, Origin, Accept, Authorization, X-CUSTOM-HEADER'
     )
     ServerParams.HasAuthentication = False
-    ServerParams.UserName = 'testserver'
-    ServerParams.Password = 'testserver'
+    ServerParams.UserName = cDefaultBasicAuthUser
+    ServerParams.Password = cDefaultBasicAuthPassword
     Encoding = esUtf8
     ForceWelcomeAccess = False
     ServerContext = 'cgieflex/dwCGIServer.exe'

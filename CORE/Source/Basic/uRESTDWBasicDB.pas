@@ -11997,11 +11997,11 @@ Begin
  {$ELSE}
   vEncoding         := esUtf8;
  {$ENDIF}
- vLogin             := 'testserver';
+ vLogin             := cDefaultBasicAuthUser;
  vRestWebService    := '127.0.0.1';
  vCompression       := True;
  vBinaryRequest     := False;
- vPassword          := vLogin;
+ vPassword          := cDefaultBasicAuthPassword;
  vRestPooler        := '';
  vPoolerPort        := 8082;
  vProxy             := False;

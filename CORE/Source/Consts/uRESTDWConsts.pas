@@ -75,7 +75,7 @@ Const
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
  RESTDWVersionINFO          = 'v2.1.0-';
- RESTDWRelease              = '3164';
+ RESTDWRelease              = '3221';
  RESTDWCodeProject          = 'Galaga - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
@@ -216,6 +216,8 @@ Const
  cMessagePartCreate         = 'MessagePart can not be created. Use descendant classes.';
  cMessageDecoderNotFound    = 'Decoder not found';
  cMessageEncoderNotFound    = 'Encoder not found';
+ cDefaultBasicAuthUser      = 'testserver';
+ cDefaultBasicAuthPassword  = 'testserver';
  cIOHandler_MaxCapturedLines = -1;
  cTimeoutDefault             = -1;
  cMaxLineLengthDefault       = 16 * 1024;
