@@ -3679,16 +3679,20 @@ Begin
   vTempQuery.FormatOptions.StrsTrim2Len   := StrsTrim2Len;
   While Not BufferInStream.Eof Do
    Begin
+    BufferStream  := Nil;
     vBufferStream := BufferInStream.ReadStream;
-    If Not Assigned(vBufferStream) Then
-     Continue;
-    BufferStream := TRESTDWBufferBase.Create;
-    BufferStream.LoadToStream(vBufferStream);
     Try
+     If Not Assigned(vBufferStream) Then
+      Continue;
+     BufferStream := TRESTDWBufferBase.Create;
+     BufferStream.LoadToStream(vBufferStream);
      vSqlStream    := BufferStream.ReadBytes;
      vParamsStream := TMemoryStream(BufferStream.ReadStream);
     Finally
-     FreeAndNil(BufferStream);
+     If Assigned(BufferStream)  Then
+      FreeAndNil(BufferStream);
+     If Assigned(vBufferStream) Then
+      FreeAndNil(vBufferStream);
     End;
     vTempQuery.Close;
     vTempQuery.SQL.Clear;
