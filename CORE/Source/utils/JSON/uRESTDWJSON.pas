@@ -688,9 +688,6 @@ begin
         while (true) do begin
             c := next();
             case (c) of
-            #0, #10, #13: begin
-                raise syntaxError('Unterminated string');
-            end;
             '\': begin
                 c := next();
                 case (c) of

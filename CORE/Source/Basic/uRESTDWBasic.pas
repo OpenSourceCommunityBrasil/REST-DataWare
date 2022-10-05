@@ -5839,6 +5839,7 @@ Var
 Begin
  BinaryBlob    := Nil;
  vTempJSON     := Nil;
+ aDataPack     := Nil;
  Try
   If ServerMethodsClass <> Nil Then
    Begin
@@ -5877,6 +5878,7 @@ Begin
                DWParams.ItemsString['DatasetStream'].SaveToStream(aDataPack);
                BinaryBlob := TMemoryStream(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.OpenDatasets(aDataPack,  vError,        vMessageError,
                                                                                                                      BinaryBlob, BinaryRequest, BinaryCompatible));
+               FreeAndNil(aDataPack);
                If Assigned(BinaryBlob) Then
                 DWParams.ItemsString['Result'].LoadFromStream(BinaryBlob)
                Else

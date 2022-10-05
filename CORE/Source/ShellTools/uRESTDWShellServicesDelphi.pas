@@ -130,7 +130,7 @@ Begin
      Begin
       For I := 0 To CORS_CustomHeaders.Count -1 Do
        Begin
-         {$IF CompilerVersion > 23}
+         {$IF CompilerVersion > 30}
          AResponse.CustomHeaders.AddPair(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
          {$ELSE}
          AResponse.CustomHeaders.Add(CORS_CustomHeaders.Names[I] + cNameValueSeparator + CORS_CustomHeaders.ValueFromIndex[I]);
@@ -139,7 +139,7 @@ Begin
      End
     Else
      Begin
-       {$IF CompilerVersion > 23}
+       {$IF CompilerVersion > 30}
        AResponse.CustomHeaders.AddPair('Access-Control-Allow-Origin','*');
        {$ELSE}
        AResponse.CustomHeaders.Add('Access-Control-Allow-Origin' + cNameValueSeparator + '*');
@@ -234,11 +234,11 @@ Begin
      End;
     For I := 0 To vResponseHeader.Count -1 Do
      Begin
-       {$IF CompilerVersion < 24}
-        AResponse.CustomHeaders.Add(vResponseHeader.Names[I] + cNameValueSeparator + vResponseHeader.Values[vResponseHeader.Names[I]]);
-       {$ELSE}
+       {$IF CompilerVersion > 30}
         AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
                                         vResponseHeader.Values[vResponseHeader.Names[I]]);
+       {$ELSE}
+        AResponse.CustomHeaders.Add(vResponseHeader.Names[I] + cNameValueSeparator + vResponseHeader.Values[vResponseHeader.Names[I]]);
        {$IFEND}
      End;
     Handled := True;
