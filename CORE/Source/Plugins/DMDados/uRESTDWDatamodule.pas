@@ -241,21 +241,21 @@ Var
 
    ParamsURI := '';
    if vIsQuery then begin
-     ParamsURI := Copy(URL,vPosQuery+1,High(URL));
+     ParamsURI := Copy(URL,vPosQuery+1,Length(URL));
      URL := Copy(URL,1,vPosQuery-1);
    end;
 
    // url igual http://localhost:8082/usuarios//?var=teste
-   while (URL <> '') and (URL[High(URL)] in ['/','?']) do
-     Delete(URL,High(URL),1);
+   while (URL <> '') and (URL[Length(URL)] in ['/','?']) do
+     Delete(URL,Length(URL),1);
 
    // url http://localhost:8082/usuarios//login//?var=teste
    while (Pos('//',URL) > 0) do
      Delete(URL,Pos('//',URL),1);
 
    // ParamsURI = /?teste=1
-   while (ParamsURI <> '') and (ParamsURI[Low(ParamsURI)] in ['/','?']) do
-     Delete(ParamsURI,Low(ParamsURI),1);
+   while (ParamsURI <> '') and (ParamsURI[InitStrPos] in ['/','?']) do
+     Delete(ParamsURI,InitStrPos,1);
 
    if URL = '' then
      URL := '/';
