@@ -1,95 +1,144 @@
-unit uPrincipal;
+unit uprincipal;
 
-{$mode objfpc}{$H+}
+{$mode ObjFPC}{$H+}
 
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls, Buttons,
-  ComCtrls, CheckLst, ufrIDEItem;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
+  ComCtrls, CheckLst, uprincipal, frteste;
 
 type
+  TSplashFormStyle = record
+    Background: string;
+    Banner: string;
+    subtitle: string;
+    Theme: string;
+    FontColor: TColor;
+  end;
 
-  { TfPrincipal }
+  { TForm1 }
 
-  TfPrincipal = class(TForm)
+  TForm1 = class(TForm)
     CheckListBox1: TCheckListBox;
     CheckListBox2: TCheckListBox;
     CheckListBox3: TCheckListBox;
-    FlowPanel1: TFlowPanel;
-    Image1: TImage;
+    imLazarus: TImage;
+    imDelphi: TImage;
+    imLanguageBack: TImage;
+    imIDEBack: TImage;
+    imIDENext: TImage;
+    imBanner: TImage;
+    imLangBR: TImage;
+    imLangUS: TImage;
+    imLangES: TImage;
+    imBackground: TImage;
+    imResourcesNext: TImage;
+    imInstallNext: TImage;
+    imTheme: TImage;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
-    Label4: TLabel;
-    Label5: TLabel;
-    Label6: TLabel;
-    Label7: TLabel;
-    Label8: TLabel;
-    Memo1: TMemo;
-    PageControl1: TPageControl;
-    Panel1: TPanel;
-    Panel10: TPanel;
-    Panel11: TPanel;
-    Panel12: TPanel;
-    Panel13: TPanel;
-    Panel14: TPanel;
-    Panel15: TPanel;
-    Panel2: TPanel;
-    Panel3: TPanel;
-    Panel4: TPanel;
-    Panel5: TPanel;
-    Panel6: TPanel;
-    Panel7: TPanel;
-    Panel8: TPanel;
-    Panel9: TPanel;
-    ScrollBox1: TScrollBox;
-    tsIDE: TTabSheet;
-    tsRecursos: TTabSheet;
-    tsStatus: TTabSheet;
+    lIDESubTitle: TLabel;
+    lSubTitle2: TLabel;
+    lVersion: TLabel;
+    lSubTitle: TLabel;
+    lTheme: TLabel;
+    pRecursos: TPanel;
+    pIDE: TPanel;
+    pLanguage: TPanel;
     procedure FormCreate(Sender: TObject);
-    procedure Panel14Click(Sender: TObject);
-    procedure Panel15Click(Sender: TObject);
-    procedure Panel4Click(Sender: TObject);
-    procedure Panel8Click(Sender: TObject);
+    procedure imIDEBackClick(Sender: TObject);
+    procedure imInstallNextClick(Sender: TObject);
+    procedure imLanguageBackClick(Sender: TObject);
+    procedure imIDENextClick(Sender: TObject);
+    procedure imResourcesNextClick(Sender: TObject);
+    procedure imThemeClick(Sender: TObject);
   private
-
+    FThemeIndex: integer;
+    procedure SetTheme(aThemeIndex: integer);
   public
 
   end;
 
 var
-  fPrincipal: TfPrincipal;
+  Form1: TForm1;
+  Themes: array of TSplashFormStyle;
 
 implementation
 
 {$R *.lfm}
 
-{ TfPrincipal }
+{ TForm1 }
 
-procedure TfPrincipal.Panel4Click(Sender: TObject);
+procedure TForm1.imThemeClick(Sender: TObject);
 begin
-  PageControl1.ActivePage := tsRecursos;
+  if FThemeIndex = 0 then
+    SetTheme(1)
+  else
+    SetTheme(0);
 end;
 
-procedure TfPrincipal.Panel14Click(Sender: TObject);
+procedure TForm1.SetTheme(aThemeIndex: integer);
+var
+  I: integer;
 begin
-  PageControl1.ActivePage := tsIDE;
+  imBanner.Picture.LoadFromResourceName(HInstance, Themes[aThemeIndex].Banner);
+  imBackground.Picture.LoadFromResourceName(HInstance, Themes[aThemeIndex].Background);
+  imTheme.Picture.LoadFromResourceName(HInstance, Themes[aThemeIndex].Theme);
+  for I := 0 to pred(ComponentCount) do
+    if (Components[I] is TLabel) and not ((Components[I] as TLabel).Name =
+      'lNextButton') then
+      (Components[I] as TLabel).Font.Color := Themes[aThemeIndex].FontColor;
+  lTheme.Caption := Themes[aThemeIndex].subtitle;
+  FThemeIndex := aThemeIndex;
 end;
 
-procedure TfPrincipal.FormCreate(Sender: TObject);
+procedure TForm1.FormCreate(Sender: TObject);
 begin
-  PageControl1.ActivePage := tsIDE;
+  pLanguage.ControlStyle := pLanguage.ControlStyle - [csOpaque] + [csParentBackground];
+  pIDE.ControlStyle := pIDE.ControlStyle - [csOpaque] + [csParentBackground];
+
+  pLanguage.Visible := True;
+  //SetTheme(0);
 end;
 
-procedure TfPrincipal.Panel15Click(Sender: TObject);
+procedure TForm1.imIDEBackClick(Sender: TObject);
 begin
-  PageControl1.ActivePage := tsRecursos;
+  pLanguage.Visible := False;
+  pRecursos.Visible := False;
+  pIDE.Visible := True;
 end;
 
-procedure TfPrincipal.Panel8Click(Sender: TObject);
+procedure TForm1.imInstallNextClick(Sender: TObject);
 begin
-  PageControl1.ActivePage := tsStatus;
+  pLanguage.Visible := False;
+  pRecursos.Visible := False;
+  pIDE.Visible := False;
+end;
+
+procedure TForm1.imLanguageBackClick(Sender: TObject);
+begin
+  pLanguage.Visible := True;
+  pRecursos.Visible := False;
+  pIDE.Visible := False;
+end;
+
+procedure TForm1.imIDENextClick(Sender: TObject);
+begin
+  pLanguage.Visible := False;
+  pRecursos.Visible := False;
+  pIDE.Visible := True;
+  //Application.CreateForm(TfPrincipal, fPrincipal);
+  //fPrincipal.Show;
+  //Self.Hide;
+end;
+
+procedure TForm1.imResourcesNextClick(Sender: TObject);
+begin
+  pLanguage.Visible := False;
+  pRecursos.Visible := True;
+  pIDE.Visible := False;
 end;
 
 end.
