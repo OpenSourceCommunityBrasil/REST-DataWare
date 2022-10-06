@@ -33,10 +33,10 @@ Uses
   {$IF Defined(RESTDWFMX)}
    , IOUtils
   {$IFEND}
+  {$IF CompilerVersion > 24}
+   , System.NetEncoding
+  {$IFEND}
  {$ENDIF},
- {$IF CompilerVersion > 24}
-  System.NetEncoding,
- {$IFEND}
  uRESTDWEncodeClass, uRESTDWCharset, uRESTDWMimeTypes;
 
  Const
