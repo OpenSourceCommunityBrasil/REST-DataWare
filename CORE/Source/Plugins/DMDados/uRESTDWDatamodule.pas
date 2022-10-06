@@ -119,12 +119,14 @@ End;
 Function  TServerMethodDataModule.GetAction(Var URL     : String;
                                             Var Params  : TRESTDWParams) : Boolean;
 Var
- I, A        : Integer;
+ I, A,vPosQuery : Integer;
  vIsQuery    : Boolean;
  vParamName,
  vTempRoute,
- vTempValue  : String;
- Procedure ParseParams(ParamsURI : String);
+ vTempValue : String;
+ ParamsURI : String;
+
+ Procedure ParseParams;
  Var
   vTempData,
   vTempParams : String;
@@ -212,6 +214,7 @@ Var
      End;
    End;
  End;
+
  Procedure CopyParams(SourceParams : TRESTDWParamsMethods);
  Var
   I : Integer;
@@ -230,12 +233,43 @@ Var
      End;
    End;
  End;
+
+ procedure ParseURL;
+ begin
+   vPosQuery  := Pos('?', URL);
+   vIsQuery   := vPosQuery > 0;
+
+   ParamsURI := '';
+   if vIsQuery then begin
+     ParamsURI := Copy(URL,vPosQuery+1,High(URL));
+     URL := Copy(URL,1,vPosQuery-1);
+   end;
+
+   // url igual http://localhost:8082/usuarios//?var=teste
+   while (URL <> '') and (URL[High(URL)] in ['/','?']) do
+     Delete(URL,High(URL),1);
+
+   // url http://localhost:8082/usuarios//login//?var=teste
+   while (Pos('//',URL) > 0) do
+     Delete(URL,Pos('//',URL),1);
+
+   // ParamsURI = /?teste=1
+   while (ParamsURI <> '') and (ParamsURI[Low(ParamsURI)] in ['/','?']) do
+     Delete(ParamsURI,Low(ParamsURI),1);
+
+   if URL = '' then
+     URL := '/';
+ end;
+
 Begin
  Result   := False;
  If Length(URL) = 0 Then
   Exit;
+
+ ParseURL;
+
  vTempValue := URL;
- vIsQuery   := (Pos('?', vTempValue) > 0);
+
  For I := 0 To ComponentCount -1 Do
   Begin
    If (Components[i] is TRESTDWServerEvents) Or
@@ -245,42 +279,13 @@ Begin
       Begin
        For A := 0 To TRESTDWServerEvents(Components[I]).Events.Count -1 Do
         Begin
-         vTempRoute := Lowercase(TRESTDWServerEvents(Components[I]).Events[A].BaseURL   +
-                                 TRESTDWServerEvents(Components[I]).Events[A].EventName);
-         If vIsQuery Then
-          Begin
-           vTempRoute := vTempRoute + '?';
-           If Copy(vTempValue, Length(vTempValue), 1) <> '?' Then
-            vTempValue := vTempValue + '?';
-          End
-         Else
-          Begin
-           vTempRoute := vTempRoute + '/';
-           If Copy(vTempValue, Length(vTempValue), 1) <> '/' Then
-            vTempValue :=  vTempValue + '/';
-          End;
-         Result     := vTempRoute = Copy(vTempValue, 1, Length(vTempRoute));
+         vTempRoute := TRESTDWServerEvents(Components[I]).Events[A].BaseURL   +
+                       TRESTDWServerEvents(Components[I]).Events[A].EventName;
+         Result     := SameText(vTempRoute, vTempValue);
+
          If Result Then
           Begin
            CopyParams(TRESTDWServerEvents(Components[I]).Events[A].Params);
-           URL        := vTempRoute;
-           vTempValue := Copy(vTempValue, Length(URL), Length(vTempValue));
-           If vIsQuery Then
-            Begin
-             If Copy(vTempValue, 1, 1) = '?' Then
-              Delete(vTempValue, 1, 1);
-             If Copy(vTempValue, Length(vTempValue), 1) = '?' Then
-              Delete(vTempValue, Length(vTempValue), 1);
-             If Copy(URL, Length(URL), 1) = '?' Then
-              Delete(URL, Length(URL), 1);
-            End
-           Else
-            Begin
-             If Copy(vTempValue, Length(vTempValue), 1) = '/' Then
-              Delete(vTempValue, Length(vTempValue), 1);
-             If Copy(URL, Length(URL), 1) = '/' Then
-              Delete(URL, Length(URL), 1);
-            End;
            Break;
           End;
         End;
@@ -289,20 +294,8 @@ Begin
       Begin
        For A := 0 To TRESTDWServerContext(Components[I]).ContextList.Count -1 Do
         Begin
-         vTempRoute := Lowercase(TRESTDWServerContext(Components[I]).ContextList[A].BaseURL   +
-                                 TRESTDWServerContext(Components[I]).ContextList[A].ContextName);
-         If vIsQuery Then
-          Begin
-           vTempRoute := vTempRoute + '?';
-           If Copy(vTempValue, Length(vTempValue), 1) <> '?' Then
-            vTempValue := vTempValue + '?';
-          End
-         Else
-          Begin
-           vTempRoute := vTempRoute + '/';
-           If Copy(vTempValue, Length(vTempValue), 1) <> '/' Then
-            vTempValue :=  vTempValue + '/';
-          End;
+         vTempRoute := TRESTDWServerContext(Components[I]).ContextList[A].BaseURL   +
+                       TRESTDWServerContext(Components[I]).ContextList[A].ContextName;
          If ((vTempValue = '/') Or (vTempValue = '')) Then
           Begin
            If TRESTDWServerContext(Components[I]).DefaultContext <> '' Then
@@ -310,39 +303,20 @@ Begin
              vTempValue := TRESTDWServerContext(Components[I]).DefaultContext;
              If vTempValue[InitStrPos] <> '/' Then
               vTempValue :=  '/' + vTempValue;
-             If Copy(vTempValue, Length(vTempValue), 1) <> '/' Then
-              vTempValue :=  vTempValue + '/';
             End;
           End;
-         Result     := vTempRoute = Copy(vTempValue, 1, Length(vTempRoute));
+         Result     := SameText(vTempRoute, vTempValue);
          If Result Then
           Begin
            CopyParams(TRESTDWServerContext(Components[I]).ContextList[A].Params);
-           URL        := vTempRoute;
-           vTempValue := Copy(vTempValue, Length(URL), Length(vTempValue));
-           If vIsQuery Then
-            Begin
-             If Copy(vTempValue, 1, 1) = '?' Then
-              Delete(vTempValue, 1, 1);
-             If Copy(vTempValue, Length(vTempValue), 1) = '?' Then
-              Delete(vTempValue, Length(vTempValue), 1);
-             If Copy(URL, Length(URL), 1) = '?' Then
-              Delete(URL, Length(URL), 1);
-            End
-           Else
-            Begin
-             If Copy(vTempValue, Length(vTempValue), 1) = '/' Then
-              Delete(vTempValue, Length(vTempValue), 1);
-             If Copy(URL, Length(URL), 1) = '/' Then
-              Delete(URL, Length(URL), 1);
-            End;
            Break;
           End;
         End;
       End;
+
      If Result Then
       Begin
-       ParseParams(vTempValue);
+       ParseParams;
        Break;
       End;
     End;
