@@ -11,17 +11,17 @@ uses
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms,
-  uPrincipal in 'src\telas\uprincipal.pas' {fPrincipal},
-  ufrIDEItem in 'src\telas\frames\ufrideitem.pas', unit1, unit2 {frIDEItem}
-  { you can add units after this };
+  uconsts in 'src\funcoes\uconsts.pas',
+  uprincipal in 'src\telas\uprincipal.pas';
 
 {$R *.res}
 
 begin
   RequireDerivedFormResource := True;
-  Application.Scaled := True;
+  Application.Scaled:=True;
   Application.Initialize;
-  Application.CreateForm(TfPrincipal, fPrincipal);
+  //Application.CreateForm(TfPrincipal, fPrincipal);
+  Application.CreateForm(TForm1, Form1);
   Application.Run;
 end.
 

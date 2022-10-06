@@ -16,6 +16,21 @@
         <DpiAware Value="True"/>
       </XPManifest>
       <Icon Value="0"/>
+      <Resources Count="13">
+        <Resource_0 FileName="Assets\128-spain.png" Type="RCDATA" ResourceName="LANGSPAIN"/>
+        <Resource_1 FileName="Assets\255-brazil.png" Type="RCDATA" ResourceName="LANGBRAZIL"/>
+        <Resource_2 FileName="Assets\Background - Dark.png" Type="RCDATA" ResourceName="DARKBG"/>
+        <Resource_3 FileName="Assets\Background - Light.png" Type="RCDATA" ResourceName="LIGHTBG"/>
+        <Resource_4 FileName="Assets\Moon Symbol.png" Type="RCDATA" ResourceName="DARKICON"/>
+        <Resource_5 FileName="Assets\Summer.png" Type="RCDATA" ResourceName="LIGHTICON"/>
+        <Resource_6 FileName="Assets\united-states.png" Type="RCDATA" ResourceName="LANGUSA"/>
+        <Resource_7 FileName="..\CORE\Images\icons\RDW_Banner.png" Type="RCDATA" ResourceName="DARKBANNER"/>
+        <Resource_8 FileName="..\CORE\Images\icons\RDW_BannerLight.png" Type="RCDATA" ResourceName="LIGHTBANNER"/>
+        <Resource_9 FileName="Assets\DelphiIDE.png" Type="RCDATA" ResourceName="LIGHTDELPHI"/>
+        <Resource_10 FileName="Assets\DelphiIDEDARK.png" Type="RCDATA" ResourceName="DARKDELPHI"/>
+        <Resource_11 FileName="Assets\LazarusIDE.png" Type="RCDATA" ResourceName="LIGHTLAZARUS"/>
+        <Resource_12 FileName="Assets\LazarusIDEDARK.png" Type="RCDATA" ResourceName="DARKLAZARUS"/>
+      </Resources>
     </General>
     <BuildModes>
       <Item Name="Debug" Default="True"/>
@@ -28,7 +43,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="src\funcoes;src"/>
+            <OtherUnitFiles Value="src\funcoes;src\telas"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -67,30 +82,26 @@
       <Unit>
         <Filename Value="RESTDWInstalador.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="restdwinstalador"/>
-      </Unit>
-      <Unit>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="fPrincipal"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="uPrincipal"/>
-      </Unit>
-      <Unit>
-        <Filename Value="src\telas\frames\ufrideitem.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="frIDEItem"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Frame"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\udetectide.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="uPrincipal"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\uidefunctions.pas"/>
         <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\uconsts.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\telas\uprincipal.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\ulazarusdetect.pas"/>
@@ -106,8 +117,8 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="src\funcoes;src"/>
-      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      <OtherUnitFiles Value="src\funcoes;src\telas"/>
+      <UnitOutputDirectory Value="$(TargetCPU)-$(TargetOS)\$(TargetMode)"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>
@@ -136,6 +147,11 @@
         </Win32>
       </Options>
     </Linking>
+    <Other>
+      <Verbosity>
+        <ShoLineNum Value="True"/>
+      </Verbosity>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions>
