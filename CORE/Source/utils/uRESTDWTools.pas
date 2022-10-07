@@ -424,7 +424,7 @@ End;
 
 Function Result2JSON(wsResult: TResultErro): String;
 Begin
- Result := '{"STATUS":"' + wsResult.Status + '","MENSSAGE":"' + wsResult.MessageText + '"}';
+ Result := Format('{"STATUS":"%s","MESSAGE":"%s"}', [wsResult.Status, wsResult.MessageText]);
 End;
 
 Function GetPairJSONInt(Status      : Integer;
@@ -3000,7 +3000,7 @@ Begin
  End;
 end;
 
-Function StringToBytes(AStr              : String)       : TRESTDWBytes;
+Function StringToBytes(AStr: String): TRESTDWBytes;
 Begin
  SetLength(Result, 0);
  If AStr <> '' Then
@@ -3008,7 +3008,7 @@ Begin
    {$IFDEF FPC}
     Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
    {$ELSE}
-    {$IF CompilerVersion < 25}
+    {$IF CompilerVersion < 22}
      SetLength(Result, Length(AStr));
      Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
     {$ELSE}
@@ -3040,7 +3040,7 @@ Begin
   {$IFDEF FPC}
    SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
   {$ELSE}
-   {$IF CompilerVersion < 25}
+   {$IF CompilerVersion < 22}
     SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
    {$ELSE}
     {$IFDEF MSWINDOWS}
@@ -3063,7 +3063,7 @@ Begin
   {$IFDEF FPC}
    SetString(Result, PAnsiChar(bin), I);
   {$ELSE}
-   {$IF CompilerVersion < 25}
+   {$IF CompilerVersion < 22}
     SetString(Result, PAnsiChar(bin), I);
    {$ELSE}
     {$IFDEF MSWINDOWS}
