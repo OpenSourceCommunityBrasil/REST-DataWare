@@ -218,6 +218,7 @@ Const
  cMessageEncoderNotFound    = 'Encoder not found';
  cDefaultBasicAuthUser      = 'testserver';
  cDefaultBasicAuthPassword  = 'testserver';
+ cServerMethodClassNotAssigned = 'Property ServerMethodClass not assigned';
  cIOHandler_MaxCapturedLines = -1;
  cTimeoutDefault             = -1;
  cMaxLineLengthDefault       = 16 * 1024;
