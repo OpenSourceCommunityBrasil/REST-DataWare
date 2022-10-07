@@ -3190,7 +3190,7 @@ Var
    AResponseInfo.ContentLength          := mb.Size;
    AResponseInfo.WriteContent;
   {$ELSE}
-   mb                                  := TStringStream.Create(ErrorMessage);
+   mb                                   := TStringStream.Create(ErrorMessage);
    mb.Position                          := 0;
    AResponseInfo.FreeContentStream      := True;
    AResponseInfo.ContentStream          := mb;
