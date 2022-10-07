@@ -81,23 +81,35 @@ Type
   Function  GetGenID                  (Query                 : TComponent;
                                        GenName               : String): Integer;          Virtual;Abstract;
   Constructor Create                  (AOwner                : TComponent);               Override; //Cria o Componente
+  Function ApplyUpdates               (MassiveStream         : TStream;
+                                       SQL                   : String;
+                                       Params                : TRESTDWParams;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String;
+                                       Var RowsAffected      : Integer) : TJSONValue;     Overload;Virtual;Abstract;
   Function ApplyUpdates               (Massive,
                                        SQL                   : String;
                                        Params                : TRESTDWParams;
                                        Var Error             : Boolean;
                                        Var MessageError      : String;
-                                       Var RowsAffected      : Integer) : TJSONValue;     Virtual;Abstract;
+                                       Var RowsAffected      : Integer) : TJSONValue;     Overload;Virtual;Abstract;
   Function ApplyUpdates_MassiveCache  (MassiveCache          : String;
                                        Var Error             : Boolean;
                                        Var MessageError      : String) : TJSONValue;      Virtual;Abstract;
   Function ProcessMassiveSQLCache     (MassiveSQLCache       : String;
                                        Var Error             : Boolean;
                                        Var MessageError      : String) : TJSONValue;      Virtual;Abstract;
+  Function ApplyUpdatesTB             (MassiveStream         : TStream;
+                                       SQL                   : String;
+                                       Params                : TRESTDWParams;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String;
+                                       Var RowsAffected      : Integer) : TJSONValue;     Overload;Virtual;Abstract;
   Function ApplyUpdatesTB             (Massive               : String;
                                        Params                : TRESTDWParams;
                                        Var Error             : Boolean;
                                        Var MessageError      : String;
-                                       Var RowsAffected      : Integer) : TJSONValue;     Virtual;Abstract;
+                                       Var RowsAffected      : Integer) : TJSONValue;     Overload;Virtual;Abstract;
   Function ApplyUpdates_MassiveCacheTB(MassiveCache          : String;
                                        Var Error             : Boolean;
                                        Var MessageError      : String) : TJSONValue;      Virtual;Abstract;
@@ -635,13 +647,15 @@ Type
                                       Var Pooler              : String;
                                       Var DWParams            : TRESTDWParams;
                                       ConnectionDefs          : TConnectionDefs;
-                                      hEncodeStrings          : Boolean;
+                                      hEncodeStrings,
+                                      BinaryEvent             : Boolean;
                                       AccessTag               : String);
   Procedure ApplyUpdatesJSONTB       (ServerMethodsClass      : TComponent;
                                       Var Pooler              : String;
                                       Var DWParams            : TRESTDWParams;
                                       ConnectionDefs          : TConnectionDefs;
-                                      hEncodeStrings          : Boolean;
+                                      hEncodeStrings,
+                                      BinaryEvent             : Boolean;
                                       AccessTag               : String);
   Procedure OpenDatasets             (ServerMethodsClass      : TComponent;
                                       Var Pooler              : String;
@@ -4840,7 +4854,7 @@ Begin
    Else If vUrlMethod = UpperCase('ApplyUpdates') Then
     Begin
      vResult    := DWParams.ItemsString['Pooler'].Value;
-     ApplyUpdatesJSON(BaseObject, vResult, DWParams, ConnectionDefs, hEncodeStrings, AccessTag);
+     ApplyUpdatesJSON(BaseObject, vResult, DWParams, ConnectionDefs, hEncodeStrings, BinaryEvent, AccessTag);
      Result     := True;
      If Not(DWParams.ItemsString['Error'].AsBoolean) Then
       JSONStr    := TReplyOK
@@ -4850,7 +4864,7 @@ Begin
    Else If vUrlMethod = UpperCase('ApplyUpdatesTB') Then
     Begin
      vResult    := DWParams.ItemsString['Pooler'].Value;
-     ApplyUpdatesJSONTB(BaseObject, vResult, DWParams, ConnectionDefs, hEncodeStrings, AccessTag);
+     ApplyUpdatesJSONTB(BaseObject, vResult, DWParams, ConnectionDefs, hEncodeStrings, BinaryEvent, AccessTag);
      Result     := True;
      If Not(DWParams.ItemsString['Error'].AsBoolean) Then
       JSONStr    := TReplyOK
@@ -5640,12 +5654,14 @@ Procedure TRESTServiceBase.ApplyUpdatesJSON(ServerMethodsClass : TComponent;
                                               Var Pooler         : String;
                                               Var DWParams       : TRESTDWParams;
                                               ConnectionDefs     : TConnectionDefs;
-                                              hEncodeStrings     : Boolean;
+                                              hEncodeStrings,
+                                              BinaryEvent        : Boolean;
                                               AccessTag          : String);
 Var
  vRowsAffected,
  I             : Integer;
  vTempJSON     : TJSONValue;
+ vBufferStream : TStream;
  vError        : Boolean;
  vSQL,
  vMessageError : String;
@@ -5691,7 +5707,20 @@ Begin
              Raise Exception.Create(cInvalidDriverConnection);
             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.PrepareConnection(ConnectionDefs);
             DWParams.ItemsString['Massive'].CriptOptions.Use := False;
-            vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdates(DWParams.ItemsString['Massive'].AsString,
+            If BinaryEvent Then
+             Begin
+              vBufferStream := TMemoryStream.Create;
+              Try
+               DWParams.ItemsString['Massive'].SaveToStream(vBufferStream);
+               vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdates(vBufferStream,
+                                                                                                      vSQL,
+                                                                                                      DWParamsD, vError, vMessageError, vRowsAffected);
+              Finally
+               FreeAndNil(vBufferStream);
+              End;
+             End
+            Else
+             vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdates(DWParams.ItemsString['Massive'].AsString,
                                                                                                     vSQL,
                                                                                                     DWParamsD, vError, vMessageError, vRowsAffected);
            Except
@@ -5733,7 +5762,8 @@ Procedure TRESTServiceBase.ApplyUpdatesJSONTB(ServerMethodsClass : TComponent;
                                                 Var Pooler         : String;
                                                 Var DWParams       : TRESTDWParams;
                                                 ConnectionDefs     : TConnectionDefs;
-                                                hEncodeStrings     : Boolean;
+                                                hEncodeStrings,
+                                                BinaryEvent        : Boolean;
                                                 AccessTag          : String);
 Var
  vRowsAffected,

@@ -2400,15 +2400,15 @@ Begin
 End;
 
 Procedure TRESTDWDatabasebaseBase.ApplyUpdates(Var PoolerMethodClient : TRESTDWPoolerMethodClient;
-                                       Massive                : TMassiveDatasetBuffer;
-                                       SQL                    : TStringList;
-                                       Var Params             : TParams;
-                                       Var Error,
-                                       hBinaryRequest         : Boolean;
-                                       Var MessageError       : String;
-                                       Var Result             : TJSONValue;
-                                       Var RowsAffected       : Integer;
-                                       RESTClientPooler       : TRESTClientPoolerBase = Nil);
+                                               Massive                : TMassiveDatasetBuffer;
+                                               SQL                    : TStringList;
+                                               Var Params             : TParams;
+                                               Var Error,
+                                               hBinaryRequest         : Boolean;
+                                               Var MessageError       : String;
+                                               Var Result             : TJSONValue;
+                                               Var RowsAffected       : Integer;
+                                               RESTClientPooler       : TRESTClientPoolerBase = Nil);
 Var
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  LDataSetList         : TJSONValue;
@@ -4773,6 +4773,7 @@ Procedure TRESTDWDatabasebaseBase.ApplyUpdates(Var MassiveCache       : TRESTDWM
 Var
  I                    : Integer;
  vUpdateLine          : String;
+ vMassiveStream       : TStream;
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  RESTClientPoolerExec : TRESTClientPoolerBase;
  ResultData           : TJSONValue;
@@ -8024,11 +8025,10 @@ End;
 
 Function TRESTDWClientSQL.ApplyUpdates(Var Error: String; ReleaseCache : Boolean = True): Boolean;
 Var
- vError        : Boolean;
- vErrorMSG,
- vMassiveJSON  : String;
- vResult       : TJSONValue;
- vActualReg    : TBookmark;
+ vError         : Boolean;
+ vErrorMSG      : String;
+ vResult        : TJSONValue;
+ vActualReg     : TBookmark;
 Begin
  Result  := False;
  vError  := False;
@@ -8051,99 +8051,94 @@ Begin
     Error := 'No data to "Applyupdates"...'
    Else
     Begin
-     vMassiveJSON := TMassiveDatasetBuffer(vMassiveDataset).ToJSON;
-     Result       := vMassiveJSON <> '';
-     If Result Then
+     Result     := False;
+     If vRESTDataBase <> Nil Then
       Begin
-       Result     := False;
-       If vRESTDataBase <> Nil Then
+       If vAutoRefreshAfterCommit Then
+        vRESTDataBase.ApplyUpdates(vActualPoolerMethodClient, TMassiveDatasetBuffer(vMassiveDataset), vSQL, vParams, vError, vBinaryRequest, vErrorMSG, vResult, vRowsAffected, Nil)
+       Else
+        vRESTDataBase.ApplyUpdates(vActualPoolerMethodClient, TMassiveDatasetBuffer(vMassiveDataset), Nil,  vParams, vError, vBinaryRequest, vErrorMSG, vResult, vRowsAffected, Nil);
+       Result := Not vError;
+       Error  := vErrorMSG;
+       If (Assigned(vResult) And (vAutoRefreshAfterCommit)) And
+          (Not (TMassiveDatasetBuffer(vMassiveDataset).ReflectChanges)) Then
         Begin
-         If vAutoRefreshAfterCommit Then
-          vRESTDataBase.ApplyUpdates(vActualPoolerMethodClient, TMassiveDatasetBuffer(vMassiveDataset), vSQL, vParams, vError, vBinaryRequest, vErrorMSG, vResult, vRowsAffected, Nil)
-         Else
-          vRESTDataBase.ApplyUpdates(vActualPoolerMethodClient, TMassiveDatasetBuffer(vMassiveDataset), Nil,  vParams, vError, vBinaryRequest, vErrorMSG, vResult, vRowsAffected, Nil);
-         Result := Not vError;
-         Error  := vErrorMSG;
-         If (Assigned(vResult) And (vAutoRefreshAfterCommit)) And
-            (Not (TMassiveDatasetBuffer(vMassiveDataset).ReflectChanges)) Then
-          Begin
-           Try
-            vActive := False;
-            ProcBeforeOpen(Self);
-            vInBlockEvents := True;
-            Filter         := '';
-            Filtered       := False;
-            vActive        := GetData(vResult);
-            If State = dsBrowse Then
-             Begin
-              If Trim(vUpdateTableName) <> '' Then
-               TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vUpdateTableName));
-              PrepareDetails(True);
-             End
-            Else If State = dsInactive Then
-             PrepareDetails(False);
+         Try
+          vActive := False;
+          ProcBeforeOpen(Self);
+          vInBlockEvents := True;
+          Filter         := '';
+          Filtered       := False;
+          vActive        := GetData(vResult);
+          If State = dsBrowse Then
+           Begin
+            If Trim(vUpdateTableName) <> '' Then
+             TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vUpdateTableName));
+            PrepareDetails(True);
+           End
+          Else If State = dsInactive Then
+           PrepareDetails(False);
+          vInBlockEvents := False;
+         Except
+          On E : Exception do
+           Begin
             vInBlockEvents := False;
-           Except
-            On E : Exception do
+            If csDesigning in ComponentState Then
+             Raise Exception.Create(PChar(E.Message))
+            Else
              Begin
-              vInBlockEvents := False;
-              If csDesigning in ComponentState Then
-               Raise Exception.Create(PChar(E.Message))
-              Else
-               Begin
-                If Assigned(vOnGetDataError) Then
-                 vOnGetDataError(False, E.Message);
-                If vRaiseError Then
-                 Raise Exception.Create(PChar(E.Message));
-               End;
+              If Assigned(vOnGetDataError) Then
+               vOnGetDataError(False, E.Message);
+              If vRaiseError Then
+               Raise Exception.Create(PChar(E.Message));
              End;
            End;
-          End
-         Else If Assigned(vResult) And
-                         (TMassiveDatasetBuffer(vMassiveDataset).ReflectChanges) Then
+         End;
+        End
+       Else If Assigned(vResult) And
+                       (TMassiveDatasetBuffer(vMassiveDataset).ReflectChanges) Then
+        Begin
+         //Edit Dataset with values back.
+         vActualReg     := GetBookmark;
+         vInBlockEvents := True;
+         If Not vResult.isnull Then
           Begin
-           //Edit Dataset with values back.
-           vActualReg     := GetBookmark;
-           vInBlockEvents := True;
-           If Not vResult.isnull Then
-            Begin
-             ProcessChanges(vResult.Value);
-             GotoBookmark(vActualReg);
-            End;
-           vInBlockEvents := False;
-           If State = dsBrowse Then
-            Begin
-             If Trim(vUpdateTableName) <> '' Then
-              TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vUpdateTableName));
-            End
-           Else If State = dsInactive Then
-            PrepareDetails(False);
-          End
-         Else
-          Begin
-           If vError Then
-            Begin
-             vInBlockEvents := False;
-
-             If Assigned(vOnGetDataError) Then
-              vOnGetDataError(False, vErrorMSG);
-             If vRaiseError Then
-              Raise Exception.Create(PChar(vErrorMSG));
-
-             If ReleaseCache Then
-              Begin
-               TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
-               RebuildMassiveDataset;
-              End;
-             
-            End;
+           ProcessChanges(vResult.Value);
+           GotoBookmark(vActualReg);
           End;
-         If Assigned(vResult) Then
-          FreeAndNil(vResult);
+         vInBlockEvents := False;
+         If State = dsBrowse Then
+          Begin
+           If Trim(vUpdateTableName) <> '' Then
+            TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vUpdateTableName));
+          End
+         Else If State = dsInactive Then
+          PrepareDetails(False);
         End
        Else
-        Error := cEmptyDBName;
-      End;
+        Begin
+         If vError Then
+          Begin
+           vInBlockEvents := False;
+
+           If Assigned(vOnGetDataError) Then
+            vOnGetDataError(False, vErrorMSG);
+           If vRaiseError Then
+            Raise Exception.Create(PChar(vErrorMSG));
+
+           If ReleaseCache Then
+            Begin
+             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+             RebuildMassiveDataset;
+            End;
+
+          End;
+        End;
+       If Assigned(vResult) Then
+        FreeAndNil(vResult);
+      End
+     Else
+      Error := cEmptyDBName;
      If Result Then
       Begin
        If ReleaseCache Then
