@@ -3017,8 +3017,8 @@ Begin
         vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
        Try
         vTempServerMethods  := vServerMethod.Create(Nil);
-        TServerMethodDataModule(vTempServerMethods).GetAction(vOldRequest, DWParams);
-        vUrlToExec := vOldRequest;
+        TServerMethodDataModule(vTempServerMethods).GetAction(Cmd, DWParams);
+        vUrlToExec := Cmd;
        Finally
        End;
        If (vTempServerMethods.ClassType = TServerMethodDatamodule)             Or
