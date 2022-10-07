@@ -90,14 +90,18 @@ Begin
   varSmallint,
   varInteger,
   varInt64,
+  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
   varUInt64,
+  {$IFEND}
   varSingle   : Begin
                  Case VarType(Result) Of
                   varShortInt : S := SizeOf(ShortInt);
                   varSmallint : S := SizeOf(Smallint);
                   varInteger  : S := SizeOf(Integer);
                   varInt64    : S := SizeOf(Int64);
+                  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
                   varUInt64   : S := SizeOf(UInt64);
+                  {$IFEND}
                   varSingle   : S := SizeOf(Single);
                  End;
                 End;
@@ -108,8 +112,11 @@ Begin
                   varLongWord : S := SizeOf(LongWord);
                  End;
                 End;
-  varString,
-  varUString   : S := Length(AnsiString(P^));
+  varString
+  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
+  , varUString
+  {$IFEND}
+              : S := Length(AnsiString(P^));
   varDouble,
   varCurrency  : Begin
                   Case VarType(Result) Of
@@ -133,8 +140,11 @@ Begin
  If Assigned(P) And (Length(ByteValue) > 0) Then
   Begin
    Case VarType(Result) Of
-    varString,
-    varUString  : Begin
+    varString
+    {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
+    , varUString
+    {$IFEND}
+                : Begin
                    Move(ByteValue[0],                 aSize,  SizeOf(DWInteger));
                    Move(ByteValue[SizeOf(DWInteger)], Result, aSize);
                   End;
@@ -158,14 +168,18 @@ Begin
   varSmallint,
   varInteger,
   varInt64,
+  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
   varUInt64,
+  {$IFEND}
   varSingle   : Begin
                  Case VarType(Value) Of
                   varShortInt : S := SizeOf(ShortInt);
                   varSmallint : S := SizeOf(Smallint);
                   varInteger  : S := SizeOf(Integer);
                   varInt64    : S := SizeOf(Int64);
+                  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
                   varUInt64   : S := SizeOf(UInt64);
+                  {$IFEND}
                   varSingle   : S := SizeOf(Single);
                  End;
                 End;
@@ -176,8 +190,11 @@ Begin
                   varLongWord : S := SizeOf(LongWord);
                  End;
                 End;
-  varString,
-  varUString  : Begin
+  varString
+  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
+  , varUString
+  {$IFEND}
+              : Begin
                  S := Length(Value);
                 End;
   varDouble,
@@ -203,8 +220,11 @@ Begin
  If Assigned(P) Then
   Begin
    Case VarType(Value) Of
-    varString,
-    varUString  : Begin
+    varString
+    {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
+    , varUString
+    {$IFEND}
+                : Begin
                    SetLength(Result, SizeOf(DWInteger) + S);
                    aSize := S;
                    Move(Pointer(@aSize)^, Result[0], SizeOf(DWInteger));
