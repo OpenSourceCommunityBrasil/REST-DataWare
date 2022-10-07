@@ -8,26 +8,64 @@
       <Unit>
         <Filename Value="RESTDWInstalador.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="restdwinstalador"/>
-        <CursorPos X="26"/>
-        <UsageCount Value="26"/>
+        <CursorPos X="43" Y="15"/>
+        <UsageCount Value="71"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\udetectide.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="354"/>
+        <CursorPos X="58" Y="364"/>
+        <UsageCount Value="68"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\uidefunctions.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="29"/>
+        <CursorPos X="5" Y="11"/>
+        <UsageCount Value="68"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\uconsts.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="30"/>
+        <CursorPos X="38" Y="57"/>
+        <UsageCount Value="65"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="src\telas\uprincipal.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="fPrincipal"/>
+        <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="104"/>
+        <CursorPos X="30" Y="115"/>
+        <UsageCount Value="27"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\telas\uprincipalold.pas"/>
+        <ComponentName Value="fPrincipalOld"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="uprincipalOld"/>
         <EditorIndex Value="-1"/>
-        <WindowIndex Value="-1"/>
-        <TopLine Value="-1"/>
-        <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="23"/>
+        <TopLine Value="44"/>
+        <CursorPos X="37" Y="25"/>
+        <UsageCount Value="67"/>
       </Unit>
       <Unit>
         <Filename Value="src\telas\frames\ufrideitem.pas"/>
-        <IsPartOfProject Value="True"/>
         <ComponentName Value="frIDEItem"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
@@ -35,27 +73,25 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="67"/>
       </Unit>
       <Unit>
-        <Filename Value="src\funcoes\udetectide.pas"/>
-        <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="174"/>
-        <CursorPos X="26" Y="185"/>
-        <FoldState Value=" T3oI0N4A"/>
-        <UsageCount Value="23"/>
-        <Loaded Value="True"/>
+        <Filename Value="src\telas\uprincipal.pas"/>
+        <ComponentName Value="fPrincipal"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="5"/>
+        <CursorPos X="3" Y="34"/>
+        <UsageCount Value="25"/>
       </Unit>
       <Unit>
-        <Filename Value="src\funcoes\uidefunctions.pas"/>
-        <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="22"/>
-        <CursorPos X="13" Y="42"/>
-        <UsageCount Value="23"/>
-        <Loaded Value="True"/>
+        <Filename Value="src\frteste.pas"/>
+        <ComponentName Value="Frame1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="22"/>
       </Unit>
       <Unit>
         <Filename Value="src\uprincipal.pas"/>
@@ -65,14 +101,14 @@
         <UnitName Value="uPrincipal"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="36" Y="82"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="19"/>
       </Unit>
       <Unit>
         <Filename Value="src\udetectide.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="25"/>
         <CursorPos X="17" Y="37"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="19"/>
       </Unit>
       <Unit>
         <Filename Value="src\ufrideitem.pas"/>
@@ -81,7 +117,7 @@
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="ufrIDEItem"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="19"/>
       </Unit>
       <Unit>
         <Filename Value="uprincipal.pas"/>
@@ -91,7 +127,7 @@
         <UnitName Value="uPrincipal"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="24" Y="15"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="16"/>
       </Unit>
       <Unit>
         <Filename Value="ufrideitem.pas"/>
@@ -100,73 +136,33 @@
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="ufrIDEItem"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="16"/>
       </Unit>
       <Unit>
         <Filename Value="udetectide.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="16"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="16"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\usplash.pas"/>
+        <ComponentName Value="Form1"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="50"/>
+        <CursorPos X="70" Y="62"/>
+        <UsageCount Value="27"/>
+      </Unit>
+      <Unit>
+        <Filename Value="D:\IDE\lazarus\lazarus\lcl\intfgraphics.pas"/>
+        <UnitName Value="IntfGraphics"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="5724"/>
+        <CursorPos Y="5734"/>
+        <UsageCount Value="9"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="13">
-      <Position>
-        <Filename Value="RESTDWInstalador.lpr"/>
-        <Caret Line="14" Column="22" TopLine="2"/>
-      </Position>
-      <Position>
-        <Filename Value="RESTDWInstalador.lpr"/>
-        <Caret Line="22" Column="26" TopLine="2"/>
-      </Position>
-      <Position>
-        <Filename Value="RESTDWInstalador.lpr"/>
-        <Caret Line="13" Column="12" TopLine="2"/>
-      </Position>
-      <Position>
-        <Filename Value="RESTDWInstalador.lpr"/>
-        <Caret Line="22" Column="26" TopLine="2"/>
-      </Position>
-      <Position>
-        <Filename Value="RESTDWInstalador.lpr"/>
-        <Caret Line="13" Column="20" TopLine="2"/>
-      </Position>
-      <Position>
-        <Filename Value="RESTDWInstalador.lpr"/>
-        <Caret Line="21" Column="53" TopLine="2"/>
-      </Position>
-      <Position>
-        <Filename Value="RESTDWInstalador.lpr"/>
-        <Caret Line="22" Column="26" TopLine="2"/>
-      </Position>
-      <Position>
-        <Filename Value="RESTDWInstalador.lpr"/>
-        <Caret Line="20" Column="18"/>
-      </Position>
-      <Position>
-        <Filename Value="RESTDWInstalador.lpr"/>
-        <Caret Line="22" Column="51" TopLine="2"/>
-      </Position>
-      <Position>
-        <Filename Value="RESTDWInstalador.lpr"/>
-        <Caret Line="14" Column="51" TopLine="2"/>
-      </Position>
-      <Position>
-        <Filename Value="RESTDWInstalador.lpr"/>
-        <Caret Line="15" Column="49" TopLine="2"/>
-      </Position>
-      <Position>
-        <Filename Value="src\funcoes\uidefunctions.pas"/>
-        <Caret Line="26" Column="42" TopLine="7"/>
-      </Position>
-      <Position>
-        <Filename Value="src\funcoes\uidefunctions.pas"/>
-        <Caret Line="42" Column="12" TopLine="22"/>
-      </Position>
-      <Position>
-        <Filename Value="src\funcoes\udetectide.pas"/>
-        <Caret Line="511" Column="19" TopLine="497"/>
-      </Position>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode=""/>

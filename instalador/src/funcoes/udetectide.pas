@@ -37,13 +37,10 @@ uses
 //{$I Common.inc}
 
 type
-  TDelphiVersions = (
-    {$IFDEF DELPHI_OLDER_VERSIONS_SUPPORT}
-    Delphi5, Delphi6,
-    {$ENDIF}
-    Delphi7, Delphi8, Delphi2005, Delphi2006, Delphi2007, Delphi2009, Delphi2010,
-    DelphiXE, DelphiXE2, DelphiXE3, DelphiXE4, DelphiXE5, Appmethod, DelphiXE6,
-    DelphiXE7, DelphiXE8, Delphi10Seattle, Delphi10Berlin, Delphi10Tokyo, Delphi10Rio,
+  TDelphiVersions = (Delphi5, Delphi6, Delphi7, Delphi8, Delphi2005,
+    Delphi2006, Delphi2007, Delphi2009, Delphi2010, DelphiXE, DelphiXE2,
+    DelphiXE3, DelphiXE4, DelphiXE5, Appmethod, DelphiXE6, DelphiXE7,
+    DelphiXE8, Delphi10Seattle, Delphi10Berlin, Delphi10Tokyo, Delphi10Rio,
     Delphi10Sydney, Delphi11Alexandria);
 
   TDelphiVersionData = class
@@ -68,7 +65,8 @@ type
 const
 {$IFDEF DELPHI_OLDER_VERSIONS_SUPPORT}
   DelphiOldVersions = 2;
-  DelphiOldVersionNumbers: array [0 .. DelphiOldVersions - 1] of TDelphiVersions = (Delphi5, Delphi6);
+  DelphiOldVersionNumbers: array [0 .. DelphiOldVersions - 1]
+  of TDelphiVersions = (Delphi5, Delphi6);
 
   DelphiOldColorsCount = 16;
 
@@ -95,10 +93,7 @@ const
    $800080, $808000, $C0C0C0, $808080, $0000FF,
    $00FF00, $00FFFF, $FF0000, $FF00FF, $FFFF00, $FFFFFF);
 {$ENDIF}
-  DelphiVersionsNames: array [TDelphiVersions] of string = (
-{$IFDEF DELPHI_OLDER_VERSIONS_SUPPORT}
-    'Delphi 5', 'Delphi 6',
-{$ENDIF}
+  DelphiVersionsNames: array [TDelphiVersions] of string = ('Delphi 5', 'Delphi 6',
     'Delphi 7', 'Delphi 8', 'BDS 2005', 'BDS 2006', 'RAD Studio 2007',
     'RAD Studio 2009', 'RAD Studio 2010', 'RAD Studio XE', 'RAD Studio XE2',
     'RAD Studio XE3', 'RAD Studio XE4', 'RAD Studio XE5', 'Appmethod 1.13',
@@ -108,10 +103,8 @@ const
     'RAD Studio 11.0 Alexandria');
 
   DelphiVersionNumbers: array [TDelphiVersions] of double = (
-{$IFDEF DELPHI_OLDER_VERSIONS_SUPPORT}
     13, // 'Delphi 5',
     14, // 'Delphi 6',
-{$ENDIF}
     15, // 'Delphi 7',
     16, // 'Delphi 8',
     17, // 'BDS 2005',
@@ -189,10 +182,8 @@ type
 
 const
   DelphiRegPaths: array [TDelphiVersions] of string = (
-{$IFDEF DELPHI_OLDER_VERSIONS_SUPPORT}
     '\Software\Borland\Delphi\5.0',
     '\Software\Borland\Delphi\6.0',
-{$ENDIF}
     '\Software\Borland\Delphi\7.0',
     '\Software\Borland\BDS\2.0',
     '\Software\Borland\BDS\3.0',
@@ -305,8 +296,99 @@ const
     Embarcadero  // 'RAD Studio 11 Alexandria
     );
 
-{$IFDEF DELPHI_OLDER_VERSIONS_SUPPORT}
+function RegKeyExists(const RegPath: string; const RootKey: HKEY): boolean;
+var
+  Reg: TRegistry;
+begin
+  try
+    Reg := TRegistry.Create;
+    try
+      Reg.RootKey := RootKey;
+      Result := Reg.KeyExists(RegPath);
+    finally
+      Reg.Free;
+    end;
+  except
+    Result := False;
+  end;
+end;
 
+function RegReadStr(const RegPath, RegValue: string; var Str: string;
+  const RootKey: HKEY): boolean;
+var
+  Reg: TRegistry;
+begin
+  try
+    Reg := TRegistry.Create;
+    try
+      Reg.RootKey := RootKey;
+      Result := Reg.OpenKey(RegPath, True);
+      if Result then  Str := Reg.ReadString(RegValue);
+    finally
+      Reg.Free;
+    end;
+  except
+    Result := False;
+  end;
+end;
+
+procedure ExtractIconFileToImageList(ImageList: TImageList; const Filename: string);
+var
+  FileInfo: TShFileInfo;
+begin
+  if FileExists(Filename) then
+  begin
+    FillChar(FileInfo, SizeOf(FileInfo), 0);
+    SHGetFileInfo(PChar(Filename), 0, FileInfo, SizeOf(FileInfo),
+      SHGFI_ICON or SHGFI_SMALLICON);
+    if FileInfo.hIcon <> 0 then
+    begin
+      ImageList_AddIcon(ImageList.Handle, FileInfo.hIcon);
+      DestroyIcon(FileInfo.hIcon);
+    end;
+  end;
+end;
+
+procedure click();
+var
+  item: TListItem;
+  DelphiComp: TDelphiVersions;
+  FileName: string;
+  ImageIndex: integer;
+  Found: boolean;
+begin
+  for DelphiComp := Low(TDelphiVersions) to High(TDelphiVersions) do
+  begin
+    Found := RegKeyExists(DelphiRegPaths[DelphiComp], HKEY_CURRENT_USER);
+    if Found then
+      Found := RegReadStr(DelphiRegPaths[DelphiComp], 'App', FileName,
+        HKEY_CURRENT_USER) and
+        FileExists(FileName);
+
+    if not Found then
+    begin
+      Found := RegKeyExists(DelphiRegPaths[DelphiComp], HKEY_LOCAL_MACHINE);
+      if Found then
+        Found := RegReadStr(DelphiRegPaths[DelphiComp], 'App', FileName,
+          HKEY_LOCAL_MACHINE) and FileExists(FileName);
+    end;
+
+    if Found then
+    begin
+      item := ListViewIDEs.Items.Add;
+      item.Caption := DelphiVersionsNames[DelphiComp];
+      item.SubItems.Add(FileName);
+      ExtractIconFileToImageList(ImageList1, Filename);
+      ImageIndex := ImageList1.Count - 1;
+      item.ImageIndex := ImageIndex;
+    end;
+  end;
+end;
+
+
+
+
+{$IFDEF DELPHI_OLDER_VERSIONS_SUPPORT}
 function DelphiIsOldVersion(ADelphiVersionData: TDelphiVersionData): Boolean;
 var
   i: Integer;
