@@ -3562,6 +3562,9 @@ Begin
  If (Value)                   And
     (Not (HTTPServer.Active)) Then
   Begin
+   if not Assigned(ServerMethodClass) then
+     raise Exception.Create(cServerMethodClassNotAssigned);
+
    Try
     If (ASSLPrivateKeyFile <> '')     And
        (ASSLPrivateKeyPassword <> '') And
