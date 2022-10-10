@@ -1741,20 +1741,24 @@ Var
      For I := 0 To RawHeaders.Count -1 Do
       Begin
        tmp := RawHeaders.Names[I];
+       vTempText := RawHeaders.Values[tmp];
+       if (vTempText <> '') and (vTempText[InitStrPos] = ' ') then
+         Delete(vTempText,1,1);
+
        If pos('dwwelcomemessage', lowercase(tmp)) > 0 Then
-        vWelcomeMessage := DecodeStrings(RawHeaders.Values[tmp]{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+        vWelcomeMessage := DecodeStrings(vTempText{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
        Else If pos('dwaccesstag', lowercase(tmp)) > 0 Then
-        vAccessTag := DecodeStrings(RawHeaders.Values[tmp]{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+        vAccessTag := DecodeStrings(vTempText{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
        Else If pos('datacompression', lowercase(tmp)) > 0 Then
-        compresseddata := StringToBoolean(RawHeaders.Values[tmp])
+        compresseddata := StringToBoolean(vTempText)
        Else If pos('dwencodestrings', lowercase(tmp)) > 0 Then
-        encodestrings  := StringToBoolean(RawHeaders.Values[tmp])
+        encodestrings  := StringToBoolean(vTempText)
        Else If pos('dwusecript', lowercase(tmp)) > 0 Then
-        vdwCriptKey    := StringToBoolean(RawHeaders.Values[tmp])
+        vdwCriptKey    := StringToBoolean(vTempText)
        Else If (pos('dwassyncexec', lowercase(tmp)) > 0) And (Not (dwassyncexec)) Then
-        dwassyncexec   := StringToBoolean(RawHeaders.Values[tmp])
+        dwassyncexec   := StringToBoolean(vTempText)
        Else if pos('binaryrequest', lowercase(tmp)) > 0 Then
-        vBinaryEvent   := StringToBoolean(RawHeaders.Values[tmp])
+        vBinaryEvent   := StringToBoolean(vTempText)
        Else If pos('dwconnectiondefs', lowercase(tmp)) > 0 Then
         Begin
          vdwConnectionDefs   := TConnectionDefs.Create;
@@ -1762,7 +1766,7 @@ Var
          Try
           JSONValue.Encoding  := vEncoding;
           JSONValue.Encoded  := True;
-          JSONValue.LoadFromJSON(RawHeaders.Values[tmp]);
+          JSONValue.LoadFromJSON(vTempText);
           vdwConnectionDefs.LoadFromJSON(JSONValue.Value);
          Finally
           FreeAndNil(JSONValue);
@@ -1777,7 +1781,7 @@ Var
           {$IFDEF FPC}
           JSONValue.DatabaseCharSet := vDatabaseCharSet;
           {$ENDIF}
-          JSONValue.LoadFromJSON(RawHeaders.Values[tmp]);
+          JSONValue.LoadFromJSON(vTempText);
           vdwservereventname := JSONValue.AsString;
          Finally
           FreeAndNil(JSONValue);
@@ -1803,11 +1807,10 @@ Var
               {$IFDEF FPC}
               JSONParam.DatabaseCharSet := vDatabaseCharSet;
               {$ENDIF}
-              tmp                       := RawHeaders.Values[tmp];
-              If (Pos(LowerCase('{"ObjectType":"toParam", "Direction":"'), LowerCase(tmp)) > 0) Then
-               JSONParam.FromJSON(tmp)
+              If (Pos(LowerCase('{"ObjectType":"toParam", "Direction":"'), LowerCase(vTempText)) > 0) Then
+               JSONParam.FromJSON(vTempText)
               Else
-               JSONParam.AsString  := tmp;
+               JSONParam.AsString  := vTempText;
               DWParams.Add(JSONParam);
              End;
            End;
@@ -2173,8 +2176,10 @@ Begin
      vUrlToExec    := Url
     Else
      vUrlToExec    := Cmd;
+
     If (Cmd <> '/') And (Cmd <> '') Then
      ReadRawHeaders;
+
     vCompareContext := CompareBaseURL(Cmd); // := aDefaultUrl;
     If Cmd <> '' Then
      TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
