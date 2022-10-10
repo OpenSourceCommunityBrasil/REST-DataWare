@@ -137,53 +137,55 @@ var
     JSONParam   : TJSONParam;
   begin
     lst := TStringList.Create;
+    try
+      pAux1 := Pos('?',ParamsURI);
+      // params com /
+      sAux1 := Copy(ParamsURI,1,pAux1-1);
+      // params com &
+      sAux2 := Copy(ParamsURI,pAux1+1,Length(ParamsURI));
 
-    pAux1 := Pos('?',ParamsURI);
-    // params com /
-    sAux1 := Copy(ParamsURI,1,pAux1-1);
-    // params com &
-    sAux2 := Copy(ParamsURI,pAux1+1,Length(ParamsURI));
+      cAux1 := 0;
+      while (sAux1 <> '') do begin
+        pAux1 := Pos('/',sAux1);
+        if pAux1 = 0 then
+          pAux1 := Length(sAux1)+1;
 
-    cAux1 := 0;
-    while (sAux1 <> '') do begin
-      pAux1 := Pos('/',sAux1);
-      if pAux1 = 0 then
-        pAux1 := Length(sAux1)+1;
+        lst.AddPair(IntToStr(cAux1),Copy(sAux1,1,pAux1-1));
 
-      lst.AddPair(IntToStr(cAux1),Copy(sAux1,1,pAux1-1));
-
-      cAux1 := cAux1 + 1;
-      Delete(sAux1,1,pAux1);
-    end;
-
-    while (sAux2 <> '') do begin
-      pAux1 := Pos('&',sAux2);
-      if pAux1 = 0 then
-        pAux1 := Length(sAux2)+1;
-
-      sAux1 := Copy(sAux2,1,pAux1-1);
-
-      if Pos('dwmark:', sAux1) = 0 then
-        lst.Add(sAux1);
-
-      Delete(sAux2,1,pAux1);
-    end;
-
-    while lst.Count > 0 do begin
-      JSONParam  := Params.ItemsString[lst.Names[0]];
-      if JSONParam = Nil then begin
-        JSONParam := TJSONParam.Create(Params.Encoding);
-        JSONParam.ParamName := lst.Names[0];
-        JSONParam.ObjectDirection := odIN;
-        JSONParam.SetValue(lst.ValueFromIndex[0]);
-        Params.Add(JSONParam);
-      end
-      else if JSONParam.IsNull then begin
-        JSONParam.SetValue(lst.ValueFromIndex[0]);
+        cAux1 := cAux1 + 1;
+        Delete(sAux1,1,pAux1);
       end;
-      lst.Delete(0);
+
+      while (sAux2 <> '') do begin
+        pAux1 := Pos('&',sAux2);
+        if pAux1 = 0 then
+          pAux1 := Length(sAux2)+1;
+
+        sAux1 := Copy(sAux2,1,pAux1-1);
+
+        if Pos('dwmark:', sAux1) = 0 then
+          lst.Add(sAux1);
+
+        Delete(sAux2,1,pAux1);
+      end;
+
+      while lst.Count > 0 do begin
+        JSONParam  := Params.ItemsString[lst.Names[0]];
+        if JSONParam = Nil then begin
+          JSONParam := TJSONParam.Create(Params.Encoding);
+          JSONParam.ParamName := lst.Names[0];
+          JSONParam.ObjectDirection := odIN;
+          JSONParam.SetValue(lst.ValueFromIndex[0]);
+          Params.Add(JSONParam);
+        end
+        else if JSONParam.IsNull then begin
+          JSONParam.SetValue(lst.ValueFromIndex[0]);
+        end;
+        lst.Delete(0);
+      end;
+    finally
+      FreeAndNil(lst);
     end;
-    FreeAndNil(lst);
   end;
 
   procedure CopyParams(SourceParams : TRESTDWParamsMethods);
