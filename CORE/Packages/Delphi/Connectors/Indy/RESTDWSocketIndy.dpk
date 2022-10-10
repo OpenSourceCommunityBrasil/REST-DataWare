@@ -1,9 +1,9 @@
 package RESTDWSocketIndy;
 
 {$IFNDEF FPC}
- {$IFNDEF VER150 or VER160 or VER170 or VER180 or
-          VER185 or VER190 or VER200 or VER210 or
-          VER220}
+ {$IF Not(Defined(VER150) or Defined(VER160) or Defined(VER170)
+       or Defined(VER180) or Defined(VER185) or Defined(VER190)
+       or Defined(VER200) or Defined(VER210) or Defined(VER220))}
   {$R RESTDWSocketIndy.res  RESTDWSocketIndy.rc}
   {$R RESTDWSocketIndy.dres RESTDWSocketIndy.rc}
   {$R *.res}
@@ -35,21 +35,13 @@ package RESTDWSocketIndy;
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
 {$RUNONLY}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
-  {$IFNDEF VER150}
-  IndySystem,
-  IndyProtocols,
-  IndyCore,
-  {$ELSE}
-  IndySystem70,
-  IndyProtocols70,
-  IndyCore70,
-  {$ENDIF}
   RESTDWCore;
 
 contains
   uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas';
 
 end.
+
