@@ -3247,6 +3247,7 @@ Begin
   {$ENDIF}
   vAuthRealm   := AResponseInfo.AuthRealm;
   vContentType := ARequestInfo.ContentType;
+
   If CommandExec  (TComponent(AContext),
                    RemoveBackslashCommands(ARequestInfo.URI),
                    ARequestInfo.RawHTTPCommand,
