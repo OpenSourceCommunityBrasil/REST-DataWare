@@ -8,7 +8,7 @@ package RESTDWCore;
   {$R RESTDWCore.dres RESTDWCore.rc}
   {$R *.res}
   {$R *.dres}
- {$ENDIF}
+ {$IFEND}
 {$ENDIF}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
