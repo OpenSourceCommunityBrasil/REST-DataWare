@@ -1,16 +1,6 @@
 package RESTDWSocketIndy;
 
-{$IFNDEF FPC}
- {$IF Not(Defined(VER150) or Defined(VER160) or Defined(VER170)
-       or Defined(VER180) or Defined(VER185) or Defined(VER190)
-       or Defined(VER200) or Defined(VER210) or Defined(VER220))}
-  {$R RESTDWSocketIndy.res  RESTDWSocketIndy.rc}
-  {$R RESTDWSocketIndy.dres RESTDWSocketIndy.rc}
-  {$R *.res}
-  {$R *.dres}
- {$ENDIF}
-{$ENDIF}
-{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$R *.res}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
@@ -32,10 +22,10 @@ package RESTDWSocketIndy;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DEFINE DEBUG}
-{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'REST Dataware Indy Sockets'}
 {$RUNONLY}
 {$IMPLICITBUILD ON}
+{$DEFINE DEBUG}
 
 requires
   RESTDWCore;
