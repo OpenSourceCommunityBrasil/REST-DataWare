@@ -150,7 +150,7 @@ var
         if pAux1 = 0 then
           pAux1 := Length(sAux1)+1;
 
-        lst.AddPair(IntToStr(cAux1),Copy(sAux1,1,pAux1-1));
+        lst.Add(IntToStr(cAux1)+'='+Copy(sAux1,1,pAux1-1));
 
         cAux1 := cAux1 + 1;
         Delete(sAux1,1,pAux1);
