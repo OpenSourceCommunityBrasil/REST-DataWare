@@ -3209,7 +3209,6 @@ Var
   AResponseInfo.Redirect(Url);
  End;
 Begin
-// ResultStream    := TStringStream.Create('');
  vResponseHeader := TStringList.Create;
  vResponseString := '';
  {$IFNDEF FPC}
@@ -3247,7 +3246,6 @@ Begin
   {$ENDIF}
   vAuthRealm   := AResponseInfo.AuthRealm;
   vContentType := ARequestInfo.ContentType;
-
   If CommandExec  (TComponent(AContext),
                    RemoveBackslashCommands(ARequestInfo.URI),
                    ARequestInfo.RawHTTPCommand,
@@ -3274,12 +3272,10 @@ Begin
    Begin
     AResponseInfo.AuthRealm   := vAuthRealm;
     AResponseInfo.ContentType := vContentType;
-    {$IFNDEF FPC}
-     {$if CompilerVersion > 21}
-      If (sCharSet <> '') Then
-       AResponseInfo.CharSet := sCharSet;
-     {$IFEND}
-    {$ENDIF}
+    If Encoding = esUtf8 Then
+     AResponseInfo.CharSet := 'utf-8'
+    Else
+     AResponseInfo.CharSet := 'ansi';
     AResponseInfo.ResponseNo               := StatusCode;
     If (vResponseString <> '')   Or
        (ErrorMessage    <> '')   Then
