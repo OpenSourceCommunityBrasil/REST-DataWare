@@ -1915,10 +1915,9 @@ Var
      Begin
       If ServerMethodsClass.Components[i] is TRESTDWServerContext Then
        Begin
-        If ((aEventName = '')      And
-            (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aServerEvent] <> Nil))   Then
+        If (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aServerEvent] <> Nil)   Then
          Begin
-          vRootContext := TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext;
+          vRootContext := '';
           Result := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aServerEvent];
           If Assigned(Result) Then
            Break;
@@ -2035,44 +2034,15 @@ Begin
      sContentType := 'application/pdf'
     Else If (Pos('.CSS', UpperCase(Cmd)) > 0) Then
      sContentType:='text/css';
-    {$IFNDEF FPC}
-     {$if CompilerVersion > 21}
-      If aDefaultUrl <> '' Then
-       Begin
-        sFile := Url;
-        vTempText := IncludeTrailingPathDelimiter(aDefaultUrl);
-        {$IFDEF MSWINDOWS}
-         vTempText := StringReplace(vTempText, '\', '/', [rfReplaceAll]);
-         vTempText := StringReplace(vTempText, '//', '/', [rfReplaceAll]);
-        {$ENDIF}
-        If Pos(vTempText, sFile) >= InitStrPos Then
-         Delete(sFile, Pos(vTempText, sFile) - FinalStrPos, Length(vTempText));
-        sFile := FRootPath + vTempText + sFile;
-       End
-      Else
-       sFile := FRootPath + Url;
-     {$ELSE}
-      If aDefaultUrl <> '' Then
-       Begin
-        sFile := Url;
-        vTempText := IncludeTrailingPathDelimiter(aDefaultUrl);
-        {$IFDEF MSWINDOWS}
-         vTempText := StringReplace(vTempText, '\', '/', [rfReplaceAll]);
-         vTempText := StringReplace(vTempText, '//', '/', [rfReplaceAll]);
-        {$ENDIF}
-        If Pos(vTempText, sFile) >= InitStrPos Then
-         Delete(sFile, Pos(vTempText, sFile) - FinalStrPos, Length(vTempText));
-        sFile := FRootPath + vTempText + sFile;
-       End
-      Else
-       sFile := FRootPath + Url;
-     {$IFEND}
-    {$ELSE}
-     sFile := FRootPath  + Url;
-    {$ENDIF}
+    sFile := Url;
+    If Pos(vTempText, sFile) >= InitStrPos Then
+     Delete(sFile, Pos(vTempText, sFile) - FinalStrPos, Length(vTempText));
+    sFile := IncludeTrailingPathDelimiter(FRootPath) + sFile;
     {$IFDEF MSWINDOWS}
      sFile := StringReplace(sFile, '/', '\', [rfReplaceAll]);
      sFile := StringReplace(sFile, '\\', '\', [rfReplaceAll]);
+    {$ELSE}
+     sFile := StringReplace(sFile, '//', '/', [rfReplaceAll]);
     {$ENDIF}
     If (vPathTraversalRaiseError) And
        (RESTDWFileExists(sFile, FRootPath)) And
@@ -2099,7 +2069,7 @@ Begin
       ServerContextStream.LoadFromFile(sFile);
       ServerContextStream.Position := 0;
       If Not (Assigned(ResultStream)) Then
-       ResultStream := TStringStream.Create('');
+       ResultStream := TMemoryStream.Create;
       ResultStream.CopyFrom(ServerContextStream, ServerContextStream.Size);
       FreeAndNil(ServerContextStream);
       DestroyComponents;
@@ -6456,21 +6426,8 @@ Begin
        vTagService := False;
        For B := 0 To TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.Count -1 Do
         Begin
-         If ((LowerCase(Pooler) = LowerCase(TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext))) Or
-            ((Trim(TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext) = '')                      And
-             ((urlContext = '') or (urlContext = '/')))                                                              Then
-          vTagService := (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler] <> Nil);
-         If vTagService Then
-          Begin
-           vRootContext := TRESTDWServerContext(ServerMethodsClass.Components[i]).DefaultContext;
-           If (((urlContext = '') or (urlContext = '/')) And (vRootContext <> '')) And (Pooler = '') Then
-            Pooler := vRootContext;
-          End
-         Else
-          Begin
-           If LowerCase(urlContext) = LowerCase(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList[B].BaseURL) Then
-            vTagService := LowerCase(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList[B].ContextName) = LowerCase(Pooler);
-          End;
+         If LowerCase(urlContext) = LowerCase(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList[B].BaseURL) Then
+          vTagService := LowerCase(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList[B].ContextName) = LowerCase(Pooler);
          If vTagService Then
           Break;
         End;
