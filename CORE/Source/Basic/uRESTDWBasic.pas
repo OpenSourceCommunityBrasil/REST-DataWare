@@ -2171,7 +2171,10 @@ Begin
                      (Pos('=', Lowercase(Url)) > 0);
     If Not vIsQueryParam Then
      vIsQueryParam := (Pos('?', Lowercase(RawHTTPCommand)) > 0);
-    vOldRequest    := Cmd;
+    if (cmd = '') or (cmd = '/') then
+     vOldRequest   := aDefaultUrl
+    else
+     vOldRequest   := Cmd;
     If vIsQueryParam Then
      vUrlToExec    := Url
     Else
@@ -3036,8 +3039,8 @@ Begin
         vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
        Try
         vTempServerMethods  := vServerMethod.Create(Nil);
-        TServerMethodDataModule(vTempServerMethods).GetAction(Cmd, DWParams);
-        vUrlToExec := Cmd;
+        TServerMethodDataModule(vTempServerMethods).GetAction(vOldRequest, DWParams);
+        vUrlToExec := vOldRequest;
        Finally
        End;
        If (vTempServerMethods.ClassType = TServerMethodDatamodule)             Or
