@@ -3750,6 +3750,17 @@ Begin
                    DWParams.CreateParam('token', vReplyString);
                   End;
                  Try
+                  If DWParams.ItemsString['MessageError'] = Nil Then
+                  Begin
+                   DWParams.CreateParam('MessageError');
+                   DWParams.ItemsString['MessageError'].ObjectDirection := odOut;
+                  End;
+
+                  if ((JSONStr <> TReplyOK) and (JSONStr <> Trim(''))) then
+                   DWParams.ItemsString['MessageError'].AsString := JSONStr
+                  else
+                   DWParams.ItemsString['MessageError'].AsString := '';
+
                   DWParams.SaveToStream(ms, tdwpxt_OUT);
                   ZCompressStreamD(ms, ResultStream);
                  Finally

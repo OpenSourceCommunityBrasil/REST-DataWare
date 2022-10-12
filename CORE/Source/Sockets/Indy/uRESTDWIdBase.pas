@@ -4440,7 +4440,10 @@ Var
              {$IFEND}
              StringStream.Size := 0;
             {$ENDIF}
-            ResultData := TReplyOK;
+            if Params.ItemsString['MessageError'].AsString = trim('') then
+             ResultData   := TReplyOK
+            else
+             ResultData := Params.ItemsString['MessageError'].AsString;
            End
           Else
            Begin
@@ -4785,4 +4788,5 @@ Begin
 End;
 
 End.
+
 
