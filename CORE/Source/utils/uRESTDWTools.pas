@@ -3285,9 +3285,10 @@ Function DecodeStrings(Value : String
 Var
  vTempValue : String;
 Begin
+ Result := '';
+ If Value = '' Then
+  Exit;
  vTempValue := StringReplace(Value, sLineBreak, '', [rfReplaceAll]);
- vTempValue := StringReplace(vTempValue, #13, '', [rfReplaceAll]);
- vTempValue := StringReplace(vTempValue, #10, '', [rfReplaceAll]);
  Try
  {$IFDEF FPC}
   Result := DecodeBase64(vTempValue, DatabaseCharSet);
