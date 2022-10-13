@@ -746,6 +746,7 @@ Type
                             Redirect            : TRedirect) : Boolean;
   Procedure   ClearDataRoute;
   Procedure   AddDataRoute (DataRoute           : String; MethodClass : TComponentClass);
+  Function    GetDataRouteCount: integer;
   Constructor Create       (AOwner              : TComponent);Override;//Cria o Componente
   Destructor  Destroy; Override;//Destroy a Classe
  Published
@@ -6650,6 +6651,11 @@ Begin
  vDataRoute.DataRoute         := DataRoute;
  vDataRoute.ServerMethodClass := MethodClass;
  vDataRouteList.Add(vDataRoute);
+End;
+
+Function TRESTServiceBase.GetDataRouteCount: integer;
+Begin
+  Result := vDataRouteList.Count;
 End;
 
 Constructor TRESTServiceBase.Create(AOwner: TComponent);
