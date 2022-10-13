@@ -3604,15 +3604,6 @@ Begin
   End
  Else If Not(Value) Then
   Begin
-   If HTTPServer.Active Then
-    Begin
-     HTTPServer.Contexts.LockList;
-     Try
-      HTTPServer.Contexts.ClearAndFree;
-     Finally
-      HTTPServer.Contexts.UnlockList;
-     End;
-    End;
    HTTPServer.Active := False;
   End;
  Inherited SetActive(HTTPServer.Active);
