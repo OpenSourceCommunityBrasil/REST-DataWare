@@ -3559,8 +3559,8 @@ Begin
  If (Value)                   And
     (Not (HTTPServer.Active)) Then
   Begin
-   if not Assigned(ServerMethodClass) then
-     raise Exception.Create(cServerMethodClassNotAssigned);
+    if not(Assigned(ServerMethodClass)) and (Self.GetDataRouteCount = 0) then
+      raise Exception.Create(cServerMethodClassNotAssigned);
 
    Try
     If (ASSLPrivateKeyFile <> '')     And
@@ -4779,5 +4779,3 @@ Begin
 End;
 
 End.
-
-
