@@ -1805,17 +1805,8 @@ Begin
    vTagGeral := LowerCase(vTagGeral);
   ctCamelCase:
    Begin
-    If vtagName = '' Then
-    Begin
-     vTagGeral := Copy(vTagGeral, 3, Length(vTagGeral));
-     vText     := vTagGeral.ToCharArray;
-     vTagGeral := '[{';
-    End
-    Else
-    Begin
-     vText     := vTagGeral.ToCharArray;
-     vTagGeral := '';
-    End;
+    vText     := vTagGeral.ToCharArray;
+    vTagGeral := '';
     I := Low(vText);
     While I <= High(vText) Do
     Begin
@@ -1833,7 +1824,7 @@ Begin
      End
      Else
      Begin
-      If (CaseType = ctCamelCase) And (I = 0) Then
+      If I = 0 Then
        vTagGeral := vTagGeral + UpperCase(vText[I])
       Else
        vTagGeral := vTagGeral + LowerCase(vText[I]);
