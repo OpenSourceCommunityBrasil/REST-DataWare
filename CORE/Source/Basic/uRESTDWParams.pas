@@ -6556,8 +6556,8 @@ Var
                      If J <> 0 Then
                       Begin
                        Stream.Read(S[InitStrPos], J);
-                       If S = TDecimalChar Then
-                        VE := Null
+                       If ((S = TDecimalChar) or (S = #0)) Then
+                        VE := 0
                        Else
                         Begin
                          S  := BuildFloatString(S);
@@ -6597,8 +6597,8 @@ Var
                     If J <> 0 Then
                      Begin
                       Stream.Read(S[InitStrPos], J);
-                      If S = TDecimalChar Then
-                       VE := Null
+                      If ((S = TDecimalChar) or (S = #0)) Then
+                       VE := 0
                       Else
                        Begin
                         S  := BuildFloatString(S);
