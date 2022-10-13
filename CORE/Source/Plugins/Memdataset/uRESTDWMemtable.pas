@@ -4,7 +4,7 @@ interface
 
 uses
   uRESTDWCustom,
-  Db, DBClient, Classes, DBConsts, Math, uRESTDWFieldsClass, uRESTDWDetailLink, Windows, SysUtils;
+  Db, DBClient, Classes, DBConsts, Math, uRESTDWFieldsClass, uRESTDWDetailLink, SysUtils;
 
 Type
  TWhileNotEofFeature  = (wnefIgnoreEvents, wnefBeginFirst, wnefBookmarkRecord);
