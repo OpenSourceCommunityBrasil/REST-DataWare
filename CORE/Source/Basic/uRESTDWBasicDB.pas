@@ -355,6 +355,7 @@ Type
   vStrsTrim,
   vStrsEmpty2Null,
   vStrsTrim2Len,
+  vIgnoreEchoPooler,
   vParamCreate          : Boolean;
   vTypeRequest          : Ttyperequest;
   vFailOverConnections  : TListDefConnections;
@@ -494,6 +495,7 @@ Type
   Property CriptOptions            : TCripto                    Read vCripto                  Write vCripto;
   Property DataRoute               : String                     Read vDataRoute               Write SetDataRoute;
   Property MyIP                    : String                     Read vMyIP                    Write SetMyIp;
+  Property IgnoreEchoPooler        : Boolean                    Read vIgnoreEchoPooler        Write vIgnoreEchoPooler;
   Property AuthenticationOptions   : TRESTDWClientAuthOptionParams Read vAuthOptionParams     Write vAuthOptionParams;
   Property Proxy                   : Boolean                    Read vProxy                   Write vProxy;             //Diz se tem servidor Proxy
   Property ProxyOptions            : TProxyOptions              Read vProxyOptions            Write vProxyOptions;      //Se tem Proxy diz quais as opções
@@ -4167,6 +4169,7 @@ End;
 Constructor TRESTDWDatabasebaseBase.Create(AOwner : TComponent);
 Begin
  Inherited;
+ vIgnoreEchoPooler         := False;
  vRESTClientPooler         := Nil;
  vUseSSL                   := False;
  vHandleRedirects          := False;
@@ -5050,7 +5053,10 @@ Begin
    Connection.BinaryRequest        := vRESTClientPooler.BinaryRequest;
    TokenValidade;
    If Not(vErrorBoolean) Then
-    vTempSend  := Connection.EchoPooler(vDataRoute, vRestPooler, vTimeOut, vConnectTimeOut, vRESTClientPooler);
+    If vIgnoreEchoPooler Then
+     vTempSend := '127.0.0.1'
+    else
+     vTempSend  := Connection.EchoPooler(vDataRoute, vRestPooler, vTimeOut, vConnectTimeOut, vRESTClientPooler);
    Result      := Trim(vTempSend) <> '';
    If Result Then
     vMyIP       := vTempSend
@@ -5109,11 +5115,14 @@ Begin
            Try
             TokenValidade;
             If Not(vErrorBoolean) Then
-             vTempSend   := Connection.EchoPooler(vFailOverConnections[I].vDataRoute,
-                                                  vFailOverConnections[I].vRestPooler,
-                                                  vFailOverConnections[I].vTimeOut,
-                                                  vFailOverConnections[I].vConnectTimeOut,
-                                                  vRESTClientPooler);
+             If vIgnoreEchoPooler Then
+              vTempSend := '127.0.0.1'
+             else
+              vTempSend   := Connection.EchoPooler(vFailOverConnections[I].vDataRoute,
+                                                   vFailOverConnections[I].vRestPooler,
+                                                   vFailOverConnections[I].vTimeOut,
+                                                   vFailOverConnections[I].vConnectTimeOut,
+                                                   vRESTClientPooler);
             Result      := Trim(vTempSend) <> '';
             If Result Then
              Begin
@@ -5205,7 +5214,10 @@ Begin
            Try
             TokenValidade;
             If Not(vErrorBoolean) Then
-             vTempSend   := Connection.EchoPooler(vFailOverConnections[I].vDataRoute,
+             If vIgnoreEchoPooler Then
+              vTempSend := '127.0.0.1'
+             else
+              vTempSend   := Connection.EchoPooler(vFailOverConnections[I].vDataRoute,
                                                    vFailOverConnections[I].vRestPooler,
                                                    vFailOverConnections[I].vTimeOut,
                                                    vFailOverConnections[I].vConnectTimeOut,
