@@ -36,7 +36,7 @@ Uses
    {$IFNDEF RESTDWAndroidService}System.UITypes, {$ENDIF}
   {$IFEND}
    {$IFDEF RESTDWCLIENTDATASET}DBClient, {$ENDIF}
-   {$IF CompilerVersion > 22} // Delphi 2010 pra cima
+   {$IF CompilerVersion > 23} // Delphi Xe3 pra cima
     {$IFDEF RESTDWFDMEMTABLE}
      FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
      FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
@@ -8427,7 +8427,7 @@ Begin
     TMemDataset(Self).CreateTable;
     TMemDataset(Self).Open;
    {$ENDIF}
-   {$IFDEF UNIDACMEM}
+   {$IFDEF RESTDWUNIDACMEM}
     TVirtualTable(Self).Close;
     TVirtualTable(Self).Open;
    {$ENDIF}
@@ -8436,7 +8436,7 @@ Begin
    TClientDataset(Self).CreateDataSet;
    TClientDataset(Self).Open;
   {$ENDIF}
-  {$IFDEF UNIDACMEM}
+  {$IFDEF RESTDWUNIDACMEM}
    TVirtualTable(Self).Close;
    TVirtualTable(Self).Open;
   {$ENDIF}
@@ -8484,7 +8484,7 @@ Begin
     TMemDataset(Self).CreateTable;
     TMemDataset(Self).Open;
    {$ENDIF}
-   {$IFDEF UNIDACMEM}
+   {$IFDEF RESTDWUNIDACMEM}
     TVirtualTable(Self).Close;
     TVirtualTable(Self).Open;
    {$ENDIF}
@@ -8493,7 +8493,7 @@ Begin
     TClientDataset(Self).CreateDataSet;
     TClientDataset(Self).Open;
    {$ENDIF}
-   {$IFDEF UNIDACMEM}
+   {$IFDEF RESTDWUNIDACMEM}
     TVirtualTable(Self).Close;
     TVirtualTable(Self).Open;
    {$ENDIF}
@@ -9516,7 +9516,7 @@ Begin
     TRESTDWMemtable(Self).Close;
     TRESTDWMemtable(Self).Open;
    {$ELSE}
-    {$IFNDEF UNIDACMEM}
+    {$IFNDEF RESTDWUNIDACMEM}
      If Self is TMemDataset Then
       TMemDataset(Self).CreateTable;
     {$ELSE}
@@ -9547,7 +9547,7 @@ Begin
     TRESTDWMemtable(Self).Close;
     TRESTDWMemtable(Self).Open;
    {$ELSE}
-    {$IFNDEF UNIDACMEM}
+    {$IFNDEF RESTDWUNIDACMEM}
      If Self is TMemDataset Then
       TMemDataset(Self).CreateTable;
     {$ELSE}

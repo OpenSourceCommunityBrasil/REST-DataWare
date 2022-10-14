@@ -1,15 +1,15 @@
 {$I ..\..\Source\Includes\uRESTDW.inc}
 
 {$IFNDEF FPC}
- {$if CompilerVersion < 26}//Delphi under 2010
+ {$if CompilerVersion < 24}//Delphi under XE3
   //Geral
   {$DEFINE RESTDWINDY}
   {.$DEFINE RESTDWCLIENTDATASET}
   {.$DEFINE RESTDWUNIDACMEM}
   {$DEFINE RESTDWMEMTABLE}
- {$ELSE}// > 2010
+ {$ELSE}// > Xe3
   //Geral
-  {$DEFINE RESTDWFDMEMTABLE}
+  {$DEFINE RESTDWFDMEMTABLE} //FireDAC somente Xe3 pra cima
   {.$DEFINE RESTDWMEMTABLE}
   {.$DEFINE RESTDWUNIDACMEM}
   {$IF Defined(HAS_FMX)}
