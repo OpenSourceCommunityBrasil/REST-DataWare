@@ -46,7 +46,7 @@ requires
    bdertl,
   {$ELSE}
    FireDAC, FireDACCommonDriver, FireDACCommon,
-  {$ENDIF}
+  {$IFEND}
   {$IFDEF WIN32}
    dcldb,
    designide,
