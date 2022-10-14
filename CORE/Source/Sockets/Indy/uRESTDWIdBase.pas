@@ -73,6 +73,7 @@ Type
   vSSLVerifyMode                   : TIdSSLVerifyModeSet;
   vSSLVerifyDepth                  : Integer;
   vSSLMode                         : TIdSSLMode;
+  aSSLVersions                     : TIdSSLVersions;
   Procedure aCommandGet             (AContext         : TIdContext;
                                      ARequestInfo     : TIdHTTPRequestInfo;
                                      AResponseInfo    : TIdHTTPResponseInfo);
@@ -120,6 +121,7 @@ Type
   Property SSLVerifyDepth          : Integer             Read vSSLVerifyDepth          Write vSSLVerifyDepth;
   Property SSLMode                 : TIdSSLMode          Read vSSLMode                 Write vSSLMode;
   Property SSLMethod               : TIdSSLVersion       Read aSSLMethod               Write aSSLMethod;
+  Property SSLVersions             : TIdSSLVersions      Read aSSLVersions             Write aSSLVersions;
   Property CipherList              : String              Read vCipherList              Write vCipherList;
 End;
 

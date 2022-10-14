@@ -8,35 +8,32 @@
       <Unit>
         <Filename Value="RESTDWInstalador.lpr"/>
         <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="24" Y="9"/>
         <UsageCount Value="78"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\udetectide.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="354"/>
         <CursorPos X="58" Y="364"/>
         <UsageCount Value="75"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\uidefunctions.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="29"/>
         <CursorPos X="5" Y="11"/>
         <UsageCount Value="75"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\uconsts.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="38" Y="57"/>
         <UsageCount Value="72"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="src\telas\uprincipal.pas"/>
@@ -45,12 +42,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="255"/>
         <CursorPos X="25" Y="257"/>
         <UsageCount Value="32"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\ulazarusdetect.pas"/>
@@ -162,128 +157,7 @@
         <UsageCount Value="10"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="99" Column="33" TopLine="87"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="100" Column="44" TopLine="87"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="107" Column="40" TopLine="94"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="131" Column="22" TopLine="141"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="72" Column="32" TopLine="50"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="99" Column="3" TopLine="92"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="72" Column="21" TopLine="65"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="143" Column="39" TopLine="129"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="178" Column="23" TopLine="151"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="75" Column="46" TopLine="58"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="160" Column="7" TopLine="147"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="188" Column="30" TopLine="167"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="201" Column="32" TopLine="192"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="72" Column="25" TopLine="53"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="247" Column="33" TopLine="244"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="253" Column="5" TopLine="238"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="254" TopLine="238"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="255" TopLine="238"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="254" Column="72" TopLine="238"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="247" Column="13" TopLine="242"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="253" Column="28" TopLine="234"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="248" Column="16" TopLine="235"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="252" TopLine="246"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="267" Column="39" TopLine="246"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="266" Column="12" TopLine="254"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="258" Column="24" TopLine="244"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="268" Column="13" TopLine="258"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="269" Column="13" TopLine="259"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="268" Column="13" TopLine="258"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="275" Column="13" TopLine="265"/>
-      </Position>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode=""/>

@@ -677,17 +677,17 @@ Type
                                         ConnectionDefs        : TConnectionDefs;
                                         hEncodeStrings        : Boolean;
                                         AccessTag             : String);
-  Procedure   ProcessMassiveSQLCache (ServerMethodsClass      : TComponent;
+  Procedure ProcessMassiveSQLCache   (ServerMethodsClass      : TComponent;
                                       Var Pooler              : String;
                                       Var DWParams            : TRESTDWParams;
                                       ConnectionDefs          : TConnectionDefs;
                                       hEncodeStrings          : Boolean;
                                       AccessTag               : String);
-  Procedure   GetEvents              (ServerMethodsClass      : TComponent;
+  Procedure GetEvents                (ServerMethodsClass      : TComponent;
                                       Pooler,
                                       urlContext              : String;
                                       Var DWParams            : TRESTDWParams);
-  Function    ReturnEvent            (ServerMethodsClass      : TComponent;
+  Function ReturnEvent               (ServerMethodsClass      : TComponent;
                                       Pooler,
                                       urlContext              : String;
                                       Var vResult             : String;
@@ -698,10 +698,10 @@ Type
                                       AccessTag               : String;
                                       Const RequestType       : TRequestType;
                                       Var   RequestHeader     : TStringList) : Boolean;
-  Procedure   GetServerEventsList    (ServerMethodsClass      : TComponent;
+  Procedure GetServerEventsList      (ServerMethodsClass      : TComponent;
                                       Var ServerEventsList    : String;
                                       AccessTag               : String);
-  Function    ReturnContext          (ServerMethodsClass      : TComponent;
+  Function ReturnContext             (ServerMethodsClass      : TComponent;
                                       Pooler,
                                       urlContext              : String;
                                       Var vResult,
@@ -713,15 +713,15 @@ Type
                                       mark                    : String;
                                       RequestHeader           : TStringList;
                                       Var ErrorCode           : Integer) : Boolean;
-  Procedure   SetServerAuthOptions   (AuthenticationOptions   : TRESTDWServerAuthOptionParams);
+  Procedure SetServerAuthOptions     (AuthenticationOptions   : TRESTDWServerAuthOptionParams);
  Public
   Procedure EchoPooler               (ServerMethodsClass      : TComponent;
                                       AContext                : TComponent;
                                       Var Pooler, MyIP        : String;
                                       AccessTag               : String;
                                       Var InvalidTag          : Boolean);Virtual;Abstract;
-  Procedure   SetActive    (Value               : Boolean);Virtual;
-  Function    CommandExec  (Const AContext : TComponent;
+  Procedure SetActive                (Value               : Boolean);Virtual;
+  Function CommandExec     (Const AContext : TComponent;
                             Url,
                             RawHTTPCommand      : String;
                             Var ContentType     : String;
