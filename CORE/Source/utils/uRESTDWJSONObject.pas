@@ -168,6 +168,7 @@ Type
                             DataModeD        : TDataMode = dmDataware;
                             DateTimeFormat   : String = '';
                             DelimiterFormat  : String = '';
+                            CaseType         : TCaseType = ctNone;
                             {$IFDEF FPC}
                             CharSet          : TDatabaseCharSet = csUndefined;
                             {$ENDIF}
@@ -1764,13 +1765,16 @@ Procedure TJSONValue.LoadFromDataset(TableName        : String;
                                      DataModeD        : TDataMode = dmDataware;
                                      DateTimeFormat   : String = '';
                                      DelimiterFormat  : String = '';
+                                     CaseType         : TCaseType = ctNone;
                                      {$IFDEF FPC}
                                      CharSet          : TDatabaseCharSet = csUndefined;
                                      {$ENDIF}
                                      DataType         : Boolean = False;
                                      HeaderLowercase  : Boolean = False);
 Var
+ I: Integer;
  vTagGeral : String;
+ vText     : String;
  {$IFNDEF FPC}
  {$IF CompilerVersion < 22} // Delphi 2010 pra cima
  vSizeChar : Integer;
@@ -1792,6 +1796,46 @@ Begin
    DatabaseCharSet := CharSet;
  {$ENDIF}
  vTagGeral        := DatasetValues(bValue, DateTimeFormat, DataModeD, DelimiterFormat, HeaderLowercase);
+
+ // 13/10/2022 - Guilherme Discher
+ Case CaseType Of
+  ctUpperCase:
+   vTagGeral := UpperCase(vTagGeral);
+  ctLowerCase:
+   vTagGeral := LowerCase(vTagGeral);
+  ctCamelCase:
+   Begin
+    vText     := vTagGeral;
+    vTagGeral := '';
+    I := InitStrPos;
+    While I <= Length(vText)-1 Do
+    Begin
+     If (vText[I] = '_') Or (vText[I] = '"') Or (vText[I -1] = '"') then
+     Begin
+      If vText[I] = '_' Then
+       Inc(I);
+
+      vTagGeral := vTagGeral + UpperCase(vText[I]);
+     End
+     Else If Trim(vText[I]) = '' Then
+     Begin
+       Inc(I);
+       vTagGeral := vTagGeral + ' ' + UpperCase(vText[I]);
+     End
+     Else
+     Begin
+      If I = 0 Then
+       vTagGeral := vTagGeral + UpperCase(vText[I])
+      Else
+       vTagGeral := vTagGeral + LowerCase(vText[I]);
+     End;
+     Inc(I);
+    End;
+   End;
+  Else
+    vTagGeral := vTagGeral;
+ End;
+
  {$IFDEF FPC}
   If vEncodingLazarus = Nil Then
    SetEncoding(vEncoding);
