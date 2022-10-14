@@ -1773,12 +1773,14 @@ Procedure TJSONValue.LoadFromDataset(TableName        : String;
                                      HeaderLowercase  : Boolean = False);
 Var
  I: Integer;
- vText: TArray<Char>;
  vTagGeral : String;
  {$IFNDEF FPC}
+ vText: TArray<Char>;
  {$IF CompilerVersion < 22} // Delphi 2010 pra cima
  vSizeChar : Integer;
  {$IFEND}
+ {$ELSE}
+ vText: TCharArray;
  {$ENDIF}
 Begin
  // Recebe o parametro "DataType" para fazer a tipagem na função que gera a linha "GenerateLine"
@@ -1807,8 +1809,8 @@ Begin
    Begin
     vText     := vTagGeral.ToCharArray;
     vTagGeral := '';
-    I := Low(vText);
-    While I <= High(vText) Do
+    I := InitStrPos;
+    While I <= Length(vText)-1 Do
     Begin
      If (vText[I] = '_') Or (vText[I] = '"') Or (vText[I -1] = '"') then
      Begin
