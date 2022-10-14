@@ -29,3 +29,6 @@ Fotos representando o problema se necessário.
 
 **Informações Adicionais**
 Adicione alguma informação adicional ou observação se necessário nesse espaço aqui.
+
+**Relator**
+Se caso você tiver criando a tarefa relatada por outra pessoa, informe o contato dessa pessoa aqui.
