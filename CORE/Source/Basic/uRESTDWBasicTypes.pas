@@ -819,7 +819,7 @@ Begin
    {$IFDEF RESTDWMEMTABLE}
     TRESTDWMemtable(Self).Close;
    {$ENDIF}
-   {$IFDEF UNIDACMEM}
+   {$IFDEF RESTDWUNIDACMEM}
     TVirtualTable(Self).Close;
    {$ENDIF}
    {$IFDEF LAZDRIVER}
@@ -844,7 +844,7 @@ Begin
   {$IFDEF RESTDWMEMTABLE}
    TRESTDWMemtable(Self).Close;
   {$ENDIF}
-  {$IFDEF UNIDACMEM}
+  {$IFDEF RESTDWUNIDACMEM}
    TVirtualTable(Self).Close;
   {$ENDIF}
   {$ENDIF}
@@ -856,7 +856,7 @@ Begin
    {$IFDEF RESTDWMEMTABLE}
     TRESTDWMemtable(Self).Open;
    {$ENDIF}
-   {$IFDEF UNIDACMEM}
+   {$IFDEF RESTDWUNIDACMEM}
     TVirtualTable(Self).Open;
    {$ENDIF}
    {$IFDEF LAZDRIVER}
@@ -881,7 +881,7 @@ Begin
   {$IFDEF RESTDWMEMTABLE}
    TRESTDWMemtable(Self).Open;
   {$ENDIF}
-  {$IFDEF UNIDACMEM}
+  {$IFDEF RESTDWUNIDACMEM}
    TVirtualTable(Self).Open;
   {$ENDIF}
   {$ENDIF}
@@ -1963,7 +1963,7 @@ Var
  Procedure CopyData;
  Begin
   vMemBRequest.First;
-  {$IFDEF UNIDACMEM}
+  {$IFDEF RESTDWUNIDACMEM}
    AssignDataSet(vMemBRequest);
   {$ELSE}
    {$IFDEF CLIENTDATASET}
@@ -2013,7 +2013,7 @@ Begin
      EnableControls;
     End;
    {$ENDIF}
-   {$IFDEF UNIDACMEM}
+   {$IFDEF RESTDWUNIDACMEM}
     vBinaryLoadRequest := True;
     DisableControls;
     Close;
@@ -2055,7 +2055,7 @@ Begin
    {$IFDEF RESTKBMMEMTABLE}
     Raise Exception.Create(Format(cInvalidBinaryRequest, ['Invalid dataset driver.']));
    {$ENDIF}
-   {$IFDEF UNIDACMEM}
+   {$IFDEF RESTDWUNIDACMEM}
     DisableControls;
     Close;
     vBinaryLoadRequest := True;
