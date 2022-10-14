@@ -139,30 +139,30 @@ Var
  Begin
   lst := TStringList.Create;
   Try
-   pAux1 := Pos('?',ParamsURI);
+   pAux1 := Pos('?', ParamsURI);
    // params com /
-   sAux1 := Copy(ParamsURI,1,pAux1-1);
+   sAux1 := Copy(ParamsURI, 1, pAux1 - 1);
    // params com &
-   sAux2 := Copy(ParamsURI,pAux1+1,Length(ParamsURI));
+   sAux2 := Copy(ParamsURI, pAux1 + 1, Length(ParamsURI));
    cAux1 := 0;
    While (sAux1 <> '') Do
     Begin
-     pAux1 := Pos('/',sAux1);
+     pAux1 := Pos('/', sAux1);
      If pAux1 = 0 Then
-      pAux1 := Length(sAux1)+1;
-     lst.AddPair(IntToStr(cAux1),Copy(sAux1,1,pAux1-1));
+      pAux1 := Length(sAux1) + 1;
+     lst.Add(IntToStr(cAux1) + '=' + Copy(sAux1, 1, pAux1 - 1));
      cAux1 := cAux1 + 1;
-     Delete(sAux1,1,pAux1);
+     Delete(sAux1, 1, pAux1);
     End;
    While (sAux2 <> '') Do
     Begin
-     pAux1 := Pos('&',sAux2);
+     pAux1 := Pos('&', sAux2);
      If pAux1 = 0 then
-      pAux1 := Length(sAux2)+1;
-     sAux1 := Copy(sAux2,1,pAux1-1);
+      pAux1 := Length(sAux2) + 1;
+     sAux1 := Copy(sAux2, 1, pAux1 - 1);
      If Pos('dwmark:', sAux1) = 0 then
       lst.Add(sAux1);
-     Delete(sAux2,1,pAux1);
+     Delete(sAux2, 1, pAux1);
     End;
    While lst.Count > 0 Do
     Begin
@@ -203,24 +203,24 @@ Var
  End;
  Procedure ParseURL;
  Begin
-  vPosQuery  := Pos('?', URL);
-  vIsQuery   := vPosQuery > 0;
+  vPosQuery := Pos('?', URL);
+  vIsQuery  := vPosQuery > 0;
   ParamsURI := '';
   If vIsQuery Then
    Begin
-    ParamsURI := Copy(URL,vPosQuery+1,Length(URL));
-    URL := Copy(URL,1,vPosQuery-1);
+    ParamsURI := Copy(URL, vPosQuery + 1, Length(URL));
+    URL := Copy(URL, 1, vPosQuery - 1);
    End;
   // url igual http://localhost:8082/usuarios//?var=teste
   While (URL <> '')       And
-        (URL[Length(URL)] In ['/','?']) Do
-   Delete(URL,Length(URL),1);
+        (URL[Length(URL)] In ['/', '?']) Do
+   Delete(URL, Length(URL), 1);
   // url http://localhost:8082/usuarios//login//?var=teste
-  While (Pos('//',URL) > 0) Do
-   Delete(URL,Pos('//',URL),1);
+  While (Pos('//', URL) > 0) Do
+   Delete(URL, Pos('//', URL), 1);
   // ParamsURI = /?teste=1
   While (ParamsURI <> '')      And
-        (ParamsURI[InitStrPos] In ['/','?']) Do
+        (ParamsURI[InitStrPos] In ['/', '?']) Do
    Delete(ParamsURI, InitStrPos, 1);
   If URL = '' Then
    URL := '/';
@@ -253,17 +253,17 @@ Begin
           vParamMethods := TRESTDWServerEvents(Components[I]).Events[A].Params;
           Break;
         end
-        else if SameText(vTempRoute, Copy(vTempValue,1,Length(vTempRoute))) then begin
+        else if SameText(vTempRoute, Copy(vTempValue, 1, Length(vTempRoute))) then begin
           Result := True;
           vTempURL := vTempRoute;
-          vTempParamsURI := Copy(vTempValue,Length(vTempRoute)+2,Length(vTempValue));
+          vTempParamsURI := Copy(vTempValue,Length(vTempRoute) + 2, Length(vTempValue));
           vParamMethods := TRESTDWServerEvents(Components[I]).Events[A].Params;
         end;
       end;
     end
     Else If (Components[i] Is TRESTDWServerContext) Then
      Begin
-      For A := 0 To TRESTDWServerContext(Components[I]).ContextList.Count -1 Do
+      For A := 0 To TRESTDWServerContext(Components[I]).ContextList.Count - 1 Do
        Begin
         vTempRoute := TRESTDWServerContext(Components[I]).ContextList[A].BaseURL   +
                       TRESTDWServerContext(Components[I]).ContextList[A].ContextName;
@@ -279,7 +279,7 @@ Begin
          Begin
           Result := True;
           vTempURL := vTempRoute;
-          vTempParamsURI := Copy(vTempValue,Length(vTempRoute)+2,Length(vTempValue));
+          vTempParamsURI := Copy(vTempValue, Length(vTempRoute) + 2, Length(vTempValue));
           vParamMethods := TRESTDWServerContext(Components[I]).ContextList[A].Params;
          End;
        End;
@@ -288,8 +288,8 @@ Begin
     Begin
      CopyParams(vParamMethods);
      URL := vTempURL;
-     ParamsURI := '?'+ParamsURI;
-     ParamsURI := vTempParamsURI+ParamsURI;
+     ParamsURI := '?' + ParamsURI;
+     ParamsURI := vTempParamsURI + ParamsURI;
      ParseParams;
      Break;
     End;

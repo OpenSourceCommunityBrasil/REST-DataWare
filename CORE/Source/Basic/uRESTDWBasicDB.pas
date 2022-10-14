@@ -26,12 +26,11 @@ unit uRESTDWBasicDB;
 interface
 
 Uses
- {$IFDEF RESTDWUNIDACMEM}DADump, UniDump, VirtualTable, MemDS,{$ENDIF}
+ {$IFDEF RESTDWUNIDACMEM}DADump, UniDump, VirtualTable, {$ENDIF}
  {$IFDEF RESTKBMMEMTABLE}kbmmemtable, {$ENDIF}
  {$IFDEF FPC}
-  {$IFNDEF RESTDWLAMW}memds, BufDataset, {$ENDIF}
-  {$IFDEF RESTDWLAZDRIVER}memds,{$ENDIF}
-  uRESTDWCharset,
+  {$IFNDEF RESTDWLAMW}BufDataset, {$ENDIF}
+  memds, uRESTDWCharset,
  {$ELSE}
   {$IF Defined(RESTDWFMX)}
    {$IFNDEF RESTDWAndroidService}System.UITypes, {$ENDIF}
@@ -47,11 +46,11 @@ Uses
     {$IFDEF RESTDWADMEMTABLE}
      uADStanIntf, uADStanOption, uADStanParam, uADStanError, uADPhysIntf,
      uADDAptIntf, uADCompDataSet, uADCompClient,
-      {$IF CompilerVersion > 26}uADStanStorageBin,{$IFEND}
+    {$IF CompilerVersion > 26}uADStanStorageBin,{$IFEND}
     {$ENDIF}
    {$IFEND}
  {$ENDIF}
- SysUtils,  Classes, Db, SyncObjs, Variants,
+ SysUtils, Classes, Db, SyncObjs, Variants,
  uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes, uRESTDWConsts,
  uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator,
  uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
