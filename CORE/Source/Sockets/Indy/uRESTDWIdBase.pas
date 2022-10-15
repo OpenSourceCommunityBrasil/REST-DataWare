@@ -73,6 +73,7 @@ Type
   vSSLVerifyMode                   : TIdSSLVerifyModeSet;
   vSSLVerifyDepth                  : Integer;
   vSSLMode                         : TIdSSLMode;
+  aSSLVersions                     : TIdSSLVersions;
   Procedure aCommandGet             (AContext         : TIdContext;
                                      ARequestInfo     : TIdHTTPRequestInfo;
                                      AResponseInfo    : TIdHTTPResponseInfo);
@@ -120,6 +121,7 @@ Type
   Property SSLVerifyDepth          : Integer             Read vSSLVerifyDepth          Write vSSLVerifyDepth;
   Property SSLMode                 : TIdSSLMode          Read vSSLMode                 Write vSSLMode;
   Property SSLMethod               : TIdSSLVersion       Read aSSLMethod               Write aSSLMethod;
+  Property SSLVersions             : TIdSSLVersions      Read aSSLVersions             Write aSSLVersions;
   Property CipherList              : String              Read vCipherList              Write vCipherList;
 End;
 
@@ -691,7 +693,6 @@ Begin
      if Assigned(OnHeadersAvailable) then
       OnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
      atempResponse.Position := 0;
-
      tempResponse.CopyFrom(atempResponse, atempResponse.Size);
      FreeAndNil(atempResponse);
      tempResponse.Position := 0;
@@ -701,9 +702,6 @@ Begin
     End
    Else
     Begin
-//     temp := Nil;
-//     If Assigned(CustomHeaders) Then
-//      temp         := TStringStream.Create(CustomHeaders.Text);
      HttpRequest.Post(AUrl, vTempHeaders, atempResponse);
      Result:= HttpRequest.ResponseCode;
      if Assigned(OnHeadersAvailable) then
@@ -716,23 +714,6 @@ Begin
      If Assigned(OnAfterRequest) then
       OnAfterRequest(AUrl, rtPost, CustomBody);
     End;
-
-
-//   HttpRequest.Post(AUrl, vTempHeaders, atempResponse);
-//   Result:= HttpRequest.ResponseCode;
-//   If Assigned(OnHeadersAvailable) Then
-//    OnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
-//   atempResponse.Position := 0;
-//   If RequestCharset = esUtf8 Then
-//    aString := utf8Decode(atempResponse.DataString)
-//   Else
-//    aString := atempResponse.DataString;
-//   StringToStream(tempResponse, aString);
-//   FreeAndNil(atempResponse);
-//   tempResponse.Position := 0;
-//   If Not IgnoreEvents Then
-//   If Assigned(OnAfterRequest) then
-//    OnAfterRequest(AUrl, rtPost, tempResponse);
   Finally
    vTempHeaders.Free;
    If Assigned(tempResponse) Then
@@ -740,8 +721,6 @@ Begin
    If Assigned(atempResponse) Then
     FreeAndNil(atempResponse);
    SendParams.Free;
-//   If Assigned(temp) Then
-//    FreeAndNil(temp);
   End;
  Except
   On E: EIdHTTPProtocolException do
