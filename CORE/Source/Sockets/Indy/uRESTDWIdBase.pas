@@ -651,7 +651,8 @@ Begin
  Result:= 200;
  SendParams   := TIdMultipartFormDataStream.Create;
  Try
-  tempResponse := Nil;
+  If Not Assigned(CustomBody) Then
+   tempResponse  := TStringStream.Create;
   SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
@@ -684,21 +685,35 @@ Begin
      OnBeforePost(AUrl, CustomHeaders);
    CopyStringList(CustomHeaders, vTempHeaders);
    SetRawHeaders(vTempHeaders, SendParams);
-   HttpRequest.Post(AUrl, SendParams, atempResponse);
-   Result:= HttpRequest.ResponseCode;
-   If Assigned(OnHeadersAvailable) Then
-    OnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
-   atempResponse.Position := 0;
-   If RequestCharset = esUtf8 Then
-    aString := utf8Decode(atempResponse.DataString)
+
+   If Not Assigned(CustomBody) Then
+    Begin
+     HttpRequest.Post(AUrl, SendParams, atempResponse);
+     Result:= HttpRequest.ResponseCode;
+     if Assigned(OnHeadersAvailable) then
+      OnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
+     atempResponse.Position := 0;
+     tempResponse.CopyFrom(atempResponse, atempResponse.Size);
+     FreeAndNil(atempResponse);
+     tempResponse.Position := 0;
+     If Not IgnoreEvents Then
+     If Assigned(OnAfterRequest) then
+      OnAfterRequest(AUrl, rtPost, tempResponse);
+    End
    Else
-    aString := atempResponse.DataString;
-   StringToStream(tempResponse, aString);
-   FreeAndNil(atempResponse);
-   tempResponse.Position := 0;
-   If Not IgnoreEvents Then
-   If Assigned(OnAfterRequest) then
-    OnAfterRequest(AUrl, rtPost, tempResponse);
+    Begin
+     HttpRequest.Post(AUrl, vTempHeaders, atempResponse);
+     Result:= HttpRequest.ResponseCode;
+     if Assigned(OnHeadersAvailable) then
+      OnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
+     atempResponse.Position := 0;
+     CustomBody.CopyFrom(atempResponse, atempResponse.Size);
+     FreeAndNil(atempResponse);
+     CustomBody.Position := 0;
+     If Not IgnoreEvents Then
+     If Assigned(OnAfterRequest) then
+      OnAfterRequest(AUrl, rtPost, CustomBody);
+    End;
   Finally
    vTempHeaders.Free;
    If Assigned(tempResponse) Then
@@ -706,8 +721,6 @@ Begin
    If Assigned(atempResponse) Then
     FreeAndNil(atempResponse);
    SendParams.Free;
-   If Assigned(temp) Then
-    FreeAndNil(temp);
   End;
  Except
   On E: EIdHTTPProtocolException do
