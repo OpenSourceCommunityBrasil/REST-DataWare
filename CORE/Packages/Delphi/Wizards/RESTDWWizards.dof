@@ -88,10 +88,10 @@ RemoteSymbols=0
 MinStackSize=16384
 MaxStackSize=1048576
 ImageBase=4194304
-ExeDescription=REST Dataware Wizards
+ExeDescription=REST Dataware - Wizards
 [Directories]
 OutputDir=
-UnitOutputDir=
+UnitOutputDir=..\..\..\compiled
 PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=
@@ -134,5 +134,12 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
-[Excluded Packages]
-c:\program files (x86)\borland\delphi7\Projects\Bpl\dclusr70.bpl=Borland User Components
+[HistoryLists\hlConditionals]
+Count=1
+Item0=DEBUG
+[HistoryLists\hlUnitAliases]
+Count=1
+Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+[HistoryLists\hlUnitOutputDirectory]
+Count=1
+Item0=..\..\..\compiled

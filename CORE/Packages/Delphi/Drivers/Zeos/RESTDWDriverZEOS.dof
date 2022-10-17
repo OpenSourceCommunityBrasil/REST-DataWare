@@ -4,7 +4,7 @@ Version=7.0
 A=8
 B=0
 C=1
-D=1
+D=0
 E=0
 F=0
 G=1
@@ -88,10 +88,10 @@ RemoteSymbols=0
 MinStackSize=16384
 MaxStackSize=1048576
 ImageBase=4194304
-ExeDescription=REST Dataware CORE - Driver ZEOS
+ExeDescription=REST Dataware - Driver ZEOS
 [Directories]
 OutputDir=
-UnitOutputDir=
+UnitOutputDir=..\..\..\..\compiled
 PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=
@@ -134,28 +134,12 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
-[Excluded Packages]
-C:\Program Files (x86)\Borland\Delphi7\Projects\Bpl\frx7.bpl=(untitled)
-C:\Program Files (x86)\Borland\Delphi7\Projects\Bpl\fs7.bpl=(untitled)
-C:\Program Files (x86)\Borland\Delphi7\Projects\Bpl\fsDB7.bpl=FastScript 1.9 ADO Components
-C:\Program Files (x86)\Borland\Delphi7\Projects\Bpl\fsADO7.bpl=FastScript 1.9 ADO Components
-C:\Program Files (x86)\Borland\Delphi7\Projects\Bpl\fsIBX7.bpl=FastScript 1.9 IBX Components
-C:\Program Files (x86)\Borland\Delphi7\Projects\Bpl\frxADO7.bpl=(untitled)
-C:\Program Files (x86)\Borland\Delphi7\Projects\Bpl\frxBDE7.bpl=(untitled)
-C:\Program Files (x86)\Borland\Delphi7\Projects\Bpl\frxDBX7.bpl=(untitled)
-C:\Program Files (x86)\Borland\Delphi7\Projects\Bpl\frxIBX7.bpl=(untitled)
-c:\program files (x86)\borland\delphi7\Projects\Bpl\VisualControl.bpl=Package de Componentes da Connectronic
-c:\program files (x86)\borland\delphi7\Projects\Bpl\dclusr70.bpl=Borland User Components
-c:\program files (x86)\borland\delphi7\Projects\Bpl\dclfrx7.bpl=FastReport 5.0 Components
-c:\program files (x86)\borland\delphi7\Projects\Bpl\dclfrxTee7.bpl=FastReport 5.0 Tee Components
-c:\program files (x86)\borland\delphi7\Projects\Bpl\MicroTerminal.bpl=(untitled)
-C:\Program Files (x86)\Embarcadero\CompsXE7\Rave11\D7\dclRave.bpl=Rave Reports 11.0 BEX Package
 [HistoryLists\hlConditionals]
 Count=1
 Item0=DEBUG
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
-[HistoryLists\hlBPLOutput]
+[HistoryLists\hlUnitOutputDirectory]
 Count=1
-Item0=.\D7
+Item0=..\..\..\compiled

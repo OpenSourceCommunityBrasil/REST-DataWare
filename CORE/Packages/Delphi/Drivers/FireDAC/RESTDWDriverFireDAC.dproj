@@ -162,19 +162,10 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="RESTDWDriverFireDAC.res"/>
-        <DCCReference Include="RESTDWDriverFireDAC.dres"/>
+        <DCCReference Include="RESTDWDriverFireDAC.dcr"/>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="RESTDWCore.dcp"/>
         <DCCReference Include="..\..\..\..\Source\Database_Drivers\uRESTDWDriverFD.pas"/>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWDriverFD.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWDriverFD</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWDriverFD16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWDriverFD16</ResourceId>
-        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

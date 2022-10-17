@@ -1,6 +1,7 @@
 package RESTDWSocketIndy;
 
 {$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
@@ -22,10 +23,11 @@ package RESTDWSocketIndy;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'REST Dataware Indy Sockets'}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'REST Dataware - Socket Indy'}
 {$RUNONLY}
 {$IMPLICITBUILD ON}
-{$DEFINE DEBUG}
 
 requires
   RESTDWCore;
