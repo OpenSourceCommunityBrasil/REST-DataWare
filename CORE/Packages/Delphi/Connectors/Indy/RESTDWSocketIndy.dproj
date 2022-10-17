@@ -171,7 +171,8 @@
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_DcuOutput>..\..\compiled</DCC_DcuOutput>
+        <DCC_DcuOutput>..\..\..\..\compiled</DCC_DcuOutput>
+        <DCC_Description>REST Dataware - Socket Indy</DCC_Description>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -190,22 +191,6 @@
         </DelphiCompile>
         <DCCReference Include="RESTDWCore.dcp"/>
         <DCCReference Include="..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas"/>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdClientPooler.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWIdClientPooler</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdClientREST.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWIdClientREST</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdDataBase.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWIdDataBase</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdServicePooler.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWIdServicePooler</ResourceId>
-        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -223,12 +208,7 @@
         <Borland.ProjectType>Package</Borland.ProjectType>
         <BorlandProject>
             <Delphi.Personality>
-                <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWSocketIcsDesign.bpl">(untitled)</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="D:\IDE\fortesreport-ce\Binary\LibD28\dclfrce.bpl">Fortes Report Comunity Edition (design-time)</Excluded_Packages>
-                </Excluded_Packages>
+                <Excluded_Packages/>
                 <Source>
                     <Source Name="MainSource">RESTDWSocketIndy.dpk</Source>
                 </Source>

@@ -153,6 +153,7 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <DCC_Description>REST Dataware - Socket Indy Design</DCC_Description>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -164,25 +165,10 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="RESTDWSocketIndyDesign.dcr"/>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="RESTDWSocketIndy.dcp"/>
         <DCCReference Include="..\..\..\..\Source\Sockets\Indy\uRESTDWIdReg.pas"/>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdClientPooler.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWIdClientPooler</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdClientREST.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWIdClientREST</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdDataBase.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWIdDataBase</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdServicePooler.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWIdServicePooler</ResourceId>
-        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -200,12 +186,7 @@
         <Borland.ProjectType>Package</Borland.ProjectType>
         <BorlandProject>
             <Delphi.Personality>
-                <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWSocketIcsDesign.bpl">(untitled)</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="D:\IDE\fortesreport-ce\Binary\LibD28\dclfrce.bpl">Fortes Report Comunity Edition (design-time)</Excluded_Packages>
-                </Excluded_Packages>
+                <Excluded_Packages/>
                 <Source>
                     <Source Name="MainSource">RESTDWSocketIndyDesign.dpk</Source>
                 </Source>
@@ -225,6 +206,12 @@
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWSocketIndyDesign.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>RESTDWSocketIndyDesign.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

@@ -38,10 +38,6 @@ Procedure Register;
 
 Implementation
 
- {$if CompilerVersion < 23}
-  {$R .\RESTDWShellServicesDesign.dcr}
- {$IFEND}
-
 uses uRESTDWCharset;
 
 Procedure Register;

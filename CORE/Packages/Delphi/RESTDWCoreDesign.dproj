@@ -132,7 +132,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_MapFile>3</DCC_MapFile>
-        <DCC_Description>REST Dataware Design</DCC_Description>
+        <DCC_Description>REST Dataware - Core Design</DCC_Description>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
@@ -148,15 +148,10 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="RESTDWCoreDesign.res"/>
-        <DCCReference Include="RESTDWCoreDesign.dres"/>
+        <DCCReference Include="RESTDWCoreDesign.dcr"/>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="RESTDWCore.dcp"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWDesignReg.pas"/>
-        <RcItem Include="..\..\Images\icons\dwIcon.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>DW</ResourceId>
-        </RcItem>
         <RcItem Include="..\..\Images\icons\components\TRESTDWBatchMove.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTDWBatchMove</ResourceId>
@@ -172,22 +167,6 @@
         <RcItem Include="..\..\Images\icons\components\TRESTDWClientEvents16.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTDWClientEvents16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWClientNotification.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientNotification</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWClientNotification16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientNotification16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWClientPooler.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientPooler</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWClientPooler16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientPooler16</ResourceId>
         </RcItem>
         <RcItem Include="..\..\Images\icons\components\TRESTDWClientREST.bmp">
             <ResourceType>BITMAP</ResourceType>
@@ -212,14 +191,6 @@
         <RcItem Include="..\..\Images\icons\components\TRESTDWContextRules16.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTDWContextRules16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWDataBase.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWDataBase</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWDataBase16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWDataBase16</ResourceId>
         </RcItem>
         <RcItem Include="..\..\Images\icons\components\TRESTDWMassiveCache.bmp">
             <ResourceType>BITMAP</ResourceType>
@@ -285,30 +256,6 @@
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTDWServerEvents16</ResourceId>
         </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWServiceNotification.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServiceNotification</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWServiceNotification16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServiceNotification16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWServicePooler.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServicePooler</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWServicePooler16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServicePooler16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWServiceSynPooler.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServiceSynPooler</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWServiceSynPooler16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServiceSynPooler16</ResourceId>
-        </RcItem>
         <RcItem Include="..\..\Images\icons\components\TRESTDWStoredProc.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTDWStoredProc</ResourceId>
@@ -353,12 +300,7 @@
                 <Source>
                     <Source Name="MainSource">RESTDWCoreDesign.dpk</Source>
                 </Source>
-                <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWSocketIcsDesign.bpl">(untitled)</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="D:\IDE\fortesreport-ce\Binary\LibD28\dclfrce.bpl">Fortes Report Comunity Edition (design-time)</Excluded_Packages>
-                </Excluded_Packages>
+                <Excluded_Packages/>
             </Delphi.Personality>
             <Deployment Version="4">
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
@@ -378,7 +320,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWCoreDesign.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWCoreDesign.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>RESTDWCoreDesign.bpl</RemoteName>
                         <Overwrite>true</Overwrite>

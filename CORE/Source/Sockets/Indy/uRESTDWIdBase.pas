@@ -651,8 +651,6 @@ Begin
  Result:= 200;
  SendParams   := TIdMultipartFormDataStream.Create;
  Try
-  If Not Assigned(CustomBody) Then
-   tempResponse  := TStringStream.Create;
   SetParams;
   SetUseSSL(UseSSL);
   vTempHeaders := TStringList.Create;
@@ -665,6 +663,7 @@ Begin
     atempResponse := TStringStream.Create;
    {$IFEND}
   {$ENDIF}
+  If Not Assigned(CustomBody) Then  
   {$IFDEF FPC}
    tempResponse  := TStringStream.Create('');
   {$ELSE}

@@ -1,0 +1,8 @@
+TRESTDWIdClientPooler BITMAP "..\icons\components\TRESTDWIdClientPooler.bmp"
+TRESTDWIdClientPooler16 BITMAP "..\icons\components\TRESTDWIdClientPooler16.bmp"
+TRESTDWIdClientREST BITMAP "..\icons\components\TRESTDWIdClientREST.bmp"
+TRESTDWIdClientREST16 BITMAP "..\icons\components\TRESTDWIdClientREST16.bmp"
+TRESTDWIdDataBase BITMAP "..\icons\components\TRESTDWIdDataBase.bmp"
+TRESTDWIdDataBase16 BITMAP "..\icons\components\TRESTDWIdDataBase16.bmp"
+TRESTDWIdServicePooler BITMAP "..\icons\components\TRESTDWIdServicePooler.bmp"
+TRESTDWIdServicePooler16 BITMAP "..\icons\components\TRESTDWIdServicePooler16.bmp"

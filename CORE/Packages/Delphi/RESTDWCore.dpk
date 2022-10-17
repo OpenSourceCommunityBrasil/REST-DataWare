@@ -1,15 +1,6 @@
 package RESTDWCore;
 
-{$IFNDEF FPC}
- {$IF Not(Defined(VER150) or Defined(VER160) or Defined(VER170)
-       or Defined(VER180) or Defined(VER185) or Defined(VER190)
-       or Defined(VER200) or Defined(VER210) or Defined(VER220))}
-  {$R RESTDWCore.res  RESTDWCore.rc}
-  {$R RESTDWCore.dres RESTDWCore.rc}
-  {$R *.res}
-  {$R *.dres}
- {$IFEND}
-{$ENDIF}
+{$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -34,7 +25,7 @@ package RESTDWCore;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'REST Dataware Base Runtime'}
+{$DESCRIPTION 'REST Dataware - Core'}
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
 

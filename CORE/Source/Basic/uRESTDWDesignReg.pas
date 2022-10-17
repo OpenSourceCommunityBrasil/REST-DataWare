@@ -237,12 +237,6 @@ Var
 
 Implementation
 
-{$IFNDEF FPC}
- {$if CompilerVersion < 23}
-  {$R .\RESTDWCoreDesign.dcr}
- {$IFEND}
-{$ENDIF}
-
 uses uRESTDWConsts, uRESTDWPoolermethod, uRESTDWBasic, uRESTDWResponseTranslator,
      uRESTDWFieldSourceEditor, uRESTDWSqlEditor, uRESTDWUpdSqlEditor,
      uRESTDWJSONViewer, uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
