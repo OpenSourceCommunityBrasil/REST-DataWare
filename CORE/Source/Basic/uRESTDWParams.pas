@@ -5053,15 +5053,9 @@ Begin
   ovTimeStamp,
   ovOraTimeStamp,
   ovTimeStampOffset : Begin
-                       vEncoded      := False;
-                       vObjectValue  := ovDateTime;
-                       vDateTime    := Value;
-//                       {$IFDEF FPC}
-//                        vDateTime    := StrToDateTime(Value);
-//                       {$ELSE}
-//                        vDateTime    := Value; //StrToDateTime(Value);
-//                       {$ENDIF}
-                       SetValue(IntToStr(DateTimeToUnix(vDateTime)), vEncoded);
+                       vEncoded     := False;
+                       vObjectValue := ovFloat;
+                       SetValue(BuildStringFloat(FloatToStr(Value), DataMode, vFloatDecimalFormat), vEncoded);
                       End;
   ovString,
   ovFixedChar,
@@ -5383,7 +5377,7 @@ Begin
                           Begin
                            If (Trim(vJSONValue.Value) <> '')     And
                               (Trim(vJSONValue.Value) <> 'null') Then
-                            Result := vJSONValue.Value
+                            Result := StrToFloat(BuildFloatString(vJSONValue.Value))
                            Else
                             Result := GetNullValue(Value);
                           End
@@ -6142,7 +6136,7 @@ Var
                    If aParam.isnull Then
                     Begin
                      L := vNull;
-                     Stream.WriteBuffer(L, Sizeof(DWInt64));
+                     Stream.Write(L, Sizeof(DWInt64));
                     End
                    Else
                     Begin
@@ -6215,7 +6209,7 @@ Var
                        Stream.Write(B, Sizeof(WordBool));
                       End;
                     End;
-       ovExtended : Begin
+       ovFloat    : Begin
                      If Not((aParam.IsEmpty) and (aParam.IsNull)) Then
                       Begin
                        S := BuildStringFloat(aParam.AsString);
@@ -6230,8 +6224,26 @@ Var
                        J := Length(S);
                        Stream.Write(J, Sizeof(DWInteger));
                        If J <> 0 then
-                        Stream.WriteBuffer(S[InitStrPos], J);
+                        Stream.Write(S[InitStrPos], J);
                       End;
+                    End;
+       ovExtended : Begin
+                    If Not((aParam.IsEmpty) and (aParam.IsNull)) Then
+                     Begin
+                      S := BuildStringFloat(aParam.AsString);
+                      J := Length(S);
+                      Stream.Write(J, Sizeof(DWInteger));
+                      If J <> 0 then
+                       Stream.Write(S[InitStrPos], J);
+                     End
+                    Else
+                     Begin
+                      S := TNullString;
+                      J := Length(S);
+                      Stream.Write(J, Sizeof(DWInteger));
+                      If J <> 0 then
+                       Stream.Write(S[InitStrPos], J);
+                     End;
                     End;
        ovSingle   : Begin
                      If aParam.isnull Then
@@ -6250,11 +6262,22 @@ Var
        ovDateTime,
        ovTimeStamp,
        ovTimeStampOffset: Begin
-                           If Not aParam.IsNull Then
-                            J := DateTimeToUnix(aParam.AsDateTime)
-                           Else
-                            J := vNull;
-                           Stream.Write(J, Sizeof(DWInt64));
+                          If Not((aParam.IsEmpty) and (aParam.IsNull)) Then
+                           Begin
+                            S := BuildStringFloat(aParam.AsString);
+                            J := Length(S);
+                            Stream.Write(J, Sizeof(DWInteger));
+                            If J <> 0 then
+                             Stream.Write(S[InitStrPos], J);
+                           End
+                          Else
+                           Begin
+                            S := TNullString;
+                            J := Length(S);
+                            Stream.Write(J, Sizeof(DWInteger));
+                            If J <> 0 then
+                             Stream.Write(S[InitStrPos], J);
+                           End;
                           End;
        ovInteger,
        ovAutoInc : Begin
@@ -6281,7 +6304,6 @@ Var
                       Stream.Write(WordData, Sizeof(DWInteger));
                      End;
                    End;
-       ovFloat,
        ovCurrency,
        ovBCD,
        ovFMTBcd  : Begin
@@ -6368,7 +6390,7 @@ Begin
     //Rewrite init Header
     Stream.Position := 0;
     aStream.Position := 0;
-    Stream.WriteBuffer(ParamsHeader, SizeOf(TRESTDWParamsHeader));
+    Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
     Stream.CopyFrom(aStream, aStream.Size);
     Stream.Position := 0;
    Finally
@@ -6392,7 +6414,7 @@ Begin
      RecordCount   := 0;
      ParamsCount   := Count;
     End;
-   Stream.WriteBuffer(ParamsHeader, SizeOf(TRESTDWParamsHeader));
+   Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
    //Write dwParamsBinList
    SaveParamsToStream(Stream);
    //Remap Bin size
@@ -6401,7 +6423,7 @@ Begin
    ParamsHeader.ParamsCount := aCount;
    //Rewrite init Header
    Stream.Position := StartPos;
-   Stream.WriteBuffer(ParamsHeader, SizeOf(TRESTDWParamsHeader));
+   Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
    Stream.Position := 0;
   {$IFEND}
  {$ELSE}
@@ -6416,7 +6438,7 @@ Begin
    RecordCount   := 0;
    ParamsCount   := Count;
   End;
- Stream.WriteBuffer(ParamsHeader, SizeOf(TRESTDWParamsHeader));
+ Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
  //Write dwParamsBinList
  SaveParamsToStream(Stream);
  //Remap Bin size
@@ -6425,7 +6447,7 @@ Begin
  ParamsHeader.ParamsCount := aCount;
  //Rewrite init Header
  Stream.Position := StartPos;
- Stream.WriteBuffer(ParamsHeader, SizeOf(TRESTDWParamsHeader));
+ Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
  Stream.Position := 0;
  {$ENDIF}
 // SetLength(vTempString, Stream.Size);
@@ -6459,6 +6481,8 @@ Var
   J, L         : DWInt64;
   B            : Boolean;
   VE           : Extended;
+  VC           : Currency;
+  VF           : DWFloat;
   vStringBytes : TRESTDWBytes;
   vItem        : TJSONParam;
   vStream      : TStream;
@@ -6466,7 +6490,7 @@ Var
   For I := 0 To ParamsCount -1 Do
    Begin
     S := '';
-    Stream.ReadBuffer(L, Sizeof(DWInt64));
+    Stream.Read(L, Sizeof(DWInt64));
     SetLength(S, L);
     Try
      If L <> 0 Then
@@ -6486,19 +6510,19 @@ Var
     //ParamName
     vItem.ParamName := S;
     //ObjectDirection
-    Stream.ReadBuffer(T, Sizeof(DWFieldTypeSize));
+    Stream.Read(T, Sizeof(DWFieldTypeSize));
     vItem.ObjectDirection := TObjectDirection(T);
     //Encoded
-    Stream.ReadBuffer(B, Sizeof(WordBool));
+    Stream.Read(B, Sizeof(WordBool));
     vItem.Encoded := B;
     //DataMode
-    Stream.ReadBuffer(T, Sizeof(DWFieldTypeSize));
+    Stream.Read(T, Sizeof(DWFieldTypeSize));
     vItem.DataMode := TDataMode(T);
     //TypeObject
-    Stream.ReadBuffer(T, Sizeof(DWFieldTypeSize));
+    Stream.Read(T, Sizeof(DWFieldTypeSize));
     vItem.vTypeObject := TTypeObject(T);
     //DataType
-    Stream.ReadBuffer(T, Sizeof(DWFieldTypeSize));
+    Stream.Read(T, Sizeof(DWFieldTypeSize));
     vItem.ObjectValue := TObjectValue(T);
     //GetValue from Datatype
     S := '';
@@ -6509,7 +6533,7 @@ Var
        ovString,
        ovObject : Begin
                    vItem.CriptOptions.Use := False;
-                   Stream.ReadBuffer(L, Sizeof(DWInt64));
+                   Stream.Read(L, Sizeof(DWInt64));
                    If (L = 0) Or (L > high(Sizeof(DWInt64))) Then
                     Continue;
                    SetLength(vStringBytes, 0);
@@ -6531,67 +6555,42 @@ Var
                    vItem.CriptOptions.Key := CriptOptions.Key;
                   End;
        ovSmallint : Begin
-                     Stream.ReadBuffer(J, Sizeof(DWInteger));
+                     Stream.Read(J, Sizeof(DWInteger));
                      vItem.AsInteger := J;
                     End;
        ovLongWord : Begin
-                     Stream.ReadBuffer(J, Sizeof(DWInteger));
+                     Stream.Read(J, Sizeof(DWInteger));
                      vItem.AsInteger := J;
                     End;
        ovShortint : Begin
-                     Stream.ReadBuffer(J, Sizeof(DWInteger));
+                     Stream.Read(J, Sizeof(DWInteger));
                      vItem.AsInteger := J;
                     End;
        ovByte     : Begin
-                     Stream.ReadBuffer(B, Sizeof(Byte));
+                     Stream.Read(B, Sizeof(Byte));
                      vItem.AsBoolean := B;
                     End;
        ovBoolean  : Begin
-                     Stream.ReadBuffer(B, Sizeof(WordBool));
+                     Stream.Read(B, Sizeof(WordBool));
                      vItem.AsBoolean := B;
                     End;
-       ovExtended : Begin
-                     Stream.Read(J, Sizeof(DWInteger));
-                     SetLength(S, J);
-                     If J <> 0 Then
-                      Begin
-                       Stream.Read(S[InitStrPos], J);
-                       If ((S = TDecimalChar) or (S = #0)) Then
-                        VE := 0
-                       Else
-                        Begin
-                         S  := BuildFloatString(S);
-                         VE := StrToFloat(S);
-                        End;
-                       vItem.AsExtended := VE;
-                      End;
+         ovFloat  : Begin
+                    Stream.Read(J, Sizeof(DWInteger));
+                    SetLength(S, J);
+                    If J <> 0 Then
+                     Begin
+                      Stream.Read(S[InitStrPos], J);
+                      If ((S = TDecimalChar) or (S = #0)) Then
+                       VF := 0
+                      Else
+                       Begin
+                        S  := BuildFloatString(S);
+                        VF := StrToFloat(S);
+                       End;
+                      vItem.AsFloat := VF;
+                     End;
                     End;
-       ovSingle   : Begin
-                     Stream.ReadBuffer(J, Sizeof(DWInteger));
-                     vItem.AsInteger := J;
-                    End;
-       ovDate,
-       ovTime,
-       ovDateTime,
-       ovTimeStamp,
-       ovTimeStampOffset: Begin
-                           Stream.ReadBuffer(J, Sizeof(DWInt64));
-                           If J <> 0 Then
-                            vItem.AsDateTime := UnixToDateTime(J);
-                          End;
-       ovInteger,
-       ovAutoInc : Begin
-                    Stream.ReadBuffer(J, Sizeof(DWInteger));
-                    vItem.AsInteger := J;
-                   End;
-       ovWord    : Begin
-                    Stream.ReadBuffer(J, Sizeof(Word));
-                    vItem.AsWord := J;
-                   End;
-       ovFloat,
-       ovCurrency,
-       ovBCD,
-       ovFMTBcd  : Begin
+      ovExtended  : Begin
                     Stream.Read(J, Sizeof(DWInteger));
                     SetLength(S, J);
                     If J <> 0 Then
@@ -6606,9 +6605,60 @@ Var
                        End;
                       vItem.AsExtended := VE;
                      End;
+                    End;
+       ovSingle   : Begin
+                     Stream.Read(J, Sizeof(DWInteger));
+                     vItem.AsInteger := J;
+                    End;
+       ovDate,
+       ovTime,
+       ovDateTime,
+       ovTimeStamp,
+       ovTimeStampOffset: Begin
+                           Stream.Read(J, Sizeof(DWInteger));
+                           SetLength(S, J);
+                           If J <> 0 Then
+                           begin
+                            Stream.Read(S[InitStrPos], J);
+                            If ((S = TDecimalChar) or (S = #0)) Then
+                             VF := 0
+                            Else
+                            Begin
+                             S  := BuildFloatString(S);
+                             VF := StrToFloat(S);
+                            End;
+                            vItem.AsDateTime := VF;
+                           End;
+                          End;
+       ovInteger,
+       ovAutoInc : Begin
+                    Stream.Read(J, Sizeof(DWInteger));
+                    vItem.AsInteger := J;
+                   End;
+       ovWord    : Begin
+                    Stream.Read(J, Sizeof(Word));
+                    vItem.AsWord := J;
+                   End;
+       ovCurrency,
+       ovBCD,
+       ovFMTBcd  : Begin
+                    Stream.Read(J, Sizeof(DWInteger));
+                    SetLength(S, J);
+                    If J <> 0 Then
+                     Begin
+                      Stream.Read(S[InitStrPos], J);
+                      If ((S = TDecimalChar) or (S = #0)) Then
+                       VC := 0
+                      Else
+                       Begin
+                        S  := BuildFloatString(S);
+                        VC := StrToFloat(S);
+                       End;
+                      vItem.AsCurrency := VC;
+                     End;
                    End;
        ovLargeint  : Begin
-                      Stream.ReadBuffer(J, Sizeof(DWInt64));
+                      Stream.Read(J, Sizeof(DWInt64));
                       vItem.AsLargeInt := J;
                      End;
        ovVariant   : ;
@@ -6617,7 +6667,7 @@ Var
        ovBlob,
        ovStream,
        ovBytes : Begin
-                  Stream.ReadBuffer(J, Sizeof(DWInt64));
+                  Stream.Read(J, Sizeof(DWInt64));
                   If J > 0 Then
                    Begin
                     vStream := TMemoryStream.Create;
@@ -6652,7 +6702,7 @@ Begin
  ParamsHeader.RecordCount   := 0;
  ParamsHeader.ParamsCount   := 0;
  ParamsHeader.DataSize      := 0;
- Stream.ReadBuffer(ParamsHeader, Sizeof(TRESTDWParamsHeader));
+ Stream.Read(ParamsHeader, Sizeof(TRESTDWParamsHeader));
  VersionNumber   := ParamsHeader.VersionNumber;
  ParamsCount     := ParamsHeader.ParamsCount;
  DataSize        := ParamsHeader.DataSize;

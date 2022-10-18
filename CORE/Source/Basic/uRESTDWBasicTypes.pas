@@ -945,6 +945,12 @@ Var
  S       : DWString;
  E       : Extended;
  F       : DWFloat;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 21}
+  Si         : Single;
+  Cr         : Currency;
+  {$IFEND}
+ {$ENDIF}
  Bool    : Boolean;
  B       : TBcd;
  P       : TMemoryStream;
@@ -957,6 +963,14 @@ Begin
    If fkCalculated = Dataset.Fields[I].FieldKind Then Continue;
    T := DWFieldTypeSize(Dataset.Fields[I].DataType);
    Stream.Write(T, Sizeof(DWFieldTypeSize));
+    {$IFNDEF FPC}
+     {$IF CompilerVersion >= 21}
+      Si := 0;
+      Cr := 0;
+     {$IFEND}
+    {$ENDIF}
+    E := 0;
+    F := 0;
    Case TFieldType(T) Of
       ftFixedChar,
       ftWideString,
@@ -1025,11 +1039,39 @@ Begin
                       Stream.Write(Bool, Sizeof(Byte));
                      End;
                    End;
-      ftFloat,
-      ftFMTBcd,
-      ftCurrency,
-      {$IFNDEF FPC}{$IF CompilerVersion >= 21}ftExtended, ftSingle, {$IFEND}{$ENDIF}
-      ftBCD     : Begin
+      {$IFNDEF FPC}
+       {$IF CompilerVersion >= 21}
+      ftSingle   : Begin
+                    If Not(Dataset.Fields[I].IsNull) Then
+                     Begin
+                      Bool := False;
+                      Stream.Write(Bool, Sizeof(Byte));
+                      Si := Dataset.Fields[I].AsSingle;
+                      Stream.Write(Si, Sizeof(DWFloat));
+                     End
+                    Else
+                     Begin
+                      Bool := True;
+                      Stream.Write(Bool, Sizeof(Byte));
+                     End;
+                   End;
+      ftExtended : Begin
+                    If Not(Dataset.Fields[I].IsNull) Then
+                     Begin
+                      Bool := False;
+                      Stream.Write(Bool, Sizeof(Byte));
+                      E := Dataset.Fields[I].AsExtended;
+                      Stream.Write(E, Sizeof(DWFloat));
+                     End
+                    Else
+                     Begin
+                      Bool := True;
+                      Stream.Write(Bool, Sizeof(Byte));
+                     End;
+                   End;
+       {$IFEND}
+      {$ENDIF}
+      ftFloat    : Begin
                     If Not(Dataset.Fields[I].IsNull) Then
                      Begin
                       Bool := False;
@@ -1042,18 +1084,41 @@ Begin
                       Bool := True;
                       Stream.Write(Bool, Sizeof(Byte));
                      End;
-                  End;
+                   End;
+      ftFMTBcd,
+      ftCurrency,
+      ftBCD     :  Begin
+                    If Not(Dataset.Fields[I].IsNull) Then
+                     Begin
+                      Bool := False;
+                      Stream.Write(Bool, Sizeof(Byte));
+                      Cr := Dataset.Fields[I].AsCurrency;
+                      Stream.Write(Cr, Sizeof(DWFloat));
+                     End
+                    Else
+                     Begin
+                      Bool := True;
+                      Stream.Write(Bool, Sizeof(Byte));
+                     End;
+                   End;
       ftDate,
       ftTime,
       ftDateTime,
       {$IFNDEF FPC}{$IF CompilerVersion >= 21}ftTimeStampOffset, {$IFEND}{$ENDIF}
       ftTimeStamp : Begin
-                     If Not Dataset.Fields[I].IsNull Then
-                      J := DateTimeToUnix(Dataset.Fields[I].AsDateTime)
-                     Else
-                      J := 0;
-                     Stream.Write(J, Sizeof(DWInt64));
-                    End;
+                    If Not(Dataset.Fields[I].IsNull) Then
+                     Begin
+                      Bool := False;
+                      Stream.Write(Bool, Sizeof(Byte));
+                      F := Dataset.Fields[I].AsDateTime;
+                      Stream.Write(F, Sizeof(DWFloat));
+                     End
+                    Else
+                     Begin
+                      Bool := True;
+                      Stream.Write(Bool, Sizeof(Byte));
+                     End;
+                   End;
       {$IFNDEF FPC}{$IF CompilerVersion >= 21}ftLongWord,{$IFEND}{$ENDIF}
       ftLargeint : Begin
                     If Not(Dataset.Fields[I].IsNull) Then
@@ -1590,6 +1655,12 @@ Var
   S, W       : DWString;
   E          : Extended;
   F          : DWFloat;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 21}
+  Si         : Single;
+  Cr         : Currency;
+  {$IFEND}
+ {$ENDIF}
   Bool       : Boolean;
   B          : TBcd;
   P          : TMemoryStream;
@@ -1626,8 +1697,15 @@ Var
     S := '';
     L := 0;
     J := 0;
+    F := 0;
+    {$IFNDEF FPC}
+     {$IF CompilerVersion >= 21}
+      Si := 0;
+      Cr := 0;
+     {$IFEND}
+    {$ENDIF}
     vFieldName := vAllListFields.Names[I];
-    Stream.ReadBuffer(T, Sizeof(DWFieldTypeSize));
+    Stream.Read(T, Sizeof(DWFieldTypeSize));
     Case TFieldType(T) Of
       ftFixedChar,
       ftWideString,
@@ -1638,7 +1716,7 @@ Var
                     SetLength(S, L);
                     {$IFDEF FPC}
                      If L <> 0 Then
-                      Stream.ReadBuffer(Pointer(S)^, L);
+                      Stream.Read(Pointer(S)^, L);
                      S := GetStringEncode(S, vDatabaseCharSet);
                     {$ELSE}
                      If L <> 0 Then
@@ -1671,16 +1749,16 @@ Var
       {$IFDEF COMPILER12_UP}
       ftByte,
       ftShortint : Begin
-                    Stream.ReadBuffer(J, Sizeof(DWInteger));
+                    Stream.Read(J, Sizeof(DWInteger));
                     If IsFieldValue Then
                      vField.AsInteger := J;
                    End;
       {$ENDIF}
       ftSmallint : Begin
-                    Stream.ReadBuffer(Bool, Sizeof(Byte));
+                    Stream.Read(Bool, Sizeof(Byte));
                     If Not Bool Then
                      Begin
-                      Stream.ReadBuffer(X, Sizeof(DWInteger));
+                      Stream.Read(X, Sizeof(DWInteger));
                       If IsFieldValue Then
                        vField.AsInteger := X;
                      End;
@@ -1688,44 +1766,80 @@ Var
       ftWord,
       ftInteger,
       ftAutoInc :  Begin
-                    Stream.ReadBuffer(Bool, Sizeof(Byte));
+                    Stream.Read(Bool, Sizeof(Byte));
                     If Not Bool Then
                      Begin
-                      Stream.ReadBuffer(J, Sizeof(DWInteger));
+                      Stream.Read(J, Sizeof(DWInteger));
                       If IsFieldValue Then
                        vField.AsInteger := J;
                      End;
                    End;
-      ftFloat,
-      ftFMTBcd,
-      ftCurrency,
-      {$IFNDEF FPC}{$IF CompilerVersion >= 21}ftExtended, ftSingle, {$IFEND}{$ENDIF}
-      ftBCD     : Begin
-                   F := 0;
-                   Stream.ReadBuffer(Bool, Sizeof(Byte));
+      {$IFNDEF FPC}
+       {$IF CompilerVersion >= 21}
+      ftSingle   : Begin
+                   Si := 0;
+                   Stream.Read(Bool, Sizeof(Byte));
                    If Not Bool Then
                     Begin
-                     Stream.ReadBuffer(F, Sizeof(DWFloat));
+                     Stream.Read(Si, Sizeof(DWFloat));
                      If IsFieldValue Then
-                      vField.Value := F;
+                      vField.AsSingle := Si;
                     End;
-                  End;
+                   End;
+      ftExtended : Begin
+                   E := 0;
+                   Stream.Read(Bool, Sizeof(Byte));
+                   If Not Bool Then
+                    Begin
+                     Stream.Read(E, Sizeof(DWFloat));
+                     If IsFieldValue Then
+                      vField.AsExtended := E;
+                    End;
+                   End;
+       {$IFEND}
+      {$ENDIF}
+      ftFloat    : Begin
+                   F := 0;
+                   Stream.Read(Bool, Sizeof(Byte));
+                   If Not Bool Then
+                    Begin
+                     Stream.Read(F, Sizeof(DWFloat));
+                     If IsFieldValue Then
+                      vField.AsFloat := F;
+                    End;
+                   End;
+      ftFMTBcd,
+      ftCurrency,
+      ftBCD     :  Begin
+                   Cr := 0;
+                   Stream.Read(Bool, Sizeof(Byte));
+                   If Not Bool Then
+                    Begin
+                     Stream.Read(Cr, Sizeof(DWFloat));
+                     If IsFieldValue Then
+                      vField.AsCurrency := Cr;
+                    End;
+                   End;
       ftDate,
       ftTime,
       ftDateTime,
       {$IFNDEF FPC}{$IF CompilerVersion >= 21}ftTimeStampOffset, {$IFEND}{$ENDIF}
       ftTimeStamp : Begin
-                     Stream.ReadBuffer(J, Sizeof(DWInt64));
-                     If J <> 0 Then
-                      If IsFieldValue Then
-                       vField.AsDateTime := UnixToDateTime(J);
+                   F := 0;
+                   Stream.Read(Bool, Sizeof(Byte));
+                   If Not Bool Then
+                    Begin
+                     Stream.Read(F, Sizeof(DWFloat));
+                     If IsFieldValue Then
+                      vField.AsDateTime := F;
                     End;
+                   End;
       {$IFNDEF FPC}{$IF CompilerVersion >= 21}ftLongWord,{$IFEND}{$ENDIF}
       ftLargeint : Begin
-                    Stream.ReadBuffer(Bool, Sizeof(Byte));
+                    Stream.Read(Bool, Sizeof(Byte));
                     If Not Bool Then
                      Begin
-                     Stream.ReadBuffer(J, Sizeof(DWInt64));
+                     Stream.Read(J, Sizeof(DWInt64));
                      If IsFieldValue Then
                       Begin
                        {$IFNDEF FPC}
@@ -1741,7 +1855,7 @@ Var
                      End;
                    End;
       ftBoolean  : Begin
-                    Stream.ReadBuffer(Bool, Sizeof(Byte));
+                    Stream.Read(Bool, Sizeof(Byte));
                     If IsFieldValue Then
                      vField.AsBoolean := Bool;
                    End;
@@ -1755,7 +1869,7 @@ Var
                     SetLength(S, L);
                     {$IFDEF FPC}
                      If L <> 0 Then
-                      Stream.ReadBuffer(Pointer(S)^, L);
+                      Stream.Read(Pointer(S)^, L);
                      S := GetStringEncode(S, vDatabaseCharSet);
                     {$ELSE}
                      If L <> 0 Then
@@ -1796,7 +1910,7 @@ Var
       ftBlob,
       {$IFNDEF FPC}{$IF CompilerVersion > 21}ftStream,{$IFEND}{$ENDIF}
       ftBytes : Begin
-                 Stream.ReadBuffer(J, Sizeof(DWInt64));
+                 Stream.Read(J, Sizeof(DWInt64));
                  If J > 0 Then
                   Begin
                    P := TMemoryStream.Create;
@@ -1826,7 +1940,7 @@ Var
                            SetLength(S, L);
                            {$IFDEF FPC}
                             If L <> 0 Then
-                             Stream.ReadBuffer(Pointer(S)^, L);
+                             Stream.Read(Pointer(S)^, L);
                             S := GetStringEncode(S, vDatabaseCharSet);
                            {$ELSE}
                             If L <> 0 Then
@@ -1857,23 +1971,23 @@ Var
                           End;
                         End;
          dwftLongWord : Begin
-                         Stream.ReadBuffer(J, Sizeof(DWInteger));
+                         Stream.Read(J, Sizeof(DWInteger));
                          If IsFieldValue Then
                           vField.AsInteger := J;
                         End;
          dwftExtended,
          dwftSingle   : Begin
                          F := 0;
-                         Stream.ReadBuffer(Bool, Sizeof(Byte));
+                         Stream.Read(Bool, Sizeof(Byte));
                          If Not Bool Then
                           Begin
-                           Stream.ReadBuffer(F, Sizeof(DWFloat));
+                           Stream.Read(F, Sizeof(DWFloat));
                            If IsFieldValue Then
                             vField.Value := F;
                           End;
                         End;
          dwftTimeStampOffset: Begin
-                               Stream.ReadBuffer(J, Sizeof(DWInt64));
+                               Stream.Read(J, Sizeof(DWInt64));
                                If J <> 0 Then
                                 If IsFieldValue Then
                                  vField.AsDateTime := UnixToDateTime(J);
@@ -1892,7 +2006,7 @@ Begin
  vAllListFields       := Nil;
  If StreamValue.Size > 0 Then
   Begin
-   StreamValue.ReadBuffer(ParamsHeader, Sizeof(TRESTDWParamsHeader));
+   StreamValue.Read(ParamsHeader, Sizeof(TRESTDWParamsHeader));
    VersionNumber   := ParamsHeader.VersionNumber;
    ParamsCount     := ParamsHeader.ParamsCount;
    RecordsCount    := ParamsHeader.RecordCount;
@@ -1900,7 +2014,7 @@ Begin
    StartPos        := StreamValue.Position;
    aSize           := StreamValue.Size;
    S := '';
-   StreamValue.ReadBuffer(I, SizeOf(DWInteger));
+   StreamValue.Read(I, SizeOf(DWInteger));
    If (I > ParamsHeader.DataSize) Or
       (I > MAXSHORT)              Or
       (I < 0)                     Then
@@ -1908,7 +2022,7 @@ Begin
    SetLength(S, I);
    {$IFDEF FPC}
     If I <> 0 Then
-     StreamValue.ReadBuffer(Pointer(S)^, I);
+     StreamValue.Read(Pointer(S)^, I);
     S := GetStringEncode(S, vDatabaseCharSet);
    {$ELSE}
     If I <> 0 Then
