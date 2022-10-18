@@ -113,10 +113,27 @@ Begin
                  End;
                 End;
   varString
-  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
-  , varUString
-  {$IFEND}
-              : S := Length(AnsiString(P^));
+  {$IFDEF FPC}
+   , varUString
+  {$ELSE}
+   {$IF CompilerVersion >= 22}
+    , varUString
+   {$IFEND}
+  {$ENDIF}     : Begin
+                  {$IFDEF FPC}
+                   S := Length(AnsiString(P^));
+                  {$ELSE}
+                   {$IF CompilerVersion >= 22}
+                     {$IF CompilerVersion >= 33}
+                      S := Length(AnsiString(P^));
+                     {$ELSE}
+                      S := Length(Utf8String(P^));
+                     {$IFEND}
+                   {$ELSE}
+                    S := Length(AnsiString(P^));
+                   {$IFEND}
+                  {$ENDIF}
+                 End;
   varDouble,
   varCurrency  : Begin
                   Case VarType(Result) Of
