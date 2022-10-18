@@ -367,7 +367,11 @@ Uses uRESTDWJSONInterface;
 
 Destructor TRESTDWIdClientREST.Destroy;
 Begin
- FreeAndNil(HttpRequest);
+ if Assigned(HttpRequest) then
+ begin
+  HttpRequest.Disconnect(false);
+  FreeAndNil(HttpRequest);
+ end;
  Inherited;
 End;
 
@@ -378,12 +382,8 @@ Begin
  {$ENDIF}
  If Assigned(HttpRequest) Then
   Begin
-   Try
-    If HttpRequest.Connected Then
-     HttpRequest.Disconnect(False);
-   Finally
-//    FreeAndNil(HttpRequest);
-   End;
+   HttpRequest.Disconnect(False);
+   //FreeAndNil(HttpRequest);
   End;
 End;
 
@@ -4741,13 +4741,14 @@ Begin
      End;
    End;
  Finally
+  If Assigned(HttpRequest) Then
+   FreeAndNil(HttpRequest);
+
   If (vErrorMessage <> '') Then
    Begin
     Result := vErrorMessage;
     Raise Exception.Create(Result);
    End;
-  If Assigned(HttpRequest) Then
-   FreeAndNil(HttpRequest);
  End;
 End;
 
@@ -4793,3 +4794,4 @@ Begin
 End;
 
 End.
+
