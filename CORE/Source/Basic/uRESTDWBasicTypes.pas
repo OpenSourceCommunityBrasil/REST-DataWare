@@ -948,9 +948,9 @@ Var
  {$IFNDEF FPC}
   {$IF CompilerVersion >= 21}
   Si         : Single;
-  Cr         : Currency;
   {$IFEND}
  {$ENDIF}
+ Cr      : Currency;
  Bool    : Boolean;
  B       : TBcd;
  P       : TMemoryStream;
@@ -966,11 +966,11 @@ Begin
     {$IFNDEF FPC}
      {$IF CompilerVersion >= 21}
       Si := 0;
-      Cr := 0;
      {$IFEND}
     {$ENDIF}
-    E := 0;
-    F := 0;
+    Cr := 0;
+    E  := 0;
+    F  := 0;
    Case TFieldType(T) Of
       ftFixedChar,
       ftWideString,
