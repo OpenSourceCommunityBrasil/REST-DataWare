@@ -1658,9 +1658,9 @@ Var
  {$IFNDEF FPC}
   {$IF CompilerVersion >= 21}
   Si         : Single;
-  Cr         : Currency;
   {$IFEND}
  {$ENDIF}
+  Cr         : Currency;
   Bool       : Boolean;
   B          : TBcd;
   P          : TMemoryStream;
@@ -1694,14 +1694,14 @@ Var
  Begin
   For I := 0 To vAllListFields.Count -1 Do
    Begin
-    S := '';
-    L := 0;
-    J := 0;
-    F := 0;
+    S  := '';
+    L  := 0;
+    J  := 0;
+    F  := 0;
+    Cr := 0;
     {$IFNDEF FPC}
      {$IF CompilerVersion >= 21}
       Si := 0;
-      Cr := 0;
      {$IFEND}
     {$ENDIF}
     vFieldName := vAllListFields.Names[I];
