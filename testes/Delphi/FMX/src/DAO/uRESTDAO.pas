@@ -3,7 +3,7 @@ unit uRESTDAO;
 interface
 
 uses
-  System.JSON, uConsts,
+  System.JSON, uConsts, System.SysUtils, System.Classes,
   REST.Client, REST.Types, REST.Authenticator.Basic
 
     ;
@@ -19,16 +19,13 @@ type
     constructor Create(aServer, aPort: string);
     destructor Destroy; override;
     procedure SetBasicAuth(user, password: string);
-    function TesteEndpoint(aEndpoint: string;
-      aMethod: TTestRequestMethod): boolean;
+    function TesteEndpoint(aEndpoint: string; aMethod: TTestRequestMethod;
+      out erro: string): boolean;
     function TesteConcorrente(aEndpoint: string; aMethod: TTestRequestMethod;
       cRepeat, cRequests: integer): boolean;
   End;
 
 implementation
-
-uses
-  System.Classes;
 
 { TRESTDAO }
 
@@ -74,10 +71,11 @@ begin
 
 end;
 
-function TRESTDAO.TesteEndpoint(aEndpoint: string;
-  aMethod: TTestRequestMethod): boolean;
+function TRESTDAO.TesteEndpoint(aEndpoint: string; aMethod: TTestRequestMethod;
+  out erro: string): boolean;
 var
   expectedCode: integer;
+  currentmethod: string;
 begin
   Result := false;
   FRESTAPI.Response := nil;
@@ -86,26 +84,31 @@ begin
     rtmGET:
       begin
         FRESTAPI.Method := rmGET;
+        currentmethod := 'GET';
         expectedCode := 200;
       end;
     rtmPOST:
       begin
         FRESTAPI.Method := rmPOST;
+        currentmethod := 'POST';
         expectedCode := 201;
       end;
     rtmPUT:
       begin
         FRESTAPI.Method := rmPUT;
+        currentmethod := 'PUT';
         expectedCode := 201;
       end;
     rtmPATCH:
       begin
         FRESTAPI.Method := rmPATCH;
+        currentmethod := 'PATCH';
         expectedCode := 201;
       end;
     rtmDELETE:
       begin
         FRESTAPI.Method := rmDELETE;
+        currentmethod := 'DELETE';
         expectedCode := 200;
       end;
   end;
@@ -115,6 +118,7 @@ begin
     Result := FRESTAPI.Response.StatusCode = expectedCode;
   except
     Result := false;
+    erro := Format('Método %s falhou', [currentmethod]);
   end;
 end;
 

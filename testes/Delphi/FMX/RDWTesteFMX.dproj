@@ -294,6 +294,10 @@
         <DCCReference Include="src\DAO\uRDWDBWareDAO.pas"/>
         <DCCReference Include="src\DAO\uRDWRESTDAO.pas"/>
         <DCCReference Include="src\uConsts.pas"/>
+        <DCCReference Include="src\Telas\uResultado.pas">
+            <Form>fResultado</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

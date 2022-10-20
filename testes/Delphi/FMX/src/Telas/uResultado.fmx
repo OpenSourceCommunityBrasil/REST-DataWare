@@ -1,0 +1,55 @@
+object fResultado: TfResultado
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu]
+  BorderStyle = ToolWindow
+  Caption = 'Resultado dos testes'
+  ClientHeight = 318
+  ClientWidth = 357
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnClose = FormClose
+  OnShow = FormShow
+  DesignerMasterStyle = 0
+  object Memo1: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    AutoHide = False
+    DataDetectorTypes = []
+    ShowScrollBars = False
+    TextSettings.WordWrap = True
+    Align = Client
+    Bounces = False
+    ControlType = Platform
+    DisableFocusEffect = True
+    Size.Width = 357.000000000000000000
+    Size.Height = 276.000000000000000000
+    Size.PlatformDefault = False
+    StyleLookup = 'memostyle'
+    TabOrder = 0
+    Viewport.Width = 353.000000000000000000
+    Viewport.Height = 272.000000000000000000
+  end
+  object Layout1: TLayout
+    Align = Bottom
+    Position.Y = 276.000000000000000000
+    Size.Width = 357.000000000000000000
+    Size.Height = 42.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object Button3: TButton
+      Align = Center
+      Hint = 'Salvar Log'
+      Size.Width = 72.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'listitembutton'
+      TabOrder = 0
+      Text = 'Salvar'
+      ParentShowHint = False
+      ShowHint = True
+      OnClick = Button3Click
+    end
+  end
+end
