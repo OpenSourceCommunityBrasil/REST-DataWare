@@ -66,26 +66,38 @@ Type
                            aResetPosition : Boolean = True);
  End;
 
- Function  VarToBytes(Value      : Variant) : TRESTDWBytes;
- Procedure BytesToVar(ByteValue  : TRESTDWBytes;
-                      Var Result : Variant);
+ Function  VarToBytes(Value      : Variant;
+                      vType      : TVarType) : TRESTDWBytes;
+ Function  BytesToVar(ByteValue  : TRESTDWBytes;
+                      vType      : TVarType) : Variant;
 
 
 
 implementation
 
-uses uRESTDWConsts;
+uses uRESTDWConsts, uRESTDWTools;
 
-Procedure BytesToVar(ByteValue  : TRESTDWBytes;
-                     Var Result : Variant);
+Function BytesToVar(ByteValue  : TRESTDWBytes;
+                    vType      : TVarType)  : Variant;
 Var
- P     : Pointer;
- S     : Integer;
- aSize : DWInteger;
+ P         : Pointer;
+ aBoolean  : Boolean;
+ aValue,
+ aSize     : DWInteger;
+ aByte     : Byte;
+ aLongWord : LongWord;
+ aDouble   : Double;
+ aDate     : TDate;
+ S         : Integer;
+ vSt       : Char;
+ aString   : DWString;
 Begin
- P := @Result;
- Case VarType(Result) Of
-  varByte     : S := SizeOf(Byte);
+ Case vType Of
+  varByte     : Begin
+                 S      := SizeOf(Byte);
+                 Move(Pointer(@ByteValue[0])^, aByte, S);
+                 Result := aByte;
+                End;
   varShortInt,
   varSmallint,
   varInteger,
@@ -94,23 +106,15 @@ Begin
   varUInt64,
   {$IFEND}
   varSingle   : Begin
-                 Case VarType(Result) Of
-                  varShortInt : S := SizeOf(ShortInt);
-                  varSmallint : S := SizeOf(Smallint);
-                  varInteger  : S := SizeOf(Integer);
-                  varInt64    : S := SizeOf(Int64);
-                  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
-                  varUInt64   : S := SizeOf(UInt64);
-                  {$IFEND}
-                  varSingle   : S := SizeOf(Single);
-                 End;
+                 S      := SizeOf(DWInteger);
+                 Move(Pointer(@ByteValue[0])^, aValue, S);
+                 Result := aValue;
                 End;
   varWord,
   varLongWord : Begin
-                 Case VarType(Result) Of
-                  varWord     : S := SizeOf(Word);
-                  varLongWord : S := SizeOf(LongWord);
-                 End;
+                 S := SizeOf(LongWord);
+                 Move(Pointer(@ByteValue[0])^, aLongWord, S);
+                 Result := aLongWord;
                 End;
   varString
   {$IFDEF FPC}
@@ -120,67 +124,62 @@ Begin
     , varUString
    {$IFEND}
   {$ENDIF}     : Begin
-                  {$IFDEF FPC}
-                   S := Length(AnsiString(P^));
-                  {$ELSE}
-                   {$IF CompilerVersion >= 22}
-                     {$IF CompilerVersion >= 33}
-                      S := Length(AnsiString(P^));
-                     {$ELSE}
-                      S := Length(Utf8String(P^));
-                     {$IFEND}
-                   {$ELSE}
-                    S := Length(AnsiString(P^));
-                   {$IFEND}
-                  {$ENDIF}
+                  Move(Pointer(@ByteValue[0])^, Pointer(@aSize)^,  SizeOf(DWInteger));
+                  If aSize > 0 Then
+                   Begin
+                    aString := BytesToString(ByteValue, SizeOf(DWInteger), aSize);
+                    Result := aString;
+                   End
+                  Else
+                   Result := '';
                  End;
   varDouble,
   varCurrency  : Begin
-                  Case VarType(Result) Of
-                   varDouble   : S := SizeOf(Double);
-                   varCurrency : S := SizeOf(Currency);
-                  End;
+                  S := SizeOf(Double);
+                  Move(Pointer(@ByteValue[0])^, aDouble, S);
+                  Result := aDouble;
                  End;
-  varDate      : S := SizeOf(Date);
-  varBoolean   : S := SizeOf(Boolean);
+  varDate      : Begin
+                  S := SizeOf(Date);
+                  Move(Pointer(@ByteValue[0])^, aDate, S);
+                  Result := aDate;
+                 End;
+  varBoolean   : Begin
+                  S := SizeOf(Boolean);
+                  Move(Pointer(@ByteValue[0])^, Pointer(@vSt)^,  S);
+                  aBoolean    := vSt = 'T';
+                  Result      := aBoolean;
+                 End;
   varNull,
-  varEmpty     : Begin
-                  P := Nil;
-                  S := 0;
-                 End;
+  varEmpty     : Result := Null;
   Else
-   Begin
-    P := Nil;
-    S := 0;
-   End;
+   Variant(Result) := Null;
  End;
- If Assigned(P) And (Length(ByteValue) > 0) Then
-  Begin
-   Case VarType(Result) Of
-    varString
-    {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
-    , varUString
-    {$IFEND}
-                : Begin
-                   Move(ByteValue[0],                 aSize,  SizeOf(DWInteger));
-                   Move(ByteValue[SizeOf(DWInteger)], Result, aSize);
-                  End;
-    Else
-     Move(ByteValue[0], Result, Length(ByteValue));
-   End;
-  End;
 End;
 
-Function VarToBytes(Value : Variant) : TRESTDWBytes;
+Function VarToBytes(Value : Variant;
+                    vType : TVarType) : TRESTDWBytes;
 Var
- P     : Pointer;
- aSize : DWInteger;
- S     : Integer;
+ P         : Pointer;
+ aValue,
+ aSize     : DWInteger;
+ aByte     : Byte;
+ aLongWord : LongWord;
+ aDouble   : Double;
+ aDate     : TDate;
+ S         : Integer;
+ vSt       : Char;
+ aString   : DWString;
 Begin
  SetLength(Result, 0);
  P := @Value;
- Case VarType(Value) Of
-  varByte     : S := SizeOf(Byte);
+ Case vType Of
+  varByte     : Begin
+                 S         := SizeOf(Byte);
+                 SetLength(Result, S);
+                 aByte     := Value;
+                 Move(aByte, Pointer(@Result[0])^, S);
+                End;
   varShortInt,
   varSmallint,
   varInteger,
@@ -189,40 +188,53 @@ Begin
   varUInt64,
   {$IFEND}
   varSingle   : Begin
-                 Case VarType(Value) Of
-                  varShortInt : S := SizeOf(ShortInt);
-                  varSmallint : S := SizeOf(Smallint);
-                  varInteger  : S := SizeOf(Integer);
-                  varInt64    : S := SizeOf(Int64);
-                  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
-                  varUInt64   : S := SizeOf(UInt64);
-                  {$IFEND}
-                  varSingle   : S := SizeOf(Single);
-                 End;
+                 S         := SizeOf(DWInteger);
+                 SetLength(Result, S);
+                 aValue    := Value;
+                 Move(aValue, Pointer(@Result[0])^, S);
                 End;
   varWord,
   varLongWord : Begin
-                 Case VarType(Value) Of
-                  varWord     : S := SizeOf(Word);
-                  varLongWord : S := SizeOf(LongWord);
-                 End;
+                 S := SizeOf(LongWord);
+                 SetLength(Result, S);
+                 aLongWord  := Value;
+                 Move(aLongWord, Pointer(@Result[0])^, S);
                 End;
   varString
   {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
   , varUString
   {$IFEND}
               : Begin
-                 S := Length(Value);
+                 aString := Value;
+                 S       := Length(aString);
+                 SetLength(Result, SizeOf(DWInteger) + S);
+                 aSize := S;
+                 Move(Pointer(@aSize)^,                Pointer(@Result[0])^, SizeOf(DWInteger));
+                 If S > 0 Then
+                  Move(AnsiString(aString)[InitStrPos], Pointer(@Result[SizeOf(DWInteger)])^, S);
                 End;
   varDouble,
   varCurrency  : Begin
-                  Case VarType(Value) Of
-                   varDouble   : S := SizeOf(Double);
-                   varCurrency : S := SizeOf(Currency);
-                  End;
+                  S := SizeOf(Double);
+                  SetLength(Result, S);
+                  aDouble    := Value;
+                  Move(aDouble, Pointer(@Result[0])^, S);
                  End;
-  varDate      : S := SizeOf(Date);
-  varBoolean   : S := SizeOf(Boolean);
+  varDate      : Begin
+                  S := SizeOf(Date);
+                  SetLength(Result, S);
+                  aDate    := Value;
+                  Move(aDate, Pointer(@Result[0])^, S);
+                 End;
+  varBoolean   : Begin
+                  S := 1;
+                  SetLength(Result, S);
+                  If Value Then
+                   vSt := 'T'
+                  Else
+                   vSt := 'F';
+                  Move(vSt, Pointer(@Result[0])^, S);
+                 End;
   varNull,
   varEmpty     : Begin
                   P := Nil;
@@ -234,26 +246,6 @@ Begin
     S := 0;
    End;
  End;
- If Assigned(P) Then
-  Begin
-   Case VarType(Value) Of
-    varString
-    {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
-    , varUString
-    {$IFEND}
-                : Begin
-                   SetLength(Result, SizeOf(DWInteger) + S);
-                   aSize := S;
-                   Move(Pointer(@aSize)^, Result[0], SizeOf(DWInteger));
-                   Move(P^,     Result[SizeOf(DWInteger)], S);
-                  End;
-    Else
-     Begin
-      SetLength(Result, S);
-      Move(P^, Pointer(Result)^, Length(Result));
-     End;
-   End;
-  End;
 End;
 
 Function  TRESTDWBufferBase.ReadBytes : TRESTDWBytes;
@@ -426,11 +418,18 @@ Begin
 End;
 
 Procedure TRESTDWBufferBase.InputBuffer(Const Buffer : TRESTDWBufferBase);
+Var
+ vBufferSize : DWBufferSize;
 Begin
  If Assigned(Buffer) Then
   Begin
-   If Buffer.vBufferBase.Size > 0 Then
-    vBufferBase.Write(Buffer.vBufferBase, Buffer.vBufferBase.Size);
+   vBufferSize := Buffer.vBufferBase.Size;
+   vBufferBase.Write(vBufferSize, SizeOf(DWBufferSize));
+   If vBufferSize > 0 Then
+    Begin
+     Buffer.vBufferBase.Position := 0;
+     vBufferBase.Write(Buffer.vBufferBase, vBufferSize);
+    End;
   End;
 End;
 

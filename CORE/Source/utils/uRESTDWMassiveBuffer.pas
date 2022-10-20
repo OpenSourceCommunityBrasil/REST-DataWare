@@ -1028,8 +1028,57 @@ End;
 Procedure TMassiveLine.LoadFromStream(Source     : TStream);
 Var
  BufferStream : TRESTDWBufferBase; //Pacote de Entrada
+ aMassiveMode : TMassiveMode;
+ vInData,
+ vOutParams   : TStream;
+ vIsNull      : Boolean;
+ MassiveValue : TMassiveValue;
 Begin
-
+ BufferStream := TRESTDWBufferBase.Create;
+ Try
+  BufferStream.LoadToStream(Source);
+  If BufferStream.Size > 0 Then
+   Begin
+    aMassiveMode := TMassiveMode(BytesToVar(BufferStream.ReadBytes, varInteger));
+    vMassiveMode := aMassiveMode;
+   End;
+  While Not BufferStream.Eof Do
+   Begin
+    If MassiveMode = mmExec Then
+     Begin
+      DataExec.Text := BytesToVar(BufferStream.ReadBytes, varString);
+      vOutParams   := BufferStream.ReadStream;
+      If Assigned(vOutParams) Then
+       Begin
+        Try
+         Params.LoadFromStream(vOutParams);
+        Finally
+         FreeAndNil(vOutParams);
+        End;
+       End;
+     End
+    Else
+     Begin
+      While Not BufferStream.Eof Do
+       Begin
+        vIsNull      := BytesToVar(BufferStream.ReadBytes, varBoolean);
+        MassiveValue := TMassiveValue.Create;
+        If Not vIsNull Then
+         Begin
+          vInData := BufferStream.ReadStream;
+          Try
+           MassiveValue.LoadFromStream(TMemoryStream(vInData));
+          Finally
+           FreeAndNil(vInData);
+          End;
+         End;
+        vMassiveValues.Add(MassiveValue);
+       End;
+     End;
+   End;
+ Finally
+  FreeAndNil(BufferStream);
+ End;
 End;
 
 Procedure TMassiveLine.SaveToStream  (Var Dest      : TStream;
@@ -1041,12 +1090,12 @@ Var
  aMassiveMode : TMassiveMode;
  vNoChange    : Boolean;
 Begin
- BufferStream := TRESTDWBufferBase.Create; //Pacote de Saida
+ BufferStream       := TRESTDWBufferBase.Create; //Pacote de Saida
  Try
-  BufferStream.InputBytes(VarToBytes(MassiveMode));
+  BufferStream.InputBytes(VarToBytes(MassiveMode, varInteger));
   If MassiveMode = mmExec Then
    Begin
-    BufferStream.InputBytes(VarToBytes(DataExec.Text));
+    BufferStream.InputBytes(VarToBytes(DataExec.Text, varString));
     vOutParams   := TMemoryStream.Create;
     Try
      Params.SaveToStream(vOutParams);
@@ -1057,57 +1106,75 @@ Begin
    End
   Else
    Begin
-    For I := 0 To vMassiveValues.Count - 1 Do
+    BufferStream.InputBytes(VarToBytes(Changes.Count > 0, varBoolean));
+    If Changes.Count > 0 Then
+     BufferStream.InputBytes(VarToBytes(EncodeStrings(Changes.Text), varString));
+    If vPrimaryValues = Nil Then
+     BufferStream.InputBytes(VarToBytes(False, varBoolean))
+    Else
      Begin
-      If I = 0 Then
+      BufferStream.InputBytes(VarToBytes(True, varBoolean));
+      BufferStream.InputBytes(VarToBytes(vPrimaryValues.Count, varInteger));
+      For I := 0 To vPrimaryValues.Count - 1 Do
        Begin
-        aMassiveMode  := StringToMassiveMode(vMassiveValues.Items[I].vJSONValue.Value);
-        Continue;
-       End;
-       Begin
-        If aMassiveMode = mmUpdate Then
+        If vPrimaryValues.Items[I].vJSONValue.IsNull Then
          Begin
-          If Changes.Count = 0 Then
-           Continue;
-          vNoChange := True;
-          For A := 0 To Changes.Count -1 Do
+          BufferStream.InputBytes(VarToBytes(True, varBoolean));
+          BufferStream.InputBytes(VarToBytes(vPrimaryValues.Items[I].ObjectValue, varInteger));
+         End
+        Else
+         Begin
+          BufferStream.InputBytes(VarToBytes(False, varBoolean));
+          BufferStream.InputBytes(VarToBytes(vPrimaryValues.Items[I].ObjectValue,         varInteger));
+          BufferStream.InputBytes(VarToBytes(vPrimaryValues.Items[I].vJSONValue.AsString, varString));
+         End;
+       End;
+     End;
+    BufferStream.InputBytes(VarToBytes(vMassiveValues.Count, varInteger));
+    For I := 1 To vMassiveValues.Count - 1 Do
+     Begin
+      If aMassiveMode = mmUpdate Then
+       Begin
+        If Changes.Count = 0 Then
+         Continue;
+        vNoChange := True;
+        For A := 0 To Changes.Count -1 Do
+         Begin
+          If TMassiveDatasetBuffer(MassiveBuffer).Dataset <> Nil Then
            Begin
-            If TMassiveDatasetBuffer(MassiveBuffer).Dataset <> Nil Then
+            If TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Count <= (I-1) Then
+             Continue;
+            If (TMassiveDatasetBuffer(MassiveBuffer).Dataset.FindField(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) <> Nil) Then
              Begin
-              If TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Count <= (I-1) Then
+              If TMassiveDatasetBuffer(MassiveBuffer).Dataset.FieldByName(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName).ReadOnly Then
                Continue;
-              If (TMassiveDatasetBuffer(MassiveBuffer).Dataset.FindField(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) <> Nil) Then
-               Begin
-                If TMassiveDatasetBuffer(MassiveBuffer).Dataset.FieldByName(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName).ReadOnly Then
-                 Continue;
-               End
-              Else
-               vNoChange := Not TMassiveDatasetBuffer(MassiveBuffer).vReflectChanges;
-              If Not((TMassiveDatasetBuffer(MassiveBuffer).Dataset.FindField(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) = Nil)) Then
-               vNoChange := Lowercase(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) <> Lowercase(Changes[A]);
              End
             Else
+             vNoChange := Not TMassiveDatasetBuffer(MassiveBuffer).vReflectChanges;
+            If Not((TMassiveDatasetBuffer(MassiveBuffer).Dataset.FindField(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) = Nil)) Then
              vNoChange := Lowercase(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) <> Lowercase(Changes[A]);
-            If Not (vNoChange) Then
-             Break;
-           End;
-          If vNoChange Then
-           Continue;
+           End
+          Else
+           vNoChange := Lowercase(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) <> Lowercase(Changes[A]);
+          If Not (vNoChange) Then
+           Break;
          End;
-        If TMassiveDatasetBuffer(MassiveBuffer).Dataset <> Nil Then
-         Begin
-          If TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Count <= (I-1) then
-           Continue;
-         End;
+        If vNoChange Then
+         Continue;
+       End;
+      If TMassiveDatasetBuffer(MassiveBuffer).Dataset <> Nil Then
+       Begin
+        If TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Count <= (I-1) then
+         Continue;
        End;
       If vMassiveValues.Items[I].vJSONValue.IsNull Then
-       BufferStream.InputBytes(VarToBytes(True)) //Valor Padrao para Null
+       BufferStream.InputBytes(VarToBytes(True, varBoolean)) //Valor Padrao para Null
       Else
        Begin
-        BufferStream.InputBytes(VarToBytes(False)); //Valor Padrao para Not Null
+        BufferStream.InputBytes(VarToBytes(False, varBoolean)); //Valor Padrao para Not Null
         vOutParams   := TMemoryStream.Create;
         Try
-         vMassiveValues.Items[I].vJSONValue.SaveToStream(TMemoryStream(vOutParams));
+         vMassiveValues.Items[I].SaveToStream(TMemoryStream(vOutParams));
          BufferStream.InputStream(vOutParams);
         Finally
          FreeAndNil(vOutParams);
@@ -2142,10 +2209,206 @@ End;
 
 Procedure TMassiveDatasetBuffer.LoadFromStream(Source     : TStream);
 Var
- BufferStream,
- BufferBase : TRESTDWBufferBase; //Pacote de Entrada
-Begin
+ BufferBase        : TRESTDWBufferBase; //Pacote de Entrada
+ aHeaderStream,
+ aBodyStream       : TStream;
+ aMassiveValue     : TMassiveValue;
+ aMassiveField     : TMassiveField;
+ aBytesDefs,
+ aBytesBody        : TRESTDWBytes;
+ aMasterCompFields,
+ aTableName,
+ aTagFields,
+ aSequenceName,
+ aSequenceField,
+ aMyCompTag,
+ aMasterCompTag,
+ aTagLinkFields    : String;
+ aMassiveType      : TTypeObject;
+ aObjectDirection  : TObjectDirection;
+ aTempBool,
+ aReflectChanges   : Boolean;
+ aObjectValue      : TObjectValue;
+ vTempValue        : String;
+ aValue            : DWInteger;
+ Function GetFieldIndex(FieldName : String) : Integer;
+ Var
+  I : Integer;
+ Begin
+  Result := -1;
+  For I := 0 To vMassiveFields.Count -1 Do
+   Begin
+    If LowerCase(vMassiveFields.Items[I].FieldName) = LowerCase(FieldName) Then
+     Result := I;
+    If Result <> -1 Then
+     Break;
+   End;
+ End;
+ Procedure LoadHeader;
+ Var
+  BufferHeader : TRESTDWBufferBase;
+  MassiveField : TMassiveField;
+ Begin
+  If Assigned(aHeaderStream)  Then
+   Begin
+    BufferHeader := TRESTDWBufferBase.Create;
+    Try
+     BufferHeader.LoadToStream(aHeaderStream);
+     FreeAndNil(aHeaderStream);
+     While Not BufferHeader.Eof Do
+      Begin
+       MassiveField                    := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
+       MassiveField.vFieldName         := BytesToVar(BufferHeader.ReadBytes, varString);
+       MassiveField.vFieldType         := TObjectValue(BytesToVar(BufferHeader.ReadBytes, varInteger));
+       MassiveField.vKeyField          := BytesToVar(BufferHeader.ReadBytes, varString) = 'S';
+       MassiveField.vRequired          := BytesToVar(BufferHeader.ReadBytes, varString) = 'S';
+       MassiveField.vSize              := BytesToVar(BufferHeader.ReadBytes, varInteger);
+       MassiveField.vPrecision         := BytesToVar(BufferHeader.ReadBytes, varInteger);
+       MassiveField.vReadOnly          := BytesToVar(BufferHeader.ReadBytes, varString) = 'S';
+       MassiveField.vAutoGenerateValue := BytesToVar(BufferHeader.ReadBytes, varString) = 'S';
+       vMassiveFields.Add(MassiveField);
+      End;
+    Finally
+     FreeAndNil(BufferHeader);
+    End;
+   End;
+ End;
+ Procedure LoadBodyData;
+ Var
+  BufferStream,
+  BufferBody   : TRESTDWBufferBase;
+  aStream      : TStream;
+  MassiveLine  : TMassiveLine;
+  MassiveValue : TMassiveValue;
+  aBool        : Boolean;
+  vValuesCount,
+  I            : Integer;
+ Begin
+  If Assigned(aBodyStream)  Then
+   Begin
+    BufferBody := TRESTDWBufferBase.Create;
+    BufferBody.LoadToStream(aBodyStream);
+    FreeAndNil(aBodyStream);
+    vMassiveMode := mmInactive;
+    Try
+     If Not BufferBody.Eof Then
+      Begin
+       aStream      := BufferBody.ReadStream;
+       MassiveLine  := TMassiveLine.Create;
+       BufferStream := TRESTDWBufferBase.Create;
+       Try
+        BufferStream.LoadToStream(aStream);
+        FreeAndNil(aStream);
+        If BufferStream.Size > 0 Then
+         vMassiveMode := TMassiveMode(BytesToVar(BufferStream.ReadBytes, varInteger));
+        NewLineBuffer(MassiveLine, vMassiveMode, vMassiveMode = mmExec);
+        If vMassiveMode = mmExec Then
+         Begin
+          vDataexec.Text := BytesToVar(BufferStream.ReadBytes, varString);
+          aStream        := BufferStream.ReadStream;
+          If Assigned(aStream) Then
+           Begin
+            Try
+             vDWParams.LoadFromStream(aStream);
+            Finally
+             FreeAndNil(aStream);
+            End;
+           End;
+         End;
+        aBool := BytesToVar(BufferStream.ReadBytes, varBoolean);
+        If aBool Then
+         MassiveLine.vChanges.Text := DecodeStrings(BytesToVar(BufferStream.ReadBytes, varString));
+        aBool := BytesToVar(BufferStream.ReadBytes, varBoolean);
+        If aBool Then
+         Begin
+          For I := 0 To BytesToVar(BufferStream.ReadBytes, varInteger) -1 Do
+           Begin
+            MassiveValue             := TMassiveValue.Create;
+            aBool                    := BytesToVar(BufferStream.ReadBytes, varBoolean);
+            MassiveValue.ObjectValue := TObjectValue(BytesToVar(BufferStream.ReadBytes, varInteger));
+            If Not aBool Then
+             Begin
+              vTempValue := BytesToVar(BufferStream.ReadBytes, varString);
+              If MassiveValue.ObjectValue in [ovString, ovWideString, ovMemo,
+                                              ovWideMemo, ovFixedChar, ovFixedWideChar] Then
+               MassiveValue.Value := vTempValue
+              Else If MassiveValue.vJSONValue.ObjectValue in [ovDate, ovTime, ovDateTime, ovTimeStamp] then     // ajuste massive
+               MassiveValue.Value := UnixToDateTime(StrToInt64(vTempValue))
+              Else
+               MassiveValue.Value := vTempValue;
+             End;
+            MassiveValue.SetModified(Not (vOnLoad));
+            If Not Assigned(MassiveLine.vPrimaryValues) Then
+             MassiveLine.vPrimaryValues := TMassiveValues.Create;
+            MassiveLine.vPrimaryValues.Add(MassiveValue);
+           End;
+         End;
+       Finally
+        FreeAndNil(aStream);
+       End;
+       vValuesCount := BytesToVar(BufferStream.ReadBytes, varInteger);
+       Try
+        For I := 0 To vValuesCount -1 Do
+         Begin
+          If vMassiveMode = mmUpdate Then
+           Begin
 
+           End
+          Else If vMassiveMode <> mmExec Then
+           Begin
+
+           End;
+          vMassiveBuffer.Add(MassiveLine);
+         End;
+       Finally
+        FreeAndNil(BufferStream);
+       End;
+      End;
+    Finally
+     FreeAndNil(BufferBody);
+    End;
+   End;
+ End;
+Begin
+ BufferBase           := TRESTDWBufferBase.Create;
+ vMassiveBuffer.ClearAll;
+ vMassiveLine.ClearAll;
+ vMassiveFields.ClearAll;
+ Try
+  BufferBase.LoadToStream(Source);
+  If BufferBase.Size > 0 Then
+   Begin
+    aHeaderStream      := BufferBase.ReadStream;
+    LoadHeader;
+    aTempBool          := BytesToVar(BufferBase.ReadBytes, varBoolean);
+    If aTempBool Then
+     aMasterCompFields := BytesToVar(BufferBase.ReadBytes, varString);
+    vMasterCompFields  := aMasterCompFields;
+    aMassiveType       := TTypeObject     (BytesToVar(BufferBase.ReadBytes, varInteger));
+    aObjectDirection   := TObjectDirection(BytesToVar(BufferBase.ReadBytes, varInteger));
+    aTempBool          := BytesToVar(BufferBase.ReadBytes, varBoolean);
+    aObjectValue       := TObjectValue    (BytesToVar(BufferBase.ReadBytes, varInteger));
+    vTableName         := BytesToVar(BufferBase.ReadBytes, varString);
+    aTagFields         := BytesToVar(BufferBase.ReadBytes, varString);
+    vReflectChanges    := BytesToVar(BufferBase.ReadBytes, varBoolean);
+    vMasterCompTag     := '';
+    vSequenceName      := BytesToVar(BufferBase.ReadBytes, varString);
+    vSequenceField     := BytesToVar(BufferBase.ReadBytes, varString);
+    vmycomptag         := BytesToVar(BufferBase.ReadBytes, varString);
+    vMasterCompTag     := BytesToVar(BufferBase.ReadBytes, varString);
+    aTagLinkFields     := BytesToVar(BufferBase.ReadBytes, varString);
+    If Trim(aTagLinkFields) <> '' Then
+     Begin
+      vMasterCompFields := DecodeStrings(aTagLinkFields{$IFDEF FPC}, csUndefined{$ENDIF});
+      BuildCompFields(vMasterCompFields);
+     End;
+    //Carregando Body
+    aBodyStream      := BufferBase.ReadStream;
+    LoadBodyData;
+   End;
+ Finally
+  FreeAndNil(BufferBase);
+ End;
 End;
 
 Procedure TMassiveDatasetBuffer.SaveToStream  (Var Dest      : TStream;
@@ -2153,14 +2416,18 @@ Procedure TMassiveDatasetBuffer.SaveToStream  (Var Dest      : TStream;
 Var
  BufferStream,
  BufferHeader,
- BufferBase     : TRESTDWBufferBase; //Pacote de Saida
- vLineStream    : TStream;
- vInfoBytes     : TRESTDWBytes;
- vSizeData      : DWInteger;
+ BufferBase       : TRESTDWBufferBase; //Pacote de Saida
+ vHeaderStream,
+ vBufferStream,
+ vLineStream      : TStream;
+ vInfoBytes       : TRESTDWBytes;
+ vValueData,
+ vSizeData        : DWInteger;
  vTagFields,
- vTagLinkFields,
- vLineString    : DWString;
- A              : Integer;
+ vTagLinkFields   : String;
+ vLineString      : DWString;
+ A                : Integer;
+ vHasMasterFields : Boolean;
  Procedure GenerateHeader;
  Var
   vPrecision,
@@ -2215,14 +2482,14 @@ Var
     If vMassiveFields.Items[I].FieldType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ovExtended,
                                              {$IFEND}{$ENDIF}ovFloat, ovCurrency, ovFMTBcd, ovSingle, ovBCD] Then
      vPrecision := vMassiveFields.Items[I].Precision;
-    BufferHeader.InputBytes(VarToBytes(vMassiveFields.Items[I].vFieldName));
-    BufferHeader.InputBytes(VarToBytes(vMassiveFields.Items[I].FieldType));
-    BufferHeader.InputBytes(VarToBytes(vPrimary));
-    BufferHeader.InputBytes(VarToBytes(vRequired));
-    BufferHeader.InputBytes(VarToBytes(vMassiveFields.Items[I].Size));
-    BufferHeader.InputBytes(VarToBytes(vPrecision));
-    BufferHeader.InputBytes(VarToBytes(vReadOnly));
-    BufferHeader.InputBytes(VarToBytes(vAutoinc));
+    BufferHeader.InputBytes(VarToBytes(vMassiveFields.Items[I].vFieldName, varString));
+    BufferHeader.InputBytes(VarToBytes(vMassiveFields.Items[I].FieldType,  varInteger));
+    BufferHeader.InputBytes(VarToBytes(vPrimary,                           varString));
+    BufferHeader.InputBytes(VarToBytes(vRequired,                          varString));
+    BufferHeader.InputBytes(VarToBytes(vMassiveFields.Items[I].Size,       varInteger));
+    BufferHeader.InputBytes(VarToBytes(vPrecision,                         varInteger));
+    BufferHeader.InputBytes(VarToBytes(vReadOnly,                          varString));
+    BufferHeader.InputBytes(VarToBytes(vAutoinc,                           varString));
    End;
  End;
 Begin
@@ -2242,25 +2509,43 @@ Begin
     End;
    End;
   //Input do Buffer de Header
-  BufferBase.InputBuffer(BufferHeader);
+  vHeaderStream := TMemoryStream.Create;
+  Try
+   BufferHeader.SaveToStream(vHeaderStream);
+   vHeaderStream.Position := 0;
+   BufferBase.InputStream(vHeaderStream);
+  Finally
+   FreeAndNil(vHeaderStream);
+  End;
   //Input dos dados do Pacote
-  BufferBase.InputBytes(VarToBytes(Trim(vMasterCompFields) <> ''));
+  vHasMasterFields := Trim(vMasterCompFields) <> '';
+  BufferBase.InputBytes(VarToBytes(vHasMasterFields,   varBoolean));
   If (Trim(vMasterCompFields) <> '') Then
-   BufferBase.InputBytes(VarToBytes(vMasterCompFields));
-  BufferBase.InputBytes(VarToBytes(toMassive));
-  BufferBase.InputBytes(VarToBytes(odINOUT));
-  BufferBase.InputBytes(VarToBytes(False));
-  BufferBase.InputBytes(VarToBytes(ovObject));
-  BufferBase.InputBytes(VarToBytes(vTableName));
-  BufferBase.InputBytes(VarToBytes(vTagFields));
-  BufferBase.InputBytes(VarToBytes(vReflectChanges));
-  BufferBase.InputBytes(VarToBytes(vSequenceName));
-  BufferBase.InputBytes(VarToBytes(vSequenceField));
-  BufferBase.InputBytes(VarToBytes(vMyCompTag));
-  BufferBase.InputBytes(VarToBytes(vMasterCompTag));
-  BufferBase.InputBytes(VarToBytes(vTagLinkFields));
+   BufferBase.InputBytes(VarToBytes(vMasterCompFields, varString));
+  vValueData := Integer(toMassive);
+  BufferBase.InputBytes(VarToBytes(vValueData,         varInteger));
+  vValueData := Integer(odINOUT);
+  BufferBase.InputBytes(VarToBytes(vValueData,         varInteger));
+  BufferBase.InputBytes(VarToBytes(False,              varBoolean));
+  vValueData := Integer(ovObject);
+  BufferBase.InputBytes(VarToBytes(vValueData,         varInteger));
+  BufferBase.InputBytes(VarToBytes(vTableName,         varString));
+  BufferBase.InputBytes(VarToBytes(vTagFields,         varString));
+  BufferBase.InputBytes(VarToBytes(vReflectChanges,    varBoolean));
+  BufferBase.InputBytes(VarToBytes(vSequenceName,      varString));
+  BufferBase.InputBytes(VarToBytes(vSequenceField,     varString));
+  BufferBase.InputBytes(VarToBytes(vMyCompTag,         varString));
+  BufferBase.InputBytes(VarToBytes(vMasterCompTag,     varString));
+  BufferBase.InputBytes(VarToBytes(vTagLinkFields,     varString));
   //Input das Linhas de Dados
-  BufferBase.InputBuffer(BufferStream);
+  vBufferStream := TMemoryStream.Create;
+  Try
+   BufferStream.SaveToStream(vBufferStream);
+   vBufferStream.Position := 0;
+   BufferBase.InputStream(vBufferStream);
+  Finally
+   FreeAndNil(vBufferStream);
+  End;
   BufferBase.SaveToStream(Dest);
  Finally
   If Assigned(BufferStream) Then
