@@ -3,7 +3,7 @@ unit uRDWRESTDAO;
 interface
 
 uses
-  System.Classes, uConsts,
+  System.Classes, uConsts, System.SysUtils,
   uRESTDWDataUtils, uRESTDWResponseTranslator, uRESTDWIdBase;
 
 type
@@ -18,8 +18,8 @@ type
     constructor Create(aServer, aPort: string; binary: boolean);
     destructor Destroy; override;
     procedure SetBasicAuth(user, password: string);
-    function TesteEndpoint(aEndpoint: string;
-      aMethod: TTestRequestMethod): boolean;
+    function TesteEndpoint(aEndpoint: string; aMethod: TTestRequestMethod;
+      out erro: string): boolean;
     function TesteConcorrente(aEndpoint: string; aMethod: TTestRequestMethod;
       cRepeat, cRequests: integer): boolean;
   End;
@@ -69,7 +69,7 @@ var
 begin
   FURL := FServer + '/' + aEndpoint;
   for I := 0 to pred(cRepeat) do
-    TThread.CreateAnonymousThread(
+    TThread.Queue(nil,
       procedure
       begin
         FStream := TStringStream.Create;
@@ -96,31 +96,51 @@ begin
         except
           teste := false;
         end;
-      end).Start;
+      end);
   Result := teste;
 end;
 
 function TRDWRESTDAO.TesteEndpoint(aEndpoint: string;
-aMethod: TTestRequestMethod): boolean;
+aMethod: TTestRequestMethod; out erro: string): boolean;
+var
+  currentmethod: string;
 begin
   FURL := FServer + '/' + aEndpoint;
   FStream := TStringStream.Create;
   try
     case aMethod of
       rtmGET:
-        Result := FRESTClient.Get(FURL, FDefaultHeader, FStream) = 200;
+        begin
+          currentmethod := 'GET';
+          Result := FRESTClient.Get(FURL, FDefaultHeader, FStream) = 200;
+        end;
+
       rtmPOST:
-        Result := FRESTClient.Post(FURL, FDefaultHeader, FStream) = 201;
+        begin
+          currentmethod := 'POST';
+          Result := FRESTClient.Post(FURL, FDefaultHeader, FStream) = 201;
+        end;
       rtmPUT:
-        Result := FRESTClient.Put(FURL, FDefaultHeader, FStream, false) = 201;
+        begin
+          currentmethod := 'PUT';
+          Result := FRESTClient.Put(FURL, FDefaultHeader, FStream, false) = 201;
+        end;
       rtmPATCH:
-        Result := FRESTClient.Patch(FURL, FDefaultHeader, FStream, false) = 201;
+        begin
+          currentmethod := 'PATCH';
+          Result := FRESTClient.Patch(FURL, FDefaultHeader, FStream,
+            false) = 201;
+        end;
       rtmDELETE:
-        Result := FRESTClient.Delete(FURL, FDefaultHeader, FStream) = 200;
+        begin
+          currentmethod := 'DELETE';
+          Result := FRESTClient.Delete(FURL, FDefaultHeader, FStream) = 200;
+        end;
     end;
     FStream.Free;
   except
     Result := false;
+    erro := Format('Método %s falhou', [currentmethod]);
   end;
 end;
 
