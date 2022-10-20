@@ -44,7 +44,8 @@ requires
   {$ENDIF}
   rtl,
   dbrtl,
-  soaprtl;
+  soaprtl,
+  dsnap;
 
 contains
   PropertyPersist in '..\..\Source\Basic\PropertyPersist.pas',
@@ -115,3 +116,4 @@ contains
   uRESTDWBufferBase in '..\..\Source\Basic\uRESTDWBufferBase.pas';
 
 End.
+

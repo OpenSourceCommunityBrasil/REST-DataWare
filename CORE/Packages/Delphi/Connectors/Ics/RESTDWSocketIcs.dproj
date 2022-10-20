@@ -76,8 +76,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
-        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_DcuOutput>..\..\..\..\compiled</DCC_DcuOutput>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_E>false</DCC_E>
         <DCC_N>false</DCC_N>
@@ -90,6 +89,7 @@
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <RuntimeOnlyPackage>true</RuntimeOnlyPackage>
         <SanitizedProjectName>RESTDWSocketIcs</SanitizedProjectName>
+        <DCC_Description>REST Dataware - Socket Ics</DCC_Description>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
         <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
@@ -188,9 +188,9 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="RESTDWSocketIcs.res"/>
-        <DCCReference Include="RESTDWSocketIcs.dres"/>
         <DCCReference Include="RESTDWCore.dcp"/>
+        <DCCReference Include="IcsVclD110Run.dcp"/>
+        <DCCReference Include="IcsCommonD110Run.dcp"/>
         <DCCReference Include="..\..\..\..\Source\Sockets\Ics\uRESTDWIcsBase.pas"/>
         <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdClientPooler.bmp">
             <ResourceType>BITMAP</ResourceType>
@@ -225,10 +225,7 @@
         <Borland.ProjectType>Package</Borland.ProjectType>
         <BorlandProject>
             <Delphi.Personality>
-                <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k240.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp240.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                </Excluded_Packages>
+                <Excluded_Packages/>
                 <Source>
                     <Source Name="MainSource">RESTDWSocketIcs.dpk</Source>
                 </Source>
@@ -239,15 +236,21 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWSocketIcs.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>RESTDWSocketIcs.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

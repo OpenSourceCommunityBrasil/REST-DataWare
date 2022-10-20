@@ -1,15 +1,6 @@
 package RESTDWSocketIcs;
 
-{$IFNDEF FPC}
- {$IFNDEF VER150 or VER160 or VER170 or VER180 or
-          VER185 or VER190 or VER200 or VER210 or
-          VER220}
-  {$R RESTDWSocketIcs.res  RESTDWSocketIcs.rc}
-  {$R RESTDWSocketIcs.dres RESTDWSocketIcs.rc}
-  {$R *.res}
-  {$R *.dres}
- {$ENDIF}
-{$ENDIF}
+{$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -34,8 +25,9 @@ package RESTDWSocketIcs;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'REST Dataware - Socket Ics'}
 {$RUNONLY}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
   RESTDWCore;

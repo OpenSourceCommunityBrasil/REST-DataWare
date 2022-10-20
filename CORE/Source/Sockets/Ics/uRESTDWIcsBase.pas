@@ -27,35 +27,14 @@ unit uRESTDWIcsBase;
 interface
 
 Uses
-   System.SysUtils,
-   System.Classes,
-   Data.Db,
-   Variants,
-   system.SyncObjs,
-   uRESTDWComponentEvents,
-   uRESTDWBasicTypes,
-   uRESTDWJSONObject,
-   uRESTDWBasic,
-   uRESTDWBasicDB,
-   uRESTDWParams,
-   uRESTDWBasicClass,
-   uRESTDWComponentBase,
-   uRESTDWCharset,
-   uRESTDWConsts,
-   uRESTDWEncodeClass,
-   uRESTDWDataUtils,
+   SysUtils, Classes, Db, Variants, SyncObjs,
+   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
+   uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWComponentBase,
+   uRESTDWCharset, uRESTDWConsts, uRESTDWEncodeClass, uRESTDWDataUtils,
    uRESTDWTools,
-   OverbyteIcsWinSock,
-   OverbyteIcsWSocket,
-   OverbyteIcsWndControl,
-   OverbyteIcsHttpAppServer,
-   OverbyteIcsUtils,
-   OverbyteIcsFormDataDecoder,
-   OverbyteIcsMimeUtils,
-   OverbyteIcsSSLEAY,
+   OverbyteIcsWinSock, OverbyteIcsWSocket, OverbyteIcsWndControl, OverbyteIcsHttpAppServer,
+   OverbyteIcsUtils, OverbyteIcsFormDataDecoder, OverbyteIcsMimeUtils, OverbyteIcsSSLEAY,
    OverbyteIcsHttpSrv;
-
-
 
 Type
 
@@ -70,7 +49,7 @@ Type
   HttpAppSrv       : TSslHttpServer;
 
   // SSL Params
-  vSSLContext                       : TSslContext;
+  vSSLContext                      : TSslContext;
   vSSLRootCertFile,
   vSSLPrivateKeyFile,
   vSSLPrivateKeyPassword,
@@ -135,14 +114,10 @@ Type
   Property BandWidthLimit : Cardinal Read vBandWidthLimit Write vBandWidthLimit default 0;
   Property BandWidthSample : Cardinal Read vBandWidthSample Write vBandWidthSample default 1000;
 
-
 End;
 
-
-
-
-
-
+  const
+    cIcsHTTPServerNotFound = 'No HTTP server found.';
 Implementation
 
 Uses uRESTDWJSONInterface, Vcl.Dialogs, OverbyteIcsWSockBuf;
@@ -183,7 +158,7 @@ begin
     end;
     end
     else
-      raise Exception.Create('No HTTP server found.');
+      raise Exception.Create(cIcsHTTPServerNotFound);
 end;
 
 Procedure TRESTDWIcsServicePooler.SetParams;
@@ -211,7 +186,7 @@ begin
 
  end
   else
-    raise Exception.Create('No HTTP server found.');
+    raise Exception.Create(cIcsHTTPServerNotFound);
 end;
 
 
@@ -376,9 +351,9 @@ Var
   mb.Position                          := 0;
   Remote.DocStream := mb;
   Remote.AnswerStream(Flags,
-                         IntToStr(StatusCode),
-                         '',
-                         '');
+                      IntToStr(StatusCode),
+                      '',
+                      '');
  End;
 
  Procedure DestroyComponents;
