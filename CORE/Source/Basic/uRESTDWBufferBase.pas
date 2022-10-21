@@ -211,7 +211,21 @@ Begin
                  aSize := S;
                  Move(Pointer(@aSize)^,                Pointer(@Result[0])^, SizeOf(DWInteger));
                  If S > 0 Then
-                  Move(AnsiString(aString)[InitStrPos], Pointer(@Result[SizeOf(DWInteger)])^, S);
+                  Begin
+                   {$IFDEF FPC}
+                    Move(AnsiString(aString)[InitStrPos], Pointer(@Result[SizeOf(DWInteger)])^, S);
+                   {$ELSE}
+                    {$IF CompilerVersion <= 22}
+                     Move(AnsiString(aString)[InitStrPos], Pointer(@Result[SizeOf(DWInteger)])^, S);
+                    {$ELSE}
+                     {$IF CompilerVersion <= 33}
+                      Move(DwString(aString)[InitStrPos], Pointer(@Result[SizeOf(DWInteger)])^, S);
+                     {$ELSE}
+                      Move(AnsiString(aString)[InitStrPos], Pointer(@Result[SizeOf(DWInteger)])^, S);
+                     {$IFEND}
+                    {$IFEND}
+                   {$ENDIF}
+                  End;
                 End;
   varDouble,
   varCurrency  : Begin

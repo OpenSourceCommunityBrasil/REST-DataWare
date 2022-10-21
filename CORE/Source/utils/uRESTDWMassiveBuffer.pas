@@ -859,7 +859,7 @@ End;
 Procedure TMassiveValue.SaveToStream(Const Stream: TMemoryStream);
 Begin
  vJSONValue.ObjectValue := ovBlob;
- vJSONValue.Encoded     := True;
+ vJSONValue.Encoded     := False;
  vJSONValue.SaveToStream(Stream, True);
 End;
 
@@ -1133,7 +1133,7 @@ Begin
     BufferStream.InputBytes(VarToBytes(vMassiveValues.Count, varInteger));
     For I := 1 To vMassiveValues.Count - 1 Do
      Begin
-      If aMassiveMode = mmUpdate Then
+      If MassiveMode = mmUpdate Then
        Begin
         If Changes.Count = 0 Then
          Continue;
@@ -2244,6 +2244,20 @@ Var
      Break;
    End;
  End;
+ Function GetFieldIndexChanges(Changes   : TStrings;
+                               FieldName : String) : Integer;
+ Var
+  I : Integer;
+ Begin
+  Result := -1;
+  For I := 0 To Changes.Count -1 Do
+   Begin
+    If LowerCase(Changes[I]) = LowerCase(FieldName) Then
+     Result := I;
+    If Result <> -1 Then
+     Break;
+   End;
+ End;
  Procedure LoadHeader;
  Var
   BufferHeader : TRESTDWBufferBase;
@@ -2277,12 +2291,13 @@ Var
  Var
   BufferStream,
   BufferBody   : TRESTDWBufferBase;
+  aValueStream,
   aStream      : TStream;
   MassiveLine  : TMassiveLine;
   MassiveValue : TMassiveValue;
   aBool        : Boolean;
   vValuesCount,
-  I            : Integer;
+  A, X, C, I   : Integer;
  Begin
   If Assigned(aBodyStream)  Then
    Begin
@@ -2348,18 +2363,47 @@ Var
        End;
        vValuesCount := BytesToVar(BufferStream.ReadBytes, varInteger);
        Try
-        For I := 0 To vValuesCount -1 Do
+        For C := 1 To vValuesCount -1 Do
          Begin
           If vMassiveMode = mmUpdate Then
            Begin
-
+            A := GetFieldIndexChanges(MassiveLine.vChanges, vMassiveFields.Items[C -1].FieldName);
+            If A > -1 Then
+             Begin
+              X := GetFieldIndex(MassiveLine.vChanges[A]) +1;
+              MassiveLine.Values[X].vJSONValue.ObjectValue := vMassiveFields.Items[X -1].vFieldType;
+              aBool := BytesToVar(BufferStream.ReadBytes, varBoolean);
+              If Not aBool Then
+               Begin
+                aValueStream := BufferStream.ReadStream;
+                Try
+                 If Assigned(aValueStream) Then
+                  MassiveLine.Values[X].LoadFromStream(TMemoryStream(aValueStream));
+                Finally
+                 If Assigned(aValueStream) Then
+                  FreeAndNil(aValueStream);
+                End;
+               End;
+             End;
            End
           Else If vMassiveMode <> mmExec Then
            Begin
-
+            MassiveLine.Values[C].vJSONValue.ObjectValue := vMassiveFields.Items[C -1].vFieldType;
+            aBool := BytesToVar(BufferStream.ReadBytes, varBoolean);
+            If Not aBool Then
+             Begin
+              aValueStream := BufferStream.ReadStream;
+              Try
+               If Assigned(aValueStream) Then
+                MassiveLine.Values[C].LoadFromStream(TMemoryStream(aValueStream));
+              Finally
+               If Assigned(aValueStream) Then
+                FreeAndNil(aValueStream);
+              End;
+             End;
            End;
-          vMassiveBuffer.Add(MassiveLine);
          End;
+        vMassiveBuffer.Add(MassiveLine);
        Finally
         FreeAndNil(BufferStream);
        End;

@@ -7465,9 +7465,11 @@ Begin
   Begin
    If (Trim(vUpdateTableName) <> '') And (vUpdateSQL = Nil) Then
     Begin
-     TMassiveDatasetBuffer(vMassiveDataset).MassiveType := MassiveType;
-     TMassiveDatasetBuffer(vMassiveDataset).LastOpen    := vLastOpen;
-     TMassiveDatasetBuffer(vMassiveDataset).MassiveMode := mmInsert;
+     TMassiveDatasetBuffer(vMassiveDataset).SequenceName  := SequenceName;
+     TMassiveDatasetBuffer(vMassiveDataset).SequenceField := SequenceField;
+     TMassiveDatasetBuffer(vMassiveDataset).MassiveType   := MassiveType;
+     TMassiveDatasetBuffer(vMassiveDataset).LastOpen      := vLastOpen;
+     TMassiveDatasetBuffer(vMassiveDataset).MassiveMode   := mmInsert;
      TMassiveDatasetBuffer(vMassiveDataset).NewBuffer  (Self, mmInsert, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
      TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmInsert, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
     End;
@@ -9113,8 +9115,10 @@ Begin
          vUpdateSQL.Store(vUpdateSQL.vSQLInsert.Text, Self)
         Else
          Begin
-          TMassiveDatasetBuffer(vMassiveDataset).MassiveType := MassiveType;
-          TMassiveDatasetBuffer(vMassiveDataset).LastOpen    := vLastOpen;
+          TMassiveDatasetBuffer(vMassiveDataset).SequenceName  := SequenceName;
+          TMassiveDatasetBuffer(vMassiveDataset).SequenceField := SequenceField;
+          TMassiveDatasetBuffer(vMassiveDataset).MassiveType   := MassiveType;
+          TMassiveDatasetBuffer(vMassiveDataset).LastOpen      := vLastOpen;
           TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, DatasetStateToMassiveType(vOldState),
                                                              vOldState = dsEdit,
                                                              TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
