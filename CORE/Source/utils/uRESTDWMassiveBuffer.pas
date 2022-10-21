@@ -152,7 +152,7 @@ Type
 End;
 
 Type
- TMassiveLine = Class(TObject)
+ TMassiveLine          = Class(TObject)
  Private
   vMassiveValues  : TMassiveValues;
   vPrimaryValues  : TMassiveValues;
@@ -171,7 +171,9 @@ Type
   Destructor  Destroy;Override;
   Procedure   ClearAll;
   Procedure   LoadFromStream      (Source     : TStream);
-  Procedure   SaveToStream        (Var Dest   : TStream);
+  Procedure   SaveToStream        (Var Dest      : TStream;
+                                   MassiveBuffer : TObject = Nil);
+  Property    Changes                         : TStringList    Read vChanges;
   Property    MassiveMode                     : TMassiveMode   Read vMassiveMode Write vMassiveMode;
   Property    UpdateFieldChanges              : TStringList    Read vChanges     Write vChanges;
   Property    MassiveType                     : TMassiveType   Read vMassiveType Write vMassiveType;
@@ -340,29 +342,31 @@ Type
   Procedure ClearDataset;                                               //Limpa Todo o Dataset Massivo
   Procedure ClearLine;                                                  //Limpa o Buffer Temporario
   Function  ToJSON          : String;                                   //Gera o JSON do Dataset Massivo
-  Procedure FromJSON (Value : String);                                  //Carrega o Dataset Massivo a partir de um JSON
-  Procedure LoadFromStream       (Source     : TStream);
-  Procedure SaveToStream         (Var Dest : TStream);
-  Function  MasterFieldFromDetail(Field      : String) : String;
-  Property  MassiveMode     : TMassiveMode     Read vMassiveMode     Write vMassiveMode;   //Modo Massivo do Buffer Atual
-  Property  MassiveType     : TMassiveType     Read vMassiveType     Write vMassiveType;
-  Property  Fields          : TMassiveFields   Read vMassiveFields   Write vMassiveFields;
-  Property  Dataexec        : TStringList      Read vDataexec        Write vDataexec;
+  Procedure FromJSON             (Value    : String);                   //Carrega o Dataset Massivo a partir de um JSON
+  Procedure LoadFromStream       (Source   : TStream);
+  Procedure SaveToStream         (Var Dest      : TStream;
+                                  MassiveBuffer : TObject = Nil);
+  Function  MasterFieldFromDetail(Field    : String) : String;
+  Property  MassiveMode     : TMassiveMode         Read vMassiveMode     Write vMassiveMode;   //Modo Massivo do Buffer Atual
+  Property  MassiveType     : TMassiveType         Read vMassiveType     Write vMassiveType;
+  Property  Fields          : TMassiveFields       Read vMassiveFields   Write vMassiveFields;
+  Property  Dataexec        : TStringList          Read vDataexec        Write vDataexec;
   Property  Params          : TRESTDWParams        Read vDWParams        Write vDWParams;
-  Property  TableName       : String           Read vTableName;
-  Property  OnLoad          : Boolean          Read vOnLoad;
+  Property  TableName       : String               Read vTableName;
+  Property  OnLoad          : Boolean              Read vOnLoad;
   {$IFDEF FPC}
-  Property DatabaseCharSet  : TDatabaseCharSet Read vDatabaseCharSet Write vDatabaseCharSet;
+  Property DatabaseCharSet  : TDatabaseCharSet     Read vDatabaseCharSet Write vDatabaseCharSet;
   {$ENDIF}
-  Property Encoding         : TEncodeSelect    Read vEncoding        Write SetEncoding;
-  Property SequenceName     : String           Read vSequenceName    Write vSequenceName;
-  Property SequenceField    : String           Read vSequenceField   Write vSequenceField;
-  Property ReflectChanges   : Boolean          Read vReflectChanges  Write vReflectChanges;
-  Property LastOpen         : Integer          Read vLastOpen        Write vLastOpen;
-  Property MassiveReply     : TMassiveReply    Read vMassiveReply    Write vMassiveReply;
-  Property MyCompTag        : String           Read vMyCompTag;
-  Property MasterCompTag    : String           Read vMasterCompTag;
-  Property MasterCompFields : String           Read vMasterCompFields;
+  Property Encoding         : TEncodeSelect        Read vEncoding        Write SetEncoding;
+  Property SequenceName     : String               Read vSequenceName    Write vSequenceName;
+  Property SequenceField    : String               Read vSequenceField   Write vSequenceField;
+  Property ReflectChanges   : Boolean              Read vReflectChanges  Write vReflectChanges;
+  Property LastOpen         : Integer              Read vLastOpen        Write vLastOpen;
+  Property MassiveReply     : TMassiveReply        Read vMassiveReply    Write vMassiveReply;
+  Property MyCompTag        : String               Read vMyCompTag;
+  Property MasterCompTag    : String               Read vMasterCompTag;
+  Property MasterCompFields : String               Read vMasterCompFields;
+  Property Dataset          : TRESTDWClientSQLBase Read vDataset;
  End;
 
 Type
@@ -1077,7 +1081,8 @@ Begin
  End;
 End;
 
-Procedure TMassiveLine.SaveToStream  (Var Dest : TStream);
+Procedure TMassiveLine.SaveToStream  (Var Dest      : TStream;
+                                      MassiveBuffer : TObject = Nil);
 Var
  BufferStream : TRESTDWBufferBase; //Pacote de Saida
  vOutParams   : TStream;
@@ -2450,7 +2455,8 @@ Begin
  End;
 End;
 
-Procedure TMassiveDatasetBuffer.SaveToStream  (Var Dest : TStream);
+Procedure TMassiveDatasetBuffer.SaveToStream  (Var Dest      : TStream;
+                                               MassiveBuffer : TObject = Nil);
 Var
  BufferStream,
  BufferHeader,
@@ -2540,7 +2546,7 @@ Begin
    Begin
     vLineStream := TMemoryStream.Create;
     Try
-     vMassiveBuffer.Items[A].SaveToStream(vLineStream);
+     vMassiveBuffer.Items[A].SaveToStream(vLineStream, MassiveBuffer);
      BufferStream.InputStream(vLineStream);
     Finally
      FreeAndNil(vLineStream);
