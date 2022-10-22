@@ -45,7 +45,6 @@ unit uRESTDWIcsBase;
 interface
 
 Uses
-<<<<<<< .mine
   System.SysUtils,
   System.Classes,
   Data.Db,
@@ -73,44 +72,6 @@ Uses
   OverbyteIcsMimeUtils,
   OverbyteIcsSSLEAY,
   OverbyteIcsHttpSrv, OverbyteIcsWSocketS;
-||||||| .r3282
-   System.SysUtils,
-   System.Classes,
-   Data.Db,
-   Variants,
-   system.SyncObjs,
-   uRESTDWComponentEvents,
-   uRESTDWBasicTypes,
-   uRESTDWJSONObject,
-   uRESTDWBasic,
-   uRESTDWBasicDB,
-   uRESTDWParams,
-   uRESTDWBasicClass,
-   uRESTDWComponentBase,
-   uRESTDWCharset,
-   uRESTDWConsts,
-   uRESTDWEncodeClass,
-   uRESTDWDataUtils,
-   uRESTDWTools,
-   OverbyteIcsWinSock,
-   OverbyteIcsWSocket,
-   OverbyteIcsWndControl,
-   OverbyteIcsHttpAppServer,
-   OverbyteIcsUtils,
-   OverbyteIcsFormDataDecoder,
-   OverbyteIcsMimeUtils,
-   OverbyteIcsSSLEAY,
-   OverbyteIcsHttpSrv;
-=======
-   SysUtils, Classes, Db, Variants, SyncObjs,
-   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
-   uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWComponentBase,
-   uRESTDWCharset, uRESTDWConsts, uRESTDWEncodeClass, uRESTDWDataUtils,
-   uRESTDWTools,
-   OverbyteIcsWinSock, OverbyteIcsWSocket, OverbyteIcsWndControl, OverbyteIcsHttpAppServer,
-   OverbyteIcsUtils, OverbyteIcsFormDataDecoder, OverbyteIcsMimeUtils, OverbyteIcsSSLEAY,
-   OverbyteIcsHttpSrv;
->>>>>>> .r3289
 
 Type
 
@@ -120,6 +81,7 @@ Type
     RawDataLen: Integer;
     Processing: Boolean;
   public
+    destructor Destroy; override;
   end;
 
   TRESTDWIcsServicePooler = Class(TRESTServicePoolerBase)
@@ -127,7 +89,6 @@ Type
     // HTTP Server
     HttpAppSrv: TSslHttpServer;
 
-<<<<<<< .mine
     // SSL Params
     vSSLContext: TSslContext;
     vSSLRootCertFile, vSSLPrivateKeyFile, vSSLPrivateKeyPassword, vSSLCertFile: String;
@@ -139,37 +100,6 @@ Type
     vSSLTimeoutSec: Cardinal;
     vSSLUse: Boolean;
     vSSLCliCertMethod: TSslCliCertMethod;
-||||||| .r3282
-  // SSL Params
-  vSSLContext                       : TSslContext;
-  vSSLRootCertFile,
-  vSSLPrivateKeyFile,
-  vSSLPrivateKeyPassword,
-  vSSLCertFile                     : String;
-  vSSLMethod                       : TSslVersionMethod;
-  vSSLVerifyMode                   : TSslVerifyPeerModes;
-  vSSLVerifyDepth                  : Integer;
-  vSSLVerifyPeer                   : Boolean;
-  vSSLCacheModes                   : TSslSessCacheModes;
-  vSSLTimeout                      : Cardinal;
-  vSSLUse                          : Boolean;
-  vSSLCliCertMethod                : TSslCliCertMethod;
-=======
-  // SSL Params
-  vSSLContext                      : TSslContext;
-  vSSLRootCertFile,
-  vSSLPrivateKeyFile,
-  vSSLPrivateKeyPassword,
-  vSSLCertFile                     : String;
-  vSSLMethod                       : TSslVersionMethod;
-  vSSLVerifyMode                   : TSslVerifyPeerModes;
-  vSSLVerifyDepth                  : Integer;
-  vSSLVerifyPeer                   : Boolean;
-  vSSLCacheModes                   : TSslSessCacheModes;
-  vSSLTimeout                      : Cardinal;
-  vSSLUse                          : Boolean;
-  vSSLCliCertMethod                : TSslCliCertMethod;
->>>>>>> .r3289
 
     // HTTP Params
     vSocketFamily: TSocketFamily;
@@ -179,6 +109,7 @@ Type
     vBuffSizeBytes: Integer;
     vBandWidthLimitBytes: Cardinal;
     vBandWidthSamplingBytes: Cardinal;
+    vListenBacklog: Integer;
 
   Public
     Constructor Create(AOwner: TComponent); Override;
@@ -196,7 +127,6 @@ Type
     procedure SetParamsHttpConnection(Remote: TMyHttpConnection);
     procedure onClientConnect(Sender, Client: TObject; Error: Word);
 
-<<<<<<< .mine
     // Misc Procedures
     Procedure SetActive(Value: Boolean); Override;
     Procedure EchoPooler(ServerMethodsClass: TComponent; AContext: TComponent;
@@ -216,15 +146,12 @@ Type
       default false;
     Property SSLCacheModes: TSslSessCacheModes Read vSSLCacheModes Write vSSLCacheModes;
     Property SSLTimeoutSec: Cardinal Read vSSLTimeoutSec Write vSSLTimeoutSec default 60;
+
     // SSL TimeOut in Seconds
     Property SSLUse: Boolean Read vSSLUse Write vSSLUse default false;
     Property SSLCliCertMethod: TSslCliCertMethod Read vSSLCliCertMethod
-
-||||||| .r3282
-
-=======
->>>>>>> .r3289
       Write vSSLCliCertMethod;
+
     // HTTP Params
     Property SocketFamily: TSocketFamily Read vSocketFamily Write vSocketFamily
       default sfAny;
@@ -238,25 +165,16 @@ Type
       Write vBandWidthLimitBytes default 0;
     Property BandWidthSamplingBytes: Cardinal Read vBandWidthSamplingBytes
       Write vBandWidthSamplingBytes default 1000;
+    Property ListenBacklog: Integer Read vListenBacklog
+      Write vListenBacklog default 50;
   End;
 
-<<<<<<< .mine
 const
   cIcsHTTPServerNotFound = 'No HTTP server found.';
 
-||||||| .r3282
-
-
-
-
-
-=======
-  const
-    cIcsHTTPServerNotFound = 'No HTTP server found.';
->>>>>>> .r3289
 Implementation
 
-Uses uRESTDWJSONInterface, Vcl.Dialogs, OverbyteIcsWSockBuf;
+Uses uRESTDWJSONInterface, Vcl.Dialogs, OverbyteIcsWSockBuf, Vcl.Forms;
 
 Procedure TRESTDWIcsServicePooler.SetHttpServerSSL;
 begin
@@ -292,19 +210,9 @@ begin
       HttpAppSrv.SslContext := nil;
       HttpAppSrv.SslEnable := false;
     end;
-<<<<<<< .mine
   end
   else
     raise Exception.Create(cIcsHTTPServerNotFound);
-||||||| .r3282
-    end
-    else
-      raise Exception.Create('No HTTP server found.');
-=======
-    end
-    else
-      raise Exception.Create(cIcsHTTPServerNotFound);
->>>>>>> .r3289
 end;
 
 procedure TRESTDWIcsServicePooler.SetSocketServerParams;
@@ -339,6 +247,8 @@ begin
 
     HttpAppSrv.BandwidthLimit := vBandWidthLimitBytes;
     HttpAppSrv.BandwidthSampling := vBandWidthSamplingBytes;
+
+    HttpAppSrv.ListenBacklog := vListenBacklog;
 
     HttpAppSrv.MultiThreaded := true;
   end
@@ -383,6 +293,7 @@ Begin
   vBuffSizeBytes := 262144; // 256kb Default
   vBandWidthLimitBytes := 0;
   vBandWidthSamplingBytes := 1000;
+  vListenBacklog := 50;
 
   Inherited;
 End;
@@ -472,22 +383,23 @@ Begin
 End;
 
 procedure TRESTDWIcsServicePooler.onPostedData(Sender: TObject; ErrCode: Word);
+var
+  Remote: TMyHttpConnection;
 begin
-  TThread.CreateAnonymousThread(
-    procedure
-    var
-      Len: Integer;
-      Remote: TMyHttpConnection;
-      Stream: TStringStream;
-      RawDataTemp: AnsiString;
-      lCount: Integer;
-    begin
-      Remote := TMyHttpConnection(Sender);
+  Remote := TMyHttpConnection(Sender);
 
-      if Not(Remote.Processing) then
+  if Not(Remote.Processing) then
+  begin
+    Remote.Processing := true;
+
+    TThread.CreateAnonymousThread(
+      procedure
+      var
+        Len: Integer;
+        Stream: TStringStream;
+        lCount: Integer;
+        RawDataTemp: AnsiString;
       begin
-        Remote.Processing := true;
-
         repeat
         begin
           SetLength(RawDataTemp, Remote.BufSize);
@@ -502,25 +414,31 @@ begin
           end
           else
             lCount := 0;
+
+          SetLength(RawDataTemp, 0);
+
+          TThread.CurrentThread.Sleep(1);
         end
         until lCount <= 0;
 
         if Remote.RequestContentLength = Remote.RawDataLen then
         begin
-          Remote.PostedDataReceived;
+          try
+            Remote.PostedDataReceived;
 
-          Stream := TStringStream.Create(Remote.RawData);
+            Stream := TStringStream.Create(Remote.RawData);
 
-          Stream.Position := 0;
+            Stream.Position := 0;
 
-          ProcessDocument(Sender, Stream);
+            ProcessDocument(Sender, Stream);
+          finally
+            FreeAndNil(Stream);
+          end;
         end;
 
         Remote.Processing := false;
-
-      end;
-    end).Start;
-
+      end).Start;
+  end;
 end;
 
 procedure TRESTDWIcsServicePooler.ProcessDocument(Sender: TObject; BodyStream: TStream);
@@ -535,7 +453,6 @@ Var
   vParams: TStringList;
   Flags: THttpGetFlag;
 
-<<<<<<< .mine
   Procedure WriteError;
   Begin
     mb := TStringStream.Create(ErrorMessage{$IF CompilerVersion > 21},
@@ -544,29 +461,6 @@ Var
     Remote.DocStream := mb;
     Remote.AnswerStream(Flags, IntToStr(StatusCode), '', '');
   End;
-||||||| .r3282
- Procedure WriteError;
- Begin
-  mb                                   := TStringStream.Create(ErrorMessage{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
-  mb.Position                          := 0;
-  Remote.DocStream := mb;
-  Remote.AnswerStream(Flags,
-                         IntToStr(StatusCode),
-                         '',
-                         '');
- End;
-=======
- Procedure WriteError;
- Begin
-  mb                                   := TStringStream.Create(ErrorMessage{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
-  mb.Position                          := 0;
-  Remote.DocStream := mb;
-  Remote.AnswerStream(Flags,
-                      IntToStr(StatusCode),
-                      '',
-                      '');
- End;
->>>>>>> .r3289
 
   Procedure DestroyComponents;
   Begin
@@ -728,5 +622,17 @@ Begin
   End;
   Inherited SetActive(Value);
 End;
+
+{ TMyHttpConnection }
+
+destructor TMyHttpConnection.Destroy;
+begin
+  if Length(RawData) > 0 then
+    SetLength(RawData, 0);
+
+  RawDataLen := 0;
+  Processing := false;
+  inherited Destroy;
+end;
 
 End.
