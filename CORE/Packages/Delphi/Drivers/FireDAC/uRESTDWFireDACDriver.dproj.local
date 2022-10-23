@@ -1,6 +1,2 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject>
-	<Transactions>
-    <Transaction>2022/10/23 16:55:14.000.140,D:\SourceForge\rdw\trunk\CORE\Packages\Delphi\Drivers\FireDAC\uRESTDWFireDACDriver.dproj=D:\SourceForge\rdw\trunk\CORE\Packages\Delphi\Drivers\FireDAC\RESTDWDriverFireDAC.dproj</Transaction>
-  </Transactions>
-</BorlandProject>
+<BorlandProject/>
