@@ -1,7 +1,7 @@
-package RESTDWDriverFireDAC;
+package uRESTDWFireDACDriver;
 
 {$R *.res}
-{$R '.\RESTDWDriverFireDAC.dcr'}
+{$R 'uRESTDWFireDACDriver.dcr'}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -34,6 +34,6 @@ requires
   RESTDWCore;
 
 contains
-  uRESTDWDriverFD in '..\..\..\..\Source\Database_Drivers\uRESTDWDriverFD.pas';
+  uRESTDWFireDACDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWFireDACDriver.pas';
 
 end.
