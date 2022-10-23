@@ -1,15 +1,8 @@
-package RESTDWDriverUNIDAC;
+package RESTDWUniDACDriver;
 
-{$IFNDEF FPC}
- {$IFNDEF VER150 or VER160 or VER170 or VER180 or
-          VER185 or VER190 or VER200 or VER210 or
-          VER220}
-  {$R RESTDWDriverUniDAC.res  RESTDWDriverUniDAC.rc}
-  {$R RESTDWDriverUniDAC.dres RESTDWDriverUniDAC.rc}
-  {$R *.res}
-  {$R *.dres}
- {$ENDIF}
-{$ENDIF}
+{$R *.res}
+{$R 'RESTDWUniDACDriver.dcr'}
+{$R *.dres}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -40,10 +33,10 @@ package RESTDWDriverUNIDAC;
 requires
   rtl,
   RESTDWCore,
-  unidac,
-  dac;
+  unidac260,
+  dac260;
 
 contains
-  uRESTDWDriverUNIDAC in '..\..\..\..\Source\Database_Drivers\uRESTDWDriverUNIDAC.pas';
+  uRESTDWUniDACDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWUniDACDriver.pas';
 
 end.
