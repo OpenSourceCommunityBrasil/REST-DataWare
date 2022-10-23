@@ -97,6 +97,12 @@ procedure Register;
 
 implementation
 
+{$IFNDEF FPC}
+ {$if CompilerVersion < 23}
+  {$R .\RESTDWAnyDACDriver.dcr}
+ {$IFEND}
+{$ENDIF}
+
 procedure Register;
 begin
   RegisterComponents('REST Dataware - Drivers', [TRESTDWAnyDACDriver]);
@@ -288,7 +294,7 @@ begin
         ServerParamValue('Protocol',  Uppercase(AConnectionDefs.Protocol));
       end;
       dbtInterbase  : begin
-        ServerParamValue('DriverID',  'FB');
+        ServerParamValue('DriverID',  'IB');
         ServerParamValue('Server',    AConnectionDefs.HostName);
         ServerParamValue('Port',      IntToStr(AConnectionDefs.dbPort));
         ServerParamValue('Database',  AConnectionDefs.DatabaseName);

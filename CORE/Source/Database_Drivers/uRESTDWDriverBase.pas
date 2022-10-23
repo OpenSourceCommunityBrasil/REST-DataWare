@@ -10,7 +10,7 @@ uses
   Classes, SysUtils, TypInfo, uRESTDWComponentBase, DB, uRESTDWParams,
   uRESTDWEncodeClass, uRESTDWCharset, uRESTDWComponentEvents,
   uRESTDWMassiveBuffer, uRESTDWJSONInterface, uRESTDWConsts,
-  uRESTDWDataModule, uRESTDWBasicTypes, uRESTDWTools, uRESTDWDataset,
+  uRESTDWDataModule, uRESTDWBasicTypes, uRESTDWTools,
   uRESTDWBufferBase, Variants;
 
 type

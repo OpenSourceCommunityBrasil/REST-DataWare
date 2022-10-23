@@ -53,7 +53,20 @@ type
   end;
 
 
+procedure Register;
+
 implementation
+
+{$IFNDEF FPC}
+ {$if CompilerVersion < 23}
+  {$R .\RESTDWApolloDBDriver.dcr}
+ {$IFEND}
+{$ENDIF}
+
+procedure Register;
+begin
+  RegisterComponents('REST Dataware - Drivers', [TRESTDWApolloDBDriver]);
+end;
 
  { TRESTDWApolloDBDriver }
 

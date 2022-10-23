@@ -107,6 +107,12 @@ procedure Register;
 
 implementation
 
+{$IFNDEF FPC}
+ {$if CompilerVersion < 23}
+  {$R .\RESTDWZeosDriver.dcr}
+ {$IFEND}
+{$ENDIF}
+
 procedure Register;
 begin
   RegisterComponents('REST Dataware - Drivers', [TRESTDWZeosDriver]);

@@ -320,6 +320,7 @@ Type
                      ovLongWord,        ovShortint,     ovByte, ovExtended, ovConnection, ovParams,    ovStream,             //42..48
                      ovTimeStampOffset, ovObject,       ovSingle);                                                           //49..51
  TDatasetType     = (dtReflection,      dtFull,         dtDiff);
+ TCaseType        = (ctNone,            ctUpperCase,    ctLowerCase,        ctCamelCase);
  Function  GetObjectName            (TypeObject         : TTypeObject)            : String;          Overload;
  Function  GetDataModeName          (TypeObject         : TDataMode)              : String;          Overload;
  Function  GetDataModeName          (TypeObject         : String)                 : TDataMode;       Overload;

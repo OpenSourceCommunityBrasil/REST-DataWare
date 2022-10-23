@@ -59,9 +59,8 @@ type
     function isAutoCommit : boolean;
   protected
     procedure setConnection(AValue: TComponent); override;
-
-    function getConectionType : TRESTDWDatabaseType; override;
   public
+    function getConectionType : TRESTDWDatabaseType; override;
     function getQuery : TRESTDWQuery; override;
     function getTable : TRESTDWTable; override;
     function getStoreProc : TRESTDWStoreProc; override;
@@ -82,6 +81,12 @@ type
 procedure Register;
 
 implementation
+
+{$IFNDEF FPC}
+ {$if CompilerVersion < 23}
+  {$R .\RESTDWFireDACDriver.dcr}
+ {$IFEND}
+{$ENDIF}
 
 procedure Register;
 begin
@@ -257,6 +262,7 @@ class procedure TRESTDWFireDACDriver.CreateConnection(
   var
     I, vIndex : Integer;
   begin
+   vIndex := -1;
    for I := 0 To TFDConnection(AConnection).Params.Count-1 do begin
      if SameText(TFDConnection(AConnection).Params.Names[I],ParamName) then begin
        vIndex := I;
