@@ -21,8 +21,6 @@ type
     rdwDatabaseSubVersion   : integer;
   end;
 
-  TRESTDWQuery = class;
-
   { TRESTDWDataset }
 
   TRESTDWDataset = class(TComponent)
