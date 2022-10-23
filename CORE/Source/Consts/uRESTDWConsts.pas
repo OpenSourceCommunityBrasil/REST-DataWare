@@ -60,8 +60,7 @@ Type
  TRESTDWOSType             = (otUnknown, otUnix, otWindows, otDotNet);
  TRESTDWIPVersion          = (Id_IPv4, Id_IPv6);
  TRESTDWSSLVersion         = (sslvSSLv2, sslvSSLv23,  sslvSSLv3,
-                              sslvTLSv1, sslvTLSv1_1, sslvTLSv1_2,
-                              sslvTLSv1_3);
+                              sslvTLSv1, sslvTLSv1_1, sslvTLSv1_2);
  TRESTDWSSLVersions        = set of TRESTDWSSLVersion;
 
 Const
@@ -74,9 +73,9 @@ Const
  wdays                      : Array [1 .. 7]  Of String = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'); {do not localize}
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
- RESTDWVersionINFO          = 'v2.1.0-';
+ RESTDWVersionINFO          = 'v2.0.7-';
  RESTDWRelease              = '3221';
- RESTDWCodeProject          = 'Galaga - GitHub';
+ RESTDWCodeProject          = 'Savage Reign - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
  SCorruptedFileHeader       = 'Corrupted File Header';
@@ -218,7 +217,7 @@ Const
  cMessageEncoderNotFound    = 'Encoder not found';
  cDefaultBasicAuthUser      = 'testserver';
  cDefaultBasicAuthPassword  = 'testserver';
- cServerMethodClassNotAssigned = 'Property ServerMethodClass not assigned.';
+ cServerMethodClassNotAssigned = 'Property ServerMethodClass not assigned';
  cIOHandler_MaxCapturedLines = -1;
  cTimeoutDefault             = -1;
  cMaxLineLengthDefault       = 16 * 1024;
@@ -321,7 +320,6 @@ Type
                      ovLongWord,        ovShortint,     ovByte, ovExtended, ovConnection, ovParams,    ovStream,             //42..48
                      ovTimeStampOffset, ovObject,       ovSingle);                                                           //49..51
  TDatasetType     = (dtReflection,      dtFull,         dtDiff);
- TCaseType        = (ctNone,            ctUpperCase,    ctLowerCase,        ctCamelCase);
  Function  GetObjectName            (TypeObject         : TTypeObject)            : String;          Overload;
  Function  GetDataModeName          (TypeObject         : TDataMode)              : String;          Overload;
  Function  GetDataModeName          (TypeObject         : String)                 : TDataMode;       Overload;
@@ -382,6 +380,7 @@ Type
 //                                                        {$ENDIF} = Nil)           : String;
  Function  ObjectValueToFieldType   (TypeObject         : TObjectValue)           : TFieldType;
  Function  FieldTypeToObjectValue   (FieldType          : TFieldType)             : TObjectValue;
+ Function  FieldTypeToDWFieldType   (FieldType          : TFieldType)             : Byte;
  Function  DatasetStateToMassiveType(DatasetState       : TDatasetState)          : TMassiveMode;
  Function  MassiveModeToString      (MassiveMode        : TMassiveMode)           : String;
  Function  StringToMassiveMode      (Value              : String)                 : TMassiveMode;
@@ -1354,6 +1353,68 @@ Begin
    Result := 'dmDataware';
  End;
 End;
+
+Function FieldTypeToDWFieldType(FieldType  : TFieldType)   : Byte;
+begin
+ Result := dwftUnknown;
+ Case FieldType Of
+  ftString          : Result := dwftString;
+  ftSmallint        : Result := dwftSmallint;
+  ftInteger         : Result := dwftInteger;
+  ftWord            : Result := dwftWord;
+  ftBoolean         : Result := dwftBoolean;
+  ftFloat           : Result := dwftFloat;
+  ftCurrency        : Result := dwftCurrency;
+  ftBCD             : Result := dwftBCD;
+  ftDate            : Result := dwftDate;
+  ftTime            : Result := dwftTime;
+  ftDateTime        : Result := dwftDateTime;
+  ftBytes           : Result := dwftBytes;
+  ftVarBytes        : Result := dwftVarBytes;
+  ftAutoInc         : Result := dwftAutoInc;
+  ftBlob            : Result := dwftBlob;
+  ftMemo            : Result := dwftMemo;
+  ftGraphic         : Result := dwftGraphic;
+  ftFmtMemo         : Result := dwftFmtMemo;
+  ftParadoxOle      : Result := dwftParadoxOle;
+  ftDBaseOle        : Result := dwftDBaseOle;
+  ftTypedBinary     : Result := dwftTypedBinary;
+  ftCursor          : Result := dwftCursor;
+  ftFixedChar       : Result := dwftFixedChar;
+  ftWideString      : Result := dwftWideString;
+  ftLargeint        : Result := dwftLargeint;
+  ftADT             : Result := dwftADT;
+  ftArray           : Result := dwftArray;
+  ftReference       : Result := dwftReference;
+  ftDataSet         : Result := dwftDataSet;
+  ftOraBlob         : Result := dwftOraBlob;
+  ftOraClob         : Result := dwftOraClob;
+  ftVariant         : Result := dwftVariant;
+  ftInterface       : Result := dwftInterface;
+  ftIDispatch       : Result := dwftIDispatch;
+  ftGuid            : Result := dwftGuid;
+  ftTimeStamp       : Result := dwftTimeStamp;
+  ftFMTBcd          : Result := dwftFMTBcd;
+  {$IFNDEF FPC}
+   {$if CompilerVersion > 21} // Delphi 2010 acima
+    ftFixedWideChar   : Result := dwftFixedWideChar;
+    ftWideMemo        : Result := dwftWideMemo;
+    ftOraTimeStamp    : Result := dwftOraTimeStamp;
+    ftOraInterval     : Result := dwftOraInterval;
+    ftLongWord        : Result := dwftLongWord;
+    ftShortint        : Result := dwftShortint;
+    ftByte            : Result := dwftByte;
+    ftExtended        : Result := dwftExtended;
+    ftConnection      : Result := dwftConnection;
+    ftParams          : Result := dwftParams;
+    ftStream          : Result := dwftStream;
+    ftTimeStampOffset : Result := dwftTimeStampOffset;
+    ftObject          : Result := dwftObject;
+    ftSingle          : Result := dwftSingle;
+   {$IFEND}
+  {$ENDIF}
+ End;
+end;
 
 Function FieldTypeToObjectValue(FieldType  : TFieldType)   : TObjectValue;
 Begin
