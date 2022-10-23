@@ -1,4 +1,4 @@
-package uRESTDWFireDACDriver;
+package RESTDWFireDACDriver;
 
 {$R *.res}
 {$R 'RESTDWFireDACDriver.dcr'}

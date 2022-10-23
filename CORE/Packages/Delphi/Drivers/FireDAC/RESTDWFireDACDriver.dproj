@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{51492283-F4E3-4B42-AF62-715E4F0BADAF}</ProjectGuid>
-        <MainSource>uRESTDWFireDACDriver.dpk</MainSource>
+        <MainSource>RESTDWFireDACDriver.dpk</MainSource>
         <ProjectVersion>19.5</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
@@ -68,7 +68,7 @@
         <GenPackage>true</GenPackage>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <GenDll>true</GenDll>
-        <SanitizedProjectName>uRESTDWFireDACDriver</SanitizedProjectName>
+        <SanitizedProjectName>RESTDWFireDACDriver</SanitizedProjectName>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <DCC_DcuOutput>..\..\..\..\compiled</DCC_DcuOutput>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
@@ -179,7 +179,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">uRESTDWFireDACDriver.dpk</Source>
+                    <Source Name="MainSource">RESTDWFireDACDriver.dpk</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\AbbreviaFMXDDesign260.bpl">TurboPack Abbrevia FMX Designtime Delphi package</Excluded_Packages>
@@ -194,9 +194,9 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule"/>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\uRESTDWFireDACDriver.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\RESTDWFireDACDriver.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>uRESTDWFireDACDriver.bpl</RemoteName>
+                        <RemoteName>RESTDWFireDACDriver.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
