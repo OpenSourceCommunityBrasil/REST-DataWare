@@ -10,11 +10,11 @@ uses
   {$IFDEF FPC}
     LResources,
   {$ENDIF}
-  Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes, MyClasses, MyAccess,
-  MyScript, DADump, MyDump, VirtualTable, MemDS, DBAccess, DB;
+  Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes, DB, MemDS,
+  DBAccess, Uni, uRESTDWMemtable;
 
 const
-  crdwConnectionNotIsUniDAC = 'Componente não é um MyConnection';
+  crdwConnectionNotIsUniDAC = 'Componente não é um UniConnection';
 
 type
   { TRESTDWUniDACDataset }
@@ -89,19 +89,19 @@ end;
 
 procedure TRESTDWUniDACStoreProc.ExecProc;
 var
-  qry : TMyStoredProc;
+  qry : TUniStoredProc;
 begin
   inherited ExecProc;
-  qry := TMyStoredProc(Self.Owner);
+  qry := TUniStoredProc(Self.Owner);
   qry.ExecProc;
 end;
 
 procedure TRESTDWUniDACStoreProc.Prepare;
 var
-  qry : TMyStoredProc;
+  qry : TUniStoredProc;
 begin
   inherited Prepare;
-  qry := TMyStoredProc(Self.Owner);
+  qry := TUniStoredProc(Self.Owner);
   qry.Prepare;
 end;
 
@@ -109,20 +109,26 @@ end;
 
 procedure TRESTDWUniDACDataset.SaveToStream(stream : TStream);
 var
-  qry : TMyDataset;
+  vDWMemtable : TRESTDWMemtable;
+  qry : TCustomUniDataSet;
 begin
   inherited SaveToStream(stream);
-  qry := TMyDataset(Self.Owner);
-  qry.SaveToStream(stream);
-
-  stream.Position := 0;
+  qry := TCustomUniDataSet(Self.Owner);
+  vDWMemtable := TRESTDWMemtable.Create(Nil);
+  try
+    vDWMemtable.Assign(qry);
+    vDWMemtable.SaveToStream(stream);
+    stream.Position := 0;
+  finally
+    FreeAndNil(vDWMemtable);
+  end;
 end;
 
  { TRESTDWUniDACDriver }
 
 procedure TRESTDWUniDACDriver.setConnection(AValue : TComponent);
 begin
-  if (Assigned(AValue)) and (not AValue.InheritsFrom(TMyConnection)) then
+  if (Assigned(AValue)) and (not AValue.InheritsFrom(TUniConnection)) then
     raise Exception.Create(crdwConnectionNotIsUniDAC);
   inherited setConnection(AValue);
 end;
@@ -134,33 +140,36 @@ end;
 
 function TRESTDWUniDACDriver.getQuery : TRESTDWQuery;
 var
-  qry : TMyQuery;
+  qry : TUniQuery;
 begin
-  qry := TMyQuery.Create(Self);
-  qry.Connection := TMyConnection(Connection);
+  qry := TUniQuery.Create(Self);
+  qry.Connection := TUniConnection(Connection);
+  qry.Options.SetEmptyStrToNull := StrsEmpty2Null;
+  qry.Options.TrimVarChar       := StrsTrim;
+  qry.Options.TrimFixedChar     := StrsTrim;
 
   Result := TRESTDWUniDACQuery.Create(qry);
 end;
 
 function TRESTDWUniDACDriver.getTable : TRESTDWTable;
 var
-  qry : TMyTable;
+  qry : TUniTable;
 begin
-  qry := TMyTable.Create(Self);
-  qry.Connection := TMyConnection(Connection);
+  qry := TUniTable.Create(Self);
+  qry.Connection := TUniConnection(Connection);
 
-  Result := TRESTDWUniDACQuery.Create(qry);
+  Result := TRESTDWTable.Create(qry);
 end;
 
 function TRESTDWUniDACDriver.getStoreProc : TRESTDWStoreProc;
 var
-  qry : TMyStoredProc;
+  qry : TUniStoredProc;
 begin
-  qry := TMyStoredProc.Create(Self);
-  qry.Connection := TMyConnection(Connection);
-  qry.FormatOptions.StrsTrim       := StrsTrim;
-  qry.FormatOptions.StrsEmpty2Null := StrsEmpty2Null;
-  qry.FormatOptions.StrsTrim2Len   := StrsTrim2Len;
+  qry := TUniStoredProc.Create(Self);
+  qry.Connection := TUniConnection(Connection);
+  qry.Options.SetEmptyStrToNull := StrsEmpty2Null;
+  qry.Options.TrimVarChar       := StrsTrim;
+  qry.Options.TrimFixedChar     := StrsTrim;
 
   Result := TRESTDWUniDACStoreProc.Create(qry);
 end;
@@ -168,14 +177,14 @@ end;
 procedure TRESTDWUniDACDriver.Connect;
 begin
   if Assigned(Connection) then
-    TMyConnection(Connection).Open;
+    TUniConnection(Connection).Open;
   inherited Connect;
 end;
 
 procedure TRESTDWUniDACDriver.Disconect;
 begin
   if Assigned(Connection) then
-    TMyConnection(Connection).Close;
+    TUniConnection(Connection).Close;
   inherited Disconect;
 end;
 
@@ -183,35 +192,35 @@ function TRESTDWUniDACDriver.isConnected : boolean;
 begin
   Result:=inherited isConnected;
   if Assigned(Connection) then
-    Result := TMyConnection(Connection).Connected;
+    Result := TUniConnection(Connection).Connected;
 end;
 
 function TRESTDWUniDACDriver.connInTransaction : boolean;
 begin
   Result:=inherited connInTransaction;
   if Assigned(Connection) then
-    Result := TMyConnection(Connection).InTransaction;
+    Result := TUniConnection(Connection).InTransaction;
 end;
 
 procedure TRESTDWUniDACDriver.connStartTransaction;
 begin
   inherited connStartTransaction;
   if Assigned(Connection) then
-    Result := TMyConnection(Connection).StartTransaction;
+    TUniConnection(Connection).StartTransaction;
 end;
 
 procedure TRESTDWUniDACDriver.connRollback;
 begin
   inherited connRollback;
   if Assigned(Connection) then
-    Result := TMyConnection(Connection).Rollback;
+    TUniConnection(Connection).Rollback;
 end;
 
 procedure TRESTDWUniDACDriver.connCommit;
 begin
   inherited connCommit;
   if Assigned(Connection) then
-    Result := TMyConnection(Connection).Commit;
+    TUniConnection(Connection).Commit;
 end;
 
 class procedure TRESTDWUniDACDriver.CreateConnection(const AConnectionDefs : TConnectionDefs;
@@ -224,10 +233,10 @@ end;
 
 procedure TRESTDWUniDACQuery.createSequencedField(seqname, field : string);
 var
-  qry : TMyQuery;
-  fd : TMyField;
+  qry : TUniQuery;
+  fd : TField;
 begin
-  qry := TMyQuery(Self.Owner);
+  qry := TUniQuery(Self.Owner);
   fd := qry.FindField(field);
   if fd <> nil then begin
     fd.Required          := False;
@@ -237,27 +246,27 @@ end;
 
 procedure TRESTDWUniDACQuery.ExecSQL;
 var
-  qry : TMyQuery;
+  qry : TUniQuery;
 begin
   inherited ExecSQL;
-  qry := TMyQuery(Self.Owner);
+  qry := TUniQuery(Self.Owner);
   qry.ExecSQL;
 end;
 
 procedure TRESTDWUniDACQuery.Prepare;
 var
-  qry : TMyQuery;
+  qry : TUniQuery;
 begin
   inherited Prepare;
-  qry := TMyQuery(Self.Owner);
+  qry := TUniQuery(Self.Owner);
   qry.Prepare;
 end;
 
 function TRESTDWUniDACQuery.RowsAffected : Int64;
 var
-  qry : TMyQuery;
+  qry : TUniQuery;
 begin
-  qry := TMyQuery(Self.Owner);
+  qry := TUniQuery(Self.Owner);
   Result := qry.RowsAffected;
 end;
 

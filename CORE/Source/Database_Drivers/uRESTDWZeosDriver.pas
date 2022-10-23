@@ -11,8 +11,8 @@ uses
     LResources,
   {$ENDIF}
   Classes, SysUtils, uRESTDWDriverBase, ZConnection, uRESTDWBasicTypes,
-  ZDataset, ZSequence, ZDbcIntfs, ZAbstractRODataset, uRESTDWDataset,
-  ZAbstractDataset, ZStoredProcedure;
+  ZDataset, ZSequence, ZDbcIntfs, ZAbstractRODataset, ZAbstractDataset,
+  ZStoredProcedure, uRESTDWMemtable;
 
 const
   {$IFDEF FPC}
@@ -154,7 +154,7 @@ begin
     stream.Position := 0;
   finally
     FreeAndNil(vDWMemtable);
-  End;
+  end;
 end;
 
 { TRESTDWZeosDriver }

@@ -59,8 +59,8 @@ type
     function isAutoCommit : boolean;
   protected
     procedure setConnection(AValue: TComponent); override;
-  public
     function getConectionType : TRESTDWDatabaseType; override;
+  public
     function getQuery : TRESTDWQuery; override;
     function getTable : TRESTDWTable; override;
     function getStoreProc : TRESTDWStoreProc; override;
