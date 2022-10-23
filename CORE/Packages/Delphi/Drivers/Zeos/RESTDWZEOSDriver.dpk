@@ -1,15 +1,8 @@
-package RESTDWDriverZEOS;
+package RESTDWZEOSDriver;
 
-{$IFNDEF FPC}
- {$IFNDEF VER150 or VER160 or VER170 or VER180 or
-          VER185 or VER190 or VER200 or VER210 or
-          VER220}
-  {$R RESTDWDriverZEOS.res  RESTDWDriverZEOS.rc}
-  {$R RESTDWDriverZEOS.dres RESTDWDriverZEOS.rc}
-  {$R *.res}
-  {$R *.dres}
- {$ENDIF}
-{$ENDIF}
+{$R *.res}
+{$R 'RESTDWZeosDriver.dcr'}
+{$R *.dres}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -47,6 +40,6 @@ requires
   ZParseSql;
 
 contains
-  uRESTDWDriverZEOS in '..\..\..\..\Source\Database_Drivers\uRESTDWDriverZEOS.pas';
+  uRESTDWZeosDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWZeosDriver.pas';
 
 end.
