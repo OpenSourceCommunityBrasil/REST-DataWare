@@ -1108,7 +1108,7 @@ Begin
    Begin
     BufferStream.InputBytes(VarToBytes(Changes.Count > 0, varBoolean));
     If Changes.Count > 0 Then
-     BufferStream.InputBytes(VarToBytes(EncodeStrings(Changes.Text), varString));
+     BufferStream.InputBytes(VarToBytes(EncodeStrings(Changes.Text{$IFDEF FPC}, TDatabaseCharSet.csUTF8{$ENDIF}), varString));
     If vPrimaryValues = Nil Then
      BufferStream.InputBytes(VarToBytes(False, varBoolean))
     Else
@@ -2332,7 +2332,7 @@ Var
          End;
         aBool := BytesToVar(BufferStream.ReadBytes, varBoolean);
         If aBool Then
-         MassiveLine.vChanges.Text := DecodeStrings(BytesToVar(BufferStream.ReadBytes, varString));
+         MassiveLine.vChanges.Text := DecodeStrings(BytesToVar(BufferStream.ReadBytes, varString){$IFDEF FPC}, TDatabaseCharSet.csUTF8{$ENDIF});
         aBool := BytesToVar(BufferStream.ReadBytes, varBoolean);
         If aBool Then
          Begin

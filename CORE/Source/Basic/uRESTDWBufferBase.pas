@@ -237,7 +237,7 @@ Begin
   varDate      : Begin
                   S := SizeOf(Date);
                   SetLength(Result, S);
-                  aDate    := Value;
+                  aDate    := VarToDateTime(Value);
                   Move(aDate, Pointer(@Result[0])^, S);
                  End;
   varBoolean   : Begin
