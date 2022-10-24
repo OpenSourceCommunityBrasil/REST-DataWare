@@ -2882,7 +2882,7 @@ Function TRESTDWDriverZeos.ApplyUpdates(MassiveStream          : TStream;
                                         Params                 : TRESTDWParams;
                                         Var Error              : Boolean;
                                         Var MessageError       : String;
-                                        Var RowsAffected       : Integer)        : TJSONValue;Overload;Override;
+                                        Var RowsAffected       : Integer)        : TJSONValue;
 Var
  vTempQuery     : TZQuery;
  vZSequence     : TZSequence;
