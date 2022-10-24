@@ -135,7 +135,8 @@ end;
 
 function TRESTDWMyDACDriver.getConectionType : TRESTDWDatabaseType;
 begin
-  Result := inherited getConectionType;
+  // somente MySQL
+  Result := dbtMySQL;
 end;
 
 function TRESTDWMyDACDriver.getQuery : TRESTDWQuery;
@@ -224,9 +225,20 @@ begin
 end;
 
 class procedure TRESTDWMyDACDriver.CreateConnection(const AConnectionDefs : TConnectionDefs;
-                                                     var AConnection : TComponent);
+                                                    var AConnection : TComponent);
 begin
   inherited CreateConnection(AConnectionDefs, AConnection);
+  if Assigned(AConnectionDefs) then begin
+    if AConnectionDefs.DriverType = dbtMySQL then begin
+      with TMyConnection(AConnection) do begin
+        Server   := AConnectionDefs.HostName;
+        Database := AConnectionDefs.DatabaseName;
+        Username := AConnectionDefs.Username;
+        Password := AConnectionDefs.Password;
+        Port     := AConnectionDefs.DBPort;
+      end;
+    end;
+  end;
 end;
 
 { TRESTDWMyDACQuery }

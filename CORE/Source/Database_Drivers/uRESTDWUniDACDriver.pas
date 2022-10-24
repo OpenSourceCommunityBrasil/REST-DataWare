@@ -14,6 +14,38 @@ uses
   DBAccess, Uni, uRESTDWMemtable;
 
 const
+  {$IFDEF FPC}
+    rdwUniDACProtocols : array of string = ('access','advantage','ase','db2',
+                      'dbf','interbase','mysql','mongodb','nexusdb','obdc',
+                      'oracle','postgresql','redshift','sql server','sqlite',
+                      'bigcommerce','bigquery','dynamics 365','freshbooks',
+                      'hubspot','magento','mailchimp','netsuite','quickbooks',
+                      'salesforce mc','salesforce','sugar crm','zoho crm');
+
+    rdwUniDACDbType : array of TRESTDWDatabaseType = (dbtAccess,dbtUndefined,
+                   dbtUndefined,dbtUndefined,dbtDbase,dbtInterbase,dbtMySQL,
+                   dbtUndefined,dbtUndefined,dbtODBC,dbtOracle,dbtPostgreSQL,
+                   dbtUndefined,dbtMsSQL,dbtSQLLite,dbtUndefined,dbtUndefined,
+                   dbtUndefined,dbtUndefined,dbtUndefined,dbtUndefined,
+                   dbtUndefined,dbtUndefined,dbtUndefined,dbtUndefined,
+                   dbtUndefined,dbtUndefined,dbtUndefined);
+  {$ELSE}
+    rdwUniDACProtocols : array of string = ['access','advantage','ase','db2',
+                      'dbf','interbase','mysql','mongodb','nexusdb','obdc',
+                      'oracle','postgresql','redshift','sql server','sqlite',
+                      'bigcommerce','bigquery','dynamics 365','freshbooks',
+                      'hubspot','magento','mailchimp','netsuite','quickbooks',
+                      'salesforce mc','salesforce','sugar crm','zoho crm'];
+
+    rdwUniDACDbType : array of TRESTDWDatabaseType = [dbtAccess,dbtUndefined,
+                   dbtUndefined,dbtUndefined,dbtDbase,dbtInterbase,dbtMySQL,
+                   dbtUndefined,dbtUndefined,dbtODBC,dbtOracle,dbtPostgreSQL,
+                   dbtUndefined,dbtMsSQL,dbtSQLLite,dbtUndefined,dbtUndefined,
+                   dbtUndefined,dbtUndefined,dbtUndefined,dbtUndefined,
+                   dbtUndefined,dbtUndefined,dbtUndefined,dbtUndefined,
+                   dbtUndefined,dbtUndefined,dbtUndefined];
+  {$ENDIF}
+
   crdwConnectionNotIsUniDAC = 'Componente não é um UniConnection';
 
 type
@@ -134,8 +166,24 @@ begin
 end;
 
 function TRESTDWUniDACDriver.getConectionType : TRESTDWDatabaseType;
+var
+  prot : string;
+  i : integer;
 begin
-  Result := inherited getConectionType;
+  Result:=inherited getConectionType;
+  if not Assigned(Connection) then
+    Exit;
+
+  prot := LowerCase(TUniConnection(Connection).ProviderName);
+
+  i := 0;
+  while i < Length(rdwUniDACProtocols) do begin
+    if Pos(rdwUniDACProtocols[i],prot) > 0 then begin
+      Result := rdwUniDACDbType[i];
+      Break;
+    end;
+    i := i + 1;
+  end;
 end;
 
 function TRESTDWUniDACDriver.getQuery : TRESTDWQuery;
@@ -227,6 +275,31 @@ class procedure TRESTDWUniDACDriver.CreateConnection(const AConnectionDefs : TCo
                                                      var AConnection : TComponent);
 begin
   inherited CreateConnection(AConnectionDefs, AConnection);
+  if Assigned(AConnectionDefs) then begin
+    case AConnectionDefs.DriverType Of
+      dbtUndefined  : TUniConnection(AConnection).ProviderName := '';
+      dbtAccess     : TUniConnection(AConnection).ProviderName := 'access';
+      dbtDbase      : TUniConnection(AConnection).ProviderName := 'dbf';
+      dbtParadox    : TUniConnection(AConnection).ProviderName := '';
+      dbtFirebird   : TUniConnection(AConnection).ProviderName := 'interbase';
+      dbtInterbase  : TUniConnection(AConnection).ProviderName := 'interbase';
+      dbtMySQL      : TUniConnection(AConnection).ProviderName := 'mysql';
+      dbtSQLLite    : TUniConnection(AConnection).ProviderName := 'sqlite';
+      dbtOracle     : TUniConnection(AConnection).ProviderName := 'oracle';
+      dbtMsSQL      : TUniConnection(AConnection).ProviderName := 'sql server';
+      dbtODBC       : TUniConnection(AConnection).ProviderName := 'odbc';
+      dbtPostgreSQL : TUniConnection(AConnection).ProviderName := 'postgresql';
+      dbtAdo        : TUniConnection(AConnection).ProviderName := '';
+    end;
+  end;
+
+  with TUniConnection(AConnection) do begin
+    Server   := AConnectionDefs.HostName;
+    Database := AConnectionDefs.DatabaseName;
+    Username := AConnectionDefs.Username;
+    Password := AConnectionDefs.Password;
+    Port     := AConnectionDefs.DBPort;
+  end;
 end;
 
 { TRESTDWUniDACQuery }
