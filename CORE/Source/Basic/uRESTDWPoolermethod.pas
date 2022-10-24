@@ -572,24 +572,25 @@ Begin
 End;
 
 Function TRESTDWPoolerMethodClient.ApplyUpdates(Massive                 : TMassiveDatasetBuffer;
-                                            Pooler, Method_Prefix,
-                                            SQL                     : String;
-                                            Params                  : TRESTDWParams;
-                                            Var Error               : Boolean;
-                                            Var MessageError        : String;
-                                            Var SocketError         : Boolean;
-                                            Var RowsAffected        : Integer;
-                                            TimeOut                 : Integer = 3000;
-                                            ConnectTimeOut          : Integer = 3000;
-                                            MassiveBuffer           : String  = '';
-                                            ConnectionDefs          : TObject           = Nil;
-                                            RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TJSONValue;
+                                                Pooler, Method_Prefix,
+                                                SQL                     : String;
+                                                Params                  : TRESTDWParams;
+                                                Var Error               : Boolean;
+                                                Var MessageError        : String;
+                                                Var SocketError         : Boolean;
+                                                Var RowsAffected        : Integer;
+                                                TimeOut                 : Integer = 3000;
+                                                ConnectTimeOut          : Integer = 3000;
+                                                MassiveBuffer           : String  = '';
+                                                ConnectionDefs          : TObject           = Nil;
+                                                RESTClientPooler        : TRESTClientPoolerBase = Nil) : TJSONValue;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse            : String;
  JSONParam            : TJSONParam;
  DWParams             : TRESTDWParams;
  bJsonValue           : TRESTDWJSONInterfaceObject;
+ vMassiveStream       : TStream;
 Begin
  Result := Nil;
  RowsAffected  := 0;
@@ -644,7 +645,20 @@ Begin
  JSONParam.ParamName                   := 'Massive';
  JSONParam.ObjectDirection             := odIn;
  If Massive <> Nil Then
-  JSONParam.AsString                   := TMassiveDatasetBuffer(Massive).ToJSON
+  Begin
+   If vBinaryRequest Then
+    Begin
+     vMassiveStream := TMemoryStream.Create;
+     Try
+      TMassiveDatasetBuffer(Massive).SaveToStream(vMassiveStream, Massive);
+      JSONParam.LoadFromStream(vMassiveStream);
+     Finally
+      FreeAndNil(vMassiveStream);
+     End;
+    End
+   Else
+    JSONParam.AsString                 := TMassiveDatasetBuffer(Massive).ToJSON;
+  End
  Else If MassiveBuffer <> '' Then
   JSONParam.AsString                   := MassiveBuffer;
  DWParams.Add(JSONParam);
