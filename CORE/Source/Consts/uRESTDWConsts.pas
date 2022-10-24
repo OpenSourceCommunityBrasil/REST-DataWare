@@ -218,7 +218,7 @@ Const
  cMessageEncoderNotFound    = 'Encoder not found';
  cDefaultBasicAuthUser      = 'testserver';
  cDefaultBasicAuthPassword  = 'testserver';
- cServerMethodClassNotAssigned = 'Property ServerMethodClass not assigned.';
+ cServerMethodClassNotAssigned = 'Property ServerMethodClass not assigned';
  cIOHandler_MaxCapturedLines = -1;
  cTimeoutDefault             = -1;
  cMaxLineLengthDefault       = 16 * 1024;
@@ -382,6 +382,7 @@ Type
 //                                                        {$ENDIF} = Nil)           : String;
  Function  ObjectValueToFieldType   (TypeObject         : TObjectValue)           : TFieldType;
  Function  FieldTypeToObjectValue   (FieldType          : TFieldType)             : TObjectValue;
+ Function  FieldTypeToDWFieldType   (FieldType          : TFieldType)             : Byte;
  Function  DatasetStateToMassiveType(DatasetState       : TDatasetState)          : TMassiveMode;
  Function  MassiveModeToString      (MassiveMode        : TMassiveMode)           : String;
  Function  StringToMassiveMode      (Value              : String)                 : TMassiveMode;
@@ -1354,6 +1355,68 @@ Begin
    Result := 'dmDataware';
  End;
 End;
+
+Function FieldTypeToDWFieldType(FieldType  : TFieldType)   : Byte;
+begin
+ Result := dwftUnknown;
+ Case FieldType Of
+  ftString          : Result := dwftString;
+  ftSmallint        : Result := dwftSmallint;
+  ftInteger         : Result := dwftInteger;
+  ftWord            : Result := dwftWord;
+  ftBoolean         : Result := dwftBoolean;
+  ftFloat           : Result := dwftFloat;
+  ftCurrency        : Result := dwftCurrency;
+  ftBCD             : Result := dwftBCD;
+  ftDate            : Result := dwftDate;
+  ftTime            : Result := dwftTime;
+  ftDateTime        : Result := dwftDateTime;
+  ftBytes           : Result := dwftBytes;
+  ftVarBytes        : Result := dwftVarBytes;
+  ftAutoInc         : Result := dwftAutoInc;
+  ftBlob            : Result := dwftBlob;
+  ftMemo            : Result := dwftMemo;
+  ftGraphic         : Result := dwftGraphic;
+  ftFmtMemo         : Result := dwftFmtMemo;
+  ftParadoxOle      : Result := dwftParadoxOle;
+  ftDBaseOle        : Result := dwftDBaseOle;
+  ftTypedBinary     : Result := dwftTypedBinary;
+  ftCursor          : Result := dwftCursor;
+  ftFixedChar       : Result := dwftFixedChar;
+  ftWideString      : Result := dwftWideString;
+  ftLargeint        : Result := dwftLargeint;
+  ftADT             : Result := dwftADT;
+  ftArray           : Result := dwftArray;
+  ftReference       : Result := dwftReference;
+  ftDataSet         : Result := dwftDataSet;
+  ftOraBlob         : Result := dwftOraBlob;
+  ftOraClob         : Result := dwftOraClob;
+  ftVariant         : Result := dwftVariant;
+  ftInterface       : Result := dwftInterface;
+  ftIDispatch       : Result := dwftIDispatch;
+  ftGuid            : Result := dwftGuid;
+  ftTimeStamp       : Result := dwftTimeStamp;
+  ftFMTBcd          : Result := dwftFMTBcd;
+  {$IFNDEF FPC}
+   {$if CompilerVersion > 21} // Delphi 2010 acima
+    ftFixedWideChar   : Result := dwftFixedWideChar;
+    ftWideMemo        : Result := dwftWideMemo;
+    ftOraTimeStamp    : Result := dwftOraTimeStamp;
+    ftOraInterval     : Result := dwftOraInterval;
+    ftLongWord        : Result := dwftLongWord;
+    ftShortint        : Result := dwftShortint;
+    ftByte            : Result := dwftByte;
+    ftExtended        : Result := dwftExtended;
+    ftConnection      : Result := dwftConnection;
+    ftParams          : Result := dwftParams;
+    ftStream          : Result := dwftStream;
+    ftTimeStampOffset : Result := dwftTimeStampOffset;
+    ftObject          : Result := dwftObject;
+    ftSingle          : Result := dwftSingle;
+   {$IFEND}
+  {$ENDIF}
+ End;
+end;
 
 Function FieldTypeToObjectValue(FieldType  : TFieldType)   : TObjectValue;
 Begin

@@ -55,7 +55,7 @@ Uses
  uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator,
  uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
  uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData,
- uRESTDWMemtable, uRESTDWBufferBase;
+ uRESTDWMemtable, uRESTDWBufferBase, uRESTDWDriverBase;
 
 Type
  TOnExecuteData           = Procedure                                        Of Object;
@@ -1385,7 +1385,7 @@ Type
  TRESTDWPoolerDB  = Class(TRESTDWComponent)
  Private
 //  FLock          : TCriticalSection;
-  vRESTDriver    : TRESTDWDriver;
+  vRESTDriver    : TRESTDWDriverBase;
   vActive,
   vStrsTrim,
   vStrsEmpty2Null,
@@ -1395,8 +1395,8 @@ Type
   vAccessTag,
   vMessagePoolerOff : String;
   vParamCreate   : Boolean;
-  Procedure SetConnection(Value : TRESTDWDriver);
-  Function  GetConnection  : TRESTDWDriver;
+  Procedure SetConnection(Value : TRESTDWDriverBase);
+  Function  GetConnection  : TRESTDWDriverBase;
  protected
   procedure Notification(AComponent: TComponent; Operation: TOperation); override;
  Public
@@ -1430,16 +1430,16 @@ Type
   Constructor Create(AOwner : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                     //Destroy a Classe
  Published
-  Property    RESTDriver       : TRESTDWDriver Read GetConnection     Write SetConnection;
-  Property    Compression      : Boolean       Read vCompression      Write vCompression;
-  Property    Encoding         : TEncodeSelect Read vEncoding         Write vEncoding;
-  Property    StrsTrim         : Boolean       Read vStrsTrim         Write vStrsTrim;
-  Property    StrsEmpty2Null   : Boolean       Read vStrsEmpty2Null   Write vStrsEmpty2Null;
-  Property    StrsTrim2Len     : Boolean       Read vStrsTrim2Len     Write vStrsTrim2Len;
-  Property    Active           : Boolean       Read vActive           Write vActive;
-  Property    PoolerOffMessage : String        Read vMessagePoolerOff Write vMessagePoolerOff;
-  Property    AccessTag        : String        Read vAccessTag        Write vAccessTag;
-  Property    ParamCreate      : Boolean       Read vParamCreate      Write vParamCreate;
+  Property    RESTDriver       : TRESTDWDriverBase Read GetConnection     Write SetConnection;
+  Property    Compression      : Boolean           Read vCompression      Write vCompression;
+  Property    Encoding         : TEncodeSelect     Read vEncoding         Write vEncoding;
+  Property    StrsTrim         : Boolean           Read vStrsTrim         Write vStrsTrim;
+  Property    StrsEmpty2Null   : Boolean           Read vStrsEmpty2Null   Write vStrsEmpty2Null;
+  Property    StrsTrim2Len     : Boolean           Read vStrsTrim2Len     Write vStrsTrim2Len;
+  Property    Active           : Boolean           Read vActive           Write vActive;
+  Property    PoolerOffMessage : String            Read vMessagePoolerOff Write vMessagePoolerOff;
+  Property    AccessTag        : String            Read vAccessTag        Write vAccessTag;
+  Property    ParamCreate      : Boolean           Read vParamCreate      Write vParamCreate;
 End;
 
  Function GeTRESTDWParams(Params : TParams; Encondig : TEncodeSelect) : TRESTDWParams;
@@ -1557,12 +1557,12 @@ Begin
   Inherited;
 End;
 
-Function  TRESTDWPoolerDB.GetConnection : TRESTDWDriver;
+Function  TRESTDWPoolerDB.GetConnection : TRESTDWDriverBase;
 Begin
  Result := vRESTDriver;
 End;
 
-Procedure TRESTDWPoolerDB.SetConnection(Value : TRESTDWDriver);
+Procedure TRESTDWPoolerDB.SetConnection(Value : TRESTDWDriverBase);
 Begin
  If vRESTDriver <> Value Then
   vRESTDriver := Value;

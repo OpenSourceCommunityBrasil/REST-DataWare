@@ -2,21 +2,21 @@
   This source is only used to compile and install the package.
  }
 
-unit RESTDWDriverZEOS;
+ unit restdwlazsqldriver;
 
 {$warn 5023 off : no warning about unused units}
 interface
 
 uses
-  uRESTDWDriverZEOS, uRESTDWDriverZEOSReg, LazarusPackageIntf;
+  uRESTDWLazSQLDriver, LazarusPackageIntf;
 
-implementation
+ implementation
 
 procedure Register;
 begin
-  RegisterUnit('uRESTDWDriverZEOSReg', @uRESTDWDriverZEOSReg.Register);
+  RegisterUnit('uRESTDWLazSQLDriver', @uRESTDWLazSQLDriver.Register);
 end;
 
 initialization
-  RegisterPackage('RESTDWDriverZEOS', @Register);
+  RegisterPackage('restdwlazsqldriver', @Register);
 end.

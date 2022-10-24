@@ -1,15 +1,7 @@
-package RESTDWDriverZEOS;
+package RESTDWUniDACDriver;
 
-{$IFNDEF FPC}
- {$IFNDEF VER150 or VER160 or VER170 or VER180 or
-          VER185 or VER190 or VER200 or VER210 or
-          VER220}
-  {$R RESTDWDriverZEOS.res  RESTDWDriverZEOS.rc}
-  {$R RESTDWDriverZEOS.dres RESTDWDriverZEOS.rc}
-  {$R *.res}
-  {$R *.dres}
- {$ENDIF}
-{$ENDIF}
+{$R *.res}
+{$R 'RESTDWUniDACDriver.dcr'}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -34,19 +26,14 @@ package RESTDWDriverZEOS;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'REST Dataware - Driver ZEOS'}
+{$DESCRIPTION 'REST Dataware - Driver UNIDAC'}
 {$IMPLICITBUILD ON}
 
 requires
   rtl,
-  RESTDWCore,
-  ZComponent,
-  ZDbc,
-  ZPlain,
-  ZCore,
-  ZParseSql;
+  RESTDWCore;
 
 contains
-  uRESTDWDriverZEOS in '..\..\..\..\Source\Database_Drivers\uRESTDWDriverZEOS.pas';
+  uRESTDWUniDACDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWUniDACDriver.pas';
 
 end.
