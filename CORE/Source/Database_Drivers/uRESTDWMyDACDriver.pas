@@ -1,9 +1,5 @@
 ﻿unit uRESTDWMyDACDriver;
 
-{$IFDEF FPC}
-  {$mode objfpc}{$H+}
-{$ENDIF}
-
 interface
 
 uses
@@ -73,12 +69,6 @@ type
 procedure Register;
 
 implementation
-
-{$IFNDEF FPC}
- {$if CompilerVersion < 23}
-  {$R .\RESTDWMyDACDriver.dcr}
- {$IFEND}
-{$ENDIF}
 
 procedure Register;
 begin
@@ -284,7 +274,7 @@ end;
 
 {$IFDEF FPC}
 initialization
-  {$I ../../Packages/Lazarus/Drivers/MyDAC/restdwMyDACdriver.lrs}
+  {$I restdwMyDACdriver.lrs}
 {$ENDIF}
 
 end.

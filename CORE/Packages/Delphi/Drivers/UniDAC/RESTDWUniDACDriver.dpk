@@ -2,7 +2,6 @@ package RESTDWUniDACDriver;
 
 {$R *.res}
 {$R 'RESTDWUniDACDriver.dcr'}
-{$R *.dres}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -32,9 +31,7 @@ package RESTDWUniDACDriver;
 
 requires
   rtl,
-  RESTDWCore,
-  unidac260,
-  dac260;
+  RESTDWCore;
 
 contains
   uRESTDWUniDACDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWUniDACDriver.pas';

@@ -1,9 +1,5 @@
 ﻿unit uRESTDWFireDACDriver;
 
-{$IFDEF FPC}
-  {$mode objfpc}{$H+}
-{$ENDIF}
-
 interface
 
 uses
@@ -81,12 +77,6 @@ type
 procedure Register;
 
 implementation
-
-{$IFNDEF FPC}
- {$if CompilerVersion < 23}
-  {$R .\RESTDWFireDACDriver.dcr}
- {$IFEND}
-{$ENDIF}
 
 procedure Register;
 begin

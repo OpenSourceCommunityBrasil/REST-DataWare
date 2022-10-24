@@ -5240,7 +5240,7 @@ Begin
             Else If vTempQuery.Params[A].DataType in [ftGuid] Then
              Begin
               If (Not (Params[I].IsNull)) Then
-                vTempQuery.Params[A].Value := Variant(StringToGUID(Params[I].AsString))
+                vTempQuery.Params[A].Value := Params[I].AsString
               Else
                 vTempQuery.Params[A].Clear;
              End

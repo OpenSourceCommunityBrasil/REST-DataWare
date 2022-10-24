@@ -1,9 +1,5 @@
 ﻿unit uRESTDWZeosDriver;
 
-{$IFDEF FPC}
-  {$mode objfpc}{$H+}
-{$ENDIF}
-
 interface
 
 uses
@@ -106,12 +102,6 @@ type
 procedure Register;
 
 implementation
-
-{$IFNDEF FPC}
- {$if CompilerVersion < 23}
-  {$R .\RESTDWZeosDriver.dcr}
- {$IFEND}
-{$ENDIF}
 
 procedure Register;
 begin
@@ -371,7 +361,7 @@ end;
 
 {$IFDEF FPC}
 initialization
-  {$I ../../Packages/Lazarus/Drivers/zeos/restdwzeosdriver.lrs}
+  {$I restdwzeosdriver.lrs}
 {$ENDIF}
 
 end.

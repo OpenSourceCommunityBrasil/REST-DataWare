@@ -106,12 +106,6 @@ procedure Register;
 
 implementation
 
-{$IFNDEF FPC}
- {$if CompilerVersion < 23}
-  {$R .\RESTDWUniDACDriver.dcr}
- {$IFEND}
-{$ENDIF}
-
 procedure Register;
 begin
   RegisterComponents('REST Dataware - Drivers', [TRESTDWUniDACDriver]);
@@ -345,7 +339,7 @@ end;
 
 {$IFDEF FPC}
 initialization
-  {$I ../../Packages/Lazarus/Drivers/unidac/restdwunidacdriver.lrs}
+  {$I restdwunidacdriver.lrs}
 {$ENDIF}
 
 end.
