@@ -260,16 +260,16 @@ class procedure TRESTDWAnyDACDriver.CreateConnection(const AConnectionDefs : TCo
   var
     I, vIndex : Integer;
   begin
-   for I := 0 To TSQLConnection(AConnection).Params.Count-1 do begin
-     if SameText(TSQLConnection(AConnection).Params.Names[I],ParamName) then begin
+   for I := 0 To TADConnection(AConnection).Params.Count-1 do begin
+     if SameText(TADConnection(AConnection).Params.Names[I],ParamName) then begin
        vIndex := I;
        Break;
      end;
    end;
    if vIndex = -1 Then
-     TSQLConnection(AConnection).Params.Add(Format('%s=%s', [Lowercase(ParamName), Value]))
+     TADConnection(AConnection).Params.Add(Format('%s=%s', [Lowercase(ParamName), Value]))
    else
-     TSQLConnection(AConnection).Params[vIndex] := Format('%s=%s', [Lowercase(ParamName), Value]);
+     TADConnection(AConnection).Params[vIndex] := Format('%s=%s', [Lowercase(ParamName), Value]);
   end;
 begin
   inherited CreateConnection(AConnectionDefs, AConnection);
