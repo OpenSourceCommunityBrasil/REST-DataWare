@@ -189,8 +189,6 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="RESTDWCore.dcp"/>
-        <DCCReference Include="IcsVclD110Run.dcp"/>
-        <DCCReference Include="IcsCommonD110Run.dcp"/>
         <DCCReference Include="..\..\..\..\Source\Sockets\Ics\uRESTDWIcsBase.pas"/>
         <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIdClientPooler.bmp">
             <ResourceType>BITMAP</ResourceType>
