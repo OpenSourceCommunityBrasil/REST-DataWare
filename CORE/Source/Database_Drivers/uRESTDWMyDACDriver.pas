@@ -11,7 +11,7 @@ uses
     LResources,
   {$ENDIF}
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes, MyClasses, MyAccess,
-  MyScript, DADump, MyDump, VirtualTable, MemDS, DBAccess, DB;
+  MyScript, DADump, MyDump, VirtualTable, MemDS, DBAccess, DB, uRESTDWMemtable;
 
 const
   crdwConnectionNotIsMyDAC = 'Componente não é um MyConnection';
@@ -109,13 +109,19 @@ end;
 
 procedure TRESTDWMyDACDataset.SaveToStream(stream : TStream);
 var
-  qry : TMyDataset;
+  vDWMemtable : TRESTDWMemtable;
+  qry : TCustomMyDataSet;
 begin
   inherited SaveToStream(stream);
-  qry := TMyDataset(Self.Owner);
-  qry.SaveToStream(stream);
-
-  stream.Position := 0;
+  qry := TCustomMyDataSet(Self.Owner);
+  vDWMemtable := TRESTDWMemtable.Create(Nil);
+  try
+    vDWMemtable.Assign(qry);
+    vDWMemtable.SaveToStream(stream);
+    stream.Position := 0;
+  finally
+    FreeAndNil(vDWMemtable);
+  end;
 end;
 
  { TRESTDWMyDACDriver }
@@ -138,6 +144,9 @@ var
 begin
   qry := TMyQuery.Create(Self);
   qry.Connection := TMyConnection(Connection);
+  qry.Options.SetEmptyStrToNull := StrsEmpty2Null;
+  qry.Options.TrimVarChar       := StrsTrim;
+  qry.Options.TrimFixedChar     := StrsTrim;
 
   Result := TRESTDWMyDACQuery.Create(qry);
 end;
@@ -149,7 +158,7 @@ begin
   qry := TMyTable.Create(Self);
   qry.Connection := TMyConnection(Connection);
 
-  Result := TRESTDWMyDACQuery.Create(qry);
+  Result := TRESTDWTable.Create(qry);
 end;
 
 function TRESTDWMyDACDriver.getStoreProc : TRESTDWStoreProc;
@@ -158,9 +167,9 @@ var
 begin
   qry := TMyStoredProc.Create(Self);
   qry.Connection := TMyConnection(Connection);
-  qry.FormatOptions.StrsTrim       := StrsTrim;
-  qry.FormatOptions.StrsEmpty2Null := StrsEmpty2Null;
-  qry.FormatOptions.StrsTrim2Len   := StrsTrim2Len;
+  qry.Options.SetEmptyStrToNull := StrsEmpty2Null;
+  qry.Options.TrimVarChar       := StrsTrim;
+  qry.Options.TrimFixedChar     := StrsTrim;
 
   Result := TRESTDWMyDACStoreProc.Create(qry);
 end;
@@ -197,21 +206,21 @@ procedure TRESTDWMyDACDriver.connStartTransaction;
 begin
   inherited connStartTransaction;
   if Assigned(Connection) then
-    Result := TMyConnection(Connection).StartTransaction;
+    TMyConnection(Connection).StartTransaction;
 end;
 
 procedure TRESTDWMyDACDriver.connRollback;
 begin
   inherited connRollback;
   if Assigned(Connection) then
-    Result := TMyConnection(Connection).Rollback;
+    TMyConnection(Connection).Rollback;
 end;
 
 procedure TRESTDWMyDACDriver.connCommit;
 begin
   inherited connCommit;
   if Assigned(Connection) then
-    Result := TMyConnection(Connection).Commit;
+    TMyConnection(Connection).Commit;
 end;
 
 class procedure TRESTDWMyDACDriver.CreateConnection(const AConnectionDefs : TConnectionDefs;
@@ -225,7 +234,7 @@ end;
 procedure TRESTDWMyDACQuery.createSequencedField(seqname, field : string);
 var
   qry : TMyQuery;
-  fd : TMyField;
+  fd : TField;
 begin
   qry := TMyQuery(Self.Owner);
   fd := qry.FindField(field);
