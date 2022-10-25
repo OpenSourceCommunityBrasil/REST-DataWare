@@ -1,957 +1,948 @@
 ﻿unit uRESTDWDriverBase;
 
-interface
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
-uses
-  Classes, SysUtils, TypInfo, uRESTDWComponentBase, DB, uRESTDWParams,
-  uRESTDWEncodeClass, uRESTDWCharset, uRESTDWComponentEvents,
-  uRESTDWMassiveBuffer, uRESTDWJSONInterface, uRESTDWConsts,
-  uRESTDWDataModule, uRESTDWBasicTypes, uRESTDWTools,
-  uRESTDWBufferBase, Variants;
+{
+  REST Dataware .
+  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+ Pascal e com compatibilidade entre sistemas operacionais.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
-type
-  TRESTDWDatabaseInfo = record
-    rdwDatabaseName : string;
-    rdwDatabaseMajorVersion : integer;
-    rdwDatabaseMinorVersion : integer;
-    rdwDatabaseSubVersion   : integer;
-  end;
+ Membros do Grupo :
 
-  { TRESTDWDataset }
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
+ Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Flávio Motta               - Member Tester and DEMO Developer.
+ Mobius One                 - Devel, Tester and Admin.
+ Gustavo                    - Criptografia and Devel.
+ Eloy                       - Devel.
+ Roniery                    - Devel.
+ Fernando Banhos            - Refactor Drivers REST Dataware.
+}
 
-  TRESTDWDataset = class(TComponent)
-  protected
-    function getFields: TFields; virtual;
-    function getParams: TParams; virtual;
-    procedure createSequencedField(seqname, field : string); virtual;
-  public
-    procedure Close; virtual;
-    procedure Open; virtual;
-    procedure Insert; virtual;
-    procedure Edit; virtual;
-    procedure Post; virtual;
-    procedure Delete; virtual;
-    procedure Next; virtual;
+Interface
 
-    procedure Prepare; virtual;
-    procedure ExecSQL; virtual;
-    procedure FetchAll; virtual;
-    procedure SaveToStream(stream : TStream); virtual;
+Uses
+  Classes, SysUtils,    TypInfo, uRESTDWParams, uRESTDWComponentBase, DB,
+  uRESTDWEncodeClass,   uRESTDWCharset,         uRESTDWComponentEvents,
+  uRESTDWMassiveBuffer, uRESTDWJSONInterface,   uRESTDWConsts,
+  uRESTDWDataModule,    uRESTDWBasicTypes,      uRESTDWTools,
+  uRESTDWBufferBase,    Variants;
 
-    function Eof : boolean; virtual;
-
-    function RecNo : int64; virtual;
-    function RecordCount : int64; virtual;
-    function ParamCount: integer; virtual;
-    function ParamByName(param : string) : TParam; virtual;
-    function FieldByName(field : string) : TField; virtual;
-    function FindField(field : string) : TField; virtual;
-
-    function RDWDataTypeFieldName(field : string) : Byte; virtual;
-    function RDWDataTypeParamName(param : string) : Byte; virtual;
-    function GetParamIndex(param : string) : integer; virtual;
-  published
-    property Params : TParams read getParams;
-    property Fields : TFields read getFields;
-  end;
-
-  { TRESTDWStoreProc }
-
-  TRESTDWStoreProc = class(TRESTDWDataset)
-  protected
-    function getStoredProcName : string;
-    procedure setStoredProcName(AValue : string);
-  public
-    procedure ExecProc; virtual;
-  published
-    property StoredProcName : string read getStoredProcName write setStoredProcName;
-  end;
-
-  { TRESTDWTable }
-
-  TRESTDWTable = class(TRESTDWDataset)
-  private
-    function getFilter: string; virtual;
-    function getFiltered: boolean; virtual;
-    function getTableName: string; virtual;
-    procedure setFilter(AValue: string); virtual;
-    procedure setFiltered(AValue: boolean); virtual;
-    procedure setTableName(AValue: string); virtual;
-  public
-
-  published
-    property Filter : string read getFilter write setFilter;
-    property Filtered : boolean read getFiltered write setFiltered;
-    property TableName : string read getTableName write setTableName;
-  end;
-
-  { TRESTDWQuery }
-
-  TRESTDWQuery = class(TRESTDWDataset)
-  private
-    function getSQL: TStrings; virtual;
-  public
-    function RowsAffected : Int64; virtual;
-    function GetInsertID : int64; virtual;
-  published
-    property SQL : TStrings read getSQL;
-  end;
-
+ Type
+  TRESTDWDatabaseInfo = Record
+   rdwDatabaseName          : String;
+   rdwDatabaseMajorVersion,
+   rdwDatabaseMinorVersion,
+   rdwDatabaseSubVersion    : Integer;
+ End;
+  TRESTDWDataset      = Class(TComponent)
+ Protected
+  Function  getFields                     : TFields; Virtual;
+  Function  getParams                     : TParams; Virtual;
+  Procedure CreateSequencedField(seqname,
+                                 field    : String); Virtual;
+ Public
+  Procedure Close;    Virtual;
+  Procedure Open;     Virtual;
+  Procedure Insert;   Virtual;
+  Procedure Edit;     Virtual;
+  Procedure Post;     Virtual;
+  Procedure Delete;   Virtual;
+  Procedure Next;     Virtual;
+  Procedure Prepare;  Virtual;
+  Procedure ExecSQL;  Virtual;
+  Procedure FetchAll; Virtual;
+  Procedure SaveToStream(stream : TStream); Virtual;
+  Function  Eof         : Boolean; Virtual;
+  Function  RecNo       : Int64;   Virtual;
+  Function  RecordCount : Int64;   Virtual;
+  Function  ParamCount  : Integer; Virtual;
+  Function  ParamByName(param : String) : TParam; Virtual;
+  Function  FieldByName(field : String) : TField; Virtual;
+  Function  FindField  (field : String) : TField; Virtual;
+  Function  RDWDataTypeFieldName(field  : String) : Byte;    Virtual;
+  Function  RDWDataTypeParamName(param  : String) : Byte;    Virtual;
+  Function  GetParamIndex       (param  : String) : integer; Virtual;
+ Published
+  Property Params : TParams Read getParams;
+  Property Fields : TFields Read getFields;
+ End;
+ { TRESTDWStoreProc }
+  TRESTDWStoreProc = Class(TRESTDWDataset)
+ Protected
+  Function  getStoredProcName        : String;
+  Procedure setStoredProcName(AValue : String);
+ Public
+  Procedure ExecProc; Virtual;
+ Published
+  Property StoredProcName : String Read getStoredProcName Write setStoredProcName;
+ End;
+ { TRESTDWTable }
+  TRESTDWTable = Class(TRESTDWDataset)
+ Private
+  Function getFilter            : String;   Virtual;
+  Function getFiltered          : Boolean;  Virtual;
+  Function getTableName         : String;   Virtual;
+  Procedure setFilter   (AValue : String);  Virtual;
+  Procedure setFiltered (AValue : Boolean); Virtual;
+  Procedure setTableName(AValue : String);  Virtual;
+ Public
+ Published
+  Property Filter    : String  Read getFilter    Write setFilter;
+  Property Filtered  : Boolean Read getFiltered  Write setFiltered;
+  Property TableName : String  Read getTableName Write setTableName;
+ End;
+  TRESTDWQuery = Class(TRESTDWDataset)
+ Private
+  Function getSQL       : TStrings; Virtual;
+ Public
+  Function RowsAffected : Int64;    Virtual;
+  Function GetInsertID  : int64;    Virtual;
+ Published
+  Property SQL          : TStrings  Read getSQL;
+ End;
   { TRESTDWDriverBase }
-
-  TRESTDWDriverBase = class(TRESTDWComponent)
-  private
-    FConnection : TComponent;
-
-    vStrsTrim,
-    vStrsEmpty2Null,
-    vStrsTrim2Len,
-    vEncodeStrings,
-    vCompression         : Boolean;
-    vEncoding            : TEncodeSelect;
-    vCommitRecords       : Integer;
-    {$IFDEF FPC}
-    vDatabaseCharSet     : TDatabaseCharSet;
-    {$ENDIF}
-    vParamCreate         : Boolean;
-    vOnPrepareConnection : TOnPrepareConnection;
-    vOnTableBeforeOpen   : TOnTableBeforeOpen;
-    vOnQueryBeforeOpen   : TOnQueryBeforeOpen;
-    vOnQueryException    : TOnQueryException;
-  protected
-    procedure setConnection(AValue: TComponent); virtual;
-
-    function isConnected : boolean; virtual;
-
-    function connInTransaction : boolean; virtual;
-    procedure connStartTransaction; virtual;
-    procedure connRollback; virtual;
-    procedure connCommit; virtual;
-
-    function isMinimumVersion(major,minor,sub : integer) : boolean; overload;
-    function isMinimumVersion(major,minor : integer) : boolean; overload;
-  public
-    function getConectionType : TRESTDWDatabaseType; virtual;
-    function getDatabaseInfo : TRESTDWDatabaseInfo; virtual;
-    function getQuery : TRESTDWQuery; virtual;
-    function getTable : TRESTDWTable; virtual;
-    function getStoreProc : TRESTDWStoreProc; virtual;
-
-    procedure Connect; virtual;
-    procedure Disconect; virtual;
-
-    function ConnectionSet : Boolean; virtual;
-
-    function GetGenID(Query : TRESTDWQuery; GenName : string; valor : integer = 1): integer; overload;virtual;
-    function GetGenID(GenName : string; valor : integer = 1): integer; overload; virtual;
-
-    function ApplyUpdates(MassiveStream    : TStream;
-                          SQL              : string;
-                          Params           : TRESTDWParams;
-                          var Error        : boolean;
-                          var MessageError : string;
-                          var RowsAffected : integer) : TJSONValue; overload;virtual;
-    function ApplyUpdates(Massive,
-                          SQL              : string;
-                          Params           : TRESTDWParams;
-                          var Error        : Boolean;
-                          var MessageError : string;
-                          var RowsAffected : Integer) : TJSONValue; overload;virtual;
-
-    function ApplyUpdatesTB(MassiveStream         : TStream;
-                            SQL                   : String;
-                            Params                : TRESTDWParams;
-                            var Error             : Boolean;
-                            var MessageError      : String;
-                            var RowsAffected      : Integer) : TJSONValue; overload;virtual;
-    Function ApplyUpdatesTB(Massive               : String;
-                            Params                : TRESTDWParams;
-                            var Error             : Boolean;
-                            var MessageError      : String;
-                            var RowsAffected      : Integer) : TJSONValue; overload;virtual;
-
-    function ApplyUpdates_MassiveCache(MassiveCache     : string;
-                                       var Error        : boolean;
-                                       var MessageError : string) : TJSONValue; virtual;
-    Function ApplyUpdates_MassiveCacheTB(MassiveCache          : String;
-                                         Var Error             : Boolean;
-                                         Var MessageError      : String) : TJSONValue; virtual;
-    function ExecuteCommand(SQL                  : String;
-                            var Error            : Boolean;
-                            var MessageError     : String;
-                            var BinaryBlob       : TMemoryStream;
-                            var RowsAffected     : Integer;
-                            Execute              : Boolean = False;
-                            BinaryEvent          : Boolean = False;
-                            MetaData             : Boolean = False;
-                            BinaryCompatibleMode : Boolean = False) : string;overload;virtual;
-    function ExecuteCommand(SQL                  : String;
-                            Params               : TRESTDWParams;
-                            var Error            : Boolean;
-                            var MessageError     : String;
-                            var BinaryBlob       : TMemoryStream;
-                            var RowsAffected     : Integer;
-                            Execute              : Boolean = False;
-                            BinaryEvent          : Boolean = False;
-                            MetaData             : Boolean = False;
-                            BinaryCompatibleMode : Boolean = False) : string;overload;virtual;
-    function ExecuteCommandTB(Tablename             : String;
-                              var Error             : Boolean;
-                              var MessageError      : String;
-                              var BinaryBlob        : TMemoryStream;
-                              var RowsAffected      : Integer;
-                              BinaryEvent           : Boolean = False;
-                              MetaData              : Boolean = False;
-                              BinaryCompatibleMode  : Boolean = False) : String; overload;virtual;
-    function ExecuteCommandTB(Tablename             : String;
+  TRESTDWDriverBase = Class(TRESTDWComponent)
+ Private
+  FConnection : TComponent;
+  vStrsTrim,
+  vStrsEmpty2Null,
+  vStrsTrim2Len,
+  vEncodeStrings,
+  vCompression         : Boolean;
+  vEncoding            : TEncodeSelect;
+  vCommitRecords       : Integer;
+  {$IFDEF FPC}
+   vDatabaseCharSet    : TDatabaseCharSet;
+  {$ENDIF}
+  vParamCreate         : Boolean;
+  vOnPrepareConnection : TOnPrepareConnection;
+  vOnTableBeforeOpen   : TOnTableBeforeOpen;
+  vOnQueryBeforeOpen   : TOnQueryBeforeOpen;
+  vOnQueryException    : TOnQueryException;
+ Protected
+  Procedure setConnection(AValue : TComponent); Virtual;
+  Function  isConnected          : Boolean;     Virtual;
+  Function  connInTransaction    : Boolean;     Virtual;
+  Procedure connStartTransaction; Virtual;
+  Procedure connRollback;         Virtual;
+  Procedure connCommit;           Virtual;
+  Function isMinimumVersion(major,
+                            minor,
+                            sub    : Integer) : Boolean; Overload;
+  Function isMinimumVersion(major,
+                            minor  : Integer) : Boolean; Overload;
+ Public
+  Function  getConectionType : TRESTDWDatabaseType; Virtual;
+  Function  getDatabaseInfo  : TRESTDWDatabaseInfo; Virtual;
+  Function  getQuery         : TRESTDWQuery;        Virtual;
+  Function  getTable         : TRESTDWTable;        Virtual;
+  Function  getStoreProc     : TRESTDWStoreProc;    Virtual;
+  Procedure Connect;                                Virtual;
+  Procedure Disconect;                              Virtual;
+  Function ConnectionSet    : Boolean;              Virtual;
+  Function GetGenID          (Query                 : TRESTDWQuery;
+                              GenName               : String;
+                              valor                 : Integer = 1) : Integer;Overload;Virtual;
+  Function GetGenID          (GenName               : String;
+                              valor                 : Integer = 1) : Integer;Overload;Virtual;
+  Function ApplyUpdates      (MassiveStream         : TStream;
+                              SQL                   : String;
                               Params                : TRESTDWParams;
                               Var Error             : Boolean;
                               Var MessageError      : String;
-                              Var BinaryBlob        : TMemoryStream;
-                              Var RowsAffected      : Integer;
-                              BinaryEvent           : Boolean = False;
-                              MetaData              : Boolean = False;
-                              BinaryCompatibleMode  : Boolean = False) : String; overload;virtual;
-    procedure ExecuteProcedure(ProcName              : String;
+                              Var RowsAffected      : Integer)   : TJSONValue;Overload;Virtual;
+  Function ApplyUpdates      (Massive,
+                              SQL                   : String;
+                              Params                : TRESTDWParams;
+                              Var Error             : Boolean;
+                              Var MessageError      : String;
+                              Var RowsAffected      : Integer)   : TJSONValue;Overload;Virtual;
+  Function ApplyUpdatesTB    (MassiveStream         : TStream;
+                              SQL                   : String;
+                              Params                : TRESTDWParams;
+                              Var Error             : Boolean;
+                              Var MessageError      : String;
+                              Var RowsAffected      : Integer)   : TJSONValue;Overload;Virtual;
+  Function ApplyUpdatesTB    (Massive               : String;
+                              Params                : TRESTDWParams;
+                              Var Error             : Boolean;
+                              Var MessageError      : String;
+                              Var RowsAffected      : Integer)   : TJSONValue;Overload;Virtual;
+  Function ApplyUpdates_MassiveCache  (MassiveStream         : TStream;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String) : TJSONValue;Overload;Virtual;
+  Function ApplyUpdates_MassiveCache  (MassiveCache          : String;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String) : TJSONValue;Overload;Virtual;
+  Function ApplyUpdates_MassiveCacheTB(MassiveStream         : TStream;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String) : TJSONValue;Overload;Virtual;
+  Function ApplyUpdates_MassiveCacheTB(MassiveCache          : String;
+                                       Var Error             : Boolean;
+                                       Var MessageError      : String) : TJSONValue;Overload;Virtual;
+  Function ExecuteCommand     (SQL                   : String;
+                               Var Error             : Boolean;
+                               Var MessageError      : String;
+                               Var BinaryBlob        : TMemoryStream;
+                               Var RowsAffected      : Integer;
+                               Execute               : Boolean = False;
+                               BinaryEvent           : Boolean = False;
+                               MetaData              : Boolean = False;
+                               BinaryCompatibleMode  : Boolean = False) : String;Overload;Virtual;
+  Function ExecuteCommand     (SQL                   : String;
                                Params                : TRESTDWParams;
-                               var Error             : Boolean;
-                               var MessageError      : String); virtual;
-    procedure ExecuteProcedurePure(ProcName              : String;
-                                   var Error             : Boolean;
-                                   var MessageError      : String); virtual;
+                               Var Error             : Boolean;
+                               Var MessageError      : String;
+                               Var BinaryBlob        : TMemoryStream;
+                               Var RowsAffected      : Integer;
+                               Execute               : Boolean = False;
+                               BinaryEvent           : Boolean = False;
+                               MetaData              : Boolean = False;
+                               BinaryCompatibleMode  : Boolean = False) : String;Overload;Virtual;
+  Function ExecuteCommandTB   (Tablename             : String;
+                               Var Error             : Boolean;
+                               Var MessageError      : String;
+                               Var BinaryBlob        : TMemoryStream;
+                               Var RowsAffected      : Integer;
+                               BinaryEvent           : Boolean = False;
+                               MetaData              : Boolean = False;
+                               BinaryCompatibleMode  : Boolean = False) : String; Overload;Virtual;
+  Function ExecuteCommandTB   (Tablename             : String;
+                               Params                : TRESTDWParams;
+                               Var Error             : Boolean;
+                               Var MessageError      : String;
+                               Var BinaryBlob        : TMemoryStream;
+                               Var RowsAffected      : Integer;
+                               BinaryEvent           : Boolean = False;
+                               MetaData              : Boolean = False;
+                               BinaryCompatibleMode  : Boolean = False) : String; Overload;Virtual;
+  Procedure ExecuteProcedure  (ProcName              : String;
+                               Params                : TRESTDWParams;
+                               Var Error             : Boolean;
+                               Var MessageError      : String); Virtual;
+  Procedure ExecuteProcedurePure(ProcName            : String;
+                                 Var Error           : Boolean;
+                                 Var MessageError    : String); Virtual;
+  Procedure GetTableNames     (Var TableNames        : TStringList;
+                               Var Error             : Boolean;
+                               Var MessageError      : String); Virtual;
+  Procedure GetFieldNames     (TableName             : String;
+                               Var FieldNames        : TStringList;
+                               Var Error             : Boolean;
+                               Var MessageError      : String); Virtual;
+  Procedure GetKeyFieldNames  (TableName             : String;
+                               Var FieldNames        : TStringList;
+                               Var Error             : Boolean;
+                               Var MessageError      : String); Virtual;
+  Procedure GetProcNames      (Var ProcNames         : TStringList;
+                               Var Error             : Boolean;
+                               Var MessageError      : String); Virtual;
+  Procedure GetProcParams     (ProcName              : String;
+                               Var ParamNames        : TStringList;
+                               Var Error             : Boolean;
+                               Var MessageError      : String); Virtual;
+  Function InsertMySQLReturnID(SQL                   : String;
+                               Var Error             : Boolean;
+                               Var MessageError      : String)          : Integer;    Overload;Virtual;
+  Function InsertMySQLReturnID(SQL                   : String;
+                               Params                : TRESTDWParams;
+                               Var Error             : Boolean;
+                               Var MessageError      : String)          : Integer;    Overload;Virtual;
+  Function OpenDatasets       (DatasetsLine          : String;
+                               Var Error             : Boolean;
+                               Var MessageError      : String;
+                               Var BinaryBlob        : TMemoryStream)   : TJSONValue; Overload;Virtual;
+  Function OpenDatasets       (DatapackStream        : TStream;
+                               Var Error             : Boolean;
+                               Var MessageError      : String;
+                               Var BinaryBlob        : TMemoryStream;
+                               aBinaryEvent          : Boolean = False;
+                               aBinaryCompatibleMode : Boolean = False) : TStream; Overload;Virtual;
+  Class Procedure CreateConnection(Const AConnectionDefs  : TConnectionDefs;
+                                   Var AConnection        : TComponent);     Virtual;
+  Procedure PrepareConnection     (Var AConnectionDefs    : TConnectionDefs);Virtual;
+  Function  ProcessMassiveSQLCache(MassiveSQLCache        : String;
+                                   Var Error              : Boolean;
+                                   Var MessageError       : String)     : TJSONValue; Virtual;
+  Procedure BuildDatasetLine      (Var Query              : TRESTDWDataset;
+                                   Massivedataset         : TMassivedatasetBuffer;
+                                   MassiveCache           : Boolean = False);
+ Published
+  Property Connection          : TComponent           Read FConnection            Write setConnection;
+  Property StrsTrim            : Boolean              Read vStrsTrim              Write vStrsTrim;
+  Property StrsEmpty2Null      : Boolean              Read vStrsEmpty2Null        Write vStrsEmpty2Null;
+  Property StrsTrim2Len        : Boolean              Read vStrsTrim2Len          Write vStrsTrim2Len;
+  Property Compression         : Boolean              Read vCompression           Write vCompression;
+  Property EncodeStringsJSON   : Boolean              Read vEncodeStrings         Write vEncodeStrings;
+  Property Encoding            : TEncodeSelect        Read vEncoding              Write vEncoding;
+  Property ParamCreate         : Boolean              Read vParamCreate           Write vParamCreate;
+  {$IFDEF FPC}
+  Property DatabaseCharSet     : TDatabaseCharSet     Read vDatabaseCharSet       Write vDatabaseCharSet;
+  {$ENDIF}
+  Property CommitRecords       : Integer              Read vCommitRecords         Write vCommitRecords;
+  Property OnPrepareConnection : TOnPrepareConnection Read vOnPrepareConnection   Write vOnPrepareConnection;
+  Property OnTableBeforeOpen   : TOnTableBeforeOpen   Read vOnTableBeforeOpen     Write vOnTableBeforeOpen;
+  Property OnQueryBeforeOpen   : TOnQueryBeforeOpen   Read vOnQueryBeforeOpen     Write vOnQueryBeforeOpen;
+  Property OnQueryException    : TOnQueryException    Read vOnQueryException      Write vOnQueryException;
+ End;
 
-    procedure GetTableNames(var TableNames        : TStringList;
-                            var Error             : Boolean;
-                            var MessageError      : String); virtual;
-    procedure GetFieldNames(TableName             : String;
-                            var FieldNames        : TStringList;
-                            var Error             : Boolean;
-                            var MessageError      : String); virtual;
-    procedure GetKeyFieldNames(TableName             : String;
-                               var FieldNames        : TStringList;
-                               var Error             : Boolean;
-                               var MessageError      : String); virtual;
-    procedure GetProcNames(var ProcNames         : TStringList;
-                           var Error             : Boolean;
-                           var MessageError      : String); virtual;
-    procedure GetProcParams(ProcName              : String;
-                            var ParamNames        : TStringList;
-                            var Error             : Boolean;
-                            var MessageError      : String); virtual;
-    function InsertMySQLReturnID(SQL                  : String;
-                                 var Error            : Boolean;
-                                 var MessageError     : String) : integer;overload;virtual;
-    function InsertMySQLReturnID(SQL                  : String;
-                                 Params               : TRESTDWParams;
-                                 var Error            : Boolean;
-                                 var MessageError     : String) : integer;overload;virtual;
-    function OpenDatasets(DatasetsLine          : String;
-                          var Error             : Boolean;
-                          var MessageError      : String;
-                          var BinaryBlob        : TMemoryStream) : TJSONValue; overload;virtual;
-    function OpenDatasets(DatapackStream        : TStream;
-                          Var Error             : Boolean;
-                          Var MessageError      : String;
-                          Var BinaryBlob        : TMemoryStream;
-                          aBinaryEvent          : Boolean = False;
-                          aBinaryCompatibleMode : Boolean = False) : TStream; overload;virtual;
+Implementation
 
-    class procedure CreateConnection(const AConnectionDefs  : TConnectionDefs;
-                                     var AConnection        : TComponent); virtual;
-    procedure PrepareConnection(var AConnectionDefs : TConnectionDefs);virtual;
-
-    function ProcessMassiveSQLCache(MassiveSQLCache  : string;
-                                    var Error        : Boolean;
-                                    var MessageError : string) : TJSONValue; virtual;
-
-
-    // base
-    procedure BuildDatasetLine(var Query      : TRESTDWDataset;
-                               Massivedataset : TMassivedatasetBuffer;
-                               MassiveCache   : Boolean = False);
-  published
-    property Connection          : TComponent           read FConnection            write setConnection;
-
-    property StrsTrim            : Boolean              read vStrsTrim              write vStrsTrim;
-    property StrsEmpty2Null      : Boolean              read vStrsEmpty2Null        write vStrsEmpty2Null;
-    property StrsTrim2Len        : Boolean              read vStrsTrim2Len          write vStrsTrim2Len;
-    property Compression         : Boolean              read vCompression           write vCompression;
-    property EncodeStringsJSON   : Boolean              read vEncodeStrings         write vEncodeStrings;
-    property Encoding            : TEncodeSelect        read vEncoding              write vEncoding;
-    property ParamCreate         : Boolean              read vParamCreate           write vParamCreate;
-   {$IFDEF FPC}
-     property DatabaseCharSet     : TDatabaseCharSet    read vDatabaseCharSet       write vDatabaseCharSet;
-   {$ENDIF}
-    property CommitRecords       : Integer              read vCommitRecords         write vCommitRecords;
-    property OnPrepareConnection : TOnPrepareConnection read vOnPrepareConnection   write vOnPrepareConnection;
-    property OnTableBeforeOpen   : TOnTableBeforeOpen   read vOnTableBeforeOpen     write vOnTableBeforeOpen;
-    property OnQueryBeforeOpen   : TOnQueryBeforeOpen   read vOnQueryBeforeOpen     write vOnQueryBeforeOpen;
-    property OnQueryException    : TOnQueryException    read vOnQueryException      write vOnQueryException;
-  end;
-
-implementation
-
-uses
-  uRESTDWBasicDB;
+Uses
+ uRESTDWBasicDB;
 
 { TRESTDWStoreProc }
 
-function TRESTDWStoreProc.getStoredProcName : string;
-begin
- try
-   Result := GetStrProp(Self.Owner,'StoredProcName');
- except
-   Result := '';
- end;
-end;
+Function TRESTDWStoreProc.getStoredProcName : String;
+Begin
+ Try
+  Result := GetStrProp(Self.Owner, 'StoredProcName');
+ Except
+  Result := '';
+ End;
+End;
 
-procedure TRESTDWStoreProc.setStoredProcName(AValue : string);
-begin
- try
-   SetStrProp(Self.Owner,'Filter',AValue);
- except
+Procedure TRESTDWStoreProc.setStoredProcName(AValue : String);
+Begin
+ Try
+  SetStrProp(Self.Owner, 'Filter', AValue);
+ Except
+ End;
+End;
 
- end;
-end;
+Procedure TRESTDWStoreProc.ExecProc;
+Begin
 
-procedure TRESTDWStoreProc.ExecProc;
-begin
-
-end;
+End;
 
 { TRESTDWDataset }
 
-function TRESTDWDataset.getFields: TFields;
-begin
-  Result := TDataSet(Self.Owner).Fields;
-end;
+Function TRESTDWDataset.getFields : TFields;
+Begin
+ Result := TDataSet(Self.Owner).Fields;
+End;
 
-function TRESTDWDataset.getParams: TParams;
-begin
-  try
-    Result := TParams(GetObjectProp(Self.Owner,'Params'));
-  except
-    Result := nil;
-  end;
-end;
+Function TRESTDWDataset.getParams : TParams;
+Begin
+ Try
+  Result := TParams(GetObjectProp(Self.Owner, 'Params'));
+ Except
+  Result := Nil;
+ End;
+End;
 
-procedure TRESTDWDataset.createSequencedField(seqname, field : string);
-begin
+Procedure TRESTDWDataset.createSequencedField(seqname,
+                                              field    : String);
+Begin
 
-end;
+End;
 
-procedure TRESTDWDataset.Close;
-begin
-  TDataSet(Self.Owner).Close;
-end;
+Procedure TRESTDWDataset.Close;
+Begin
+ TDataSet(Self.Owner).Close;
+End;
 
-procedure TRESTDWDataset.Open;
-begin
-  TDataSet(Self.Owner).Open;
-end;
+Procedure TRESTDWDataset.Open;
+Begin
+ TDataSet(Self.Owner).Open;
+End;
 
-procedure TRESTDWDataset.Insert;
-begin
-  TDataSet(Self.Owner).Insert;
-end;
+Procedure TRESTDWDataset.Insert;
+Begin
+ TDataSet(Self.Owner).Insert;
+End;
 
-procedure TRESTDWDataset.Edit;
-begin
-  TDataSet(Self.Owner).Edit;
-end;
+Procedure TRESTDWDataset.Edit;
+Begin
+ TDataSet(Self.Owner).Edit;
+End;
 
-procedure TRESTDWDataset.Post;
-begin
-  TDataSet(Self.Owner).Post;
-end;
+Procedure TRESTDWDataset.Post;
+Begin
+ TDataSet(Self.Owner).Post;
+End;
 
-procedure TRESTDWDataset.Delete;
-begin
-  TDataSet(Self.Owner).Delete;
-end;
+Procedure TRESTDWDataset.Delete;
+Begin
+ TDataSet(Self.Owner).Delete;
+End;
 
-procedure TRESTDWDataset.Next;
-begin
-  TDataSet(Self.Owner).Next;
-end;
+Procedure TRESTDWDataset.Next;
+Begin
+ TDataSet(Self.Owner).Next;
+End;
 
-procedure TRESTDWDataset.Prepare;
-begin
+Procedure TRESTDWDataset.Prepare;
+Begin
 
-end;
+End;
 
-procedure TRESTDWDataset.ExecSQL;
-begin
+Procedure TRESTDWDataset.ExecSQL;
+Begin
 
-end;
+End;
 
-procedure TRESTDWDataset.FetchAll;
-begin
+Procedure TRESTDWDataset.FetchAll;
+Begin
 
-end;
+End;
 
-procedure TRESTDWDataset.SaveToStream(stream: TStream);
-begin
+Procedure TRESTDWDataset.SaveToStream(stream: TStream);
+Begin
 
-end;
+End;
 
-function TRESTDWDataset.Eof: boolean;
-begin
-  Result := TDataSet(Self.Owner).EOF;
-end;
+Function TRESTDWDataset.Eof: boolean;
+Begin
+ Result := TDataSet(Self.Owner).EOF;
+End;
 
-function TRESTDWDataset.RecNo: int64;
-begin
-  Result := TDataSet(Self.Owner).RecNo;
-end;
+Function TRESTDWDataset.RecNo: int64;
+Begin
+ Result := TDataSet(Self.Owner).RecNo;
+End;
 
-function TRESTDWDataset.RecordCount: int64;
-begin
+Function TRESTDWDataset.RecordCount: int64;
+Begin
+ Result := -1;
+End;
+
+Function TRESTDWDataset.ParamCount: integer;
+Begin
+ Try
+  Result := Params.Count;
+ Except
   Result := -1;
-end;
+ End;
+End;
 
-function TRESTDWDataset.ParamCount: integer;
-begin
-  try
-    Result := Params.Count;
-  except
-    Result := -1;
-  end;
-end;
+Function TRESTDWDataset.ParamByName(param: String): TParam;
+Begin
+ Try
+  Result := Params.FindParam(param);
+ Except
+  Result := nil;
+ End;
+End;
 
-function TRESTDWDataset.ParamByName(param: string): TParam;
-begin
-  try
-    Result := Params.FindParam(param);
-  except
-    Result := nil;
-  end;
-end;
+Function TRESTDWDataset.FieldByName(field: String): TField;
+Begin
+ Result := TDataSet(Self.Owner).FieldByName(field);
+End;
 
-function TRESTDWDataset.FieldByName(field: string): TField;
-begin
-  Result := TDataSet(Self.Owner).FieldByName(field);
-end;
+Function TRESTDWDataset.FindField(field: String): TField;
+Begin
+ Result := TDataSet(Self.Owner).FindField(field);
+End;
 
-function TRESTDWDataset.FindField(field: string): TField;
-begin
-  Result := TDataSet(Self.Owner).FindField(field);
-end;
+Function TRESTDWDataset.RDWDataTypeFieldName(field : String) : Byte;
+Var
+ vDType : TFieldType;
+Begin
+ vDType := FieldByName(field).DataType;
+ Result := FieldTypeToDWFieldType(vDType);
+End;
 
-function TRESTDWDataset.RDWDataTypeFieldName(field : string) : Byte;
-var
-  vDType : TFieldType;
-begin
-  vDType := FieldByName(field).DataType;
-  Result := FieldTypeToDWFieldType(vDType);
-end;
+Function TRESTDWDataset.RDWDataTypeParamName(param : String) : Byte;
+Var
+ vDType : TFieldType;
+Begin
+ Try
+  vDType := ParamByName(param).DataType;
+ Except
+  vDType := ftUnknown;
+ End;
+ Result := FieldTypeToDWFieldType(vDType);
+End;
 
-function TRESTDWDataset.RDWDataTypeParamName(param : string) : Byte;
-var
-  vDType : TFieldType;
-begin
-  try
-    vDType := ParamByName(param).DataType;
-  except
-    vDType := ftUnknown;
-  end;
-  Result := FieldTypeToDWFieldType(vDType);
-end;
-
-function TRESTDWDataset.GetParamIndex(param: string): integer;
-var
-  prm : TParam;
-begin
-  try
-    prm := Params.FindParam(param);
-    Result := prm.Index;
-  except
-    Result := -1;
-  end;
-end;
+Function TRESTDWDataset.GetParamIndex(param : String): integer;
+Var
+ prm : TParam;
+Begin
+ Try
+  prm := Params.FindParam(param);
+  Result := prm.Index;
+ Except
+  Result := -1;
+ End;
+End;
 
 { TRESTDWTable }
 
-function TRESTDWTable.getFilter: string;
-begin
-  try
-    Result := GetStrProp(Self.Owner,'Filter');
-  except
-    Result := '';
-  end;
-end;
+Function TRESTDWTable.getFilter : String;
+Begin
+ Try
+  Result := GetStrProp(Self.Owner,'Filter');
+ Except
+  Result := '';
+ End;
+End;
 
-function TRESTDWTable.getFiltered: boolean;
-begin
-  try
-    Result := Boolean(GetPropValue(Self.Owner,'Filtered'));
-  except
-    Result := False;
-  end;
-end;
+Function TRESTDWTable.getFiltered: boolean;
+Begin
+ Try
+  Result := Boolean(GetPropValue(Self.Owner,'Filtered'));
+ Except
+  Result := False;
+ End;
+End;
 
-function TRESTDWTable.getTableName: string;
-begin
-  try
-    Result := GetStrProp(Self.Owner,'TableName');
-  except
-    Result := '';
-  end;
-end;
+Function TRESTDWTable.getTableName : String;
+Begin
+ Try
+  Result := GetStrProp(Self.Owner,'TableName');
+ Except
+  Result := '';
+ End;
+End;
 
-procedure TRESTDWTable.setFilter(AValue: string);
-begin
-  try
-    SetStrProp(Self.Owner,'Filter',AValue);
-  except
+Procedure TRESTDWTable.setFilter(AValue : String);
+Begin
+ Try
+  SetStrProp(Self.Owner,'Filter',AValue);
+ Except
 
-  end;
-end;
+ End;
+End;
 
-procedure TRESTDWTable.setFiltered(AValue: boolean);
-begin
-  try
-    SetPropValue(Self.Owner,'Filtered',AValue);
-  except
+Procedure TRESTDWTable.setFiltered(AValue: boolean);
+Begin
+ Try
+  SetPropValue(Self.Owner,'Filtered',AValue);
+ Except
 
-  end;
-end;
+ End;
+End;
 
-procedure TRESTDWTable.setTableName(AValue: string);
-begin
+Procedure TRESTDWTable.setTableName(AValue : String);
+Begin
 
-end;
+End;
 
 { TRESTDWQuery }
 
-function TRESTDWQuery.getSQL: TStrings;
-begin
-  try
-    Result := TStrings(GetObjectProp(Self.Owner,'SQL'));
-  except
-    Result := nil;
-  end;
-end;
+Function TRESTDWQuery.getSQL: TStrings;
+Begin
+ Try
+  Result := TStrings(GetObjectProp(Self.Owner,'SQL'));
+ Except
+  Result := nil;
+ End;
+End;
 
-function TRESTDWQuery.RowsAffected: Int64;
-begin
+Function TRESTDWQuery.RowsAffected : Int64;
+Begin
+ Result := -1;
+End;
+
+Function TRESTDWQuery.GetInsertID : Int64;
+Var
+ drv : TRESTDWDriverBase;
+Begin
+ Result := -1;
+ drv    := TRESTDWDriverBase(Self.Owner);
+ Try
+  If drv.getConectionType = dbtMySQL Then
+   Begin
+    Close;
+    SQL.Clear;
+    SQL.Add('SELECT LAST_INSERT_ID() ID');
+    Open;
+    Result := Fields[0].AsLargeInt;
+   End;
+ Except
   Result := -1;
-end;
-
-function TRESTDWQuery.GetInsertID: int64;
-var
-  drv : TRESTDWDriverBase;
-begin
-  Result := -1;
-
-  drv := TRESTDWDriverBase(Self.Owner);
-
-  try
-    if drv.getConectionType = dbtMySQL then begin
-      Close;
-      SQL.Clear;
-      SQL.Add('SELECT LAST_INSERT_ID() ID');
-      Open;
-
-      Result := Fields[0].AsLargeInt;
-    end;
-  except
-    Result := -1;
-  end;
-end;
+ End;
+End;
 
 { TRESTDWDriverBase }
 
-function TRESTDWDriverBase.getConectionType: TRESTDWDatabaseType;
-begin
-  Result := dbtUndefined;
-end;
+Function TRESTDWDriverBase.getConectionType : TRESTDWDatabaseType;
+Begin
+ Result := dbtUndefined;
+End;
 
-function TRESTDWDriverBase.getDatabaseInfo: TRESTDWDatabaseInfo;
-var
-  connType: TRESTDWDatabaseType;
-  qry : TRESTDWQuery;
-  iAux1 : integer;
-  sAux1, sVersion : string;
-  lst : TStringList;
-begin
-  Result.rdwDatabaseName := '';
-  Result.rdwDatabaseMajorVersion := 0;
-  Result.rdwDatabaseMinorVersion := 0;
-  Result.rdwDatabaseSubVersion := 0;
+Function TRESTDWDriverBase.getDatabaseInfo  : TRESTDWDatabaseInfo;
+Var
+ connType : TRESTDWDatabaseType;
+ qry      : TRESTDWQuery;
+ iAux1    : Integer;
+ sAux1,
+ sVersion : String;
+ lst      : TStringList;
+Begin
+ Result.rdwDatabaseName         := '';
+ Result.rdwDatabaseMajorVersion := 0;
+ Result.rdwDatabaseMinorVersion := 0;
+ Result.rdwDatabaseSubVersion   := 0;
+ // rdwDatabaseName foi definido para possiveis subversoes
+ // ex: no MySQL temos o MariaDB
+ // ex: no Firebird temos a versao HQBird
+ sVersion := '';
+ connType := getConectionType;
+ lst := TStringList.Create;
+ qry := getQuery;
+ Try
+  Case connType Of
+   dbtFirebird    : Begin
+                     Result.rdwDatabaseName         := 'firebird';
+                     Result.rdwDatabaseMajorVersion := 1;
+                     Result.rdwDatabaseMinorVersion := 5;
+                     Result.rdwDatabaseSubVersion   := 0;
+                     Try
+                      qry.SQL.Add('select rdb$get_context(''SYSTEM'',''ENGINE_VERSION'')');
+                      qry.SQL.Add('from rdb$database');
+                      qry.Open;
+                      sVersion := qry.Fields[0].AsString;
+                     Except
+                     End;
+                    End;
+   dbtInterbase   : Begin
+                     Result.rdwDatabaseName         := 'interbase';
+                     Result.rdwDatabaseMajorVersion := 6;
+                     Result.rdwDatabaseMinorVersion := 0;
+                     Result.rdwDatabaseSubVersion   := 0;
+                     Try
+                      qry.SQL.Add('select rdb$get_context(''SYSTEM'',''ENGINE_VERSION'')');
+                      qry.SQL.Add('from rdb$database');
+                      qry.Open;
+                      sVersion := qry.Fields[0].AsString;
+                     Except
 
-  // rdwDatabaseName foi definido para possiveis subversoes
-  // ex: no MySQL temos o MariaDB
-  // ex: no Firebird temos a versao HQBird
+                     End;
+                    End;
+    dbtMySQL      : Begin
+                     Result.rdwDatabaseName         := 'mysql';
+                     Result.rdwDatabaseMajorVersion := 3;
+                     Result.rdwDatabaseMinorVersion := 0;
+                     Result.rdwDatabaseSubVersion   := 0;
+                     Try
+                      qry.SQL.Add('SHOW VARIABLES LIKE ''%version%''');
+                      qry.Open;
+                      While Not qry.Eof Do
+                       Begin
+                        sAux1 := qry.FieldByName('variable_name').AsString;
+                        If SameText(sAux1, 'innodb_version') Then
+                         sVersion := qry.FieldByName('value').AsString
+                        Else If SameText(sAux1,'version')    Then
+                         Begin
+                          sAux1 := qry.FieldByName('value').AsString;
+                          If Pos('mariadb',LowerCase(sAux1)) > 0 Then
+                           Result.rdwDatabaseName := 'mariadb';
+                          iAux1 := 1;
+                          While iAux1 <= Length(sAux1) Do
+                           Begin
+                            If Not (sAux1[iAux1] In ['0'..'9', '.']) Then
+                             Delete(sAux1,iAux1,1)
+                            Else
+                             iAux1 := iAux1 + 1;
+                           End;
+                          sVersion := sAux1;
+                         End
+                        Else If SameText(sAux1,'version_comment') Then
+                         Begin
+                          sAux1 := qry.FieldByName('value').AsString;
+                          If Pos('mariadb',LowerCase(sAux1)) > 0 Then
+                           Result.rdwDatabaseName := 'mariadb';
+                         End;
+                        qry.Next;
+                       End;
+                     Except
 
-  sVersion := '';
+                     End;
+                    End;
+    dbtPostgreSQL : Begin
+                     Result.rdwDatabaseName := 'postgresql';
+                     Result.rdwDatabaseMajorVersion := 7;
+                     Result.rdwDatabaseMinorVersion := 0;
+                     Result.rdwDatabaseSubVersion   := 0;
+                     Try
+                      qry.SQL.Add('SELECT version()');
+                      qry.Open;
+                      sAux1 := qry.Fields[0].AsString;
+                      iAux1 := Pos('.',sAux1);
+                      While (iAux1 > 0)           And
+                            (sAux1[iAux1] <> ' ') Do
+                       iAux1 := iAux1 - 1;
+                      If iAux1 > 0 then
+                       Delete(sAux1,1,iAux1);
+                      sAux1 := Trim(sAux1);
+                      iAux1 := 1;
+                      While (iAux1        <= Length(sAux1))  And
+                            (sAux1[iAux1] In ['0'..'9','.']) Do
+                       Begin
+                        sVersion := sVersion + sAux1[iAux1];
+                        iAux1 := iAux1 + 1;
+                       End;
+                     Except
 
-  connType := getConectionType;
-  lst := TStringList.Create;
-  qry := getQuery;
-  try
-    if connType = dbtFirebird then begin
-      Result.rdwDatabaseName := 'firebird';
-      Result.rdwDatabaseMajorVersion := 1;
-      Result.rdwDatabaseMinorVersion := 5;
-      Result.rdwDatabaseSubVersion   := 0;
-      try
-        qry.SQL.Add('select rdb$get_context(''SYSTEM'',''ENGINE_VERSION'')');
-        qry.SQL.Add('from rdb$database');
-        qry.Open;
+                     End;
+                     If sVersion = '' Then
+                      Begin
+                       Try
+                        qry.SQL.Add('SHOW server_version');
+                        qry.Open;
+                        sVersion := qry.Fields[0].AsString;
+                       Except
+                       End;
+                      End;
+                    End;
+    dbtSQLLite    : Begin
+                     Result.rdwDatabaseName         := 'sqlite';
+                     Result.rdwDatabaseMajorVersion := 1;
+                     Result.rdwDatabaseMinorVersion := 0;
+                     Result.rdwDatabaseSubVersion   := 0;
+                     Try
+                      qry.SQL.Add('select sqlite_version()');
+                      qry.Open;
+                      sVersion := qry.Fields[0].AsString;
+                     Except
 
-        sVersion := qry.Fields[0].AsString;
-      except
+                     End;
+                    End;
+    dbtOracle     : Begin
+                     Result.rdwDatabaseName         := 'oracle';
+                     Result.rdwDatabaseMajorVersion := 0;
+                     Result.rdwDatabaseMinorVersion := 0;
+                     Result.rdwDatabaseSubVersion   := 0;
+                     Try
+                      qry.SQL.Add('SELECT * FROM v$version');
+                      qry.SQL.Add('WHERE banner LIKE ''Oracle%''');
+                      qry.Open;
+                      sAux1 := qry.Fields[0].AsString;
+                      Repeat
+                       iAux1 := Pos(' ',sAux1);
+                       If iAux1 > 0 Then
+                        Begin
+                         If Pos('.',Copy(sAux1,1,iAux1-1)) > 0 Then
+                          Begin
+                           sVersion := Copy(sAux1,1,iAux1-1);
+                           Break;
+                          End;
+                         Delete(sVersion,1,iAux1);
+                        End;
+                      Until iAux1 = 0;
+                     Except
+                     End;
+                    End;
+    dbtMsSQL      : Begin
+                     Result.rdwDatabaseName         := 'mssql';
+                     Result.rdwDatabaseMajorVersion := 0;
+                     Result.rdwDatabaseMinorVersion := 0;
+                     Result.rdwDatabaseSubVersion   := 0;
+                     Try
+                      qry.SQL.Add('select @@VERSION');
+                      qry.Open;
+                      sAux1 := qry.Fields[0].AsString;
+                      Repeat
+                       iAux1 := Pos(' ',sAux1);
+                       If iAux1 > 0 Then
+                        Begin
+                         If Pos('.',Copy(sAux1,1,iAux1-1)) > 0 Then
+                          Begin
+                           sVersion := Copy(sAux1,1,iAux1-1);
+                           Break;
+                          End;
+                         Delete(sVersion,1,iAux1);
+                        End;
+                      Until iAux1 = 0;
+                     Except
+                     End;
+                    End;
+  End;
+  If sVersion <> '' Then
+   Begin
+    Repeat
+     iAux1 := Pos('.',sVersion);
+     If iAux1 > 0 Then
+      Begin
+       lst.Add(Copy(sVersion,1,iAux1-1));
+       Delete(sVersion,1,iAux1);
+      End;
+    Until iAux1 = 0;
+    If lst.Count > 0 Then
+     Result.rdwDatabaseMajorVersion := StrToInt(lst.Strings[0]);
+    If lst.Count > 1 Then
+     Result.rdwDatabaseMinorVersion := StrToInt(lst.Strings[1]);
+    If lst.Count > 2 Then
+     Result.rdwDatabaseSubVersion := StrToInt(lst.Strings[2]);
+   End;
+ Finally
+  FreeAndNil(qry);
+  FreeAndNil(lst);
+ End;
+End;
 
-      end;
-    end
-    else if connType = dbtInterbase then begin
-      Result.rdwDatabaseName := 'interbase';
-      Result.rdwDatabaseMajorVersion := 6;
-      Result.rdwDatabaseMinorVersion := 0;
-      Result.rdwDatabaseSubVersion   := 0;
-      try
-        qry.SQL.Add('select rdb$get_context(''SYSTEM'',''ENGINE_VERSION'')');
-        qry.SQL.Add('from rdb$database');
-        qry.Open;
+Function TRESTDWDriverBase.getQuery: TRESTDWQuery;
+Begin
+ Result := Nil;
+End;
 
-        sVersion := qry.Fields[0].AsString;
-      except
+Function TRESTDWDriverBase.getTable: TRESTDWTable;
+Begin
+ Result := Nil;
+End;
 
-      end;
-    end
-    else if connType = dbtMySQL then begin
-      Result.rdwDatabaseName := 'mysql';
-      Result.rdwDatabaseMajorVersion := 3;
-      Result.rdwDatabaseMinorVersion := 0;
-      Result.rdwDatabaseSubVersion   := 0;
+Function TRESTDWDriverBase.getStoreProc : TRESTDWStoreProc;
+Begin
+ Result := Nil;
+End;
 
-      try
-        qry.SQL.Add('SHOW VARIABLES LIKE ''%version%''');
-        qry.Open;
+Function TRESTDWDriverBase.isConnected: boolean;
+Begin
+ Result := False;
+End;
 
-        while not qry.Eof do begin
-          sAux1 := qry.FieldByName('variable_name').AsString;
-          if SameText(sAux1,'innodb_version') then begin
-            sVersion := qry.FieldByName('value').AsString;
-          end
-          else if SameText(sAux1,'version') then begin
-            sAux1 := qry.FieldByName('value').AsString;
-            if Pos('mariadb',LowerCase(sAux1)) > 0 then
-              Result.rdwDatabaseName := 'mariadb';
+Function TRESTDWDriverBase.connInTransaction: boolean;
+Begin
+ Result := False;
+End;
 
-            iAux1 := 1;
-            while iAux1 <= Length(sAux1) do begin
-              if not (sAux1[iAux1] in ['0'..'9','.']) then
-                Delete(sAux1,iAux1,1)
-              else
-                iAux1 := iAux1 + 1;
-            end;
+Procedure TRESTDWDriverBase.connStartTransaction;
+Begin
 
-            sVersion := sAux1;
-          end
-          else if SameText(sAux1,'version_comment') then begin
-            sAux1 := qry.FieldByName('value').AsString;
-            if Pos('mariadb',LowerCase(sAux1)) > 0 then
-              Result.rdwDatabaseName := 'mariadb';
-          end;
-          qry.Next;
-        end;
-      except
+End;
 
-      end;
-    end
-    else if connType = dbtPostgreSQL then begin
-      Result.rdwDatabaseName := 'postgresql';
-      Result.rdwDatabaseMajorVersion := 7;
-      Result.rdwDatabaseMinorVersion := 0;
-      Result.rdwDatabaseSubVersion   := 0;
+Procedure TRESTDWDriverBase.connRollback;
+Begin
 
-      try
-        qry.SQL.Add('SELECT version()');
-        qry.Open;
+End;
 
-        sAux1 := qry.Fields[0].AsString;
-        iAux1 := Pos('.',sAux1);
-        while (iAux1 > 0) and (sAux1[iAux1] <> ' ') do
-          iAux1 := iAux1 - 1;
+Procedure TRESTDWDriverBase.connCommit;
+Begin
 
-        if iAux1 > 0 then
-          Delete(sAux1,1,iAux1);
+End;
 
-        sAux1 := Trim(sAux1);
+Function TRESTDWDriverBase.isMinimumVersion(major, minor, sub: integer): boolean;
+Var
+ info : TRESTDWDatabaseInfo;
+Begin
+ info := getDatabaseInfo;
+ Result := (info.rdwDatabaseMajorVersion >= major) And
+           (info.rdwDatabaseMinorVersion >= minor) And
+           (info.rdwDatabaseMinorVersion >= sub);
+End;
 
-        iAux1 := 1;
-        while (iAux1 <= Length(sAux1)) and (sAux1[iAux1] in ['0'..'9','.']) do begin
-          sVersion := sVersion + sAux1[iAux1];
-          iAux1 := iAux1 + 1;
-        end;
-      except
+Function TRESTDWDriverBase.isMinimumVersion(major, minor: integer): boolean;
+Begin
+ Result := isMinimumVersion(major, minor, 0);
+End;
 
-      end;
+Procedure TRESTDWDriverBase.setConnection(AValue: TComponent);
+Begin
+ If FConnection = AValue Then
+  Exit;
+ Disconect;
+ FConnection := AValue;
+End;
 
-      if sVersion = '' then begin
-       try
-          qry.SQL.Add('SHOW server_version');
-          qry.Open;
+Procedure TRESTDWDriverBase.Connect;
+Begin
 
-          sVersion := qry.Fields[0].AsString;
-        except
+End;
 
-        end;
-      end;
-    end
-    else if connType = dbtSQLLite then begin
-      Result.rdwDatabaseName := 'sqlite';
-      Result.rdwDatabaseMajorVersion := 1;
-      Result.rdwDatabaseMinorVersion := 0;
-      Result.rdwDatabaseSubVersion   := 0;
-      try
-        qry.SQL.Add('select sqlite_version()');
-        qry.Open;
+Procedure TRESTDWDriverBase.Disconect;
+Begin
 
-        sVersion := qry.Fields[0].AsString;
-      except
+End;
 
-      end;
-    end
-    else if connType = dbtOracle then begin
-      Result.rdwDatabaseName := 'oracle';
-      Result.rdwDatabaseMajorVersion := 0;
-      Result.rdwDatabaseMinorVersion := 0;
-      Result.rdwDatabaseSubVersion   := 0;
-      try
-        qry.SQL.Add('SELECT * FROM v$version');
-        qry.SQL.Add('WHERE banner LIKE ''Oracle%''');
-        qry.Open;
+Function TRESTDWDriverBase.ConnectionSet: Boolean;
+Begin
+ Result := Assigned(FConnection);
+End;
 
-        sAux1 := qry.Fields[0].AsString;
-        repeat
-          iAux1 := Pos(' ',sAux1);
-          if iAux1 > 0 then begin
-            if Pos('.',Copy(sAux1,1,iAux1-1)) > 0 then begin
-              sVersion := Copy(sAux1,1,iAux1-1);
-              Break;
-            end;
-            Delete(sVersion,1,iAux1);
-          end;
-        until iAux1 = 0;
-      except
+Function TRESTDWDriverBase.GetGenID(Query   : TRESTDWQuery;
+                                    GenName : String;
+                                    valor   : Integer) : Integer;
+Var
+ connType : TRESTDWDatabaseType;
+Begin
+ Result := -1;
+ connType := getConectionType;
+ With Query Do
+  Begin
+   Close;
+   SQL.Clear;
+   Case connType Of
+    dbtFirebird   : Begin
+                     SQL.Add('select gen_id('+QuotedStr(GenName)+','+IntToStr(valor)+')');
+                     SQL.Add('from rdb$database');
+                     Open;
+                     Result := Query.Fields[0].AsInteger;
+                    End;
+    dbtMySQL      : Begin
+                     SQL.Add('show table status where name = '+QuotedStr(GenName));
+                     Open;
+                     Result := valor + Query.FieldByName('auto_increment').AsInteger;
+                     If valor <> 0 Then
+                      Begin
+                       SQL.Clear;
+                       SQL.Add('alter table '+GenName+' auto_increment='+IntToStr(Result));
+                       ExecSQL;
+                      End;
+                    End;
+    dbtSQLLite    : Begin
+                     SQL.Add('create table if not exist sqlite_sequence(name,seq)');
+                     ExecSQL;
+                     SQL.Clear;
+                     SQL.Add('select seq from sqlite_sequence');
+                     SQL.Add('where name = '+QuotedStr(GenName));
+                     Open;
+                     Result := valor + Query.Fields[0].AsInteger;
+                     If valor <> 0 Then
+                      Begin
+                       SQL.Clear;
+                       SQL.Add('insert or replace into sqlite_sequence(name,seq)');
+                       SQL.Add('values('+QuotedStr(GenName)+','+IntToStr(Result)+')');
+                       ExecSQL;
+                      End;
+                    End;
+    dbtPostgreSQL : Begin
+                     SQL.Add('select currval('+QuotedStr(GenName)+')');
+                     Open;
+                     Try
+                      If valor <> 0 Then
+                       Begin
+                        SQL.Clear;
+                        SQL.Add('select nextval('+QuotedStr(GenName)+')');
+                        Open;
+                       End;
+                     Except
+                      SQL.Clear;
+                      SQL.Add('select nextval('+QuotedStr(GenName)+')');
+                      Open;
+                     End;
+                     Result := Query.Fields[0].AsInteger;
+                    End;
+   End;
+  End;
+End;
 
-      end;
-    end
-    else if connType = dbtMsSQL then begin
-      Result.rdwDatabaseName := 'mssql';
-      Result.rdwDatabaseMajorVersion := 0;
-      Result.rdwDatabaseMinorVersion := 0;
-      Result.rdwDatabaseSubVersion   := 0;
-      try
-        qry.SQL.Add('select @@VERSION');
-        qry.Open;
+Function TRESTDWDriverBase.GetGenID(GenName : String;
+                                    valor   : Integer) : Integer;
+Var
+ qry : TRESTDWQuery;
+Begin
+ qry := getQuery;
+ Try
+  Result := GetGenID(qry,GenName,valor);
+ Finally
+  FreeAndNil(qry);
+ End;
+End;
 
-        sAux1 := qry.Fields[0].AsString;
-        repeat
-          iAux1 := Pos(' ',sAux1);
-          if iAux1 > 0 then begin
-            if Pos('.',Copy(sAux1,1,iAux1-1)) > 0 then begin
-              sVersion := Copy(sAux1,1,iAux1-1);
-              Break;
-            end;
-            Delete(sVersion,1,iAux1);
-          end;
-        until iAux1 = 0;
-      except
-
-      end;
-    end;
-
-    if sVersion <> '' then begin
-      repeat
-        iAux1 := Pos('.',sVersion);
-        if iAux1 > 0 then begin
-          lst.Add(Copy(sVersion,1,iAux1-1));
-          Delete(sVersion,1,iAux1);
-        end;
-      until iAux1 = 0;
-
-      if lst.Count > 0 then
-        Result.rdwDatabaseMajorVersion := StrToInt(lst.Strings[0]);
-      if lst.Count > 1 then
-        Result.rdwDatabaseMinorVersion := StrToInt(lst.Strings[1]);
-      if lst.Count > 2 then
-        Result.rdwDatabaseSubVersion := StrToInt(lst.Strings[2]);
-    end;
-  finally
-    FreeAndNil(qry);
-    FreeAndNil(lst);
-  end;
-end;
-
-function TRESTDWDriverBase.getQuery: TRESTDWQuery;
-begin
-  Result := nil;
-end;
-
-function TRESTDWDriverBase.getTable: TRESTDWTable;
-begin
-  Result := nil;
-end;
-
-function TRESTDWDriverBase.getStoreProc : TRESTDWStoreProc;
-begin
-  Result := nil;
-end;
-
-function TRESTDWDriverBase.isConnected: boolean;
-begin
-  Result := False;
-end;
-
-function TRESTDWDriverBase.connInTransaction: boolean;
-begin
-  Result := False
-end;
-
-procedure TRESTDWDriverBase.connStartTransaction;
-begin
-
-end;
-
-procedure TRESTDWDriverBase.connRollback;
-begin
-
-end;
-
-procedure TRESTDWDriverBase.connCommit;
-begin
-
-end;
-
-function TRESTDWDriverBase.isMinimumVersion(major, minor, sub: integer): boolean;
-var
-  info : TRESTDWDatabaseInfo;
-begin
-  info := getDatabaseInfo;
-  Result := (info.rdwDatabaseMajorVersion >= major) and
-            (info.rdwDatabaseMinorVersion >= minor) and
-            (info.rdwDatabaseMinorVersion >= sub);
-end;
-
-function TRESTDWDriverBase.isMinimumVersion(major, minor: integer): boolean;
-begin
-  Result := isMinimumVersion(major,minor,0);
-end;
-
-procedure TRESTDWDriverBase.setConnection(AValue: TComponent);
-begin
-  if FConnection = AValue then
-    Exit;
-
-  Disconect;
-  FConnection := AValue;
-end;
-
-procedure TRESTDWDriverBase.Connect;
-begin
-
-end;
-
-procedure TRESTDWDriverBase.Disconect;
-begin
-
-end;
-
-function TRESTDWDriverBase.ConnectionSet: Boolean;
-begin
-  Result := Assigned(FConnection);
-end;
-
-function TRESTDWDriverBase.GetGenID(Query: TRESTDWQuery;
-                                    GenName: string; valor: integer): integer;
-var
-  connType : TRESTDWDatabaseType;
-begin
-  Result := -1;
-  connType := getConectionType;
-  with Query do begin
-    Close;
-    SQL.Clear;
-    if connType = dbtFirebird then begin
-      SQL.Add('select gen_id('+QuotedStr(GenName)+','+IntToStr(valor)+')');
-      SQL.Add('from rdb$database');
-      Open;
-
-      Result := Query.Fields[0].AsInteger;
-    end
-    else if connType = dbtMySQL then begin
-      SQL.Add('show table status where name = '+QuotedStr(GenName));
-      Open;
-
-      Result := valor + Query.FieldByName('auto_increment').AsInteger;
-
-      if valor <> 0 then begin
-        SQL.Clear;
-        SQL.Add('alter table '+GenName+' auto_increment='+IntToStr(Result));
-        ExecSQL;
-      end;
-    end
-    else if connType = dbtSQLLite then begin
-      SQL.Add('create table if not exist sqlite_sequence(name,seq)');
-      ExecSQL;
-
-      SQL.Clear;
-      SQL.Add('select seq from sqlite_sequence');
-      SQL.Add('where name = '+QuotedStr(GenName));
-      Open;
-
-      Result := valor + Query.Fields[0].AsInteger;
-
-      if valor <> 0 then begin
-        SQL.Clear;
-        SQL.Add('insert or replace into sqlite_sequence(name,seq)');
-        SQL.Add('values('+QuotedStr(GenName)+','+IntToStr(Result)+')');
-        ExecSQL;
-      end;
-    end
-    else if connType = dbtPostgreSQL then begin
-      SQL.Add('select currval('+QuotedStr(GenName)+')');
-      Open;
-
-      try
-        if valor <> 0 then begin
-          SQL.Clear;
-          SQL.Add('select nextval('+QuotedStr(GenName)+')');
-          Open;
-        end;
-      except
-        SQL.Clear;
-        SQL.Add('select nextval('+QuotedStr(GenName)+')');
-        Open;
-      end;
-
-      Result := Query.Fields[0].AsInteger;
-    end;
-  end;
-end;
-
-function TRESTDWDriverBase.GetGenID(GenName: string; valor: integer): integer;
-var
-  qry : TRESTDWQuery;
-begin
-  qry := getQuery;
-  try
-    Result := GetGenID(qry,GenName,valor);
-  finally
-    FreeAndNil(qry);
-  end;
-end;
-
-function TRESTDWDriverBase.ApplyUpdates(MassiveStream: TStream;
-                                        SQL: string;
-                                        Params: TRESTDWParams;
-                                        var Error: boolean;
-                                        var MessageError: string;
-                                        var RowsAffected: integer): TJSONValue;
+Function TRESTDWDriverBase.ApplyUpdates(MassiveStream    : TStream;
+                                        SQL              : String;
+                                        Params           : TRESTDWParams;
+                                        var Error        : Boolean;
+                                        var MessageError : String;
+                                        var RowsAffected : integer) : TJSONValue;
 Var
  vTempQuery     : TRESTDWQuery;
  A, I           : Integer;
@@ -962,8 +953,7 @@ Var
  vFieldType     : TFieldType;
  vStateResource,
  vMassiveLine   : Boolean;
-
-  Procedure BuildReflectionChanges(Var ReflectionChanges : String;
+ Procedure BuildReflectionChanges(Var ReflectionChanges : String;
                                   MassiveDataset        : TMassiveDatasetBuffer;
                                   Query                 : TDataset); //Todo
  Var
@@ -1870,16 +1860,15 @@ Var
   End;
  End;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  Try
   Result     := Nil;
   Error      := False;
   vStringStream := Nil;
   vTempQuery := getQuery;
   vStateResource := isConnected;
-  If not isConnected Then
-    Connect;
-
+  If Not isConnected Then
+   Connect;
   vTempQuery.SQL.Clear;
   vResultReflection := '';
   If LoadMassive(MassiveStream, vTempQuery) Then
@@ -1998,9 +1987,8 @@ Begin
        Result.Utf8SpecialChars := True;
        Result.LoadFromDataset('RESULTDATA', TDataSet(vTempQuery.Owner), EncodeStringsJSON);
        Error         := False;
-
-       if not vStateResource then
-          Disconect;
+       If not vStateResource then
+        Disconect;
       Except
        On E : Exception do
         Begin
@@ -2035,13 +2023,14 @@ Begin
   vTempQuery.Close;
   FreeAndNil(vTempQuery);
  End;
-end;
+End;
 
-function TRESTDWDriverBase.ApplyUpdates(Massive,SQL: string;
-                                        Params: TRESTDWParams;
-                                        var Error: Boolean;
-                                        var MessageError: string;
-                                        var RowsAffected: Integer): TJSONValue;
+Function TRESTDWDriverBase.ApplyUpdates(Massive,
+                                        SQL              : String;
+                                        Params           : TRESTDWParams;
+                                        Var Error        : Boolean;
+                                        Var MessageError : String;
+                                        Var RowsAffected : Integer): TJSONValue;
 Var
  vTempQuery     : TRESTDWQuery;
  A, I           : Integer;
@@ -2956,7 +2945,7 @@ Var
   End;
  End;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  Try
   Result     := Nil;
   Error      := False;
@@ -2964,7 +2953,7 @@ Begin
   vTempQuery := getQuery;
   vStateResource := isConnected;
   If Not vStateResource Then
-    connCommit;
+   connCommit;
   vTempQuery.SQL.Clear;
   vResultReflection := '';
   If LoadMassive(Massive, vTempQuery) Then
@@ -3047,7 +3036,6 @@ Begin
                       vTempQuery.Params[A].AsTime     := Params[I].AsDateTime
                      Else
                       vTempQuery.Params[A].AsDateTime := Params[I].AsDateTime;
-//                     vTempQuery.Params[A].AsDateTime  := Params[I].AsDateTime
                     End
                    Else
                     vTempQuery.Params[A].Clear;
@@ -3083,9 +3071,9 @@ Begin
        Result.Encoded  := EncodeStringsJSON;
        Result.Utf8SpecialChars := True;
        Result.LoadFromDataset('RESULTDATA', TDataSet(vTempQuery.Owner), EncodeStringsJSON);
-       Error         := False;
-       if not vStateResource then
-         Disconect
+       Error          := False;
+       If Not vStateResource Then
+        Disconect;
       Except
        On E : Exception do
         Begin
@@ -3119,27 +3107,792 @@ Begin
   vTempQuery.Close;
   FreeAndNil(vTempQuery);
  End;
-end;
+End;
 
-function TRESTDWDriverBase.ApplyUpdatesTB(MassiveStream: TStream;
-                                          SQL: String;
-                                          Params: TRESTDWParams;
-                                          var Error: Boolean;
-                                          var MessageError: String;
-                                          var RowsAffected: Integer): TJSONValue;
-var
-  StrMassive : string;
-begin
-  SetLength(StrMassive,MassiveStream.Size);
-  MassiveStream.Read(StrMassive[InitStrPos],MassiveStream.Size);
-  Result := ApplyUpdatesTB(StrMassive,Params,Error,MessageError,RowsAffected);
-end;
+Function TRESTDWDriverBase.ApplyUpdatesTB(MassiveStream    : TStream;
+                                          SQL              : String;
+                                          Params           : TRESTDWParams;
+                                          Var Error        : Boolean;
+                                          Var MessageError : String;
+                                          Var RowsAffected : Integer): TJSONValue;
+Var
+ vTempQuery     : TRESTDWTable;
+ A, I           : Integer;
+ vResultReflection,
+ vParamName     : String;
+ vStringStream  : TMemoryStream;
+ bPrimaryKeys   : TStringList;
+ vMassiveLine   : Boolean;
+ vValueKeys     : TRESTDWValueKeys;
+ vDataSet       : TDataSet;
+ Procedure BuildReflectionChanges(Var ReflectionChanges : String;
+                                  MassiveDataset        : TMassiveDatasetBuffer;
+                                  Query                 : TDataset); //Todo
+ Var
+  I                : Integer;
+  vTempValue,
+  vStringFloat,
+  vReflectionLine,
+  vReflectionLines : String;
+  vFieldType       : TFieldType;
+  MassiveField     : TMassiveField;
+  vFieldChanged    : Boolean;
+ Begin
+  ReflectionChanges := '%s';
+  vReflectionLine   := '';
+  {$IFDEF FPC}
+  vFieldChanged     := False;
+  {$ENDIF}
+  If MassiveDataset.Fields.FieldByName(RESTDWFieldBookmark) <> Nil Then
+   Begin
+    vReflectionLines  := Format('{"dwbookmark":"%s"%s}', [MassiveDataset.Fields.FieldByName(RESTDWFieldBookmark).Value, ', "reflectionlines":[%s]']);
+    For I := 0 To Query.Fields.Count -1 Do
+     Begin
+      MassiveField := MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName);
+      If MassiveField <> Nil Then
+       Begin
+        vFieldType := Query.Fields[I].DataType;
+        If MassiveField.Modified Then
+         vFieldChanged := MassiveField.Modified
+        Else
+         Begin
+          Case vFieldType Of
+            ftDate, ftTime,
+            ftDateTime, ftTimeStamp : Begin
+                                       If (Not MassiveField.IsNull) Then
+                                        Begin
+                                         If (MassiveField.IsNull And Not (Query.Fields[I].IsNull)) Or
+                                            (Not (MassiveField.IsNull) And Query.Fields[I].IsNull) Then
+                                          vFieldChanged     := True
+                                         Else
+                                          vFieldChanged     := (Query.Fields[I].AsDateTime <> MassiveField.Value);
+                                        End
+                                       Else
+                                        vFieldChanged    := Not(Query.Fields[I].IsNull);
+                                      End;
+           ftBytes, ftVarBytes,
+           ftBlob,  ftGraphic,
+           ftOraBlob, ftOraClob     : Begin
+                                       vStringStream  := TMemoryStream.Create;
+                                       Try
+                                        TBlobfield(Query.Fields[I]).SaveToStream(vStringStream);
+                                        vStringStream.Position := 0;
+  //                                      vFieldChanged := StreamToHex(vStringStream) <> MassiveField.Value;
+                                        vFieldChanged := EncodeStream(vStringStream) <> MassiveField.Value;
+                                       Finally
+                                        FreeAndNil(vStringStream);
+                                       End;
+                                      End;
+           Else
+            vFieldChanged := (Query.Fields[I].Value <> MassiveField.Value);
+          End;
+         End;
+        If vFieldChanged Then
+         Begin
+          Case vFieldType Of
+           ftDate, ftTime,
+           ftDateTime, ftTimeStamp : Begin
+                                      If (Not MassiveField.IsNull) Then
+                                       Begin
+                                        If (Query.Fields[I].AsDateTime <> MassiveField.Value) Or (MassiveField.Modified) Then
+                                         Begin
+                                          If (MassiveField.Modified) Then
+                                           vTempValue := IntToStr(DateTimeToUnix(StrToDateTime(MassiveField.Value)))
+                                          Else
+                                           vTempValue := IntToStr(DateTimeToUnix(Query.Fields[I].AsDateTime));
+                                          If vReflectionLine = '' Then
+                                           vReflectionLine := Format('{"%s":"%s"}', [MassiveField.FieldName, vTempValue])
+                                          Else
+                                           vReflectionLine := vReflectionLine + Format(', {"%s":"%s"}', [MassiveField.FieldName, vTempValue]);
+                                         End;
+                                       End
+                                      Else
+                                       Begin
+                                        If vReflectionLine = '' Then
+                                         vReflectionLine := Format('{"%s":"%s"}', [MassiveField.FieldName,
+                                                                                   IntToStr(DateTimeToUnix(Query.Fields[I].AsDateTime))])
+                                        Else
+                                         vReflectionLine := vReflectionLine + Format(', {"%s":"%s"}', [MassiveField.FieldName,
+                                                                                     IntToStr(DateTimeToUnix(Query.Fields[I].AsDateTime))]);
+                                       End;
+                                     End;
+           ftFloat,
+           ftCurrency, ftBCD,
+           ftFMTBcd{$IFNDEF FPC}{$IF CompilerVersion >= 22},
+                                 ftSingle,
+                                 ftExtended
+                                 {$IFEND}
+                                 {$ENDIF} : Begin
+                                             vStringFloat  := Query.Fields[I].AsString;
+                                             If (Trim(vStringFloat) <> '') Then
+                                              vStringFloat := BuildStringFloat(vStringFloat)
+                                             Else
+                                              vStringFloat := cNullvalue;
+                                             If (MassiveField.Modified) Then
+                                              vStringFloat := BuildStringFloat(MassiveField.Value);
+                                             If vReflectionLine = '' Then
+                                              vReflectionLine := Format('{"%s":"%s"}', [MassiveField.FieldName, vStringFloat])
+                                             Else
+                                              vReflectionLine := vReflectionLine + Format(', {"%s":"%s"}', [MassiveField.FieldName, vStringFloat]);
+                                            End;
+           Else
+            Begin
+             If Not (vFieldType In [ftBytes, ftVarBytes, ftBlob,
+                                    ftGraphic, ftOraBlob, ftOraClob]) Then
+              Begin
+               vTempValue := Query.Fields[I].AsString;
+               If (MassiveField.Modified) Then
+                If Not MassiveField.IsNull Then
+                 vTempValue := MassiveField.Value
+                Else
+                 vTempValue := cNullvalue;
+               If vReflectionLine = '' Then
+                vReflectionLine := Format('{"%s":"%s"}', [MassiveField.FieldName,
+                                                          EncodeStrings(vTempValue{$IFDEF FPC}, csUndefined{$ENDIF})])
+               Else
+                vReflectionLine := vReflectionLine + Format(', {"%s":"%s"}', [MassiveField.FieldName,
+                                                                              EncodeStrings(vTempValue{$IFDEF FPC}, csUndefined{$ENDIF})]);
+              End
+             Else
+              Begin
+               vStringStream  := TMemoryStream.Create;
+               Try
+                TBlobfield(Query.Fields[I]).SaveToStream(vStringStream);
+                vStringStream.Position := 0;
+                If vStringStream.Size > 0 Then
+                 Begin
+                  If vReflectionLine = '' Then
+                   vReflectionLine := Format('{"%s":"%s"}', [MassiveField.FieldName,
+                                                             EncodeStream(vStringStream)]) // StreamToHex(vStringStream)])
+                  Else
+                   vReflectionLine := vReflectionLine + Format(', {"%s":"%s"}', [MassiveField.FieldName,
+                                                                                 EncodeStream(vStringStream)]); // StreamToHex(vStringStream)]);
+                 End
+                Else
+                 Begin
+                  If vReflectionLine = '' Then
+                   vReflectionLine := Format('{"%s":"%s"}', [MassiveField.FieldName, cNullvalue])
+                  Else
+                   vReflectionLine := vReflectionLine + Format(', {"%s":"%s"}', [MassiveField.FieldName, cNullvalue]);
+                 End;
+               Finally
+                FreeAndNil(vStringStream);
+               End;
+              End;
+            End;
+          End;
+         End;
+       End;
+     End;
+    If vReflectionLine <> '' Then
+     ReflectionChanges := Format(ReflectionChanges, [Format(vReflectionLines, [vReflectionLine])])
+    Else
+     ReflectionChanges := '';
+   End;
+ End;
+ Function LoadMassive(MassiveStream : TStream;
+                      Var Query     : TRESTDWTable) : Boolean;
+ Var
+  MassiveDataset : TMassiveDatasetBuffer;
+  A, B           : Integer;
 
-function TRESTDWDriverBase.ApplyUpdatesTB(Massive: String;
-                                          Params: TRESTDWParams;
-                                          var Error: Boolean;
-                                          var MessageError: String;
-                                          var RowsAffected: Integer): TJSONValue;
+  Procedure PrepareData(Var Query      : TRESTDWTable;
+                        MassiveDataset : TMassiveDatasetBuffer;
+                        Var vError     : Boolean;
+                        Var ErrorMSG   : String);
+  Var
+   vResultReflectionLine,
+   vLocate    : String;
+   I          : Integer;
+   Procedure SetUpdateBuffer(All : Boolean = False);
+   Var
+    X : Integer;
+    MassiveReplyCache : TMassiveReplyCache;
+    MassiveReplyValue : TMassiveReplyValue;
+   Begin
+    If (I = 0) or (All) Then
+     Begin
+      bPrimaryKeys := MassiveDataset.PrimaryKeys;
+      Try
+       For X := 0 To bPrimaryKeys.Count -1 Do
+        Begin
+         If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 22} // Delphi 2010 pra baixo
+                                                                       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                                                       ftString,    ftWideString,
+                                                                       ftMemo, ftFmtMemo {$IFNDEF FPC}
+                                                                               {$IF CompilerVersion > 22}
+                                                                                , ftWideMemo
+                                                                               {$IFEND}
+                                                                               {$ELSE}
+                                                                               , ftWideMemo
+                                                                              {$ENDIF}]    Then
+          Begin
+           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Size > 0 Then
+            Begin
+             Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType := ftString;
+             Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Value := Copy(MassiveDataset.AtualRec.PrimaryValues[X].Value, 1, Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Size);
+            end
+           Else
+            Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Value := MassiveDataset.AtualRec.PrimaryValues[X].Value;
+          End
+         Else
+          Begin
+           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftUnknown] Then
+            Begin
+             If Not (ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(bPrimaryKeys[X]).FieldType) in [ftUnknown]) Then
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(bPrimaryKeys[X]).FieldType)
+             Else
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType := ftString;
+            End;
+           If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion >= 22}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+            Begin
+             If MassiveDataset.MasterCompTag <> '' Then
+              MassiveReplyCache := MassiveDataset.MassiveReply.ItemsString[MassiveDataset.MasterCompTag]
+             Else
+              MassiveReplyCache := MassiveDataset.MassiveReply.ItemsString[MassiveDataset.MyCompTag];
+             MassiveReplyValue := Nil;
+             If MassiveReplyCache <> Nil Then
+              Begin
+               MassiveReplyValue := MassiveReplyCache.ItemByValue(bPrimaryKeys[X], MassiveDataset.AtualRec.PrimaryValues[X].OldValue);
+               If MassiveReplyValue = Nil Then
+                MassiveReplyValue := MassiveReplyCache.ItemByValue(bPrimaryKeys[X], MassiveDataset.AtualRec.PrimaryValues[X].Value);
+               If MassiveReplyValue <> Nil Then
+                Begin
+                 If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [{$IFNDEF FPC}{$IF CompilerVersion >= 22}ftLongWord, {$IFEND}{$ENDIF} ftLargeint] Then
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]){$IFNDEF FPC}{$IF CompilerVersion >= 22}.AsLargeInt{$ELSE}.AsInteger{$IFEND}{$ELSE}.AsLargeInt{$ENDIF} := StrToInt64(MassiveReplyValue.NewValue)
+                 Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveReplyValue.NewValue)
+                 Else
+                  Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveReplyValue.NewValue);
+                End;
+              End;
+             If (MassiveReplyValue = Nil) And (Not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) Then
+              Begin
+               If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [{$IFNDEF FPC}{$IF CompilerVersion >= 22}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]){$IFNDEF FPC}{$IF CompilerVersion >= 22}.AsLargeInt{$ELSE}.AsInteger{$IFEND}{$ELSE}.AsLargeInt{$ENDIF} := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+               Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType = ftSmallInt Then
+                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+               Else
+                Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsInteger  := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+              End;
+            End
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd{$IFNDEF FPC}{$IF CompilerVersion >= 22}, ftSingle{$IFEND}{$ENDIF}] Then
+            Begin
+             If (Not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) Then
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsFloat  := StrToFloat(BuildFloatString(MassiveDataset.AtualRec.PrimaryValues[X].Value));
+            End
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+            Begin
+             If (Not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) Then
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).AsDateTime  := MassiveDataset.AtualRec.PrimaryValues[X].Value
+             Else
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Clear;
+            End  //Tratar Blobs de Parametros...
+           Else If Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).DataType in [ftBytes, ftVarBytes, ftBlob,
+                                                                              ftGraphic, ftOraBlob, ftOraClob] Then
+            Begin
+             If Not Assigned(vStringStream) Then
+              vStringStream  := TMemoryStream.Create;
+             Try
+              MassiveDataset.AtualRec.PrimaryValues[X].SaveToStream(vStringStream);
+              vStringStream.Position := 0;
+              Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).LoadFromStream(vStringStream, ftBlob);
+             Finally
+              If Assigned(vStringStream) Then
+               FreeAndNil(vStringStream);
+             End;
+            End
+           Else
+            Query.ParamByName('DWKEY_' + bPrimaryKeys[X]).Value := MassiveDataset.AtualRec.PrimaryValues[X].Value;
+          End;
+        End;
+      Finally
+       FreeAndNil(bPrimaryKeys);
+      End;
+     End;
+    If Not (All) Then
+     Begin
+      If Query.Fields[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 22} // Delphi 2010 pra baixo
+                         ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                         ftString,    ftWideString,
+                         ftMemo, ftFmtMemo {$IFNDEF FPC}
+                                    {$IF CompilerVersion > 22}
+                                     , ftWideMemo
+                                    {$IFEND}
+                                    {$ELSE}
+                                    , ftWideMemo
+                                   {$ENDIF}]    Then
+       Begin
+        If (Not(MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).IsNull)) Then
+         Begin
+          If Query.Fields[I].Size > 0 Then
+           Begin
+            Query.Fields[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).Value, 1, Query.Fields[I].Size);
+           End
+          Else
+           Query.Fields[I].Value := MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).Value;
+         End;
+       End
+      Else
+       Begin
+        If Query.Fields[I].DataType in [ftBoolean, ftInterface, ftIDispatch, ftGuid] Then
+         Begin
+          If (Not (MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).IsNull)) Then
+           Query.Fields[I].Value := MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).Value
+          Else
+           Query.Fields[I].Clear;
+         End
+        Else If Query.Fields[I].DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion >= 22}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+         Begin
+          If (Not (MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).IsNull)) Then
+           Begin
+            If Query.Fields[I].DataType in [{$IFNDEF FPC}{$IF CompilerVersion >= 22}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+             Query.Fields[I]{$IFNDEF FPC}{$IF CompilerVersion >= 22}.AsLargeInt{$ELSE}.AsInteger{$IFEND}{$ELSE}.AsLargeInt{$ENDIF} := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).Value)
+            Else
+             Query.Fields[I].AsInteger  := StrToInt(MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).Value);
+           End
+          Else
+           Query.Fields[I].Clear;
+         End
+        Else If Query.Fields[I].DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd{$IFNDEF FPC}{$IF CompilerVersion >= 22}, ftSingle{$IFEND}{$ENDIF}] Then
+         Begin
+          If (Not (MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).IsNull)) Then
+           Query.Fields[I].AsFloat  := StrToFloat(BuildFloatString(MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).Value))
+          Else
+           Query.Fields[I].Clear;
+         End
+        Else If Query.Fields[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+         Begin
+          If (Not (MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).IsNull)) Then
+           Query.Fields[I].AsDateTime  := MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).Value
+          Else
+           Query.Fields[I].Clear;
+         End  //Tratar Blobs de Parametros...
+        Else If Query.Fields[I].DataType in [ftBytes, ftVarBytes, ftBlob,
+                                             ftGraphic, ftOraBlob, ftOraClob] Then
+         Begin
+           If (Not (MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).IsNull)) Then
+            Begin
+             If Not Assigned(vStringStream) Then
+              vStringStream := TMemoryStream.Create;
+             Try
+              MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).SaveToStream(vStringStream);
+              If vStringStream <> Nil Then
+               Begin
+                vStringStream.Position := 0;
+                TBlobField(Query.Fields[I]).LoadFromStream(vStringStream);
+               End
+              Else
+               Query.Fields[I].Clear;
+             Finally
+              If Assigned(vStringStream) Then
+               FreeAndNil(vStringStream);
+             End;
+            End
+           Else
+            Query.Fields[I].Clear;
+         End
+        Else
+         Query.Fields[I].Value := MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).Value;
+       End;
+     End;
+   End;
+  Begin
+   Query.Close;
+   Query.Filter    := '';
+   Query.Filtered  := False;
+   Query.TableName := MassiveDataset.TableName;
+   vLocate         := '';
+   Case MassiveDataset.MassiveMode Of
+    mmInsert : Begin
+                vLocate := '1=0';
+               End;
+    mmUpdate,
+    mmDelete : Begin
+                bPrimaryKeys := MassiveDataset.PrimaryKeys;
+                Try
+                 For I := 0 To bPrimaryKeys.Count -1 Do
+                  Begin
+                   If MassiveDataset.MassiveMode = mmUpdate Then
+                    Begin
+                     If I = 0 Then
+                      vLocate := Format('%s=''%s''', [bPrimaryKeys[I], MassiveDataset.AtualRec.PrimaryValues[I].Value])
+                     Else
+                      vLocate := vLocate + ' and ' + Format('%s=''%s''', [bPrimaryKeys[I], MassiveDataset.AtualRec.PrimaryValues[I].Value]);
+                    End
+                   Else
+                    Begin
+                     If I = 0 Then
+                      vLocate := Format('%s=''%s''', [bPrimaryKeys[I], MassiveDataset.AtualRec.Values[I +1].Value])
+                     Else
+                      vLocate := vLocate + ' and ' + Format('%s=''%s''', [bPrimaryKeys[I], MassiveDataset.AtualRec.Values[I +1].Value]);
+                    End;
+                  End;
+                Finally
+                 FreeAndNil(bPrimaryKeys);
+                End;
+               End;
+   End;
+   Query.Filter    := vLocate;
+   Query.Filtered  := True;
+   //Params
+   If (MassiveDataset.MassiveMode <> mmDelete) Then
+    Begin
+     If Assigned(Self.OnTableBeforeOpen) Then
+      Self.OnTableBeforeOpen(vDataSet, Params, MassiveDataset.TableName);
+     Query.Open;
+     Query.FetchAll;
+     For I := 0 To MassiveDataset.Fields.Count -1 Do
+      Begin
+       If (MassiveDataset.Fields.Items[I].KeyField) And
+          (MassiveDataset.Fields.Items[I].AutoGenerateValue) Then
+        Begin
+         If Query.FindField(MassiveDataset.Fields.Items[I].FieldName) <> Nil Then
+          Begin
+           Query.createSequencedField(MassiveDataset.SequenceName, MassiveDataset.Fields.Items[I].FieldName);
+          End;
+        End;
+      End;
+     Try
+      Case MassiveDataset.MassiveMode Of
+       mmInsert : Query.Insert;
+       mmUpdate : Begin
+                   If Query.RecNo > 0 Then
+                    Query.Edit
+                   Else
+                    Raise Exception.Create(PChar('Record not found to update...'));
+                  End;
+      End;
+      BuildDatasetLine(TRESTDWDataset(Query), MassiveDataset);
+     Finally
+      Case MassiveDataset.MassiveMode Of
+       mmInsert, mmUpdate : Begin
+                             Query.Post;
+//                             Query.RefreshCurrentRow(true);
+//                             Query.Resync([rmExact, rmCenter]);
+                            End;
+      End;
+      //Retorno de Dados do ReflectionChanges
+      BuildReflectionChanges(vResultReflectionLine, MassiveDataset, TDataset(Query));
+      If vResultReflection = '' Then
+       vResultReflection := vResultReflectionLine
+      Else
+       vResultReflection := vResultReflection + ', ' + vResultReflectionLine;
+      If (Self.Owner.ClassType = TServerMethodDatamodule)             Or
+         (Self.Owner.ClassType.InheritsFrom(TServerMethodDatamodule)) Then
+       Begin
+        If Assigned(TServerMethodDataModule(Self.Owner).OnAfterMassiveLineProcess) Then
+         TServerMethodDataModule(Self.Owner).OnAfterMassiveLineProcess(MassiveDataset, TDataset(Query));
+       End;
+      Query.Close;
+     End;
+    End
+   Else
+    Begin
+     Query.Open;
+     Query.Delete;
+    End;
+  End;
+ Begin
+  MassiveDataset := TMassiveDatasetBuffer.Create(Nil);
+  Result         := False;
+  Try
+   MassiveStream.Position := 0;
+   MassiveDataset.LoadFromStream(MassiveStream);
+   MassiveDataset.First;
+   If Self.Owner      Is TServerMethodDataModule Then
+    Begin
+     If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveBegin) Then
+      TServerMethodDataModule(Self.Owner).OnMassiveBegin(MassiveDataset);
+    End;
+   B             := 1;
+   Result        := True;
+   For A := 1 To MassiveDataset.RecordCount Do
+    Begin
+     If not connInTransaction Then Begin
+       connStartTransaction;
+       If Self.Owner      Is TServerMethodDataModule Then
+        Begin
+         If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterStartTransaction) Then
+          TServerMethodDataModule(Self.Owner).OnMassiveAfterStartTransaction(MassiveDataset);
+        End;
+      End;
+     Query.Close;
+     Query.Filter := '';
+     Query.Filtered := False;
+     If Self.Owner      Is TServerMethodDataModule Then
+      Begin
+       vMassiveLine := False;
+       If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveProcess) Then
+        Begin
+         TServerMethodDataModule(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+         If vMassiveLine Then
+          Begin
+           MassiveDataset.Next;
+           Continue;
+          End;
+        End;
+      End;
+     PrepareData(Query, MassiveDataset, Error, MessageError);
+     Try
+      If (Not (MassiveDataset.ReflectChanges))     Or
+         ((MassiveDataset.ReflectChanges)          And
+          (MassiveDataset.MassiveMode in [mmExec])) Then
+       Query.ExecSQL;
+     Except
+      On E : Exception do
+       Begin
+        Error  := True;
+        Result := False;
+        If connInTransaction Then
+          connRollback;
+        MessageError := E.Message;
+        Exit;
+       End;
+     End;
+     If B >= CommitRecords Then
+      Begin
+       Try
+        If connInTransaction Then
+         Begin
+          If Self.Owner      Is TServerMethodDataModule Then
+           Begin
+            If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit) Then
+             TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit(MassiveDataset);
+           End;
+           connCommit;
+          If Self.Owner      Is TServerMethodDataModule Then
+           Begin
+            If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit) Then
+             TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit(MassiveDataset);
+           End;
+         End;
+       Except
+        On E : Exception do
+         Begin
+          Error  := True;
+          Result := False;
+          If connInTransaction Then
+            connRollback;
+          MessageError := E.Message;
+          Break;
+         End;
+       End;
+       B := 1;
+      End
+     Else
+      Inc(B);
+     MassiveDataset.Next;
+    End;
+   Try
+    If connInTransaction Then
+     Begin
+      If Self.Owner      Is TServerMethodDataModule Then
+       Begin
+        If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit) Then
+         TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit(MassiveDataset);
+       End;
+         connCommit;
+      If Self.Owner      Is TServerMethodDataModule Then
+       Begin
+        If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit) Then
+         TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit(MassiveDataset);
+       End;
+     End;
+   Except
+    On E : Exception do
+     Begin
+      Error  := True;
+      Result := False;
+      If connInTransaction Then
+        connRollback;
+      MessageError := E.Message;
+     End;
+   End;
+  Finally
+   If Self.Owner      Is TServerMethodDataModule Then
+    Begin
+     If Assigned(TServerMethodDataModule(Self.Owner).OnMassiveEnd) Then
+      TServerMethodDataModule(Self.Owner).OnMassiveEnd(MassiveDataset);
+    End;
+   FreeAndNil(MassiveDataset);
+   Query.Filter := '';
+   Query.Filtered := False;
+  End;
+ End;
+Begin
+ {$IFNDEF FPC}Inherited;{$ENDIF}
+ Try
+  Result         := Nil;
+  Error          := False;
+  vStringStream  := Nil;
+  vTempQuery     := getTable;
+  vDataSet       := TDataSet(vTempQuery.Owner);
+  vValueKeys     := TRESTDWValueKeys.Create;
+  If Not isConnected Then
+   Connect;
+  vTempQuery.Filter       := '';
+  vResultReflection := '';
+  If LoadMassive(MassiveStream, vTempQuery) Then
+   Begin
+    If (vResultReflection = '') Then
+     Begin
+      Try
+       vTempQuery.Filter   := '';
+       vTempQuery.Filtered := False;
+       If Params <> Nil Then
+        Begin
+         For I := 0 To Params.Count -1 Do
+          Begin
+           If vTempQuery.Fields.Count > I Then
+            Begin
+             vParamName := Copy(StringReplace(Params[I].ParamName, ',', '', []), 1, Length(Params[I].ParamName));
+             A := vTempQuery.GetParamIndex(vParamName);
+             If A > -1 Then//vTempQuery.ParamByName(vParamName) <> Nil Then
+              Begin
+               If vTempQuery.Fields[A].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 22} // Delphi 2010 pra baixo
+                                                     ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
+                                                     ftString,    ftWideString,
+                                                     ftMemo, ftFmtMemo {$IFNDEF FPC}
+                                                              {$IF CompilerVersion > 22}
+                                                               , ftWideMemo
+                                                              {$IFEND}
+                                                              {$ELSE}
+                                                              , ftWideMemo
+                                                            {$ENDIF}]    Then
+                Begin
+                 If vTempQuery.Fields[A].Size > 0 Then
+                  Begin
+//                   vTempQuery.Fields[A].DataType := ftString;
+                   vTempQuery.Fields[A].Value := Copy(Params[I].Value, 1, vTempQuery.Fields[A].Size);
+                  End
+                 Else
+                  vTempQuery.Fields[A].Value := Params[I].Value;
+                End
+               Else
+                Begin
+//                 If vTempQuery.Fields[A].DataType in [ftUnknown] Then
+//                  Begin
+//                   If Not (ObjectValueToFieldType(Params[I].ObjectValue) in [ftUnknown]) Then
+//                    vTempQuery.Fields[A].DataType := ObjectValueToFieldType(Params[I].ObjectValue)
+//                   Else
+//                    vTempQuery.Fields[A].DataType := ftString;
+//                  End;
+                 If vTempQuery.Fields[A].DataType in [ftInteger, ftSmallInt, ftWord{$IFNDEF FPC}{$IF CompilerVersion >= 22}, ftLongWord{$IFEND}{$ENDIF}, ftLargeint] Then
+                  Begin
+                   If Trim(Params[I].Value) <> '' Then
+                    Begin
+                     If vTempQuery.Fields[A].DataType in [{$IFNDEF FPC}{$IF CompilerVersion >= 22}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+                      Begin
+                       {$IFNDEF FPC}
+                        {$IF CompilerVersion > 22}vTempQuery.Fields[A].AsLargeInt := StrToInt64(Params[I].Value);
+                        {$ELSE}vTempQuery.Fields[A].AsInteger                     := StrToInt64(Params[I].Value);
+                        {$IFEND}
+                       {$ELSE}
+                        vTempQuery.Fields[A].AsLargeInt := StrToInt64(Params[I].Value);
+                       {$ENDIF}
+                      End
+                     Else
+                      vTempQuery.Fields[A].AsInteger  := StrToInt(Params[I].Value);
+                    End
+                   Else
+                    vTempQuery.Fields[A].Clear;
+                  End
+                 Else If vTempQuery.Fields[A].DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd{$IFNDEF FPC}{$IF CompilerVersion >= 22}, ftSingle{$IFEND}{$ENDIF}] Then
+                  Begin
+                   If Trim(Params[I].Value) <> '' Then
+                    vTempQuery.Fields[A].AsFloat  := StrToFloat(BuildFloatString(Params[I].Value))
+                   Else
+                    vTempQuery.Fields[A].Clear;
+                  End
+                 Else If vTempQuery.Fields[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
+                  Begin
+                   If Trim(Params[I].Value) <> '' Then
+                    vTempQuery.Fields[A].AsDateTime := Params[I].AsDateTime
+                   Else
+                    vTempQuery.Fields[A].Clear;
+                  End  //Tratar Blobs de Parametros...
+                 Else If vTempQuery.Fields[A].DataType in [ftBytes, ftVarBytes, ftBlob,
+                                                           ftGraphic, ftOraBlob, ftOraClob] Then
+                  Begin
+                   If Not Assigned(vStringStream) Then
+                    vStringStream  := TMemoryStream.Create;
+                   Try
+                    Params[I].SaveToStream(vStringStream);
+                    vStringStream.Position := 0;
+                    If vStringStream.Size > 0 Then
+                     TBlobField(vTempQuery.Fields[A]).LoadFromStream(vStringStream);
+                   Finally
+                    If Assigned(vStringStream) Then
+                     FreeAndNil(vStringStream);
+                   End;
+                  End
+                 Else
+                  vTempQuery.Fields[A].Value    := Params[I].Value;
+                End;
+              End;
+            End
+           Else
+            Break;
+          End;
+        End;
+       vTempQuery.Open;
+       vTempQuery.FetchAll;
+       If Result = Nil Then
+        Result         := TJSONValue.Create;
+       Result.Encoding := Encoding;
+       Result.Encoded  := EncodeStringsJSON;
+       {$IFDEF FPC}
+        Result.DatabaseCharSet := DatabaseCharSet;
+       {$ENDIF}
+       Result.Utf8SpecialChars := True;
+       Result.LoadFromDataset('RESULTDATA', TDataSet(vTempQuery.Owner), EncodeStringsJSON);
+       Error         := False;
+      Except
+       On E : Exception do
+        Begin
+         Try
+          Error          := True;
+          MessageError   := E.Message;
+          If Result = Nil Then
+           Result        := TJSONValue.Create;
+          Result.Encoded := True;
+          {$IFDEF FPC}
+           Result.DatabaseCharSet := DatabaseCharSet;
+          {$ENDIF}
+          Result.SetValue(GetPairJSONStr('NOK', MessageError));
+          connRollback;
+         Except
+         End;
+        End;
+      End;
+     End
+    Else If (vResultReflection <> '') Then
+     Begin
+      If Result = Nil Then
+       Result         := TJSONValue.Create;
+      Result.Encoding := Encoding;
+      Result.Encoded  := EncodeStringsJSON;
+      {$IFDEF FPC}
+       Result.DatabaseCharSet := DatabaseCharSet;
+      {$ENDIF}
+      Result.SetValue('[' + vResultReflection + ']');
+      Error         := False;
+     End;
+   End;
+ Finally
+  RowsAffected := vTempQuery.RecordCount;
+  vTempQuery.Close;
+  FreeAndNil(vTempQuery);
+  FreeAndNil(vValueKeys);
+ End;
+End;
+
+Function TRESTDWDriverBase.ApplyUpdatesTB(Massive          : String;
+                                          Params           : TRESTDWParams;
+                                          var Error        : Boolean;
+                                          var MessageError : String;
+                                          var RowsAffected : Integer): TJSONValue;
 Var
  vTempQuery     : TRESTDWTable;
  A, I           : Integer;
@@ -3912,9 +4665,16 @@ Begin
  End;
 end;
 
-function TRESTDWDriverBase.ApplyUpdates_MassiveCache(MassiveCache: string;
-                                                     var Error: boolean;
-                                                     var MessageError: string): TJSONValue;
+Function TRESTDWDriverBase.ApplyUpdates_MassiveCache  (MassiveStream         : TStream;
+                                                       Var Error             : Boolean;
+                                                       Var MessageError      : String) : TJSONValue;
+Begin
+
+End;
+
+Function TRESTDWDriverBase.ApplyUpdates_MassiveCache  (MassiveCache     : String;
+                                                       Var Error        : Boolean;
+                                                       Var MessageError : String): TJSONValue;
 Var
  vTempQuery        : TRESTDWQuery;
  vStringStream     : TMemoryStream;
@@ -4820,7 +5580,7 @@ Var
   End;
  End;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  vResultReflection := '';
  Result     := Nil;
  vStringStream := Nil;
@@ -4849,18 +5609,25 @@ Begin
   vTempQuery.Close;
   vTempQuery.Free;
  End;
-end;
+End;
 
-function TRESTDWDriverBase.ApplyUpdates_MassiveCacheTB(MassiveCache: String;
-                                                       var Error: Boolean;
-                                                       var MessageError: String): TJSONValue;
-begin
+Function TRESTDWDriverBase.ApplyUpdates_MassiveCacheTB(MassiveStream         : TStream;
+                                                       Var Error             : Boolean;
+                                                       Var MessageError      : String) : TJSONValue;
+Begin
 
-end;
+End;
 
-function TRESTDWDriverBase.ProcessMassiveSQLCache(MassiveSQLCache: string;
+Function TRESTDWDriverBase.ApplyUpdates_MassiveCacheTB(MassiveCache     : String;
+                                                       Var Error        : Boolean;
+                                                       Var MessageError : String): TJSONValue;
+Begin
+
+End;
+
+Function TRESTDWDriverBase.ProcessMassiveSQLCache(MassiveSQLCache: String;
                                                   var Error: Boolean;
-                                                  var MessageError: string): TJSONValue;
+                                                  var MessageError: String): TJSONValue;
 Var
  vTempQuery        : TRESTDWQuery;
  vStringStream     : TMemoryStream;
@@ -5050,7 +5817,7 @@ Var
   End;
  End;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  vResultReflection := '';
  Result     := Nil;
  vStringStream := Nil;
@@ -5081,30 +5848,30 @@ Begin
  End;
 end;
 
-function TRESTDWDriverBase.ExecuteCommand(SQL: String;
-                                          var Error: Boolean;
-                                          var MessageError: String;
-                                          var BinaryBlob: TMemoryStream;
-                                          var RowsAffected: Integer;
-                                          Execute: Boolean;
-                                          BinaryEvent: Boolean;
-                                          MetaData: Boolean;
-                                          BinaryCompatibleMode: Boolean): string;
-begin
-  Result := ExecuteCommand(SQL,nil,Error,MessageError,BinaryBlob,RowsAffected,
-                           Execute,BinaryEvent,MetaData,BinaryCompatibleMode);
-end;
+Function TRESTDWDriverBase.ExecuteCommand(SQL                   : String;
+                                          Var Error             : Boolean;
+                                          Var MessageError      : String;
+                                          Var BinaryBlob        : TMemoryStream;
+                                          Var RowsAffected      : Integer;
+                                          Execute               : Boolean = False;
+                                          BinaryEvent           : Boolean = False;
+                                          MetaData              : Boolean = False;
+                                          BinaryCompatibleMode  : Boolean = False) : String;
+Begin
+ Result := ExecuteCommand(SQL, Nil, Error, MessageError, BinaryBlob, RowsAffected,
+                          Execute, BinaryEvent, MetaData, BinaryCompatibleMode);
+End;
 
-function TRESTDWDriverBase.ExecuteCommand(SQL: String;
-                                          Params: TRESTDWParams;
-                                          var Error: Boolean;
-                                          var MessageError: String;
-                                          var BinaryBlob: TMemoryStream;
-                                          var RowsAffected: Integer;
-                                          Execute: Boolean;
-                                          BinaryEvent: Boolean;
-                                          MetaData: Boolean;
-                                          BinaryCompatibleMode: Boolean): string;
+Function TRESTDWDriverBase.ExecuteCommand(SQL                   : String;
+                                          Params                : TRESTDWParams;
+                                          Var Error             : Boolean;
+                                          Var MessageError      : String;
+                                          Var BinaryBlob        : TMemoryStream;
+                                          Var RowsAffected      : Integer;
+                                          Execute               : Boolean = False;
+                                          BinaryEvent           : Boolean = False;
+                                          MetaData              : Boolean = False;
+                                          BinaryCompatibleMode  : Boolean = False): String;
 Var
  vTempQuery     : TRESTDWQuery;
  vDataSet       : TDataSet;
@@ -5114,7 +5881,7 @@ Var
  vStringStream  : TMemoryStream;
  aResult        : TJSONValue;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  Error  := False;
  Result := '';
  vStringStream := Nil;
@@ -5326,7 +6093,7 @@ Begin
  vTempQuery.Free;
 end;
 
-function TRESTDWDriverBase.ExecuteCommandTB(Tablename: String;
+Function TRESTDWDriverBase.ExecuteCommandTB(Tablename: String;
                                             var Error: Boolean;
                                             var MessageError: String;
                                             var BinaryBlob: TMemoryStream;
@@ -5339,7 +6106,7 @@ begin
                    BinaryEvent,MetaData,BinaryCompatibleMode);
 end;
 
-function TRESTDWDriverBase.ExecuteCommandTB(Tablename: String;
+Function TRESTDWDriverBase.ExecuteCommandTB(Tablename: String;
                                             Params: TRESTDWParams;
                                             var Error: Boolean;
                                             var MessageError: String;
@@ -5433,17 +6200,17 @@ begin
  vTempQuery.Free;
 end;
 
-procedure TRESTDWDriverBase.ExecuteProcedure(ProcName: String;
-                                             Params: TRESTDWParams;
-                                             var Error: Boolean;
-                                             var MessageError: String);
-var
-  A, I            : Integer;
-  vParamName      : String;
-  vStateResource  : Boolean;
-  vTempStoredProc : TRESTDWStoreProc;
-begin
-  inherited;
+Procedure TRESTDWDriverBase.ExecuteProcedure(ProcName         : String;
+                                             Params           : TRESTDWParams;
+                                             Var Error        : Boolean;
+                                             Var MessageError : String);
+Var
+ A, I            : Integer;
+ vParamName      : String;
+ vStateResource  : Boolean;
+ vTempStoredProc : TRESTDWStoreProc;
+Begin
+ {$IFNDEF FPC}Inherited;{$ENDIF}
   Error  := False;
   vTempStoredProc := getStoreProc;
   vStateResource := isConnected;
@@ -5506,769 +6273,772 @@ begin
  vTempStoredProc.Free;
 end;
 
-procedure TRESTDWDriverBase.ExecuteProcedurePure(ProcName: String;
-                                                 var Error: Boolean;
-                                                 var MessageError: String);
-begin
-  ExecuteProcedure(ProcName,nil,Error,MessageError);
-end;
+Procedure TRESTDWDriverBase.ExecuteProcedurePure(ProcName         : String;
+                                                 Var Error        : Boolean;
+                                                 Var MessageError : String);
+Begin
+ ExecuteProcedure(ProcName, nil, Error, MessageError);
+End;
 
-procedure TRESTDWDriverBase.GetTableNames(var TableNames: TStringList;
-                                          var Error: Boolean;
-                                          var MessageError: String);
-var
-  vStateResource : Boolean;
-  connType : TRESTDWDatabaseType;
-  qry : TRESTDWQuery;
-  vSchema : string;
-  fdPos : integer;
-begin
-  if not Assigned(TableNames) then
-    TableNames := TStringList.Create;
-
-  vSchema := '';
+Procedure TRESTDWDriverBase.GetTableNames(Var TableNames   : TStringList;
+                                          Var Error        : Boolean;
+                                          Var MessageError : String);
+Var
+ vStateResource : Boolean;
+ connType : TRESTDWDatabaseType;
+ qry : TRESTDWQuery;
+ vSchema : String;
+ fdPos : integer;
+Begin
+ If Not Assigned(TableNames) Then
+  TableNames := TStringList.Create;
+ vSchema := '';
 {
   if Pos('.', vTable) > 0 then begin
     vSchema := Copy(vTable, InitStrPos, Pos('.', vTable)-1);
     Delete(vTable, InitStrPos, Pos('.', vTable));
   end;
 }
-  connType := getConectionType;
-  try
-    vStateResource := isConnected;
-    if not vStateResource Then
-      Connect;
-
-    fdPos := 0;
-    qry := getQuery;
-    try
-      if connType = dbtFirebird then begin
-        qry.SQL.Add('SELECT RDB$RELATION_NAME FROM RDB$RELATIONS');
-        qry.SQL.Add('ORDER BY RDB$RELATION_NAME');
-        qry.Open;
-      end
-      else if connType = dbtInterbase then begin
-        qry.SQL.Add('SELECT RDB$RELATION_NAME FROM RDB$RELATIONS');
-        qry.SQL.Add('ORDER BY RDB$RELATION_NAME');
-        qry.Open;
-      end
-      else if connType = dbtMySQL then begin
-        qry.SQL.Add('SHOW TABLES');
-        qry.Open;
-      end
-      else if connType = dbtPostgreSQL then begin
-        qry.SQL.Add('SELECT N.NSPNAME || ''.'' || C.RELNAME');
-        qry.SQL.Add('FROM PG_CATALOG.PG_CLASS C');
-        qry.SQL.Add('INNER JOIN PG_CATALOG.PG_NAMESPACE N ON N.OID = C.RELNAMESPACE');
-        qry.SQL.Add('WHERE C.RELKIND = ''r'' and N.NSPNAME <> ''information_schema'' and ');
-        qry.SQL.Add('      N.NSPNAME <> ''pg_catalog'' and N.NSPNAME <> ''dbo'' and ');
-        qry.SQL.Add('      N.NSPNAME <> ''sys'' and SUBSTR(C.RELNAME, 1, 3) <> ''pg_'' and');
-        if vSchema <> '' then
-          qry.SQL.Add(' and lower(N.NSPNAME) = '+QuotedStr(LowerCase(vSchema)));
-        qry.Open;
-      end
-      else if connType = dbtSQLLite then begin
-        qry.SQL.Add('SELECT name FROM sqlite_master');
-        qry.SQL.Add('WHERE type=''table''');
-        qry.Open;
-      end
-      else if connType = dbtMsSQL then begin
-        qry.SQL.Add('select concat(user_name(uid),''.'',name)');
-        qry.SQL.Add('from sysobjects');
-        qry.SQL.Add('where type in (''U'',''V'')');
-        qry.Open;
-      end
-      else if connType = dbtOracle then begin
-        qry.SQL.Add('SELECT sys_context(''userenv'',''current_schema'') || ''.'' || table_name');
-        qry.SQL.Add('FROM USER_CATALOG');
-        qry.SQL.Add('WHERE TABLE_TYPE <> ''SEQUENCE''');
-        qry.Open;
-      end;
-
-      while not qry.Eof do begin
-        TableNames.Add(qry.Fields[fdPos].AsString);
-        qry.Next;
-      end;
-    finally
-      FreeAndNil(qry);
-    end;
-
-    if not vStateResource Then
-      Disconect;
-  except
-    on E : Exception do begin
-      Error          := True;
-      MessageError   := E.Message;
-      Disconect;
-    end;
-  end;
-end;
-
-procedure TRESTDWDriverBase.GetFieldNames(TableName: String;
-                                          var FieldNames: TStringList;
-                                          var Error: Boolean;
-                                          var MessageError: String);
-var
-  vStateResource : Boolean;
-  connType : TRESTDWDatabaseType;
-  qry : TRESTDWQuery;
-  vTable,vSchema : string;
-  fPos : integer;
-begin
-  if not Assigned(FieldNames) then
-    FieldNames := TStringList.Create;
-
-  vSchema := '';
-  vTable := TableName;
-  if Pos('.', vTable) > 0 then begin
-    vSchema := Copy(vTable, InitStrPos, Pos('.', vTable)-1);
-    Delete(vTable, InitStrPos, Pos('.', vTable));
-  end;
-
-  connType := getConectionType;
-  try
-    vStateResource := isConnected;
-    if not vStateResource Then
-      Connect;
-
-    fPos := 0;
-
-    qry := getQuery;
-    try
-      if connType = dbtFirebird then begin
-        qry.SQL.Add('SELECT RDB$FIELD_NAME FROM RDB$RELATION_FIELDS ');
-        qry.SQL.Add('WHERE RDB$RELATION_NAME='+QuotedStr(UpperCase(vTable)));
-        qry.Open;
-      end
-      else if connType = dbtInterbase then begin
-        qry.SQL.Add('SELECT RDB$FIELD_NAME FROM RDB$RELATION_FIELDS ');
-        qry.SQL.Add('WHERE RDB$RELATION_NAME='+QuotedStr(UpperCase(vTable)));
-        qry.Open;
-      end
-      else if connType = dbtMySQL then begin
-        qry.SQL.Add('SHOW COLUMNS FROM '+vTable);
-        qry.Open;
-      end
-      else if connType = dbtPostgreSQL then begin
-        qry.SQL.Add('SELECT A.ATTNAME');
-        qry.SQL.Add('FROM PG_CATALOG.PG_CLASS C');
-        qry.SQL.Add('INNER JOIN PG_CATALOG.PG_NAMESPACE N ON N.OID = C.RELNAMESPACE');
-        qry.SQL.Add('INNER JOIN PG_CATALOG.PG_ATTRIBUTE A ON A.ATTRELID = C.OID');
-        qry.SQL.Add('WHERE A.ATTNUM > 0 AND NOT A.ATTISDROPPED AND');
-        qry.SQL.Add('      lower(C.RELNAME) = '+QuotedStr(LowerCase(vTable)));
-        if vSchema <> '' then
-          qry.SQL.Add('    and lower(N.NSPNAME) = '+QuotedStr(LowerCase(vSchema)));
-        qry.Open;
-      end
-      else if connType = dbtSQLLite then begin
-        fPos := 1;
-        qry.SQL.Add('PRAGMA table_info('+vTable+')');
-        qry.Open;
-      end
-      else if connType = dbtMsSQL then begin
-        qry.SQL.Add('select c.name');
-        qry.SQL.Add('from syscolumns c');
-        qry.SQL.Add('join sysobjects o on c.id=o.id');
-        qry.SQL.Add('where c.id=object_id('+QuotedStr(vTable)+')');
-        if vSchema <> '' then
-          qry.SQL.Add('      and user_name(o.uid) = '+QuotedStr(vSchema));
-        qry.Open;
-      end
-      else if connType = dbtOracle then begin
-        qry.SQL.Add('SELECT COLUMN_NAME');
-        qry.SQL.Add('FROM ALL_TAB_COLUMNS');
-        qry.SQL.Add('WHERE upper(TABLE_NAME) = '+QuotedStr(UpperCase(vTable)));
-        if vSchema <> '' then
-          qry.SQL.Add('      and upper(OWNER) = '+QuotedStr(UpperCase(vSchema)));
-        qry.Open;
-      end;
-
-      while not qry.Eof do begin
-        FieldNames.Add(qry.Fields[fPos].AsString);
-        qry.Next;
-      end;
-    finally
-      FreeAndNil(qry);
-    end;
-
-    if not vStateResource Then
-      Disconect;
-  except
-    on E : Exception do begin
-      Error          := True;
-      MessageError   := E.Message;
-      Disconect;
-    end;
-  end;
-end;
-
-procedure TRESTDWDriverBase.GetKeyFieldNames(TableName: String;
-                                             var FieldNames: TStringList;
-                                             var Error: Boolean;
-                                             var MessageError: String);
-var
-  vStateResource : Boolean;
-  connType : TRESTDWDatabaseType;
-  qry : TRESTDWQuery;
-  vTable,vSchema : string;
-begin
-  if not Assigned(FieldNames) then
-    FieldNames := TStringList.Create;
-
-  vSchema := '';
-  vTable := TableName;
-  if Pos('.', vTable) > 0 then begin
-    vSchema := Copy(vTable, InitStrPos, Pos('.', vTable)-1);
-    Delete(vTable, InitStrPos, Pos('.', vTable));
-  end;
-
-  connType := getConectionType;
-  try
-    vStateResource := isConnected;
-    if not vStateResource Then
-      Connect;
-
-    qry := getQuery;
-    try
-      if connType = dbtFirebird then begin
-        qry.SQL.Add('SELECT S.RDB$FIELD_NAME');
-        qry.SQL.Add('FROM RDB$RELATION_CONSTRAINTS C, RDB$INDEX_SEGMENTS S');
-        qry.SQL.Add('WHERE C.RDB$RELATION_NAME = '+QuotedStr(AnsiUpperCase(vTable))+' AND');
-        qry.SQL.Add('      C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' AND');
-        qry.SQL.Add('      S.RDB$INDEX_NAME = C.RDB$INDEX_NAME');
-        qry.Open;
-
-        while not qry.Eof do begin
-          FieldNames.Add(qry.FieldByName('RDB$FIELD_NAME').AsString);
-          qry.Next;
-        end;
-      end
-      else if connType = dbtInterbase then begin
-        qry.SQL.Add('SELECT S.RDB$FIELD_NAME');
-        qry.SQL.Add('FROM RDB$RELATION_CONSTRAINTS C, RDB$INDEX_SEGMENTS S');
-        qry.SQL.Add('WHERE C.RDB$RELATION_NAME = '+QuotedStr(AnsiUpperCase(vTable))+' AND');
-        qry.SQL.Add('      C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' AND');
-        qry.SQL.Add('      S.RDB$INDEX_NAME = C.RDB$INDEX_NAME');
-        qry.Open;
-
-        while not qry.Eof do begin
-          FieldNames.Add(qry.FieldByName('RDB$FIELD_NAME').AsString);
-          qry.Next;
-        end;
-      end
-      else if connType = dbtMySQL then begin
-        qry.SQL.Add('SHOW INDEX FROM '+vTable);
-        qry.Open;
-
-        while not qry.Eof do begin
-          if (Pos('PRIMARY',UpperCase(qry.FieldByName('KEY_NAME').AsString)) > 0) then
-            FieldNames.Add(qry.FieldByName('COLUMN_NAME').AsString);
-          qry.Next;
-        end;
-      end
-      else if connType = dbtPostgreSQL then begin
-        qry.SQL.Add('SELECT A.ATTNAME');
-        qry.SQL.Add('FROM PG_CATALOG.PG_INDEX I');
-        qry.SQL.Add('INNER JOIN PG_CATALOG.PG_CLASS TC ON TC.OID = I.INDRELID');
-        qry.SQL.Add('INNER JOIN PG_CATALOG.PG_CLASS IC ON IC.OID = I.INDEXRELID');
-        qry.SQL.Add('INNER JOIN PG_CATALOG.PG_ATTRIBUTE A ON A.ATTRELID = I.INDRELID AND');
-        qry.SQL.Add('           A.ATTNUM = ANY(I.INDKEY)');
-        qry.SQL.Add('INNER JOIN PG_CATALOG.PG_NAMESPACE N ON N.OID = TC.RELNAMESPACE');
-        qry.SQL.Add('WHERE lower(TC.RELNAME) = '+QuotedStr(LowerCase(vTable))+' and ');
-        qry.SQL.Add('      I.INDISPRIMARY ');
-        if vSchema <> '' then
-          qry.SQL.Add('  AND lower(N.NSPNAME) = '+QuotedStr(LowerCase(vSchema)));
-        qry.Open;
-
-        while not qry.Eof do begin
-          FieldNames.Add(qry.FieldByName('ATTNAME').AsString);
-          qry.Next;
-        end;
-      end
-      else if connType = dbtSQLLite then begin
-        qry.SQL.Add('PRAGMA table_info('+vTable+')');
-        qry.Open;
-
-        while not qry.Eof do begin
-          if qry.FieldByName('pk').AsInteger > 0 then
-            FieldNames.Add(qry.FieldByName('name').AsString);
-          qry.Next;
-        end;
-      end;
-    finally
-      FreeAndNil(qry);
-    end;
-
-    if not vStateResource Then
-      Disconect;
-  except
-    on E : Exception do begin
-      Error          := True;
-      MessageError   := E.Message;
-      Disconect;
-    end;
-  end;
-end;
-
-procedure TRESTDWDriverBase.GetProcNames(var ProcNames: TStringList;
-                                         var Error: Boolean;
-                                         var MessageError: String);
-var
-  vStateResource : Boolean;
-  connType : TRESTDWDatabaseType;
-  qry : TRESTDWQuery;
-  vSchema : string;
-  fPos : integer;
-begin
-  if not Assigned(ProcNames) then
-    ProcNames := TStringList.Create;
-
-  vSchema := '';
-
-  connType := getConectionType;
-  try
-    vStateResource := isConnected;
-    if not vStateResource Then
-      Connect;
-
-    fPos := 0;
-
-    qry := getQuery;
-    try
-      if connType = dbtFirebird then begin
-        qry.SQL.Add('SELECT RDB$PROCEDURE_NAME FROM RDB$PROCEDURES');
-        qry.Open;
-      end
-      else if connType = dbtInterbase then begin
-        qry.SQL.Add('SELECT RDB$PROCEDURE_NAME FROM RDB$PROCEDURES');
-        qry.Open;
-      end
-      else if connType = dbtMySQL then begin
-        fPos := 1; // coluna name
-        qry.SQL.Add('SHOW PROCEDURE STATUS');
-        qry.SQL.Add('WHERE db = DATABASE() AND type = ''PROCEDURE''');
-        qry.Open;
-      end
-      else if connType = dbtPostgreSQL then begin
-        qry.SQL.Add('SELECT N.NSPNAME || ''.'' || P.PRONAME FROM PG_CATALOG.PG_PROC P');
-        qry.SQL.ADD('INNER JOIN PG_CATALOG.PG_NAMESPACE N ON N.OID = P.PRONAMESPACE');
-        qry.SQL.Add('WHERE P.PROARGNAMES IS NOT NULL');
-        if vSchema <> '' then
-          qry.SQL.Add('    and lower(N.NSPNAME) = '+QuotedStr(LowerCase(vSchema)));
-        qry.Open;
-      end
-      else if connType = dbtSQLLite then begin
-        // nao existe procedures
-      end
-      else if connType = dbtMsSQL then begin
-        qry.SQL.Add('select concat(user_name(uid),''.'',name)');
-        qry.SQL.Add('from sysobjects');
-        qry.SQL.Add('where type in (''P'',''FN'',''IF'',''TF'')');
-        qry.Open;
-      end
-      else if connType = dbtOracle then begin
-        qry.SQL.Add('SELECT case ');
-        qry.SQL.Add('         when PROCEDURE_NAME is null then OBJECT_NAME');
-        qry.SQL.Add('              ELSE OBJECT_NAME || ''.'' || PROCEDURE_NAME');
-        qry.SQL.Add('       end AS procedure_name');
-        qry.SQL.Add('FROM USER_PROCEDURES');
-        qry.Open;
-      end;
-
-      while not qry.Eof do begin
-        ProcNames.Add(qry.Fields[fPos].AsString);
-        qry.Next;
-      end;
-    finally
-      FreeAndNil(qry);
-    end;
-
-    if not vStateResource Then
-      Disconect;
-  except
-    on E : Exception do begin
-      Error          := True;
-      MessageError   := E.Message;
-      Disconect;
-    end;
-  end;
-end;
-
-procedure TRESTDWDriverBase.GetProcParams(ProcName: String;
-                                          var ParamNames: TStringList;
-                                          var Error: Boolean;
-                                          var MessageError: String);
-var
-  vStateResource : Boolean;
-  connType : TRESTDWDatabaseType;
-  qry : TRESTDWQuery;
-  vProc,vSchema : string;
-
-  vFieldType : string;
-  vSize, vPrecision : integer;
-
-  procedure convertFB_IBTypes;
-  begin
-    vFieldType := 'ftUnknown';
-    vSize := 0;
-    vPrecision := 0;
-    case qry.FieldByName('rdb$field_type').AsInteger of
-      007 : begin
-            vFieldType := 'ftSmallint';
-            if qry.FieldByName('rdb$field_sub_type').AsInteger > 0 then
-              vFieldType := 'ftFloat';
-      end;
-      008 : begin
-            vFieldType := 'ftInteger';
-            if qry.FieldByName('rdb$field_sub_type').AsInteger > 0 then
-              vFieldType := 'ftFloat';
-      end;
-      009 : vFieldType := 'ftLargeint';
-      010 : vFieldType := 'ftFloat';
-      011 : vFieldType := 'ftFloat';
-      012 : vFieldType := 'ftDateTime';
-      013 : vFieldType := 'ftTime';
-      014 : vFieldType := 'ftFixedChar';
-      016 : begin
-            vFieldType := 'ftLargeint';
-            if qry.FieldByName('rdb$field_sub_type').AsInteger > 0 then
-              vFieldType := 'ftFloat';
-      end;
-      027 : vFieldType := 'ftFloat';
-      035 : vFieldType := 'ftTimeStamp';
-      037 : vFieldType := 'ftString';
-      040 : vFieldType := 'ftString';
-      261 : begin
-        vFieldType := 'ftBlob';
-        if qry.FieldByName('rdb$field_sub_type').AsInteger = 1 then
-          vFieldType := 'ftMemo';
-      end;
-    end;
-
-    if qry.FieldByName('rdb$field_type').AsInteger in [14,37,40] then begin
-      vSize := qry.FieldByName('rdb$field_length').AsInteger;
-      // field com charset e colation
-      if (qry.FieldByName('rdb$character_length').AsInteger > 0) and
-         (qry.FieldByName('rdb$character_length').AsInteger < vSize) then
-        vSize := qry.FieldByName('rdb$character_length').AsInteger;
-    end
-    else if qry.FieldByName('rdb$field_type').AsInteger = 27 then begin
-      vSize := qry.FieldByName('rdb$field_precision').AsInteger;
-
-      if (qry.FieldByName('rdb$field_scale').AsInteger < 0) then begin
-        vSize := 15;
-        if (qry.FieldByName('rdb$field_precision').AsInteger > 0) then
-          vSize := qry.FieldByName('rdb$field_precision').AsInteger;
-        vPrecision := Abs(qry.FieldByName('rdb$field_scale').AsInteger);
-      end;
-    end
-    else if (qry.FieldByName('rdb$field_type').AsInteger in [7,8,16]) and
-            (qry.FieldByName('rdb$field_sub_type').AsInteger > 0) then begin
-      vSize := qry.FieldByName('rdb$field_precision').AsInteger;
-
-      if (qry.FieldByName('rdb$field_scale').AsInteger < 0) then begin
-        vSize := 15;
-        if (qry.FieldByName('rdb$field_precision').AsInteger > 0) then
-          vSize := qry.FieldByName('rdb$field_precision').AsInteger;
-        vPrecision := Abs(qry.FieldByName('rdb$field_scale').AsInteger);
-      end;
-    end;
-  end;
-
-  procedure convertMySQLTypes;
-  var
-    sAux1 : string;
-  begin
-    vFieldType := 'ftUnknown';
-    vSize := 0;
-    vPrecision := 0;
-
-    sAux1 := LowerCase(qry.FieldByName('data_type').AsString);
-    if SameText(sAux1,'integer') or SameText(sAux1,'int') then begin
-      vFieldType := 'ftInteger';
-    end
-    else if SameText(sAux1,'smallint') or SameText(sAux1,'tinyint') or
-            SameText(sAux1,'mediumint') or SameText(sAux1,'bit') then begin
-      vFieldType := 'ftSmallint';
-    end
-    else if SameText(sAux1,'longint') or SameText(sAux1,'bigint') then begin
-      vFieldType := 'ftLargeint';
-    end
-    else if SameText(sAux1,'real') or SameText(sAux1,'decimal') or
-            SameText(sAux1,'numeric') or SameText(sAux1,'float') or
-            SameText(sAux1,'double') or SameText(sAux1,'double precision') then begin
-      vFieldType := 'ftFloat';
-      vSize := qry.FieldByName('numeric_precision').AsInteger;
-      vPrecision := qry.FieldByName('numeric_scale').AsInteger;
-    end
-    else if SameText(sAux1,'varchar') then begin
-      vFieldType := 'ftString';
-      vSize := qry.FieldByName('character_maximum_length').AsInteger;
-      if vSize >= 32767 then begin
-        vFieldType := 'ftMemo';
-        vSize := 0;
-      end;
-    end
-    else if SameText(sAux1,'char') then begin
-      vFieldType := 'ftFixedChar';
-      vSize := qry.FieldByName('character_maximum_length').AsInteger;
-    end
-    else if SameText(sAux1,'timestamp') then begin
-      vFieldType := 'ftTimeStamp';
-    end
-    else if SameText(sAux1,'time') then begin
-      vFieldType := 'ftTime';
-    end
-    else if SameText(sAux1,'datetime') then begin
-      vFieldType := 'ftDateTime';
-    end
-    else if SameText(sAux1,'date') then begin
-      vFieldType := 'ftDate';
-    end
-    else if SameText(sAux1,'year') then begin
-      vFieldType := 'ftSmallint';
-    end
-    else if SameText(sAux1,'blob') or SameText(sAux1,'binary') or
-            SameText(sAux1,'tinyblob') or SameText(sAux1,'mediumblob') or
-            SameText(sAux1,'longblob') then begin
-      vFieldType := 'ftBlob';
-    end
-    else if SameText(sAux1,'text') or SameText(sAux1,'tinytext') or
-            SameText(sAux1,'mediumtext') or SameText(sAux1,'longtext') or
-            SameText(sAux1,'json') then begin
-      vFieldType := 'ftMemo';
-    end;
-  end;
-
-  procedure convertPostgresTypes;
-  var
-    sAux1 : string;
-  begin
-    vFieldType := 'ftUnknown';
-    vSize := 0;
-    vPrecision := 0;
-
-    sAux1 := LowerCase(qry.FieldByName('data_type').AsString);
-    if SameText(sAux1,'integer') or SameText(sAux1,'int') or
-       (Pos('int[',sAux1) > 0) then begin
-      vFieldType := 'ftInteger';
-    end
-    else if SameText(sAux1,'smallint') or SameText(sAux1,'tinyint') or
-            SameText(sAux1,'mediumint') or SameText(sAux1,'bit') then begin
-      vFieldType := 'ftSmallint';
-    end
-    else if (Pos('bigint',sAux1) > 0) then begin
-      vFieldType := 'ftLargeint';
-    end
-    else if SameText(sAux1,'real') or SameText(sAux1,'decimal') or
-            SameText(sAux1,'numeric') or SameText(sAux1,'float') or
-            SameText(sAux1,'double') or SameText(sAux1,'double precision') then begin
-      vFieldType := 'ftFloat';
-      vSize := 15;
-      vPrecision := 6;
-    end
-    else if SameText(sAux1,'varchar') or (Pos('character varying',sAux1) > 0) then begin
-      vFieldType := 'ftString';
-      vSize := 255;
-    end
-    else if SameText(sAux1,'character') or (Pos('character[',sAux1) > 0) then begin
-      vFieldType := 'ftFixedChar';
-      vSize := 255;
-    end
-    else if (Pos('timestamp',sAux1) > 0) then begin
-      vFieldType := 'ftTimeStamp';
-    end
-    else if SameText(sAux1,'time') or (Pos('time with',sAux1) > 0) then begin
-      vFieldType := 'ftTime';
-    end
-    else if SameText(sAux1,'date') then begin
-      vFieldType := 'ftDate';
-    end
-    else if (Pos(sAux1,'bytea') > 0) then begin
-      vFieldType := 'ftBlob';
-    end
-    else if (Pos(sAux1,'text') > 0) or (Pos(sAux1,'json') > 0) or
-            (Pos(sAux1,'xml') > 0) then begin
-      vFieldType := 'ftMemo';
-    end;
-  end;
-
-begin
-  // nesta funcão pode ser usado as funcoes
-  // getDatabaseInfo ou isMinimumVersion
-  // para trazer informacao de versao de cada banco
-
-  if not Assigned(ParamNames) then
-    ParamNames := TStringList.Create;
-
-  vSchema := '';
-  vProc := ProcName;
-  if Pos('.', vProc) > 0 then begin
-    vSchema := Copy(vProc, InitStrPos, Pos('.', vProc)-1);
-    Delete(vProc, InitStrPos, Pos('.', vProc));
-  end;
-
-  connType := getConectionType;
-  try
-    vStateResource := isConnected;
-    if not vStateResource Then
-      Connect;
-
-    qry := getQuery;
-    try
-      if connType = dbtFirebird then begin
-        qry.SQL.Add('SELECT PP.RDB$PARAMETER_NAME, F.RDB$FIELD_LENGTH,');
-        qry.SQL.Add('       F.RDB$FIELD_TYPE, F.RDB$FIELD_SUB_TYPE,');
-        qry.SQL.Add('       F.RDB$CHARACTER_LENGTH, F.RDB$NULL_FLAG,');
-        qry.SQL.Add('       F.RDB$DEFAULT_SOURCE, CS.RDB$CHARACTER_SET_NAME,');
-        qry.SQL.Add('       CL.RDB$COLLATION_NAME, FD.RDB$LOWER_BOUND, FD.RDB$UPPER_BOUND');
-        qry.SQL.Add('FROM RDB$PROCEDURE_PARAMETERS PP ');
-        qry.SQL.Add('INNER JOIN RDB$FIELDS F ON F.RDB$FIELD_NAME = PP.RDB$FIELD_SOURCE');
-        qry.SQL.Add('LEFT JOIN RDB$CHARACTER_SETS CS ON CS.RDB$CHARACTER_SET_ID = F.RDB$CHARACTER_SET_ID');
-        qry.SQL.Add('LEFT JOIN RDB$COLLATIONS CL ON CL.RDB$CHARACTER_SET_ID = F.RDB$CHARACTER_SET_ID AND');
-        qry.SQL.Add('     CL.RDB$COLLATION_ID = coalesce(F.RDB$COLLATION_ID,RF.RDB$COLLATION_ID)');
-        qry.SQL.Add('LEFT JOIN RDB$FIELD_DIMENSIONS FD ON FD.RDB$FIELD_NAME = F.RDB$FIELD_NAME');
-        qry.SQL.Add('WHERE PP.RDB$PROCEDURE_NAME = '+QuotedStr(UpperCase(vProc))+' AND');
-        qry.SQL.Add('      PP.RDB$PARAMETER_TYPE = 0');
-        qry.Open;
-
-        while not qry.Eof do begin
-          convertFB_IBTypes;
-          ParamNames.Add(Format(cParamDetails, [qry.Fields[0].AsString,
-                                                vFieldType,vSize,vPrecision]));
-
-          qry.Next;
-        end;
-      end
-      else if connType = dbtInterbase then begin
-        qry.SQL.Add('SELECT PP.RDB$PARAMETER_NAME, F.RDB$FIELD_LENGTH,');
-        qry.SQL.Add('       F.RDB$FIELD_TYPE, F.RDB$FIELD_SUB_TYPE,');
-        qry.SQL.Add('       F.RDB$CHARACTER_LENGTH, F.RDB$NULL_FLAG,');
-        qry.SQL.Add('       F.RDB$DEFAULT_SOURCE, CS.RDB$CHARACTER_SET_NAME,');
-        qry.SQL.Add('       CL.RDB$COLLATION_NAME, FD.RDB$LOWER_BOUND, FD.RDB$UPPER_BOUND');
-        qry.SQL.Add('FROM RDB$PROCEDURE_PARAMETERS PP ');
-        qry.SQL.Add('INNER JOIN RDB$FIELDS F ON F.RDB$FIELD_NAME = PP.RDB$FIELD_SOURCE');
-        qry.SQL.Add('LEFT JOIN RDB$CHARACTER_SETS CS ON CS.RDB$CHARACTER_SET_ID = F.RDB$CHARACTER_SET_ID');
-        qry.SQL.Add('LEFT JOIN RDB$COLLATIONS CL ON CL.RDB$CHARACTER_SET_ID = F.RDB$CHARACTER_SET_ID AND');
-        qry.SQL.Add('     CL.RDB$COLLATION_ID = coalesce(F.RDB$COLLATION_ID,RF.RDB$COLLATION_ID)');
-        qry.SQL.Add('LEFT JOIN RDB$FIELD_DIMENSIONS FD ON FD.RDB$FIELD_NAME = F.RDB$FIELD_NAME');
-        qry.SQL.Add('WHERE PP.RDB$PROCEDURE_NAME = '+QuotedStr(UpperCase(vProc))+' AND');
-        qry.SQL.Add('      PP.RDB$PARAMETER_TYPE = 0');
-        qry.Open;
-
-        while not qry.Eof do begin
-          convertFB_IBTypes;
-          ParamNames.Add(Format(cParamDetails, [qry.Fields[0].AsString,
-                                                vFieldType,vSize,vPrecision]));
-
-          qry.Next;
-        end;
-      end
-      else if connType = dbtMySQL then begin
-        // somente mysql maior que 5
-        qry.SQL.Add('SELECT parameter_name, data_type, character_maximum_length,');
-        qry.SQL.Add('       character_octet_length,numeric_precision,numeric_scale,');
-        qry.SQL.Add('       dtd_identifier');
-        qry.SQL.Add('FROM information_schema.parameters');
-        qry.SQL.Add('WHERE SPECIFIC_NAME = '+QuotedStr(vProc)+' AND');
-        qry.SQL.Add('      SPECIFIC_SCHEMA = DATABASE() and');
-        qry.SQL.Add('      ROUTINE_TYPE = ''PROCEDURE'' and');
-        qry.SQL.Add('      PARAMETER_MODE = ''IN''');
-        try
-          qry.Open;
-          while not qry.Eof do begin
-            convertMySQLTypes;
-            ParamNames.Add(Format(cParamDetails, [qry.Fields[0].AsString,
-                                                  vFieldType,vSize,vPrecision]));
-
-            qry.Next;
-          end;
-        except
-
-        end;
-      end
-      else if connType = dbtPostgreSQL then begin
-        qry.SQL.Add('select a.parameter_name, a.data_type');
-        qry.SQL.Add('from information_schema.routines p');
-        qry.SQL.Add('left join information_schema.parameters a on');
-        qry.SQL.Add('          p.specific_schema = a.specific_schema and');
-        qry.SQL.Add('          p.specific_name = a.specific_name');
-        qry.SQL.Add('where p.routine_schema not in (''pg_catalog'', ''information_schema'') and');
-        qry.SQL.Add('      p.routine_type = ''PROCEDURE'' and');
-        qry.SQL.Add('      p.routine_name = '+QuotedStr(vProc)+' and');
-        qry.SQL.Add('      a.parameter_name is not null and');
-        qry.SQL.Add('      a.parameter_mode like ''IN%''');
-        if vSchema <> '' then
-          qry.SQL.Add('    and p.specific_schema = '+QuotedStr(vSchema));
-        qry.SQL.Add('order by p.specific_schema, p.specific_name, p.routine_name,');
-        qry.SQL.Add('         a.ordinal_position');
-        try
-          qry.Open;
-          while not qry.Eof do begin
-            convertPostgresTypes;
-            ParamNames.Add(Format(cParamDetails, [qry.Fields[0].AsString,
-                                                  vFieldType,vSize,vPrecision]));
-
-            qry.Next;
-          end;
-        except
-
-        end;
-      end
-      else if connType = dbtSQLLite then begin
-        // sqlite nao tem procedures
-      end;
-    finally
-      FreeAndNil(qry);
-    end;
-
-    if not vStateResource Then
-      Disconect;
-  except
-    on E : Exception do begin
-      Error          := True;
-      MessageError   := E.Message;
-      Disconect;
-    end;
-  end;
-end;
-
-function TRESTDWDriverBase.InsertMySQLReturnID(SQL: String;
-                                               var Error: Boolean;
-                                               var MessageError: String): integer;
-begin
-  Result := InsertMySQLReturnID(SQL,nil,Error,MessageError);
-end;
-
-function TRESTDWDriverBase.InsertMySQLReturnID(SQL: String;
-                                               Params: TRESTDWParams;
-                                               var Error: Boolean;
-                                               var MessageError: String): integer;
-var
-  vTempQuery     : TRESTDWQuery;
-  A, I           : Integer;
-  vParamName     : String;
-  vStringStream  : TMemoryStream;
-  vStateResource : Boolean;
-Begin
-  Result := -1;
-  Error  := False;
-  vStringStream := Nil;
-  if not Assigned(FConnection) then
-    Exit;
-
-  vTempQuery := getQuery;
-
+ connType := getConectionType;
+ Try
   vStateResource := isConnected;
-  if not vStateResource Then
-    Connect;
+  If Not vStateResource Then
+   Connect;
+  fdPos := 0;
+  qry := getQuery;
+  Try
+   Case connType Of
+    dbtFirebird : Begin
+                   qry.SQL.Add('SELECT RDB$RELATION_NAME FROM RDB$RELATIONS');
+                   qry.SQL.Add('ORDER BY RDB$RELATION_NAME');
+                   qry.Open;
+                  End;
+    dbtInterbase : Begin
+                    qry.SQL.Add('SELECT RDB$RELATION_NAME FROM RDB$RELATIONS');
+                    qry.SQL.Add('ORDER BY RDB$RELATION_NAME');
+                    qry.Open;
+                   End;
+    dbtMySQL     : Begin
+                    qry.SQL.Add('SHOW TABLES');
+                    qry.Open;
+                   End;
+    dbtPostgreSQL : Begin
+                     qry.SQL.Add('SELECT N.NSPNAME || ''.'' || C.RELNAME');
+                     qry.SQL.Add('FROM PG_CATALOG.PG_CLASS C');
+                     qry.SQL.Add('INNER JOIN PG_CATALOG.PG_NAMESPACE N ON N.OID = C.RELNAMESPACE');
+                     qry.SQL.Add('WHERE C.RELKIND = ''r'' and N.NSPNAME <> ''information_schema'' and ');
+                     qry.SQL.Add('      N.NSPNAME <> ''pg_catalog'' and N.NSPNAME <> ''dbo'' and ');
+                     qry.SQL.Add('      N.NSPNAME <> ''sys'' and SUBSTR(C.RELNAME, 1, 3) <> ''pg_'' and');
+                     If vSchema <> '' Then
+                      qry.SQL.Add(' and lower(N.NSPNAME) = '+QuotedStr(LowerCase(vSchema)));
+                     qry.Open;
+                    End;
+    dbtSQLLite    : Begin
+                     qry.SQL.Add('SELECT name FROM sqlite_master');
+                     qry.SQL.Add('WHERE type=''table''');
+                     qry.Open;
+                    End;
+    dbtMsSQL      : Begin
+                     qry.SQL.Add('select concat(user_name(uid),''.'',name)');
+                     qry.SQL.Add('from sysobjects');
+                     qry.SQL.Add('where type in (''U'',''V'')');
+                     qry.Open;
+                    End;
+    dbtOracle     : Begin
+                     qry.SQL.Add('SELECT sys_context(''userenv'',''current_schema'') || ''.'' || table_name');
+                     qry.SQL.Add('FROM USER_CATALOG');
+                     qry.SQL.Add('WHERE TABLE_TYPE <> ''SEQUENCE''');
+                     qry.Open;
+                    End;
 
-  If Not connInTransaction Then
-    connStartTransaction;
+   End;
+   While Not qry.Eof Do
+    Begin
+     TableNames.Add(qry.Fields[fdPos].AsString);
+     qry.Next;
+    End;
+  Finally
+   FreeAndNil(qry);
+  End;
+  If Not vStateResource Then
+   Disconect;
+ Except
+  On E : Exception Do
+   Begin
+    Error          := True;
+    MessageError   := E.Message;
+    Disconect;
+   End;
+ End;
+End;
 
-  vTempQuery.SQL.Clear;
-  vTempQuery.SQL.Add(SQL);
-  if Params <> nil then begin
+Procedure TRESTDWDriverBase.GetFieldNames(TableName        : String;
+                                          Var FieldNames   : TStringList;
+                                          Var Error        : Boolean;
+                                          Var MessageError : String);
+Var
+ vStateResource : Boolean;
+ connType       : TRESTDWDatabaseType;
+ qry            : TRESTDWQuery;
+ vTable,
+ vSchema        : String;
+ fPos           : Integer;
+Begin
+ If Not Assigned(FieldNames) Then
+  FieldNames := TStringList.Create;
+ vSchema := '';
+ vTable := TableName;
+ If Pos('.', vTable) > 0 Then
+  Begin
+   vSchema := Copy(vTable, InitStrPos, Pos('.', vTable)-1);
+   Delete(vTable, InitStrPos, Pos('.', vTable));
+  End;
+ connType := getConectionType;
+ Try
+  vStateResource := isConnected;
+  If Not vStateResource Then
+   Connect;
+  fPos := 0;
+  qry := getQuery;
+  Try
+   Case connType Of
+    dbtFirebird  : Begin
+                    qry.SQL.Add('SELECT RDB$FIELD_NAME FROM RDB$RELATION_FIELDS ');
+                    qry.SQL.Add('WHERE RDB$RELATION_NAME='+QuotedStr(UpperCase(vTable)));
+                    qry.Open;
+                   End;
+    dbtInterbase : Begin
+                    qry.SQL.Add('SELECT RDB$FIELD_NAME FROM RDB$RELATION_FIELDS ');
+                    qry.SQL.Add('WHERE RDB$RELATION_NAME='+QuotedStr(UpperCase(vTable)));
+                    qry.Open;
+                   End;
+    dbtMySQL     : Begin
+                    qry.SQL.Add('SHOW COLUMNS FROM '+vTable);
+                    qry.Open;
+                   End;
+    dbtPostgreSQL : Begin
+                     qry.SQL.Add('SELECT A.ATTNAME');
+                     qry.SQL.Add('FROM PG_CATALOG.PG_CLASS C');
+                     qry.SQL.Add('INNER JOIN PG_CATALOG.PG_NAMESPACE N ON N.OID = C.RELNAMESPACE');
+                     qry.SQL.Add('INNER JOIN PG_CATALOG.PG_ATTRIBUTE A ON A.ATTRELID = C.OID');
+                     qry.SQL.Add('WHERE A.ATTNUM > 0 AND NOT A.ATTISDROPPED AND');
+                     qry.SQL.Add('      lower(C.RELNAME) = '+QuotedStr(LowerCase(vTable)));
+                     If vSchema <> '' Then
+                      qry.SQL.Add('    and lower(N.NSPNAME) = '+QuotedStr(LowerCase(vSchema)));
+                     qry.Open;
+                    End;
+    dbtSQLLite    : Begin
+                     fPos := 1;
+                     qry.SQL.Add('PRAGMA table_info('+vTable+')');
+                     qry.Open;
+                    End;
+    dbtMsSQL      : Begin
+                     qry.SQL.Add('select c.name');
+                     qry.SQL.Add('from syscolumns c');
+                     qry.SQL.Add('join sysobjects o on c.id=o.id');
+                     qry.SQL.Add('where c.id=object_id('+QuotedStr(vTable)+')');
+                     If vSchema <> '' Then
+                      qry.SQL.Add('      and user_name(o.uid) = '+QuotedStr(vSchema));
+                     qry.Open;
+                    End;
+    dbtOracle     : Begin
+                     qry.SQL.Add('SELECT COLUMN_NAME');
+                     qry.SQL.Add('FROM ALL_TAB_COLUMNS');
+                     qry.SQL.Add('WHERE upper(TABLE_NAME) = '+QuotedStr(UpperCase(vTable)));
+                     If vSchema <> '' Then
+                      qry.SQL.Add('      and upper(OWNER) = '+QuotedStr(UpperCase(vSchema)));
+                     qry.Open;
+                    End;
+   End;
+   While Not qry.Eof Do
+    Begin
+     FieldNames.Add(qry.Fields[fPos].AsString);
+     qry.Next;
+    End;
+  Finally
+   FreeAndNil(qry);
+  End;
+  If Not vStateResource Then
+   Disconect;
+ Except
+  On E : Exception Do
+   Begin
+    Error          := True;
+    MessageError   := E.Message;
+    Disconect;
+   End;
+ End;
+end;
+
+Procedure TRESTDWDriverBase.GetKeyFieldNames(TableName        : String;
+                                             Var FieldNames   : TStringList;
+                                             Var Error        : Boolean;
+                                             Var MessageError : String);
+Var
+ vStateResource : Boolean;
+ connType       : TRESTDWDatabaseType;
+ qry            : TRESTDWQuery;
+ vTable,
+ vSchema        : String;
+Begin
+ If Not Assigned(FieldNames) Then
+  FieldNames := TStringList.Create;
+ vSchema := '';
+ vTable := TableName;
+ If Pos('.', vTable) > 0     Then
+  Begin
+   vSchema := Copy(vTable, InitStrPos, Pos('.', vTable)-1);
+   Delete(vTable, InitStrPos, Pos('.', vTable));
+  End;
+ connType := getConectionType;
+ Try
+  vStateResource := isConnected;
+  If Not vStateResource Then
+   Connect;
+  qry := getQuery;
+  Try
+   Case connType Of
+    dbtFirebird  : Begin
+                    qry.SQL.Add('SELECT S.RDB$FIELD_NAME');
+                    qry.SQL.Add('FROM RDB$RELATION_CONSTRAINTS C, RDB$INDEX_SEGMENTS S');
+                    qry.SQL.Add('WHERE C.RDB$RELATION_NAME = '+QuotedStr(AnsiUpperCase(vTable))+' AND');
+                    qry.SQL.Add('      C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' AND');
+                    qry.SQL.Add('      S.RDB$INDEX_NAME = C.RDB$INDEX_NAME');
+                    qry.Open;
+                    While Not qry.Eof Do
+                     Begin
+                      FieldNames.Add(qry.FieldByName('RDB$FIELD_NAME').AsString);
+                      qry.Next;
+                     End;
+                   End;
+    dbtInterbase : Begin
+                    qry.SQL.Add('SELECT S.RDB$FIELD_NAME');
+                    qry.SQL.Add('FROM RDB$RELATION_CONSTRAINTS C, RDB$INDEX_SEGMENTS S');
+                    qry.SQL.Add('WHERE C.RDB$RELATION_NAME = '+QuotedStr(AnsiUpperCase(vTable))+' AND');
+                    qry.SQL.Add('      C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' AND');
+                    qry.SQL.Add('      S.RDB$INDEX_NAME = C.RDB$INDEX_NAME');
+                    qry.Open;
+                    While Not qry.Eof Do
+                     Begin
+                      FieldNames.Add(qry.FieldByName('RDB$FIELD_NAME').AsString);
+                      qry.Next;
+                     End;
+                   End;
+    dbtMySQL     : Begin
+                    qry.SQL.Add('SHOW INDEX FROM '+vTable);
+                    qry.Open;
+                    While Not qry.Eof Do
+                     Begin
+                      If (Pos('PRIMARY', UpperCase(qry.FieldByName('KEY_NAME').AsString)) > 0) Then
+                       FieldNames.Add(qry.FieldByName('COLUMN_NAME').AsString);
+                      qry.Next;
+                     End;
+                   End;
+    dbtPostgreSQL : Begin
+                     qry.SQL.Add('SELECT A.ATTNAME');
+                     qry.SQL.Add('FROM PG_CATALOG.PG_INDEX I');
+                     qry.SQL.Add('INNER JOIN PG_CATALOG.PG_CLASS TC ON TC.OID = I.INDRELID');
+                     qry.SQL.Add('INNER JOIN PG_CATALOG.PG_CLASS IC ON IC.OID = I.INDEXRELID');
+                     qry.SQL.Add('INNER JOIN PG_CATALOG.PG_ATTRIBUTE A ON A.ATTRELID = I.INDRELID AND');
+                     qry.SQL.Add('           A.ATTNUM = ANY(I.INDKEY)');
+                     qry.SQL.Add('INNER JOIN PG_CATALOG.PG_NAMESPACE N ON N.OID = TC.RELNAMESPACE');
+                     qry.SQL.Add('WHERE lower(TC.RELNAME) = '+QuotedStr(LowerCase(vTable))+' and ');
+                     qry.SQL.Add('      I.INDISPRIMARY ');
+                     If vSchema <> '' Then
+                      qry.SQL.Add('  AND lower(N.NSPNAME) = '+QuotedStr(LowerCase(vSchema)));
+                     qry.Open;
+                     While Not qry.Eof Do
+                      Begin
+                       FieldNames.Add(qry.FieldByName('ATTNAME').AsString);
+                       qry.Next;
+                      End;
+                    End;
+    dbtSQLLite    : Begin
+                     qry.SQL.Add('PRAGMA table_info('+vTable+')');
+                     qry.Open;
+                     While Not qry.Eof Do
+                      Begin
+                       If qry.FieldByName('pk').AsInteger > 0 Then
+                        FieldNames.Add(qry.FieldByName('name').AsString);
+                       qry.Next;
+                      End;
+                    End;
+   End;
+  Finally
+   FreeAndNil(qry);
+  End;
+  If Not vStateResource Then
+   Disconect;
+ Except
+  On E : Exception Do
+   Begin
+    Error          := True;
+    MessageError   := E.Message;
+    Disconect;
+   End;
+ End;
+End;
+
+Procedure TRESTDWDriverBase.GetProcNames(Var ProcNames    : TStringList;
+                                         Var Error        : Boolean;
+                                         Var MessageError : String);
+Var
+ vStateResource : Boolean;
+ connType       : TRESTDWDatabaseType;
+ qry            : TRESTDWQuery;
+ vSchema        : String;
+ fPos           : integer;
+Begin
+ If Not Assigned(ProcNames) Then
+  ProcNames := TStringList.Create;
+ vSchema := '';
+ connType := getConectionType;
+ Try
+  vStateResource := isConnected;
+  If Not vStateResource Then
+   Connect;
+  fPos := 0;
+  qry := getQuery;
+  Try
+   Case connType Of
+    dbtFirebird  : Begin
+                    qry.SQL.Add('SELECT RDB$Procedure_NAME FROM RDB$ProcedureS');
+                    qry.Open;
+                   End;
+    dbtInterbase : Begin
+                    qry.SQL.Add('SELECT RDB$Procedure_NAME FROM RDB$ProcedureS');
+                    qry.Open;
+                   End;
+    dbtMySQL     : Begin
+                    fPos := 1; // coluna name
+                    qry.SQL.Add('SHOW Procedure STATUS');
+                    qry.SQL.Add('WHERE db = DATABASE() AND type = ''Procedure''');
+                    qry.Open;
+                   End;
+    dbtPostgreSQL : Begin
+                     qry.SQL.Add('SELECT N.NSPNAME || ''.'' || P.PRONAME FROM PG_CATALOG.PG_PROC P');
+                     qry.SQL.ADD('INNER JOIN PG_CATALOG.PG_NAMESPACE N ON N.OID = P.PRONAMESPACE');
+                     qry.SQL.Add('WHERE P.PROARGNAMES IS NOT NULL');
+                     If vSchema <> '' Then
+                      qry.SQL.Add('    and lower(N.NSPNAME) = '+QuotedStr(LowerCase(vSchema)));
+                     qry.Open;
+                    End;
+    dbtSQLLite    : Begin
+                     // nao existe Procedures
+                    End;
+    dbtMsSQL      : Begin
+                     qry.SQL.Add('select concat(user_name(uid),''.'',name)');
+                     qry.SQL.Add('from sysobjects');
+                     qry.SQL.Add('where type in (''P'',''FN'',''IF'',''TF'')');
+                     qry.Open;
+                    End;
+    dbtOracle     : Begin
+                     qry.SQL.Add('SELECT case ');
+                     qry.SQL.Add('         when Procedure_NAME is null then OBJECT_NAME');
+                     qry.SQL.Add('              ELSE OBJECT_NAME || ''.'' || Procedure_NAME');
+                     qry.SQL.Add('       end AS Procedure_name');
+                     qry.SQL.Add('FROM USER_ProcedureS');
+                     qry.Open;
+                    End;
+   End;
+   While Not qry.Eof Do
+    Begin
+     ProcNames.Add(qry.Fields[fPos].AsString);
+     qry.Next;
+    End;
+  Finally
+   FreeAndNil(qry);
+  End;
+  If Not vStateResource Then
+   Disconect;
+ Except
+  On E : Exception Do
+   Begin
+    Error          := True;
+    MessageError   := E.Message;
+    Disconect;
+   End;
+ End;
+End;
+
+Procedure TRESTDWDriverBase.GetProcParams(ProcName         : String;
+                                          Var ParamNames   : TStringList;
+                                          Var Error        : Boolean;
+                                          Var MessageError : String);
+Var
+ vStateResource : Boolean;
+ connType       : TRESTDWDatabaseType;
+ qry            : TRESTDWQuery;
+ vProc,
+ vSchema,
+ vFieldType     : String;
+ vSize,
+ vPrecision     : Integer;
+ Procedure convertFB_IBTypes;
+ Begin
+  vFieldType := 'ftUnknown';
+  vSize := 0;
+  vPrecision := 0;
+  Case qry.FieldByName('rdb$field_type').AsInteger Of
+   007 : Begin
+          vFieldType := 'ftSmallint';
+          If qry.FieldByName('rdb$field_sub_type').AsInteger > 0 Then
+           vFieldType := 'ftFloat';
+         End;
+   008 : Begin
+          vFieldType := 'ftInteger';
+          If qry.FieldByName('rdb$field_sub_type').AsInteger > 0 Then
+           vFieldType := 'ftFloat';
+         End;
+   009 : vFieldType := 'ftLargeint';
+   010 : vFieldType := 'ftFloat';
+   011 : vFieldType := 'ftFloat';
+   012 : vFieldType := 'ftDateTime';
+   013 : vFieldType := 'ftTime';
+   014 : vFieldType := 'ftFixedChar';
+   016 : Begin
+          vFieldType := 'ftLargeint';
+          If qry.FieldByName('rdb$field_sub_type').AsInteger > 0 Then
+           vFieldType := 'ftFloat';
+         End;
+   027 : vFieldType := 'ftFloat';
+   035 : vFieldType := 'ftTimeStamp';
+   037 : vFieldType := 'ftString';
+   040 : vFieldType := 'ftString';
+   261 : Begin
+          vFieldType := 'ftBlob';
+          If qry.FieldByName('rdb$field_sub_type').AsInteger = 1   Then
+           vFieldType := 'ftMemo';
+         End;
+  End;
+  If qry.FieldByName('rdb$field_type').AsInteger in [14,37,40]     Then
+   Begin
+    vSize := qry.FieldByName('rdb$field_length').AsInteger;
+      // field com charset e colation
+    If (qry.FieldByName('rdb$character_length').AsInteger > 0)     And
+       (qry.FieldByName('rdb$character_length').AsInteger < vSize) Then
+        vSize := qry.FieldByName('rdb$character_length').AsInteger;
+   End
+  Else If qry.FieldByName('rdb$field_type').AsInteger = 27         Then
+   Begin
+    vSize := qry.FieldByName('rdb$field_precision').AsInteger;
+    If (qry.FieldByName('rdb$field_scale').AsInteger < 0) Then
+     Begin
+      vSize := 15;
+      If (qry.FieldByName('rdb$field_precision').AsInteger > 0) Then
+       vSize := qry.FieldByName('rdb$field_precision').AsInteger;
+      vPrecision := Abs(qry.FieldByName('rdb$field_scale').AsInteger);
+     End;
+   End
+  Else If (qry.FieldByName('rdb$field_type').AsInteger    in [7,8,16]) And
+          (qry.FieldByName('rdb$field_sub_type').AsInteger > 0)        Then
+   Begin
+    vSize := qry.FieldByName('rdb$field_precision').AsInteger;
+    If (qry.FieldByName('rdb$field_scale').AsInteger < 0) Then
+     Begin
+      vSize := 15;
+      If (qry.FieldByName('rdb$field_precision').AsInteger > 0) Then
+       vSize := qry.FieldByName('rdb$field_precision').AsInteger;
+      vPrecision := Abs(qry.FieldByName('rdb$field_scale').AsInteger);
+     End;
+   End;
+ End;
+ Procedure convertMySQLTypes;
+ Var
+  sAux1 : String;
+ Begin
+  vFieldType := 'ftUnknown';
+  vSize      := 0;
+  vPrecision := 0;
+  sAux1      := LowerCase(qry.FieldByName('data_type').AsString);
+  If SameText(sAux1, 'integer')        Or
+     SameText(sAux1, 'int')            Then
+   vFieldType := 'ftInteger'
+  Else If SameText(sAux1, 'smallint')  Or
+          SameText(sAux1, 'tinyint')   Or
+          SameText(sAux1, 'mediumint') Or
+          SameText(sAux1, 'bit')       Then
+   vFieldType := 'ftSmallint'
+  Else If SameText(sAux1, 'longint')   Or
+          SameText(sAux1, 'bigint')    Then
+   vFieldType := 'ftLargeint'
+  Else If SameText(sAux1, 'real')      Or
+          SameText(sAux1, 'decimal')   Or
+          SameText(sAux1, 'numeric')   Or
+          SameText(sAux1, 'float')     Or
+          SameText(sAux1, 'double')    Or
+          SameText(sAux1, 'double precision') Then
+    Begin
+     vFieldType := 'ftFloat';
+     vSize      := qry.FieldByName('numeric_precision').AsInteger;
+     vPrecision := qry.FieldByName('numeric_scale').AsInteger;
+    End
+   Else If SameText(sAux1, 'varchar') Then
+    Begin
+     vFieldType := 'ftString';
+     vSize := qry.FieldByName('character_maximum_length').AsInteger;
+     If vSize >= 32767 Then
+      Begin
+       vFieldType := 'ftMemo';
+       vSize := 0;
+      end;
+    End
+   Else If SameText(sAux1, 'char') Then
+    Begin
+     vFieldType := 'ftFixedChar';
+     vSize := qry.FieldByName('character_maximum_length').AsInteger;
+    End
+   Else If SameText(sAux1, 'timestamp')  Then
+    vFieldType := 'ftTimeStamp'
+   Else if SameText(sAux1, 'time')       Then
+    vFieldType := 'ftTime'
+   Else If SameText(sAux1, 'datetime')   Then
+    vFieldType := 'ftDateTime'
+   Else If SameText(sAux1, 'date')       Then
+    vFieldType := 'ftDate'
+   Else If SameText(sAux1, 'year')       Then
+    vFieldType := 'ftSmallint'
+   Else If SameText(sAux1, 'blob')       Or
+           SameText(sAux1, 'binary')     Or
+           SameText(sAux1, 'tinyblob')   Or
+           SameText(sAux1,'mediumblob')  Or
+           SameText(sAux1,'longblob')    Then
+    vFieldType := 'ftBlob'
+   Else If SameText(sAux1,  'text')       Or
+           SameText(sAux1,  'tinytext')   Or
+           SameText(sAux1,  'mediumtext') Or
+           SameText(sAux1,  'longtext')   Or
+            SameText(sAux1, 'json')       Then
+    vFieldType := 'ftMemo';
+ End;
+ Procedure convertPostgresTypes;
+ Var
+  sAux1 : String;
+ Begin
+  vFieldType := 'ftUnknown';
+  vSize      := 0;
+  vPrecision := 0;
+  sAux1      := LowerCase(qry.FieldByName('data_type').AsString);
+  If SameText(sAux1, 'integer') Or
+     SameText(sAux1, 'int')     Or
+    (Pos('int[',sAux1) > 0)     Then
+   vFieldType := 'ftInteger'
+  Else If SameText(sAux1, 'smallint')  Or
+          SameText(sAux1, 'tinyint')   Or
+          SameText(sAux1, 'mediumint') Or
+          SameText(sAux1, 'bit')       Then
+   vFieldType := 'ftSmallint'
+  Else If (Pos('bigint', sAux1) > 0)   Then
+   vFieldType := 'ftLargeint'
+  Else If SameText(sAux1, 'real')    Or
+          SameText(sAux1, 'decimal') Or
+          SameText(sAux1, 'numeric') Or
+          SameText(sAux1, 'float')   Or
+          SameText(sAux1, 'double')  Or
+          SameText(sAux1, 'double precision') Then
+   Begin
+    vFieldType := 'ftFloat';
+    vSize := 15;
+    vPrecision := 6;
+   End
+  Else If SameText(sAux1, 'varchar')           Or
+         (Pos('character varying', sAux1) > 0) Then
+   Begin
+    vFieldType := 'ftString';
+    vSize := 255;
+   End
+  Else If SameText(sAux1, 'character') Or
+         (Pos('character[',sAux1) > 0) Then
+   Begin
+    vFieldType := 'ftFixedChar';
+    vSize := 255;
+   End
+  Else If (Pos('timestamp', sAux1) > 0) Then
+   vFieldType := 'ftTimeStamp'
+  Else If SameText(sAux1, 'time')       Or
+         (Pos('time with', sAux1) > 0)  Then
+   vFieldType := 'ftTime'
+  Else If SameText(sAux1, 'date')       Then
+   vFieldType := 'ftDate'
+  Else If (Pos(sAux1,'bytea') > 0) Then
+   vFieldType := 'ftBlob'
+  Else If (Pos(sAux1, 'text') > 0)  Or
+          (Pos(sAux1, 'json') > 0)  Or
+          (Pos(sAux1, 'xml')  > 0)  Then
+   vFieldType := 'ftMemo';
+ End;
+Begin
+ // nesta funcão pode ser usado as funcoes
+ // getDatabaseInfo ou isMinimumVersion
+ // para trazer informacao de versao de cada banco
+ If Not Assigned(ParamNames) Then
+  ParamNames := TStringList.Create;
+ vSchema := '';
+ vProc := ProcName;
+ If Pos('.', vProc) > 0 Then
+  Begin
+   vSchema := Copy(vProc, InitStrPos, Pos('.', vProc)-1);
+   Delete(vProc, InitStrPos, Pos('.', vProc));
+  End;
+ connType := getConectionType;
+ Try
+  vStateResource := isConnected;
+  If Not vStateResource Then
+   Connect;
+  qry := getQuery;
+  Try
+   Case connType Of
+    dbtFirebird  : Begin
+                    qry.SQL.Add('SELECT PP.RDB$PARAMETER_NAME, F.RDB$FIELD_LENGTH,');
+                    qry.SQL.Add('       F.RDB$FIELD_TYPE, F.RDB$FIELD_SUB_TYPE,');
+                    qry.SQL.Add('       F.RDB$CHARACTER_LENGTH, F.RDB$NULL_FLAG,');
+                    qry.SQL.Add('       F.RDB$DEFAULT_SOURCE, CS.RDB$CHARACTER_SET_NAME,');
+                    qry.SQL.Add('       CL.RDB$COLLATION_NAME, FD.RDB$LOWER_BOUND, FD.RDB$UPPER_BOUND');
+                    qry.SQL.Add('FROM RDB$Procedure_PARAMETERS PP ');
+                    qry.SQL.Add('INNER JOIN RDB$FIELDS F ON F.RDB$FIELD_NAME = PP.RDB$FIELD_SOURCE');
+                    qry.SQL.Add('LEFT JOIN RDB$CHARACTER_SETS CS ON CS.RDB$CHARACTER_SET_ID = F.RDB$CHARACTER_SET_ID');
+                    qry.SQL.Add('LEFT JOIN RDB$COLLATIONS CL ON CL.RDB$CHARACTER_SET_ID = F.RDB$CHARACTER_SET_ID AND');
+                    qry.SQL.Add('     CL.RDB$COLLATION_ID = coalesce(F.RDB$COLLATION_ID,RF.RDB$COLLATION_ID)');
+                    qry.SQL.Add('LEFT JOIN RDB$FIELD_DIMENSIONS FD ON FD.RDB$FIELD_NAME = F.RDB$FIELD_NAME');
+                    qry.SQL.Add('WHERE PP.RDB$Procedure_NAME = '+QuotedStr(UpperCase(vProc))+' AND');
+                    qry.SQL.Add('      PP.RDB$PARAMETER_TYPE = 0');
+                    qry.Open;
+                    While Not qry.Eof Do
+                     Begin
+                      convertFB_IBTypes;
+                      ParamNames.Add(Format(cParamDetails, [qry.Fields[0].AsString,
+                                                            vFieldType,vSize,vPrecision]));
+                      qry.Next;
+                     End;
+                   End;
+    dbtInterbase : Begin
+                    qry.SQL.Add('SELECT PP.RDB$PARAMETER_NAME, F.RDB$FIELD_LENGTH,');
+                    qry.SQL.Add('       F.RDB$FIELD_TYPE, F.RDB$FIELD_SUB_TYPE,');
+                    qry.SQL.Add('       F.RDB$CHARACTER_LENGTH, F.RDB$NULL_FLAG,');
+                    qry.SQL.Add('       F.RDB$DEFAULT_SOURCE, CS.RDB$CHARACTER_SET_NAME,');
+                    qry.SQL.Add('       CL.RDB$COLLATION_NAME, FD.RDB$LOWER_BOUND, FD.RDB$UPPER_BOUND');
+                    qry.SQL.Add('FROM RDB$Procedure_PARAMETERS PP ');
+                    qry.SQL.Add('INNER JOIN RDB$FIELDS F ON F.RDB$FIELD_NAME = PP.RDB$FIELD_SOURCE');
+                    qry.SQL.Add('LEFT JOIN RDB$CHARACTER_SETS CS ON CS.RDB$CHARACTER_SET_ID = F.RDB$CHARACTER_SET_ID');
+                    qry.SQL.Add('LEFT JOIN RDB$COLLATIONS CL ON CL.RDB$CHARACTER_SET_ID = F.RDB$CHARACTER_SET_ID AND');
+                    qry.SQL.Add('     CL.RDB$COLLATION_ID = coalesce(F.RDB$COLLATION_ID,RF.RDB$COLLATION_ID)');
+                    qry.SQL.Add('LEFT JOIN RDB$FIELD_DIMENSIONS FD ON FD.RDB$FIELD_NAME = F.RDB$FIELD_NAME');
+                    qry.SQL.Add('WHERE PP.RDB$Procedure_NAME = '+QuotedStr(UpperCase(vProc))+' AND');
+                    qry.SQL.Add('      PP.RDB$PARAMETER_TYPE = 0');
+                    qry.Open;
+                    While Not qry.Eof Do
+                     Begin
+                      convertFB_IBTypes;
+                      ParamNames.Add(Format(cParamDetails, [qry.Fields[0].AsString,
+                                                            vFieldType,vSize,vPrecision]));
+                      qry.Next;
+                     End;
+                   End;
+    dbtMySQL     : Begin
+                    // somente mysql maior que 5
+                    qry.SQL.Add('SELECT parameter_name, data_type, character_maximum_length,');
+                    qry.SQL.Add('       character_octet_length,numeric_precision,numeric_scale,');
+                    qry.SQL.Add('       dtd_identifier');
+                    qry.SQL.Add('FROM information_schema.parameters');
+                    qry.SQL.Add('WHERE SPECIFIC_NAME = '+QuotedStr(vProc)+' AND');
+                    qry.SQL.Add('      SPECIFIC_SCHEMA = DATABASE() and');
+                    qry.SQL.Add('      ROUTINE_TYPE = ''Procedure'' and');
+                    qry.SQL.Add('      PARAMETER_MODE = ''IN''');
+                    Try
+                     qry.Open;
+                     While Not qry.Eof Do
+                      Begin
+                       convertMySQLTypes;
+                       ParamNames.Add(Format(cParamDetails, [qry.Fields[0].AsString,
+                                                             vFieldType,vSize,vPrecision]));
+
+                       qry.Next;
+                      End;
+                    Except
+
+                    End;
+                   End;
+    dbtPostgreSQL : Begin
+                     qry.SQL.Add('select a.parameter_name, a.data_type');
+                     qry.SQL.Add('from information_schema.routines p');
+                     qry.SQL.Add('left join information_schema.parameters a on');
+                     qry.SQL.Add('          p.specific_schema = a.specific_schema and');
+                     qry.SQL.Add('          p.specific_name = a.specific_name');
+                     qry.SQL.Add('where p.routine_schema not in (''pg_catalog'', ''information_schema'') and');
+                     qry.SQL.Add('      p.routine_type = ''Procedure'' and');
+                     qry.SQL.Add('      p.routine_name = '+QuotedStr(vProc)+' and');
+                     qry.SQL.Add('      a.parameter_name is not null and');
+                     qry.SQL.Add('      a.parameter_mode like ''IN%''');
+                     If vSchema <> '' Then
+                      qry.SQL.Add('    and p.specific_schema = '+QuotedStr(vSchema));
+                     qry.SQL.Add('order by p.specific_schema, p.specific_name, p.routine_name,');
+                     qry.SQL.Add('         a.ordinal_position');
+                     Try
+                      qry.Open;
+                      While Not qry.Eof Do
+                       Begin
+                        convertPostgresTypes;
+                        ParamNames.Add(Format(cParamDetails, [qry.Fields[0].AsString,
+                                                              vFieldType,vSize,vPrecision]));
+
+                        qry.Next;
+                       End;
+                     Except
+
+                     End;
+                    End;
+    dbtSQLLite    : Begin
+                     // sqlite nao tem Procedures
+                    End;
+   End;
+  Finally
+   FreeAndNil(qry);
+  End;
+  If Not vStateResource Then
+   Disconect;
+ Except
+  On E : Exception Do
+   Begin
+    Error          := True;
+    MessageError   := E.Message;
+    Disconect;
+   End;
+ End;
+End;
+
+Function TRESTDWDriverBase.InsertMySQLReturnID(SQL              : String;
+                                               Var Error        : Boolean;
+                                               Var MessageError : String) : Integer;
+Begin
+ Result := InsertMySQLReturnID(SQL, Nil, Error, MessageError);
+End;
+
+Function TRESTDWDriverBase.InsertMySQLReturnID(SQL              : String;
+                                               Params           : TRESTDWParams;
+                                               var Error        : Boolean;
+                                               var MessageError : String) : Integer;
+Var
+ vTempQuery     : TRESTDWQuery;
+ A, I           : Integer;
+ vParamName     : String;
+ vStringStream  : TMemoryStream;
+ vStateResource : Boolean;
+Begin
+ Result := -1;
+ Error  := False;
+ vStringStream := Nil;
+ If Not Assigned(FConnection) Then
+  Exit;
+ vTempQuery := getQuery;
+ vStateResource := isConnected;
+ If Not vStateResource Then
+  Connect;
+ If Not connInTransaction Then
+  connStartTransaction;
+ vTempQuery.SQL.Clear;
+ vTempQuery.SQL.Add(SQL);
+ If Params <> Nil Then
+  Begin
    For I := 0 To Params.Count -1 Do
     Begin
      If vTempQuery.Params.Count > I Then
@@ -6351,45 +7121,40 @@ Begin
       Break;
     End;
   End;
+ Result := -1;
+ Error  := False;
+ Try
+  Try
+   vTempQuery.ExecSQL;
+   Result := vTempQuery.GetInsertID;
+   Error := False;
+   If connInTransaction Then
+    connCommit;
+  Finally
+  End;
+  If Not vStateResource Then
+   Disconect
+ Except
+  On E : Exception Do
+   Begin
+    Try
+     Error        := True;
+     MessageError := E.Message;
+     Result       := -1;
+     connRollback;
+     Disconect;
+    Except
+    End;
+   End;
+ End;
+ vTempQuery.Close;
+ FreeAndNil(vTempQuery);
+End;
 
-  Result := -1;
-  Error  := False;
-  try
-    try
-      vTempQuery.ExecSQL;
-
-      Result := vTempQuery.GetInsertID;
-
-      Error := False;
-
-      if connInTransaction then
-        connCommit;
-    finally
-
-    end;
-    if not vStateResource then
-      Disconect
-  except
-    on E : Exception do begin
-      try
-        Error        := True;
-        MessageError := E.Message;
-        Result       := -1;
-        connRollback;
-        Disconect;
-      except
-
-      end;
-    end;
-  end;
-  vTempQuery.Close;
-  FreeAndNil(vTempQuery);
-end;
-
-function TRESTDWDriverBase.OpenDatasets(DatasetsLine: String;
-                                        var Error: Boolean;
-                                        var MessageError: String;
-                                        var BinaryBlob: TMemoryStream): TJSONValue;
+Function TRESTDWDriverBase.OpenDatasets(DatasetsLine     : String;
+                                        var Error        : Boolean;
+                                        var MessageError : String;
+                                        var BinaryBlob   : TMemoryStream): TJSONValue;
 Var
  vTempQuery      : TRESTDWQuery;
  vTempJSON       : TJSONValue;
@@ -6404,7 +7169,7 @@ Var
  bJsonValue      : TRESTDWJSONInterfaceObject;
  vStream         : TMemoryStream;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  Error           := False;
  vBinaryEvent    := False;
  vMetaData       := False;
@@ -6415,10 +7180,8 @@ Begin
   vStateResource := isConnected;
   If Not vStateResource Then
    Connect;
-
   If Not connInTransaction Then
     connStartTransaction;
-
   bJsonValue  := TRESTDWJSONInterfaceObject.Create(DatasetsLine);
   For I := 0 To bJsonValue.PairCount - 1 Do
    Begin
@@ -6488,10 +7251,10 @@ Begin
     End;
     FreeAndNil(bJsonArray);
    End;
-   If connInTransaction Then
-     connCommit;
-   If Not vStateResource Then
-    Disconect;
+  If connInTransaction Then
+   connCommit;
+  If Not vStateResource Then
+   Disconect;
  Except
   On E : Exception do
    Begin
@@ -6517,13 +7280,14 @@ Begin
  vTempQuery.Free;
  If bJsonValue <> Nil Then
   FreeAndNil(bJsonValue);
-end;
+End;
 
-function TRESTDWDriverBase.OpenDatasets(DatapackStream: TStream;
-                                        var Error: Boolean;
-                                        var MessageError: String;
-                                        var BinaryBlob: TMemoryStream;
-                                        aBinaryEvent: Boolean; aBinaryCompatibleMode: Boolean): TStream;
+Function TRESTDWDriverBase.OpenDatasets(DatapackStream        : TStream;
+                                        Var Error             : Boolean;
+                                        Var MessageError      : String;
+                                        Var BinaryBlob        : TMemoryStream;
+                                        aBinaryEvent          : Boolean;
+                                        aBinaryCompatibleMode : Boolean): TStream;
 Var
  X               : Integer;
  vTempQuery      : TRESTDWQuery;
@@ -6537,7 +7301,7 @@ Var
  vBufferStream,
  vParamsStream   : TStream;
 Begin
- Inherited;
+ {$IFNDEF FPC}Inherited;{$ENDIF}
  Result          := Nil;
  Error           := False;
  BufferInStream  := TRESTDWBufferBase.Create;
@@ -6547,11 +7311,9 @@ Begin
   BufferInStream.LoadToStream(DatapackStream);
   vStateResource := isConnected;
   If Not vStateResource Then
-    Connect;
-
+   Connect;
   If Not connInTransaction Then
-    connStartTransaction;
-
+   connStartTransaction;
   While Not BufferInStream.Eof Do
    Begin
     BufferStream  := Nil;
@@ -6610,11 +7372,10 @@ Begin
      FreeAndNil(vStream);
     End;
    End;
-   If connInTransaction Then
-    connCommit;
-
-   If Not vStateResource Then
-     Disconect;
+  If connInTransaction Then
+   connCommit;
+  If Not vStateResource Then
+   Disconect;
  Except
   On E : Exception do
    Begin
@@ -6633,25 +7394,25 @@ Begin
  vTempQuery.Free;
 end;
 
-class procedure TRESTDWDriverBase.CreateConnection(const AConnectionDefs: TConnectionDefs;
-                                                   var AConnection: TComponent);
-begin
- if (not Assigned(AConnection)) or (not Assigned(AConnectionDefs)) then
-   Exit;
-end;
+Class Procedure TRESTDWDriverBase.CreateConnection(Const AConnectionDefs : TConnectionDefs;
+                                                   Var AConnection       : TComponent);
+Begin
+ If (Not Assigned(AConnection))     Or
+    (Not Assigned(AConnectionDefs)) Then
+  Exit;
+End;
 
-procedure TRESTDWDriverBase.PrepareConnection(var AConnectionDefs: TConnectionDefs);
-begin
-  if Assigned(OnPrepareConnection) then
-    OnPrepareConnection(AConnectionDefs);
+Procedure TRESTDWDriverBase.PrepareConnection(Var AConnectionDefs : TConnectionDefs);
+Begin
+ If Assigned(OnPrepareConnection) Then
+  OnPrepareConnection(AConnectionDefs);
+ If (Not Assigned(FConnection))     Or
+    (Not Assigned(AConnectionDefs)) Then
+  Exit;
+ CreateConnection(AConnectionDefs,FConnection);
+End;
 
-  if (not Assigned(FConnection)) or (not Assigned(AConnectionDefs)) then
-    Exit;
-
-  CreateConnection(AConnectionDefs,FConnection);
-end;
-
-procedure TRESTDWDriverBase.BuildDatasetLine(var Query: TRESTDWDataset;
+Procedure TRESTDWDriverBase.BuildDatasetLine(var Query: TRESTDWDataset;
                             Massivedataset: TMassivedatasetBuffer;
                             MassiveCache: Boolean);
 Var
@@ -7061,6 +7822,6 @@ Begin
       End;
     End;
   End;
-end;
+End;
 
-end.
+End.
