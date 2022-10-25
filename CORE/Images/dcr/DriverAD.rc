@@ -1,2 +1,2 @@
-TRESTDWDriverAD BITMAP "..\icons\components\TRESTDWDriverAD.bmp"
-TRESTDWDriverAD16 BITMAP "..\icons\components\TRESTDWDriverAD16.bmp"
+TRESTDWAnyDACDriver BITMAP "..\icons\components\TRESTDWDriverAD.bmp"
+TRESTDWAnyDACDriver16 BITMAP "..\icons\components\TRESTDWDriverAD16.bmp"
