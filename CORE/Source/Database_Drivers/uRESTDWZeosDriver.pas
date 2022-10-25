@@ -295,7 +295,7 @@ end;
 
 function TRESTDWZeosDriver.aGetConnection: TZConnection;
 begin
- Result := TFDConnection(GetConnection);
+ Result := TZConnection(GetConnection);
 end;
 
 procedure TRESTDWZeosDriver.aSetConnection(const Value: TZConnection);
