@@ -24,10 +24,6 @@
  Fernando Banhos            - Refactor Drivers REST Dataware.
 }
 
-{$IFDEF FPC}
-  {$mode objfpc}{$H+}
-{$ENDIF}
-
 interface
 
 uses
@@ -103,6 +99,9 @@ type
   { TRESTDWUniDACDriver }
 
   TRESTDWUniDACDriver = class(TRESTDWDriverBase)
+  private
+    function aGetConnection: TUniConnection;
+    procedure aSetConnection(const Value: TUniConnection);
   protected
     procedure setConnection(AValue: TComponent); override;
     function getConectionType : TRESTDWDatabaseType; override;
@@ -123,7 +122,7 @@ type
     class procedure CreateConnection(Const AConnectionDefs : TConnectionDefs;
                                      var AConnection : TComponent); override;
   published
-
+    Property  Connection : TUniConnection Read aGetConnection Write aSetConnection;
   end;
 
 procedure Register;
@@ -280,6 +279,16 @@ begin
   inherited connRollback;
   if Assigned(Connection) then
     TUniConnection(Connection).Rollback;
+end;
+
+function TRESTDWUniDACDriver.aGetConnection: TUniConnection;
+begin
+ Result := TUniConnection(GetConnection);
+end;
+
+procedure TRESTDWUniDACDriver.aSetConnection(const Value: TUniConnection);
+begin
+ setConnection(Value);
 end;
 
 procedure TRESTDWUniDACDriver.connCommit;

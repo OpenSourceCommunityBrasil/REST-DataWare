@@ -1,4 +1,4 @@
-unit uRESTDWLazSQLDriver;
+﻿unit uRESTDWLazSQLDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -23,10 +23,6 @@ unit uRESTDWLazSQLDriver;
  Roniery                    - Devel.
  Fernando Banhos            - Refactor Drivers REST Dataware.
 }
-
-{$IFDEF FPC}
-  {$mode objfpc}{$H+}
-{$ENDIF}
 
 interface
 
@@ -76,6 +72,8 @@ type
   TRESTDWLazSQLDriver = class(TRESTDWDriverBase)
   private
     FTransaction : TSQLTransaction;
+    function aGetConnection: TSQLConnection;
+    procedure aSetConnection(const Value: TSQLConnection);
   protected
     procedure setConnection(AValue: TComponent); override;
 
@@ -98,6 +96,8 @@ type
 
     class procedure CreateConnection(const AConnectionDefs  : TConnectionDefs;
                                      var AConnection        : TComponent); override;
+  published
+    Property  Connection : TSQLConnection Read aGetConnection Write aSetConnection;
   end;
 
 procedure Register;
@@ -268,6 +268,16 @@ end;
 procedure TRESTDWLazSQLDriver.connRollback;
 begin
   FTransaction.Rollback;
+end;
+
+function TRESTDWLazSQLDriver.aGetConnection: TSQLConnection;
+begin
+ Result := TSQLConnection(GetConnection);
+end;
+
+procedure TRESTDWLazSQLDriver.aSetConnection(const Value: TSQLConnection);
+begin
+ setConnection(Value);
 end;
 
 procedure TRESTDWLazSQLDriver.connCommit;

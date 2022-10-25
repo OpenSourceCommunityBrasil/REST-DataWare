@@ -67,6 +67,9 @@ type
   { TRESTDWMyDACDriver }
 
   TRESTDWMyDACDriver = class(TRESTDWDriverBase)
+  private
+    function aGetConnection: TMyConnection;
+    procedure aSetConnection(const Value: TMyConnection);
   protected
     procedure setConnection(AValue: TComponent); override;
     function getConectionType : TRESTDWDatabaseType; override;
@@ -87,7 +90,7 @@ type
     class procedure CreateConnection(Const AConnectionDefs : TConnectionDefs;
                                      var AConnection : TComponent); override;
   published
-
+    Property  Connection : TMyConnection Read aGetConnection Write aSetConnection;
   end;
 
 procedure Register;
@@ -229,6 +232,16 @@ begin
   inherited connRollback;
   if Assigned(Connection) then
     TMyConnection(Connection).Rollback;
+end;
+
+function TRESTDWMyDACDriver.aGetConnection: TMyConnection;
+begin
+ Result := TMyConnection(GetConnection);
+end;
+
+procedure TRESTDWMyDACDriver.aSetConnection(const Value: TMyConnection);
+begin
+ setConnection(Value);
 end;
 
 procedure TRESTDWMyDACDriver.connCommit;

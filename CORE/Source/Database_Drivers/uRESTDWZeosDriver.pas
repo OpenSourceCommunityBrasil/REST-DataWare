@@ -96,6 +96,8 @@ type
   TRESTDWZeosDriver = class(TRESTDWDriverBase)
   private
     FTransaction : TZTransaction;
+    function aGetConnection: TZConnection;
+    procedure aSetConnection(const Value: TZConnection);
   protected
     procedure setConnection(AValue: TComponent); override;
 
@@ -120,7 +122,7 @@ type
     class procedure CreateConnection(Const AConnectionDefs : TConnectionDefs;
                                      var AConnection : TComponent); override;
   published
-
+    Property  Connection : TZConnection Read aGetConnection Write aSetConnection;
   end;
 
 procedure Register;
@@ -289,6 +291,16 @@ begin
   inherited connRollback;
   if Assigned(Connection) then
     TZConnection(Connection).Rollback;
+end;
+
+function TRESTDWZeosDriver.aGetConnection: TZConnection;
+begin
+ Result := TFDConnection(GetConnection);
+end;
+
+procedure TRESTDWZeosDriver.aSetConnection(const Value: TZConnection);
+begin
+ setConnection(Value);
 end;
 
 procedure TRESTDWZeosDriver.connCommit;

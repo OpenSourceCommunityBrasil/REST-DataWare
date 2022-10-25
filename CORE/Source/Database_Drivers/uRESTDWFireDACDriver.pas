@@ -97,7 +97,7 @@ type
     class procedure CreateConnection(const AConnectionDefs  : TConnectionDefs;
                                      var AConnection        : TComponent); override;
   Published
-   Property  Connection : TFDConnection Read aGetConnection Write aSetConnection;
+    Property  Connection : TFDConnection Read aGetConnection Write aSetConnection;
   end;
 
 procedure Register;
