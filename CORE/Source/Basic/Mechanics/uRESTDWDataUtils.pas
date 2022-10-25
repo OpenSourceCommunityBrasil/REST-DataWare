@@ -38,7 +38,7 @@ Uses
 Type
  TRESTDWAuthOptionTypes = (rdwOATBasic, rdwOATBearer, rdwOATToken);
  TRESTDWAuthOption      = (rdwAONone,   rdwAOBasic,   rdwAOBearer,
-                        rdwAOToken,  rdwOAuth);
+                           rdwAOToken,  rdwOAuth);
  TRESTDWTokenType       = (rdwTS,       rdwJWT,       rdwPersonal);
  TRESTDWAuthOptions     = Set of TRESTDWAuthOption;
  TRESTDWCryptType       = (rdwAES256,   rdwHSHA256,   rdwRSA);

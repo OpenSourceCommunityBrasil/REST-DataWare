@@ -78,7 +78,9 @@ type
     function isAutoCommit : boolean;
   protected
     procedure setConnection(AValue: TComponent); override;
-    function getConectionType : TRESTDWDatabaseType; override;
+    function  getConectionType : TRESTDWDatabaseType; override;
+    Procedure aSetConnection(Value : TFDConnection);
+    Function  aGetConnection       : TFDConnection;
   public
     function getQuery : TRESTDWQuery; override;
     function getTable : TRESTDWTable; override;
@@ -92,9 +94,10 @@ type
     procedure connStartTransaction; override;
     procedure connRollback; override;
     procedure connCommit; override;
-
     class procedure CreateConnection(const AConnectionDefs  : TConnectionDefs;
                                      var AConnection        : TComponent); override;
+  Published
+   Property  Connection : TFDConnection Read aGetConnection Write aSetConnection;
   end;
 
 procedure Register;
@@ -177,6 +180,16 @@ begin
     i := i + 1;
   end;
 end;
+
+Procedure TRESTDWFireDACDriver.asetConnection(Value : TFDConnection);
+Begin
+ setConnection(Value);
+End;
+
+Function TRESTDWFireDACDriver.aGetConnection : TFDConnection;
+Begin
+ Result := TFDConnection(GetConnection);
+End;
 
 function TRESTDWFireDACDriver.getQuery: TRESTDWQuery;
 var

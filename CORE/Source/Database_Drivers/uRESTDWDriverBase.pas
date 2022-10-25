@@ -127,6 +127,7 @@ Uses
   vOnQueryException    : TOnQueryException;
  Protected
   Procedure setConnection(AValue : TComponent); Virtual;
+  Function  getConnection        : TComponent;  Virtual;
   Function  isConnected          : Boolean;     Virtual;
   Function  connInTransaction    : Boolean;     Virtual;
   Procedure connStartTransaction; Virtual;
@@ -274,7 +275,6 @@ Uses
                                    Massivedataset         : TMassivedatasetBuffer;
                                    MassiveCache           : Boolean = False);
  Published
-  Property Connection          : TComponent           Read FConnection            Write setConnection;
   Property StrsTrim            : Boolean              Read vStrsTrim              Write vStrsTrim;
   Property StrsEmpty2Null      : Boolean              Read vStrsEmpty2Null        Write vStrsEmpty2Null;
   Property StrsTrim2Len        : Boolean              Read vStrsTrim2Len          Write vStrsTrim2Len;
@@ -568,6 +568,11 @@ Begin
  Result := dbtUndefined;
 End;
 
+Function TRESTDWDriverBase.getConnection: TComponent;
+Begin
+ Result := FConnection;
+End;
+
 Function TRESTDWDriverBase.getDatabaseInfo  : TRESTDWDatabaseInfo;
 Var
  connType : TRESTDWDatabaseType;
@@ -838,7 +843,8 @@ Procedure TRESTDWDriverBase.setConnection(AValue: TComponent);
 Begin
  If FConnection = AValue Then
   Exit;
- Disconect;
+ If isConnected Then
+  Disconect;
  FConnection := AValue;
 End;
 
