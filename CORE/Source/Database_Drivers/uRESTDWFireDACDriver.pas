@@ -42,19 +42,17 @@ const
                      dbtODBC,dbtOracle,dbtPostgreSQL,dbtSQLLite,dbtUndefined,
                      dbtUndefined];
 
-  crdwConnectionNotFireDAC = 'Componente não é um FireDACConnection';
-
 type
   { TRESTDWFireDACDataset }
 
-  TRESTDWFireDACDataset = class(TRESTDWDataset)
+  TRESTDWFireDACDataset = class(TRESTDWDrvDataset)
   public
     procedure SaveToStream(stream : TStream); override;
   end;
 
   { TRESTDWFireDACStoreProc }
 
-  TRESTDWFireDACStoreProc = class(TRESTDWStoreProc)
+  TRESTDWFireDACStoreProc = class(TRESTDWDrvStoreProc)
   public
     procedure ExecProc; override;
     procedure Prepare; override;
@@ -62,7 +60,7 @@ type
 
   { TRESTDWFireDACQuery }
 
-  TRESTDWFireDACQuery = class(TRESTDWQuery)
+  TRESTDWFireDACQuery = class(TRESTDWDrvQuery)
   protected
     procedure createSequencedField(seqname,field : string); override;
   public
@@ -75,16 +73,15 @@ type
 
   TRESTDWFireDACDriver = class(TRESTDWDriverBase)
   private
+    FConnTeste : TComponent;
     function isAutoCommit : boolean;
   protected
-    procedure setConnection(AValue: TComponent); override;
     function  getConectionType : TRESTDWDatabaseType; override;
-    Procedure aSetConnection(Value : TFDConnection);
-    Function  aGetConnection       : TFDConnection;
+    Function compConnIsValid(comp : TComponent) : boolean; override;
   public
-    function getQuery : TRESTDWQuery; override;
-    function getTable : TRESTDWTable; override;
-    function getStoreProc : TRESTDWStoreProc; override;
+    function getQuery : TRESTDWDrvQuery; override;
+    function getTable : TRESTDWDrvTable; override;
+    function getStoreProc : TRESTDWDrvStoreProc; override;
 
     procedure Connect; override;
     procedure Disconect; override;
@@ -96,8 +93,6 @@ type
     procedure connCommit; override;
     class procedure CreateConnection(const AConnectionDefs  : TConnectionDefs;
                                      var AConnection        : TComponent); override;
-  Published
-    Property  Connection : TFDConnection Read aGetConnection Write aSetConnection;
   end;
 
 procedure Register;
@@ -153,13 +148,6 @@ begin
   {$IFEND}
 end;
 
-procedure TRESTDWFireDACDriver.setConnection(AValue: TComponent);
-begin
-  if (Assigned(AValue)) and (not AValue.InheritsFrom(TFDConnection)) then
-    raise Exception.Create(crdwConnectionNotFireDAC);
-  inherited setConnection(AValue);
-end;
-
 function TRESTDWFireDACDriver.getConectionType: TRESTDWDatabaseType;
 var
   conn : string;
@@ -181,17 +169,7 @@ begin
   end;
 end;
 
-Procedure TRESTDWFireDACDriver.asetConnection(Value : TFDConnection);
-Begin
- setConnection(Value);
-End;
-
-Function TRESTDWFireDACDriver.aGetConnection : TFDConnection;
-Begin
- Result := TFDConnection(GetConnection);
-End;
-
-function TRESTDWFireDACDriver.getQuery: TRESTDWQuery;
+function TRESTDWFireDACDriver.getQuery: TRESTDWDrvQuery;
 var
   qry : TFDQuery;
 begin
@@ -207,7 +185,7 @@ begin
   Result := TRESTDWFireDACQuery.Create(qry);
 end;
 
-function TRESTDWFireDACDriver.getTable : TRESTDWTable;
+function TRESTDWFireDACDriver.getTable : TRESTDWDrvTable;
 var
   qry : TFDTable;
 begin
@@ -216,10 +194,10 @@ begin
   qry.Connection := TFDConnection(Connection);
   qry.CachedUpdates := False;
 
-  Result := TRESTDWTable.Create(qry);
+  Result := TRESTDWDrvTable.Create(qry);
 end;
 
-function TRESTDWFireDACDriver.getStoreProc : TRESTDWStoreProc;
+function TRESTDWFireDACDriver.getStoreProc : TRESTDWDrvStoreProc;
 var
   qry : TFDStoredProc;
 begin
@@ -272,6 +250,11 @@ begin
   inherited connRollback;
   if Assigned(Connection) and (not isAutoCommit) then
     TFDConnection(Connection).Rollback;
+end;
+
+function TRESTDWFireDACDriver.compConnIsValid(comp: TComponent): boolean;
+begin
+  Result := comp.InheritsFrom(TFDConnection);
 end;
 
 procedure TRESTDWFireDACDriver.connCommit;

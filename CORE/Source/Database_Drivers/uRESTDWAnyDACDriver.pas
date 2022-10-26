@@ -56,19 +56,17 @@ const
                        dbtUndefined];
   {$ENDIF}
 
-  crdwConnectionNotFireDAC = 'Componente não é um AnyDACConnection';
-
 type
   { TRESTDWAnyDACDataset }
 
-  TRESTDWAnyDACDataset = class(TRESTDWDataset)
+  TRESTDWAnyDACDataset = class(TRESTDWDrvDataset)
   public
     procedure SaveToStream(stream : TStream); override;
   end;
 
   { TRESTDWAnyDACStoreProc }
 
-  TRESTDWAnyDACStoreProc = class(TRESTDWStoreProc)
+  TRESTDWAnyDACStoreProc = class(TRESTDWDrvStoreProc)
   public
     procedure ExecProc; override;
     procedure Prepare; override;
@@ -76,7 +74,7 @@ type
 
   { TRESTDWAnyDACQuery }
 
-  TRESTDWAnyDACQuery = class(TRESTDWQuery)
+  TRESTDWAnyDACQuery = class(TRESTDWDrvQuery)
   protected
     procedure createSequencedField(seqname, field : string); override;
   public
@@ -89,17 +87,13 @@ type
   { TRESTDWAnyDACDriver }
 
   TRESTDWAnyDACDriver = class(TRESTDWDriverBase)
-  private
-    function aGetConnection: TADConnection;
-    procedure aSetConnection(const Value: TADConnection);
   protected
-    procedure setConnection(AValue: TComponent); override;
-
+    Function compConnIsValid(comp : TComponent) : boolean; override;
     function getConectionType : TRESTDWDatabaseType; override;
   public
-    function getQuery : TRESTDWQuery; override;
-    function getTable : TRESTDWTable; override;
-    function getStoreProc : TRESTDWStoreProc; override;
+    function getQuery : TRESTDWDrvQuery; override;
+    function getTable : TRESTDWDrvTable; override;
+    function getStoreProc : TRESTDWDrvStoreProc; override;
 
     procedure Connect; override;
     procedure Disconect; override;
@@ -112,8 +106,6 @@ type
 
     class procedure CreateConnection(Const AConnectionDefs : TConnectionDefs;
                                      var AConnection : TComponent); override;
-  published
-    Property Connection : TADConnection Read aGetConnection Write aSetConnection;
   end;
 
 procedure Register;
@@ -166,13 +158,6 @@ end;
 
  { TRESTDWAnyDACDriver }
 
-procedure TRESTDWAnyDACDriver.setConnection(AValue : TComponent);
-begin
-  if (Assigned(AValue)) and (not AValue.InheritsFrom(TADConnection)) then
-    raise Exception.Create(crdwConnectionNotFireDAC);
-  inherited setConnection(AValue);
-end;
-
 function TRESTDWAnyDACDriver.getConectionType : TRESTDWDatabaseType;
 var
   conn : string;
@@ -194,7 +179,7 @@ begin
   end;
 end;
 
-function TRESTDWAnyDACDriver.getQuery : TRESTDWQuery;
+function TRESTDWAnyDACDriver.getQuery : TRESTDWDrvQuery;
 var
   qry : TADQuery;
 begin
@@ -204,7 +189,7 @@ begin
   Result := TRESTDWAnyDACQuery.Create(qry);
 end;
 
-function TRESTDWAnyDACDriver.getTable : TRESTDWTable;
+function TRESTDWAnyDACDriver.getTable : TRESTDWDrvTable;
 var
   qry : TADTable;
 begin
@@ -212,10 +197,10 @@ begin
   qry.FetchOptions.RowsetSize := -1;
   qry.Connection := TADConnection(Connection);
 
-  Result := TRESTDWTable.Create(qry);
+  Result := TRESTDWDrvTable.Create(qry);
 end;
 
-function TRESTDWAnyDACDriver.getStoreProc : TRESTDWStoreProc;
+function TRESTDWAnyDACDriver.getStoreProc : TRESTDWDrvStoreProc;
 var
   qry : TADStoredProc;
 begin
@@ -270,14 +255,9 @@ begin
     Result := TADConnection(Connection).Rollback;
 end;
 
-function TRESTDWAnyDACDriver.aGetConnection: TADConnection;
+function TRESTDWAnyDACDriver.compConnIsValid(comp: TComponent): boolean;
 begin
- Result := TADConnection(GetConnection);
-end;
-
-procedure TRESTDWAnyDACDriver.aSetConnection(const Value: TADConnection);
-begin
- setConnection(Value);
+  Result := comp.InheritsFrom(TADConnection);
 end;
 
 procedure TRESTDWAnyDACDriver.connCommit;

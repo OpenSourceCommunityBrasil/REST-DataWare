@@ -39,14 +39,14 @@ const
 type
   { TRESTDWMyDACDataset }
 
-  TRESTDWMyDACDataset = class(TRESTDWDataset)
+  TRESTDWMyDACDataset = class(TRESTDWDrvDataset)
   public
     procedure SaveToStream(stream : TStream); override;
   end;
 
   { TRESTDWMyDACStoreProc }
 
-  TRESTDWMyDACStoreProc = class(TRESTDWStoreProc)
+  TRESTDWMyDACStoreProc = class(TRESTDWDrvStoreProc)
   public
     procedure ExecProc; override;
     procedure Prepare; override;
@@ -54,7 +54,7 @@ type
 
   { TRESTDWMyDACQuery }
 
-  TRESTDWMyDACQuery = class(TRESTDWQuery)
+  TRESTDWMyDACQuery = class(TRESTDWDrvQuery)
   protected
     procedure createSequencedField(seqname,field : string); override;
   public
@@ -67,16 +67,13 @@ type
   { TRESTDWMyDACDriver }
 
   TRESTDWMyDACDriver = class(TRESTDWDriverBase)
-  private
-    function aGetConnection: TMyConnection;
-    procedure aSetConnection(const Value: TMyConnection);
   protected
-    procedure setConnection(AValue: TComponent); override;
     function getConectionType : TRESTDWDatabaseType; override;
+    Function compConnIsValid(comp : TComponent) : boolean; override;
   public
-    function getQuery : TRESTDWQuery; override;
-    function getTable : TRESTDWTable; override;
-    function getStoreProc : TRESTDWStoreProc; override;
+    function getQuery : TRESTDWDrvQuery; override;
+    function getTable : TRESTDWDrvTable; override;
+    function getStoreProc : TRESTDWDrvStoreProc; override;
 
     procedure Connect; override;
     procedure Disconect; override;
@@ -89,8 +86,6 @@ type
 
     class procedure CreateConnection(Const AConnectionDefs : TConnectionDefs;
                                      var AConnection : TComponent); override;
-  published
-    Property  Connection : TMyConnection Read aGetConnection Write aSetConnection;
   end;
 
 procedure Register;
@@ -143,20 +138,13 @@ end;
 
  { TRESTDWMyDACDriver }
 
-procedure TRESTDWMyDACDriver.setConnection(AValue : TComponent);
-begin
-  if (Assigned(AValue)) and (not AValue.InheritsFrom(TMyConnection)) then
-    raise Exception.Create(crdwConnectionNotIsMyDAC);
-  inherited setConnection(AValue);
-end;
-
 function TRESTDWMyDACDriver.getConectionType : TRESTDWDatabaseType;
 begin
   // somente MySQL
   Result := dbtMySQL;
 end;
 
-function TRESTDWMyDACDriver.getQuery : TRESTDWQuery;
+function TRESTDWMyDACDriver.getQuery : TRESTDWDrvQuery;
 var
   qry : TMyQuery;
 begin
@@ -169,17 +157,17 @@ begin
   Result := TRESTDWMyDACQuery.Create(qry);
 end;
 
-function TRESTDWMyDACDriver.getTable : TRESTDWTable;
+function TRESTDWMyDACDriver.getTable : TRESTDWDrvTable;
 var
   qry : TMyTable;
 begin
   qry := TMyTable.Create(Self);
   qry.Connection := TMyConnection(Connection);
 
-  Result := TRESTDWTable.Create(qry);
+  Result := TRESTDWDrvTable.Create(qry);
 end;
 
-function TRESTDWMyDACDriver.getStoreProc : TRESTDWStoreProc;
+function TRESTDWMyDACDriver.getStoreProc : TRESTDWDrvStoreProc;
 var
   qry : TMyStoredProc;
 begin
@@ -234,14 +222,9 @@ begin
     TMyConnection(Connection).Rollback;
 end;
 
-function TRESTDWMyDACDriver.aGetConnection: TMyConnection;
+function TRESTDWMyDACDriver.compConnIsValid(comp: TComponent): boolean;
 begin
- Result := TMyConnection(GetConnection);
-end;
-
-procedure TRESTDWMyDACDriver.aSetConnection(const Value: TMyConnection);
-begin
- setConnection(Value);
+  Result := comp.InheritsFrom(TMyConnection);
 end;
 
 procedure TRESTDWMyDACDriver.connCommit;

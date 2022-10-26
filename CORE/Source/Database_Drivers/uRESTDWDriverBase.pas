@@ -40,7 +40,8 @@ Uses
    rdwDatabaseMinorVersion,
    rdwDatabaseSubVersion    : Integer;
  End;
-  TRESTDWDataset      = Class(TComponent)
+
+  TRESTDWDrvDataset      = Class(TComponent)
  Protected
   Function  getFields                     : TFields; Virtual;
   Function  getParams                     : TParams; Virtual;
@@ -72,8 +73,8 @@ Uses
   Property Params : TParams Read getParams;
   Property Fields : TFields Read getFields;
  End;
- { TRESTDWStoreProc }
-  TRESTDWStoreProc = Class(TRESTDWDataset)
+ { TRESTDWDrvStoreProc }
+  TRESTDWDrvStoreProc = Class(TRESTDWDrvDataset)
  Protected
   Function  getStoredProcName        : String;
   Procedure setStoredProcName(AValue : String);
@@ -82,8 +83,9 @@ Uses
  Published
   Property StoredProcName : String Read getStoredProcName Write setStoredProcName;
  End;
- { TRESTDWTable }
-  TRESTDWTable = Class(TRESTDWDataset)
+
+ { TRESTDWDrvTable }
+  TRESTDWDrvTable = Class(TRESTDWDrvDataset)
  Private
   Function getFilter            : String;   Virtual;
   Function getFiltered          : Boolean;  Virtual;
@@ -97,7 +99,7 @@ Uses
   Property Filtered  : Boolean Read getFiltered  Write setFiltered;
   Property TableName : String  Read getTableName Write setTableName;
  End;
-  TRESTDWQuery = Class(TRESTDWDataset)
+  TRESTDWDrvQuery = Class(TRESTDWDrvDataset)
  Private
   Function getSQL       : TStrings; Virtual;
  Public
@@ -110,6 +112,7 @@ Uses
   TRESTDWDriverBase = Class(TRESTDWComponent)
  Private
   FConnection : TComponent;
+  FServerMethod : TServerMethodDataModule;
   vStrsTrim,
   vStrsEmpty2Null,
   vStrsTrim2Len,
@@ -127,7 +130,6 @@ Uses
   vOnQueryException    : TOnQueryException;
  Protected
   Procedure setConnection(AValue : TComponent); Virtual;
-  Function  getConnection        : TComponent;  Virtual;
   Function  isConnected          : Boolean;     Virtual;
   Function  connInTransaction    : Boolean;     Virtual;
   Procedure connStartTransaction; Virtual;
@@ -138,16 +140,20 @@ Uses
                             sub    : Integer) : Boolean; Overload;
   Function isMinimumVersion(major,
                             minor  : Integer) : Boolean; Overload;
+
  Public
+  constructor Create(AOwner : TComponent);
+
+  Function compConnIsValid(comp : TComponent) : boolean; virtual;
   Function  getConectionType : TRESTDWDatabaseType; Virtual;
   Function  getDatabaseInfo  : TRESTDWDatabaseInfo; Virtual;
-  Function  getQuery         : TRESTDWQuery;        Virtual;
-  Function  getTable         : TRESTDWTable;        Virtual;
-  Function  getStoreProc     : TRESTDWStoreProc;    Virtual;
+  Function  getQuery         : TRESTDWDrvQuery;        Virtual;
+  Function  getTable         : TRESTDWDrvTable;        Virtual;
+  Function  getStoreProc     : TRESTDWDrvStoreProc;    Virtual;
   Procedure Connect;                                Virtual;
   Procedure Disconect;                              Virtual;
   Function ConnectionSet    : Boolean;              Virtual;
-  Function GetGenID          (Query                 : TRESTDWQuery;
+  Function GetGenID          (Query                 : TRESTDWDrvQuery;
                               GenName               : String;
                               valor                 : Integer = 1) : Integer;Overload;Virtual;
   Function GetGenID          (GenName               : String;
@@ -271,10 +277,12 @@ Uses
   Function  ProcessMassiveSQLCache(MassiveSQLCache        : String;
                                    Var Error              : Boolean;
                                    Var MessageError       : String)     : TJSONValue; Virtual;
-  Procedure BuildDatasetLine      (Var Query              : TRESTDWDataset;
+  Procedure BuildDatasetLine      (Var Query              : TRESTDWDrvDataset;
                                    Massivedataset         : TMassivedatasetBuffer;
                                    MassiveCache           : Boolean = False);
  Published
+  Property Connection          : TComponent           read FConnection            write setConnection;
+
   Property StrsTrim            : Boolean              Read vStrsTrim              Write vStrsTrim;
   Property StrsEmpty2Null      : Boolean              Read vStrsEmpty2Null        Write vStrsEmpty2Null;
   Property StrsTrim2Len        : Boolean              Read vStrsTrim2Len          Write vStrsTrim2Len;
@@ -297,9 +305,9 @@ Implementation
 Uses
  uRESTDWBasicDB;
 
-{ TRESTDWStoreProc }
+{ TRESTDWDrvStoreProc }
 
-Function TRESTDWStoreProc.getStoredProcName : String;
+Function TRESTDWDrvStoreProc.getStoredProcName : String;
 Begin
  Try
   Result := GetStrProp(Self.Owner, 'StoredProcName');
@@ -308,7 +316,7 @@ Begin
  End;
 End;
 
-Procedure TRESTDWStoreProc.setStoredProcName(AValue : String);
+Procedure TRESTDWDrvStoreProc.setStoredProcName(AValue : String);
 Begin
  Try
   SetStrProp(Self.Owner, 'Filter', AValue);
@@ -316,19 +324,19 @@ Begin
  End;
 End;
 
-Procedure TRESTDWStoreProc.ExecProc;
+Procedure TRESTDWDrvStoreProc.ExecProc;
 Begin
 
 End;
 
-{ TRESTDWDataset }
+{ TRESTDWDrvDataset }
 
-Function TRESTDWDataset.getFields : TFields;
+Function TRESTDWDrvDataset.getFields : TFields;
 Begin
  Result := TDataSet(Self.Owner).Fields;
 End;
 
-Function TRESTDWDataset.getParams : TParams;
+Function TRESTDWDrvDataset.getParams : TParams;
 Begin
  Try
   Result := TParams(GetObjectProp(Self.Owner, 'Params'));
@@ -337,83 +345,83 @@ Begin
  End;
 End;
 
-Procedure TRESTDWDataset.createSequencedField(seqname,
+Procedure TRESTDWDrvDataset.createSequencedField(seqname,
                                               field    : String);
 Begin
 
 End;
 
-Procedure TRESTDWDataset.Close;
+Procedure TRESTDWDrvDataset.Close;
 Begin
  TDataSet(Self.Owner).Close;
 End;
 
-Procedure TRESTDWDataset.Open;
+Procedure TRESTDWDrvDataset.Open;
 Begin
  TDataSet(Self.Owner).Open;
 End;
 
-Procedure TRESTDWDataset.Insert;
+Procedure TRESTDWDrvDataset.Insert;
 Begin
  TDataSet(Self.Owner).Insert;
 End;
 
-Procedure TRESTDWDataset.Edit;
+Procedure TRESTDWDrvDataset.Edit;
 Begin
  TDataSet(Self.Owner).Edit;
 End;
 
-Procedure TRESTDWDataset.Post;
+Procedure TRESTDWDrvDataset.Post;
 Begin
  TDataSet(Self.Owner).Post;
 End;
 
-Procedure TRESTDWDataset.Delete;
+Procedure TRESTDWDrvDataset.Delete;
 Begin
  TDataSet(Self.Owner).Delete;
 End;
 
-Procedure TRESTDWDataset.Next;
+Procedure TRESTDWDrvDataset.Next;
 Begin
  TDataSet(Self.Owner).Next;
 End;
 
-Procedure TRESTDWDataset.Prepare;
+Procedure TRESTDWDrvDataset.Prepare;
 Begin
 
 End;
 
-Procedure TRESTDWDataset.ExecSQL;
+Procedure TRESTDWDrvDataset.ExecSQL;
 Begin
 
 End;
 
-Procedure TRESTDWDataset.FetchAll;
+Procedure TRESTDWDrvDataset.FetchAll;
 Begin
 
 End;
 
-Procedure TRESTDWDataset.SaveToStream(stream: TStream);
+Procedure TRESTDWDrvDataset.SaveToStream(stream: TStream);
 Begin
 
 End;
 
-Function TRESTDWDataset.Eof: boolean;
+Function TRESTDWDrvDataset.Eof: boolean;
 Begin
  Result := TDataSet(Self.Owner).EOF;
 End;
 
-Function TRESTDWDataset.RecNo: int64;
+Function TRESTDWDrvDataset.RecNo: int64;
 Begin
  Result := TDataSet(Self.Owner).RecNo;
 End;
 
-Function TRESTDWDataset.RecordCount: int64;
+Function TRESTDWDrvDataset.RecordCount: int64;
 Begin
  Result := -1;
 End;
 
-Function TRESTDWDataset.ParamCount: integer;
+Function TRESTDWDrvDataset.ParamCount: integer;
 Begin
  Try
   Result := Params.Count;
@@ -422,7 +430,7 @@ Begin
  End;
 End;
 
-Function TRESTDWDataset.ParamByName(param: String): TParam;
+Function TRESTDWDrvDataset.ParamByName(param: String): TParam;
 Begin
  Try
   Result := Params.FindParam(param);
@@ -431,17 +439,17 @@ Begin
  End;
 End;
 
-Function TRESTDWDataset.FieldByName(field: String): TField;
+Function TRESTDWDrvDataset.FieldByName(field: String): TField;
 Begin
  Result := TDataSet(Self.Owner).FieldByName(field);
 End;
 
-Function TRESTDWDataset.FindField(field: String): TField;
+Function TRESTDWDrvDataset.FindField(field: String): TField;
 Begin
  Result := TDataSet(Self.Owner).FindField(field);
 End;
 
-Function TRESTDWDataset.RDWDataTypeFieldName(field : String) : Byte;
+Function TRESTDWDrvDataset.RDWDataTypeFieldName(field : String) : Byte;
 Var
  vDType : TFieldType;
 Begin
@@ -449,7 +457,7 @@ Begin
  Result := FieldTypeToDWFieldType(vDType);
 End;
 
-Function TRESTDWDataset.RDWDataTypeParamName(param : String) : Byte;
+Function TRESTDWDrvDataset.RDWDataTypeParamName(param : String) : Byte;
 Var
  vDType : TFieldType;
 Begin
@@ -461,7 +469,7 @@ Begin
  Result := FieldTypeToDWFieldType(vDType);
 End;
 
-Function TRESTDWDataset.GetParamIndex(param : String): integer;
+Function TRESTDWDrvDataset.GetParamIndex(param : String): integer;
 Var
  prm : TParam;
 Begin
@@ -473,9 +481,9 @@ Begin
  End;
 End;
 
-{ TRESTDWTable }
+{ TRESTDWDrvTable }
 
-Function TRESTDWTable.getFilter : String;
+Function TRESTDWDrvTable.getFilter : String;
 Begin
  Try
   Result := GetStrProp(Self.Owner,'Filter');
@@ -484,7 +492,7 @@ Begin
  End;
 End;
 
-Function TRESTDWTable.getFiltered: boolean;
+Function TRESTDWDrvTable.getFiltered: boolean;
 Begin
  Try
   Result := Boolean(GetPropValue(Self.Owner,'Filtered'));
@@ -493,7 +501,7 @@ Begin
  End;
 End;
 
-Function TRESTDWTable.getTableName : String;
+Function TRESTDWDrvTable.getTableName : String;
 Begin
  Try
   Result := GetStrProp(Self.Owner,'TableName');
@@ -502,7 +510,7 @@ Begin
  End;
 End;
 
-Procedure TRESTDWTable.setFilter(AValue : String);
+Procedure TRESTDWDrvTable.setFilter(AValue : String);
 Begin
  Try
   SetStrProp(Self.Owner,'Filter',AValue);
@@ -511,7 +519,7 @@ Begin
  End;
 End;
 
-Procedure TRESTDWTable.setFiltered(AValue: boolean);
+Procedure TRESTDWDrvTable.setFiltered(AValue: boolean);
 Begin
  Try
   SetPropValue(Self.Owner,'Filtered',AValue);
@@ -520,14 +528,14 @@ Begin
  End;
 End;
 
-Procedure TRESTDWTable.setTableName(AValue : String);
+Procedure TRESTDWDrvTable.setTableName(AValue : String);
 Begin
 
 End;
 
-{ TRESTDWQuery }
+{ TRESTDWDrvQuery }
 
-Function TRESTDWQuery.getSQL: TStrings;
+Function TRESTDWDrvQuery.getSQL: TStrings;
 Begin
  Try
   Result := TStrings(GetObjectProp(Self.Owner,'SQL'));
@@ -536,12 +544,12 @@ Begin
  End;
 End;
 
-Function TRESTDWQuery.RowsAffected : Int64;
+Function TRESTDWDrvQuery.RowsAffected : Int64;
 Begin
  Result := -1;
 End;
 
-Function TRESTDWQuery.GetInsertID : Int64;
+Function TRESTDWDrvQuery.GetInsertID : Int64;
 Var
  drv : TRESTDWDriverBase;
 Begin
@@ -568,15 +576,10 @@ Begin
  Result := dbtUndefined;
 End;
 
-Function TRESTDWDriverBase.getConnection: TComponent;
-Begin
- Result := FConnection;
-End;
-
 Function TRESTDWDriverBase.getDatabaseInfo  : TRESTDWDatabaseInfo;
 Var
  connType : TRESTDWDatabaseType;
- qry      : TRESTDWQuery;
+ qry      : TRESTDWDrvQuery;
  iAux1    : Integer;
  sAux1,
  sVersion : String;
@@ -784,17 +787,17 @@ Begin
  End;
 End;
 
-Function TRESTDWDriverBase.getQuery: TRESTDWQuery;
+Function TRESTDWDriverBase.getQuery: TRESTDWDrvQuery;
 Begin
  Result := Nil;
 End;
 
-Function TRESTDWDriverBase.getTable: TRESTDWTable;
+Function TRESTDWDriverBase.getTable: TRESTDWDrvTable;
 Begin
  Result := Nil;
 End;
 
-Function TRESTDWDriverBase.getStoreProc : TRESTDWStoreProc;
+Function TRESTDWDriverBase.getStoreProc : TRESTDWDrvStoreProc;
 Begin
  Result := Nil;
 End;
@@ -818,6 +821,11 @@ Procedure TRESTDWDriverBase.connRollback;
 Begin
 
 End;
+
+function TRESTDWDriverBase.compConnIsValid(comp: TComponent): boolean;
+begin
+  Result := False;
+end;
 
 Procedure TRESTDWDriverBase.connCommit;
 Begin
@@ -863,7 +871,7 @@ Begin
  Result := Assigned(FConnection);
 End;
 
-Function TRESTDWDriverBase.GetGenID(Query   : TRESTDWQuery;
+Function TRESTDWDriverBase.GetGenID(Query   : TRESTDWDrvQuery;
                                     GenName : String;
                                     valor   : Integer) : Integer;
 Var
@@ -933,7 +941,7 @@ End;
 Function TRESTDWDriverBase.GetGenID(GenName : String;
                                     valor   : Integer) : Integer;
 Var
- qry : TRESTDWQuery;
+ qry : TRESTDWDrvQuery;
 Begin
  qry := getQuery;
  Try
@@ -950,7 +958,7 @@ Function TRESTDWDriverBase.ApplyUpdates(MassiveStream    : TStream;
                                         var MessageError : String;
                                         var RowsAffected : integer) : TJSONValue;
 Var
- vTempQuery     : TRESTDWQuery;
+ vTempQuery     : TRESTDWDrvQuery;
  A, I           : Integer;
  vResultReflection,
  vParamName     : String;
@@ -1126,11 +1134,11 @@ Var
      ReflectionChanges := '';
    End;
  End;
- Function LoadMassive(Massive : TStream; Var Query : TRESTDWQuery) : Boolean;
+ Function LoadMassive(Massive : TStream; Var Query : TRESTDWDrvQuery) : Boolean;
  Var
   MassiveDataset : TMassiveDatasetBuffer;
   A, B           : Integer;
-  Procedure PrepareData(Var Query      : TRESTDWQuery;
+  Procedure PrepareData(Var Query      : TRESTDWDrvQuery;
                         MassiveDataset : TMassiveDatasetBuffer;
                         Var vError     : Boolean;
                         Var ErrorMSG   : String);
@@ -1489,7 +1497,7 @@ Var
                     Raise Exception.Create(PChar('Record not found to update...'));
                   End;
       End;
-      BuildDatasetLine(TRESTDWDataset(Query), MassiveDataset);
+      BuildDatasetLine(TRESTDWDrvDataset(Query), MassiveDataset);
      Finally
       Case MassiveDataset.MassiveMode Of
        mmInsert, mmUpdate : Query.Post;
@@ -2038,7 +2046,7 @@ Function TRESTDWDriverBase.ApplyUpdates(Massive,
                                         Var MessageError : String;
                                         Var RowsAffected : Integer): TJSONValue;
 Var
- vTempQuery     : TRESTDWQuery;
+ vTempQuery     : TRESTDWDrvQuery;
  A, I           : Integer;
  vResultReflection,
  vParamName     : String;
@@ -2211,11 +2219,11 @@ Var
      ReflectionChanges := '';
    End;
  End;
- Function LoadMassive(Massive : String; Var Query : TRESTDWQuery) : Boolean;
+ Function LoadMassive(Massive : String; Var Query : TRESTDWDrvQuery) : Boolean;
  Var
   MassiveDataset : TMassiveDatasetBuffer;
   A, B           : Integer;
-  Procedure PrepareData(Var Query      : TRESTDWQuery;
+  Procedure PrepareData(Var Query      : TRESTDWDrvQuery;
                         MassiveDataset : TMassiveDatasetBuffer;
                         Var vError     : Boolean;
                         Var ErrorMSG   : String);
@@ -2574,7 +2582,7 @@ Var
                     Raise Exception.Create(PChar('Record not found to update...'));
                   End;
       End;
-      BuildDatasetLine(TRESTDWDataset(Query), MassiveDataset);
+      BuildDatasetLine(TRESTDWDrvDataset(Query), MassiveDataset);
      Finally
       Case MassiveDataset.MassiveMode Of
        mmInsert, mmUpdate : Query.Post;
@@ -3122,7 +3130,7 @@ Function TRESTDWDriverBase.ApplyUpdatesTB(MassiveStream    : TStream;
                                           Var MessageError : String;
                                           Var RowsAffected : Integer): TJSONValue;
 Var
- vTempQuery     : TRESTDWTable;
+ vTempQuery     : TRESTDWDrvTable;
  A, I           : Integer;
  vResultReflection,
  vParamName     : String;
@@ -3297,12 +3305,12 @@ Var
    End;
  End;
  Function LoadMassive(MassiveStream : TStream;
-                      Var Query     : TRESTDWTable) : Boolean;
+                      Var Query     : TRESTDWDrvTable) : Boolean;
  Var
   MassiveDataset : TMassiveDatasetBuffer;
   A, B           : Integer;
 
-  Procedure PrepareData(Var Query      : TRESTDWTable;
+  Procedure PrepareData(Var Query      : TRESTDWDrvTable;
                         MassiveDataset : TMassiveDatasetBuffer;
                         Var vError     : Boolean;
                         Var ErrorMSG   : String);
@@ -3569,7 +3577,7 @@ Var
                     Raise Exception.Create(PChar('Record not found to update...'));
                   End;
       End;
-      BuildDatasetLine(TRESTDWDataset(Query), MassiveDataset);
+      BuildDatasetLine(TRESTDWDrvDataset(Query), MassiveDataset);
      Finally
       Case MassiveDataset.MassiveMode Of
        mmInsert, mmUpdate : Begin
@@ -3900,7 +3908,7 @@ Function TRESTDWDriverBase.ApplyUpdatesTB(Massive          : String;
                                           var MessageError : String;
                                           var RowsAffected : Integer): TJSONValue;
 Var
- vTempQuery     : TRESTDWTable;
+ vTempQuery     : TRESTDWDrvTable;
  A, I           : Integer;
  vResultReflection,
  vParamName     : String;
@@ -4075,12 +4083,12 @@ Var
      ReflectionChanges := '';
    End;
  End;
- Function LoadMassive(Massive : String; Var Query : TRESTDWTable) : Boolean;
+ Function LoadMassive(Massive : String; Var Query : TRESTDWDrvTable) : Boolean;
  Var
   MassiveDataset : TMassiveDatasetBuffer;
   A, B           : Integer;
 
-  Procedure PrepareData(Var Query      : TRESTDWTable;
+  Procedure PrepareData(Var Query      : TRESTDWDrvTable;
                         MassiveDataset : TMassiveDatasetBuffer;
                         Var vError     : Boolean;
                         Var ErrorMSG   : String);
@@ -4347,7 +4355,7 @@ Var
                     Raise Exception.Create(PChar('Record not found to update...'));
                   End;
       End;
-      BuildDatasetLine(TRESTDWDataset(Query), MassiveDataset);
+      BuildDatasetLine(TRESTDWDrvDataset(Query), MassiveDataset);
      Finally
       Case MassiveDataset.MassiveMode Of
        mmInsert, mmUpdate : Begin
@@ -4682,7 +4690,7 @@ Function TRESTDWDriverBase.ApplyUpdates_MassiveCache  (MassiveCache     : String
                                                        Var Error        : Boolean;
                                                        Var MessageError : String): TJSONValue;
 Var
- vTempQuery        : TRESTDWQuery;
+ vTempQuery        : TRESTDWDrvQuery;
  vStringStream     : TMemoryStream;
  bPrimaryKeys      : TStringList;
  vFieldType        : TFieldType;
@@ -4861,14 +4869,14 @@ Var
      ReflectionChanges := '';
    End;
  End;
- Function LoadMassive(Massive : String; Var Query : TRESTDWQuery) : Boolean;
+ Function LoadMassive(Massive : String; Var Query : TRESTDWDrvQuery) : Boolean;
  Var
   MassiveDataset : TMassiveDatasetBuffer;
   A, X           : Integer;
   bJsonValueB    : TRESTDWJSONInterfaceBase;
   bJsonValue     : TRESTDWJSONInterfaceObject;
   bJsonArray     : TRESTDWJSONInterfaceArray;
-  Procedure PrepareData(Var Query      : TRESTDWQuery;
+  Procedure PrepareData(Var Query      : TRESTDWDrvQuery;
                         MassiveDataset : TMassiveDatasetBuffer;
                         Var vError     : Boolean;
                         Var ErrorMSG   : String);
@@ -5226,7 +5234,7 @@ Var
                     Raise Exception.Create(PChar('Record not found to update...'));
                   End;
       End;
-      BuildDatasetLine(TRESTDWDataset(Query), MassiveDataset, True);
+      BuildDatasetLine(TRESTDWDrvDataset(Query), MassiveDataset, True);
      Finally
       Case MassiveDataset.MassiveMode Of
        mmInsert, mmUpdate : Query.Post;
@@ -5635,12 +5643,12 @@ Function TRESTDWDriverBase.ProcessMassiveSQLCache(MassiveSQLCache: String;
                                                   var Error: Boolean;
                                                   var MessageError: String): TJSONValue;
 Var
- vTempQuery        : TRESTDWQuery;
+ vTempQuery        : TRESTDWDrvQuery;
  vStringStream     : TMemoryStream;
  vStateResource    : Boolean;
  vResultReflection : String;
 
- Function LoadMassive(Massive : String; Var Query : TRESTDWQuery) : Boolean;
+ Function LoadMassive(Massive : String; Var Query : TRESTDWDrvQuery) : Boolean;
  Var
   X, A, I         : Integer;
   vMassiveSQLMode : TMassiveSQLMode;
@@ -5879,7 +5887,7 @@ Function TRESTDWDriverBase.ExecuteCommand(SQL                   : String;
                                           MetaData              : Boolean = False;
                                           BinaryCompatibleMode  : Boolean = False): String;
 Var
- vTempQuery     : TRESTDWQuery;
+ vTempQuery     : TRESTDWDrvQuery;
  vDataSet       : TDataSet;
  A, I           : Integer;
  vParamName     : String;
@@ -6121,7 +6129,7 @@ Function TRESTDWDriverBase.ExecuteCommandTB(Tablename: String;
                                             BinaryEvent: Boolean; MetaData: Boolean;
                                             BinaryCompatibleMode: Boolean): String;
 var
-  vTempQuery     : TRESTDWTable;
+  vTempQuery     : TRESTDWDrvTable;
   vDataset       : TDataset;
   aResult        : TJSONValue;
   vStateResource : Boolean;
@@ -6214,7 +6222,7 @@ Var
  A, I            : Integer;
  vParamName      : String;
  vStateResource  : Boolean;
- vTempStoredProc : TRESTDWStoreProc;
+ vTempStoredProc : TRESTDWDrvStoreProc;
 Begin
  {$IFNDEF FPC}Inherited;{$ENDIF}
   Error  := False;
@@ -6292,7 +6300,7 @@ Procedure TRESTDWDriverBase.GetTableNames(Var TableNames   : TStringList;
 Var
  vStateResource : Boolean;
  connType : TRESTDWDatabaseType;
- qry : TRESTDWQuery;
+ qry : TRESTDWDrvQuery;
  vSchema : String;
  fdPos : integer;
 Begin
@@ -6385,7 +6393,7 @@ Procedure TRESTDWDriverBase.GetFieldNames(TableName        : String;
 Var
  vStateResource : Boolean;
  connType       : TRESTDWDatabaseType;
- qry            : TRESTDWQuery;
+ qry            : TRESTDWDrvQuery;
  vTable,
  vSchema        : String;
  fPos           : Integer;
@@ -6483,7 +6491,7 @@ Procedure TRESTDWDriverBase.GetKeyFieldNames(TableName        : String;
 Var
  vStateResource : Boolean;
  connType       : TRESTDWDatabaseType;
- qry            : TRESTDWQuery;
+ qry            : TRESTDWDrvQuery;
  vTable,
  vSchema        : String;
 Begin
@@ -6591,7 +6599,7 @@ Procedure TRESTDWDriverBase.GetProcNames(Var ProcNames    : TStringList;
 Var
  vStateResource : Boolean;
  connType       : TRESTDWDatabaseType;
- qry            : TRESTDWQuery;
+ qry            : TRESTDWDrvQuery;
  vSchema        : String;
  fPos           : integer;
 Begin
@@ -6674,7 +6682,7 @@ Procedure TRESTDWDriverBase.GetProcParams(ProcName         : String;
 Var
  vStateResource : Boolean;
  connType       : TRESTDWDatabaseType;
- qry            : TRESTDWQuery;
+ qry            : TRESTDWDrvQuery;
  vProc,
  vSchema,
  vFieldType     : String;
@@ -7024,7 +7032,7 @@ Function TRESTDWDriverBase.InsertMySQLReturnID(SQL              : String;
                                                var Error        : Boolean;
                                                var MessageError : String) : Integer;
 Var
- vTempQuery     : TRESTDWQuery;
+ vTempQuery     : TRESTDWDrvQuery;
  A, I           : Integer;
  vParamName     : String;
  vStringStream  : TMemoryStream;
@@ -7162,7 +7170,7 @@ Function TRESTDWDriverBase.OpenDatasets(DatasetsLine     : String;
                                         var MessageError : String;
                                         var BinaryBlob   : TMemoryStream): TJSONValue;
 Var
- vTempQuery      : TRESTDWQuery;
+ vTempQuery      : TRESTDWDrvQuery;
  vTempJSON       : TJSONValue;
  vJSONLine       : String;
  I, X            : Integer;
@@ -7296,7 +7304,7 @@ Function TRESTDWDriverBase.OpenDatasets(DatapackStream        : TStream;
                                         aBinaryCompatibleMode : Boolean): TStream;
 Var
  X               : Integer;
- vTempQuery      : TRESTDWQuery;
+ vTempQuery      : TRESTDWDrvQuery;
  vStateResource  : Boolean;
  DWParams        : TRESTDWParams;
  BufferOutStream,
@@ -7400,6 +7408,34 @@ Begin
  vTempQuery.Free;
 end;
 
+constructor TRESTDWDriverBase.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+
+  vEncodeStrings       := True;
+  {$IFDEF FPC}
+    vDatabaseCharSet   := csUndefined;
+  {$ENDIF}
+  vCommitRecords       := 100;
+  vOnTableBeforeOpen   := Nil;
+  vOnPrepareConnection := Nil;
+  vParamCreate         := False;
+  vStrsTrim            := vParamCreate;
+  vStrsEmpty2Null      := vParamCreate;
+  vStrsTrim2Len        := vParamCreate;
+  vEncodeStrings       := vParamCreate;
+  vCompression         := vParamCreate;
+
+  // fernando banhos 25/10/2022
+  // algumas rotinas de paramscreate foram retiradas devido
+  // incompatibilidade com outros drivers
+  vParamCreate         := True;
+
+  FServerMethod := nil;
+  if Self.Owner.InheritsFrom(TServerMethodDataModule) then
+    FServerMethod := TServerMethodDataModule(Self.Owner);
+end;
+
 Class Procedure TRESTDWDriverBase.CreateConnection(Const AConnectionDefs : TConnectionDefs;
                                                    Var AConnection       : TComponent);
 Begin
@@ -7418,7 +7454,7 @@ Begin
  CreateConnection(AConnectionDefs,FConnection);
 End;
 
-Procedure TRESTDWDriverBase.BuildDatasetLine(var Query: TRESTDWDataset;
+Procedure TRESTDWDriverBase.BuildDatasetLine(var Query: TRESTDWDrvDataset;
                             Massivedataset: TMassivedatasetBuffer;
                             MassiveCache: Boolean);
 Var
@@ -7631,7 +7667,7 @@ Begin
         Begin
          A := -1;
          If (MassiveDataset.SequenceName <> '') Then
-          A := GetGenID(TRESTDWQuery(Query),MassiveDataset.SequenceName);
+          A := GetGenID(TRESTDWDrvQuery(Query),MassiveDataset.SequenceName);
          If A > -1 Then
           Query.Fields[I].Value := A;
          Continue;

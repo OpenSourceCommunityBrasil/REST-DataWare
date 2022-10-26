@@ -30,21 +30,15 @@ uses
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes,
   apWin, ApConn, apoQSet, apCommon;
 
-const
-  crdwConnectionNotApolloDB = 'Componente não é um ApolloDBConnection';
-
-
 type
   { TRESTDWApolloDBQuery }
 
-  TRESTDWApolloDBQuery = class(TRESTDWQuery)
+  TRESTDWApolloDBQuery = class(TRESTDWDrvQuery)
   public
     procedure ExecSQL; override;
     procedure Prepare; override;
 
     function RowsAffected : Int64; override;
-
-    function createTransaction : TRESTDWTransaction; override;
   end;
 
   { TRESTDWApolloDBDriver }
@@ -54,13 +48,11 @@ type
     FDatabaseName : string;
     FPassword : string;
     FTableType : TApolloTableType;
-    function aGetConnection: TApolloConnection;
-    procedure aSetConnection(const Value: TApolloConnection);
   protected
-    procedure setConnection(AValue: TComponent); override;
+    Function compConnIsValid(comp : TComponent) : boolean; override;
   public
-    function getQuery : TRESTDWQuery; override;
-    function getTable : TRESTDWTable; override;
+    function getQuery : TRESTDWDrvQuery; override;
+    function getTable : TRESTDWDrvTable; override;
 
     procedure Connect; override;
     procedure Disconect; override;
@@ -70,7 +62,6 @@ type
     class procedure CreateConnection(Const AConnectionDefs : TConnectionDefs;
                                      var AConnection : TComponent); override;
   published
-    Property Connection   : TApolloConnection Read aGetConnection Write aSetConnection;
     property DatabaseName : String            read FDatabaseName  Write FDatabaseName;
     property Password     : String            read FPassword      Write FPassword;
     property TableType    : TApolloTableType  read FTableType     Write FTableType;
@@ -94,14 +85,7 @@ end;
 
  { TRESTDWApolloDBDriver }
 
-procedure TRESTDWApolloDBDriver.setConnection(AValue : TComponent);
-begin
-  if (Assigned(AValue)) and (not AValue.InheritsFrom(TApolloConnection)) then
-    raise Exception.Create(crdwConnectionNotApolloDB);
-  inherited setConnection(AValue);
-end;
-
-function TRESTDWApolloDBDriver.getQuery : TRESTDWQuery;
+function TRESTDWApolloDBDriver.getQuery : TRESTDWDrvQuery;
 var
   qry : TMyQuery;
 begin
@@ -114,7 +98,7 @@ begin
   Result := TRESTDWApolloDBQuery.Create(qry);
 end;
 
-function TRESTDWApolloDBDriver.getTable : TRESTDWTable;
+function TRESTDWApolloDBDriver.getTable : TRESTDWDrvTable;
 var
   qry : TApolloTable;
 begin
@@ -124,17 +108,12 @@ begin
   qry.TableType    := FTableType;
   qry.Password     := FPassword;
 
-  Result := TRESTDWTable.Create(qry);
+  Result := TRESTDWDrvTable.Create(qry);
 end;
 
-function TRESTDWApolloDBDriver.aGetConnection: TApolloConnection;
+function TRESTDWApolloDBDriver.compConnIsValid(comp: TComponent): boolean;
 begin
- Result := TApolloConnection(GetConnection);
-end;
-
-procedure TRESTDWApolloDBDriver.aSetConnection(const Value: TApolloConnection);
-begin
- setConnection(Value);
+  Result := comp.InheritsFrom(TApolloConnection);
 end;
 
 procedure TRESTDWApolloDBDriver.Connect;
@@ -190,11 +169,6 @@ var
 begin
   qry := TApolloQuery(Self.Owner);
   Result := -1; //qry.RowsAffected;
-end;
-
-function TRESTDWApolloDBQuery.createTransaction : TRESTDWTransaction;
-begin
-  Result := TRESTDWTransaction.Create(nil);
 end;
 
 end.

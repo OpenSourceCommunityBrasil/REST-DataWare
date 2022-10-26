@@ -40,20 +40,18 @@ const
                     dbtPostgreSQL,dbtPostgreSQL,dbtOracle,dbtODBC,dbtMySQL,
                     dbtSQLLite,dbtFirebird,dbtFirebird);
 
-  crdwConnectionNotIsLazSQL = 'Componente não é um SQLConnection';
-
 type
 
   { TRESTDWLazSQLDataset }
 
-  TRESTDWLazSQLDataset = class(TRESTDWDataset)
+  TRESTDWLazSQLDataset = class(TRESTDWDrvDataset)
   public
     procedure SaveToStream(stream : TStream); override;
   end;
 
   { TRESTDWLazSQLQuery }
 
-  TRESTDWLazSQLQuery = class(TRESTDWQuery)
+  TRESTDWLazSQLQuery = class(TRESTDWDrvQuery)
   private
     FSequence : TSQLSequence;
   protected
@@ -72,17 +70,16 @@ type
   TRESTDWLazSQLDriver = class(TRESTDWDriverBase)
   private
     FTransaction : TSQLTransaction;
-    function aGetConnection: TSQLConnection;
-    procedure aSetConnection(const Value: TSQLConnection);
   protected
     procedure setConnection(AValue: TComponent); override;
 
     function getConectionType : TRESTDWDatabaseType; override;
+    Function compConnIsValid(comp : TComponent) : boolean; override;
   public
     constructor Create(AOwner : TComponent);
     destructor Destroy; override;
 
-    function getQuery : TRESTDWQuery; override;
+    function getQuery : TRESTDWDrvQuery; override;
 
     procedure Connect; override;
     procedure Disconect; override;
@@ -96,8 +93,6 @@ type
 
     class procedure CreateConnection(const AConnectionDefs  : TConnectionDefs;
                                      var AConnection        : TComponent); override;
-  published
-    Property  Connection : TSQLConnection Read aGetConnection Write aSetConnection;
   end;
 
 procedure Register;
@@ -178,9 +173,6 @@ end;
 
 procedure TRESTDWLazSQLDriver.setConnection(AValue: TComponent);
 begin
-  if (Assigned(AValue)) and (not AValue.InheritsFrom(TSQLConnection)) then
-    raise Exception.Create(crdwConnectionNotIsLazSQL);
-
   if FTransaction <> nil then
     FTransaction.SQLConnection := TSQLConnection(AValue);
   inherited setConnection(AValue);
@@ -210,7 +202,7 @@ begin
   end;
 end;
 
-function TRESTDWLazSQLDriver.getQuery : TRESTDWQuery;
+function TRESTDWLazSQLDriver.getQuery : TRESTDWDrvQuery;
 var
   qry : TSQLQuery;
 begin
@@ -270,14 +262,9 @@ begin
   FTransaction.Rollback;
 end;
 
-function TRESTDWLazSQLDriver.aGetConnection: TSQLConnection;
+function TRESTDWLazSQLDriver.compConnIsValid(comp: TComponent): boolean;
 begin
- Result := TSQLConnection(GetConnection);
-end;
-
-procedure TRESTDWLazSQLDriver.aSetConnection(const Value: TSQLConnection);
-begin
- setConnection(Value);
+  Result := comp.InheritsFrom(TSQLConnection);
 end;
 
 procedure TRESTDWLazSQLDriver.connCommit;
