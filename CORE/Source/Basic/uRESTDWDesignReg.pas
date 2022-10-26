@@ -121,6 +121,15 @@ Type
   Procedure Edit;                                 Override;
 End;
 
+Type
+  TDriverConnectionListProperty = class(TComponentProperty)
+  public
+    function  GetAttributes: TPropertyAttributes; override;
+    procedure GetValueList(List: TStrings); virtual;
+    procedure GetValues(Proc: TGetStrProc); override;
+  end;
+
+
 type
  TRESTDWServerEventsEditor = Class(TComponentEditor)
   Function  GetVerbCount       : Integer;  Override;
@@ -239,7 +248,8 @@ Implementation
 
 uses uRESTDWConsts, uRESTDWPoolermethod, uRESTDWBasic, uRESTDWResponseTranslator,
      uRESTDWFieldSourceEditor, uRESTDWSqlEditor, uRESTDWUpdSqlEditor,
-     uRESTDWJSONViewer, uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
+     uRESTDWJSONViewer, uRESTDWCharset, uRESTDWDriverBase
+     {$IFDEF FPC}, utemplateproglaz{$ENDIF};
 
 {$IFNDEF FPC}
 {$IFDEF  RTL240_UP}
@@ -804,6 +814,7 @@ Begin
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
 //  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
  {$ENDIF}
+  RegisterPropertyEditor(TypeInfo(TComponent),        TRESTDWDriverBase,         'Connection',      TDriverConnectionListProperty);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWTable,              'Tablename',       TTableList);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientEvents,       'ServerEventName', TServerEventsList);
   RegisterPropertyEditor(TypeInfo(TStrings),          TRESTDWClientSQL,          'SQL',             TRESTDWSQLEditor);
@@ -1092,6 +1103,47 @@ Begin
     Proc(Component.Name);
   End;
 End;
+
+{ TDriverConnectionListProperty }
+
+function TDriverConnectionListProperty.GetAttributes: TPropertyAttributes;
+begin
+  Result := [paValueList, paSortList];
+end;
+
+procedure TDriverConnectionListProperty.GetValueList(List: TStrings);
+var
+  comp : TComponent;
+  drv : TRESTDWDriverBase;
+  i : integer;
+begin
+  drv  := TRESTDWDriverBase(GetComponent(0));
+  comp := drv.Owner;
+  if Assigned(Comp) then begin
+    i := 0;
+    while i < comp.ComponentCount do begin
+      if drv.compConnIsValid(comp.Components[i]) then
+        List.Add(comp.Components[i].Name);
+
+      i := i + 1;
+    end;
+  end;
+end;
+
+procedure TDriverConnectionListProperty.GetValues(Proc: TGetStrProc);
+var
+  i: Integer;
+  Values: TStringList;
+begin
+  Values := TStringList.Create;
+  try
+    GetValueList(Values);
+    for i := 0 to Pred(Values.Count) do
+      Proc(Values[i]);
+  finally
+    Values.Free;
+  end;
+end;
 
 initialization
  {$IFNDEF FPC}
