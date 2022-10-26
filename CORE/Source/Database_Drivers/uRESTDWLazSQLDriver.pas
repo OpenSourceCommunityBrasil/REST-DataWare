@@ -1,4 +1,4 @@
-unit uRESTDWLazSQLDriver;
+﻿unit uRESTDWLazSQLDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -24,10 +24,6 @@ unit uRESTDWLazSQLDriver;
  Fernando Banhos            - Refactor Drivers REST Dataware.
 }
 
-{$IFDEF FPC}
-  {$mode objfpc}{$H+}
-{$ENDIF}
-
 interface
 
 uses
@@ -44,20 +40,18 @@ const
                     dbtPostgreSQL,dbtPostgreSQL,dbtOracle,dbtODBC,dbtMySQL,
                     dbtSQLLite,dbtFirebird,dbtFirebird);
 
-  crdwConnectionNotIsLazSQL = 'Componente não é um SQLConnection';
-
 type
 
   { TRESTDWLazSQLDataset }
 
-  TRESTDWLazSQLDataset = class(TRESTDWDataset)
+  TRESTDWLazSQLDataset = class(TRESTDWDrvDataset)
   public
     procedure SaveToStream(stream : TStream); override;
   end;
 
   { TRESTDWLazSQLQuery }
 
-  TRESTDWLazSQLQuery = class(TRESTDWQuery)
+  TRESTDWLazSQLQuery = class(TRESTDWDrvQuery)
   private
     FSequence : TSQLSequence;
   protected
@@ -80,11 +74,12 @@ type
     procedure setConnection(AValue: TComponent); override;
 
     function getConectionType : TRESTDWDatabaseType; override;
+    Function compConnIsValid(comp : TComponent) : boolean; override;
   public
     constructor Create(AOwner : TComponent);
     destructor Destroy; override;
 
-    function getQuery : TRESTDWQuery; override;
+    function getQuery : TRESTDWDrvQuery; override;
 
     procedure Connect; override;
     procedure Disconect; override;
@@ -178,9 +173,6 @@ end;
 
 procedure TRESTDWLazSQLDriver.setConnection(AValue: TComponent);
 begin
-  if (Assigned(AValue)) and (not AValue.InheritsFrom(TSQLConnection)) then
-    raise Exception.Create(crdwConnectionNotIsLazSQL);
-
   if FTransaction <> nil then
     FTransaction.SQLConnection := TSQLConnection(AValue);
   inherited setConnection(AValue);
@@ -210,7 +202,7 @@ begin
   end;
 end;
 
-function TRESTDWLazSQLDriver.getQuery : TRESTDWQuery;
+function TRESTDWLazSQLDriver.getQuery : TRESTDWDrvQuery;
 var
   qry : TSQLQuery;
 begin
@@ -268,6 +260,11 @@ end;
 procedure TRESTDWLazSQLDriver.connRollback;
 begin
   FTransaction.Rollback;
+end;
+
+function TRESTDWLazSQLDriver.compConnIsValid(comp: TComponent): boolean;
+begin
+  Result := comp.InheritsFrom(TSQLConnection);
 end;
 
 procedure TRESTDWLazSQLDriver.connCommit;

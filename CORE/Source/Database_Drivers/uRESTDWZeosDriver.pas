@@ -62,14 +62,14 @@ const
 type
   { TRESTDWZeosDataset }
 
-  TRESTDWZeosDataset = class(TRESTDWDataset)
+  TRESTDWZeosDataset = class(TRESTDWDrvDataset)
   public
     procedure SaveToStream(stream : TStream); override;
   end;
 
   { TRESTDWZeosStoreProc }
 
-  TRESTDWZeosStoreProc = class(TRESTDWStoreProc)
+  TRESTDWZeosStoreProc = class(TRESTDWDrvStoreProc)
   public
     procedure ExecProc; override;
     procedure Prepare; override;
@@ -77,7 +77,7 @@ type
 
   { TRESTDWZeosQuery }
 
-  TRESTDWZeosQuery = class(TRESTDWQuery)
+  TRESTDWZeosQuery = class(TRESTDWDrvQuery)
   private
     FSequence : TZSequence;
   protected
@@ -100,13 +100,14 @@ type
     procedure setConnection(AValue: TComponent); override;
 
     function getConectionType : TRESTDWDatabaseType; override;
+    Function compConnIsValid(comp : TComponent) : boolean; override;
   public
     constructor Create(AOwner : TComponent);
     destructor Destroy; override;
 
-    function getQuery : TRESTDWQuery; override;
-    function getTable : TRESTDWTable; override;
-    function getStoreProc : TRESTDWStoreProc; override;
+    function getQuery : TRESTDWDrvQuery; override;
+    function getTable : TRESTDWDrvTable; override;
+    function getStoreProc : TRESTDWDrvStoreProc; override;
 
     procedure Connect; override;
     procedure Disconect; override;
@@ -119,8 +120,6 @@ type
 
     class procedure CreateConnection(Const AConnectionDefs : TConnectionDefs;
                                      var AConnection : TComponent); override;
-  published
-
   end;
 
 procedure Register;
@@ -175,9 +174,6 @@ end;
 
 procedure TRESTDWZeosDriver.setConnection(AValue: TComponent);
 begin
-  if (Assigned(AValue)) and (not AValue.InheritsFrom(TZConnection)) then
-    raise Exception.Create(crdwConnectionNotZeos);
-
   if FTransaction <> nil then
     FTransaction.Connection := TZConnection(AValue);
   inherited setConnection(AValue);
@@ -217,7 +213,7 @@ begin
   inherited Destroy;
 end;
 
-function TRESTDWZeosDriver.getQuery: TRESTDWQuery;
+function TRESTDWZeosDriver.getQuery: TRESTDWDrvQuery;
 var
   qry : TZQuery;
 begin
@@ -228,7 +224,7 @@ begin
   Result := TRESTDWZeosQuery.Create(qry);
 end;
 
-function TRESTDWZeosDriver.getTable : TRESTDWTable;
+function TRESTDWZeosDriver.getTable : TRESTDWDrvTable;
 var
   qry : TZTable;
 begin
@@ -236,10 +232,10 @@ begin
   qry.Connection := TZConnection(Connection);
   qry.Transaction := FTransaction;
 
-  Result := TRESTDWTable.Create(qry);
+  Result := TRESTDWDrvTable.Create(qry);
 end;
 
-function TRESTDWZeosDriver.getStoreProc : TRESTDWStoreProc;
+function TRESTDWZeosDriver.getStoreProc : TRESTDWDrvStoreProc;
 var
   qry : TZStoredProc;
 begin
@@ -289,6 +285,11 @@ begin
   inherited connRollback;
   if Assigned(Connection) then
     TZConnection(Connection).Rollback;
+end;
+
+function TRESTDWZeosDriver.compConnIsValid(comp: TComponent): boolean;
+begin
+  Result := comp.InheritsFrom(TZConnection)
 end;
 
 procedure TRESTDWZeosDriver.connCommit;

@@ -1,8 +1,28 @@
-unit uRESTDWApolloDBDriver;
+﻿unit uRESTDWApolloDBDriver;
 
-{$IFDEF FPC}
-  {$mode objfpc}{$H+}
-{$ENDIF}
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+
+{
+  REST Dataware .
+  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+ Pascal e com compatibilidade entre sistemas operacionais.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+
+ Membros do Grupo :
+
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
+ Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Flávio Motta               - Member Tester and DEMO Developer.
+ Mobius One                 - Devel, Tester and Admin.
+ Gustavo                    - Criptografia and Devel.
+ Eloy                       - Devel.
+ Roniery                    - Devel.
+ Fernando Banhos            - Refactor Drivers REST Dataware.
+}
 
 interface
 
@@ -10,21 +30,15 @@ uses
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes,
   apWin, ApConn, apoQSet, apCommon;
 
-const
-  crdwConnectionNotApolloDB = 'Componente não é um ApolloDBConnection';
-
-
 type
   { TRESTDWApolloDBQuery }
 
-  TRESTDWApolloDBQuery = class(TRESTDWQuery)
+  TRESTDWApolloDBQuery = class(TRESTDWDrvQuery)
   public
     procedure ExecSQL; override;
     procedure Prepare; override;
 
     function RowsAffected : Int64; override;
-
-    function createTransaction : TRESTDWTransaction; override;
   end;
 
   { TRESTDWApolloDBDriver }
@@ -35,10 +49,11 @@ type
     FPassword : string;
     FTableType : TApolloTableType;
   protected
-    procedure setConnection(AValue: TComponent); override;
+    Function compConnIsValid(comp : TComponent) : boolean; override;
   public
-    function getQuery : TRESTDWQuery; override;
-    function getTable : TRESTDWTable; override;
+    function getQuery : TRESTDWDrvQuery; override;
+    function getTable : TRESTDWDrvTable; override;
+
     procedure Connect; override;
     procedure Disconect; override;
 
@@ -47,9 +62,9 @@ type
     class procedure CreateConnection(Const AConnectionDefs : TConnectionDefs;
                                      var AConnection : TComponent); override;
   published
-    property DatabaseName : String            read FDatabaseName Write FDatabaseName;
-    property Password     : String            read FPassword     Write FPassword;
-    property TableType    : TApolloTableType  read FTableType    Write FTableType;
+    property DatabaseName : String            read FDatabaseName  Write FDatabaseName;
+    property Password     : String            read FPassword      Write FPassword;
+    property TableType    : TApolloTableType  read FTableType     Write FTableType;
   end;
 
 
@@ -70,14 +85,7 @@ end;
 
  { TRESTDWApolloDBDriver }
 
-procedure TRESTDWApolloDBDriver.setConnection(AValue : TComponent);
-begin
-  if (Assigned(AValue)) and (not AValue.InheritsFrom(TApolloConnection)) then
-    raise Exception.Create(crdwConnectionNotApolloDB);
-  inherited setConnection(AValue);
-end;
-
-function TRESTDWApolloDBDriver.getQuery : TRESTDWQuery;
+function TRESTDWApolloDBDriver.getQuery : TRESTDWDrvQuery;
 var
   qry : TMyQuery;
 begin
@@ -90,7 +98,7 @@ begin
   Result := TRESTDWApolloDBQuery.Create(qry);
 end;
 
-function TRESTDWApolloDBDriver.getTable : TRESTDWTable;
+function TRESTDWApolloDBDriver.getTable : TRESTDWDrvTable;
 var
   qry : TApolloTable;
 begin
@@ -100,7 +108,12 @@ begin
   qry.TableType    := FTableType;
   qry.Password     := FPassword;
 
-  Result := TRESTDWTable.Create(qry);
+  Result := TRESTDWDrvTable.Create(qry);
+end;
+
+function TRESTDWApolloDBDriver.compConnIsValid(comp: TComponent): boolean;
+begin
+  Result := comp.InheritsFrom(TApolloConnection);
 end;
 
 procedure TRESTDWApolloDBDriver.Connect;
@@ -156,11 +169,6 @@ var
 begin
   qry := TApolloQuery(Self.Owner);
   Result := -1; //qry.RowsAffected;
-end;
-
-function TRESTDWApolloDBQuery.createTransaction : TRESTDWTransaction;
-begin
-  Result := TRESTDWTransaction.Create(nil);
 end;
 
 end.

@@ -24,10 +24,6 @@
  Fernando Banhos            - Refactor Drivers REST Dataware.
 }
 
-{$IFDEF FPC}
-  {$mode objfpc}{$H+}
-{$ENDIF}
-
 interface
 
 uses
@@ -70,19 +66,17 @@ const
                    dbtUndefined,dbtUndefined,dbtUndefined];
   {$ENDIF}
 
-  crdwConnectionNotIsUniDAC = 'Componente não é um UniConnection';
-
 type
   { TRESTDWUniDACDataset }
 
-  TRESTDWUniDACDataset = class(TRESTDWDataset)
+  TRESTDWUniDACDataset = class(TRESTDWDrvDataset)
   public
     procedure SaveToStream(stream : TStream); override;
   end;
 
   { TRESTDWUniDACStoreProc }
 
-  TRESTDWUniDACStoreProc = class(TRESTDWStoreProc)
+  TRESTDWUniDACStoreProc = class(TRESTDWDrvStoreProc)
   public
     procedure ExecProc; override;
     procedure Prepare; override;
@@ -90,7 +84,7 @@ type
 
   { TRESTDWUniDACQuery }
 
-  TRESTDWUniDACQuery = class(TRESTDWQuery)
+  TRESTDWUniDACQuery = class(TRESTDWDrvQuery)
   protected
     procedure createSequencedField(seqname,field : string); override;
   public
@@ -104,12 +98,12 @@ type
 
   TRESTDWUniDACDriver = class(TRESTDWDriverBase)
   protected
-    procedure setConnection(AValue: TComponent); override;
     function getConectionType : TRESTDWDatabaseType; override;
+    Function compConnIsValid(comp : TComponent) : boolean; override;
   public
-    function getQuery : TRESTDWQuery; override;
-    function getTable : TRESTDWTable; override;
-    function getStoreProc : TRESTDWStoreProc; override;
+    function getQuery : TRESTDWDrvQuery; override;
+    function getTable : TRESTDWDrvTable; override;
+    function getStoreProc : TRESTDWDrvStoreProc; override;
 
     procedure Connect; override;
     procedure Disconect; override;
@@ -122,8 +116,6 @@ type
 
     class procedure CreateConnection(Const AConnectionDefs : TConnectionDefs;
                                      var AConnection : TComponent); override;
-  published
-
   end;
 
 procedure Register;
@@ -176,13 +168,6 @@ end;
 
  { TRESTDWUniDACDriver }
 
-procedure TRESTDWUniDACDriver.setConnection(AValue : TComponent);
-begin
-  if (Assigned(AValue)) and (not AValue.InheritsFrom(TUniConnection)) then
-    raise Exception.Create(crdwConnectionNotIsUniDAC);
-  inherited setConnection(AValue);
-end;
-
 function TRESTDWUniDACDriver.getConectionType : TRESTDWDatabaseType;
 var
   prot : string;
@@ -204,7 +189,7 @@ begin
   end;
 end;
 
-function TRESTDWUniDACDriver.getQuery : TRESTDWQuery;
+function TRESTDWUniDACDriver.getQuery : TRESTDWDrvQuery;
 var
   qry : TUniQuery;
 begin
@@ -217,17 +202,17 @@ begin
   Result := TRESTDWUniDACQuery.Create(qry);
 end;
 
-function TRESTDWUniDACDriver.getTable : TRESTDWTable;
+function TRESTDWUniDACDriver.getTable : TRESTDWDrvTable;
 var
   qry : TUniTable;
 begin
   qry := TUniTable.Create(Self);
   qry.Connection := TUniConnection(Connection);
 
-  Result := TRESTDWTable.Create(qry);
+  Result := TRESTDWDrvTable.Create(qry);
 end;
 
-function TRESTDWUniDACDriver.getStoreProc : TRESTDWStoreProc;
+function TRESTDWUniDACDriver.getStoreProc : TRESTDWDrvStoreProc;
 var
   qry : TUniStoredProc;
 begin
@@ -280,6 +265,11 @@ begin
   inherited connRollback;
   if Assigned(Connection) then
     TUniConnection(Connection).Rollback;
+end;
+
+function TRESTDWUniDACDriver.compConnIsValid(comp: TComponent): boolean;
+begin
+  Result := comp.InheritsFrom(TUniConnection);
 end;
 
 procedure TRESTDWUniDACDriver.connCommit;

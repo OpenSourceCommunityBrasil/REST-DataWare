@@ -1,8 +1,28 @@
 ﻿unit uRESTDWAnyDACDriver;
 
-{$IFDEF FPC}
-  {$mode objfpc}{$H+}
-{$ENDIF}
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+
+{
+  REST Dataware .
+  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+ Pascal e com compatibilidade entre sistemas operacionais.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+
+ Membros do Grupo :
+
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
+ Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Flávio Motta               - Member Tester and DEMO Developer.
+ Mobius One                 - Devel, Tester and Admin.
+ Gustavo                    - Criptografia and Devel.
+ Eloy                       - Devel.
+ Roniery                    - Devel.
+ Fernando Banhos            - Refactor Drivers REST Dataware.
+}
 
 interface
 
@@ -36,19 +56,17 @@ const
                        dbtUndefined];
   {$ENDIF}
 
-  crdwConnectionNotFireDAC = 'Componente não é um AnyDACConnection';
-
 type
   { TRESTDWAnyDACDataset }
 
-  TRESTDWAnyDACDataset = class(TRESTDWDataset)
+  TRESTDWAnyDACDataset = class(TRESTDWDrvDataset)
   public
     procedure SaveToStream(stream : TStream); override;
   end;
 
   { TRESTDWAnyDACStoreProc }
 
-  TRESTDWAnyDACStoreProc = class(TRESTDWStoreProc)
+  TRESTDWAnyDACStoreProc = class(TRESTDWDrvStoreProc)
   public
     procedure ExecProc; override;
     procedure Prepare; override;
@@ -56,7 +74,7 @@ type
 
   { TRESTDWAnyDACQuery }
 
-  TRESTDWAnyDACQuery = class(TRESTDWQuery)
+  TRESTDWAnyDACQuery = class(TRESTDWDrvQuery)
   protected
     procedure createSequencedField(seqname, field : string); override;
   public
@@ -70,13 +88,12 @@ type
 
   TRESTDWAnyDACDriver = class(TRESTDWDriverBase)
   protected
-    procedure setConnection(AValue: TComponent); override;
-
+    Function compConnIsValid(comp : TComponent) : boolean; override;
     function getConectionType : TRESTDWDatabaseType; override;
   public
-    function getQuery : TRESTDWQuery; override;
-    function getTable : TRESTDWTable; override;
-    function getStoreProc : TRESTDWStoreProc; override;
+    function getQuery : TRESTDWDrvQuery; override;
+    function getTable : TRESTDWDrvTable; override;
+    function getStoreProc : TRESTDWDrvStoreProc; override;
 
     procedure Connect; override;
     procedure Disconect; override;
@@ -89,8 +106,6 @@ type
 
     class procedure CreateConnection(Const AConnectionDefs : TConnectionDefs;
                                      var AConnection : TComponent); override;
-  published
-
   end;
 
 procedure Register;
@@ -143,13 +158,6 @@ end;
 
  { TRESTDWAnyDACDriver }
 
-procedure TRESTDWAnyDACDriver.setConnection(AValue : TComponent);
-begin
-  if (Assigned(AValue)) and (not AValue.InheritsFrom(TADConnection)) then
-    raise Exception.Create(crdwConnectionNotFireDAC);
-  inherited setConnection(AValue);
-end;
-
 function TRESTDWAnyDACDriver.getConectionType : TRESTDWDatabaseType;
 var
   conn : string;
@@ -171,7 +179,7 @@ begin
   end;
 end;
 
-function TRESTDWAnyDACDriver.getQuery : TRESTDWQuery;
+function TRESTDWAnyDACDriver.getQuery : TRESTDWDrvQuery;
 var
   qry : TADQuery;
 begin
@@ -181,7 +189,7 @@ begin
   Result := TRESTDWAnyDACQuery.Create(qry);
 end;
 
-function TRESTDWAnyDACDriver.getTable : TRESTDWTable;
+function TRESTDWAnyDACDriver.getTable : TRESTDWDrvTable;
 var
   qry : TADTable;
 begin
@@ -189,10 +197,10 @@ begin
   qry.FetchOptions.RowsetSize := -1;
   qry.Connection := TADConnection(Connection);
 
-  Result := TRESTDWTable.Create(qry);
+  Result := TRESTDWDrvTable.Create(qry);
 end;
 
-function TRESTDWAnyDACDriver.getStoreProc : TRESTDWStoreProc;
+function TRESTDWAnyDACDriver.getStoreProc : TRESTDWDrvStoreProc;
 var
   qry : TADStoredProc;
 begin
@@ -245,6 +253,11 @@ begin
   inherited connRollback;
   if Assigned(Connection) then
     Result := TADConnection(Connection).Rollback;
+end;
+
+function TRESTDWAnyDACDriver.compConnIsValid(comp: TComponent): boolean;
+begin
+  Result := comp.InheritsFrom(TADConnection);
 end;
 
 procedure TRESTDWAnyDACDriver.connCommit;
