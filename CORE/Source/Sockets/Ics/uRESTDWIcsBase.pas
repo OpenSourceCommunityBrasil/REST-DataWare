@@ -354,11 +354,13 @@ begin
 end;
 
 Constructor TRESTDWIcsServicePooler.Create(AOwner: TComponent);
+Type
+ PSslContext = ^TSslContext;
 Begin
   HttpAppSrv := TSslHttpAppSrv.Create(nil);
 
-  if Assigned(HttpAppSrv.SSLContext) then
-    FreeAndNil(HttpAppSrv.SSLContext);
+  If Assigned(HttpAppSrv.SSLContext) Then
+    HttpAppSrv.SSLContext.Free;
 
   // TODO 2
   HttpAppSrv.DocDir := '';
@@ -451,7 +453,8 @@ Begin
   End;
   If Assigned(HttpAppSrv) Then
   begin
-    FreeAndNil(HttpAppSrv.SSLContext);
+   If Assigned(HttpAppSrv.SSLContext) Then
+     HttpAppSrv.SSLContext.Free;
     FreeAndNil(HttpAppSrv);
   end;
   Inherited;
