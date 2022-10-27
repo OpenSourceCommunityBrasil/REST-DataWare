@@ -927,13 +927,13 @@ Begin
   End;
   If sVersion <> '' Then
    Begin
+    sVersion := Trim(sVersion) + '.';
     Repeat
      iAux1 := Pos('.',sVersion);
-     If iAux1 > 0 Then
-      Begin
+     If iAux1 > 0 Then Begin
        lst.Add(Copy(sVersion,1,iAux1-1));
        Delete(sVersion,1,iAux1);
-      End;
+     End;
     Until iAux1 = 0;
     If lst.Count > 0 Then
      Result.rdwDatabaseMajorVersion := StrToInt(lst.Strings[0]);
