@@ -57,13 +57,6 @@ const
   {$ENDIF}
 
 type
-  { TRESTDWAnyDACDataset }
-
-  TRESTDWAnyDACDataset = class(TRESTDWDrvDataset)
-  public
-    procedure SaveToStream(stream : TStream); override;
-  end;
-
   { TRESTDWAnyDACStoreProc }
 
   TRESTDWAnyDACStoreProc = class(TRESTDWDrvStoreProc)
@@ -72,12 +65,18 @@ type
     procedure Prepare; override;
   end;
 
+  TRESTDWAnyDACTable = class(TRESTDWDrvTable)
+  public
+    procedure SaveToStream(stream : TStream); override;
+  end;
+
   { TRESTDWAnyDACQuery }
 
   TRESTDWAnyDACQuery = class(TRESTDWDrvQuery)
   protected
     procedure createSequencedField(seqname, field : string); override;
   public
+    procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
 
@@ -141,19 +140,6 @@ begin
   inherited Prepare;
   qry := TADStoredProc(Self.Owner);
   qry.Prepare;
-end;
-
-{ TRESTDWAnyDACDataset }
-
-procedure TRESTDWAnyDACDataset.SaveToStream(stream : TStream);
-var
-  qry : TADDataset;
-begin
-  inherited SaveToStream(stream);
-  qry := TADDataset(Self.Owner);
-  qry.SaveToStream(stream);
-
-  stream.Position := 0;
 end;
 
  { TRESTDWAnyDACDriver }
@@ -399,6 +385,31 @@ begin
   qry := TADQuery(Self.Owner);
   Result := qry.RowsAffected;
 end;
+
+procedure TRESTDWAnyDACQuery.SaveToStream(stream: TStream);
+var
+  qry : TADQuery;
+begin
+  inherited SaveToStream(stream);
+  qry := TADQuery(Self.Owner);
+  qry.SaveToStream(stream);
+
+  stream.Position := 0;
+end;
+
+{ TRESTDWAnyDACTable }
+
+procedure TRESTDWAnyDACTable.SaveToStream(stream: TStream);
+var
+  qry : TADTable;
+begin
+  inherited SaveToStream(stream);
+  qry := TADTable(Self.Owner);
+  qry.SaveToStream(stream);
+
+  stream.Position := 0;
+end;
+
 
 {$IFDEF FPC}
 initialization

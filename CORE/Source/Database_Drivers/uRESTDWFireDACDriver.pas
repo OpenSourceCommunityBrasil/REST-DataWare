@@ -29,7 +29,8 @@ interface
 uses
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes,
   FireDAC.Comp.Client, FireDAC.Comp.DataSet, FireDAC.Stan.StorageBin,
-  FireDAC.Stan.Intf, FireDAC.Stan.Option, DB;
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.DApt.Intf, FireDAC.DApt,
+  DB;
 
 const
   rdwFireDACDrivers : array of string = ['ads','asa','db2','ds','fb','ib',
@@ -43,13 +44,6 @@ const
                      dbtUndefined];
 
 type
-  { TRESTDWFireDACDataset }
-
-  TRESTDWFireDACDataset = class(TRESTDWDrvDataset)
-  public
-    procedure SaveToStream(stream : TStream); override;
-  end;
-
   { TRESTDWFireDACStoreProc }
 
   TRESTDWFireDACStoreProc = class(TRESTDWDrvStoreProc)
@@ -58,12 +52,19 @@ type
     procedure Prepare; override;
   end;
 
+  { TRESTDWFireDACTable }
+  TRESTDWFireDACTable = class(TRESTDWDrvTable)
+  public
+    procedure SaveToStream(stream : TStream); override;
+  end;
+
   { TRESTDWFireDACQuery }
 
   TRESTDWFireDACQuery = class(TRESTDWDrvQuery)
   protected
     procedure createSequencedField(seqname,field : string); override;
   public
+    procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
     function RowsAffected : Int64; override;
@@ -124,19 +125,6 @@ begin
   qry.Prepare;
 end;
 
-{ TRESTDWFireDACDataset }
-
-procedure TRESTDWFireDACDataset.SaveToStream(stream : TStream);
-var
-  qry : TFDDataset;
-begin
-  inherited SaveToStream(stream);
-  qry := TFDDataset(Self.Owner);
-  qry.SaveToStream(stream, sfBinary);
-
-  stream.Position := 0;
-end;
-
 { TRESTDWFireDACDriver }
 
 function TRESTDWFireDACDriver.isAutoCommit: boolean;
@@ -194,7 +182,7 @@ begin
   qry.Connection := TFDConnection(Connection);
   qry.CachedUpdates := False;
 
-  Result := TRESTDWDrvTable.Create(qry);
+  Result := TRESTDWFireDACTable.Create(qry);
 end;
 
 function TRESTDWFireDACDriver.getStoreProc : TRESTDWDrvStoreProc;
@@ -397,6 +385,30 @@ var
 begin
   qry := TFDQuery(Self.Owner);
   Result := qry.RowsAffected;
+end;
+
+procedure TRESTDWFireDACQuery.SaveToStream(stream: TStream);
+var
+  qry : TFDQuery;
+begin
+  inherited SaveToStream(stream);
+  qry := TFDQuery(Self.Owner);
+  qry.SaveToStream(stream, sfBinary);
+
+  stream.Position := 0;
+end;
+
+{ TRESTDWFireDACTable }
+
+procedure TRESTDWFireDACTable.SaveToStream(stream: TStream);
+var
+  qry : TFDTable;
+begin
+  inherited SaveToStream(stream);
+  qry := TFDTable(Self.Owner);
+  qry.SaveToStream(stream, sfBinary);
+
+  stream.Position := 0;
 end;
 
 end.
