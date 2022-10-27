@@ -3523,7 +3523,7 @@ Begin
             Finally
              TRESTDWClientSQLBase(Datasets[I]).SetInBlockEvents(False);
              If TRESTDWClientSQL(Datasets[I]).Active Then
-              If TRESTDWClientSQL(Datasets[I]).BinaryRequest Then
+              If BinaryRequest Then
                TRESTDWClientSQL(Datasets[I]).ProcAfterOpen(TRESTDWClientSQL(Datasets[I]));
             End;
             TRESTDWClientSQL(Datasets[I]).DisableControls;
@@ -8133,12 +8133,10 @@ Begin
          If vError Then
           Begin
            vInBlockEvents := False;
-
            If Assigned(vOnGetDataError) Then
             vOnGetDataError(False, vErrorMSG);
            If vRaiseError Then
             Raise Exception.Create(PChar(vErrorMSG));
-
            If ReleaseCache Then
             Begin
              TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;

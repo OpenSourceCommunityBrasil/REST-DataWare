@@ -378,6 +378,7 @@ Type
   vBeforeUseCriptKey   : TBeforeUseCriptKey;
   vCORSCustomHeaders,
   vDefaultPage         : TStringList;
+  vEncode_Errors,
   vPathTraversalRaiseError,
   vForceWelcomeAccess,
   vCORS,
@@ -610,6 +611,7 @@ Type
   Property ForceWelcomeAccess      : Boolean                       Read vForceWelcomeAccess      Write vForceWelcomeAccess;
   Property OnBeforeUseCriptKey     : TBeforeUseCriptKey            Read vBeforeUseCriptKey       Write vBeforeUseCriptKey;
   Property CriptOptions            : TCripto                       Read vCripto                  Write vCripto;
+  Property EncodeErrors            : Boolean                       Read vEncode_Errors           Write vEncode_Errors;
   {$IFDEF FPC}
   Property DatabaseCharSet         : TDatabaseCharSet              Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
@@ -3550,7 +3552,12 @@ Begin
                   Begin
                    If Not(((vUrlToExec = '') Or (vUrlToExec = '/')) And (RequestType = rtGet)) Then
                     If Not (WelcomeAccept) And (vErrorMessage <> '') Then
-                     vReplyString := escape_chars(vErrorMessage)
+                     Begin
+                      If vEncode_Errors then
+                       vReplyString := escape_chars(vErrorMessage)
+                      Else
+                       vReplyString := vErrorMessage;
+                     End
                     Else
                      vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
                   End;
@@ -6098,6 +6105,7 @@ Begin
  {$ENDIF}
  vServerAuthOptions                     := TRESTDWServerAuthOptionParams.Create(Self);
  vActive                                := False;
+ vEncode_Errors                         := False;
  vEncoding                              := esUtf8;
  vServicePort                           := 8082;
  vForceWelcomeAccess                    := False;
