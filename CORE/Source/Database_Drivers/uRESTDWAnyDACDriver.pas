@@ -183,7 +183,7 @@ begin
   qry.FetchOptions.RowsetSize := -1;
   qry.Connection := TADConnection(Connection);
 
-  Result := TRESTDWDrvTable.Create(qry);
+  Result := TRESTDWAnyDACTable.Create(qry);
 end;
 
 function TRESTDWAnyDACDriver.getStoreProc : TRESTDWDrvStoreProc;
