@@ -68,10 +68,10 @@ Uses
   Function  ParamByName(param : String) : TParam; Virtual;
   Function  FieldByName(field : String) : TField; Virtual;
   Function  FindField  (field : String) : TField; Virtual;
-  Function  RDWDataTypeFieldName(field  : String) : Byte;    Virtual;
-  Function  RDWDataTypeParamName(param  : String) : Byte;    Virtual;
-  function  RDWDataTypeField(idx : integer) : Byte; virtual;
-  function  RDWDataTypeParam(idx : integer) : Byte; virtual;
+  Function  RESTDWDataTypeFieldName(field  : String) : Byte;    Virtual;
+  Function  RESTDWDataTypeParamName(param  : String) : Byte;    Virtual;
+  function  RESTDWDataTypeField(idx : integer) : Byte; virtual;
+  function  RESTDWDataTypeParam(idx : integer) : Byte; virtual;
   Function  GetParamIndex       (param  : String) : integer; Virtual;
   Function  RowsAffected : Int64;    Virtual;
   Function  GetInsertID  : int64;    Virtual;
@@ -413,9 +413,9 @@ begin
       vParamName := Copy(StringReplace(DWParams[I].ParamName, ',', '', []), 1, Length(DWParams[I].ParamName));
       A := Self.GetParamIndex(vParamName);
       if A > -1 then begin
-        if Self.RDWDataTypeParam(A) in [dwftFixedChar,dwftFixedWideChar,dwftString,dwftWideString,
+        if Self.RESTDWDataTypeParam(A) in [dwftFixedChar,dwftFixedWideChar,dwftString,dwftWideString,
                                         dwftMemo,dwftFmtMemo,dwftWideMemo] then begin
-          if Self.RDWDataTypeParam(A) in [dwftMemo, dwftFmtMemo, dwftWideMemo] then
+          if Self.RESTDWDataTypeParam(A) in [dwftMemo, dwftFmtMemo, dwftWideMemo] then
             Self.Params[A].Value := DWParams[I].Value
           else begin
             if Self.Params[A].Size > 0 Then
@@ -432,9 +432,9 @@ begin
               Self.Params[A].DataType := ftString;
           end;
 
-          if Self.RDWDataTypeParam(A) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
+          if Self.RESTDWDataTypeParam(A) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
             if Trim(DWParams[I].Value) <> '' then begin
-              if Self.RDWDataTypeParam(A) in [dwftLongWord, dwftLargeint] then
+              if Self.RESTDWDataTypeParam(A) in [dwftLongWord, dwftLargeint] then
                 Self.Params[A].AsLargeInt := StrToInt64(DWParams[I].Value)
               else If Self.Params[A].DataType = ftSmallInt Then
                 Self.Params[A].AsSmallInt := StrToInt(DWParams[I].Value)
@@ -444,7 +444,7 @@ begin
             else
               Self.Params[A].Clear;
           end
-          else if Self.RDWDataTypeParam(A) in [dwftFloat,dwftCurrency,dwftBCD,dwftFMTBcd,dwftSingle] then begin
+          else if Self.RESTDWDataTypeParam(A) in [dwftFloat,dwftCurrency,dwftBCD,dwftFMTBcd,dwftSingle] then begin
             if Trim(DWParams[I].Value) <> '' then
               Self.Params[A].AsFloat  := StrToFloat(BuildFloatString(DWParams[I].Value))
             else
@@ -475,7 +475,7 @@ begin
               FreeAndNil(vStringStream);
             end;
           end
-          else if Self.RDWDataTypeParam(A) in [dwftFixedChar, dwftFixedWideChar,
+          else if Self.RESTDWDataTypeParam(A) in [dwftFixedChar, dwftFixedWideChar,
                   dwftString, dwftWideString, dwftMemo, dwftFmtMemo, dwftWideMemo] then begin
               if (Trim(DWParams[I].Value) <> '') then
                Self.Params[A].AsString := Params[I].Value
@@ -594,7 +594,7 @@ Begin
  Result := TDataSet(Self.Owner).FindField(field);
 End;
 
-function TRESTDWDrvDataset.RDWDataTypeField(idx: integer): Byte;
+function TRESTDWDrvDataset.RESTDWDataTypeField(idx: integer): Byte;
 var
   vDType : TFieldType;
 begin
@@ -602,7 +602,7 @@ begin
   Result := FieldTypeToDWFieldType(vDType);
 end;
 
-Function TRESTDWDrvDataset.RDWDataTypeFieldName(field : String) : Byte;
+Function TRESTDWDrvDataset.RESTDWDataTypeFieldName(field : String) : Byte;
 Var
  vDType : TFieldType;
 Begin
@@ -610,7 +610,7 @@ Begin
  Result := FieldTypeToDWFieldType(vDType);
 End;
 
-function TRESTDWDrvDataset.RDWDataTypeParam(idx: integer): Byte;
+function TRESTDWDrvDataset.RESTDWDataTypeParam(idx: integer): Byte;
 var
   vDType : TFieldType;
 begin
@@ -618,7 +618,7 @@ begin
   Result := FieldTypeToDWFieldType(vDType);
 end;
 
-Function TRESTDWDrvDataset.RDWDataTypeParamName(param : String) : Byte;
+Function TRESTDWDrvDataset.RESTDWDataTypeParamName(param : String) : Byte;
 Var
  vDType : TFieldType;
 Begin
@@ -927,13 +927,13 @@ Begin
   End;
   If sVersion <> '' Then
    Begin
+    sVersion := Trim(sVersion) + '.';
     Repeat
      iAux1 := Pos('.',sVersion);
-     If iAux1 > 0 Then
-      Begin
+     If iAux1 > 0 Then Begin
        lst.Add(Copy(sVersion,1,iAux1-1));
        Delete(sVersion,1,iAux1);
-      End;
+     End;
     Until iAux1 = 0;
     If lst.Count > 0 Then
      Result.rdwDatabaseMajorVersion := StrToInt(lst.Strings[0]);
@@ -1034,7 +1034,7 @@ begin
     try
       for X := 0 to bPrimaryKeys.Count - 1 do begin
         A := Query.GetParamIndex('DWKEY_' + bPrimaryKeys[X]);
-        if Query.RDWDataTypeParam(A) in [
+        if Query.RESTDWDataTypeParam(A) in [
           dwftFixedChar,
           dwftFixedWideChar,
           dwftString,
@@ -1055,7 +1055,7 @@ begin
               Query.Params[A].DataType := ftString;
           end;
 
-          if Query.RDWDataTypeParam(A) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
+          if Query.RESTDWDataTypeParam(A) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
             if MassiveDataset.MasterCompTag <> '' then
               MassiveReplyCache := MassiveDataset.MassiveReply.ItemsString[MassiveDataset.MasterCompTag]
             else
@@ -1070,7 +1070,7 @@ begin
                 MassiveReplyValue := MassiveReplyCache.ItemByValue(bPrimaryKeys[X], MassiveDataset.AtualRec.PrimaryValues[X].Value);
 
               if MassiveReplyValue <> nil then  begin
-                if Query.RDWDataTypeParam(A) in [dwftLongWord,dwftLargeint] then
+                if Query.RESTDWDataTypeParam(A) in [dwftLongWord,dwftLargeint] then
                   {$IFNDEF FPC}
                     {$IF CompilerVersion >= 21}
                       Query.Params[A].AsLargeInt := StrToInt64(MassiveReplyValue.NewValue)
@@ -1089,7 +1089,7 @@ begin
 
             if (MassiveReplyValue = nil) and
                (not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) then begin
-              if Query.RDWDataTypeParam(A) in [dwftLongWord,dwftLargeint] then
+              if Query.RESTDWDataTypeParam(A) in [dwftLongWord,dwftLargeint] then
                 Query.Params[A].AsLargeInt := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
               else if Query.Params[A].DataType = ftSmallInt then
                 Query.Params[A].AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
@@ -1097,7 +1097,7 @@ begin
                 Query.Params[A].AsInteger := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
             end;
           end
-          else if Query.RDWDataTypeParam(A) in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd, dwftSingle] then begin
+          else if Query.RESTDWDataTypeParam(A) in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd, dwftSingle] then begin
             if (not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) then
               Query.Params[A].AsFloat := StrToFloat(BuildFloatString(MassiveDataset.AtualRec.PrimaryValues[X].Value));
           end
@@ -1128,7 +1128,7 @@ begin
   end;
 
   if not (All) then begin
-    if Query.RDWDataTypeParam(IParam) in [
+    if Query.RESTDWDataTypeParam(IParam) in [
       dwftFixedChar, dwftFixedWideChar,
       dwftString, dwftWideString,
       dwftMemo, dwftFmtMemo,
@@ -1154,9 +1154,9 @@ begin
         else
           Query.Params[IParam].Clear;
       end
-      else if Query.RDWDataTypeParam(IParam) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord,dwftLargeint] then begin
+      else if Query.RESTDWDataTypeParam(IParam) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord,dwftLargeint] then begin
         if (not (MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).IsNull)) then begin
-          if Query.RDWDataTypeParam(IParam) in [dwftLongWord,dwftLargeint] then
+          if Query.RESTDWDataTypeParam(IParam) in [dwftLongWord,dwftLargeint] then
             Query.Params[IParam].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).Value)
           else if Query.Params[IParam].DataType = ftSmallInt then
             Query.Params[IParam].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).Value)
@@ -1166,7 +1166,7 @@ begin
         else
           Query.Params[IParam].Clear;
       end
-      else if Query.RDWDataTypeParam(IParam) in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd, dwftSingle] then begin
+      else if Query.RESTDWDataTypeParam(IParam) in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd, dwftSingle] then begin
         if (not (MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).IsNull)) then
           Query.Params[IParam].AsFloat := StrToFloat(BuildFloatString(MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).Value))
         else
@@ -2757,6 +2757,45 @@ Begin
                        qry.Next;
                       End;
                     End;
+    dbtMsSQL      : begin
+                      qry.SQL.Add('select col.name');
+                      qry.SQL.Add('from sys.tables tab');
+                      qry.SQL.Add('inner join sys.indexes pk on');
+                      qry.SQL.Add('      tab.object_id = pk.object_id and ');
+                      qry.SQL.Add('      pk.is_primary_key = 1');
+                      qry.SQL.Add('inner join sys.index_columns ic on');
+                      qry.SQL.Add('      ic.object_id = tab.object_id and ');
+                      qry.SQL.Add('      ic.index_id = pk.index_id');
+                      qry.SQL.Add('inner join sys.columns col on');
+                      qry.SQL.Add('      ic.object_id = col.object_id');
+                      qry.SQL.Add('      and ic.column_id = col.column_id');
+                      qry.SQL.Add('where tab.name = '+QuotedStr(LowerCase(vTable)));
+                      If vSchema <> '' Then
+                        qry.SQL.Add('  and schema_name(tab.schema_id) = '+QuotedStr(LowerCase(vSchema)));
+                      qry.Open;
+                      While Not qry.Eof Do
+                       Begin
+                        FieldNames.Add(qry.FieldByName('name').AsString);
+                        qry.Next;
+                       End;
+    end;
+    dbtOracle     : begin
+                      qry.SQL.Add('select cc.column_name,');
+                      qry.SQL.Add('from all_constraints c');
+                      qry.SQL.Add('inner join all_cons_columns cc on');
+                      qry.SQL.Add('      c.constraint_name = cc.constraint_name and');
+                      qry.SQL.Add('	  c.owner = cc.owner');
+                      qry.SQL.Add('where c.constraint_type = ''P'' and');
+                      qry.SQL.Add('      cc.table_name = '+QuotedStr(LowerCase(vSchema)));
+                      If vSchema <> '' Then
+                        qry.SQL.Add('   and cc.owner = '+QuotedStr(LowerCase(vSchema)));
+                      qry.Open;
+                      While Not qry.Eof Do
+                       Begin
+                        FieldNames.Add(qry.FieldByName('column_name').AsString);
+                        qry.Next;
+                       End;
+    end;
    End;
   Finally
    FreeAndNil(qry);
@@ -3743,7 +3782,7 @@ begin
           end;
 
           if MassiveDataset.MassiveMode <> mmUpdate then begin
-            if Query.RDWDataTypeParam(I) in [dwftFixedChar,dwftFixedWideChar,dwftString,dwftWideString,dwftMemo,dwftFmtMemo,dwftWideMemo] then begin
+            if Query.RESTDWDataTypeParam(I) in [dwftFixedChar,dwftFixedWideChar,dwftString,dwftWideString,dwftMemo,dwftFmtMemo,dwftWideMemo] then begin
               if (not (MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull)) then begin
                 if Query.Params[I].Size > 0 then
                   Query.Params[I].Value := Copy(MassiveDataset.Params.ItemsString[Query.Params[I].Name].Value, 1, Query.Params[I].Size)
@@ -3760,9 +3799,9 @@ begin
                 else
                   Query.Params[I].DataType := ftString;
               end;
-              if Query.RDWDataTypeParam(I) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
+              if Query.RESTDWDataTypeParam(I) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
                 if (not (MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull)) then begin
-                  if Query.RDWDataTypeParam(I) in [dwftLongWord,dwftLargeint] then
+                  if Query.RESTDWDataTypeParam(I) in [dwftLongWord,dwftLargeint] then
                     Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Params.ItemsString[Query.Params[I].Name].Value)
                   else if Query.Params[I].DataType = ftSmallInt then
                     Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Params.ItemsString[Query.Params[I].Name].Value)
@@ -3772,7 +3811,7 @@ begin
                 else
                   Query.Params[I].Clear;
               end
-              else if Query.RDWDataTypeParam(I) in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd,dwftSingle] then begin
+              else if Query.RESTDWDataTypeParam(I) in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd,dwftSingle] then begin
                 if (not (MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull)) then
                   Query.Params[I].AsFloat := StrToFloat(BuildFloatString(MassiveDataset.Params.ItemsString[Query.Params[I].Name].Value))
                 else
@@ -3827,7 +3866,7 @@ begin
           end;
 
           if MassiveDataset.MassiveMode <> mmUpdate then begin
-            if Query.RDWDataTypeParam(I) in [dwftFixedChar, dwftFixedWideChar, dwftString, dwftWideString, dwftMemo, dwftFmtMemo, dwftWideMemo] then begin
+            if Query.RESTDWDataTypeParam(I) in [dwftFixedChar, dwftFixedWideChar, dwftString, dwftWideString, dwftMemo, dwftFmtMemo, dwftWideMemo] then begin
               if (not (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull)) then begin
                 if Query.Params[I].Size > 0 then
                   Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
@@ -3851,9 +3890,9 @@ begin
                 else
                   Query.Params[I].Clear;
               end
-              else if Query.RDWDataTypeParam(I) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
+              else if Query.RESTDWDataTypeParam(I) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
                 if (not (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull)) then begin
-                  if Query.RDWDataTypeParam(I) in [dwftLongWord,dwftLargeint] then
+                  if Query.RESTDWDataTypeParam(I) in [dwftLongWord,dwftLargeint] then
                     Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
                   else if Query.Params[I].DataType = ftSmallInt then
                     Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
@@ -3863,7 +3902,7 @@ begin
                 else
                   Query.Params[I].Clear;
               end
-              else if Query.RDWDataTypeParam(I) in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd, dwftSingle] then begin
+              else if Query.RESTDWDataTypeParam(I) in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd, dwftSingle] then begin
                 if (not (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull)) then
                   Query.Params[I].AsFloat := StrToFloat(BuildFloatString(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value))
                 else
