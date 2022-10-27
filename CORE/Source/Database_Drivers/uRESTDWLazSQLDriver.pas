@@ -41,14 +41,6 @@ const
                     dbtSQLLite,dbtFirebird,dbtFirebird);
 
 type
-
-  { TRESTDWLazSQLDataset }
-
-  TRESTDWLazSQLDataset = class(TRESTDWDrvDataset)
-  public
-    procedure SaveToStream(stream : TStream); override;
-  end;
-
   { TRESTDWLazSQLQuery }
 
   TRESTDWLazSQLQuery = class(TRESTDWDrvQuery)
@@ -57,6 +49,7 @@ type
   protected
     procedure createSequencedField(seqname,field : string); override;
   public
+    procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
 
@@ -76,7 +69,7 @@ type
     function getConectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
   public
-    constructor Create(AOwner : TComponent);
+    constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
 
     function getQuery : TRESTDWDrvQuery; override;
@@ -102,19 +95,6 @@ implementation
 procedure Register;
 begin
   RegisterComponents('REST Dataware - Drivers', [TRESTDWLazSQLDriver]);
-end;
-
-{ TRESTDWLazSQLDataset }
-
-procedure TRESTDWLazSQLDataset.SaveToStream(stream: TStream);
-var
-  qry : TSQLQuery;
-begin
-  inherited SaveToStream(stream);
-  qry := TSQLQuery(Self.Owner);
-  qry.SaveToStream(stream);
-
-  stream.Position := 0;
 end;
 
 { TRESTDWLazSQLQuery }
@@ -167,6 +147,17 @@ var
 begin
   qry := TSQLQuery(Self.Owner);
   Result := qry.RowsAffected;
+end;
+
+procedure TRESTDWLazSQLQuery.SaveToStream(stream: TStream);
+var
+  qry : TSQLQuery;
+begin
+  inherited SaveToStream(stream);
+  qry := TSQLQuery(Self.Owner);
+  qry.SaveToStream(stream);
+
+  stream.Position := 0;
 end;
 
 { TRESTDWLazSQLDriver }

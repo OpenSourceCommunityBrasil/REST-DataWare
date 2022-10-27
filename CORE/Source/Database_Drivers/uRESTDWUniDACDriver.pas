@@ -67,9 +67,7 @@ const
   {$ENDIF}
 
 type
-  { TRESTDWUniDACDataset }
-
-  TRESTDWUniDACDataset = class(TRESTDWDrvDataset)
+  TRESTDWUniDACTable = class(TRESTDWDrvTable)
   public
     procedure SaveToStream(stream : TStream); override;
   end;
@@ -88,6 +86,7 @@ type
   protected
     procedure createSequencedField(seqname,field : string); override;
   public
+    procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
 
@@ -147,25 +146,6 @@ begin
   qry.Prepare;
 end;
 
-{ TRESTDWUniDACDataset }
-
-procedure TRESTDWUniDACDataset.SaveToStream(stream : TStream);
-var
-  vDWMemtable : TRESTDWMemtable;
-  qry : TCustomUniDataSet;
-begin
-  inherited SaveToStream(stream);
-  qry := TCustomUniDataSet(Self.Owner);
-  vDWMemtable := TRESTDWMemtable.Create(Nil);
-  try
-    vDWMemtable.Assign(qry);
-    vDWMemtable.SaveToStream(stream);
-    stream.Position := 0;
-  finally
-    FreeAndNil(vDWMemtable);
-  end;
-end;
-
  { TRESTDWUniDACDriver }
 
 function TRESTDWUniDACDriver.getConectionType : TRESTDWDatabaseType;
@@ -209,7 +189,7 @@ begin
   qry := TUniTable.Create(Self);
   qry.Connection := TUniConnection(Connection);
 
-  Result := TRESTDWDrvTable.Create(qry);
+  Result := TRESTDWUniDACTable.Create(qry);
 end;
 
 function TRESTDWUniDACDriver.getStoreProc : TRESTDWDrvStoreProc;
@@ -350,6 +330,43 @@ begin
   qry := TUniQuery(Self.Owner);
   Result := qry.RowsAffected;
 end;
+
+procedure TRESTDWUniDACQuery.SaveToStream(stream: TStream);
+var
+  vDWMemtable : TRESTDWMemtable;
+  qry : TUniQuery;
+begin
+  inherited SaveToStream(stream);
+  qry := TUniQuery(Self.Owner);
+  vDWMemtable := TRESTDWMemtable.Create(Nil);
+  try
+    vDWMemtable.Assign(qry);
+    vDWMemtable.SaveToStream(stream);
+    stream.Position := 0;
+  finally
+    FreeAndNil(vDWMemtable);
+  end;
+end;
+
+{ TRESTDWUniDACTable }
+
+procedure TRESTDWUniDACTable.SaveToStream(stream: TStream);
+var
+  vDWMemtable : TRESTDWMemtable;
+  qry : TUniTable;
+begin
+  inherited SaveToStream(stream);
+  qry := TUniTable(Self.Owner);
+  vDWMemtable := TRESTDWMemtable.Create(Nil);
+  try
+    vDWMemtable.Assign(qry);
+    vDWMemtable.SaveToStream(stream);
+    stream.Position := 0;
+  finally
+    FreeAndNil(vDWMemtable);
+  end;
+end;
+
 
 {$IFDEF FPC}
 initialization

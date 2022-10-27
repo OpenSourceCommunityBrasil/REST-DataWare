@@ -60,19 +60,17 @@ const
   crdwConnectionNotZeos = 'Componente não é um ZeosConnection';
 
 type
-  { TRESTDWZeosDataset }
-
-  TRESTDWZeosDataset = class(TRESTDWDrvDataset)
-  public
-    procedure SaveToStream(stream : TStream); override;
-  end;
-
   { TRESTDWZeosStoreProc }
 
   TRESTDWZeosStoreProc = class(TRESTDWDrvStoreProc)
   public
     procedure ExecProc; override;
     procedure Prepare; override;
+  end;
+
+  TRESTDWZeosTable = class(TRESTDWDrvTable)
+  public
+    procedure SaveToStream(stream : TStream); override;
   end;
 
   { TRESTDWZeosQuery }
@@ -83,6 +81,7 @@ type
   protected
     procedure createSequencedField(seqname, field : string); override;
   public
+    procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
 
@@ -102,7 +101,7 @@ type
     function getConectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
   public
-    constructor Create(AOwner : TComponent);
+    constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
 
     function getQuery : TRESTDWDrvQuery; override;
@@ -149,25 +148,6 @@ begin
   inherited Prepare;
   qry := TZStoredProc(Self.Owner);
   qry.Prepare;
-end;
-
-{ TRESTDWZeosDataset }
-
-procedure TRESTDWZeosDataset.SaveToStream(stream: TStream);
-var
-  vDWMemtable : TRESTDWMemtable;
-  qry : TZAbstractRWTxnUpdateObjDataSet;
-begin
-  inherited SaveToStream(stream);
-  qry := TZAbstractRWTxnUpdateObjDataSet(Self.Owner);
-  vDWMemtable := TRESTDWMemtable.Create(Nil);
-  try
-    vDWMemtable.Assign(qry);
-    vDWMemtable.SaveToStream(stream);
-    stream.Position := 0;
-  finally
-    FreeAndNil(vDWMemtable);
-  end;
 end;
 
 { TRESTDWZeosDriver }
@@ -232,7 +212,7 @@ begin
   qry.Connection := TZConnection(Connection);
   qry.Transaction := FTransaction;
 
-  Result := TRESTDWDrvTable.Create(qry);
+  Result := TRESTDWZeosTable.Create(qry);
 end;
 
 function TRESTDWZeosDriver.getStoreProc : TRESTDWDrvStoreProc;
@@ -382,6 +362,42 @@ begin
   inherited Prepare;
   qry := TZQuery(Self.Owner);
   Result := qry.RowsAffected;
+end;
+
+procedure TRESTDWZeosQuery.SaveToStream(stream: TStream);
+var
+  vDWMemtable : TRESTDWMemtable;
+  qry : TZQuery;
+begin
+  inherited SaveToStream(stream);
+  qry := TZQuery(Self.Owner);
+  vDWMemtable := TRESTDWMemtable.Create(Nil);
+  try
+    vDWMemtable.Assign(qry);
+    vDWMemtable.SaveToStream(stream);
+    stream.Position := 0;
+  finally
+    FreeAndNil(vDWMemtable);
+  end;
+end;
+
+{ TRESTDWZeosTable }
+
+procedure TRESTDWZeosTable.SaveToStream(stream: TStream);
+var
+  vDWMemtable : TRESTDWMemtable;
+  qry : TZTable;
+begin
+  inherited SaveToStream(stream);
+  qry := TZTable(Self.Owner);
+  vDWMemtable := TRESTDWMemtable.Create(Nil);
+  try
+    vDWMemtable.Assign(qry);
+    vDWMemtable.SaveToStream(stream);
+    stream.Position := 0;
+  finally
+    FreeAndNil(vDWMemtable);
+  end;
 end;
 
 {$IFDEF FPC}

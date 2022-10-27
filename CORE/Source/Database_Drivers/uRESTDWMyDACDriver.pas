@@ -37,9 +37,7 @@ const
   crdwConnectionNotIsMyDAC = 'Componente não é um MyConnection';
 
 type
-  { TRESTDWMyDACDataset }
-
-  TRESTDWMyDACDataset = class(TRESTDWDrvDataset)
+  TRESTDWMyDACTable = class(TRESTDWDrvTable)
   public
     procedure SaveToStream(stream : TStream); override;
   end;
@@ -58,6 +56,7 @@ type
   protected
     procedure createSequencedField(seqname,field : string); override;
   public
+    procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
 
@@ -117,25 +116,6 @@ begin
   qry.Prepare;
 end;
 
-{ TRESTDWMyDACDataset }
-
-procedure TRESTDWMyDACDataset.SaveToStream(stream : TStream);
-var
-  vDWMemtable : TRESTDWMemtable;
-  qry : TCustomMyDataSet;
-begin
-  inherited SaveToStream(stream);
-  qry := TCustomMyDataSet(Self.Owner);
-  vDWMemtable := TRESTDWMemtable.Create(Nil);
-  try
-    vDWMemtable.Assign(qry);
-    vDWMemtable.SaveToStream(stream);
-    stream.Position := 0;
-  finally
-    FreeAndNil(vDWMemtable);
-  end;
-end;
-
  { TRESTDWMyDACDriver }
 
 function TRESTDWMyDACDriver.getConectionType : TRESTDWDatabaseType;
@@ -164,7 +144,7 @@ begin
   qry := TMyTable.Create(Self);
   qry.Connection := TMyConnection(Connection);
 
-  Result := TRESTDWDrvTable.Create(qry);
+  Result := TRESTDWMyDACTable.Create(qry);
 end;
 
 function TRESTDWMyDACDriver.getStoreProc : TRESTDWDrvStoreProc;
@@ -291,6 +271,43 @@ begin
   qry := TMyQuery(Self.Owner);
   Result := qry.RowsAffected;
 end;
+
+procedure TRESTDWMyDACQuery.SaveToStream(stream: TStream);
+var
+  vDWMemtable : TRESTDWMemtable;
+  qry : TMyQuery;
+begin
+  inherited SaveToStream(stream);
+  qry := TMyQuery(Self.Owner);
+  vDWMemtable := TRESTDWMemtable.Create(Nil);
+  try
+    vDWMemtable.Assign(qry);
+    vDWMemtable.SaveToStream(stream);
+    stream.Position := 0;
+  finally
+    FreeAndNil(vDWMemtable);
+  end;
+end;
+
+{ TRESTDWMyDACTable }
+
+procedure TRESTDWMyDACTable.SaveToStream(stream: TStream);
+var
+  vDWMemtable : TRESTDWMemtable;
+  qry : TMyTable;
+begin
+  inherited SaveToStream(stream);
+  qry := TMyTable(Self.Owner);
+  vDWMemtable := TRESTDWMemtable.Create(Nil);
+  try
+    vDWMemtable.Assign(qry);
+    vDWMemtable.SaveToStream(stream);
+    stream.Position := 0;
+  finally
+    FreeAndNil(vDWMemtable);
+  end;
+end;
+
 
 {$IFDEF FPC}
 initialization

@@ -31,10 +31,15 @@ uses
   apWin, ApConn, apoQSet, apCommon;
 
 type
+  TRESTDWApolloDBTable = class(TRESTDWDrvTable)
+  public
+    procedure SaveToStream(stream : TStream); override;
+  end;
   { TRESTDWApolloDBQuery }
 
   TRESTDWApolloDBQuery = class(TRESTDWDrvQuery)
   public
+    procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
 
@@ -108,7 +113,7 @@ begin
   qry.TableType    := FTableType;
   qry.Password     := FPassword;
 
-  Result := TRESTDWDrvTable.Create(qry);
+  Result := TRESTDWApolloDBTable.Create(qry);
 end;
 
 function TRESTDWApolloDBDriver.compConnIsValid(comp: TComponent): boolean;
@@ -169,6 +174,20 @@ var
 begin
   qry := TApolloQuery(Self.Owner);
   Result := -1; //qry.RowsAffected;
+end;
+
+procedure TRESTDWApolloDBQuery.SaveToStream(stream: TStream);
+begin
+  inherited;
+
+end;
+
+{ TRESTDWApolloDBTable }
+
+procedure TRESTDWApolloDBTable.SaveToStream(stream: TStream);
+begin
+  inherited;
+
 end;
 
 end.
