@@ -2757,6 +2757,45 @@ Begin
                        qry.Next;
                       End;
                     End;
+    dbtMsSQL      : begin
+                      qry.SQL.Add('select col.name');
+                      qry.SQL.Add('from sys.tables tab');
+                      qry.SQL.Add('inner join sys.indexes pk on');
+                      qry.SQL.Add('      tab.object_id = pk.object_id and ');
+                      qry.SQL.Add('      pk.is_primary_key = 1');
+                      qry.SQL.Add('inner join sys.index_columns ic on');
+                      qry.SQL.Add('      ic.object_id = tab.object_id and ');
+                      qry.SQL.Add('      ic.index_id = pk.index_id');
+                      qry.SQL.Add('inner join sys.columns col on');
+                      qry.SQL.Add('      ic.object_id = col.object_id');
+                      qry.SQL.Add('      and ic.column_id = col.column_id');
+                      qry.SQL.Add('where tab.name = '+QuotedStr(LowerCase(vTable)));
+                      If vSchema <> '' Then
+                        qry.SQL.Add('  and schema_name(tab.schema_id) = '+QuotedStr(LowerCase(vSchema)));
+                      qry.Open;
+                      While Not qry.Eof Do
+                       Begin
+                        FieldNames.Add(qry.FieldByName('name').AsString);
+                        qry.Next;
+                       End;
+    end;
+    dbtOracle     : begin
+                      qry.SQL.Add('select cc.column_name,');
+                      qry.SQL.Add('from all_constraints c');
+                      qry.SQL.Add('inner join all_cons_columns cc on');
+                      qry.SQL.Add('      c.constraint_name = cc.constraint_name and');
+                      qry.SQL.Add('	  c.owner = cc.owner');
+                      qry.SQL.Add('where c.constraint_type = ''P'' and');
+                      qry.SQL.Add('      cc.table_name = '+QuotedStr(LowerCase(vSchema)));
+                      If vSchema <> '' Then
+                        qry.SQL.Add('   and cc.owner = '+QuotedStr(LowerCase(vSchema)));
+                      qry.Open;
+                      While Not qry.Eof Do
+                       Begin
+                        FieldNames.Add(qry.FieldByName('column_name').AsString);
+                        qry.Next;
+                       End;
+    end;
    End;
   Finally
    FreeAndNil(qry);
