@@ -60,7 +60,7 @@ Uses
   Procedure ExecProc; Virtual;
   Procedure FetchAll; Virtual;
   Procedure SaveToStream(stream : TStream); Virtual;
-  procedure ImportParams(DWParams : TRESTDWParams);
+  Procedure ImportParams(DWParams : TRESTDWParams);
   Function  Eof         : Boolean; Virtual;
   Function  RecNo       : Int64;   Virtual;
   Function  RecordCount : Int64;   Virtual;
@@ -2122,6 +2122,7 @@ Var
       vParamsString   := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[2].Value{$IFDEF FPC}, csUndefined{$ENDIF});
       vBookmark       := TRESTDWJSONInterfaceObject(bJsonValueB).pairs[3].Value;
       vBinaryRequest  := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[4].Value);
+
       vDWParams.FromJSON(vParamsString, vBinaryRequest);
       Query.Close;
       Case vMassiveSQLMode Of
@@ -2131,7 +2132,7 @@ Var
                        Query.ImportParams(vDWParams);
                        Query.ExecSQL;
                       End;
-      End;
+      end;
      Finally
       Query.SQL.Clear;
       FreeAndNil(bJsonValueB);
