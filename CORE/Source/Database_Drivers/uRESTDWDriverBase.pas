@@ -60,6 +60,7 @@ Uses
   Procedure ExecProc; Virtual;
   Procedure FetchAll; Virtual;
   Procedure SaveToStream(stream : TStream); Virtual;
+  Procedure SaveToStreamCompatibleMode(stream : TStream); Virtual;
   Procedure ImportParams(DWParams : TRESTDWParams);
   Function  Eof         : Boolean; Virtual;
   Function  RecNo       : Int64;   Virtual;
@@ -545,6 +546,21 @@ Procedure TRESTDWDrvDataset.SaveToStream(stream: TStream);
 Begin
 
 End;
+
+procedure TRESTDWDrvDataset.SaveToStreamCompatibleMode(stream: TStream);
+var
+  qry : TDataSet;
+  memtable : TRESTDWMemtable;
+begin
+  memtable := TRESTDWMemtable.Create(nil);
+  try
+    memtable.Assign(qry);
+    memtable.SaveToStream(stream);
+    stream.Position := 0;
+  finally
+    FreeAndNil(memtable);
+  end;
+end;
 
 Function TRESTDWDrvDataset.Eof: boolean;
 Begin
