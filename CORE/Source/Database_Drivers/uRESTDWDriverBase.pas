@@ -41,6 +41,8 @@ Uses
    rdwDatabaseSubVersion    : Integer
  End;
 
+  TRESTDWDrvDataset      = Class;
+
   TRDWDrvParam = class(TObject)
   private
     FOwner : TPersistent;
@@ -99,19 +101,30 @@ Uses
 
   TRDWDrvParams = class(TCollection)
   private
+    FDataset : TRESTDWDrvDataset;
     function GetItem(Index: Integer): TRDWDrvParam;
   public
+    destructor Destroy; override;
+
     function FindParam(param : string) : TRDWDrvParam;
     property Items[Index: Integer]: TRDWDrvParam read GetItem; default;
+  published
+    property Dataset : TRESTDWDrvDataset read FDataset write FDataset;
  end;
 
-  TRESTDWDrvDataset      = Class(TComponent)
+ TRESTDWDrvDataset      = Class(TComponent)
+ private
+  FParamsList : TStringList;
+  FRDWParams : TRDWDrvParams;
  Protected
   Function  getFields                     : TFields; Virtual;
   Function  getParams                     : TRDWDrvParams; Virtual;
   Procedure CreateSequencedField(seqname,
                                  field    : String); Virtual;
  Public
+  constructor Create(AOwner : TComponent); override;
+  destructor Destroy; override;
+
   Procedure Close;    Virtual;
   Procedure Open;     Virtual;
   Procedure Insert;   Virtual;
@@ -140,6 +153,9 @@ Uses
   Function  GetParamIndex(param  : String) : integer; Virtual;
   Function  RowsAffected : Int64;    Virtual;
   Function  GetInsertID  : int64;    Virtual;
+
+  Function RESTDWParam(index : integer) : TRDWDrvParam;
+  Procedure AddRESTDWParam(index : integer; param : TRDWDrvParam);
  Published
   Property Params : TRDWDrvParams Read getParams;
   Property Fields : TFields Read getFields;
@@ -242,7 +258,6 @@ Uses
 
  Public
   constructor Create(AOwner : TComponent); override;
-  destructor Destroy; override;
 
   Function compConnIsValid(comp : TComponent) : boolean; virtual;
   Function  getConectionType : TRESTDWDatabaseType; Virtual;
@@ -406,20 +421,6 @@ Implementation
 Uses
   uRESTDWBasicDB;
 
-var
-  FParamsList : TStringList;
-
-procedure ClearParamsList;
-begin
-  if not Assigned(FParamsList) then
-    Exit;
-
-  while FParamsList.Count > 0 do begin
-    TObject(FParamsList.Objects[0]).Free;
-    FParamsList.Delete(0);
-  end;
-end;
-
 { TRESTDWDrvStoreProc }
 
 Function TRESTDWDrvStoreProc.getStoredProcName : String;
@@ -449,17 +450,37 @@ End;
 Function TRESTDWDrvDataset.getParams : TRDWDrvParams;
 Begin
   Try
-    Result := TRDWDrvParams(GetObjectProp(TDataSet(Self.Owner), 'Params'));
+    if not Assigned(FRDWParams) then begin
+      FRDWParams := TRDWDrvParams(GetObjectProp(TDataSet(Self.Owner), 'Params'));
+      FRDWParams.Dataset := Self;
+    end;
+    Result := FRDWParams;
   Except
     Result := Nil;
   End;
 End;
 
+constructor TRESTDWDrvDataset.Create(AOwner: TComponent);
+begin
+  inherited;
+  FRDWParams := nil;
+  FParamsList := TStringList.Create;
+end;
+
 Procedure TRESTDWDrvDataset.createSequencedField(seqname,
-                                              field    : String);
+                                                 field    : String);
 Begin
 
 End;
+
+procedure TRESTDWDrvDataset.AddRESTDWParam(index : integer; param: TRDWDrvParam);
+var
+  p : integer;
+begin
+  p := FParamsList.IndexOf(IntToStr(index));
+  if p < 0 then
+    FParamsList.AddObject(IntToStr(index),param);
+end;
 
 Procedure TRESTDWDrvDataset.Close;
 Begin
@@ -593,6 +614,20 @@ Begin
  TDataSet(Self.Owner).Delete;
 End;
 
+destructor TRESTDWDrvDataset.Destroy;
+var
+  obj : TObject;
+begin
+  while FParamsList.Count > 0 do begin
+    obj := TObject(FParamsList.Objects[0]);
+    FreeAndNil(obj);
+    FParamsList.Delete(0);
+  end;
+  FreeAndNil(FParamsList);
+  FRDWParams.Dataset := nil;
+  inherited;
+end;
+
 Procedure TRESTDWDrvDataset.Next;
 Begin
  TDataSet(Self.Owner).Next;
@@ -722,6 +757,16 @@ Begin
  End;
  Result := FieldTypeToDWFieldType(vDType);
 End;
+
+function TRESTDWDrvDataset.RESTDWParam(index: integer): TRDWDrvParam;
+var
+  p : integer;
+begin
+  Result := nil;
+  p := FParamsList.IndexOf(IntToStr(index));
+  if p >= 0 then
+    Result := TRDWDrvParam(FParamsList.Objects[p]);
+end;
 
 function TRESTDWDrvDataset.GetInsertID: int64;
 begin
@@ -1302,13 +1347,6 @@ Procedure TRESTDWDriverBase.Connect;
 Begin
 
 End;
-
-destructor TRESTDWDriverBase.Destroy;
-begin
-  ClearParamsList;
-  FreeAndNil(FParamsList);
-  inherited;
-end;
 
 Procedure TRESTDWDriverBase.Disconect;
 Begin
@@ -3632,9 +3670,6 @@ end;
 constructor TRESTDWDriverBase.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  if not Assigned(FParamsList) then
-    FParamsList          := TStringList.Create;
-
   vEncodeStrings       := True;
   {$IFDEF FPC}
     vDatabaseCharSet   := csUndefined;
@@ -4708,6 +4743,12 @@ end;
 
 { TRDWDrvParams }
 
+destructor TRDWDrvParams.Destroy;
+begin
+  FDataset := nil;
+  inherited;
+end;
+
 function TRDWDrvParams.FindParam(param: string): TRDWDrvParam;
 var
   I: Integer;
@@ -4726,19 +4767,12 @@ end;
 function TRDWDrvParams.GetItem(Index: Integer): TRDWDrvParam;
 var
   ci : TCollectionItem;
-  p : integer;
 begin
-  if not Assigned(FParamsList) then
-    FParamsList := TStringList.Create;
-
-  p := FParamsList.IndexOf(IntToStr(Index));
-  if p < 0 then begin
+  Result := FDataset.RESTDWParam(Index);
+  if Result = nil then begin
     ci := inherited Items[Index];
     Result := TRDWDrvParam.Create(ci);
-    FParamsList.AddObject(IntToStr(Index),Result);
-  end
-  else begin
-    Result := TRDWDrvParam(FParamsList.Objects[p]);
+    FDataset.AddRESTDWParam(Index,Result);
   end;
 end;
 
@@ -5003,12 +5037,5 @@ procedure TRDWDrvParam.setValue(const AValue: Variant);
 begin
   SetVariantProp(FOwner,'Value',AValue);
 end;
-
-initialization
-  FParamsList := nil;
-
-finalization
-  ClearParamsList;
-  FreeAndNil(FParamsList);
 
 end.
