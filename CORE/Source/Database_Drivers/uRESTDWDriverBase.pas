@@ -149,8 +149,6 @@ Uses
  Protected
   Function  getStoredProcName        : String;
   Procedure setStoredProcName(AValue : String);
- Public
-
  Published
   Property StoredProcName : String Read getStoredProcName Write setStoredProcName;
  End;
@@ -4718,7 +4716,7 @@ begin
   Result := nil;
   for I := 0 to Count - 1 do begin
     prm := Items[i];
-    if SameText(prm.Name,param) then begin
+    if (prm <> nil) and (SameText(prm.Name,param)) then begin
       Result := prm;
       Exit;
     end;
@@ -4730,6 +4728,9 @@ var
   ci : TCollectionItem;
   p : integer;
 begin
+  if not Assigned(FParamsList) then
+    FParamsList := TStringList.Create;
+
   p := FParamsList.IndexOf(IntToStr(Index));
   if p < 0 then begin
     ci := inherited Items[Index];
