@@ -3410,7 +3410,7 @@ Var
  vTempQuery      : TRESTDWDrvQuery;
  vTempJSON       : TJSONValue;
  vJSONLine       : String;
- I, X            : Integer;
+ I               : Integer;
  vMetaData,
  vBinaryEvent,
  vStateResource,
@@ -3448,14 +3448,7 @@ Begin
       DWParams := TRESTDWParams.Create;
       Try
        DWParams.FromJSON(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[1].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-       For X := 0 To DWParams.Count -1 Do
-        Begin
-         If vTempQuery.ParamByName(DWParams[X].ParamName) <> Nil Then
-          Begin
-           vTempQuery.ParamByName(DWParams[X].ParamName).DataType := ObjectValueToFieldType(DWParams[X].ObjectValue);
-           vTempQuery.ParamByName(DWParams[X].ParamName).Value    := DWParams[X].Value;
-          End;
-        End;
+       vTempQuery.ImportParams(DWParams);
       Finally
        DWParams.Free;
       End;
@@ -3589,14 +3582,7 @@ Begin
     DWParams := TRESTDWParams.Create;
     Try
      DWParams.LoadFromStream(vParamsStream);
-     For X := 0 To DWParams.Count - 1 Do
-      Begin
-       If vTempQuery.ParamByName(DWParams[X].ParamName) <> Nil Then
-        Begin
-         vTempQuery.ParamByName(DWParams[X].ParamName).DataType := ObjectValueToFieldType(DWParams[X].ObjectValue);
-         vTempQuery.ParamByName(DWParams[X].ParamName).Value    := DWParams[X].Value;
-        End;
-      End;
+     vTempQuery.ImportParams(DWParams);
     Finally
      DWParams.Free;
      If Assigned(vParamsStream) Then
