@@ -31,7 +31,7 @@ uses
     LResources,
   {$ENDIF}
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes, DB, MemDS,
-  DBAccess, Uni, uRESTDWMemtable;
+  DBAccess, Uni, uRESTDWMemtable, VirtualTable;
 
 const
   {$IFDEF FPC}
@@ -333,18 +333,17 @@ end;
 
 procedure TRESTDWUniDACQuery.SaveToStream(stream: TStream);
 var
-  vDWMemtable : TRESTDWMemtable;
+  vTable : TVirtualTable;
   qry : TUniQuery;
 begin
-  inherited SaveToStream(stream);
   qry := TUniQuery(Self.Owner);
-  vDWMemtable := TRESTDWMemtable.Create(Nil);
+  vTable  := TVirtualTable.Create(Nil);
   try
-    vDWMemtable.Assign(qry);
-    vDWMemtable.SaveToStream(stream);
+    vTable.Assign(qry);
+    vTable.SaveToStream(stream);
     stream.Position := 0;
   finally
-    FreeAndNil(vDWMemtable);
+    vTable.Free;
   end;
 end;
 
@@ -352,21 +351,19 @@ end;
 
 procedure TRESTDWUniDACTable.SaveToStream(stream: TStream);
 var
-  vDWMemtable : TRESTDWMemtable;
   qry : TUniTable;
+  vTable : TVirtualTable;
 begin
-  inherited SaveToStream(stream);
   qry := TUniTable(Self.Owner);
-  vDWMemtable := TRESTDWMemtable.Create(Nil);
+  vTable  := TVirtualTable.Create(Nil);
   try
-    vDWMemtable.Assign(qry);
-    vDWMemtable.SaveToStream(stream);
+    vTable.Assign(qry);
+    vTable.SaveToStream(stream);
     stream.Position := 0;
   finally
-    FreeAndNil(vDWMemtable);
+    vTable.Free;
   end;
 end;
-
 
 {$IFDEF FPC}
 initialization

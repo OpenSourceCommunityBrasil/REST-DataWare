@@ -31,20 +31,84 @@ Uses
   uRESTDWEncodeClass,   uRESTDWCharset,         uRESTDWComponentEvents,
   uRESTDWMassiveBuffer, uRESTDWJSONInterface,   uRESTDWConsts,
   uRESTDWDataModule,    uRESTDWBasicTypes,      uRESTDWTools,
-  uRESTDWBufferBase,    Variants;
+  uRESTDWBufferBase,    Variants,               uRESTDWMemtable;
 
  Type
   TRESTDWDatabaseInfo = Record
    rdwDatabaseName          : String;
    rdwDatabaseMajorVersion,
    rdwDatabaseMinorVersion,
-   rdwDatabaseSubVersion    : Integer;
+   rdwDatabaseSubVersion    : Integer
  End;
+
+  TRDWDrvParam = class(TObject)
+  private
+    FOwner : TPersistent;
+    function getAsLargeInt: int64;
+    function getAsInteger: integer;
+    function getAsSmallint: smallInt;
+    function geAsInteger: integer;
+    function getAsDateTime: TDateTime;
+    function getAsFloat: Double;
+    function getAsString: string;
+    procedure setAsDate(const AValue: TDateTime);
+    procedure setAsDateTime(const AValue: TDateTime);
+    procedure setAsFloat(const AValue: Double);
+    procedure setAsTime(const AValue: TDateTime);
+    procedure setAsLargeInt(const AValue: int64);
+    procedure setAsInteger(const AValue: integer);
+    procedure setAsSmallint(const AValue: smallInt);
+    procedure setAsString(const AValue: string);
+    function getIsUnicode: Boolean;
+  protected
+    function getDataType: TFieldType; virtual;
+    procedure setDataType(const AValue: TFieldType); virtual;
+    function getName: string;
+    procedure setName(const AValue: string);
+    function getValue: Variant;
+    procedure setValue(const AValue: Variant);
+    function getSize: integer;
+    procedure setSize(const AValue: integer);
+
+    procedure BeginSetBlobRawData;
+    function EndSetBlobRawData(ALen: LongWord; APtr: PByte): PByte;
+
+    constructor Create(AOwner : TPersistent);
+    destructor Destroy; override;
+  public
+    function IsNull : boolean;
+    procedure Clear;
+    procedure LoadFromFile(const AFileName: String; ABlobType: TFieldType);
+    procedure LoadFromStream(AStream: TStream; ABlobType: TFieldType);
+  published
+    property IsUnicode: Boolean    read getIsUnicode;
+    property DataType : TFieldType read getDataType write setDataType;
+    property Name     : string     read getName write setName;
+    property Value    : Variant    read getValue write setValue;
+    property Size     : integer    read getSize write setSize;
+
+    property AsLargeint : int64     read getAsLargeInt write setAsLargeInt;
+    property AsSmallint : smallInt  read getAsSmallint write setAsSmallint;
+    property AsInteger  : integer   read getAsInteger  write setAsInteger;
+    property AsFloat    : Double    read getAsFloat    write setAsFloat;
+    property AsDate     : TDateTime read getAsDateTime write setAsDate;
+    property AsTime     : TDateTime read getAsDateTime write setAsTime;
+    property AsDateTime : TDateTime read getAsDateTime write setAsDateTime;
+    property AsString   : string    read getAsString   write setAsString;
+  end;
+
+  TRDWDrvParams = class(TCollection)
+  private
+    function GetItem(Index: Integer): TRDWDrvParam;
+  public
+    function FindParam(param : string) : TRDWDrvParam;
+    property Items[Index: Integer]: TRDWDrvParam read GetItem; default;
+ end;
 
   TRESTDWDrvDataset      = Class(TComponent)
  Protected
   Function  getFields                     : TFields; Virtual;
-  Function  getParams                     : TParams; Virtual;
+  Function  getParams                     : TRDWDrvParams; Virtual;
   Procedure CreateSequencedField(seqname,
                                  field    : String); Virtual;
  Public
@@ -60,23 +124,24 @@ Uses
   Procedure ExecProc; Virtual;
   Procedure FetchAll; Virtual;
   Procedure SaveToStream(stream : TStream); Virtual;
-  procedure ImportParams(DWParams : TRESTDWParams);
+  Procedure SaveToStreamCompatibleMode(stream : TStream); Virtual;
+  Procedure ImportParams(DWParams : TRESTDWParams);
   Function  Eof         : Boolean; Virtual;
   Function  RecNo       : Int64;   Virtual;
   Function  RecordCount : Int64;   Virtual;
   Function  ParamCount  : Integer; Virtual;
-  Function  ParamByName(param : String) : TParam; Virtual;
+  Function  ParamByName(param : String) : TRDWDrvParam; Virtual;
   Function  FieldByName(field : String) : TField; Virtual;
   Function  FindField  (field : String) : TField; Virtual;
   Function  RESTDWDataTypeFieldName(field  : String) : Byte;    Virtual;
   Function  RESTDWDataTypeParamName(param  : String) : Byte;    Virtual;
   function  RESTDWDataTypeField(idx : integer) : Byte; virtual;
   function  RESTDWDataTypeParam(idx : integer) : Byte; virtual;
-  Function  GetParamIndex       (param  : String) : integer; Virtual;
+  Function  GetParamIndex(param  : String) : integer; Virtual;
   Function  RowsAffected : Int64;    Virtual;
   Function  GetInsertID  : int64;    Virtual;
  Published
-  Property Params : TParams Read getParams;
+  Property Params : TRDWDrvParams Read getParams;
   Property Fields : TFields Read getFields;
  End;
  { TRESTDWDrvStoreProc }
@@ -179,6 +244,7 @@ Uses
 
  Public
   constructor Create(AOwner : TComponent); override;
+  destructor Destroy; override;
 
   Function compConnIsValid(comp : TComponent) : boolean; virtual;
   Function  getConectionType : TRESTDWDatabaseType; Virtual;
@@ -340,7 +406,21 @@ Uses
 Implementation
 
 Uses
- uRESTDWBasicDB;
+  uRESTDWBasicDB;
+
+var
+  FParamsList : TStringList;
+
+procedure ClearParamsList;
+begin
+  if not Assigned(FParamsList) then
+    Exit;
+
+  while FParamsList.Count > 0 do begin
+    TObject(FParamsList.Objects[0]).Free;
+    FParamsList.Delete(0);
+  end;
+end;
 
 { TRESTDWDrvStoreProc }
 
@@ -368,13 +448,13 @@ Begin
  Result := TDataSet(Self.Owner).Fields;
 End;
 
-Function TRESTDWDrvDataset.getParams : TParams;
+Function TRESTDWDrvDataset.getParams : TRDWDrvParams;
 Begin
- Try
-  Result := TParams(GetObjectProp(Self.Owner, 'Params'));
- Except
-  Result := Nil;
- End;
+  Try
+    Result := TRDWDrvParams(GetObjectProp(TDataSet(Self.Owner), 'Params'));
+  Except
+    Result := Nil;
+  End;
 End;
 
 Procedure TRESTDWDrvDataset.createSequencedField(seqname,
@@ -414,7 +494,7 @@ begin
       A := Self.GetParamIndex(vParamName);
       if A > -1 then begin
         if Self.RESTDWDataTypeParam(A) in [dwftFixedChar,dwftFixedWideChar,dwftString,dwftWideString,
-                                        dwftMemo,dwftFmtMemo,dwftWideMemo] then begin
+                                           dwftMemo,dwftFmtMemo,dwftWideMemo] then begin
           if Self.RESTDWDataTypeParam(A) in [dwftMemo, dwftFmtMemo, dwftWideMemo] then
             Self.Params[A].Value := DWParams[I].Value
           else begin
@@ -433,7 +513,7 @@ begin
           end;
 
           if Self.RESTDWDataTypeParam(A) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
-            if Trim(DWParams[I].Value) <> '' then begin
+            if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then begin
               if Self.RESTDWDataTypeParam(A) in [dwftLongWord, dwftLargeint] then
                 Self.Params[A].AsLargeInt := StrToInt64(DWParams[I].Value)
               else If Self.Params[A].DataType = ftSmallInt Then
@@ -445,13 +525,13 @@ begin
               Self.Params[A].Clear;
           end
           else if Self.RESTDWDataTypeParam(A) in [dwftFloat,dwftCurrency,dwftBCD,dwftFMTBcd,dwftSingle] then begin
-            if Trim(DWParams[I].Value) <> '' then
+            if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then
               Self.Params[A].AsFloat  := StrToFloat(BuildFloatString(DWParams[I].Value))
             else
               Self.Params[A].Clear;
           end
           else If Self.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] then begin
-            if Trim(DWParams[I].Value) <> '' then begin
+            if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then begin
               if Self.Params[A].DataType = ftDate then
                 Self.Params[A].AsDate := DWParams[I].AsDateTime
               else If Self.Params[A].DataType = ftTime then
@@ -464,8 +544,7 @@ begin
           end
           //Tratar Blobs de Parametros...
           else if Self.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob,ftGraphic, ftOraBlob, ftOraClob] then begin
-            if Not Assigned(vStringStream) Then
-              vStringStream  := TMemoryStream.Create;
+            vStringStream  := TMemoryStream.Create;
             try
               DWParams[I].SaveToStream(TStream(vStringStream));
               vStringStream.Position := 0;
@@ -477,19 +556,19 @@ begin
           end
           else if Self.RESTDWDataTypeParam(A) in [dwftFixedChar, dwftFixedWideChar,
                   dwftString, dwftWideString, dwftMemo, dwftFmtMemo, dwftWideMemo] then begin
-              if (Trim(DWParams[I].Value) <> '') then
-               Self.Params[A].AsString := Params[I].Value
+              if (not DWParams[I].IsNull) then
+               Self.Params[A].AsString := DWParams[I].Value
               Else
                Self.Params[A].Clear;
           end
           else If Self.Params[A].DataType in [ftGuid] Then begin
-            if (Not (Params[I].IsNull)) Then
-                Self.Params[A].Value := Params[I].AsString
+            if (not (DWParams[I].IsNull)) Then
+                Self.Params[A].Value := DWParams[I].AsString
               Else
                 Self.Params[A].Clear;
           end
           else
-            Self.Params[A].Value := Params[I].Value;
+            Self.Params[A].Value := DWParams[I].Value;
         end;
       end;
     end
@@ -546,6 +625,22 @@ Begin
 
 End;
 
+procedure TRESTDWDrvDataset.SaveToStreamCompatibleMode(stream: TStream);
+var
+  qry : TDataSet;
+  memtable : TRESTDWMemtable;
+begin
+  qry := TDataSet(qry.Owner);
+  memtable := TRESTDWMemtable.Create(nil);
+  try
+    memtable.Assign(qry);
+    memtable.SaveToStream(stream);
+    stream.Position := 0;
+  finally
+    FreeAndNil(memtable);
+  end;
+end;
+
 Function TRESTDWDrvDataset.Eof: boolean;
 Begin
  Result := TDataSet(Self.Owner).EOF;
@@ -575,7 +670,7 @@ Begin
  End;
 End;
 
-Function TRESTDWDrvDataset.ParamByName(param: String): TParam;
+Function TRESTDWDrvDataset.ParamByName(param: String): TRDWDrvParam;
 Begin
  Try
   Result := Params.FindParam(param);
@@ -623,7 +718,7 @@ Var
  vDType : TFieldType;
 Begin
  Try
-  vDType := ParamByName(param).DataType;
+  vDType := TRDWDrvParam(ParamByName(param)).DataType;
  Except
   vDType := ftUnknown;
  End;
@@ -636,15 +731,17 @@ begin
 end;
 
 Function TRESTDWDrvDataset.GetParamIndex(param : String): integer;
-Var
- prm : TParam;
-Begin
- Try
-  prm := Params.FindParam(param);
-  Result := prm.Index;
- Except
-  Result := -1;
- End;
+var
+  I: Integer;
+  prm : string;
+begin
+  for I := 0 to Params.Count - 1 do begin
+    prm := Params.Items[I].Name;
+    if SameText(prm,param) then begin
+      Result := i;
+      Break;
+    end;
+  end;
 End;
 
 { TRESTDWDrvTable }
@@ -1207,6 +1304,13 @@ Procedure TRESTDWDriverBase.Connect;
 Begin
 
 End;
+
+destructor TRESTDWDriverBase.Destroy;
+begin
+  ClearParamsList;
+  FreeAndNil(FParamsList);
+  inherited;
+end;
 
 Procedure TRESTDWDriverBase.Disconect;
 Begin
@@ -2122,6 +2226,7 @@ Var
       vParamsString   := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[2].Value{$IFDEF FPC}, csUndefined{$ENDIF});
       vBookmark       := TRESTDWJSONInterfaceObject(bJsonValueB).pairs[3].Value;
       vBinaryRequest  := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[4].Value);
+
       vDWParams.FromJSON(vParamsString, vBinaryRequest);
       Query.Close;
       Case vMassiveSQLMode Of
@@ -2131,7 +2236,7 @@ Var
                        Query.ImportParams(vDWParams);
                        Query.ExecSQL;
                       End;
-      End;
+      end;
      Finally
       Query.SQL.Clear;
       FreeAndNil(bJsonValueB);
@@ -3305,7 +3410,7 @@ Var
  vTempQuery      : TRESTDWDrvQuery;
  vTempJSON       : TJSONValue;
  vJSONLine       : String;
- I, X            : Integer;
+ I               : Integer;
  vMetaData,
  vBinaryEvent,
  vStateResource,
@@ -3343,14 +3448,7 @@ Begin
       DWParams := TRESTDWParams.Create;
       Try
        DWParams.FromJSON(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[1].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-       For X := 0 To DWParams.Count -1 Do
-        Begin
-         If vTempQuery.ParamByName(DWParams[X].ParamName) <> Nil Then
-          Begin
-           vTempQuery.ParamByName(DWParams[X].ParamName).DataType := ObjectValueToFieldType(DWParams[X].ObjectValue);
-           vTempQuery.ParamByName(DWParams[X].ParamName).Value    := DWParams[X].Value;
-          End;
-        End;
+       vTempQuery.ImportParams(DWParams);
       Finally
        DWParams.Free;
       End;
@@ -3484,14 +3582,7 @@ Begin
     DWParams := TRESTDWParams.Create;
     Try
      DWParams.LoadFromStream(vParamsStream);
-     For X := 0 To DWParams.Count - 1 Do
-      Begin
-       If vTempQuery.ParamByName(DWParams[X].ParamName) <> Nil Then
-        Begin
-         vTempQuery.ParamByName(DWParams[X].ParamName).DataType := ObjectValueToFieldType(DWParams[X].ObjectValue);
-         vTempQuery.ParamByName(DWParams[X].ParamName).Value    := DWParams[X].Value;
-        End;
-      End;
+     vTempQuery.ImportParams(DWParams);
     Finally
      DWParams.Free;
      If Assigned(vParamsStream) Then
@@ -3543,6 +3634,8 @@ end;
 constructor TRESTDWDriverBase.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  if not Assigned(FParamsList) then
+    FParamsList          := TStringList.Create;
 
   vEncodeStrings       := True;
   {$IFDEF FPC}
@@ -4615,4 +4708,306 @@ Begin
   End;
 end;
 
-End.
+{ TRDWDrvParams }
+
+function TRDWDrvParams.FindParam(param: string): TRDWDrvParam;
+var
+  I: Integer;
+  prm : TRDWDrvParam;
+begin
+  Result := nil;
+  for I := 0 to Count - 1 do begin
+    prm := Items[i];
+    if SameText(prm.Name,param) then begin
+      Result := prm;
+      Exit;
+    end;
+  end;
+end;
+
+function TRDWDrvParams.GetItem(Index: Integer): TRDWDrvParam;
+var
+  ci : TCollectionItem;
+  p : integer;
+begin
+  p := FParamsList.IndexOf(IntToStr(Index));
+  if p < 0 then begin
+    ci := inherited Items[Index];
+    Result := TRDWDrvParam.Create(ci);
+    FParamsList.AddObject(IntToStr(Index),Result);
+  end
+  else begin
+    Result := TRDWDrvParam(FParamsList.Objects[p]);
+  end;
+end;
+
+{ TRDWDrvParam }
+
+procedure TRDWDrvParam.BeginSetBlobRawData;
+begin
+  if not (DataType in [ftString, ftWideString, ftFixedChar,
+                       ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftDBaseOle,
+                       ftTypedBinary, ftOraBlob, ftOraClob,
+                       ftWideMemo, ftFixedWideChar]) then
+    DataType := ftBlob;
+  Value := null;
+end;
+
+procedure TRDWDrvParam.Clear;
+begin
+  Value := null;
+end;
+
+constructor TRDWDrvParam.Create(AOwner: TPersistent);
+begin
+  FOwner := AOwner;
+end;
+
+destructor TRDWDrvParam.Destroy;
+begin
+  FOwner := nil;
+  inherited;
+end;
+
+function TRDWDrvParam.EndSetBlobRawData(ALen: LongWord; APtr: PByte): PByte;
+var
+  pData: PVarData;
+  pVar : Variant;
+begin
+  pVar := Value;
+  pData := @TVarData(pVar);
+  if IsUnicode then begin
+    pData^.VType := varUString;
+    if APtr <> nil then
+      SetString(UnicodeString(pData^.VUString), PWideChar(APtr), ALen)
+    else
+      SetLength(UnicodeString(pData^.VUString), ALen);
+    Result := PByte(PWideChar(UnicodeString(pData^.VUString)));
+  end
+  else begin
+{$IFDEF NEXTGEN}
+    FValue[AIndex] := VarArrayCreate([0, Integer(ALen) - 1], varByte);
+    Result := PByte(pData^.VArray^.Data);
+    if APtr <> nil then
+      Move(APtr^, Result^, ALen);
+{$ELSE}
+    pData^.VType := varString;
+    if APtr <> nil then
+      SetString(AnsiString(pData^.VString), PAnsiChar(APtr), ALen)
+    else
+      SetLength(AnsiString(pData^.VString), ALen);
+    Result := PByte(PAnsiChar(AnsiString(pData^.VString)));
+{$ENDIF}
+  end;
+  if (APtr = nil) and (ALen = 0) then
+    Result := nil;
+end;
+
+function TRDWDrvParam.geAsInteger: integer;
+begin
+  Result := 0;
+  if not IsNull then
+    Result := Value
+end;
+
+function TRDWDrvParam.getAsDateTime: TDateTime;
+begin
+  Result := 0.0;
+  if not IsNull then
+    Result := VarToDateTime(Value);
+end;
+
+function TRDWDrvParam.getAsFloat: Double;
+begin
+  Result := 0.0;
+  if not IsNull then
+    Result := Value
+end;
+
+function TRDWDrvParam.getAsInteger: integer;
+begin
+  Result := 0;
+  if not IsNull then
+    Result := Value
+end;
+
+function TRDWDrvParam.getAsLargeInt: int64;
+begin
+  Result := 0;
+  if not IsNull then
+    Result := Value
+end;
+
+function TRDWDrvParam.getAsSmallint: smallInt;
+begin
+  Result := 0;
+  if not IsNull then
+    Result := Value
+end;
+
+function TRDWDrvParam.getAsString: string;
+begin
+  Result := '';
+  if not IsNull then
+    Result := VarToStr(Value);
+end;
+
+function TRDWDrvParam.getDataType: TFieldType;
+var
+  enum : string;
+begin
+  enum := GetEnumProp(FOwner,'DataType');
+  Result := TFieldType(GetEnumValue(TypeInfo(TFieldType),enum));
+end;
+
+function TRDWDrvParam.getIsUnicode: Boolean;
+begin
+  Result := (DataType in [ftWideString, ftFixedWideChar, ftWideMemo,
+                          ftFmtMemo, ftDBaseOle]) or (DataType = ftOraClob);
+end;
+
+function TRDWDrvParam.getName: string;
+begin
+  Result := GetStrProp(FOwner,'Name');
+end;
+
+function TRDWDrvParam.getSize: integer;
+begin
+  Result := GetInt64Prop(FOwner,'Size');
+end;
+
+function TRDWDrvParam.getValue: Variant;
+begin
+  Result := GetVariantProp(FOwner,'Value');
+end;
+
+function TRDWDrvParam.IsNull: boolean;
+var
+  pData: PVarData;
+begin
+  pData := FindVarData(Value);
+  Result := (pData^.VType = varNull) or (pData^.VType = varEmpty);
+end;
+
+procedure TRDWDrvParam.LoadFromFile(const AFileName: String; ABlobType: TFieldType);
+var
+  stream: TStream;
+begin
+  stream := TFileStream.Create(AFileName, fmOpenRead or fmShareDenyWrite);
+  try
+    LoadFromStream(stream, ABlobType);
+  finally
+    stream.Free;
+  end;
+end;
+
+procedure TRDWDrvParam.LoadFromStream(AStream: TStream; ABlobType: TFieldType);
+
+  function ReallocRawData(ALen: LongWord): PByte;
+  begin
+    if IsUnicode then
+      ALen := ALen div SizeOf(WideChar);
+    Result := EndSetBlobRawData(ALen, nil);
+  end;
+
+const
+  CBufSize = $7FFE;
+var
+  iLen: LongInt;
+  iRead: Integer;
+begin
+  BeginSetBlobRawData;
+  DataType := ABlobType;
+  AStream.Position := 0;
+  iLen := AStream.Size;
+  if iLen < 0 then begin
+    iLen := 0;
+    repeat
+      iRead := AStream.Read((ReallocRawData(iLen + CBufSize) + iLen)^, CBufSize);
+      Inc(iLen, iRead);
+    until iRead < CBufSize;
+    ReallocRawData(iLen);
+  end
+  else
+    AStream.ReadBuffer(ReallocRawData(iLen)^, iLen);
+end;
+
+procedure TRDWDrvParam.setAsDate(const AValue: TDateTime);
+begin
+  DataType := ftDate;
+  Value := AValue;
+end;
+
+procedure TRDWDrvParam.setAsDateTime(const AValue: TDateTime);
+begin
+  DataType := ftDateTime;
+  Value := AValue;
+end;
+
+procedure TRDWDrvParam.setAsFloat(const AValue: Double);
+begin
+  DataType := ftFloat;
+  Value := AValue;
+end;
+
+procedure TRDWDrvParam.setAsInteger(const AValue: integer);
+begin
+  DataType := ftInteger;
+  Value := AValue;
+end;
+
+procedure TRDWDrvParam.setAsLargeInt(const AValue: int64);
+begin
+  DataType := ftLargeint;
+  Value := AValue;
+end;
+
+procedure TRDWDrvParam.setAsSmallint(const AValue: smallInt);
+begin
+  DataType := ftSmallint;
+  Value := AValue;
+end;
+
+procedure TRDWDrvParam.setAsString(const AValue: string);
+begin
+  DataType := ftString;
+  Value := AValue;
+end;
+
+procedure TRDWDrvParam.setAsTime(const AValue: TDateTime);
+begin
+  DataType := ftTime;
+  Value := AValue;
+end;
+
+procedure TRDWDrvParam.setDataType(const AValue: TFieldType);
+var
+  enum : string;
+begin
+  enum := GetEnumName(TypeInfo(TFieldType),Ord(AValue));
+  SetEnumProp(FOwner,'DataType',enum);
+end;
+
+procedure TRDWDrvParam.setName(const AValue: string);
+begin
+  SetStrProp(FOwner,'Name',Value);
+end;
+
+procedure TRDWDrvParam.setSize(const AValue: integer);
+begin
+  SetInt64Prop(FOwner,'Size',AValue);
+end;
+
+procedure TRDWDrvParam.setValue(const AValue: Variant);
+begin
+  SetVariantProp(FOwner,'Value',AValue);
+end;
+
+initialization
+  FParamsList := nil;
+
+finalization
+  ClearParamsList;
+  FreeAndNil(FParamsList);
+
+end.

@@ -30,9 +30,15 @@ uses
   {$IFDEF FPC}
     LResources,
   {$ENDIF}
+
+  {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
+    ZMemTable,
+  {$ELSE}
+    uRESTDWMemTable,
+  {$ENDIF}
   Classes, SysUtils, uRESTDWDriverBase, ZConnection, uRESTDWBasicTypes,
   ZDataset, ZSequence, ZDbcIntfs, ZAbstractRODataset, ZAbstractDataset,
-  ZStoredProcedure, uRESTDWMemtable;
+  ZStoredProcedure;
 
 const
   {$IFDEF FPC}
@@ -366,18 +372,29 @@ end;
 
 procedure TRESTDWZeosQuery.SaveToStream(stream: TStream);
 var
-  vDWMemtable : TRESTDWMemtable;
   qry : TZQuery;
+  {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
+    memtable : TZMemTable;
+  {$ELSE}
+    memtable : TRESTDWMemtable;
+  {$ENDIF}
 begin
-  inherited SaveToStream(stream);
   qry := TZQuery(Self.Owner);
-  vDWMemtable := TRESTDWMemtable.Create(Nil);
+  {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
+    memtable := TZMemTable.Create(nil);
+  {$ELSE}
+    memtable := TRESTDWMemtable.Create(nil);
+  {$ENDIF}
   try
-    vDWMemtable.Assign(qry);
-    vDWMemtable.SaveToStream(stream);
+    {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
+      memtable.AssignDataFrom(qry);
+    {$ELSE}
+      memtable.Assign(qry);
+    {$ENDIF}
+    memtable.SaveToStream(stream);
     stream.Position := 0;
   finally
-    FreeAndNil(vDWMemtable);
+    FreeAndNil(memtable);
   end;
 end;
 
@@ -385,18 +402,29 @@ end;
 
 procedure TRESTDWZeosTable.SaveToStream(stream: TStream);
 var
-  vDWMemtable : TRESTDWMemtable;
   qry : TZTable;
+  {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
+    memtable : TZMemTable;
+  {$ELSE}
+    memtable : TRESTDWMemtable;
+  {$ENDIF}
 begin
-  inherited SaveToStream(stream);
   qry := TZTable(Self.Owner);
-  vDWMemtable := TRESTDWMemtable.Create(Nil);
+  {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
+    memtable := TZMemTable.Create(nil);
+  {$ELSE}
+    memtable := TRESTDWMemtable.Create(nil);
+  {$ENDIF}
   try
-    vDWMemtable.Assign(qry);
-    vDWMemtable.SaveToStream(stream);
+    {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
+      memtable.AssignDataFrom(qry);
+    {$ELSE}
+      memtable.Assign(qry);
+    {$ENDIF}
+    memtable.SaveToStream(stream);
     stream.Position := 0;
   finally
-    FreeAndNil(vDWMemtable);
+    FreeAndNil(memtable);
   end;
 end;
 
