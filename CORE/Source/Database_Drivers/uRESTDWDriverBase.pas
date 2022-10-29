@@ -4715,6 +4715,7 @@ var
   I: Integer;
   prm : TRDWDrvParam;
 begin
+  Result := nil;
   for I := 0 to Count - 1 do begin
     prm := Items[i];
     if SameText(prm.Name,param) then begin
@@ -4722,7 +4723,6 @@ begin
       Exit;
     end;
   end;
-  Result := nil;
 end;
 
 function TRDWDrvParams.GetItem(Index: Integer): TRDWDrvParam;
