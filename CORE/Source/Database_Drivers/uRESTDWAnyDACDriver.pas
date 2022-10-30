@@ -68,6 +68,7 @@ type
   TRESTDWAnyDACTable = class(TRESTDWDrvTable)
   public
     procedure SaveToStream(stream : TStream); override;
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
   end;
 
   { TRESTDWAnyDACQuery }
@@ -79,6 +80,7 @@ type
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
 
     function RowsAffected : Int64; override;
   end;
@@ -369,6 +371,15 @@ begin
   qry.ExecSQL;
 end;
 
+procedure TRESTDWAnyDACQuery.LoadFromStreamParam(IParam: integer;
+  stream: TStream; blobtype: TBlobType);
+var
+  qry : TADQuery;
+begin
+  qry := TADQuery(Self.Owner);
+
+end;
+
 procedure TRESTDWAnyDACQuery.Prepare;
 var
   qry : TADQuery;
@@ -399,11 +410,19 @@ end;
 
 { TRESTDWAnyDACTable }
 
+procedure TRESTDWAnyDACTable.LoadFromStreamParam(IParam: integer;
+  stream: TStream; blobtype: TBlobType);
+var
+  qry : TADTable;
+begin
+  qry := TADTable(Self.Owner);
+
+end;
+
 procedure TRESTDWAnyDACTable.SaveToStream(stream: TStream);
 var
   qry : TADTable;
 begin
-  inherited SaveToStream(stream);
   qry := TADTable(Self.Owner);
   qry.SaveToStream(stream);
 

@@ -70,6 +70,7 @@ type
   TRESTDWUniDACTable = class(TRESTDWDrvTable)
   public
     procedure SaveToStream(stream : TStream); override;
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
   end;
 
   { TRESTDWUniDACStoreProc }
@@ -89,6 +90,7 @@ type
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
 
     function RowsAffected : Int64; override;
   end;
@@ -96,10 +98,16 @@ type
   { TRESTDWUniDACDriver }
 
   TRESTDWUniDACDriver = class(TRESTDWDriverBase)
+  private
+    FTransaction : TUniTransaction;
   protected
+    procedure setConnection(AValue: TComponent); override;
     function getConectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
   public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+
     function getQuery : TRESTDWDrvQuery; override;
     function getTable : TRESTDWDrvTable; override;
     function getStoreProc : TRESTDWDrvStoreProc; override;
@@ -178,6 +186,7 @@ begin
   qry.Options.SetEmptyStrToNull := StrsEmpty2Null;
   qry.Options.TrimVarChar       := StrsTrim;
   qry.Options.TrimFixedChar     := StrsTrim;
+  qry.Transaction               := FTransaction;
 
   Result := TRESTDWUniDACQuery.Create(qry);
 end;
@@ -187,7 +196,11 @@ var
   qry : TUniTable;
 begin
   qry := TUniTable.Create(Self);
-  qry.Connection := TUniConnection(Connection);
+  qry.Connection  := TUniConnection(Connection);
+  qry.Options.SetEmptyStrToNull := StrsEmpty2Null;
+  qry.Options.TrimVarChar       := StrsTrim;
+  qry.Options.TrimFixedChar     := StrsTrim;
+  qry.Transaction               := FTransaction;
 
   Result := TRESTDWUniDACTable.Create(qry);
 end;
@@ -201,6 +214,7 @@ begin
   qry.Options.SetEmptyStrToNull := StrsEmpty2Null;
   qry.Options.TrimVarChar       := StrsTrim;
   qry.Options.TrimFixedChar     := StrsTrim;
+  qry.Transaction               := FTransaction;
 
   Result := TRESTDWUniDACStoreProc.Create(qry);
 end;
@@ -210,6 +224,12 @@ begin
   if Assigned(Connection) then
     TUniConnection(Connection).Open;
   inherited Connect;
+end;
+
+destructor TRESTDWUniDACDriver.Destroy;
+begin
+  FreeAndNil(FTransaction);
+  inherited;
 end;
 
 procedure TRESTDWUniDACDriver.Disconect;
@@ -224,6 +244,15 @@ begin
   Result:=inherited isConnected;
   if Assigned(Connection) then
     Result := TUniConnection(Connection).Connected;
+end;
+
+procedure TRESTDWUniDACDriver.setConnection(AValue: TComponent);
+begin
+  inherited;
+  if not Assigned(FTransaction) then
+    FTransaction := TUniTransaction.Create(Self);
+  FTransaction.DefaultConnection := TUniConnection(AValue);
+  TUniConnection(AValue).DefaultTransaction := FTransaction;
 end;
 
 function TRESTDWUniDACDriver.connInTransaction : boolean;
@@ -257,6 +286,13 @@ begin
   inherited connCommit;
   if Assigned(Connection) then
     TUniConnection(Connection).Commit;
+end;
+
+constructor TRESTDWUniDACDriver.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FTransaction := TUniTransaction.Create(Self);
+  FTransaction.DefaultConnection := TUniConnection(Connection);
 end;
 
 class procedure TRESTDWUniDACDriver.CreateConnection(const AConnectionDefs : TConnectionDefs;
@@ -314,6 +350,15 @@ begin
   qry.ExecSQL;
 end;
 
+procedure TRESTDWUniDACQuery.LoadFromStreamParam(IParam: integer;
+  stream: TStream; blobtype: TBlobType);
+var
+  qry : TUniQuery;
+begin
+  qry := TUniQuery(Self.Owner);
+  qry.Params[IParam].LoadFromStream(stream,blobtype);
+end;
+
 procedure TRESTDWUniDACQuery.Prepare;
 var
   qry : TUniQuery;
@@ -348,6 +393,15 @@ begin
 end;
 
 { TRESTDWUniDACTable }
+
+procedure TRESTDWUniDACTable.LoadFromStreamParam(IParam: integer;
+  stream: TStream; blobtype: TBlobType);
+var
+  qry : TUniTable;
+begin
+  qry := TUniTable(Self.Owner);
+  qry.Params[IParam].LoadFromStream(stream,blobtype);
+end;
 
 procedure TRESTDWUniDACTable.SaveToStream(stream: TStream);
 var

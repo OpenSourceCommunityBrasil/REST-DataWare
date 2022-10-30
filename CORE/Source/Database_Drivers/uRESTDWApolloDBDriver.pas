@@ -34,11 +34,13 @@ type
   TRESTDWApolloDBTable = class(TRESTDWDrvTable)
   public
     procedure SaveToStream(stream : TStream); override;
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
   end;
   { TRESTDWApolloDBQuery }
 
   TRESTDWApolloDBQuery = class(TRESTDWDrvQuery)
   public
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
@@ -159,6 +161,13 @@ begin
   qry.ExecSQL;
 end;
 
+procedure TRESTDWApolloDBQuery.LoadFromStreamParam(IParam: integer;
+  stream: TStream; blobtype: TBlobType);
+begin
+  inherited;
+
+end;
+
 procedure TRESTDWApolloDBQuery.Prepare;
 var
   qry : TApolloQuery;
@@ -183,6 +192,13 @@ begin
 end;
 
 { TRESTDWApolloDBTable }
+
+procedure TRESTDWApolloDBTable.LoadFromStreamParam(IParam: integer;
+  stream: TStream; blobtype: TBlobType);
+begin
+  inherited;
+
+end;
 
 procedure TRESTDWApolloDBTable.SaveToStream(stream: TStream);
 begin

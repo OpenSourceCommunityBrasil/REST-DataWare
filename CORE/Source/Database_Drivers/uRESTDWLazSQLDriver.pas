@@ -52,6 +52,7 @@ type
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
 
     destructor Destroy; override;
 
@@ -123,6 +124,15 @@ begin
   inherited ExecSQL;
   qry := TSQLQuery(Self.Owner);
   qry.ExecSQL;
+end;
+
+procedure TRESTDWLazSQLQuery.LoadFromStreamParam(IParam: integer;
+  stream: TStream; blobtype: TBlobType);
+var
+  qry : TSQLQuery;
+begin
+  qry := TSQLQuery(Self.Owner);
+  qry.Params[IParam].LoadFromStream(stream,blobtype);
 end;
 
 procedure TRESTDWLazSQLQuery.Prepare;

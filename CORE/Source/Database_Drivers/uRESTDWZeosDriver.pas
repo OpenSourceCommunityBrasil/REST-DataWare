@@ -1,6 +1,7 @@
 ﻿unit uRESTDWZeosDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ZComponent.inc}
 
 {
   REST Dataware .
@@ -38,7 +39,7 @@ uses
   {$ENDIF}
   Classes, SysUtils, uRESTDWDriverBase, ZConnection, uRESTDWBasicTypes,
   ZDataset, ZSequence, ZDbcIntfs, ZAbstractRODataset, ZAbstractDataset,
-  ZStoredProcedure;
+  ZStoredProcedure, DB, ZEncoding, ZDatasetUtils;
 
 const
   {$IFDEF FPC}
@@ -77,6 +78,7 @@ type
   TRESTDWZeosTable = class(TRESTDWDrvTable)
   public
     procedure SaveToStream(stream : TStream); override;
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
   end;
 
   { TRESTDWZeosQuery }
@@ -90,6 +92,7 @@ type
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
 
     destructor Destroy; override;
 
@@ -100,7 +103,9 @@ type
 
   TRESTDWZeosDriver = class(TRESTDWDriverBase)
   private
-    FTransaction : TZTransaction;
+    {$IFDEF ZEOS80UP}
+      FTransaction : TZTransaction;
+    {$ENDIF}
   protected
     procedure setConnection(AValue: TComponent); override;
 
@@ -142,7 +147,6 @@ procedure TRESTDWZeosStoreProc.ExecProc;
 var
   qry : TZStoredProc;
 begin
-  inherited ExecProc;
   qry := TZStoredProc(Self.Owner);
   qry.ExecProc;
 end;
@@ -151,7 +155,6 @@ procedure TRESTDWZeosStoreProc.Prepare;
 var
   qry : TZStoredProc;
 begin
-  inherited Prepare;
   qry := TZStoredProc(Self.Owner);
   qry.Prepare;
 end;
@@ -160,8 +163,13 @@ end;
 
 procedure TRESTDWZeosDriver.setConnection(AValue: TComponent);
 begin
-  if FTransaction <> nil then
-    FTransaction.Connection := TZConnection(AValue);
+  {$IFDEF ZEOS80UP}
+    if not TZConnection(AValue).AutoCommit then begin
+      if not Assigned(FTransaction) then
+        FTransaction := TZTransaction.Create(nil);
+      FTransaction.Connection := TZConnection(Connection);
+    end;
+  {$ENDIF}
   inherited setConnection(AValue);
 end;
 
@@ -186,16 +194,12 @@ begin
   end;
 end;
 
-constructor TRESTDWZeosDriver.Create(AOwner : TComponent);
-begin
-  inherited Create(AOwner);
-  FTransaction := TZTransaction.Create(Self);
-  FTransaction.Connection := TZConnection(Connection);
-end;
-
 destructor TRESTDWZeosDriver.Destroy;
 begin
-  FTransaction.Free;
+  {$IFDEF ZEOS80UP}
+    if Assigned(FTransaction) then
+      FreeAndNil(FTransaction);
+  {$ENDIF}
   inherited Destroy;
 end;
 
@@ -205,7 +209,9 @@ var
 begin
   qry := TZQuery.Create(Self);
   qry.Connection := TZConnection(Connection);
-  qry.Transaction := FTransaction;
+  {$IFDEF ZEOS80UP}
+    qry.Transaction := FTransaction;
+  {$ENDIF}
 
   Result := TRESTDWZeosQuery.Create(qry);
 end;
@@ -216,7 +222,9 @@ var
 begin
   qry := TZTable.Create(Self);
   qry.Connection := TZConnection(Connection);
-  qry.Transaction := FTransaction;
+  {$IFDEF ZEOS80UP}
+    qry.Transaction := FTransaction;
+  {$ENDIF}
 
   Result := TRESTDWZeosTable.Create(qry);
 end;
@@ -227,50 +235,65 @@ var
 begin
   qry := TZStoredProc.Create(Self);
   qry.Connection := TZConnection(Connection);
+  {$IFDEF ZEOS80UP}
+    qry.Transaction := FTransaction;
+  {$ENDIF}
 
   Result := TRESTDWZeosStoreProc.Create(qry);
 end;
 
 procedure TRESTDWZeosDriver.Connect;
 begin
-  if Assigned(Connection) then
-    TZConnection(Connection).Connect;
+  if Assigned(Connection) and (not TZConnection(Connection).Connected) then
+    TZConnection(Connection).Connected := True;
   inherited Connect;
 end;
 
 procedure TRESTDWZeosDriver.Disconect;
 begin
-  if Assigned(Connection) then
-    TZConnection(Connection).Disconnect;
+  if Assigned(Connection) and (TZConnection(Connection).Connected) then
+    TZConnection(Connection).Connected := False;
   inherited Disconect;
 end;
 
 function TRESTDWZeosDriver.isConnected: boolean;
 begin
-  Result:=inherited isConnected;
+  Result := inherited isConnected;
   if Assigned(Connection) then
     Result := TZConnection(Connection).Connected;
 end;
 
 function TRESTDWZeosDriver.connInTransaction: boolean;
 begin
-  Result:=inherited connInTransaction;
-  if Assigned(Connection) then
-    Result := TZConnection(Connection).InTransaction;
+  Result := inherited connInTransaction;
+  if Assigned(Connection) and (not TZConnection(Connection).AutoCommit) then
+    Result := TZConnection(Connection).InTransaction
+  {$IFDEF ZEOS80UP}
+    else if (Assigned(FTransaction)) then
+      Result := FTransaction.Active;
+  {$ENDIF}
 end;
 
 procedure TRESTDWZeosDriver.connStartTransaction;
 begin
   inherited connStartTransaction;
-  if Assigned(Connection) then
-    TZConnection(Connection).StartTransaction;
+  if Assigned(Connection) and (not TZConnection(Connection).AutoCommit) then
+    TZConnection(Connection).StartTransaction
+  {$IFDEF ZEOS80UP}
+    else if (Assigned(FTransaction)) then
+      FTransaction.StartTransaction;
+  {$ENDIF}
 end;
 
 procedure TRESTDWZeosDriver.connRollback;
 begin
   inherited connRollback;
-  if Assigned(Connection) then
-    TZConnection(Connection).Rollback;
+  if Assigned(Connection) and (not TZConnection(Connection).AutoCommit) then
+    TZConnection(Connection).Rollback
+  {$IFDEF ZEOS80UP}
+    else if (Assigned(FTransaction)) then
+      FTransaction.Rollback;
+  {$ENDIF}
 end;
 
 function TRESTDWZeosDriver.compConnIsValid(comp: TComponent): boolean;
@@ -280,9 +303,20 @@ end;
 
 procedure TRESTDWZeosDriver.connCommit;
 begin
-  inherited connCommit;
-  if Assigned(Connection) then
-    TZConnection(Connection).Commit;
+  if TZConnection(Connection).AutoCommit then
+    TZConnection(Connection).Commit
+  {$IFDEF ZEOS80UP}
+    else if (Assigned(FTransaction)) then
+      FTransaction.Commit;
+  {$ENDIF}
+end;
+
+constructor TRESTDWZeosDriver.Create(AOwner: TComponent);
+begin
+  {$IFDEF ZEOS80UP}
+    FTransaction := nil;
+  {$ENDIF}
+  inherited Create(AOwner);
 end;
 
 class procedure TRESTDWZeosDriver.CreateConnection(
@@ -340,9 +374,31 @@ procedure TRESTDWZeosQuery.ExecSQL;
 var
   qry : TZQuery;
 begin
-  inherited ExecSQL;
   qry := TZQuery(Self.Owner);
   qry.ExecSQL;
+end;
+
+procedure TRESTDWZeosQuery.LoadFromStreamParam(IParam: integer; stream: TStream;
+  blobtype: TBlobType);
+var
+  qry : TZQuery;
+  {$IFDEF ZEOS80UP}
+    cp : Word;
+  {$ENDIF}
+begin
+  qry := TZQuery(Self.Owner);
+  {$IFDEF ZEOS80UP}
+    if BlobType in [ftWideString{$IFDEF WITH_WIDEMEMO}, ftFixedWideChar, ftWideMemo{$ENDIF}] then
+      qry.Params[IParam].LoadTextFromStream(Stream, zCP_UTF16)
+    else if BlobType in [ftBlob, ftGraphic, ftTypedBinary, ftOraBlob] then
+      qry.Params[IParam].LoadBinaryFromStream(Stream)
+    else if BlobType in [ftMemo, ftParadoxOle, ftDBaseOle, ftOraClob] then begin
+      cp := qry.Connection.RawCharacterTransliterateOptions.GetRawTransliterateCodePage(ttParam);
+      qry.Params[IParam].LoadTextFromStream(Stream, cp);
+    end;
+  {$ELSE}
+    qry.Params[IParam].LoadFromStream(stream,blobtype);
+  {$ENDIF}
 end;
 
 procedure TRESTDWZeosQuery.Prepare;
@@ -357,7 +413,7 @@ end;
 destructor TRESTDWZeosQuery.Destroy;
 begin
   if FSequence <> nil then
-    FSequence.Free;
+    FreeAndNil(FSequence);
   inherited Destroy;
 end;
 
@@ -399,6 +455,29 @@ begin
 end;
 
 { TRESTDWZeosTable }
+
+procedure TRESTDWZeosTable.LoadFromStreamParam(IParam: integer; stream: TStream;
+  blobtype: TBlobType);
+var
+  qry : TZTable;
+  pname : string;
+  cp : Word;
+begin
+  pname := Self.Params.Items[IParam].Name;
+  qry := TZTable(Self.Owner);
+  {$IFDEF ZEOS80UP}
+    if BlobType in [ftWideString{$IFDEF WITH_WIDEMEMO}, ftFixedWideChar, ftWideMemo{$ENDIF}] then
+      qry.ParamByName(pname).LoadTextFromStream(Stream, zCP_UTF16)
+    else if BlobType in [ftBlob, ftGraphic, ftTypedBinary, ftOraBlob] then
+      qry.ParamByName(pname).LoadBinaryFromStream(Stream)
+    else if BlobType in [ftMemo, ftParadoxOle, ftDBaseOle, ftOraClob] then begin
+      cp := qry.Connection.RawCharacterTransliterateOptions.GetRawTransliterateCodePage(ttParam);
+      qry.ParamByName(pname).LoadTextFromStream(Stream, cp);
+    end;
+  {$ELSE}
+    qry.ParamByName(pname).LoadFromStream(stream,blobtype);
+  {$ENDIF}
+end;
 
 procedure TRESTDWZeosTable.SaveToStream(stream: TStream);
 var

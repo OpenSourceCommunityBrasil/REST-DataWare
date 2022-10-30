@@ -42,10 +42,13 @@ Uses
  End;
 
   TRESTDWDrvDataset      = Class;
+  TRDWDrvParams = class;
 
   TRDWDrvParam = class(TObject)
   private
     FOwner : TPersistent;
+    FDrvParams : TRDWDrvParams;
+    FIdxParam : integer;
     function getAsLargeInt: int64;
     function getAsInteger: integer;
     function getAsSmallint: smallInt;
@@ -61,7 +64,6 @@ Uses
     procedure setAsInteger(const AValue: integer);
     procedure setAsSmallint(const AValue: smallInt);
     procedure setAsString(const AValue: string);
-    function getIsUnicode: Boolean;
   protected
     function getDataType: TFieldType; virtual;
     procedure setDataType(const AValue: TFieldType); virtual;
@@ -72,9 +74,6 @@ Uses
     function getSize: integer;
     procedure setSize(const AValue: integer);
 
-    procedure BeginSetBlobRawData;
-    function EndSetBlobRawData(ALen: LongWord; APtr: PByte): PByte;
-
     constructor Create(AOwner : TPersistent);
     destructor Destroy; override;
   public
@@ -83,7 +82,6 @@ Uses
     procedure LoadFromFile(const AFileName: String; ABlobType: TFieldType);
     procedure LoadFromStream(AStream: TStream; ABlobType: TFieldType);
   published
-    property IsUnicode: Boolean    read getIsUnicode;
     property DataType : TFieldType read getDataType write setDataType;
     property Name     : string     read getName write setName;
     property Value    : Variant    read getValue write setValue;
@@ -97,6 +95,9 @@ Uses
     property AsTime     : TDateTime read getAsDateTime write setAsTime;
     property AsDateTime : TDateTime read getAsDateTime write setAsDateTime;
     property AsString   : string    read getAsString   write setAsString;
+
+    property DrvParams : TRDWDrvParams read FDrvParams write FDrvParams;
+    property IdxParam : integer read FIdxParam write FIdxParam;
   end;
 
   TRDWDrvParams = class(TCollection)
@@ -156,6 +157,7 @@ Uses
 
   Function RESTDWParam(index : integer) : TRDWDrvParam;
   Procedure AddRESTDWParam(index : integer; param : TRDWDrvParam);
+  Procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); virtual;
  Published
   Property Params : TRDWDrvParams Read getParams;
   Property Fields : TFields Read getFields;
@@ -258,6 +260,7 @@ Uses
 
  Public
   constructor Create(AOwner : TComponent); override;
+  destructor Destroy; override;
 
   Function compConnIsValid(comp : TComponent) : boolean; virtual;
   Function  getConectionType : TRESTDWDatabaseType; Virtual;
@@ -462,7 +465,7 @@ End;
 
 constructor TRESTDWDrvDataset.Create(AOwner: TComponent);
 begin
-  inherited;
+  inherited Create(AOwner);
   FRDWParams := nil;
   FParamsList := TStringList.Create;
 end;
@@ -489,7 +492,7 @@ End;
 
 Procedure TRESTDWDrvDataset.Open;
 Begin
- TDataSet(Self.Owner).Open;
+  TDataSet(Self.Owner).Open;
 End;
 
 procedure TRESTDWDrvDataset.ImportParams(DWParams: TRESTDWParams);
@@ -599,6 +602,12 @@ Begin
  TDataSet(Self.Owner).Insert;
 End;
 
+procedure TRESTDWDrvDataset.LoadFromStreamParam(IParam: integer;
+  stream: TStream; blobtype: TBlobType);
+begin
+
+end;
+
 Procedure TRESTDWDrvDataset.Edit;
 Begin
  TDataSet(Self.Owner).Edit;
@@ -616,15 +625,19 @@ End;
 
 destructor TRESTDWDrvDataset.Destroy;
 var
-  obj : TObject;
+  obj : TRDWDrvParam;
 begin
   while FParamsList.Count > 0 do begin
-    obj := TObject(FParamsList.Objects[0]);
+    obj := TRDWDrvParam(FParamsList.Objects[0]);
+    obj.DrvParams := nil;
     FreeAndNil(obj);
     FParamsList.Delete(0);
   end;
   FreeAndNil(FParamsList);
-  FRDWParams.Dataset := nil;
+
+  if Assigned(FRDWParams) then
+    FRDWParams.Dataset := nil;
+
   inherited;
 end;
 
@@ -863,7 +876,15 @@ Begin
     SQL.Clear;
     SQL.Add('SELECT LAST_INSERT_ID() ID');
     Open;
-    Result := Fields[0].AsLargeInt;
+    {$IFNDEF FPC}
+      {$IF CompilerVersion > 21}
+        Result := Fields[0].AsLargeInt;
+      {$ELSE}
+        Result := Fields[0].AsInteger;
+      {$IFEND}
+    {$ELSE}
+      Result := Fields[0].AsLargeInt;
+    {$ENDIF}
    End;
  Except
   Result := -1;
@@ -1348,6 +1369,12 @@ Begin
 
 End;
 
+destructor TRESTDWDriverBase.Destroy;
+begin
+  FConnection := nil;
+  inherited;
+end;
+
 Procedure TRESTDWDriverBase.Disconect;
 Begin
 
@@ -1499,27 +1526,27 @@ Var
       MassiveStream.Position := 0;
       MassiveDataset.LoadFromStream(MassiveStream);
       MassiveDataset.First;
-      if Self.Owner is TServerMethodDataModule then begin
-        if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveBegin) then
-          TServerMethodDataModule(Self.Owner).OnMassiveBegin(MassiveDataset);
+      if Assigned(FServerMethod) then begin
+        if Assigned(FServerMethod.OnMassiveBegin) then
+          FServerMethod.OnMassiveBegin(MassiveDataset);
       end;
       B := 1;
       Result := True;
       for A := 1 to MassiveDataset.RecordCount do begin
         if not connInTransaction then begin
           connStartTransaction;
-          if Self.Owner is TServerMethodDataModule then begin
-            if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterStartTransaction) then
-              TServerMethodDataModule(Self.Owner).OnMassiveAfterStartTransaction(MassiveDataset);
+          if Assigned(FServerMethod) then begin
+            if Assigned(FServerMethod.OnMassiveAfterStartTransaction) then
+              FServerMethod.OnMassiveAfterStartTransaction(MassiveDataset);
           end;
         end;
         Query.Close;
         Query.Filter := '';
         Query.Filtered := False;
-        if Self.Owner is TServerMethodDataModule then begin
+        if Assigned(FServerMethod) then begin
           vMassiveLine := False;
-          if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveProcess) then begin
-            TServerMethodDataModule(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+          if Assigned(FServerMethod.OnMassiveProcess) then begin
+            FServerMethod.OnMassiveProcess(MassiveDataset, vMassiveLine);
             if vMassiveLine then begin
               MassiveDataset.Next;
               Continue;
@@ -1546,14 +1573,14 @@ Var
         if B >= CommitRecords then begin
           try
             if connInTransaction then begin
-              if Self.Owner is TServerMethodDataModule then begin
-                if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit) then
-                  TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit(MassiveDataset);
+              if Assigned(FServerMethod) then begin
+                if Assigned(FServerMethod.OnMassiveAfterBeforeCommit) then
+                  FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
               end;
               connCommit;
-              if Self.Owner is TServerMethodDataModule then begin
-                if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit) then
-                  TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit(MassiveDataset);
+              if Assigned(FServerMethod) then begin
+                if Assigned(FServerMethod.OnMassiveAfterAfterCommit) then
+                  FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
               end;
             end;
           except
@@ -1574,14 +1601,14 @@ Var
       end;
       try
         if connInTransaction then begin
-          if Self.Owner is TServerMethodDataModule then begin
-            if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit) then
-              TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit(MassiveDataset);
+          if Assigned(FServerMethod) then begin
+            if Assigned(FServerMethod.OnMassiveAfterBeforeCommit) then
+              FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
           end;
           connCommit;
-          if Self.Owner is TServerMethodDataModule then begin
-            if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit) then
-              TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit(MassiveDataset);
+          if Assigned(FServerMethod) then begin
+            if Assigned(FServerMethod.OnMassiveAfterAfterCommit) then
+              FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
           end;
         end;
       except
@@ -1594,10 +1621,10 @@ Var
         end;
       end;
     finally
-      if Self.Owner is TServerMethodDataModule then
+      if Assigned(FServerMethod) then
       begin
-        if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveEnd) then
-          TServerMethodDataModule(Self.Owner).OnMassiveEnd(MassiveDataset);
+        if Assigned(FServerMethod.OnMassiveEnd) then
+          FServerMethod.OnMassiveEnd(MassiveDataset);
       end;
       FreeAndNil(MassiveDataset);
       Query.Filter := '';
@@ -1694,25 +1721,25 @@ var
     Result := False;
     try
       MassiveDataset.First;
-      if Self.Owner is TServerMethodDataModule then begin
-        if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveBegin) then
-          TServerMethodDataModule(Self.Owner).OnMassiveBegin(MassiveDataset);
+      if Assigned(FServerMethod) then begin
+        if Assigned(FServerMethod.OnMassiveBegin) then
+          FServerMethod.OnMassiveBegin(MassiveDataset);
       end;
       B := 1;
       Result := True;
       for A := 1 to MassiveDataset.RecordCount do begin
         if not connInTransaction then begin
           connStartTransaction;
-          if Self.Owner is TServerMethodDataModule then begin
-            if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterStartTransaction) then
-              TServerMethodDataModule(Self.Owner).OnMassiveAfterStartTransaction(MassiveDataset);
+          if Assigned(FServerMethod) then begin
+            if Assigned(FServerMethod.OnMassiveAfterStartTransaction) then
+              FServerMethod.OnMassiveAfterStartTransaction(MassiveDataset);
           end;
         end;
         Query.SQL.Clear;
-        if Self.Owner is TServerMethodDataModule then begin
+        if Assigned(FServerMethod) then begin
           vMassiveLine := False;
-          if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveProcess) then begin
-            TServerMethodDataModule(Self.Owner).OnMassiveProcess(MassiveDataset,vMassiveLine);
+          if Assigned(FServerMethod.OnMassiveProcess) then begin
+            FServerMethod.OnMassiveProcess(MassiveDataset,vMassiveLine);
             if vMassiveLine then begin
               MassiveDataset.Next;
               Continue;
@@ -1739,14 +1766,14 @@ var
         if B >= CommitRecords then begin
           try
             if connInTransaction then begin
-              if Self.Owner is TServerMethodDataModule then begin
-                if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit) then
-                  TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit(MassiveDataset);
+              if Assigned(FServerMethod) then begin
+                if Assigned(FServerMethod.OnMassiveAfterBeforeCommit) then
+                  FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
               end;
               connCommit;
-              if Self.Owner is TServerMethodDataModule then begin
-                if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit) then
-                  TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit(MassiveDataset);
+              if Assigned(FServerMethod) then begin
+                if Assigned(FServerMethod.OnMassiveAfterAfterCommit) then
+                  FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
               end;
             end;
           except
@@ -1767,14 +1794,14 @@ var
       end;
       try
         if connInTransaction then begin
-          if Self.Owner is TServerMethodDataModule then begin
-            if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit) then
-              TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit(MassiveDataset);
+          if Assigned(FServerMethod) then begin
+            if Assigned(FServerMethod.OnMassiveAfterBeforeCommit) then
+              FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
           end;
           connCommit;
-          if Self.Owner is TServerMethodDataModule then begin
-            if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit) then
-              TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit(MassiveDataset);
+          if Assigned(FServerMethod) then begin
+            if Assigned(FServerMethod.OnMassiveAfterAfterCommit) then
+              FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
           end;
         end;
       except
@@ -1787,9 +1814,9 @@ var
         end;
       end;
     finally
-      if Self.Owner is TServerMethodDataModule then begin
-        if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveEnd) then
-          TServerMethodDataModule(Self.Owner).OnMassiveEnd(MassiveDataset);
+      if Assigned(FServerMethod) then begin
+        if Assigned(FServerMethod.OnMassiveEnd) then
+          FServerMethod.OnMassiveEnd(MassiveDataset);
       end;
       Query.SQL.Clear;
     end;
@@ -1802,7 +1829,7 @@ begin
     vTempQuery := getQuery;
 
     vStateResource := isConnected;
-    if not isConnected then
+    if not vStateResource then
       Connect;
 
     vTempQuery.SQL.Clear;
@@ -1881,28 +1908,27 @@ var
     try
       MassiveDataset.FromJSON(Massive);
       MassiveDataset.First;
-      if Self.Owner is TServerMethodDataModule then begin
-        if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveBegin) then
-          TServerMethodDataModule(Self.Owner).OnMassiveBegin(MassiveDataset);
+      if Assigned(FServerMethod) then begin
+        if Assigned(FServerMethod.OnMassiveBegin) then
+          FServerMethod.OnMassiveBegin(MassiveDataset);
       end;
       B := 1;
       Result := True;
       for A := 1 to MassiveDataset.RecordCount do begin
         if not connInTransaction then begin
           connStartTransaction;
-          if Self.Owner is TServerMethodDataModule then begin
-            if Assigned(TServerMethodDataModule(
-              Self.Owner).OnMassiveAfterStartTransaction) then
-              TServerMethodDataModule(Self.Owner).OnMassiveAfterStartTransaction(MassiveDataset);
+          if Assigned(FServerMethod) then begin
+            if Assigned(FServerMethod.OnMassiveAfterStartTransaction) then
+              FServerMethod.OnMassiveAfterStartTransaction(MassiveDataset);
           end;
         end;
         Query.Close;
         Query.Filter := '';
         Query.Filtered := False;
-        if Self.Owner is TServerMethodDataModule then begin
+        if Assigned(FServerMethod) then begin
           vMassiveLine := False;
-          if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveProcess) then begin
-            TServerMethodDataModule(Self.Owner).OnMassiveProcess(MassiveDataset,vMassiveLine);
+          if Assigned(FServerMethod.OnMassiveProcess) then begin
+            FServerMethod.OnMassiveProcess(MassiveDataset,vMassiveLine);
             if vMassiveLine then begin
               MassiveDataset.Next;
               Continue;
@@ -1928,14 +1954,14 @@ var
         if B >= CommitRecords then begin
           try
             if connInTransaction then begin
-              if Self.Owner is TServerMethodDataModule then begin
-                if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit) then
-                  TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit(MassiveDataset);
+              if Assigned(FServerMethod) then begin
+                if Assigned(FServerMethod.OnMassiveAfterBeforeCommit) then
+                  FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
               end;
               connCommit;
-              if Self.Owner is TServerMethodDataModule then begin
-                if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit) then
-                  TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit(MassiveDataset);
+              if Assigned(FServerMethod) then begin
+                if Assigned(FServerMethod.OnMassiveAfterAfterCommit) then
+                  FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
               end;
             end;
           except
@@ -1958,14 +1984,14 @@ var
       try
         if connInTransaction then
         begin
-          if Self.Owner is TServerMethodDataModule then begin
-            if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit) then
-              TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit(MassiveDataset);
+          if Assigned(FServerMethod) then begin
+            if Assigned(FServerMethod.OnMassiveAfterBeforeCommit) then
+              FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
           end;
           connCommit;
-          if Self.Owner is TServerMethodDataModule then begin
-            if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit) then
-              TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit(MassiveDataset);
+          if Assigned(FServerMethod) then begin
+            if Assigned(FServerMethod.OnMassiveAfterAfterCommit) then
+              FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
           end;
         end;
       except
@@ -1978,9 +2004,9 @@ var
         end;
       end;
     finally
-      if Self.Owner is TServerMethodDataModule then begin
-        if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveEnd) then
-          TServerMethodDataModule(Self.Owner).OnMassiveEnd(MassiveDataset);
+      if Assigned(FServerMethod) then begin
+        if Assigned(FServerMethod.OnMassiveEnd) then
+          FServerMethod.OnMassiveEnd(MassiveDataset);
       end;
       FreeAndNil(MassiveDataset);
       Query.Filter := '';
@@ -2087,24 +2113,24 @@ var
         bJsonValueB := bJsonArray.GetObject(X);
         if not connInTransaction then begin
           connStartTransaction;
-          if Self.Owner is TServerMethodDataModule then begin
-            if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterStartTransaction) then
-              TServerMethodDataModule(Self.Owner).OnMassiveAfterStartTransaction(MassiveDataset);
+          if Assigned(FServerMethod) then begin
+            if Assigned(FServerMethod.OnMassiveAfterStartTransaction) then
+              FServerMethod.OnMassiveAfterStartTransaction(MassiveDataset);
           end;
         end;
         try
           MassiveDataset.FromJSON(TRESTDWJSONInterfaceObject(bJsonValueB).ToJSON);
           MassiveDataset.First;
-          if Self.Owner is TServerMethodDataModule then begin
-            if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveBegin) then
-              TServerMethodDataModule(Self.Owner).OnMassiveBegin(MassiveDataset);
+          if Assigned(FServerMethod) then begin
+            if Assigned(FServerMethod.OnMassiveBegin) then
+              FServerMethod.OnMassiveBegin(MassiveDataset);
           end;
           for A := 1 to MassiveDataset.RecordCount do begin
             Query.SQL.Clear;
-            if Self.Owner is TServerMethodDataModule then begin
+            if Assigned(FServerMethod) then begin
               vMassiveLine := False;
-              if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveProcess) then  begin
-                TServerMethodDataModule(Self.Owner).OnMassiveProcess(MassiveDataset, vMassiveLine);
+              if Assigned(FServerMethod.OnMassiveProcess) then  begin
+                FServerMethod.OnMassiveProcess(MassiveDataset, vMassiveLine);
                 if vMassiveLine then begin
                   MassiveDataset.Next;
                   Continue;
@@ -2120,10 +2146,9 @@ var
                 Query.ExecSQL;
 
                 // Inclusão do método de after massive line process
-                if (Self.Owner.ClassType = TServerMethodDatamodule) or
-                   (Self.Owner.ClassType.InheritsFrom(TServerMethodDatamodule)) then begin
-                  if Assigned(TServerMethodDataModule(Self.Owner).OnAfterMassiveLineProcess) then
-                    TServerMethodDataModule(Self.Owner).OnAfterMassiveLineProcess(MassiveDataset, TDataset(Query.Owner));
+                if Assigned(FServerMethod) then begin
+                  if Assigned(FServerMethod.OnAfterMassiveLineProcess) then
+                    FServerMethod.OnAfterMassiveLineProcess(MassiveDataset, TDataset(Query.Owner));
                 end;
               end;
             except
@@ -2147,14 +2172,14 @@ var
         try
           Result := True;
           if connInTransaction then begin
-            if Self.Owner is TServerMethodDataModule then begin
-              if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit) then
-                TServerMethodDataModule(Self.Owner).OnMassiveAfterBeforeCommit(MassiveDataset);
+            if Assigned(FServerMethod) then begin
+              if Assigned(FServerMethod.OnMassiveAfterBeforeCommit) then
+                FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
             end;
             connCommit;
-            if Self.Owner is TServerMethodDataModule then begin
-              if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit) then
-                TServerMethodDataModule(Self.Owner).OnMassiveAfterAfterCommit(MassiveDataset);
+            if Assigned(FServerMethod) then begin
+              if Assigned(FServerMethod.OnMassiveAfterAfterCommit) then
+                FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
             end;
           end;
         except
@@ -2168,9 +2193,9 @@ var
           end;
         end;
       end;
-      if Self.Owner is TServerMethodDataModule then begin
-        if Assigned(TServerMethodDataModule(Self.Owner).OnMassiveEnd) then
-          TServerMethodDataModule(Self.Owner).OnMassiveEnd(MassiveDataset);
+      if Assigned(FServerMethod) then begin
+        if Assigned(FServerMethod.OnMassiveEnd) then
+          FServerMethod.OnMassiveEnd(MassiveDataset);
       end;
     finally
       FreeAndNil(bJsonValue);
@@ -2368,7 +2393,7 @@ begin
   vDataSet := TDataSet(vTempQuery.Owner);
   try
     vStateResource := isConnected;
-    if not isConnected then
+    if not vStateResource then
       Connect;
 
     if not connInTransaction then
@@ -2393,8 +2418,7 @@ begin
 
         if not BinaryEvent then  begin
           aResult.Utf8SpecialChars := True;
-          aResult.LoadFromDataset('RESULTDATA', TDataSet(vTempQuery.Owner),
-            EncodeStringsJSON);
+          aResult.LoadFromDataset('RESULTDATA', vDataSet, EncodeStringsJSON);
           Result := aResult.ToJSON;
         end
         else if not BinaryCompatibleMode then begin
@@ -2407,7 +2431,7 @@ begin
           end;
         end
         else
-          TRESTDWClientSQLBase.SaveToStream(TDataSet(vTempQuery.Owner), BinaryBlob);
+          TRESTDWClientSQLBase.SaveToStream(vDataSet, BinaryBlob);
       finally
       end;
     end
@@ -2422,6 +2446,7 @@ begin
       aResult.SetValue('COMMANDOK');
       Result := aResult.ToJSON;
     end;
+
     if not vStateResource then
       Disconect
   except
@@ -2450,7 +2475,8 @@ begin
   FreeAndNil(aResult);
   RowsAffected := vTempQuery.RowsAffected;
   vTempQuery.Close;
-  vTempQuery.Free;
+  vDataSet := nil;
+  FreeAndNil(vTempQuery);
 end;
 
 Function TRESTDWDriverBase.ExecuteCommandTB(Tablename: String;
@@ -3689,7 +3715,7 @@ begin
   // incompatibilidade com outros drivers
   // compatibilidade somente com firedac
   vParamCreate         := True;
-
+  FConnection := nil;
   FServerMethod := nil;
   if Self.Owner.InheritsFrom(TServerMethodDataModule) then
     FServerMethod := TServerMethodDataModule(Self.Owner);
@@ -3885,10 +3911,9 @@ begin
         ReflectionChanges := vResultReflectionLine
       else
         ReflectionChanges := ReflectionChanges + ', ' + vResultReflectionLine;
-      if (Self.Owner.ClassType = TServerMethodDatamodule) or
-         (Self.Owner.ClassType.InheritsFrom(TServerMethodDatamodule)) then begin
-        if Assigned(TServerMethodDataModule(Self.Owner).OnAfterMassiveLineProcess) then
-          TServerMethodDataModule(Self.Owner).OnAfterMassiveLineProcess(MassiveDataset, TDataset(Query.Owner));
+      if Assigned(FServerMethod) then begin
+        if Assigned(FServerMethod.OnAfterMassiveLineProcess) then
+          FServerMethod.OnAfterMassiveLineProcess(MassiveDataset, TDataset(Query.Owner));
       end;
       Query.Close;
     end;
@@ -4167,10 +4192,9 @@ begin
         ReflectionChanges := vResultReflectionLine
       else
         ReflectionChanges := ReflectionChanges + ', ' + vResultReflectionLine;
-      if (Self.Owner.ClassType = TServerMethodDatamodule) or
-         (Self.Owner.ClassType.InheritsFrom(TServerMethodDatamodule)) then begin
-        if Assigned(TServerMethodDataModule(Self.Owner).OnAfterMassiveLineProcess) then
-          TServerMethodDataModule(Self.Owner).OnAfterMassiveLineProcess(MassiveDataset, TDataset(Query));
+      if Assigned(FServerMethod) then begin
+        if Assigned(FServerMethod.OnAfterMassiveLineProcess) then
+          FServerMethod.OnAfterMassiveLineProcess(MassiveDataset, vDataSet);
       end;
       Query.Close;
     end;
@@ -4772,21 +4796,13 @@ begin
   if Result = nil then begin
     ci := inherited Items[Index];
     Result := TRDWDrvParam.Create(ci);
+    Result.DrvParams := Self;
+    Result.IdxParam := Index;
     FDataset.AddRESTDWParam(Index,Result);
   end;
 end;
 
 { TRDWDrvParam }
-
-procedure TRDWDrvParam.BeginSetBlobRawData;
-begin
-  if not (DataType in [ftString, ftWideString, ftFixedChar,
-                       ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftDBaseOle,
-                       ftTypedBinary, ftOraBlob, ftOraClob,
-                       ftWideMemo, ftFixedWideChar]) then
-    DataType := ftBlob;
-  Value := null;
-end;
 
 procedure TRDWDrvParam.Clear;
 begin
@@ -4801,41 +4817,8 @@ end;
 destructor TRDWDrvParam.Destroy;
 begin
   FOwner := nil;
+  FDrvParams := nil;
   inherited;
-end;
-
-function TRDWDrvParam.EndSetBlobRawData(ALen: LongWord; APtr: PByte): PByte;
-var
-  pData: PVarData;
-  pVar : Variant;
-begin
-  pVar := Value;
-  pData := @TVarData(pVar);
-  if IsUnicode then begin
-    pData^.VType := varUString;
-    if APtr <> nil then
-      SetString(UnicodeString(pData^.VUString), PWideChar(APtr), ALen)
-    else
-      SetLength(UnicodeString(pData^.VUString), ALen);
-    Result := PByte(PWideChar(UnicodeString(pData^.VUString)));
-  end
-  else begin
-{$IFDEF NEXTGEN}
-    FValue[AIndex] := VarArrayCreate([0, Integer(ALen) - 1], varByte);
-    Result := PByte(pData^.VArray^.Data);
-    if APtr <> nil then
-      Move(APtr^, Result^, ALen);
-{$ELSE}
-    pData^.VType := varString;
-    if APtr <> nil then
-      SetString(AnsiString(pData^.VString), PAnsiChar(APtr), ALen)
-    else
-      SetLength(AnsiString(pData^.VString), ALen);
-    Result := PByte(PAnsiChar(AnsiString(pData^.VString)));
-{$ENDIF}
-  end;
-  if (APtr = nil) and (ALen = 0) then
-    Result := nil;
 end;
 
 function TRDWDrvParam.geAsInteger: integer;
@@ -4895,12 +4878,6 @@ begin
   Result := TFieldType(GetEnumValue(TypeInfo(TFieldType),enum));
 end;
 
-function TRDWDrvParam.getIsUnicode: Boolean;
-begin
-  Result := (DataType in [ftWideString, ftFixedWideChar, ftWideMemo,
-                          ftFmtMemo, ftDBaseOle]) or (DataType = ftOraClob);
-end;
-
 function TRDWDrvParam.getName: string;
 begin
   Result := GetStrProp(FOwner,'Name');
@@ -4937,34 +4914,8 @@ begin
 end;
 
 procedure TRDWDrvParam.LoadFromStream(AStream: TStream; ABlobType: TFieldType);
-
-  function ReallocRawData(ALen: LongWord): PByte;
-  begin
-    if IsUnicode then
-      ALen := ALen div SizeOf(WideChar);
-    Result := EndSetBlobRawData(ALen, nil);
-  end;
-
-const
-  CBufSize = $7FFE;
-var
-  iLen: LongInt;
-  iRead: Integer;
 begin
-  BeginSetBlobRawData;
-  DataType := ABlobType;
-  AStream.Position := 0;
-  iLen := AStream.Size;
-  if iLen < 0 then begin
-    iLen := 0;
-    repeat
-      iRead := AStream.Read((ReallocRawData(iLen + CBufSize) + iLen)^, CBufSize);
-      Inc(iLen, iRead);
-    until iRead < CBufSize;
-    ReallocRawData(iLen);
-  end
-  else
-    AStream.ReadBuffer(ReallocRawData(iLen)^, iLen);
+  FDrvParams.Dataset.LoadFromStreamParam(FIdxParam,AStream,ABlobType);
 end;
 
 procedure TRDWDrvParam.setAsDate(const AValue: TDateTime);
@@ -5035,7 +4986,7 @@ end;
 
 procedure TRDWDrvParam.setValue(const AValue: Variant);
 begin
-  SetVariantProp(FOwner,'Value',AValue);
+  SetPropValue(FOwner,'Value',AValue);
 end;
 
 end.
