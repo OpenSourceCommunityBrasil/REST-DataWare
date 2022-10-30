@@ -30,7 +30,7 @@ uses
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes,
   FireDAC.Comp.Client, FireDAC.Comp.DataSet, FireDAC.Stan.StorageBin,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.DApt.Intf, FireDAC.DApt,
-  DB;
+  FireDAC.Stan.Param, DB;
 
 const
   rdwFireDACDrivers : array of string = ['ads','asa','db2','ds','fb','ib',
@@ -56,6 +56,7 @@ type
   TRESTDWFireDACTable = class(TRESTDWDrvTable)
   public
     procedure SaveToStream(stream : TStream); override;
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
   end;
 
   { TRESTDWFireDACQuery }
@@ -67,6 +68,8 @@ type
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
+
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
     function RowsAffected : Int64; override;
   end;
 
@@ -77,7 +80,7 @@ type
     FConnTeste : TComponent;
     function isAutoCommit : boolean;
   protected
-    function  getConectionType : TRESTDWDatabaseType; override;
+    function getConectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
   public
     function getQuery : TRESTDWDrvQuery; override;
@@ -370,6 +373,15 @@ begin
   qry.ExecSQL;
 end;
 
+procedure TRESTDWFireDACQuery.LoadFromStreamParam(IParam: integer;
+  stream: TStream; blobtype: TBlobType);
+var
+  qry : TFDQuery;
+begin
+  qry := TFDQuery(Self.Owner);
+  qry.Params[IParam].LoadFromStream(stream,blobtype);
+end;
+
 procedure TRESTDWFireDACQuery.Prepare;
 var
   qry : TFDQuery;
@@ -400,11 +412,19 @@ end;
 
 { TRESTDWFireDACTable }
 
+procedure TRESTDWFireDACTable.LoadFromStreamParam(IParam: integer;
+  stream: TStream; blobtype: TBlobType);
+var
+  qry : TFDTable;
+begin
+  qry := TFDTable(Self.Owner);
+  qry.Params[IParam].LoadFromStream(stream,blobtype);
+end;
+
 procedure TRESTDWFireDACTable.SaveToStream(stream: TStream);
 var
   qry : TFDTable;
 begin
-  inherited SaveToStream(stream);
   qry := TFDTable(Self.Owner);
   qry.SaveToStream(stream, sfBinary);
 
