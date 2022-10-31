@@ -1,4 +1,4 @@
-﻿unit uRESTDWZeosDriver;
+unit uRESTDWZeosDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {$I ZComponent.inc}
@@ -42,29 +42,16 @@ uses
   ZStoredProcedure, DB, ZEncoding, ZDatasetUtils;
 
 const
-  {$IFDEF FPC}
-    rdwZeosProtocols : array of string = ('ado','asa','asa_capi','firebird',
-                      'interbase','mssql','mysql','odbc_a','odbc_w','oledb',
-                      'oracle','pooled','postgresql','sqlite','sybase',
-                      'webserviceproxy');
+  rdwZeosProtocols : array[0..16] of string = (('ado'),('asa'),('asa_capi'),
+                    ('firebird'),('interbase'),('mssql'),('mysql'),('odbc_a'),
+                    ('odbc_w'),('oledb'),('oracle'),('pooled'),('postgresql'),
+                    ('sqlite'),('sybase'),('webserviceproxy'),('mariadb'));
 
-    rdwZeosDbType : array of TRESTDWDatabaseType = (dbtAdo,dbtUndefined,
-                   dbtUndefined,dbtFirebird,dbtInterbase,dbtMsSQL,dbtMySQL,
-                   dbtODBC,dbtODBC,dbtUndefined,dbtOracle,dbtUndefined,
-                   dbtPostgreSQL,dbtSQLLite,dbtUndefined,dbtUndefined);
-  {$ELSE}
-    rdwZeosProtocols : array of string = ['ado','asa','asa_capi','firebird',
-                      'interbase','mssql','mysql','odbc_a','odbc_w','oledb',
-                      'oracle','pooled','postgresql','sqlite','sybase',
-                      'webserviceproxy'];
-
-    rdwZeosDbType : array of TRESTDWDatabaseType = [dbtAdo,dbtUndefined,
-                   dbtUndefined,dbtFirebird,dbtInterbase,dbtMsSQL,dbtMySQL,
-                   dbtODBC,dbtODBC,dbtUndefined,dbtOracle,dbtUndefined,
-                   dbtPostgreSQL,dbtSQLLite,dbtUndefined,dbtUndefined];
-  {$ENDIF}
-
-  crdwConnectionNotZeos = 'Componente não é um ZeosConnection';
+  rdwZeosDbType : array[0..16] of TRESTDWDatabaseType = ((dbtAdo),(dbtUndefined),
+                 (dbtUndefined),(dbtFirebird),(dbtInterbase),(dbtMsSQL),(dbtMySQL),
+                 (dbtODBC),(dbtODBC),(dbtUndefined),(dbtOracle),(dbtUndefined),
+                 (dbtPostgreSQL),(dbtSQLLite),(dbtUndefined),(dbtUndefined),
+                 (dbtMySQL));
 
 type
   { TRESTDWZeosStoreProc }

@@ -1,4 +1,4 @@
-﻿unit uRESTDWFireDACDriver;
+unit uRESTDWFireDACDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -33,15 +33,16 @@ uses
   FireDAC.Stan.Param, DB;
 
 const
-  rdwFireDACDrivers : array of string = ['ads','asa','db2','ds','fb','ib',
-                      'iblite','infx','mongo','msacc','mssql','mysql','odbc',
-                      'ora','pg','sqlite','tdata','tdbx'];
+  rdwFireDACDrivers : array[0..17] of string = (('ads'),('asa'),('db2'),('ds'),
+                      ('fb'),('ib'),('iblite'),('infx'),('mongo'),('msacc'),
+                      ('mssql'),('mysql'),('odbc'),('ora'),('pg'),('sqlite'),
+                      ('tdata'),('tdbx'));
 
-  rdwFireDACDbType : array of TRESTDWDatabaseType = [dbtUndefined,dbtUndefined,
-                     dbtDbase,dbtUndefined,dbtFirebird,dbtInterbase,dbtInterbase,
-                     dbtUndefined,dbtUndefined,dbtUndefined,dbtMsSQL,dbtMySQL,
-                     dbtODBC,dbtOracle,dbtPostgreSQL,dbtSQLLite,dbtUndefined,
-                     dbtUndefined];
+  rdwFireDACDbType : array[0..17] of TRESTDWDatabaseType = ((dbtUndefined),(dbtUndefined),
+                     (dbtDbase),(dbtUndefined),(dbtFirebird),(dbtInterbase),(dbtInterbase),
+                     (dbtUndefined),(dbtUndefined),(dbtUndefined),(dbtMsSQL),(dbtMySQL),
+                     (dbtODBC),(dbtOracle),(dbtPostgreSQL),(dbtSQLLite),(dbtUndefined),
+                     (dbtUndefined));
 
 type
   { TRESTDWFireDACStoreProc }

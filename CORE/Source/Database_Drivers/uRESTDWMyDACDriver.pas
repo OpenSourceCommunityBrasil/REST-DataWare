@@ -1,4 +1,4 @@
-﻿unit uRESTDWMyDACDriver;
+unit uRESTDWMyDACDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -33,12 +33,10 @@ uses
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes, MyClasses, MyAccess,
   MyScript, DADump, MyDump, VirtualTable, MemDS, DBAccess, DB, uRESTDWMemtable;
 
-const
-  crdwConnectionNotIsMyDAC = 'Componente não é um MyConnection';
-
 type
   TRESTDWMyDACTable = class(TRESTDWDrvTable)
   public
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
     procedure SaveToStream(stream : TStream); override;
   end;
 
@@ -56,6 +54,7 @@ type
   protected
     procedure createSequencedField(seqname,field : string); override;
   public
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
@@ -66,10 +65,16 @@ type
   { TRESTDWMyDACDriver }
 
   TRESTDWMyDACDriver = class(TRESTDWDriverBase)
+  private
+    FTransaction : TMyTransaction;
   protected
+    procedure setConnection(AValue: TComponent); override;
     function getConectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
   public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+
     function getQuery : TRESTDWDrvQuery; override;
     function getTable : TRESTDWDrvTable; override;
     function getStoreProc : TRESTDWDrvStoreProc; override;
@@ -133,6 +138,7 @@ begin
   qry.Options.SetEmptyStrToNull := StrsEmpty2Null;
   qry.Options.TrimVarChar       := StrsTrim;
   qry.Options.TrimFixedChar     := StrsTrim;
+  qry.Transaction               := FTransaction;
 
   Result := TRESTDWMyDACQuery.Create(qry);
 end;
@@ -143,6 +149,10 @@ var
 begin
   qry := TMyTable.Create(Self);
   qry.Connection := TMyConnection(Connection);
+  qry.Options.SetEmptyStrToNull := StrsEmpty2Null;
+  qry.Options.TrimVarChar       := StrsTrim;
+  qry.Options.TrimFixedChar     := StrsTrim;
+  qry.Transaction               := FTransaction;
 
   Result := TRESTDWMyDACTable.Create(qry);
 end;
@@ -156,22 +166,29 @@ begin
   qry.Options.SetEmptyStrToNull := StrsEmpty2Null;
   qry.Options.TrimVarChar       := StrsTrim;
   qry.Options.TrimFixedChar     := StrsTrim;
+  qry.Transaction               := FTransaction;
 
   Result := TRESTDWMyDACStoreProc.Create(qry);
 end;
 
 procedure TRESTDWMyDACDriver.Connect;
 begin
+  inherited Connect;
   if Assigned(Connection) then
     TMyConnection(Connection).Open;
-  inherited Connect;
+end;
+
+destructor TRESTDWMyDACDriver.Destroy;
+begin
+
+  inherited;
 end;
 
 procedure TRESTDWMyDACDriver.Disconect;
 begin
+  inherited Disconect;
   if Assigned(Connection) then
     TMyConnection(Connection).Close;
-  inherited Disconect;
 end;
 
 function TRESTDWMyDACDriver.isConnected : boolean;
@@ -179,6 +196,14 @@ begin
   Result:=inherited isConnected;
   if Assigned(Connection) then
     Result := TMyConnection(Connection).Connected;
+end;
+
+procedure TRESTDWMyDACDriver.setConnection(AValue: TComponent);
+begin
+  if not Assigned(FTransaction) then
+    FTransaction := TMyTransaction.Create(Self);
+  FTransaction.DefaultConnection := TMyConnection(AValue);
+  TMyConnection(AValue).DefaultTransaction := FTransaction;
 end;
 
 function TRESTDWMyDACDriver.connInTransaction : boolean;
@@ -212,6 +237,13 @@ begin
   inherited connCommit;
   if Assigned(Connection) then
     TMyConnection(Connection).Commit;
+end;
+
+constructor TRESTDWMyDACDriver.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FTransaction := TMyTransaction.Create(Self);
+  FTransaction.DefaultConnection := TMyConnection(Connection);
 end;
 
 class procedure TRESTDWMyDACDriver.CreateConnection(const AConnectionDefs : TConnectionDefs;
@@ -255,6 +287,15 @@ begin
   qry.ExecSQL;
 end;
 
+procedure TRESTDWMyDACQuery.LoadFromStreamParam(IParam: integer;
+  stream: TStream; blobtype: TBlobType);
+var
+  qry : TMyQuery;
+begin
+  qry := TMyQuery(Self.Owner);
+  qry.Params[IParam].LoadFromStream(stream,blobtype);
+end;
+
 procedure TRESTDWMyDACQuery.Prepare;
 var
   qry : TMyQuery;
@@ -290,6 +331,15 @@ begin
 end;
 
 { TRESTDWMyDACTable }
+
+procedure TRESTDWMyDACTable.LoadFromStreamParam(IParam: integer;
+  stream: TStream; blobtype: TBlobType);
+var
+  qry : TMyTable;
+begin
+  qry := TMyTable(Self.Owner);
+  qry.Params[IParam].LoadFromStream(stream,blobtype);
+end;
 
 procedure TRESTDWMyDACTable.SaveToStream(stream: TStream);
 var

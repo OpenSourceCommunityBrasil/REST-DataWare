@@ -1,4 +1,4 @@
-﻿unit uRESTDWDriverBase;
+unit uRESTDWDriverBase;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -876,15 +876,11 @@ Begin
     SQL.Clear;
     SQL.Add('SELECT LAST_INSERT_ID() ID');
     Open;
-    {$IFNDEF FPC}
-      {$IF CompilerVersion > 21}
-        Result := Fields[0].AsLargeInt;
-      {$ELSE}
-        Result := Fields[0].AsInteger;
-      {$IFEND}
+    {$IF NOT DEFINED(FPC) AND (CompilerVersion < 22)}
+      Result := Fields[0].AsInteger;
     {$ELSE}
       Result := Fields[0].AsLargeInt;
-    {$ENDIF}
+    {$IFEND}
    End;
  Except
   Result := -1;

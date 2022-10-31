@@ -1,4 +1,4 @@
-﻿unit uRESTDWLazSQLDriver;
+unit uRESTDWLazSQLDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -33,12 +33,13 @@ uses
   Classes, SysUtils, uRESTDWDriverBase, SQLDB, uRESTDWBasicTypes;
 
 const
-  rdwLazSQLConnector : array of string = ('mssql','sybase','postgresql','pqconn',
-                      'oracle','odbc','mysql','sqlite','firebird','ibconn');
+  rdwLazSQLConnector : array[0..9] of string = (('mssql'),('sybase'),
+                      ('postgresql'),('pqconn'),('oracle'),('odbc'),('mysql'),
+                      ('sqlite'),('firebird'),('ibconn'));
 
-  rdwLazSQLDbType : array of TRESTDWDatabaseType = (dbtMsSQL,dbtUndefined,
-                    dbtPostgreSQL,dbtPostgreSQL,dbtOracle,dbtODBC,dbtMySQL,
-                    dbtSQLLite,dbtFirebird,dbtFirebird);
+  rdwLazSQLDbType : array[0..9] of TRESTDWDatabaseType = ((dbtMsSQL),(dbtUndefined),
+                    (dbtPostgreSQL),(dbtPostgreSQL),(dbtOracle),(dbtODBC),(dbtMySQL),
+                    (dbtSQLLite),(dbtFirebird),(dbtFirebird));
 
 type
   { TRESTDWLazSQLQuery }

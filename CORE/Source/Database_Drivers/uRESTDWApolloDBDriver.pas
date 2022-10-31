@@ -1,4 +1,4 @@
-﻿unit uRESTDWApolloDBDriver;
+unit uRESTDWApolloDBDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 

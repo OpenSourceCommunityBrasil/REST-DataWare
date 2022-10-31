@@ -1,4 +1,4 @@
-﻿unit uRESTDWUniDACDriver;
+unit uRESTDWUniDACDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -34,37 +34,23 @@ uses
   DBAccess, Uni, uRESTDWMemtable, VirtualTable;
 
 const
-  {$IFDEF FPC}
-    rdwUniDACProtocols : array of string = ('access','advantage','ase','db2',
-                      'dbf','interbase','mysql','mongodb','nexusdb','obdc',
-                      'oracle','postgresql','redshift','sql server','sqlite',
-                      'bigcommerce','bigquery','dynamics 365','freshbooks',
-                      'hubspot','magento','mailchimp','netsuite','quickbooks',
-                      'salesforce mc','salesforce','sugar crm','zoho crm');
+  rdwUniDACProtocols : array[0..27] of string = (('access'),('advantage'),
+                      ('ase'),('db2'),('dbf'),('interbase'),('mysql'),
+                      ('mongodb'),('nexusdb'),('obdc'),('oracle'),
+                      ('postgresql'),('redshift'),('sql server'),('sqlite'),
+                      ('bigcommerce'),('bigquery'),('dynamics 365'),
+                      ('freshbooks'),('hubspot'),('magento'),('mailchimp'),
+                      ('netsuite'),('quickbooks'),('salesforce mc'),
+                      ('salesforce'),('sugar crm'),('zoho crm'));
 
-    rdwUniDACDbType : array of TRESTDWDatabaseType = (dbtAccess,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtDbase,dbtInterbase,dbtMySQL,
-                   dbtUndefined,dbtUndefined,dbtODBC,dbtOracle,dbtPostgreSQL,
-                   dbtUndefined,dbtMsSQL,dbtSQLLite,dbtUndefined,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtUndefined,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtUndefined,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtUndefined);
-  {$ELSE}
-    rdwUniDACProtocols : array of string = ['access','advantage','ase','db2',
-                      'dbf','interbase','mysql','mongodb','nexusdb','obdc',
-                      'oracle','postgresql','redshift','sql server','sqlite',
-                      'bigcommerce','bigquery','dynamics 365','freshbooks',
-                      'hubspot','magento','mailchimp','netsuite','quickbooks',
-                      'salesforce mc','salesforce','sugar crm','zoho crm'];
-
-    rdwUniDACDbType : array of TRESTDWDatabaseType = [dbtAccess,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtDbase,dbtInterbase,dbtMySQL,
-                   dbtUndefined,dbtUndefined,dbtODBC,dbtOracle,dbtPostgreSQL,
-                   dbtUndefined,dbtMsSQL,dbtSQLLite,dbtUndefined,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtUndefined,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtUndefined,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtUndefined];
-  {$ENDIF}
+  rdwUniDACDbType : array[0..27] of TRESTDWDatabaseType = ((dbtAccess),
+                    (dbtUndefined),(dbtUndefined),(dbtUndefined),(dbtDbase),
+                    (dbtInterbase,(dbtMySQL),(dbtUndefined),(dbtUndefined),
+                    (dbtODBC),(dbtOracle),(dbtPostgreSQL),(dbtUndefined),
+                    (dbtMsSQL),(dbtSQLLite),(dbtUndefined),(dbtUndefined),
+                    (dbtUndefined),(dbtUndefined),(dbtUndefined),(dbtUndefined),
+                    (dbtUndefined),(dbtUndefined),(dbtUndefined),(dbtUndefined),
+                    (dbtUndefined),(dbtUndefined),(dbtUndefined));
 
 type
   TRESTDWUniDACTable = class(TRESTDWDrvTable)
