@@ -194,8 +194,6 @@ Type
  Public
   Destructor Destroy;Override;
   Procedure  Delete(Index : Integer);                         Overload;
-  Procedure  LoadFromStream    (Source     : TStream);
-  Procedure  SaveToStream      (Const Dest : TStream);
   Function   Add   (Item  : TMassiveLine)  : Integer;         Overload;
   Property   Items[Index  : Integer]       : TMassiveLine Read GetRec Write PutRec; Default;
 End;
@@ -852,6 +850,7 @@ Begin
    vJSONValue.DatabaseCharSet := csUndefined;
    {$ENDIF}
    vJSONValue.LoadFromStream(Stream);
+   vJSONValue.Encoded         := True;
   End;
  vIsNull := vJSONValue.IsNull;
 End;
@@ -860,7 +859,7 @@ Procedure TMassiveValue.SaveToStream(Const Stream: TMemoryStream);
 Begin
  vJSONValue.ObjectValue := ovBlob;
  vJSONValue.Encoded     := False;
- vJSONValue.SaveToStream(Stream, True);
+ vJSONValue.SaveToStream(Stream);
 End;
 
 Procedure TMassiveValue.SetModified(Value : Boolean);
@@ -1250,22 +1249,6 @@ Procedure TMassiveBuffer.PutRec(Index: Integer; Item: TMassiveLine);
 Begin
  If (Index < Self.Count) And (Index > -1) Then
   TMassiveLine(TList(Self).Items[Index]^) := Item;
-End;
-
-Procedure TMassiveBuffer.LoadFromStream(Source     : TStream);
-Var
- BufferStream,
- BufferBase : TRESTDWBufferBase; //Pacote de Entrada
-Begin
-
-End;
-
-Procedure TMassiveBuffer.SaveToStream  (Const Dest : TStream);
-Var
- BufferStream,
- BufferBase : TRESTDWBufferBase; //Pacote de Saida
-Begin
-
 End;
 
 { TMassiveDatasetBuffer }

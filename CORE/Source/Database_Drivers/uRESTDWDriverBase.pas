@@ -1208,7 +1208,6 @@ begin
             Query.Params[A].Value := MassiveDataset.AtualRec.PrimaryValues[X].Value;
         end
         else begin
-
           if Query.Params[A].DataType in [ftUnknown] then begin
             if not (ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(bPrimaryKeys[X]).FieldType) in [ftUnknown]) then
               Query.Params[A].DataType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(bPrimaryKeys[X]).FieldType)
@@ -1470,18 +1469,18 @@ Function TRESTDWDriverBase.ApplyUpdates(MassiveStream    : TStream;
                                         Params           : TRESTDWParams;
                                         var Error        : Boolean;
                                         var MessageError : String;
-                                        var RowsAffected : integer) : TJSONValue;
-var
-  MassiveDataset : TMassiveDatasetBuffer;
-begin
-  MassiveDataset := TMassiveDatasetBuffer.Create(nil);
-  try
-    MassiveDataset.LoadFromStream(MassiveStream);
-    Result := ApplyUpdates(MassiveDataset,SQL,Params,Error,MessageError,RowsAffected);
-  finally
-    FreeAndNil(MassiveDataset);
-  end;
-end;
+                                        var RowsAffected : Integer) : TJSONValue;
+Var
+ MassiveDataset : TMassiveDatasetBuffer;
+Begin
+ MassiveDataset := TMassiveDatasetBuffer.Create(nil);
+ Try
+  MassiveDataset.LoadFromStream(MassiveStream);
+  Result := ApplyUpdates(MassiveDataset, SQL, Params, Error, MessageError, RowsAffected);
+ Finally
+  FreeAndNil(MassiveDataset);
+ End;
+End;
 
 
 Function TRESTDWDriverBase.ApplyUpdates(Massive,
@@ -1490,17 +1489,17 @@ Function TRESTDWDriverBase.ApplyUpdates(Massive,
                                         Var Error        : Boolean;
                                         Var MessageError : String;
                                         Var RowsAffected : Integer): TJSONValue;
-var
-  MassiveDataset : TMassiveDatasetBuffer;
-begin
-  MassiveDataset := TMassiveDatasetBuffer.Create(nil);
-  try
-    MassiveDataset.FromJSON(Massive);
-    Result := ApplyUpdates(MassiveDataset,SQL,Params,Error,MessageError,RowsAffected);
-  finally
-    FreeAndNil(MassiveDataset);
-  end;
-end;
+Var
+ MassiveDataset : TMassiveDatasetBuffer;
+Begin
+ MassiveDataset := TMassiveDatasetBuffer.Create(nil);
+ Try
+  MassiveDataset.FromJSON(Massive);
+  Result := ApplyUpdates(MassiveDataset, SQL, Params, Error, MessageError, RowsAffected);
+ Finally
+  FreeAndNil(MassiveDataset);
+ End;
+End;
 
 Function TRESTDWDriverBase.ApplyUpdatesTB(MassiveStream    : TStream;
                                           SQL              : String;
@@ -4008,11 +4007,9 @@ begin
       else begin
         if (MassiveDataset.Fields.FieldByName(Query.Params[I].Name) <> nil) then begin
           vFieldType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).FieldType);
-          if not MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull then begin
+          if not MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull Then begin
             if vFieldType = ftUnknown then
-              Query.Params[I].DataType := ftString
-            else
-              Query.Params[I].DataType := vFieldType;
+              Query.Params[I].DataType := ftString;
             Query.Params[I].Clear;
           end;
 

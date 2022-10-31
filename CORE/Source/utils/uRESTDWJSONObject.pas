@@ -3804,28 +3804,13 @@ Begin
 End;
 
 Procedure TJSONValue.SaveToStream(Const Stream : TMemoryStream;
-                                  Binary : Boolean = False);
-Var
- vTempStream : TMemoryStream;
+                                  Binary       : Boolean = False);
 Begin
  Try
-  If Not Binary Then
-   Stream.Write(aValue[0], Length(aValue))
-  Else
-   Begin
-    If Not VarIsNull(Value) Then
-     Begin
-      vTempStream := DecodeStream(Value);
-      If Assigned(vTempStream) Then
-       Begin
-        Stream.CopyFrom(vTempStream, vTempStream.Size);
-        FreeAndNil(vTempStream);
-       End;
-     End;
-   End;
+  If Length(aValue) > 0 Then
+   Stream.Write(aValue[0], Length(aValue));
  Finally
-  If Assigned(Stream) Then
-   Stream.Position := 0;
+  Stream.Position := 0;
  End;
 End;
 
@@ -3916,10 +3901,19 @@ End;
 Procedure TJSONValue.LoadFromStream(Stream : TMemoryStream;
                                     Encode : Boolean = True);
 Begin
- ObjectValue := ovBlob;
- vBinary := True;
+// ObjectValue := ovBlob;
+// vBinary := True;
+ vNullValue := True;
  If Stream <> Nil Then
-  SetValue(EncodeStream(Stream), Encode); //StreamToHex(Stream), Encode);
+  Begin
+   If Stream.Size > 0 Then
+    Begin
+     SetLength(aValue, Stream.Size);
+     Stream.Read(aValue[0], Stream.Size);
+     vNullValue := False;
+    End;
+//   SetValue(EncodeStream(Stream), Encode);
+  End;
 End;
 
 Function TJSONValue.GetNewDataField : TNewDataField;
