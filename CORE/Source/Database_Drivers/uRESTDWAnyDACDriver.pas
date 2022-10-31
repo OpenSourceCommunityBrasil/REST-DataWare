@@ -1,4 +1,4 @@
-ï»¿unit uRESTDWAnyDACDriver;
+unit uRESTDWAnyDACDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -6,17 +6,17 @@
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware tambÃ©m tem por objetivo levar componentes compatÃ­veis entre o Delphi e outros Compiladores
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal vocÃª usuÃ¡rio que precisa
- de produtividade e flexibilidade para produÃ§Ã£o de ServiÃ§os REST/JSON, simplificando o processo para vocÃª programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de OrganizaÃ§Ã£o dos Projetos
- FlÃ¡vio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -31,30 +31,20 @@ uses
     LResources,
   {$ENDIF}
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes, uADCompClient,
-  uADCompDataSet, DB;
+  uADCompDataSet, DB, uADStanStorage, uADStanIntf, uADDatSManager, 
+  uADDAptIntf, uADDAptManager;
 
 const
-  {$IFDEF FPC}
-    rdwAnyDACDrivers : array of string = ('ads','asa','db2','ds','fb','ib',
-                        'iblite','infx','mongo','msacc','mssql','mysql','odbc',
-                        'ora','pg','sqlite','tdata','tdbx');
+    rdwAnyDACDrivers : array[0..17] of string = (('ads'),('asa'),('db2'),('ds'),
+                        ('fb'),('ib'),('iblite'),('infx'),('mongo'),('msacc'),
+                        ('mssql'),('mysql'),('odbc'),('ora'),('pg'),('sqlite'),
+                        ('tdata'),('tdbx'));
 
-    rdwAnyDACDbType : array of TRESTDWDatabaseType = (dbtUndefined,dbtUndefined,
-                       dbtDbase,dbtUndefined,dbtFirebird,dbtInterbase,dbtInterbase,
-                       dbtUndefined,dbtUndefined,dbtUndefined,dbtMsSQL,dbtMySQL,
-                       dbtODBC,dbtOracle,dbtPostgreSQL,dbtSQLLite,dbtUndefined,
-                       dbtUndefined);
-  {$ELSE}
-    rdwAnyDACDrivers : array of string = ['ads','asa','db2','ds','fb','ib',
-                        'iblite','infx','mongo','msacc','mssql','mysql','odbc',
-                        'ora','pg','sqlite','tdata','tdbx'];
-
-    rdwAnyDACDbType : array of TRESTDWDatabaseType = [dbtUndefined,dbtUndefined,
-                       dbtDbase,dbtUndefined,dbtFirebird,dbtInterbase,dbtInterbase,
-                       dbtUndefined,dbtUndefined,dbtUndefined,dbtMsSQL,dbtMySQL,
-                       dbtODBC,dbtOracle,dbtPostgreSQL,dbtSQLLite,dbtUndefined,
-                       dbtUndefined];
-  {$ENDIF}
+    rdwAnyDACDbType : array[0..17] of TRESTDWDatabaseType = ((dbtUndefined),(dbtUndefined),
+                       (dbtDbase),(dbtUndefined),(dbtFirebird),(dbtInterbase),(dbtInterbase),
+                       (dbtUndefined),(dbtUndefined),(dbtUndefined),(dbtMsSQL),(dbtMySQL),
+                       (dbtODBC),(dbtOracle),(dbtPostgreSQL),(dbtSQLLite),(dbtUndefined),
+                       (dbtUndefined));
 
 type
   { TRESTDWAnyDACStoreProc }
@@ -155,7 +145,7 @@ begin
   if not Assigned(Connection) then
     Exit;
 
-  conn := LowerCase(TADConnector(Connection).DriverName);
+  conn := LowerCase(TADConnection(Connection).DriverName);
 
   i := 0;
   while i < Length(rdwAnyDACDrivers) do begin
@@ -173,6 +163,9 @@ var
 begin
   qry := TADQuery.Create(Self);
   qry.Connection := TADConnection(Connection);
+  qry.FormatOptions.StrsTrim       := StrsTrim;
+  qry.FormatOptions.StrsEmpty2Null := StrsEmpty2Null;
+  qry.FormatOptions.StrsTrim2Len   := StrsTrim2Len;
 
   Result := TRESTDWAnyDACQuery.Create(qry);
 end;
@@ -184,6 +177,9 @@ begin
   qry := TADTable.Create(Self);
   qry.FetchOptions.RowsetSize := -1;
   qry.Connection := TADConnection(Connection);
+  qry.FormatOptions.StrsTrim       := StrsTrim;
+  qry.FormatOptions.StrsEmpty2Null := StrsEmpty2Null;
+  qry.FormatOptions.StrsTrim2Len   := StrsTrim2Len;
 
   Result := TRESTDWAnyDACTable.Create(qry);
 end;
@@ -233,14 +229,14 @@ procedure TRESTDWAnyDACDriver.connStartTransaction;
 begin
   inherited connStartTransaction;
   if Assigned(Connection) then
-    Result := TADConnection(Connection).StartTransaction;
+    TADConnection(Connection).StartTransaction;
 end;
 
 procedure TRESTDWAnyDACDriver.connRollback;
 begin
   inherited connRollback;
   if Assigned(Connection) then
-    Result := TADConnection(Connection).Rollback;
+    TADConnection(Connection).Rollback;
 end;
 
 function TRESTDWAnyDACDriver.compConnIsValid(comp: TComponent): boolean;
@@ -252,7 +248,7 @@ procedure TRESTDWAnyDACDriver.connCommit;
 begin
   inherited connCommit;
   if Assigned(Connection) then
-    Result := TADConnection(Connection).Commit;
+    TADConnection(Connection).Commit;
 end;
 
 class procedure TRESTDWAnyDACDriver.CreateConnection(const AConnectionDefs : TConnectionDefs;
@@ -352,7 +348,7 @@ end;
 procedure TRESTDWAnyDACQuery.createSequencedField(seqname, field : string);
 var
   qry : TADQuery;
-  fd : TADField;
+  fd : TField;
 begin
   qry := TADQuery(Self.Owner);
   fd := qry.FindField(field);
@@ -377,7 +373,7 @@ var
   qry : TADQuery;
 begin
   qry := TADQuery(Self.Owner);
-
+  qry.Params[IParam].LoadFromStream(stream,blobtype);
 end;
 
 procedure TRESTDWAnyDACQuery.Prepare;
@@ -403,7 +399,7 @@ var
 begin
   inherited SaveToStream(stream);
   qry := TADQuery(Self.Owner);
-  qry.SaveToStream(stream);
+  qry.SaveToStream(stream, sfBinary);
 
   stream.Position := 0;
 end;
@@ -414,9 +410,11 @@ procedure TRESTDWAnyDACTable.LoadFromStreamParam(IParam: integer;
   stream: TStream; blobtype: TBlobType);
 var
   qry : TADTable;
+  pname : string;
 begin
+  pname := Self.Params[IParam].Name;
   qry := TADTable(Self.Owner);
-
+  qry.ParamByName(pname).LoadFromStream(stream,blobtype);
 end;
 
 procedure TRESTDWAnyDACTable.SaveToStream(stream: TStream);
@@ -424,7 +422,7 @@ var
   qry : TADTable;
 begin
   qry := TADTable(Self.Owner);
-  qry.SaveToStream(stream);
+  qry.SaveToStream(stream, sfBinary);
 
   stream.Position := 0;
 end;
@@ -432,7 +430,7 @@ end;
 
 {$IFDEF FPC}
 initialization
-  {$I ../../Packages/Lazarus/Drivers/anydac/restdwanydacdriver.lrs}
+  {$I ./restdwanydacdriver.lrs}
 {$ENDIF}
 
 end.

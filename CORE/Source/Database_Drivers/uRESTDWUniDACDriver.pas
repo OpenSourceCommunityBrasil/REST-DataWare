@@ -1,4 +1,4 @@
-ï»¿unit uRESTDWUniDACDriver;
+unit uRESTDWUniDACDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -6,17 +6,17 @@
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware tambÃ©m tem por objetivo levar componentes compatÃ­veis entre o Delphi e outros Compiladores
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal vocÃª usuÃ¡rio que precisa
- de produtividade e flexibilidade para produÃ§Ã£o de ServiÃ§os REST/JSON, simplificando o processo para vocÃª programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de OrganizaÃ§Ã£o dos Projetos
- FlÃ¡vio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -34,37 +34,23 @@ uses
   DBAccess, Uni, uRESTDWMemtable, VirtualTable;
 
 const
-  {$IFDEF FPC}
-    rdwUniDACProtocols : array of string = ('access','advantage','ase','db2',
-                      'dbf','interbase','mysql','mongodb','nexusdb','obdc',
-                      'oracle','postgresql','redshift','sql server','sqlite',
-                      'bigcommerce','bigquery','dynamics 365','freshbooks',
-                      'hubspot','magento','mailchimp','netsuite','quickbooks',
-                      'salesforce mc','salesforce','sugar crm','zoho crm');
+  rdwUniDACProtocols : array[0..27] of string = (('access'),('advantage'),
+                      ('ase'),('db2'),('dbf'),('interbase'),('mysql'),
+                      ('mongodb'),('nexusdb'),('obdc'),('oracle'),
+                      ('postgresql'),('redshift'),('sql server'),('sqlite'),
+                      ('bigcommerce'),('bigquery'),('dynamics 365'),
+                      ('freshbooks'),('hubspot'),('magento'),('mailchimp'),
+                      ('netsuite'),('quickbooks'),('salesforce mc'),
+                      ('salesforce'),('sugar crm'),('zoho crm'));
 
-    rdwUniDACDbType : array of TRESTDWDatabaseType = (dbtAccess,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtDbase,dbtInterbase,dbtMySQL,
-                   dbtUndefined,dbtUndefined,dbtODBC,dbtOracle,dbtPostgreSQL,
-                   dbtUndefined,dbtMsSQL,dbtSQLLite,dbtUndefined,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtUndefined,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtUndefined,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtUndefined);
-  {$ELSE}
-    rdwUniDACProtocols : array of string = ['access','advantage','ase','db2',
-                      'dbf','interbase','mysql','mongodb','nexusdb','obdc',
-                      'oracle','postgresql','redshift','sql server','sqlite',
-                      'bigcommerce','bigquery','dynamics 365','freshbooks',
-                      'hubspot','magento','mailchimp','netsuite','quickbooks',
-                      'salesforce mc','salesforce','sugar crm','zoho crm'];
-
-    rdwUniDACDbType : array of TRESTDWDatabaseType = [dbtAccess,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtDbase,dbtInterbase,dbtMySQL,
-                   dbtUndefined,dbtUndefined,dbtODBC,dbtOracle,dbtPostgreSQL,
-                   dbtUndefined,dbtMsSQL,dbtSQLLite,dbtUndefined,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtUndefined,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtUndefined,dbtUndefined,
-                   dbtUndefined,dbtUndefined,dbtUndefined];
-  {$ENDIF}
+  rdwUniDACDbType : array[0..27] of TRESTDWDatabaseType = ((dbtAccess),
+                    (dbtUndefined),(dbtUndefined),(dbtUndefined),(dbtDbase),
+                    (dbtInterbase,(dbtMySQL),(dbtUndefined),(dbtUndefined),
+                    (dbtODBC),(dbtOracle),(dbtPostgreSQL),(dbtUndefined),
+                    (dbtMsSQL),(dbtSQLLite),(dbtUndefined),(dbtUndefined),
+                    (dbtUndefined),(dbtUndefined),(dbtUndefined),(dbtUndefined),
+                    (dbtUndefined),(dbtUndefined),(dbtUndefined),(dbtUndefined),
+                    (dbtUndefined),(dbtUndefined),(dbtUndefined));
 
 type
   TRESTDWUniDACTable = class(TRESTDWDrvTable)

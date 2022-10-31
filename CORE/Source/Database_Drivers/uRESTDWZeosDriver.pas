@@ -1,4 +1,4 @@
-ï»¿unit uRESTDWZeosDriver;
+unit uRESTDWZeosDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {$I ZComponent.inc}
@@ -7,17 +7,17 @@
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware tambÃ©m tem por objetivo levar componentes compatÃ­veis entre o Delphi e outros Compiladores
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal vocÃª usuÃ¡rio que precisa
- de produtividade e flexibilidade para produÃ§Ã£o de ServiÃ§os REST/JSON, simplificando o processo para vocÃª programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de OrganizaÃ§Ã£o dos Projetos
- FlÃ¡vio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -42,29 +42,16 @@ uses
   ZStoredProcedure, DB, ZEncoding, ZDatasetUtils;
 
 const
-  {$IFDEF FPC}
-    rdwZeosProtocols : array of string = ('ado','asa','asa_capi','firebird',
-                      'interbase','mssql','mysql','odbc_a','odbc_w','oledb',
-                      'oracle','pooled','postgresql','sqlite','sybase',
-                      'webserviceproxy');
+  rdwZeosProtocols : array[0..16] of string = (('ado'),('asa'),('asa_capi'),
+                    ('firebird'),('interbase'),('mssql'),('mysql'),('odbc_a'),
+                    ('odbc_w'),('oledb'),('oracle'),('pooled'),('postgresql'),
+                    ('sqlite'),('sybase'),('webserviceproxy'),('mariadb'));
 
-    rdwZeosDbType : array of TRESTDWDatabaseType = (dbtAdo,dbtUndefined,
-                   dbtUndefined,dbtFirebird,dbtInterbase,dbtMsSQL,dbtMySQL,
-                   dbtODBC,dbtODBC,dbtUndefined,dbtOracle,dbtUndefined,
-                   dbtPostgreSQL,dbtSQLLite,dbtUndefined,dbtUndefined);
-  {$ELSE}
-    rdwZeosProtocols : array of string = ['ado','asa','asa_capi','firebird',
-                      'interbase','mssql','mysql','odbc_a','odbc_w','oledb',
-                      'oracle','pooled','postgresql','sqlite','sybase',
-                      'webserviceproxy'];
-
-    rdwZeosDbType : array of TRESTDWDatabaseType = [dbtAdo,dbtUndefined,
-                   dbtUndefined,dbtFirebird,dbtInterbase,dbtMsSQL,dbtMySQL,
-                   dbtODBC,dbtODBC,dbtUndefined,dbtOracle,dbtUndefined,
-                   dbtPostgreSQL,dbtSQLLite,dbtUndefined,dbtUndefined];
-  {$ENDIF}
-
-  crdwConnectionNotZeos = 'Componente nÃ£o Ã© um ZeosConnection';
+  rdwZeosDbType : array[0..16] of TRESTDWDatabaseType = ((dbtAdo),(dbtUndefined),
+                 (dbtUndefined),(dbtFirebird),(dbtInterbase),(dbtMsSQL),(dbtMySQL),
+                 (dbtODBC),(dbtODBC),(dbtUndefined),(dbtOracle),(dbtUndefined),
+                 (dbtPostgreSQL),(dbtSQLLite),(dbtUndefined),(dbtUndefined),
+                 (dbtMySQL));
 
 type
   { TRESTDWZeosStoreProc }

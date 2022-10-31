@@ -1,4 +1,4 @@
-ï»¿unit uRESTDWFireDACDriver;
+unit uRESTDWFireDACDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -6,17 +6,17 @@
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware tambÃ©m tem por objetivo levar componentes compatÃ­veis entre o Delphi e outros Compiladores
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal vocÃª usuÃ¡rio que precisa
- de produtividade e flexibilidade para produÃ§Ã£o de ServiÃ§os REST/JSON, simplificando o processo para vocÃª programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de OrganizaÃ§Ã£o dos Projetos
- FlÃ¡vio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -33,15 +33,16 @@ uses
   FireDAC.Stan.Param, DB;
 
 const
-  rdwFireDACDrivers : array of string = ['ads','asa','db2','ds','fb','ib',
-                      'iblite','infx','mongo','msacc','mssql','mysql','odbc',
-                      'ora','pg','sqlite','tdata','tdbx'];
+  rdwFireDACDrivers : array[0..17] of string = (('ads'),('asa'),('db2'),('ds'),
+                      ('fb'),('ib'),('iblite'),('infx'),('mongo'),('msacc'),
+                      ('mssql'),('mysql'),('odbc'),('ora'),('pg'),('sqlite'),
+                      ('tdata'),('tdbx'));
 
-  rdwFireDACDbType : array of TRESTDWDatabaseType = [dbtUndefined,dbtUndefined,
-                     dbtDbase,dbtUndefined,dbtFirebird,dbtInterbase,dbtInterbase,
-                     dbtUndefined,dbtUndefined,dbtUndefined,dbtMsSQL,dbtMySQL,
-                     dbtODBC,dbtOracle,dbtPostgreSQL,dbtSQLLite,dbtUndefined,
-                     dbtUndefined];
+  rdwFireDACDbType : array[0..17] of TRESTDWDatabaseType = ((dbtUndefined),(dbtUndefined),
+                     (dbtDbase),(dbtUndefined),(dbtFirebird),(dbtInterbase),(dbtInterbase),
+                     (dbtUndefined),(dbtUndefined),(dbtUndefined),(dbtMsSQL),(dbtMySQL),
+                     (dbtODBC),(dbtOracle),(dbtPostgreSQL),(dbtSQLLite),(dbtUndefined),
+                     (dbtUndefined));
 
 type
   { TRESTDWFireDACStoreProc }
