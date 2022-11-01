@@ -1,4 +1,4 @@
-unit uRESTDWApolloDBDriver;
+﻿unit uRESTDWApolloDBDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -27,14 +27,14 @@ unit uRESTDWApolloDBDriver;
 interface
 
 uses
-  Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes,
-  apWin, ApConn, apoQSet, apCommon;
+  Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes, uRESTDWConsts,
+  apWin, ApConn, apoQSet, apCommon, DB, ApoDSet, TypInfo, apGlobal,
+  apoEnv, uRESTDWMemTable;
 
 type
   TRESTDWApolloDBTable = class(TRESTDWDrvTable)
   public
     procedure SaveToStream(stream : TStream); override;
-    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
   end;
   { TRESTDWApolloDBQuery }
 
@@ -52,9 +52,8 @@ type
 
   TRESTDWApolloDBDriver = class(TRESTDWDriverBase)
   private
-    FDatabaseName : string;
-    FPassword : string;
     FTableType : TApolloTableType;
+    FPassword : string;
   protected
     Function compConnIsValid(comp : TComponent) : boolean; override;
   public
@@ -66,12 +65,20 @@ type
 
     function isConnected : boolean; override;
 
+    Procedure GetTableNames     (Var TableNames        : TStringList;
+                                 Var Error             : Boolean;
+                                 Var MessageError      : String); override;
+    
+    Procedure GetFieldNames     (TableName             : String;
+                                 Var FieldNames        : TStringList;
+                                 Var Error             : Boolean;
+                                 Var MessageError      : String); override;
+
     class procedure CreateConnection(Const AConnectionDefs : TConnectionDefs;
                                      var AConnection : TComponent); override;
   published
-    property DatabaseName : String            read FDatabaseName  Write FDatabaseName;
+    property TableType    : TApolloTableType  read FTableType     Write FTableType;  
     property Password     : String            read FPassword      Write FPassword;
-    property TableType    : TApolloTableType  read FTableType     Write FTableType;
   end;
 
 
@@ -94,13 +101,24 @@ end;
 
 function TRESTDWApolloDBDriver.getQuery : TRESTDWDrvQuery;
 var
-  qry : TMyQuery;
+  qry : TApolloQuery;
 begin
-  qry := TMyQuery.Create(Self);
-//  qry.Connection := TApolloConnection(Connection);
-  qry.DatabaseName := FDatabaseName;
-  qry.TableType    := FTableType;
-  qry.Password     := FPassword;
+  qry := TApolloQuery.Create(Self);
+  if Connection is TApolloConnection then begin 
+    qry.AccessMethod := amServer;
+    qry.DatabaseName := '';
+    if Self.ServerMethod <> nil then     
+      qry.DataBaseName := Self.ServerMethod.ClientWelcomeMessage;
+    qry.ApolloConnection := TApolloConnection(Connection);
+    qry.ApolloConnection.DataBaseName := qry.DataBaseName;
+  end
+  else if Connection is TApolloDatabase then begin  
+    qry.AccessMethod := amLocal;
+    qry.ApolloConnection := nil;
+    qry.DatabaseName := TApolloDatabase(Connection).DataPathAlias;
+  end;
+  qry.TableType := FTableType;
+  qry.Password := FPassword;
 
   Result := TRESTDWApolloDBQuery.Create(qry);
 end;
@@ -110,44 +128,191 @@ var
   qry : TApolloTable;
 begin
   qry := TApolloTable.Create(Self);
-//  qry.Connection := TApolloConnection(Connection);
-  qry.DatabaseName := FDatabaseName;
-  qry.TableType    := FTableType;
-  qry.Password     := FPassword;
+  if Connection is TApolloConnection then begin  
+    qry.AccessMethod := amServer;
+    qry.DatabaseName := '';
+    if Self.ServerMethod <> nil then     
+      qry.DatabaseName := Self.ServerMethod.ClientWelcomeMessage;
+    qry.ApolloConnection := TApolloConnection(Connection);
+  end
+  else if Connection is TApolloDatabase then begin  
+    qry.AccessMethod := amLocal;
+    qry.ApolloConnection := nil;
+    qry.DatabaseName := TApolloDatabase(Connection).DataPathAlias;
+  end;
+  qry.TableType := FTableType;
+  qry.Password := FPassword;
 
   Result := TRESTDWApolloDBTable.Create(qry);
 end;
 
+procedure TRESTDWApolloDBDriver.GetTableNames(var TableNames: TStringList;
+  var Error: Boolean; var MessageError: String);
+var
+  dbs, tbs, tabs : TStringList;
+  p : integer;
+  s : string;
+begin   
+  tabs := TStringList.Create;     
+  if Connection is TApolloConnection then begin  
+    dbs := TApolloConnection(Connection).GetDatabaseNamesList;
+    while dbs.Count > 0 do begin
+      tbs := TApolloConnection(Connection).GetTableNamesList(dbs.Strings[0]); 
+      while tbs.Count > 0 do begin      
+        s := AnsiUpperCase(tbs.Strings[0]);
+        p := LastDelimiter('.',s);
+        if p > 0 then    
+          s := Copy(s,1,p-1); 
+
+        tabs.Add(dbs.Strings[0]+'.'+s);
+        tbs.Delete(0);      
+      end;
+      dbs.Delete(0);
+    end;
+    FreeAndNil(dbs);
+    FreeAndNil(tbs);    
+  end
+  else if Connection is TApolloDatabase then begin
+    tbs := TStringList.Create;     
+    TApolloDatabase(Connection).EnumTableNames(tbs);
+    while tbs.Count > 0 do begin
+      s := AnsiUpperCase(tbs.Strings[0]);
+      p := LastDelimiter('.',s);
+      if p > 0 then    
+        s := Copy(s,1,p-1); 
+      tabs.Add(s);
+      tbs.Delete(0);
+    end;
+    FreeAndNil(tbs);
+  end;
+
+  if Not Assigned(TableNames) then
+    TableNames := TStringList.Create;
+
+  while tabs.Count > 0 do begin
+    TableNames.Add(tabs.Strings[0]);
+    tabs.Delete(0);   
+  end;             
+  
+  FreeAndNil(tabs);
+end;
+
 function TRESTDWApolloDBDriver.compConnIsValid(comp: TComponent): boolean;
 begin
-  Result := comp.InheritsFrom(TApolloConnection);
+  Result := comp.InheritsFrom(TApolloConnection) or
+            comp.InheritsFrom(TApolloDatabase);
 end;
 
 procedure TRESTDWApolloDBDriver.Connect;
 begin
-  if Assigned(Connection) then
-    TApolloConnection(Connection).Open;
+  if Assigned(Connection) and (Connection is TApolloConnection) then
+    TApolloConnection(Connection).Connect;
   inherited Connect;
 end;
 
 procedure TRESTDWApolloDBDriver.Disconect;
 begin
-  if Assigned(Connection) then
-    TMyConnection(Connection).Close;
+  if Assigned(Connection) and (Connection is TApolloConnection) then
+    TApolloConnection(Connection).Disconnect;
   inherited Disconect;
+end;
+
+procedure TRESTDWApolloDBDriver.GetFieldNames(TableName: String;
+  var FieldNames: TStringList; var Error: Boolean; var MessageError: String);
+var
+  qry : TApolloTable;
+  i : integer;
+  vSchema, vTable : string;
+  vStateResource : boolean;
+begin
+  if not Assigned(FieldNames) then
+    FieldNames := TStringList.Create;
+   
+  vSchema := '';
+  vTable := TableName;
+  if Pos('.', vTable) > 0 then begin
+    vSchema := Copy(vTable, InitStrPos, Pos('.', vTable)-1);
+    Delete(vTable, InitStrPos, Pos('.', vTable));
+  end;
+  vTable := vTable + '.DBF';
+  
+  qry := TApolloTable.Create(Self);
+  qry.Close;
+  try
+    if Connection is TApolloConnection then begin  
+      if not SameText(vSchema,TApolloConnection(Connection).DataBaseName) then
+        Disconect;
+        
+      TApolloConnection(Connection).DataBaseName := '';
+
+      vStateResource := isConnected;
+      if not vStateResource Then
+        Connect;       
+
+      TApolloConnection(Connection).GetDataBaseNames;
+      TApolloConnection(Connection).DataBaseName := vSchema;
+      
+      i := TApolloConnection(Connection).ap_GetTableType(vSchema,vTable);
+      
+      qry.AccessMethod := amServer;
+      qry.ApolloConnection := TApolloConnection(Connection);
+      qry.DatabaseName := TApolloConnection(Connection).DataBaseName;      
+      qry.TableType := TApolloTableType(i);
+    end
+    else if Connection is TApolloDatabase then begin  
+      qry.AccessMethod := amLocal;
+      qry.ApolloConnection := nil;
+      qry.DatabaseName := TApolloDatabase(Connection).DataPathAlias;     
+      qry.TableType := FTableType;
+    end;
+    qry.Password := FPassword;
+    qry.TableName := vTable;
+
+    try
+      qry.Open;
+    except
+      i := 0;      
+      while i < 5 do begin
+        try
+          qry.TableType := TApolloTableType(i);
+          qry.Open;
+          Break;
+        except
+
+        end;
+        i := i + 1;
+      end;    
+    end;
+
+    i := 0;
+    while i < qry.Fields.Count do begin
+      FieldNames.Add(AnsiUpperCase(qry.Fields[i].DisplayName));
+      i := i + 1;  
+    end;
+  finally
+    qry.Free;
+  end;
+
+  if not vStateResource then
+    Disconect;  
 end;
 
 function TRESTDWApolloDBDriver.isConnected : boolean;
 begin
   Result:=inherited isConnected;
-  if Assigned(Connection) then
-    Result := TApolloConnection(Connection).Connected;
+  if Assigned(Connection) then begin
+    if (Connection is TApolloConnection) then
+      Result := TApolloConnection(Connection).Connected
+    else if (Connection is TApolloDatabase) then
+      Result := TApolloDatabase(Connection).DataPathAlias <> '';       
+  end;
 end;
 
 class procedure TRESTDWApolloDBDriver.CreateConnection(const AConnectionDefs : TConnectionDefs;
                                                      var AConnection : TComponent);
 begin
   inherited CreateConnection(AConnectionDefs, AConnection);
+ 
 end;
 
 { TRESTDWApolloDBQuery }
@@ -156,16 +321,17 @@ procedure TRESTDWApolloDBQuery.ExecSQL;
 var
   qry : TApolloQuery;
 begin
-  inherited ExecSQL;
   qry := TApolloQuery(Self.Owner);
   qry.ExecSQL;
 end;
 
 procedure TRESTDWApolloDBQuery.LoadFromStreamParam(IParam: integer;
   stream: TStream; blobtype: TBlobType);
+var
+  qry : TApolloQuery;
 begin
-  inherited;
-
+  qry := TApolloQuery(Self.Owner);
+  qry.Params[IParam].LoadFromStream(stream,blobtype);
 end;
 
 procedure TRESTDWApolloDBQuery.Prepare;
@@ -182,28 +348,39 @@ var
   qry : TApolloQuery;
 begin
   qry := TApolloQuery(Self.Owner);
-  Result := -1; //qry.RowsAffected;
+  Result := qry.RecordCount;
 end;
 
 procedure TRESTDWApolloDBQuery.SaveToStream(stream: TStream);
+var
+  qry : TApolloQuery;
+  vDWMemtable : TRESTDWMemtable;
 begin
-  inherited;
-
+  qry := TApolloQuery(Self.Owner);
+  vDWMemtable := TRESTDWMemtable.Create(nil);
+  try
+    vDWMemtable.Assign(qry);
+    vDWMemtable.SaveToStream(stream);
+  finally
+    vDWMemtable.Free;
+  end;
 end;
 
 { TRESTDWApolloDBTable }
 
-procedure TRESTDWApolloDBTable.LoadFromStreamParam(IParam: integer;
-  stream: TStream; blobtype: TBlobType);
-begin
-  inherited;
-
-end;
-
 procedure TRESTDWApolloDBTable.SaveToStream(stream: TStream);
+var
+  qry : TApolloTable;
+  vDWMemtable : TRESTDWMemtable;
 begin
-  inherited;
-
+  qry := TApolloTable(Self.Owner);
+  vDWMemtable := TRESTDWMemtable.Create(nil);
+  try
+    vDWMemtable.Assign(qry);
+    vDWMemtable.SaveToStream(stream);
+  finally
+    vDWMemtable.Free;
+  end;
 end;
 
 end.
