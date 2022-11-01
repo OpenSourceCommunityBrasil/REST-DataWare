@@ -75,7 +75,7 @@ Const
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
  RESTDWVersionINFO          = 'v2.1.0-';
- RESTDWRelease              = '166';
+ RESTDWRelease              = '171';
  RESTDWCodeProject          = 'Galaga - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
