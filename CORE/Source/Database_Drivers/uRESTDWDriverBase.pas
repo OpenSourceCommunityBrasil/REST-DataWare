@@ -1,4 +1,4 @@
-unit uRESTDWDriverBase;
+﻿unit uRESTDWDriverBase;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -399,6 +399,8 @@ Uses
   Procedure BuildDatasetLine      (Var Query              : TRESTDWDrvDataset;
                                    Massivedataset         : TMassivedatasetBuffer;
                                    MassiveCache           : Boolean = False);
+
+  property ServerMethod  : TServerMethodDataModule read FServerMethod;
  Published
   Property Connection          : TComponent           read FConnection            write setConnection;
 
