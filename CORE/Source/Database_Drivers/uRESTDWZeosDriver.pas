@@ -1,4 +1,4 @@
-unit uRESTDWZeosDriver;
+﻿unit uRESTDWZeosDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {$I ZComponent.inc}
@@ -66,6 +66,7 @@ type
   public
     procedure SaveToStream(stream : TStream); override;
     procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
+    procedure FetchAll; override;
   end;
 
   { TRESTDWZeosQuery }
@@ -80,6 +81,7 @@ type
     procedure ExecSQL; override;
     procedure Prepare; override;
     procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
+    procedure FetchAll; override;
 
     destructor Destroy; override;
 
@@ -365,6 +367,14 @@ begin
   qry.ExecSQL;
 end;
 
+procedure TRESTDWZeosQuery.FetchAll;
+var
+  qry : TZTable;
+begin
+  qry := TZQuery(Self.Owner);
+  qry.FetchAll;
+end;
+
 procedure TRESTDWZeosQuery.LoadFromStreamParam(IParam: integer; stream: TStream;
   blobtype: TBlobType);
 var
@@ -442,6 +452,14 @@ begin
 end;
 
 { TRESTDWZeosTable }
+
+procedure TRESTDWZeosTable.FetchAll;
+var
+  qry : TZTable;
+begin
+  qry := TZTable(Self.Owner);
+  qry.FetchAll;
+end;
 
 procedure TRESTDWZeosTable.LoadFromStreamParam(IParam: integer; stream: TStream;
   blobtype: TBlobType);

@@ -44,6 +44,7 @@ type
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
+    procedure FetchAll; override;
 
     function RowsAffected : Int64; override;
   end;
@@ -128,20 +129,21 @@ var
   qry : TApolloTable;
 begin
   qry := TApolloTable.Create(Self);
-  if Connection is TApolloConnection then begin  
+  if Connection is TApolloConnection then begin
     qry.AccessMethod := amServer;
     qry.DatabaseName := '';
-    if Self.ServerMethod <> nil then     
+    if Self.ServerMethod <> nil then
       qry.DatabaseName := Self.ServerMethod.ClientWelcomeMessage;
     qry.ApolloConnection := TApolloConnection(Connection);
   end
-  else if Connection is TApolloDatabase then begin  
+  else if Connection is TApolloDatabase then begin
     qry.AccessMethod := amLocal;
     qry.ApolloConnection := nil;
     qry.DatabaseName := TApolloDatabase(Connection).DataPathAlias;
   end;
   qry.TableType := FTableType;
   qry.Password := FPassword;
+  qry.FetchCount := -1; // fetchall
 
   Result := TRESTDWApolloDBTable.Create(qry);
 end;
@@ -323,6 +325,14 @@ var
 begin
   qry := TApolloQuery(Self.Owner);
   qry.ExecSQL;
+end;
+
+procedure TRESTDWApolloDBQuery.FetchAll;
+var
+  qry : TApolloQuery;
+begin
+  qry := TApolloQuery(Self.Owner);
+  qry.FetchAll;
 end;
 
 procedure TRESTDWApolloDBQuery.LoadFromStreamParam(IParam: integer;
