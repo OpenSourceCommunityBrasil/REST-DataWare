@@ -1,4 +1,4 @@
-unit uRESTDWAnyDACDriver;
+﻿unit uRESTDWAnyDACDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -59,6 +59,7 @@ type
   public
     procedure SaveToStream(stream : TStream); override;
     procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
+    procedure FetchAll; override;
   end;
 
   { TRESTDWAnyDACQuery }
@@ -71,6 +72,7 @@ type
     procedure ExecSQL; override;
     procedure Prepare; override;
     procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
+    procedure FetchAll; override;
 
     function RowsAffected : Int64; override;
   end;
@@ -367,6 +369,14 @@ begin
   qry.ExecSQL;
 end;
 
+procedure TRESTDWAnyDACQuery.FetchAll;
+var
+  qry : TADQuery;
+begin
+  qry := TADQuery(Self.Owner);
+  qry.FetchAll;
+end;
+
 procedure TRESTDWAnyDACQuery.LoadFromStreamParam(IParam: integer;
   stream: TStream; blobtype: TBlobType);
 var
@@ -405,6 +415,14 @@ begin
 end;
 
 { TRESTDWAnyDACTable }
+
+procedure TRESTDWAnyDACTable.FetchAll;
+var
+  qry : TADTable;
+begin
+  qry := TADTable(Self.Owner);
+  qry.FetchAll;
+end;
 
 procedure TRESTDWAnyDACTable.LoadFromStreamParam(IParam: integer;
   stream: TStream; blobtype: TBlobType);

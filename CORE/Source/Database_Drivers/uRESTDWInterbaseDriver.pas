@@ -47,6 +47,7 @@ type
   TRESTDWInterbaseTable = class(TRESTDWDrvTable)
   public
     procedure SaveToStream(stream : TStream); override;
+    procedure FetchAll; override;
   end;
 
   { TRESTDWInterbaseQuery }
@@ -59,6 +60,7 @@ type
     procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
+    procedure FetchAll; override;
 
     function RowsAffected : Int64; override;
   end;
@@ -125,6 +127,14 @@ begin
   inherited ExecSQL;
   qry := TIBQuery(Self.Owner);
   qry.ExecSQL;
+end;
+
+procedure TRESTDWInterbaseQuery.FetchAll;
+var
+  qry : TIBQuery;
+begin
+  qry := TIBQuery(Self.Owner);
+  qry.FetchAll;
 end;
 
 procedure TRESTDWInterbaseQuery.LoadFromStreamParam(IParam: integer;
@@ -342,6 +352,14 @@ begin
 end;
 
 { TRESTDWInterbaseTable }
+
+procedure TRESTDWInterbaseTable.FetchAll;
+var
+  qry : TIBTable;
+begin
+  qry := TIBTable(Self.Owner);
+  qry.FetchAll;
+end;
 
 procedure TRESTDWInterbaseTable.SaveToStream(stream: TStream);
 var

@@ -1,4 +1,4 @@
-unit uRESTDWFireDACDriver;
+﻿unit uRESTDWFireDACDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -58,6 +58,7 @@ type
   public
     procedure SaveToStream(stream : TStream); override;
     procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
+    procedure FetchAll; override;
   end;
 
   { TRESTDWFireDACQuery }
@@ -69,6 +70,7 @@ type
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
+    procedure FetchAll; override;
 
     procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
     function RowsAffected : Int64; override;
@@ -374,6 +376,14 @@ begin
   qry.ExecSQL;
 end;
 
+procedure TRESTDWFireDACQuery.FetchAll;
+var
+  qry : TFDQuery;
+begin
+  qry := TFDQuery(Self.Owner);
+  qry.FetchAll;
+end;
+
 procedure TRESTDWFireDACQuery.LoadFromStreamParam(IParam: integer;
   stream: TStream; blobtype: TBlobType);
 var
@@ -412,6 +422,14 @@ begin
 end;
 
 { TRESTDWFireDACTable }
+
+procedure TRESTDWFireDACTable.FetchAll;
+var
+  qry : TFDTable;
+begin
+  qry := TFDTable(Self.Owner);
+  qry.FetchAll;
+end;
 
 procedure TRESTDWFireDACTable.LoadFromStreamParam(IParam: integer;
   stream: TStream; blobtype: TBlobType);

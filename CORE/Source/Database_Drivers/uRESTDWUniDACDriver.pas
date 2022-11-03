@@ -1,4 +1,4 @@
-unit uRESTDWUniDACDriver;
+﻿unit uRESTDWUniDACDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -45,7 +45,7 @@ const
 
   rdwUniDACDbType : array[0..27] of TRESTDWDatabaseType = ((dbtAccess),
                     (dbtUndefined),(dbtUndefined),(dbtUndefined),(dbtDbase),
-                    (dbtInterbase,(dbtMySQL),(dbtUndefined),(dbtUndefined),
+                    (dbtInterbase)(dbtMySQL),(dbtUndefined),(dbtUndefined),
                     (dbtODBC),(dbtOracle),(dbtPostgreSQL),(dbtUndefined),
                     (dbtMsSQL),(dbtSQLLite),(dbtUndefined),(dbtUndefined),
                     (dbtUndefined),(dbtUndefined),(dbtUndefined),(dbtUndefined),
@@ -57,6 +57,7 @@ type
   public
     procedure SaveToStream(stream : TStream); override;
     procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
+    procedure FetchAll; override;
   end;
 
   { TRESTDWUniDACStoreProc }
@@ -77,6 +78,7 @@ type
     procedure ExecSQL; override;
     procedure Prepare; override;
     procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
+    procedure FetchAll; override;
 
     function RowsAffected : Int64; override;
   end;
@@ -336,6 +338,14 @@ begin
   qry.ExecSQL;
 end;
 
+procedure TRESTDWUniDACQuery.FetchAll;
+var
+  qry : TUniQuery;
+begin
+  qry := TUniQuery(Self.Owner);
+  qry.FetchingAll;
+end;
+
 procedure TRESTDWUniDACQuery.LoadFromStreamParam(IParam: integer;
   stream: TStream; blobtype: TBlobType);
 var
@@ -379,6 +389,14 @@ begin
 end;
 
 { TRESTDWUniDACTable }
+
+procedure TRESTDWUniDACTable.FetchAll;
+var
+  qry : TUniTable;
+begin
+  qry := TUniTable(Self.Owner);
+  qry.FetchingAll;
+end;
 
 procedure TRESTDWUniDACTable.LoadFromStreamParam(IParam: integer;
   stream: TStream; blobtype: TBlobType);
