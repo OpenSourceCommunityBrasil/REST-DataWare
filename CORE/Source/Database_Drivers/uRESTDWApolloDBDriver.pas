@@ -46,7 +46,16 @@ type
     procedure Prepare; override;
     procedure FetchAll; override;
 
-    function RowsAffected : Int64; override;
+    function  RowsAffected : Int64; override;
+    function  ParamCount : Integer; override;
+
+    function  getParamDataType(IParam : integer) : TFieldType; override;
+    function  getParamName(IParam : integer) : string; override;
+    function  getParamSize(IParam : integer) : integer; override;
+    function  getParamValue(IParam : integer) : variant; override;
+
+    procedure setParamDataType(IParam : integer; AValue : TFieldType); override;
+    procedure setParamValue(IParam : integer; AValue : variant); override;
   end;
 
   { TRESTDWApolloDBDriver }
@@ -335,6 +344,38 @@ begin
   qry.FetchAll;
 end;
 
+function TRESTDWApolloDBQuery.getParamDataType(IParam: integer): TFieldType;
+var
+  qry : TApolloQuery;
+begin
+  qry := TApolloQuery(Self.Owner);
+  Result := qry.Params[IParam].DataType;
+end;
+
+function TRESTDWApolloDBQuery.getParamName(IParam: integer): string;
+var
+  qry : TApolloQuery;
+begin
+  qry := TApolloQuery(Self.Owner);
+  Result := qry.Params[IParam].Name;
+end;
+
+function TRESTDWApolloDBQuery.getParamSize(IParam: integer): integer;
+var
+  qry : TApolloQuery;
+begin
+  qry := TApolloQuery(Self.Owner);
+  Result := qry.Params[IParam].Size;
+end;
+
+function TRESTDWApolloDBQuery.getParamValue(IParam: integer): variant;
+var
+  qry : TApolloQuery;
+begin
+  qry := TApolloQuery(Self.Owner);
+  Result := qry.Params[IParam].Value;
+end;
+
 procedure TRESTDWApolloDBQuery.LoadFromStreamParam(IParam: integer;
   stream: TStream; blobtype: TBlobType);
 var
@@ -342,6 +383,14 @@ var
 begin
   qry := TApolloQuery(Self.Owner);
   qry.Params[IParam].LoadFromStream(stream,blobtype);
+end;
+
+function TRESTDWApolloDBQuery.ParamCount: Integer;
+var
+  qry : TApolloQuery;
+begin
+  qry := TApolloQuery(Self.Owner);
+  Result := qry.ParamCount;
 end;
 
 procedure TRESTDWApolloDBQuery.Prepare;
@@ -374,6 +423,24 @@ begin
   finally
     vDWMemtable.Free;
   end;
+end;
+
+procedure TRESTDWApolloDBQuery.setParamDataType(IParam: integer;
+                                                AValue: TFieldType);
+var
+  qry : TApolloQuery;
+begin
+  qry := TApolloQuery(Self.Owner);
+  Result := qry.Params[IParam].DataType := AValue;
+end;
+
+procedure TRESTDWApolloDBQuery.setParamValue(IParam: integer;
+                                             AValue: variant);
+var
+  qry : TApolloQuery;
+begin
+  qry := TApolloQuery(Self.Owner);
+  Result := qry.Params[IParam].Value := AValue;
 end;
 
 { TRESTDWApolloDBTable }

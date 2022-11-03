@@ -45,7 +45,7 @@ const
 
   rdwUniDACDbType : array[0..27] of TRESTDWDatabaseType = ((dbtAccess),
                     (dbtUndefined),(dbtUndefined),(dbtUndefined),(dbtDbase),
-                    (dbtInterbase)(dbtMySQL),(dbtUndefined),(dbtUndefined),
+                    (dbtInterbase),(dbtMySQL),(dbtUndefined),(dbtUndefined),
                     (dbtODBC),(dbtOracle),(dbtPostgreSQL),(dbtUndefined),
                     (dbtMsSQL),(dbtSQLLite),(dbtUndefined),(dbtUndefined),
                     (dbtUndefined),(dbtUndefined),(dbtUndefined),(dbtUndefined),
@@ -77,10 +77,20 @@ type
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
-    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
     procedure FetchAll; override;
 
-    function RowsAffected : Int64; override;
+    function  RowsAffected : Int64; override;
+    function  ParamCount : Integer; override;
+
+    function  getParamDataType(IParam : integer) : TFieldType; override;
+    function  getParamName(IParam : integer) : string; override;
+    function  getParamSize(IParam : integer) : integer; override;
+    function  getParamValue(IParam : integer) : variant; override;
+
+    procedure setParamDataType(IParam : integer; AValue : TFieldType); override;
+    procedure setParamValue(IParam : integer; AValue : variant); override;
+
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
   end;
 
   { TRESTDWUniDACDriver }
@@ -370,6 +380,62 @@ var
 begin
   qry := TUniQuery(Self.Owner);
   Result := qry.RowsAffected;
+end;
+
+function TRESTDWUniDACQuery.ParamCount : Integer;
+var
+  qry : TUniQuery;
+begin
+  qry := TUniQuery(Self.Owner);
+  Result := qry.ParamCount;
+end;
+
+function TRESTDWUniDACQuery.getParamDataType(IParam : integer) : TFieldType;
+var
+  qry : TUniQuery;
+begin
+  qry := TUniQuery(Self.Owner);
+  Result := qry.Params[IParam].DataType;
+end;
+
+function TRESTDWUniDACQuery.getParamName(IParam : integer) : string;
+var
+  qry : TUniQuery;
+begin
+  qry := TUniQuery(Self.Owner);
+  Result := qry.Params[IParam].Name;
+end;
+
+function TRESTDWUniDACQuery.getParamSize(IParam : integer) : integer;
+var
+  qry : TUniQuery;
+begin
+  qry := TUniQuery(Self.Owner);
+  Result := qry.Params[IParam].Size;
+end;
+
+function TRESTDWUniDACQuery.getParamValue(IParam : integer) : variant;
+var
+  qry : TUniQuery;
+begin
+  qry := TUniQuery(Self.Owner);
+  Result := qry.Params[IParam].Value;
+end;
+
+procedure TRESTDWUniDACQuery.setParamDataType(IParam : integer; AValue : TFieldType);
+var
+  qry : TUniQuery;
+begin
+  qry := TUniQuery(Self.Owner);
+  qry.Params[IParam].DataType := AValue;
+end;
+
+procedure TRESTDWUniDACQuery.setParamValue(IParam : integer; AValue : variant);
+var
+  qry : TUniQuery;
+begin
+  qry := TUniQuery(Self.Owner);
+  qry.Params[IParam].Value := AValue;
 end;
 
 procedure TRESTDWUniDACQuery.SaveToStream(stream: TStream);

@@ -53,11 +53,21 @@ type
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
-    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
 
     destructor Destroy; override;
 
-    function RowsAffected : Int64; override;
+    function  RowsAffected : Int64; override;
+    function  ParamCount : Integer; override;
+
+    function  getParamDataType(IParam : integer) : TFieldType; override;
+    function  getParamName(IParam : integer) : string; override;
+    function  getParamSize(IParam : integer) : integer; override;
+    function  getParamValue(IParam : integer) : variant; override;
+
+    procedure setParamDataType(IParam : integer; AValue : TFieldType); override;
+    procedure setParamValue(IParam : integer; AValue : variant); override;
+
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
   end;
 
   { TRESTDWLazSQLDriver }
@@ -158,6 +168,62 @@ var
 begin
   qry := TSQLQuery(Self.Owner);
   Result := qry.RowsAffected;
+end;
+
+function TRESTDWLazSQLQuery.ParamCount : Integer;
+var
+  qry : TSQLQuery;
+begin
+  qry := TSQLQuery(Self.Owner);
+  Result := qry.Params.Count;
+end;
+
+function TRESTDWLazSQLQuery.getParamDataType(IParam : integer) : TFieldType;
+var
+  qry : TSQLQuery;
+begin
+  qry := TSQLQuery(Self.Owner);
+  Result := qry.Params[IParam].DataType;
+end;
+
+function TRESTDWLazSQLQuery.getParamName(IParam : integer) : string;
+var
+  qry : TSQLQuery;
+begin
+  qry := TSQLQuery(Self.Owner);
+  Result := qry.Params[IParam].Name;
+end;
+
+function TRESTDWLazSQLQuery.getParamSize(IParam : integer) : integer;
+var
+  qry : TSQLQuery;
+begin
+  qry := TSQLQuery(Self.Owner);
+  Result := qry.Params[IParam].Size;
+end;
+
+function TRESTDWLazSQLQuery.getParamValue(IParam : integer) : variant;
+var
+  qry : TSQLQuery;
+begin
+  qry := TSQLQuery(Self.Owner);
+  Result := qry.Params[IParam].Value;
+end;
+
+procedure TRESTDWLazSQLQuery.setParamDataType(IParam : integer; AValue : TFieldType);
+var
+  qry : TSQLQuery;
+begin
+  qry := TSQLQuery(Self.Owner);
+  qry.Params[IParam].DataType := AValue;
+end;
+
+procedure TRESTDWLazSQLQuery.setParamValue(IParam : integer; AValue : variant);
+var
+  qry : TSQLQuery;
+begin
+  qry := TSQLQuery(Self.Owner);
+  qry.Params[IParam].Value := AValue;
 end;
 
 procedure TRESTDWLazSQLQuery.SaveToStream(stream: TStream);

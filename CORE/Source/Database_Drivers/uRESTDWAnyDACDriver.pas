@@ -74,7 +74,16 @@ type
     procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
     procedure FetchAll; override;
 
-    function RowsAffected : Int64; override;
+    function  RowsAffected : Int64; override;
+    function  ParamCount : Integer; override;
+
+    function  getParamDataType(IParam : integer) : TFieldType; override;
+    function  getParamName(IParam : integer) : string; override;
+    function  getParamSize(IParam : integer) : integer; override;
+    function  getParamValue(IParam : integer) : variant; override;
+
+    procedure setParamDataType(IParam : integer; AValue : TFieldType); override;
+    procedure setParamValue(IParam : integer; AValue : variant); override;
   end;
 
   { TRESTDWAnyDACDriver }
@@ -377,6 +386,38 @@ begin
   qry.FetchAll;
 end;
 
+function TRESTDWAnyDACQuery.getParamDataType(IParam: integer): TFieldType;
+var
+  qry : TADQuery;
+begin
+  qry := TADQuery(Self.Owner);
+  Result := qry.Params[IParam].DataType;
+end;
+
+function TRESTDWAnyDACQuery.getParamName(IParam: integer): string;
+var
+  qry : TADQuery;
+begin
+  qry := TADQuery(Self.Owner);
+  Result := qry.Params[IParam].Name;
+end;
+
+function TRESTDWAnyDACQuery.getParamSize(IParam: integer): integer;
+var
+  qry : TADQuery;
+begin
+  qry := TADQuery(Self.Owner);
+  Result := qry.Params[IParam].Size;
+end;
+
+function TRESTDWAnyDACQuery.getParamValue(IParam: integer): variant;
+var
+  qry : TADQuery;
+begin
+  qry := TADQuery(Self.Owner);
+  Result := qry.Params[IParam].Value;
+end;
+
 procedure TRESTDWAnyDACQuery.LoadFromStreamParam(IParam: integer;
   stream: TStream; blobtype: TBlobType);
 var
@@ -384,6 +425,14 @@ var
 begin
   qry := TADQuery(Self.Owner);
   qry.Params[IParam].LoadFromStream(stream,blobtype);
+end;
+
+function TRESTDWAnyDACQuery.ParamCount: Integer;
+var
+  qry : TADQuery;
+begin
+  qry := TADQuery(Self.Owner);
+  Result := qry.ParamCount;
 end;
 
 procedure TRESTDWAnyDACQuery.Prepare;
@@ -407,11 +456,27 @@ procedure TRESTDWAnyDACQuery.SaveToStream(stream: TStream);
 var
   qry : TADQuery;
 begin
-  inherited SaveToStream(stream);
   qry := TADQuery(Self.Owner);
   qry.SaveToStream(stream, sfBinary);
 
   stream.Position := 0;
+end;
+
+procedure TRESTDWAnyDACQuery.setParamDataType(IParam: integer;
+                                              AValue: TFieldType);
+var
+  qry : TADQuery;
+begin
+  qry := TADQuery(Self.Owner);
+  qry.Params[IParam].DataType := AValue;
+end;
+
+procedure TRESTDWAnyDACQuery.setParamValue(IParam: integer; AValue: variant);
+var
+  qry : TADQuery;
+begin
+  qry := TADQuery(Self.Owner);
+  qry.Params[IParam].Value := AValue;
 end;
 
 { TRESTDWAnyDACTable }
