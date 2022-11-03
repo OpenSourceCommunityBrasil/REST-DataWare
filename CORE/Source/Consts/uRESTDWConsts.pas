@@ -6,17 +6,17 @@ Unit uRESTDWConsts;
   REST Dataware.
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambÃ©m tem por objetivo levar componentes compatÃ­veis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal vocÃª usuÃ¡rio que precisa
+ de produtividade e flexibilidade para produÃ§Ã£o de ServiÃ§os REST/JSON, simplificando o processo para vocÃª programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de OrganizaÃ§Ã£o dos Projetos
+ FlÃ¡vio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -74,7 +74,7 @@ Const
  monthnames                 : Array [1 .. 12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
  RESTDWVersionINFO          = 'v2.0.7-';
- RESTDWRelease              = '67';
+ RESTDWRelease              = '69';
  RESTDWCodeProject          = 'Savage Reign - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  GOffsetFromUTC             : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
@@ -1238,9 +1238,9 @@ Var
  Const
   MaxBufSize = $F000;
 Begin
- { ** Criando a instância do objeto TMemoryStream para retorno do método ** }
+ { ** Criando a instÃ¢ncia do objeto TMemoryStream para retorno do mÃ©todo ** }
  Dest := TMemoryStream.Create;
- { ** Reposicionando o stream para o seu início ** }
+ { ** Reposicionando o stream para o seu inÃ­cio ** }
  source.Seek(0, soBeginning);
  source.Position := 0;
  GetMem(Buffer, MaxBufSize);
@@ -1250,7 +1250,7 @@ Begin
   If BytesRead > 0 then
    Dest.WriteBuffer(Buffer^, BytesRead);
  Until MaxBufSize > BytesRead;
- { ** Reposicionando o stream de retorno para o seu início ** }
+ { ** Reposicionando o stream de retorno para o seu inÃ­cio ** }
  Dest.Seek(0, soBeginning);
 End;
 
