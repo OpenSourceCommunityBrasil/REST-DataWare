@@ -891,7 +891,7 @@ Begin
     Begin
      If (Pos('/', Result) = 0) And
         (Pos('-', Result) <= 1) Then
-      Result := UnixToDateTime(StrToInt64(Result));
+      Result := StrToFloat(Result);
     End
    Else
     Result := 0;
@@ -5176,7 +5176,7 @@ Begin
                          Else
                           Begin
                            If (vJSONValue.Value <> '') And (Lowercase(vJSONValue.Value) <> 'null') Then
-                            Result := UnixToDateTime(StrToInt64(vJSONValue.Value))
+                            Result := StrToFloat(vJSONValue.Value)
                            Else
                             Result := Null;
                           End;
@@ -5601,11 +5601,11 @@ Begin
  Else If Param.DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
   Begin
    If Param.DataType = ftDate Then
-    SetValue(inttostr(DateTimeToUnix(Param.AsDate)), False)
+    SetValue(FloatToStr(Param.AsDate), False)
    Else if Param.DataType = ftTime then
-    SetValue(inttostr(DateTimeToUnix(Param.AsTime)), False)
+    SetValue(FloatToStr(Param.AsTime), False)
    Else
-    SetValue(inttostr(DateTimeToUnix(Param.AsDateTime)), False);
+    SetValue(FloatToStr(Param.AsDateTime), False);
   End
  Else If Param.DataType in [ftBoolean] Then
   SetValue(GetStringFromBoolean(Param.AsBoolean), False);
