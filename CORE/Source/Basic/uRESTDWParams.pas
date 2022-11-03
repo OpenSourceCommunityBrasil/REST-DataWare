@@ -5601,11 +5601,11 @@ Begin
  Else If Param.DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] Then
   Begin
    If Param.DataType = ftDate Then
-    SetValue(inttostr(DateTimeToUnix(Param.AsDate)), False)
+    SetValue(FloatToStr(Param.AsDate), False)
    Else if Param.DataType = ftTime then
-    SetValue(inttostr(DateTimeToUnix(Param.AsTime)), False)
+    SetValue(FloatToStr(Param.AsTime), False)
    Else
-    SetValue(inttostr(DateTimeToUnix(Param.AsDateTime)), False);
+    SetValue(FloatToStr(Param.AsDateTime), False);
   End
  Else If Param.DataType in [ftBoolean] Then
   SetValue(GetStringFromBoolean(Param.AsBoolean), False);
