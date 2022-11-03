@@ -67,6 +67,20 @@ type
   protected
     procedure createSequencedField(seqname,field : string); override;
   public
+   Function   RESTDWDataTypeParam(idx : integer) : Byte;override;
+   Function   GetParamIndex(param : String): integer;override;
+   Function   GetParamName (cIndex    : Integer) : String;override;
+   Function   GetParamType (Paramname : String)  : TFieldType;
+   Procedure  SetParamType (Paramname : String;
+                            FieldType : TFieldType);override;
+   Procedure  SetParamValue(Paramname : String;
+                            aValue    : Variant);override;
+   Function   GetParamSize (Paramname : String) : Integer;override;
+   Procedure  ParamClear   (Paramname : String);override;
+   Procedure  SetParamValueStream(Paramname   : String;
+                                  aValue      : TStream);override;
+   Procedure  Close;override;
+   Procedure  Open;override;
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
@@ -105,6 +119,8 @@ type
 procedure Register;
 
 implementation
+
+Uses uRESTDWConsts;
 
 procedure Register;
 begin
@@ -175,7 +191,6 @@ begin
   qry.ResourceOptions.ParamCreate  := True;
   qry.ResourceOptions.StoreItems   := [siMeta,siData,siDelta];
   qry.FetchOptions.Mode            := fmAll;
-
   Result := TRESTDWFireDACQuery.Create(qry);
 end;
 
@@ -368,19 +383,17 @@ begin
 end;
 
 procedure TRESTDWFireDACQuery.ExecSQL;
-var
-  qry : TFDQuery;
 begin
-  inherited ExecSQL;
-  qry := TFDQuery(Self.Owner);
-  qry.ExecSQL;
+//  inherited ExecSQL;
+ If Assigned(NativeDataset) Then
+  TFDQuery(NativeDataset).ExecSQL;
 end;
 
 procedure TRESTDWFireDACQuery.FetchAll;
 var
   qry : TFDQuery;
 begin
-  qry := TFDQuery(Self.Owner);
+  qry := TFDQuery(NativeDataset);
   qry.FetchAll;
 end;
 
@@ -397,8 +410,8 @@ procedure TRESTDWFireDACQuery.Prepare;
 var
   qry : TFDQuery;
 begin
-  inherited Prepare;
-  qry := TFDQuery(Self.Owner);
+//  inherited Prepare;
+  qry := TFDQuery(NativeDataset);
   qry.Prepare;
 end;
 
@@ -406,18 +419,88 @@ function TRESTDWFireDACQuery.RowsAffected: Int64;
 var
   qry : TFDQuery;
 begin
-  qry := TFDQuery(Self.Owner);
+  qry := TFDQuery(NativeDataset);
   Result := qry.RowsAffected;
 end;
+
+Function  TRESTDWFireDACQuery.GetParamName(cIndex    : Integer) : String;
+Begin
+ Result := TFDParams(Params)[cIndex].Name;
+End;
+
+Function TRESTDWFireDACQuery.GetParamIndex(param : String): integer;
+var
+  I: Integer;
+  prm : string;
+begin
+  for I := 0 to Params.Count - 1 do begin
+    prm := TFDParams(Params)[I].Name;
+    if SameText(prm,param) then begin
+      Result := i;
+      Break;
+    end;
+  end;
+End;
+
+Function  TRESTDWFireDACQuery.RESTDWDataTypeParam(idx : integer) : Byte;
+var
+  vDType : TFieldType;
+begin
+ vDType := TFDParams(Params)[idx].DataType;
+ Result := FieldTypeToDWFieldType(vDType);
+end;
+
+Function TRESTDWFireDACQuery.GetParamSize(Paramname : String) : Integer;
+Begin
+ Result := TFDParams(Params).ParamByName(Paramname).Size;
+End;
+
+Procedure  TRESTDWFireDACQuery.SetParamValueStream(Paramname   : String;
+                                                   aValue      : TStream);
+Begin
+ If Assigned(TFDParams(Params).ParamByName(Paramname)) Then
+  TFDParams(Params).ParamByName(Paramname).LoadFromStream(aValue, FtBlob);
+End;
+
+Procedure TRESTDWFireDACQuery.ParamClear (Paramname : String);
+Begin
+ TFDParams(Params).ParamByName(Paramname).Clear;
+End;
+
+Procedure TRESTDWFireDACQuery.Close;
+Begin
+ TFDQuery(Owner).Close;
+End;
+
+Procedure TRESTDWFireDACQuery.Open;
+Begin
+ TFDQuery(Owner).Open;
+End;
+
+Procedure TRESTDWFireDACQuery.SetParamValue(Paramname : String;
+                                            aValue    : Variant);
+Begin
+ TFDParams(Params).ParamByName(Paramname).Value := aValue;
+End;
+
+Function  TRESTDWFireDACQuery.GetParamType (Paramname : String)  : TFieldType;
+Begin
+ Result := TFDParams(Params).ParamByName(Paramname).DataType;
+End;
+
+Procedure TRESTDWFireDACQuery.SetParamType(Paramname : String;
+                                           FieldType : TFieldType);
+Begin
+ TFDParams(Params).ParamByName(Paramname).DataType := FieldType;
+End;
 
 procedure TRESTDWFireDACQuery.SaveToStream(stream: TStream);
 var
   qry : TFDQuery;
 begin
   inherited SaveToStream(stream);
-  qry := TFDQuery(Self.Owner);
+  qry := TFDQuery(NativeDataset);
   qry.SaveToStream(stream, sfBinary);
-
   stream.Position := 0;
 end;
 

@@ -3605,12 +3605,13 @@ Begin
                    DWParams.CreateParam('MessageError');
                    DWParams.ItemsString['MessageError'].ObjectDirection := odOut;
                   End;
-
-                  if ((JSONStr <> TReplyOK) and (JSONStr <> Trim(''))) then
-                   DWParams.ItemsString['MessageError'].AsString := JSONStr
-                  else
+                  If ((JSONStr <> TReplyOK) and (JSONStr <> Trim(''))) then
+                   Begin
+                    If DWParams.ItemsString['MessageError'].AsString = '' Then
+                     DWParams.ItemsString['MessageError'].AsString := JSONStr;
+                   End
+                  Else
                    DWParams.ItemsString['MessageError'].AsString := '';
-
                   DWParams.SaveToStream(ms, tdwpxt_OUT);
                   ZCompressStreamD(ms, ResultStream);
                  Finally

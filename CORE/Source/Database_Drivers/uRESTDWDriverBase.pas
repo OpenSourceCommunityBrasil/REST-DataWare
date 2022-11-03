@@ -46,16 +46,16 @@ Uses
 
   TRDWDrvParam = class(TObject)
   private
-    FOwner : TPersistent;
+    FOwner     : TPersistent;
     FDrvParams : TRDWDrvParams;
-    FIdxParam : integer;
-    function getAsLargeInt: int64;
-    function getAsInteger: integer;
-    function getAsSmallint: smallInt;
-    function geAsInteger: integer;
-    function getAsDateTime: TDateTime;
-    function getAsFloat: Double;
-    function getAsString: string;
+    FIdxParam  : Integer;
+    function  getAsLargeInt: int64;
+    function  getAsInteger: integer;
+    function  getAsSmallint: smallInt;
+    function  geAsInteger: integer;
+    function  getAsDateTime: TDateTime;
+    function  getAsFloat: Double;
+    function  getAsString: string;
     procedure setAsDate(const AValue: TDateTime);
     procedure setAsDateTime(const AValue: TDateTime);
     procedure setAsFloat(const AValue: Double);
@@ -65,13 +65,13 @@ Uses
     procedure setAsSmallint(const AValue: smallInt);
     procedure setAsString(const AValue: string);
   protected
-    function getDataType: TFieldType; virtual;
+    function  getDataType: TFieldType; virtual;
     procedure setDataType(const AValue: TFieldType); virtual;
-    function getName: string;
+    function  getName: string;
     procedure setName(const AValue: string);
-    function getValue: Variant;
+    function  getValue: Variant;
     procedure setValue(const AValue: Variant);
-    function getSize: integer;
+    function  getSize: integer;
     procedure setSize(const AValue: integer);
 
     constructor Create(AOwner : TPersistent);
@@ -115,11 +115,12 @@ Uses
 
  TRESTDWDrvDataset      = Class(TComponent)
  private
-  FParamsList : TStringList;
-  FRDWParams : TRDWDrvParams;
+  vNativeComponent : TDataSet;
+  FParamsList      : TStringList;
+  FRDWParams       : TCollection;
  Protected
-  Function  getFields                     : TFields; Virtual;
-  Function  getParams                     : TRDWDrvParams; Virtual;
+  Function  getFields                     : TFields;     Virtual;
+  Function  getParams                     : TCollection; Virtual;
   Procedure CreateSequencedField(seqname,
                                  field    : String); Virtual;
  Public
@@ -153,14 +154,14 @@ Uses
   function  RESTDWDataTypeParam(idx : integer) : Byte; virtual;
   Function  GetParamIndex(param  : String) : integer; Virtual;
   Function  RowsAffected : Int64;    Virtual;
-  Function  GetInsertID  : int64;    Virtual;
+  Function  GetInsertID  : Int64;    Virtual;
 
-  Function RESTDWParam(index : integer) : TRDWDrvParam;
+  Function  RESTDWParam(index : integer) : TRDWDrvParam;
   Procedure AddRESTDWParam(index : integer; param : TRDWDrvParam);
   Procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); virtual;
  Published
-  Property Params : TRDWDrvParams Read getParams;
-  Property Fields : TFields Read getFields;
+  Property  Params       : TCollection Read getParams Default nil;
+  Property  Fields       : TFields     Read getFields;
  End;
  { TRESTDWDrvStoreProc }
   TRESTDWDrvStoreProc = Class(TRESTDWDrvDataset)
@@ -168,7 +169,7 @@ Uses
   Function  getStoredProcName        : String;
   Procedure setStoredProcName(AValue : String);
  Published
-  Property StoredProcName : String Read getStoredProcName Write setStoredProcName;
+  Property  StoredProcName : String Read getStoredProcName Write setStoredProcName;
  End;
 
  { TRESTDWDrvTable }
@@ -191,7 +192,20 @@ Uses
  Private
   Function getSQL       : TStrings; Virtual;
  Public
-  Function  GetInsertID  : int64;    Virtual;
+  Procedure Close;Virtual;
+  Procedure Open; Virtual;
+  Function  GetParamName (cIndex    : Integer) : String; Virtual;
+  Function  GetParamType (Paramname : String)  : TFieldType;Virtual;
+  Procedure SetParamType (Paramname : String;
+                          FieldType : TFieldType); Virtual;
+  Procedure SetParamValue(Paramname : String;
+                          aValue    : Variant); Virtual;
+  Procedure SetParamValueStream(Paramname   : String;
+                                aValue      : TStream); Virtual;
+  Function  GetParamSize (Paramname : String) : Integer;Virtual;
+  Procedure ParamClear   (Paramname : String);Virtual;
+  Function  GetInsertID   : int64;    Virtual;
+  Property  NativeDataset : TDataset Read vNativeComponent;
  Published
   Property SQL          : TStrings  Read getSQL;
  End;
@@ -251,7 +265,6 @@ Uses
                               Var MessageError      : String;
                               Var RowsAffected      : Integer)   : TJSONValue;Overload;Virtual;
 
-
   Function isMinimumVersion(major,
                             minor,
                             sub    : Integer) : Boolean; Overload;
@@ -276,7 +289,6 @@ Uses
                               valor                 : Integer = 1) : Integer;Overload;Virtual;
   Function GetGenID          (GenName               : String;
                               valor                 : Integer = 1) : Integer;Overload;Virtual;
-
   Function ApplyUpdates      (MassiveStream         : TStream;
                               SQL                   : String;
                               Params                : TRESTDWParams;
@@ -449,27 +461,27 @@ End;
 
 Function TRESTDWDrvDataset.getFields : TFields;
 Begin
- Result := TDataSet(Self.Owner).Fields;
+ Result := vNativeComponent.Fields;
 End;
 
-Function TRESTDWDrvDataset.getParams : TRDWDrvParams;
+Function TRESTDWDrvDataset.getParams : TCollection;
 Begin
+ Result := Nil;
   Try
-    if not Assigned(FRDWParams) then begin
-      FRDWParams := TRDWDrvParams(GetObjectProp(TDataSet(Self.Owner), 'Params'));
-      FRDWParams.Dataset := Self;
-    end;
-    Result := FRDWParams;
+   If Not Assigned(FRDWParams) Then
+    FRDWParams := TCollection(GetObjectProp(vNativeComponent, 'Params'));
+   Result := FRDWParams;
   Except
-    Result := Nil;
+   Result := Nil;
   End;
 End;
 
 constructor TRESTDWDrvDataset.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
-  FRDWParams := nil;
-  FParamsList := TStringList.Create;
+ inherited Create(AOwner);
+ vNativeComponent := TDataset(AOwner);
+ FRDWParams := nil;
+ FParamsList := TStringList.Create;
 end;
 
 Procedure TRESTDWDrvDataset.createSequencedField(seqname,
@@ -489,12 +501,12 @@ end;
 
 Procedure TRESTDWDrvDataset.Close;
 Begin
- TDataSet(Self.Owner).Close;
+ TDataset(Self.Owner).Close;
 End;
 
 Procedure TRESTDWDrvDataset.Open;
 Begin
-  TDataSet(Self.Owner).Open;
+ TDataset(Self.Owner).Open;
 End;
 
 procedure TRESTDWDrvDataset.ImportParams(DWParams: TRESTDWParams);
@@ -520,60 +532,60 @@ begin
         if Self.RESTDWDataTypeParam(A) in [dwftFixedChar,dwftFixedWideChar,dwftString,dwftWideString,
                                            dwftMemo,dwftFmtMemo,dwftWideMemo] then begin
           if Self.RESTDWDataTypeParam(A) in [dwftMemo, dwftFmtMemo, dwftWideMemo] then
-            Self.Params[A].Value := DWParams[I].Value
+            TParam(Params.Items[A]).Value := DWParams[I].Value
           else begin
-            if Self.Params[A].Size > 0 Then
-              Self.Params[A].Value := Copy(DWParams[I].Value, 1, Self.Params[A].Size)
+            if TParam(Params.Items[A]).Size > 0 Then
+              TParam(Params.Items[A]).Value := Copy(DWParams[I].Value, 1, TParam(Params.Items[A]).Size)
             else
-              Self.Params[A].Value := DWParams[I].Value;
+              TParam(Params.Items[A]).Value := DWParams[I].Value;
           end;
         end
         else begin
-          if Self.Params[A].DataType in [ftUnknown] then begin
+          if TParam(Params.Items[A]).DataType in [ftUnknown] then begin
             if not (ObjectValueToFieldType(DWParams[I].ObjectValue) in [ftUnknown]) then
-              Self.Params[A].DataType := ObjectValueToFieldType(DWParams[I].ObjectValue)
+              TParam(Params.Items[A]).DataType := ObjectValueToFieldType(DWParams[I].ObjectValue)
             else
-              Self.Params[A].DataType := ftString;
+              TParam(Params.Items[A]).DataType := ftString;
           end;
 
           if Self.RESTDWDataTypeParam(A) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
             if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then begin
               if Self.RESTDWDataTypeParam(A) in [dwftLongWord, dwftLargeint] then
-                Self.Params[A].AsLargeInt := StrToInt64(DWParams[I].Value)
-              else If Self.Params[A].DataType = ftSmallInt Then
-                Self.Params[A].AsSmallInt := StrToInt(DWParams[I].Value)
+                TParam(Params.Items[A]).AsLargeInt := StrToInt64(DWParams[I].Value)
+              else If TParam(Params.Items[A]).DataType = ftSmallInt Then
+                TParam(Params.Items[A]).AsSmallInt := StrToInt(DWParams[I].Value)
               else
-                Self.Params[A].AsInteger  := StrToInt(DWParams[I].Value);
+                TParam(Params.Items[A]).AsInteger  := StrToInt(DWParams[I].Value);
             end
             else
-              Self.Params[A].Clear;
+              TParam(Params.Items[A]).Clear;
           end
           else if Self.RESTDWDataTypeParam(A) in [dwftFloat,dwftCurrency,dwftBCD,dwftFMTBcd,dwftSingle] then begin
             if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then
-              Self.Params[A].AsFloat  := StrToFloat(BuildFloatString(DWParams[I].Value))
+              TParam(Params.Items[A]).AsFloat  := StrToFloat(BuildFloatString(DWParams[I].Value))
             else
-              Self.Params[A].Clear;
+              TParam(Params.Items[A]).Clear;
           end
-          else If Self.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] then begin
+          else If TParam(Params.Items[A]).DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] then begin
             if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then begin
-              if Self.Params[A].DataType = ftDate then
-                Self.Params[A].AsDate := DWParams[I].AsDateTime
-              else If Self.Params[A].DataType = ftTime then
-                Self.Params[A].AsTime := DWParams[I].AsDateTime
+              if TParam(Params.Items[A]).DataType = ftDate then
+                TParam(Params.Items[A]).AsDate := DWParams[I].AsDateTime
+              else If TParam(Params.Items[A]).DataType = ftTime then
+                TParam(Params.Items[A]).AsTime := DWParams[I].AsDateTime
               else
-                Self.Params[A].AsDateTime := DWParams[I].AsDateTime;
+                TParam(Params.Items[A]).AsDateTime := DWParams[I].AsDateTime;
             end
             else
-              Self.Params[A].Clear;
+              TParam(Params.Items[A]).Clear;
           end
           //Tratar Blobs de Parametros...
-          else if Self.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob,ftGraphic, ftOraBlob, ftOraClob] then begin
+          else if TParam(Params.Items[A]).DataType in [ftBytes, ftVarBytes, ftBlob,ftGraphic, ftOraBlob, ftOraClob] then begin
             vStringStream  := TMemoryStream.Create;
             try
               DWParams[I].SaveToStream(TStream(vStringStream));
               vStringStream.Position := 0;
               if vStringStream.Size > 0 then
-                Self.Params[A].LoadFromStream(vStringStream, ftBlob);
+                TParam(Params.Items[A]).LoadFromStream(vStringStream, ftBlob);
             finally
               FreeAndNil(vStringStream);
             end;
@@ -581,18 +593,18 @@ begin
           else if Self.RESTDWDataTypeParam(A) in [dwftFixedChar, dwftFixedWideChar,
                   dwftString, dwftWideString, dwftMemo, dwftFmtMemo, dwftWideMemo] then begin
               if (not DWParams[I].IsNull) then
-               Self.Params[A].AsString := DWParams[I].Value
+               TParam(Params.Items[A]).AsString := DWParams[I].Value
               Else
-               Self.Params[A].Clear;
+               TParam(Params.Items[A]).Clear;
           end
-          else If Self.Params[A].DataType in [ftGuid] Then begin
+          else If TParam(Params.Items[A]).DataType in [ftGuid] Then begin
             if (not (DWParams[I].IsNull)) Then
-                Self.Params[A].Value := DWParams[I].AsString
+                TParam(Params.Items[A]).Value := DWParams[I].AsString
               Else
-                Self.Params[A].Clear;
+                TParam(Params.Items[A]).Clear;
           end
           else
-            Self.Params[A].Value := DWParams[I].Value;
+            TParam(Params.Items[A]).Value := DWParams[I].Value;
         end;
       end;
     end
@@ -601,7 +613,7 @@ end;
 
 Procedure TRESTDWDrvDataset.Insert;
 Begin
- TDataSet(Self.Owner).Insert;
+ vNativeComponent.Insert;
 End;
 
 procedure TRESTDWDrvDataset.LoadFromStreamParam(IParam: integer;
@@ -612,40 +624,27 @@ end;
 
 Procedure TRESTDWDrvDataset.Edit;
 Begin
- TDataSet(Self.Owner).Edit;
+ vNativeComponent.Edit;
 End;
 
 Procedure TRESTDWDrvDataset.Post;
 Begin
- TDataSet(Self.Owner).Post;
+ vNativeComponent.Post;
 End;
 
 Procedure TRESTDWDrvDataset.Delete;
 Begin
- TDataSet(Self.Owner).Delete;
+ vNativeComponent.Delete;
 End;
 
 destructor TRESTDWDrvDataset.Destroy;
-var
-  obj : TRDWDrvParam;
 begin
-  while FParamsList.Count > 0 do begin
-    obj := TRDWDrvParam(FParamsList.Objects[0]);
-    obj.DrvParams := nil;
-    FreeAndNil(obj);
-    FParamsList.Delete(0);
-  end;
-  FreeAndNil(FParamsList);
-
-  if Assigned(FRDWParams) then
-    FRDWParams.Dataset := nil;
-
   inherited;
 end;
 
 Procedure TRESTDWDrvDataset.Next;
 Begin
- TDataSet(Self.Owner).Next;
+ vNativeComponent.Next;
 End;
 
 Procedure TRESTDWDrvDataset.Prepare;
@@ -691,12 +690,12 @@ end;
 
 Function TRESTDWDrvDataset.Eof: boolean;
 Begin
- Result := TDataSet(Self.Owner).EOF;
+ Result := vNativeComponent.EOF;
 End;
 
 Function TRESTDWDrvDataset.RecNo: int64;
 Begin
- Result := TDataSet(Self.Owner).RecNo;
+ Result := vNativeComponent.RecNo;
 End;
 
 Function TRESTDWDrvDataset.RecordCount: int64;
@@ -720,21 +719,21 @@ End;
 
 Function TRESTDWDrvDataset.ParamByName(param: String): TRDWDrvParam;
 Begin
- Try
-  Result := Params.FindParam(param);
- Except
-  Result := nil;
- End;
+// Try
+//  Result := Params.FindParam(param);
+// Except
+//  Result := nil;
+// End;
 End;
 
 Function TRESTDWDrvDataset.FieldByName(field: String): TField;
 Begin
- Result := TDataSet(Self.Owner).FieldByName(field);
+ Result := vNativeComponent.FieldByName(field);
 End;
 
 Function TRESTDWDrvDataset.FindField(field: String): TField;
 Begin
- Result := TDataSet(Self.Owner).FindField(field);
+ Result := vNativeComponent.FindField(field);
 End;
 
 function TRESTDWDrvDataset.RESTDWDataTypeField(idx: integer): Byte;
@@ -754,12 +753,9 @@ Begin
 End;
 
 function TRESTDWDrvDataset.RESTDWDataTypeParam(idx: integer): Byte;
-var
-  vDType : TFieldType;
-begin
-  vDType := Params[idx].DataType;
-  Result := FieldTypeToDWFieldType(vDType);
-end;
+Begin
+
+End;
 
 Function TRESTDWDrvDataset.RESTDWDataTypeParamName(param : String) : Byte;
 Var
@@ -789,19 +785,9 @@ begin
 end;
 
 Function TRESTDWDrvDataset.GetParamIndex(param : String): integer;
-var
-  I: Integer;
-  prm : string;
-begin
-  for I := 0 to Params.Count - 1 do begin
-    prm := Params.Items[I].Name;
-    if SameText(prm,param) then begin
-      Result := i;
-      Break;
-    end;
-  end;
-End;
+Begin
 
+End;
 { TRESTDWDrvTable }
 
 Function TRESTDWDrvTable.getFilter : String;
@@ -863,6 +849,55 @@ Begin
  Except
   Result := nil;
  End;
+End;
+
+Procedure TRESTDWDrvQuery.Close;
+Begin
+
+End;
+
+Procedure TRESTDWDrvQuery.Open;
+Begin
+
+End;
+
+
+Function  TRESTDWDrvQuery.GetParamType (Paramname : String)  : TFieldType;
+Begin
+
+End;
+
+Function  TRESTDWDrvQuery.GetParamName(cIndex    : Integer) : String;
+Begin
+
+End;
+
+Procedure TRESTDWDrvQuery.SetParamType(Paramname : String;
+                                       FieldType : TFieldType);
+Begin
+
+End;
+
+Procedure TRESTDWDrvQuery.SetParamValueStream(Paramname   : String;
+                                              aValue      : TStream);
+Begin
+
+End;
+
+Procedure TRESTDWDrvQuery.SetParamValue(Paramname : String;
+                                        aValue    : Variant);
+Begin
+
+End;
+
+Function  TRESTDWDrvQuery.GetParamSize (Paramname : String) : Integer;
+Begin
+
+End;
+
+Procedure TRESTDWDrvQuery.ParamClear(Paramname : String);
+Begin
+
 End;
 
 Function TRESTDWDrvQuery.GetInsertID : Int64;
@@ -1183,6 +1218,7 @@ var
   X, A : integer;
   MassiveReplyCache: TMassiveReplyCache;
   MassiveReplyValue: TMassiveReplyValue;
+  vParamName,
   vTempValue: string;
   bPrimaryKeys : TStringList;
   vStringStream : TMemoryStream;
@@ -1192,6 +1228,7 @@ begin
     bPrimaryKeys := MassiveDataset.PrimaryKeys;
     try
       for X := 0 to bPrimaryKeys.Count - 1 do begin
+       vParamName := Query.GetParamName(X);
         A := Query.GetParamIndex('DWKEY_' + bPrimaryKeys[X]);
         if Query.RESTDWDataTypeParam(A) in [
           dwftFixedChar,
@@ -1200,17 +1237,17 @@ begin
           dwftWideString,
           dwftMemo, dwftFmtMemo,
           dwftWideMemo] then begin
-          if Query.Params[A].Size > 0 then
-            Query.Params[A].Value := Copy(MassiveDataset.AtualRec.PrimaryValues[X].Value, 1,Query.Params[A].Size)
+          if Query.GetParamSize(vParamName) > 0 then
+            Query.SetParamValue(vParamName, Copy(MassiveDataset.AtualRec.PrimaryValues[X].Value, 1,TParam(Query.Params.Items[A]).Size))
           else
-            Query.Params[A].Value := MassiveDataset.AtualRec.PrimaryValues[X].Value;
+            Query.SetParamValue(vParamName, MassiveDataset.AtualRec.PrimaryValues[X].Value);
         end
         else begin
-          if Query.Params[A].DataType in [ftUnknown] then begin
+          if Query.GetParamType(vParamName) in [ftUnknown] then begin
             if not (ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(bPrimaryKeys[X]).FieldType) in [ftUnknown]) then
-              Query.Params[A].DataType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(bPrimaryKeys[X]).FieldType)
+              Query.SetParamType(vParamName, ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(bPrimaryKeys[X]).FieldType))
             else
-              Query.Params[A].DataType := ftString;
+              Query.SetParamType(vParamName, ftString);
           end;
 
           if Query.RESTDWDataTypeParam(A) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
@@ -1231,53 +1268,53 @@ begin
                 if Query.RESTDWDataTypeParam(A) in [dwftLongWord,dwftLargeint] then
                   {$IFNDEF FPC}
                     {$IF CompilerVersion >= 21}
-                      Query.Params[A].AsLargeInt := StrToInt64(MassiveReplyValue.NewValue)
+                      Query.SetParamValue(vParamName, StrToInt64(MassiveReplyValue.NewValue))
                     {$ELSE}
-                      Query.Params[A].AsInteger := StrToInt64(MassiveReplyValue.NewValue)
+                      Query.SetParamValue(vParamName, StrToInt64(MassiveReplyValue.NewValue))
                     {$IFEND}
                   {$ELSE}
-                    Query.Params[A].AsLargeInt := StrToInt64(MassiveReplyValue.NewValue)
+                    Query.SetParamValue(vParamName, StrToInt64(MassiveReplyValue.NewValue))
                   {$ENDIF}
-                else if Query.Params[A].DataType = ftSmallInt then
-                  Query.Params[A].AsSmallInt := StrToInt(MassiveReplyValue.NewValue)
+                else if Query.GetParamType(vParamName) = ftSmallInt then
+                  Query.SetParamValue(vParamName, StrToInt(MassiveReplyValue.NewValue))
                 else
-                  Query.Params[A].AsInteger := StrToInt(MassiveReplyValue.NewValue);
+                  Query.SetParamValue(vParamName, StrToInt(MassiveReplyValue.NewValue));
               end;
             end;
 
             if (MassiveReplyValue = nil) and
                (not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) then begin
               if Query.RESTDWDataTypeParam(A) in [dwftLongWord,dwftLargeint] then
-                Query.Params[A].AsLargeInt := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-              else if Query.Params[A].DataType = ftSmallInt then
-                Query.Params[A].AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+                Query.SetParamValue(vParamName, StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value))
+              else if Query.GetParamType(vParamName) = ftSmallInt then
+                Query.SetParamValue(vParamName, StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value))
               else
-                Query.Params[A].AsInteger := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+                Query.SetParamValue(vParamName, StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value));
             end;
           end
           else if Query.RESTDWDataTypeParam(A) in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd, dwftSingle] then begin
             if (not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) then
-              Query.Params[A].AsFloat := StrToFloat(BuildFloatString(MassiveDataset.AtualRec.PrimaryValues[X].Value));
+              Query.SetParamValue(vParamName, StrToFloat(BuildFloatString(MassiveDataset.AtualRec.PrimaryValues[X].Value)));
           end
-          else if Query.Params[A].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] then begin
+          else if Query.GetParamType(vParamName) in [ftDate, ftTime, ftDateTime, ftTimeStamp] then begin
             if (not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) then
-              Query.Params[A].AsDateTime := MassiveDataset.AtualRec.PrimaryValues[X].Value
+              Query.SetParamValue(vParamName, MassiveDataset.AtualRec.PrimaryValues[X].Value)
             else
-              Query.Params[A].Clear;
+              Query.ParamClear(vParamName);
           end
           //Tratar Blobs de Parametros...
-          else if Query.Params[A].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] then begin
+          else if Query.GetParamType(vParamName) in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] then begin
             vStringStream := TMemoryStream.Create;
             try
               MassiveDataset.AtualRec.PrimaryValues[X].SaveToStream(vStringStream);
               vStringStream.Position := 0;
-              Query.Params[A].LoadFromStream(vStringStream, ftBlob);
+              TParam(Query.Params.Items[A]).LoadFromStream(vStringStream, ftBlob);
             finally
               FreeAndNil(vStringStream);
             end;
           end
           else
-            Query.Params[A].Value := MassiveDataset.AtualRec.PrimaryValues[X].Value;
+            Query.SetParamValue(vParamName, MassiveDataset.AtualRec.PrimaryValues[X].Value);
         end;
       end;
     finally
@@ -1291,72 +1328,72 @@ begin
       dwftString, dwftWideString,
       dwftMemo, dwftFmtMemo,
       dwftWideMemo] then begin
-      if (not (MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).IsNull)) then begin
-        if Query.Params[IParam].Size > 0 then
-          Query.Params[IParam].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).Value, 1, Query.Params[IParam].Size)
+      if (not (MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).IsNull)) then begin
+        if TParam(Query.Params.Items[IParam]).Size > 0 then
+          TParam(Query.Params.Items[IParam]).Value := Copy(MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).Value, 1, TParam(Query.Params.Items[IParam]).Size)
         else
-          Query.Params[IParam].Value := MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).Value;
+          TParam(Query.Params.Items[IParam]).Value := MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).Value;
       end;
     end
     else begin
-      if Query.Params[IParam].DataType in [ftUnknown] then begin
-        if not (ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).FieldType) in [ftUnknown]) then
-          Query.Params[IParam].DataType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).FieldType)
+      if TParam(Query.Params.Items[IParam]).DataType in [ftUnknown] then begin
+        if not (ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).FieldType) in [ftUnknown]) then
+          TParam(Query.Params.Items[IParam]).DataType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).FieldType)
         else
-          Query.Params[IParam].DataType := ftString;
+          TParam(Query.Params.Items[IParam]).DataType := ftString;
       end;
 
-      if Query.Params[IParam].DataType in [ftBoolean, ftInterface, ftIDispatch, ftGuid] then begin
-        if (not (MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).IsNull)) then
-          Query.Params[IParam].Value := MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).Value
+      if TParam(Query.Params.Items[IParam]).DataType in [ftBoolean, ftInterface, ftIDispatch, ftGuid] then begin
+        if (not (MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).IsNull)) then
+          TParam(Query.Params.Items[IParam]).Value := MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).Value
         else
-          Query.Params[IParam].Clear;
+          TParam(Query.Params.Items[IParam]).Clear;
       end
       else if Query.RESTDWDataTypeParam(IParam) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord,dwftLargeint] then begin
-        if (not (MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).IsNull)) then begin
+        if (not (MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).IsNull)) then begin
           if Query.RESTDWDataTypeParam(IParam) in [dwftLongWord,dwftLargeint] then
-            Query.Params[IParam].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).Value)
-          else if Query.Params[IParam].DataType = ftSmallInt then
-            Query.Params[IParam].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).Value)
+            TParam(Query.Params.Items[IParam]).AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).Value)
+          else if TParam(Query.Params.Items[IParam]).DataType = ftSmallInt then
+            TParam(Query.Params.Items[IParam]).AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).Value)
           else
-            Query.Params[IParam].AsInteger := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).Value);
+            TParam(Query.Params.Items[IParam]).AsInteger := StrToInt(MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).Value);
         end
         else
-          Query.Params[IParam].Clear;
+          TParam(Query.Params.Items[IParam]).Clear;
       end
       else if Query.RESTDWDataTypeParam(IParam) in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd, dwftSingle] then begin
-        if (not (MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).IsNull)) then
-          Query.Params[IParam].AsFloat := StrToFloat(BuildFloatString(MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).Value))
+        if (not (MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).IsNull)) then
+          TParam(Query.Params.Items[IParam]).AsFloat := StrToFloat(BuildFloatString(MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).Value))
         else
-          Query.Params[IParam].Clear;
+          TParam(Query.Params.Items[IParam]).Clear;
       end
-      else if Query.Params[IParam].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] then begin
-        if (not (MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).IsNull)) then
-          Query.Params[IParam].AsDateTime := MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).Value
+      else if TParam(Query.Params.Items[IParam]).DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] then begin
+        if (not (MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).IsNull)) then
+          TParam(Query.Params.Items[IParam]).AsDateTime := MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).Value
         else
-          Query.Params[IParam].Clear;
+          TParam(Query.Params.Items[IParam]).Clear;
       end
       //Tratar Blobs de Parametros...
-      else if Query.Params[IParam].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] then begin
-        if (not (MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).IsNull)) then begin
+      else if TParam(Query.Params.Items[IParam]).DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] then begin
+        if (not (MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).IsNull)) then begin
           vStringStream := TMemoryStream.Create;
           try
-            MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).SaveToStream(vStringStream);
+            MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).SaveToStream(vStringStream);
             if vStringStream <> nil then begin
               vStringStream.Position := 0;
-              Query.Params[IParam].LoadFromStream(vStringStream, ftBlob);
+              TParam(Query.Params.Items[IParam]).LoadFromStream(vStringStream, ftBlob);
             end
             else
-              Query.Params[IParam].Clear;
+              TParam(Query.Params.Items[IParam]).Clear;
           finally
             FreeAndNil(vStringStream);
           end;
         end
         else
-          Query.Params[IParam].Clear;
+          TParam(Query.Params.Items[IParam]).Clear;
       end
       else
-        Query.Params[IParam].Value := MassiveDataset.Fields.FieldByName(Query.Params[IParam].Name).Value;
+        TParam(Query.Params.Items[IParam]).Value := MassiveDataset.Fields.FieldByName(TParam(Query.Params.Items[IParam]).Name).Value;
     end;
   end;
 end;
@@ -1396,7 +1433,7 @@ Begin
    SQL.Clear;
    Case connType Of
     dbtFirebird   : Begin
-                     SQL.Add('select gen_id('+QuotedStr(GenName)+','+IntToStr(valor)+')');
+                     SQL.Add('select gen_id('+ GenName + ', ' + IntToStr(valor)+')');
                      SQL.Add('from rdb$database');
                      Open;
                      Result := Query.Fields[0].AsInteger;
@@ -1456,7 +1493,7 @@ Var
 Begin
  qry := getQuery;
  Try
-  Result := GetGenID(qry,GenName,valor);
+  Result := GetGenID(qry, GenName, valor);
  Finally
   FreeAndNil(qry);
  End;
@@ -1877,9 +1914,12 @@ begin
     end;
   finally
     FreeAndNil(BufferBase);
-    RowsAffected := vTempQuery.RowsAffected;
-    vTempQuery.Close;
-    FreeAndNil(vTempQuery);
+    If Assigned(vTempQuery) Then
+     Begin
+      RowsAffected := vTempQuery.RowsAffected;
+      vTempQuery.Close;
+      FreeAndNil(vTempQuery);
+     End;
   end;
 end;
 
@@ -2082,7 +2122,7 @@ Function TRESTDWDriverBase.ApplyUpdates_MassiveCache  (MassiveStream         : T
                                                        Var Error             : Boolean;
                                                        Var MessageError      : String) : TJSONValue;
 Begin
-
+//
 End;
 
 Function TRESTDWDriverBase.ApplyUpdates_MassiveCache  (MassiveCache     : String;
@@ -2092,7 +2132,6 @@ var
   vTempQuery: TRESTDWDrvQuery;
   vStateResource, vMassiveLine: boolean;
   vResultReflection: string;
-
   function LoadMassive(var Query: TRESTDWDrvQuery): boolean;
   var
     MassiveDataset: TMassiveDatasetBuffer;
@@ -3745,9 +3784,12 @@ procedure TRESTDWDriverBase.PrepareDataQuery(var Query: TRESTDWDrvQuery;
 var
   vResultReflectionLine,
   vLineSQL, vFields,
-  vParamsSQL: string;
+  vParamName,
+  vParamsSQL    : String;
+  vParam        : TParam;
   I : integer;
   bPrimaryKeys  : TStringList;
+  vParamFieldType,
   vFieldType    : TFieldType;
   vStringStream : TMemoryStream;
 begin
@@ -3918,83 +3960,85 @@ begin
   else
   begin
     for I := 0 to Query.ParamCount - 1 do begin
+     vParam     := TParam(Query.Params.Items[I]);
+     vParamName := Query.GetParamName(I);
       if MassiveDataset.MassiveMode = mmExec then begin
-        if MassiveDataset.Params.ItemsString[Query.Params[I].Name] <> nil then begin
-          vFieldType := ObjectValueToFieldType(MassiveDataset.Params.ItemsString[Query.Params[I].Name].ObjectValue);
-          if MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull then begin
+        if MassiveDataset.Params.ItemsString[vParamName] <> nil then begin
+          vFieldType := ObjectValueToFieldType(MassiveDataset.Params.ItemsString[vParamName].ObjectValue);
+          if MassiveDataset.Params.ItemsString[vParamName].IsNull then begin
             if vFieldType = ftUnknown then
-              Query.Params[I].DataType := ftString
+             Query.SetParamType(vParamName, ftString)
             else
-              Query.Params[I].DataType := vFieldType;
-            Query.Params[I].Clear;
+             Query.SetParamType(vParamName, vFieldType);
+            Query.ParamClear(vParamName);
           end;
 
           if MassiveDataset.MassiveMode <> mmUpdate then begin
             if Query.RESTDWDataTypeParam(I) in [dwftFixedChar,dwftFixedWideChar,dwftString,dwftWideString,dwftMemo,dwftFmtMemo,dwftWideMemo] then begin
-              if (not (MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull)) then begin
-                if Query.Params[I].Size > 0 then
-                  Query.Params[I].Value := Copy(MassiveDataset.Params.ItemsString[Query.Params[I].Name].Value, 1, Query.Params[I].Size)
+              if (not (MassiveDataset.Params.ItemsString[vParamName].IsNull)) then begin
+                if Query.GetParamSize(vParamName) > 0 then
+                 Query.SetParamValue(vParamName, Copy(MassiveDataset.Params.ItemsString[vParamName].Value, 1, Query.GetParamSize(vParamName)))
                 else
-                  Query.Params[I].Value := MassiveDataset.Params.ItemsString[Query.Params[I].Name].Value;
+                 Query.SetParamValue(vParamName, MassiveDataset.Params.ItemsString[vParamName].Value);
               end
               else
-                Query.Params[I].Clear;
+               Query.ParamClear(vParamName);
             end
             else begin
-              if Query.Params[I].DataType in [ftUnknown] then begin
-                if not (ObjectValueToFieldType( MassiveDataset.Params.ItemsString[Query.Params[I].Name].ObjectValue) in [ftUnknown]) then
-                  Query.Params[I].DataType := ObjectValueToFieldType(MassiveDataset.Params.ItemsString[Query.Params[I].Name].ObjectValue)
+              if Query.GetParamType(vParamName) in [ftUnknown] then begin
+                if not (ObjectValueToFieldType( MassiveDataset.Params.ItemsString[vParamName].ObjectValue) in [ftUnknown]) then
+                 Query.SetParamType(vParamName, ObjectValueToFieldType(MassiveDataset.Params.ItemsString[vParamName].ObjectValue))
                 else
-                  Query.Params[I].DataType := ftString;
+                 Query.SetParamType(vParamName, ftString);
               end;
               if Query.RESTDWDataTypeParam(I) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
-                if (not (MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull)) then begin
+                if (not (MassiveDataset.Params.ItemsString[vParamName].IsNull)) then begin
                   if Query.RESTDWDataTypeParam(I) in [dwftLongWord,dwftLargeint] then
-                    Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Params.ItemsString[Query.Params[I].Name].Value)
-                  else if Query.Params[I].DataType = ftSmallInt then
-                    Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Params.ItemsString[Query.Params[I].Name].Value)
+                    Query.SetParamValue(vParamName, StrToInt64(MassiveDataset.Params.ItemsString[vParamName].Value))
+                  else if Query.GetParamType(vParamName) = ftSmallInt then
+                    Query.SetParamValue(vParamName, StrToInt(MassiveDataset.Params.ItemsString[vParamName].Value))
                   else
-                    Query.Params[I].AsInteger := StrToInt(MassiveDataset.Params.ItemsString[Query.Params[I].Name].Value);
+                    Query.SetParamValue(vParamName, StrToInt(MassiveDataset.Params.ItemsString[vParamName].Value));
                 end
                 else
-                  Query.Params[I].Clear;
+                 Query.ParamClear(vParamName);
               end
               else if Query.RESTDWDataTypeParam(I) in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd,dwftSingle] then begin
-                if (not (MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull)) then
-                  Query.Params[I].AsFloat := StrToFloat(BuildFloatString(MassiveDataset.Params.ItemsString[Query.Params[I].Name].Value))
+                if (not (MassiveDataset.Params.ItemsString[vParamName].IsNull)) then
+                  Query.SetParamValue(vParamName, StrToFloat(BuildFloatString(MassiveDataset.Params.ItemsString[vParamName].Value)))
                 else
-                  Query.Params[I].Clear;
+                  Query.ParamClear(vParamName);
               end
-              else if Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] then
+              else if Query.GetParamType(vParamName) in [ftDate, ftTime, ftDateTime, ftTimeStamp] then
               begin
-                if (not (MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull)) then
-                  Query.Params[I].AsDateTime := MassiveDataset.Params.ItemsString[Query.Params[I].Name].Value
+                if (not (MassiveDataset.Params.ItemsString[vParamName].IsNull)) then
+                  Query.SetParamValue(vParamName, MassiveDataset.Params.ItemsString[vParamName].Value)
                 else
-                  Query.Params[I].Clear;
+                  Query.ParamClear(vParamName);
               end
               //Tratar Blobs de Parametros...
-              else if Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] then begin
+              else if Query.GetParamType(vParamName) in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] then begin
                 vStringStream := TMemoryStream.Create;
                 try
-                  if (not (MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull)) then begin
-                    MassiveDataset.Params.ItemsString[Query.Params[I].Name].SaveToStream(TStream(vStringStream));
+                  if (not (MassiveDataset.Params.ItemsString[vParamName].IsNull)) then begin
+                    MassiveDataset.Params.ItemsString[vParamName].SaveToStream(TStream(vStringStream));
                     if vStringStream <> nil then begin
                       vStringStream.Position := 0;
-                      Query.Params[I].LoadFromStream(vStringStream, ftBlob);
+                     vParam.LoadFromStream(vStringStream, ftBlob);
                     end
                     else
-                      Query.Params[I].Clear;
+                     Query.ParamClear(vParamName);
                   end
                   else
-                    Query.Params[I].Clear;
+                   Query.ParamClear(vParamName);
                 finally
                   FreeAndNil(vStringStream);
                 end;
               end
-              else if (not (MassiveDataset.Params.ItemsString[Query.Params[I].Name].IsNull)) then
-                Query.Params[I].Value := MassiveDataset.Params.ItemsString[Query.Params[I].Name].Value
+              else if (not (MassiveDataset.Params.ItemsString[vParamName].IsNull)) then
+               Query.SetParamValue(vParamName, MassiveDataset.Params.ItemsString[vParamName].Value)
               else
-                Query.Params[I].Clear;
+               Query.ParamClear(vParamName);
             end;
           end
           else begin //Update
@@ -4003,85 +4047,85 @@ begin
         end;
       end
       else begin
-        if (MassiveDataset.Fields.FieldByName(Query.Params[I].Name) <> nil) then begin
-          vFieldType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).FieldType);
-          if not MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull Then begin
+        if (MassiveDataset.Fields.FieldByName(vParamName) <> nil) then begin
+          vFieldType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(vParamName).FieldType);
+          if not MassiveDataset.Fields.FieldByName(vParamName).IsNull Then begin
             if vFieldType = ftUnknown then
-              Query.Params[I].DataType := ftString;
-            Query.Params[I].Clear;
+             Query.SetParamType(vParamName, ftString);
+           Query.ParamClear(vParamName);
           end;
-
           if MassiveDataset.MassiveMode <> mmUpdate then begin
             if Query.RESTDWDataTypeParam(I) in [dwftFixedChar, dwftFixedWideChar, dwftString, dwftWideString, dwftMemo, dwftFmtMemo, dwftWideMemo] then begin
-              if (not (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull)) then begin
-                if Query.Params[I].Size > 0 then
-                  Query.Params[I].Value := Copy(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value, 1, Query.Params[I].Size)
+              if (not (MassiveDataset.Fields.FieldByName(vParamName).IsNull)) then begin
+                if Query.GetParamSize(vParamName) > 0 then
+                 Query.SetParamValue(vParamName, Copy(MassiveDataset.Fields.FieldByName(vParamName).Value, 1, vParam.Size))
                 else
-                  Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value;
+                 Query.SetParamValue(vParamName, MassiveDataset.Fields.FieldByName(vParamName).Value);
               end
               else
-                Query.Params[I].Clear;
+               Query.ParamClear(vParamName);
             end
             else begin
-              if Query.Params[I].DataType in [ftUnknown] then begin
+              vParamFieldType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(vParamName).FieldType);
+              if Query.GetParamType(vParamName) in [ftUnknown] then begin
                 if not (ObjectValueToFieldType(
-                  MassiveDataset.Fields.FieldByName(Query.Params[I].Name).FieldType) in [ftUnknown]) then
-                  Query.Params[I].DataType := ObjectValueToFieldType(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).FieldType)
+                  MassiveDataset.Fields.FieldByName(vParamName).FieldType) in [ftUnknown]) then
+                  Query.SetParamType(vParamName, vParamFieldType)
                 else
-                  Query.Params[I].DataType := ftString;
+                  Query.SetParamType(vParamName, ftString);
               end;
-              if Query.Params[I].DataType in [ftBoolean, ftInterface, ftIDispatch, ftGuid] then begin
-                if (not (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull)) then
-                  Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value
+              if Query.GetParamType(vParamName) in [ftBoolean, ftInterface, ftIDispatch, ftGuid] then begin
+                if (not (MassiveDataset.Fields.FieldByName(vParamName).IsNull)) then
+                 Query.SetParamValue(vParamName, MassiveDataset.Fields.FieldByName(vParamName).Value)
                 else
-                  Query.Params[I].Clear;
+                 Query.ParamClear(vParamName);
               end
               else if Query.RESTDWDataTypeParam(I) in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
-                if (not (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull)) then begin
+                if (not (MassiveDataset.Fields.FieldByName(vParamName).IsNull)) then begin
                   if Query.RESTDWDataTypeParam(I) in [dwftLongWord,dwftLargeint] then
-                    Query.Params[I].AsLargeInt := StrToInt64(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
-                  else if Query.Params[I].DataType = ftSmallInt then
-                    Query.Params[I].AsSmallInt := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value)
+                   Query.SetParamValue(vParamName, StrToInt64(MassiveDataset.Fields.FieldByName(vParamName).Value))
+                  else if Query.GetParamType(vParamName) = ftSmallInt then
+                   Query.SetParamValue(vParamName, StrToInt(MassiveDataset.Fields.FieldByName(vParamName).Value))
                   else
-                    Query.Params[I].AsInteger := StrToInt(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value);
+                   Query.SetParamValue(vParamName, StrToInt(MassiveDataset.Fields.FieldByName(vParamName).Value));
                 end
                 else
-                  Query.Params[I].Clear;
+                 Query.ParamClear(vParamName);
               end
               else if Query.RESTDWDataTypeParam(I) in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd, dwftSingle] then begin
-                if (not (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull)) then
-                  Query.Params[I].AsFloat := StrToFloat(BuildFloatString(MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value))
+                if (not (MassiveDataset.Fields.FieldByName(vParamName).IsNull)) then
+                 Query.SetParamValue(vParamName, StrToFloat(BuildFloatString(MassiveDataset.Fields.FieldByName(vParamName).Value)))
                 else
-                  Query.Params[I].Clear;
+                 Query.ParamClear(vParamName);
               end
-              else if Query.Params[I].DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] then begin
-                if (not (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull)) then
-                  Query.Params[I].AsDateTime := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value
+              else if Query.GetParamType(vParamName) in [ftDate, ftTime, ftDateTime, ftTimeStamp] then begin
+                if (not (MassiveDataset.Fields.FieldByName(vParamName).IsNull)) then
+                 Query.SetParamValue(vParamName, MassiveDataset.Fields.FieldByName(vParamName).Value)
                 else
-                  Query.Params[I].Clear;
+                 Query.ParamClear(vParamName);
               end  //Tratar Blobs de Parametros...
-              else if Query.Params[I].DataType in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] then begin
+              else if Query.GetParamType(vParamName) in [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] then begin
                 vStringStream := TMemoryStream.Create;
                 try
-                  if (not (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull)) then begin
-                    MassiveDataset.Fields.FieldByName(Query.Params[I].Name).SaveToStream(vStringStream);
+                  if (not (MassiveDataset.Fields.FieldByName(vParamName).IsNull)) then begin
+                    MassiveDataset.Fields.FieldByName(vParamName).SaveToStream(vStringStream);
                     if vStringStream <> nil then begin
                       vStringStream.Position := 0;
-                      Query.Params[I].LoadFromStream(vStringStream, ftBlob);
+                     Query.SetParamValueStream(vParamName, vStringStream);
                     end
                     else
-                      Query.Params[I].Clear;
+                     Query.ParamClear(vParamName);
                   end
                   else
-                    Query.Params[I].Clear;
+                   Query.ParamClear(vParamName);
                 finally
                   FreeAndNil(vStringStream);
                 end;
               end
-              else if (not (MassiveDataset.Fields.FieldByName(Query.Params[I].Name).IsNull)) then
-                Query.Params[I].Value := MassiveDataset.Fields.FieldByName(Query.Params[I].Name).Value
+              else if (not (MassiveDataset.Fields.FieldByName(vParamName).IsNull)) then
+               Query.SetParamValue(vParamName, MassiveDataset.Fields.FieldByName(vParamName).Value)
               else
-                Query.Params[I].Clear;
+               Query.ParamClear(vParamName);
             end;
           end
           else begin //Update
@@ -4413,7 +4457,7 @@ Begin
         Begin
          A := -1;
          If (MassiveDataset.SequenceName <> '') Then
-          A := GetGenID(TRESTDWDrvQuery(Query),MassiveDataset.SequenceName);
+          A := GetGenID(MassiveDataset.SequenceName);
          If A > -1 Then
           Query.Fields[I].Value := A;
          Continue;
@@ -4961,12 +5005,12 @@ begin
   Value := AValue;
 end;
 
-procedure TRDWDrvParam.setDataType(const AValue: TFieldType);
+procedure TRDWDrvParam.setDataType(const AValue : TFieldType);
 var
-  enum : string;
+  pComponent : ^TComponent;
 begin
-  enum := GetEnumName(TypeInfo(TFieldType),Ord(AValue));
-  SetEnumProp(FOwner,'DataType',enum);
+ pComponent := @FOwner;
+ SetOrdProp(TComponent(pComponent^), 'DataType', Integer(AValue));
 end;
 
 procedure TRDWDrvParam.setName(const AValue: string);
@@ -4981,7 +5025,7 @@ end;
 
 procedure TRDWDrvParam.setValue(const AValue: Variant);
 begin
-  SetPropValue(FOwner,'Value',AValue);
+  SetPropValue(FOwner, 'Value', AValue);
 end;
 
 end.
