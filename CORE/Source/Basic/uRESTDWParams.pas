@@ -891,7 +891,7 @@ Begin
     Begin
      If (Pos('/', Result) = 0) And
         (Pos('-', Result) <= 1) Then
-      Result := UnixToDateTime(StrToInt64(Result));
+      Result := StrToFloat(Result);
     End
    Else
     Result := 0;
@@ -5176,7 +5176,7 @@ Begin
                          Else
                           Begin
                            If (vJSONValue.Value <> '') And (Lowercase(vJSONValue.Value) <> 'null') Then
-                            Result := UnixToDateTime(StrToInt64(vJSONValue.Value))
+                            Result := StrToFloat(vJSONValue.Value)
                            Else
                             Result := Null;
                           End;
