@@ -30,7 +30,7 @@ uses
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes,
   FireDAC.Comp.Client, FireDAC.Comp.DataSet, FireDAC.Stan.StorageBin,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.DApt.Intf, FireDAC.DApt,
-  FireDAC.Stan.Param, DB;
+  FireDAC.Stan.Param, DB, uRESTDWPhysicBase;
 
 const
   rdwFireDACDrivers : array[0..17] of string = (('ads'),('asa'),('db2'),('ds'),
@@ -112,13 +112,20 @@ type
                                      var AConnection        : TComponent); override;
   end;
 
+  Type
+   TRESTDWPhysicFireDAC = Class(TRESTDWPhysicBase)
+  Protected
+  Public
+   Constructor Create          (AOwner : TComponent);Override;
+  End;
+
 procedure Register;
 
 implementation
 
 procedure Register;
 begin
-  RegisterComponents('REST Dataware - Drivers', [TRESTDWFireDACDriver]);
+  RegisterComponents('REST Dataware - Drivers', [TRESTDWFireDACDriver, TRESTDWPhysicFireDAC]);
 end;
 
 { TRESTDWFireDACStoreProc }
@@ -516,6 +523,14 @@ begin
 
   stream.Position := 0;
 end;
+
+{ TRESTDWPhysicFireDAC }
+
+Constructor TRESTDWPhysicFireDAC.Create(AOwner: TComponent);
+Begin
+ Inherited;
+ SetBaseComponentClass(TFDMemtable);
+End;
 
 end.
 

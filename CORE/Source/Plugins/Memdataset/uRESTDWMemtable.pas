@@ -4,7 +4,7 @@ interface
 
 uses
   uRESTDWCustom,
-  Db, DBClient, Classes, DBConsts, Math, uRESTDWFieldsClass, uRESTDWDetailLink, SysUtils;
+  Db, Classes, Math, uRESTDWFieldsClass, uRESTDWDetailLink, SysUtils;
 
 Type
  TWhileNotEofFeature  = (wnefIgnoreEvents, wnefBeginFirst, wnefBookmarkRecord);
@@ -230,7 +230,6 @@ type
     property IndexFieldNames;
     property IndexName;
     property MasterFields;
-    property MasterSource;
     property BeforeOpen;
     property AfterOpen;
     property BeforeClose;
@@ -279,7 +278,7 @@ const
 implementation
 
 uses
-  Variants;
+  uRESTDWConsts, Variants;
 
 const
   INTERNAL_FIRST = 0;

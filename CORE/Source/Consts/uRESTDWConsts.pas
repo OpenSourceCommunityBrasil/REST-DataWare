@@ -1,4 +1,4 @@
-Unit uRESTDWConsts;
+﻿Unit uRESTDWConsts;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -124,6 +124,7 @@ Const
                               '<h1>REST Dataware</h1>'                      +
                               '<h2>Server Status - Online</h2></body></html>';
  cAuthRealm                 = 'WWW-Authenticate: %s realm="%s", %s charset="UTF-8"';
+ cInvalidVirtualMethod      = 'Invalid Virtual Method: %s, proper override method class needed';
  UrlBase                    = '%s://%s:%d/%s';
  UrlBaseA                   = '%s://%s:%d%s';
  ByteBuffer                 = 1024 * 8; //8kb
@@ -137,6 +138,8 @@ Const
  MinutesInDay               = 1440;   {Number of minutes in a day}
  AssyncCommandMSG           = '{"status":"OK", "assyncmsg":"AssyncCommand Executed"}';
  cNameValueSeparator        = ':';
+ cSetPhysicDriver           = 'A PhysicDriver is needed to work';
+ SNotEditing                = 'Not in Edit mode';
  RESTDWDialogoTitulo        = 'REST DataWare Components';
  RESTDWSobreTitulo          = 'REST DataWare '+ RESTDWVersao;
  RESTDWSobreDescricao       = 'https://github.com/OpenSourceCommunityBrasil/REST-DataWare' + sLineBreak +
