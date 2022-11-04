@@ -198,14 +198,6 @@
         <DCCReference Include="ZCore.dcp"/>
         <DCCReference Include="ZParseSql.dcp"/>
         <DCCReference Include="..\..\..\..\Source\Database_Drivers\uRESTDWZeosDriver.pas"/>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWDRIVERZEOS.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESDWZeosDriver</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWDRIVERZEOS16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESDWZeosDriver16</ResourceId>
-        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -291,6 +283,12 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx64\libcgsqlite3.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="..\..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWDriverZEOS.bpl" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="..\..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWZEOSDriver.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>RESTDWZEOSDriver.bpl</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\RESTDWZEOSDriver.bpl" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="OSX32">
