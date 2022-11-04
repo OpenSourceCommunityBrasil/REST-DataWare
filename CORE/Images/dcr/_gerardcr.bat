@@ -10,6 +10,7 @@ set path_brcc32="D:\IDE\Embarcadero\Studio\7\Bin\brcc32.exe"
 # Sockets
 %path_brcc32% -fo "..\..\Packages\Delphi\Connectors\Indy\RESTDWSocketIndyDesign.dcr" "SocketIndy.rc"
 %path_brcc32% -fo "..\..\Packages\Delphi\Connectors\Ics\RESTDWSocketIcsDesign.dcr" "SocketIcs.rc"
+#%path_brcc32% -fo "..\..\Packages\Delphi\Connectors\Synopse\RESTDWSocketSynDesign.dcr" "SocketSynopse.rc"
 
 # Drivers DBWare
 %path_brcc32% -fo "..\..\Packages\Delphi\Drivers\ApolloDB\RESTDWApolloDBDriver.dcr" "DriverApolloDB.rc"
