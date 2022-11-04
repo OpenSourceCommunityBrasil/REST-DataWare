@@ -1250,7 +1250,7 @@ Type
 End;
 
 Type
- TRESTDWStoredProc = Class(TRESTDWClientSQLBase)
+ TRESTDWStoredProcedure = Class(TRESTDWClientSQLBase)
  Private
   vActualPoolerMethodClient : TRESTDWPoolerMethodClient;
   vParams        : TParams;
@@ -5651,12 +5651,12 @@ Begin
    vClientSQLBase := Value;
    TRESTDWTable (vClientSQLBase).UpdateSQL := Self;
   End
- Else If Value is TRESTDWStoredProc Then
+ Else If Value is TRESTDWStoredProcedure Then
   Begin
    If Assigned(vClientSQLBase) Then
-    TRESTDWStoredProc(vClientSQLBase).UpdateSQL := Nil;
+    TRESTDWStoredProcedure(vClientSQLBase).UpdateSQL := Nil;
    vClientSQLBase := Value;
-   TRESTDWStoredProc (vClientSQLBase).UpdateSQL := Self;
+   TRESTDWStoredProcedure (vClientSQLBase).UpdateSQL := Self;
   End
  Else
   Begin
@@ -5757,8 +5757,8 @@ Begin
   Begin
    If vClientSQLBase.ClassType     = TRESTDWClientSQL Then
     TRESTDWClientSQL(vClientSQLBase).UpdateSQL := Nil
-   Else If vClientSQLBase.ClassType = TRESTDWStoredProc Then
-    TRESTDWStoredProc(vClientSQLBase).UpdateSQL := Nil;
+   Else If vClientSQLBase.ClassType = TRESTDWStoredProcedure Then
+    TRESTDWStoredProcedure(vClientSQLBase).UpdateSQL := Nil;
   End;
  vClientSQLBase := Value;
 End;
@@ -11581,7 +11581,7 @@ End;
 //{$ENDIF}
 //End;
 
-constructor TRESTDWStoredProc.Create(AOwner: TComponent);
+constructor TRESTDWStoredProcedure.Create(AOwner: TComponent);
 begin
  Inherited;
  vParams        := TParams.Create(Self);
@@ -11591,13 +11591,13 @@ begin
  vBinaryRequest := False;
 end;
 
-destructor TRESTDWStoredProc.Destroy;
+destructor TRESTDWStoredProcedure.Destroy;
 begin
  vParams.Free;
  Inherited;
 end;
 
-Function TRESTDWStoredProc.ExecProc(Var Error : String) : Boolean;
+Function TRESTDWStoredProcedure.ExecProc(Var Error : String) : Boolean;
 Begin
  If vRESTDataBase <> Nil Then
   Begin
@@ -11608,12 +11608,12 @@ Begin
   Raise Exception.Create(PChar(cEmptyDBName));
 End;
 
-Function TRESTDWStoredProc.ParamByName(Value: String): TParam;
+Function TRESTDWStoredProcedure.ParamByName(Value: String): TParam;
 Begin
  Result := Params.ParamByName(Value);
 End;
 
-Procedure TRESTDWStoredProc.SetUpdateSQL(Value : TRESTDWUpdateSQL);
+Procedure TRESTDWStoredProcedure.SetUpdateSQL(Value : TRESTDWUpdateSQL);
 Begin
  If (Assigned(vUpdateSQL)) And
     (vUpdateSQL <> Value)  Then
@@ -11630,12 +11630,12 @@ Begin
   End;
 End;
 
-Function  TRESTDWStoredProc.GetUpdateSQL       : TRESTDWUpdateSQL;
+Function  TRESTDWStoredProcedure.GetUpdateSQL       : TRESTDWUpdateSQL;
 Begin
  Result := vUpdateSQL;
 End;
 
-Procedure TRESTDWStoredProc.Notification(AComponent : TComponent;
+Procedure TRESTDWStoredProcedure.Notification(AComponent : TComponent;
                                          Operation  : TOperation);
 Begin
  If (Operation    = opRemove)              And
@@ -11647,7 +11647,7 @@ Begin
  Inherited Notification(AComponent, Operation);
 end;
 
-procedure TRESTDWStoredProc.SetDataBase(const Value: TRESTDWDatabasebaseBase);
+procedure TRESTDWStoredProcedure.SetDataBase(const Value: TRESTDWDatabasebaseBase);
 begin
  vRESTDataBase := Value;
 end;

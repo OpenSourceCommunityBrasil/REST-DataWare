@@ -100,7 +100,7 @@ Const
   { Private declarations }
   vLastSelect        : String;
   RESTDWDatabase     : TRESTDWDatabasebaseBase;
-  RESTDWStoredProc   : TRESTDWStoredProc;
+  RESTDWStoredProc   : TRESTDWStoredProcedure;
   RESTDWClientSQL    : TRESTDWClientSQL;
   RESTDWUpdateSQL    : TRESTDWUpdateSQL;
   Procedure SetFields;
@@ -652,9 +652,9 @@ Procedure TFrmDWUpdSqlEditor.SetClientSQL(Value: TRESTDWClientSQL);
 Var
  vMemString : TStringList;
 Begin
- If Value.ClassType = TRESTDWStoredProc Then
+ If Value.ClassType = TRESTDWStoredProcedure Then
   Begin
-   RESTDWStoredProc   := TRESTDWStoredProc(Value);
+   RESTDWStoredProc   := TRESTDWStoredProcedure(Value);
    If RESTDWStoredProc <> Nil Then
     Begin
      If RESTDWStoredProc.DataBase <> Nil Then

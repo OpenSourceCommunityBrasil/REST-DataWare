@@ -186,14 +186,6 @@
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTDWClientEvents16</ResourceId>
         </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWClientREST.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientREST</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWClientRest16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWClientREST16</ResourceId>
-        </RcItem>
         <RcItem Include="..\..\Images\icons\components\TRESTDWClientSQL.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTDWClientSQL</ResourceId>
@@ -273,14 +265,6 @@
         <RcItem Include="..\..\Images\icons\components\TRESTDWServerEvents16.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TRESTDWServerEvents16</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWStoredProc.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWStoredProc</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\Images\icons\components\TRESTDWStoredProc16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWStoredProc16</ResourceId>
         </RcItem>
         <RcItem Include="..\..\Images\icons\components\TRESTDWTable.bmp">
             <ResourceType>BITMAP</ResourceType>

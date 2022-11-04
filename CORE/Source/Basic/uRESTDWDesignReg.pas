@@ -804,7 +804,7 @@ Begin
  RegisterComponents('REST Dataware - Tools',       [TRESTDWResponseTranslator, TRESTDWBufferDB]);
 
  RegisterComponents('REST Dataware - DB',          [TRESTDWPoolerDB,        TRESTDWClientSQL,  TRESTDWMemtable, TRESTDWTable,      TRESTDWUpdateSQL,
-                                                   TRESTDWMassiveSQLCache, TRESTDWStoredProc, TRESTDWPoolerList, TRESTDWMassiveCache,  TRESTDWBatchMove]);
+                                                   TRESTDWMassiveSQLCache, TRESTDWStoredProcedure, TRESTDWPoolerList, TRESTDWMassiveCache,  TRESTDWBatchMove]);
 // AddIDEMenu;//Menu do REST Debugger
  {$IFNDEF FPC}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
@@ -1157,11 +1157,11 @@ initialization
  {$ENDIF}
  UnlistPublishedProperty(TRESTDWClientSQL,  'FieldDefs');
  UnlistPublishedProperty(TRESTDWClientSQL,  'Options');
- UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceName');
- UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceField');
- UnlistPublishedProperty(TRESTDWStoredProc, 'OnWriterProcess');
- UnlistPublishedProperty(TRESTDWStoredProc, 'FieldDefs');
- UnlistPublishedProperty(TRESTDWStoredProc, 'Options');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceName');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceField');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'OnWriterProcess');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'FieldDefs');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'Options');
  UnlistPublishedProperty(TRESTDWClientSQL,  'CachedUpdates');
  UnlistPublishedProperty(TRESTDWClientSQL,  'MasterSource');
  UnlistPublishedProperty(TRESTDWClientSQL,  'MasterFields');
@@ -1180,20 +1180,20 @@ initialization
  UnlistPublishedProperty(TRESTDWClientSQL,  'FieldOptions');
  UnlistPublishedProperty(TRESTDWClientSQL,  'Constraints');
  UnlistPublishedProperty(TRESTDWClientSQL,  'ConstraintsEnabled');
- UnlistPublishedProperty(TRESTDWStoredProc, 'StoreDefs');
- UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceName');
- UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceField');
- UnlistPublishedProperty(TRESTDWStoredProc, 'OnWriterProcess');
- UnlistPublishedProperty(TRESTDWStoredProc, 'UpdateOptions');
- UnlistPublishedProperty(TRESTDWStoredProc, 'FetchOptions');
- UnlistPublishedProperty(TRESTDWStoredProc, 'ObjectView');
- UnlistPublishedProperty(TRESTDWStoredProc, 'ResourceOptions');
- UnlistPublishedProperty(TRESTDWStoredProc, 'CachedUpdates');
- UnlistPublishedProperty(TRESTDWStoredProc, 'MasterSource');
- UnlistPublishedProperty(TRESTDWStoredProc, 'MasterFields');
- UnlistPublishedProperty(TRESTDWStoredProc, 'DetailFields');
- UnlistPublishedProperty(TRESTDWStoredProc, 'ActiveStoredUsage');
- UnlistPublishedProperty(TRESTDWStoredProc, 'Adapter');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'StoreDefs');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceName');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceField');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'OnWriterProcess');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'UpdateOptions');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'FetchOptions');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'ObjectView');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'ResourceOptions');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'CachedUpdates');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'MasterSource');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'MasterFields');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'DetailFields');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'ActiveStoredUsage');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'Adapter');
 
 Finalization
  {$IFNDEF FPC}
