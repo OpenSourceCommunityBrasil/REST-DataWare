@@ -168,14 +168,6 @@
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="RESTDWShellServices.dcp"/>
         <DCCReference Include="..\..\..\Source\ShellTools\uRESTDWShellServicesRegDelphi.pas"/>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWServiceCGI.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServiceCGI</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\Images\icons\components\TRESTDWServiceCGI16.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWServiceCGI16</ResourceId>
-        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
