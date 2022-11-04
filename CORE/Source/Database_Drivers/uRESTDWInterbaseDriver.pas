@@ -62,7 +62,16 @@ type
     procedure Prepare; override;
     procedure FetchAll; override;
 
-    function RowsAffected : Int64; override;
+    function  RowsAffected : Int64; override;
+    function  ParamCount : Integer; override;
+
+    function  getParamDataType(IParam : integer) : TFieldType; override;
+    function  getParamName(IParam : integer) : string; override;
+    function  getParamSize(IParam : integer) : integer; override;
+    function  getParamValue(IParam : integer) : variant; override;
+
+    procedure setParamDataType(IParam : integer; AValue : TFieldType); override;
+    procedure setParamValue(IParam : integer; AValue : variant); override;
   end;
 
   { TRESTDWInterbaseDriver }
@@ -137,6 +146,38 @@ begin
   qry.FetchAll;
 end;
 
+function TRESTDWInterbaseQuery.getParamDataType(IParam: integer): TFieldType;
+var
+  qry : TIBQuery;
+begin
+  qry := TIBQuery(Self.Owner);
+  Result := qry.Params[IParam].DataType;
+end;
+
+function TRESTDWInterbaseQuery.getParamName(IParam: integer): string;
+var
+  qry : TIBQuery;
+begin
+  qry := TIBQuery(Self.Owner);
+  Result := qry.Params[IParam].Name;
+end;
+
+function TRESTDWInterbaseQuery.getParamSize(IParam: integer): integer;
+var
+  qry : TIBQuery;
+begin
+  qry := TIBQuery(Self.Owner);
+  Result := qry.Params[IParam].Size;
+end;
+
+function TRESTDWInterbaseQuery.getParamValue(IParam: integer): variant;
+var
+  qry : TIBQuery;
+begin
+  qry := TIBQuery(Self.Owner);
+  Result := qry.Params[IParam].Value;
+end;
+
 procedure TRESTDWInterbaseQuery.LoadFromStreamParam(IParam: integer;
   stream: TStream; blobtype: TBlobType);
 var
@@ -144,6 +185,14 @@ var
 begin
   qry := TIBQuery(Self.Owner);
   qry.Params[IParam].LoadFromStream(stream,blobtype);
+end;
+
+function TRESTDWInterbaseQuery.ParamCount: Integer;
+var
+  qry : TIBQuery;
+begin
+  qry := TIBQuery(Self.Owner);
+  Result := qry.ParamCount;
 end;
 
 procedure TRESTDWInterbaseQuery.Prepare;
@@ -177,6 +226,23 @@ begin
   finally
     FreeAndNil(memtable);
   end;
+end;
+
+procedure TRESTDWInterbaseQuery.setParamDataType(IParam: integer;
+                                                 AValue: TFieldType);
+var
+  qry : TIBQuery;
+begin
+  qry := TIBQuery(Self.Owner);
+  qry.Params[IParam].DataType := AValue;
+end;
+
+procedure TRESTDWInterbaseQuery.setParamValue(IParam: integer; AValue: variant);
+var
+  qry : TIBQuery;
+begin
+  qry := TIBQuery(Self.Owner);
+  qry.Params[IParam].Value := AValue;
 end;
 
 { TRESTDWInterbaseDriver }

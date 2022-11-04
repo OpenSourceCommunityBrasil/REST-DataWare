@@ -55,13 +55,23 @@ type
   protected
     procedure createSequencedField(seqname,field : string); override;
   public
-    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
     procedure FetchAll; override;
 
-    function RowsAffected : Int64; override;
+    function  RowsAffected : Int64; override;
+    function  ParamCount : Integer; override;
+
+    function  getParamDataType(IParam : integer) : TFieldType; override;
+    function  getParamName(IParam : integer) : string; override;
+    function  getParamSize(IParam : integer) : integer; override;
+    function  getParamValue(IParam : integer) : variant; override;
+
+    procedure setParamDataType(IParam : integer; AValue : TFieldType); override;
+    procedure setParamValue(IParam : integer; AValue : variant); override;
+
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
   end;
 
   { TRESTDWMyDACDriver }
@@ -321,6 +331,62 @@ var
 begin
   qry := TMyQuery(Self.Owner);
   Result := qry.RowsAffected;
+end;
+
+function TRESTDWMyDACQuery.ParamCount : Integer;
+var
+  qry : TMyQuery;
+begin
+  qry := TMyQuery(Self.Owner);
+  Result := qry.ParamCount;
+end;
+
+function TRESTDWMyDACQuery.getParamDataType(IParam : integer) : TFieldType;
+var
+  qry : TMyQuery;
+begin
+  qry := TMyQuery(Self.Owner);
+  Result := qry.Params[IParam].DataType;
+end;
+
+function TRESTDWMyDACQuery.getParamName(IParam : integer) : string;
+var
+  qry : TMyQuery;
+begin
+  qry := TMyQuery(Self.Owner);
+  Result := qry.Params[IParam].Name;
+end;
+
+function TRESTDWMyDACQuery.getParamSize(IParam : integer) : integer;
+var
+  qry : TMyQuery;
+begin
+  qry := TMyQuery(Self.Owner);
+  Result := qry.Params[IParam].Size;
+end;
+
+function TRESTDWMyDACQuery.getParamValue(IParam : integer) : variant;
+var
+  qry : TMyQuery;
+begin
+  qry := TMyQuery(Self.Owner);
+  Result := qry.Params[IParam].Value;
+end;
+
+procedure TRESTDWMyDACQuery.setParamDataType(IParam : integer; AValue : TFieldType);
+var
+  qry : TMyQuery;
+begin
+  qry := TMyQuery(Self.Owner);
+  qry.Params[IParam].DataType := AValue;
+end;
+
+procedure TRESTDWMyDACQuery.setParamValue(IParam : integer; AValue : variant);
+var
+  qry : TMyQuery;
+begin
+  qry := TMyQuery(Self.Owner);
+  qry.Params[IParam].Value := AValue;
 end;
 
 procedure TRESTDWMyDACQuery.SaveToStream(stream: TStream);

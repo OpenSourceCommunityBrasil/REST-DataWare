@@ -80,12 +80,22 @@ type
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
-    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
     procedure FetchAll; override;
 
     destructor Destroy; override;
 
-    function RowsAffected : Int64; override;
+    function  RowsAffected : Int64; override;
+    function  ParamCount : Integer; override;
+
+    function  getParamDataType(IParam : integer) : TFieldType; override;
+    function  getParamName(IParam : integer) : string; override;
+    function  getParamSize(IParam : integer) : integer; override;
+    function  getParamValue(IParam : integer) : variant; override;
+
+    procedure setParamDataType(IParam : integer; AValue : TFieldType); override;
+    procedure setParamValue(IParam : integer; AValue : variant); override;
+
+    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
   end;
 
   { TRESTDWZeosDriver }
@@ -371,7 +381,7 @@ procedure TRESTDWZeosQuery.FetchAll;
 var
   qry : TZTable;
 begin
-  qry := TZQuery(Self.Owner);
+  qry := TZTable(Self.Owner);
   qry.FetchAll;
 end;
 
@@ -418,9 +428,64 @@ function TRESTDWZeosQuery.RowsAffected: Int64;
 var
   qry : TZQuery;
 begin
-  inherited Prepare;
   qry := TZQuery(Self.Owner);
   Result := qry.RowsAffected;
+end;
+
+function TRESTDWZeosQuery.ParamCount : Integer;
+var
+  qry : TZQuery;
+begin
+  qry := TZQuery(Self.Owner);
+  Result := qry.Params.Count;
+end;
+
+function TRESTDWZeosQuery.getParamDataType(IParam : integer) : TFieldType;
+var
+  qry : TZQuery;
+begin
+  qry := TZQuery(Self.Owner);
+  Result := qry.Params[IParam].DataType;
+end;
+
+function TRESTDWZeosQuery.getParamName(IParam : integer) : string;
+var
+  qry : TZQuery;
+begin
+  qry := TZQuery(Self.Owner);
+  Result := qry.Params[IParam].Name;
+end;
+
+function TRESTDWZeosQuery.getParamSize(IParam : integer) : integer;
+var
+  qry : TZQuery;
+begin
+  qry := TZQuery(Self.Owner);
+  Result := qry.Params[IParam].Size;
+end;
+
+function TRESTDWZeosQuery.getParamValue(IParam : integer) : variant;
+var
+  qry : TZQuery;
+begin
+  qry := TZQuery(Self.Owner);
+  Result := qry.Params[IParam].Value;
+end;
+
+procedure TRESTDWZeosQuery.setParamDataType(IParam : integer; AValue : TFieldType);
+var
+  qry : TZQuery;
+begin
+  qry := TZQuery(Self.Owner);
+  qry.Params[IParam].DataType := AValue;
+end;
+
+procedure TRESTDWZeosQuery.setParamValue(IParam : integer; AValue : variant);
+var
+  qry : TZQuery;
+begin
+  qry := TZQuery(Self.Owner);
+  qry.Params[IParam].Value := AValue;
 end;
 
 procedure TRESTDWZeosQuery.SaveToStream(stream: TStream);
@@ -468,7 +533,7 @@ var
   pname : string;
   cp : Word;
 begin
-  pname := Self.Params.Items[IParam].Name;
+  pname := Self.Params[IParam].Name;
   qry := TZTable(Self.Owner);
   {$IFDEF ZEOS80UP}
     if BlobType in [ftWideString{$IFDEF WITH_WIDEMEMO}, ftFixedWideChar, ftWideMemo{$ENDIF}] then
