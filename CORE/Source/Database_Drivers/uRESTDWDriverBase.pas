@@ -520,14 +520,18 @@ begin
       if vParam <> nil then begin
         if vParam.RESTDWDataTypeParam in [dwftFixedChar,dwftFixedWideChar,dwftString,dwftWideString,
                                           dwftMemo,dwftFmtMemo,dwftWideMemo] then begin
-          if vParam.RESTDWDataTypeParam in [dwftMemo, dwftFmtMemo, dwftWideMemo] then
-            vParam.Value := DWParams[I].Value
-          else begin
-            if vParam.Size > 0 Then
-              vParam.Value := Copy(DWParams[I].Value, 1, vParam.Size)
-            else
-              vParam.Value := DWParams[I].Value;
-          end;
+          if (not DWParams[I].IsNull) then begin
+            if vParam.RESTDWDataTypeParam in [dwftMemo, dwftFmtMemo, dwftWideMemo] then
+              vParam.Value := DWParams[I].Value
+            else begin
+              if vParam.Size > 0 Then
+                vParam.Value := Copy(DWParams[I].Value, 1, vParam.Size)
+              else
+                vParam.Value := DWParams[I].Value;
+            end;
+          end
+          else
+            vParam.Clear;
         end
         else begin
           if vParam.DataType in [ftUnknown] then begin
