@@ -715,8 +715,8 @@ Begin
     End;
   Finally
    vTempHeaders.Free;
-   If Assigned(tempResponse) Then
-    FreeAndNil(tempResponse);
+   If tempResponse <> nil Then
+    tempResponse  :=  nil;
    If Assigned(atempResponse) Then
     FreeAndNil(atempResponse);
    SendParams.Free;
