@@ -714,9 +714,12 @@ Begin
       OnAfterRequest(AUrl, rtPost, CustomBody);
     End;
   Finally
+    If Not Assigned(CustomBody) Then
+      begin
+       If Assigned(tempResponse) Then
+        FreeAndNil(tempResponse);
+      end;
    vTempHeaders.Free;
-   If tempResponse <> nil Then
-    tempResponse  :=  nil;
    If Assigned(atempResponse) Then
     FreeAndNil(atempResponse);
    SendParams.Free;
