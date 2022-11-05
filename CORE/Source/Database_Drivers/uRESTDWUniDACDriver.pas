@@ -489,10 +489,5 @@ begin
   end;
 end;
 
-{$IFDEF FPC}
-initialization
-  {$I restdwunidacdriver.lrs}
-{$ENDIF}
-
 end.
 

@@ -18,5 +18,6 @@ begin
 end;
 
 initialization
+  {$I restdwlazarusdrivers.lrs}
   RegisterPackage('restdwdriverunidac', @Register);
 end.

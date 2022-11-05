@@ -510,11 +510,4 @@ begin
   stream.Position := 0;
 end;
 
-
-{$IFDEF FPC}
-initialization
-  {$I ./restdwanydacdriver.lrs}
-{$ENDIF}
-
 end.
-

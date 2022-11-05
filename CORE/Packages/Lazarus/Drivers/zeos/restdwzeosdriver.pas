@@ -2,7 +2,7 @@
   This source is only used to compile and install the package.
  }
 
- unit restdwzeosdriver;
+unit restdwzeosdriver;
 
 {$warn 5023 off : no warning about unused units}
 interface
@@ -10,7 +10,7 @@ interface
 uses
   uRESTDWZeosDriver, LazarusPackageIntf;
 
- implementation
+implementation
 
 procedure Register;
 begin
@@ -18,5 +18,6 @@ begin
 end;
 
 initialization
+  {$I restdwlazarusdrivres.lrs}
   RegisterPackage('restdwzeosdriver', @Register);
 end.

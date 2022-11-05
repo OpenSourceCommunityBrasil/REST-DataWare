@@ -421,10 +421,5 @@ Begin
   end;
 end;
 
-{$IFDEF FPC}
-initialization
-  {$I ../../Packages/Lazarus/Drivers/lazdriver/restdwlazsqldriver.lrs}
-{$ENDIF}
-
 end.
 

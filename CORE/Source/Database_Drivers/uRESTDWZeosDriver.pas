@@ -577,10 +577,5 @@ begin
   end;
 end;
 
-{$IFDEF FPC}
-initialization
-  {$I restdwzeosdriver.lrs}
-{$ENDIF}
-
 end.
 

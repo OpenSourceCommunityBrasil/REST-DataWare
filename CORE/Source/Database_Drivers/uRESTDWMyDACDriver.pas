@@ -442,11 +442,5 @@ begin
   end;
 end;
 
-
-{$IFDEF FPC}
-initialization
-  {$I restdwMyDACdriver.lrs}
-{$ENDIF}
-
 end.
 

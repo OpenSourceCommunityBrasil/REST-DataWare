@@ -363,12 +363,12 @@
         <UnitName Value="uRESTDWMimeTypes"/>
       </Item82>
       <Item83>
-        <Filename Value="..\..\Source\Plugins\Memdataset\uRESTDWCustom_Real.pas"/>
-        <UnitName Value="uRESTDWCustom_Real"/>
-      </Item83>
-      <Item84>
         <Filename Value="..\..\Source\Plugins\Memdataset\uRESTDWMemtable.pas"/>
         <UnitName Value="uRESTDWMemtable"/>
+      </Item83>
+      <Item84>
+        <Filename Value="..\..\Source\Plugins\Memdataset\uRESTDWCustom.pas"/>
+        <UnitName Value="uRESTDWCustom"/>
       </Item84>
     </Files>
     <CompatibilityMode Value="True"/>
