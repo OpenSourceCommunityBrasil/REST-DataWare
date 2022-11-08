@@ -30,19 +30,30 @@ Uses
  Classes,  SysUtils, uRESTDWConsts, uRESTDWPhysicBase, Db;
 
  Type
-  TCustomdwMemtable = Class(TDataSet)
+  TCustomdwMemtable = Class(TDataset)
  Protected
   Procedure   InternalPost;             Override; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
   Procedure   InternalOpen;             Override; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Open
   Function    GetRecordCount : Integer; Override;
   Procedure   InternalRefresh;          Override; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Refresh
   Procedure   CloseCursor;              Override; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Close
+  Function    IsCursorOpen   : Boolean; Override;
+  Procedure   Loaded;                   Override;
+  Function    GetData            : OleVariant;Virtual;
+  Function    GetRecord (Buffer  : TRecBuf;
+                         GetMode : TGetMode;
+                         DoCheck : Boolean) : TGetResult; Override;
+  Function    aGetRecord(Buffer  : TRecBuf;
+                         GetMode : TGetMode;
+                         DoCheck : Boolean) : TGetResult;
  Private
+  aPhysicSelf   : TDataset;
   vIndexFieldNames,
   vIndexName,
   vMasterFields : String;
   vIndexDefs    : TIndexDefs;
   vPhysicDriver : TRESTDWPhysicBase;
+  Procedure SetPhysicDriver(aPhysicDriver : TRESTDWPhysicBase);
  Public
   Procedure CreateDataset;Virtual;
   Procedure CleanData;    Virtual;
@@ -59,13 +70,20 @@ Uses
   Destructor  Destroy;    Override;
  Published
   Property IndexDefs       : TIndexDefs        Read vIndexDefs       Write vIndexDefs;
-  Property PhysicDriver    : TRESTDWPhysicBase Read vPhysicDriver    Write vPhysicDriver;
+  Property PhysicDriver    : TRESTDWPhysicBase Read vPhysicDriver    Write SetPhysicDriver;
   Property IndexFieldNames : String            Read vIndexFieldNames Write vIndexFieldNames;
   Property IndexName       : String            Read vIndexName       Write vIndexName;
   Property MasterFields    : String            Read vMasterFields    Write vMasterFields;
  End;
 
 Implementation
+
+Function TCustomdwMemtable.aGetRecord(Buffer  : TRecBuf;
+                                      GetMode : TGetMode;
+                                      DoCheck : Boolean): TGetResult;
+Begin
+
+End;
 
 Procedure TCustomdwMemtable.CleanData;
 Begin
@@ -95,7 +113,21 @@ End;
 Destructor TCustomdwMemtable.Destroy;
 Begin
  FreeAndNil(vIndexDefs);
+ If Assigned(aPhysicSelf) Then
+  FreeAndNil(aPhysicSelf);
  Inherited;
+End;
+
+Function TCustomdwMemtable.GetData : OleVariant;
+Begin
+
+End;
+
+Function TCustomdwMemtable.GetRecord(Buffer  : TRecBuf;
+                                     GetMode : TGetMode;
+                                     DoCheck : Boolean): TGetResult;
+Begin
+ Result := AGetRecord(Buffer, GetMode, DoCheck);
 End;
 
 Function TCustomdwMemtable.GetRecordCount : Integer;
@@ -111,7 +143,13 @@ Begin
  If Not Assigned(vPhysicDriver) Then
   Raise Exception.Create(cSetPhysicDriver)
  Else
-  Inherited;
+  Begin
+   aPhysicSelf.Close;
+   aPhysicSelf.FieldDefs.Assign(FieldDefs);
+   aPhysicSelf.Open;
+   vPhysicDriver.CopyDataset(aPhysicSelf, Self);
+//   Inherited;
+  End;
 End;
 
 Procedure TCustomdwMemtable.InternalPost;
@@ -128,6 +166,17 @@ Begin
   Raise Exception.Create(cSetPhysicDriver)
  Else
   Inherited;
+End;
+
+Function TCustomdwMemtable.IsCursorOpen: Boolean;
+Begin
+
+End;
+
+Procedure TCustomdwMemtable.Loaded;
+Begin
+ Inherited;
+
 End;
 
 Procedure TCustomdwMemtable.LoadFromStream(aStream : TStream);
@@ -158,6 +207,17 @@ End;
 Procedure TCustomdwMemtable.SetMasterFields(aIndexFieldNames: String);
 Begin
  Raise Exception.Create(Format(cInvalidVirtualMethod, ['SetMasterFields']));
+End;
+
+Procedure TCustomdwMemtable.SetPhysicDriver(aPhysicDriver : TRESTDWPhysicBase);
+Begin
+ vPhysicDriver := aPhysicDriver;
+ If Assigned(vPhysicDriver) Then
+  Begin
+   If Assigned(aPhysicSelf) Then
+    FreeAndNil(aPhysicSelf);
+   aPhysicSelf := TDataset(vPhysicDriver.BaseComponentClass.Create(Owner));
+  End;
 End;
 
 Procedure TCustomdwMemtable.SortOn(Const AFieldNames : String;

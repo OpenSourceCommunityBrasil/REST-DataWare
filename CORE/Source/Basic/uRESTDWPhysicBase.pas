@@ -40,6 +40,8 @@ Uses
   Procedure Notification     (AComponent : TComponent;
                               Operation  : TOperation);      Override;
  Public
+  Procedure CopyDataset      (Source     : TDataset;
+                              Dest       : TDataset);        Virtual;
   Constructor Create          (AOwner    : TComponent);      Override;
   Destructor  Destroy; Override;
   Property    BaseComponentClass         : TComponentClass   Read aBaseComponentClass;
@@ -54,6 +56,12 @@ Implementation
 Procedure TRESTDWPhysicBase.SetBaseComponentClass(aClass : TComponentClass);
 Begin
  aBaseComponentClass := aClass;
+End;
+
+Procedure TRESTDWPhysicBase.CopyDataset(Source : TDataset;
+                                        Dest   : TDataset);
+Begin
+ Raise Exception.Create('CopyDataset not assigned...')
 End;
 
 Constructor TRESTDWPhysicBase.Create(AOwner: TComponent);

@@ -39,7 +39,6 @@ unit uRESTDWIcsBase;
 // TODO 4
 // Portar a propriedade RequestTimeOut para dentro dos Sockets (remover no Pooler Base);
 
-
 interface
 
 Uses
@@ -136,9 +135,9 @@ Type
     Destructor Destroy; override;
 
     // Document procedures
-    Procedure onDocumentReadyServer(Sender: TObject; Var Flags: THttpGetFlag);
+    Procedure onDocumentReadyServer(Sender: TObject; Var Flag: THttpGetFlag);
     procedure onPostedDataServer(Sender: TObject; ErrCode: Word);
-    procedure ProcessDocument(Sender: TObject; iBodyStream: TStream);
+    procedure ProcessDocument(Sender: TObject; iBodyStream: TStream; iFlag: THttpGetFlag);
     procedure onExceptionServer(Sender: TObject; E: ESocketException);
     procedure onServerStartedServer(Sender: TObject);
     procedure onServerStoppedServer(Sender: TObject);
@@ -354,8 +353,6 @@ begin
 end;
 
 Constructor TRESTDWIcsServicePooler.Create(AOwner: TComponent);
-Type
- PSslContext = ^TSslContext;
 Begin
   HttpAppSrv := TSslHttpAppSrv.Create(nil);
 
@@ -453,8 +450,8 @@ Begin
   End;
   If Assigned(HttpAppSrv) Then
   begin
-   If Assigned(HttpAppSrv.SSLContext) Then
-     HttpAppSrv.SSLContext.Free;
+    If Assigned(HttpAppSrv.SSLContext) Then
+      HttpAppSrv.SSLContext.Free;
     FreeAndNil(HttpAppSrv);
   end;
   Inherited;
@@ -541,14 +538,15 @@ begin
 
       Stream.Position := 0;
 
-      ProcessDocument(Sender, Stream);
+      ProcessDocument(Sender, Stream, hgWillSendMySelf);
     finally
       FreeAndNil(Stream);
     end;
   end;
 end;
 
-procedure TRESTDWIcsServicePooler.ProcessDocument(Sender: TObject; iBodyStream: TStream);
+procedure TRESTDWIcsServicePooler.ProcessDocument(Sender: TObject; iBodyStream: TStream;
+  iFlag: THttpGetFlag);
 var
   BodyStream: TStream;
 begin
@@ -572,7 +570,6 @@ begin
       mb: TStringStream;
       vRedirect: TRedirect;
       vParams: TStringList;
-      Flags: THttpGetFlag;
 
       Procedure WriteError;
       Begin
@@ -580,7 +577,7 @@ begin
           TEncoding.UTF8{$IFEND});
         mb.Position := 0;
         Remote.DocStream := mb;
-        Remote.AnswerStream(Flags, IntToStr(StatusCode), '', '');
+        Remote.AnswerStream(iFlag, IntToStr(StatusCode), '', '');
       End;
 
       Procedure DestroyComponents;
@@ -603,8 +600,6 @@ begin
     begin
       try
         Remote := Sender as TPoolerHttpConnection;
-
-        Flags := hgWillSendMySelf;
 
         vResponseHeader := TStringList.Create;
         vResponseString := '';
@@ -648,7 +643,7 @@ begin
           Begin
             ResultStream.Position := 0;
             Remote.DocStream := ResultStream;
-            Remote.AnswerStream(Flags, IntToStr(StatusCode), vContentType,
+            Remote.AnswerStream(iFlag, IntToStr(StatusCode), vContentType,
               vResponseHeader.Text);
           End;
         End
@@ -668,7 +663,7 @@ begin
           Begin
             ResultStream.Position := 0;
             Remote.DocStream := ResultStream;
-            Remote.AnswerStream(Flags, IntToStr(StatusCode), vContentType,
+            Remote.AnswerStream(iFlag, IntToStr(StatusCode), vContentType,
               vResponseHeader.Text);
           End;
         End;
@@ -681,20 +676,24 @@ begin
 end;
 
 Procedure TRESTDWIcsServicePooler.onDocumentReadyServer(Sender: TObject;
-Var Flags: THttpGetFlag);
+Var Flag: THttpGetFlag);
 var
   Remote: TPoolerHttpConnection;
 begin
   Remote := Sender as TPoolerHttpConnection;
 
   if Assigned(vOnDocumentReady) then
-    vOnDocumentReady(Remote, Flags);
+    vOnDocumentReady(Remote, Flag);
 
   if not(Remote.RequestMethod in [THttpMethod.httpMethodGet, THttpMethod.httpMethodDelete])
   then
-    Flags := hgAcceptData
+    Flag := hgAcceptData
   else
-    ProcessDocument(Sender, nil);
+  begin
+    Flag := hgWillSendMySelf;
+
+    ProcessDocument(Sender, nil, Flag);
+  end;
 End;
 
 Procedure TRESTDWIcsServicePooler.SetActive(Value: Boolean);
@@ -704,6 +703,9 @@ Begin
   If (Value) Then
   Begin
     Try
+      if not(Assigned(ServerMethodClass)) and (Self.GetDataRouteCount = 0) then
+        raise Exception.Create(cServerMethodClassNotAssigned);
+
       SetHttpServerParams;
 
       SetHttpServerSSL;
@@ -732,7 +734,7 @@ Begin
     Except
       On E: Exception do
       Begin
-        Raise Exception.Create(PChar(E.Message));
+        Raise Exception.Create(E.Message);
       End;
     End;
   End

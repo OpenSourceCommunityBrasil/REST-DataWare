@@ -70,7 +70,6 @@ Type
     procedure DoOnCalcFields; override;
     procedure DoOnNewRecord; override;
 //    procedure DoFilterRecord; override;
-
     procedure BridgeDataSetEvent(ADataSetEvent: TFtDataSetEvent; AField: TField = nil); virtual;
 
   public

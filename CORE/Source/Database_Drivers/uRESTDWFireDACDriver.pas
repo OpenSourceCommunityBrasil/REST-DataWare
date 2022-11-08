@@ -115,8 +115,11 @@ type
   Type
    TRESTDWPhysicFireDAC = Class(TRESTDWPhysicBase)
   Protected
+   Function  CreateComponent    : TComponent; Override;
+   Procedure CopyDataset(Source : TDataset;
+                         Dest   : TDataset);Override;
   Public
-   Constructor Create          (AOwner : TComponent);Override;
+   Constructor Create   (AOwner : TComponent);Override;
   End;
 
 procedure Register;
@@ -526,10 +529,23 @@ end;
 
 { TRESTDWPhysicFireDAC }
 
+procedure TRESTDWPhysicFireDAC.CopyDataset(Source : TDataset;
+                                           Dest   : TDataset);
+Begin
+ FreeAndNil(Dest);
+ Dest := TFDMemtable(CreateComponent);
+ TFDMemtable(Dest).CloneCursor(TFDMemtable(Source));
+End;
+
 Constructor TRESTDWPhysicFireDAC.Create(AOwner: TComponent);
 Begin
  Inherited;
  SetBaseComponentClass(TFDMemtable);
+End;
+
+Function TRESTDWPhysicFireDAC.CreateComponent : TComponent;
+Begin
+ Result := Inherited CreateComponent;
 End;
 
 end.
