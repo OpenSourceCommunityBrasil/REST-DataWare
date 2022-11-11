@@ -44,9 +44,10 @@ interface
 Uses
   System.SysUtils,
   System.Classes,
+  System.DateUtils,
   Data.Db,
   Variants,
-  System.SyncObjs,
+  VCL.ExtCtrls,
   uRESTDWComponentEvents,
   uRESTDWBasicTypes,
   uRESTDWJSONObject,
@@ -68,7 +69,8 @@ Uses
   OverbyteIcsFormDataDecoder,
   OverbyteIcsMimeUtils,
   OverbyteIcsSSLEAY,
-  OverbyteIcsHttpSrv, OverbyteIcsWSocketS;
+  OverbyteIcsHttpSrv,
+  OverbyteIcsWSocketS;
 
 Type
 
@@ -89,6 +91,37 @@ Type
     Of Object;
   TOnAnswered = Procedure(Sender: TPoolerHttpConnection) Of Object;
   TOnBlackListed = Procedure(IP, Port: string) Of Object;
+  TOnBruteForceBlock = Procedure(IP, Port: string) Of Object;
+
+  TBruteForceProtection = class(TPersistent)
+  private
+    vBruteForceSampleMin: Integer;
+    vBruteForceTry: Integer;
+    vBruteForceExpirationMin: Integer;
+    vBruteForceList: TStringList;
+    vBruteForceProtectionStatus: Boolean;
+    vBruteForceTimer: TTimer;
+    function GetBruteForceIndex(IP: String): Integer;
+  public
+    Constructor Create;
+    Destructor Destroy;
+    procedure ClearBruteForceList;
+    procedure StartBruteForce;
+    procedure StopBruteForce;
+    procedure SampleBruteForce(Sender: TObject);
+    procedure BruteForceAttempt(IP: String);
+    function BruteForceAllow(IP: String): Boolean;
+  published
+    property BruteForceProtectionStatus: Boolean read vBruteForceProtectionStatus
+      write vBruteForceProtectionStatus default true;
+    property BruteForceSampleMin: Integer read vBruteForceSampleMin
+      write vBruteForceSampleMin default 1;
+    // Sampling time in minutes to clear blocked IP
+    property BruteForceTry: Integer read vBruteForceTry write vBruteForceTry default 3;
+    // Attempt times before block
+    property BruteForceExpirationMin: Integer read vBruteForceExpirationMin
+      write vBruteForceExpirationMin default 30; // Blocked IP expiration time in minutes
+  end;
 
   TRESTDWIcsServicePooler = Class(TRESTServicePoolerBase)
   Private
@@ -101,6 +134,7 @@ Type
     vOnDocumentReady: TOnDocumentReady;
     vOnAnswered: TOnAnswered;
     vOnBlackListed: TOnBlackListed;
+    vOnBruteForceBlock: TOnBruteForceBlock;
 
     // HTTP Server
     HttpAppSrv: TSslHttpAppSrv;
@@ -123,12 +157,15 @@ Type
     vServiceTimeout: Integer;
     vBuffSizeBytes: Integer;
     vBandWidthLimitBytes: Cardinal;
-    vBandWidthSamplingBytes: Cardinal;
+    vBandWidthSampleSec: Cardinal;
     vListenBacklog: Integer;
 
     // Security
+    vBruteForceProtection: TBruteForceProtection;
     vIpBlackList: TStrings;
     procedure SetvIpBlackList(Lines: TStrings);
+    procedure CustomAnswerStream(Pooler: TPoolerHttpConnection; Flag: THttpGetFlag;
+      StatusCode: Integer; ContentType, Header: String);
 
   Public
     Constructor Create(AOwner: TComponent); Override;
@@ -171,6 +208,8 @@ Type
       Write vOnDocumentReady;
     Property onAnswered: TOnAnswered Read vOnAnswered Write vOnAnswered;
     Property onBlackListed: TOnBlackListed Read vOnBlackListed Write vOnBlackListed;
+    Property onBruteForceBlock: TOnBruteForceBlock Read vOnBruteForceBlock
+      Write vOnBruteForceBlock;
 
     // SSL Params
     Property SSLRootCertFile: String Read vSSLRootCertFile Write vSSLRootCertFile;
@@ -203,12 +242,14 @@ Type
       default 262144; // 256kb Default
     Property BandWidthLimitBytes: Cardinal Read vBandWidthLimitBytes
       Write vBandWidthLimitBytes default 0;
-    Property BandWidthSamplingBytes: Cardinal Read vBandWidthSamplingBytes
-      Write vBandWidthSamplingBytes default 1000;
+    Property BandWidthSamplingBytes: Cardinal Read vBandWidthSampleSec
+      Write vBandWidthSampleSec default 1;
     Property ListenBacklog: Integer Read vListenBacklog Write vListenBacklog default 50;
 
     // Secutiry
     Property IpBlackList: TStrings Read vIpBlackList Write SetvIpBlackList;
+    Property BruteForceProtection: TBruteForceProtection read vBruteForceProtection
+      write vBruteForceProtection;
   End;
 
 const
@@ -216,7 +257,7 @@ const
 
 Implementation
 
-Uses uRESTDWJSONInterface, Vcl.Dialogs, OverbyteIcsWSockBuf, Vcl.Forms;
+Uses uRESTDWJSONInterface, VCL.Dialogs, OverbyteIcsWSockBuf, VCL.Forms;
 
 Procedure TRESTDWIcsServicePooler.SetHttpServerSSL;
 begin
@@ -287,7 +328,7 @@ begin
     HttpAppSrv.MaxBlkSize := vBuffSizeBytes;
 
     HttpAppSrv.BandwidthLimit := vBandWidthLimitBytes;
-    HttpAppSrv.BandwidthSampling := vBandWidthSamplingBytes;
+    HttpAppSrv.BandwidthSampling := vBandWidthSampleSec * 1000;
 
     HttpAppSrv.ListenBacklog := vListenBacklog;
 
@@ -376,11 +417,13 @@ Begin
   vServiceTimeout := 60; // TimeOut in Seconds
   vBuffSizeBytes := 262144; // 256kb Default
   vBandWidthLimitBytes := 0;
-  vBandWidthSamplingBytes := 1000;
+  vBandWidthSampleSec := 1000;
   vListenBacklog := 50;
 
   vIpBlackList := TStringList.Create;
   vIpBlackList.Clear;
+
+  vBruteForceProtection := TBruteForceProtection.Create;
 
   Inherited;
 End;
@@ -405,6 +448,17 @@ var
 begin
   Remote := Client as TPoolerHttpConnection;
 
+  // Check for Brute Force exploit
+  if not(vBruteForceProtection.BruteForceAllow(Remote.PeerAddr)) then
+  begin
+    Remote.Close;
+
+    if Assigned(vOnBruteForceBlock) then
+      vOnBruteForceBlock(Remote.PeerAddr, Remote.PeerPort);
+
+    exit;
+  end;
+
   // Blocking the black list IPs
   if vIpBlackList.Count > 0 then
   begin
@@ -414,6 +468,8 @@ begin
 
       if Assigned(vOnBlackListed) then
         vOnBlackListed(Remote.PeerAddr, Remote.PeerPort);
+
+      exit;
     end;
   end;
 
@@ -441,19 +497,26 @@ end;
 Destructor TRESTDWIcsServicePooler.Destroy;
 Begin
   Try
+
     If Active Then
     Begin
       If HttpAppSrv.ListenAllOK Then
         HttpAppSrv.Stop;
     End;
   Except
+    //
   End;
+
   If Assigned(HttpAppSrv) Then
   begin
     If Assigned(HttpAppSrv.SSLContext) Then
       HttpAppSrv.SSLContext.Free;
     FreeAndNil(HttpAppSrv);
   end;
+
+  if Assigned(vBruteForceProtection) then
+    FreeAndNil(vBruteForceProtection);
+
   Inherited;
 End;
 
@@ -575,9 +638,12 @@ begin
       Begin
         mb := TStringStream.Create(ErrorMessage{$IF CompilerVersion > 21},
           TEncoding.UTF8{$IFEND});
+
         mb.Position := 0;
+
         Remote.DocStream := mb;
-        Remote.AnswerStream(iFlag, IntToStr(StatusCode), '', '');
+
+        CustomAnswerStream(Remote, iFlag, StatusCode, '', '');
       End;
 
       Procedure DestroyComponents;
@@ -630,6 +696,7 @@ begin
           vResponseHeader, vResponseString, ResultStream, vRedirect) Then
         Begin
           Remote.AuthRealm := vAuthRealm;
+
           If (vResponseString <> '') Or (ErrorMessage <> '') Then
           Begin
             If Assigned(ResultStream) Then
@@ -639,31 +706,38 @@ begin
             Else
               ResultStream := TStringStream.Create(ErrorMessage);
           End;
+
           If Assigned(ResultStream) Then
           Begin
             ResultStream.Position := 0;
             Remote.DocStream := ResultStream;
-            Remote.AnswerStream(iFlag, IntToStr(StatusCode), vContentType,
+
+            CustomAnswerStream(Remote, iFlag, StatusCode, vContentType,
               vResponseHeader.Text);
           End;
         End
         Else // Tratamento de Erros.
         Begin
           Remote.AuthRealm := vAuthRealm;
+
           If (vResponseString <> '') Or (ErrorMessage <> '') Then
           Begin
             If Assigned(ResultStream) Then
               FreeAndNil(ResultStream);
+
             If (vResponseString <> '') Then
               ResultStream := TStringStream.Create(vResponseString)
             Else
               ResultStream := TStringStream.Create(ErrorMessage);
           End;
+
           If Assigned(ResultStream) Then
           Begin
             ResultStream.Position := 0;
+
             Remote.DocStream := ResultStream;
-            Remote.AnswerStream(iFlag, IntToStr(StatusCode), vContentType,
+
+            CustomAnswerStream(Remote, iFlag, StatusCode, vContentType,
               vResponseHeader.Text);
           End;
         End;
@@ -672,6 +746,32 @@ begin
       end;
 
     end).Start;
+
+end;
+
+Procedure TRESTDWIcsServicePooler.CustomAnswerStream(Pooler: TPoolerHttpConnection;
+Flag: THttpGetFlag; StatusCode: Integer; ContentType: String; Header: String);
+begin
+  case StatusCode of
+    401:
+      begin
+        vBruteForceProtection.BruteForceAttempt(Pooler.PeerAddr);
+
+        if vBruteForceProtection.BruteForceAllow(Pooler.PeerAddr) then
+          Pooler.Answer401
+        else
+        begin
+          Pooler.Answer403;
+
+          if Assigned(vOnBruteForceBlock) then
+            vOnBruteForceBlock(Pooler.PeerAddr, Pooler.PeerPort);
+        end;
+      end;
+    403:
+      Pooler.Answer403;
+  else
+    Pooler.AnswerStream(Flag, IntToStr(StatusCode), ContentType, Header);
+  end;
 
 end;
 
@@ -730,6 +830,8 @@ Begin
         HttpAppSrv.Start;
 
         SetSocketServerParams;
+
+        vBruteForceProtection.StartBruteForce;
       End;
     Except
       On E: Exception do
@@ -743,6 +845,8 @@ Begin
     Try
       If HttpAppSrv.ListenAllOK Then
         HttpAppSrv.Stop;
+
+      vBruteForceProtection.StopBruteForce;
     Except
     End;
   End;
@@ -758,6 +862,187 @@ begin
 
   RawDataLen := 0;
   inherited Destroy;
+end;
+
+{ TBruteForceProtection }
+
+function TBruteForceProtection.BruteForceAllow(IP: String): Boolean;
+var
+  aux: TStringList;
+
+begin
+  if vBruteForceProtectionStatus then
+  begin
+    try
+      aux := TStringList.Create;
+      aux.Delimiter := ';';
+      aux.StrictDelimiter := true;
+      aux.Clear;
+
+      try
+        if GetBruteForceIndex(IP) > -1 then
+        begin
+          aux.DelimitedText := vBruteForceList.ValueFromIndex[GetBruteForceIndex(IP)];
+
+          if ((aux[0].ToInteger > vBruteForceTry) and
+            (IncMinute(aux[1].ToDouble, vBruteForceExpirationMin) > now)) then
+            Result := false
+          else
+          begin
+            if (IncMinute(aux[1].ToDouble, vBruteForceExpirationMin) < now) then
+              vBruteForceList.Delete(GetBruteForceIndex(IP));
+
+            Result := true;
+          end;
+        end
+        else
+          Result := true;
+      except
+        Result := false;
+      end;
+    finally
+      FreeAndNil(aux);
+    end;
+  end
+  else
+    Result := true;
+end;
+
+function TBruteForceProtection.GetBruteForceIndex(IP: String): Integer;
+begin
+  Result := vBruteForceList.IndexOfName(IP);
+end;
+
+procedure TBruteForceProtection.SampleBruteForce(Sender: TObject);
+var
+  x: Integer;
+  aux: TStringList;
+begin
+  try
+    aux := TStringList.Create;
+
+    for x := 0 to vBruteForceList.Count - 1 do
+    begin
+
+      aux.Delimiter := ';';
+      aux.StrictDelimiter := true;
+      aux.Clear;
+
+      aux.DelimitedText := vBruteForceList[x];
+
+      if (IncMinute(aux[1].ToDouble, vBruteForceExpirationMin) < now) then
+        vBruteForceList.Delete(x);
+    end;
+  finally
+    FreeAndNil(aux);
+  end;
+end;
+
+procedure TBruteForceProtection.StartBruteForce;
+begin
+
+  if Assigned(vBruteForceTimer) then
+  begin
+    vBruteForceTimer.Enabled := false;
+
+    FreeAndNil(vBruteForceTimer);
+  end;
+
+  if vBruteForceProtectionStatus then
+  begin
+    vBruteForceTimer := TTimer.Create(nil);
+
+    vBruteForceTimer.Enabled := false;
+
+    vBruteForceTimer.Interval := vBruteForceSampleMin * 60 * 1000;
+
+    vBruteForceTimer.OnTimer := SampleBruteForce;
+
+    vBruteForceTimer.Enabled := true;
+  end;
+
+end;
+
+procedure TBruteForceProtection.StopBruteForce;
+begin
+
+  if Assigned(vBruteForceTimer) then
+  begin
+    vBruteForceTimer.Enabled := false;
+
+    FreeAndNil(vBruteForceTimer);
+  end;
+
+  ClearBruteForceList;
+
+end;
+
+procedure TBruteForceProtection.BruteForceAttempt(IP: String);
+var
+  aux: TStringList;
+
+begin
+  if vBruteForceProtectionStatus then
+  begin
+    try
+      aux := TStringList.Create;
+      aux.Delimiter := ';';
+      aux.StrictDelimiter := true;
+      aux.Clear;
+
+      try
+        if GetBruteForceIndex(IP) > -1 then
+        begin
+          aux.DelimitedText := vBruteForceList.ValueFromIndex[GetBruteForceIndex(IP)];
+
+          aux[0] := (aux[0].ToInteger + 1).ToString;
+
+          aux[1] := FloatToStr(now);
+
+          vBruteForceList.ValueFromIndex[GetBruteForceIndex(IP)] := aux.DelimitedText;
+        end
+        else
+        begin
+          vBruteForceList.AddPair(IP, '1;' + FloatToStr(now));
+        end;
+      except
+        //
+      end;
+    finally
+      FreeAndNil(aux);
+    end;
+  end;
+end;
+
+procedure TBruteForceProtection.ClearBruteForceList;
+begin
+
+  if Assigned(vBruteForceList) then
+  begin
+    vBruteForceList.Clear;
+    vBruteForceList.NameValueSeparator := '=';
+  end;
+
+end;
+
+constructor TBruteForceProtection.Create;
+begin
+  vBruteForceSampleMin := 1;
+  vBruteForceTry := 3;
+  vBruteForceExpirationMin := 30;
+  vBruteForceProtectionStatus := true;
+
+  vBruteForceList := TStringList.Create;
+  vBruteForceList.Clear;
+  vBruteForceList.NameValueSeparator := '=';
+end;
+
+destructor TBruteForceProtection.Destroy;
+begin
+  StopBruteForce;
+
+  if Assigned(vBruteForceList) then
+    FreeAndNil(vBruteForceList);
 end;
 
 End.
