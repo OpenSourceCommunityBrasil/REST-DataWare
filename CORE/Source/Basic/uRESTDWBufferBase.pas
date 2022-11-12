@@ -87,7 +87,11 @@ Var
  aByte     : Byte;
  aLongWord : LongWord;
  aDouble   : Double;
+ {$IF (Not DEFINED(FPC)) AND (CompilerVersion < 21)}
+ aDate     : TDateTime;
+ {$ELSE}
  aDate     : TDate;
+ {$IFEND}
  S         : Integer;
  vSt       : Char;
  aString   : DWString;
@@ -166,7 +170,11 @@ Var
  aByte     : Byte;
  aLongWord : LongWord;
  aDouble   : Double;
+ {$IF (Not DEFINED(FPC)) AND (CompilerVersion < 21)}
+ aDate     : TDateTime;
+ {$ELSE}
  aDate     : TDate;
+ {$IFEND}
  S         : Integer;
  vSt       : Char;
  aString   : DWString;
