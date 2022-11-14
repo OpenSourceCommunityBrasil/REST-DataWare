@@ -151,7 +151,6 @@ Type
     vSSLCliCertMethod: TSslCliCertMethod;
 
     // HTTP Params
-    vSocketFamily: TSocketFamily;
     vMaxClients: Integer;
     vKeepAliveSec: Cardinal;
     vServiceTimeout: Integer;
@@ -232,8 +231,6 @@ Type
       Write vSSLCliCertMethod;
 
     // HTTP Params
-    Property SocketFamily: TSocketFamily Read vSocketFamily Write vSocketFamily
-      default sfAny;
     Property MaxClients: Integer Read vMaxClients Write vMaxClients default 0;
     Property KeepAliveSec: Cardinal Read vKeepAliveSec Write vKeepAliveSec default 0;
     Property RequestTimeout: Integer Read vServiceTimeout Write vServiceTimeout
@@ -260,6 +257,8 @@ Implementation
 Uses uRESTDWJSONInterface, VCL.Dialogs, OverbyteIcsWSockBuf, VCL.Forms;
 
 Procedure TRESTDWIcsServicePooler.SetHttpServerSSL;
+var
+  x: Integer;
 begin
   if Assigned(HttpAppSrv) then
   begin
@@ -286,11 +285,18 @@ begin
       HttpAppSrv.RootCA := vSSLRootCertFile;
 
       HttpAppSrv.SslEnable := true;
+
+      for x := 0 to HttpAppSrv.MultiListenSockets.Count - 1 do
+        HttpAppSrv.MultiListenSockets[x].SslEnable := true;
     end
     else
     begin
       HttpAppSrv.SSLContext := nil;
+
       HttpAppSrv.SslEnable := false;
+
+      for x := 0 to HttpAppSrv.MultiListenSockets.Count - 1 do
+        HttpAppSrv.MultiListenSockets[x].SslEnable := false;
     end;
   end
   else
@@ -305,12 +311,13 @@ begin
 end;
 
 Procedure TRESTDWIcsServicePooler.SetHttpServerParams;
+var
+  x: Integer;
 begin
   if Assigned(HttpAppSrv) then
   begin
     HttpAppSrv.ClientClass := TPoolerHttpConnection;
 
-    HttpAppSrv.SocketFamily := vSocketFamily;
     HttpAppSrv.MaxClients := vMaxClients;
     HttpAppSrv.KeepAliveTimeSec := vKeepAliveSec;
 
@@ -330,12 +337,63 @@ begin
     HttpAppSrv.BandwidthLimit := vBandWidthLimitBytes;
     HttpAppSrv.BandwidthSampling := vBandWidthSampleSec * 1000;
 
-    HttpAppSrv.ListenBacklog := vListenBacklog;
-
     HttpAppSrv.onClientConnect := onClientConnectServer;
     HttpAppSrv.onClientDisconnect := onClientDisconnectServer;
     HttpAppSrv.onServerStarted := onServerStartedServer;
     HttpAppSrv.onServerStopped := onServerStoppedServer;
+
+    if AuthenticationOptions.AuthorizationOption <> rdwAONone then
+    begin
+
+      case AuthenticationOptions.AuthorizationOption of
+        rdwAOBasic:
+          HttpAppSrv.AuthTypes := [atBasic];
+        rdwAOBearer, rdwAOToken, rdwOAuth:
+          begin
+            HttpAppSrv.AuthTypes := [atDigest];
+          end;
+      end;
+
+    end
+    else
+      HttpAppSrv.AuthTypes := [atNone];
+
+    if ((ServerIPVersionConfig.ServerIpVersion = sivBoth) or
+      (ServerIPVersionConfig.ServerIpVersion = sivIPv4)) then
+    begin
+
+      HttpAppSrv.Port := IntToStr(ServicePort);
+      HttpAppSrv.ListenBacklog := vListenBacklog;
+      HttpAppSrv.SocketFamily := sfAnyIPv4;
+      HttpAppSrv.Addr := ServerIPVersionConfig.IPv4Address;
+
+      HttpAppSrv.MultiListenSockets.Clear;
+
+      if (ServerIPVersionConfig.ServerIpVersion = sivBoth) then
+      begin
+        with HttpAppSrv.MultiListenSockets.Add do
+        begin
+
+          Port := IntToStr(ServicePort);
+          ListenBacklog := vListenBacklog;
+          SocketFamily := sfAnyIPv6;
+          Addr := ServerIPVersionConfig.IPv6Address;
+
+        end;
+      end;
+    end
+    else if (ServerIPVersionConfig.ServerIpVersion = sivIPv6) then
+    begin
+
+      HttpAppSrv.Port := IntToStr(ServicePort);
+      HttpAppSrv.ListenBacklog := vListenBacklog;
+      HttpAppSrv.SocketFamily := sfAnyIPv6;
+      HttpAppSrv.Addr := ServerIPVersionConfig.IPv6Address;
+
+      HttpAppSrv.MultiListenSockets.Clear;
+
+    end;
+
   end
   else
     raise Exception.Create(cIcsHTTPServerNotFound);
@@ -410,7 +468,6 @@ Begin
   vSSLVerifyPeer := false;
   vSSLTimeoutSec := 60; // SSL TimeOut in Seconds
   vSSLUse := false;
-  vSocketFamily := sfAny;
 
   vMaxClients := 0;
   vKeepAliveSec := 0;
@@ -806,26 +863,12 @@ Begin
       if not(Assigned(ServerMethodClass)) and (Self.GetDataRouteCount = 0) then
         raise Exception.Create(cServerMethodClassNotAssigned);
 
-      SetHttpServerParams;
-
-      SetHttpServerSSL;
-
       If Not HttpAppSrv.ListenAllOK Then
       Begin
-        HttpAppSrv.Port := IntToStr(ServicePort);
-        If AuthenticationOptions.AuthorizationOption <> rdwAONone Then
-        Begin
-          Case AuthenticationOptions.AuthorizationOption Of
-            rdwAOBasic:
-              HttpAppSrv.AuthTypes := [atBasic];
-            rdwAOBearer, rdwAOToken, rdwOAuth:
-              Begin
-                HttpAppSrv.AuthTypes := [atDigest];
-              End;
-          End;
-        End
-        Else
-          HttpAppSrv.AuthTypes := [atNone];
+
+        SetHttpServerParams;
+
+        SetHttpServerSSL;
 
         HttpAppSrv.Start;
 
@@ -845,6 +888,8 @@ Begin
     Try
       If HttpAppSrv.ListenAllOK Then
         HttpAppSrv.Stop;
+
+      HttpAppSrv.MultiListenSockets.Clear;
 
       vBruteForceProtection.StopBruteForce;
     Except

@@ -308,18 +308,13 @@ Type
  Private
   vCipherList                      : String;
   aSSLMethod                       : TIdSSLVersion;
-  HttpRequest                      : TRESTDWIdClientREST;
   vSSLMode                         : TIdSSLMode;
-  Procedure   SetParams            (TransparentProxy      : TProxyConnectionInfo;
-                                    aRequestTimeout,
-                                    aConnectTimeout       : Integer;
-                                    AuthorizationParams   : TRESTDWClientAuthOptionParams);
  Public
   Constructor Create               (AOwner  : TComponent);Override;
   Destructor  Destroy;Override;
  Published
-  Property SSLMode                 : TIdSSLMode          Read vSSLMode                 Write vSSLMode;
-  Property CipherList              : String              Read vCipherList              Write vCipherList;
+  Property SSLMode                 : TIdSSLMode               Read vSSLMode                 Write vSSLMode;
+  Property CipherList              : String                   Read vCipherList              Write vCipherList;
 End;
 
 Type
@@ -352,8 +347,8 @@ Type
                                     aAccessTag             : String;
                                     aAuthenticationOptions : TRESTDWClientAuthOptionParams);Override;
  Published
-  Property SSLMode                 : TIdSSLMode          Read vSSLMode                 Write vSSLMode;
-  Property CipherList              : String              Read vCipherList              Write vCipherList;
+  Property SSLMode                 : TIdSSLMode               Read vSSLMode                 Write vSSLMode;
+  Property CipherList              : String                   Read vCipherList              Write vCipherList;
 End;
 
 //Fix to Indy Request Patch and Put
@@ -3607,9 +3602,32 @@ Begin
      End
     Else
      HTTPServer.IOHandler  := Nil;
+
     If HTTPServer.Bindings.Count > 0 Then
      HTTPServer.Bindings.Clear;
-    HTTPServer.Bindings.DefaultPort := ServicePort;
+
+    //Add IPv4 bind
+    if ((ServerIPVersionConfig.ServerIpVersion = sivBoth) or (ServerIPVersionConfig.ServerIpVersion = sivIPv4)) then
+    begin
+      with HTTPServer.Bindings.Add do
+      begin
+        IP := ServerIPVersionConfig.IPv4Address;
+        IPVersion := Id_IPv4;
+        Port := ServicePort;
+      end;
+    end;
+
+    //Add IPv6 bind
+    if ((ServerIPVersionConfig.ServerIpVersion = sivBoth) or (ServerIPVersionConfig.ServerIpVersion = sivIPv6)) then
+    begin
+      with HTTPServer.Bindings.Add do
+      begin
+        IP := ServerIPVersionConfig.IPv6Address;
+        IPVersion := Id_IPv6;
+        Port := ServicePort;
+      end;
+    end;
+
     HTTPServer.DefaultPort          := ServicePort;
     HTTPServer.Active               := True;
    Except
@@ -3639,6 +3657,7 @@ Begin
 End;
 
 { TRESTDWIdClientPooler }
+
 
 Procedure TRESTDWIdClientPooler.SetParams(TransparentProxy    : TProxyConnectionInfo;
                                           aRequestTimeout      : Integer;
@@ -3671,7 +3690,7 @@ Begin
  vCipherList            := '';
  ContentType            := cContentTypeFormUrl;
  ContentEncoding        := cDefaultContentEncoding;
-End;
+ End;
 
 Destructor TRESTDWIdClientPooler.Destroy;
 Begin
@@ -4061,14 +4080,20 @@ Var
   vTpRequest : String;
  Begin
   Result := '';
+
   If TpRequest = trHttp Then
    vTpRequest := 'http'
   Else If TpRequest = trHttps Then
    vTpRequest := 'https';
+
+  if ClientIpVersion = civIPv6 then
+   Host := '[' + Host + ']';
+
   If (aDataRoute = '') Then
    Result := LowerCase(Format(UrlBaseA, [vTpRequest, Host, Port, '/'])) + EventData
   Else
-   Result := LowerCase(Format(UrlBaseA, [vTpRequest, Host, Port, aDataRoute])) + EventData
+   Result := LowerCase(Format(UrlBaseA, [vTpRequest, Host, Port, aDataRoute])) + EventData;
+
  End;
  Procedure SetCharsetRequest(Var HttpRequest : TRESTDWIdClientREST;
                              Charset         : TEncodeSelect);
@@ -4760,41 +4785,23 @@ End;
 Constructor TRESTDWIdDatabase.Create(AOwner: TComponent);
 Begin
  Inherited;
- HttpRequest            := Nil;
- vCipherList            := '';
- RESTClientPooler       := TRESTDWIdClientPooler.Create(Self);
- ContentType            := cContentTypeFormUrl;
- ContentEncoding        := cDefaultContentEncoding;
+
+ vCipherList                                             := '';
+ RESTClientPooler                                        := TRESTDWIdClientPooler.Create(Self);
+ ContentType                                             := cContentTypeFormUrl;
+ ContentEncoding                                         := cDefaultContentEncoding;
+
+ TRESTDWIdClientPooler(RESTClientPooler).ClientIpVersion := ClientIpVersion;
 End;
 
 Destructor TRESTDWIdDatabase.Destroy;
 Begin
- If Assigned(HttpRequest) Then
-  FreeAndNil(HttpRequest);
  DestroyClientPooler;
+
  Inherited;
 End;
 
-Procedure TRESTDWIdDatabase.SetParams(TransparentProxy    : TProxyConnectionInfo;
-                                      aRequestTimeout      : Integer;
-                                      aConnectTimeout      : Integer;
-                                      AuthorizationParams : TRESTDWClientAuthOptionParams);
-Begin
- HttpRequest.DefaultCustomHeader.Clear;
- HttpRequest.AcceptEncoding              := AcceptEncoding;
- HttpRequest.AuthenticationOptions       := AuthorizationParams;
- HttpRequest.ProxyOptions.ProxyUsername  := TransparentProxy.ProxyUsername;
- HttpRequest.ProxyOptions.ProxyServer    := TransparentProxy.ProxyServer;
- HttpRequest.ProxyOptions.ProxyPassword  := TransparentProxy.ProxyPassword;
- HttpRequest.ProxyOptions.ProxyPort      := TransparentProxy.ProxyPort;
- HttpRequest.RequestTimeout              := RequestTimeout;
- HttpRequest.ConnectTimeout              := ConnectTimeout;
- HttpRequest.ContentType                 := ContentType;
-// HttpRequest.AllowCookies                := AllowCookies;
- HttpRequest.HandleRedirects             := HandleRedirects;
- HttpRequest.Charset                     := Charset;
- HttpRequest.UserAgent                   := UserAgent;
-End;
 
 End.
+
 

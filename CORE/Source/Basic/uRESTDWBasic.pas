@@ -59,6 +59,30 @@ Uses
  End;
 
 Type
+ TRESTDWClientIpVersions = (civIPv4, civIPv6);
+
+Type
+ TRESTDWServerIpVersions = (sivIPv4, sivIPv6, sivBoth);
+
+Type
+ TRESTDWServerIpVersionConfig = class(TPersistent)
+ Private
+  //IP version select
+  vServerIpVersion: TRESTDWServerIpVersions;
+  //IPv4
+  vIPv4Address: String;
+  //IPv6
+  vIPv6Address: String;
+ Public
+  Constructor Create;
+  Destructor  Destroy;
+ Published
+  Property ServerIpVersion : TRESTDWServerIpVersions   Read vServerIpVersion  Write vServerIpVersion default sivIPv4;
+  Property IPv4Address     : String                    Read vIPv4Address      Write vIPv4Address;
+  Property IPv6Address     : String                    Read vIPv6Address      Write vIPv6Address;
+end;
+
+Type
  TRESTDWConnectionServerCP = Class(TCollectionItem)
  Private
   vTransparentProxy     : TProxyConnectionInfo;
@@ -154,6 +178,7 @@ Type
   Function  GetAllowCookies                   : Boolean;
   Procedure SetAllowCookies(Value             : Boolean);
  Private
+  vClientIpVersion      : TRESTDWClientIpVersions;
   //Variáveis, Procedures e Funções Privadas
   vTransparentProxy    : TProxyConnectionInfo;
   vOnWorkBegin,
@@ -199,8 +224,9 @@ Type
   {$ENDIF}
   vFailOverConnections : TFailOverConnections;
   vSSLVersions         : TRESTDWSSLVersions;
-  Function    SendEvent   (EventData        : String)          : String;Overload;
-  Procedure   SetDataRoute(Value : String);
+  Function    SendEvent      (EventData        : String)          : String;Overload;
+  Procedure   SetDataRoute   (Value : String);
+  Procedure   SetIpVersion   (IpV: TRESTDWClientIpVersions);
  Public
   //Métodos, Propriedades, Variáveis, Procedures e Funções Publicas
   Procedure   ReconfigureConnection(TypeRequest           : Ttyperequest;
@@ -274,6 +300,7 @@ Type
   {$IFDEF FPC}
   Property DatabaseCharSet         : TDatabaseCharSet              Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
+  Property ClientIpVersion         : TRESTDWClientIpVersions       Read vClientIpVersion         Write SetIpVersion default civIPv4;
  End;
 
  Type
@@ -382,21 +409,22 @@ Type
   vPathTraversalRaiseError,
   vForceWelcomeAccess,
   vCORS,
-  vActive              : Boolean;
-  vProxyOptions        : TProxyConnectionInfo;
+  vActive                : Boolean;
+  vProxyOptions          : TProxyConnectionInfo;
   vServiceTimeout,
-  vServicePort         : Integer;
-  vCripto              : TCripto;
-  aServerMethod        : TComponentClass;
-  vDataRouteList       : TRESTDWDataRouteList;
-  vServerAuthOptions   : TRESTDWServerAuthOptionParams;
-  vLastRequest         : TLastRequest;
-  vLastResponse        : TLastResponse;
+  vServicePort           : Integer;
+  vCripto                : TCripto;
+  aServerMethod          : TComponentClass;
+  vDataRouteList         : TRESTDWDataRouteList;
+  vServerAuthOptions     : TRESTDWServerAuthOptionParams;
+  vLastRequest           : TLastRequest;
+  vLastResponse          : TLastResponse;
   FRootPath,
-  aDefaultUrl          : String;
-  vEncoding            : TEncodeSelect;
-  vOnCreate            : TOnCreate;
-  vSSLVersions         : TRESTDWSSLVersions;
+  aDefaultUrl            : String;
+  vEncoding              : TEncodeSelect;
+  vOnCreate              : TOnCreate;
+  vSSLVersions           : TRESTDWSSLVersions;
+  vServerIpVersionConfig : TRESTDWServerIpVersionConfig;
   Procedure SetCORSCustomHeader (Value : TStringList);
   Procedure SetDefaultPage (Value : TStringList);
   Procedure SetServerMethod(Value                     : TComponentClass);
@@ -617,6 +645,7 @@ Type
   {$ENDIF}
   Property OnCreate                : TOnCreate                     Read vOnCreate                Write vOnCreate;
   Property SSLVersions             : TRESTDWSSLVersions            Read vSSLVersions             Write vSSLVersions;
+  Property ServerIPVersionConfig   : TRESTDWServerIpVersionConfig  Read vServerIpVersionConfig   Write vServerIpVersionConfig;
 End;
 
 //Heranças para Servidores Standalone
@@ -1369,6 +1398,11 @@ Begin
   End;
 End;
 
+procedure TRESTClientPoolerBase.SetIpVersion(IpV: TRESTDWClientIpVersions);
+begin
+ vClientIpVersion := Ipv;
+end;
+
 Constructor TRESTClientPoolerBase.Create(AOwner: TComponent);
 Begin
  Inherited;
@@ -1406,6 +1440,7 @@ Begin
  vUseSSL                               := False;
  vFailOverConnections                  := TFailOverConnections.Create(Self, TRESTDWConnectionServerCP);
  vPoolerNotFoundMessage                := cPoolerNotFound;
+ vClientIpVersion                      := civIPv4;
 End;
 
 Destructor  TRESTClientPoolerBase.Destroy;
@@ -6115,6 +6150,8 @@ Begin
  FRootPath                              := '/';
  aDefaultUrl                            := '';
  vServiceTimeout                        := -1;
+
+ vServerIpVersionConfig := TRESTDWServerIpVersionConfig.Create;
 End;
 
 Destructor TRESTServiceBase.Destroy;
@@ -6131,6 +6168,9 @@ Begin
   FreeAndNil(vDataRouteList);
  If Assigned(vServerAuthOptions) Then
   FreeAndNil(vServerAuthOptions);
+
+ if Assigned(vServerIpVersionConfig) then
+  FreeAndNil(vServerIpVersionConfig);
  Inherited;
 End;
 
@@ -6165,5 +6205,21 @@ Procedure TRESTShellServicesBase.Notification(AComponent : TComponent;
 Begin
  Inherited Notification(AComponent, Operation);
 End;
+
+{ TRESTDWServerIpVersionConfig }
+
+constructor TRESTDWServerIpVersionConfig.Create;
+begin
+  vServerIpVersion := sivIPv4;
+
+  vIPv4Address := '0.0.0.0';
+
+  vIPv6Address := '::';
+end;
+
+destructor TRESTDWServerIpVersionConfig.Destroy;
+begin
+  //
+end;
 
 end.

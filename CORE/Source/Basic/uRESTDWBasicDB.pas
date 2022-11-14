@@ -308,6 +308,7 @@ End;
 Type
  TRESTDWDatabasebaseBase = Class(TRESTDWComponent)
  Private
+  vClientIpVersion      : TRESTDWClientIpVersions;
   vSSLVersions          : TRESTDWSSLVersions;
   vOnWorkBegin,
   vOnWork               : TOnWork;
@@ -359,6 +360,7 @@ Type
   vTypeRequest          : Ttyperequest;
   vFailOverConnections  : TListDefConnections;
   vRESTClientPooler     : TRESTClientPoolerBase;
+  Procedure SetIpVersion            (IpV: TRESTDWClientIpVersions);
   Procedure CopyParams              (ConnectionDB           : TRESTDWPoolerMethodClient;
                                      Var RESTClientPooler   : TRESTClientPoolerBase);
   Function  RenewToken              (Var PoolerMethodClient : TRESTDWPoolerMethodClient;
@@ -531,6 +533,7 @@ Type
   Property UseSSL                  : Boolean                    Read vUseSSL                  Write vUseSSL;
   Property SSLVersions             : TRESTDWSSLVersions         Read vSSLVersions             Write vSSLVersions;
   Property UserAgent               : String                     Read vUserAgent               Write vUserAgent;
+  Property ClientIpVersion         : TRESTDWClientIpVersions    Read vClientIpVersion         Write SetIpVersion default civIPv4;
 End;
 
 Type
@@ -4217,6 +4220,7 @@ Begin
  vStrsEmpty2Null           := False;
  vStrsTrim2Len             := True;
  vParamCreate              := True;
+ vClientIpVersion          := civIPv4;
 End;
 
 Destructor  TRESTDWPoolerList.Destroy;
@@ -5404,6 +5408,15 @@ Begin
     vDataRoute := vDataRoute + '/';
   End;
 End;
+
+procedure TRESTDWDatabasebaseBase.SetIpVersion(IpV: TRESTDWClientIpVersions);
+begin
+ vClientIpVersion := IpV;
+
+ if Assigned(RESTClientPooler) then
+  RESTClientPooler.ClientIpVersion := IpV;
+
+end;
 
 Procedure TRESTDWPoolerList.SetConnection(Value : Boolean);
 Begin
