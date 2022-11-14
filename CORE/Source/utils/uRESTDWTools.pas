@@ -27,17 +27,14 @@ interface
 
 Uses
  {$IFDEF FPC}
- Classes,  SysUtils, uRESTDWBasicTypes, LConvEncoding, lazutf8, Db
+ LConvEncoding, lazutf8,
  {$ELSE}
- Classes,  SysUtils, uRESTDWBasicTypes, Db, EncdDecd
-  {$IF Defined(RESTDWFMX)}
-   , IOUtils
-  {$IFEND}
-  {$IF CompilerVersion > 24}
-   , System.NetEncoding
-  {$IFEND}
- {$ENDIF},
- uRESTDWEncodeClass, uRESTDWCharset, uRESTDWMimeTypes;
+ EncdDecd,
+  {$IF Defined(RESTDWFMX)}IOUtils,{$IFEND}
+  {$IF CompilerVersion > 27}NetEncoding,{$IFEND}
+ {$ENDIF}
+ Classes, SysUtils, DB,
+ uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWMimeTypes;
 
  Const
   B64Table      = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
@@ -3159,7 +3156,7 @@ Function Decode64(const S: string): string;
 Var
  sa : String;
  {$IFNDEF FPC}
-  {$IF CompilerVersion > 24}
+  {$IF CompilerVersion > 27}
    ne: TBase64Encoding;
   {$IFEND}
  {$ENDIF}
@@ -3173,7 +3170,7 @@ Begin
    {$IFDEF FPC}
     Result := BytesToString(Base64Decode(SA));
    {$ELSE}
-    {$IF CompilerVersion > 24}
+    {$IF CompilerVersion > 27}
      ne     := TBase64Encoding.Create(-1, '');
      Try
       Result := ne.Decode(SA);
@@ -3233,7 +3230,7 @@ Function EncodeBase64(Const Value : String) : String;
 Var
  vValue : String;
  {$IFNDEF FPC}
-  {$IF CompilerVersion > 24}
+  {$IF CompilerVersion > 27}
    Ne : TBase64Encoding;
   {$IFEND}
  {$ENDIF}
@@ -3258,7 +3255,7 @@ Begin
  {$IFDEF FPC}
   Result := Base64Encode(Value);
  {$ELSE}
-  {$IF CompilerVersion > 24}
+  {$IF CompilerVersion > 27}
    Ne      := TBase64Encoding.Create(-1, '');
    Try
     Result := Ne.Encode(Value);
