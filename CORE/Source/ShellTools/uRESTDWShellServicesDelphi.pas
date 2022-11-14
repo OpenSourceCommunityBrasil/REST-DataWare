@@ -120,7 +120,7 @@ Begin
  vResponseString := '';
  vStream         := Nil;
  vRedirect       := Redirect;
- {$IF CompilerVersion > 23}
+ {$IF CompilerVersion > 26}
   ARequest.ReadTotalContent;
  {$IFEND}
  Try
