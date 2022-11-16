@@ -544,29 +544,29 @@ begin
           if vParam.RESTDWDataTypeParam in [dwftInteger, dwftSmallInt, dwftWord, dwftLongWord, dwftLargeint] then begin
             if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then begin
               if vParam.RESTDWDataTypeParam in [dwftLongWord, dwftLargeint] then
-                vParam.AsLargeInt := StrToInt64(DWParams[I].Value)
+                vParam.Value := StrToInt64(DWParams[I].Value)
               else If vParam.DataType = ftSmallInt Then
-                vParam.AsSmallInt := StrToInt(DWParams[I].Value)
+                vParam.Value := StrToInt(DWParams[I].Value)
               else
-                vParam.AsInteger  := StrToInt(DWParams[I].Value);
+                vParam.Value  := StrToInt(DWParams[I].Value);
             end
             else
               vParam.Clear;
           end
           else if vParam.RESTDWDataTypeParam in [dwftFloat,dwftCurrency,dwftBCD,dwftFMTBcd,dwftSingle] then begin
             if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then
-              vParam.AsFloat  := StrToFloat(BuildFloatString(DWParams[I].Value))
+              vParam.Value  := StrToFloat(BuildFloatString(DWParams[I].Value))
             else
               vParam.Clear;
           end
           else If vParam.DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] then begin
             if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then begin
               if vParam.DataType = ftDate then
-                vParam.AsDate := DWParams[I].AsDateTime
+                vParam.Value := DWParams[I].AsDateTime
               else If vParam.DataType = ftTime then
-                vParam.AsTime := DWParams[I].AsDateTime
+                vParam.Value := DWParams[I].AsDateTime
               else
-                vParam.AsDateTime := DWParams[I].AsDateTime;
+                vParam.Value := DWParams[I].AsDateTime;
             end
             else
               vParam.Clear;
@@ -586,7 +586,7 @@ begin
           else if vParam.RESTDWDataTypeParam in [dwftFixedChar, dwftFixedWideChar,
                   dwftString, dwftWideString, dwftMemo, dwftFmtMemo, dwftWideMemo] then begin
               if (not DWParams[I].IsNull) then
-               vParam.AsString := DWParams[I].Value
+               vParam.Value := DWParams[I].AsString
               Else
                vParam.Clear;
           end
