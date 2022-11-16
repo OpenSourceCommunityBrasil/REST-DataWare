@@ -4854,7 +4854,6 @@ End;
 Procedure TJSONParam.SaveToFile(FileName: String);
 Var
  vStringStream : TStream;
- aBytes        : TRESTDWBytes;
  {$IFDEF FPC}
  vFileStream   : TFileStream;
  {$ELSE}
@@ -4863,12 +4862,10 @@ Var
    {$IFEND}
  {$ENDIF}
 Begin
+ vStringStream := Nil;
  If TestNilParam Then
   Exit;
- vStringStream := TMemoryStream.Create;
- aBytes        := vJSONValue.AsBytes;
- If Length(aBytes) > 0 Then
-  vStringStream.Write(aBytes[0], Length(aBytes));
+ SaveToStream(vStringStream);
  vStringStream.Position := 0;
  Try
   {$IFDEF FPC}
