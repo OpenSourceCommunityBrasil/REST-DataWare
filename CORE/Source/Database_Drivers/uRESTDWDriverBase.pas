@@ -553,18 +553,24 @@ begin
             else
               vParam.Clear;
           end
-          else if vParam.RESTDWDataTypeParam in [dwftFloat,dwftCurrency,dwftBCD,dwftFMTBcd,dwftSingle] then begin
+          else if vParam.RESTDWDataTypeParam in [dwftFloat,dwftBCD,dwftFMTBcd,dwftSingle,dwftExtended] then begin
             if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then
               vParam.Value  := StrToFloat(BuildFloatString(DWParams[I].Value))
+            else
+              vParam.Clear;
+          end
+          else if vParam.RESTDWDataTypeParam in [dwftCurrency] then begin
+            if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then
+              vParam.Value  := StrToCurr(BuildFloatString(DWParams[I].Value))
             else
               vParam.Clear;
           end
           else If vParam.DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] then begin
             if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then begin
               if vParam.DataType = ftDate then
-                vParam.Value := DWParams[I].AsDateTime
+                vParam.Value := DWParams[I].AsDate
               else If vParam.DataType = ftTime then
-                vParam.Value := DWParams[I].AsDateTime
+                vParam.Value := DWParams[I].AsTime
               else
                 vParam.Value := DWParams[I].AsDateTime;
             end
