@@ -412,7 +412,13 @@ Type
                                         Var ResultPR       : TRESTDWParams
                                         {$IFDEF FPC}
                                         ;DatabaseCharSet   : TDatabaseCharSet
-                                        {$ENDIF})          : Boolean;
+                                        {$ENDIF})          : Boolean;Overload;
+   Class Function ParseBodyRawToDWParam(Const BodyRaw      : TStream;
+                                        Encoding           : TEncodeSelect;
+                                        Var ResultPR       : TRESTDWParams
+                                        {$IFDEF FPC}
+                                        ;DatabaseCharSet   : TDatabaseCharSet
+                                        {$ENDIF})          : Boolean;Overload;
    Class Function ParseBodyBinToDWParam(Const BodyBin      : String;
                                         Encoding           : TEncodeSelect;
                                         Var ResultPR       : TRESTDWParams
@@ -2215,6 +2221,37 @@ Begin
    Else
     JSONParam.ParamName       := 'UNDEFINED';
    JSONParam.SetValue(BodyRaw, True);
+   ResultPR.Add(JSONParam);
+  End;
+End;
+
+Class Function TRESTDWDataUtils.ParseBodyRawToDWParam(Const BodyRaw    : TStream;
+                                                Encoding         : TEncodeSelect;
+                                                Var ResultPR     : TRESTDWParams
+                                                {$IFDEF FPC}
+                                                ;DatabaseCharSet : TDatabaseCharSet
+                                                {$ENDIF})        : Boolean;
+Var
+ JSONParam: TJSONParam;
+Begin
+ If (BodyRaw.Size > 0) Then
+  Begin
+   BodyRaw.Position := 0;
+   If Not Assigned(ResultPR) Then
+    Begin
+     ResultPR := TRESTDWParams.Create;
+     ResultPR.Encoding := Encoding;
+     {$IFDEF FPC}
+     ResultPR.DatabaseCharSet := DatabaseCharSet;
+     {$ENDIF}
+    End;
+   JSONParam                 := TJSONParam.Create(ResultPR.Encoding);
+   JSONParam.ObjectDirection := odIN;
+   If Assigned(ResultPR.ItemsString['dwNameParamBody']) And (ResultPR.ItemsString['dwNameParamBody'].AsString<>'') Then
+    JSONParam.ParamName       := ResultPR.ItemsString['dwNameParamBody'].AsString
+   Else
+    JSONParam.ParamName       := 'UNDEFINED';
+   JSONParam.LoadFromStream(BodyRaw);
    ResultPR.Add(JSONParam);
   End;
 End;
