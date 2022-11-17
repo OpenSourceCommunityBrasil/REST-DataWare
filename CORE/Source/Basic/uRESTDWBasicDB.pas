@@ -479,7 +479,8 @@ Type
                                      Var FieldNames         : TStringList)  : Boolean;
   Function    GetKeyFieldNames      (TableName              : String;
                                      Var FieldNames         : TStringList)  : Boolean;
-  Procedure   OpenDatasets          (Datasets               : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF});Overload;
+  Procedure   OpenDatasets          (Datasets               : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
+                                     BinaryCompatible       : Boolean = False);Overload;
   Property    Connected            : Boolean                    Read GetStateDB               Write SetConnectionProp;
   Property    PoolerList           : TStringList                Read GetRestPoolers;
   Property    RESTClientPooler     : TRESTClientPoolerBase      Read vRESTClientPooler        Write vRESTClientPooler;
@@ -3131,12 +3132,13 @@ Begin
   End;
 End;
 
-Procedure TRESTDWDatabasebaseBase.OpenDatasets(Datasets         : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF});
+Procedure TRESTDWDatabasebaseBase.OpenDatasets(Datasets         : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
+                                               BinaryCompatible : Boolean = False);
 Var
  Error        : Boolean;
  MessageError : String;
 Begin
- OpenDatasets(Datasets, Error, MessageError);
+ OpenDatasets(Datasets, Error, MessageError, True, BinaryCompatible);
  If Error Then
   Raise Exception.Create(PChar(MessageError));
 End;
