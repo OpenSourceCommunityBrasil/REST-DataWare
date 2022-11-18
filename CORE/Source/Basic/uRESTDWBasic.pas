@@ -27,24 +27,17 @@ interface
 
 Uses
  {$IFDEF FPC}
- SysUtils,      Classes, Db, Variants,
- uRESTDWDataUtils,     uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
- uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWCharset, uRESTDWEncodeClass, uRESTDWConsts,
- syncobjs, uRESTDWComponentBase, uzliblaz
+  uzliblaz,
  {$ELSE}
-  {$IF CompilerVersion <= 22}
-   SysUtils, Classes, Db, Variants, EncdDecd, SyncObjs, uRESTDWDataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWComponentBase
-  {$ELSE}
-   System.SysUtils, System.Classes, Data.Db, Variants, system.SyncObjs, uRESTDWDataUtils, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWComponentBase,
-   {$IF Defined(RESTDWFMX)}
-    System.IOUtils,
-   {$IFEND}
-   uRESTDWCharset
-  {$IFEND}
-   , uRESTDWConsts
- {$ENDIF}, uRESTDWMessageCoderMIME;
+  {$IF CompilerVersion <= 22}EncdDecd,{$IFEND}
+  {$IF Defined(RESTDWFMX)}System.IOUtils,{$IFEND}
+ {$ENDIF}
+ SysUtils, Classes, Db, Variants, SyncObjs,
+ uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWParams,
+ uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWDataUtils,
+ uRESTDWComponentBase, uRESTDWConsts, uRESTDWMessageCoderMIME
+
+ ;
 
  type
   TRedirect = Procedure(Url : String;

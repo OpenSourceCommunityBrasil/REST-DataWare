@@ -27,13 +27,8 @@ Interface
 
 Uses
   Classes,
-  uRESTDWCoderMIME,
-  uRESTDWHeaderList,
-  uRESTDWBasicTypes,
-  uRESTDWConsts,
-  uRESTDWTools,
-  uRESTDWIOHandlerStream,
-  uRESTDWMessage;
+  uRESTDWCoderMIME, uRESTDWHeaderList, uRESTDWBasicTypes, uRESTDWConsts,
+  uRESTDWTools, uRESTDWIOHandlerStream, uRESTDWMessage;
 
  Type
   TRESTDWIOHandlerStreamMsg = Class(TRESTDWIOHandlerStream)

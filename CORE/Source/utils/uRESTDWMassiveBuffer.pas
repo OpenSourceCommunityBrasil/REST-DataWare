@@ -25,11 +25,10 @@ unit uRESTDWMassiveBuffer;
 
 interface
 
-uses SysUtils, Classes,    Variants, uRESTDWParams,
-     DB, uRESTDWConsts,    uRESTDWBasicTypes,
-     uRESTDWJSONInterface, uRESTDWJSONObject,
-     uRESTDWComponentBase, uRESTDWEncodeClass,
-     uRESTDWCharset,       uRESTDWBufferBase;
+uses
+  SysUtils, Classes, Variants, DB,
+  uRESTDWParams, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWJSONInterface,
+  uRESTDWJSONObject, uRESTDWComponentBase, uRESTDWEncodeClass, uRESTDWBufferBase;
 
 Const
  cJSONValue = '{"MassiveSQLMode":"%s", "SQL":"%s", "Params":"%s", "Bookmark":"%s", ' +

@@ -25,17 +25,9 @@ unit uRESTDWMD5;
 
 Interface
 
-Uses {$IFDEF FPC}
-      SysUtils,      Classes     {$IFDEF RESTDWWINDOWS}, Windows{$ENDIF};
-     {$ELSE}
-      {$IF CompilerVersion <= 22}
-       SysUtils, Classes
-      {$ELSE}
-       System.SysUtils, System.Classes
-      {$IFEND}
-      {$IFDEF RESTDWWINDOWS}, Windows{$ENDIF};
-     {$ENDIF}
-
+Uses
+  {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
+  SysUtils, Classes;
 
 Type
 { The TRESTDWMD5Digest record is the type of results of

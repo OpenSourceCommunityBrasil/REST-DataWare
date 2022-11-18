@@ -26,20 +26,11 @@ unit uRESTDWBase64;
 Interface
 
 Uses
- {$IFDEF FPC}
-  SysUtils,
- {$ELSE}
-  {$IF CompilerVersion >= 28}
-  System.SysUtils,
+ {$IF Not(DEFINED(FPC)) AND (CompilerVersion >= 28)}
   System.NetEncoding,
-  {$ELSE}
+ {$IFEND}
   SysUtils,
-  {$IFEND}
- {$ENDIF}
- uRESTDWTools,
- uRESTDWEncodeClass,
- uRESTDWCharset,
- uRESTDWBasicTypes;
+  uRESTDWTools, uRESTDWEncodeClass, uRESTDWBasicTypes, uRESTDWConsts;
 
  Type
   TRESTDWBase64 = Class

@@ -25,26 +25,22 @@ unit uRESTDWIdReg;
 interface
 
 uses
-{$IFDEF FPC}
-  StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
-  Variants, TypInfo, uRESTDWIdBase,
-  LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf,
-  ProjectIntf, ComponentEditors, Classes, fpWeb;
-{$ELSE}
-{$IFDEF WINDOWS}Windows, {$ENDIF}SysUtils, Variants, StrEdit, TypInfo,
-  uRESTDWIdBase,
-  RTLConsts,
-{$IFDEF COMPILER16_UP}
-  UITypes,
-{$ENDIF}
-{$IF CompilerVersion > 22}
-  ToolsApi, DesignWindows, DesignEditors, DBReg, DSDesign,
-  DesignIntf, ExptIntf, Classes, Db, ColnEdit;
-{$ELSE}
-ToolsApi, Graphics, DesignWindows, DesignEditors, DBReg, DesignIntf,
-  Classes, Db, DbTables, DSDesign, ColnEdit;
-{$IFEND}
-{$ENDIF}
+  {$IFDEF FPC}
+    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
+    LResources, LazFileUtils, FormEditingIntf, PropEdits, lazideintf,
+    ProjectIntf, ComponentEditors, fpWeb,
+  {$ELSE}
+    StrEdit, RTLConsts, Db, ColnEdit, DBReg, DesignIntf, DSDesign, ToolsApi,
+    DesignWindows, DesignEditors,
+    {$IFDEF COMPILER16_UP}UITypes,{$ENDIF}
+    {$IF CompilerVersion > 22}
+      ExptIntf,
+    {$ELSE}
+      Graphics, DbTables,
+    {$IFEND}
+  {$ENDIF}
+  Classes, Variants, TypInfo, SysUtils,
+  uRESTDWIdBase;
 
 Type
   TPoolersList = Class(TStringProperty)
@@ -58,7 +54,10 @@ Procedure Register;
 
 Implementation
 
-uses uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
+{$IFDEF FPC}
+uses
+  utemplateproglaz;
+{$ENDIF}
 
 Function TPoolersList.GetAttributes: TPropertyAttributes;
 Begin

@@ -3,23 +3,14 @@
 interface
 
 uses
- {$IFDEF FPC}
- SysUtils,  Classes, DB, lconvencoding, uRESTDWCharset,
- {$ELSE}
- {$IF CompilerVersion < 23}
- SysUtils,          Classes, DB,
- {$ELSE}
- System.SysUtils,   System.Classes, Data.DB,
- {$IFEND}
- {$ENDIF}
- ZSqlUpdate,           ZAbstractRODataset,  ZAbstractDataset,
- ZDataset,             ZConnection,         ZStoredProcedure,
- ZSqlProcessor,        ZSequence,           ZSqlMetadata,
- uRESTDWConsts,        uRESTDWDataUtils,           uRESTDWBasicDB,
- uRESTDWJSONInterface, uRESTDWDataJSON,     uRESTDWMassiveBuffer,
- Variants,             uRESTDWDatamodule,   uRESTDWDataset,
- uRESTDWJSONObject,    uRESTDWParams,       uRESTDWBasicTypes,
- uRESTDWBasic,         uRESTDWTools,        uRESTDWBufferBase;
+ {$IFDEF FPC}lconvencoding,{$ENDIF}
+ SysUtils, Classes, DB, Variants, 
+ ZSqlUpdate, ZAbstractRODataset, ZAbstractDataset, ZDataset, ZConnection,
+ ZStoredProcedure, ZSqlProcessor, ZSequence, ZSqlMetadata,
+ uRESTDWConsts, uRESTDWDataUtils, uRESTDWBasicDB, uRESTDWJSONInterface,
+ uRESTDWDataJSON, uRESTDWMassiveBuffer, uRESTDWDatamodule, 
+ uRESTDWDataset, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasicTypes,
+ uRESTDWBasic, uRESTDWTools, uRESTDWBufferBase;
 
 Type
  TRESTDWDriverZeos   = Class(TRESTDWDriver)

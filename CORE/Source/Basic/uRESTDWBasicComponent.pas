@@ -25,15 +25,8 @@ unit uRESTDWBasicComponent;
 
 interface
 
-Uses {$IFDEF FPC}
-      SysUtils, Classes
-     {$ELSE}
-      {$IF CompilerVersion <= 22}
-       SysUtils, Classes
-      {$ELSE}
-       System.SysUtils, System.Classes
-      {$IFEND}
-     {$ENDIF};
+Uses
+  SysUtils, Classes;
 
 Type
  TRESTDWAboutInfo = (RESTDWAbout);

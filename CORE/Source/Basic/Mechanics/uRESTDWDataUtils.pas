@@ -26,14 +26,11 @@ unit uRESTDWDataUtils;
 interface
 
 Uses
-  {$IFDEF FPC}
-  Classes,  SysUtils,
-  {$ELSE}
-  Classes,  SysUtils,
-  StringBuilderUnit,
-  {$ENDIF} uRESTDWTools, uRESTDWConsts,
-  DateUtils, uRESTDWMD5, uRESTDWBasicTypes,
-  uRESTDWEncodeClass, uRESTDWCharset, uRESTDWParams, uRESTDWMimeTypes;
+  {$IFNDEF FPC}StringBuilderUnit,{$ENDIF}
+  Classes, SysUtils,
+  uRESTDWTools, uRESTDWConsts, uRESTDWMD5, uRESTDWBasicTypes,
+  uRESTDWEncodeClass, uRESTDWParams, uRESTDWMimeTypes,
+  DateUtils;
 
 Type
  TRESTDWAuthOptionTypes = (rdwOATBasic, rdwOATBearer, rdwOATToken);

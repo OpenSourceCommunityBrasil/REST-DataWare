@@ -25,20 +25,13 @@ unit uRESTDWPoolermethod;
 
 Interface
 
-Uses {$IFDEF FPC}
-     SysUtils,  Classes, uRESTDWDataUtils, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
-     uRESTDWConsts, uRESTDWBasic, uRESTDWTools,      uRESTDWMassiveBuffer,  uRESTDWComponentEvents, uRESTDWBasicTypes,
-     uRESTDWJSONObject, uRESTDWCharset, uRESTDWEncodeClass, uRESTDWParams;
-     {$ELSE}
-     {$IF CompilerVersion <= 22}
-     SysUtils, Classes,
-     {$ELSE}
-     System.SysUtils, System.Classes,
-     {$IFEND}
-     uRESTDWDataUtils, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
-     uRESTDWConsts, uRESTDWEncodeClass, uRESTDWBasic, uRESTDWTools,      uRESTDWMassiveBuffer,  uRESTDWComponentEvents, uRESTDWBasicTypes,
-     uRESTDWJSONObject, uRESTDWCharset, uRESTDWParams;
-     {$ENDIF}
+Uses
+  {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
+  SysUtils, Classes,
+  uRESTDWMassiveBuffer, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWTools,
+  uRESTDWJSONObject, uRESTDWEncodeClass, uRESTDWBasic,
+  uRESTDWConsts, uRESTDWDataUtils, uRESTDWParams;
+
 
  Type
   TRESTDWPoolerMethodClient  = Class(TComponent)

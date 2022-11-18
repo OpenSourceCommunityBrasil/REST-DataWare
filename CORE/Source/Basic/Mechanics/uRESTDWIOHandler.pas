@@ -26,13 +26,8 @@ unit uRESTDWIOHandler;
 Interface
 
 Uses
- Classes,
- uRESTDWException,
- uRESTDWBuffer,
- uRESTDWBasicTypes,
- uRESTDWTools,
- uRESTDWComponentBase,
- uRESTDWConsts;
+ Classes, uRESTDWException, uRESTDWBuffer, uRESTDWBasicTypes, uRESTDWTools,
+ uRESTDWComponentBase, uRESTDWConsts;
 
 Const
  GRecvBufferSizeDefault  = 32 * 1024;

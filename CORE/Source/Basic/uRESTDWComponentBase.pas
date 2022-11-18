@@ -25,7 +25,9 @@ unit uRESTDWComponentBase;
 
 interface
 
-uses Classes, SysUtils, uRESTDWCharset, uRESTDWConsts{$IFDEF FPC}, lclversion{$ENDIF};
+uses
+  {$IFDEF FPC}lclversion,{$ENDIF}
+  Classes, SysUtils, uRESTDWConsts;
 
 Type
  TRESTDWComponent       = Class(TComponent)

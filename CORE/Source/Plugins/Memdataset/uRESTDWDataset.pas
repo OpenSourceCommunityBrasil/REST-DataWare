@@ -1,4 +1,4 @@
-unit uRESTDWDataset;
+﻿unit uRESTDWDataset;
 
 {$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 {$IFDEF FPC}
@@ -9,18 +9,23 @@ unit uRESTDWDataset;
 interface
 
 Uses
- SysConst, TypInfo, uRESTDWConsts, {$IFNDEF FPC}DBConsts, SqlTimSt, {$ELSE}Masks, {$ENDIF}IniFiles, DateUtils, Math, FMTBcd,
- StrUtils, Types, Variants,
  {$IFDEF FPC}
-  Db, Graphics, contnrs, LConvEncoding,
- {$ELSE}{$IF CompilerVersion <= 22}
-         contnrs, DBCommon, Db, Graphics,
-        {$ELSE}
-         System.UIConsts, System.UITypes, System.Generics.Collections,
-         System.VarCmplx, DBCommon, Data.Db,
-        {$IFEND}
+   Graphics, contnrs, LConvEncoding, Masks,
+ {$ELSE}
+  DBConsts, SqlTimSt,
+  {$IF CompilerVersion <= 22}
+   contnrs, DBCommon, Graphics,
+  {$ELSE}
+   UIConsts, UITypes, Generics.Collections,
+   VarCmplx, DBCommon,
+  {$IFEND}
  {$ENDIF}
- SysUtils, Classes, uRESTDWCharset, uRESTDWEncodeClass, uZlibLaz;
+ uRESTDWConsts, uRESTDWEncodeClass, uZlibLaz,
+
+ SysConst, TypInfo, SysUtils, Classes, IniFiles, DateUtils, Math, FMTBcd,
+ StrUtils, Types, Db, Variants
+
+ ;
 
 {$IFDEF REGION}
 {$REGION ' For init '}
@@ -34,43 +39,43 @@ Const
  NTAVersion        = 0;
  MAXSHORT          = 32767;
 {Supported types}
-  dwftString          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftString);
-  dwftSmallint        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftSmallint);
-  dwftInteger         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftInteger);
-  dwftWord            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftWord);
-  dwftBoolean         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftBoolean);
-  dwftFloat           = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftFloat);
-  dwftCurrency        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftCurrency);
-  dwftBCD             = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftBCD);
-  dwftDate            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftDate);
-  dwftTime            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftTime);
-  dwftDateTime        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftDateTime);
-  dwftBytes           = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftBytes);
-  dwftVarBytes        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftVarBytes);
-  dwftAutoInc         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftAutoInc);
-  dwftBlob            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftBlob);
-  dwftMemo            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftMemo);
-  dwftGraphic         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftGraphic);
-  dwftFmtMemo         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftFmtMemo);
-  dwftParadoxOle      = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftParadoxOle);
-  dwftDBaseOle        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftDBaseOle);
-  dwftTypedBinary     = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftTypedBinary);
-  dwftFixedChar       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftFixedChar);
-  dwftWideString      = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftWideString);
-  dwftLargeint        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftLargeint);
-  dwftOraBlob         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftOraBlob);
-  dwftOraClob         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftOraClob);
-  dwftVariant         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftVariant);
-  dwftInterface       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftInterface);
-  dwftIDispatch       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftIDispatch);
-  dwftGuid            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftGuid);
-  dwftTimeStamp       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftTimeStamp);
-  dwftFMTBcd          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftFMTBcd);
+  dwftString          = Integer(DB.ftString);
+  dwftSmallint        = Integer(DB.ftSmallint);
+  dwftInteger         = Integer(DB.ftInteger);
+  dwftWord            = Integer(DB.ftWord);
+  dwftBoolean         = Integer(DB.ftBoolean);
+  dwftFloat           = Integer(DB.ftFloat);
+  dwftCurrency        = Integer(DB.ftCurrency);
+  dwftBCD             = Integer(DB.ftBCD);
+  dwftDate            = Integer(DB.ftDate);
+  dwftTime            = Integer(DB.ftTime);
+  dwftDateTime        = Integer(DB.ftDateTime);
+  dwftBytes           = Integer(DB.ftBytes);
+  dwftVarBytes        = Integer(DB.ftVarBytes);
+  dwftAutoInc         = Integer(DB.ftAutoInc);
+  dwftBlob            = Integer(DB.ftBlob);
+  dwftMemo            = Integer(DB.ftMemo);
+  dwftGraphic         = Integer(DB.ftGraphic);
+  dwftFmtMemo         = Integer(DB.ftFmtMemo);
+  dwftParadoxOle      = Integer(DB.ftParadoxOle);
+  dwftDBaseOle        = Integer(DB.ftDBaseOle);
+  dwftTypedBinary     = Integer(DB.ftTypedBinary);
+  dwftFixedChar       = Integer(DB.ftFixedChar);
+  dwftWideString      = Integer(DB.ftWideString);
+  dwftLargeint        = Integer(DB.ftLargeint);
+  dwftOraBlob         = Integer(DB.ftOraBlob);
+  dwftOraClob         = Integer(DB.ftOraClob);
+  dwftVariant         = Integer(DB.ftVariant);
+  dwftInterface       = Integer(DB.ftInterface);
+  dwftIDispatch       = Integer(DB.ftIDispatch);
+  dwftGuid            = Integer(DB.ftGuid);
+  dwftTimeStamp       = Integer(DB.ftTimeStamp);
+  dwftFMTBcd          = Integer(DB.ftFMTBcd);
   {$IFDEF COMPILER10_UP}
-  dwftFixedWideChar   = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftFixedWideChar);
-  dwftWideMemo        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftWideMemo);
-  dwftOraTimeStamp    = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftOraTimeStamp);
-  dwftOraInterval     = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftOraInterval);
+  dwftFixedWideChar   = Integer(DB.ftFixedWideChar);
+  dwftWideMemo        = Integer(DB.ftWideMemo);
+  dwftOraTimeStamp    = Integer(DB.ftOraTimeStamp);
+  dwftOraInterval     = Integer(DB.ftOraInterval);
   {$ELSE}
   dwftFixedWideChar   = Integer(38);
   dwftWideMemo        = Integer(39);
@@ -78,13 +83,13 @@ Const
   dwftOraInterval     = Integer(41);
   {$ENDIF}
   {$IFDEF COMPILER14_UP}
-  dwftLongWord        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftLongWord); //42
-  dwftShortint        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftShortint); //43
-  dwftByte            = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftByte); //44
-  dwftExtended        = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftExtended); //45
-  dwftStream          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftStream); //48
-  dwftTimeStampOffset = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftTimeStampOffset); //49
-  dwftSingle          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftSingle); //51
+  dwftLongWord        = Integer(DB.ftLongWord); //42
+  dwftShortint        = Integer(DB.ftShortint); //43
+  dwftByte            = Integer(DB.ftByte); //44
+  dwftExtended        = Integer(DB.ftExtended); //45
+  dwftStream          = Integer(DB.ftStream); //48
+  dwftTimeStampOffset = Integer(DB.ftTimeStampOffset); //49
+  dwftSingle          = Integer(DB.ftSingle); //51
   {$ELSE}
   dwftLongWord        = Integer(42);
   dwftShortint        = Integer(43);
@@ -96,18 +101,18 @@ Const
   {$ENDIF}
 
   {Unsupported types}
-  dwftUnknown         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftUnknown);
-  dwftCursor          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftCursor);
-  dwftADT             = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftADT);
-  dwftArray           = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftArray);
-  dwftReference       = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftReference);
-  dwftDataSet         = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftDataSet);
+  dwftUnknown         = Integer(DB.ftUnknown);
+  dwftCursor          = Integer(DB.ftCursor);
+  dwftADT             = Integer(DB.ftADT);
+  dwftArray           = Integer(DB.ftArray);
+  dwftReference       = Integer(DB.ftReference);
+  dwftDataSet         = Integer(DB.ftDataSet);
   {Unknown newest types for support in future}
 
   {$IFDEF COMPILER14_UP}
-  dwftConnection      = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftConnection); //46
-  dwftParams          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftParams); //47
-  dwftObject          = Integer({$IFNDEF FPC}{$IF CompilerVersion > 22}Data.{$IFEND}{$ENDIF}DB.ftObject); //50
+  dwftConnection      = Integer(DB.ftConnection); //46
+  dwftParams          = Integer(DB.ftParams); //47
+  dwftObject          = Integer(DB.ftObject); //50
   {$ENDIF}
   dwftColor           = Integer(255);
   {$IFDEF REGION}{$ENDREGION}{$ENDIF}

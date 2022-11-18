@@ -30,9 +30,7 @@ interface
 Uses
   {$IF CompilerVersion <= 22}
    EncdDecd, uRESTDWMassiveBuffer,
-  {$ELSE}
-     uRESTDWCharset,
-  {$IFEND}
+  {$ENDIF}
   SysUtils, Classes, Db, Variants, HTTPApp, SyncObjs,
   uRESTDWBasic, uRESTDWJSONObject, uRESTDWBasicTypes, uRESTDWComponentEvents,
   uRESTDWComponentBase, uRESTDWBasicClass, uRESTDWParams, uRESTDWBasicDB,

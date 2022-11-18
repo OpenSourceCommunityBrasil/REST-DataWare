@@ -26,11 +26,7 @@ unit uRESTDWBuffer;
 Interface
 
 Uses
-  Classes,
-  uRESTDWException,
-  uRESTDWBasicTypes,
-  uRESTDWTools,
-  SysUtils;
+  Classes, SysUtils, uRESTDWException, uRESTDWBasicTypes, uRESTDWTools;
 
 Type
  eRESTDWNotEnoughDataInBuffer = Class(eRESTDWException);

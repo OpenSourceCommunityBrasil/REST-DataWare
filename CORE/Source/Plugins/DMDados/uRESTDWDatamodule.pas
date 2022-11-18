@@ -3,8 +3,9 @@ unit uRESTDWDatamodule;
 interface
 
 Uses
-  SysUtils, Classes, uRESTDWCharset, uRESTDWDataUtils, uRESTDWComponentEvents,
-  uRESTDWBasicTypes, uRESTDWConsts, uRESTDWJSONObject, uRESTDWEncodeClass, uRESTDWParams;
+  SysUtils, Classes, uRESTDWDataUtils, uRESTDWComponentEvents,
+  uRESTDWBasicTypes, uRESTDWConsts, uRESTDWJSONObject, uRESTDWEncodeClass,
+  uRESTDWParams;
 
 Type
  TUserBasicAuth  =             Procedure(Welcomemsg, AccessTag,

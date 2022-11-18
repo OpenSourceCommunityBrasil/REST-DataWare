@@ -26,16 +26,9 @@ Unit uRESTDWMessageCoderMIME;
 Interface
 
 Uses
- Classes,
- SysUtils,
- uRESTDWBasicTypes,
- uRESTDWException,
- uRESTDWComponentBase,
- uRESTDWMessage,
- uRESTDWTools,
- uRESTDWCoder,
- uRESTDWMessageCoder,
- uRESTDWCoderHeader;
+ Classes, SysUtils,
+ uRESTDWBasicTypes, uRESTDWException, uRESTDWComponentBase, uRESTDWMessage,
+ uRESTDWTools, uRESTDWCoder, uRESTDWMessageCoder, uRESTDWCoderHeader;
 
  Type
   eRESTDWNotEnoughDataInBuffer = Class(eRESTDWException);
@@ -103,10 +96,9 @@ Uses
 
 Implementation
 
-Uses uRESTDWCoderMIME,
-     uRESTDWCoderQuotedPrintable,
-     uRESTDWCoderBinHex4,
-     uRESTDWBuffer;
+Uses
+  uRESTDWCoderMIME, uRESTDWCoderQuotedPrintable, uRESTDWCoderBinHex4,
+  uRESTDWBuffer;
 
 Function DoReadLnFromStream(AStream        : TStream;
                             ATerminator    : String;

@@ -29,7 +29,8 @@ interface
 
 Uses
  SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts, uRESTDWComponentBase,
- uRESTDWBasic, uRESTDWBasicTypes, uRESTDWTools, uRESTDWCharset, uRESTDWParams, uRESTDWJSONInterface;
+ uRESTDWBasic, uRESTDWBasicTypes, uRESTDWTools, uRESTDWParams,
+ uRESTDWJSONInterface;
 
 Const
  TServerEventsConst = '{"typeobject":"%s", "objectdirection":"%s", "objectvalue":"%s", "paramname":"%s", "encoded":"%s", "default":"%s"}';

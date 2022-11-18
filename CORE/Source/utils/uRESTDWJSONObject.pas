@@ -26,19 +26,17 @@ Unit uRESTDWJSONObject;
 Interface
 
 Uses
-  uRESTDWJSONInterface, uRESTDWCharset, uRESTDWConsts,
-  uRESTDWTools, Variants, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWDataUtils,
   {$IFDEF FPC}
-   SysUtils, Classes, DB,
-   LConvEncoding, math
+    LConvEncoding, math,
   {$ELSE}
-   {$IF CompilerVersion > 22}
-    System.SysUtils, System.Classes, System.IOUtils,
-    System.Rtti, Data.DB
-   {$ELSE}
-    SysUtils, Classes, DB
-  {$IFEND}
-  {$ENDIF}, uRESTDWResponseTranslator;
+    {$IF CompilerVersion > 22}
+      IOUtils, Rtti,
+    {$IFEND}
+  {$ENDIF}
+  SysUtils, Classes, DB, Variants,
+  uRESTDWJSONInterface, uRESTDWConsts,
+  uRESTDWTools, uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWDataUtils,
+  uRESTDWResponseTranslator;
 
 Const                                      // \b  \t  \n   \f   \r
  TSpecialChars : Array [0 .. 7] Of Char = ('\', '"', '/', #8, #9, #10, #12, #13);
@@ -195,7 +193,7 @@ Type
   Procedure WriteToDataset (JSONValue          : String;
                             Const DestDS       : TDataset;
                             ResponseTranslator : TRESTDWResponseTranslator;
-                            ResquestMode       : TResquestMode);Overload;
+                            RequestMode        : TRequestMode);Overload;
   Procedure WriteToDataset (DatasetType      : TDatasetType;
                             JSONValue        : String;
                             Const DestDS     : TDataset;
@@ -1016,7 +1014,7 @@ Begin
  If vNullValue Then
   aResult := cNullvalue
  Else If ((Trim(aResult) = '') or (Trim(bValue) = cNullvalueTag)) And vInsertTag Then
-  aResult := cBlanckStringJSON;
+  aResult := cBlankStringJSON;
  If DataMode = dmDataware Then
   Begin
    If (vTypeObject  = toDataset) Then
@@ -1060,17 +1058,17 @@ Begin
         Begin
          If aResult <> '' Then
           Begin
-           If (((((aResult <> cBlanckStringJSON) And
+           If (((((aResult <> cBlankStringJSON) And
               Not((aResult[InitStrPos] = '"')    And
                   (aResult[Length(aResult) - FinalStrPos] = '"'))))   And
                (vEncoded)) Or (Not(vEncoded)     And (aResult = ''))) Or
                (Pos('"', aResult) = 0)           Then
             aResult := '"' + aResult + '"'
            Else If (aResult = '') Then
-            aResult := cBlanckStringJSON;
+            aResult := cBlankStringJSON;
           End
          Else
-          aResult := cBlanckStringJSON;
+          aResult := cBlankStringJSON;
         End;
        If (Trim(bValue) = cNullvalueTag) Then
         Result := Format(TValueFormatJSONValue, ['ObjectType', GetObjectName(vTypeObject), 'Direction',
@@ -2039,7 +2037,7 @@ End;
 Procedure TJSONValue.WriteToDataset(JSONValue          : String;
                                     Const DestDS       : TDataset;
                                     ResponseTranslator : TRESTDWResponseTranslator;
-                                    ResquestMode       : TResquestMode);
+                                    RequestMode        : TRequestMode);
 Var
  FieldValidate     : TFieldNotifyEvent;
  //vFieldDefinition : TFieldDefinition;
@@ -2230,7 +2228,7 @@ Begin
     If DestDS.Active Then
      DestDS.Close;
     vTempValueJSON := JSONValue;
-    If (ResquestMode = rtOnlyFields) Or
+    If (RequestMode = rtOnlyFields) Or
       (((ResponseTranslator.ElementAutoReadRootIndex)    Or
         (ResponseTranslator.ElementRootBaseName <> '')   Or
         (ResponseTranslator.ElementRootBaseIndex > -1))) Then

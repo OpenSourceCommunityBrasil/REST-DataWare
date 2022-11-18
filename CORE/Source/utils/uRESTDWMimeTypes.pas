@@ -3,7 +3,7 @@ unit uRESTDWMimeTypes;
 interface
 
 uses
-{$IFDEF MSWindows}Windows, Registry, {$ENDIF}
+  {$IFDEF RESTDWWINDOWS}Windows, Registry, {$ENDIF}
   Classes, SysUtils, StrUtils, uRESTDWConsts;
 
 type
@@ -561,7 +561,7 @@ begin
 end;
 
 procedure TMimeTable.GetMIMETableFromOS(const AMIMEList: TStringList);
-{$IFDEF MSWindows}
+{$IFDEF RESTDWWINDOWS}
 var
   reg: TRegistry;
   KeyList: TStringList;
@@ -569,7 +569,7 @@ var
   S, LExt: string;
 {$ENDIF}
 begin
-{$IFNDEF MSWindows}
+{$IFNDEF RESTDWWINDOWS}
   Exit;
 {$ELSE}
   AMIMEList.Sorted := False;

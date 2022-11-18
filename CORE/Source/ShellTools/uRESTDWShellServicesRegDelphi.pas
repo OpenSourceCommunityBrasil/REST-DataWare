@@ -38,8 +38,6 @@ Procedure Register;
 
 Implementation
 
-uses uRESTDWCharset;
-
 Procedure Register;
 Begin
  RegisterComponents('REST Dataware - Service',     [TRESTDWShellService]);

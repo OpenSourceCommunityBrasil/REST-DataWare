@@ -26,9 +26,7 @@ unit uRESTDWCoderHeader;
 Interface
 
 uses
-  Classes,
-  uRESTDWBasicTypes,
-  uRESTDWTools;
+  Classes, uRESTDWBasicTypes, uRESTDWTools;
 
   Function EncodeHeader(Const Header         : String;
                         Specials             : String;

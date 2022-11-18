@@ -28,17 +28,9 @@ unit uRESTDWResponseTranslator;
 
 interface
 
-Uses uRESTDWComponentBase,
-     {$IFDEF FPC}
-      uRESTDWConsts, SysUtils, Classes
-     {$ELSE}
-     {$IF CompilerVersion <= 22}
-      SysUtils, Classes,
-     {$ELSE}
-      System.SysUtils, System.Classes,
-     {$IFEND}
-      uRESTDWTools, uRESTDWConsts
-     {$ENDIF};
+Uses
+  SysUtils, Classes,
+  uRESTDWComponentBase, uRESTDWTools, uRESTDWConsts;
 
 Type
  TPrepareGet         = Procedure (Var AUrl          : String;

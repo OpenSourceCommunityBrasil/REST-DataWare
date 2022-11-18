@@ -2,7 +2,7 @@ unit uRestDWLazDriver;
 
 interface
 
-uses SysUtils,  Classes, DB, lconvencoding, uRESTDWCharset,
+uses SysUtils,  Classes, DB, lconvencoding,
      sqldb,       mssqlconn,     pqconnection,
      oracleconnection,  odbcconn,        mysql40conn,   mysql41conn,
      mysql50conn,       mysql51conn,     mysql55conn,   mysql56conn,

@@ -9,7 +9,7 @@ uses SysUtils,  Classes,   DB, Uni, UniScript,    DADump,
      uRESTDWMassiveBuffer,    Variants,                uRESTDWDatamodule,
      uRESTDWDataset,          uRESTDWJSONObject,       uRESTDWParams,
      uRESTDWBasicTypes,       uRESTDWBasic,            uRESTDWTools,
-     uRESTDWCharset,          uRESTDWBufferBase;
+     uRESTDWBufferBase;
 
 Type
 

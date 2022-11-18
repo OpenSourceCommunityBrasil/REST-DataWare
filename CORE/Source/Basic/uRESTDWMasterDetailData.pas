@@ -27,7 +27,8 @@ unit uRESTDWMasterDetailData;
 
 Interface
 
-Uses SysUtils, Classes;
+Uses
+  SysUtils, Classes;
 
 Type
  TRESTClient = Class End;
