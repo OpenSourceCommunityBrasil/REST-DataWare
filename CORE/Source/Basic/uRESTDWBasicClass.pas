@@ -25,16 +25,10 @@ unit uRESTDWBasicClass;
 
 interface
 
-Uses uRESTDWComponentBase, uRESTDWConsts,
-     {$IFDEF FPC}
-      SysUtils, Classes
-     {$ELSE}
-      {$IF CompilerVersion <= 22}
-       SysUtils, Classes
-      {$ELSE}
-       System.SysUtils, System.Classes
-      {$IFEND}
-     {$ENDIF}, uRESTDWDataUtils, uRESTDWComponentEvents, uRESTDWEncodeClass, uRESTDWBasicTypes;
+Uses
+  SysUtils, Classes,
+  uRESTDWComponentBase, uRESTDWConsts, uRESTDWDataUtils, uRESTDWComponentEvents,
+  uRESTDWEncodeClass, uRESTDWBasicTypes;
 
 Type
  TRESTDWClientRESTBase = Class(TRESTDWComponent) //Novo Componente de Acesso a Requisições REST para o Servidores Diversos

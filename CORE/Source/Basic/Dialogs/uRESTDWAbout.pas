@@ -4,7 +4,7 @@ unit uRESTDWAbout;
 
 interface
 
-uses Classes, SysUtils, uRESTDWCharset, uRESTDWConsts{$IFDEF FPC}, lclversion{$ENDIF};
+uses Classes, SysUtils, uRESTDWConsts{$IFDEF FPC}, lclversion{$ENDIF};
 
 Type
  TRESTDWComponent       = Class(TComponent)

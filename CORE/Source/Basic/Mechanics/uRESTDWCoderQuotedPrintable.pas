@@ -26,9 +26,7 @@ unit uRESTDWCoderQuotedPrintable;
 Interface
 
 Uses
-  Classes,
-  uRESTDWCoder,
-  SysUtils;
+  Classes, uRESTDWCoder, SysUtils;
 
   Type
    TRESTDWDecoderQuotedPrintable = Class(TRESTDWDecoder)

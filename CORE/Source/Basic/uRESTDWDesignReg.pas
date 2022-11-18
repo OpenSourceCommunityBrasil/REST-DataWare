@@ -26,26 +26,26 @@ unit uRESTDWDesignReg;
 interface
 
 uses
-  uRESTDWComponentBase,
   {$IFDEF FPC}
-    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
-    LResources, LazFileUtils, SysUtils, Classes, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, fpWeb,
-    uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWBufferDb;
+    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
+    LResources, LazFileUtils,  FormEditingIntf, PropEdits, lazideintf,
+    ProjectIntf, ComponentEditors, fpWeb,
   {$ELSE}
-   Windows, SysUtils, Variants, StrEdit, TypInfo, uRESTDWDatamodule, uRESTDWServerEvents,
-   uRESTDWBasicClass, uRESTDWServerContext, uRESTDWBasicDB, uRESTDWMassiveBuffer, uRESTDWMemtable, uRESTDWBufferDb,
-   RTLConsts, {$IFDEF RESTDWSYNOPSE}uRESTDWSynBase,{$ENDIF}
-   {$IFDEF COMPILER16_UP}
-   UITypes,
-   {$ENDIF}
-   {$if CompilerVersion > 22}
-    ToolsApi, vcl.Graphics, DesignWindows, DesignEditors, DBReg, DSDesign,
-    DesignIntf, ExptIntf, Classes, Db, ColnEdit;
+   Windows, StrEdit, RTLConsts, Db, DBReg, ToolsApi, DesignWindows,
+   DesignEditors, DSDesign, DesignIntf, ColnEdit,
+   {$IF CompilerVersion > 22}
+    vcl.Graphics,  ExptIntf,
    {$ELSE}
-    ToolsApi, Graphics, DesignWindows, DesignEditors, DBReg, DesignIntf,
-    Classes, Db, DbTables, DSDesign, ColnEdit;
+     Graphics, DbTables,
    {$IFEND}
+   {$IFDEF COMPILER16_UP}UITypes,{$ENDIF}
   {$ENDIF}
+  Variants, TypInfo, SysUtils, Classes,
+  uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWBasicDB,
+  uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWBufferDb,
+  uRESTDWComponentBase
+
+  ;
 
 {$IFNDEF CLR}
 Const
@@ -246,10 +246,11 @@ Var
 
 Implementation
 
-uses uRESTDWConsts, uRESTDWPoolermethod, uRESTDWBasic, uRESTDWResponseTranslator,
-     uRESTDWFieldSourceEditor, uRESTDWSqlEditor, uRESTDWUpdSqlEditor,
-     uRESTDWJSONViewer, uRESTDWCharset, uRESTDWDriverBase
-     {$IFDEF FPC}, utemplateproglaz{$ENDIF};
+uses
+  {$IFDEF FPC} utemplateproglaz,{$ENDIF}
+   uRESTDWConsts, uRESTDWPoolermethod, uRESTDWBasic, uRESTDWResponseTranslator,
+   uRESTDWFieldSourceEditor, uRESTDWSqlEditor, uRESTDWUpdSqlEditor,
+   uRESTDWJSONViewer;
 
 {$IFNDEF FPC}
 {$IFDEF  RTL240_UP}
@@ -351,7 +352,7 @@ Function TRESTDWDatamodule.GetInterfaceUsesSection : String;
 Begin
  Result  := Inherited GetInterfaceUsesSection;
  Result  := Result + ', SysTypes, uRESTDWBasicTypes, uRESTDWJSONObject,' + LineEnding;
- Result  := Result + '  uRESTDWCharset, uRESTDWParams, uRESTDWDataUtils, uRESTDWComponentEvents, uRESTDWDatamodule';
+ Result  := Result + '  uRESTDWParams, uRESTDWDataUtils, uRESTDWComponentEvents, uRESTDWDatamodule';
 End;
 
 //Function TRESTDWCGIDatamodule.GetInterfaceUsesSection : String;

@@ -25,7 +25,8 @@ unit uRESTDWEncodeClass;
 
 Interface
 
-Uses SysUtils,  Classes;
+Uses
+  SysUtils, Classes;
 
 Type
  TEncodeSelect    = (esASCII, esUtf8, esANSI);

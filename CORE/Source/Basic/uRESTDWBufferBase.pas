@@ -26,18 +26,9 @@ unit uRESTDWBufferBase;
 
 interface
 
-Uses {$IFDEF FPC}
-      SysUtils, Classes
-     {$ELSE}
-      {$IF CompilerVersion <= 22}
-       SysUtils, Classes
-      {$ELSE}
-       System.SysUtils, System.Classes
-      {$IFEND}
-     {$ENDIF},
-     Variants,
-     uRESTDWBasicComponent,
-     uRESTDWBasicTypes;
+Uses
+  SysUtils, Classes, Variants,
+  uRESTDWBasicComponent, uRESTDWBasicTypes;
 
 Type
  TRESTDWBufferBase = Class(TObject)

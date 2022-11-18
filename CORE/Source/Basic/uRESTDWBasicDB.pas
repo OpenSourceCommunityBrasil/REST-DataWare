@@ -30,7 +30,7 @@ Uses
  {$IFDEF RESTKBMMEMTABLE}kbmmemtable, {$ENDIF}
  {$IFDEF FPC}
   {$IFNDEF RESTDWLAMW}BufDataset, {$ENDIF}
-  memds, uRESTDWCharset,
+  memds,
  {$ELSE}
   {$IF Defined(RESTDWFMX)}
    {$IFNDEF RESTDWAndroidService}System.UITypes, {$ENDIF}

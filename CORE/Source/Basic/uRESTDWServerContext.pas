@@ -28,22 +28,13 @@ unit uRESTDWServerContext;
 interface
 
 Uses
- SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts, uRESTDWComponentBase,
- uRESTDWCharset, uRESTDWParams,
- uRESTDWBasic, uRESTDWBasicTypes,
- uRESTDWTools{$IFNDEF FPC}
-              {$IF CompilerVersion > 21} // Delphi 2010 pra cima
-               {$IF Defined(HAS_FMX)} // Alteardo para IOS Brito
-                 , System.json
-               {$ELSE}
-                , uRESTDWJSON
-               {$IFEND}
-              {$ELSE}
-               , uRESTDWJSON
-              {$IFEND}
-              {$ELSE}
-              , uRESTDWJSON
-              {$ENDIF};
+  {$IF Defined(HAS_FMX)}
+    System.JSON,
+  {$ELSE}
+    uRESTDWJSON,
+  {$IFEND}
+  SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts, uRESTDWComponentBase,
+  uRESTDWParams, uRESTDWBasic, uRESTDWBasicTypes, uRESTDWTools;
 
 Const
  TServerEventsConst = '{"typeobject":"%s", "objectdirection":"%s", "objectvalue":"%s", "paramname":"%s", "encoded":"%s", "default":"%s"}';

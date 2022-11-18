@@ -26,13 +26,8 @@ unit uRESTDWCoderBinHex4;
 Interface
 
 Uses
- Classes,
- uRESTDWException,
- uRESTDWCoder,
- uRESTDWCoder3to4,
- uRESTDWTools,
- uRESTDWBasicTypes,
- SysUtils;
+ Classes, SysUtils, uRESTDWException, uRESTDWCoder, uRESTDWCoder3to4, uRESTDWTools,
+ uRESTDWBasicTypes;
 
  Type
   TRESTDWEncoderBinHex4 = Class(TRESTDWEncoder3to4)

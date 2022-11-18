@@ -49,7 +49,7 @@ Uses
   {$ENDIF}
   SysUtils,  Classes, Db, FMTBcd,
   uRESTDWComponentBase, uRESTDWMemtable, uRESTDWConsts, uRESTDWEncodeClass,
-  uRESTDWCharset, uRESTDWMimeTypes
+  uRESTDWMimeTypes
 
  ;
 

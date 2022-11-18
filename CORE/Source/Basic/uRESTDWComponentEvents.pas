@@ -26,16 +26,9 @@ unit uRESTDWComponentEvents;
 interface
 
 Uses
- {$IFDEF FPC}
- SysUtils,      uRESTDWDataUtils, Classes,
- uRESTDWConsts, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, Db;
- {$ELSE}
-  {$IF CompilerVersion <= 22}
-   SysUtils, uRESTDWDataUtils, Classes, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, uRESTDWConsts, Db
-  {$ELSE}
-   System.SysUtils, uRESTDWDataUtils, System.Classes, uRESTDWParams, uRESTDWBasicTypes, uRESTDWMassiveBuffer, uRESTDWConsts, Db
-  {$IFEND};
- {$ENDIF}
+ SysUtils, Classes, Db,
+ uRESTDWDataUtils, uRESTDWParams, uRESTDWBasicTypes, uRESTDWConsts,
+ uRESTDWMassiveBuffer;
 
  Type
   TOnCreate               = Procedure(Sender                : TObject)               Of Object;

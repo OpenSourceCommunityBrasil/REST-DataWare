@@ -42,7 +42,7 @@ Procedure Register;
 
 Implementation
 
-uses uRESTDWConsts, uRESTDWCharset, utemplateproglaz;
+uses uRESTDWConsts, utemplateproglaz;
 
 Procedure Register;
 Begin

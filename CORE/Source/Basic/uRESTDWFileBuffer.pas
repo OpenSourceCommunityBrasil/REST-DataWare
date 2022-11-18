@@ -27,8 +27,9 @@ unit uRESTDWFileBuffer;
 interface
 
 uses
-  SysUtils, Types, Variants, Classes, uRESTDWConsts,
-  uRESTDWDynamic, uRESTDWTools, uRESTDWBasicTypes, uRESTDWComponentBase;
+  SysUtils, Types, Variants, Classes,
+  uRESTDWConsts, uRESTDWDynamic, uRESTDWTools, uRESTDWBasicTypes,
+  uRESTDWComponentBase;
 
 Const
  cFinalLine      = #10;

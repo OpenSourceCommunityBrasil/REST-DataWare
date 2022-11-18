@@ -27,34 +27,32 @@ unit uRESTDWIdBase;
 interface
 
 Uses
- {$IFDEF FPC}
- SysUtils,      Classes, Db, Variants, {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
- uRESTDWBasic, uRESTDWBasicDB, uRESTDWConsts, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
- uRESTDWParams, uRESTDWBasicClass, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWComponentBase
- {$ELSE}
-  {$IF CompilerVersion <= 22}
-   SysUtils, Classes, Db, Variants, EncdDecd, SyncObjs, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass, uRESTDWComponentBase
-  {$ELSE}
-   System.SysUtils, System.Classes, Data.Db, Variants, system.SyncObjs, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWComponentBase,
-   {$IF Defined(RESTDWFMX)}{$IFNDEF RESTDWAndroidService}FMX.Forms,{$ENDIF}
-   {$ELSE}
-    {$IF CompilerVersion <= 22}Forms,
-     {$ELSE}VCL.Forms,
+  {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
+  {$IFNDEF FPC}
+    {$IF (CompilerVersion <= 22)}
+     EncdDecd, SyncObjs, uRESTDWMassiveBuffer,
+    {$ELSE}
+      SyncObjs,
     {$IFEND}
-   {$IFEND}
-   uRESTDWCharset
-   {$IFDEF RESTDWWINDOWS}
-    , Windows
-   {$ENDIF}
-  {$IFEND}
-   , uRESTDWConsts, uRESTDWEncodeClass
- {$ENDIF}
- ,uRESTDWDataUtils, IdContext, IdHeaderList,        IdTCPConnection,  IdHTTPServer, IdCustomHTTPServer, IdSSLOpenSSL,  IdSSL,
- IdAuthentication,      IdTCPClient,         IdHTTPHeaderInfo, IdComponent,  IdBaseComponent,
- IdHTTP,                IdMultipartFormData, IdMessageCoder,   IdMessage,    IdGlobalProtocols,
- IdGlobal,              IdStack,             uRESTDWTools;
+  {$IF Defined(RESTDWFMX) AND Not(Defined(RESTDWAndroidService))} FMX.Forms, {$IFEND}
+    {$IFNDEF RESTDWFMX}
+      {$IF (CompilerVersion > 22)}
+        VCL.Forms,
+      {$ELSE}
+        Forms,
+      {$IFEND}
+    {$ENDIF}
+  {$ENDIF}
+  SysUtils, Classes, Db, Variants,
+
+  uRESTDWBasic, uRESTDWBasicDB, uRESTDWComponentEvents, uRESTDWBasicTypes,
+  uRESTDWJSONObject, uRESTDWParams, uRESTDWBasicClass, uRESTDWComponentBase,
+  uRESTDWConsts, uRESTDWEncodeClass, uRESTDWDataUtils, uRESTDWTools,
+
+  IdContext, IdHeaderList, IdTCPConnection, IdHTTPServer, IdCustomHTTPServer,
+  IdSSLOpenSSL, IdSSL, IdAuthentication, IdTCPClient, IdHTTPHeaderInfo,
+  IdComponent, IdBaseComponent, IdHTTP, IdMultipartFormData, IdMessageCoder,
+  IdMessage, IdGlobalProtocols, IdGlobal, IdStack;
 
 Type
  PIdSSLVersions = ^TIdSSLVersions;

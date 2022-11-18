@@ -28,7 +28,6 @@ Interface
 Uses
  Classes, uRESTDWBasicTypes;
 
-
  Type
   TRESTDWHeaderList = class(TStringList)
  Protected
@@ -81,9 +80,7 @@ Uses
 Implementation
 
 Uses
-  uRESTDWException,
-  SysUtils,
-  uRESTDWTools;
+  SysUtils, uRESTDWException, uRESTDWTools;
 
 Procedure TRESTDWHeaderList.AddStdValues(ASrc: TStrings);
 Var

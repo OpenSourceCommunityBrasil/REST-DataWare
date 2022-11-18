@@ -26,12 +26,8 @@ unit uRESTDWMessage;
 Interface
 
 Uses
- Classes,
- uRESTDWAttachment,
- uRESTDWHeaderList,
- uRESTDWMessageParts,
- uRESTDWComponentBase,
- uRESTDWException;
+ Classes, uRESTDWAttachment, uRESTDWHeaderList, uRESTDWMessageParts,
+ uRESTDWComponentBase, uRESTDWException;
 
 Type
  TRESTDWMessagePriority = (mpHighest, mpHigh, mpNormal, mpLow, mpLowest);

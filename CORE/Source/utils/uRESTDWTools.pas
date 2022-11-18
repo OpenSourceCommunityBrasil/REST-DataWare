@@ -34,7 +34,7 @@ Uses
   {$IF CompilerVersion > 27}NetEncoding,{$IFEND}
  {$ENDIF}
  Classes, SysUtils, DB,
- uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWCharset, uRESTDWMimeTypes;
+ uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWMimeTypes, uRESTDWConsts;
 
  Const
   B64Table      = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
@@ -341,7 +341,7 @@ Uses
 
 Implementation
 
-Uses uRESTDWConsts, uRESTDWBase64, uRESTDWException{$IFNDEF HAS_FMX}{$IFNDEF UNIX}, Windows{$ENDIF}{$ENDIF};
+Uses uRESTDWBase64, uRESTDWException{$IFNDEF HAS_FMX}{$IFNDEF UNIX}, Windows{$ENDIF}{$ENDIF};
 
 
 {$IFDEF FPC}
