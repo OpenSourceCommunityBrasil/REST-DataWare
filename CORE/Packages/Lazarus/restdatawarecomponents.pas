@@ -22,7 +22,7 @@ uses
   uRESTDWMessageCoderQuotedPrintable, uRESTDWMessageParts, DWDCPbase64, 
   DWDCPblockciphers, DWDCPcast256, DWDCPconst, DWDCPcrypt2, DWDCPrijndael, 
   DWDCPsha256, DWDCPtypes, uRESTDWConsts, uRESTDWDatamodule, 
-  uRESTDWJSONViewer, uRESTDWDataset, uRESTDWExprParser, 
+  uRESTDWJSONViewer, uRESTDWMemtable, uRESTDWExprParser, 
   uRESTDWFieldSourceEditor, uRESTDWSqlEditor, uRESTDWUpdSqlEditor, 
   utemplateproglaz, uRESTDWBufferBase, StringBuilderUnit, uRESTDWBase64, 
   uRESTDWDynamic, uRESTDWJSONObject, uRESTDWMassiveBuffer, uRESTDWMD5, 

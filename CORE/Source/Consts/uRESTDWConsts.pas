@@ -45,9 +45,9 @@ Const
  GOffsetFromUTC   : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
  
  // controle de versão
- RESTDWVersionINFO          = 'v2.0.7-';
- RESTDWRelease              = '79';
- RESTDWCodeProject          = 'Savage Reign - GitHub';
+ RESTDWVersionINFO          = 'v2.1.0-';
+ RESTDWRelease              = '178';
+ RESTDWCodeProject          = 'Galaga - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  cSetPhysicDriver           = 'A PhysicDriver is needed to work';
  SNotEditing                = 'Not in Edit mode';
