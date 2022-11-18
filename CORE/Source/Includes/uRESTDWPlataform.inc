@@ -1,5 +1,8 @@
 {$I ..\..\Source\Includes\uRESTDW.inc}
 
+{$IFDEF MSWINDOWS}
+ {$DEFINE RESTDWWINDOWS}
+{$ENDIF}
 {$IFNDEF FPC}
  {$if CompilerVersion < 24}//Delphi under XE3
   //Geral
@@ -19,9 +22,6 @@
    {$IFEND}
   {$ELSE}
    {$DEFINE RESTDWDESKTOP}
-   {$IFDEF MSWINDOWS}
-    {$DEFINE RESTDWWINDOWS}
-   {$ENDIF}
   {$IFEND}
  {$IFEND}
 {$ELSE} //Lazarus
