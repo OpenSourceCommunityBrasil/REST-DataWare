@@ -1,5 +1,7 @@
 unit uRESTDWDynamic;
 
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+
 Interface
 
 Uses
