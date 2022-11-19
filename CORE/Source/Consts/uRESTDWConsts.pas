@@ -117,6 +117,7 @@ Const
  cInvalidAuth                   = 'HTTP/1.1 401 Unauthorized';
  cInvalidInternalError          = 'Internal Server Error';
  cInvalidMessageTo              = 'Invalid Sendmessage %s to user %s, error %s';
+ cInvalidVirtualMethod          = 'Invalid Virtual Method: %s, proper override method class needed';
  cIOHandler_MaxCapturedLines    = -1;
  cMaxLineLengthDefault          = 16 * 1024;
  cMessagePartCreate             = 'MessagePart can not be created. Use descendant classes.';

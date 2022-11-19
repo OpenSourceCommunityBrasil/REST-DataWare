@@ -42,34 +42,16 @@ unit uRESTDWIcsBase;
 interface
 
 Uses
-  System.SysUtils,
-  System.Classes,
-  System.DateUtils,
-  Data.Db,
-  Variants,
+  SysUtils, Classes, DateUtils, Db, Variants,
   VCL.ExtCtrls,
-  uRESTDWComponentEvents,
-  uRESTDWBasicTypes,
-  uRESTDWJSONObject,
-  uRESTDWBasic,
-  uRESTDWBasicDB,
-  uRESTDWParams,
-  uRESTDWBasicClass,
-  uRESTDWComponentBase,
-  uRESTDWCharset,
-  uRESTDWConsts,
-  uRESTDWEncodeClass,
-  uRESTDWDataUtils,
-  uRESTDWTools,
-  OverbyteIcsWinSock,
-  OverbyteIcsWSocket,
-  OverbyteIcsWndControl,
-  OverbyteIcsHttpAppServer,
-  OverbyteIcsUtils,
-  OverbyteIcsFormDataDecoder,
-  OverbyteIcsMimeUtils,
-  OverbyteIcsSSLEAY,
-  OverbyteIcsHttpSrv,
+
+  uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
+  uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWComponentBase,
+  uRESTDWConsts, uRESTDWEncodeClass, uRESTDWDataUtils, uRESTDWTools,
+
+  OverbyteIcsWinSock, OverbyteIcsWSocket, OverbyteIcsWndControl,
+  OverbyteIcsHttpAppServer, OverbyteIcsUtils, OverbyteIcsFormDataDecoder,
+  OverbyteIcsMimeUtils, OverbyteIcsSSLEAY, OverbyteIcsHttpSrv,
   OverbyteIcsWSocketS;
 
 Type

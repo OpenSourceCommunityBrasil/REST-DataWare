@@ -42,8 +42,8 @@ uses
   {$ENDIF}
   Variants, TypInfo, SysUtils, Classes,
   uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWBasicDB,
-  uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWBufferDb,
-  uRESTDWComponentBase
+  uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWMemTable, uRESTDWBufferDb,
+  uRESTDWComponentBase, uRESTDWDriverBase
 
   ;
 

@@ -1,7 +1,6 @@
 unit uRESTDWIcsReg;
 
 {$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
-
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -27,26 +26,8 @@ unit uRESTDWIcsReg;
 interface
 
 uses
-{$IFDEF FPC}
-  StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
-  Variants, TypInfo, uRESTDWIcsBase,
-  LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf,
-  ProjectIntf, ComponentEditors, Classes, fpWeb;
-{$ELSE}
-{$IFDEF WINDOWS}Windows, {$ENDIF}SysUtils, Variants, StrEdit, TypInfo,
-  uRESTDWIcsBase,
-  RTLConsts,
-{$IFDEF COMPILER16_UP}
-  UITypes,
-{$ENDIF}
-{$IF CompilerVersion > 22}
-  ToolsApi, DesignWindows, DesignEditors, DBReg, DSDesign,
-  DesignIntf, ExptIntf, Classes, Db, ColnEdit;
-{$ELSE}
-ToolsApi, Graphics, DesignWindows, DesignEditors, DBReg, DesignIntf,
-  Classes, Db, DbTables, DSDesign, ColnEdit;
-{$IFEND}
-{$ENDIF}
+  Classes, DesignIntf, DesignEditors,
+  uRESTDWIcsBase;
 
 Type
   TPoolersList = Class(TStringProperty)
@@ -60,18 +41,27 @@ Procedure Register;
 
 Implementation
 
-{$IFNDEF FPC}
- {$if CompilerVersion < 23}
-  {$R .\RESTDWSocketIndyDesign.dcr}
- {$IFEND}
-{$ENDIF}
-
-uses uRESTDWCharset{$IFDEF FPC}, utemplateproglaz{$ENDIF};
-
 Function TPoolersList.GetAttributes: TPropertyAttributes;
 Begin
   // editor, sorted list, multiple selection
   Result := [paValueList, paSortList];
+End;
+
+procedure TPoolersList.GetValues(Proc: TGetStrProc);
+Var
+  vLista: TStringList;
+  I: Integer;
+Begin
+  // Provide a list of Poolers
+  // With GetComponent(0) as TRESTDWIcsDatabase Do
+  // Begin
+  // Try
+  // vLista := TRESTDWIcsDatabase(GetComponent(0)).PoolerList;
+  // For I := 0 To vLista.Count - 1 Do
+  // Proc(vLista[I]);
+  // Except
+  // End;
+  // End;
 End;
 
 Procedure TPoolersList.Edit;
@@ -86,31 +76,9 @@ Begin
   End;
 end;
 
-Procedure TPoolersList.GetValues(Proc: TGetStrProc);
-Var
-  vLista: TStringList;
-  I: Integer;
-Begin
-  // Provide a list of Poolers
-//  With GetComponent(0) as TRESTDWIcsDatabase Do
-//  Begin
-//    Try
-//      vLista := TRESTDWIcsDatabase(GetComponent(0)).PoolerList;
-//      For I := 0 To vLista.Count - 1 Do
-//        Proc(vLista[I]);
-//    Except
-//    End;
-//  End;
-End;
-
 Procedure Register;
 Begin
   RegisterComponents('REST Dataware - Service', [TRESTDWIcsServicePooler]);
-//  RegisterComponents('REST Dataware - Client''s',
-//    [TRESTDWIdClientREST, TRESTDWIdClientPooler]);
-//  RegisterComponents('REST Dataware - DB', [TRESTDWIdDatabase]);
-//  RegisterPropertyEditor(TypeInfo(String), TRESTDWIdDatabase, 'PoolerName',
-//    TPoolersList);
 End;
 
 initialization

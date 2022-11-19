@@ -27,11 +27,11 @@
 Interface
 
 Uses
-  Classes, SysUtils,    TypInfo, uRESTDWParams, uRESTDWComponentBase, DB,
-  uRESTDWEncodeClass,   uRESTDWCharset,         uRESTDWComponentEvents,
-  uRESTDWMassiveBuffer, uRESTDWJSONInterface,   uRESTDWConsts,
-  uRESTDWDataModule,    uRESTDWBasicTypes,      uRESTDWTools,
-  uRESTDWBufferBase,    Variants,               uRESTDWMemtable;
+  Classes, SysUtils, TypInfo, DB, Variants,
+  uRESTDWParams, uRESTDWComponentBase, uRESTDWEncodeClass,
+  uRESTDWComponentEvents, uRESTDWMassiveBuffer, uRESTDWJSONInterface,
+  uRESTDWConsts, uRESTDWDataModule, uRESTDWBasicTypes, uRESTDWTools,
+  uRESTDWBufferBase, uRESTDWMemtable;
 
 Type
   TRESTDWDatabaseInfo = Record
