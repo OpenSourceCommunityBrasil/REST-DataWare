@@ -42,16 +42,34 @@ unit uRESTDWIcsBase;
 interface
 
 Uses
-  SysUtils, Classes, DateUtils, Db, Variants,
+  System.SysUtils,
+  System.Classes,
+  System.DateUtils,
+  Data.Db,
+  Variants,
   VCL.ExtCtrls,
-
-  uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
-  uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWComponentBase,
-  uRESTDWConsts, uRESTDWEncodeClass, uRESTDWDataUtils, uRESTDWTools,
-
-  OverbyteIcsWinSock, OverbyteIcsWSocket, OverbyteIcsWndControl,
-  OverbyteIcsHttpAppServer, OverbyteIcsUtils, OverbyteIcsFormDataDecoder,
-  OverbyteIcsMimeUtils, OverbyteIcsSSLEAY, OverbyteIcsHttpSrv,
+  uRESTDWComponentEvents,
+  uRESTDWBasicTypes,
+  uRESTDWJSONObject,
+  uRESTDWBasic,
+  uRESTDWBasicDB,
+  uRESTDWParams,
+  uRESTDWBasicClass,
+  uRESTDWComponentBase,
+  uRESTDWCharset,
+  uRESTDWConsts,
+  uRESTDWEncodeClass,
+  uRESTDWDataUtils,
+  uRESTDWTools,
+  OverbyteIcsWinSock,
+  OverbyteIcsWSocket,
+  OverbyteIcsWndControl,
+  OverbyteIcsHttpAppServer,
+  OverbyteIcsUtils,
+  OverbyteIcsFormDataDecoder,
+  OverbyteIcsMimeUtils,
+  OverbyteIcsSSLEAY,
+  OverbyteIcsHttpSrv,
   OverbyteIcsWSocketS;
 
 Type
@@ -123,7 +141,7 @@ Type
 
     // SSL Params
     vSSLRootCertFile, vSSLPrivateKeyFile, vSSLPrivateKeyPassword, vSSLCertFile: String;
-    vSSLMethod: TSslVersionMethod;
+    vSSLVerMethodMin, vSSLVerMethodMax: TSslVerMethod;
     vSSLVerifyMode: TSslVerifyPeerModes;
     vSSLVerifyDepth: Integer;
     vSSLVerifyPeer: Boolean;
@@ -198,8 +216,10 @@ Type
     Property SSLPrivateKeyPassword: String Read vSSLPrivateKeyPassword
       Write vSSLPrivateKeyPassword;
     Property SSLCertFile: String Read vSSLCertFile Write vSSLCertFile;
-    Property SSLMethod: TSslVersionMethod Read vSSLMethod Write vSSLMethod
-      default sslBestVer;
+    Property SSLVersionMin: TSslVerMethod Read vSSLVerMethodMin Write vSSLVerMethodMin
+      default sslVerTLS1_2;
+    Property SSLVersionMax: TSslVerMethod Read vSSLVerMethodMax Write vSSLVerMethodMax
+      default sslVerMax;
     Property SSLVerifyMode: TSslVerifyPeerModes Read vSSLVerifyMode Write vSSLVerifyMode;
     Property SSLVerifyDepth: Integer Read vSSLVerifyDepth Write vSSLVerifyDepth default 9;
     Property SSLVerifyPeer: Boolean Read vSSLVerifyPeer Write vSSLVerifyPeer
@@ -221,7 +241,7 @@ Type
       default 262144; // 256kb Default
     Property BandWidthLimitBytes: Cardinal Read vBandWidthLimitBytes
       Write vBandWidthLimitBytes default 0;
-    Property BandWidthSamplingBytes: Cardinal Read vBandWidthSampleSec
+    Property BandWidthSamplingSec: Cardinal Read vBandWidthSampleSec
       Write vBandWidthSampleSec default 1;
     Property ListenBacklog: Integer Read vListenBacklog Write vListenBacklog default 50;
 
@@ -253,14 +273,13 @@ begin
       HttpAppSrv.SSLContext.SSLVerifyPeer := vSSLVerifyPeer;
       HttpAppSrv.SSLContext.SSLVerifyDepth := vSSLVerifyDepth;
       HttpAppSrv.SSLContext.SslVerifyPeerModes := vSSLVerifyMode;
-      HttpAppSrv.SSLContext.SslVersionMethod := vSSLMethod;
+      HttpAppSrv.SSLContext.SslMinVersion := vSSLVerMethodMin;
+      HttpAppSrv.SSLContext.SslMaxVersion := vSSLVerMethodMax;
       HttpAppSrv.SSLContext.SSLCertFile := vSSLCertFile;
       HttpAppSrv.SSLContext.SslPrivKeyFile := vSSLPrivateKeyFile;
       HttpAppSrv.SSLContext.SslPassPhrase := vSSLPrivateKeyPassword;
 
       // TODO 1
-      HttpAppSrv.SSLContext.SslMaxVersion := TSslVerMethod.sslVerMax;
-      HttpAppSrv.SSLContext.SslMinVersion := TSslVerMethod.sslVerSSL3;
       HttpAppSrv.SSLContext.SslCliSecurity := TSslCliSecurity.sslCliSecIgnore;
       HttpAppSrv.SSLContext.SslSecLevel := TSslSecLevel.sslSecLevelAny;
 
@@ -445,7 +464,8 @@ Begin
   HttpAppSrv.TemplateDir := '';
   HttpAppSrv.DefaultDoc := '';
 
-  vSSLMethod := sslBestVer;
+  vSSLVerMethodMin := sslVerTLS1_2;
+  vSSLVerMethodMax := sslVerMax;
   vSSLVerifyDepth := 9;
   vSSLVerifyPeer := false;
   vSSLTimeoutSec := 60; // SSL TimeOut in Seconds
@@ -456,7 +476,7 @@ Begin
   vServiceTimeout := 60; // TimeOut in Seconds
   vBuffSizeBytes := 262144; // 256kb Default
   vBandWidthLimitBytes := 0;
-  vBandWidthSampleSec := 1000;
+  vBandWidthSampleSec := 1;
   vListenBacklog := 50;
 
   vIpBlackList := TStringList.Create;
@@ -490,6 +510,9 @@ begin
   // Check for Brute Force exploit
   if not(vBruteForceProtection.BruteForceAllow(Remote.PeerAddr)) then
   begin
+    if Assigned(vOnClientConnect) then
+      vOnClientConnect(Remote, Remote.LastError);
+
     Remote.Close;
 
     if Assigned(vOnBruteForceBlock) then
@@ -503,6 +526,9 @@ begin
   begin
     if vIpBlackList.IndexOf(Remote.PeerAddr) <> -1 then
     begin
+      if Assigned(vOnClientConnect) then
+        vOnClientConnect(Remote, Remote.LastError);
+
       Remote.Close;
 
       if Assigned(vOnBlackListed) then
@@ -799,12 +825,7 @@ begin
         if vBruteForceProtection.BruteForceAllow(Pooler.PeerAddr) then
           Pooler.Answer401
         else
-        begin
           Pooler.Answer403;
-
-          if Assigned(vOnBruteForceBlock) then
-            vOnBruteForceBlock(Pooler.PeerAddr, Pooler.PeerPort);
-        end;
       end;
     403:
       Pooler.Answer403;
