@@ -36,17 +36,12 @@ unit uRESTDWIcsBase;
 // TODO 3
 // Portar AnonymousThread pra Thread (compatibilidade com Delphi antigo);
 
-// TODO 4
-// Portar a propriedade RequestTimeOut para dentro dos Sockets (remover no Pooler Base);
-
 interface
 
 Uses
   System.SysUtils,
   System.Classes,
   System.DateUtils,
-  Data.Db,
-  Variants,
   VCL.ExtCtrls,
   uRESTDWComponentEvents,
   uRESTDWBasicTypes,
@@ -56,7 +51,6 @@ Uses
   uRESTDWParams,
   uRESTDWBasicClass,
   uRESTDWComponentBase,
-  uRESTDWCharset,
   uRESTDWConsts,
   uRESTDWEncodeClass,
   uRESTDWDataUtils,
@@ -70,7 +64,8 @@ Uses
   OverbyteIcsMimeUtils,
   OverbyteIcsSSLEAY,
   OverbyteIcsHttpSrv,
-  OverbyteIcsWSocketS;
+  OverbyteIcsWSocketS,
+  OverbyteIcsSslX509Utils;
 
 Type
 
@@ -90,16 +85,54 @@ Type
   TOnDocumentReady = Procedure(Sender: TPoolerHttpConnection; Var Flags: THttpGetFlag)
     Of Object;
   TOnAnswered = Procedure(Sender: TPoolerHttpConnection) Of Object;
+  TOnTimeout = Procedure(Sender: TPoolerHttpConnection; Reason: TTimeoutReason) of Object;
   TOnBlackListed = Procedure(IP, Port: string) Of Object;
   TOnBruteForceBlock = Procedure(IP, Port: string) Of Object;
 
-  TBruteForceProtection = class(TPersistent)
+  TIcsSelfAssignedCert = class(TPersistent)
+  private
+    vAutoGenerateOnStart: boolean;
+    vCountry: string;
+    vState: string;
+    vLocality: string;
+    vOrganization: string;
+    vOrgUnit: string;
+    vExpireDays: Integer;
+    vEmail: string;
+    vCommonName: string;
+    vPrivKeyType: TSslPrivKeyType;
+    vCertDigest: TEvpDigest;
+    vCert: TSslCertTools;
+  public
+    constructor Create;
+    destructor Destory;
+    procedure CreateCertificate;
+    function CertificateString: string;
+    function PrivateKeyString: string;
+  published
+    property AutoGenerateOnStart: boolean read vAutoGenerateOnStart
+      write vAutoGenerateOnStart default false;
+    property Country: String read vCountry write vCountry;
+    property State: String read vState write vState;
+    property Locality: String read vLocality write vLocality;
+    property Organization: String read vOrganization write vOrganization;
+    property OrganizationUnit: String read vOrgUnit write vOrgUnit;
+    property Email: String read vEmail write vEmail;
+    property ExpireDays: Integer read vExpireDays write vExpireDays default 365;
+    property CommonName: String read vCommonName write vCommonName;
+    property PrivateKeyType: TSslPrivKeyType read vPrivKeyType write vPrivKeyType
+      default PrivKeyRsa4096;
+    property CertificateDigestType: TEvpDigest read vCertDigest write vCertDigest
+      default Digest_sha512;
+  end;
+
+  TIcsBruteForceProtection = class(TPersistent)
   private
     vBruteForceSampleMin: Integer;
     vBruteForceTry: Integer;
     vBruteForceExpirationMin: Integer;
     vBruteForceList: TStringList;
-    vBruteForceProtectionStatus: Boolean;
+    vBruteForceProtectionStatus: boolean;
     vBruteForceTimer: TTimer;
     function GetBruteForceIndex(IP: String): Integer;
   public
@@ -110,9 +143,9 @@ Type
     procedure StopBruteForce;
     procedure SampleBruteForce(Sender: TObject);
     procedure BruteForceAttempt(IP: String);
-    function BruteForceAllow(IP: String): Boolean;
+    function BruteForceAllow(IP: String): boolean;
   published
-    property BruteForceProtectionStatus: Boolean read vBruteForceProtectionStatus
+    property BruteForceProtectionStatus: boolean read vBruteForceProtectionStatus
       write vBruteForceProtectionStatus default true;
     property BruteForceSampleMin: Integer read vBruteForceSampleMin
       write vBruteForceSampleMin default 1;
@@ -133,6 +166,7 @@ Type
     vOnClientDisconnect: TOnClientDisconnect;
     vOnDocumentReady: TOnDocumentReady;
     vOnAnswered: TOnAnswered;
+    vOnTimeout: TOnTimeout;
     vOnBlackListed: TOnBlackListed;
     vOnBruteForceBlock: TOnBruteForceBlock;
 
@@ -144,11 +178,12 @@ Type
     vSSLVerMethodMin, vSSLVerMethodMax: TSslVerMethod;
     vSSLVerifyMode: TSslVerifyPeerModes;
     vSSLVerifyDepth: Integer;
-    vSSLVerifyPeer: Boolean;
+    vSSLVerifyPeer: boolean;
     vSSLCacheModes: TSslSessCacheModes;
     vSSLTimeoutSec: Cardinal;
-    vSSLUse: Boolean;
+    vSSLUse: boolean;
     vSSLCliCertMethod: TSslCliCertMethod;
+    vIcsSelfAssignedCert: TIcsSelfAssignedCert;
 
     // HTTP Params
     vMaxClients: Integer;
@@ -160,11 +195,8 @@ Type
     vListenBacklog: Integer;
 
     // Security
-    vBruteForceProtection: TBruteForceProtection;
+    vBruteForceProtection: TIcsBruteForceProtection;
     vIpBlackList: TStrings;
-    procedure SetvIpBlackList(Lines: TStrings);
-    procedure CustomAnswerStream(Pooler: TPoolerHttpConnection; Flag: THttpGetFlag;
-      StatusCode: Integer; ContentType, Header: String);
 
   Public
     Constructor Create(AOwner: TComponent); Override;
@@ -179,6 +211,8 @@ Type
     procedure onServerStoppedServer(Sender: TObject);
     procedure onClientDisconnectServer(Sender: TObject; Client: TObject; Error: Word);
     procedure onAnsweredServer(Sender: TObject);
+    procedure CustomAnswerStream(Pooler: TPoolerHttpConnection; Flag: THttpGetFlag;
+      StatusCode: Integer; ContentType, Header: String);
 
     // Prepare procedures
     procedure SetHttpServerSSL;
@@ -188,9 +222,11 @@ Type
     procedure onClientConnectServer(Sender: TObject; Client: TObject; Error: Word);
 
     // Misc Procedures
-    Procedure SetActive(Value: Boolean); Override;
+    Function ClientCount: Integer;
+    Procedure SetActive(Value: boolean); Override;
     Procedure EchoPooler(ServerMethodsClass: TComponent; AContext: TComponent;
-      Var Pooler, MyIP: String; AccessTag: String; Var InvalidTag: Boolean); Override;
+      Var Pooler, MyIP: String; AccessTag: String; Var InvalidTag: boolean); Override;
+    procedure onClientTimeout(Sender: TObject; Reason: TTimeoutReason);
 
   Published
     // Events
@@ -206,6 +242,7 @@ Type
     Property onDocumentReady: TOnDocumentReady Read vOnDocumentReady
       Write vOnDocumentReady;
     Property onAnswered: TOnAnswered Read vOnAnswered Write vOnAnswered;
+    Property onTimeout: TOnTimeout read vOnTimeout Write vOnTimeout;
     Property onBlackListed: TOnBlackListed Read vOnBlackListed Write vOnBlackListed;
     Property onBruteForceBlock: TOnBruteForceBlock Read vOnBruteForceBlock
       Write vOnBruteForceBlock;
@@ -222,13 +259,15 @@ Type
       default sslVerMax;
     Property SSLVerifyMode: TSslVerifyPeerModes Read vSSLVerifyMode Write vSSLVerifyMode;
     Property SSLVerifyDepth: Integer Read vSSLVerifyDepth Write vSSLVerifyDepth default 9;
-    Property SSLVerifyPeer: Boolean Read vSSLVerifyPeer Write vSSLVerifyPeer
+    Property SSLVerifyPeer: boolean Read vSSLVerifyPeer Write vSSLVerifyPeer
       default false;
     Property SSLCacheModes: TSslSessCacheModes Read vSSLCacheModes Write vSSLCacheModes;
     Property SSLTimeoutSec: Cardinal Read vSSLTimeoutSec Write vSSLTimeoutSec default 60;
+    property SelfAssignedCert: TIcsSelfAssignedCert read vIcsSelfAssignedCert
+      write vIcsSelfAssignedCert;
 
     // SSL TimeOut in Seconds
-    Property SSLUse: Boolean Read vSSLUse Write vSSLUse default false;
+    Property SSLUse: boolean Read vSSLUse Write vSSLUse default false;
     Property SSLCliCertMethod: TSslCliCertMethod Read vSSLCliCertMethod
       Write vSSLCliCertMethod;
 
@@ -236,7 +275,7 @@ Type
     Property MaxClients: Integer Read vMaxClients Write vMaxClients default 0;
     Property KeepAliveSec: Cardinal Read vKeepAliveSec Write vKeepAliveSec default 0;
     Property RequestTimeout: Integer Read vServiceTimeout Write vServiceTimeout
-      default 60; // Connection TimeOut in Seconds
+      default 60000; // Connection TimeOut in Milliseconds
     Property BuffSizeBytes: Integer Read vBuffSizeBytes Write vBuffSizeBytes
       default 262144; // 256kb Default
     Property BandWidthLimitBytes: Cardinal Read vBandWidthLimitBytes
@@ -246,8 +285,9 @@ Type
     Property ListenBacklog: Integer Read vListenBacklog Write vListenBacklog default 50;
 
     // Secutiry
+    procedure SetvIpBlackList(Lines: TStrings);
     Property IpBlackList: TStrings Read vIpBlackList Write SetvIpBlackList;
-    Property BruteForceProtection: TBruteForceProtection read vBruteForceProtection
+    Property BruteForceProtection: TIcsBruteForceProtection read vBruteForceProtection
       write vBruteForceProtection;
   End;
 
@@ -268,6 +308,11 @@ begin
     begin
       HttpAppSrv.SSLContext := TSslContext.Create(HttpAppSrv);
 
+      HttpAppSrv.SslEnable := true;
+
+      for x := 0 to HttpAppSrv.MultiListenSockets.Count - 1 do
+        HttpAppSrv.MultiListenSockets[x].SslEnable := true;
+
       HttpAppSrv.SSLContext.SslSessionTimeout := vSSLTimeoutSec;
       HttpAppSrv.SSLContext.SslSessionCacheModes := vSSLCacheModes;
       HttpAppSrv.SSLContext.SSLVerifyPeer := vSSLVerifyPeer;
@@ -275,29 +320,35 @@ begin
       HttpAppSrv.SSLContext.SslVerifyPeerModes := vSSLVerifyMode;
       HttpAppSrv.SSLContext.SslMinVersion := vSSLVerMethodMin;
       HttpAppSrv.SSLContext.SslMaxVersion := vSSLVerMethodMax;
-      HttpAppSrv.SSLContext.SSLCertFile := vSSLCertFile;
-      HttpAppSrv.SSLContext.SslPrivKeyFile := vSSLPrivateKeyFile;
-      HttpAppSrv.SSLContext.SslPassPhrase := vSSLPrivateKeyPassword;
+
+      if vIcsSelfAssignedCert.vAutoGenerateOnStart then
+      begin
+        vIcsSelfAssignedCert.CreateCertificate;
+
+        HttpAppSrv.SSLContext.SslPrivKeyLines.Text :=
+          vIcsSelfAssignedCert.PrivateKeyString;
+        HttpAppSrv.SSLContext.SslCertLines.Text := vIcsSelfAssignedCert.CertificateString;
+      end
+      else
+      begin
+        HttpAppSrv.SSLContext.SSLCertFile := vSSLCertFile;
+        HttpAppSrv.SSLContext.SslPrivKeyFile := vSSLPrivateKeyFile;
+        HttpAppSrv.SSLContext.SslPassPhrase := vSSLPrivateKeyPassword;
+        HttpAppSrv.RootCA := vSSLRootCertFile;
+      end;
 
       // TODO 1
       HttpAppSrv.SSLContext.SslCliSecurity := TSslCliSecurity.sslCliSecIgnore;
       HttpAppSrv.SSLContext.SslSecLevel := TSslSecLevel.sslSecLevelAny;
-
-      HttpAppSrv.RootCA := vSSLRootCertFile;
-
-      HttpAppSrv.SslEnable := true;
-
-      for x := 0 to HttpAppSrv.MultiListenSockets.Count - 1 do
-        HttpAppSrv.MultiListenSockets[x].SslEnable := true;
     end
     else
     begin
-      HttpAppSrv.SSLContext := nil;
-
       HttpAppSrv.SslEnable := false;
 
       for x := 0 to HttpAppSrv.MultiListenSockets.Count - 1 do
         HttpAppSrv.MultiListenSockets[x].SslEnable := false;
+
+      HttpAppSrv.SSLContext := nil;
     end;
   end
   else
@@ -322,10 +373,10 @@ begin
     HttpAppSrv.MaxClients := vMaxClients;
     HttpAppSrv.KeepAliveTimeSec := vKeepAliveSec;
 
-    if vServiceTimeout > 0 then
+    if trunc(vServiceTimeout / 1000) > 0 then
     begin
       HttpAppSrv.LingerOnOff := wsLingerOn;
-      HttpAppSrv.LingerTimeout := vServiceTimeout;
+      HttpAppSrv.LingerTimeout := trunc(vServiceTimeout / 1000);
     end
     else
     begin
@@ -404,10 +455,10 @@ procedure TRESTDWIcsServicePooler.onExceptionServer(Sender: TObject; E: ESocketE
 var
   Remote: TPoolerHttpConnection;
 begin
+  Remote := Sender as TPoolerHttpConnection;
+
   if Assigned(vOnException) then
   begin
-    Remote := Sender as TPoolerHttpConnection;
-
     vOnException(Remote, E);
   end;
 end;
@@ -433,8 +484,32 @@ begin
   vIpBlackList.Assign(Lines);
 end;
 
+procedure TRESTDWIcsServicePooler.onClientTimeout(Sender: TObject;
+  Reason: TTimeoutReason);
+var
+  Remote: TPoolerHttpConnection;
+begin
+  Remote := Sender as TPoolerHttpConnection;
+
+  Remote.CloseDelayed;
+
+  if Assigned(vOnTimeout) then
+  begin
+    vOnTimeout(Remote, Reason);
+  end;
+end;
+
 procedure TRESTDWIcsServicePooler.SetHttpConnectionParams(Remote: TPoolerHttpConnection);
 begin
+  Remote.TimeoutIdle := vServiceTimeout;
+  Remote.TimeoutConnect := vServiceTimeout;
+  Remote.TimeoutSampling := 1000;
+
+  if vServiceTimeout > 0 then
+    Remote.TimeoutStartSampling
+  else
+    Remote.TimeoutStopSampling;
+
   Remote.LineMode := true;
   Remote.LineLimit := MaxInt;
   Remote.LineEnd := sLineBreak;
@@ -442,6 +517,7 @@ begin
   Remote.RawData := '';
   Remote.RawDataLen := 0;
 
+  Remote.onTimeout := onClientTimeout;
   Remote.OnGetDocument := onDocumentReadyServer;
   Remote.OnPostDocument := onDocumentReadyServer;
   Remote.OnPutDocument := onDocumentReadyServer;
@@ -450,6 +526,16 @@ begin
   Remote.onPostedData := onPostedDataServer;
   Remote.onException := onExceptionServer;
   Remote.OnAfterAnswer := onAnsweredServer;
+end;
+
+function TRESTDWIcsServicePooler.ClientCount: Integer;
+begin
+  try
+    if Assigned(HttpAppSrv) then
+      Result := HttpAppSrv.ClientCount;
+  except
+    Result := 0;
+  end;
 end;
 
 Constructor TRESTDWIcsServicePooler.Create(AOwner: TComponent);
@@ -470,10 +556,11 @@ Begin
   vSSLVerifyPeer := false;
   vSSLTimeoutSec := 60; // SSL TimeOut in Seconds
   vSSLUse := false;
+  vIcsSelfAssignedCert := TIcsSelfAssignedCert.Create;
 
   vMaxClients := 0;
   vKeepAliveSec := 0;
-  vServiceTimeout := 60; // TimeOut in Seconds
+  vServiceTimeout := 60000; // TimeOut in Milliseconds
   vBuffSizeBytes := 262144; // 256kb Default
   vBandWidthLimitBytes := 0;
   vBandWidthSampleSec := 1;
@@ -482,7 +569,7 @@ Begin
   vIpBlackList := TStringList.Create;
   vIpBlackList.Clear;
 
-  vBruteForceProtection := TBruteForceProtection.Create;
+  vBruteForceProtection := TIcsBruteForceProtection.Create;
 
   Inherited;
 End;
@@ -491,10 +578,10 @@ procedure TRESTDWIcsServicePooler.onAnsweredServer(Sender: TObject);
 var
   Remote: TPoolerHttpConnection;
 begin
+  Remote := Sender as TPoolerHttpConnection;
+
   if Assigned(vOnAnswered) then
   begin
-    Remote := Sender as TPoolerHttpConnection;
-
     vOnAnswered(Remote);
   end;
 end;
@@ -513,7 +600,7 @@ begin
     if Assigned(vOnClientConnect) then
       vOnClientConnect(Remote, Remote.LastError);
 
-    Remote.Close;
+    Remote.CloseDelayed;
 
     if Assigned(vOnBruteForceBlock) then
       vOnBruteForceBlock(Remote.PeerAddr, Remote.PeerPort);
@@ -529,7 +616,7 @@ begin
       if Assigned(vOnClientConnect) then
         vOnClientConnect(Remote, Remote.LastError);
 
-      Remote.Close;
+      Remote.CloseDelayed;
 
       if Assigned(vOnBlackListed) then
         vOnBlackListed(Remote.PeerAddr, Remote.PeerPort);
@@ -586,7 +673,7 @@ Begin
 End;
 
 Procedure TRESTDWIcsServicePooler.EchoPooler(ServerMethodsClass, AContext: TComponent;
-  Var Pooler, MyIP: String; AccessTag: String; Var InvalidTag: Boolean);
+  Var Pooler, MyIP: String; AccessTag: String; Var InvalidTag: boolean);
 Var
   Remote: THttpAppSrvConnection;
   i: Integer;
@@ -817,6 +904,9 @@ end;
 Procedure TRESTDWIcsServicePooler.CustomAnswerStream(Pooler: TPoolerHttpConnection;
 Flag: THttpGetFlag; StatusCode: Integer; ContentType: String; Header: String);
 begin
+
+  Pooler.TimeoutStopSampling;
+
   case StatusCode of
     401:
       begin
@@ -856,7 +946,7 @@ begin
   end;
 End;
 
-Procedure TRESTDWIcsServicePooler.SetActive(Value: Boolean);
+Procedure TRESTDWIcsServicePooler.SetActive(Value: boolean);
 var
   x: Integer;
 Begin
@@ -912,9 +1002,9 @@ begin
   inherited Destroy;
 end;
 
-{ TBruteForceProtection }
+{ TIcsBruteForceProtection }
 
-function TBruteForceProtection.BruteForceAllow(IP: String): Boolean;
+function TIcsBruteForceProtection.BruteForceAllow(IP: String): boolean;
 var
   aux: TStringList;
 
@@ -956,12 +1046,12 @@ begin
     Result := true;
 end;
 
-function TBruteForceProtection.GetBruteForceIndex(IP: String): Integer;
+function TIcsBruteForceProtection.GetBruteForceIndex(IP: String): Integer;
 begin
   Result := vBruteForceList.IndexOfName(IP);
 end;
 
-procedure TBruteForceProtection.SampleBruteForce(Sender: TObject);
+procedure TIcsBruteForceProtection.SampleBruteForce(Sender: TObject);
 var
   x: Integer;
   aux: TStringList;
@@ -986,7 +1076,7 @@ begin
   end;
 end;
 
-procedure TBruteForceProtection.StartBruteForce;
+procedure TIcsBruteForceProtection.StartBruteForce;
 begin
 
   if Assigned(vBruteForceTimer) then
@@ -1011,7 +1101,7 @@ begin
 
 end;
 
-procedure TBruteForceProtection.StopBruteForce;
+procedure TIcsBruteForceProtection.StopBruteForce;
 begin
 
   if Assigned(vBruteForceTimer) then
@@ -1025,7 +1115,7 @@ begin
 
 end;
 
-procedure TBruteForceProtection.BruteForceAttempt(IP: String);
+procedure TIcsBruteForceProtection.BruteForceAttempt(IP: String);
 var
   aux: TStringList;
 
@@ -1062,7 +1152,7 @@ begin
   end;
 end;
 
-procedure TBruteForceProtection.ClearBruteForceList;
+procedure TIcsBruteForceProtection.ClearBruteForceList;
 begin
 
   if Assigned(vBruteForceList) then
@@ -1073,7 +1163,7 @@ begin
 
 end;
 
-constructor TBruteForceProtection.Create;
+constructor TIcsBruteForceProtection.Create;
 begin
   vBruteForceSampleMin := 1;
   vBruteForceTry := 3;
@@ -1085,12 +1175,64 @@ begin
   vBruteForceList.NameValueSeparator := '=';
 end;
 
-destructor TBruteForceProtection.Destroy;
+destructor TIcsBruteForceProtection.Destroy;
 begin
   StopBruteForce;
 
   if Assigned(vBruteForceList) then
     FreeAndNil(vBruteForceList);
+end;
+
+{ TIcsSelfAssignedCert }
+
+function TIcsSelfAssignedCert.CertificateString: string;
+begin
+  Result := vCert.SaveCertToText;
+end;
+
+constructor TIcsSelfAssignedCert.Create;
+begin
+  if Assigned(vCert) then
+    FreeAndNil(vCert);
+
+  vCert := TSslCertTools.Create(nil);
+
+  vAutoGenerateOnStart := false;
+  vPrivKeyType := TSslPrivKeyType.PrivKeyRsa4096;
+  vCertDigest := TEvpDigest.Digest_sha512;
+  vExpireDays := 365;
+end;
+
+procedure TIcsSelfAssignedCert.CreateCertificate;
+begin
+  vCert.DoClearCerts;
+  vCert.DoClearCA;
+  vCert.ClearAll;
+
+  vCert.Country := vCountry;
+  vCert.State := vState;
+  vCert.Locality := vLocality;
+  vCert.Organization := vOrganization;
+  vCert.OrgUnit := vOrgUnit;
+  vCert.Email := vEmail;
+  vCert.CommonName := vCommonName;
+  vCert.PrivKeyType := vPrivKeyType;
+  vCert.CertDigest := vCertDigest;
+  vCert.ExpireDays := vExpireDays;
+
+  vCert.DoKeyPair;
+  vCert.DoSelfSignCert;
+end;
+
+destructor TIcsSelfAssignedCert.Destory;
+begin
+  if Assigned(vCert) then
+    FreeAndNil(vCert);
+end;
+
+function TIcsSelfAssignedCert.PrivateKeyString: string;
+begin
+  Result := vCert.SavePKeyToText;
 end;
 
 End.
