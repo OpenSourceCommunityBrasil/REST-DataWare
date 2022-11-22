@@ -373,17 +373,6 @@ begin
     HttpAppSrv.MaxClients := vMaxClients;
     HttpAppSrv.KeepAliveTimeSec := vKeepAliveSec;
 
-    if trunc(vServiceTimeout / 1000) > 0 then
-    begin
-      HttpAppSrv.LingerOnOff := wsLingerOn;
-      HttpAppSrv.LingerTimeout := trunc(vServiceTimeout / 1000);
-    end
-    else
-    begin
-      HttpAppSrv.LingerOnOff := wsLingerOff;
-      HttpAppSrv.LingerTimeout := 0;
-    end;
-
     HttpAppSrv.MaxBlkSize := vBuffSizeBytes;
 
     HttpAppSrv.BandwidthLimit := vBandWidthLimitBytes;
