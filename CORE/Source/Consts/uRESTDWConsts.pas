@@ -45,8 +45,8 @@ Const
  GOffsetFromUTC   : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
  
  // controle de versão
- RESTDWVersionINFO          = 'v2.0.7-';
- RESTDWRelease              = '79';
+ RESTDWVersionINFO          = 'v2.0.8-';
+ RESTDWRelease              = '1';
  RESTDWCodeProject          = 'Savage Reign - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  RESTDWDialogoTitulo        = 'REST DataWare Components';
