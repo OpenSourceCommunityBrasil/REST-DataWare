@@ -254,7 +254,7 @@ Begin
           vParamMethods := TRESTDWServerEvents(Components[I]).Events[A].Params;
           Break;
         end
-        else if SameText(vTempRoute, Copy(vTempValue, 1, Length(vTempRoute))) then begin
+        else if SameText(vTempRoute+'/', Copy(vTempValue+'/', 1, Length(vTempRoute+'/'))) then begin
           Result := True;
           vTempURL := vTempRoute;
           vTempParamsURI := Copy(vTempValue,Length(vTempRoute) + 2, Length(vTempValue));
@@ -276,7 +276,7 @@ Begin
           vParamMethods := TRESTDWServerContext(Components[I]).ContextList[A].Params;
           Break;
          End
-        Else If SameText(vTempRoute, Copy(vTempValue, 1, Length(vTempRoute))) Then
+        Else If SameText(vTempRoute+'/', Copy(vTempValue+'/', 1, Length(vTempRoute+'/'))) Then
          Begin
           Result := True;
           vTempURL := vTempRoute;
