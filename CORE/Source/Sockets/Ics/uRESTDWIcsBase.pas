@@ -658,6 +658,9 @@ Begin
   if Assigned(vBruteForceProtection) then
     FreeAndNil(vBruteForceProtection);
 
+  if Assigned(vIcsSelfAssignedCert) then
+    FreeAndNil(vIcsSelfAssignedCert);
+
   Inherited;
 End;
 
