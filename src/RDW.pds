@@ -1,6 +1,6 @@
 [Main]
 StoreRelativePaths=1
-Language=br.1252
+Language=br.utf8
 OutputDir=..\..\gh-pages
 GenerateFormat=0
 ProjectName=
