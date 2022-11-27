@@ -849,7 +849,6 @@ Begin
    vJSONValue.DatabaseCharSet := csUndefined;
    {$ENDIF}
    vJSONValue.LoadFromStream(Stream);
-   vJSONValue.Encoded         := True;
   End;
  vIsNull := vJSONValue.IsNull;
 End;
@@ -859,6 +858,7 @@ Begin
  vJSONValue.ObjectValue := ovBlob;
  vJSONValue.Encoded     := False;
  vJSONValue.SaveToStream(Stream);
+ Stream.Position := 0;
 End;
 
 Procedure TMassiveValue.SetModified(Value : Boolean);
@@ -1534,12 +1534,12 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                          TBlobField(Field).SaveToStream(vStringStream);
                                          vStringStream.Position := 0;
                                          If Not UpdateTag Then
-                                          MassiveLineBuff.vMassiveValues.Items[I + 1].Value := EncodeStream(vStringStream) //StreamToHex(vStringStream)
+                                          MassiveLineBuff.vMassiveValues.Items[I + 1].LoadFromStream(vStringStream) //StreamToHex(vStringStream)
                                          Else
                                           Begin
                                            If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> EncodeStream(vStringStream) Then //StreamToHex(vStringStream) Then
                                             Begin
-                                             MassiveLineBuff.vMassiveValues.Items[I + 1].Value := EncodeStream(vStringStream); //StreamToHex(vStringStream);
+                                             MassiveLineBuff.vMassiveValues.Items[I + 1].LoadFromStream(vStringStream); //StreamToHex(vStringStream);
                                              MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
                                             End;
                                           End;

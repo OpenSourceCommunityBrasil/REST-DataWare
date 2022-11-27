@@ -4224,6 +4224,7 @@ Var
  I, A              : Integer;
  vMasterField,
  vTempValue        : String;
+ vDados,
  vStringStream     : TMemoryStream;
  MassiveField      : TMassiveField;
  MassiveReplyValue : TMassiveReplyValue;
@@ -4430,7 +4431,9 @@ Begin
         Begin
          A := -1;
          If (MassiveDataset.SequenceName <> '') Then
-          A := GetGenID(MassiveDataset.SequenceName);
+          A := GetGenID(MassiveDataset.SequenceName)
+         Else
+          Query.Fields[I].Required := False;
          If A > -1 Then
           Query.Fields[I].Value := A;
          Continue;
@@ -4601,7 +4604,9 @@ Begin
             If (vTempValue <> 'null') And
                (vTempValue <> '') Then
              Begin
-              vStringStream := DecodeStream(vTempValue);
+              vStringStream := TMemoryStream.Create;
+              MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).SaveToStream(vStringStream);
+//              vStringStream := DecodeStream(vTempValue);
               vStringStream.Position := 0;
               TBlobfield(Query.Fields[I]).LoadFromStream(vStringStream);
              End
