@@ -58,6 +58,7 @@ Procedure TRESTDWShellService.Command(ARequest    : TRequest;
                                       Var Handled : Boolean);
 Var
  sCharSet,
+ vCommandLine,
  vToken,
  ErrorMessage,
  vAuthRealm,
@@ -138,9 +139,12 @@ Begin
    vStream    := TMemoryStream.Create;
   vStream.Position := 0;
   vContentType     := ARequest.ContentType;
+  vCommandLine := Trim(ARequest.PathInfo);
+  If Trim(ARequest.QueryString) <> '' Then
+   vCommandLine := vCommandLine + '?' + ARequest.QueryString;
   If CommandExec  (TComponent(AResponse),
-                   RemoveBackslashCommands(ARequest.PathInfo),
-                   ARequest.Method + ' ' + ARequest.PathInfo,
+                   RemoveBackslashCommands(vCommandLine),
+                   ARequest.Method + ' ' + vCommandLine,
                    vContentType,
                    ARequest.RemoteAddr,
                    ARequest.UserAgent,
