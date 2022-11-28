@@ -1,0 +1,92 @@
+name: Form Bug Report
+description: Preencher um relatório de erro.
+title: "[Bug]: "
+labels: ["vcs: Erro"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Preencha todos os campos requeridos abaixo para reportar um erro.
+  - type: textarea
+    id: descricao-bug
+    attributes:
+      label: Descrição do bug
+      description: Descreva de forma específica como quando e onde ocorre o bug.
+      placeholder: Descreva de forma específica como quando e onde ocorre o bug.
+    validations:
+      required: true
+  - type: textarea
+    id: passos-bug
+    attributes:
+      label: **Passos para reproduzir o problema**
+      description: Descreva os passos pra conseguir reproduzir o problema que você achou.
+      placeholder: |
+        exemplo
+        1. Vá para '...'
+        2. Clique em '....'
+        3. Faça '....'
+        4. Erro
+    validations:
+      required: true      
+  - type: textarea
+    id: expectativa-bug
+    attributes:
+      label: **Comportamento esperado**
+      description: Descreva o que você espera que acontecesse e faça aqui suas sugestões de melhorias.
+      placeholder: Descreva o que você espera que acontecesse e faça aqui suas sugestões de melhorias.
+    validations:
+      required: false       
+  - type: textarea
+    id: imagens-bug
+    attributes:
+      label: **Imagens do problema**
+      description: cole ou arraste aqui as imagens pra ajudar a informar o problema.
+      placeholder: cole ou arraste aqui as imagens.
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        Informações técnicas necessárias:
+  - type: dropdown
+    id: version
+    attributes:
+      label: Versão RDW:
+      description: Informe a versão do RDW usada.
+      options:
+        - 2.1.0 (branch)
+        - 2.0.8 (trunk)
+        - 2.0.7 (latest release)
+    validations:
+      required: true
+  - type: dropdown
+    id: IDE
+    attributes:
+      label: IDE:
+      description: Informe a IDE usada.
+      options:
+        - Delphi novo
+        - Delphi antigo
+        - Lazarus
+    validations:
+      required: true
+  - type: dropdown
+    id: OS
+    attributes:
+      label: Sistema Operacional
+      description: Informe o Sistema Operacional onde o erro ocorre.
+      options:
+        - Windows
+        - Linux
+        - Mac
+        - Outro
+    validations:
+      required: true
+  - type: input
+    id: relator
+    attributes:
+      label: Relator do Problema
+      description: Caso você esteja abrindo a issue para outra pessoa, informe o contato dela no telegram pra conseguirmos contato
+      placeholder: ex. FulanoDeTal @fulanodt
+    validations:
+      required: false
