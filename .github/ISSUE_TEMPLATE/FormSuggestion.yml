@@ -1,0 +1,49 @@
+name: Form Feature Suggestion
+description: Preencher um relatório de sugestão de mudança.
+title: "[Feature Request]: "
+labels: ["vcs: Novo Recurso"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Preencha todos os campos requeridos abaixo para sugerir uma ideia ou função ou recurso para o projeto.
+  - type: textarea
+    id: descricao-sugestao
+    attributes:
+      label: "Descrição da Sugestão"
+      description: "Um texto conciso descrevendo em detalhes o que você sugere."
+      placeholder: "Um texto conciso descrevendo em detalhes o que você sugere."
+    validations:
+      required: true
+  - type: textarea
+    id: anexos
+    attributes:
+      label: "Anexos"
+      description: "Imagens ou documentos descrevendo incrementando a sugestão."
+      placeholder: "Imagens ou documentos descrevendo incrementando a sugestão."
+    validations:
+      required: true
+  - type: textarea
+    id: motivo
+    attributes:
+      label: "Motivo da Mudança"
+      description: "Se caso a sugestão for uma alteração de um recurso já existente, descreva o porquê aqui."
+      placeholder: "Se caso a sugestão for uma alteração de um recurso já existente, descreva o porquê aqui."
+    validations:
+      required: false
+  - type: textarea
+    id: informacoes
+    attributes:
+      label: "Informações adicionais"
+      description: "Caso necessário descreva aqui as observações ou informações adicionais que queira fazer."
+      placeholder: "Caso necessário descreva aqui as observações ou informações adicionais que queira fazer."
+    validations:
+      required: false
+  - type: input
+    id: relator
+    attributes:
+      label: "Relator do Problema"
+      description: "Caso você esteja abrindo a issue para outra pessoa, informe o contato dela no telegram pra conseguirmos contato."
+      placeholder: "ex. FulanoDeTal @fulanodt"
+    validations:
+      required: false
