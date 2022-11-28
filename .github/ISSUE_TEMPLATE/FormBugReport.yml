@@ -2,6 +2,7 @@ name: Form Bug Report
 description: Preencher um relatório de erro.
 title: "[Bug]: "
 labels: ["vcs: Erro"]
+projects: ["RDW"]
 body:
   - type: markdown
     attributes:
