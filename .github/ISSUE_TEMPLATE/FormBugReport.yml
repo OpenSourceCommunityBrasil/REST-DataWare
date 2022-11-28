@@ -18,7 +18,7 @@ body:
   - type: textarea
     id: passos-bug
     attributes:
-      label: **Passos para reproduzir o problema**
+      label: Passos para reproduzir o problema
       description: Descreva os passos pra conseguir reproduzir o problema que você achou.
       placeholder: |
         exemplo
@@ -31,7 +31,7 @@ body:
   - type: textarea
     id: expectativa-bug
     attributes:
-      label: **Comportamento esperado**
+      label: Comportamento esperado
       description: Descreva o que você espera que acontecesse e faça aqui suas sugestões de melhorias.
       placeholder: Descreva o que você espera que acontecesse e faça aqui suas sugestões de melhorias.
     validations:
@@ -39,7 +39,7 @@ body:
   - type: textarea
     id: imagens-bug
     attributes:
-      label: **Imagens do problema**
+      label: Imagens do problema
       description: cole ou arraste aqui as imagens pra ajudar a informar o problema.
       placeholder: cole ou arraste aqui as imagens.
     validations:
