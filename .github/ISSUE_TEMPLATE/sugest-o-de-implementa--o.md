@@ -2,7 +2,7 @@
 name: Sugestão de implementação
 about: Sugerir uma ideia ou função ou recurso para o projeto
 title: "[Feature Request] descrição resumida da sugestão aqui"
-labels: Novo Recurso
+labels: ''
 assignees: ''
 
 ---
