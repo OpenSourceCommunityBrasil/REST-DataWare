@@ -63,6 +63,7 @@ Type
   Destructor  Destroy;Override;
   Function    IsNull : Boolean;
   Function    AsString : String;
+  Procedure   CopyValue     (aValue : TMassiveValue);
   Procedure   LoadFromStream(Stream : TMemoryStream);
   Procedure   SaveToStream  (Const Stream : TMemoryStream);
   Property    ValueName   : String       Read vValueName   Write vValueName;
@@ -752,6 +753,12 @@ End;
 
 { TMassiveValue }
 
+Procedure TMassiveValue.CopyValue(aValue : TMassiveValue);
+Begin
+ vJSONValue.Encoded := aValue.vJSONValue.Encoded;
+ Value              := aValue.vJSONValue.Value;
+End;
+
 Constructor TMassiveValue.Create;
 Begin
  vBinary    := False;
@@ -855,8 +862,6 @@ End;
 
 Procedure TMassiveValue.SaveToStream(Const Stream: TMemoryStream);
 Begin
- vJSONValue.ObjectValue := ovBlob;
- vJSONValue.Encoded     := False;
  vJSONValue.SaveToStream(Stream);
  Stream.Position := 0;
 End;
@@ -888,7 +893,7 @@ Begin
      vJSONValue.Encoded := True;
     End
    Else
-    vJSONValue.SetValue(Value);
+    vJSONValue.SetValue(Value, False);
   End;
  vIsNull := vJSONValue.IsNull;
 End;
@@ -2174,10 +2179,10 @@ Begin
            MassiveLine.vPrimaryValues := TMassiveValues.Create;
           For A := 0 To vMassiveLine.vPrimaryValues.Count -1 do
            Begin
-            MassiveValue  := TMassiveValue.Create;
+            MassiveValue             := TMassiveValue.Create;
             MassiveValue.ObjectValue := vMassiveLine.vPrimaryValues.Items[A].ObjectValue;
             MassiveValue.ValueName   := vMassiveLine.vPrimaryValues.Items[A].ValueName;
-            MassiveValue.Value       := vMassiveLine.vPrimaryValues.Items[A].Value;
+            MassiveValue.CopyValue(vMassiveLine.vPrimaryValues.Items[A]);
             MassiveLine.vPrimaryValues.Add(MassiveValue);
            End;
          End;
@@ -2288,7 +2293,7 @@ Var
     FreeAndNil(aBodyStream);
     vMassiveMode := mmInactive;
     Try
-     If Not BufferBody.Eof Then
+     While Not BufferBody.Eof Do
       Begin
        aStream      := BufferBody.ReadStream;
        MassiveLine  := TMassiveLine.Create;

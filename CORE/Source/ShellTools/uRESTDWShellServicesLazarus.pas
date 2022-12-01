@@ -58,10 +58,10 @@ Procedure TRESTDWShellService.Command(ARequest    : TRequest;
                                       Var Handled : Boolean);
 Var
  sCharSet,
- vCommandLine,
  vToken,
  ErrorMessage,
  vAuthRealm,
+ vCommandLine,
  vContentType,
  vResponseString : String;
  I,

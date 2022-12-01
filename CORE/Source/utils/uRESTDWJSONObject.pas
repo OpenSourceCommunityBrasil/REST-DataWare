@@ -4282,17 +4282,16 @@ Begin
  Else
   Begin
    vNullValue := False;
-   If ((bValue = '') or (bValue = 'null')) Then
-    Begin
-     If Not vNullValue Then
-      vNullValue := Not(vObjectValue in [ovWideString, ovString, ovGuid, ovMemo,
-                                         ovWideMemo, ovFmtMemo, ovFixedChar,
-                                         ovFixedWideChar]);
-     Exit;
-    End;
-
    If vObjectValue in [ovString, ovGuid, ovMemo, ovWideMemo, ovFmtMemo, ovObject, ovDataset] Then
     Begin
+     If ((bValue = '') or (bValue = 'null')) Then
+      Begin
+       If Not vNullValue Then
+        vNullValue := Not(vObjectValue in [ovWideString, ovString, ovGuid, ovMemo,
+                                           ovWideMemo, ovFmtMemo, ovFixedChar,
+                                           ovFixedWideChar]);
+       Exit;
+      End;
      {$IFDEF FPC}
      If vEncodingLazarus = Nil Then
       SetEncoding(vEncoding);
@@ -4344,7 +4343,7 @@ Begin
       aValue := StringToBytes(Format(TJsonStringValue, [bValue]));
      {$ENDIF}
     End
-   Else If vObjectValue in [ovSingle, ovFloat, ovCurrency, ovBCD, ovFMTBcd, ovExtended] Then
+   Else If vObjectValue in [ovSmallInt, ovSingle, ovFloat, ovCurrency, ovBCD, ovFMTBcd, ovExtended] Then
     Begin
      {$IFDEF FPC}
       If vEncoding = esUtf8 Then
@@ -4357,7 +4356,7 @@ Begin
     End
    Else
     Begin
-     If bValue <> 'null' Then
+     If VarToStr(bValue) <> 'null' Then
       Begin
       {$IFDEF FPC}
        If vEncoding = esUtf8 Then

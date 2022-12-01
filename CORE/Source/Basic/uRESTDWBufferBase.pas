@@ -84,7 +84,7 @@ Var
  aDate     : TDate;
  {$IFEND}
  S         : Integer;
- vSt       : Char;
+ vSt,
  aString   : DWString;
 Begin
  Case vType Of
@@ -141,7 +141,8 @@ Begin
                  End;
   varBoolean   : Begin
                   S := SizeOf(Boolean);
-                  Move(Pointer(@ByteValue[0])^, Pointer(@vSt)^,  S);
+                  vSt := BytesToString(ByteValue, 0, 1);
+//                  Move(Pointer(@ByteValue[0])^, Pointer(@vSt)^,  S);
                   aBoolean    := vSt = 'T';
                   Result      := aBoolean;
                  End;
