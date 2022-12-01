@@ -1825,7 +1825,11 @@ Var
   Else If (Pos('DELETE ', UpperCase(Result)) > 0)   Then
    Result := StringReplace(Result, 'DELETE ', '', [rfReplaceAll, rfIgnoreCase])
   Else If (Pos('PATCH ', UpperCase(Result)) > 0)   Then
-   Result := StringReplace(Result, 'PATCH ', '', [rfReplaceAll, rfIgnoreCase]);
+   Result := StringReplace(Result, 'PATCH ', '', [rfReplaceAll, rfIgnoreCase])
+  Else If (Pos('OPTION ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'OPTION ', '', [rfReplaceAll, rfIgnoreCase])
+  Else If (Pos('OPTIONS ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'OPTIONS ', '', [rfReplaceAll, rfIgnoreCase]);
  End;
  Function CompareBaseURL(Var Value : String) : Boolean;
  Var
@@ -1984,7 +1988,7 @@ Begin
   Cmd := StringReplace(Cmd, ' HTTP/1.1', '', [rfReplaceAll]);
   Cmd := StringReplace(Cmd, ' HTTP/2.0', '', [rfReplaceAll]);
   Cmd := StringReplace(Cmd, ' HTTP/2.1', '', [rfReplaceAll]);
-  vCORSOption := UpperCase(Copy(Cmd, 1, 7));
+  vCORSOption := UpperCase(Copy(Cmd, 1, 6));
   If (UpperCase(Copy (Cmd, 1, 3)) = 'GET' )   OR
      (UpperCase(Copy (Cmd, 1, 4)) = 'POST')   OR
      (UpperCase(Copy (Cmd, 1, 3)) = 'PUT')    OR
@@ -2919,7 +2923,7 @@ Begin
          //TODO
 //         TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUriOptions.EventName, vUriOptions.ServerEvent, ClientPort);
          //Novo Lugar para Autenticação
-         If ((vCORS) And (vCORSOption <> 'OPTIONS')) Or
+         If ((vCORS) And (vCORSOption <> 'OPTION')) Or
              (vServerAuthOptions.AuthorizationOption in [rdwAOBasic, rdwAOBearer, rdwAOToken]) Then
           Begin
            vAcceptAuth           := False;
