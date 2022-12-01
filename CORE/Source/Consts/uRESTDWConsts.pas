@@ -290,7 +290,7 @@ Type
                          ovLongWord,        ovShortint,     ovByte, ovExtended, ovConnection, ovParams,    ovStream,             //42..48
                          ovTimeStampOffset, ovObject,       ovSingle);                                                           //49..51
  TRequestMode         = (rtOnlyFields, rtOnlyData, rtJSONAll);
- TRequestType         = (rtGet, rtPost, rtPut, rtPatch, rtDelete);
+ TRequestType         = (rtGet, rtPost, rtPut, rtPatch, rtDelete, rtOption);
  TRESTDWIPVersion     = (Id_IPv4, Id_IPv6);
  TRESTDWJSONType      = (TRESTDWJSONObjectType, TRESTDWJSONArrayType);
  TRESTDWJSONTypes     = Set of TRESTDWJSONType;

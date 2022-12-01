@@ -1989,7 +1989,8 @@ Begin
      (UpperCase(Copy (Cmd, 1, 4)) = 'POST')   OR
      (UpperCase(Copy (Cmd, 1, 3)) = 'PUT')    OR
      (UpperCase(Copy (Cmd, 1, 4)) = 'DELE')   OR
-     (UpperCase(Copy (Cmd, 1, 4)) = 'PATC')   Then
+     (UpperCase(Copy (Cmd, 1, 4)) = 'PATC')   OR
+     (UpperCase(Copy (Cmd, 1, 4)) = 'OPTI')   Then
    Begin
     RequestType := rtGet;
     If (UpperCase(Copy (Cmd, 1, 4))      = 'POST') Then
@@ -1999,7 +2000,9 @@ Begin
     Else If (UpperCase(Copy (Cmd, 1, 4)) = 'DELE') Then
      RequestType := rtDelete
     Else If (UpperCase(Copy (Cmd, 1, 4)) = 'PATC') Then
-     RequestType := rtPatch;
+     RequestType := rtPatch
+    Else If (UpperCase(Copy (Cmd, 1, 4)) = 'OPTI') Then
+     RequestType := rtOption;
     {$IFNDEF FPC}
      If {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
                                       {$ELSE}Url{$IFEND}
