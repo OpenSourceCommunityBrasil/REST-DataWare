@@ -1505,7 +1505,6 @@ Var
  aToken,
  vToken,
  vDataBuff,
- vCORSOption,
  vUrlToExec,
  vOldRequest,
  vdwservereventname,
@@ -1988,7 +1987,6 @@ Begin
   Cmd := StringReplace(Cmd, ' HTTP/1.1', '', [rfReplaceAll]);
   Cmd := StringReplace(Cmd, ' HTTP/2.0', '', [rfReplaceAll]);
   Cmd := StringReplace(Cmd, ' HTTP/2.1', '', [rfReplaceAll]);
-  vCORSOption := UpperCase(Copy(Cmd, 1, 6));
   If (UpperCase(Copy (Cmd, 1, 3)) = 'GET' )   OR
      (UpperCase(Copy (Cmd, 1, 4)) = 'POST')   OR
      (UpperCase(Copy (Cmd, 1, 3)) = 'PUT')    OR
@@ -2923,8 +2921,11 @@ Begin
          //TODO
 //         TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUriOptions.EventName, vUriOptions.ServerEvent, ClientPort);
          //Novo Lugar para Autenticação
-         If ((vCORS) And (vCORSOption <> 'OPTION')) Or
-             (vServerAuthOptions.AuthorizationOption in [rdwAOBasic, rdwAOBearer, rdwAOToken]) Then
+         If ((vCORS) And (RequestType = rtOption)) Then
+          vErrorCode            := cCORSPreflightCODE;
+         If ((vCORS)   And (RequestType <> rtOption)) Or
+             (((vCORS) And (RequestType <> rtOption)) And
+              (vServerAuthOptions.AuthorizationOption in [rdwAOBasic, rdwAOBearer, rdwAOToken])) Then
           Begin
            vAcceptAuth           := False;
            vErrorCode            := 401;
@@ -3437,12 +3438,14 @@ Begin
             vServerAuthOptions.CopyServerAuthParams(vRDWAuthOptionParam);
             TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
            End;
-          If (Not (vGettoken)) And (Not (vTokenValidate)) Then
+          If (RequestType = rtOption) Then
+           Result := True
+          Else If (Not (vGettoken)) And (Not (vTokenValidate)) Then
            Begin
             If Not ServiceMethods(TComponent(vTempServerMethods), AContext, vUrlToExec, vdwservereventname, DWParams,
-                                  JSONStr, DataMode, vErrorCode,  vContentType, vServerContextCall, ServerContextStream,
-                                  vdwConnectionDefs,  EncodeStrings, vAccessTag, WelcomeAccept, RequestType, vMark,
-                                  vRequestHeader, vBinaryEvent, vMetadata, vBinaryCompatibleMode, vCompareContext) Or (lowercase(vContentType) = 'application/php') Then
+                                       JSONStr, DataMode, vErrorCode,  vContentType, vServerContextCall, ServerContextStream,
+                                       vdwConnectionDefs,  EncodeStrings, vAccessTag, WelcomeAccept, RequestType, vMark,
+                                       vRequestHeader, vBinaryEvent, vMetadata, vBinaryCompatibleMode, vCompareContext) Or (lowercase(vContentType) = 'application/php') Then
              Begin
               Result := False;
               If Not dwassyncexec Then
@@ -3581,20 +3584,23 @@ Begin
                     End;
                   End;
 //                 vErrorCode   := 200;
-                 If vBinaryEvent Then
-                  vReplyString := JSONStr
-                 Else
+                 If (RequestType <> rtOption) Then
                   Begin
-                   If Not(((vUrlToExec = '') Or (vUrlToExec = '/')) And (RequestType = rtGet)) Then
-                    If Not (WelcomeAccept) And (vErrorMessage <> '') Then
-                     Begin
-                      If vEncode_Errors then
-                       vReplyString := escape_chars(vErrorMessage)
+                   If vBinaryEvent Then
+                    vReplyString := JSONStr
+                   Else
+                    Begin
+                     If Not(((vUrlToExec = '') Or (vUrlToExec = '/')) And (RequestType = rtGet)) Then
+                      If Not (WelcomeAccept) And (vErrorMessage <> '') Then
+                       Begin
+                        If vEncode_Errors then
+                         vReplyString := escape_chars(vErrorMessage)
+                        Else
+                         vReplyString := vErrorMessage;
+                       End
                       Else
-                       vReplyString := vErrorMessage;
-                     End
-                    Else
-                     vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
+                       vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
+                    End;
                   End;
                 End
                Else If DataMode = dmRAW Then

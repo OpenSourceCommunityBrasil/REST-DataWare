@@ -81,6 +81,7 @@ Const
  cConnectionRename              = 'CONNECTIONRENAME';
  cContentTypeFormUrl            = 'application/x-www-form-urlencoded';
  cContentTypeMultiPart          = 'multipart/form-data';
+ cCORSPreflightCODE             = 200;
  cCreatedToken                  = '201 Created';
  cDefaultBasicAuthUser          = 'testserver';
  cDefaultBasicAuthPassword      = 'testserver';
