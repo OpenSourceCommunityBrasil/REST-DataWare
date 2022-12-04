@@ -338,11 +338,20 @@ Uses
  Function  GetStringEncode (Value : String; DatabaseCharSet : TDatabaseCharSet) : String;
  Function  GetStringDecode (Value : String; DatabaseCharSet : TDatabaseCharSet) : String;
  {$ENDIF}
+ Function RemoveLineBreaks(aText : string): string;
 
 Implementation
 
 Uses uRESTDWBase64, uRESTDWException{$IFNDEF HAS_FMX}{$IFNDEF UNIX}, Windows{$ENDIF}{$ENDIF};
 
+
+Function RemoveLineBreaks(aText : string): string;//Gledston 03/12/2022  
+begin                                             //linha 3087 na Function EncodeBase64(AValue : TStream) : String;
+ { Retirando as quebras de linha em campos blob }
+ Result := StringReplace(aText, #$D#$A, '', [rfReplaceAll]);
+ { Retirando as quebras de linha em campos blob }
+ Result := StringReplace(Result, #13#10, '', [rfReplaceAll]);
+end;
 
 {$IFDEF FPC}
 Function  GetStringUnicode(Value : String) : String;
@@ -3086,7 +3095,7 @@ Function EncodeStream (Value : TStream) : String;
      StreamDecoded.CopyFrom(AValue, AValue.Size);
      StreamDecoded.Position := 0;
      EncdDecd.EncodeStream(StreamDecoded, StreamEncoded);
-     Result := StreamEncoded.DataString;
+     Result := RemoveLineBreaks( StreamEncoded.DataString ); //Gledston 03/12/2022
     Finally
      StreamEncoded.Free;
      StreamDecoded.Free;
@@ -3401,4 +3410,3 @@ Begin
 End;
 
 End.
-
