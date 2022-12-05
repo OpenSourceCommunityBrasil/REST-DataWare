@@ -3014,7 +3014,7 @@ Begin
    {$IFDEF FPC}
     Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
    {$ELSE}
-    {$IF CompilerVersion < 22}
+    {$IF CompilerVersion < 23}
      SetLength(Result, Length(AStr));
      Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
     {$ELSE}
@@ -3046,7 +3046,7 @@ Begin
   {$IFDEF FPC}
    SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
   {$ELSE}
-   {$IF CompilerVersion < 22}
+   {$IF CompilerVersion < 23}
     SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
    {$ELSE}
     {$IFDEF MSWINDOWS}
@@ -3069,7 +3069,7 @@ Begin
   {$IFDEF FPC}
    SetString(Result, PAnsiChar(bin), I);
   {$ELSE}
-   {$IF CompilerVersion < 22}
+   {$IF CompilerVersion < 23}
     SetString(Result, PAnsiChar(bin), I);
    {$ELSE}
     {$IFDEF MSWINDOWS}
