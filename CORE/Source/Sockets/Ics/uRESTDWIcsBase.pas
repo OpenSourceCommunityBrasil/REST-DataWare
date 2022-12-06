@@ -71,10 +71,12 @@ Type
 
   TPoolerHttpConnection = class(THttpAppSrvConnection)
   protected
-    RawData: AnsiString;
-    RawDataLen: Integer;
+    vRawData: AnsiString;
+    vRawDataLen: Integer;
+    vNeedClose: boolean;
   public
     destructor Destroy; override;
+    constructor Create(AOwner: TComponent); override;
   end;
 
   TOnException = Procedure(Sender: TPoolerHttpConnection; E: ESocketException) Of Object;
@@ -197,6 +199,8 @@ Type
     // Security
     vBruteForceProtection: TIcsBruteForceProtection;
     vIpBlackList: TStrings;
+    vServerStatusCheck: boolean;
+    procedure onBeforeProcessRequestServer(Sender: TObject);
 
   Public
     Constructor Create(AOwner: TComponent); Override;
@@ -209,7 +213,6 @@ Type
     procedure onExceptionServer(Sender: TObject; E: ESocketException);
     procedure onServerStartedServer(Sender: TObject);
     procedure onServerStoppedServer(Sender: TObject);
-    procedure onClientDisconnectServer(Sender: TObject; Client: TObject; Error: Word);
     procedure onAnsweredServer(Sender: TObject);
     procedure CustomAnswerStream(Pooler: TPoolerHttpConnection; Flag: THttpGetFlag;
       StatusCode: Integer; ContentType, Header: String);
@@ -219,7 +222,6 @@ Type
     procedure SetHttpServerParams;
     procedure SetSocketServerParams;
     procedure SetHttpConnectionParams(Remote: TPoolerHttpConnection);
-    procedure onClientConnectServer(Sender: TObject; Client: TObject; Error: Word);
 
     // Misc Procedures
     Function ClientCount: Integer;
@@ -227,6 +229,8 @@ Type
     Procedure EchoPooler(ServerMethodsClass: TComponent; AContext: TComponent;
       Var Pooler, MyIP: String; AccessTag: String; Var InvalidTag: boolean); Override;
     procedure onClientTimeout(Sender: TObject; Reason: TTimeoutReason);
+    procedure onClientConnectServer(Sender: TObject; Client: TObject; Error: Word);
+    procedure onClientDisconnectServer(Sender: TObject; Client: TObject; Error: Word);
 
   Published
     // Events
@@ -289,10 +293,13 @@ Type
     Property IpBlackList: TStrings Read vIpBlackList Write SetvIpBlackList;
     Property BruteForceProtection: TIcsBruteForceProtection read vBruteForceProtection
       write vBruteForceProtection;
+    Property ServerStatusCheck: boolean read vServerStatusCheck write vServerStatusCheck
+      default true;
   End;
 
 const
   cIcsHTTPServerNotFound = 'No HTTP server found.';
+  cIcsNoServerStatusCheck = 'No server status check.';
 
 Implementation
 
@@ -480,6 +487,7 @@ var
 begin
   Remote := Sender as TPoolerHttpConnection;
 
+  Remote.vNeedClose := true;
   Remote.CloseDelayed;
 
   if Assigned(vOnTimeout) then
@@ -503,8 +511,9 @@ begin
   Remote.LineLimit := MaxInt;
   Remote.LineEnd := sLineBreak;
 
-  Remote.RawData := '';
-  Remote.RawDataLen := 0;
+  Remote.vRawData := '';
+  Remote.vRawDataLen := 0;
+  Remote.vNeedClose := false;
 
   Remote.onTimeout := onClientTimeout;
   Remote.OnGetDocument := onDocumentReadyServer;
@@ -512,9 +521,27 @@ begin
   Remote.OnPutDocument := onDocumentReadyServer;
   Remote.OnDeleteDocument := onDocumentReadyServer;
   Remote.OnPatchDocument := onDocumentReadyServer;
-  Remote.onPostedData := onPostedDataServer;
+  Remote.OnPostedData := onPostedDataServer;
   Remote.onException := onExceptionServer;
   Remote.OnAfterAnswer := onAnsweredServer;
+  Remote.OnBeforeProcessRequest := onBeforeProcessRequestServer;
+end;
+
+procedure TRESTDWIcsServicePooler.onBeforeProcessRequestServer(Sender: TObject);
+var
+  Remote: TPoolerHttpConnection;
+begin
+  Remote := Sender as TPoolerHttpConnection;
+
+  // Reject server status check
+  if ((vServerStatusCheck = false) and ((String.IsNullOrEmpty(Remote.Path)) or
+    (Remote.Path = '/'))) then
+  begin
+
+    Remote.vNeedClose := true;
+    Remote.CloseDelayed;
+
+  end
 end;
 
 function TRESTDWIcsServicePooler.ClientCount: Integer;
@@ -557,6 +584,7 @@ Begin
 
   vIpBlackList := TStringList.Create;
   vIpBlackList.Clear;
+  vServerStatusCheck := true;
 
   vBruteForceProtection := TIcsBruteForceProtection.Create;
 
@@ -589,6 +617,7 @@ begin
     if Assigned(vOnClientConnect) then
       vOnClientConnect(Remote, Remote.LastError);
 
+    Remote.vNeedClose := true;
     Remote.CloseDelayed;
 
     if Assigned(vOnBruteForceBlock) then
@@ -605,6 +634,7 @@ begin
       if Assigned(vOnClientConnect) then
         vOnClientConnect(Remote, Remote.LastError);
 
+      Remote.vNeedClose := true;
       Remote.CloseDelayed;
 
       if Assigned(vOnBlackListed) then
@@ -726,8 +756,8 @@ begin
     if lCount > 0 then
     begin
       SetLength(RawDataTemp, lCount);
-      Remote.RawData := Remote.RawData + RawDataTemp;
-      Remote.RawDataLen := Remote.RawDataLen + lCount;
+      Remote.vRawData := Remote.vRawData + RawDataTemp;
+      Remote.vRawDataLen := Remote.vRawDataLen + lCount;
     end
     else
       lCount := 0;
@@ -736,12 +766,12 @@ begin
   end
   until lCount <= 0;
 
-  if Remote.RequestContentLength = Remote.RawDataLen then
+  if Remote.RequestContentLength = Remote.vRawDataLen then
   begin
     try
       Remote.PostedDataReceived;
 
-      Stream := TStringStream.Create(Remote.RawData);
+      Stream := TStringStream.Create(Remote.vRawData);
 
       Stream.Position := 0;
 
@@ -811,6 +841,9 @@ begin
       try
         Remote := Sender as TPoolerHttpConnection;
 
+        if (Remote.vNeedClose) then
+          raise Exception.Create(cIcsNoServerStatusCheck);
+
         vResponseHeader := TStringList.Create;
         vResponseString := '';
         @vRedirect := @Redirect;
@@ -826,6 +859,7 @@ begin
           Else
             vResponseHeader.AddPair('Access-Control-Allow-Origin', '*');
         End;
+
         vToken := Remote.AuthDigestUri;
         vAuthRealm := Remote.AuthRealm;
         vContentType := Remote.RequestContentType;
@@ -985,12 +1019,26 @@ End;
 
 { TMyHttpConnection }
 
+constructor TPoolerHttpConnection.Create(AOwner: TComponent);
+begin
+  inherited;
+
+  vNeedClose := false;
+
+  SetLength(vRawData, 0);
+
+  vRawDataLen := 0;
+end;
+
 destructor TPoolerHttpConnection.Destroy;
 begin
-  if Length(RawData) > 0 then
-    SetLength(RawData, 0);
+  vNeedClose := true;
 
-  RawDataLen := 0;
+  if Length(vRawData) > 0 then
+    SetLength(vRawData, 0);
+
+  vRawDataLen := 0;
+
   inherited Destroy;
 end;
 
