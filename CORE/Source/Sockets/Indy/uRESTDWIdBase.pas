@@ -47,7 +47,7 @@ Uses
 
   uRESTDWBasic, uRESTDWBasicDB, uRESTDWComponentEvents, uRESTDWBasicTypes,
   uRESTDWJSONObject, uRESTDWParams, uRESTDWBasicClass, uRESTDWComponentBase,
-  uRESTDWConsts, uRESTDWEncodeClass, uRESTDWDataUtils, uRESTDWTools,
+  uRESTDWConsts, uRESTDWEncodeClass, uRESTDWDataUtils, uRESTDWTools, uRESTDWZlib,
 
   IdContext, IdHeaderList, IdTCPConnection, IdHTTPServer, IdCustomHTTPServer,
   IdSSLOpenSSL, IdSSL, IdAuthentication, IdTCPClient, IdHTTPHeaderInfo,

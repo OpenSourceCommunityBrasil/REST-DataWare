@@ -55,7 +55,7 @@ Uses
  uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator,
  uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
  uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData,
- uRESTDWMemtable, uRESTDWBufferBase, uRESTDWDriverBase;
+ uRESTDWMemtable, uRESTDWBufferBase, uRESTDWDriverBase, uRESTDWTools;
 
 Type
  TOnExecuteData           = Procedure                                        Of Object;
@@ -1453,7 +1453,7 @@ Var
 
 implementation
 
-Uses uRESTDWJSONInterface, uRESTDWTools;
+Uses uRESTDWJSONInterface;
 
 Function GeTRESTDWParams(Params : TParams; Encondig : TEncodeSelect) : TRESTDWParams;
 Var

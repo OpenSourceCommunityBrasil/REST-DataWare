@@ -2290,7 +2290,7 @@ Begin
      ResultPR.Add(JSONParam);
      If Not Assigned(ResultPR.ItemsString['Content-Type']) then
       Begin
-       vContentType:= GetMIMEType(ResultPR.ItemsString['dwFileNameBody'].AsString);
+       vContentType:= TRESTDWMimeType.GetMIMEType(ResultPR.ItemsString['dwFileNameBody'].AsString);
        If vContentType <> '' then
         Begin
          JSONParam   := TJSONParam.Create(ResultPR.Encoding);

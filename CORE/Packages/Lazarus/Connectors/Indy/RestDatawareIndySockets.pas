@@ -14,7 +14,7 @@ implementation
 
 procedure Register;
 begin
- RegisterUnit('uRESTDWIdReg', @uRESTDWIdReg.Register);
+  RegisterUnit('uRESTDWIdReg', @uRESTDWIdReg.Register);
 end;
 
 initialization

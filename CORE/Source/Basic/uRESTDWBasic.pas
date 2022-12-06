@@ -34,8 +34,9 @@ Uses
  {$ENDIF}
  SysUtils, Classes, Db, Variants, SyncObjs,
  uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWParams,
- uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWDataUtils,
- uRESTDWComponentBase, uRESTDWConsts, uRESTDWMessageCoderMIME
+ uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWDataUtils, uRESTDWTools,
+ uRESTDWComponentBase, uRESTDWConsts, uRESTDWMessageCoderMIME, uRESTDWZLib,
+ uRESTDWMimeTypes
 
  ;
 
@@ -678,7 +679,7 @@ End;
 
 Implementation
 
-Uses uRESTDWDatamodule,   uRESTDWPoolermethod,  uRESTDWTools,
+Uses uRESTDWDatamodule,   uRESTDWPoolermethod,
      uRESTDWServerEvents, uRESTDWServerContext, uRESTDWMessageCoder,
      uRESTDWBasicDB,      uRESTDWBufferBase,    ZLib;
 
@@ -1954,7 +1955,7 @@ Begin
     If RESTDWFileExists(sFile, FRootPath) then
      Begin
       StatusCode    := 200;
-      ContentType   := GetMIMEType(sFile);
+      ContentType   := TRESTDWMIMEType.GetMIMEType(sFile);
       ServerContextStream := TMemoryStream.Create;
       ServerContextStream.LoadFromFile(sFile);
       ServerContextStream.Position := 0;
@@ -2224,7 +2225,7 @@ Begin
                 End;
                If (sContentType =  '') And
                   (sFile        <> '') Then
-                vObjectName := GetMIMEType(sFile);
+                vObjectName := TRESTDWMIMEType.GetMIMEType(sFile);
                JSONParam.ParamName        := vObjectName;
                JSONParam.ParamFileName    := sFile;
                JSONParam.ParamContentType := sContentType;
@@ -2559,7 +2560,7 @@ Begin
                        Begin
                         vObjectName := 'dwfilename';
                         If (sContentType = '') and (sFile <> '') then
-                         vObjectName := GetMIMEType(sFile);
+                         vObjectName := TRESTDWMIMEType.GetMIMEType(sFile);
                         JSONParam.ParamName        := vObjectName;
                         JSONParam.ParamFileName    := sFile;
                         JSONParam.ParamContentType := sContentType;
@@ -3479,7 +3480,7 @@ Begin
                   vTagReply := vFileExists or scripttags(ExcludeTag(Cmd));
                   If vTagReply Then
                    Begin
-                    ContentType            := GetMIMEType(sFile);
+                    ContentType            := TRESTDWMIMEType.GetMIMEType(sFile);
                     If scripttags(ExcludeTag(Cmd)) and Not vFileExists Then
                      ContentStream         := TMemoryStream.Create
                     Else

@@ -35,9 +35,11 @@ Const
                '"BinaryRequest":"%s", "FetchRowSQL":"%s", "LockSQL":"%s", "UnlockSQL":"%s"}';
 
 Type
+  TMassiveDataset  = Class
+End;
+
  TMassiveType = (mtMassiveCache, mtMassiveObject);
 
-Type
  TMassiveValue = Class(TObject)
  Private
   vIsNull,
@@ -78,7 +80,6 @@ Type
   Property Encoding          : TEncodeSelect  Read vEncoding        Write SetEncoding;
 End;
 
-Type
  PMassiveValue  = ^TMassiveValue;
  TMassiveValues = Class(TList)
  Private
@@ -93,7 +94,6 @@ Type
   Property   Items[Index  : Integer]       : TMassiveValue Read GetRec Write PutRec; Default;
 End;
 
-Type
  TMassiveField = Class(TObject)
  Private
   vMassiveFields : TList;
@@ -132,7 +132,6 @@ Type
   Property    Modified          : Boolean      Read GetModified;
 End;
 
-Type
  PMassiveField  = ^TMassiveField;
  TMassiveFields = Class(TList)
  Private
@@ -151,7 +150,6 @@ Type
   Property   Items[Index  : Integer]       : TMassiveField Read GetRec Write PutRec; Default;
 End;
 
-Type
  TMassiveLine          = Class(TObject)
  Private
   vMassiveValues  : TMassiveValues;
@@ -183,7 +181,6 @@ Type
   Property    PrimaryValues[Index  : Integer] : TMassiveValue  Read GetRecPK     Write PutRecPK;
 End;
 
-Type
  PMassiveLine   = ^TMassiveLine;
  TMassiveBuffer = Class(TList)
  Private
@@ -199,7 +196,6 @@ Type
 End;
 
 //Massive reply queue
-Type
  PMassiveReplyValue = ^TMassiveReplyValue;
  TMassiveReplyValue = Class(TObject)
  Private
@@ -215,7 +211,6 @@ Type
   Property    ValueName : String  Read vValueName   Write vValueName;
 End;
 
-Type
  PMassiveReplyCache = ^TMassiveReplyCache;
  TMassiveReplyCache = Class(TList)
  Private
@@ -235,7 +230,6 @@ Type
   Property    Values[Index  : Integer] : TMassiveReplyValue  Read GetRec       Write PutRec;
 End;
 
-Type
  PMassiveReply = ^TMassiveReply;
  TMassiveReply = Class(TList)
  Private
@@ -266,7 +260,6 @@ Type
   Property   ItemsString[Index  : String]       : TMassiveReplyCache Read GetRecName Write PutRecName;
 End;
 
-Type
  TMassiveDatasetBuffer = Class(TMassiveDataset)
  Protected
   vLastOpen        : Integer;
@@ -367,10 +360,8 @@ Type
   Property Dataset          : TRESTDWClientSQLBase Read vDataset;
  End;
 
-Type
  TRESTDWMassiveCacheValue = String;
 
-Type
  PMassiveCacheValue  = ^TRESTDWMassiveCacheValue;
  TRESTDWMassiveCacheList = Class(TList)
  Private
@@ -385,7 +376,6 @@ Type
   Property   Items[Index  : Integer]            : TRESTDWMassiveCacheValue Read GetRec Write PutRec; Default;
 End;
 
-Type
  TMassiveCacheDataset  = TDataset;
  PMassiveCacheDataset  = ^TMassiveCacheDataset;
  TRESTDWMassiveCacheDatasetList = Class(TList)
@@ -403,7 +393,6 @@ Type
   Property   Items      [Index  : Integer]  : TMassiveCacheDataset Read GetRec       Write PutRec; Default;
 End;
 
-Type
  TRESTDWMassiveCache = Class(TComponent)
  Private
   MassiveCacheList        : TRESTDWMassiveCacheList;
@@ -424,7 +413,6 @@ Type
   Property    ReflectChanges    : Boolean      Read vReflectChanges Write vReflectChanges;
 End;
 
-Type
  TRESTDWMassiveCacheSQLValue = Class(TCollectionItem)
  Private
   vMassiveSQLMode : TMassiveSQLMode;
@@ -458,7 +446,6 @@ Type
   Property Params                 : TParams           Read vParams         Write vParams;
 End;
 
-Type
  PMassiveCacheSQLValue  = ^TRESTDWMassiveCacheSQLValue;
  TRESTDWMassiveCacheSQLList = Class(TRESTDWOwnedCollection)
  Private
@@ -480,7 +467,6 @@ Type
   Property   Items[Index  : Integer] : TRESTDWMassiveCacheSQLValue Read GetRec    Write PutRec; Default;
 End;
 
-Type
  TRESTDWMassiveSQLCache = Class(TRESTDWComponent)
  Private
   vEncoding            : TEncodeSelect;
@@ -501,18 +487,18 @@ Type
   Property CachedList : TRESTDWMassiveCacheSQLList Read vMassiveCacheSQLList Write vMassiveCacheSQLList;
 End;
 
-Type
  TMassiveProcess     = Procedure(Var MassiveDataset : TMassiveDatasetBuffer;
                                  Var Ignore         : Boolean) Of Object;
  TMassiveEvent       = Procedure(Var MassiveDataset : TMassiveDatasetBuffer) Of Object;
  TMassiveLineProcess = Procedure(Var MassiveDataset : TMassiveDatasetBuffer;
                                  Dataset            : TDataset) Of Object;
 
+Function  MassiveSQLMode(aValue : TMassiveSQLMode) : String; overload;
+Function  MassiveSQLMode(aValue : String) : TMassiveSQLMode; overload;
+
 implementation
 
-
 Uses uRESTDWBasicDB, uRESTDWPoolermethod, PropertyPersist, uRESTDWTools;
-
 
 Function removestr(Astr: string; Asubstr: string):string;
 Begin
@@ -4403,6 +4389,28 @@ Begin
  vMassiveCacheSQLValue                := TRESTDWMassiveCacheSQLValue(vMassiveCacheSQLList.Add);
  vMassiveCacheSQLValue.BinaryRequest  := True;
  vMassiveCacheSQLValue.MemDS.LoadFromStream(MemDS);
+End;
+
+{ Global Functions }
+
+Function  MassiveSQLMode(aValue : TMassiveSQLMode) : String;
+Begin
+ Result := 'msUnknow';
+ Case aValue Of
+  msqlQuery   : Result := 'msqlQuery';
+  msqlExecute : Result := 'msqlExecute';
+ End;
+End;
+
+Function  MassiveSQLMode(aValue : String) : TMassiveSQLMode;
+Var
+ aData : String;
+Begin
+ aData := lowercase(aValue);
+ If aData = lowercase('msqlQuery') Then
+  Result := msqlQuery
+ Else If aData = lowercase('msqlExecute') Then
+  Result := msqlExecute;
 End;
 
 End.

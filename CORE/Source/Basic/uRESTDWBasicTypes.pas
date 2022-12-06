@@ -48,8 +48,7 @@ Uses
    {$IFEND}
   {$ENDIF}
   SysUtils,  Classes, Db, FMTBcd,
-  uRESTDWComponentBase, uRESTDWMemtable, uRESTDWConsts, uRESTDWEncodeClass,
-  uRESTDWMimeTypes;
+  uRESTDWComponentBase, uRESTDWMemtable, uRESTDWConsts, uRESTDWEncodeClass;
 
  Const
   dwftColor       = Integer(255);
@@ -517,7 +516,9 @@ Var
 
 Implementation
 
-Uses uRESTDWTools, uRESTDWDataJSON, uRESTDWJSONInterface, uRESTDWBasicDB, uRESTDWDataUtils;
+Uses
+  uRESTDWTools, uRESTDWDataJSON, uRESTDWJSONInterface, uRESTDWBasicDB,
+  uRESTDWDataUtils, uRESTDWMimeTypes;
 
 Class Function TRESTDWStreamHelper.ReadBytes(Const AStream : TStream;
                                              Var   VBytes  : TRESTDWBytes;
@@ -1301,7 +1302,7 @@ Var
   Try
    For I := 0 To Dataset.FieldCount - 1 Do
     Begin
-     S := Dataset.Fields[I].FieldName + '=' + GetFieldTypeB(Dataset.Fields[I].DataType);
+     S := Dataset.Fields[I].FieldName + '=' + FieldTypeToStr(Dataset.Fields[I].DataType);
      If fkLookup = Dataset.Fields[I].FieldKind then
       S := S + ':lookup'
      Else If fkCalculated = Dataset.Fields[I].FieldKind then

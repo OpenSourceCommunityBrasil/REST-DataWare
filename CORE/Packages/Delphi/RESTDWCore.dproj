@@ -244,7 +244,7 @@
         <DCCReference Include="..\..\Source\utils\uRESTDWMassiveBuffer.pas"/>
         <DCCReference Include="..\..\Source\utils\uRESTDWMD5.pas"/>
         <DCCReference Include="..\..\Source\utils\uRESTDWTools.pas"/>
-        <DCCReference Include="..\..\Source\utils\uzliblaz.pas"/>
+        <DCCReference Include="..\..\Source\utils\uRESTDWZlib.pas"/>
         <DCCReference Include="..\..\Source\utils\JSON\uRESTDWDataJSON.pas"/>
         <DCCReference Include="..\..\Source\utils\JSON\uRESTDWDynArray.pas"/>
         <DCCReference Include="..\..\Source\utils\JSON\uRESTDWJSON.pas"/>
@@ -252,6 +252,7 @@
         <DCCReference Include="..\..\Source\utils\JSON\uRESTDWSerialize.pas"/>
         <DCCReference Include="..\..\Source\utils\uRESTDWMimeTypes.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBufferBase.pas"/>
+        <DCCReference Include="..\..\Source\utils\uRESTDWURLFunctions.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -290,12 +291,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>

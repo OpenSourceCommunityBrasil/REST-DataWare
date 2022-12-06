@@ -27,9 +27,7 @@ Interface
 
 Uses
  Classes,
- uRESTDWAttachment,
- uRESTDWMessageParts,
- uRESTDWTools;
+ uRESTDWAttachment, uRESTDWMessageParts, uRESTDWTools, uRESTDWMimeTypes;
 
  Type
   TRESTDWAttachmentFile = Class(TRESTDWAttachment)
@@ -81,7 +79,7 @@ Begin
  FStoredPathName := AFileName;
  FFileIsTempFile := False;
  If FFilename <> '' Then
-  ContentType := GetMimeTypeFromFile(FFilename);
+  ContentType := TRESTDWMimeType.GetMIMEType(FFilename);
 End;
 
 Destructor TRESTDWAttachmentFile.Destroy;

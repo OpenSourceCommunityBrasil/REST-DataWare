@@ -14,7 +14,7 @@ Uses
    Windows,
   {$ENDIF}
  {$ENDIF}
-  SysUtils, Classes, TypInfo;
+  SysUtils, Classes, TypInfo, uRESTDWTools;
 
 Type
 
