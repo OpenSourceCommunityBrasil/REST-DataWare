@@ -172,18 +172,18 @@ Type
   Procedure   Assign   (Source   : TPersistent);Override;
   Function    GetToken (aSecrets : String) : String;  Virtual; Abstract;
   Function    FromToken(Value    : String) : Boolean; Virtual; Abstract;
-  Property    BeginTime          : TDateTime    Read vInitRequest     Write vInitRequest;
-  Property    EndTime            : TDateTime    Read vFinalRequest    Write vFinalRequest;
-  Property    Secrets            : String       Read vSecrets         Write vSecrets;
+  Property    BeginTime          : TDateTime       Read vInitRequest     Write vInitRequest;
+  Property    EndTime            : TDateTime       Read vFinalRequest    Write vFinalRequest;
+  Property    Secrets            : String          Read vSecrets         Write vSecrets;
  Published
   Property    TokenType         : TRESTDWTokenType Read vRDWTokenType    Write vRDWTokenType;
   Property    CryptType         : TRESTDWCryptType Read vRDWCryptType    Write SetCryptType;
-  Property    Key               : String        Read vTokenName       Write vTokenName;
-  Property    GetTokenEvent     : String        Read vGetTokenName    Write SetGetTokenName;
-  Property    GetTokenRoutes    : TRESTDWRoutes     Read vDWRoutes        Write vDWRoutes;
-  Property    TokenHash         : String        Read vTokenHash       Write SetTokenHash;
-  Property    ServerSignature   : String        Read vServerSignature Write vServerSignature;
-  Property    LifeCycle         : Integer       Read vLifeCycle       Write vLifeCycle;
+  Property    Key               : String           Read vTokenName       Write vTokenName;
+  Property    GetTokenEvent     : String           Read vGetTokenName    Write SetGetTokenName;
+  Property    GetTokenRoutes    : TRESTDWRoutes    Read vDWRoutes        Write vDWRoutes;
+  Property    TokenHash         : String           Read vTokenHash       Write SetTokenHash;
+  Property    ServerSignature   : String           Read vServerSignature Write vServerSignature;
+  Property    LifeCycle         : Integer          Read vLifeCycle       Write vLifeCycle;
 End;
 
 Type

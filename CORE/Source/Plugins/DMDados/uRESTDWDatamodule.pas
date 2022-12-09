@@ -74,8 +74,9 @@ Type
                              UserAgent,
                              BaseRequest : String;
                              port        : Integer);
-   Function    GetAction    (Var URL     : String;
-                             Var Params  : TRESTDWParams) : Boolean;
+   Function    GetAction    (Var URL                : String;
+                             Var Params             : TRESTDWParams;
+                             Var CORS_CustomHeaders : TStrings) : Boolean;
    Constructor Create(Sender : TComponent);Override;
    Destructor  Destroy;override;
    Property ServerAuthOptions              : TRESTDWAuthOptionParam Read vServerAuthOptions              Write vServerAuthOptions;
@@ -117,8 +118,9 @@ Begin
  Inherited;
 End;
 
-Function  TServerMethodDataModule.GetAction(Var URL     : String;
-                                            Var Params  : TRESTDWParams) : Boolean;
+Function  TServerMethodDataModule.GetAction(Var URL                : String;
+                                            Var Params             : TRESTDWParams;
+                                            Var CORS_CustomHeaders : TStrings) : Boolean;
 Var
  I, A,
  vPosQuery     : Integer;
@@ -226,6 +228,65 @@ Var
   If URL = '' Then
    URL := '/';
  End;
+ Procedure BuildCORS(Routes : TRESTDWRoutes);
+ Var
+  vStrAcceptedRoutes : String;
+ Begin
+  vStrAcceptedRoutes := '';
+  If Assigned(CORS_CustomHeaders) Then
+   Begin
+    CORS_CustomHeaders.Clear;
+    If crAll In Routes Then
+     CORS_CustomHeaders.Add('Access-Control-Allow-Methods=GET, POST, PATCH, PUT, DELETE, OPTIONS')
+    Else
+     Begin
+      If crGet in Routes Then
+       Begin
+        If vStrAcceptedRoutes <> '' Then
+         vStrAcceptedRoutes := vStrAcceptedRoutes + ', GET'
+        Else
+         vStrAcceptedRoutes := 'GET';
+       End;
+      If crPost in Routes Then
+       Begin
+        If vStrAcceptedRoutes <> '' Then
+         vStrAcceptedRoutes := vStrAcceptedRoutes + ', POST'
+        Else
+         vStrAcceptedRoutes := 'POST';
+       End;
+      If crPut in Routes Then
+       Begin
+        If vStrAcceptedRoutes <> '' Then
+         vStrAcceptedRoutes := vStrAcceptedRoutes + ', PUT'
+        Else
+         vStrAcceptedRoutes := 'PUT';
+       End;
+      If crPatch in Routes Then
+       Begin
+        If vStrAcceptedRoutes <> '' Then
+         vStrAcceptedRoutes := vStrAcceptedRoutes + ', PATCH'
+        Else
+         vStrAcceptedRoutes := 'PATCH';
+       End;
+      If crDelete in Routes Then
+       Begin
+        If vStrAcceptedRoutes <> '' Then
+         vStrAcceptedRoutes := vStrAcceptedRoutes + ', DELETE'
+        Else
+         vStrAcceptedRoutes := 'DELETE';
+       End;
+      If crOption in Routes Then
+       Begin
+        If vStrAcceptedRoutes <> '' Then
+         vStrAcceptedRoutes := vStrAcceptedRoutes + ', OPTION'
+        Else
+         vStrAcceptedRoutes := 'OPTION';
+       End;
+      If vStrAcceptedRoutes <> '' Then
+       CORS_CustomHeaders.Add('Access-Control-Allow-Methods=' + vStrAcceptedRoutes);
+     End;
+   End;
+ End;
 Begin
  Result   := False;
  If Length(URL) = 0 Then
@@ -234,61 +295,69 @@ Begin
  vTempValue := URL;
  For I := 0 To ComponentCount -1 Do
   Begin
-    if (Components[i] is TRESTDWServerEvents) then begin
-      for A := 0 To TRESTDWServerEvents(Components[I]).Events.Count -1 do begin
-        vTempRoute := TRESTDWServerEvents(Components[I]).Events[A].BaseURL   +
-                      TRESTDWServerEvents(Components[I]).Events[A].EventName;
-
-        if ((vTempValue = '/') or (vTempValue = '')) then begin
-          if TRESTDWServerEvents(Components[I]).DefaultEvent <> '' then begin
-            vTempValue := TRESTDWServerEvents(Components[I]).DefaultEvent;
-            if vTempValue[InitStrPos] <> '/' then
-              vTempValue :=  '/' + vTempValue;
-          end;
-        end;
-
-        if SameText(vTempRoute, vTempValue) then begin
-          Result := True;
-          vTempURL := vTempRoute;
-          vTempParamsURI := '';
-          vParamMethods := TRESTDWServerEvents(Components[I]).Events[A].Params;
-          Break;
-        end
-        else if SameText(vTempRoute+'/', Copy(vTempValue+'/', 1, Length(vTempRoute+'/'))) then begin
-          Result := True;
-          vTempURL := vTempRoute;
-          vTempParamsURI := Copy(vTempValue,Length(vTempRoute) + 2, Length(vTempValue));
-          vParamMethods := TRESTDWServerEvents(Components[I]).Events[A].Params;
-        end;
-      end;
-    end
-    Else If (Components[i] Is TRESTDWServerContext) Then
-     Begin
-      For A := 0 To TRESTDWServerContext(Components[I]).ContextList.Count - 1 Do
-       Begin
-        vTempRoute := TRESTDWServerContext(Components[I]).ContextList[A].BaseURL   +
-                      TRESTDWServerContext(Components[I]).ContextList[A].ContextName;
-        If SameText(vTempRoute, vTempValue) Then
-         Begin
-          Result := True;
-          vTempURL := vTempRoute;
-          vTempParamsURI := '';
-          vParamMethods := TRESTDWServerContext(Components[I]).ContextList[A].Params;
-          Break;
-         End
-        Else If SameText(vTempRoute+'/', Copy(vTempValue+'/', 1, Length(vTempRoute+'/'))) Then
-         Begin
-          Result := True;
-          vTempURL := vTempRoute;
-          vTempParamsURI := Copy(vTempValue, Length(vTempRoute) + 2, Length(vTempValue));
-          vParamMethods := TRESTDWServerContext(Components[I]).ContextList[A].Params;
-         End;
-       End;
+   If (Components[i] Is TRESTDWServerEvents) Then
+    Begin
+     For A := 0 To TRESTDWServerEvents(Components[I]).Events.Count -1 Do
+      Begin
+       vTempRoute := TRESTDWServerEvents(Components[I]).Events[A].BaseURL   +
+                     TRESTDWServerEvents(Components[I]).Events[A].EventName;
+       If ((vTempValue = '/') or (vTempValue = '')) Then
+        Begin
+         If TRESTDWServerEvents(Components[I]).DefaultEvent <> '' Then
+          Begin
+           vTempValue := TRESTDWServerEvents(Components[I]).DefaultEvent;
+           If vTempValue[InitStrPos] <> '/' Then
+            vTempValue :=  '/' + vTempValue;
+          End;
+        End;
+       If SameText(vTempRoute, vTempValue) Then
+        Begin
+         Result         := True;
+         vTempURL       := vTempRoute;
+         vTempParamsURI := '';
+         vParamMethods  := TRESTDWServerEvents(Components[I]).Events[A].Params;
+         BuildCORS(TRESTDWServerEvents(Components[I]).Events[A].Routes);
+         Break;
+        End
+       Else If SameText(vTempRoute + '/', Copy(vTempValue + '/', InitStrPos, Length(vTempRoute + '/') - FinalStrPos)) Then
+        Begin
+         Result         := True;
+         vTempURL       := vTempRoute;
+         vTempParamsURI := Copy(vTempValue, Length(vTempRoute) + 2, Length(vTempValue));
+         vParamMethods  := TRESTDWServerEvents(Components[I]).Events[A].Params;
+         BuildCORS(TRESTDWServerEvents(Components[I]).Events[A].Routes);
+        End;
+      End;
+    End
+   Else If (Components[i] Is TRESTDWServerContext) Then
+    Begin
+     For A := 0 To TRESTDWServerContext(Components[I]).ContextList.Count - 1 Do
+      Begin
+       vTempRoute := TRESTDWServerContext(Components[I]).ContextList[A].BaseURL   +
+                     TRESTDWServerContext(Components[I]).ContextList[A].ContextName;
+       If SameText(vTempRoute, vTempValue) Then
+        Begin
+         Result         := True;
+         vTempURL       := vTempRoute;
+         vTempParamsURI := '';
+         vParamMethods  := TRESTDWServerContext(Components[I]).ContextList[A].Params;
+         BuildCORS(TRESTDWServerContext(Components[I]).ContextList[A].Routes);
+         Break;
+        End
+       Else If SameText(vTempRoute+'/', Copy(vTempValue+'/', 1, Length(vTempRoute+'/'))) Then
+        Begin
+         Result         := True;
+         vTempURL       := vTempRoute;
+         vTempParamsURI := Copy(vTempValue, Length(vTempRoute) + 2, Length(vTempValue));
+         vParamMethods  := TRESTDWServerContext(Components[I]).ContextList[A].Params;
+         BuildCORS(TRESTDWServerContext(Components[I]).ContextList[A].Routes);
+        End;
+      End;
      End;
    If Result Then
     Begin
      CopyParams(vParamMethods);
-     URL := vTempURL;
+     URL       := vTempURL;
      ParamsURI := '?' + ParamsURI;
      ParamsURI := vTempParamsURI + ParamsURI;
      ParseParams;
@@ -299,7 +368,7 @@ Begin
     ((URL = '')   Or
      (URL = '/')) Then
   URL := '';
-end;
+End;
 
 Procedure TServerMethodDataModule.SetClientInfo(ip,
                                                 UserAgent,

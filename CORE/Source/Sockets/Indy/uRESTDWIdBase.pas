@@ -44,11 +44,9 @@ Uses
     {$ENDIF}
   {$ENDIF}
   SysUtils, Classes, Db, Variants,
-
   uRESTDWBasic, uRESTDWBasicDB, uRESTDWComponentEvents, uRESTDWBasicTypes,
   uRESTDWJSONObject, uRESTDWParams, uRESTDWBasicClass, uRESTDWComponentBase,
   uRESTDWConsts, uRESTDWEncodeClass, uRESTDWDataUtils, uRESTDWTools, uRESTDWZlib,
-
   IdContext, IdHeaderList, IdTCPConnection, IdHTTPServer, IdCustomHTTPServer,
   IdSSLOpenSSL, IdSSL, IdAuthentication, IdTCPClient, IdHTTPHeaderInfo,
   IdComponent, IdBaseComponent, IdHTTP, IdMultipartFormData, IdMessageCoder,
@@ -3182,9 +3180,9 @@ Var
  vAuthRealm,
  vContentType,
  vResponseString : String;
- I,
- StatusCode      : Integer;
+ I, StatusCode   : Integer;
  ResultStream    : TStream;
+ vCORSHeader     : TStrings;
  vResponseHeader : TStringList;
  mb              : TStringStream;
  vRedirect       : TRedirect;
@@ -3213,20 +3211,17 @@ Var
  Begin
   If Assigned(vResponseHeader) Then
    FreeAndNil(vResponseHeader);
+  If Assigned(vCORSHeader) Then
+   FreeAndNil(vCORSHeader);
  End;
  Procedure Redirect(Url : String);
  Begin
   AResponseInfo.Redirect(Url);
  End;
-Begin
- vResponseHeader := TStringList.Create;
- vResponseString := '';
- {$IFNDEF FPC}
-  @vRedirect     := @Redirect;
- {$ELSE}
-  vRedirect      := TRedirect(@Redirect);
- {$ENDIF}
- Try
+ Procedure SetReplyCORS;
+ Var
+  I : Integer;
+ Begin
   If CORS Then
    Begin
     If CORS_CustomHeaders.Count > 0 Then
@@ -3236,7 +3231,26 @@ Begin
      End
     Else
      AResponseInfo.CustomHeaders.AddValue('Access-Control-Allow-Origin','*');
+    If Assigned(vCORSHeader) Then
+     Begin
+      If vCORSHeader.Count > 0 Then
+       Begin
+        For I := 0 To vCORSHeader.Count -1 Do
+         AResponseInfo.CustomHeaders.AddValue(vCORSHeader.Names[I], vCORSHeader.ValueFromIndex[I]);
+       End;
+     End;
    End;
+ End;
+Begin
+ vResponseHeader := TStringList.Create;
+ vCORSHeader     := TStringList.Create;
+ vResponseString := '';
+ {$IFNDEF FPC}
+  @vRedirect     := @Redirect;
+ {$ELSE}
+  vRedirect      := TRedirect(@Redirect);
+ {$ENDIF}
+ Try
   {$IFNDEF FPC}
    {$IF Defined(HAS_FMX)}
     {$IFDEF HAS_UTF8}
@@ -3278,8 +3292,10 @@ Begin
                    vResponseHeader,
                    vResponseString,
                    ResultStream,
+                   vCORSHeader,
                    vRedirect) Then
    Begin
+    SetReplyCORS;
     AResponseInfo.AuthRealm   := vAuthRealm;
     AResponseInfo.ContentType := vContentType;
     If Encoding = esUtf8 Then
@@ -3320,6 +3336,7 @@ Begin
    End
   Else //Tratamento de Erros.
    Begin
+    SetReplyCORS;
     AResponseInfo.AuthRealm := vAuthRealm;
     {$IFNDEF FPC}
      {$if CompilerVersion > 21}

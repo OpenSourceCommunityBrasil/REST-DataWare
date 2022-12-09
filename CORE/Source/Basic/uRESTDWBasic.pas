@@ -586,29 +586,30 @@ Type
                                       AccessTag               : String;
                                       Var InvalidTag          : Boolean);Virtual;Abstract;
   Procedure SetActive                (Value               : Boolean);Virtual;
-  Function CommandExec     (Const AContext : TComponent;
+  Function CommandExec     (Const AContext        : TComponent;
                             Url,
-                            RawHTTPCommand      : String;
-                            Var ContentType     : String;
+                            RawHTTPCommand        : String;
+                            Var ContentType       : String;
                             ClientIP,
                             UserAgent,
                             AuthUsername,
                             AuthPassword,
-                            Token               : String;
-                            RequestHeaders      : TStringList;
-                            ClientPort          : Integer;
+                            Token                 : String;
+                            RequestHeaders        : TStringList;
+                            ClientPort            : Integer;
                             RawHeaders,
-                            Params              : TStrings;
-                            QueryParams         : String;
-                            ContentStringStream : TStream;
+                            Params                : TStrings;
+                            QueryParams           : String;
+                            ContentStringStream   : TStream;
                             Var AuthRealm,
                             sCharSet,
-                            ErrorMessage        : String;
-                            Var StatusCode      : Integer;
-                            Var ResponseHeaders : TStringList;
-                            Var ResponseString  : String;
-                            Var ResultStream  : TStream;
-                            Redirect            : TRedirect) : Boolean;
+                            ErrorMessage          : String;
+                            Var StatusCode        : Integer;
+                            Var ResponseHeaders   : TStringList;
+                            Var ResponseString    : String;
+                            Var ResultStream      : TStream;
+                            Var CORSCustomHeaders : TStrings;
+                            Redirect              : TRedirect) : Boolean;
   Procedure   ClearDataRoute;
   Procedure   AddDataRoute (DataRoute           : String; MethodClass : TComponentClass);
   Function    GetDataRouteCount: integer;
@@ -1453,29 +1454,30 @@ Begin
  Inherited;
 End;
 
-Function TRESTServiceBase.CommandExec(Const AContext : TComponent;
+Function TRESTServiceBase.CommandExec(Const AContext        : TComponent;
                                       Url,
-                                      RawHTTPCommand      : String;
-                                      Var ContentType     : String;
+                                      RawHTTPCommand        : String;
+                                      Var ContentType       : String;
                                       ClientIP,
                                       UserAgent,
                                       AuthUsername,
                                       AuthPassword,
-                                      Token               : String;
-                                      RequestHeaders      : TStringList;
-                                      ClientPort          : Integer;
+                                      Token                 : String;
+                                      RequestHeaders        : TStringList;
+                                      ClientPort            : Integer;
                                       RawHeaders,
-                                      Params              : TStrings;
-                                      QueryParams         : String;
-                                      ContentStringStream : TStream;
+                                      Params                : TStrings;
+                                      QueryParams           : String;
+                                      ContentStringStream   : TStream;
                                       Var AuthRealm,
                                       sCharSet,
-                                      ErrorMessage        : String;
-                                      Var StatusCode      : Integer;
-                                      Var ResponseHeaders : TStringList;
-                                      Var ResponseString  : String;
-                                      Var ResultStream    : TStream;
-                                      Redirect            : TRedirect) : Boolean;
+                                      ErrorMessage          : String;
+                                      Var StatusCode        : Integer;
+                                      Var ResponseHeaders   : TStringList;
+                                      Var ResponseString    : String;
+                                      Var ResultStream      : TStream;
+                                      Var CORSCustomHeaders : TStrings;
+                                      Redirect              : TRedirect) : Boolean;
 Var
  I, vErrorCode      : Integer;
  DataMode           : TDataMode;
@@ -2020,18 +2022,16 @@ Begin
                      (Pos('=', Lowercase(Url)) > 0);
     If Not vIsQueryParam Then
      vIsQueryParam := (Pos('?', Lowercase(RawHTTPCommand)) > 0);
-    if (cmd = '') or (cmd = '/') then
+    If (cmd = '') or (cmd = '/') Then
      vOldRequest   := aDefaultUrl
-    else
+    Else
      vOldRequest   := Cmd;
     If vIsQueryParam Then
      vUrlToExec    := Url
     Else
      vUrlToExec    := Cmd;
-
     If (Cmd <> '/') And (Cmd <> '') Then
      ReadRawHeaders;
-
     vCompareContext := CompareBaseURL(Cmd); // := aDefaultUrl;
     If Cmd <> '' Then
      TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
@@ -2888,7 +2888,9 @@ Begin
         vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
        Try
         vTempServerMethods  := vServerMethod.Create(Nil);
-        TServerMethodDataModule(vTempServerMethods).GetAction(vOldRequest, DWParams);
+        If Not vCORS Then
+         FreeAndNil(CORSCustomHeaders);
+        TServerMethodDataModule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders);
         vUrlToExec := vOldRequest;
        Finally
        End;
@@ -2919,16 +2921,12 @@ Begin
           End;
          vServerAuthOptions.CopyServerAuthParams(vRDWAuthOptionParam);
          TServerMethodDatamodule(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
-         //TODO
-//         TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUriOptions.EventName, vUriOptions.ServerEvent, ClientPort);
-         //Novo Lugar para Autenticação
-         If ((vCORS) And (RequestType = rtOption)) Then
-          vErrorCode            := cCORSPreflightCODE
-         Else If (RequestType <> rtOption) Or
-              (vServerAuthOptions.AuthorizationOption in [rdwAOBasic, rdwAOBearer, rdwAOToken]) Then
+         If (vServerAuthOptions.AuthorizationOption in [rdwAOBasic, rdwAOBearer, rdwAOToken]) Then
           Begin
            vAcceptAuth           := False;
            vErrorCode            := 401;
+//           If ((vCORS) And (RequestType = rtOption)) Then
+//            vErrorCode           := cCORSPreflightCODE;
            vErrorMessage         := cInvalidAuth;
            Case vServerAuthOptions.AuthorizationOption Of
             rdwAOBasic  : Begin
@@ -3438,9 +3436,7 @@ Begin
             vServerAuthOptions.CopyServerAuthParams(vRDWAuthOptionParam);
             TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
            End;
-          If (RequestType = rtOption) Then
-           Result := True
-          Else If (Not (vGettoken)) And (Not (vTokenValidate)) Then
+          If (Not (vGettoken)) And (Not (vTokenValidate)) Then
            Begin
             If Not ServiceMethods(TComponent(vTempServerMethods), AContext, vUrlToExec, vdwservereventname, DWParams,
                                        JSONStr, DataMode, vErrorCode,  vContentType, vServerContextCall, ServerContextStream,
@@ -5706,12 +5702,12 @@ Function TRESTServiceBase.ReturnEvent(ServerMethodsClass : TComponent;
                                       Const RequestType   : TRequestType;
                                       Var   RequestHeader : TStringList) : Boolean;
 Var
- I, B          : Integer;
+ I, B               : Integer;
  vRejected,
- vTagService   : Boolean;
- vErrorMessage : String;
- vStrAcceptedRoutes: string;
- vDWRoutes: TRESTDWRoutes;
+ vTagService        : Boolean;
+ vErrorMessage,
+ vStrAcceptedRoutes : String;
+ vDWRoutes          : TRESTDWRoutes;
 Begin
  Result        := False;
  vRejected     := False;
@@ -5846,6 +5842,13 @@ Begin
              Else
               vStrAcceptedRoutes := 'DELETE';
             End;
+           If crOption in vDWRoutes Then
+            Begin
+             If vStrAcceptedRoutes <> '' Then
+              vStrAcceptedRoutes := vStrAcceptedRoutes + ', OPTION'
+             Else
+              vStrAcceptedRoutes := 'OPTION';
+            End;
            If vStrAcceptedRoutes <> '' then
             Begin
              vResult   := 'Request rejected. Acceptable HTTP methods: '+vStrAcceptedRoutes;
@@ -5909,23 +5912,23 @@ Function TRESTServiceBase.ReturnContext(ServerMethodsClass      : TComponent;
                                           RequestHeader           : TStringList;
                                           Var ErrorCode           : Integer) : Boolean;
 Var
- I, B          : Integer;
+ I, B               : Integer;
  vRejected,
  vTagService,
- vDefaultPageB : Boolean;
+ vDefaultPageB      : Boolean;
  vErrorMessage,
  vBaseHeader,
- vRootContext : String;
- vStrAcceptedRoutes: string;
- vDWRoutes: TRESTDWRoutes;
+ vRootContext,
+ vStrAcceptedRoutes : String;
+ vDWRoutes          : TRESTDWRoutes;
 Begin
- Result        := False;
+ Result         := False;
  vDefaultPageB  := False;
- vRejected     := False;
- Error         := False;
- vTagService   := Result;
- vRootContext  := '';
- vErrorMessage := '';
+ vRejected      := False;
+ Error          := False;
+ vTagService    := Result;
+ vRootContext   := '';
+ vErrorMessage  := '';
  If (Pooler <> '') And (urlContext = '') Then
   Begin
    urlContext := Pooler;
@@ -6086,6 +6089,13 @@ Begin
              Else
               vStrAcceptedRoutes := 'DELETE';
             End;
+           If crOption in vDWRoutes Then
+            Begin
+             If vStrAcceptedRoutes <> '' Then
+              vStrAcceptedRoutes := vStrAcceptedRoutes + ', OPTION'
+             Else
+              vStrAcceptedRoutes := 'OPTION';
+            End;
            If vStrAcceptedRoutes <> '' Then
             Begin
              vResult   := cRequestRejectedMethods + vStrAcceptedRoutes;
@@ -6138,8 +6148,8 @@ Begin
  vCORSCustomHeaders                     := TStringList.Create;
  vDataRouteList                         := TRESTDWDataRouteList.Create;
  vCORSCustomHeaders.Add('Access-Control-Allow-Origin=*');
- vCORSCustomHeaders.Add('Access-Control-Allow-Methods=GET, POST, PATCH, PUT, DELETE, OPTIONS');
  vCORSCustomHeaders.Add('Access-Control-Allow-Headers=Content-Type, Origin, Accept, Authorization, X-CUSTOM-HEADER');
+// vCORSCustomHeaders.Add('Access-Control-Allow-Credentials=true');
  vCripto                                := TCripto.Create;
  {$IFDEF FPC}
  vDatabaseCharSet                       := csUndefined;
@@ -6162,20 +6172,19 @@ End;
 
 Destructor TRESTServiceBase.Destroy;
 Begin
- If Assigned(vProxyOptions) Then
+ If Assigned(vProxyOptions)          Then
   FreeAndNil(vProxyOptions);
- If Assigned(vCripto) Then
+ If Assigned(vCripto)                Then
   FreeAndNil(vCripto);
- If Assigned(vDefaultPage) Then
+ If Assigned(vDefaultPage)           Then
   FreeAndNil(vDefaultPage);
- If Assigned(vCORSCustomHeaders) Then
+ If Assigned(vCORSCustomHeaders)     Then
   FreeAndNil(vCORSCustomHeaders);
- If Assigned(vDataRouteList) Then
+ If Assigned(vDataRouteList)         Then
   FreeAndNil(vDataRouteList);
- If Assigned(vServerAuthOptions) Then
+ If Assigned(vServerAuthOptions)     Then
   FreeAndNil(vServerAuthOptions);
-
- if Assigned(vServerIpVersionConfig) then
+ If Assigned(vServerIpVersionConfig) Then
   FreeAndNil(vServerIpVersionConfig);
  Inherited;
 End;

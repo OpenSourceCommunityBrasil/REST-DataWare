@@ -80,6 +80,7 @@ Var
  I,
  StatusCode      : Integer;
  ResultStream    : TStream;
+ vCORSHeader     : TStrings;
  vRawHeader,
  vResponseHeader : TStringList;
  mb              : TStringStream;
@@ -111,9 +112,53 @@ Var
    FreeAndNil(vStream);
   If Assigned(vRawHeader) Then
    FreeAndNil(vRawHeader);
+  If Assigned(vCORSHeader) Then
+   FreeAndNil(vCORSHeader);
+ End;
+ Procedure SetReplyCORS;
+ Var
+  I : Integer;
+ Begin
+  If CORS Then
+   Begin
+    If CORS_CustomHeaders.Count > 0 Then
+     Begin
+      For I := 0 To CORS_CustomHeaders.Count -1 Do
+       Begin
+        {$IF CompilerVersion > 30}
+         AResponse.CustomHeaders.AddPair(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
+        {$ELSE}
+         AResponse.CustomHeaders.Add(CORS_CustomHeaders.Names[I] + cNameValueSeparator + CORS_CustomHeaders.ValueFromIndex[I]);
+        {$IFEND}
+       End;
+     End
+    Else
+     Begin
+      {$IF CompilerVersion > 30}
+       AResponse.CustomHeaders.AddPair('Access-Control-Allow-Origin','*');
+      {$ELSE}
+       AResponse.CustomHeaders.Add('Access-Control-Allow-Origin' + cNameValueSeparator + '*');
+      {$IFEND}
+     End;
+    If Assigned(vCORSHeader) Then
+     Begin
+      If vCORSHeader.Count > 0 Then
+       Begin
+        For I := 0 To vCORSHeader.Count -1 Do
+         Begin
+          {$IF CompilerVersion > 30}
+           AResponse.CustomHeaders.AddPair(vCORSHeader.Names[I], vCORSHeader.ValueFromIndex[I]);
+          {$ELSE}
+           AResponse.CustomHeaders.Add(vCORSHeader.Names[I] + cNameValueSeparator + vCORSHeader.ValueFromIndex[I]);
+          {$IFEND}
+         End;
+       End;
+     End;
+   End;
  End;
 Begin
  ResultStream    := TStringStream.Create('');
+ vCORSHeader     := TStringList.Create;
  vResponseHeader := TStringList.Create;
  vResponseString := '';
  vStream         := Nil;
@@ -122,28 +167,6 @@ Begin
   ARequest.ReadTotalContent;
  {$IFEND}
  Try
-  If CORS Then
-   Begin
-    If CORS_CustomHeaders.Count > 0 Then
-     Begin
-      For I := 0 To CORS_CustomHeaders.Count -1 Do
-       Begin
-         {$IF CompilerVersion > 30}
-         AResponse.CustomHeaders.AddPair(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
-         {$ELSE}
-         AResponse.CustomHeaders.Add(CORS_CustomHeaders.Names[I] + cNameValueSeparator + CORS_CustomHeaders.ValueFromIndex[I]);
-         {$IFEND}
-       End;
-     End
-    Else
-     Begin
-       {$IF CompilerVersion > 30}
-       AResponse.CustomHeaders.AddPair('Access-Control-Allow-Origin','*');
-       {$ELSE}
-       AResponse.CustomHeaders.Add('Access-Control-Allow-Origin' + cNameValueSeparator + '*');
-       {$IFEND}
-     End;
-   End;
   vAuthRealm := AResponse.Realm;
   vToken     := ARequest.Authorization;
   //ARequest.Connection
@@ -190,8 +213,10 @@ Begin
                    vResponseHeader,
                    vResponseString,
                    ResultStream,
+                   vCORSHeader,
                    vRedirect) Then
    Begin
+    SetReplyCORS;
     AResponse.Realm       := vAuthRealm;
     AResponse.ContentType := vContentType;
     {$if CompilerVersion > 21}
@@ -240,14 +265,15 @@ Begin
        {$IFEND}
      End;
     Handled := True;
-     AResponse.SendResponse;
-     {$IF CompilerVersion < 21}
-      If Assigned(ResultStream) Then
-       FreeAndNil(ResultStream);
-     {$IFEND}
+    AResponse.SendResponse;
+    {$IF CompilerVersion < 21}
+     If Assigned(ResultStream) Then
+      FreeAndNil(ResultStream);
+    {$IFEND}
    End
   Else //Tratamento de Erros.
    Begin
+    SetReplyCORS;
     AResponse.Realm := vAuthRealm;
     {$if CompilerVersion > 21}
      If (sCharSet <> '') Then

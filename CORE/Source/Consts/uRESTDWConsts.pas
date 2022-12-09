@@ -47,7 +47,7 @@ Const
  // controle de versão
  RESTDWVersionINFO          = 'v2.1.0-';
  RESTDWRelease              = '224';
- RESTDWCodeProject          = 'Galaga - GitHub';
+ RESTDWCodeProject          = 'Galaga - SourceForge';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  cSetPhysicDriver           = 'A PhysicDriver is needed to work';
  SNotEditing                = 'Not in Edit mode';
@@ -258,7 +258,7 @@ Type
  TRESTDWJSONTypes     = Set of TRESTDWJSONType;
  TRESTDWMaxLineAction = (maException, maSplit);
  TRESTDWOSType        = (otUnknown, otUnix, otWindows, otDotNet);
- TRESTDWRoute         = (crAll, crGet, crPost, crPut, crPatch, crDelete);
+ TRESTDWRoute         = (crAll, crGet, crPost, crPut, crPatch, crDelete, crOption);
  TRESTDWRoutes        = Set of TRESTDWRoute;
  TRESTDWSSLVersion    = (sslvSSLv2, sslvSSLv23,  sslvSSLv3, sslvTLSv1, sslvTLSv1_1, sslvTLSv1_2);
  TRESTDWSSLVersions   = set of TRESTDWSSLVersion;
