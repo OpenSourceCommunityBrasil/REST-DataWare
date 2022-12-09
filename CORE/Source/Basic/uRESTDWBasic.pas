@@ -2890,7 +2890,11 @@ Begin
         vTempServerMethods  := vServerMethod.Create(Nil);
         If Not vCORS Then
          FreeAndNil(CORSCustomHeaders);
-        TServerMethodDataModule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders);
+        If TServerMethodDataModule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
+         Begin
+          If ((vCORS) And (RequestType = rtOption)) Then
+           vErrorCode := 200;
+         End;
         vUrlToExec := vOldRequest;
        Finally
        End;
@@ -2925,8 +2929,6 @@ Begin
           Begin
            vAcceptAuth           := False;
            vErrorCode            := 401;
-//           If ((vCORS) And (RequestType = rtOption)) Then
-//            vErrorCode           := cCORSPreflightCODE;
            vErrorMessage         := cInvalidAuth;
            Case vServerAuthOptions.AuthorizationOption Of
             rdwAOBasic  : Begin
@@ -5640,9 +5642,9 @@ Begin
 End;
 
 Procedure TRESTServiceBase.GetEvents(ServerMethodsClass : TComponent;
-                                       Pooler,
-                                       urlContext         : String;
-                                       Var DWParams       : TRESTDWParams);
+                                     Pooler,
+                                     urlContext         : String;
+                                     Var DWParams       : TRESTDWParams);
 Var
  I         : Integer;
  vError    : Boolean;
@@ -5763,12 +5765,15 @@ Begin
             Begin
              TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].CompareParams(DWParams);
              Try
-              If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnBeforeExecute) Then
-               TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnBeforeExecute(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler]);
-              If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEventByType) Then
-               TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEventByType(DWParams, vResult, RequestType, ErrorCode, RequestHeader)
-              Else If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent) Then
-               TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent(DWParams, vResult);
+              If RequestType <> rtOption Then
+               Begin
+                If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnBeforeExecute) Then
+                 TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnBeforeExecute(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler]);
+                If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEventByType) Then
+                 TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEventByType(DWParams, vResult, RequestType, ErrorCode, RequestHeader)
+                Else If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent) Then
+                 TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent(DWParams, vResult);
+               End;
               DataMode := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].DataMode;
               ContentType := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].defaultcontenttype;
               If Trim(ContentType) = '' Then
@@ -5959,93 +5964,95 @@ Begin
          If (RequestTypeToRoute(RequestType) In TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].Routes) Or
             (crAll in TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].Routes) Then
           Begin
-           If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).OnBeforeRenderer) Then
-            TRESTDWServerContext(ServerMethodsClass.Components[i]).OnBeforeRenderer(ServerMethodsClass.Components[i]);
            If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnAuthRequest) Then
             TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnAuthRequest(DWParams, vRejected, vErrorMessage, ErrorCode, RequestHeader);
-           If Not vRejected Then
+           If RequestType <> rtOption Then
             Begin
-             Result  := True;
-             vResult := '';
-             TRESTDWServerContext(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, DWParams);
-             TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].CompareParams(DWParams);
-             Try
-              ContentType := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContentType;
-              If mark <> '' Then
-               Begin
-                vResult    := '';
-                Result     := Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules);
-                If Result Then
+             If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).OnBeforeRenderer) Then
+              TRESTDWServerContext(ServerMethodsClass.Components[i]).OnBeforeRenderer(ServerMethodsClass.Components[i]);
+             If Not vRejected Then
+              Begin
+               Result  := True;
+               vResult := '';
+               TRESTDWServerContext(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, DWParams);
+               TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].CompareParams(DWParams);
+               Try
+                ContentType := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContentType;
+                If mark <> '' Then
                  Begin
-                  Result   := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark] <> Nil;
+                  vResult    := '';
+                  Result     := Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules);
                   If Result Then
                    Begin
-                    Result := Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark].OnRequestExecute);
+                    Result   := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark] <> Nil;
                     If Result Then
                      Begin
-                      ContentType := cDefaultContentType;
-                      TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark].OnRequestExecute(DWParams, ContentType, vResult);
-//                      vResult := utf8Encode(vResult);
+                      Result := Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark].OnRequestExecute);
+                      If Result Then
+                       Begin
+                        ContentType := cDefaultContentType;
+                        TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.Items.MarkByName[mark].OnRequestExecute(DWParams, ContentType, vResult);
+                       End;
                      End;
                    End;
-                 End;
-               End
-              Else If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules) Then
-               Begin
-                vBaseHeader := '';
-                ContentType := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.ContentType;
-                vResult := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.BuildContext(TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader,
-                                                                                                                                          TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].IgnoreBaseHeader);
-               End
-              Else
-               Begin
-                If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeCall) Then
-                 TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeCall(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler]);
-                vDefaultPageB := Not Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequest);
-                If Not vDefaultPageB Then
-                 TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequest(DWParams, ContentType, vResult, RequestType);
-                If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequestStream) Then
-                 Begin
-                  vDefaultPageB := False;
-                  ServerContextStream := TMemoryStream.Create;
-                  Try
-                   TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequestStream(DWParams, ContentType, ServerContextStream, RequestType, ErrorCode);
-                  Finally
-                   If ServerContextStream.Size = 0 Then
-                    FreeAndNil(ServerContextStream);
-                  End;
-                 End;
-                If vDefaultPageB Then
+                 End
+                Else If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules) Then
                  Begin
                   vBaseHeader := '';
-                  If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader) Then
-                   vBaseHeader := TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader.Text;
-                  vResult := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].DefaultHtml.Text;
-                  If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeRenderer) Then
-                   TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeRenderer(vBaseHeader, ContentType, vResult, RequestType);
+                  ContentType := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.ContentType;
+                  vResult := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.BuildContext(TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader,
+                                                                                                                                            TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].IgnoreBaseHeader);
+                 End
+                Else
+                 Begin
+                  If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeCall) Then
+                   TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeCall(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler]);
+                  vDefaultPageB := Not Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequest);
+                  If Not vDefaultPageB Then
+                   TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequest(DWParams, ContentType, vResult, RequestType);
+                  If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequestStream) Then
+                   Begin
+                    vDefaultPageB := False;
+                    ServerContextStream := TMemoryStream.Create;
+                    Try
+                     TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnReplyRequestStream(DWParams, ContentType, ServerContextStream, RequestType, ErrorCode);
+                    Finally
+                     If ServerContextStream.Size = 0 Then
+                      FreeAndNil(ServerContextStream);
+                    End;
+                   End;
+                  If vDefaultPageB Then
+                   Begin
+                    vBaseHeader := '';
+                    If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader) Then
+                     vBaseHeader := TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader.Text;
+                    vResult := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].DefaultHtml.Text;
+                    If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeRenderer) Then
+                     TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeRenderer(vBaseHeader, ContentType, vResult, RequestType);
+                   End;
+                 End;
+               Except
+                On E : Exception Do
+                 Begin
+                  If DWParams.ItemsString['dwencodestrings'] <> Nil Then
+                   vResult := EncodeStrings(e.Message{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                  Else
+                   vResult := e.Message;
+                  Error   := True;
+                  Exit;
                  End;
                End;
-             Except
-              On E : Exception Do
-               Begin
-                If DWParams.ItemsString['dwencodestrings'] <> Nil Then
-                 vResult := EncodeStrings(e.Message{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
-                Else
-                 vResult := e.Message;
-                Error   := True;
-                Exit;
-               End;
-             End;
-            End
-           Else
-            Begin
-             If vErrorMessage <> '' Then
-              Begin
-               ContentType := 'text/html';
-               vResult     := vErrorMessage;
               End
              Else
-              vResult   := cRequestRejected;
+              Begin
+               If vErrorMessage <> '' Then
+                Begin
+                 ContentType := 'text/html';
+                 vResult     := vErrorMessage;
+                End
+               Else
+                vResult   := cRequestRejected;
+              End;
             End;
            If Trim(vResult) = '' Then
             vResult := TReplyOK;

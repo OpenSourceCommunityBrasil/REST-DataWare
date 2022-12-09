@@ -3511,6 +3511,7 @@ Begin
   rtPut    : Result := crPut;
   rtPatch  : Result := crPatch;
   rtDelete : Result := crDelete;
+  rtOption : Result := crOption;
  End;
 End;
 
