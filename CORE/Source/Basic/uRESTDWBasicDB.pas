@@ -8256,7 +8256,7 @@ Begin
      Break;
     End;
   End;
- If Not Assigned(Result) Then 
+ If Not Assigned(Result) Then
   Raise Exception.Create(Format(cParamNotFound, [Value]));
 End;
 
@@ -8281,7 +8281,7 @@ Begin
      Break;
     End;
   End;
- If Not Assigned(Result) Then 
+ If Not Assigned(Result) Then
   Raise Exception.Create(Format(cParamNotFound, [Value]));
 End;
 
@@ -12230,17 +12230,18 @@ End;
 
 Function TRESTDWPoolerListBase.TryConnect: Boolean;
 Var
-  List: TStringList;
+ PoolerList: TStringList;
 Begin
- List := Self.GetPoolerList;
+ PoolerList := Self.GetPoolerList;
 
  try
   vPoolerList.Clear;
-  vPoolerList.Assign(Self.GetPoolerList);
+  vPoolerList.Assign(PoolerList);
   Result := True;
  finally
-  FreeAndNil(List)
+  FreeAndNil(PoolerList)
  end;
+
 End;
 
 end.
