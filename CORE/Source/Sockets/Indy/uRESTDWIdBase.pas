@@ -347,6 +347,13 @@ Type
   Property CipherList              : String                   Read vCipherList              Write vCipherList;
 End;
 
+Type
+  TRESTDWIdPoolerList = Class(TRESTDWPoolerListBase)
+  Public
+    Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
+    Destructor  Destroy;Override;
+  End;
+
 //Fix to Indy Request Patch and Put
 Type
  TIdHTTPAccess = class(TIdHTTP)
@@ -4816,5 +4823,20 @@ Begin
  Inherited;
 End;
 
+
+{ TRESTDWIdPoolerList }
+
+constructor TRESTDWIdPoolerList.Create(AOwner: TComponent);
+begin
+  Inherited;
+
+  RESTClientPooler := TRESTDWIdClientPooler.Create(Self);
+end;
+
+destructor TRESTDWIdPoolerList.Destroy;
+begin
+
+  Inherited;
+end;
 
 End.

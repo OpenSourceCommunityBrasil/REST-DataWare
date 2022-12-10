@@ -1285,61 +1285,63 @@ Type
 End;
 
 Type
- TRESTDWPoolerList = Class(TRESTDWComponent)
- Private
-  vEncoding            : TEncodeSelect;
-  vUserAgent,
-  vAccessTag,
-  vWelcomeMessage,
-  vPoolerPrefix,                                     //Prefixo do WS
-  vDataRoute,
-  vRestWebService,                                   //Rest WebService para consultas
-  vPoolerNotFoundMessage,
-  vRestURL             : String;                     //Qual o Pooler de Conexão do DataSet
-  vTimeOut,
-  vConnectTimeOut,
-  vRedirectMaximum,
-  vPoolerPort          : Integer;                    //A Porta do Pooler
-  vCompression,
-  vHandleRedirects,
-  vConnected,
-  vProxy               : Boolean;                    //Diz se tem servidor Proxy
-  vProxyOptions        : TProxyOptions;              //Se tem Proxy diz quais as opções
-  vPoolerList          : TStringList;
-  vAuthOptionParams    : TRESTDWClientAuthOptionParams;
-  vCripto              : TCripto;
-  vTypeRequest         : TTypeRequest;
-  Procedure SetConnection(Value : Boolean);          //Seta o Estado da Conexão
-  Procedure SetPoolerPort(Value : Integer);          //Seta a Porta do Pooler a ser usada
-  Function  TryConnect : Boolean;                    //Tenta Conectar o Servidor para saber se posso executar comandos
-//  Procedure SetConnectionOptions(Var Value : TRESTClientPoolerBase); //Seta as Opções de Conexão
- Public
-  Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
-  Destructor  Destroy;Override;                      //Destroy a Classe
- Published
-  Property Active                : Boolean                    Read vConnected          Write SetConnection;      //Seta o Estado da Conexão
-  Property WelcomeMessage        : String                     Read vWelcomeMessage     Write vWelcomeMessage;    //Welcome Message Event
-  Property Proxy                 : Boolean                    Read vProxy              Write vProxy;             //Diz se tem servidor Proxy
-  Property Compression           : Boolean                    Read vCompression        Write vCompression;       //Compressão de Dados
-  Property DataRoute             : String                     Read vDataRoute          Write vDataRoute;
-  Property RequestTimeOut        : Integer                    Read vTimeOut            Write vTimeOut;           //Timeout da Requisição
-  Property ConnectTimeOut        : Integer                    Read vConnectTimeOut     Write vConnectTimeOut;
-  Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams   Write vAuthOptionParams;
-  Property CriptOptions          : TCripto                    Read vCripto             Write vCripto;
-  Property ProxyOptions          : TProxyOptions              Read vProxyOptions       Write vProxyOptions;      //Se tem Proxy diz quais as opções
-  Property PoolerService         : String                     Read vRestWebService     Write vRestWebService;    //Host do WebService REST
-  Property PoolerURL             : String                     Read vRestURL            Write vRestURL;           //URL do WebService REST
-  Property PoolerPort            : Integer                    Read vPoolerPort         Write SetPoolerPort;      //A Porta do Pooler do DataSet
-  Property PoolerPrefix          : String                     Read vPoolerPrefix       Write vPoolerPrefix;      //Prefixo do WebService REST
-  Property Poolers               : TStringList                Read vPoolerList;
-  Property HandleRedirects       : Boolean                    Read vHandleRedirects    Write vHandleRedirects;
-  Property RedirectMaximum       : Integer                    Read vRedirectMaximum    Write vRedirectMaximum;
-  Property AccessTag             : String                     Read vAccessTag          Write vAccessTag;
-  Property Encoding              : TEncodeSelect              Read vEncoding           Write vEncoding;          //Encoding da string
-  Property UserAgent             : String                     Read vUserAgent          Write vUserAgent;
-  Property PoolerNotFoundMessage : String                     Read vPoolerNotFoundMessage Write vPoolerNotFoundMessage;
-  Property TypeRequest           : TTypeRequest               Read vTypeRequest        Write vTypeRequest       Default trHttp;
- End;
+  TRESTDWPoolerListBase = Class(TRESTDWComponent)
+  Private
+    vEncoding            : TEncodeSelect;
+    vUserAgent,
+    vAccessTag,
+    vWelcomeMessage,
+    vPoolerPrefix,                                     //Prefixo do WS
+    vDataRoute,
+    vRestWebService,                                   //Rest WebService para consultas
+    vPoolerNotFoundMessage,
+    vRestURL             : String;                     //Qual o Pooler de Conexão do DataSet
+    vTimeOut,
+    vConnectTimeOut,
+    vRedirectMaximum,
+    vPoolerPort          : Integer;                    //A Porta do Pooler
+    vCompression,
+    vHandleRedirects,
+    vConnected,
+    vProxy               : Boolean;                    //Diz se tem servidor Proxy
+    vProxyOptions        : TProxyOptions;              //Se tem Proxy diz quais as opções
+    vPoolerList          : TStringList;
+    vAuthOptionParams    : TRESTDWClientAuthOptionParams;
+    vCripto              : TCripto;
+    vTypeRequest         : TTypeRequest;
+    Procedure SetConnection(Value : Boolean);          //Seta o Estado da Conexão
+    Procedure SetPoolerPort(Value : Integer);          //Seta a Porta do Pooler a ser usada
+    Function  TryConnect : Boolean;                    //Tenta Conectar o Servidor para saber se posso executar comandos
+    Function  GetPoolerList: TStringList;              // Listar os Poolers
+  //  Procedure SetConnectionOptions(Var Value : TRESTClientPoolerBase); //Seta as Opções de Conexão
+  Public
+    RESTClientPooler: TRESTClientPoolerBase;           //Pooler
+    Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
+    Destructor  Destroy;Override;                      //Destroy a Classe
+  Published
+    Property Active                : Boolean                    Read vConnected          Write SetConnection;      //Seta o Estado da Conexão
+    Property WelcomeMessage        : String                     Read vWelcomeMessage     Write vWelcomeMessage;    //Welcome Message Event
+    Property Proxy                 : Boolean                    Read vProxy              Write vProxy;             //Diz se tem servidor Proxy
+    Property Compression           : Boolean                    Read vCompression        Write vCompression;       //Compressão de Dados
+    Property DataRoute             : String                     Read vDataRoute          Write vDataRoute;
+    Property RequestTimeOut        : Integer                    Read vTimeOut            Write vTimeOut;           //Timeout da Requisição
+    Property ConnectTimeOut        : Integer                    Read vConnectTimeOut     Write vConnectTimeOut;
+    Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams   Write vAuthOptionParams;
+    Property CriptOptions          : TCripto                    Read vCripto             Write vCripto;
+    Property ProxyOptions          : TProxyOptions              Read vProxyOptions       Write vProxyOptions;      //Se tem Proxy diz quais as opções
+    Property PoolerService         : String                     Read vRestWebService     Write vRestWebService;    //Host do WebService REST
+    Property PoolerURL             : String                     Read vRestURL            Write vRestURL;           //URL do WebService REST
+    Property PoolerPort            : Integer                    Read vPoolerPort         Write SetPoolerPort;      //A Porta do Pooler do DataSet
+    Property PoolerPrefix          : String                     Read vPoolerPrefix       Write vPoolerPrefix;      //Prefixo do WebService REST
+    Property Poolers               : TStringList                Read vPoolerList;
+    Property HandleRedirects       : Boolean                    Read vHandleRedirects    Write vHandleRedirects;
+    Property RedirectMaximum       : Integer                    Read vRedirectMaximum    Write vRedirectMaximum;
+    Property AccessTag             : String                     Read vAccessTag          Write vAccessTag;
+    Property Encoding              : TEncodeSelect              Read vEncoding           Write vEncoding;          //Encoding da string
+    Property UserAgent             : String                     Read vUserAgent          Write vUserAgent;
+    Property PoolerNotFoundMessage : String                     Read vPoolerNotFoundMessage Write vPoolerNotFoundMessage;
+    Property TypeRequest           : TTypeRequest               Read vTypeRequest        Write vTypeRequest       Default trHttp;
+   End;
 
 Type
  PRESTDWValueKey = ^TRESTDWValueKey;
@@ -1840,33 +1842,6 @@ Begin
  vPassword := vLogin;
  vPort     := 8888;
 End;
-
-{
-Procedure TRESTDWPoolerList.SetConnectionOptions(Var Value : TRESTClientPoolerBase);
-Begin
- Value                   := TRESTClientPoolerBase.Create(Nil);
- Value.TypeRequest       := trHttp;
- Value.Host              := vRestWebService;
- Value.Port              := vPoolerPort;
- Value.UrlPath           := vRestURL;
- Value.UserName          := vLogin;
- Value.Password          := vPassword;
- if vProxy then
-  Begin
-   Value.ProxyOptions.ProxyServer   := vProxyOptions.vServer;
-   Value.ProxyOptions.ProxyPort     := vProxyOptions.vPort;
-   Value.ProxyOptions.ProxyUsername := vProxyOptions.vLogin;
-   Value.ProxyOptions.ProxyPassword := vProxyOptions.vPassword;
-  End
- Else
-  Begin
-   Value.ProxyOptions.ProxyServer   := '';
-   Value.ProxyOptions.ProxyPort     := 0;
-   Value.ProxyOptions.ProxyUsername := '';
-   Value.ProxyOptions.ProxyPassword := '';
-  End;
-End;
-}
 
 Procedure TRESTDWDatabasebaseBase.SetOnStatus(Value : TOnStatus);
 Begin
@@ -4149,27 +4124,6 @@ Begin
  Result := vConnected;
 End;
 
-Constructor TRESTDWPoolerList.Create(AOwner : TComponent);
-Begin
- Inherited;
- vDataRoute        := '';
- vPoolerNotFoundMessage := cPoolerNotFound;
- vPoolerPort       := 8082;
- vTimeOut          := 3000;
- vConnectTimeOut   := 3000;
- vProxy            := False;
- vCompression      := True;
- vTypeRequest      := trHttp;
- vProxyOptions     := TProxyOptions.Create;
- vPoolerList       := TStringList.Create;
- vAuthOptionParams := TRESTDWClientAuthOptionParams.Create(Self);
- vCripto           := TCripto.Create;
- vEncoding         := esUtf8;
- vUserAgent        := cUserAgent;
- vHandleRedirects  := False;
- vRedirectMaximum  := 0;
-End;
-
 Constructor TRESTDWDatabasebaseBase.Create(AOwner : TComponent);
 Begin
  Inherited;
@@ -4223,16 +4177,6 @@ Begin
  vStrsTrim2Len             := True;
  vParamCreate              := True;
  vClientIpVersion          := civIPv4;
-End;
-
-Destructor  TRESTDWPoolerList.Destroy;
-Begin
- vProxyOptions.Free;
- FreeAndNil(vAuthOptionParams);
- FreeAndNil(vCripto);
- If vPoolerList <> Nil Then
-  vPoolerList.Free;
- Inherited;
 End;
 
 Destructor  TRESTDWDatabasebaseBase.Destroy;
@@ -4931,37 +4875,6 @@ Begin
  SetConnection(False);
 End;
 
-Function  TRESTDWPoolerList.TryConnect : Boolean;
-Var
- vConnection : TRESTDWPoolerMethodClient;
- I           : Integer;
-Begin
- vConnection                  := TRESTDWPoolerMethodClient.Create(Nil);
- vConnection.PoolerNotFoundMessage := PoolerNotFoundMessage;
- vConnection.UserAgent        := vUserAgent;
- vConnection.HandleRedirects  := vHandleRedirects;
- vConnection.RedirectMaximum  := vRedirectMaximum;
- vConnection.WelcomeMessage   := vWelcomeMessage;
- vConnection.Host             := vRestWebService;
- vConnection.Port             := vPoolerPort;
- vConnection.Compression      := vCompression;
- vConnection.TypeRequest      := VtypeRequest;
- vConnection.AccessTag        := vAccessTag;
- vConnection.Encoding         := Encoding;
- vConnection.CriptOptions.Use := VCripto.Use;
- vConnection.CriptOptions.Key := VCripto.Key;
- vConnection.DataRoute        := DataRoute;
- vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
- Try
-  vPoolerList.Clear;
-  vPoolerList.Assign(vConnection.GetPoolerList(vRestURL, vTimeOut, vConnectTimeOut));
-  Result      := True;
- Finally
-  If Assigned(vConnection) Then
-   FreeAndNil(vConnection);
- End;
-End;
-
 Procedure TRESTDWDatabasebaseBase.ReconfigureConnection(Var Connection        : TRESTDWPoolerMethodClient;
                                                         Var ConnectionExec    : TRESTClientPoolerBase;
                                                         TypeRequest           : Ttyperequest;
@@ -5420,19 +5333,7 @@ begin
 
 end;
 
-Procedure TRESTDWPoolerList.SetConnection(Value : Boolean);
-Begin
- vConnected := Value;
- If vConnected Then
-  vConnected := TryConnect;
-End;
-
 Procedure TRESTDWDatabasebaseBase.SetPoolerPort(Value : Integer);
-Begin
- vPoolerPort := Value;
-End;
-
-Procedure TRESTDWPoolerList.SetPoolerPort(Value : Integer);
 Begin
  vPoolerPort := Value;
 End;
@@ -8197,7 +8098,7 @@ Begin
      Break;
     End;
   End;
- If Not Assigned(Result) Then 
+ If Not Assigned(Result) Then
   Raise Exception.Create(Format(cParamNotFound, [Value]));
 End;
 
@@ -8222,7 +8123,7 @@ Begin
      Break;
     End;
   End;
- If Not Assigned(Result) Then 
+ If Not Assigned(Result) Then
   Raise Exception.Create(Format(cParamNotFound, [Value]));
 End;
 
@@ -12042,6 +11943,147 @@ Begin
  FreeAndNil(vProxyOptions);
  FreeAndNil(vAuthOptionParams);
  Inherited;
+End;
+
+{ TRESTDWPoolerListBase }
+
+Constructor TRESTDWPoolerListBase.Create(AOwner: TComponent);
+Begin
+ Inherited;
+ vDataRoute        := '';
+ vPoolerNotFoundMessage := cPoolerNotFound;
+ vPoolerPort       := 8082;
+ vTimeOut          := 3000;
+ vConnectTimeOut   := 3000;
+ vProxy            := False;
+ vCompression      := True;
+ vTypeRequest      := trHttp;
+ vProxyOptions     := TProxyOptions.Create;
+ vPoolerList       := TStringList.Create;
+ vAuthOptionParams := TRESTDWClientAuthOptionParams.Create(Self);
+ vCripto           := TCripto.Create;
+ vEncoding         := esUtf8;
+ vUserAgent        := cUserAgent;
+ vHandleRedirects  := False;
+ vRedirectMaximum  := 0;
+End;
+
+Destructor TRESTDWPoolerListBase.Destroy;
+Begin
+ vProxyOptions.Free;
+ FreeAndNil(vAuthOptionParams);
+ FreeAndNil(vCripto);
+ FreeAndNil(RESTClientPooler);
+ If vPoolerList <> Nil Then
+  FreeAndNil(vPoolerList);
+ Inherited;
+End;
+
+Function TRESTDWPoolerListBase.GetPoolerList: TStringList;
+Var
+ vTempString,
+ lResponse            : String;
+ JSONParam            : TJSONParam;
+ DWParams             : TRESTDWParams;
+Begin
+ Result := Nil;
+ RESTClientPooler.PoolerNotFoundMessage := PoolerNotFoundMessage;
+ RESTClientPooler.WelcomeMessage  := vWelcomeMessage;
+ RESTClientPooler.HandleRedirects := vHandleRedirects;
+ RESTClientPooler.RedirectMaximum := vRedirectMaximum;
+ RESTClientPooler.Host            := vRestWebService;
+ RESTClientPooler.Port            := vPoolerPort;
+ RESTClientPooler.RequestTimeOut  := vTimeOut;
+ RESTClientPooler.ConnectTimeOut  := vConnectTimeOut;
+ RESTClientPooler.DataCompression := Compression;
+ RESTClientPooler.TypeRequest     := vTypeRequest;
+ RESTClientPooler.Encoding        := vEncoding;
+ RESTClientPooler.UserAgent       := vUserAgent;
+ RESTClientPooler.SetAccessTag(vAccessTag);
+ RESTClientPooler.CriptOptions.Use:= vCripto.Use;
+ RESTClientPooler.CriptOptions.Key:= vCripto.Key;
+ RESTClientPooler.DataRoute        := vDataRoute;
+ RESTClientPooler.AuthenticationOptions := vAuthOptionParams;
+ {$IFDEF FPC}
+ RESTClientPooler.DatabaseCharSet  := vDatabaseCharSet;
+ {$ENDIF}
+ DWParams  := TRESTDWParams.Create;
+ DWParams.Encoding               := RESTClientPooler.Encoding;
+ JSONParam                       := TJSONParam.Create(RESTClientPooler.Encoding);
+ JSONParam.ParamName             := 'Result';
+ JSONParam.ObjectDirection       := odOUT;
+ JSONParam.ObjectValue           := ovString;
+ JSONParam.AsString              := '';
+// JSONParam.SetValue('', JSONParam.Encoded);
+ DWParams.Add(JSONParam);
+ Try
+  Try
+   lResponse := RESTClientPooler.SendEvent('GetPoolerList', DWParams);
+   If (lResponse <> '') And
+      (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
+    Begin
+     Result      := TStringList.Create;
+     vTempString := DWParams.ItemsString['Result'].AsString;
+     While Not (vTempString = '') Do
+      Begin
+       if Pos('|', vTempString) > 0 then
+        Begin
+         Result.Add(Copy(vTempString, 1, Pos('|', vTempString) -1));
+         Delete(vTempString, 1, Pos('|', vTempString));
+        End
+       Else
+        Begin
+         Result.Add(Copy(vTempString, 1, Length(vTempString)));
+         Delete(vTempString, 1, Length(vTempString));
+        End;
+      End;
+    End
+   Else
+    Begin
+     If (lResponse = '') Then
+      lResponse  := Format('Unresolved Host : ''%s''', [vRestWebService])
+     Else If (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
+      lResponse  := 'Unauthorized...';
+     Raise Exception.Create(lResponse);
+     lResponse := '';
+    End;
+  Except
+   On E : Exception Do
+    Begin
+     Raise Exception.Create(E.Message);
+    End;
+  End;
+ Finally
+  FreeAndNil(DWParams);
+ End;
+End;
+
+Procedure TRESTDWPoolerListBase.SetConnection(Value: Boolean);
+Begin
+ vConnected := Value;
+ If vConnected Then
+  vConnected := TryConnect;
+End;
+
+Procedure TRESTDWPoolerListBase.SetPoolerPort(Value: Integer);
+Begin
+ vPoolerPort := Value;
+End;
+
+Function TRESTDWPoolerListBase.TryConnect: Boolean;
+Var
+ PoolerList: TStringList;
+Begin
+ PoolerList := Self.GetPoolerList;
+
+ try
+  vPoolerList.Clear;
+  vPoolerList.Assign(PoolerList);
+  Result := True;
+ finally
+  FreeAndNil(PoolerList)
+ end;
+
 End;
 
 end.
