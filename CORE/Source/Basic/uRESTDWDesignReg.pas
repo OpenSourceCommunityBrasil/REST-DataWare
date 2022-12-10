@@ -805,7 +805,7 @@ Begin
  RegisterComponents('REST Dataware - Tools',       [TRESTDWResponseTranslator, TRESTDWBufferDB]);
 
  RegisterComponents('REST Dataware - DB',          [TRESTDWPoolerDB,        TRESTDWClientSQL,  TRESTDWMemtable, TRESTDWTable,      TRESTDWUpdateSQL,
-                                                   TRESTDWMassiveSQLCache, TRESTDWStoredProcedure, TRESTDWPoolerList, TRESTDWMassiveCache,  TRESTDWBatchMove]);
+                                                   TRESTDWMassiveSQLCache, TRESTDWStoredProcedure, TRESTDWMassiveCache,  TRESTDWBatchMove]);
 // AddIDEMenu;//Menu do REST Debugger
  {$IFNDEF FPC}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
