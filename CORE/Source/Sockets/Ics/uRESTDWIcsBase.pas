@@ -297,6 +297,7 @@ Type
 
 const
   cIcsHTTPServerNotFound = 'No HTTP server found.';
+  cIcsHTTPConnectionClosed = 'Closed HTTP connection.';
 
 Implementation
 
@@ -393,7 +394,11 @@ begin
     HttpAppSrv.MaxBlkSize := vBuffSizeBytes;
 
     HttpAppSrv.BandwidthLimit := vBandWidthLimitBytes;
-    HttpAppSrv.BandwidthSampling := vBandWidthSampleSec * 1000;
+
+    if vBandWidthSampleSec < 1 then
+      HttpAppSrv.BandwidthSampling := 1000
+    else
+      HttpAppSrv.BandwidthSampling := vBandWidthSampleSec * 1000;
 
     HttpAppSrv.onClientConnect := onClientConnectServer;
     HttpAppSrv.onClientDisconnect := onClientDisconnectServer;
@@ -407,9 +412,7 @@ begin
         rdwAOBasic:
           HttpAppSrv.AuthTypes := [atBasic];
         rdwAOBearer, rdwAOToken, rdwOAuth:
-          begin
-            HttpAppSrv.AuthTypes := [atDigest];
-          end;
+          HttpAppSrv.AuthTypes := [atDigest];
       end;
 
     end
@@ -498,11 +501,14 @@ begin
   Remote := Sender as TPoolerHttpConnection;
 
   Remote.vNeedClose := true;
-  Remote.CloseDelayed;
 
-  if Assigned(vOnTimeout) then
-  begin
-    vOnTimeout(Remote, Reason);
+  try
+    if Assigned(vOnTimeout) then
+    begin
+      vOnTimeout(Remote, Reason);
+    end;
+  finally
+    HttpAppSrv.WSocketServer.Disconnect(Remote);
   end;
 end;
 
@@ -510,7 +516,8 @@ procedure TRESTDWIcsServicePooler.SetHttpConnectionParams(Remote: TPoolerHttpCon
 begin
   Remote.TimeoutIdle := vServiceTimeout;
   Remote.TimeoutConnect := vServiceTimeout;
-  Remote.TimeoutSampling := 1000;
+  Remote.TimeoutSampling := 5000;
+  Remote.TimeoutKeepThreadAlive := false;
 
   if vServiceTimeout > 0 then
     Remote.TimeoutStartSampling
@@ -550,7 +557,8 @@ begin
   begin
 
     Remote.vNeedClose := true;
-    Remote.CloseDelayed;
+
+    HttpAppSrv.WSocketServer.Disconnect(Remote);
 
   end
 end;
@@ -624,14 +632,17 @@ begin
   // Check for Brute Force exploit
   if not(vBruteForceProtection.BruteForceAllow(Remote.PeerAddr)) then
   begin
-    if Assigned(vOnClientConnect) then
-      vOnClientConnect(Remote, Remote.LastError);
-
     Remote.vNeedClose := true;
-    Remote.CloseDelayed;
 
-    if Assigned(vOnBruteForceBlock) then
-      vOnBruteForceBlock(Remote.PeerAddr, Remote.PeerPort);
+    try
+      if Assigned(vOnClientConnect) then
+        vOnClientConnect(Remote, Remote.LastError);
+
+      if Assigned(vOnBruteForceBlock) then
+        vOnBruteForceBlock(Remote.PeerAddr, Remote.PeerPort);
+    finally
+      HttpAppSrv.WSocketServer.Disconnect(Remote);
+    end;
 
     exit;
   end;
@@ -641,14 +652,17 @@ begin
   begin
     if vIpBlackList.IndexOf(Remote.PeerAddr) <> -1 then
     begin
-      if Assigned(vOnClientConnect) then
-        vOnClientConnect(Remote, Remote.LastError);
-
       Remote.vNeedClose := true;
-      Remote.CloseDelayed;
 
-      if Assigned(vOnBlackListed) then
-        vOnBlackListed(Remote.PeerAddr, Remote.PeerPort);
+      try
+        if Assigned(vOnClientConnect) then
+          vOnClientConnect(Remote, Remote.LastError);
+
+        if Assigned(vOnBlackListed) then
+          vOnBlackListed(Remote.PeerAddr, Remote.PeerPort);
+      finally
+        HttpAppSrv.WSocketServer.Disconnect(Remote);
+      end;
 
       exit;
     end;
@@ -891,8 +905,15 @@ begin
       try
         Remote := Sender as TPoolerHttpConnection;
 
-        if (Remote.vNeedClose) then
-          raise Exception.Create('No server status check.');
+        if (Remote.vNeedClose = true) then
+        begin
+
+          if (HttpAppSrv.IsClient(Remote) = true) then
+            HttpAppSrv.WSocketServer.Disconnect(Remote);
+
+          raise Exception.Create(cIcsHTTPConnectionClosed)
+
+        end;
 
         vResponseHeader := TStringList.Create;
         vCORSHeader := TStringList.Create;
