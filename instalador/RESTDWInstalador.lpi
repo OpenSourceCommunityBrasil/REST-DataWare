@@ -86,7 +86,6 @@
       <Unit>
         <Filename Value="src\funcoes\udetectide.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="uPrincipal"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\uidefunctions.pas"/>
@@ -104,7 +103,7 @@
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="src\funcoes\ulazarusdetect.pas"/>
+        <Filename Value="src\funcoes\ulocale.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>

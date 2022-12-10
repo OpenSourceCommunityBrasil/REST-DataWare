@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  ComCtrls, CheckLst;
+  ComCtrls, CheckLst, ValEdit;
 
 type
   TSplashFormStyle = record
@@ -24,38 +24,60 @@ type
     CheckListBox1: TCheckListBox;
     CheckListBox2: TCheckListBox;
     CheckListBox3: TCheckListBox;
+    CheckListBox4: TCheckListBox;
+    ComboBox1: TComboBox;
+    cbInstallType: TComboBox;
     Image1: TImage;
+    imConfirmBack: TImage;
+    imInstallBack: TImage;
+    imConfirmNext: TImage;
+    imInstallClose: TImage;
     imLazarus: TImage;
     imDelphi: TImage;
-    imLanguageBack: TImage;
     imIDEBack: TImage;
-    imIDENext: TImage;
+    imResourceBack: TImage;
+    imLanguageNext: TImage;
     imBanner: TImage;
     imLangBR: TImage;
     imLangUS: TImage;
     imLangES: TImage;
     imBackground: TImage;
-    imResourcesNext: TImage;
-    imInstallNext: TImage;
+    imIDENext: TImage;
+    imResourceNext: TImage;
     imTheme: TImage;
+    Label1: TLabel;
+    Label2: TLabel;
+    LabeledEdit1: TLabeledEdit;
     lDataEngine: TLabel;
     lDBWare: TLabel;
     lOtherResources: TLabel;
+    lOtherResources1: TLabel;
     lResourcesNext: TLabel;
+    lConfirmNext: TLabel;
+    lInstallClose: TLabel;
     lResourcesPrevious: TLabel;
     lLanguageNext: TLabel;
     lIDEPrevious: TLabel;
     lIDESubTitle: TLabel;
     lIDENext: TLabel;
+    lConfirmBack: TLabel;
+    lInstallBack: TLabel;
     lResourcesSubTitle: TLabel;
+    lConfirmSubTitle: TLabel;
+    lInstallSubTitle: TLabel;
     lVersion: TLabel;
     lLanguageSubTitle: TLabel;
     lTheme: TLabel;
+    mmConfirm: TMemo;
+    mmLogInstall: TMemo;
+    pConfirmaRecursos: TPanel;
+    pInstall: TPanel;
     pRecursos: TPanel;
     pIDE: TPanel;
     pLanguage: TPanel;
     selectionbox: TShape;
     IDESelector: TShape;
+    procedure ConfigureInstallOptions(Sender: TObject);
     procedure FormClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -65,11 +87,13 @@ type
     procedure imBannerMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
     procedure imBannerMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
+    procedure imConfirmBackClick(Sender: TObject);
+    procedure imConfirmNextClick(Sender: TObject);
+    procedure imResourceBackClick(Sender: TObject);
+    procedure imResourceNextClick(Sender: TObject);
     procedure imIDEBackClick(Sender: TObject);
-    procedure imInstallNextClick(Sender: TObject);
-    procedure imLanguageBackClick(Sender: TObject);
+    procedure imLanguageNextClick(Sender: TObject);
     procedure imIDENextClick(Sender: TObject);
-    procedure imResourcesNextClick(Sender: TObject);
     procedure imThemeClick(Sender: TObject);
     procedure ImageSelect(Sender: TObject);
     procedure IDESelect(Sender: TObject);
@@ -82,6 +106,7 @@ type
     procedure ConfigThemes;
     procedure SetIgnoredLabels;
     procedure Translate(aLangIndex: integer);
+    procedure ShowStep(aStepIndex: integer);
   public
 
   end;
@@ -142,16 +167,16 @@ begin
 end;
 
 procedure TForm1.SetIgnoredLabels;
+var
+  I: integer;
 begin
   if not Assigned(IgnoredLabels) then
     IgnoredLabels := TStringList.Create
   else
     IgnoredLabels.Clear;
-  IgnoredLabels.Add('lLanguageNext');
-  IgnoredLabels.Add('lIDEPrevious');
-  IgnoredLabels.Add('lIDENext');
-  IgnoredLabels.Add('lResourcesNext');
-  IgnoredLabels.Add('lResourcesPrevious');
+  for I := 0 to pred(ComponentCount) do
+    if (Components[I] is TLabel) and (TLabel(Components[I]).Tag = 1) then
+      IgnoredLabels.Add(TLabel(Components[I]).Name);
 end;
 
 procedure TForm1.Translate(aLangIndex: integer);
@@ -213,6 +238,24 @@ begin
   end;
 end;
 
+procedure TForm1.ShowStep(aStepIndex: integer);
+begin
+  pInstall.Visible := False;
+  pConfirmaRecursos.Visible := False;
+  pLanguage.Visible := False;
+  pIDE.Visible := False;
+  pRecursos.Visible := False;
+  pConfirmaRecursos.Visible := False;
+
+  case aStepIndex of
+    0: pLanguage.Visible := True;
+    1: pIDE.Visible := True;
+    2: pRecursos.Visible := True;
+    3: pConfirmaRecursos.Visible := True;
+    4: pInstall.Visible := True;
+  end;
+end;
+
 procedure TForm1.ImageSelect(Sender: TObject);
 begin
   selectionbox.Left := TImage(Sender).Left - 2;
@@ -231,20 +274,33 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  //pLanguage.ControlStyle := pLanguage.ControlStyle - [csOpaque] + [csParentBackground];
-  //pIDE.ControlStyle := pIDE.ControlStyle - [csOpaque] + [csParentBackground];
+  {$IFNDEF MSWindows}
+  imDelphi.Enabled := False;
+  imDelphi.Visible := False;
+  {$ENDIF}
   SetIgnoredLabels;
   ConfigThemes;
 
-  pLanguage.Visible := True;
-  selectionbox.Visible := False;
-  IDESelector.Visible := False;
+  ShowStep(0);
   SetTheme(0);
 end;
 
 procedure TForm1.FormClick(Sender: TObject);
 begin
   ShowMessage('formclick');
+end;
+
+procedure TForm1.ConfigureInstallOptions(Sender: TObject);
+begin
+{
+Padrão - Indy
+TLS 1.3
+Full
+Custom
+}
+  case cbInstallType.ItemIndex of
+    0: ;
+  end;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -261,8 +317,6 @@ end;
 procedure TForm1.imBannerMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: integer);
 begin
-  //ShowMessage(Format('X: %d, Y: %d | FMouseClick.X: %d. FMouseClick.Y: %d',
-  //[Mouse.CursorPos.X, Mouse.CursorPos.Y, FMouseClick.X, FMouseClick.Y]));
   FMouseClick := Mouse.CursorPos;
   imBanner.Tag := 1;
 end;
@@ -283,42 +337,39 @@ begin
   imBanner.Tag := 0;
 end;
 
+procedure TForm1.imConfirmBackClick(Sender: TObject);
+begin
+  ShowStep(2);
+end;
+
+procedure TForm1.imConfirmNextClick(Sender: TObject);
+begin
+  ShowStep(4);
+end;
+
+procedure TForm1.imResourceBackClick(Sender: TObject);
+begin
+  ShowStep(1);
+end;
+
+procedure TForm1.imResourceNextClick(Sender: TObject);
+begin
+  ShowStep(3);
+end;
+
 procedure TForm1.imIDEBackClick(Sender: TObject);
 begin
-  pLanguage.Visible := False;
-  pRecursos.Visible := False;
-  pIDE.Visible := True;
+  ShowStep(0);
 end;
 
-procedure TForm1.imInstallNextClick(Sender: TObject);
+procedure TForm1.imLanguageNextClick(Sender: TObject);
 begin
-  pLanguage.Visible := False;
-  pRecursos.Visible := False;
-  pIDE.Visible := False;
-end;
-
-procedure TForm1.imLanguageBackClick(Sender: TObject);
-begin
-  pLanguage.Visible := True;
-  pRecursos.Visible := False;
-  pIDE.Visible := False;
+  ShowStep(1);
 end;
 
 procedure TForm1.imIDENextClick(Sender: TObject);
 begin
-  pLanguage.Visible := False;
-  pRecursos.Visible := False;
-  pIDE.Visible := True;
-  //Application.CreateForm(TfPrincipal, fPrincipal);
-  //fPrincipal.Show;
-  //Self.Hide;
-end;
-
-procedure TForm1.imResourcesNextClick(Sender: TObject);
-begin
-  pLanguage.Visible := False;
-  pRecursos.Visible := True;
-  pIDE.Visible := False;
+  ShowStep(2);
 end;
 
 end.

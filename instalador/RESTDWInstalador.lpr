@@ -12,6 +12,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms,
   uconsts in 'src\funcoes\uconsts.pas',
+  ulocale in 'src\funcoes\ulocale.pas',
   uprincipal in 'src\telas\uprincipal.pas';
 
 {$R *.res}
