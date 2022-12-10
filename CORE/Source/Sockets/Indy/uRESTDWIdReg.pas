@@ -97,10 +97,10 @@ End;
 
 Procedure Register;
 Begin
-  RegisterComponents('REST Dataware - Service', [TRESTDWIdServicePooler]);
+  RegisterComponents('REST Dataware - Service', [TRESTDWIdServicePooler, TRESTDWIdPoolerList]);
   RegisterComponents('REST Dataware - Client''s',
     [TRESTDWIdClientREST, TRESTDWIdClientPooler]);
-  RegisterComponents('REST Dataware - DB', [TRESTDWIdDatabase, TRESTDWIdPoolerList]);
+  RegisterComponents('REST Dataware - DB', [TRESTDWIdDatabase]);
   RegisterPropertyEditor(TypeInfo(String), TRESTDWIdDatabase, 'PoolerName',
     TPoolersList);
 End;
