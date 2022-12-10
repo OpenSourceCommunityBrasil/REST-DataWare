@@ -189,7 +189,6 @@ Type
 
     // HTTP Params
     vMaxClients: Integer;
-    vKeepAliveSec: Cardinal;
     vServiceTimeout: Integer;
     vBuffSizeBytes: Integer;
     vBandWidthLimitBytes: Cardinal;
@@ -277,7 +276,6 @@ Type
 
     // HTTP Params
     Property MaxClients: Integer Read vMaxClients Write vMaxClients default 0;
-    Property KeepAliveSec: Cardinal Read vKeepAliveSec Write vKeepAliveSec default 0;
     Property RequestTimeout: Integer Read vServiceTimeout Write vServiceTimeout
       default 60000; // Connection TimeOut in Milliseconds
     Property BuffSizeBytes: Integer Read vBuffSizeBytes Write vBuffSizeBytes
@@ -299,7 +297,6 @@ Type
 
 const
   cIcsHTTPServerNotFound = 'No HTTP server found.';
-  cIcsNoServerStatusCheck = 'No server status check.';
 
 Implementation
 
@@ -372,13 +369,26 @@ end;
 Procedure TRESTDWIcsServicePooler.SetHttpServerParams;
 var
   x: Integer;
+  vKeepAliveTimeSec: Integer;
 begin
   if Assigned(HttpAppSrv) then
   begin
     HttpAppSrv.ClientClass := TPoolerHttpConnection;
 
     HttpAppSrv.MaxClients := vMaxClients;
-    HttpAppSrv.KeepAliveTimeSec := vKeepAliveSec;
+    HttpAppSrv.MaxRequestsKeepAlive := vMaxClients;
+
+    if ((vServiceTimeout > 0) and (vServiceTimeout < 1000)) then
+      vKeepAliveTimeSec := 1
+    else if vServiceTimeout <= 0 then
+      vKeepAliveTimeSec := 0
+    else
+      vKeepAliveTimeSec := trunc(vServiceTimeout / 1000);
+
+    HttpAppSrv.KeepAliveTimeSec := vKeepAliveTimeSec;
+    HttpAppSrv.KeepAliveTimeXferSec := vKeepAliveTimeSec;
+
+    HttpAppSrv.SessionTimeout := vServiceTimeout;
 
     HttpAppSrv.MaxBlkSize := vBuffSizeBytes;
 
@@ -521,6 +531,7 @@ begin
   Remote.OnPutDocument := onDocumentReadyServer;
   Remote.OnDeleteDocument := onDocumentReadyServer;
   Remote.OnPatchDocument := onDocumentReadyServer;
+  Remote.OnOptionsDocument := onDocumentReadyServer;
   Remote.OnPostedData := onPostedDataServer;
   Remote.onException := onExceptionServer;
   Remote.OnAfterAnswer := onAnsweredServer;
@@ -575,7 +586,6 @@ Begin
   vIcsSelfAssignedCert := TIcsSelfAssignedCert.Create;
 
   vMaxClients := 0;
-  vKeepAliveSec := 0;
   vServiceTimeout := 60000; // TimeOut in Milliseconds
   vBuffSizeBytes := 262144; // 256kb Default
   vBandWidthLimitBytes := 0;
@@ -674,6 +684,7 @@ Begin
       If HttpAppSrv.ListenAllOK Then
         HttpAppSrv.Stop;
     End;
+
   Except
     //
   End;
@@ -807,6 +818,7 @@ begin
       mb: TStringStream;
       vRedirect: TRedirect;
       vParams: TStringList;
+      vCORSHeader: TStrings;
 
       Procedure WriteError;
       Begin
@@ -830,6 +842,9 @@ begin
 
         if Assigned(BodyStream) then
           FreeAndNil(BodyStream);
+
+        If Assigned(vCORSHeader) Then
+          FreeAndNil(vCORSHeader);
       End;
 
       Procedure Redirect(Url: String);
@@ -837,28 +852,52 @@ begin
         Remote.WebRedirectURL := Url;
       End;
 
+      Procedure SetReplyCORS;
+      Var
+        i: Integer;
+      Begin
+        If CORS Then
+        Begin
+
+          If CORS_CustomHeaders.Count > 0 Then
+          Begin
+
+            For i := 0 To CORS_CustomHeaders.Count - 1 Do
+              vResponseHeader.AddPair(CORS_CustomHeaders.Names[i],
+                CORS_CustomHeaders.ValueFromIndex[i]);
+
+          End
+          Else
+            vResponseHeader.AddPair('Access-Control-Allow-Origin', '*');
+
+          If Assigned(vCORSHeader) Then
+          Begin
+
+            If vCORSHeader.Count > 0 Then
+            Begin
+
+              For i := 0 To vCORSHeader.Count - 1 Do
+                vResponseHeader.AddPair(vCORSHeader.Names[i],
+                  vCORSHeader.ValueFromIndex[i]);
+
+            End;
+
+          End;
+
+        End;
+      End;
+
     begin
       try
         Remote := Sender as TPoolerHttpConnection;
 
         if (Remote.vNeedClose) then
-          raise Exception.Create(cIcsNoServerStatusCheck);
+          raise Exception.Create('No server status check.');
 
         vResponseHeader := TStringList.Create;
+        vCORSHeader := TStringList.Create;
         vResponseString := '';
         @vRedirect := @Redirect;
-
-        If CORS Then
-        Begin
-          If CORS_CustomHeaders.Count > 0 Then
-          Begin
-            For i := 0 To CORS_CustomHeaders.Count - 1 Do
-              vResponseHeader.AddPair(CORS_CustomHeaders.Names[i],
-                CORS_CustomHeaders.ValueFromIndex[i]);
-          End
-          Else
-            vResponseHeader.AddPair('Access-Control-Allow-Origin', '*');
-        End;
 
         vToken := Remote.AuthDigestUri;
         vAuthRealm := Remote.AuthRealm;
@@ -871,8 +910,10 @@ begin
           Remote.RequestUserAgent, Remote.AuthUserName, Remote.AuthPassword, vToken,
           Remote.RequestHeader, StrToInt(Remote.PeerPort), Remote.RequestHeader, vParams,
           Remote.Params, BodyStream, vAuthRealm, sCharSet, ErrorMessage, StatusCode,
-          vResponseHeader, vResponseString, ResultStream, vRedirect) Then
+          vResponseHeader, vResponseString, ResultStream, vCORSHeader, vRedirect) Then
         Begin
+          SetReplyCORS;
+
           Remote.AuthRealm := vAuthRealm;
 
           If (vResponseString <> '') Or (ErrorMessage <> '') Then
@@ -896,6 +937,8 @@ begin
         End
         Else // Tratamento de Erros.
         Begin
+          SetReplyCORS;
+
           Remote.AuthRealm := vAuthRealm;
 
           If (vResponseString <> '') Or (ErrorMessage <> '') Then
@@ -931,15 +974,18 @@ Procedure TRESTDWIcsServicePooler.CustomAnswerStream(Pooler: TPoolerHttpConnecti
 Flag: THttpGetFlag; StatusCode: Integer; ContentType: String; Header: String);
 begin
 
-  Pooler.TimeoutStopSampling;
-
   case StatusCode of
     401:
       begin
         vBruteForceProtection.BruteForceAttempt(Pooler.PeerAddr);
 
         if vBruteForceProtection.BruteForceAllow(Pooler.PeerAddr) then
-          Pooler.Answer401
+        begin
+          if self.AuthenticationOptions.OptionParams.AuthDialog then
+            Pooler.Answer401
+          else
+            Pooler.Answer403;
+        end
         else
           Pooler.Answer403;
       end;
@@ -979,7 +1025,7 @@ Begin
   If (Value) Then
   Begin
     Try
-      if not(Assigned(ServerMethodClass)) and (Self.GetDataRouteCount = 0) then
+      if not(Assigned(ServerMethodClass)) and (self.GetDataRouteCount = 0) then
         raise Exception.Create(cServerMethodClassNotAssigned);
 
       If Not HttpAppSrv.ListenAllOK Then
