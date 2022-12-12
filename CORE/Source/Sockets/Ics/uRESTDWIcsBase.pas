@@ -42,6 +42,7 @@ Uses
   System.SysUtils,
   System.Classes,
   System.DateUtils,
+  System.SyncObjs,
   VCL.ExtCtrls,
   uRESTDWComponentEvents,
   uRESTDWBasicTypes,
@@ -130,6 +131,7 @@ Type
 
   TIcsBruteForceProtection = class(TPersistent)
   private
+    vBruteForceCS: TCriticalSection;
     vBruteForceSampleMin: Integer;
     vBruteForceTry: Integer;
     vBruteForceExpirationMin: Integer;
@@ -1118,6 +1120,8 @@ var
 begin
   if vBruteForceProtectionStatus then
   begin
+    vBruteForceCS.Acquire;
+
     try
       aux := TStringList.Create;
       aux.Delimiter := ';';
@@ -1145,9 +1149,13 @@ begin
       except
         Result := false;
       end;
+
     finally
       FreeAndNil(aux);
+
+      vBruteForceCS.Release;
     end;
+
   end
   else
     Result := true;
@@ -1163,6 +1171,8 @@ var
   x: Integer;
   aux: TStringList;
 begin
+  vBruteForceCS.Acquire;
+
   try
     aux := TStringList.Create;
 
@@ -1180,6 +1190,8 @@ begin
     end;
   finally
     FreeAndNil(aux);
+
+    vBruteForceCS.Release;
   end;
 end;
 
@@ -1229,6 +1241,8 @@ var
 begin
   if vBruteForceProtectionStatus then
   begin
+    vBruteForceCS.Acquire;
+
     try
       aux := TStringList.Create;
       aux.Delimiter := ';';
@@ -1253,25 +1267,39 @@ begin
       except
         //
       end;
+
     finally
       FreeAndNil(aux);
+
+      vBruteForceCS.Release;
     end;
+
   end;
 end;
 
 procedure TIcsBruteForceProtection.ClearBruteForceList;
 begin
 
-  if Assigned(vBruteForceList) then
-  begin
-    vBruteForceList.Clear;
-    vBruteForceList.NameValueSeparator := '=';
+  vBruteForceCS.Acquire;
+
+  try
+
+    if Assigned(vBruteForceList) then
+    begin
+      vBruteForceList.Clear;
+      vBruteForceList.NameValueSeparator := '=';
+    end;
+
+  finally
+    vBruteForceCS.Release;
   end;
 
 end;
 
 constructor TIcsBruteForceProtection.Create;
 begin
+  vBruteForceCS := TCriticalSection.Create;
+
   vBruteForceSampleMin := 1;
   vBruteForceTry := 3;
   vBruteForceExpirationMin := 30;
@@ -1288,6 +1316,9 @@ begin
 
   if Assigned(vBruteForceList) then
     FreeAndNil(vBruteForceList);
+
+  if Assigned(vBruteForceCS) then
+    FreeAndNil(vBruteForceCS);
 end;
 
 { TIcsSelfAssignedCert }
