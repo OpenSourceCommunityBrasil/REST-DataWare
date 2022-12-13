@@ -424,36 +424,7 @@ Uses
  End;
 
  Type
-  {$IFDEF FPC}
-   {$IFDEF RESTDWLAZDRIVER}
-    TRESTDWClientSQLBase   = Class(TMemDataset)                   //Classe com as funcionalidades de um DBQuery
-   {$ENDIF}
-   {$IFDEF RESTDWUNIDACMEM}
-    TRESTDWClientSQLBase   = Class(TVirtualTable)
-   {$ENDIF}
-   {$IFDEF RESTDWMEMTABLE}
-    TRESTDWClientSQLBase   = Class(TRESTDWMemtable)                 //Classe com as funcionalidades de um DBQuery
-   {$ENDIF}
-  {$ELSE}
-   {$IFDEF RESTDWCLIENTDATASET}
-    TRESTDWClientSQLBase   = Class(TClientDataSet)                 //Classe com as funcionalidades de um DBQuery
-   {$ENDIF}
-   {$IFDEF RESTDWKBMMEMTABLE}
-    TRESTDWClientSQLBase   = Class(TKbmMemtable)                 //Classe com as funcionalidades de um DBQuery
-   {$ENDIF}
-   {$IFDEF RESTDWUNIDACMEM}
-    TRESTDWClientSQLBase   = Class(TVirtualTable)
-   {$ENDIF}
-   {$IFDEF RESTDWFDMEMTABLE}
-    TRESTDWClientSQLBase   = Class(TFDMemtable)                 //Classe com as funcionalidades de um DBQuery
-   {$ENDIF}
-   {$IFDEF RESTDWADMEMTABLE}
-    TRESTDWClientSQLBase   = Class(TADMemtable)                 //Classe com as funcionalidades de um DBQuery
-   {$ENDIF}
-   {$IFDEF RESTDWMEMTABLE}
-    TRESTDWClientSQLBase   = Class(TRESTDWMemtable)             //Classe com as funcionalidades de um DBQuery
-   {$ENDIF}
-  {$ENDIF}
+  TRESTDWClientSQLBase  = Class(TDataset)             //Classe com as funcionalidades de um DBQuery
   Private
    fsAbout                            : TRESTDWAboutInfo;
    vComponentTag,
@@ -2086,7 +2057,8 @@ Var
      While Not vMemBRequest.Eof Do
       Begin
        Append;
-       CopyRecord(vMemBRequest);
+       //TODO XyberX
+//       CopyRecord(vMemBRequest);
        Post;
        vMemBRequest.Next;
       End;

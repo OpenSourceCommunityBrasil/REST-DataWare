@@ -605,7 +605,7 @@ Type
 End;
 
 Type
- TRESTDWClientSQL = Class(TRESTDWClientSQLBase) //Classe com as funcionalidades de um DBQuery
+ TRESTDWClientSQL = Class (TRESTDWClientSQLBase, IUnknown) //Classe com as funcionalidades de um DBQuery
  Private
   vActualPoolerMethodClient : TRESTDWPoolerMethodClient;
   vOldState             : TDatasetState;

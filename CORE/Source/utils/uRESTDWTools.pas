@@ -61,7 +61,6 @@ Uses
   CHAR32        = #32;
   LWS           = TAB + CHAR32;
 
- Function  FieldTypeToDWFieldType   (FieldType          : TFieldType)             : Byte;
  Function  EncryptSHA256          (Key, Text          : TRESTDWString;
                                    Encrypt            : Boolean)                : String;
 
@@ -408,6 +407,8 @@ Function  GetObjectName            (TypeObject         : TTypeObject)           
 //                                                        {$ENDIF} = Nil)           : String;
  Function  ObjectValueToFieldType   (TypeObject         : TObjectValue)           : TFieldType;
  Function  FieldTypeToObjectValue   (FieldType          : TFieldType)             : TObjectValue;
+ Function  FieldTypeToDWFieldType   (FieldType          : TFieldType)             : Byte;
+ Function  DWFieldTypeToFieldType   (DWFieldType        : Byte)                   : TFieldType;
  Function  DatasetStateToMassiveType(DatasetState       : TDatasetState)          : TMassiveMode;
  Function  MassiveModeToString      (MassiveMode        : TMassiveMode)           : String;
  Function  StringToMassiveMode      (Value              : String)                 : TMassiveMode;
@@ -443,8 +444,83 @@ begin                                             //linha 3087 na Function Encod
  Result := StringReplace(Result, #13#10, '', [rfReplaceAll]);
 end;
 
+Function DWFieldTypeToFieldType(DWFieldType : Byte) : TFieldType;
+Begin
+ Result := ftUnknown;
+ Case DWFieldType Of
+  dwftString          : Result := ftString;
+  dwftSmallint        : Result := ftSmallint;
+  dwftInteger         : Result := ftInteger;
+  dwftWord            : Result := ftWord;
+  dwftBoolean         : Result := ftBoolean;
+  dwftFloat           : Result := ftFloat;
+  dwftCurrency        : Result := ftCurrency;
+  dwftBCD             : Result := ftBCD;
+  dwftDate            : Result := ftDate;
+  dwftTime            : Result := ftTime;
+  dwftDateTime        : Result := ftDateTime;
+  dwftBytes           : Result := ftBytes;
+  dwftVarBytes        : Result := ftVarBytes;
+  dwftAutoInc         : Result := ftAutoInc;
+  dwftBlob            : Result := ftBlob;
+  dwftMemo            : Result := ftMemo;
+  dwftGraphic         : Result := ftGraphic;
+  dwftFmtMemo         : Result := ftFmtMemo;
+  dwftParadoxOle      : Result := ftParadoxOle;
+  dwftDBaseOle        : Result := ftDBaseOle;
+  dwftTypedBinary     : Result := ftTypedBinary;
+  dwftCursor          : Result := ftCursor;
+  dwftFixedChar       : Result := ftFixedChar;
+  dwftWideString      : Result := ftWideString;
+  dwftLargeint        : Result := ftLargeint;
+  dwftADT             : Result := ftADT;
+  dwftArray           : Result := ftArray;
+  dwftReference       : Result := ftReference;
+  dwftDataSet         : Result := ftDataSet;
+  dwftOraBlob         : Result := ftOraBlob;
+  dwftOraClob         : Result := ftOraClob;
+  dwftVariant         : Result := ftVariant;
+  dwftInterface       : Result := ftInterface;
+  dwftIDispatch       : Result := ftIDispatch;
+  dwftGuid            : Result := ftGuid;
+  dwftTimeStamp       : Result := ftTimeStamp;
+  dwftFMTBcd          : Result := ftFMTBcd;
+  {$IF NOT DEFINED(FPC) AND (CompilerVersion > 21)}
+    dwftFixedWideChar   : Result := ftFixedWideChar;
+    dwftWideMemo        : Result := ftWideMemo;
+    dwftOraTimeStamp    : Result := ftOraTimeStamp;
+    dwftOraInterval     : Result := ftOraInterval;
+    dwftLongWord        : Result := ftLongWord;
+    dwftShortint        : Result := ftShortint;
+    dwftByte            : Result := ftByte;
+    dwftExtended        : Result := ftExtended;
+    dwftConnection      : Result := ftConnection;
+    dwftParams          : Result := ftParams;
+    dwftStream          : Result := ftStream;
+    dwftTimeStampOffset : Result := ftTimeStampOffset;
+    dwftObject          : Result := ftObject;
+    dwftSingle          : Result := ftSingle;
+  {$ELSE}
+    dwftFixedWideChar   : Result := ftFixedWideChar;
+    dwftWideMemo        : Result := ftWideMemo;
+    dwftOraTimeStamp    : Result := ftOraTimeStamp;
+    dwftOraInterval     : Result := ftOraInterval;
+    dwftLongWord        : Result := ftLongWord;
+    dwftShortint        : Result := ftShortint;
+    dwftByte            : Result := ftByte;
+    dwftExtended        : Result := ftExtended;
+    dwftConnection      : Result := ftConnection;
+    dwftParams          : Result := ftParams;
+    dwftStream          : Result := ftStream;
+    dwftTimeStampOffset : Result := ftTimeStampOffset;
+    dwftObject          : Result := ftObject;
+    dwftSingle          : Result := ftSingle;
+  {$IFEND}
+ End;
+End;
+
 Function FieldTypeToDWFieldType(FieldType  : TFieldType)   : Byte;
-begin
+Begin
  Result := dwftUnknown;
  Case FieldType Of
   ftString          : Result := dwftString;
@@ -503,7 +579,7 @@ begin
    {$IFEND}
   {$ENDIF}
  End;
-end;
+End;
 
 { TCripto }
 
