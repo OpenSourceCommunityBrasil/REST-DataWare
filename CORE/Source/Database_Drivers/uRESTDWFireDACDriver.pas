@@ -30,7 +30,8 @@ uses
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes,
   FireDAC.Comp.Client, FireDAC.Comp.DataSet, FireDAC.Stan.StorageBin,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.DApt.Intf, FireDAC.DApt,
-  FireDAC.Stan.Param, DB, uRESTDWPhysicBase;
+  FireDAC.Stan.Param, FireDAC.DatS, DB, uRESTDWPhysicBase, uRESTDWBasicDB,
+  Firedac.Phys.RDW, uRESTDWFDClientSQL;
 
 const
   rdwFireDACDrivers : array[0..17] of string = (('ads'),('asa'),('db2'),('ds'),
@@ -122,13 +123,19 @@ type
    Constructor Create   (AOwner : TComponent);Override;
   End;
 
+//  Type
+//   TRESTDWFDClientSQL = Class(TRESTDWClientSQL)
+//  Public
+//   Constructor Create   (AOwner : TComponent);Override;
+//  End;
+
 procedure Register;
 
 implementation
 
 procedure Register;
 begin
-  RegisterComponents('REST Dataware - Drivers', [TRESTDWFireDACDriver, TRESTDWPhysicFireDAC]);
+  RegisterComponents('REST Dataware - Drivers', [TRESTDWFireDACDriver, TRESTDWFDPhysicDriver, TRESTDWFDClientSQL]);
 end;
 
 { TRESTDWFireDACStoreProc }
@@ -547,6 +554,14 @@ Function TRESTDWPhysicFireDAC.CreateComponent : TComponent;
 Begin
  Result := Inherited CreateComponent;
 End;
+
+//{ TRESTDWFDClientSQL }
+//
+//Constructor TRESTDWFDClientSQL.Create(AOwner: TComponent);
+//Begin
+// Inherited;
+// PPointer(Self)^ := TRESTDWClientSQL(TFDMemtable.Create(Nil));
+//End;
 
 end.
 

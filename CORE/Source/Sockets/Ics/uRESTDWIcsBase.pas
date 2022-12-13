@@ -80,7 +80,7 @@ Type
     constructor Create(AOwner: TComponent); override;
   end;
 
-  TOnException = Procedure(Sender: TPoolerHttpConnection; E: ESocketException) Of Object;
+  TOnException = Procedure(Sender: TPoolerHttpConnection; Error: String) Of Object;
   TOnServerStarted = Procedure(Sender: TObject) Of Object;
   TOnServerStopped = Procedure(Sender: TObject) Of Object;
   TOnClientConnect = Procedure(Sender: TPoolerHttpConnection; Error: Word) Of Object;
@@ -89,8 +89,9 @@ Type
     Of Object;
   TOnAnswered = Procedure(Sender: TPoolerHttpConnection) Of Object;
   TOnTimeout = Procedure(Sender: TPoolerHttpConnection; Reason: TTimeoutReason) of Object;
-  TOnBlackListed = Procedure(IP, Port: string) Of Object;
+  TOnBlackListBlock = Procedure(IP, Port: string) Of Object;
   TOnBruteForceBlock = Procedure(IP, Port: string) Of Object;
+  TOnServerStatusCheckBlock = Procedure(IP, Port: string) Of Object;
 
   TIcsSelfAssignedCert = class(TPersistent)
   private
@@ -171,8 +172,9 @@ Type
     vOnDocumentReady: TOnDocumentReady;
     vOnAnswered: TOnAnswered;
     vOnTimeout: TOnTimeout;
-    vOnBlackListed: TOnBlackListed;
+    vOnBlackListBlock: TOnBlackListBlock;
     vOnBruteForceBlock: TOnBruteForceBlock;
+    vOnServerStatusCheckBlock: TOnServerStatusCheckBlock;
 
     // HTTP Server
     HttpAppSrv: TSslHttpAppSrv;
@@ -202,6 +204,9 @@ Type
     vIpBlackList: TStrings;
     vServerStatusCheck: boolean;
     procedure onBeforeProcessRequestServer(Sender: TObject);
+
+    // Misc
+    procedure DisconnectClient(Client: TPoolerHttpConnection; Server: TSslHttpAppSrv);
 
   Public
     Constructor Create(AOwner: TComponent); Override;
@@ -248,9 +253,12 @@ Type
       Write vOnDocumentReady;
     Property onAnswered: TOnAnswered Read vOnAnswered Write vOnAnswered;
     Property onTimeout: TOnTimeout read vOnTimeout Write vOnTimeout;
-    Property onBlackListed: TOnBlackListed Read vOnBlackListed Write vOnBlackListed;
+    Property onBlackListBlock: TOnBlackListBlock Read vOnBlackListBlock
+      Write vOnBlackListBlock;
     Property onBruteForceBlock: TOnBruteForceBlock Read vOnBruteForceBlock
       Write vOnBruteForceBlock;
+    Property onServerStatusCheckBlock: TOnServerStatusCheckBlock
+      Read vOnServerStatusCheckBlock write vOnServerStatusCheckBlock;
 
     // SSL Params
     Property SSLRootCertFile: String Read vSSLRootCertFile Write vSSLRootCertFile;
@@ -298,8 +306,8 @@ Type
   End;
 
 const
-  cIcsHTTPServerNotFound = 'No HTTP server found.';
-  cIcsHTTPConnectionClosed = 'Closed HTTP connection.';
+  cIcsHTTPServerNotFound = 'No HTTP server found';
+  cIcsHTTPConnectionClosed = 'Closed HTTP connection';
 
 Implementation
 
@@ -469,25 +477,19 @@ begin
   Remote := Sender as TPoolerHttpConnection;
 
   if Assigned(vOnException) then
-  begin
-    vOnException(Remote, E);
-  end;
+    vOnException(Remote, E.Message);
 end;
 
 procedure TRESTDWIcsServicePooler.onServerStartedServer(Sender: TObject);
 begin
   if Assigned(vOnServerStarted) then
-  begin
     vOnServerStarted(Sender);
-  end;
 end;
 
 procedure TRESTDWIcsServicePooler.onServerStoppedServer(Sender: TObject);
 begin
   if Assigned(vOnServerStopped) then
-  begin
     vOnServerStopped(Sender);
-  end;
 end;
 
 procedure TRESTDWIcsServicePooler.SetvIpBlackList(Lines: TStrings);
@@ -502,15 +504,11 @@ var
 begin
   Remote := Sender as TPoolerHttpConnection;
 
-  Remote.vNeedClose := true;
-
   try
     if Assigned(vOnTimeout) then
-    begin
       vOnTimeout(Remote, Reason);
-    end;
   finally
-    HttpAppSrv.WSocketServer.Disconnect(Remote);
+    DisconnectClient(Remote, HttpAppSrv);
   end;
 end;
 
@@ -520,11 +518,6 @@ begin
   Remote.TimeoutConnect := vServiceTimeout;
   Remote.TimeoutSampling := 5000;
   Remote.TimeoutKeepThreadAlive := false;
-
-  if vServiceTimeout > 0 then
-    Remote.TimeoutStartSampling
-  else
-    Remote.TimeoutStopSampling;
 
   Remote.LineMode := true;
   Remote.LineLimit := MaxInt;
@@ -557,11 +550,12 @@ begin
   if ((vServerStatusCheck = false) and ((String.IsNullOrEmpty(Remote.Path)) or
     (Remote.Path = '/'))) then
   begin
-
-    Remote.vNeedClose := true;
-
-    HttpAppSrv.WSocketServer.Disconnect(Remote);
-
+    try
+      if Assigned(vOnServerStatusCheckBlock) then
+        vOnServerStatusCheckBlock(Remote.PeerAddr, Remote.PeerPort);
+    finally
+      DisconnectClient(Remote, HttpAppSrv);
+    end;
   end
 end;
 
@@ -571,7 +565,7 @@ begin
     if Assigned(HttpAppSrv) then
       Result := HttpAppSrv.ClientCount;
   except
-    Result := 0;
+    Result := -1;
   end;
 end;
 
@@ -617,9 +611,11 @@ var
 begin
   Remote := Sender as TPoolerHttpConnection;
 
-  if Assigned(vOnAnswered) then
-  begin
-    vOnAnswered(Remote);
+  try
+    if Assigned(vOnAnswered) then
+      vOnAnswered(Remote);
+  finally
+    DisconnectClient(Remote, HttpAppSrv);
   end;
 end;
 
@@ -634,8 +630,6 @@ begin
   // Check for Brute Force exploit
   if not(vBruteForceProtection.BruteForceAllow(Remote.PeerAddr)) then
   begin
-    Remote.vNeedClose := true;
-
     try
       if Assigned(vOnClientConnect) then
         vOnClientConnect(Remote, Remote.LastError);
@@ -643,7 +637,7 @@ begin
       if Assigned(vOnBruteForceBlock) then
         vOnBruteForceBlock(Remote.PeerAddr, Remote.PeerPort);
     finally
-      HttpAppSrv.WSocketServer.Disconnect(Remote);
+      DisconnectClient(Remote, HttpAppSrv);
     end;
 
     exit;
@@ -654,26 +648,27 @@ begin
   begin
     if vIpBlackList.IndexOf(Remote.PeerAddr) <> -1 then
     begin
-      Remote.vNeedClose := true;
-
       try
         if Assigned(vOnClientConnect) then
           vOnClientConnect(Remote, Remote.LastError);
 
-        if Assigned(vOnBlackListed) then
-          vOnBlackListed(Remote.PeerAddr, Remote.PeerPort);
+        if Assigned(vOnBlackListBlock) then
+          vOnBlackListBlock(Remote.PeerAddr, Remote.PeerPort);
       finally
-        HttpAppSrv.WSocketServer.Disconnect(Remote);
+        DisconnectClient(Remote, HttpAppSrv);
       end;
 
       exit;
     end;
   end;
 
-  SetHttpConnectionParams(Remote);
+  try
+    if Assigned(vOnClientConnect) then
+      vOnClientConnect(Remote, Error);
+  finally
+    SetHttpConnectionParams(Remote);
+  end;
 
-  if Assigned(vOnClientConnect) then
-    vOnClientConnect(Remote, Error);
 end;
 
 procedure TRESTDWIcsServicePooler.onClientDisconnectServer(Sender: TObject;
@@ -685,22 +680,18 @@ begin
   Remote := Client as TPoolerHttpConnection;
 
   if Assigned(vOnClientDisconnect) then
-  begin
     vOnClientDisconnect(Remote, Error);
-  end;
 
 end;
 
 Destructor TRESTDWIcsServicePooler.Destroy;
 Begin
   Try
-
     If Active Then
     Begin
       If HttpAppSrv.ListenAllOK Then
         HttpAppSrv.Stop;
     End;
-
   Except
     //
   End;
@@ -730,36 +721,53 @@ Begin
   Inherited;
 
   InvalidTag := false;
+
   MyIP := '';
+
   If ServerMethodsClass <> Nil Then
   Begin
+
     For i := 0 To ServerMethodsClass.ComponentCount - 1 Do
     Begin
+
       If (ServerMethodsClass.Components[i].ClassType = TRESTDWPoolerDB) Or
         (ServerMethodsClass.Components[i].InheritsFrom(TRESTDWPoolerDB)) Then
       Begin
+
         If Pooler = Format('%s.%s', [ServerMethodsClass.ClassName,
           ServerMethodsClass.Components[i].Name]) Then
         Begin
+
           If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
           Begin
+
             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <>
               AccessTag Then
             Begin
               InvalidTag := true;
+
               exit;
             End;
+
           End;
+
           If AContext <> Nil Then
           Begin
             Remote := THttpAppSrvConnection(AContext);
+
             MyIP := Remote.PeerAddr;
           End;
+
           Break;
+
         End;
+
       End;
+
     End;
+
   End;
+
   If MyIP = '' Then
     Raise Exception.Create(cInvalidPoolerName);
 End;
@@ -772,39 +780,51 @@ var
   lCount: Integer;
   RawDataTemp: AnsiString;
 begin
-  Remote := Sender as TPoolerHttpConnection;
+  try
+    Remote := Sender as TPoolerHttpConnection;
 
-  repeat
-  begin
-    SetLength(RawDataTemp, Remote.BufSize);
-
-    lCount := Remote.Receive(@RawDataTemp[1], Remote.BufSize);
-
-    if lCount > 0 then
+    repeat
     begin
-      SetLength(RawDataTemp, lCount);
-      Remote.vRawData := Remote.vRawData + RawDataTemp;
-      Remote.vRawDataLen := Remote.vRawDataLen + lCount;
+      SetLength(RawDataTemp, Remote.BufSize);
+
+      lCount := Remote.Receive(@RawDataTemp[1], Remote.BufSize);
+
+      if lCount > 0 then
+      begin
+        SetLength(RawDataTemp, lCount);
+        Remote.vRawData := Remote.vRawData + RawDataTemp;
+        Remote.vRawDataLen := Remote.vRawDataLen + lCount;
+      end
+      else
+        lCount := 0;
+
+      SetLength(RawDataTemp, 0);
     end
-    else
-      lCount := 0;
+    until lCount <= 0;
 
-    SetLength(RawDataTemp, 0);
-  end
-  until lCount <= 0;
+    if Remote.RequestContentLength = Remote.vRawDataLen then
+    begin
+      try
+        Remote.PostedDataReceived;
 
-  if Remote.RequestContentLength = Remote.vRawDataLen then
-  begin
-    try
-      Remote.PostedDataReceived;
+        Stream := TStringStream.Create(Remote.vRawData);
 
-      Stream := TStringStream.Create(Remote.vRawData);
+        Stream.Position := 0;
 
-      Stream.Position := 0;
-
-      ProcessDocument(Sender, Stream, hgWillSendMySelf);
-    finally
-      FreeAndNil(Stream);
+        ProcessDocument(Sender, Stream, hgWillSendMySelf);
+      finally
+        FreeAndNil(Stream);
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      try
+        if Assigned(vOnException) then
+          vOnException(Remote, 'onPostedDataServer - ' + E.Message);
+      finally
+        DisconnectClient(Remote, HttpAppSrv);
+      end;
     end;
   end;
 end;
@@ -835,18 +855,6 @@ begin
       vRedirect: TRedirect;
       vParams: TStringList;
       vCORSHeader: TStrings;
-
-      Procedure WriteError;
-      Begin
-        mb := TStringStream.Create(ErrorMessage{$IF CompilerVersion > 21},
-          TEncoding.UTF8{$IFEND});
-
-        mb.Position := 0;
-
-        Remote.DocStream := mb;
-
-        CustomAnswerStream(Remote, iFlag, StatusCode, '', '');
-      End;
 
       Procedure DestroyComponents;
       Begin
@@ -905,92 +913,104 @@ begin
 
     begin
       try
-        Remote := Sender as TPoolerHttpConnection;
+        try
+          Remote := Sender as TPoolerHttpConnection;
 
-        if (Remote.vNeedClose = true) then
-        begin
+          if (Remote.vNeedClose = true) then
+          begin
+            DisconnectClient(Remote, HttpAppSrv);
 
-          if (HttpAppSrv.IsClient(Remote) = true) then
-            HttpAppSrv.WSocketServer.Disconnect(Remote);
+            raise Exception.Create(cIcsHTTPConnectionClosed);
+          end;
 
-          raise Exception.Create(cIcsHTTPConnectionClosed)
+          vResponseHeader := TStringList.Create;
+          vCORSHeader := TStringList.Create;
+          vResponseString := '';
+          @vRedirect := @Redirect;
 
+          vToken := Remote.AuthDigestUri;
+          vAuthRealm := Remote.AuthRealm;
+          vContentType := Remote.RequestContentType;
+          vParams := TStringList.Create;
+          vParams.Text := Remote.Params;
+
+          CommandExec(TComponent(Remote), RemoveBackslashCommands(Remote.Path),
+            Remote.Method + ' ' + Remote.Path, vContentType, Remote.PeerAddr,
+            Remote.RequestUserAgent, Remote.AuthUserName, Remote.AuthPassword, vToken,
+            Remote.RequestHeader, StrToInt(Remote.PeerPort), Remote.RequestHeader,
+            vParams, Remote.Params, BodyStream, vAuthRealm, sCharSet, ErrorMessage,
+            StatusCode, vResponseHeader, vResponseString, ResultStream, vCORSHeader,
+            vRedirect);
+
+          SetReplyCORS;
+
+          Remote.AuthRealm := vAuthRealm;
+
+          If (vResponseString <> '') Or (ErrorMessage <> '') Then
+          Begin
+            If Assigned(ResultStream) Then
+              FreeAndNil(ResultStream);
+
+            If (vResponseString <> '') Then
+              ResultStream := TStringStream.Create(vResponseString)
+            Else
+              ResultStream := TStringStream.Create(ErrorMessage);
+          End;
+
+          If Assigned(ResultStream) Then
+          Begin
+            ResultStream.Position := 0;
+            Remote.DocStream := ResultStream;
+
+            CustomAnswerStream(Remote, iFlag, StatusCode, vContentType,
+              vResponseHeader.Text);
+          End;
+
+        except
+          on E: Exception do
+          begin
+            try
+              if Assigned(vOnException) then
+                vOnException(Remote, 'ProcessDocument - ' + E.Message);
+            finally
+              DisconnectClient(Remote, HttpAppSrv);
+            end;
+          end;
         end;
-
-        vResponseHeader := TStringList.Create;
-        vCORSHeader := TStringList.Create;
-        vResponseString := '';
-        @vRedirect := @Redirect;
-
-        vToken := Remote.AuthDigestUri;
-        vAuthRealm := Remote.AuthRealm;
-        vContentType := Remote.RequestContentType;
-        vParams := TStringList.Create;
-        vParams.Text := Remote.Params;
-
-        If CommandExec(TComponent(Remote), RemoveBackslashCommands(Remote.Path),
-          Remote.Method + ' ' + Remote.Path, vContentType, Remote.PeerAddr,
-          Remote.RequestUserAgent, Remote.AuthUserName, Remote.AuthPassword, vToken,
-          Remote.RequestHeader, StrToInt(Remote.PeerPort), Remote.RequestHeader, vParams,
-          Remote.Params, BodyStream, vAuthRealm, sCharSet, ErrorMessage, StatusCode,
-          vResponseHeader, vResponseString, ResultStream, vCORSHeader, vRedirect) Then
-        Begin
-          SetReplyCORS;
-
-          Remote.AuthRealm := vAuthRealm;
-
-          If (vResponseString <> '') Or (ErrorMessage <> '') Then
-          Begin
-            If Assigned(ResultStream) Then
-              FreeAndNil(ResultStream);
-            If (vResponseString <> '') Then
-              ResultStream := TStringStream.Create(vResponseString)
-            Else
-              ResultStream := TStringStream.Create(ErrorMessage);
-          End;
-
-          If Assigned(ResultStream) Then
-          Begin
-            ResultStream.Position := 0;
-            Remote.DocStream := ResultStream;
-
-            CustomAnswerStream(Remote, iFlag, StatusCode, vContentType,
-              vResponseHeader.Text);
-          End;
-        End
-        Else // Tratamento de Erros.
-        Begin
-          SetReplyCORS;
-
-          Remote.AuthRealm := vAuthRealm;
-
-          If (vResponseString <> '') Or (ErrorMessage <> '') Then
-          Begin
-            If Assigned(ResultStream) Then
-              FreeAndNil(ResultStream);
-
-            If (vResponseString <> '') Then
-              ResultStream := TStringStream.Create(vResponseString)
-            Else
-              ResultStream := TStringStream.Create(ErrorMessage);
-          End;
-
-          If Assigned(ResultStream) Then
-          Begin
-            ResultStream.Position := 0;
-
-            Remote.DocStream := ResultStream;
-
-            CustomAnswerStream(Remote, iFlag, StatusCode, vContentType,
-              vResponseHeader.Text);
-          End;
-        End;
       finally
         DestroyComponents;
       end;
 
     end).Start;
 
+end;
+
+Procedure TRESTDWIcsServicePooler.DisconnectClient(Client: TPoolerHttpConnection;
+Server: TSslHttpAppSrv);
+begin
+  try
+    // Try gracefully disconnection
+    Client.vNeedClose := true;
+
+    if Server.IsClient(Client) then
+      Client.Shutdown(2);
+
+  except
+    on E: Exception do
+    begin
+
+      try
+        if Assigned(vOnException) then
+          vOnException(Client, 'DisconnectClient - ' + E.Message);
+      finally
+        // Forced disconnection
+        if Server.IsClient(Client) then
+          Server.WSocketServer.Disconnect(Client);
+
+        Client.vNeedClose := true;
+      end;
+    end;
+  end;
 end;
 
 Procedure TRESTDWIcsServicePooler.CustomAnswerStream(Pooler: TPoolerHttpConnection;
@@ -1014,6 +1034,8 @@ begin
       end;
     403:
       Pooler.Answer403;
+    404:
+      Pooler.Answer404;
   else
     Pooler.AnswerStream(Flag, IntToStr(StatusCode), ContentType, Header);
   end;
@@ -1027,17 +1049,31 @@ var
 begin
   Remote := Sender as TPoolerHttpConnection;
 
-  if Assigned(vOnDocumentReady) then
-    vOnDocumentReady(Remote, Flag);
+  try
+    if Assigned(vOnDocumentReady) then
+      vOnDocumentReady(Remote, Flag);
+  finally
+    try
+      if not(Remote.RequestMethod in [THttpMethod.httpMethodGet,
+        THttpMethod.httpMethodDelete, THttpMethod.httpMethodOptions]) then
+        Flag := hgAcceptData
+      else
+      begin
+        Flag := hgWillSendMySelf;
 
-  if not(Remote.RequestMethod in [THttpMethod.httpMethodGet, THttpMethod.httpMethodDelete])
-  then
-    Flag := hgAcceptData
-  else
-  begin
-    Flag := hgWillSendMySelf;
-
-    ProcessDocument(Sender, nil, Flag);
+        ProcessDocument(Sender, nil, Flag);
+      end;
+    except
+      on E: Exception do
+      begin
+        try
+          if Assigned(vOnException) then
+            vOnException(Remote, 'onDocumentReadyServer - ' + E.Message);
+        finally
+          DisconnectClient(Remote, HttpAppSrv);
+        end;
+      end;
+    end;
   end;
 End;
 
@@ -1197,7 +1233,6 @@ end;
 
 procedure TIcsBruteForceProtection.StartBruteForce;
 begin
-
   if Assigned(vBruteForceTimer) then
   begin
     vBruteForceTimer.Enabled := false;
@@ -1217,12 +1252,10 @@ begin
 
     vBruteForceTimer.Enabled := true;
   end;
-
 end;
 
 procedure TIcsBruteForceProtection.StopBruteForce;
 begin
-
   if Assigned(vBruteForceTimer) then
   begin
     vBruteForceTimer.Enabled := false;
@@ -1231,7 +1264,6 @@ begin
   end;
 
   ClearBruteForceList;
-
 end;
 
 procedure TIcsBruteForceProtection.BruteForceAttempt(IP: String);

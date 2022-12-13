@@ -42,10 +42,8 @@ uses
   {$ENDIF}
   Variants, TypInfo, SysUtils, Classes,
   uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWBasicDB,
-  uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWMemTable, uRESTDWBufferDb,
-  uRESTDWComponentBase, uRESTDWDriverBase
-
-  ;
+  uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWMemoryDataset, uRESTDWBufferDb,
+  uRESTDWComponentBase, uRESTDWDriverBase;
 
 {$IFNDEF CLR}
 Const
@@ -804,8 +802,8 @@ Begin
  RegisterComponents('REST Dataware - API',         [TRESTDWServerEvents, TRESTDWServerContext, TRESTDWContextRules]);
  RegisterComponents('REST Dataware - Tools',       [TRESTDWResponseTranslator, TRESTDWBufferDB]);
 
- RegisterComponents('REST Dataware - DB',          [TRESTDWPoolerDB,        TRESTDWClientSQL,  TRESTDWMemtable, TRESTDWTable,      TRESTDWUpdateSQL,
-                                                   TRESTDWMassiveSQLCache, TRESTDWStoredProcedure, TRESTDWMassiveCache,  TRESTDWBatchMove]);
+ RegisterComponents('REST Dataware - DB',          [TRESTDWPoolerDB,        TRESTDWMemTable, TRESTDWTable,      TRESTDWUpdateSQL,
+                                                    TRESTDWMassiveSQLCache, TRESTDWStoredProcedure, TRESTDWMassiveCache,  TRESTDWBatchMove]);
 // AddIDEMenu;//Menu do REST Debugger
  {$IFNDEF FPC}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);

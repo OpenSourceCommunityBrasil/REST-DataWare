@@ -172,6 +172,15 @@
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="RESTDWCore.dcp"/>
         <DCCReference Include="..\..\..\..\Source\Database_Drivers\uRESTDWFireDACDriver.pas"/>
+        <DCCReference Include="..\..\..\..\Source\Database_Drivers\FireDACEngine\uRESTDWFDClientSQL.pas"/>
+        <DCCReference Include="..\..\..\..\Source\Database_Drivers\FireDACEngine\Physicdriver\Firedac.Phys.RDW.pas"/>
+        <DCCReference Include="..\..\..\..\Source\Database_Drivers\FireDACEngine\Physicdriver\Firedac.Phys.RDWBase.pas"/>
+        <DCCReference Include="..\..\..\..\Source\Database_Drivers\FireDACEngine\Physicdriver\Firedac.Phys.RDWDef.pas"/>
+        <DCCReference Include="..\..\..\..\Source\Database_Drivers\FireDACEngine\Physicdriver\Firedac.Phys.RDWMeta.pas"/>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

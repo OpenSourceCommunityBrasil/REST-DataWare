@@ -424,7 +424,7 @@ Uses
  End;
 
  Type
-  TRESTDWClientSQLBase  = Class(TDataset)             //Classe com as funcionalidades de um DBQuery
+  TRESTDWClientSQLBase  = Class(TRESTDWMemTable)             //Classe com as funcionalidades de um DBQuery
   Private
    fsAbout                            : TRESTDWAboutInfo;
    vComponentTag,

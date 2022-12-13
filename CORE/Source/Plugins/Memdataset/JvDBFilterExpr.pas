@@ -1,4 +1,27 @@
-unit uRESTDWDBFilterExpr;
+unit JvDBFilterExpr;
+
+{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
+
+{
+  REST Dataware .
+  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+ Pascal e com compatibilidade entre sistemas operacionais.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+
+ Membros do Grupo :
+
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
+ Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Flávio Motta               - Member Tester and DEMO Developer.
+ Mobius One                 - Devel, Tester and Admin.
+ Gustavo                    - Criptografia and Devel.
+ Eloy                       - Devel.
+ Roniery                    - Devel.
+}
 
 interface
 
@@ -6,7 +29,7 @@ uses
   SysUtils, Classes, Variants, DB, DBCommon;
 
 type
-  TDBFilterExpression = class(TObject)
+  TJvDBFilterExpression = class(TObject)
   private
     FDataSet: TDataSet;
     FParser: TExprParser;
@@ -23,7 +46,7 @@ type
 implementation
 
 uses
-  SqlTimSt, DateUtils, Resources_FT;
+  SqlTimSt, DateUtils, JvResources, JclSysUtils;
 
 var
   FieldTypeMapInitialized: Boolean = False;
@@ -44,18 +67,6 @@ type
     FParserOptions: TParserOptions;
     FNodes: PExprNode;
   end;
-
-{SysUtils}
-function VarIsNullEmpty(const V: Variant): Boolean;
-begin
-  Result := VarIsNull(V) or VarIsEmpty(V);
-end;
-
-function VarIsNullEmptyBlank(const V: Variant): Boolean;
-begin
-  Result := VarIsNull(V) or VarIsEmpty(V) or (VarToStr(V) = '');
-end;
-{/SysUtils}
 
 {------------------------------------------------------------------------------}
 function TrimLeftEx(const S, Blanks: string): string;
@@ -92,6 +103,8 @@ begin
     Dec(R);
   Result := Copy(S, L, R - L + 1);
 end;
+
+// Derived from "Like" by Michael Winter
 
 function IsLike(const MaskStr, S: string): Boolean;
 var
@@ -204,9 +217,9 @@ begin
 end;
 {------------------------------------------------------------------------------}
 
-{ TDBFilterExpression }
+{ TJvDBFilterExpression }
 
-constructor TDBFilterExpression.Create(ADataSet: TDataSet; const Filter: string;
+constructor TJvDBFilterExpression.Create(ADataSet: TDataSet; const Filter: string;
   const FilterOptions: TFilterOptions);
 var
   FieldType: TFieldType;
@@ -250,18 +263,18 @@ begin
   end;
 end;
 
-destructor TDBFilterExpression.Destroy;
+destructor TJvDBFilterExpression.Destroy;
 begin
   FParser.Free;
   inherited Destroy;
 end;
 
-function TDBFilterExpression.Evaluate: Boolean;
+function TJvDBFilterExpression.Evaluate: Boolean;
 begin
   Result := EvalOpNode(FRoot);
 end;
 
-function TDBFilterExpression.EvaluateNode(N: PExprNode): Variant;
+function TJvDBFilterExpression.EvaluateNode(N: PExprNode): Variant;
 begin
   if N = nil then
     Result := Unassigned
@@ -282,7 +295,7 @@ begin
   end;
 end;
 
-function TDBFilterExpression.EvalOpNode(N: PExprNode): Boolean;
+function TJvDBFilterExpression.EvalOpNode(N: PExprNode): Boolean;
 var
   I: Integer;
   V: Variant;
@@ -349,7 +362,7 @@ begin
   end;
 end;
 
-function TDBFilterExpression.EvalFuncNode(N: PExprNode): Variant;
+function TJvDBFilterExpression.EvalFuncNode(N: PExprNode): Variant;
 var
   V: Variant;
 begin
