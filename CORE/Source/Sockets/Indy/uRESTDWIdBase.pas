@@ -4558,15 +4558,8 @@ Var
          Delete(vErrorMessage, 1, Pos(IntToStr(e.ErrorCode), vErrorMessage) + Length(IntToStr(e.ErrorCode)));
          vErrorMessage := Trim(vErrorMessage);
         End;
-       {$IFDEF FPC}
-        vErrorMessage := Unescape_chars(vErrorMessage);
-       {$ELSE}
-        {$IF CompilerVersion <= 22}
+        // irrelevante isso aqui pois vai ser modificado logo abaixo
          vErrorMessage := Unescape_chars(vErrorMessage);
-        {$ELSE}
-         vErrorMessage := vErrorMessage;
-        {$IFEND}
-       {$ENDIF}
       End;
      If e.ErrorCode = 405 Then
       vErrorMessage := cInvalidPoolerName;
@@ -4796,7 +4789,7 @@ Begin
 
   If (vErrorMessage <> '') Then
    Begin
-    Result := vErrorMessage;
+    Result := unescape_chars(vErrorMessage);
     Raise Exception.Create(Result);
    End;
  End;
