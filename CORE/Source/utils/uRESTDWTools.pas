@@ -3278,6 +3278,11 @@ End;
 Function Decode64(const S: string): string;
 Var
  sa : String;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion > 27}
+   ne: TBase64Encoding;
+  {$IFEND}
+ {$ENDIF}
 Begin
  If (Trim(S) <> '')   And
     (Trim(S) <> '""') Then
@@ -3285,7 +3290,20 @@ Begin
    SA := S;
    If Pos(sLineBreak, SA) > 0 Then
     SA := StringReplace(SA, sLineBreak, '', [rfReplaceAll]);
+   {$IFDEF FPC}
     Result := BytesToString(Base64Decode(SA));
+   {$ELSE}
+    {$IF CompilerVersion > 27}
+     ne     := TBase64Encoding.Create(-1, '');
+     Try
+      Result := ne.Decode(SA);
+     Finally
+      FreeAndNil(ne);
+     End;
+    {$ELSE}
+     Result := BytesToString(Base64Decode(SA));
+    {$IFEND}
+   {$ENDIF}
   End;
 End;
 {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
