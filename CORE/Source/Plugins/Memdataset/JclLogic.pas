@@ -1,7 +1,6 @@
 unit JclLogic;
 
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -23,10 +22,13 @@ unit JclLogic;
  Roniery                    - Devel.
 }
 
+{$IFDEF FPC}
+ {$MODE Delphi}
+ {$ASMMode Intel}
+{$ENDIF}
+
 {$RANGECHECKS OFF}
-
 interface
-
 // Conversion
 function OrdToBinary(Value: Byte): string; overload;
 function OrdToBinary(Value: ShortInt): string; overload;
@@ -35,12 +37,10 @@ function OrdToBinary(Value: Word): string; overload;
 function OrdToBinary(Value: Integer): string; overload;
 function OrdToBinary(Value: Cardinal): string; overload;
 function OrdToBinary(Value: Int64): string; overload;
-
 // Bit manipulation
 type
   TBitRange = Byte;
   TBooleanArray = array of Boolean;
-
 function BitsHighest(X: Byte): Integer; overload;
 function BitsHighest(X: ShortInt): Integer; overload;
 function BitsHighest(X: SmallInt): Integer; overload;
@@ -48,7 +48,6 @@ function BitsHighest(X: Word): Integer; overload;
 function BitsHighest(X: Integer): Integer; overload;
 function BitsHighest(X: Cardinal): Integer; overload;
 function BitsHighest(X: Int64): Integer; overload;
-
 function BitsLowest(X: Byte): Integer; overload;
 function BitsLowest(X: Shortint): Integer; overload;
 function BitsLowest(X: Smallint): Integer; overload;
@@ -56,7 +55,6 @@ function BitsLowest(X: Word): Integer; overload;
 function BitsLowest(X: Cardinal): Integer; overload;
 function BitsLowest(X: Integer): Integer; overload;
 function BitsLowest(X: Int64): Integer; overload;
-
 function ClearBit(const Value: Byte; const Bit: TBitRange): Byte; overload;
 function ClearBit(const Value: Shortint; const Bit: TBitRange): Shortint; overload;
 function ClearBit(const Value: Smallint; const Bit: TBitRange): Smallint; overload;
@@ -68,7 +66,6 @@ procedure ClearBitBuffer(var Value; const Bit: Cardinal); overload;
 {$IFDEF CPU64}
 procedure ClearBitBuffer(var Value; const Bit: Int64); overload;
 {$ENDIF CPU64}
-
 function CountBitsSet(X: Byte): Integer; overload;
 function CountBitsSet(X: Word): Integer; overload;
 function CountBitsSet(X: Smallint): Integer; overload;
@@ -77,7 +74,6 @@ function CountBitsSet(X: Integer): Integer; overload;
 function CountBitsSet(X: Cardinal): Integer; overload;
 function CountBitsSet(X: Int64): Integer; overload;
 function CountBitsSet(P: Pointer; Count: Cardinal): Cardinal; overload;
-
 function CountBitsCleared(X: Byte): Integer; overload;
 function CountBitsCleared(X: Shortint): Integer; overload;
 function CountBitsCleared(X: Smallint): Integer; overload;
@@ -86,7 +82,6 @@ function CountBitsCleared(X: Integer): Integer; overload;
 function CountBitsCleared(X: Cardinal): Integer; overload;
 function CountBitsCleared(X: Int64): Integer; overload;
 function CountBitsCleared(P: Pointer; Count: Cardinal): Cardinal; overload;
-
 function LRot(const Value: Byte; const Count: TBitRange): Byte; overload;
 function LRot(const Value: Word; const Count: TBitRange): Word; overload;
 function LRot(const Value: Integer; const Count: TBitRange): Integer; overload;
@@ -99,16 +94,13 @@ function ReverseBits(Value: Integer): Integer; overload;
 function ReverseBits(Value: Cardinal): Cardinal; overload;
 function ReverseBits(Value: Int64): Int64; overload;
 function ReverseBits(P: Pointer; Count: Integer): Pointer; overload;
-
 function RRot(const Value: Byte; const Count: TBitRange): Byte; overload;
 function RRot(const Value: Word; const Count: TBitRange): Word; overload;
 function RRot(const Value: Integer; const Count: TBitRange): Integer; overload;
 function RRot(const Value: Int64; const Count: TBitRange): Int64; overload;
-
 function Sar(const Value: Shortint; const Count: TBitRange): Shortint; overload;
 function Sar(const Value: Smallint; const Count: TBitRange): Smallint; overload;
 function Sar(const Value: Integer; const Count: TBitRange): Integer; overload;
-
 function SetBit(const Value: Byte; const Bit: TBitRange): Byte; overload;
 function SetBit(const Value: Shortint; const Bit: TBitRange): Shortint; overload;
 function SetBit(const Value: Smallint; const Bit: TBitRange): Smallint; overload;
@@ -120,7 +112,6 @@ procedure SetBitBuffer(var Value; const Bit: Cardinal); overload;
 {$IFDEF CPU64}
 procedure SetBitBuffer(var Value; const Bit: Int64); overload;
 {$ENDIF CPU64}
-
 function TestBit(const Value: Byte; const Bit: TBitRange): Boolean; overload;
 function TestBit(const Value: Shortint; const Bit: TBitRange): Boolean; overload;
 function TestBit(const Value: Smallint; const Bit: TBitRange): Boolean; overload;
@@ -132,7 +123,6 @@ function TestBitBuffer(const Value; const Bit: Cardinal): Boolean; overload;
 {$IFDEF CPU64}
 function TestBitBuffer(const Value; const Bit: Int64): Boolean; overload;
 {$ENDIF CPU64}
-
 function TestBits(const Value, Mask: Byte): Boolean; overload;
 function TestBits(const Value, Mask: Shortint): Boolean; overload;
 function TestBits(const Value, Mask: Smallint): Boolean; overload;
@@ -140,7 +130,6 @@ function TestBits(const Value, Mask: Word): Boolean; overload;
 function TestBits(const Value, Mask: Cardinal): Boolean; overload;
 function TestBits(const Value, Mask: Integer): Boolean; overload;
 function TestBits(const Value, Mask: Int64): Boolean; overload;
-
 function ToggleBit(const Value: Byte; const Bit: TBitRange): Byte; overload;
 function ToggleBit(const Value: Shortint; const Bit: TBitRange): Shortint; overload;
 function ToggleBit(const Value: Smallint; const Bit: TBitRange): Smallint; overload;
@@ -152,31 +141,25 @@ procedure ToggleBitBuffer(var Value; const Bit: Cardinal); overload;
 {$IFDEF CPU64}
 procedure ToggleBitBuffer(var Value; const Bit: Int64); overload;
 {$ENDIF CPU64}
-
 procedure BooleansToBits(var Dest: Byte; const B: TBooleanArray); overload;
 procedure BooleansToBits(var Dest: Word; const B: TBooleanArray); overload;
 procedure BooleansToBits(var Dest: Integer; const B: TBooleanArray); overload;
 procedure BooleansToBits(var Dest: Int64; const B: TBooleanArray); overload;
-
 procedure BitsToBooleans(const Bits: Byte; var B: TBooleanArray; AllBits: Boolean = False); overload;
 procedure BitsToBooleans(const Bits: Word; var B: TBooleanArray; AllBits: Boolean = False); overload;
 procedure BitsToBooleans(const Bits: Integer; var B: TBooleanArray; AllBits: Boolean = False); overload;
 procedure BitsToBooleans(const Bits: Int64; var B: TBooleanArray; AllBits: Boolean = False); overload;
-
 function BitsNeeded(const X: Byte): Integer; overload;
 function BitsNeeded(const X: Word): Integer; overload;
 function BitsNeeded(const X: Integer): Integer; overload;
 function BitsNeeded(const X: Int64): Integer; overload;
-
 function Digits(const X: Cardinal): Integer;
-
 function ReverseBytes(Value: Word): Word; overload;
 function ReverseBytes(Value: Smallint): Smallint; overload;
 function ReverseBytes(Value: Integer): Integer; overload;
 function ReverseBytes(Value: Cardinal): Cardinal; overload;
 function ReverseBytes(Value: Int64): Int64; overload;
 function ReverseBytes(P: Pointer; Count: Integer): Pointer; overload;
-
 // Arithmetic
 procedure SwapOrd(var I, J: Byte); overload;
 procedure SwapOrd(var I, J: Shortint); overload;
@@ -185,7 +168,6 @@ procedure SwapOrd(var I, J: Word); overload;
 procedure SwapOrd(var I, J: Integer); overload;
 procedure SwapOrd(var I, J: Cardinal); overload;
 procedure SwapOrd(var I, J: Int64); overload;
-
 function IncLimit(var B: Byte; const Limit: Byte; const Incr: Byte = 1): Byte; overload;
 function IncLimit(var B: Shortint; const Limit: Shortint; const Incr: Shortint = 1): Shortint; overload;
 function IncLimit(var B: Smallint; const Limit: Smallint; const Incr: Smallint = 1): Smallint; overload;
@@ -193,7 +175,6 @@ function IncLimit(var B: Word; const Limit: Word; const Incr: Word = 1): Word; o
 function IncLimit(var B: Integer; const Limit: Integer; const Incr: Integer = 1): Integer; overload;
 function IncLimit(var B: Cardinal; const Limit: Cardinal; const Incr: Cardinal = 1): Cardinal; overload;
 function IncLimit(var B: Int64; const Limit: Int64; const Incr: Int64 = 1): Int64; overload;
-
 function DecLimit(var B: Byte; const Limit: Byte; const Decr: Byte = 1): Byte; overload;
 function DecLimit(var B: Shortint; const Limit: Shortint; const Decr: Shortint = 1): Shortint; overload;
 function DecLimit(var B: Smallint; const Limit: Smallint; const Decr: Smallint = 1): Smallint; overload;
@@ -201,7 +182,6 @@ function DecLimit(var B: Word; const Limit: Word; const Decr: Word = 1): Word; o
 function DecLimit(var B: Integer; const Limit: Integer; const Decr: Integer = 1): Integer; overload;
 function DecLimit(var B: Cardinal; const Limit: Cardinal; const Decr: Cardinal = 1): Cardinal; overload;
 function DecLimit(var B: Int64; const Limit: Int64; const Decr: Int64 = 1): Int64; overload;
-
 function IncLimitClamp(var B: Byte; const Limit: Byte; const Incr: Byte = 1): Byte; overload;
 function IncLimitClamp(var B: Shortint; const Limit: Shortint; const Incr: Shortint = 1): Shortint; overload;
 function IncLimitClamp(var B: Smallint; const Limit: Smallint; const Incr: Smallint = 1): Smallint; overload;
@@ -209,7 +189,6 @@ function IncLimitClamp(var B: Word; const Limit: Word; const Incr: Word = 1): Wo
 function IncLimitClamp(var B: Integer; const Limit: Integer; const Incr: Integer = 1): Integer; overload;
 function IncLimitClamp(var B: Cardinal; const Limit: Cardinal; const Incr: Cardinal = 1): Cardinal; overload;
 function IncLimitClamp(var B: Int64; const Limit: Int64; const Incr: Int64 = 1): Int64; overload;
-
 function DecLimitClamp(var B: Byte; const Limit: Byte; const Decr: Byte = 1): Byte; overload;
 function DecLimitClamp(var B: Shortint; const Limit: Shortint; const Decr: Shortint = 1): Shortint; overload;
 function DecLimitClamp(var B: Smallint; const Limit: Smallint; const Decr: Smallint = 1): Smallint; overload;
@@ -217,7 +196,6 @@ function DecLimitClamp(var B: Word; const Limit: Word; const Decr: Word = 1): Wo
 function DecLimitClamp(var B: Integer; const Limit: Integer; const Decr: Integer = 1): Integer; overload;
 function DecLimitClamp(var B: Cardinal; const Limit: Cardinal; const Decr: Cardinal = 1): Cardinal; overload;
 function DecLimitClamp(var B: Int64; const Limit: Int64; const Decr: Int64 = 1): Int64; overload;
-
 function Max(const B1, B2: Byte): Byte; overload;
 function Max(const B1, B2: Shortint): Shortint; overload;
 function Max(const B1, B2: Smallint): Smallint; overload;
@@ -225,7 +203,6 @@ function Max(const B1, B2: Word): Word; overload;
 function Max(const B1, B2: Integer): Integer; overload;
 function Max(const B1, B2: Cardinal): Cardinal; overload;
 function Max(const B1, B2: Int64): Int64; overload;
-
 function Min(const B1, B2: Byte): Byte; overload;
 function Min(const B1, B2: Shortint): Shortint; overload;
 function Min(const B1, B2: Smallint): Smallint; overload;
@@ -233,10 +210,8 @@ function Min(const B1, B2: Word): Word; overload;
 function Min(const B1, B2: Integer): Integer; overload;
 function Min(const B1, B2: Cardinal): Cardinal; overload;
 function Min(const B1, B2: Int64): Int64; overload;
-
 const
   // Constants defining the number of bits in each Integer type
-
   BitsPerNibble   = 4;
   BitsPerByte     = 8;
   BitsPerShortint = SizeOf(Shortint) * BitsPerByte;
@@ -245,9 +220,7 @@ const
   BitsPerInteger  = SizeOf(Integer) * BitsPerByte;
   BitsPerCardinal = SizeOf(Cardinal) * BitsPerByte;
   BitsPerInt64    = SizeOf(Int64) * BitsPerByte;
-
   // Constants defining the number of nibbles in each Integer type
-
   NibblesPerByte     = BitsPerByte div BitsPerNibble;
   NibblesPerShortint = SizeOf(Shortint) * NibblesPerByte;
   NibblesPerSmallint = SizeOf(Smallint) * NibblesPerByte;
@@ -255,9 +228,7 @@ const
   NibblesPerInteger  = SizeOf(Integer) * NibblesPerByte;
   NibblesPerCardinal = SizeOf(Cardinal) * NibblesPerByte;
   NibblesPerInt64    = SizeOf(Int64) * NibblesPerByte;
-
   // Constants defining a mask with all bits set for each Integer type
-
   NibbleMask      = $F;
   ByteMask        = Byte($FF);
   ShortintMask    = Shortint($FF);
@@ -266,7 +237,6 @@ const
   IntegerMask     = Integer($FFFFFFFF);
   CardinalMask    = Cardinal($FFFFFFFF);
   Int64Mask       = Int64($FFFFFFFFFFFFFFFF);
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -278,12 +248,9 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   JclBase;
-
 // Conversion
 function OrdToBinary(Value: Byte): string;
 var
@@ -296,7 +263,6 @@ begin
     Value := Value shr 1;
   end;
 end;
-
 function OrdToBinary(Value: Shortint): string;
 var
   I: Integer;
@@ -308,7 +274,6 @@ begin
     Value := Value shr 1;
   end;
 end;
-
 function OrdToBinary(Value: Smallint): string;
 var
   I: Integer;
@@ -322,7 +287,6 @@ begin
     S := S shr 1;
   end;
 end;
-
 function OrdToBinary(Value: Word): string;
 var
   I: Integer;
@@ -334,7 +298,6 @@ begin
     Value := Value shr 1;
   end;
 end;
-
 function OrdToBinary(Value: Integer): string;
 var
   I: Integer;
@@ -346,7 +309,6 @@ begin
     Value := Value shr 1;
   end;
 end;
-
 function OrdToBinary(Value: Cardinal): string;
 var
   I: Integer;
@@ -358,7 +320,6 @@ begin
     Value := Value shr 1;
   end;
 end;
-
 function OrdToBinary(Value: Int64): string;
 var
   I: Integer;
@@ -370,7 +331,6 @@ begin
     Value := Value shr Int64(1);
   end;
 end;
-
 
 // Bit manipulation
 function BitsHighest(X: Cardinal): Integer;
@@ -394,7 +354,6 @@ asm
   CMOVZ   EAX, R10D
   {$ENDIF CPU64}
 end;
-
 function BitsHighest(X: Integer): Integer;
 asm
   {$IFDEF CPU32}
@@ -416,27 +375,22 @@ asm
   CMOVZ   EAX, R10D
   {$ENDIF CPU64}
 end;
-
 function BitsHighest(X: Byte): Integer;
 begin
   Result := BitsHighest(Cardinal(X));
 end;
-
 function BitsHighest(X: Word): Integer;
 begin
   Result := BitsHighest(Cardinal(X));
 end;
-
 function BitsHighest(X: SmallInt): Integer;
 begin
   Result := BitsHighest(Integer(X));
 end;
-
 function BitsHighest(X: ShortInt): Integer;
 begin
   Result := BitsHighest(Integer(X));
 end;
-
 function BitsHighest(X: Int64): Integer;
 {$IFDEF CPU32}
 begin
@@ -450,17 +404,14 @@ end;
 asm
   // --> RCX X
   // <-- RAX
-
   // this is much shorter than "MOV RAX, -1"
   XOR     RAX, RAX
   DEC     EAX
-
   MOV     R10, RAX
   BSR     RAX, RCX
   CMOVZ   RAX, R10
 end;
 {$ENDIF CPU64}
-
 function BitsLowest(X: Cardinal): Integer;
 asm
   {$IFDEF CPU32}
@@ -482,7 +433,6 @@ asm
   CMOVZ   EAX, R10D
   {$ENDIF CPU64}
 end;
-
 function BitsLowest(X: Integer): Integer;
 asm
   {$IFDEF CPU32}
@@ -504,27 +454,22 @@ asm
   CMOVZ   EAX, R10D
   {$ENDIF CPU64}
 end;
-
 function BitsLowest(X: Byte): Integer;
 begin
   Result := BitsLowest(Cardinal(X));
 end;
-
 function BitsLowest(X: Shortint): Integer;
 begin
   Result := BitsLowest(Integer(X));
 end;
-
 function BitsLowest(X: Smallint): Integer;
 begin
   Result := BitsLowest(Integer(X));
 end;
-
 function BitsLowest(X: Word): Integer;
 begin
   Result := BitsLowest(Cardinal(X));
 end;
-
 function BitsLowest(X: Int64): Integer;
 {$IFDEF CPU32}
 begin
@@ -538,17 +483,14 @@ end;
 asm
   // --> RCX X
   // <-- RAX
-
   // this is much shorter than "MOV RAX, -1"
   XOR     RAX, RAX
   DEC     EAX
-
   MOV     R10, RAX
   BSF     RAX, RCX
   CMOVZ   RAX, R10
 end;
 {$ENDIF CPU64}
-
 function ClearBit(const Value: Byte; const Bit: TBitRange): Byte;
 asm
   // 32 --> AL Value
@@ -563,7 +505,6 @@ asm
   {$ENDIF CPU64}
   BTR    EAX, EDX
 end;
-
 function ClearBit(const Value: Shortint; const Bit: TBitRange): Shortint;
 asm
   // 32 --> AL Value
@@ -578,7 +519,6 @@ asm
   {$ENDIF CPU64}
   BTR    EAX, EDX
 end;
-
 function ClearBit(const Value: Smallint; const Bit: TBitRange): Smallint;
 asm
   // 32 --> AX Value
@@ -593,7 +533,6 @@ asm
   {$ENDIF CPU64}
   BTR    EAX, EDX
 end;
-
 function ClearBit(const Value: Word; const Bit: TBitRange): Word;
 asm
   // 32 --> AX Value
@@ -608,7 +547,6 @@ asm
   {$ENDIF CPU64}
   BTR    EAX, EDX
 end;
-
 function ClearBit(const Value: Cardinal; const Bit: TBitRange): Cardinal;
 asm
   // 32 --> EAX Value
@@ -622,7 +560,6 @@ asm
   {$ENDIF CPU64}
   BTR    EAX, EDX
 end;
-
 function ClearBit(const Value: Integer; const Bit: TBitRange): Integer;
 asm
   // 32 --> EAX Value
@@ -636,7 +573,6 @@ asm
   {$ENDIF CPU64}
   BTR    EAX, EDX
 end;
-
 function ClearBit(const Value: Int64; const Bit: TBitRange): Int64;
 {$IFDEF CPU32}
 begin
@@ -652,7 +588,6 @@ asm
   BTR    RAX, RDX
 end;
 {$ENDIF CPU64}
-
 procedure ClearBitBuffer(var Value; const Bit: Cardinal);
 {$IFDEF PUREPASCAL}
 var
@@ -673,7 +608,6 @@ asm
   BTR    [Value], Bit
 end;
 {$ENDIF ~PUREPASCAL}
-
 {$IFDEF CPU64}
 procedure ClearBitBuffer(var Value; const Bit: Int64);
 {$IFDEF PUREPASCAL}
@@ -694,10 +628,8 @@ asm
 end;
 {$ENDIF ~PUREPASCAL}
 {$ENDIF CPU64}
-
 const
   BitSetPerNibble: array[0..15] of Integer = (0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4);
-
 function CountBitsSet(X: Cardinal): Integer;
 var
   Index: Integer;
@@ -709,12 +641,10 @@ begin
     X := X shr BitsPerNibble;
   end;
 end;
-
 function CountBitsSet(X: Byte): Integer;
 begin
   Result := BitSetPerNibble[X shr BitsPerNibble] + BitSetPerNibble[X and $F];
 end;
-
 function CountBitsSet(X: Word): Integer;
 var
   Index: Integer;
@@ -726,7 +656,6 @@ begin
     X := X shr BitsPerNibble;
   end;
 end;
-
 function CountBitsSet(X: Smallint): Integer;
 var
   Index: Integer;
@@ -738,12 +667,10 @@ begin
     X := X shr BitsPerNibble;
   end;
 end;
-
 function CountBitsSet(X: ShortInt): Integer;
 begin
   Result := BitSetPerNibble[X shr BitsPerNibble] + BitSetPerNibble[X and $F];
 end;
-
 function CountBitsSet(X: Integer): Integer;
 var
   Index: Integer;
@@ -755,7 +682,6 @@ begin
     X := X shr BitsPerNibble;
   end;
 end;
-
 function CountBitsSet(P: Pointer; Count: Cardinal): Cardinal;
 var
   b: Byte;
@@ -764,62 +690,50 @@ begin
   while Count > 0 do
   begin
     b := PByte(P)^;
-
     // lower Nibble
     Inc(Result, BitSetPerNibble[b and $0F]);
     // upper Nibble
     Inc(Result, BitSetPerNibble[b shr BitsPerNibble]);
-
     Dec(Count);
     Inc(PByte(P));
   end;
 end;
-
 function CountBitsSet(X: Int64): Integer;
 begin
   Result := CountBitsSet(TJclULargeInteger(X).LowPart) + CountBitsSet(TJclULargeInteger(X).HighPart);
 end;
-
 function CountBitsCleared(X: Byte): Integer;
 begin
   Result := BitsPerByte - CountBitsSet(Byte(X));
 end;
-
 function CountBitsCleared(X: Shortint): Integer;
 begin
   Result := BitsPerShortint - CountBitsSet(Byte(X));
 end;
-
 function CountBitsCleared(X: Smallint): Integer;
 begin
   Result := BitsPerSmallint - CountBitsSet(Word(X));
 end;
-
 function CountBitsCleared(X: Word): Integer;
 begin
   Result := BitsPerWord - CountBitsSet(Word(X));
 end;
-
 function CountBitsCleared(X: Integer): Integer;
 begin
   Result := BitsPerInteger - CountBitsSet(Integer(X));
 end;
-
 function CountBitsCleared(X: Cardinal): Integer;
 begin
   Result := BitsPerCardinal - CountBitsSet(Cardinal(X));
 end;
-
 function CountBitsCleared(X: Int64): Integer;
 begin
   Result := BitsPerInt64 - CountBitsSet(Int64(X));
 end;
-
 function CountBitsCleared(P: Pointer; Count: Cardinal): Cardinal;
 begin
   Result := Count * BitsPerByte - CountBitsSet(P, Count);
 end;
-
 function LRot(const Value: Byte; const Count: TBitRange): Byte;
 asm
   {$IFDEF CPU32}
@@ -838,7 +752,6 @@ asm
   ROL    AL, CL
   {$ENDIF CPU64}
 end;
-
 function LRot(const Value: Word; const Count: TBitRange): Word;
 asm
   {$IFDEF CPU32}
@@ -857,7 +770,6 @@ asm
   ROL    AX, CL
   {$ENDIF CPU64}
 end;
-
 function LRot(const Value: Integer; const Count: TBitRange): Integer;
 asm
   {$IFDEF CPU32}
@@ -876,43 +788,34 @@ asm
   ROL    EAX, CL
   {$ENDIF CPU64}
 end;
-
 function LRot(const Value: Int64; const Count: TBitRange): Int64;
 {$IFDEF CPU32}
 asm
   // --> Value on stack
   //     AL  Count
   // <-- EDX:EAX Result
-
   PUSH   ESI
   PUSH   EDI
-
   MOV    CL, Count
   MOV    EDX, DWORD PTR [Value + 4]
   MOV    EAX, DWORD PTR [Value]
-
   // Count := Count mod 64
   AND    CL, $3F
   JZ     @@End
-
   CMP    CL, 32
   JL     @@RolBits
-
   // Count >= 32: "rol Count" = "rol 32" + "rol (32 - Count)"
 @@Swap:
   // "rol 32"
   XCHG   EAX, EDX
   // Count := 32 - Count
   SUB    CL, 32
-
 @@RolBits:
   MOV    EDI, EDX
   MOV    ESI, EAX
-
   // shift the bits
   SHL    EDX, CL
   SHL    EAX, CL
-
   // CounterShiftCount := 32 - Count
   NEG    CL
   ADD    CL, 32
@@ -921,7 +824,6 @@ asm
   SHR    ESI, CL
   OR     EAX, EDI
   OR     EDX, ESI
-
 @@End:
   POP    EDI
   POP    ESI
@@ -937,7 +839,6 @@ asm
   ROL    RAX, CL
 end;
 {$ENDIF CPU64}
-
 function RRot(const Value: Int64; const Count: TBitRange): Int64;
 {$IFDEF CPU32}
 begin
@@ -954,29 +855,24 @@ asm
   ROR    RAX, CL
 end;
 {$ENDIF CPU64}
-
 const
   // Lookup table of bit reversed nibbles, used by simple overloads of ReverseBits
   RevNibbles: array [0..NibbleMask] of Byte =
     ($0, $8, $4, $C, $2, $A, $6, $E, $1, $9, $5, $D, $3, $B, $7, $F);
-
 function ReverseBits(Value: Byte): Byte;
 begin
   Result := RevNibbles[Value shr BitsPerNibble] or
     (RevNibbles[Value and NibbleMask] shl BitsPerNibble);
 end;
-
 function ReverseBits(Value: Shortint): Shortint;
 begin
   Result := RevNibbles[Byte(Value) shr BitsPerNibble] or
     (RevNibbles[Value and NibbleMask] shl BitsPerNibble);
 end;
-
 function ReverseBits(Value: Smallint): Smallint;
 begin
   Result := ReverseBits(Word(Value));
 end;
-
 function ReverseBits(Value: Word): Word;
 var
   I: Integer;
@@ -988,7 +884,6 @@ begin
     Value := Value shr BitsPerNibble;
   end;
 end;
-
 function ReverseBits(Value: Integer): Integer;
 var
   I: Integer;
@@ -1000,7 +895,6 @@ begin
     Value := Value shr BitsPerNibble;
   end;
 end;
-
 function ReverseBits(Value: Cardinal): Cardinal;
 var
   I: Integer;
@@ -1012,13 +906,11 @@ begin
     Value := Value shr BitsPerNibble;
   end;
 end;
-
 function ReverseBits(Value: Int64): Int64;
 begin
   TJclULargeInteger(Result).LowPart := ReverseBits(TJclULargeInteger(Value).HighPart);
   TJclULargeInteger(Result).HighPart := ReverseBits(TJclULargeInteger(Value).LowPart);
 end;
-
 const
   // Lookup table of reversed bytes, used by pointer overload of ReverseBits
   ReverseTable: array [0..ByteMask] of Byte = (
@@ -1054,7 +946,6 @@ const
     $17, $97, $57, $D7, $37, $B7, $77, $F7,
     $0F, $8F, $4F, $CF, $2F, $AF, $6F, $EF,
     $1F, $9F, $5F, $DF, $3F, $BF, $7F, $FF);
-
 function ReverseBits(P: Pointer; Count: Integer): Pointer;
 var
   P1, P2: PByte;
@@ -1078,7 +969,6 @@ begin
   end;
   Result := P;
 end;
-
 function RRot(const Value: Byte; const Count: TBitRange): Byte;
 asm
   {$IFDEF CPU32}
@@ -1097,7 +987,6 @@ asm
   ROR    AL, CL
   {$ENDIF CPU64}
 end;
-
 function RRot(const Value: Word; const Count: TBitRange): Word;
 asm
   {$IFDEF CPU32}
@@ -1116,7 +1005,6 @@ asm
   ROR    AX, CL
   {$ENDIF CPU64}
 end;
-
 function RRot(const Value: Integer; const Count: TBitRange): Integer;
 asm
   {$IFDEF CPU32}
@@ -1135,7 +1023,6 @@ asm
   ROR    EAX, CL
   {$ENDIF CPU64}
 end;
-
 function Sar(const Value: Shortint; const Count: TBitRange): Shortint;
 asm
   {$IFDEF CPU32}
@@ -1154,7 +1041,6 @@ asm
   SAR    AL, CL
   {$ENDIF CPU64}
 end;
-
 function Sar(const Value: Smallint; const Count: TBitRange): Smallint;
 asm
   {$IFDEF CPU32}
@@ -1173,7 +1059,6 @@ asm
   SAR    AX, CL
   {$ENDIF CPU64}
 end;
-
 function Sar(const Value: Integer; const Count: TBitRange): Integer;
 asm
   {$IFDEF CPU32}
@@ -1192,7 +1077,6 @@ asm
   SAR    EAX, CL
   {$ENDIF CPU64}
 end;
-
 function SetBit(const Value: Byte; const Bit: TBitRange): Byte;
 asm
   // 32 --> AL Value
@@ -1207,7 +1091,6 @@ asm
   {$ENDIF CPU64}
   BTS    EAX, EDX
 end;
-
 function SetBit(const Value: Shortint; const Bit: TBitRange): Shortint;
 asm
   // 32 --> AL Value
@@ -1222,7 +1105,6 @@ asm
   {$ENDIF CPU64}
   BTS    EAX, EDX
 end;
-
 function SetBit(const Value: Smallint; const Bit: TBitRange): Smallint;
 asm
   // 32 --> AX Value
@@ -1237,7 +1119,6 @@ asm
   {$ENDIF CPU64}
   BTS    EAX, EDX
 end;
-
 function SetBit(const Value: Word; const Bit: TBitRange): Word;
 asm
   // 32 --> AX Value
@@ -1252,7 +1133,6 @@ asm
   {$ENDIF CPU64}
   BTS    EAX, EDX
 end;
-
 function SetBit(const Value: Cardinal; const Bit: TBitRange): Cardinal;
 asm
   // 32 --> EAX Value
@@ -1266,7 +1146,6 @@ asm
   {$ENDIF CPU64}
   BTS    EAX, EDX
 end;
-
 function SetBit(const Value: Integer; const Bit: TBitRange): Integer;
 asm
   // 32 --> EAX Value
@@ -1280,7 +1159,6 @@ asm
   {$ENDIF CPU64}
   BTS    EAX, EDX
 end;
-
 function SetBit(const Value: Int64; const Bit: TBitRange): Int64;
 {$IFDEF CPU32}
 begin
@@ -1296,7 +1174,6 @@ asm
   BTS    RAX, RDX
 end;
 {$ENDIF CPU64}
-
 procedure SetBitBuffer(var Value; const Bit: Cardinal);
 {$IFDEF PUREPASCAL}
 var
@@ -1313,7 +1190,6 @@ asm
   BTS    [Value], Bit
 end;
 {$ENDIF ~PUREPASCAL}
-
 {$IFDEF CPU64}
 procedure SetBitBuffer(var Value; const Bit: Int64);
 {$IFDEF PUREPASCAL}
@@ -1332,7 +1208,6 @@ asm
 end;
 {$ENDIF ~PUREPASCAL}
 {$ENDIF CPU64}
-
 function TestBit(const Value: Byte; const Bit: TBitRange): Boolean;
 {$IFDEF PUREPASCAL}
 begin
@@ -1354,7 +1229,6 @@ asm
   SETC   AL
 end;
 {$ENDIF ~PUREPASCAL}
-
 function TestBit(const Value: Shortint; const Bit: TBitRange): Boolean;
 {$IFDEF PUREPASCAL}
 begin
@@ -1376,7 +1250,6 @@ asm
   SETC   AL
 end;
 {$ENDIF ~PUREPASCAL}
-
 function TestBit(const Value: Smallint; const Bit: TBitRange): Boolean;
 {$IFDEF PUREPASCAL}
 begin
@@ -1398,7 +1271,6 @@ asm
   SETC   AL
 end;
 {$ENDIF ~PUREPASCAL}
-
 function TestBit(const Value: Word; const Bit: TBitRange): Boolean;
 {$IFDEF PUREPASCAL}
 begin
@@ -1420,7 +1292,6 @@ asm
   SETC   AL
 end;
 {$ENDIF ~PUREPASCAL}
-
 function TestBit(const Value: Cardinal; const Bit: TBitRange): Boolean;
 {$IFDEF PUREPASCAL}
 begin
@@ -1441,7 +1312,6 @@ asm
   SETC   AL
 end;
 {$ENDIF ~PUREPASCAL}
-
 function TestBit(const Value: Integer; const Bit: TBitRange): Boolean;
 {$IFDEF PUREPASCAL}
 begin
@@ -1462,7 +1332,6 @@ asm
   SETC   AL
 end;
 {$ENDIF ~PUREPASCAL}
-
 function TestBit(const Value: Int64; const Bit: TBitRange): Boolean;
 {$IFDEF CPU32}
 begin
@@ -1479,7 +1348,6 @@ asm
   SETC   AL
 end;
 {$ENDIF ~PUREPASCAL}
-
 function TestBitBuffer(const Value; const Bit: Cardinal): Boolean;
 {$IFDEF PUREPASCAL}
 var
@@ -1497,7 +1365,6 @@ asm
   SETC   AL
 end;
 {$ENDIF ~PUREPASCAL}
-
 {$IFDEF CPU64}
 function TestBitBuffer(const Value; const Bit: Int64): Boolean;
 {$IFDEF PUREPASCAL}
@@ -1517,42 +1384,34 @@ asm
 end;
 {$ENDIF ~PUREPASCAL}
 {$ENDIF CPU64}
-
 function TestBits(const Value, Mask: Byte): Boolean;
 begin
   Result := (Value and Mask) = Mask;
 end;
-
 function TestBits(const Value, Mask: Shortint): Boolean;
 begin
   Result := (Value and Mask) = Mask;
 end;
-
 function TestBits(const Value, Mask: Smallint): Boolean;
 begin
   Result := (Value and Mask) = Mask;
 end;
-
 function TestBits(const Value, Mask: Word): Boolean;
 begin
   Result := (Value and Mask) = Mask;
 end;
-
 function TestBits(const Value, Mask: Cardinal): Boolean;
 begin
   Result := (Value and Mask) = Mask;
 end;
-
 function TestBits(const Value, Mask: Integer): Boolean;
 begin
   Result := (Value and Mask) = Mask;
 end;
-
 function TestBits(const Value, Mask: Int64): Boolean;
 begin
   Result := (Value and Mask) = Mask;
 end;
-
 function ToggleBit(const Value: Byte; const Bit: TBitRange): Byte;
 {$IFDEF PUREPASCAL}
 begin
@@ -1573,7 +1432,6 @@ asm
   BTC    EAX, EDX
 end;
 {$ENDIF ~PUREPASCAL}
-
 function ToggleBit(const Value: Shortint; const Bit: TBitRange): Shortint;
 {$IFDEF PUREPASCAL}
 begin
@@ -1594,7 +1452,6 @@ asm
   BTC    EAX, EDX
 end;
 {$ENDIF ~PUREPASCAL}
-
 function ToggleBit(const Value: Smallint; const Bit: TBitRange): Smallint;
 {$IFDEF PUREPASCAL}
 begin
@@ -1615,7 +1472,6 @@ asm
   BTC    EAX, EDX
 end;
 {$ENDIF ~PUREPASCAL}
-
 function ToggleBit(const Value: Word; const Bit: TBitRange): Word;
 {$IFDEF PUREPASCAL}
 begin
@@ -1636,7 +1492,6 @@ asm
   BTC    EAX, EDX
 end;
 {$ENDIF ~PUREPASCAL}
-
 function ToggleBit(const Value: Cardinal; const Bit: TBitRange): Cardinal;
 {$IFDEF PUREPASCAL}
 begin
@@ -1656,7 +1511,6 @@ asm
   BTC    EAX, EDX
 end;
 {$ENDIF ~PUREPASCAL}
-
 function ToggleBit(const Value: Integer; const Bit: TBitRange): Integer;
 {$IFDEF PUREPASCAL}
 begin
@@ -1676,7 +1530,6 @@ asm
   BTC    EAX, EDX
 end;
 {$ENDIF ~PUREPASCAL}
-
 function ToggleBit(const Value: Int64; const Bit: TBitRange): Int64;
 {$IFDEF CPU32}
 begin
@@ -1692,7 +1545,6 @@ asm
   BTC    RAX, RDX
 end;
 {$ENDIF CPU64}
-
 procedure ToggleBitBuffer(var Value; const Bit: Cardinal);
 {$IFDEF PUREPASCAL}
 var
@@ -1709,7 +1561,6 @@ asm
   BTC    [Value], Bit
 end;
 {$ENDIF ~PUREPASCAL}
-
 {$IFDEF CPU64}
 procedure ToggleBitBuffer(var Value; const Bit: Int64);
 {$IFDEF PUREPASCAL}
@@ -1728,7 +1579,6 @@ asm
 end;
 {$ENDIF ~PUREPASCAL}
 {$ENDIF CPU64}
-
 procedure BooleansToBits(var Dest: Byte; const B: TBooleanArray);
 var
   I, H: Integer;
@@ -1739,7 +1589,6 @@ begin
     if B[I] then
       Dest := SetBit(Dest, TBitRange(I));
 end;
-
 procedure BooleansToBits(var Dest: Word; const B: TBooleanArray);
 var
   I, H: Integer;
@@ -1750,7 +1599,6 @@ begin
     if B[I] then
       Dest := SetBit(Dest, TBitRange(I));
 end;
-
 procedure BooleansToBits(var Dest: Integer; const B: TBooleanArray);
 var
   I, H: Integer;
@@ -1761,7 +1609,6 @@ begin
     if B[I] then
       Dest := SetBit(Dest, TBitRange(I));
 end;
-
 procedure BooleansToBits(var Dest: Int64; const B: TBooleanArray);
 var
   I, H: Integer;
@@ -1772,7 +1619,6 @@ begin
     if B[I] then
       Dest := SetBit(Dest, TBitRange(I));
 end;
-
 procedure BitsToBooleans(const Bits: Byte; var B: TBooleanArray; AllBits: Boolean);
 var
   I: Integer;
@@ -1784,7 +1630,6 @@ begin
   for I := 0 to High(B) do
     B[I] := TestBit(Bits, TBitRange(I));
 end;
-
 procedure BitsToBooleans(const Bits: Word; var B: TBooleanArray; AllBits: Boolean);
 var
   I: Integer;
@@ -1796,7 +1641,6 @@ begin
   for I := 0 to High(B) do
     B[I] := TestBit(Bits, TBitRange(I));
 end;
-
 procedure BitsToBooleans(const Bits: Integer; var B: TBooleanArray; AllBits: Boolean);
 var
   I: Integer;
@@ -1808,7 +1652,6 @@ begin
   for I := 0 to High(B) do
     B[I] := TestBit(Bits, TBitRange(I));
 end;
-
 procedure BitsToBooleans(const Bits: Int64; var B: TBooleanArray; AllBits: Boolean);
 var
   I: Integer;
@@ -1820,7 +1663,6 @@ begin
   for I := 0 to High(B) do
     B[I] := TestBit(Bits, TBitRange(I));
 end;
-
 function Digits(const X: Cardinal): Integer;
 var
   Val: Cardinal;
@@ -1832,35 +1674,30 @@ begin
     Val := Val div 10;
   until Val = 0;
 end;
-
 function BitsNeeded(const X: Byte): Integer;
 begin
   Result := BitsHighest(X) + 1;
   if Result = 0 then
     Result := 1;
 end;
-
 function BitsNeeded(const X: Word): Integer;
 begin
   Result := BitsHighest(X) + 1;
   if Result = 0 then
     Result := 1;
 end;
-
 function BitsNeeded(const X: Integer): Integer;
 begin
   Result := BitsHighest(X) + 1;
   if Result = 0 then
     Result := 1;
 end;
-
 function BitsNeeded(const X: Int64): Integer;
 begin
   Result := BitsHighest(X) + 1;
   if Result = 0 then
     Result := 1;
 end;
-
 function ReverseBytes(Value: Word): Word;
 {$IFDEF PUREPASCAL}
 begin
@@ -1881,7 +1718,6 @@ asm
   {$ENDIF CPU64}
 end;
 {$ENDIF ~PUREPASCAL}
-
 function ReverseBytes(Value: Smallint): Smallint;
 {$IFDEF PUREPASCAL}
 asm
@@ -1902,7 +1738,6 @@ asm
   {$ENDIF CPU64}
 end;
 {$ENDIF ~PUREPASCAL}
-
 function ReverseBytes(Value: Integer): Integer;
 {$IFDEF PUREPASCAL}
 begin
@@ -1923,7 +1758,6 @@ asm
   {$ENDIF CPU64}
 end;
 {$ENDIF ~PUREPASCAL}
-
 function ReverseBytes(Value: Cardinal): Cardinal;
 {$IFDEF PUREPASCAL}
 begin
@@ -1944,7 +1778,6 @@ asm
   {$ENDIF CPU64}
 end;
 {$ENDIF ~PUREPASCAL}
-
 function ReverseBytes(Value: Int64): Int64;
 {$IFDEF CPU32}
 var
@@ -1965,7 +1798,6 @@ asm
   BSWAP  RAX
 end;
 {$ENDIF CPU64}
-
 function ReverseBytes(P: Pointer; Count: Integer): Pointer;
 var
   P1, P2: PByte;
@@ -1987,7 +1819,6 @@ begin
   end;
   Result := P;
 end;
-
 // Arithmetic
 procedure SwapOrd(var I, J: Byte);
 var
@@ -1997,7 +1828,6 @@ begin
   I := J;
   J := T;
 end;
-
 procedure SwapOrd(var I, J: Cardinal);
 var
   T: Cardinal;
@@ -2006,7 +1836,6 @@ begin
   I := J;
   J := T;
 end;
-
 procedure SwapOrd(var I, J: Integer);
 var
   T: Integer;
@@ -2015,7 +1844,6 @@ begin
   I := J;
   J := T;
 end;
-
 procedure SwapOrd(var I, J: Int64);
 var
   T: Int64;
@@ -2024,7 +1852,6 @@ begin
   I := J;
   J := T;
 end;
-
 procedure SwapOrd(var I, J: Shortint);
 var
   T: Shortint;
@@ -2033,7 +1860,6 @@ begin
   I := J;
   J := T;
 end;
-
 procedure SwapOrd(var I, J: Smallint);
 var
   T: Smallint;
@@ -2042,7 +1868,6 @@ begin
   I := J;
   J := T;
 end;
-
 procedure SwapOrd(var I, J: Word);
 var
   T: Word;
@@ -2051,105 +1876,90 @@ begin
   I := J;
   J := T;
 end;
-
 function IncLimit(var B: Byte; const Limit, Incr: Byte): Byte;
 begin
   if (B + Incr) <= Limit then
     Inc(B, Incr);
   Result := B;
 end;
-
 function IncLimit(var B: Shortint; const Limit, Incr: Shortint): Shortint;
 begin
   if (B + Incr) <= Limit then
     Inc(B, Incr);
   Result := B;
 end;
-
 function IncLimit(var B: Smallint; const Limit, Incr: Smallint): Smallint;
 begin
   if (B + Incr) <= Limit then
     Inc(B, Incr);
   Result := B;
 end;
-
 function IncLimit(var B: Word; const Limit, Incr: Word): Word;
 begin
   if (B + Incr) <= Limit then
     Inc(B, Incr);
   Result := B;
 end;
-
 function IncLimit(var B: Integer; const Limit, Incr: Integer): Integer;
 begin
   if (B + Incr) <= Limit then
     Inc(B, Incr);
   Result := B;
 end;
-
 function IncLimit(var B: Cardinal; const Limit, Incr: Cardinal): Cardinal;
 begin
   if (B + Incr) <= Limit then
     Inc(B, Incr);
   Result := B;
 end;
-
 function IncLimit(var B: Int64; const Limit, Incr: Int64): Int64;
 begin
   if (B + Incr) <= Limit then
     Inc(B, Incr);
   Result := B;
 end;
-
 function DecLimit(var B: Byte; const Limit, Decr: Byte): Byte;
 begin
   if (B - Decr) >= Limit then
     Dec(B, Decr);
   Result := B;
 end;
-
 function DecLimit(var B: Shortint; const Limit, Decr: Shortint): shortint;
 begin
   if (B - Decr) >= Limit then
     Dec(B, Decr);
   Result := B;
 end;
-
 function DecLimit(var B: Smallint; const Limit, Decr: Smallint): Smallint;
 begin
   if (B - Decr) >= Limit then
     Dec(B, Decr);
   Result := B;
 end;
-
 function DecLimit(var B: Word; const Limit, Decr: Word): Word;
 begin
   if (B - Decr) >= Limit then
     Dec(B, Decr);
   Result := B;
 end;
-
 function DecLimit(var B: Integer; const Limit, Decr: Integer): Integer;
 begin
   if (B - Decr) >= Limit then
     Dec(B, Decr);
   Result := B;
 end;
-
 function DecLimit(var B: Cardinal; const Limit, Decr: Cardinal): Cardinal;
 begin
   if (B - Decr) >= Limit then
     Dec(B, Decr);
   Result := B;
 end;
-
 function DecLimit(var B: Int64; const Limit, Decr: Int64): Int64;
 begin
   if (B - Decr) >= Limit then
     Dec(B, Decr);
   Result := B;
 end;
-
 function IncLimitClamp(var B: Byte; const Limit, Incr: Byte): Byte;
 begin
   if (B + Incr) <= Limit then
@@ -2158,7 +1968,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function IncLimitClamp(var B: Shortint; const Limit, Incr: Shortint): Shortint;
 begin
   if (B + Incr) <= Limit then
@@ -2167,7 +1976,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function IncLimitClamp(var B: Smallint; const Limit, Incr: Smallint): Smallint;
 begin
   if (B + Incr) <= Limit then
@@ -2176,7 +1984,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function IncLimitClamp(var B: Word; const Limit, Incr: Word): Word;
 begin
   if (B + Incr) <= Limit then
@@ -2185,7 +1992,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function IncLimitClamp(var B: Integer; const Limit, Incr: Integer): Integer;
 begin
   if (B + Incr) <= Limit then
@@ -2194,7 +2000,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function IncLimitClamp(var B: Cardinal; const Limit, Incr: Cardinal): Cardinal;
 begin
   if (B + Incr) <= Limit then
@@ -2203,7 +2008,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function IncLimitClamp(var B: Int64; const Limit, Incr: Int64): Int64;
 begin
   if (B + Incr) <= Limit then
@@ -2212,7 +2016,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function DecLimitClamp(var B: Byte; const Limit, Decr: Byte): Byte;
 begin
   if (B - Decr) >= Limit then
@@ -2221,7 +2024,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function DecLimitClamp(var B: Shortint; const Limit, Decr: Shortint): Shortint;
 begin
   if (B - Decr) >= Limit then
@@ -2230,7 +2032,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function DecLimitClamp(var B: Smallint; const Limit, Decr: Smallint): Smallint;
 begin
   if (B - Decr) >= Limit then
@@ -2239,7 +2040,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function DecLimitClamp(var B: Word; const Limit, Decr: Word): Word;
 begin
   if (B - Decr) >= Limit then
@@ -2248,7 +2048,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function DecLimitClamp(var B: Integer; const Limit, Decr: Integer): Integer;
 begin
   if (B - Decr) >= Limit then
@@ -2257,7 +2056,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function DecLimitClamp(var B: Cardinal; const Limit, Decr: Cardinal): Cardinal;
 begin
   if (B - Decr) >= Limit then
@@ -2266,7 +2064,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function DecLimitClamp(var B: Int64; const Limit, Decr: Int64): Int64;
 begin
   if (B - Decr) >= Limit then
@@ -2275,7 +2072,6 @@ begin
     B := Limit;
   Result := B;
 end;
-
 function Max(const B1, B2: Byte): Byte;
 begin
   if B1 > B2 then
@@ -2283,7 +2079,6 @@ begin
   else
     Result := B2;
 end;
-
 function Min(const B1, B2: Byte): Byte;
 begin
   if B1 < B2 then
@@ -2291,7 +2086,6 @@ begin
   else
     Result := B2;
 end;
-
 function Max(const B1, B2: Shortint): Shortint;
 begin
   if B1 > B2 then
@@ -2299,7 +2093,6 @@ begin
   else
     Result := B2;
 end;
-
 function Max(const B1, B2: Smallint): Smallint;
 begin
   if B1 > B2 then
@@ -2307,7 +2100,6 @@ begin
   else
     Result := B2;
 end;
-
 function Min(const B1, B2: Shortint): Shortint;
 begin
   if B1 < B2 then
@@ -2315,7 +2107,6 @@ begin
   else
     Result := B2;
 end;
-
 function Min(const B1, B2: Smallint): Smallint;
 begin
   if B1 < B2 then
@@ -2323,7 +2114,6 @@ begin
   else
     Result := B2;
 end;
-
 function Max(const B1, B2: Word): Word;
 begin
   if B1 > B2 then
@@ -2331,7 +2121,6 @@ begin
   else
     Result := B2;
 end;
-
 function Max(const B1, B2: Int64): Int64;
 begin
   if B1 > B2 then
@@ -2339,7 +2128,6 @@ begin
   else
     Result := B2;
 end;
-
 function Min(const B1, B2: Word): Word;
 begin
   if B1 < B2 then
@@ -2347,7 +2135,6 @@ begin
   else
     Result := B2;
 end;
-
 function Max(const B1, B2: Integer): Integer;
 begin
   if B1 > B2 then
@@ -2355,7 +2142,6 @@ begin
   else
     Result := B2;
 end;
-
 function Min(const B1, B2: Integer): Integer;
 begin
   if B1 < B2 then
@@ -2363,7 +2149,6 @@ begin
   else
     Result := B2;
 end;
-
 function Max(const B1, B2: Cardinal): Cardinal;
 begin
   if B1 > B2 then
@@ -2371,7 +2156,6 @@ begin
   else
     Result := B2;
 end;
-
 function Min(const B1, B2: Cardinal): Cardinal;
 begin
   if B1 < B2 then
@@ -2379,7 +2163,6 @@ begin
   else
     Result := B2;
 end;
-
 function Min(const B1, B2: Int64): Int64;
 begin
   if B1 < B2 then
@@ -2387,13 +2170,10 @@ begin
   else
     Result := B2;
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.

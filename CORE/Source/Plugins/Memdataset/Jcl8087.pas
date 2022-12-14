@@ -1,7 +1,5 @@
 unit Jcl8087;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -23,8 +21,12 @@ unit Jcl8087;
  Roniery                    - Devel.
 }
 
-interface
+{$IFDEF FPC}
+ {$MODE Delphi}
+ {$ASMMode Intel}
+{$ENDIF}
 
+interface
 type
   T8087Precision = (pcSingle, pcReserved, pcDouble, pcExtended);
   T8087Rounding = (rcNearestOrEven, rcDownInfinity, rcUpInfinity, rcChopOrTruncate);
@@ -32,28 +34,23 @@ type
   T8087Exception = (emInvalidOp, emDenormalizedOperand, emZeroDivide, emOverflow,
     emUnderflow, emPrecision);
   T8087Exceptions = set of T8087Exception;
-
 const
   All8087Exceptions = [Low(T8087Exception)..High(T8087Exception)];
-
 function Get8087ControlWord: Word;
 function Get8087Infinity: T8087Infinity;
 function Get8087Precision: T8087Precision;
 function Get8087Rounding: T8087Rounding;
 function Get8087StatusWord(ClearExceptions: Boolean): Word;
-
 function Set8087Infinity(const Infinity: T8087Infinity): T8087Infinity;
 function Set8087Precision(const Precision: T8087Precision): T8087Precision;
 function Set8087Rounding(const Rounding: T8087Rounding): T8087Rounding;
 function Set8087ControlWord(const Control: Word): Word;
-
 function ClearPending8087Exceptions: T8087Exceptions;
 function GetPending8087Exceptions: T8087Exceptions;
 function GetMasked8087Exceptions: T8087Exceptions;
 function SetMasked8087Exceptions(Exceptions: T8087Exceptions; ClearBefore: Boolean = True): T8087Exceptions;
 function Mask8087Exceptions(Exceptions: T8087Exceptions): T8087Exceptions;
 function Unmask8087Exceptions(Exceptions: T8087Exceptions; ClearBefore: Boolean = True): T8087Exceptions;
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -65,33 +62,26 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 const
   X87ExceptBits = $3F;
-
 function Get8087ControlWord: Word;
 asm
           FSTCW   Result
           FWAIT
 end;
-
 function Get8087Infinity: T8087Infinity;
 begin
   Result := T8087Infinity((Get8087ControlWord and $1000) shr 12);
 end;
-
 function Get8087Precision: T8087Precision;
 begin
   Result := T8087Precision((Get8087ControlWord and $0300) shr 8);
 end;
-
 function Get8087Rounding: T8087Rounding;
 begin
   Result := T8087Rounding((Get8087ControlWord and $0C00) shr 10);
 end;
-
 {$IFDEF CPU64}
 function Get8087StatusWord(ClearExceptions: Boolean): Word;
 asm
@@ -116,7 +106,6 @@ begin
   end;
 end;
 {$ENDIF CPU64}
-
 function Set8087Infinity(const Infinity: T8087Infinity): T8087Infinity;
 var
   CW: Word;
@@ -125,7 +114,6 @@ begin
   Result := T8087Infinity((CW and $1000) shr 12);
   Set8087ControlWord((CW and $EFFF) or (Word(Infinity) shl 12));
 end;
-
 function Set8087Precision(const Precision: T8087Precision): T8087Precision;
 var
   CW: Word;
@@ -134,7 +122,6 @@ begin
   Result := T8087Precision((CW and $0300) shr 8);
   Set8087ControlWord((CW and $FCFF) or (Word(Precision) shl 8));
 end;
-
 function Set8087Rounding(const Rounding: T8087Rounding): T8087Rounding;
 var
   CW: Word;
@@ -143,7 +130,6 @@ begin
   Result := T8087Rounding((CW and $0C00) shr 10);
   Set8087ControlWord((CW and $F3FF) or (Word(Rounding) shl 10));
 end;
-
 function Set8087ControlWord(const Control: Word): Word;
 var
   StackControl: Word;
@@ -153,21 +139,17 @@ asm
           FSTCW   Result         // save the old control word
           FLDCW   StackControl   // load the new control word
 end;
-
 function ClearPending8087Exceptions: T8087Exceptions;
-
   function GetSW: Word;
   asm
           FNSTSW  Result
           AND     Result, X87ExceptBits
           FNCLEX
   end;
-
 var
   SW: Word;
 begin
   SW := GetSW;
-
   Result := [];
   if (SW and $01) <> 0 then
     Include(Result, emInvalidOp);
@@ -182,15 +164,12 @@ begin
   if (SW and $20) <> 0 then
     Include(Result, emPrecision);
 end;
-
 function GetPending8087Exceptions: T8087Exceptions;
-
   function GetSW: Word;
   asm
           FNSTSW  Result
           AND     Result, X87ExceptBits
   end;
-
 var
   SW: Word;
 begin
@@ -209,15 +188,12 @@ begin
   if (SW and $20) <> 0 then
     Include(Result, emPrecision);
 end;
-
 function GetMasked8087Exceptions: T8087Exceptions;
-
   function GetCW: Word;
   asm
           FSTCW   Result
           AND     Result, X87ExceptBits
   end;
-
 var
   CW: Word;
 begin
@@ -236,14 +212,11 @@ begin
   if (CW and $20) <> 0 then
     Include(Result, emPrecision);
 end;
-
 function SetMasked8087Exceptions(Exceptions: T8087Exceptions; ClearBefore: Boolean): T8087Exceptions;
-
   function ClearPendingExceptions: Word;
   asm
         FNCLEX                     // clear pending exceptions
   end;
-
   function SetCW(NewCW: Word): Word;
   var
     StackNewCW: Word;
@@ -256,7 +229,6 @@ function SetMasked8087Exceptions(Exceptions: T8087Exceptions; ClearBefore: Boole
         OR      StackNewCW, AX
         FLDCW   StackNewCW
   end;
-
 var
   OldCW, NewCW: Word;
 begin
@@ -290,27 +262,22 @@ begin
   if (OldCW and $20) <> 0 then
     Include(Result, emPrecision);
 end;
-
 function Mask8087Exceptions(Exceptions: T8087Exceptions): T8087Exceptions;
 begin
   Result := GetMasked8087Exceptions;
   Exceptions := Exceptions + Result;
   SetMasked8087Exceptions(Exceptions, False);
 end;
-
 function Unmask8087Exceptions(Exceptions: T8087Exceptions; ClearBefore: Boolean): T8087Exceptions;
 begin
   Result := GetMasked8087Exceptions;
   Exceptions := Result - Exceptions;
   SetMasked8087Exceptions(Exceptions, ClearBefore);
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.

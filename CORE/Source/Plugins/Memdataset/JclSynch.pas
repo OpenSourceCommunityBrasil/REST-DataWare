@@ -1,7 +1,5 @@
 unit JclSynch;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -23,8 +21,12 @@ unit JclSynch;
  Roniery                    - Devel.
 }
 
-interface
+{$IFDEF FPC}
+ {$MODE Delphi}
+ {$ASMMode Intel}
+{$ENDIF}
 
+interface
 uses
   {$IFDEF HAS_UNITSCOPE}
   {$IFDEF MSWINDOWS}
@@ -36,7 +38,6 @@ uses
   {$ENDIF MSWINDOWS}
   {$ENDIF ~HAS_UNITSCOPE}
   JclBase;
-
 // Locked Integer manipulation
 //
 // Routines to manipulate simple typed variables in a thread safe manner
@@ -52,7 +53,6 @@ function LockedExchangeInc(var Target: Integer): Integer; overload;
 function LockedExchangeSub(var Target: Integer; Value: Integer): Integer; overload;
 function LockedInc(var Target: Integer): Integer; overload;
 function LockedSub(var Target: Integer; Value: Integer): Integer; overload;
-
 {$IFDEF CPU64}
 function LockedAdd(var Target: Int64; Value: Int64): Int64; overload;
 function LockedCompareExchange(var Target: Int64; Exch, Comp: Int64): Int64; overload;
@@ -64,21 +64,17 @@ function LockedExchangeInc(var Target: Int64): Int64; overload;
 function LockedExchangeSub(var Target: Int64; Value: Int64): Int64; overload;
 function LockedInc(var Target: Int64): Int64; overload;
 function LockedSub(var Target: Int64; Value: Int64): Int64; overload;
-
 {$IFDEF BORLAND}
 function LockedDec(var Target: NativeInt): NativeInt; overload;
 function LockedInc(var Target: NativeInt): NativeInt; overload;
 {$ENDIF BORLAND}
 {$ENDIF CPU64}
-
 // TJclDispatcherObject
 //
 // Base class for operating system provided synchronisation primitives
 type
   TJclWaitResult = (wrAbandoned, wrError, wrIoCompletion, wrSignaled, wrTimeout);
-
   TJclWaitHandle = THandle;
-
   TJclDispatcherObject = class(TObject)
   private
     FExisted: Boolean;
@@ -98,7 +94,6 @@ type
     property Handle: TJclWaitHandle read FHandle;
     property Name: string read FName;
   end;
-
 // Wait functions
 //
 // Object enabled Wait functions (takes TJclDispatcher objects as parameter as
@@ -107,7 +102,6 @@ function WaitForMultipleObjects(const Objects: array of TJclDispatcherObject;
   WaitAll: Boolean; TimeOut: Cardinal): Cardinal;
 function WaitAlertableForMultipleObjects(const Objects: array of TJclDispatcherObject;
   WaitAll: Boolean; TimeOut: Cardinal): Cardinal;
-
 type
   TJclCriticalSection = class(TObject)
   private
@@ -119,7 +113,6 @@ type
     procedure Enter;
     procedure Leave;
   end;
-
   TJclCriticalSectionEx = class(TJclCriticalSection)
   private
     FSpinCount: Cardinal;
@@ -133,7 +126,6 @@ type
     function TryEnter: Boolean;
     property SpinCount: Cardinal read GetSpinCount write SetSpinCount;
   end;
-
   TJclEvent = class(TJclDispatcherObject)
   public
     constructor Create(SecAttr: PSecurityAttributes; Manual, Signaled: Boolean; const Name: string);
@@ -142,7 +134,6 @@ type
     function ResetEvent: Boolean;
     function SetEvent: Boolean;
   end;
-
   TJclWaitableTimer = class(TJclDispatcherObject)
   private
     FResume: Boolean;
@@ -153,7 +144,6 @@ type
     function SetTimer(const DueTime: Int64; Period: Longint; Resume: Boolean): Boolean;
     function SetTimerApc(const DueTime: Int64; Period: Longint; Resume: Boolean; Apc: TFNTimerAPCRoutine; Arg: Pointer): Boolean;
   end;
-
   TJclSemaphore = class(TJclDispatcherObject)
   public
     constructor Create(SecAttr: PSecurityAttributes; Initial, Maximum: Longint; const Name: string);
@@ -161,7 +151,6 @@ type
     function Release(ReleaseCount: Longint): Boolean;
     function ReleasePrev(ReleaseCount: Longint; var PrevCount: Longint): Boolean;
   end;
-
   TJclMutex = class(TJclDispatcherObject)
   public
     constructor Create(SecAttr: PSecurityAttributes; InitialOwner: Boolean;
@@ -170,7 +159,6 @@ type
     function Acquire(const TimeOut: Cardinal = INFINITE): Boolean;
     function Release: Boolean;
   end;
-
   POptexSharedInfo = ^TOptexSharedInfo;
   TOptexSharedInfo = record
     SpinCount: Integer;      // number of times to try and enter the optex before
@@ -179,7 +167,6 @@ type
     ThreadId: Longword;      // id of thread that owns the optex, 0 if free
     RecursionCount: Integer; // number of times the optex is owned, 0 if free
   end;
-
   TJclOptex = class(TObject)
   private
     FEvent: TJclEvent;
@@ -201,16 +188,13 @@ type
     property SpinCount: Integer read GetSpinCount write SetSpinCount;
     property UniProcess: Boolean read GetUniProcess;
   end;
-
   TMrewPreferred = (mpReaders, mpWriters, mpEqual);
-
   TMrewThreadInfo = record
     ThreadId: Longword;      // client-id of thread
     RecursionCount: Integer; // number of times a thread accessed the mrew
     Reader: Boolean;         // true if reader, false if writer
   end;
   TMrewThreadInfoArray = array of TMrewThreadInfo;
-
   TJclMultiReadExclusiveWrite = class(TObject)
   private
     FLock: TJclCriticalSection;
@@ -229,14 +213,12 @@ type
     procedure Release;
   public
     constructor Create(Preferred: TMrewPreferred);
-
     destructor Destroy; override;
     procedure BeginRead;
     procedure BeginWrite;
     procedure EndRead;
     procedure EndWrite;
   end;
-
   PMetSectSharedInfo = ^TMetSectSharedInfo;
   TMetSectSharedInfo = record
     Initialized: LongBool;    // Is the metered section initialized?
@@ -245,14 +227,12 @@ type
     AvailableCount: Longint;  // Available resource count
     MaximumCount: Longint;    // Maximum resource count
   end;
-
   PMeteredSection = ^TMeteredSection;
   TMeteredSection = record
     Event: THandle;           // Handle to a kernel event object
     FileMap: THandle;         // Handle to memory mapped file
     SharedInfo: PMetSectSharedInfo;
   end;
-
   TJclMeteredSection = class(TObject)
   private
     FMetSect: PMeteredSection;
@@ -271,7 +251,6 @@ type
     function Leave(ReleaseCount: Longint): Boolean; overload;
     function Leave(ReleaseCount: Longint; out PrevCount: Longint): Boolean; overload;
   end;
-
 // Debugging
 //
 // Note that the following function and structure declarations are all offically
@@ -283,30 +262,25 @@ type
     EventType: Longint;       // 0 = manual, otherwise auto
     Signaled: LongBool;       // true is signaled
   end;
-
   TMutexInfo = record
     SignalState: Longint;     // >0 = signaled, <0 = |SignalState| recurs. acquired
     Owned: ByteBool;          // owned by thread
     Abandoned: ByteBool;      // is abandoned?
   end;
-
   TSemaphoreCounts = record
     CurrentCount: Longint;    // current semaphore count
     MaximumCount: Longint;    // maximum semaphore count
   end;
-
   TTimerInfo = record
     Remaining: TLargeInteger; // 100ns intervals until signaled
     Signaled: ByteBool;       // is signaled?
   end;
-
 function QueryCriticalSection(CS: TJclCriticalSection; var Info: TRTLCriticalSection): Boolean;
 { TODO -cTest : Test these 4 functions }
 function QueryEvent(Handle: THandle; var Info: TEventInfo): Boolean;
 function QueryMutex(Handle: THandle; var Info: TMutexInfo): Boolean;
 function QuerySemaphore(Handle: THandle; var Info: TSemaphoreCounts): Boolean;
 function QueryTimer(Handle: THandle; var Info: TTimerInfo): Boolean;
-
 type
   // Exceptions
   EJclWin32HandleObjectError = class(EJclWin32Error);
@@ -317,9 +291,7 @@ type
   EJclSemaphoreError = class(EJclWin32Error);
   EJclMutexError = class(EJclWin32Error);
   EJclMeteredSectionError = class(EJclError);
-
 function ValidateMutexName(const aName: string): string;
-
 
 {$IFDEF UNITVERSIONING}
 const
@@ -332,9 +304,7 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   {$IFDEF HAS_UNITSCOPE}
   System.SysUtils,
@@ -343,11 +313,9 @@ uses
   {$ENDIF ~HAS_UNITSCOPE}
   JclLogic, JclRegistry, JclResources,
   JclSysInfo, JclStrings;
-
 const
   RegSessionManager = {HKLM\} 'SYSTEM\CurrentControlSet\Control\Session Manager';
   RegCritSecTimeout = {RegSessionManager\} 'CriticalSectionTimeout';
-
 // Locked Integer manipulation
 function LockedAdd(var Target: Integer; Value: Integer): Integer;
 asm
@@ -369,7 +337,6 @@ asm
         ADD     EAX, EDX
         {$ENDIF CPU64}
 end;
-
 function LockedCompareExchange(var Target: Integer; Exch, Comp: Integer): Integer;
 asm
         {$IFDEF CPU32}
@@ -395,7 +362,6 @@ asm
         LOCK CMPXCHG [RCX], EDX
         {$ENDIF CPU64}
 end;
-
 function LockedCompareExchange(var Target: Pointer; Exch, Comp: Pointer): Pointer;
 asm
         {$IFDEF CPU32}
@@ -421,7 +387,6 @@ asm
         LOCK CMPXCHG [RCX], RDX
         {$ENDIF CPU64}
 end;
-
 function LockedCompareExchange(var Target: TObject; Exch, Comp: TObject): TObject;
 asm
         {$IFDEF CPU32}
@@ -447,7 +412,6 @@ asm
         LOCK CMPXCHG [RCX], RDX
         {$ENDIF CPU64}
 end;
-
 function LockedDec(var Target: Integer): Integer;
 asm
         {$IFDEF CPU32}
@@ -466,7 +430,6 @@ asm
         DEC     EAX
         {$ENDIF CPU64}
 end;
-
 function LockedExchange(var Target: Integer; Value: Integer): Integer;
 asm
         {$IFDEF CPU32}
@@ -489,7 +452,6 @@ asm
         LOCK XCHG [RCX], EAX
         {$ENDIF CPU64}
 end;
-
 function LockedExchangeAdd(var Target: Integer; Value: Integer): Integer;
 asm
         {$IFDEF CPU32}
@@ -512,7 +474,6 @@ asm
         LOCK XADD [RCX], EAX
         {$ENDIF CPU64}
 end;
-
 function LockedExchangeDec(var Target: Integer): Integer;
 asm
         {$IFDEF CPU32}
@@ -529,7 +490,6 @@ asm
         LOCK XADD [RCX], EAX
         {$ENDIF CPU64}
 end;
-
 function LockedExchangeInc(var Target: Integer): Integer;
 asm
         {$IFDEF CPU32}
@@ -546,7 +506,6 @@ asm
         LOCK XADD [RCX], EAX
         {$ENDIF CPU64}
 end;
-
 function LockedExchangeSub(var Target: Integer; Value: Integer): Integer;
 asm
         {$IFDEF CPU32}
@@ -571,7 +530,6 @@ asm
         LOCK XADD [RCX], EAX
         {$ENDIF CPU64}
 end;
-
 function LockedInc(var Target: Integer): Integer;
 asm
         {$IFDEF CPU32}
@@ -590,7 +548,6 @@ asm
         INC     EAX
         {$ENDIF CPU64}
 end;
-
 function LockedSub(var Target: Integer; Value: Integer): Integer;
 asm
         {$IFDEF CPU32}
@@ -613,9 +570,7 @@ asm
         ADD     EAX, EDX
         {$ENDIF CPU64}
 end;
-
 {$IFDEF CPU64}
-
 // Locked Int64 manipulation
 function LockedAdd(var Target: Int64; Value: Int64): Int64;
 asm
@@ -626,7 +581,6 @@ asm
         LOCK XADD [RCX], RAX
         ADD     RAX, RDX
 end;
-
 function LockedCompareExchange(var Target: Int64; Exch, Comp: Int64): Int64;
 asm
         // --> RCX Target
@@ -636,7 +590,6 @@ asm
         MOV     RAX, R8
         LOCK CMPXCHG [RCX], RDX
 end;
-
 function LockedDec(var Target: Int64): Int64;
 asm
         // --> RCX Target
@@ -645,7 +598,6 @@ asm
         LOCK XADD [RCX], RAX
         DEC     RAX
 end;
-
 function LockedExchange(var Target: Int64; Value: Int64): Int64;
 asm
         // --> RCX Target
@@ -654,7 +606,6 @@ asm
         MOV     RAX, RDX
         LOCK XCHG [RCX], RAX
 end;
-
 function LockedExchangeAdd(var Target: Int64; Value: Int64): Int64;
 asm
         // --> RCX Target
@@ -663,7 +614,6 @@ asm
         MOV     RAX, RDX
         LOCK XADD [RCX], RAX
 end;
-
 function LockedExchangeDec(var Target: Int64): Int64;
 asm
         // --> RCX Target
@@ -671,7 +621,6 @@ asm
         MOV     RAX, -1
         LOCK XADD [RCX], RAX
 end;
-
 function LockedExchangeInc(var Target: Int64): Int64;
 asm
         // --> RCX Target
@@ -679,7 +628,6 @@ asm
         MOV     RAX, 1
         LOCK XADD [RCX], RAX
 end;
-
 function LockedExchangeSub(var Target: Int64; Value: Int64): Int64;
 asm
         // --> RCX Target
@@ -689,7 +637,6 @@ asm
         MOV     RAX, RDX
         LOCK XADD [RCX], RAX
 end;
-
 function LockedInc(var Target: Int64): Int64;
 asm
         // --> RCX Target
@@ -698,7 +645,6 @@ asm
         LOCK XADD [RCX], RAX
         INC     RAX
 end;
-
 function LockedSub(var Target: Int64; Value: Int64): Int64;
 asm
         // --> RCX Target
@@ -709,9 +655,7 @@ asm
         LOCK XADD [RCX], RAX
         ADD     RAX, RDX
 end;
-
 {$IFDEF BORLAND}
-
 function LockedDec(var Target: NativeInt): NativeInt;
 asm
         // --> RCX Target
@@ -720,7 +664,6 @@ asm
         LOCK XADD [RCX], RAX
         DEC     RAX
 end;
-
 function LockedInc(var Target: NativeInt): NativeInt;
 asm
         // --> RCX Target
@@ -729,13 +672,9 @@ asm
         LOCK XADD [RCX], RAX
         INC     RAX
 end;
-
 {$ENDIF BORLAND}
-
 {$ENDIF CPU64}
-
 //=== { TJclDispatcherObject } ===============================================
-
 function MapSignalResult(const Ret: DWORD): TJclWaitResult;
 begin
   case Ret of
@@ -753,7 +692,6 @@ begin
     Result := wrError;
   end;
 end;
-
 constructor TJclDispatcherObject.Attach(AHandle: TJclWaitHandle);
 begin
   inherited Create;
@@ -761,37 +699,30 @@ begin
   FHandle := AHandle;
   FName := '';
 end;
-
 destructor TJclDispatcherObject.Destroy;
 begin
   CloseHandle(FHandle);
   inherited Destroy;
 end;
-
 { TODO: Use RTDL Version of SignalObjectAndWait }
-
 function TJclDispatcherObject.SignalAndWait(const Obj: TJclDispatcherObject;
   TimeOut: Cardinal; Alertable: Boolean): TJclWaitResult;
 begin
   // Note: Do not make this method virtual! It's only available on NT 4 up...
   Result := MapSignalResult(Cardinal({$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.SignalObjectAndWait(Obj.Handle, Handle, TimeOut, Alertable)));
 end;
-
 function TJclDispatcherObject.WaitAlertable(const TimeOut: Cardinal): TJclWaitResult;
 begin
   Result := MapSignalResult({$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.WaitForSingleObjectEx(FHandle, TimeOut, True));
 end;
-
 function TJclDispatcherObject.WaitFor(const TimeOut: Cardinal): TJclWaitResult;
 begin
   Result := MapSignalResult({$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.WaitForSingleObject(FHandle, TimeOut));
 end;
-
 function TJclDispatcherObject.WaitForever: TJclWaitResult;
 begin
   Result := WaitFor(INFINITE);
 end;
-
 // Wait functions
 function WaitForMultipleObjects(const Objects: array of TJclDispatcherObject;
   WaitAll: Boolean; TimeOut: Cardinal): Cardinal;
@@ -805,7 +736,6 @@ begin
     Handles[I] := Objects[I].Handle;
   Result := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.WaitForMultipleObjects(Count, @Handles[0], WaitAll, TimeOut);
 end;
-
 function WaitAlertableForMultipleObjects(const Objects: array of TJclDispatcherObject;
   WaitAll: Boolean; TimeOut: Cardinal): Cardinal;
 var
@@ -818,21 +748,17 @@ begin
     Handles[I] := Objects[I].Handle;
   Result := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.WaitForMultipleObjectsEx(Count, @Handles[0], WaitAll, TimeOut, True);
 end;
-
 //=== { TJclCriticalSection } ================================================
-
 constructor TJclCriticalSection.Create;
 begin
   inherited Create;
   {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.InitializeCriticalSection(FCriticalSection);
 end;
-
 destructor TJclCriticalSection.Destroy;
 begin
   {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.DeleteCriticalSection(FCriticalSection);
   inherited Destroy;
 end;
-
 class procedure TJclCriticalSection.CreateAndEnter(var CS: TJclCriticalSection);
 var
   NewCritSect: TJclCriticalSection;
@@ -845,40 +771,31 @@ begin
   end;
   CS.Enter;
 end;
-
 procedure TJclCriticalSection.Enter;
 begin
   {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.EnterCriticalSection(FCriticalSection);
 end;
-
 procedure TJclCriticalSection.Leave;
 begin
   {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.LeaveCriticalSection(FCriticalSection);
 end;
-
 //== { TJclCriticalSectionEx } ===============================================
-
 const
   DefaultCritSectSpinCount = 4000;
-
 constructor TJclCriticalSectionEx.Create;
 begin
   CreateEx(DefaultCritSectSpinCount, False);
 end;
-
 { TODO: Use RTDL Version of InitializeCriticalSectionAndSpinCount }
-
 constructor TJclCriticalSectionEx.CreateEx(SpinCount: Cardinal;
   NoFailEnter: Boolean);
 begin
   FSpinCount := SpinCount;
   if NoFailEnter then
     SpinCount := SpinCount or Cardinal($80000000);
-
   if not InitializeCriticalSectionAndSpinCount(FCriticalSection, SpinCount) then
     raise EJclCriticalSectionError.CreateRes(@RsSynchInitCriticalSection);
 end;
-
 function TJclCriticalSectionEx.GetSpinCount: Cardinal;
 begin
   // Spinning only makes sense on multiprocessor systems. On a single processor
@@ -889,33 +806,27 @@ begin
   else
     Result := FSpinCount;
 end;
-
 class function TJclCriticalSectionEx.GetSpinTimeOut: Cardinal;
 begin
   Result := Cardinal(RegReadInteger(HKEY_LOCAL_MACHINE, RegSessionManager,
     RegCritSecTimeout));
 end;
-
 { TODO: Use RTLD version of SetCriticalSectionSpinCount }
 procedure TJclCriticalSectionEx.SetSpinCount(const Value: Cardinal);
 begin
   FSpinCount := SetCriticalSectionSpinCount(FCriticalSection, Value);
 end;
-
 class procedure TJclCriticalSectionEx.SetSpinTimeOut(const Value: Cardinal);
 begin
   RegWriteInteger(HKEY_LOCAL_MACHINE, RegSessionManager, RegCritSecTimeout,
     Integer(Value));
 end;
-
 { TODO: Use RTLD version of TryEnterCriticalSection }
 function TJclCriticalSectionEx.TryEnter: Boolean;
 begin
   Result := TryEnterCriticalSection(FCriticalSection);
 end;
-
 //== { TJclEvent } ===========================================================
-
 constructor TJclEvent.Create(SecAttr: PSecurityAttributes; Manual, Signaled: Boolean; const Name: string);
 begin
   inherited Create;
@@ -925,7 +836,6 @@ begin
     raise EJclEventError.CreateRes(@RsSynchCreateEvent);
   FExisted := GetLastError = ERROR_ALREADY_EXISTS;
 end;
-
 constructor TJclEvent.Open(Access: Cardinal; Inheritable: Boolean;
   const Name: string);
 begin
@@ -935,24 +845,19 @@ begin
   if FHandle = 0 then
     raise EJclEventError.CreateRes(@RsSynchOpenEvent);
 end;
-
 function TJclEvent.Pulse: Boolean;
 begin
   Result := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.PulseEvent(FHandle);
 end;
-
 function TJclEvent.ResetEvent: Boolean;
 begin
   Result := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.ResetEvent(FHandle);
 end;
-
 function TJclEvent.SetEvent: Boolean;
 begin
   Result := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.SetEvent(FHandle);
 end;
-
 //=== { TJclWaitableTimer } ==================================================
-
 { TODO: Use RTLD version of CreateWaitableTimer }
 constructor TJclWaitableTimer.Create(SecAttr: PSecurityAttributes;
   Manual: Boolean; const Name: string);
@@ -964,15 +869,12 @@ begin
     raise EJclWaitableTimerError.CreateRes(@RsSynchCreateWaitableTimer);
   FExisted := GetLastError = ERROR_ALREADY_EXISTS;
 end;
-
 { TODO: Use RTLD version of CancelWaitableTimer }
 function TJclWaitableTimer.Cancel: Boolean;
 begin
   Result := CancelWaitableTimer(FHandle);
 end;
-
 { TODO: Use RTLD version of OpenWaitableTimer }
-
 constructor TJclWaitableTimer.Open(Access: Cardinal; Inheritable: Boolean;
   const Name: string);
 begin
@@ -983,7 +885,6 @@ begin
   if FHandle = 0 then
     raise EJclWaitableTimerError.CreateRes(@RsSynchOpenWaitableTimer);
 end;
-
 { TODO: Use RTLD version of SetWaitableTimer }
 function TJclWaitableTimer.SetTimer(const DueTime: Int64; Period: Longint;
   Resume: Boolean): Boolean;
@@ -994,7 +895,6 @@ begin
   FResume := Resume;
   Result := SetWaitableTimer(FHandle, DT, Period, nil, nil, FResume);
 end;
-
 { TODO -cHelp : OS restrictions }
 function TJclWaitableTimer.SetTimerApc(const DueTime: Int64; Period: Longint;
   Resume: Boolean; Apc: TFNTimerAPCRoutine; Arg: Pointer): Boolean;
@@ -1008,9 +908,7 @@ begin
   // if not Result and (GetLastError = ERROR_CALL_NOT_IMPLEMENTED) then
   //   RaiseLastOSError;
 end;
-
 //== { TJclSemaphore } =======================================================
-
 constructor TJclSemaphore.Create(SecAttr: PSecurityAttributes;
   Initial, Maximum: Integer; const Name: string);
 begin
@@ -1021,7 +919,6 @@ begin
     raise EJclSemaphoreError.CreateRes(@RsSynchCreateSemaphore);
   FExisted := GetLastError = ERROR_ALREADY_EXISTS;
 end;
-
 constructor TJclSemaphore.Open(Access: Cardinal; Inheritable: Boolean;
   const Name: string);
 begin
@@ -1031,25 +928,20 @@ begin
   if FHandle = 0 then
     raise EJclSemaphoreError.CreateRes(@RsSynchOpenSemaphore);
 end;
-
 function TJclSemaphore.ReleasePrev(ReleaseCount: Longint;
   var PrevCount: Longint): Boolean;
 begin
   Result := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.ReleaseSemaphore(FHandle, ReleaseCount, @PrevCount);
 end;
-
 function TJclSemaphore.Release(ReleaseCount: Integer): Boolean;
 begin
   Result := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.ReleaseSemaphore(FHandle, ReleaseCount, nil);
 end;
-
 //=== { TJclMutex } ==========================================================
-
 function TJclMutex.Acquire(const TimeOut: Cardinal): Boolean;
 begin
   Result := WaitFor(TimeOut) = wrSignaled;
 end;
-
 constructor TJclMutex.Create(SecAttr: PSecurityAttributes; InitialOwner: Boolean; const Name: string);
 begin
   inherited Create;
@@ -1059,7 +951,6 @@ begin
     raise EJclMutexError.CreateRes(@RsSynchCreateMutex);
   FExisted := GetLastError = ERROR_ALREADY_EXISTS;
 end;
-
 constructor TJclMutex.Open(Access: Cardinal; Inheritable: Boolean; const Name: string);
 begin
   inherited Create;
@@ -1069,14 +960,11 @@ begin
   if FHandle = 0 then
     raise EJclMutexError.CreateRes(@RsSynchOpenMutex);
 end;
-
 function TJclMutex.Release: Boolean;
 begin
   Result := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.ReleaseMutex(FHandle);
 end;
-
 //=== { TJclOptex } ==========================================================
-
 constructor TJclOptex.Create(const Name: string; SpinCount: Integer);
 begin
   FExisted := False;
@@ -1103,7 +991,6 @@ begin
   end;
   SetSpinCount(SpinCount);
 end;
-
 destructor TJclOptex.Destroy;
 begin
   FreeAndNil(FEvent);
@@ -1116,7 +1003,6 @@ begin
   end;
   inherited Destroy;
 end;
-
 procedure TJclOptex.Enter;
 var
   ThreadId: Longword;
@@ -1147,17 +1033,14 @@ begin
     end;
   end;
 end;
-
 function TJclOptex.GetSpinCount: Integer;
 begin
   Result := FSharedInfo^.SpinCount;
 end;
-
 function TJclOptex.GetUniProcess: Boolean;
 begin
   Result := FFileMapping = 0;
 end;
-
 procedure TJclOptex.Leave;
 begin
   Dec(FSharedInfo^.RecursionCount);
@@ -1170,7 +1053,6 @@ begin
       FEvent.SetEvent;
   end;
 end;
-
 procedure TJclOptex.SetSpinCount(Value: Integer);
 begin
   if Value < 0 then
@@ -1179,7 +1061,6 @@ begin
   if ProcessorCount > 1 then
     {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.InterlockedExchange(Integer(FSharedInfo^.SpinCount), Value);
 end;
-
 function TJclOptex.TryEnter: Boolean;
 var
   ThreadId: Longword;
@@ -1212,9 +1093,7 @@ begin
   until ThreadOwnsOptex or (SpinCount <= 0);
   Result := ThreadOwnsOptex;
 end;
-
 //=== { TJclMultiReadExclusiveWrite } ========================================
-
 constructor TJclMultiReadExclusiveWrite.Create(Preferred: TMrewPreferred);
 begin
   inherited Create;
@@ -1227,7 +1106,6 @@ begin
   FWaitingReaders := 0;
   FWaitingWriters := 0;
 end;
-
 destructor TJclMultiReadExclusiveWrite.Destroy;
 begin
   FreeAndNil(FSemReaders);
@@ -1235,7 +1113,6 @@ begin
   FreeAndNil(FLock);
   inherited Destroy;
 end;
-
 procedure TJclMultiReadExclusiveWrite.AddToThreadList(ThreadId: Longword;
   Reader: Boolean);
 var
@@ -1248,7 +1125,6 @@ begin
   FThreads[L].RecursionCount := 1;
   FThreads[L].Reader := Reader;
 end;
-
 procedure TJclMultiReadExclusiveWrite.BeginRead;
 var
   ThreadId: Longword;
@@ -1295,7 +1171,6 @@ begin
   if MustWait then
     FSemReaders.WaitForever;
 end;
-
 procedure TJclMultiReadExclusiveWrite.BeginWrite;
 var
   ThreadId: Longword;
@@ -1353,17 +1228,14 @@ begin
   if MustWait then
     FSemWriters.WaitFor(INFINITE);
 end;
-
 procedure TJclMultiReadExclusiveWrite.EndRead;
 begin
   Release;
 end;
-
 procedure TJclMultiReadExclusiveWrite.EndWrite;
 begin
   Release;
 end;
-
 function TJclMultiReadExclusiveWrite.FindThread(ThreadId: Longword): Integer;
 var
   I: Integer;
@@ -1377,7 +1249,6 @@ begin
       Exit;
     end;
 end;
-
 procedure TJclMultiReadExclusiveWrite.Release;
 var
   ThreadId: Longword;
@@ -1407,7 +1278,6 @@ begin
     FLock.Leave;
   end;
 end;
-
 procedure TJclMultiReadExclusiveWrite.ReleaseWaiters(WasReading: Boolean);
 var
   ToRelease: TMrewPreferred;
@@ -1462,7 +1332,6 @@ begin
       // no waiters
   end;
 end;
-
 procedure TJclMultiReadExclusiveWrite.RemoveFromThreadList(Index: Integer);
 var
   L: Integer;
@@ -1473,12 +1342,9 @@ begin
     Move(FThreads[Index + 1], FThreads[Index], SizeOf(TMrewThreadInfo) * (L - Index - 1));
   SetLength(FThreads, L - 1);
 end;
-
 //=== { TJclMeteredSection } =================================================
-
 const
   MAX_METSECT_NAMELEN = 128;
-
 constructor TJclMeteredSection.Create(InitialCount, MaxCount: Integer; const Name: string);
 begin
   if (MaxCount < 1) or (InitialCount > MaxCount) or (InitialCount < 0) or
@@ -1495,7 +1361,6 @@ begin
     end;
   end;
 end;
-
 constructor TJclMeteredSection.Open(const Name: string);
 begin
   FMetSect := nil;
@@ -1510,19 +1375,16 @@ begin
     raise EJclMeteredSectionError.CreateRes(@RsMetSectInitialize);
   end;
 end;
-
 destructor TJclMeteredSection.Destroy;
 begin
   CloseMeteredSection;
   inherited Destroy;
 end;
-
 procedure TJclMeteredSection.AcquireLock;
 begin
   while {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.InterlockedExchange(FMetSect^.SharedInfo^.SpinLock, 1) <> 0 do
     {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.Sleep(0);
 end;
-
 procedure TJclMeteredSection.CloseMeteredSection;
 begin
   if FMetSect <> nil then
@@ -1536,7 +1398,6 @@ begin
     FreeMem(FMetSect);
   end;
 end;
-
 function TJclMeteredSection.CreateMetSectEvent(const Name: string; OpenOnly: Boolean): Boolean;
 var
   FullName: string;
@@ -1553,7 +1414,6 @@ begin
   end;
   Result := FMetSect^.Event <> 0;
 end;
-
 function TJclMeteredSection.CreateMetSectFileView(InitialCount, MaxCount: Longint;
   const Name: string; OpenOnly: Boolean): Boolean;
 var
@@ -1591,7 +1451,6 @@ begin
     end;
   end;
 end;
-
 function TJclMeteredSection.Enter(TimeOut: Longword): TJclWaitResult;
 begin
   Result := wrSignaled;
@@ -1613,7 +1472,6 @@ begin
     Result := MapSignalResult({$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.WaitForSingleObject(FMetSect^.Event, TimeOut));
   end;
 end;
-
 function TJclMeteredSection.InitMeteredSection(InitialCount, MaxCount: Longint;
   const Name: string; OpenOnly: Boolean): Boolean;
 begin
@@ -1621,7 +1479,6 @@ begin
   if CreateMetSectEvent(Name, OpenOnly) then
     Result := CreateMetSectFileView(InitialCount, MaxCount, Name, OpenOnly);
 end;
-
 function TJclMeteredSection.Leave(ReleaseCount: Integer; out PrevCount: Integer): Boolean;
 var
   Count: Integer;
@@ -1651,43 +1508,34 @@ begin
   end;
   Result := True;
 end;
-
 function TJclMeteredSection.Leave(ReleaseCount: Integer): Boolean;
 var
   Previous: Longint;
 begin
   Result := Leave(ReleaseCount, Previous);
 end;
-
 procedure TJclMeteredSection.ReleaseLock;
 begin
   {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.InterlockedExchange(FMetSect^.SharedInfo^.SpinLock, 0);
 end;
-
 //=== Debugging ==============================================================
-
 function QueryCriticalSection(CS: TJclCriticalSection; var Info: TRTLCriticalSection): Boolean;
 begin
   Result := CS <> nil;
   if Result then
     Info := CS.FCriticalSection;
 end;
-
 // Native API functions
 // http://undocumented.ntinternals.net/
-
 { TODO: RTLD version }
-
 type
  TNtQueryProc = function (Handle: THandle; InfoClass: Byte; Info: Pointer;
      Len: Longint; ResLen: PLongint): Longint; stdcall;
-
 var
   _QueryEvent: TNtQueryProc = nil;
   _QueryMutex: TNtQueryProc = nil;
   _QuerySemaphore: TNtQueryProc = nil;
   _QueryTimer: TNtQueryProc = nil;
-
 function CallQueryProc(var P: TNtQueryProc; const Name: string; Handle: THandle;
   Info: Pointer; InfoSize: Longint): Boolean;
 var
@@ -1707,27 +1555,22 @@ begin
     Result := (Status and $80000000) = 0;
   end;
 end;
-
 function QueryEvent(Handle: THandle; var Info: TEventInfo): Boolean;
 begin
   Result := CallQueryProc(_QueryEvent, 'NtQueryEvent', Handle, @Info, SizeOf(Info));
 end;
-
 function QueryMutex(Handle: THandle; var Info: TMutexInfo): Boolean;
 begin
   Result := CallQueryProc(_QueryMutex, 'NtQueryMutex', Handle, @Info, SizeOf(Info));
 end;
-
 function QuerySemaphore(Handle: THandle; var Info: TSemaphoreCounts): Boolean;
 begin
   Result := CallQueryProc(_QuerySemaphore, 'NtQuerySemaphore', Handle, @Info, SizeOf(Info));
 end;
-
 function QueryTimer(Handle: THandle; var Info: TTimerInfo): Boolean;
 begin
   Result := CallQueryProc(_QueryTimer, 'NtQueryTimer', Handle, @Info, SizeOf(Info));
 end;
-
 function ValidateMutexName(const aName: string): string;
 const cMutexMaxName = 200;
 begin
@@ -1738,14 +1581,10 @@ begin
   Result := StrReplaceChar(Result, '\', '_');
 end;
 
-
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.

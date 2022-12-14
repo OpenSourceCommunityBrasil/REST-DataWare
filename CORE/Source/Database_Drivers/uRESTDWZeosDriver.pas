@@ -35,7 +35,7 @@ uses
   {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
     ZMemTable,
   {$ELSE}
-    uRESTDWMemTable,
+    uRESTDWMemoryDataset,
   {$ENDIF}
   Classes, SysUtils, uRESTDWDriverBase, ZConnection, uRESTDWBasicTypes,
   ZDataset, ZSequence, ZDbcIntfs, ZAbstractRODataset, ZAbstractDataset,
@@ -509,7 +509,8 @@ begin
     {$ELSE}
       memtable.Assign(qry);
     {$ENDIF}
-    memtable.SaveToStream(stream);
+    // TODO -oXyberX -cMemTable: Função SaveToStream não existe no TRESTDWMemtable
+//    memtable.SaveToStream(stream);
     stream.Position := 0;
   finally
     FreeAndNil(memtable);
@@ -570,7 +571,8 @@ begin
     {$ELSE}
       memtable.Assign(qry);
     {$ENDIF}
-    memtable.SaveToStream(stream);
+    // TODO -oXyberX -cMemTable: Função SaveToStream não existe no TRESTDWMemtable
+//    memtable.SaveToStream(stream);
     stream.Position := 0;
   finally
     FreeAndNil(memtable);

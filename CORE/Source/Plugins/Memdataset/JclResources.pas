@@ -1,7 +1,5 @@
 unit JclResources;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,16 +22,13 @@ unit JclResources;
 }
 
 interface
-
 //=== JclBase ================================================================
 resourcestring
   RsCantConvertAddr64  = 'The address %s%.16x cannot be converted to 32 bit';
   RsEReplacementChar   = 'Failed to get ANSI replacement character';
-
 //=== JclCharsets ============================================================
 resourcestring
   RsENoCharset = 'No matching charset';
-
 //=== JclCIL =================================================================
 resourcestring
   RsInstructionStreamInvalid = 'Invalid IL instruction stream';
@@ -328,7 +323,6 @@ resourcestring
   RsCILNameunused68    = 'unused';
   RsCILNameunused69    = 'unused';
   RsCILNameunused70    = 'unused';
-
   RsCILCmdnop         = 'no operation';
   RsCILCmdbreak       = 'breakpoint instruction';
   RsCILCmdldarg0      = 'load argument onto the stack';
@@ -620,7 +614,6 @@ resourcestring
   RsCILCmdunused68    = '';
   RsCILCmdunused69    = '';
   RsCILCmdunused70    = '';
-
   RsCILDescrnop         = 'Do nothing';
   RsCILDescrbreak       = 'inform a debugger that a breakpoint has been reached.';
   RsCILDescrldarg0      = 'Load argument 0 onto stack';
@@ -912,25 +905,21 @@ resourcestring
   RsCILDescrunused68    = '';
   RsCILDescrunused69    = '';
   RsCILDescrunused70    = '';
-
 //=== JclCLR =================================================================
 resourcestring
   RsClrCopyright    = '// Delphi-JEDI .NET Framework IL Disassembler.  Version 0.1' +  sLineBreak +
     '// Project JEDI Code Library (JCL) Team. All rights reserved.' +  sLineBreak;
   RsUnknownTableFmt = '%s%s';
   RsUnknownTable    = 'Unknown table - ';
-
 //=== JclCOM =================================================================
 resourcestring
   RsComInvalidParam      = 'An invalid parameter was passed to the routine. If a parameter was ' +
     'expected, it might be an unassigned item or nil pointer';
   RsComFailedStreamRead  = 'Failed to read all of the data from the specified stream';
   RsComFailedStreamWrite = 'Failed to write all of the data into the specified stream';
-
 //=== JclComplex =============================================================
 resourcestring
   RsComplexInvalidString = 'Failed to create a complex number from the string provided';
-
 //=== JclCompression =========================================================
 resourcestring
   RsCompressionReadNotSupported      = 'read is not an supported operation.';
@@ -1117,11 +1106,9 @@ resourcestring
   RsCompressionHxsExtensions         = '*.hxs;*.hxi;*.hxr;*.hxq;*.hxw;*.lit';
   RsCompressionDuplicate             = 'The file %s already exists in the archive';
   RsCompressionReplaceError          = 'At least one compression volume could not be replaced after an archive out-of-place update';
-
 //=== JclConsole =============================================================
 resourcestring
   RsCannotRaiseSignal = 'Cannot raise %s signal.';
-
 //=== JclContainerIntf =======================================================
 resourcestring
   RsEOutOfBounds           = 'Out of bounds';
@@ -1136,50 +1123,39 @@ resourcestring
   RsENoHashConverter       = 'Hash converter is not assigned';
   RsEAssignError           = 'Assignation error';
   RsEReadOnlyError         = 'Container is read-only';
-
 //=== JclCounter =============================================================
 resourcestring
   RsNoCounter = 'No high performance counters supported';
-
 //=== JclDateTime ============================================================
 resourcestring
   RsMakeUTCTime    = 'Error converting to UTC time. Time zone could not be determined';
   RsDateConversion = 'Error illegal date or time format';
-
 //=== JclDebug ===============================================================
 resourcestring
   RsUnknownFunctionAt     = 'Unknown function at %s';
-
 //=== JclCppException ========================================================
 resourcestring
   RsCppUnhandledExceptionMsg = 'Unhandled C++ exception of type ''%s'' occurred';
-
 //=== JclDotNet ==============================================================
 resourcestring
   RsEUnknownCLRVersion = '"%s" is not a known CLR version';
-
 //=== JclExprEval ============================================================
 resourcestring
   RsExprEvalRParenExpected = 'Parse error: '')'' expected';
   RsExprEvalFactorExpected = 'Parse error: Factor expected';
   RsExprEvalUnknownSymbol  = 'Parse error: Unknown symbol: ''%s''';
-
   RsExprEvalFirstArg = 'Parse error: ''('' and function''s first parameter expected';
   RsExprEvalNextArg  = 'Parse error: '','' and another parameter expected';
   RsExprEvalEndArgs  = 'Parse error: '')'' to close function''s parameters expected';
-
   RsExprEvalExprNotFound          = 'Expression compiler error: Expression ''%s'' not found';
   RsExprEvalExprPtrNotFound       = 'Expression compiler error: Expression pointer not found';
   RsExprEvalExprRefCountAssertion = 'Expression compiler error: expression refcount < 0';
-
 //=== JclFileUtils ===========================================================
 resourcestring
   // Path manipulation
   RsPathInvalidDrive = '%s is not a valid drive';
-
   // Files and directories
   RsFileUtilsAttrUnavailable = 'Unable to retrieve attributes of %s';
-
   RsCannotCreateDir = 'Unable to create directory';
   RsDelTreePathIsEmpty = 'DelTree: Path is empty';
   RsFileSearchAttrInconsistency = 'Some file search attributes are required AND rejected!';
@@ -1187,7 +1163,6 @@ resourcestring
   RsEWindowNotValid = 'The window with handle %d is not valid';
   RsEProcessNotValid = 'The process with ID %d is not valid';
   RsEModuleNotValid = 'The Module with handle %d is not valid';
-
   // TJclFileVersionInfo
   RsFileUtilsNoVersionInfo = 'File contains no version information';
   RsFileUtilsFileDoesNotExist = 'The file %s does not exist';
@@ -1210,7 +1185,6 @@ resourcestring
   RsVosOS232PM32    = '32-bit PM, running on 32-bit OS/2';
   RsVosNTWindows32  = 'Win32 API, running on Windows/NT';
   RsVosDesignedFor  = 'Designed for %s';
-
   // Strings returned from OSFileTypeToString()
   RsVftUnknown         = 'Unknown';
   RsVftApp             = 'Application';
@@ -1232,10 +1206,8 @@ resourcestring
   RsVft2FontRASTER     = 'Raster';
   RsVft2FontVECTOR     = 'Vector';
   RsVft2FontTRUETYPE   = 'TrueType';
-
   // TJclFileStream
   RsFileStreamCreate         = 'Unable to create temporary file stream';
-
   // TJclFileMapping
   RsCreateFileMapping        = 'Failed to create FileMapping';
   RsCreateFileMappingView    = 'Failed to create FileMappingView';
@@ -1243,7 +1215,6 @@ resourcestring
   RsFileMappingInvalidHandle = 'Invalid file handle';
   RsViewNeedsMapping         = 'FileMap argument of TJclFileMappingView constructor cannot be nil';
   RsFailedToObtainSize       = 'Failed to obtain size of file';
-
   // GetDriveTypeStr()
   RsUnknownDrive   = 'Unknown drive type';
   RsRemovableDrive = 'Removable Drive';
@@ -1251,7 +1222,6 @@ resourcestring
   RsRemoteDrive    = 'Remote Drive';
   RsCDRomDrive     = 'CD-ROM';
   RsRamDisk        = 'RAM-Disk';
-
   // GetFileAttributeList()
   RsAttrDirectory  = 'Directory';
   RsAttrReadOnly   = 'ReadOnly';
@@ -1260,7 +1230,6 @@ resourcestring
   RsAttrArchive    = 'Archive';
   RsAttrAnyFile    = 'AnyFile';
   RsAttrHidden     = 'Hidden';
-
   // GetFileAttributeListEx()
   RsAttrNormal       = 'Normal';
   RsAttrTemporary    = 'Temporary';
@@ -1269,23 +1238,18 @@ resourcestring
   RsAttrEncrypted    = 'Encrypted';
   RsAttrReparsePoint = 'Reparse Point';
   RsAttrSparseFile   = 'Sparse';
-
   // TJclFileMapping.Create
   RsFileMappingOpenFile = 'Unable to open the file';
-
   // TJclMappedTextReader
   RsFileIndexOutOfRange = 'Index of out range';
-
   // FileGetTypeName()
   RsDefaultFileTypeName = ' File';
-
 //=== JclMapi ================================================================
 resourcestring
   RsMapiError         = 'MAPI Error: (%d) "%s"';
   RsMapiMissingExport = 'Function "%s" is not exported by client';
   RsMapiInvalidIndex  = 'Index is out ot range';
   RsMapiMailNoClient  = 'No Simple MAPI client installed, cannot send the message';
-
   RsMapiErrUSER_ABORT               = 'User abort';
   RsMapiErrFAILURE                  = 'General MAPI failure';
   RsMapiErrLOGIN_FAILURE            = 'MAPI login failure';
@@ -1311,13 +1275,11 @@ resourcestring
   RsMapiErrINVALID_EDITFIELDS       = 'Invalid edit fields';
   RsMapiErrINVALID_RECIPS           = 'Invalid recipients';
   RsMapiErrNOT_SUPPORTED            = 'Not supported';
-
   RsMapiMailORIG    = 'From';
   RsMapiMailTO      = 'To';
   RsMapiMailCC      = 'Cc';
   RsMapiMailBCC     = 'Bcc';
   RsMapiMailSubject = 'Subject';
-
 //=== JclMath ================================================================
 resourcestring
   RsMathDomainError    = 'Domain check failure in JclMath';
@@ -1332,7 +1294,6 @@ resourcestring
   RsNaNSignal          = 'NaN signaling %d';
   RsPowerInfinite      = 'Power function: Result is infinite';
   RsPowerComplex       = 'Power function: Result is complex';
-
 //=== JclMetadata ============================================================
 resourcestring
   RsUnknownClassLayout      = 'Unknown class layout - $%.8x';
@@ -1341,7 +1302,6 @@ resourcestring
   RsUnknownManifestResource = 'Unknown manifest resource visibility - %d';
   RsNoLocalVarSig           = 'Signature %s is not LocalVarSig';
   RsLocalVarSigOutOfRange   = 'LocalVarSig count %d is out of range [1..$$FFFE]';
-
 //=== JclMIDI ================================================================
 resourcestring
   RsOctaveC      = 'C';
@@ -1356,18 +1316,15 @@ resourcestring
   RsOctaveA      = 'A';
   RsOctaveASharp = 'A#';
   RsOctaveB      = 'B';
-
   RsMidiInvalidChannelNum = 'Invalid MIDI channel number (%d)';
   {$IFDEF UNIX}
   RsMidiNotImplemented    = 'JclMidi: MIDI I/O for Unix not (yet) implemented';
   {$ENDIF UNIX}
-
 //=== JclMiscel ==============================================================
 resourcestring
   // CreateProcAsUser
   RsCreateProcNTRequiredError         = 'Windows NT required';
   RsCreateProcBuild1057Error          = 'NT version 3.51 build 1057 or later required';
-
   RsCreateProcPrivilegeMissing        = 'This account does not have the privilege "%s" (%s)';
   RsCreateProcLogonUserError          = 'LogonUser failed';
   RsCreateProcAccessDenied            = 'Access denied';
@@ -1378,7 +1335,6 @@ resourcestring
     'the following privileges: ' + '"%s"(%s)' + sLineBreak + '"%s"(%s)' + sLineBreak;
   RsCreateProcCommandNotFound         = 'Command or filename not found: "%s"';
   RsCreateProcFailed                  = 'CreateProcessAsUser failed';
-
 //=== JclMultimedia ==========================================================
 resourcestring
   // Multimedia timer
@@ -1386,7 +1342,6 @@ resourcestring
   RsMmSetEvent         = 'Error setting multimedia event timer';
   RsMmInconsistentId   = 'Multimedia timer callback was called with inconsistent Id';
   RsMmTimerActive      = 'This operation cannot be performed while the timer is active';
-
   // Audio Mixer
   RsMmMixerSource      = 'Source';
   RsMmMixerDestination = 'Destination';
@@ -1408,25 +1363,21 @@ resourcestring
   RsMmMixerAnalog      = 'Analog';
   RsMmMixerNoDevices   = 'No mixer device found';
   RsMmMixerCtlNotFound = 'Line control (%s, %.8x) not found';
-
   // EJclMciError
   RsMmUnknownError     = 'Unknown MCI error No. %d';
   RsMmMciErrorPrefix   = 'MCI-Error: ';
-
   // CD audio routines
   RsMmNoCdAudio        = 'Cannot open CDAUDIO-Device';
   RsMmCdTrackNo        = 'Track: %.2u';
   RsMMCdTimeFormat     = '%2u:%.2u';
   RsMMTrackAudio       = 'Audio';
   RsMMTrackOther       = 'Other';
-
 //=== JclNTFS ================================================================
 resourcestring
   RsInvalidArgument = '%s: Invalid argument <%s>';
   RsNtfsUnableToDeleteSymbolicLink = 'Unable to delete temporary symbolic link';
   RsEUnableToCreatePropertyStorage = 'Unable to create property storage';
   RsEIncomatibleDataFormat = 'Incompatible data format';
-
 //=== JclPCRE ================================================================
 resourcestring
   RsErrNoMatch       = 'No match';
@@ -1470,11 +1421,9 @@ resourcestring
   RsErrBadMode       = 'Bad Mode';
   RsErrBadEndianness = 'Bad endianness';
   RsErrBadRestart    = 'Bad Restart';
-
 //=== JclPeImage =============================================================
 resourcestring
   RsPeReadOnlyStream = 'Stream is read-only';
-
   // TJclPeImage
   RsPeCantOpen                = 'Cannot open file "%s"';
   RsPeNotPE                   = 'This is not a PE format';
@@ -1482,7 +1431,6 @@ resourcestring
   RsPeNotResDir               = 'Not a resource directory';
   RsPeNotAvailableForAttached = 'Feature is not available for attached images';
   RsPeSectionNotFound         = 'Section "%s" not found';
-
   // PE directory names
   RsPeImg_00 = 'Exports';
   RsPeImg_01 = 'Imports';
@@ -1500,7 +1448,6 @@ resourcestring
   RsPeImg_13 = 'Delay load import';
   RsPeImg_14 = 'COM run-time';
   RsPeImg_Reserved = 'reserved [%.2d]';
-
   // NT Header names
   RsPeSignature               = 'Signature';
   RsPeMachine                 = 'Machine';
@@ -1536,7 +1483,6 @@ resourcestring
   RsPeSizeOfHeapCommit        = 'Size of Heap Commit';
   RsPeLoaderFlags             = 'Loader Flags';
   RsPeNumberOfRvaAndSizes     = 'Number of RVA';
-
   // Load config names
   RsPeVersion                       = 'Version';
   RsPeGlobalFlagsClear              = 'GlobalFlagsClear';
@@ -1552,7 +1498,6 @@ resourcestring
   RsPeCSDVersion                    = 'CSDVersion';
   RsPeReserved                      = 'Reserved';
   RsPeEditList                      = 'EditList';
-
   // Machine names
   RsPeMACHINE_UNKNOWN   = 'Unknown';
   RsPeMACHINE_I386      = 'Intel 386';
@@ -1582,7 +1527,6 @@ resourcestring
   RsPeMACHINE_AMD64     = 'AMD64 (K8)';
   RsPeMACHINE_M32R      = 'M32R little-endian';
   RsPeMACHINE_CEE       = 'CEE';
-
   // Subsystem names
   RsPeSUBSYSTEM_UNKNOWN     = 'Unknown';
   RsPeSUBSYSTEM_NATIVE      = 'Native';
@@ -1591,7 +1535,6 @@ resourcestring
   RsPeSUBSYSTEM_OS2_CUI     = 'OS/2';
   RsPeSUBSYSTEM_POSIX_CUI   = 'Posix';
   RsPeSUBSYSTEM_RESERVED8   = 'Reserved 8';
-
   // Debug symbol type names
   RsPeDEBUG_UNKNOWN       = 'UNKNOWN';
   RsPeDEBUG_COFF          = 'COFF';
@@ -1603,30 +1546,25 @@ resourcestring
   RsPeDEBUG_OMAP_TO_SRC   = 'OMAP_TO_SRC';
   RsPeDEBUG_OMAP_FROM_SRC = 'OMAP_FROM_SRC';
   RsPeDEBUG_BORLAND       = 'BORLAND';
-
   // TJclPePackageInfo.PackageModuleTypeToString
   RsPePkgExecutable = 'Executable';
   RsPePkgPackage    = 'Package';
   PsPePkgLibrary    = 'Library';
-
   // TJclPePackageInfo.PackageOptionsToString
   RsPePkgNeverBuild     = 'NeverBuild';
   RsPePkgDesignOnly     = 'DesignOnly';
   RsPePkgRunOnly        = 'RunOnly';
   RsPePkgIgnoreDupUnits = 'IgnoreDupUnits';
-
   // TJclPePackageInfo.ProducerToString
   RsPePkgV3Produced        = 'Delphi 3 or C++ Builder 3';
   RsPePkgProducerUndefined = 'Undefined';
   RsPePkgBCB4Produced      = 'C++ Builder 4 or later';
   RsPePkgDelphi4Produced   = 'Delphi 4 or later';
-
   // TJclPePackageInfo.UnitInfoFlagsToString
   RsPePkgMain     = 'Main';
   RsPePkgWeak     = 'Weak';
   RsPePkgOrgWeak  = 'OrgWeak';
   RsPePkgImplicit = 'Implicit';
-
 //=== JclRegistry ============================================================
 resourcestring
   RsUnableToOpenKeyRead  = 'Unable to open key "%s\%s" for read';
@@ -1634,7 +1572,6 @@ resourcestring
   RsUnableToAccessValue  = 'Unable to open key "%s\%s" and access value "%s"';
   RsWrongDataType        = '"%s\%s\%s" is of wrong kind or size';
   RsInconsistentPath     = '"%s" does not match RootKey';
-
 //=== JclRTTI ================================================================
 resourcestring
   RsRTTISetValueOutOfRange  = 'Set value over %s does not fit into a 32-bit integer.';
@@ -1642,7 +1579,6 @@ resourcestring
   RsRTTIUnknownIdentifier = 'Unknown identifier ''%s''.';
   RsRTTIInvalidBaseType   = 'Invalid base type (%s is of type %s).';
   RsRTTINoStringValue     = 'The property %s of type %s has no string value'; 
-
   RsRTTIVar           = 'var ';
   RsRTTIConst         = 'const ';
   RsRTTIArrayOf       = 'array of ';
@@ -1653,18 +1589,14 @@ resourcestring
   RsRTTIFalse         = 'False';
   RsRTTITypeError     = '???';
   RsRTTITypeInfoAt    = 'Type info: %p';
-
   RsRTTIPropRead      = 'read';
   RsRTTIPropWrite     = 'write';
   RsRTTIPropStored    = 'stored';
-
   RsRTTIField         = 'field';
   RsRTTIStaticMethod  = 'static method';
   RsRTTIVirtualMethod = 'virtual method';
-
   RsRTTIIndex         = 'index';
   RsRTTIDefault       = 'default';
-
   RsRTTIName          = 'Name: ';
   RsRTTIType          = 'Type: ';
   RsRTTIFlags         = 'Flags: ';
@@ -1688,9 +1620,7 @@ resourcestring
   RsRTTIElType        = 'Element type: ';
   RsRTTIElNeedCleanup = 'Elements need clean up: ';
   RsRTTIVarType       = 'Variant type: ';
-
   RsDeclarationFormat = '// Declaration for ''%s'' not supported.';
-
 //=== JclSchedule ============================================================
 resourcestring
   RsScheduleInvalidTime     = 'Invalid time specification';
@@ -1702,13 +1632,11 @@ resourcestring
   RsScheduleDayNotSupported = 'Property Day not supported for current IndexKind';
   RsScheduleDayInRange      = 'Day values should fall in the range 1 .. 31';
   RsScheduleMonthInRange    = 'Month values should fall in the range 1 .. 12';
-
 //=== JclSecurity ============================================================
 resourcestring
   RsInvalidSID = 'Invalid SID';
   RsSIDBufferTooSmall = 'SID buffer too small.';
   RsLsaError = 'LSA Error: NT Status = %.8x, message: %s'; 
-
 //=== JclSimpleXml ===========================================================
 resourcestring
   RsEInvalidXMLElementUnexpectedCharacte =
@@ -1732,11 +1660,9 @@ resourcestring
   RsEInvalidMSOExpectedsButFounds = 'Invalid MSO: expected "%0:s" but found "%1:s" at position %d';
   RsEInvalidMSOUnexpectedEndOfDat = 'Invalid MSO: Unexpected end of data at position %d';
   RsEInvalidDocumentUnexpectedTextInFile = 'Invalid Document: Unexpected text in file prolog at position %d';
-
 //=== JclStatistics ==========================================================
 resourcestring
   RsInvalidSampleSize = 'Invalid sample size (%d)';
-
 //=== JclStreams =============================================================
 resourcestring
   RsStreamsCreateError = 'Cannot create file %s';
@@ -1744,14 +1670,12 @@ resourcestring
   RsStreamsSetSizeError = 'Error setting stream size';
   RsStreamsSeekError = 'Error seeking stream';
   RsStreamsCRCError = 'Cyclic Redundency Check (CRC) error: data are damaged';
-
 //=== JclStrHashMap ==========================================================
 resourcestring
   RsStringHashMapMustBeEmpty = 'HashList: must be empty to set size to zero';
   RsStringHashMapDuplicate   = 'Duplicate hash list entry: %s';
   RsStringHashMapInvalidNode = 'Tried to remove invalid node: %s';
   RsStringHashMapNoTraits    = 'HashList must have traits';
-
 //=== JclStrings =============================================================
 resourcestring
   RsBlankSearchString       = 'Search string cannot be blank';
@@ -1769,11 +1693,9 @@ resourcestring
   RsTabs_TabWidthExpected = 'Tab width expected.';
   // Default text for the NullReferenceException in .NET
   RsArg_NullReferenceException = 'Object reference not set to an instance of an object.';
-
 //=== JclStructStorage =======================================================
 resourcestring
   RsIStreamNil = 'IStream is nil';
-
 //=== JclSynch ===============================================================
 resourcestring
   RsSynchAttachWin32Handle    = 'Invalid handle to TJclWin32HandleObject.Attach';
@@ -1791,12 +1713,10 @@ resourcestring
   RsMetSectInvalidParameter   = 'An invalid parameter was passed to the constructor.';
   RsMetSectInitialize         = 'Failed to initialize the metered section.';
   RsMetSectNameEmpty          = 'Name cannot be empty when using the Open constructor.';
-
 //=== JclSysInfo =============================================================
 resourcestring
   RsSystemProcess     = 'System Process';
   RsSystemIdleProcess = 'System Idle Process';
-
   RsIntelUnknownCache = 'Unknown cache ID (%.2x)';
   RsIntelCacheDescr00 = 'Null descriptor';
   RsIntelCacheDescr01 = 'Instruction TLB: 4 KByte pages, 4-way set associative, 32 entries';
@@ -1901,9 +1821,7 @@ resourcestring
   RsIntelCacheDescrF0 = '64-Byte Prefetching';
   RsIntelCacheDescrF1 = '128-Byte Prefetching';
   RsIntelCacheDescrFF = 'CPUID leaf 2 does not report cache descriptor information, use CPUID leaf 4 to query cache parameters';
-
   RsUnknownAMDModel = 'Unknown AMD (Model %d)';
-
   RsOSVersionWin95              = 'Windows 95';
   RsOSVersionWin95OSR2          = 'Windows 95 OSR2';
   RsOSVersionWin98              = 'Windows 98';
@@ -1932,7 +1850,6 @@ resourcestring
   RsOSVersionWinServer2022      = 'Windows Server 2022';
   RsOSVersionWinServer          = 'Windows Server';
   RsOSVersionWin11              = 'Windows 11';
-
   RsEditionWinXPHome            = 'Home Edition';
   RsEditionWinXPPro             = 'Professional';
   RsEditionWinXPHomeN           = 'Home Edition N';
@@ -1968,7 +1885,6 @@ resourcestring
   RsEditionWin10Pro             = 'Pro';
   RsEditionWin10Enterprise      = 'Enterprise';
   RsEditionWin10Education       = 'Education';
-
   RsProductTypeWorkStation      = 'Workstation';
   RsProductTypeServer           = 'Server';
   RsProductTypeAdvancedServer   = 'Advanced Server';
@@ -1977,20 +1893,15 @@ resourcestring
   RsProductTypeDatacenterServer = 'Datacenter Server';
   RsProductTypeEnterprise       = 'Enterprise';
   RsProductTypeWebEdition       = 'Web Edition';
-
   RsEOpenGLInfo                 = 'GetOpenGLVersion: %s failed';
   RsENetWkstaGetInfo            = 'NetWkstaGetInfo failed';
-
   {$IFDEF MSWINDOWS}
   RsSPInfo = 'SP%u';
   {$ENDIF MSWINDOWS}
-
   {$IFDEF UNIX}
   RsInvalidProcessID = 'Invalid process ID %d';
   {$ENDIF UNIX}
-
   RsOpenGLInfoError = 'Err';
-
 //=== JclSysUtils ============================================================
 resourcestring
   RsVMTMemoryWriteError  = 'Error writing VMT memory (%s)';
@@ -1998,26 +1909,20 @@ resourcestring
   RsStringToBoolean      = 'Unable to convert the string "%s" to a boolean';
   RsInvalidDigit         = 'Invalid base %d digit ''%s'' encountered.';
   RsInvalidDigitValue    = 'There is no valid base %d digit for decimal value %d';
-
   {$IFDEF UNIX}
   RsReadKeyError         = 'ReadKey: Problem waiting on stdin';
   {$ENDIF UNIX}
-
   RsInvalidGUIDString    = 'Invalid conversion from string to GUID (%s).';
-
   RsInvalidMMFName = 'Invalid MMF name "%s"';
   RsInvalidMMFEmpty = 'The MMF named "%s" cannot be created empty';
-
 //=== JclTD32 ================================================================
 resourcestring
   RsHasNotTD32Info = 'File [%s] has not TD32 debug information!';
-
 //=== JclTimeZones ===========================================================
 resourcestring
   RsEDaylightSavingsNotSupported = 'Daylight Savings not supported by this timezone';
   RsEAutoAdjustNotEnabled = 'Auto adjust for Daylight Savings is not enabled.  Date is not available';
   RsENoCallbackFunc = 'No callback function assigned';
-
 //=== JclUnicode =============================================================
 resourcestring
   RsUREErrorFmt               = '%s%s%s';
@@ -2034,23 +1939,19 @@ resourcestring
   RsDecomposedUnicodeChar     = 'decomposed Unicode character > $FFFFFF found';
   RsCombiningClassUnicodeChar = 'combining class for Unicode character > $FFFFFF found';
   RsEUnexpectedEOSeq          = 'Unexpected end of sequence';
-
 //=== JclUnitConv ============================================================
 resourcestring
   RsTempConvTypeError = 'An invalid type has been provided for the %s parameter';
   RsConvTempBelowAbsoluteZero = 'Temperature can not be below Absolute Zero!';
-
 //=== JclWin32 ===============================================================
 resourcestring
   RsWin32Error        = 'Win32 error: %s (%u)%s%s';
   RsELibraryNotFound  = 'Library not found: %s';
   RsEFunctionNotFound = 'Function not found: %s.%s';
-
 //=== JclWinMidi =============================================================
 resourcestring
   RsMidiInUnknownError  = 'Unknown MIDI-In error No. %d';
   RsMidiOutUnknownError = 'Unknown MIDI-Out error No. %d';
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -2062,15 +1963,11 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.

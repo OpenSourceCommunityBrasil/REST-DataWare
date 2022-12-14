@@ -1,7 +1,5 @@
 unit JvConsts;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,14 +22,11 @@ unit JvConsts;
 }
 
 interface
-
 uses
   SysUtils, Classes, Windows, TypInfo;
-
 const
   { JvEditor }
   JvEditorCompletionChars = #8'0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm_';
-
   { Various units }
   DigitSymbols = ['0'..'9'];
   SignSymbols = ['+', '-'];
@@ -43,7 +38,6 @@ const
   IdentifierFirstSymbols = ['_'] + IdentifierLetters;
   IdentifierSymbols = IdentifierFirstSymbols + DigitSymbols;
   HexadecimalSymbols = DigitSymbols + HexadecimalUppercaseLetters + HexadecimalLowercaseLetters;
-
   {$IFDEF DELPHI6}
   SDelphiKey = 'Software\Borland\Delphi\6.0';
   {$ENDIF DELPHI6}
@@ -113,7 +107,6 @@ const
   {$IFDEF DELPHI28}
   SDelphiKey = 'Software\Embarcadero\BDS\22.0';
   {$ENDIF DELPHI27}
-
   {$IF not declared(SDelphiKey)}
     {$MESSAGE FATAL 'Declaration for SDelphiKey is missing'}
   {$IFEND}
@@ -123,24 +116,19 @@ const
   DPA_RenderDisabledAsGrayed = 1;
   DPA_RendersSingleItem = 2;
   DPA_ConsumerDisplaysList = 3;
-
   { Define command message that did not exist in earlier VCL versions }
   {$IFNDEF COMPILER9_UP}
   CM_INVALIDATEDOCKHOST = CM_BASE + 70;
   {$ENDIF !COMPILER9_UP}
-
   { Values for WParam for CM_SPEEDBARCHANGED message }
   SBR_CHANGED        = 0; { change buttons properties  }
   SBR_DESTROYED      = 1; { destroy SpeedBar           }
   SBR_BTNSELECT      = 2; { select button in SpeedBar  }
   SBR_BTNSIZECHANGED = 3; { button size changed        }
-
   { TBitmap.GetTransparentColor from GRAPHICS.PAS use this value }
   PaletteMask = $02000000;
-
   sLineBreakStr = string(sLineBreak); // "native string" line break constant
   sLineBreakLen = Length(sLineBreak);
-
   CrLf = #13#10;
   Cr = #13;
   Lf = #10;
@@ -167,16 +155,12 @@ const
   PathDelim = '/';
   AllFilePattern = '*';
   {$ENDIF UNIX}
-
   {const Separators is used in GetWordOnPos, JvUtils.ReplaceStrings and SubWord}
   Separators: TSysCharSet = [#00, ' ', '-', #13, #10, '.', ',', '/', '\', '#', '"', '''',
     ':', '+', '%', '*', '(', ')', ';', '=', '{', '}', '[', ']', '{', '}', '<', '>'];
-
   DigitChars = ['0'..'9'];
-
 const
   ROP_DSPDxax = $00E20746;
-
 const
   FOURCC_ACON = 'ACON';
   FOURCC_IART = 'IART';
@@ -189,15 +173,12 @@ const
   FOURCC_icon = 'icon';
   FOURCC_rate = 'rate';
   FOURCC_seq  = 'seq ';
-
   AF_ICON     = $00000001;
   AF_SEQUENCE = $00000002;
-
 const
   KeyboardShiftStates = [ssShift, ssAlt, ssCtrl];
   MouseShiftStates = [ssLeft, ssRight, ssMiddle, ssDouble];
   tkStrings: set of TTypeKind = [tkString, tkLString, {$IFDEF UNICODE} tkUString, {$ENDIF} tkWString];
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -207,16 +188,11 @@ const
     LogPath: 'JVCL\run'
   );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.
-

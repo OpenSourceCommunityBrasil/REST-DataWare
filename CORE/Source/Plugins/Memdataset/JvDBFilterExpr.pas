@@ -1,7 +1,5 @@
 unit JvDBFilterExpr;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,10 +22,8 @@ unit JvDBFilterExpr;
 }
 
 interface
-
 uses
   SysUtils, Classes, Variants, DB, DBCommon;
-
 type
   TJvDBFilterExpression = class(TObject)
   private
@@ -42,23 +38,18 @@ type
     destructor Destroy; override;
     function Evaluate: Boolean;
   end;
-
 implementation
-
 uses
   SqlTimSt, DateUtils, JvResources, JclSysUtils;
-
 var
   FieldTypeMapInitialized: Boolean = False;
   FieldTypeMap: TFieldMap;
-
 type
   TExprParserAccess = class
   protected
     FDecimalSeparator: {$IF CompilerVersion > 17.0}WideChar{$ELSE}Char{$IFEND}; // Delphi 2006+ use WideChar
     FFilter: TFilterExpr;
   end;
-
   TFilterExprAccess = class
   protected
     FDataSet: TDataSet;
@@ -67,7 +58,6 @@ type
     FParserOptions: TParserOptions;
     FNodes: PExprNode;
   end;
-
 {------------------------------------------------------------------------------}
 function TrimLeftEx(const S, Blanks: string): string;
 var
@@ -79,7 +69,6 @@ begin
     Inc(I);
   Result := Copy(S, I, MaxInt);
 end;
-
 function TrimRightEx(const S, Blanks: string): string;
 var
   I: Integer;
@@ -89,7 +78,6 @@ begin
     Dec(I);
   Result := Copy(S, 1, I);
 end;
-
 function TrimEx(const S, Blanks: string): string;
 var
   L, R, Len: Integer;
@@ -103,9 +91,7 @@ begin
     Dec(R);
   Result := Copy(S, L, R - L + 1);
 end;
-
 // Derived from "Like" by Michael Winter
-
 function IsLike(const MaskStr, S: string): Boolean;
 var
   StringPtr: PChar;
@@ -119,18 +105,14 @@ begin
     Result := False;
     Exit;
   end;
-
   Result := MaskStr = '%';
-
   if Result or (S = '') then
     Exit;
   Index := 1;
-
   StringPtr := PChar(S) + Index - 1;
   PatternPtr := PChar(MaskStr);
   StringRes := nil;
   PatternRes := nil;
-
   repeat
     repeat
       case PatternPtr^ of
@@ -139,7 +121,6 @@ begin
             Result := StringPtr^ = #0;
             if Result or (StringRes = nil) or (PatternRes = nil) then
               Exit;
-
             StringPtr := StringRes;
             PatternPtr := PatternRes;
             Break;
@@ -177,7 +158,6 @@ begin
           end;
       end;
     until False;
-
     repeat
       case PatternPtr^ of
         #0:
@@ -216,15 +196,12 @@ begin
   until False;
 end;
 {------------------------------------------------------------------------------}
-
 { TJvDBFilterExpression }
-
 constructor TJvDBFilterExpression.Create(ADataSet: TDataSet; const Filter: string;
   const FilterOptions: TFilterOptions);
 var
   FieldType: TFieldType;
   Nodes: PExprNode;
-
   function NodesContainsLeftRight(Root: PExprNode): Boolean;
   var
     Node: PExprNode;
@@ -239,11 +216,9 @@ var
     end;
     Result := False;
   end;
-
 begin
   inherited Create;
   FDataSet := ADataSet;
-
   if not FieldTypeMapInitialized then
   begin
     FieldTypeMapInitialized := True;
@@ -252,7 +227,6 @@ begin
   end;
   FParser := TExprParser.Create(ADataSet, Filter, [], [poExtSyntax], '', nil, FieldTypeMap);
   Nodes := TFilterExprAccess(TExprParserAccess(FParser).FFilter).FNodes;
-
   { Find root node because FNodes is the last added node which must not be the root node.
     The root node is the node which istn't referenced by any other node's Left or Right field. }
   if Nodes <> nil then
@@ -262,18 +236,15 @@ begin
       FRoot := FRoot.FNext;
   end;
 end;
-
 destructor TJvDBFilterExpression.Destroy;
 begin
   FParser.Free;
   inherited Destroy;
 end;
-
 function TJvDBFilterExpression.Evaluate: Boolean;
 begin
   Result := EvalOpNode(FRoot);
 end;
-
 function TJvDBFilterExpression.EvaluateNode(N: PExprNode): Variant;
 begin
   if N = nil then
@@ -294,7 +265,6 @@ begin
     end;
   end;
 end;
-
 function TJvDBFilterExpression.EvalOpNode(N: PExprNode): Boolean;
 var
   I: Integer;
@@ -361,7 +331,6 @@ begin
     end;
   end;
 end;
-
 function TJvDBFilterExpression.EvalFuncNode(N: PExprNode): Variant;
 var
   V: Variant;
@@ -373,7 +342,6 @@ begin
     if (N.FArgs <> nil) and (N.FArgs.Count > 0) then
     begin
       V := EvaluateNode(N.FArgs[0]);
-
       if CompareText(N.FData, 'UPPER') = 0 then
         Result := AnsiUpperCase(V)
       else
@@ -466,5 +434,4 @@ begin
       raise Exception.CreateResFmt(@RsMissingFilterFunctionParameters, [N.FData]);
   end;
 end;
-
 end.

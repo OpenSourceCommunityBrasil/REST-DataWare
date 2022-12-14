@@ -22,19 +22,17 @@ uses
   uRESTDWMessageCoderQuotedPrintable, uRESTDWMessageParts, DWDCPbase64, 
   DWDCPblockciphers, DWDCPcast256, DWDCPconst, DWDCPcrypt2, DWDCPrijndael, 
   DWDCPsha256, DWDCPtypes, uRESTDWConsts, uRESTDWDatamodule, 
-  uRESTDWJSONViewer, uRESTDWMemtable, uRESTDWExprParser, 
-  uRESTDWFieldSourceEditor, uRESTDWSqlEditor, uRESTDWUpdSqlEditor, 
-  utemplateproglaz, uRESTDWBufferBase, StringBuilderUnit, uRESTDWBase64, 
-  uRESTDWDynamic, uRESTDWJSONObject, uRESTDWMassiveBuffer, uRESTDWMD5, 
-  uRESTDWTools, uZlibLaz, uRESTDWDataJSON, uRESTDWDynArray, uRESTDWJSON, 
-  uRESTDWJSONInterface, uRESTDWSerialize, uRESTDWDesignReg, uRESTDWAbout, 
-  uRESTDWMimeTypes, LazarusPackageIntf;
+  uRESTDWJSONViewer, uRESTDWFieldSourceEditor, uRESTDWSqlEditor, 
+  uRESTDWUpdSqlEditor, utemplateproglaz, uRESTDWBufferBase, StringBuilderUnit, 
+  uRESTDWBase64, uRESTDWDynamic, uRESTDWJSONObject, uRESTDWMassiveBuffer, 
+  uRESTDWMD5, uRESTDWTools, uRESTDWDataJSON, uRESTDWDynArray, uRESTDWJSON, 
+  uRESTDWJSONInterface, uRESTDWSerialize, uRESTDWMimeTypes, uRESTDWAbout, 
+  uRESTDWZlib, uRESTDWMemoryDataset, LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
-  RegisterUnit('uRESTDWDesignReg', @uRESTDWDesignReg.Register);
 end;
 
 initialization

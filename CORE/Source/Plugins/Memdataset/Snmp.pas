@@ -1,10 +1,7 @@
 unit Snmp;
-
 interface
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-{$I ..\..\CORE\Source\Includes\windowsonly.inc}
-
+{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\windowsonly.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -26,23 +23,24 @@ interface
  Roniery                    - Devel.
 }
 
+{$IFDEF FPC}
+ {$MODE Delphi}
+ {$ASMMode Intel}
+{$ENDIF}
+
 {$DEFINE SNMP_DYNAMIC_LINK}
 {$DEFINE SNMP_DYNAMIC_LINK_EXPLICIT}
 {$DEFINE SNMPSTRICT}
-
 {$ALIGN ON}
 {$MINENUMSIZE 4}
-
 {$IFNDEF SNMP_DYNAMIC_LINK}
 {$IFDEF SUPPORTS_WEAKPACKAGEUNIT}
   {$WEAKPACKAGEUNIT ON}
 {$ENDIF SUPPORTS_WEAKPACKAGEUNIT}
 {$ENDIF ~SNMP_DYNAMIC_LINK}
-
 {$IFDEF UNICODE}
 {$A4}  // MANTIS 4931 - GetMacAddress crash in Delphi 2009. record alignment fix.
 {$ENDIF}
-
 uses
   {$IFDEF UNITVERSIONING}
   JclUnitVersioning,
@@ -52,11 +50,8 @@ uses
   {$ELSE ~HAS_UNITSCOPE}
   Windows, SysUtils;
   {$ENDIF ~HAS_UNITSCOPE}
-
 //DOM-IGNORE-BEGIN
-
 (*$HPPEMIT '#include <snmp.h>'*)
-
 type
   PAsnOctetString = ^TAsnOctetString;
   TAsnOctetString = record
@@ -64,13 +59,11 @@ type
     length: UINT;
     dynamic_: Boolean;
   end;
-
   PAsnObjectIdentifier = ^TAsnObjectIdentifier;
   TAsnObjectIdentifier = record
     idLength: UINT;
     ids: PUINT;
   end;
-
   TAsnInteger32        = LongInt;
   {$EXTERNALSYM TAsnInteger32}
   TAsnUnsigned32       = ULONG;
@@ -97,7 +90,6 @@ type
   {$EXTERNALSYM TAsnDisplayString}
   TAsnOpaque           = TAsnOctetString;
   {$EXTERNALSYM TAsnOpaque}
-
   PAsnAny = ^TAsnAny;
   TAsnAny = record
     asnType: Byte;
@@ -115,26 +107,20 @@ type
      10: (ticks: TAsnTimeticks);           // ASN_TIMETICKS
      11: (arbitrary: TAsnOpaque);          // ASN_OPAQUE
   end;
-
   TAsnObjectName = TAsnObjectIdentifier;
   TAsnObjectSyntax = TAsnAny;
-
   PSnmpVarBind = ^TSnmpVarBind;
   TSnmpVarBind = record
     name: TAsnObjectName;
     value: TAsnObjectSyntax;
   end;
-
   PSnmpVarBindList = ^TSnmpVarBindList;
   TSnmpVarBindList = record
     list: PSnmpVarBind;
     len: UINT;
   end;
-
 const
-
 { ASN/BER Base Types }
-
   ASN_UNIVERSAL                   = $00;
   {$EXTERNALSYM ASN_UNIVERSAL}
   ASN_APPLICATION                 = $40;
@@ -143,14 +129,11 @@ const
   {$EXTERNALSYM ASN_CONTEXT}
   ASN_PRIVATE                     = $C0;
   {$EXTERNALSYM ASN_PRIVATE}
-
   ASN_PRIMITIVE                   = $00;
   {$EXTERNALSYM ASN_PRIMITIVE}
   ASN_CONSTRUCTOR                 = $20;
   {$EXTERNALSYM ASN_CONSTRUCTOR}
-
 { PDU Type Values }
-
   SNMP_PDU_GET                    = (ASN_CONTEXT or ASN_CONSTRUCTOR or $0);
   {$EXTERNALSYM SNMP_PDU_GET}
   SNMP_PDU_GETNEXT                = (ASN_CONTEXT or ASN_CONSTRUCTOR or $1);
@@ -167,9 +150,7 @@ const
   {$EXTERNALSYM SNMP_PDU_INFORM}
   SNMP_PDU_TRAP                   = (ASN_CONTEXT or ASN_CONSTRUCTOR or $7);
   {$EXTERNALSYM SNMP_PDU_TRAP}
-
 { SNMP Simple Syntax Values }
-
   ASN_INTEGER                     = (ASN_UNIVERSAL or ASN_PRIMITIVE or $02);
   {$EXTERNALSYM ASN_INTEGER}
   ASN_BITS                        = (ASN_UNIVERSAL or ASN_PRIMITIVE or $03);
@@ -182,16 +163,12 @@ const
   {$EXTERNALSYM ASN_OBJECTIDENTIFIER}
   ASN_INTEGER32                   = ASN_INTEGER;
   {$EXTERNALSYM ASN_INTEGER32}
-
 { SNMP Constructor Syntax Values }
-
   ASN_SEQUENCE                    = (ASN_UNIVERSAL or ASN_CONSTRUCTOR or $10);
   {$EXTERNALSYM ASN_SEQUENCE}
   ASN_SEQUENCEOF                  = ASN_SEQUENCE;
   {$EXTERNALSYM ASN_SEQUENCEOF}
-
 { SNMP Application Syntax Values }
-
   ASN_IPADDRESS                   = (ASN_APPLICATION or ASN_PRIMITIVE or $00);
   {$EXTERNALSYM ASN_IPADDRESS}
   ASN_COUNTER32                   = (ASN_APPLICATION or ASN_PRIMITIVE or $01);
@@ -206,18 +183,14 @@ const
   {$EXTERNALSYM ASN_COUNTER64}
   ASN_UNSIGNED32                  = (ASN_APPLICATION or ASN_PRIMITIVE or $07);
   {$EXTERNALSYM ASN_UNSIGNED32}
-
 { SNMP Exception Conditions }
-
   SNMP_EXCEPTION_NOSUCHOBJECT     = (ASN_CONTEXT or ASN_PRIMITIVE or $00);
   {$EXTERNALSYM SNMP_EXCEPTION_NOSUCHOBJECT}
   SNMP_EXCEPTION_NOSUCHINSTANCE   = (ASN_CONTEXT or ASN_PRIMITIVE or $01);
   {$EXTERNALSYM SNMP_EXCEPTION_NOSUCHINSTANCE}
   SNMP_EXCEPTION_ENDOFMIBVIEW     = (ASN_CONTEXT or ASN_PRIMITIVE or $02);
   {$EXTERNALSYM SNMP_EXCEPTION_ENDOFMIBVIEW}
-
 { SNMP Request Types (used in SnmpExtensionQueryEx) }
-
   SNMP_EXTENSION_GET              = SNMP_PDU_GET;
   {$EXTERNALSYM SNMP_EXTENSION_GET}
   SNMP_EXTENSION_GET_NEXT         = SNMP_PDU_GETNEXT;
@@ -232,9 +205,7 @@ const
   {$EXTERNALSYM SNMP_EXTENSION_SET_UNDO}
   SNMP_EXTENSION_SET_CLEANUP      = (ASN_PRIVATE or ASN_CONSTRUCTOR or $2);
   {$EXTERNALSYM SNMP_EXTENSION_SET_CLEANUP}
-
 { SNMP Error Codes }
-
   SNMP_ERRORSTATUS_NOERROR                    = 0;
   {$EXTERNALSYM SNMP_ERRORSTATUS_NOERROR}
   SNMP_ERRORSTATUS_TOOBIG                     = 1;
@@ -273,9 +244,7 @@ const
   {$EXTERNALSYM SNMP_ERRORSTATUS_NOTWRITABLE}
   SNMP_ERRORSTATUS_INCONSISTENTNAME           = 18;
   {$EXTERNALSYM SNMP_ERRORSTATUS_INCONSISTENTNAME}
-
 { SNMPv1 Trap Types }
-
   SNMP_GENERICTRAP_COLDSTART                  = 0;
   {$EXTERNALSYM SNMP_GENERICTRAP_COLDSTART}
   SNMP_GENERICTRAP_WARMSTART                  = 1;
@@ -290,9 +259,7 @@ const
   {$EXTERNALSYM SNMP_GENERICTRAP_EGPNEIGHLOSS}
   SNMP_GENERICTRAP_ENTERSPECIFIC              = 6;
   {$EXTERNALSYM SNMP_GENERICTRAP_ENTERSPECIFIC}
-
 { SNMP Access Types }
-
   SNMP_ACCESS_NONE                            = 0;
   {$EXTERNALSYM SNMP_ACCESS_NONE}
   SNMP_ACCESS_NOTIFY                          = 1;
@@ -303,9 +270,7 @@ const
   {$EXTERNALSYM SNMP_ACCESS_READ_WRITE}
   SNMP_ACCESS_READ_CREATE                     = 4;
   {$EXTERNALSYM SNMP_ACCESS_READ_CREATE}
-
 { SNMP API Return Code Definitions }
-
 type
   SNMPAPI                                     = Integer;
   {$EXTERNALSYM SNMPAPI}
@@ -314,32 +279,21 @@ const
   {$EXTERNALSYM SNMPAPI_NOERROR}
   SNMPAPI_ERROR                               = False;
   {$EXTERNALSYM SNMPAPI_ERROR}
-
 { SNMP Extension API Type Definitions }
-
 type
   TSnmpExtensionInit = function (dwUptimeReference: DWORD; var phSubagentTrapEvent: THandle;
     var pFirstSupportedRegion: PAsnObjectIdentifier): Boolean; stdcall;
-
   TSnmpExtensionInitEx = function (var pNextSupportedRegion: PAsnObjectIdentifier): Boolean; stdcall;
-
   TSnmpExtensionMonitor = function (pAgentMgmtData: Pointer): Boolean; stdcall;
-
   TSnmpExtensionQuery = function (bPduType: Byte; var pVarBindList: TSnmpVarBindList;
     var pErrorStatus: TAsnInteger32; var pErrorIndex: TAsnInteger32): Boolean; stdcall;
-
   TSnmpExtensionQueryEx = function (nRequestType: UINT; nTransactionId: UINT; var pVarBindList: PSnmpVarBindList;
     var pContextInfo: PAsnOctetString; var pErrorStatus: TAsnInteger32; var pErrorIndex: TAsnInteger32): Boolean; stdcall;
-
   TSnmpExtensionTrap = function (pEnterpriseOid: PAsnObjectIdentifier; var pGenericTrapId: TAsnInteger32;
      var pSpecificTrapId: TAsnInteger32; var pTimeStamp: TAsnTimeticks; var pVarBindList: PSnmpVarBindList): Boolean; stdcall;
-
   TSnmpExtensionClose = procedure; stdcall;
-
 { SNMP API Prototypes }
-
 {$IFDEF SNMP_DYNAMIC_LINK}
-
 var
   SnmpUtilOidCpy: function(pOidDst: PAsnObjectIdentifier; pOidSrc: PAsnObjectIdentifier): SNMPAPI; stdcall;
   SnmpUtilOidAppend: function(pOidDst: PAsnObjectIdentifier; pOidSrc: PAsnObjectIdentifier): SNMPAPI; stdcall;
@@ -366,9 +320,7 @@ var
   SnmpSvcGetUptime: function: DWORD; stdcall;
   SnmpSvcSetLogLevel: procedure(nLogLevel: Integer); stdcall;
   SnmpSvcSetLogType: procedure(nLogType: Integer); stdcall;
-
 {$ELSE ~SNMP_DYNAMIC_LINK}
-
 function SnmpUtilOidCpy(pOidDst: PAsnObjectIdentifier; pOidSrc: PAsnObjectIdentifier): SNMPAPI; stdcall;
 function SnmpUtilOidAppend(pOidDst: PAsnObjectIdentifier; pOidSrc: PAsnObjectIdentifier): SNMPAPI; stdcall;
 function SnmpUtilOidNCmp(pOid1, pOid2: PAsnObjectIdentifier; nSubIds: UINT): SNMPAPI; stdcall;
@@ -394,9 +346,7 @@ procedure SnmpUtilPrintAsnAny(pAny: PAsnAny); stdcall;
 function SnmpSvcGetUptime: DWORD; stdcall;
 procedure SnmpSvcSetLogLevel(nLogLevel: Integer); stdcall;
 procedure SnmpSvcSetLogType(nLogType: Integer); stdcall;
-
 {$ENDIF ~SNMP_DYNAMIC_LINK}
-
 {$EXTERNALSYM SnmpUtilOidCpy}
 {$EXTERNALSYM SnmpUtilOidAppend}
 {$EXTERNALSYM SnmpUtilOidNCmp}
@@ -422,9 +372,7 @@ procedure SnmpSvcSetLogType(nLogType: Integer); stdcall;
 {$EXTERNALSYM SnmpSvcGetUptime}
 {$EXTERNALSYM SnmpSvcSetLogLevel}
 {$EXTERNALSYM SnmpSvcSetLogType}
-
 { SNMP Debugging Definitions }
-
 const
   SNMP_LOG_SILENT                 = $0;
   {$EXTERNALSYM SNMP_LOG_SILENT}
@@ -438,7 +386,6 @@ const
   {$EXTERNALSYM SNMP_LOG_TRACE}
   SNMP_LOG_VERBOSE                = $5;
   {$EXTERNALSYM SNMP_LOG_VERBOSE}
-
   SNMP_OUTPUT_TO_CONSOLE          = $1;
   {$EXTERNALSYM SNMP_OUTPUT_TO_CONSOLE}
   SNMP_OUTPUT_TO_LOGFILE          = $2;
@@ -447,30 +394,20 @@ const
   {$EXTERNALSYM SNMP_OUTPUT_TO_EVENTLOG}
   SNMP_OUTPUT_TO_DEBUGGER         = $8;
   {$EXTERNALSYM SNMP_OUTPUT_TO_DEBUGGER}
-
 { SNMP Debugging Prototypes }
-
 {$IFNDEF SNMP_DYNAMIC_LINK}
-
 procedure SnmpUtilDbgPrint(nLogLevel: Integer; szFormat: PAnsiChar); stdcall;
-
 {$ELSE SNMP_DYNAMIC_LINK}
-
 var
   SnmpUtilDbgPrint: procedure (nLogLevel: Integer; szFormat: PAnsiChar); stdcall;
-
 {$ENDIF ~SNMP_DYNAMIC_LINK}
-
 {$EXTERNALSYM SnmpUtilDbgPrint}
-
 { Miscellaneous definitions }
-
 const
   DEFINE_NULLOID: TAsnObjectIdentifier = (idLength: 0; ids: nil);
   {$EXTERNALSYM DEFINE_NULLOID}
   DEFINE_NULLOCTETS: TAsnOctetString = (stream: nil; length: 0; dynamic_: False);
   {$EXTERNALSYM DEFINE_NULLOCTETS}
-
   DEFAULT_SNMP_PORT_UDP       = 161;
   {$EXTERNALSYM DEFAULT_SNMP_PORT_UDP}
   DEFAULT_SNMP_PORT_IPX       = 36879;
@@ -481,9 +418,7 @@ const
   {$EXTERNALSYM DEFAULT_SNMPTRAP_PORT_IPX}
   SNMP_MAX_OID_LEN            = 128;
   {$EXTERNALSYM SNMP_MAX_OID_LEN}
-
 { API Error Code Definitions }
-
   SNMP_MEM_ALLOC_ERROR            = 1;
   {$EXTERNALSYM SNMP_MEM_ALLOC_ERROR}
   SNMP_BERAPI_INVALID_LENGTH      = 10;
@@ -508,81 +443,60 @@ const
   {$EXTERNALSYM SNMP_AUTHAPI_INVALID_MSG_TYPE}
   SNMP_AUTHAPI_TRIV_AUTH_FAILED   = 32;
   {$EXTERNALSYM SNMP_AUTHAPI_TRIV_AUTH_FAILED}
-
 { Support for old definitions (support disabled via SNMPSTRICT) }
-
 {$IFNDEF SNMPSTRICT}
-
 {$IFNDEF SNMP_DYNAMIC_LINK}
-
 var
   SNMP_oidcpy: function (pOidDst: PAsnObjectIdentifier; pOidSrc: PAsnObjectIdentifier): SNMPAPI; stdcall;
   SNMP_oidappend: function (pOidDst: PAsnObjectIdentifier; pOidSrc: PAsnObjectIdentifier): SNMPAPI; stdcall;
   SNMP_oidncmp: function (pOid1, pOid2: PAsnObjectIdentifier; nSubIds: UINT): SNMPAPI; stdcall;
   SNMP_oidcmp: function (pOid1, pOid2: PAsnObjectIdentifier): SNMPAPI; stdcall;
   SNMP_oidfree: procedure (pOid: TAsnObjectIdentifier); stdcall;
-
   SNMP_CopyVarBind: function (pVbDst: PSnmpVarBind; pVbSrc: PSnmpVarBind): SNMPAPI; stdcall;
   SNMP_FreeVarBind: procedure (pVb: PSnmpVarBind); stdcall;
   SNMP_CopyVarBindList: function (pVblDst: PSnmpVarBindList; pVblSrc: PSnmpVarBindList): SNMPAPI; stdcall;
   SNMP_FreeVarBindList: procedure (pVbl: PSnmpVarBindList); stdcall;
-
   SNMP_printany: procedure (pAny: PAsnAny); stdcall;
-
   SNMP_free: procedure (pMem: Pointer); stdcall;
   SNMP_malloc: function (nBytes: UINT): Pointer; stdcall;
   SNMP_realloc: function (pMem: Pointer; nBytes: UINT): Pointer; stdcall;
-
   SNMP_DBG_free: procedure (pMem: Pointer); stdcall;
   SNMP_DBG_malloc: function (nBytes: UINT): Pointer; stdcall;
   SNMP_DBG_realloc: function (pMem: Pointer; nBytes: UINT): Pointer; stdcall;
-
 {$ELSE SNMP_DYNAMIC_LINK}
-
 function SNMP_oidcpy(pOidDst: PAsnObjectIdentifier; pOidSrc: PAsnObjectIdentifier): SNMPAPI; stdcall;
 function SNMP_oidappend(pOidDst: PAsnObjectIdentifier; pOidSrc: PAsnObjectIdentifier): SNMPAPI; stdcall;
 function SNMP_oidncmp(pOid1, pOid2: PAsnObjectIdentifier; nSubIds: UINT): SNMPAPI; stdcall;
 function SNMP_oidcmp(pOid1, pOid2: PAsnObjectIdentifier): SNMPAPI; stdcall;
 procedure SNMP_oidfree(pOid: TAsnObjectIdentifier); stdcall;
-
 function SNMP_CopyVarBind(pVbDst: PSnmpVarBind; pVbSrc: PSnmpVarBind): SNMPAPI; stdcall;
 procedure SNMP_FreeVarBind(pVb: PSnmpVarBind); stdcall;
 function SNMP_CopyVarBindList(pVblDst: PSnmpVarBindList; pVblSrc: PSnmpVarBindList): SNMPAPI; stdcall;
 procedure SNMP_FreeVarBindList(pVbl: PSnmpVarBindList); stdcall;
-
 procedure SNMP_printany(pAny: PAsnAny); stdcall;
-
 procedure SNMP_free(pMem: Pointer); stdcall;
 function SNMP_malloc(nBytes: UINT): Pointer; stdcall;
 function SNMP_realloc(pMem: Pointer; nBytes: UINT): Pointer; stdcall;
-
 procedure SNMP_DBG_free(pMem: Pointer); stdcall;
 function SNMP_DBG_malloc(nBytes: UINT): Pointer; stdcall;
 function SNMP_DBG_realloc(pMem: Pointer; nBytes: UINT): Pointer; stdcall;
-
 {$ENDIF SNMP_DYNAMIC_LINK}
-
 {$EXTERNALSYM SNMP_oidcpy}
 {$EXTERNALSYM SNMP_oidappend}
 {$EXTERNALSYM SNMP_oidncmp}
 {$EXTERNALSYM SNMP_oidcmp}
 {$EXTERNALSYM SNMP_oidfree}
-
 {$EXTERNALSYM SNMP_CopyVarBind}
 {$EXTERNALSYM SNMP_FreeVarBind}
 {$EXTERNALSYM SNMP_CopyVarBindList}
 {$EXTERNALSYM SNMP_FreeVarBindList}
-
 {$EXTERNALSYM SNMP_printany}
-
 {$EXTERNALSYM SNMP_free}
 {$EXTERNALSYM SNMP_malloc}
 {$EXTERNALSYM SNMP_realloc}
-
 {$EXTERNALSYM SNMP_DBG_free}
 {$EXTERNALSYM SNMP_DBG_malloc}
 {$EXTERNALSYM SNMP_DBG_realloc}
-
 const
   ASN_RFC1155_IPADDRESS           = ASN_IPADDRESS;
   {$EXTERNALSYM ASN_RFC1155_IPADDRESS}
@@ -596,7 +510,6 @@ const
   {$EXTERNALSYM ASN_RFC1155_OPAQUE}
   ASN_RFC1213_DISPSTRING          = ASN_OCTETSTRING;
   {$EXTERNALSYM ASN_RFC1213_DISPSTRING}
-
   ASN_RFC1157_GETREQUEST          = SNMP_PDU_GET;
   {$EXTERNALSYM ASN_RFC1157_GETREQUEST}
   ASN_RFC1157_GETNEXTREQUEST      = SNMP_PDU_GETNEXT;
@@ -607,12 +520,10 @@ const
   {$EXTERNALSYM ASN_RFC1157_SETREQUEST}
   ASN_RFC1157_TRAP                = SNMP_PDU_V1TRAP;
   {$EXTERNALSYM ASN_RFC1157_TRAP}
-
   ASN_CONTEXTSPECIFIC             = ASN_CONTEXT;
   {$EXTERNALSYM ASN_CONTEXTSPECIFIC}
   ASN_PRIMATIVE                   = ASN_PRIMITIVE;
   {$EXTERNALSYM ASN_PRIMATIVE}
-
 type
   RFC1157VarBindList              = TSnmpVarBindList;
   {$EXTERNALSYM RFC1157VarBindList}
@@ -624,11 +535,8 @@ type
   {$EXTERNALSYM TAsnCounter}
   TAsnGauge                       = TAsnGauge32;
   {$EXTERNALSYM TAsnGauge}
-
 {$ENDIF ~SNMPSTRICT}
-
 { SNMP Extension API Prototypes }
-
 var
   SnmpExtensionInit: TSnmpExtensionInit;
   {$EXTERNALSYM SnmpExtensionInit}
@@ -644,13 +552,10 @@ var
   {$EXTERNALSYM SnmpExtensionTrap}
   SnmpExtensionClose: TSnmpExtensionClose;
   {$EXTERNALSYM SnmpExtensionClose}
-
 //DOM-IGNORE-END
-
 function SnmpExtensionLoaded: Boolean;
 function LoadSnmpExtension(const LibName: string): Boolean;
 function UnloadSnmpExtension: Boolean;
-
 {$IFDEF SNMP_DYNAMIC_LINK}
 function SnmpLoaded: Boolean;
 {$IFDEF SNMP_DYNAMIC_LINK_EXPLICIT}
@@ -658,7 +563,6 @@ function LoadSnmp: Boolean;
 function UnloadSnmp: Boolean;
 {$ENDIF SNMP_DYNAMIC_LINK_EXPLICIT}
 {$ENDIF SNMP_DYNAMIC_LINK}
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -670,20 +574,15 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 const
   snmpapilib = 'snmpapi.dll';
-
 var
   ExtensionLibHandle: THandle;
-
 function SnmpExtensionLoaded: Boolean;
 begin
   Result := ExtensionLibHandle <> 0;
 end;
-
 function LoadSnmpExtension(const LibName: string): Boolean;
 begin
   Result := UnloadSnmpExtension;
@@ -706,7 +605,6 @@ begin
     end;
   end;
 end;
-
 function UnloadSnmpExtension: Boolean;
 begin
   if SnmpExtensionLoaded then
@@ -724,17 +622,13 @@ begin
   else
     Result := True;
 end;
-
 {$IFDEF SNMP_DYNAMIC_LINK}
-
 var
   SnmpLibHandle: THandle;
-
 function SnmpLoaded: Boolean;
 begin
   Result := SnmpLibHandle <> 0;
 end;
-
 function UnloadSnmp: Boolean;
 begin
   Result := True;
@@ -788,7 +682,6 @@ begin
    {$ENDIF ~SNMPSTRICT}
   end;
 end;
-
 function LoadSnmp: Boolean;
 begin
   Result := SnmpLoaded;
@@ -845,9 +738,7 @@ begin
    end;
   end;
 end;
-
 {$ELSE ~SNMP_DYNAMIC_LINK}
-
 function SnmpUtilOidCpy; external snmpapilib name 'SnmpUtilOidCpy';
 function SnmpUtilOidAppend; external snmpapilib name 'SnmpUtilOidAppend';
 function SnmpUtilOidNCmp; external snmpapilib name 'SnmpUtilOidNCmp';
@@ -874,7 +765,6 @@ function SnmpSvcGetUptime; external snmpapilib name 'SnmpSvcGetUptime';
 procedure SnmpSvcSetLogLevel; external snmpapilib name 'SnmpSvcSetLogLevel';
 procedure SnmpSvcSetLogType; external snmpapilib name 'SnmpSvcSetLogType';
 procedure SnmpUtilDbgPrint; external snmpapilib name 'SnmpUtilDbgPrint';
-
 {$IFNDEF SNMPSTRICT}
 function SNMP_oidcpy; external snmpapilib name 'SnmpUtilOidCpy';
 function SNMP_oidappend; external snmpapilib name 'SnmpUtilOidAppend';
@@ -893,9 +783,7 @@ procedure SNMP_DBG_free; external snmpapilib name 'SnmpUtilMemFree';
 function SNMP_DBG_malloc; external snmpapilib name 'SnmpUtilMemAlloc';
 function SNMP_DBG_realloc; external snmpapilib name 'SnmpUtilMemReAlloc';
 {$ENDIF ~SNMPSTRICT}
-
 {$ENDIF ~SNMP_DYNAMIC_LINK}
-
 procedure InitializeSnmp;
 begin
   {$IFDEF SNMP_DYNAMIC_LINK}
@@ -904,7 +792,6 @@ begin
   {$ENDIF ~SNMP_DYNAMIC_LINK_EXPLICIT}
   {$ENDIF SNMP_DYNAMIC_LINK}
 end;
-
 procedure FinalizeSnmp;
 begin
   {$IFDEF SNMP_DYNAMIC_LINK}
@@ -913,17 +800,14 @@ begin
   {$ENDIF ~SNMP_DYNAMIC_LINK_EXPLICIT}
   {$ENDIF SNMP_DYNAMIC_LINK}
 end;
-
 initialization
   InitializeSnmp;
   {$IFDEF UNITVERSIONING}
   RegisterUnitVersion(HInstance, UnitVersioning);
   {$ENDIF UNITVERSIONING}
-
 finalization
   FinalizeSnmp;
   {$IFDEF UNITVERSIONING}
   UnregisterUnitVersion(HInstance);
   {$ENDIF UNITVERSIONING}
-
 end.

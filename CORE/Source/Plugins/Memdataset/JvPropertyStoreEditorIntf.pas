@@ -1,7 +1,5 @@
 unit JvPropertyStoreEditorIntf;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,10 +22,8 @@ unit JvPropertyStoreEditorIntf;
 }
 
 interface
-
 uses
   Classes;
-
 type
   IJvPropertyEditorHandler = interface
     ['{7DD4CC1F-335E-44F7-AE90-9DB630BF5B31}']
@@ -38,7 +34,6 @@ type
     function EditIntf_DisplayProperty (const PropertyName : string) : Boolean;
     function EditIntf_IsPropertySimple (const PropertyName : string) : Boolean;
   end;
-
   IJvPropertyListEditorHandler = interface
     ['{BC1F664F-867F-4041-B718-0FD76A0CA3E8}']
     function ListEditIntf_ObjectCount : integer;
@@ -50,7 +45,6 @@ type
     function ListEditIntf_CloneNewObject(Index : integer): TPersistent;
     procedure ListEditIntf_DeleteObject (Index : integer);
   end;
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -60,17 +54,13 @@ const
     LogPath: 'JVCL\run'
   );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 
 end.

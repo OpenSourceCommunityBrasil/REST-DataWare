@@ -1,10 +1,7 @@
 unit JclWin32;
-
 interface
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-{$I ..\..\CORE\Source\Includes\windowsonly.inc}
-
+{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\windowsonly.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -26,9 +23,13 @@ interface
  Roniery                    - Devel.
 }
 
+{$IFDEF FPC}
+ {$MODE Delphi}
+ {$ASMMode Intel}
+{$ENDIF}
+
 {$MINENUMSIZE 4}
 {$ALIGN ON}
-
 uses
   {$IFDEF HAS_UNITSCOPE}
   Winapi.Windows, System.SysUtils,
@@ -43,7 +44,6 @@ uses
   ActiveX,
   {$ENDIF ~HAS_UNITSCOPE}
   JclBase;
-
 {$HPPEMIT '#include <WinDef.h>'}
 {$HPPEMIT '#include <WinNT.h>'}
 {$HPPEMIT '#include <WinBase.h>'}
@@ -76,7 +76,6 @@ uses
 {$HPPEMIT '#define IMAGE_LOAD_CONFIG_DIRECTORY64 ::IMAGE_LOAD_CONFIG_DIRECTORY64'}
 {$HPPEMIT ''}
 {$ENDIF RTL230_UP}
-
 // EJclWin32Error
 {$IFDEF MSWINDOWS}
 type
@@ -93,9 +92,7 @@ type
     property LastErrorMsg: string read FLastErrorMsg;
   end;
 {$ENDIF MSWINDOWS}
-
 //DOM-IGNORE-BEGIN
-
 {$I win32api\WinDef.int}
 {$I win32api\WinNT.int}
 {$I win32api\WinBase.int}
@@ -126,76 +123,53 @@ type
 {$I win32api\NtSecApi.int}
 {$I win32api\TlHelp32.int}
 {$I win32api\Winternl.int}
-
 //DOM-IGNORE-END
-
 {$IFDEF MSWINDOWS}
-
 const
   RtdlSetNamedSecurityInfoW: function(pObjectName: LPWSTR; ObjectType: SE_OBJECT_TYPE;
     SecurityInfo: SECURITY_INFORMATION; psidOwner, psidGroup: PSID;
     pDacl, pSacl: PACL): DWORD stdcall = SetNamedSecurityInfoW;
-
   RtdlSetWaitableTimer: function(hTimer: THandle; var lpDueTime: TLargeInteger;
     lPeriod: Longint; pfnCompletionRoutine: TFNTimerAPCRoutine;
     lpArgToCompletionRoutine: Pointer; fResume: BOOL): BOOL stdcall = SetWaitableTimer;
-
   RtdlNetUserAdd: function(servername: LPCWSTR; level: DWORD;
     buf: PByte; parm_err: PDWord): NET_API_STATUS stdcall = NetUserAdd;
-
   RtdlNetUserDel: function(servername: LPCWSTR;
     username: LPCWSTR): NET_API_STATUS stdcall = NetUserDel;
-
   RtdlNetGroupAdd: function(servername: LPCWSTR; level: DWORD; buf: PByte;
     parm_err: PDWord): NET_API_STATUS stdcall = NetGroupAdd;
-
   RtdlNetGroupEnum: function(servername: LPCWSTR; level: DWORD;
     out bufptr: PByte; prefmaxlen: DWORD; out entriesread, totalentries: DWORD;
     resume_handle: PDWORD_PTR): NET_API_STATUS stdcall = NetGroupEnum;
-
   RtdlNetGroupDel: function(servername: LPCWSTR;
     groupname: LPCWSTR): NET_API_STATUS stdcall = NetGroupDel;
-
   RtdlNetLocalGroupAdd: function(servername: LPCWSTR; level: DWORD;
     buf: PByte; parm_err: PDWord): NET_API_STATUS stdcall = NetLocalGroupAdd;
-
   RtdlNetLocalGroupEnum: function(servername: LPCWSTR; level: DWORD;
     out bufptr: PByte; prefmaxlen: DWORD; out entriesread, totalentries: DWORD;
     resumehandle: PDWORD_PTR): NET_API_STATUS stdcall = NetLocalGroupEnum;
-
   RtdlNetLocalGroupDel: function(servername: LPCWSTR;
     groupname: LPCWSTR): NET_API_STATUS stdcall = NetLocalGroupDel;
-
   RtdlNetLocalGroupAddMembers: function(servername: LPCWSTR; groupname: LPCWSTR;
     level: DWORD; buf: PByte;
     totalentries: DWORD): NET_API_STATUS stdcall = NetLocalGroupAddMembers;
-
   RtdlNetApiBufferFree: function(Buffer: Pointer): NET_API_STATUS stdcall = NetApiBufferFree;
-
   RtdlGetCalendarInfoA: function(Locale: LCID; Calendar: CALID; CalType: CALTYPE;
     lpCalData: PAnsiChar; cchData: Integer;
     lpValue: PDWORD): Integer stdcall = GetCalendarInfoA;
-
   RtdlGetCalendarInfoW: function(Locale: LCID; Calendar: CALID; CalType: CALTYPE;
     lpCalData: PWideChar; cchData: Integer;
     lpValue: PDWORD): Integer stdcall = GetCalendarInfoW;
-
   RtdlEnumCalendarInfoExW: function(lpCalInfoEnumProc: TCalInfoEnumProcExW;
     Locale: LCID; Calendar: CALID; CalType: CALTYPE): BOOL stdcall = EnumCalendarInfoExW;
-
   RtdlGetVolumeNameForVolumeMountPointW: function(lpszVolumeMountPoint: LPCWSTR;
     lpszVolumeName: LPWSTR; cchBufferLength: DWORD): BOOL stdcall = GetVolumeNameForVolumeMountPointW;
-
   RtdlSetVolumeMountPointW: function(lpszVolumeMountPoint: LPCWSTR;
     lpszVolumeName: LPCWSTR): BOOL stdcall = SetVolumeMountPointW;
-
   RtdlDeleteVolumeMountPointW: function(lpszVolumeMountPoint: LPCWSTR): BOOL
     stdcall = DeleteVolumeMountPointW;
-
   RtdlNetBios: function(P: PNCB): UCHAR stdcall = NetBios;
-
 {$ENDIF MSWINDOWS}
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -205,12 +179,9 @@ const
     LogPath: 'JCL\source\windows'
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   JclResources;
-
 procedure GetProcedureAddress(var P: Pointer; const ModuleName, ProcName: string);
 var
   ModuleHandle: HMODULE;
@@ -229,41 +200,33 @@ begin
       raise EJclError.CreateResFmt(@RsEFunctionNotFound, [ModuleName, ProcName]);
   end;
 end;
-
 //== { EJclWin32Error } ======================================================
-
 {$IFDEF MSWINDOWS}
-
 constructor EJclWin32Error.Create(const Msg: string);
 begin
   FLastError := GetLastError;
   FLastErrorMsg := SysErrorMessage(FLastError);
   inherited CreateResFmt(@RsWin32Error, [FLastErrorMsg, FLastError, NativeLineBreak, Msg]);
 end;
-
 constructor EJclWin32Error.CreateFmt(const Msg: string; const Args: array of const);
 begin
   FLastError := GetLastError;
   FLastErrorMsg := SysErrorMessage(FLastError);
   inherited CreateResFmt(@RsWin32Error, [FLastErrorMsg, FLastError, NativeLineBreak, Format(Msg, Args)]);
 end;
-
 constructor EJclWin32Error.CreateRes(Ident: Integer);
 begin
   FLastError := GetLastError;
   FLastErrorMsg := SysErrorMessage(FLastError);
   inherited CreateResFmt(@RsWin32Error, [FLastErrorMsg, FLastError, NativeLineBreak, LoadStr(Ident)]);
 end;
-
 constructor EJclWin32Error.CreateRes(ResStringRec: PResStringRec);
 begin
   FLastError := GetLastError;
   FLastErrorMsg := SysErrorMessage(FLastError);
   inherited CreateResFmt(@RsWin32Error, [FLastErrorMsg, FLastError, NativeLineBreak, LoadResString(ResStringRec)]);
 end;
-
 {$ENDIF MSWINDOWS}
-
 {$I win32api\AclApi.imp}
 {$I win32api\ImageHlp.imp}
 {$I win32api\IoAPI.imp}
@@ -281,16 +244,11 @@ end;
 {$I win32api\NtSecApi.imp}
 {$I win32api\TlHelp32.imp}
 {$I win32api\Winternl.imp}
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.
-
-
 

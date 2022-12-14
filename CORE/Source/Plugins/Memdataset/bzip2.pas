@@ -1,7 +1,5 @@
 unit bzip2;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,39 +22,30 @@ unit bzip2;
 }
 
 interface
-
 uses
   JclBase,
   JclSysUtils;
-
 //DOM-IGNORE-BEGIN
-
 {
 /*-------------------------------------------------------------*/
 /*--- Public header file for the library.                   ---*/
 /*---                                               bzlib.h ---*/
 /*-------------------------------------------------------------*/
-
 /* ------------------------------------------------------------------
    This file is part of bzip2/libbzip2, a program and library for
    lossless, block-sorting data compression.
-
    bzip2/libbzip2 version 1.0.4 of 20 December 2006
    Copyright (C) 1996-2006 Julian Seward <jseward@bzip.org>
-
    Please read the WARNING, DISCLAIMER and PATENTS sections in the
    README file.
-
    This program is released under the terms of the license contained
    in the file LICENSE.
    ------------------------------------------------------------------ */
 }
-
 const
   BZ_RUN              = 0;
   BZ_FLUSH            = 1;
   BZ_FINISH           = 2;
-
   BZ_OK               = 0;
   BZ_RUN_OK           = 1;
   BZ_FLUSH_OK         = 2;
@@ -71,47 +60,37 @@ const
   BZ_UNEXPECTED_EOF   = -7;
   BZ_OUTBUFF_FULL     = -8;
   BZ_CONFIG_ERROR     = -9;
-
 type
    bz_stream = record
       next_in: PByte;
       avail_in: Cardinal;
       total_in_lo32: Cardinal;
       total_in_hi32: Cardinal;
-
       next_out: PByte;
       avail_out: Cardinal;
       total_out_lo32: Cardinal;
       total_out_hi32: Cardinal;
-
       state: Pointer;
-
       bzalloc: function (opaque: Pointer; n, m: Integer): Pointer; cdecl; // returns n*m bytes
       bzfree: procedure (opaque, p: Pointer); cdecl; // free p
       opaque: Pointer;
    end;
-
 {$IFNDEF BZIP2_LINKONREQUEST}
 //-- Core (low-level) library functions --
-
 //function BZ2_bzCompressInit(var strm: bz_stream;
 //  blockSize100k, verbosity, workFactor: Integer): Integer;
 //  {$IFDEF BZIP2_EXPORT_STDCALL}stdcall;{$ENDIF BZIP2_EXPORT_STDCALL}
 //  {$IFDEF BZIP2_EXPORT_CDECL}cdecl;{$ENDIF BZIP2_EXPORT_CDECL}
-
 //function BZ2_bzCompress(var strm: bz_stream; action: Integer): Integer;
 //  {$IFDEF BZIP2_EXPORT_STDCALL}stdcall;{$ENDIF BZIP2_EXPORT_STDCALL}
 //  {$IFDEF BZIP2_EXPORT_CDECL}cdecl;{$ENDIF BZIP2_EXPORT_CDECL}
-
 //function BZ2_bzCompressEnd(var strm: bz_stream): Integer;
 //  {$IFDEF BZIP2_EXPORT_STDCALL}stdcall;{$ENDIF BZIP2_EXPORT_STDCALL}
 //  {$IFDEF BZIP2_EXPORT_CDECL}cdecl;{$ENDIF BZIP2_EXPORT_CDECL}
-
 //function BZ2_bzDecompressInit(var strm: bz_stream;
 //  verbosity, small: Integer): Integer;
 //  {$IFDEF BZIP2_EXPORT_STDCALL}stdcall;{$ENDIF BZIP2_EXPORT_STDCALL}
 //  {$IFDEF BZIP2_EXPORT_CDECL}cdecl;{$ENDIF BZIP2_EXPORT_CDECL}
-
 //function BZ2_bzDecompress(var strm: bz_stream): Integer;
 //  {$IFDEF BZIP2_EXPORT_STDCALL}stdcall;{$ENDIF BZIP2_EXPORT_STDCALL}
 //  {$IFDEF BZIP2_EXPORT_CDECL}cdecl;{$ENDIF BZIP2_EXPORT_CDECL}
@@ -119,19 +98,13 @@ type
 //function BZ2_bzDecompressEnd(var strm: bz_stream): Integer;
 //  {$IFDEF BZIP2_EXPORT_STDCALL}stdcall;{$ENDIF BZIP2_EXPORT_STDCALL}
 //  {$IFDEF BZIP2_EXPORT_CDECL}cdecl;{$ENDIF BZIP2_EXPORT_CDECL}
-
 //-- High(er) level library functions --
-
 type
   BZFILE = Pointer;
-
 // TODO: no stdio for static link (problems while linking stdin/stdout/stderr)
-
 {#ifndef BZ_NO_STDIO
 #define BZ_MAX_UNUSED 5000
-
 typedef void BZFILE;
-
 BZ_EXTERN BZFILE* BZ_API(BZ2_bzReadOpen) ( 
       int*  bzerror,   
       FILE* f, 
@@ -140,26 +113,22 @@ BZ_EXTERN BZFILE* BZ_API(BZ2_bzReadOpen) (
       void* unused,    
       int   nUnused 
    );
-
 BZ_EXTERN void BZ_API(BZ2_bzReadClose) ( 
       int*    bzerror, 
       BZFILE* b 
    );
-
 BZ_EXTERN void BZ_API(BZ2_bzReadGetUnused) ( 
       int*    bzerror, 
       BZFILE* b, 
       void**  unused,  
       int*    nUnused 
    );
-
 BZ_EXTERN int BZ_API(BZ2_bzRead) ( 
       int*    bzerror, 
       BZFILE* b, 
       void*   buf, 
       int     len 
    );
-
 BZ_EXTERN BZFILE* BZ_API(BZ2_bzWriteOpen) ( 
       int*  bzerror,      
       FILE* f, 
@@ -167,14 +136,12 @@ BZ_EXTERN BZFILE* BZ_API(BZ2_bzWriteOpen) (
       int   verbosity, 
       int   workFactor 
    );
-
 BZ_EXTERN void BZ_API(BZ2_bzWrite) ( 
       int*    bzerror, 
       BZFILE* b, 
       void*   buf, 
       int     len 
    );
-
 BZ_EXTERN void BZ_API(BZ2_bzWriteClose) ( 
       int*          bzerror, 
       BZFILE*       b, 
@@ -182,7 +149,6 @@ BZ_EXTERN void BZ_API(BZ2_bzWriteClose) (
       unsigned int* nbytes_in, 
       unsigned int* nbytes_out 
    );
-
 BZ_EXTERN void BZ_API(BZ2_bzWriteClose64) ( 
       int*          bzerror, 
       BZFILE*       b, 
@@ -194,19 +160,15 @@ BZ_EXTERN void BZ_API(BZ2_bzWriteClose64) (
    );
 #endif}
 
-
 //- Utility functions --
-
 //function BZ2_bzBuffToBuffCompress(dest: PByte; destLen: PCardinal; source: PByte;
 //  sourceLen: Cardinal; blockSize100k, verbosity, workFactor: Integer): Integer;
 //  {$IFDEF BZIP2_EXPORT_STDCALL}stdcall;{$ENDIF BZIP2_EXPORT_STDCALL}
 //  {$IFDEF BZIP2_EXPORT_CDECL}cdecl;{$ENDIF BZIP2_EXPORT_CDECL}
-
 //function BZ2_bzBuffToBuffDecompress(dest: PByte; destLen: PCardinal; source: PByte;
 //  sourceLen: Cardinal; small, verbosity: Integer): Integer;
 //  {$IFDEF BZIP2_EXPORT_STDCALL}stdcall;{$ENDIF BZIP2_EXPORT_STDCALL}
 //  {$IFDEF BZIP2_EXPORT_CDECL}cdecl;{$ENDIF BZIP2_EXPORT_CDECL}
-
 {
 /*--
    Code contributed by Yoshioka Tsuneo (tsuneo@rr.iij4u.or.jp)
@@ -217,28 +179,19 @@ BZ_EXTERN void BZ_API(BZ2_bzWriteClose64) (
    If this code breaks, please contact both Yoshioka and me.
 --*/
 }
-
 //function BZ2_bzlibVersion: PAnsiChar;
 //  {$IFDEF BZIP2_EXPORT_STDCALL}stdcall;{$ENDIF BZIP2_EXPORT_STDCALL}
 //  {$IFDEF BZIP2_EXPORT_CDECL}cdecl;{$ENDIF BZIP2_EXPORT_CDECL}
-
 // no STDIO (see above)
 {
 function BZ2_bzopen(path, mode: PChar): BZFILE;
-
 function BZ2_bzdopen(fd: Integer; mode: PChar): BZFILE;
-
 function BZ2_bzread(b: BZFILE; buf: Pointer; len: Integer): Integer;
-
 function BZ2_bzwrite(b: BZFILE; buf: Pointer; len: Integer): Integer;
-
 function BZ2_bzflush(b: BZFILE): Integer;
-
 procedure BZ2_bzclose(b: BZFILE);
-
 function BZ2_bzerror(b: BZFILE; errnum: PInteger): PChar;
 }
-
 {$ELSE BZIP2_LINKONREQUEST}
 type
   BZ2_bzCompressInit_func = function(var strm: bz_stream;
@@ -274,7 +227,6 @@ type
   BZ2_bzlibVersion_func = function: PAnsiChar;
     {$IFDEF BZIP2_EXPORT_STDCALL}stdcall;{$ENDIF BZIP2_EXPORT_STDCALL}
     {$IFDEF BZIP2_EXPORT_CDECL}cdecl;{$ENDIF BZIP2_EXPORT_CDECL}
-
 var
   BZ2_bzCompressInit: BZ2_bzCompressInit_func = nil;
   BZ2_bzCompress: BZ2_bzCompress_func = nil;
@@ -286,12 +238,9 @@ var
   BZ2_bzBuffToBuffDecompress: BZ2_bzBuffToBuffDecompress_func = nil;
   BZ2_bzlibVersion: BZ2_bzlibVersion_func = nil;
 {$ENDIF BZIP2_LINKONREQUEST}
-
 var
   bz2_internal_error_event: procedure(errcode: Integer) of object = nil;
-
 //DOM-IGNORE-END
-
 const
   {$IFDEF MSWINDOWS}
   BZip2DefaultLibraryName = 'bzip2.dll'; // from http://gnuwin32.sourceforge.net/
@@ -308,7 +257,6 @@ const
   BZip2BuffToBuffCompressDefaultExportName = 'BZ2_bzBuffToBuffCompress';
   BZip2BuffToBuffDecompressDefaultExportName = 'BZ2_bzBuffToBuffDecompress';
   BZip2LibVersionDefaultExportName = 'BZ2_bzlibVersion';
-
 {$IFDEF BZIP2_LINKONREQUEST}
 var
   BZip2LibraryName: string = BZip2DefaultLibraryName;
@@ -323,11 +271,9 @@ var
   BZip2LibVersionExportName: string = BZip2LibVersionDefaultExportName;
   BZip2LibraryHandle: TModuleHandle = INVALID_MODULEHANDLE_VALUE;
 {$ENDIF BZIP2_LINKONREQUEST}
-
 function LoadBZip2: Boolean;
 function IsBZip2Loaded: Boolean;
 procedure UnloadBZip2;
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -339,9 +285,7 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   {$IFDEF HAS_UNITSCOPE}
   {$IFDEF BZIP2_LINKONREQUEST}
@@ -366,7 +310,6 @@ uses
   {$ENDIF HAS_UNIT_LIBC}
   SysUtils;
   {$ENDIF ~HAS_UNITSCOPE}
-
 {$IFDEF BZIP2_STATICLINK}
 function BZ2_bzCompressInit; external;
 function BZ2_bzCompress; external;
@@ -389,7 +332,6 @@ function _BZ2_indexIntoF: Pointer;
 {$IFDEF CPU64}
 function BZ2_indexIntoF: Pointer; external;
 {$ENDIF CPU64}
-
 {$IFDEF CPU32}
 {$LINK ..\windows\obj\bzip2\win32\bzlib.obj}
 {$LINK ..\windows\obj\bzip2\win32\randtable.obj}
@@ -408,7 +350,6 @@ function BZ2_indexIntoF: Pointer; external;
 {$LINK ..\windows\obj\bzip2\win64\huffman.obj}
 {$LINK ..\windows\obj\bzip2\win64\blocksort.obj}
 {$ENDIF CPU64}
-
 {$IFDEF CPU32}
 function _malloc(size: Longint): Pointer; cdecl;
 {$ENDIF CPU32}
@@ -418,7 +359,6 @@ function malloc(size: SizeInt): Pointer;
 begin
   GetMem(Result, Size);
 end;
-
 {$IFDEF CPU32}
 procedure _free(pBlock: Pointer); cdecl;
 {$ENDIF CPU32}
@@ -428,7 +368,6 @@ procedure free(pBlock: Pointer);
 begin
   FreeMem(pBlock);
 end;
-
 {$IFDEF CPU32}
 procedure _bz_internal_error(errcode: Integer); cdecl;
 {$ENDIF CPU32}
@@ -439,9 +378,7 @@ begin
   if Assigned(bz2_internal_error_event) then
     bz2_internal_error_event(errcode);
 end;
-
 {$ENDIF BZIP2_STATICLINK}
-
 {$IFDEF BZIP2_LINKDLL}
 function BZ2_bzCompressInit; external BZip2DefaultLibraryName name BZip2CompressInitDefaultExportName;
 function BZ2_bzCompress; external BZip2DefaultLibraryName name BZip2CompressDefaultExportName;
@@ -453,14 +390,12 @@ function BZ2_bzBuffToBuffCompress; external BZip2DefaultLibraryName name BZip2Bu
 function BZ2_bzBuffToBuffDecompress; external BZip2DefaultLibraryName name BZip2BuffToBuffDecompressDefaultExportName;
 function BZ2_bzlibVersion; external BZip2DefaultLibraryName name BZip2LibVersionDefaultExportName;
 {$ENDIF BZIP2_LINKDLL}
-
 function LoadBZip2: Boolean;
 {$IFDEF BZIP2_LINKONREQUEST}
 begin
   Result := BZip2LibraryHandle <> INVALID_MODULEHANDLE_VALUE;
   if Result then
     Exit;
-
   Result := JclSysUtils.LoadModule(BZip2LibraryHandle, BZip2LibraryName);
   if Result then
   begin
@@ -480,7 +415,6 @@ begin
   Result := True;
 end;
 {$ENDIF ~BZIP2_LINKONREQUEST}
-
 function IsBZip2Loaded: Boolean;
 begin
   {$IFDEF BZIP2_LINKONREQUEST}
@@ -489,20 +423,16 @@ begin
   Result := True;
   {$ENDIF ~BZIP2_LINKONREQUEST}
 end;
-
 procedure UnloadBZip2;
 begin
   {$IFDEF BZIP2_LINKONREQUEST}
   JclSysUtils.UnloadModule(BZip2LibraryHandle);
   {$ENDIF BZIP2_LINKONREQUEST}
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.

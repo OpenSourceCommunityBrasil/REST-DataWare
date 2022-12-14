@@ -1,7 +1,5 @@
 unit JclCharsets;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,26 +22,21 @@ unit JclCharsets;
 }
 
 interface
-
 uses
   {$IFDEF UNITVERSIONING}
   JclUnitVersioning,
   {$ENDIF UNITVERSIONING}
   JclBase;
-
 type
   EJclCharsetError = class(EJclError);
-
 const
   CP_UTF16LE = 1200;
-
 type
   TJclCharsetInfo = record
     Name: string;
     CodePage: Word;
     FamilyCodePage: Word;
   end;
-
 const JclCharsetInfos: array [0..285] of TJclCharsetInfo =
 (* Arabic (ASMO 708) ASMO-708 708 1256 *)
     ((Name: 'ASMO-708'; CodePage: 708; FamilyCodePage: 1256),
@@ -449,13 +442,11 @@ const JclCharsetInfos: array [0..285] of TJclCharsetInfo =
      (Name: 'us'; CodePage: 1252; FamilyCodePage: 1252),
      (Name: 'us-ascii'; CodePage: 1252; FamilyCodePage: 1252),
      (Name: 'x-ansi'; CodePage: 1252; FamilyCodePage: 1252) );
-
 function FamilyCodePageFromCharsetName(const CharsetName: string): Word;
 function FamilyCodePageFromCodePage(CodePage: Word): Word;
 function CodePageFromCharsetName(const CharsetName: string): Word;
 function CharsetInfoFromCharsetName(const CharsetName: string): TJclCharsetInfo;
 function CharsetNameFromCodePage(CodePage: Word): string;
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -467,9 +458,7 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   {$IFDEF HAS_UNITSCOPE}
   System.SysUtils,
@@ -477,7 +466,6 @@ uses
   SysUtils,
   {$ENDIF ~HAS_UNITSCOPE}
   JclResources;
-
 function FamilyCodePageFromCharsetName(const CharsetName: string): Word;
 var
   Index: Integer;
@@ -492,7 +480,6 @@ begin
   end;
   raise EJclCharsetError.CreateRes(@RsENoCharset);
 end;
-
 function CodePageFromCharsetName(const CharsetName: string): Word;
 var
   Index: Integer;
@@ -507,7 +494,6 @@ begin
   end;
   raise EJclCharsetError.CreateRes(@RsENoCharset);
 end;
-
 function CharsetInfoFromCharsetName(const CharsetName: string): TJclCharsetInfo;
 var
   Index: Integer;
@@ -522,7 +508,6 @@ begin
   end;
   raise EJclCharsetError.CreateRes(@RsENoCharset);
 end;
-
 function FamilyCodePageFromCodePage(CodePage: Word): Word;
 var
   Index: Integer;
@@ -535,7 +520,6 @@ begin
   end;
   raise EJclCharsetError.CreateRes(@RsENoCharset);
 end;
-
 function CharsetNameFromCodePage(CodePage: Word): string;
 var
   Index: Integer;
@@ -548,14 +532,10 @@ begin
   end;
   raise EJclCharsetError.CreateRes(@RsENoCharset);
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.
-

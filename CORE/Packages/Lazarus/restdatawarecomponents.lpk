@@ -32,7 +32,7 @@
     <Description Value="The proposal was fulfilled. REST DW was created to facilitate the creation of CRUDs in the same model that we created applications for Client / Server Database. Today, being able to write data to a bank via WebService is too complex for simple operations, making scheduling of simple screens time-consuming. With REST Dataware, you no longer have to worry about creating SQL Insertion, Deletion, Read, and Execution methods via Webservice; Simply add a RESTDataBase connection component and add a RESTClientSQL component that will already have your SQL solution fully functional as you did back in the day and with all the power of modern REST / JSON technology with data compression and everything the language can offer. Have fun."/>
     <License Value="GPL- 3.0"/>
     <Version Major="2" Minor="1"/>
-    <Files Count="83">
+    <Files Count="84">
       <Item1>
         <Filename Value="restdatawarecomponents.lrs"/>
         <Type Value="LRS"/>
@@ -302,69 +302,73 @@
         <UnitName Value="uRESTDWBase64"/>
       </Item67>
       <Item68>
-        <Filename Value="..\..\Source\utils\uRESTDWCharset.pas"/>
-        <UnitName Value="uRESTDWCharset"/>
+        <Filename Value="..\..\Source\utils\uRESTDWDynamic.pas"/>
+        <UnitName Value="uRESTDWDynamic"/>
       </Item68>
       <Item69>
         <Filename Value="..\..\Source\utils\uRESTDWDynamic.pas"/>
         <UnitName Value="uRESTDWDynamic"/>
       </Item69>
       <Item70>
-        <Filename Value="..\..\Source\utils\uRESTDWDynamic.pas"/>
-        <UnitName Value="uRESTDWDynamic"/>
-      </Item70>
-      <Item71>
         <Filename Value="..\..\Source\utils\uRESTDWJSONObject.pas"/>
         <UnitName Value="uRESTDWJSONObject"/>
-      </Item71>
-      <Item72>
+      </Item70>
+      <Item71>
         <Filename Value="..\..\Source\utils\uRESTDWMassiveBuffer.pas"/>
         <UnitName Value="uRESTDWMassiveBuffer"/>
-      </Item72>
-      <Item73>
+      </Item71>
+      <Item72>
         <Filename Value="..\..\Source\utils\uRESTDWMD5.pas"/>
         <UnitName Value="uRESTDWMD5"/>
-      </Item73>
-      <Item74>
+      </Item72>
+      <Item73>
         <Filename Value="..\..\Source\utils\uRESTDWTools.pas"/>
         <UnitName Value="uRESTDWTools"/>
-      </Item74>
-      <Item75>
-        <Filename Value="..\..\Source\utils\uzliblaz.pas"/>
-        <UnitName Value="uZlibLaz"/>
-      </Item75>
-      <Item76>
+      </Item73>
+      <Item74>
         <Filename Value="..\..\Source\utils\JSON\uRESTDWDataJSON.pas"/>
         <UnitName Value="uRESTDWDataJSON"/>
-      </Item76>
-      <Item77>
+      </Item74>
+      <Item75>
         <Filename Value="..\..\Source\utils\JSON\uRESTDWDynArray.pas"/>
         <UnitName Value="uRESTDWDynArray"/>
-      </Item77>
-      <Item78>
+      </Item75>
+      <Item76>
         <Filename Value="..\..\Source\utils\JSON\uRESTDWJSON.pas"/>
         <UnitName Value="uRESTDWJSON"/>
-      </Item78>
-      <Item79>
+      </Item76>
+      <Item77>
         <Filename Value="..\..\Source\utils\JSON\uRESTDWJSONInterface.pas"/>
         <UnitName Value="uRESTDWJSONInterface"/>
-      </Item79>
-      <Item80>
+      </Item77>
+      <Item78>
         <Filename Value="..\..\Source\utils\JSON\uRESTDWSerialize.pas"/>
         <UnitName Value="uRESTDWSerialize"/>
-      </Item80>
-      <Item81>
+      </Item78>
+      <Item79>
         <Filename Value="..\..\Source\utils\uRESTDWMimeTypes.pas"/>
         <UnitName Value="uRESTDWMimeTypes"/>
-      </Item81>
-      <Item82>
+      </Item79>
+      <Item80>
         <Filename Value="..\..\Source\Basic\Dialogs\uRESTDWAbout.pas"/>
         <UnitName Value="uRESTDWAbout"/>
+      </Item80>
+      <Item81>
+        <Filename Value="..\..\Source\utils\uRESTDWZlib.pas"/>
+        <UnitName Value="uRESTDWZlib"/>
+      </Item81>
+      <Item82>
+        <Filename Value="..\..\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas"/>
+        <UnitName Value="uRESTDWMemoryDataset"/>
       </Item82>
       <Item83>
-        <Filename Value="..\..\Source\Plugins\Memdataset\uRESTDWCustom.pas"/>
-        <UnitName Value="uRESTDWCustom"/>
+        <Filename Value="..\..\Source\Includes\unixonly.inc"/>
+        <Type Value="Include"/>
       </Item83>
+      <Item84>
+        <Filename Value="..\..\Source\Includes\windowsonly.inc"/>
+        <Type Value="Include"/>
+      </Item84>
     </Files>
     <CompatibilityMode Value="True"/>
     <RequiredPkgs Count="3">
@@ -379,7 +383,6 @@
       </Item3>
     </RequiredPkgs>
     <UsageOptions>
-      <LibraryPath Value="..\..\Source\static\$(TargetCPU)-$(TargetOS)"/>
       <UnitPath Value="$(PkgOutDir)"/>
     </UsageOptions>
     <PublishOptions>

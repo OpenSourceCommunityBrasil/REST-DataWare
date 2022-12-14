@@ -1,7 +1,6 @@
 unit JclAnsiStrings;
 
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -23,8 +22,12 @@ unit JclAnsiStrings;
  Roniery                    - Devel.
 }
 
-interface
+{$IFDEF FPC}
+ {$MODE Delphi}
+ {$ASMMode Intel}
+{$ENDIF}
 
+interface
 uses
   {$IFDEF HAS_UNITSCOPE}
   {$IFDEF MSWINDOWS}
@@ -44,13 +47,10 @@ uses
   {$ENDIF HAS_UNIT_ANSISTRINGS}
   {$ENDIF ~HAS_UNITSCOPE}
   JclBase;
-
 // Ansi types
-
 type
   {$IFDEF SUPPORTS_UNICODE}
   TJclAnsiStringList = class;
-
   // Codegear should be the one providing this class, in the AnsiStrings unit.
   // It has been requested in QC 65630 but this was closed as "won't do".
   // So we are providing here a very light implementation that is designed
@@ -78,15 +78,12 @@ type
     procedure SetValueFromIndex(Index: Integer; const Value: AnsiString);
   protected
     procedure AssignTo(Dest: TPersistent); override;
-
     procedure Error(const Msg: string; Data: Integer); overload;
     procedure Error(Msg: PResStringRec; Data: Integer); overload;
-
     function GetString(Index: Integer): AnsiString; virtual; abstract;
     procedure SetString(Index: Integer; const Value: AnsiString); virtual; abstract;
     function GetObject(Index: Integer): TObject; virtual; abstract;
     procedure SetObject(Index: Integer; AObject: TObject); virtual; abstract;
-
     function GetCapacity: Integer; virtual;
     procedure SetCapacity(const Value: Integer); virtual;
     function GetCount: Integer; virtual; abstract;
@@ -95,9 +92,7 @@ type
     property UpdateCount: Integer read FUpdateCount;
   public
     constructor Create;
-
     procedure Assign(Source: TPersistent); override;
-
     function Add(const S: AnsiString): Integer; virtual;
     function AddObject(const S: AnsiString; AObject: TObject): Integer; virtual; abstract;
     procedure AddStrings(Strings: TJclAnsiStrings); virtual;
@@ -115,13 +110,11 @@ type
     function IndexOfName(const Name: AnsiString): Integer; virtual;
     function IndexOfObject(AObject: TObject): Integer; virtual;
     procedure Exchange(Index1, Index2: Integer); virtual;
-
     property Delimiter: AnsiChar read FDelimiter write FDelimiter;
     property DelimitedText: AnsiString read GetDelimitedText write SetDelimitedText;
     property CommaText: AnsiString read GetCommaText write SetCommaText;
     property StrictDelimiter: Boolean read FStrictDelimiter write FStrictDelimiter;
     property QuoteChar: AnsiChar read FQuoteChar write FQuoteChar;
-
     property Strings[Index: Integer]: AnsiString read GetString write SetString; default;
     property Objects[Index: Integer]: TObject read GetObject write SetObject;
     property Text: AnsiString read GetText write SetText;
@@ -132,14 +125,11 @@ type
     property ValueFromIndex[Index: Integer]: AnsiString read GetValueFromIndex write SetValueFromIndex;
     property NameValueSeparator: AnsiChar read FNameValueSeparator write FNameValueSeparator;
   end;
-
   TJclAnsiStringListSortCompare = function(List: TJclAnsiStringList; Index1, Index2: Integer): Integer;
-
   TJclAnsiStringObjectHolder = record
     Str: AnsiString;
     Obj: TObject;
   end;
-
   TJclAnsiStringList = class(TJclAnsiStrings)
   private
     FStrings: array of TJclAnsiStringObjectHolder;
@@ -163,13 +153,11 @@ type
     function GetCount: Integer; override;
     function CompareStrings(const S1, S2: AnsiString): Integer; override;
     procedure SetUpdateState(Updating: Boolean); override;
-
     procedure Changed; virtual;
     procedure Changing; virtual;
   public
     constructor Create;
     destructor Destroy; override;
-
     function AddObject(const S: AnsiString; AObject: TObject): Integer; override;
     procedure Assign(Source: TPersistent); override;
     procedure InsertObject(Index: Integer; const S: AnsiString; AObject: TObject); override;
@@ -178,11 +166,9 @@ type
     procedure CustomSort(Compare: TJclAnsiStringListSortCompare); virtual;
     procedure Sort; virtual;
     procedure Clear; override;
-
     property CaseSensitive: Boolean read FCaseSensitive write FCaseSensitive;
     property Duplicates: TDuplicates read FDuplicates write FDuplicates;
     property Sorted: Boolean read FSorted write SetSorted;
-
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
   end;
@@ -190,17 +176,13 @@ type
   TJclAnsiStrings = Classes.TStrings;
   TJclAnsiStringList = Classes.TStringList;
   {$ENDIF ~SUPPORTS_UNICODE}
-
   TAnsiStrings = TJclAnsiStrings;
   TAnsiStringList = TJclAnsiStringList;
-
 // Exceptions
 type
   EJclAnsiStringError = class(EJclError);
   EJclAnsiStringListError = class(EJclAnsiStringError);
-
 // Character constants and sets
-
 const
   // Misc. often used character definitions
   AnsiNull           = AnsiChar(#0);
@@ -240,22 +222,17 @@ const
   AnsiComma          = AnsiChar(',');
   AnsiBackslash      = AnsiChar('\');
   AnsiForwardSlash   = AnsiChar('/');
-
   AnsiDoubleQuote = AnsiChar('"');
   AnsiSingleQuote = AnsiChar('''');
-
   {$IFDEF MSWINDOWS}
   AnsiLineBreak = AnsiCrLf;
   {$ENDIF MSWINDOWS}
   {$IFDEF UNIX}
   AnsiLineBreak = AnsiLineFeed;
   {$ENDIF UNIX}
-
   AnsiSignMinus = AnsiChar('-');
   AnsiSignPlus  = AnsiChar('+');
-
   // Misc. character sets
-
   AnsiWhiteSpace             = [AnsiTab, AnsiLineFeed, AnsiVerticalTab,
     AnsiFormFeed, AnsiCarriageReturn, AnsiSpace];
   AnsiSigns                  = [AnsiSignMinus, AnsiSignPlus];
@@ -266,7 +243,6 @@ const
   AnsiOctDigits              = ['0'..'7'];
   AnsiHexDigits              = ['0'..'9', 'A'..'F', 'a'..'f'];
   AnsiValidIdentifierLetters = ['0'..'9', 'A'..'Z', 'a'..'z', '_'];
-
 const
   // CharType return values
   C1_UPPER  = $0001; // Uppercase
@@ -278,7 +254,6 @@ const
   C1_BLANK  = $0040; // Blank characters
   C1_XDIGIT = $0080; // Hexadecimal digits
   C1_ALPHA  = $0100; // Any linguistic character: alphabetic, syllabary, or ideographic
-
   {$IFDEF MSWINDOWS}
   {$IFDEF SUPPORTS_EXTSYM}
   {$EXTERNALSYM C1_UPPER}
@@ -292,7 +267,6 @@ const
   {$EXTERNALSYM C1_ALPHA}
   {$ENDIF SUPPORTS_EXTSYM}
   {$ENDIF MSWINDOWS}
-
 // String Test Routines
 function StrIsAlpha(const S: AnsiString): Boolean;
 function StrIsAlphaNum(const S: AnsiString): Boolean;
@@ -302,7 +276,6 @@ function StrConsistsOfNumberChars(const S: AnsiString): Boolean;
 function StrIsDigit(const S: AnsiString): Boolean;
 function StrIsSubset(const S: AnsiString; const ValidChars: TSysCharSet): Boolean;
 function StrSame(const S1, S2: AnsiString): Boolean;
-
 // String Transformation Routines
 function StrCenter(const S: AnsiString; L: SizeInt; C: AnsiChar = ' '): AnsiString;
 function StrCharPosLower(const S: AnsiString; CharPos: SizeInt): AnsiString;
@@ -349,19 +322,16 @@ function StrTrimQuotes(const S: AnsiString; QuoteChar: AnsiChar): AnsiString; ov
 function StrUpper(const S: AnsiString): AnsiString;
 procedure StrUpperInPlace(var S: AnsiString);
 procedure StrUpperBuff(S: PAnsiChar);
-
 {$IFDEF MSWINDOWS}
 function StrOemToAnsi(const S: AnsiString): AnsiString;
 function StrAnsiToOem(const S: AnsiString): AnsiString;
 {$ENDIF MSWINDOWS}
-
 // String Management
 procedure StrAddRef(var S: AnsiString);
 procedure StrDecRef(var S: AnsiString);
 function StrLength(const S: AnsiString): Longint;
 function StrRefCount(const S: AnsiString): Longint;
 procedure StrResetLength(var S: AnsiString);
-
 // String Search and Replace Routines
 function StrCharCount(const S: AnsiString; C: AnsiChar): SizeInt;
 function StrCharsCount(const S: AnsiString; Chars: TSysCharSet): SizeInt;
@@ -389,7 +359,6 @@ function StrNPos(const S, SubStr: AnsiString; N: SizeInt): SizeInt;
 function StrPrefixIndex(const S: AnsiString; const Prefixes: array of AnsiString): SizeInt;
 function StrSearch(const Substr, S: AnsiString; const Index: SizeInt = 1): SizeInt;
 function StrSuffixIndex(const S: AnsiString; const Suffixes: array of AnsiString): SizeInt;
-
 // String Extraction
 // String Extraction
 // Returns the String before SubStr
@@ -411,7 +380,6 @@ function StrMid(const S: AnsiString; Start, Count: SizeInt): AnsiString;
 function StrRestOf(const S: AnsiString; N: SizeInt): AnsiString;
 /// Returns the right Count characters of the AnsiString
 function StrRight(const S: AnsiString; Count: SizeInt): AnsiString;
-
 // Character Test Routines
 function CharEqualNoCase(const C1, C2: AnsiChar): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
 function CharIsAlpha(const C: AnsiChar): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
@@ -434,39 +402,32 @@ function CharIsValidIdentifierLetter(const C: AnsiChar): Boolean; {$IFDEF SUPPOR
 function CharIsWhiteSpace(const C: AnsiChar): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
 function CharIsWildcard(const C: AnsiChar): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
 function CharType(const C: AnsiChar): Word;
-
 // Character Transformation Routines
 function CharHex(const C: AnsiChar): Byte;
 function CharLower(const C: AnsiChar): AnsiChar;
 function CharUpper(const C: AnsiChar): AnsiChar;
 function CharToggleCase(const C: AnsiChar): AnsiChar;
-
 // Character Search and Replace
 function CharPos(const S: AnsiString; const C: AnsiChar; const Index: SizeInt = 1): SizeInt;
 function CharLastPos(const S: AnsiString; const C: AnsiChar; const Index: SizeInt = 1): SizeInt;
 function CharIPos(const S: AnsiString; C: AnsiChar; const Index: SizeInt = 1): SizeInt;
 function CharReplace(var S: AnsiString; const Search, Replace: AnsiChar): SizeInt;
-
 // PCharVector
 type
   PAnsiCharVector = ^PAnsiChar;
-
 function StringsToPCharVector(var Dest: PAnsiCharVector; const Source: TJclAnsiStrings): PAnsiCharVector;
 function PCharVectorCount(Source: PAnsiCharVector): SizeInt;
 procedure PCharVectorToStrings(const Dest: TJclAnsiStrings; Source: PAnsiCharVector);
 procedure FreePCharVector(var Dest: PAnsiCharVector);
-
 // MultiSz Routines
 type
   PAnsiMultiSz = PAnsiChar;
-
 function StringsToMultiSz(var Dest: PAnsiMultiSz; const Source: TJclAnsiStrings): PAnsiMultiSz;
 procedure MultiSzToStrings(const Dest: TJclAnsiStrings; const Source: PAnsiMultiSz);
 function MultiSzLength(const Source: PAnsiMultiSz): SizeInt;
 procedure AllocateMultiSz(var Dest: PAnsiMultiSz; Len: SizeInt);
 procedure FreeMultiSz(var Dest: PAnsiMultiSz);
 function MultiSzDup(const Source: PAnsiMultiSz): PAnsiMultiSz;
-
 // TJclAnsiStrings Manipulation
 procedure StrIToStrings(S, Sep: AnsiString; const List: TJclAnsiStrings; const AllowEmptyString: Boolean = True);
 procedure StrToStrings(S, Sep: AnsiString; const List: TJclAnsiStrings; const AllowEmptyString: Boolean = True);
@@ -475,7 +436,6 @@ procedure TrimStrings(const List: TJclAnsiStrings; DeleteIfEmpty: Boolean = True
 procedure TrimStringsRight(const List: TJclAnsiStrings; DeleteIfEmpty: Boolean = True);
 procedure TrimStringsLeft(const List: TJclAnsiStrings; DeleteIfEmpty: Boolean = True);
 function AddStringToStrings(const S: AnsiString; Strings: TJclAnsiStrings; const Unique: Boolean): Boolean;
-
 // Miscellaneous
 // (OF) moved to JclSysUtils
 //function BooleanToStr(B: Boolean): AnsiString;
@@ -491,12 +451,9 @@ function StrIdent(var S: PAnsiChar; out Ident: AnsiString): Boolean; overload;
 function StrToFloatSafe(const S: AnsiString): Float;
 function StrToIntSafe(const S: AnsiString): Integer;
 procedure StrNormIndex(const StrLen: SizeInt; var Index: SizeInt; var Count: SizeInt); overload;
-
 function ArrayOf(List: TJclAnsiStrings): TDynStringArray; overload;
-
 function AnsiCompareNaturalStr(const S1, S2: AnsiString): SizeInt;
 function AnsiCompareNaturalText(const S1, S2: AnsiString): SizeInt;
-
 // Explicit ANSI version of former/deprecated SysUtils PAnsiChar functions
 {$IFNDEF DEPRECATED_SYSUTILS_ANSISTRINGS}
   {$IFDEF SUPPORTS_INLINE}
@@ -505,7 +462,6 @@ function AnsiCompareNaturalText(const S1, S2: AnsiString): SizeInt;
 {$ENDIF ~DEPRECATED_SYSUTILS_ANSISTRINGS}
 function StrNewA(const Str: PAnsiChar): PAnsiChar;                                           {$IFDEF ANSI_INLINE}inline;{$ENDIF}
 procedure StrDisposeA(Str: PAnsiChar);                                                       {$IFDEF ANSI_INLINE}inline;{$ENDIF}
-
 function StrLenA(S: PAnsiChar): Integer;                                                     {$IFDEF ANSI_INLINE}inline;{$ENDIF}
 function StrEndA(const Str: PAnsiChar): PAnsiChar;                                           {$IFDEF ANSI_INLINE}inline;{$ENDIF}
 function StrPosA(const Str1, Str2: PAnsiChar): PAnsiChar;                                    {$IFDEF ANSI_INLINE}inline;{$ENDIF}
@@ -521,13 +477,10 @@ function StrCompA(const Str1, Str2: PAnsiChar): Integer;                        
 function StrLCompA(const Str1, Str2: PAnsiChar; MaxLen: Cardinal): Integer;                  {$IFDEF ANSI_INLINE}inline;{$ENDIF}
 function StrICompA(const Str1, Str2: PAnsiChar): Integer;                                    {$IFDEF ANSI_INLINE}inline;{$ENDIF}
 function StrLICompA(const Str1, Str2: PAnsiChar; MaxLen: Cardinal): Integer;                 {$IFDEF ANSI_INLINE}inline;{$ENDIF}
-
 function StrFmtA(Buffer, Format: PAnsiChar; const Args: array of const): PAnsiChar;
-
 function AnsiStrPosA(const Str1, Str2: PAnsiChar): PAnsiChar;                                {$IFDEF ANSI_INLINE}inline;{$ENDIF}
 function AnsiStrLICompA(S1, S2: PAnsiChar; MaxLen: Cardinal): Integer;                       {$IFDEF ANSI_INLINE}inline;{$ENDIF}
 function AnsiStrLCompA(S1, S2: PAnsiChar; MaxLen: Cardinal): Integer;                        {$IFDEF ANSI_INLINE}inline;{$ENDIF}
-
 
 // internal structures published to make function inlining working
 const
@@ -536,12 +489,10 @@ const
   AnsiUpOffset    = AnsiCharCount * 1;       // offset to upper case chars
   AnsiReOffset    = AnsiCharCount * 2;       // offset to reverse case chars
   AnsiCaseMapSize = AnsiCharCount * 3;       // # of chars is a table
-
 var
   AnsiCaseMap: array [0..AnsiCaseMapSize - 1] of AnsiChar; // case mappings
   AnsiCaseMapReady: Boolean = False;         // true if case map exists
   AnsiCharTypes: array [AnsiChar] of Word;
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -553,9 +504,7 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   {$IFDEF HAS_UNIT_LIBC}
   Libc,
@@ -570,19 +519,15 @@ uses
   {$ENDIF HAS_UNIT_RTLCONSTS}
   {$ENDIF SUPPORTS_UNICODE}
   JclLogic, JclResources, JclStreams, JclSynch, JclSysUtils;
-
 //=== Internal ===============================================================
-
 type
   TAnsiStrRec = packed record
     RefCount: Integer;
     Length: Integer;
   end;
   PAnsiStrRec = ^TAnsiStrRec;
-
 const
   AnsiStrRecSize  = SizeOf(TAnsiStrRec);     // size of the AnsiString header rec
-
 procedure LoadCharTypes;
 var
   CurrChar: AnsiChar;
@@ -623,7 +568,6 @@ begin
     {$ENDIF ~CHAR_TYPES_INITIALIZED}
   end;
 end;
-
 procedure LoadCaseMap;
 var
   CurrChar, UpCaseChar, LoCaseChar, ReCaseChar: AnsiChar;
@@ -661,10 +605,8 @@ begin
     AnsiCaseMapReady := True;
   end;
 end;
-
 // Uppercases or Lowercases a give AnsiString depending on the
 // passed offset. (UpOffset or LoOffset)
-
 procedure StrCase(var Str: AnsiString; const Offset: SizeInt);
 var
   P: PAnsiChar;
@@ -682,11 +624,9 @@ begin
     end;
   end;
 end;
-
 // Internal utility function
 // Uppercases or Lowercases a give null terminated string depending on the
 // passed offset. (UpOffset or LoOffset)
-
 procedure StrCaseBuff(S: PAnsiChar; const Offset: SizeInt);
 begin
   if (S <> nil) and (S^ <> #0) then
@@ -697,21 +637,16 @@ begin
     until S^ = #0;
   end;
 end;
-
 {$IFDEF SUPPORTS_UNICODE}
-
 //=== { TJclAnsiStrings } ====================================================
-
 constructor TJclAnsiStrings.Create;
 begin
   inherited Create;
-
   FDelimiter := ',';
   FNameValueSeparator := '=';
   FQuoteChar := '"';
   FStrictDelimiter := False;
 end;
-
 procedure TJclAnsiStrings.Assign(Source: TPersistent);
 var
   StringsSource: TStrings;
@@ -734,7 +669,6 @@ begin
   else
     inherited Assign(Source);
 end;
-
 procedure TJclAnsiStrings.AssignTo(Dest: TPersistent);
 var
   StringsDest: TStrings;
@@ -773,12 +707,10 @@ begin
   else
     inherited AssignTo(Dest);
 end;
-
 function TJclAnsiStrings.Add(const S: AnsiString): Integer;
 begin
   Result := AddObject(S, nil);
 end;
-
 procedure TJclAnsiStrings.AddStrings(Strings: TJclAnsiStrings);
 var
   I: Integer;
@@ -786,26 +718,21 @@ begin
   for I := 0 to Strings.Count - 1 do
     Add(Strings.Strings[I]);
 end;
-
 procedure TJclAnsiStrings.Error(const Msg: string; Data: Integer);
 begin
   raise EJclAnsiStringListError.CreateFmt(Msg, [Data]);
 end;
-
 procedure TJclAnsiStrings.Error(Msg: PResStringRec; Data: Integer);
 begin
   Error(LoadResString(Msg), Data);
 end;
-
 function TJclAnsiStrings.CompareStrings(const S1, S2: AnsiString): Integer;
 begin
   Result := CompareStr(S1, S2);
 end;
-
 procedure TJclAnsiStrings.SetUpdateState(Updating: Boolean);
 begin
 end;
-
 function TJclAnsiStrings.IndexOf(const S: AnsiString): Integer;
 begin
   for Result := 0 to Count - 1 do
@@ -813,7 +740,6 @@ begin
       Exit;
   Result := -1;
 end;
-
 function TJclAnsiStrings.IndexOfName(const Name: AnsiString): Integer;
 var
   P: Integer;
@@ -828,7 +754,6 @@ begin
   end;
   Result := -1;
 end;
-
 function TJclAnsiStrings.IndexOfObject(AObject: TObject): Integer;
 begin
   for Result := 0 to Count - 1 do
@@ -836,7 +761,6 @@ begin
       Exit;
   Result := -1;
 end;
-
 procedure TJclAnsiStrings.Exchange(Index1, Index2: Integer);
 var
   TempString: AnsiString;
@@ -854,19 +778,15 @@ begin
     EndUpdate;
   end;
 end;
-
 function TJclAnsiStrings.GetCommaText: AnsiString;
 begin
   Result := GetDelimitedText(AnsiComma, AnsiDoubleQuote);
 end;
-
 function TJclAnsiStrings.GetDelimitedText: AnsiString;
 begin
   Result := GetDelimitedText(Delimiter, QuoteChar);
 end;
-
 function TJclAnsiStrings.GetDelimitedText(const ADelimiter: AnsiString; AQuoteChar: AnsiChar): AnsiString;
-
   function Quoted(Item: AnsiString): AnsiString;
   begin
     if (not StrictDelimiter) and ((Pos(AnsiSpace, Item) > 0) or (Pos(FQuoteChar, Item) > 0)) then
@@ -876,7 +796,6 @@ function TJclAnsiStrings.GetDelimitedText(const ADelimiter: AnsiString; AQuoteCh
     else
       Result := Item;
   end;
-
 var
   I: Integer;
 begin
@@ -886,31 +805,25 @@ begin
   if Count > 0 then
     Result := Result + Quoted(Strings[Count - 1]);
 end;
-
 procedure TJclAnsiStrings.Insert(Index: Integer; const S: AnsiString);
 begin
   InsertObject(Index, S, nil);
 end;
-
 procedure TJclAnsiStrings.SetCommaText(const Value: AnsiString);
 begin
   SetDelimitedText(Value, AnsiComma, AnsiDoubleQuote);
 end;
-
 procedure TJclAnsiStrings.SetDelimitedText(const Value: AnsiString);
 begin
   SetDelimitedText(Value, Delimiter, QuoteChar);
 end;
-
 procedure TJclAnsiStrings.SetDelimitedText(const Value, ADelimiter: AnsiString; AQuoteChar: AnsiChar);
-
   procedure InternalAdd(Item: AnsiString);
   begin
     Item := StrTrimQuotes(Item, AQuoteChar);
     StrReplace(Item, AQuoteChar + AQuoteChar, AQuoteChar, [rfReplaceAll]);
     Add(Item);
   end;
-
 var
   ValueLength, LastStart, Index, QuoteCharCount: Integer;
   ValueChar: AnsiChar;
@@ -943,7 +856,6 @@ begin
     end;
   end;
 end;
-
 function TJclAnsiStrings.GetText: AnsiString;
 var
   I: Integer;
@@ -954,7 +866,6 @@ begin
   if Count > 0 then
     Result := Result + Strings[Count - 1] + AnsiLineBreak;
 end;
-
 procedure TJclAnsiStrings.SetText(const Value: AnsiString);
 var
   Index, Start, Len: Integer;
@@ -968,39 +879,32 @@ begin
     Start := Index;
     while (Index <= Len) and not CharIsReturn(Value[Index]) do
       Inc(Index);
-
     S := Copy(Value, Start, Index - Start);
     Add(S);
-
     if (Index <= Len) and (Value[Index] = AnsiCarriageReturn) then
       Inc(Index);
     if (Index <= Len) and (Value[Index] = AnsiLineFeed) then
       Inc(Index);
   end;
 end;
-
 function TJclAnsiStrings.GetCapacity: Integer;
 begin
   Result := Count; // Might be overridden in derived classes
 end;
-
 procedure TJclAnsiStrings.SetCapacity(const Value: Integer);
 begin
   // Nothing at this level
 end;
-
 procedure TJclAnsiStrings.BeginUpdate;
 begin
   if FUpdateCount = 0 then SetUpdateState(True);
   Inc(FUpdateCount);
 end;
-
 procedure TJclAnsiStrings.EndUpdate;
 begin
   Dec(FUpdateCount);
   if FUpdateCount = 0 then SetUpdateState(False);
 end;
-
 procedure TJclAnsiStrings.LoadFromFile(const FileName: TFileName);
 var
   Stream: TStream;
@@ -1012,7 +916,6 @@ begin
     Stream.Free;
   end;
 end;
-
 procedure TJclAnsiStrings.LoadFromStream(Stream: TStream);
 var
   Size: Integer;
@@ -1028,7 +931,6 @@ begin
     EndUpdate;
   end;
 end;
-
 procedure TJclAnsiStrings.SaveToFile(const FileName: TFileName);
 var
   Stream: TStream;
@@ -1040,7 +942,6 @@ begin
     Stream.Free;
   end;
 end;
-
 procedure TJclAnsiStrings.SaveToStream(Stream: TStream);
 var
   S: AnsiString;
@@ -1048,7 +949,6 @@ begin
   S := GetText;
   Stream.WriteBuffer(PAnsiChar(S)^, Length(S));
 end;
-
 function TJclAnsiStrings.ExtractName(const S: AnsiString): AnsiString;
 var
   P: Integer;
@@ -1060,12 +960,10 @@ begin
   else
     SetLength(Result, 0);
 end;
-
 function TJclAnsiStrings.GetName(Index: Integer): AnsiString;
 begin
   Result := ExtractName(Strings[Index]);
 end;
-
 function TJclAnsiStrings.GetValue(const Name: AnsiString): AnsiString;
 var
   I: Integer;
@@ -1076,7 +974,6 @@ begin
   else
     Result := '';
 end;
-
 procedure TJclAnsiStrings.SetValue(const Name, Value: AnsiString);
 var
   I: Integer;
@@ -1094,7 +991,6 @@ begin
       Delete(I);
   end;
 end;
-
 function TJclAnsiStrings.GetValueFromIndex(Index: Integer): AnsiString;
 var
   S: AnsiString;
@@ -1112,7 +1008,6 @@ begin
   else
     Result := '';
 end;
-
 procedure TJclAnsiStrings.SetValueFromIndex(Index: Integer; const Value: AnsiString);
 begin
   if Value <> '' then
@@ -1127,23 +1022,18 @@ begin
       Delete(Index);
   end;
 end;
-
 //=== { TJclAnsiStringList } =================================================
-
 constructor TJclAnsiStringList.Create;
 begin
   inherited Create;
   FCaseSensitive := True;
 end;
-
 destructor TJclAnsiStringList.Destroy;
 begin
   FOnChange := nil;
   FOnChanging := nil;
-
   inherited Destroy;
 end;
-
 procedure TJclAnsiStringList.Assign(Source: TPersistent);
 var
   StringListSource: TStringList;
@@ -1157,7 +1047,6 @@ begin
   end;
   inherited Assign(Source);
 end;
-
 procedure TJclAnsiStringList.AssignTo(Dest: TPersistent);
 var
   StringListDest: TStringList;
@@ -1182,7 +1071,6 @@ begin
   end;
   inherited AssignTo(Dest);
 end;
-
 function TJclAnsiStringList.CompareStrings(const S1: AnsiString; const S2: AnsiString): Integer;
 begin
   if FCaseSensitive then
@@ -1190,24 +1078,20 @@ begin
   else
     Result := CompareText(S1, S2);
 end;
-
 procedure TJclAnsiStringList.SetUpdateState(Updating: Boolean);
 begin
   if Updating then Changing else Changed;
 end;
-
 procedure TJclAnsiStringList.Changed;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChange) then
     FOnChange(Self);
 end;
-
 procedure TJclAnsiStringList.Changing;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChanging) then
     FOnChanging(Self);
 end;
-
 procedure TJclAnsiStringList.Grow;
 var
   Delta: Integer;
@@ -1218,79 +1102,61 @@ begin
     Delta := 16
   else
     Delta := 4;
-
   SetCapacity(Capacity + Delta);
 end;
-
 function TJclAnsiStringList.GetString(Index: Integer): AnsiString;
 begin
   if (Index < 0) or (Index >= FCount) then
     Error(@SListIndexError, Index);
-
   Result := FStrings[Index].Str;
 end;
-
 procedure TJclAnsiStringList.SetString(Index: Integer; const Value: AnsiString);
 begin
   if Sorted then
     Error(@SSortedListError, 0);
-
   if (Index < 0) or (Index >= FCount) then
     Error(@SListIndexError, Index);
-
   FStrings[Index].Str := Value;
 end;
-
 function TJclAnsiStringList.GetObject(Index: Integer): TObject;
 begin
   if (Index < 0) or (Index >= FCount) then
     Error(@SListIndexError, Index);
-
   Result := FStrings[Index].Obj;
 end;
-
 procedure TJclAnsiStringList.SetObject(Index: Integer; AObject: TObject);
 begin
   if (Index < 0) or (Index >= FCount) then
     Error(@SListIndexError, Index);
-
   FStrings[Index].Obj := AObject;
 end;
-
 function TJclAnsiStringList.GetCapacity: Integer;
 begin
   Result := Length(FStrings);
 end;
-
 procedure TJclAnsiStringList.SetCapacity(const Value: Integer);
 begin
   if (Value < FCount) then
     Error(@SListCapacityError, Value);
-
   if Value <> Capacity then
     SetLength(FStrings, Value);
 end;
-
 function TJclAnsiStringList.GetCount: Integer;
 begin
   Result := FCount;
 end;
-
 procedure TJclAnsiStringList.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
 var
   I: Integer;
 begin
   if Count = Capacity then
     Grow;
-
   for I := Count - 1 downto Index do
     FStrings[I + 1] := FStrings[I];
-
   FStrings[Index].Str := S;
   FStrings[Index].Obj := AObject;
   Inc(FCount);
 end;
-
 function TJclAnsiStringList.AddObject(const S: AnsiString; AObject: TObject): Integer;
 var
   Found: Boolean;
@@ -1310,17 +1176,14 @@ begin
           Error(@SDuplicateString, 0);
     end;
   end;
-
   InsertObject(Result, S, AObject);
 end;
-
 procedure TJclAnsiStringList.Delete(Index: Integer);
 var
   I: Integer;
 begin
   if (Index < 0) or (Index >= FCount) then
     Error(@SListIndexError, Index);
-
   for I := Index to Count - 2 do
     FStrings[I] := FStrings[I + 1];
     
@@ -1328,7 +1191,6 @@ begin
     
   Dec(FCount);
 end;
-
 procedure TJclAnsiStringList.Clear;
 var
   I: Integer;
@@ -1340,7 +1202,6 @@ begin
     FStrings[I].Obj := nil;
   end;
 end;
-
 function TJclAnsiStringList.Find(const S: AnsiString; var Index: Integer): Boolean;
 var
   L, H, I, C: Integer;
@@ -1367,24 +1228,20 @@ begin
   end;
   Index := L;
 end;
-
 function AnsiStringListCompareStrings(List: TJclAnsiStringList; Index1, Index2: Integer): Integer;
 begin
   Result := List.CompareStrings(List.FStrings[Index1].Str,
                                 List.FStrings[Index2].Str);
 end;
-
 procedure TJclAnsiStringList.Sort;
 begin
   CustomSort(AnsiStringListCompareStrings);
 end;
-
 procedure TJclAnsiStringList.CustomSort(Compare: TJclAnsiStringListSortCompare);
 begin
   if not Sorted and (FCount > 1) then
     QuickSort(0, FCount - 1, Compare);
 end;
-
 procedure TJclAnsiStringList.QuickSort(L, R: Integer; SCompare: TJclAnsiStringListSortCompare);
 var
   I, J, P: Integer;
@@ -1416,7 +1273,6 @@ begin
     L := I;
   until I >= R;
 end;
-
 procedure TJclAnsiStringList.SetSorted(Value: Boolean);
 begin
   if FSorted <> Value then
@@ -1426,9 +1282,7 @@ begin
     FSorted := Value;
   end;
 end;
-
 {$ENDIF SUPPORTS_UNICODE}
-
 // String Test Routines
 function StrIsAlpha(const S: AnsiString): Boolean;
 var
@@ -1444,7 +1298,6 @@ begin
     end;
   end;
 end;
-
 function StrIsAlphaNum(const S: AnsiString): Boolean;
 var
   I: SizeInt;
@@ -1459,7 +1312,6 @@ begin
     end;
   end;
 end;
-
 function StrConsistsofNumberChars(const S: AnsiString): Boolean;
 var
   I: SizeInt;
@@ -1474,7 +1326,6 @@ begin
     end;
   end;
 end;
-
 function StrContainsChars(const S: AnsiString; Chars: TSysCharSet; CheckAll: Boolean): Boolean;
 var
   I: SizeInt;
@@ -1508,7 +1359,6 @@ begin
     end;
   end;
 end;
-
 function StrIsAlphaNumUnderscore(const S: AnsiString): Boolean;
 var
   I: SizeInt;
@@ -1517,17 +1367,14 @@ begin
   for i := 1 to Length(s) do
   begin
     C := S[I];
-
     if not (CharIsAlphaNum(C) or (C = '_')) then
     begin
       Result := False;
       Exit;
     end;
   end;
-
   Result := True and (Length(S) > 0);
 end;
-
 function StrIsDigit(const S: AnsiString): Boolean;
 var
   I: SizeInt;
@@ -1542,7 +1389,6 @@ begin
     end;
   end;
 end;
-
 function StrIsSubset(const S: AnsiString; const ValidChars: TSysCharSet): Boolean;
 var
   I: SizeInt;
@@ -1555,17 +1401,13 @@ begin
       Exit;
     end;
   end;
-
   Result := True and (Length(S) > 0);
 end;
-
 function StrSame(const S1, S2: AnsiString): Boolean;
 begin
   Result := StrCompare(S1, S2) = 0;
 end;
-
 //=== String Transformation Routines =========================================
-
 function StrCenter(const S: AnsiString; L: SizeInt; C: AnsiChar = ' '): AnsiString;
 begin
   if Length(S) < L then
@@ -1576,26 +1418,22 @@ begin
   else
     Result := S;
 end;
-
 function StrCharPosLower(const S: AnsiString; CharPos: SizeInt): AnsiString;
 begin
   Result := S;
   if (CharPos > 0) and (CharPos <= Length(S)) then
     Result[CharPos] := CharLower(Result[CharPos]);
 end;
-
 function StrCharPosUpper(const S: AnsiString; CharPos: SizeInt): AnsiString;
 begin
   Result := S;
   if (CharPos > 0) and (CharPos <= Length(S)) then
     Result[CharPos] := CharUpper(Result[CharPos]);
 end;
-
 function StrDoubleQuote(const S: AnsiString): AnsiString;
 begin
   Result := AnsiDoubleQuote + S + AnsiDoubleQuote;
 end;
-
 function StrEnsureNoPrefix(const Prefix, Text: AnsiString): AnsiString;
 var
   PrefixLen: SizeInt;
@@ -1606,7 +1444,6 @@ begin
   else
     Result := Text;
 end;
-
 function StrEnsureNoSuffix(const Suffix, Text: AnsiString): AnsiString;
 var
   SuffixLen: SizeInt;
@@ -1619,7 +1456,6 @@ begin
   else
     Result := Text;
 end;
-
 function StrEnsurePrefix(const Prefix, Text: AnsiString): AnsiString;
 var
   PrefixLen: SizeInt;
@@ -1630,7 +1466,6 @@ begin
   else
     Result := Prefix + Text;
 end;
-
 function StrEnsureSuffix(const Suffix, Text: AnsiString): AnsiString;
 var
   SuffixLen: SizeInt;
@@ -1641,7 +1476,6 @@ begin
   else
     Result := Text + Suffix;
 end;
-
 function StrEscapedToString(const S: AnsiString): AnsiString;
   procedure HandleHexEscapeSeq(const S: AnsiString; var I: SizeInt; Len: SizeInt; var Dest: AnsiString);
   const
@@ -1672,14 +1506,11 @@ function StrEscapedToString(const S: AnsiString): AnsiString;
           Val := Val * 16 + N;
         end;
       end;
-
       if Val > Ord(High(AnsiChar)) then
         raise EJclAnsiStringError.CreateResFmt(@RsNumericConstantTooLarge, [Val, StartI]);
-
       Dest := Dest + AnsiChar(Val);
     end;
   end;
-
   procedure HandleOctEscapeSeq(const S: AnsiString; var I: SizeInt; Len: SizeInt; var Dest: AnsiString);
   const
     OctDigits = AnsiString('01234567');
@@ -1707,13 +1538,10 @@ function StrEscapedToString(const S: AnsiString): AnsiString;
         end;
       end;
     end;
-
     if Val > Ord(High(AnsiChar)) then
       raise EJclAnsiStringError.CreateResFmt(@RsNumericConstantTooLarge, [Val, StartI]);
-
     Dest := Dest + AnsiChar(Val);
   end;
-
 var
   I, Len: SizeInt;
 begin
@@ -1768,41 +1596,34 @@ begin
     Inc(I);
   end;
 end;
-
 function StrLower(const S: AnsiString): AnsiString;
 begin
   Result := S;
   StrLowerInPlace(Result);
 end;
-
 procedure StrLowerInPlace(var S: AnsiString);
 begin
   StrCase(S, AnsiLoOffset);
 end;
-
 procedure StrLowerBuff(S: PAnsiChar);
 begin
   StrCaseBuff(S, AnsiLoOffset);
 end;
-
 procedure StrMove(var Dest: AnsiString; const Source: AnsiString;
   const ToIndex, FromIndex, Count: SizeInt);
 begin
   // Check strings
   if (Source = '') or (Length(Dest) = 0) then
     Exit;
-
   // Check FromIndex
   if (FromIndex <= 0) or (FromIndex > Length(Source)) or
     (ToIndex <= 0) or (ToIndex > Length(Dest)) or
     ((FromIndex + Count - 1) > Length(Source)) or ((ToIndex + Count - 1) > Length(Dest)) then
     { TODO : Is failure without notice the proper thing to do here? }
     Exit;
-
   // Move
   Move(Source[FromIndex], Dest[ToIndex], Count);
 end;
-
 function StrPadLeft(const S: AnsiString; Len: SizeInt; C: AnsiChar): AnsiString;
 var
   L: SizeInt;
@@ -1813,7 +1634,6 @@ begin
   else
     Result := S;
 end;
-
 function StrPadRight(const S: AnsiString; Len: SizeInt; C: AnsiChar): AnsiString;
 var
   L: SizeInt;
@@ -1824,14 +1644,12 @@ begin
   else
     Result := S;
 end;
-
 function StrProper(const S: AnsiString): AnsiString;
 begin
   Result := StrLower(S);
   if Result <> '' then
     Result[1] := UpCase(Result[1]);
 end;
-
 procedure StrProperBuff(S: PAnsiChar);
 begin
   if (S <> nil) and (S^ <> #0) then
@@ -1840,7 +1658,6 @@ begin
     S^ := CharUpper(S^);
   end;
 end;
-
 function StrQuote(const S: AnsiString; C: AnsiChar): AnsiString;
 var
   L: SizeInt;
@@ -1858,7 +1675,6 @@ begin
       Result := Result + C;
   end;
 end;
-
 function StrRemoveChars(const S: AnsiString; const Chars: TSysCharSet): AnsiString;
 var
   Source, Dest: PAnsiChar;
@@ -1880,7 +1696,6 @@ begin
   end;
   SetLength(Result, Dest - PAnsiChar(Result));
 end;
-
 function StrKeepChars(const S: AnsiString; const Chars: TSysCharSet): AnsiString;
 var
   Source, Dest: PAnsiChar;
@@ -1902,7 +1717,6 @@ begin
   end;
   SetLength(Result, Dest - PAnsiChar(Result));
 end;
-
 function StrRepeat(const S: AnsiString; Count: SizeInt): AnsiString;
 var
   L: SizeInt;
@@ -1921,7 +1735,6 @@ begin
     end;
   end;
 end;
-
 function StrRepeatLength(const S: AnsiString; const L: SizeInt): AnsiString;
 var
   Count: SizeInt;
@@ -1930,7 +1743,6 @@ var
 begin
   Result := '';
   LenS := Length(S);
-
   if (LenS > 0) and (S <> '') then
   begin
     Count := L div LenS;
@@ -1948,7 +1760,6 @@ begin
       SetLength(Result, L);
   end;
 end;
-
 procedure StrReplace(var S: AnsiString; const Search, Replace: AnsiString; Flags: TReplaceFlags);
 var
   SearchStr: AnsiString;
@@ -1975,7 +1786,6 @@ begin
     else
       raise EJclAnsiStringError.CreateRes(@RsBlankSearchString);
   end;
-
   if S <> '' then
   begin
     IgnoreCase := rfIgnoreCase in Flags;
@@ -2078,7 +1888,6 @@ begin
     S := ResultStr;
   end;
 end;
-
 function StrReplaceChar(const S: AnsiString; const Source, Replace: AnsiChar): AnsiString;
 var
   I: SizeInt;
@@ -2088,7 +1897,6 @@ begin
     if Result[I] = Source then
       Result[I] := Replace;
 end;
-
 function StrReplaceChars(const S: AnsiString; const Chars: TSysCharSet; Replace: AnsiChar): AnsiString;
 var
   I: SizeInt;
@@ -2098,7 +1906,6 @@ begin
     if Result[I] in Chars then
       Result[I] := Replace;
 end;
-
 function StrReplaceButChars(const S: AnsiString; const Chars: TSysCharSet;
   Replace: AnsiChar): AnsiString;
 var
@@ -2109,13 +1916,11 @@ begin
     if not (Result[I] in Chars) then
       Result[I] := Replace;
 end;
-
 function StrReverse(const S: AnsiString): AnsiString;
 begin
   Result := S;
   StrReverseInplace(Result);
 end;
-
 procedure StrReverseInPlace(var S: AnsiString);
 var
   P1, P2: PAnsiChar;
@@ -2133,24 +1938,20 @@ begin
     Dec(P2);
   end;
 end;
-
 function StrSingleQuote(const S: AnsiString): AnsiString;
 begin
   Result := AnsiSingleQuote + S + AnsiSingleQuote;
 end;
-
 procedure StrSkipChars(var S: PAnsiChar; const Chars: TSysCharSet);
 begin
   while S^ in Chars do
     Inc(S);
 end;
-
 procedure StrSkipChars(const S: AnsiString; var Index: SizeInt; const Chars: TSysCharSet);
 begin
   while S[Index] in Chars do
     Inc(Index);
 end;
-
 function StrSmartCase(const S: AnsiString; Delimiters: TSysCharSet): AnsiString;
 var
   Source, Dest: PAnsiChar;
@@ -2159,30 +1960,24 @@ begin
   Result := '';
   if Delimiters = [] then
     Include(Delimiters, AnsiSpace);
-
   if S <> '' then
   begin
     Result := S;
     UniqueString(Result);
-
     Len := Length(S);
     Source := PAnsiChar(S);
     Dest := PAnsiChar(Result);
     Inc(Dest);
-
     for Index := 2 to Len do
     begin
       if (Source^ in Delimiters) then
         Dest^ := CharUpper(Dest^);
-
       Inc(Dest);
       Inc(Source);
     end;
-
     Result[1] := CharUpper(Result[1]);
   end;
 end;
-
 function StrStringToEscaped(const S: AnsiString): AnsiString;
 var
   I: SizeInt;
@@ -2218,7 +2013,6 @@ begin
     end;
   end;
 end;
-
 function StrStripNonNumberChars(const S: AnsiString): AnsiString;
 var
   I: SizeInt;
@@ -2232,7 +2026,6 @@ begin
       Result := Result + C;
   end;
 end;
-
 function StrToHex(const Source: AnsiString): AnsiString;
 var
   Index: SizeInt;
@@ -2271,7 +2064,6 @@ begin
     end;
   end;
 end;
-
 function StrTrimCharLeft(const S: AnsiString; C: AnsiChar): AnsiString;
 var
   I, L: SizeInt;
@@ -2282,7 +2074,6 @@ begin
     Inc(I);
   Result := Copy(S, I, L - I + 1);
 end;
-
 function StrTrimCharsLeft(const S: AnsiString; const Chars: TSysCharSet): AnsiString;
 var
   I, L: SizeInt;
@@ -2293,7 +2084,6 @@ begin
     Inc(I);
   Result := Copy(S, I, L - I + 1);
 end;
-
 function StrTrimCharsRight(const S: AnsiString; const Chars: TSysCharSet): AnsiString;
 var
   I: SizeInt;
@@ -2303,7 +2093,6 @@ begin
     Dec(I);
   Result := Copy(S, 1, I);
 end;
-
 function StrTrimCharRight(const S: AnsiString; C: AnsiChar): AnsiString;
 var
   I: SizeInt;
@@ -2313,7 +2102,6 @@ begin
     Dec(I);
   Result := Copy(S, 1, I);
 end;
-
 function StrTrimQuotes(const S: AnsiString): AnsiString;
 var
   First, Last: AnsiChar;
@@ -2332,7 +2120,6 @@ begin
   else
     Result := S;
 end;
-
 function StrTrimQuotes(const S: AnsiString; QuoteChar: AnsiChar): AnsiString;
 var
   First, Last: AnsiChar;
@@ -2351,39 +2138,32 @@ begin
   else
     Result := S;
 end;
-
 function StrUpper(const S: AnsiString): AnsiString;
 begin
   Result := S;
   StrUpperInPlace(Result);
 end;
-
 procedure StrUpperInPlace(var S: AnsiString);
 begin
   StrCase(S, AnsiUpOffset);
 end;
-
 procedure StrUpperBuff(S: PAnsiChar);
 begin
   StrCaseBuff(S, AnsiUpOffset);
 end;
-
 {$IFDEF MSWINDOWS}
 function StrOemToAnsi(const S: AnsiString): AnsiString;
 begin
   SetLength(Result, Length(S));
   OemToAnsiBuff(PAnsiChar(S), PAnsiChar(Result), Length(S));
 end;
-
 function StrAnsiToOem(const S: AnsiString): AnsiString;
 begin
   SetLength(Result, Length(S));
   AnsiToOemBuff(PAnsiChar(S), PAnsiChar(Result), Length(S));
 end;
 {$ENDIF MSWINDOWS}
-
 //=== String Management ======================================================
-
 procedure StrAddRef(var S: AnsiString);
 var
   P: PAnsiStrRec;
@@ -2398,7 +2178,6 @@ begin
       LockedInc(P^.RefCount);
   end;
 end;
-
 procedure StrDecRef(var S: AnsiString);
 var
   P: PAnsiStrRec;
@@ -2420,7 +2199,6 @@ begin
     end;
   end;
 end;
-
 function StrLength(const S: AnsiString): Longint;
 var
   P: PAnsiStrRec;
@@ -2433,7 +2211,6 @@ begin
     Result := P^.Length and (not $80000000 shr 1);
   end;
 end;
-
 function StrRefCount(const S: AnsiString): Longint;
 var
   P: PAnsiStrRec;
@@ -2446,7 +2223,6 @@ begin
     Result := P^.RefCount;
   end;
 end;
-
 procedure StrResetLength(var S: AnsiString);
 var
   I: SizeInt;
@@ -2458,9 +2234,7 @@ begin
       Exit;
     end;
 end;
-
 //=== String Search and Replace Routines =====================================
-
 function StrCharCount(const S: AnsiString; C: AnsiChar): SizeInt;
 var
   I: SizeInt;
@@ -2470,7 +2244,6 @@ begin
     if S[I] = C then
       Inc(Result);
 end;
-
 function StrCharsCount(const S: AnsiString; Chars: TSysCharSet): SizeInt;
 var
   I: SizeInt;
@@ -2480,7 +2253,6 @@ begin
     if S[I] in Chars then
       Inc(Result);
 end;
-
 function StrStrCount(const S, SubS: AnsiString): SizeInt;
 var
   I: SizeInt;
@@ -2494,10 +2266,8 @@ begin
     Exit;
   end;
   I := StrSearch(SubS, S, 1);
-
   if I > 0 then
     Inc(Result);
-
   while (I > 0) and (Length(S) > I + Length(SubS)) do
   begin
     I := StrSearch(SubS, S, I + 1);
@@ -2505,7 +2275,6 @@ begin
       Inc(Result);
   end;
 end;
-
 (*
 { 1}  Test(StrCompareRange('', '', 1, 5), 0);
 { 2}  Test(StrCompareRange('A', '', 1, 5), -1);
@@ -2551,14 +2320,12 @@ begin
   begin
     Len1 := Length(S1);
     Len2 := Length(S2);
-
     if (Index - 1) + Count > Len1 then
       Result := -2
     else
     begin
       if (Index - 1) + Count > Len2 then // strange behaviour, but the assembler code does it
         Count := Len2 - (Index - 1);
-
       if CaseSensitive then
       begin
         for I := 0 to Count - 1 do
@@ -2594,7 +2361,6 @@ begin
     end;
   end;
 end;
-
 function StrCompare(const S1, S2: AnsiString; CaseSensitive: Boolean): SizeInt;
 var
   Len1, Len2: SizeInt;
@@ -2610,19 +2376,16 @@ begin
       Result := StrCompareRangeEx(S1, S2, 1, Len1, CaseSensitive);
   end;
 end;
-
 function StrCompareRange(const S1, S2: AnsiString; Index, Count: SizeInt; CaseSensitive: Boolean): SizeInt;
 begin
   Result := StrCompareRangeEx(S1, S2, Index, Count, CaseSensitive);
 end;
-
 function StrRepeatChar(C: AnsiChar; Count: SizeInt): AnsiString;
 begin
   SetLength(Result, Count);
   if Count > 0 then
     FillChar(Result[1], Count, C);
 end;
-
 function StrFind(const Substr, S: AnsiString; const Index: SizeInt): SizeInt;
 var
   pos: SizeInt;
@@ -2638,27 +2401,22 @@ begin
   else
     Result := 0;
 end;
-
 function StrHasPrefix(const S: AnsiString; const Prefixes: array of AnsiString): Boolean;
 begin
   Result := StrPrefixIndex(S, Prefixes) > -1;
 end;
-
 function StrHasSuffix(const S: AnsiString; const Suffixes: array of AnsiString): Boolean;
 begin
   Result := StrSuffixIndex(S, Suffixes) > -1;
 end;
-
 function StrIHasPrefix(const S: AnsiString; const Prefixes: array of AnsiString): Boolean;
 begin
   Result := StrIPrefixIndex(S, Prefixes) > -1;
 end;
-
 function StrIHasSuffix(const S: AnsiString; const Suffixes: array of AnsiString): Boolean;
 begin
   Result := StrISuffixIndex(S, Suffixes) > -1;
 end;
-
 function StrIndex(const S: AnsiString; const List: array of AnsiString; CaseSensitive: Boolean): SizeInt;
 var
   I: SizeInt;
@@ -2673,17 +2431,14 @@ begin
     end;
   end;
 end;
-
 function StrILastPos(const SubStr, S: AnsiString): SizeInt;
 begin
   Result := StrLastPos(StrUpper(SubStr), StrUpper(S));
 end;
-
 function StrIPos(const SubStr, S: AnsiString): SizeInt;
 begin
   Result := Pos(StrUpper(SubStr), StrUpper(S));
 end;
-
 function StrIPrefixIndex(const S: AnsiString; const Prefixes: array of AnsiString): SizeInt;
 var
   I: SizeInt;
@@ -2700,12 +2455,10 @@ begin
     end;
   end;
 end;
-
 function StrIsOneOf(const S: AnsiString; const List: array of AnsiString): Boolean;
 begin
   Result := StrIndex(S, List) > -1;
 end;
-
 function StrISuffixIndex(const S: AnsiString; const Suffixes: array of AnsiString): SizeInt;
 var
   I: SizeInt;
@@ -2722,7 +2475,6 @@ begin
     end;
   end;
 end;
-
 function StrLastPos(const SubStr, S: AnsiString): SizeInt;
 var
   Last, Current: PAnsiChar;
@@ -2730,7 +2482,6 @@ begin
   Result := 0;
   Last := nil;
   Current := PAnsiChar(S);
-
   while (Current <> nil) and (Current^ <> #0) do
   begin
     Current := AnsiStrPosA(PAnsiChar(Current), PAnsiChar(SubStr));
@@ -2743,10 +2494,8 @@ begin
   if Last <> nil then
     Result := Abs(PAnsiChar(S) - Last) + 1;
 end;
-
 // IMPORTANT NOTE: The StrMatch function does currently not work with the Asterix (*)
 // (*) acts like (?)
-
 function StrMatch(const Substr, S: AnsiString; Index: SizeInt): SizeInt;
 var
   SI, SubI, SLen, SubLen: SizeInt;
@@ -2781,9 +2530,7 @@ begin
   end;
 end;
 
-
 // Derived from "Like" by Michael Winter
-
 function StrMatches(const Substr, S: AnsiString; const Index: SizeInt): Boolean;
 var
   StringPtr: PAnsiChar;
@@ -2793,20 +2540,15 @@ var
 begin
   if SubStr = '' then
     raise EJclAnsiStringError.CreateRes(@RsBlankSearchString);
-
   Result := SubStr = '*';
-
   if Result or (S = '') then
     Exit;
-
   if (Index <= 0) or (Index > Length(S)) then
     raise EJclAnsiStringError.CreateRes(@RsArgumentOutOfRange);
-
   StringPtr := PAnsiChar(@S[Index]);
   PatternPtr := PAnsiChar(SubStr);
   StringRes := nil;
   PatternRes := nil;
-
   repeat
     repeat
       case PatternPtr^ of
@@ -2815,7 +2557,6 @@ begin
             Result := StringPtr^ = #0;
             if Result or (StringRes = nil) or (PatternRes = nil) then
               Exit;
-
             StringPtr := StringRes;
             PatternPtr := PatternRes;
             Break;
@@ -2853,7 +2594,6 @@ begin
           end;
       end;
     until False;
-
     repeat
       case PatternPtr^ of
         #0:
@@ -2891,7 +2631,6 @@ begin
     until False;
   until False;
 end;
-
 function StrNPos(const S, SubStr: AnsiString; N: SizeInt): SizeInt;
 var
   I, P: SizeInt;
@@ -2901,7 +2640,6 @@ begin
     Result := 0;
     Exit;
   end;
-
   Result := StrSearch(SubStr, S, 1);
   I := 1;
   while I < N do
@@ -2919,7 +2657,6 @@ begin
     end;
   end;
 end;
-
 function StrNIPos(const S, SubStr: AnsiString; N: SizeInt): SizeInt;
 var
   I, P: SizeInt;
@@ -2929,7 +2666,6 @@ begin
     Result := 0;
     Exit;
   end;
-
   Result := StrFind(SubStr, S, 1);
   I := 1;
   while I < N do
@@ -2947,7 +2683,6 @@ begin
     end;
   end;
 end;
-
 function StrPrefixIndex(const S: AnsiString; const Prefixes: array of AnsiString): SizeInt;
 var
   I: SizeInt;
@@ -2964,7 +2699,6 @@ begin
     end;
   end;
 end;
-
 function StrSearch(const Substr, S: AnsiString; const Index: SizeInt): SizeInt;
 var
   SP, SPI, SubP: PAnsiChar;
@@ -2987,7 +2721,6 @@ begin
   else
     Result := 0;
 end;
-
 function StrSuffixIndex(const S: AnsiString; const Suffixes: array of AnsiString): SizeInt;
 var
   I: SizeInt;
@@ -3004,9 +2737,7 @@ begin
     end;
   end;
 end;
-
 //=== String Extraction ======================================================
-
 function StrAfter(const SubStr, S: AnsiString): AnsiString;
 var
   P: SizeInt;
@@ -3017,7 +2748,6 @@ begin
   else
     Result := StrRestOf(S, P + Length(SubStr));
 end;
-
 function StrBefore(const SubStr, S: AnsiString): AnsiString;
 var
   P: SizeInt;
@@ -3028,7 +2758,6 @@ begin
   else
     Result := StrLeft(S, P - 1);
 end;
-
 function StrSplit(const SubStr, S: AnsiString;var Left, Right : AnsiString): boolean;
 var
   P: SizeInt;
@@ -3046,7 +2775,6 @@ begin
     Right := '';
   end;
 end;
-
 function StrBetween(const S: AnsiString; const Start, Stop: AnsiChar): AnsiString;
 var
   PosStart, PosEnd: SizeInt;
@@ -3054,7 +2782,6 @@ var
 begin
   PosStart := Pos(Start, S);
   PosEnd := StrSearch(Stop, S, PosStart + 1);  // PosEnd has to be after PosStart.
-
   if (PosStart > 0) and (PosEnd > PosStart) then
   begin
     L := PosEnd - PosStart;
@@ -3063,34 +2790,27 @@ begin
   else
     Result := '';
 end;
-
 function StrChopRight(const S: AnsiString; N: SizeInt): AnsiString;
 begin
   Result := Copy(S, 1, Length(S) - N);
 end;
-
 function StrLeft(const S: AnsiString; Count: SizeInt): AnsiString;
 begin
   Result := Copy(S, 1, Count);
 end;
-
 function StrMid(const S: AnsiString; Start, Count: SizeInt): AnsiString;
 begin
   Result := Copy(S, Start, Count);
 end;
-
 function StrRestOf(const S: AnsiString; N: SizeInt): AnsiString;
 begin
   Result := Copy(S, N, (Length(S) - N + 1));
 end;
-
 function StrRight(const S: AnsiString; Count: SizeInt): AnsiString;
 begin
   Result := Copy(S, Length(S) - Count + 1, Count);
 end;
-
 //=== Character (do we have it ;) ============================================
-
 function CharEqualNoCase(const C1, C2: AnsiChar): Boolean;
 begin
   // if they are not equal chars, may be same letter different case
@@ -3098,43 +2818,35 @@ begin
     (CharIsAlpha(C1) and CharIsAlpha(C2) and (CharLower(C1) = CharLower(C2)));
 end;
 
-
 function CharIsAlpha(const C: AnsiChar): Boolean;
 begin
   Result := (AnsiCharTypes[C] and C1_ALPHA) <> 0;
 end;
-
 function CharIsAlphaNum(const C: AnsiChar): Boolean;
 begin
   Result := ((AnsiCharTypes[C] and C1_ALPHA) <> 0) or
     ((AnsiCharTypes[C] and C1_DIGIT) <> 0);
 end;
-
 function CharIsBlank(const C: AnsiChar): Boolean;
 begin
   Result := ((AnsiCharTypes[C] and C1_BLANK) <> 0);
 end;
-
 function CharIsControl(const C: AnsiChar): Boolean;
 begin
   Result := (AnsiCharTypes[C] and C1_CNTRL) <> 0;
 end;
-
 function CharIsDelete(const C: AnsiChar): Boolean;
 begin
   Result := (C = #8);
 end;
-
 function CharIsDigit(const C: AnsiChar): Boolean;
 begin
   Result := (AnsiCharTypes[C] and C1_DIGIT) <> 0;
 end;
-
 function CharIsFracDigit(const C: AnsiChar): Boolean;
 begin
   Result := (C = '.') or ((AnsiCharTypes[C] and C1_DIGIT) <> 0);
 end;
-
 function CharIsHexDigit(const C: AnsiChar): Boolean;
 begin
   case C of
@@ -3145,12 +2857,10 @@ begin
     Result := ((AnsiCharTypes[C] and C1_DIGIT) <> 0);
   end;
 end;
-
 function CharIsLower(const C: AnsiChar): Boolean;
 begin
   Result := (AnsiCharTypes[C] and C1_LOWER) <> 0;
 end;
-
 // JclSysUtils.TJclFormatSettings.GetDecimalSeparator is manually inlined in the 2 following functions
 // this fixes compiler warnings about functions not being inlined
  
@@ -3159,38 +2869,31 @@ begin
   Result := ((AnsiCharTypes[C] and C1_DIGIT) <> 0) or (C = AnsiSignMinus) or (C = AnsiSignPlus) or
     (Char(C) = {$IFDEF RTL220_UP}FormatSettings.DecimalSeparator{$ELSE}SysUtils.DecimalSeparator{$ENDIF});
 end;
-
 function CharIsNumber(const C: AnsiChar): Boolean;
 begin
   Result := ((AnsiCharTypes[C] and C1_DIGIT) <> 0) or
     (Char(C) = {$IFDEF RTL220_UP}FormatSettings.DecimalSeparator{$ELSE}SysUtils.DecimalSeparator{$ENDIF});
 end;
-
 function CharIsPrintable(const C: AnsiChar): Boolean;
 begin
   Result := not CharIsControl(C);
 end;
-
 function CharIsPunctuation(const C: AnsiChar): Boolean;
 begin
   Result := ((AnsiCharTypes[C] and C1_PUNCT) <> 0);
 end;
-
 function CharIsReturn(const C: AnsiChar): Boolean;
 begin
   Result := (C = AnsiLineFeed) or (C = AnsiCarriageReturn);
 end;
-
 function CharIsSpace(const C: AnsiChar): Boolean;
 begin
   Result := (AnsiCharTypes[C] and C1_SPACE) <> 0;
 end;
-
 function CharIsUpper(const C: AnsiChar): Boolean;
 begin
   Result := (AnsiCharTypes[C] and C1_UPPER) <> 0;
 end;
-
 function CharIsValidIdentifierLetter(const C: AnsiChar): Boolean;
 begin
   case C of
@@ -3200,14 +2903,12 @@ begin
     Result := False;
   end;
 end;
-
 function CharIsWhiteSpace(const C: AnsiChar): Boolean;
 begin
   Result := (C = AnsiTab) or (C = AnsiLineFeed) or (C = AnsiVerticalTab) or
             (C = AnsiFormFeed) or (C = AnsiCarriageReturn) or (C =AnsiSpace) or
             ((AnsiCharTypes[C] and C1_SPACE) <> 0);
 end;
-
 function CharIsWildcard(const C: AnsiChar): Boolean;
 begin
   case C of
@@ -3217,14 +2918,11 @@ begin
     Result := False;
   end;
 end;
-
 function CharType(const C: AnsiChar): Word;
 begin
   Result := AnsiCharTypes[C];
 end;
-
 //=== PCharVector ============================================================
-
 function StringsToPCharVector(var Dest: PAnsiCharVector; const Source: TJclAnsiStrings): PAnsiCharVector;
 var
   I: SizeInt;
@@ -3248,7 +2946,6 @@ begin
   Move(List[0], Dest^, (Source.Count + 1) * SizeOf(PAnsiChar));
   Result := Dest;
 end;
-
 function PCharVectorCount(Source: PAnsiCharVector): SizeInt;
 begin
   Result := 0;
@@ -3259,7 +2956,6 @@ begin
     Inc(Result);
   end;
 end;
-
 procedure PCharVectorToStrings(const Dest: TJclAnsiStrings; Source: PAnsiCharVector);
 var
   I, Count: SizeInt;
@@ -3281,7 +2977,6 @@ begin
     end;
   end;
 end;
-
 procedure FreePCharVector(var Dest: PAnsiCharVector);
 var
   I, Count: SizeInt;
@@ -3298,9 +2993,7 @@ begin
     Dest := nil;
   end;
 end;
-
 //=== Character Transformation Routines ======================================
-
 function CharHex(const C: AnsiChar): Byte;
 begin
   case C of
@@ -3314,24 +3007,19 @@ begin
     Result := $FF;
   end;
 end;
-
 function CharLower(const C: AnsiChar): AnsiChar;
 begin
   Result := AnsiCaseMap[Ord(C) + AnsiLoOffset];
 end;
-
 function CharToggleCase(const C: AnsiChar): AnsiChar;
 begin
   Result := AnsiCaseMap[Ord(C) + AnsiReOffset];
 end;
-
 function CharUpper(const C: AnsiChar): AnsiChar;
 begin
   Result := AnsiCaseMap[Ord(C) + AnsiUpOffset];
 end;
-
 //=== Character Search and Replace ===========================================
-
 function CharLastPos(const S: AnsiString; const C: AnsiChar; const Index: SizeInt): SizeInt;
 begin
   if (Index > 0) and (Index <= Length(S)) then
@@ -3340,7 +3028,6 @@ begin
         Exit;
   Result := 0;
 end;
-
 function CharPos(const S: AnsiString; const C: AnsiChar; const Index: SizeInt): SizeInt;
 begin
   if (Index > 0) and (Index <= Length(S)) then
@@ -3349,7 +3036,6 @@ begin
         Exit;
   Result := 0;
 end;
-
 function CharIPos(const S: AnsiString; C: AnsiChar; const Index: SizeInt): SizeInt;
 begin
   if (Index > 0) and (Index <= Length(S)) then
@@ -3361,7 +3047,6 @@ begin
   end;
   Result := 0;
 end;
-
 function CharReplace(var S: AnsiString; const Search, Replace: AnsiChar): SizeInt;
 var
   P: PAnsiChar;
@@ -3384,9 +3069,7 @@ begin
     end;
   end;
 end;
-
 //=== MultiSz ================================================================
-
 function StringsToMultiSz(var Dest: PAnsiMultiSz; const Source: TJclAnsiStrings): PAnsiMultiSz;
 var
   I, TotalLength: SizeInt;
@@ -3409,7 +3092,6 @@ begin
   P^ := #0;
   Result := Dest;
 end;
-
 procedure MultiSzToStrings(const Dest: TJclAnsiStrings; const Source: PAnsiMultiSz);
 var
   P: PAnsiMultiSz;
@@ -3432,7 +3114,6 @@ begin
     Dest.EndUpdate;
   end;
 end;
-
 function MultiSzLength(const Source: PAnsiMultiSz): SizeInt;
 var
   P: PAnsiMultiSz;
@@ -3449,7 +3130,6 @@ begin
     Inc(Result);
   end;
 end;
-
 procedure AllocateMultiSz(var Dest: PAnsiMultiSz; Len: SizeInt);
 begin
   if Len > 0 then
@@ -3457,14 +3137,12 @@ begin
   else
     Dest := nil;
 end;
-
 procedure FreeMultiSz(var Dest: PAnsiMultiSz);
 begin
   if Dest <> nil then
     FreeMem(Dest);
   Dest := nil;
 end;
-
 function MultiSzDup(const Source: PAnsiMultiSz): PAnsiMultiSz;
 var
   Len: SizeInt;
@@ -3479,9 +3157,7 @@ begin
   else
     Result := nil;
 end;
-
 //=== TJclAnsiStrings Manipulation ===============================================
-
 procedure StrToStrings(S, Sep: AnsiString; const List: TJclAnsiStrings; const AllowEmptyString: Boolean = True);
 var
   I, L: SizeInt;
@@ -3507,7 +3183,6 @@ begin
     List.EndUpdate;
   end;
 end;
-
 procedure StrIToStrings(S, Sep: AnsiString; const List: TJclAnsiStrings; const AllowEmptyString: Boolean = True);
 var
   I, L: SizeInt;
@@ -3537,7 +3212,6 @@ begin
     List.EndUpdate;
   end;
 end;
-
 function StringsToStr(const List: TJclAnsiStrings; const Sep: AnsiString;
   const AllowEmptyString: Boolean): AnsiString;
 var
@@ -3560,7 +3234,6 @@ begin
     Delete(Result, Length(Result) - L + 1, L);
   end;
 end;
-
 procedure TrimStrings(const List: TJclAnsiStrings; DeleteIfEmpty: Boolean);
 var
   I: SizeInt;
@@ -3578,7 +3251,6 @@ begin
     List.EndUpdate;
   end;
 end;
-
 procedure TrimStringsRight(const List: TJclAnsiStrings; DeleteIfEmpty: Boolean);
 var
   I: SizeInt;
@@ -3596,7 +3268,6 @@ begin
     List.EndUpdate;
   end;
 end;
-
 procedure TrimStringsLeft(const List: TJclAnsiStrings; DeleteIfEmpty: Boolean);
 var
   I: SizeInt;
@@ -3614,7 +3285,6 @@ begin
     List.EndUpdate;
   end;
 end;
-
 function AddStringToStrings(const S: AnsiString; Strings: TJclAnsiStrings; const Unique: Boolean): Boolean;
 begin
   Assert(Strings <> nil);
@@ -3622,9 +3292,7 @@ begin
   if not Result then
     Result := Strings.Add(S) > -1;
 end;
-
 //=== Miscellaneous ==========================================================
-
 function FileToString(const FileName: TFileName): AnsiString;
 var
   FS: TFileStream;
@@ -3640,7 +3308,6 @@ begin
     FS.Free;
   end;
 end;
-
 procedure StringToFile(const FileName: TFileName; const Contents: AnsiString; Append: Boolean);
 var
   FS: TFileStream;
@@ -3660,7 +3327,6 @@ begin
     FS.Free;
   end;
 end;
-
 function StrToken(var S: AnsiString; Separator: AnsiChar): AnsiString;
 var
   I: SizeInt;
@@ -3677,7 +3343,6 @@ begin
     S := '';
   end;
 end;
-
 procedure StrTokens(const S: AnsiString; const List: TJclAnsiStrings);
 var
   Start: PAnsiChar;
@@ -3687,7 +3352,6 @@ begin
   Assert(List <> nil);
   if List = nil then
     Exit;
-
   List.BeginUpdate;
   try
     List.Clear;
@@ -3701,16 +3365,13 @@ begin
     List.EndUpdate;
   end;
 end;
-
 procedure StrTokenToStrings(S: AnsiString; Separator: AnsiChar; const List: TJclAnsiStrings);
 var
   Token: AnsiString;
 begin
   Assert(List <> nil);
-
   if List = nil then
     Exit;
-
   List.BeginUpdate;
   try
     List.Clear;
@@ -3723,7 +3384,6 @@ begin
     List.EndUpdate;
   end;
 end;
-
 function StrWord(const S: AnsiString; var Index: SizeInt; out Word: AnsiString): Boolean;
 var
   Start: SizeInt;
@@ -3771,7 +3431,6 @@ begin
     end;
   end;
 end;
-
 function StrWord(var S: PAnsiChar; out Word: AnsiString): Boolean;
 var
   Start: PAnsiChar;
@@ -3812,7 +3471,6 @@ begin
     end;
   end;
 end;
-
 function StrIdent(const S: AnsiString; var Index: SizeInt; out Ident: AnsiString): Boolean;
 var
   Start: SizeInt;
@@ -3853,7 +3511,6 @@ begin
     Inc(Index);
   end;
 end;
-
 function StrIdent(var S: PAnsiChar; out Ident: AnsiString): Boolean;
 var
   Start: PAnsiChar;
@@ -3894,7 +3551,6 @@ begin
     Inc(S);
   end;
 end;
-
 function StrToFloatSafe(const S: AnsiString): Float;
 var
   Temp: AnsiString;
@@ -3907,7 +3563,6 @@ begin
   ThouSep := AnsiChar(JclFormatSettings.ThousandSeparator);
   Temp := S;
   SwapSeparators := False;
-
   IsNegative := False;
   J := 0;
   for I := 1 to Length(Temp) do
@@ -3923,7 +3578,6 @@ begin
       Break;
     end;
   end;
-
   if not SwapSeparators then
   begin
     K := CharPos(Temp, DecSep);
@@ -3936,7 +3590,6 @@ begin
       // that thousand separators appear only to the left of the decimal
       (K < CharPos(Temp, ThouSep)));
   end;
-
   if SwapSeparators then
   begin
     // assume a numerical string from a different locale,
@@ -3948,9 +3601,7 @@ begin
       if Temp[I] = ThouSep then
         Temp[I] := DecSep;
   end;
-
   Temp := StrKeepChars(Temp, AnsiDecDigits + [DecSep]);
-
   if Length(Temp) > 0 then
   begin
     if Temp[1] = DecSep then
@@ -3964,18 +3615,15 @@ begin
   else
     Result := 0.0;
 end;
-
 function StrToIntSafe(const S: AnsiString): Integer;
 begin
   Result := Trunc(StrToFloatSafe(S));
 end;
-
 procedure StrNormIndex(const StrLen: SizeInt; var Index: SizeInt; var Count: SizeInt); overload;
 begin
   Index := Max(1, Min(Index, StrLen + 1));
   Count := Max(0, Min(Count, StrLen + 1 - Index));
 end;
-
 function ArrayOf(List: TJclAnsiStrings): TDynStringArray;
 var
   I: SizeInt;
@@ -3989,12 +3637,10 @@ begin
   else
     Result := nil;
 end;
-
 function AnsiCompareNatural(const S1, S2: AnsiString; CaseInsensitive: Boolean): SizeInt;
 var
   Cur1, Len1,
   Cur2, Len2: SizeInt;
-
   procedure NumberCompare;
   var
     IsReallyNumber: Boolean;
@@ -4015,7 +3661,6 @@ var
       Inc(Result);
       Inc(Cur2);
     end;
-
     // if spaces match, or both strings are actually followed by a numeric character, continue the checks
     if (Result = 0) or (CharIsNumberChar(S1[Cur1])) and (CharIsNumberChar(S2[Cur2])) then
     begin
@@ -4027,19 +3672,16 @@ var
         Result := -1
       else
         Result := 0;
-
       if (S1[Cur1] = '-') or (S1[Cur1] = '+') then
         Inc(Cur1);
       if (S2[Cur2] = '-') or (S2[Cur2] = '+') then
         Inc(Cur2);
-
       FirstDiffBreaks := (S1[Cur1] = '0') or (S2[Cur2] = '0');
       while CharIsDigit(S1[Cur1]) and CharIsDigit(S2[Cur2]) do
       begin
         IsReallyNumber := True;
         Val1 := StrToInt(string(S1[Cur1]));
         Val2 := StrToInt(string(S2[Cur2]));
-
         if (Result = 0) and (Val1 < Val2) then
           Result := -1
         else
@@ -4050,7 +3692,6 @@ var
         Inc(Cur1);
         Inc(Cur2);
       end;
-
       if IsReallyNumber then
       begin
         if not FirstDiffBreaks then
@@ -4064,14 +3705,12 @@ var
       end;
     end;
   end;
-
 begin
   Cur1 := 1;
   Len1 := Length(S1);
   Cur2 := 1;
   Len2 := Length(S2);
   Result := 0;
-
   while (Result = 0) do
   begin
     if (Cur1 = Len1) and (Cur2 = Len2) then
@@ -4103,132 +3742,106 @@ begin
     end;
   end;
 end;
-
 function AnsiCompareNaturalStr(const S1, S2: AnsiString): SizeInt; overload;
 begin
   Result := AnsiCompareNatural(S1, S2, False);
 end;
-
 function AnsiCompareNaturalText(const S1, S2: AnsiString): SizeInt; overload;
 begin
   Result := AnsiCompareNatural(S1, S2, True);
 end;
 
-
 function StrNewA(const Str: PAnsiChar): PAnsiChar;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrNew(Str);
 end;
-
 procedure StrDisposeA(Str: PAnsiChar);
 begin
   {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrDispose(Str);
 end;
-
 function StrLenA(S: PAnsiChar): Integer;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrLen(S);
 end;
-
 function StrEndA(const Str: PAnsiChar): PAnsiChar;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrEnd(Str);
 end;
-
 function StrPosA(const Str1, Str2: PAnsiChar): PAnsiChar;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrPos(Str1, Str2);
 end;
-
 function StrPasA(const Str: PAnsiChar): AnsiString;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrPas(Str);
 end;
-
 function StrCopyA(Dest: PAnsiChar; const Source: PAnsiChar): PAnsiChar;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrCopy(Dest, Source);
 end;
-
 function StrLCopyA(Dest: PAnsiChar; const Source: PAnsiChar; MaxLen: Cardinal): PAnsiChar;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrLCopy(Dest, Source, MaxLen);
 end;
-
 function StrPCopyA(Dest: PAnsiChar; const Source: AnsiString): PAnsiChar;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrPCopy(Dest, Source);
 end;
-
 function StrPLCopyA(Dest: PAnsiChar; const Source: AnsiString; MaxLen: Cardinal): PAnsiChar;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrPLCopy(Dest, Source, MaxLen);
 end;
-
 function StrECopyA(Dest: PAnsiChar; const Source: PAnsiChar): PAnsiChar;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrECopy(Dest, Source);
 end;
-
 function StrCatA(Dest: PAnsiChar; const Source: PAnsiChar): PAnsiChar;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrCat(Dest, Source);
 end;
-
 function StrLCatA(Dest: PAnsiChar; const Source: PAnsiChar; MaxLen: Cardinal): PAnsiChar;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrLCat(Dest, Source, MaxLen);
 end;
-
 function StrCompA(const Str1, Str2: PAnsiChar): Integer;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrComp(Str1, Str2);
 end;
-
 function StrLCompA(const Str1, Str2: PAnsiChar; MaxLen: Cardinal): Integer;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrLComp(Str1, Str2, MaxLen);
 end;
-
 function StrICompA(const Str1, Str2: PAnsiChar): Integer;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrIComp(Str1, Str2);
 end;
-
 function StrLICompA(const Str1, Str2: PAnsiChar; MaxLen: Cardinal): Integer;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrIComp(Str1, Str2);
 end;
-
 function StrFmtA(Buffer, Format: PAnsiChar; const Args: array of const): PAnsiChar;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrFmt(Buffer, Format, Args);
 end;
-
 function AnsiStrPosA(const Str1, Str2: PAnsiChar): PAnsiChar;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}AnsiStrPos(Str1, Str2);
 end;
-
 function AnsiStrLICompA(S1, S2: PAnsiChar; MaxLen: Cardinal): Integer;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}AnsiStrLIComp(S1, S2, MaxLen);
 end;
-
 function AnsiStrLCompA(S1, S2: PAnsiChar; MaxLen: Cardinal): Integer;
 begin
   Result := {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}AnsiStrLComp(S1, S2, MaxLen);
 end;
-
 
 initialization
   LoadCharTypes;  // this table first
   LoadCaseMap;    // or this function does not work
 {$IFDEF UNITVERSIONING}
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.

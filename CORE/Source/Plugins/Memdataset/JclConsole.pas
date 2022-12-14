@@ -1,8 +1,6 @@
 unit JclConsole;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-{$I ..\..\CORE\Source\Includes\windowsonly.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\windowsonly.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -30,9 +28,7 @@ unit JclConsole;
 (*$HPPEMIT '}'*)
 {$HPPEMIT 'using namespace JclConsole;'}
 {$HPPEMIT ''}
-
 interface
-
 uses
   {$IFDEF UNITVERSIONING}
   JclUnitVersioning,
@@ -43,12 +39,10 @@ uses
   Windows, Classes, SysUtils, Contnrs,
   {$ENDIF ~HAS_UNITSCOPE}
   JclBase;
-
 // Console
 type
   TJclScreenBuffer = class;
   TJclInputBuffer = class;
-
   TJclConsole = class(TObject)
   private
     FScreens: TObjectList;
@@ -98,25 +92,20 @@ type
     property OnLogOff: TNotifyEvent read FOnLogOff write FOnLogOff;
     property OnShutdown: TNotifyEvent read FOnShutdown write FOnShutdown;
   end;
-
   TJclConsoleInputMode = (imLine, imEcho, imProcessed, imWindow, imMouse);
   TJclConsoleInputModes = set of TJclConsoleInputMode;
   TJclConsoleOutputMode = (omProcessed, omWrapAtEol);
   TJclConsoleOutputModes = set of TJclConsoleOutputMode;
-
   IJclScreenTextAttribute = interface;
   TJclScreenFont = class;
   TJclScreenCharacter = class;
   TJclScreenCursor = class;
   TJclScreenWindow = class;
-
   // Console screen buffer
   TJclScreenBufferBeforeResizeEvent = procedure(Sender: TObject; const NewSize: TCoord; var CanResize: Boolean) of object;
   TJclScreenBufferAfterResizeEvent = procedure(Sender: TObject) of object;
-
   TJclScreenBufferTextHorizontalAlign = (thaCurrent, thaLeft, thaCenter, thaRight);
   TJclScreenBufferTextVerticalAlign = (tvaCurrent, tvaTop, tvaCenter, tvaBottom);
-
   TJclScreenBuffer = class(TObject)
   private
     FHandle: THandle;
@@ -174,20 +163,16 @@ type
     property OnBeforeResize: TJclScreenBufferBeforeResizeEvent read FOnBeforeResize write FOnBeforeResize;
     property OnAfterResize: TJclScreenBufferAfterResizeEvent read FOnAfterResize write FOnAfterResize;
   end;
-
   // Console screen text attributes
   TJclScreenFontColor = (fclBlack, fclBlue, fclGreen, fclRed, fclCyan, fclMagenta, fclYellow, fclWhite);
   TJclScreenBackColor = (bclBlack, bclBlue, bclGreen, bclRed, bclCyan, bclMagenta, bclYellow, bclWhite);
   TJclScreenFontStyle = (fsLeadingByte, fsTrailingByte, fsGridHorizontal, fsGridLeftVertical, fsGridRightVertical, fsReverseVideo, fsUnderscore, fsSbcsDbcs);
   TJclScreenFontStyles = set of TJclScreenFontStyle;
-
   IJclScreenTextAttribute = interface
     ['{B880B1AC-9F1A-4F42-9D44-EA482B4F3510}']
     function GetTextAttribute: Word;
     procedure SetTextAttribute(const Value: Word);
-
     property TextAttribute: Word read GetTextAttribute write SetTextAttribute;
-
     function GetColor: TJclScreenFontColor;
     procedure SetColor(const Value: TJclScreenFontColor);
     function GetBgColor: TJclScreenBackColor;
@@ -198,26 +183,20 @@ type
     procedure SetBgHighlight(const Value: Boolean);
     function GetStyle: TJclScreenFontStyles;
     procedure SetStyle(const Value: TJclScreenFontStyles);
-
     property Color: TJclScreenFontColor read GetColor write SetColor;
     property BgColor: TJclScreenBackColor read GetBgColor write SetBgColor;
     property Highlight: Boolean read GetHighlight write SetHighlight;
     property BgHighlight: Boolean read GetBgHighlight write SetBgHighlight;
     property Style: TJclScreenFontStyles read GetStyle write SetStyle;
   end;
-
   TJclScreenCustomTextAttribute = class(TInterfacedObject, IJclScreenTextAttribute)
   public
     constructor Create(const Attr: TJclScreenCustomTextAttribute = nil); overload;
-
     procedure Clear;
-
     { IJclScreenTextAttribute }
     function GetTextAttribute: Word; virtual; abstract;
     procedure SetTextAttribute(const Value: Word); virtual; abstract;
-
     property TextAttribute: Word read GetTextAttribute write SetTextAttribute;
-
     function GetColor: TJclScreenFontColor;
     procedure SetColor(const Value: TJclScreenFontColor);
     function GetBgColor: TJclScreenBackColor;
@@ -228,14 +207,12 @@ type
     procedure SetBgHighlight(const Value: Boolean);
     function GetStyle: TJclScreenFontStyles;
     procedure SetStyle(const Value: TJclScreenFontStyles);
-
     property Color: TJclScreenFontColor read GetColor write SetColor;
     property BgColor: TJclScreenBackColor read GetBgColor write SetBgColor;
     property Highlight: Boolean read GetHighlight write SetHighlight;
     property BgHighlight: Boolean read GetBgHighlight write SetBgHighlight;
     property Style: TJclScreenFontStyles read GetStyle write SetStyle;
   end;
-
   TJclScreenFont = class(TJclScreenCustomTextAttribute, IJclScreenTextAttribute)
   private
     FScreenBuffer: TJclScreenBuffer;
@@ -246,7 +223,6 @@ type
     function GetTextAttribute: Word; override;
     procedure SetTextAttribute(const Value: Word); override;
   end;
-
   TJclScreenTextAttribute = class(TJclScreenCustomTextAttribute, IJclScreenTextAttribute)
   private
     FAttribute: Word;
@@ -261,7 +237,6 @@ type
     function GetTextAttribute: Word; override;
     procedure SetTextAttribute(const Value: Word); override;
   end;
-
   TJclScreenCharacter = class(TJclScreenCustomTextAttribute, IJclScreenTextAttribute)
   private
     FCharInfo: TCharInfo;
@@ -275,9 +250,7 @@ type
     function GetTextAttribute: Word; override;
     procedure SetTextAttribute(const Value: Word); override;
   end;
-
   TJclScreenCursorSize = 1..100;
-
   TJclScreenCursor = class(TObject)
   private
     FScreenBuffer: TJclScreenBuffer;
@@ -302,7 +275,6 @@ type
     property Size: TJclScreenCursorSize read GetSize write SetSize;
     property Visible: Boolean read GetVisible write SetVisible;
   end;
-
   // Console screen window
   TJclScreenWindow = class(TObject)
   private
@@ -344,12 +316,9 @@ type
     property Width: Smallint read GetWidth write SetWidth;
     property Height: Smallint read GetHeight write SetHeight;
   end;
-
   // Console input buffer
   TJclInputCtrlEvent = ( ceCtrlC, ceCtrlBreak, ceCtrlClose, ceCtrlLogOff, ceCtrlShutdown );
-
   TJclInputRecordArray = array of TInputRecord;
-
   TJclInputBuffer = class(TObject)
   private
     FConsole: TJclConsole;
@@ -376,7 +345,6 @@ type
     property Mode: TJclConsoleInputModes read GetMode write SetMode;
     property EventCount: DWORD read GetEventCount;
   end;
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -388,9 +356,7 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   {$IFDEF FPC}
   JwaWinNT,
@@ -401,7 +367,6 @@ uses
   Math, TypInfo,
   {$ENDIF ~HAS_UNITSCOPE}
   JclFileUtils, JclResources, JclSysUtils;
-
 {$IFDEF FPC}
 {$EXTERNALSYM CreateConsoleScreenBuffer}
 const
@@ -414,7 +379,6 @@ function SetConsoleWindowInfo(hConsoleOutput: THandle; bAbsolute: BOOL;
   const lpConsoleWindow: TSmallRect): BOOL; stdcall;
   external kernel32 name 'SetConsoleWindowInfo';
 {$ENDIF FPC}
-
 const
   COMMON_LVB_LEADING_BYTE    = $0100; // Leading Byte of DBCS
   COMMON_LVB_TRAILING_BYTE   = $0200; // Trailing Byte of DBCS
@@ -423,16 +387,13 @@ const
   COMMON_LVB_GRID_RVERTICAL  = $1000; // DBCS: Grid attribute: right vertical.
   COMMON_LVB_REVERSE_VIDEO   = $4000; // DBCS: Reverse fore/back ground attribute.
   COMMON_LVB_UNDERSCORE      = $8000; // DBCS: Underscore.
-
   COMMON_LVB_SBCSDBCS        = $0300; // SBCS or DBCS flag.
-
 const
   FontColorMask: Word = FOREGROUND_BLUE or FOREGROUND_GREEN or FOREGROUND_RED;
   BackColorMask: Word = BACKGROUND_BLUE or BACKGROUND_GREEN or BACKGROUND_RED;
   FontStyleMask: Word = COMMON_LVB_LEADING_BYTE or COMMON_LVB_TRAILING_BYTE or
     COMMON_LVB_GRID_HORIZONTAL or COMMON_LVB_GRID_LVERTICAL or COMMON_LVB_GRID_RVERTICAL or
     COMMON_LVB_REVERSE_VIDEO or COMMON_LVB_UNDERSCORE or COMMON_LVB_SBCSDBCS;
-
   FontColorMapping: array [TJclScreenFontColor] of Word =
    (0,
     FOREGROUND_BLUE,
@@ -442,7 +403,6 @@ const
     FOREGROUND_BLUE or FOREGROUND_RED,
     FOREGROUND_GREEN or FOREGROUND_RED,
     FOREGROUND_BLUE or FOREGROUND_GREEN or FOREGROUND_RED);
-
   BackColorMapping: array [TJclScreenBackColor] of Word =
    (0,
     BACKGROUND_BLUE,
@@ -452,7 +412,6 @@ const
     BACKGROUND_BLUE or BACKGROUND_RED,
     BACKGROUND_GREEN or BACKGROUND_RED,
     BACKGROUND_BLUE or BACKGROUND_GREEN or BACKGROUND_RED);
-
   FontStyleMapping: array [TJclScreenFontStyle] of Word =
    (COMMON_LVB_LEADING_BYTE,    // Leading Byte of DBCS
     COMMON_LVB_TRAILING_BYTE,   // Trailing Byte of DBCS
@@ -462,23 +421,18 @@ const
     COMMON_LVB_REVERSE_VIDEO,   // DBCS: Reverse fore/back ground attribute.
     COMMON_LVB_UNDERSCORE,      // DBCS: Underscore.
     COMMON_LVB_SBCSDBCS);       // SBCS or DBCS flag.
-
 const
   InputModeMapping: array [TJclConsoleInputMode] of DWORD =
     (ENABLE_LINE_INPUT, ENABLE_ECHO_INPUT, ENABLE_PROCESSED_INPUT,
      ENABLE_WINDOW_INPUT, ENABLE_MOUSE_INPUT);
-
   OutputModeMapping: array [TJclConsoleOutputMode] of DWORD =
     (ENABLE_PROCESSED_OUTPUT, ENABLE_WRAP_AT_EOL_OUTPUT);
-
 var
   g_DefaultConsole: TJclConsole = nil;
-
 // Due to changes in Vista and onwards Windows will terminate
 // console immidiately after executing CtrlHandler. We need put some wait in it.
 // These subprograms may only work if main application is console and it creates its own message pump.
 // On GUI one these should work always.
-
 function ProcessMessage(var Msg: TMsg): Boolean;
 begin
   Result := False;
@@ -489,14 +443,12 @@ begin
     {$IFDEF HAS_UNITSCOPE}WinApi.{$ENDIF}Windows.DispatchMessage(Msg);
   end;
 end;
-
 procedure ProcessMessages;
 var
   Msg: {$IFDEF HAS_UNITSCOPE}WinApi.{$ENDIF}Windows.TMsg;
 begin
   while ProcessMessage(Msg) do;
 end;
-
 procedure Wait(N: LongWord);
 var
   TickCount: LongWord;
@@ -506,7 +458,6 @@ begin
   while GetTickCount < TickCount do
     ProcessMessages;
 end;
-
 function CtrlHandler(CtrlType: DWORD): BOOL; stdcall;
 var
   Console: TJclConsole;
@@ -541,9 +492,7 @@ begin
   end;
   Wait(200);
 end;
-
 //=== { TJclConsole } ========================================================
-
 constructor TJclConsole.Create;
 begin
   inherited Create;
@@ -557,7 +506,6 @@ begin
   FOnShutdown := nil;
   SetConsoleCtrlHandler(@CtrlHandler, True);
 end;
-
 destructor TJclConsole.Destroy;
 begin
   // (rom) why as first line?
@@ -566,38 +514,31 @@ begin
   FreeAndNil(FInput);
   FreeAndNil(FScreens);
 end;
-
 class procedure TJclConsole.Alloc;
 begin
   Win32Check(AllocConsole);
 end;
-
 class procedure TJclConsole.Free;
 begin
   Win32Check(FreeConsole);
 end;
-
 function TJclConsole.GetScreen(const Idx: Longword): TJclScreenBuffer;
 begin
   // (rom) maybe some checks on Idx here?
   Result := TJclScreenBuffer(FScreens[Idx]);
 end;
-
 function TJclConsole.GetScreenCount: Longword;
 begin
   Result := FScreens.Count;
 end;
-
 function TJclConsole.GetActiveScreen: TJclScreenBuffer;
 begin
   Result := Screens[FActiveScreenIndex];
 end;
-
 procedure TJclConsole.SetActiveScreen(const Value: TJclScreenBuffer);
 begin
   SetActiveScreenIndex(FScreens.IndexOf(Value));
 end;
-
 procedure TJclConsole.SetActiveScreenIndex(const Value: Longword);
 begin
   if ActiveScreenIndex <> Value then
@@ -606,19 +547,16 @@ begin
     FActiveScreenIndex := Value;
   end;
 end;
-
 class function TJclConsole.Default: TJclConsole;
 begin
   if not Assigned(g_DefaultConsole) then
     g_DefaultConsole := TJclConsole.Create;
   Result := g_DefaultConsole;
 end;
-
 class procedure TJclConsole.Shutdown;
 begin
   FreeAndNil(g_DefaultConsole);
 end;
-
 function TJclConsole.Add(AWidth, AHeight: Smallint): TJclScreenBuffer;
 begin
   if AWidth = 0 then
@@ -627,18 +565,15 @@ begin
     AHeight := ActiveScreen.Size.Y;
   Result := TJclScreenBuffer(FScreens[FScreens.Add(TJclScreenBuffer.Create(AWidth, AHeight))]);
 end;
-
 function TJclConsole.Remove(const ScrBuf: TJclScreenBuffer): Longword;
 begin
   Result := FScreens.IndexOf(ScrBuf);
   Delete(Result);
 end;
-
 procedure TJclConsole.Delete(const Idx: Longword);
 begin
   FScreens.Delete(Idx);
 end;
-
 function TJclConsole.GetTitle: string;
 var
   Len: Integer;
@@ -650,34 +585,28 @@ begin
   Win32Check((0 < Len) and (Len < Length(Result)));
   SetLength(Result, Len);
 end;
-
 procedure TJclConsole.SetTitle(const Value: string);
 begin
   Win32Check(SetConsoleTitle(PChar(Value)));
 end;
-
 function TJclConsole.GetInputCodePage: DWORD;
 begin
   Result := GetConsoleCP;
 end;
-
 procedure TJclConsole.SetInputCodePage(const Value: DWORD);
 begin
   { TODO -cTest : SetConsoleCP under Win9x }
   Win32Check(SetConsoleCP(Value));
 end;
-
 function TJclConsole.GetOutputCodePage: DWORD;
 begin
   Result := GetConsoleOutputCP;
 end;
-
 procedure TJclConsole.SetOutputCodePage(const Value: DWORD);
 begin
   { TODO -cTest : SetConsoleOutputCP under Win9x }
   Win32Check(SetConsoleOutputCP(Value));
 end;
-
 class function TJclConsole.IsConsole(const Module: HMODULE): Boolean;
 var
   DosHeader: PImageDosHeader;
@@ -697,7 +626,6 @@ begin
       Result := NtHeaders^.OptionalHeader.Subsystem = IMAGE_SUBSYSTEM_WINDOWS_CUI;
   end;
 end;
-
 class function TJclConsole.IsConsole(const FileName: TFileName): Boolean;
 begin
   with TJclFileMappingStream.Create(FileName) do
@@ -707,15 +635,12 @@ begin
     Free;
   end;
 end;
-
 class function TJclConsole.MouseButtonCount: DWORD;
 begin
   Result := 0;
   Win32Check(GetNumberOfConsoleMouseButtons(Result));
 end;
-
 //=== { TJclScreenBuffer } ===================================================
-
 constructor TJclScreenBuffer.Create;
 begin
   inherited Create;
@@ -724,7 +649,6 @@ begin
   Win32Check(FHandle <> INVALID_HANDLE_VALUE);
   Init;
 end;
-
 constructor TJclScreenBuffer.Create(const AHandle: THandle);
 begin
   inherited Create;
@@ -732,7 +656,6 @@ begin
   Assert(FHandle <> INVALID_HANDLE_VALUE);
   Init;
 end;
-
 constructor TJclScreenBuffer.Create(const AWidth, AHeight: Smallint);
 begin
   inherited Create;
@@ -742,7 +665,6 @@ begin
   Init;
   DoResize(AWidth, AHeight);
 end;
-
 destructor TJclScreenBuffer.Destroy;
 begin
   // (rom) why as first line?
@@ -753,7 +675,6 @@ begin
   FreeAndNil(FCharList);
   CloseHandle(FHandle);
 end;
-
 procedure TJclScreenBuffer.Init;
 begin
   FCharList := TObjectList.Create;
@@ -763,42 +684,34 @@ begin
   FCursor := TJclScreenCursor.Create(Self);
   FWindow := TJclScreenWindow.Create(Self);
 end;
-
 function TJclScreenBuffer.GetInfo: TConsoleScreenBufferInfo;
 begin
   Win32Check(GetConsoleScreenBufferInfo(FHandle, Result));
 end;
-
 function TJclScreenBuffer.GetSize: TCoord;
 begin
   Result := Info.dwSize;
 end;
-
 procedure TJclScreenBuffer.SetSize(const Value: TCoord);
 begin
   DoResize(Value);
 end;
-
 function TJclScreenBuffer.GetWidth: Smallint;
 begin
   Result := Size.X;
 end;
-
 procedure TJclScreenBuffer.SetWidth(const Value: Smallint);
 begin
   DoResize(Value, Size.Y);
 end;
-
 function TJclScreenBuffer.GetHeight: Smallint;
 begin
   Result := Size.Y;
 end;
-
 procedure TJclScreenBuffer.SetHeight(const Value: Smallint);
 begin
   DoResize(Size.X, Value);
 end;
-
 procedure TJclScreenBuffer.DoResize(const NewSize: TCoord);
 var
   CanResize: Boolean;
@@ -817,7 +730,6 @@ begin
       FOnAfterResize(Self);
   end;
 end;
-
 procedure TJclScreenBuffer.DoResize(const NewWidth, NewHeight: Smallint);
 var
   NewSize: TCoord;
@@ -826,7 +738,6 @@ begin
   NewSize.Y := NewHeight;
   DoResize(NewSize);
 end;
-
 function TJclScreenBuffer.GetMode: TJclConsoleOutputModes;
 var
   OutputMode: DWORD;
@@ -839,7 +750,6 @@ begin
     if (OutputMode and OutputModeMapping[AMode]) = OutputModeMapping[AMode] then
       Include(Result, AMode);
 end;
-
 procedure TJclScreenBuffer.SetMode(const Value: TJclConsoleOutputModes);
 var
   OutputMode: DWORD;
@@ -851,7 +761,6 @@ begin
       OutputMode := OutputMode or OutputModeMapping[AMode];
   Win32Check(SetConsoleMode(FHandle, OutputMode));
 end;
-
 function TJclScreenBuffer.Write(const Text: string;
   const ATextAttribute: IJclScreenTextAttribute): DWORD;
 begin
@@ -860,14 +769,12 @@ begin
   Result := 0;
   Win32Check(WriteConsole(Handle, PChar(Text), Length(Text), Result, nil));
 end;
-
 function TJclScreenBuffer.Writeln(const Text: string;
   const ATextAttribute: IJclScreenTextAttribute): DWORD;
 begin
   Result := Write(Text, ATextAttribute);
   Cursor.MoveTo(Window.Left, Cursor.Position.Y + 1);
 end;
-
 function TJclScreenBuffer.Write(const Text: string; const X, Y: Smallint;
   const ATextAttribute: IJclScreenTextAttribute): DWORD;
 var
@@ -886,7 +793,6 @@ begin
       Pos.X := X;
       Pos.Y := Y;
     end;
-
     if Assigned(ATextAttribute) then
     begin
       SetLength(Attrs, Length(Text));
@@ -900,7 +806,6 @@ begin
   else
     Result := 0;
 end;
-
 function TJclScreenBuffer.Write(const Text: string; const X, Y: Smallint;
   pAttrs: PWORD): DWORD;
 var
@@ -920,7 +825,6 @@ begin
     Win32Check(WriteConsoleOutputAttribute(Handle, pAttrs, Length(Text), Pos, Result));
   Win32Check(WriteConsoleOutputCharacter(Handle, PChar(Text), Length(Text), Pos, Result));
 end;
-
 function TJclScreenBuffer.Write(const Text: string;
   const HorizontalAlign: TJclScreenBufferTextHorizontalAlign;
   const VerticalAlign: TJclScreenBufferTextVerticalAlign;
@@ -952,7 +856,6 @@ begin
   end;
   Result := Write(Text, X, Y, ATextAttribute);
 end;
-
 function TJclScreenBuffer.Read(const Count: Integer): string;
 var
   ReadCount: DWORD;
@@ -962,12 +865,10 @@ begin
   Win32Check(ReadConsole(Handle, PChar(Result), Count, ReadCount, nil));
   SetLength(Result, Min(ReadCount, StrLen(PChar(Result))));
 end;
-
 function TJclScreenBuffer.Readln: string;
 begin
   Result := Read(Window.Right - Cursor.Position.X + 1);
 end;
-
 function TJclScreenBuffer.Read(X, Y: Smallint; const Count: Integer): string;
 var
   ReadPos: TCoord;
@@ -980,12 +881,10 @@ begin
   Win32Check(ReadConsoleOutputCharacter(Handle, PChar(Result), Count, ReadPos, ReadCount));
   SetLength(Result, Min(ReadCount, StrLen(PChar(Result))));
 end;
-
 function TJclScreenBuffer.Readln(X, Y: Smallint): string;
 begin
   Result := Read(X, Y, Window.Right - X + 1);
 end;
-
 procedure TJclScreenBuffer.Fill(const ch: Char; const ATextAttribute: IJclScreenTextAttribute);
 var
   WriteCount: DWORD;
@@ -998,21 +897,17 @@ begin
   else
     Win32Check(FillConsoleOutputAttribute(Handle, Font.TextAttribute, Width * Height, Cursor.Position, WriteCount));
 end;
-
 procedure TJclScreenBuffer.Clear;
 begin
   Fill(' ', TJclScreenTextAttribute.Create(fclWhite, bclBlack, False, False, []));
 end;
-
 //=== { TJclScreenCustomTextAttribute } ======================================
-
 constructor TJclScreenCustomTextAttribute.Create(const Attr: TJclScreenCustomTextAttribute);
 begin
   inherited Create;
   if Assigned(Attr) then
     SetTextAttribute(Attr.GetTextAttribute);
 end;
-
 function TJclScreenCustomTextAttribute.GetColor: TJclScreenFontColor;
 var
   TA: Word;
@@ -1022,7 +917,6 @@ begin
     if (TA and FontColorMapping[Result]) = FontColorMapping[Result] then
       Break;
 end;
-
 function TJclScreenCustomTextAttribute.GetBgColor: TJclScreenBackColor;
 var
   TA: Word;
@@ -1032,27 +926,22 @@ begin
     if (TA and BackColorMapping[Result]) = BackColorMapping[Result] then
       Break;
 end;
-
 function TJclScreenCustomTextAttribute.GetHighlight: Boolean;
 begin
   Result := (TextAttribute and FOREGROUND_INTENSITY) = FOREGROUND_INTENSITY;
 end;
-
 function TJclScreenCustomTextAttribute.GetBgHighlight: Boolean;
 begin
   Result := (TextAttribute and BACKGROUND_INTENSITY) = BACKGROUND_INTENSITY;
 end;
-
 procedure TJclScreenCustomTextAttribute.SetColor(const Value: TJclScreenFontColor);
 begin
   TextAttribute := (TextAttribute and (not FontColorMask)) or FontColorMapping[Value];
 end;
-
 procedure TJclScreenCustomTextAttribute.SetBgColor(const Value: TJclScreenBackColor);
 begin
   TextAttribute := (TextAttribute and (not BackColorMask)) or BackColorMapping[Value];
 end;
-
 procedure TJclScreenCustomTextAttribute.SetHighlight(const Value: Boolean);
 begin
   if Value then
@@ -1060,7 +949,6 @@ begin
   else
     TextAttribute := TextAttribute and (not FOREGROUND_INTENSITY);
 end;
-
 procedure TJclScreenCustomTextAttribute.SetBgHighlight(const Value: Boolean);
 begin
   if Value then
@@ -1068,7 +956,6 @@ begin
   else
     TextAttribute := TextAttribute and (not BACKGROUND_INTENSITY);
 end;
-
 function TJclScreenCustomTextAttribute.GetStyle: TJclScreenFontStyles;
 var
   ta: Word;
@@ -1080,7 +967,6 @@ begin
     if (ta and FontStyleMapping[AStyle]) = FontStyleMapping[AStyle] then
       Include(Result, AStyle);
 end;
-
 procedure TJclScreenCustomTextAttribute.SetStyle(const Value: TJclScreenFontStyles);
 var
   ta: Word;
@@ -1092,38 +978,30 @@ begin
       ta := ta or FontStyleMapping[AStyle];
   TextAttribute := (TextAttribute and (not FontStyleMask)) or ta;
 end;
-
 procedure TJclScreenCustomTextAttribute.Clear;
 begin
   TextAttribute := FontColorMapping[fclWhite] or BackColorMapping[bclBlack];
 end;
-
 //=== { TJclScreenFont } =====================================================
-
 constructor TJclScreenFont.Create(const AScrBuf: TJclScreenBuffer);
 begin
   inherited Create;
   FScreenBuffer := AScrBuf;
 end;
-
 function TJclScreenFont.GetTextAttribute: Word;
 begin
   Result := ScreenBuffer.Info.wAttributes;
 end;
-
 procedure TJclScreenFont.SetTextAttribute(const Value: Word);
 begin
   Win32Check(SetConsoleTextAttribute(ScreenBuffer.Handle, Value));
 end;
-
 //=== { TJclScreenTextAttribute 0 ============================================
-
 constructor TJclScreenTextAttribute.Create(const Attribute: Word);
 begin
   inherited Create;
   FAttribute := Attribute;
 end;
-
 constructor TJclScreenTextAttribute.Create(const AColor: TJclScreenFontColor;
   const ABgColor: TJclScreenBackColor; const AHighLight, ABgHighLight: Boolean;
   const AStyle: TJclScreenFontStyles);
@@ -1135,79 +1013,63 @@ begin
   BgHighlight := ABgHighLight;
   Style := AStyle;
 end;
-
 function TJclScreenTextAttribute.GetTextAttribute: Word;
 begin
   Result := FAttribute;
 end;
-
 procedure TJclScreenTextAttribute.SetTextAttribute(const Value: Word);
 begin
   FAttribute := Value;
 end;
-
 //=== { TJclScreenCharacter } ================================================
-
 constructor TJclScreenCharacter.Create(const CharInfo: TCharInfo);
 begin
   inherited Create;
   FCharInfo := CharInfo;
 end;
-
 function TJclScreenCharacter.GetCharacter: Char;
 begin
   Result := Char(FCharInfo.AsciiChar);
 end;
-
 procedure TJclScreenCharacter.SetCharacter(const Value: Char);
 begin
   FCharInfo.AsciiChar := AnsiChar(Value);
 end;
-
 function TJclScreenCharacter.GetTextAttribute: Word;
 begin
   Result := FCharInfo.Attributes;
 end;
-
 procedure TJclScreenCharacter.SetTextAttribute(const Value: Word);
 begin
   FCharInfo.Attributes := Value;
 end;
-
 //=== { TJclScreenCursor } ===================================================
-
 constructor TJclScreenCursor.Create(const AScrBuf: TJclScreenBuffer);
 begin
   inherited Create;
   FScreenBuffer := AScrBuf;
 end;
-
 function TJclScreenCursor.GetInfo: TConsoleCursorInfo;
 begin
   ResetMemory(Result, SizeOf(Result));
   Win32Check(GetConsoleCursorInfo(ScreenBuffer.Handle, Result));
 end;
-
 procedure TJclScreenCursor.SetInfo(const Value: TConsoleCursorInfo);
 begin
   Win32Check(SetConsoleCursorInfo(ScreenBuffer.Handle, Value));
 end;
-
 function TJclScreenCursor.GetPosition: TCoord;
 begin
   Result := ScreenBuffer.Info.dwCursorPosition;
 end;
-
 procedure TJclScreenCursor.SetPosition(const Value: TCoord);
 begin
   Win32Check(SetConsoleCursorPosition(ScreenBuffer.Handle, Value));
 end;
-
 function TJclScreenCursor.GetSize: TJclScreenCursorSize;
 begin
   Result := Info.dwSize;
 end;
-
 procedure TJclScreenCursor.SetSize(const Value: TJclScreenCursorSize);
 var
   NewInfo: TConsoleCursorInfo;
@@ -1216,12 +1078,10 @@ begin
   NewInfo.dwSize := Value;
   Info := NewInfo;
 end;
-
 function TJclScreenCursor.GetVisible: Boolean;
 begin
   Result := Info.bVisible;
 end;
-
 procedure TJclScreenCursor.SetVisible(const Value: Boolean);
 var
   NewInfo: TConsoleCursorInfo;
@@ -1230,12 +1090,10 @@ begin
   NewInfo.bVisible := Value;
   Info := NewInfo;
 end;
-
 procedure TJclScreenCursor.MoveTo(const DestPos: TCoord);
 begin
   Position := DestPos;
 end;
-
 procedure TJclScreenCursor.MoveTo(const x, y: Smallint);
 var
   DestPos: TCoord;
@@ -1244,7 +1102,6 @@ begin
   DestPos.Y := y;
   MoveTo(DestPos);
 end;
-
 procedure TJclScreenCursor.MoveBy(const Delta: TCoord);
 var
   DestPos: TCoord;
@@ -1254,7 +1111,6 @@ begin
   Inc(DestPos.Y, Delta.Y);
   MoveTo(DestPos);
 end;
-
 procedure TJclScreenCursor.MoveBy(const cx, cy: Smallint);
 var
   DestPos: TCoord;
@@ -1264,25 +1120,20 @@ begin
   Inc(DestPos.Y, cy);
   MoveTo(DestPos);
 end;
-
 //=== { TJclScreenWindow } ===================================================
-
 constructor TJclScreenWindow.Create(const AScrBuf: TJclScreenBuffer);
 begin
   inherited Create;
   FScreenBuffer := AScrBuf;
 end;
-
 function TJclScreenWindow.GetMaxConsoleWindowSize: TCoord;
 begin
   Result := GetLargestConsoleWindowSize(ScreenBuffer.Handle);
 end;
-
 function TJclScreenWindow.GetMaxWindow: TCoord;
 begin
   Result := ScreenBuffer.Info.dwMaximumWindowSize;
 end;
-
 procedure TJclScreenWindow.InternalSetPosition(const X, Y: SmallInt);
 var
   NewRect: TSmallRect;
@@ -1296,7 +1147,6 @@ begin
     DoResize(NewRect);
   end;
 end;
-
 procedure TJclScreenWindow.InternalSetSize(const X, Y: SmallInt);
 var
   NewRect: TSmallRect;
@@ -1310,94 +1160,76 @@ begin
     DoResize(NewRect);
   end;
 end;
-
 function TJclScreenWindow.GetLeft: Smallint;
 begin
   Result := ScreenBuffer.Info.srWindow.Left;
 end;
-
 function TJclScreenWindow.GetRight: Smallint;
 begin
   Result := ScreenBuffer.Info.srWindow.Right;
 end;
-
 function TJclScreenWindow.GetTop: Smallint;
 begin
   Result := ScreenBuffer.Info.srWindow.Top;
 end;
-
 function TJclScreenWindow.GetBottom: Smallint;
 begin
   Result := ScreenBuffer.Info.srWindow.Bottom;
 end;
-
 function TJclScreenWindow.GetWidth: Smallint;
 begin
   Result := ScreenBuffer.Info.srWindow.Right - ScreenBuffer.Info.srWindow.Left + 1;
 end;
-
 function TJclScreenWindow.GetHeight: Smallint;
 begin
   Result := ScreenBuffer.Info.srWindow.Bottom - ScreenBuffer.Info.srWindow.Top + 1;
 end;
-
 procedure TJclScreenWindow.SetLeft(const Value: Smallint);
 begin
   InternalSetPosition(Value, Top);
 end;
-
 procedure TJclScreenWindow.SetRight(const Value: Smallint);
 begin
   InternalSetSize(Value - Left + 1, Height);
 end;
-
 procedure TJclScreenWindow.SetTop(const Value: Smallint);
 begin
   InternalSetPosition(Left, Value);
 end;
-
 procedure TJclScreenWindow.SetBottom(const Value: Smallint);
 begin
   InternalSetSize(Width, Value - Top + 1);
 end;
-
 procedure TJclScreenWindow.SetWidth(const Value: Smallint);
 begin
   InternalSetSize(Value, Height);
 end;
-
 procedure TJclScreenWindow.SetHeight(const Value: Smallint);
 begin
   InternalSetSize(Width, Value);
 end;
-
 function TJclScreenWindow.GetPosition: TCoord;
 begin
   Result.X := Left;
   Result.Y := Top;
 end;
-
 function TJclScreenWindow.GetSize: TCoord;
 begin
   Result.X := Width;
   Result.Y := Height;
 end;
-
 procedure TJclScreenWindow.SetPosition(const Value: TCoord);
 begin
   InternalSetPosition(Value.X, Value.Y);
 end;
-
 procedure TJclScreenWindow.SetSize(const Value: TCoord);
 begin
   InternalSetSize(Value.X, Value.Y);
 end;
-
 procedure TJclScreenWindow.DoResize(const NewRect: TSmallRect; bAbsolute: Boolean);
 begin
   Win32Check(SetConsoleWindowInfo(ScreenBuffer.Handle, bAbsolute, NewRect));
 end;
-
 procedure TJclScreenWindow.Scroll(const cx, cy: Smallint);
 var
   Delta: TSmallRect;
@@ -1408,9 +1240,7 @@ begin
   Delta.Bottom := cy;
   DoResize(Delta, False);
 end;
-
 //=== { TJclInputBuffer } ====================================================
-
 constructor TJclInputBuffer.Create(const AConsole: TJclConsole);
 begin
   inherited Create;
@@ -1419,18 +1249,15 @@ begin
     FILE_SHARE_READ or FILE_SHARE_WRITE, nil, OPEN_EXISTING, 0, 0);
   Win32Check(INVALID_HANDLE_VALUE <> FHandle);
 end;
-
 destructor TJclInputBuffer.Destroy;
 begin
   CloseHandle(FHandle);
   inherited Destroy;
 end;
-
 procedure TJclInputBuffer.Clear;
 begin
   Win32Check(FlushConsoleInputBuffer(Handle));
 end;
-
 function TJclInputBuffer.GetMode: TJclConsoleInputModes;
 var
   InputMode: DWORD;
@@ -1443,7 +1270,6 @@ begin
     if (InputMode and InputModeMapping[AMode]) = InputModeMapping[AMode] then
       Include(Result, AMode);
 end;
-
 procedure TJclInputBuffer.SetMode(const Value: TJclConsoleInputModes);
 var
   InputMode: DWORD;
@@ -1455,7 +1281,6 @@ begin
       InputMode := InputMode or InputModeMapping[AMode];
   Win32Check(SetConsoleMode(Handle, InputMode));
 end;
-
 procedure TJclInputBuffer.RaiseCtrlEvent(const AEvent: TJclInputCtrlEvent;
   const ProcessGroupId: DWORD);
 const
@@ -1468,24 +1293,20 @@ begin
     raise EJclError.CreateResFmt(@RsCannotRaiseSignal,
       [GetEnumName(TypeInfo(TJclInputCtrlEvent), Integer(AEvent))]);
 end;
-
 function TJclInputBuffer.GetEventCount: DWORD;
 begin
   Result := 0;
   Win32Check(GetNumberOfConsoleInputEvents(Handle, Result));
 end;
-
 function TJclInputBuffer.WaitEvent(const TimeOut: DWORD): Boolean;
 begin
   Result := WaitForSingleObject(Handle, TimeOut) = WAIT_OBJECT_0;
 end;
-
 function TJclInputBuffer.GetEvents(var Events: TJclInputRecordArray): DWORD;
 begin
   Result := 0;
   Win32Check(ReadConsoleInput(Handle, Events[0], Length(Events), Result));
 end;
-
 function TJclInputBuffer.PeekEvents(var Events: TJclInputRecordArray): DWORD;
 begin
   if EventCount = 0 then
@@ -1493,35 +1314,29 @@ begin
   else
     Win32Check(PeekConsoleInput(Handle, Events[0], Length(Events), Result));
 end;
-
 function TJclInputBuffer.PutEvents(const Events: TJclInputRecordArray): DWORD;
 begin
   Result := 0;
   Win32Check(WriteConsoleInput(Handle, Events[0], Length(Events), Result));
 end;
-
 function TJclInputBuffer.GetEvents(const Count: Integer): TJclInputRecordArray;
 begin
   SetLength(Result, Count);
   SetLength(Result, GetEvents(Result));
 end;
-
 function TJclInputBuffer.PeekEvents(const Count: Integer): TJclInputRecordArray;
 begin
   SetLength(Result, Count);
   SetLength(Result, PeekEvents(Result));
 end;
-
 function TJclInputBuffer.GetEvent: TInputRecord;
 begin
   Result := GetEvents(1)[0];
 end;
-
 function TJclInputBuffer.PeekEvent: TInputRecord;
 begin
   Result := PeekEvents(1)[0];
 end;
-
 function TJclInputBuffer.PutEvent(const Event: TInputRecord): Boolean;
 var
   Evts: TJclInputRecordArray;
@@ -1530,13 +1345,10 @@ begin
   Evts[0] := Event;
   Result := PutEvents(Evts) = 1;
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.

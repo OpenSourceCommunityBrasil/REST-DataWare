@@ -1,8 +1,6 @@
 unit JvJCLUtils;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-{$I ..\..\CORE\Source\Includes\crossplatform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\crossplatform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -25,10 +23,8 @@ unit JvJCLUtils;
 }
 
 interface
-
 // (p3) note: this unit should only contain JCL compatible routines (no Forms etc)
 // and no JVCL units!
-
 uses
   {$IFDEF UNITVERSIONING}
   JclUnitVersioning,
@@ -44,7 +40,6 @@ uses
   StrUtils, TypInfo,
   JclBase,
   JvTypes;
-
 const
   {$IFDEF MSWINDOWS}
   PathDelim = '\';
@@ -59,13 +54,11 @@ const
     // Note: the else is on purpose, VCL is not defined for a console application
   NullHandle = 0;
   USDecimalSeparator = '.';
-
 {$IFNDEF COMPILER12_UP} // Delphi 2009 introduced it and fixed the NativeInt of Delphi 2007
 type
   // Compatibility for older Delphi versions, so the JVCL doesn't need to IFDEFs every call to
   // SetWindowLongPtr/GetWindowLongPtr.
   NativeInt = Integer;
-
   {$EXTERNALSYM INT_PTR}
   INT_PTR = Integer;
   {$EXTERNALSYM LONG_PTR}
@@ -76,7 +69,6 @@ type
   ULONG_PTR = LongWord;
   {$EXTERNALSYM DWORD_PTR}
   DWORD_PTR = ULONG_PTR;
-
 const
   GWLP_WNDPROC    = -4;
   {$EXTERNALSYM GWLP_WNDPROC}
@@ -88,39 +80,32 @@ const
   {$EXTERNALSYM GWLP_USERDATA}
   GWLP_ID         = -12;
   {$EXTERNALSYM GWLP_ID}
-
 {$EXTERNALSYM GetWindowLongPtr}
 function GetWindowLongPtr(hWnd: HWND; nIndex: Integer): LONG_PTR; stdcall;
 {$EXTERNALSYM SetWindowLongPtr}
 function SetWindowLongPtr(hWnd: HWND; nIndex: Integer; dwNewLong: LONG_PTR): LONG_PTR; stdcall;
 {$ENDIF ~COMPILER12_UP}
-
 type
   EJvConvertError = Class(EConvertError);  { subclass EConvertError raised by some non-Def versions of floating point conversion routine }
   {$IFDEF UNIX}
   TFileTime = Integer;
   {$ENDIF UNIX}
-
   {$IFNDEF RTL150_UP}
   TFormatSettings = record
     DecimalSeparator: Char;
   end;
   {$ENDIF RTL150_UP}
-
 function SendRectMessage(Handle: THandle; Msg: Integer; wParam: WPARAM; var R: TRect): Integer;
 function SendStructMessage(Handle: THandle; Msg: Integer; wParam: WPARAM; var Data): Integer;
 function ReadCharsFromStream(Stream: TStream; var Buf: array of AnsiChar; BufSize: Integer): Integer; // ANSI-Stream
 function WriteStringToStream(Stream: TStream; const Buf: AnsiString; BufSize: Integer): Integer; // ANSI-Stream
-
 {$IFNDEF COMPILER12_UP}
 function UTF8ToString(const S: UTF8String): string; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
 {$ENDIF ~COMPILER12_UP}
-
 const
   DefaultDateOrder = doDMY;
   CenturyOffset: Byte = 60;
   NullDate: TDateTime = {-693594} 0;
-
 
 //------------------------------------------------------------------------------------
 // This 'USA' hack functionality is made useless by the JvSafeStrToFloatDef routine:
@@ -130,16 +115,13 @@ const
    // StrToFloatUS uses US '.' as decimal seperator and ',' as thousand separator
    //function StrToFloatUSDef(const Text: string; Default: Extended): Extended;
 
-
 function VarIsInt(Value: Variant): Boolean;
  // VarIsInt returns VarIsOrdinal-[varBoolean]
-
 { PosIdx returns the index of the first appearance of SubStr in Str. The search
   starts at index "Index". }
 function PosIdx(const SubStr, S: string; Index: Integer = 0): Integer;
 function PosIdxW(const SubStr, S: WideString; Index: Integer = 0): Integer;
 function PosLastCharIdx(Ch: Char; const S: string; Index: Integer = 0): Integer;
-
 { GetWordOnPos returns Word from string, S, on the cursor position, P}
 function GetWordOnPos(const S: string; const P: Integer): string;
 function GetWordOnPosW(const S: WideString; const P: Integer): WideString;
@@ -161,7 +143,6 @@ procedure GetEndPosCaretW(const Text: WideString; CaretX, CaretY: Integer;
   var X, Y: Integer);
 { GetEndPosCaret returns the caret position of the last char. For the position
   after the last char of Text you must add 1 to the returned X value. }
-
 { SubStrBySeparator returns substring from string, S, separated with Separator string}
 function SubStrBySeparator(const S: string; const Index: Integer; const Separator: string; StartIndex: Integer = 1): string;
 function SubStrBySeparatorW(const S: WideString; const Index: Integer; const Separator: WideString; StartIndex: Integer = 1): WideString;
@@ -186,7 +167,6 @@ function ConcatSep(const S1, S2, Separator: string): string; {$IFDEF SUPPORTS_IN
 { ConcatLeftSep is same to previous function, but
   strings concatenate right to left }
 function ConcatLeftSep(const S1, S2, Separator: string): string; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
-
 { Next 4 function for russian chars transliterating.
   This functions are needed because Oem2Ansi and Ansi2Oem functions
   sometimes suck }
@@ -195,7 +175,6 @@ procedure Win2Dos(var S: AnsiString);
 function Dos2WinRes(const S: AnsiString): AnsiString; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
 function Win2DosRes(const S: AnsiString): AnsiString; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
 function Win2Koi(const S: AnsiString): AnsiString;
-
 { FillString fills the string Buffer with Count Chars }
 procedure FillString(var Buffer: string; Count: Integer; const Value: Char); overload;
 procedure FillString(var Buffer: string; StartIndex, Count: Integer; const Value: Char); overload;
@@ -213,7 +192,6 @@ procedure FillNativeChar(var Buffer; Count: Integer; const Value: Char); // D200
 procedure MoveNativeChar(const Source; var Dest; Count: Integer); // D2009 internal error {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
 { IsSubString() compares the sub string to the string. Indices are 1th based. }
 function IsSubString(const S: string; StartIndex: Integer; const SubStr: string): Boolean;
-
 { Spaces returns string consists on N space chars }
 function Spaces(const N: Integer): string;
 { AddSpaces adds spaces to string S, if its Length is smaller than N }
@@ -238,7 +216,6 @@ function CharInSet(const Ch: AnsiChar; const SetOfChar: TSysCharSet): Boolean; {
 function CharInSetW(const Ch: WideChar; const SetOfChar: TSysCharSet): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
 function CountOfChar(const Ch: Char; const S: string): Integer;
 function DefStr(const S: string; Default: string): string; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
-
 { StrLICompW2 is a faster replacement for JclUnicode.StrLICompW }
 function StrLICompW2(S1, S2: PWideChar; MaxLen: Integer): Integer;
 function StrPosW(S, SubStr: PWideChar): PWideChar;
@@ -248,7 +225,6 @@ function TrimLeftW(const S: WideString): WideString; {$IFDEF SUPPORTS_INLINE} in
 function TrimRightW(const S: WideString): WideString; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
 {**** files routines}
 procedure SetDelimitedText(List: TStrings; const Text: string; Delimiter: Char);
-
 const
   {$IFDEF MSWINDOWS}
   DefaultCaseSensitivity = False;
@@ -256,7 +232,6 @@ const
   {$IFDEF UNIX}
   DefaultCaseSensitivity = True;
   {$ENDIF UNIX}
-
 { GenTempFileName returns temporary file name on
   drive, there FileName is placed }
 function GenTempFileName(FileName: string): string;
@@ -277,13 +252,11 @@ function FileEquMask(FileName, Mask: TFileName;
 function FileEquMasks(FileName, Masks: TFileName;
   CaseSensitive: Boolean = DefaultCaseSensitivity): Boolean;
 function DeleteFiles(const Folder: TFileName; const Masks: string): Boolean;
-
 {$IFDEF MSWINDOWS}
 { LZFileExpand expand file, FileSource,
   into FileDest. Given file must be compressed, using MS Compress program }
 function LZFileExpand(const FileSource, FileDest: string): Boolean;
 {$ENDIF MSWINDOWS}
-
 { FileGetInfo fills SearchRec record for specified file attributes}
 function FileGetInfo(FileName: TFileName; var SearchRec: TSearchRec): Boolean;
 { HasSubFolder returns True, if folder APath contains other folders }
@@ -310,41 +283,32 @@ function CopyDir(const SourceDir, DestDir: TFileName): Boolean;
 //function FileTimeToDateTime(const FT: TFileTime): TDateTime;
 procedure FileTimeToDosDateTimeDWord(const FT: TFileTime; out Dft: DWORD);
 function MakeValidFileName(const FileName: TFileName; ReplaceBadChar: Char): TFileName;
-
 {**** Graphic routines }
-
 
 { IsTTFontSelected returns True, if True Type font
   is selected in specified device context }
 function IsTTFontSelected(const DC: HDC): Boolean;
-
 { TrueInflateRect inflates rect in other method, than InflateRect API function }
 function TrueInflateRect(const R: TRect; const I: Integer): TRect;
 {**** Color routines }
 procedure RGBToHSV(R, G, B: Integer; var H, S, V: Integer);
 function RGBToBGR(Value: Cardinal): Cardinal;
-
 {**** other routines }
 procedure SwapInt(var Int1, Int2: Integer); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
 function IntPower(Base, Exponent: Integer): Integer;
 function StrToBool(const S: string): Boolean;
-
 function Var2Type(V: Variant; const DestVarType: Integer): Variant;
 function VarToInt(V: Variant): Integer;
 function VarToFloat(V: Variant): Double;
-
 { following functions are not documented
   because they do not work properly sometimes, so do not use them }
 // (rom) ReplaceStrings1, GetSubStr removed
-
 function GetLongFileName(const FileName: string): string;
 function FileNewExt(const FileName, NewExt: TFileName): TFileName;
 function GetParameter: string;
 function GetComputerID: string;
 function GetComputerName: string;
-
 {**** string routines }
-
 { ReplaceAllStrings searches for all substrings, Words,
   in a string, S, and replaces them with Frases with the same Index. }
 function ReplaceAllStrings(const S: string; Words, Frases: TStrings): string;
@@ -367,9 +331,7 @@ procedure DeleteEmptyLines(Ss: TStrings);
   Note: If strings SQL allready contains where-statement,
   it must be started on the begining of any line }
 procedure SQLAddWhere(SQL: TStrings; const Where: string);
-
 {**** files routines - }
-
 {$IFDEF MSWINDOWS}
 { ResSaveToFile save resource named as Name with Typ type into file FileName.
   Resource can be compressed using MS Compress program}
@@ -391,41 +353,32 @@ procedure SaveTextFile(const FileName: TFileName; const Source: string);
   that are equal to mask, Mask, into strings, FileList}
 function ReadFolder(const Folder, Mask: TFileName; FileList: TStrings): Integer;
 function ReadFolders(const Folder: TFileName; FolderList: TStrings): Integer;
-
 procedure SetChildPropOrd(Owner: TComponent; const PropName: string; Value: Longint);
 procedure Error(const Msg: string);
 procedure ClearList(List: TList);
-
 function GetPropType(Obj: TObject; const PropName: string): TTypeKind;
 function GetPropStr(Obj: TObject; const PropName: string): string;
 function GetPropOrd(Obj: TObject; const PropName: string): Integer;
 function GetPropMethod(Obj: TObject; const PropName: string): TMethod;
-
 procedure PrepareIniSection(Ss: TStrings);
 { following functions are not documented because
   they are don't work properly, so don't use them }
-
 // (rom) from JvBandWindows to make it obsolete
 function PointL(const X, Y: Longint): TPointL; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
 // (rom) from JvBandUtils to make it obsolete
 function iif(const Test: Boolean; const ATrue, AFalse: Variant): Variant; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
 
-
 {$IFNDEF COMPILER12_UP} // Delphi 2009 introduced the "TRect" overload
 function InvalidateRect(hWnd: HWND; const lpRect: TRect; bErase: BOOL): BOOL; overload; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
 function InvalidateRect(hWnd: HWND; lpRect: PRect; bErase: BOOL): BOOL; overload; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
 {$ENDIF ~COMPILER12_UP}
-
 { begin JvRLE }
-
 // (rom) changed API for inclusion in JCL
-
 procedure RleCompressTo(InStream, OutStream: TStream);
 procedure RleDecompressTo(InStream, OutStream: TStream);
 procedure RleCompress(Stream: TStream);
 procedure RleDecompress(Stream: TStream);
 { end JvRLE }
-
 { begin JvDateUtil }
 function CurrentYear: Word; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
 function IsLeapYear(AYear: Integer): Boolean;
@@ -454,7 +407,6 @@ function IncMinute(ATime: TDateTime; Delta: Integer): TDateTime;
 function IncSecond(ATime: TDateTime; Delta: Integer): TDateTime;
 function IncMSec(ATime: TDateTime; Delta: Integer): TDateTime;
 function CutTime(ADate: TDateTime): TDateTime; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE} { Set time to 00:00:00:00 }
-
 { String to date conversions }
 function GetDateOrder(const DateFormat: string): TDateOrder;
 function MonthFromName(const S: string; MaxLen: Byte): Byte;
@@ -463,18 +415,14 @@ function StrToDateFmt(const DateFormat, S: string): TDateTime;
 function StrToDateFmtDef(const DateFormat, S: string; Default: TDateTime): TDateTime;
 function DefDateFormat(AFourDigitYear: Boolean): string;
 function DefDateMask(BlanksChar: Char; AFourDigitYear: Boolean): string;
-
 function FormatLongDate(Value: TDateTime): string;
 function FormatLongDateTime(Value: TDateTime): string;
 { end JvDateUtil }
 function BufToBinStr(Buf: Pointer; BufSize: Integer): string;
 function BinStrToBuf(Value: string; Buf: Pointer; BufSize: Integer): Integer;
 
-
 { begin JvStrUtils }
-
   { ** Common string handling routines ** }
-
 {$IFDEF UNIX}
 function iconversion(InP: PAnsiChar; OutP: Pointer; InBytes, OutBytes: Cardinal;
   const ToCode, FromCode: AnsiString): Boolean;
@@ -483,7 +431,6 @@ function iconvWideString(const S: WideString; const ToCode, FromCode: AnsiString
 function OemStrToAnsi(const S: AnsiString): AnsiString;
 function AnsiStrToOem(const S: AnsiString): AnsiString;
 {$ENDIF UNIX}
-
 function StrToOem(const AnsiStr: AnsiString): AnsiString;
 { StrToOem translates a string from the Windows character set into the
   OEM character set. }
@@ -591,13 +538,9 @@ function XorDecode(const Key, Source: string): string;
   {$IFDEF SUPPORTS_DEPRECATED}deprecated{$IFDEF SUPPORTS_DEPRECATED_DETAILS} 'use XorEncodeString that has support for non-ASCII chars'{$ENDIF};{$ENDIF}
 function XorEncodeString(const Key, Source: string): string;
 function XorDecodeString(const Key, Source: string): string;
-
 { ** Command line routines ** }
-
 function GetCmdLineArg(const Switch: string; ASwitchChars: TSysCharSet): string;
-
 { ** Numeric string handling routines ** }
-
 function Numb2USA(const S: string): string;
 { Numb2USA converts numeric string S to USA-format. }
 function Dec2Hex(N: Longint; A: Byte): string; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
@@ -621,30 +564,23 @@ function IntToRoman(Value: Longint): string;
 function RomanToInt(const S: string): Longint;
 { RomanToInt converts the given string to an integer value. If the string
   doesn't contain a valid roman numeric value, the 0 value is returned. }
-
 function FindNotBlankCharPos(const S: string): Integer;
 function FindNotBlankCharPosW(const S: WideString): Integer;
 function AnsiChangeCase(const S: string): string;
 function WideChangeCase(const S: string): string;
-
 function StartsText(const SubStr, S: string): Boolean;
 function EndsText(const SubStr, S: string): Boolean;
-
 function DequotedStr(const S: string; QuoteChar: Char = ''''): string;
 function AnsiDequotedStr(const S: string; AQuote: Char): string; // follow Delphi 2009's "Ansi" prefix
-
 {end JvStrUtils}
-
 {$IFDEF UNIX}
 function GetTempFileName(const Prefix: AnsiString): AnsiString;
 {$ENDIF UNIX}
-
 function HasAttr(const FileName: string; Attr: Integer): Boolean;
 function DeleteFilesEx(const FileMasks: array of string): Boolean;
 function NormalDir(const DirName: string): string;
 function RemoveBackSlash(const DirName: string): string; // only for Windows/DOS Paths
 function ValidFileName(const FileName: string): Boolean;
-
 {$IFDEF MSWINDOWS}
 function FileLock(Handle: Integer; Offset, LockSize: Longint): Integer; overload;
 function FileLock(Handle: Integer; Offset, LockSize: Int64): Integer; overload;
@@ -653,7 +589,6 @@ function FileUnlock(Handle: Integer; Offset, LockSize: Int64): Integer; overload
 {$ENDIF MSWINDOWS}
 function GetWindowsDir: string;
 function GetSystemDir: string;
-
 function ShortToLongFileName(const ShortName: string): string;
 function LongToShortFileName(const LongName: string): string;
 function ShortToLongPath(const ShortName: string): string;
@@ -662,104 +597,80 @@ function LongToShortPath(const LongName: string): string;
 procedure CreateFileLink(const FileName, DisplayName: string; Folder: Integer);
 procedure DeleteFileLink(const DisplayName: string; Folder: Integer);
 {$ENDIF MSWINDOWS}
-
 { end JvFileUtil }
-
 // Works like PtInRect but includes all edges in comparision
 function PtInRectInclusive(R: TRect; Pt: TPoint): Boolean;
 // Works like PtInRect but excludes all edges from comparision
 function PtInRectExclusive(R: TRect; Pt: TPoint): Boolean;
-
 function FourDigitYear: Boolean; {$IFDEF SUPPORTS_DEPRECATED} deprecated; {$ENDIF}
 function IsFourDigitYear: Boolean;
-
 { moved from JvJVCLUTils }
-
 //Open an object with the shell (url or something like that)
 function OpenObject(const Value: string): Boolean; overload;
 function OpenObject(Value: PChar): Boolean; overload;
-
 {$IFDEF MSWINDOWS}
 //Raise the last Exception
 procedure RaiseLastWin32; overload;
 procedure RaiseLastWin32(const Text: string); overload;
 //Raise the last Exception with a small comment from your part
-
 { GetFileVersion returns the most significant 32 bits of a file's binary
   version number. Typically, this includes the major and minor version placed
   together in one 32-bit Integer. It generally does not include the release
   or build numbers. It returns 0 if it failed. }
 function GetFileVersion(const AFileName: string): Cardinal;
 {$EXTERNALSYM GetFileVersion}
-
 //Get version of Shell.dll
 function GetShellVersion: Cardinal;
 {$EXTERNALSYM GetShellVersion}
-
 // CD functions
 procedure OpenCdDrive;
 procedure CloseCdDrive;
-
 // returns True if Drive is accessible
 function DiskInDrive(Drive: Char): Boolean;
 {$ENDIF MSWINDOWS}
-
 //Same as linux function ;)
 procedure PError(const Text: string);
-
 // execute a program without waiting
 procedure Exec(const FileName, Parameters, Directory: string);
 // execute a program and wait for it to finish
 function ExecuteAndWait(CommandLine: string; const WorkingDirectory: string; Visibility: Integer = SW_SHOW): Integer;
-
 
 // returns True if this is the first instance of the program that is running
 function FirstInstance(const ATitle: string): Boolean;
 // restores a window based on it's classname and Caption. Either can be left empty
 // to widen the search
 procedure RestoreOtherInstance(const MainFormClassName, MainFormCaption: string);
-
 // manipulate the traybar and start button
 procedure HideTraybar;
 procedure ShowTraybar;
 procedure ShowStartButton(Visible: Boolean = True);
-
 // (rom) SC_MONITORPOWER is documented as Windows 95 only
 // (rom) better do some testing
 // set monitor functions
 procedure MonitorOn;
 procedure MonitorOff;
 procedure LowPower;
-
 // send a key to the window named AppName
 function SendKey(const AppName: string; Key: Char): Boolean;
-
 {$IFDEF MSWINDOWS}
-
 // returns a list of all windows currently visible, the Objects property is filled with their window handle
 procedure GetVisibleWindows(List: TStrings);
 // associates an extension to a specific program
 procedure AssociateExtension(const IconPath, ProgramName, Path, Extension: string);
-
 procedure AddToRecentDocs(const FileName: string);
 function GetRecentDocs: TStringList;
 {$ENDIF MSWINDOWS}
-
 // JvComponentFunctions
 {-----------------------------------------------------------------------------
 Comments:
   Functions pulled out of MemoEx, used in MemoEx.pas and TypedEdit.pas
-
   This unit has low internal cohesion (ie it contains routines that do all kinds of stuff)
   Some are very good candidates for wider reuse
   some are quite specific to the controls
   and in a larger library this unit would be broken up
-
   I have tried to group related functions together
 }
-
 function CharIsMoney(const Ch: Char): Boolean;
-
 { there is a STrToIntDef provided by Delphi, but no "safe" versions of
   StrToFloat or StrToCurr }
 // Note: before using JvSafeStrToFloatDef, please be aware that it will ignore
@@ -767,58 +678,42 @@ function CharIsMoney(const Ch: Char): Boolean;
 // from what StrToFloatDef in Delphi 6 up is doing. This has been documented in Mantis
 // issue# 2935: http://issuetracker.delphi-jedi.org/view.php?id=2935
 // and in Mantis 4466: http://issuetracker.delphi-jedi.org/view.php?id=4466
-
 function JvSafeStrToFloatDef(const Str: string; Def: Extended; aDecimalSeparator: Char = ' '): Extended; {NOTE: default value of Space is a magic wildcard}
-
 function JvSafeStrToFloat(const Str: string; aDecimalSeparator: Char = ' '): Extended; {NOTE: default value of Space is a magic wildcard}
-
 
 function StrToCurrDef(const Str: string; Def: Currency): Currency;
 function IntToExtended(I: Integer): Extended;
-
 { GetChangedText works out the new text given the current cursor pos & the key pressed
   It is not very useful in other contexts,
   but it is in this unit as it is needed in both MemoEx and TypedEdit }
 function GetChangedText(const Text: string; SelStart, SelLength: Integer; Key: Char): string;
-
 function MakeYear4Digit(Year, Pivot: Integer): Integer;
-
 function StrIsInteger(const S: string): Boolean;
 function StrIsFloatMoney(const Ps: string): Boolean;
 function StrIsDateTime(const Ps: string): Boolean;
-
 function PreformatDateString(Ps: string): string;
-
 function BooleanToInteger(const B: Boolean): Integer;
 function StringToBoolean(const Ps: string): Boolean;
-
 function SafeStrToDateTime(const Ps: string): TDateTime;
 function SafeStrToDate(const Ps: string): TDateTime;
 function SafeStrToTime(const Ps: string): TDateTime;
-
 function StrDelete(const psSub, psMain: string): string;
-
   { returns the fractional value of pcValue}
 function TimeOnly(pcValue: TDateTime): TTime;
 { returns the integral value of pcValue }
 function DateOnly(pcValue: TDateTime): TDate;
-
 type
   TdtKind = (dtkDateOnly, dtkTimeOnly, dtkDateTime);
-
 const
   { TDateTime value used to signify Null value}
   NullEquivalentDate: TDateTime = 0.0;
-
 function DateIsNull(const pdtValue: TDateTime; const pdtKind: TdtKind): Boolean;
 // Replacement for Win32Check to avoid platform specific warnings in D6
 function OSCheck(RetVal: Boolean): Boolean;
-
 { Shortens a fully qualified Path name so that it can be drawn with a specified length limit.
   Same as FileCtrl.MinimizeName in functionality (but not implementation). Included here to
   not be forced to use FileCtrl unnecessarily }
 function MinimizeString(const S: string; const MaxLen: Integer): string;
-
 {$IFDEF MSWINDOWS}
 { RunDLL32 runs a function in a DLL using the utility rundll32.exe (on NT) or rundll.exe (on Win95/98)
  ModuleName is the name of the DLL to load, FuncName is the function to call and CmdLine is
@@ -835,7 +730,6 @@ function MinimizeString(const S: string; const MaxLen: Integer): string;
 type
   // the signature of procedures in DLL's that can be called using rundll32.exe
   TRunDLL32Proc = procedure(Handle: THandle; HInstance: HMODULE; CmdLine: PChar; CmdShow: Integer); stdcall;
-
 function RunDLL32(const ModuleName, FuncName, CmdLine: string; WaitForCompletion: Boolean; CmdShow: Integer =
   SW_SHOWDEFAULT): Boolean;
 { RunDll32Internal does the same as RunDLL32 but does not use the RunDLL32.exe application to do it.
@@ -856,7 +750,6 @@ procedure RunDll32Internal(Wnd: THandle; const DLLName, FuncName, CmdLine: strin
 from the function. Returns False if the DLL couldn't be loaded or if GetDLLVersion couldn't be found. }
 function GetDLLVersion(const DLLName: string; var pdwMajor, pdwMinor: Integer): Boolean;
 {$ENDIF MSWINDOWS}
-
 procedure ResourceNotFound(ResID: PChar);
 function EmptyRect: TRect;
 function RectWidth(R: TRect): Integer;
@@ -866,7 +759,6 @@ procedure RectNormalize(var R: TRect);
 function RectIsSquare(const R: TRect): Boolean;
 function RectSquare(var ARect: TRect; AMaxSize: Integer = -1): Boolean;
 //If AMaxSize = -1 ,then auto calc Square's max size
-
 {$IFDEF MSWINDOWS}
 procedure FreeUnusedOle;
 function GetWindowsVersionString: string;
@@ -874,7 +766,6 @@ function LoadDLL(const LibName: string): THandle;
 function RegisterServer(const ModuleName: string): Boolean;
 function UnregisterServer(const ModuleName: string): Boolean;
 {$ENDIF MSWINDOWS}
-
 { String routines }
 function GetEnvVar(const VarName: string): string;
 function AnsiUpperFirstChar(const S: string): string; // follow Delphi 2009's example with the "Ansi" prefix
@@ -882,30 +773,23 @@ function StringToPChar(var S: string): PChar;
 function StrPAlloc(const S: string): PChar;
 procedure SplitCommandLine(const CmdLine: string; var ExeName, Params: string);
 function DropT(const S: string): string;
-
 function WindowClassName(Wnd: THandle): string;
-
 procedure SwitchToWindow(Wnd: THandle; Restore: Boolean);
 procedure ActivateWindow(Wnd: THandle);
 procedure ShowWinNoAnimate(Handle: THandle; CmdShow: Integer);
 procedure KillMessage(Wnd: THandle; Msg: Cardinal);
-
 { SetWindowTop put window to top without recreating window }
 procedure SetWindowTop(const Handle: THandle; const Top: Boolean);
 procedure CenterWindow(Wnd: THandle);
 function MakeVariant(const Values: array of Variant): Variant;
-
 { Convert dialog units to pixels and backwards }
-
 {$IFDEF MSWINDOWS}
 function DialogUnitsToPixelsX(DlgUnits: Word): Word;
 function DialogUnitsToPixelsY(DlgUnits: Word): Word;
 function PixelsToDialogUnitsX(PixUnits: Word): Word;
 function PixelsToDialogUnitsY(PixUnits: Word): Word;
 {$ENDIF MSWINDOWS}
-
 function GetUniqueFileNameInDir(const Path, FileNameMask: string): string;
-
 {$IFDEF BCB}
 function FindPrevInstance(const MainFormClass: ShortString;
   const ATitle: string): THandle;
@@ -916,17 +800,14 @@ function FindPrevInstance(const MainFormClass, ATitle: string): THandle;
 function ActivatePrevInstance(const MainFormClass, ATitle: string): Boolean;
 {$ENDIF BCB}
 
-
 {$IFDEF MSWINDOWS}
 { BrowseForFolderNative displays Browse For Folder dialog }
 function BrowseForFolderNative(const Handle: THandle; const Title: string; var Folder: string): Boolean;
 {$ENDIF MSWINDOWS}
 
-
 // Removes all non-numeric characters from AValue and returns
 // the resulting string
 function TextToValText(const AValue: string): string;
-
 
 type
   RasterOp = (
@@ -949,7 +830,6 @@ type
     RasterOp_NandROP,
     RasterOp_NorROP,
     RasterOp_LastROP = 15);
-
 function BitBlt(DestDC: HDC; X, Y, Width, Height: Integer; SrcDC: HDC;
   XSrc, YSrc: Integer; Rop: RasterOp; IgnoreMask: Boolean): LongBool; overload;
 function BitBlt(DestDC: HDC; X, Y, Width, Height: Integer; SrcDC: HDC;
@@ -957,21 +837,16 @@ function BitBlt(DestDC: HDC; X, Y, Width, Height: Integer; SrcDC: HDC;
 function BitBlt(DestDC: HDC; X, Y, Width, Height: Integer; SrcDC: HDC;
   XSrc, YSrc: Integer; WinRop: Cardinal): LongBool; overload;
 
-
-
 function IsEqualGUID(const IID1, IID2: TGUID): Boolean;
 {$EXTERNALSYM IsEqualGUID}
-
 
 // Containers
 type
   TIntegerListChange = procedure(Sender: TObject; Item: Integer; Action: TListNotification) of object;
-
   TIntegerList = class(TList)
   private
     FOnChange: TIntegerListChange;
     FLoading: Boolean;
-
     function GetItem(Index: Integer): Integer;
     procedure SetItem(Index: Integer; const Value: Integer);
   protected
@@ -982,7 +857,6 @@ type
     procedure ReadData(Reader: TReader);
     procedure WriteData(Writer: TWriter);
     property Loading: Boolean read FLoading;
-
     // Overloaded to accept/return Integer instead of Pointer.
     function Add(Value: Integer): Integer;
     function Extract(Item: Integer): Integer;
@@ -992,15 +866,11 @@ type
     function Last: Integer;
     function Remove(Item: Integer): Integer;
     property Items[Index: Integer]: Integer read GetItem write SetItem; default;
-
     property OnChange: TIntegerListChange read FOnChange write FOnChange;
   end;
-
 type
   TCollectionSortProc = function(Item1, Item2: TCollectionItem): Integer;
-
 procedure CollectionSort(Collection: Classes.TCollection; SortProc: TCollectionSortProc);
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -1010,9 +880,7 @@ const
     LogPath: 'JVCL\run'
   );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   RTLConsts, SysConst,
   {$IFDEF MSWINDOWS}
@@ -1023,7 +891,6 @@ uses
   {$ENDIF HAS_UNIT_CHARACTER}
   JclStrings, JclSysInfo, JclFileUtils,
   Math, JclSysUtils;
-
 const
   Separators: TSysCharSet = [#00, ' ', '-', #13, #10, '.', ',', '/', '\', '#', '"', '''',
   ':', '+', '%', '*', '(', ')', ';', '=', '{', '}', '[', ']', '{', '}', '<', '>'];
@@ -1034,55 +901,46 @@ const
   RC_DefaultIcon = 'DefaultIcon';
   {$ENDIF MSWINDOWS}
   tkStrings: set of TTypeKind = [tkString, tkLString, {$IFDEF UNICODE} tkUString, {$ENDIF} tkWString];
-
 resourcestring
   // (p3) duplicated from JvConsts since this unit should not rely on JVCL at all
   RsEPropertyNotExists = 'Property "%s" does not exist';
   RsEInvalidPropertyType = 'Property "%s" has invalid type';
   RsEPivotLessThanZero = 'JvJCLUtils.MakeYear4Digit: Pivot < 0';
-
 {$IFNDEF COMPILER12_UP} // Delphi 2009 introduced it and fixed the NativeInt of Delphi 2007
 function GetWindowLongPtr(hWnd: HWND; nIndex: Integer): LONG_PTR; stdcall;
 asm
   pop ebp
   jmp GetWindowLong
 end;
-
 function SetWindowLongPtr(hWnd: HWND; nIndex: Integer; dwNewLong: LONG_PTR): LONG_PTR; stdcall;
 asm
   pop ebp
   jmp SetWindowLong
 end;
 {$ENDIF ~COMPILER12_UP}
-
 function SendRectMessage(Handle: THandle; Msg: Integer; wParam: WPARAM; var R: TRect): Integer;
 begin
   Result := SendMessage(Handle, Msg, wParam, LPARAM(@R));
 end;
-
 function SendStructMessage(Handle: THandle; Msg: Integer; wParam: WPARAM; var Data): Integer;
 begin
   Result := SendMessage(Handle, Msg, wParam, LPARAM(@Data));
 end;
 
-
 function ReadCharsFromStream(Stream: TStream; var Buf: array of AnsiChar; BufSize: Integer): Integer;
 begin
   Result := Stream.Read(Buf[0], BufSize);
 end;
-
 function WriteStringToStream(Stream: TStream; const Buf: AnsiString; BufSize: Integer): Integer;
 begin
   Result := Stream.Write(Buf[1], BufSize);
 end;
-
 {$IFNDEF COMPILER12_UP}
 function UTF8ToString(const S: UTF8String): string;
 begin
   Result := UTF8Decode(S);
 end;
 {$ENDIF ~COMPILER12_UP}
-
 // DEPRECATED:
 // StrToFloatUS uses US '.' as decimal separator and ',' as thousand separator
 //   [the right way to do this would have been to set up a TFormatSettings record]
@@ -1104,7 +962,6 @@ begin
   end;
 end;*)
 
-
 // DEPRECATED:
 (*
 function StrToFloatUS(const Text: string): Extended;
@@ -1116,7 +973,6 @@ begin
   end;
 end;
 *)
-
 // DEPRECATED:
 (*
 function StrToFloatUSDef(const Text: string; Default: Extended): Extended;
@@ -1124,14 +980,12 @@ begin
   Result := JvSafeStrToFloatDef(USToLocalFloatStr(Text), Default);
 end;
 *)
-
 function VarIsInt(Value: Variant): Boolean;
 begin
   Result := VarType(Value) in [varByte,
     varShortInt, varWord, varLongWord, {varInt64,}
     varSmallint, varInteger];
 end;
-
 function PosIdx(const SubStr, S: string; Index: Integer = 0): Integer;
   // use best register allocation
   function Find(Index, EndPos: Integer; StartChar: Char; const S: string): Integer;
@@ -1141,7 +995,6 @@ function PosIdx(const SubStr, S: string; Index: Integer = 0): Integer;
         Exit;
     Result := 0;
   end;
-
   // use best register allocation
   function FindNext(Index, EndPos: Integer; const S, SubStr: string): Integer;
   begin
@@ -1150,7 +1003,6 @@ function PosIdx(const SubStr, S: string; Index: Integer = 0): Integer;
         Exit;
     Result := 0;
   end;
-
 var
   StartChar: Char;
   LenSubStr, LenStr: Integer;
@@ -1163,7 +1015,6 @@ begin
   LenStr := Length(S);
   if (LenSubStr = 0) or (S = '') or (LenSubStr > LenStr - (Index - 1)) then
     Exit;
-
   StartChar := SubStr[1];
   EndPos := LenStr - LenSubStr + 1;
   if LenSubStr = 1 then
@@ -1186,9 +1037,7 @@ begin
     until False;
   end;
 end;
-
 function PosIdxW(const SubStr, S: WideString; Index: Integer = 0): Integer;
-
   // use best register allocation
   function Find(Index, EndPos: Integer; StartChar: WideChar; const S: WideString): Integer;
   begin
@@ -1197,7 +1046,6 @@ function PosIdxW(const SubStr, S: WideString; Index: Integer = 0): Integer;
         Exit;
     Result := 0;
   end;
-
   // use best register allocation
   function FindNext(Index, EndPos: Integer; const S, SubStr: WideString): Integer;
   begin
@@ -1206,7 +1054,6 @@ function PosIdxW(const SubStr, S: WideString; Index: Integer = 0): Integer;
         Exit;
     Result := 0;
   end;
-
 var
   StartChar: WideChar;
   LenSubStr, LenStr: Integer;
@@ -1219,7 +1066,6 @@ begin
   LenStr := Length(S);
   if (LenSubStr = 0) or (S = '') or (LenSubStr > LenStr - (Index - 1)) then
     Exit;
-
   StartChar := SubStr[1];
   EndPos := LenStr - LenSubStr + 1;
   if LenSubStr = 1 then
@@ -1242,7 +1088,6 @@ begin
     until False;
   end;
 end;
-
 function PosLastCharIdx(Ch: Char; const S: string; Index: Integer = 0): Integer;
 begin
   if (Index = 0) or (Index > Length(S)) then
@@ -1252,7 +1097,6 @@ begin
       Exit;
   Result := 0;
 end;
-
 function GetLineByPos(const S: string; const Pos: Integer): Integer;
 var
   I: Integer;
@@ -1271,7 +1115,6 @@ begin
     end;
   end;
 end;
-
 procedure GetXYByPos(const S: string; const Pos: Integer; var X, Y: Integer);
 var
   I, IB: Integer;
@@ -1295,7 +1138,6 @@ begin
     X := Pos - IB;
   end;
 end;
-
 procedure GetXYByPosW(const S: WideString; const Pos: Integer; var X, Y: Integer);
 var
   I, IB: Integer;
@@ -1319,7 +1161,6 @@ begin
     X := Pos - IB;
   end;
 end;
-
 function GetWordOnPos(const S: string; const P: Integer): string;
 var
   I, Beg: Integer;
@@ -1339,7 +1180,6 @@ begin
   else
     Result := S[P];
 end;
-
 function GetWordOnPosW(const S: WideString; const P: Integer): WideString;
 var
   I, Beg: Integer;
@@ -1359,7 +1199,6 @@ begin
   else
     Result := S[P];
 end;
-
 function GetWordOnPos2(const S: string; P: Integer; var iBeg, iEnd: Integer): string;
 begin
   Result := '';
@@ -1385,7 +1224,6 @@ begin
   else
     Result := S[P];
 end;
-
 function GetWordOnPos2W(const S: WideString; P: Integer; var iBeg, iEnd: Integer): WideString;
 begin
   Result := '';
@@ -1412,7 +1250,6 @@ begin
   else
     Result := S[P];
 end;
-
 function GetWordOnPosEx(const S: string; const P: Integer; var iBeg, iEnd: Integer): string;
 begin
   Result := '';
@@ -1443,7 +1280,6 @@ begin
   else
     Result := S[P];
 end;
-
 function GetWordOnPosExW(const S: WideString; const P: Integer; var iBeg, iEnd: Integer): WideString;
 begin
   Result := '';
@@ -1474,7 +1310,6 @@ begin
   else
     Result := S[P];
 end;
-
 function GetNextWordPosEx(const Text: string; StartIndex: Integer;
   var iBeg, iEnd: Integer): string;
 var
@@ -1505,7 +1340,6 @@ begin
     Result := Copy(Text, iBeg, iEnd - iBeg)
   else
     Result := Text[StartIndex];
-
   // go right
   iEnd := iBeg;
   while (iEnd <= Len) and not CharInSet(Text[iEnd], Separators) do
@@ -1516,7 +1350,6 @@ begin
     Dec(iEnd);
   Result := Copy(Text, iBeg, iEnd - iBeg + 1);
 end;
-
 function GetNextWordPosExW(const Text: WideString; StartIndex: Integer;
   var iBeg, iEnd: Integer): WideString;
 var
@@ -1547,7 +1380,6 @@ begin
     Result := Copy(Text, iBeg, iEnd - iBeg)
   else
     Result := Text[StartIndex];
-
   // go right
   iEnd := iBeg;
   while (iEnd <= Len) and not CharInSetW(Text[iEnd], Separators) do
@@ -1558,7 +1390,6 @@ begin
     Dec(iEnd);
   Result := Copy(Text, iBeg, iEnd - iBeg + 1);
 end;
-
 procedure GetEndPosCaret(const Text: string; CaretX, CaretY: Integer;
   var X, Y: Integer);
 begin
@@ -1570,7 +1401,6 @@ begin
   Dec(X);
   Inc(Y, CaretY);
 end;
-
 procedure GetEndPosCaretW(const Text: WideString; CaretX, CaretY: Integer;
   var X, Y: Integer);
 begin
@@ -1582,7 +1412,6 @@ begin
   Dec(X);
   Inc(Y, CaretY);
 end;
-
 function SubStrBySeparator(const S: string; const Index: Integer; const Separator: string; StartIndex: Integer): string;
 { Returns a substring. Substrings are divided by a separator character }
 var
@@ -1591,13 +1420,11 @@ begin
   Result := '';
   LenSeparator := Length(Separator);
   LenS := Length(S);
-
   if StartIndex <= 0 then
     StartIndex := 1;
   if (LenS = 0) or (LenSeparator = 0) or (StartIndex > LenS) or
      ((Index < 0) or ((Index = 0) and (LenS > 0) and (S[StartIndex] = Separator[1]))) then
     Exit;
-
   for I := 1 to Index do
   begin
     StartIndex := PosIdx(Separator, S, StartIndex);
@@ -1614,7 +1441,6 @@ begin
   //if CompareText(Result, Separator) = 0 then
   //  Result := '';
 end;
-
 function SubStrBySeparatorW(const S: WideString; const Index: Integer; const Separator: WideString; StartIndex: Integer): WideString;
 { Returns a substring. Substrings are divided by a separator character }
 var
@@ -1623,13 +1449,11 @@ begin
   Result := '';
   LenSeparator := Length(Separator);
   LenS := Length(S);
-
   if StartIndex <= 0 then
     StartIndex := 1;
   if (LenS = 0) or (LenSeparator = 0) or (StartIndex > LenS) or
      ((Index < 0) or ((Index = 0) and (LenS > 0) and (S[StartIndex] = Separator[1]))) then
     Exit;
-
   for I := 1 to Index do
   begin
     StartIndex := PosIdx(Separator, S, StartIndex);
@@ -1646,7 +1470,6 @@ begin
   //if WideCompareText(Result, Separator) = 0 then
   //  Result := '';
 end;
-
 function SubWord(P: PChar; var P2: PChar): string;
 var
   I: Integer;
@@ -1657,7 +1480,6 @@ begin
   SetString(Result, P, I);
   P2 := P + I;
 end;
-
 function ReplaceString(S: string; const OldPattern, NewPattern: string; StartIndex: Integer): string;
 var
   I, LenOldPattern: Integer;
@@ -1677,7 +1499,6 @@ begin
   end;
   Result := S;
 end;
-
 function ReplaceStringW(S: WideString; const OldPattern, NewPattern: WideString; StartIndex: Integer): WideString;
 var
   I, LenOldPattern: Integer;
@@ -1697,7 +1518,6 @@ begin
   end;
   Result := S;
 end;
-
 function ConcatSep(const S1, S2, Separator: string): string;
 begin
   Result := S1;
@@ -1705,7 +1525,6 @@ begin
     Result := Result + Separator;
   Result := Result + S2;
 end;
-
 function ConcatLeftSep(const S1, S2, Separator: string): string;
 begin
   Result := S1;
@@ -1713,7 +1532,6 @@ begin
     Result := Separator + Result;
   Result := S2 + Result;
 end;
-
 function MinimizeString(const S: string; const MaxLen: Integer): string;
 begin
   if Length(S) > MaxLen then
@@ -1724,12 +1542,10 @@ begin
   else
     Result := S;
 end;
-
 function TrueInflateRect(const R: TRect; const I: Integer): TRect;
 begin
   SetRect(Result, R.Left - I, R.Top - I, R.Right + I, R.Bottom + I);
 end;
-
 function FileGetInfo(FileName: TFileName; var SearchRec: TSearchRec): Boolean;
 var
   DosError: Integer;
@@ -1761,7 +1577,6 @@ begin
   end;
   FindClose(SearchRec);
 end;
-
 function HasSubFolder(APath: TFileName): Boolean;
 var
   SearchRec: TSearchRec;
@@ -1782,7 +1597,6 @@ begin
   end;
   FindClose(SearchRec);
 end;
-
 function IsEmptyFolder(APath: TFileName): Boolean;
 var
   SearchRec: TSearchRec;
@@ -1802,7 +1616,6 @@ begin
   end;
   FindClose(SearchRec);
 end;
-
 {$IFDEF MSWINDOWS}
 function LZFileExpand(const FileSource, FileDest: string): Boolean;
 type
@@ -1862,7 +1675,6 @@ begin
   end;
 end;
 {$ENDIF MSWINDOWS}
-
 procedure Dos2Win(var S: AnsiString);
 var
   I: Integer;
@@ -1875,7 +1687,6 @@ begin
         S[I] := AnsiChar(Byte(S[I]) + (240 - $E0));
     end;
 end;
-
 procedure Win2Dos(var S: AnsiString);
 var
   I: Integer;
@@ -1888,19 +1699,16 @@ begin
         S[I] := AnsiChar(Byte(S[I]) - (240 - $E0));
     end;
 end;
-
 function Dos2WinRes(const S: AnsiString): AnsiString;
 begin
   Result := S;
   Dos2Win(Result);
 end;
-
 function Win2DosRes(const S: AnsiString): AnsiString;
 begin
   Result := S;
   Win2Dos(Result);
 end;
-
 function Win2Koi(const S: AnsiString): AnsiString;
 const
   W: AnsiString = 'àáâãäå¸æçèéêëìíîïðñ=óôõ÷öøùüûúýÝÿ+--+-+¨ÆÇ++--Ý-+ÏÐÑÒÓÔi×ÖØ+_Ý+ÝÞî';
@@ -1916,7 +1724,6 @@ begin
       Result[I] := K[J];
   end;
 end;
-
 procedure FillString(var Buffer: string; Count: Integer; const Value: Char);
 begin
   {$IFDEF COMPILER12_UP}
@@ -1925,7 +1732,6 @@ begin
   FillChar(Buffer[1], Count * SizeOf(Char), Value);
   {$ENDIF COMPILER12_UP}
 end;
-
 procedure FillString(var Buffer: string; StartIndex, Count: Integer; const Value: Char);
 begin
   if StartIndex <= 0 then
@@ -1936,12 +1742,10 @@ begin
   FillChar(Buffer[StartIndex], Count * SizeOf(Char), Value);
   {$ENDIF COMPILER12_UP}
 end;
-
 procedure MoveString(const Source: string; var Dest: string; Count: Integer);
 begin
   Move(Source[1], Dest[1], Count * SizeOf(Char));
 end;
-
 procedure MoveString(const Source: string; SrcStartIdx: Integer; var Dest: string;
   DstStartIdx: Integer; Count: Integer);
 begin
@@ -1949,10 +1753,8 @@ begin
     DstStartIdx := 1;
   if SrcStartIdx <= 0 then
     SrcStartIdx := 1;
-
   Move(Source[SrcStartIdx], Dest[DstStartIdx], Count * SizeOf(Char));
 end;
-
 procedure FillWideChar(var Buffer; Count: Integer; const Value: WideChar);
 var
   P: PLongint;
@@ -1972,12 +1774,10 @@ begin
   if CopyWord then
     PWideChar(P)^ := Value;
 end;
-
 procedure MoveWideChar(const Source; var Dest; Count: Integer);
 begin
   Move(Source, Dest, Count * SizeOf(WideChar));
 end;
-
 procedure FillNativeChar(var Buffer; Count: Integer; const Value: Char);
 begin
   {$IFDEF COMPILER12_UP}
@@ -1986,7 +1786,6 @@ begin
   FillChar(Buffer, Count, Value);
   {$ENDIF COMPILER12_UP}
 end;
-
 procedure MoveNativeChar(const Source; var Dest; Count: Integer);
 begin
   {$IFDEF COMPILER12_UP}
@@ -1995,7 +1794,6 @@ begin
   Move(Source, Dest, Count);
   {$ENDIF COMPILER12_UP}
 end;
-
 function IsSubString(const S: string; StartIndex: Integer; const SubStr: string): Boolean;
 begin
   if StartIndex < 1 then
@@ -2004,7 +1802,6 @@ begin
     StartIndex := Length(S);
   Result := StrLComp(PChar(S) + StartIndex - 1, PChar(SubStr), Length(SubStr)) = 0;
 end;
-
 function Spaces(const N: Integer): string;
 begin
   if N > 0 then
@@ -2015,7 +1812,6 @@ begin
   else
     Result := '';
 end;
-
 function AddSpaces(const S: string; const N: Integer): string;
 var
   Len: Integer;
@@ -2030,7 +1826,6 @@ begin
   else
     Result := S;
 end;
-
 function SpacesW(const N: Integer): WideString;
 begin
   if N > 0 then
@@ -2041,7 +1836,6 @@ begin
   else
     Result := '';
 end;
-
 function AddSpacesW(const S: WideString; const N: Integer): WideString;
 var
   Len: Integer;
@@ -2056,9 +1850,7 @@ begin
   else
     Result := S;
 end;
-
 { (rb) maybe construct an english variant? }
-
 function LastDateRUS(const Dat: TDateTime): string;
 const
   D2D: array [0..9] of Byte =
@@ -2103,14 +1895,12 @@ begin
       Result := IntToStr(D) + ' ' + Day[D2D[StrToInt(IntToStr(D)[Length(IntToStr(D))])]] + ' íàçàä' // ago
   end;
 end;
-
 function AddSlash(const Dir: TFileName): string;
 begin
   Result := Dir;
   if (Length(Dir) > 0) and (Dir[Length(Dir)] <> PathDelim) then
     Result := Dir + PathDelim;
 end;
-
 function AddPath(const FileName, Path: TFileName): TFileName;
 begin
   if ExtractFileDrive(FileName) = '' then
@@ -2118,7 +1908,6 @@ begin
   else
     Result := FileName;
 end;
-
 function AddPaths(const PathList, Path: string): string;
 var
   I: Integer;
@@ -2134,7 +1923,6 @@ begin
     S := SubStrBySeparator(PathList, I, PathSep);
   end;
 end;
-
 function ParentPath(const Path: TFileName): TFileName;
 begin
   Result := Path;
@@ -2142,7 +1930,6 @@ begin
     Delete(Result, Length(Result), 1);
   Result := ExtractFilePath(Result);
 end;
-
 function FindInPath(const FileName, PathList: string): TFileName;
 var
   I: Integer;
@@ -2160,7 +1947,6 @@ begin
   end;
   Result := '';
 end;
-
 {$IFDEF MSWINDOWS}
 function GetComputerID: string;
 var
@@ -2190,17 +1976,14 @@ begin
   Result := 'None';
 end;
 {$ENDIF UNIX}
-
 function GetComputerName: string;
 begin
   Result := GetLocalComputerName;
 end;
-
 function CurrencyToStr(const Cur: Currency): string;
 begin
   Result := CurrToStrF(Cur, ffCurrency, JclFormatSettings.CurrencyDecimals)
 end;
-
 function HasChar(const Ch: Char; const S: string): Boolean;
 var
   I: Integer;
@@ -2211,12 +1994,10 @@ begin
       Exit;
   Result := False;
 end;
-
 function HasCharW(const Ch: WideChar; const S: WideString): Boolean;
 begin
   Result := Pos(Ch, S) > 0;
 end;
-
 function HasAnyChar(const Chars: string; const S: string): Boolean;
 var
   I: Integer;
@@ -2229,7 +2010,6 @@ begin
     end;
   Result := False;
 end;
-
 function CountOfChar(const Ch: Char; const S: string): Integer;
 var
   I: Integer;
@@ -2239,7 +2019,6 @@ begin
     if S[I] = Ch then
       Inc(Result);
 end;
-
 procedure SwapInt(var Int1, Int2: Integer);
 var
   Tmp: Integer;
@@ -2248,7 +2027,6 @@ begin
   Int1 := Int2;
   Int2 := Tmp;
 end;
-
 function DeleteReadOnlyFile(const FileName: TFileName): Boolean;
 begin
   {$IFDEF MSWINDOWS}
@@ -2259,7 +2037,6 @@ begin
   {$ENDIF UNIX}
   Result := DeleteFile(FileName);
 end;
-
 function HasParam(const Param: string): Boolean;
 var
   I: Integer;
@@ -2272,7 +2049,6 @@ begin
       Exit;
   end;
 end;
-
 function HasSwitch(const Param: string): Boolean;
 var
   I: Integer;
@@ -2286,7 +2062,6 @@ begin
         Exit;
     end;
 end;
-
 function Switch(const Param: string): string;
 var
   I: Integer;
@@ -2300,17 +2075,14 @@ begin
       Exit;
     end;
 end;
-
 function ExePath: TFileName;
 begin
   Result := ExtractFilePath(ParamStr(0));
 end;
-
 function FileNewExt(const FileName, NewExt: TFileName): TFileName;
 begin
   Result := Copy(FileName, 1, Length(FileName) - Length(ExtractFileExt(FileName))) + NewExt;
 end;
-
 {$IFNDEF COMPILER12_UP}
 function ToUpper(C: Char): Char;
 var s : string;
@@ -2319,14 +2091,12 @@ begin
   Result := s[1];
 end;
 {$ENDIF ~COMPILER12_UP}
-
 {$IFNDEF COMPILER12_UP}
 function CharInSet(const Ch: AnsiChar; const SetOfChar: TSysCharSet): Boolean;
 begin
   Result := Ch in SetOfChar;
 end;
 {$ENDIF ~COMPILER12_UP}
-
 function CharInSetW(const Ch: WideChar; const SetOfChar: TSysCharSet): Boolean;
 begin
   if Word(Ch) > 255 then
@@ -2334,7 +2104,6 @@ begin
   else
     Result := AnsiChar(Ch) in SetOfChar;
 end;
-
 function IntPower(Base, Exponent: Integer): Integer;
 begin
   if Exponent > 0 then
@@ -2353,7 +2122,6 @@ begin
   else
     Result := 1;
 end;
-
 function Var2Type(V: Variant; const DestVarType: Integer): Variant;
 var
   VType: TVarType;
@@ -2382,17 +2150,14 @@ begin
   if (DestVarType = varInteger) and (VType = varBoolean) then
     Result := Integer(V = True);
 end;
-
 function VarToInt(V: Variant): Integer;
 begin
   Result := Var2Type(V, varInteger);
 end;
-
 function VarToFloat(V: Variant): Double;
 begin
   Result := Var2Type(V, varDouble);
 end;
-
 function CopyDir(const SourceDir, DestDir: TFileName): Boolean;
 var
   SearchRec: TSearchRec;
@@ -2422,7 +2187,6 @@ begin
   FindClose(SearchRec);
   Result := True;
 end;
-
 //////////////////////////////////////////////////////////////////////////////
 { Note: FileTimeToDateTime has been commented out, it is not used anywhere
         in the JVCL code. Further, the old version is not to be returned
@@ -2454,12 +2218,10 @@ end;}
 end;}
 //{$ENDIF UNIX}
 // ------------------------- old version --------------------------------
-
 procedure FileTimeToDosDateTimeDWord(const FT: TFileTime; out Dft: DWORD);
 begin
   FileTimeToDosDateTime(FT, LongRec(Dft).Hi, LongRec(Dft).Lo);
 end;
-
 function MakeValidFileName(const FileName: TFileName;
   ReplaceBadChar: Char): TFileName;
 var
@@ -2470,7 +2232,6 @@ begin
     if HasChar(Result[I], '''":?*\/') then
       Result[I] := ReplaceBadChar;
 end;
-
 function DefStr(const S: string; Default: string): string;
 begin
   if S <> '' then
@@ -2478,7 +2239,6 @@ begin
   else
     Result := Default;
 end;
-
 function StrLICompW2(S1, S2: PWideChar; MaxLen: Integer): Integer;
 // faster than the JclUnicode.StrLICompW function
 var
@@ -2488,7 +2248,6 @@ begin
   SetString(P2, S2, Min(MaxLen, StrLenW(S2)));
   Result := SysUtils.WideCompareText(P1, P2);
 end;
-
 function StrPosW(S, SubStr: PWideChar): PWideChar;
 var
   P: PWideChar;
@@ -2520,7 +2279,6 @@ begin
   end;
   Result := nil;
 end;
-
 function StrLenW(S: PWideChar): Integer;
 begin
   Result := 0;
@@ -2528,22 +2286,18 @@ begin
     while S[Result] <> #0 do
       Inc(Result);
 end;
-
 function TrimW(const S: WideString): WideString;
 begin
   Result := Trim(S);
 end;
-
 function TrimLeftW(const S: WideString): WideString;
 begin
   Result := TrimLeft(S);
 end;
-
 function TrimRightW(const S: WideString): WideString;
 begin
   Result := TrimRight(S);
 end;
-
 procedure SetDelimitedText(List: TStrings; const Text: string; Delimiter: Char);
 var
   Ch: Char;
@@ -2556,12 +2310,10 @@ begin
     List.Delimiter := Ch;
   end;
 end;
-
 function StrToBool(const S: string): Boolean;
 begin
   Result := (S = '1') or SameText(S, 'True') or SameText(S, 'yes');
 end;
-
 function IniReadSection(const IniFileName: TFileName; const Section: string; Ss: TStrings): Boolean;
 var
   F: Integer;
@@ -2594,7 +2346,6 @@ begin
     Free;
   end;
 end;
-
 procedure SaveTextFile(const FileName: TFileName; const Source: string);
 begin
   with TStringList.Create do
@@ -2605,7 +2356,6 @@ begin
     Free;
   end;
 end;
-
 function LoadTextFile(const FileName: TFileName): string;
 begin
   with TStringList.Create do
@@ -2616,7 +2366,6 @@ begin
     Free;
   end;
 end;
-
 function ReadFolder(const Folder, Mask: TFileName; FileList: TStrings): Integer;
 var
   SearchRec: TSearchRec;
@@ -2638,7 +2387,6 @@ begin
     FileList.EndUpdate;
   end;
 end;
-
 function ReadFolders(const Folder: TFileName; FolderList: TStrings): Integer;
 var
   SearchRec: TSearchRec;
@@ -2661,14 +2409,12 @@ begin
     FolderList.EndUpdate;
   end;
 end;
-
 { example for ReplaceStrings:
     with memEdit do
     begin
       Text := ReplaceStrings(Text, SelStart+1, SelLength, memWords.Lines, memFrases.Lines, NewSelStart);
       SelStart := NewSelStart-1;
     end; }
-
 function ReplaceStrings(const S: string; PosBeg, Len: Integer; Words, Frases: TStrings;
   var NewSelStart: Integer): string;
 var
@@ -2711,13 +2457,10 @@ begin
     NewSelStart := Beg + Length(Frases[F]);
   end;
 end;
-
 {  example for ReplaceAllStrings:
-
     with memEdit do
       Text := ReplaceAllStrings(Text, memWords.Lines, memFrases.Lines);
 }
-
 function ReplaceAllStrings(const S: string; Words, Frases: TStrings): string;
 var
   I: Integer;
@@ -2726,7 +2469,6 @@ begin
   for I := 0 to Words.Count - 1 do
     Result := ReplaceString(Result, Words[I], Frases[I]);
 end;
-
 function CountOfLines(const S: string): Integer;
 begin
   with TStringList.Create do
@@ -2737,7 +2479,6 @@ begin
     Free;
   end;
 end;
-
 procedure DeleteOfLines(Ss: TStrings; const Words: array of string);
 var
   I, J: Integer;
@@ -2752,12 +2493,10 @@ begin
     Ss.EndUpdate;
   end;
 end;
-
 procedure DeleteEmptyLines(Ss: TStrings);
 begin
   DeleteOfLines(Ss,['']);
 end;
-
 procedure SQLAddWhere(SQL: TStrings; const Where: string);
 var
   I, J: Integer;
@@ -2778,9 +2517,7 @@ begin
     end;
   SQL.Insert(J, 'and ' + Where);
 end;
-
 {$IFDEF MSWINDOWS}
-
 function ResSaveToFileEx(Instance: HINST; Typ, Name: PChar;
   const Compressed: Boolean; const FileName: string): Boolean;
 var
@@ -2836,13 +2573,11 @@ begin
   except
   end;
 end;
-
 function ResSaveToFile(const Typ, Name: string; const Compressed: Boolean;
   const FileName: string): Boolean;
 begin
   Result := ResSaveToFileEx(HInstance, PChar(Typ), PChar(Name), Compressed, FileName);
 end;
-
 function ResSaveToString(Instance: HINST; const Typ, Name: string;
   var S: string): Boolean;
 var
@@ -2875,9 +2610,7 @@ begin
   { And now it is possible to duplicate [translated] }
   SetString(S, PChar(RAddr), RLen);
 end;
-
 {$ENDIF MSWINDOWS}
-
 procedure SetChildPropOrd(Owner: TComponent; const PropName: string; Value: Longint);
 var
   I: Integer;
@@ -2890,12 +2623,10 @@ begin
       SetOrdProp(Owner.Components[I], PropInfo, Value);
   end;
 end;
-
 procedure Error(const Msg: string);
 begin
   raise Exception.Create(Msg);
 end;
-
 procedure ClearList(List: TList);
 var
   I: Integer;
@@ -2908,12 +2639,10 @@ begin
     List.Clear;
   end;
 end;
-
 function GetPropTypeKind(PropInf: PPropInfo): TTypeKind;
 begin
   Result := PropInf.PropType^.Kind;
 end;
-
 function GetPropType(Obj: TObject; const PropName: string): TTypeKind;
 var
   PropInf: PPropInfo;
@@ -2924,7 +2653,6 @@ begin
   else
     Result := GetPropTypeKind(PropInf);
 end;
-
 function GetPropStr(Obj: TObject; const PropName: string): string;
 var
   PropInf: PPropInfo;
@@ -2936,7 +2664,6 @@ begin
     raise Exception.CreateResFmt(@RsEInvalidPropertyType, [PropName]);
   Result := GetStrProp(Obj, PropInf);
 end;
-
 function GetPropOrd(Obj: TObject; const PropName: string): Integer;
 var
   PropInf: PPropInfo;
@@ -2948,7 +2675,6 @@ begin
     raise Exception.CreateResFmt(@RsEInvalidPropertyType, [PropName]);
   Result := GetOrdProp(Obj, PropInf);
 end;
-
 function GetPropMethod(Obj: TObject; const PropName: string): TMethod;
 var
   PropInf: PPropInfo;
@@ -2960,7 +2686,6 @@ begin
     raise Exception.CreateResFmt(@RsEInvalidPropertyType, [PropName]);
   Result := GetMethodProp(Obj, PropInf);
 end;
-
 procedure PrepareIniSection(Ss: TStrings);
 var
   I: Integer;
@@ -2978,7 +2703,6 @@ begin
     Ss.EndUpdate;
   end;
 end;
-
 {:Creates a TPointL structure from a pair of coordinates.
 Call PointL to create a TPointL structure that represents the specified
 coordinates. Use PointL to construct parameters for functions
@@ -2995,13 +2719,11 @@ begin
 end;
 </Code>
 }
-
 function PointL(const X, Y: Longint): TPointL;
 begin
   Result.X := X;
   Result.Y := Y;
 end;
-
 {:Conditional assignment.
 Returns the value in True or False depending on the condition Test.
 @param  Test    The test condition.
@@ -3019,7 +2741,6 @@ else
   bar := 0;
 </Code>
 }
-
 function iif(const Test: Boolean; const ATrue, AFalse: Variant): Variant;
 begin
   if Test then
@@ -3028,19 +2749,15 @@ begin
     Result := AFalse;
 end;
 
-
 { begin JvIconClipboardUtils}
 { Icon clipboard routines }
-
 var
   Private_CF_ICON: Word;
-
 { Real-size icons support routines }
 const
   RC3_STOCKICON = 0;
   RC3_ICON = 1;
   RC3_CURSOR = 2;
-
 type
   PCursorOrIcon = ^TCursorOrIcon;
   TCursorOrIcon = packed record
@@ -3048,7 +2765,6 @@ type
     wType: Word;
     Count: Word;
   end;
-
   PIconRec = ^TIconRec;
   TIconRec = packed record
     Width: Byte;
@@ -3059,12 +2775,10 @@ type
     DIBSize: Longint;
     DIBOffset: Longint;
   end;
-
 function WidthBytes(I: Longint): Longint;
 begin
   Result := ((I + 31) div 32) * 4;
 end;
-
 function GetDInColors(BitCount: Word): Integer;
 begin
   case BitCount of
@@ -3074,12 +2788,10 @@ begin
     Result := 0;
   end;
 end;
-
 procedure OutOfResources;
 begin
 //  raise EOutOfResources.Create(SOutOfResources);
 end;
-
 function DupBits(Src: HBITMAP; Size: TPoint; Mono: Boolean): HBITMAP;
 var
   DC, Mem1, Mem2: HDC;
@@ -3118,7 +2830,6 @@ begin
   DeleteDC(Mem1);
   DeleteDC(Mem2);
 end;
-
 procedure TwoBitsFromDIB(var BI: TBitmapInfoHeader; var XorBits, AndBits: HBITMAP);
 type
   PLongArray = ^TLongArray;
@@ -3179,9 +2890,7 @@ begin
     ReleaseDC(HWND_DESKTOP, DC);
   end;
 end;
-
 { begin JvRLE }
-
 procedure RleCompressTo(InStream, OutStream: TStream);
 var
   Count, Count2, Count3, I: Integer;
@@ -3232,7 +2941,6 @@ begin
     OutStream.Write(Buf2, Count2);
   until Count <> 1024;
 end;
-
 procedure RleDecompressTo(InStream, OutStream: TStream);
 var
   Count, Count2, Count3, I: Integer;
@@ -3270,7 +2978,6 @@ begin
     OutStream.Write(Buf2, Count2);
   until Count <> 1024;
 end;
-
 procedure RleCompress(Stream: TStream);
 var
   Tmp: TMemoryStream;
@@ -3285,7 +2992,6 @@ begin
     Tmp.Free;
   end;
 end;
-
 procedure RleDecompress(Stream: TStream);
 var
   Tmp: TMemoryStream;
@@ -3301,24 +3007,19 @@ begin
   end;
 end;
 { end JvRLE }
-
 { begin JvDateUtil }
-
 function IsLeapYear(AYear: Integer): Boolean;
 begin
   Result := (AYear mod 4 = 0) and ((AYear mod 100 <> 0) or (AYear mod 400 = 0));
 end;
-
 function DaysInAMonth(const AYear, AMonth: Word): Word;
 begin
   Result := MonthDays[(AMonth = 2) and IsLeapYear(AYear), AMonth];
 end;
-
 function DaysPerMonth(AYear, AMonth: Integer): Integer;
 begin
   Result := DaysInAMonth(AYear, AMonth);
 end;
-
 function FirstDayOfNextMonth: TDateTime;
 var
   Year, Month, Day: Word;
@@ -3334,7 +3035,6 @@ begin
   end;
   Result := EncodeDate(Year, Month, Day);
 end;
-
 function FirstDayOfPrevMonth: TDateTime;
 var
   Year, Month, Day: Word;
@@ -3350,7 +3050,6 @@ begin
   end;
   Result := EncodeDate(Year, Month, Day);
 end;
-
 function LastDayOfPrevMonth: TDateTime;
 var
   D: TDateTime;
@@ -3361,28 +3060,24 @@ begin
   Day := DaysPerMonth(Year, Month);
   Result := EncodeDate(Year, Month, Day);
 end;
-
 function ExtractDay(ADate: TDateTime): Word;
 var
   M, Y: Word;
 begin
   DecodeDate(ADate, Y, M, Result);
 end;
-
 function ExtractMonth(ADate: TDateTime): Word;
 var
   D, Y: Word;
 begin
   DecodeDate(ADate, Y, Result, D);
 end;
-
 function ExtractYear(ADate: TDateTime): Word;
 var
   D, M: Word;
 begin
   DecodeDate(ADate, Result, M, D);
 end;
-
 function IncDate(ADate: TDateTime; Days, Months, Years: Integer): TDateTime;
 var
   D, M, Y: Word;
@@ -3410,7 +3105,6 @@ begin
     Day := DaysPerMonth(Year, Month);
   Result := EncodeDate(Year, Month, Day) + Days + Frac(ADate);
 end;
-
 procedure DateDiff(Date1, Date2: TDateTime; var Days, Months, Years: Word);
 { Corrected by Anatoly A. Sanko (2:450/73) }
 var
@@ -3447,22 +3141,18 @@ begin
   end;
   Inc(Days, Day2 - Day1);
 end;
-
 function IncDay(ADate: TDateTime; Delta: Integer): TDateTime;
 begin
   Result := ADate + Delta;
 end;
-
 function IncMonth(ADate: TDateTime; Delta: Integer): TDateTime;
 begin
   Result := IncDate(ADate, 0, Delta, 0);
 end;
-
 function IncYear(ADate: TDateTime; Delta: Integer): TDateTime;
 begin
   Result := IncDate(ADate, 0, 0, Delta);
 end;
-
 function MonthsBetween(Date1, Date2: TDateTime): Double;
 var
   D, M, Y: Word;
@@ -3481,13 +3171,11 @@ begin
   if D >= 21 then
     Result := Result + 1;
 end;
-
 function IsValidDate(Y, M, D: Word): Boolean;
 begin
   Result := (Y >= 1) and (Y <= 9999) and (M >= 1) and (M <= 12) and
     (D >= 1) and (D <= DaysPerMonth(Y, M));
 end;
-
 function ValidDate(ADate: TDateTime): Boolean;
 var
   Year, Month, Day: Word;
@@ -3499,7 +3187,6 @@ begin
     Result := False;
   end;
 end;
-
 function DaysInPeriod(Date1, Date2: TDateTime): Longint;
 begin
   if ValidDate(Date1) and ValidDate(Date2) then
@@ -3507,7 +3194,6 @@ begin
   else
     Result := 0;
 end;
-
 { // (ahuser) wrong implementation
 function DaysBetween(Date1, Date2: TDateTime): Longint;
 begin
@@ -3515,7 +3201,6 @@ begin
   if Result < 0 then
     Result := 0;
 end;}
-
 function DaysBetween(Date1, Date2: TDateTime): Longint;
 begin
   if Date1 < Date2 then
@@ -3523,7 +3208,6 @@ begin
   else
     Result := Trunc(Date1 - Date2);
 end;
-
 function IncTime(ATime: TDateTime; Hours, Minutes, Seconds,
   MSecs: Integer): TDateTime;
 begin
@@ -3532,39 +3216,31 @@ begin
   if Result < 0 then
     Result := Result + 1;
 end;
-
 function IncHour(ATime: TDateTime; Delta: Integer): TDateTime;
 begin
   Result := IncTime(ATime, Delta, 0, 0, 0);
 end;
-
 function IncMinute(ATime: TDateTime; Delta: Integer): TDateTime;
 begin
   Result := IncTime(ATime, 0, Delta, 0, 0);
 end;
-
 function IncSecond(ATime: TDateTime; Delta: Integer): TDateTime;
 begin
   Result := IncTime(ATime, 0, 0, Delta, 0);
 end;
-
 function IncMSec(ATime: TDateTime; Delta: Integer): TDateTime;
 begin
   Result := IncTime(ATime, 0, 0, 0, Delta);
 end;
-
 function CutTime(ADate: TDateTime): TDateTime;
 begin
   Result := Trunc(ADate);
 end;
-
 function CurrentYear: Word;
 begin
   Result := ExtractYear(Date);
 end;
-
 { String to date conversions. Copied from SYSUTILS.PAS unit. }
-
 procedure ScanBlanks(const S: string; var Pos: Integer);
 var
   I: Integer;
@@ -3574,7 +3250,6 @@ begin
     Inc(I);
   Pos := I;
 end;
-
 function ScanNumber(const S: string; MaxLength: Integer; var Pos: Integer;
   var Number: Longint): Boolean;
 var
@@ -3598,7 +3273,6 @@ begin
     Result := True;
   end;
 end;
-
 function ScanChar(const S: string; var Pos: Integer; Ch: Char): Boolean;
 begin
   Result := False;
@@ -3609,7 +3283,6 @@ begin
     Result := True;
   end;
 end;
-
 procedure ScanToNumber(const S: string; var Pos: Integer);
 begin
   while (Pos <= Length(S)) and not CharInSet(S[Pos], ['0'..'9']) do
@@ -3621,7 +3294,6 @@ begin
     Inc(Pos);
   end;
 end;
-
 function GetDateOrder(const DateFormat: string): TDateOrder;
 var
   I: Integer;
@@ -3646,14 +3318,11 @@ begin
     Exit;
   end;
 end;
-
 function CurrentMonth: Word;
 begin
   Result := ExtractMonth(Date);
 end;
-
 {Modified}
-
 function ExpandYear(Year: Integer): Integer;
 var
   N: Longint;
@@ -3672,7 +3341,6 @@ begin
     end;
   end;
 end;
-
 function ScanDate(const S, DateFormat: string; var Position: Integer;
   var Y, M, D: Integer): Boolean;
 var
@@ -3746,7 +3414,6 @@ begin
   end;
   Result := IsValidDate(Y, M, D) and (Position > Length(S));
 end;
-
 function MonthFromName(const S: string; MaxLen: Byte): Byte;
 begin
   if Length(S) > 0 then
@@ -3758,7 +3425,6 @@ begin
     end;
   Result := 0;
 end;
-
 procedure ExtractMask(const Format, S: string; Ch: Char; Cnt: Integer;
   var I: Integer; Blank, Default: Integer);
 var
@@ -3795,7 +3461,6 @@ begin
   else
     I := StrToIntDef(Tmp, -1);
 end;
-
 function ScanDateStr(const Format, S: string; var D, M, Y: Integer): Boolean;
 var
   Pos: Integer;
@@ -3815,7 +3480,6 @@ begin
     Result := ScanDate(S, Format, Pos, Y, M, D);
   end;
 end;
-
 function InternalStrToDate(const DateFormat, S: string;
   var Date: TDateTime): Boolean;
 var
@@ -3837,25 +3501,21 @@ begin
     end;
   end;
 end;
-
 function StrToDateFmt(const DateFormat, S: string): TDateTime;
 begin
   if not InternalStrToDate(DateFormat, S, Result) then
     raise EConvertError.CreateResFmt(@SInvalidDate, [S]);
 end;
-
 function StrToDateDef(const S: string; Default: TDateTime): TDateTime;
 begin
   if not InternalStrToDate(JclFormatSettings.ShortDateFormat, S, Result) then
     Result := Trunc(Default);
 end;
-
 function StrToDateFmtDef(const DateFormat, S: string; Default: TDateTime): TDateTime;
 begin
   if not InternalStrToDate(DateFormat, S, Result) then
     Result := Trunc(Default);
 end;
-
 function DefDateFormat(AFourDigitYear: Boolean): string;
 begin
   if AFourDigitYear then
@@ -3881,7 +3541,6 @@ begin
     end;
   end;
 end;
-
 function DefDateMask(BlanksChar: Char; AFourDigitYear: Boolean): string;
 begin
   if AFourDigitYear then
@@ -3905,7 +3564,6 @@ begin
   if Result <> '' then
     Result := Result + BlanksChar;
 end;
-
 function FormatLongDate(Value: TDateTime): string;
 {$IFDEF MSWINDOWS}
 var
@@ -3923,7 +3581,6 @@ begin
   Result := TrimRight(FormatDateTime(LongDateFormat, Value));
 end;
 {$ENDIF UNIX}
-
 function FormatLongDateTime(Value: TDateTime): string;
 begin
   if Value <> NullDate then
@@ -3931,18 +3588,15 @@ begin
   else
     Result := '';
 end;
-
 function FourDigitYear: Boolean; // deprecated
 begin
   Result := IsFourDigitYear;
 end;
-
 function IsFourDigitYear: Boolean;
 begin
   Result := Pos('YYYY', AnsiUpperCase(JclFormatSettings.ShortDateFormat)) > 0;
 end;
 { end JvDateUtil }
-
 function BufToBinStr(Buf: Pointer; BufSize: Integer): string;
 var
   I: Integer;
@@ -3952,7 +3606,6 @@ begin
   for I := 0 to Pred(BufSize) do
     Result := Result + IntToHex(P[I] , 2);
 end;
-
 function BinStrToBuf(Value: string; Buf: Pointer; BufSize: Integer): Integer;
 var
   I: Integer;
@@ -3967,10 +3620,8 @@ begin
     P[I] := StrToInt('$' + Value[2 * I + 1] + Value[2 * I + 2]);
   Result := BufSize;
 end;
-
 { begin JvStrUtils }
 {$IFDEF UNIX}
-
 function iconversion(InP: PAnsiChar; OutP: Pointer; InBytes, OutBytes: Cardinal;
   const ToCode, FromCode: AnsiString): Boolean;
 var
@@ -3988,7 +3639,6 @@ begin
     end;
   end;
 end;
-
 function iconvString(const S, ToCode, FromCode: AnsiString): AnsiString;
 begin
   SetLength(Result, Length(S));
@@ -3997,7 +3647,6 @@ begin
     ToCode, FromCode) then
     Result := S;
 end;
-
 function iconvWideString(const S: WideString; const ToCode, FromCode: AnsiString): WideString;
 begin
   SetLength(Result, Length(S));
@@ -4006,19 +3655,15 @@ begin
     ToCode, FromCode) then
     Result := S;
 end;
-
 function OemStrToAnsi(const S: AnsiString): AnsiString;
 begin
   Result := iconvString(S, 'WINDOWS-1252', 'CP850');
 end;
-
 function AnsiStrToOem(const S: AnsiString): AnsiString;
 begin
   Result := iconvString(S, 'CP850', 'WINDOWS-1250');
 end;
-
 {$ENDIF UNIX}
-
 function StrToOem(const AnsiStr: AnsiString): AnsiString;
 begin
   {$IFDEF MSWINDOWS}
@@ -4030,7 +3675,6 @@ begin
   Result := AnsiStrToOem(AnsiStr);
   {$ENDIF UNIX}
 end;
-
 function OemToAnsiStr(const OemStr: AnsiString): AnsiString;
 begin
   {$IFDEF MSWINDOWS}
@@ -4042,7 +3686,6 @@ begin
   Result := OemStrToAnsi(OemStr);
   {$ENDIF UNIX}
 end;
-
 function IsEmptyStr(const S: string; const EmptyChars: TSysCharSet): Boolean;
 var
   I, SLen: Integer;
@@ -4061,7 +3704,6 @@ begin
   end;
   Result := True;
 end;
-
 function ReplaceStr(const S, Srch, Replace: string): string;
 var
   I: Integer;
@@ -4080,12 +3722,10 @@ begin
       Result := Result + Source;
   until I <= 0;
 end;
-
 function DelSpace(const S: string): string;
 begin
   Result := DelChars(S, ' ');
 end;
-
 function DelChars(const S: string; Chr: Char): string;
 var
   I: Integer;
@@ -4097,7 +3737,6 @@ begin
       Delete(Result, I, 1);
   end;
 end;
-
 function DelBSpace(const S: string): string;
 var
   I, L: Integer;
@@ -4108,7 +3747,6 @@ begin
     Inc(I);
   Result := Copy(S, I, MaxInt);
 end;
-
 function DelESpace(const S: string): string;
 var
   I: Integer;
@@ -4118,12 +3756,10 @@ begin
     Dec(I);
   Result := Copy(S, 1, I);
 end;
-
 function DelRSpace(const S: string): string;
 begin
   Result := DelBSpace(DelESpace(S));
 end;
-
 function DelSpace1(const S: string): string;
 var
   I: Integer;
@@ -4135,7 +3771,6 @@ begin
       Delete(Result, I, 1);
   end;
 end;
-
 function Tab2Space(const S: string; Numb: Byte): string;
 var
   I: Integer;
@@ -4154,7 +3789,6 @@ begin
       Inc(I);
   end;
 end;
-
 function MakeStr(C: Char; N: Integer): string; overload;
 begin
   if N < 1 then
@@ -4165,7 +3799,6 @@ begin
     FillString(Result, Length(Result), C);
   end;
 end;
-
 {$IFNDEF COMPILER12_UP}
 function MakeStr(C: WideChar; N: Integer): WideString; overload;
 begin
@@ -4178,12 +3811,10 @@ begin
   end;
 end;
 {$ENDIF !COMPILER12_UP}
-
 function MS(C: Char; N: Integer): string;
 begin
   Result := MakeStr(C, N);
 end;
-
 function NPos(const C: string; S: string; N: Integer): Integer;
 var
   I, P, K: Integer;
@@ -4205,7 +3836,6 @@ begin
       Exit;
   end;
 end;
-
 function AddChar(C: Char; const S: string; N: Integer): string;
 begin
   if Length(S) < N then
@@ -4213,7 +3843,6 @@ begin
   else
     Result := S;
 end;
-
 function AddCharR(C: Char; const S: string; N: Integer): string;
 begin
   if Length(S) < N then
@@ -4221,47 +3850,36 @@ begin
   else
     Result := S;
 end;
-
 function LeftStr(const S: string; N: Integer): string;
 begin
   Result := AddCharR(' ', S, N);
 end;
-
 function RightStr(const S: string; N: Integer): string;
 begin
   Result := AddChar(' ', S, N);
 end;
-
 {$IFDEF MSWINDOWS}
-
 function CompStr(const S1, S2: string): Integer;
 begin
   Result := CompareString(GetThreadLocale, SORT_STRINGSORT, PChar(S1),
     Length(S1), PChar(S2), Length(S2)) - 2;
 end;
-
 function CompText(const S1, S2: string): Integer;
 begin
   Result := CompareString(GetThreadLocale, SORT_STRINGSORT or NORM_IGNORECASE,
     PChar(S1), Length(S1), PChar(S2), Length(S2)) - 2;
 end;
-
 {$ENDIF MSWINDOWS}
-
 {$IFDEF UNIX}
-
 function CompStr(const S1, S2: string): Integer;
 begin
   Result := AnsiCompareStr(S1, S2);
 end;
-
 function CompText(const S1, S2: string): Integer;
 begin
   Result := AnsiCompareText(S1, S2);
 end;
-
 {$ENDIF UNIX}
-
 function Copy2Symb(const S: string; Symb: Char): string;
 var
   P: Integer;
@@ -4271,23 +3889,19 @@ begin
     P := Length(S) + 1;
   Result := Copy(S, 1, P - 1);
 end;
-
 function Copy2SymbDel(var S: string; Symb: Char): string;
 begin
   Result := Copy2Symb(S, Symb);
   S := DelBSpace(Copy(S, Length(Result) + 1, Length(S)));
 end;
-
 function Copy2Space(const S: string): string;
 begin
   Result := Copy2Symb(S, ' ');
 end;
-
 function Copy2SpaceDel(var S: string): string;
 begin
   Result := Copy2SymbDel(S, ' ');
 end;
-
 function AnsiProperCase(const S: string; const WordDelims: TSysCharSet): string;
 var
   SLen, I: Cardinal;
@@ -4305,7 +3919,6 @@ begin
       Inc(I);
   end;
 end;
-
 function WordCount(const S: string; const WordDelims: TSysCharSet): Integer;
 var
   SLen, I: Cardinal;
@@ -4323,7 +3936,6 @@ begin
       Inc(I);
   end;
 end;
-
 function WordPosition(const N: Integer; const S: string;
   const WordDelims: TSysCharSet): Integer;
 var
@@ -4348,7 +3960,6 @@ begin
       Result := I;
   end;
 end;
-
 function ExtractWord(N: Integer; const S: string;
   const WordDelims: TSysCharSet): string;
 var
@@ -4369,7 +3980,6 @@ begin
     end;
   SetLength(Result, Len);
 end;
-
 function ExtractWordPos(N: Integer; const S: string;
   const WordDelims: TSysCharSet; var Pos: Integer): string;
 var
@@ -4390,7 +4000,6 @@ begin
     end;
   SetLength(Result, Len);
 end;
-
 function ExtractDelimited(N: Integer; const S: string;
   const Delims: TSysCharSet): string;
 var
@@ -4418,7 +4027,6 @@ begin
     Inc(I);
   end;
 end;
-
 function ExtractSubstr(const S: string; var Pos: Integer;
   const Delims: TSysCharSet): string;
 var
@@ -4432,7 +4040,6 @@ begin
     Inc(I);
   Pos := I;
 end;
-
 function IsWordPresent(const W, S: string; const WordDelims: TSysCharSet): Boolean;
 var
   Count, I: Integer;
@@ -4446,17 +4053,14 @@ begin
       Exit;
     end;
 end;
-
 function QuotedString(const S: string; Quote: Char): string;
 begin
   Result := AnsiQuotedStr(S, Quote);
 end;
-
 function ExtractQuotedString(const S: string; Quote: Char): string;
 begin
   Result := DequotedStr(S, Quote);
 end;
-
 function Numb2USA(const S: string): string;
 var
   I, NA: Integer;
@@ -4474,7 +4078,6 @@ begin
     Dec(I);
   end;
 end;
-
 function CenterStr(const S: string; Len: Integer): string;
 begin
   if Length(S) < Len then
@@ -4485,12 +4088,10 @@ begin
   else
     Result := S;
 end;
-
 function Dec2Hex(N: Longint; A: Byte): string;
 begin
   Result := IntToHex(N, A);
 end;
-
 function Hex2Dec(const S: string): Longint;
 var
   HexStr: string;
@@ -4501,7 +4102,6 @@ begin
     HexStr := S;
   Result := StrToIntDef(HexStr, 0);
 end;
-
 function Dec2Numb(N: Int64; A, B: Byte): string;
 var
   C: Integer;
@@ -4527,7 +4127,6 @@ begin
   if Result <> '' then
     Result := AddChar('0', Result, A);
 end;
-
 function Numb2Dec(S: string; B: Byte): Int64;
 var
   I, P: Int64;
@@ -4546,7 +4145,6 @@ begin
     P := P * B;
   end;
 end;
-
 function RomanToInt(const S: string): Longint;
 const
   RomanChars = ['C', 'D', 'I', 'L', 'M', 'V', 'X'];
@@ -4590,7 +4188,6 @@ begin
   if Negative then
     Result := -Result;
 end;
-
 function IntToRoman(Value: Longint): string;
 label
   A500, A400, A100, A90, A50, A40, A10, A9, A5, A4, A1;
@@ -4692,7 +4289,6 @@ begin
     Result := Result + 'I';
   end;
 end;
-
 function IntToBin(Value: Longint; Digits, Spaces: Integer): string;
 begin
   Result := '';
@@ -4706,7 +4302,6 @@ begin
     Result := Result + IntToStr((Value shr Digits) and 1);
   end;
 end;
-
 function FindPart(const HelpWilds, InputStr: string): Integer;
 var
   I, J: Integer;
@@ -4745,9 +4340,7 @@ begin
   end;
   Result := 0;
 end;
-
 function IsWild(InputStr, Wilds: string; IgnoreCase: Boolean): Boolean;
-
   function SearchNext(var Wilds: string): Integer;
     { looking for next *, returns position and string until position }
   begin
@@ -4755,7 +4348,6 @@ function IsWild(InputStr, Wilds: string; IgnoreCase: Boolean): Boolean;
     if Result > 0 then
       Wilds := Copy(Wilds, 1, Result - 1);
   end;
-
 var
   CWild, CInputWord: Integer; { counter for positions }
   I, LenHelpWilds: Integer;
@@ -4843,7 +4435,6 @@ begin
     Result := False;
     Exit;
   until (CInputWord > MaxInputWord) or (CWild > MaxWilds);
-
   {$IFNDEF COMPILER27_UP}
   // Delphi 10.4 complains that this code is useless and if one looks at the
   // lines just above the until statement, it makes a lot of sense...
@@ -4854,7 +4445,6 @@ begin
     Result := False;
   {$ENDIF ~COMPILER27_UP}
 end;
-
 function XorString(const Key, Src: ShortString): ShortString;
 var
   I: Integer;
@@ -4864,7 +4454,6 @@ begin
     for I := 1 to Length(Src) do
       Result[I] := AnsiChar(Chr(Byte(Key[1 + ((I - 1) mod Length(Key))]) xor Ord(Src[I])));
 end;
-
 function XorEncode(const Key, Source: string): string;
 var
   I, KeyLen: Integer;
@@ -4881,7 +4470,6 @@ begin
     Result := Result + AnsiLowerCase(IntToHex(C, 2));
   end;
 end;
-
 function XorDecode(const Key, Source: string): string;
 var
   I, KeyLen: Integer;
@@ -4897,7 +4485,6 @@ begin
     Result := Result + C;
   end;
 end;
-
 function XorEncodeString(const Key, Source: string): string;
 const
   HexChars: array[0..15] of Char =
@@ -4922,7 +4509,6 @@ begin
     Result[1 + (I - 1) * 2 + 1] := HexChars[C and $0F];
   end;
 end;
-
 function XorDecodeString(const Key, Source: string): string;
 var
   I, KeyLen: Integer;
@@ -4960,7 +4546,6 @@ begin
   end;
   Result := UTF8ToString(Utf8Result);
 end;
-
 function GetCmdLineArg(const Switch: string; ASwitchChars: TSysCharSet): string;
 var
   I: Integer;
@@ -4986,9 +4571,7 @@ begin
   end;
   Result := '';
 end;
-
 { begin JvStrUtil }
-
 function FindNotBlankCharPos(const S: string): Integer;
 begin
   for Result := 1 to Length(S) do
@@ -4996,7 +4579,6 @@ begin
       Exit;
   Result := Length(S) + 1;
 end;
-
 function FindNotBlankCharPosW(const S: WideString): Integer;
 begin
   for Result := 1 to Length(S) do
@@ -5004,9 +4586,7 @@ begin
       Exit;
   Result := Length(S) + 1;
 end;
-
 // (rom) reimplemented
-
 function AnsiChangeCase(const S: string): string;
 var
   I: Integer;
@@ -5022,7 +4602,6 @@ begin
     else
       Result[I] := Up[I];
 end;
-
 function WideChangeCase(const S: string): string;
 var
   I: Integer;
@@ -5038,12 +4617,9 @@ begin
     else
       Result[I] := Up[I];
 end;
-
 { end JvStrUtil }
 { end JvStrUtils }
-
 { begin JvFileUtil }
-
 function NormalDir(const DirName: string): string;
 begin
   Result := DirName;
@@ -5057,7 +4633,6 @@ begin
       Result := Result + '\';
   {$ENDIF MSWINDOWS}
 end;
-
 function RemoveBackSlash(const DirName: string): string;
 begin
   Result := DirName;
@@ -5068,7 +4643,6 @@ begin
       (Result[2] = ':')) then
       Delete(Result, Length(Result), 1);
 end;
-
 function HasAttr(const FileName: string; Attr: Integer): Boolean;
 var
   FileAttr: Integer;
@@ -5076,7 +4650,6 @@ begin
   FileAttr := FileGetAttr(FileName);
   Result := (FileAttr >= 0) and (FileAttr and Attr = Attr);
 end;
-
 function DeleteFilesEx(const FileMasks: array of string): Boolean;
 var
   I: Integer;
@@ -5085,25 +4658,20 @@ begin
   for I := Low(FileMasks) to High(FileMasks) do
     Result := Result and DeleteFiles(ExtractFilePath(FileMasks[I]), ExtractFileName(FileMasks[I]));
 end;
-
 {$IFDEF MSWINDOWS}
-
 function GetWindowsDir: string;
 var
   Buffer: array [0..MAX_PATH - 1] of Char;
 begin
   SetString(Result, Buffer, GetWindowsDirectory(Buffer, Length(Buffer) - 1));
 end;
-
 function GetSystemDir: string;
 var
   Buffer: array [0..MAX_PATH - 1] of Char;
 begin
   SetString(Result, Buffer, GetSystemDirectory(Buffer, Length(Buffer) - 1));
 end;
-
 {$ENDIF MSWINDOWS}
-
 {$IFDEF UNIX}
 function GetTempFileName(const Prefix: AnsiString): AnsiString;
 var
@@ -5115,7 +4683,6 @@ begin
     Libc.free(P);
 end;
 {$ENDIF UNIX}
-
 function GenTempFileName(FileName: string): string;
 var
   TempDir: string;
@@ -5158,12 +4725,10 @@ begin
     Result := '~JVCLTemp.tmp';
   DeleteFile(Result);
 end;
-
 function GenTempFileNameExt(FileName: string; const FileExt: string): string;
 begin
   Result := ChangeFileExt(GenTempFileName(FileName), FileExt);
 end;
-
 function ClearDir(const Dir: string): Boolean;
 var
   SearchRec: TSearchRec;
@@ -5187,13 +4752,11 @@ begin
   end;
   FindClose(SearchRec);
 end;
-
 function DeleteDir(const Dir: string): Boolean;
 begin
   ClearDir(Dir);
   Result := RemoveDir(Dir);
 end;
-
 function DeleteFiles(const Folder: TFileName; const Masks: string): Boolean;
 var
   SearchRec: TSearchRec;
@@ -5211,7 +4774,6 @@ begin
   end;
   FindClose(SearchRec);
 end;
-
 function GetParameter: string;
 var
   FN, FN1: PChar;
@@ -5248,7 +4810,6 @@ begin
   if FileExists(Result) then
     Result := GetLongFileName(Result);
 end;
-
 function GetLongFileName(const FileName: string): string;
 {$IFDEF MSWINDOWS}
 var
@@ -5265,7 +4826,6 @@ begin
   Result := ExpandFileName(FileName);
   {$ENDIF UNIX}
 end;
-
 function FileEquMask(FileName, Mask: TFileName; CaseSensitive: Boolean): Boolean;
 var
   I: Integer;
@@ -5317,7 +4877,6 @@ begin
   if Index > LenFileName then
     Result := True;
 end;
-
 function FileEquMasks(FileName, Masks: TFileName; CaseSensitive: Boolean): Boolean;
 var
   I: Integer;
@@ -5338,9 +4897,7 @@ begin
       Mask := Trim(SubStrBySeparator(Masks, I, PathSep));
     end;
 end;
-
 function ValidFileName(const FileName: string): Boolean;
-
   function HasAny(const Str, SubStr: string): Boolean;
   var
     I: Integer;
@@ -5355,7 +4912,6 @@ function ValidFileName(const FileName: string): Boolean;
       end;
     end;
   end;
-
 begin
   Result := (FileName <> '') and
   {$IFDEF MSWINDOWS}
@@ -5367,9 +4923,7 @@ begin
   if Result then
     Result := Pos(PathDelim, ExtractFileName(FileName)) = 0;
 end;
-
 {$IFDEF MSWINDOWS}
-
 function FileLock(Handle: Integer; Offset, LockSize: Longint): Integer; overload;
 begin
   if LockFile(Handle, Offset, 0, LockSize, 0) then
@@ -5377,7 +4931,6 @@ begin
   else
     Result := GetLastError;
 end;
-
 function FileUnlock(Handle: Integer; Offset, LockSize: Longint): Integer; overload;
 begin
   if UnlockFile(Handle, Offset, 0, LockSize, 0) then
@@ -5385,7 +4938,6 @@ begin
   else
     Result := GetLastError;
 end;
-
 function FileLock(Handle: Integer; Offset, LockSize: Int64): Integer; overload;
 begin
   if LockFile(Handle, Int64Rec(Offset).Lo, Int64Rec(Offset).Hi,
@@ -5394,7 +4946,6 @@ begin
   else
     Result := GetLastError;
 end;
-
 function FileUnlock(Handle: Integer; Offset, LockSize: Int64): Integer; overload;
 begin
   if UnlockFile(Handle, Int64Rec(Offset).Lo, Int64Rec(Offset).Hi,
@@ -5403,9 +4954,7 @@ begin
   else
     Result := GetLastError;
 end;
-
 {$ENDIF MSWINDOWS}
-
 function ShortToLongFileName(const ShortName: string): string;
 {$IFDEF MSWINDOWS}
 var
@@ -5432,7 +4981,6 @@ begin
     Result := '';
 end;
 {$ENDIF UNIX}
-
 function LongToShortFileName(const LongName: string): string;
 {$IFDEF MSWINDOWS}
 var
@@ -5459,7 +5007,6 @@ begin
     Result := '';
 end;
 {$ENDIF UNIX}
-
 function ShortToLongPath(const ShortName: string): string;
 var
   LastSlash: PChar;
@@ -5483,7 +5030,6 @@ begin
     StrDispose(TempPathPtr);
   end;
 end;
-
 function LongToShortPath(const LongName: string): string;
 var
   LastSlash: PChar;
@@ -5507,16 +5053,12 @@ begin
     StrDispose(TempPathPtr);
   end;
 end;
-
 {$IFDEF MSWINDOWS}
-
 const
   IID_IPersistFile: TGUID =
   (D1: $0000010B; D2: $0000; D3: $0000; D4: ($C0, $00, $00, $00, $00, $00, $00, $46));
-
 const
   LinkExt = '.lnk';
-
 procedure CreateFileLink(const FileName, DisplayName: string; Folder: Integer);
 var
   ShellLink: IShellLink;
@@ -5555,7 +5097,6 @@ begin
     CoUninitialize;
   end;
 end;
-
 procedure DeleteFileLink(const DisplayName: string; Folder: Integer);
 var
   ShellLink: IShellLink;
@@ -5578,48 +5119,38 @@ begin
     CoUninitialize;
   end;
 end;
-
 {$ENDIF MSWINDOWS}
-
 { end JvFileUtil }
-
 function PtInRectInclusive(R: TRect; Pt: TPoint): Boolean;
 begin
   R.Right := R.Right + 1;
   R.Bottom := R.Bottom + 1;
   Result := PtInRect(R, Pt);
 end;
-
 function PtInRectExclusive(R: TRect; Pt: TPoint): Boolean;
 begin
   R.Left := R.Left + 1;
   R.Top := R.Top + 1;
   Result := PtInRect(R, Pt);
 end;
-
 function OpenObject(const Value: string): Boolean; overload;
 begin
   Result := OpenObject(PChar(Value));
 end;
-
 { (rb) Duplicate of JvFunctions.Exec }
 function OpenObject(Value: PChar): Boolean; overload;
 begin
   Result := ShellExecute(0, 'open', Value, nil, nil, SW_SHOWNORMAL) > HINSTANCE_ERROR;
 end;
-
 {$IFDEF MSWINDOWS}
-
 procedure RaiseLastWin32; overload;
 begin
   PError('');
 end;
-
 procedure RaiseLastWin32(const Text: string); overload;
 begin
   PError(Text);
 end;
-
 function GetFileVersion(const AFileName: string): Cardinal;
 var
   FileName: string;
@@ -5646,29 +5177,23 @@ begin
     end;
   end;
 end;
-
 var
   ShellVersion: Integer;
-
 function GetShellVersion: Cardinal;
 begin
   if ShellVersion = 0 then
     ShellVersion := GetFileVersion('shell32.dll');
   Result := ShellVersion;
 end;
-
 procedure OpenCdDrive;
 begin
   mciSendString(PChar(RC_OpenCDDrive), nil, 0, Windows.GetForegroundWindow);
 end;
-
 procedure CloseCdDrive;
 begin
   mciSendString(PChar(RC_CloseCDDrive), nil, 0, Windows.GetForegroundWindow);
 end;
-
 { (rb) Duplicate of JclFileUtils.DiskInDrive }
-
 function DiskInDrive(Drive: Char): Boolean;
 var
   DrvNum: Byte;
@@ -5684,9 +5209,7 @@ begin
     SetErrorMode(EMode);
   end;
 end;
-
 {$ENDIF MSWINDOWS}
-
 procedure PError(const Text: string);
 var
   LastError: Integer;
@@ -5705,7 +5228,6 @@ begin
     raise EOSError.Create(St);
   end;
 end;
-
 procedure Exec(const FileName, Parameters, Directory: string);
 begin
   {$IFDEF MSWINDOWS}
@@ -5723,9 +5245,7 @@ end;
 //  Libc.system(PChar(Format('cd "%s" ; "%s" %s &', [Directory, FileName, Parameters])));
 // end;
 {$ENDIF UNIX}
-
 { (rb) Duplicate of JclMiscel.WinExec32AndWait }
-
 function ExecuteAndWait(CommandLine: string; const WorkingDirectory: string; Visibility: Integer): Integer;
 {$IFDEF MSWINDOWS}
 var
@@ -5742,7 +5262,6 @@ begin
     nil, Pointer(WorkingDirectory), StartupInfo, ProcessInfo) then
   begin
     WaitForSingleObject(ProcessInfo.hProcess, INFINITE);
-
     // required to avoid running resource leak.
     CloseHandle(ProcessInfo.hProcess);
     CloseHandle(ProcessInfo.hThread);
@@ -5769,7 +5288,6 @@ begin
 end;
 {$ENDIF UNIX}
 
-
 function FirstInstance(const ATitle: string): Boolean;
 var
   Mutex: THandle;
@@ -5781,41 +5299,33 @@ begin
     ReleaseMutex(Mutex);
   end;
 end;
-
 procedure RestoreOtherInstance(const MainFormClassName, MainFormCaption: string);
 var
   OtherWnd, OwnerWnd: HWND;
 begin
   OtherWnd := FindWindow(PChar(MainFormClassName), PChar(MainFormCaption));
   ShowWindow(OtherWnd, SW_SHOW); //in case the window was not visible before
-
   OwnerWnd := 0;
   if OtherWnd <> 0 then
     OwnerWnd := GetWindow(OtherWnd, GW_OWNER);
-
   if OwnerWnd <> 0 then
     OtherWnd := OwnerWnd;
-
   if OtherWnd <> 0 then
   begin
     { (rb) Use JvVCLUtils.SwitchToWindow }
     if IsIconic(OtherWnd) then
       ShowWindow(OtherWnd, SW_RESTORE);
-
     SetForegroundWindow(OtherWnd);
   end;
 end;
-
 procedure HideTraybar;
 begin
   ShowWindow(FindWindow(PChar(RC_ShellName), nil), SW_HIDE);
 end;
-
 procedure ShowTraybar;
 begin
   ShowWindow(FindWindow(PChar(RC_ShellName), nil), SW_SHOW);
 end;
-
 procedure ShowStartButton(Visible: Boolean);
 var
   Tray, Child: HWND;
@@ -5838,22 +5348,18 @@ begin
     Child := GetWindow(Child, GW_HWNDNEXT);
   end;
 end;
-
 procedure MonitorOn;
 begin
   SendMessage(GetForegroundWindow, WM_SYSCOMMAND, SC_MONITORPOWER, -1);
 end;
-
 procedure MonitorOff;
 begin
   SendMessage(GetForegroundWindow, WM_SYSCOMMAND, SC_MONITORPOWER, 2);
 end;
-
 procedure LowPower;
 begin
   SendMessage(GetForegroundWindow, WM_SYSCOMMAND, SC_MONITORPOWER, 1);
 end;
-
 procedure SendShift(H: THandle; Down: Boolean);
 var
   VKey: Word;
@@ -5865,7 +5371,6 @@ begin
     ScanCode := ScanCode or $C0000000;
   SendMessage(H, WM_KEYDOWN, VKey, LPARAM(ScanCode));
 end;
-
 procedure SendCtrl(H: THandle; Down: Boolean);
 var
   VKey: Word;
@@ -5877,7 +5382,6 @@ begin
     ScanCode := ScanCode or $C0000000;
   SendMessage(H, WM_KEYDOWN, VKey, LPARAM(ScanCode));
 end;
-
 function SendKey(const AppName: string; Key: Char): Boolean;
 var
   VKey: Word;
@@ -5913,10 +5417,7 @@ begin
     Result := False;
 end;
 
-
-
 {$IFDEF MSWINDOWS}
-
 procedure RebuildIconCache;
 var
   Dummy: DWORD;
@@ -5924,7 +5425,6 @@ begin
   SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETNONCLIENTMETRICS,
     LPARAM(PChar('WindowMetrics')), SMTO_NORMAL or SMTO_ABORTIFHUNG, 10000, {$IFDEF RTL230_UP}@{$ENDIF}Dummy);
 end;
-
 procedure AssociateFileExtension(const IconPath, ProgramName, Path, Extension: string);
 begin
   with TRegistry.Create do
@@ -5954,19 +5454,15 @@ begin
   end;
   RebuildIconCache;
 end;
-
 procedure AssociateExtension(const IconPath, ProgramName, Path, Extension: string);
 begin
   AssociateFileExtension(IconPath, ProgramName, Path, Extension);
 end;
-
 function GetRecentDocs: TStringList;
-
 var
   Path: string;
   T: TSearchRec;
   Res: Integer;
-
 begin
   Result := TStringList.Create;
   Path := IncludeTrailingPathDelimiter(GetRecentFolder);
@@ -5983,14 +5479,11 @@ begin
     FindClose(T);
   end;
 end;
-
 { (rb) Duplicate of JvWinDialogs.AddToRecentDocs }
-
 procedure AddToRecentDocs(const FileName: string);
 begin
   SHAddToRecentDocs(SHARD_PATH, PChar(FileName));
 end;
-
 function EnumWindowsProc(Handle: THandle; LParam: TStrings): Boolean; stdcall;
 var
   St: array [0..256] of Char;
@@ -6005,7 +5498,6 @@ begin
   end;
   Result := True;
 end;
-
 procedure GetVisibleWindows(List: TStrings);
 begin
   List.BeginUpdate;
@@ -6016,28 +5508,21 @@ begin
     List.EndUpdate;
   end;
 end;
-
 {$ENDIF MSWINDOWS}
 // from JvComponentFunctions
-
 function StrPosNoCase(const psSub, psMain: string): Integer;
 begin
   Result := Pos(AnsiUpperCase(psSub), AnsiUpperCase(psMain));
 end;
-
 function StrRestOf(const Ps: string; const N: Integer): string;
 begin
   Result := Copy(Ps, N, {(Length(Ps) - N + 1)} MaxInt);
 end;
-
 {!!!!!!!! use these because the JCL one is badly broken }
-
 { I am using this one purely as an internal for StrReplace
-
  Replaces parts of a string with new text. iUpdatePos is the last update position
  i.e. the position where substr was found + the length of the replacement string + 1.
  Use 0 first time in }
-
 function StrReplaceInstance(const psSource, psSearch, psReplace: string;
   var piUpdatePos: Integer; const pbCaseSens: Boolean): string;
 var
@@ -6049,10 +5534,8 @@ begin
     Exit;
   if psSearch = '' then
     Exit;
-
   Result := Copy(psSource, 1, piUpdatePos - 1);
   lsCopy := StrRestOf(psSource, piUpdatePos);
-
   if pbCaseSens then
     liIndex := Pos(psSearch, lsCopy)
   else
@@ -6063,13 +5546,11 @@ begin
     piUpdatePos := Length(psSource) + 1;
     Exit;
   end;
-
   Result := Result + Copy(lsCopy, 1, liIndex - 1);
   Result := Result + psReplace;
   piUpdatePos := Length(Result) + 1;
   Result := Result + StrRestOf(lsCopy, liIndex + Length(psSearch));
 end;
-
 function LStrReplace(const psSource, psSearch, psReplace: string;
   const pbCaseSens: Boolean): string;
 var
@@ -6080,16 +5561,13 @@ begin
   while liUpdatePos < Length(Result) do
     Result := StrReplaceInstance(Result, psSearch, psReplace, liUpdatePos, pbCaseSens);
 end;
-
 { if it's not a decimal point then it must be a digit, space or Currency symbol
   also always use $ for money }
-
 function CharIsMoney(const Ch: Char): Boolean;
 begin
   Result := CharIsDigit(Ch) or (Ch = NativeSpace) or (Ch = '$') or (Ch = '-') or
     (Pos(Ch, JclFormatSettings.CurrencyString) > 0);
 end;
-
 function StrToCurrDef(const Str: string; Def: Currency): Currency;
 var
   LStr: TJclStringBuilder;
@@ -6117,13 +5595,11 @@ begin
     end;
   end;
 end;
-
 { JvStrConvertErrorFmt used from JvSafeStrToFloat }
 procedure JvStrConvertErrorFmt(ResString: PResStringRec; const Args: array of const);
 begin
   raise EJvConvertError.CreateResFmt(ResString, Args); { will be also caught if you catch E:EConvertERror }
 end;
-
 {$IFNDEF RTL150_UP}
 function TextToFloatD5D6(Buffer: PAnsiChar; var Value; ValueType: TFloatValue;
   const FormatSettings: TFormatSettings): Boolean;
@@ -6141,11 +5617,8 @@ begin
 end;
 {$ENDIF ~RTL150_UP}
 
-
 { _JvSafeStrToFloat:  [PRIVATE INTERNAL FUNCTION]
-
      [ not to be called outside this unit, see below for public api ]
-
     This is a refactored version of the internal guts of the former routine
     StrToFloatDefIgnoreInvalidCharacters with some improvements made to decimal
     separator handling.
@@ -6160,7 +5633,6 @@ begin
   Result := false;
   if Str = '' then
     Exit; { hows this for a nice optimization?  WPostma. }
-
   { Locale Handling logic October 2008 supercedes former StrToFloatUS functionality. }
   {$IFDEF RTL150_UP}
   LocalFormatSettings.ThousandSeparator := GetLocaleChar(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, '.');
@@ -6172,7 +5644,6 @@ begin
     aDecimalSeparator := LocalFormatSettings.DecimalSeparator { default case! use system defaults! }
   else
     LocalFormatSettings.DecimalSeparator := aDecimalSeparator; { custom format specified! }
-
   { Cross-codepage safety feature:  Handed '1.2', a string without a comma,
     but which is obviously a floating point number, convert it properly also.
     This functionality is important for JvCsvDataSet and may be important in other
@@ -6182,29 +5653,24 @@ begin
     aDecimalSeparator := USDecimalSeparator; { automatically works when US decimal values are encountered }
     LocalFormatSettings.DecimalSeparator := aDecimalSeparator; { custom format specified! }
   end;
-
   LStr := TJclStringBuilder.Create(Length(Str));
   try
     CharSet := ['0'..'9', '-', '+', 'e', 'E', AnsiChar(aDecimalSeparator)];
     //if (aDecimalSeparator<>USDecimalSeparator) then
     //    CharSet := CharSet + [USDecimalSeparator]; { we allow US Decimal separators, even when it's not the regional setting, we just grandfather it in as valid }
-
     for I := 1 to Length(Str) do
       if CharInSet(Str[I], CharSet) then
         LStr.Append(Str[I]);
-
 
     if LStr.Length > 0 then
     try
       { the string '-' fails StrToFloat, but it can be interpreted as 0  }
       if LStr[LStr.Length - 1] = '-' then
         LStr.Append('0');
-
       { a string that ends in a '.' such as '12.' fails StrToFloat,
        but as far as I am concerned, it may as well be interpreted as 12.0 }
       if LStr[LStr.Length - 1] = aDecimalSeparator then
         LStr.Append('0');
-
       {$IFDEF RTL150_UP}
       if not TextToFloat(PChar(LStr.ToString), OutValue, fvExtended, LocalFormatSettings) then
       {$ELSE}
@@ -6213,7 +5679,6 @@ begin
         Result := False
       else
         Result := True; { success! }
-
     except
       Result := False;
     end;
@@ -6221,7 +5686,6 @@ begin
     LStr.Free;
   end;
 end;
-
 // JvSafeStrToFloatDef:
 //
 // Note: before using StrToFloatDef, please be aware that it will ignore
@@ -6241,7 +5705,6 @@ begin
   if not _JvSafeStrToFloat(Str, aDecimalSeparator, Result) then
     Result := Def; { failed, use default }
 end;
-
 // New routine, same as JvSafeStrToFloatDef but it will raise a conversion exception,
 // for cases when you actually want to handle an EConvertError yourself and where
 // there is no convenient or possible float value for your case.
@@ -6251,62 +5714,51 @@ begin
   if not _JvSafeStrToFloat(Str, aDecimalSeparator, Result) then
     JvStrConvertErrorFmt(@SInvalidFloat, [Str]); {failed, raise exception }
 end;
-
 function IntToExtended(I: Integer): Extended;
 begin
   Result := I;
 end;
-
 function GetChangedText(const Text: string; SelStart, SelLength: Integer; Key: Char): string;
 begin
   { take the original text, replace what will be overwritten with new value }
   Result := Text;
-
   if SelLength > 0 then
     Delete(Result, SelStart + 1, SelLength);
   if Key <> #0 then
     Insert(Key, Result, SelStart + 1);
 end;
-
 { "window" technique for years to translate 2 digits to 4 digits.
    The window is 100 years wide
    The pivot year is the lower edge of the window
   A pivot year of 1900 is equivalent to putting 1900 before every 2-digit year
  if pivot is 1940, then 40 is interpreted as 1940, 00 as 2000 and 39 as 2039
  The system default is 1950
-
  Why the reimplementation?
  JclDatetime.Make4DigitYear will fail after 2100, this won't
  note that in this implementation pivot is a 4-digit year
  I have made it accept JclDatetime.Make4DigitYear's 2 digit pivot years.
  They are expanded by adding 1900.
-
  It is also better in that a valid 4-digit year will pass through unchanged,
  not fail an assertion.
 }
-
 function MakeYear4Digit(Year, Pivot: Integer): Integer;
 var
   Century: Integer;
 begin
   if Pivot < 0 then
     raise Exception.CreateRes(@RsEPivotLessThanZero);
-
   { map 100 to zero }
   if Year = 100 then
     Year := 0;
   if Pivot = 100 then
     Pivot := 0;
-
   // turn 2 digit pivot to 4 digit
   if Pivot < 100 then
     Pivot := Pivot + 1900;
-
   { turn 2 digit years to 4 digits }
   if (Year >= 0) and (Year < 100) then
   begin
     Century := (Pivot div 100) * 100;
-
     Result := Year + Century; // give the result the same century as the pivot
     if Result < Pivot then
       //  cannot be lower than the Pivot
@@ -6315,7 +5767,6 @@ begin
   else
     Result := Year;
 end;
-
 function StrIsInteger(const S: string): Boolean;
 var
   I: Integer;
@@ -6332,7 +5783,6 @@ begin
     end;
   end;
 end;
-
 function StrIsFloatMoney(const Ps: string): Boolean;
 var
   I, liDots: Integer;
@@ -6340,12 +5790,10 @@ var
 begin
   Result := True;
   liDots := 0;
-
   for I := 1 to Length(Ps) do
   begin
     { allow digits, space, Currency symbol and one decimal dot }
     Ch := Ps[I];
-
     if Ch = JclFormatSettings.DecimalSeparator then
     begin
       Inc(liDots);
@@ -6363,7 +5811,6 @@ begin
     end;
   end;
 end;
-
 function StrIsDateTime(const Ps: string): Boolean;
 const
   MIN_DATE_TIME_LEN = 6; {2Jan02 }
@@ -6379,24 +5826,20 @@ begin
     Result := False;
     Exit;
   end;
-
   if Length(Ps) > MAX_DATE_TIME_LEN then
   begin
     Result := False;
     Exit;
   end;
-
   lbDisqualify := False;
   liColons := 0;
   liSlashes := 0;
   liSpaces := 0;
   liDigits := 0;
   liAlpha := 0;
-
   for I := 1 to Length(Ps) do
   begin
     Ch := Ps[I];
-
     if Ch = ':' then
       Inc(liColons)
     else
@@ -6418,7 +5861,6 @@ begin
       Break;
     end;
   end;
-
   Result := False;
   if not lbDisqualify then
     { a date must have colons and slashes and spaces, but not to many of each }
@@ -6429,41 +5871,31 @@ begin
         longest month name is 8 chars }
         if (liDigits >= 3) and (liDigits <= 16) and (liAlpha <= 10) then
           Result := True;
-
   { define in terms of results - if I can interpret it as a date, then I can }
   if Result then
     Result := (SafeStrToDateTime(PreformatDateString(Ps)) <> 0);
 end;
-
 function PreformatDateString(Ps: string): string;
 var
   I: Integer;
 begin
   { turn any month names to numbers }
-
   { use the StrReplace in stringfunctions -
   the one in JclStrings is badly broken and brings down the app }
-
   for I := JclFormatSettings.MonthNamesLowIndex to JclFormatSettings.MonthNamesHighIndex do
     Ps := LStrReplace(Ps, JclFormatSettings.LongMonthNames[I], IntToStr(I), False);
-
   { now that 'January' is gone, catch 'Jan' }
   for I := JclFormatSettings.MonthNamesLowIndex to JclFormatSettings.MonthNamesHighIndex do
     Ps := LStrReplace(Ps, JclFormatSettings.ShortMonthNames[I], IntToStr(I), False);
-
   { remove redundant spaces }
   Ps := LStrReplace(Ps, NativeSpace + NativeSpace, NativeSpace, False);
-
   Result := Ps;
 end;
-
 function BooleanToInteger(const B: Boolean): Integer;
 begin
   Result := Ord(B);
 end;
-
 { from my ConvertFunctions unit }
-
 function StringToBoolean(const Ps: string): Boolean;
 const
   TRUE_STRINGS: array [1..5] of string = ('True', 't', 'y', 'yes', '1');
@@ -6471,7 +5903,6 @@ var
   I: Integer;
 begin
   Result := False;
-
   for I := Low(TRUE_STRINGS) to High(TRUE_STRINGS) do
     if AnsiSameText(Ps, TRUE_STRINGS[I]) then
     begin
@@ -6479,7 +5910,6 @@ begin
       Break;
     end;
 end;
-
 function SafeStrToDateTime(const Ps: string): TDateTime;
 begin
   try
@@ -6491,7 +5921,6 @@ begin
     raise;
   end;
 end;
-
 function SafeStrToDate(const Ps: string): TDateTime;
 begin
   try
@@ -6503,7 +5932,6 @@ begin
     raise;
   end;
 end;
-
 function SafeStrToTime(const Ps: string): TDateTime;
 begin
   try
@@ -6515,14 +5943,11 @@ begin
     raise;
   end;
 end;
-
 {!! from strFunctions }
-
 function StrDeleteChars(const Ps: string; const piPos: Integer; const piCount: Integer): string;
 begin
   Result := Copy(Ps, 1, piPos - 1) + StrRestOf(Ps, piPos + piCount);
 end;
-
 function StrDelete(const psSub, psMain: string): string;
 var
   liPos: Integer;
@@ -6530,28 +5955,22 @@ begin
   Result := psMain;
   if psSub = '' then
     Exit;
-
   liPos := StrIPos(psSub, psMain);
-
   while liPos > 0 do
   begin
     Result := StrDeleteChars(Result, liPos, Length(psSub));
     liPos := StrIPos(psSub, Result);
   end;
 end;
-
 function TimeOnly(pcValue: TDateTime): TTime;
 begin
   Result := Frac(pcValue);
 end;
-
 function DateOnly(pcValue: TDateTime): TDate;
 begin
   Result := Trunc(pcValue);
 end;
-
 { have to do this as it depends what the datekind of the control is}
-
 function DateIsNull(const pdtValue: TDateTime; const pdtKind: TdtKind): Boolean;
 begin
   Result := False;
@@ -6564,16 +5983,13 @@ begin
       Result := pdtValue = NullEquivalentDate;
   end;
 end;
-
 function OSCheck(RetVal: Boolean): Boolean;
 begin
   if not RetVal then
     RaiseLastOSError;
   Result := RetVal;
 end;
-
 {$IFDEF MSWINDOWS}
-
 function RunDLL32(const ModuleName, FuncName, CmdLine: string; WaitForCompletion: Boolean; CmdShow: Integer =
   SW_SHOWDEFAULT): Boolean;
 var
@@ -6594,7 +6010,6 @@ begin
     CloseHandle(PI.hProcess);
   end;
 end;
-
 procedure RunDll32Internal(Wnd: THandle; const DLLName, FuncName, CmdLine: string; CmdShow: Integer = SW_SHOWDEFAULT);
 var
   H: THandle;
@@ -6612,7 +6027,6 @@ begin
     end;
   end;
 end;
-
 type
   // (p3) from ShLwAPI
   TDLLVersionInfo = packed record
@@ -6622,7 +6036,6 @@ type
     dwBuildNumber: DWORD;
     dwPlatformId: DWORD;
   end;
-
 function GetDLLVersion(const DLLName: string; var pdwMajor, pdwMinor: Integer): Boolean;
 var
   hDLL, hr: THandle;
@@ -6660,12 +6073,9 @@ begin
   end;
   Result := False;
 end;
-
 {$ENDIF MSWINDOWS}
 {from JvVCLUtils }
-
 { Exceptions }
-
 procedure ResourceNotFound(ResID: PChar);
 var
   S: string;
@@ -6676,22 +6086,18 @@ begin
     S := ResID;
   raise EResNotFound.CreateResFmt(@SResNotFound, [S]);
 end;
-
 function EmptyRect: TRect;
 begin
   Result := Rect(0, 0, 0, 0);
 end;
-
 function RectWidth(R: TRect): Integer;
 begin
   Result := Abs(R.Right - R.Left);
 end;
-
 function RectHeight(R: TRect): Integer;
 begin
   Result := Abs(R.Bottom - R.Top);
 end;
-
 procedure RectNormalize(var R: TRect);
 var
   Temp: Integer;
@@ -6709,18 +6115,15 @@ begin
     R.Bottom := Temp;
   end;
 end;
-
 function CompareRect(const R1, R2: TRect): Boolean;
 begin
   Result := (R1.Left = R2.Left) and (R1.Top = R2.Top) and
             (R1.Right = R2.Right) and (R1.Bottom = R2.Bottom);
 end;
-
 function RectIsSquare(const R: TRect): Boolean;
 begin
   Result := RectHeight(R) = RectWidth(R);
 end;
-
 function RectSquare(var ARect: TRect; AMaxSize: Integer): Boolean;
 const
   cSquareMinSize = 4; // Min size is 4 pixel
@@ -6736,7 +6139,6 @@ begin
     Result := True;
     Exit;
   end;
-
   iW := RectWidth(ARect);
   iH := RectHeight(ARect);
   iMinSize := Min(iW, iH);
@@ -6744,27 +6146,21 @@ begin
     AMaxSize := iMinSize
   else
     AMaxSize := Min(iMinSize, AMaxSize);
-
   pTopLeft.Y :=ARect.Top + (iH - AMaxSize) div 2;
   pTopLeft.X :=ARect.Left + (iW - AMaxSize) div 2;
-
   pRightBottom.Y := pTopLeft.Y + AMaxSize;
   pRightBottom.X := pTopLeft.X + AMaxSize;
-
   ARect := Rect(pTopLeft, pRightBottom);
   Result := True;
 end;
-
 {$IFDEF MSWINDOWS}
 { Service routines }
-
 function LoadDLL(const LibName: string): THandle;
 begin
   Result := SafeLoadLibrary(LibName);
   if Result = 0 then
     OSCheck(False);
 end;
-
 function GetWindowsVersionString: string;
 const
   sWindowsVersion = 'Windows %s %d.%.2d.%.3d %s';
@@ -6794,9 +6190,7 @@ begin
       dwMinorVersion, dwBuildNumber, szCSDVersion]));
   end;
 end;
-
 { RegisterServer procedure written by Vladimir Gaitanoff, 2:50/430.2 }
-
 function RegisterServer(const ModuleName: string): Boolean;
 type
   TCOMFunc = function: HRESULT;
@@ -6814,7 +6208,6 @@ begin
     FreeLibrary(Handle);
   end;
 end;
-
 // UnregisterServer by Ralf Kaiser patterned on RegisterServer
 function UnregisterServer(const ModuleName: string): Boolean;
 type
@@ -6836,30 +6229,23 @@ begin
     FreeLibrary(Handle);
   end;
 end;
-
 procedure FreeUnusedOle;
 begin
   FreeLibrary(GetModuleHandle('OleAut32'));
 end;
-
 function GetEnvVar(const VarName: string): string;
 begin
   Result := GetEnvironmentVariable(VarName);
 end;
-
 {$ENDIF MSWINDOWS}
-
 {$IFDEF UNIX}
 function GetEnvVar(const VarName: string): string;
 begin
   Result := getenv(PChar(VarName));
 end;
 {$ENDIF UNIX}
-
 { String routines }
-
 procedure SplitCommandLine(const CmdLine: string; var ExeName, Params: string);
-
   function SkipString(P: PChar): PChar;
   begin
     if P^ = '"' then
@@ -6885,14 +6271,12 @@ procedure SplitCommandLine(const CmdLine: string; var ExeName, Params: string);
       end;
     Result := P;
   end;
-
   function SkipWhiteChars(P: PChar): PChar;
   begin
     Result := P;
     while (Result^ <> #0) and (Result^ <= ' ') do
       Inc(Result);
   end;
-
 var
   F, P: PChar;
 begin
@@ -6910,7 +6294,6 @@ begin
     SetString(Params, P, StrLen(P));
   end;
 end;
-
 function AnsiUpperFirstChar(const S: string): string;
 var
   Temp: string;
@@ -6923,17 +6306,14 @@ begin
     Result[1] := Temp[1];
   end;
 end;
-
 function StrPAlloc(const S: string): PChar;
 begin
   Result := StrPCopy(StrAlloc(Length(S) + 1), S);
 end;
-
 function StringToPChar(var S: string): PChar;
 begin
   Result := PChar(S);
 end;
-
 function DropT(const S: string): string;
 begin
   if (UpCase(S[1]) = 'T') and (Length(S) > 1) then
@@ -6941,14 +6321,12 @@ begin
   else
     Result := S;
 end;
-
 function WindowClassName(Wnd: THandle): string;
 var
   Buffer: array [0..255] of Char;
 begin
   SetString(Result, Buffer, GetClassName(Wnd, Buffer, Length(Buffer) - 1));
 end;
-
 function GetAnimation: Boolean;
 var
   Info: TAnimationInfo;
@@ -6959,7 +6337,6 @@ begin
   else
     Result := False;
 end;
-
 procedure SetAnimation(Value: Boolean);
 var
   Info: TAnimationInfo;
@@ -6968,7 +6345,6 @@ begin
   Info.iMinAnimate := Ord(Value);
   SystemParametersInfo(SPI_SETANIMATION, Info.cbSize, @Info, 0);
 end;
-
 procedure ShowWinNoAnimate(Handle: THandle; CmdShow: Integer);
 var
   Animation: Boolean;
@@ -6980,7 +6356,6 @@ begin
   if Animation then
     SetAnimation(True);
 end;
-
 procedure SwitchToWindow(Wnd: THandle; Restore: Boolean);
 begin
   if Windows.IsWindowEnabled(Wnd) then
@@ -6994,12 +6369,10 @@ begin
     end;
   end;
 end;
-
 function GetWindowParent(Wnd: THandle): THandle;
 begin
   Result := THandle(GetWindowLongPtr(Wnd, GWLP_HWNDPARENT));
 end;
-
 procedure ActivateWindow(Wnd: THandle);
 begin
   if Wnd <> 0 then
@@ -7008,7 +6381,6 @@ begin
     SetForegroundWindow(Wnd);
   end;
 end;
-
 {$IFDEF BCB}
 function FindPrevInstance(const MainFormClass: ShortString; const ATitle: string): THandle;
 {$ELSE}
@@ -7033,7 +6405,6 @@ begin
     StrDispose(BufClass);
   end;
 end;
-
 function WindowsEnum(Handle: HWND; var IsDelphi: Boolean): BOOL; stdcall;
 begin
   if WindowClassName(Handle) = 'TAppBuilder' then
@@ -7044,7 +6415,6 @@ begin
   else
     Result := True;
 end;
-
 {$IFDEF BCB}
 function ActivatePrevInstance(const MainFormClass: ShortString; const ATitle: string): Boolean;
 {$ELSE}
@@ -7092,7 +6462,6 @@ begin
     Result := True;
   end;
 end;
-
 {$IFDEF MSWINDOWS}
 function BrowseForFolderNative(const Handle: THandle; const Title: string; var Folder: string): Boolean;
 var
@@ -7118,7 +6487,6 @@ begin
   end;
 end;
 {$ENDIF MSWINDOWS}
-
 procedure FitRectToScreen(var Rect: TRect);
 var
   X, Y, Delta: Integer;
@@ -7150,7 +6518,6 @@ begin
     Rect.Bottom := Rect.Top + Delta;
   end;
 end;
-
 procedure CenterWindow(Wnd: THandle);
 var
   R: TRect;
@@ -7163,7 +6530,6 @@ begin
   SetWindowPos(Wnd, 0, R.Left, R.Top, 0, 0, SWP_NOACTIVATE or
     SWP_NOSIZE or SWP_NOZORDER);
 end;
-
 { Delete the requested message from the queue, but throw back }
 { any WM_QUIT msgs that PeekMessage may also return.          }
 { Copied from DbGrid.pas                                      }
@@ -7175,7 +6541,6 @@ begin
   if PeekMessage(M, Wnd, Msg, Msg, PM_REMOVE) and (M.Message = WM_QUIT) then
     PostQuitMessage(M.WParam);
 end;
-
 procedure SetWindowTop(const Handle: THandle; const Top: Boolean);
 const
   TopFlag: array [Boolean] of THandle = (HWND_NOTOPMOST, HWND_TOPMOST);
@@ -7183,7 +6548,6 @@ begin
   SetWindowPos(Handle, TopFlag[Top], 0, 0, 0, 0, SWP_NOMOVE or
     SWP_NOSIZE or SWP_NOACTIVATE);
 end;
-
 function MakeVariant(const Values: array of Variant): Variant;
 begin
   if High(Values) - Low(Values) > 1 then
@@ -7194,32 +6558,25 @@ begin
   else
     Result := Null;
 end;
-
 {$IFDEF MSWINDOWS}
 { Dialog units }
-
 function DialogUnitsToPixelsX(DlgUnits: Word): Word;
 begin
   Result := (DlgUnits * LoWord(GetDialogBaseUnits)) div 4;
 end;
-
 function DialogUnitsToPixelsY(DlgUnits: Word): Word;
 begin
   Result := (DlgUnits * HiWord(GetDialogBaseUnits)) div 8;
 end;
-
 function PixelsToDialogUnitsX(PixUnits: Word): Word;
 begin
   Result := PixUnits * 4 div LoWord(GetDialogBaseUnits);
 end;
-
 function PixelsToDialogUnitsY(PixUnits: Word): Word;
 begin
   Result := PixUnits * 8 div HiWord(GetDialogBaseUnits);
 end;
-
 {$ENDIF MSWINDOWS}
-
 function GetUniqueFileNameInDir(const Path, FileNameMask: string): string;
 var
   CurrentName: string;
@@ -7236,7 +6593,6 @@ begin
     end;
   end;
 end;
-
 function IsTTFontSelected(const DC: HDC): Boolean;
 var
   Metrics: TTextMetric;
@@ -7244,7 +6600,6 @@ begin
   GetTextMetrics(DC, Metrics);
   Result := (Metrics.tmPitchAndFamily and TMPF_TRUETYPE) <> 0;
 end;
-
 {$IFDEF DELPHI2007}
 {$WARNINGS OFF}  // D2007 gives a bogus W1035 on the first line that assigns Result.
 {$ENDIF DELPHI2007}
@@ -7256,12 +6611,10 @@ begin
   Result := DelRSpace(AValue);
   if JclFormatSettings.DecimalSeparator <> JclFormatSettings.ThousandSeparator then
     Result := DelChars(Result, JclFormatSettings.ThousandSeparator);
-
   if (JclFormatSettings.DecimalSeparator <> '.') and (JclFormatSettings.ThousandSeparator <> '.') then
     Result := ReplaceStr(Result, '.', JclFormatSettings.DecimalSeparator);
   if (JclFormatSettings.DecimalSeparator <> ',') and (JclFormatSettings.ThousandSeparator <> ',') then
     Result := ReplaceStr(Result, ',', JclFormatSettings.DecimalSeparator);
-
   J := 1;
   CharSet := ['0'..'9', '-', '+',
         AnsiChar(JclFormatSettings.DecimalSeparator),
@@ -7273,7 +6626,6 @@ begin
       Inc(J);
     end;
   SetLength(Result, J - 1);
-
   if Result = '' then
     Result := '0'
   else
@@ -7281,7 +6633,6 @@ begin
     Result := '-0';
 end;
 {$WARNINGS ON}
-
 const
   // (p3) move to interface?
   ROP_DSna    = $00220326;   // RasterOp_NotAndROP
@@ -7302,7 +6653,6 @@ const
   {$EXTERNALSYM ROP_DSan}
   ROP_DSon    = $001100A6;   // NOTSRCERASE
   {$EXTERNALSYM ROP_DSon}
-
 function RasterOpToWinRop(Rop: RasterOp): Cardinal;
 begin
   case Rop of
@@ -7340,40 +6690,31 @@ begin
     Result := 0;
   end;
 end;
-
 function BitBlt(DestDC: HDC; X, Y, Width, Height: Integer; SrcDC: HDC;
   XSrc, YSrc: Integer; Rop: RasterOp; IgnoreMask: Boolean): LongBool;
 begin
   Result := Windows.BitBlt(DestDC, X, Y, Width, Height, SrcDC, XSrc, YSrc, RasterOpToWinRop(Rop));
 end;
-
 function BitBlt(DestDC: HDC; X, Y, Width, Height: Integer; SrcDC: HDC;
   XSrc, YSrc: Integer; WinRop: Cardinal; IgnoreMask: Boolean): LongBool;
 begin
   Result := Windows.BitBlt(DestDC, X, Y, Width, Height, SrcDC, XSrc, YSrc, WinRop);
 end;
-
 function BitBlt(DestDC: HDC; X, Y, Width, Height: Integer; SrcDC: HDC; XSrc, YSrc: Integer; WinRop: Cardinal): LongBool;
 begin
   Result := Windows.BitBlt(DestDC, X, Y, Width, Height, SrcDC, XSrc, YSrc, WinRop);
 end;
 
 
-
-
-
 function IsEqualGUID(const IID1, IID2: TGUID): Boolean;
 begin
   Result := SysUtils.IsEqualGUID(IID1, IID2);
 end;
-
 {Color functions}
 procedure RGBToHSV(R, G, B: Integer; var H, S, V: Integer);
-
 var
   Delta: Integer;
   Min, Max: Integer;
-
   function GetMax(I, J, K: Integer): Integer;
   begin
     if J > I then
@@ -7382,7 +6723,6 @@ var
       I := K;
     Result := I;
   end;
-
   function GetMin(I, J, K: Integer): Integer;
   begin
     if J < I then
@@ -7391,7 +6731,6 @@ var
       I := K;
     Result := I;
   end;
-
 
 begin
   Min := GetMin(R, G, B);
@@ -7417,7 +6756,6 @@ begin
       H := H + 360;
   end;
 end;
-
 function RGBToBGR(Value: Cardinal): Cardinal;
 begin
   Result :=
@@ -7425,22 +6763,18 @@ begin
     (Value and $0000FF00) or
    ((Value and $000000FF) shl 16);
 end;
-
 function StartsText(const SubStr, S: string): Boolean;
 begin
   Result := AnsiStartsText(SubStr, S);
 end;
-
 function EndsText(const SubStr, S: string): Boolean;
 begin
   Result := AnsiEndsText(SubStr, S);
 end;
-
 function DequotedStr(const S: string; QuoteChar: Char = ''''): string;
 begin
   Result := AnsiDequotedStr(S, Char(QuoteChar));
 end;
-
 function AnsiDequotedStr(const S: string; AQuote: Char): string;
 var
   P: PChar;
@@ -7448,7 +6782,6 @@ begin
   P := PChar(S);
   Result := AnsiExtractQuotedStr(P, AQuote);
 end;
-
 procedure CollectionQuickSort(List: Classes.TCollection; L, R: Integer; SortProc: TCollectionSortProc);
 var
  I, J, pix: Integer;
@@ -7462,26 +6795,22 @@ begin
     if pix > List.Count - 1 then
       pix := List.Count - 1;
     P := List.Items[pix];
-
     repeat
       while SortProc(List.Items[I], P) < 0 do
         Inc(I);
       while SortProc(List.Items[J], P) > 0 do
         Dec(J);
-
       if I <= J then
       begin
         t1 := List.Items[I];
         t2 := List.Items[J];
         t1.Index := J;
         t2.Index := I;
-
         if pix = I then
           pix := J
         else
         if pix = J then
           pix := I;
-
         P := List.Items[pix];
         Inc(I);
         Dec(J);
@@ -7493,61 +6822,49 @@ begin
   until I >= R;
   List.EndUpdate;
 end;
-
 procedure CollectionSort(Collection: Classes.TCollection; SortProc: TCollectionSortProc);
 begin
   if Assigned(Collection) and Assigned(SortProc) and (Collection.Count >= 2) then
     CollectionQuickSort(Collection, 0, Collection.Count - 1, SortProc);
 end;
-
 { TIntegerList }
-
 function TIntegerList.Add(Value: Integer): Integer;
 begin
   Result := inherited Add(TObject(Value));
 end;
-
 procedure TIntegerList.DoChange(Item: Integer; Action: TListNotification);
 begin
   if Assigned(OnChange) then
     OnChange(Self, Item, Action);
 end;
-
 function TIntegerList.Extract(Item: Integer): Integer;
 begin
   Result := Integer(inherited Extract(TObject(Item)));
 end;
-
 function TIntegerList.First: Integer;
 begin
   Result := Integer(inherited First);
 end;
-
 function TIntegerList.GetItem(Index: Integer): Integer;
 begin
   Result := Integer(inherited Items[Index]);
 end;
-
 function TIntegerList.IndexOf(Item: Integer): Integer;
 begin
   Result := inherited IndexOf(TObject(Item));
 end;
-
 procedure TIntegerList.Insert(Index, Item: Integer);
 begin
   inherited Insert(Index, TObject(Item));
 end;
-
 function TIntegerList.Last: Integer;
 begin
   Result := Integer(inherited Last);
 end;
-
 procedure TIntegerList.Notify(Ptr: Pointer; Action: TListNotification);
 begin
   DoChange(Integer(Ptr), Action);
 end;
-
 procedure TIntegerList.ReadData(Reader: TReader);
 begin
   FLoading := True;
@@ -7561,17 +6878,14 @@ begin
     FLoading := False;
   end;
 end;
-
 function TIntegerList.Remove(Item: Integer): Integer;
 begin
   Result := Integer(inherited Remove(TObject(Item)));
 end;
-
 procedure TIntegerList.SetItem(Index: Integer; const Value: Integer);
 begin
   inherited Items[Index] := TObject(Value);
 end;
-
 procedure TIntegerList.WriteData(Writer: TWriter);
 var
   I: Integer;
@@ -7581,14 +6895,10 @@ begin
     Writer.WriteInteger(Items[I]);
   Writer.WriteListEnd;
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.
-

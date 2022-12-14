@@ -1,7 +1,5 @@
 unit JvTranslateString;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,11 +22,9 @@ unit JvTranslateString;
 }
 
 interface
-
 uses
   Classes,
   JvComponentBase, JvResources;
-
 type
   /// This component is for string-replacement. All replacements are based on
   /// delimiter-encapsulated words. The delimiters can be freely defined. The default
@@ -51,7 +47,6 @@ type
   /// DESKTOPSIZE : Size of the desktop in format widthxheight
   TProcessCommandEvent = procedure(Sender: TObject; const Command: string;
     var CommandResult: string; var Changed: Boolean) of object;
-
   {$IFDEF RTL230_UP}
   [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidOSX32)]
   {$ENDIF RTL230_UP}
@@ -90,9 +85,7 @@ type
     property TimeSeparator: Char read FTimeSeparator write FTimeSeparator;
     property OnProcessCommand: TProcessCommandEvent read FOnProcessCommand write FOnProcessCommand;
   end;
-
 implementation
-
 uses
   {$IFDEF HAS_UNIT_SYSTEM_UITYPES}
   System.UITypes,
@@ -101,7 +94,6 @@ uses
   JclFileUtils,
   JvJCLUtils,
   JvJVCLUtils;
-
 const
   cAppNameMask = 'APPL_NAME';
   cCompanyNameMask = 'COMPANY_NAME';
@@ -117,11 +109,9 @@ const
   cProductVersionMask = 'PRODUCTVERSION';
   cScreenSizeMask = 'SCREENSIZE';
   cDesktopSizeMask = 'DESKTOPSIZE';
-
   cDefaultAppName = 'MyJVCLApplication';
   cDefaultCompanyName = 'MyCompany';
   cDefaultVersion = '0.0.0.0';
-
 constructor TJvTranslateString.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -137,7 +127,6 @@ begin
   FProductVersionHandled := False;
   FFileVersionHandled := False;
 end;
-
 procedure TJvTranslateString.SetDateFormat(const Value: string);
 var i : Integer;
 begin
@@ -150,12 +139,10 @@ begin
         Exit;
       end;
 end;
-
 procedure TJvTranslateString.SetDateTimeFormat(const Value: string);
 begin
   FDateTimeFormat := Value;
 end;
-
 procedure TJvTranslateString.SetTimeFormat(const Value: string);
 var i : Integer;
 begin
@@ -168,7 +155,6 @@ begin
         Exit;
       end;
 end;
-
 function TJvTranslateString.TranslateString(InString: string): string;
 var
   I, J: Integer;
@@ -212,7 +198,6 @@ begin
     end;
   end;
 end;
-
 function TJvTranslateString.TranslateString(InString: string; var Changed: Boolean): string;
 var
   I, J: Integer;
@@ -250,14 +235,10 @@ begin
     end;
   end;
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.
-

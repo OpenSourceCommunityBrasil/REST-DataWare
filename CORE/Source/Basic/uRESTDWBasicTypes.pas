@@ -48,7 +48,7 @@ Uses
    {$IFEND}
   {$ENDIF}
   SysUtils,  Classes, Db, FMTBcd,
-  uRESTDWComponentBase, uRESTDWMemtable, uRESTDWConsts, uRESTDWEncodeClass;
+  uRESTDWComponentBase, uRESTDWMemoryDataset, uRESTDWConsts, uRESTDWEncodeClass;
 
  Const
   dwftColor       = Integer(255);

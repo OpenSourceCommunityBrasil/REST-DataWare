@@ -55,7 +55,7 @@ Uses
  uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator,
  uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
  uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData,
- uRESTDWMemtable, uRESTDWBufferBase, uRESTDWDriverBase, uRESTDWTools;
+ uRESTDWMemoryDataset, uRESTDWBufferBase, uRESTDWDriverBase, uRESTDWTools;
 
 Type
  TOnExecuteData           = Procedure                                        Of Object;

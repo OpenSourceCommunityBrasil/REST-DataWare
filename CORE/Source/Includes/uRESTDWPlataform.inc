@@ -1,6 +1,6 @@
 {$I ..\..\Source\Includes\uRESTDW.inc}
 
-{$IFDEF FPC}
+{$IF Defined(FPC)}
  {$IFDEF CPU32}
   {$DEFINE CPU32}
  {$ENDIF CPU32}
@@ -8,14 +8,14 @@
   {$DEFINE CPU64}
  {$ENDIF CPU64}
 {$ELSE}
- {$IFDEF CPUX32}
+ {$IF Defined(CPUX32)}
   {$DEFINE CPU32}
  {$ELSEIF CPUX64}
   {$DEFINE CPU64}
  {$ELSE}
   {$DEFINE CPU32}
  {$IFEND}
-{$ENDIF}
+{$IFEND}
 
 {$IFDEF MSWINDOWS}
  {$DEFINE RESTDWWINDOWS}

@@ -1,7 +1,5 @@
 unit JclIniFiles;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,7 +22,6 @@ unit JclIniFiles;
 }
 
 interface
-
 uses
   {$IFDEF UNITVERSIONING}
   JclUnitVersioning,
@@ -34,7 +31,6 @@ uses
   {$ELSE ~HAS_UNITSCOPE}
   SysUtils, Classes, IniFiles;
   {$ENDIF ~HAS_UNITSCOPE}
-
 // Initialization (ini) Files
 function IniReadBool(const FileName, Section, Line: string): Boolean;              // John C Molyneux
 function IniReadInteger(const FileName, Section, Line: string): Integer;           // John C Molyneux
@@ -42,11 +38,9 @@ function IniReadString(const FileName, Section, Line: string): string;          
 procedure IniWriteBool(const FileName, Section, Line: string; Value: Boolean);     // John C Molyneux
 procedure IniWriteInteger(const FileName, Section, Line: string; Value: Integer);  // John C Molyneux
 procedure IniWriteString(const FileName, Section, Line, Value: string);            // John C Molyneux
-
 // Initialization (ini) Files helper routines
 procedure IniReadStrings(IniFile: TCustomIniFile; const Section: string; Strings: TStrings);
 procedure IniWriteStrings(IniFile: TCustomIniFile; const Section: string; Strings: TStrings);
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -58,9 +52,7 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 // Initialization Files
 function IniReadBool(const FileName, Section, Line: string): Boolean;
 var
@@ -73,7 +65,6 @@ begin
     Ini.Free;
   end;
 end;
-
 function IniReadInteger(const FileName, Section, Line: string): Integer;
 var
   Ini: TIniFile;
@@ -85,7 +76,6 @@ begin
     Ini.Free;
   end;
 end;
-
 function IniReadString(const FileName, Section, Line: string): string;
 var
   Ini: TIniFile;
@@ -97,7 +87,6 @@ begin
     Ini.Free;
   end;
 end;
-
 procedure IniWriteBool(const FileName, Section, Line: string; Value: Boolean);
 var
   Ini: TIniFile;
@@ -109,7 +98,6 @@ begin
     Ini.Free;
   end;
 end;
-
 procedure IniWriteInteger(const FileName, Section, Line: string; Value: Integer);
 var
   Ini: TIniFile;
@@ -121,7 +109,6 @@ begin
     Ini.Free;
   end;
 end;
-
 procedure IniWriteString(const FileName, Section, Line, Value: string);
 var
   Ini: TIniFile;
@@ -133,11 +120,9 @@ begin
     Ini.Free;
   end;
 end;
-
 // Initialization (ini) Files helper routines
 const
   ItemCountName = 'Count';
-
 procedure IniReadStrings(IniFile: TCustomIniFile; const Section: string; Strings: TStrings);
 var
   Count, I: Integer;
@@ -155,7 +140,6 @@ begin
     end;
   end;
 end;
-
 procedure IniWriteStrings(IniFile: TCustomIniFile; const Section: string; Strings: TStrings);
 var
   I: Integer;
@@ -168,13 +152,10 @@ begin
       WriteString(Section, IntToStr(I), Strings[I]);
   end;
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.

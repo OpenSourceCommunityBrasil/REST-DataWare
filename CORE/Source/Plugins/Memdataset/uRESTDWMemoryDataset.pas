@@ -1,7 +1,5 @@
 unit uRESTDWMemoryDataset;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,12 +22,10 @@ unit uRESTDWMemoryDataset;
 }
 
 interface
-
 uses
   Windows,  // to avoid warning under BDS2006, and in the interface section to allow compilation in RS2008
   SysUtils, Classes, DB, Variants,
   JvDBUtils, JvExprParser, JvDBFilterExpr;
-
 type
   TPVariant = ^Variant;
   TApplyMode = (amNone, amAppend, amMerge);
@@ -277,7 +273,6 @@ type
     property BeforeApplyRecord: TApplyRecordEvent read FBeforeApplyRecord write FBeforeApplyRecord;
     property AfterApplyRecord: TApplyRecordEvent read FAfterApplyRecord write FAfterApplyRecord;
   end;
-
   TJvMemBlobStream = class(TStream)
   private
     FField: TBlobField;
@@ -298,7 +293,6 @@ type
     function Seek(Offset: Longint; Origin: Word): Longint; override;
     procedure Truncate;
   end;
-
   TJvMemoryRecord = class(TPersistent)
   private
     FMemoryData: TRESTDWMemTable;
@@ -318,9 +312,7 @@ type
     property Index: Integer read GetIndex write SetIndex;
     property Data: Pointer read FData;
   end;
-
 implementation
-
 uses
   Types, DBConsts, Math,
   {$IFDEF RTL240_UP}
@@ -336,12 +328,10 @@ uses
   {$ENDIF ~UNICODE}
   JvJVCLUtils,
   JvResources;
-
 const
   ftBlobTypes = [ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftParadoxOle,
     ftDBaseOle, ftTypedBinary, ftOraBlob, ftOraClob
     {$IFDEF COMPILER10_UP}, ftWideMemo{$ENDIF COMPILER10_UP}];
-
   // If you add a new supported type you _must_ also update CalcFieldLen()
   ftSupported = [ftString, ftSmallint, ftInteger, ftWord, ftBoolean,
     ftFloat, ftCurrency, ftDate, ftTime, ftDateTime, ftAutoInc, ftBCD,
@@ -354,27 +344,20 @@ const
     {$ENDIF COMPILER12_UP}
     ftBytes, ftVarBytes, ftADT, ftFixedChar, ftWideString, ftLargeint,
     ftVariant, ftGuid] + ftBlobTypes;
-
   fkStoredFields = [fkData];
-
   GuidSize = 38;
-
   STATUSNAME = 'C67F70Z90'; (* Magic *)
-
 type
   PMemBookmarkInfo = ^TMemBookmarkInfo;
-
   TMemBookmarkInfo = record
     BookmarkData: TJvBookmarkData;
     BookmarkFlag: TBookmarkFlag;
   end;
-
 procedure AppHandleException(Sender: TObject);
 begin
   if Assigned(ApplicationHandleException) then
     ApplicationHandleException(Sender);
 end;
-
 procedure CopyFieldValue(DestField, SourceField: TField);
 begin
   if SourceField.IsNull then
@@ -405,7 +388,6 @@ begin
   else
     DestField.Assign(SourceField);;
 end;
-
 function CalcFieldLen(FieldType: TFieldType; Size: Word): Word;
 begin
   if not (FieldType in ftSupported) then
@@ -476,7 +458,6 @@ begin
     end;
   end;
 end;
-
 procedure CalcDataSize(FieldDef: TFieldDef; var DataSize: Integer);
 var
   I: Integer;
@@ -486,36 +467,29 @@ begin
   for I := 0 to FieldDef.ChildDefs.Count - 1 do
     CalcDataSize(FieldDef.ChildDefs[I], DataSize);
 end;
-
 procedure Error(const Msg: string);
 begin
   DatabaseError(Msg);
 end;
-
 procedure ErrorFmt(const Msg: string; const Args: array of const);
 begin
   DatabaseErrorFmt(Msg, Args);
 end;
-
 //=== { TJvMemoryRecord } ====================================================
-
 constructor TJvMemoryRecord.Create(MemoryData: TRESTDWMemTable);
 begin
   CreateEx(MemoryData, True);
 end;
-
 constructor TJvMemoryRecord.CreateEx(MemoryData: TRESTDWMemTable; UpdateParent: Boolean);
 begin
   inherited Create;
   SetMemoryData(MemoryData, UpdateParent);
 end;
-
 destructor TJvMemoryRecord.Destroy;
 begin
   SetMemoryData(nil, True);
   inherited Destroy;
 end;
-
 function TJvMemoryRecord.GetIndex: Integer;
 begin
   if FMemoryData <> nil then
@@ -523,7 +497,6 @@ begin
   else
     Result := -1;
 end;
-
 procedure TJvMemoryRecord.SetMemoryData(Value: TRESTDWMemTable; UpdateParent: Boolean);
 var
   I: Integer;
@@ -562,7 +535,6 @@ begin
     end;
   end;
 end;
-
 procedure TJvMemoryRecord.SetIndex(Value: Integer);
 var
   CurIndex: Integer;
@@ -571,9 +543,7 @@ begin
   if (CurIndex >= 0) and (CurIndex <> Value) then
     FMemoryData.FRecords.Move(CurIndex, Value);
 end;
-
 //=== { TRESTDWMemTable } ======================================================
-
 constructor TRESTDWMemTable.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -591,7 +561,6 @@ begin
   FDataSetClosed := False;
   FTrimEmptyString := True;
 end;
-
 destructor TRESTDWMemTable.Destroy;
 var
   I: Integer;
@@ -622,7 +591,6 @@ begin
   FOffsets := nil;
   inherited Destroy;
 end;
-
 function TRESTDWMemTable.CompareFields(Data1, Data2: Pointer;
   FieldType: TFieldType; CaseInsensitive: Boolean): Integer;
 begin
@@ -695,7 +663,6 @@ begin
       Result := CompareText(PAnsiChar(Data1), PAnsiChar(Data2));
   end;
 end;
-
 function TRESTDWMemTable.GetCapacity: Integer;
 begin
   if FRecords <> nil then
@@ -703,18 +670,15 @@ begin
   else
     Result := 0;
 end;
-
 procedure TRESTDWMemTable.SetCapacity(Value: Integer);
 begin
   if FRecords <> nil then
     FRecords.Capacity := Value;
 end;
-
 function TRESTDWMemTable.AddRecord: TJvMemoryRecord;
 begin
   Result := TJvMemoryRecord.Create(Self);
 end;
-
 function TRESTDWMemTable.FindRecordID(ID: Integer): TJvMemoryRecord;
 var
   I: Integer;
@@ -727,18 +691,15 @@ begin
   end;
   Result := nil;
 end;
-
 function TRESTDWMemTable.InsertRecord(Index: Integer): TJvMemoryRecord;
 begin
   Result := AddRecord;
   Result.Index := Index;
 end;
-
 function TRESTDWMemTable.GetMemoryRecord(Index: Integer): TJvMemoryRecord;
 begin
   Result := TJvMemoryRecord(FRecords[Index]);
 end;
-
 procedure TRESTDWMemTable.InitFieldDefsFromFields;
 var
   I: Integer;
@@ -761,7 +722,6 @@ begin
   inherited InitFieldDefsFromFields;
   { Calculate fields offsets }
   SetLength(FOffsets, FieldDefList.Count);
-
   FieldDefList.Update;
   FieldDefsUpdated := FieldDefs.Updated;
   try
@@ -782,7 +742,6 @@ begin
     FieldDefs.Updated := FieldDefsUpdated;
   end;
 end;
-
 function TRESTDWMemTable.FindFieldData(Buffer: Pointer; Field: TField): Pointer;
 var
   Index: Integer;
@@ -800,7 +759,6 @@ begin
         Result := (PJvMemBuffer(Buffer) + FOffsets[Index]);
   end;
 end;
-
 function TRESTDWMemTable.CalcRecordSize: Integer;
 var
   I: Integer;
@@ -809,7 +767,6 @@ begin
   for I := 0 to FieldDefs.Count - 1 do
     CalcDataSize(FieldDefs[I], Result);
 end;
-
 procedure TRESTDWMemTable.InitBufferPointers(GetProps: Boolean);
 begin
   if GetProps then
@@ -818,7 +775,6 @@ begin
   FBlobOfs := FBookmarkOfs + SizeOf(TMemBookmarkInfo);
   FRecBufSize := FBlobOfs + BlobFieldCount * SizeOf(Pointer);
 end;
-
 procedure TRESTDWMemTable.ClearRecords;
 var
   I: Integer;
@@ -834,7 +790,6 @@ begin
   FLastID := Low(Integer);
   FRecordPos := -1;
 end;
-
 function TRESTDWMemTable.AllocRecordBuffer: PJvMemBuffer;
 begin
   {$IFDEF COMPILER12_UP}
@@ -845,7 +800,6 @@ begin
   if BlobFieldCount > 0 then
     Initialize(PMemBlobArray(Result + FBlobOfs)[0], BlobFieldCount);
 end;
-
 procedure TRESTDWMemTable.FreeRecordBuffer(var Buffer: PJvMemBuffer);
 begin
   if BlobFieldCount > 0 then
@@ -857,12 +811,10 @@ begin
   {$ENDIF COMPILER12_UP}
   Buffer := nil;
 end;
-
 procedure TRESTDWMemTable.ClearCalcFields(Buffer: PJvMemBuffer);
 begin
   FillChar(Buffer[FRecordSize], CalcFieldsSize, 0);
 end;
-
 procedure TRESTDWMemTable.InternalInitRecord(Buffer: PJvMemBuffer);
 var
   I: Integer;
@@ -871,7 +823,6 @@ begin
   for I := 0 to BlobFieldCount - 1 do
     PMemBlobArray(Buffer + FBlobOfs)[I] := '';
 end;
-
 procedure TRESTDWMemTable.InitRecord(Buffer: PJvMemBuffer);
 begin
   {$IFDEF NEXTGEN}
@@ -888,7 +839,6 @@ begin
     BookmarkFlag := bfInserted;
   end;
 end;
-
 function TRESTDWMemTable.GetCurrentRecord(Buffer: PJvMemBuffer): Boolean;
 begin
   Result := False;
@@ -902,7 +852,6 @@ begin
     end;
   end;
 end;
-
 procedure TRESTDWMemTable.RecordToBuffer(Rec: TJvMemoryRecord; Buffer: PJvMemBuffer);
 var
   I: Integer;
@@ -917,7 +866,6 @@ begin
     PMemBlobArray(Buffer + FBlobOfs)[I] := PMemBlobArray(Rec.FBlobs)[I];
   GetCalcFields({$IFDEF RTL250_UP}TRecBuf{$ENDIF}(Buffer));
 end;
-
 function TRESTDWMemTable.GetRecord(Buffer: PJvMemBuffer; GetMode: TGetMode;
   DoCheck: Boolean): TGetResult;
 var
@@ -975,12 +923,10 @@ begin
   if (Result = grError) and DoCheck then
     Error(RsEMemNoRecords);
 end;
-
 function TRESTDWMemTable.GetRecordSize: Word;
 begin
   Result := FRecordSize;
 end;
-
 function TRESTDWMemTable.GetActiveRecBuf(var RecBuf: PJvMemBuffer): Boolean;
 begin
   case State of
@@ -1000,7 +946,6 @@ begin
   end;
   Result := RecBuf <> nil;
 end;
-
 function TRESTDWMemTable.InternalGetFieldData(Field: TField; Buffer: Pointer): Boolean;
 var
   RecBuf: PJvMemBuffer;
@@ -1010,7 +955,6 @@ begin
   Result := False;
   if not GetActiveRecBuf(RecBuf) then
     Exit;
-
   if Field.FieldNo > 0 then
   begin
     Data := FindFieldData(RecBuf, Field);
@@ -1052,12 +996,10 @@ begin
       Move(RecBuf[1], Buffer^, Field.DataSize);
   end;
 end;
-
 function TRESTDWMemTable.GetFieldData(Field: TField; {$IFDEF RTL250_UP}var{$ENDIF} Buffer: TJvValueBuffer): Boolean;
 begin
   Result := InternalGetFieldData(Field, {$IFDEF RTL240_UP}@Buffer[0]{$ELSE}Buffer{$ENDIF RTL240_UP});
 end;
-
 {$IFNDEF NEXTGEN}
   {$IFDEF RTL240_UP}
 function TRESTDWMemTable.GetFieldData(Field: TField; Buffer: Pointer): Boolean;
@@ -1066,7 +1008,6 @@ begin
 end;
   {$ENDIF RTL240_UP}
 {$ENDIF ~NEXTGEN}
-
 procedure TRESTDWMemTable.InternalSetFieldData(Field: TField; Buffer: Pointer; const ValidateBuffer: TJvValueBuffer);
 var
   RecBuf: PJvMemBuffer;
@@ -1125,12 +1066,10 @@ begin
   if not (State in [dsCalcFields, dsFilter, dsNewValue]) then
     DataEvent(deFieldChange, NativeInt(Field));
 end;
-
 procedure TRESTDWMemTable.SetFieldData(Field: TField; Buffer: TJvValueBuffer);
 begin
   InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer[0]){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer);
 end;
-
 {$IFNDEF NEXTGEN}
   {$IFDEF RTL240_UP}
 procedure TRESTDWMemTable.SetFieldData(Field: TField; Buffer: Pointer);
@@ -1148,7 +1087,6 @@ begin
 end;
   {$ENDIF RTL240_UP}
 {$ENDIF ~NEXTGEN}
-
 procedure TRESTDWMemTable.SetFiltered(Value: Boolean);
 begin
   if Active then
@@ -1161,7 +1099,6 @@ begin
   else
     inherited SetFiltered(Value);
 end;
-
 procedure TRESTDWMemTable.SetOnFilterRecord(const Value: TFilterRecordEvent);
 begin
   if Active then
@@ -1174,7 +1111,6 @@ begin
   else
     inherited SetOnFilterRecord(Value);
 end;
-
 function TRESTDWMemTable.RecordFilter: Boolean;
 var
   SaveState: TDataSetState;
@@ -1196,7 +1132,6 @@ begin
         else
         if FFilterExpression <> nil then
           Result := FFilterExpression.Evaluate();
-
         if Assigned(OnFilterRecord) then
           OnFilterRecord(Self, Result);
       except
@@ -1208,12 +1143,10 @@ begin
       Result := False;
   end;
 end;
-
 function TRESTDWMemTable.GetBlobData(Field: TField; Buffer: PJvMemBuffer): TMemBlobData;
 begin
   Result := PMemBlobArray(Buffer + FBlobOfs)[Field.Offset];
 end;
-
 procedure TRESTDWMemTable.SetBlobData(Field: TField; Buffer: PJvMemBuffer; Value: TMemBlobData);
 begin
   if Buffer = PJvMemBuffer(ActiveBuffer) then
@@ -1223,7 +1156,6 @@ begin
     PMemBlobArray(Buffer + FBlobOfs)[Field.Offset] := Value;
   end;
 end;
-
 procedure TRESTDWMemTable.CloseBlob(Field: TField);
 begin
   if (FRecordPos >= 0) and (FRecordPos < FRecords.Count) and (State = dsEdit) then
@@ -1232,18 +1164,15 @@ begin
   else
     PMemBlobArray(ActiveBuffer + FBlobOfs)[Field.Offset] := '';
 end;
-
 function TRESTDWMemTable.CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream;
 begin
   Result := TJvMemBlobStream.Create(Field as TBlobField, Mode);
 end;
-
 function TRESTDWMemTable.BookmarkValid(Bookmark: TBookmark): Boolean;
 begin
   Result := (Bookmark <> nil) and FActive and
     (FindRecordID(TJvBookmarkData({$IFDEF RTL200_UP}Pointer(@Bookmark[0]){$ELSE}Bookmark{$ENDIF RTL200_UP}^)) <> nil);
 end;
-
 function TRESTDWMemTable.CompareBookmarks(Bookmark1, Bookmark2: TBookmark): Integer;
 begin
   if (Bookmark1 = nil) and (Bookmark2 = nil) then
@@ -1265,12 +1194,10 @@ begin
   else
     Result := 0;
 end;
-
 procedure TRESTDWMemTable.GetBookmarkData(Buffer: PJvMemBuffer; Data: TJvBookmark);
 begin
   Move(PMemBookmarkInfo(Buffer + FBookmarkOfs)^.BookmarkData, TJvBookmarkData({$IFDEF RTL240_UP}Pointer(@Data[0]){$ELSE}Data{$ENDIF RTL240_UP}^), SizeOf(TJvBookmarkData));
 end;
-
 {$IFNDEF NEXTGEN}
   {$IFDEF RTL240_UP}
 procedure TRESTDWMemTable.GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
@@ -1283,12 +1210,10 @@ begin
 end;
   {$ENDIF RTL240_UP}
 {$ENDIF !NEXTGEN}
-
 procedure TRESTDWMemTable.SetBookmarkData(Buffer: PJvMemBuffer; Data: TJvBookmark);
 begin
   Move({$IFDEF RTL240_UP}Pointer(@Data[0]){$ELSE}Data{$ENDIF RTL240_UP}^, PMemBookmarkInfo(Buffer + FBookmarkOfs)^.BookmarkData, SizeOf(TJvBookmarkData));
 end;
-
 {$IFNDEF NEXTGEN}
   {$IFDEF RTL240_UP}
 procedure TRESTDWMemTable.SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
@@ -1297,17 +1222,14 @@ begin
 end;
   {$ENDIF RTL240_UP}
 {$ENDIF !NEXTGEN}
-
 function TRESTDWMemTable.GetBookmarkFlag(Buffer: PJvMemBuffer): TBookmarkFlag;
 begin
   Result := PMemBookmarkInfo(Buffer + FBookmarkOfs)^.BookmarkFlag;
 end;
-
 procedure TRESTDWMemTable.SetBookmarkFlag(Buffer: PJvMemBuffer; Value: TBookmarkFlag);
 begin
   PMemBookmarkInfo(Buffer + FBookmarkOfs)^.BookmarkFlag := Value;
 end;
-
 procedure TRESTDWMemTable.InternalGotoBookmarkData(BookmarkData: TJvBookmarkData);
 var
   Rec: TJvMemoryRecord;
@@ -1329,12 +1251,10 @@ begin
     end;
   end;
 end;
-
 procedure TRESTDWMemTable.InternalGotoBookmark(Bookmark: TJvBookmark);
 begin
   InternalGotoBookmarkData(TJvBookmarkData({$IFDEF RTL240_UP}Pointer(@Bookmark[0]){$ELSE}Bookmark{$ENDIF RTL240_UP}^));
 end;
-
 {$IFNDEF NEXTGEN}
   {$IFDEF RTL240_UP}
 procedure TRESTDWMemTable.InternalGotoBookmark(Bookmark: Pointer);
@@ -1343,22 +1263,18 @@ begin
 end;
   {$ENDIF RTL240_UP}
 {$ENDIF !NEXTGEN}
-
 procedure TRESTDWMemTable.InternalSetToRecord(Buffer: PJvMemBuffer);
 begin
   InternalGotoBookmarkData(PMemBookmarkInfo(Buffer + FBookmarkOfs)^.BookmarkData);
 end;
-
 procedure TRESTDWMemTable.InternalFirst;
 begin
   FRecordPos := -1;
 end;
-
 procedure TRESTDWMemTable.InternalLast;
 begin
   FRecordPos := FRecords.Count;
 end;
-
 {$IFNDEF COMPILER10_UP} // Delphi 2006+ has support for WideString
 procedure TRESTDWMemTable.DataConvert(Field: TField; Source, Dest: Pointer; ToNative: Boolean);
 begin
@@ -1376,7 +1292,6 @@ begin
     inherited DataConvert(Field, Source, Dest, ToNative);
 end;
 {$ENDIF ~COMPILER10_UP}
-
 procedure TRESTDWMemTable.AssignMemoryRecord(Rec: TJvMemoryRecord; Buffer: PJvMemBuffer);
 var
   I: Integer;
@@ -1385,7 +1300,6 @@ begin
   for I := 0 to BlobFieldCount - 1 do
     PMemBlobArray(Rec.FBlobs)[I] := PMemBlobArray(Buffer + FBlobOfs)[I];
 end;
-
 procedure TRESTDWMemTable.SetMemoryRecordData(Buffer: PJvMemBuffer; Pos: Integer);
 var
   Rec: TJvMemoryRecord;
@@ -1395,7 +1309,6 @@ begin
   Rec := Records[Pos];
   AssignMemoryRecord(Rec, Buffer);
 end;
-
 procedure TRESTDWMemTable.SetAutoIncFields(Buffer: PJvMemBuffer);
 var
   I, Count: Integer;
@@ -1418,7 +1331,6 @@ begin
   if Count > 0 then
     Inc(FAutoInc);
 end;
-
 procedure TRESTDWMemTable.InternalAddRecord(Buffer: TJvRecordBuffer; Append: Boolean);
 var
   RecPos: Integer;
@@ -1441,7 +1353,6 @@ begin
   SetAutoIncFields(Buffer);
   SetMemoryRecordData(Buffer, Rec.Index);
 end;
-
 procedure TRESTDWMemTable.InternalDelete;
 var
   Accept: Boolean;
@@ -1467,7 +1378,6 @@ begin
       end;
     end;
   end;
-
   Records[FRecordPos].Free;
   if FRecordPos >= FRecords.Count then
     Dec(FRecordPos);
@@ -1480,7 +1390,6 @@ begin
   until Accept or (FRecordPos < 0);
   if FRecords.Count = 0 then
     FLastID := Low(Integer);
-
   if FApplyMode <> amNone then
   begin
     if Status = rsInserted then
@@ -1491,7 +1400,6 @@ begin
       Inc(FRowsChanged);
   end;
 end;
-
 procedure TRESTDWMemTable.InternalPost;
 var
   RecPos: Integer;
@@ -1500,7 +1408,6 @@ var
   NewChange: Boolean;
 begin
   inherited InternalPost;
-
   NewChange := False;
   if (FApplyMode <> amNone) and not IsLoading then
   begin
@@ -1537,7 +1444,6 @@ begin
       end;
     end;
   end;
-
   if State = dsEdit then
     SetMemoryRecordData(PJvMemBuffer(ActiveBuffer), FRecordPos)
   else
@@ -1560,11 +1466,9 @@ begin
       FRecordPos := RecPos;
     end;
   end;
-
   if NewChange then
     Inc(FRowsChanged);
 end;
-
 procedure TRESTDWMemTable.OpenCursor(InfoQuery: Boolean);
 begin
   try
@@ -1583,7 +1487,6 @@ begin
     SysUtils.Abort;
     Exit;
   end;
-
   if not InfoQuery then
   begin
     if FieldCount > 0 then
@@ -1593,7 +1496,6 @@ begin
   FActive := True;
   inherited OpenCursor(InfoQuery);
 end;
-
 procedure TRESTDWMemTable.InternalOpen;
 begin
   BookmarkSize := SizeOf(TJvBookmarkData);
@@ -1608,7 +1510,6 @@ begin
   InitBufferPointers(True);
   InternalFirst;
 end;
-
 procedure TRESTDWMemTable.DoAfterOpen;
 begin
   if (FDataSet <> nil) and FLoadRecords then
@@ -1632,11 +1533,9 @@ begin
     SortOnFields();
   inherited DoAfterOpen;
 End;
-
 // Filtering contribution June 2009 - C.Schiffler - MANTIS # 0004328
 // Uses expression parser.
 procedure TRESTDWMemTable.SetFilterText(const Value: string);
-
   procedure UpdateFilter;
   begin
     FreeAndNil(FFilterParser);
@@ -1656,7 +1555,6 @@ procedure TRESTDWMemTable.SetFilterText(const Value: string);
       end;
     end;
   end;
-
 begin
   if Active then
   begin
@@ -1672,7 +1570,6 @@ begin
     UpdateFilter;
   end;
 end;
-
 function TRESTDWMemTable.ParserGetVariableValue(Sender: TObject; const VarName: string; var Value: Variant): Boolean;
 var
   Field: TField;
@@ -1686,7 +1583,6 @@ begin
   else
     Result := False;
 end;
-
 procedure TRESTDWMemTable.InternalClose;
 begin
   ClearRecords;
@@ -1699,27 +1595,22 @@ begin
   FreeIndexList;
   FActive := False;
 end;
-
 procedure TRESTDWMemTable.InternalHandleException;
 begin
   AppHandleException(Self);
 end;
-
 procedure TRESTDWMemTable.InternalInitFieldDefs;
 begin
   // InitFieldDefsFromFields
 end;
-
 function TRESTDWMemTable.IsCursorOpen: Boolean;
 begin
   Result := FActive;
 end;
-
 function TRESTDWMemTable.GetRecordCount: Integer;
 begin
   Result := FRecords.Count;
 end;
-
 function TRESTDWMemTable.GetRecNo: Integer;
 begin
   CheckActive;
@@ -1729,7 +1620,6 @@ begin
   else
     Result := FRecordPos + 1;
 end;
-
 procedure TRESTDWMemTable.SetRecNo(Value: Integer);
 begin
   if (Value > 0) and (Value <= FRecords.Count) then
@@ -1740,7 +1630,6 @@ begin
     DoAfterScroll;
   end;
 end;
-
 procedure TRESTDWMemTable.SetUseDataSetFilter(const Value: Boolean);
 begin
   if Value <> FUseDataSetFilter then
@@ -1749,12 +1638,10 @@ begin
     SetFilterText(Filter); // update the filter engine
   end;
 end;
-
 function TRESTDWMemTable.IsSequenced: Boolean;
 begin
   Result := not Filtered;
 end;
-
 function TRESTDWMemTable.Locate(const KeyFields: string; const KeyValues: Variant;
   Options: TLocateOptions): Boolean;
 begin
@@ -1766,7 +1653,6 @@ begin
     DoAfterScroll;
   end;
 end;
-
 function TRESTDWMemTable.Lookup(const KeyFields: string; const KeyValues: Variant;
   const ResultFields: string): Variant;
 var
@@ -1776,7 +1662,6 @@ var
   SaveState: TDataSetState;
   I: Integer;
   Matched: Boolean;
-
   function CompareField(var Field: TField; Value: Variant): Boolean; {BG}
   var
     S: string;
@@ -1794,7 +1679,6 @@ var
     else
       Result := (Field.Value = Value);
   end;
-
   function CompareRecord: Boolean;
   var
     I: Integer;
@@ -1814,13 +1698,11 @@ var
       end;
     end;
   end;
-
 begin
   Result := Null;
   CheckBrowseMode;
   if IsEmpty then
     Exit;
-
   Fields := TList{$IFDEF RTL240_UP}<TField>{$ENDIF RTL240_UP}.Create;
   try
     GetFieldList(Fields, KeyFields);
@@ -1853,14 +1735,12 @@ begin
     Fields.Free;
   end;
 end;
-
 procedure TRESTDWMemTable.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = DataSet) then
     SetDataSet(nil);
 end;
-
 procedure TRESTDWMemTable.EmptyTable;
 begin
   if Active then
@@ -1871,7 +1751,6 @@ begin
     DataEvent(deDataSetChange, 0);
   end;
 end;
-
 procedure TRESTDWMemTable.AddStatusField;
 begin
   // Check if FieldStatus not exists in FieldDefs
@@ -1879,7 +1758,6 @@ begin
     FStatusName) then
     FieldDefs.Add(FStatusName, ftSmallint);
 end;
-
 procedure TRESTDWMemTable.HideStatusField;
 begin
   // Check if FieldStatus already exists in FieldDefs
@@ -1892,9 +1770,7 @@ begin
     Fields[Fields.Count - 1].Visible := False; // Hide in Fields
   end;
 end;
-
 procedure TRESTDWMemTable.CheckStructure(UseAutoIncAsInteger: Boolean);
-
   procedure CheckDataTypes(FieldDefs: TFieldDefs);
   var
     J: Integer;
@@ -1907,7 +1783,6 @@ procedure TRESTDWMemTable.CheckStructure(UseAutoIncAsInteger: Boolean);
         FieldDefs.Items[J].Free;
     end;
   end;
-
 var
   I: Integer;
 begin
@@ -1918,13 +1793,11 @@ begin
     else
       FieldDefs.Items[I].CreateField(Self);
 end;
-
 procedure TRESTDWMemTable.SetDataSet(ADataSet: TDataSet);
 begin
   if ADataSet <> Self then
     ReplaceComponentReference(Self, ADataSet, TComponent(FDataSet));
 end;
-
 procedure TRESTDWMemTable.FixReadOnlyFields(MakeReadOnly: Boolean);
 var
   I: Integer;
@@ -1939,7 +1812,6 @@ begin
       Fields[I].ReadOnly := False;
     end;
 end;
-
 procedure TRESTDWMemTable.CopyStructure(Source: TDataSet; UseAutoIncAsInteger: Boolean);
 var
   I: Integer;
@@ -1949,7 +1821,6 @@ begin
   CheckInactive;
   for I := FieldCount - 1 downto 0 do
     Fields[I].Free;
-
   Source.FieldDefs.Update;
   FieldDefs := Source.FieldDefs;
   if FApplyMode <> amNone then
@@ -1958,7 +1829,6 @@ begin
   if FApplyMode <> amNone then
     HideStatusField;
 end;
-
 function TRESTDWMemTable.LoadFromDataSet(Source: TDataSet; RecordCount: Integer;
   Mode: TLoadMode; DisableAllControls: Boolean = True): Integer;
 var
@@ -2004,7 +1874,6 @@ begin
         Source.First;
         MovedCount := MaxInt;
       end;
-
       FinalAutoInc := 0;
       FixReadOnlyFields(False);
       // find first source autoinc field
@@ -2076,7 +1945,6 @@ begin
     FSaveLoadState := slsNone;
   end;
 end;
-
 function TRESTDWMemTable.SaveToDataSet(Dest: TDataSet; RecordCount: Integer;
   DisableAllControls: Boolean = True): Integer;
 var
@@ -2180,14 +2048,12 @@ begin
     FSaveLoadState := slsNone;
   end;
 end;
-
 procedure TRESTDWMemTable.SortOnFields(const FieldNames: string = '';
   CaseInsensitive: Boolean = True; Descending: Boolean = False);
 begin
   // Post the table before sorting
   if State in dsEditModes then
     Post;
-
   if FieldNames <> '' then
     CreateIndexList(FieldNames)
   else
@@ -2204,12 +2070,10 @@ begin
     raise;
   end;
 end;
-
 procedure TRESTDWMemTable.SwapRecords(Idx1, Idx2: integer);
 begin
   FRecords.Exchange(Idx1, Idx2);
 end;
-
 
 procedure TRESTDWMemTable.Sort;
 var
@@ -2235,7 +2099,6 @@ begin
     Resync([]);
   end;
 end;
-
 procedure TRESTDWMemTable.QuickSort(L, R: Integer; Compare: TCompareRecords);
 var
   I, J: Integer;
@@ -2262,7 +2125,6 @@ begin
     L := I;
   until I >= R;
 end;
-
 function TRESTDWMemTable.CompareRecords(Item1, Item2: TJvMemoryRecord): Integer;
 var
   Data1, Data2: PByte;
@@ -2339,7 +2201,6 @@ begin
       Result := -Result;
   end;
 end;
-
 function TRESTDWMemTable.GetIsIndexField(Field: TField): Boolean;
 begin
   if FIndexList <> nil then
@@ -2347,11 +2208,9 @@ begin
   else
     Result := False;
 end;
-
 procedure TRESTDWMemTable.CreateIndexList(const FieldNames: WideString);
 type
   TFieldTypeSet = set of TFieldType;
-
   function GetSetFieldNames(const FieldTypeSet: TFieldTypeSet): string;
   var
     FieldType: TFieldType;
@@ -2361,7 +2220,6 @@ type
         Result := Result + FieldTypeNames[FieldType] + ', ';
     Result := Copy(Result, 1, Length(Result) - 2);
   end;
-
 var
   Pos: Integer;
   F: TField;
@@ -2381,7 +2239,6 @@ begin
         FieldTypeNames[F.DataType]]);
   end;
 end;
-
 procedure TRESTDWMemTable.FreeIndexList;
 begin
   if FIndexList <> nil then
@@ -2390,7 +2247,6 @@ begin
     FIndexList := nil;
   end;
 end;
-
 function TRESTDWMemTable.GetValues(FldNames: string = ''): Variant;
 var
   I: Integer;
@@ -2401,7 +2257,6 @@ begin
     FldNames := FKeyFieldNames;
   if FldNames = '' then
     Exit;
-
   // Mantis 3610: If there is only one field in the dataset, return a
   // variant array with only one element. This seems to be required for
   // ADO, DBIsam, DBX and others to work.
@@ -2423,7 +2278,6 @@ begin
   else
     Result := FieldByName(FldNames).Value;
 end;
-
 function TRESTDWMemTable.CopyFromDataSet: Integer;
 var
   I, Len, FinalAutoInc: Integer;
@@ -2452,7 +2306,6 @@ begin
       FDataSet.Close;
     Exit;
   end;
-
   FinalAutoInc := 0;
   FDataSet.DisableControls;
   DisableControls;
@@ -2467,7 +2320,6 @@ begin
     StatusField := nil;
     if FApplyMode <> amNone then
       StatusField := FieldByName(FStatusName);
-
     // find first source autoinc field
     FSrcAutoIncField := nil;
     for I := 0 to FDataSet.FieldCount - 1 do
@@ -2476,7 +2328,6 @@ begin
         FSrcAutoIncField := FDataSet.Fields[I];
         Break;
       end;
-
     FDataSet.First;
     while not FDataSet.EOF do
     begin
@@ -2523,33 +2374,28 @@ begin
       FDataSet.Close;
   end;
 end;
-
 procedure TRESTDWMemTable.DoBeforeApply(ADataSet: TDataset; RowsPending: Integer);
 begin
   if Assigned(FBeforeApply) then
     FBeforeApply(ADataset, RowsPending);
 end;
-
 procedure TRESTDWMemTable.DoAfterApply(ADataSet: TDataset; RowsApplied: Integer);
 begin
   if Assigned(FAfterApply) then
     FAfterApply(ADataset, RowsApplied);
 end;
-
 procedure TRESTDWMemTable.DoBeforeApplyRecord(ADataset: TDataset;
   RS: TRecordStatus; Found: Boolean);
 begin
   if Assigned(FBeforeApplyRecord) then
     FBeforeApplyRecord(ADataset, RS, Found);
 end;
-
 procedure TRESTDWMemTable.DoAfterApplyRecord(ADataset: TDataset;
   RS: TRecordStatus; Apply: Boolean);
 begin
   if Assigned(FAfterApplyRecord) then
     FAfterApplyRecord(ADataset, RS, Apply);
 end;
-
 procedure TRESTDWMemTable.ClearChanges;
 var
   I: Integer;
@@ -2566,9 +2412,7 @@ begin
     end;
     FDeletedValues.Clear;
   end;
-
   EmptyTable;
-
   if FLoadRecords then
   begin
     FRowsOriginal := CopyFromDataSet;
@@ -2583,7 +2427,6 @@ begin
     end;
   end;
 end;
-
 procedure TRESTDWMemTable.CancelChanges;
 begin
   CheckBrowseMode;
@@ -2591,7 +2434,6 @@ begin
   FRowsChanged := 0;
   FRowsAffected := 0;
 end;
-
 function TRESTDWMemTable.ApplyChanges: Boolean;
 var
   xKey: Variant;
@@ -2600,7 +2442,6 @@ var
   Status: TRecordStatus;
   bFound, bApply: Boolean;
   FOriginal, FClient: TField;
-
   function WriteFields: Boolean;
   var
     J: Integer;
@@ -2626,7 +2467,6 @@ var
       Result := False;
     end;
   end;
-
   function InsertRec: Boolean;
   begin
     try
@@ -2638,7 +2478,6 @@ var
       Result := False;
     end;
   end;
-
   function UpdateRec: Boolean;
   begin
     try
@@ -2650,7 +2489,6 @@ var
       Result := False;
     end;
   end;
-
   function DeleteRec: Boolean;
   begin
     try
@@ -2660,7 +2498,6 @@ var
       Result := False;
     end;
   end;
-
   function SaveChanges: Integer;
   var
     I: Integer;
@@ -2828,10 +2665,8 @@ var
       FDataSet.EnableControls;
     end;
   end;
-
 begin
   Result := False;
-
   if (FDataSet = nil) or (FApplyMode = amNone) then
     Exit;
   if (FApplyMode <> amNone) and (FKeyFieldNames = '') then
@@ -2839,17 +2674,14 @@ begin
   Len := FieldDefs.Count - 2;
   if (Len < 1) then
     Exit;
-
   try
     if not FDataSet.Active then
       FDataSet.Open;
   except
     Exit;
   end;
-
   CheckBrowseMode;
   DoBeforeApply(FDataset, FRowsChanged);
-
   FSaveLoadState := slsSaving;
   if (FRowsChanged < 1) or (IsEmpty and (FDeletedValues.Count < 1)) then
   begin
@@ -2863,18 +2695,14 @@ begin
       ((FRowsAffected > 0) and (FRowsAffected < FRowsChanged) and not FExactApply);
   end;
   FSaveLoadState := slsNone;
-
   DoAfterApply(FDataset, FRowsAffected);
   if Result then
     ClearChanges;
-
   FRowsAffected := 0;
   FRowsChanged := 0;
-
   if FDataSet.Active and FDatasetClosed then
     FDataset.Close;
 end;
-
 function TRESTDWMemTable.FindDeleted(KeyValues: Variant): Integer;
 var
   I, J, Len, Equals: Integer;
@@ -2920,40 +2748,32 @@ begin
       Dispose(PxKey);
   end;
 end;
-
 function TRESTDWMemTable.IsDeleted(out Index: Integer): Boolean;
 begin
   Index := FindDeleted(GetValues());
   Result := Index > -1;
 end;
-
 function TRESTDWMemTable.IsInserted: Boolean;
 begin
   Result := TRecordStatus(FieldByName(FStatusName).AsInteger) = rsInserted;
 end;
-
 function TRESTDWMemTable.IsUpdated: Boolean;
 begin
   Result := TRecordStatus(FieldByName(FStatusName).AsInteger) = rsUpdated;
 end;
-
 function TRESTDWMemTable.IsOriginal: Boolean;
 begin
   Result := TRecordStatus(FieldByName(FStatusName).AsInteger) = rsOriginal;
 end;
-
 function TRESTDWMemTable.IsLoading: Boolean;
 begin
   Result := FSaveLoadState = slsLoading;
 end;
-
 function TRESTDWMemTable.IsSaving: Boolean;
 begin
   Result := FSaveLoadState = slsSaving;
 end;
-
 //=== { TJvMemBlobStream } ===================================================
-
 constructor TJvMemBlobStream.Create(Field: TBlobField; Mode: TBlobStreamMode);
 begin
   // (rom) added inherited Create;
@@ -2977,7 +2797,6 @@ begin
   if Mode = bmWrite then
     Truncate;
 end;
-
 destructor TJvMemBlobStream.Destroy;
 begin
   if FOpened and FModified then
@@ -2990,7 +2809,6 @@ begin
     end;
   inherited Destroy;
 end;
-
 function TJvMemBlobStream.GetBlobFromRecord(Field: TField): TMemBlobData;
 var
   Rec: TJvMemoryRecord;
@@ -3010,7 +2828,6 @@ begin
       Result := PMemBlobArray(Rec.FBlobs)[FField.Offset];
   end;
 end;
-
 function TJvMemBlobStream.Read(var Buffer; Count: Longint): Longint;
 begin
   Result := 0;
@@ -3036,7 +2853,6 @@ begin
     end;
   end;
 end;
-
 function TJvMemBlobStream.Write(const Buffer; Count: Longint): Longint;
 var
   Temp: TMemBlobData;
@@ -3054,7 +2870,6 @@ begin
     FModified := True;
   end;
 end;
-
 function TJvMemBlobStream.Seek(Offset: Longint; Origin: Word): Longint;
 begin
   case Origin of
@@ -3067,7 +2882,6 @@ begin
   end;
   Result := FPosition;
 end;
-
 procedure TJvMemBlobStream.Truncate;
 begin
   if FOpened and FCached and (FMode <> bmRead) then
@@ -3076,7 +2890,6 @@ begin
     FModified := True;
   end;
 end;
-
 function TJvMemBlobStream.GetBlobSize: Longint;
 begin
   Result := 0;
@@ -3086,5 +2899,4 @@ begin
     else
       Result := Length(GetBlobFromRecord(FField));
 end;
-
 end.

@@ -1,8 +1,6 @@
 unit JclDateTime;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-{$I ..\..\CORE\Source\Includes\crossplatform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\crossplatform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -25,7 +23,6 @@ unit JclDateTime;
 }
 
 interface
-
 uses
   {$IFDEF UNITVERSIONING}
   JclUnitVersioning,
@@ -52,18 +49,14 @@ uses
   {$ENDIF FPC}
   {$ENDIF}
   JclBase, JclResources;
-
 const
   // 1970-01-01T00:00:00 in TDateTime
   UnixTimeStart = 25569;
-
 { Encode / Decode functions }
-
 function EncodeDate(const Year: Integer; Month, Day: Word): TDateTime;
 procedure DecodeDate(Date: TDateTime; out Year, Month, Day: Word); overload;
 procedure DecodeDate(Date: TDateTime; out Year: Integer; out Month, Day: Word); overload;
 procedure DecodeDate(Date: TDateTime; out Year, Month, Day: Integer); overload;
-
 function CenturyOfDate(const DateTime: TDateTime): Integer;
 function CenturyBaseYear(const DateTime: TDateTime): Integer;
 function DayOfDate(const DateTime: TDateTime): Integer;
@@ -75,9 +68,7 @@ function DayOfTheYearToDateTime(const Year, Day: Integer): TDateTime;
 function HourOfTime(const DateTime: TDateTime): Integer;
 function MinuteOfTime(const DateTime: TDateTime): Integer;
 function SecondOfTime(const DateTime: TDateTime): Integer;
-
 { ISO 8601 support }
-
 function GetISOYearNumberOfWeeks(const Year: Word): Word;
 function IsISOLongYear(const Year: Word): Boolean; overload;
 function IsISOLongYear(const DateTime: TDateTime): Boolean; overload;
@@ -86,9 +77,7 @@ function ISOWeekNumber(DateTime: TDateTime; out YearOfWeekNumber, WeekDay: Integ
 function ISOWeekNumber(DateTime: TDateTime; out YearOfWeekNumber: Integer): Integer; overload;
 function ISOWeekNumber(DateTime: TDateTime): Integer; overload;
 function ISOWeekToDateTime(const Year, Week, Day: Integer): TDateTime;
-
 { Miscellanous }
-
 function IsLeapYear(const Year: Integer): Boolean; overload;
 function IsLeapYear(const DateTime: TDateTime): Boolean; overload;
 function DaysInMonth(const DateTime: TDateTime): Integer;
@@ -98,30 +87,23 @@ function EasterSunday(const Year: Integer): TDateTime;
 function FormatDateTime(Form: string; DateTime: TDateTime): string;
 function FATDatesEqual(const FileTime1, FileTime2: Int64): Boolean; overload;
 function FATDatesEqual(const FileTime1, FileTime2: TFileTime): Boolean; overload;
-
 // Conversion
 type
   TDosDateTime = Integer;
-
 function HoursToMSecs(Hours: Integer): Integer;
 function MinutesToMSecs(Minutes: Integer): Integer;
 function SecondsToMSecs(Seconds: Integer): Integer;
-
 function TimeOfDateTimeToSeconds(DateTime: TDateTime): Integer;
 function TimeOfDateTimeToMSecs(DateTime: TDateTime): Integer;
-
 function DateTimeToLocalDateTime(DateTime: TDateTime): TDateTime;
 function LocalDateTimeToDateTime(DateTime: TDateTime): TDateTime;
-
 {$IFDEF MSWINDOWS}
 function DateTimeToDosDateTime(const DateTime: TDateTime): TDosDateTime;
 function DateTimeToFileTime(DateTime: TDateTime): TFileTime;
 function DateTimeToSystemTime(DateTime: TDateTime): TSystemTime; overload;
 procedure DateTimeToSystemTime(DateTime: TDateTime; out SysTime: TSystemTime); overload;
-
 function LocalDateTimeToFileTime(DateTime: TDateTime): FileTime;
 {$ENDIF MSWINDOWS}
-
 function DosDateTimeToDateTime(const DosTime: TDosDateTime): TDateTime;
 {$IFDEF MSWINDOWS}
 function DosDateTimeToFileTime(DosTime: TDosDateTime): TFileTime; overload;
@@ -129,7 +111,6 @@ procedure DosDateTimeToFileTime(DTH, DTL: Word; FT: TFileTime); overload;
 function DosDateTimeToSystemTime(const DosTime: TDosDateTime): TSystemTime;
 {$ENDIF MSWINDOWS}
 function DosDateTimeToStr(DateTime: Integer): string;
-
 function FileTimeToDateTime(const FileTime: TFileTime): TDateTime;
 {$IFDEF MSWINDOWS}
 function FileTimeToLocalDateTime(const FileTime: TFileTime): TDateTime;
@@ -139,37 +120,30 @@ function FileTimeToSystemTime(const FileTime: TFileTime): TSystemTime; overload;
 procedure  FileTimeToSystemTime(const FileTime: TFileTime; out ST: TSystemTime); overload;
 {$ENDIF MSWINDOWS}
 function FileTimeToStr(const FileTime: TFileTime): string;
-
 {$IFDEF MSWINDOWS}
 function SystemTimeToDosDateTime(const SystemTime: TSystemTime): TDosDateTime;
 function SystemTimeToFileTime(const SystemTime: TSystemTime): TFileTime; overload;
 procedure SystemTimeToFileTime(const SystemTime: TSystemTime; FTime: TFileTime); overload;
 function SystemTimeToStr(const SystemTime: TSystemTime): string;
-
 // Filedates
 function CreationDateTimeOfFile(const Sr: TSearchRec): TDateTime;
 function LastAccessDateTimeOfFile(const Sr: TSearchRec): TDateTime;
 function LastWriteDateTimeOfFile(const Sr: TSearchRec): TDateTime;
 {$ENDIF MSWINDOWS}
-
 type
   TJclUnixTime32 = Longword;
-
 function DateTimeToUnixTime(DateTime: TDateTime): TJclUnixTime32;
 function UnixTimeToDateTime(const UnixTime: TJclUnixTime32): TDateTime;
-
 {$IFDEF MSWINDOWS}
 function FileTimeToUnixTime(const AValue: TFileTime): TJclUnixTime32;
 function UnixTimeToFileTime(const AValue: TJclUnixTime32): TFileTime;
 {$ENDIF MSWINDOWS}
-
 // Time stamps (formerly in JclSchedule)
 function NullStamp: TTimeStamp;
 function CompareTimeStamps(const Stamp1, Stamp2: TTimeStamp): Int64;
 function EqualTimeStamps(const Stamp1, Stamp2: TTimeStamp): Boolean;
 function IsNullTimeStamp(const Stamp: TTimeStamp): Boolean;
 function TimeStampDOW(const Stamp: TTimeStamp): Integer;
-
 // Day of week (formerly in JclSchedule)
 function FirstWeekDay(const Year, Month: Integer; out DOW: Integer): Integer; overload;
 function FirstWeekDay(const Year, Month: Integer): Integer; overload;
@@ -184,10 +158,8 @@ function IndexedWeekendDay(const Year, Month: Integer; Index: Integer): Integer;
 function FirstDayOfWeek(const Year, Month, DayOfWeek: Integer): Integer;
 function LastDayOfWeek(const Year, Month, DayOfWeek: Integer): Integer;
 function IndexedDayOfWeek(const Year, Month, DayOfWeek, Index: Integer): Integer;
-
 type
   EJclDateTimeError = class(EJclError);
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -199,16 +171,12 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   JclSysUtils;
-
 const
   DaysInMonths: array [1..12] of Integer =
     (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
-
   MinutesPerDay     = 60 * 24;
   //SecondsPerMinute  = 60;
   //SecondsPerHour    = 3600;
@@ -223,18 +191,15 @@ const
   DateTimeMaxDay    = 2958466;              //  12/31/EncodeDateMaxYear + 1;
   FileTimeBase      = -109205.0;
   FileTimeStep: Extended = 24.0 * 60.0 * 60.0 * 1000.0 * 1000.0 * 10.0; // 100 nSek per Day
-
   // Weekday to start the week
   //   1 : Sonday
   //   2 : Monday (according to ISO 8601)
   //ISOFirstWeekDay = 2;
-
   // minmimum number of days of the year in the first week of the year week
   //   1 : week one starts at 1/1
   //   4 : first week has at least four days (according to ISO 8601)
   //   7 : first full week
   //ISOFirstWeekMinDays = 4;
-
 function EncodeDate(const Year: Integer; Month, Day: Word): TDateTime; overload;
 begin
   if (Year > 0) and (Year < EncodeDateMaxYear + 1) then
@@ -253,12 +218,10 @@ begin
     Result := Integer(Round(Result)) + (Day - 1);
   end;
 end;
-
 procedure DecodeDate(Date: TDateTime; out Year, Month, Day: Word);
 begin
   {$IFDEF HAS_UNITSCOPE}System.{$ENDIF}SysUtils.DecodeDate(Date, Year, Month, Day);
 end;
-
 procedure DecodeDate(Date: TDateTime; out Year, Month, Day: Integer);
 var
   WMonth, WDay: Word;
@@ -267,7 +230,6 @@ begin
   Month := WMonth;
   Day := WDay;
 end;
-
 procedure DecodeDate(Date: TDateTime; out Year: Integer; out Month, Day: Word);
 var
   WYear: Word;
@@ -305,13 +267,11 @@ begin
       Year := Year + 1;                     // BaseDate is 1/1/1
   end;
 end;
-
 procedure ResultCheck(Val: LongBool);
 begin
   if not Val then
     raise EJclDateTimeError.CreateRes(@RsDateConversion);
 end;
-
 function CenturyBaseYear(const DateTime: TDateTime): Integer;
 var
   Y: Integer;
@@ -321,7 +281,6 @@ begin
   if Y <= 0 then
     Result := Result - 100;
 end;
-
 function CenturyOfDate(const DateTime: TDateTime): Integer;
 var
   Y: Integer;
@@ -332,7 +291,6 @@ begin
   else
     Result := (Y div 100) - 1;
 end;
-
 function DayOfDate(const DateTime: TDateTime): Integer;
 var
   Y: Integer;
@@ -341,7 +299,6 @@ begin
   DecodeDate(DateTime, Y, M, D);
   Result := D;
 end;
-
 function MonthOfDate(const DateTime: TDateTime): Integer;
 var
   Y: Integer;
@@ -350,14 +307,12 @@ begin
   DecodeDate(DateTime, Y, M, D);
   Result := M;
 end;
-
 function YearOfDate(const DateTime: TDateTime): Integer;
 var
   M, D: Word;
 begin
   DecodeDate(DateTime, Result, M, D);
 end;
-
 function DayOfTheYear(const DateTime: TDateTime; out Year: Integer): Integer;
 var
   Month, Day: Word;
@@ -368,19 +323,16 @@ begin
   Result := Trunc(DateTime);
   Result := Result - Trunc(DT) + 1;
 end;
-
 function DayOfTheYear(const DateTime: TDateTime): Integer;
 var
   Year: Integer;
 begin
   Result := DayOfTheYear(DateTime, Year);
 end;
-
 function DayOfTheYearToDateTime(const Year, Day: Integer): TDateTime;
 begin
   Result := EncodeDate(Year, 1, 1) + Day - 1;
 end;
-
 function HourOfTime(const DateTime: TDateTime): Integer;
 var
   H, M, S, MS: Word;
@@ -388,7 +340,6 @@ begin
   DecodeTime(DateTime, H, M, S, MS);
   Result := H;
 end;
-
 function MinuteOfTime(const DateTime: TDateTime): Integer;
 var
   H, M, S, MS: Word;
@@ -396,7 +347,6 @@ begin
   DecodeTime(DateTime, H, M, S, MS);
   Result := M;
 end;
-
 function SecondOfTime(const DateTime: TDateTime): Integer;
 var
   H, M, S, MS: Word;
@@ -404,17 +354,14 @@ begin
   DecodeTime(DateTime, H, M, S, MS);
   Result := S;
 end;
-
 function TimeOfDateTimeToSeconds(DateTime: TDateTime): Integer;
 begin
   Result := Round(Frac(DateTime) * SecondsPerDay);
 end;
-
 function TimeOfDateTimeToMSecs(DateTime: TDateTime): Integer;
 begin
   Result := Round(Frac(DateTime) * MSecsPerDay);
 end;
-
 function DaysInMonth(const DateTime: TDateTime): Integer;
 var
   M: Integer;
@@ -424,14 +371,12 @@ begin
   if (M = 2) and IsLeapYear(DateTime) then
     Result := 29;
 end;
-
 // SysUtils.DayOfWeek returns the day of the week of the given date. The result is an integer between
 // 1 and 7, corresponding to Sunday through Saturday. ISODayOfWeek on the other hand returns an integer
 // between 1 and 7 where the first day is a Monday. The forumla for calculation ISODayOfTheWeek is
 // simply
 //                    DayOfWeek(D) - 1  if DayOfWeek(D) > 1
 // ISODayOfWeek (D) = 7                 if DayOfWeek(D) = 1
-
 function ISODayOfWeek(const DateTime: TDateTime): Word;
 var
   TmpDayOfWeek: Word;
@@ -442,11 +387,9 @@ begin
   else
     Result := TmpDayOfWeek - 1;
 end;
-
 // Determines if the ISO Year is ordinary  (52 weeks) or Long (53 weeks). Uses a rule first
 // suggested by Sven Pran (Norway) and Lars Nordentoft (Denmark) - according to
 // http://www.phys.uu.nl/~vgent/calendar/isocalendar.htm
-
 function IsISOLongYear(const DateTime: TDateTime): Boolean;
 var
   TmpYear: Word;
@@ -454,7 +397,6 @@ begin
   TmpYear := YearOfDate(DateTime);
   Result := IsISOLongYear(TmpYear);
 end;
-
 function IsISOLongYear(const Year: Word): Boolean;
 var
   TmpWeekday: Word;
@@ -462,18 +404,15 @@ begin
   TmpWeekday := ISODayOfWeek(DayOfTheYearToDateTime(Year, 1));
   Result := (IsLeapYear(Year) and ((TmpWeekday = 3) or (TmpWeekday = 4))) or (TmpWeekday = 4);
 end;
-
 function GetISOYearNumberOfWeeks(const Year: Word): Word;
 begin
   Result := 52;
   if IsISOLongYear(Year) then
     Result := 53;
 end;
-
 // ISOWeekNumber function returns Integer 1..7 equivalent to Sunday..Saturday.
 // ISO 8601 weeks start with Monday and the first week of a year is the one which
 // includes the first Thursday
-
 function ISOWeekNumber(DateTime: TDateTime; out YearOfWeekNumber, WeekDay: Integer): Integer;
 var
   TmpYear: Integer;
@@ -487,10 +426,8 @@ begin
   if (MonthOfDate(DateTime) = 12) and (DayOfDate(DateTime) >= 29) and
     (ISODayOfWeek(DateTime) <= 3) then
     TmpYear := TmpYear + 1;
-
   January4th := DayOfTheYearToDateTime(TmpYear, 4);
   FirstMonday := January4th + 1 - ISODayOfWeek(January4th);
-
   // If our date is < FirstMonday we are in the last week of the previous year
   if DateTime < FirstMonday then
   begin
@@ -503,25 +440,21 @@ begin
     YearOfWeekNumber := TmpYear;
     Result := (Trunc(DateTime - FirstMonday) div 7) + 1;
   end;
-
   if Result > GetISOYearNumberOfWeeks(YearOfDate(DateTime)) then
     Result := GetISOYearNumberOfWeeks(YearOfDate(DateTime));
 end;
-
 function ISOWeekNumber(DateTime: TDateTime; out YearOfWeekNumber: Integer): Integer;
 var
   Temp: Integer;
 begin
   Result := ISOWeekNumber(DateTime, YearOfWeekNumber, Temp);
 end;
-
 function ISOWeekNumber(DateTime: TDateTime): Integer;
 var
   Temp: Integer;
 begin
   Result := ISOWeekNumber(DateTime, Temp, Temp);
 end;
-
 function ISOWeekToDateTime(const Year, Week, Day: Integer): TDateTime;
 var
   January4th: TDateTime;
@@ -531,20 +464,16 @@ begin
   FirstMonday := January4th + 1 - ISODayOfWeek(January4th);
   Result := FirstMonday + (Week - 1) * 7 + (Day - 1);
 end;
-
 // The original Gregorian rule for all who want to learn it
 // Result := (Year mod 4 = 0) and ((Year mod 100 <> 0) or (Year mod 400 = 0));
-
 function IsLeapYear(const Year: Integer): Boolean;
 begin
   Result := {$IFDEF HAS_UNITSCOPE}System.{$ENDIF}SysUtils.IsLeapYear(Year);
 end;
-
 function IsLeapYear(const DateTime: TDateTime): Boolean;
 begin
   Result := IsLeapYear(YearOfDate(DateTime));
 end;
-
 function Make4DigitYear(Year, Pivot: Integer): Integer;
 begin
   { TODO : Make4DigitYear }                                                                                                  
@@ -558,14 +487,12 @@ begin
   else
     Result := 1900 + Year;
 end;
-
 // "window" technique for years to translate 2 digits to 4 digits.
 // The window is 100 years wide
 // The windowsill year is the lower edge of the window
 // A windowsill year of 1900 is equivalent to putting 1900 before every 2-digit year
 // if WindowsillYear is 1940, then 40 is interpreted as 1940, 00 as 2000 and 39 as 2039
 // The system default is 1950
-
 function MakeYear4Digit(Year, WindowsillYear: Integer): Integer;
 var
   CC, Y: Integer;
@@ -582,12 +509,10 @@ begin
   if (Year >= 100) or (Year < 0) then
     Assert(Year = Result);  // Assert: no unwanted century translation
 end;
-
 // Calculates and returns Easter Day for specified year.
 // Originally from Mark Lussier, AppVision <MLussier att best dott com>.
 // Corrected to prevent integer overflow if it is inadvertedly
 // passed a year of 6554 or greater.
-
 function EasterSunday(const Year: Integer): TDateTime;
 var
   Month, Day, Moon, Epact, Sunday,
@@ -629,9 +554,7 @@ begin
   end;
   Result := EncodeDate(Year, Month, Day);
 end;
-
 // Conversion
-
 {$IFDEF MSWINDOWS}
 function DateTimeToLocalDateTime(DateTime: TDateTime): TDateTime;
 var
@@ -648,7 +571,6 @@ begin
   end;
 end;
 {$ENDIF MSWINDOWS}
-
 {$IFDEF UNIX}
 function DateTimeToLocalDateTime(DateTime: TDateTime): TDateTime;
 var
@@ -669,7 +591,6 @@ begin
   Result  := ((DateTime * SecsPerDay) - Offset) / SecsPerDay;
 end;
 {$ENDIF UNIX}
-
 {$IFDEF MSWINDOWS}
 function LocalDateTimeToDateTime(DateTime: TDateTime): TDateTime;
 var
@@ -686,7 +607,6 @@ begin
   end;
 end;
 {$ENDIF MSWINDOWS}
-
 {$IFDEF UNIX}
 function LocalDateTimeToDateTime(DateTime: TDateTime): TDateTime;
 var
@@ -707,40 +627,33 @@ begin
   Result  := ((DateTime * SecsPerDay) + Offset) / SecsPerDay;
 end;
 {$ENDIF UNIX}
-
 function HoursToMSecs(Hours: Integer): Integer;
 begin
   Assert(Hours < MaxInt / MsecsPerHour);
   Result := Hours * MsecsPerHour;
 end;
-
 function MinutesToMSecs(Minutes: Integer): Integer;
 begin
   Assert(Minutes < MaxInt div MsecsPerMinute);
   Result := Minutes * MsecsPerMinute;
 end;
-
 function SecondsToMSecs(Seconds: Integer): Integer;
 begin
   Assert(Seconds < MaxInt div 1000);
   Result := Seconds * 1000;
 end;
-
 // using system calls this can be done like this:
 // var
 //  SystemTime: TSystemTime;
 // begin
 //  ResultCheck(FileTimeToSystemTime(FileTime, SystemTime));
 //  Result := SystemTimeToDateTime(SystemTime);
-
 function FileTimeToDateTime(const FileTime: TFileTime): TDateTime;
 begin
   Result := Int64(FileTime) / FileTimeStep;
   Result := Result + FileTimeBase;
 end;
-
 {$IFDEF MSWINDOWS}
-
 function FileTimeToLocalDateTime(const FileTime: TFileTime): TDateTime;
 var
   LocalFileTime: TFileTime;
@@ -751,7 +664,6 @@ begin
   Result := FileTimeToDateTime(LocalFileTime);
   { TODO : daylight saving time }
 end;
-
 function LocalDateTimeToFileTime(DateTime: TDateTime): FileTime;
 var
   LocalFileTime: TFileTime;
@@ -762,9 +674,7 @@ begin
   ResultCheck(LocalFileTimeToFileTime(LocalFileTime, Result));
   { TODO : daylight saving time }
 end;
-
 {$ENDIF MSWINDOWS}
-
 function DateTimeToFileTime(DateTime: TDateTime): TFileTime;
 var
   E: Extended;
@@ -774,9 +684,7 @@ begin
   F64 := Round(E);
   Result := TFileTime(F64);
 end;
-
 {$IFDEF MSWINDOWS}
-
 function DosDateTimeToSystemTime(const DosTime: TDosDateTime): TSystemTime;
 var
   FileTime: TFileTime;
@@ -784,7 +692,6 @@ begin
   FileTime := DosDateTimeToFileTime(DosTime);
   Result := FileTimeToSystemTime(FileTime);
 end;
-
 function SystemTimeToDosDateTime(const SystemTime: TSystemTime): TDosDateTime;
 var
   FileTime: TFileTime;
@@ -792,9 +699,7 @@ begin
   FileTime := SystemTimeToFileTime(SystemTime);
   Result := FileTimeToDosDateTime(FileTime);
 end;
-
 {$ENDIF MSWINDOWS}
-
 // DosDateTimeToDateTime performs the same action as SysUtils.FileDateToDateTime
 // not using SysUtils.FileDateToDateTime this can be done like that:
 // var
@@ -804,12 +709,10 @@ end;
 //  ResultCheck(DosDateTimeToFileTime(HiWord(DosTime), LoWord(DosTime), FileTime));
 //  ResultCheck(FileTimeToSystemTime(FileTime, SystemTime));
 //  Result := SystemTimeToDateTime(SystemTime);
-
 function DosDateTimeToDateTime(const DosTime: TDosDateTime): TDateTime;
 begin
   Result := {$IFDEF HAS_UNITSCOPE}System.{$ENDIF}SysUtils.FileDateToDateTime(DosTime);
 end;
-
 // DateTimeToDosDateTime performs the same action as SysUtils.DateTimeToFileDate
 // not using SysUtils.DateTimeToDosDateTime this can be done like that:
 // var
@@ -821,19 +724,15 @@ end;
 //  ResultCheck(SystemTimeToFileTime(SystemTime, FileTime));
 //  ResultCheck(FileTimeToDosDateTime(FileTime, Date, Time));
 //  Result := (Date shl 16) or Time;
-
 function DateTimeToDosDateTime(const DateTime: TDateTime): TDosDateTime;
 begin
   Result := {$IFDEF HAS_UNITSCOPE}System.{$ENDIF}SysUtils.DateTimeToFileDate(DateTime);
 end;
-
 {$IFDEF MSWINDOWS}
-
 function FileTimeToSystemTime(const FileTime: TFileTime): TSystemTime; overload;
 begin
   ResultCheck({$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.FileTimeToSystemTime(FileTime, Result));
 end;
-
 procedure FileTimeToSystemTime(const FileTime: TFileTime; out ST: TSystemTime); overload;
 begin
   {$IFDEF FPC}
@@ -841,41 +740,34 @@ begin
   {$ENDIF FPC}
   {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.FileTimeToSystemTime(FileTime, ST);
 end;
-
 function SystemTimeToFileTime(const SystemTime: TSystemTime): TFileTime;  overload;
 begin
   Result.dwHighDateTime := 0;
   Result.dwLowDateTime := 0;
   ResultCheck({$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.SystemTimeToFileTime(SystemTime, Result));
 end;
-
 procedure SystemTimeToFileTime(const SystemTime: TSystemTime; FTime: TFileTime); overload;
 begin
   {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.SystemTimeToFileTime(SystemTime, FTime);
 end;
-
 function DateTimeToSystemTime(DateTime: TDateTime): TSystemTime;  overload;
 begin
   {$IFDEF HAS_UNITSCOPE}System.{$ENDIF}SysUtils.DateTimeToSystemTime(DateTime, Result);
 end;
-
 procedure DateTimeToSystemTime(DateTime: TDateTime; out SysTime: TSystemTime); overload;
 begin
   {$IFDEF HAS_UNITSCOPE}System.{$ENDIF}SysUtils.DateTimeToSystemTime(DateTime, SysTime);
 end;
-
 function DosDateTimeToFileTime(DosTime: TDosDateTime): TFileTime; overload;
 begin
   Result.dwHighDateTime := 0;
   Result.dwLowDateTime := 0;
   ResultCheck({$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.DosDateTimeToFileTime(HIWORD(DosTime), LOWORD(DosTime), Result));
 end;
-
 procedure DosDateTimeToFileTime(DTH, DTL: Word; FT: TFileTime); overload;
 begin
   {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.DosDateTimeToFileTime(DTH, DTL, FT);
 end;
-
 function FileTimeToDosDateTime(const FileTime: TFileTime): TDosDateTime; overload;
 var
   Date, Time: Word;
@@ -885,16 +777,13 @@ begin
   ResultCheck({$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.FileTimeToDosDateTime(FileTime, Date, Time));
   Result := (Date shl 16) or Time;
 end;
-
 procedure FileTimeToDosDateTime(const FileTime: TFileTime; out Date, Time: Word); overload;
 begin
   Date := 0;
   Time := 0;
   {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.FileTimeToDosDateTime(FileTime, Date, Time);
 end;
-
 {$ENDIF MSWINDOWS}
-
 function FileTimeToStr(const FileTime: TFileTime): string;
 var
   DateTime: TDateTime;
@@ -902,42 +791,33 @@ begin
   DateTime := FileTimeToDateTime(FileTime);
   Result := DateTimeToStr(DateTime);
 end;
-
 function DosDateTimeToStr(DateTime: Integer): string;
 begin
   Result := DateTimeToStr(DosDateTimeToDateTime(DateTime));
 end;
-
 {$IFDEF MSWINDOWS}
-
 // we can't do this better without copying Borland-owned code from the Delphi VCL,
 // as the straight forward conversion doing exactly this task is hidden
 // deeply inside SysUtils.pas.
 // So the date is converted forth and back to/from Julian date
 // If someone needs a faster version please take a look at SysUtils.pas->DateTimeToStr.
-
 function SystemTimeToStr(const SystemTime: TSystemTime): string;
 begin
   Result := DateTimeToStr(SystemTimeToDateTime(SystemTime));
 end;
-
 function CreationDateTimeOfFile(const Sr: TSearchRec): TDateTime;
 begin
   Result := FileTimeToDateTime(Sr.FindData.ftCreationTime);
 end;
-
 function LastAccessDateTimeOfFile(const Sr: TSearchRec): TDateTime;
 begin
   Result := FileTimeToDateTime(Sr.FindData.ftLastAccessTime);
 end;
-
 function LastWriteDateTimeOfFile(const Sr: TSearchRec): TDateTime;
 begin
   Result := FileTimeToDateTime(Sr.FindData.ftLastWriteTime);
 end;
-
 {$ENDIF MSWINDOWS}
-
 // Additional format tokens (also available in upper case):
 // w: Week no according to ISO
 // ww: Week no according to ISO forced two digits
@@ -946,12 +826,10 @@ end;
 // e: Number of the Day in the ISO-week denoted by w (ISO-Notation 1=Monday...)
 // f: Number of the Day in the year denoted by y
 // fff: Number of the Day in the year denoted by y forced three digits
-
 function FormatDateTime(Form: string; DateTime: TDateTime): string;
 var
   N: Integer;
   ISODay, ISOWeek, ISOYear, DayOfYear, YY: Integer;
-
   procedure Digest;
   begin
     if N > 1 then
@@ -961,7 +839,6 @@ var
       N := 1;
     end;
   end;
-
 begin
   ISOWeek := 0;
   DayOfYear := 0;
@@ -1107,59 +984,45 @@ begin
   end;
   Result := {$IFDEF HAS_UNITSCOPE}System.{$ENDIF}SysUtils.FormatDateTime(Result + Form, DateTime);
 end;
-
 // FAT has a granularity of 2 seconds
 // The intervals are 1/10 of a second
-
 function FATDatesEqual(const FileTime1, FileTime2: Int64): Boolean;
 const
   ALLOWED_FAT_FILE_TIME_VARIATION = 20;
 begin
   Result := Abs(FileTime1 - FileTime2) <= ALLOWED_FAT_FILE_TIME_VARIATION;
 end;
-
 function FATDatesEqual(const FileTime1, FileTime2: TFileTime): Boolean;
 begin
   Result := FATDatesEqual(Int64(FileTime1), Int64(FileTime2));
 end;
-
 // Conversion Unix time <--> TDateTime
-
 function DateTimeToUnixTime(DateTime: TDateTime): TJclUnixTime32;
 begin
   Result := Round((DateTime-UnixTimeStart) * SecondsPerDay);
 end;
-
 function UnixTimeToDateTime(const UnixTime: TJclUnixTime32): TDateTime;
 begin
   Result:= UnixTimeStart + (UnixTime / SecondsPerDay);
 end;
-
 // Conversion Unix time <--> FileTime
-
 {$IFDEF MSWINDOWS}
-
 function UnixTimeToFileTime(const AValue: TJclUnixTime32): TFileTime;
 begin
   Result := DateTimeToFileTime(UnixTimeToDateTime(AValue));
 end;
-
 function FileTimeToUnixTime(const AValue: TFileTime): TJclUnixTime32;
 begin
  Result := DateTimeToUnixTime(FileTimeToDateTime(AValue));
 end;
-
 {$ENDIF MSWINDOWS}
-
 // Time stamps utilities
-
 // Utility functions
 function NullStamp: TTimeStamp;
 begin
   Result.Date := 0;
   Result.Time := -1;
 end;
-
 function CompareTimeStamps(const Stamp1, Stamp2: TTimeStamp): Int64;
 begin
   if Stamp1.Date < Stamp2.Date then
@@ -1179,24 +1042,19 @@ begin
     Result := 1;
 //  Result := Int64(Stamp1) - Int64(Stamp2);
 end;
-
 function EqualTimeStamps(const Stamp1, Stamp2: TTimeStamp): Boolean;
 begin
   Result := CompareTimeStamps(Stamp1, Stamp2) = 0;
 end;
-
 function IsNullTimeStamp(const Stamp: TTimeStamp): Boolean;
 begin
   Result := CompareTimeStamps(NullStamp, Stamp) = 0;
 end;
-
 function TimeStampDOW(const Stamp: TTimeStamp): Integer;
 begin
   Result := (Stamp.Date - 1) mod 7 + 1
 end;
-
 // day of week utilities
-
 function FirstWeekDay(const Year, Month: Integer; out DOW: Integer): Integer;
 begin
   DOW := ISODayOfWeek(EncodeDate(Year, Month, 1));
@@ -1208,14 +1066,12 @@ begin
   else
     Result := 1;
 end;
-
 function FirstWeekDay(const Year, Month: Integer): Integer;
 var
   Dummy: Integer;
 begin
   Result := FirstWeekDay(Year, Month, Dummy);
 end;
-
 function LastWeekDay(const Year, Month: Integer; out DOW: Integer): Integer;
 begin
   DOW := ISODayOfWeek(EncodeDate(Year, Month, DaysInMonth(EncodeDate(Year, Month, 1))));
@@ -1227,14 +1083,12 @@ begin
   else
     Result := DaysInMonth(EncodeDate(Year, Month, 1));
 end;
-
 function LastWeekDay(const Year, Month: Integer): Integer;
 var
   Dummy: Integer;
 begin
   Result := LastWeekDay(Year, Month, Dummy);
 end;
-
 function IndexedWeekDay(const Year, Month: Integer; Index: Integer): Integer;
 var
   DOW: Integer;
@@ -1286,7 +1140,6 @@ begin
   if (Result < 0) or (Result > DaysInMonth(EncodeDate(Year, Month, 1))) then
     Result := 0;
 end;
-
 function FirstWeekendDay(const Year, Month: Integer; out DOW: Integer): Integer;
 begin
   DOW := ISODayOfWeek(EncodeDate(Year, Month, 1));
@@ -1298,14 +1151,12 @@ begin
   else
     Result := 1;
 end;
-
 function FirstWeekendDay(const Year, Month: Integer): Integer;
 var
   Dummy: Integer;
 begin
   Result := FirstWeekendDay(Year, Month, Dummy);
 end;
-
 function LastWeekendDay(const Year, Month: Integer; out DOW: Integer): Integer;
 begin
   DOW := ISODayOfWeek(EncodeDate(Year, Month, DaysInMonth(EncodeDate(Year, Month, 1))));
@@ -1317,14 +1168,12 @@ begin
   else
     Result := DaysInMonth(EncodeDate(Year, Month, 1));
 end;
-
 function LastWeekendDay(const Year, Month: Integer): Integer;
 var
   Dummy: Integer;
 begin
   Result := LastWeekendDay(Year, Month, Dummy);
 end;
-
 function IndexedWeekendDay(const Year, Month: Integer; Index: Integer): Integer;
 var
   DOW: Integer;
@@ -1367,7 +1216,6 @@ begin
   if (Result < 0) or (Result > DaysInMonth(EncodeDate(Year, Month, 1))) then
     Result := 0;
 end;
-
 function FirstDayOfWeek(const Year, Month, DayOfWeek: Integer): Integer;
 var
   DOW: Integer;
@@ -1381,7 +1229,6 @@ begin
   else
     Result := 1;
 end;
-
 function LastDayOfWeek(const Year, Month, DayOfWeek: Integer): Integer;
 var
   DOW: Integer;
@@ -1395,7 +1242,6 @@ begin
   else
     Result := DaysInMonth(EncodeDate(Year, Month, 1));
 end;
-
 function IndexedDayOfWeek(const Year, Month, DayOfWeek, Index: Integer): Integer;
 begin
   if Index > 0 then
@@ -1408,14 +1254,10 @@ begin
   if (Result < 0) or (Result > DaysInMonth(EncodeDate(Year, Month, 1))) then
     Result := 0;
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.
-

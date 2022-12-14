@@ -1,8 +1,6 @@
 unit JvStrings;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-{$I ..\..\CORE\Source\Includes\crossplatform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\crossplatform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -25,7 +23,6 @@ unit JvStrings;
 }
 
 interface
-
 uses
   {$IFDEF UNITVERSIONING}
   JclUnitVersioning,
@@ -34,20 +31,16 @@ uses
   Windows,
   {$ENDIF MSWINDOWS}
   SysUtils, Classes;
-
 {regular expressions}
-
 {template functions}
 function ReplaceFirst(const SourceStr, FindStr, ReplaceStr: string): string;
 function ReplaceLast(const SourceStr, FindStr, ReplaceStr: string): string;
 function InsertLastBlock(var SourceStr: string; BlockStr: string): Boolean;
 function RemoveMasterBlocks(const SourceStr: string): string;
 function RemoveFields(const SourceStr: string): string;
-
 {http functions}
 function URLEncode(const Value: AnsiString): AnsiString; // Converts string To A URLEncoded string
 function URLDecode(const Value: AnsiString): AnsiString; // Converts string From A URLEncoded string
-
 {set functions}
 procedure SplitSet(AText: string; AList: TStringList);
 function JoinSet(AList: TStringList): string;
@@ -61,41 +54,30 @@ function SetSort(const AText: string): string;
 function SetUnion(const Set1, Set2: string): string;
 function SetIntersect(const Set1, Set2: string): string;
 function SetExclude(const Set1, Set2: string): string;
-
 {replace any <,> etc by &lt; &gt;}
 function XMLSafe(const AText: string): string; {$IFDEF SUPPORTS_DEPRECATED} deprecated {$IFDEF SUPPORTS_DEPRECATED_DETAILS} 'Use JclSimpleXml.SimpleXMLEncode' {$ENDIF} ; {$ENDIF}
-
 {simple hash, Result can be used in Encrypt}
 function Hash(const AText: string): Integer;
-
 { Base64 encode and decode a string }
 function B64Encode(const S: AnsiString): AnsiString;
 function B64Decode(const S: AnsiString): AnsiString;
-
 {Basic encryption from a Borland Example}
 function Encrypt(const InString: AnsiString; StartKey, MultKey, AddKey: Integer): AnsiString;
 function Decrypt(const InString: AnsiString; StartKey, MultKey, AddKey: Integer): AnsiString;
-
 {Using Encrypt and Decrypt in combination with B64Encode and B64Decode}
 function EncryptB64(const InString: AnsiString; StartKey, MultKey, AddKey: Integer): AnsiString;
 function DecryptB64(const InString: AnsiString; StartKey, MultKey, AddKey: Integer): AnsiString;
-
 procedure CSVToTags(Src, Dst: TStringList);
 // converts a csv list to a tagged string list
-
 procedure TagsToCSV(Src, Dst: TStringList);
 // converts a tagged string list to a csv list
 // only fieldnames from the first record are scanned ib the other records
-
 procedure ListSelect(Src, Dst: TStringList; const AKey, AValue: string);
 {selects akey=avalue from Src and returns recordset in Dst}
-
 procedure ListFilter(Src: TStringList; const AKey, AValue: string);
 {filters Src for akey=avalue}
-
 procedure ListOrderBy(Src: TStringList; const AKey: string; Numeric: Boolean);
 {orders a tagged Src list by akey}
-
 function PosStr(const FindString, SourceString: string;
   StartPos: Integer = 1): Integer;
 { PosStr searches the first occurrence of a substring FindString in a string
@@ -105,12 +87,9 @@ function PosStr(const FindString, SourceString: string;
   StartPos character index. If a specified substring is not found Q_PosStr
   returns zero. The author of algorithm is Peter Morris (UK) (Faststrings unit
   from www.torry.ru). }
-
 function PosStrLast(const FindString, SourceString: string): Integer;
 {finds the last occurance}
-
 function LastPosChar(const FindChar: Char; SourceString: string): Integer;
-
 function PosText(const FindString, SourceString: string;
   StartPos: Integer = 1): Integer;
 { PosText searches the first occurrence of a substring FindString in a string
@@ -120,10 +99,8 @@ function PosText(const FindString, SourceString: string;
   string starting with StartPos character index. If a specified substring is
   not found Q_PosStr returns zero. The author of algorithm is Peter Morris
   (UK) (Faststrings unit from www.torry.ru). }
-
 function PosTextLast(const FindString, SourceString: string): Integer;
 {finds the last occurance}
-
 function NameValuesToXML(const AText: string): string;
 {$IFDEF MSWINDOWS}
 procedure LoadResourceFile(AFile: string; MemStream: TMemoryStream);
@@ -166,7 +143,6 @@ procedure SetValue(var AText: string; const AName, AValue: string);
 // sets a string value in a line
 procedure DeleteValue(var AText: string; const AName: string);
 // deletes a AName="value" pair from AText
-
 procedure GetNames(AText: string; AList: TStringList);
 // get a list of names from a string with name="value" pairs
 function BackPosStr(Start: Integer; const FindString, SourceString: string): Integer;
@@ -195,13 +171,11 @@ function Easter(NYear: Integer): TDateTime;
 // returns the easter date of a year.
 function GetWeekNumber(Today: TDateTime): string;
 //gets a datecode. Returns year and weeknumber in format: YYWW
-
 function ParseNumber(const S: string): Integer;
 // parse number returns the last position, starting from 1
 function ParseDate(const S: string): Integer;
 // parse a SQL style data string from positions 1,
 // starts and ends with #
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -211,9 +185,7 @@ const
     LogPath: 'JVCL\run'
   );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   {$IFDEF RTL200_UP}
   AnsiStrings,
@@ -222,11 +194,9 @@ uses
   JvJCLUtils,
   {$ENDIF ~COMPILER12_UP}
   JvConsts, JvResources, JvTypes, JclSimpleXml;
-
 const
   B64Table: AnsiString = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
   ValidURLChars: AnsiString = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$-_@.&+-!*"''(),;/#?:';
-
 procedure SaveString(const AFile, AText: string);
 begin
   with TFileStream.Create(AFile, fmCreate) do
@@ -236,7 +206,6 @@ begin
     Free;
   end;
 end;
-
 function LoadString(const AFile: string): string;
 var
   S: string;
@@ -250,7 +219,6 @@ begin
   end;
   Result := S;
 end;
-
 procedure DeleteValue(var AText: string; const AName: string);
 var
   P, P2, L: Integer;
@@ -266,7 +234,6 @@ begin
     Dec(P); // include the preceding space if not the first one
   Delete(AText, P, P2 - P + 1);
 end;
-
 function GetValue(const AText, AName: string): string;
 var
   P, P2, L: Integer;
@@ -282,7 +249,6 @@ begin
   Result := Copy(AText, P + L, P2 - (P + L));
   Result := SysUtils.StringReplace(Result, '~~', Cr, [rfReplaceAll]);
 end;
-
 function HasStrValue(const AText, AName: string; var AValue: string): Boolean;
 var
   P, P2, L: Integer;
@@ -300,7 +266,6 @@ begin
   AValue := SysUtils.StringReplace(S, '~~', Cr, [rfReplaceAll]);
   Result := True;
 end;
-
 function GetStrValue(const AText, AName, ADefault: string): string;
 var
   S: string;
@@ -311,7 +276,6 @@ begin
   else
     Result := ADefault;
 end;
-
 function GetIntValue(const AText, AName: string; ADefault: Integer): Integer;
 var
   S: string;
@@ -323,7 +287,6 @@ begin
     Result := ADefault;
   end;
 end;
-
 function GetFloatValue(const AText, AName: string; ADefault: Extended): Extended;
 var
   S: string;
@@ -338,7 +301,6 @@ begin
   else
     Result := ADefault;
 end;
-
 procedure SetValue(var AText: string; const AName, AValue: string);
 var
   P, P2, L: Integer;
@@ -361,7 +323,6 @@ begin
     end;
   end;
 end;
-
 function BackPosStr(Start: Integer; const FindString, SourceString: string): Integer;
 var
   P, L: Integer;
@@ -383,7 +344,6 @@ begin
     Start := Start - L;
   until Start < 1;
 end;
-
 function BackPosText(Start: Integer; const FindString, SourceString: string): Integer;
 var
   P, L, From: Integer;
@@ -405,7 +365,6 @@ begin
     From := From - L;
   until From < 1;
 end;
-
 function PosRangeStr(Start: Integer; const HeadString, TailString, SourceString: string;
   var RangeBegin: Integer; var RangeEnd: Integer): Boolean;
 begin
@@ -419,7 +378,6 @@ begin
   RangeEnd := RangeEnd + Length(TailString) - 1;
   Result := True;
 end;
-
 function PosRangeText(Start: Integer; const HeadString, TailString, SourceString: string;
   var RangeBegin: Integer; var RangeEnd: Integer): Boolean;
 begin
@@ -433,7 +391,6 @@ begin
   RangeEnd := RangeEnd + Length(TailString) - 1;
   Result := True;
 end;
-
 function InnerTag(Start: Integer; const HeadString, TailString, SourceString: string;
   var RangeBegin: Integer; var RangeEnd: Integer): Boolean;
 begin
@@ -448,12 +405,10 @@ begin
   RangeEnd := RangeEnd - 1;
   Result := True;
 end;
-
 function PosTag(Start: Integer; SourceString: string; var RangeBegin: Integer; var RangeEnd: Integer): Boolean;
 begin
   Result := PosRangeStr(Start, '<', '>', SourceString, RangeBegin, RangeEnd);
 end;
-
 function BackPosRangeStr(Start: Integer; const HeadString, TailString, SourceString: string;
   var RangeBegin: Integer; var RangeEnd: Integer): Boolean;
 var
@@ -478,7 +433,6 @@ begin
     Start := Start - L;
   until Start < 1;
 end;
-
 function BackPosRangeText(Start: Integer; const HeadString, TailString, SourceString: string;
   var RangeBegin: Integer; var RangeEnd: Integer): Boolean;
 var
@@ -503,7 +457,6 @@ begin
     Start := Start - L;
   until Start < 1;
 end;
-
 function PosNonSpace(Start: Integer; const SourceText: string): Integer;
 var
   P, L: Integer;
@@ -518,7 +471,6 @@ begin
   if SourceText[P] <> ' ' then
     Result := P;
 end;
-
 function BeginOfAttribute(Start: Integer; const SourceText: string): Integer;
 var
   P, L: Integer;
@@ -537,7 +489,6 @@ begin
   if CharInSet(SourceText[P], ['a'..'z', 'A'..'Z']) then
     Result := P;
 end;
-
 function ParseAttribute(var Start: Integer; const SourceText: string;
   var AName, AValue: string): Boolean;
 var
@@ -560,7 +511,6 @@ begin
   Start := P + 1;
   Result := True;
 end;
-
 procedure ParseAttributes(const SourceText: string; Attributes: TStrings);
 var
   Name, Value: string;
@@ -576,7 +526,6 @@ begin
     Attributes.EndUpdate;
   end;
 end;
-
 function GetToken(var Start: Integer; const SourceText: string): string;
 var
   P1, P2: Integer;
@@ -604,46 +553,33 @@ begin
     Start := P2;
   end;
 end;
-
 function Easter(NYear: Integer): TDateTime;
 var
   NMonth, NDay, NMoon, NEpact, NSunday, NGold, NCent, NCorX, NCorZ: Integer;
 begin
-
   { The Golden Number of the year in the 19 year Metonic Cycle }
   NGold := ((NYear mod 19) + 1);
-
   { Calculate the Century }
   NCent := ((NYear div 100) + 1);
-
   { No. of Years in which leap year was dropped in order to keep in step
     with the sun }
   NCorX := ((3 * NCent) div 4 - 12);
-
   { Special Correction to Syncronize Easter with the moon's orbit }
   NCorZ := ((8 * NCent + 5) div 25 - 5);
-
   { Find Sunday }
   NSunday := ((5 * NYear) div 4 - NCorX - 10);
-
   { Set Epact (specifies occurance of full moon }
   NEpact := ((11 * NGold + 20 + NCorZ - NCorX) mod 30);
-
   if (NEpact < 0) then
     NEpact := NEpact + 30;
-
   if ((NEpact = 25) and (NGold > 11)) or (NEpact = 24) then
     NEpact := NEpact + 1;
-
   { Find Full Moon }
   NMoon := 44 - NEpact;
-
   if (NMoon < 21) then
     NMoon := NMoon + 30;
-
   { Advance to Sunday }
   NMoon := (NMoon + 7 - ((NSunday + NMoon) mod 7));
-
   if (NMoon > 31) then
   begin
     NMonth := 4;
@@ -654,16 +590,12 @@ begin
     NMonth := 3;
     NDay := NMoon;
   end;
-
   Result := EncodeDate(NYear, NMonth, NDay);
 end;
-
 //gets a datecode. Returns year and weeknumber in format: YYWW
-
 {DayOfWeek function returns Integer 1..7 equivalent to Sunday..Saturday.
 ISO 8601 weeks Start with Monday and the first week of a year is the one which
 includes the first Thursday - Fiddle takes care of all this}
-
 function GetWeekNumber(Today: TDateTime): string;
 const
   Fiddle: array [1..7] of Byte = (6, 7, 8, 9, 10, 4, 5);
@@ -676,27 +608,19 @@ begin
   Present := Trunc(Today); //truncate to remove hours, mins and secs
   DecodeDate(Present, Year, Month, Day); //decode to find year
   StartOfYear := EncodeDate(Year, 1, 1); //encode 1st Jan of the year
-
   //find what day of week 1st Jan is, then add days according to rule
   FirstDayOfYear := Fiddle[DayOfWeek(StartOfYear)];
-
   //calc number of days since beginning of year + additional according to rule
   NumberOfDays := Trunc(Present - StartOfYear) + FirstDayOfYear;
-
   //calc number of weeks
   WeekNumber := Trunc(NumberOfDays / 7);
-
   //Format year, needed to prevent millenium bug and keep the Fluffy Spangle happy
   YearNumber := FormatDateTime('yyyy', Present);
-
   YearNumber := YearNumber + 'W';
-
   if WeekNumber < 10 then
     YearNumber := YearNumber + '0'; //add leading zero for week
-
   //create datecode string
   Result := YearNumber + IntToStr(WeekNumber);
-
   if WeekNumber = 0 then //recursive call for year begin/end...
     //see if previous year end was week 52 or 53
     Result := GetWeekNumber(EncodeDate(Year - 1, 12, 31))
@@ -709,7 +633,6 @@ begin
       Result := YearNumber + 'W01';
     end;
 end;
-
 function RelativePath(const ASrc, ADst: string): string;
 var
   Doc, SDoc, ParDoc, Img, SImg, ParImg, Rel: string;
@@ -754,7 +677,6 @@ begin
     Rel := '';
   Result := Rel;
 end;
-
 procedure GetHTMLAnchors(const AFile: string; AList: TStringList);
 var
   S, SA: string;
@@ -778,7 +700,6 @@ begin
     end;
   until P1 = 0;
 end;
-
 function UppercaseHTMLTags(const AText: string): string;
 var
   P, P2: Integer;
@@ -820,7 +741,6 @@ begin
     end;
   until P = 0;
 end;
-
 function LowercaseHTMLTags(const AText: string): string;
 var
   P, P2: Integer;
@@ -863,7 +783,6 @@ begin
     end;
   until P = 0;
 end;
-
 function PosEscaped(Start: Integer; const SourceText, FindText: string; EscapeChar: Char): Integer;
 begin
   Result := PosText(FindText, SourceText, Start);
@@ -879,7 +798,6 @@ begin
       Exit;
   until SourceText[Result - 1] <> EscapeChar;
 end;
-
 function DeleteEscaped(const SourceText: string; EscapeChar: Char): string;
 var
   I: Integer;
@@ -895,7 +813,6 @@ begin
     end;
   SetLength(Result, RealLen);
 end;
-
 procedure RecurseDirFiles(const ADir: string; var AFileList: TStringList);
 var
   SR: TSearchRec;
@@ -913,7 +830,6 @@ begin
         AFileList.Add(ADir + PathDelim + SR.Name);
   FindClose(SR);
 end;
-
 procedure RecurseDirProgs(const ADir: string; var AFileList: TStringList);
 var
   SR: TSearchRec;
@@ -953,7 +869,6 @@ begin
     end;
   FindClose(SR);
 end;
-
 procedure LoadResourceFile(AFile: string; MemStream: TMemoryStream);
 var
   ResStream: TResourceStream;
@@ -971,7 +886,6 @@ begin
     ResStream.Free;
   end;
 end;
-
 procedure GetNames(AText: string; AList: TStringList);
 var
   P: Integer;
@@ -992,7 +906,6 @@ begin
     end;
   until P = 0;
 end;
-
 function NameValuesToXML(const AText: string): string;
 var
   AList: TStringList;
@@ -1024,7 +937,6 @@ begin
   AList.Free;
   Result := Xml;
 end;
-
 function LastPosChar(const FindChar: Char; SourceString: string): Integer;
 var
   I: Integer;
@@ -1034,7 +946,6 @@ begin
     Dec(I);
   Result := I;
 end;
-
 function PosStr(const FindString, SourceString: string; StartPos: Integer): Integer;
 var
   P: PChar;
@@ -1047,7 +958,6 @@ begin
       Result := P - PChar(SourceString) + 1;
   end;
 end;
-
 function PosText(const FindString, SourceString: string; StartPos: Integer): Integer;
 begin
   // Not the fastest implementation but the JCL doesn't have a better one, either.
@@ -1055,12 +965,10 @@ begin
   if Result <> 0 then
     Result := Result + StartPos - 1;
 end;
-
 function GetBoolValue(const AText, AName: string): Boolean;
 begin
   Result := CompareText(GetValue(AText, AName), 'yes') = 0;
 end;
-
 procedure ListSelect(Src, Dst: TStringList; const AKey, AValue: string);
 var
   I: Integer;
@@ -1072,7 +980,6 @@ begin
       Dst.Add(Src[I]);
   end;
 end;
-
 procedure ListFilter(Src: TStringList; const AKey, AValue: string);
 var
   I: Integer;
@@ -1087,7 +994,6 @@ begin
   Src.Assign(Dst);
   Dst.Free;
 end;
-
 procedure ListOrderBy(Src: TStringList; const AKey: string; Numeric: Boolean);
 var
   I, Index: Integer;
@@ -1123,9 +1029,7 @@ begin
   Src.Assign(Dst);
   Dst.Free;
 end;
-
 // converts a csv list to a tagged string list
-
 procedure CSVToTags(Src, Dst: TStringList);
 var
   I, FI, FC: Integer;
@@ -1155,10 +1059,8 @@ begin
     Names.Free;
   end;
 end;
-
 // converts a tagged string list to a csv list
 // only fieldnames from the first record are scanned ib the other records
-
 procedure TagsToCSV(Src, Dst: TStringList);
 var
   I, FI, FC: Integer;
@@ -1191,7 +1093,6 @@ begin
     Names.Free;
   end;
 end;
-
 function B64Encode(const S: AnsiString): AnsiString;
 var
   I: Integer;
@@ -1220,7 +1121,6 @@ begin
   if (Length(S) mod 3) = 2 then
     Result[Length(Result)] := '=';
 end;
-
 function B64Decode(const S: AnsiString): AnsiString;
 var
   I: Integer;
@@ -1230,7 +1130,6 @@ var
 begin
   if ((Length(S) mod 4) <> 0) or (S = '') then
     raise EJVCLException.CreateRes({$IFNDEF CLR}@{$ENDIF}RsEIncorrectStringFormat);
-
   SetLength(RetValue, ((Length(S) div 4) - 1) * 3);
   for I := 1 to ((Length(S) div 4) - 1) do
   begin
@@ -1434,11 +1333,9 @@ begin
   end;
   Result := RetValue;
 end;
-
 {*******************************************************
  * Standard Encryption algorithm - Copied from Borland *
  *******************************************************}
-
 function Encrypt(const InString: AnsiString; StartKey, MultKey, AddKey: Integer): AnsiString;
 var
   I: Integer;
@@ -1453,7 +1350,6 @@ end;
 {*******************************************************
  * Standard Decryption algorithm - Copied from Borland *
  *******************************************************}
-
 function Decrypt(const InString: AnsiString; StartKey, MultKey, AddKey: Integer): AnsiString;
 var
   I: Integer;
@@ -1465,17 +1361,14 @@ begin
     StartKey := (Byte(InString[I]) + StartKey) * MultKey + AddKey;
   end;
 end;
-
 function EncryptB64(const InString: AnsiString; StartKey, MultKey, AddKey: Integer): AnsiString;
 begin
   Result := B64Encode(Encrypt(InString, StartKey, MultKey, AddKey));
 end;
-
 function DecryptB64(const InString: AnsiString; StartKey, MultKey, AddKey: Integer): AnsiString;
 begin
   Result := Decrypt(B64Decode(InString), StartKey, MultKey, AddKey);
 end;
-
 function Hash(const AText: string): Integer;
 var
   I: Integer;
@@ -1487,14 +1380,11 @@ begin
   for I := 2 to Length(AText) do
     Result := (Result * Ord(AText[I])) xor Result;
 end;
-
 {replace any <,> etc by &lt; &gt;}
-
 function XMLSafe(const AText: string): string;
 begin
   Result := JclSimpleXml.SimpleXMLEncode(AText);
 end;
-
 function FirstOfSet(const AText: string): string;
 var
   P: Integer;
@@ -1513,7 +1403,6 @@ begin
     Result := Copy(Result, 1, P - 1);
   end;
 end;
-
 function LastOfSet(const AText: string): string;
 var
   C: Integer;
@@ -1535,7 +1424,6 @@ begin
     Result := Copy(Result, C, Length(Result));
   end;
 end;
-
 function CountOfSet(const AText: string): Integer;
 var
   Lit: TStringList;
@@ -1545,7 +1433,6 @@ begin
   Result := Lit.Count;
   Lit.Free;
 end;
-
 function SetRotateRight(const AText: string): string;
 var
   Lit: TStringList;
@@ -1563,7 +1450,6 @@ begin
     Result := '';
   Lit.Free;
 end;
-
 function SetRotateLeft(const AText: string): string;
 var
   Lit: TStringList;
@@ -1581,7 +1467,6 @@ begin
     Result := '';
   Lit.Free;
 end;
-
 procedure SplitSet(AText: string; AList: TStringList);
 var
   P: Integer;
@@ -1619,7 +1504,6 @@ begin
     AText := Trim(AText);
   end;
 end;
-
 function JoinSet(AList: TStringList): string;
 var
   I: Integer;
@@ -1629,7 +1513,6 @@ begin
     Result := Result + AList[I] + ' ';
   Delete(Result, Length(Result), 1);
 end;
-
 function SetPick(const AText: string; AIndex: Integer): string;
 var
   Lit: TStringList;
@@ -1644,7 +1527,6 @@ begin
     Result := '';
   Lit.Free;
 end;
-
 function SetSort(const AText: string): string;
 var
   Lit: TStringList;
@@ -1660,7 +1542,6 @@ begin
     Result := '';
   Lit.Free;
 end;
-
 function SetUnion(const Set1, Set2: string): string;
 var
   Lit1, Lit2, Lit3: TStringList;
@@ -1688,7 +1569,6 @@ begin
   Lit2.Free;
   Lit3.Free;
 end;
-
 function SetIntersect(const Set1, Set2: string): string;
 var
   Lit1, Lit2, Lit3: TStringList;
@@ -1712,7 +1592,6 @@ begin
   Lit2.Free;
   Lit3.Free;
 end;
-
 function SetExclude(const Set1, Set2: string): string;
 var
   Lit1, Lit2: TStringList;
@@ -1737,9 +1616,7 @@ begin
   Lit1.Free;
   Lit2.Free;
 end;
-
 // This function converts a string into a RFC 1630 compliant URL
-
 function URLEncode(const Value: AnsiString): AnsiString;
 var
   I: Integer;
@@ -1759,7 +1636,6 @@ begin
       end;
     end;
 end;
-
 function URLDecode(const Value: AnsiString): AnsiString;
 const
   HexChars: AnsiString = '0123456789ABCDEF';
@@ -1793,9 +1669,7 @@ begin
     Inc(I);
   end;
 end;
-
 {template functions}
-
 function ReplaceFirst(const SourceStr, FindStr, ReplaceStr: string): string;
 var
   P: Integer;
@@ -1805,7 +1679,6 @@ begin
   if P <> 0 then
     Result := Copy(SourceStr, 1, P - 1) + ReplaceStr + Copy(SourceStr, P + Length(FindStr), Length(SourceStr));
 end;
-
 function ReplaceLast(const SourceStr, FindStr, ReplaceStr: string): string;
 var
   P: Integer;
@@ -1815,11 +1688,9 @@ begin
   if P <> 0 then
     Result := Copy(SourceStr, 1, P - 1) + ReplaceStr + Copy(SourceStr, P + Length(FindStr), Length(SourceStr));
 end;
-
 // insert a block template
 // the last occurance of {block:aBlockname}
 // the block template is marked with {begin:aBlockname} and {end:aBlockname}
-
 function InsertLastBlock(var SourceStr: string; BlockStr: string): Boolean;
 var
   // phead: Integer;
@@ -1852,9 +1723,7 @@ begin
   SourceStr := Copy(SourceStr, 1, PBlock - 1) + SBR + Copy(SourceStr, PBlock, Length(SourceStr));
   Result := True;
 end;
-
 // removes all  {begin:somefield} to {end:somefield} from ASource
-
 function RemoveMasterBlocks(const SourceStr: string): string;
 var
   S, Src: string;
@@ -1882,9 +1751,7 @@ begin
   until PB = 0;
   Result := S + Src;
 end;
-
 // removes all {field} entries in a template
-
 function RemoveFields(const SourceStr: string): string;
 var
   Src, S: string;
@@ -1907,9 +1774,7 @@ begin
   until PB = 0;
   Result := S + Src;
 end;
-
 {finds the last occurance}
-
 function PosStrLast(const FindString, SourceString: string): Integer;
 var
   I, L: Integer;
@@ -1930,9 +1795,7 @@ begin
     I := I - L;
   end;
 end;
-
 {finds the last occurance}
-
 function PosTextLast(const FindString, SourceString: string): Integer;
 var
   I, L: Integer;
@@ -1953,7 +1816,6 @@ begin
     I := I - L;
   end;
 end;
-
 procedure DirFiles(const ADir, AMask: string; AFileList: TStringList);
 var
   SR: TSearchRec;
@@ -1966,9 +1828,7 @@ begin
         AFileList.Add(ADir + SR.Name);
   FindClose(SR);
 end;
-
 // parse number returns the last position, starting from 1
-
 function ParseNumber(const S: string): Integer;
 var
   I, E, E2, C: Integer;
@@ -1994,10 +1854,8 @@ begin
   end;
   Result := I;
 end;
-
 // parse a SQL style data string from positions 1,
 // starts and ends with #
-
 function ParseDate(const S: string): Integer;
 var
   P: Integer;
@@ -2014,13 +1872,10 @@ begin
       Result := 0;
     end;
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.

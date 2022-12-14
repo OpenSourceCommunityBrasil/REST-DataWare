@@ -1,6 +1,5 @@
 unit JclBase;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -24,7 +23,6 @@ unit JclBase;
 }
 
 interface
-
 uses
   {$IFDEF HAS_UNITSCOPE}
   {$IFDEF MSWINDOWS}
@@ -37,7 +35,6 @@ uses
   {$ENDIF MSWINDOWS}
   SysUtils;
   {$ENDIF ~HAS_UNITSCOPE}
-
 // Version
 const
   JclVersionMajor   = 2;    // 0=pre-release|beta/1, 2, ...=final
@@ -46,15 +43,12 @@ const
   JclVersionBuild   = 5677; // build number, days since march 1, 2000
   JclVersion = (JclVersionMajor shl 24) or (JclVersionMinor shl 16) or
     (JclVersionRelease shl 15) or (JclVersionBuild shl 0);
-
 // EJclError
 type
   EJclError = class(Exception);
-
 // EJclInternalError
 type
   EJclInternalError = class(EJclError);
-
 // Types
 Type
  {$IFDEF FPC}
@@ -63,7 +57,6 @@ Type
   Float = Single;
  {$ENDIF}
  PFloat = ^Float;
-
 type
   {$IFDEF FPC}
    Largeint = Int64;
@@ -90,30 +83,24 @@ type
    {$ENDIF}
   PPInt64 = ^PInt64;
   PPPAnsiChar = ^PPAnsiChar;
-
 // Int64 support
 procedure I64ToCardinals(I: Int64; out LowPart, HighPart: Cardinal);
 procedure CardinalsToI64(out I: Int64; const LowPart, HighPart: Cardinal);
-
 // Redefinition of TLargeInteger to relieve dependency on Windows.pas
-
 {$IFNDEF FPC}
 type
   PLargeInteger = ^TLargeInteger;
   TLargeInteger = Int64;
 {$ENDIF ~FPC}
-
 {$IFNDEF COMPILER11_UP}
 type
   TBytes = array of Byte;
 {$ENDIF ~COMPILER11_UP}
-
 // Redefinition of PByteArray to avoid range check exceptions.
 type
   TJclByteArray = array [0..MaxInt div SizeOf(Byte) - 1] of Byte;
   PJclByteArray = ^TJclByteArray;
   TJclBytes = Pointer; // under .NET System.pas: TBytes = array of Byte;
-
 // Redefinition of ULARGE_INTEGER to relieve dependency on Windows.pas
 type
   {$IFNDEF FPC}
@@ -131,12 +118,10 @@ type
   {$ENDIF ~FPC}
   TJclULargeInteger = ULARGE_INTEGER;
   PJclULargeInteger = PULARGE_INTEGER;
-
   {$IFNDEF COMPILER16_UP}
   LONG = Longint;
   {$EXTERNALSYM LONG}
   {$ENDIF ~COMPILER16_UP}
-
 // Dynamic Array support
 type
   TDynByteArray          = array of Byte;
@@ -164,7 +149,6 @@ type
   TDynCharArray       = array of Char;
   TDynAnsiCharArray   = array of AnsiChar;
   TDynWideCharArray   = array of WideChar;
-
 // Cross-Platform Compatibility
 const
   // line delimiters for a version of Delphi/C++Builder
@@ -178,12 +162,10 @@ const
   {$IFDEF UNIX}
   NativeLineBreak      = NativeLineFeed;
   {$ENDIF UNIX}
-
   HexPrefixPascal = string('$');
   HexPrefixC      = string('0x');
   HexDigitFmt32   = string('%.8x');
   HexDigitFmt64   = string('%.16x');
-
   HexPrefix       = HexPrefixPascal;
   {$IFDEF FPC}
    {$IFDEF CPU32}
@@ -193,7 +175,7 @@ const
    HexDigitFmt     = HexDigitFmt64;
    {$ENDIF CPU64}
   {$ELSE}
-   {$IFDEF CPUX32}
+   {$IF Defined(CPUX32)}
    HexDigitFmt     = HexDigitFmt32;
    {$ELSEIF CPUX64}
    HexDigitFmt     = HexDigitFmt64;
@@ -202,7 +184,6 @@ const
    {$IFEND}
   {$ENDIF}
   HexFmt = HexPrefix + HexDigitFmt;
-
 const
   BOM_UTF16_LSB: array [0..1] of Byte = ($FF,$FE);
   BOM_UTF16_MSB: array [0..1] of Byte = ($FE,$FF);
@@ -214,7 +195,6 @@ const
 //  BOM_UTF7_3: array [0..3] of Byte = ($2B,$2F,$76,$2B);
 //  BOM_UTF7_4: array [0..3] of Byte = ($2B,$2F,$76,$2F);
 //  BOM_UTF7_5: array [0..3] of Byte = ($2B,$2F,$76,$38,$2D);
-
 type
   // Unicode transformation formats (UTF) data types
   PUTF7 = ^UTF7;
@@ -225,16 +205,13 @@ type
   UTF16 = WideChar;
   PUTF32 = ^UTF32;
   UTF32 = Cardinal;
-
   // UTF conversion schemes (UCS) data types
   PUCS4 = ^UCS4;
   UCS4 = Cardinal;
   PUCS2 = PWideChar;
   UCS2 = WideChar;
-
   TUCS2Array = array of UCS2;
   TUCS4Array = array of UCS4;
-
   // string types
   TUTF8String = AnsiString;
   {$IFDEF SUPPORTS_UNICODE_STRING}
@@ -244,47 +221,37 @@ type
   TUTF16String = WideString;
   TUCS2String = WideString;
   {$ENDIF SUPPORTS_UNICODE_STRING}
-
 var
   AnsiReplacementCharacter: AnsiChar;
-
 const
   UCS4ReplacementCharacter: UCS4 = $0000FFFD;
   MaximumUCS2: UCS4 = $0000FFFF;
   MaximumUTF16: UCS4 = $0010FFFF;
   MaximumUCS4: UCS4 = $7FFFFFFF;
-
   SurrogateHighStart = UCS4($D800);
   SurrogateHighEnd = UCS4($DBFF);
   SurrogateLowStart = UCS4($DC00);
   SurrogateLowEnd = UCS4($DFFF);
-
 // basic set types
 type
   TSetOfAnsiChar = set of AnsiChar;
-
 {$IFNDEF XPLATFORM_RTL}
 procedure RaiseLastOSError;
 {$ENDIF ~XPLATFORM_RTL}
-
 {$IFNDEF RTL230_UP}
 procedure CheckOSError(ErrorCode: Cardinal);
 {$ENDIF RTL230_UP}
-
 procedure MoveChar(const Source: string; FromIndex: SizeInt;
   var Dest: string; ToIndex, Count: SizeInt); overload; // Index: 0..n-1
-
 function AnsiByteArrayStringLen(Data: TBytes): SizeInt;
 function StringToAnsiByteArray(const S: string): TBytes;
 function AnsiByteArrayToString(const Data: TBytes; Count: SizeInt): string;
-
 function BytesOf(const Value: AnsiString): TBytes; overload;
 function BytesOf(const Value: WideString): TBytes; overload;
 function BytesOf(const Value: WideChar): TBytes; overload;
 function BytesOf(const Value: AnsiChar): TBytes; overload;
 function StringOf(const Bytes: array of Byte): AnsiString; overload;
 function StringOf(const Bytes: Pointer; Size: Cardinal): AnsiString; overload;
-
 {$IFNDEF FPC}
 {$IFNDEF COMPILER11_UP}
 type // Definitions for 32 Bit Compilers
@@ -300,12 +267,10 @@ type // Definitions for 32 Bit Compilers
   DWORD_PTR = ULONG_PTR;
   {$EXTERNALSYM DWORD_PTR}
 {$ENDIF ~COMPILER11_UP}
-
 type
   PDWORD_PTR = ^DWORD_PTR;
   {$EXTERNALSYM PDWORD_PTR}
 {$ENDIF ~FPC}
-
 type
   TJclAddr32 = Cardinal;
   {$IFDEF FPC}
@@ -318,7 +283,7 @@ type
    {$ENDIF CPU64}
   {$ELSE}
    TJclAddr64 = Int64;
-   {$IFDEF CPUX32}
+   {$IF Defined(CPUX32)}
     TJclAddr = TJclAddr32;
    {$ELSEIF CPUX64}
     TJclAddr = TJclAddr64;
@@ -327,30 +292,23 @@ type
    {$IFEND}
   {$ENDIF}
   PJclAddr = ^TJclAddr;
-
   EJclAddr64Exception = class(EJclError);
-
 function Addr64ToAddr32(const Value: TJclAddr64): TJclAddr32;
 function Addr32ToAddr64(const Value: TJclAddr32): TJclAddr64;
-
 {$IFDEF FPC}
 type
   HWND = type Windows.HWND;
 {$ENDIF FPC}
-
  {$IFDEF SUPPORTS_GENERICS}
 //DOM-IGNORE-BEGIN
-
 type
   TCompare<T> = function(const Obj1, Obj2: T): Integer;
   TEqualityCompare<T> = function(const Obj1, Obj2: T): Boolean;
   THashConvert<T> = function(const AItem: T): Integer;
-
   IEqualityComparer<T> = interface
     function Equals(A, B: T): Boolean;
     function GetHashCode(Obj: T): Integer;
   end;
-
   TEquatable<T: class> = class(TInterfacedObject, IEquatable<T>, IEqualityComparer<T>)
   public
     { IEquatable<T> }
@@ -362,23 +320,19 @@ type
     function GetHashCode2(Obj: T): Integer;
     function IEqualityComparer<T>.GetHashCode = GetHashCode2;
   end;
-
 //DOM-IGNORE-END
 {$ENDIF SUPPORTS_GENERICS}
-
 const
   {$IFDEF SUPPORTS_UNICODE}
   AWSuffix = 'W';
   {$ELSE ~SUPPORTS_UNICODE}
   AWSuffix = 'A';
   {$ENDIF ~SUPPORTS_UNICODE}
-
 {$IFDEF FPC}
 // FPC emits a lot of warning because the first parameter of its internal
 // GetMem is a var parameter, which is not initialized before the call to GetMem
 procedure GetMem(out P; Size: Longint);
 {$ENDIF FPC}
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -390,18 +344,14 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   JclResources;
-
 procedure MoveChar(const Source: string; FromIndex: SizeInt;
   var Dest: string; ToIndex, Count: SizeInt);
 begin
   Move(Source[FromIndex + 1], Dest[ToIndex + 1], Count * SizeOf(Char));
 end;
-
 function AnsiByteArrayStringLen(Data: TBytes): SizeInt;
 var
   I: SizeInt;
@@ -414,7 +364,6 @@ begin
       Break;
     end;
 end;
-
 function StringToAnsiByteArray(const S: string): TBytes;
 var
   I: SizeInt;
@@ -425,7 +374,6 @@ begin
   for I := 0 to High(Result) do
     Result[I] := Byte(AnsiS[I + 1]);
 end;
-
 function AnsiByteArrayToString(const Data: TBytes; Count: SizeInt): string;
 var
   I: SizeInt;
@@ -438,14 +386,12 @@ begin
     AnsiS[I + 1] := AnsiChar(Data[I]);
   Result := string(AnsiS); // convert to System.String
 end;
-
 function BytesOf(const Value: AnsiString): TBytes;
 begin
   SetLength(Result, Length(Value));
   if Value <> '' then
     Move(Pointer(Value)^, Result[0], Length(Value));
 end;
-
 function BytesOf(const Value: WideString): TBytes;
 begin
   if Value <> '' then
@@ -453,18 +399,15 @@ begin
   else
     SetLength(Result, 0);
 end;
-
 function BytesOf(const Value: WideChar): TBytes;
 begin
   Result := JclBase.BytesOf(WideString(Value));
 end;
-
 function BytesOf(const Value: AnsiChar): TBytes;
 begin
   SetLength(Result, 1);
   Result[0] := Byte(Value);
 end;
-
 function StringOf(const Bytes: array of Byte): AnsiString;
 begin
   if Length(Bytes) > 0 then
@@ -475,7 +418,6 @@ begin
   else
     Result := '';
 end;
-
 function StringOf(const Bytes: Pointer; Size: Cardinal): AnsiString;
 begin
   if (Bytes <> nil) and (Size > 0) then
@@ -486,30 +428,24 @@ begin
   else
     Result := '';
 end;
-
 // Int64 support
-
 procedure I64ToCardinals(I: Int64; out LowPart, HighPart: Cardinal);
 begin
   LowPart := TJclULargeInteger(I).LowPart;
   HighPart := TJclULargeInteger(I).HighPart;
 end;
-
 procedure CardinalsToI64(out I: Int64; const LowPart, HighPart: Cardinal);
 begin
   TJclULargeInteger(I).LowPart := LowPart;
   TJclULargeInteger(I).HighPart := HighPart;
 end;
-
 // Cross Platform Compatibility
-
 {$IFNDEF XPLATFORM_RTL}
 procedure RaiseLastOSError;
 begin
   RaiseLastWin32Error;
 end;
 {$ENDIF ~XPLATFORM_RTL}
-
 {$IFNDEF RTL230_UP}
 procedure CheckOSError(ErrorCode: Cardinal);
 begin
@@ -521,9 +457,7 @@ begin
     {$ENDIF ~RTL170_UP}
 end;
 {$ENDIF RTL230_UP}
-
 {$OVERFLOWCHECKS OFF}
-
 function Addr64ToAddr32(const Value: TJclAddr64): TJclAddr32;
 begin
   if (Value shr 32) = 0 then
@@ -531,21 +465,16 @@ begin
   else
     raise EJclAddr64Exception.CreateResFmt(@RsCantConvertAddr64, [HexPrefix, Value]);
 end;
-
 function Addr32ToAddr64(const Value: TJclAddr32): TJclAddr64;
 begin
   Result := Value;
 end;
-
 {$IFDEF OVERFLOWCHECKS_ON}
 {$OVERFLOWCHECKS ON}
 {$ENDIF OVERFLOWCHECKS_ON}
-
 {$IFDEF SUPPORTS_GENERICS}
 //DOM-IGNORE-BEGIN
-
 //=== { TEquatable<T> } ======================================================
-
 function TEquatable<T>.TestEquals(Other: T): Boolean;
 begin
   if Other = nil then
@@ -553,7 +482,6 @@ begin
   else
     Result := GetHashCode = Other.GetHashCode;
 end;
-
 function TEquatable<T>.TestEquals(A, B: T): Boolean;
 begin
   if A = nil then
@@ -564,7 +492,6 @@ begin
   else
     Result := A.GetHashCode = B.GetHashCode;
 end;
-
 function TEquatable<T>.GetHashCode2(Obj: T): Integer;
 begin
   if Obj = nil then
@@ -572,10 +499,8 @@ begin
   else
     Result := Obj.GetHashCode;
 end;
-
 //DOM-IGNORE-END
 {$ENDIF SUPPORTS_GENERICS}
-
 procedure LoadAnsiReplacementCharacter;
 {$IFDEF MSWINDOWS}
 var
@@ -592,7 +517,6 @@ begin
   AnsiReplacementCharacter := '?';
 end;
 {$ENDIF ~MSWINDOWS}
-
 {$IFDEF FPC}
 // FPC emits a lot of warning because the first parameter of its internal
 // GetMem is a var parameter, which is not initialized before the call to GetMem
@@ -602,17 +526,13 @@ begin
   GetMem(Pointer(P), Size);
 end;
 {$ENDIF FPC}
-
 initialization
-
   LoadAnsiReplacementCharacter;
   {$IFDEF UNITVERSIONING}
   RegisterUnitVersion(HInstance, UnitVersioning);
   {$ENDIF UNITVERSIONING}
-
 finalization
   {$IFDEF UNITVERSIONING}
   UnregisterUnitVersion(HInstance);
   {$ENDIF UNITVERSIONING}
-
 end.

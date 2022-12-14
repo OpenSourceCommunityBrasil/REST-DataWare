@@ -1,7 +1,6 @@
 unit JclWideStrings;
 
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -23,8 +22,12 @@ unit JclWideStrings;
  Roniery                    - Devel.
 }
 
-interface
+{$IFDEF FPC}
+ {$MODE Delphi}
+ {$ASMMode Intel}
+{$ENDIF}
 
+interface
 uses
   {$IFDEF UNITVERSIONING}
   JclUnitVersioning,
@@ -35,11 +38,9 @@ uses
   Classes, SysUtils,
   {$ENDIF ~HAS_UNITSCOPE}
   JclBase;
-
 // Exceptions
 type
   EJclWideStringError = class(EJclError);
-
 const
   // definitions of often used characters:
   // Note: Use them only for tests of a certain character not to determine character
@@ -49,7 +50,6 @@ const
   WideNull               = WideChar(#0);
   WideTabulator          = WideChar(#9);
   WideSpace              = WideChar(#32);
-
   // logical line breaks
   WideLF                 = WideChar(#10);
   WideLineFeed           = WideChar(#10);
@@ -60,30 +60,25 @@ const
   WideCRLF               = WideString(#13#10);
   WideLineSeparator      = WideChar($2028);
   WideParagraphSeparator = WideChar($2029);
-
   {$IFDEF MSWINDOWS}
   WideLineBreak = WideCRLF;
   {$ENDIF MSWINDOWS}
   {$IFDEF UNIX}
   WideLineBreak = WideLineFeed;
   {$ENDIF UNIX}
-
   BOM_LSB_FIRST = WideChar($FEFF);
   BOM_MSB_FIRST = WideChar($FFFE);
-
 type
   {$IFDEF SUPPORTS_UNICODE}
   TJclWideStrings = {$IFDEF HAS_UNITSCOPE}System.{$ENDIF}Classes.TStrings;
   TJclWideStringList = {$IFDEF HAS_UNITSCOPE}System.{$ENDIF}Classes.TStringList;
   {$ELSE ~SUPPORTS_UNICODE}
-
   TWideFileOptionsType =
    (
     foAnsiFile,  // loads/writes an ANSI file
     foUnicodeLB  // reads/writes BOM_LSB_FIRST/BOM_MSB_FIRST
    );
   TWideFileOptions = set of TWideFileOptionsType;
-
   TSearchFlag = (
     sfCaseSensitive,    // match letter case
     sfIgnoreNonSpacing, // ignore non-spacing characters in search
@@ -92,12 +87,9 @@ type
     sfWholeWordOnly     // match only text at end/start and/or surrounded by white spaces
   );
   TSearchFlags = set of TSearchFlag;
-
   TJclWideStrings = class;
   TJclWideStringList = class;
-
   TJclWideStringListSortCompare = function(List: TJclWideStringList; Index1, Index2: Integer): Integer;
-
   TJclWideStrings = class(TPersistent)
   private
     FDelimiter: WideChar;
@@ -185,14 +177,12 @@ type
     property Strings[Index: Integer]: WideString read Get write Put; default;
     property Text: WideString read GetTextStr write SetTextStr;
   end;
-
   // do not replace by JclUnicode.TWideStringList (speed and size issue)
   PWStringItem = ^TWStringItem;
   TWStringItem = record
     FString: WideString;
     FObject: TObject;
   end;
-
   TJclWideStringList = class(TJclWideStrings)
   private
     FList: TList;
@@ -237,24 +227,18 @@ type
     property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
   end;
   {$ENDIF ~SUPPORTS_UNICODE}
-
   TWideStringList = TJclWideStringList;
   TWideStrings = TJclWideStrings;
-
   TJclUnicodeStringList = TJclWideStringList;
   TJclUnicodeStrings = TJclWideStrings;
-
   // OF deprecated?
   TWStringList = TJclWideStringList;
   TWStrings = TJclWideStrings;
-
 // WideChar functions
 function CharToWideChar(Ch: AnsiChar): WideChar;
 function WideCharToChar(Ch: WideChar): AnsiChar;
-
 // PWideChar functions
 procedure MoveWideChar(const Source; var Dest; Count: SizeInt);
-
 function StrLenW(const Str: PWideChar): SizeInt;
 function StrEndW(const Str: PWideChar): PWideChar;
 function StrMoveW(Dest: PWideChar; const Source: PWideChar; Count: SizeInt): PWideChar;
@@ -285,7 +269,6 @@ function StrNewW(const Str: WideString): PWideChar; overload;
 procedure StrDisposeW(Str: PWideChar);
 procedure StrDisposeAndNilW(var Str: PWideChar);
 procedure StrSwapByteOrder(Str: PWideChar);
-
 // WideString functions
 function WidePos(const SubStr, S: WideString): SizeInt;
 function WideQuotedStr(const S: WideString; Quote: WideChar): WideString;
@@ -299,26 +282,21 @@ function TrimLeftW(const S: WideString): WideString;
 function TrimRightW(const S: WideString): WideString;
 function WideReverse(const AText: Widestring): Widestring;
 procedure WideReverseInPlace(var S: WideString);
-
 function TrimLeftLengthW(const S: WideString): SizeInt;
 function TrimRightLengthW(const S: WideString): SizeInt;
-
 {$IFNDEF FPC}
 function WideStartsText(const SubStr, S: WideString): Boolean;
 function WideStartsStr(const SubStr, S: WideString): Boolean;
 {$ENDIF ~FPC}
-
 // MultiSz Routines
 type
   PWideMultiSz = PWideChar;
-
 function StringsToMultiSz(var Dest: PWideMultiSz; const Source: TJclWideStrings): PWideMultiSz;
 procedure MultiSzToStrings(const Dest: TJclWideStrings; const Source: PWideMultiSz);
 function MultiSzLength(const Source: PWideMultiSz): SizeInt;
 procedure AllocateMultiSz(var Dest: PWideMultiSz; Len: SizeInt);
 procedure FreeMultiSz(var Dest: PWideMultiSz);
 function MultiSzDup(const Source: PWideMultiSz): PWideMultiSz;
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -330,9 +308,7 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   {$IFDEF HAS_UNITSCOPE}
   {$IFDEF HAS_UNIT_RTLCONSTS}
@@ -353,7 +329,6 @@ uses
   {$ENDIF ~HAS_UNITSCOPE}
   JclUnicode,
   JclResources;
-
 procedure SwapWordByteOrder(P: PWideChar; Len: SizeInt);
 begin
   while Len > 0 do
@@ -363,9 +338,7 @@ begin
     Inc(P);
   end;
 end;
-
 //=== WideChar functions =====================================================
-
 function CharToWideChar(Ch: AnsiChar): WideChar;
 var
   WS: WideString;
@@ -373,7 +346,6 @@ begin
   WS := WideChar(Ch);
   Result := WS[1];
 end;
-
 function WideCharToChar(Ch: WideChar): AnsiChar;
 var
   S: WideString;
@@ -381,14 +353,11 @@ begin
   S := Ch;
   Result := AnsiChar(S[1]);
 end;
-
 //=== PWideChar functions ====================================================
-
 procedure MoveWideChar(const Source; var Dest; Count: SizeInt);
 begin
   Move(Source, Dest, Count * SizeOf(WideChar));
 end;
-
 function StrAllocW(WideSize: SizeInt): PWideChar;
 begin
   WideSize := SizeOf(WideChar) * WideSize + SizeOf(SizeInt);
@@ -396,7 +365,6 @@ begin
   SizeInt(Pointer(Result)^) := WideSize;
   Inc(Result, SizeOf(SizeInt) div SizeOf(WideChar));
 end;
-
 function StrNewW(const Str: PWideChar): PWideChar;
 // Duplicates the given string (if not nil) and returns the address of the new string.
 var
@@ -410,12 +378,10 @@ begin
     Result := StrMoveW(StrAllocW(Size), Str, Size);
   end;
 end;
-
 function StrNewW(const Str: WideString): PWideChar;
 begin
   Result := StrNewW(PWideChar(Str));
 end;
-
 procedure StrDisposeW(Str: PWideChar);
 // releases a string allocated with StrNewW or StrAllocW
 begin
@@ -425,7 +391,6 @@ begin
     FreeMem(Str);
   end;
 end;
-
 procedure StrDisposeAndNilW(var Str: PWideChar);
 var
   Buff: PWideChar;
@@ -434,7 +399,6 @@ begin
   Str := nil;
   StrDisposeW(Buff);
 end;
-
 const
   // data used to bring UTF-16 coded strings into correct UTF-32 order for correct comparation
   UTF16Fixup: array [0..31] of Word = (
@@ -442,7 +406,6 @@ const
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     $2000, $F800, $F800, $F800, $F800
   );
-
 function StrCompW(const Str1, Str2: PWideChar): SizeInt;
 // Binary comparation of Str1 and Str2 with surrogate fix-up.
 // Returns < 0 if Str1 is smaller in binary order than Str2, = 0 if both strings are
@@ -462,7 +425,6 @@ begin
     C1 := Word(C1 or UTF16Fixup[C1 shr 11]);
     C2 := Word(Run2^);
     C2 := Word(C2 or UTF16Fixup[C2 shr 11]);
-
     // now C1 and C2 are in UTF-32-compatible order
     Result := SizeInt(C1) - SizeInt(C2);
     if(Result <> 0) or (C1 = 0) or (C2 = 0) then
@@ -470,13 +432,11 @@ begin
     Inc(Run1);
     Inc(Run2);
   until False;
-
   // If the strings have different lengths but the comparation returned equity so far
   // then adjust the result so that the longer string is marked as the larger one.
   if Result = 0 then
     Result := (Run1 - Str1) - (Run2 - Str2);
 end;
-
 function StrLCompW(const Str1, Str2: PWideChar; MaxLen: SizeInt): SizeInt;
 // compares strings up to MaxLen code points
 // see also StrCompW
@@ -493,7 +453,6 @@ begin
       C1 := Word(C1 or UTF16Fixup[C1 shr 11]);
       C2 := Word(S2^);
       C2 := Word(C2 or UTF16Fixup[C2 shr 11]);
-
       // now C1 and C2 are in UTF-32-compatible order
       { TODO : surrogates take up 2 words and are counted twice here, count them only once }
       Result := SizeInt(C1) - SizeInt(C2);
@@ -507,7 +466,6 @@ begin
   else
     Result := 0;
 end;
-
 function StrICompW(const Str1, Str2: PWideChar): SizeInt;
 // Compares Str1 to Str2 without case sensitivity.
 // See also comments in StrCompW, but keep in mind that case folding might result in
@@ -533,14 +491,12 @@ begin
     Folded1 := Folded1 + WideCaseFolding(S1^);
     Inc(S1);
   end;
-
   Folded2 := '';
   while S2^ <> #0 do
   begin
     Folded2 := Folded2 + WideCaseFolding(S2^);
     Inc(S2);
   end;
-
   Run1 := PWideChar(Folded1);
   Run2 := PWideChar(Folded2);
   repeat
@@ -548,7 +504,6 @@ begin
     C1 := Word(C1 or UTF16Fixup[C1 shr 11]);
     C2 := Word(Run2^);
     C2 := Word(C2 or UTF16Fixup[C2 shr 11]);
-
     // now C1 and C2 are in UTF-32-compatible order
     Result := SizeInt(C1) - SizeInt(C2);
     if(Result <> 0) or (C1 = 0) or (C2 = 0) then
@@ -556,14 +511,12 @@ begin
     Inc(Run1);
     Inc(Run2);
   until False;
-
   // If the strings have different lengths but the comparation returned equity so far
   // then adjust the result so that the longer string is marked as the larger one.
   if Result = 0 then
     Result := (Run1 - PWideChar(Folded1)) - (Run2 - PWideChar(Folded2));
 end;
 {$ENDIF ~UNICODE_RTL_DATABASE}
-
 function StrLICompW(const Str1, Str2: PWideChar; MaxLen: SizeInt): SizeInt;
 // compares strings up to MaxLen code points
 // see also StrICompW
@@ -590,23 +543,19 @@ begin
       Folded1 := Folded1 + WideCaseFolding(S1^);
       Inc(S1);
     end;
-
     Folded2 := '';
     while S2^ <> #0 do
     begin
       Folded2 := Folded2 + WideCaseFolding(S2^);
       Inc(S2);
     end;
-
     Run1 := PWideChar(Folded1);
     Run2 := PWideChar(Folded2);
-
     repeat
       C1 := Word(Run1^);
       C1 := Word(C1 or UTF16Fixup[C1 shr 11]);
       C2 := Word(Run2^);
       C2 := Word(C2 or UTF16Fixup[C2 shr 11]);
-
       // now C1 and C2 are in UTF-32-compatible order
       { TODO : surrogates take up 2 words and are counted twice here, count them only once }
       Result := SizeInt(C1) - SizeInt(C2);
@@ -621,7 +570,6 @@ begin
     Result := 0;
 end;
 {$ENDIF UNICODE_RTL_DATABASE}
-
 function StrLICompW2(const Str1, Str2: PWideChar; MaxLen: SizeInt): SizeInt;
 var
   P1, P2: WideString;
@@ -631,7 +579,6 @@ begin
   SetString(P2, Str2, Min(MaxLen, StrLenW(Str2)));
   Result := WideCompareText(P1, P2);
 end;
-
 function StrPosW(const Str, SubStr: PWideChar): PWideChar;
 var
   P: PWideChar;
@@ -662,7 +609,6 @@ begin
   end;
   Result := nil;
 end;
-
 function StrLenW(const Str: PWideChar): SizeInt;
 begin
   Result := 0;
@@ -670,7 +616,6 @@ begin
     while Str[Result] <> #0 do
       Inc(Result);
 end;
-
 function StrScanW(const Str: PWideChar; Ch: WideChar): PWideChar;
 begin
   Result := Str;
@@ -682,7 +627,6 @@ begin
       Result := nil;
   end;
 end;
-
 function StrEndW(const Str: PWideChar): PWideChar;
 begin
   Result := Str;
@@ -690,7 +634,6 @@ begin
     while Result^ <> #0 do
       Inc(Result);
 end;
-
 function StrCopyW(Dest: PWideChar; const Source: PWideChar): PWideChar;
 var
   Src: PWideChar;
@@ -709,7 +652,6 @@ begin
     Dest^ := #0;
   end;
 end;
-
 function StrECopyW(Dest: PWideChar; const Source: PWideChar): PWideChar;
 var
   Src: PWideChar;
@@ -728,7 +670,6 @@ begin
   end;
   Result := Dest;
 end;
-
 function StrLCopyW(Dest: PWideChar; const Source: PWideChar; MaxLen: SizeInt): PWideChar;
 var
   Src: PWideChar;
@@ -748,36 +689,30 @@ begin
     Dest^ := #0;
   end;
 end;
-
 function StrCatW(Dest: PWideChar; const Source: PWideChar): PWideChar;
 begin
   Result := Dest;
   StrCopyW(StrEndW(Dest), Source);
 end;
-
 function StrLCatW(Dest: PWideChar; const Source: PWideChar; MaxLen: SizeInt): PWideChar;
 begin
   Result := Dest;
   StrLCopyW(StrEndW(Dest), Source, MaxLen);
 end;
-
 function StrMoveW(Dest: PWideChar; const Source: PWideChar; Count: SizeInt): PWideChar;
 begin
   Result := Dest;
   if Count > 0 then
     Move(Source^, Dest^, Count * SizeOf(WideChar));
 end;
-
 function StrPCopyWW(Dest: PWideChar; const Source: WideString): PWideChar;
 begin
   Result := StrLCopyW(Dest, PWideChar(Source), Length(Source));
 end;
-
 function StrPLCopyWW(Dest: PWideChar; const Source: WideString; MaxLen: SizeInt): PWideChar;
 begin
   Result := StrLCopyW(Dest, PWideChar(Source), MaxLen);
 end;
-
 function StrRScanW(const Str: PWideChar; Chr: WideChar): PWideChar;
 var
   P: PWideChar;
@@ -793,14 +728,11 @@ begin
     until P^ = #0;
   end;
 end;
-
 // (rom) following functions copied from JclUnicode.pas
-
 // exchanges in each character of the given string the low order and high order
 // byte to go from LSB to MSB and vice versa.
 // EAX/RAX contains address of string
 // stop at the first #0 character
-
 procedure StrSwapByteOrder(Str: PWideChar);
 asm
        {$IFDEF CPU32}
@@ -835,7 +767,6 @@ asm
 @@2:
        {$ENDIF CPU64}
 end;
-
 function StrNScanW(const Str1, Str2: PWideChar): SizeInt;
 // Determines where (in Str1) the first time one of the characters of Str2 appear.
 // The result is the length of a string part of Str1 where none of the characters of
@@ -856,7 +787,6 @@ begin
     Result := Run - Str1;
   end;
 end;
-
 function StrRNScanW(const Str1, Str2: PWideChar): SizeInt;
 // This function does the same as StrRNScanW but uses Str1 in reverse order. This
 // means Str1 points to the last character of a string, is traversed reversely
@@ -878,7 +808,6 @@ begin
     Result := Str1 - Run;
   end;
 end;
-
 // Returns a pointer to first occurrence of a specified character in a string
 // or nil if not found.
 // Note: this is just a binary search for the specified character and there's no
@@ -896,7 +825,6 @@ begin
   end;
   Result := nil;
 end;
-
 function StrBufSizeW(const Str: PWideChar): SizeInt;
 // Returns max number of wide characters that can be stored in a buffer
 // allocated by StrAllocW.
@@ -912,14 +840,12 @@ begin
   else
     Result := 0;
 end;
-
 function StrPCopyW(Dest: PWideChar; const Source: AnsiString): PWideChar;
 // copies a Pascal-style string to a null-terminated wide string
 begin
   Result := StrPLCopyW(Dest, Source, SizeInt(Length(Source)));
   Result[Length(Source)] := WideNull;
 end;
-
 function StrPLCopyW(Dest: PWideChar; const Source: AnsiString; MaxLen: SizeInt): PWideChar;
 // copies characters from a Pascal-style string into a null-terminated wide string
 var
@@ -935,9 +861,7 @@ begin
   end;
   Result := Dest;
 end;
-
 //=== WideString functions ===================================================
-
 function WidePos(const SubStr, S: WideString): SizeInt;
 var
   P: PWideChar;
@@ -948,9 +872,7 @@ begin
   else
     Result := 0;
 end;
-
 // original code by Mike Lischke (extracted from JclUnicode.pas)
-
 function WideQuotedStr(const S: WideString; Quote: WideChar): WideString;
 var
   P, Src,
@@ -965,7 +887,6 @@ begin
     Inc(AddCount);
     P := StrScanW(P, Quote);
   end;
-
   if AddCount = 0 then
     Result := Quote + S + Quote
   else
@@ -991,9 +912,7 @@ begin
     Dest^ := Quote;
   end;
 end;
-
 // original code by Mike Lischke (extracted from JclUnicode.pas)
-
 function WideExtractQuotedStr(var Src: PWideChar; Quote: WideChar): WideString;
 var
   P, Dest: PWideChar;
@@ -1002,7 +921,6 @@ begin
   Result := '';
   if (Src = nil) or (Src^ <> Quote) then
     Exit;
-
   Inc(Src);
   DropCount := 1;
   P := Src;
@@ -1016,12 +934,10 @@ begin
     Inc(DropCount);
     Src := StrScanW(Src, Quote);
   end;
-
   if Src = nil then
     Src := StrEndW(P);
   if (Src - P) <= 1 then
     Exit;
-
   if DropCount = 1 then
     SetString(Result, P, Src - P - 1)
   else
@@ -1045,7 +961,6 @@ begin
     MoveWideChar(P^, Dest^, Src - P - 1);
   end;
 end;
-
 
 function TrimW(const S: WideString): WideString;
 // available from Delphi 7 up
@@ -1071,7 +986,6 @@ begin
   end;
 end;
 {$ENDIF ~RTL150_UP}
-
 function TrimLeftW(const S: WideString): WideString;
 // available from Delphi 7 up
 {$IFDEF RTL150_UP}
@@ -1089,7 +1003,6 @@ begin
   Result := Copy(S, I, Maxint);
 end;
 {$ENDIF ~RTL150_UP}
-
 function TrimRightW(const S: WideString): WideString;
 // available from Delphi 7 up
 {$IFDEF RTL150_UP}
@@ -1106,13 +1019,11 @@ begin
   Result := Copy(S, 1, I);
 end;
 {$ENDIF ~RTL150_UP}
-
 function WideReverse(const AText: Widestring): Widestring;
 begin
   Result := AText;
   WideReverseInPlace(Result);
 end;
-
 procedure WideReverseInPlace(var S: WideString);
 var
   P1, P2: PWideChar;
@@ -1130,7 +1041,6 @@ begin
     Dec(P2);
   end;
 end;
-
 function WideCompareText(const S1, S2: WideString): SizeInt;
 begin
   {$IFDEF MSWINDOWS}
@@ -1144,7 +1054,6 @@ begin
   Result := CompareText(S1, S2);
   {$ENDIF MSWINDOWS}
 end;
-
 function WideCompareStr(const S1, S2: WideString): SizeInt;
 begin
   {$IFDEF MSWINDOWS}
@@ -1162,7 +1071,6 @@ begin
     {$ENDIF ~FPC}
   {$ENDIF ~MSWINDOWS}
 end;
-
 function WideUpperCase(const S: WideString): WideString;
 begin
   Result := S;
@@ -1174,7 +1082,6 @@ begin
     Result := UpperCase(Result);
     {$ENDIF ~MSWINDOWS}
 end;
-
 function WideLowerCase(const S: WideString): WideString;
 begin
   Result := S;
@@ -1186,7 +1093,6 @@ begin
     Result := LowerCase(Result);
     {$ENDIF ~MSWINDOWS}
 end;
-
 function TrimLeftLengthW(const S: WideString): SizeInt;
 var
   Len: SizeInt;
@@ -1197,16 +1103,13 @@ begin
     Inc(Result);
   Result := Len - Result + 1;
 end;
-
 function TrimRightLengthW(const S: WideString): SizeInt;
 begin
   Result := Length(S);
   while (Result > 0) and (S[Result] <= #32) do
     Dec(Result);
 end;
-
 {$IFNDEF FPC}
-
 function WideStartsText(const SubStr, S: WideString): Boolean;
 var
   Len: SizeInt;
@@ -1214,7 +1117,6 @@ begin
   Len := Length(SubStr);
   Result := (Len <= Length(S)) and (StrLICompW(PWideChar(SubStr), PWideChar(S), Len) = 0);
 end;
-
 function WideStartsStr(const SubStr, S: WideString): Boolean;
 var
   Len: SizeInt;
@@ -1222,12 +1124,9 @@ begin
   Len := Length(SubStr);
   Result := (Len <= Length(S)) and (StrLCompW(PWideChar(SubStr), PWideChar(S), Len) = 0);
 end;
-
 {$ENDIF ~FPC}
-
 {$IFNDEF SUPPORTS_UNICODE}
 //=== { TJclWideStrings } ==========================================================
-
 constructor TJclWideStrings.Create;
 begin
   inherited Create;
@@ -1242,18 +1141,15 @@ begin
   FDelimiter := ',';
   FQuoteChar := '"';
 end;
-
 function TJclWideStrings.Add(const S: WideString): Integer;
 begin
   Result := AddObject(S, nil);
 end;
-
 function TJclWideStrings.AddObject(const S: WideString; AObject: TObject): Integer;
 begin
   Result := Count;
   InsertObject(Result, S, AObject);
 end;
-
 procedure TJclWideStrings.AddStrings(Strings: TJclWideStrings);
 var
   I: Integer;
@@ -1261,7 +1157,6 @@ begin
   for I := 0 to Strings.Count - 1 do
     AddObject(Strings.GetP(I)^, Strings.Objects[I]);
 end;
-
 procedure TJclWideStrings.AddStrings(Strings: TStrings);
 var
   I: Integer;
@@ -1269,7 +1164,6 @@ begin
   for I := 0 to Strings.Count - 1 do
     AddObject(Strings.Strings[I], Strings.Objects[I]);
 end;
-
 procedure TJclWideStrings.AddStringsTo(Dest: TStrings);
 var
   I: Integer;
@@ -1277,12 +1171,10 @@ begin
   for I := 0 to Count - 1 do
     Dest.AddObject(GetP(I)^, Objects[I]);
 end;
-
 procedure TJclWideStrings.Append(const S: WideString);
 begin
   Add(S);
 end;
-
 procedure TJclWideStrings.Assign(Source: TPersistent);
 begin
   if Source is TJclWideStrings then
@@ -1323,7 +1215,6 @@ begin
   else
     inherited Assign(Source);
 end;
-
 procedure TJclWideStrings.AssignTo(Dest: TPersistent);
 var
   I: Integer;
@@ -1353,19 +1244,16 @@ begin
   else
     inherited AssignTo(Dest);
 end;
-
 procedure TJclWideStrings.BeginUpdate;
 begin
   if FUpdateCount = 0 then
     SetUpdateState(True);
   Inc(FUpdateCount);
 end;
-
 function TJclWideStrings.CompareStrings(const S1, S2: WideString): Integer;
 begin
   Result := WideCompareText(S1, S2);
 end;
-
 function TJclWideStrings.CreateAnsiStringList: TStrings;
 var
   I: Integer;
@@ -1381,9 +1269,7 @@ begin
     raise;
   end;
 end;
-
 procedure TJclWideStrings.DefineProperties(Filer: TFiler);
-
   function DoWrite: Boolean;
   begin
     if Filer.Ancestor <> nil then
@@ -1395,18 +1281,15 @@ procedure TJclWideStrings.DefineProperties(Filer: TFiler);
     else
       Result := Count > 0;
   end;
-
 begin
   Filer.DefineProperty('Strings', ReadData, WriteData, DoWrite);
 end;
-
 procedure TJclWideStrings.EndUpdate;
 begin
   Dec(FUpdateCount);
   if FUpdateCount = 0 then
     SetUpdateState(False);
 end;
-
 function TJclWideStrings.Equals(Strings: TStrings): Boolean;
 var
   I: Integer;
@@ -1420,7 +1303,6 @@ begin
     Result := True;
   end;
 end;
-
 function TJclWideStrings.Equals(Strings: TJclWideStrings): Boolean;
 var
   I: Integer;
@@ -1434,7 +1316,6 @@ begin
     Result := True;
   end;
 end;
-
 procedure TJclWideStrings.Exchange(Index1, Index2: Integer);
 var
   TempObject: TObject;
@@ -1452,7 +1333,6 @@ begin
     EndUpdate;
   end;
 end;
-
 function TJclWideStrings.ExtractName(const S: WideString): WideString;
 var
   Index: Integer;
@@ -1464,27 +1344,22 @@ begin
   else
     SetLength(Result, 0);
 end;
-
 function TJclWideStrings.Get(Index: Integer): WideString;
 begin
   Result := GetP(Index)^;
 end;
-
 function TJclWideStrings.GetCapacity: Integer;
 begin
   Result := Count;
 end;
-
 function TJclWideStrings.GetCommaText: WideString;
 begin
   Result := GetDelimitedTextEx(',', '"');
 end;
-
 function TJclWideStrings.GetDelimitedText: WideString;
 begin
   Result := GetDelimitedTextEx(FDelimiter, FQuoteChar);
 end;
-
 function TJclWideStrings.GetDelimitedTextEx(ADelimiter, AQuoteChar: WideChar): WideString;
 var
   S: WideString;
@@ -1520,7 +1395,6 @@ begin
     System.Delete(Result, Length(Result), 1);
   end;
 end;
-
 function TJclWideStrings.GetName(Index: Integer): WideString;
 var
   I: Integer;
@@ -1530,17 +1404,14 @@ begin
   if I > 0 then
     SetLength(Result, I - 1);
 end;
-
 function TJclWideStrings.GetObject(Index: Integer): TObject;
 begin
   Result := nil;
 end;
-
 function TJclWideStrings.GetText: PWideChar;
 begin
   Result := StrNewW(GetTextStr);
 end;
-
 function TJclWideStrings.GetTextStr: WideString;
 var
   I: Integer;
@@ -1570,7 +1441,6 @@ begin
     end;
   end;
 end;
-
 function TJclWideStrings.GetValue(const Name: WideString): WideString;
 var
   Idx: Integer;
@@ -1581,7 +1451,6 @@ begin
   else
     Result := '';
 end;
-
 function TJclWideStrings.GetValueFromIndex(Index: Integer): WideString;
 var
   I: Integer;
@@ -1593,7 +1462,6 @@ begin
   else
     Result := '';
 end;
-
 function TJclWideStrings.IndexOf(const S: WideString): Integer;
 begin
   for Result := 0 to Count - 1 do
@@ -1601,7 +1469,6 @@ begin
       Exit;
   Result := -1;
 end;
-
 function TJclWideStrings.IndexOfName(const Name: WideString): Integer;
 begin
   for Result := 0 to Count - 1 do
@@ -1609,7 +1476,6 @@ begin
       Exit;
   Result := -1;
 end;
-
 function TJclWideStrings.IndexOfObject(AObject: TObject): Integer;
 begin
   for Result := 0 to Count - 1 do
@@ -1617,16 +1483,13 @@ begin
       Exit;
   Result := -1;
 end;
-
 procedure TJclWideStrings.Insert(Index: Integer; const S: WideString);
 begin
   InsertObject(Index, S, nil);
 end;
-
 procedure TJclWideStrings.InsertObject(Index: Integer; const S: WideString; AObject: TObject);
 begin
 end;
-
 procedure TJclWideStrings.LoadFromFile(const FileName: TFileName;
   WideFileOptions: TWideFileOptions = []);
 var
@@ -1639,7 +1502,6 @@ begin
     Stream.Free;
   end;
 end;
-
 procedure TJclWideStrings.LoadFromStream(Stream: TStream;
   WideFileOptions: TWideFileOptions = []);
 var
@@ -1673,7 +1535,6 @@ begin
     EndUpdate;
   end;
 end;
-
 procedure TJclWideStrings.Move(CurIndex, NewIndex: Integer);
 var
   TempObject: TObject;
@@ -1692,7 +1553,6 @@ begin
     end;
   end;
 end;
-
 procedure TJclWideStrings.ReadData(Reader: TReader);
 begin
   BeginUpdate;
@@ -1709,7 +1569,6 @@ begin
     EndUpdate;
   end;
 end;
-
 procedure TJclWideStrings.SaveToFile(const FileName: TFileName; WideFileOptions: TWideFileOptions = []);
 var
   Stream: TFileStream;
@@ -1721,7 +1580,6 @@ begin
     Stream.Free;
   end;
 end;
-
 procedure TJclWideStrings.SaveToStream(Stream: TStream; WideFileOptions: TWideFileOptions = []);
 var
   AnsiS: AnsiString;
@@ -1744,27 +1602,22 @@ begin
     Stream.Write(WideS[1], Length(WideS) * SizeOf(WideChar));
   end;
 end;
-
 procedure TJclWideStrings.SetCapacity(NewCapacity: Integer);
 begin
 end;
-
 procedure TJclWideStrings.SetCommaText(const Value: WideString);
 begin
   SetDelimitedTextEx(',', '"', Value);
 end;
-
 procedure TJclWideStrings.SetDelimitedText(const Value: WideString);
 begin
   SetDelimitedTextEx(Delimiter, QuoteChar, Value);
 end;
-
 procedure TJclWideStrings.SetDelimitedTextEx(ADelimiter, AQuoteChar: WideChar;
   const Value: WideString);
 var
   P, P1: PWideChar;
   S: WideString;
-
   procedure IgnoreWhiteSpace(var P: PWideChar);
   begin
     while True do
@@ -1775,7 +1628,6 @@ var
         Break;
       end;
   end;
-
 begin
   BeginUpdate;
   try
@@ -1794,7 +1646,6 @@ begin
         SetString(S, P1, P - P1);
       end;
       Add(S);
-
       IgnoreWhiteSpace(P);
       if P[0] = ADelimiter then
       begin
@@ -1806,12 +1657,10 @@ begin
     EndUpdate;
   end;
 end;
-
 procedure TJclWideStrings.SetText(Text: PWideChar);
 begin
   SetTextStr(Text);
 end;
-
 procedure TJclWideStrings.SetTextStr(const Value: WideString);
 var
   P, Start: PWideChar;
@@ -1856,11 +1705,9 @@ begin
     EndUpdate;
   end;
 end;
-
 procedure TJclWideStrings.SetUpdateState(Updating: Boolean);
 begin
 end;
-
 procedure TJclWideStrings.SetValue(const Name, Value: WideString);
 var
   Idx: Integer;
@@ -1872,7 +1719,6 @@ begin
   if Value <> '' then
     Add(Name + NameValueSeparator + Value);
 end;
-
 procedure TJclWideStrings.SetValueFromIndex(Index: Integer; const Value: WideString);
 var
   S: WideString;
@@ -1892,7 +1738,6 @@ begin
     Put(Index, S);
   end;
 end;
-
 procedure TJclWideStrings.WriteData(Writer: TWriter);
 var
   I: Integer;
@@ -1902,15 +1747,12 @@ begin
      Writer.WriteWideString(GetP(I)^);
   Writer.WriteListEnd;
 end;
-
 //=== { TJclWideStringList } =======================================================
-
 constructor TJclWideStringList.Create;
 begin
   inherited Create;
   FList := TList.Create;
 end;
-
 destructor TJclWideStringList.Destroy;
 begin
   FOnChange := nil;
@@ -1920,7 +1762,6 @@ begin
   FList.Free;
   inherited Destroy;
 end;
-
 function TJclWideStringList.AddObject(const S: WideString; AObject: TObject): Integer;
 begin
   if not Sorted then
@@ -1935,19 +1776,16 @@ begin
     end;
   InsertObject(Result, S, AObject);
 end;
-
 procedure TJclWideStringList.Changed;
 begin
   if Assigned(FOnChange) then
     FOnChange(Self);
 end;
-
 procedure TJclWideStringList.Changing;
 begin
   if Assigned(FOnChanging) then
     FOnChanging(Self);
 end;
-
 procedure TJclWideStringList.Clear;
 var
   I: Integer;
@@ -1965,7 +1803,6 @@ begin
   if FUpdateCount = 0 then
     Changed;
 end;
-
 function TJclWideStringList.CompareStrings(const S1, S2: WideString): Integer;
 begin
   if CaseSensitive then
@@ -1973,18 +1810,15 @@ begin
   else
     Result := WideCompareText(S1, S2);
 end;
-
 threadvar
   CustomSortList: TJclWideStringList;
   CustomSortCompare: TJclWideStringListSortCompare;
-
 function WStringListCustomSort(Item1, Item2: Pointer): Integer;
 begin
   Result := CustomSortCompare(CustomSortList,
     CustomSortList.FList.IndexOf(Item1),
     CustomSortList.FList.IndexOf(Item2));
 end;
-
 procedure TJclWideStringList.CustomSort(Compare: TJclWideStringListSortCompare);
 var
   TempList: TJclWideStringList;
@@ -2003,7 +1837,6 @@ begin
     CustomSortCompare := TempCompare;
   end;
 end;
-
 procedure TJclWideStringList.Delete(Index: Integer);
 var
   Item: PWStringItem;
@@ -2017,7 +1850,6 @@ begin
   if FUpdateCount = 0 then
     Changed;
 end;
-
 procedure TJclWideStringList.Exchange(Index1, Index2: Integer);
 begin
   if FUpdateCount = 0 then
@@ -2026,7 +1858,6 @@ begin
   if FUpdateCount = 0 then
     Changed;
 end;
-
 function TJclWideStringList.Find(const S: WideString; var Index: Integer): Boolean;
 var
   L, H, I, C: Integer;
@@ -2061,32 +1892,26 @@ begin
     Result := Index <> -1;
   end;
 end;
-
 function TJclWideStringList.GetCapacity: Integer;
 begin
   Result := FList.Capacity;
 end;
-
 function TJclWideStringList.GetCount: Integer;
 begin
   Result := FList.Count;
 end;
-
 function TJclWideStringList.GetItem(Index: Integer): PWStringItem;
 begin
   Result := FList[Index];
 end;
-
 function TJclWideStringList.GetObject(Index: Integer): TObject;
 begin
   Result := GetItem(Index).FObject;
 end;
-
 function TJclWideStringList.GetP(Index: Integer): PWideString;
 begin
   Result := Addr(GetItem(Index).FString);
 end;
-
 function TJclWideStringList.IndexOf(const S: WideString): Integer;
 begin
   if Sorted then
@@ -2103,7 +1928,6 @@ begin
     Result := -1;
   end;
 end;
-
 procedure TJclWideStringList.InsertObject(Index: Integer; const S: WideString;
   AObject: TObject);
 var
@@ -2114,14 +1938,12 @@ begin
   FList.Insert(Index, nil); // error check
   P := AllocMem(SizeOf(TWStringItem));
   FList[Index] := P;
-
   Put(Index, S);
   if AObject <> nil then
     PutObject(Index, AObject);
   if FUpdateCount = 0 then
     Changed;
 end;
-
 procedure TJclWideStringList.Put(Index: Integer; const Value: WideString);
 begin
   if FUpdateCount = 0 then
@@ -2130,7 +1952,6 @@ begin
   if FUpdateCount = 0 then
     Changed;
 end;
-
 procedure TJclWideStringList.PutObject(Index: Integer; AObject: TObject);
 begin
   if FUpdateCount = 0 then
@@ -2139,12 +1960,10 @@ begin
   if FUpdateCount = 0 then
     Changed;
 end;
-
 procedure TJclWideStringList.SetCapacity(NewCapacity: Integer);
 begin
   FList.Capacity := NewCapacity;
 end;
-
 procedure TJclWideStringList.SetCaseSensitive(const Value: Boolean);
 begin
   if Value <> FCaseSensitive then
@@ -2157,7 +1976,6 @@ begin
     end;
   end;
 end;
-
 procedure TJclWideStringList.SetSorted(Value: Boolean);
 begin
   if Value <> FSorted then
@@ -2171,7 +1989,6 @@ begin
     end;
   end;
 end;
-
 procedure TJclWideStringList.SetUpdateState(Updating: Boolean);
 begin
   if Updating then
@@ -2179,20 +1996,16 @@ begin
   else
     Changed;
 end;
-
 function DefaultSort(List: TJclWideStringList; Index1, Index2: Integer): Integer;
 begin
   Result := List.CompareStrings(List.GetItem(Index1).FString, List.GetItem(Index2).FString);
 end;
-
 procedure TJclWideStringList.Sort;
 begin
   if not Sorted then
     CustomSort(DefaultSort);
 end;
-
 {$ENDIF ~SUPPORTS_UNICODE}
-
 function StringsToMultiSz(var Dest: PWideMultiSz; const Source: TJclWideStrings): PWideMultiSz;
 var
   I, TotalLength: Integer;
@@ -2215,7 +2028,6 @@ begin
   P^:= #0;
   Result := Dest;
 end;
-
 procedure MultiSzToStrings(const Dest: TJclWideStrings; const Source: PWideMultiSz);
 var
   P: PWideMultiSz;
@@ -2238,7 +2050,6 @@ begin
     Dest.EndUpdate;
   end;
 end;
-
 function MultiSzLength(const Source: PWideMultiSz): SizeInt;
 var
   P: PWideMultiSz;
@@ -2255,7 +2066,6 @@ begin
     Inc(Result);
   end;
 end;
-
 procedure AllocateMultiSz(var Dest: PWideMultiSz; Len: SizeInt);
 begin
   if Len > 0 then
@@ -2263,14 +2073,12 @@ begin
   else
     Dest := nil;
 end;
-
 procedure FreeMultiSz(var Dest: PWideMultiSz);
 begin
   if Dest <> nil then
     FreeMem(Dest);
   Dest := nil;
 end;
-
 function MultiSzDup(const Source: PWideMultiSz): PWideMultiSz;
 var
   Len: Integer;
@@ -2285,13 +2093,10 @@ begin
   else
     Result := nil;
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.

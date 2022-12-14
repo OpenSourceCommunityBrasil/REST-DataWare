@@ -1,7 +1,5 @@
 unit JvJVCLUtils;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,7 +22,6 @@ unit JvJVCLUtils;
 }
 
 interface
-
 uses
   Variants,
   {$IFDEF MSWINDOWS}
@@ -39,33 +36,24 @@ uses
   Classes, // must be after "Forms"
   JclBase,
   JvJCLUtils, JvAppStorage, JvTypes;
-
 // hides / shows the a forms caption area
 procedure HideFormCaption(FormHandle: THandle; Hide: Boolean);
-
 {$IFDEF MSWINDOWS}
 type
   TJvWallpaperStyle = (wpTile, wpCenter, wpStretch);
-
 // set the background wallpaper (two versions)
 procedure SetWallpaper(const Path: string); overload;
 procedure SetWallpaper(const Path: string; Style: TJvWallpaperStyle); overload;
 {$ENDIF MSWINDOWS}
-
 procedure RGBToHSV(R, G, B: Integer; var H, S, V: Integer);
-
 { from JvVCLUtils }
 
-
 procedure LaunchCpl(const FileName: string);
-
 // for Win 2000 and XP
 procedure ShowSafeRemovalDialog;
-
 {
   GetControlPanelApplets retrieves information about all control panel applets in a specified folder.
   APath is the Path to the folder to search and AMask is the filename mask (containing wildcards if necessary) to use.
-
   The information is returned in the Strings and Images lists according to the following rules:
    The Display Name and Path to the CPL file is returned in Strings with the following format:
      '<displayname>=<Path>'
@@ -79,27 +67,19 @@ procedure ShowSafeRemovalDialog;
          Tmp.ImageIndex := Integer(Strings.Objects[I]);
   The function returns True if any Control Panel Applets were found (i.e Strings.Count is > 0 when returning)
 }
-
 function PointInPolyRgn(const P: TPoint; const Points: array of TPoint): Boolean;
 procedure PaintInverseRect(const RectOrg, RectEnd: TPoint);
 procedure DrawInvertFrame(ScreenRect: TRect; Width: Integer);
-
 procedure ShowMDIClientEdge(ClientHandle: THandle; ShowEdge: Boolean);
-
 { Gradient filling routine }
-
 type
   TFillDirection = (fdTopToBottom, fdBottomToTop, fdLeftToRight, fdRightToLeft);
 
-
 { Grid drawing }
-
 type
   TVertAlignment = (vaTopJustify, vaCenterJustify, vaBottomJustify);
 
-
 function MsgBox(Handle: THandle; const Caption, Text: string; Flags: Integer): Integer; overload;
-
 (***** Utility MessageBox based dialogs *)
 // returns True if user clicked Yes
 function MsgYesNo(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
@@ -111,7 +91,6 @@ function MsgAbortRetryIgnore(Handle: Integer; const Msg, Caption: string; Flags:
 function MsgYesNoCancel(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Integer;
 // returns True if user clicked OK
 function MsgOKCancel(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
-
 // dialog without icon
 procedure MsgOK(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
 // dialog with info icon
@@ -124,58 +103,43 @@ procedure MsgQuestion(Handle: Integer; const Msg, Caption: string; Flags: DWORD 
 procedure MsgError(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
 // dialog with custom icon (must be available in the app resource)
 procedure MsgAbout(Handle: Integer; const Msg, Caption: string; const IcoName: string = 'MAINICON'; Flags: DWORD = MB_OK);
-
 {**** Windows routines }
-
-
 
 //=== { Support functions for DPI Aware apps } ================================
 const cDefaultPixelsPerInch : Integer = 96;
-
 type
   TMenuAnimation = (maNone, maRandom, maUnfold, maSlide);
-
 {$IFDEF MSWINDOWS}
 { return filename ShortCut linked to }
 function ResolveLink(const HWND: THandle; const LinkFile: TFileName;
   var FileName: TFileName): HRESULT;
 {$ENDIF MSWINDOWS}
-
 type
   TProcObj = procedure of object;
-
 { end JvUtils }
-
 type
   TOnGetDefaultIniName = function: string;
   TPlacementOption = (fpState, fpSize, fpLocation, fpActiveControl);
   TPlacementOptions = set of TPlacementOption;
   TPlacementOperation = (poSave, poRestore);
-
 var
   OnGetDefaultIniName: TOnGetDefaultIniName = nil;
   DefCompanyName: string = '';
   RegUseAppTitle: Boolean = False;
-
 function StrToIniStr(const Str: string): string;
 function IniStrToStr(const Str: string): string;
-
 // Ini Utilitie Functions
 // Added by RDB
-
 function RectToStr(Rect: TRect): string;
 function StrToRect(const Str: string; const Def: TRect): TRect;
 function PointToStr(P: TPoint): string;
 function StrToPoint(const Str: string; const Def: TPoint): TPoint;
-
 type
   TMappingMethod = (mmHistogram, mmQuantize, mmTrunc784, mmTrunc666,
     mmTripel, mmGrayscale);
 
-
 var
   DefaultMappingMethod: TMappingMethod = mmHistogram;
-
 type
   // equivalent of TPoint, but that can be a published property
   TJvPoint = class(TPersistent)
@@ -200,7 +164,6 @@ type
     property X: Longint read FX write SetX default 0;
     property Y: Longint read FY write SetY default 0;
   end;
-
   // equivalent of TRect, but that can be a published property
   TJvRect = class(TPersistent)
   private
@@ -242,7 +205,6 @@ type
     property Right: Integer read GetRight write SetRight default 0;
     property Bottom: Integer read GetBottom write SetBottom default 0;
   end;
-
   TJvSize = class(TPersistent)
   private
     FWidth: Longint;
@@ -265,13 +227,10 @@ type
     property Width: Longint read FWidth write SetWidth default 0;
     property Height: Longint read FHeight write SetHeight default 0;
   end;
-
 { begin JvCtrlUtils }
-
 //------------------------------------------------------------------------------
 // ToolBarMenu
 //------------------------------------------------------------------------------
-
 type
   PJvLVItemStateData = ^TJvLVItemStateData;
   TJvLVItemStateData = record
@@ -280,33 +239,26 @@ type
     Focused: Boolean;
     Selected: Boolean;
   end;
-
 {$IFDEF MSWINDOWS}
 // AllocateHWndEx works like Classes.AllocateHWnd but does not use any virtual memory pages
 function AllocateHWndEx(Method: TWndMethod; const AClassName: string = ''): THandle;
 // DeallocateHWndEx works like Classes.DeallocateHWnd but does not use any virtual memory pages
 procedure DeallocateHWndEx(Wnd: THandle);
-
 function JvMakeObjectInstance(Method: TWndMethod): Pointer;
 procedure JvFreeObjectInstance(ObjectInstance: Pointer);
 {$ENDIF MSWINDOWS}
-
 function IsPositiveResult(Value: TModalResult): Boolean;
 function IsNegativeResult(Value: TModalResult): Boolean;
 function IsAbortResult(const Value: TModalResult): Boolean;
 function StripAllFromResult(const Value: TModalResult): TModalResult;
 type
   TJvHTMLCalcType = (htmlShow, htmlCalcWidth, htmlCalcHeight, htmlHyperLink);
-
 const
   DefaultSuperSubScriptRatio = 2/3;
-
 function HTMLPrepareText(const Text: string): string;
-
 function GetTopOwner(aCmp: TComponent): TComponent;
 function IsOwnedComponent(aCmp, aOwner: TComponent): Boolean;
 function IsChildWindow(const AChild, AParent: THandle): Boolean;
-
 // This function generates a unique name for a component inside the list of all
 // owner components.
 // The name is generated in the login <OwnerName>_<AComponentName><Nr> or
@@ -319,10 +271,7 @@ function GenerateUniqueComponentName(AOwner, AComponent: TComponent; const AComp
 // <OwnerName>_<ACOmponent.ClassName><Nr> when the AComponentName parameter
 // is not defined. The number will be increased until the name is unique.
 procedure GenerateUniqueComponentName(AComponent: TComponent; const AComponentName: string = ''); overload;
-
 function ReplaceComponentReference(This, NewReference: TComponent; var VarReference: TComponent): Boolean;
-
-
 
 {$IFDEF UNITVERSIONING}
 const
@@ -333,9 +282,7 @@ const
     LogPath: 'JVCL\run'
   );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   {$IFDEF MSWINDOWS}
   CommCtrl, ShlObj, ActiveX,
@@ -343,9 +290,7 @@ uses
   Math, Contnrs,
   JclFileUtils,
   JvConsts, JvResources;
-
 {$R JvConsts.res}
-
 const
   {$IFDEF MSWINDOWS}
   RC_ControlRegistry = 'Control Panel\Desktop';
@@ -354,12 +299,10 @@ const
   RC_TileWallpaper = 'TileWallpaper';
   RC_RunCpl = 'rundll32.exe shell32,Control_RunDLL ';
   {$ENDIF MSWINDOWS}
-
 procedure RGBToHSV(R, G, B: Integer; var H, S, V: Integer);
 var
   Delta: Integer;
   Min, Max: Integer;
-
   function GetMax(I, J, K: Integer): Integer;
   begin
     if J > I then
@@ -368,7 +311,6 @@ var
       I := K;
     Result := I;
   end;
-
   function GetMin(I, J, K: Integer): Integer;
   begin
     if J < I then
@@ -377,7 +319,6 @@ var
       I := K;
     Result := I;
   end;
-
 begin
   Min := GetMin(R, G, B);
   Max := GetMax(R, G, B);
@@ -402,14 +343,11 @@ begin
       H := H + 360;
   end;
 end;
-
 {$IFDEF MSWINDOWS}
-
 procedure SetWallpaper(const Path: string);
 begin
   SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, PChar(Path), SPIF_UPDATEINIFILE);
 end;
-
 procedure SetWallpaper(const Path: string; Style: TJvWallpaperStyle);
 begin
   with TRegistry.Create do
@@ -440,12 +378,9 @@ begin
   end;
   SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nil, SPIF_SENDWININICHANGE);
 end;
-
 {$ENDIF MSWINDOWS}
-
 type
   TGetXBitmapMode =(gxRed, gxGreen, gxBlue, gxHue, gxSaturation, gxValue);
-
 procedure HideFormCaption(FormHandle: THandle; Hide: Boolean);
 begin
   if Hide then
@@ -456,25 +391,21 @@ begin
       GetWindowLong(FormHandle, GWL_STYLE) or WS_CAPTION);
 end;
 
-
 procedure LaunchCpl(const FileName: string);
 begin
   // rundll32.exe shell32,Control_RunDLL ';
   RunDLL32('shell32.dll', 'Control_RunDLL', FileName, True);
   //  WinExec(PChar(RC_RunCpl + FileName), SW_SHOWNORMAL);
 end;
-
 procedure ShowSafeRemovalDialog;
 begin
   LaunchCpl('HOTPLUG.DLL');
 end;
-
 const
   {$EXTERNALSYM WM_CPL_LAUNCH}
   WM_CPL_LAUNCH = (WM_USER + 1000);
   {$EXTERNALSYM WM_CPL_LAUNCHED}
   WM_CPL_LAUNCHED = (WM_USER + 1001);
-
   { (p3) just define enough to make the Cpl unnecessary for us (for the benefit of PE users) }
   cCplAddress = 'CPlApplet';
   CPL_INIT = 1;
@@ -487,18 +418,15 @@ const
   {$EXTERNALSYM CPL_EXIT}
   CPL_NEWINQUIRE = 8;
   {$EXTERNALSYM CPL_NEWINQUIRE}
-
 type
   TCPLApplet = function(hwndCPl: THandle; uMsg: UINT;
     lParam1, lParam2: LPARAM): Longint; stdcall;
-
   TCPLInfo = record
     idIcon: Integer;
     idName: Integer;
     idInfo: Integer;
     lData: LONG_PTR;
   end;
-
   TNewCPLInfoA = record
     dwSize: DWORD;
     dwFlags: DWORD;
@@ -519,7 +447,6 @@ type
     szInfo: array [0..63] of WideChar;
     szHelpFile: array [0..127] of WideChar;
   end;
-
 procedure PaintInverseRect(const RectOrg, RectEnd: TPoint);
 var
   DC: Windows.HDC;
@@ -533,7 +460,6 @@ begin
     Windows.ReleaseDC(HWND_DESKTOP, DC);
   end;
 end;
-
 procedure DrawInvertFrame(ScreenRect: TRect; Width: Integer);
 var
   DC: Windows.HDC;
@@ -550,7 +476,6 @@ begin
     Windows.ReleaseDC(HWND_DESKTOP, DC);
   end;
 end;
-
 function PointInPolyRgn(const P: TPoint; const Points: array of TPoint):
   Boolean;
 var
@@ -569,12 +494,10 @@ begin
     end;
   end;
 end;
-
 function PaletteEntries(Palette: HPALETTE): Integer;
 begin
   GetObject(Palette, SizeOf(Integer), @Result);
 end;
-
 procedure ShowMDIClientEdge(ClientHandle: THandle; ShowEdge: Boolean);
 var
   Style: Longint;
@@ -597,7 +520,6 @@ begin
       SWP_FRAMECHANGED or SWP_NOACTIVATE or SWP_NOMOVE or SWP_NOSIZE or SWP_NOZORDER);
   end;
 end;
-
 function MsgBox(Handle: THandle; const Caption, Text: string; Flags: Integer): Integer;
 begin
   {$IFDEF MSWINDOWS}
@@ -607,7 +529,6 @@ begin
   Result := MsgBox(Caption, Text, Flags);
   {$ENDIF UNIX}
 end;
-
 {$IFDEF MSWINDOWS}
 function LoadAniCursor(Instance: THandle; ResID: PChar): HCURSOR;
 { Unfortunately I don't know how we can load animated cursor from
@@ -650,19 +571,14 @@ begin
   end;
 end;
 {$ENDIF MSWINDOWS}
-
 var
   WaitCount: Integer = 0;
   SaveCursor: TCursor = crDefault;
-
 const
   FWaitCursor: TCursor = crHourGlass;
-
 {$IFDEF MSWINDOWS}
-
 var
   OLEDragCursorsLoaded: Boolean = False;
-
 { Check if this is the active Windows task }
 { Copied from implementation of FORMS.PAS  }
 type
@@ -671,7 +587,6 @@ type
     FocusWnd: Windows.HWND;
     Found: Boolean;
   end;
-
 function CheckTaskWindow(Window: HWND; Data: LPARAM): BOOL; stdcall;
 begin
   Result := True;
@@ -681,7 +596,6 @@ begin
     Result := False;
   end;
 end;
-
 function IsForegroundTask: Boolean;
 var
   Info: TCheckTaskInfo;
@@ -692,68 +606,55 @@ begin
   Result := Info.Found;
 end;
 {$ENDIF MSWINDOWS}
-
 {$IFDEF UNIX}
 function IsForegroundTask: Boolean;
 begin
   Result := Application.Active;
 end;
 {$ENDIF UNIX}
-
 const
   NoHelp = 0; { for MsgDlg2 }
   MsgDlgCharSet: Integer = DEFAULT_CHARSET;
-
 function MsgYesNo(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
 begin
   Result := MsgBox(Handle, Caption, Msg, MB_YESNO or Flags) = IDYES;
 end;
-
 function MsgRetryCancel(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
 begin
   Result := MsgBox(Handle, Caption, Msg, MB_RETRYCANCEL or Flags) = IDRETRY;
 end;
-
 function MsgAbortRetryIgnore(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Integer;
 begin
   Result := MsgBox(Handle, Caption, Msg, MB_ABORTRETRYIGNORE or Flags);
 end;
-
 function MsgYesNoCancel(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Integer;
 begin
   Result := MsgBox(Handle, Caption, Msg, MB_YESNOCANCEL or Flags);
 end;
-
 function MsgOKCancel(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
 begin
   Result := MsgBox(Handle, Caption, Msg, MB_OKCANCEL or Flags) = IDOK;
 end;
-
 procedure MsgOK(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
 begin
   MsgBox(Handle, Caption, Msg, MB_OK or Flags);
 end;
-
 procedure MsgInfo(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
 begin
   MsgOK(Handle, Msg, Caption, MB_ICONINFORMATION or Flags);
 end;
-
 procedure MsgWarn(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
 begin
   MsgOK(Handle, Msg, Caption, MB_ICONWARNING or Flags);
 end;
-
 procedure MsgQuestion(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
 begin
   MsgOK(Handle, Msg, Caption, MB_ICONQUESTION or Flags);
 end;
-
 procedure MsgError(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
 begin
   MsgOK(Handle, Msg, Caption, MB_ICONERROR or Flags);
 end;
-
 function FindIcon(hInstance: DWORD; const IconName: string): Boolean;
 begin
   if Win32Platform = VER_PLATFORM_WIN32_NT then
@@ -765,14 +666,12 @@ begin
       (FindResourceA(hInstance, PAnsiChar(AnsiString(IconName)), PAnsiChar(RT_GROUP_ICON)) <> 0) or
       (FindResourceA(hInstance, PAnsiChar(AnsiString(IconName)), PAnsiChar(RT_ICON)) <> 0);
 end;
-
 type
   TMsgBoxParamsRec = record
     case Boolean of
       False: (ParamsA: TMsgBoxParamsA);
       True: (ParamsW: TMsgBoxParamsW);
   end;
-
 procedure MsgAbout(Handle: Integer; const Msg, Caption: string; const IcoName: string = 'MAINICON'; Flags: DWORD = MB_OK);
 var
   Params: TMsgBoxParamsRec;
@@ -818,9 +717,7 @@ begin
     MessageBoxIndirectA(Params.ParamsA);
   end;
 end;
-
 {$IFDEF MSWINDOWS}
-
 function ResolveLink(const HWND: THandle; const LinkFile: TFileName;
   var FileName: TFileName): HRESULT;
 var
@@ -841,7 +738,6 @@ begin
       CLSCTX_INPROC_SERVER, IShellLink, psl);
     if Succeeded(Result) then
     begin
-
       // Get a Pointer to the IPersistFile interface.
       Result := psl.QueryInterface(IPersistFile, ppf);
       if Succeeded(Result) then
@@ -875,12 +771,9 @@ begin
   Pointer(psl) := nil;
   Pointer(ppf) := nil;
 end;
-
 {$ENDIF MSWINDOWS}
-
 var
   ProcList: TList = nil;
-
 type
   TJvProcItem = class(TObject)
   private
@@ -888,13 +781,11 @@ type
   public
     constructor Create(AProcObj: TProcObj);
   end;
-
 constructor TJvProcItem.Create(AProcObj: TProcObj);
 begin
   inherited Create;
   FProcObj := AProcObj;
 end;
-
 procedure TmrProc(hwnd: THandle; uMsg: Integer; idEvent: Integer; dwTime: Integer); stdcall;
 var
   Pr: TProcObj;
@@ -916,9 +807,7 @@ begin
   if Assigned(Pr) then
     Pr;
 end;
-
 { end JvUtils }
-
 function StrToIniStr(const Str: string): string;
 var
   N: Integer;
@@ -935,7 +824,6 @@ begin
       Result := Copy(Result, 1, N - 1) + '\n' + Copy(Result, N + 2, Length(Result));
   until N = 0;
 end;
-
 function IniStrToStr(const Str: string): string;
 var
   N: Integer;
@@ -947,7 +835,6 @@ begin
       Result := Copy(Result, 1, N - 1) + CrLf + Copy(Result, N + 2, Length(Result));
   until N = 0;
 end;
-
 { The following strings should not be localized }
 const
   siFlags = 'Flags';
@@ -958,14 +845,11 @@ const
   siMDIChild = 'MDI Children';
   siListCount = 'Count';
   siItem = 'Item%d';
-
 {$HINTS OFF}
 type
   TComponentAccessProtected = class(TComponent);
 {$HINTS ON}
-
 { end JvAppUtils }
-
 
 function MaxFloat(const Values: array of Extended): Extended;
 var
@@ -976,18 +860,14 @@ begin
     if Values[I] > Result then
       Result := Values[I];
 end;
-
 function WidthBytes(I: Longint): Longint;
 begin
   Result := ((I + 31) div 32) * 4;
 end;
-
 const
   MAX_COLORS = 4096;
-
 type
   TTriple = array [0..2] of Byte;
-
   PQColor = ^TQColor;
   TQColor = record
     RGB: TTriple;
@@ -995,13 +875,10 @@ type
     Count: Longint;
     PNext: PQColor;
   end;
-
   PQColorArray = ^TQColorArray;
   TQColorArray = array [0..MAX_COLORS - 1] of TQColor;
-
   PQColorList = ^TQColorList;
   TQColorList = array [0..{$IFDEF RTL230_UP}MaxInt div 16{$ELSE}MaxListSize{$ENDIF RTL230_UP} - 1] of PQColor;
-
   PNewColor = ^TNewColor;
   TNewColor = record
     RGBMin: TTriple;
@@ -1010,10 +887,8 @@ type
     Count: Longint;
     QuantizedColors: PQColor;
   end;
-
   PNewColorArray = ^TNewColorArray;
   TNewColorArray = array [Byte] of TNewColor;
-
 procedure PInsert(ColorList: PQColorList;
   Number: Integer; SortRGBAxis: Integer);
 var
@@ -1037,7 +912,6 @@ begin
     ColorList[J + 1] := Temp;
   end;
 end;
-
 procedure PSort(ColorList: PQColorList;
   Number: Integer; SortRGBAxis: Integer);
 var
@@ -1084,7 +958,6 @@ begin
     PSort(ColorList, I, SortRGBAxis);
   end;
 end;
-
 function DivideMap(NewColorSubdiv: PNewColorArray; ColorMapSize: Integer;
   var NewColormapSize: Integer; LPSTR: Pointer): Integer;
 var
@@ -1172,7 +1045,6 @@ begin
   end;
   Result := 1;
 end;
-
 function Quantize(const Bmp: TBitmapInfoHeader; gptr, Data8: Pointer;
   var ColorCount: Integer; var OutputColormap: TRGBPalette): Integer;
 type
@@ -1321,40 +1193,30 @@ begin
   ColorCount := NewColormapSize;
   Result := 0;
 end;
-
 {
   Procedures to truncate to lower bits-per-pixel, grayscale, tripel and
   histogram conversion based on freeware C source code of GBM package by
   Andy Key (nyangau att interalpha dott co dott uk). The home page of GBM
   author is at http://www.interalpha.net/customer/nyangau/.
 }
-
 { Truncate to lower bits per pixel }
-
 type
   TTruncLine = procedure(Src, Dest: Pointer; CX: Integer);
-
   { For 6Rx6Gx6B, 7Rx8Gx4B palettes etc. }
-
 const
   Scale04: array [0..3] of Byte = (0, 85, 170, 255);
   Scale06: array [0..5] of Byte = (0, 51, 102, 153, 204, 255);
   Scale07: array [0..6] of Byte = (0, 43, 85, 128, 170, 213, 255);
   Scale08: array [0..7] of Byte = (0, 36, 73, 109, 146, 182, 219, 255);
-
   { For 6Rx6Gx6B, 7Rx8Gx4B palettes etc. }
-
 var
   TruncTablesInitialized: Boolean = False;
   TruncIndex04: array [Byte] of Byte;
   TruncIndex06: array [Byte] of Byte;
   TruncIndex07: array [Byte] of Byte;
   TruncIndex08: array [Byte] of Byte;
-
   { These functions initialises this module }
-
 procedure InitTruncTables;
-
   function NearestIndex(Value: Byte; const Bytes: array of Byte): Byte;
   var
     B, I: Byte;
@@ -1374,7 +1236,6 @@ procedure InitTruncTables;
       end;
     end;
   end;
-
 var
   I: Integer;
 begin
@@ -1396,7 +1257,6 @@ begin
     end;
   end;
 end;
-
 procedure Trunc(const Header: TBitmapInfoHeader; Src, Dest: Pointer;
   DstBitsPerPixel: Integer; TruncLineProc: TTruncLine);
 var
@@ -1408,12 +1268,10 @@ begin
   for Y := 0 to Header.biHeight - 1 do
     TruncLineProc(PAnsiChar(Src) + Y * SrcScanline, PAnsiChar(Dest) + Y * DstScanline, Header.biWidth);
 end;
-
 { return 6Rx6Gx6B palette
   This function makes the palette for the 6 red X 6 green X 6 blue palette.
   216 palette entrys used. Remaining 40 Left blank.
 }
-
 procedure TruncPal6R6G6B(var Colors: TRGBPalette);
 var
   I, R, G, B: Byte;
@@ -1431,9 +1289,7 @@ begin
         Inc(I);
       end;
 end;
-
 { truncate to 6Rx6Gx6B one line }
-
 procedure TruncLine6R6G6B(Src, Dest: Pointer; CX: Integer);
 var
   X: Integer;
@@ -1452,21 +1308,17 @@ begin
     Inc(PByte(Dest));
   end;
 end;
-
 { truncate to 6Rx6Gx6B }
-
 procedure Trunc6R6G6B(const Header: TBitmapInfoHeader;
   const Data24, Data8: Pointer);
 begin
   Trunc(Header, Data24, Data8, 8, TruncLine6R6G6B);
 end;
-
 { return 7Rx8Gx4B palette
   This function makes the palette for the 7 red X 8 green X 4 blue palette.
   224 palette entrys used. Remaining 32 Left blank.
   Colours calculated to match those used by 8514/A PM driver.
 }
-
 procedure TruncPal7R8G4B(var Colors: TRGBPalette);
 var
   I, R, G, B: Byte;
@@ -1484,9 +1336,7 @@ begin
         Inc(I);
       end;
 end;
-
 { truncate to 7Rx8Gx4B one line }
-
 procedure TruncLine7R8G4B(Src, Dest: Pointer; CX: Integer);
 var
   X: Integer;
@@ -1505,17 +1355,13 @@ begin
     Inc(PByte(Dest));
   end;
 end;
-
 { truncate to 7Rx8Gx4B }
-
 procedure Trunc7R8G4B(const Header: TBitmapInfoHeader;
   const Data24, Data8: Pointer);
 begin
   Trunc(Header, Data24, Data8, 8, TruncLine7R8G4B);
 end;
-
 { Grayscale support }
-
 procedure GrayPal(var Colors: TRGBPalette);
 var
   I: Byte;
@@ -1524,7 +1370,6 @@ begin
   for I := 0 to 255 do
     FillChar(Colors[I], 3, I);
 end;
-
 procedure GrayScale(const Header: TBitmapInfoHeader; Data24, Data8: Pointer);
 var
   SrcScanline, DstScanline: Longint;
@@ -1553,9 +1398,7 @@ begin
     Data8 := PAnsiChar(Data8) + DstScanline;
   end;
 end;
-
 { Tripel conversion }
-
 procedure TripelPal(var Colors: TRGBPalette);
 var
   I: Byte;
@@ -1568,7 +1411,6 @@ begin
     Colors[I + $80].rgbBlue := I shl 2;
   end;
 end;
-
 procedure Tripel(const Header: TBitmapInfoHeader; Data24, Data8: Pointer);
 var
   SrcScanline, DstScanline: Longint;
@@ -1601,18 +1443,14 @@ begin
     Data8 := PAnsiChar(Data8) + DstScanline;
   end;
 end;
-
 { Histogram/Frequency-of-use method of color reduction }
-
 const
   MAX_N_COLS = 2049;
   MAX_N_HASH = 5191;
-
 function Hash(R, G, B: Byte): Word;
 begin
   Result := Word(Longint(Longint(R + G) * Longint(G + B) * Longint(B + R)) mod MAX_N_HASH);
 end;
-
 type
   PFreqRecord = ^TFreqRecord;
   TFreqRecord = record
@@ -1622,7 +1460,6 @@ type
     Frequency: Longint;
     Nearest: Byte;
   end;
-
   PHist = ^THist;
   THist = record
     ColCount: Longint;
@@ -1632,7 +1469,6 @@ type
     Freqs: array [0..MAX_N_COLS - 1] of TFreqRecord;
     HashTable: array [0..MAX_N_HASH - 1] of Word;
   end;
-
 function CreateHistogram(R, G, B: Byte): PHist;
 { create empty histogram }
 begin
@@ -1646,7 +1482,6 @@ begin
   end;
   FillChar(Result^.HashTable, MAX_N_HASH * SizeOf(Word), 255);
 end;
-
 procedure ClearHistogram(var Hist: PHist; R, G, B: Byte);
 begin
   with Hist^ do
@@ -1658,13 +1493,11 @@ begin
   end;
   FillChar(Hist^.HashTable, MAX_N_HASH * SizeOf(Word), 255);
 end;
-
 procedure DeleteHistogram(var Hist: PHist);
 begin
   FreeMem(Hist, SizeOf(THist));
   Hist := nil;
 end;
-
 function AddToHistogram(var Hist: THist; const Header: TBitmapInfoHeader;
   Data24: Pointer): Boolean;
 { add bitmap data to histogram }
@@ -1727,7 +1560,6 @@ begin
   Hist.ColCount := ColCount;
   Result := True;
 end;
-
 procedure PalHistogram(var Hist: THist; var Colors: TRGBPalette;
   ColorsWanted: Integer);
 { work out a palette from Hist }
@@ -1791,7 +1623,6 @@ begin
     end;
   end;
 end;
-
 procedure MapHistogram(var Hist: THist; const Header: TBitmapInfoHeader;
   Data24, Data8: Pointer);
 { map bitmap data to Hist palette }
@@ -1834,7 +1665,6 @@ begin
     Inc(PByte(Data8), Step8);
   end;
 end;
-
 procedure Histogram(const Header: TBitmapInfoHeader; var Colors: TRGBPalette;
   Data24, Data8: Pointer; ColorsWanted: Integer; Rm, Gm, BM: Byte);
 { map single bitmap to frequency optimised palette }
@@ -1866,9 +1696,7 @@ begin
     DeleteHistogram(Hist);
   end;
 end;
-
 { expand to 24 bits-per-pixel }
-
 (*
 procedure ExpandTo24Bit(const Header: TBitmapInfoHeader; Colors: TRGBPalette;
   Data, NewData: Pointer);
@@ -1958,7 +1786,6 @@ begin
   end;
 end;
 *)
-
 function BytesPerScanLine(PixelsPerScanline, BitsPerPixel,
   Alignment: Longint): Longint;
 begin
@@ -1967,7 +1794,6 @@ begin
   Result := Result div 8;
 end;
 
-
 function GetDInColors(const BI: TBitmapInfoHeader): Integer;
 begin
   if (BI.biClrUsed = 0) and (BI.biBitCount <= 8) then
@@ -1975,9 +1801,7 @@ begin
   else
     Result := BI.biClrUsed;
 end;
-
 { Change bits per pixel in a General Bitmap }
-
 function ZoomImage(ImageW, ImageH, MaxW, MaxH: Integer; Stretch: Boolean):
   TPoint;
 var
@@ -2007,11 +1831,8 @@ begin
   end;
 end;
 
-
 {$IFDEF MSWINDOWS}
-
 //=== AllocateHWndEx =========================================================
-
 const
   cUtilWindowExClass: TWndClass = (
     style: 0;
@@ -2024,7 +1845,6 @@ const
     hbrBackground: 0;
     lpszMenuName: nil;
     lpszClassName: 'TPUtilWindowEx');
-
 function StdWndProc(Window: THandle; Message, WParam: WPARAM;
   LParam: LPARAM): LRESULT; stdcall;
 var
@@ -2045,7 +1865,6 @@ begin
   else
     Result := DefWindowProc(Window, Message, WParam, LParam);
 end;
-
 function AllocateHWndEx(Method: TWndMethod; const AClassName: string = ''): THandle;
 var
   TempClass: TWndClass;
@@ -2057,7 +1876,6 @@ begin
   UtilWindowExClass.lpfnWndProc := @DefWindowProc;
   if AClassName <> '' then
     UtilWindowExClass.lpszClassName := PChar(AClassName);
-
   ClassRegistered := Windows.GetClassInfo(HInstance, UtilWindowExClass.lpszClassName,
     TempClass);
   if not ClassRegistered or (TempClass.lpfnWndProc <> @DefWindowProc) then
@@ -2068,7 +1886,6 @@ begin
   end;
   Result := Windows.CreateWindowEx(Windows.WS_EX_TOOLWINDOW, UtilWindowExClass.lpszClassName,
     '', Windows.WS_POPUP, 0, 0, 0, 0, 0, 0, HInstance, nil);
-
   if Assigned(Method) then
   begin
     SetWindowLongPtr(Result, 0, LONG_PTR(TMethod(Method).Code));
@@ -2076,34 +1893,27 @@ begin
     SetWindowLongPtr(Result, GWLP_WNDPROC, LONG_PTR(@StdWndProc));
   end;
 end;
-
 procedure DeallocateHWndEx(Wnd: THandle);
 begin
   Windows.DestroyWindow(Wnd);
 end;
-
 function JvMakeObjectInstance(Method: TWndMethod): Pointer;
 begin
   Result := MakeObjectInstance(Method);
 end;
-
 procedure JvFreeObjectInstance(ObjectInstance: Pointer);
 begin
   if Assigned(ObjectInstance) then
     FreeObjectInstance(ObjectInstance);
 end;
-
 {$ENDIF MSWINDOWS}
-
 const
   LeftBrackets = ['[', '{', '('];
   RightsBrackets = [']', '}', ')'];
-
 function RectToStr(Rect: TRect): string;
 begin
   Result := Format('[%d,%d,%d,%d]', [Rect.Left, Rect.Top, Rect.Right, Rect.Bottom]);
 end;
-
 function StrToRect(const Str: string; const Def: TRect): TRect;
 var
   S: string;
@@ -2141,12 +1951,10 @@ begin
     end;
   end;
 end;
-
 function PointToStr(P: TPoint): string;
 begin
   Result := Format('[%d,%d]', [P.X, P.Y]);
 end;
-
 function StrToPoint(const Str: string; const Def: TPoint): TPoint;
 var
   S: string;
@@ -2170,22 +1978,18 @@ begin
     Result.Y := StrToIntDef(Temp, Def.Y);
   end;
 end;
-
 function IsPositiveResult(Value: TModalResult): Boolean;
 begin
   Result := Value in [mrOk, mrYes, mrAll, mrYesToAll];
 end;
-
 function IsNegativeResult(Value: TModalResult): Boolean;
 begin
   Result := Value in [mrNo, mrNoToAll];
 end;
-
 function IsAbortResult(const Value: TModalResult): Boolean;
 begin
   Result := Value in [mrCancel, mrAbort];
 end;
-
 function StripAllFromResult(const Value: TModalResult): TModalResult;
 begin
   case Value of
@@ -2199,9 +2003,7 @@ begin
     Result := Value;
   end;
 end;
-
 //=== { TJvPoint } ===========================================================
-
 procedure TJvPoint.Assign(Source: TPersistent);
 begin
   if Source is TJvPoint then
@@ -2213,36 +2015,30 @@ begin
   else
     inherited Assign(Source);
 end;
-
 procedure TJvPoint.AssignPoint(const Source: TPoint);
 begin
   X := Source.X;
   Y := Source.Y;
 end;
-
 procedure TJvPoint.Assign(const Source: TPoint);
 begin
   X := Source.X;
   Y := Source.Y;
 end;
-
 procedure TJvPoint.CopyToPoint(var Point: TPoint);
 begin
   Point.X := X;
   Point.Y := Y;
 end;
-
 procedure TJvPoint.DoChange;
 begin
   if Assigned(FOnChange) then
     FOnChange(Self);
 end;
-
 function TJvPoint.GetAsPoint: TPoint;
 begin
   Result := Point(FX, FY);
 end;
-
 procedure TJvPoint.SetAsPoint(const Value: TPoint);
 begin
   if (Value.X <> FX) or (Value.Y <> FY) then
@@ -2252,7 +2048,6 @@ begin
     DoChange;
   end;
 end;
-
 procedure TJvPoint.SetX(Value: Longint);
 begin
   if Value <> FX then
@@ -2261,7 +2056,6 @@ begin
     DoChange;
   end;
 end;
-
 procedure TJvPoint.SetY(Value: Longint);
 begin
   if Value <> FY then
@@ -2270,9 +2064,7 @@ begin
     DoChange;
   end;
 end;
-
 //=== { TJvRect } ============================================================
-
 constructor TJvRect.Create;
 begin
   inherited Create;
@@ -2281,14 +2073,12 @@ begin
   FTopLeft.OnChange := PointChange;
   FBottomRight.OnChange := PointChange;
 end;
-
 destructor TJvRect.Destroy;
 begin
   FTopLeft.Free;
   FBottomRight.Free;
   inherited Destroy;
 end;
-
 procedure TJvRect.Assign(Source: TPersistent);
 begin
   if Source is TJvRect then
@@ -2300,108 +2090,87 @@ begin
   else
     inherited Assign(Source);
 end;
-
 procedure TJvRect.AssignRect(const Source: TRect);
 begin
   TopLeft.AssignPoint(Source.TopLeft);
   BottomRight.AssignPoint(Source.BottomRight);
 end;
-
 procedure TJvRect.Assign(const Source: TRect);
 begin
   TopLeft.Assign(Source.TopLeft);
   BottomRight.Assign(Source.BottomRight);
 end;
-
 procedure TJvRect.CopyToRect(var Rect: TRect);
 begin
   TopLeft.CopyToPoint(Rect.TopLeft);
   BottomRight.CopyToPoint(Rect.BottomRight);
 end;
-
 procedure TJvRect.DoChange;
 begin
   if Assigned(FOnChange) then
     FOnChange(Self);
 end;
-
 function TJvRect.GetBottom: Integer;
 begin
   Result := FBottomRight.Y;
 end;
-
 function TJvRect.GetLeft: Integer;
 begin
   Result := FTopLeft.X;
 end;
-
 function TJvRect.GetRight: Integer;
 begin
   Result := FBottomRight.X;
 end;
-
 function TJvRect.GetTop: Integer;
 begin
   Result := FTopLeft.Y;
 end;
-
 procedure TJvRect.PointChange(Sender: TObject);
 begin
   DoChange;
 end;
-
 procedure TJvRect.SetBottom(Value: Integer);
 begin
   FBottomRight.Y := Value;
 end;
-
 procedure TJvRect.SetBottomRight(Value: TJvPoint);
 begin
   FBottomRight.Assign(Value);
 end;
-
 procedure TJvRect.SetLeft(Value: Integer);
 begin
   FTopLeft.X := Value;
 end;
-
 procedure TJvRect.SetRight(Value: Integer);
 begin
   FBottomRight.X := Value;
 end;
-
 procedure TJvRect.SetTop(Value: Integer);
 begin
   FTopLeft.Y := Value;
 end;
-
 procedure TJvRect.SetTopLeft(Value: TJvPoint);
 begin
   FTopLeft.Assign(Value);
 end;
-
 function TJvRect.GetHeight: Integer;
 begin
   Result := FBottomRight.Y - FTopLeft.Y;
 end;
-
 function TJvRect.GetWidth: Integer;
 begin
   Result := FBottomRight.X - FTopLeft.X;
 end;
-
 procedure TJvRect.SetHeight(Value: Integer);
 begin
   FBottomRight.Y := FTopLeft.Y + Value;
 end;
-
 procedure TJvRect.SetWidth(Value: Integer);
 begin
   FBottomRight.X := FTopLeft.X + Value;
 end;
-
 { TJvSize }
-
 procedure TJvSize.Assign(Source: TPersistent);
 begin
   if Source is TJvSize then
@@ -2415,39 +2184,33 @@ begin
     inherited Assign(Source);
   end;
 end;
-
 procedure TJvSize.AssignSize(const Source: TSize);
 begin
   FWidth := Source.cx;
   FHeight := Source.cy;
   DoChange;
 end;
-
 procedure TJvSize.Assign(const Source: TSize);
 begin
   FWidth := Source.cx;
   FHeight := Source.cy;
   DoChange;
 end;
-
 procedure TJvSize.CopyToSize(var Size: TSize);
 begin
   Size.cx := Width;
   Size.cy := Height;
 end;
-
 procedure TJvSize.DoChange;
 begin
   if Assigned(OnChange) then
    OnChange(Self);
 end;
-
 function TJvSize.GetSize: TSize;
 begin
   Result.cx := FWidth;
   Result.cy := FHeight;
 end;
-
 procedure TJvSize.SetSize(const Value: TSize);
 begin
   if (Value.cx <> FWidth) or (Value.cy <> FHeight) then
@@ -2457,7 +2220,6 @@ begin
     DoChange;
   end;
 end;
-
 procedure TJvSize.SetHeight(Value: Integer);
 begin
   if FHeight <> Value then
@@ -2466,7 +2228,6 @@ begin
     DoChange;
   end;
 end;
-
 procedure TJvSize.SetWidth(Value: Integer);
 begin
   if FWidth <> Value then
@@ -2475,7 +2236,6 @@ begin
     DoChange;
   end;
 end;
-
 const
   cBR = '<BR>';
   cHR = '<HR>';
@@ -2490,7 +2250,6 @@ const
   cIND = 'IND';
   cCOLOR = 'COLOR';
   cBGCOLOR = 'BGCOLOR';
-
 // moved from JvHTControls and renamed
 function HTMLPrepareText(const Text: string): string;
 type
@@ -2518,7 +2277,6 @@ begin
   Result := StringReplace(Result, cBR, sLineBreak, [rfReplaceAll, rfIgnoreCase]);
   Result := StringReplace(Result, cHR, cHR + sLineBreak, [rfReplaceAll, rfIgnoreCase]); // fixed <HR><BR>
 end;
-
 function HTMLBeforeTag(var Str: string; DeleteToTag: Boolean = False): string;
 begin
   if Pos(cTagBegin, Str) > 0 then
@@ -2534,7 +2292,6 @@ begin
       Str := '';
   end;
 end;
-
 function GetChar(const Str: string; Pos: Word; Up: Boolean = False): Char;
 begin
   if Length(Str) >= Pos then
@@ -2544,17 +2301,14 @@ begin
   if Up then
     Result := UpCase(Result);
 end;
-
 function HTMLDeleteTag(const Str: string): string;
 begin
   Result := Str;
   if (GetChar(Result, 1) = cTagBegin) and (Pos(cTagEnd, Result) > 1) then
     Delete(Result, 1, Pos(cTagEnd, Result));
 end;
-
 type
   TScriptPosition = (spNormal, spSuperscript, spSubscript);
-
 function HTMLPlainText(const Text: string): string;
 var
   S: string;
@@ -2571,13 +2325,11 @@ begin
   end;
   Result := Result + S;
 end;
-
 function MapWindowRect(hWndFrom, hWndTo: HWND; ARect: TRect): TRect;
 begin
   MapWindowPoints(hWndFrom, hWndTo, ARect, 2);
   Result := ARect;
 end;
-
 function BeginClipRect(DC: HDC; AClipRect: TRect; fnMode: Integer): Integer; 
 var
   MyRgn: HRGN;
@@ -2593,12 +2345,10 @@ begin
     end;
   end;
 end;
-
 function EndClipRect(DC: HDC): Integer;
 begin
   Result := SelectClipRgn(DC, 0);
 end;
-
 function GetTopOwner(aCmp: TComponent): TComponent;
 begin
   if aCmp = nil then
@@ -2609,13 +2359,11 @@ begin
   else
     Result := aCmp;
 end;
-
 function IsOwnedComponent(aCmp, aOwner: TComponent): Boolean;
 begin
   Result := False;
   if not (Assigned(aCmp) or Assigned(aOwner)) then
     Exit;
-
   Result := True;
   while aCmp.Owner <> nil do
   begin
@@ -2625,7 +2373,6 @@ begin
   end;
   Result := False;
 end;
-
 function IsChildWindow(const AChild, AParent: THandle): Boolean;
 var
   LParent: HWND;
@@ -2641,10 +2388,8 @@ begin
     Result := (LParent = AParent) and (LParent <> NullHandle);
   end;
 end;
-
 function GenerateUniqueComponentName(AOwner, AComponent: TComponent; const
     AComponentName: string = ''): string;
-
   function ValidateName(const AName: string): String;
   var
     I: Integer;
@@ -2670,7 +2415,6 @@ function GenerateUniqueComponentName(AOwner, AComponent: TComponent; const
       end;
     end;
   end;
-
   function GenerateName(const AName: string; ANumber: Integer): string;
   var vName : String;
   begin
@@ -2688,7 +2432,6 @@ function GenerateUniqueComponentName(AOwner, AComponent: TComponent; const
     if ANumber > 0 then
       Result := Result + IntToStr(ANumber);
   end;
-
   function IsUnique(const AName: string): Boolean;
   var
     I: Integer;
@@ -2703,7 +2446,6 @@ function GenerateUniqueComponentName(AOwner, AComponent: TComponent; const
           Break;
         end;
   end;
-
 var
   I: Integer;
 begin
@@ -2720,14 +2462,12 @@ begin
       Break;
   end;
 end;
-
 procedure GenerateUniqueComponentName(AComponent: TComponent; const AComponentName: string = '');
 begin
   if not Assigned(AComponent) then
     Exit;
   AComponent.Name := GenerateUniqueComponentName(AComponent.Owner, AComponent, AComponentName);
 end;
-
 
 function ReplaceComponentReference(This, NewReference: TComponent; var VarReference: TComponent): Boolean;
 begin
@@ -2741,5 +2481,4 @@ begin
       VarReference.FreeNotification(This);
   end;
 end;
-
 end.

@@ -1,7 +1,5 @@
 unit JclSysInfo;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,7 +22,6 @@ unit JclSysInfo;
 }
 
 interface
-
 uses
   {$IFDEF UNITVERSIONING}
   JclUnitVersioning,
@@ -44,14 +41,12 @@ uses
   Classes,
   {$ENDIF ~HAS_UNITSCOPE}
   JclBase, JclResources;
-
 // Environment Variables
 {$IFDEF MSWINDOWS}
 type
   TEnvironmentOption = (eoLocalMachine, eoCurrentUser, eoAdditional);
   TEnvironmentOptions = set of TEnvironmentOption;
 {$ENDIF MSWINDOWS}
-
 function DelEnvironmentVar(const Name: string): Boolean;
 function ExpandEnvironmentVar(var Value: string): Boolean;
 function ExpandEnvironmentVarCustom(var Value: string; Vars: TStrings): Boolean;
@@ -65,7 +60,6 @@ function CreateEnvironmentBlock(const Options: TEnvironmentOptions; const Additi
 procedure DestroyEnvironmentBlock(var Env: PChar);
 procedure SetGlobalEnvironmentVariable(VariableName, VariableContent: string);
 {$ENDIF MSWINDOWS}
-
 // Common Folder Locations
 {$IFDEF MSWINDOWS}
 function GetCommonFilesFolder: string;
@@ -76,7 +70,6 @@ function GetProgramFilesFolder: string;
 function GetWindowsFolder: string;
 function GetWindowsSystemFolder: string;
 function GetWindowsTempFolder: string;
-
 function GetDesktopFolder: string;
 function GetProgramsFolder: string;
 {$ENDIF MSWINDOWS}
@@ -105,20 +98,17 @@ function GetTemplatesFolder: string;
 function GetInternetCacheFolder: string;
 function GetCookiesFolder: string;
 function GetHistoryFolder: string;
-
 // Advanced Power Management (APM)
 type
   TAPMLineStatus = (alsOffline, alsOnline, alsUnknown);
   TAPMBatteryFlag = (abfHigh, abfLow, abfCritical, abfCharging, abfNoBattery, abfUnknown);
   TAPMBatteryFlags = set of TAPMBatteryFlag;
-
 function GetAPMLineStatus: TAPMLineStatus;
 function GetAPMBatteryFlag: TAPMBatteryFlag;
 function GetAPMBatteryFlags: TAPMBatteryFlags;
 function GetAPMBatteryLifePercent: Integer;
 function GetAPMBatteryLifeTime: DWORD;
 function GetAPMBatteryFullLifeTime: DWORD;
-
 // Identification
 type
   TFileSystemFlag =
@@ -139,9 +129,7 @@ type
     fsVolumeIsReadOnly          // The specified volume is read-only.
                                 // Windows 2000/NT and Windows Me/98/95:  This value is not supported.
    );
-
   TFileSystemFlags = set of TFileSystemFlag;
-
 function GetVolumeName(const Drive: string): string;
 function GetVolumeSerialNumber(const Drive: string): string;
 function GetVolumeFileSystem(const Drive: string): string;
@@ -167,33 +155,25 @@ function GetBIOSCopyright: string;
 function GetBIOSExtendedInfo: string;
 function GetBIOSDate: TDateTime;
 {$ENDIF MSWINDOWS}
-
 // Processes, Tasks and Modules
 type
   TJclTerminateAppResult = (taError, taClean, taKill);
-
 function RunningProcessesList(const List: TStrings; FullPath: Boolean = True): Boolean;
-
 {$IFDEF MSWINDOWS}
 function LoadedModulesList(const List: TStrings; ProcessID: DWORD; HandlesOnly: Boolean = False): Boolean;
 function GetTasksList(const List: TStrings): Boolean;
-
 function ModuleFromAddr(const Addr: Pointer): HMODULE;
 function IsSystemModule(const Module: HMODULE): Boolean;
-
 procedure BeginModuleFromAddrCache;
 procedure EndModuleFromAddrCache;
 function CachedModuleFromAddr(const Addr: Pointer): HMODULE;
-
 function IsMainAppWindow(Wnd: THandle): Boolean;
 function IsWindowResponding(Wnd: THandle; Timeout: Integer): Boolean;
-
 function GetWindowIcon(Wnd: THandle; LargeIcon: Boolean): HICON;
 function GetWindowCaption(Wnd: THandle): string;
 function TerminateTask(Wnd: THandle; Timeout: Integer): TJclTerminateAppResult;
 function TerminateApp(ProcessID: DWORD; Timeout: Integer): TJclTerminateAppResult;
 {$ENDIF MSWINDOWS}
-
 {$IFDEF MSWINDOWS}
 {.$IFNDEF FPC}
 function GetPidFromProcessName(const ProcessName: string): THandle;
@@ -202,12 +182,10 @@ function GetProcessNameFromPid(PID: DWORD): string;
 function GetMainAppWndFromPid(PID: DWORD): THandle;
 function GetWndFromPid(PID: DWORD; const WindowClassName: string): HWND;
 {.$ENDIF ~FPC}
-
 function GetShellProcessName: string;
 {.$IFNDEF FPC}
 function GetShellProcessHandle: THandle;
 {.$ENDIF ~FPC}
-
 // Version Information
 type
   TWindowsVersion =
@@ -235,7 +213,6 @@ type
     pax8632,   // x86 32 bit processors (some P4, Celeron, Athlon and older)
     pax8664,   // x86 64 bit processors (latest P4, Celeron and Athlon64)
     paIA64);   // Itanium processors
-
 var
   { in case of additions, don't forget to update initialization section! }
   IsWin95: Boolean = False;
@@ -270,7 +247,6 @@ var
   IsWinServer2022: Boolean = False;
   IsWinServer: Boolean = False;
   IsWin11: Boolean = False;
-
 const
   PROCESSOR_ARCHITECTURE_INTEL = 0;
   {$EXTERNALSYM PROCESSOR_ARCHITECTURE_INTEL}
@@ -280,10 +256,8 @@ const
   {$EXTERNALSYM PROCESSOR_ARCHITECTURE_IA32_ON_WIN64}
   PROCESSOR_ARCHITECTURE_IA64 = 6;
   {$EXTERNALSYM PROCESSOR_ARCHITECTURE_IA64}
-
 const
   Windows11InitialBuildNumber = 22000;
-
 function GetWindowsVersion: TWindowsVersion;
 function GetWindowsEdition: TWindowsEdition;
 function NtProductType: TNtProductType;
@@ -318,9 +292,7 @@ function GetProcessorArchitecture: TProcessorArchitecture;
 function IsWindows64: Boolean;
 function JclCheckWinVersion(Major, Minor: Integer): Boolean;
 {$ENDIF MSWINDOWS}
-
 function GetOSVersionString: string;
-
 // Hardware
 {$IFDEF MSWINDOWS}
 function GetMacAddresses(const Machine: string; const Addresses: TStrings): Integer;
@@ -329,11 +301,9 @@ function ReadTimeStampCounter: Int64;
 {$IFDEF WIN64}
 {$EXTERNALSYM ReadTimeStampCounter}
 {$ENDIF WIN64}
-
 type
   TTLBInformation = (tiEntries, tiAssociativity);
   TCacheInformation = (ciLineSize {in Bytes}, ciLinesPerTag, ciAssociativity, ciSize);
-
   TIntelSpecific = record
     L2Cache: Cardinal;
     CacheDescriptors: array [0..15] of Byte;
@@ -347,12 +317,10 @@ type
     PhysicalAddressBits: Byte;
     VirtualAddressBits: Byte;
   end;
-
   TCyrixSpecific = record
     L1CacheInfo: array [0..3] of Byte;
     TLBInfo: array [0..3] of Byte;
   end;
-
   TAMDSpecific = packed record
     ExFeatures: Cardinal;
     ExFeatures2: Cardinal;
@@ -381,7 +349,6 @@ type
     PhysicalAddressSize: Byte;
     VirtualAddressSize: Byte;
   end;
-
   TVIASpecific = record
     ExFeatures: Cardinal;
     DataTLB: array [TTLBInformation] of Byte;
@@ -390,7 +357,6 @@ type
     L1InstructionCache: array [TCacheInformation] of Byte;
     L2DataCache: Cardinal;
   end;
-
   TTransmetaSpecific = record
     ExFeatures: Cardinal;
     DataTLB: array [TTLBInformation] of Byte;
@@ -409,12 +375,10 @@ type
     CurrentFrequency: Cardinal;
     CurrentPerformance: Cardinal;
   end;
-
   TCacheFamily = (
     cfInstructionTLB, cfDataTLB,
     cfL1InstructionCache, cfL1DataCache,
     cfL2Cache, cfL2TLB, cfL3Cache, cfTrace, cfOther);
-
   TCacheInfo = record
     D: Byte;
     Family: TCacheFamily;
@@ -425,25 +389,21 @@ type
     Entries: Cardinal;        // for TLB
     I: PResStringRec;
   end;
-
   TFreqInfo = record
     RawFreq: Int64;
     NormFreq: Int64;
     InCycles: Int64;
     ExTicks: Int64;
   end;
-
 const
   CPU_TYPE_INTEL     = 1;
   CPU_TYPE_CYRIX     = 2;
   CPU_TYPE_AMD       = 3;
   CPU_TYPE_TRANSMETA = 4;
   CPU_TYPE_VIA       = 5;
-
 type
   TSSESupport = (sse, sse2, sse3, ssse3, sse41, sse42, sse4A, sse5, avx);
   TSSESupports = set of TSSESupport;
-
   TCpuInfo = record
     HasInstruction: Boolean;
     AES: Boolean;
@@ -493,21 +453,18 @@ type
       CPU_TYPE_TRANSMETA: (TransmetaSpecific: TTransmetaSpecific;);
       CPU_TYPE_VIA: (ViaSpecific: TViaSpecific;);
   end;
-
 const
   VendorIDIntel: array [0..11] of AnsiChar = 'GenuineIntel';
   VendorIDCyrix: array [0..11] of AnsiChar = 'CyrixInstead';
   VendorIDAMD: array [0..11] of AnsiChar = 'AuthenticAMD';
   VendorIDTransmeta: array [0..11] of AnsiChar = 'GenuineTMx86';
   VendorIDVIA: array [0..11] of AnsiChar = 'CentaurHauls';
-
 // Constants to be used with Feature Flag set of a CPU
 // eg. IF (Features and FPU_FLAG = FPU_FLAG) THEN CPU has Floating-Point unit on
 // chip. However, Intel claims that in future models, a zero in the feature
 // flags will mean that the chip has that feature, however, the following flags
 // will work for any production 80x86 chip or clone.
 // eg. IF (Features and FPU_FLAG = 0) then CPU has Floating-Point unit on chip.
-
 const
   { 32 bits in a DWord Value }
   BIT_0       = $00000001;
@@ -542,7 +499,6 @@ const
   BIT_29      = $20000000;
   BIT_30      = $40000000;
   BIT_31      = DWORD($80000000);
-
   { Standard Feature Flags }
   FPU_FLAG    = BIT_0;  // Floating-Point unit on chip
   VME_FLAG    = BIT_1;  // Virtual Mode Extention
@@ -576,7 +532,6 @@ const
   TM_FLAG     = BIT_29; // Thermal monitor
   BIT_30_FLAG = BIT_30; // Reserved, do not count on value
   PBE_FLAG    = BIT_31; // Pending Break Enable
-
   { Standard Intel Feature Flags }
   INTEL_FPU    = BIT_0;  // Floating-Point unit on chip
   INTEL_VME    = BIT_1;  // Virtual Mode Extention
@@ -610,7 +565,6 @@ const
   INTEL_TM     = BIT_29; // Thermal monitor
   INTEL_IA64   = BIT_30; // IA32 emulation mode on Itanium processors (IA64)
   INTEL_PBE    = BIT_31; // Pending Break Enable
-
   { Extended Intel Feature Flags }
   EINTEL_SSE3      = BIT_0;  // Streaming SIMD Extensions 3
   EINTEL_PCLMULQDQ = BIT_1;  // the processor supports the PCLMULQDQ instruction
@@ -644,7 +598,6 @@ const
   EINTEL_BIT_29    = BIT_29; // Reserved, do not count on value
   EINTEL_RDRAND    = BIT_30; // the processor supports the RDRAND instruction.
   EINTEL_BIT_31    = BIT_31; // Always return 0
-
   { Extended Intel 64 Bits Feature Flags }
   EINTEL64_BIT_0  = BIT_0;  // Reserved, do not count on value
   EINTEL64_BIT_1  = BIT_1;  // Reserved, do not count on value
@@ -678,7 +631,6 @@ const
   EINTEL64_EM64T  = BIT_29; // Intel Extended Memory 64 Technology
   EINTEL64_BIT_30 = BIT_30; // Reserved, do not count on value
   EINTEL64_BIT_31 = BIT_31; // Reserved, do not count on value
-
   { Extended Intel 64 Bits Feature Flags continued }
   EINTEL64_2_LAHF   = BIT_0;  // LAHF/SAHF available in 64 bit mode
   EINTEL64_2_BIT_1  = BIT_1;  // Reserved, do not count on value
@@ -712,7 +664,6 @@ const
   EINTEL64_2_BIT_29 = BIT_29; // Reserved, do not count on value
   EINTEL64_2_BIT_30 = BIT_30; // Reserved, do not count on value
   EINTEL64_2_BIT_31 = BIT_31; // Reserved, do not count on value
-
   { INTEL Power Management Flags }
   PINTEL_TEMPSENSOR = BIT_0;  // Digital temperature sensor
   PINTEL_TURBOBOOST = BIT_1;  // Intel Turbo Boost Technology Available
@@ -746,7 +697,6 @@ const
   PINTEL_BIT_29     = BIT_29; // Reserved, do not count on value
   PINTEL_BIT_30     = BIT_30; // Reserved, do not count on value
   PINTEL_BIT_31     = BIT_31; // Reserved, do not count on value
-
   { AMD Standard Feature Flags }
   AMD_FPU     = BIT_0;  // Floating-Point unit on chip
   AMD_VME     = BIT_1;  // Virtual Mode Extention
@@ -780,7 +730,6 @@ const
   AMD_BIT_29  = BIT_29; // Reserved, do not count on value
   AMD_BIT_30  = BIT_30; // Reserved, do not count on value
   AMD_BIT_31  = BIT_31; // Reserved, do not count on value
-
   { AMD Standard Feature Flags continued }
   AMD2_SSE3       = BIT_0;  // SSE3 extensions
   AMD2_PCLMULQDQ  = BIT_1;  // PCLMULQDQ instruction support
@@ -814,7 +763,6 @@ const
   AMD2_F16C       = BIT_29; // half-precision convert instruction support
   AMD2_BIT_30     = BIT_30; // Reserved, do not count on value
   AMD2_RAZ        = BIT_31; // Reserved for use by hypervisor to indicate guest status
-
   { AMD Enhanced Feature Flags }
   EAMD_FPU     = BIT_0;  // Floating-Point unit on chip
   EAMD_VME     = BIT_1;  // Virtual Mode Extention
@@ -848,7 +796,6 @@ const
   EAMD_LONG    = BIT_29; // Long Mode (64-bit Core)
   EAMD_EX3DNOW = BIT_30; // AMD Extensions to 3DNow! intructions
   EAMD_3DNOW   = BIT_31; // AMD 3DNOW! Technology
-
   { AMD Extended Feature Flags continued }
   EAMD2_LAHF          = BIT_0;  // LAHF/SAHF available in 64-bit mode
   EAMD2_CMPLEGACY     = BIT_1;  // core multi-processing legacy mode
@@ -882,7 +829,6 @@ const
   EAMD2_BIT_29        = BIT_29; // Reserved, do not count on value
   EAMD2_BIT_30        = BIT_30; // Reserved, do not count on value
   EAMD2_BIT_31        = BIT_31; // Reserved, do not count on value
-
   { AMD Power Management Features Flags }
   PAMD_TEMPSENSOR       = BIT_0;  // Temperature Sensor
   PAMD_FREQUENCYID      = BIT_1;  // Frequency ID Control
@@ -916,13 +862,11 @@ const
   PAMD_BIT_29           = BIT_29; // Reserved, do not count on value
   PAMD_BIT_30           = BIT_30; // Reserved, do not count on value
   PAMD_BIT_31           = BIT_31; // Reserved, do not count on value
-
   { AMD TLB and L1 Associativity constants }
   AMD_ASSOC_RESERVED = 0;
   AMD_ASSOC_DIRECT   = 1;
   // 2 to 254 = direct value to the associativity
   AMD_ASSOC_FULLY    = 255;
-
   { AMD L2 Cache Associativity constants }
   AMD_L2_ASSOC_DISABLED = 0;
   AMD_L2_ASSOC_DIRECT   = 1;
@@ -936,9 +880,7 @@ const
   AMD_L2_ASSOC_96WAY    = 13;
   AMD_L2_ASSOC_128WAY   = 14;
   AMD_L2_ASSOC_FULLY    = 15;
-
   // TODO AMD SVM and LWP bits
-
   { VIA Standard Feature Flags }
   VIA_FPU           = BIT_0;  // FPU present
   VIA_VME           = BIT_1;  // Virtual Mode Extension
@@ -972,7 +914,6 @@ const
   VIA_BIT_29        = BIT_29; // Reserved, do not count on value
   VIA_BIT_30        = BIT_30; // Reserved, do not count on value
   VIA_3DNOW         = BIT_31; // 3DNow! Technology
-
   { VIA Extended Feature Flags }
   EVIA_AIS    = BIT_0;  // Alternate Instruction Set
   EVIA_AISE   = BIT_1;  // Alternate Instruction Set Enabled
@@ -1006,7 +947,6 @@ const
   EVIA_BIT_29 = BIT_29; // Reserved, do not count on value
   EVIA_BIT_30 = BIT_30; // Reserved, do not count on value
   EVIA_BIT_31 = BIT_31; // Reserved, do not count on value
-
   { Cyrix Standard Feature Flags }
   CYRIX_FPU    = BIT_0;  // Floating-Point unit on chip
   CYRIX_VME    = BIT_1;  // Virtual Mode Extention
@@ -1040,7 +980,6 @@ const
   CYRIX_BIT_29 = BIT_29; // Reserved, do not count on value
   CYRIX_BIT_30 = BIT_30; // Reserved, do not count on value
   CYRIX_BIT_31 = BIT_31; // Reserved, do not count on value
-
   { Cyrix Enhanced Feature Flags }
   ECYRIX_FPU    = BIT_0;  // Floating-Point unit on chip
   ECYRIX_VME    = BIT_1;  // Virtual Mode Extention
@@ -1074,7 +1013,6 @@ const
   ECYRIX_BIT_29 = BIT_29; // Reserved, do not count on value
   ECYRIX_BIT_30 = BIT_30; // Reserved, do not count on value
   ECYRIX_BIT_31 = BIT_31; // Reserved, do not count on value
-
   { Transmeta Features }
   TRANSMETA_FPU    = BIT_0;  // Floating-Point unit on chip
   TRANSMETA_VME    = BIT_1;  // Virtual Mode Extention
@@ -1108,7 +1046,6 @@ const
   TRANSMETA_BIT_29 = BIT_29; // Reserved, do not count on value
   TRANSMETA_BIT_30 = BIT_30; // Reserved, do not count on value
   TRANSMETA_BIT_31 = BIT_31; // Reserved, do not count on value
-
   { Extended Transmeta Features }
   ETRANSMETA_FPU    = BIT_0;  // Floating-Point unit on chip
   ETRANSMETA_VME    = BIT_1;  // Virtual Mode Extention
@@ -1142,7 +1079,6 @@ const
   ETRANSMETA_BIT_29 = BIT_29; // Reserved, do not count on value
   ETRANSMETA_BIT_30 = BIT_30; // Reserved, do not count on value
   ETRANSMETA_BIT_31 = BIT_31; // Reserved, do not count on value
-
   { Transmeta Specific Features }
   STRANSMETA_RECOVERY = BIT_0;  // Recovery Mode
   STRANSMETA_LONGRUN  = BIT_1;  // Long Run
@@ -1176,7 +1112,6 @@ const
   STRANSMETA_BIT_29   = BIT_29; // Reserved, do not count on value
   STRANSMETA_BIT_30   = BIT_30; // Reserved, do not count on value
   STRANSMETA_BIT_31   = BIT_31; // Reserved, do not count on value
-
   { Constants of bits of the MXCSR register - Intel and AMD processors that support SSE instructions}
   MXCSR_IE  = BIT_0;                  // Invalid Operation flag
   MXCSR_DE  = BIT_1;                  // Denormal flag
@@ -1195,7 +1130,6 @@ const
   MXCSR_RC2 = BIT_14;                 // Rounding control, bit 2
   MXCSR_RC  = MXCSR_RC1 or MXCSR_RC2; // Rounding control
   MXCSR_FZ  = BIT_15;                 // Flush to Zero
-
 const
   IntelCacheDescription: array [0..102] of TCacheInfo = (
     (D: $00; Family: cfOther;              Size: 0;     WaysOfAssoc: 0;  LineSize: 0;  LinePerSector: 0; Entries: 0;   I: @RsIntelCacheDescr00),
@@ -1302,23 +1236,18 @@ const
     (D: $F1; Family: cfOther;              Size: 0;     WaysOfAssoc: 0;  LineSize: 0;  LinePerSector: 0; Entries: 0;   I: @RsIntelCacheDescrF1),
     (D: $FF; Family: cfOther;              Size: 0;     WaysOfAssoc: 0;  LineSize: 0;  LinePerSector: 0; Entries: 0;   I: @RsIntelCacheDescrFF)
   );
-
 procedure GetCpuInfo(var CpuInfo: TCpuInfo);
-
 function GetIntelCacheDescription(const D: Byte): string;
 function RoundFrequency(const Frequency: Integer): Integer;
 {$IFDEF MSWINDOWS}
 function GetCPUSpeed(var CpuSpeed: TFreqInfo): Boolean;
-
 type
   TOSEnabledFeature = (oefFPU, oefSSE, oefAVX);
   TOSEnabledFeatures = set of TOSEnabledFeature;
-
 function GetOSEnabledFeatures: TOSEnabledFeatures;
 {$ENDIF MSWINDOWS}
 function CPUID: TCpuInfo;
 function TestFDIVInstruction: Boolean;
-
 // Memory Information
 {$IFDEF MSWINDOWS}
 function GetMaxAppAddress: TJclAddr;
@@ -1335,18 +1264,15 @@ function GetFreePageFileMemory: Int64;
 function GetTotalVirtualMemory: Int64;
 function GetFreeVirtualMemory: Int64;
 {$ENDIF MSWINDOWS}
-
 // Alloc granularity
 procedure RoundToAllocGranularity64(var Value: Int64; Up: Boolean);
 procedure RoundToAllocGranularityPtr(var Value: Pointer; Up: Boolean);
-
 {$IFDEF MSWINDOWS}
 // Keyboard Information
 function GetKeyState(const VirtualKey: Cardinal): Boolean;
 function GetNumLockKeyState: Boolean;
 function GetScrollLockKeyState: Boolean;
 function GetCapsLockKeyState: Boolean;
-
 // Windows 95/98/Me system resources information
 type
   TFreeSysResKind = (rtSystem, rtGdi, rtUser);
@@ -1355,13 +1281,10 @@ type
     GdiRes: Integer;
     UserRes: Integer;
   end;
-
 function IsSystemResourcesMeterPresent: Boolean;
-
 function GetFreeSystemResources(const ResourceType: TFreeSysResKind): Integer; overload;
 function GetFreeSystemResources: TFreeSystemResources; overload;
 function GetBPP: Cardinal;
-
 // Installed programs information
 function ProgIDExists(const ProgID: string): Boolean;
 function IsWordInstalled: Boolean;
@@ -1374,15 +1297,12 @@ function IsInternetExplorerInstalled: Boolean;
 function IsMSProjectInstalled: Boolean;
 function IsOpenOfficeInstalled: Boolean;
 function IsLibreOfficeInstalled: Boolean;
-
 {$ENDIF MSWINDOWS}
-
 // Public global variables
 var
   ProcessorCount: Cardinal = 0;
   AllocGranularity: Cardinal = 0;
   PageSize: Cardinal = 0;
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -1394,9 +1314,7 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   {$IFDEF HAS_UNITSCOPE}
   System.SysUtils, System.Math,
@@ -1426,10 +1344,8 @@ uses
   {$ENDIF ~HAS_UNITSCOPE}
   Jcl8087, JclIniFiles,
   JclSysUtils, JclFileUtils, JclAnsiStrings, JclStrings;
-
 {$IFDEF FPC}
 {$IFDEF MSWINDOWS}
-
 function PidlToPath(IdList: PItemIdList): string;
 begin
   SetLength(Result, MAX_PATH);
@@ -1438,9 +1354,7 @@ begin
   else
     Result := '';
 end;
-
 //----------------------------------------------------------------------------
-
 function GetSpecialFolderLocation(const Folder: Integer): string;
 var
   FolderPidl: PItemIdList;
@@ -1457,18 +1371,13 @@ begin
   else
     Result := '';
 end;
-
 //----------------------------------------------------------------------------
-
 {$ENDIF MSWINDOWS}
 {$ENDIF FPC}
-
 //=== Registry helpers =======================================================
-
 const
   HKLM_CURRENT_VERSION_WINDOWS = 'SOFTWARE\Microsoft\Windows\CurrentVersion';
   HKLM_CURRENT_VERSION_NT      = 'SOFTWARE\Microsoft\Windows NT\CurrentVersion';
-
 function RegReadHklmKeyStringValue(const Key, Name: string; Def: string; ForceNative: boolean = false): string;
 var
   LastAccessMode: TJclRegWOW64Access;
@@ -1485,7 +1394,6 @@ begin
   end else
     Result := RegReadStringDef(HKEY_LOCAL_MACHINE, Key, Name, Def);
 end;
-
 function RegReadHklmKeyIntegerValue(const Key, Name: string; Def: Integer; ForceNative: boolean = false): Integer;
 var
   LastAccessMode: TJclRegWOW64Access;
@@ -1502,29 +1410,23 @@ begin
   end else
     Result := RegReadIntegerDef(HKEY_LOCAL_MACHINE, Key, Name, Def);
 end;
-
 function ReadWindowsCurrentVersionStringValue(const Name: string; Def: string; ForceNative: boolean = false): string; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF SUPPORTS_INLINE}
 begin
   Result := RegReadHklmKeyStringValue(HKLM_CURRENT_VERSION_WINDOWS, Name, Def, ForceNative);
 end;
-
 function ReadWindowsCurrentVersionIntegerValue(const Name: string; Def: Integer; ForceNative: boolean = false): Integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF SUPPORTS_INLINE}
 begin
   Result := RegReadHklmKeyIntegerValue(HKLM_CURRENT_VERSION_WINDOWS, Name, Def, ForceNative);
 end;
-
 function ReadWindowsNTCurrentVersionStringValue(const Name: string; Def: string; ForceNative: boolean = false): string; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF SUPPORTS_INLINE}
 begin
   Result := RegReadHklmKeyStringValue(HKLM_CURRENT_VERSION_NT, Name, Def, ForceNative);
 end;
-
 function ReadWindowsNTCurrentVersionIntegerValue(const Name: string; Def: Integer; ForceNative: boolean = false): Integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF SUPPORTS_INLINE}
 begin
   Result := RegReadHklmKeyIntegerValue(HKLM_CURRENT_VERSION_NT, Name, Def, ForceNative);
 end;
-
 //=== Environment ============================================================
-
 function DelEnvironmentVar(const Name: string): Boolean;
 begin
   {$IFDEF UNIX}
@@ -1535,7 +1437,6 @@ begin
   Result := SetEnvironmentVariable(PChar(Name), nil);
   {$ENDIF MSWINDOWS}
 end;
-
 function ExpandEnvironmentVar(var Value: string): Boolean;
 {$IFDEF UNIX}
 begin
@@ -1558,9 +1459,7 @@ begin
   end;
 end;
 {$ENDIF MSWINDOWS}
-
 function ExpandEnvironmentVarCustom(var Value: string; Vars: TStrings): Boolean;
-
   function FindClosingBrace(const R: string; var Position: Integer): Boolean;
   var
     Index, Len, BraceCount: Integer;
@@ -1580,7 +1479,6 @@ function ExpandEnvironmentVarCustom(var Value: string; Vars: TStrings): Boolean;
         else
           Quotes := Quotes + NativeSingleQuote;
       end;
-
       if (R[Position] = NativeDoubleQuote) then
       begin
         Index := JclStrings.CharPos(Quotes, NativeDoubleQuote);
@@ -1589,7 +1487,6 @@ function ExpandEnvironmentVarCustom(var Value: string; Vars: TStrings): Boolean;
         else
           Quotes := Quotes + NativeDoubleQuote;
       end;
-
       if (R[Position] = '`') then
       begin
         Index := JclStrings.CharPos(Quotes, '`');
@@ -1598,7 +1495,6 @@ function ExpandEnvironmentVarCustom(var Value: string; Vars: TStrings): Boolean;
         else
           Quotes := Quotes + '`';
       end;
-
       if Quotes = '' then
       begin
         if R[Position] = ')' then
@@ -1614,7 +1510,6 @@ function ExpandEnvironmentVarCustom(var Value: string; Vars: TStrings): Boolean;
       Inc(Position);
     end;
     Result := Position <= Len;
-
 //    Delphi XE's CodeGear.Delphi.Targets has a bug where the closing paran is missing
 //    "'$(DelphiWin32DebugDCUPath'!=''". But it is still a valid string and not worth
 //    an exception.
@@ -1622,7 +1517,6 @@ function ExpandEnvironmentVarCustom(var Value: string; Vars: TStrings): Boolean;
 //    if Position > Len then
 //      raise EJclMsBuildError.CreateResFmt(@RsEEndOfString, [S]);
   end;
-
 var
   Start, Position: Integer;
   PropertyName, PropertyValue: string;
@@ -1638,9 +1532,7 @@ begin
       if not FindClosingBrace(Value, Position) then
         Break;
       PropertyName := Copy(Value, Start + 2, Position - Start - 2);
-
       PropertyValue := Vars.Values[PropertyName];
-
       if PropertyValue <> '' then
         StrReplace(Value,
                    Copy(Value, Start, Position - Start + 1), // $(PropertyName)
@@ -1654,29 +1546,22 @@ begin
     end;
   until Start = 0;
 end;
-
 {$IFDEF UNIX}
-
 function GetEnvironmentVar(const Name: string; var Value: string): Boolean;
 begin
   Value := getenv(PChar(Name));
   Result := Value <> '';
 end;
-
 function GetEnvironmentVar(const Name: string; var Value: string; Expand: Boolean): Boolean;
 begin
   Result := GetEnvironmentVar(Name, Value); // Expand is there just for x-platform compatibility
 end;
-
 {$ENDIF UNIX}
-
 {$IFDEF MSWINDOWS}
-
 function GetEnvironmentVar(const Name: string; out Value: string): Boolean;
 begin
   Result := GetEnvironmentVar(Name, Value, True);
 end;
-
 function GetEnvironmentVar(const Name: string; out Value: string; Expand: Boolean): Boolean;
 var
   R: DWORD;
@@ -1694,9 +1579,7 @@ begin
       ExpandEnvironmentVar(Value);
   end;
 end;
-
 {$ENDIF MSWINDOWS}
-
 {$IFDEF LINUX}
 function GetEnvironmentVars(const Vars: TStrings): Boolean;
 var
@@ -1716,19 +1599,16 @@ begin
     Vars.EndUpdate;
   end;
 end;
-
 function GetEnvironmentVars(const Vars: TStrings; Expand: Boolean): Boolean;
 begin
   Result := GetEnvironmentVars(Vars); // Expand is there just for x-platform compatibility
 end;
 {$ENDIF LINUX}
-
 {$IFDEF MSWINDOWS}
 function GetEnvironmentVars(const Vars: TStrings): Boolean;
 begin
   Result := GetEnvironmentVars(Vars, True);
 end;
-
 function GetEnvironmentVars(const Vars: TStrings; Expand: Boolean): Boolean;
 var
   Raw: PChar;
@@ -1758,9 +1638,7 @@ begin
     Vars.EndUpdate;
   end;
 end;
-
 {$ENDIF MSWINDOWS}
-
 function SetEnvironmentVar(const Name, Value: string): Boolean;
 begin
   {$IFDEF UNIX}
@@ -1771,9 +1649,7 @@ begin
   Result := SetEnvironmentVariable(PChar(Name), PChar(Value));
   {$ENDIF MSWINDOWS}
 end;
-
 {$IFDEF MSWINDOWS}
-
 function CreateEnvironmentBlock(const Options: TEnvironmentOptions; const AdditionalVars: TStrings): PChar;
 const
   RegLocalEnvironment = 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment';
@@ -1838,15 +1714,12 @@ begin
     FreeAndNil(TempList);
   end;
 end;
-
 // frees an environment block allocated by CreateEnvironmentBlock and
 // sets Env to nil
-
 procedure DestroyEnvironmentBlock(var Env: PChar);
 begin
   FreeMultiSz(Env);
 end;
-
 procedure SetGlobalEnvironmentVariable(VariableName, VariableContent: string);
 const
   cEnvironment = 'Environment';
@@ -1865,9 +1738,7 @@ begin
   end;
   SendMessage(HWND_BROADCAST, WM_SETTINGCHANGE, 0, LPARAM(PChar(cEnvironment)));
 end;
-
 //=== Common Folders =========================================================
-
 { TODO : Check for documented solution }
 function GetCommonFilesFolder: string;
 begin
@@ -1876,9 +1747,7 @@ begin
   Result := RegReadStringDef(HKEY_LOCAL_MACHINE, HKLM_CURRENT_VERSION_WINDOWS,
     'CommonFilesDir', '');
 end;
-
 {$ENDIF MSWINDOWS}
-
 function GetCurrentFolder: string;
 {$IFDEF UNIX}
 const
@@ -1919,7 +1788,6 @@ begin
   end;
 end;
 {$ENDIF MSWINDOWS}
-
 {$IFDEF MSWINDOWS}
 { TODO : Check for documented solution }
 function GetProgramFilesFolder: string;
@@ -1928,7 +1796,6 @@ begin
   // as we want the platform (x86/x64) specific common folder.
   Result := RegReadStringDef(HKEY_LOCAL_MACHINE, HKLM_CURRENT_VERSION_WINDOWS, 'ProgramFilesDir', '');
 end;
-
 { TODO : Check for documented solution }
 function GetWindowsFolder: string;
 var
@@ -1943,7 +1810,6 @@ begin
     StrResetLength(Result);
   end;
 end;
-
 { TODO : Check for documented solution }
 function GetWindowsSystemFolder: string;
 var
@@ -1958,23 +1824,19 @@ begin
     StrResetLength(Result);
   end;
 end;
-
 function GetWindowsTempFolder: string;
 begin
   Result := PathRemoveSeparator(PathGetTempPath);
 end;
-
 function GetDesktopFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_DESKTOP);
 end;
-
 { TODO : Check GetProgramsFolder = GetProgramFilesFolder }
 function GetProgramsFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_PROGRAMS);
 end;
-
 {$ENDIF MSWINDOWS}
 function GetPersonalFolder: string;
 begin
@@ -1985,123 +1847,99 @@ begin
   Result := GetSpecialFolderLocation(CSIDL_PERSONAL);
   {$ENDIF MSWINDOWS}
 end;
-
 {$IFDEF MSWINDOWS}
 function GetFavoritesFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_FAVORITES);
 end;
-
 function GetStartupFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_STARTUP);
 end;
-
 function GetRecentFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_RECENT);
 end;
-
 function GetSendToFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_SENDTO);
 end;
-
 function GetStartmenuFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_STARTMENU);
 end;
-
 function GetDesktopDirectoryFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_DESKTOPDIRECTORY);
 end;
-
 function GetCommonDocumentsFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_COMMON_DOCUMENTS);
 end;
-
 function GetNethoodFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_NETHOOD);
 end;
-
 function GetFontsFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_FONTS);
 end;
-
 function GetCommonStartmenuFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_COMMON_STARTMENU);
 end;
-
 function GetCommonProgramsFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_COMMON_PROGRAMS);
 end;
-
 function GetCommonStartupFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_COMMON_STARTUP);
 end;
-
 function GetCommonDesktopdirectoryFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_COMMON_DESKTOPDIRECTORY);
 end;
-
 function GetCommonAppdataFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_COMMON_APPDATA);
 end;
-
 function GetAppdataFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_APPDATA);
 end;
-
 function GetLocalAppData: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_LOCAL_APPDATA);
 end;
-
 function GetPrinthoodFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_PRINTHOOD);
 end;
-
 function GetCommonFavoritesFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_COMMON_FAVORITES);
 end;
-
 function GetTemplatesFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_TEMPLATES);
 end;
-
 function GetInternetCacheFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_INTERNET_CACHE);
 end;
-
 function GetCookiesFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_COOKIES);
 end;
-
 function GetHistoryFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_HISTORY);
 end;
-
 function GetProfileFolder: string;
 begin
   Result := GetSpecialFolderLocation(CSIDL_PROFILE);
 end;
-
 // the following special folders are pure virtual and cannot be
 // mapped to a directory path:
 // CSIDL_INTERNET
@@ -2112,11 +1950,9 @@ end;
 // CSIDL_NETWORK
 // CSIDL_ALTSTARTUP
 // CSIDL_COMMON_ALTSTARTUP
-
 // Identification
 type
   TVolumeInfoKind = (vikName, vikSerial, vikFileSystem);
-
 function GetVolumeInfoHelper(const Drive: string; InfoKind: TVolumeInfoKind): string;
 var
   VolumeSerialNumber: DWORD;
@@ -2157,24 +1993,19 @@ begin
     SetErrorMode(ErrorMode);
   end;
 end;
-
 function GetVolumeName(const Drive: string): string;
 begin
   Result := GetVolumeInfoHelper(Drive, vikName);
 end;
-
 function GetVolumeSerialNumber(const Drive: string): string;
 begin
   Result := GetVolumeInfoHelper(Drive, vikSerial);
 end;
-
 function GetVolumeFileSystem(const Drive: string): string;
 begin
   Result := GetVolumeInfoHelper(Drive, vikFileSystem);
 end;
-
 { TODO -cHelp : Donator (incl. TFileSystemFlag[s]): Robert Rossmair }
-
 function GetVolumeFileSystemFlags(const Volume: string): TFileSystemFlags;
 const
   FileSystemFlags: array [TFileSystemFlag] of DWORD =
@@ -2207,11 +2038,8 @@ begin
     if (Flags and FileSystemFlags[Flag]) <> 0 then
       Include(Result, Flag);
 end;
-
 {$ENDIF MSWINDOWS}
-
 { TODO -cDoc: Contributor: twm }
-
 function GetIPAddress(const HostName: string): string;
 var
   {$IFDEF MSWINDOWS}
@@ -2247,15 +2075,12 @@ begin
     end;
     {$ENDIF MSWINDOWS}
 end;
-
 { TODO -cDoc: Donator: twm }
-
 {$IFDEF MSWINDOWS}
 procedure GetIpAddresses(Results: TStrings);
 begin
   GetIpAddresses(Results, '');
 end;
-
 procedure GetIpAddresses(Results: TStrings; const HostName: AnsiString);
 type
   TaPInAddr = array[0..10] of PInAddr;
@@ -2297,11 +2122,8 @@ begin
   end;
 end;
 {$ENDIF MSWINDOWS}
-
 {$IFDEF UNIX}
-
 { TODO -cDoc: Donator: twm, Contributor rrossmair }
-
 // Returns all IP addresses of the local machine in the form
 // <interface>=<IP-Address> (which allows for access to the interface names
 // by means of Results.Names and the addresses through Results.Values)
@@ -2314,7 +2136,6 @@ end;
 //
 // note that this will append to Results!
 //
-
 procedure GetIpAddresses(Results: TStrings);
 var
   Sock: Integer;
@@ -2326,7 +2147,6 @@ begin
   Sock := socket(AF_INET, SOCK_STREAM, 0);
   if Sock < 0 then
     RaiseLastOSError;
-
   try
     //returns pointer to dynamically allocated list of structs
     ListSave := if_nameindex();
@@ -2363,9 +2183,7 @@ begin
     Libc.__close(Sock)
   end;
 end;
-
 {$ENDIF UNIX}
-
 function GetLocalComputerName: string;
 {$IFDEF LINUX}
 var
@@ -2389,7 +2207,6 @@ begin
     Result := '';
 end;
 {$ENDIF MSWINDOWS}
-
 function GetLocalUserName: string;
 {$IFDEF UNIX}
 begin
@@ -2410,7 +2227,6 @@ begin
     Result := '';
 end;
 {$ENDIF MSWINDOWS}
-
 {$IFDEF MSWINDOWS}
 function GetRegisteredCompany: string;
 begin
@@ -2420,7 +2236,6 @@ begin
   else
     Result := ReadWindowsCurrentVersionStringValue('RegisteredOrganization', '', True);
 end;
-
 function GetRegisteredOwner: string;
 begin
   { TODO : check for MSDN documentation }
@@ -2429,9 +2244,7 @@ begin
   else
     Result := ReadWindowsCurrentVersionStringValue('RegisteredOwner', '', True);
 end;
-
 { TODO: Check supported platforms, maybe complete rewrite }
-
 function GetUserDomainName(const CurUser: string): string;
 var
   Count1, Count2: DWORD;
@@ -2456,7 +2269,6 @@ begin
     FreeMem(Sd);
   end;
 end;
-
 function GetWorkGroupName: WideString;
 var
   WkstaInfo: PByte;
@@ -2468,7 +2280,6 @@ begin
   Result := WideString(PWideChar(WkstaInfo100^.wki100_langroup));
   NetApiBufferFree(Pointer(WkstaInfo));
 end;
-
 {$ENDIF MSWINDOWS}
 function GetDomainName: string;
 {$IFDEF UNIX}
@@ -2489,7 +2300,6 @@ var
   InfoBuffer: PChar;
   AccountName: array [0..UNLEN] of Char;
   DomainName: array [0..UNLEN] of Char;
-
   InfoBufferSize: Cardinal;
   AccountSize: Cardinal;
   DomainSize: Cardinal;
@@ -2498,7 +2308,6 @@ begin
   InfoBufferSize := 1000;
   AccountSize := Length(AccountName);
   DomainSize := Length(DomainName);
-
   hProcess := GetCurrentProcess;
   if OpenProcessToken(hProcess, TOKEN_READ, hAccessToken) then
   try
@@ -2518,11 +2327,9 @@ begin
   end
 end;
 {$ENDIF MSWINDOWS}
-
 {$IFDEF MSWINDOWS}
 // Reference: How to Obtain BIOS Information from the Registry
 // http://support.microsoft.com/default.aspx?scid=kb;en-us;q195268
-
 function GetBIOSName: string;
 const
   Win9xBIOSInfoKey = 'Enum\Root\*PNP0C01\0000';
@@ -2532,7 +2339,6 @@ begin
   else
     Result := RegReadStringDef(HKEY_LOCAL_MACHINE, Win9xBIOSInfoKey, 'BIOSName', '');
 end;
-
 function GetBIOSCopyright: string;
 const
   ADR_BIOSCOPYRIGHT = $FE091;
@@ -2545,7 +2351,6 @@ begin
     Result := '';
   end;
 end;
-
 function GetBIOSExtendedInfo: string;
 const
   ADR_BIOSEXTENDEDINFO = $FEC71;
@@ -2558,10 +2363,8 @@ begin
     Result := '';
   end;
 end;
-
 // Reference: How to Obtain BIOS Information from the Registry
 // http://support.microsoft.com/default.aspx?scid=kb;en-us;q195268
-
 { TODO : the date string can be e.g. 00/00/00 }
 function GetBIOSDate: TDateTime;
 const
@@ -2615,17 +2418,13 @@ begin
   end;
   {$ENDIF ~RTL150_UP}
 end;
-
 {$ENDIF MSWINDOWS}
-
 //=== Processes, Tasks and Modules ===========================================
-
 {$IFDEF UNIX}
 const
   CommLen = 16;  // synchronize with size of comm in struct task_struct in
                  //     /usr/include/linux/sched.h
   SProcDirectory = '/proc';
-
 function RunningProcessesList(const List: TStrings; FullPath: Boolean): Boolean;
 var
   ProcDir: PDirectoryStream;
@@ -2656,10 +2455,8 @@ begin
         if E = 0 then // name was process id
         begin
           FileName := '';
-
           if FullPath then
             FileName := SymbolicLinkTarget(Format('/proc/%s/exe', [PtrDirEnt^.d_name]));
-
           if FileName = '' then // usually due to insufficient access rights
           begin
             // read stat
@@ -2676,7 +2473,6 @@ begin
               fclose(F);
             end;
           end;
-
           List.AddObject(FileName, Pointer(ProcID));
         end;
         {$IFDEF FPC}
@@ -2692,13 +2488,9 @@ begin
     end;
   end;
 end;
-
 {$ENDIF UNIX}
-
 {$IFDEF MSWINDOWS}
-
 function RunningProcessesList(const List: TStrings; FullPath: Boolean): Boolean;
-
   // This function always returns an empty string on Win9x
   function ProcessFileName(PID: DWORD): string;
   var
@@ -2727,7 +2519,6 @@ function RunningProcessesList(const List: TStrings; FullPath: Boolean): Boolean;
       CloseHandle(Handle);
     end;
   end;
-
   { TODO: Check return value of CreateToolhelp32Snapshot on Windows NT (0?) }
   function BuildListTH: Boolean;
   var
@@ -2774,7 +2565,6 @@ function RunningProcessesList(const List: TStrings; FullPath: Boolean): Boolean;
       CloseHandle(SnapProcHandle);
     end;
   end;
-
   function BuildListPS: Boolean;
   var
     PIDs: array [0..1024] of DWORD;
@@ -2815,7 +2605,6 @@ function RunningProcessesList(const List: TStrings; FullPath: Boolean): Boolean;
       end;
     end;
   end;
-
 begin
   { TODO : safer solution? }
   List.BeginUpdate;
@@ -2828,11 +2617,8 @@ begin
     List.EndUpdate;
   end;
 end;
-
 { TODO Windows 9x ? }
-
 function LoadedModulesList(const List: TStrings; ProcessID: DWORD; HandlesOnly: Boolean): Boolean;
-
   procedure AddToList(ProcessHandle: THandle; Module: HMODULE);
   var
     FileName: array [0..MAX_PATH] of Char;
@@ -2852,7 +2638,6 @@ function LoadedModulesList(const List: TStrings; ProcessID: DWORD; HandlesOnly: 
         List.AddObject(FileName, Pointer(ModuleInfo.lpBaseOfDll));
     end;
   end;
-
   function EnumModulesVQ(ProcessHandle: THandle): Boolean;
   var
     MemInfo: TMemoryBasicInformation;
@@ -2884,7 +2669,6 @@ function LoadedModulesList(const List: TStrings; ProcessID: DWORD; HandlesOnly: 
       Res := VirtualQueryEx(ProcessHandle, Base, MemInfo, SizeOf(MemInfo));
     end;
   end;
-
   function EnumModulesPS: Boolean;
   var
     ProcessHandle: THandle;
@@ -2912,9 +2696,7 @@ function LoadedModulesList(const List: TStrings; ProcessID: DWORD; HandlesOnly: 
       CloseHandle(ProcessHandle);
     end;
   end;
-
  { TODO: Check return value of CreateToolhelp32Snapshot on Windows NT (0?) }
-
   function EnumModulesTH: Boolean;
   var
     SnapProcHandle: THandle;
@@ -2940,7 +2722,6 @@ function LoadedModulesList(const List: TStrings; ProcessID: DWORD; HandlesOnly: 
       CloseHandle(SnapProcHandle);
     end;
   end;
-
 begin
   List.BeginUpdate;
   try
@@ -2952,7 +2733,6 @@ begin
     List.EndUpdate;
   end;
 end;
-
 function EnumTaskWindowsProc(Wnd: THandle; List: TStrings): Boolean; stdcall;
 var
   Caption: array [0..1024] of Char;
@@ -2961,7 +2741,6 @@ begin
     List.AddObject(Caption, Pointer(Wnd));
   Result := True;
 end;
-
 function GetTasksList(const List: TStrings): Boolean;
 begin
   List.BeginUpdate;
@@ -2971,7 +2750,6 @@ begin
     List.EndUpdate;
   end;
 end;
-
 function ModuleFromAddr(const Addr: Pointer): HMODULE;
 var
   MI: TMemoryBasicInformation;
@@ -2981,7 +2759,6 @@ begin
   else
     Result := 0;
 end;
-
 function IsSystemModule(const Module: HMODULE): Boolean;
 var
   CurModule: PLibModule;
@@ -3002,7 +2779,6 @@ begin
   end;
 end;
 
-
 // Cache for the slow VirtualQuery calls
 //
 // BeginModuleFromAddrCache;
@@ -3019,21 +2795,17 @@ type
     Size: SizeInt;
     Module: HMODULE;
   end;
-
   TModuleAddrSizeList = class(TList)
   public
     Counter: Integer;
     LastAccessIndex: Integer;
   end;
-
 // The main module (EXE) and the module that contains the JclSysInfo unit can be
 // cached once for all Begin/EndModuleFromAddrCache blocks.
 var
   MainModuleAddrSize, InstanceModuleAddrSize: TModuleAddrSize;
-
 threadvar
   ModuleAddrSize: TModuleAddrSizeList;
-
 procedure BeginModuleFromAddrCache;
 const
   ModuleCodeOffset = $1000;
@@ -3049,7 +2821,6 @@ begin
     List.Counter := 1;
     List.LastAccessIndex := -1;
     ModuleAddrSize := List;
-
     // Query the module addresses for the main module and JclSysInfo's module and
     // add them to the list.
     MainModule := 0;
@@ -3070,7 +2841,6 @@ begin
         List.LastAccessIndex := -1;
       end;
     end;
-
     if (MainModule = 0) and (MainModuleAddrSize.Module <> 0) then
     begin
       New(P);
@@ -3087,7 +2857,6 @@ begin
   else
     Inc(List.Counter);
 end;
-
 procedure EndModuleFromAddrCache;
 var
   List: TModuleAddrSizeList;
@@ -3106,7 +2875,6 @@ begin
     end;
   end;
 end;
-
 function CachedModuleFromAddr(const Addr: Pointer): HMODULE;
 var
   P: PModuleAddrSize;
@@ -3120,7 +2888,6 @@ begin
     Result := ModuleFromAddr(Addr);
     Exit;
   end;
-
   LastAccessIndex := List.LastAccessIndex;
   if LastAccessIndex <> -1 then
   begin
@@ -3132,7 +2899,6 @@ begin
       Exit;
     end;
   end;
-
   for I := 0 to List.Count - 1 do
   begin
     P := List[I];
@@ -3144,7 +2910,6 @@ begin
       Exit;
     end;
   end;
-
   if (VirtualQuery(Addr, MI, SizeOf(MI)) = SizeOf(MI)) and (MI.State = MEM_COMMIT) then
   begin
     New(P);
@@ -3157,10 +2922,8 @@ begin
   else
     Result := 0;
 end;
-
 // Reference: http://msdn.microsoft.com/library/periodic/period97/win321197.htm
 { TODO : wrong link }
-
 function IsMainAppWindow(Wnd: THandle): Boolean;
 var
   ParentWnd: THandle;
@@ -3176,7 +2939,6 @@ begin
   else
     Result := False;
 end;
-
 function IsWindowResponding(Wnd: THandle; Timeout: Integer): Boolean;
 var
   Res: DWORD;
@@ -3184,7 +2946,6 @@ begin
   Res := 0;
   Result := SendMessageTimeout(Wnd, WM_NULL, 0, 0, SMTO_ABORTIFHUNG, Timeout, {$IFDEF RTL230_UP}@{$ENDIF}Res) <> 0;
 end;
-
 function GetWindowIcon(Wnd: THandle; LargeIcon: Boolean): HICON;
 var
   Width, Height: Integer;
@@ -3211,7 +2972,6 @@ begin
     TempIcon := SendMessage(Wnd, WM_GETICON, ICON_BIG, 0);
   Result := CopyImage(TempIcon, IMAGE_ICON, Width, Height, 0);
 end;
-
 function GetWindowCaption(Wnd: THandle): string;
 var
   Buffer: string;
@@ -3225,10 +2985,8 @@ begin
   Size := GetWindowText(Wnd, PChar(Buffer), Size + 1);
   Result := Copy(Buffer, 1, Size);
 end;
-
 // Q178893
 // http://support.microsoft.com/default.aspx?scid=kb;en-us;178893
-
 function EnumTerminateAppWindowsProc(Wnd: THandle; ProcessID: DWORD): Boolean; stdcall;
 var
   PID: DWORD;
@@ -3238,7 +2996,6 @@ begin
     PostMessage(Wnd, WM_CLOSE, 0, 0);
   Result := True;
 end;
-
 function TerminateApp(ProcessID: DWORD; Timeout: Integer): TJclTerminateAppResult;
 var
   ProcessHandle: THandle;
@@ -3260,7 +3017,6 @@ begin
     end;
   end;
 end;
-
 function TerminateTask(Wnd: THandle; Timeout: Integer): TJclTerminateAppResult;
 var
   PID: DWORD;
@@ -3270,7 +3026,6 @@ begin
   else
     Result := taError;
 end;
-
 function GetProcessNameFromWnd(Wnd: THandle): string;
 var
   List: TStringList;
@@ -3295,7 +3050,6 @@ begin
     end;
   end;
 end;
-
 function GetPidFromProcessName(const ProcessName: string): THandle;
 var
   List: TStringList;
@@ -3316,7 +3070,6 @@ begin
     List.Free;
   end;
 end;
-
 function GetProcessNameFromPid(PID: DWORD): string;
 var
   List: TStringList;
@@ -3338,14 +3091,12 @@ begin
     List.Free;
   end;
 end;
-
 type
   PSearch = ^TSearch;
   TSearch = record
     PID: DWORD;
     Wnd: THandle;
   end;
-
 function EnumMainAppWindowsProc(Wnd: THandle; Res: PSearch): Boolean; stdcall;
 var
   WindowPid: DWORD;
@@ -3360,7 +3111,6 @@ begin
   else
     Result := True;
 end;
-
 function GetMainAppWndFromPid(PID: DWORD): THandle;
 var
   SearchRec: TSearch;
@@ -3370,7 +3120,6 @@ begin
   EnumWindows(@EnumMainAppWindowsProc, LPARAM(@SearchRec));
   Result := SearchRec.Wnd;
 end;
-
 type
   PEnumWndStruct = ^TEnumWndStruct;
   TEnumWndStruct = record
@@ -3378,7 +3127,6 @@ type
       WndClassName: string;
       ResultWnd: HWND;
   end;
-
 function EnumPidWinProc(Wnd: HWND; Enum: PEnumWndStruct): BOOL; stdcall;
 var
   PID: DWORD;
@@ -3400,7 +3148,6 @@ begin
     StrDispose(C);
   end;
 end;
-
 function GetWndFromPid(PID: DWORD; const WindowClassName: string): HWND;
 var
   EnumWndStruct: TEnumWndStruct;
@@ -3411,7 +3158,6 @@ begin
   EnumWindows(@EnumPidWinProc, LPARAM(@EnumWndStruct));
   Result := EnumWndStruct.ResultWnd;
 end;
-
 function GetShellProcessName: string;
 const
   cShellKey = HKLM_CURRENT_VERSION_NT + '\WinLogon';
@@ -3427,7 +3173,6 @@ begin
   if Result = '' then
     Result := cShellDefault;
 end;
-
 function GetShellProcessHandle: THandle;
 var
   Pid: Longword;
@@ -3437,11 +3182,8 @@ begin
   if Result = 0 then
     RaiseLastOSError;
 end;
-
 //=== Version Information ====================================================
-
 { Q159/238
-
   Windows 95 retail, OEM    4.00.950                      7/11/95
   Windows 95 retail SP1     4.00.950A                     7/11/95-12/31/95
   OEM Service Release 2     4.00.1111* (4.00.950B)        8/24/96
@@ -3452,10 +3194,8 @@ end;
   Windows Millennium        4.90.3000
 }
 { TODO : Distinquish between all these different releases? }
-
 var
   KernelVersionHi: DWORD;
-
 function GetWindowsVersion: TWindowsVersion;
 var
   TrimmedWin32CSDVersion: string;
@@ -3470,7 +3210,6 @@ begin
   Win32MinorVersionEx := -1;
   Result := wvUnknown;
   TrimmedWin32CSDVersion := Trim(Win32CSDVersion);
-
   case Win32Platform of
     VER_PLATFORM_WIN32_WINDOWS:
       case Win32MinorVersion of
@@ -3532,7 +3271,6 @@ begin
           // Starting with Windows 8.1, the GetVersion(Ex) API is deprecated and will detect the
           // application as Windows 8 (kernel version 6.2) until an application manifest is included
           // See https://msdn.microsoft.com/en-us/library/windows/desktop/dn302074.aspx
-
           if Win32MinorVersion = 2 then
           begin
             ProductName := GetWindowsProductName;
@@ -3555,7 +3293,6 @@ begin
           end
           else
             Win32MinorVersionEx := Win32MinorVersion;
-
           case Win32MinorVersionEx of
             0:
               begin
@@ -3612,7 +3349,6 @@ begin
         end;
       end;
   end;
-
   // This part will only be hit with Windows 10, Windows Server 2016 and beyond where an application manifest is not included
   if (Win32MajorVersionEx >= 10) then
   begin
@@ -3652,17 +3388,14 @@ begin
     end;
   end;
 end;
-
 function GetWindowsEdition: TWindowsEdition;
 var
   Edition: string;
 begin
   Result := weUnknown;
   Edition := GetWindowsProductName;
-
   // Remove (tm) in 'Windows (TM) Vista Ultimate'
   Edition := StringReplace(Edition, '(TM) ', '', [rfReplaceAll, rfIgnoreCase]);
-
   if Pos('Windows XP', Edition) = 1 then
   begin
    // Windows XP Editions
@@ -3797,9 +3530,7 @@ begin
    else
       Result := weWin10;
   end
-
 end;
-
 function NtProductType: TNtProductType;
 const
   ProductTypeKey = 'SYSTEM\CurrentControlSet\Control\ProductOptions';
@@ -3813,7 +3544,6 @@ begin
   ResetMemory(SystemInfo, SizeOf(SystemInfo));
   OSVersionInfo.dwOSVersionInfoSize := SizeOf(OSVersionInfo);
   GetNativeSystemInfo(SystemInfo);
-
   // Favor documented API over registry
   if IsWinNT4 and (GetWindowsServicePackVersion >= 6) then
   begin
@@ -3897,7 +3627,6 @@ begin
       end;
     end;
   end;
-
   if Result = ptUnknown then
   begin
     // Non Windows 2000/XP system or the above method failed, try registry
@@ -3914,7 +3643,6 @@ begin
       Result := ptUnknown;
   end;
 end;
-
 function GetWindowsVersionString: string;
 begin
   case GetWindowsVersion of
@@ -3978,7 +3706,6 @@ begin
     Result := '';
   end;
 end;
-
 function GetWindowsEditionString: string;
 begin
   case GetWindowsEdition of
@@ -4056,14 +3783,12 @@ begin
     Result := '';
   end;
 end;
-
 function GetWindowsProductString: string;
 begin
   Result := GetWindowsVersionString;
   if GetWindowsEditionString <> '' then
     Result := Result + ' ' + GetWindowsEditionString;
 end;
-
 function GetWindowsProductName: string;
 begin
   // On Windows 10/11, the productname in the 'WOW6432Node' key differs from the value
@@ -4072,7 +3797,6 @@ begin
   // which alos have the 'WOW6432Node' registry key.
   Result := ReadWindowsNTCurrentVersionStringValue('ProductName', '', IsWin10 or IsWin11);
 end;
-
 function NtProductTypeString: string;
 begin
   case NtProductType of
@@ -4096,7 +3820,6 @@ begin
     Result := '';
   end;
 end;
-
 function GetWindowsBuildNumber: Integer;
 begin
   // Starting with Windows 8.1, the GetVersion(Ex) API is deprecated and will detect the
@@ -4107,7 +3830,6 @@ begin
   else
     Result := Win32BuildNumber;
 end;
-
 function GetWindowsMajorVersionNumber: Integer;
 var
   Ver: string;
@@ -4129,7 +3851,6 @@ begin
   else
     Result := Win32MajorVersion;
 end;
-
 function GetWindowsMinorVersionNumber: Integer;
 var
   Ver: string;
@@ -4151,13 +3872,11 @@ begin
   else
     Result := Win32MinorVersion;
 end;
-
 function GetWindowsVersionNumber: string;
 begin
   // Returns version number as MajorVersionNumber.MinorVersionNumber (string type)
   Result := Format('%d.%d', [GetWindowsMajorVersionNumber, GetWindowsMinorVersionNumber]);
 end;
-
 function GetWindowsServicePackVersion: Integer;
 const
   RegWindowsControl = 'SYSTEM\CurrentControlSet\Control\Windows';
@@ -4179,7 +3898,6 @@ begin
     Result := StrToInt(IntToHex(SP, 4)) div 100;
   end;
 end;
-
 function GetWindowsServicePackVersionString: string;
 var
   SP: Integer;
@@ -4190,7 +3908,6 @@ begin
   else
     Result := '';
 end;
-
 function GetWindowsDisplayVersion: string;
 begin
   // Starting with Windows 10 20H2, the DisplayVersion registry entry is being populated ("20H2")
@@ -4199,7 +3916,6 @@ begin
   else
     Result := '';
 end;
-
 function GetWindowsReleaseId: Integer;
 begin
   // Starting with Windows 10 21H1, the ReleaseId registry entry is no more incremented (still populated as "2009" like Windows 10 20H2 and Windows 11)
@@ -4209,7 +3925,6 @@ begin
   else
     Result := -1;
 end;
-
 function GetWindowsReleaseName: String;
 var
   WindowsDisplayVersion: string;
@@ -4260,7 +3975,6 @@ begin
   else
     Result := '';
 end;
-
 function GetWindowsReleaseCode: String;
 var
   WindowsReleaseId: Integer;
@@ -4289,7 +4003,6 @@ begin
   else
     Result := GetWindowsDisplayVersion;
 end;
-
 function GetWindowsReleaseCodeName: String;
 begin
   if IsWin10 then
@@ -4324,7 +4037,6 @@ begin
   else
     Result := GetWindowsDisplayVersion;
 end;
-
 function GetWindowsReleaseVersion: String;
 var
   WindowsReleaseId: Integer;
@@ -4360,7 +4072,6 @@ begin
   else
     Result := '';
 end;
-
 function GetWindows10DisplayVersion: string;
 begin
   if IsWin10 then
@@ -4368,7 +4079,6 @@ begin
   else
     Result := '';
 end;
-
 function GetWindows10ReleaseId: Integer;
 begin
   if IsWin10 then
@@ -4376,7 +4086,6 @@ begin
   else
     Result := -1;
 end;
-
 function GetWindows10ReleaseName: String;
 begin
   if IsWin10 then
@@ -4384,7 +4093,6 @@ begin
   else
     Result := '';
 end;
-
 function GetWindows10ReleaseCodeName: String;
 begin
   if IsWin10 then
@@ -4392,7 +4100,6 @@ begin
   else
     Result := '';
 end;
-
 function GetWindows10ReleaseVersion: String;
 begin
   if IsWin10 then
@@ -4400,7 +4107,6 @@ begin
   else
     Result := '';
 end;
-
 function GetWindowsServerDisplayVersion: string;
 begin
   if IsWinServer then
@@ -4408,7 +4114,6 @@ begin
   else
     Result := '';
 end;
-
 function GetWindowsServerReleaseId: Integer;
 begin
   if IsWinServer then
@@ -4416,7 +4121,6 @@ begin
   else
     Result := -1;
 end;
-
 function GetWindowsServerReleaseVersion: String;
 begin
   if IsWinServer then
@@ -4424,7 +4128,6 @@ begin
   else
     Result := '';
 end;
-
 // Imports copied from OpenGL unit. Direct using of OpenGL unit might cause unexpected problems due
 // setting 8087CW in the intialization section
 {
@@ -4432,16 +4135,13 @@ function glGetString(name: Cardinal): PChar; stdcall; external opengl32;
 function glGetError: Cardinal; stdcall; external opengl32;
 function gluErrorString(errCode: Cardinal): PChar; stdcall; external 'glu32.dll';
 }
-
 type
   TglGetStringFunc = function(name: Cardinal): PAnsiChar; stdcall;
   TglGetErrorFunc = function: Cardinal; stdcall;
   TgluErrorStringFunc = function(errCode: Cardinal): PAnsiChar; stdcall;
-
   TwglCreateContextFunc = function(DC: HDC): HGLRC; stdcall;
   TwglDeleteContextFunc = function(p1: HGLRC): BOOL; stdcall;
   TwglMakeCurrentFunc = function(DC: HDC; p2: HGLRC): BOOL; stdcall;
-
 const
   glu32 = 'glu32.dll'; // do not localize
   glGetStringName = 'glGetString'; // do not localize
@@ -4452,7 +4152,6 @@ const
   wglMakeCurrentName = 'wglMakeCurrent'; // do not localize
   ChoosePixelFormatName = 'ChoosePixelFormat'; // do not localize
   SetPixelFormatName = 'SetPixelFormat'; // do not localize
-
 function GetOpenGLVersion(const Win: THandle; out Version, Vendor: AnsiString): Boolean;
 const
   GL_NO_ERROR = 0;
@@ -4460,15 +4159,12 @@ const
   GL_VERSION  = $1F02;
 var
   OpenGlLib, Glu32Lib: HModule;
-
   glGetStringFunc: TglGetStringFunc;
   glGetErrorFunc: TglGetErrorFunc;
   gluErrorStringFunc: TgluErrorStringFunc;
-
   wglCreateContextFunc: TwglCreateContextFunc;
   wglDeleteContextFunc: TwglDeleteContextFunc;
   wglMakeCurrentFunc: TwglMakeCurrentFunc;
-
   pfd: TPixelFormatDescriptor;
   iFormatIndex: Integer;
   hGLContext: HGLRC;
@@ -4478,21 +4174,17 @@ var
   bError: Boolean;
   sOpenGLVersion, sOpenGLVendor: AnsiString;
   Save8087CW: Word;
-
   procedure FunctionFailedError(Name: string);
   begin
     raise EJclError.CreateResFmt(@RsEOpenGLInfo, [Name]);
   end;
-
 begin
   @glGetStringFunc := nil;
   @glGetErrorFunc := nil;
   @gluErrorStringFunc := nil;
-
   @wglCreateContextFunc := nil;
   @wglDeleteContextFunc := nil;
   @wglMakeCurrentFunc := nil;
-
   Glu32Lib := 0;
   OpenGlLib := SafeLoadLibrary(opengl32);
   try
@@ -4504,13 +4196,11 @@ begin
         glGetStringFunc := GetProcAddress(OpenGlLib, glGetStringName);
         glGetErrorFunc := GetProcAddress(OpenGlLib, glGetErrorName);
         gluErrorStringFunc := GetProcAddress(Glu32Lib, gluErrorStringName);
-
         wglCreateContextFunc := GetProcAddress(OpenGlLib, wglCreateContextName);
         wglDeleteContextFunc := GetProcAddress(OpenGlLib, wglDeleteContextName);
         wglMakeCurrentFunc := GetProcAddress(OpenGlLib, wglMakeCurrentName);
       end;
     end;
-
     if not (Assigned(glGetStringFunc) and Assigned(glGetErrorFunc) and Assigned(gluErrorStringFunc) and
             Assigned(wglCreateContextFunc) and Assigned(wglDeleteContextFunc) and Assigned(wglMakeCurrentFunc)) then
     begin
@@ -4520,7 +4210,6 @@ begin
       Version := AnsiString(LoadResString(@RsOpenGLInfoError));
       Exit;
     end;
-
     { To call for the version information string we must first have an active
       context established for use.  We can, of course, close this after use }
     Save8087CW := Get8087ControlWord;
@@ -4529,7 +4218,6 @@ begin
       hGLContext := 0;
       Result := False;
       bError := False;
-
       if Win = 0 then
       begin
         Result := False;
@@ -4537,7 +4225,6 @@ begin
         Version := AnsiString(LoadResString(@RsOpenGLInfoError));
         Exit;
       end;
-
       ResetMemory(pfd, SizeOf(pfd));
       with pfd do
       begin
@@ -4549,23 +4236,18 @@ begin
         cDepthBits := 32;  { Depth of the z-buffer }
         iLayerType := PFD_MAIN_PLANE;
       end;
-
       hGLDC := GetDC(Win);
       try
         iFormatIndex := ChoosePixelFormat(hGLDC, @pfd);
         if iFormatIndex = 0 then
           FunctionFailedError(ChoosePixelFormatName);
-
         if not SetPixelFormat(hGLDC, iFormatIndex, @pfd) then
           FunctionFailedError(SetPixelFormatName);
-
         hGLContext := wglCreateContextFunc(hGLDC);
         if hGLContext = 0 then
           FunctionFailedError(wglCreateContextName);
-
         if not wglMakeCurrentFunc(hGLDC, hGLContext) then
           FunctionFailedError(wglMakeCurrentName);
-
         { TODO : Review the following.  Not sure I am 100% happy with this code
                  in its current structure. }
         pcTemp := glGetStringFunc(GL_VERSION);
@@ -4585,7 +4267,6 @@ begin
             sOpenGLVendor := '';
           end;
         end;
-
         pcTemp := glGetStringFunc(GL_VENDOR);
         if pcTemp <> nil then
         begin
@@ -4603,7 +4284,6 @@ begin
             Exit;
           end;
         end;
-
         Result := (not bError);
         Version := sOpenGLVersion;
         Vendor := sOpenGLVendor;
@@ -4623,7 +4303,6 @@ begin
       FreeLibrary(Glu32Lib);
   end;
 end;
-
 function GetNativeSystemInfo(var SystemInfo: TSystemInfo): Boolean;
 type
   TGetNativeSystemInfo = procedure (var SystemInfo: TSystemInfo); stdcall;
@@ -4633,7 +4312,6 @@ var
 begin
   Result := False;
   LibraryHandle := GetModuleHandle(kernel32);
-
   if LibraryHandle <> 0 then
   begin
     _GetNativeSystemInfo := GetProcAddress(LibraryHandle, PAnsiChar('GetNativeSystemInfo'));
@@ -4648,10 +4326,8 @@ begin
   else
     GetSystemInfo(SystemInfo);
 end;
-
 var
   CachedGetProcessorArchitecture: DWORD = DWORD(-1);
-
 function GetProcessorArchitecture: TProcessorArchitecture;
 var
   ASystemInfo: TSystemInfo;
@@ -4673,12 +4349,10 @@ begin
       Result := paUnknown;
   end;
 end;
-
 function IsWindows64: Boolean;
 begin
   Result := GetProcessorArchitecture in [paIA64, pax8664];
 end;
-
 function JclCheckWinVersion(Major, Minor: Integer): Boolean;
 begin
   {$IFDEF RTL150_UP}
@@ -4689,9 +4363,7 @@ begin
             ((Win32MajorVersion = Major) and (Win32MinorVersion >= Minor));
   {$ENDIF RTL150_UP}
 end;
-
 {$ENDIF MSWINDOWS}
-
 function GetOSVersionString: string;
 {$IFDEF UNIX}
 var
@@ -4706,12 +4378,9 @@ begin
   Result := Format('%s %s', [GetWindowsVersionString, GetWindowsServicePackVersionString]);
 end;
 {$ENDIF MSWINDOWS}
-
 //=== Hardware ===============================================================
-
 // Helper function for GetMacAddress()
 // Converts the adapter_address array to a string
-
 function AdapterToString(Adapter: PJclByteArray): string;
 begin
   Result := Format('%2.2x-%2.2x-%2.2x-%2.2x-%2.2x-%2.2x',
@@ -4719,12 +4388,10 @@ begin
     Integer(Adapter[2]), Integer(Adapter[3]),
     Integer(Adapter[4]), Integer(Adapter[5])]);
 end;
-
 { TODO: RTLD version of NetBios }
 {$IFDEF MSWINDOWS}
 type
   TNetBios = function(P: PNCB): Byte; stdcall;
-
 var
   NetBiosLib: HINST = 0;
   _NetBios: TNetBios;
@@ -4734,9 +4401,7 @@ var
   OID_ifEntryType: array [0..9] of UINT = (1, 3, 6, 1, 2, 1, 2, 2, 1, 3);
   OID_ifEntryNum: array [0..7] of UINT = (1, 3, 6, 1, 2, 1, 2, 1);
   {$ENDIF FPC}
-
 function GetMacAddresses(const Machine: string; const Addresses: TStrings): Integer;
-
   procedure ExitNetbios;
     begin
     if NetBiosLib <> 0 then
@@ -4745,7 +4410,6 @@ function GetMacAddresses(const Machine: string; const Addresses: TStrings): Inte
       NetBiosLib := 0;
     end;
   end;
-
   function InitNetbios: Boolean;
   begin
     Result := True;
@@ -4762,7 +4426,6 @@ function GetMacAddresses(const Machine: string; const Addresses: TStrings): Inte
       end;
     end;
   end;
-
   function NetBios(P: PNCB): Byte;
   begin
     if InitNetbios then
@@ -4770,11 +4433,9 @@ function GetMacAddresses(const Machine: string; const Addresses: TStrings): Inte
     else
       Result := 1; // anything other than NRC_GOODRET will do
   end;
-
   procedure GetMacAddressesNetBios;
   // Platform SDK
   // http://msdn.microsoft.com/library/default.asp?url=/library/en-us/netbios/netbios_1l82.asp
-
   // Microsoft Knowledge Base Article - 118623
   // HOWTO: Get the MAC Address for an Ethernet Adapter
   // http://support.microsoft.com/default.aspx?scid=kb;en-us;118623
@@ -4828,7 +4489,6 @@ function GetMacAddresses(const Machine: string; const Addresses: TStrings): Inte
       end;
     end;
   end;
-
   procedure GetMacAddressesSnmp;
   const
     InetMib1 = 'inetmib1.dll';
@@ -4912,7 +4572,6 @@ function GetMacAddresses(const Machine: string; const Addresses: TStrings): Inte
       UnloadSnmp;
     end;
   end;
-
 begin
   Result := -1;
   Addresses.BeginUpdate;
@@ -4936,7 +4595,6 @@ asm
         // Result in RAX
         {$ENDIF CPU64}
 end;
-
 function GetIntelCacheDescription(const D: Byte): string;
 var
   I: Integer;
@@ -4953,7 +4611,6 @@ begin
   if Result = '' then
     Result := Format(LoadResString(@RsIntelUnknownCache),[D]);
 end;
-
 procedure GetCpuInfo(var CpuInfo: TCpuInfo);
 begin
   CpuInfo := CPUID;
@@ -4966,7 +4623,6 @@ begin
     {$ENDIF MSWINDOWS}
   end;
 end;
-
 function RoundFrequency(const Frequency: Integer): Integer;
 const
   NF: array [0..8] of Integer = (0, 20, 33, 50, 60, 66, 80, 90, 100);
@@ -4992,7 +4648,6 @@ begin
   end;
   Result := Frequency + RF;
 end;
-
 function GetCPUSpeed(var CpuSpeed: TFreqInfo): Boolean;
 {$IFDEF UNIX}
 begin
@@ -5001,7 +4656,6 @@ begin
 end;
 {$ENDIF UNIX}
 {$IFDEF MSWINDOWS}
-
 var
   T0, T1: Int64;
   CountFreq: Int64;
@@ -5021,7 +4675,6 @@ begin
   TotalCycles := 0;
   TotalTicks := 0;
   Total := 0;
-
   Thread := GetCurrentThread();
   CountFreq := 0;
   Result := QueryPerformanceFrequency(CountFreq);
@@ -5036,7 +4689,6 @@ begin
       T0 := 0;
       QueryPerformanceCounter(T0);
       T1 := T0;
-
       Priority := GetThreadPriority(Thread);
       if Priority <> THREAD_PRIORITY_ERROR_RETURN then
         SetThreadPriority(Thread, THREAD_PRIORITY_TIME_CRITICAL);
@@ -5047,7 +4699,6 @@ begin
           Stamp0 := ReadTimeStampCounter;
         end;
         T0 := T1;
-
         while T1 - T0 < 1000 do
         begin
           QueryPerformanceCounter(T1);
@@ -5057,29 +4708,23 @@ begin
         if Priority <> THREAD_PRIORITY_ERROR_RETURN then
           SetThreadPriority(Thread, Priority);
       end;
-
       Cycles := Stamp1 - Stamp0;
       Ticks := T1 - T0;
       Ticks := Ticks * 100000;
-
       // avoid division by zero
       if CountFreq = 0 then
         Ticks := High(Int64)
       else
         Ticks := Ticks / (CountFreq / 10);
-
       TotalTicks := TotalTicks + Ticks;
       TotalCycles := TotalCycles + Cycles;
-
       // avoid division by zero
       if IsZero(Ticks) then
         Freq := High(Freq)
       else
         Freq := Round(Cycles / Ticks);
-
       Total := Freq + Freq2 + Freq3;
     end;
-
     // avoid division by zero
     if IsZero(TotalTicks) then
     begin
@@ -5093,25 +4738,19 @@ begin
       Freq2 := Round((TotalCycles * 100) / TotalTicks); // freq. in multiples of 10^4 Hz
       CpuSpeed.RawFreq := Round(TotalCycles / TotalTicks);
     end;
-
     CpuSpeed.NormFreq := CpuSpeed.RawFreq;
-
     if Freq2 - (Freq3 * 10) >= 6 then
       Inc(Freq3);
-
 
     Freq := CpuSpeed.RawFreq * 10;
     if (Freq3 - Freq) >= 6 then
       Inc(CpuSpeed.NormFreq);
-
     CpuSpeed.ExTicks := Round(TotalTicks);
     CpuSpeed.InCycles := TotalCycles;
-
     CpuSpeed.NormFreq := RoundFrequency(CpuSpeed.NormFreq);
     Result := True;
   end;
 end;
-
 function GetOSEnabledFeatures: TOSEnabledFeatures;
 var
   EnabledFeatures: Int64;
@@ -5135,7 +4774,6 @@ begin
     Result := [];
 end;
 {$ENDIF MSWINDOWS}
-
 function CPUID: TCpuInfo;
   function HasCPUIDInstruction: Boolean;
   const
@@ -5194,7 +4832,6 @@ function CPUID: TCpuInfo;
   {$IFNDEF DELPHI64_TEMPORARY}
   end;
   {$ENDIF ~DELPHI64_TEMPORARY}
-
   procedure CallCPUID(ValueEAX, ValueECX: Cardinal; out ReturnedEAX, ReturnedEBX, ReturnedECX, ReturnedEDX);
   {$IFNDEF DELPHI64_TEMPORARY}
   begin
@@ -5247,7 +4884,6 @@ function CPUID: TCpuInfo;
   {$IFNDEF DELPHI64_TEMPORARY}
   end;
   {$ENDIF ~DELPHI64_TEMPORARY}
-
   procedure ProcessStandard(var CPUInfo: TCpuInfo; HiVal: Cardinal);
   var
     VersionInfo, AdditionalInfo, ExFeatures: Cardinal;
@@ -5255,14 +4891,12 @@ function CPUID: TCpuInfo;
     if HiVal >= 1 then
     begin
       CallCPUID(1, 0, VersionInfo, AdditionalInfo, ExFeatures, CPUInfo.Features);
-
       CPUInfo.PType := (VersionInfo and $00003000) shr 12;
       CPUInfo.Family := (VersionInfo and $00000F00) shr 8;
       CPUInfo.Model := (VersionInfo and $000000F0) shr 4;
       CPUInfo.Stepping := (VersionInfo and $0000000F);
       CPUInfo.ExtendedModel := (VersionInfo and $000F0000) shr 16;
       CPUInfo.ExtendedFamily := (VersionInfo and $0FF00000) shr 20;
-
       if CPUInfo.CpuType = CPU_TYPE_INTEL then
       begin
         CPUInfo.IntelSpecific.ExFeatures := ExFeatures;
@@ -5276,7 +4910,6 @@ function CPUID: TCpuInfo;
           if CPUInfo.LogicalCore = 0 then
             CPUInfo.LogicalCore := 1;
         end;
-
         if HiVal >= 2 then
         begin
           CPUInfo.HasCacheInfo := True;
@@ -5287,7 +4920,6 @@ function CPUID: TCpuInfo;
       end;
     end;
   end;
-
   procedure ProcessIntel(var CPUInfo: TCpuInfo; HiVal: Cardinal);
   var
     ExHiVal, Unused, AddressSize, CoreInfo: Cardinal;
@@ -5295,18 +4927,14 @@ function CPUID: TCpuInfo;
   begin
     CPUInfo.CpuType := CPU_TYPE_INTEL;
     CPUInfo.Manufacturer := 'Intel';
-
     ProcessStandard(CPUInfo, HiVal);
-
     if HiVal >= 4 then
     begin
       CallCPUID(4, 0, CoreInfo, Unused, Unused, Unused);
       CPUInfo.PhysicalCore := ((CoreInfo and $FC000000) shr 26) + 1;
     end;
-
     if HiVal >= 6 then
       CallCPUID(6, 0, CPUInfo.IntelSpecific.PowerManagementFeatures, Unused, Unused, Unused);
-
     // check Intel extended
     CallCPUID($80000000, 0, ExHiVal, Unused, Unused, Unused);
     if ExHiVal >= $80000001 then
@@ -5329,7 +4957,6 @@ function CPUID: TCpuInfo;
       CPUInfo.IntelSpecific.PhysicalAddressBits := AddressSize and $000000FF;
       CPUInfo.IntelSpecific.VirtualAddressBits := (AddressSize and $0000FF00) shr 8;
     end;
-
     if CPUInfo.HasCacheInfo then
     begin
       if (CPUInfo.IntelSpecific.L2Cache <> 0) then
@@ -5470,7 +5097,6 @@ function CPUID: TCpuInfo;
         StrPCopyA(CPUInfo.CpuName, AnsiString(Format('P%d', [CPUInfo.Family])));
       end;
     end;
-
     CPUInfo.HardwareHyperThreadingTechnology := CPUInfo.LogicalCore <> CPUInfo.PhysicalCore;
     CPUInfo.AES := (CPUInfo.IntelSpecific.ExFeatures and EINTEL_AES) <> 0;
     CPUInfo.MMX := (CPUInfo.Features and MMX_FLAG) <> 0;
@@ -5492,19 +5118,16 @@ function CPUID: TCpuInfo;
     CPUInfo.Is64Bits := CPUInfo.HasExtendedInfo and ((CPUInfo.IntelSpecific.Ex64Features and EINTEL64_EM64T)<>0);
     CPUInfo.DepCapable := CPUInfo.HasExtendedInfo and ((CPUInfo.IntelSpecific.Ex64Features and EINTEL64_XD) <> 0);
   end;
-
   procedure ProcessAMD(var CPUInfo: TCpuInfo; HiVal: Cardinal);
   var
     ExHiVal, Unused, VersionInfo, AdditionalInfo: Cardinal;
   begin
     CPUInfo.CpuType := CPU_TYPE_AMD;
     CPUInfo.Manufacturer := 'AMD';
-
     // check AMD extended
     if HiVal >= 1 then
     begin
       CallCPUID(1, 0, VersionInfo, AdditionalInfo, CPUInfo.AMDSpecific.Features2, CPUInfo.Features);
-
       CPUInfo.AMDSpecific.BrandID := AdditionalInfo and $000000FF;
       CPUInfo.AMDSpecific.FlushLineSize := (AdditionalInfo and $0000FF00) shr 8;
       CPUInfo.AMDSpecific.APICID := (AdditionalInfo and $FF000000) shr 24;
@@ -5516,13 +5139,11 @@ function CPUID: TCpuInfo;
           CPUInfo.LogicalCore := 1;
       end;
     end;
-
     CallCPUID($80000000, 0, ExHiVal, Unused, Unused, Unused);
     if ExHiVal <> 0 then
     begin
       // AMD only
       CPUInfo.HasExtendedInfo := True;
-
       if ExHiVal >= $80000001 then
       begin
         CallCPUID($80000001, 0, VersionInfo, AdditionalInfo, CPUInfo.AMDSpecific.ExFeatures2, CPUInfo.AMDSpecific.ExFeatures);
@@ -5622,12 +5243,10 @@ function CPUID: TCpuInfo;
               StrFmtA(CPUInfo.CpuName, PAnsiChar(AnsiString(LoadResString(@RsUnknownAMDModel))), [CPUInfo.Model]);
           end;
         8:
-
         else
           CPUInfo.CpuName := 'Unknown AMD Chip';
       end;
     end;
-
     CPUInfo.HardwareHyperThreadingTechnology := CPUInfo.LogicalCore <> CPUInfo.PhysicalCore;
     CPUInfo.AES := (CPUInfo.AMDSpecific.Features2 and AMD2_AES) <> 0;
     CPUInfo.MMX := (CPUInfo.Features and AMD_MMX) <> 0;
@@ -5653,14 +5272,12 @@ function CPUID: TCpuInfo;
     CPUInfo.Is64Bits := CPUInfo.HasExtendedInfo and ((CPUInfo.AMDSpecific.ExFeatures and EAMD_LONG) <> 0);
     CPUInfo.DEPCapable := CPUInfo.HasExtendedInfo and ((CPUInfo.AMDSpecific.ExFeatures and EAMD_NX) <> 0);
   end;
-
   procedure ProcessCyrix(var CPUInfo: TCpuInfo; HiVal: Cardinal);
   var
     ExHiVal, Unused, VersionInfo, AdditionalInfo: Cardinal;
   begin
     CPUInfo.CpuType := CPU_TYPE_CYRIX;
     CPUInfo.Manufacturer := 'Cyrix';
-
     // check Cyrix extended
     CallCPUID($80000000, 0, ExHiVal, Unused, Unused, Unused);
     if ExHiVal <> 0 then
@@ -5707,14 +5324,12 @@ function CPUID: TCpuInfo;
       end;
     end;
   end;
-
   procedure ProcessVIA(var CPUInfo: TCpuInfo; HiVal: Cardinal);
   var
     ExHiVal, Unused, VersionInfo: Cardinal;
   begin
     CPUInfo.CpuType := CPU_TYPE_VIA;
     CPUInfo.Manufacturer := 'Via';
-
     // check VIA extended
     CallCPUID($80000000, 0, ExHiVal, Unused, Unused, Unused);
     if ExHiVal <> 0 then
@@ -5742,7 +5357,6 @@ function CPUID: TCpuInfo;
       end;
       if ExHiVal >= $80000006 then
         CallCPUID($80000006, 0, Unused, Unused, CPUInfo.ViaSpecific.L2DataCache, Unused);
-
       if CPUInfo.HasCacheInfo then
       begin
         CPUInfo.L1DataCacheSize := CPUInfo.VIASpecific.L1DataCache[ciSize];
@@ -5755,14 +5369,12 @@ function CPUID: TCpuInfo;
         CPUInfo.L2CacheAssociativity := (CPUInfo.VIASpecific.L2DataCache shr 12) and $F;
         CPUInfo.L2CacheSize := CPUInfo.VIASpecific.L2DataCache shr 16;
       end;
-
       CallCPUID($C0000000, 0, ExHiVal, Unused, Unused, Unused);
       if ExHiVal >= $C0000001 then
         CallCPUID($C0000001, 0, Unused, Unused, Unused, CPUInfo.ViaSpecific.ExFeatures);
     end
     else
       ProcessStandard(CPUInfo, HiVal);
-
     if not CPUInfo.HasExtendedInfo then
       CPUInfo.CpuName := 'C3';
     CPUInfo.MMX := (CPUInfo.Features and VIA_MMX) <> 0;
@@ -5771,14 +5383,12 @@ function CPUID: TCpuInfo;
       Include(CPUInfo.SSE, sse);
     CPUInfo._3DNow := (CPUInfo.Features and VIA_3DNOW) <> 0;
   end;
-
   procedure ProcessTransmeta(var CPUInfo: TCpuInfo; HiVal: Cardinal);
   var
     ExHiVal, Unused, VersionInfo: Cardinal;
   begin
     CPUInfo.CpuType := CPU_TYPE_TRANSMETA;
     CPUInfo.Manufacturer := 'Transmeta';
-
     if (HiVal >= 1) then
     begin
       CallCPUID(1, 0, VersionInfo, Unused, Unused, CPUInfo.Features);
@@ -5789,13 +5399,11 @@ function CPUID: TCpuInfo;
     end;
     // no information when eax is 2
     // eax is 3 means Serial Number, not detected there
-
     // small CPU description, overriden if ExHiVal >= 80000002
     CallCPUID($80000000, 0, ExHiVal, CPUInfo.CpuName[0], CPUInfo.CpuName[8], CPUInfo.CpuName[4]);
     if ExHiVal <> 0 then
     begin
       CPUInfo.HasExtendedInfo := True;
-
       if ExHiVal >= $80000001 then
         CallCPUID($80000001, 0, Unused, Unused, Unused, CPUInfo.TransmetaSpecific.ExFeatures);
       if ExHiVal >= $80000002 then
@@ -5827,7 +5435,6 @@ function CPUID: TCpuInfo;
     end
     else
       CPUInfo.CpuName := 'Crusoe';
-
     CallCPUID($80860000, 0, ExHiVal, Unused, Unused, Unused);
     if ExHiVal <> 0 then
     begin
@@ -5854,14 +5461,12 @@ function CPUID: TCpuInfo;
     end;
     CPUInfo.MMX := (CPUInfo.Features and TRANSMETA_MMX) <> 0;
   end;
-
 var
   HiVal: Cardinal;
 begin
   ResetMemory(Result, sizeof(Result));
   Result.LogicalCore := 1;
   Result.PhysicalCore := 1;
-
   if HasCPUIDInstruction then
   begin
     Result.HasInstruction := True;
@@ -5882,14 +5487,12 @@ begin
   end
   else
     Result.Family := 4;
-
   if Result.CpuType = 0 then
   begin
     Result.Manufacturer := 'Unknown';
     Result.CpuName := 'Unknown';
   end;
 end;
-
 function TestFDIVInstruction: Boolean;
 {$IFDEF CPU32}
 var
@@ -5925,9 +5528,7 @@ begin
   Result := True;
 end;
 {$ENDIF CPU64}
-
 //=== Alloc granularity ======================================================
-
 procedure RoundToAllocGranularity64(var Value: Int64; Up: Boolean);
 begin
   if (Value mod AllocGranularity) <> 0 then
@@ -5936,7 +5537,6 @@ begin
     else
       Value := (Value div AllocGranularity) * AllocGranularity;
 end;
-
 procedure RoundToAllocGranularityPtr(var Value: Pointer; Up: Boolean);
 var
   Addr: TJclAddr;
@@ -5951,19 +5551,15 @@ begin
     Value := Pointer(Addr);
   end;
 end;
-
 //=== Advanced Power Management (APM) ========================================
-
 {$IFDEF MSWINDOWS}
 function GetAPMLineStatus: TAPMLineStatus;
 var
   SystemPowerStatus: TSystemPowerStatus;
 begin
   Result := alsUnknown;
-
   if (Win32Platform = VER_PLATFORM_WIN32_NT) and (Win32MajorVersion < 5) then // Windows NT doesn't support GetSystemPowerStatus
     Exit;                                                                     // so we return alsUnknown
-
   SystemPowerStatus.ACLineStatus := 0;
   if not GetSystemPowerStatus(SystemPowerStatus) then
     RaiseLastOSError
@@ -5979,16 +5575,13 @@ begin
     end;
   end;
 end;
-
 function GetAPMBatteryFlag: TAPMBatteryFlag;
 var
   SystemPowerStatus: TSystemPowerStatus;
 begin
   Result := abfUnknown;
-
   if (Win32Platform = VER_PLATFORM_WIN32_NT) and (Win32MajorVersion < 5) then // Windows NT doesn't support GetSystemPowerStatus
     Exit;                                                                     // so we return abfUnknown
-
   SystemPowerStatus.ACLineStatus := 0;
   if not GetSystemPowerStatus(SystemPowerStatus) then
     RaiseLastOSError
@@ -6011,19 +5604,16 @@ begin
   end;
 end;
 
-
 function GetAPMBatteryFlags: TAPMBatteryFlags;
 var
   SystemPowerStatus: TSystemPowerStatus;
 begin
   Result := [];
-
   if (Win32Platform = VER_PLATFORM_WIN32_NT) and (Win32MajorVersion < 5) then // Windows NT doesn't support GetSystemPowerStatus
   begin
     Result := [abfUnknown];
     Exit;                                                                     // so we return [abfUnknown]
   end;
-
   SystemPowerStatus.ACLineStatus := 0;
   if not GetSystemPowerStatus(SystemPowerStatus) then
     RaiseLastOSError
@@ -6043,57 +5633,46 @@ begin
       Result := Result + [abfUnknown];
   end;
 end;
-
 function GetAPMBatteryLifePercent: Integer;
 var
   SystemPowerStatus: TSystemPowerStatus;
 begin
   Result := 0;
-
   if (Win32Platform = VER_PLATFORM_WIN32_NT) and (Win32MajorVersion < 5) then // Windows NT doesn't support GetSystemPowerStatus
     Exit;
-
   SystemPowerStatus.ACLineStatus := 0;
   if not GetSystemPowerStatus(SystemPowerStatus) then
     RaiseLastOSError
   else
     Result := SystemPowerStatus.BatteryLifePercent;
 end;
-
 function GetAPMBatteryLifeTime: DWORD;
 var
   SystemPowerStatus: TSystemPowerStatus;
 begin
   Result := 0;
-
   if (Win32Platform = VER_PLATFORM_WIN32_NT) and (Win32MajorVersion < 5) then // Windows NT doesn't support GetSystemPowerStatus
     Exit;
-
   SystemPowerStatus.ACLineStatus := 0;
   if not GetSystemPowerStatus(SystemPowerStatus) then
     RaiseLastOSError
   else
     Result := SystemPowerStatus.BatteryLifeTime;
 end;
-
 function GetAPMBatteryFullLifeTime: DWORD;
 var
   SystemPowerStatus: TSystemPowerStatus;
 begin
   Result := 0;
-
   if (Win32Platform = VER_PLATFORM_WIN32_NT) and (Win32MajorVersion < 5) then // Windows NT doesn't support GetSystemPowerStatus
     Exit;
-
   SystemPowerStatus.ACLineStatus := 0;
   if not GetSystemPowerStatus(SystemPowerStatus) then
     RaiseLastOSError
   else
     Result := SystemPowerStatus.BatteryFullLifeTime;
 end;
-
 //=== Memory Information =====================================================
-
 function GetMaxAppAddress: TJclAddr;
 var
   SystemInfo: TSystemInfo;
@@ -6102,7 +5681,6 @@ begin
   GetSystemInfo(SystemInfo);
   Result := TJclAddr(SystemInfo.lpMaximumApplicationAddress);
 end;
-
 function GetMinAppAddress: TJclAddr;
 var
   SystemInfo: TSystemInfo;
@@ -6112,7 +5690,6 @@ begin
   Result := TJclAddr(SystemInfo.lpMinimumApplicationAddress);
 end;
 {$ENDIF MSWINDOWS}
-
 function GetMemoryLoad: Byte;
 {$IFDEF UNIX}
 var
@@ -6138,7 +5715,6 @@ begin
   Result := MemoryStatusEx.dwMemoryLoad;
 end;
 {$ENDIF MSWINDOWS}
-
 function GetSwapFileSize: Int64;
 {$IFDEF UNIX}
 var
@@ -6163,7 +5739,6 @@ begin
   Result := MemoryStatusEx.ullTotalPageFile - MemoryStatusEx.ullAvailPageFile;
 end;
 {$ENDIF MSWINDOWS}
-
 function GetSwapFileUsage: Byte;
 {$IFDEF UNIX}
 var
@@ -6192,7 +5767,6 @@ begin
       Result := 0;
 end;
 {$ENDIF MSWINDOWS}
-
 function GetTotalPhysicalMemory: Int64;
 {$IFDEF UNIX}
 var
@@ -6217,7 +5791,6 @@ begin
   Result := MemoryStatusEx.ullTotalPhys;
 end;
 {$ENDIF MSWINDOWS}
-
 function GetFreePhysicalMemory: Int64;
 {$IFDEF UNIX}
 var
@@ -6241,7 +5814,6 @@ begin
     RaiseLastOSError;
   Result := MemoryStatusEx.ullAvailPhys;
 end;
-
 function GetTotalPageFileMemory: Int64;
 var
   MemoryStatusEx: TMemoryStatusEx;
@@ -6252,7 +5824,6 @@ begin
     RaiseLastOSError;
   Result := MemoryStatusEx.ullTotalPageFile;
 end;
-
 function GetFreePageFileMemory: Int64;
 var
   MemoryStatusEx: TMemoryStatusEx;
@@ -6263,7 +5834,6 @@ begin
     RaiseLastOSError;
   Result := MemoryStatusEx.ullAvailPageFile;
 end;
-
 function GetTotalVirtualMemory: Int64;
 var
   MemoryStatusEx: TMemoryStatusEx;
@@ -6274,7 +5844,6 @@ begin
     RaiseLastOSError;
   Result := MemoryStatusEx.ullTotalVirtual;
 end;
-
 function GetFreeVirtualMemory: Int64;
 var
   MemoryStatusEx: TMemoryStatusEx;
@@ -6285,9 +5854,7 @@ begin
     RaiseLastOSError;
   Result := MemoryStatusEx.ullAvailVirtual;
 end;
-
 //=== Keyboard Information ===================================================
-
 function GetKeybStateHelper(VirtualKey: Cardinal; Mask: Byte): Boolean;
 var
   Keys: TKeyboardState;
@@ -6295,34 +5862,27 @@ begin
   Keys[0] := 0;
   Result := GetKeyBoardState(Keys) and (Keys[VirtualKey] and Mask <> 0);
 end;
-
 function GetKeyState(const VirtualKey: Cardinal): Boolean;
 begin
   Result := GetKeybStateHelper(VirtualKey, $80);
 end;
-
 function GetNumLockKeyState: Boolean;
 begin
   Result := GetKeybStateHelper(VK_NUMLOCK, $01);
 end;
-
 function GetScrollLockKeyState: Boolean;
 begin
   Result := GetKeybStateHelper(VK_SCROLL, $01);
 end;
-
 function GetCapsLockKeyState: Boolean;
 begin
   Result := GetKeybStateHelper(VK_CAPITAL, $01);
 end;
-
 //=== Windows 95/98/ME system resources information ==========================
-
 { TODO -oPJH : compare to Win9xFreeSysResources }
 var
   ResmeterLibHandle: THandle;
   MyGetFreeSystemResources: function(ResType: UINT): UINT; stdcall;
-
 procedure UnloadSystemResourcesMeterLib;
 begin
   if ResmeterLibHandle <> 0 then
@@ -6332,9 +5892,7 @@ begin
     @MyGetFreeSystemResources := nil;
   end;
 end;
-
 function IsSystemResourcesMeterPresent: Boolean;
-
   procedure LoadResmeter;
   begin
     ResmeterLibHandle := SafeLoadLibrary('rsrc32.dll', SEM_FAILCRITICALERRORS);
@@ -6345,13 +5903,11 @@ function IsSystemResourcesMeterPresent: Boolean;
         UnloadSystemResourcesMeterLib;
     end;
   end;
-
 begin
   if not IsWinNT and (ResmeterLibHandle = 0) then
     LoadResmeter;
   Result := (ResmeterLibHandle <> 0);
 end;
-
 function GetFreeSystemResources(const ResourceType: TFreeSysResKind): Integer;
 const
   ParamValues: array [TFreeSysResKind] of UINT = (0, 1, 2);
@@ -6361,7 +5917,6 @@ begin
   else
     Result := -1;
 end;
-
 function GetFreeSystemResources: TFreeSystemResources;
 begin
   with Result do
@@ -6371,7 +5926,6 @@ begin
     UserRes := GetFreeSystemResources(rtUser);
   end;
 end;
-
 function GetBPP: Cardinal;
 var
   DC: HDC;
@@ -6385,9 +5939,7 @@ begin
   else
     Result := 0;
 end;
-
 //=== Installed programs =====================================================
-
 function ProgIDExists(const ProgID: string): Boolean;
 var
   Tmp: TGUID;
@@ -6396,59 +5948,47 @@ begin
   WideProgID := ProgID;
   Result := Succeeded(CLSIDFromProgID(PWideChar(WideProgID), Tmp));
 end;
-
 function IsWordInstalled: Boolean;
 begin
   Result := ProgIDExists('Word.Application');
 end;
-
 function IsExcelInstalled: Boolean;
 begin
   Result := ProgIDExists('Excel.Application');
 end;
-
 function IsAccessInstalled: Boolean;
 begin
   Result := ProgIDExists('Access.Application');
 end;
-
 function IsPowerPointInstalled: Boolean;
 begin
   Result := ProgIDExists('PowerPoint.Application');
 end;
-
 function IsFrontPageInstalled: Boolean;
 begin
   Result := ProgIDExists('FrontPage.Application');
 end;
-
 function IsOutlookInstalled: Boolean;
 begin
   Result := ProgIDExists('Outlook.Application');
 end;
-
 function IsInternetExplorerInstalled: Boolean;
 begin
   Result := ProgIDExists('InternetExplorer.Application');
 end;
-
 function IsMSProjectInstalled: Boolean;
 begin
   Result := ProgIDExists('MSProject.Application');
 end;
-
 function IsOpenOfficeInstalled: Boolean;
 begin
   Result := ProgIDExists('com.sun.star.ServiceManager');
 end;
-
 function IsLibreOfficeInstalled: Boolean;
 begin
   Result := ProgIDExists('com.sun.star.ServiceManager.1');
 end;
-
 //=== Initialization/Finalization ============================================
-
 procedure InitSysInfo;
 var
   SystemInfo: TSystemInfo;
@@ -6456,24 +5996,19 @@ var
   VerFixedFileInfo: TVSFixedFileInfo;
 begin
   { processor information related initialization }
-
   ResetMemory(SystemInfo, SizeOf(SystemInfo));
   GetSystemInfo(SystemInfo);
   ProcessorCount := SystemInfo.dwNumberOfProcessors;
   AllocGranularity := SystemInfo.dwAllocationGranularity;
   PageSize := SystemInfo.dwPageSize;
-
   { Windows version information }
-
   IsWinNT := Win32Platform = VER_PLATFORM_WIN32_NT;
-
   Kernel32FileName := GetModulePath(GetModuleHandle(kernel32));
   VerFixedFileInfo.dwFileDateLS := 0;
   if (not IsWinNT) and VersionFixedFileInfo(Kernel32FileName, VerFixedFileInfo) then
     KernelVersionHi := VerFixedFileInfo.dwProductVersionMS
   else
     KernelVersionHi := 0;
-
   case GetWindowsVersion of
     wvUnknown:
       ;
@@ -6549,24 +6084,19 @@ begin
       IsWin11 := True;
   end;
 end;
-
 procedure FinalizeSysInfo;
 begin
   UnloadSystemResourcesMeterLib;
 end;
-
 initialization
   InitSysInfo;
   {$IFDEF UNITVERSIONING}
   RegisterUnitVersion(HInstance, UnitVersioning);
   {$ENDIF UNITVERSIONING}
-
 finalization
   {$IFDEF UNITVERSIONING}
   UnregisterUnitVersion(HInstance);
   {$ENDIF UNITVERSIONING}
   FinalizeSysInfo;
-
 {$ENDIF MSWINDOWS}
-
 end.

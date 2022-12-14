@@ -1,7 +1,5 @@
 unit JclMime;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,7 +22,6 @@ unit JclMime;
 }
 
 interface
-
 uses
   {$IFDEF HAS_UNITSCOPE}
   System.SysUtils, System.Classes,
@@ -32,7 +29,6 @@ uses
   SysUtils, Classes,
   {$ENDIF ~HAS_UNITSCOPE}
   JclBase;
-
 function MimeEncodeString(const S: AnsiString): AnsiString;
 function MimeEncodeStringNoCRLF(const S: AnsiString): AnsiString;
 function MimeDecodeString(const S: AnsiString): AnsiString;
@@ -41,7 +37,6 @@ function MimeEncodedSizeNoCRLF(const InputSize: SizeInt): SizeInt;
 function MimeDecodedSize(const InputSize: SizeInt): SizeInt;
 procedure DecodeHttpBasicAuthentication(const BasicCredentials: AnsiString;
   out UserId, PassWord: AnsiString);
-
 procedure MimeEncode(const InputBuffer: TDynByteArray; InputOffset: SizeInt;
   const InputByteCount: SizeInt; out OutputBuffer: TDynByteArray; OutputOffset: SizeInt = 0); overload;
 procedure MimeEncodeNoCRLF(const InputBuffer: TDynByteArray; InputOffset: SizeInt;
@@ -55,7 +50,6 @@ function MimeDecodePartial(const InputBuffer: TDynByteArray; InputOffset: SizeIn
   var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): SizeInt; overload;
 function MimeDecodePartialEnd(out OutputBuffer: TDynByteArray; OutputOffset: SizeInt;
   const ByteBuffer: Cardinal; const ByteBufferSpace: Cardinal): SizeInt; overload;
-
 procedure MimeEncode(const InputBuffer: TDynByteArray; const InputByteCount: SizeInt;
   out OutputBuffer: TDynByteArray); overload;
 procedure MimeEncodeNoCRLF(const InputBuffer: TDynByteArray; const InputByteCount: SizeInt;
@@ -68,7 +62,6 @@ function MimeDecodePartial(const InputBuffer: TDynByteArray; const InputByteCoun
   out OutputBuffer: TDynByteArray; var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): SizeInt; overload;
 function MimeDecodePartialEnd(out OutputBuffer: TDynByteArray; const ByteBuffer: Cardinal;
   const ByteBufferSpace: Cardinal): SizeInt; overload;
-
 procedure MimeEncode(const InputBuffer; const InputByteCount: SizeInt; out OutputBuffer); overload;
 procedure MimeEncodeNoCRLF(const InputBuffer; const InputByteCount: SizeInt; out OutputBuffer); overload;
 procedure MimeEncodeFullLines(const InputBuffer; const InputByteCount: SizeInt; out OutputBuffer); overload;
@@ -77,19 +70,16 @@ function MimeDecodePartial(const InputBuffer; const InputByteCount: SizeInt; out
   var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): SizeInt; overload;
 function MimeDecodePartialEnd(out OutputBuffer; const ByteBuffer: Cardinal;
   const ByteBufferSpace: Cardinal): SizeInt; overload;
-
 procedure MimeEncodeFile(const InputFileName, OutputFileName: TFileName);
 procedure MimeEncodeFileNoCRLF(const InputFileName, OutputFileName: TFileName);
 procedure MimeDecodeFile(const InputFileName, OutputFileName: TFileName);
 procedure MimeEncodeStream(const InputStream: TStream; const OutputStream: TStream);
 procedure MimeEncodeStreamNoCRLF(const InputStream: TStream; const OutputStream: TStream);
 procedure MimeDecodeStream(const InputStream: TStream; const OutputStream: TStream);
-
 const
   MIME_ENCODED_LINE_BREAK = 76;
   MIME_DECODED_LINE_BREAK = MIME_ENCODED_LINE_BREAK div 4 * 3;
   MIME_BUFFER_SIZE = MIME_DECODED_LINE_BREAK * 3 * 4 * 4;
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -101,9 +91,7 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 // Caution: For MimeEncodeStream and all other kinds of multi-buffered
 // Mime encodings (i.e. Files etc.), BufferSize must be set to a multiple of 3.
 // Even though the implementation of the Mime decoding routines below
@@ -111,7 +99,6 @@ implementation
 // multiples of four. The chosen size is a multiple of 3 and of 4 as well.
 // The following numbers are, in addition, also divisible by 1024:
 // $2400, $3000, $3C00, $4800, $5400, $6000, $6C00.
-
 const
   { The mime encoding table. Do not alter. }
   MIME_ENCODE_TABLE: array [0..63] of Byte = (
@@ -123,9 +110,7 @@ const
     111, 112, 113, 114, 115, 116, 117, 118, //  40 - 47
     119, 120, 121, 122, 048, 049, 050, 051, //  48 - 55
     052, 053, 054, 055, 056, 057, 043, 047); // 56 - 63
-
   MIME_PAD_CHAR = Byte('=');
-
   MIME_DECODE_TABLE: array [Byte] of Byte = (
     255, 255, 255, 255, 255, 255, 255, 255, //   0 -   7
     255, 255, 255, 255, 255, 255, 255, 255, //   8 -  15
@@ -159,43 +144,36 @@ const
     255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255);
-
 procedure MimeEncode(const InputBuffer: TDynByteArray; const InputByteCount: SizeInt;
   out OutputBuffer: TDynByteArray);
 begin
   MimeEncode(InputBuffer, 0, InputByteCount, OutputBuffer, 0);
 end;
-
 procedure MimeEncodeNoCRLF(const InputBuffer: TDynByteArray; const InputByteCount: SizeInt;
   out OutputBuffer: TDynByteArray);
 begin
   MimeEncodeNoCRLF(InputBuffer, 0, InputByteCount, OutputBuffer, 0);
 end;
-
 procedure MimeEncodeFullLines(const InputBuffer: TDynByteArray; const InputByteCount: SizeInt;
   out OutputBuffer: TDynByteArray);
 begin
   MimeEncodeFullLines(InputBuffer, 0, InputByteCount, OutputBuffer, 0);
 end;
-
 function MimeDecode(const InputBuffer: TDynByteArray; const InputByteCount: SizeInt;
   out OutputBuffer: TDynByteArray): SizeInt;
 begin
   Result := MimeDecode(InputBuffer, 0, InputByteCount, OutputBuffer, 0);
 end;
-
 function MimeDecodePartial(const InputBuffer: TDynByteArray; const InputByteCount: SizeInt;
   out OutputBuffer: TDynByteArray; var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): SizeInt;
 begin
   Result := MimeDecodePartial(InputBuffer, 0, InputByteCount, OutputBuffer, 0, ByteBuffer, ByteBufferSpace);
 end;
-
 function MimeDecodePartialEnd(out OutputBuffer: TDynByteArray; const ByteBuffer: Cardinal;
   const ByteBufferSpace: Cardinal): SizeInt;
 begin
   Result := MimeDecodePartialEnd(OutputBuffer, 0, ByteBuffer, ByteBufferSpace);
 end;
-
 type
   PByte4 = ^TByte4;
   TByte4 = packed record
@@ -204,14 +182,12 @@ type
     B3: Byte;
     B4: Byte;
   end;
-
   PByte3 = ^TByte3;
   TByte3 = packed record
     B1: Byte;
     B2: Byte;
     B3: Byte;
   end;
-
 // Wrapper functions & procedures
 function MimeEncodeString(const S: AnsiString): AnsiString;
 var
@@ -226,7 +202,6 @@ begin
   else
     Result := '';
 end;
-
 function MimeEncodeStringNoCRLF(const S: AnsiString): AnsiString;
 var
   L: SizeInt;
@@ -240,7 +215,6 @@ begin
   else
     Result := '';
 end;
-
 function MimeDecodeString(const S: AnsiString): AnsiString;
 var
   ByteBuffer, ByteBufferSpace: Cardinal;
@@ -263,7 +237,6 @@ begin
   else
     Result := '';
 end;
-
 procedure DecodeHttpBasicAuthentication(const BasicCredentials: AnsiString; out UserId, PassWord: AnsiString);
 const
   LBasic = 6; { Length ('Basic ') }
@@ -273,21 +246,16 @@ var
 begin
   UserId := '';
   PassWord := '';
-
   P := PAnsiChar(BasicCredentials);
   if P = nil then
     Exit;
-
   L := Length(BasicCredentials);
   if L <= LBasic then
     Exit;
-
   Dec(L, LBasic);
   Inc(P, LBasic);
-
   GetMem(DecodedPtr, MimeDecodedSize(L));
   L := MimeDecode(P^, L, DecodedPtr^);
-
   { Look for colon (':'). }
   I := 0;
   P := DecodedPtr;
@@ -296,17 +264,14 @@ begin
     Inc(I);
     Dec(L);
   end;
-
   { Store UserId and Password. }
   SetString(UserId, DecodedPtr, I);
   if L > 1 then
     SetString(PassWord, DecodedPtr + I + 1, L - 1)
   else
     PassWord := '';
-
   FreeMem(DecodedPtr);
 end;
-
 // Helper functions
 function MimeEncodedSize(const InputSize: SizeInt): SizeInt;
 begin
@@ -315,17 +280,14 @@ begin
   else
     Result := InputSize;
 end;
-
 function MimeEncodedSizeNoCRLF(const InputSize: SizeInt): SizeInt;
 begin
   Result := (InputSize + 2) div 3 * 4;
 end;
-
 function MimeDecodedSize(const InputSize: SizeInt): SizeInt;
 begin
   Result := (InputSize + 3) div 4 * 3;
 end;
-
 
 // Primary functions & procedures
 procedure MimeEncode(const InputBuffer: TDynByteArray; InputOffset: SizeInt;
@@ -340,7 +302,6 @@ begin
   IDelta := IDelta * MIME_DECODED_LINE_BREAK;
   MimeEncodeNoCRLF(InputBuffer, InputOffset + IDelta, InputByteCount - IDelta, OutputBuffer, OutputOffset + ODelta);
 end;
-
 // Primary functions & procedures
 procedure MimeEncode(const InputBuffer; const InputByteCount: SizeInt; out OutputBuffer);
 var
@@ -357,7 +318,6 @@ begin
   Inc(O, ODelta);
   MimeEncodeNoCRLF(I^, InputByteCount - IDelta, O^);
 end;
-
 procedure MimeEncodeFullLines(const InputBuffer: TDynByteArray; InputOffset: SizeInt;
   const InputByteCount: SizeInt; out OutputBuffer: TDynByteArray; OutputOffset: SizeInt);
 var
@@ -369,16 +329,12 @@ begin
   { Do we have enough input to encode a full line? }
   if InputByteCount < MIME_DECODED_LINE_BREAK then
     Exit;
-
   InIndex := InputOffset;
   OutIndex := OutputOffset;
-
   InnerLimit := InIndex;
   Inc(InnerLimit, MIME_DECODED_LINE_BREAK);
-
   OuterLimit := InIndex;
   Inc(OuterLimit, InputByteCount);
-
   { Multiple line loop. }
   repeat
     { Single line loop. }
@@ -400,16 +356,13 @@ begin
       OutputBuffer[OutIndex + 0] := MIME_ENCODE_TABLE[B];
       Inc(OutIndex, 3);
     until InIndex >= InnerLimit;
-
     { Write line break (CRLF). }
     OutputBuffer[OutIndex + 0] := 13;
     OutputBuffer[OutIndex + 1] := 10;
     Inc(OutIndex, 2);
-
     Inc(InnerLimit, MIME_DECODED_LINE_BREAK);
   until InnerLimit > OuterLimit;
 end;
-
 procedure MimeEncodeFullLines(const InputBuffer; const InputByteCount: SizeInt; out OutputBuffer);
 var
   B: Cardinal;
@@ -420,16 +373,12 @@ begin
   { Do we have enough input to encode a full line? }
   if InputByteCount < MIME_DECODED_LINE_BREAK then
     Exit;
-
   InPtr := @InputBuffer;
   OutPtr := @OutputBuffer;
-
   InnerLimit := TJclAddr(InPtr);
   Inc(InnerLimit, MIME_DECODED_LINE_BREAK);
-
   OuterLimit := TJclAddr(InPtr);
   Inc(OuterLimit, InputByteCount);
-
   { Multiple line loop. }
   repeat
     { Single line loop. }
@@ -451,16 +400,13 @@ begin
       OutPtr^.B1 := MIME_ENCODE_TABLE[B];
       Inc(OutPtr);
     until TJclAddr(InPtr) >= InnerLimit;
-
     { Write line break (CRLF). }
     OutPtr^.B1 := 13;
     OutPtr^.B2 := 10;
     Inc(TJclAddr(OutPtr), 2);
-
     Inc(InnerLimit, MIME_DECODED_LINE_BREAK);
   until InnerLimit > OuterLimit;
 end;
-
 procedure MimeEncodeNoCRLF(const InputBuffer: TDynByteArray; InputOffset: SizeInt;
   const InputByteCount: SizeInt; out OutputBuffer: TDynByteArray; OutputOffset: SizeInt);
 var
@@ -471,15 +417,11 @@ var
 begin
   if InputByteCount = 0 then
     Exit;
-
   InIndex := InputOffset;
   OutIndex := OutputOffset;
-
   OuterLimit := InputByteCount div 3 * 3;
-
   InnerLimit := InIndex;
   Inc(InnerLimit, OuterLimit);
-
   { Last line loop. }
   while InIndex < InnerLimit do
   begin
@@ -500,7 +442,6 @@ begin
     OutputBuffer[OutIndex + 0] := MIME_ENCODE_TABLE[B];
     Inc(OutIndex, 3);
   end;
-
   { End of data & padding. }
   case TJclAddr(InputByteCount) - OuterLimit of
     1:
@@ -528,7 +469,6 @@ begin
       end;
   end;
 end;
-
 procedure MimeEncodeNoCRLF(const InputBuffer; const InputByteCount: SizeInt; out OutputBuffer);
 var
   B: Cardinal;
@@ -538,15 +478,11 @@ var
 begin
   if InputByteCount = 0 then
     Exit;
-
   InPtr := @InputBuffer;
   OutPtr := @OutputBuffer;
-
   OuterLimit := InputByteCount div 3 * 3;
-
   InnerLimit := TJclAddr(InPtr);
   Inc(InnerLimit, OuterLimit);
-
   { Last line loop. }
   while TJclAddr(InPtr) < TJclAddr(InnerLimit) do
   begin
@@ -567,7 +503,6 @@ begin
     OutPtr^.B1 := MIME_ENCODE_TABLE[B];
     Inc(OutPtr);
   end;
-
   { End of data & padding. }
   case TJclAddr(InputByteCount) - OuterLimit of
     1:
@@ -595,7 +530,6 @@ begin
       end;
   end;
 end;
-
 // Decoding Core
 function MimeDecode(const InputBuffer: TDynByteArray; InputOffset: SizeInt;
   const InputByteCount: SizeInt; out OutputBuffer: TDynByteArray; OutputOffset: SizeInt): SizeInt;
@@ -607,7 +541,6 @@ begin
   Result := MimeDecodePartial(InputBuffer, InputOffset, InputByteCount, OutputBuffer, OutputOffset, ByteBuffer, ByteBufferSpace);
   Inc(Result, MimeDecodePartialEnd(OutputBuffer, OutputOffset + Result, ByteBuffer, ByteBufferSpace));
 end;
-
 // Decoding Core
 function MimeDecode(const InputBuffer; const InputByteCount: SizeInt; out OutputBuffer): SizeInt;
 var
@@ -621,7 +554,6 @@ begin
   Inc(O, Result);
   Inc(Result, MimeDecodePartialEnd(O^, ByteBuffer, ByteBufferSpace));
 end;
-
 function MimeDecodePartial(const InputBuffer: TDynByteArray; InputOffset: SizeInt;
   const InputByteCount: SizeInt; out OutputBuffer: TDynByteArray; OutputOffset: SizeInt;
   var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): SizeInt;
@@ -650,7 +582,6 @@ begin
         { Have we read 4 bytes from InputBuffer? }
         if LByteBufferSpace <> 0 then
           Continue;
-
         { Write 3 bytes to OutputBuffer (in reverse order). }
         OutputBuffer[OutIndex + 2] := Byte(LByteBuffer);
         LByteBuffer := LByteBuffer shr 8;
@@ -668,7 +599,6 @@ begin
   else
     Result := 0;
 end;
-
 function MimeDecodePartial(const InputBuffer; const InputByteCount: SizeInt; out OutputBuffer;
   var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): SizeInt;
 var
@@ -696,7 +626,6 @@ begin
       { Have we read 4 bytes from InputBuffer? }
       if LByteBufferSpace <> 0 then
         Continue;
-
       { Write 3 bytes to OutputBuffer (in reverse order). }
       OutPtr^.B3 := Byte(LByteBuffer);
       LByteBuffer := LByteBuffer shr 8;
@@ -714,7 +643,6 @@ begin
   else
     Result := 0;
 end;
-
 function MimeDecodePartialEnd(out OutputBuffer: TDynByteArray; OutputOffset: SizeInt;
   const ByteBuffer: Cardinal; const ByteBufferSpace: Cardinal): SizeInt;
 var
@@ -739,7 +667,6 @@ begin
     Result := 0;
   end;
 end;
-
 function MimeDecodePartialEnd(out OutputBuffer; const ByteBuffer: Cardinal;
   const ByteBufferSpace: Cardinal): SizeInt;
 var
@@ -764,7 +691,6 @@ begin
     Result := 0;
   end;
 end;
-
 // File Encoding & Decoding
 procedure MimeEncodeFile(const InputFileName, OutputFileName: TFileName);
 var
@@ -782,7 +708,6 @@ begin
     InputStream.Free;
   end;
 end;
-
 procedure MimeEncodeFileNoCRLF(const InputFileName, OutputFileName: TFileName);
 var
   InputStream, OutputStream: TFileStream;
@@ -799,7 +724,6 @@ begin
     InputStream.Free;
   end;
 end;
-
 procedure MimeDecodeFile(const InputFileName, OutputFileName: TFileName);
 var
   InputStream, OutputStream: TFileStream;
@@ -816,7 +740,6 @@ begin
     InputStream.Free;
   end;
 end;
-
 // Stream Encoding & Decoding
 procedure MimeEncodeStream(const InputStream: TStream; const OutputStream: TStream);
 var
@@ -828,30 +751,23 @@ var
 begin
   InputBuffer[0] := 0;
   BytesRead := InputStream.Read(InputBuffer, SizeOf(InputBuffer));
-
   while BytesRead = Length(InputBuffer) do
   begin
     MimeEncodeFullLines(InputBuffer, Length(InputBuffer), OutputBuffer);
     OutputStream.Write(OutputBuffer, Length(OutputBuffer));
     BytesRead := InputStream.Read(InputBuffer, Length(InputBuffer));
   end;
-
   MimeEncodeFullLines(InputBuffer, BytesRead, OutputBuffer);
-
   IDelta := BytesRead div MIME_DECODED_LINE_BREAK; // Number of lines processed.
   ODelta := IDelta * (MIME_ENCODED_LINE_BREAK + 2);
   IDelta := IDelta * MIME_DECODED_LINE_BREAK;
-
   I := @InputBuffer;
   Inc(I, IDelta);
   O := @OutputBuffer;
   Inc(O, ODelta);
-
   MimeEncodeNoCRLF(I^, BytesRead - IDelta, O^);
-
   OutputStream.Write(OutputBuffer, MimeEncodedSize(BytesRead));
 end;
-
 procedure MimeEncodeStreamNoCRLF(const InputStream: TStream; const OutputStream: TStream);
 var
   InputBuffer: array [0..MIME_BUFFER_SIZE - 1] of Byte;
@@ -860,18 +776,15 @@ var
 begin
   InputBuffer[0] := 0;
   BytesRead := InputStream.Read(InputBuffer, SizeOf(InputBuffer));
-
   while BytesRead = Length(InputBuffer) do
   begin
     MimeEncodeNoCRLF(InputBuffer, Length(InputBuffer), OutputBuffer);
     OutputStream.Write(OutputBuffer, Length(OutputBuffer));
     BytesRead := InputStream.Read(InputBuffer, Length(InputBuffer));
   end;
-
   MimeEncodeNoCRLF(InputBuffer, BytesRead, OutputBuffer);
   OutputStream.Write(OutputBuffer, MimeEncodedSizeNoCRLF(BytesRead));
 end;
-
 procedure MimeDecodeStream(const InputStream: TStream; const OutputStream: TStream);
 var
   ByteBuffer, ByteBufferSpace: Cardinal;
@@ -883,7 +796,6 @@ begin
   ByteBufferSpace := 4;
   InputBuffer[0] := 0;
   BytesRead := InputStream.Read(InputBuffer, SizeOf(InputBuffer));
-
   while BytesRead > 0 do
   begin
     OutputStream.Write(OutputBuffer, MimeDecodePartial(InputBuffer, BytesRead, OutputBuffer, ByteBuffer, ByteBufferSpace));
@@ -891,13 +803,10 @@ begin
   end;
   OutputStream.Write(OutputBuffer, MimeDecodePartialEnd(OutputBuffer, ByteBuffer, ByteBufferSpace));
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.

@@ -38,14 +38,8 @@ requires
   {$ELSE}
    FireDAC, FireDACCommonDriver, FireDACCommon,
   {$IFEND}
-  {$IFDEF WIN32}
-   dcldb,
-   designide,
-  {$ENDIF}
-  rtl,
-  dbrtl,
-  soaprtl,
-  dsnap;
+  dcldb,
+  soaprtl;
 
 contains
   PropertyPersist in '..\..\Source\Basic\PropertyPersist.pas',
@@ -60,7 +54,6 @@ contains
   uRESTDWServerEvents in '..\..\Source\Basic\uRESTDWServerEvents.pas',
   uRESTDWConsts in '..\..\Source\Consts\uRESTDWConsts.pas',
   uRESTDWDatamodule in '..\..\Source\Plugins\DMDados\uRESTDWDatamodule.pas' {ServerMethodDataModule: TDataModule},
-  uRESTDWMemtable in '..\..\Source\Plugins\Memdataset\uRESTDWMemtable.pas',
   uRESTDWMessageCoderMIME in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderMIME.pas',
   uRESTDWException in '..\..\Source\Basic\Mechanics\uRESTDWException.pas',
   uRESTDWMessage in '..\..\Source\Basic\Mechanics\uRESTDWMessage.pas',
@@ -113,7 +106,8 @@ contains
   uRESTDWSerialize in '..\..\Source\utils\JSON\uRESTDWSerialize.pas',
   uRESTDWMimeTypes in '..\..\Source\utils\uRESTDWMimeTypes.pas',
   uRESTDWBufferBase in '..\..\Source\Basic\uRESTDWBufferBase.pas',
-  uRESTDWURLFunctions in '..\..\Source\utils\uRESTDWURLFunctions.pas';
+  uRESTDWURLFunctions in '..\..\Source\utils\uRESTDWURLFunctions.pas',
+  uRESTDWMemoryDataset in '..\..\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas';
 
 End.
 

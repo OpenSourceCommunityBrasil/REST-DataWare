@@ -31,7 +31,7 @@ Uses
   uRESTDWParams, uRESTDWComponentBase, uRESTDWEncodeClass,
   uRESTDWComponentEvents, uRESTDWMassiveBuffer, uRESTDWJSONInterface,
   uRESTDWConsts, uRESTDWDataModule, uRESTDWBasicTypes, uRESTDWTools,
-  uRESTDWBufferBase, uRESTDWMemtable;
+  uRESTDWBufferBase, uRESTDWMemoryDataset;
 
 Type
   TRESTDWDatabaseInfo = Record
@@ -688,7 +688,8 @@ begin
   memtable := TRESTDWMemtable.Create(nil);
   try
     memtable.Assign(qry);
-    memtable.SaveToStream(stream);
+    // TODO -oXyberX -cMemTable: Função SaveToStream não existe no TRESTDWMemtable
+//    memtable.SaveToStream(stream);
     stream.Position := 0;
   finally
     FreeAndNil(memtable);

@@ -1,7 +1,5 @@
 unit JvDBUtils;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,29 +22,24 @@ unit JvDBUtils;
 }
 
 interface
-
 uses
   {$IFDEF MSWINDOWS}
   Windows,
   {$ENDIF MSWINDOWS}
   Variants, Classes, SysUtils, DB,
   JvAppStorage;
-
 type
   IJvDataControl = interface
     ['{8B6910C8-D5FD-40BA-A427-FC54FE7B85E5}']
     function GetDataLink: TDataLink;
   end;
-
   TJvDataLink = class(TDataLink)
   protected
     procedure FocusControl(Field: TFieldRef); overload; override;
     procedure FocusControl(const Field: TField); reintroduce; overload; virtual;
   end;
-
   TCommit = (ctNone, ctStep, ctAll);
   TJvDBProgressEvent = procedure(UserData: Integer; var Cancel: Boolean; Line: Integer) of object;
-
   EJvScriptError = class(Exception)
   private
     FErrPos: Integer;
@@ -57,7 +50,6 @@ type
     constructor Create(const AMessage: string; AErrPos: Integer; DummyForBCB: Integer = 0); overload;
     property ErrPos: Integer read FErrPos;
   end;
-
   TJvLocateObject = class(TObject)
   private
     FDataSet: TDataSet;
@@ -88,16 +80,11 @@ type
     property DataSet: TDataSet read FDataSet write SetDataSet;
     property IndexSwitch: Boolean read FIndexSwitch write FIndexSwitch;
   end;
-
   TCreateLocateObject = function: TJvLocateObject;
-
 var
   CreateLocateObject: TCreateLocateObject = nil;
-
 function CreateLocate(DataSet: TDataSet): TJvLocateObject;
-
 { Utility routines }
-
 function ExtractFieldNameEx(const Fields: {$IFDEF COMPILER10_UP} WideString {$ELSE} string {$ENDIF};
   var Pos: Integer): string;
 function IsDataSetEmpty(DataSet: TDataSet): Boolean;
@@ -122,9 +109,7 @@ procedure AssignRecord(Source, Dest: TDataSet; ByName: Boolean);
 procedure CheckRequiredField(Field: TField);
 procedure CheckRequiredFields(const Fields: array of TField);
 procedure GotoBookmarkEx(DataSet: TDataSet; const Bookmark: TBookmark; Mode: TResyncMode = [rmExact, rmCenter]; ForceScrollEvents: Boolean = False);
-
 { SQL expressions }
-
 function DateToSQL(Value: TDateTime): string;
 function FormatSQLDateRange(Date1, Date2: TDateTime;
   const FieldName: string): string;
@@ -137,11 +122,9 @@ function FormatSQLCondition(const FieldName, Operator, Value: string;
   FieldType: TFieldType; Exact: Boolean): string;
 function FormatAnsiSQLCondition(const FieldName, Operator, Value: string;
   FieldType: TFieldType; Exact: Boolean): string;
-
 const
   TrueExpr = '0=0';
   {$NODEFINE TrueExpr}
-
 const
   { Server Date formats}
   sdfStandard16 = '''"''mm''/''dd''/''yyyy''"'''; {"mm/dd/yyyy"}
@@ -149,10 +132,8 @@ const
   sdfOracle = '"TO_DATE(''"dd/mm/yyyy"'', ''DD/MM/YYYY'')"';
   sdfInterbase = '"CAST(''"mm"/"dd"/"yyyy"'' AS DATE)"';
   sdfMSSQL = '"CONVERT(datetime, ''"mm"/"dd"/"yyyy"'', 103)"';
-
 const
   ServerDateFmt: string = sdfStandard16;
-
 {.$NODEFINE ftNonTextTypes}
 (*$HPPEMIT 'namespace JvDBUtils'*)
 (*$HPPEMIT '{'*)
@@ -160,15 +141,12 @@ const
 (*$HPPEMIT '        << ftBytes << ftVarBytes << ftBlob << ftMemo << ftGraphic \'*)
 (*$HPPEMIT '        << ftFmtMemo << ftParadoxOle << ftDBaseOle << ftTypedBinary << ftCursor )'*)
 (*$HPPEMIT '}'*)
-
 type
   Largeint = Longint;
   {$NODEFINE Largeint}
-
 function NameDelimiter(C: Char): Boolean;
 function IsLiteral(C: Char): Boolean;
 procedure _DBError(const Msg: string);
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -178,9 +156,7 @@ const
     LogPath: 'JVCL\run'
   );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   DBConsts, Math,
   {$IFDEF HAS_UNIT_SYSTEM_UITYPES}
@@ -190,43 +166,33 @@ uses
   System.Generics.Collections,
   {$ENDIF RTL240_UP}
   JvJVCLUtils, JvJCLUtils, JvTypes, JvConsts, JvResources;
-
 { TJvDataLink }
-
 procedure TJvDataLink.FocusControl(Field: TFieldRef);
 begin
   FocusControl(Field^);
 end;
-
 procedure TJvDataLink.FocusControl(const Field: TField);
 begin
 end;
-
 { Utility routines }
-
 function NameDelimiter(C: Char): Boolean;
 begin
   Result := CharInSet(C, [' ', ',', ';', ')', '.', Cr, Lf]);
 end;
-
 function IsLiteral(C: Char): Boolean;
 begin
   Result := CharInSet(C, ['''', '"']);
 end;
-
 procedure _DBError(const Msg: string);
 begin
   DatabaseError(Msg);
 end;
-
 constructor EJvScriptError.Create(const AMessage: string; AErrPos: Integer; DummyForBCB: Integer);
 begin
   inherited Create(AMessage);
   FErrPos := AErrPos;
 end;
-
 // (rom) better use Windows dialogs which are localized
-
 function SetToBookmark(ADataSet: TDataSet; ABookmark: TBookmark): Boolean;
 begin
   Result := False;
@@ -238,9 +204,7 @@ begin
   except
   end;
 end;
-
 { Refresh Query procedure }
-
 procedure RefreshQuery(Query: TDataSet);
 var
   BookMk: TBookmark;
@@ -263,13 +227,11 @@ begin
     Query.EnableControls;
   end;
 end;
-
 procedure TJvLocateObject.SetDataSet(Value: TDataSet);
 begin
   ActiveChanged;
   FDataSet := Value;
 end;
-
 function TJvLocateObject.LocateFull: Boolean;
 begin
   Result := False;
@@ -284,21 +246,17 @@ begin
     DataSet.Next;
   end;
 end;
-
 function TJvLocateObject.LocateKey: Boolean;
 begin
   Result := False;
 end;
-
 function TJvLocateObject.FilterApplicable: Boolean;
 begin
   Result := FLookupField.FieldKind in [fkData, fkInternalCalc];
 end;
-
 procedure TJvLocateObject.CheckFieldType(Field: TField);
 begin
 end;
-
 //function TJvLocateObject.Locate(const KeyField, KeyValue: string;
 //  Exact, CaseSensitive: Boolean; DisableControls: Boolean; RightTrimmedLookup: Boolean): Boolean;
 //var
@@ -370,16 +328,13 @@ end;
 //      DataSet.EnableControls;
 //  end;
 //end;
-
 function TJvLocateObject.UseKey: Boolean;
 begin
   Result := False;
 end;
-
 procedure TJvLocateObject.ActiveChanged;
 begin
 end;
-
 function TJvLocateObject.MatchesLookup(Field: TField): Boolean;
 var
   Temp: string;
@@ -392,7 +347,6 @@ begin
   else
     Result := AnsiSameText(Temp, LookupValue);
 end;
-
 function CreateLocate(DataSet: TDataSet): TJvLocateObject;
 begin
   if Assigned(CreateLocateObject) then
@@ -402,16 +356,13 @@ begin
   if (Result <> nil) and (DataSet <> nil) then
     Result.DataSet := DataSet;
 end;
-
 { DataSet locate routines }
-
 function DataSetLocateThrough(DataSet: TDataSet; const KeyFields: string;
   const KeyValues: Variant; Options: TLocateOptions): Boolean;
 var
   FieldCount: Integer;
   Fields: TList{$IFDEF RTL240_UP}<TField>{$ENDIF RTL240_UP};
   Bookmark: {$IFDEF RTL200_UP}TBookmark{$ELSE}TBookmarkStr{$ENDIF RTL200_UP};
-
   function CompareField(Field: TField; const Value: Variant): Boolean;
   var
     S: string;
@@ -434,7 +385,6 @@ var
     else
       Result := (Field.Value = Value);
   end;
-
   function CompareRecord: Boolean;
   var
     I: Integer;
@@ -449,7 +399,6 @@ var
         Result := Result and CompareField(TField(Fields[I]), KeyValues[I]);
     end;
   end;
-
 begin
   Result := False;
   DataSet.CheckBrowseMode;
@@ -485,9 +434,7 @@ begin
     Fields.Free;
   end;
 end;
-
 { DataSetSortedSearch. Navigate on sorted DataSet routine. }
-
 function DataSetSortedSearch(DataSet: TDataSet; const Value,
   FieldName: string; CaseInsensitive: Boolean): Boolean;
 var
@@ -496,7 +443,6 @@ var
   CurrentValue: string;
   BookMk: TBookmark;
   Field: TField;
-
   function UpStr(const Value: string): string;
   begin
     if CaseInsensitive then
@@ -504,7 +450,6 @@ var
     else
       Result := Value;
   end;
-
   function GetCurrentStr: string;
   begin
     Result := Field.AsString;
@@ -512,7 +457,6 @@ var
       SetLength(Result, Length(Value));
     Result := UpStr(Result);
   end;
-
 begin
   Result := False;
   if DataSet = nil then
@@ -571,21 +515,17 @@ begin
   else
     DatabaseErrorFmt(SFieldTypeMismatch, [Field.DisplayName]);
 end;
-
 { Save and restore DataSet Fields layout }
-
 function DataSetSectionName(DataSet: TDataSet): string;
 begin
  Result := DataSet.Name;
 end;
-
 function CheckSection(DataSet: TDataSet; const Section: string): string;
 begin
   Result := Section;
   if Result = '' then
     Result := DataSetSectionName(DataSet);
 end;
-
 procedure InternalSaveFields(DataSet: TDataSet; AppStorage: TJvCustomAppStorage; const Path: string);
 var
   I: Integer;
@@ -604,7 +544,6 @@ begin
     AppStorage.EndUpdate;
   end;
 end;
-
 procedure InternalRestoreFields(DataSet: TDataSet; AppStorage: TJvCustomAppStorage;
   const Path: string; RestoreVisible: Boolean);
 type
@@ -656,37 +595,30 @@ begin
     FieldArray := nil;
   end;
 end;
-
 procedure SaveFields(DataSet: TDataSet; AppStorage: TJvCustomAppStorage; const Path: string);
 begin
   InternalSaveFields(DataSet, AppStorage, AppStorage.ConcatPaths([Path, DataSetSectionName(DataSet)]));
 end;
-
 procedure RestoreFields(DataSet: TDataSet; AppStorage: TJvCustomAppStorage; const Path: string;
   RestoreVisible: Boolean);
 begin
   InternalRestoreFields(DataSet, AppStorage, AppStorage.ConcatPaths([DataSetSectionName(DataSet)]),
     RestoreVisible);
 end;
-
 function ExtractFieldNameEx(const Fields: {$IFDEF COMPILER10_UP} WideString {$ELSE} string {$ENDIF};
   var Pos: Integer): string;
 begin
   Result := ExtractFieldName(Fields, Pos);
 end;
-
 function IsDataSetEmpty(DataSet: TDataSet): Boolean;
 begin
   Result := (not DataSet.Active) or (DataSet.Eof and DataSet.Bof);
 end;
-
 { SQL expressions }
-
 function DateToSQL(Value: TDateTime): string;
 begin
   Result := IntToStr(Trunc(Value));
 end;
-
 function FormatSQLDateRange(Date1, Date2: TDateTime;
   const FieldName: string): string;
 begin
@@ -712,7 +644,6 @@ begin
         FieldName, FormatDateTime(ServerDateFmt, IncDay(Date1, -1))]);
   end;
 end;
-
 function FormatSQLDateRangeEx(Date1, Date2: TDateTime;
   const FieldName: string): string;
 begin
@@ -732,7 +663,6 @@ begin
         FieldName, FormatDateTime(ServerDateFmt, Date1)]);
   end;
 end;
-
 function FormatSQLNumericRange(const FieldName: string;
   LowValue, HighValue, LowEmpty, HighEmpty: Double; Inclusive: Boolean): string;
 const
@@ -755,7 +685,6 @@ begin
         FieldName, Operators[Inclusive, 1], LowValue]);
   end;
 end;
-
 function StrMaskSQL(const Value: string): string;
 begin
   if (Pos('*', Value) = 0) and (Pos('?', Value) = 0) and (Value <> '') then
@@ -763,7 +692,6 @@ begin
   else
     Result := Value;
 end;
-
 function FormatSQLCondition(const FieldName, Operator, Value: string;
   FieldType: TFieldType; Exact: Boolean): string;
 var
@@ -817,7 +745,6 @@ begin
   else
     Result := Format('%s %s %s', [FieldName, LogicOperator, FieldValue]);
 end;
-
 function FormatAnsiSQLCondition(const FieldName, Operator, Value: string;
   FieldType: TFieldType; Exact: Boolean): string;
 var
@@ -835,7 +762,6 @@ begin
     S := Value;
   Result := FormatSQLCondition(FieldName, Operator, S, FieldType, Exact) + Esc;
 end;
-
 procedure CheckRequiredField(Field: TField);
 begin
   if not Field.ReadOnly and not Field.Calculated and Field.IsNull then
@@ -844,7 +770,6 @@ begin
     DatabaseErrorFmt(SFieldRequired, [Field.DisplayName]);
   end;
 end;
-
 procedure CheckRequiredFields(const Fields: array of TField);
 var
   I: Integer;
@@ -852,10 +777,8 @@ begin
   for I := Low(Fields) to High(Fields) do
     CheckRequiredField(Fields[I]);
 end;
-
 type
   TDataSetAccess = class(TDataSet);
-
 procedure GotoBookmarkEx(DataSet: TDataSet; const Bookmark: TBookmark; Mode: TResyncMode; ForceScrollEvents: Boolean);
 var
   DS: TDataSetAccess;
@@ -870,7 +793,6 @@ begin
 		if ForceScrollEvents or (rmCenter in Mode) then DS.DoAfterScroll;
 	end;
 end;
-
 procedure AssignRecord(Source, Dest: TDataSet; ByName: Boolean);
 var
   I: Integer;
@@ -929,14 +851,10 @@ begin
     end;
   end;
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.
-

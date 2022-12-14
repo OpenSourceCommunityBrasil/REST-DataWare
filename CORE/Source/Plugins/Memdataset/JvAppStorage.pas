@@ -1,7 +1,5 @@
 unit JvAppStorage;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -24,7 +22,6 @@ unit JvAppStorage;
 }
 
 interface
-
 uses
   Windows,
   JclStrings, // must be included before WideStrings
@@ -37,23 +34,19 @@ uses
   JvJCLUtils,
   {$ENDIF ~COMPILER12_UP}
   JvComponentBase, JvTypes, JvTranslateString, IniFiles;
-
 const
   // (rom) this name is shared in several units and should be made global
   cItem = 'Item';
   {$NODEFINE cItem}
   cVersionCheckName = 'Version';
   {$NODEFINE cVersionCheckName}
-
 type
   TJvCustomAppStorage = class;
   TJvAppStorage = class;
   TJvCustomAppStorageOptions = class;
   TJvAppSubStorages = class;
   TJvAppSubStorage = class;
-
   EJVCLAppStorageError = class(EJVCLException);
-
   { TAppStorage does not automatically store published properties of a class that
     supports the IJvAppStorageHandler interface. Instead it invokes the Read and
     Write methods. }
@@ -62,14 +55,12 @@ type
     procedure ReadFromAppStorage(AppStorage: TJvCustomAppStorage; const BasePath: string);
     procedure WriteToAppStorage(AppStorage: TJvCustomAppStorage; const BasePath: string);
   end;
-
   { TAppStorage automatically stores published properties of a class that
     supports the IJvAppStoragePublishedProps interface, even if the class
     supports the IJvAppStorageHandler interface, too. }
   IJvAppStoragePublishedProps = interface
     ['{0211AEF7-CCE9-4F13-B3CE-287251C89182}']
   end;
-
   TJvAppStorageListItemEvent = procedure(Sender: TJvCustomAppStorage; const Path: string;
     const List: TObject; const Index: Integer; const ItemName: string) of object;
   TJvAppStorageListDeleteEvent = procedure(Sender: TJvCustomAppStorage; const Path: string;
@@ -82,9 +73,7 @@ type
   TJvAppStorageObjectListItemCreateEvent = function(Sender: TJvCustomAppStorage; const Path: string; Index: Integer):
     TPersistent of object;
   TJvAppStorageErrorEvent = procedure(Sender: TObject; const Value: string) of object;
-
   TJvAppStorageOptionsClass = class of TJvCustomAppStorageOptions;
-
   TJvAppStorageEnumOption = (
     aeoFolders, // report folders
     aeoValues, // report values
@@ -92,9 +81,7 @@ type
     aeoReportRelative, // report all found folders and values relative to the requested path (otherwise relative to the Root path)
     aeoRecursive); // scan sub folders as well
   TJvAppStorageEnumOptions = set of TJvAppStorageEnumOption;
-
   TSynchronizeMethod = procedure of object;
-
   TFileLocation = (
     flCustom, // FileName property will contain full path
 {$IFDEF MSWINDOWS}
@@ -104,7 +91,6 @@ type
     flExeFile, // Store in same folder as application's exe file; only use file name part of FileName property.
     flUserFolder);
   // Store in %USER%\Application Data. Use the FileName property if it's a relative path or only the file name part of FileName property.
-
   TJvCustomAppStorage = class(TJvComponent)
   private
     CachedFormatSettings: TFormatSettings;
@@ -130,9 +116,7 @@ type
     procedure SetTranslateStringEngine(const Value: TJvTranslateString);
   protected
     FFlushOnDestroy: Boolean;
-
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-
     //1 Synchronize the Flush and Reload procedure
     /// Defines if the execution of flush and reload for the current
     /// AppStoragePath should be synchronized via a global mutex
@@ -143,11 +127,9 @@ type
         FSynchronizeFlushReload default False;
     //1 Synchronize the execution of an method using a JclMutex
     procedure Synchronize(AMethod: TSynchronizeMethod; AIdentifier: String);
-
     { Sets the value of FFlushOnDestroy. Derived classes may override this
       method to prevent it from changing or add extra behaviour to it. }
     procedure SetFlushOnDestroy(Value: Boolean); virtual;
-
     //Returns the property count of an instance
     function GetPropCount(Instance: TPersistent): Integer;
     //Returns the property name of an instance at a certain index
@@ -180,11 +162,9 @@ type
     { StringList item deleter used by WriteStringList in the call to WriteList. }
     procedure DeleteStringListItem(Sender: TJvCustomAppStorage; const Path: string;
       const List: TObject; const First, Last: Integer; const ItemName: string);
-
     { Default Function for creating a new Object. The classname could be received from the AppStorage using the Path "Classname" }
     function DefaultObjectListItemCreateEvent(Sender: TJvCustomAppStorage; const Path: string; Index: Integer):
       TPersistent;
-
     { ObjectList item reader used by ReadObjectList in the call to ReadList. }
     procedure ReadObjectListItem(Sender: TJvCustomAppStorage; const Path: string;
       const List: TObject; const Index: Integer; const ItemName: string);
@@ -205,7 +185,6 @@ type
     procedure DeleteWideStringListItem(Sender: TJvCustomAppStorage; const Path: string;
       const List: TObject; const First, Last: Integer; const ItemName: string);
     {$ENDIF}
-
     { StringList item reader used by ReadStringObjectList in the call to ReadList. }
     procedure ReadStringObjectListItem(Sender: TJvCustomAppStorage; const Path: string;
       const List: TObject; const Index: Integer; const ItemName: string);
@@ -215,7 +194,6 @@ type
     { StringList item deleter used by WriteStringObjectList in the call to WriteList. }
     procedure DeleteStringObjectListItem(Sender: TJvCustomAppStorage; const Path: string;
       const List: TObject; const First, Last: Integer; const ItemName: string);
-
     { Collection item reader used by ReadCollection in the call to ReadList. }
     procedure ReadCollectionItem(Sender: TJvCustomAppStorage; const Path: string;
       const List: TObject; const Index: Integer; const ItemName: string);
@@ -225,7 +203,6 @@ type
     { Collection item deleter used by WriteCollection in the call to WriteList. }
     procedure DeleteCollectionItem(Sender: TJvCustomAppStorage; const Path: string;
       const List: TObject; const First, Last: Integer; const ItemName: string);
-
     { Enum all folders in the specified folder. }
     procedure EnumFolders(const Path: string; const Strings: TStrings;
       const ReportListAsValue: Boolean = True); virtual; abstract;
@@ -252,7 +229,6 @@ type
     { Determines if the specified is a sub store of this storage (will scan the entire sub storage
       hierarchy. }
     function HasSubStorage(AStore: TJvCustomAppStorage): Boolean;
-
     { Determines if the path represents a folder (ignores sub stores) }
     function IsFolderInt(const Path: string; ListIsValue: Boolean = True): Boolean; virtual; abstract;
     { Determines if the specified path exists (ignores sub stores) }
@@ -285,14 +261,12 @@ type
     function DoReadString(const Path: string; const Default: string): string; virtual; abstract;
     { Stores an string value. }
     procedure DoWriteString(const Path: string; const Value: string); virtual; abstract;
-
     { Retrieves the specified widestring value. If the value is not found, the Default will be
       returned. If the value is not a string (or can't be converted to a string an EConvertError
       exception will be raised. }
     function DoReadWideString(const Path: string; const Default: Widestring): Widestring; virtual;
     { Stores an widestring value. }
     procedure DoWriteWideString(const Path: string; const Value: Widestring); virtual;
-
     { Retrieves the specified value into a buffer. The result holds the number of bytes actually
       retrieved. }
     function DoReadBinary(const Path: string; Buf: TJvBytes; BufSize: Integer): Integer; virtual; abstract;
@@ -310,7 +284,6 @@ type
     function DoReadBoolean(const Path: string; Default: Boolean): Boolean; virtual;
     { Stores a Boolean value. }
     procedure DoWriteBoolean(const Path: string; Value: Boolean); virtual;
-
     { Retrieves the specified Integer value. If the value is not found, the Default will be
       returned. If the value is not an Integer (or can't be converted to an Integer an EConvertError
       exception will be raised. }
@@ -357,14 +330,11 @@ type
     procedure ReadSetInt(const Path: string; ATypeInfo: PTypeInfo; const Default; out Value); virtual;
     { Stores a set (ignores sub stores). }
     procedure WriteSetInt(const Path: string; ATypeInfo: PTypeInfo; const Value); virtual;
-
     function EncryptPropertyValue(Value: string): string;
     function DecryptPropertyValue(Value: string): string;
-
     procedure SetReadOnly(Value: Boolean);
     function GetReadOnly: Boolean;
     function GetPhysicalReadOnly: Boolean; virtual;
-
     property SubStorages: TJvAppSubStorages read FSubStorages write SetSubStorages;
     function DecodeStrToDateTime(const Value: string): TDateTime; virtual;
     function EncodeDateTimeToStr(Value: TDateTime): string; virtual;
@@ -386,7 +356,6 @@ type
     {$IFDEF SUPPORTS_CLASS_CTORDTORS}
     class destructor Destroy;
     {$ENDIF SUPPORTS_CLASS_CTORDTORS}
-
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     // (p3) moved Flush, Reload and AutoFlush to the base storage because users
@@ -484,7 +453,6 @@ type
       const OnWriteItem: TJvAppStorageListItemEvent;
       const OnDeleteItems: TJvAppStorageListDeleteEvent = nil;
       const ItemName: string = cItem);
-
     { Retrieves a list of objects. The list is optionally cleared before before reading starts.
       The ObjectType of the Object is retrieved from the stored "Classname" value.
       The result value is the number of items read. Uses ReadList with internally provided methods to
@@ -501,7 +469,6 @@ type
     { Stores a list of objects. Uses WriteList with internally provided methods to do the actual
       storing. }
     procedure WriteObjectList(const Path: string; List: TList; const ItemName: string = cItem);
-
     { Retrieves a list of collection items . The list is optionally cleared before before reading starts.
       The result value is the number of items read. Uses ReadList with internally provided methods to
       do the actual reading. }
@@ -510,7 +477,6 @@ type
     { Stores all items of a collection. Uses WriteList with internally provided methods to do the actual
       storing. }
     procedure WriteCollection(const Path: string; List: TCollection; const ItemName: string = cItem);
-
     { Retrieves a string list with addition objects.
       The ObjectType of the Object is retrieved from the stored "Classname" value.
       The string list is optionally cleared before reading starts. The
@@ -528,7 +494,6 @@ type
       ItemCreator: TJvAppStorageObjectListItemCreateEvent;
       const ClearFirst: Boolean = True;
       const ItemName: string = cItem): Integer; overload;
-
     { Stores and also the attached object informations of a string list.
       Uses WriteList with internally provided methods to do the actual
       storing. }
@@ -579,7 +544,6 @@ type
     { Stores a TPersistent-Object with all of its published properties}
     procedure WritePersistent(const Path: string; const PersObj: TPersistent; const Recursive: Boolean = True; const
       IgnoreProperties: TStrings = nil);
-
     { Translates a Char value to a (valid) key name. Used by the set storage methods. }
     function GetCharName(Ch: Char): string; virtual;
     { Translates an Integer value to a key name. Used by the set storage methods. }
@@ -627,17 +591,14 @@ type
     property OnTranslatePropertyName: TJvAppStoragePropTranslateEvent read FOnTranslatePropertyName write FOnTranslatePropertyName;
     property OnEncryptPropertyValue: TJvAppStorageCryptEvent read FOnEncryptPropertyValue write FOnEncryptPropertyValue;
     property OnDecryptPropertyValue: TJvAppStorageCryptEvent read FOnDecryptPropertyValue write FOnDecryptPropertyValue;
-
     // called when an error occurred in one of the methods.
     property OnError: TJvAppStorageErrorEvent read FOnError write FOnError;
   end;
-
   { Generic store that can only be used to combine various other storages (only storages in the
     SubStorages collection are usable; any references to paths not specified in this collection
     will raise an exception). Can be used for example to provide access to the entire registry
     hive from a single app store component by adding a number of TJvAppRegistryStorage storages,
     each referencing a specific root key and link them to a suitable root key path:
-
     RootPath              Store
     ========              =====
     HKCR                  asRegStoreHKCR
@@ -646,7 +607,6 @@ type
     HKEY_CURRENT_USER     asRegStoreHKCU
     HKLM                  asRegStoreHKLM
     HKEY_LOCAL_MACHINE    asRegStoreHKLM
-
     In the above scheme, both 'HKCU\<path>' as well as 'HKEY_CURRENT_USER'<path>' will link to
     asRegStoreHKCU, ie. HKCU and HKEY_CURRENT_USER are aliases of each other. }
   {$IFDEF RTL230_UP}
@@ -680,7 +640,6 @@ type
     property FlushOnDestroy;
     property SubStorages;
   end;
-
   TJvCustomAppStorageOptions = class(TPersistent)
   private
     FBooleanAsString: Boolean;
@@ -722,7 +681,6 @@ type
     function DefaultFalseString: string;
     function IsValueTrueString(Value: string): Boolean;
     function IsValueFalseString(Value: string): Boolean;
-
     property BooleanStringTrueValues: string read FBooleanStringTrueValues write SetBooleanStringTrueValues;
     property BooleanStringFalseValues: string read FBooleanStringFalseValues write SetBooleanStringFalseValues;
     property BooleanAsString: Boolean read FBooleanAsString write SetBooleanAsString default True;
@@ -745,7 +703,6 @@ type
         FUseTranslateStringEngineDateTimeFormats write
         FUseTranslateStringEngineDateTimeFormats default False;
   end;
-
   TJvAppStorageOptions = class(TJvCustomAppStorageOptions)
   published
     property BooleanStringTrueValues;
@@ -762,7 +719,6 @@ type
     property UseOldItemNameFormat;
     property UseTranslateStringEngineDateTimeFormats;
   end;
-
   TJvAppSubStorages = class(TOwnedCollection)
   private
     function GetRootStorage: TJvCustomAppStorage;
@@ -783,7 +739,6 @@ type
       path itself. To search for a sub store for a root path, simply add '\*' at the end of the
       path. }
     function MatchFor(APath: string; IgnoreIndex: Integer = -1): TJvAppSubStorage;
-
     property RootStorage: TJvCustomAppStorage read GetRootStorage;
   public
     constructor Create(AOwner: TJvCustomAppStorage);
@@ -791,10 +746,8 @@ type
     procedure Delete(Index: Integer); overload;
     procedure Delete(RootPath: string; const IncludeSubPaths: Boolean = False); overload;
     procedure Delete(AppStorage: TJvCustomAppStorage); overload;
-
     property Items[I: Integer]: TJvAppSubStorage read GetItem write SetItem; default;
   end;
-
   TJvAppSubStorage = class(TCollectionItem)
   private
     FRootPath: string;
@@ -804,18 +757,15 @@ type
     function GetDisplayName: string; override;
     procedure SetRootPath(Value: string);
     procedure SetAppStorage(Value: TJvCustomAppStorage);
-
     property OwnerStore: TJvCustomAppStorage read GetOwnerStore;
   published
     property RootPath: string read FRootPath write SetRootPath;
     property AppStorage: TJvCustomAppStorage read FAppStorage write SetAppStorage;
   end;
 
-
   TJvAppFileStorageBackupType = (afsbtNone, afsbtCreateBefore, afsbtRenameAfter);
   TJvAppFileStorageBackupHistoryType = (afsbhtNone, afsbhtAllways, afsbht1Minute, afsbht15Minute, afsbht1Hour, afsbht4Hour,
         afsbht12Hour, afsbht1Day, afsbht3Day, afsbht1Week, afsbht1Month);
-
   TJvAppFileStorageOptions = class(TJvCustomAppStorageOptions)
   private
     FBackupHistoryCount: Integer;
@@ -839,7 +789,6 @@ type
     /// the old file as backup and the new as save file
     property BackupType: TJvAppFileStorageBackupType read FBackupType write FBackupType default afsbtNone;
   end;
-
   // Base class for all in memory file storage classes.
   // All descendents implement a file storage, but all changes
   // are left in memory until the Flush method is called.
@@ -868,38 +817,29 @@ type
     {$ELSE}
     FFileAge: Integer;
     {$ENDIF}
-
     function GetAsString: string; virtual; abstract;
     procedure SetAsString(const Value: string); virtual; abstract;
-
     procedure SetFileName(const Value: TFileName);
     procedure SetOnGetFileName(Value: TJvAppStorageGetFileNameEvent);
     procedure SetLocation(const Value: TFileLocation);
     function DefaultExtension: string; virtual;
-
     function DoGetFileName: TFileName; virtual;
     property AsString: string read GetAsString write SetAsString;
-
     // OnGetFileName triggered on Location = flCustom
     property OnGetFileName: TJvAppStorageGetFileNameEvent read FOnGetFileName write SetOnGetFileName;
-
     function GetPhysicalReadOnly: Boolean; override;
     procedure RecalculateFullFileName;
-
     procedure ClearInternal; virtual; abstract;
     procedure FlushInternal; virtual; abstract;
     procedure FlushToFile;
     { Retrieve the class that holds the storage options and format settings. }
     class function GetStorageOptionsClass: TJvAppStorageOptionsClass; override;
     procedure ReloadInternal; virtual; abstract;
-
   public
     constructor Create(AOwner: TComponent); override;
     procedure Flush; override;
-
     procedure Reload; override;
     function ReloadNeeded: Boolean; override;
-
     property FileName: TFileName read FFileName write SetFileName;
     property FullFileName: TFileName read FFullFileName;
     property Location: TFileLocation read FLocation write SetLocation default flExeFile;
@@ -907,7 +847,6 @@ type
     property ReadOnly;
     property StorageOptions: TJvAppFileStorageOptions read GetStorageOptions write SetStorageOptions;
   end;
-
   { This Engine implements the possibility to implement special property handlers
     for TObject-based properties for storing/restoring them with the
     functions read/writeproperty.
@@ -922,9 +861,7 @@ type
     procedure WriteProperty(AStorage: TJvCustomAppStorage; const APath: string; AObject: TObject; AProperty: TObject; const
       Recursive: Boolean; const IgnoreProperties: TStrings = nil); virtual;
   end;
-
   TJvAppStoragePropertyBaseEngineClass = class of TJvAppStoragePropertyBaseEngine;
-
   //1 This class emulates a TCustomInifile using an appstorage class as data container
   TJvAppStorageIniFile = class(TCustomIniFile)
   private
@@ -958,23 +895,18 @@ type
     property AppStorage: TJvCustomAppStorage read FAppStorage write FAppStorage;
     property BaseSection: string read FBaseSection write FBaseSection;
   end;
-
 procedure RegisterAppStoragePropertyEngine(AEngineClass: TJvAppStoragePropertyBaseEngineClass);
 procedure UnregisterAppStoragePropertyEngine(AEngineClass: TJvAppStoragePropertyBaseEngineClass);
-
 // (marcelb) moved back; the constants are useful to the outside world after a call to GetStoredValues
 // (rom) give it better names and delete these comments :-)
 const
   aptFolder = 1;
   aptValue = 2;
-
 implementation
-
 uses
   StrUtils,
   JclFileUtils, JclSysInfo, JclRTTI, JclMime,
   JvPropertyStore, JvConsts, JvResources, JvStrings, JclSynch, JvJVCLUtils;
-
 type
   TJvAppStoragePropertyEngineList = class(TList)
   public
@@ -987,11 +919,9 @@ type
     function WriteProperty(AStorage: TJvCustomAppStorage; const APath: string; AObject: TObject; AProperty: TObject; const Recursive:
       Boolean; const IgnoreProperties: TStrings = nil): Boolean;
   end;
-
 var
   GlobalRegisteredAppStoragePropertyEngineList: TJvAppStoragePropertyEngineList;
   GlobalRegisteredAppStoragePropertyEngineListDestroyed: Boolean;
-
 function RegisteredAppStoragePropertyEngineList: TJvAppStoragePropertyEngineList;
 begin
   if (GlobalRegisteredAppStoragePropertyEngineList = nil) and
@@ -999,28 +929,23 @@ begin
     GlobalRegisteredAppStoragePropertyEngineList := TJvAppStoragePropertyEngineList.Create;
   Result := GlobalRegisteredAppStoragePropertyEngineList;
 end;
-
 //=== Global Engine Handling =================================================
-
 procedure RegisterAppStoragePropertyEngine(AEngineClass: TJvAppStoragePropertyBaseEngineClass);
 begin
   if RegisteredAppStoragePropertyEngineList <> nil then
     RegisteredAppStoragePropertyEngineList.RegisterEngine(AEngineClass);
 end;
-
 procedure UnregisterAppStoragePropertyEngine(AEngineClass: TJvAppStoragePropertyBaseEngineClass);
 begin
   if RegisteredAppStoragePropertyEngineList <> nil then
     RegisteredAppStoragePropertyEngineList.UnregisterEngine(AEngineClass);
 end;
-
 procedure DestroyAppStoragePropertyEngineList;
 begin
   GlobalRegisteredAppStoragePropertyEngineListDestroyed := True;
   GlobalRegisteredAppStoragePropertyEngineList.Free;
   GlobalRegisteredAppStoragePropertyEngineList := nil;
 end;
-
 const
   // (rom) this name is shared in several units and should be made global
   cCount = 'Count';
@@ -1031,7 +956,6 @@ const
   // (rom) should this be PathDelim + '*' as implemented before i changed it
   // (rom) or \* as comments say?
   cSubStorePath = PathDelim + '*';
-
 function OptimizePaths(const Paths: array of string): string;
 var
   PathIndex: Integer;
@@ -1043,24 +967,18 @@ var
   L: Integer;
 begin
   PathIndex := High(Paths);
-
   if PathIndex < 0 then
   begin
     Result := '';
     Exit;
   end;
-
   while (PathIndex > 0) and (StrLeft(Paths[PathIndex], 1) <> PathDelim) do
     Dec(PathIndex);
-
   MaxLength := 0;
   for I := PathIndex to High(Paths) do
     Inc(MaxLength, Length(Paths[I]) + 1);
-
   SetLength(Result, MaxLength);
-
   ResultIndex := 1;
-
   repeat
     Head := 1;
     // L is only used for optimalization
@@ -1117,14 +1035,11 @@ begin
     until Head > L;
     Inc(PathIndex);
   until PathIndex > High(Paths);
-
   // skip the last added delimiter (if it exists)
   if ResultIndex > 1 then
     Dec(ResultIndex);
-
   SetLength(Result, ResultIndex - 1);
 end;
-
 procedure CopyEnumValue(const Source; var Target; const Kind: TOrdType);
 begin
   case Kind of
@@ -1136,7 +1051,6 @@ begin
       Longword(Target) := Longword(Source);
   end;
 end;
-
 function OrdOfEnum(const Value; OrdType: TOrdType): Integer;
 begin
   case OrdType of
@@ -1154,9 +1068,7 @@ begin
     Result := -1;
   end;
 end;
-
 //=== { TJvCustomAppStorageOptions } =========================================
-
 constructor TJvCustomAppStorageOptions.Create;
 begin
   inherited Create;
@@ -1174,7 +1086,6 @@ begin
   UseOldItemNameFormat := True;
   FUseTranslateStringEngineDateTimeFormats := False;
 end;
-
 procedure TJvCustomAppStorageOptions.Assign(Source: TPersistent);
 begin
   if (Source = Self) then
@@ -1198,7 +1109,6 @@ begin
   else
     inherited assign(Source);
 end;
-
 function TJvCustomAppStorageOptions.IsValueListString(const AValue, AList: string): Boolean;
 var
   st: TStringList;
@@ -1211,7 +1121,6 @@ begin
     st.Free;
   end;
 end;
-
 function TJvCustomAppStorageOptions.DefaultTrueString: string;
 var
   I: Integer;
@@ -1221,7 +1130,6 @@ begin
     I := Length(FBooleanStringTrueValues) + 1;
   Result := Trim(Copy(FBooleanStringTrueValues, 1, I - 1));
 end;
-
 function TJvCustomAppStorageOptions.DefaultFalseString: string;
 var
   I: Integer;
@@ -1231,93 +1139,75 @@ begin
     I := Length(FBooleanStringFalseValues) + 1;
   Result := Trim(Copy(FBooleanStringFalseValues, 1, I - 1));
 end;
-
 function TJvCustomAppStorageOptions.IsValueTrueString(Value: string): Boolean;
 begin
   Result := IsValueListString(Value, FBooleanStringTrueValues);
 end;
-
 function TJvCustomAppStorageOptions.IsValueFalseString(Value: string): Boolean;
 begin
   Result := IsValueListString(Value, FBooleanStringFalseValues);
 end;
-
 procedure TJvCustomAppStorageOptions.SetBooleanAsString(Value: Boolean);
 begin
   FBooleanAsString := Value and (DefaultTrueString <> '') and (DefaultFalseString <> '');
 end;
-
 procedure TJvCustomAppStorageOptions.SetBooleanStringTrueValues(Value: string);
 begin
   FBooleanStringTrueValues := Value;
   FBooleanAsString := FBooleanAsString and (DefaultTrueString <> '')
 end;
-
 procedure TJvCustomAppStorageOptions.SetBooleanStringFalseValues(Value: string);
 begin
   FBooleanStringFalseValues := Value;
   FBooleanAsString := FBooleanAsString and (DefaultFalseString <> '')
 end;
-
 procedure TJvCustomAppStorageOptions.SetEnumAsStr(Value: Boolean);
 begin
   FEnumAsStr := Value;
 end;
-
 procedure TJvCustomAppStorageOptions.SetIntAsStr(Value: Boolean);
 begin
   FIntAsStr := Value;
 end;
-
 procedure TJvCustomAppStorageOptions.SetSetAsStr(Value: Boolean);
 begin
   FSetAsStr := Value;
 end;
-
 procedure TJvCustomAppStorageOptions.SetStoreDefaultValues(const Value: Boolean);
 begin
   FStoreDefaultValues := Value;
 end;
-
 procedure TJvCustomAppStorageOptions.SetDateTimeAsStr(Value: Boolean);
 begin
   FDateTimeAsString := Value;
 end;
-
 procedure TJvCustomAppStorageOptions.SetFloatAsStr(Value: Boolean);
 begin
   FFloatAsString := Value;
 end;
-
 procedure TJvCustomAppStorageOptions.SetDefaultIfReadConvertError(Value: Boolean);
 begin
   FDefaultIfReadConvertError := Value;
 end;
-
 procedure TJvCustomAppStorageOptions.SetDefaultIfValueNotExists(Value: Boolean);
 begin
   FDefaultIfValueNotExists := Value;
 end;
-
 procedure TJvCustomAppStorageOptions.SetStoreStringListAsSingleString(const Value: Boolean);
 begin
   FStoreStringListAsSingleString := Value;
 end;
-
 procedure TJvCustomAppStorageOptions.SetUseOldItemNameFormat(const Value: Boolean);
 begin
   FUseOldItemNameFormat := Value;
 end;
-
 //=== { TJvCustomAppStorage } ================================================
-
 {$IFDEF SUPPORTS_CLASS_CTORDTORS}
 class destructor TJvCustomAppStorage.Destroy;
 begin
   DestroyAppStoragePropertyEngineList;
 end;
 {$ENDIF SUPPORTS_CLASS_CTORDTORS}
-
 constructor TJvCustomAppStorage.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -1331,7 +1221,6 @@ begin
   FInternalTranslateStringEngine := TJvTranslateString.Create(Self);
   FSynchronizeFlushReload := False;
 end;
-
 destructor TJvCustomAppStorage.Destroy;
 begin
   if FlushOnDestroy then
@@ -1341,39 +1230,32 @@ begin
   FreeAndNil(FStorageOptions);
   inherited Destroy;
 end;
-
 procedure TJvCustomAppStorage.Flush;
 begin
   // do nothing
 end;
-
 procedure TJvCustomAppStorage.Reload;
 begin
   // do nothing
 end;
-
 procedure TJvCustomAppStorage.ReloadIfNeeded;
 begin
   if ReloadNeeded then
     Reload;
 end;
-
 function TJvCustomAppStorage.ReloadNeeded: Boolean;
 begin
   Result := AutoReload and not IsUpdating;
 end;
-
 procedure TJvCustomAppStorage.FlushIfNeeded;
 begin
   if FlushNeeded then
     Flush;
 end;
-
 function TJvCustomAppStorage.FlushNeeded: Boolean;
 begin
   Result := AutoFlush and not IsUpdating;
 end;
-
 procedure TJvCustomAppStorage.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
@@ -1383,12 +1265,10 @@ begin
     else if (AComponent = FTranslateStringEngine) then
       FTranslateStringEngine := nil;
 end;
-
 procedure TJvCustomAppStorage.SetFlushOnDestroy(Value: Boolean);
 begin
   FFlushOnDestroy := Value;
 end;
-
 function TJvCustomAppStorage.GetPropCount(Instance: TPersistent): Integer;
 var
   Data: PTypeData;
@@ -1396,7 +1276,6 @@ begin
   Data := GetTypeData(Instance.ClassInfo);
   Result := Data.PropCount;
 end;
-
 function TJvCustomAppStorage.GetPropName(Instance: TPersistent; Index: Integer): string;
 var
   PropList: PPropList;
@@ -1414,12 +1293,10 @@ begin
     FreeMem(PropList);
   end;
 end;
-
 class function TJvCustomAppStorage.GetStorageOptionsClass: TJvAppStorageOptionsClass;
 begin
   Result := TJvAppStorageOptions;
 end;
-
 procedure TJvCustomAppStorage.SplitKeyPath(const Path: string; out Key, ValueName: string);
 var
   AbsPath: string;
@@ -1430,47 +1307,39 @@ begin
   Key := StrLeft(AbsPath, ValueNamePos - 1);
   ValueName := StrRestOf(AbsPath, ValueNamePos + 1);
 end;
-
 procedure TJvCustomAppStorage.SetSubStorages(Value: TJvAppSubStorages);
 begin
 end;
-
 function TJvCustomAppStorage.GetRoot: string;
 begin
   Result := FRoot;
 end;
-
 procedure TJvCustomAppStorage.SetRoot(const Value: string);
 begin
   FRoot := OptimizePaths([Value]);
 end;
-
 function TJvCustomAppStorage.GetCurrentPath: string;
 begin
   Result := GetAbsPath('');
 end;
-
 function TJvCustomAppStorage.GetAbsPath(const Path: string): string;
 begin
   Result := GetRoot + PathDelim + OptimizePaths([GetPath, Path]);
   while (Result <> '') and (Result[1] = PathDelim) do
     Delete(Result, 1, 1);
 end;
-
 procedure TJvCustomAppStorage.ReadStringListItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const Index: Integer; const ItemName: string);
 begin
   if List is TStrings then
     TStrings(List).Add(Sender.ReadString(ConcatPaths([Path, ItemNameIndexPath (ItemName, Index)])));
 end;
-
 procedure TJvCustomAppStorage.WriteStringListItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const Index: Integer; const ItemName: string);
 begin
   if List is TStrings then
     Sender.WriteString(ConcatPaths([Path, ItemNameIndexPath (ItemName, Index)]), TStrings(List)[Index]);
 end;
-
 procedure TJvCustomAppStorage.DeleteStringListItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const First, Last: Integer; const ItemName: string);
 var
@@ -1480,7 +1349,6 @@ begin
     for I := First to Last do
       Sender.DeleteValue(ConcatPaths([Path, ItemName + IntToStr(I)]));
 end;
-
 {$IFDEF COMPILER10_UP}
 procedure TJvCustomAppStorage.ReadWideStringListItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const Index: Integer; const ItemName: string);
@@ -1488,14 +1356,12 @@ begin
   if List is WideStrings.TWideStrings then
     WideStrings.TWideStrings(List).Add(Sender.ReadWideString(ConcatPaths([Path, ItemName + IntToStr(Index)])));
 end;
-
 procedure TJvCustomAppStorage.WriteWideStringListItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const Index: Integer; const ItemName: string);
 begin
   if List is WideStrings.TWideStrings then
     Sender.WriteWideString(ConcatPaths([Path, ItemName + IntToStr(Index)]), WideStrings.TWideStrings(List)[Index]);
 end;
-
 procedure TJvCustomAppStorage.DeleteWideStringListItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const First, Last: Integer; const ItemName: string);
 var
@@ -1506,7 +1372,6 @@ begin
       Sender.DeleteValue(ConcatPaths([Path, ItemName + IntToStr(I)]));
 end;
 {$ENDIF}
-
 function TJvCustomAppStorage.DefaultObjectListItemCreateEvent(Sender: TJvCustomAppStorage;
   const Path: string; Index: Integer): TPersistent;
 var
@@ -1515,7 +1380,6 @@ begin
   NewClassName := Sender.ReadString(ConcatPaths([Path, cClassName]));
   Result := GetClass(NewClassName).Create;
 end;
-
 procedure TJvCustomAppStorage.ReadObjectListItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const Index: Integer; const ItemName: string);
 var
@@ -1533,7 +1397,6 @@ begin
     Sender.ReadPersistent(NewPath, NewItem);
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteObjectListItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const Index: Integer; const ItemName: string);
 begin
@@ -1541,7 +1404,6 @@ begin
     if Assigned(TList(List)[Index]) then
       Sender.WritePersistent(ConcatPaths([Path, ItemNameIndexPath (ItemName, Index)]), TPersistent(TList(List)[Index]));
 end;
-
 procedure TJvCustomAppStorage.DeleteObjectListItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const First, Last: Integer; const ItemName: string);
 var
@@ -1551,7 +1413,6 @@ begin
     for I := First to Last do
       Sender.DeleteValue(ConcatPaths([Path, ItemName + IntToStr(I)]));
 end;
-
 procedure TJvCustomAppStorage.ReadStringObjectListItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const Index: Integer; const ItemName: string);
 var
@@ -1575,7 +1436,6 @@ begin
       Sender.ReadPersistent(ConcatPaths([NewPath, cObject]), NewItem);
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteStringObjectListItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const Index: Integer; const ItemName: string);
 var
@@ -1595,7 +1455,6 @@ begin
         Sender.WritePersistent(ConcatPaths([Path, ItemNameIndexPath (ItemName, Index), cObject]), TPersistent(Obj));
   end;
 end;
-
 procedure TJvCustomAppStorage.DeleteStringObjectListItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const First, Last: Integer; const ItemName: string);
 var
@@ -1605,7 +1464,6 @@ begin
     for I := First to Last do
       Sender.DeleteValue(ConcatPaths([Path, ItemName + IntToStr(I)]));
 end;
-
 procedure TJvCustomAppStorage.ReadCollectionItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const Index: Integer; const ItemName: string);
 var
@@ -1623,7 +1481,6 @@ begin
       Sender.ReadPersistent(NewPath, NewItem);
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteCollectionItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const Index: Integer; const ItemName: string);
 var
@@ -1642,7 +1499,6 @@ begin
         Sender.WritePersistent(ConcatPaths([Path, ItemNameIndexPath (ItemName, Index)]), TPersistent(Item));
   end;
 end;
-
 procedure TJvCustomAppStorage.DeleteCollectionItem(Sender: TJvCustomAppStorage;
   const Path: string; const List: TObject; const First, Last: Integer; const ItemName: string);
 var
@@ -1652,7 +1508,6 @@ begin
     for I := First to Last do
       Sender.DeleteValue(ConcatPaths([Path, ItemName + IntToStr(I)]));
 end;
-
 procedure TJvCustomAppStorage.InternalGetStoredValues(const PrefixPath, SearchPath: string;
   const Strings: TStrings; const Options: TJvAppStorageEnumOptions);
 var
@@ -1714,29 +1569,24 @@ begin
     TempList.Free;
   end;
 end;
-
 function TJvCustomAppStorage.GetPath: string;
 begin
   Result := FCurPath;
 end;
-
 procedure TJvCustomAppStorage.SetPath(const Path: string);
 begin
   FCurPath := OptimizePaths([Path]);
 end;
-
 procedure TJvCustomAppStorage.SetStorageOptions(Value: TJvCustomAppStorageOptions);
 begin
   if (Value <> nil) and (Value <> FStorageOptions) then
     FStorageOptions.Assign(Value);
 end;
-
 procedure TJvCustomAppStorage.DoTranslatePropertyName(Instance: TPersistent; var Name: string; const Reading: Boolean);
 begin
   if Assigned(FOnTranslatePropertyName) then
     FOnTranslatePropertyName(Self, Instance, Name, Reading);
 end;
-
 function TJvCustomAppStorage.HasSubStorage(AStore: TJvCustomAppStorage): Boolean;
 var
   I: Integer;
@@ -1750,17 +1600,14 @@ begin
     Dec(I);
   end;
 end;
-
 function TJvCustomAppStorage.ListStoredInt(const Path: string; const ItemName: string = cItem): Boolean;
 begin
   Result := ValueStoredInt(StrEnsureSuffix(PathDelim, Path) + cCount);
 end;
-
 function TJvCustomAppStorage.DoReadDateTime(const Path: string; Default: TDateTime): TDateTime;
 begin
   Result := DoReadFloat(Path, Default);
 end;
-
 function TJvCustomAppStorage.DoReadWideString(const Path: string;
   const Default: Widestring): Widestring;
 begin
@@ -1770,12 +1617,10 @@ begin
   Result := UTF8Decode(ReadString(Path, UTF8Encode(Default)));
   {$ENDIF COMPILER12_UP}
 end;
-
 procedure TJvCustomAppStorage.DoWriteDateTime(const Path: string; Value: TDateTime);
 begin
   DoWriteFloat(Path, Value);
 end;
-
 procedure TJvCustomAppStorage.DoWriteWideString(const Path: string;
   const Value: Widestring);
 begin
@@ -1785,23 +1630,19 @@ begin
   DoWriteString(Path,string(UTF8Encode(Value)));
   {$ENDIF COMPILER12_UP}
 end;
-
 procedure TJvCustomAppStorage.DoError(const msg: string);
 begin
   if Assigned(OnError) then
     OnError(Self, msg);
 end;
-
 function TJvCustomAppStorage.DoReadBoolean(const Path: string; Default: Boolean): Boolean;
 begin
   Result := DoReadInteger(Path, Ord(Default)) <> Ord(False);
 end;
-
 procedure TJvCustomAppStorage.DoWriteBoolean(const Path: string; Value: Boolean);
 begin
   DoWriteInteger(Path, Ord(Value));
 end;
-
 function TJvCustomAppStorage.ReadIntegerInt(const Path: string; Default: Integer): Integer;
 begin
   if not ValueStoredInt(Path) and StorageOptions.DefaultIfValueNotExists then
@@ -1817,12 +1658,10 @@ begin
         raise;
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteIntegerInt(const Path: string; Value: Integer);
 begin
   DoWriteInteger(Path, Value);
 end;
-
 function TJvCustomAppStorage.ReadFloatInt(const Path: string; Default: Extended): Extended;
 begin
   if not ValueStoredInt(Path) and StorageOptions.DefaultIfValueNotExists then
@@ -1851,7 +1690,6 @@ begin
         raise;
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteFloatInt(const Path: string; Value: Extended);
 begin
   if StorageOptions.FloatAsString then
@@ -1859,7 +1697,6 @@ begin
   else
     DoWriteFloat(Path, Value);
 end;
-
 function TJvCustomAppStorage.ReadStringInt(const Path: string; const Default: string): string;
 begin
   if not ValueStoredInt(Path) and StorageOptions.DefaultIfValueNotExists then
@@ -1875,22 +1712,18 @@ begin
         raise;
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteStringInt(const Path: string; const Value: string);
 begin
   DoWriteString(Path, EncryptPropertyValue(Value));
 end;
-
 function TJvCustomAppStorage.ReadBinaryInt(const Path: string; Buf: TJvBytes; BufSize: Integer): Integer;
 begin
   Result := DoReadBinary(Path, Buf, BufSize);
 end;
-
 procedure TJvCustomAppStorage.WriteBinaryInt(const Path: string; const Buf: TJvBytes; BufSize: Integer);
 begin
   DoWriteBinary(Path, Buf, BufSize);
 end;
-
 function TJvCustomAppStorage.ReadDateTimeInt(const Path: string; Default: TDateTime): TDateTime;
 begin
   if not ValueStoredInt(Path) and StorageOptions.DefaultIfValueNotExists then
@@ -1920,7 +1753,6 @@ begin
         raise;
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteDateTimeInt(const Path: string; Value: TDateTime);
 begin
   if StorageOptions.DateTimeAsString then
@@ -1928,7 +1760,6 @@ begin
   else
     DoWriteFloat(Path, Value);
 end;
-
 function TJvCustomAppStorage.ReadBooleanInt(const Path: string; Default: Boolean): Boolean;
 var
   Value: string;
@@ -1964,7 +1795,6 @@ begin
         raise;
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteBooleanInt(const Path: string; Value: Boolean);
 begin
   if StorageOptions.BooleanAsString then
@@ -1975,7 +1805,6 @@ begin
   else
     DoWriteBoolean(Path, Value);
 end;
-
 class function TJvCustomAppStorage.NameIsListItem(const Name: string): Boolean;
 var
   NameStart: PChar;
@@ -1985,12 +1814,10 @@ begin
     NameStart := PChar(Name);
   Result := (AnsiStrLIComp(NameStart, cItem, 4) = 0) and CharInSet(NameStart[4], DigitSymbols);
 end;
-
 class function TJvCustomAppStorage.ConcatPaths(const Paths: array of string): string;
 begin
   Result := OptimizePaths(Paths);
 end;
-
 procedure TJvCustomAppStorage.ResolvePath(const InPath: string; out TargetStore: TJvCustomAppStorage;
   out TargetPath: string);
 var
@@ -2008,7 +1835,6 @@ begin
       raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
   end;
 end;
-
 function TJvCustomAppStorage.IsFolder(const Path: string; ListIsValue: Boolean): Boolean;
 var
   TargetStore: TJvCustomAppStorage;
@@ -2017,7 +1843,6 @@ begin
   ResolvePath(Path, TargetStore, TargetPath);
   Result := TargetStore.IsFolderInt(TargetPath, ListIsValue);
 end;
-
 function TJvCustomAppStorage.PathExists(const Path: string): Boolean;
 var
   TargetStore: TJvCustomAppStorage;
@@ -2026,7 +1851,6 @@ begin
   ResolvePath(Path, TargetStore, TargetPath);
   Result := TargetStore.PathExistsInt(TargetPath);
 end;
-
 function TJvCustomAppStorage.ValueStored(const Path: string): Boolean;
 var
   TargetStore: TJvCustomAppStorage;
@@ -2035,7 +1859,6 @@ begin
   ResolvePath(Path, TargetStore, TargetPath);
   Result := TargetStore.ValueStoredInt(TargetPath);
 end;
-
 function TJvCustomAppStorage.ListStored(const Path: string; const ItemName: string = cItem): Boolean;
 var
   TargetStore: TJvCustomAppStorage;
@@ -2044,7 +1867,6 @@ begin
   ResolvePath(Path, TargetStore, TargetPath);
   Result := TargetStore.ListStoredInt(TargetPath, ItemName);
 end;
-
 procedure TJvCustomAppStorage.DeleteValue(const Path: string);
 var
   TargetStore: TJvCustomAppStorage;
@@ -2054,7 +1876,6 @@ begin
   if not TargetStore.ReadOnly then
     TargetStore.DeleteValueInt(TargetPath);
 end;
-
 procedure TJvCustomAppStorage.DeleteSubTree(const Path: string);
 var
   TargetStore: TJvCustomAppStorage;
@@ -2064,7 +1885,6 @@ begin
   if not TargetStore.ReadOnly then
     TargetStore.DeleteSubTreeInt(TargetPath);
 end;
-
 function TJvCustomAppStorage.ReadInteger(const Path: string; Default: Integer): Integer;
 var
   TargetStore: TJvCustomAppStorage;
@@ -2073,7 +1893,6 @@ begin
   ResolvePath(Path, TargetStore, TargetPath);
   Result := TargetStore.ReadIntegerInt(TargetPath, Default);
 end;
-
 procedure TJvCustomAppStorage.WriteInteger(const Path: string; Value: Integer);
 var
   TargetStore: TJvCustomAppStorage;
@@ -2083,7 +1902,6 @@ begin
   if not TargetStore.ReadOnly then
     TargetStore.WriteIntegerInt(TargetPath, Value);
 end;
-
 function TJvCustomAppStorage.ReadFloat(const Path: string; Default: Extended): Extended;
 var
   TargetStore: TJvCustomAppStorage;
@@ -2092,7 +1910,6 @@ begin
   ResolvePath(Path, TargetStore, TargetPath);
   Result := TargetStore.ReadFloatInt(TargetPath, Default);
 end;
-
 procedure TJvCustomAppStorage.WriteFloat(const Path: string; Value: Extended);
 var
   TargetStore: TJvCustomAppStorage;
@@ -2102,7 +1919,6 @@ begin
   if not TargetStore.ReadOnly then
     TargetStore.WriteFloatInt(TargetPath, Value);
 end;
-
 function TJvCustomAppStorage.ReadString(const Path: string; const Default: string): string;
 var
   TargetStore: TJvCustomAppStorage;
@@ -2111,7 +1927,6 @@ begin
   ResolvePath(Path, TargetStore, TargetPath);
   Result := TargetStore.ReadStringInt(TargetPath, Default);
 end;
-
 procedure TJvCustomAppStorage.WriteString(const Path: string; const Value: string);
 var
   TargetStore: TJvCustomAppStorage;
@@ -2121,7 +1936,6 @@ begin
   if not TargetStore.ReadOnly then
     TargetStore.WriteStringInt(TargetPath, Value);
 end;
-
 function TJvCustomAppStorage.ReadBinary(const Path: string; Buf: TJvBytes; BufSize: Integer): Integer;
 var
   TargetStore: TJvCustomAppStorage;
@@ -2130,7 +1944,6 @@ begin
   ResolvePath(Path, TargetStore, TargetPath);
   Result := TargetStore.ReadBinaryInt(TargetPath, Buf, BufSize);
 end;
-
 procedure TJvCustomAppStorage.WriteBinary(const Path: string; const Buf: TJvBytes; BufSize: Integer);
 var
   TargetStore: TJvCustomAppStorage;
@@ -2140,7 +1953,6 @@ begin
   if not TargetStore.ReadOnly then
     TargetStore.WriteBinaryInt(TargetPath, Buf, BufSize);
 end;
-
 function TJvCustomAppStorage.ReadDateTime(const Path: string; Default: TDateTime): TDateTime;
 var
   TargetStore: TJvCustomAppStorage;
@@ -2149,7 +1961,6 @@ begin
   ResolvePath(Path, TargetStore, TargetPath);
   Result := TargetStore.ReadDateTimeInt(TargetPath, Default);
 end;
-
 procedure TJvCustomAppStorage.WriteDateTime(const Path: string; Value: TDateTime);
 var
   TargetStore: TJvCustomAppStorage;
@@ -2159,7 +1970,6 @@ begin
   if not TargetStore.ReadOnly then
     TargetStore.WriteDateTimeInt(TargetPath, Value);
 end;
-
 function TJvCustomAppStorage.ReadBoolean(const Path: string; Default: Boolean): Boolean;
 var
   TargetStore: TJvCustomAppStorage;
@@ -2168,7 +1978,6 @@ begin
   ResolvePath(Path, TargetStore, TargetPath);
   Result := TargetStore.ReadBooleanInt(TargetPath, Default);
 end;
-
 procedure TJvCustomAppStorage.WriteBoolean(const Path: string; Value: Boolean);
 var
   TargetStore: TJvCustomAppStorage;
@@ -2178,7 +1987,6 @@ begin
   if not TargetStore.ReadOnly then
     TargetStore.WriteBooleanInt(TargetPath, Value);
 end;
-
 function TJvCustomAppStorage.ReadList(const Path: string; const List: TObject;
   const OnReadItem: TJvAppStorageListItemEvent;
   const ItemName: string = cItem): Integer;
@@ -2196,7 +2004,6 @@ begin
     EndUpdate;
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteList(const Path: string; const List: TObject;
   const ItemCount: Integer; const OnWriteItem: TJvAppStorageListItemEvent;
   const OnDeleteItems: TJvAppStorageListDeleteEvent = nil; const ItemName: string = cItem);
@@ -2222,13 +2029,11 @@ begin
     end;
   end;
 end;
-
 function TJvCustomAppStorage.ReadObjectList(const Path: string; List: TList;
   const ClearFirst: Boolean = True; const ItemName: string = cItem): Integer;
 begin
   Result := ReadObjectList(Path, List, DefaultObjectListItemCreateEvent, ClearFirst, ItemName);
 end;
-
 function TJvCustomAppStorage.ReadObjectList(const Path: string; List: TList;
   ItemCreator: TJvAppStorageObjectListItemCreateEvent;
   const ClearFirst: Boolean = True; const ItemName: string = cItem): Integer;
@@ -2253,13 +2058,11 @@ begin
     end;
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteObjectList(const Path: string; List: TList;
   const ItemName: string = cItem);
 begin
   WriteList(Path, List, List.Count, WriteObjectListItem, DeleteObjectListItem, ItemName);
 end;
-
 function TJvCustomAppStorage.ReadCollection(const Path: string; List: TCollection;
   const ClearFirst: Boolean = True; const ItemName: string = cItem): Integer;
 begin
@@ -2276,14 +2079,12 @@ begin
     List.EndUpdate;
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteCollection(const Path: string;
   List: TCollection; const ItemName: string = cItem);
 begin
   WriteList(Path, List, List.Count, WriteCollectionItem, DeleteCollectionItem, ItemName);
   WritePersistent(Path,List);
 end;
-
 function TJvCustomAppStorage.ReadStringList(const Path: string; const SL: TStrings;
   const ClearFirst: Boolean = True; const ItemName: string = cItem): Integer;
 begin
@@ -2308,7 +2109,6 @@ begin
     EndUpdate;
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteStringList(const Path: string;
   const SL: TStrings; const ItemName: string = cItem);
 begin
@@ -2329,7 +2129,6 @@ begin
     EndUpdate;
   end;
 end;
-
 {$IFDEF COMPILER10_UP}
 function TJvCustomAppStorage.ReadWideStringList(const Path: string; const SL: WideStrings.TWideStrings;
   const ClearFirst: Boolean = True; const ItemName: string = cItem): Integer;
@@ -2354,7 +2153,6 @@ begin
     EndUpdate;
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteWideStringList(const Path: string;
   const SL: WideStrings.TWideStrings; const ItemName: string = cItem);
 begin
@@ -2367,13 +2165,11 @@ begin
   end;
 end;
 {$ENDIF}
-
 function TJvCustomAppStorage.ReadStringObjectList(const Path: string; const SL: TStrings;
   const ClearFirst: Boolean = True; const ItemName: string = cItem): Integer;
 begin
   Result := ReadStringObjectList(Path, SL, DefaultObjectListItemCreateEvent, ClearFirst, ItemName);
 end;
-
 function TJvCustomAppStorage.ReadStringObjectList(const Path: string;
   const SL: TStrings; ItemCreator: TJvAppStorageObjectListItemCreateEvent;
   const ClearFirst: Boolean = True; const ItemName: string = cItem): Integer;
@@ -2405,7 +2201,6 @@ begin
     end;
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteStringObjectList(const Path: string;
   const SL: TStrings; const ItemName: string = cItem);
 var
@@ -2418,7 +2213,6 @@ begin
     TargetStore.WriteStringObjectListItem, TargetStore.DeleteStringObjectListItem, ItemName);
   WritePersistent(Path,SL);
 end;
-
 procedure TJvCustomAppStorage.ReadEnumerationInt(const Path: string;
   TypeInfo: PTypeInfo; const Default; out Value);
 var
@@ -2487,7 +2281,6 @@ begin
     CopyEnumValue(OrdValue, Value, GetTypeData(TypeInfo).OrdType);
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteEnumerationInt(const Path: string;
   TypeInfo: PTypeInfo; const Value);
 var
@@ -2528,7 +2321,6 @@ begin
           else
             raise EJVCLAppStorageError.CreateRes(@RsEInvalidType);
 end;
-
 procedure TJvCustomAppStorage.ReadEnumeration(const Path: string; TypeInfo: PTypeInfo; const Default; out Value);
 var
   TargetStore: TJvCustomAppStorage;
@@ -2537,7 +2329,6 @@ begin
   ResolvePath(Path, TargetStore, TargetPath);
   TargetStore.ReadEnumerationInt(TargetPath, TypeInfo, Default, Value);
 end;
-
 procedure TJvCustomAppStorage.WriteEnumeration(const Path: string;
   TypeInfo: PTypeInfo; const Value);
 var
@@ -2548,7 +2339,6 @@ begin
   if not TargetStore.ReadOnly then
     TargetStore.WriteEnumerationInt(TargetPath, TypeInfo, Value);
 end;
-
 procedure TJvCustomAppStorage.ReadSetInt(const Path: string;
   ATypeInfo: PTypeInfo; const Default; out Value);
 var
@@ -2596,7 +2386,6 @@ begin
     // It's stored as a string value or not stored at all
     JclStrToSet(ATypeInfo, Value, ReadStringInt(Path, JclSetToStr(ATypeInfo, Default, True)));
 end;
-
 procedure TJvCustomAppStorage.WriteSetInt(const Path: string; ATypeInfo: PTypeInfo; const Value);
 var
   Lst: TStrings;
@@ -2642,7 +2431,6 @@ begin
     end;
   end;
 end;
-
 procedure TJvCustomAppStorage.ReadSet(const Path: string; ATypeInfo: PTypeInfo; const Default; out Value);
 var
   TargetStore: TJvCustomAppStorage;
@@ -2651,7 +2439,6 @@ begin
   ResolvePath(Path, TargetStore, TargetPath);
   TargetStore.ReadSetInt(TargetPath, ATypeInfo, Default, Value);
 end;
-
 procedure TJvCustomAppStorage.WriteSet(const Path: string; ATypeInfo: PTypeInfo; const Value);
 var
   TargetStore: TJvCustomAppStorage;
@@ -2661,7 +2448,6 @@ begin
   if not TargetStore.ReadOnly then
     TargetStore.WriteSetInt(TargetPath, ATypeInfo, Value);
 end;
-
 procedure TJvCustomAppStorage.ReadProperty(const Path: string; const PersObj: TPersistent; const PropName: string; const
   Recursive, ClearFirst: Boolean; const IgnoreProperties: TStrings = nil);
 var
@@ -2673,13 +2459,11 @@ var
 begin
   if not Assigned(PersObj) then
     Exit;
-
   P := GetPropInfo(PersObj, PropName);
   T := PropType(PersObj, PropName);
   if T <> tkClass then
     if not Assigned(P.SetProc)  then
       Exit;
-
   case T of
     {$IFDEF UNICODE} tkUString, {$ENDIF}
     tkLString, tkString:
@@ -2742,14 +2526,12 @@ begin
       end;
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteProperty(const Path: string; const PersObj: TPersistent; const PropName: string; const
   Recursive: Boolean; const IgnoreProperties: TStrings = nil);
 var
   TmpValue: Integer;
   SubObj: TObject;
   P: PPropInfo;
-
   function IsDefaultOrdProp(PropInfo: PPropInfo): Boolean;
   var
     Value: Longint;
@@ -2759,7 +2541,6 @@ var
     Default := PPropInfo(PropInfo)^.Default;
     Result := (Default <> LongInt($80000000)) and (Value = Default);
   end;
-
   function IsDefaultStrProp(PropInfo: PPropInfo): Boolean;
   var
     Value: WideString;
@@ -2767,7 +2548,6 @@ var
     Value := GetWideStrProp(PersObj, PropInfo);
     Result := Value = '';
   end;
-
   function IsDefaultInt64Prop(PropInfo: PPropInfo): Boolean;
   var
     Value: Int64;
@@ -2775,7 +2555,6 @@ var
     Value := GetInt64Prop(PersObj, PropInfo);
     Result := Value = 0;
   end;
-
   function IsDefaultFloatProp(PropInfo: PPropInfo): Boolean;
   var
     Value: Extended;
@@ -2783,13 +2562,10 @@ var
     Value := GetFloatProp(PersObj, PropInfo);
     Result := Value = 0;
   end;
-
 begin
   if not Assigned(PersObj) then
     Exit;
-
   P := GetPropInfo(PersObj, PropName, tkAny);
-
   // If not storing the default values, then do not do anything if the property
   // is read only, write only or its "stored" function returns False.
   // Note: we do not add a call to IsDefaultPropertyValue here because it would
@@ -2799,7 +2575,6 @@ begin
     and (not Assigned(P.GetProc) or not Assigned(P.SetProc) or not IsStoredProp(PersObj, P))
     and (PropType(PersObj, PropName) <> tkClass) then // Classes can have data without having a stored property
     Exit;
-
   case PropType(PersObj, PropName) of
     {$IFDEF UNICODE} tkUString, {$ENDIF}
     tkLString, tkString:
@@ -2894,7 +2669,6 @@ begin
       end;
   end;
 end;
-
 procedure TJvCustomAppStorage.ReadPersistent(const Path: string; const PersObj: TPersistent;
   const Recursive, ClearFirst: Boolean; const IgnoreProperties: TStrings);
 var
@@ -2919,7 +2693,6 @@ begin
         ReadProperty(PropPath, PersObj, PropName, Recursive, ClearFirst, IgnoreProperties);
     end;
 end;
-
 procedure TJvCustomAppStorage.WritePersistent(const Path: string; const PersObj: TPersistent; const Recursive: Boolean = True;
   const IgnoreProperties: TStrings = nil);
 var
@@ -2943,7 +2716,6 @@ begin
         WriteProperty(PropPath, PersObj, PropName, Recursive, IgnoreProperties);
     end;
 end;
-
 function TJvCustomAppStorage.GetCharName(Ch: Char): string;
 begin
   if CharInSet(Ch, ['!'..'z']) then
@@ -2951,12 +2723,10 @@ begin
   else
     Result := 'Char#' + IntToStr(Ord(Ch));
 end;
-
 function TJvCustomAppStorage.GetIntName(Value: Integer): string;
 begin
   Result := 'Int_' + IntToStr(Value);
 end;
-
 function TJvCustomAppStorage.EncryptPropertyValue(Value: string): string;
 begin
   if Assigned(FOnEncryptPropertyValue) and IsPropertyValueCryptEnabled then
@@ -2966,7 +2736,6 @@ begin
   end;
   Result := Value;
 end;
-
 function TJvCustomAppStorage.DecryptPropertyValue(Value: string): string;
 begin
   if Assigned(FOnDecryptPropertyValue) and IsPropertyValueCryptEnabled then
@@ -2976,7 +2745,6 @@ begin
   end;
   Result := Value;
 end;
-
 function TJvCustomAppStorage.TranslatePropertyName(Instance: TPersistent; const AName: string; const Reading: Boolean):
     string;
 begin
@@ -2986,12 +2754,10 @@ begin
   else
     DoTranslatePropertyName(Instance, Result, Reading);
 end;
-
 procedure TJvCustomAppStorage.SetReadOnly(Value: Boolean);
 begin
   FReadOnly := Value;
 end;
-
 function TJvCustomAppStorage.GetReadOnly: Boolean;
 begin
   if csDesigning in ComponentState then
@@ -2999,12 +2765,10 @@ begin
   else
     Result := FReadOnly or GetPhysicalReadOnly;
 end;
-
 function TJvCustomAppStorage.GetPhysicalReadOnly: Boolean;
 begin
   Result := False;
 end;
-
 procedure TJvCustomAppStorage.GetStoredValues(const Path: string;
   const Strings: TStrings; const Options: TJvAppStorageEnumOptions);
 var
@@ -3016,7 +2780,6 @@ begin
   try
     Strings.Clear;
     SearchPath := OptimizePaths([Path]);
-
     if aeoReportRelative in Options then
     begin
       InternalGetStoredValues('', SearchPath, Strings, Options);
@@ -3026,7 +2789,6 @@ begin
       OptimizedSearchPath := OptimizePaths([Self.Path, SearchPath]);
       InternalGetStoredValues(OptimizedSearchPath +
         PathDelim, SearchPath, Strings, Options);
-
       // Mantis 3803: Only remove the path if ReportRelative was not asked.
       // If not, then with \F1\R1 and \F1\F1 we would only return the values
       // in \F1\R1 in "relative mode" which is not correct
@@ -3038,28 +2800,21 @@ begin
     Strings.EndUpdate;
   end;
 end;
-
 { Enables the Cryption of Property-Values (Only String-Values) }
-
 procedure TJvCustomAppStorage.EnablePropertyValueCrypt;
 begin
   Inc(FCryptEnabledStatus);
 end;
-
 { Disables the Cryption of Property-Values (Only String-Values) }
-
 procedure TJvCustomAppStorage.DisablePropertyValueCrypt;
 begin
   Dec(FCryptEnabledStatus);
 end;
-
 { Returns the current state if Property-Value Cryption is enabled }
-
 function TJvCustomAppStorage.IsPropertyValueCryptEnabled: Boolean;
 begin
   Result := (FCryptEnabledStatus > 0);
 end;
-
 function TJvCustomAppStorage.ItemNameIndexPath(const ItemName: string; const Index: Integer): string;
 begin
   if StorageOptions.UseOldItemNameFormat then
@@ -3067,14 +2822,12 @@ begin
   else
     Result := ItemName + '['+IntToStr(Index)+']';
 end;
-
 procedure TJvCustomAppStorage.Loaded;
 begin
   inherited Loaded;
   if not IsUpdating then
     Reload;
 end;
-
 procedure TJvCustomAppStorage.BeginUpdate;
 var i : Integer;
 begin
@@ -3085,7 +2838,6 @@ begin
     if Assigned(SubStorages[i].AppStorage) then
       SubStorages[i].AppStorage.BeginUpdate;
 end;
-
 procedure TJvCustomAppStorage.CheckDeletePathByVersion(const Path: string;
   VersionNumber: Integer; DeleteIfNotEqual: Boolean = False;
   WriteVersionNumber: Boolean = True; const VersionName: string = 'Version');
@@ -3112,7 +2864,6 @@ begin
     end;
   end;
 end;
-
 function TJvCustomAppStorage.DecodeStrToDateTime(const Value: string): TDateTime;
 begin
   if StorageOptions.UseTranslateStringEngineDateTimeFormats then
@@ -3125,12 +2876,9 @@ begin
   else
     Result := StrToDateTime(Value);
 end;
-
 procedure TJvCustomAppStorage.DoSetXMLProperty(const Path, Name, Value : string);
 begin
-
 end;
-
 procedure TJvCustomAppStorage.SetXMLProperty(const Path, Name, Value : string);
 var
   TargetStore: TJvCustomAppStorage;
@@ -3140,12 +2888,10 @@ begin
   if not TargetStore.ReadOnly then
     TargetStore.SetXMLPropertyInt(TargetPath, Name, Value);
 end;
-
 procedure TJvCustomAppStorage.SetXMLPropertyInt(const Path, Name, Value : string);
 begin
   DoSetXMLProperty(Path, Name, Value);
 end;
-
 function TJvCustomAppStorage.EncodeDateTimeToStr(Value: TDateTime): string;
 begin
   if StorageOptions.UseTranslateStringEngineDateTimeFormats then
@@ -3153,7 +2899,6 @@ begin
   else
     Result := DateTimeToStr(Value);
 end;
-
 procedure TJvCustomAppStorage.EndUpdate;
 var i : Integer;
 begin
@@ -3165,7 +2910,6 @@ begin
   if FUpdateCount < 0 then
     FUpdateCount := 0;
 end;
-
 function TJvCustomAppStorage.GetActiveTranslateStringEngine: TJvTranslateString;
 begin
   if Assigned(TranslateStringEngine) then
@@ -3173,7 +2917,6 @@ begin
   else
     Result := FInternalTranslateStringEngine;
 end;
-
 function TJvCustomAppStorage.GetFormatSettings: TFormatSettings;
 {$IFDEF COMPILER7_UP}
 var 
@@ -3208,17 +2951,14 @@ begin
   {$ENDIF COMPILER7_UP}
   Result := CachedFormatSettings;
 end;
-
 function TJvCustomAppStorage.GetUpdating: Boolean;
 begin
   Result := FUpdateCount <> 0;
 end;
-
 function TJvCustomAppStorage.ReadListItemCount(const Path: string; const ItemName: string = cItem): Integer;
 begin
   Result := ReadInteger(ConcatPaths([Path, cCount]), 0);
 end;
-
 procedure TJvCustomAppStorage.Synchronize(AMethod: TSynchronizeMethod;
     AIdentifier: String);
 var
@@ -3242,173 +2982,138 @@ begin
     end;
   end;
 end;
-
 procedure TJvCustomAppStorage.WriteListItemCount(const Path: string; const ItemCount: Integer; const ItemName: string =
     cItem);
 begin
   WriteInteger(ConcatPaths([Path, cCount]), ItemCount);
 end;
-
 procedure TJvCustomAppStorage.SetTranslateStringEngine(const Value: TJvTranslateString);
 begin
   ReplaceComponentReference(Self, Value, TComponent(FTranslateStringEngine));
 end;
-
 function TJvCustomAppStorage.ReadWideString(const Path: string; const Default: WideString = ''): WideString;
 begin
   Result := DoReadWideString(Path,Default);
 end;
-
 procedure TJvCustomAppStorage.SetCurrentInstanceCreateEvent(const Value:
     TJvAppStorageObjectListItemCreateEvent);
 begin
   FCurrentInstanceCreateEvent := Value;
 end;
-
 procedure TJvCustomAppStorage.WriteWideString(const Path: string;
   const Value: WideString);
 begin
   DoWriteWideString(Path,Value);
 end;
-
 //=== { TJvAppStorage } ======================================================
-
 function TJvAppStorage.IsFolderInt(const Path: string; ListIsValue: Boolean): Boolean;
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 function TJvAppStorage.PathExistsInt(const Path: string): Boolean;
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 function TJvAppStorage.ValueStoredInt(const Path: string): Boolean;
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 procedure TJvAppStorage.DeleteValueInt(const Path: string);
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 procedure TJvAppStorage.DeleteSubTreeInt(const Path: string);
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 function TJvAppStorage.ReadIntegerInt(const Path: string; Default: Integer): Integer;
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 procedure TJvAppStorage.WriteIntegerInt(const Path: string; Value: Integer);
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 function TJvAppStorage.ReadFloatInt(const Path: string; Default: Extended): Extended;
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 procedure TJvAppStorage.WriteFloatInt(const Path: string; Value: Extended);
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 function TJvAppStorage.ReadStringInt(const Path: string; const Default: string): string;
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 procedure TJvAppStorage.WriteStringInt(const Path: string; const Value: string);
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 function TJvAppStorage.ReadBinaryInt(const Path: string; Buf: TJvBytes; BufSize: Integer): Integer;
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 procedure TJvAppStorage.WriteBinaryInt(const Path: string; const Buf: TJvBytes; BufSize: Integer);
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 function TJvAppStorage.ReadDateTimeInt(const Path: string; Default: TDateTime): TDateTime;
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 procedure TJvAppStorage.WriteDateTimeInt(const Path: string; Value: TDateTime);
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 function TJvAppStorage.ReadBooleanInt(const Path: string; Default: Boolean): Boolean;
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 procedure TJvAppStorage.WriteBooleanInt(const Path: string; Value: Boolean);
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 procedure TJvAppStorage.ReadEnumerationInt(const Path: string; TypeInfo: PTypeInfo; const Default; out Value);
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 procedure TJvAppStorage.WriteEnumerationInt(const Path: string; TypeInfo: PTypeInfo; const Value);
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 procedure TJvAppStorage.ReadSetInt(const Path: string; ATypeInfo: PTypeInfo; const Default; out Value);
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 procedure TJvAppStorage.WriteSetInt(const Path: string; ATypeInfo: PTypeInfo; const Value);
 begin
   raise EJVCLAppStorageError.CreateRes(@RsEInvalidPath);
 end;
-
 //=== { TJvAppSubStorages } ==================================================
-
 constructor TJvAppSubStorages.Create(AOwner: TJvCustomAppStorage);
 begin
   inherited Create(AOwner, TJvAppSubStorage);
 end;
-
 function TJvAppSubStorages.GetRootStorage: TJvCustomAppStorage;
 begin
   Result := TJvCustomAppStorage(GetOwner);
 end;
-
 function TJvAppSubStorages.GetItem(I: Integer): TJvAppSubStorage;
 begin
   Result := TJvAppSubStorage(inherited GetItem(I));
 end;
-
 procedure TJvAppSubStorages.SetItem(I: Integer; Value: TJvAppSubStorage);
 begin
   inherited SetItem(I, Value);
 end;
-
 procedure TJvAppSubStorages.RootOptionsChanged;
 begin
 end;
-
 function TJvAppSubStorages.CheckUniqueBase(const APath: string; IgnoreIndex: Integer): Boolean;
 begin
   Result := MatchFor(OptimizePaths([APath]) + cSubStorePath, IgnoreIndex) = nil;
 end;
-
 function TJvAppSubStorages.MatchFor(APath: string; IgnoreIndex: Integer): TJvAppSubStorage;
 var
   I: Integer;
@@ -3426,7 +3131,6 @@ begin
           if (Result = nil) or (Length(Result.RootPath) < Length(Items[I].RootPath)) then
             Result := Items[I]; // no previous match or new match is close to what we searched for
 end;
-
 procedure TJvAppSubStorages.Add(RootPath: string; AppStorage: TJvCustomAppStorage);
 var
   Tmp: TJvAppSubStorage;
@@ -3440,12 +3144,10 @@ begin
     raise;
   end;
 end;
-
 procedure TJvAppSubStorages.Delete(Index: Integer);
 begin
   inherited Delete(Index);
 end;
-
 procedure TJvAppSubStorages.Delete(RootPath: string; const IncludeSubPaths: Boolean);
 var
   I: Integer;
@@ -3465,7 +3167,6 @@ begin
     end;
   end;
 end;
-
 procedure TJvAppSubStorages.Delete(AppStorage: TJvCustomAppStorage);
 var
   I: Integer;
@@ -3478,14 +3179,11 @@ begin
     Dec(I);
   end;
 end;
-
 //=== { TJvAppSubStorage } ===================================================
-
 function TJvAppSubStorage.GetOwnerStore: TJvCustomAppStorage;
 begin
   Result := TJvAppSubStorages(Collection).RootStorage;
 end;
-
 function TJvAppSubStorage.GetDisplayName: string;
 begin
   if (RootPath <> '') and (AppStorage <> nil) then
@@ -3493,7 +3191,6 @@ begin
   else
     Result := inherited GetDisplayName;
 end;
-
 procedure TJvAppSubStorage.SetRootPath(Value: string);
 begin
   Value := OptimizePaths([Value]);
@@ -3503,7 +3200,6 @@ begin
     else
       raise EJVCLAppStorageError.CreateResFmt(@RsENotAUniqueRootPath, [Value]);
 end;
-
 procedure TJvAppSubStorage.SetAppStorage(Value: TJvCustomAppStorage);
 begin
   if Value <> AppStorage then
@@ -3513,9 +3209,7 @@ begin
     ReplaceComponentReference(OwnerStore, Value, TComponent(FAppstorage));
   end;
 end;
-
 //=== { TJvAppStorageFileName } ==============================================
-
 {procedure TJvAppStorageFileName.SetLocation(Value: TFileLocation);
 begin
   if Location <> Value then
@@ -3524,7 +3218,6 @@ begin
     DoChange;
   end;
 end;
-
 procedure TJvAppStorageFileName.SetFileName(Value: TFileName);
 begin
   if FileName <> Value then
@@ -3533,13 +3226,11 @@ begin
     DoChange;
   end;
 end;
-
 procedure TJvAppStorageFileName.DoChange;
 begin
   if Assigned(FOnChange) then
     OnChange(Self);
 end;
-
 function TJvAppStorageFileName.GetFileName: TFileName;
 var
   NameOnly: string;
@@ -3568,16 +3259,13 @@ begin
     end;
   end;
 end;
-
 constructor TJvAppStorageFileName.Create(ADefaultExtension: string);
 begin
   inherited Create;
   FLocation := flExeFile;
   FFileName := ChangeFileExt(ExtractFileName(Application.ExeName), '.' + ADefaultExtension);
 end;  }
-
 //=== { TJvCustomAppMemoryFileStorage } ======================================
-
 constructor TJvCustomAppMemoryFileStorage.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -3586,7 +3274,6 @@ begin
   FFileLoaded := False;
   FFileAge := -1;
 end;
-
 function TJvCustomAppMemoryFileStorage.CalculateFullFileName: string;
 var
   NameOnly: string;
@@ -3627,13 +3314,11 @@ begin
     end;
   end;
 end;
-
 procedure TJvCustomAppMemoryFileStorage.RecalculateFullFileName;
 begin
   FFullFileName := CalculateFullFileName;
   FPhysicalReadOnly := FileExists(FullFileName) and FileIsReadOnly(FullFileName);
 end;
-
 function TJvCustomAppMemoryFileStorage.ReloadNeeded: Boolean;
 {$IFDEF DELPHI2005_UP}
 var t : TDateTime;
@@ -3648,19 +3333,16 @@ begin
     Result := FFileAge <> FileAge(FullFileName);;
   {$ENDIF}
 end;
-
 function TJvCustomAppMemoryFileStorage.GetPhysicalReadOnly: Boolean;
 begin
   Result := FPhysicalReadOnly;
 end;
-
 function TJvCustomAppMemoryFileStorage.DoGetFileName: TFileName;
 begin
   Result := ActiveTranslateStringEngine.TranslateString(FileName);
   if Assigned(FOnGetFileName) then
     FOnGetFileName(Self, Result);
 end;
-
 procedure TJvCustomAppMemoryFileStorage.SetFileNameInternal(const Value: TFileName);
 begin
   // Mantis 3680: only add an extension if there is not already one.
@@ -3670,7 +3352,6 @@ begin
     FFileName := Value;
   RecalculateFullFileName;
 end;
-
 procedure TJvCustomAppMemoryFileStorage.SetFileName(const Value: TFileName);
 begin
   if Value <> FileName then
@@ -3678,14 +3359,11 @@ begin
     if not (csLoading in ComponentState) and not IsUpdating then
       if FullFileName <> CalculateFullFileName then
         Flush;
-
     SetFileNameInternal(Value);
-
     if not (csLoading in ComponentState) and not IsUpdating then
       Reload;
   end;
 end;
-
 procedure TJvCustomAppMemoryFileStorage.SetOnGetFileName(Value: TJvAppStorageGetFileNameEvent);
 begin
   if not (csLoading in ComponentState) and not IsUpdating then
@@ -3695,7 +3373,6 @@ begin
   if not (csLoading in ComponentState) and not IsUpdating then
     Reload;
 end;
-
 procedure TJvCustomAppMemoryFileStorage.SetLocation(const Value: TFileLocation);
 begin
   if FLocation <> Value then
@@ -3709,14 +3386,11 @@ begin
       Reload;
   end;
 end;
-
 function TJvCustomAppMemoryFileStorage.DefaultExtension: string;
 begin
   Result := '';
 end;
-
 //=== { TJvCustomAppMemoryFileStorage } ===============================================
-
 procedure TJvCustomAppMemoryFileStorage.Flush;
 begin
   if (FullFileName <> '') and not ReadOnly and not (csDesigning in ComponentState) then
@@ -3725,7 +3399,6 @@ begin
     else
       FlushToFile;
 end;
-
 procedure TJvCustomAppMemoryFileStorage.FlushToFile;
 var
   Path: string;
@@ -3748,9 +3421,7 @@ begin
         SaveFullFileName := FullFileName;
         SetFileNameInternal(FileName+'.tmp');
       end;
-
       FlushInternal;
-
       if (StorageOptions.BackupType = afsbtRenameAfter) then
       begin
         FileMove(SaveFullFileName, BackupFileName, True);
@@ -3771,7 +3442,6 @@ begin
           afsbht1Week    : FileHistory(FullFileName, Path, StorageOptions.BackupHistoryCount, Now-7);
           afsbht1Month   : FileHistory(FullFileName, Path, StorageOptions.BackupHistoryCount, Now-30);
         end;
-
       if (StorageOptions.BackupType <> afsbtNone) and not StorageOptions.BackupKeepFileAfterFlush then
         DeleteFile(BackupFileName);
     except
@@ -3780,17 +3450,14 @@ begin
     end;
   end;
 end;
-
 function TJvCustomAppMemoryFileStorage.GetStorageOptions: TJvAppFileStorageOptions;
 begin
   Result := TJvAppFileStorageOptions(inherited StorageOptions);
 end;
-
 class function TJvCustomAppMemoryFileStorage.GetStorageOptionsClass: TJvAppStorageOptionsClass;
 begin
   Result := TJvAppFileStorageOptions;
 end;
-
 procedure TJvCustomAppMemoryFileStorage.Reload;
 begin
   if not IsUpdating and not (csDesigning in ComponentState) then
@@ -3802,7 +3469,6 @@ begin
     {$ELSE}
     FFileAge:= FileAge(FullFileName);
     {$ENDIF}
-
     inherited Reload;
     if FileExists(FullFileName) then
       if SynchronizeFlushReload then
@@ -3813,37 +3479,29 @@ begin
       ClearInternal;
   end;
 end;
-
 procedure TJvCustomAppMemoryFileStorage.SetStorageOptions(const Value: TJvAppFileStorageOptions);
 begin
   (Inherited StorageOptions).Assign(Value);
 end;
-
 //=== { TJvAppStoragePropertyBaseEngine } ====================================
-
 constructor TJvAppStoragePropertyBaseEngine.Create;
 begin
   inherited Create;
   // virtual constructor
 end;
-
 function TJvAppStoragePropertyBaseEngine.Supports(AObject: TObject; AProperty: TObject): Boolean;
 begin
   Result := False;
 end;
-
 procedure TJvAppStoragePropertyBaseEngine.ReadProperty(AStorage: TJvCustomAppStorage; const APath: string; AObject: TObject;
   AProperty: TObject; const Recursive, ClearFirst: Boolean; const IgnoreProperties: TStrings = nil);
 begin
 end;
-
 procedure TJvAppStoragePropertyBaseEngine.WriteProperty(AStorage: TJvCustomAppStorage; const APath: string; AObject: TObject;
   AProperty: TObject; const Recursive: Boolean; const IgnoreProperties: TStrings = nil);
 begin
 end;
-
 //=== { TJvAppStoragePropertyEngineList } ====================================
-
 destructor TJvAppStoragePropertyEngineList.Destroy;
 var
   I: Integer;
@@ -3855,12 +3513,10 @@ begin
   end;
   inherited Destroy;
 end;
-
 procedure TJvAppStoragePropertyEngineList.RegisterEngine(AEngineClass: TJvAppStoragePropertyBaseEngineClass);
 begin
   Add(AEngineClass.Create);
 end;
-
 procedure TJvAppStoragePropertyEngineList.UnregisterEngine(AEngineClass: TJvAppStoragePropertyBaseEngineClass);
 var
   I: Integer;
@@ -3879,7 +3535,6 @@ begin
     Inc(I);
   end;
 end;
-
 function TJvAppStoragePropertyEngineList.GetEngine(AObject: TObject;
   AProperty: TObject): TJvAppStoragePropertyBaseEngine;
 var
@@ -3893,7 +3548,6 @@ begin
       Break;
     end;
 end;
-
 function TJvAppStoragePropertyEngineList.ReadProperty(AStorage: TJvCustomAppStorage; const APath: string; AObject: TObject;
   AProperty: TObject; const Recursive, ClearFirst: Boolean; const IgnoreProperties: TStrings = nil): Boolean;
 var
@@ -3904,7 +3558,6 @@ begin
   if Result then
     Engine.ReadProperty(AStorage, APath, AObject, AProperty, Recursive, ClearFirst, IgnoreProperties);
 end;
-
 function TJvAppStoragePropertyEngineList.WriteProperty(AStorage: TJvCustomAppStorage; const APath: string; AObject: TObject;
   AProperty: TObject; const Recursive: Boolean; const IgnoreProperties: TStrings = nil): Boolean;
 var
@@ -3915,7 +3568,6 @@ begin
   if Result then
     Engine.WriteProperty(AStorage, APath, AObject, AProperty, Recursive, IgnoreProperties);
 end;
-
 constructor TJvAppFileStorageOptions.Create;
 begin
   inherited Create;
@@ -3924,7 +3576,6 @@ begin
   FBackupHistoryType := afsbhtNone;
   FBackupHistoryCount := 0;
 end;
-
 procedure TJvAppFileStorageOptions.Assign(Source: TPersistent);
 begin
   if (Source = Self) then
@@ -3936,131 +3587,105 @@ begin
   end;
   inherited assign(Source);
 end;
-
 constructor TJvAppStorageIniFile.Create(const AppStorage : TJvCustomAppStorage);
 begin
   fAppStorage := AppStorage;
 end;
-
 procedure TJvAppStorageIniFile.DeleteKey(const Section, Ident: string);
 begin
   AppStorage.DeleteValue(AppStorage.ConcatPaths([BaseSection, Section, Ident]));
 end;
-
 procedure TJvAppStorageIniFile.EraseSection(const Section: string);
 begin
   AppStorage.DeleteSubTree(AppStorage.ConcatPaths([BaseSection, Section]));
 end;
-
 function TJvAppStorageIniFile.ReadBool(const Section, Ident: string; Default: Boolean): Boolean;
 begin
   Result := AppStorage.ReadBoolean(AppStorage.ConcatPaths([BaseSection, Section, Ident]), Default);
 end;
-
 function TJvAppStorageIniFile.ReadDate(const Section, Name: string; Default: TDateTime): TDateTime;
 begin
   Result := AppStorage.ReadDateTime(AppStorage.ConcatPaths([BaseSection, Section, Name]), Default);
 end;
-
 function TJvAppStorageIniFile.ReadDateTime(const Section, Name: string; Default: TDateTime): TDateTime;
 begin
   Result := AppStorage.ReadDateTime(AppStorage.ConcatPaths([BaseSection, Section, Name]), Default);
 end;
-
 function TJvAppStorageIniFile.ReadFloat(const Section, Name: string; Default: Double): Double;
 begin
   Result := AppStorage.ReadFloat(AppStorage.ConcatPaths([BaseSection, Section, Name]), Default);
 end;
-
 function TJvAppStorageIniFile.ReadInteger(const Section, Ident: string; Default: Longint): Longint;
 begin
   Result := AppStorage.ReadInteger(AppStorage.ConcatPaths([BaseSection, Section, Ident]), Default);
 end;
-
 procedure TJvAppStorageIniFile.ReadSection(const Section: string; Strings: TStrings);
 begin
   AppStorage.EnumFolders(AppStorage.ConcatPaths([BaseSection, Section]), Strings);
 end;
-
 procedure TJvAppStorageIniFile.ReadSections(Strings: TStrings);
 begin
   AppStorage.EnumFolders(AppStorage.ConcatPaths([BaseSection]), Strings);
 end;
-
 procedure TJvAppStorageIniFile.ReadSectionValues(const Section: string; Strings: TStrings);
 begin
   AppStorage.EnumValues(AppStorage.ConcatPaths([BaseSection, Section]), Strings);
 end;
-
 function TJvAppStorageIniFile.ReadString(const Section, Ident, Default: string): string;
 begin
   Result := AppStorage.ReadString(AppStorage.ConcatPaths([BaseSection, Section, Ident]), Default);
 end;
-
 function TJvAppStorageIniFile.ReadTime(const Section, Name: string; Default: TDateTime): TDateTime;
 begin
   Result := AppStorage.ReadDateTime(AppStorage.ConcatPaths([BaseSection, Section, Name]), Default);
 end;
-
 procedure TJvAppStorageIniFile.UpdateFile;
 begin
   AppStorage.Flush;
 end;
-
 {$IFDEF DELPHI9_UP}
 function TJvAppStorageIniFile.ValueExists(const Section, Ident: string): Boolean;
 begin
   Result := AppStorage.PathExists(AppStorage.ConcatPaths([BaseSection, Section, Ident]))
 end;
 {$ENDIF DELPHI9_UP}
-
 procedure TJvAppStorageIniFile.WriteBool(const Section, Ident: string; Value: Boolean);
 begin
   AppStorage.WriteBoolean(AppStorage.ConcatPaths([BaseSection, Section, Ident]),Value);
 end;
-
 procedure TJvAppStorageIniFile.WriteDate(const Section, Name: string; Value: TDateTime);
 begin
   AppStorage.WriteDateTime(AppStorage.ConcatPaths([BaseSection, Section, Name]),Value);
 end;
-
 procedure TJvAppStorageIniFile.WriteDateTime(const Section, Name: string; Value: TDateTime);
 begin
   AppStorage.WriteDateTime(AppStorage.ConcatPaths([BaseSection, Section, Name]),Value);
 end;
-
 procedure TJvAppStorageIniFile.WriteFloat(const Section, Name: string; Value: Double);
 begin
   AppStorage.WriteFloat(AppStorage.ConcatPaths([BaseSection, Section, Name]),Value);
 end;
-
 procedure TJvAppStorageIniFile.WriteInteger(const Section, Ident: string; Value: Longint);
 begin
   AppStorage.WriteInteger(AppStorage.ConcatPaths([BaseSection, Section, Ident]),Value);
 end;
-
 procedure TJvAppStorageIniFile.WriteString(const Section, Ident, Value: string);
 begin
   AppStorage.WriteString(AppStorage.ConcatPaths([BaseSection, Section, Ident]),Value);
 end;
-
 procedure TJvAppStorageIniFile.WriteTime(const Section, Name: string; Value: TDateTime);
 begin
   AppStorage.WriteDateTime(AppStorage.ConcatPaths([BaseSection, Section, Name]),Value);
 end;
-
 initialization
   {$IFDEF UNITVERSIONING}
   RegisterUnitVersion(HInstance, UnitVersioning);
   {$ENDIF UNITVERSIONING}
-
 finalization
   {$IFNDEF SUPPORTS_CLASS_CTORDTORS}
   DestroyAppStoragePropertyEngineList;
   {$ENDIF ~SUPPORTS_CLASS_CTORDTORS}
-
   {$IFDEF UNITVERSIONING}
   UnregisterUnitVersion(HInstance);
   {$ENDIF UNITVERSIONING}
-
 end.

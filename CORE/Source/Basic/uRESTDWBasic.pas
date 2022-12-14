@@ -26,9 +26,7 @@ unit uRESTDWBasic;
 interface
 
 Uses
- {$IFDEF FPC}
-  uzliblaz,
- {$ELSE}
+ {$IFNDEF FPC}
   {$IF CompilerVersion <= 22}EncdDecd,{$IFEND}
   {$IF Defined(RESTDWFMX)}System.IOUtils,{$IFEND}
  {$ENDIF}

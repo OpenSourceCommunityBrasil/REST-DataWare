@@ -1,8 +1,6 @@
 unit JclSecurity;
-
-{$I ..\..\CORE\Source\Includes\uRESTDWPlataform.inc}
-{$I ..\..\CORE\Source\Includes\windowsonly.inc}
-
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\windowsonly.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -25,9 +23,7 @@ unit JclSecurity;
 }
 
 {$HPPEMIT '#define TTokenInformationClass TOKEN_INFORMATION_CLASS'}
-
 interface
-
 uses
   {$IFDEF UNITVERSIONING}
   JclUnitVersioning,
@@ -38,14 +34,11 @@ uses
   Windows, SysUtils,
   {$ENDIF ~HAS_UNITSCOPE}
   JclBase;
-
 type
   EJclSecurityError = class(EJclError);
-
 // Access Control
 function CreateNullDacl(out Sa: TSecurityAttributes; const Inheritable: Boolean): PSecurityAttributes;
 function CreateInheritable(out Sa: TSecurityAttributes): PSecurityAttributes;
-
 // Privileges
 function IsGroupMember(RelativeGroupID: DWORD): Boolean;
 function IsAdministrator: Boolean;
@@ -66,33 +59,26 @@ function IsMonitoringUser: Boolean;
 function IsLoggingUser: Boolean;
 function IsAuthorizationAccess: Boolean;
 function IsTSLicenseServer: Boolean;
-
 function EnableProcessPrivilege(const Enable: Boolean; const Privilege: string): Boolean;
 function EnableThreadPrivilege(const Enable: Boolean; const Privilege: string): Boolean;
 function IsPrivilegeEnabled(const Privilege: string): Boolean;
-
 function GetPrivilegeDisplayName(const PrivilegeName: string): string;
 function SetUserObjectFullAccess(hUserObject: THandle): Boolean;
 function GetUserObjectName(hUserObject: THandle): string;
-
 // Account Information
 procedure LookupAccountBySid(Sid: PSID; out Name, Domain: AnsiString; Silent: Boolean = False); overload;
 procedure LookupAccountBySid(Sid: PSID; out Name, Domain: WideString; Silent: Boolean = False); overload;
 procedure QueryTokenInformation(Token: THandle; InformationClass: TTokenInformationClass; var Buffer: Pointer);
 procedure FreeTokenInformation(var Buffer: Pointer);
 function GetInteractiveUserName: string;
-
 // SID utilities
 function SIDToString(ASID: PSID): string;
 procedure StringToSID(const SIDString: String; SID: PSID; cbSID: DWORD);
-
 // Computer Information
 function GetComputerSID(SID: PSID; cbSID: DWORD): Boolean;
-
 // Windows Vista/Server 2008 UAC (User Account Control)
 function IsUACEnabled: Boolean;
 function IsElevated: Boolean;
-
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -104,9 +90,7 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-
 implementation
-
 uses
   {$IFDEF HAS_UNITSCOPE}
   System.Classes,
@@ -120,9 +104,7 @@ uses
   {$ENDIF BORLAND}
   {$ENDIF ~HAS_UNITSCOPE}
   JclRegistry, JclResources, JclStrings, JclSysInfo, JclWin32;
-
 //=== Access Control =========================================================
-
 function CreateNullDacl(out Sa: TSecurityAttributes; const Inheritable: Boolean): PSecurityAttributes;
 begin
   if IsWinNT then
@@ -146,7 +128,6 @@ begin
     Result := nil;
   end;
 end;
-
 function CreateInheritable(out Sa: TSecurityAttributes): PSecurityAttributes;
 begin
   Sa.nLength := SizeOf(Sa);
@@ -157,9 +138,7 @@ begin
   else
     Result := nil;
 end;
-
 //=== Privileges =============================================================
-
 function IsGroupMember(RelativeGroupID: DWORD): Boolean;
 var
   psidAdmin: Pointer;
@@ -228,97 +207,78 @@ begin
       FreeSid(psidAdmin);
   end;
 end;
-
 function IsAdministrator: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_ADMINS);
 end;
-
 function IsUser: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_USERS);
 end;
-
 function IsGuest: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_GUESTS);
 end;
-
 function IsPowerUser: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_POWER_USERS);
 end;
-
 function IsAccountOperator: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_ACCOUNT_OPS);
 end;
-
 function IsSystemOperator: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_SYSTEM_OPS);
 end;
-
 function IsPrintOperator: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_PRINT_OPS);
 end;
-
 function IsBackupOperator: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_BACKUP_OPS);
 end;
-
 function IsReplicator: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_REPLICATOR);
 end;
-
 function IsRASServer: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_RAS_SERVERS);
 end;
-
 function IsPreWin2000CompAccess: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_PREW2KCOMPACCESS);
 end;
-
 function IsRemoteDesktopUser: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_REMOTE_DESKTOP_USERS);
 end;
-
 function IsNetworkConfigurationOperator: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_NETWORK_CONFIGURATION_OPS);
 end;
-
 function IsIncomingForestTrustBuilder: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_INCOMING_FOREST_TRUST_BUILDERS);
 end;
-
 function IsMonitoringUser: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_MONITORING_USERS);
 end;
-
 function IsLoggingUser: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_LOGGING_USERS);
 end;
-
 function IsAuthorizationAccess: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_AUTHORIZATIONACCESS);
 end;
-
 function IsTSLicenseServer: Boolean;
 begin
   Result := IsGroupMember(DOMAIN_ALIAS_RID_TS_LICENSE_SERVERS);
 end;
-
 function EnableProcessPrivilege(const Enable: Boolean; const Privilege: string): Boolean;
 const
   PrivAttrs: array [Boolean] of DWORD = (0, SE_PRIVILEGE_ENABLED);
@@ -340,7 +300,6 @@ begin
     CloseHandle(Token);
   end;
 end;
-
 function EnableThreadPrivilege(const Enable: Boolean; const Privilege: string): Boolean;
 const
   PrivAttrs: array [Boolean] of DWORD = (0, SE_PRIVILEGE_ENABLED);
@@ -367,7 +326,6 @@ begin
     CloseHandle(Token);
   end;
 end;
-
 function IsPrivilegeEnabled(const Privilege: string): Boolean;
 var
   Token: THandle;
@@ -392,7 +350,6 @@ begin
     CloseHandle(Token);
   end;
 end;
-
 function GetPrivilegeDisplayName(const PrivilegeName: string): string;
 var
   Count: DWORD;
@@ -402,13 +359,11 @@ begin
   begin
     Count  := 0;
     LangID := LANG_USER_DEFAULT;
-
     // have the the API function determine the required string length
     Result := '';
     if not LookupPrivilegeDisplayName(nil, PChar(PrivilegeName), PChar(Result), Count, LangID) then
       Count := 256;
     SetLength(Result, Count + 1);
-
     if LookupPrivilegeDisplayName(nil, PChar(PrivilegeName), PChar(Result), Count, LangID) then
       StrResetLength(Result)
     else
@@ -417,7 +372,6 @@ begin
   else
     Result := '';  // Win9x/ME
 end;
-
 function SetUserObjectFullAccess(hUserObject: THandle): Boolean;
 var
   Sd: PSecurity_Descriptor;
@@ -430,13 +384,10 @@ begin
   Sd := PSecurity_Descriptor(LocalAlloc(LPTR, SECURITY_DESCRIPTOR_MIN_LENGTH));
   InitializeSecurityDescriptor(Sd, SECURITY_DESCRIPTOR_REVISION);
   SetSecurityDescriptorDacl(Sd, True, nil, False);
-
   Si := DACL_SECURITY_INFORMATION;
   Result := SetUserObjectSecurity(hUserObject, Si, Sd);
-
   LocalFree(HLOCAL(Sd));
 end;
-
 function GetUserObjectName(hUserObject: THandle): string;
 var
   Count: DWORD;
@@ -448,7 +399,6 @@ begin
     Result := '';
     GetUserObjectInformation(hUserObject, UOI_NAME, PChar(Result), 0, Count);
     SetLength(Result, Count + 1);
-
     if GetUserObjectInformation(hUserObject, UOI_NAME, PChar(Result), Count, Count) then
       StrResetLength(Result)
     else
@@ -457,9 +407,7 @@ begin
   else
     Result := '';
 end;
-
 //=== Account Information ====================================================
-
 procedure LookupAccountBySid(Sid: PSID; out Name, Domain: AnsiString; Silent: Boolean);
 var
   NameSize, DomainSize: DWORD;
@@ -491,7 +439,6 @@ begin
     Domain := '';
   end;
 end;
-
 procedure LookupAccountBySid(Sid: PSID; out Name, Domain: WideString; Silent: Boolean);
 var
   NameSize, DomainSize: DWORD;
@@ -523,7 +470,6 @@ begin
     Domain := '';
   end;
 end;
-
 procedure QueryTokenInformation(Token: THandle;
   InformationClass: TTokenInformationClass; var Buffer: Pointer);
 var
@@ -555,14 +501,12 @@ begin
     end;
   end;
 end;
-
 procedure FreeTokenInformation(var Buffer: Pointer);
 begin
   if Buffer <> nil then
     FreeMem(Buffer);
   Buffer := nil;
 end;
-
 function GetInteractiveUserName: string;
 var
   Handle: THandle;
@@ -597,9 +541,7 @@ begin
     CloseHandle(Handle);
   end;
 end;
-
 //=== SID utilities ==========================================================
-
 function SIDToString(ASID: PSID): string;
 var
   SidIdAuthority: PSIDIdentifierAuthority;
@@ -607,26 +549,19 @@ var
   Counter: Integer;
 begin
   SidRev := SID_REVISION;
-
   // Validate the binary SID.
   if not IsValidSid(ASid) then
     Raise EJclSecurityError.CreateRes(@RsInvalidSID);
-
   // Get the identifier authority value from the SID.
   SidIdAuthority := GetSidIdentifierAuthority(ASid);
-
   // Get the number of subauthorities in the SID.
   SubAuthorities := GetSidSubAuthorityCount(ASid)^;
-
   //Compute the buffer length.
   // S-SID_REVISION- + IdentifierAuthority- + subauthorities- + NULL
   SidSize := (15 + 12 + (12 * SubAuthorities) + 1) * SizeOf(CHAR);
-
   SetLength(Result, SidSize+1);
-
   // Add 'S' prefix and revision number to the string.
   Result := Format('S-%u-',[SidRev]);
-
   // Add SID identifier authority to the string.
   if (SidIdAuthority^.Value[0] <> 0) or (SidIdAuthority^.Value[1] <> 0) then
     Result := Result + AnsiLowerCase(Format('0x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x',
@@ -642,12 +577,10 @@ begin
          ULONG(SidIdAuthority^.Value[4] shl 8)+
          ULONG(SidIdAuthority^.Value[3] shl 16)+
          ULONG(SidIdAuthority^.Value[2] shl 24)]);
-
   // Add SID subauthorities to the string.
   for Counter := 0 to SubAuthorities-1 do
     Result := Result + Format('-%u',[GetSidSubAuthority(ASid, Counter)^]);
 end;
-
 procedure StringToSID(const SIDString: String; SID: PSID; cbSID: DWORD);
 var
   {$IFDEF FPC} ASID: PSID; {$ELSE} ASID : ^_SID; {$ENDIF}
@@ -657,25 +590,20 @@ var
 begin
   if (Length (SIDString) <= 3) or (SIDString [1] <> 'S') or (SIDString [2] <> '-') then
     raise EJclSecurityError.CreateRes(@RsInvalidSID);
-
   RequiredSize := SizeOf(_SID) - SizeOf(DWORD); // _SID.Revision + _SID.SubAuthorityCount + _SID.IdentifierAuthority
   if cbSID < RequiredSize then
     raise EJclSecurityError.CreateRes(@RsSIDBufferTooSmall);
-
   ASID := SID; // typecast from opaque structure
-
   CurrentPos := StrFind('-', SIDString, 3);
   if CurrentPos <= 0 then
     raise EJclSecurityError.CreateRes(@RsInvalidSID);
   ASID^.Revision := StrToInt(Copy(SIDString, 3, CurrentPos - 3));
-
   Inc(CurrentPos);
   TempPos := StrFind('-', SIDString, CurrentPos);
   if TempPos = 0 then
     Authority := Copy(SIDString, CurrentPos, Length(SIDString) - CurrentPos + 1)
   else
     Authority := Copy(SIDString, CurrentPos, TempPos - CurrentPos);
-
   if Length(Authority) < 1 then
     raise EJclSecurityError.CreateRes(@RsInvalidSID);
   if (Length(Authority) = 14) and (Authority[1] = '0') and (Authority[2] = 'x') then
@@ -697,36 +625,28 @@ begin
     ASID^.IdentifierAuthority.Value[4] := (AuthorityValue and $0000FF00) shr 8;
     ASID^.IdentifierAuthority.Value[5] :=  AuthorityValue and $000000FF;
   end;
-
   CurrentPos := TempPos + 1;
   ASID^.SubAuthorityCount := 0;
-
   while CurrentPos > 1 do
   begin
     TempPos := StrFind('-', SIDString, CurrentPos);
-
     Inc(RequiredSize, SizeOf(DWORD)); // _SID.SubAuthority[x]
     if cbSID < RequiredSize then
       raise EJclSecurityError.CreateRes(@RsSIDBufferTooSmall);
-
     if TempPos = 0 then
       Authority := Copy(SIDString, CurrentPos, Length(SIDString) - CurrentPos + 1)
     else
       Authority := Copy(SIDString, CurrentPos, TempPos - CurrentPos);
-
     {$RANGECHECKS OFF}
     ASID^.SubAuthority[ASID^.SubAuthorityCount] := StrToInt64(Authority);
     {$IFDEF RANGECHECKS_ON}
     {$RANGECHECKS ON}
     {$ENDIF RANGECHECKS_ON}
     Inc(ASID^.SubAuthorityCount);
-
     CurrentPos := TempPos + 1;
   end;
 end;
-
 //=== Computer Information ===================================================
-
 function LsaNTCheck(NTResult: Cardinal) : Cardinal;
 var
   WinError: Cardinal;
@@ -739,7 +659,6 @@ begin
       raise EJclSecurityError.CreateResFmt(@RsLsaError, [NTResult, SysErrorMessage(WinError)]);
   end;
 end;
-
 function GetComputerSID(SID: PSID; cbSID: DWORD): Boolean;
 var
   ObjectAttributes: TLsaObjectAttributes;
@@ -749,7 +668,6 @@ begin
   if IsWinNT then
   begin
     ZeroMemory(@ObjectAttributes,SizeOf(ObjectAttributes));
-
     {$IFDEF FPC}
     PolicyHandle := 0;
     {$ENDIF FPC}
@@ -773,15 +691,12 @@ begin
   else
     Result := False; // Win9x
 end;
-
 //=== Windows Vista/Server 2008 UAC (User Account Control) ===================
-
 function IsUACEnabled: Boolean;
 begin
   Result := JclCheckWinVersion(6, 0) and
     RegReadBoolDef(HKLM, '\Software\Microsoft\Windows\CurrentVersion\Policies\System', 'EnableLUA', False);
 end;
-
 // source: Vista elevator from the Code Project
 function IsElevated: Boolean;
 const
@@ -816,13 +731,10 @@ begin
   else
     Result := IsAdministrator;
 end;
-
 {$IFDEF UNITVERSIONING}
 initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-
 finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-
 end.
