@@ -203,7 +203,6 @@ Type
     vBruteForceProtection: TIcsBruteForceProtection;
     vIpBlackList: TStrings;
     vServerStatusCheck: boolean;
-    procedure onBeforeProcessRequestServer(Sender: TObject);
 
     // Misc
     procedure DisconnectClient(Client: TPoolerHttpConnection; Server: TSslHttpAppSrv);
@@ -537,26 +536,6 @@ begin
   Remote.OnPostedData := onPostedDataServer;
   Remote.onException := onExceptionServer;
   Remote.OnAfterAnswer := onAnsweredServer;
-  Remote.OnBeforeProcessRequest := onBeforeProcessRequestServer;
-end;
-
-procedure TRESTDWIcsServicePooler.onBeforeProcessRequestServer(Sender: TObject);
-var
-  Remote: TPoolerHttpConnection;
-begin
-  Remote := Sender as TPoolerHttpConnection;
-
-  // Reject server status check
-  if ((vServerStatusCheck = false) and ((String.IsNullOrEmpty(Remote.Path)) or
-    (Remote.Path = '/'))) then
-  begin
-    try
-      if Assigned(vOnServerStatusCheckBlock) then
-        vOnServerStatusCheckBlock(Remote.PeerAddr, Remote.PeerPort);
-    finally
-      DisconnectClient(Remote, HttpAppSrv);
-    end;
-  end
 end;
 
 function TRESTDWIcsServicePooler.ClientCount: Integer;
@@ -615,6 +594,8 @@ begin
     if Assigned(vOnAnswered) then
       vOnAnswered(Remote);
   finally
+    // Force client disconnection after answer
+    // Avoid ghost connections and timeouts
     DisconnectClient(Remote, HttpAppSrv);
   end;
 end;
@@ -916,11 +897,23 @@ begin
         try
           Remote := Sender as TPoolerHttpConnection;
 
+          // Do not process the document if HTTP conection needs to be closed
+          // but for some reason it was not closed
           if (Remote.vNeedClose = true) then
-          begin
-            DisconnectClient(Remote, HttpAppSrv);
-
             raise Exception.Create(cIcsHTTPConnectionClosed);
+
+          // Server status check protection
+          if ((vServerStatusCheck = false) and ((String.IsNullOrEmpty(Remote.Path)) or
+            (Remote.Path = '/'))) then
+          begin
+            try
+              if Assigned(vOnServerStatusCheckBlock) then
+                vOnServerStatusCheckBlock(Remote.PeerAddr, Remote.PeerPort);
+            finally
+              DisconnectClient(Remote, HttpAppSrv);
+            end;
+
+            exit;
           end;
 
           vResponseHeader := TStringList.Create;
@@ -989,7 +982,7 @@ Procedure TRESTDWIcsServicePooler.DisconnectClient(Client: TPoolerHttpConnection
 Server: TSslHttpAppSrv);
 begin
   try
-    // Try gracefully disconnection
+    // Try disconnecting gracefully
     Client.vNeedClose := true;
 
     if Server.IsClient(Client) then
