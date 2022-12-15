@@ -3298,18 +3298,6 @@ Begin
     {$ELSE}
      Result := BytesToString(Base64Decode(SA));
    {$IFEND}
-   {$ELSE}
-    {$IF CompilerVersion > 27}
-     ne     := TBase64Encoding.Create(-1, '');
-     Try
-      Result := ne.Decode(SA);
-     Finally
-      FreeAndNil(ne);
-     End;
-    {$ELSE}
-     Result := BytesToString(Base64Decode(SA));
-    {$IFEND}
-   {$ENDIF}
   End;
 End;
 {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
