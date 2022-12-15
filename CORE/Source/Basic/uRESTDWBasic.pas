@@ -3215,6 +3215,8 @@ Begin
                                      aToken      := GetTokenString(vToken);
                                      If aToken = '' Then
                                       aToken     := GetBearerString(vToken);
+                                     If aToken = '' Then
+                                      aToken     := Token;
                                      vToken      := aToken;
                                     End;
                                   {$ELSE}
@@ -3227,6 +3229,8 @@ Begin
                                      aToken      := GetTokenString(vToken);
                                      If aToken = '' Then
                                       aToken     := GetBearerString(vToken);
+                                     If aToken = '' Then
+                                      aToken     := Token;
                                      vToken      := aToken;
                                     End;
                                   {$ENDIF}
@@ -3240,6 +3244,8 @@ Begin
                                     aToken      := GetTokenString(vToken);
                                     If aToken = '' Then
                                      aToken     := GetBearerString(vToken);
+                                    If aToken = '' Then
+                                     aToken     := Token;
                                     vToken      := aToken;
                                    End;
                                  {$IFEND}
@@ -3253,6 +3259,8 @@ Begin
                                    aToken      := GetTokenString(vToken);
                                    If aToken = '' Then
                                     aToken     := GetBearerString(vToken);
+                                   If aToken = '' Then
+                                    aToken     := Token;
                                    vToken      := aToken;
                                   End;
                                 {$ENDIF}
@@ -3398,6 +3406,8 @@ Begin
                                      aToken      := GetTokenString(vToken);
                                      If aToken = '' Then
                                       aToken     := GetBearerString(vToken);
+                                     If aToken = '' Then
+                                      aToken     := Token;
                                      vToken      := aToken;
                                     End;
                                   {$ELSE}
@@ -3410,12 +3420,14 @@ Begin
                                      aToken      := GetTokenString(vToken);
                                      If aToken = '' Then
                                       aToken     := GetBearerString(vToken);
+                                     If aToken = '' Then
+                                      aToken     := Token;
                                      vToken      := aToken;
                                     End;
                                   {$ENDIF}
                                  {$ELSE}
                                   If Trim(Token) <> '' Then
-                                    vToken       := Token
+                                   vToken       := Token
                                   Else
                                    vToken       := RawHeaders.Values['Authorization'];
                                   If Trim(vToken) <> '' Then
@@ -3423,6 +3435,8 @@ Begin
                                     aToken      := GetTokenString(vToken);
                                     If aToken = '' Then
                                      aToken     := GetBearerString(vToken);
+                                    If aToken = '' Then
+                                     aToken     := Token;
                                     vToken      := aToken;
                                    End;
                                  {$IFEND}
@@ -3436,6 +3450,8 @@ Begin
                                    aToken      := GetTokenString(vToken);
                                    If aToken = '' Then
                                     aToken     := GetBearerString(vToken);
+                                   If aToken = '' Then
+                                    aToken     := Token;
                                    vToken      := aToken;
                                   End;
                                 {$ENDIF}
