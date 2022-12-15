@@ -761,14 +761,24 @@ End;
 Procedure TRESTDWAuthOptionTokenClient.FromToken(TokenValue : String);
 Var
  bJsonValue : TRESTDWJSONInterfaceObject;
+ vTokenB,
  vHeader,
  vBody      : String;
 Begin
- vToken     := TokenValue;
+ vTokenB     := TokenValue;
+ If Trim(vTokenB) <> '' Then
+  Begin
+   vTokenB     := GetTokenString(TokenValue);
+   If vTokenB = '' Then
+    vTokenB     := GetBearerString(TokenValue);
+   If vTokenB = '' Then
+    vTokenB     := TokenValue;
+  End;
+ vToken := vTokenB;
  Try
-  vHeader   := Copy(TokenValue, InitStrPos, Pos('.', TokenValue) - 1);
-  Delete(TokenValue, InitStrPos, Pos('.', TokenValue));
-  vBody     := Copy(TokenValue, InitStrPos, Pos('.', TokenValue) - 1);
+  vHeader   := Copy(vTokenB, InitStrPos, Pos('.', vTokenB) - 1);
+  Delete(vTokenB, InitStrPos, Pos('.', vTokenB));
+  vBody     := Copy(vTokenB, InitStrPos, Pos('.', vTokenB) - 1);
   //Read Header
   If Trim(vHeader) <> '' Then
    Begin

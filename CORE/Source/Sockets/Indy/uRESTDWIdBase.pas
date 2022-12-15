@@ -3501,7 +3501,8 @@ Begin
  Else
   Begin
    vValueAuth  := AHeaders[headerIndex];
-   If AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken] Then
+   If (AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken])  And
+      (Pos('basic', Lowercase(vValueAuth)) = 0) Then
     Begin
      vAuthValue       := TRESTDWAuthOptionTokenClient.Create;
      vAuthValue.Token := vValueAuth;
