@@ -4284,7 +4284,7 @@ Begin
    vNullValue := False;
    If vObjectValue in [ovString, ovGuid, ovMemo, ovWideMemo, ovFmtMemo, ovObject, ovDataset] Then
     Begin
-     If ((bValue = '') or (bValue = 'null')) Then
+     If ((VarToStr(bValue) = '') or (VarToStr(bValue) = 'null')) Then
       Begin
        If Not vNullValue Then
         vNullValue := Not(vObjectValue in [ovWideString, ovString, ovGuid, ovMemo,

@@ -604,8 +604,15 @@ Type
                      OnThreadRequestError : TOnThreadRequestError);
 End;
 
+type
+  IRESTDWPlus = interface
+    procedure loadStream(stream : TStream);
+    function findFieldName(name : string) : TField;
+    function getDataset : TDataSet;
+  end;
+
 Type
- TRESTDWClientSQL = Class (TRESTDWClientSQLBase, IUnknown) //Classe com as funcionalidades de um DBQuery
+ TRESTDWClientSQL = Class (TRESTDWClientSQLBase) //Classe com as funcionalidades de um DBQuery
  Private
   vActualPoolerMethodClient : TRESTDWPoolerMethodClient;
   vOldState             : TDatasetState;
