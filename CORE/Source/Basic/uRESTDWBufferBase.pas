@@ -344,13 +344,18 @@ Begin
    If aResetBuffer Then
     NewBuffer;
    vBufferPosition := Stream.Position;
-   Try
-    vBufferBase.CopyFrom(Stream, Stream.Size);
-   Finally
-    Stream.Position := vBufferPosition;
-   End;
-   If aResetPosition Then
-    ResetPosition;
+   If Stream.Position < (Stream.Size -1) Then
+    Begin
+     Try
+      vBufferBase.CopyFrom(Stream, Stream.Size - Stream.Position);
+     Finally
+      Stream.Position := vBufferPosition;
+     End;
+     If aResetPosition Then
+      ResetPosition;
+    End
+   Else
+    Raise Exception.Create('Range Check Error on LoadFromStream, Size and position error...');
   End;
 End;
 
@@ -359,7 +364,8 @@ Var
  vBufferSize : DWBufferSize;
 Begin
  Result := Nil;
- If vBufferBase.Size > 0 Then
+ If (vBufferBase.Size > 0)                          And
+    (vBufferBase.Position < (vBufferBase.Size -1))  Then
   Begin
    Try
     vBufferBase.Read(vBufferSize, SizeOf(DWBufferSize));
@@ -372,7 +378,9 @@ Begin
    Except
 
    End;
-  End;
+  End
+ Else
+  Raise Exception.Create('Range Check Error on ReadStream, Size and position error...');
 End;
 
 Procedure TRESTDWBufferBase.ResetPosition;
@@ -410,7 +418,7 @@ Function TRESTDWBufferBase.Bof : Boolean;
 Begin
  Result := Assigned(vBufferBase);
  If Result Then
-  Result := vBufferBase.Position = 0;
+  Result := (vBufferBase.Position = 0);
 End;
 
 Constructor TRESTDWBufferBase.Create;
@@ -428,7 +436,7 @@ Function TRESTDWBufferBase.Eof : Boolean;
 Begin
  Result := Not Assigned(vBufferBase);
  If Not Result Then
-  Result := vBufferBase.Position = vBufferBase.Size;
+  Result := vBufferBase.Position >= (vBufferBase.Size -1);
 End;
 
 Procedure TRESTDWBufferBase.InputBuffer(Const Buffer : TRESTDWBufferBase);
