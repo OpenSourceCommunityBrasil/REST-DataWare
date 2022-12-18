@@ -45,8 +45,9 @@ type
 implementation
 
 uses
-  Data.DBXCommon, FireDAC.Stan.Consts, Firedac.Phys.RDWBase;
+  FireDAC.Stan.Consts, Firedac.Phys.RDWBase;
 
+// Data.DBXCommon,
 // TFDPhysTDBXConnectionDefParams
 // Generated for: FireDAC TDBX driver
 
@@ -97,13 +98,13 @@ end;
 {-------------------------------------------------------------------------------}
 function TFDPhysRDWConnectionDefParams.GetDriverName: String;
 begin
-  Result := FDef.AsString[TDBXPropertyNames.DriverName];
+  Result := FDef.AsString[DriverName];
 end;
 
 {-------------------------------------------------------------------------------}
 procedure TFDPhysRDWConnectionDefParams.SetDriverName(const AValue: String);
 begin
-  FDef.AsString[TDBXPropertyNames.DriverName] := AValue;
+  FDef.AsString[DriverName] := AValue;
 end;
 
 {-------------------------------------------------------------------------------}
