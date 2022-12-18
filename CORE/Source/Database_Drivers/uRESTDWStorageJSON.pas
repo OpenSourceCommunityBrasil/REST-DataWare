@@ -1,17 +1,18 @@
-unit uRESTDWStorageBinRDW;
+unit uRESTDWStorageJSON;
 
 interface
 
 uses
-  Classes, SysUtils, uRESTDWStorageBase, DB, uRESTDWConsts;
+  Classes, SysUtils, uRESTDWStorageBase, DB, uRESTDWConsts,
+  uRESTDWJson;
 
 type
-  TRESTDWStorageBinRDW = class(TRESTDWStorageBase)
+  TRESTDWStorageJSON = class(TRESTDWStorageBase)
   private
     FFieldTypes : array of integer;
   protected
-    procedure SaveRecordToStream(Dataset : TDataset; stream  : TStream);
-    procedure LoadRecordFromStream(Dataset : TDataset; stream  : TStream);
+    function SaveRecordToStream(Dataset : TDataset) : ansistring;
+    procedure LoadRecordFromStream(Dataset : TDataset; json : TJSONArray);
   public
     procedure SaveDatasetToStream(dataset : TDataset; var stream : TStream); override;
     procedure LoadDatasetFromStream(dataset : TDataset; stream : TStream); overload; override;
@@ -24,7 +25,7 @@ uses
 
 { TRESTDWStorageBinRDW }
 
-procedure TRESTDWStorageBinRDW.LoadDatasetFromStream(dataset: TDataset; stream: TStream);
+procedure TRESTDWStorageJSON.LoadDatasetFromStream(dataset: TDataset; stream: TStream);
 var
   fc : integer;
   fk : TFieldKind;
@@ -34,63 +35,82 @@ var
   s : ansistring;
   ft : Byte;
   b : boolean;
+
   vFieldDef : TFieldDef;
+  json : TJSONObject;
+  jArr1, jArr2 : TJSONArray;
+  arrLen : LongInt;
+  sAux : ansistring;
 begin
   stream.Position := 0;
-  stream.Read(fc,SizeOf(Integer));
 
-  SetLength(FFieldTypes,fc);
+  SetLength(sAux,stream.Size);
+  stream.Read(sAux[InitStrPos],stream.Size);
 
-  Stream.Read(b, Sizeof(Byte));
-  EncodeStrs := b;
+  stream.Size := 0; // limpando a memoria
+
+  json := TJSONObject.create(sAux);
 
   dataset.Close;
   dataset.FieldDefs.Clear;
 
-  for i := 0 to fc-1 do begin
-    stream.Read(j,SizeOf(Integer));
+  jArr1 := TJSONArray(json.get('fields'));
+
+  arrLen := jArr1.length - 1;
+  SetLength(FFieldTypes,arrLen+1);
+
+  for i := 0 to arrLen do begin
+    jArr2 := TJSONArray(jArr1.get(0));
+    j := jArr2.getInt(0);
     fk := TFieldKind(j);
+
     vFieldDef := dataset.FieldDefs.AddFieldDef;
 
-    stream.Read(j,SizeOf(Integer));
-    SetLength(s,j);
-    stream.Read(s[InitStrPos],j);
-
+    s := jArr2.getString(1);
     vFieldDef.Name := s;
 
-    stream.Read(ft,SizeOf(Byte));
+    ft := jArr2.getInt(2);
     vFieldDef.DataType := DWFieldTypeToFieldType(ft);
     FFieldTypes[i] := ft;
 
-    stream.Read(j,SizeOf(Integer));
+    j := jArr2.getInt(3);
     vFieldDef.Size := j;
 
-    stream.Read(j,SizeOf(Integer));
+    j := jArr2.getInt(4);
     if (ft in [dwftFloat, dwftCurrency,dwftBCD,dwftExtended,dwftSingle,dwftFMTBcd]) then
       vFieldDef.Precision := j;
 
-    stream.Read(b,SizeOf(Byte));
-
+    b := jArr2.getBoolean(5);
     vFieldDef.Required := b;
+
     if fk = fkInternalCalc Then
       vFieldDef.InternalCalcField := True;
+
+    jArr1.delete(0);
   end;
 
-  stream.Read(rc,SizeOf(LongInt));
+  jArr1 := TJSONArray(json.get('lines'));
 
   dataset.Open;
-
   dataset.DisableControls;
-  for i := 1 to rc do begin
+  arrLen := jArr1.length - 1;
+
+  for i := 0 to arrLen do begin
+    jArr2 := TJSONArray(jArr1.get(0));
+
     dataset.Append;
-    LoadRecordFromStream(Dataset,stream);
+    LoadRecordFromStream(Dataset,jArr2);
     dataset.Post;
+
+    jArr1.delete(0);
   end;
   dataset.First;
   dataset.EnableControls;
+
+  FreeAndNil(json);
 end;
 
-procedure TRESTDWStorageBinRDW.LoadRecordFromStream(Dataset: TDataset; stream: TStream);
+procedure TRESTDWStorageJSON.LoadRecordFromStream(Dataset : TDataset; json : TJSONArray);
 var
   i : integer;
   L : longInt;
@@ -99,7 +119,7 @@ var
   E : Extended;
   S : ansistring;
   Cr : Currency;
-  P : TMemoryStream;
+  P : TStringStream;
   Bool : boolean;
   vField : TField;
 begin
@@ -107,7 +127,7 @@ begin
     vField := Dataset.Fields[i];
     vField.Clear;
 
-    Stream.Read(Bool, Sizeof(Byte));
+    Bool := json.isNull(i);
     if Bool then // is null
       Continue;
 
@@ -115,17 +135,13 @@ begin
       dwftFixedChar,
       dwftWideString,
       dwftString : begin
-                  Stream.Read(L, Sizeof(L));
-                  S := '';
-                  if L > 0 then begin
-                    SetLength(S, L);
+                  S := json.getString(i);
+                  if S <> '' then begin
                     {$IFDEF FPC}
-                     Stream.Read(Pointer(S)^, L);
                      if EncodeStrs then
                        S := DecodeStrings(S);
                      S := GetStringEncode(S, FDatabaseCharSet);
                     {$ELSE}
-                     Stream.Read(S[InitStrPos], L);
                      if EncodeStrs then
                        S := DecodeStrings(S);
                     {$ENDIF}
@@ -138,25 +154,25 @@ begin
       dwftWord,
       dwftInteger,
       dwftAutoInc :  Begin
-                  Stream.Read(J, Sizeof(Integer));
+                  J := json.getInt(i);
                   vField.AsInteger := J;
       end;
       dwftSingle   : begin
-                  Stream.Read(R, Sizeof(Real));
+                  R := json.getDouble(i);
                   vField.AsSingle := R;
       end;
       dwftExtended : begin
-                  Stream.Read(R, Sizeof(Real));
+                  R := json.getDouble(i);
                   vField.AsExtended := R;
       end;
       dwftFloat    : begin
-                  Stream.Read(R, Sizeof(Real));
+                  R := json.getDouble(i);
                   vField.AsFloat := R;
       end;
       dwftFMTBcd,
       dwftCurrency,
       dwftBCD     :  begin
-                  Stream.Read(Cr, Sizeof(Currency));
+                  Cr := json.getDouble(i);
                   vField.AsCurrency := Cr;
       end;
       dwftTimeStampOffset,
@@ -164,12 +180,12 @@ begin
       dwftTime,
       dwftDateTime,
       dwftTimeStamp : begin
-                  Stream.Read(R, Sizeof(Real));
+                  R := json.getDouble(i);
                   vField.AsDateTime := R;
       End;
       dwftLongWord,
       dwftLargeint : begin
-                  Stream.Read(L, Sizeof(LongInt));
+                  L := json.getInt64(i);
                   {$IF NOT DEFINED(FPC) AND (CompilerVersion < 22)}
                     vField.AsInteger := L;
                   {$ELSE}
@@ -177,7 +193,7 @@ begin
                   {$IFEND}
       end;
       dwftBoolean  : begin
-                  Stream.Read(Bool, Sizeof(Byte));
+                  Bool := json.getBoolean(i);
                   vField.AsBoolean := Bool
       End;
       dwftMemo,
@@ -186,30 +202,26 @@ begin
       dwftFmtMemo,
       dwftBlob,
       dwftBytes : begin
-                  Stream.Read(L, Sizeof(LongInt));
-                  if L > 0 then Begin
-                    P := TMemoryStream.Create;
+                  S := json.getString(i);
+                  if S <> '' then Begin
+                    S := DecodeStrings(S);
+                    P := TStringStream.Create(S);
                     try
-                      P.CopyFrom(Stream, L);
                       P.Position := 0;
                       TBlobField(vField).LoadFromStream(P);
                     finally
-                     P.Free;
+                      P.Free;
                     end;
                   end;
       end;
       else begin
-                  Stream.Read(L, Sizeof(L));
-                  S := '';
-                  if L > 0 then begin
-                    SetLength(S, L);
+                  S := json.getString(i);
+                  if S <> '' then begin
                     {$IFDEF FPC}
-                     Stream.Read(Pointer(S)^, L);
                      if EncodeStrs then
                        S := DecodeStrings(S);
                      S := GetStringEncode(S, FDatabaseCharSet);
                     {$ELSE}
-                     Stream.Read(S[InitStrPos], L);
                      if EncodeStrs then
                        S := DecodeStrings(S);
                     {$ENDIF}
@@ -220,103 +232,124 @@ begin
   end;
 end;
 
-procedure TRESTDWStorageBinRDW.SaveDatasetToStream(dataset: TDataset; var stream: TStream);
+procedure TRESTDWStorageJSON.SaveDatasetToStream(dataset: TDataset; var stream: TStream);
 var
   i : integer;
-  rc : Longint;
   s : ansistring;
   j : integer;
   b : boolean;
   y : byte;
 
   bm : TBookmark;
+
+  sAux : ansistring;
 begin
   stream.Size := 0;
 
-  if not Dataset.Active then
-    Dataset.Open
-  else
-    Dataset.CheckBrowseMode;
-  Dataset.UpdateCursorPos;
-
-  i := Dataset.FieldCount;
-  stream.Write(i,SizeOf(integer));
-
-  b := EncodeStrs;
-  stream.Write(b,SizeOf(Byte));
+  sAux := '{"fields":[';
+  stream.Write(sAux[InitStrPos],Length(sAux));
 
   i := 0;
   while i < Dataset.FieldCount do begin
+    sAux := '';
+    if i > 0 then
+      sAux := sAux + ',';
+    sAux := sAux + '[';
     j := Ord(Dataset.Fields[i].FieldKind);
-    stream.Write(j,SizeOf(Integer));
+    sAux := sAux + IntToStr(j);
 
     s := Dataset.Fields[i].DisplayName;
-    j := Length(s);
-    stream.Write(j,SizeOf(Integer));
-    stream.Write(s[InitStrPos],j);
+    sAux := sAux + ',"' + s + '"';
 
     y := FieldTypeToDWFieldType(Dataset.Fields[i].DataType);
-    stream.Write(y,SizeOf(Byte));
+    sAux := sAux + ',' + IntToStr(y);
 
     j := Dataset.Fields[i].Size;
-    stream.Write(j,SizeOf(Integer));
+    sAux := sAux + ',' + IntToStr(j);
 
     j := 0;
     if Dataset.Fields[i].InheritsFrom(TFloatField) then
       j := TFloatField(Dataset.Fields[i]).Precision;
-
-    stream.Write(j,SizeOf(Integer));
+    sAux := sAux + ',' + IntToStr(j);
 
     b := Dataset.Fields[i].Required;
-    stream.Write(b,SizeOf(Byte));
+    if b then
+      sAux := sAux + ',true'
+    else
+      sAux := sAux + ',false';
+
+    sAux := sAux + ']';
+    stream.Write(sAux[InitStrPos],Length(sAux));
 
     i := i + 1;
   end;
-
-  i := stream.Position;
-  rc := 0;
-  stream.WriteBuffer(rc,SizeOf(Longint));
+  sAux := '],"lines":[';
+  stream.Write(sAux[InitStrPos],Length(sAux));
 
   bm := dataset.GetBookmark;
   dataset.DisableControls;
   dataset.First;
-  rc := 0;
+  i := 0;
   while not Dataset.Eof do begin
-    SaveRecordToStream(dataset,stream);
+    sAux := SaveRecordToStream(dataset);
+    sAux := '[' + sAux + ']';
+    if i > 0 then
+      sAux := ',' + sAux;
+    stream.Write(sAux[InitStrPos],Length(sAux));
+
     dataset.Next;
-    rc := rc + 1;
+    i := i + 1;
   end;
   dataset.GotoBookmark(bm);
   dataset.FreeBookmark(bm);
   dataset.EnableControls;
 
-  stream.Position := i;
-  stream.WriteBuffer(rc,SizeOf(Longint));
+  sAux := ']}';
+  stream.Write(sAux[InitStrPos],Length(sAux));
   stream.Position := 0;
 end;
 
-procedure TRESTDWStorageBinRDW.SaveRecordToStream(Dataset: TDataset; stream: TStream);
+function TRESTDWStorageJSON.SaveRecordToStream(Dataset : TDataset) : ansistring;
 var
   i  : integer;
   s  : ansistring;
   L  : longint;
   J  : integer;
-  R  : Real;
+  R  : Extended;
   E  : Extended;
   Cr : Currency;
-  P  : TMemoryStream;
+  P  : TStringStream;
   Bool : Boolean;
+
+  function ftos(fl : Extended) : ansistring;
+  var
+    ps : integer;
+    ss : ansistring;
+  begin
+    ss := FloatToStr(fl);
+    ps := Pos(',',ss);
+    if ps > 0 then begin
+      Delete(ss,ps,1);
+      Insert('.',ss,ps);
+    end;
+    ftos := ss;
+  end;
 Begin
   P := nil;
+  Result := '';
   for i := 0 to Dataset.FieldCount - 1 do begin
     if fkCalculated = Dataset.Fields[I].FieldKind then
       Bool := True
     else
       Bool := Dataset.Fields[I].IsNull;
 
-    Stream.Write(Bool, SizeOf(Byte));
-    if Bool then
+    if Result <> '' then
+      Result := Result + ',';
+
+    if Bool then begin
+      Result := Result + 'null';
       Continue;
+    end;
 
     case Dataset.Fields[I].DataType Of
       ftFixedChar,
@@ -325,19 +358,14 @@ Begin
                   S := Dataset.Fields[I].AsString;
                   if EncodeStrs then
                     S := EncodeStrings(S);
-                  L := Length(S);
-                  Stream.Write(L, Sizeof(L));
-                  {$IFNDEF FPC}
-                    if L <> 0 then Stream.Write(S[InitStrPos], L);
-                  {$ELSE}
-                    if L <> 0 then Stream.Write(S[1], L);
-                  {$ENDIF}
+                  Result := Result + '"' + S + '"';
+
       end;
       {$IFDEF COMPILER12_UP}
       ftByte,
       ftShortint : begin
                   J := Dataset.Fields[I].AsInteger;
-                  Stream.Write(J, Sizeof(Integer));
+                  Result := Result + IntToStr(J);
       end;
       {$ENDIF}
       ftSmallint,
@@ -345,29 +373,29 @@ Begin
       ftInteger,
       ftAutoInc :  Begin
                   J := Dataset.Fields[I].AsInteger;
-                  Stream.Write(J, Sizeof(Integer));
+                  Result := Result + IntToStr(J);
       end;
       {$IFNDEF FPC}
         {$IF CompilerVersion >= 21}
           ftSingle   : begin
                       R := Dataset.Fields[I].AsSingle;
-                      Stream.Write(R, Sizeof(Real));
+                      Result := Result + ftos(R);
           end;
           ftExtended : begin
                       E := Dataset.Fields[I].AsExtended;
-                      Stream.Write(E, Sizeof(Extended));
+                      Result := Result + ftos(E);
           end;
         {$IFEND}
       {$ENDIF}
       ftFloat    : begin
                   R := Dataset.Fields[I].AsFloat;
-                  Stream.Write(R, Sizeof(Real));
+                  Result := Result + ftos(R);
       end;
       ftFMTBcd,
       ftCurrency,
       ftBCD     :  begin
                   Cr := Dataset.Fields[I].AsCurrency;
-                  Stream.Write(Cr, Sizeof(Currency));
+                  Result := Result + ftos(Cr);
       end;
       {$IFNDEF FPC}
         {$IF CompilerVersion >= 21}
@@ -379,7 +407,7 @@ Begin
       ftDateTime,
       ftTimeStamp : begin
                   R := Dataset.Fields[I].AsDateTime;
-                  Stream.Write(R, Sizeof(Real));
+                  Result := Result + ftos(R);
       End;
       {$IFNDEF FPC}
         {$IF CompilerVersion >= 21}
@@ -392,11 +420,14 @@ Begin
                   {$ELSE}
                     L := Dataset.Fields[I].AsLargeInt;
                   {$ENDIF}
-                  Stream.Write(L, Sizeof(Longint));
+                  Result := Result + IntToStr(L);
       end;
       ftBoolean  : begin
                   Bool := Dataset.Fields[I].AsBoolean;
-                  Stream.Write(Bool, Sizeof(Byte));
+                  if Bool then
+                    Result := Result + 'true'
+                  else
+                    Result := Result + 'false';
       End;
       ftMemo,
       {$IFNDEF FPC}
@@ -410,13 +441,11 @@ Begin
       ftFmtMemo,
       ftBlob,
       ftBytes : begin
-                  P := TMemoryStream.Create;
+                  P := TStringStream.Create;
                   try
                     TBlobField(Dataset.Fields[I]).SaveToStream(P);
-                    L := P.Size;
-                    Stream.Write(L, Sizeof(Longint));
-                    P.Position := 0;
-                    Stream.CopyFrom(P, L);
+                    S := EncodeStrings(P.DataString);
+                    Result := Result + '"' + S + '"';
                   finally
                     FreeAndNil(P);
                   end;
@@ -425,13 +454,7 @@ Begin
                   S := Dataset.Fields[I].AsString;
                   if EncodeStrs then
                     S := EncodeStrings(S);
-                  L := Length(S);
-                  Stream.Write(L, Sizeof(L));
-                  {$IFNDEF FPC}
-                    If L <> 0 Then Stream.Write(S[InitStrPos], L);
-                  {$ELSE}
-                    If L <> 0 Then Stream.Write(S[1], L);
-                  {$ENDIF}
+                  Result := Result + '"' + S + '"';
       end;
     end;
   end;
