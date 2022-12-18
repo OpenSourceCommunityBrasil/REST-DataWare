@@ -31,7 +31,8 @@ Uses
   uRESTDWParams, uRESTDWComponentBase, uRESTDWEncodeClass,
   uRESTDWComponentEvents, uRESTDWMassiveBuffer, uRESTDWJSONInterface,
   uRESTDWConsts, uRESTDWDataModule, uRESTDWBasicTypes, uRESTDWTools,
-  uRESTDWBufferBase, uRESTDWMemoryDataset;
+  uRESTDWBufferBase, uRESTDWMemoryDataset, uRESTDWStorageBase,
+  uRESTDWStorageBinRDW;
 
 Type
   TRESTDWDatabaseInfo = Record
@@ -98,6 +99,7 @@ Type
  TRESTDWDrvDataset      = Class(TComponent)
  private
   FParamsList : TStringList;
+  FRESTDWStorage : TRESTDWStorageBase;
   function getRDWDrvParam(idx: integer): TRDWDrvParam;
  Protected
   Function  getFields                     : TFields; Virtual;
@@ -149,6 +151,7 @@ Type
   Property Params[idx : integer] : TRDWDrvParam read getRDWDrvParam;
  Published
   Property Fields : TFields Read getFields;
+  property RESTDWStorage : TRESTDWStorageBase read FRESTDWStorage write FRESTDWStorage;
  End;
  { TRESTDWDrvStoreProc }
   TRESTDWDrvStoreProc = Class(TRESTDWDrvDataset)
@@ -188,6 +191,7 @@ Type
  Private
   FConnection : TComponent;
   FServerMethod : TServerMethodDataModule;
+  FRESTDWStorage : TRESTDWStorageBase;
   vStrsTrim,
   vStrsEmpty2Null,
   vStrsTrim2Len,
@@ -399,6 +403,7 @@ Type
   Property EncodeStringsJSON   : Boolean              Read vEncodeStrings         Write vEncodeStrings;
   Property Encoding            : TEncodeSelect        Read vEncoding              Write vEncoding;
   Property ParamCreate         : Boolean              Read vParamCreate           Write vParamCreate;
+  property RESTDWStorage       : TRESTDWStorageBase   Read FRESTDWStorage         Write FRESTDWStorage;
   {$IFDEF FPC}
   Property DatabaseCharSet     : TDatabaseCharSet     Read vDatabaseCharSet       Write vDatabaseCharSet;
   {$ENDIF}
@@ -479,6 +484,7 @@ begin
   inherited Create(AOwner);
   FParamsList := TStringList.Create;
   FParamsList.Sorted := True;
+  FRESTDWStorage := nil;
 end;
 
 Procedure TRESTDWDrvDataset.createSequencedField(seqname,
@@ -682,17 +688,19 @@ End;
 procedure TRESTDWDrvDataset.SaveToStreamCompatibleMode(stream: TStream);
 var
   qry : TDataSet;
-  memtable : TRESTDWMemtable;
+  stor : TRESTDWStorageBinRDW;
 begin
-  qry := TDataSet(qry.Owner);
-  memtable := TRESTDWMemtable.Create(nil);
-  try
-    memtable.Assign(qry);
-    // TODO -oXyberX -cMemTable: Função SaveToStream não existe no TRESTDWMemtable
-//    memtable.SaveToStream(stream);
-    stream.Position := 0;
-  finally
-    FreeAndNil(memtable);
+  qry := TDataSet(Self.Owner);
+  if FRESTDWStorage = nil then begin
+    stor := TRESTDWStorageBinRDW.Create(nil);
+    try
+      stor.SaveDatasetToStream(qry,stream);
+    finally
+      stor.Free;
+    end;
+  end
+  else begin
+    FRESTDWStorage.SaveDatasetToStream(qry,stream);
   end;
 end;
 
@@ -2443,8 +2451,18 @@ begin
           finally
           end;
         end
-        else
-          TRESTDWClientSQLBase.SaveToStream(vDataSet, BinaryBlob);
+        else begin
+          if not Assigned(BinaryBlob) then
+            BinaryBlob := TMemoryStream.Create;
+
+          try
+            vTempQuery.RESTDWStorage := FRESTDWStorage;
+            vTempQuery.SaveToStreamCompatibleMode(BinaryBlob);
+            BinaryBlob.Position := 0;
+          finally
+
+          end;
+        end;
       finally
       end;
     end
@@ -2559,8 +2577,17 @@ begin
 
         end;
       end
-      else
-        TRESTDWClientSQLBase.SaveToStream(TDataset(vTempQuery.Owner), BinaryBlob);
+      else begin
+        if not Assigned(BinaryBlob) then
+          BinaryBlob := TMemoryStream.Create;
+        try
+          vTempQuery.RESTDWStorage := FRESTDWStorage;
+          vTempQuery.SaveToStreamCompatibleMode(BinaryBlob);
+          BinaryBlob.Position := 0;
+        finally
+
+        end;
+      end;
 
       if not vStateResource then
         Connect;
@@ -3537,8 +3564,15 @@ Begin
       vTempJSON.Utf8SpecialChars := True;
       vTempJSON.LoadFromDataset('RESULTDATA', TDataSet(vTempQuery.Owner), EncodeStringsJSON);
      End
-    Else If vCompatibleMode Then
-     TRESTDWClientSQLBase.SaveToStream(TDataSet(vTempQuery.Owner), vStream)
+    Else If vCompatibleMode Then begin
+      vStream := TMemoryStream.Create;
+      Try
+       vTempQuery.RESTDWStorage := FRESTDWStorage;
+       vTempQuery.SaveToStreamCompatibleMode(vStream);
+       vStream.Position := 0;
+      Finally
+      End;
+    end
     Else
      Begin
       vStream := TMemoryStream.Create;
@@ -3665,8 +3699,14 @@ Begin
     End;
     vTempQuery.Open;
     vStream := Nil;
-    If aBinaryCompatibleMode Then
-     TRESTDWClientSQLBase.SaveToStream(TDataSet(vTempQuery.Owner), vStream)
+    If aBinaryCompatibleMode Then begin
+      vStream := TMemoryStream.Create;
+      Try
+       vTempQuery.SaveToStreamCompatibleMode(vStream);
+       vStream.Position := 0;
+      Finally
+      End;
+    end
     Else
      Begin
       vStream := TMemoryStream.Create;

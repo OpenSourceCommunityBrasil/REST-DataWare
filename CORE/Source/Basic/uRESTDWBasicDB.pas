@@ -8396,47 +8396,9 @@ Begin
  vCreateDS := True;
  SetInBlockEvents(True);
  Try
-  {$IFDEF FPC}
-   {$IFDEF ZEOSDRIVER} //TODO
-   {$ENDIF}
-   {$IFDEF RESTDWMEMTABLE}
-    TRESTDWMemtable(Self).Close;
-    TRESTDWMemtable(Self).Open;
-   {$ENDIF}
-   {$IFDEF LAZDRIVER}
-    TMemDataset(Self).CreateTable;
-    TMemDataset(Self).Open;
-   {$ENDIF}
-   {$IFDEF RESTDWUNIDACMEM}
-    TVirtualTable(Self).Close;
-    TVirtualTable(Self).Open;
-   {$ENDIF}
-  {$ELSE}
-   {$IFDEF CLIENTDATASET}
-    TClientDataset(Self).CreateDataSet;
-    TClientDataset(Self).Open;
-   {$ENDIF}
-   {$IFDEF RESTDWUNIDACMEM}
-    TVirtualTable(Self).Close;
-    TVirtualTable(Self).Open;
-   {$ENDIF}
-   {$IFDEF RESTKBMMEMTABLE}
-    Tkbmmemtable(Self).Close;
-    Tkbmmemtable(Self).open;
-   {$ENDIF}
-   {$IFDEF RESTDWFDMEMTABLE}
-    TFDmemtable(Self).CreateDataSet;
-    TFDmemtable(Self).Open;
-   {$ENDIF}
-   {$IFDEF RESTADMEMTABLE}
-    TADmemtable(Self).CreateDataSet;
-    TADmemtable(Self).Open;
-   {$ENDIF}
-   {$IFDEF RESTDWMEMTABLE}
-    TRESTDWMemtable(Self).Close;
-    TRESTDWMemtable(Self).Open;
-   {$ENDIF}
-  {$ENDIF}
+
+  EmptyTable;
+
   vCreateDS := False;
   vActive   := Not vCreateDS;
  Finally
@@ -10579,10 +10541,14 @@ Begin
            vTempDS := TRESTDWClientSQL.Create(Nil);
            Try
             TRESTDWClientSQLBase(vTempDS).BinaryCompatibleMode := BinaryCompatibleMode;
+{
+// fernando
             If BinaryCompatibleMode Then
              TRESTDWClientSQLBase(vTempDS).LoadFromStream(TMemoryStream(vStream), stMetadata)
             Else
              TRESTDWClientSQL(vTempDS).LoadFromStream(TMemoryStream(vStream));
+}
+            TRESTDWClientSQL(vTempDS).LoadFromStream(vStream);
             NewBinaryFieldList;
            Finally
             FreeAndNil(vTempDS);
@@ -10888,10 +10854,13 @@ Begin
            vTempDS := TRESTDWClientSQL.Create(Nil);
            Try
             TRESTDWClientSQLBase(vTempDS).BinaryCompatibleMode := BinaryCompatibleMode;
+{ // fernando
             If BinaryCompatibleMode Then
              TRESTDWClientSQLBase(vTempDS).LoadFromStream(TMemoryStream(vStream), stMetadata)
             Else
              TRESTDWClientSQL(vTempDS).LoadFromStream(TMemoryStream(vStream));
+}
+            TRESTDWClientSQL(vTempDS).LoadFromStream(vStream);
             NewBinaryFieldList;
            Finally
             FreeAndNil(vTempDS);
@@ -11130,7 +11099,7 @@ Begin
   Exit;
  vInBlockEvents := True;
  Try
-  TRESTDWClientSQLBase(Self).SaveToStream(Stream);
+  TRESTDWClientSQLBase(Self).SaveToStream(TStream(Stream));
  Finally
   vInBlockEvents := False;
  End;
@@ -11142,7 +11111,7 @@ Begin
   Exit;
  vInBlockEvents := True;
  Try
-  TRESTDWClientSQLBase(Self).SaveToStream(Stream);
+  TRESTDWClientSQLBase(Self).SaveToStream(TStream(Stream));
  Finally
   vInBlockEvents := False;
  End;

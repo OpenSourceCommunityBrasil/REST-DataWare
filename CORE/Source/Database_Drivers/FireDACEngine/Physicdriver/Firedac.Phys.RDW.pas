@@ -35,7 +35,7 @@ type
   TRESTDWFDPhysicDriver     = class;
   TFDPhysRDWConnection = class;
 
-  TRESTDWFDPhysicDriver = class(TRESTDWFDPhysicDriverBase)
+  TRESTDWFDPhysicDriver = class(TFDPhysRDWDriverBase)
   private
     // function GetDriverParams(AKeys: TStrings): TStrings;
   protected

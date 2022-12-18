@@ -30,8 +30,7 @@ uses
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes,
   FireDAC.Comp.Client, FireDAC.Comp.DataSet, FireDAC.Stan.StorageBin,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.DApt.Intf, FireDAC.DApt,
-  FireDAC.Stan.Param, FireDAC.DatS, DB, uRESTDWPhysicBase, uRESTDWBasicDB,
-  Firedac.Phys.RDW, uRESTDWFDClientSQL;
+  FireDAC.Stan.Param, FireDAC.DatS, DB, uRESTDWBasicDB, Firedac.Phys.RDW;
 
 const
   rdwFireDACDrivers : array[0..17] of string = (('ads'),('asa'),('db2'),('ds'),
@@ -113,29 +112,14 @@ type
                                      var AConnection        : TComponent); override;
   end;
 
-  Type
-   TRESTDWPhysicFireDAC = Class(TRESTDWPhysicBase)
-  Protected
-   Function  CreateComponent    : TComponent; Override;
-   Procedure CopyDataset(Source : TDataset;
-                         Dest   : TDataset);Override;
-  Public
-   Constructor Create   (AOwner : TComponent);Override;
-  End;
-
-//  Type
-//   TRESTDWFDClientSQL = Class(TRESTDWClientSQL)
-//  Public
-//   Constructor Create   (AOwner : TComponent);Override;
-//  End;
-
 procedure Register;
 
 implementation
 
 procedure Register;
 begin
-  RegisterComponents('REST Dataware - Drivers', [TRESTDWFireDACDriver, TRESTDWFDPhysicDriver, TRESTDWFDClientSQL]);
+  RegisterComponents('REST Dataware - Drivers', [TRESTDWFireDACDriver]);
+  RegisterComponents('REST Dataware - Physicals', [TRESTDWFDPhysicDriverLink]);
 end;
 
 { TRESTDWFireDACStoreProc }
@@ -533,35 +517,6 @@ begin
 
   stream.Position := 0;
 end;
-
-{ TRESTDWPhysicFireDAC }
-
-procedure TRESTDWPhysicFireDAC.CopyDataset(Source : TDataset;
-                                           Dest   : TDataset);
-Begin
- FreeAndNil(Dest);
- Dest := TFDMemtable(CreateComponent);
- TFDMemtable(Dest).CloneCursor(TFDMemtable(Source));
-End;
-
-Constructor TRESTDWPhysicFireDAC.Create(AOwner: TComponent);
-Begin
- Inherited;
- SetBaseComponentClass(TFDMemtable);
-End;
-
-Function TRESTDWPhysicFireDAC.CreateComponent : TComponent;
-Begin
- Result := Inherited CreateComponent;
-End;
-
-//{ TRESTDWFDClientSQL }
-//
-//Constructor TRESTDWFDClientSQL.Create(AOwner: TComponent);
-//Begin
-// Inherited;
-// PPointer(Self)^ := TRESTDWClientSQL(TFDMemtable.Create(Nil));
-//End;
 
 end.
 

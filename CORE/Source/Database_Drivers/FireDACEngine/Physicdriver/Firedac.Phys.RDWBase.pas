@@ -841,6 +841,12 @@ end;
 function TFDPhysRDWCommand.InternalColInfoGet(var AColInfo: TFDPhysDataColumnInfo): Boolean;
 var
   iCount: Integer;
+  fld : TField;
+  datType : TFDDataType;
+  datSize : LongWord;
+  datPrec : integer;
+  datScale : integer;
+  datAttrs : TFDDataAttributes;
 begin
   if AColInfo.FParentTableSourceID <> -1 then
     begin
@@ -858,23 +864,43 @@ begin
         end;
     end;
 
+// fernando
+{
   with FRDWCommand.FDsResult.GetFieldColumn(FRDWCommand.FDsResult.Fields[FColumnIndex - 1]) do
     begin
       AColInfo.FSourceID   := FColumnIndex;
-      AColInfo.FSourceName := SourceName;
+      AColInfo.FSourceName := DisplayName;
       // AColInfo.FOriginColName
       AColInfo.FSourceType := DataType;
       AColInfo.FType       := DataType;
       // AColInfo.FOriginTabName:= OriginTabName;
       AColInfo.FAttrs := Attributes;
 
-      AColInfo.FLen := StorageSize;
+      AColInfo.FLen := Size;
 
       AColInfo.FPrec  := Precision;
-      AColInfo.FScale := Scale;
+      AColInfo.FScale := 0;
 
       AColInfo.FForceAddOpts := Options;
     end;
+}
+// novo
+  fld := FRDWCommand.FDsResult.Fields[FColumnIndex - 1];
+
+  TFDFormatOptions.FieldDef2ColumnDef(fld,datType,datSize,datPrec,datScale,datAttrs);
+
+  AColInfo.FSourceID   := FColumnIndex;
+  AColInfo.FSourceName := fld.DisplayName;
+  // AColInfo.FOriginColName
+  AColInfo.FSourceType := datType;
+  AColInfo.FType       := datType;
+  // AColInfo.FOriginTabName:= OriginTabName;
+  AColInfo.FAttrs := datAttrs;
+
+  AColInfo.FLen := datSize;
+
+  AColInfo.FPrec  := datPrec;
+  AColInfo.FScale := datScale;
 
   Inc(FColumnIndex);
   Result := True;
@@ -1035,6 +1061,7 @@ var
   oRow    : TFDDatSRow;
   j       : Integer;
   pData   : Pointer;
+  vData   : Variant;
   iLen    : LongWord;
   oFmtOpts: TFDFormatOptions;
 begin
@@ -1047,8 +1074,13 @@ begin
         oCol := ATable.Columns[j];
         if (oCol.SourceID > 0) and CheckFetchColumn(oCol.SourceDataType, oCol.Attributes) then
           begin
-            FRDWCommand.FDsResult.SourceView.Rows[FRDWCommand.FDsResult.RecNo - 1]
-              .GetData(oCol.SourceID - 1, rvDefault, pData, 0, iLen, False);
+// fernando
+//            FRDWCommand.FDsResult.SourceView.Rows[FRDWCommand.FDsResult.RecNo - 1]
+//              .GetData(oCol.SourceID - 1, rvDefault, pData, 0, iLen, False);
+// novo
+            vData := FRDWCommand.FDsResult.Fields[oCol.SourceID - 1].Value;
+            pData := @vData;
+            iLen := FRDWCommand.FDsResult.Fields[oCol.SourceID - 1].Size;
 
             oRow.SetData(j, pData, iLen);
           end;
