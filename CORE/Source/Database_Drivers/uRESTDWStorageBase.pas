@@ -3,7 +3,7 @@ unit uRESTDWStorageBase;
 interface
 
 uses
-  Classes, SysUtils, uRESTDWComponentBase, DB, uRESTDWEncodeClass;
+  Classes, SysUtils, uRESTDWComponentBase, DB, uRESTDWEncodeClass, uRESTDWConsts;
 
 type
   TRESTDWStorageBase = class(TRESTDWComponent)

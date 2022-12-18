@@ -22,10 +22,12 @@ unit uRESTDWMemoryDataset;
 }
 
 interface
+
 uses
   Windows,  // to avoid warning under BDS2006, and in the interface section to allow compilation in RS2008
-  SysUtils, Classes, DB, Variants,
+  SysUtils, Classes, DB, Variants, uRESTDWStorageBinRDW, uRESTDWStorageBase,
   JvDBUtils, JvExprParser, JvDBFilterExpr;
+
 type
   TPVariant = ^Variant;
   TApplyMode = (amNone, amAppend, amMerge);
@@ -96,6 +98,7 @@ type
     FClearing: Boolean;
     FUseDataSetFilter: Boolean;
     FTrimEmptyString: Boolean;
+    FRESTDWStorage : TRESTDWStorageBase;
     function AddRecord: TJvMemoryRecord;
     function InsertRecord(Index: Integer): TJvMemoryRecord;
     function FindRecordID(ID: Integer): TJvMemoryRecord;
@@ -224,6 +227,11 @@ type
     function ApplyChanges: Boolean;
     function IsLoading: Boolean;
     function IsSaving: Boolean;
+    Procedure SaveToStream(var Stream : TStream);
+    Procedure LoadFromStream(Stream : TStream);
+
+    Procedure Assign(Source : TPersistent); Reintroduce;  Overload; Override;
+
     property RowsOriginal: Integer read FRowsOriginal;
     property RowsChanged: Integer read FRowsChanged;
     property RowsAffected: Integer read FRowsAffected;
@@ -246,6 +254,7 @@ type
     property AutoIncAsInteger: Boolean read FAutoIncAsInteger write FAutoIncAsInteger default False;
     property OneValueInArray: Boolean read FOneValueInArray write FOneValueInArray default True;
     property TrimEmptyString: Boolean read FTrimEmptyString write FTrimEmptyString default True;
+    property RESTDWStorage : TRESTDWStorageBase read FRESTDWStorage write FRESTDWStorage;
     property BeforeOpen;
     property AfterOpen;
     property BeforeClose;
@@ -560,6 +569,7 @@ begin
   FOneValueInArray := True;
   FDataSetClosed := False;
   FTrimEmptyString := True;
+  FRESTDWStorage := nil;
 end;
 destructor TRESTDWMemTable.Destroy;
 var
@@ -1292,6 +1302,14 @@ begin
     inherited DataConvert(Field, Source, Dest, ToNative);
 end;
 {$ENDIF ~COMPILER10_UP}
+procedure TRESTDWMemTable.Assign(Source: TPersistent);
+begin
+  if Source is TDataSet then
+    LoadFromDataSet(TDataSet(Source), -1, lmCopy)
+  else
+    inherited Assign(Source);
+end;
+
 procedure TRESTDWMemTable.AssignMemoryRecord(Rec: TJvMemoryRecord; Buffer: PJvMemBuffer);
 var
   I: Integer;
@@ -1848,7 +1866,7 @@ begin
     Source.CheckBrowseMode;
   Source.UpdateCursorPos;
   SB := Source.GetBookmark;
-  //***************************  
+  //***************************
   try
     //********** Dest (self) ***********
     if DisableAllControls then
@@ -1945,6 +1963,23 @@ begin
     FSaveLoadState := slsNone;
   end;
 end;
+procedure TRESTDWMemTable.LoadFromStream(Stream: TStream);
+var
+  stor : TRESTDWStorageBinRDW;
+begin
+  if FRESTDWStorage = nil then begin 
+    stor := TRESTDWStorageBinRDW.Create(nil);
+    try
+      stor.LoadDatasetFromStream(Self, Stream);
+    finally
+      stor.Free;
+    end;
+  end
+  else begin
+    FRESTDWStorage.LoadDatasetFromStream(Self, Stream);    
+  end;
+end;
+
 function TRESTDWMemTable.SaveToDataSet(Dest: TDataSet; RecordCount: Integer;
   DisableAllControls: Boolean = True): Integer;
 var
@@ -2048,6 +2083,24 @@ begin
     FSaveLoadState := slsNone;
   end;
 end;
+
+procedure TRESTDWMemTable.SaveToStream(var Stream: TStream);
+var
+  stor : TRESTDWStorageBinRDW;
+begin
+  if FRESTDWStorage = nil then begin  
+    stor := TRESTDWStorageBinRDW.Create(nil);
+    try
+      stor.SaveDatasetToStream(TDataset(Self), Stream);
+    finally
+      stor.Free;
+    end;
+  end
+  else begin
+    FRESTDWStorage.SaveDatasetToStream(TDataset(Self), Stream);
+  end;
+end;
+
 procedure TRESTDWMemTable.SortOnFields(const FieldNames: string = '';
   CaseInsensitive: Boolean = True; Descending: Boolean = False);
 begin
@@ -2070,6 +2123,7 @@ begin
     raise;
   end;
 end;
+
 procedure TRESTDWMemTable.SwapRecords(Idx1, Idx2: integer);
 begin
   FRecords.Exchange(Idx1, Idx2);

@@ -802,7 +802,7 @@ Begin
  RegisterComponents('REST Dataware - API',         [TRESTDWServerEvents, TRESTDWServerContext, TRESTDWContextRules]);
  RegisterComponents('REST Dataware - Tools',       [TRESTDWResponseTranslator, TRESTDWBufferDB]);
 
- RegisterComponents('REST Dataware - DB',          [TRESTDWPoolerDB,        TRESTDWMemTable, TRESTDWTable,      TRESTDWUpdateSQL,
+ RegisterComponents('REST Dataware - DB',          [TRESTDWPoolerDB,        TRESTDWMemTable,        TRESTDWClientSQL,     TRESTDWTable,  TRESTDWUpdateSQL,
                                                     TRESTDWMassiveSQLCache, TRESTDWStoredProcedure, TRESTDWMassiveCache,  TRESTDWBatchMove]);
 // AddIDEMenu;//Menu do REST Debugger
  {$IFNDEF FPC}

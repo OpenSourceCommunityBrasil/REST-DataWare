@@ -3,8 +3,7 @@ unit uRESTDWStorageBinRDW;
 interface
 
 uses
-  Classes, SysUtils, uRESTDWStorageBase, DB, uRESTDWConsts, uRESTDWBasicTypes,
-  uRESTDWTools;
+  Classes, SysUtils, uRESTDWStorageBase, DB, uRESTDWConsts;
 
 type
   TRESTDWStorageBinRDW = class(TRESTDWStorageBase)
@@ -19,6 +18,9 @@ type
   end;
 
 implementation
+
+uses
+  uRESTDWBasicTypes, uRESTDWTools;
 
 { TRESTDWStorageBinRDW }
 
@@ -38,6 +40,9 @@ begin
   stream.Read(fc,SizeOf(Integer));
 
   SetLength(FFieldTypes,fc);
+
+  Stream.Read(b, Sizeof(Byte));
+  EncodeStrs := b;
 
   dataset.Close;
   dataset.FieldDefs.Clear;
@@ -228,11 +233,20 @@ var
 begin
   stream.Size := 0;
 
-  i := Dataset.Fields.Count;
+  if not Dataset.Active then
+    Dataset.Open
+  else
+    Dataset.CheckBrowseMode;
+  Dataset.UpdateCursorPos;
+
+  i := Dataset.FieldCount;
   stream.Write(i,SizeOf(integer));
 
+  b := EncodeStrs;
+  stream.Write(b,SizeOf(Byte));
+
   i := 0;
-  while i < Dataset.Fields.Count do begin
+  while i < Dataset.FieldCount do begin
     j := Ord(Dataset.Fields[i].FieldKind);
     stream.Write(j,SizeOf(Integer));
 

@@ -20,8 +20,8 @@ implementation
 uses
   System.SysUtils, System.IniFiles, System.Variants,
   FireDAC.Stan.Intf, FireDAC.Stan.Consts, FireDAC.Stan.Util,
-  FireDAC.DatS,
-  FireDAC.Phys.Intf, FireDAC.Phys, FireDAC.Phys.SQLGenerator, FireDAC.Phys.Meta,
+  FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.Phys, FireDAC.Phys.SQLGenerator,
+  FireDAC.Phys.Meta,
 {$IFNDEF FireDAC_MOBILE}
   FireDAC.Phys.MSAccMeta, FireDAC.Phys.MSSQLMeta, FireDAC.Phys.MySQLMeta,
   FireDAC.Phys.OracleMeta, FireDAC.Phys.DB2Meta, FireDAC.Phys.ASAMeta,
@@ -35,7 +35,7 @@ type
   TRESTDWFDPhysicDriver     = class;
   TFDPhysRDWConnection = class;
 
-  TRESTDWFDPhysicDriver = class(TRESTDWFDPhysicDriverBase)
+  TRESTDWFDPhysicDriver = class(TFDPhysRDWDriverBase)
   private
     // function GetDriverParams(AKeys: TStrings): TStrings;
   protected

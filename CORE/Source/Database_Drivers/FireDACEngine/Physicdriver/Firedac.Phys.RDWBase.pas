@@ -4,13 +4,10 @@ unit Firedac.Phys.RDWBase;
 interface
 
 uses
-  System.SyncObjs, Data.DBXCommon, Data.DB, //
-  FireDAC.Phys, System.Classes, FireDAC.DatS, FireDAC.Stan.Intf, FireDAC.Stan.Error,
-  FireDAC.Stan.Util, FireDAC.Stan.Param, Firedac.Stan.Option, Data.DBCommonTypes,
-  uRESTDWIdBase, uRESTDWParams, uRESTDWBasicTypes, uRESTDWBasicDB,
-  FireDAC.Phys.Intf //
-
-    ;
+  System.SyncObjs, Data.DB, FireDAC.Phys, System.Classes, FireDAC.DatS,
+  FireDAC.Stan.Intf, FireDAC.Stan.Error, FireDAC.Stan.Util, FireDAC.Stan.Param,
+  Firedac.Stan.Option, uRESTDWParams, uRESTDWBasicTypes, uRESTDWBasicDB,
+  FireDAC.Phys.Intf;
 
 type
 
@@ -25,7 +22,8 @@ type
 
   ERDWNativeException = class(EFDDBEngineException)
   public
-    constructor Create(ADBXError: TDBXError; const ADriverName: String = ''); overload;
+    constructor Create(AADCode: Integer; const AMessage: String); overload;
+//    constructor Create(ADBXError: TDBXError; const ADriverName: String = ''); overload;
   end;
 
   // componente para incluir a uses na unit do FDConnection
@@ -40,7 +38,8 @@ type
     FLock             : TCriticalSection;
     FCurrentConnection: TFDPhysRDWConnectionBase;
     // class function GetRegistryFile(const Setting, Default: string): string;
-    procedure DoError(ADBXError: TDBXError);
+//    procedure DoError(ADBXError: TDBXError);
+    procedure DoError(AADCode: Integer);
   public
     constructor Create(AOwningObj: TObject = nil);
     destructor Destroy; override;
@@ -67,12 +66,12 @@ type
 
   TFDPhysRDWConnectionBase = class(TFDPhysConnection)
   private
-    FRDWDatabase   : TRESTDWIdDatabase;
+    FRDWDatabase   : TRESTDWDatabasebaseBase;
     FRdbmsKind     : TFDRDBMSKind;
     FCurrentCommand: TFDPhysRDWCommand;
-{$IFDEF FireDAC_MONITOR}
-    function DoTrace(TraceInfo: TDBXTraceInfo): CBRType;
-{$ENDIF}
+    {$IFDEF FireDAC_MONITOR}
+//    function DoTrace(TraceInfo: TDBXTraceInfo): CBRType;
+    {$ENDIF}
     // Cria os objetos e interfaces de conexão
     procedure GetConnInterfaces;
     // Seta os parametros da conexão
@@ -111,7 +110,7 @@ type
     constructor Create(ADriverObj: TFDPhysDriver; AConnHost: TFDPhysConnectionHost); override;
     destructor Destroy; override;
     // Retorna o RDWDatabase
-    property Database: TRESTDWIdDatabase read FRDWDatabase;
+    property Database: TRESTDWDatabasebaseBase read FRDWDatabase;
     // Property DriverName: String read FDriverName;
     property PhysDriver: TFDPhysRDWDriverBase read GetPhysDriver;
   end;
@@ -141,7 +140,7 @@ type
     // FCmdResult    : uRestDwParams.TJSONValue;
     FDsResult     : TRESTDWClientSQL;
     FLastReader   : TRDWReader;
-    FRDWConnection: TRESTDWIdDatabase;
+    FRDWConnection: TRESTDWDatabasebaseBase;
     FMessageError : string;
     { TODO -oDelcio -cRDW : Ver onde altera FPrepared }
     FPrepared: Boolean;
@@ -295,10 +294,9 @@ implementation
 
 uses
   System.Variants, System.Win.Registry, Winapi.Windows,
-  System.SysUtils, SqlConst, Data.FmtBcd,
-  Data.SqlTimSt, FireDAC.Stan.SQLTimeInt, Data.DBXMetaDataNames,
-  FireDAC.Stan.Consts, uRESTDWJSONObject, uRESTDWPoolermethod,
-  uRESTDWDataUtils, Firedac.Phys.RDWDef, System.StrUtils;
+  System.SysUtils, FireDAC.Stan.SQLTimeInt, FireDAC.Stan.Consts,
+  uRESTDWJSONObject, uRESTDWPoolermethod, uRESTDWDataUtils,
+  Firedac.Phys.RDWDef, System.StrUtils;
 
 { TFDPhysRDWLib }
 
@@ -315,6 +313,12 @@ begin
   inherited Destroy;
 end;
 
+procedure TFDPhysRDWLib.DoError(AADCode: Integer);
+begin
+
+end;
+
+(*
 procedure TFDPhysRDWLib.DoError(ADBXError: TDBXError);
 var
   oObj: TObject;
@@ -336,6 +340,7 @@ begin
   FDFree(ADBXError);
   FDException(oObj, oExc {$IFDEF FireDAC_Monitor}, False {$ENDIF});
 end;
+*)
 
 { TFDPhysRDWDriverBase }
 
@@ -367,6 +372,12 @@ begin
   Result := FLib;
 end;
 
+constructor ERDWNativeException.Create(AADCode: Integer; const AMessage: String);
+begin
+
+end;
+
+{
 constructor ERDWNativeException.Create(ADBXError: TDBXError; const ADriverName: String);
 var
   eKind: TFDCommandExceptionKind;
@@ -392,6 +403,7 @@ begin
     eKind := ekUserPwdInvalid;
   AppendError(1, ADBXError.ErrorCode, ADBXError.Message, '', eKind, -1, -1);
 end;
+}
 
 { TFDPhysRDWConnectionBase }
 
@@ -461,6 +473,7 @@ begin
     end;
 end;
 
+(*
 function TFDPhysRDWConnectionBase.DoTrace(TraceInfo: TDBXTraceInfo): CBRType;
 var
   oObj: TObject;
@@ -478,6 +491,7 @@ begin
   GetMonitor.Notify(ekVendor, esProgress, oObj, TraceInfo.Message, []);
   Result := cbrUSEDEF;
 end;
+*)
 
 procedure TFDPhysRDWConnectionBase.InternalTracingChanged;
 begin
@@ -500,18 +514,17 @@ begin
   PhysDriver.Lib.FLock.Enter;
   PhysDriver.Lib.FCurrentConnection := Self;
   try
-    if FRDWDatabase = nil then
-      begin
-        FRDWDatabase              := TRESTDWIdDatabase.Create(nil);
-        FRDWDatabase.OnConnection := DoEventConnecton;
-{$IFDEF FireDAC_MONITOR}
-        if GetTracing then
-          begin
+    if FRDWDatabase = nil then begin
+      // fernando
+      //FRDWDatabase              := TRESTDWIdDatabase.Create(nil);
+      FRDWDatabase.OnConnection := DoEventConnecton;
+      {$IFDEF FireDAC_MONITOR}
+        if GetTracing then begin
             { TODO -oDelcio -cRDW: Implementar Monitor Tracing }
-          end;
+        end;
         InternalTracingChanged;
-{$ENDIF}
-      end;
+      {$ENDIF}
+    end;
   finally
     PhysDriver.Lib.FCurrentConnection := nil;
     PhysDriver.Lib.FLock.Leave;
@@ -841,6 +854,12 @@ end;
 function TFDPhysRDWCommand.InternalColInfoGet(var AColInfo: TFDPhysDataColumnInfo): Boolean;
 var
   iCount: Integer;
+  fld : TField;
+  datType : TFDDataType;
+  datSize : LongWord;
+  datPrec : integer;
+  datScale : integer;
+  datAttrs : TFDDataAttributes;
 begin
   if AColInfo.FParentTableSourceID <> -1 then
     begin
@@ -858,23 +877,43 @@ begin
         end;
     end;
 
+// fernando
+{
   with FRDWCommand.FDsResult.GetFieldColumn(FRDWCommand.FDsResult.Fields[FColumnIndex - 1]) do
     begin
       AColInfo.FSourceID   := FColumnIndex;
-      AColInfo.FSourceName := SourceName;
+      AColInfo.FSourceName := DisplayName;
       // AColInfo.FOriginColName
       AColInfo.FSourceType := DataType;
       AColInfo.FType       := DataType;
       // AColInfo.FOriginTabName:= OriginTabName;
       AColInfo.FAttrs := Attributes;
 
-      AColInfo.FLen := StorageSize;
+      AColInfo.FLen := Size;
 
       AColInfo.FPrec  := Precision;
-      AColInfo.FScale := Scale;
+      AColInfo.FScale := 0;
 
       AColInfo.FForceAddOpts := Options;
     end;
+}
+// novo
+  fld := FRDWCommand.FDsResult.Fields[FColumnIndex - 1];
+
+  TFDFormatOptions.FieldDef2ColumnDef(fld,datType,datSize,datPrec,datScale,datAttrs);
+
+  AColInfo.FSourceID   := FColumnIndex;
+  AColInfo.FSourceName := fld.DisplayName;
+  // AColInfo.FOriginColName
+  AColInfo.FSourceType := datType;
+  AColInfo.FType       := datType;
+  // AColInfo.FOriginTabName:= OriginTabName;
+  AColInfo.FAttrs := datAttrs;
+
+  AColInfo.FLen := datSize;
+
+  AColInfo.FPrec  := datPrec;
+  AColInfo.FScale := datScale;
 
   Inc(FColumnIndex);
   Result := True;
@@ -1035,6 +1074,7 @@ var
   oRow    : TFDDatSRow;
   j       : Integer;
   pData   : Pointer;
+  vData   : Variant;
   iLen    : LongWord;
   oFmtOpts: TFDFormatOptions;
 begin
@@ -1047,8 +1087,13 @@ begin
         oCol := ATable.Columns[j];
         if (oCol.SourceID > 0) and CheckFetchColumn(oCol.SourceDataType, oCol.Attributes) then
           begin
-            FRDWCommand.FDsResult.SourceView.Rows[FRDWCommand.FDsResult.RecNo - 1]
-              .GetData(oCol.SourceID - 1, rvDefault, pData, 0, iLen, False);
+// fernando
+//            FRDWCommand.FDsResult.SourceView.Rows[FRDWCommand.FDsResult.RecNo - 1]
+//              .GetData(oCol.SourceID - 1, rvDefault, pData, 0, iLen, False);
+// novo
+            vData := FRDWCommand.FDsResult.Fields[oCol.SourceID - 1].Value;
+            pData := @vData;
+            iLen := FRDWCommand.FDsResult.Fields[oCol.SourceID - 1].Size;
 
             oRow.SetData(j, pData, iLen);
           end;

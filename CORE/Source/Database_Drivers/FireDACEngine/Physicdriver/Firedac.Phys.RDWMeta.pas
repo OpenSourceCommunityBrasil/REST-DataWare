@@ -4,8 +4,7 @@ unit Firedac.Phys.RDWMeta;
 interface
 
 uses
-  System.Classes,
-  FireDAC.Stan.Intf,
+  System.Classes, FireDAC.Stan.Intf, uRESTDWBasicDB,
   FireDAC.Phys.Intf, FireDAC.Phys, FireDAC.Phys.Meta, Firedac.Phys.RDW;
 
 type
@@ -35,28 +34,20 @@ type
 implementation
 
 uses
-  System.SysUtils,
-  Data.DBXCommon, Data.DBXMetaDataWriterFactory, Data.DBXMetaDataWriter,
-  FireDAC.Stan.Util, uRESTDWIdBase;
+  System.SysUtils, FireDAC.Stan.Util;
 
 {-------------------------------------------------------------------------------}
 { TFDPhysRDWMetadata                                                           }
 {-------------------------------------------------------------------------------}
 constructor TFDPhysRDWMetadata.Create(const AConnection: TFDPhysConnection;
   const ACSVKeywords: String);
-type
-  TDBXDatabaseMetaDataEx = TDBXDatabaseMetaData;
-  TDBXConnectionEx = TRESTDWIdDatabase;
 var
-  oDbxConn: TRESTDWIdDatabase;
- // oDbxMeta: TDBXDatabaseMetaData;
-  oDbxMetaWrtr: TDBXMetaDataWriter;
- // s: String;
+  oDbxConn: TRESTDWDatabasebaseBase;
   iClntVer: TFDVersion;
 begin
 {TODO -oDelcio -cGeneral : Implementar  TFDPhysRDWMetadata.Create}
 
-  oDbxConn := TRESTDWIdDatabase(AConnection.CliObj);
+  oDbxConn := TRESTDWDatabasebaseBase(AConnection.CliObj);
  // oDbxMeta := oDbxConn.DatabaseMetaData;
 //  if oDbxConn is TDBXConnectionEx then
 //    iClntVer := FDVerStr2Int(TDBXConnectionEx(oDbxConn).ProductVersion)
@@ -93,7 +84,7 @@ begin
 //      oDbxMetaWrtr := TDBXMetaDataWriterFactory.CreateWriter(TDBXConnectionEx(oDbxConn).ProductName);
 //    except
 //      // no visible exception, if metadata is not registered
-      oDbxMetaWrtr := nil;
+//      oDbxMetaWrtr := nil;
 //    end;
 //    if oDbxMetaWrtr <> nil then begin
 //      FNameParts := [npBaseObject, npObject];
