@@ -30,20 +30,9 @@ package RESTDWFireDACDriver;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl,
-  RESTDWCore,
-  DbxCommonDriver,
-  IndySystem,
-  IndyProtocols,
-  IndyCore,
-  dbexpress,
-  RESTDWSocketIndy;
+  RESTDWCore;
 
 contains
-  Firedac.Phys.RDW in '..\..\..\..\Source\Database_Drivers\FireDACEngine\Physicdriver\Firedac.Phys.RDW.pas',
-  Firedac.Phys.RDWBase in '..\..\..\..\Source\Database_Drivers\FireDACEngine\Physicdriver\Firedac.Phys.RDWBase.pas',
-  Firedac.Phys.RDWDef in '..\..\..\..\Source\Database_Drivers\FireDACEngine\Physicdriver\Firedac.Phys.RDWDef.pas',
-  Firedac.Phys.RDWMeta in '..\..\..\..\Source\Database_Drivers\FireDACEngine\Physicdriver\Firedac.Phys.RDWMeta.pas',
   uRESTDWFireDACDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWFireDACDriver.pas';
 
 end.

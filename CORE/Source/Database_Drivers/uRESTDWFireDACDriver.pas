@@ -30,7 +30,7 @@ uses
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes,
   FireDAC.Comp.Client, FireDAC.Comp.DataSet, FireDAC.Stan.StorageBin,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.DApt.Intf, FireDAC.DApt,
-  FireDAC.Stan.Param, FireDAC.DatS, DB, uRESTDWBasicDB, Firedac.Phys.RDW;
+  FireDAC.Stan.Param, FireDAC.DatS, DB, uRESTDWBasicDB;
 
 const
   rdwFireDACDrivers : array[0..17] of string = (('ads'),('asa'),('db2'),('ds'),
@@ -119,7 +119,7 @@ implementation
 procedure Register;
 begin
   RegisterComponents('REST Dataware - Drivers', [TRESTDWFireDACDriver]);
-  RegisterComponents('REST Dataware - Physicals', [TRESTDWFDPhysicDriverLink]);
+//  RegisterComponents('REST Dataware - Physicals', [TRESTDWFDPhysicDriverLink]);
 end;
 
 { TRESTDWFireDACStoreProc }
