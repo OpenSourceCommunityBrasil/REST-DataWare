@@ -2069,8 +2069,6 @@ Begin
      {$IFNDEF FPC}{$IF (CompilerVersion = 23) OR (CompilerVersion = 24)}
      //TODO
      {$ELSE}
-      {$IFNDEF OLDINDY}
-       {$IFDEF INDY_NEW}
         {$IF CompilerVersion > 26} // Delphi XE6 pra cima
         If Assigned(SendParams) Then
          Begin
@@ -2082,8 +2080,6 @@ Begin
         Else
          TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodPatch, AUrl, temp, atempResponse, []);
         {$IFEND}
-       {$ENDIF}
-      {$ENDIF}
      {$IFEND}
      {$ENDIF}
      FreeAndNil(temp);
@@ -2107,8 +2103,6 @@ Begin
      {$IFNDEF FPC}{$IF (CompilerVersion = 23) OR (CompilerVersion = 24)}
      //TODO
      {$ELSE}
-      {$IFNDEF OLDINDY}
-       {$IFDEF INDY_NEW}
         {$IF CompilerVersion > 26} // Delphi XE6 pra cima
          If Assigned(SendParams) Then
           Begin
@@ -2120,8 +2114,6 @@ Begin
          Else
           TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodPatch, AUrl, temp, Nil, []);
         {$IFEND}
-       {$ENDIF}
-      {$ENDIF}
      {$IFEND}
      {$ENDIF}
      FreeAndNil(temp);
@@ -2242,8 +2234,6 @@ Begin
      {$IFNDEF FPC}{$IF (CompilerVersion = 23) OR (CompilerVersion = 24)}
      //TODO
      {$ELSE}
-      {$IFNDEF OLDINDY}
-       {$IFDEF INDY_NEW}
         {$IF CompilerVersion > 26} // Delphi XE6 pra cima
         If Assigned(SendParams) Then
          Begin
@@ -2255,8 +2245,6 @@ Begin
         Else
          TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodPatch, AUrl, temp, atempResponse, []);
         {$IFEND}
-       {$ENDIF}
-      {$ENDIF}
      {$IFEND}
      {$ENDIF}
      FreeAndNil(temp);
@@ -2280,8 +2268,6 @@ Begin
      {$IFNDEF FPC}{$IF (CompilerVersion = 23) OR (CompilerVersion = 24)}
      //TODO
      {$ELSE}
-      {$IFNDEF OLDINDY}
-       {$IFDEF INDY_NEW}
         {$IF CompilerVersion > 26} // Delphi XE6 pra cima
          If Assigned(SendParams) Then
           Begin
@@ -2293,8 +2279,6 @@ Begin
          Else
           TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodPatch, AUrl, temp, Nil, []);
         {$IFEND}
-       {$ENDIF}
-      {$ENDIF}
      {$IFEND}
      {$ENDIF}
      FreeAndNil(temp);
@@ -2648,11 +2632,7 @@ Begin
    {$IFDEF FPC}
     HttpRequest.Delete(AUrl, atempResponse);
    {$ELSE}
-    {$IFDEF OLDINDY}
-     HttpRequest.Delete(AUrl);
-    {$ELSE}
      TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, AUrl, SendParams, atempResponse, []);
-    {$ENDIF}
    {$ENDIF}
    Result:= HttpRequest.ResponseCode;
    If Assigned(atempResponse) Then
@@ -2751,11 +2731,7 @@ Begin
    {$IFDEF FPC}
     HttpRequest.Delete(AUrl, atempResponse);
    {$ELSE}
-    {$IFDEF OLDINDY}
-     HttpRequest.Delete(AUrl);
-    {$ELSE}
      TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, AUrl, SendParams, atempResponse, []);
-    {$ENDIF}
    {$ENDIF}
    Result:= HttpRequest.ResponseCode;
    If Assigned(atempResponse) Then
