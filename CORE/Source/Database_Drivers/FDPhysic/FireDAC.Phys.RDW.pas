@@ -10,14 +10,14 @@ uses
   FireDAC.Phys.RDWBase;
 
 type
-  [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidOSX32 or pidiOSSimulator or
-    pidiOSDevice32 or pidiOSDevice64 or pidAndroid)] 
+  [ComponentPlatformsAttribute(pfidWindows or pfidOSX or pfidLinux)]
   TFDPhysRDWDriverLink = class(TFDPhysRDWBaseDriverLink)
 
   end;
 
 procedure register;
 
+{-------------------------------------------------------------------------------}
 implementation
 
 uses
@@ -44,10 +44,6 @@ begin
   RegisterComponents('REST Dataware - Physicals', [TFDPhysRDWDriverLink]);
 end;
 
-{-------------------------------------------------------------------------------}
-{ TFDPhysRDWDriver                                                           }
-{-------------------------------------------------------------------------------}
-
 function TFDPhysRDWDriver.InternalCreateConnection(
   AConnHost: TFDPhysConnectionHost): TFDPhysConnection;
 begin
@@ -63,7 +59,7 @@ end;
 {-------------------------------------------------------------------------------}
 class function TFDPhysRDWDriver.GetBaseDriverDesc: String;
 begin
-  Result := 'Rest Dataware Data Source';
+  Result := 'Rest Dataware';
 end;
 
 {-------------------------------------------------------------------------------}
@@ -86,15 +82,9 @@ end;
 
 {-------------------------------------------------------------------------------}
 initialization
- {$if CompilerVersion > 31}
   FDRegisterDriverClass(TFDPhysRDWDriver);
- {$ELSE}
-  FDPhysManager.RegisterDriverClass(TFDPhysRDWDriver);
- {$IFEND}
 
 finalization
- {$if CompilerVersion > 31}
   FDUnregisterDriverClass(TFDPhysRDWDriver);
- {$IFEND}
 
 end.

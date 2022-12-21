@@ -5302,7 +5302,8 @@ Begin
   Begin
    vConnected := Value;
    vMyIP := '';
-   If vAuthOptionParams.AuthorizationOption in [rdwAOBearer, rdwAOToken] Then
+   If (Assigned(vAuthOptionParams)) and
+      (vAuthOptionParams.AuthorizationOption in [rdwAOBearer, rdwAOToken]) Then
     Begin
      Case vAuthOptionParams.AuthorizationOption Of
       rdwAOBearer : TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).Token := '';
