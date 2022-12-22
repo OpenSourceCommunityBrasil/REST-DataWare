@@ -1,6 +1,7 @@
-package PhysRDW;
+package RESTDWFireDACPhysLink;
 
 {$R *.res}
+{$R 'RESTDWFireDACPhysLink.dcr'}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -28,20 +29,12 @@ package PhysRDW;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl,
-  designide,
-  vcl,
-  vclactnband,
-  vclx,
-  xmlrtl,
-  dbrtl,
   FireDACCommonDriver,
   FireDACCommon,
-  soaprtl,
   FireDAC,
   RESTDWCore;
 
 contains
-  FireDAC.Phys.RDW in 'FireDAC.Phys.RDW.pas';
+  FireDAC.Phys.RDW in '..\..\..\Source\Database_Drivers\FireDACPhysLink\FireDAC.Phys.RDW.pas';
 
 end.
