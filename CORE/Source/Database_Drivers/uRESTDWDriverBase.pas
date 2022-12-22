@@ -2420,7 +2420,7 @@ begin
       connStartTransaction;
 
     vTempQuery.SQL.Clear;
-    vTempQuery.SQL.Add(SQL);
+    vTempQuery.SQL.Text := SQL;
     vTempQuery.ImportParams(Params);
     if not Execute then begin
       if Assigned(Self.OnQueryBeforeOpen) then

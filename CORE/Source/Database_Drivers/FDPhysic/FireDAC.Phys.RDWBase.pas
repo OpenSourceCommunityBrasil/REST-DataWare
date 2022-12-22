@@ -72,6 +72,7 @@ type
 
     function readFieldStream : TFDPhysDataColumnInfo;
     function readDataStream(col : integer) : Variant;
+    procedure readStreamFields;
 
     function RDWExecuteComand(exec : boolean = False) : Longint;
     function RDWGetTables : integer;
@@ -172,7 +173,10 @@ end;
 function TFDPhysRDWConnectionBase.InternalCreateCommandGenerator(
   const ACommand: IFDPhysCommand): TFDPhysCommandGenerator;
 begin
-  Result := TFDPhysCommandGenerator.Create(ACommand);
+  if Assigned(ACommand) then
+    Result := TFDPhysRDWCommandGenerator.Create(ACommand)
+  else
+    Result := TFDPhysRDWCommandGenerator.Create(Self);
 end;
 
 function TFDPhysRDWConnectionBase.InternalCreateMetadata: TObject;
@@ -264,32 +268,29 @@ begin
       oRow.SetData(2, null); // SCHEMA_NAME
       oRow.SetData(3, GetBaseObjectName); // TABLE_NAME
       oRow.SetData(4, null); // INDEX_NAME
-      oRow.SetData(5, FInfoMetada.Strings[ARow]); // COLUMN_NAME
-      oRow.SetData(6, ARow); // COLUMN_POSITION
-      oRow.SetData(7, null); // SORT_ORDER
-      oRow.SetData(8, null); // FILTER
+      oRow.SetData(5, Trim(FInfoMetada.Strings[ARow])); // CONSTRAINT_NAME
+      oRow.SetData(6, ARow); // INDEX_TYPE
     end
     else if GetMetaInfoKind = mkTables then begin
       oRow.SetData(0, ARow); // RECNO
       oRow.SetData(1, null); // CATALOG_NAME
       oRow.SetData(2, null); // SCHEMA_NAME
-      oRow.SetData(3, FInfoMetada.Strings[ARow]); // TABLE_NAME
-      oRow.SetData(4, null); // INDEX_NAME
-      oRow.SetData(5, null); // COLUMN_NAME
-      oRow.SetData(6, null); // COLUMN_POSITION
-      oRow.SetData(7, ARow); // SORT_ORDER
-      oRow.SetData(8, null); // FILTER
+      oRow.SetData(3, Trim(FInfoMetada.Strings[ARow])); // TABLE_NAME
+      oRow.SetData(4, ctTable); // TABLE_TYPE
     end
     else if GetMetaInfoKind = mkTableFields then begin
       oRow.SetData(0, ARow); // RECNO
       oRow.SetData(1, null); // CATALOG_NAME
       oRow.SetData(2, null); // SCHEMA_NAME
       oRow.SetData(3, GetBaseObjectName); // TABLE_NAME
-      oRow.SetData(4, null); // INDEX_NAME
-      oRow.SetData(5, FInfoMetada.Strings[ARow]); // COLUMN_NAME
-      oRow.SetData(6, null); // COLUMN_POSITION
-      oRow.SetData(7, ARow); // SORT_ORDER
-      oRow.SetData(8, null); // FILTER
+      oRow.SetData(4, Trim(FInfoMetada.Strings[ARow])); // COLUMN_NAME
+      oRow.SetData(5, ARow); // COLUMN_POSITION
+      oRow.SetData(6, null); // COLUMN_DATATYPE
+      oRow.SetData(7, null); // COLUMN_TYPENAME
+      oRow.SetData(8, null); // COLUMN_ATTRIBUTES
+      oRow.SetData(9, null); // COLUMN_PRECISION
+      oRow.SetData(10, null); // COLUMN_SCALE
+      oRow.SetData(11, null); // COLUMN_LENGTH
     end;
     ATable.Rows.Add(oRow);
   except
@@ -358,7 +359,7 @@ begin
     Result := False;
     Exit;
   end;
- 
+
   AColInfo := readFieldStream;
 
   FColumnIndex := FColumnIndex + 1;
@@ -396,7 +397,6 @@ var
   i: LongWord;
 begin
   Result := 0;
-  ARowsetSize := MaxInt;
 
   if GetMetaInfoKind in [mkTables,mkTableFields,mkPrimaryKeyFields] then begin
     ARowsetSize := FInfoMetada.Count;
@@ -407,8 +407,11 @@ begin
     end
   end
   else if GetMetaInfoKind = mkNone then begin
-    if FRecordCount = -1 then
+    if FRecordCount = -1 then begin
+      if FStream.Position = 0 then
+        readStreamFields;
       FStream.Read(FRecordCount,SizeOf(Longint));
+    end;
 
     for i := 1 to ARowsetSize do begin
       if FStream.Position = FStream.Size then
@@ -439,16 +442,38 @@ begin
   else if GetMetaInfoKind = mkTables then begin
     ACount := RDWGetTables;
     Result := ACount >= 0;
+    if Result then
+      Self.SetState(csOpen);
   end
   else if GetMetaInfoKind = mkPrimaryKeyFields then begin
     ACount := RDWGetPKTablesFields(GetBaseObjectName);
     Result := ACount >= 0;
+    if Result then
+      Self.SetState(csOpen);
+  end
+  else if GetMetaInfoKind = mkTableFields then begin
+    ACount := RDWGetTablesFields(GetBaseObjectName);
+    Result := ACount >= 0;
+    if Result then
+      Self.SetState(csOpen);
   end;
 end;
 
 procedure TFDPhysRDWCommand.InternalPrepare;
+//var
+//  rName: TFDPhysParsedName;
 begin
+{
+  if GetMetaInfoKind <> mkNone then begin
+    if GetCommandKind = skUnknown then
+      SetCommandKind(skSelect);
+    GetSelectMetaInfoParams(rName);
+    GenerateSelectMetaInfo(rName);
+  end;
 
+  GenerateLimitSelect();
+  GenerateParamMarkers();
+}
 end;
 
 procedure TFDPhysRDWCommand.InternalUnprepare;
@@ -492,11 +517,12 @@ begin
     addParams(GetParams);
 
     FFieldCount := -1;
+    FRecordCount := -1;
 
     vSQL := TStringList.Create;
     vSQL.Text := sSQL;
 
-    vDataSetList := TJSONValue.Create;
+    vDataSetList := nil;
     try
       vRESTDataBase.ExecuteCommand(vPoolermethod, vSQL, vParams, vError,
                                    vMessageError, vDataSetList, vRowsAffected,
@@ -506,14 +532,15 @@ begin
       if (vDataSetList <> nil) and (not vDataSetList.IsNull) then
         vDataSetList.SaveToStream(FStream);
     finally
-      vDataSetList.Free;
+      FreeAndNil(vDataSetList);
     end;
 
     vSQL.Free;
     vParams.Free;
 
     if not vError then begin
-      Result := 0;
+
+      Result := vRowsAffected;
       if exec then
         Result := vRowsAffected;
     end
@@ -521,6 +548,9 @@ begin
       Result := -1;
       raise Exception.Create(vMessageError);
     end;
+  end
+  else begin
+    raise Exception.Create('Comando SQL em branco');
   end;
 end;
 
@@ -535,6 +565,8 @@ begin
   try
     vRESTDataBase.GetKeyFieldNames(tabela,FInfoMetada);
     Result := FInfoMetada.Count;
+    if Result = 0 then
+      Result := -1;
   finally
 
   end;
@@ -551,6 +583,8 @@ begin
   try
     vRESTDataBase.GetTableNames(FInfoMetada);
     Result := FInfoMetada.Count;
+    if Result = 0 then
+      Result := -1;
   finally
 
   end;
@@ -567,6 +601,8 @@ begin
   try
     vRESTDataBase.GetFieldNames(tabela,FInfoMetada);
     Result := FInfoMetada.Count;
+    if Result = 0 then
+      Result := -1;
   finally
 
   end;
@@ -748,6 +784,22 @@ begin
 
   Result.FPrec  := datPrec;
   Result.FScale := datScale;
+end;
+
+procedure TFDPhysRDWCommand.readStreamFields;
+var
+  i : integer;
+begin
+  FStream.Position := 0;
+  FStream.Read(FFieldCount,SizeOf(integer));
+  SetLength(FFieldTypes,FFieldCount);
+
+  FStream.Read(FEncodeStrs, Sizeof(Byte));
+
+  for i := 0 to FFieldCount-1 do begin
+    FColumnIndex := i;
+    readFieldStream;
+  end;
 end;
 
 { TFDPhysRDWBaseDriverLink }
