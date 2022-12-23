@@ -1,4 +1,4 @@
-unit FireDAC.Phys.RESTDWBase;
+﻿unit FireDAC.Phys.RESTDWBase;
 
 {$I ..\Includes\uRESTDWPlataform.inc}
 
@@ -38,11 +38,13 @@ type
   TFDPhysRDWBaseDriverLink = class(TFDPhysDriverLink)
   private
     FDatabase : TRESTDWDatabasebaseBase;
+    FRDBMS : TFDRDBMSKind;
   protected
     function GetBaseDriverID: String; override;
     function IsConfigured: Boolean; override;
   published
     property Database : TRESTDWDatabasebaseBase read FDatabase write FDatabase;
+    property RDBMS: TFDRDBMSKind read FRDBMS write FRDBMS;
   end;
 
   TFDPhysRDWDriverBase = class(TFDPhysDriver)
@@ -119,6 +121,8 @@ type
   end;
 
 const
+  // nao mude o conteudo dessa variavel, ela influencia da adicão automatica
+  // da unit FireDAC.Phys.{RESTDW}Def no projeto
   S_FD_RDWId = 'RESTDW';
 
 implementation
@@ -173,7 +177,7 @@ procedure TFDPhysRDWConnectionBase.findDatabase;
 var
   rdwDriver : TFDPhysRDWBaseDriverLink;
 begin
-  rdwDriver := TFDPhysRDWBaseDriverLink(DriverObj.Manager.FindDriverLink(S_FD_RDWId));
+  rdwDriver := TFDPhysRDWBaseDriverLink(DriverObj.Manager.FindDriverLink(DriverObj.DriverID));
   if Assigned(rdwDriver) then
     FDatabase := rdwDriver.Database;
 end;
