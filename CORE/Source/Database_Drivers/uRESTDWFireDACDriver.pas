@@ -119,7 +119,6 @@ implementation
 procedure Register;
 begin
   RegisterComponents('REST Dataware - Drivers', [TRESTDWFireDACDriver]);
-//  RegisterComponents('REST Dataware - Physicals', [TRESTDWFDPhysicDriverLink]);
 end;
 
 { TRESTDWFireDACStoreProc }

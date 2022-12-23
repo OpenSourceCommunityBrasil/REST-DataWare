@@ -35,6 +35,6 @@ requires
   RESTDWCore;
 
 contains
-  FireDAC.Phys.RDW in '..\..\..\Source\Database_Drivers\FireDACPhysLink\FireDAC.Phys.RDW.pas';
+  FireDAC.Phys.RESTDW in '..\..\..\Source\Database_Drivers\FireDACPhysLink\FireDAC.Phys.RESTDW.pas';
 
 end.

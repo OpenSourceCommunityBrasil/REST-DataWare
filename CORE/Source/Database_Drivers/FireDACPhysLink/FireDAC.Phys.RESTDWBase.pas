@@ -1,4 +1,28 @@
-unit FireDAC.Phys.RDWBase;
+﻿unit FireDAC.Phys.RESTDWBase;
+
+{$I ..\Includes\uRESTDWPlataform.inc}
+
+{
+  REST Dataware .
+  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+ Pascal e com compatibilidade entre sistemas operacionais.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+
+ Membros do Grupo :
+
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
+ Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Flávio Motta               - Member Tester and DEMO Developer.
+ Mobius One                 - Devel, Tester and Admin.
+ Gustavo                    - Criptografia and Devel.
+ Eloy                       - Devel.
+ Roniery                    - Devel.
+ Fernando Banhos            - Drivers e Datasets.
+}
 
 interface
 
@@ -6,7 +30,7 @@ uses
   Classes, SysUtils, FireDAC.Phys, FireDAC.Stan.Intf, FireDAC.Phys.Intf,
   FireDAC.Phys.SQLGenerator, FireDAC.Stan.Util, FireDAC.Stan.Param,
   FireDAC.DatS, Firedac.Stan.Option, Variants,
-  uRESTDWBasicDB, DB, uRESTDWPoolermethod, FireDAC.Phys.RDWMeta;
+  uRESTDWBasicDB, DB, uRESTDWPoolermethod, FireDAC.Phys.RESTDWMeta;
 
 type
   TFDPhysRDWConnectionBase = class;
@@ -14,11 +38,13 @@ type
   TFDPhysRDWBaseDriverLink = class(TFDPhysDriverLink)
   private
     FDatabase : TRESTDWDatabasebaseBase;
+    FRDBMS : TFDRDBMSKind;
   protected
     function GetBaseDriverID: String; override;
     function IsConfigured: Boolean; override;
   published
     property Database : TRESTDWDatabasebaseBase read FDatabase write FDatabase;
+    property RDBMS: TFDRDBMSKind read FRDBMS write FRDBMS;
   end;
 
   TFDPhysRDWDriverBase = class(TFDPhysDriver)
@@ -95,12 +121,14 @@ type
   end;
 
 const
+  // nao mude o conteudo dessa variavel, ela influencia da adicão automatica
+  // da unit FireDAC.Phys.{RESTDW}Def no projeto
   S_FD_RDWId = 'RESTDW';
 
 implementation
 
 uses
-  FireDAC.Phys.RDWDef, Data.SqlTimSt, uRESTDWParams, uRESTDWConsts,
+  FireDAC.Phys.RESTDWDef, Data.SqlTimSt, uRESTDWParams, uRESTDWConsts,
   uRESTDWTools, uRESTDWBasicTypes;
 
 { TFDPhysRDWDriverBase }
@@ -149,7 +177,7 @@ procedure TFDPhysRDWConnectionBase.findDatabase;
 var
   rdwDriver : TFDPhysRDWBaseDriverLink;
 begin
-  rdwDriver := TFDPhysRDWBaseDriverLink(DriverObj.Manager.FindDriverLink(S_FD_RDWId));
+  rdwDriver := TFDPhysRDWBaseDriverLink(DriverObj.Manager.FindDriverLink(DriverObj.DriverID));
   if Assigned(rdwDriver) then
     FDatabase := rdwDriver.Database;
 end;
@@ -748,10 +776,13 @@ var
   datPrec : integer;
   datScale : integer;
   datAttrs : TFDDataAttributes;
+
+  oFmtOpts: TFDFormatOptions;
 begin
   if FStream.Size = 0 then
     Exit;
 
+  oFmtOpts := FOptions.FormatOptions;
   FStream.Read(j,SizeOf(Integer));
   fk := TFieldKind(j);
 
@@ -772,11 +803,20 @@ begin
 
   FStream.Read(b,SizeOf(Byte)); // somente pra position
 
-  TFDFormatOptions.FieldDef2ColumnDef(ft,fs,fp,0,datType,datSize,datPrec,datScale,datAttrs);
+  oFmtOpts.FieldDef2ColumnDef(ft,fs,fp,0,datType,datSize,datPrec,datScale,datAttrs);
 
   Result.FSourceID   := FColumnIndex;
   Result.FSourceType := datType;
+
+  if GetMetaInfoKind = mkNone then begin
+    oFmtOpts.ResolveDataType(Result.FSourceName, Result.FSourceName,
+          datType, datSize, datPrec,
+          datScale, datType, datSize, True);
+  end;
+
   Result.FType       := datType;
+
+
   // Result.FOriginTabName:= OriginTabName;
   Result.FAttrs := datAttrs;
 
