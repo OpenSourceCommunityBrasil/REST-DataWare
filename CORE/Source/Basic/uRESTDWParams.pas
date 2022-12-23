@@ -506,7 +506,7 @@ End;
 
 implementation
 
-Uses uRESTDWJSONInterface, uRESTDWDataUtils, PropertyPersist;
+Uses uRESTDWJSONInterface, uRESTDWDataUtils, uRESTDWPropertyPersist;
 
 Function CopyValue(Var bValue : String): String;
 Var
@@ -5950,7 +5950,7 @@ Begin
       vStringStream := TStringStream.Create(DecodeStrings(bJsonOBJ.Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
       Try
        vStringStream.Position := 0;
-       TPropertyPersist(vParam).LoadFromStream(vStringStream);
+       TRESTDWPropertyPersist(vParam).LoadFromStream(vStringStream);
        JSONParam.ParamName       := vParam.Name;
        JSONParam.ObjectValue     := FieldTypeToObjectValue(vParam.DataType);
        JSONParam.LoadFromParam(vParam);

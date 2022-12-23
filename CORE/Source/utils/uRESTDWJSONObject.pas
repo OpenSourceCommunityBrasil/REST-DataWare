@@ -446,7 +446,7 @@ Function StringToGUID      (GUID           : String) : TGUID;
 implementation
 
 Uses
- PropertyPersist;
+ uRESTDWPropertyPersist;
 
 {$IFNDEF FPC}
   {$IF CompilerVersion > 22} // Delphi 2010 pra cima

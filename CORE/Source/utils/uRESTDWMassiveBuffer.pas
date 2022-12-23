@@ -498,7 +498,7 @@ Function  MassiveSQLMode(aValue : String) : TMassiveSQLMode; overload;
 
 implementation
 
-Uses uRESTDWBasicDB, uRESTDWPoolermethod, PropertyPersist, uRESTDWTools;
+Uses uRESTDWBasicDB, uRESTDWPoolermethod, uRESTDWPropertyPersist, uRESTDWTools;
 
 Function removestr(Astr: string; Asubstr: string):string;
 Begin
@@ -3850,7 +3850,7 @@ Begin
   Begin
    vStringStream := TStringStream.Create('');
    Try
-    TPropertyPersist(Params[I]).SaveToStream(vStringStream);
+    TRESTDWPropertyPersist(Params[I]).SaveToStream(vStringStream);
     vTempLine := EncodeStrings(vStringStream.DataString{$IFDEF FPC}, csUndefined{$ENDIF});
    Finally
     vStringStream.Free;
