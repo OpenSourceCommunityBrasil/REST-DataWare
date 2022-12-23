@@ -776,10 +776,13 @@ var
   datPrec : integer;
   datScale : integer;
   datAttrs : TFDDataAttributes;
+
+  oFmtOpts: TFDFormatOptions;
 begin
   if FStream.Size = 0 then
     Exit;
 
+  oFmtOpts := FOptions.FormatOptions;
   FStream.Read(j,SizeOf(Integer));
   fk := TFieldKind(j);
 
@@ -800,11 +803,20 @@ begin
 
   FStream.Read(b,SizeOf(Byte)); // somente pra position
 
-  TFDFormatOptions.FieldDef2ColumnDef(ft,fs,fp,0,datType,datSize,datPrec,datScale,datAttrs);
+  oFmtOpts.FieldDef2ColumnDef(ft,fs,fp,0,datType,datSize,datPrec,datScale,datAttrs);
 
   Result.FSourceID   := FColumnIndex;
   Result.FSourceType := datType;
+
+  if GetMetaInfoKind = mkNone then begin
+    oFmtOpts.ResolveDataType(Result.FSourceName, Result.FSourceName,
+          datType, datSize, datPrec,
+          datScale, datType, datSize, True);
+  end;
+
   Result.FType       := datType;
+
+
   // Result.FOriginTabName:= OriginTabName;
   Result.FAttrs := datAttrs;
 
