@@ -107,7 +107,7 @@ type
   protected
     procedure InternalPrepare; override;
     procedure InternalUnprepare; override;
-    function InternalOpen(var ACount: TFDCounter): Boolean; override;
+    function InternalOpen{$IF CompilerVersion > 31}(var ACount: TFDCounter){$IFEND}: Boolean; override;
     function InternalNextRecordSet: Boolean; override;
     procedure InternalClose; override;
     procedure InternalExecute(ATimes, AOffset: Integer; var ACount: TFDCounter); override;
@@ -459,29 +459,47 @@ begin
   Result := False;
 end;
 
-function TFDPhysRDWCommand.InternalOpen(var ACount: TFDCounter): Boolean;
+function TFDPhysRDWCommand.InternalOpen{$IF CompilerVersion > 31}(var ACount: TFDCounter){$IFEND}: Boolean;
 begin
+ {$IF CompilerVersion > 31}
   ACount := -1;
+ {$IFEND}
   Result := False;
   if GetMetaInfoKind = mkNone then begin
+   {$IF CompilerVersion > 31}
     ACount := RDWExecuteComand;
     Result := ACount >= 0;
+   {$ELSE}
+    Result := RDWExecuteComand >= 0;
+   {$IFEND}
   end
   else if GetMetaInfoKind = mkTables then begin
+   {$IF CompilerVersion > 31}
     ACount := RDWGetTables;
     Result := ACount >= 0;
+   {$ELSE}
+    Result := RDWGetTables >= 0;
+   {$IFEND}
     if Result then
       Self.SetState(csOpen);
   end
   else if GetMetaInfoKind = mkPrimaryKeyFields then begin
+   {$IF CompilerVersion > 31}
     ACount := RDWGetPKTablesFields(GetBaseObjectName);
     Result := ACount >= 0;
+   {$ELSE}
+    Result := RDWGetPKTablesFields(GetBaseObjectName) >= 0;
+   {$IFEND}
     if Result then
       Self.SetState(csOpen);
   end
   else if GetMetaInfoKind = mkTableFields then begin
+   {$IF CompilerVersion > 31}
     ACount := RDWGetTablesFields(GetBaseObjectName);
     Result := ACount >= 0;
+   {$ELSE}
+    Result := RDWGetTablesFields(GetBaseObjectName) >= 0;
+   {$IFEND}
     if Result then
       Self.SetState(csOpen);
   end;
