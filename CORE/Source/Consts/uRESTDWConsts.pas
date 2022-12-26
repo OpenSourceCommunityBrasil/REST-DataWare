@@ -51,7 +51,7 @@ Const
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  cSetPhysicDriver           = 'A PhysicDriver is needed to work';
  SNotEditing                = 'Not in Edit mode';
- RESTDWDialogoTitulo        = 'REST DataWare Components';
+ RESTDWDialogoTitulo        = 'REST DataWare Components ' + RESTDWVersao;
  RESTDWSobreTitulo          = 'REST DataWare '+ RESTDWVersao;
  RESTDWSobreDescricao       = 'https://github.com/OpenSourceCommunityBrasil/REST-DataWare' + sLineBreak +
                               'Components REST Dataware';

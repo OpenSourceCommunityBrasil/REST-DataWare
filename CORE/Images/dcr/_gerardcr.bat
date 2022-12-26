@@ -19,6 +19,3 @@ set path_brcc32="D:\IDE\Embarcadero\Studio\7\Bin\brcc32.exe"
 %path_brcc32% -fo "..\..\Packages\Delphi\Drivers\MyDAC\RESTDWMyDACDriver.dcr" "DriverMyDAC.rc"
 %path_brcc32% -fo "..\..\Packages\Delphi\Drivers\UniDAC\RESTDWUniDACDriver.dcr" "DriverUNIDAC.rc"
 %path_brcc32% -fo "..\..\Packages\Delphi\Drivers\Zeos\RESTDWZeosDriver.dcr" "DriverZEOS.rc"
-
-# PhysLink
-%path_brcc32% -fo "..\..\Packages\Delphi\Phys\RESTDWFireDACPhysLink.dcr" "FireDACPhysLink.rc"

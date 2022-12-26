@@ -216,7 +216,6 @@
         <DCCReference Include="FireDACCommon.dcp"/>
         <DCCReference Include="dcldb.dcp"/>
         <DCCReference Include="soaprtl.dcp"/>
-        <DCCReference Include="..\..\Source\Basic\PropertyPersist.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasic.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasicDB.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasicTypes.pas"/>
@@ -285,6 +284,7 @@
         <DCCReference Include="..\..\Source\Basic\uRESTDWBufferBase.pas"/>
         <DCCReference Include="..\..\Source\utils\uRESTDWURLFunctions.pas"/>
         <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas"/>
+        <DCCReference Include="..\..\Source\Basic\uRESTDWPropertyPersist.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -325,12 +325,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>

@@ -42,7 +42,6 @@ requires
   soaprtl;
 
 contains
-  PropertyPersist in '..\..\Source\Basic\PropertyPersist.pas',
   uRESTDWBasic in '..\..\Source\Basic\uRESTDWBasic.pas',
   uRESTDWBasicDB in '..\..\Source\Basic\uRESTDWBasicDB.pas',
   uRESTDWBasicTypes in '..\..\Source\Basic\uRESTDWBasicTypes.pas',
@@ -107,7 +106,8 @@ contains
   uRESTDWMimeTypes in '..\..\Source\utils\uRESTDWMimeTypes.pas',
   uRESTDWBufferBase in '..\..\Source\Basic\uRESTDWBufferBase.pas',
   uRESTDWURLFunctions in '..\..\Source\utils\uRESTDWURLFunctions.pas',
-  uRESTDWMemoryDataset in '..\..\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas';
+  uRESTDWMemoryDataset in '..\..\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas',
+  uRESTDWPropertyPersist in '..\..\Source\Basic\uRESTDWPropertyPersist.pas';
 
 End.
 

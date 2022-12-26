@@ -41,8 +41,6 @@ type
 
   end;
 
-procedure register;
-
 {-------------------------------------------------------------------------------}
 implementation
 
@@ -64,11 +62,6 @@ type
     class function GetConnectionDefParamsClass: TFDConnectionDefParamsClass; override;
     function GetConnParams(AKeys: TStrings; AParams: TFDDatSTable): TFDDatSTable; override;
   end;
-
-procedure register;
-begin
-  RegisterComponents('REST Dataware - PhysLink', [TRESTDWFireDACPhysLink]);
-end;
 
 function TFDPhysRDWDriver.InternalCreateConnection(
   AConnHost: TFDPhysConnectionHost): TFDPhysConnection;

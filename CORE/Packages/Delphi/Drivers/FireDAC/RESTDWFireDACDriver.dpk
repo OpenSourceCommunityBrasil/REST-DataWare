@@ -33,7 +33,8 @@ requires
   RESTDWCore;
 
 contains
-  uRESTDWFireDACDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWFireDACDriver.pas';
+  uRESTDWFireDACDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWFireDACDriver.pas',
+  FireDAC.Phys.RESTDW in '..\..\..\..\Source\Database_Drivers\FireDACPhysLink\FireDAC.Phys.RESTDW.pas';
 
 end.
 
