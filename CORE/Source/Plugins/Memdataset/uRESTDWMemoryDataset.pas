@@ -1,5 +1,7 @@
 unit uRESTDWMemoryDataset;
+
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -26,7 +28,7 @@ interface
 uses
   Windows,  // to avoid warning under BDS2006, and in the interface section to allow compilation in RS2008
   SysUtils, Classes, DB, Variants, uRESTDWStorageBinRDW, uRESTDWStorageBase,
-  JvDBUtils, JvExprParser, JvDBFilterExpr;
+  uRESTDWMemDBUtils, uRESTDWMemExprParser, uRESTDWMemDBFilterExpr;
 
 type
   TPVariant = ^Variant;
@@ -331,12 +333,12 @@ uses
   AnsiStrings,
   {$ENDIF HAS_UNIT_ANSISTRINGS}
   FMTBcd, SqlTimSt,
-  JclSysUtils, JclAnsiStrings,
+  uRESTDWMemSysUtils, uRESTDWMemAnsiStrings,
   {$IFNDEF UNICODE}
-  JvJCLUtils,
+  uRESTDWMemJCLUtils,
   {$ENDIF ~UNICODE}
-  JvJVCLUtils,
-  JvResources;
+  uRESTDWMemVCLUtils,
+  uRESTDWMemResources;
 const
   ftBlobTypes = [ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftParadoxOle,
     ftDBaseOle, ftTypedBinary, ftOraBlob, ftOraClob

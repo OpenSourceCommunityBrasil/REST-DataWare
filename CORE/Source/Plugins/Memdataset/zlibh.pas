@@ -1,4 +1,5 @@
 unit zlibh;
+
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
@@ -49,10 +50,10 @@ uses
   Libc,
   {$ENDIF HAS_UNIT_LIBC}
   {$IFDEF UNITVERSIONING}
-  JclUnitVersioning,
+  uRESTDWMemUnitVersioning,
   {$ENDIF UNITVERSIONING}
-  JclBase,
-  JclSysUtils;
+  uRESTDWMemBase,
+  uRESTDWMemSysUtils;
 //DOM-IGNORE-BEGIN
 {$IFNDEF ZLIB_RTL}
 {$IFNDEF FPC}

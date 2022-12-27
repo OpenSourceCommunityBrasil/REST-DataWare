@@ -1,5 +1,7 @@
 unit sevenzip;
+
 interface
+
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {$I ..\..\Source\Includes\windowsonly.inc}
 {
@@ -30,10 +32,11 @@ uses
   ActiveX, Windows,
   {$ENDIF ~HAS_UNITSCOPE}
   {$IFDEF UNITVERSIONING}
-  JclUnitVersioning,
+  uRESTDWMemUnitVersioning,
   {$ENDIF UNITVERSIONING}
-  JclBase,
-  JclSysUtils;
+  uRESTDWMemBase,
+  uRESTDWMemSysUtils;
+
 const
   CLSID_CCodec : TGUID = '{23170F69-40C1-2790-0000-000000000000}';
   CLSID_CCodecBCJ2    : TGUID = '{23170F69-40C1-2790-1B01-030300000000}'; // BCJ2 0303011B
@@ -245,8 +248,8 @@ type
   PISequentialOutStream = ^ISequentialOutStream;
   ICompressCoder2 = interface(IUnknown)
     ['{23170F69-40C1-278A-0000-000400180000}']
-    procedure Code(InStreams: PISequentialInStream; InSizes: JclBase.PPInt64; NumInStreams: Cardinal;
-      OutStreams: PISequentialOutStream; OutSizes: JclBase.PPInt64; NumOutStreams: Cardinal;
+    procedure Code(InStreams: PISequentialInStream; InSizes: uRESTDWMemBase.PPInt64; NumInStreams: Cardinal;
+      OutStreams: PISequentialOutStream; OutSizes: uRESTDWMemBase.PPInt64; NumOutStreams: Cardinal;
       Progress: ICompressProgressInfo); safecall;
   end;
 const

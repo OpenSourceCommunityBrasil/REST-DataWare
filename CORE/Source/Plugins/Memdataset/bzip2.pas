@@ -1,5 +1,7 @@
 unit bzip2;
+
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -23,8 +25,8 @@ unit bzip2;
 
 interface
 uses
-  JclBase,
-  JclSysUtils;
+  uRESTDWMemBase,
+  uRESTDWMemSysUtils;
 //DOM-IGNORE-BEGIN
 {
 /*-------------------------------------------------------------*/
