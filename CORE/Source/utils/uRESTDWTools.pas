@@ -430,11 +430,23 @@ Function  GetObjectName            (TypeObject         : TTypeObject)           
  Function  RandomString             (strLen             : Integer)                : String;
  Function  StrDWLength              (Value              : String)                 : Integer;
  Function  RequestTypeToString      (RequestType        : TRequestType)           : String;
+ Function  VarIsNullEmpty           (Const V            : Variant)                : Boolean;
+ Function  VarIsNullEmptyBlank      (Const V            : Variant)                : Boolean;
  Procedure InitializeStrings;
 
 Implementation
 Uses
-  uRESTDWBase64, uRESTDWException;
+  uRESTDWBase64, uRESTDWException, Variants;
+
+Function VarIsNullEmpty(const V: Variant): Boolean;
+Begin
+ Result := VarIsNull(V) or VarIsEmpty(V);
+End;
+
+Function VarIsNullEmptyBlank(const V: Variant): Boolean;
+Begin
+ Result := VarIsNull(V) or VarIsEmpty(V) or (VarToStr(V) = '');
+End;
 
 Function RemoveLineBreaks(aText : string): string;//Gledston 03/12/2022
 begin                                             //linha 3087 na Function EncodeBase64(AValue : TStream) : String;

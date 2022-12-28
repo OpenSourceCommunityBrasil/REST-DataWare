@@ -235,18 +235,6 @@ const
   {$IFDEF UNIX}
   DefaultCaseSensitivity = True;
   {$ENDIF UNIX}
-{ GenTempFileName returns temporary file name on
-  drive, there FileName is placed }
-function GenTempFileName(FileName: string): string;
-{ GenTempFileNameExt same to previous function, but
-  returning filename has given extension, FileExt }
-function GenTempFileNameExt(FileName: string; const FileExt: string): string;
-{ ClearDir clears folder Dir }
-function ClearDir(const Dir: string): Boolean;
-{ DeleteDir clears and than delete folder Dir }
-function DeleteDir(const Dir: string): Boolean;
-{ FileEquMask returns True if file, FileName,
-  is compatible with given dos file mask, Mask }
 function FileEquMask(FileName, Mask: TFileName;
   CaseSensitive: Boolean = DefaultCaseSensitivity): Boolean;
 { FileEquMasks returns True if file, FileName,
@@ -254,7 +242,6 @@ function FileEquMask(FileName, Mask: TFileName;
   Masks must be separated with SepPath (MSW: ';' / UNIX: ':') }
 function FileEquMasks(FileName, Masks: TFileName;
   CaseSensitive: Boolean = DefaultCaseSensitivity): Boolean;
-function DeleteFiles(const Folder: TFileName; const Masks: string): Boolean;
 {$IFDEF MSWINDOWS}
 { LZFileExpand expand file, FileSource,
   into FileDest. Given file must be compressed, using MS Compress program }
@@ -335,15 +322,6 @@ procedure DeleteEmptyLines(Ss: TStrings);
   it must be started on the begining of any line }
 procedure SQLAddWhere(SQL: TStrings; const Where: string);
 {**** files routines - }
-{$IFDEF MSWINDOWS}
-{ ResSaveToFile save resource named as Name with Typ type into file FileName.
-  Resource can be compressed using MS Compress program}
-function ResSaveToFile(const Typ, Name: string; const Compressed: Boolean; const FileName: string): Boolean;
-function ResSaveToFileEx(Instance: HINST; Typ, Name: PChar;
-  const Compressed: Boolean; const FileName: string): Boolean;
-function ResSaveToString(Instance: HINST; const Typ, Name: string;
-  var S: string): Boolean;
-{$ENDIF MSWINDOWS}
 { IniReadSection read section, Section, from ini-file,
   IniFileName, into strings, Ss.
   This function reads ALL strings from specified section.
@@ -580,7 +558,6 @@ function AnsiDequotedStr(const S: string; AQuote: Char): string; // follow Delph
 function GetTempFileName(const Prefix: AnsiString): AnsiString;
 {$ENDIF UNIX}
 function HasAttr(const FileName: string; Attr: Integer): Boolean;
-function DeleteFilesEx(const FileMasks: array of string): Boolean;
 function NormalDir(const DirName: string): string;
 function RemoveBackSlash(const DirName: string): string; // only for Windows/DOS Paths
 function ValidFileName(const FileName: string): Boolean;
@@ -884,8 +861,8 @@ uses
   {$IFDEF HAS_UNIT_CHARACTER}
   Character, // needed for JclStrings inlined functions
   {$ENDIF HAS_UNIT_CHARACTER}
-  uRESTDWMemStringsB, uRESTDWMemFileUtils,
-  Math, uRESTDWMemSysUtils;
+  uRESTDWMemStringsB,
+  Math, uRESTDWBasicTypes;
 
 const
   Separators: TSysCharSet = [#00, ' ', '-', #13, #10, '.', ',', '/', '\', '#', '"', '''',
@@ -1978,7 +1955,7 @@ begin
 end;
 function CurrencyToStr(const Cur: Currency): string;
 begin
-  Result := CurrToStrF(Cur, ffCurrency, JclFormatSettings.CurrencyDecimals)
+  Result := CurrToStrF(Cur, ffCurrency, RESTDWCurrencyDecimals)
 end;
 function HasChar(const Ch: Char; const S: string): Boolean;
 var
@@ -2513,100 +2490,6 @@ begin
     end;
   SQL.Insert(J, 'and ' + Where);
 end;
-{$IFDEF MSWINDOWS}
-function ResSaveToFileEx(Instance: HINST; Typ, Name: PChar;
-  const Compressed: Boolean; const FileName: string): Boolean;
-var
-  RhRsrc: HRSRC;
-  RhGlobal: HGLOBAL;
-  RAddr: Pointer;
-  RLen: DWORD;
-  Stream: TFileStream;
-  FileDest: string;
-begin
-  Result := False;
-  RhRsrc := FindResource(
-    Instance, // resource-module handle
-    Name, // address of resource name
-    Typ); // address of resource type
-  if RhRsrc = 0 then
-    Exit;
-  RhGlobal := LoadResource(
-    Instance, // resource-module handle
-    RhRsrc); // resource handle
-  if RhGlobal = 0 then
-    Exit;
-  RAddr := LockResource(
-    RhGlobal); // handle to resource to lock
-  FreeResource(RhGlobal);
-  if RAddr = nil then
-    Exit;
-  RLen := SizeofResource(
-    Instance, // resource-module handle
-    RhRsrc); // resource handle
-  if RLen = 0 then
-    Exit;
-  { And now it is possible to duplicate [translated] }
-  Stream := nil; { for Free [translated] }
-  if Compressed then
-    FileDest := GenTempFileName(FileName)
-  else
-    FileDest := FileName;
-  try
-    try
-      Stream := TFileStream.Create(FileDest, fmCreate or fmOpenWrite or fmShareExclusive);
-      Stream.WriteBuffer(RAddr^, RLen);
-    finally
-      Stream.Free;
-    end;
-    if Compressed then
-    begin
-      Result := LZFileExpand(FileDest, FileName);
-      DeleteFile(FileDest);
-    end
-    else
-      Result := True;
-  except
-  end;
-end;
-function ResSaveToFile(const Typ, Name: string; const Compressed: Boolean;
-  const FileName: string): Boolean;
-begin
-  Result := ResSaveToFileEx(HInstance, PChar(Typ), PChar(Name), Compressed, FileName);
-end;
-function ResSaveToString(Instance: HINST; const Typ, Name: string;
-  var S: string): Boolean;
-var
-  RhRsrc: HRSRC;
-  RhGlobal: HGLOBAL;
-  RAddr: Pointer;
-  RLen: DWORD;
-begin
-  Result := False;
-  RhRsrc := FindResource(
-    Instance, // resource-module handle
-    PChar(Name), // address of resource name
-    PChar(Typ)); // address of resource type
-  if RhRsrc = 0 then
-    Exit;
-  RhGlobal := LoadResource(
-    Instance, // resource-module handle
-    RhRsrc); // resource handle
-  if RhGlobal = 0 then
-    Exit;
-  RAddr := LockResource(RhGlobal); // handle to resource to lock
-  FreeResource(RhGlobal);
-  if RAddr = nil then
-    Exit;
-  RLen := SizeofResource(
-    Instance, // resource-module handle
-    RhRsrc); // resource handle
-  if RLen = 0 then
-    Exit;
-  { And now it is possible to duplicate [translated] }
-  SetString(S, PChar(RAddr), RLen);
-end;
-{$ENDIF MSWINDOWS}
 procedure SetChildPropOrd(Owner: TComponent; const PropName: string; Value: Longint);
 var
   I: Integer;
@@ -3348,12 +3231,12 @@ begin
   M := 0;
   D := 0;
   DateOrder := GetDateOrder(DateFormat);
-  if JclFormatSettings.ShortDateFormat[1] = 'g' then { skip over prefix text }
+  if RESTDWShortDateFormat[1] = 'g' then { skip over prefix text }
     ScanToNumber(S, Position);
-  if not (ScanNumber(S, MaxInt, Position, N1) and ScanChar(S, Position, JclFormatSettings.DateSeparator) and
+  if not (ScanNumber(S, MaxInt, Position, N1) and ScanChar(S, Position, RESTDWDateSeparator) and
     ScanNumber(S, MaxInt, Position, N2)) then
     Exit;
-  if ScanChar(S, Position, JclFormatSettings.DateSeparator) then
+  if ScanChar(S, Position, RESTDWDateSeparator) then
   begin
     if not ScanNumber(S, MaxInt, Position, N3) then
       Exit;
@@ -3393,11 +3276,11 @@ begin
       D := N2;
     end;
   end;
-  ScanChar(S, Position, JclFormatSettings.DateSeparator);
+  ScanChar(S, Position, RESTDWDateSeparator);
   ScanBlanks(S, Position);
-  if SysLocale.FarEast and (Pos('ddd', JclFormatSettings.ShortDateFormat) <> 0) then
+  if SysLocale.FarEast and (Pos('ddd', RESTDWShortDateFormat) <> 0) then
   begin { ignore trailing text }
-    if CharInSet(JclFormatSettings.ShortTimeFormat[1], ['0'..'9']) then { stop at time digit }
+    if CharInSet(RESTDWShortTimeFormat[1], ['0'..'9']) then { stop at time digit }
       ScanToNumber(S, Position)
     else { stop at time prefix }
       repeat
@@ -3405,8 +3288,8 @@ begin
           Inc(Position);
         ScanBlanks(S, Position);
       until (Position > Length(S)) or
-        AnsiSameText(JclFormatSettings.TimeAMString, Copy(S, Position, Length(JclFormatSettings.TimeAMString))) or
-        AnsiSameText(JclFormatSettings.TimePMString, Copy(S, Position, Length(JclFormatSettings.TimePMString)));
+        AnsiSameText(RESTDWTimeAMString, Copy(S, Position, Length(RESTDWTimeAMString))) or
+        AnsiSameText(RESTDWTimePMString, Copy(S, Position, Length(RESTDWTimePMString)));
   end;
   Result := IsValidDate(Y, M, D) and (Position > Length(S));
 end;
@@ -3415,8 +3298,8 @@ begin
   if Length(S) > 0 then
     for Result := 1 to 12 do
     begin
-      if (Length(JclFormatSettings.LongMonthNames[Result]) > 0) and
-         AnsiSameText(Copy(S, 1, MaxLen), Copy(JclFormatSettings.LongMonthNames[Result], 1, MaxLen)) then
+      if (Length(RESTDWLongMonthNames[Result]) > 0) and
+         AnsiSameText(Copy(S, 1, MaxLen), Copy(RESTDWLongMonthNames[Result], 1, MaxLen)) then
         Exit;
     end;
   Result := 0;
@@ -3504,7 +3387,7 @@ begin
 end;
 function StrToDateDef(const S: string; Default: TDateTime): TDateTime;
 begin
-  if not InternalStrToDate(JclFormatSettings.ShortDateFormat, S, Result) then
+  if not InternalStrToDate(RESTDWShortDateFormat, S, Result) then
     Result := Trunc(Default);
 end;
 function StrToDateFmtDef(const DateFormat, S: string; Default: TDateTime): TDateTime;
@@ -3516,7 +3399,7 @@ function DefDateFormat(AFourDigitYear: Boolean): string;
 begin
   if AFourDigitYear then
   begin
-    case GetDateOrder(JclFormatSettings.ShortDateFormat) of
+    case GetDateOrder(RESTDWShortDateFormat) of
       doMDY:
         Result := 'MM/DD/YYYY';
       doDMY:
@@ -3527,7 +3410,7 @@ begin
   end
   else
   begin
-    case GetDateOrder(JclFormatSettings.ShortDateFormat) of
+    case GetDateOrder(RESTDWShortDateFormat) of
       doMDY:
         Result := 'MM/DD/YY';
       doDMY:
@@ -3541,7 +3424,7 @@ function DefDateMask(BlanksChar: Char; AFourDigitYear: Boolean): string;
 begin
   if AFourDigitYear then
   begin
-    case GetDateOrder(JclFormatSettings.ShortDateFormat) of
+    case GetDateOrder(RESTDWShortDateFormat) of
       doMDY, doDMY:
         Result := '!99/99/9999;1;';
       doYMD:
@@ -3550,7 +3433,7 @@ begin
   end
   else
   begin
-    case GetDateOrder(JclFormatSettings.ShortDateFormat) of
+    case GetDateOrder(RESTDWShortDateFormat) of
       doMDY, doDMY:
         Result := '!99/99/99;1;';
       doYMD:
@@ -3590,7 +3473,7 @@ begin
 end;
 function IsFourDigitYear: Boolean;
 begin
-  Result := Pos('YYYY', AnsiUpperCase(JclFormatSettings.ShortDateFormat)) > 0;
+  Result := Pos('YYYY', AnsiUpperCase(RESTDWShortDateFormat)) > 0;
 end;
 { end JvDateUtil }
 function BufToBinStr(Buf: Pointer; BufSize: Integer): string;
@@ -4646,14 +4529,6 @@ begin
   FileAttr := FileGetAttr(FileName);
   Result := (FileAttr >= 0) and (FileAttr and Attr = Attr);
 end;
-function DeleteFilesEx(const FileMasks: array of string): Boolean;
-var
-  I: Integer;
-begin
-  Result := True;
-  for I := Low(FileMasks) to High(FileMasks) do
-    Result := Result and DeleteFiles(ExtractFilePath(FileMasks[I]), ExtractFileName(FileMasks[I]));
-end;
 {$IFDEF MSWINDOWS}
 function GetWindowsDir: string;
 var
@@ -4679,97 +4554,6 @@ begin
     Libc.free(P);
 end;
 {$ENDIF UNIX}
-function GenTempFileName(FileName: string): string;
-var
-  TempDir: string;
-  {$IFDEF MSWINDOWS}
-  TempFile: array [0..MAX_PATH] of Char;
-  {$ENDIF MSWINDOWS}
-  {$IFDEF UNIX}
-  TempFile: string;
-  {$ENDIF UNIX}
-  STempDir: TFileName;
-  Res: Integer;
-begin
-  TempDir := PathGetTempPath;
-  if FileName <> '' then
-  begin
-    if Length(FileName) < 4 then
-      FileName := ExpandFileName(FileName);
-    if (Length(FileName) > 4) and (FileName[2] = ':') and
-      (Length(TempDir) > 4) and
-      (AnsiCompareFileName(TempDir, FileName) <> 0) then
-    begin
-      STempDir := ExtractFilePath(FileName);
-      MoveString(STempDir, TempDir, Length(STempDir) + 1);
-    end;
-  end;
-  {$IFDEF MSWINDOWS}
-  Res := GetTempFileName(
-    PChar(TempDir), { address of directory name for temporary file}
-    '~JV', { address of filename prefix}
-    0, { number used to create temporary filename}
-    TempFile); { address of buffer that receives the new filename}
-  {$ENDIF MSWINDOWS}
-  {$IFDEF UNIX}
-  TempFile := GetTempFileName('~JV');
-  Res := 1;
-  {$ENDIF UNIX}
-  if Res <> 0 then
-    Result := TempFile
-  else
-    Result := '~JVCLTemp.tmp';
-  DeleteFile(Result);
-end;
-function GenTempFileNameExt(FileName: string; const FileExt: string): string;
-begin
-  Result := ChangeFileExt(GenTempFileName(FileName), FileExt);
-end;
-function ClearDir(const Dir: string): Boolean;
-var
-  SearchRec: TSearchRec;
-  DosError: Integer;
-  Path: TFileName;
-begin
-  Result := True;
-  Path := AddSlash(Dir);
-  DosError := FindFirst(Path + AllFilesMask, faAnyFile, SearchRec);
-  while DosError = 0 do
-  begin
-    if (SearchRec.Name <> '.') and (SearchRec.Name <> '..') then
-    begin
-      if (SearchRec.Attr and faDirectory) = faDirectory then
-        Result := Result and DeleteDir(Path + SearchRec.Name)
-      else
-        Result := Result and DeleteFile(Path + SearchRec.Name);
-      // if not Result then Exit;
-    end;
-    DosError := FindNext(SearchRec);
-  end;
-  FindClose(SearchRec);
-end;
-function DeleteDir(const Dir: string): Boolean;
-begin
-  ClearDir(Dir);
-  Result := RemoveDir(Dir);
-end;
-function DeleteFiles(const Folder: TFileName; const Masks: string): Boolean;
-var
-  SearchRec: TSearchRec;
-  DosError: Integer;
-  Path: TFileName;
-begin
-  Result := False;
-  Path := AddSlash(Folder);
-  DosError := FindFirst(Path + AllFilesMask, faAnyFile and not faDirectory, SearchRec);
-  while DosError = 0 do
-  begin
-    if FileEquMasks(Path + SearchRec.Name, Masks) then
-      Result := DeleteFile(Path + SearchRec.Name);
-    DosError := FindNext(SearchRec);
-  end;
-  FindClose(SearchRec);
-end;
 function GetParameter: string;
 var
   FN, FN1: PChar;
@@ -5544,7 +5328,7 @@ end;
 function CharIsMoney(const Ch: Char): Boolean;
 begin
   Result := CharIsDigit(Ch) or (Ch = NativeSpace) or (Ch = '$') or (Ch = '-') or
-    (Pos(Ch, JclFormatSettings.CurrencyString) > 0);
+    (Pos(Ch, RESTDWCurrencyString) > 0);
 end;
 function StrToCurrDef(const Str: string; Def: Currency): Currency;
 var
@@ -5558,7 +5342,7 @@ begin
   begin
     LStr := TJclStringBuilder.Create(Length(Str));
     try
-      CharSet := ['0'..'9', '-', '+', AnsiChar(JclFormatSettings.DecimalSeparator)];
+      CharSet := ['0'..'9', '-', '+', AnsiChar(RESTDWDecimalSeparator)];
       for I := 1 to Length(Str) do
         if CharInSet(Str[I], CharSet) then
           LStr.Append(Str[I]);
@@ -5754,7 +5538,7 @@ begin
   for I := 1 to Length(S) do
   begin
     Ch := Char(S[I]);
-    if not CharIsNumberChar(Ch) or (Ch = JclFormatSettings.DecimalSeparator) then //Az
+    if not CharIsNumberChar(Ch) or (Ch = RESTDWDecimalSeparator) then //Az
     begin
       Result := False;
       Exit;
@@ -5772,7 +5556,7 @@ begin
   begin
     { allow digits, space, Currency symbol and one decimal dot }
     Ch := Ps[I];
-    if Ch = JclFormatSettings.DecimalSeparator then
+    if Ch = RESTDWDecimalSeparator then
     begin
       Inc(liDots);
       if liDots > 1 then
@@ -5860,11 +5644,11 @@ begin
   { turn any month names to numbers }
   { use the StrReplace in stringfunctions -
   the one in JclStrings is badly broken and brings down the app }
-  for I := JclFormatSettings.MonthNamesLowIndex to JclFormatSettings.MonthNamesHighIndex do
-    Ps := LStrReplace(Ps, JclFormatSettings.LongMonthNames[I], IntToStr(I), False);
+  for I := 1 to 12 do
+    Ps := LStrReplace(Ps, RESTDWLongMonthNames[I], IntToStr(I), False);
   { now that 'January' is gone, catch 'Jan' }
-  for I := JclFormatSettings.MonthNamesLowIndex to JclFormatSettings.MonthNamesHighIndex do
-    Ps := LStrReplace(Ps, JclFormatSettings.ShortMonthNames[I], IntToStr(I), False);
+  for I := 1 to 12 do
+    Ps := LStrReplace(Ps, RESTDWShortMonthNames[I], IntToStr(I), False);
   { remove redundant spaces }
   Ps := LStrReplace(Ps, NativeSpace + NativeSpace, NativeSpace, False);
   Result := Ps;
@@ -6587,16 +6371,16 @@ var
   CharSet: TSysCharSet;
 begin
   Result := DelRSpace(AValue);
-  if JclFormatSettings.DecimalSeparator <> JclFormatSettings.ThousandSeparator then
-    Result := DelChars(Result, JclFormatSettings.ThousandSeparator);
-  if (JclFormatSettings.DecimalSeparator <> '.') and (JclFormatSettings.ThousandSeparator <> '.') then
-    Result := ReplaceStr(Result, '.', JclFormatSettings.DecimalSeparator);
-  if (JclFormatSettings.DecimalSeparator <> ',') and (JclFormatSettings.ThousandSeparator <> ',') then
-    Result := ReplaceStr(Result, ',', JclFormatSettings.DecimalSeparator);
+  if RESTDWDecimalSeparator <> RESTDWThousandSeparator then
+    Result := DelChars(Result, RESTDWThousandSeparator);
+  if (RESTDWDecimalSeparator <> '.') and (RESTDWThousandSeparator <> '.') then
+    Result := ReplaceStr(Result, '.', RESTDWDecimalSeparator);
+  if (RESTDWDecimalSeparator <> ',') and (RESTDWThousandSeparator <> ',') then
+    Result := ReplaceStr(Result, ',', RESTDWDecimalSeparator);
   J := 1;
   CharSet := ['0'..'9', '-', '+',
-        AnsiChar(JclFormatSettings.DecimalSeparator),
-        AnsiChar(JclFormatSettings.ThousandSeparator)];
+        AnsiChar(RESTDWDecimalSeparator),
+        AnsiChar(RESTDWThousandSeparator)];
   for I := 1 to Length(Result) do
     if CharInSet(Result[I], CharSet) then
     begin

@@ -47,7 +47,7 @@ uses
   {$ENDIF ~HAS_UNITSCOPE}
   uRESTDWMemAnsiStrings,
   uRESTDWMemWideStrings,
-  uRESTDWMemBase;
+  uRESTDWMemBase, Math;
 // Exceptions
 type
   EJclStringError = class(EJclError);
@@ -168,7 +168,6 @@ function StrReplaceChars(const S: string; const Chars: array of Char; Replace: C
 function StrReplaceButChars(const S: string; const Chars: TCharValidator; Replace: Char): string; overload;
 function StrReplaceButChars(const S: string; const Chars: array of Char; Replace: Char): string; overload;
 function StrRepeat(const S: string; Count: SizeInt): string;
-function StrRepeatLength(const S: string; L: SizeInt): string;
 function StrReverse(const S: string): string;
 procedure StrReverseInPlace(var S: string);
 function StrSingleQuote(const S: string): string;
@@ -529,17 +528,6 @@ var
   StrCaseMapReady: Boolean = False;         // true if case map exists
   StrCharTypes: array [Char] of Word;
 {$ENDIF ~UNICODE_RTL_DATABASE}
-{$IFDEF UNITVERSIONING}
-const
-  UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL$';
-    Revision: '$Revision$';
-    Date: '$Date$';
-    LogPath: 'JCL\source\common';
-    Extra: '';
-    Data: nil
-    );
-{$ENDIF UNITVERSIONING}
 implementation
 uses
   {$IFDEF HAS_UNIT_LIBC}
@@ -552,7 +540,7 @@ uses
   StrUtils,
   {$ENDIF ~HAS_UNITSCOPE}
   {$ENDIF SUPPORTS_UNICODE}
-  uRESTDWMemLogic, uRESTDWMemResources, uRESTDWMemStreams, uRESTDWMemSysUtils;
+  uRESTDWMemResources, uRESTDWMemStreams, uRESTDWBasicTypes;
 //=== Internal ===============================================================
 type
   TStrRec = packed record
@@ -1306,25 +1294,6 @@ begin
       Move(Source^, Dest^, Len * SizeOf(Char));
       Inc(Dest, Len);
     end;
-end;
-function StrRepeatLength(const S: string; L: SizeInt): string;
-var
-  Len: SizeInt;
-  Dest: PChar;
-begin
-  Result := '';
-  Len := Length(S);
-  if (Len > 0) and (S <> '') then
-  begin
-    SetLength(Result, L);
-    Dest := PChar(Result);
-    while (L > 0) do
-    begin
-      Move(S[1], Dest^, Min(L, Len) * SizeOf(Char));
-      Inc(Dest, Len);
-      Dec(L, Len);
-    end;
-  end;
 end;
 procedure StrReplace(var S: string; const Search, Replace: string; Flags: TReplaceFlags);
 var
@@ -2601,11 +2570,11 @@ begin
 end;
 function CharIsNumberChar(const C: Char): Boolean;
 begin
-  Result := CharIsDigit(C) or (C = '+') or (C = '-') or (C = JclFormatSettings.DecimalSeparator);
+  Result := CharIsDigit(C) or (C = '+') or (C = '-') or (C = RESTDWDecimalSeparator);
 end;
 function CharIsNumber(const C: Char): Boolean;
 begin
-  Result := CharIsDigit(C) or (C = JclFormatSettings.DecimalSeparator);
+  Result := CharIsDigit(C) or (C = RESTDWDecimalSeparator);
 end;
 function CharIsPrintable(const C: Char): Boolean;
 begin
@@ -4900,6 +4869,7 @@ function CompareNaturalText(const S1, S2: string): SizeInt;
 begin
   Result := CompareNatural(S1, S2, True);
 end;
+
 initialization
   {$IFNDEF UNICODE_RTL_DATABASE}
   LoadCharTypes;  // this table first

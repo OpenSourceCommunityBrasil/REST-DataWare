@@ -1169,17 +1169,12 @@ type
     function AddState(NewStates: array of SizeInt): SizeInt;
     procedure AddSymbolState(Symbol, State: SizeInt);
     function BuildCharacterClass(CP: PUCS2; Limit: SizeInt; Symbol: PUcSymbolTableEntry): SizeInt;
-    procedure ClearUREBuffer;
     function CompileSymbol(S: PUCS2; Limit: SizeInt; Symbol: PUcSymbolTableEntry): SizeInt;
-    procedure CompileURE(RE: PWideChar; RELength: SizeInt; Casefold: Boolean);
     procedure CollectPendingOperations(var State: SizeInt);
-    function ConvertRegExpToNFA(RE: PWideChar; RELength: SizeInt): SizeInt;
     function ExecuteURE(Flags: Cardinal; Text: PUCS2; TextLen: SizeInt; var MatchStart, MatchEnd: SizeInt): Boolean;
-    procedure ClearDFA;
     procedure HexDigitSetup(Symbol: PUcSymbolTableEntry);
     function MakeExpression(AType, LHS, RHS: SizeInt): SizeInt;
     function MakeHexNumber(NP: PUCS2; Limit: SizeInt; var Number: UCS4): SizeInt;
-    function MakeSymbol(S: PUCS2; Limit: SizeInt; out Consumed: SizeInt): SizeInt;
     procedure MergeEquivalents;
     function ParsePropertyList(Properties: PUCS2; Limit: SizeInt; var Categories: TCharacterCategories): SizeInt;
     function Peek: SizeInt;
@@ -1192,8 +1187,6 @@ type
     function SymbolsAreDifferent(A, B: PUcSymbolTableEntry): Boolean;
   public
     procedure Clear; override;
-    procedure FindPrepare(const Pattern: WideString; Options: TSearchFlags); overload; override;
-    procedure FindPrepare(Pattern: PWideChar; PatternLength: SizeInt; Options: TSearchFlags); overload; override;
     function FindFirst(const Text: WideString; var Start, Stop: SizeInt): Boolean; overload; override;
     function FindFirst(Text: PWideChar; TextLen: SizeInt; var Start, Stop: SizeInt): Boolean; overload; override;
     function FindAll(const Text: WideString): Boolean; overload; override;
@@ -1608,11 +1601,8 @@ uses
   ZLibh,
   {$ENDIF UNICODE_ZLIB_DATA}
   uRESTDWMemStreams,
-  {$IFNDEF UNICODE_RAW_DATA}
-  uRESTDWMemCompression,
-  {$ENDIF ~UNICODE_RAW_DATA}
   {$ENDIF ~UNICODE_RTL_DATABASE}
-  uRESTDWMemResources, uRESTDWMemSysUtils, uRESTDWMemStringConversions, uRESTDWMemWideStrings;
+  uRESTDWMemResources, uRESTDWMemStringConversions, uRESTDWMemWideStrings;
 const
   {$IFDEF FPC} // declarations from unit [Rtl]Consts
   SDuplicateString = 'String list does not allow duplicates';
@@ -3019,8 +3009,6 @@ const
 procedure TURESearch.Clear;
 begin
   inherited Clear;
-  ClearUREBuffer;
-  ClearDFA;
 end;
 procedure TURESearch.Push(V: SizeInt);
 begin
@@ -3720,42 +3708,6 @@ begin
     end;
   end;
 end;
-function TURESearch.MakeSymbol(S: PUCS2; Limit: SizeInt; out Consumed: SizeInt): SizeInt;
-// constructs a symbol, but only keep unique symbols
-var
-  I: SizeInt;
-  Start: PUcSymbolTableEntry;
-  Symbol: TUcSymbolTableEntry;
-begin
-  // Build the next symbol so we can test to see if it is already in the symbol table.
-  ResetMemory(Symbol, SizeOf(TUcSymbolTableEntry));
-  Consumed := CompileSymbol(S, Limit, @Symbol);
-  // Check to see if the symbol exists.
-  I := 0;
-  Start := @FUREBuffer.SymbolTable.Symbols[0];
-  while (I < FUREBuffer.SymbolTable.SymbolsUsed) and SymbolsAreDifferent(@Symbol, Start) do
-  begin
-    Inc(I);
-    Inc(Start);
-  end;
-  if I < FUREBuffer.SymbolTable.SymbolsUsed then
-  begin
-    // Free up any ranges used for the symbol.
-    if (Symbol.AType = _URE_CCLASS) or (Symbol.AType = _URE_NCCLASS) then
-      Symbol.Symbol.CCL.Ranges := nil;
-    Result := FUREBuffer.SymbolTable.Symbols[I].ID;
-    Exit;
-  end;
-  // Need to add the new symbol.
-  if FUREBuffer.SymbolTable.SymbolsUsed = Length(FUREBuffer.SymbolTable.Symbols) then
-  begin
-    SetLength(FUREBuffer.SymbolTable.Symbols, Length(FUREBuffer.SymbolTable.Symbols) + 8);
-  end;
-  Symbol.ID := FUREBuffer.SymbolTable.SymbolsUsed;
-  Inc(FUREBuffer.SymbolTable.SymbolsUsed);
-  FUREBuffer.SymbolTable.Symbols[Symbol.ID] := Symbol;
-  Result := Symbol.ID;
-end;
 function TURESearch.MakeExpression(AType, LHS, RHS: SizeInt): SizeInt;
 var
   I: SizeInt;
@@ -3811,209 +3763,6 @@ begin
     Operation := Pop;
     State := MakeExpression(Operation, Pop, State);
   until False;
-end;
-function TURESearch.ConvertRegExpToNFA(RE: PWideChar; RELength: SizeInt): SizeInt;
-// Converts the regular expression into an NFA in a form that will be easy to
-// reduce to a DFA. The starting state for the reduction will be returned.
-var
-  C: UCS2;
-  Head, Tail: PUCS2;
-  S: WideString;
-  Symbol,
-  State,
-  LastState,
-  Used,
-  M, N: SizeInt;
-  I: SizeInt;
-begin
-  State := _URE_NOOP;
-  Head := RE;
-  Tail := Head + RELength;
-  while (FUREBuffer.Error = _URE_OK) and (Head < Tail) do
-  begin
-    C := Head^;
-    Inc(Head);
-    case C of
-      '(':
-        Push(_URE_PAREN);
-      ')': // check for the case of too many close parentheses
-        begin
-          if Peek = _URE_NOOP then
-          begin
-            FUREBuffer.Error := _URE_UNBALANCED_GROUP;
-            Break;
-          end;
-          CollectPendingOperations(State);
-          // remove the _URE_PAREN off the stack
-          Pop;
-        end;
-      '*':
-        State := MakeExpression(_URE_STAR, State, _URE_NOOP);
-      '+':
-        State := MakeExpression(_URE_PLUS, State, _URE_NOOP);
-      '?':
-        State := MakeExpression(_URE_QUEST, State, _URE_NOOP);
-      '|':
-        begin
-          CollectPendingOperations(State);
-          Push(State);
-          Push(_URE_OR);
-        end;
-      '{': // expressions of the form {m, n}
-        begin
-          C := #0;
-          M := 0;
-          N := 0;
-          // get first number
-          while UnicodeIsWhiteSpace(UCS4(Head^)) do
-            Inc(Head);
-          // very slow implementation
-          S := '';
-          while (Head^ >= WideChar('0')) and (Head^ <= WideChar('9')) do
-          begin
-            S := S + Head^;
-            Inc(Head);
-          end;
-          if S <> '' then
-            M := StrToInt(S);
-          while UnicodeIsWhiteSpace(UCS4(Head^)) do
-            Inc(Head);
-          if (Head^ <> ',') and (Head^ <> '}') then
-          begin
-            FUREBuffer.Error := _URE_INVALID_RANGE;
-            Break;
-          end;
-          // check for an upper limit
-          if Head^ <> '}' then
-          begin
-            Inc(Head);
-            // get second number
-            while UnicodeIsWhiteSpace(UCS4(Head^)) do
-              Inc(Head);
-            // very slow implementation
-            S := '';
-            while (Head^ >= WideChar('0')) and (Head^ <= WideChar('9')) do
-            begin
-              S := S + Head^;
-              Inc(Head);
-            end;
-            if S <> '' then
-              N := StrToInt(S);
-          end
-          else
-            N := M;
-          if Head^ <> '}' then
-          begin
-            FUREBuffer.Error := _URE_RANGE_OPEN;
-            Break;
-          end
-          else
-            Inc(Head);
-          // N = 0 means unlimited number of occurences
-          if N = 0 then
-          begin
-            case M of
-              0: // {,} {0,}  {0, 0} mean the same as the star operator
-                State := MakeExpression(_URE_STAR, State, _URE_NOOP);
-              1: // {1,} {1, 0} mean the same as the plus operator
-                State := MakeExpression(_URE_PLUS, State, _URE_NOOP);
-            else
-              begin
-                // encapsulate the expanded branches as would they be in parenthesis
-                // in order to avoid unwanted concatenation with pending operations/symbols
-                Push(_URE_PAREN);
-                // {m,} {m, 0} mean M fixed occurences plus star operator
-                // make E^m...
-                for I := 1 to M - 1 do
-                begin
-                  Push(State);
-                  Push(_URE_AND);
-                end;
-                // ...and repeat the last symbol one or more times
-                State := MakeExpression(_URE_PLUS, State, _URE_NOOP);
-                CollectPendingOperations(State);
-                Pop;
-              end;
-            end;
-          end
-          else
-          begin
-            // check proper range limits
-            if M > N then
-            begin
-              FUREBuffer.Error := _URE_INVALID_RANGE;
-              Break;
-            end;
-            // check special case {0, 1} (which corresponds to the ? operator)
-            if (M = 0) and (N = 1) then
-              State := MakeExpression(_URE_QUEST, State, _URE_NOOP)
-            else
-            begin
-              // handle the general case by expanding {m, n} into the equivalent
-              // expression E^m | E^(m + 1) | ... | E^n
-              // encapsulate the expanded branches as would they be in parenthesis
-              // in order to avoid unwanted concatenation with pending operations/symbols
-              Push(_URE_PAREN);
-              // keep initial state as this is the one all alternatives start from
-              LastState := State;
-              // Consider the special case M = 0 first. Because there's no construct
-              // to enter a pure epsilon-transition into the expression array I
-              // work around with the question mark operator to describe the first
-              // and second branch alternative.
-              if M = 0 then
-              begin
-                State := MakeExpression(_URE_QUEST, State, _URE_NOOP);
-                Inc(M, 2);
-                // Mark the pending OR operation (there must always follow at
-                // least on more alternative because the special case {0, 1} has
-                // already been handled).
-                Push(State);
-                Push(_URE_OR);
-              end;
-              while M <= N do
-              begin
-                State := LastState;
-                // create E^M
-                for I := 1 to SizeInt(M) - 1 do
-                begin
-                  Push(State);
-                  Push(_URE_AND);
-                end;
-                // finish the branch and mark it as pending OR operation if it
-                // isn't the last one
-                CollectPendingOperations(State);
-                if M < N then
-                begin
-                  Push(State);
-                  Push(_URE_OR);
-                end;
-                Inc(M);
-              end;
-              // remove the _URE_PAREN off the stack
-              Pop;
-            end;
-          end;
-        end;
-    else
-      Dec(Head);
-      Symbol := MakeSymbol(Head, Tail - Head, Used);
-      Inc(Head, Used);
-      State := MakeExpression(_URE_SYMBOL, Symbol, _URE_NOOP);
-    end;
-    if (C <> '(') and (C <> '|') and (C <> '{') and (Head < Tail) and
-       (not IsSpecial(Word(Head^)) or (Head^ = '(')) then
-    begin
-      Push(State);
-      Push(_URE_AND);
-    end;
-  end;
-  CollectPendingOperations(State);
-  if FUREBuffer.Stack.ListUsed > 0 then
-    FUREBuffer.Error := _URE_UNBALANCED_GROUP;
-  if FUREBuffer.Error = _URE_OK then
-    Result := State
-  else
-    Result := _URE_NOOP;
 end;
 procedure TURESearch.AddSymbolState(Symbol, State: SizeInt);
 var
@@ -4371,157 +4120,6 @@ begin
     Inc(State1);
   end;
 end;
-procedure TURESearch.ClearUREBuffer;
-var
-  I: SizeInt;
-begin
-  with FUREBuffer do
-  begin
-    // quite a few dynamic arrays to free
-    Stack.List := nil;
-    ExpressionList.Expressions := nil;
-    // the symbol table has been handed over to the DFA and will be freed on
-    // release of the DFA
-    SymbolTable.SymbolsUsed := 0;
-    for I := 0 to States.StatesUsed - 1 do
-    begin
-      States.States[I].Transitions := nil;
-      States.States[I].StateList.List := nil;
-      States.States[I].StateList.ListUsed := 0;
-      States.States[I].TransitionsUsed := 0;
-    end;
-    States.StatesUsed := 0;
-    States.States := nil;
-    EquivalentList.Equivalents := nil;
-  end;
-  ResetMemory(FUREBuffer, SizeOf(FUREBuffer));
-end;
-procedure TURESearch.CompileURE(RE: PWideChar; RELength: SizeInt; Casefold: Boolean);
-var
-  I, J: SizeInt;
-  State: SizeInt;
-  Run: PUcState;
-  TP: SizeInt;
-  procedure UREError(Text: string; RE: PWideChar);
-  var
-    S: string;
-  begin
-    S := RE;
-    raise EJclUnicodeError.CreateResFmt(@RsUREErrorFmt, [LoadResString(@RsUREBaseString), Text, S]);
-  end;
-begin
-  // be paranoid
-  if (RE <> nil) and (RE^ <> WideNull) and (RELength > 0) then
-  begin
-    // Reset the various fields of the compilation buffer. Default the Flags
-    // to indicate the presense of the "^$" pattern.  If any other pattern
-    // occurs, then this flag will be removed.  This is done to catch this
-    // special pattern and handle it specially when matching.
-    ClearUREBuffer;
-    ClearDFA;
-    FUREBuffer.Flags := _URE_DFA_BLANKLINE;
-    if Casefold then
-      FUREBuffer.Flags := FUREBuffer.Flags or _URE_DFA_CASEFOLD;
-    // Construct the NFA. If this stage returns a 0, then an error occurred or an
-    // empty expression was passed.
-    State := ConvertRegExpToNFA(RE, RELength);
-    if State <> _URE_NOOP then
-    begin
-      // Do the expression reduction to get the initial DFA.
-      Reduce(State);
-      // Merge all the equivalent DFA States.
-      MergeEquivalents;
-      // Construct the minimal DFA.
-      FDFA.Flags := FUREBuffer.Flags and (_URE_DFA_CASEFOLD or _URE_DFA_BLANKLINE);
-      // Free up the NFA state groups and transfer the symbols from the buffer
-      // to the DFA.
-      FDFA.SymbolTable := FUREBuffer.SymbolTable;
-      FUREBuffer.SymbolTable.Symbols := nil;
-      // Collect the total number of states and transitions needed for the DFA.
-      State := 0;
-      for I := 0 to FUREBuffer.States.StatesUsed - 1 do
-      begin
-        if FUREBuffer.States.States[I].ID = State then
-        begin
-          Inc(FDFA.StateList.StatesUsed);
-          Inc(FDFA.TransitionList.TransitionsUsed, FUREBuffer.States.States[I].TransitionsUsed);
-          Inc(State);
-        end;
-      end;
-      // Allocate enough space for the states and transitions.
-      SetLength(FDFA.StateList.States, FDFA.StateList.StatesUsed);
-      SetLength(FDFA.TransitionList.Transitions, FDFA.TransitionList.TransitionsUsed);
-      // Actually transfer the DFA States from the buffer.
-      State := 0;
-      TP := 0;
-      Run := @FUREBuffer.States.States[0];
-      for I := 0 to FUREBuffer.States.StatesUsed - 1 do
-      begin
-        if Run.ID = State then
-        begin
-          FDFA.StateList.States[I].StartTransition := TP;
-          FDFA.StateList.States[I].NumberTransitions := Run.TransitionsUsed;
-          FDFA.StateList.States[I].Accepting := Run.Accepting;
-          // Add the transitions for the state
-          for J := 0 to FDFA.StateList.States[I].NumberTransitions - 1 do
-          begin
-            FDFA.TransitionList.Transitions[TP].Symbol := Run.Transitions[J].LHS;
-            FDFA.TransitionList.Transitions[TP].NextState :=
-              FUREBuffer.States.States[Run.Transitions[J].RHS].ID;
-            Inc(TP);
-          end;
-          Inc(State);
-        end;
-        Inc(Run);
-      end;
-    end
-    else
-    begin
-      // there might be an error while parsing the pattern, show it if so
-      case FUREBuffer.Error of
-        _URE_UNEXPECTED_EOS:
-          UREError(LoadResString(@RsUREUnexpectedEOS), RE);
-        _URE_CCLASS_OPEN:
-          UREError(LoadResString(@RsURECharacterClassOpen), RE);
-        _URE_UNBALANCED_GROUP:
-          UREError(LoadResString(@RsUREUnbalancedGroup), RE);
-        _URE_INVALID_PROPERTY:
-          UREError(LoadResString(@RsUREInvalidCharProperty), RE);
-        _URE_INVALID_RANGE:
-          UREError(LoadResString(@RsUREInvalidRepeatRange), RE);
-        _URE_RANGE_OPEN:
-          UREError(LoadResString(@RsURERepeatRangeOpen), RE);
-      else
-        // expression was empty
-        raise EJclUnicodeError.CreateRes(@RsUREExpressionEmpty);
-      end;
-    end;
-  end;
-end;
-procedure TURESearch.ClearDFA;
-var
-  I: SizeInt;
-begin
-  with FDFA do
-  begin
-    for I := 0 to SymbolTable.SymbolsUsed - 1 do
-    begin
-      if (SymbolTable.Symbols[I].AType = _URE_CCLASS) or
-         (SymbolTable.Symbols[I].AType = _URE_NCCLASS) then
-        SymbolTable.Symbols[I].Symbol.CCL.Ranges := nil;
-    end;
-    for I := 0 to SymbolTable.SymbolsUsed - 1 do
-    begin
-      FDFA.SymbolTable.Symbols[I].States.List := nil;
-      FDFA.SymbolTable.Symbols[I].States.ListUsed := 0;
-    end;
-    SymbolTable.SymbolsUsed := 0;
-    SymbolTable.Symbols := nil;
-    StateList.States := nil;
-    TransitionList.Transitions := nil;
-  end;
-  ResetMemory(FDFA, SizeOf(FDFA));
-end;
 function IsSeparator(C: UCS4): Boolean;
 begin
   Result := (C = $D) or (C = $A) or (C = $2028) or (C = $2029);
@@ -4781,14 +4379,6 @@ begin
   Result := ExecuteURE(0, Text, TextLen, Start, Stop);
   if Result then
     AddResult(Start, Stop);
-end;
-procedure TURESearch.FindPrepare(Pattern: PWideChar; PatternLength: SizeInt; Options: TSearchFlags);
-begin
-  CompileURE(Pattern, PatternLength, not (sfCaseSensitive in Options));
-end;
-procedure TURESearch.FindPrepare(const Pattern: WideString; Options: TSearchFlags);
-begin
-  CompileURE(PWideChar(Pattern), Length(Pattern), not (sfCaseSensitive in Options));
 end;
 //=== { TWideStrings } =======================================================
 constructor TWideStrings.Create;

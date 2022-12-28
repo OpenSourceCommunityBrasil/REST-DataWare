@@ -205,23 +205,28 @@ Uses
   {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
    {$IF Defined(HAS_FMX)}
     DWString     = String;
-    DWWideString = String;
+    DWWideString = WideString;
+    DWChar       = Char;
    {$ELSE}
     DWString     = Utf8String;
-    DWWideString = Utf8String;
+    DWWideString = WideString;
+    DWChar       = Utf8Char;
    {$IFEND}
   {$ELSE}
    {$IF Defined(HAS_FMX)}
     DWString     = Utf8String;
-    DWWideString = Utf8String;
+    DWWideString = WideString;
+    DWChar       = Utf8Char;
    {$ELSE}
     DWString     = AnsiString;
     DWWideString = WideString;
+    DWChar       = Char;
    {$IFEND}
   {$IFEND}
  {$ELSE}
   DWString     = AnsiString;
   DWWideString = WideString;
+  DWChar       = Char;
  {$ENDIF}
  PArrayData    = ^TArrayData;
  TArrayData    = Array of Variant;
@@ -469,10 +474,26 @@ Uses
 
 Type
  TRESTDWDatasetArray = Array of TRESTDWClientSQLBase;
+ TArrayMonth         = Array [1..12] Of String;
+ TArrayWeek          = Array [1..7] Of String;
 
 Var
- RESTDWHexDigits   : Array [0..15] Of Char = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F');
- RESTDWOctalDigits : Array [0..7]  Of Char = ('0', '1', '2', '3', '4', '5', '6', '7');
+ RESTDWHexDigits        : Array [0..15] Of Char = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F');
+ RESTDWOctalDigits      : Array [0..7]  Of Char = ('0', '1', '2', '3', '4', '5', '6', '7');
+ RESTDWShortMonthNames,
+ RESTDWLongMonthNames   : TArrayMonth;
+ RESTDWShortDayNames,
+ RESTDWLongDayNames     : TArrayWeek;
+ RESTDWTimeAMString,
+ RESTDWTimePMString,
+ RESTDWCurrencyString,
+ RESTDWShortTimeFormat,
+ RESTDWShortDateFormat  : DWString;
+ RESTDWCurrencyDecimals : Byte;
+ RESTDWDateSeparator,
+ RESTDWTimeSeparator,
+ RESTDWThousandSeparator,
+ RESTDWDecimalSeparator : DWChar;
 
 Implementation
 
@@ -1034,5 +1055,55 @@ Begin
  vItem^ := Item;
  Result := TList(Self).Add(vItem);
 End;
+
+Initialization
+{$IFDEF FPC}
+ RESTDWDecimalSeparator  := DecimalSeparator;
+ RESTDWThousandSeparator := ThousandSeparator;
+ RESTDWCurrencyDecimals  := CurrencyDecimals;
+ RESTDWShortDateFormat   := ShortDateFormat;
+ RESTDWDateSeparator     := DateSeparator;
+ RESTDWTimeSeparator     := TimeSeparator;
+ RESTDWShortTimeFormat   := ShortTimeFormat;
+ RESTDWTimeAMString      := TimeAMString;
+ RESTDWTimePMString      := TimePMString;
+ RESTDWLongMonthNames    := TArrayMonth(LongMonthNames);
+ RESTDWShortMonthNames   := TArrayMonth(ShortMonthNames);
+ RESTDWShortDayNames     := TArrayWeek(ShortDayNames);
+ RESTDWLongDayNames      := TArrayWeek(LongDayNames);
+ RESTDWCurrencyString    := CurrencyString;
+{$ELSE}
+ {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+  RESTDWDecimalSeparator  := FormatSettings.DecimalSeparator;
+  RESTDWThousandSeparator := FormatSettings.ThousandSeparator;
+  RESTDWCurrencyDecimals  := FormatSettings.CurrencyDecimals;
+  RESTDWShortDateFormat   := FormatSettings.ShortDateFormat;
+  RESTDWDateSeparator     := FormatSettings.DateSeparator;
+  RESTDWTimeSeparator     := FormatSettings.TimeSeparator;
+  RESTDWShortTimeFormat   := FormatSettings.ShortTimeFormat;
+  RESTDWTimeAMString      := FormatSettings.TimeAMString;
+  RESTDWTimePMString      := FormatSettings.TimePMString;
+  RESTDWCurrencyString    := FormatSettings.CurrencyString;
+  RESTDWLongMonthNames    := TArrayMonth(FormatSettings.LongMonthNames);
+  RESTDWShortMonthNames   := TArrayMonth(FormatSettings.ShortMonthNames);
+  RESTDWShortDayNames     := TArrayWeek(FormatSettings.ShortDayNames);
+  RESTDWLongDayNames      := TArrayWeek(FormatSettings.LongDayNames);
+ {$ELSE}
+  RESTDWDecimalSeparator  := DecimalSeparator;
+  RESTDWThousandSeparator := ThousandSeparator;
+  RESTDWCurrencyDecimals  := CurrencyDecimals;
+  RESTDWShortDateFormat   := ShortDateFormat;
+  RESTDWDateSeparator     := DateSeparator;
+  RESTDWTimeSeparator     := TimeSeparator;
+  RESTDWShortTimeFormat   := ShortTimeFormat;
+  RESTDWTimeAMString      := TimeAMString;
+  RESTDWTimePMString      := TimePMString;
+  RESTDWLongMonthNames    := TArrayMonth(LongMonthNames);
+  RESTDWShortMonthNames   := TArrayMonth(ShortMonthNames);
+  RESTDWShortDayNames     := TArrayWeek(ShortDayNames);
+  RESTDWLongDayNames      := TArrayWeek(LongDayNames);
+  RESTDWCurrencyString    := CurrencyString;
+ {$IFEND}
+{$ENDIF}
 
 end.

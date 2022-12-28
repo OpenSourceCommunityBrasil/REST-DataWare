@@ -46,7 +46,7 @@ uses
   AnsiStrings,
   {$ENDIF HAS_UNIT_ANSISTRINGS}
   {$ENDIF ~HAS_UNITSCOPE}
-  uRESTDWMemBase;
+  uRESTDWMemBase, Math;
 // Ansi types
 type
   {$IFDEF SUPPORTS_UNICODE}
@@ -508,8 +508,8 @@ uses
   {$ENDIF}
   {$ENDIF HAS_UNIT_RTLCONSTS}
   {$ENDIF SUPPORTS_UNICODE}
-  uRESTDWMemLogic, uRESTDWMemResources, uRESTDWMemStreams, uRESTDWMemSysUtils,
-  uRESTDWMemStringsB;
+  uRESTDWMemResources, uRESTDWMemStreams,
+  uRESTDWMemStringsB, uRESTDWBasicTypes;
 //=== Internal ===============================================================
 type
   TAnsiStrRec = packed record
@@ -3571,8 +3571,8 @@ var
   DecSep: AnsiChar;
   ThouSep: AnsiChar;
 begin
-  DecSep := AnsiChar(JclFormatSettings.DecimalSeparator);
-  ThouSep := AnsiChar(JclFormatSettings.ThousandSeparator);
+  DecSep := AnsiChar(RESTDWDecimalSeparator);
+  ThouSep := AnsiChar(RESTDWThousandSeparator);
   Temp := S;
   SwapSeparators := False;
   IsNegative := False;

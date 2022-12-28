@@ -333,12 +333,13 @@ uses
   AnsiStrings,
   {$ENDIF HAS_UNIT_ANSISTRINGS}
   FMTBcd, SqlTimSt,
-  uRESTDWMemSysUtils, uRESTDWMemAnsiStrings,
+  uRESTDWMemAnsiStrings,
   {$IFNDEF UNICODE}
   uRESTDWMemJCLUtils,
   {$ENDIF ~UNICODE}
   uRESTDWMemVCLUtils,
-  uRESTDWMemResources;
+  uRESTDWMemResources,
+  uRESTDWTools;
 const
   ftBlobTypes = [ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftParadoxOle,
     ftDBaseOle, ftTypedBinary, ftOraBlob, ftOraClob
@@ -364,6 +365,14 @@ type
     BookmarkData: TJvBookmarkData;
     BookmarkFlag: TBookmarkFlag;
   end;
+
+
+Function ExtractFieldNameEx(const Fields: {$IFDEF COMPILER10_UP} WideString {$ELSE} string {$ENDIF};
+  var Pos: Integer): string;
+begin
+  Result := ExtractFieldName(Fields, Pos);
+end;
+
 procedure AppHandleException(Sender: TObject);
 begin
   if Assigned(ApplicationHandleException) then

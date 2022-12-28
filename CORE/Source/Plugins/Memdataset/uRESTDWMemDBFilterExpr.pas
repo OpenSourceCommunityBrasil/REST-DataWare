@@ -40,7 +40,7 @@ type
   end;
 implementation
 uses
-  SqlTimSt, DateUtils, uRESTDWMemResources, uRESTDWMemSysUtils;
+  SqlTimSt, DateUtils, uRESTDWMemResources, uRESTDWBasicTypes, uRESTDWTools;
 var
   FieldTypeMapInitialized: Boolean = False;
   FieldTypeMap: TFieldMap;

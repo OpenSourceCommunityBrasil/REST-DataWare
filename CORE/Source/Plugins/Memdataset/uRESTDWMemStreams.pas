@@ -103,27 +103,6 @@ type
     function Write(const Buffer; Count: Longint): Longint; override;
     function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
   end;
-  TJclNullStream = class(TJclStream)
-  private
-    FPosition: Int64;
-    FSize: Int64;
-  protected
-    procedure SetSize(const NewSize: Int64); override;
-  public
-    function Read(var Buffer; Count: Longint): Longint; override;
-    function Write(const Buffer; Count: Longint): Longint; override;
-    function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
-  end;
-  TJclRandomStream = class(TJclNullStream)
-  protected
-    function GetRandSeed: Longint; virtual;
-    procedure SetRandSeed(Seed: Longint); virtual;
-  public
-    function RandomData: Byte; virtual;
-    procedure Randomize; dynamic;
-    function Read(var Buffer; Count: Longint): Longint; override;
-    property RandSeed: Longint read GetRandSeed write SetRandSeed;
-  end;
   TJclMultiplexStream = class(TJclStream)
   private
     FStreams: TList;
@@ -538,8 +517,7 @@ uses
   {$ENDIF HAS_UNITSCOPE}
   uRESTDWMemResources,
   uRESTDWMemCharsets,
-  uRESTDWMemMath,
-  uRESTDWMemSysUtils;
+  uRESTDWMemMath;
 
 function StreamCopy(Source: TStream; Dest: TStream; BufferSize: Longint): Int64;
 var
@@ -831,101 +809,6 @@ begin
     Result := -1
   else
     Result := 0;
-end;
-//=== { TJclNullStream } =====================================================
-// a stream which only keeps position and size, but no data
-// so it is a Unix /dev/zero equivalent (?)
-procedure TJclNullStream.SetSize(const NewSize: Int64);
-begin
-  if NewSize > 0 then
-    FSize := NewSize
-  else
-    FSize := 0;
-  if FPosition > FSize then
-    FPosition := FSize;
-end;
-function TJclNullStream.Read(var Buffer; Count: Longint): Longint;
-begin
-  if Count < 0 then
-    Count := 0;
-  // FPosition > FSize is possible!
-  if FSize - FPosition < Count then
-    Count := FSize - FPosition;
-  // does not read if beyond EOF
-  if Count > 0 then
-  begin
-    ResetMemory(Buffer, Count);
-    FPosition := FPosition + Count;
-  end;
-  Result := Count;
-end;
-function TJclNullStream.Write(const Buffer; Count: Longint): Longint;
-begin
-  if Count < 0 then
-    Count := 0;
-  FPosition := FPosition + Count;
-  // writing when FPosition > FSize is possible!
-  if FPosition > FSize then
-    FSize := FPosition;
-  Result := Count;
-end;
-function TJclNullStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
-var
-  Rel: Int64;
-begin
-  case Origin of
-    soBeginning:
-      Rel := 0;
-    soCurrent:
-      Rel := FPosition;
-    soEnd:
-      Rel := FSize;
-  else
-    // force Rel + Offset = -1 (code is never reached)
-    Rel := Offset - 1;
-  end;
-  if Rel + Offset >= 0 then
-  begin
-    // all non-negative destination positions including beyond EOF are valid
-    FPosition := Rel + Offset;
-    Result := FPosition;
-  end
-  else
-    Result := -1;
-end;
-//=== { TJclRandomStream } ===================================================
-// A TJclNullStream decendant which returns random data when read
-// so it is a Unix /dev/random equivalent
-function TJclRandomStream.GetRandSeed: Longint;
-begin
-  Result := System.RandSeed;
-end;
-procedure TJclRandomStream.SetRandSeed(Seed: Longint);
-begin
-  System.RandSeed := Seed;
-end;
-function TJclRandomStream.RandomData: Byte;
-begin
-  Result := System.Random(256);
-end;
-procedure TJclRandomStream.Randomize;
-begin
-  System.Randomize;
-end;
-function TJclRandomStream.Read(var Buffer; Count: Longint): Longint;
-var
-  I: Longint;
-  BufferPtr: PByte;
-begin
-  // this handles all necessary checks
-  Count := inherited Read(Buffer, Count);
-  BufferPtr := @Buffer;
-  for I := 0 to Count - 1 do
-  begin
-    BufferPtr^ := RandomData;
-    Inc(BufferPtr);
-  end;
-  Result := Count;
 end;
 //=== { TJclMultiplexStream } ================================================
 constructor TJclMultiplexStream.Create;

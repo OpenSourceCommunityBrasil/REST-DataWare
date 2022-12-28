@@ -35,7 +35,7 @@ uses
   MultiMon,
   Classes, // must be after "Forms"
   uRESTDWMemBase,
-  uRESTDWMemJCLUtils, uRESTDWMemAppStorage, uRESTDWMemTypes;
+  uRESTDWMemJCLUtils, uRESTDWMemTypes;
 
 // hides / shows the a forms caption area
 procedure HideFormCaption(FormHandle: THandle; Hide: Boolean);
@@ -289,7 +289,6 @@ uses
   CommCtrl, ShlObj, ActiveX,
   {$ENDIF MSWINDOWS}
   Math, Contnrs,
-  uRESTDWMemFileUtils,
   uRESTDWMemConsts, uRESTDWMemResources;
 
 //{$R uRESTDWMemConsts.res}
@@ -532,89 +531,6 @@ begin
   Result := MsgBox(Caption, Text, Flags);
   {$ENDIF UNIX}
 end;
-{$IFDEF MSWINDOWS}
-function LoadAniCursor(Instance: THandle; ResID: PChar): HCURSOR;
-{ Unfortunately I don't know how we can load animated cursor from
-  executable resource directly. So I write this routine using temporary
-  file and LoadCursorFromFile function. }
-var
-  S: TFileStream;
-  FileName: string;
-  RSrc: HRSRC;
-  Res: THandle;
-  Data: Pointer;
-begin
-  Result := 0;
-  RSrc := FindResource(Instance, ResID, RT_ANICURSOR);
-  if RSrc <> 0 then
-  begin
-    FileName := FileGetTempName('ANI');
-    try
-      Res := LoadResource(Instance, RSrc);
-      try
-        Data := LockResource(Res);
-        if Data <> nil then
-        try
-          S := TFileStream.Create(FileName, fmCreate);
-          try
-            S.WriteBuffer(Data^, SizeOfResource(Instance, RSrc));
-          finally
-            S.Free;
-          end;
-          Result := LoadCursorFromFile(PChar(FileName));
-        finally
-          UnlockResource(Res);
-        end;
-      finally
-        FreeResource(Res);
-      end;
-    finally
-      Windows.DeleteFile(PChar(FileName));
-    end;
-  end;
-end;
-{$ENDIF MSWINDOWS}
-var
-  WaitCount: Integer = 0;
-  SaveCursor: TCursor = crDefault;
-const
-  FWaitCursor: TCursor = crHourGlass;
-{$IFDEF MSWINDOWS}
-var
-  OLEDragCursorsLoaded: Boolean = False;
-{ Check if this is the active Windows task }
-{ Copied from implementation of FORMS.PAS  }
-type
-  PCheckTaskInfo = ^TCheckTaskInfo;
-  TCheckTaskInfo = record
-    FocusWnd: Windows.HWND;
-    Found: Boolean;
-  end;
-function CheckTaskWindow(Window: HWND; Data: LPARAM): BOOL; stdcall;
-begin
-  Result := True;
-  if PCheckTaskInfo(Data).FocusWnd = Window then
-  begin
-    PCheckTaskInfo(Data).Found := True;
-    Result := False;
-  end;
-end;
-function IsForegroundTask: Boolean;
-var
-  Info: TCheckTaskInfo;
-begin
-  Info.FocusWnd := Windows.GetActiveWindow;
-  Info.Found := False;
-  EnumThreadWindows(GetCurrentThreadId, @CheckTaskWindow, LPARAM(@Info));
-  Result := Info.Found;
-end;
-{$ENDIF MSWINDOWS}
-{$IFDEF UNIX}
-function IsForegroundTask: Boolean;
-begin
-  Result := Application.Active;
-end;
-{$ENDIF UNIX}
 const
   NoHelp = 0; { for MsgDlg2 }
   MsgDlgCharSet: Integer = DEFAULT_CHARSET;

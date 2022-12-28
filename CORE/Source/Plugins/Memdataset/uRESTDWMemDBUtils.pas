@@ -27,8 +27,7 @@ uses
   {$IFDEF MSWINDOWS}
   Windows,
   {$ENDIF MSWINDOWS}
-  Variants, Classes, SysUtils, DB,
-  uRESTDWMemAppStorage;
+  Variants, Classes, SysUtils, DB;
 
 type
   IJvDataControl = interface
@@ -87,16 +86,11 @@ var
   CreateLocateObject: TCreateLocateObject = nil;
 function CreateLocate(DataSet: TDataSet): TJvLocateObject;
 { Utility routines }
-function ExtractFieldNameEx(const Fields: {$IFDEF COMPILER10_UP} WideString {$ELSE} string {$ENDIF};
-  var Pos: Integer): string;
 function IsDataSetEmpty(DataSet: TDataSet): Boolean;
 procedure RefreshQuery(Query: TDataSet);
 function DataSetSortedSearch(DataSet: TDataSet;
   const Value, FieldName: string; CaseInsensitive: Boolean): Boolean;
 function DataSetSectionName(DataSet: TDataSet): string;
-procedure InternalSaveFields(DataSet: TDataSet; AppStorage: TJvCustomAppStorage; const Path: string);
-procedure InternalRestoreFields(DataSet: TDataSet; AppStorage: TJvCustomAppStorage;
-  const Path: string; RestoreVisible: Boolean);
 function DataSetLocateThrough(DataSet: TDataSet; const KeyFields: string;
   const KeyValues: Variant; Options: TLocateOptions): Boolean;
 (*
@@ -104,9 +98,6 @@ procedure SaveFieldsReg(DataSet: TDataSet; IniFile: TRegIniFile);
 procedure RestoreFieldsReg(DataSet: TDataSet; IniFile: TRegIniFile;
   RestoreVisible: Boolean);
 *)
-procedure SaveFields(DataSet: TDataSet; AppStorage: TJvCustomAppStorage; const Path: string = '');
-procedure RestoreFields(DataSet: TDataSet; AppStorage: TJvCustomAppStorage; const Path: string = '';
-  RestoreVisible: Boolean = True);
 procedure AssignRecord(Source, Dest: TDataSet; ByName: Boolean);
 procedure CheckRequiredField(Field: TField);
 procedure CheckRequiredFields(const Fields: array of TField);
@@ -528,90 +519,6 @@ begin
   Result := Section;
   if Result = '' then
     Result := DataSetSectionName(DataSet);
-end;
-procedure InternalSaveFields(DataSet: TDataSet; AppStorage: TJvCustomAppStorage; const Path: string);
-var
-  I: Integer;
-  Field: TField;
-begin
-  AppStorage.BeginUpdate;
-  try
-    for I := 0 to DataSet.FieldCount - 1 do
-    begin
-      Field := DataSet.Fields[i];
-      AppStorage.WriteString(AppStorage.ConcatPaths([CheckSection(DataSet, Path),
-        DataSet.Name + Field.FieldName]),
-        Format('%d,%d,%d', [Field.Index, Field.DisplayWidth, Integer(Field.Visible)]));
-    end;
-  finally
-    AppStorage.EndUpdate;
-  end;
-end;
-procedure InternalRestoreFields(DataSet: TDataSet; AppStorage: TJvCustomAppStorage;
-  const Path: string; RestoreVisible: Boolean);
-type
-  TFieldInfo = record
-    Field: TField;
-    EndIndex: Integer;
-  end;
-  TFieldArray = array of TFieldInfo;
-const
-  Delims = [' ', ','];
-var
-  I, J: Integer;
-  S: string;
-  FieldArray: TFieldArray;
-begin
-  SetLength(FieldArray, DataSet.FieldCount);
-  AppStorage.BeginUpdate;
-  try
-    for I := 0 to DataSet.FieldCount - 1 do
-    begin
-      S := AppStorage.ReadString(AppStorage.ConcatPaths([CheckSection(DataSet, Path),
-        DataSet.Name + DataSet.Fields[I].FieldName]), '');
-      FieldArray[I].Field := DataSet.Fields[I];
-      FieldArray[I].EndIndex := DataSet.Fields[I].Index;
-      if S <> '' then
-      begin
-        FieldArray[I].EndIndex := StrToIntDef(ExtractWord(1, S, Delims),
-          FieldArray[I].EndIndex);
-        DataSet.Fields[I].DisplayWidth := StrToIntDef(ExtractWord(2, S, Delims),
-          DataSet.Fields[I].DisplayWidth);
-        if RestoreVisible then
-          DataSet.Fields[I].Visible := Boolean(StrToIntDef(ExtractWord(3, S, Delims),
-            Integer(DataSet.Fields[I].Visible)));
-      end;
-    end;
-    for I := 0 to DataSet.FieldCount - 1 do
-    begin
-      for J := 0 to DataSet.FieldCount - 1 do
-      begin
-        if FieldArray[J].EndIndex = I then
-        begin
-          FieldArray[J].Field.Index := FieldArray[J].EndIndex;
-          Break;
-        end;
-      end;
-    end;
-  finally
-    AppStorage.EndUpdate;
-    FieldArray := nil;
-  end;
-end;
-procedure SaveFields(DataSet: TDataSet; AppStorage: TJvCustomAppStorage; const Path: string);
-begin
-  InternalSaveFields(DataSet, AppStorage, AppStorage.ConcatPaths([Path, DataSetSectionName(DataSet)]));
-end;
-procedure RestoreFields(DataSet: TDataSet; AppStorage: TJvCustomAppStorage; const Path: string;
-  RestoreVisible: Boolean);
-begin
-  InternalRestoreFields(DataSet, AppStorage, AppStorage.ConcatPaths([DataSetSectionName(DataSet)]),
-    RestoreVisible);
-end;
-function ExtractFieldNameEx(const Fields: {$IFDEF COMPILER10_UP} WideString {$ELSE} string {$ENDIF};
-  var Pos: Integer): string;
-begin
-  Result := ExtractFieldName(Fields, Pos);
 end;
 function IsDataSetEmpty(DataSet: TDataSet): Boolean;
 begin
