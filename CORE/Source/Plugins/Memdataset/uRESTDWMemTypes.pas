@@ -27,7 +27,6 @@ interface
 
 uses
   SysUtils, Classes,
-  Windows, Messages,
   uRESTDWMemResources;
 const
   MaxPixelCount = 32767;
@@ -41,6 +40,33 @@ type
   TJvBytes = Pointer;
   IntPtr = Pointer;
 type
+  {$IFNDEF FPC}
+   {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
+    {$IF Defined(HAS_FMX)}
+     DWString     = String;
+     DWWideString = WideString;
+     DWChar       = Char;
+    {$ELSE}
+     DWString     = Utf8String;
+     DWWideString = WideString;
+     DWChar       = Utf8Char;
+    {$IFEND}
+   {$ELSE}
+    {$IF Defined(HAS_FMX)}
+     DWString     = Utf8String;
+     DWWideString = Utf8String;
+     DWChar       = Utf8Char;
+    {$ELSE}
+     DWString     = AnsiString;
+     DWWideString = WideString;
+     DWChar       = Char;
+    {$IFEND}
+   {$IFEND}
+  {$ELSE}
+   DWString     = AnsiString;
+   DWWideString = WideString;
+   DWChar       = Char;
+  {$ENDIF}
   {$IFNDEF COMPILER9_UP}
   TVerticalAlignment = (taAlignTop, taAlignBottom, taVerticalCenter);
   TTopBottom = taAlignTop..taAlignBottom;
@@ -120,74 +146,21 @@ type
   TJvDoneStreamEvent = procedure(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string) of object;
   TJvHTTPProgressEvent = procedure(Sender: TObject; UserData, Position: Integer; TotalSize: Integer; Url: string; var Continue: Boolean) of object;
   TJvFTPProgressEvent = procedure(Sender: TObject; Position: Integer; Url: string) of object;
-  // from JvComponent.pas
-  TJvClipboardCommand = (caCopy, caCut, caPaste, caClear, caUndo);
-  TJvClipboardCommands = set of TJvClipboardCommand;
-  PJvRGBArray = ^TJvRGBArray;
-  TJvRGBArray = array [0..MaxPixelCount] of TJvRGBTriple;
-  PRGBQuadArray = ^TRGBQuadArray;
-  TRGBQuadArray = array [0..MaxPixelCount] of TRGBQuad;
-  PRGBPalette = ^TRGBPalette;
-  TRGBPalette = array [Byte] of TRGBQuad;
-  { (rom) unused
-  TJvPoint = class(TPersistent)
-  protected
-    FX: Integer;
-    FY: Integer;
-  published
-    property X: Integer read FX write FX;
-    property Y: Integer read FY write FY;
-  end;
-  }
   TJvErrorEvent = procedure(Sender: TObject; ErrorMsg: string) of object;
   TJvWaveLocation = (frFile, frResource, frRAM);
   TJvPopupPosition = (ppNone, ppForm, ppApplication);
-  //  TJvDirMask = (dmFileNameChange, dmDirnameChange, dmAttributesChange, dmSizeChange, dmLastWriteChange, dmSecurityChange); //JvDirectorySpy
-  //  TJvDirMasks = set of TJvDirMask;
-  //  EJvDirectoryError = class(EJVCLException); // JvDirectorySpy
-  //  TListEvent = procedure(Sender: TObject; Title: string; Handle: THandle) of object; // JvWindowsTitle
   TJvProgressEvent = procedure(Sender: TObject; Current, Total: Integer) of object;
   TJvNextPageEvent = procedure(Sender: TObject; PageNumber: Integer) of object;
   TJvBitmapStyle = (bsNormal, bsCentered, bsStretched);
-  //  TOnOpened = procedure(Sender: TObject; Value: string) of object; // archive
-  //  TOnOpenCanceled = procedure(Sender: TObject) of object; // archive
   TJvGradientStyle = (grFilled, grEllipse, grHorizontal, grVertical, grPyramid, grMount);
-  //  TOnDelete = procedure(Sender: TObject; Path: string) of object;
   TJvParentEvent = procedure(Sender: TObject; ParentWindow: THandle) of object;
-  //  TOnImage = procedure(Sender: TObject; Image: TBitmap) of object; // JvClipboardViewer
-  //  TOnText = procedure(Sender: TObject; Text: string) of object;
-  //  TJvRestart = (rsLogoff, rsShutdown, rsReboot, rsRestart, rsRebootSystem, rsExitAndExecApp);
-  //  TJvRunOption = (roNoBrowse, roNoDefault, roCalcDirectory, roNoLabel, roNoSeparateMem); // JvRunDlg
-  //  TJvRunOptions = set of TJvRunOption; // JvRunDlg
-  //  TJvFileKind = (ftFile, ftPrinter); // JvObjectPropertiesDlg
-  //  TSHFormatDrive = function(Handle: THandle; Drive, ID, Options: Word): LongInt; stdcall; // JvFormatDrive
-  //  TFormatOption = (shQuickFormat, shFull, shSystemFilesOnly); // JvFormatDrive
-  //  TButtonStyle = (bsAbortRetryIgnore, bsOk, bsOkCancel, bsRetryCancel, bsYesNo, bsYesNoCancel); // JvMessageBox
-  //  TButtonDisplay = (bdIconExclamation, bdIconWarning, bdIconInformation, bdIconAsterisk, bdIconQuestion, bdIconStop, bdIconError, bdIconHand); // JvMessageBox
-  //  TDefault = (dbButton1, dbButton2, dbButton3, dbButton4); // JvMessageBox
-  //  TModality = (bmApplModal, bmSystemModal, bmTaskModal); // JvMessageBox
-  //  TButtonOption = (boDefaultDesktopOnly, boHelp, boRight, boRtlReading, boSetForeground, boTopMost); // JvMessageBox
-  //  TButtonOptions = set of TButtonOption; // JvMessageBox
-  //  TButtonResult = (brAbort, brCancel, brIgnore, brNo, brOk, brRetry, brYes); // JvMessageBox
-  //  TMsgStyle = (msBeep, msIconAsterisk, msIconExclamation, msIconHand, msIconQuestion, msOk); // JvMessageBeep
   TJvDiskRes = (dsSuccess, dsCancel, dsSkipfile, dsError);
   TJvDiskStyle = (idfCheckFirst, idfNoBeep, idfNoBrowse, idfNoCompressed, idfNoDetails,
     idfNoForeground, idfNoSkip, idfOemDisk, idfWarnIfSkip);
   TJvDiskStyles = set of TJvDiskStyle;
   TJvDeleteStyle = (idNoBeep, idNoForeground);
   TJvDeleteStyles = set of TJvDeleteStyle;
-  //   TOnOk = procedure(Sender: TObject; Password: string; var Accept: Boolean) of object; // JvPasswordForm
-  //  TCoordChanged = procedure(Sender: TObject; Coord: string) of object;
   TJvNotifyParamsEvent = procedure(Sender: TObject; Params: Pointer) of object;
-  TJvFileInfoRec = record
-    Attributes: DWORD;
-    DisplayName: string;
-    ExeType: Integer;
-    Icon: HICON;
-    Location: string;
-    TypeName: string;
-    SysIconIndex: Integer;
-  end;
   TJvAnimation = (anLeftRight, anRightLeft, anRightAndLeft, anLeftVumeter, anRightVumeter);
   TJvAnimations = set of TJvAnimation;
   //   TOnFound = procedure(Sender: TObject; Path: string) of object; // JvSearchFile
@@ -202,7 +175,7 @@ type
   TJvTriggerKind =
     (tkOneShot, tkEachSecond, tkEachMinute, tkEachHour, tkEachDay, tkEachMonth, tkEachYear);
   // End of Bianconi
-  TJvFourCC = array [0..3] of AnsiChar;
+  TJvFourCC = array [0..3] of DWChar;
   PJvAniTag = ^TJvAniTag;
   TJvAniTag = packed record
     ckID: TJvFourCC;
@@ -286,19 +259,16 @@ type
     procedure SetThreadName(const Value: String); virtual;
   public
     {$IFNDEF DELPHI2010_UP}
-    procedure NameThreadForDebugging(AThreadName: AnsiString; AThreadID: LongWord = $FFFFFFFF);
+    procedure NameThreadForDebugging(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
     {$ENDIF}
-    procedure NameThread(AThreadName: AnsiString; AThreadID: LongWord = $FFFFFFFF); {$IFDEF SUPPORTS_UNICODE_STRING} overload; {$ENDIF} virtual;
-    {$IFDEF SUPPORTS_UNICODE_STRING}
-    procedure NameThread(AThreadName: String; AThreadID: LongWord = $FFFFFFFF); overload;
-    {$ENDIF}
+    procedure NameThread(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF); {$IFDEF SUPPORTS_UNICODE_STRING} overload; {$ENDIF} virtual;
     property ThreadName: String read GetThreadName write SetThreadName;
   end;
 // Using this variable you can enhance the NameThread procedure system wide by inserting a procedure
 // which executes for example a MadExcept TraceOut to enhance the MadExcept call stack results.
 // The procedure for MadExcept could look like:
 //
-//      procedure NameThreadMadExcept(AThreadName: AnsiString; AThreadID: LongWord);
+//      procedure NameThreadMadExcept(AThreadName: DWString; AThreadID: LongWord);
 //      begin
 //        MadExcept.NameThread(AThreadID, AThreadName);
 //      end;
@@ -309,7 +279,7 @@ type
 //       JvTypes.JvCustomThreadNamingProc := NameThreadMadExcept;
 //
 var
-  JvCustomThreadNamingProc: procedure (AThreadName: AnsiString; AThreadID: LongWord);
+  JvCustomThreadNamingProc: procedure (AThreadName: DWString; AThreadID: LongWord);
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -399,7 +369,7 @@ begin
     Changed;
 end;
 {$IFNDEF DELPHI2010_UP}
-procedure TJvCustomThread.NameThreadForDebugging(AThreadName: AnsiString; AThreadID: LongWord = $FFFFFFFF);
+procedure TJvCustomThread.NameThreadForDebugging(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
 type
   TThreadNameInfo = record
     FType: LongWord;     // must be 0x1000
@@ -430,7 +400,7 @@ begin
   else
     Result := FThreadName+' {'+ClassName+'}';
 end;
-procedure TJvCustomThread.NameThread(AThreadName: AnsiString; AThreadID: LongWord = $FFFFFFFF);
+procedure TJvCustomThread.NameThread(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
 begin
   if AThreadID = $FFFFFFFF then
     AThreadID := ThreadID;
@@ -438,20 +408,11 @@ begin
   if Assigned(JvCustomThreadNamingProc) then
     JvCustomThreadNamingProc(aThreadName, AThreadID);
 end;
-{$IFDEF SUPPORTS_UNICODE_STRING}
-procedure TJvCustomThread.NameThread(AThreadName: String; AThreadID: LongWord = $FFFFFFFF);
-begin
-  NameThread(AnsiString(AThreadName), AThreadId);
-end;
-{$ENDIF}
+
 procedure TJvCustomThread.SetThreadName(const Value: String);
 begin
   FThreadName := Value;
 end;
-{$IFDEF UNITVERSIONING}
-initialization
-  RegisterUnitVersion(HInstance, UnitVersioning);
-finalization
-  UnregisterUnitVersion(HInstance);
-{$ENDIF UNITVERSIONING}
+
 end.
+

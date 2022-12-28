@@ -1,4 +1,5 @@
 unit uRESTDWMemExprParser;
+
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
@@ -23,8 +24,10 @@ unit uRESTDWMemExprParser;
 
 interface
 uses
-  SysUtils, Contnrs;
+  SysUtils, Classes;
+
 type
+  TObjectList = Class(TList);
   TOnGetVariableValue = function(Sender: TObject; const VarName: string;
     var Value: Variant): Boolean of object;
   TOnExecuteFunction = function(Sender: TObject; const FuncName: string;
@@ -65,7 +68,7 @@ var
 {$ENDIF TESTING_PARSER}
 implementation
 uses
-  Classes, Variants, Masks;
+  Variants, Masks;
 {$IFDEF COMPILER12_UP}
   // Our charsets do not contain any char > 127 what makes it safe because the
   // compiler generates correct code.
@@ -246,12 +249,11 @@ end;
 constructor TScan.Create;
 begin
   inherited Create;
-  OwnsObjects := True;
   FErrorMessage := '';
 end;
 function TScan.GetItem(Index: Integer): TLex;
 begin
-  Result := inherited Items[Index] as TLex;
+  Result := TLex(inherited Items[Index]);
 end;
 function TScan.Parse(const Str: string): Boolean;
 var
@@ -788,7 +790,7 @@ end;
 constructor TNodeFunction.Create(AParser: TParser; AFunc: TLex);
 begin
   inherited Create(AParser);
-  FArgs := TObjectList.Create(True);
+  FArgs := TObjectList.Create;
   FFunc := AFunc;
 end;
 destructor TNodeFunction.Destroy;

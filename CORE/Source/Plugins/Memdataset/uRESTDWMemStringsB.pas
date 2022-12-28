@@ -93,7 +93,7 @@ const
   NativeForwardSlash = Char('/');
   NativeDoubleQuote = Char('"');
   NativeSingleQuote = Char('''');
-  NativeLineBreak = uRESTDWMemBase.NativeLineBreak;
+  NativeLineBreak = sLineBreak;
 const
   // CharType return values
   C1_UPPER = $0001; // Uppercase
@@ -298,20 +298,11 @@ function MultiSzLength(const Source: PMultiSz): SizeInt;
 procedure AllocateMultiSz(var Dest: PMultiSz; Len: SizeInt);
 procedure FreeMultiSz(var Dest: PMultiSz);
 function MultiSzDup(const Source: PMultiSz): PMultiSz;
-function AnsiStringsToAnsiMultiSz(var Dest: PAnsiMultiSz; const Source: TAnsiStrings): PAnsiMultiSz;
  {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-procedure AnsiMultiSzToAnsiStrings(const Dest: TAnsiStrings; const Source: PAnsiMultiSz); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function AnsiMultiSzLength(const Source: PAnsiMultiSz): SizeInt; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
 procedure AllocateAnsiMultiSz(var Dest: PAnsiMultiSz; Len: SizeInt); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
 procedure FreeAnsiMultiSz(var Dest: PAnsiMultiSz); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function AnsiMultiSzDup(const Source: PAnsiMultiSz): PAnsiMultiSz; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function WideStringsToWideMultiSz(var Dest: PWideMultiSz; const Source: TWideStrings): PWideMultiSz;
- {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-procedure WideMultiSzToWideStrings(const Dest: TWideStrings; const Source: PWideMultiSz); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function WideMultiSzLength(const Source: PWideMultiSz): SizeInt; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
 procedure AllocateWideMultiSz(var Dest: PWideMultiSz; Len: SizeInt); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
 procedure FreeWideMultiSz(var Dest: PWideMultiSz); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function WideMultiSzDup(const Source: PWideMultiSz): PWideMultiSz; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
 // TStrings Manipulation
 procedure StrIToStrings(S, Sep: string; const List: TStrings; const AllowEmptyString: Boolean = True);
 procedure StrToStrings(S, Sep: string; const List: TStrings; const AllowEmptyString: Boolean = True);
@@ -325,9 +316,9 @@ function AddStringToStrings(const S: string; Strings: TStrings; const Unique: Bo
 // Miscellaneous
 // (OF) moved to JclSysUtils
 // function BooleanToStr(B: Boolean): string;
- // AnsiString here because it is binary data
-function FileToString(const FileName: string): {$IFDEF COMPILER12_UP}RawByteString{$ELSE}AnsiString{$ENDIF};
-procedure StringToFile(const FileName: string; const Contents: {$IFDEF COMPILER12_UP}RawByteString{$ELSE}AnsiString{$ENDIF};
+ // DWString here because it is binary data
+function FileToString(const FileName: string): {$IFDEF COMPILER12_UP}RawByteString{$ELSE}DWString{$ENDIF};
+procedure StringToFile(const FileName: string; const Contents: {$IFDEF COMPILER12_UP}RawByteString{$ELSE}DWString{$ENDIF};
   Append: Boolean = False);
 function StrToken(var S: string; Separator: Char): string;
 procedure StrTokens(const S: string; const List: TStrings);
@@ -506,15 +497,8 @@ type
   public
     constructor Create; overload;
   end;
-procedure StrResetLength(var S: WideString); overload;
-procedure StrResetLength(var S: AnsiString); overload;
-procedure StrResetLength(S: TJclStringBuilder); overload;
-{$IFDEF SUPPORTS_UNICODE_STRING}
-procedure StrResetLength(var S: UnicodeString); overload;
-{$ENDIF SUPPORTS_UNICODE_STRING}
+procedure StrResetLength(var S: DWString); overload;
 // natural comparison functions
-function CompareNaturalStr(const S1, S2: string): SizeInt; overload;
-function CompareNaturalText(const S1, S2: string): SizeInt; overload;
 {$IFNDEF UNICODE_RTL_DATABASE}
 // internal structures published to make function inlining working
 const
@@ -584,9 +568,6 @@ begin
     {$DEFINE CHAR_TYPES_INITIALIZED}
     {$ENDIF LINUX}
     StrCharTypes[CurrChar] := CurrType;
-    {$IFNDEF CHAR_TYPES_INITIALIZED}
-    Implement case map initialization here
-    {$ENDIF ~CHAR_TYPES_INITIALIZED}
   end;
 end;
 procedure LoadCaseMap;
@@ -609,9 +590,6 @@ begin
       UpCaseChar := Char(toupper(Byte(CurrChar)));
       {$DEFINE CASE_MAP_INITIALIZED}
       {$ENDIF LINUX}
-      {$IFNDEF CASE_MAP_INITIALIZED}
-      Implement case map initialization here
-      {$ENDIF ~CASE_MAP_INITIALIZED}
       if CharIsUpper(CurrChar) then
         ReCaseChar := LoCaseChar
       else
@@ -1827,7 +1805,7 @@ begin
     Result := P^.RefCount;
   end;
 end;
-procedure StrResetLength(var S: WideString);
+procedure StrResetLength(var S: DWString);
 var
   I: SizeInt;
 begin
@@ -1838,42 +1816,6 @@ begin
       Exit;
     end;
 end;
-procedure StrResetLength(var S: AnsiString);
-var
-  I: SizeInt;
-begin
-  for I := 0 to Length(S) - 1 do
-    if S[I + 1] = #0 then
-    begin
-      SetLength(S, I);
-      Exit;
-    end;
-end;
-procedure StrResetLength(S: TJclStringBuilder);
-var
-  I: SizeInt;
-begin
-  if S <> nil then
-    for I := 0 to S.Length - 1 do
-      if S[I] = #0 then
-      begin
-        S.Length := I;
-        Exit;
-      end;
-end;
-{$IFDEF SUPPORTS_UNICODE_STRING}
-procedure StrResetLength(var S: UnicodeString);
-var
-  I: SizeInt;
-begin
-  for I := 0 to Length(S) - 1 do
-    if S[I + 1] = #0 then
-    begin
-      SetLength(S, I);
-      Exit;
-    end;
-end;
-{$ENDIF SUPPORTS_UNICODE_STRING}
 //=== String Search and Replace Routines =====================================
 function StrCharCount(const S: string; C: Char): SizeInt;
 var
@@ -2030,40 +1972,10 @@ begin
   Result := StrCompareRangeEx(S1, S2, Index, Count, CaseSensitive);
 end;
 procedure StrFillChar(var S; Count: SizeInt; C: Char);
-{$IFDEF SUPPORTS_UNICODE}
-asm
-        // 32 --> EAX S
-        //        EDX Count
-        //        ECX C
-        // 64 --> RCX S
-        //        RDX Count
-        //        R8W C
-        {$IFDEF CPU32}
-        DEC     EDX
-        JS      @@Leave
-@@Loop:
-        MOV     [EAX], CX
-        ADD     EAX, 2
-        DEC     EDX
-        JNS     @@Loop
-        {$ENDIF CPU32}
-        {$IFDEF CPU64}
-        DEC     RDX
-        JS      @@Leave
-@@Loop:
-        MOV     WORD PTR [RCX], R8W
-        ADD     RCX, 2
-        DEC     RDX
-        JNS     @@Loop
-        {$ENDIF CPU64}
-@@Leave:
-end;
-{$ELSE ~SUPPORTS_UNICODE}
 begin
   if Count > 0 then
     FillChar(S, Count, C);
 end;
-{$ENDIF ~SUPPORTS_UNICODE}
 function StrRepeatChar(C: Char; Count: SizeInt): string;
 begin
   SetLength(Result, Count);
@@ -2909,18 +2821,6 @@ begin
   else
     Result := nil;
 end;
-function AnsiStringsToAnsiMultiSz(var Dest: PAnsiMultiSz; const Source: TAnsiStrings): PAnsiMultiSz;
-begin
-  Result := uRESTDWMemAnsiStrings.StringsToMultiSz(Dest, Source);
-end;
-procedure AnsiMultiSzToAnsiStrings(const Dest: TAnsiStrings; const Source: PAnsiMultiSz);
-begin
-  uRESTDWMemAnsiStrings.MultiSzToStrings(Dest, Source);
-end;
-function AnsiMultiSzLength(const Source: PAnsiMultiSz): SizeInt;
-begin
-  Result := uRESTDWMemAnsiStrings.MultiSzLength(Source);
-end;
 procedure AllocateAnsiMultiSz(var Dest: PAnsiMultiSz; Len: SizeInt);
 begin
   uRESTDWMemAnsiStrings.AllocateMultiSz(Dest, Len);
@@ -2929,22 +2829,6 @@ procedure FreeAnsiMultiSz(var Dest: PAnsiMultiSz);
 begin
   uRESTDWMemAnsiStrings.FreeMultiSz(Dest);
 end;
-function AnsiMultiSzDup(const Source: PAnsiMultiSz): PAnsiMultiSz;
-begin
-  Result := uRESTDWMemAnsiStrings.MultiSzDup(Source);
-end;
-function WideStringsToWideMultiSz(var Dest: PWideMultiSz; const Source: TWideStrings): PWideMultiSz;
-begin
-  Result := uRESTDWMemWideStrings.StringsToMultiSz(Dest, Source);
-end;
-procedure WideMultiSzToWideStrings(const Dest: TWideStrings; const Source: PWideMultiSz);
-begin
-  uRESTDWMemWideStrings.MultiSzToStrings(Dest, Source);
-end;
-function WideMultiSzLength(const Source: PWideMultiSz): SizeInt;
-begin
-  Result := uRESTDWMemWideStrings.MultiSzLength(Source);
-end;
 procedure AllocateWideMultiSz(var Dest: PWideMultiSz; Len: SizeInt);
 begin
   uRESTDWMemWideStrings.AllocateMultiSz(Dest, Len);
@@ -2952,10 +2836,6 @@ end;
 procedure FreeWideMultiSz(var Dest: PWideMultiSz);
 begin
   uRESTDWMemWideStrings.FreeMultiSz(Dest);
-end;
-function WideMultiSzDup(const Source: PWideMultiSz): PWideMultiSz;
-begin
-  Result := uRESTDWMemWideStrings.MultiSzDup(Source);
 end;
 //=== TStrings Manipulation ==================================================
 procedure StrToStrings(S, Sep: string; const List: TStrings; const AllowEmptyString: Boolean = True);
@@ -3118,7 +2998,7 @@ begin
     Result := Strings.Add(S) > -1;
 end;
 //=== Miscellaneous ==========================================================
-function FileToString(const FileName: string): {$IFDEF COMPILER12_UP}RawByteString{$ELSE}AnsiString{$ENDIF};
+function FileToString(const FileName: string): {$IFDEF COMPILER12_UP}RawByteString{$ELSE}DWString{$ENDIF};
 var
   fs: TFileStream;
   Len: SizeInt;
@@ -3133,7 +3013,7 @@ begin
     fs.Free;
   end;
 end;
-procedure StringToFile(const FileName: string; const Contents: {$IFDEF COMPILER12_UP}RawByteString{$ELSE}AnsiString{$ENDIF};
+procedure StringToFile(const FileName: string; const Contents: {$IFDEF COMPILER12_UP}RawByteString{$ELSE}DWString{$ENDIF};
   Append: Boolean);
 var
   FS: TFileStream;
@@ -3573,33 +3453,18 @@ var
       vtBoolean:
         Result := BoolToStr[V.VBoolean];
       vtChar:
-        Result := string(AnsiString(V.VChar));
+        Result := string(DWString(V.VChar));
       vtExtended:
         Result := FloatToStr(V.VExtended^);
       vtString:
-        Result := string(V.VString^);
+        Result := {$IFDEF NEXTGEN}String(V.VWideString^);{$ELSE}String(V.VString^);{$ENDIF}
       vtPointer:
         Result := IntToHex(TJclAddr(V.VPointer), 8);
       vtPChar:
-        Result := string(AnsiString(V.VPChar));
-      vtObject:
-        if (V.VObject is TInterfacedObject) and V.VObject.GetInterface(IToString, Intf) then
-        begin
-          Result := Intf.ToString;
-          Pointer(Intf) := nil; // do not release the object
-          // undo the RefCount change
-          Dec(TInterfacedObjectAccess(V.VObject).FRefCount);
-        end
-        else
-        if ((V.VObject is TComponent) or (V.VObject is TInterfacedPersistent)) and V.VObject.GetInterface(IToString, Intf) then
-          Result := Intf.ToString
-        {$IFDEF RTL200_UP}
-        else
-          Result := V.VObject.ToString;
-        {$ELSE}
-        else
-          raise ArgumentNullException.CreateResFmt(@RsDotNetFormatObjectArgumentNotSupported, [V.VObject.ClassName, Index]);
-        {$ENDIF RTL200_UP}
+        Result := string(DWString(V.VPChar));
+                 //TODO XyberX
+      vtObject:  Begin
+                 End;
       vtClass:
         Result := V.VClass.ClassName;
       vtWideChar:
@@ -3618,7 +3483,7 @@ var
         else
           raise ArgumentNullException.CreateResFmt(@RsDotNetFormatArgumentNotSupported, [Index]);
       vtWideString:
-        Result := WideString(V.VWideString);
+        Result := DWWideString(V.VWideString);
       vtInt64:
         Result := IntToStr(V.VInt64^);
       {$IFDEF SUPPORTS_UNICODE_STRING}
@@ -4859,15 +4724,6 @@ begin
       Inc(Cur2);
     end;
   end;
-end;
-
-function CompareNaturalStr(const S1, S2: string): SizeInt;
-begin
-  Result := CompareNatural(S1, S2, False);
-end;
-function CompareNaturalText(const S1, S2: string): SizeInt;
-begin
-  Result := CompareNatural(S1, S2, True);
 end;
 
 initialization

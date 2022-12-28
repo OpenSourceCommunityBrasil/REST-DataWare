@@ -27,7 +27,7 @@ uses
   {$IFDEF MSWINDOWS}
   Windows,
   {$ENDIF MSWINDOWS}
-  Variants, Classes, SysUtils, DB;
+  Variants, Classes, SysUtils, DB, DateUtils;
 
 type
   IJvDataControl = interface
@@ -93,11 +93,7 @@ function DataSetSortedSearch(DataSet: TDataSet;
 function DataSetSectionName(DataSet: TDataSet): string;
 function DataSetLocateThrough(DataSet: TDataSet; const KeyFields: string;
   const KeyValues: Variant; Options: TLocateOptions): Boolean;
-(*
-procedure SaveFieldsReg(DataSet: TDataSet; IniFile: TRegIniFile);
-procedure RestoreFieldsReg(DataSet: TDataSet; IniFile: TRegIniFile;
-  RestoreVisible: Boolean);
-*)
+
 procedure AssignRecord(Source, Dest: TDataSet; ByName: Boolean);
 procedure CheckRequiredField(Field: TField);
 procedure CheckRequiredFields(const Fields: array of TField);
@@ -111,10 +107,6 @@ function FormatSQLDateRangeEx(Date1, Date2: TDateTime;
 function FormatSQLNumericRange(const FieldName: string;
   LowValue, HighValue, LowEmpty, HighEmpty: Double; Inclusive: Boolean): string;
 function StrMaskSQL(const Value: string): string;
-function FormatSQLCondition(const FieldName, Operator, Value: string;
-  FieldType: TFieldType; Exact: Boolean): string;
-function FormatAnsiSQLCondition(const FieldName, Operator, Value: string;
-  FieldType: TFieldType; Exact: Boolean): string;
 const
   TrueExpr = '0=0';
   {$NODEFINE TrueExpr}
@@ -158,7 +150,7 @@ uses
   {$IFDEF RTL240_UP}
   System.Generics.Collections,
   {$ENDIF RTL240_UP}
-  uRESTDWMemVCLUtils, uRESTDWMemJCLUtils, uRESTDWMemTypes, uRESTDWMemConsts, uRESTDWMemResources;
+  uRESTDWMemVCLUtils, uRESTDWMemTypes, uRESTDWMemConsts, uRESTDWMemResources;
 
 { TJvDataLink }
 procedure TJvDataLink.FocusControl(Field: TFieldRef);
@@ -601,76 +593,6 @@ begin
     Result := '*' + Value + '*'
   else
     Result := Value;
-end;
-function FormatSQLCondition(const FieldName, Operator, Value: string;
-  FieldType: TFieldType; Exact: Boolean): string;
-var
-  EmptyValue: Boolean;
-  FieldValue: string;
-  DateValue: TDateTime;
-  LogicOperator: string;
-begin
-  FieldValue := '';
-  DateValue := NullDate;
-  Exact := Exact or not (FieldType in
-    [ftString{$IFDEF UNICODE}, ftWideString{$ENDIF UNICODE}, ftDate, ftTime, ftDateTime]);
-  if FieldType in [ftDate, ftTime, ftDateTime] then
-  begin
-    DateValue := StrToDateDef(Value, NullDate);
-    EmptyValue := (DateValue = NullDate);
-    FieldValue := FormatDateTime(ServerDateFmt, DateValue);
-  end
-  else
-  begin
-    FieldValue := Value;
-    EmptyValue := FieldValue = '';
-    if not (Exact or EmptyValue) then
-      FieldValue := ReplaceStr(ReplaceStr(StrMaskSQL(FieldValue),
-        '*', '%'), '?', '_');
-    if FieldType in [ftString{$IFDEF UNICODE}, ftWideString{$ENDIF UNICODE}] then
-      FieldValue := '''' + FieldValue + '''';
-  end;
-  LogicOperator := Operator;
-  if LogicOperator = '' then
-  begin
-    if Exact then
-      LogicOperator := '='
-    else
-    begin
-      if FieldType in [ftString{$IFDEF UNICODE}, ftWideString{$ENDIF UNICODE}] then
-        LogicOperator := 'LIKE'
-      else
-        LogicOperator := '>=';
-    end;
-  end;
-  if EmptyValue then
-    Result := TrueExpr
-  else
-  if (FieldType = ftDateTime) and Exact then
-  begin
-    DateValue := IncDay(DateValue, 1);
-    Result := Format('(%s >= %s) and (%s < %s)', [FieldName, FieldValue,
-      FieldName, FormatDateTime(ServerDateFmt, DateValue)]);
-  end
-  else
-    Result := Format('%s %s %s', [FieldName, LogicOperator, FieldValue]);
-end;
-function FormatAnsiSQLCondition(const FieldName, Operator, Value: string;
-  FieldType: TFieldType; Exact: Boolean): string;
-var
-  S, Esc: string;
-begin
-  Esc := '';
-  if not Exact and (FieldType in [ftString{$IFDEF UNICODE}, ftWideString{$ENDIF UNICODE}]) then
-  begin
-    S := ReplaceStr(ReplaceStr(ReplaceStr(Value, '/', '//'),
-      '_', '/_'), '%', '/%');
-    if S <> Value then
-      Esc := ' ESCAPE''/''';
-  end
-  else
-    S := Value;
-  Result := FormatSQLCondition(FieldName, Operator, S, FieldType, Exact) + Esc;
 end;
 procedure CheckRequiredField(Field: TField);
 begin

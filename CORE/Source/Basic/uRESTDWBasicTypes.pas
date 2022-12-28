@@ -215,7 +215,7 @@ Uses
   {$ELSE}
    {$IF Defined(HAS_FMX)}
     DWString     = Utf8String;
-    DWWideString = WideString;
+    DWWideString = Utf8String;
     DWChar       = Utf8Char;
    {$ELSE}
     DWString     = AnsiString;
@@ -228,6 +228,7 @@ Uses
   DWWideString = WideString;
   DWChar       = Char;
  {$ENDIF}
+ PDWString     = ^DWString;
  PArrayData    = ^TArrayData;
  TArrayData    = Array of Variant;
  Type
@@ -493,7 +494,7 @@ Var
  RESTDWDateSeparator,
  RESTDWTimeSeparator,
  RESTDWThousandSeparator,
- RESTDWDecimalSeparator : DWChar;
+ RESTDWDecimalSeparator : Char;
 
 Implementation
 

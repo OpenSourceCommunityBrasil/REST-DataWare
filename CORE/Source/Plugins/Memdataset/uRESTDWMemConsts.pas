@@ -25,7 +25,7 @@ unit uRESTDWMemConsts;
 
 interface
 uses
-  SysUtils, Classes, Windows, TypInfo;
+  SysUtils, Classes, TypInfo;
 const
   { JvEditor }
   JvEditorCompletionChars = #8'0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm_';

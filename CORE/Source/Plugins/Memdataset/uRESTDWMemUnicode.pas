@@ -40,37 +40,67 @@ uses
   Character,
   {$ENDIF HAS_UNIT_CHARACTER}
   {$ENDIF ~HAS_UNITSCOPE}
-  uRESTDWMemBase;
+  uRESTDWMemBase, Types;
 {$IFNDEF FPC}
  {$IFDEF MSWINDOWS}
   {$DEFINE OWN_WIDESTRING_MEMMGR}
  {$ENDIF MSWINDOWS}
 {$ENDIF ~FPC}
+Type
+ {$IFNDEF FPC}
+  {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
+   {$IF Defined(HAS_FMX)}
+    DWString     = String;
+    DWWideString = WideString;
+    DWChar       = Char;
+   {$ELSE}
+    DWString     = Utf8String;
+    DWWideString = WideString;
+    DWChar       = Utf8Char;
+   {$IFEND}
+  {$ELSE}
+   {$IF Defined(HAS_FMX)}
+    DWString     = Utf8String;
+    DWWideString = Utf8String;
+    DWChar       = Utf8Char;
+   {$ELSE}
+    DWString     = AnsiString;
+    DWWideString = WideString;
+    DWChar       = Char;
+   {$IFEND}
+  {$IFEND}
+ {$ELSE}
+  DWString     = AnsiString;
+  DWWideString = WideString;
+  DWChar       = Char;
+ {$ENDIF}
+ PDWChar       = ^DWChar;
+ LCID          = DWORD;
 const
   // definitions of often used characters:
   // Note: Use them only for tests of a certain character not to determine character
   //       classes (like white spaces) as in Unicode are often many code points defined
   //       being in a certain class. Hence your best option is to use the various
   //       UnicodeIs* functions.
-  WideNull = WideChar(#0);
-  WideTabulator = WideChar(#9);
-  WideSpace = WideChar(#32);
+  WideNull = DWChar(#0);
+  WideTabulator = DWChar(#9);
+  WideSpace = DWChar(#32);
   // logical line breaks
-  WideLF = WideChar(#10);
-  WideLineFeed = WideChar(#10);
-  WideVerticalTab = WideChar(#11);
-  WideFormFeed = WideChar(#12);
-  WideCR = WideChar(#13);
-  WideCarriageReturn = WideChar(#13);
-  WideCRLF = WideString(#13#10);
-  WideLineSeparator = WideChar($2028);
-  WideParagraphSeparator = WideChar($2029);
+  WideLF = DWChar(#10);
+  WideLineFeed = DWChar(#10);
+  WideVerticalTab = DWChar(#11);
+  WideFormFeed = DWChar(#12);
+  WideCR = DWChar(#13);
+  WideCarriageReturn = DWChar(#13);
+  WideCRLF = DWWideString(#13#10);
+  WideLineSeparator = DWChar($2028);
+  WideParagraphSeparator = DWChar($2029);
   // byte order marks for Unicode files
   // Unicode text files (in UTF-16 format) should contain $FFFE as first character to
   // identify such a file clearly. Depending on the system where the file was created
   // on this appears either in big endian or little endian style.
-  BOM_LSB_FIRST = WideChar($FEFF);
-  BOM_MSB_FIRST = WideChar($FFFE);
+  BOM_LSB_FIRST = DWChar($FEFF);
+  BOM_MSB_FIRST = DWChar($FFFE);
 type
   TSaveFormat = ( sfUTF16LSB, sfUTF16MSB, sfUTF8, sfAnsi );
 const
@@ -936,12 +966,12 @@ type
     procedure Clear; virtual;
     procedure ClearResults; virtual;
     procedure DeleteResult(Index: SizeInt); virtual;
-    procedure FindPrepare(const Pattern: WideString; Options: TSearchFlags); overload; virtual; abstract;
-    procedure FindPrepare(Pattern: PWideChar; PatternLength: SizeInt; Options: TSearchFlags); overload; virtual; abstract;
-    function FindFirst(const Text: WideString; var Start, Stop: SizeInt): Boolean; overload; virtual; abstract;
-    function FindFirst(Text: PWideChar; TextLen: SizeInt; var Start, Stop: SizeInt): Boolean; overload; virtual; abstract;
-    function FindAll(const Text: WideString): Boolean; overload; virtual; abstract;
-    function FindAll(Text: PWideChar; TextLen: SizeInt): Boolean; overload; virtual; abstract;
+    procedure FindPrepare(const Pattern: DWWideString; Options: TSearchFlags); overload; virtual; abstract;
+    procedure FindPrepare(Pattern: PDWChar; PatternLength: SizeInt; Options: TSearchFlags); overload; virtual; abstract;
+    function FindFirst(const Text: DWWideString; var Start, Stop: SizeInt): Boolean; overload; virtual; abstract;
+    function FindFirst(Text: PDWChar; TextLen: SizeInt; var Start, Stop: SizeInt): Boolean; overload; virtual; abstract;
+    function FindAll(const Text: DWWideString): Boolean; overload; virtual; abstract;
+    function FindAll(Text: PDWChar; TextLen: SizeInt): Boolean; overload; virtual; abstract;
     procedure GetResult(Index: SizeInt; var Start, Stop: SizeInt); virtual;
     property Count: SizeInt read GetCount;
   end;
@@ -975,18 +1005,9 @@ type
     FMD4: SizeInt;
   protected
     procedure ClearPattern;
-    procedure Compile(Pattern: PUCS2; PatternLength: SizeInt; Flags: TSearchFlags);
-    function Find(Text: PUCS2; TextLen: SizeInt; var MatchStart, MatchEnd: SizeInt): Boolean;
-    function GetSkipValue(TextStart, TextEnd: PUCS2): SizeInt;
-    function Match(Text, Start, Stop: PUCS2; var MatchStart, MatchEnd: SizeInt): Boolean;
   public
     procedure Clear; override;
-    procedure FindPrepare(const Pattern: WideString; Options: TSearchFlags); overload; override;
-    procedure FindPrepare(Pattern: PWideChar; PatternLength: SizeInt; Options: TSearchFlags); overload; override;
-    function FindFirst(const Text: WideString; var Start, Stop: SizeInt): Boolean; overload; override;
-    function FindFirst(Text: PWideChar; TextLen: SizeInt; var Start, Stop: SizeInt): Boolean; overload; override;
-    function FindAll(const Text: WideString): Boolean; overload; override;
-    function FindAll(Text: PWideChar; TextLen: SizeInt): Boolean; overload; override;
+    function FindAll(const Text: DWWideString): Boolean; overload; override;
   end;
   // Regular expression search engine for text in UCS2 form taking surrogates
   // into account. This implementation is an improved translation from the URE
@@ -1168,29 +1189,18 @@ type
     procedure AddRange(var CCL: TUcCClass; Range: TUcRange);
     function AddState(NewStates: array of SizeInt): SizeInt;
     procedure AddSymbolState(Symbol, State: SizeInt);
-    function BuildCharacterClass(CP: PUCS2; Limit: SizeInt; Symbol: PUcSymbolTableEntry): SizeInt;
-    function CompileSymbol(S: PUCS2; Limit: SizeInt; Symbol: PUcSymbolTableEntry): SizeInt;
     procedure CollectPendingOperations(var State: SizeInt);
-    function ExecuteURE(Flags: Cardinal; Text: PUCS2; TextLen: SizeInt; var MatchStart, MatchEnd: SizeInt): Boolean;
     procedure HexDigitSetup(Symbol: PUcSymbolTableEntry);
     function MakeExpression(AType, LHS, RHS: SizeInt): SizeInt;
-    function MakeHexNumber(NP: PUCS2; Limit: SizeInt; var Number: UCS4): SizeInt;
     procedure MergeEquivalents;
-    function ParsePropertyList(Properties: PUCS2; Limit: SizeInt; var Categories: TCharacterCategories): SizeInt;
     function Peek: SizeInt;
     function Pop: SizeInt;
-    function PosixCCL(CP: PUCS2; Limit: SizeInt; Symbol: PUcSymbolTableEntry): SizeInt;
-    function ProbeLowSurrogate(LeftState: PUCS2; Limit: SizeInt; var Code: UCS4): SizeInt;
     procedure Push(V: SizeInt);
     procedure Reduce(Start: SizeInt);
     procedure SpaceSetup(Symbol: PUcSymbolTableEntry; Categories: TCharacterCategories);
     function SymbolsAreDifferent(A, B: PUcSymbolTableEntry): Boolean;
   public
     procedure Clear; override;
-    function FindFirst(const Text: WideString; var Start, Stop: SizeInt): Boolean; overload; override;
-    function FindFirst(Text: PWideChar; TextLen: SizeInt; var Start, Stop: SizeInt): Boolean; overload; override;
-    function FindAll(const Text: WideString): Boolean; overload; override;
-    function FindAll(Text: PWideChar; TextLen: SizeInt): Boolean; overload; override;
   end;
   // Event used to give the application a chance to switch the way of how to save
   // the text in TWideStrings if the text contains characters not only from the
@@ -1207,35 +1217,26 @@ type
     FOnConfirmConversion: TConfirmConversionEvent;
     FSaveFormat: TSaveFormat;  // overrides the FSaveUnicode flag, initialized when a file is loaded,
                                // expect losses if it is set to sfAnsi before saving
-    function GetCommaText: WideString;
-    function GetName(Index: Integer): WideString;
-    function GetValue(const Name: WideString): WideString;
-    procedure ReadData(Reader: TReader);
-    procedure SetCommaText(const Value: WideString);
-    procedure SetNormalizationForm(const Value: TNormalizationForm);
-    procedure SetValue(const Name, Value: WideString);
+    function GetName(Index: Integer): DWWideString;
     procedure WriteData(Writer: TWriter);
     function GetSaveUnicode: Boolean;
     procedure SetSaveUnicode(const Value: Boolean);
   protected
-    procedure DefineProperties(Filer: TFiler); override;
     procedure DoConfirmConversion(var Allowed: Boolean); virtual;
-    procedure Error(const Msg: string; Data: Integer);
-    function Get(Index: Integer): WideString; virtual; abstract;
+    function Get(Index: Integer): DWWideString; virtual; abstract;
     function GetCapacity: Integer; virtual;
     function GetCount: Integer; virtual; abstract;
     function GetObject(Index: Integer): TObject; virtual;
-    function GetTextStr: WideString; virtual;
-    procedure Put(Index: Integer; const S: WideString); virtual; abstract;
+    function GetTextStr: DWWideString; virtual;
+    procedure Put(Index: Integer; const S: DWWideString); virtual; abstract;
     procedure PutObject(Index: Integer; AObject: TObject); virtual; abstract;
     procedure SetCapacity(NewCapacity: Integer); virtual;
-    procedure SetUpdateState(Updating: Boolean); virtual;
     procedure SetLanguage(Value: LCID); virtual;
   public
     constructor Create;
-    function Add(const S: WideString): Integer; virtual;
-    function AddObject(const S: WideString; AObject: TObject): Integer; virtual;
-    procedure Append(const S: WideString);
+    function Add(const S: DWWideString): Integer; virtual;
+    function AddObject(const S: DWWideString; AObject: TObject): Integer; virtual;
+    procedure Append(const S: DWWideString);
     procedure AddStrings(Strings: TStrings); overload; virtual;
     procedure AddStrings(Strings: TWideStrings); overload; virtual;
     procedure Assign(Source: TPersistent); override;
@@ -1246,40 +1247,28 @@ type
     procedure EndUpdate;
     function Equals(Strings: TWideStrings): Boolean; {$IFDEF RTL200_UP} reintroduce; {$ENDIF RTL200_UP}
     procedure Exchange(Index1, Index2: Integer); virtual;
-    function GetSeparatedText(Separators: WideString): WideString; virtual;
-    function GetText: PWideChar; virtual;
-    function IndexOf(const S: WideString): Integer; virtual;
-    function IndexOfName(const Name: WideString): Integer;
+    function GetSeparatedText(Separators: DWWideString): DWWideString; virtual;
     function IndexOfObject(AObject: TObject): Integer;
-    procedure Insert(Index: Integer; const S: WideString); virtual; abstract;
-    procedure InsertObject(Index: Integer; const S: WideString; AObject: TObject);
-    procedure LoadFromFile(const FileName: TFileName); virtual;
-    procedure LoadFromStream(Stream: TStream); virtual;
+    procedure Insert(Index: Integer; const S: DWWideString); virtual; abstract;
+    procedure InsertObject(Index: Integer; const S: DWWideString; AObject: TObject);
     procedure Move(CurIndex, NewIndex: Integer); virtual;
-    procedure SaveToFile(const FileName: TFileName); virtual;
-    procedure SaveToStream(Stream: TStream; WithBOM: Boolean = True); virtual;
-    procedure SetText(const Value: WideString); virtual;
     property Capacity: Integer read GetCapacity write SetCapacity;
-    property CommaText: WideString read GetCommaText write SetCommaText;
     property Count: Integer read GetCount;
     property Language: LCID read FLanguage write SetLanguage;
-    property Names[Index: Integer]: WideString read GetName;
-    property NormalizationForm: TNormalizationForm read FNormalizationForm write SetNormalizationForm default nfC;
+    property Names[Index: Integer]: DWWideString read GetName;
     property Objects[Index: Integer]: TObject read GetObject write PutObject;
-    property Values[const Name: WideString]: WideString read GetValue write SetValue;
     property Saved: Boolean read FSaved;
     property SaveUnicode: Boolean read GetSaveUnicode write SetSaveUnicode default True;
     property SaveFormat: TSaveFormat read FSaveFormat write FSaveFormat default sfUnicodeLSB;
-    property Strings[Index: Integer]: WideString read Get write Put; default;
-    property Text: WideString read GetTextStr write SetText;
+    property Strings[Index: Integer]: DWWideString read Get write Put; default;
     property OnConfirmConversion: TConfirmConversionEvent read FOnConfirmConversion write FOnConfirmConversion;
   end;
   //----- TWideStringList class
   TWideStringItem = record
     {$IFDEF OWN_WIDESTRING_MEMMGR}
-    FString: PWideChar; // "array of WideChar";
+    FString: PDWChar; // "array of DWChar";
     {$ELSE ~OWN_WIDESTRING_MEMMGR}
-    FString: WideString;
+    FString: DWWideString;
     {$ENDIF ~OWN_WIDESTRING_MEMMGR}
     FObject: TObject;
   end;
@@ -1295,103 +1284,41 @@ type
     procedure ExchangeItems(Index1, Index2: Integer);
     procedure Grow;
     procedure QuickSort(L, R: Integer);
-    procedure InsertItem(Index: Integer; const S: WideString);
     procedure SetSorted(Value: Boolean);
     {$IFDEF OWN_WIDESTRING_MEMMGR}
-    procedure SetListString(Index: Integer; const S: WideString);
+    procedure SetListString(Index: Integer; const S: DWWideString);
     {$ENDIF OWN_WIDESTRING_MEMMGR}
   protected
     procedure Changed; virtual;
     procedure Changing; virtual;
-    function Get(Index: Integer): WideString; override;
+    function Get(Index: Integer): DWWideString; override;
     function GetCapacity: Integer; override;
     function GetCount: Integer; override;
     function GetObject(Index: Integer): TObject; override;
-    procedure Put(Index: Integer; const S: WideString); override;
     procedure PutObject(Index: Integer; AObject: TObject); override;
     procedure SetCapacity(NewCapacity: Integer); override;
-    procedure SetUpdateState(Updating: Boolean); override;
     procedure SetLanguage(Value: LCID); override;
   public
     destructor Destroy; override;
-    function Add(const S: WideString): Integer; override;
     procedure Clear; override;
     procedure Delete(Index: Integer); override;
     procedure Exchange(Index1, Index2: Integer); override;
-    function Find(const S: WideString; var Index: Integer): Boolean; virtual;
-    function IndexOf(const S: WideString): Integer; override;
-    procedure Insert(Index: Integer; const S: WideString); override;
     procedure Sort; virtual;
     property Duplicates: TDuplicates read FDuplicates write FDuplicates;
     property Sorted: Boolean read FSorted write SetSorted;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
   end;
+function WideDecompose(const S: DWWideString; Compatible: Boolean = True): DWWideString; overload;
+function WideDecompose(const S: DWWideString; Tags: TCompatibilityFormattingTags): DWWideString; overload;
 {$ENDIF ~UNICODE_RTL_DATABASE}
-{
-// all these functions are now in JclWideStrings.pas
-function StrLenW(Str: PWideChar): SizeInt;
-function StrEndW(Str: PWideChar): PWideChar;
-function StrMoveW(Dest, Source: PWideChar; Count: SizeInt): PWideChar;
-function StrCopyW(Dest, Source: PWideChar): PWideChar;
-function StrECopyW(Dest, Source: PWideChar): PWideChar;
-function StrLCopyW(Dest, Source: PWideChar; MaxLen: SizeInt): PWideChar;
-function StrPCopyWW(Dest: PWideChar; const Source: WideString): PWideChar; overload;
-function StrPCopyW(Dest: PWideChar; const Source: AnsiString): PWideChar;
-function StrPLCopyWW(Dest: PWideChar; const Source: WideString; MaxLen: SizeInt): PWideChar;
-function StrPLCopyW(Dest: PWideChar; const Source: AnsiString; MaxLen: SizeInt): PWideChar;
-function StrCatW(Dest: PWideChar; const Source: PWideChar): PWideChar;
-function StrLCatW(Dest, Source: PWideChar; MaxLen: SizeInt): PWideChar;
-function StrCompW(const Str1, Str2: PWideChar): Integer;
-function StrICompW(const Str1, Str2: PWideChar): Integer;
-function StrLCompW(const Str1, Str2: PWideChar; MaxLen: SizeInt): Integer;
-function StrLICompW(const Str1, Str2: PWideChar; MaxLen: SizeInt): Integer;
-function StrNScanW(const Str1, Str2: PWideChar): SizeInt;
-function StrRNScanW(const Str1, Str2: PWideChar): SizeInt;
-function StrScanW(Str: PWideChar; Chr: WideChar): PWideChar; overload;
-function StrScanW(Str: PWideChar; Chr: WideChar; StrLen: SizeInt): PWideChar; overload;
-function StrRScanW(Str: PWideChar; Chr: WideChar): PWideChar;
-function StrPosW(Str, SubStr: PWideChar): PWideChar;
-function StrAllocW(WideSize: SizeInt): PWideChar;
-function StrBufSizeW(const Str: PWideChar): SizeInt;
-function StrNewW(const Str: PWideChar): PWideChar; overload;
-function StrNewW(const Str: WideString): PWideChar; overload;
-procedure StrDisposeW(Str: PWideChar);
-procedure StrDisposeAndNilW(var Str: PWideChar);
-procedure StrSwapByteOrder(Str: PWideChar);
-}
-// functions involving Delphi wide strings
-function WideAdjustLineBreaks(const S: WideString): WideString;
-function WideCharPos(const S: WideString; const Ch: WideChar; const Index: SizeInt): SizeInt;  //az
-{$IFNDEF UNICODE_RTL_DATABASE}
-function WideCompose(const S: WideString; Compatible: Boolean = True): WideString; overload;
-function WideCompose(const S: WideString; Tags: TCompatibilityFormattingTags): WideString; overload;
-function WideDecompose(const S: WideString; Compatible: Boolean = True): WideString; overload;
-function WideDecompose(const S: WideString; Tags: TCompatibilityFormattingTags): WideString; overload;
-{$ENDIF ~UNICODE_RTL_DATABASE}
-function WideExtractQuotedStr(var Src: PWideChar; Quote: WideChar): WideString;
-function WideQuotedStr(const S: WideString; Quote: WideChar): WideString;
-function WideStringOfChar(C: WideChar; Count: SizeInt): WideString;
+function DWWideStringOfChar(C: DWChar; Count: SizeInt): DWWideString;
 // case conversion function
 type
   TCaseType = (ctFold, ctLower, ctTitle, ctUpper);
-{$IFNDEF UNICODE_RTL_DATABASE}
-function WideNormalize(const S: WideString; Form: TNormalizationForm): WideString;
-function WideCaseConvert(C: WideChar; CaseType: TCaseType): WideString; overload;
-function WideCaseConvert(const S: WideString; CaseType: TCaseType): WideString; overload;
-function WideCaseFolding(C: WideChar): WideString; overload; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
-function WideCaseFolding(const S: WideString): WideString; overload; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
-function WideTitleCase(C: WideChar): WideString; overload; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
-function WideTitleCase(const S: WideString): WideString; overload; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
-{$ENDIF ~UNICODE_RTL_DATABASE}
-function WideLowerCase(C: WideChar): WideString; overload; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
-function WideLowerCase(const S: WideString): WideString; overload; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
-function WideUpperCase(C: WideChar): WideString; overload; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
-function WideUpperCase(const S: WideString): WideString; overload; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
-function WideSameText(const Str1, Str2: WideString): Boolean;
-function WideTrim(const S: WideString): WideString;
-function WideTrimLeft(const S: WideString): WideString;
-function WideTrimRight(const S: WideString): WideString;
+function WideTrim(const S: DWWideString): DWWideString;
+function WideTrimLeft(const S: DWWideString): DWWideString;
+function WideTrimRight(const S: DWWideString): DWWideString;
 type
   // result type for number retrieval functions
   TUcNumber = record
@@ -1523,19 +1450,11 @@ function UnicodeIsUnifiedIdeograph(C: UCS4): Boolean;
 function UnicodeIsVariationSelector(C: UCS4): Boolean;
 {$ENDIF ~UNICODE_RTL_DATABASE}
 // Utility functions
-function CharSetFromLocale(Language: LCID): Byte;
-function GetCharSetFromLocale(Language: LCID; out FontCharSet: Byte): Boolean;
-function CodePageFromLocale(Language: LCID): Word;
 function CodeBlockName(const CB: TUnicodeBlock): string;
 function CodeBlockRange(const CB: TUnicodeBlock): TUnicodeBlockRange;
 function CodeBlockFromChar(const C: UCS4): TUnicodeBlock;
-function KeyboardCodePage: Word;
-function KeyUnicode(C: Char): WideChar;
-function StringToWideStringEx(const S: AnsiString; CodePage: Word): WideString;
-function TranslateString(const S: AnsiString; CP1, CP2: Word): AnsiString;
-function WideStringToStringEx(const WS: WideString; CodePage: Word): AnsiString;
 type
-  TCompareFunc = function (const W1, W2: WideString; Locale: LCID): Integer;
+  TCompareFunc = function (const W1, W2: DWWideString; Locale: LCID): Integer;
 var
   WideCompareText: TCompareFunc;
 type
@@ -1554,8 +1473,8 @@ procedure UCS4ArrayConcat(var Left: TUCS4Array; Right: UCS4); overload; {$IFDEF 
 procedure UCS4ArrayConcat(var Left: TUCS4Array; const Right: TUCS4Array); overload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 function UCS4ArrayEquals(const Left: TUCS4Array; const Right: TUCS4Array): Boolean; overload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 function UCS4ArrayEquals(const Left: TUCS4Array; Right: UCS4): Boolean; overload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-function UCS4ArrayEquals(const Left: TUCS4Array; const Right: AnsiString): Boolean; overload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-function UCS4ArrayEquals(const Left: TUCS4Array; Right: AnsiChar): Boolean; overload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function UCS4ArrayEquals(const Left: TUCS4Array; const Right: DWString): Boolean; overload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function UCS4ArrayEquals(const Left: TUCS4Array; Right: DWChar): Boolean; overload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -2518,458 +2437,14 @@ begin
   FSkipsUsed := 0;
   FMD4 := 0;
 end;
-function TUTBMSearch.GetSkipValue(TextStart, TextEnd: PUCS2): SizeInt;
-// looks up the SkipValues value for a character
-var
-  I: SizeInt;
-  C1,
-  C2: UCS4;
-  Sp: PUTBMSkip;
-begin
-  Result := 0;
-  if TJclAddr(TextStart) < TJclAddr(TextEnd) then
-  begin
-    C1 := UCS4(TextStart^);
-    if (TextStart + 1) < TextEnd then
-      C2 := UCS4((TextStart + 1)^)
-    else
-      C2 := $FFFFFFFF;
-    if (SurrogateHighStart <= C1) and (C1 <= SurrogateHighEnd) and
-       (SurrogateLowStart <= C2) and (C2 <= $DDDD) then
-      C1 := $10000 + (((C1 and $03FF) shl 10) or (C2 and $03FF));
-    Sp := FSkipValues;
-    for I := 0 to FSkipsUsed - 1 do
-    begin
-      if not (Boolean(C1 xor Sp.BMChar.UpCase) and
-              Boolean(C1 xor Sp.BMChar.LoCase) and
-              Boolean(C1 xor Sp.BMChar.TitleCase)) then
-      begin
-        if (TextEnd - TextStart) < Sp.SkipValues then
-          Result := TextEnd - TextStart
-        else
-          Result := Sp.SkipValues;
-        Exit;
-      end;
-      Inc(Sp);
-    end;
-    Result := FPatternLength;
-  end;
-end;
-function TUTBMSearch.Match(Text, Start, Stop: PUCS2; var MatchStart, MatchEnd: SizeInt): Boolean;
-// Checks once whether the text at position Start (which points to the end of the
-// current text part to be matched) matches.
-// Note: If whole words only are allowed then the left and right border tests are
-//       done here too. The keypoint for the right border is that the next character
-//       after the search string is either the text end or a space character.
-//       For the left side this is similar, but there is nothing like a string
-//       start marker (like the string end marker #0).
-//
-//       It seems not obvious, but we still can use the passed Text pointer to do
-//       the left check. Although this pointer might not point to the real string
-//       start (e.g. in TUTBMSearch.FindAll Text is incremented as needed) it is
-//       still a valid check mark. The reason is that Text either points to the
-//       real string start or a previous match (happend already, keep in mind the
-//       search options do not change in the FindAll loop) and the character just
-//       before Text is a space character.
-//       This fact implies, though, that strings passed to Find (or FindFirst,
-//       FindAll in TUTBMSearch) always really start at the given address. Although
-//       this might not be the case in some circumstances (e.g. if you pass only
-//       the selection from an editor) it is still assumed that a pattern matching
-//       from the first position on (from the search string start) also matches
-//       when whole words only are allowed.
-var
-  CheckSpace: Boolean;
-  C1, C2: UCS4;
-  Count: SizeInt;
-  Cp: PUTBMChar;
-begin
-  // be pessimistic
-  Result := False;
-  // set the potential match endpoint first
-  MatchEnd := (Start - Text) + 1;
-  C1 := UCS4(Start^);
-  if (Start + 1) < Stop then
-    C2 := UCS4((Start + 1)^)
-  else
-    C2 := $FFFFFFFF;
-  if (SurrogateHighStart <= C1) and (C1 <= SurrogateHighEnd) and
-     (SurrogateLowStart <= C2) and (C2 <= SurrogateLowEnd) then
-  begin
-    C1 := $10000 + (((C1 and $03FF) shl 10) or (C2 and $03FF));
-    // Adjust the match end point to occur after the UTF-16 character.
-    Inc(MatchEnd);
-  end;
-  // check special cases
-  if FPatternUsed = 1 then
-  begin
-    MatchStart := Start - Text;
-    Result := True;
-    Exit;
-  end;
-  // Early out if entire words need to be matched and the next character
-  // in the search string is neither the string end nor a space character.
-  if (sfWholeWordOnly in FFlags) and
-     not ((Start + 1)^ = WideNull) and
-     not UnicodeIsWhiteSpace(UCS4((Start + 1)^)) then
-    Exit;
-  // compare backward
-  Cp := FPattern;
-  Inc(Cp, FPatternUsed - 1);
-  Count := FPatternLength;
-  while (Start >= Text) and (Count > 0) do
-  begin
-    // ignore non-spacing characters if indicated
-    if sfIgnoreNonSpacing in FFlags then
-    begin
-      while (Start > Text) and UnicodeIsNonSpacing(C1) do
-      begin
-        Dec(Start);
-        C2 := UCS4(Start^);
-        if (Start - 1) > Text then
-          C1 := UCS4((Start - 1)^)
-        else
-          C1 := $FFFFFFFF;
-        if (SurrogateLowStart <= C2) and (C2 <= SurrogateLowEnd) and
-           (SurrogateHighStart <= C1) and (C1 <= SurrogateHighEnd) then
-        begin
-          C1 := $10000 + (((C1 and $03FF) shl 10) or (C2 and $03FF));
-          Dec(Start);
-        end
-        else
-          C1 := C2;
-      end;
-    end;
-    // handle space compression if indicated
-    if sfSpaceCompress in FFlags then
-    begin
-      CheckSpace := False;
-      while (Start > Text) and (UnicodeIsWhiteSpace(C1) or UnicodeIsControl(C1)) do
-      begin
-        CheckSpace := UnicodeIsWhiteSpace(C1);
-        Dec(Start);
-        C2 := UCS4(Start^);
-        if (Start - 1) > Text then
-          C1 := UCS4((Start - 1)^)
-        else
-          C1 := $FFFFFFFF;
-        if (SurrogateLowStart <= C2) and (C2 <= SurrogateLowEnd) and
-           (SurrogateHighStart <= C1) and (C1 <= SurrogateHighEnd) then
-        begin
-          C1 := $10000 + (((C1 and $03FF) shl 10) or (C2 and $03FF));
-          Dec(Start);
-        end
-        else
-          C1 := C2;
-      end;
-      // Handle things if space compression was indicated and one or
-      // more member characters were found.
-      if CheckSpace then
-      begin
-        if Cp.UpCase <> $20 then
-          Exit;
-        Dec(Cp);
-        Dec(Count);
-        // If Count is 0 at this place then the space character(s) was the first
-        // in the pattern and we need to correct the start position.
-        if Count = 0 then
-          Inc(Start);
-      end;
-    end;
-    // handle the normal comparison cases
-    if (Count > 0) and
-       (Boolean(C1 xor Cp.UpCase) and
-        Boolean(C1 xor Cp.LoCase) and
-        Boolean(C1 xor Cp.TitleCase)) then
-      Exit;
-    if C1 >= $10000 then
-      Dec(Count, 2)
-    else
-      Dec(Count, 1);
-    if Count > 0 then
-    begin
-      Dec(Cp);
-      // get the next preceding character
-      if Start > Text then
-      begin
-        Dec(Start);
-        C2 := UCS4(Start^);
-        if (Start - 1) > Text then
-          C1 := UCS4((Start - 1)^)
-        else
-          C1 := $FFFFFFFF;
-        if (SurrogateLowStart <= C2) and (C2 <= SurrogateLowEnd) and
-           (SurrogateHighStart <= C1) and (C1 <= SurrogateHighEnd) then
-        begin
-          C1 := $10000 + (((C1 and $03FF) shl 10) or (C2 and $03FF));
-          Dec(Start);
-        end
-        else
-          C1 := C2;
-      end;
-    end;
-  end;
-  // So far the string matched. Now check its left border for a space character
-  // if whole word only are allowed.
-  if not (sfWholeWordOnly in FFlags) or
-     (Start <= Text) or
-     UnicodeIsWhiteSpace(UCS4((Start - 1)^)) then
-  begin
-    // set the match start position
-    MatchStart := Start - Text;
-    Result := True;
-  end;
-end;
-procedure TUTBMSearch.Compile(Pattern: PUCS2; PatternLength: SizeInt; Flags: TSearchFlags);
-var
-  HaveSpace: Boolean;
-  I, J, K,
-  SLen: SizeInt;
-  Cp: PUTBMChar;
-  Sp: PUTBMSkip;
-  C1, C2,
-  Sentinel: UCS4;
-begin
-  if (Pattern <> nil) and (Pattern^ <> #0) and (PatternLength > 0) then
-  begin
-    // do some initialization
-    FFlags := Flags;
-    // extra skip flag
-    FMD4 := 1;
-    Sentinel := 0;
-    // allocate more storage if necessary
-    FPattern := AllocMem(SizeOf(TUTBMChar) * PatternLength);
-    FSkipValues := AllocMem(SizeOf(TUTBMSkip) * PatternLength);
-    FPatternSize := PatternLength;
-    // Preprocess the pattern to remove controls (if specified) and determine case.
-    Cp := FPattern;
-    I := 0;
-    HaveSpace := False;
-    while I < PatternLength do
-    begin
-      C1 := UCS4(Pattern[I]);
-      if (I + 1) < PatternLength then
-        C2 := UCS4(Pattern[I + 1])
-      else
-        C2 := $FFFFFFFF;
-      if (SurrogateHighStart <= C1) and (C1 <= SurrogateHighEnd) and
-         (SurrogateLowStart <= C2) and (C2 <= SurrogateLowEnd) then
-        C1 := $10000 + (((C1 and $03FF) shl 10) or (C2 and $03FF));
-      // Make sure the HaveSpace flag is turned off if the character is not an
-      // appropriate one.
-      if not UnicodeIsWhiteSpace(C1) then
-        HaveSpace := False;
-      // If non-spacing characters should be ignored, do it here.
-      if (sfIgnoreNonSpacing in Flags) and UnicodeIsNonSpacing(C1) then
-      begin
-        Inc(I);
-        Continue;
-      end;
-      // check if spaces and controls need to be compressed
-      if sfSpaceCompress in Flags then
-      begin
-        if UnicodeIsWhiteSpace(C1) then
-        begin
-          if not HaveSpace then
-          begin
-            // Add a space and set the flag.
-            Cp.UpCase := $20;
-            Cp.LoCase := $20;
-            Cp.TitleCase := $20;
-            Inc(Cp);
-            // increase the real pattern length
-            Inc(FPatternLength);
-            Sentinel := $20;
-            HaveSpace := True;
-          end;
-          Inc(I);
-          Continue;
-        end;
-        // ignore all control characters
-        if UnicodeIsControl(C1) then
-        begin
-          Inc(I);
-          Continue;
-        end;
-      end;
-      // add the character
-      if not (sfCaseSensitive in Flags) then
-      begin
-        { TODO : use the entire mapping, not only the first character }
-        Cp.UpCase := UnicodeToUpper(C1)[0];
-        Cp.LoCase := UnicodeToLower(C1)[0];
-        Cp.TitleCase := UnicodeToTitle(C1)[0];
-      end
-      else
-      begin
-        Cp.UpCase := C1;
-        Cp.LoCase := C1;
-        Cp.TitleCase := C1;
-      end;
-      Sentinel := Cp.UpCase;
-      // move to the next character
-      Inc(Cp);
-      // increase the real pattern length appropriately
-      if C1 >= $10000 then
-        Inc(FPatternLength, 2)
-      else
-        Inc(FPatternLength);
-      // increment the loop index for UTF-16 characters
-      if C1 > $10000 then
-        Inc(I, 2)
-      else
-        Inc(I);
-    end;
-    // set the number of characters actually used
-    FPatternUsed := (TJclAddr(Cp) - TJclAddr(FPattern)) div SizeOf(TUTBMChar);
-    // Go through and construct the skip array and determine the actual length
-    // of the pattern in UCS2 terms.
-    SLen := FPatternLength - 1;
-    Cp := FPattern;
-    K := 0;
-    for I := 0 to FPatternUsed - 1 do
-    begin
-      // locate the character in the FSkipValues array
-      Sp := FSkipValues;
-      J := 0;
-      while (J < FSkipsUsed) and (Sp.BMChar.UpCase <> Cp.UpCase) do
-      begin
-        Inc(J);
-        Inc(Sp);
-      end;
-      // If the character is not found, set the new FSkipValues element and
-      // increase the number of FSkipValues elements.
-      if J = FSkipsUsed then
-      begin
-        Sp.BMChar := Cp;
-        Inc(FSkipsUsed);
-      end;
-      // Set the updated FSkipValues value.  If the character is UTF-16 and is
-      // not the last one in the pattern, add one to its FSkipValues value.
-      Sp.SkipValues := SLen - K;
-      if (Cp.UpCase >= $10000) and ((K + 2) < SLen) then
-        Inc(Sp.SkipValues);
-      // set the new extra FSkipValues for the sentinel character
-      if ((Cp.UpCase >= $10000) and
-          ((K + 2) <= SLen) or ((K + 1) <= SLen) and
-          (Cp.UpCase = Sentinel)) then
-        FMD4 := SLen - K;
-      // increase the actual index
-      if Cp.UpCase >= $10000 then
-        Inc(K, 2)
-      else
-        Inc(K);
-      Inc(Cp);
-    end;
-  end;
-end;
-function TUTBMSearch.Find(Text: PUCS2; TextLen: SizeInt; var MatchStart, MatchEnd: SizeInt): Boolean;
-// this is the main matching routine using a tuned Boyer-Moore algorithm
-var
-  K: SizeInt;
-  Start,
-  Stop: PUCS2;
-begin
-  Result := False;
-  if (FPattern <> nil) and (FPatternUsed > 0) and (Text <> nil) and
-     (TextLen > 0) and (TextLen >= FPatternLength) then
-  begin
-    Start := Text + FPatternLength - 1;
-    Stop := Text + TextLen;
-    // adjust the start point if it points to a low surrogate
-    if (SurrogateLowStart <= UCS4(Start^)) and
-       (UCS4(Start^) <= SurrogateLowEnd) and
-       (SurrogateHighStart <= UCS4((Start - 1)^)) and
-       (UCS4((Start - 1)^) <= SurrogateHighEnd) then
-      Dec(Start);
-    while Start < Stop do
-    begin
-      repeat
-        K := GetSkipValue(Start, Stop);
-        if K = 0 then
-          Break;
-        Inc(Start, K);
-        if (Start < Stop) and
-           (SurrogateLowStart <= UCS4(Start^)) and
-           (UCS4(Start^) <= SurrogateLowEnd) and
-           (SurrogateHighStart <= UCS4((Start - 1)^)) and
-           (UCS4((Start - 1)^) <= SurrogateHighEnd) then
-          Dec(Start);
-      until False;
-      if (Start < Stop) and Match(Text, Start, Stop, MatchStart, MatchEnd) then
-      begin
-        Result := True;
-        Break;
-      end;
-      Inc(Start, FMD4);
-      if (Start < Stop) and
-         (SurrogateLowStart <= UCS4(Start^)) and
-         (UCS4(Start^) <= SurrogateLowEnd) and
-         (SurrogateHighStart <= UCS4((Start - 1)^)) and
-         (UCS4((Start - 1)^) <= SurrogateHighEnd) then
-        Dec(Start);
-    end;
-  end;
-end;
 procedure TUTBMSearch.Clear;
 begin
   ClearPattern;
   inherited Clear;
 end;
-function TUTBMSearch.FindAll(const Text: WideString): Boolean;
+function TUTBMSearch.FindAll(const Text: DWWideString): Boolean;
 begin
-  Result := FindAll(PWideChar(Text), Length(Text));
-end;
-function TUTBMSearch.FindAll(Text: PWideChar; TextLen: SizeInt): Boolean;
-// Looks for all occurences of the pattern passed to FindPrepare and creates an
-// internal list of their positions.
-var
-  Start, Stop: SizeInt;
-  Run: PWideChar;
-  RunLen: SizeInt;
-begin
-  ClearResults;
-  Run := Text;
-  RunLen := TextLen;
-  Start := 0;
-  Stop := 0;
-  // repeat to find all occurences of the pattern
-  while Find(Run, RunLen, Start, Stop) do
-  begin
-    // store this result (consider text pointer movement)...
-    AddResult(Start + (Run - Text), Stop + (Run - Text));
-    // ... and advance text position and length
-    Inc(Run, Stop);
-    Dec(RunLen, Stop);
-  end;
-  Result := Count > 0;
-end;
-function TUTBMSearch.FindFirst(const Text: WideString; var Start, Stop: SizeInt): Boolean;
-// Looks for the first occurence of the pattern passed to FindPrepare in Text and
-// returns True if one could be found (in which case Start and Stop are set to
-// the according indices) otherwise False. This function is in particular of
-// interest if only one occurence needs to be found.
-begin
-  ClearResults;
-  Result := Find(PWideChar(Text), Length(Text), Start, Stop);
-  if Result then
-    AddResult(Start, Stop);
-end;
-function TUTBMSearch.FindFirst(Text: PWideChar; TextLen: SizeInt; var Start, Stop: SizeInt): Boolean;
-// Same as the WideString version of this method.
-begin
-  ClearResults;
-  Result := Find(Text, TextLen, Start, Stop);
-  if Result then
-    AddResult(Start, Stop);
-end;
-procedure TUTBMSearch.FindPrepare(const Pattern: WideString; Options: TSearchFlags);
-begin
-  FindPrepare(PWideChar(Pattern), Length(Pattern), Options);
-end;
-procedure TUTBMSearch.FindPrepare(Pattern: PWideChar; PatternLength: SizeInt; Options: TSearchFlags);
-// prepares following search by compiling the given pattern into an internal structure
-begin
-  Compile(Pattern, PatternLength, Options);
+  Result := FindAll(PDWChar(Text), Length(Text));
 end;
 //----------------- Unicode RE search core ---------------------------------------------------------
 const
@@ -3045,84 +2520,6 @@ begin
     if FUREBuffer.Reducing then
       FUREBuffer.ExpressionList.Expressions[Word(Result)].OnStack := False;
   end;
-end;
-function TURESearch.ParsePropertyList(Properties: PUCS2; Limit: SizeInt;
-  var Categories: TCharacterCategories): SizeInt;
-// Parse a comma-separated list of integers that represent character properties.
-// Combine them into a set of categories and return the number of characters consumed.
-var
-  N: SizeInt;
-  Run,
-  ListEnd: PUCS2;
-begin
-  Run := Properties;
-  ListEnd := Run + Limit;
-  N := 0;
-  Categories := [];
-  while (FUREBuffer.Error = _URE_OK) and (Run < ListEnd) do
-  begin
-    if Run^ = ',' then
-    begin
-      // Encountered a comma, so take the number parsed so far as category and
-      // reset the number.
-      Include(Categories, TCharacterCategory(N));
-      N := 0;
-    end
-    else
-    begin
-      if (Run^ >= '0') and (Run^ <= '9') then
-      begin
-        // Encountered a digit, so start or continue building the SizeInt that
-        // represents the character category.
-        N := (N * 10) + SizeInt(Word(Run^) - Ord('0'));
-      end
-      else
-      begin
-        // Encountered something that is not part of the property list.
-        // Indicate that we are done.
-        Break;
-      end;
-    end;
-    // If the number is to large then there is a problem.
-    // Most likely a missing comma separator.
-    if SizeInt(N) > Ord(High(TCharacterCategory)) then
-      FUREBuffer.Error := _URE_INVALID_PROPERTY;
-    Inc(Run);
-  end;
-  // Return the number of characters consumed.
-  Result := Run - Properties;
-end;
-function TURESearch.MakeHexNumber(NP: PUCS2; Limit: SizeInt; var Number: UCS4): SizeInt;
-// Collect a hex number with 1 to 4 digits and return the number of characters used.
-var
-  I: SizeInt;
-  Run,
-  ListEnd: PUCS2;
-begin
-  Run := np;
-  ListEnd := Run + Limit;
-  Number := 0;
-  I := 0;
-  while (I < 4) and (Run < ListEnd) do
-  begin
-    if (Run^ >= '0') and (Run^ <= '9') then
-      Number := (Number shl 4) or (Cardinal(Word(Run^) - Ord('0')))
-    else
-    begin
-      if (Run^ >= 'A') and (Run^ <= 'F') then
-        Number := (Number shl 4) or (Cardinal(Word(Run^) - Ord('A')) + 10)
-      else
-      begin
-        if (Run^ >= 'a') and (Run^ <= 'f') then
-          Number := (Number shl 4) or (Cardinal(Word(Run^) - Ord('a')) + 10)
-        else
-          Break;
-      end;
-    end;
-    Inc(I);
-    Inc(Run);
-  end;
-  Result := Run - NP;
 end;
 procedure TURESearch.AddRange(var CCL: TUcCClass; Range: TUcRange);
 // Insert a Range into a character class, removing duplicates and ordering them
@@ -3275,413 +2672,6 @@ const
     (Key: #$0074; Len: 1; Next: 64; Setup: 0; Categories: []),
     (Key: #$003A; Len: 1; Next: 65; Setup: 3; Categories: [])
   );
-function TURESearch.PosixCCL(CP: PUCS2; Limit: SizeInt; Symbol: PUcSymbolTableEntry): SizeInt;
-// Probe for one of the POSIX colon delimited character classes in the static trie.
-var
-  I: SizeInt;
-  N: SizeInt;
-  TP: PTrie;
-  Run,
-  ListEnd: PUCS2;
-begin
-  Result := 0;
-  // If the number of characters left is less than 7,
-  // then this cannot be interpreted as one of the colon delimited classes.
-  if Limit >= 7 then
-  begin
-    Run := cp;
-    ListEnd := Run + Limit;
-    TP := @CClassTrie[0];
-    I := 0;
-    while (Run < ListEnd) and (I < 8) do
-    begin
-      N := TP.Len;
-      while (N > 0) and (TP.Key <> Run^) do
-      begin
-        Inc(TP);
-        Dec(N);
-      end;
-      if N = 0 then
-      begin
-        Result := 0;
-        Exit;
-      end;
-      if (Run^ = ':') and ((I = 6) or (I = 7)) then
-      begin
-        Inc(Run);
-        Break;
-      end;
-      if (Run + 1) < ListEnd then
-        TP := @CClassTrie[TP.Next];
-      Inc(I);
-      Inc(Run);
-    end;
-    Result := Run - CP;
-    case TP.Setup of
-      1:
-        Symbol.Categories := Symbol.Categories + TP.Categories;
-      2:
-        SpaceSetup(Symbol, TP.Categories);
-      3:
-        HexDigitSetup(Symbol);
-    else
-      Result := 0;
-    end;
-  end;
-end;
-function TURESearch.BuildCharacterClass(CP: PUCS2; Limit: SizeInt; Symbol: PUcSymbolTableEntry): SizeInt;
-// Construct a list of ranges and return the number of characters consumed.
-var
-  RangeEnd: SizeInt;
-  N: SizeInt;
-  Run,
-  ListEnd: PUCS2;
-  C, Last: UCS4;
-  Range: TUcRange;
-begin
-  Run := cp;
-  ListEnd := Run + Limit;
-  if Run^ = '^' then
-  begin
-    Symbol.AType := _URE_NCCLASS;
-    Inc(Run);
-  end
-  else
-    Symbol.AType := _URE_CCLASS;
-  Last := 0;
-  RangeEnd := 0;
-  while (FUREBuffer.Error = _URE_OK) and (Run < ListEnd) do
-  begin
-    // Allow for the special case []abc], where the first closing bracket would end an empty
-    // character class, which makes no sense. Hence this bracket is treaded literally.
-    if (Run^ = ']') and (Symbol.Symbol.CCL.RangesUsed > 0) then
-      Break;
-    C := UCS4(Run^);
-    Inc(Run);
-    // escape character
-    if C = Ord('\') then
-    begin
-      if Run = ListEnd then
-      begin
-        // The EOS was encountered when expecting the reverse solidus to be followed by the character it is escaping.
-        // Set an Error code and return the number of characters consumed up to this point.
-        FUREBuffer.Error := _URE_UNEXPECTED_EOS;
-        Result := Run - CP;
-        Exit;
-      end;
-      C := UCS4(Run^);
-      Inc(Run);
-      case UCS2(C) of
-        'a':
-          C := $07;
-        'b':
-          C := $08;
-        'f':
-          C := $0C;
-        'n':
-          C := $0A;
-        'R':
-          C := $0D;
-        't':
-          C := $09;
-        'v':
-          C := $0B;
-        'p', 'P':
-          begin
-            Inc(Run, ParsePropertyList(Run, ListEnd - Run, Symbol.Categories));
-            // Invert the bit mask of the properties if this is a negated character class or if 'P' is used to specify
-            // a list of character properties that should *not* match in a character class.
-            if C = Ord('P') then
-              Symbol.Categories := ClassAll - Symbol.Categories;
-            Continue;
-          end;
-        'x', 'X', 'u', 'U':
-          begin
-            if (Run < ListEnd) and
-               ((Run^ >= '0') and (Run^ <= '9') or
-                (Run^ >= 'A') and (Run^ <= 'F') or
-                (Run^ >= 'a') and (Run^ <= 'f')) then
-              Inc(Run, MakeHexNumber(Run, ListEnd - Run, C));
-          end;
-      end;
-    end
-    else
-    begin
-      if C = Ord(':') then
-      begin
-        // Probe for a POSIX colon delimited character class.
-        Dec(Run);
-        N := PosixCCL(Run, ListEnd - Run, Symbol);
-        if N = 0 then
-          Inc(Run)
-        else
-        begin
-          Inc(Run, N);
-          Continue;
-        end;
-      end;
-    end;
-    // Check to see if the current character is a low surrogate that needs
-    // to be combined with a preceding high surrogate.
-    if Last <> 0 then
-    begin
-      if (C >= SurrogateLowStart) and (C <= SurrogateLowEnd) then
-      begin
-        // Construct the UTF16 character code.
-        C := $10000 + (((Last and $03FF) shl 10) or (C and $03FF))
-      end
-      else
-      begin
-        // Add the isolated high surrogate to the range.
-        if RangeEnd = 1 then
-          Range.MaxCode := Last and $FFFF
-        else
-        begin
-          Range.MinCode := Last and $FFFF;
-          Range.MaxCode := Last and $FFFF;
-        end;
-        AddRange(Symbol.Symbol.CCL, Range);
-        RangeEnd := 0;
-      end;
-    end;
-    // Clear the Last character code.
-    Last := 0;
-    // This slightly awkward code handles the different cases needed to construct a range.
-    if (C >= SurrogateHighStart) and (C <= SurrogateHighEnd) then
-    begin
-      // If the high surrogate is followed by a Range indicator, simply add it as the Range start.  Otherwise,
-      // save it in  the next character is a low surrogate.
-      if Run^ = '-' then
-      begin
-        Inc(Run);
-        Range.MinCode := C;
-        RangeEnd := 1;
-      end
-      else
-        Last := C;
-    end
-    else
-    begin
-      if RangeEnd = 1 then
-      begin
-        Range.MaxCode := C;
-        AddRange(Symbol.Symbol.CCL, Range);
-        RangeEnd := 0;
-      end
-      else
-      begin
-        Range.MinCode := C;
-        Range.MaxCode := C;
-        if Run^ = '-' then
-        begin
-          Inc(Run);
-          RangeEnd := 1;
-        end
-        else
-          AddRange(Symbol.Symbol.CCL, Range);
-      end;
-    end;
-  end;
-  if (Run < ListEnd) and (Run^ = ']') then
-    Inc(Run)
-  else
-  begin
-    // The parse was not terminated by the character class close symbol (']'), so set an error code.
-    FUREBuffer.Error := _URE_CCLASS_OPEN;
-  end;
-  Result := Run - CP;
-end;
-function TURESearch.ProbeLowSurrogate(LeftState: PUCS2; Limit: SizeInt; var Code: UCS4): SizeInt;
-// probes for a low surrogate hex code
-var
-  I: SizeInt;
-  Run,
-  ListEnd: PUCS2;
-begin
-  I := 0;
-  Code := 0;
-  Run := LeftState;
-  ListEnd := Run + Limit;
-  while (I < 4) and (Run < ListEnd) do
-  begin
-    if (Run^ >= '0') and (Run^ <= '9') then
-      Code := (Code shl 4) or (Cardinal(Word(Run^) - Ord('0')))
-    else
-    begin
-      if (Run^ >= 'A') and (Run^ <= 'F') then
-        Code := (Code shl 4) or (Cardinal(Word(Run^) - Ord('A')) + 10)
-      else
-      begin
-        if (Run^ >= 'a') and (Run^ <= 'f') then
-          Code := (Code shl 4) or (Cardinal(Word(Run^) - Ord('a')) + 10)
-        else
-          Break;
-      end;
-    end;
-    Inc(Run);
-  end;
-  if (SurrogateLowStart <= Code) and (Code <= SurrogateLowEnd) then
-    Result :=  Run - LeftState
-  else
-    Result := 0;
-end;
-function TURESearch.CompileSymbol(S: PUCS2; Limit: SizeInt; Symbol: PUcSymbolTableEntry): SizeInt;
-var
-  C: UCS4;
-  Run,
-  ListEnd: PUCS2;
-begin
-  Run := S;
-  ListEnd := S + Limit;
-  C := UCS4(Run^);
-  Inc(Run);
-  if C = Ord('\') then
-  begin
-    if Run = ListEnd then
-    begin
-      // The EOS was encountered when expecting the reverse solidus to be followed
-      // by the character it is escaping. Set an Error code and return the number
-      // of characters consumed up to this point.
-      FUREBuffer.Error := _URE_UNEXPECTED_EOS;
-      Result := Run - S;
-      Exit;
-    end;
-    C := UCS4(Run^);
-    Inc(Run);
-    case UCS2(C) of
-      'p', 'P':
-        begin
-          if UCS2(C) = 'p' then
-            Symbol.AType :=_URE_CCLASS
-          else
-            Symbol.AType :=_URE_NCCLASS;
-          Inc(Run, ParsePropertyList(Run, ListEnd - Run, Symbol.Categories));
-        end;
-      'a':
-        begin
-          Symbol.AType := _URE_CHAR;
-          Symbol.Symbol.Chr := $07;
-        end;
-      'b':
-        begin
-          Symbol.AType := _URE_CHAR;
-          Symbol.Symbol.Chr := $08;
-        end;
-      'f':
-        begin
-          Symbol.AType := _URE_CHAR;
-          Symbol.Symbol.Chr := $0C;
-        end;
-      'n':
-        begin
-          Symbol.AType := _URE_CHAR;
-          Symbol.Symbol.Chr := $0A;
-        end;
-      'r':
-        begin
-          Symbol.AType := _URE_CHAR;
-          Symbol.Symbol.Chr := $0D;
-        end;
-      't':
-        begin
-          Symbol.AType := _URE_CHAR;
-          Symbol.Symbol.Chr := $09;
-        end;
-      'v':
-        begin
-          Symbol.AType := _URE_CHAR;
-          Symbol.Symbol.Chr := $0B;
-        end;
-    else
-      case UCS2(C) of
-        'x', 'X', 'u', 'U':
-          begin
-            // Collect between 1 and 4 digits representing an UCS2 code.
-            if (Run < ListEnd) and
-              ((Run^ >= '0') and (Run^ <= '9') or
-               (Run^ >= 'A') and (Run^ <= 'F') or
-               (Run^ >= 'a') and (Run^ <= 'f')) then
-              Inc(Run, MakeHexNumber(Run, ListEnd - Run, C));
-          end;
-      end;
-      // Simply add an escaped character here.
-      Symbol.AType := _URE_CHAR;
-      Symbol.Symbol.Chr := C;
-    end;
-  end
-  else
-  begin
-    if (UCS2(C) = '^') or (UCS2(C) = '$') then
-    begin
-      // Handle the BOL and EOL anchors. This actually consists simply of setting
-      // a flag that indicates that the user supplied anchor match function should
-      // be called. This needs to be done instead of simply matching line/paragraph
-      // separators because beginning-of-text and end-of-text tests are needed as well.
-      if UCS2(C) = '^' then
-        Symbol.AType := _URE_BOL_ANCHOR
-      else
-        Symbol.AType := _URE_EOL_ANCHOR;
-    end
-    else
-    begin
-      if UCS2(C) = '[' then
-      begin
-        // construct a character class
-        Inc(Run, BuildCharacterClass(Run, ListEnd - Run, Symbol));
-      end
-      else
-      begin
-        if UCS2(C) = '.' then
-          Symbol.AType := _URE_ANY_CHAR
-        else
-        begin
-          Symbol.AType := _URE_CHAR;
-          Symbol.Symbol.Chr := C;
-        end;
-      end;
-    end;
-  end;
-  // If the symbol type happens to be a character and is a high surrogate, then
-  // probe forward to see if it is followed by a low surrogate that needs to be added.
-  if (Run < ListEnd) and
-     (Symbol.AType = _URE_CHAR) and
-     (SurrogateHighStart <= Symbol.Symbol.Chr) and
-     (Symbol.Symbol.Chr <= SurrogateHighEnd) then
-  begin
-    if (SurrogateLowStart <= UCS4(Run^)) and
-       (UCS4(Run^) <= SurrogateLowEnd) then
-    begin
-      Symbol.Symbol.Chr := $10000 + (((Symbol.Symbol.Chr and $03FF) shl 10) or (UCS4(Run^) and $03FF));
-      Inc(Run);
-    end
-    else
-    begin
-      if (Run^ = '\') and (((Run + 1)^ = 'x') or ((Run + 1)^ = 'X') or
-         ((Run + 1)^ = 'u') or ((Run + 1)^ = 'U')) then
-      begin
-        Inc(Run, ProbeLowSurrogate(Run + 2, ListEnd - (Run + 2), C));
-        if (SurrogateLowStart <= C) and (C <= SurrogateLowEnd) then
-        begin
-          // Take into account the \[xu] in front of the hex code.
-          Inc(Run, 2);
-          Symbol.Symbol.Chr := $10000 + (((Symbol.Symbol.Chr and $03FF) shl 10) or (C and $03FF));
-        end;
-      end;
-    end;
-  end;
-  // Last, make sure any _URE_CHAR type symbols are changed to lower if the
-  // 'Casefold' flag is set.
-  { TODO : use the entire mapping, not only the first character and use the
-           case fold abilities of the unit. }
-  if ((FUREBuffer.Flags and _URE_DFA_CASEFOLD) <> 0) and (Symbol.AType = _URE_CHAR) then
-    Symbol.Symbol.Chr := UnicodeToLower(Symbol.Symbol.Chr)[0];
-  // If the symbol constructed is anything other than one of the anchors,
-  // make sure the _URE_DFA_BLANKLINE flag is removed.
-  if (Symbol.AType <> _URE_BOL_ANCHOR) and (Symbol.AType <> _URE_EOL_ANCHOR) then
-    FUREBuffer.Flags := FUREBuffer.Flags and not _URE_DFA_BLANKLINE;
-  // Return the number of characters consumed.
-  Result := Run - S;
-end;
 function TURESearch.SymbolsAreDifferent(A, B: PUcSymbolTableEntry): Boolean;
 begin
   Result := False;
@@ -4124,267 +3114,9 @@ function IsSeparator(C: UCS4): Boolean;
 begin
   Result := (C = $D) or (C = $A) or (C = $2028) or (C = $2029);
 end;
-function TURESearch.ExecuteURE(Flags: Cardinal; Text: PUCS2; TextLen: SizeInt; var MatchStart,
-  MatchEnd: SizeInt): Boolean;
-var
-  I, J: SizeInt;
-  Matched,
-  Found: Boolean;
-  Start, Stop: SizeInt;
-  C: UCS4;
-  Run, Tail, lp: PUCS2;
-  LastState: PDFAState;
-  Symbol: PUcSymbolTableEntry;
-  Rp: PUcRange;
-  LCMapping: TUCS4Array;
-begin
-  Result := False;
-  if Text <> nil then
-  begin
-    // Handle the special case of an empty string matching the "^$" pattern.
-    if (Textlen = 0) and ((FDFA.Flags and _URE_DFA_BLANKLINE) <> 0) then
-    begin
-      MatchStart := 0;
-      MatchEnd := 0;
-      Result := True;
-      Exit;
-    end;
-    Run := Text;
-    Tail := Run + TextLen;
-    Start := -1;
-    Stop := -1;
-    LastState := @FDFA.StateList.States[0];
-    Found := False;
-    while not Found and (Run < Tail) do
-    begin
-      lp := Run;
-      C := UCS4(Run^);
-      Inc(Run);
-      // Check to see if this is a high surrogate that should be combined with a
-      // following low surrogate.
-      if (Run < Tail) and
-         (SurrogateHighStart <= C) and (C <= SurrogateHighEnd) and
-         (SurrogateLowStart <= UCS4(Run^)) and (UCS4(Run^) <= SurrogateLowEnd) then
-      begin
-        C := $10000 + (((C and $03FF) shl 10) or (UCS4(Run^) and $03FF));
-        Inc(Run);
-      end;
-      // Determine if the character is non-spacing and should be skipped.
-      if ((Flags and URE_IGNORE_NONSPACING) <> 0) and UnicodeIsNonSpacing(C) then
-      begin
-        Inc(Run);
-        Continue;
-      end;
-      if (FDFA.Flags and _URE_DFA_CASEFOLD) <> 0 then
-      begin
-        SetLength(LCMapping, 0);
-        { TODO : use the entire mapping, not only the first character }
-        // (CaseLookup used for a little extra speed: avoids dynamic array allocation)
-        if CaseLookup(C, ctLower, LCMapping) then
-          C := LCMapping[0];
-      end;
-      // See if one of the transitions matches.
-      I := LastState.NumberTransitions - 1;
-      Matched := False;
-      while not Matched and (I >= 0) do
-      begin
-        Symbol := @FDFA.SymbolTable.Symbols[FDFA.TransitionList.Transitions[LastState.StartTransition + I].Symbol];
-        case Symbol.AType of
-          _URE_ANY_CHAR:
-            if ((Flags and URE_DONT_MATCHES_SEPARATORS) <> 0) or
-               not IsSeparator(C) then
-              Matched := True;
-          _URE_CHAR:
-            if C = Symbol.Symbol.Chr then
-              Matched := True;
-          _URE_BOL_ANCHOR:
-            if Lp = Text then
-            begin
-              Run := lp;
-              Matched := True;
-            end
-            else
-            begin
-              if IsSeparator(C) then
-              begin
-                if (C = $D) and (Run < Tail) and (Run^ = #$A) then
-                  Inc(Run);
-                Lp := Run;
-                Matched := True;
-              end;
-            end;
-          _URE_EOL_ANCHOR:
-            if IsSeparator(C) then
-            begin
-              // Put the pointer back before the separator so the match end
-              // position will be correct. This  will also cause the `Run'
-              // pointer to be advanced over the current separator once the
-              // match end point has been recorded.
-              Run := Lp;
-              Matched := True;
-            end;
-          _URE_CCLASS,
-          _URE_NCCLASS:
-            with Symbol^ do
-            begin
-              if Categories <> [] then
-                Matched := CategoryLookup(C, Categories);
-              if Symbol.CCL.RangesUsed > 0 then
-              begin
-                Rp := @Symbol.CCL.Ranges[0];
-                for J := 0 to Symbol.CCL.RangesUsed - 1 do
-                begin
-                  if (Rp.MinCode <= C) and (C <= Rp.MaxCode) then
-                  begin
-                    Matched := True;
-                    Break;
-                  end;
-                  Inc(Rp);
-                end;
-              end;
-              if AType = _URE_NCCLASS then
-                Matched := not Matched;
-            end;
-        end;
-        if Matched then
-        begin
-          if Start = -1 then
-            Start := Lp - Text
-          else
-            Stop := Run - Text;
-          LastState := @FDFA.StateList.States[FDFA.TransitionList.Transitions[LastState.StartTransition + I].NextState];
-          // If the match was an EOL anchor, adjust the pointer past the separator
-          // that caused the match. The correct match position has been recorded
-          // already.
-          if Symbol.AType = _URE_EOL_ANCHOR then
-          begin
-            // skip the character that caused the match
-            Inc(Run);
-            // handle the infamous CRLF situation
-            if (Run < Tail) and (C = $D) and (Run^ = #$A) then
-              Inc(Run);
-          end;
-        end;
-        Dec(I);
-      end;
-      if not Matched then
-      begin
-        Found := LastState.Accepting;
-        if not Found then
-        begin
-          // If the last state was not accepting, then reset and start over.
-          LastState := @FDFA.StateList.States[0];
-          Start := -1;
-          Stop := -1;
-        end
-        else
-        begin
-          // set start and stop pointer if not yet done
-          if Start = -1 then
-          begin
-            Start := Lp - Text;
-            Stop := Run - Text;
-          end
-          else
-          begin
-            if Stop = -1 then
-              Stop := Lp - Text;
-          end;
-        end;
-      end
-      else
-      begin
-        if Run = Tail then
-        begin
-          if not LastState.Accepting then
-          begin
-            // This ugly hack is to make sure the end-of-line anchors match
-            // when the source text hits the end. This is only done if the last
-            // subexpression matches.
-            for I := 0 to LastState.NumberTransitions - 1 do
-            begin
-              if Found then
-                Break;
-              Symbol := @FDFA.SymbolTable.Symbols[FDFA.TransitionList.Transitions[LastState.StartTransition + I].Symbol];
-              if Symbol.AType =_URE_EOL_ANCHOR then
-              begin
-                LastState := @FDFA.StateList.States[FDFA.TransitionList.Transitions[LastState.StartTransition + I].NextState];
-                if LastState.Accepting then
-                begin
-                  Stop := Run - Text;
-                  Found := True;
-                end
-                else
-                  Break;
-              end;
-            end;
-          end
-          else
-          begin
-            // Make sure any conditions that match all the way to the end of
-            // the string match.
-            Found := True;
-            Stop := Run - Text;
-          end;
-        end;
-      end;
-    end;
-    if Found then
-    begin
-      MatchStart := Start;
-      MatchEnd := Stop;
-    end;
-    Result := Found;
-  end;
-end;
-function TURESearch.FindAll(const Text: WideString): Boolean;
-begin
-  Result := FindAll(PWideChar(Text), Length(Text));
-end;
-function TURESearch.FindAll(Text: PWideChar; TextLen: SizeInt): Boolean;
-// Looks for all occurences of the pattern passed to FindPrepare and creates an
-// internal list of their positions.
-var
-  Start, Stop: SizeInt;
-  Run: PWideChar;
-  RunLen: SizeInt;
-begin
-  ClearResults;
-  Run := Text;
-  RunLen := TextLen;
-  // repeat to find all occurences of the pattern
-  Start := 0;
-  Stop := 0;
-  while ExecuteURE(0, Run, RunLen, Start, Stop) do
-  begin
-    // store this result (consider text pointer movement)...
-    AddResult(Start + (Run - Text), Stop + (Run - Text));
-    // ... and advance text position and length
-    Inc(Run, Stop);
-    Dec(RunLen, Stop);
-  end;
-  Result := FResults.Count > 0;
-end;
-function TURESearch.FindFirst(const Text: WideString; var Start, Stop: SizeInt): Boolean;
-begin
-  Result := FindFirst(PWideChar(Text), Length(Text), Start, Stop);
-end;
-function TURESearch.FindFirst(Text: PWideChar; TextLen: SizeInt; var Start, Stop: SizeInt): Boolean;
-// Looks for the first occurence of the pattern passed to FindPrepare in Text and
-// returns True if one could be found (in which case Start and Stop are set to
-// the according indices) otherwise False. This function is in particular of
-// interest if only one occurence needs to be found.
-begin
-  ClearResults;
-  Result := ExecuteURE(0, Text, TextLen, Start, Stop);
-  if Result then
-    AddResult(Start, Stop);
-end;
-//=== { TWideStrings } =======================================================
 constructor TWideStrings.Create;
 begin
   inherited Create;
-  FLanguage := GetUserDefaultLCID;
   FNormalizationForm := nfC;
   FSaveFormat := sfUnicodeLSB;
 end;
@@ -4403,17 +3135,17 @@ begin
   else
     SaveFormat := sfAnsi;
 end;
-function TWideStrings.Add(const S: WideString): Integer;
+function TWideStrings.Add(const S: DWWideString): Integer;
 begin
   Result := GetCount;
   Insert(Result, S);
 end;
-function TWideStrings.AddObject(const S: WideString; AObject: TObject): Integer;
+function TWideStrings.AddObject(const S: DWWideString; AObject: TObject): Integer;
 begin
   Result := Add(S);
   PutObject(Result, AObject);
 end;
-procedure TWideStrings.Append(const S: WideString);
+procedure TWideStrings.Append(const S: DWWideString);
 begin
   Add(S);
 end;
@@ -4536,32 +3268,9 @@ begin
 end;
 procedure TWideStrings.BeginUpdate;
 begin
-  if FUpdateCount = 0 then
-    SetUpdateState(True);
   Inc(FUpdateCount);
 end;
-procedure TWideStrings.DefineProperties(Filer: TFiler);
-// Defines a private property for the content of the list.
-// There's a bug in the handling of text DFMs in Classes.pas which prevents
-// WideStrings from loading under some circumstances. Zbysek Hlinka
-// (zhlinka att login dott cz) brought this to my attention and supplied also a solution.
-// See ReadData and WriteData methods for implementation details.
-  //--------------- local function --------------------------------------------
-  function DoWrite: Boolean;
-  begin
-    if Filer.Ancestor <> nil then
-    begin
-      Result := True;
-      if Filer.Ancestor is TWideStrings then
-        Result := not Equals(TWideStrings(Filer.Ancestor))
-    end
-    else
-      Result := Count > 0;
-  end;
-  //--------------- end local function ----------------------------------------
-begin
-  Filer.DefineProperty('WideStrings', ReadData, WriteData, DoWrite);
-end;
+
 procedure TWideStrings.DoConfirmConversion(var Allowed: Boolean);
 begin
   if Assigned(FOnConfirmConversion) then
@@ -4570,8 +3279,6 @@ end;
 procedure TWideStrings.EndUpdate;
 begin
   Dec(FUpdateCount);
-  if FUpdateCount = 0 then
-    SetUpdateState(False);
 end;
 function TWideStrings.Equals(Strings: TWideStrings): Boolean;
 var
@@ -4588,25 +3295,10 @@ begin
       Exit;
   Result := True;
 end;
-procedure TWideStrings.Error(const Msg: string; Data: Integer);
-  function ReturnAddr: Pointer;
-  asm
-          {$IFDEF CPU32}
-          MOV     EAX, EBP
-          MOV     EAX, [EAX + 4]
-          {$ENDIF CPU32}
-          {$IFDEF CPU64}
-          MOV     RAX, RBP
-          MOV     RAX, [RAX + 8]
-          {$ENDIF CPU64}
-  end;
-begin
-  raise EStringListError.CreateFmt(Msg, [Data]) at ReturnAddr;
-end;
 procedure TWideStrings.Exchange(Index1, Index2: Integer);
 var
   TempObject: TObject;
-  TempString: WideString;
+  TempString: DWWideString;
 begin
   BeginUpdate;
   try
@@ -4625,32 +3317,7 @@ function TWideStrings.GetCapacity: Integer;
 begin
   Result := Count;
 end;
-function TWideStrings.GetCommaText: WideString;
-var
-  S: WideString;
-  P: PWideChar;
-  I, Count: Integer;
-begin
-  Count := GetCount;
-  if (Count = 1) and (Get(0) = '') then
-    Result := '""'
-  else
-  begin
-    Result := '';
-    for I := 0 to Count - 1 do
-    begin
-      S := Get(I);
-      P := PWideChar(S);
-      while (P^ > WideSpace) and (P^ <> '"') and (P^ <> ',') do
-        Inc(P);
-      if P^ <> WideNull then
-        S := WideQuotedStr(S, '"');
-      Result := Result + S + ',';
-    end;
-    System.Delete(Result, Length(Result), 1);
-  end;
-end;
-function TWideStrings.GetName(Index: Integer): WideString;
+function TWideStrings.GetName(Index: Integer): DWWideString;
 var
   P: Integer;
 begin
@@ -4665,15 +3332,15 @@ function TWideStrings.GetObject(Index: Integer): TObject;
 begin
   Result := nil;
 end;
-function TWideStrings.GetSeparatedText(Separators: WideString): WideString;
+function TWideStrings.GetSeparatedText(Separators: DWWideString): DWWideString;
 // Same as GetText but with customizable separator characters.
 var
   I, L,
   Size,
   Count,
   SepSize: Integer;
-  P: PWideChar;
-  S: WideString;
+  P: PDWChar;
+  S: DWWideString;
 begin
   Count := GetCount;
   SepSize := Length(Separators);
@@ -4705,49 +3372,9 @@ begin
     end;
   end;
 end;
-function TWideStrings.GetTextStr: WideString;
+function TWideStrings.GetTextStr: DWWideString;
 begin
   Result := GetSeparatedText(WideCRLF);
-end;
-function TWideStrings.GetText: PWideChar;
-begin
-  Result := StrNewW(GetTextStr);
-end;
-function TWideStrings.GetValue(const Name: WideString): WideString;
-var
-  I: Integer;
-begin
-  I := IndexOfName(Name);
-  if I >= 0 then
-    Result := Copy(Get(I), Length(Name) + 2, MaxInt)
-  else
-    Result := '';
-end;
-function TWideStrings.IndexOf(const S: WideString): Integer;
-var
-  NormString: WideString;
-begin
-  NormString := WideNormalize(S, FNormalizationForm);
-  for Result := 0 to GetCount - 1 do
-    if WideCompareText(Get(Result), NormString, FLanguage) = 0 then
-      Exit;
-  Result := -1;
-end;
-function TWideStrings.IndexOfName(const Name: WideString): Integer;
-var
-  P: Integer;
-  S: WideString;
-  NormName: WideString;
-begin
-  NormName := WideNormalize(Name, FNormalizationForm);
-  for Result := 0 to GetCount - 1 do
-  begin
-    S := Get(Result);
-    P := Pos('=', S);
-    if (P > 0) and (WideCompareText(Copy(S, 1, P - 1), NormName, FLanguage) = 0) then
-      Exit;
-  end;
-  Result := -1;
 end;
 function TWideStrings.IndexOfObject(AObject: TObject): Integer;
 begin
@@ -4756,116 +3383,15 @@ begin
       Exit;
   Result := -1;
 end;
-procedure TWideStrings.InsertObject(Index: Integer; const S: WideString; AObject: TObject);
+procedure TWideStrings.InsertObject(Index: Integer; const S: DWWideString; AObject: TObject);
 begin
   Insert(Index, S);
   PutObject(Index, AObject);
 end;
-procedure TWideStrings.LoadFromFile(const FileName: TFileName);
-var
-  Stream: TStream;
-begin
-  try
-    Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
-    try
-      LoadFromStream(Stream);
-    finally
-      Stream.Free;
-    end;
-  except
-    RaiseLastOSError;
-  end;
-end;
-procedure TWideStrings.LoadFromStream(Stream: TStream);
-// usual loader routine, but enhanced to handle byte order marks in stream
-var
-  Size,
-  BytesRead: Integer;
-  ByteOrderMask: array [0..5] of Byte; // BOM size is max 5 bytes (cf: wikipedia)
-                                       // but it is easier to implement with a multiple of 2
-  Loaded: Boolean;
-  SW: WideString;
-  SA: AnsiString;
-begin
-  BeginUpdate;
-  try
-    Loaded := False;
-    Size := Stream.Size - Stream.Position;
-    ByteOrderMask[0] := 0;
-    BytesRead := Stream.Read(ByteOrderMask[0],SizeOf(ByteOrderMask));
-    // UTF16 LSB = Unicode LSB
-    if (BytesRead >= 2) and (ByteOrderMask[0] = BOM_UTF16_LSB[0])
-      and (ByteOrderMask[1] = BOM_UTF16_LSB[1]) then
-    begin
-      FSaveFormat := sfUTF16LSB;
-      SetLength(SW, (Size - 2) div SizeOf(WideChar));
-      Assert((Size and 1) <> 1,'Number of chars must be a multiple of 2');
-      if BytesRead > 2 then
-      begin
-        System.Move(ByteOrderMask[2], SW[1], BytesRead-2); // max 4 bytes = 2 widechars
-        if Size > BytesRead then
-          // first 2 chars (maximum) were copied by System.Move
-          Stream.Read(SW[3], Size-BytesRead);
-      end;
-      SetText(SW);
-      Loaded := True;
-    end;
-    // UTF16 MSB = Unicode MSB
-    if (BytesRead >= 2) and (ByteOrderMask[0] = BOM_UTF16_MSB[0])
-      and (ByteOrderMask[1] = BOM_UTF16_MSB[1]) then
-    begin
-      FSaveFormat := sfUTF16MSB;
-      SetLength(SW, (Size - 2) div SizeOf(WideChar));
-      Assert((Size and 1) <> 1,'Number of chars must be a multiple of 2');
-      if BytesRead > 2 then
-      begin
-        System.Move(ByteOrderMask[2],SW[1],BytesRead-2); // max 4 bytes = 2 widechars
-        if Size > BytesRead then
-          // first 2 chars (maximum) were copied by System.Move
-          Stream.Read(SW[3], Size-BytesRead);
-        StrSwapByteOrder(PWideChar(SW));
-      end;
-      SetText(SW);
-      Loaded := True;
-    end;
-    // UTF8
-    if (BytesRead >= 3) and (ByteOrderMask[0] = BOM_UTF8[0])
-      and (ByteOrderMask[1] = BOM_UTF8[1]) and (ByteOrderMask[2] = BOM_UTF8[2]) then
-    begin
-      FSaveFormat := sfUTF8;
-      SetLength(SA, (Size-3) div SizeOf(AnsiChar));
-      if BytesRead > 3 then
-      begin
-        System.Move(ByteOrderMask[3],SA[1],BytesRead-3); // max 3 bytes = 3 chars
-        if Size > BytesRead then
-          // first 3 chars were copied by System.Move
-          Stream.Read(SA[4], Size-BytesRead);
-        SW := UTF8ToWideString(SA);
-      end;
-      SetText(SW);
-      Loaded := True;
-    end;
-    // default case (Ansi)
-    if not Loaded then
-    begin
-      FSaveFormat := sfAnsi;
-      SetLength(SA, Size div SizeOf(AnsiChar));
-      if BytesRead > 0 then
-      begin
-        System.Move(ByteOrderMask[0], SA[1], BytesRead); // max 6 bytes = 6 chars
-        if Size > BytesRead then
-          Stream.Read(SA[7], Size-BytesRead); // first 6 chars were copied by System.Move
-      end;
-      SetText(StringToWideStringEx(SA, CodePageFromLocale(FLanguage)));
-    end;
-  finally
-    EndUpdate;
-  end;
-end;
 procedure TWideStrings.Move(CurIndex, NewIndex: Integer);
 var
   TempObject: TObject;
-  TempString: WideString;
+  TempString: DWWideString;
 begin
   if CurIndex <> NewIndex then
   begin
@@ -4880,209 +3406,10 @@ begin
     end;
   end;
 end;
-procedure TWideStrings.ReadData(Reader: TReader);
-begin
-  case Reader.NextValue of
-    vaLString, vaString:
-      SetText(Reader.ReadString);
-  else
-    SetText(Reader.{$IFDEF RTL240_UP}ReadString{$ELSE}ReadWideString{$ENDIF});
-  end;
-end;
-procedure TWideStrings.SaveToFile(const FileName: TFileName);
-var
-  Stream: TStream;
-begin
-  Stream := TFileStream.Create(FileName, fmCreate);
-  try
-    SaveToStream(Stream);
-  finally
-    Stream.Free;
-  end;
-end;
-procedure TWideStrings.SaveToStream(Stream: TStream; WithBOM: Boolean = True);
-// Saves the currently loaded text into the given stream. WithBOM determines whether to write a
-// byte order mark or not. Note: when saved as ANSI text there will never be a BOM.
-var
-  SW: WideString;
-  SA: AnsiString;
-  Allowed: Boolean;
-  Run: PWideChar;
-begin
-  // The application can decide in which format to save the content.
-  // If FSaveUnicode is False then all strings are saved in standard ANSI format
-  // which is also loadable by TStrings but you should be aware that all Unicode
-  // strings are then converted to ANSI based on the current system locale.
-  // An extra event is supplied to ask the user about the potential loss of
-  // information when converting Unicode to ANSI strings.
-  SW := GetTextStr;
-  Allowed := True;
-  FSaved := False; // be pessimistic
-  // A check for potential information loss makes only sense if the application has
-  // set an event to be used as call back to ask about the conversion.
-  if (FSaveFormat = sfAnsi) and Assigned(FOnConfirmConversion) then
-  begin
-    // application requests to save only ANSI characters, so check the text and
-    // call back in case information could be lost
-    Run := PWideChar(SW);
-    // only ask if there's at least one Unicode character in the text
-    while (Run^>#0) and (run^<=#255) do
-      Inc(Run);
-    // Note: The application can still set FSaveUnicode to True in the callback.
-    if Run^ <> WideNull then
-      DoConfirmConversion(Allowed);
-  end;
-  if Allowed then
-  begin
-    // only save if allowed
-    case SaveFormat of
-      sfUTF16LSB :
-        begin
-          if WithBOM then
-            Stream.WriteBuffer(BOM_UTF16_LSB[0],SizeOf(BOM_UTF16_LSB));
-          if Length(SW) > 0 then
-            Stream.WriteBuffer(SW[1],Length(SW)*SizeOf(UTF16));
-          FSaved := True;
-        end;
-      sfUTF16MSB :
-        begin
-          if WithBOM then
-            Stream.WriteBuffer(BOM_UTF16_MSB[0],SizeOf(BOM_UTF16_MSB));
-          if Length(SW) > 0 then
-          begin
-            StrSwapByteOrder(PWideChar(SW));
-            Stream.WriteBuffer(SW[1],Length(SW)*SizeOf(UTF16));
-          end;
-          FSaved := True;
-        end;
-      sfUTF8 :
-        begin
-          if WithBOM then
-            Stream.WriteBuffer(BOM_UTF8[0],SizeOf(BOM_UTF8));
-          if Length(SW) > 0 then
-          begin
-            SA := WideStringToUTF8(SW);
-            Stream.WriteBuffer(SA[1],Length(SA)*SizeOf(UTF8));
-          end;
-          FSaved := True;
-        end;
-      sfAnsi :
-        begin
-          if Length(SW) > 0 then
-          begin
-            SA := WideStringToStringEx(SW,CodePageFromLocale(FLanguage));
-            Stream.WriteBuffer(SA[1],Length(SA)*SizeOf(AnsiChar));
-          end;
-          FSaved := True;
-        end;
-    end;
-  end;
-end;
+
 procedure TWideStrings.SetCapacity(NewCapacity: Integer);
 begin
   // do nothing - descendants may optionally implement this method
-end;
-procedure TWideStrings.SetCommaText(const Value: WideString);
-var
-  P, P1: PWideChar;
-  S: WideString;
-begin
-  BeginUpdate;
-  try
-    Clear;
-    P := PWideChar(Value);
-    while (P^ >= #1) and (P^ <= WideSpace) do
-      Inc(P);
-    while P^ <> WideNull do
-    begin
-      if P^ = '"' then
-        S := WideExtractQuotedStr(P, '"')
-      else
-      begin
-        P1 := P;
-        while (P^ > WideSpace) and (P^ <> ',') do
-          Inc(P);
-        SetString(S, P1, P - P1);
-      end;
-      Add(S);
-      while (P^ >= #1) and (P^ <= WideSpace) do
-        Inc(P);
-      if P^ = ',' then
-      begin
-        repeat
-          Inc(P);
-        until not ((P^ >= #1) and (P^ <= WideSpace));
-      end;
-    end;
-  finally
-    EndUpdate;
-  end;
-end;
-procedure TWideStrings.SetText(const Value: WideString);
-var
-  Head,
-  Tail: PWideChar;
-  S: WideString;
-begin
-  BeginUpdate;
-  try
-    Clear;
-    Head := PWideChar(Value);
-    while Head^ <> WideNull do
-    begin
-      Tail := Head;
-      while (Tail^ <> WideNull) and (Tail^ <> WideLineFeed) and (Tail^ <> WideCarriageReturn) and
-        (Tail^ <> WideVerticalTab) and (Tail^ <> WideFormFeed) and (Tail^ <> WideLineSeparator) and
-        (Tail^ <> WideParagraphSeparator) do
-        Inc(Tail);
-      SetString(S, Head, Tail - Head);
-      Add(S);
-      Head := Tail;
-      if Head^ <> WideNull then
-      begin
-        Inc(Head);
-        if (Tail^ = WideCarriageReturn) and (Head^ = WideLineFeed) then
-          Inc(Head);
-      end;
-    end;
-  finally
-    EndUpdate;
-  end;
-end;
-procedure TWideStrings.SetUpdateState(Updating: Boolean);
-begin
-end;
-procedure TWideStrings.SetNormalizationForm(const Value: TNormalizationForm);
-var
-  I: Integer;
-begin
-  if FNormalizationForm <> Value then
-  begin
-    FNormalizationForm := Value;
-    if FNormalizationForm <> nfNone then
-    begin
-      // renormalize all strings according to the new form
-      for I := 0 to GetCount - 1 do
-        Put(I, WideNormalize(Get(I), FNormalizationForm));
-    end;
-  end;
-end;
-procedure TWideStrings.SetValue(const Name, Value: WideString);
-var
-  I : Integer;
-begin
-  I := IndexOfName(Name);
-  if Value <> '' then
-  begin
-    if I < 0 then
-      I := Add('');
-    Put(I, Name + '=' + Value);
-  end
-  else
-  begin
-    if I >= 0 then
-      Delete(I);
-  end;
 end;
 procedure TWideStrings.WriteData(Writer: TWriter);
 begin
@@ -5095,24 +3422,6 @@ begin
   FOnChanging := nil;
   Clear;
   inherited Destroy;
-end;
-function TWideStringList.Add(const S: WideString): Integer;
-begin
-  if not Sorted then
-    Result := FCount
-  else
-  begin
-    if Find(S, Result) then
-    begin
-      case Duplicates of
-        dupIgnore:
-          Exit;
-        dupError:
-          Error(SDuplicateString, 0);
-      end;
-    end;
-  end;
-  InsertItem(Result, S);
 end;
 procedure TWideStringList.Changed;
 begin
@@ -5149,7 +3458,7 @@ end;
 procedure TWideStringList.Delete(Index: Integer);
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
-    Error(SListIndexError, Index);
+    raise Exception.Create(Format(SListIndexError, [Index]));
   Changing;
   {$IFDEF OWN_WIDESTRING_MEMMGR}
   SetListString(Index, '');
@@ -5167,9 +3476,9 @@ end;
 procedure TWideStringList.Exchange(Index1, Index2: Integer);
 begin
   if Cardinal(Index1) >= Cardinal(FCount) then
-    Error(SListIndexError, Index1);
+    raise Exception.Create(Format(SListIndexError, [Index1]));
   if Cardinal(Index2) >= Cardinal(FCount) then
-    Error(SListIndexError, Index2);
+    raise Exception.Create(Format(SListIndexError, [Index2]));
   Changing;
   ExchangeItems(Index1, Index2);
   Changed;
@@ -5182,42 +3491,14 @@ begin
   FList[Index1] := FList[Index2];
   FList[Index2] := Temp;
 end;
-function TWideStringList.Find(const S: WideString; var Index: Integer): Boolean;
-var
-  L, H, I, C: Integer;
-  NormString: WideString;
-begin
-  Result := False;
-  NormString := WideNormalize(S, FNormalizationForm);
-  L := 0;
-  H := FCount - 1;
-  while L <= H do
-  begin
-    I := (L + H) shr 1;
-    C := WideCompareText(FList[I].FString, NormString, FLanguage);
-    if C < 0 then
-      L := I+1
-    else
-    begin
-      H := I - 1;
-      if C = 0 then
-      begin
-        Result := True;
-        if Duplicates <> dupAccept then
-          L := I;
-      end;
-    end;
-  end;
-  Index := L;
-end;
-function TWideStringList.Get(Index: Integer): WideString;
+function TWideStringList.Get(Index: Integer): DWWideString;
 {$IFDEF OWN_WIDESTRING_MEMMGR}
 var
   Len: Integer;
 {$ENDIF OWN_WIDESTRING_MEMMGR}
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
-    Error(SListIndexError, Index);
+   raise Exception.Create(Format(SListIndexError, [Index]));
   {$IFDEF OWN_WIDESTRING_MEMMGR}
   with FList[Index] do
   begin
@@ -5246,7 +3527,7 @@ end;
 function TWideStringList.GetObject(Index: Integer): TObject;
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
-    Error(SListIndexError, Index);
+    raise Exception.Create(Format(SListIndexError, [Index]));
   Result := FList[Index].FObject;
 end;
 procedure TWideStringList.Grow;
@@ -5266,24 +3547,8 @@ begin
   end;
   SetCapacity(Len + Delta);
 end;
-function TWideStringList.IndexOf(const S: WideString): Integer;
-begin
-  if not Sorted then
-    Result := inherited IndexOf(S)
-  else
-    if not Find(S, Result) then
-      Result := -1;
-end;
-procedure TWideStringList.Insert(Index: Integer; const S: WideString);
-begin
-  if Sorted then
-    Error(SSortedListError, 0);
-  if Cardinal(Index) > Cardinal(FCount) then
-    Error(SListIndexError, Index);
-  InsertItem(Index, S);
-end;
 {$IFDEF OWN_WIDESTRING_MEMMGR}
-procedure TWideStringList.SetListString(Index: Integer; const S: WideString);
+procedure TWideStringList.SetListString(Index: Integer; const S: DWWideString);
 var
   Len: Integer;
   A: TDynWideCharArray;
@@ -5300,59 +3565,15 @@ begin
       System.Move(S[1], A[0], Len * SizeOf(WideChar));
       A[Len] := #0;
     end;
-    FString := PWideChar(A);
+    FString := PDWChar(A);
     Pointer(A) := nil; // do not release the array on procedure exit
   end;
 end;
 {$ENDIF OWN_WIDESTRING_MEMMGR}
-procedure TWideStringList.InsertItem(Index: Integer; const S: WideString);
-begin
-  Changing;
-  if FCount = Length(FList) then
-    Grow;
-  if Index < FCount then
-    System.Move(FList[Index], FList[Index + 1], (FCount - Index) * SizeOf(TWideStringItem));
-  with FList[Index] do
-  begin
-    Pointer(FString) := nil; // avoid freeing the string, the address is now used in another element
-    FObject := nil;
-    if (FNormalizationForm <> nfNone) and (Length(S) > 0) then
-    {$IFDEF OWN_WIDESTRING_MEMMGR}
-      SetListString(Index, WideNormalize(S, FNormalizationForm))
-    else
-      SetListString(Index, S);
-    {$ELSE ~OWN_WIDESTRING_MEMMGR}
-      FString := WideNormalize(S, FNormalizationForm)
-    else
-      FString := S;
-    {$ENDIF ~OWN_WIDESTRING_MEMMGR}
-  end;
-  Inc(FCount);
-  Changed;
-end;
-procedure TWideStringList.Put(Index: Integer; const S: WideString);
-begin
-  if Sorted then
-    Error(SSortedListError, 0);
-  if Cardinal(Index) >= Cardinal(FCount) then
-    Error(SListIndexError, Index);
-  Changing;
-  if (FNormalizationForm <> nfNone) and (Length(S) > 0) then
-  {$IFDEF OWN_WIDESTRING_MEMMGR}
-    SetListString(Index, WideNormalize(S, FNormalizationForm))
-  else
-    SetListString(Index, S);
-  {$ELSE ~OWN_WIDESTRING_MEMMGR}
-    FList[Index].FString := WideNormalize(S, FNormalizationForm)
-  else
-    FList[Index].FString := S;
-  {$ENDIF ~OWN_WIDESTRING_MEMMGR}
-  Changed;
-end;
 procedure TWideStringList.PutObject(Index: Integer; AObject: TObject);
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
-    Error(SListIndexError, Index);
+   raise Exception.Create(Format(SListIndexError, [Index]));
   Changing;
   FList[Index].FObject := AObject;
   Changed;
@@ -5360,16 +3581,16 @@ end;
 procedure TWideStringList.QuickSort(L, R: Integer);
 var
   I, J: Integer;
-  P: WideString;
+  P: DWWideString;
 begin
   repeat
     I := L;
     J := R;
-    P := FList[(L + R) shr 1].FString;
+    P := PDWString(@FList[(L + R) shr 1].FString)^;
     repeat
-      while WideCompareText(FList[I].FString, P, FLanguage) < 0 do
+      while WideCompareText(PDWString(@FList[I].FString)^, P, FLanguage) < 0 do
         Inc(I);
-      while WideCompareText(FList[J].FString, P, FLanguage) > 0 do
+      while WideCompareText(PDWString(@FList[J].FString)^, P, FLanguage) > 0 do
         Dec(J);
       if I <= J then
       begin
@@ -5398,13 +3619,6 @@ begin
     FSorted := Value;
   end;
 end;
-procedure TWideStringList.SetUpdateState(Updating: Boolean);
-begin
-  if Updating then
-    Changing
-  else
-    Changed;
-end;
 procedure TWideStringList.Sort;
 begin
   if not Sorted and (FCount > 1) then
@@ -5421,135 +3635,7 @@ begin
     Sort;
 end;
 {$ENDIF ~UNICODE_RTL_DATABASE}
-// exchanges in each character of the given string the low order and high order
-// byte to go from LSB to MSB and vice versa.
-// EAX contains address of string
-function WideAdjustLineBreaks(const S: WideString): WideString;
-var
-  Source,
-  SourceEnd,
-  Dest: PWideChar;
-begin
-  Source := Pointer(S);
-  SourceEnd := Source + Length(S);
-  Source := Pointer(S);
-  SetString(Result, nil, SourceEnd - Source);
-  Dest := Pointer(Result);
-  while Source < SourceEnd do
-  begin
-    case Source^ of
-      WideLineFeed:
-        begin
-          Dest^ := WideLineSeparator;
-          Inc(Dest);
-          Inc(Source);
-        end;
-      WideCarriageReturn:
-        begin
-          Dest^ := WideLineSeparator;
-          Inc(Dest);
-          Inc(Source);
-          if Source^ = WideLineFeed then
-            Inc(Source);
-        end;
-    else
-      Dest^ := Source^;
-      Inc(Dest);
-      Inc(Source);
-    end;
-  end;
-  SetLength(Result, (TJclAddr(Dest) - TJclAddr(Result)) div 2);
-end;
-function WideQuotedStr(const S: WideString; Quote: WideChar): WideString;
-// works like QuotedStr from SysUtils.pas but can insert any quotation character
-var
-  P, Src,
-  Dest: PWideChar;
-  AddCount: SizeInt;
-begin
-  AddCount := 0;
-  P := StrScanW(PWideChar(S), Quote);
-  while (P <> nil) do
-  begin
-    Inc(P);
-    Inc(AddCount);
-    P := StrScanW(P, Quote);
-  end;
-  if AddCount = 0 then
-    Result := Quote + S + Quote
-  else
-  begin
-    SetLength(Result, Length(S) + AddCount + 2);
-    Dest := PWideChar(Result);
-    Dest^ := Quote;
-    Inc(Dest);
-    Src := PWideChar(S);
-    P := StrScanW(Src, Quote);
-    repeat
-      Inc(P);
-      Move(Src^, Dest^, 2 * (P - Src));
-      Inc(Dest, P - Src);
-      Dest^ := Quote;
-      Inc(Dest);
-      Src := P;
-      P := StrScanW(Src, Quote);
-    until P = nil;
-    P := StrEndW(Src);
-    Move(Src^, Dest^, 2 * (P - Src));
-    Inc(Dest, P - Src);
-    Dest^ := Quote;
-  end;
-end;
-function WideExtractQuotedStr(var Src: PWideChar; Quote: WideChar): WideString;
-// extracts a string enclosed in quote characters given by Quote
-var
-  P, Dest: PWideChar;
-  DropCount: SizeInt;
-begin
-  Result := '';
-  if (Src = nil) or (Src^ <> Quote) then
-    Exit;
-  Inc(Src);
-  DropCount := 1;
-  P := Src;
-  Src := StrScanW(Src, Quote);
-  while Src <> nil do   // count adjacent pairs of quote chars
-  begin
-    Inc(Src);
-    if Src^ <> Quote then
-      Break;
-    Inc(Src);
-    Inc(DropCount);
-    Src := StrScanW(Src, Quote);
-  end;
-  if Src = nil then
-    Src := StrEndW(P);
-  if (Src - P) <= 1 then
-    Exit;
-  if DropCount = 1 then
-    SetString(Result, P, Src - P - 1)
-  else
-  begin
-    SetLength(Result, Src - P - DropCount);
-    Dest := PWideChar(Result);
-    Src := StrScanW(P, Quote);
-    while Src <> nil do
-    begin
-      Inc(Src);
-      if Src^ <> Quote then
-        Break;
-      Move(P^, Dest^, 2 * (Src - P));
-      Inc(Dest, Src - P);
-      Inc(Src);
-      P := Src;
-      Src := StrScanW(Src, Quote);
-    end;
-    if Src = nil then
-      Src := StrEndW(P);
-    Move(P^, Dest^, 2 * (Src - P - 1));
-  end;
-end;
-function WideStringOfChar(C: WideChar; Count: SizeInt): WideString;
+function DWWideStringOfChar(C: DWChar; Count: SizeInt): DWWideString;
 // returns a string of Count characters filled with C
 var
   I: SizeInt;
@@ -5558,7 +3644,7 @@ begin
   for I := 1 to Count do
     Result[I] := C;
 end;
-function WideTrim(const S: WideString): WideString;
+function WideTrim(const S: DWWideString): DWWideString;
 var
   I, L: SizeInt;
 begin
@@ -5575,7 +3661,7 @@ begin
     Result := Copy(S, I, L - I + 1);
   end;
 end;
-function WideTrimLeft(const S: WideString): WideString;
+function WideTrimLeft(const S: DWWideString): DWWideString;
 var
   I, L: SizeInt;
 begin
@@ -5585,7 +3671,7 @@ begin
     Inc(I);
   Result := Copy(S, I, Maxint);
 end;
-function WideTrimRight(const S: WideString): WideString;
+function WideTrimRight(const S: DWWideString): DWWideString;
 var
   I: SizeInt;
 begin
@@ -5594,180 +3680,12 @@ begin
     Dec(I);
   Result := Copy(S, 1, I);
 end;
-// returns the index of character Ch in S, starts searching at index Index
-// Note: This is a quick memory search. No attempt is made to interpret either
-// the given charcter nor the string (ligatures, modifiers, surrogates etc.)
-// Code from Azret Botash.
-function WideCharPos(const S: WideString; const Ch: WideChar; const Index: SizeInt): SizeInt;
-var
-  P, R: PWideChar;
-begin
-  if (Index > 0) and (Index <= Length(S)) then
-  begin
-    P := PWideChar(@S[Index]);
-    R := StrScanW(P, Ch);
-    if R <> nil then
-      Result := R - P + Index
-    else
-      Result := 0;
-  end
-  else
-    Result := 0;
-end;
 {$IFNDEF UNICODE_RTL_DATABASE}
-function WideComposeHangul(const Source: WideString): WideString;
-var
-  Len: SizeInt;
-  Ch, Last: WideChar;
-  I: SizeInt;
-  LIndex, VIndex,
-  SIndex, TIndex: SizeInt;
-begin
-  Result := '';
-  Len := Length(Source);
-  if Len > 0 then
-  begin
-    Last := Source[1];
-    Result := Last;
-    for I := 2 to Len do
-    begin
-      Ch := Source[I];
-      // 1. check to see if two current characters are L and V
-      LIndex := Word(Last) - LBase;
-      if (0 <= LIndex) and (LIndex < LCount) then
-      begin
-        VIndex := Word(Ch) - VBase;
-        if (0 <= VIndex) and (VIndex < VCount) then
-        begin
-          // make syllable of form LV
-          Last := WideChar((SBase + (LIndex * VCount + VIndex) * TCount));
-          Result[Length(Result)] := Last; // reset last
-          Continue; // discard Ch
-        end;
-      end;
-      // 2. check to see if two current characters are LV and T
-      SIndex := Word(Last) - SBase;
-      if (0 <= SIndex) and (SIndex < SCount) and ((SIndex mod TCount) = 0) then
-      begin
-        TIndex := Word(Ch) - TBase;
-        if (0 <= TIndex) and (TIndex <= TCount) then
-        begin
-          // make syllable of form LVT
-          Inc(Word(Last), TIndex);
-          Result[Length(Result)] := Last; // reset last
-          Continue; // discard Ch
-        end;
-      end;
-      // if neither case was true, just add the character
-      Last := Ch;
-      Result := Result + Ch;
-    end;
-  end;
-end;
-// Returns canonical composition of characters in S.
-function WideCompose(const S: WideString; Compatible: Boolean): WideString;
-var
-  Buffer: array of UCS4;
-  LastInPos, InPos, OutPos, BufferSize, NbProcessed: SizeInt;
-  Composite: UCS4;
-begin
-  // Set an arbitrary length for the result. This is automatically done when checking
-  // for hangul composition.
-  Result := WideComposeHangul(S);
-  if Result = '' then
-    Exit;
-  if not CompositionsLoaded then
-    LoadCompositionData;
-  LastInPos := Length(Result);
-  if LastInPos > MaxCompositionSize then
-    SetLength(Buffer, MaxCompositionSize)
-  else
-    SetLength(Buffer, LastInPos);
-  BufferSize := 0;
-  InPos := 0;
-  OutPos := 0;
-  while (InPos < LastInPos) or (BufferSize > 0) do
-  begin
-    // fill buffer from input
-    while BufferSize < Length(Buffer) do
-    begin
-      if InPos < LastInPos then
-      begin
-        Inc(InPos);
-        Buffer[BufferSize] := UCS4(Result[InPos]);
-        Inc(BufferSize);
-      end
-      else
-        SetLength(Buffer, BufferSize);
-    end;
-    if Length(Buffer) = 0 then
-      Break;
-    NbProcessed := UnicodeCompose(Buffer, Composite, Compatible);
-    if NbProcessed = 0 then
-      Break;
-    if BufferSize > NbProcessed then
-      Move(Buffer[NbProcessed], Buffer[0], (BufferSize - NbProcessed) * SizeOf(UCS4));
-    Dec(BufferSize, NbProcessed);
-    Inc(OutPos);
-    Result[OutPos] := UCS2(Composite);
-  end;
-  // since we have likely shortened the source string we have to set the correct length on exit
-  SetLength(Result, OutPos);
-end;
-function WideCompose(const S: WideString; Tags: TCompatibilityFormattingTags): WideString;
-var
-  Buffer: array of UCS4;
-  LastInPos, InPos, OutPos, BufferSize, NbProcessed: SizeInt;
-  Composite: UCS4;
-begin
-  // Set an arbitrary length for the result. This is automatically done when checking
-  // for hangul composition.
-  Result := WideComposeHangul(S);
-  if Result = '' then
-    Exit;
-  if not CompositionsLoaded then
-    LoadCompositionData;
-  LastInPos := Length(Result);
-  if LastInPos > MaxCompositionSize then
-    SetLength(Buffer, MaxCompositionSize)
-  else
-    SetLength(Buffer, LastInPos);
-  BufferSize := 0;
-  InPos := 0;
-  OutPos := 0;
-  while (InPos < LastInPos) or (BufferSize > 0) do
-  begin
-    // fill buffer from input
-    while BufferSize < Length(Buffer) do
-    begin
-      if InPos < LastInPos then
-      begin
-        Inc(InPos);
-        Buffer[BufferSize] := UCS4(Result[InPos]);
-        Inc(BufferSize);
-      end
-      else
-        SetLength(Buffer, BufferSize);
-    end;
-    if Length(Buffer) = 0 then
-      Break;
-    NbProcessed := UnicodeCompose(Buffer, Composite, Tags);
-    if NbProcessed = 0 then
-      Break;
-    if BufferSize > NbProcessed then
-      Move(Buffer[NbProcessed], Buffer[0], (BufferSize - NbProcessed) * SizeOf(UCS4));
-    Dec(BufferSize, NbProcessed);
-    Inc(OutPos);
-    Result[OutPos] := UCS2(Composite);
-  end;
-  // since we have likely shortened the source string we have to set the correct length on exit
-  SetLength(Result, OutPos);
-end;
-procedure FixCanonical(var S: WideString);
+procedure FixCanonical(var S: DWWideString);
 // Examines S and reorders all combining marks in the string so that they are in canonical order.
 var
   I: SizeInt;
-  Temp: WideChar;
+  Temp: DWChar;
   CurrentClass,
   LastClass: Cardinal;
 begin
@@ -5796,7 +3714,7 @@ begin
     until I = 1;
   end;
 end;
-function WideDecompose(const S: WideString; Compatible: Boolean): WideString;
+function WideDecompose(const S: DWWideString; Compatible: Boolean): DWWideString;
 // returns a string with all characters of S but decomposed, e.g.  is returned as E^ etc.
 var
   I, J: SizeInt;
@@ -5812,12 +3730,12 @@ begin
       Result := Result + S[I]
     else
       for J := 0 to High(Decomp) do
-        Result := Result + WideChar(Decomp[J]);
+        Result := Result + DWChar(Decomp[J]);
   end;
   // combining marks must be sorted according to their canonical combining class
   FixCanonical(Result);
 end;
-function WideDecompose(const S: WideString; Tags: TCompatibilityFormattingTags): WideString;
+function WideDecompose(const S: DWWideString; Tags: TCompatibilityFormattingTags): DWWideString;
 // returns a string with all characters of S but decomposed, e.g.  is returned as E^ etc.
 var
   I, J: SizeInt;
@@ -5833,165 +3751,12 @@ begin
       Result := Result + S[I]
     else
       for J := 0 to High(Decomp) do
-        Result := Result + WideChar(Decomp[J]);
+        Result := Result + DWChar(Decomp[J]);
   end;
   // combining marks must be sorted according to their canonical combining class
   FixCanonical(Result);
 end;
-function WideNormalize(const S: WideString; Form: TNormalizationForm): WideString;
-var
-  Temp: WideString;
-  Compatible: Boolean;
-begin
-  Result := S;
-  if Form = nfNone then
-    Exit; // No normalization needed.
-  Compatible := Form in [nfKC, nfKD];
-  if Form in [nfD, nfKD] then
-    Result := WideDecompose(S, Compatible)
-  else
-  begin
-    Temp := WideDecompose(S, Compatible);
-    Result := WideCompose(Temp, Compatible);
-  end;
-end;
 {$ENDIF ~UNICODE_RTL_DATABASE}
-function WideSameText(const Str1, Str2: WideString): Boolean;
-// Compares both strings case-insensitively and returns True if both are equal, otherwise False is returned.
-begin
-  Result := Length(Str1) = Length(Str2);
-  if Result then
-    Result := StrICompW(PWideChar(Str1), PWideChar(Str2)) = 0;
-end;
-//----------------- general purpose case mapping ---------------------------------------------------
-{$IFNDEF UNICODE_RTL_DATABASE}
-function WideCaseConvert(C: WideChar; CaseType: TCaseType): WideString;
-var
-  I, RPos: SizeInt;
-  Mapping: TUCS4Array;
-begin
-  SetLength(Mapping, 0);
-  if not CaseLookup(UCS4(C), CaseType, Mapping) then
-    Result := C
-  else
-  begin
-    SetLength(Result, 2 * Length(Mapping));
-    RPos := 1;
-    for I := Low(Mapping) to High(Mapping) do
-      UTF16SetNextChar(Result, RPos, Mapping[I]);
-    if RPos > 0 then
-      SetLength(Result, RPos - 1)
-    else
-      raise EJclUnexpectedEOSequenceError.Create;
-  end;
-end;
-function WideCaseConvert(const S: WideString; CaseType: TCaseType): WideString;
-var
-  SLen, RLen, SPos, RPos, K, MapLen: SizeInt;
-  Code: UCS4;
-  Mapping: TUCS4Array;
-begin
-  SetLength(Mapping, 0);
-  SLen := Length(S);
-  RLen := SLen;
-  SetLength(Result, RLen);
-  SPos := 1;
-  RPos := 1;
-  while (SPos > 0) and (SPos <= SLen) do
-  begin
-    Code := UTF16GetNextChar(S, SPos);
-    if SPos = -1 then
-      raise EJclUnexpectedEOSequenceError.Create;
-    if CaseLookup(Code, CaseType, Mapping) then
-    begin
-      MapLen:= Length(Mapping);
-      if MapLen = 1 then
-        Code := Mapping[0];
-    end
-    else
-      MapLen := 1;
-    if MapLen = 1 then
-    begin
-      if not UTF16SetNextChar(Result, RPos, Code) then
-      begin
-        Inc(RLen, SLen);
-        SetLength(Result, RLen);
-        UTF16SetNextChar(Result, RPos, Code);
-      end;
-    end
-    else
-    begin
-      for K := Low(Mapping) to High(Mapping) do
-        if not UTF16SetNextChar(Result, RPos, Code) then
-      begin
-        Inc(RLen, SLen);
-        SetLength(Result, RLen);
-        UTF16SetNextChar(Result, RPos, Code);
-      end;
-    end;
-  end;
-  if RPos > 0 then
-    SetLength(Result, RPos - 1)
-  else
-    raise EJclUnexpectedEOSequenceError.Create;
-end;
-// Note that most of the assigned code points don't have a case mapping and are therefore
-// returned as they are. Other code points, however, might be converted into several characters
-// like the german  (eszett) whose upper case mapping is SS.
-function WideCaseFolding(C: WideChar): WideString;
-// Special case folding function to map a string to either its lower case or
-// to special cases. This can be used for case-insensitive comparation.
-begin
-  Result:= WideCaseConvert(C, ctFold);
-end;
-function WideCaseFolding(const S: WideString): WideString;
-begin
-  Result:= WideCaseConvert(S, ctFold);
-end;
-{$ENDIF ~UNICODE_RTL_DATABASE}
-function WideLowerCase(C: WideChar): WideString;
-begin
-  {$IFDEF UNICODE_RTL_DATABASE}
-  Result := TCharacter.ToLower(C);
-  {$ELSE ~UNICODE_RTL_DATABASE}
-  Result:= WideCaseConvert(C, ctLower);
-  {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-function WideLowerCase(const S: WideString): WideString;
-begin
-  {$IFDEF UNICODE_RTL_DATABASE}
-  Result := TCharacter.ToLower(S);
-  {$ELSE ~UNICODE_RTL_DATABASE}
-  Result:= WideCaseConvert(S, ctLower);
-  {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-{$IFNDEF UNICODE_RTL_DATABASE}
-function WideTitleCase(C: WideChar): WideString;
-begin
-  Result:= WideCaseConvert(C, ctTitle);
-end;
-function WideTitleCase(const S: WideString): WideString;
-begin
-  Result:= WideCaseConvert(S, ctTitle);
-end;
-{$ENDIF ~UNICODE_RTL_DATABASE}
-function WideUpperCase(C: WideChar): WideString;
-begin
-  {$IFDEF UNICODE_RTL_DATABASE}
-  Result := TCharacter.ToUpper(C);
-  {$ELSE ~UNICODE_RTL_DATABASE}
-  Result:= WideCaseConvert(C, ctUpper);
-  {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-function WideUpperCase(const S: WideString): WideString;
-begin
-  {$IFDEF UNICODE_RTL_DATABASE}
-  Result := TCharacter.ToUpper(S);
-  {$ELSE ~UNICODE_RTL_DATABASE}
-  Result:= WideCaseConvert(S, ctUpper);
-  {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-//----------------- character test routines --------------------------------------------------------
 function UnicodeIsAlpha(C: UCS4): Boolean; // Is the character alphabetic?
 begin
   {$IFDEF UNICODE_RTL_DATABASE}
@@ -6695,55 +4460,6 @@ begin
   Result := CategoryLookup(C, [ccVariationSelector]);
 end;
 {$ENDIF ~UNICODE_RTL_DATABASE}
-// I need to fix a problem (introduced by MS) here. The first parameter can be a pointer
-// (and is so defined) or can be a normal DWORD, depending on the dwFlags parameter.
-// As usual, lpSrc has been translated to a var parameter. But this does not work in
-// our case, hence the redeclaration of the function with a pointer as first parameter.
-function TranslateCharsetInfoEx(lpSrc: SizeInt; out lpCs: TCharsetInfo; dwFlags: DWORD): BOOL; stdcall;
-  external 'gdi32.dll' name 'TranslateCharsetInfo';
-function GetCharSetFromLocale(Language: LCID; out FontCharSet: Byte): Boolean;
-const
-  TCI_SRCLOCALE = $1000;
-var
-  CP: Word;
-  CSI: TCharsetInfo;
-begin
-//  if not JclCheckWinVersion(5, 0) then // Win2k required
-//  begin
-//    // these versions of Windows don't support TCI_SRCLOCALE
-//    CP := CodePageFromLocale(Language);
-//    if CP = 0 then
-//      RaiseLastOSError;
-//    Result := TranslateCharsetInfoEx(CP, CSI, TCI_SRCCODEPAGE);
-//  end
-//  else
-  Result := TranslateCharsetInfoEx(Language, CSI, TCI_SRCLOCALE);
-  if Result then
-    FontCharset := CSI.ciCharset;
-end;
-function CharSetFromLocale(Language: LCID): Byte;
-begin
-  if not GetCharSetFromLocale(Language, Result) then
-    RaiseLastOSError;
-end;
-function CodePageFromLocale(Language: LCID): Word;
-// determines the code page for a given locale
-var
-  Buf: array [0..6] of Char;
-begin
-  GetLocaleInfo(Language, LOCALE_IDefaultAnsiCodePage, Buf, 6);
-  Result := StrToIntDef(Buf, GetACP);
-end;
-function KeyboardCodePage: Word;
-begin
-  Result := CodePageFromLocale(GetKeyboardLayout(0) and $FFFF);
-end;
-function KeyUnicode(C: Char): WideChar;
-// converts the given character (as it comes with a WM_CHAR message) into its
-// corresponding Unicode character depending on the active keyboard layout
-begin
-  MultiByteToWideChar(KeyboardCodePage, MB_USEGLYPHCHARS, @C, 1, @Result, 1);
-end;
 function CodeBlockRange(const CB: TUnicodeBlock): TUnicodeBlockRange;
 // http://www.unicode.org/Public/5.0.0/ucd/Blocks.txt
 begin
@@ -6788,56 +4504,6 @@ begin
   end;
 end;
 
-function CompareTextWin95(const W1, W2: WideString; Locale: LCID): SizeInt;
-// special comparation function for Win9x since there's no system defined
-// comparation function, returns -1 if W1 < W2, 0 if W1 = W2 or 1 if W1 > W2
-var
-  S1, S2: AnsiString;
-  CP: Word;
-  L1, L2: SizeInt;
-begin
-  L1 := Length(W1);
-  L2 := Length(W2);
-  SetLength(S1, L1);
-  SetLength(S2, L2);
-  CP := CodePageFromLocale(Locale);
-  WideCharToMultiByte(CP, 0, PWideChar(W1), L1, PAnsiChar(S1), L1, nil, nil);
-  WideCharToMultiByte(CP, 0, PWideChar(W2), L2, PAnsiChar(S2), L2, nil, nil);
-  Result := CompareStringA(Locale, NORM_IGNORECASE, PAnsiChar(S1), Length(S1),
-    PAnsiChar(S2), Length(S2)) - 2;
-end;
-function CompareTextWinNT(const W1, W2: WideString; Locale: LCID): SizeInt;
-// Wrapper function for WinNT since there's no system defined comparation function
-// in Win9x and we need a central comparation function for TWideStringList.
-// Returns -1 if W1 < W2, 0 if W1 = W2 or 1 if W1 > W2
-begin
-  Result := CompareStringW(Locale, NORM_IGNORECASE, PWideChar(W1), Length(W1),
-    PWideChar(W2), Length(W2)) - 2;
-end;
-function StringToWideStringEx(const S: AnsiString; CodePage: Word): WideString;
-var
-  InputLength,
-  OutputLength: SizeInt;
-begin
-  InputLength := Length(S);
-  OutputLength := MultiByteToWideChar(CodePage, 0, PAnsiChar(S), InputLength, nil, 0);
-  SetLength(Result, OutputLength);
-  MultiByteToWideChar(CodePage, 0, PAnsiChar(S), InputLength, PWideChar(Result), OutputLength);
-end;
-function WideStringToStringEx(const WS: WideString; CodePage: Word): AnsiString;
-var
-  InputLength,
-  OutputLength: SizeInt;
-begin
-  InputLength := Length(WS);
-  OutputLength := WideCharToMultiByte(CodePage, 0, PWideChar(WS), InputLength, nil, 0, nil, nil);
-  SetLength(Result, OutputLength);
-  WideCharToMultiByte(CodePage, 0, PWideChar(WS), InputLength, PAnsiChar(Result), OutputLength, nil, nil);
-end;
-function TranslateString(const S: AnsiString; CP1, CP2: Word): AnsiString;
-begin
-  Result:= WideStringToStringEx(StringToWideStringEx(S, CP1), CP2);
-end;
 function UCS4Array(Ch: UCS4): TUCS4Array;
 begin
   SetLength(Result, 1);
@@ -6883,7 +4549,7 @@ function UCS4ArrayEquals(const Left: TUCS4Array; Right: UCS4): Boolean;
 begin
   Result := (Length(Left) = 1) and (Left[0] = Right);
 end;
-function UCS4ArrayEquals(const Left: TUCS4Array; const Right: AnsiString): Boolean;
+function UCS4ArrayEquals(const Left: TUCS4Array; const Right: DWString): Boolean;
 var
   I: SizeInt;
 begin
@@ -6896,30 +4562,8 @@ begin
   end;
   Result := I < 0;
 end;
-function UCS4ArrayEquals(const Left: TUCS4Array; Right: AnsiChar): Boolean;
+function UCS4ArrayEquals(const Left: TUCS4Array; Right: DWChar): Boolean;
 begin
   Result := (Length(Left) = 1) and (Left[0] = Ord(Right));
 end;
-procedure PrepareUnicodeData;
-// Prepares structures which are globally needed.
-begin
-  if (Win32Platform and VER_PLATFORM_WIN32_NT) <> 0 then
-    @WideCompareText := @CompareTextWinNT
-  else
-    @WideCompareText := @CompareTextWin95;
-end;
-procedure FreeUnicodeData;
-// Frees all data which has been allocated and which is not automatically freed by Delphi.
-begin
-end;
-initialization
-  PrepareUnicodeData;
-  {$IFDEF UNITVERSIONING}
-  RegisterUnitVersion(HInstance, UnitVersioning);
-  {$ENDIF UNITVERSIONING}
-finalization
-  {$IFDEF UNITVERSIONING}
-  UnregisterUnitVersion(HInstance);
-  {$ENDIF UNITVERSIONING}
-  FreeUnicodeData;
 end.

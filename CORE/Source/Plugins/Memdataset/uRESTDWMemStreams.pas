@@ -36,7 +36,6 @@ uses
   Winapi.Windows,
   {$ENDIF MSWINDOWS}
   System.SysUtils, System.Classes,
-  System.Contnrs,
   {$ELSE ~HAS_UNITSCOPE}
   {$IFDEF MSWINDOWS}
   Windows,
@@ -47,10 +46,11 @@ uses
   {$IFDEF HAS_UNIT_LIBC}
   Libc,
   {$ENDIF HAS_UNIT_LIBC}
-  uRESTDWMemBase, uRESTDWMemStringConversions;
+  uRESTDWMemBase, uRESTDWMemMath, uRESTDWMemStringConversions;
 const
   StreamDefaultBufferSize = 4096;
 type
+  TObjectList     = class(Tlist);
   EJclStreamError = class(EJclError);
   // abstraction layer to support Delphi 5 and C++Builder 5 streams
   // 64 bit version of overloaded functions are introduced
@@ -59,8 +59,7 @@ type
     procedure SetSize(NewSize: Longint); overload; override;
     procedure SetSize(const NewSize: Int64); overload; override;
   public
-    function Seek(Offset: Longint; Origin: Word): Longint; overload; override;
-    function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; overload; override;
+    function  Seek(Offset: Longint; Origin: Word): Longint; overload; override;
     procedure LoadFromStream(Source: TStream; BufferSize: Longint = StreamDefaultBufferSize); virtual;
     procedure LoadFromFile(const FileName: TFileName; BufferSize: Longint = StreamDefaultBufferSize); virtual;
     procedure SaveToStream(Dest: TStream; BufferSize: Longint = StreamDefaultBufferSize); virtual;
@@ -76,7 +75,6 @@ type
     constructor Create(AHandle: THandle);
     function Read(var Buffer; Count: Longint): Longint; override;
     function Write(const Buffer; Count: Longint): Longint; override;
-    function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
     property Handle: THandle read FHandle;
   end;
   TJclFileStream = class(TJclHandleStream)
@@ -163,8 +161,6 @@ type
     function BufferHit: Boolean;
     function GetCalcedSize: Int64; virtual;
     function LoadBuffer: Boolean; virtual;
-    function ReadFromBuffer(var Buffer; Count, Start: Longint): Longint;
-    function WriteToBuffer(const Buffer; Count, Start: Longint): Longint;
   protected
     procedure DoAfterStreamChange; override;
     procedure DoBeforeStreamChange; override;
@@ -173,8 +169,6 @@ type
     constructor Create(AStream: TStream; AOwnsStream: Boolean = False);
     destructor Destroy; override;
     procedure Flush; virtual;
-    function Read(var Buffer; Count: Longint): Longint; override;
-    function Write(const Buffer; Count: Longint): Longint; override;
     function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
     property BufferSize: Longint read FBufferSize write FBufferSize;
   end;
@@ -200,7 +194,7 @@ type
     function IsEqual(Stream: TStream): Boolean;
     function ReadBoolean: Boolean;
     function ReadChar: Char;
-    function ReadAnsiChar: AnsiChar;
+    function ReadAnsiChar: DWChar;
     function ReadWideChar: WideChar;
     function ReadByte: Byte;
     function ReadCurrency: Currency;
@@ -210,16 +204,16 @@ type
     function ReadInt64: Int64;
     function ReadInteger: Integer;
     function ReadCString: string; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-    function ReadCAnsiString: AnsiString;
-    function ReadCWideString: WideString;
+    function ReadCAnsiString: DWString;
+    function ReadCWideString: DWWideString;
     function ReadShortString: string;
     function ReadSingle: Single;
     function ReadSizedString: string; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-    function ReadSizedAnsiString: AnsiString;
-    function ReadSizedWideString: WideString;
+    function ReadSizedAnsiString: DWString;
+    function ReadSizedWideString: DWWideString;
     procedure WriteBoolean(Value: Boolean);
     procedure WriteChar(Value: Char);
-    procedure WriteAnsiChar(Value: AnsiChar);
+    procedure WriteAnsiChar(Value: DWChar);
     procedure WriteWideChar(Value: WideChar);
     procedure WriteByte(Value: Byte);
     procedure WriteCurrency(const Value: Currency);
@@ -229,14 +223,13 @@ type
     procedure WriteInt64(Value: Int64); overload;
     procedure WriteInteger(Value: Integer); overload;
     procedure WriteCString(const Value: string); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-    procedure WriteCAnsiString(const Value: AnsiString);
-    procedure WriteCWideString(const Value: WideString);
+    procedure WriteCAnsiString(const Value: DWString);
+    procedure WriteCWideString(const Value: DWWideString);
     // use WriteCString
-    procedure WriteShortString(const Value: ShortString);
     procedure WriteSingle(const Value: Single);
     procedure WriteSizedString(const Value: string); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-    procedure WriteSizedAnsiString(const Value: AnsiString);
-    procedure WriteSizedWideString(const Value: WideString);
+    procedure WriteSizedAnsiString(const Value: DWString);
+    procedure WriteSizedWideString(const Value: DWWideString);
   end;
   TJclScopedStream = class(TJclStream)
   private
@@ -409,26 +402,14 @@ type
     constructor Create(AStream: TStream; AOwnsStream: Boolean = False); virtual;
     destructor Destroy; override;
     procedure Flush; virtual;
-    function ReadString(var Buffer: string; Start, Count: Longint): Longint; overload;
-    function ReadString(BufferSize: Longint = StreamDefaultBufferSize): string; overload;
-    function ReadAnsiString(var Buffer: AnsiString; Start, Count: Longint): Longint; overload;
-    function ReadAnsiString(BufferSize: Longint = StreamDefaultBufferSize): AnsiString; overload;
-    function ReadWideString(var Buffer: WideString; Start, Count: Longint): Longint; overload;
-    function ReadWideString(BufferSize: Longint = StreamDefaultBufferSize): WideString; overload;
     function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; virtual;
-    function WriteString(const Buffer: string; Start, Count: Longint): Longint;
-    function WriteAnsiString(const Buffer: AnsiString; Start, Count: Longint): Longint;
-    function WriteWideString(const Buffer: WideString; Start, Count: Longint): Longint;
     function PeekChar(out Buffer: Char): Boolean;
-    function PeekAnsiChar(out Buffer: AnsiChar): Boolean;
     function PeekUCS4(out Buffer: UCS4): Boolean;
     function PeekWideChar(out Buffer: WideChar): Boolean;
     function ReadChar(out Buffer: Char): Boolean;
-    function ReadAnsiChar(out Buffer: AnsiChar): Boolean;
     function ReadUCS4(out Buffer: UCS4): Boolean;
     function ReadWideChar(out Buffer: WideChar): Boolean;
     function WriteChar(Value: Char): Boolean;
-    function WriteAnsiChar(Value: AnsiChar): Boolean;
     function WriteUCS4(Value: UCS4): Boolean;
     function WriteWideChar(Value: WideChar): Boolean;
     function SkipBOM: LongInt; virtual;
@@ -444,29 +425,17 @@ type
   private
     FCodePage: Word;
   protected
-    function InternalGetNextChar(S: TStream; out Ch: UCS4): Boolean; override;
-    function InternalGetNextBuffer(S: TStream; var Buffer: TUCS4Array; Start, Count: SizeInt): Longint; override;
-    function InternalSetNextChar(S: TStream; Ch: UCS4): Boolean; override;
-    function InternalSetNextBuffer(S: TStream; const Buffer: TUCS4Array; Start, Count: SizeInt): Longint; override;
   public
     constructor Create(AStream: TStream; AOwnsStream: Boolean = False); override;
     property CodePage: Word read FCodePage write FCodePage;
   end;
   TJclUTF8Stream = class(TJclStringStream)
   protected
-    function InternalGetNextChar(S: TStream; out Ch: UCS4): Boolean; override;
-    function InternalGetNextBuffer(S: TStream; var Buffer: TUCS4Array; Start, Count: SizeInt): Longint; override;
-    function InternalSetNextChar(S: TStream; Ch: UCS4): Boolean; override;
-    function InternalSetNextBuffer(S: TStream; const Buffer: TUCS4Array; Start, Count: SizeInt): Longint; override;
   public
     constructor Create(AStream: TStream; AOwnsStream: Boolean = False); override;
   end;
   TJclUTF16Stream = class(TJclStringStream)
   protected
-    function InternalGetNextChar(S: TStream; out Ch: UCS4): Boolean; override;
-    function InternalGetNextBuffer(S: TStream; var Buffer: TUCS4Array; Start, Count: SizeInt): Longint; override;
-    function InternalSetNextChar(S: TStream; Ch: UCS4): Boolean; override;
-    function InternalSetNextBuffer(S: TStream; const Buffer: TUCS4Array; Start, Count: SizeInt): Longint; override;
   public
     constructor Create(AStream: TStream; AOwnsStream: Boolean = False); override;
   end;
@@ -477,10 +446,6 @@ type
     FEncoding: TJclStringEncoding;
     procedure SetCodePage(Value: Word);
   protected
-    function InternalGetNextChar(S: TStream; out Ch: UCS4): Boolean; override;
-    function InternalGetNextBuffer(S: TStream; var Buffer: TUCS4Array; Start, Count: SizeInt): Longint; override;
-    function InternalSetNextChar(S: TStream; Ch: UCS4): Boolean; override;
-    function InternalSetNextBuffer(S: TStream; const Buffer: TUCS4Array; Start, Count: SizeInt): Longint; override;
   public
     constructor Create(AStream: TStream; AOwnsStream: Boolean = False); override;
     function SkipBOM: LongInt; override;
@@ -490,34 +455,16 @@ type
 // buffered copy of all available bytes from Source to Dest
 // returns the number of bytes that were copied
 function StreamCopy(Source: TStream; Dest: TStream; BufferSize: Longint = StreamDefaultBufferSize): Int64;
-// buffered copy of all available characters from Source to Dest
-// retuns the number of characters (in specified encoding) that were copied
-function StringStreamCopy(Source, Dest: TJclStringStream; BufferLength: Longint = StreamDefaultBufferSize): Int64;
-function AnsiStringStreamCopy(Source, Dest: TJclStringStream; BufferLength: Longint = StreamDefaultBufferSize): Int64;
-function WideStringStreamCopy(Source, Dest: TJclStringStream; BufferLength: Longint = StreamDefaultBufferSize): Int64;
-// compares 2 streams for differencies
 function CompareStreams(A, B : TStream; BufferSize: Longint = StreamDefaultBufferSize): Boolean;
 // compares 2 files for differencies (calling CompareStreams)
 function CompareFiles(const FileA, FileB: TFileName; BufferSize: Longint = StreamDefaultBufferSize): Boolean;
-{$IFDEF UNITVERSIONING}
-const
-  UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL$';
-    Revision: '$Revision$';
-    Date: '$Date$';
-    LogPath: 'JCL\source\common';
-    Extra: '';
-    Data: nil
-    );
-{$ENDIF UNITVERSIONING}
 implementation
 uses
   {$IFDEF HAS_UNITSCOPE}
   System.Types,
   {$ENDIF HAS_UNITSCOPE}
   uRESTDWMemResources,
-  uRESTDWMemCharsets,
-  uRESTDWMemMath;
+  uRESTDWMemCharsets;
 
 function StreamCopy(Source: TStream; Dest: TStream; BufferSize: Longint): Int64;
 var
@@ -531,45 +478,6 @@ begin
     Result := Result + ByteCount;
     Dest.WriteBuffer(Buffer[0], ByteCount);
   until ByteCount < BufferSize;
-end;
-function StringStreamCopy(Source, Dest: TJclStringStream; BufferLength: Longint): Int64;
-var
-  Buffer: string;
-  CharCount: Longint;
-begin
-  Result := 0;
-  SetLength(Buffer, BufferLength);
-  repeat
-    CharCount := Source.ReadString(Buffer, 1, BufferLength);
-    Result := Result + CharCount;
-    CharCount := Dest.WriteString(Buffer, 1, CharCount);
-  until CharCount = 0;
-end;
-function AnsiStringStreamCopy(Source, Dest: TJclStringStream; BufferLength: Longint): Int64;
-var
-  Buffer: AnsiString;
-  CharCount: Longint;
-begin
-  Result := 0;
-  SetLength(Buffer, BufferLength);
-  repeat
-    CharCount := Source.ReadAnsiString(Buffer, 1, BufferLength);
-    Result := Result + CharCount;
-    CharCount := Dest.WriteAnsiString(Buffer, 1, CharCount);
-  until CharCount = 0;
-end;
-function WideStringStreamCopy(Source, Dest: TJclStringStream; BufferLength: Longint): Int64;
-var
-  Buffer: WideString;
-  CharCount: Longint;
-begin
-  Result := 0;
-  SetLength(Buffer, BufferLength);
-  repeat
-    CharCount := Source.ReadWideString(Buffer, 1, BufferLength);
-    Result := Result + CharCount;
-    CharCount := Dest.WriteWideString(Buffer, 1, CharCount);
-  until CharCount = 0;
 end;
 function CompareStreams(A, B : TStream; BufferSize: Longint): Boolean;
 var
@@ -659,11 +567,6 @@ procedure TJclStream.SaveToStream(Dest: TStream; BufferSize: Integer);
 begin
   StreamCopy(Self, Dest, BufferSize);
 end;
-function TJclStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
-begin
-  // override to customize
-  Result := -1;
-end;
 procedure TJclStream.SetSize(NewSize: Longint);
 begin
   SetSize(Int64(NewSize));
@@ -700,38 +603,6 @@ begin
   Result := __write(Handle, Buffer, Count);
   {$ENDIF LINUX}
 end;
-{$IFDEF MSWINDOWS}
-function TJclHandleStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
-const
-  INVALID_SET_FILE_POINTER = -1;
-type
-  TLarge = record
-    case Boolean of
-    False:
-     (OffsetLo: Longint;
-      OffsetHi: Longint);
-    True:
-      (Offset64: Int64);
-  end;
-var
-  Offs: TLarge;
-begin
-  Offs.Offset64 := Offset;
-  Offs.OffsetLo := SetFilePointer(Handle, Offs.OffsetLo, @Offs.OffsetHi, Ord(Origin));
-  if (Offs.OffsetLo = INVALID_SET_FILE_POINTER) and (GetLastError <> NO_ERROR) then
-    Result := -1
-  else
-    Result := Offs.Offset64;
-end;
-{$ENDIF MSWINDOWS}
-{$IFDEF LINUX}
-function TJclHandleStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
-const
-  SeekOrigins: array [TSeekOrigin] of Cardinal = ( SEEK_SET {soBeginning}, SEEK_CUR {soCurrent}, SEEK_END {soEnd} );
-begin
-  Result := lseek(Handle, Offset, SeekOrigins[Origin]);
-end;
-{$ENDIF LINUX}
 procedure TJclHandleStream.SetSize(const NewSize: Int64);
 begin
   Seek(NewSize, soBeginning);
@@ -1031,33 +902,6 @@ begin
   FBufferStart := FPosition;
   Result := (FBufferCurrentSize > 0);
 end;
-function TJclBufferedStream.Read(var Buffer; Count: Longint): Longint;
-const
-  Offset = 0;
-begin
-  Result := Count + Offset;
-  while Count > 0 do
-  begin
-    if not BufferHit then
-      if not LoadBuffer then
-        Break;
-    Dec(Count, ReadFromBuffer(Buffer, Count, Result - Count));
-  end;
-  Result := Result - Count - Offset;
-end;
-function TJclBufferedStream.ReadFromBuffer(var Buffer; Count, Start: Longint): Longint;
-var
-  BufPos: Longint;
-  P: PAnsiChar;
-begin
-  Result := Count;
-  BufPos := FPosition - FBufferStart;
-  if Result > FBufferCurrentSize - BufPos then
-    Result := FBufferCurrentSize - BufPos;
-  P := @Buffer;
-  Move(FBuffer[BufPos], P[Start], Result);
-  Inc(FPosition, Result);
-end;
 function TJclBufferedStream.Seek(const Offset: Int64;
   Origin: TSeekOrigin): Int64;
 var
@@ -1098,36 +942,6 @@ begin
   // fix from Marcelo Rocha
   if Stream <> nil then
     FPosition := Stream.Position;
-end;
-function TJclBufferedStream.Write(const Buffer; Count: Longint): Longint;
-const
-  Offset = 0;
-begin
-  Result := Count + Offset;
-  while Count > 0 do
-  begin
-    if (FBufferStart > FPosition) or (FPosition >= (FBufferStart + FBufferSize)) then
-      LoadBuffer;
-    Dec(Count, WriteToBuffer(Buffer, Count, Result - Count));
-  end;
-  Result := Result - Count - Offset;
-end;
-function TJclBufferedStream.WriteToBuffer(const Buffer; Count, Start: Longint): Longint;
-var
-  BufPos: Longint;
-  P: PAnsiChar;
-begin
-  Result := Count;
-  BufPos := FPosition - FBufferStart;
-  if Result > Length(FBuffer) - BufPos then
-    Result := Length(FBuffer) - BufPos;
-  if FBufferCurrentSize < BufPos + Result then
-    FBufferCurrentSize := BufPos + Result;
-  P := @Buffer;
-  Move(P[Start], FBuffer[BufPos], Result);
-  if FBufferMaxModifiedPos < BufPos + Result then
-    FBufferMaxModifiedPos := BufPos + Result;
-  Inc(FPosition, Result);
 end;
 //=== { TJclEventStream } ====================================================
 constructor TJclEventStream.Create(AStream: TStream; ANotification:
@@ -1199,7 +1013,7 @@ begin
   Result := #0;
   ReadBuffer(Result, SizeOf(Result));
 end;
-function TJclEasyStream.ReadAnsiChar: AnsiChar;
+function TJclEasyStream.ReadAnsiChar: DWChar;
 begin
   Result := #0;
   ReadBuffer(Result, SizeOf(Result));
@@ -1252,7 +1066,7 @@ begin
   Result := ReadCAnsiString;
   {$ENDIF ~SUPPORTS_UNICODE}
 end;
-function TJclEasyStream.ReadCAnsiString: AnsiString;
+function TJclEasyStream.ReadCAnsiString: DWString;
 var
   CurrPos: Longint;
   StrSize: Integer;
@@ -1261,11 +1075,11 @@ begin
   repeat
   until ReadAnsiChar = #0;
   StrSize := Position - CurrPos;                       // Get number of bytes
-  SetLength(Result, StrSize div SizeOf(AnsiChar) - 1); // Set number of chars without #0
+  SetLength(Result, StrSize div SizeOf(Char) - 1); // Set number of chars without #0
   Position := CurrPos;                                 // Seek to start read
   ReadBuffer(Result[1], StrSize);                      // Read ansi data and #0
 end;
-function TJclEasyStream.ReadCWideString: WideString;
+function TJclEasyStream.ReadCWideString: DWWideString;
 var
   CurrPos: Integer;
   StrSize: Integer;
@@ -1299,7 +1113,7 @@ begin
   Result := ReadSizedAnsiString;
   {$ENDIF ~SUPPORTS_UNICODE}
 end;
-function TJclEasyStream.ReadSizedAnsiString: AnsiString;
+function TJclEasyStream.ReadSizedAnsiString: DWString;
 var
   StrSize: Integer;
 begin
@@ -1307,7 +1121,7 @@ begin
   SetLength(Result, StrSize);
   ReadBuffer(Result[1], StrSize * SizeOf(Result[1]));
 end;
-function TJclEasyStream.ReadSizedWideString: WideString;
+function TJclEasyStream.ReadSizedWideString: DWWideString;
 var
   StrSize: Integer;
 begin
@@ -1323,7 +1137,7 @@ procedure TJclEasyStream.WriteChar(Value: Char);
 begin
   WriteBuffer(Value, SizeOf(Value));
 end;
-procedure TJclEasyStream.WriteAnsiChar(Value: AnsiChar);
+procedure TJclEasyStream.WriteAnsiChar(Value: DWChar);
 begin
   WriteBuffer(Value, SizeOf(Value));
 end;
@@ -1367,23 +1181,19 @@ begin
   WriteCAnsiString(Value);
   {$ENDIF ~SUPPORTS_UNICODE}
 end;
-procedure TJclEasyStream.WriteCAnsiString(const Value: AnsiString);
+procedure TJclEasyStream.WriteCAnsiString(const Value: DWString);
 var
   StrSize: Integer;
 begin
   StrSize := Length(Value);
   WriteBuffer(Value[1], (StrSize + 1) * SizeOf(Value[1]));
 end;
-procedure TJclEasyStream.WriteCWideString(const Value: WideString);
+procedure TJclEasyStream.WriteCWideString(const Value: DWWideString);
 var
   StrSize: Integer;
 begin
   StrSize := Length(Value);
   WriteBuffer(Value[1], (StrSize + 1) * SizeOf(Value[1]));
-end;
-procedure TJclEasyStream.WriteShortString(const Value: ShortString);
-begin
-  WriteBuffer(Value[0], Length(Value) + 1);
 end;
 procedure TJclEasyStream.WriteSingle(const Value: Single);
 begin
@@ -1397,7 +1207,7 @@ begin
   WriteSizedAnsiString(Value);
   {$ENDIF ~SUPPORTS_UNICODE}
 end;
-procedure TJclEasyStream.WriteSizedAnsiString(const Value: AnsiString);
+procedure TJclEasyStream.WriteSizedAnsiString(const Value: DWString);
 var
   StrSize: Integer;
 begin
@@ -1405,7 +1215,7 @@ begin
   WriteInteger(StrSize);
   WriteBuffer(Value[1], StrSize * SizeOf(Value[1]));
 end;
-procedure TJclEasyStream.WriteSizedWideString(const Value: WideString);
+procedure TJclEasyStream.WriteSizedWideString(const Value: DWWideString);
 var
   StrSize: Integer;
 begin
@@ -1917,7 +1727,7 @@ end;
 constructor TJclStaticSplitStream.Create(AForcePosition: Boolean);
 begin
   inherited Create(AForcePosition);
-  FVolumes := TObjectList.Create(True);
+  FVolumes := TObjectList.Create;
 end;
 destructor TJclStaticSplitStream.Destroy;
 var
@@ -2089,14 +1899,6 @@ begin
   FStrPeekBufferNext := FStream.Seek(0, soCurrent);
   Result := (FStrPeekPosition >= FStrPeekBufferPosition) and (FStrPeekPosition < (FStrPeekBufferPosition + FStrPeekBufferCurrentSize));
 end;
-function TJclStringStream.PeekAnsiChar(out Buffer: AnsiChar): Boolean;
-var
-  Ch: UCS4;
-begin
-  Result := PeekUCS4(Ch);
-  if Result then
-    Buffer := UCS4ToAnsiChar(Ch);
-end;
 function TJclStringStream.PeekChar(out Buffer: Char): Boolean;
 var
   Ch: UCS4;
@@ -2141,84 +1943,6 @@ begin
   if Result then
     Buffer := UCS4ToWideChar(Ch);
 end;
-function TJclStringStream.ReadString(var Buffer: string; Start, Count: Longint): Longint;
-var
-  Index: Integer;
-  StrPos: SizeInt;
-  Ch: UCS4;
-begin
-  Index := Start;
-  while Index < Start + Count - 1 do // avoid overflow on surrogate pairs for WideString
-  begin
-    if ReadUCS4(Ch) then
-    begin
-      StrPos := Index;
-      if StringSetNextChar(Buffer, StrPos, Ch) and (StrPos > 0) then
-        Index := StrPos
-      else
-        Break; // end of string (write)
-    end
-    else
-      Break; // end of stream (read)
-  end;
-  Result := Index - Start;
-end;
-function TJclStringStream.ReadString(BufferSize: Longint): string;
-var
-  Buffer: string;
-  ProcessedLength: Longint;
-begin
-  Result := '';
-  SetLength(Buffer, BufferSize);
-  repeat
-    ProcessedLength := ReadString(Buffer, 1, BufferSize);
-    if ProcessedLength > 0 then
-      Result := Result + Copy(Buffer, 1, ProcessedLength);
-  until ProcessedLength = 0;
-end;
-function TJclStringStream.ReadAnsiChar(out Buffer: AnsiChar): Boolean;
-var
-  Ch: UCS4;
-begin
-  Result := ReadUCS4(Ch);
-  if Result then
-    Buffer := UCS4ToAnsiChar(Ch);
-end;
-function TJclStringStream.ReadAnsiString(var Buffer: AnsiString; Start, Count: Longint): Longint;
-var
-  Index: Integer;
-  StrPos: SizeInt;
-  Ch: UCS4;
-begin
-  Index := Start;
-  while Index < Start + Count do
-  begin
-    if ReadUCS4(Ch) then
-    begin
-      StrPos := Index;
-      if AnsiSetNextChar(Buffer, StrPos, Ch) and (StrPos > 0) then
-        Index := StrPos
-      else
-        Break; // end of string (write)
-    end
-    else
-      Break; // end of stream (read)
-  end;
-  Result := Index - Start;
-end;
-function TJclStringStream.ReadAnsiString(BufferSize: Longint): AnsiString;
-var
-  Buffer: AnsiString;
-  ProcessedLength: Longint;
-begin
-  Result := '';
-  SetLength(Buffer, BufferSize);
-  repeat
-    ProcessedLength := ReadAnsiString(Buffer, 1, BufferSize);
-    if ProcessedLength > 0 then
-      Result := Result + Copy(Buffer, 1, ProcessedLength);
-  until ProcessedLength = 0;
-end;
 function TJclStringStream.ReadChar(out Buffer: Char): Boolean;
 var
   Ch: UCS4;
@@ -2255,41 +1979,6 @@ begin
   Result := ReadUCS4(Ch);
   if Result then
     Buffer := UCS4ToWideChar(Ch);
-end;
-function TJclStringStream.ReadWideString(var Buffer: WideString; Start, Count: Longint): Longint;
-var
-  Index: Integer;
-  StrPos: SizeInt;
-  Ch: UCS4;
-begin
-  Index := Start;
-  while Index < Start + Count - 1 do // avoid overflow on surrogate pairs
-  begin
-    if ReadUCS4(Ch) then
-    begin
-      StrPos := Index;
-      if UTF16SetNextChar(Buffer, StrPos, Ch) and (StrPos > 0) then
-        Index := StrPos
-      else
-        Break; // end of string (write)
-    end
-    else
-      Break; // end of stream (read)
-  end;
-  Result := Index - Start;
-end;
-function TJclStringStream.ReadWideString(BufferSize: Longint): WideString;
-var
-  Buffer: WideString;
-  ProcessedLength: Longint;
-begin
-  Result := '';
-  SetLength(Buffer, BufferSize);
-  repeat
-    ProcessedLength := ReadWideString(Buffer, 1, BufferSize);
-    if ProcessedLength > 0 then
-      Result := Result + Copy(Buffer, 1, ProcessedLength);
-  until ProcessedLength = 0;
 end;
 function TJclStringStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
 begin
@@ -2353,46 +2042,6 @@ function TJclStringStream.WriteChar(Value: Char): Boolean;
 begin
   Result := WriteUCS4(CharToUCS4(Value));
 end;
-function TJclStringStream.WriteString(const Buffer: string; Start, Count: Longint): Longint;
-var
-  Index: Integer;
-  StrPos: SizeInt;
-  Ch: UCS4;
-begin
-  Index := Start;
-  while Index < Start + Count do
-  begin
-    StrPos := Index;
-    Ch := StringGetNextChar(Buffer, StrPos);
-    if (StrPos > 0) and WriteUCS4(Ch) then
-      Index := StrPos
-    else
-      Break; // end of string (read) or end of stream (write)
-  end;
-  Result := Index - Start;
-end;
-function TJclStringStream.WriteAnsiChar(Value: AnsiChar): Boolean;
-begin
-  Result := WriteUCS4(AnsiCharToUCS4(Value));
-end;
-function TJclStringStream.WriteAnsiString(const Buffer: AnsiString; Start, Count: Longint): Longint;
-var
-  Index: Integer;
-  StrPos: SizeInt;
-  Ch: UCS4;
-begin
-  Index := Start;
-  while Index < Start + Count do
-  begin
-    StrPos := Index;
-    Ch := AnsiGetNextChar(Buffer, StrPos);
-    if (StrPos > 0) and WriteUCS4(Ch) then
-      Index := StrPos
-    else
-      Break; // end of string (read) or end of stream (write)
-  end;
-  Result := Index - Start;
-end;
 function TJclStringStream.WriteUCS4(Value: UCS4): Boolean;
 var
   BufferPos: Int64;
@@ -2418,24 +2067,6 @@ function TJclStringStream.WriteWideChar(Value: WideChar): Boolean;
 begin
   Result := WriteUCS4(WideCharToUCS4(Value));
 end;
-function TJclStringStream.WriteWideString(const Buffer: WideString; Start, Count: Longint): Longint;
-var
-  Index: Integer;
-  StrPos: SizeInt;
-  Ch: UCS4;
-begin
-  Index := Start;
-  while Index < Start + Count do
-  begin
-    StrPos := Index;
-    Ch := UTF16GetNextChar(Buffer, StrPos);
-    if (StrPos > 0) and WriteUCS4(Ch) then
-      Index := StrPos
-    else
-      Break; // end of string (read) or end of stream (write)
-  end;
-  Result := Index - Start;
-end;
 //=== { TJclAnsiStream } ======================================================
 constructor TJclAnsiStream.Create(AStream: TStream; AOwnsStream: Boolean);
 begin
@@ -2443,37 +2074,6 @@ begin
   SetLength(FBOM, 0);
   FCodePage := CP_ACP;
 end;
-function TJclAnsiStream.InternalGetNextBuffer(S: TStream;
-  var Buffer: TUCS4Array; Start, Count: SizeInt): Longint;
-begin
-  if FCodePage = CP_ACP then
-    Result := AnsiGetNextBufferFromStream(S, Buffer, Start, Count)
-  else
-    Result := AnsiGetNextBufferFromStream(S, FCodePage, Buffer, Start, Count);
-end;
-function TJclAnsiStream.InternalGetNextChar(S: TStream; out Ch: UCS4): Boolean;
-begin
-  if FCodePage = CP_ACP then
-    Result := AnsiGetNextCharFromStream(S, Ch)
-  else
-    Result := AnsiGetNextCharFromStream(S, FCodePage, Ch);
-end;
-function TJclAnsiStream.InternalSetNextBuffer(S: TStream;
-  const Buffer: TUCS4Array; Start, Count: SizeInt): Longint;
-begin
-  if FCodePage = CP_ACP then
-    Result := AnsiSetNextBufferToStream(S, Buffer, Start, Count)
-  else
-    Result := AnsiSetNextBufferToStream(S, FCodePage, Buffer, Start, Count);
-end;
-function TJclAnsiStream.InternalSetNextChar(S: TStream; Ch: UCS4): Boolean;
-begin
-  if FCodePage = CP_ACP then
-    Result := AnsiSetNextCharToStream(S, Ch)
-  else
-    Result := AnsiSetNextCharToStream(S, FCodePage, Ch);
-end;
-//=== { TJclUTF8Stream } ======================================================
 constructor TJclUTF8Stream.Create(AStream: TStream; AOwnsStream: Boolean);
 var
   I: Integer;
@@ -2482,24 +2082,6 @@ begin
   SetLength(FBOM, Length(BOM_UTF8));
   for I := Low(BOM_UTF8) to High(BOM_UTF8) do
     FBOM[I - Low(BOM_UTF8)] := BOM_UTF8[I];
-end;
-function TJclUTF8Stream.InternalGetNextBuffer(S: TStream;
-  var Buffer: TUCS4Array; Start, Count: SizeInt): Longint;
-begin
-  Result := UTF8GetNextBufferFromStream(S, Buffer, Start, Count);
-end;
-function TJclUTF8Stream.InternalGetNextChar(S: TStream; out Ch: UCS4): Boolean;
-begin
-  Result := UTF8GetNextCharFromStream(S, Ch);
-end;
-function TJclUTF8Stream.InternalSetNextBuffer(S: TStream;
-  const Buffer: TUCS4Array; Start, Count: SizeInt): Longint;
-begin
-  Result := UTF8SetNextBufferToStream(S, Buffer, Start, Count);
-end;
-function TJclUTF8Stream.InternalSetNextChar(S: TStream; Ch: UCS4): Boolean;
-begin
-  Result := UTF8SetNextCharToStream(S, Ch);
 end;
 //=== { TJclUTF16Stream } =====================================================
 constructor TJclUTF16Stream.Create(AStream: TStream; AOwnsStream: Boolean);
@@ -2511,25 +2093,6 @@ begin
   for I := Low(BOM_UTF16_LSB) to High(BOM_UTF16_LSB) do
     FBOM[I - Low(BOM_UTF16_LSB)] := BOM_UTF16_LSB[I];
 end;
-function TJclUTF16Stream.InternalGetNextBuffer(S: TStream;
-  var Buffer: TUCS4Array; Start, Count: SizeInt): Longint;
-begin
-  Result := UTF16GetNextBufferFromStream(S, Buffer, Start, Count);
-end;
-function TJclUTF16Stream.InternalGetNextChar(S: TStream; out Ch: UCS4): Boolean;
-begin
-  Result := UTF16GetNextCharFromStream(S, Ch);
-end;
-function TJclUTF16Stream.InternalSetNextBuffer(S: TStream;
-  const Buffer: TUCS4Array; Start, Count: SizeInt): Longint;
-begin
-  Result := UTF16SetNextBufferToStream(S, Buffer, Start, Count);
-end;
-function TJclUTF16Stream.InternalSetNextChar(S: TStream; Ch: UCS4): Boolean;
-begin
-  Result := UTF16SetNextCharToStream(S, Ch);
-end;
-//=== { TJclAutoStream } ======================================================
 constructor TJclAutoStream.Create(AStream: TStream; AOwnsStream: Boolean);
 var
   I, MaxLength, ReadLength: Integer;
@@ -2592,60 +2155,6 @@ begin
   end;
   FStream.Seek(Length(FBOM) - ReadLength, soCurrent);
   InvalidateBuffers;
-end;
-function TJclAutoStream.InternalGetNextBuffer(S: TStream;
-  var Buffer: TUCS4Array; Start, Count: SizeInt): Longint;
-begin
-  case FCodePage of
-    CP_UTF8:
-      Result := UTF8GetNextBufferFromStream(S, Buffer, Start, Count);
-    CP_UTF16LE:
-      Result := UTF16GetNextBufferFromStream(S, Buffer, Start, Count);
-    CP_ACP:
-      Result := AnsiGetNextBufferFromStream(S, Buffer, Start, Count);
-  else
-    Result := AnsiGetNextBufferFromStream(S, CodePage, Buffer, Start, Count);
-  end;
-end;
-function TJclAutoStream.InternalGetNextChar(S: TStream; out Ch: UCS4): Boolean;
-begin
-  case FCodePage of
-    CP_UTF8:
-      Result := UTF8GetNextCharFromStream(S, Ch);
-    CP_UTF16LE:
-      Result := UTF16GetNextCharFromStream(S, Ch);
-    CP_ACP:
-      Result := AnsiGetNextCharFromStream(S, Ch);
-  else
-    Result := AnsiGetNextCharFromStream(S, CodePage, Ch);
-  end;
-end;
-function TJclAutoStream.InternalSetNextBuffer(S: TStream;
-  const Buffer: TUCS4Array; Start, Count: SizeInt): Longint;
-begin
-  case FCodePage of
-    CP_UTF8:
-      Result := UTF8SetNextBufferToStream(S, Buffer, Start, Count);
-    CP_UTF16LE:
-      Result := UTF16SetNextBufferToStream(S, Buffer, Start, Count);
-    CP_ACP:
-      Result := AnsiSetNextBufferToStream(S, Buffer, Start, Count);
-  else
-    Result := AnsiSetNextBufferToStream(S, CodePage, Buffer, Start, Count);
-  end;
-end;
-function TJclAutoStream.InternalSetNextChar(S: TStream; Ch: UCS4): Boolean;
-begin
-  case FCodePage of
-    CP_UTF8:
-      Result := UTF8SetNextCharToStream(S, Ch);
-    CP_UTF16LE:
-      Result := UTF16SetNextCharToStream(S, Ch);
-    CP_ACP:
-      Result := AnsiSetNextCharToStream(S, Ch);
-  else
-    Result := AnsiSetNextCharToStream(S, CodePage, Ch);
-  end;
 end;
 procedure TJclAutoStream.SetCodePage(Value: Word);
 begin

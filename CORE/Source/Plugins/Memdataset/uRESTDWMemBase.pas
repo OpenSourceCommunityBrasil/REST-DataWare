@@ -29,13 +29,14 @@ uses
   {$IFDEF MSWINDOWS}
   Winapi.Windows,
   {$ENDIF MSWINDOWS}
-  System.SysUtils;
+  System.SysUtils
   {$ELSE ~HAS_UNITSCOPE}
   {$IFDEF MSWINDOWS}
   Windows,
   {$ENDIF MSWINDOWS}
-  SysUtils;
-  {$ENDIF ~HAS_UNITSCOPE}
+  SysUtils
+  {$ENDIF ~HAS_UNITSCOPE},
+  uRESTDWBasicTypes;
 // Version
 const
   {$IFDEF UNIX}
@@ -91,6 +92,7 @@ type
    {$IFNDEF COMPILER7_UP}
     UInt64 = Int64;
    {$ENDIF ~COMPILER7_UP}
+    PAnsiChar = ^DWString;
     PWideChar = System.PWideChar;
     PPWideChar = ^PWideChar;
     PPAnsiChar = ^PAnsiChar;
@@ -154,15 +156,15 @@ type
   TDynFloatArray         = array of Float;
   TDynPointerArray       = array of Pointer;
   TDynStringArray        = array of string;
-  TDynAnsiStringArray    = array of AnsiString;
-  TDynWideStringArray    = array of WideString;
+  TDynAnsiStringArray    = array of DwString;
+  TDynWideStringArray    = array of DwWideString;
   {$IFDEF SUPPORTS_UNICODE_STRING}
   TDynUnicodeStringArray = array of UnicodeString;
   {$ENDIF SUPPORTS_UNICODE_STRING}
   TDynIInterfaceArray    = array of IInterface;
   TDynObjectArray        = array of TObject;
   TDynCharArray       = array of Char;
-  TDynAnsiCharArray   = array of AnsiChar;
+  TDynAnsiCharArray   = array of DwChar;
   TDynWideCharArray   = array of WideChar;
 // Cross-Platform Compatibility
 const
@@ -212,10 +214,38 @@ const
 //  BOM_UTF7_5: array [0..3] of Byte = ($2B,$2F,$76,$38,$2D);
 type
   // Unicode transformation formats (UTF) data types
+ {$IFNDEF FPC}
+  {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
+   {$IF Defined(HAS_FMX)}
+    DWString     = String;
+    DWWideString = WideString;
+    DWChar       = Char;
+   {$ELSE}
+    DWString     = Utf8String;
+    DWWideString = WideString;
+    DWChar       = Utf8Char;
+   {$IFEND}
+  {$ELSE}
+   {$IF Defined(HAS_FMX)}
+    DWString     = Utf8String;
+    DWWideString = Utf8String;
+    DWChar       = Utf8Char;
+   {$ELSE}
+    DWString     = AnsiString;
+    DWWideString = WideString;
+    DWChar       = Char;
+   {$IFEND}
+  {$IFEND}
+ {$ELSE}
+  DWString     = AnsiString;
+  DWWideString = WideString;
+  DWChar       = Char;
+ {$ENDIF}
+ PDWChar       = ^DWChar;
   PUTF7 = ^UTF7;
-  UTF7 = AnsiChar;
+  UTF7 = DwChar;
   PUTF8 = ^UTF8;
-  UTF8 = AnsiChar;
+  UTF8 = DwChar;
   PUTF16 = ^UTF16;
   UTF16 = WideChar;
   PUTF32 = ^UTF32;
@@ -223,21 +253,21 @@ type
   // UTF conversion schemes (UCS) data types
   PUCS4 = ^UCS4;
   UCS4 = Cardinal;
-  PUCS2 = PWideChar;
+  PUCS2 = PDWChar;
   UCS2 = WideChar;
   TUCS2Array = array of UCS2;
   TUCS4Array = array of UCS4;
   // string types
-  TUTF8String = AnsiString;
+  TUTF8String = DwString;
   {$IFDEF SUPPORTS_UNICODE_STRING}
   TUTF16String = UnicodeString;
   TUCS2String = UnicodeString;
   {$ELSE}
-  TUTF16String = WideString;
-  TUCS2String = WideString;
+  TUTF16String = DWWideString;
+  TUCS2String = DWWideString;
   {$ENDIF SUPPORTS_UNICODE_STRING}
 var
-  AnsiReplacementCharacter: AnsiChar;
+  AnsiReplacementCharacter: DwChar;
 const
   UCS4ReplacementCharacter: UCS4 = $0000FFFD;
   MaximumUCS2: UCS4 = $0000FFFF;
@@ -249,7 +279,7 @@ const
   SurrogateLowEnd = UCS4($DFFF);
 // basic set types
 type
-  TSetOfAnsiChar = set of AnsiChar;
+  TSetOfAnsiChar = set of DwChar;
 {$IFNDEF XPLATFORM_RTL}
 procedure RaiseLastOSError;
 {$ENDIF ~XPLATFORM_RTL}
@@ -261,15 +291,7 @@ procedure MoveChar(const Source: string; FromIndex: SizeInt;
 function AnsiByteArrayStringLen(Data: TBytes): SizeInt;
 function StringToAnsiByteArray(const S: string): TBytes;
 function AnsiByteArrayToString(const Data: TBytes; Count: SizeInt): string;
-function BytesOf(const Value: AnsiString): TBytes; overload;
-function BytesOf(const Value: WideString): TBytes; overload;
-function BytesOf(const Value: WideChar): TBytes; overload;
-function BytesOf(const Value: AnsiChar): TBytes; overload;
-function StringOf(const Bytes: array of Byte): AnsiString; overload;
-function StringOf(const Bytes: Pointer; Size: Cardinal): AnsiString; overload;
-function PathAddSeparator(const Path: string): string;
-function PathRemoveSeparator(const Path: string): string;
-function IsDirectory(const FileName: string {$IFDEF UNIX}; ResolveSymLinks: Boolean = True {$ENDIF}): Boolean;
+function BytesOf(const Value: DWString): TBytes; overload;
 {$IFNDEF FPC}
 {$IFNDEF COMPILER11_UP}
 type // Definitions for 32 Bit Compilers
@@ -281,11 +303,10 @@ type // Definitions for 32 Bit Compilers
   UINT_PTR = Cardinal;
   {$EXTERNALSYM UINT_PTR}
   ULONG_PTR = LongWord;
-  {$EXTERNALSYM ULONG_PTR}
-  DWORD_PTR = ULONG_PTR;
   {$EXTERNALSYM DWORD_PTR}
 {$ENDIF ~COMPILER11_UP}
 type
+  DWORD_PTR  = LongWord;
   PDWORD_PTR = ^DWORD_PTR;
   {$EXTERNALSYM PDWORD_PTR}
 {$ENDIF ~FPC}
@@ -357,24 +378,6 @@ implementation
 uses
   uRESTDWMemResources;
 
-function PathAddSeparator(const Path: string): string;
-begin
-  Result := Path;
-  if (Path = '') or (Path[Length(Path)] <> DirDelimiter) then
-    Result := Path + DirDelimiter;
-end;
-
-function PathRemoveSeparator(const Path: string): string;
-var
-  L: Integer;
-begin
-  L := Length(Path);
-  if (L <> 0) and (Path[L] = DirDelimiter) then
-    Result := Copy(Path, 1, L - 1)
-  else
-    Result := Path;
-end;
-
 {$IFDEF MSWINDOWS}
 function IsDirectory(const FileName: string): Boolean;
 var
@@ -415,9 +418,9 @@ end;
 function StringToAnsiByteArray(const S: string): TBytes;
 var
   I: SizeInt;
-  AnsiS: AnsiString;
+  AnsiS: DWString;
 begin
-  AnsiS := AnsiString(S); // convert to AnsiString
+  AnsiS := DWString(S); // convert to DWString
   SetLength(Result, Length(AnsiS));
   for I := 0 to High(Result) do
     Result[I] := Byte(AnsiS[I + 1]);
@@ -425,53 +428,27 @@ end;
 function AnsiByteArrayToString(const Data: TBytes; Count: SizeInt): string;
 var
   I: SizeInt;
-  AnsiS: AnsiString;
+  AnsiS: DWString;
 begin
   if Length(Data) < Count then
     Count := Length(Data);
   SetLength(AnsiS, Count);
   for I := 0 to Length(AnsiS) - 1 do
-    AnsiS[I + 1] := AnsiChar(Data[I]);
+    PChar(@AnsiS[I + 1])^ := DWChar(Data[I]);
   Result := string(AnsiS); // convert to System.String
 end;
-function BytesOf(const Value: AnsiString): TBytes;
+function BytesOf(const Value: DWString): TBytes;
 begin
   SetLength(Result, Length(Value));
   if Value <> '' then
     Move(Pointer(Value)^, Result[0], Length(Value));
 end;
-function BytesOf(const Value: WideString): TBytes;
-begin
-  if Value <> '' then
-    Result := uRESTDWMemBase.BytesOf(AnsiString(Value))
-  else
-    SetLength(Result, 0);
-end;
-function BytesOf(const Value: WideChar): TBytes;
-begin
-  Result := uRESTDWMemBase.BytesOf(WideString(Value));
-end;
-function BytesOf(const Value: AnsiChar): TBytes;
-begin
-  SetLength(Result, 1);
-  Result[0] := Byte(Value);
-end;
-function StringOf(const Bytes: array of Byte): AnsiString;
+function StringOf(const Bytes: array of Byte): DWString;
 begin
   if Length(Bytes) > 0 then
   begin
     SetLength(Result, Length(Bytes));
     Move(Bytes[0], Pointer(Result)^, Length(Bytes));
-  end
-  else
-    Result := '';
-end;
-function StringOf(const Bytes: Pointer; Size: Cardinal): AnsiString;
-begin
-  if (Bytes <> nil) and (Size > 0) then
-  begin
-    SetLength(Result, Size);
-    Move(Bytes^, Pointer(Result)^, Size);
   end
   else
     Result := '';
@@ -556,7 +533,7 @@ var
 begin
   CpInfo.MaxCharSize := 0;
   if GetCPInfo(CP_ACP, CpInfo) then
-    AnsiReplacementCharacter := AnsiChar(Chr(CpInfo.DefaultChar[0]))
+    AnsiReplacementCharacter := DWChar(Chr(CpInfo.DefaultChar[0]))
   else
     raise EJclInternalError.CreateRes(@RsEReplacementChar);
 end;
