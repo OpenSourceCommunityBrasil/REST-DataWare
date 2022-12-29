@@ -1,6 +1,6 @@
 unit uRESTDWMemoryDataset;
 
-{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -1678,7 +1678,7 @@ begin
 end;
 procedure TRESTDWMemTable.InternalClose;
 begin
-  ClearRecords;
+  EmptyTable;
   FAutoInc := 1;
   BindFields(False);
   {$IFNDEF HAS_AUTOMATIC_DB_FIELDS}
@@ -1844,16 +1844,15 @@ procedure TRESTDWMemTable.Notification(AComponent: TComponent; Operation: TOpera
 begin
   inherited Notification(AComponent, Operation);
 end;
+
 procedure TRESTDWMemTable.EmptyTable;
 begin
-  if Active then
-  begin
-    CheckBrowseMode;
-    ClearRecords;
-    ClearBuffers;
-    DataEvent(deDataSetChange, 0);
-  end;
+// CheckBrowseMode;
+ ClearRecords;
+ ClearBuffers;
+ DataEvent(deDataSetChange, 0);
 end;
+
 procedure TRESTDWMemTable.AddStatusField;
 begin
   // Check if FieldStatus not exists in FieldDefs
