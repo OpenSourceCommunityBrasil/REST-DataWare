@@ -1,6 +1,6 @@
 unit uRESTDWMemDateTime;
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
-{$I ..\..\Source\Includes\crossplatform.inc}
+{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\crossplatform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -172,8 +172,8 @@ const
     );
 {$ENDIF UNITVERSIONING}
 implementation
-uses
-  uRESTDWMemSysUtils;
+//uses
+  //uRESTDWMemSysUtils;
 const
   DaysInMonths: array [1..12] of Integer =
     (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
@@ -200,7 +200,7 @@ const
   //   4 : first week has at least four days (according to ISO 8601)
   //   7 : first full week
   //ISOFirstWeekMinDays = 4;
-function EncodeDate(const Year: Integer; Month, Day: Word): TDateTime; overload;
+function EncodeDate(const Year: Integer; Month, Day: Word): TDateTime;
 begin
   if (Year > 0) and (Year < EncodeDateMaxYear + 1) then
     Result := {$IFDEF HAS_UNITSCOPE}System.{$ENDIF}SysUtils.EncodeDate(Year, Month, Day)

@@ -798,7 +798,7 @@ Begin
 //  FormEditingHook.RegisterDesignerBaseClass(TServerMethodDataModule);
  {$ENDIF}
 // RegisterComponents('REST Dataware - Service',     [TRESTDWServiceNotification]);
- RegisterComponents('REST Dataware - Client''s',   [TRESTDWClientEvents]);
+ RegisterComponents('REST Dataware - Client',      [TRESTDWClientEvents]);
  RegisterComponents('REST Dataware - API',         [TRESTDWServerEvents, TRESTDWServerContext, TRESTDWContextRules]);
  RegisterComponents('REST Dataware - Tools',       [TRESTDWResponseTranslator, TRESTDWBufferDB]);
 

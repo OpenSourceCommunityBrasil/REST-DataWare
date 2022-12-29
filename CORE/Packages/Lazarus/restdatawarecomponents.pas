@@ -27,12 +27,20 @@ uses
   uRESTDWBase64, uRESTDWDynamic, uRESTDWJSONObject, uRESTDWMassiveBuffer, 
   uRESTDWMD5, uRESTDWTools, uRESTDWDataJSON, uRESTDWDynArray, uRESTDWJSON, 
   uRESTDWJSONInterface, uRESTDWSerialize, uRESTDWMimeTypes, uRESTDWAbout, 
-  uRESTDWZlib, uRESTDWMemoryDataset, uRESTDWDriverBase, LazarusPackageIntf;
+  uRESTDWZlib, uRESTDWMemoryDataset, uRESTDWMemAnsiStrings, uRESTDWMemBase, 
+  uRESTDWMemCharsets, uRESTDWMemComponentBase, uRESTDWMemConsts, 
+  uRESTDWMemDateTime, uRESTDWMemDBFilterExpr, uRESTDWMemDBUtils, 
+  uRESTDWMemExprParser, uRESTDWMemMath, uRESTDWMemResources, 
+  uRESTDWMemStreams, uRESTDWMemStringConversions, uRESTDWMemStrings, 
+  uRESTDWMemStringsB, uRESTDWMemTranslateString, uRESTDWMemTypes, 
+  uRESTDWMemUnicode, uRESTDWMemVCLUtils, uRESTDWMemWideStrings, 
+  uRESTDWDesignReg, LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
+  RegisterUnit('uRESTDWDesignReg', @uRESTDWDesignReg.Register);
 end;
 
 initialization
