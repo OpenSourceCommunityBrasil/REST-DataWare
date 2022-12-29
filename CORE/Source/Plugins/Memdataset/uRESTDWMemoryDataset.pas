@@ -26,42 +26,13 @@ unit uRESTDWMemoryDataset;
 interface
 
 uses
-  SysUtils, Classes, DB, Variants, uRESTDWStorageBinRDW, uRESTDWStorageBase,
+  SysUtils, Classes, DB, Variants, uRESTDWStorageBinRDW, uRESTDWStorageBase, uRESTDWProtoTypes,
   uRESTDWMemDBUtils, uRESTDWMemExprParser{$IFNDEF FPC}, uRESTDWMemDBFilterExpr{$ENDIF};
 
 type
   {$IFDEF NEXTGEN}
    TRecordBuffer = PByte;
   {$ENDIF !NEXTGEN}
-  {$IFNDEF FPC}
-   {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
-    {$IF Defined(HAS_FMX)}
-     DWString     = String;
-     DWWideString = WideString;
-     DWChar       = Char;
-    {$ELSE}
-     DWString     = Utf8String;
-     DWWideString = WideString;
-     DWChar       = Utf8Char;
-    {$IFEND}
-   {$ELSE}
-    {$IF Defined(HAS_FMX)}
-     DWString     = Utf8String;
-     DWWideString = Utf8String;
-     DWChar       = Utf8Char;
-    {$ELSE}
-     DWString     = AnsiString;
-     DWWideString = WideString;
-     DWChar       = Char;
-    {$IFEND}
-   {$IFEND}
-  {$ELSE}
-   DWString     = AnsiString;
-   DWWideString = WideString;
-   DWChar       = Char;
-  {$ENDIF}
-  PDWChar       = ^DWChar;
-  PDWString     = ^DWString;
   TPVariant = ^Variant;
   TApplyMode = (amNone, amAppend, amMerge);
   TApplyEvent = procedure(Dataset: TDataset; Rows: Integer) of object;
@@ -159,7 +130,7 @@ type
     procedure DoAfterApplyRecord(ADataset: TDataset; RS: TRecordStatus; aApply: Boolean);
     procedure SetUseDataSetFilter(const Value: Boolean);
     procedure InternalGotoBookmarkData(BookmarkData: TJvBookmarkData);
-    function InternalGetFieldData(Field: TField; Buffer: Pointer): Boolean;
+    function  InternalGetFieldData(Field: TField; Buffer: Pointer): Boolean;
     procedure InternalSetFieldData(Field: TField; Buffer: Pointer; const ValidateBuffer: TJvValueBuffer);
   protected
     function FindFieldData(Buffer: Pointer; Field: TField): Pointer;
@@ -169,13 +140,13 @@ type
     procedure DataConvert(Field: TField; Source, Dest: Pointer; ToNative: Boolean); override;
     {$ENDIF ~COMPILER10_UP}
     procedure AssignMemoryRecord(Rec: TJvMemoryRecord; Buffer: PJvMemBuffer);
-    function GetActiveRecBuf(var RecBuf: PJvMemBuffer): Boolean; virtual;
+    function  GetActiveRecBuf(var RecBuf: PJvMemBuffer): Boolean; virtual;
     procedure InitFieldDefsFromFields;
     procedure RecordToBuffer(Rec: TJvMemoryRecord; Buffer: PJvMemBuffer);
     procedure SetMemoryRecordData(Buffer: PJvMemBuffer; Pos: Integer); virtual;
     procedure SetAutoIncFields(Buffer: PJvMemBuffer); virtual;
-    function CompareRecords(Item1, Item2: TJvMemoryRecord): Integer; virtual;
-    function GetBlobData(Field: TField; Buffer: PJvMemBuffer): TMemBlobData;
+    function  CompareRecords(Item1, Item2: TJvMemoryRecord): Integer; virtual;
+    function  GetBlobData(Field: TField; Buffer: PJvMemBuffer): TMemBlobData;
     procedure SetBlobData(Field: TField; Buffer: PJvMemBuffer; Value: TMemBlobData);
     {$IFDEF NEXTGEN}
      Function  AllocRecBuf                : TRecBuf;    override;
@@ -198,7 +169,7 @@ type
     Procedure InitRecord         (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF});                Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
     Procedure InternalAddRecord  (Buffer  : {$IFDEF FPC}Pointer{$ELSE}{$IFDEF NEXTGEN}TRecBuf{$ELSE}{$IF CompilerVersion <= 22}Pointer{$ELSE}TRecordBuffer{$IFEND}{$ENDIF}{$ENDIF};
                                   aAppend : Boolean);                              {$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Function  GetCurrentRecord   (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF}): Boolean;       Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
+    Function  GetCurrentRecord   (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF}): Boolean;Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
     Procedure ClearCalcFields    (Buffer  : {$IFDEF NEXTGEN}NativeInt{$ELSE}PJvMemBuffer{$ENDIF});Override;
 
     function GetRecordSize: Word; override;
@@ -207,15 +178,15 @@ type
     procedure SetFieldData(Field: TField; Buffer: TJvValueBuffer); overload; override;
     {$IFNDEF NEXTGEN}
       {$IFDEF RTL240_UP}
-    procedure SetFieldData(Field: TField; Buffer: Pointer); overload; override;
-    procedure GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); overload; override;
-    procedure InternalGotoBookmark(Bookmark: Pointer); overload; override;
-    procedure SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); overload; override;
+       procedure SetFieldData(Field: TField; Buffer: Pointer); overload; override;
+       procedure GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); overload; override;
+       procedure InternalGotoBookmark(Bookmark: Pointer); overload; override;
+       procedure SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); overload; override;
       {$ENDIF RTL240_UP}
     {$ENDIF ~NEXTGEN}
     procedure CloseBlob(Field: TField); override;
     procedure InternalGotoBookmark(aBookmark: TJvBookmark); overload; override;
-    function GetIsIndexField(Field: TField): Boolean; override;
+    function  GetIsIndexField(Field: TField): Boolean; override;
     procedure InternalFirst; override;
     procedure InternalLast; override;
     procedure InternalDelete; override;
@@ -376,7 +347,9 @@ uses
   uRESTDWMemAnsiStrings,
   uRESTDWMemVCLUtils,
   uRESTDWMemResources,
-  uRESTDWTools;
+  uRESTDWTools,
+  uRESTDWBasicTypes;
+
 const
   ftBlobTypes = [ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftParadoxOle,
     ftDBaseOle, ftTypedBinary, ftOraBlob, ftOraClob
@@ -479,10 +452,10 @@ begin
       ftBCD, ftFMTBCD:
         Result := SizeOf(TBcd);
       ftTimeStamp:
-        Result := SizeOf(TDateTime);
+        Result := SizeOf(TSQLTimeStamp);
       {$IFDEF COMPILER10_UP}
       ftOraTimestamp:
-        Result := SizeOf(TDateTime);
+        Result := SizeOf(TSQLTimeStamp);
       ftFixedWideChar:
         Result := (Result + 1) * SizeOf(WideChar);
       {$ENDIF COMPILER10_UP}

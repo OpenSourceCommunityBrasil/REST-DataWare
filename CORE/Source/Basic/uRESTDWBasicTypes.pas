@@ -67,6 +67,17 @@ Uses
  End;
 
  Type
+  TSQLTimeStamp = Record
+   Year,
+   Month,
+   Day,
+   Hour,
+   Minute,
+   Second    : Word;
+   Fractions : Cardinal;
+ End;
+
+ Type
   TClassNull= Class(TComponent)
  End;
 

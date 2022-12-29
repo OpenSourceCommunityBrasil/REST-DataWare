@@ -37,7 +37,8 @@ uses
   {$ELSE ~HAS_UNITSCOPE}
   Classes, SysUtils,
   {$ENDIF ~HAS_UNITSCOPE}
-  uRESTDWMemBase;
+  uRESTDWMemBase,
+  uRESTDWProtoTypes;
 // Exceptions
 type
   EJclWideStringError = class(EJclError);
