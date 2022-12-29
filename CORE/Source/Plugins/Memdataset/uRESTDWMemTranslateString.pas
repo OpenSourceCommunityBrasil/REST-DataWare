@@ -90,9 +90,7 @@ uses
   {$IFDEF HAS_UNIT_SYSTEM_UITYPES}
   System.UITypes,
   {$ENDIF}
-  SysUtils, Types,
-  uRESTDWMemFileUtils,
-  uRESTDWMemJCLUtils;
+  SysUtils, Types;
 
 const
   cAppNameMask = 'APPL_NAME';

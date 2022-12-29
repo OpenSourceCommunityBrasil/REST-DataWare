@@ -26,7 +26,7 @@ unit uRESTDWCoder3to4;
 Interface
 
 Uses
-  Classes, SysUtils, uRESTDWCoder, uRESTDWBasicTypes;
+  Classes, SysUtils, uRESTDWCoder, uRESTDWBasicTypes, uRESTDWProtoTypes;
 
  Type
   TRESTDWDecodeTable = Array[1..127] of Byte;

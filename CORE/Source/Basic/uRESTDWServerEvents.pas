@@ -29,7 +29,7 @@ interface
 
 Uses
  SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts, uRESTDWComponentBase,
- uRESTDWBasic, uRESTDWBasicTypes, uRESTDWTools, uRESTDWParams,
+ uRESTDWBasic, uRESTDWProtoTypes, uRESTDWTools, uRESTDWParams,
  uRESTDWJSONInterface;
 
 Const

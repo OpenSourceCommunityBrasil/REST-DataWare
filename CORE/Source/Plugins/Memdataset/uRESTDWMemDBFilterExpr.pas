@@ -23,16 +23,18 @@ unit uRESTDWMemDBFilterExpr;
 
 interface
 uses
-  SysUtils, Classes, Variants, DB, DBCommon;
+  SysUtils, Classes, Variants, DB{$IFNDEF FPC}, DBCommon {$ENDIF};
 type
   TJvDBFilterExpression = class(TObject)
   private
     FDataSet: TDataSet;
+    {$IFNDEF FPC}
     FParser: TExprParser;
     FRoot: PExprNode;
     function EvalOpNode(N: PExprNode): Boolean;
     function EvalFuncNode(N: PExprNode): Variant;
     function EvaluateNode(N: PExprNode): Variant;
+    {$ENDIF}
   public
     constructor Create(ADataSet: TDataSet; const Filter: string; const FilterOptions: TFilterOptions);
     destructor Destroy; override;
@@ -40,23 +42,28 @@ type
   end;
 implementation
 uses
-  SqlTimSt, DateUtils, uRESTDWMemResources, uRESTDWBasicTypes, uRESTDWTools;
+ {$IFNDEF FPC}SqlTimSt, {$ENDIF}DateUtils, uRESTDWMemResources, uRESTDWBasicTypes, uRESTDWTools;
+
 var
   FieldTypeMapInitialized: Boolean = False;
   FieldTypeMap: TFieldMap;
 type
   TExprParserAccess = class
   protected
-    FDecimalSeparator: {$IF CompilerVersion > 17.0}WideChar{$ELSE}Char{$IFEND}; // Delphi 2006+ use WideChar
+    FDecimalSeparator: {$IFNDEF FPC}{$IF CompilerVersion > 17.0}WideChar{$ELSE}Char{$IFEND}{$ELSE}Char{$ENDIF}; // Delphi 2006+ use WideChar
+    {$IFNDEF FPC}
     FFilter: TFilterExpr;
+    {$ENDIF}
   end;
   TFilterExprAccess = class
   protected
     FDataSet: TDataSet;
     FFieldMap: TFieldMap;
     FOptions: TFilterOptions;
+    {$IFNDEF FPC}
     FParserOptions: TParserOptions;
     FNodes: PExprNode;
+    {$ENDIF}
   end;
 {------------------------------------------------------------------------------}
 function TrimLeftEx(const S, Blanks: string): string;
@@ -201,6 +208,7 @@ constructor TJvDBFilterExpression.Create(ADataSet: TDataSet; const Filter: strin
   const FilterOptions: TFilterOptions);
 var
   FieldType: TFieldType;
+  {$IFNDEF FPC}
   Nodes: PExprNode;
   function NodesContainsLeftRight(Root: PExprNode): Boolean;
   var
@@ -216,6 +224,7 @@ var
     end;
     Result := False;
   end;
+  {$ENDIF}
 begin
   inherited Create;
   FDataSet := ADataSet;
@@ -225,6 +234,7 @@ begin
     for FieldType := Low(FieldType) to High(FieldType) do
       FieldTypeMap[FieldType] := Ord(FieldType);
   end;
+  {$IFNDEF FPC}
   FParser := TExprParser.Create(ADataSet, Filter, [], [poExtSyntax], '', nil, FieldTypeMap);
   Nodes := TFilterExprAccess(TExprParserAccess(FParser).FFilter).FNodes;
   { Find root node because FNodes is the last added node which must not be the root node.
@@ -235,16 +245,24 @@ begin
     while (FRoot.FNext <> nil) and not ((FRoot.FKind = enOperator) and not NodesContainsLeftRight(FRoot)) do
       FRoot := FRoot.FNext;
   end;
+  {$ENDIF}
 end;
 destructor TJvDBFilterExpression.Destroy;
 begin
+  {$IFNDEF FPC}
   FParser.Free;
+  {$ENDIF}
   inherited Destroy;
 end;
 function TJvDBFilterExpression.Evaluate: Boolean;
 begin
+ Result := False;
+ {$IFNDEF FPC}
   Result := EvalOpNode(FRoot);
+ {$ENDIF}
 end;
+
+{$IFNDEF FPC}
 function TJvDBFilterExpression.EvaluateNode(N: PExprNode): Variant;
 begin
   if N = nil then
@@ -331,6 +349,7 @@ begin
     end;
   end;
 end;
+
 function TJvDBFilterExpression.EvalFuncNode(N: PExprNode): Variant;
 var
   V: Variant;
@@ -434,4 +453,5 @@ begin
       raise Exception.CreateResFmt(@RsMissingFilterFunctionParameters, [N.FData]);
   end;
 end;
+{$ENDIF}
 end.

@@ -27,7 +27,7 @@ interface
 
 uses
   SysUtils, Classes, Variants, DB,
-  uRESTDWParams, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWJSONInterface,
+  uRESTDWParams, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWJSONInterface,
   uRESTDWJSONObject, uRESTDWComponentBase, uRESTDWEncodeClass, uRESTDWBufferBase;
 
 Const

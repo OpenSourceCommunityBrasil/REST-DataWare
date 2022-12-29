@@ -30,7 +30,7 @@ Uses
   System.NetEncoding,
  {$IFEND}
   SysUtils,
-  uRESTDWTools, uRESTDWEncodeClass, uRESTDWBasicTypes, uRESTDWConsts;
+  uRESTDWTools, uRESTDWEncodeClass, uRESTDWProtoTypes, uRESTDWConsts;
 
  Type
   TRESTDWBase64 = Class

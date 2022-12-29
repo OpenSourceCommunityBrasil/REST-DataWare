@@ -26,7 +26,7 @@ unit uRESTDWIOHandler;
 Interface
 
 Uses
- Classes, uRESTDWException, uRESTDWBuffer, uRESTDWBasicTypes, uRESTDWTools,
+ Classes, uRESTDWException, uRESTDWBuffer, uRESTDWProtoTypes, uRESTDWTools,
  uRESTDWComponentBase, uRESTDWConsts;
 
 Const

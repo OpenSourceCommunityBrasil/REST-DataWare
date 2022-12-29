@@ -27,7 +27,8 @@ uses
   {$IFDEF MSWINDOWS}
   Windows,
   {$ENDIF MSWINDOWS}
-  Variants, Classes, SysUtils, DB, DateUtils;
+  Variants, Classes, SysUtils, DB, DateUtils,
+  uRESTDWTools;
 
 type
   IJvDataControl = interface
@@ -163,11 +164,11 @@ end;
 { Utility routines }
 function NameDelimiter(C: Char): Boolean;
 begin
-  Result := CharInSet(C, [' ', ',', ';', ')', '.', Cr, Lf]);
+  Result := RESTDWCharInSet(C, [' ', ',', ';', ')', '.', Cr, Lf]);
 end;
 function IsLiteral(C: Char): Boolean;
 begin
-  Result := CharInSet(C, ['''', '"']);
+  Result := RESTDWCharInSet(C, ['''', '"']);
 end;
 procedure _DBError(const Msg: string);
 begin

@@ -30,7 +30,7 @@ uses
   Classes, SysUtils, FireDAC.Phys, FireDAC.Stan.Intf, FireDAC.Phys.Intf,
   FireDAC.Phys.SQLGenerator, FireDAC.Stan.Util, FireDAC.Stan.Param,
   FireDAC.DatS, Firedac.Stan.Option, Variants,
-  uRESTDWBasicDB, DB, uRESTDWPoolermethod, FireDAC.Phys.RESTDWMeta;
+  uRESTDWBasicDB, DB, uRESTDWPoolermethod, uRESTDWProtoTypes, FireDAC.Phys.RESTDWMeta;
 
 type
   TFDPhysRDWConnectionBase = class;

@@ -40,41 +40,13 @@ uses
   Character,
   {$ENDIF HAS_UNIT_CHARACTER}
   {$ENDIF ~HAS_UNITSCOPE}
-  uRESTDWMemBase, Types;
+  uRESTDWMemBase, Types, uRESTDWProtoTypes;
 {$IFNDEF FPC}
  {$IFDEF MSWINDOWS}
   {$DEFINE OWN_WIDESTRING_MEMMGR}
  {$ENDIF MSWINDOWS}
 {$ENDIF ~FPC}
 Type
- {$IFNDEF FPC}
-  {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
-   {$IF Defined(HAS_FMX)}
-    DWString     = String;
-    DWWideString = WideString;
-    DWChar       = Char;
-   {$ELSE}
-    DWString     = Utf8String;
-    DWWideString = WideString;
-    DWChar       = Utf8Char;
-   {$IFEND}
-  {$ELSE}
-   {$IF Defined(HAS_FMX)}
-    DWString     = Utf8String;
-    DWWideString = Utf8String;
-    DWChar       = Utf8Char;
-   {$ELSE}
-    DWString     = AnsiString;
-    DWWideString = WideString;
-    DWChar       = Char;
-   {$IFEND}
-  {$IFEND}
- {$ELSE}
-  DWString     = AnsiString;
-  DWWideString = WideString;
-  DWChar       = Char;
- {$ENDIF}
- PDWChar       = ^DWChar;
  LCID          = DWORD;
 const
   // definitions of often used characters:
@@ -1007,7 +979,7 @@ type
     procedure ClearPattern;
   public
     procedure Clear; override;
-    function FindAll(const Text: DWWideString): Boolean; overload; override;
+//    function FindAll(const Text: DWWideString): Boolean; overload; override;
   end;
   // Regular expression search engine for text in UCS2 form taking surrogates
   // into account. This implementation is an improved translation from the URE
@@ -1303,11 +1275,9 @@ type
 function WideDecompose(const S: DWWideString; Compatible: Boolean = True): DWWideString; overload;
 function WideDecompose(const S: DWWideString; Tags: TCompatibilityFormattingTags): DWWideString; overload;
 {$ENDIF ~UNICODE_RTL_DATABASE}
-function DWWideStringOfChar(C: DWChar; Count: SizeInt): DWWideString;
 // case conversion function
 type
   TCaseType = (ctFold, ctLower, ctTitle, ctUpper);
-function WideTrim(const S: DWWideString): DWWideString;
 function WideTrimLeft(const S: DWWideString): DWWideString;
 function WideTrimRight(const S: DWWideString): DWWideString;
 type
@@ -1465,7 +1435,7 @@ procedure UCS4ArrayConcat(var Left: TUCS4Array; const Right: TUCS4Array); overlo
 function UCS4ArrayEquals(const Left: TUCS4Array; const Right: TUCS4Array): Boolean; overload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 function UCS4ArrayEquals(const Left: TUCS4Array; Right: UCS4): Boolean; overload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 function UCS4ArrayEquals(const Left: TUCS4Array; const Right: DWString): Boolean; overload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-function UCS4ArrayEquals(const Left: TUCS4Array; Right: DWChar): Boolean; overload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+//function UCS4ArrayEquals(const Left: TUCS4Array; Right: DWChar): Boolean; overload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
@@ -2433,10 +2403,11 @@ begin
   ClearPattern;
   inherited Clear;
 end;
-function TUTBMSearch.FindAll(const Text: DWWideString): Boolean;
-begin
-  Result := FindAll(PDWChar(Text), Length(Text));
-end;
+
+//function TUTBMSearch.FindAll(const Text: DWWideString): Boolean;
+//begin
+//  Result := FindAll(PDWChar(Text), Length(Text));
+//end;
 //----------------- Unicode RE search core ---------------------------------------------------------
 const
   // error codes
@@ -3343,32 +3314,6 @@ begin
     Sort;
 end;
 {$ENDIF ~UNICODE_RTL_DATABASE}
-function DWWideStringOfChar(C: DWChar; Count: SizeInt): DWWideString;
-// returns a string of Count characters filled with C
-var
-  I: SizeInt;
-begin
-  SetLength(Result, Count);
-  for I := 1 to Count do
-    Result[I] := C;
-end;
-function WideTrim(const S: DWWideString): DWWideString;
-var
-  I, L: SizeInt;
-begin
-  L := Length(S);
-  I := 1;
-  while (I <= L) and (UnicodeIsWhiteSpace(UCS4(S[I])) or UnicodeIsControl(UCS4(S[I]))) do
-    Inc(I);
-  if I > L then
-    Result := ''
-  else
-  begin
-    while UnicodeIsWhiteSpace(UCS4(S[L])) or UnicodeIsControl(UCS4(S[L])) do
-      Dec(L);
-    Result := Copy(S, I, L - I + 1);
-  end;
-end;
 function WideTrimLeft(const S: DWWideString): DWWideString;
 var
   I, L: SizeInt;
@@ -3393,7 +3338,7 @@ procedure FixCanonical(var S: DWWideString);
 // Examines S and reorders all combining marks in the string so that they are in canonical order.
 var
   I: SizeInt;
-  Temp: DWChar;
+  Temp: DWWideChar;
   CurrentClass,
   LastClass: Cardinal;
 begin
@@ -4270,8 +4215,8 @@ begin
   end;
   Result := I < 0;
 end;
-function UCS4ArrayEquals(const Left: TUCS4Array; Right: DWChar): Boolean;
-begin
-  Result := (Length(Left) = 1) and (Left[0] = Ord(Right));
-end;
+//function UCS4ArrayEquals(const Left: TUCS4Array; Right: DWChar): Boolean;
+//begin
+//  Result := (Length(Left) = 1) and (Left[0] = Ord(Right));
+//end;
 end.

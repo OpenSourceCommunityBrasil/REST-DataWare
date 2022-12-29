@@ -560,7 +560,7 @@ function DateTimeToLocalDateTime(DateTime: TDateTime): TDateTime;
 var
   TimeZoneInfo: TTimeZoneInformation;
 begin
-  ResetMemory(TimeZoneInfo, SizeOf(TimeZoneInfo));
+//  ResetMemory(TimeZoneInfo, SizeOf(TimeZoneInfo));
   case GetTimeZoneInformation(TimeZoneInfo) of
     TIME_ZONE_ID_STANDARD, TIME_ZONE_ID_UNKNOWN:
       Result := DateTime - (TimeZoneInfo.Bias + TimeZoneInfo.StandardBias) / MinutesPerDay;
@@ -596,7 +596,7 @@ function LocalDateTimeToDateTime(DateTime: TDateTime): TDateTime;
 var
   TimeZoneInfo: TTimeZoneInformation;
 begin
-  ResetMemory(TimeZoneInfo, SizeOf(TimeZoneInfo));
+//  ResetMemory(TimeZoneInfo, SizeOf(TimeZoneInfo));
   case GetTimeZoneInformation(TimeZoneInfo) of
     TIME_ZONE_ID_STANDARD, TIME_ZONE_ID_UNKNOWN:
       Result := DateTime + (TimeZoneInfo.Bias + TimeZoneInfo.StandardBias) / MinutesPerDay;

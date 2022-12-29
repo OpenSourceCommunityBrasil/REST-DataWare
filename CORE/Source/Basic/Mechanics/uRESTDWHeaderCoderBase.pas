@@ -26,7 +26,7 @@ unit uRESTDWHeaderCoderBase;
 interface
 
 uses
-  Classes, uRESTDWBasicTypes, uRESTDWException, uRESTDWTools;
+  Classes, uRESTDWProtoTypes, uRESTDWException, uRESTDWTools;
 
 Type
   TRESTDWHeaderDecodingNeededEvent = Procedure(Const ACharSet : String;

@@ -26,7 +26,7 @@ unit uRESTDWHeaderList;
 Interface
 
 Uses
- Classes, uRESTDWBasicTypes;
+ Classes, uRESTDWProtoTypes;
 
  Type
   TRESTDWHeaderList = class(TStringList)

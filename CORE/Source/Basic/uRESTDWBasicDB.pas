@@ -51,7 +51,7 @@ Uses
    {$IFEND}
  {$ENDIF}
  SysUtils, Classes, Db, SyncObjs, Variants,
- uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes, uRESTDWConsts,
+ uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWConsts,
  uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator,
  uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
  uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData,

@@ -26,7 +26,7 @@ interface
 }
 
 uses
-  Classes, uRESTDWComponentBase, uRESTDWBasicTypes, uRESTDWTools;
+  Classes, uRESTDWComponentBase, uRESTDWProtoTypes, uRESTDWTools;
 
  Type
   TRESTDWEncoder = Class(TRESTDWComponent)

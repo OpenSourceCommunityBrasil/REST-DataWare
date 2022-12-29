@@ -27,7 +27,7 @@ Interface
 
 Uses
   Classes,
-  uRESTDWCoderMIME, uRESTDWHeaderList, uRESTDWBasicTypes, uRESTDWConsts,
+  uRESTDWCoderMIME, uRESTDWHeaderList, uRESTDWProtoTypes, uRESTDWConsts,
   uRESTDWTools, uRESTDWIOHandlerStream, uRESTDWMessage;
 
  Type

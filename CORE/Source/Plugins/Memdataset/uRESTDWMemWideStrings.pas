@@ -40,34 +40,6 @@ uses
   uRESTDWMemBase;
 // Exceptions
 type
- {$IFNDEF FPC}
-  {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
-   {$IF Defined(HAS_FMX)}
-    DWString     = String;
-    DWWideString = WideString;
-    DWChar       = Char;
-   {$ELSE}
-    DWString     = Utf8String;
-    DWWideString = WideString;
-    DWChar       = Utf8Char;
-   {$IFEND}
-  {$ELSE}
-   {$IF Defined(HAS_FMX)}
-    DWString     = Utf8String;
-    DWWideString = Utf8String;
-    DWChar       = Utf8Char;
-   {$ELSE}
-    DWString     = AnsiString;
-    DWWideString = WideString;
-    DWChar       = Char;
-   {$IFEND}
-  {$IFEND}
- {$ELSE}
-  DWString     = AnsiString;
-  DWWideString = WideString;
-  DWChar       = Char;
- {$ENDIF}
-  PDWChar      = ^DWChar;
   EJclWideStringError = class(EJclError);
 const
   // definitions of often used characters:
@@ -282,7 +254,9 @@ uses
   Math,
   {$ENDIF ~HAS_UNITSCOPE}
   uRESTDWMemUnicode,
-  uRESTDWMemResources;
+  uRESTDWMemResources,
+  uRESTDWConsts;
+  
 procedure SwapWordByteOrder(P: PDWChar; Len: SizeInt);
 begin
   while Len > 0 do
@@ -298,7 +272,7 @@ var
   WS: DWWideString;
 begin
   WS := DWChar(Ch);
-  Result := WS[1];
+  Result := DWChar(WS[1]);
 end;
 function DWCharToChar(Ch: DWChar): DWChar;
 var
@@ -847,12 +821,12 @@ begin
     Len := Length(W^);
     if Len > 0 then
     begin
-      MoveWideChar(W^[1], P[0], Len);
+      MoveWideChar(W^[1], P^, Len);
       Inc(P, Len);
     end;
     if LL > 0 then
     begin
-      MoveWideChar(FLineSeparator[1], P[0], LL);
+      MoveWideChar(FLineSeparator[1], P^, LL);
       Inc(P, LL);
     end;
   end;
@@ -943,12 +917,12 @@ begin
 end;
 procedure TJclWideStrings.SetText(Text: PDWChar);
 begin
-  SetTextStr(Text);
+  SetTextStr(DWString(Text^));
 end;
 procedure TJclWideStrings.SetTextStr(const Value: DWWideString);
 var
-  P, Start: PDWChar;
-  S: DWWideString;
+  P, Start: PDWWideString;
+  S: String;
   Len: Integer;
 begin
   BeginUpdate;
@@ -956,31 +930,31 @@ begin
     Clear;
     if Value <> '' then
     begin
-      P := PDWChar(Value);
+      P := @Value;
       if P <> nil then
       begin
-        while P[0] <> DWChar(0) do
+        while P^[InitStrPos] <> DWChar(0) do
         begin
           Start := P;
           while True do
           begin
-            case P[0] of
+            case P^[InitStrPos] of
               DWChar(0), DWChar(10), DWChar(13):
                 Break;
             end;
             Inc(P);
           end;
-          Len := P - Start;
+          Len := Length(P^) - Length(Start^);
           if Len > 0 then
           begin
-            SetString(S, Start, Len);
+            SetString(S, PChar(@Start), Len);
             AddObject(S, nil); // consumes most time
           end
           else
             AddObject('', nil);
-          if P[0] = DWChar(13) then
+          if P^[InitStrPos] = DWChar(13) then
             Inc(P);
-          if P[0] = DWChar(10) then
+          if P^[InitStrPos] = DWChar(10) then
             Inc(P);
         end;
       end;

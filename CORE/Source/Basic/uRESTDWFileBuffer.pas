@@ -28,7 +28,7 @@ interface
 
 uses
   SysUtils, Types, Variants, Classes,
-  uRESTDWConsts, uRESTDWDynamic, uRESTDWTools, uRESTDWBasicTypes,
+  uRESTDWConsts, uRESTDWDynamic, uRESTDWTools, uRESTDWProtoTypes,
   uRESTDWComponentBase;
 
 Const

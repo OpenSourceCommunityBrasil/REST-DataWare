@@ -46,7 +46,8 @@ Implementation
 Uses
  uRESTDWException,
  uRESTDWTools,
- uRESTDWBasicTypes;
+ uRESTDWBasicTypes,
+ uRESTDWProtoTypes;
 
 Procedure TRESTDWDecoderQuotedPrintable.Decode(ASrcStream: TStream; const ABytes: Integer = -1);
 Var

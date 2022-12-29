@@ -196,7 +196,7 @@ type
     Procedure SetBookmarkData    (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF};
                                   Data    : TJvBookmark);                 Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
     Procedure InitRecord         (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF});                Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Procedure InternalAddRecord  (Buffer  : {$IFDEF FPC}Pointer{$ELSE}{$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}{$ENDIF};
+    Procedure InternalAddRecord  (Buffer  : {$IFDEF FPC}Pointer{$ELSE}{$IFDEF NEXTGEN}TRecBuf{$ELSE}{$IF CompilerVersion <= 22}Pointer{$ELSE}TRecordBuffer{$IFEND}{$ENDIF}{$ENDIF};
                                   aAppend : Boolean);                              {$IFNDEF NEXTGEN}Override;{$ENDIF}
     Function  GetCurrentRecord   (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF}): Boolean;       Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
     Procedure ClearCalcFields    (Buffer  : {$IFDEF NEXTGEN}NativeInt{$ELSE}PJvMemBuffer{$ENDIF});Override;
@@ -1021,7 +1021,8 @@ begin
   InternalGotoBookmarkData(PMemBookmarkInfo(Buffer + FBookmarkOfs)^.BookmarkData);
 end;
 
-procedure TRESTDWMemTable.InternalAddRecord(Buffer: {$IFDEF FPC}Pointer{$ELSE}{$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}{$ENDIF}; aAppend: Boolean);
+procedure TRESTDWMemTable.InternalAddRecord(Buffer: {$IFDEF FPC}Pointer{$ELSE}{$IFDEF NEXTGEN}TRecBuf{$ELSE}{$IF CompilerVersion <= 22}Pointer{$ELSE}TRecordBuffer{$IFEND}{$ENDIF}{$ENDIF};
+                                            aAppend: Boolean);
 var
   RecPos: Integer;
   Rec: TJvMemoryRecord;
@@ -1110,9 +1111,9 @@ begin
                                                                             {$ELSE}PChar(Data){$IFEND}
                                                                {$ELSE}PAnsiChar(Data){$ENDIF}) > 0));
         ftWideString:
-          Result := Result and (not TrimEmptyString or (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PWideChar(Data)
+          Result := Result and (not TrimEmptyString or (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PChar(Data)
                                                                             {$ELSE}PChar(Data){$IFEND}
-                                                               {$ELSE}PWideChar(Data){$ENDIF}) > 0));
+                                                                            {$ELSE}PWideChar(Data){$ENDIF}) > 0));
       end;
       if Result and (Buffer <> nil) then
         if Field.DataType = ftVariant then

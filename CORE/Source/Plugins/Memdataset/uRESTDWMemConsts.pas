@@ -29,6 +29,10 @@ uses
 const
   {$IFDEF FPC}
   CM_BASE = $B000;
+  {$ELSE}
+   {$IFNDEF COMPILER9_UP}
+    CM_BASE = $B000;
+   {$ENDIF !COMPILER9_UP}
   {$ENDIF}
   { JvEditor }
   JvEditorCompletionChars = #8'0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm_';

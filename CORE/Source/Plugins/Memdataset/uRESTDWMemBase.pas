@@ -36,7 +36,7 @@ uses
   {$ENDIF MSWINDOWS}
   SysUtils
   {$ENDIF ~HAS_UNITSCOPE},
-  uRESTDWBasicTypes;
+  uRESTDWProtoTypes;
 // Version
 const
   {$IFDEF UNIX}

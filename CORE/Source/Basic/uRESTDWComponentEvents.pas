@@ -27,7 +27,7 @@ interface
 
 Uses
  SysUtils, Classes, Db,
- uRESTDWDataUtils, uRESTDWParams, uRESTDWBasicTypes, uRESTDWConsts,
+ uRESTDWDataUtils, uRESTDWParams, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWConsts,
  uRESTDWMassiveBuffer;
 
  Type

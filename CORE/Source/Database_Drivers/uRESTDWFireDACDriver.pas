@@ -30,7 +30,7 @@ uses
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes,
   FireDAC.Comp.Client, FireDAC.Comp.DataSet, FireDAC.Stan.StorageBin,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.DApt.Intf, FireDAC.DApt,
-  FireDAC.Stan.Param, FireDAC.DatS, DB, uRESTDWBasicDB, FireDAC.Phys.RESTDW;
+  FireDAC.Stan.Param, FireDAC.DatS, DB, uRESTDWBasicDB, uRESTDWProtoTypes, FireDAC.Phys.RESTDW;
 
 const
   rdwFireDACDrivers : array[0..17] of string = (('ads'),('asa'),('db2'),('ds'),

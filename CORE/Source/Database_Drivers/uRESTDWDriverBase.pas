@@ -1,4 +1,4 @@
-﻿unit uRESTDWDriverBase;
+unit uRESTDWDriverBase;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -30,8 +30,8 @@ Uses
   Classes, SysUtils, TypInfo, DB, Variants,
   uRESTDWParams, uRESTDWComponentBase, uRESTDWEncodeClass,
   uRESTDWComponentEvents, uRESTDWJSONInterface, uRESTDWBufferBase,
-  uRESTDWConsts, uRESTDWDataModule, uRESTDWBasicTypes, uRESTDWTools,
-  uRESTDWStorageBase,  uRESTDWStorageBinRDW, uRESTDWMassiveBuffer;
+  uRESTDWConsts, uRESTDWDataModule, uRESTDWBasicTypes, uRESTDWProtoTypes,
+  uRESTDWTools, uRESTDWStorageBase,  uRESTDWStorageBinRDW, uRESTDWMassiveBuffer;
 
 Type
   TRESTDWDatabaseInfo = Record

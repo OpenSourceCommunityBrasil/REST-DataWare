@@ -423,7 +423,7 @@ uses
   {$ENDIF HAS_UNIT_RTLCONSTS}
   {$ENDIF SUPPORTS_UNICODE}
   uRESTDWMemResources, uRESTDWMemStreams,
-  uRESTDWMemStringsB, uRESTDWBasicTypes;
+  uRESTDWMemStringsB, uRESTDWProtoTypes;
 //=== Internal ===============================================================
 type
   TAnsiStrRec = packed record

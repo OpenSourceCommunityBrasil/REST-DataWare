@@ -31,7 +31,8 @@ Uses
   {$IF CompilerVersion > 27}NetEncoding,{$IFEND}
  {$ENDIF}
  Classes, SysUtils, DB,
- uRESTDWBasicTypes, uRESTDWEncodeClass, uRESTDWConsts, DWDCPrijndael, DWDCPsha256;
+ uRESTDWProtoTypes, uRESTDWEncodeClass, uRESTDWConsts, DWDCPrijndael,
+ DWDCPsha256;
 
   Type
    TCripto = Class(TPersistent)
@@ -392,15 +393,6 @@ Function  GetObjectName            (TypeObject         : TTypeObject)           
  Procedure CopyStream               (Const Source       : TStream;
                                      Dest               : TStream);
  Function RemoveLineBreaks(aText : string): string;
-// Function  BytesArrToString         (aValue             : tIdBytes;
-//                                     IdEncode           : {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}
-//                                                         TIdTextEncoding
-//                                                        {$ELSE}
-//                                                         IIdTextEncoding
-//                                                        {$IFEND}
-//                                                        {$ELSE}
-//                                                         IIdTextEncoding
-//                                                        {$ENDIF} = Nil)           : String;
  Function  ObjectValueToFieldType   (TypeObject         : TObjectValue)           : TFieldType;
  Function  FieldTypeToObjectValue   (FieldType          : TFieldType)             : TObjectValue;
  Function  FieldTypeToDWFieldType   (FieldType          : TFieldType)             : Byte;
@@ -428,11 +420,67 @@ Function  GetObjectName            (TypeObject         : TTypeObject)           
  Function  RequestTypeToString      (RequestType        : TRequestType)           : String;
  Function  VarIsNullEmpty           (Const V            : Variant)                : Boolean;
  Function  VarIsNullEmptyBlank      (Const V            : Variant)                : Boolean;
+ {$IFDEF FPC}
+  Function RESTDWCharInSet                (C                  : DWChar;
+                                           Const CharSet      : TCharSet) : Boolean;Overload;
+  Function RESTDWCharInSet                (C                  : DWWideChar;
+                                           Const CharSet      : TCharSet) : Boolean;Overload;
+ {$ELSE}
+  {$IFNDEF NEXTGEN}
+   Function RESTDWCharInSet               (C                  : DWChar;
+                                           Const CharSet      : TCharSet) : Boolean;Overload;
+   Function RESTDWCharInSet               (C                  : DWWideChar;
+                                           Const CharSet      : TCharSet) : Boolean;Overload;
+  {$ELSE}
+   Function RESTDWCharInSet               (C                  : Byte;
+                                           Const CharSet      : TCharSet) : Boolean;Overload;
+   Function RESTDWCharInSet               (C                  : DWChar;
+                                           Const CharSet      : TCharSet) : Boolean;Overload;
+  {$ENDIF}
+ {$ENDIF}
  Procedure InitializeStrings;
 
 Implementation
+
 Uses
-  uRESTDWBase64, uRESTDWException, Variants;
+  uRESTDWBase64, uRESTDWException, Variants, uRESTDWBasicTypes;
+
+{$IFDEF FPC}
+ Function RESTDWCharInSet(C             : DWChar;
+                          Const CharSet : TCharSet) : Boolean;
+ Begin
+  Result := C In CharSet;
+ End;
+ Function RESTDWCharInSet(C             : DWWideChar;
+                          Const CharSet : TCharSet): Boolean;
+ Begin
+  Result := C In CharSet;
+ End;
+{$ELSE}
+ {$IFNDEF NEXTGEN}
+  Function RESTDWCharInSet(C             : DWChar;
+                           Const CharSet : TCharSet) : Boolean;
+  Begin
+   Result := C In CharSet;
+  End;
+  Function RESTDWCharInSet(C             : DWWideChar;
+                           Const CharSet : TCharSet): Boolean;
+  Begin
+   Result := DWChar(C) In CharSet;
+  End;
+ {$ELSE}
+  Function RESTDWCharInSet(C             : Byte;
+                           Const CharSet : TCharSet) : Boolean;
+  Begin
+   Result := Char(C) In CharSet;
+  End;
+  Function RESTDWCharInSet(C             : DWChar;
+                           Const CharSet : TCharSet) : Boolean;
+  Begin
+   Result := C In CharSet;
+  End;
+ {$ENDIF}
+{$ENDIF}
 
 Function VarIsNullEmpty(const V: Variant): Boolean;
 Begin
@@ -509,8 +557,12 @@ Begin
     dwftObject          : Result := ftObject;
     dwftSingle          : Result := ftSingle;
   {$ELSE}
-    dwftFixedWideChar   : Result := ftFixedWideChar;
-    dwftWideMemo        : Result := ftWideMemo;
+    {$IFNDEF FPC}
+     {$IF CompilerVersion > 22}
+      dwftFixedWideChar   : Result := ftFixedWideChar;
+      dwftWideMemo        : Result := ftWideMemo;
+     {$IFEND}
+    {$ENDIF}
     dwftOraTimeStamp    : Result := ftTimeStamp;
     dwftOraInterval     : Result := ftInteger;
     dwftLongWord        : Result := ftWord;
@@ -699,10 +751,12 @@ Begin
  SetLength(VBytes, LOldLen + 1);
  VBytes[LOldLen] := AByte;
 End;
+
 Function Result2JSON(wsResult: TResultErro): String;
 Begin
  Result := Format('{"STATUS":"%s","MESSAGE":"%s"}', [wsResult.Status, wsResult.MessageText]);
 End;
+
 Function GetPairJSONInt(Status      : Integer;
                         MessageText : String;
                         Encoding    : TEncodeSelect = esUtf8) : String;

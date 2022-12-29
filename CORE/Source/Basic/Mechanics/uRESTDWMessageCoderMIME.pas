@@ -27,7 +27,7 @@ Interface
 
 Uses
  Classes, SysUtils,
- uRESTDWBasicTypes, uRESTDWException, uRESTDWComponentBase, uRESTDWMessage,
+ uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWException, uRESTDWComponentBase, uRESTDWMessage,
  uRESTDWTools, uRESTDWCoder, uRESTDWMessageCoder, uRESTDWCoderHeader;
 
  Type

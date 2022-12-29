@@ -31,12 +31,10 @@ Uses
   {$IF Defined(RESTDWFMX)}System.IOUtils,{$IFEND}
  {$ENDIF}
  SysUtils, Classes, Db, Variants, SyncObjs,
- uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWParams,
- uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWDataUtils, uRESTDWTools,
- uRESTDWComponentBase, uRESTDWConsts, uRESTDWMessageCoderMIME, uRESTDWZLib,
- uRESTDWMimeTypes
-
- ;
+ uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWJSONObject,
+ uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWDataUtils,
+ uRESTDWTools, uRESTDWComponentBase, uRESTDWConsts, uRESTDWMessageCoderMIME,
+ uRESTDWZLib, uRESTDWMimeTypes;
 
  type
   TRedirect = Procedure(Url : String;

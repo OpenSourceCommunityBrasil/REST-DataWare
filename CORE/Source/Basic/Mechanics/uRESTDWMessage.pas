@@ -27,7 +27,7 @@ Interface
 
 Uses
  Classes, uRESTDWAttachment, uRESTDWHeaderList, uRESTDWMessageParts,
- uRESTDWComponentBase, uRESTDWException;
+ uRESTDWComponentBase, uRESTDWException, uRESTDWProtoTypes;
 
 Type
  TRESTDWMessagePriority = (mpHighest, mpHigh, mpNormal, mpLow, mpLowest);

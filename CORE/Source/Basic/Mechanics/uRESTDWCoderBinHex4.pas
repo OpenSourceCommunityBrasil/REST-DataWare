@@ -27,7 +27,7 @@ Interface
 
 Uses
  Classes, SysUtils, uRESTDWException, uRESTDWCoder, uRESTDWCoder3to4, uRESTDWTools,
- uRESTDWBasicTypes;
+ uRESTDWBasicTypes, uRESTDWProtoTypes;
 
  Type
   TRESTDWEncoderBinHex4 = Class(TRESTDWEncoder3to4)

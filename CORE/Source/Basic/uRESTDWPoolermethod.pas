@@ -28,7 +28,7 @@ Interface
 Uses
   {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
   SysUtils, Classes,
-  uRESTDWMassiveBuffer, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWTools,
+  uRESTDWMassiveBuffer, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWTools,
   uRESTDWJSONObject, uRESTDWEncodeClass, uRESTDWBasic,
   uRESTDWConsts, uRESTDWDataUtils, uRESTDWParams;
 

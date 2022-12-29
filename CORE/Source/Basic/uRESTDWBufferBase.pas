@@ -28,7 +28,7 @@ interface
 
 Uses
   SysUtils, Classes, Variants,
-  uRESTDWBasicComponent, uRESTDWBasicTypes;
+  uRESTDWBasicComponent, uRESTDWProtoTypes;
 
 Type
  TRESTDWBufferBase = Class(TObject)

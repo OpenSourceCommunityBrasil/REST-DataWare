@@ -53,8 +53,6 @@ function SetSort(const AText: string): string;
 function SetUnion(const Set1, Set2: string): string;
 function SetIntersect(const Set1, Set2: string): string;
 function SetExclude(const Set1, Set2: string): string;
-{replace any <,> etc by &lt; &gt;}
-function XMLSafe(const AText: string): string; {$IFDEF SUPPORTS_DEPRECATED} deprecated {$IFDEF SUPPORTS_DEPRECATED_DETAILS} 'Use JclSimpleXml.SimpleXMLEncode' {$ENDIF} ; {$ENDIF}
 {simple hash, Result can be used in Encrypt}
 function Hash(const AText: string): Integer;
 { Base64 encode and decode a string }
@@ -181,10 +179,7 @@ uses
   {$IFDEF RTL200_UP}
   AnsiStrings,
   {$ENDIF RTL200_UP}
-  {$IFNDEF COMPILER12_UP}
-  JvJCLUtils,
-  {$ENDIF ~COMPILER12_UP}
-  uRESTDWMemConsts, uRESTDWMemResources, uRESTDWMemTypes, uRESTDWMemSimpleXml;
+  uRESTDWMemConsts, uRESTDWMemResources, uRESTDWMemTypes;
 
 const
   B64Table: AnsiString = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
@@ -1010,12 +1005,20 @@ begin
     except
       // just use the unformatted value
     end;
-    Lit.AddObject(S, TObject(I));
+    {$IFNDEF FPC}
+     Lit.AddObject(S, TObject(I));
+    {$ELSE}
+     Lit.AddObject(S, TObject(@I));
+    {$ENDIF}
   end;
   Lit.Sort;
   for I := 0 to Src.Count - 1 do
   begin
+   {$IFNDEF FPC}
     Index := Integer(Lit.Objects[I]);
+   {$ELSE}
+    Index := PInteger(Lit.Objects[I])^;
+   {$ENDIF}
     Dst.Add(Src[Index]);
   end;
   Lit.Free;
@@ -1373,11 +1376,7 @@ begin
   for I := 2 to Length(AText) do
     Result := (Result * Ord(AText[I])) xor Result;
 end;
-{replace any <,> etc by &lt; &gt;}
-function XMLSafe(const AText: string): string;
-begin
-  Result := uRESTDWMemSimpleXml.SimpleXMLEncode(AText);
-end;
+
 function FirstOfSet(const AText: string): string;
 var
   P: Integer;

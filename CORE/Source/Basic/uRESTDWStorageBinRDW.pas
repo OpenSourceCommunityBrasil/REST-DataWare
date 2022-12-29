@@ -20,7 +20,7 @@ type
 implementation
 
 uses
-  uRESTDWBasicTypes, uRESTDWTools;
+  uRESTDWProtoTypes, uRESTDWTools;
 
 { TRESTDWStorageBinRDW }
 
@@ -138,15 +138,19 @@ begin
       dwftWord,
       dwftInteger,
       dwftAutoInc :  Begin
-                  Stream.Read(J, Sizeof(Integer));
-                  vField.AsInteger := J;
-      end;
+                      Stream.Read(J, Sizeof(Integer));
+                      vField.AsInteger := J;
+                     End;
       dwftSingle   : begin
                       Stream.Read(R, Sizeof(Real));
                       {$IFDEF FPC}
                        vField.AsFloat := R;
                       {$ELSE}
-                       vField.AsSingle  := R;
+                       {$IF (CompilerVersion < 22)}
+                        vField.AsFloat := R;
+                       {$ELSE}
+                        vField.AsSingle  := R;
+                       {$IFEND}
                       {$ENDIF}
                      end;
       dwftExtended : begin
@@ -154,7 +158,11 @@ begin
                       {$IFDEF FPC}
                        vField.AsFloat := R;
                       {$ELSE}
-                       vField.AsExtended := R;
+                       {$IF (CompilerVersion < 22)}
+                        vField.AsFloat := R;
+                       {$ELSE}
+                        vField.AsExtended := R;
+                       {$IFEND}
                       {$ENDIF}
                      end;
       dwftFloat    : begin
@@ -399,7 +407,7 @@ Begin
                     L := Dataset.Fields[I].AsInteger;
                   {$ELSE}
                     L := Dataset.Fields[I].AsLargeInt;
-                  {$ENDIF}
+                  {$IFEND}
                   Stream.Write(L, Sizeof(Longint));
       end;
       ftBoolean  : begin

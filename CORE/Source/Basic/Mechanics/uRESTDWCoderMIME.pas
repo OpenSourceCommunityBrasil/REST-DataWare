@@ -26,7 +26,7 @@ Unit uRESTDWCoderMIME;
 Interface
 
 Uses
- Classes, uRESTDWCoder3to4, uRESTDWBasicTypes;
+ Classes, uRESTDWCoder3to4, uRESTDWProtoTypes;
 
  Type
   TRESTDWEncoderMIME = Class(TRESTDWEncoder3to4)

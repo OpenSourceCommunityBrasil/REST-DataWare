@@ -110,7 +110,7 @@ uses
 
 Implementation
 
-Uses uRESTDWMessageCoderMIME, uRESTDWBuffer, uRESTDWBasicTypes;
+Uses uRESTDWMessageCoderMIME, uRESTDWBuffer, uRESTDWBasicTypes, uRESTDWProtoTypes;
 
 var
   GMessageDecoderList: TRESTDWMessageDecoderList = nil;

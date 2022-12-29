@@ -46,7 +46,7 @@ Uses
   SysUtils, Classes, Db, Variants,
   uRESTDWBasic, uRESTDWBasicDB, uRESTDWComponentEvents, uRESTDWBasicTypes,
   uRESTDWJSONObject, uRESTDWParams, uRESTDWBasicClass, uRESTDWComponentBase,
-  uRESTDWConsts, uRESTDWEncodeClass, uRESTDWDataUtils, uRESTDWTools, uRESTDWZlib,
+  uRESTDWConsts, uRESTDWProtoTypes, uRESTDWEncodeClass, uRESTDWDataUtils, uRESTDWTools, uRESTDWZlib,
   IdContext, IdHeaderList, IdTCPConnection, IdHTTPServer, IdCustomHTTPServer,
   IdSSLOpenSSL, IdSSL, IdAuthentication, IdTCPClient, IdHTTPHeaderInfo,
   IdComponent, IdBaseComponent, IdHTTP, IdMultipartFormData, IdMessageCoder,
