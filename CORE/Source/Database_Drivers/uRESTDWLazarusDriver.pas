@@ -420,7 +420,7 @@ Begin
 end;
 
 initialization
-{$I ..\restdwlazarusdrivers.lrs}
+{$I ..\RESTDWLazarusDrivers.lrs}
 
 end.
 

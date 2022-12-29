@@ -107,7 +107,7 @@ End;
 
 {$IFDEF FPC}
 initialization
-{$I RestDatawareIndySockets.lrs}
+{$I RESTDWIndySockets.lrs}
 {$ENDIF}
 
 end.

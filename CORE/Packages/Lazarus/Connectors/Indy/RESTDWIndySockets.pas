@@ -2,21 +2,21 @@
   This source is only used to compile and install the package.
  }
 
-unit RESTDWLazarusDriver;
+unit RESTDWIndySockets;
 
 {$warn 5023 off : no warning about unused units}
 interface
 
 uses
-  uRESTDWLazarusDriver, LazarusPackageIntf;
+  uRESTDWIdBase, uRESTDWIdReg, LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
-  RegisterUnit('uRESTDWLazarusDriver', @uRESTDWLazarusDriver.Register);
+  RegisterUnit('uRESTDWIdReg', @uRESTDWIdReg.Register);
 end;
 
 initialization
-  RegisterPackage('RESTDWLazarusDriver', @Register);
+  RegisterPackage('RESTDWIndySockets', @Register);
 end.

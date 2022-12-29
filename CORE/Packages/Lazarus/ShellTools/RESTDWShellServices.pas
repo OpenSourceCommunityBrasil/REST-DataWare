@@ -2,21 +2,23 @@
   This source is only used to compile and install the package.
  }
 
-unit RESTDWLazarusDriver;
+unit RESTDWShellServices;
 
 {$warn 5023 off : no warning about unused units}
 interface
 
 uses
-  uRESTDWLazarusDriver, LazarusPackageIntf;
+  uRESTDWShellServicesLazarus, uRESTDWShellServicesRegLazarus, 
+  LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
-  RegisterUnit('uRESTDWLazarusDriver', @uRESTDWLazarusDriver.Register);
+  RegisterUnit('uRESTDWShellServicesRegLazarus', 
+    @uRESTDWShellServicesRegLazarus.Register);
 end;
 
 initialization
-  RegisterPackage('RESTDWLazarusDriver', @Register);
+  RegisterPackage('RESTDWShellServices', @Register);
 end.

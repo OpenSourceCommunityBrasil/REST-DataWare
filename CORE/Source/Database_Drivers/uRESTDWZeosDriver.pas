@@ -583,7 +583,7 @@ end;
 
 {$IFDEF FPC}
 initialization
-{$I ..\restdwlazarusdrivers.lrs}
+{$I ..\RESTDWLazarusDrivers.lrs}
 {$ENDIF}
 
 end.

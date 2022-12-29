@@ -2,7 +2,7 @@
   This source is only used to compile and install the package.
  }
 
-unit restdwdriverunidac;
+unit RESTDWUnidacDriver;
 
 {$warn 5023 off : no warning about unused units}
 interface
@@ -19,5 +19,5 @@ end;
 
 initialization
   {$I restdwlazarusdrivers.lrs}
-  RegisterPackage('restdwdriverunidac', @Register);
+  RegisterPackage('RESTDWUnidacDriver', @Register);
 end.
