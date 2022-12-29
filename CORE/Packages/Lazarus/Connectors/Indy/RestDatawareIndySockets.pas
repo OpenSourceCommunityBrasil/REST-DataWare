@@ -18,6 +18,5 @@ begin
 end;
 
 initialization
-  {$I restdatawareindysockets.lrs}
   RegisterPackage('RestDatawareIndySockets', @Register);
 end.

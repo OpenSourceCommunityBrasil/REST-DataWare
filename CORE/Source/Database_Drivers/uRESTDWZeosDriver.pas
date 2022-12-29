@@ -1,7 +1,7 @@
 ﻿unit uRESTDWZeosDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
-{$I ZComponent.inc}
+{$IFNDEF FPC}{$I ZComponent.inc}{$ENDIF}
 
 {
   REST Dataware .
@@ -37,9 +37,11 @@ uses
   {$ELSE}
     uRESTDWMemoryDataset,
   {$ENDIF}
-  Classes, SysUtils, uRESTDWDriverBase, ZConnection, uRESTDWBasicTypes,
-  ZDataset, ZSequence, ZDbcIntfs, ZAbstractRODataset, ZAbstractDataset,
-  ZStoredProcedure, DB, ZEncoding, ZDatasetUtils;
+  Classes, SysUtils, DB,
+  ZConnection, ZDataset, ZSequence, ZDbcIntfs, ZAbstractRODataset,
+  ZAbstractDataset, ZStoredProcedure, ZEncoding, ZDatasetUtils,
+  uRESTDWDriverBase, uRESTDWBasicTypes, uRESTDWProtoTypes
+  ;
 
 const
   rdwZeosProtocols : array[0..16] of string = (('ado'),('asa'),('asa_capi'),
@@ -578,6 +580,11 @@ begin
     FreeAndNil(memtable);
   end;
 end;
+
+{$IFDEF FPC}
+initialization
+{$I ..\restdwlazarusdrivers.lrs}
+{$ENDIF}
 
 end.
 

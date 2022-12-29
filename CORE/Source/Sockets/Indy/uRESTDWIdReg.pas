@@ -105,8 +105,9 @@ Begin
     TPoolersList);
 End;
 
+{$IFDEF FPC}
 initialization
-
-Finalization
+{$I RestDatawareIndySockets.lrs}
+{$ENDIF}
 
 end.

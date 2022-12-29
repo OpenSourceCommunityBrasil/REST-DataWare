@@ -46,7 +46,7 @@ uses uRESTDWConsts, utemplateproglaz;
 
 Procedure Register;
 Begin
- RegisterComponents('REST Dataware - Service',     [TRESTDWShellService]);
+ RegisterComponents('REST Dataware - Service', [TRESTDWShellService]);
  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TRESTDWAboutDialogProperty);
 End;
 
@@ -75,6 +75,7 @@ Begin
 End;
 
 initialization
+{$I RestDatawareShellservices.lrs}
  UnlistPublishedProperty(TRESTDWShellService,  'Active');
  UnlistPublishedProperty(TRESTDWShellService,  'ServicePort');
  UnlistPublishedProperty(TRESTDWShellService,  'RequestTimeOut');

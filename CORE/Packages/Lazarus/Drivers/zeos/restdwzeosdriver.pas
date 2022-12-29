@@ -18,6 +18,5 @@ begin
 end;
 
 initialization
-  {$I restdwlazarusdrivres.lrs}
   RegisterPackage('restdwzeosdriver', @Register);
 end.

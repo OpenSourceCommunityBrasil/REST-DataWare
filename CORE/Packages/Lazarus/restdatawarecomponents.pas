@@ -34,7 +34,7 @@ uses
   uRESTDWMemStreams, uRESTDWMemStringConversions, uRESTDWMemStrings, 
   uRESTDWMemStringsB, uRESTDWMemTranslateString, uRESTDWMemTypes, 
   uRESTDWMemUnicode, uRESTDWMemVCLUtils, uRESTDWMemWideStrings, 
-  uRESTDWDesignReg, LazarusPackageIntf;
+  uRESTDWDesignReg, uRESTDWProtoTypes, LazarusPackageIntf;
 
 implementation
 

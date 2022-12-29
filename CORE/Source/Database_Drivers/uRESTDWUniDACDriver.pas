@@ -30,8 +30,9 @@ uses
   {$IFDEF FPC}
     LResources,
   {$ENDIF}
-  Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes, DB, MemDS,
-  DBAccess, Uni, uRESTDWMemtable, VirtualTable;
+  Classes, SysUtils, DB,
+  MemDS, DBAccess, Uni, VirtualTable,
+  uRESTDWMemtable, uRESTDWDriverBase, uRESTDWBasicTypes, uRESTDWProtoTypes;
 
 const
   rdwUniDACProtocols : array[0..27] of string = (('access'),('advantage'),
@@ -488,6 +489,11 @@ begin
     vTable.Free;
   end;
 end;
+
+{$IFDEF FPC}
+initialization
+{$I ..\restdwlazarusdrivers.lrs}
+{$ENDIF}
 
 end.
 

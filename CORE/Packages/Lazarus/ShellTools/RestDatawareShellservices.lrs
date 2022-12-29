@@ -1,4 +1,4 @@
-LazarusResources.Add('TRESTDWCGIRunner','PNG',[
+LazarusResources.Add('TRESTDWShellService','PNG',[
   #137'PNG'#13#10#26#10#0#0#0#13'IHDR'#0#0#0' '#0#0#0' '#8#6#0#0#0'szz'#244#0#0
   +#0#9'pHYs'#0#0#11#19#0#0#11#19#1#0#154#156#24#0#0#0#1'sRGB'#0#174#206#28#233
   +#0#0#0#4'gAMA'#0#0#177#143#11#252'a'#5#0#0#2'7IDATx'#1#237#151'O'#171'ia'#20
