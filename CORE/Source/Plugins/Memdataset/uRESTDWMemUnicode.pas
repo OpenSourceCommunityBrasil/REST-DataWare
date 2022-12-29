@@ -1192,13 +1192,11 @@ type
     procedure CollectPendingOperations(var State: SizeInt);
     procedure HexDigitSetup(Symbol: PUcSymbolTableEntry);
     function MakeExpression(AType, LHS, RHS: SizeInt): SizeInt;
-    procedure MergeEquivalents;
     function Peek: SizeInt;
     function Pop: SizeInt;
     procedure Push(V: SizeInt);
     procedure Reduce(Start: SizeInt);
     procedure SpaceSetup(Symbol: PUcSymbolTableEntry; Categories: TCharacterCategories);
-    function SymbolsAreDifferent(A, B: PUcSymbolTableEntry): Boolean;
   public
     procedure Clear; override;
   end;
@@ -1218,7 +1216,6 @@ type
     FSaveFormat: TSaveFormat;  // overrides the FSaveUnicode flag, initialized when a file is loaded,
                                // expect losses if it is set to sfAnsi before saving
     function GetName(Index: Integer): DWWideString;
-    procedure WriteData(Writer: TWriter);
     function GetSaveUnicode: Boolean;
     procedure SetSaveUnicode(const Value: Boolean);
   protected
@@ -1227,7 +1224,6 @@ type
     function GetCapacity: Integer; virtual;
     function GetCount: Integer; virtual; abstract;
     function GetObject(Index: Integer): TObject; virtual;
-    function GetTextStr: DWWideString; virtual;
     procedure Put(Index: Integer; const S: DWWideString); virtual; abstract;
     procedure PutObject(Index: Integer; AObject: TObject); virtual; abstract;
     procedure SetCapacity(NewCapacity: Integer); virtual;
@@ -1237,17 +1233,12 @@ type
     function Add(const S: DWWideString): Integer; virtual;
     function AddObject(const S: DWWideString; AObject: TObject): Integer; virtual;
     procedure Append(const S: DWWideString);
-    procedure AddStrings(Strings: TStrings); overload; virtual;
     procedure AddStrings(Strings: TWideStrings); overload; virtual;
-    procedure Assign(Source: TPersistent); override;
-    procedure AssignTo(Dest: TPersistent); override;
     procedure BeginUpdate;
     procedure Clear; virtual; abstract;
     procedure Delete(Index: Integer); virtual; abstract;
     procedure EndUpdate;
-    function Equals(Strings: TWideStrings): Boolean; {$IFDEF RTL200_UP} reintroduce; {$ENDIF RTL200_UP}
     procedure Exchange(Index1, Index2: Integer); virtual;
-    function GetSeparatedText(Separators: DWWideString): DWWideString; virtual;
     function IndexOfObject(AObject: TObject): Integer;
     procedure Insert(Index: Integer; const S: DWWideString); virtual; abstract;
     procedure InsertObject(Index: Integer; const S: DWWideString; AObject: TObject);
@@ -2571,22 +2562,16 @@ procedure TURESearch.SpaceSetup(Symbol: PUcSymbolTableEntry; Categories: TCharac
 var
   Range: TUcRange;
 begin
-  Symbol.Categories := Symbol.Categories + Categories;
   Range.MinCode := UCS4(WideTabulator);
   Range.MaxCode := UCS4(WideTabulator);
-  AddRange(Symbol.Symbol.CCL, Range);
   Range.MinCode := UCS4(WideCarriageReturn);
   Range.MaxCode := UCS4(WideCarriageReturn);
-  AddRange(Symbol.Symbol.CCL, Range);
   Range.MinCode := UCS4(WideLineFeed);
   Range.MaxCode := UCS4(WideLineFeed);
-  AddRange(Symbol.Symbol.CCL, Range);
   Range.MinCode := UCS4(WideFormFeed);
   Range.MaxCode := UCS4(WideFormFeed);
-  AddRange(Symbol.Symbol.CCL, Range);
   Range.MinCode := $FEFF;
   Range.MaxCode := $FEFF;
-  AddRange(Symbol.Symbol.CCL, Range);
 end;
 procedure TURESearch.HexDigitSetup(Symbol: PUcSymbolTableEntry);
 var
@@ -2594,13 +2579,10 @@ var
 begin
   Range.MinCode := UCS4('0');
   Range.MaxCode := UCS4('9');
-  AddRange(Symbol.Symbol.CCL, Range);
   Range.MinCode := UCS4('A');
   Range.MaxCode := UCS4('F');
-  AddRange(Symbol.Symbol.CCL, Range);
   Range.MinCode := UCS4('a');
   Range.MaxCode := UCS4('f');
-  AddRange(Symbol.Symbol.CCL, Range);
 end;
 const
   CClassTrie: array [0..64] of TTrie = (
@@ -2672,32 +2654,6 @@ const
     (Key: #$0074; Len: 1; Next: 64; Setup: 0; Categories: []),
     (Key: #$003A; Len: 1; Next: 65; Setup: 3; Categories: [])
   );
-function TURESearch.SymbolsAreDifferent(A, B: PUcSymbolTableEntry): Boolean;
-begin
-  Result := False;
-  if (A.AType <> B.AType) or (A.Mods <> B.Mods) or (A.Categories <> B.Categories) then
-    Result := True
-  else
-  begin
-    if (A.AType = _URE_CCLASS) or (A.AType = _URE_NCCLASS) then
-    begin
-      if A.Symbol.CCL.RangesUsed <> B.Symbol.CCL.RangesUsed then
-        Result := True
-      else
-      begin
-        if (A.Symbol.CCL.RangesUsed > 0) and
-          not CompareMem(@A.Symbol.CCL.Ranges[0], @B.Symbol.CCL.Ranges[0],
-            SizeOf(TUcRange) * A.Symbol.CCL.RangesUsed) then
-          Result := True;;
-      end;
-    end
-    else
-    begin
-      if (A.AType = _URE_CHAR) and (A.Symbol.Chr <> B.Symbol.Chr) then
-        Result := True;
-    end;
-  end;
-end;
 function TURESearch.MakeExpression(AType, LHS, RHS: SizeInt): SizeInt;
 var
   I: SizeInt;
@@ -3029,87 +2985,6 @@ begin
     end;
   end;
 end;
-procedure TURESearch.MergeEquivalents;
-// merges the DFA states that are equivalent
-var
-  I, J, K,
-  Equal: SizeInt;
-  Done: Boolean;
-  State1, State2,
-  LeftState,
-  RightState: PUcState;
-begin
-  for I := 0 to FUREBuffer.States.StatesUsed - 1 do
-  begin
-    State1 := @FUREBuffer.States.States[I];
-    if State1.ID = SizeInt(I) then
-    begin
-      J := 0;
-      while J < I do
-      begin
-        State2 := @FUREBuffer.States.States[J];
-        if State2.ID = SizeInt(J) then
-        begin
-          FUREBuffer.EquivalentList.EquivalentsUsed := 0;
-          AddEquivalentPair(I, J);
-          Done := False;
-          Equal := 0;
-          while Equal < FUREBuffer.EquivalentList.EquivalentsUsed do
-          begin
-            LeftState := @FUREBuffer.States.States[FUREBuffer.EquivalentList.Equivalents[Equal].Left];
-            RightState := @FUREBuffer.States.States[FUREBuffer.EquivalentList.Equivalents[Equal].Right];
-            if (LeftState.Accepting <> RightState.Accepting) or
-               (LeftState.TransitionsUsed <> RightState.TransitionsUsed) then
-            begin
-              Done := True;
-              Break;
-            end;
-            K := 0;
-            while (K < LeftState.TransitionsUsed) and
-                  (LeftState.Transitions[K].LHS = RightState.Transitions[K].LHS) do
-              Inc(K);
-            if K < LeftState.TransitionsUsed then
-            begin
-              Done := True;
-              Break;
-            end;
-            for K := 0 to LeftState.TransitionsUsed - 1 do
-              AddEquivalentPair(LeftState.Transitions[K].RHS, RightState.Transitions[K].RHS);
-            Inc(Equal);
-          end;
-          if not Done then
-            Break;
-        end;
-        Inc(J);
-      end;
-      if J < I then
-      begin
-        with FUREBuffer do
-        begin
-          for Equal := 0 to EquivalentList.EquivalentsUsed - 1 do
-          begin
-            States.States[EquivalentList.Equivalents[Equal].Right].ID :=
-              States.States[EquivalentList.Equivalents[Equal].Left].ID;
-          end;
-        end;
-      end;
-    end;
-  end;
-  // Renumber the states appropriately
-  State1 := @FUREBuffer.States.States[0];
-  Equal := 0;
-  for I := 0 to FUREBuffer.States.StatesUsed - 1 do
-  begin
-    if State1.ID = SizeInt(I) then
-    begin
-      State1.ID := Equal;
-      Inc(Equal);
-    end
-    else
-      State1.ID := FUREBuffer.States.States[State1.ID].ID;
-    Inc(State1);
-  end;
-end;
 function IsSeparator(C: UCS4): Boolean;
 begin
   Result := (C = $D) or (C = $A) or (C = $2028) or (C = $2029);
@@ -3149,30 +3024,6 @@ procedure TWideStrings.Append(const S: DWWideString);
 begin
   Add(S);
 end;
-procedure TWideStrings.AddStrings(Strings: TStrings);
-var
-  I: Integer;
-  {$IFNDEF SUPPORTS_UNICODE}
-  CP: Word;
-  {$ENDIF ~SUPPORTS_UNICODE}
-begin
-  BeginUpdate;
-  try
-    {$IFNDEF SUPPORTS_UNICODE}
-    CP := CodePageFromLocale(FLanguage);
-    {$ENDIF ~SUPPORTS_UNICODE}
-    for I := 0 to Strings.Count - 1 do
-    begin
-      {$IFDEF SUPPORTS_UNICODE}
-      AddObject(Strings[I], Strings.Objects[I])
-      {$ELSE ~SUPPORTS_UNICODE}
-      AddObject(StringToWideStringEx(Strings[I], CP), Strings.Objects[I])
-      {$ENDIF ~SUPPORTS_UNICODE}
-    end;
-  finally
-    EndUpdate;
-  end;
-end;
 procedure TWideStrings.AddStrings(Strings: TWideStrings);
 var
   I: Integer;
@@ -3184,86 +3035,6 @@ begin
       AddObject(Strings[I], Strings.Objects[I]);
   finally
     EndUpdate;
-  end;
-end;
-procedure TWideStrings.Assign(Source: TPersistent);
-// usual assignment routine, but able to assign wide and small strings
-begin
-  if Source is TWideStrings then
-  begin
-    BeginUpdate;
-    try
-      Clear;
-      AddStrings(TWideStrings(Source));
-    finally
-      EndUpdate;
-    end;
-  end
-  else
-  begin
-    if Source is TStrings then
-    begin
-      BeginUpdate;
-      try
-        Clear;
-        AddStrings(TStrings(Source));
-      finally
-        EndUpdate;
-      end;
-    end
-    else
-      inherited Assign(Source);
-  end;
-end;
-procedure TWideStrings.AssignTo(Dest: TPersistent);
-// need to do also assignment to old style TStrings, but this class doesn't know
-// TWideStrings, so we need to do it from here
-var
-  I: Integer;
-  {$IFNDEF SUPPORTS_UNICODE}
-  CP: Word;
-  {$ENDIF ~SUPPORTS_UNICODE}
-begin
-  if Dest is TStrings then
-  begin
-    with Dest as TStrings do
-    begin
-      BeginUpdate;
-      try
-        {$IFNDEF SUPPORTS_UNICODE}
-        CP := CodePageFromLocale(FLanguage);
-        {$ENDIF SUPPORTS_UNICODE}
-        Clear;
-        for I := 0 to Self.Count - 1 do
-        begin
-          {$IFDEF SUPPORTS_UNICODE}
-          AddObject(Self[I], Self.Objects[I]);
-          {$ELSE ~SUPPORTS_UNICODE}
-          AddObject(WideStringToStringEx(Self[I], CP), Self.Objects[I]);
-          {$ENDIF ~SUPPORTS_UNICODE}
-        end;
-      finally
-        EndUpdate;
-      end;
-    end;
-  end
-  else
-  begin
-    if Dest is TWideStrings then
-    begin
-      with Dest as TWideStrings do
-      begin
-        BeginUpdate;
-        try
-          Clear;
-          AddStrings(Self);
-        finally
-          EndUpdate;
-        end;
-      end;
-    end
-    else
-      inherited AssignTo(Dest);
   end;
 end;
 procedure TWideStrings.BeginUpdate;
@@ -3279,21 +3050,6 @@ end;
 procedure TWideStrings.EndUpdate;
 begin
   Dec(FUpdateCount);
-end;
-function TWideStrings.Equals(Strings: TWideStrings): Boolean;
-var
-  I, Count: Integer;
-begin
-  Assert(Strings <> nil);
-  Result := False;
-  Count := GetCount;
-  if Count <> Strings.GetCount then
-    Exit;
-  { TODO : use internal comparation routine as soon as composition is implemented }
-  for I := 0 to Count - 1 do
-    if Get(I) <> Strings.Get(I) then
-      Exit;
-  Result := True;
 end;
 procedure TWideStrings.Exchange(Index1, Index2: Integer);
 var
@@ -3332,50 +3088,6 @@ function TWideStrings.GetObject(Index: Integer): TObject;
 begin
   Result := nil;
 end;
-function TWideStrings.GetSeparatedText(Separators: DWWideString): DWWideString;
-// Same as GetText but with customizable separator characters.
-var
-  I, L,
-  Size,
-  Count,
-  SepSize: Integer;
-  P: PDWChar;
-  S: DWWideString;
-begin
-  Count := GetCount;
-  SepSize := Length(Separators);
-  Size := 0;
-  for I := 0 to Count - 1 do
-    Inc(Size, Length(Get(I)) + SepSize);
-  // set one separator less, the last line does not need a trailing separator
-  SetLength(Result, Size - SepSize);
-  if Size > 0 then
-  begin
-    P := Pointer(Result);
-    I := 0;
-    while True do
-    begin
-      S := Get(I);
-      L := Length(S);
-      if L <> 0 then
-      begin
-        // add current string
-        System.Move(Pointer(S)^, P^, 2 * L);
-        Inc(P, L);
-      end;
-      Inc(I);
-      if I = Count then
-        Break;
-      // add separators
-      System.Move(Pointer(Separators)^, P^, SizeOf(WideChar) * SepSize);
-      Inc(P, SepSize);
-    end;
-  end;
-end;
-function TWideStrings.GetTextStr: DWWideString;
-begin
-  Result := GetSeparatedText(WideCRLF);
-end;
 function TWideStrings.IndexOfObject(AObject: TObject): Integer;
 begin
   for Result := 0 to GetCount - 1 do
@@ -3410,10 +3122,6 @@ end;
 procedure TWideStrings.SetCapacity(NewCapacity: Integer);
 begin
   // do nothing - descendants may optionally implement this method
-end;
-procedure TWideStrings.WriteData(Writer: TWriter);
-begin
-  Writer.{$IFDEF RTL240_UP}WriteString{$ELSE}WriteWideString{$ENDIF}(GetTextStr);
 end;
 //=== { TWideStringList } ====================================================
 destructor TWideStringList.Destroy;

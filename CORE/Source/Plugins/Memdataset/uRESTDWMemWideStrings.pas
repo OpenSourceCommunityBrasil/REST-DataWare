@@ -125,20 +125,10 @@ type
     FNameValueSeparator: DWChar;
     FLineSeparator: DWWideString;
     FUpdateCount: Integer;
-    function GetCommaText: DWWideString;
-    function GetDelimitedText: DWWideString;
-    function GetName(Index: Integer): DWWideString;
-    function GetValue(const Name: DWWideString): DWWideString;
     procedure ReadData(Reader: TReader);
-    procedure SetCommaText(const Value: DWWideString);
-    procedure SetDelimitedText(const Value: DWWideString);
-    procedure SetValue(const Name, Value: DWWideString);
     procedure WriteData(Writer: TWriter);
-    function GetValueFromIndex(Index: Integer): DWWideString;
-    procedure SetValueFromIndex(Index: Integer; const Value: DWWideString);
   protected
     procedure DefineProperties(Filer: TFiler); override;
-    function ExtractName(const S: DWWideString): DWWideString;
     function GetP(Index: Integer): PWideString; virtual; abstract;
     function Get(Index: Integer): DWWideString;
     function GetCapacity: Integer; virtual;
@@ -151,7 +141,6 @@ type
     procedure SetTextStr(const Value: DWWideString); virtual;
     procedure SetUpdateState(Updating: Boolean); virtual;
     property UpdateCount: Integer read FUpdateCount;
-    function CompareStrings(const S1, S2: DWWideString): Integer; virtual;
     procedure AssignTo(Dest: TPersistent); override;
   public
     constructor Create;
@@ -170,35 +159,21 @@ type
     function Equals(Strings: TJclWideStrings): Boolean; {$IFDEF RTL200_UP}reintroduce; {$ENDIF RTL200_UP}overload;
     function Equals(Strings: TStrings): Boolean; {$IFDEF RTL200_UP}reintroduce; {$ENDIF RTL200_UP}overload;
     procedure Exchange(Index1, Index2: Integer); virtual;
-    function GetText: PDWChar; virtual;
-    function IndexOf(const S: DWWideString): Integer; virtual;
-    function IndexOfName(const Name: DWWideString): Integer; virtual;
     function IndexOfObject(AObject: TObject): Integer; virtual;
     procedure Insert(Index: Integer; const S: DWWideString); virtual;
     procedure InsertObject(Index: Integer; const S: DWWideString;
       AObject: TObject); virtual;
-    procedure LoadFromFile(const FileName: TFileName;
-      WideFileOptions: TWideFileOptions = []); virtual;
-    procedure LoadFromStream(Stream: TStream;
-      WideFileOptions: TWideFileOptions = []); virtual;
     procedure Move(CurIndex, NewIndex: Integer); virtual;
     procedure SaveToFile(const FileName: TFileName;
       WideFileOptions: TWideFileOptions = []); virtual;
     procedure SaveToStream(Stream: TStream;
       WideFileOptions: TWideFileOptions = []); virtual;
     procedure SetText(Text: PDWChar); virtual;
-    function GetDelimitedTextEx(ADelimiter, AQuoteChar: DWChar): DWWideString;
-    procedure SetDelimitedTextEx(ADelimiter, AQuoteChar: DWChar; const Value: DWWideString);
     property Capacity: Integer read GetCapacity write SetCapacity;
-    property CommaText: DWWideString read GetCommaText write SetCommaText;
     property Count: Integer read GetCount;
     property Delimiter: DWChar read FDelimiter write FDelimiter;
-    property DelimitedText: DWWideString read GetDelimitedText write SetDelimitedText;
-    property Names[Index: Integer]: DWWideString read GetName;
     property Objects[Index: Integer]: TObject read GetObject write PutObject;
     property QuoteChar: DWChar read FQuoteChar write FQuoteChar;
-    property Values[const Name: DWWideString]: DWWideString read GetValue write SetValue;
-    property ValueFromIndex[Index: Integer]: DWWideString read GetValueFromIndex write SetValueFromIndex;
     property NameValueSeparator: DWChar read FNameValueSeparator write FNameValueSeparator;
     property LineSeparator: DWWideString read FLineSeparator write FLineSeparator;
     property PStrings[Index: Integer]: PWideString read GetP;
@@ -219,8 +194,6 @@ type
     FCaseSensitive: Boolean;
     FOnChange: TNotifyEvent;
     FOnChanging: TNotifyEvent;
-    procedure SetSorted(Value: Boolean);
-    procedure SetCaseSensitive(const Value: Boolean);
   protected
     function GetItem(Index: Integer): PWStringItem;
     procedure Changed; virtual;
@@ -233,24 +206,17 @@ type
     procedure PutObject(Index: Integer; AObject: TObject); override;
     procedure SetCapacity(NewCapacity: Integer); override;
     procedure SetUpdateState(Updating: Boolean); override;
-    function CompareStrings(const S1, S2: DWWideString): Integer; override;
   public
     constructor Create;
     destructor Destroy; override;
-    function AddObject(const S: DWWideString; AObject: TObject): Integer; override;
     procedure Clear; override;
     procedure Delete(Index: Integer); override;
     procedure Exchange(Index1, Index2: Integer); override;
-    function Find(const S: DWWideString; var Index: Integer): Boolean; virtual;
     // Find() also works with unsorted lists
-    function IndexOf(const S: DWWideString): Integer; override;
     procedure InsertObject(Index: Integer; const S: DWWideString;
       AObject: TObject); override;
-    procedure Sort; virtual;
     procedure CustomSort(Compare: TJclWideStringListSortCompare); virtual;
     property Duplicates: TDuplicates read FDuplicates write FDuplicates;
-    property Sorted: Boolean read FSorted write SetSorted;
-    property CaseSensitive: Boolean read FCaseSensitive write SetCaseSensitive;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
   end;
@@ -284,7 +250,6 @@ function StrBufSizeW(const Str: PDWChar): SizeInt;
 procedure StrDisposeW(Str: PDWChar);
 procedure StrDisposeAndNilW(var Str: PDWChar);
 // DWWideString functions
-function WideCompareText(const S1, S2: DWWideString): SizeInt;
 function WideUpperCase(const S: DWWideString): DWWideString;
 function WideLowerCase(const S: DWWideString): DWWideString;
 function TrimW(const S: DWWideString): DWWideString;
@@ -609,19 +574,6 @@ begin
   Result := Copy(S, 1, I);
 end;
 {$ENDIF ~RTL150_UP}
-function WideCompareText(const S1, S2: DWWideString): SizeInt;
-begin
-  {$IFDEF MSWINDOWS}
-  if Win32Platform = VER_PLATFORM_WIN32_WINDOWS then
-    Result := AnsiCompareText(string(S1), string(S2))
-  else
-    Result := CompareStringW(LOCALE_USER_DEFAULT, NORM_IGNORECASE,
-                             PChar(S1), Length(S1), PChar(S2), Length(S2)) - 2;
-  {$ELSE ~MSWINDOWS}
-  { TODO : Don't cheat here }
-  Result := CompareText(S1, S2);
-  {$ENDIF MSWINDOWS}
-end;
 function WideUpperCase(const S: DWWideString): DWWideString;
 begin
   Result := S;
@@ -785,10 +737,6 @@ begin
     SetUpdateState(True);
   Inc(FUpdateCount);
 end;
-function TJclWideStrings.CompareStrings(const S1, S2: DWWideString): Integer;
-begin
-  Result := WideCompareText(S1, S2);
-end;
 function TJclWideStrings.CreateAnsiStringList: TStrings;
 var
   I: Integer;
@@ -868,17 +816,6 @@ begin
     EndUpdate;
   end;
 end;
-function TJclWideStrings.ExtractName(const S: DWWideString): DWWideString;
-var
-  Index: Integer;
-begin
-  Result := S;
-  Index := WidePos(NameValueSeparator, Result);
-  if Index <> 0 then
-    SetLength(Result, Index - 1)
-  else
-    SetLength(Result, 0);
-end;
 function TJclWideStrings.Get(Index: Integer): DWWideString;
 begin
   Result := GetP(Index)^;
@@ -887,65 +824,9 @@ function TJclWideStrings.GetCapacity: Integer;
 begin
   Result := Count;
 end;
-function TJclWideStrings.GetCommaText: DWWideString;
-begin
-  Result := GetDelimitedTextEx(',', '"');
-end;
-function TJclWideStrings.GetDelimitedText: DWWideString;
-begin
-  Result := GetDelimitedTextEx(FDelimiter, FQuoteChar);
-end;
-function TJclWideStrings.GetDelimitedTextEx(ADelimiter, AQuoteChar: DWChar): DWWideString;
-var
-  S: DWWideString;
-  P: PDWChar;
-  I, Num: Integer;
-begin
-  Num := GetCount;
-  if (Num = 1) and (GetP(0)^ = '') then
-    Result := AQuoteChar + '' + AQuoteChar // Compiler wants it this way
-  else
-  begin
-    Result := '';
-    for I := 0 to Count - 1 do
-    begin
-      S := GetP(I)^;
-      P := PDWChar(S);
-      while True do
-      begin
-        case P[0] of
-          DWChar(0)..WideChar(32):
-            Inc(P);
-        else
-          if (P[0] = AQuoteChar) or (P[0] = ADelimiter) then
-            Inc(P)
-          else
-            Break;
-        end;
-      end;
-      if P[0] <> DWChar(0) then
-        S := WideQuotedStr(S, AQuoteChar);
-      Result := Result + S + ADelimiter;
-    end;
-    System.Delete(Result, Length(Result), 1);
-  end;
-end;
-function TJclWideStrings.GetName(Index: Integer): DWWideString;
-var
-  I: Integer;
-begin
-  Result := GetP(Index)^;
-  I := WidePos(FNameValueSeparator, Result);
-  if I > 0 then
-    SetLength(Result, I - 1);
-end;
 function TJclWideStrings.GetObject(Index: Integer): TObject;
 begin
   Result := nil;
-end;
-function TJclWideStrings.GetText: PDWChar;
-begin
-  Result := StrNewW(GetTextStr);
 end;
 function TJclWideStrings.GetTextStr: DWWideString;
 var
@@ -976,41 +857,6 @@ begin
     end;
   end;
 end;
-function TJclWideStrings.GetValue(const Name: DWWideString): DWWideString;
-var
-  Idx: Integer;
-begin
-  Idx := IndexOfName(Name);
-  if Idx >= 0 then
-    Result := GetValueFromIndex(Idx)
-  else
-    Result := '';
-end;
-function TJclWideStrings.GetValueFromIndex(Index: Integer): DWWideString;
-var
-  I: Integer;
-begin
-  Result := GetP(Index)^;
-  I := WidePos(FNameValueSeparator, Result);
-  if I > 0 then
-    System.Delete(Result, 1, I)
-  else
-    Result := '';
-end;
-function TJclWideStrings.IndexOf(const S: DWWideString): Integer;
-begin
-  for Result := 0 to Count - 1 do
-    if CompareStrings(GetP(Result)^, S) = 0 then
-      Exit;
-  Result := -1;
-end;
-function TJclWideStrings.IndexOfName(const Name: DWWideString): Integer;
-begin
-  for Result := 0 to Count - 1 do
-    if CompareStrings(Names[Result], Name) = 0 then
-      Exit;
-  Result := -1;
-end;
 function TJclWideStrings.IndexOfObject(AObject: TObject): Integer;
 begin
   for Result := 0 to Count - 1 do
@@ -1024,51 +870,6 @@ begin
 end;
 procedure TJclWideStrings.InsertObject(Index: Integer; const S: DWWideString; AObject: TObject);
 begin
-end;
-procedure TJclWideStrings.LoadFromFile(const FileName: TFileName;
-  WideFileOptions: TWideFileOptions = []);
-var
-  Stream: TFileStream;
-begin
-  Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
-  try
-    LoadFromStream(Stream, WideFileOptions);
-  finally
-    Stream.Free;
-  end;
-end;
-procedure TJclWideStrings.LoadFromStream(Stream: TStream;
-  WideFileOptions: TWideFileOptions = []);
-var
-  AnsiS: AnsiString;
-  WideS: DWWideString;
-  WC: DWChar;
-begin
-  BeginUpdate;
-  try
-    Clear;
-    WC := #0;
-    Stream.Read(WC, SizeOf(WC));
-    if (foAnsiFile in WideFileOptions) and (Hi(Word(WC)) <> 0) and (WC <> BOM_LSB_FIRST) and (WC <> BOM_MSB_FIRST) then
-    begin
-      Stream.Seek(-SizeOf(WC), soFromCurrent);
-      SetLength(AnsiS, (Stream.Size - Stream.Position) div SizeOf(AnsiChar));
-      Stream.Read(AnsiS[1], Length(AnsiS) * SizeOf(AnsiChar));
-      SetTextStr(WideString(AnsiS)); // explicit Unicode conversion
-    end
-    else
-    begin
-      if (WC <> BOM_LSB_FIRST) and (WC <> BOM_MSB_FIRST) then
-        Stream.Seek(-SizeOf(WC), soFromCurrent);
-      SetLength(WideS, (Stream.Size - Stream.Position + 1) div SizeOf(WideChar));
-      Stream.Read(WideS[1], Length(WideS) * SizeOf(WideChar));
-      if WC = BOM_MSB_FIRST then
-        SwapWordByteOrder(PWideChar(WideS), Length(WideS));
-      SetTextStr(WideS);
-    end;
-  finally
-    EndUpdate;
-  end;
 end;
 procedure TJclWideStrings.Move(CurIndex, NewIndex: Integer);
 var
@@ -1140,58 +941,6 @@ end;
 procedure TJclWideStrings.SetCapacity(NewCapacity: Integer);
 begin
 end;
-procedure TJclWideStrings.SetCommaText(const Value: DWWideString);
-begin
-  SetDelimitedTextEx(',', '"', Value);
-end;
-procedure TJclWideStrings.SetDelimitedText(const Value: DWWideString);
-begin
-  SetDelimitedTextEx(Delimiter, QuoteChar, Value);
-end;
-procedure TJclWideStrings.SetDelimitedTextEx(ADelimiter, AQuoteChar: DWChar;
-  const Value: DWWideString);
-var
-  P, P1: PDWChar;
-  S: DWWideString;
-  procedure IgnoreWhiteSpace(var P: PDWChar);
-  begin
-    while True do
-      case P^ of
-        DWChar(1)..WideChar(32):
-          Inc(P);
-      else
-        Break;
-      end;
-  end;
-begin
-  BeginUpdate;
-  try
-    Clear;
-    P := PDWChar(Value);
-    IgnoreWhiteSpace(P);
-    while P[0] <> DWChar(0) do
-    begin
-      if P[0] = AQuoteChar then
-        S := WideExtractQuotedStr(P, AQuoteChar)
-      else
-      begin
-        P1 := P;
-        while (P[0] > DWChar(32)) and (P[0] <> ADelimiter) do
-          Inc(P);
-        SetString(S, P1, P - P1);
-      end;
-      Add(S);
-      IgnoreWhiteSpace(P);
-      if P[0] = ADelimiter then
-      begin
-        Inc(P);
-        IgnoreWhiteSpace(P);
-      end;
-    end;
-  finally
-    EndUpdate;
-  end;
-end;
 procedure TJclWideStrings.SetText(Text: PDWChar);
 begin
   SetTextStr(Text);
@@ -1243,36 +992,6 @@ end;
 procedure TJclWideStrings.SetUpdateState(Updating: Boolean);
 begin
 end;
-procedure TJclWideStrings.SetValue(const Name, Value: DWWideString);
-var
-  Idx: Integer;
-begin
-  Idx := IndexOfName(Name);
-  if Idx >= 0 then
-    SetValueFromIndex(Idx, Value)
-  else
-  if Value <> '' then
-    Add(Name + NameValueSeparator + Value);
-end;
-procedure TJclWideStrings.SetValueFromIndex(Index: Integer; const Value: DWWideString);
-var
-  S: DWWideString;
-  I: Integer;
-begin
-  if Value = '' then
-    Delete(Index)
-  else
-  begin
-    if Index < 0 then
-      Index := Add('');
-    S := GetP(Index)^;
-    I := WidePos(NameValueSeparator, S);
-    if I > 0 then
-      System.Delete(S, I, MaxInt);
-    S := S + NameValueSeparator + Value;
-    Put(Index, S);
-  end;
-end;
 procedure TJclWideStrings.WriteData(Writer: TWriter);
 var
   I: Integer;
@@ -1296,20 +1015,6 @@ begin
   Clear;
   FList.Free;
   inherited Destroy;
-end;
-function TJclWideStringList.AddObject(const S: DWWideString; AObject: TObject): Integer;
-begin
-  if not Sorted then
-    Result := Count
-  else
-  if Find(S, Result) then
-    case Duplicates of
-      dupIgnore:
-        Exit;
-      dupError:
-        raise EListError.CreateRes(@SDuplicateString);
-    end;
-  InsertObject(Result, S, AObject);
 end;
 procedure TJclWideStringList.Changed;
 begin
@@ -1337,13 +1042,6 @@ begin
   FList.Clear;
   if FUpdateCount = 0 then
     Changed;
-end;
-function TJclWideStringList.CompareStrings(const S1, S2: DWWideString): Integer;
-begin
-  if CaseSensitive then
-    Result := WideCompareStr(S1, S2)
-  else
-    Result := WideCompareText(S1, S2);
 end;
 threadvar
   CustomSortList: TJclWideStringList;
@@ -1393,40 +1091,6 @@ begin
   if FUpdateCount = 0 then
     Changed;
 end;
-function TJclWideStringList.Find(const S: DWWideString; var Index: Integer): Boolean;
-var
-  L, H, I, C: Integer;
-begin
-  Result := False;
-  if Sorted then
-  begin
-    L := 0;
-    H := Count - 1;
-    while L <= H do
-    begin
-      I := (L + H) shr 1;
-      C := CompareStrings(GetItem(I).FString, S);
-      if C < 0 then
-        L := I + 1
-      else
-      begin
-        H := I - 1;
-        if C = 0 then
-        begin
-          Result := True;
-          if Duplicates <> dupAccept then
-            L := I;
-        end;
-      end;
-    end;
-    Index := L;
-  end
-  else
-  begin
-    Index := IndexOf(S);
-    Result := Index <> -1;
-  end;
-end;
 function TJclWideStringList.GetCapacity: Integer;
 begin
   Result := FList.Capacity;
@@ -1446,22 +1110,6 @@ end;
 function TJclWideStringList.GetP(Index: Integer): PWideString;
 begin
   Result := Addr(GetItem(Index).FString);
-end;
-function TJclWideStringList.IndexOf(const S: DWWideString): Integer;
-begin
-  if Sorted then
-  begin
-    Result := -1;
-    if not Find(S, Result) then
-      Result := -1;
-  end
-  else
-  begin
-    for Result := 0 to Count - 1 do
-      if CompareStrings(GetItem(Result).FString, S) = 0 then
-        Exit;
-    Result := -1;
-  end;
 end;
 procedure TJclWideStringList.InsertObject(Index: Integer; const S: DWWideString;
   AObject: TObject);
@@ -1499,46 +1147,12 @@ procedure TJclWideStringList.SetCapacity(NewCapacity: Integer);
 begin
   FList.Capacity := NewCapacity;
 end;
-procedure TJclWideStringList.SetCaseSensitive(const Value: Boolean);
-begin
-  if Value <> FCaseSensitive then
-  begin
-    FCaseSensitive := Value;
-    if Sorted then
-    begin
-      Sorted := False;
-      Sorted := True; // re-sort
-    end;
-  end;
-end;
-procedure TJclWideStringList.SetSorted(Value: Boolean);
-begin
-  if Value <> FSorted then
-  begin
-    FSorted := Value;
-    if FSorted then
-    begin
-      FSorted := False;
-      Sort;
-      FSorted := True;
-    end;
-  end;
-end;
 procedure TJclWideStringList.SetUpdateState(Updating: Boolean);
 begin
   if Updating then
     Changing
   else
     Changed;
-end;
-function DefaultSort(List: TJclWideStringList; Index1, Index2: Integer): Integer;
-begin
-  Result := List.CompareStrings(List.GetItem(Index1).FString, List.GetItem(Index2).FString);
-end;
-procedure TJclWideStringList.Sort;
-begin
-  if not Sorted then
-    CustomSort(DefaultSort);
 end;
 {$ENDIF ~SUPPORTS_UNICODE}
 procedure AllocateMultiSz(var Dest: PWideMultiSz; Len: SizeInt);

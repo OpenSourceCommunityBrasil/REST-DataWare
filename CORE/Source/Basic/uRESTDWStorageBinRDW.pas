@@ -31,7 +31,7 @@ var
   rc : LongInt;
   i : LongInt;
   j : integer;
-  s : ansistring;
+  s : DWString;
   ft : Byte;
   b : boolean;
   vFieldDef : TFieldDef;
@@ -97,7 +97,7 @@ var
   J : integer;
   R : Real;
   E : Extended;
-  S : ansistring;
+  S : DWString;
   Cr : Currency;
   P : TMemoryStream;
   Bool : boolean;
@@ -122,8 +122,8 @@ begin
                     {$IFDEF FPC}
                      Stream.Read(Pointer(S)^, L);
                      if EncodeStrs then
-                       S := DecodeStrings(S);
-                     S := GetStringEncode(S, FDatabaseCharSet);
+                       S := DecodeStrings(S, csUndefined);
+                     S := GetStringEncode(S, csUndefined);
                     {$ELSE}
                      Stream.Read(S[InitStrPos], L);
                      if EncodeStrs then
@@ -142,13 +142,21 @@ begin
                   vField.AsInteger := J;
       end;
       dwftSingle   : begin
-                  Stream.Read(R, Sizeof(Real));
-                  vField.AsSingle := R;
-      end;
+                      Stream.Read(R, Sizeof(Real));
+                      {$IFDEF FPC}
+                       vField.AsFloat := R;
+                      {$ELSE}
+                       vField.AsSingle  := R;
+                      {$ENDIF}
+                     end;
       dwftExtended : begin
-                  Stream.Read(R, Sizeof(Real));
-                  vField.AsExtended := R;
-      end;
+                      Stream.Read(R, Sizeof(Real));
+                      {$IFDEF FPC}
+                       vField.AsFloat := R;
+                      {$ELSE}
+                       vField.AsExtended := R;
+                      {$ENDIF}
+                     end;
       dwftFloat    : begin
                   Stream.Read(R, Sizeof(Real));
                   vField.AsFloat := R;
@@ -206,8 +214,8 @@ begin
                     {$IFDEF FPC}
                      Stream.Read(Pointer(S)^, L);
                      if EncodeStrs then
-                       S := DecodeStrings(S);
-                     S := GetStringEncode(S, FDatabaseCharSet);
+                       S := DecodeStrings(S, csUndefined);
+                     S := GetStringEncode(S, csUndefined);
                     {$ELSE}
                      Stream.Read(S[InitStrPos], L);
                      if EncodeStrs then
@@ -224,7 +232,7 @@ procedure TRESTDWStorageBinRDW.SaveDatasetToStream(dataset: TDataset; var stream
 var
   i : integer;
   rc : Longint;
-  s : ansistring;
+  s : DWString;
   j : integer;
   b : boolean;
   y : byte;
@@ -298,7 +306,7 @@ end;
 procedure TRESTDWStorageBinRDW.SaveRecordToStream(Dataset: TDataset; stream: TStream);
 var
   i  : integer;
-  s  : ansistring;
+  s  : DWString;
   L  : longint;
   J  : integer;
   R  : Real;
@@ -324,7 +332,7 @@ Begin
       ftString : begin
                   S := Dataset.Fields[I].AsString;
                   if EncodeStrs then
-                    S := EncodeStrings(S);
+                    S := EncodeStrings(S{$IFDEF FPC}, csUndefined{$ENDIF});
                   L := Length(S);
                   Stream.Write(L, Sizeof(L));
                   {$IFNDEF FPC}
@@ -424,7 +432,7 @@ Begin
       else begin
                   S := Dataset.Fields[I].AsString;
                   if EncodeStrs then
-                    S := EncodeStrings(S);
+                    S := EncodeStrings(S{$IFDEF FPC}, csUndefined{$ENDIF});
                   L := Length(S);
                   Stream.Write(L, Sizeof(L));
                   {$IFNDEF FPC}

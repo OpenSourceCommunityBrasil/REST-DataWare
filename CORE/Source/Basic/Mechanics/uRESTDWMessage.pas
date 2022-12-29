@@ -433,7 +433,7 @@ Begin
   LDate := Now
  Else
   LDate := Self.Date;
- FLastGeneratedHeaders.Values['Date'] := LocalDateTimeToGMT(LDate); {do not localize}
+// FLastGeneratedHeaders.Values['Date'] := LocalDateTimeToGMT(LDate); {do not localize}
  If Priority <> mpNormal Then
   Begin
    FLastGeneratedHeaders.Values['Priority'] := cPriorityStrs[Priority]; {do not localize}
@@ -494,7 +494,7 @@ Begin
   ContentTransferEncoding := Headers.Values['Content-Transfer-Encoding']; {do not localize}
   ContentDisposition := Headers.Values['Content-Disposition'];  {do not localize}
   References := Headers.Values['References']; {do not localize}
-  Date  := GMTToLocalDateTime(Headers.Values['Date']); {do not localize}
+//  Date  := GMTToLocalDateTime(Headers.Values['Date']); {do not localize}
   FText := Headers.Values['Sender']; {do not localize}
   If Length(Headers.Values['X-Priority']) > 0 Then
    Priority := GetMsgPriority(Headers.Values['X-Priority'])

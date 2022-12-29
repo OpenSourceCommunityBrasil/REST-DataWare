@@ -3,7 +3,7 @@ unit uRESTDWZlib;
 interface
 
 Uses
-{$IFDEF FPC}zstream, {$ENDIF}
+{$IFDEF FPC}zstream, base64,{$ENDIF}
   SysUtils, Classes,
   zlib,
   uRESTDWDataUtils, uRESTDWTools, uRESTDWConsts;

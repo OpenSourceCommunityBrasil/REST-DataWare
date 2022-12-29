@@ -403,13 +403,10 @@ type
     destructor Destroy; override;
     procedure Flush; virtual;
     function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; virtual;
-    function PeekChar(out Buffer: Char): Boolean;
     function PeekUCS4(out Buffer: UCS4): Boolean;
     function PeekWideChar(out Buffer: WideChar): Boolean;
-    function ReadChar(out Buffer: Char): Boolean;
     function ReadUCS4(out Buffer: UCS4): Boolean;
     function ReadWideChar(out Buffer: WideChar): Boolean;
-    function WriteChar(Value: Char): Boolean;
     function WriteUCS4(Value: UCS4): Boolean;
     function WriteWideChar(Value: WideChar): Boolean;
     function SkipBOM: LongInt; virtual;
@@ -1899,14 +1896,6 @@ begin
   FStrPeekBufferNext := FStream.Seek(0, soCurrent);
   Result := (FStrPeekPosition >= FStrPeekBufferPosition) and (FStrPeekPosition < (FStrPeekBufferPosition + FStrPeekBufferCurrentSize));
 end;
-function TJclStringStream.PeekChar(out Buffer: Char): Boolean;
-var
-  Ch: UCS4;
-begin
-  Result := PeekUCS4(Ch);
-  if Result then
-    Buffer := UCS4ToChar(Ch);
-end;
 function TJclStringStream.PeekUCS4(out Buffer: UCS4): Boolean;
 begin
   if (FStrPeekPosition >= FStrPeekBufferPosition) and (FStrPeekPosition < (FStrPeekBufferPosition + FStrPeekBufferCurrentSize)) then
@@ -1942,14 +1931,6 @@ begin
   Result := PeekUCS4(Ch);
   if Result then
     Buffer := UCS4ToWideChar(Ch);
-end;
-function TJclStringStream.ReadChar(out Buffer: Char): Boolean;
-var
-  Ch: UCS4;
-begin
-  Result := ReadUCS4(Ch);
-  if Result then
-    Buffer := UCS4ToChar(Ch);
 end;
 function TJclStringStream.ReadUCS4(out Buffer: UCS4): Boolean;
 begin
@@ -2037,10 +2018,6 @@ begin
   else
     Result := 0;
   InvalidateBuffers;
-end;
-function TJclStringStream.WriteChar(Value: Char): Boolean;
-begin
-  Result := WriteUCS4(CharToUCS4(Value));
 end;
 function TJclStringStream.WriteUCS4(Value: UCS4): Boolean;
 var

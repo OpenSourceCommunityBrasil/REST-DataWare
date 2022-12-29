@@ -27,6 +27,9 @@ interface
 uses
   SysUtils, Classes, TypInfo;
 const
+  {$IFDEF FPC}
+  CM_BASE = $B000;
+  {$ENDIF}
   { JvEditor }
   JvEditorCompletionChars = #8'0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm_';
   { Various units }
@@ -109,10 +112,7 @@ const
   {$IFDEF DELPHI28}
   SDelphiKey = 'Software\Embarcadero\BDS\22.0';
   {$ENDIF DELPHI27}
-  {$IF not declared(SDelphiKey)}
-    {$MESSAGE FATAL 'Declaration for SDelphiKey is missing'}
-  {$IFEND}
-  
+
   { JvDataProvider constants }
   { Consumer attributes }
   DPA_RenderDisabledAsGrayed = 1;
@@ -159,7 +159,7 @@ const
   {$ENDIF UNIX}
   {const Separators is used in GetWordOnPos, JvUtils.ReplaceStrings and SubWord}
   Separators: TSysCharSet = [#00, ' ', '-', #13, #10, '.', ',', '/', '\', '#', '"', '''',
-    ':', '+', '%', '*', '(', ')', ';', '=', '{', '}', '[', ']', '{', '}', '<', '>'];
+    ':', '+', '%', '*', '(', ')', ';', '=', '{', '}', '[', ']', '<', '>'];
   DigitChars = ['0'..'9'];
 const
   ROP_DSPDxax = $00E20746;

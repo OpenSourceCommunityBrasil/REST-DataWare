@@ -393,8 +393,8 @@ function AddStringToStrings(const S: DWString; Strings: TJclAnsiStrings; const U
 function FileToString(const FileName: TFileName): DWString;
 procedure StringToFile(const FileName: TFileName; const Contents: DWString; Append: Boolean = False);
 function StrToken(var S: DWString; Separator: DWChar): DWString;
-procedure StrTokenToStrings(S: DWString; Separator: DWChar; const List: TJclAnsiStrings);Overload;
-procedure StrTokenToStrings(S: string; Separator: Char; const List: TStrings);Overload;
+//procedure StrTokenToStrings(S: DWString; Separator: DWChar; const List: TJclAnsiStrings);Overload;
+//procedure StrTokenToStrings(S: string; Separator: Char; const List: TStrings);Overload;
 procedure StrNormIndex(const StrLen: SizeInt; var Index: SizeInt; var Count: SizeInt); overload;
 function ArrayOf(List: TJclAnsiStrings): TDynStringArray; overload;
 // internal structures published to make function inlining working
@@ -2263,45 +2263,26 @@ begin
   end;
 end;
 
-procedure StrTokenToStrings(S: string; Separator: Char; const List: TStrings);
-var
-  Token: string;
-begin
-  Assert(List <> nil);
-  if List = nil then
-    Exit;
-  List.BeginUpdate;
-  try
-    List.Clear;
-    while S <> '' do
-    begin
-      Token := uRESTDWMemStringsB.StrToken(S, Separator);
-      List.Add(Token);
-    end;
-  finally
-    List.EndUpdate;
-  end;
-end;
+//procedure StrTokenToStrings(S: string; Separator: Char; const List: TStrings);
+//var
+//  Token: string;
+//begin
+//  Assert(List <> nil);
+//  if List = nil then
+//    Exit;
+//  List.BeginUpdate;
+//  try
+//    List.Clear;
+//    while S <> '' do
+//    begin
+//      Token := uRESTDWMemStringsB.StrToken(S, Separator);
+//      List.Add(Token);
+//    end;
+//  finally
+//    List.EndUpdate;
+//  end;
+//end;
 
-procedure StrTokenToStrings(S: DWString; Separator: DWChar; const List: TJclAnsiStrings);
-var
-  Token: DWString;
-begin
-  Assert(List <> nil);
-  if List = nil then
-    Exit;
-  List.BeginUpdate;
-  try
-    List.Clear;
-    while S <> '' do
-    begin
-      Token := StrToken(S, Separator);
-      List.Add(Token);
-    end;
-  finally
-    List.EndUpdate;
-  end;
-end;
 procedure StrNormIndex(const StrLen: SizeInt; var Index: SizeInt; var Count: SizeInt); overload;
 begin
   Index := Max(1, Min(Index, StrLen + 1));

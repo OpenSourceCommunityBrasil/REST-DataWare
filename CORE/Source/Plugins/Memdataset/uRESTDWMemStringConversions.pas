@@ -97,20 +97,7 @@ function UCS4CharCount(const S: TUCS4Array): SizeInt;
 // if UNICODE_SILENT_FAILURE is not defined and an invalid UTFX sequence is detected, an exception is raised
 // returns True on success and Value contains UCS4 character that was read
 function UCS4ToWideChar(Value: UCS4): WideChar;
-function UCS4ToChar(Value: UCS4): Char; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
 function WideCharToUCS4(Value: WideChar): UCS4;
-function CharToUCS4(Value: Char): UCS4; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF SUPPORTS_INLINE}
-{$IFDEF UNITVERSIONING}
-const
-  UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL$';
-    Revision: '$Revision$';
-    Date: '$Date$';
-    LogPath: 'JCL\source\common';
-    Extra: '';
-    Data: nil
-    );
-{$ENDIF UNITVERSIONING}
 implementation
 uses
   {$IFDEF HAS_UNITSCOPE}
@@ -889,7 +876,7 @@ begin
       // 7 bits to store
       if (StrPos > 0) and (StrPos <= StrLength) then
       begin
-        PDWString(S[StrPos])^ := DWChar(Ch);
+        PDWString(@S[StrPos])^ := DWChar(Ch);
         Inc(StrPos);
       end
       else
@@ -1375,30 +1362,8 @@ begin
   else
     Result := WideChar(UCS4ReplacementCharacter);
 end;
-function UCS4ToChar(Value: UCS4): Char;
-begin
-  {$IFDEF SUPPORTS_UNICODE}
-  Result := UCS4ToWideChar(Value);
-  {$ELSE ~SUPPORTS_UNICODE}
-  Result := UCS4ToAnsiChar(Value);
-  {$ENDIF ~SUPPORTS_UNICODE}
-end;
 function WideCharToUCS4(Value: WideChar): UCS4;
 begin
   Result := UCS4(Value);
 end;
-function CharToUCS4(Value: Char): UCS4;
-begin
-  {$IFDEF SUPPORTS_UNICODE}
-  Result := WideCharToUCS4(Value);
-  {$ELSE ~SUPPORTS_UNICODE}
-  Result := DWCharToUCS4(Value);
-  {$ENDIF ~SUPPORTS_UNICODE}
-end;
-{$IFDEF UNITVERSIONING}
-initialization
-  RegisterUnitVersion(HInstance, UnitVersioning);
-finalization
-  UnregisterUnitVersion(HInstance);
-{$ENDIF UNITVERSIONING}
 end.

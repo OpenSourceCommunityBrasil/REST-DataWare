@@ -143,7 +143,7 @@ const
 {$ENDIF UNITVERSIONING}
 implementation
 uses
-  DBConsts, Math,
+  Math,
   {$IFDEF HAS_UNIT_SYSTEM_UITYPES}
   System.UITypes,
   {$ENDIF}
@@ -336,7 +336,13 @@ end;
 function CreateLocate(DataSet: TDataSet): TJvLocateObject;
 begin
   if Assigned(CreateLocateObject) then
-    Result := CreateLocateObject
+   Begin
+    {$IFDEF FPC}
+     Result := CreateLocateObject();
+    {$ELSE}
+     Result := CreateLocateObject;
+    {$ENDIF}
+   End
   else
     Result := TJvLocateObject.Create;
   if (Result <> nil) and (DataSet <> nil) then
@@ -348,7 +354,10 @@ function DataSetLocateThrough(DataSet: TDataSet; const KeyFields: string;
 var
   FieldCount: Integer;
   Fields: TList{$IFDEF RTL240_UP}<TField>{$ENDIF RTL240_UP};
-  Bookmark: {$IFDEF RTL200_UP}TBookmark{$ELSE}TBookmarkStr{$ENDIF RTL200_UP};
+  Bookmark: {$IFDEF FPC}TBookmark
+            {$ELSE}
+            {$IFDEF RTL200_UP}TBookmark{$ELSE}TBookmarkStr{$ENDIF RTL200_UP}
+            {$ENDIF};
   function CompareField(Field: TField; const Value: Variant): Boolean;
   var
     S: string;
@@ -499,7 +508,7 @@ begin
     end;
   end
   else
-    DatabaseErrorFmt(SFieldTypeMismatch, [Field.DisplayName]);
+    DatabaseErrorFmt('Field %s TypeMismatch', [Field.DisplayName]);
 end;
 { Save and restore DataSet Fields layout }
 function DataSetSectionName(DataSet: TDataSet): string;
@@ -568,7 +577,7 @@ end;
 function FormatSQLNumericRange(const FieldName: string;
   LowValue, HighValue, LowEmpty, HighEmpty: Double; Inclusive: Boolean): string;
 const
-  Operators: array[Boolean, 1..2] of string[2] = (('>', '<'), ('>=', '<='));
+  Operators: array[Boolean, 1..2] of string = (('>', '<'), ('>=', '<='));
 begin
   Result := TrueExpr;
   if (LowValue = HighValue) and (LowValue <> LowEmpty) then
@@ -599,7 +608,7 @@ begin
   if not Field.ReadOnly and not Field.Calculated and Field.IsNull then
   begin
     Field.FocusControl;
-    DatabaseErrorFmt(SFieldRequired, [Field.DisplayName]);
+    DatabaseErrorFmt('Field %s Required', [Field.DisplayName]);
   end;
 end;
 procedure CheckRequiredFields(const Fields: array of TField);
@@ -631,7 +640,7 @@ var
   F, FSrc: TField;
 begin
   if not (Dest.State in dsEditModes) then
-    _DBError(SNotEditing);
+    _DBError('Not Editing');
   if ByName then
   begin
     for I := 0 to Source.FieldCount - 1 do

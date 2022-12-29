@@ -306,12 +306,8 @@ Uses
  Function  MakeTempFilename       (Const APath          : TFileName = '')  : TFileName;
  Function  CopyFileTo             (Const Source,
                                    Destination          : TFileName)       : Boolean;
- Function  OffsetFromUTC                                : TDateTime;
  Function  UTCOffsetToStr         (Const AOffset        : TDateTime;
                                    Const AUseGMTStr     : Boolean = False) : String;
- Function  LocalDateTimeToGMT     (Const Value          : TDateTime;
-                                   Const AUseGMTStr     : Boolean = False) : String;
- Function  GMTToLocalDateTime     (S                    : String)          : TDateTime;
  Function  RawStrInternetToDateTime(Var Value           : String;
                                     Var VDateTime       : TDateTime)       : Boolean;
  Function  IsNumeric              (Const AChar          : Char)            : Boolean; Overload;
@@ -515,18 +511,14 @@ Begin
   {$ELSE}
     dwftFixedWideChar   : Result := ftFixedWideChar;
     dwftWideMemo        : Result := ftWideMemo;
-    dwftOraTimeStamp    : Result := ftOraTimeStamp;
-    dwftOraInterval     : Result := ftOraInterval;
-    dwftLongWord        : Result := ftLongWord;
-    dwftShortint        : Result := ftShortint;
-    dwftByte            : Result := ftByte;
-    dwftExtended        : Result := ftExtended;
-    dwftConnection      : Result := ftConnection;
-    dwftParams          : Result := ftParams;
-    dwftStream          : Result := ftStream;
-    dwftTimeStampOffset : Result := ftTimeStampOffset;
-    dwftObject          : Result := ftObject;
-    dwftSingle          : Result := ftSingle;
+    dwftOraTimeStamp    : Result := ftTimeStamp;
+    dwftOraInterval     : Result := ftInteger;
+    dwftLongWord        : Result := ftWord;
+    dwftShortint        : Result := ftInteger;
+    dwftByte            : Result := ftTypedBinary;
+    dwftExtended        : Result := ftFloat;
+    dwftStream          : Result := ftBlob;
+    dwftTimeStampOffset : Result := ftTimeStamp;
   {$IFEND}
  End;
 End;
@@ -962,76 +954,6 @@ Begin
     End;
   End;
 End;
-Function OffsetFromUTC : TDateTime;
-{$IFDEF WINDOWS}
-Var
- iBias: Integer;
- tmez: TTimeZoneInformation;
-{$ENDIF}
-{$IFDEF UNIX}
- {$IFDEF USE_VCL_POSIX}
-Var
- T  : Time_t;
- TV : TimeVal;
- UT : tm;
- {$ENDIF}
- {$IFDEF USE_BASEUNIX}
-Var
- timeval: TTimeVal;
- timezone: TTimeZone;
- {$ENDIF}
-{$ENDIF}
-Begin
- {$IFDEF UNIX}
-    {$IFDEF USE_VCL_POSIX}
-  gettimeofday(TV, nil);
-  T := TV.tv_sec;
-  localtime_r(T, UT);
-  Result := UT.tm_gmtoff / 60 / 60 / 24;
-    {$ELSE}
-      {$IFDEF USE_BASEUNIX}
-  fpGetTimeOfDay (@TimeVal, @TimeZone);
-  Result := -1 * (timezone.tz_minuteswest / 60 / 24)
-      {$ELSE}
-  Result := GOffsetFromUTC;
-      {$ENDIF}
-    {$ENDIF}
-  {$ELSE}
-      {$IFDEF WINDOWS}
-  case GetTimeZoneInformation({$IFDEF WINCE}@{$ENDIF}tmez) of
-    TIME_ZONE_ID_INVALID  :
-      Raise eRESTDWFailedToRetreiveTimeZoneInfo.Create(cFailedTimeZoneInfo);
-    TIME_ZONE_ID_UNKNOWN  :
-       iBias := tmez.Bias;
-    TIME_ZONE_ID_DAYLIGHT : begin
-      iBias := tmez.Bias;
-      if tmez.DaylightDate.wMonth <> 0 then begin
-        iBias := iBias + tmez.DaylightBias;
-      end;
-    end;
-    TIME_ZONE_ID_STANDARD : begin
-      iBias := tmez.Bias;
-      if tmez.StandardDate.wMonth <> 0 then begin
-        iBias := iBias + tmez.StandardBias;
-      end;
-    end
-   Else
-    Raise eRESTDWFailedToRetreiveTimeZoneInfo.Create(cFailedTimeZoneInfo);
-  End;
-  {We use ABS because EncodeTime will only accept positive values}
-  Result := EncodeTime(Abs(iBias) div 60, Abs(iBias) mod 60, 0, 0);
-  {The GetTimeZone function returns values oriented towards converting
-   a GMT time into a local time.  We wish to do the opposite by returning
-   the difference between the local time and GMT.  So I just make a positive
-   value negative and leave a negative value as positive}
-  if iBias > 0 then begin
-    Result := 0.0 - Result;
-  end;
-      {$ELSE}
-  Result := GOffsetFromUTC;
-      {$ENDIF}
-    {$ENDIF}
-End;
 Function UTCOffsetToStr(Const AOffset    : TDateTime;
                         Const AUseGMTStr : Boolean = False) : String;
 Var
@@ -1051,19 +973,6 @@ Begin
    Else
     Result[1] := '+';  {do not localize}
   End;
-End;
-Function LocalDateTimeToGMT(Const Value      : TDateTime;
-                            Const AUseGMTStr : Boolean = False) : String;
-Var
- wDay,
- wMonth,
- wYear   : Word;
-Begin
- DecodeDate(Value, wYear, wMonth, wDay);
- Result := Format('%s, %d %s %d %s %s',    {do not localize}
-                  [wdays[DayOfWeek(Value)], wDay, monthnames[wMonth],
-                   wYear, FormatDateTime('HH":"nn":"ss', Value), {do not localize}
-                   UTCOffsetToStr(OffsetFromUTC, AUseGMTStr)]);
 End;
 Function RDWStrToInt(Const S  : String;
                      ADefault : Integer = 0) : Integer;
@@ -2313,16 +2222,6 @@ Begin
    Except
     Result := 0.0;
    End;
-  End;
-End;
-Function GMTToLocalDateTime(S : String) : TDateTime;
-Var
- DateTimeOffset : TDateTime;
-Begin
- If RawStrInternetToDateTime(S, Result) Then
-  Begin
-   DateTimeOffset := GmtOffsetStrToDateTime(S);
-   Result := Result - DateTimeOffset + OffsetFromUTC;
   End;
 End;
 Function ReplaceHeaderSubItem(Const AHeaderLine,

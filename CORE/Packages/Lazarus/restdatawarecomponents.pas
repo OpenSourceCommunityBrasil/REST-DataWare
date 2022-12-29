@@ -8,8 +8,8 @@ unit restdatawarecomponents;
 interface
 
 uses
-  PropertyPersist, uRESTDWBasic, uRESTDWBasicClass, uRESTDWBasicComponent, 
-  uRESTDWBasicDB, uRESTDWBasicTypes, uRESTDWBufferDb, uRESTDWComponentBase, 
+  uRESTDWBasic, uRESTDWBasicClass, uRESTDWBasicComponent, uRESTDWBasicDB, 
+  uRESTDWBasicTypes, uRESTDWBufferDb, uRESTDWComponentBase, 
   uRESTDWComponentEvents, uRESTDWEncodeClass, uRESTDWFileBuffer, 
   uRESTDWMasterDetailData, uRESTDWParams, uRESTDWPoolermethod, 
   uRESTDWResponseTranslator, uRESTDWServerContext, uRESTDWServerEvents, 
@@ -27,7 +27,7 @@ uses
   uRESTDWBase64, uRESTDWDynamic, uRESTDWJSONObject, uRESTDWMassiveBuffer, 
   uRESTDWMD5, uRESTDWTools, uRESTDWDataJSON, uRESTDWDynArray, uRESTDWJSON, 
   uRESTDWJSONInterface, uRESTDWSerialize, uRESTDWMimeTypes, uRESTDWAbout, 
-  uRESTDWZlib, uRESTDWMemoryDataset, LazarusPackageIntf;
+  uRESTDWZlib, uRESTDWMemoryDataset, uRESTDWDriverBase, LazarusPackageIntf;
 
 implementation
 

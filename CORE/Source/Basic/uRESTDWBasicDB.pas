@@ -1316,6 +1316,9 @@ Type
     vAuthOptionParams    : TRESTDWClientAuthOptionParams;
     vCripto              : TCripto;
     vTypeRequest         : TTypeRequest;
+    {$IFDEF FPC}
+    vDatabaseCharSet      : TDatabaseCharSet;
+    {$ENDIF}
     Procedure SetConnection(Value : Boolean);          //Seta o Estado da Conexão
     Procedure SetPoolerPort(Value : Integer);          //Seta a Porta do Pooler a ser usada
     Function  TryConnect : Boolean;                    //Tenta Conectar o Servidor para saber se posso executar comandos
@@ -1348,6 +1351,9 @@ Type
     Property UserAgent             : String                     Read vUserAgent          Write vUserAgent;
     Property PoolerNotFoundMessage : String                     Read vPoolerNotFoundMessage Write vPoolerNotFoundMessage;
     Property TypeRequest           : TTypeRequest               Read vTypeRequest        Write vTypeRequest       Default trHttp;
+    {$IFDEF FPC}
+    Property DatabaseCharSet       : TDatabaseCharSet           Read vDatabaseCharSet      Write vDatabaseCharSet;
+    {$ENDIF}
    End;
 
 Type

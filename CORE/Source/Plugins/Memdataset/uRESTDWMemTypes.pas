@@ -122,7 +122,6 @@ type
     procedure Changing; virtual;
     procedure ChangedProperty(const PropName: string); virtual;
     procedure ChangingProperty(const PropName: string); virtual;
-    procedure SetUpdateState(Updating: Boolean); virtual;
     property UpdateCount: Integer read FUpdateCount;
   public
     procedure BeginUpdate; virtual;
@@ -331,8 +330,6 @@ end;
 { TJvPersistentProperty }
 procedure TJvPersistentProperty.BeginUpdate;
 begin
-  if FUpdateCount = 0 then
-    SetUpdateState(True);
   Inc(FUpdateCount);
 end;
 procedure TJvPersistentProperty.Changed;
@@ -358,15 +355,6 @@ end;
 procedure TJvPersistentProperty.EndUpdate;
 begin
   Dec(FUpdateCount);
-  if FUpdateCount = 0 then
-    SetUpdateState(False);
-end;
-procedure TJvPersistentProperty.SetUpdateState(Updating: Boolean);
-begin
-  if Updating then
-    Changing
-  else
-    Changed;
 end;
 {$IFNDEF DELPHI2010_UP}
 procedure TJvCustomThread.NameThreadForDebugging(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
@@ -386,10 +374,10 @@ begin
     ThreadNameInfo.FName := PAnsiChar(AThreadName);
     ThreadNameInfo.FThreadID := AThreadID;
     ThreadNameInfo.FFlags := 0;
-    try
-      RaiseException($406D1388, 0, SizeOf(ThreadNameInfo) div SizeOf(LongWord), @ThreadNameInfo);
-    except
-    end;
+    //try
+    //  RaiseException($406D1388, 0, SizeOf(ThreadNameInfo) div SizeOf(LongWord), @ThreadNameInfo);
+    //except
+    //end;
   end;
 end;
 {$ENDIF DELPHI2010_UP}

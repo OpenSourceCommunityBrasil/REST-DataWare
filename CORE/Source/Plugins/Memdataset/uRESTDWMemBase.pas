@@ -434,7 +434,7 @@ begin
     Count := Length(Data);
   SetLength(AnsiS, Count);
   for I := 0 to Length(AnsiS) - 1 do
-    PChar(@AnsiS[I + 1])^ := DWChar(Data[I]);
+    PDWChar(@AnsiS[I + 1])^ := DWChar(Data[I]);
   Result := string(AnsiS); // convert to System.String
 end;
 function BytesOf(const Value: DWString): TBytes;

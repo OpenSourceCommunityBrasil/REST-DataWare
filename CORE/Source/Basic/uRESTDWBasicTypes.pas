@@ -888,9 +888,6 @@ End;
 Procedure TRESTDWClientSQLBase.SetDatabaseCharSet(Value : TDatabaseCharSet);
 Begin
  vDatabaseCharSet := Value;
- {$IFDEF RESTDWMEMTABLE}
-  TRESTDWMemtable(Self).DatabaseCharSet := Value; //Classe com as funcionalidades de um DBQuery
- {$ENDIF}
 End;
 {$ENDIF}
 
