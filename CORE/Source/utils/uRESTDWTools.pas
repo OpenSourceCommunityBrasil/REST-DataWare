@@ -511,7 +511,6 @@ Begin
   dwftBoolean         : Result := ftBoolean;
   dwftFloat           : Result := ftFloat;
   dwftCurrency        : Result := ftCurrency;
-  dwftBCD             : Result := ftBCD;
   dwftDate            : Result := ftDate;
   dwftTime            : Result := ftTime;
   dwftDateTime        : Result := ftDateTime;
@@ -527,7 +526,6 @@ Begin
   dwftTypedBinary     : Result := ftTypedBinary;
   dwftCursor          : Result := ftCursor;
   dwftFixedChar       : Result := ftFixedChar;
-  dwftWideString      : Result := ftWideString;
   dwftLargeint        : Result := ftLargeint;
   dwftADT             : Result := ftADT;
   dwftArray           : Result := ftArray;
@@ -540,8 +538,10 @@ Begin
   dwftIDispatch       : Result := ftIDispatch;
   dwftGuid            : Result := ftGuid;
   dwftTimeStamp       : Result := ftTimeStamp;
-  dwftFMTBcd          : Result := ftFMTBcd;
   {$IF NOT DEFINED(FPC) AND (CompilerVersion > 21)}
+    dwftBCD             : Result := ftBCD;
+    dwftFMTBcd          : Result := ftFMTBcd;
+    dwftWideString      : Result := ftWideString;
     dwftFixedWideChar   : Result := ftFixedWideChar;
     dwftWideMemo        : Result := ftWideMemo;
     dwftOraTimeStamp    : Result := ftOraTimeStamp;
@@ -561,8 +561,15 @@ Begin
      {$IF CompilerVersion > 22}
       dwftFixedWideChar   : Result := ftFixedWideChar;
       dwftWideMemo        : Result := ftWideMemo;
+     {$ELSE}
+       dwftFixedWideChar   : Result := ftFixedChar;
+       dwftWideMemo        : Result := ftMemo;
      {$IFEND}
+    {$ELSE}
+       dwftFixedWideChar   : Result := ftFixedChar;
+       dwftWideMemo        : Result := ftMemo;
     {$ENDIF}
+    dwftWideString      : Result := ftString;
     dwftOraTimeStamp    : Result := ftTimeStamp;
     dwftOraInterval     : Result := ftInteger;
     dwftLongWord        : Result := ftWord;
@@ -571,6 +578,9 @@ Begin
     dwftExtended        : Result := ftFloat;
     dwftStream          : Result := ftBlob;
     dwftTimeStampOffset : Result := ftTimeStamp;
+    dwftSingle          : Result := ftFloat;
+    dwftBCD             : Result := ftFloat;
+    dwftFMTBcd          : Result := ftFloat;
   {$IFEND}
  End;
 End;
