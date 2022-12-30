@@ -152,9 +152,9 @@ type
      Function  AllocRecBuf                : TRecBuf;    override;
      Procedure FreeRecBuf    (Var Buffer  : TRecBuf);   override;
     {$ENDIF NEXTGEN}
-    Function  AllocRecordBuffer           : PJvMemBuffer;                          {$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Procedure FreeRecordBuffer(Var Buffer : PJvMemBuffer);                         {$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Procedure InternalInitRecord(Buffer   : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF});
+    Function  AllocRecordBuffer           : PJvMemBuffer; {$IFNDEF NEXTGEN}Override;{$ENDIF}
+    Procedure FreeRecordBuffer(Var Buffer : PJvMemBuffer);{$IFNDEF NEXTGEN}Override;{$ENDIF}
+    Procedure InternalInitRecord(Buffer   : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF});{$IFNDEF NEXTGEN}Override;{$ENDIF}
     Function  GetRecord         (Buffer   : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF};
                                  GetMode  : TGetMode;
                                  DoCheck  : Boolean) : TGetResult;        Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
@@ -166,7 +166,7 @@ type
                                   Value   : TBookmarkFlag);               Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
     Procedure SetBookmarkData    (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF};
                                   Data    : TJvBookmark);                 Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Procedure InitRecord         (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF});                Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
+    Procedure InitRecord         (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF});Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
     Procedure InternalAddRecord  (Buffer  : {$IFDEF FPC}Pointer{$ELSE}{$IFDEF NEXTGEN}TRecBuf{$ELSE}{$IF CompilerVersion <= 22}Pointer{$ELSE}TRecordBuffer{$IFEND}{$ENDIF}{$ENDIF};
                                   aAppend : Boolean);                              {$IFNDEF NEXTGEN}Override;{$ENDIF}
     Function  GetCurrentRecord   (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF}): Boolean;Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
@@ -329,7 +329,7 @@ type
   protected
     procedure SetIndex(Value: Integer); virtual;
   public
-    constructor Create(MemoryData: TRESTDWMemTable); virtual;
+    constructor Create  (MemoryData: TRESTDWMemTable); virtual;
     constructor CreateEx(MemoryData: TRESTDWMemTable; UpdateParent: Boolean); virtual;
     destructor Destroy; override;
     property MemoryData: TRESTDWMemTable read FMemoryData;
@@ -541,7 +541,7 @@ begin
       if not FMemoryData.FClearing then
         FMemoryData.FRecords.Remove(Self);
       if FMemoryData.BlobFieldCount > 0 then
-        Finalize(PMemBlobArray(FBlobs)[0], FMemoryData.BlobFieldCount);
+        Finalize(PMemBlobArray(FBlobs)^[0], FMemoryData.BlobFieldCount);
       ReallocMem(FBlobs, 0);
       ReallocMem(FData, 0);
       FMemoryData := nil;
@@ -558,7 +558,7 @@ begin
       if Value.BlobFieldCount > 0 then
       begin
         ReallocMem(FBlobs, Value.BlobFieldCount * SizeOf(Pointer));
-        Initialize(PMemBlobArray(FBlobs)[0], Value.BlobFieldCount);
+        Initialize(PMemBlobArray(FBlobs)^[0], Value.BlobFieldCount);
       end;
       DataSize := 0;
       for I := 0 to Value.FieldDefs.Count - 1 do
@@ -833,13 +833,13 @@ begin
   Result := StrAlloc(FRecBufSize);
   {$ENDIF COMPILER12_UP}
   if BlobFieldCount > 0 then
-    Initialize(PMemBlobArray(Result + FBlobOfs)[0], BlobFieldCount);
+    Initialize(PMemBlobArray(Result + FBlobOfs)^[0], BlobFieldCount);
 end;
 
 procedure TRESTDWMemTable.FreeRecordBuffer(var Buffer: PJvMemBuffer);
 begin
   if BlobFieldCount > 0 then
-    Finalize(PMemBlobArray(Buffer + FBlobOfs)[0], BlobFieldCount);
+    Finalize(PMemBlobArray(Buffer + FBlobOfs)^[0], BlobFieldCount);
   {$IFDEF COMPILER12_UP}
   FreeMem(Buffer);
   {$ELSE}
@@ -1029,7 +1029,7 @@ begin
     BookmarkFlag := bfCurrent;
   end;
   for I := 0 to BlobFieldCount - 1 do
-    PMemBlobArray(Buffer + FBlobOfs)[I] := PMemBlobArray(Rec.FBlobs)[I];
+    PMemBlobArray(Buffer + FBlobOfs)^[I] := PMemBlobArray(Rec.FBlobs)^[I];
   GetCalcFields({$IFDEF RTL250_UP}TRecBuf{$ENDIF}(Buffer));
 end;
 function TRESTDWMemTable.GetRecordSize: Word;
@@ -1274,8 +1274,8 @@ end;
 procedure TRESTDWMemTable.CloseBlob(Field: TField);
 begin
   if (FRecordPos >= 0) and (FRecordPos < FRecords.Count) and (State = dsEdit) then
-    PMemBlobArray(ActiveBuffer + FBlobOfs)[Field.Offset] :=
-      PMemBlobArray(Records[FRecordPos].FBlobs)[Field.Offset]
+    PMemBlobArray(ActiveBuffer + FBlobOfs)^[Field.Offset] :=
+      PMemBlobArray(Records[FRecordPos].FBlobs)^[Field.Offset]
   else
     PMemBlobArray(ActiveBuffer + FBlobOfs)^[Field.Offset] := '';
 end;
@@ -1401,7 +1401,7 @@ var
 begin
   Move(Buffer^, Rec.Data^, FRecordSize);
   for I := 0 to BlobFieldCount - 1 do
-    PMemBlobArray(Rec.FBlobs)[I] := PMemBlobArray(Buffer + FBlobOfs)[I];
+    PMemBlobArray(Rec.FBlobs)^[I] := PMemBlobArray(Buffer + FBlobOfs)^[I];
 end;
 procedure TRESTDWMemTable.SetMemoryRecordData(Buffer: PJvMemBuffer; Pos: Integer);
 var
@@ -1677,17 +1677,46 @@ begin
     Result := False;
 end;
 procedure TRESTDWMemTable.InternalClose;
-begin
-  EmptyTable;
-  FAutoInc := 1;
-  BindFields(False);
-  {$IFNDEF HAS_AUTOMATIC_DB_FIELDS}
-  if DefaultFields then
-  {$ENDIF !HAS_AUTOMATIC_DB_FIELDS}
-    DestroyFields;
-  FreeIndexList;
-  FActive := False;
-end;
+// Procedure CleanAll;
+// Begin
+//  Try
+//   ClearChanges;
+//   If Assigned(FRecords) Then
+//    FreeAndNil(FRecords);
+//   FRecords := TList.Create;
+//   If Assigned(FDeletedValues) Then
+//    FreeAndNil(FDeletedValues);
+//   FDeletedValues := TList.Create;
+//  Finally
+//   ClearRecords;
+//   ClearBuffers;
+//   FRecordPos := -1;
+//   FLastID := Low(Integer);
+//   FAutoInc := 1;
+//   FStatusName := STATUSNAME;
+//   FRowsOriginal := 0;
+//   FRowsChanged := 0;
+//   FRowsAffected := 0;
+//   FSaveLoadState := slsNone;
+//   FOneValueInArray := True;
+//   FDataSetClosed := False;
+//   FRowsChanged := 0;
+//   FRowsAffected := 0;
+//   if Assigned(FRESTDWStorage) then
+//    FreeAndNil(FRESTDWStorage);
+//   FActive := False;
+//  End;
+// End;
+Begin
+ ClearRecords;
+ FAutoInc := 1;
+ BindFields(False);
+ If DefaultFields then
+  DestroyFields;
+ FreeIndexList;
+ FActive := False;
+End;
+
 procedure TRESTDWMemTable.InternalHandleException;
 begin
   AppHandleException(Self);
@@ -1847,10 +1876,13 @@ end;
 
 procedure TRESTDWMemTable.EmptyTable;
 begin
-// CheckBrowseMode;
- ClearRecords;
- ClearBuffers;
- DataEvent(deDataSetChange, 0);
+ If Active then
+  Begin
+   CheckBrowseMode;
+   ClearRecords;
+   ClearBuffers;
+   DataEvent(deDataSetChange, 0);
+  End;
 end;
 
 procedure TRESTDWMemTable.AddStatusField;
@@ -2380,14 +2412,13 @@ begin
         FieldTypeNames[F.DataType]]);
   end;
 end;
-procedure TRESTDWMemTable.FreeIndexList;
-begin
-  if FIndexList <> nil then
-  begin
-    FIndexList.Free;
-    FIndexList := nil;
-  end;
-end;
+
+Procedure TRESTDWMemTable.FreeIndexList;
+Begin
+ If Assigned(FIndexList) Then
+  FreeANdNil(FIndexList);
+End;
+
 function TRESTDWMemTable.GetValues(FldNames: string = ''): Variant;
 var
   I: Integer;

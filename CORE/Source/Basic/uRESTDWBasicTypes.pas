@@ -585,76 +585,12 @@ End;
 
 Procedure TRESTDWClientSQLBase.BaseClose;
 Begin
-  {$IFDEF FPC}
-   {$IFDEF RESTDWMEMTABLE}
-    TRESTDWMemtable(Self).Close;
-   {$ENDIF}
-   {$IFDEF RESTDWUNIDACMEM}
-    TVirtualTable(Self).Close;
-   {$ENDIF}
-   {$IFDEF LAZDRIVER}
-    TMemDataset(Self).Close;
-   {$ENDIF}
-  {$ELSE}
-  {$IFDEF CLIENTDATASET}
-   TClientDataset(Self).Close;
-  {$ENDIF}
-  {$IFDEF RESJEDI}
-   TJvMemoryData(Self).Close;
-  {$ENDIF}
-  {$IFDEF RESTKBMMEMTABLE}
-   Tkbmmemtable(Self).Close;
-  {$ENDIF}
-  {$IFDEF RESTDWFDMEMTABLE}
-   TFDmemtable(Self).Close;
-  {$ENDIF}
-  {$IFDEF RESTADMEMTABLE}
-   TADmemtable(Self).Close;
-  {$ENDIF}
-  {$IFDEF RESTDWMEMTABLE}
-   TRESTDWMemtable(Self).Close;
-  {$ENDIF}
-  {$IFDEF RESTDWUNIDACMEM}
-   TVirtualTable(Self).Close;
-  {$ENDIF}
-  {$ENDIF}
+ TRESTDWClientSQLBase(Self).Close;
 End;
 
 Procedure TRESTDWClientSQLBase.BaseOpen;
 Begin
-  {$IFDEF FPC}
-   {$IFDEF RESTDWMEMTABLE}
-    TRESTDWMemtable(Self).Open;
-   {$ENDIF}
-   {$IFDEF RESTDWUNIDACMEM}
-    TVirtualTable(Self).Open;
-   {$ENDIF}
-   {$IFDEF LAZDRIVER}
-    TMemDataset(Self).Open;
-   {$ENDIF}
-  {$ELSE}
-  {$IFDEF CLIENTDATASET}
-   TClientDataset(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESJEDI}
-   TJvMemoryData(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTKBMMEMTABLE}
-   TKbmmemtable(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTDWFDMEMTABLE}
-   TFDmemtable(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTADMEMTABLE}
-   TADmemtable(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTDWMEMTABLE}
-   TRESTDWMemtable(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTDWUNIDACMEM}
-   TVirtualTable(Self).Open;
-  {$ENDIF}
-  {$ENDIF}
+ TRESTDWClientSQLBase(Self).Open;
 End;
 
 Constructor TRESTDWClientSQLBase.Create(AOwner: TComponent);

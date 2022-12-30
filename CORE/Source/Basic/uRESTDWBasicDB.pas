@@ -788,7 +788,7 @@ Type
   Procedure   SetDWResponseTranslator(const Value: TRESTDWResponseTranslator);
   Function    GetReadData                   : Boolean;
   Property    MasterFields                  : String   Read vMasterFields  Write vMasterFields;
-//  Procedure   InternalDeferredPost;override; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
+  Procedure   InternalClose;override;
  Protected
   vBookmark : Integer;
   vActive,
@@ -9166,6 +9166,18 @@ Begin
  Inherited InternalLast;
 End;
 
+Procedure TRESTDWClientSQL.InternalClose;
+Begin
+ BaseClose;
+ vinactive       := False;
+ vRowsAffected   := 0;
+ vOldRecordCount := 0;
+ vJsonCount      := 0;
+ vParamCount     := 0;
+ vActualRec      := 0;
+ Inherited InternalClose;
+End;
+
 Procedure TRESTDWClientSQL.InternalLast;
 Begin
  If Not ((vInBlockEvents) or (vInitDataset)) Then
@@ -11036,8 +11048,13 @@ End;
 
 Function TRESTDWClientSQL.GetRecordCount : Integer;
 Begin
- If Not Filtered Then
-  Result := vJsonCount
+ If Not vInBlockEvents Then
+  Begin
+   If Not Filtered Then
+    Result := vJsonCount
+   Else
+    Result := Inherited GetRecordCount;
+  End
  Else
   Result := Inherited GetRecordCount;
 End;
