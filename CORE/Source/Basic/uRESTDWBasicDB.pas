@@ -32,19 +32,6 @@ Uses
   {$IF Defined(RESTDWFMX)}
    {$IFNDEF RESTDWAndroidService}System.UITypes, {$ENDIF}
   {$IFEND}
-   {$IF CompilerVersion > 23} // Delphi Xe3 pra cima
-    {$IFDEF RESTDWFDMEMTABLE}
-     FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
-     FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-     FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-    {$IF CompilerVersion > 26}FireDAC.Stan.StorageBin,{$IFEND}
-    {$ENDIF}
-    {$IFDEF RESTDWADMEMTABLE}
-     uADStanIntf, uADStanOption, uADStanParam, uADStanError, uADPhysIntf,
-     uADDAptIntf, uADCompDataSet, uADCompClient,
-    {$IF CompilerVersion > 26}uADStanStorageBin,{$IFEND}
-    {$ENDIF}
-   {$IFEND}
  {$ENDIF}
  SysUtils, Classes, Db, SyncObjs, Variants,
  uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWConsts,
@@ -693,46 +680,8 @@ Type
   vMasterDetailList     : TMasterDetailList;                 //DataSet MasterDetail Function
   vMassiveDataset       : TMassiveDataset;
   vLastOpen             : Integer;
-  {$IFDEF FPC}
-  {$IFDEF RESTDWLAZDRIVER}
-  procedure CloneDefinitions     (Source  : TMemDataset;
-                                  aSelf   : TMemDataset);
-  {$ENDIF}
-  {$IFDEF RESTDWMEMTABLE}
   Procedure CloneDefinitions     (Source  : TRESTDWMemtable;
                                   aSelf   : TRESTDWMemtable); //Fields em Definições
-  {$ENDIF}
-  {$IFDEF RESTDWUNIDACMEM}
-  Procedure CloneDefinitions     (Source  : TVirtualTable;
-                                   aSelf  : TVirtualTable);
-  {$ENDIF}
-  {$ELSE}
-  {$IFDEF RESTDWCLIENTDATASET}
-  Procedure  CloneDefinitions    (Source  : TClientDataset;
-                                  aSelf   : TClientDataset); //Fields em Definições
-  {$ENDIF}
-  {$IFDEF RESTDWUNIDACMEM}
-  Procedure CloneDefinitions     (Source  : TVirtualTable;
-                                   aSelf  : TVirtualTable);
-  {$ENDIF}
-  {$IFDEF RESTDWKBMMEMTABLE}
-  Procedure  CloneDefinitions    (Source  : TKbmMemtable;
-                                  aSelf   : TKbmMemtable); //Fields em Definições
-  {$ENDIF}
-  {$IFDEF RESTDWFDMEMTABLE}
-  Procedure  CloneDefinitions    (Source  : TFdMemtable;
-                                  aSelf   : TFdMemtable); //Fields em Definições
-  {$ENDIF}
-  {$IFDEF RESTDWADMEMTABLE}
-  Procedure  CloneDefinitions    (Source  : TAdMemtable;
-                                  aSelf   : TAdMemtable); //Fields em Definições
-  Property CommandText;
-  {$ENDIF}
-  {$IFDEF RESTDWMEMTABLE}
-  Procedure  CloneDefinitions    (Source  : TRESTDWMemtable;
-                                  aSelf   : TRESTDWMemtable); //Fields em Definições
-  {$ENDIF}
-  {$ENDIF}
   Procedure   OnChangingSQL      (Sender  : TObject);       //Quando Altera o SQL da Lista
   Procedure   OnBeforeChangingSQL(Sender  : TObject);
   Procedure   SetActiveDB        (Value   : Boolean);       //Seta o Estado do Dataset
@@ -8336,47 +8285,8 @@ Begin
  vCreateDS := True;
  SetInBlockEvents(True);
  Try
-  {$IFDEF FPC}
-   {$IFDEF ZEOSDRIVER} //TODO
-   {$ENDIF}
-   {$IFDEF RESTDWMEMTABLE}
-    TRESTDWMemtable(Self).Close;
-    TRESTDWMemtable(Self).Open;
-   {$ENDIF}
-   {$IFDEF LAZDRIVER}
-    TMemDataset(Self).CreateTable;
-    TMemDataset(Self).Open;
-   {$ENDIF}
-   {$IFDEF RESTDWUNIDACMEM}
-    TVirtualTable(Self).Close;
-    TVirtualTable(Self).Open;
-   {$ENDIF}
-  {$ELSE}
-  {$IFDEF CLIENTDATASET}
-   TClientDataset(Self).CreateDataSet;
-   TClientDataset(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTDWUNIDACMEM}
-   TVirtualTable(Self).Close;
-   TVirtualTable(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTKBMMEMTABLE}
-   Tkbmmemtable(Self).Close;
-   Tkbmmemtable(Self).open;
-  {$ENDIF}
-  {$IFDEF RESTDWFDMEMTABLE}
-   TFDmemtable(Self).CreateDataSet;
-   TFDmemtable(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTADMEMTABLE}
-   TADmemtable(Self).CreateDataSet;
-   TADmemtable(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTDWMEMTABLE}
-   TRESTDWMemtable(Self).Close;
-   TRESTDWMemtable(Self).Open;
-   {$ENDIF}
-  {$ENDIF}
+  TRESTDWMemtable(Self).Close;
+  TRESTDWMemtable(Self).Open;
   vCreateDS := False;
   vActive   := Not vCreateDS;
  Finally
@@ -8405,70 +8315,8 @@ End;
 Class Procedure TRESTDWTable.CreateEmptyDataset(Const Dataset : TDataset);
 Begin
  Try
-  {$IFDEF RESTDWMEMTABLE}
-  If (Dataset.ClassParent = TRESTDWMemtable) Or
-     (Dataset.ClassType   = TRESTDWMemtable) Then
-   Begin
-    TRESTDWMemtable(Dataset).Close;
-    TRESTDWMemtable(Dataset).Open;
-   End;
-  {$ENDIF}
-  {$IFDEF FPC}
-   If (Dataset.ClassParent = TMemDataset) Or
-      (Dataset.ClassType   = TMemDataset) Then
-    Begin
-     TMemDataset(Dataset).CreateTable;
-//     TMemDataset(Self).Open;
-    End;
-   If (Dataset.ClassParent = TBufDataset) Or
-      (Dataset.ClassType   = TBufDataset) Then
-    Begin
-     TBufDataset(Dataset).Close;
-     TBufDataset(Dataset).CreateDataset;
-    End;
-  {$ELSE}
-   {$IF CompilerVersion > 27} // Delphi XE7 pra cima
-    {$IFNDEF HAS_FMX}  // Incluído inicialmente para iOS/Brito
-     {$IFDEF RESTDWCLIENTDATASET}
-     If (Dataset.ClassParent = TCustomClientDataSet) Or
-        (Dataset.ClassType   = TCustomClientDataSet) Or
-        (Dataset.ClassParent = TClientDataSet)       Or
-        (Dataset.ClassType   = TClientDataSet)       Then
-      Begin
-       TClientDataset(Dataset).Close;
-       TClientDataset(Dataset).CreateDataSet;
-      End;
-     {$ENDIF}
-     {$IFDEF RESTDWMEMTABLE}
-     If (Dataset.ClassParent = TRESTDWMemtable) Or
-        (Dataset.ClassType   = TRESTDWMemtable) Then
-      Begin
-       TRESTDWMemtable(Dataset).Close;
-       TRESTDWMemtable(Dataset).CreateDataSet;
-      End;
-     {$ENDIF}
-     {$IFDEF RESTDWFDMEMTABLE}
-     If (Dataset.ClassParent = TFDmemtable) Or
-        (Dataset.ClassType   = TFDmemtable) Then
-      Begin
-       TFDmemtable(Dataset).Close;
-       TFDmemtable(Dataset).CreateDataSet;
-      End;
-     {$ENDIF}
-    {$ENDIF}
-   {$ELSE}
-    {$IFDEF RESTDWCLIENTDATASET}
-    If (Dataset.ClassParent = TCustomClientDataSet) Or
-       (Dataset.ClassType   = TCustomClientDataSet) Or
-       (Dataset.ClassParent = TClientDataSet)       Or
-       (Dataset.ClassType   = TClientDataSet)       Then
-     Begin
-      TClientDataset(Dataset).Close;
-      TClientDataset(Dataset).CreateDataSet;
-     End;
-    {$ENDIF}
-   {$IFEND}
-  {$ENDIF}
+  TRESTDWMemtable(Dataset).Close;
+  TRESTDWMemtable(Dataset).Open;
  Finally
  End;
 End;
@@ -8476,70 +8324,8 @@ End;
 Class Procedure TRESTDWClientSQL.CreateEmptyDataset(Const Dataset : TDataset);
 Begin
  Try
-  {$IFDEF RESTDWMEMTABLE}
-  If (Dataset.ClassParent = TRESTDWMemtable) Or
-     (Dataset.ClassType   = TRESTDWMemtable) Then
-   Begin
-    TRESTDWMemtable(Dataset).Close;
-    TRESTDWMemtable(Dataset).Open;
-   End;
-  {$ENDIF}
-  {$IFDEF FPC}
-   If (Dataset.ClassParent = TMemDataset) Or
-      (Dataset.ClassType   = TMemDataset) Then
-    Begin
-     TMemDataset(Dataset).CreateTable;
-//     TMemDataset(Self).Open;
-    End;
-   If (Dataset.ClassParent = TBufDataset) Or
-      (Dataset.ClassType   = TBufDataset) Then
-    Begin
-     TBufDataset(Dataset).Close;
-     TBufDataset(Dataset).CreateDataset;
-    End;
-  {$ELSE}
-   {$IF CompilerVersion > 27} // Delphi XE7 pra cima
-    {$IFNDEF HAS_FMX}  // Incluído inicialmente para iOS/Brito
-     {$IFDEF CLIENTDATASET}
-      If (Dataset.ClassParent = TCustomClientDataSet) Or
-         (Dataset.ClassType   = TCustomClientDataSet) Or
-         (Dataset.ClassParent = TClientDataSet)       Or
-         (Dataset.ClassType   = TClientDataSet)       Then
-       Begin
-        TClientDataset(Dataset).Close;
-        TClientDataset(Dataset).CreateDataSet;
-       End;
-     {$ENDIF}
-     {$IFDEF RESTDWMEMTABLE}
-     If (Dataset.ClassParent = TRESTDWMemtable) Or
-        (Dataset.ClassType   = TRESTDWMemtable) Then
-      Begin
-       TRESTDWMemtable(Dataset).Close;
-       TRESTDWMemtable(Dataset).CreateDataSet;
-      End;
-     {$ENDIF}
-     {$IFDEF RESTDWFDMEMTABLE}
-     If (Dataset.ClassParent = TFDmemtable) Or
-        (Dataset.ClassType   = TFDmemtable) Then
-      Begin
-       TFDmemtable(Dataset).Close;
-       TFDmemtable(Dataset).CreateDataSet;
-      End;
-     {$ENDIF}
-    {$ENDIF}
-   {$ELSE}
-    {$IFDEF CLIENTDATASET}
-    If (Dataset.ClassParent = TCustomClientDataSet) Or
-       (Dataset.ClassType   = TCustomClientDataSet) Or
-       (Dataset.ClassParent = TClientDataSet)       Or
-       (Dataset.ClassType   = TClientDataSet)       Then
-     Begin
-      TClientDataset(Dataset).Close;
-      TClientDataset(Dataset).CreateDataSet;
-     End;
-    {$ENDIF}
-   {$IFEND}
-  {$ENDIF}
+  TRESTDWMemtable(Dataset).Close;
+  TRESTDWMemtable(Dataset).Open;
  Finally
  End;
 End;
@@ -9840,39 +9626,8 @@ Begin
 // {$ENDIF}
 End;
 
-{$IFDEF FPC}
-{$IFDEF RESTDWLAZDRIVER}
-procedure TRESTDWClientSQL.CloneDefinitions(Source  : TMemDataset;
-                                            aSelf   : TMemDataset);
-{$ENDIF}
-{$IFDEF RESTDWMEMTABLE}
 Procedure TRESTDWClientSQL.CloneDefinitions(Source  : TRESTDWMemtable;
                                             aSelf   : TRESTDWMemtable); //Fields em Definições
-{$ENDIF}
-{$IFDEF RESTDWUNIDACMEM}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source : TVirtualTable; aSelf : TVirtualTable);
-{$ENDIF}
-{$ELSE}
-{$IFDEF RESTDWCLIENTDATASET}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source : TClientDataset; aSelf : TClientDataset);
-{$ENDIF}
-{$IFDEF RESTDWUNIDACMEM}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source : TVirtualTable; aSelf : TVirtualTable);
-{$ENDIF}
-{$IFDEF RESTDWKBMMEMTABLE}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source : TKbmmemtable; aSelf : TKbmmemtable);
-{$ENDIF}
-{$IFDEF RESTDWFDMEMTABLE}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source : TFDmemtable; aSelf : TFDmemtable);
-{$ENDIF}
-{$IFDEF RESTDWADMEMTABLE}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source : TADmemtable; aSelf : TADmemtable);
-{$ENDIF}
-{$IFDEF RESTDWMEMTABLE}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source  : TRESTDWMemtable;
-                                            aSelf   : TRESTDWMemtable); //Fields em Definições
-{$ENDIF}
-{$ENDIF}
 Var
  I, A : Integer;
 Begin
