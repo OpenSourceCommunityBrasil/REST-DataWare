@@ -176,7 +176,11 @@ begin
       end;
       dwftFMTBcd :  begin
         Stream.Read(Cr, Sizeof(Currency));
-        vField.AsBCD := CurrToBCD(Cr);
+        {$IFDEF FPC}
+          vField.AsBCD := CurrToBCD(Cr);
+        {$ELSE}
+          vField.AsBCD := DoubleToBcd(Cr);
+        {$ENDIF}
       end;
       dwftCurrency,
       dwftBCD : begin

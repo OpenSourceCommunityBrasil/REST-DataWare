@@ -139,7 +139,7 @@ type
     // Delphi 2006+ has support for DWWideString
     {$IF DEFINED(FPC) OR NOT DEFINED(COMPILER10_UP)}
       procedure DataConvert(Field: TField; Source, Dest: Pointer; ToNative: Boolean); override;
-    {$ENDIF}
+    {$IFEND}
     procedure AssignMemoryRecord(Rec: TJvMemoryRecord; Buffer: PJvMemBuffer);
     function  GetActiveRecBuf(var RecBuf: PJvMemBuffer): Boolean; virtual;
     procedure InitFieldDefsFromFields;
@@ -354,7 +354,7 @@ uses
 const
   ftBlobTypes = [ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftParadoxOle,
     ftDBaseOle, ftTypedBinary, ftOraBlob, ftOraClob
-    {$IF DEFINED(FPC) OR DEFINED(COMPILER10_UP)}, ftWideMemo{$ENDIF}];
+    {$IF DEFINED(FPC) OR DEFINED(COMPILER10_UP)}, ftWideMemo{$IFEND}];
   // If you add a new supported type you _must_ also update CalcFieldLen()
   ftSupported = [ftString, ftSmallint, ftInteger, ftWord, ftBoolean,
     ftFloat, ftCurrency, ftDate, ftTime, ftDateTime, ftAutoInc, ftBCD,
@@ -411,7 +411,7 @@ begin
       {$IF DEFINED(FPC) OR DEFINED(COMPILER10_UP)}
         ftWideString: DestField.AsWideString := SourceField.AsWideString;
         ftFixedWideChar: DestField.AsWideString := SourceField.AsWideString;
-      {$ENDIF}
+      {$IFEND}
       ftFloat:
         DestField.AsFloat := SourceField.AsFloat;
       ftDateTime:
@@ -718,7 +718,7 @@ begin
         else
           Result := AnsiCompareStr(WideCharToString(PWideChar(Data1)),
             WideCharToString(PWideChar(Data2)));
-    {$ENDIF}
+    {$IFEND}
     ftLargeint:
       if Int64(Data1^) > Int64(Data2^) then
         Result := 1
@@ -1126,7 +1126,7 @@ begin
             Result := Result and (not TrimEmptyString or (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PChar(Data)
                                                                             {$ELSE}PChar(Data){$IFEND}
                                                                             {$ELSE}PWideChar(Data){$ENDIF}) > 0));
-        {$ENDIF}
+        {$IFEND}
       end;
       if Result and (Buffer <> nil) then
         if Field.DataType = ftVariant then
