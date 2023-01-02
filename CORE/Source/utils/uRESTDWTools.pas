@@ -537,10 +537,10 @@ Begin
   dwftInterface       : Result := ftInterface;
   dwftIDispatch       : Result := ftIDispatch;
   dwftGuid            : Result := ftGuid;
-  dwftTimeStamp       : Result := ftTimeStamp;
   dwftBCD             : Result := ftBCD;
   dwftFMTBcd          : Result := ftFMTBcd;
   {$IF NOT DEFINED(FPC) AND (CompilerVersion > 21)}
+    dwftTimeStamp       : Result := ftTimeStamp;
     dwftWideString      : Result := ftWideString;
     dwftFixedWideChar   : Result := ftFixedWideChar;
     dwftWideMemo        : Result := ftWideMemo;
@@ -569,15 +569,16 @@ Begin
        dwftFixedWideChar   : Result := ftFixedWideChar;
        dwftWideMemo        : Result := ftWideMemo;
     {$ENDIF}
+    dwftTimeStamp       : Result := ftDateTime; // ftTimeStamp nao definido 3.2.4
     dwftWideString      : Result := ftWideString;
-    dwftOraTimeStamp    : Result := ftTimeStamp;
+    dwftOraTimeStamp    : Result := ftDateTime; // ftTimeStamp nao definido 3.2.4
     dwftOraInterval     : Result := ftInteger;
     dwftLongWord        : Result := ftWord;
     dwftShortint        : Result := ftInteger;
     dwftByte            : Result := ftTypedBinary;
     dwftExtended        : Result := ftFloat;
     dwftStream          : Result := ftBlob;
-    dwftTimeStampOffset : Result := ftTimeStamp;
+    dwftTimeStampOffset : Result := ftDateTime; // ftTimeStamp nao definido 3.2.4
     dwftSingle          : Result := ftFloat;
   {$IFEND}
  End;
