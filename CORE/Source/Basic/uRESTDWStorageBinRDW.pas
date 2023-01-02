@@ -20,7 +20,7 @@ type
 implementation
 
 uses
-  uRESTDWProtoTypes, uRESTDWTools;
+  uRESTDWProtoTypes, uRESTDWTools, FmtBCD;
 
 { TRESTDWStorageBinRDW }
 
@@ -66,8 +66,13 @@ begin
     vFieldDef.Size := j;
 
     stream.Read(j,SizeOf(Integer));
-    if (ft in [dwftFloat, dwftCurrency,dwftBCD,dwftExtended,dwftSingle,dwftFMTBcd]) then
+    if (ft in [dwftFloat, dwftCurrency,dwftExtended,dwftSingle]) then begin
       vFieldDef.Precision := j;
+    end
+    else if (ft in [dwftBCD,dwftFMTBcd]) then begin
+      vFieldDef.Size := 0;
+      vFieldDef.Precision := 0;
+    end;
 
     stream.Read(b,SizeOf(Byte));
 
@@ -166,14 +171,17 @@ begin
                       {$ENDIF}
                      end;
       dwftFloat    : begin
-                  Stream.Read(R, Sizeof(Real));
-                  vField.AsFloat := R;
+        Stream.Read(R, Sizeof(Real));
+        vField.AsFloat := R;
       end;
-      dwftFMTBcd,
+      dwftFMTBcd :  begin
+        Stream.Read(Cr, Sizeof(Currency));
+        vField.AsBCD := CurrToBCD(Cr);
+      end;
       dwftCurrency,
-      dwftBCD     :  begin
-                  Stream.Read(Cr, Sizeof(Currency));
-                  vField.AsCurrency := Cr;
+      dwftBCD : begin
+        Stream.Read(Cr, Sizeof(Currency));
+        vField.AsCurrency := Cr;
       end;
       dwftTimeStampOffset,
       dwftDate,

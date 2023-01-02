@@ -538,9 +538,9 @@ Begin
   dwftIDispatch       : Result := ftIDispatch;
   dwftGuid            : Result := ftGuid;
   dwftTimeStamp       : Result := ftTimeStamp;
+  dwftBCD             : Result := ftBCD;
+  dwftFMTBcd          : Result := ftFMTBcd;
   {$IF NOT DEFINED(FPC) AND (CompilerVersion > 21)}
-    dwftBCD             : Result := ftBCD;
-    dwftFMTBcd          : Result := ftFMTBcd;
     dwftWideString      : Result := ftWideString;
     dwftFixedWideChar   : Result := ftFixedWideChar;
     dwftWideMemo        : Result := ftWideMemo;
@@ -559,17 +559,17 @@ Begin
   {$ELSE}
     {$IFNDEF FPC}
      {$IF CompilerVersion > 22}
-      dwftFixedWideChar   : Result := ftFixedWideChar;
-      dwftWideMemo        : Result := ftWideMemo;
+       dwftFixedWideChar   : Result := ftFixedWideChar;
+       dwftWideMemo        : Result := ftWideMemo;
      {$ELSE}
        dwftFixedWideChar   : Result := ftFixedChar;
        dwftWideMemo        : Result := ftMemo;
      {$IFEND}
     {$ELSE}
-       dwftFixedWideChar   : Result := ftFixedChar;
-       dwftWideMemo        : Result := ftMemo;
+       dwftFixedWideChar   : Result := ftFixedWideChar;
+       dwftWideMemo        : Result := ftWideMemo;
     {$ENDIF}
-    dwftWideString      : Result := ftString;
+    dwftWideString      : Result := ftWideString;
     dwftOraTimeStamp    : Result := ftTimeStamp;
     dwftOraInterval     : Result := ftInteger;
     dwftLongWord        : Result := ftWord;
@@ -579,8 +579,6 @@ Begin
     dwftStream          : Result := ftBlob;
     dwftTimeStampOffset : Result := ftTimeStamp;
     dwftSingle          : Result := ftFloat;
-    dwftBCD             : Result := ftFloat;
-    dwftFMTBcd          : Result := ftFloat;
   {$IFEND}
  End;
 End;
