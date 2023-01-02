@@ -26,16 +26,12 @@ unit uRESTDWBasicDB;
 interface
 
 Uses
- {$IFDEF RESTDWUNIDACMEM}DADump, UniDump, VirtualTable, {$ENDIF}
- {$IFDEF RESTKBMMEMTABLE}kbmmemtable, {$ENDIF}
  {$IFDEF FPC}
-  {$IFNDEF RESTDWLAMW}BufDataset, {$ENDIF}
   memds,
  {$ELSE}
   {$IF Defined(RESTDWFMX)}
    {$IFNDEF RESTDWAndroidService}System.UITypes, {$ENDIF}
   {$IFEND}
-   {$IFDEF RESTDWCLIENTDATASET}DBClient, {$ENDIF}
    {$IF CompilerVersion > 23} // Delphi Xe3 pra cima
     {$IFDEF RESTDWFDMEMTABLE}
      FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,

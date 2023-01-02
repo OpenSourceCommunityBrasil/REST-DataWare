@@ -43,33 +43,6 @@ uses
   uRESTDWMemBase, Math;
 // Ansi types
 type
- {$IFNDEF FPC}
-  {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
-   {$IF Defined(HAS_FMX)}
-    DWString     = String;
-    DWWideString = WideString;
-    DWChar       = Char;
-   {$ELSE}
-    DWString     = Utf8String;
-    DWWideString = WideString;
-    DWChar       = Utf8Char;
-   {$IFEND}
-  {$ELSE}
-   {$IF Defined(HAS_FMX)}
-    DWString     = Utf8String;
-    DWWideString = Utf8String;
-    DWChar       = Utf8Char;
-   {$ELSE}
-    DWString     = AnsiString;
-    DWWideString = WideString;
-    DWChar       = AnsiChar;
-   {$IFEND}
-  {$IFEND}
- {$ELSE}
-  DWString     = AnsiString;
-  DWWideString = WideString;
-  DWChar       = AnsiChar;
- {$ENDIF}
   {$IFDEF SUPPORTS_UNICODE}
   TJclAnsiStringList = class;
   // Codegear should be the one providing this class, in the DWStrings unit.

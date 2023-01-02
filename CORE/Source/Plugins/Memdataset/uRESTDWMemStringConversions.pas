@@ -35,34 +35,6 @@ uses
   {$ENDIF ~HAS_UNITSCOPE}
   uRESTDWMemBase;
 type
- {$IFNDEF FPC}
-  {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
-   {$IF Defined(HAS_FMX)}
-    DWString     = String;
-    DWWideString = WideString;
-    DWChar       = Char;
-   {$ELSE}
-    DWString     = Utf8String;
-    DWWideString = WideString;
-    DWChar       = Utf8Char;
-   {$IFEND}
-  {$ELSE}
-   {$IF Defined(HAS_FMX)}
-    DWString     = Utf8String;
-    DWWideString = Utf8String;
-    DWChar       = Utf8Char;
-   {$ELSE}
-    DWString     = AnsiString;
-    DWWideString = WideString;
-    DWChar       = Char;
-   {$IFEND}
-  {$IFEND}
- {$ELSE}
-  DWString     = AnsiString;
-  DWWideString = WideString;
-  DWChar       = Char;
- {$ENDIF}
-  PDWString     = ^DWString;
   EJclStringConversionError = class(EJclError);
   EJclUnexpectedEOSequenceError = class (EJclStringConversionError)
   public
@@ -109,7 +81,8 @@ uses
   Windows,
   {$ENDIF MSWINDOWS}
   {$ENDIF ~HAS_UNITSCOPE}
-  uRESTDWMemResources;
+  uRESTDWMemResources,
+  uRESTDWProtoTypes;
 const MB_ERR_INVALID_CHARS = 8;
 constructor EJclUnexpectedEOSequenceError.Create;
 begin

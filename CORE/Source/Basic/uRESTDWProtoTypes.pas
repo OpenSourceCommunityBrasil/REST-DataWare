@@ -197,7 +197,7 @@ uses
   {$ELSE}
    {$IF Defined(HAS_FMX)}
     DWString     = Utf8String;
-    DWWideString = Utf8String;
+    DWWideString = WideString;
     DWChar       = Utf8Char;
    {$ELSE}
     DWString     = AnsiString;
