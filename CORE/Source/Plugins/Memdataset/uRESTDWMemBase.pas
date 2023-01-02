@@ -214,34 +214,6 @@ const
 //  BOM_UTF7_5: array [0..3] of Byte = ($2B,$2F,$76,$38,$2D);
 type
   // Unicode transformation formats (UTF) data types
- {$IFNDEF FPC}
-  {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
-   {$IF Defined(HAS_FMX)}
-    DWString     = String;
-    DWWideString = WideString;
-    DWChar       = Char;
-   {$ELSE}
-    DWString     = Utf8String;
-    DWWideString = WideString;
-    DWChar       = Utf8Char;
-   {$IFEND}
-  {$ELSE}
-   {$IF Defined(HAS_FMX)}
-    DWString     = Utf8String;
-    DWWideString = Utf8String;
-    DWChar       = Utf8Char;
-   {$ELSE}
-    DWString     = AnsiString;
-    DWWideString = WideString;
-    DWChar       = Char;
-   {$IFEND}
-  {$IFEND}
- {$ELSE}
-  DWString     = AnsiString;
-  DWWideString = WideString;
-  DWChar       = Char;
- {$ENDIF}
- PDWChar       = ^DWChar;
   PUTF7 = ^UTF7;
   UTF7 = DwChar;
   PUTF8 = ^UTF8;

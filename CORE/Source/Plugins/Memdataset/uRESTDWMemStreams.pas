@@ -46,7 +46,9 @@ uses
   {$IFDEF HAS_UNIT_LIBC}
   Libc,
   {$ENDIF HAS_UNIT_LIBC}
-  uRESTDWMemBase, uRESTDWMemMath, uRESTDWMemStringConversions;
+  uRESTDWMemBase, uRESTDWMemMath,
+  uRESTDWMemStringConversions,
+  uRESTDWPrototypes;
 const
   StreamDefaultBufferSize = 4096;
 type
@@ -534,7 +536,7 @@ begin
   Result := Result64;
 end;
 procedure TJclStream.LoadFromFile(const FileName: TFileName;
-  BufferSize: Integer);
+  BufferSize: Longint = StreamDefaultBufferSize);
 var
   FS: TStream;
 begin
@@ -545,11 +547,11 @@ begin
     FS.Free;
   end;
 end;
-procedure TJclStream.LoadFromStream(Source: TStream; BufferSize: Integer);
+procedure TJclStream.LoadFromStream(Source: TStream; BufferSize: Longint = StreamDefaultBufferSize);
 begin
   StreamCopy(Source, Self, BufferSize);
 end;
-procedure TJclStream.SaveToFile(const FileName: TFileName; BufferSize: Integer);
+procedure TJclStream.SaveToFile(const FileName: TFileName; BufferSize: Longint = StreamDefaultBufferSize);
 var
   FS: TStream;
 begin
@@ -560,7 +562,7 @@ begin
     FS.Free;
   end;
 end;
-procedure TJclStream.SaveToStream(Dest: TStream; BufferSize: Integer);
+procedure TJclStream.SaveToStream(Dest: TStream; BufferSize: Longint = StreamDefaultBufferSize);
 begin
   StreamCopy(Self, Dest, BufferSize);
 end;
@@ -1353,7 +1355,8 @@ begin
   // override to customize (computation of protection)
 end;
 constructor TJclSectoredStream.Create(AStorageStream: TStream;
-  AOwnsStream: Boolean; ASectorOverHead: Integer);
+                                      AOwnsStream: Boolean = False;
+                                      ASectorOverHead: Longint = 0);
 begin
   inherited Create(AStorageStream, AOwnsStream);
   FSectorOverHead := ASectorOverHead;

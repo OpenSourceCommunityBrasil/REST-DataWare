@@ -47,7 +47,8 @@ uses
   {$ENDIF ~HAS_UNITSCOPE}
   uRESTDWMemAnsiStrings,
   uRESTDWMemWideStrings,
-  uRESTDWMemBase, Math;
+  uRESTDWMemBase, Math,
+  uRESTDWPrototypes;
 // Exceptions
 type
   EJclStringError = class(EJclError);

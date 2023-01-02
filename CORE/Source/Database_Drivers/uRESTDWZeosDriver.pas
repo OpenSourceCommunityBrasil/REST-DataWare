@@ -1,4 +1,4 @@
-﻿unit uRESTDWZeosDriver;
+unit uRESTDWZeosDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {$IFNDEF FPC}{$I ZComponent.inc}{$ENDIF}

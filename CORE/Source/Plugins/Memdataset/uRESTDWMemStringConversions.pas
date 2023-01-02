@@ -33,7 +33,8 @@ uses
   {$ELSE ~HAS_UNITSCOPE}
   Classes,
   {$ENDIF ~HAS_UNITSCOPE}
-  uRESTDWMemBase;
+  uRESTDWMemBase,
+  uRESTDWPrototypes;
 type
   EJclStringConversionError = class(EJclError);
   EJclUnexpectedEOSequenceError = class (EJclStringConversionError)
@@ -81,8 +82,7 @@ uses
   Windows,
   {$ENDIF MSWINDOWS}
   {$ENDIF ~HAS_UNITSCOPE}
-  uRESTDWMemResources,
-  uRESTDWProtoTypes;
+  uRESTDWMemResources;
 const MB_ERR_INVALID_CHARS = 8;
 constructor EJclUnexpectedEOSequenceError.Create;
 begin

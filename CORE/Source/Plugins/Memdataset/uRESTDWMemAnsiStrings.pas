@@ -40,7 +40,7 @@ uses
   {$ENDIF MSWINDOWS}
   Classes, SysUtils,
   {$ENDIF ~HAS_UNITSCOPE}
-  uRESTDWMemBase, Math;
+  uRESTDWMemBase, Math, uRESTDWPrototypes;
 // Ansi types
 type
   {$IFDEF SUPPORTS_UNICODE}
@@ -396,7 +396,7 @@ uses
   {$ENDIF HAS_UNIT_RTLCONSTS}
   {$ENDIF SUPPORTS_UNICODE}
   uRESTDWMemResources, uRESTDWMemStreams,
-  uRESTDWMemStringsB, uRESTDWProtoTypes;
+  uRESTDWMemStringsB;
 //=== Internal ===============================================================
 type
   TAnsiStrRec = packed record
