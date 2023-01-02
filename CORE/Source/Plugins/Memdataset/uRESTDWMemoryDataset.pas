@@ -1,6 +1,6 @@
 unit uRESTDWMemoryDataset;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -136,9 +136,10 @@ type
     function FindFieldData(Buffer: Pointer; Field: TField): Pointer;
     function CompareFields(Data1, Data2: Pointer; FieldType: TFieldType;
       CaseInsensitive: Boolean): Integer; virtual;
-    {$IFNDEF COMPILER10_UP} // Delphi 2006+ has support for DWWideString
-    procedure DataConvert(Field: TField; Source, Dest: Pointer; ToNative: Boolean); override;
-    {$ENDIF ~COMPILER10_UP}
+    // Delphi 2006+ has support for DWWideString
+    {$IF DEFINED(FPC) OR NOT DEFINED(COMPILER10_UP)}
+      procedure DataConvert(Field: TField; Source, Dest: Pointer; ToNative: Boolean); override;
+    {$ENDIF}
     procedure AssignMemoryRecord(Rec: TJvMemoryRecord; Buffer: PJvMemBuffer);
     function  GetActiveRecBuf(var RecBuf: PJvMemBuffer): Boolean; virtual;
     procedure InitFieldDefsFromFields;
@@ -353,17 +354,21 @@ uses
 const
   ftBlobTypes = [ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftParadoxOle,
     ftDBaseOle, ftTypedBinary, ftOraBlob, ftOraClob
-    {$IFDEF COMPILER10_UP}, ftWideMemo{$ENDIF COMPILER10_UP}];
+    {$IF DEFINED(FPC) OR DEFINED(COMPILER10_UP)}, ftWideMemo{$ENDIF}];
   // If you add a new supported type you _must_ also update CalcFieldLen()
   ftSupported = [ftString, ftSmallint, ftInteger, ftWord, ftBoolean,
     ftFloat, ftCurrency, ftDate, ftTime, ftDateTime, ftAutoInc, ftBCD,
     ftFMTBCD, ftTimestamp,
-    {$IFDEF COMPILER10_UP}
-    ftOraTimestamp, ftFixedWideChar,
-    {$ENDIF COMPILER10_UP}
-    {$IFDEF COMPILER12_UP}
-    ftLongWord, ftShortint, ftByte, ftExtended,
-    {$ENDIF COMPILER12_UP}
+    {$IFNDEF FPC}
+      {$IFDEF COMPILER10_UP}
+      ftOraTimestamp, ftFixedWideChar,
+      {$ENDIF COMPILER10_UP}
+      {$IFDEF COMPILER12_UP}
+      ftLongWord, ftShortint, ftByte, ftExtended,
+      {$ENDIF COMPILER12_UP}
+    {$ELSE}
+      ftFixedWideChar,
+    {$ENDIF FPC}
     ftBytes, ftVarBytes, ftADT, ftFixedChar, ftWideString, ftLargeint,
     ftVariant, ftGuid] + ftBlobTypes;
   fkStoredFields = [fkData];
@@ -403,10 +408,10 @@ begin
         DestField.AsBCD := SourceField.AsBCD;
       ftString:
         DestField.AsString := SourceField.AsString;
-      {$IFDEF COMPILER10_UP}
-      ftWideString:
-        DestField.AsWideString := SourceField.AsWideString;
-      {$ENDIF COMPILER10_UP}
+      {$IF DEFINED(FPC) OR DEFINED(COMPILER10_UP)}
+        ftWideString: DestField.AsWideString := SourceField.AsWideString;
+        ftFixedWideChar: DestField.AsWideString := SourceField.AsWideString;
+      {$ENDIF}
       ftFloat:
         DestField.AsFloat := SourceField.AsFloat;
       ftDateTime:
@@ -429,7 +434,8 @@ begin
   begin
     Result := Size;
     case FieldType of
-      ftString:
+      ftString,
+      ftFixedChar:
         Inc(Result);
       ftSmallint:
         Result := SizeOf(Smallint);
@@ -449,36 +455,46 @@ begin
         Result := SizeOf(TDateTime);
       ftAutoInc:
         Result := SizeOf(Longint);
-      ftBCD, ftFMTBCD:
-        Result := SizeOf(TBcd);
+      {$IFDEF FPC}
+        ftBCD: Result := SizeOf(Currency);
+        ftFMTBCD: Result := SizeOf(TBCD);
+      {$ELSE}
+        ftBCD, ftFMTBCD:
+          Result := SizeOf(TBcd);
+      {$ENDIF}
       ftTimeStamp:
         Result := SizeOf(TSQLTimeStamp);
-      {$IFDEF COMPILER10_UP}
-      ftOraTimestamp:
-        Result := SizeOf(TSQLTimeStamp);
-      ftFixedWideChar:
-        Result := (Result + 1) * SizeOf(WideChar);
-      {$ENDIF COMPILER10_UP}
-      {$IFDEF COMPILER12_UP}
-      ftLongWord:
-        Result := SizeOf(LongWord);
-      ftShortint:
-        Result := SizeOf(Shortint);
-      ftByte:
-        Result := SizeOf(Byte);
-      ftExtended:
-        Result := SizeOf(Extended);
-      {$ENDIF COMPILER12_UP}
+      {$IFNDEF FPC}
+        {$IFDEF COMPILER10_UP}
+        ftOraTimestamp:
+          Result := SizeOf(TSQLTimeStamp);
+        ftFixedWideChar:
+          Result := (Result + 1) * SizeOf(WideChar);
+        ftWideString:
+          Result := (Result + 1) * SizeOf(WideChar);
+        {$ENDIF COMPILER10_UP}
+        {$IFDEF COMPILER12_UP}
+        ftLongWord:
+          Result := SizeOf(LongWord);
+        ftShortint:
+          Result := SizeOf(Shortint);
+        ftByte:
+          Result := SizeOf(Byte);
+        ftExtended:
+          Result := SizeOf(Extended);
+        {$ENDIF COMPILER12_UP}
+      {$ELSE}
+        ftFixedWideChar:
+          Result := (Result + 1) * SizeOf(WideChar);
+        ftWideString:
+          Result := (Result + 1) * SizeOf(WideChar);
+      {$ENDIF}
       ftBytes:
         Result := Size;
       ftVarBytes:
         Result := Size + 2;
       ftADT:
         Result := 0;
-      ftFixedChar:
-        Inc(Result);
-      ftWideString:
-        Result := (Result + 1) * SizeOf(WideChar);
       ftLargeint:
         Result := SizeOf(Int64);
       ftVariant:
@@ -665,8 +681,17 @@ begin
       else
       if Double(Data1^) < Double(Data2^) then
         Result := -1;
-    ftFMTBcd, ftBcd:
-      Result := BcdCompare(TBcd(Data1^), TBcd(Data2^));
+    {$IFDEF FPC}
+      ftFMTBcd : Result := BcdCompare(TBcd(Data1^), TBcd(Data2^));
+      ftBcd    :
+        if Double(Data1^) > Double(Data2^) then
+          Result := 1
+        else if Double(Data1^) < Double(Data2^) then
+          Result := -1;
+    {$ELSE}
+      ftFMTBcd, ftBcd:
+        Result := BcdCompare(TBcd(Data1^), TBcd(Data2^));
+    {$ENDIF}
     ftDateTime:
       if TDateTime(Data1^) > TDateTime(Data2^) then
         Result := 1
@@ -678,13 +703,22 @@ begin
         Result := AnsiCompareText(PDWString(@Data1)^, PDWString(@Data2)^)
       else
         Result := AnsiCompareStr(PDWString(@Data1)^, PDWString(@Data2)^);
-    ftWideString:
-      if CaseInsensitive then
-        Result := AnsiCompareText(WideCharToString(PWideChar(Data1)),
-          WideCharToString(PWideChar(Data2)))
-      else
-        Result := AnsiCompareStr(WideCharToString(PWideChar(Data1)),
-          WideCharToString(PWideChar(Data2)));
+    {$IF DEFINED(FPC) OR DEFINED(COMPILER10_UP)}
+      ftFixedWideChar:
+        if CaseInsensitive then
+          Result := AnsiCompareText(WideCharToString(PWideChar(Data1)),
+            WideCharToString(PWideChar(Data2)))
+        else
+          Result := AnsiCompareStr(WideCharToString(PWideChar(Data1)),
+            WideCharToString(PWideChar(Data2)));
+      ftWideString:
+        if CaseInsensitive then
+          Result := AnsiCompareText(WideCharToString(PWideChar(Data1)),
+            WideCharToString(PWideChar(Data2)))
+        else
+          Result := AnsiCompareStr(WideCharToString(PWideChar(Data1)),
+            WideCharToString(PWideChar(Data2)));
+    {$ENDIF}
     ftLargeint:
       if Int64(Data1^) > Int64(Data2^) then
         Result := 1
@@ -1083,10 +1117,16 @@ begin
           Result := Result and (not TrimEmptyString or (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
                                                                             {$ELSE}PChar(Data){$IFEND}
                                                                {$ELSE}PAnsiChar(Data){$ENDIF}) > 0));
-        ftWideString:
-          Result := Result and (not TrimEmptyString or (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PChar(Data)
+        {$IF DEFINED(FPC) OR DEFINED(COMPILER10_UP)}
+          ftWideString:
+            Result := Result and (not TrimEmptyString or (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PChar(Data)
+                                                                              {$ELSE}PChar(Data){$IFEND}
+                                                                              {$ELSE}PWideChar(Data){$ENDIF}) > 0));
+          ftFixedWideChar:
+            Result := Result and (not TrimEmptyString or (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PChar(Data)
                                                                             {$ELSE}PChar(Data){$IFEND}
                                                                             {$ELSE}PWideChar(Data){$ENDIF}) > 0));
+        {$ENDIF}
       end;
       if Result and (Buffer <> nil) then
         if Field.DataType = ftVariant then
@@ -1370,23 +1410,37 @@ procedure TRESTDWMemTable.InternalLast;
 begin
   FRecordPos := FRecords.Count;
 end;
-{$IFNDEF COMPILER10_UP} // Delphi 2006+ has support for DWWideString
-procedure TRESTDWMemTable.DataConvert(Field: TField; Source, Dest: Pointer; ToNative: Boolean);
-begin
-  if Field.DataType = ftWideString then
+
+{$IFNDEF FPC}
+  {$IFNDEF COMPILER10_UP} // Delphi 2006+ has support for DWWideString
+  procedure TRESTDWMemTable.DataConvert(Field: TField; Source, Dest: Pointer; ToNative: Boolean);
   begin
-    if ToNative then
+    if Field.DataType = ftWideString then
     begin
-      Word(Dest^) := Length(PWideString(Source)^) * SizeOf(WideChar);
-      Move(PWideChar(Source^)^, (PWideChar(Dest) + 1)^, Word(Dest^));
+      if ToNative then
+      begin
+        Word(Dest^) := Length(PWideString(Source)^) * SizeOf(WideChar);
+        Move(PWideChar(Source^)^, (PWideChar(Dest) + 1)^, Word(Dest^));
+      end
+      else
+        SetString(WideString(Dest^), PWideChar(PWideChar(Source) + 1), Word(Source^) div SizeOf(WideChar));
     end
     else
-      SetString(WideString(Dest^), PWideChar(PWideChar(Source) + 1), Word(Source^) div SizeOf(WideChar));
-  end
-  else
-    inherited DataConvert(Field, Source, Dest, ToNative);
-end;
-{$ENDIF ~COMPILER10_UP}
+      inherited DataConvert(Field, Source, Dest, ToNative);
+  end;
+  {$ENDIF ~COMPILER10_UP}
+{$ELSE}
+  procedure TRESTDWMemTable.DataConvert(Field: TField; Source, Dest: Pointer; ToNative: Boolean);
+  begin
+    if Field.DataType = ftFixedWideChar then begin
+      StrCopy(PWideChar(Dest), PWideChar(Source));
+    end
+    else
+      inherited DataConvert(Field, Source, Dest, ToNative);
+  end;
+{$ENDIF}
+
+
 procedure TRESTDWMemTable.Assign(Source: TPersistent);
 begin
   if Source is TDataSet then
@@ -1792,7 +1846,7 @@ var
   var
     S: string;
   begin
-    if Field.DataType in [ftString{$IFDEF UNICODE}, ftWideString{$ENDIF}] then
+    if Field.DataType in [ftString{$IFDEF UNICODE}, ftWideString, ftFixedWideChar{$ENDIF}] then
     begin
       if Value = Null then
         Result := Field.IsNull
