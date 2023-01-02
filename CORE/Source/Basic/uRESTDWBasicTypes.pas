@@ -255,7 +255,6 @@ Uses
    Property DatabaseCharSet      : TDatabaseCharSet Read GetDatabaseCharSet Write SetDatabaseCharSet;
    {$ENDIF}
   Published
-   Property BinaryCompatibleMode : Boolean          Read vBinaryCompatibleMode  Write vBinaryCompatibleMode;
    Property    SequenceName      : String           Read vSequenceName          Write vSequenceName;
    Property    SequenceField     : String           Read vSequenceField         Write vSequenceField;
    Property    OnWriterProcess   : TOnWriterProcess Read vOnWriterProcess       Write vOnWriterProcess;
@@ -599,9 +598,7 @@ Begin
  vOnWriterProcess      := Nil;
  vBinaryCompatibleMode := False;
  vLoadFromStream       := False;
- {$IFDEF RESTDWMEMTABLE}
-  vBinaryCompatibleMode := True;
- {$ENDIF}
+ vBinaryCompatibleMode := True;
 End;
 
 {$IFDEF FPC}

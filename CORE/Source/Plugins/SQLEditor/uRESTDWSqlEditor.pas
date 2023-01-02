@@ -156,9 +156,6 @@ Begin
  Try
   RESTDWClientSQLB.Close;
   RESTDWClientSQLB.BinaryRequest        := RESTDWClientSQL.BinaryRequest;
-  {$IFNDEF DWMEMTABLE}
-  RESTDWClientSQLB.BinaryCompatibleMode := RESTDWClientSQL.BinaryCompatibleMode;
-  {$ENDIF}
   RESTDWClientSQLB.SQL.Clear;
   RESTDWClientSQLB.SQL.Add(Memo.Lines.Text);
   RESTDWClientSQLB.Open;

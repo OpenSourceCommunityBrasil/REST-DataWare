@@ -69,7 +69,7 @@ begin
     if (ft in [dwftFloat, dwftCurrency,dwftExtended,dwftSingle]) then begin
       vFieldDef.Precision := j;
     end
-    else if (ft in [dwftBCD,dwftFMTBcd]) then begin
+    else if (ft in [dwftBCD, dwftFMTBcd]) then begin
       vFieldDef.Size := 0;
       vFieldDef.Precision := 0;
     end;
@@ -106,7 +106,7 @@ var
   Cr : Currency;
   P : TMemoryStream;
   Bool : boolean;
-  vField : TField;
+  vField  : TField;
 begin
   for i := 0 to Length(FFieldTypes)-1 do begin
     vField := Dataset.Fields[i];
@@ -176,7 +176,11 @@ begin
       end;
       dwftFMTBcd :  begin
         Stream.Read(Cr, Sizeof(Currency));
-        vField.AsBCD := CurrToBCD(Cr);
+        {$IFDEF FPC}
+         vField.AsBCD := CurrToBCD(Cr);
+        {$ELSE}
+         vField.AsBCD := DoubleToBCD(Cr);
+        {$ENDIF}
       end;
       dwftCurrency,
       dwftBCD : begin

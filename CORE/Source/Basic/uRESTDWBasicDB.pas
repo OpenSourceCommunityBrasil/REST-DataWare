@@ -873,7 +873,7 @@ Type
   {$IFDEF FPC}
   Property DatabaseCharSet;
   {$ENDIF}
-  Property BinaryCompatibleMode;
+//  Property BinaryCompatibleMode;
   Property MasterCascadeDelete     : Boolean               Read vCascadeDelete            Write vCascadeDelete;
   Property BinaryRequest           : Boolean               Read vBinaryRequest            Write vBinaryRequest;
   Property Datapacks               : Integer               Read vDatapacks                Write SetDatapacks;
@@ -1116,7 +1116,7 @@ Type
   {$IFDEF FPC}
   Property DatabaseCharSet;
   {$ENDIF}
-  Property BinaryCompatibleMode;
+//  Property BinaryCompatibleMode;
   Property MasterCascadeDelete     : Boolean               Read vCascadeDelete            Write vCascadeDelete;
   Property BinaryRequest           : Boolean               Read vBinaryRequest            Write vBinaryRequest;
   Property Datapacks               : Integer               Read vDatapacks                Write SetDatapacks;
@@ -3180,7 +3180,7 @@ Var
     Result            := Format(TDatasetRequestJSON, [vTempLineSQL, vTempLineParams,
                                                       BooleanToString(TRESTDWClientSQL(Value).BinaryRequest),
                                                       BooleanToString(TRESTDWClientSQL(Value).Fields.Count = 0),
-                                                      BooleanToString(TRESTDWClientSQL(Value).BinaryCompatibleMode)]);
+                                                      BooleanToString(True)]);
    End;
  End;
  Procedure DatasetRequestToStream(Value : TRESTDWClientSQLBase);
@@ -3448,9 +3448,6 @@ Begin
           Else
            Begin
             vStream := DecodeStream(TRESTDWJSONInterfaceObject(vJsonValueB).pairs[0].value);
-            {$IFNDEF RESTDWMEMTABLE}
-            TRESTDWClientSQLBase(Datasets[I]).BinaryCompatibleMode := TRESTDWClientSQL(Datasets[I]).BinaryCompatibleMode;
-            {$ENDIF}
             TRESTDWClientSQLBase(Datasets[I]).SetInBlockEvents(True);
             Try
              TRESTDWClientSQLBase(Datasets[I]).LoadFromStream(TMemoryStream(vStream));
@@ -3507,9 +3504,6 @@ Begin
           Begin
            vStream := BufferStream.ReadStream;
            Try
-            {$IFNDEF RESTDWMEMTABLE}
-            TRESTDWClientSQLBase(Datasets[I]).BinaryCompatibleMode := TRESTDWClientSQL(Datasets[I]).BinaryCompatibleMode;
-            {$ENDIF}
             TRESTDWClientSQLBase(Datasets[I]).SetInBlockEvents(True);
             Try
              TRESTDWClientSQLBase(Datasets[I]).LoadFromStream(TMemoryStream(vStream));
@@ -9295,9 +9289,6 @@ Begin
  vInBlockEvents := True;
  Try
   Stream.Position := 0;
-  {$IFNDEF RESTDWMEMTABLE}
-  BinaryCompatibleMode := False;
-  {$ENDIF}
   TRESTDWClientSQLBase(Self).LoadFromStream(Stream);
  Finally
   vInBlockEvents := False;
@@ -9314,9 +9305,6 @@ begin
  vInBlockEvents := True;
  Try
   Stream.Position := 0;
-  {$IFNDEF RESTDWMEMTABLE}
-  BinaryCompatibleMode := False;
-  {$ENDIF}
   TRESTDWClientSQLBase(Self).LoadFromStream(Stream);
  Finally
   vInBlockEvents := False;
@@ -10485,7 +10473,7 @@ Begin
     If DataSet = Nil Then
      Begin
       vRESTDataBase.ExecuteCommandTB(vActualPoolerMethodClient, vTablename, vParams, vError, vMessageError, LDataSetList,
-                                     vRowsAffected, BinaryRequest,  BinaryCompatibleMode, Fields.Count = 0, Nil);
+                                     vRowsAffected, BinaryRequest,  True, Fields.Count = 0, Nil);
       If LDataSetList <> Nil Then
        Begin
         If BinaryRequest Then
@@ -10559,14 +10547,6 @@ Begin
            vStream.Position := 0;
            vTempDS := TRESTDWClientSQL.Create(Nil);
            Try
-            TRESTDWClientSQLBase(vTempDS).BinaryCompatibleMode := BinaryCompatibleMode;
-{
-// fernando
-            If BinaryCompatibleMode Then
-             TRESTDWClientSQLBase(vTempDS).LoadFromStream(TMemoryStream(vStream), stMetadata)
-            Else
-             TRESTDWClientSQL(vTempDS).LoadFromStream(TMemoryStream(vStream));
-}
             TRESTDWClientSQL(vTempDS).LoadFromStream(vStream);
             NewBinaryFieldList;
            Finally
@@ -10575,7 +10555,6 @@ Begin
           End;
          vStream.Position := 0;
          SetInBlockEvents(True);
-         TRESTDWClientSQLBase(Self).BinaryCompatibleMode := BinaryCompatibleMode;
          Try
           TRESTDWClientSQLBase(Self).LoadFromStream(TMemoryStream(vStream));
           TRESTDWClientSQLBase(Self).DisableControls;
@@ -10789,7 +10768,7 @@ Begin
       For I := 0 To 1 Do
        Begin
         vRESTDataBase.ExecuteCommand(vActualPoolerMethodClient, vSQL, vParams, vError, vMessageError, LDataSetList,
-                                     vRowsAffected, False, BinaryRequest,  BinaryCompatibleMode, vMetaData, vRESTDataBase.RESTClientPooler);
+                                     vRowsAffected, False, BinaryRequest,  True, vMetaData, vRESTDataBase.RESTClientPooler);
         If Not(vError) or (vMessageError <> cInvalidAuth) Then
          Break;
        End;
@@ -10872,13 +10851,6 @@ Begin
            vStream.Position := 0;
            vTempDS := TRESTDWClientSQL.Create(Nil);
            Try
-            TRESTDWClientSQLBase(vTempDS).BinaryCompatibleMode := BinaryCompatibleMode;
-{ // fernando
-            If BinaryCompatibleMode Then
-             TRESTDWClientSQLBase(vTempDS).LoadFromStream(TMemoryStream(vStream), stMetadata)
-            Else
-             TRESTDWClientSQL(vTempDS).LoadFromStream(TMemoryStream(vStream));
-}
             TRESTDWClientSQL(vTempDS).LoadFromStream(vStream);
             NewBinaryFieldList;
            Finally
@@ -10887,7 +10859,6 @@ Begin
           End;
          vStream.Position := 0;
          SetInBlockEvents(True);
-         TRESTDWClientSQLBase(Self).BinaryCompatibleMode := BinaryCompatibleMode;
          Try
           TRESTDWClientSQLBase(Self).LoadFromStream(TMemoryStream(vStream));
           TRESTDWClientSQLBase(Self).DisableControls;
