@@ -1,4 +1,4 @@
-unit uRESTDWDriverBase;
+﻿unit uRESTDWDriverBase;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -27,11 +27,11 @@ unit uRESTDWDriverBase;
 Interface
 
 Uses
-  Classes, SysUtils, TypInfo, DB, Variants,
+  Classes, SysUtils, TypInfo, DB, Variants, uRESTDWMemoryDataset,
   uRESTDWParams, uRESTDWComponentBase, uRESTDWEncodeClass,
   uRESTDWComponentEvents, uRESTDWJSONInterface, uRESTDWBufferBase,
   uRESTDWConsts, uRESTDWDataModule, uRESTDWBasicTypes, uRESTDWProtoTypes,
-  uRESTDWTools, uRESTDWStorageBase,  uRESTDWStorageBinRDW, uRESTDWMassiveBuffer;
+  uRESTDWTools, uRESTDWStorageBinRDW, uRESTDWMassiveBuffer;
 
 Type
   TRESTDWDatabaseInfo = Record
@@ -693,13 +693,14 @@ begin
   if FRESTDWStorage = nil then begin
     stor := TRESTDWStorageBinRDW.Create(nil);
     try
-      stor.SaveDatasetToStream(qry,stream);
+      stor.EncodeStrs := False;
+      stor.SaveToStream(qry,stream);
     finally
       stor.Free;
     end;
   end
   else begin
-    FRESTDWStorage.SaveDatasetToStream(qry,stream);
+    FRESTDWStorage.SaveToStream(qry,stream);
   end;
 end;
 
