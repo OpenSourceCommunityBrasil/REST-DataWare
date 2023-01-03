@@ -27,7 +27,7 @@ interface
 
 uses
   SysUtils, Classes, DB, Variants, uRESTDWProtoTypes, uRESTDWMemDBUtils,
-  uRESTDWMemExprParser{$IFNDEF FPC}, uRESTDWMemDBFilterExpr{$ENDIF},
+  uRESTDWMemExprParser{$IFNDEF FPC}, uRESTDWMemDBFilterExpr, SqlTimSt{$ENDIF},
   uRESTDWComponentBase, uRESTDWConsts;
 
 type
@@ -269,6 +269,7 @@ type
     function CompareBookmarks(aBookmark1, aBookmark2: TBookmark): Integer; override;
     function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
     procedure FixReadOnlyFields(MakeReadOnly: Boolean);
+    Procedure ClearBuffer;
     function GetFieldData(Field: TField; {$IFDEF RTL250_UP}var{$ENDIF} Buffer: TJvValueBuffer): Boolean; overload; override;
     {$IFNDEF NEXTGEN}
       {$IFDEF RTL240_UP}
@@ -903,15 +904,19 @@ begin
   FBlobOfs := FBookmarkOfs + SizeOf(TMemBookmarkInfo);
   FRecBufSize := FBlobOfs + BlobFieldCount * SizeOf(Pointer);
 end;
+
 procedure TRESTDWMemTable.ClearRecords;
 var
   I: Integer;
 begin
   FClearing := True;
   try
-    for I := FRecords.Count - 1 downto 0  do
+   If Assigned(FRecords) Then
+    Begin
+     for I := FRecords.Count - 1 downto 0  do
       TJvMemoryRecord(FRecords[I]).Free;
-    FRecords.Clear;
+     FRecords.Clear;
+    End; 
   finally
     FClearing := False;
   end;
@@ -1506,6 +1511,8 @@ end;
 {$IFNDEF FPC}
   {$IFNDEF COMPILER10_UP} // Delphi 2006+ has support for DWWideString
   procedure TRESTDWMemTable.DataConvert(Field: TField; Source, Dest: Pointer; ToNative: Boolean);
+  Var
+   D: TDateTime;
   begin
     if Field.DataType = ftWideString then
     begin
@@ -1518,7 +1525,7 @@ end;
         SetString(WideString(Dest^), PWideChar(PWideChar(Source) + 1), Word(Source^) div SizeOf(WideChar));
     end
     else
-      inherited DataConvert(Field, Source, Dest, ToNative);
+     inherited DataConvert(Field, Source, Dest, ToNative);
   end;
   {$ENDIF ~COMPILER10_UP}
 {$ELSE}
@@ -1854,7 +1861,7 @@ procedure TRESTDWMemTable.InternalClose;
 //  End;
 // End;
 Begin
- ClearRecords;
+ ClearBuffer;
  FAutoInc := 1;
  BindFields(False);
  If DefaultFields then
@@ -2073,6 +2080,13 @@ begin
     else
       FieldDefs.Items[I].CreateField(Self);
 end;
+
+Procedure TRESTDWMemTable.ClearBuffer;
+Begin
+ ClearRecords;
+ ClearBuffers;
+ DataEvent(deDataSetChange, 0);
+End;
 
 procedure TRESTDWMemTable.FixReadOnlyFields(MakeReadOnly: Boolean);
 var
@@ -3241,7 +3255,7 @@ end;
 procedure TRESTDWStorageBase.LoadFromStream(dataset: TDataset; stream: TStream);
 begin
   if dataset.InheritsFrom(TRESTDWMemTable) then
-    LoadDWMemFromStream(TRESTDWMemTable(dataset),stream)
+    LoadDWMemFromStream(TRESTDWMemTable(dataset), stream)
   else
     LoadDatasetFromStream(dataset,stream);
 end;

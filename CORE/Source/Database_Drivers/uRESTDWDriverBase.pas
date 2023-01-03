@@ -693,6 +693,7 @@ begin
   if FRESTDWStorage = nil then begin
     stor := TRESTDWStorageBinRDW.Create(nil);
     try
+      stor.EncodeStrs := False;
       stor.SaveToStream(qry,stream);
     finally
       stor.Free;

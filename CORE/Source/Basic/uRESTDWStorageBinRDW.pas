@@ -116,50 +116,40 @@ var
   b : boolean;
   vFieldDef : TFieldDef;
   ds : TRESTDWMemTable;
-begin
-//  LoadDatasetFromStream(TDataSet(dataset),stream);
-//  Exit;
+Begin
+ ds := TRESTDWMemTable(dataset.GetDataset);
 
-  ds := {$IFDEF FPC} TRESTDWMemTable(dataset.GetDataset) {$ELSE} TRESTDWMemTable(dataset) {$ENDIF};
-
-  stream.Position := 0;
-  stream.Read(fc,SizeOf(Integer));
-
-  SetLength(FFieldTypes,fc);
-
-  Stream.Read(b, Sizeof(Byte));
-  EncodeStrs := b;
-
-  ds.EmptyTable;
-  if ds.Active then
-    ds.CancelChanges;
-
-  ds.Close;
+ stream.Position := 0;
+ stream.Read(fc,SizeOf(Integer));
+ SetLength(FFieldTypes,fc);
+ Stream.Read(b, Sizeof(Byte));
+ EncodeStrs := b;
+ ds.ClearBuffer;
+ If ds.Active Then
+  Begin
+   ds.CancelChanges;
+   ds.Close;
+  End;
+ If ds.FieldDefs.Count > 0 Then
   ds.FieldDefs.Clear;
-
-  for i := 0 to fc-1 do begin
+ For i := 0 To fc-1 Do
+  Begin
+   stream.Read(j,SizeOf(Integer));
+   fk := TFieldKind(j);
+   vFieldDef := ds.FieldDefs.AddFieldDef;
     stream.Read(j,SizeOf(Integer));
-    fk := TFieldKind(j);
-    vFieldDef := ds.FieldDefs.AddFieldDef;
-
+   SetLength(s,j);
+   stream.Read(s[InitStrPos],j);
+   vFieldDef.Name := s;
+   stream.Read(ft,SizeOf(Byte));
+   vFieldDef.DataType := DWFieldTypeToFieldType(ft);
+   FFieldTypes[i] := ft;
     stream.Read(j,SizeOf(Integer));
-    SetLength(s,j);
-    stream.Read(s[InitStrPos],j);
-
-    vFieldDef.Name := s;
-
-    stream.Read(ft,SizeOf(Byte));
-    vFieldDef.DataType := DWFieldTypeToFieldType(ft);
-    FFieldTypes[i] := ft;
-
-    stream.Read(j,SizeOf(Integer));
-    vFieldDef.Size := j;
-
-    stream.Read(j,SizeOf(Integer));
-    if (ft in [dwftFloat, dwftCurrency,dwftExtended,dwftSingle]) then begin
-      vFieldDef.Precision := j;
-    end
-    else if (ft in [dwftBCD, dwftFMTBcd]) then begin
+   vFieldDef.Size := j;
+   stream.Read(j,SizeOf(Integer));
+   if (ft in [dwftFloat, dwftCurrency,dwftExtended,dwftSingle]) then
+    vFieldDef.Precision := j
+   Else if (ft in [dwftBCD, dwftFMTBcd]) then begin
       vFieldDef.Size := 0;
       vFieldDef.Precision := 0;
     end;
@@ -197,20 +187,32 @@ var
 
  Bool          : boolean;
  L             : LongInt;
- S             : DWString;
- J             : Integer;
  R             : Real;
- E             : Extended;
+ S             : DWString;
  Cr            : Currency;
- P             : TMemoryStream;
- Dt            : TDateTime;
+ P             : TStream;
  Ts            : {$IFDEF FPC} TTimeStamp {$ELSE} TSQLTimeStamp {$ENDIF};
  bcd           : TBcd;
  {$IFDEF FPC}
+  dtRec         : TDateTimeRec;
+ {$ELSE}
+  {$IF (CompilerVersion < 22)}
    dtRec         : TDateTimeRec;
+  {$IFEND}
  {$ENDIF}
 Begin
-  ds := {$IFDEF FPC} TRESTDWMemTable(dataset.GetDataset) {$ELSE} TRESTDWMemTable(dataset) {$ENDIF};
+(*
+  ds := {$IFDEF FPC}
+         TRESTDWMemTable(dataset.GetDataset)
+        {$ELSE}
+         {$IF (CompilerVersion < 22)}
+          TRESTDWMemTable(dataset.GetDataset)
+         {$ELSE}
+          TRESTDWMemTable(dataset)
+         {$IFEND}
+        {$ENDIF};
+*)
+  ds := TRESTDWMemTable(dataset.GetDataset);
 
   stream.Read(rc,SizeOf(LongInt));
   rc := rc - 1;
@@ -230,7 +232,7 @@ Begin
           if dataset.DataTypeIsBlobTypes(aDataType) then
             PData    := Pointer(dataset.GetBlobRec(ds.Fields[B], vActualRecord))
           else
-            PData    := (PActualRecord + dataset.GetOffSets(aIndex));
+            PData    := Pointer(PActualRecord + dataset.GetOffSets(aIndex));
         end;
 
         // field null
@@ -238,17 +240,39 @@ Begin
 
         if PData <> nil then begin
           if not Bool then begin
-            PData^ := {$IFDEF FPC} Char(1) {$ELSE}  Ord(True) {$ENDIF};
+            PData^ := {$IFDEF FPC} Char(1) {$ELSE} Ord(True) {$ENDIF};
             Inc(PData);
 
+            cLen := Dataset.GetCalcFieldLen(ds.Fields[B].DataType, ds.Fields[B].Size);
             {$IFDEF FPC}
-              cLen := Dataset.GetCalcFieldLen(ds.Fields[B].DataType, ds.Fields[B].Size);
-              FillChar(PData^, cLen, #0);
+              FillChar(PData^, cLen , #0);
+            {$ELSE}
+              FillChar(PData^, cLen , 0);
             {$ENDIF}
 
             case FieldTypeToDWFieldType(aDataType) of
-              dwftFixedChar,
               dwftWideString,
+              dwftFixedWideChar : begin
+                Stream.Read(L, Sizeof(L));
+                S := '';
+                if L > 0 then begin
+                  SetLength(S, L);
+                  {$IFDEF FPC}
+                   Stream.Read(Pointer(S)^, L);
+                   if EncodeStrs then
+                     S := DecodeStrings(S, csUndefined);
+                   S := GetStringEncode(S, csUndefined);
+                   L := (Length(S)+1)*SizeOf(WideChar);
+                   Move(Pointer(WideString(S))^, PData^, L);
+                  {$ELSE}
+                   Stream.Read(S[InitStrPos], L);
+                   if EncodeStrs then
+                     S := DecodeStrings(S);
+                   Move(S[InitStrPos], PData^, Length(S));
+                  {$ENDIF}
+                end;
+              end;
+              dwftFixedChar,
               dwftString : begin
                           Stream.Read(L, Sizeof(L));
                           S := '';
@@ -264,7 +288,7 @@ Begin
                              Stream.Read(S[InitStrPos], L);
                              if EncodeStrs then
                                S := DecodeStrings(S);
-                             Move(S[1], PData^, Length(S));
+                             Move(S[InitStrPos], PData^, Length(S));
                             {$ENDIF}
                           end;
               end;
@@ -274,20 +298,20 @@ Begin
               dwftWord,
               dwftInteger,
               dwftAutoInc :  Begin
-                              Stream.Read(J, Sizeof(Integer));
-                              Move(J, PData^, Sizeof(J))
+                              Stream.Read(PData^, Sizeof(Integer));
+//                              Move(J, PData^, Sizeof(J))
               end;
               dwftSingle   : begin
-                              Stream.Read(R, Sizeof(Real));
-                              Move(R, PData^, Sizeof(R))
+                              Stream.Read(PData^, Sizeof(Real));
+//                              Move(R, PData^, Sizeof(R))
                              end;
               dwftExtended : begin
-                              Stream.Read(E, Sizeof(Extended));
-                              Move(E, PData^, Sizeof(E))
+                              Stream.Read(PData^, Sizeof(Extended));
+//                              Move(E, PData^, Sizeof(E))
                              end;
               dwftFloat    : begin
-                Stream.Read(R, Sizeof(Real));
-                Move(R, PData^, Sizeof(R))
+                Stream.Read(PData^, Sizeof(Real));
+//                Move(R, PData^, Sizeof(R))
               end;
               dwftFMTBcd :  begin
                 Stream.Read(Cr, Sizeof(Currency));
@@ -300,36 +324,44 @@ Begin
               end;
               dwftCurrency,
               dwftBCD : begin
-                Stream.Read(Cr, Sizeof(Currency));
-                Move(Cr, PData^, Sizeof(Cr))
+                Stream.Read(PData^, Sizeof(Currency));
+//                Move(Cr, PData^, Sizeof(Cr))
               end;
               dwftDate,
               dwftTime,
               dwftDateTime : begin
                 Stream.Read(R, Sizeof(Real));
-                Dt := R;
                 {$IFDEF FPC}
-                  dtRec := DateTimeToDateTimeRec(aDataType,Dt);
+                  dtRec := DateTimeToDateTimeRec(aDataType,TDateTime(R));
                   Move(dtRec, PData^, SizeOf(dtRec));
                 {$ELSE}
-                  Move(Dt, PData^, SizeOf(Dt));
+                  {$IF (CompilerVersion < 22)}
+                   Case aDataType Of
+                    ftDate: dtRec.Date := DateTimeToTimeStamp(R).Date;
+                    ftTime: dtRec.Time := DateTimeToTimeStamp(R).Time;
+                    Else
+                     dtRec.DateTime := TimeStampToMSecs(DateTimeToTimeStamp(R));
+                   End;
+                   Move(dtRec, PData^, SizeOf(dtRec));
+                  {$ELSE}
+                    Move(R, PData^, SizeOf(TDateTime));
+                  {$IFEND}
                 {$ENDIF}
               end;
               dwftTimeStampOffset,
               dwftTimeStamp : begin
                           Stream.Read(R, Sizeof(Real));
-                          Dt := R;
-                          Ts := {$IFDEF FPC} DateTimeToTimeStamp(Dt) {$ELSE} DateTimeToSQLTimeStamp(Dt) {$ENDIF};
+                          Ts := {$IFDEF FPC} DateTimeToTimeStamp(R) {$ELSE} DateTimeToSQLTimeStamp(R) {$ENDIF};
                           Move(Ts, PData^, Sizeof(Ts));
               End;
               dwftLongWord,
               dwftLargeint : begin
-                          Stream.Read(L, Sizeof(LongInt));
-                          Move(L, PData^, Sizeof(L))
+                          Stream.Read(PData^, Sizeof(LongInt));
+//                          Move(L, PData^, Sizeof(L))
               end;
               dwftBoolean  : begin
-                          Stream.Read(Bool, Sizeof(Byte));
-                          Move(Bool, PData^, Sizeof(Byte))
+                          Stream.Read(PData^, Sizeof(Byte));
+//                          Move(Bool, PData^, Sizeof(Byte))
               End;
               dwftMemo,
               dwftWideMemo,
@@ -339,13 +371,12 @@ Begin
               dwftBytes : begin
                           Stream.Read(L, Sizeof(LongInt));
                           if L > 0 then Begin
-                            P := TMemoryStream.Create;
+                            P := ds.CreateBlobStream(ds.Fields[B],bmWrite);
                             try
                               P.CopyFrom(Stream, L);
                               P.Position := 0;
-                              TBlobField(ds.Fields[B]).LoadFromStream(P);
                             finally
-                             P.Free;
+
                             end;
                           end;
               end;
@@ -359,10 +390,12 @@ Begin
                              if EncodeStrs then
                                S := DecodeStrings(S, csUndefined);
                              S := GetStringEncode(S, csUndefined);
+                             Move(Pointer(S)^, PData^, Length(S));
                             {$ELSE}
                              Stream.Read(S[InitStrPos], L);
                              if EncodeStrs then
                                S := DecodeStrings(S);
+                             Move(S[InitStrPos], PData^, Length(S));
                             {$ENDIF}
                           end;
                           Move(S[1], PData^, L)
@@ -632,7 +665,7 @@ var
 begin
   stream.Size := 0;
 
-  ds := {$IFDEF FPC} TRESTDWMemTable(dataset.GetDataset) {$ELSE} TRESTDWMemTable(dataset) {$ENDIF};
+  ds := TRESTDWMemTable(dataset.GetDataset);
 
   if not ds.Active then
     ds.Open
@@ -711,7 +744,7 @@ var
  Ts            : {$IFDEF FPC} TTimeStamp {$ELSE} TSQLTimeStamp {$ENDIF};
  bcd           : TBcd;
 Begin
-  ds := {$IFDEF FPC} TRESTDWMemTable(dataset.GetDataset) {$ELSE} TRESTDWMemTable(dataset) {$ENDIF};
+  ds := TRESTDWMemTable(dataset.GetDataset);
 
   fc := ds.Fields.Count - 1;
   Result := dataset.GetRecordCount - 1; // isso pesa muito
@@ -729,7 +762,7 @@ Begin
           if dataset.DataTypeIsBlobTypes(aDataType) then
             PData    := Pointer(dataset.GetBlobRec(ds.Fields[B], vActualRecord))
           else
-            PData    := (PActualRecord + dataset.GetOffSets(aIndex));
+            PData    := Pointer(PActualRecord + dataset.GetOffSets(aIndex));
           if PData <> nil then begin
             if ds.Fields[B] is TBlobField then
               aBreak  := PData <> nil
