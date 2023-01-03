@@ -26,8 +26,9 @@ unit uRESTDWMemoryDataset;
 interface
 
 uses
-  SysUtils, Classes, DB, Variants, uRESTDWStorageBinRDW, uRESTDWStorageBase, uRESTDWProtoTypes,
-  uRESTDWMemDBUtils, uRESTDWMemExprParser{$IFNDEF FPC}, uRESTDWMemDBFilterExpr{$ENDIF};
+  SysUtils, Classes, DB, Variants, uRESTDWProtoTypes, uRESTDWMemDBUtils,
+  uRESTDWMemExprParser{$IFNDEF FPC}, uRESTDWMemDBFilterExpr{$ENDIF},
+  uRESTDWComponentBase, uRESTDWConsts;
 
 type
   {$IFDEF NEXTGEN}
@@ -62,7 +63,54 @@ type
   TJvValueBuffer = Pointer;
   TJvRecordBuffer = Pointer;
   {$ENDIF RTL240_UP}
-  TRESTDWMemTable = class(TDataSet)
+
+  IRESTDWMemTable = interface
+    function GetRecordCount: Integer;
+    function GetMemoryRecord(Index: integer): TJvMemoryRecord;
+    function GetOffSets(index : integer) : Word;
+    function DataTypeSuported(datatype : TFieldType) : boolean; // new
+    function DataTypeIsBlobTypes(datatype : TFieldType) : boolean; // new
+    function GetBlobRec(Field: TField; Rec : TJvMemoryRecord) : TMemBlobData;
+
+    function GetCalcFieldLen(FieldType: TFieldType; Size: Word): Word;
+    procedure InternalAddRecord(Buffer  : {$IFDEF FPC}Pointer{$ELSE}
+                                          {$IFDEF NEXTGEN}TRecBuf{$ELSE}
+                                          {$IF CompilerVersion <= 22}Pointer{$ELSE}TRecordBuffer
+                                          {$IFEND}
+                                          {$ENDIF}
+                                          {$ENDIF};
+                               aAppend : Boolean);
+    procedure InitRecord(Buffer: PJvMemBuffer);
+    function AllocRecordBuffer: PJvMemBuffer;
+    procedure SetMemoryRecordData(Buffer: PJvMemBuffer; Pos: Integer);
+    function GetDataset : TDataSet;
+  end;
+
+  TRESTDWStorageBase = class(TRESTDWComponent)
+  private
+    {$IFDEF FPC}
+      FDatabaseCharSet : TDatabaseCharSet;
+    {$ENDIF}
+    FEncodeStrs : boolean;
+  protected
+    procedure SaveDatasetToStream(dataset : TDataset; var stream : TStream); virtual;
+    procedure LoadDatasetFromStream(dataset : TDataset; stream : TStream); virtual;
+
+    procedure SaveDWMemToStream(dataset : IRESTDWMemTable; var stream : TStream); virtual;
+    procedure LoadDWMemFromStream(dataset : IRESTDWMemTable; stream : TStream); virtual;
+  public
+    constructor Create(AOwner : TComponent); override;
+
+    procedure SaveToStream(dataset : TDataset; var stream : TStream);
+    procedure LoadFromStream(dataset : TDataset; stream : TStream);
+  public
+    {$IFDEF FPC}
+      property DatabaseCharSet : TDatabaseCharSet read FDatabaseCharSet write FDatabaseCharSet;
+    {$ENDIF}
+    property EncodeStrs : boolean read FEncodeStrs write FEncodeStrs;
+  end;
+
+  TRESTDWMemTable = class(TDataSet, IRESTDWMemTable)
   private
     FSaveLoadState: TSaveLoadState;
     FRecordPos: Integer;
@@ -205,6 +253,14 @@ type
     procedure SetFilterText(const Value: string); override;
     function ParserGetVariableValue(Sender: TObject; const VarName: string; var Value: Variant): Boolean; virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    // interface
+      function DataTypeSuported(datatype : TFieldType) : boolean;
+      function DataTypeIsBlobTypes(datatype : TFieldType) : boolean;
+      function GetOffSets(index : integer) : Word;
+      function GetBlobRec(Field: TField; Rec : TJvMemoryRecord) : TMemBlobData;
+      function GetCalcFieldLen(FieldType: TFieldType; Size: Word): Word;
+      function GetDataset : TDataSet;
+    // interface
     property Records[Index: Integer]: TJvMemoryRecord read GetMemoryRecord;
   public
     constructor Create(AOwner: TComponent); override;
@@ -338,6 +394,7 @@ type
     property Index: Integer read GetIndex write SetIndex;
     property Data: Pointer read FData;
   end;
+
 implementation
 uses
   Types, Math,
@@ -349,7 +406,8 @@ uses
   uRESTDWMemVCLUtils,
   uRESTDWMemResources,
   uRESTDWTools,
-  uRESTDWBasicTypes;
+  uRESTDWBasicTypes,
+  uRESTDWStorageBinRDW;
 
 const
   ftBlobTypes = [ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftParadoxOle,
@@ -731,6 +789,7 @@ begin
       Result := CompareText(PDWString(Data1)^, PDWString(Data2)^);
   end;
 end;
+
 function TRESTDWMemTable.GetCapacity: Integer;
 begin
   if FRecords <> nil then
@@ -764,6 +823,7 @@ begin
   Result := AddRecord;
   Result.Index := Index;
 end;
+
 function TRESTDWMemTable.GetMemoryRecord(Index: Integer): TJvMemoryRecord;
 begin
   Result := TJvMemoryRecord(FRecords[Index]);
@@ -1406,9 +1466,41 @@ procedure TRESTDWMemTable.InternalFirst;
 begin
   FRecordPos := -1;
 end;
+
 procedure TRESTDWMemTable.InternalLast;
 begin
   FRecordPos := FRecords.Count;
+end;
+
+function TRESTDWMemTable.GetDataset : TDataSet;
+begin
+  Result := TDataSet(Self);
+end;
+
+function TRESTDWMemTable.GetCalcFieldLen(FieldType: TFieldType;
+  Size: Word): Word;
+begin
+  Result := CalcFieldLen(FieldType, Size);
+end;
+
+function TRESTDWMemTable.GetBlobRec(Field: TField; Rec : TJvMemoryRecord) : TMemBlobData;
+begin
+  Result := PMemBlobArray(Rec.FBlobs)^[Field.Offset];
+end;
+
+function TRESTDWMemTable.GetOffSets(index : integer) : Word;
+begin
+  Result := FOffsets[index];
+end;
+
+function TRESTDWMemTable.DataTypeIsBlobTypes(datatype : TFieldType) : boolean;
+begin
+  Result := datatype in ftBlobTypes;
+end;
+
+function TRESTDWMemTable.DataTypeSuported(datatype: TFieldType): boolean;
+begin
+  Result := datatype in ftSupported;
 end;
 
 {$IFNDEF FPC}
@@ -2136,13 +2228,13 @@ begin
   if FRESTDWStorage = nil then begin 
     stor := TRESTDWStorageBinRDW.Create(nil);
     try
-      stor.LoadDatasetFromStream(Self, Stream);
+      stor.LoadFromStream(Self, Stream);
     finally
       stor.Free;
     end;
   end
   else begin
-    FRESTDWStorage.LoadDatasetFromStream(Self, Stream);    
+    FRESTDWStorage.LoadFromStream(Self, Stream);
   end;
 end;
 
@@ -2257,13 +2349,13 @@ begin
   if FRESTDWStorage = nil then begin  
     stor := TRESTDWStorageBinRDW.Create(nil);
     try
-      stor.SaveDatasetToStream(TDataset(Self), Stream);
+      stor.SaveToStream(TDataset(Self), Stream);
     finally
       stor.Free;
     end;
   end
   else begin
-    FRESTDWStorage.SaveDatasetToStream(TDataset(Self), Stream);
+    FRESTDWStorage.SaveToStream(TDataset(Self), Stream);
   end;
 end;
 
@@ -3125,4 +3217,56 @@ begin
     else
       Result := Length(GetBlobFromRecord(FField));
 end;
+
+{ TRESTDWStorageBase }
+
+constructor TRESTDWStorageBase.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FEncodeStrs := True;
+end;
+
+procedure TRESTDWStorageBase.LoadDatasetFromStream(dataset: TDataset;
+  stream: TStream);
+begin
+
+end;
+
+procedure TRESTDWStorageBase.LoadDWMemFromStream(dataset: IRESTDWMemTable;
+  stream: TStream);
+begin
+
+end;
+
+procedure TRESTDWStorageBase.LoadFromStream(dataset: TDataset; stream: TStream);
+begin
+  if dataset.InheritsFrom(TRESTDWMemTable) then
+    LoadDWMemFromStream(TRESTDWMemTable(dataset),stream)
+  else
+    LoadDatasetFromStream(dataset,stream);
+end;
+
+procedure TRESTDWStorageBase.SaveDatasetToStream(dataset: TDataset;
+  var stream: TStream);
+begin
+
+end;
+
+procedure TRESTDWStorageBase.SaveDWMemToStream(dataset: IRESTDWMemTable;
+  var stream: TStream);
+begin
+
+end;
+
+procedure TRESTDWStorageBase.SaveToStream(dataset: TDataset;
+  var stream: TStream);
+begin
+  if dataset.InheritsFrom(TRESTDWMemTable) then
+    SaveDWMemToStream(TRESTDWMemTable(dataset),stream)
+  else
+    SaveDatasetToStream(dataset,stream);
+end;
+
 end.
+
+
