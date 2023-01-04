@@ -274,6 +274,8 @@ var
   oRow    : TFDDatSRow;
   j       : Integer;
   oFmtOpts: TFDFormatOptions;
+  sSchema,
+  sTable  : string;
 //  ss : TStringList;
 begin
   oFmtOpts := GetOptions.FormatOptions;
@@ -296,14 +298,26 @@ begin
       oRow.SetData(2, null); // SCHEMA_NAME
       oRow.SetData(3, GetBaseObjectName); // TABLE_NAME
       oRow.SetData(4, null); // INDEX_NAME
-      oRow.SetData(5, Trim(FInfoMetada.Strings[ARow])); // CONSTRAINT_NAME
+      oRow.SetData(5, FInfoMetada.Strings[ARow]); // CONSTRAINT_NAME
       oRow.SetData(6, ARow); // INDEX_TYPE
     end
     else if GetMetaInfoKind = mkTables then begin
+      sSchema := '';
+      sTable := FInfoMetada.Strings[ARow];
+      j := Pos('.',sTable);
+      if j > 0 then begin
+        sSchema := Copy(sTable,1,j-1);
+        Delete(sTable,1,j);
+      end;
+
       oRow.SetData(0, ARow); // RECNO
       oRow.SetData(1, null); // CATALOG_NAME
-      oRow.SetData(2, null); // SCHEMA_NAME
-      oRow.SetData(3, Trim(FInfoMetada.Strings[ARow])); // TABLE_NAME
+      if sSchema <> '' then
+        oRow.SetData(2, sSchema) // SCHEMA_NAME
+      else
+        oRow.SetData(2, null); // SCHEMA_NAME
+
+      oRow.SetData(3, sTable); // TABLE_NAME
       oRow.SetData(4, ctTable); // TABLE_TYPE
     end
     else if GetMetaInfoKind = mkTableFields then begin
@@ -311,7 +325,7 @@ begin
       oRow.SetData(1, null); // CATALOG_NAME
       oRow.SetData(2, null); // SCHEMA_NAME
       oRow.SetData(3, GetBaseObjectName); // TABLE_NAME
-      oRow.SetData(4, Trim(FInfoMetada.Strings[ARow])); // COLUMN_NAME
+      oRow.SetData(4, FInfoMetada.Strings[ARow]); // COLUMN_NAME
       oRow.SetData(5, ARow); // COLUMN_POSITION
       oRow.SetData(6, null); // COLUMN_DATATYPE
       oRow.SetData(7, null); // COLUMN_TYPENAME

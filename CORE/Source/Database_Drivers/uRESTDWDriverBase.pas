@@ -28,7 +28,7 @@ Interface
 
 Uses
   Classes, SysUtils, TypInfo, DB, Variants, uRESTDWMemoryDataset,
-  uRESTDWParams, uRESTDWComponentBase, uRESTDWEncodeClass,
+  uRESTDWParams, uRESTDWComponentBase, uRESTDWEncodeClass, StrUtils,
   uRESTDWComponentEvents, uRESTDWJSONInterface, uRESTDWBufferBase,
   uRESTDWConsts, uRESTDWDataModule, uRESTDWBasicTypes, uRESTDWProtoTypes,
   uRESTDWTools, uRESTDWStorageBin, uRESTDWMassiveBuffer;
@@ -2688,7 +2688,7 @@ Var
  vStateResource : Boolean;
  connType : TRESTDWDatabaseType;
  qry : TRESTDWDrvQuery;
- vSchema : String;
+ vSchema, sTable : String;
  fdPos : integer;
 Begin
  If Not Assigned(TableNames) Then
@@ -2755,7 +2755,9 @@ Begin
    End;
    While Not qry.Eof Do
     Begin
-     TableNames.Add(qry.Fields[fdPos].AsString);
+     sTable := Trim(qry.Fields[fdPos].AsString);
+     sTable := AnsiReplaceStr(sTable,'"','');
+     TableNames.Add(sTable);
      qry.Next;
     End;
   Finally
@@ -2781,7 +2783,7 @@ Var
  vStateResource : Boolean;
  connType       : TRESTDWDatabaseType;
  qry            : TRESTDWDrvQuery;
- vTable,
+ vTable, sFields,
  vSchema        : String;
  fPos           : Integer;
 Begin
@@ -2853,7 +2855,10 @@ Begin
    End;
    While Not qry.Eof Do
     Begin
-     FieldNames.Add(qry.Fields[fPos].AsString);
+     sFields := Trim(qry.Fields[fPos].AsString);
+     sFields := AnsiReplaceStr(sFields,'"','');
+
+     FieldNames.Add(sFields);
      qry.Next;
     End;
   Finally
@@ -2879,7 +2884,7 @@ Var
  vStateResource : Boolean;
  connType       : TRESTDWDatabaseType;
  qry            : TRESTDWDrvQuery;
- vTable,
+ vTable, sFields,
  vSchema        : String;
 Begin
  If Not Assigned(FieldNames) Then
@@ -2908,7 +2913,9 @@ Begin
                     qry.Open;
                     While Not qry.Eof Do
                      Begin
-                      FieldNames.Add(qry.FieldByName('RDB$FIELD_NAME').AsString);
+                      sFields := Trim(qry.FieldByName('RDB$FIELD_NAME').AsString);
+                      sFields := AnsiReplaceStr(sFields,'"','');
+                      FieldNames.Add(sFields);
                       qry.Next;
                      End;
                    End;
@@ -2921,7 +2928,9 @@ Begin
                     qry.Open;
                     While Not qry.Eof Do
                      Begin
-                      FieldNames.Add(qry.FieldByName('RDB$FIELD_NAME').AsString);
+                      sFields := Trim(qry.FieldByName('RDB$FIELD_NAME').AsString);
+                      sFields := AnsiReplaceStr(sFields,'"','');
+                      FieldNames.Add(sFields);
                       qry.Next;
                      End;
                    End;
@@ -2930,8 +2939,11 @@ Begin
                     qry.Open;
                     While Not qry.Eof Do
                      Begin
-                      If (Pos('PRIMARY', UpperCase(qry.FieldByName('KEY_NAME').AsString)) > 0) Then
-                       FieldNames.Add(qry.FieldByName('COLUMN_NAME').AsString);
+                      If (Pos('PRIMARY', UpperCase(qry.FieldByName('KEY_NAME').AsString)) > 0) Then Begin
+                        sFields := Trim(qry.FieldByName('COLUMN_NAME').AsString);
+                        sFields := AnsiReplaceStr(sFields,'"','');
+                       FieldNames.Add(sFields);
+                      End;
                       qry.Next;
                      End;
                    End;
@@ -2950,7 +2962,9 @@ Begin
                      qry.Open;
                      While Not qry.Eof Do
                       Begin
-                       FieldNames.Add(qry.FieldByName('ATTNAME').AsString);
+                       sFields := Trim(qry.FieldByName('ATTNAME').AsString);
+                       sFields := AnsiReplaceStr(sFields,'"','');
+                       FieldNames.Add(sFields);
                        qry.Next;
                       End;
                     End;
@@ -2959,8 +2973,11 @@ Begin
                      qry.Open;
                      While Not qry.Eof Do
                       Begin
-                       If qry.FieldByName('pk').AsInteger > 0 Then
-                        FieldNames.Add(qry.FieldByName('name').AsString);
+                       If qry.FieldByName('pk').AsInteger > 0 Then Begin
+                        sFields := Trim(qry.FieldByName('name').AsString);
+                        sFields := AnsiReplaceStr(sFields,'"','');
+                        FieldNames.Add(sFields);
+                       End;
                        qry.Next;
                       End;
                     End;
@@ -2982,7 +2999,9 @@ Begin
                       qry.Open;
                       While Not qry.Eof Do
                        Begin
-                        FieldNames.Add(qry.FieldByName('name').AsString);
+                        sFields := Trim(qry.FieldByName('name').AsString);
+                        sFields := AnsiReplaceStr(sFields,'"','');
+                        FieldNames.Add(sFields);
                         qry.Next;
                        End;
     end;
@@ -2999,7 +3018,9 @@ Begin
                       qry.Open;
                       While Not qry.Eof Do
                        Begin
-                        FieldNames.Add(qry.FieldByName('column_name').AsString);
+                        sFields := Trim(qry.FieldByName('column_name').AsString);
+                        sFields := AnsiReplaceStr(sFields,'"','');
+                        FieldNames.Add(sFields);
                         qry.Next;
                        End;
     end;
@@ -3026,7 +3047,7 @@ Var
  vStateResource : Boolean;
  connType       : TRESTDWDatabaseType;
  qry            : TRESTDWDrvQuery;
- vSchema        : String;
+ vSchema,sProcs : String;
  fPos           : integer;
 Begin
  If Not Assigned(ProcNames) Then
@@ -3083,7 +3104,9 @@ Begin
    End;
    While Not qry.Eof Do
     Begin
-     ProcNames.Add(qry.Fields[fPos].AsString);
+     sProcs := Trim(qry.Fields[fPos].AsString);
+     sProcs := AnsiReplaceStr(sProcs,'"','');
+     ProcNames.Add(sProcs);
      qry.Next;
     End;
   Finally
@@ -3110,7 +3133,7 @@ Var
  connType       : TRESTDWDatabaseType;
  qry            : TRESTDWDrvQuery;
  vProc,
- vSchema,
+ vSchema, sParam,
  vFieldType     : String;
  vSize,
  vPrecision     : Integer;
@@ -3346,8 +3369,9 @@ Begin
                     While Not qry.Eof Do
                      Begin
                       convertFB_IBTypes;
-                      ParamNames.Add(Format(cParamDetails, [qry.Fields[0].AsString,
-                                                            vFieldType,vSize,vPrecision]));
+                      sParam := Trim(qry.Fields[0].AsString);
+                      sParam := AnsiReplaceStr(sParam,'"','');
+                      ParamNames.Add(Format(cParamDetails, [sParam,vFieldType,vSize,vPrecision]));
                       qry.Next;
                      End;
                    End;
@@ -3369,8 +3393,9 @@ Begin
                     While Not qry.Eof Do
                      Begin
                       convertFB_IBTypes;
-                      ParamNames.Add(Format(cParamDetails, [qry.Fields[0].AsString,
-                                                            vFieldType,vSize,vPrecision]));
+                      sParam := Trim(qry.Fields[0].AsString);
+                      sParam := AnsiReplaceStr(sParam,'"','');
+                      ParamNames.Add(Format(cParamDetails, [sParam,vFieldType,vSize,vPrecision]));
                       qry.Next;
                      End;
                    End;
@@ -3389,8 +3414,9 @@ Begin
                      While Not qry.Eof Do
                       Begin
                        convertMySQLTypes;
-                       ParamNames.Add(Format(cParamDetails, [qry.Fields[0].AsString,
-                                                             vFieldType,vSize,vPrecision]));
+                       sParam := Trim(qry.Fields[0].AsString);
+                       sParam := AnsiReplaceStr(sParam,'"','');
+                       ParamNames.Add(Format(cParamDetails, [sParam,vFieldType,vSize,vPrecision]));
 
                        qry.Next;
                       End;
@@ -3418,8 +3444,9 @@ Begin
                       While Not qry.Eof Do
                        Begin
                         convertPostgresTypes;
-                        ParamNames.Add(Format(cParamDetails, [qry.Fields[0].AsString,
-                                                              vFieldType,vSize,vPrecision]));
+                        sParam := Trim(qry.Fields[0].AsString);
+                        sParam := AnsiReplaceStr(sParam,'"','');
+                        ParamNames.Add(Format(cParamDetails, [sParam,vFieldType,vSize,vPrecision]));
 
                         qry.Next;
                        End;
