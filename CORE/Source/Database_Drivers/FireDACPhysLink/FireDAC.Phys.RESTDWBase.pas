@@ -838,7 +838,9 @@ begin
   if (ft in [ftBlob, ftMemo,ftGraphic, ftWideMemo, ftOraBlob, ftOraClob]) then
     datAttrs := datAttrs + [caBlobData]
   else
-    datAttrs := datAttrs + [caSearchable,caBase];
+    datAttrs := datAttrs + [caSearchable];
+
+  datAttrs := datAttrs + [caBase];
 
   if ft in [ftFixedChar,ftFixedWideChar] then
     datAttrs := datAttrs + [caFixedLen];
