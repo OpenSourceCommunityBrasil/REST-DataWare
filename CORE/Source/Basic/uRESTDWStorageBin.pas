@@ -1,4 +1,4 @@
-unit uRESTDWStorageBinRDW;
+unit uRESTDWStorageBin;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -42,12 +42,15 @@ var
   s : DWString;
   ft : Byte;
   b : boolean;
+  y : byte;
   vFieldDef : TFieldDef;
+  fldAttrs : array of byte;
 begin
   stream.Position := 0;
   stream.Read(fc,SizeOf(Integer));
 
   SetLength(FFieldTypes,fc);
+  SetLength(fldAttrs,fc);
 
   Stream.Read(b, Sizeof(Byte));
   EncodeStrs := b;
@@ -82,9 +85,11 @@ begin
       vFieldDef.Precision := 0;
     end;
 
-    stream.Read(b,SizeOf(Byte));
+    stream.Read(y,SizeOf(Byte));
+    fldAttrs[i] := y;
 
-    vFieldDef.Required := b;
+    vFieldDef.Required := y and 1 > 0;
+
     if fk = fkInternalCalc Then
       vFieldDef.InternalCalcField := True;
   end;
@@ -92,6 +97,23 @@ begin
   stream.Read(rc,SizeOf(LongInt));
 
   dataset.Open;
+
+  for i := 0 to fc-1 do begin
+    if fldAttrs[i] and 2 > 0 then
+      dataset.Fields[i].ProviderFlags := dataset.Fields[i].ProviderFlags + [pfInUpdate];
+    if fldAttrs[i] and 4 > 0 then
+      dataset.Fields[i].ProviderFlags := dataset.Fields[i].ProviderFlags + [pfInWhere];
+    if fldAttrs[i] and 8 > 0 then
+      dataset.Fields[i].ProviderFlags := dataset.Fields[i].ProviderFlags + [pfInKey];
+    if fldAttrs[i] and 16 > 0 then
+      dataset.Fields[i].ProviderFlags := dataset.Fields[i].ProviderFlags + [pfHidden];
+    {$IFDEF FPC}
+      if fldAttrs[i] and 32 > 0 then
+        dataset.Fields[i].ProviderFlags := dataset.Fields[i].ProviderFlags + [pfRefreshOnInsert];
+      if fldAttrs[i] and 64 > 0 then
+        dataset.Fields[i].ProviderFlags := dataset.Fields[i].ProviderFlags + [pfRefreshOnUpdate];
+    {$ENDIF}
+  end;
 
   dataset.DisableControls;
   for i := 1 to rc do begin
@@ -114,14 +136,19 @@ var
   s : DWString;
   ft : Byte;
   b : boolean;
+  y : byte;
   vFieldDef : TFieldDef;
   ds : TRESTDWMemTable;
+  fldAttrs : array of byte;
 Begin
  ds := TRESTDWMemTable(dataset.GetDataset);
 
  stream.Position := 0;
  stream.Read(fc,SizeOf(Integer));
+
  SetLength(FFieldTypes,fc);
+ SetLength(fldAttrs,fc);
+
  Stream.Read(b, Sizeof(Byte));
  EncodeStrs := b;
  ds.ClearBuffer;
@@ -154,14 +181,33 @@ Begin
       vFieldDef.Precision := 0;
     end;
 
-    stream.Read(b,SizeOf(Byte));
+    stream.Read(y,SizeOf(Byte));
 
-    vFieldDef.Required := b;
+    vFieldDef.Required := y and 1 > 0;
+
     if fk = fkInternalCalc Then
       vFieldDef.InternalCalcField := True;
   end;
 
   ds.Open;
+
+  for i := 0 to fc-1 do begin
+    if fldAttrs[i] and 2 > 0 then
+      ds.Fields[i].ProviderFlags := ds.Fields[i].ProviderFlags + [pfInUpdate];
+    if fldAttrs[i] and 4 > 0 then
+      ds.Fields[i].ProviderFlags := ds.Fields[i].ProviderFlags + [pfInWhere];
+    if fldAttrs[i] and 8 > 0 then
+      ds.Fields[i].ProviderFlags := ds.Fields[i].ProviderFlags + [pfInKey];
+    if fldAttrs[i] and 16 > 0 then
+      ds.Fields[i].ProviderFlags := ds.Fields[i].ProviderFlags + [pfHidden];
+    {$IFDEF FPC}
+      if fldAttrs[i] and 32 > 0 then
+        ds.Fields[i].ProviderFlags := ds.Fields[i].ProviderFlags + [pfRefreshOnInsert];
+      if fldAttrs[i] and 64 > 0 then
+        ds.Fields[i].ProviderFlags := ds.Fields[i].ProviderFlags + [pfRefreshOnUpdate];
+    {$ENDIF}
+  end;
+
   ds.DisableControls;
   LoadRecordDWMemFromStream(dataset,stream);
   ds.EnableControls;
@@ -620,8 +666,25 @@ begin
 
     stream.Write(j,SizeOf(Integer));
 
-    b := Dataset.Fields[i].Required;
-    stream.Write(b,SizeOf(Byte));
+    y := 0;
+    if Dataset.Fields[i].Required then
+      y := y + 1;
+
+    if pfInUpdate in Dataset.Fields[i].ProviderFlags then
+      y := y + 2;
+    if pfInWhere in Dataset.Fields[i].ProviderFlags then
+      y := y + 4;
+    if pfInKey in Dataset.Fields[i].ProviderFlags then
+      y := y + 8;
+    if pfHidden in Dataset.Fields[i].ProviderFlags then
+      y := y + 16;
+    {$IFDEF FPC}
+      if pfRefreshOnInsert in Dataset.Fields[i].ProviderFlags then
+        y := y + 32;
+      if pfRefreshOnUpdate in Dataset.Fields[i].ProviderFlags then
+        y := y + 64;
+    {$ENDIF}
+    stream.Write(y,SizeOf(Byte));
 
     i := i + 1;
   end;
@@ -701,8 +764,25 @@ begin
 
     stream.Write(j,SizeOf(Integer));
 
-    b := ds.Fields[i].Required;
-    stream.Write(b,SizeOf(Byte));
+    y := 0;
+    if ds.Fields[i].Required then
+      y := y + 1;
+
+    if pfInUpdate in ds.Fields[i].ProviderFlags then
+      y := y + 2;
+    if pfInWhere in ds.Fields[i].ProviderFlags then
+      y := y + 4;
+    if pfInKey in ds.Fields[i].ProviderFlags then
+      y := y + 8;
+    if pfHidden in ds.Fields[i].ProviderFlags then
+      y := y + 16;
+    {$IFDEF FPC}
+      if pfRefreshOnInsert in ds.Fields[i].ProviderFlags then
+        y := y + 32;
+      if pfRefreshOnUpdate in ds.Fields[i].ProviderFlags then
+        y := y + 64;
+    {$ENDIF}
+    stream.Write(y,SizeOf(Byte));
 
     i := i + 1;
   end;
