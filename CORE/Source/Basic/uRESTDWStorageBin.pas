@@ -666,6 +666,7 @@ begin
 
     stream.Write(j,SizeOf(Integer));
 
+    y := 0;
     if Dataset.Fields[i].Required then
       y := y + 1;
 
@@ -763,6 +764,7 @@ begin
 
     stream.Write(j,SizeOf(Integer));
 
+    y := 0;
     if ds.Fields[i].Required then
       y := y + 1;
 
