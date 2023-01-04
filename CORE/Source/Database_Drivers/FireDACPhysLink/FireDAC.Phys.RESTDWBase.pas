@@ -782,7 +782,7 @@ var
   fk : TFieldKind;
   j : integer;
   s : ansistring;
-  b : boolean;
+  y : byte;
   rft : Byte;
 
   ft : TFieldType;
@@ -819,7 +819,7 @@ begin
 
   FStream.Read(fp,SizeOf(Integer));
 
-  FStream.Read(b,SizeOf(Byte)); // somente pra position
+  FStream.Read(y,SizeOf(Byte)); // somente pra position
 
   oFmtOpts.FieldDef2ColumnDef(ft,fs,fp,0,datType,datSize,datPrec,datScale,datAttrs);
 
@@ -838,22 +838,34 @@ begin
   if datAttrs = [] then begin
     datAttrs := datAttrs + [caBase];
 
-    if not b then
+    if y and 1 = 0 then
       datAttrs := datAttrs + [caAllowNull];
 
     if datType in [dtBlob,dtMemo,dtWideMemo,dtXML,dtHBlob,dtHMemo,dtWideHMemo,dtHBFile] then
       datAttrs := datAttrs + [caBlobData]
     else
       datAttrs := datAttrs + [caSearchable];
+
+    if ft in [ftFixedChar,ftFixedWideChar] then
+      datAttrs := datAttrs + [caFixedLen];
   end;
 
 //  Result.FOriginTabName := OriginTabName;
   Result.FAttrs := datAttrs;
 
   Result.FLen := datSize;
-  if b then
-    Result.FForceAddOpts := Result.FForceAddOpts + [coInKey]
-  else
+  if y and 2 = 0 then
+    Result.FForceAddOpts := Result.FForceAddOpts + [coInUpdate];
+  if y and 4 = 0 then
+    Result.FForceAddOpts := Result.FForceAddOpts + [coInWhere];
+  if y and 8 = 0 then
+    Result.FForceAddOpts := Result.FForceAddOpts + [coInKey];
+  if y and 32 = 0 then
+    Result.FForceAddOpts := Result.FForceAddOpts + [coAfterInsChanged];
+  if y and 64 = 0 then
+    Result.FForceAddOpts := Result.FForceAddOpts + [coAfterUpdChanged];
+
+  if y and 1 = 0 then
     Result.FForceAddOpts := Result.FForceAddOpts + [coAllowNull];
 
   Result.FPrec  := datPrec;

@@ -31,7 +31,7 @@ Uses
   uRESTDWParams, uRESTDWComponentBase, uRESTDWEncodeClass,
   uRESTDWComponentEvents, uRESTDWJSONInterface, uRESTDWBufferBase,
   uRESTDWConsts, uRESTDWDataModule, uRESTDWBasicTypes, uRESTDWProtoTypes,
-  uRESTDWTools, uRESTDWStorageBinRDW, uRESTDWMassiveBuffer;
+  uRESTDWTools, uRESTDWStorageBin, uRESTDWMassiveBuffer;
 
 Type
   TRESTDWDatabaseInfo = Record

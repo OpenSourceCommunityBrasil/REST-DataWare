@@ -408,7 +408,7 @@ uses
   uRESTDWMemResources,
   uRESTDWTools,
   uRESTDWBasicTypes,
-  uRESTDWStorageBinRDW;
+  uRESTDWStorageBin;
 
 const
   ftBlobTypes = [ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftParadoxOle,
