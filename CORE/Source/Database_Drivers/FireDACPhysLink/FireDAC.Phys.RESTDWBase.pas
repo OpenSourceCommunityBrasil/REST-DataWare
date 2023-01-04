@@ -866,7 +866,7 @@ begin
 
   Result.FForceAddOpts := Result.FForceAddOpts - [coReadOnly];
 
-
+  Result.FLen  := datSize;
   Result.FPrec  := datPrec;
   Result.FScale := datScale;
 end;
