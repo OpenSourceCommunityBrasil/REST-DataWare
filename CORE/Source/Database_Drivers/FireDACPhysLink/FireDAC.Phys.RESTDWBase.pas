@@ -819,7 +819,7 @@ begin
 
   FStream.Read(fp,SizeOf(Integer));
 
-  FStream.Read(y,SizeOf(Byte)); // somente pra position
+  FStream.Read(y,SizeOf(Byte));
 
   oFmtOpts.FieldDef2ColumnDef(ft,fs,fp,0,datType,datSize,datPrec,datScale,datAttrs);
 
@@ -832,25 +832,19 @@ begin
           datScale, datType, datSize, True);
   end;
 
+  if y and 1 = 0 then
+    datAttrs := datAttrs + [caAllowNull];
+
+  if (ft in [ftBlob, ftMemo,ftGraphic, ftWideMemo, ftOraBlob, ftOraClob]) then
+    datAttrs := datAttrs + [caBlobData]
+  else
+    datAttrs := datAttrs + [caSearchable,caBase];
+
+  if ft in [ftFixedChar,ftFixedWideChar] then
+    datAttrs := datAttrs + [caFixedLen];
+
   Result.FType       := datType;
 //  Result.FOriginTabName.FCatalog := '';
-
-  if datAttrs = [] then begin
-    datAttrs := datAttrs + [caBase];
-
-    if y and 1 = 0 then
-      datAttrs := datAttrs + [caAllowNull];
-
-    if datType in [dtBlob,dtMemo,dtWideMemo,dtXML,dtHBlob,dtHMemo,dtWideHMemo,dtHBFile] then
-      datAttrs := datAttrs + [caBlobData]
-    else
-      datAttrs := datAttrs + [caSearchable];
-
-    if ft in [ftFixedChar,ftFixedWideChar] then
-      datAttrs := datAttrs + [caFixedLen];
-  end;
-
-//  Result.FOriginTabName := OriginTabName;
   Result.FAttrs := datAttrs;
 
   Result.FLen := datSize;
@@ -867,6 +861,11 @@ begin
 
   if y and 1 = 0 then
     Result.FForceAddOpts := Result.FForceAddOpts + [coAllowNull];
+
+  Result.FForceRemOpts := [coReadOnly];
+
+  Result.FForceAddOpts := Result.FForceAddOpts - [coReadOnly];
+
 
   Result.FPrec  := datPrec;
   Result.FScale := datScale;
