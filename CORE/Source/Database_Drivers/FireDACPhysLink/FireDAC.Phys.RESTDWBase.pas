@@ -833,7 +833,7 @@ begin
   end;
 
   Result.FType       := datType;
-  Result.FOriginTabName.FCatalog := 'paciente';
+//  Result.FOriginTabName.FCatalog := '';
 
   if datAttrs = [] then begin
     datAttrs := datAttrs + [caBase];
