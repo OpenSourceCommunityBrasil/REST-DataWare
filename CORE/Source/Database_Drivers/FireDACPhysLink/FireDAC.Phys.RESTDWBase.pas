@@ -833,12 +833,22 @@ begin
   end;
 
   Result.FType       := datType;
+  Result.FOriginTabName.FCatalog := 'paciente';
 
+  if datAttrs = [] then begin
+    datAttrs := datAttrs + [caAllowNull,caBase];
 
-  // Result.FOriginTabName:= OriginTabName;
+    if datType in [dtBlob,dtMemo,dtWideMemo,dtXML,dtHBlob,dtHMemo,dtWideHMemo,dtHBFile] then
+      datAttrs := datAttrs + [caBlobData]
+    else
+      datAttrs := datAttrs + [caSearchable]
+  end;
+
+//  Result.FOriginTabName := OriginTabName;
   Result.FAttrs := datAttrs;
 
   Result.FLen := datSize;
+  Result.FForceAddOpts := [coAllowNull];
 
   Result.FPrec  := datPrec;
   Result.FScale := datScale;
