@@ -854,15 +854,15 @@ begin
   Result.FAttrs := datAttrs;
 
   Result.FLen := datSize;
-  if y and 2 = 0 then
+  if y and 2 > 0 then
     Result.FForceAddOpts := Result.FForceAddOpts + [coInUpdate];
-  if y and 4 = 0 then
+  if y and 4 > 0 then
     Result.FForceAddOpts := Result.FForceAddOpts + [coInWhere];
-  if y and 8 = 0 then
+  if y and 8 > 0 then
     Result.FForceAddOpts := Result.FForceAddOpts + [coInKey];
-  if y and 32 = 0 then
+  if y and 32 > 0 then
     Result.FForceAddOpts := Result.FForceAddOpts + [coAfterInsChanged];
-  if y and 64 = 0 then
+  if y and 64 > 0 then
     Result.FForceAddOpts := Result.FForceAddOpts + [coAfterUpdChanged];
 
   if y and 1 = 0 then
