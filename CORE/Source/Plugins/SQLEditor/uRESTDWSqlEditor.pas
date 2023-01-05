@@ -1,6 +1,6 @@
 unit uRESTDWSqlEditor;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -44,42 +44,44 @@ Const
    BtnExecute: TButton;
    BtnOk: TButton;
    DBGridRecord: TDBGrid;
-   Memo: TMemo;
-   PageControl: TPageControl;
    PageControlResult: TPageControl;
    PnlAction: TPanel;
    PnlButton: TPanel;
    PnlSQL: TPanel;
-    pSQLEditor: TPanel;
-    lbTables: TListBox;
-    labSql: TLabel;
-    Label1: TLabel;
-    lbFields: TListBox;
-    Label2: TLabel;
-    pSQLTypes: TPanel;
-    rbInsert: TRadioButton;
-    rbSelect: TRadioButton;
-    rbDelete: TRadioButton;
-    rbUpdate: TRadioButton;
-    TabSheetSQL: TTabSheet;
-    TabSheetTable: TTabSheet;
-    procedure BtnExecuteClick(Sender: TObject);
-    {$IFNDEF FPC}
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    {$ELSE}
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    {$ENDIF}
-    procedure FormShow(Sender: TObject);
-    procedure BtnCancelarClick(Sender: TObject);
-    procedure BtnOkClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-    procedure FormResize(Sender: TObject);
-    procedure lbTablesClick(Sender: TObject);
-    procedure lbTablesKeyUp(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
-    procedure MemoDragOver(Sender, Source: TObject; X, Y: Integer;
-      State: TDragState; var Accept: Boolean);
-    procedure MemoDragDrop(Sender, Source: TObject; X, Y: Integer);
+   pSQLEditor: TPanel;
+   lbTables: TListBox;
+   labSql: TLabel;
+   Label1: TLabel;
+   lbFields: TListBox;
+   Label2: TLabel;
+   pSQLTypes: TPanel;
+   rbInsert: TRadioButton;
+   rbSelect: TRadioButton;
+   rbDelete: TRadioButton;
+   rbUpdate: TRadioButton;
+   TabSheetTable: TTabSheet;
+   pEditor: TPanel;
+   PageControl: TPageControl;
+   TabSheetSQL: TTabSheet;
+   Memo: TMemo;
+   Panel1: TPanel;
+   Label3: TLabel;
+   lbExecutedTime: TLabel;
+   procedure BtnExecuteClick(Sender: TObject);
+   {$IFNDEF FPC}
+   procedure FormClose(Sender: TObject; var Action: TCloseAction);
+   {$ELSE}
+   procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+   {$ENDIF}
+   procedure FormShow(Sender: TObject);
+   procedure FormCreate(Sender: TObject);
+   procedure FormResize(Sender: TObject);
+   procedure lbTablesClick(Sender: TObject);
+   procedure lbTablesKeyUp(Sender: TObject; var Key: Word;
+     Shift: TShiftState);
+   procedure MemoDragOver(Sender, Source: TObject; X, Y: Integer;
+     State: TDragState; var Accept: Boolean);
+   procedure MemoDragDrop(Sender, Source: TObject; X, Y: Integer);
  Private
   { Private declarations }
   DataSource         : TDataSource;
@@ -95,7 +97,6 @@ Const
   { Public declarations }
   Procedure SetClientSQL(Value : TRESTDWClientSQL);
   Property  Database : TRESTDWDatabasebaseBase Read RESTDWDatabase Write SetDatabase;
-
  End;
 
  Type
@@ -142,15 +143,13 @@ End;
 
 Function TRESTDWSQLEditor.GetAttributes: TPropertyAttributes;
 Begin
- Result := [paDialog, paReadonly];
+ Result := [paDialog, paAutoUpdate];
+// Result := [paDialog, paReadonly];
 End;
 
-procedure TFrmDWSqlEditor.BtnCancelarClick(Sender: TObject);
-begin
- RESTDWClientSQL.SQL.Text := vOldSQL;
-end;
-
 Procedure TFrmDWSqlEditor.BtnExecuteClick(Sender: TObject);
+var
+  dti, dtf : TDateTime;
 Begin
  Screen.Cursor := crHourGlass;
  Try
@@ -158,8 +157,12 @@ Begin
   RESTDWClientSQLB.BinaryRequest        := RESTDWClientSQL.BinaryRequest;
   RESTDWClientSQLB.SQL.Clear;
   RESTDWClientSQLB.SQL.Add(Memo.Lines.Text);
+
+  dti := Now;
   RESTDWClientSQLB.Open;
+  dtf := Now;
  Finally
+  lbExecutedTime.Caption := FormatDateTime('HH:nn:ss:zzz',dtf-dti);
   Screen.Cursor := crDefault;
  End;
 End;
@@ -170,35 +173,45 @@ procedure TFrmDWSqlEditor.FormClose(Sender: TObject; var Action: TCloseAction);
 procedure TFrmDWSqlEditor.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 {$ENDIF}
 begin
- If MessageDlg({$IFDEF FPC}'SQL Editor', {$ENDIF}'Realmente deseja sair ?', mtConfirmation, [mbYes, mbNo], 0) <> mrYes  then
-  Begin
-   {$IFNDEF FPC}Action:={$ELSE}CloseAction:={$ENDIF}caNone;
-   Exit;
-  End;
- {$IFNDEF FPC}
+ If (ModalResult = mrCancel) and (vOldSQL <> Memo.Text) Then
+ Begin
+   {$IFDEF FPC}
+    If MessageDlg('SQL Editor', 'Realmente deseja sair ?', mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+     Begin
+      CloseAction:=caNone;
+      Exit;
+     End;
+  {$ELSE}
+    If MessageDlg('Realmente deseja sair ?', mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+     Begin
+      Action:=caNone;
+      Exit;
+     End;
+  {$ENDIF}
+ End;
+
+//   RESTDWClientSQL.SQL.Text := vOldSQL
+//   RESTDWClientSQL.SQL.Text := Memo.Text;
+ if ModalResult <> mrCancel then
+   RESTDWClientSQL.SQL.Assign(Memo.Lines);
+
  RESTDWClientSQLB.Active := False;
  FreeAndNil(RESTDWClientSQLB);
  If Assigned(RESTDWDatabase) Then
   RESTDWDatabase.Active   := False;
  FreeAndNil(DataSource);
  Release;
- {$ENDIF}
-end;
-
-procedure TFrmDWSqlEditor.BtnOkClick(Sender: TObject);
-begin
- RESTDWClientSQL.SQL.Text := Memo.Text;
 end;
 
 procedure TFrmDWSqlEditor.FormCreate(Sender: TObject);
 begin
  RESTDWClientSQLB := TRESTDWClientSQL.Create(Self);
+ DataSource       := TDataSource.Create(Self);
  vLastSelect      := '';
 end;
 
 procedure TFrmDWSqlEditor.FormShow(Sender: TObject);
 begin
- DataSource                := TDataSource.Create(Self);
  DataSource.DataSet        := RESTDWClientSQLB;
  DBGridRecord.DataSource   := DataSource;
  PnlButton.Visible         := False;
