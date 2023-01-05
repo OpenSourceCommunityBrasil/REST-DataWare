@@ -68,10 +68,11 @@ type
     function GetRecordCount: Integer;
     function GetMemoryRecord(Index: integer): TJvMemoryRecord;
     function GetOffSets(index : integer) : Word;
+    function GetOffSetsBlobs : Word;
     function DataTypeSuported(datatype : TFieldType) : boolean; // new
     function DataTypeIsBlobTypes(datatype : TFieldType) : boolean; // new
     function GetBlobRec(Field: TField; Rec : TJvMemoryRecord) : TMemBlobData;
-
+    function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream;
     function GetCalcFieldLen(FieldType: TFieldType; Size: Word): Word;
     procedure InternalAddRecord(Buffer  : {$IFDEF FPC}Pointer{$ELSE}
                                           {$IFDEF NEXTGEN}TRecBuf{$ELSE}
@@ -257,6 +258,7 @@ type
       function DataTypeSuported(datatype : TFieldType) : boolean;
       function DataTypeIsBlobTypes(datatype : TFieldType) : boolean;
       function GetOffSets(index : integer) : Word;
+      function GetOffSetsBlobs : Word;
       function GetBlobRec(Field: TField; Rec : TJvMemoryRecord) : TMemBlobData;
       function GetCalcFieldLen(FieldType: TFieldType; Size: Word): Word;
       function GetDataset : TDataSet;
@@ -393,7 +395,8 @@ type
     property MemoryData: TRESTDWMemTable read FMemoryData;
     property ID: Integer read FID write FID;
     property Index: Integer read GetIndex write SetIndex;
-    property Data: Pointer read FData;
+    property Data: Pointer read FData Write FData;
+    property Blobs: Pointer read FBlobs Write FBlobs;
   end;
 
 implementation
@@ -615,8 +618,8 @@ begin
     begin
       if not FMemoryData.FClearing then
         FMemoryData.FRecords.Remove(Self);
-      if FMemoryData.BlobFieldCount > 0 then
-        Finalize(PMemBlobArray(FBlobs)^[0], FMemoryData.BlobFieldCount);
+//      if FMemoryData.BlobFieldCount > 0 then
+//        Finalize(PMemBlobArray(FBlobs)^[0], FMemoryData.BlobFieldCount);
       ReallocMem(FBlobs, 0);
       ReallocMem(FData, 0);
       FMemoryData := nil;
@@ -827,8 +830,9 @@ end;
 
 function TRESTDWMemTable.GetMemoryRecord(Index: Integer): TJvMemoryRecord;
 begin
-  Result := TJvMemoryRecord(FRecords[Index]);
+  Result := TJvMemoryRecord(@FRecords[Index]^);
 end;
+
 procedure TRESTDWMemTable.InitFieldDefsFromFields;
 var
   I: Integer;
@@ -937,8 +941,8 @@ end;
 
 procedure TRESTDWMemTable.FreeRecordBuffer(var Buffer: PJvMemBuffer);
 begin
-  if BlobFieldCount > 0 then
-    Finalize(PMemBlobArray(Buffer + FBlobOfs)^[0], BlobFieldCount);
+//  if BlobFieldCount > 0 then
+//    Finalize(PMemBlobArray(Buffer + FBlobOfs)^[0], BlobFieldCount);
   {$IFDEF COMPILER12_UP}
   FreeMem(Buffer);
   {$ELSE}
@@ -1121,14 +1125,18 @@ procedure TRESTDWMemTable.RecordToBuffer(Rec: TJvMemoryRecord; Buffer: PJvMemBuf
 var
   I: Integer;
 begin
+//  Buffer := Rec.Data;
   Move(Rec.Data^, Buffer^, FRecordSize);
   with PMemBookmarkInfo(Buffer + FBookmarkOfs)^ do
   begin
     BookmarkData := Rec.ID;
     BookmarkFlag := bfCurrent;
   end;
-  for I := 0 to BlobFieldCount - 1 do
-    PMemBlobArray(Buffer + FBlobOfs)^[I] := PMemBlobArray(Rec.FBlobs)^[I];
+//  for I := 0 to BlobFieldCount - 1 do
+//   Begin
+//    If PMemBlobArray(Rec.FBlobs)^[I] = '' Then
+//     PMemBlobArray(Rec.FBlobs)^[I] := PMemBlobArray(Buffer)^[I];
+//   End;
   GetCalcFields({$IFDEF RTL250_UP}TRecBuf{$ENDIF}(Buffer));
 end;
 function TRESTDWMemTable.GetRecordSize: Word;
@@ -1498,6 +1506,11 @@ begin
   Result := FOffsets[index];
 end;
 
+function TRESTDWMemTable.GetOffSetsBlobs : Word;
+begin
+  Result := FBlobOfs;
+end;
+
 function TRESTDWMemTable.DataTypeIsBlobTypes(datatype : TFieldType) : boolean;
 begin
   Result := datatype in ftBlobTypes;
@@ -1552,9 +1565,13 @@ procedure TRESTDWMemTable.AssignMemoryRecord(Rec: TJvMemoryRecord; Buffer: PJvMe
 var
   I: Integer;
 begin
+// Rec.Data := Buffer;
   Move(Buffer^, Rec.Data^, FRecordSize);
-  for I := 0 to BlobFieldCount - 1 do
-    PMemBlobArray(Rec.FBlobs)^[I] := PMemBlobArray(Buffer + FBlobOfs)^[I];
+//  for I := 0 to BlobFieldCount - 1 do
+//   Begin
+//    If PMemBlobArray(Rec.FBlobs)^[I] = '' Then
+//     PMemBlobArray(Rec.FBlobs)^[I] := PMemBlobArray(Buffer + FBlobOfs)^[I];
+//   End;
 end;
 procedure TRESTDWMemTable.SetMemoryRecordData(Buffer: PJvMemBuffer; Pos: Integer);
 var

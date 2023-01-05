@@ -420,6 +420,10 @@ Function  GetObjectName            (TypeObject         : TTypeObject)           
  Function  RequestTypeToString      (RequestType        : TRequestType)           : String;
  Function  VarIsNullEmpty           (Const V            : Variant)                : Boolean;
  Function  VarIsNullEmptyBlank      (Const V            : Variant)                : Boolean;
+ Procedure DynArrayToBinVariant     (Var   V            : Variant;
+                                     Const DynArray;
+                                     Len                : Integer);
+
  {$IFDEF FPC}
   Function RESTDWCharInSet                (C                  : DWChar;
                                            Const CharSet      : TCharSet) : Boolean;Overload;
@@ -444,6 +448,45 @@ Implementation
 
 Uses
   uRESTDWBase64, uRESTDWException, Variants, uRESTDWBasicTypes;
+
+Procedure DynArrayToBinVariant(var V: Variant; const DynArray; Len: Integer);
+var
+ {$IFDEF COMPILER16_UP}
+  LVarBounds : Array of Integer;
+ {$ELSE}
+  {$IFNDEF FPC}
+   LVarBounds : Array of NativeInt;
+  {$ELSE}
+   LVarBounds : Array of SizeInt;
+  {$ENDIF}
+ {$ENDIF}
+ aVarData : PVarData;
+begin
+  LVarBounds := nil;
+  { This resets the Variant to VT_EMPTY - flag which is used to determine whether the }
+  { the cast to Variant succeeded or not }
+  VarClear(V);
+  { Get Variant-style Bounds (lo/hi pair) of Dynamic Array }
+  SetLength(LVarBounds, 2);
+  LVarBounds[0] := 0;
+  LVarBounds[1] := Len - 1;
+  { Create Variant of SAFEARRAY }
+  V := VarArrayCreate(LVarBounds, varByte);
+  Assert(VarArrayDimCount(V) = 1);
+  { Keep the data around for a bit }
+  VarArrayLock(V);
+  Try
+   aVarData := PVarData(@V);
+   {$IFNDEF FPC}
+    Move(Pointer(DynArray)^, aVarData^.VArray.Data^, Len);
+   {$ELSE}
+    Move(Pointer(DynArray)^, aVarData^.VArray, Len);
+   {$ENDIF}
+   { Let go of the data }
+  Finally
+   VarArrayUnlock(V);
+  End;
+End;
 
 {$IFDEF FPC}
  Function RESTDWCharInSet(C             : DWChar;

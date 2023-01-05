@@ -239,6 +239,9 @@ var
  P             : TStream;
  Ts            : {$IFDEF FPC} TTimeStamp {$ELSE} TSQLTimeStamp {$ENDIF};
  bcd           : TBcd;
+ aBytes        : TRESTDWBytes;
+ aVariant      : PVariant;
+// MemBlobData   : TRESTDWString;
  {$IFDEF FPC}
   dtRec         : TDateTimeRec;
  {$ELSE}
@@ -275,10 +278,10 @@ Begin
       if (aIndex >= 0) And (PActualRecord <> Nil) then begin
         aDataType := ds.FieldDefs[aIndex].DataType;
         if dataset.DataTypeSuported(aDataType) then begin
-          if dataset.DataTypeIsBlobTypes(aDataType) then
-            PData    := Pointer(dataset.GetBlobRec(ds.Fields[B], vActualRecord))
-          else
-            PData    := Pointer(PActualRecord + dataset.GetOffSets(aIndex));
+         if dataset.DataTypeIsBlobTypes(aDataType) then
+          PData    := Pointer(@PMemBlobArray(vActualRecord.Blobs)^[ds.Fields[B].Offset])
+         else
+          PData    := Pointer(PActualRecord + dataset.GetOffSets(aIndex));
         end;
 
         // field null
@@ -286,16 +289,17 @@ Begin
 
         if PData <> nil then begin
           if not Bool then begin
-            PData^ := {$IFDEF FPC} Char(1) {$ELSE} Ord(True) {$ENDIF};
-            Inc(PData);
-
-            cLen := Dataset.GetCalcFieldLen(ds.Fields[B].DataType, ds.Fields[B].Size);
-            {$IFDEF FPC}
+           if Not dataset.DataTypeIsBlobTypes(aDataType) then
+            Begin
+             PData^ := {$IFDEF FPC} Char(1) {$ELSE} Ord(True) {$ENDIF};
+             Inc(PData);
+             cLen := Dataset.GetCalcFieldLen(ds.Fields[B].DataType, ds.Fields[B].Size);
+             {$IFDEF FPC}
               FillChar(PData^, cLen , #0);
-            {$ELSE}
+             {$ELSE}
               FillChar(PData^, cLen , 0);
-            {$ENDIF}
-
+             {$ENDIF}
+            End;
             case FieldTypeToDWFieldType(aDataType) of
               dwftWideString,
               dwftFixedWideChar : begin
@@ -415,17 +419,15 @@ Begin
               dwftFmtMemo,
               dwftBlob,
               dwftBytes : begin
-                          Stream.Read(L, Sizeof(LongInt));
-                          if L > 0 then Begin
-                            P := ds.CreateBlobStream(ds.Fields[B],bmWrite);
-                            try
-                              P.CopyFrom(Stream, L);
-                              P.Position := 0;
-                            finally
-
-                            end;
+                           Stream.Read(L, Sizeof(LongInt));
+                           If L > 0 Then
+                            Begin
+                             SetLength(aBytes, L);
+                             Stream.Read(aBytes[0], L);
+                             aVariant  := PVariant(PData);
+                             DynArrayToBinVariant(aVariant^, aBytes, L);
+                            End;
                           end;
-              end;
               else begin
                           Stream.Read(L, Sizeof(L));
                           S := '';
