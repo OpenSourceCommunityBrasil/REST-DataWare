@@ -681,17 +681,35 @@ Var
 Begin
  //Provide a list of Tables
  vLista := Nil;
- With GetComponent(0) as TRESTDWTable Do
+ If GetComponent(0) is TRESTDWTable Then
   Begin
-   Try
-    If TRESTDWTable(GetComponent(0)).DataBase <> Nil Then
-     Begin
-      TRESTDWTable(GetComponent(0)).DataBase.GetTableNames(vLista);
-      For I := 0 To vLista.Count -1 Do
-       Proc (vLista[I]);
+   With GetComponent(0) as TRESTDWTable Do
+    Begin
+     Try
+      If TRESTDWTable(GetComponent(0)).DataBase <> Nil Then
+       Begin
+        TRESTDWTable(GetComponent(0)).DataBase.GetTableNames(vLista);
+        For I := 0 To vLista.Count -1 Do
+        Proc (vLista[I]);
+       End;
+     Except
      End;
-   Except
-   End;
+    End;
+  End
+ Else If GetComponent(0) is TRESTDWClientSQL Then
+  Begin
+   With GetComponent(0) as TRESTDWClientSQL Do
+    Begin
+     Try
+      If TRESTDWClientSQL(GetComponent(0)).DataBase <> Nil Then
+       Begin
+        TRESTDWClientSQL(GetComponent(0)).DataBase.GetTableNames(vLista);
+        For I := 0 To vLista.Count -1 Do
+        Proc (vLista[I]);
+       End;
+     Except
+     End;
+    End;
   End;
 End;
 
@@ -819,6 +837,8 @@ Begin
   RegisterPropertyEditor(TypeInfo(TStrings),          TRESTDWClientSQL,          'SQL',             TRESTDWSQLEditor);
   RegisterPropertyEditor(TypeInfo(TStrings),          TRESTDWClientSQL,          'RelationFields',  TRESTDWFieldsRelationEditor);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientSQL,          'SequenceField',   TRESTDWFieldsList);
+  RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientSQL,          'UpdateTableName', TTableList);
+
   RegisterComponentEditor(TRESTDWServerEvents,        TComponentEditorClass(TRESTDWServerEventsEditor));
   RegisterComponentEditor(TRESTDWClientEvents,        TComponentEditorClass(TRESTDWClientEventsEditor));
   RegisterComponentEditor(TRESTDWResponseTranslator,  TComponentEditorClass(TRESTDWJSONViewer));

@@ -2693,6 +2693,8 @@ Var
 Begin
  If Not Assigned(TableNames) Then
   TableNames := TStringList.Create;
+
+ TableNames.Sorted := True;
  vSchema := '';
 {
   if Pos('.', vTable) > 0 then begin
