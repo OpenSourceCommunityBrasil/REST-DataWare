@@ -3045,9 +3045,9 @@ Begin
 //         TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUriOptions.EventName, vUriOptions.ServerEvent, ClientPort);
          //Novo Lugar para Autenticação
          If ((vCORS) And (RequestType = rtOption)) Then
-          vErrorCode            := cCORSPreflightCODE;
-         If ((vCORS)   And (RequestType <> rtOption)) Or
-             (((vCORS) And (RequestType <> rtOption)) And
+          vErrorCode            := cCORSPreflightCODE
+         Else
+         If ((vCORS And (RequestType <> rtOption)) Or
               (vServerAuthOptions.AuthorizationOption in [rdwAOBasic, rdwAOBearer, rdwAOToken])) Then
           Begin
            vAcceptAuth           := False;
