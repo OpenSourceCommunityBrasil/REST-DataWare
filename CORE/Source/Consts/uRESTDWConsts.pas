@@ -46,7 +46,7 @@ Const
  
  // controle de versão
  RESTDWVersionINFO          = 'v2.0.8-';
- RESTDWRelease              = '25';
+ RESTDWRelease              = '29';
  RESTDWCodeProject          = 'Savage Reign - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  RESTDWDialogoTitulo        = 'REST DataWare Components';
