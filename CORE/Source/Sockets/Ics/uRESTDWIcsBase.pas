@@ -109,7 +109,7 @@ Type
     vCert: TSslCertTools;
   public
     constructor Create;
-    destructor Destory;
+    destructor Destroy; override;
     procedure CreateCertificate;
     function CertificateString: string;
     function PrivateKeyString: string;
@@ -142,7 +142,7 @@ Type
     function GetBruteForceIndex(IP: String): Integer;
   public
     Constructor Create;
-    Destructor Destroy;
+    Destructor Destroy; override;
     procedure ClearBruteForceList;
     procedure StartBruteForce;
     procedure StopBruteForce;
@@ -214,7 +214,7 @@ Type
     // Document procedures
     Procedure onDocumentReadyServer(Sender: TObject; Var Flag: THttpGetFlag);
     procedure onPostedDataServer(Sender: TObject; ErrCode: Word);
-    procedure ProcessDocument(Sender: TObject; iBodyStream: TStream; iFlag: THttpGetFlag);
+    procedure ProcessDocument(Sender: TObject; BodyStream: TStream; Flag: THttpGetFlag);
     procedure onExceptionServer(Sender: TObject; E: ESocketException);
     procedure onServerStartedServer(Sender: TObject);
     procedure onServerStoppedServer(Sender: TObject);
@@ -307,6 +307,7 @@ Type
 const
   cIcsHTTPServerNotFound = 'No HTTP server found';
   cIcsHTTPConnectionClosed = 'Closed HTTP connection';
+  cIcsCorruptedPackage = 'Corrupted package: RequestContentLength <> Stream.Size';
 
 Implementation
 
@@ -550,10 +551,12 @@ end;
 
 Constructor TRESTDWIcsServicePooler.Create(AOwner: TComponent);
 Begin
+  Inherited Create(AOwner);
+
   HttpAppSrv := TSslHttpAppSrv.Create(nil);
 
   If Assigned(HttpAppSrv.SSLContext) Then
-    HttpAppSrv.SSLContext.Free;
+    FreeAndNil(HttpAppSrv.SSLContext);
 
   // TODO 2
   HttpAppSrv.DocDir := '';
@@ -580,8 +583,6 @@ Begin
   vServerStatusCheck := true;
 
   vBruteForceProtection := TIcsBruteForceProtection.Create;
-
-  Inherited;
 End;
 
 procedure TRESTDWIcsServicePooler.onAnsweredServer(Sender: TObject);
@@ -649,7 +650,6 @@ begin
   finally
     SetHttpConnectionParams(Remote);
   end;
-
 end;
 
 procedure TRESTDWIcsServicePooler.onClientDisconnectServer(Sender: TObject;
@@ -657,12 +657,10 @@ procedure TRESTDWIcsServicePooler.onClientDisconnectServer(Sender: TObject;
 var
   Remote: TPoolerHttpConnection;
 begin
-
   Remote := Client as TPoolerHttpConnection;
 
   if Assigned(vOnClientDisconnect) then
     vOnClientDisconnect(Remote, Error);
-
 end;
 
 Destructor TRESTDWIcsServicePooler.Destroy;
@@ -680,7 +678,8 @@ Begin
   If Assigned(HttpAppSrv) Then
   begin
     If Assigned(HttpAppSrv.SSLContext) Then
-      HttpAppSrv.SSLContext.Free;
+      FreeAndNil(HttpAppSrv.SSLContext);
+
     FreeAndNil(HttpAppSrv);
   end;
 
@@ -690,7 +689,10 @@ Begin
   if Assigned(vIcsSelfAssignedCert) then
     FreeAndNil(vIcsSelfAssignedCert);
 
-  Inherited;
+  if Assigned(vIpBlackList) then
+    FreeAndNil(vIpBlackList);
+
+  Inherited Destroy;
 End;
 
 Procedure TRESTDWIcsServicePooler.EchoPooler(ServerMethodsClass, AContext: TComponent;
@@ -757,9 +759,9 @@ procedure TRESTDWIcsServicePooler.onPostedDataServer(Sender: TObject; ErrCode: W
 var
   Remote: TPoolerHttpConnection;
   Len: Integer;
-  Stream: TStringStream;
   lCount: Integer;
   RawDataTemp: AnsiString;
+  Stream: TStream;
 begin
   try
     Remote := Sender as TPoolerHttpConnection;
@@ -785,8 +787,10 @@ begin
 
     if Remote.RequestContentLength = Remote.vRawDataLen then
     begin
+      Remote.PostedDataReceived;
+
       try
-        Remote.PostedDataReceived;
+        Stream := nil;
 
         Stream := TStringStream.Create(Remote.vRawData);
 
@@ -794,7 +798,8 @@ begin
 
         ProcessDocument(Sender, Stream, hgWillSendMySelf);
       finally
-        FreeAndNil(Stream);
+        if Assigned(Stream) then
+          FreeAndNil(Stream);
       end;
     end;
   except
@@ -810,172 +815,202 @@ begin
   end;
 end;
 
-procedure TRESTDWIcsServicePooler.ProcessDocument(Sender: TObject; iBodyStream: TStream;
-  iFlag: THttpGetFlag);
+procedure TRESTDWIcsServicePooler.ProcessDocument(Sender: TObject; BodyStream: TStream;
+  Flag: THttpGetFlag);
 var
-  BodyStream: TStream;
+  Remote: TPoolerHttpConnection;
+  lBodyStream: TStream;
 begin
-  if iBodyStream = nil then
-    iBodyStream := TMemoryStream.Create;
+  try
+    lBodyStream := nil;
 
-  BodyStream := TStringStream.Create;
+    lBodyStream := TMemoryStream.Create;
 
-  BodyStream.CopyFrom(iBodyStream, iBodyStream.Size);
+    Remote := Sender as TPoolerHttpConnection;
 
-  BodyStream.Position := 0;
+    if BodyStream = nil then
+    begin
+      lBodyStream.Size := 0;
 
-  TThread.CreateAnonymousThread(
-    procedure
-    Var
-      Remote: TPoolerHttpConnection;
-      sCharSet, vToken, ErrorMessage, vAuthRealm, vContentType, vResponseString: String;
-      i, StatusCode: Integer;
-      ResultStream: TStream;
-      vResponseHeader: TStringList;
-      mb: TStringStream;
-      vRedirect: TRedirect;
-      vParams: TStringList;
-      vCORSHeader: TStrings;
+      lBodyStream.Position := 0;
+    end
+    else
+    begin
+      lBodyStream.CopyFrom(BodyStream, BodyStream.Size);
 
-      Procedure DestroyComponents;
-      Begin
-        If Assigned(vResponseHeader) Then
-          FreeAndNil(vResponseHeader);
+      lBodyStream.Position := 0;
+    end;
 
-        If Assigned(vParams) Then
-          FreeAndNil(vParams);
+    if (Remote.RequestContentLength <> lBodyStream.Size) then
+      raise Exception.Create(cIcsCorruptedPackage);
 
-        if Assigned(BodyStream) then
-          FreeAndNil(BodyStream);
-
-        If Assigned(vCORSHeader) Then
-          FreeAndNil(vCORSHeader);
-      End;
-
-      Procedure Redirect(Url: String);
-      Begin
-        Remote.WebRedirectURL := Url;
-      End;
-
-      Procedure SetReplyCORS;
+    TThread.CreateAnonymousThread(
+      procedure
       Var
-        i: Integer;
-      Begin
-        If CORS Then
+        vCharSet, vToken, vErrorMessage, vAuthRealm, vContentType,
+          vResponseString: String;
+        StatusCode: Integer;
+        ResultStream: TStream;
+        vResponseHeader: TStringList;
+        vParams: TStringList;
+        vCORSHeader: TStringList;
+        vRedirect: TRedirect;
+
+        Procedure DestroyComponents;
         Begin
+          If Assigned(vResponseHeader) Then
+            FreeAndNil(vResponseHeader);
 
-          If CORS_CustomHeaders.Count > 0 Then
-          Begin
+          If Assigned(vParams) Then
+            FreeAndNil(vParams);
 
-            For i := 0 To CORS_CustomHeaders.Count - 1 Do
-              vResponseHeader.AddPair(CORS_CustomHeaders.Names[i],
-                CORS_CustomHeaders.ValueFromIndex[i]);
+          if Assigned(lBodyStream) then
+            FreeAndNil(lBodyStream);
 
-          End
-          Else
-            vResponseHeader.AddPair('Access-Control-Allow-Origin', '*');
+          if Assigned(ResultStream) then
+            FreeAndNil(ResultStream);
 
           If Assigned(vCORSHeader) Then
-          Begin
+            FreeAndNil(vCORSHeader);
+        End;
 
-            If vCORSHeader.Count > 0 Then
+        Procedure Redirect(Url: String);
+        Begin
+          Remote.WebRedirectURL := Url;
+        End;
+
+        Procedure SetReplyCORS;
+        Var
+          i: Integer;
+        Begin
+          If CORS Then
+          Begin
+            If CORS_CustomHeaders.Count > 0 Then
             Begin
 
-              For i := 0 To vCORSHeader.Count - 1 Do
-                vResponseHeader.AddPair(vCORSHeader.Names[i],
-                  vCORSHeader.ValueFromIndex[i]);
+              For i := 0 To CORS_CustomHeaders.Count - 1 Do
+                vResponseHeader.AddPair(CORS_CustomHeaders.Names[i],
+                  CORS_CustomHeaders.ValueFromIndex[i]);
+            End
+            Else
+              vResponseHeader.AddPair('Access-Control-Allow-Origin', '*');
 
+            If Assigned(vCORSHeader) Then
+            Begin
+              If vCORSHeader.Count > 0 Then
+              Begin
+                For i := 0 To vCORSHeader.Count - 1 Do
+                  vResponseHeader.AddPair(vCORSHeader.Names[i],
+                    vCORSHeader.ValueFromIndex[i]);
+              End;
             End;
 
           End;
-
         End;
-      End;
 
-    begin
-      try
+      begin
         try
-          Remote := Sender as TPoolerHttpConnection;
+          try
+            vCORSHeader := nil;
+            vResponseHeader := nil;
+            vParams := nil;
+            ResultStream := nil;
 
-          // Do not process the document if HTTP conection needs to be closed
-          // but for some reason it was not closed
-          if (Remote.vNeedClose = true) then
-            raise Exception.Create(cIcsHTTPConnectionClosed);
+            vCORSHeader := TStringList.Create;
+            vResponseHeader := TStringList.Create;
+            vParams := TStringList.Create;
 
-          // Server status check protection
-          if ((vServerStatusCheck = false) and ((String.IsNullOrEmpty(Remote.Path)) or
-            (Remote.Path = '/'))) then
-          begin
-            try
-              if Assigned(vOnServerStatusCheckBlock) then
-                vOnServerStatusCheckBlock(Remote.PeerAddr, Remote.PeerPort);
-            finally
-              DisconnectClient(Remote, HttpAppSrv);
+            vResponseString := '';
+            @vRedirect := @Redirect;
+            vToken := Remote.AuthDigestUri;
+            vAuthRealm := Remote.AuthRealm;
+            vContentType := Remote.RequestContentType;
+            vParams.Text := Remote.Params;
+
+            // Do not process the document if HTTP conection needs to be closed
+            // but for some reason it was not closed
+            if (Remote.vNeedClose = true) then
+              raise Exception.Create(cIcsHTTPConnectionClosed);
+
+            // Server status check protection
+            if ((vServerStatusCheck = false) and ((String.IsNullOrEmpty(Remote.Path)) or
+              (Remote.Path = '/'))) then
+            begin
+              try
+                if Assigned(vOnServerStatusCheckBlock) then
+                  vOnServerStatusCheckBlock(Remote.PeerAddr, Remote.PeerPort);
+              finally
+                DisconnectClient(Remote, HttpAppSrv);
+              end;
+
+              exit;
             end;
 
-            exit;
-          end;
+            CommandExec(TComponent(Remote), RemoveBackslashCommands(Remote.Path),
+              Remote.Method + ' ' + Remote.Path, vContentType, Remote.PeerAddr,
+              Remote.RequestUserAgent, Remote.AuthUserName, Remote.AuthPassword, vToken,
+              Remote.RequestHeader, StrToInt(Remote.PeerPort), Remote.RequestHeader,
+              vParams, Remote.Params, lBodyStream, vAuthRealm, vCharSet, vErrorMessage,
+              StatusCode, vResponseHeader, vResponseString, ResultStream, vCORSHeader,
+              vRedirect);
 
-          vResponseHeader := TStringList.Create;
-          vCORSHeader := TStringList.Create;
-          vResponseString := '';
-          @vRedirect := @Redirect;
+            SetReplyCORS;
 
-          vToken := Remote.AuthDigestUri;
-          vAuthRealm := Remote.AuthRealm;
-          vContentType := Remote.RequestContentType;
-          vParams := TStringList.Create;
-          vParams.Text := Remote.Params;
+            Remote.AuthRealm := vAuthRealm;
 
-          CommandExec(TComponent(Remote), RemoveBackslashCommands(Remote.Path),
-            Remote.Method + ' ' + Remote.Path, vContentType, Remote.PeerAddr,
-            Remote.RequestUserAgent, Remote.AuthUserName, Remote.AuthPassword, vToken,
-            Remote.RequestHeader, StrToInt(Remote.PeerPort), Remote.RequestHeader,
-            vParams, Remote.Params, BodyStream, vAuthRealm, sCharSet, ErrorMessage,
-            StatusCode, vResponseHeader, vResponseString, ResultStream, vCORSHeader,
-            vRedirect);
+            If (vResponseString <> '') Or (vErrorMessage <> '') Then
+            Begin
+              If Assigned(ResultStream) Then
+                FreeAndNil(ResultStream);
 
-          SetReplyCORS;
+              If (vResponseString <> '') Then
+                ResultStream := TStringStream.Create(vResponseString)
+              Else
+                ResultStream := TStringStream.Create(vErrorMessage);
+            End;
 
-          Remote.AuthRealm := vAuthRealm;
-
-          If (vResponseString <> '') Or (ErrorMessage <> '') Then
-          Begin
             If Assigned(ResultStream) Then
-              FreeAndNil(ResultStream);
+            Begin
+              ResultStream.Position := 0;
 
-            If (vResponseString <> '') Then
-              ResultStream := TStringStream.Create(vResponseString)
-            Else
-              ResultStream := TStringStream.Create(ErrorMessage);
-          End;
+              Remote.DocStream := TStringStream.Create;
+              Remote.DocStream.CopyFrom(ResultStream, ResultStream.Size);
+              Remote.DocStream.Position := 0;
 
-          If Assigned(ResultStream) Then
-          Begin
-            ResultStream.Position := 0;
-            Remote.DocStream := ResultStream;
+              CustomAnswerStream(Remote, Flag, StatusCode, vContentType,
+                vResponseHeader.Text);
+            End;
 
-            CustomAnswerStream(Remote, iFlag, StatusCode, vContentType,
-              vResponseHeader.Text);
-          End;
-
-        except
-          on E: Exception do
-          begin
-            try
-              if Assigned(vOnException) then
-                vOnException(Remote, 'ProcessDocument - ' + E.Message);
-            finally
-              DisconnectClient(Remote, HttpAppSrv);
+          except
+            on E: Exception do
+            begin
+              try
+                if Assigned(vOnException) then
+                  vOnException(Remote, 'ProcessDocument Thread - ' + E.Message);
+              finally
+                DisconnectClient(Remote, HttpAppSrv);
+              end;
             end;
           end;
+        finally
+          DestroyComponents;
         end;
+
+      end).Start;
+  except
+    on E: Exception do
+    begin
+      if Assigned(lBodyStream) then
+        FreeAndNil(lBodyStream);
+
+      try
+        if Assigned(vOnException) then
+          vOnException(Remote, 'ProcessDocument - ' + E.Message);
       finally
-        DestroyComponents;
+        DisconnectClient(Remote, HttpAppSrv);
       end;
-
-    end).Start;
-
+    end;
+  end;
 end;
 
 Procedure TRESTDWIcsServicePooler.DisconnectClient(Client: TPoolerHttpConnection;
@@ -1009,7 +1044,6 @@ end;
 Procedure TRESTDWIcsServicePooler.CustomAnswerStream(Pooler: TPoolerHttpConnection;
 Flag: THttpGetFlag; StatusCode: Integer; ContentType: String; Header: String);
 begin
-
   case StatusCode of
     401:
       begin
@@ -1032,7 +1066,6 @@ begin
   else
     Pooler.AnswerStream(Flag, IntToStr(StatusCode), ContentType, Header);
   end;
-
 end;
 
 Procedure TRESTDWIcsServicePooler.onDocumentReadyServer(Sender: TObject;
@@ -1119,7 +1152,7 @@ End;
 
 constructor TPoolerHttpConnection.Create(AOwner: TComponent);
 begin
-  inherited;
+  Inherited Create(AOwner);
 
   vNeedClose := false;
 
@@ -1147,17 +1180,19 @@ var
   aux: TStringList;
 
 begin
-  if vBruteForceProtectionStatus then
-  begin
-    vBruteForceCS.Acquire;
+  vBruteForceCS.Acquire;
 
+  try
     try
-      aux := TStringList.Create;
-      aux.Delimiter := ';';
-      aux.StrictDelimiter := true;
-      aux.Clear;
+      aux := nil;
 
-      try
+      if vBruteForceProtectionStatus then
+      begin
+        aux := TStringList.Create;
+        aux.Delimiter := ';';
+        aux.StrictDelimiter := true;
+        aux.Clear;
+
         if GetBruteForceIndex(IP) > -1 then
         begin
           aux.DelimitedText := vBruteForceList.ValueFromIndex[GetBruteForceIndex(IP)];
@@ -1175,19 +1210,18 @@ begin
         end
         else
           Result := true;
-      except
-        Result := false;
-      end;
-
-    finally
+      end
+      else
+        Result := true;
+    except
+      Result := false;
+    end;
+  finally
+    if Assigned(aux) then
       FreeAndNil(aux);
 
-      vBruteForceCS.Release;
-    end;
-
-  end
-  else
-    Result := true;
+    vBruteForceCS.Release;
+  end;
 end;
 
 function TIcsBruteForceProtection.GetBruteForceIndex(IP: String): Integer;
@@ -1203,6 +1237,8 @@ begin
   vBruteForceCS.Acquire;
 
   try
+    aux := nil;
+
     aux := TStringList.Create;
 
     for x := 0 to vBruteForceList.Count - 1 do
@@ -1218,7 +1254,8 @@ begin
         vBruteForceList.Delete(x);
     end;
   finally
-    FreeAndNil(aux);
+    if Assigned(aux) then
+      FreeAndNil(aux);
 
     vBruteForceCS.Release;
   end;
@@ -1264,17 +1301,19 @@ var
   aux: TStringList;
 
 begin
-  if vBruteForceProtectionStatus then
-  begin
-    vBruteForceCS.Acquire;
+  vBruteForceCS.Acquire;
 
+  try
     try
-      aux := TStringList.Create;
-      aux.Delimiter := ';';
-      aux.StrictDelimiter := true;
-      aux.Clear;
+      aux := nil;
 
-      try
+      if vBruteForceProtectionStatus then
+      begin
+        aux := TStringList.Create;
+        aux.Delimiter := ';';
+        aux.StrictDelimiter := true;
+        aux.Clear;
+
         if GetBruteForceIndex(IP) > -1 then
         begin
           aux.DelimitedText := vBruteForceList.ValueFromIndex[GetBruteForceIndex(IP)];
@@ -1289,36 +1328,32 @@ begin
         begin
           vBruteForceList.AddPair(IP, '1;' + FloatToStr(now));
         end;
-      except
-        //
       end;
-
-    finally
+    except
+      //
+    end;
+  finally
+    if Assigned(aux) then
       FreeAndNil(aux);
 
-      vBruteForceCS.Release;
-    end;
-
+    vBruteForceCS.Release;
   end;
 end;
 
 procedure TIcsBruteForceProtection.ClearBruteForceList;
 begin
-
   vBruteForceCS.Acquire;
 
   try
-
     if Assigned(vBruteForceList) then
     begin
       vBruteForceList.Clear;
+
       vBruteForceList.NameValueSeparator := '=';
     end;
-
   finally
     vBruteForceCS.Release;
   end;
-
 end;
 
 constructor TIcsBruteForceProtection.Create;
@@ -1344,6 +1379,8 @@ begin
 
   if Assigned(vBruteForceCS) then
     FreeAndNil(vBruteForceCS);
+
+  Inherited Destroy;
 end;
 
 { TIcsSelfAssignedCert }
@@ -1387,10 +1424,12 @@ begin
   vCert.DoSelfSignCert;
 end;
 
-destructor TIcsSelfAssignedCert.Destory;
+destructor TIcsSelfAssignedCert.Destroy;
 begin
   if Assigned(vCert) then
     FreeAndNil(vCert);
+
+  Inherited Destroy;
 end;
 
 function TIcsSelfAssignedCert.PrivateKeyString: string;
