@@ -563,6 +563,7 @@ var
         Name      := AFDParams[I].Name;
         DataType  := AFDParams[I].DataType;
         ParamType := AFDParams[I].ParamType;
+        Size      := AFDParams[I].Size;
         Value     := AFDParams[I].Value;
       end;
     end;
@@ -752,10 +753,22 @@ begin
                 FStream.Read(Bool, Sizeof(Byte));
                 Result := Bool
     End;
-    dwftMemo,
     dwftWideMemo,
+    dwftFmtMemo : begin
+                FStream.Read(L, Sizeof(LongInt));
+                if L > 0 then Begin
+                  P := TStringStream.Create;
+                  try
+                    P.CopyFrom(FStream, L);
+                    P.Position := 0;
+                    Result := TEncoding.Unicode.GetString(P.Bytes);
+                  finally
+                   P.Free;
+                  end;
+                end;
+    end;
+    dwftMemo,
     dwftStream,
-    dwftFmtMemo,
     dwftBlob,
     dwftBytes : begin
                 FStream.Read(L, Sizeof(LongInt));

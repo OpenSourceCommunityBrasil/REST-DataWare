@@ -239,25 +239,8 @@ var
  aBytes        : TRESTDWBytes;
  aVariant      : PVariant;
 // MemBlobData   : TRESTDWString;
- {$IFDEF FPC}
-  dtRec         : TDateTimeRec;
- {$ELSE}
-  {$IF (CompilerVersion < 22)}
-   dtRec         : TDateTimeRec;
-  {$IFEND}
- {$ENDIF}
+ dtRec         : TDateTimeRec;
 Begin
-(*
-  ds := {$IFDEF FPC}
-         TRESTDWMemTable(dataset.GetDataset)
-        {$ELSE}
-         {$IF (CompilerVersion < 22)}
-          TRESTDWMemTable(dataset.GetDataset)
-         {$ELSE}
-          TRESTDWMemTable(dataset)
-         {$IFEND}
-        {$ENDIF};
-*)
   ds := TRESTDWMemTable(dataset.GetDataset);
 
   stream.Read(rc,SizeOf(LongInt));
@@ -309,7 +292,8 @@ Begin
                                        Stream.Read(S[InitStrPos], L);
                                        if EncodeStrs then
                                          S := DecodeStrings(S);
-                                       Move(S[InitStrPos], PData^, Length(S));
+                                       L := (Length(S)+1)*SizeOf(WideChar);
+                                       Move(WideString(S)[InitStrPos], PData^, L);
                                       {$ENDIF}
                                     end;
                                   end;
@@ -379,20 +363,16 @@ Begin
               dwftDateTime : begin
                 Stream.Read(R, Sizeof(Real));
                 {$IFDEF FPC}
-                  dtRec := DateTimeToDateTimeRec(aDataType,TDateTime(R));
-                  Move(dtRec, PData^, SizeOf(dtRec));
+                 dtRec := DateTimeToDateTimeRec(aDataType,TDateTime(R));
+                 Move(dtRec, PData^, SizeOf(dtRec));
                 {$ELSE}
-                  {$IF (CompilerVersion < 22)}
-                   Case aDataType Of
-                    ftDate: dtRec.Date := DateTimeToTimeStamp(R).Date;
-                    ftTime: dtRec.Time := DateTimeToTimeStamp(R).Time;
-                    Else
-                     dtRec.DateTime := TimeStampToMSecs(DateTimeToTimeStamp(R));
-                   End;
-                   Move(dtRec, PData^, SizeOf(dtRec));
-                  {$ELSE}
-                    Move(R, PData^, SizeOf(TDateTime));
-                  {$IFEND}
+                 Case aDataType Of
+                  ftDate: dtRec.Date := DateTimeToTimeStamp(R).Date;
+                  ftTime: dtRec.Time := DateTimeToTimeStamp(R).Time;
+                  Else
+                   dtRec.DateTime := TimeStampToMSecs(DateTimeToTimeStamp(R));
+                 End;
+                 Move(dtRec, PData^, SizeOf(dtRec));
                 {$ENDIF}
               end;
               dwftTimeStampOffset,
