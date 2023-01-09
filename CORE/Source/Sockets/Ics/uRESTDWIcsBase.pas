@@ -363,7 +363,11 @@ begin
       for x := 0 to HttpAppSrv.MultiListenSockets.Count - 1 do
         HttpAppSrv.MultiListenSockets[x].SslEnable := false;
 
-      HttpAppSrv.SSLContext := nil;
+      If Assigned(HttpAppSrv.SSLContext) Then
+      begin
+        HttpAppSrv.SSLContext.Free;
+        HttpAppSrv.SSLContext := nil;
+      end;
     end;
   end
   else
@@ -556,7 +560,10 @@ Begin
   HttpAppSrv := TSslHttpAppSrv.Create(nil);
 
   If Assigned(HttpAppSrv.SSLContext) Then
-    FreeAndNil(HttpAppSrv.SSLContext);
+  begin
+    HttpAppSrv.SSLContext.Free;
+    HttpAppSrv.SSLContext := nil;
+  end;
 
   // TODO 2
   HttpAppSrv.DocDir := '';
@@ -678,7 +685,10 @@ Begin
   If Assigned(HttpAppSrv) Then
   begin
     If Assigned(HttpAppSrv.SSLContext) Then
-      FreeAndNil(HttpAppSrv.SSLContext);
+    begin
+      HttpAppSrv.SSLContext.Free;
+      HttpAppSrv.SSLContext := nil;
+    end;
 
     FreeAndNil(HttpAppSrv);
   end;
@@ -951,8 +961,8 @@ begin
               Remote.RequestUserAgent, Remote.AuthUserName, Remote.AuthPassword, vToken,
               Remote.RequestHeader, StrToInt(Remote.PeerPort), Remote.RequestHeader,
               vParams, Remote.Params, lBodyStream, vAuthRealm, vCharSet, vErrorMessage,
-              StatusCode, vResponseHeader, vResponseString, ResultStream, vCORSHeader,
-              vRedirect);
+              StatusCode, vResponseHeader, vResponseString, ResultStream,
+              TStrings(vCORSHeader), vRedirect);
 
             SetReplyCORS;
 
