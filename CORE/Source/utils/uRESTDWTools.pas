@@ -455,7 +455,11 @@ var
   LVarBounds : Array of Integer;
  {$ELSE}
   {$IFNDEF FPC}
-   LVarBounds : Array of NativeInt;
+   {$IF CompilerVersion < 27}
+    LVarBounds : Array of Integer;
+   {$ELSE}
+    LVarBounds : Array of NativeInt;
+   {$IFEND}
   {$ELSE}
    LVarBounds : Array of SizeInt;
   {$ENDIF}
@@ -471,7 +475,15 @@ begin
   LVarBounds[0] := 0;
   LVarBounds[1] := Len - 1;
   { Create Variant of SAFEARRAY }
-  V := VarArrayCreate(LVarBounds, varByte);
+  {$IFNDEF FPC}
+   {$IF CompilerVersion > 27}
+    V := VarArrayCreate(LVarBounds, varByte);
+   {$ELSE}
+    V := VarArrayCreate(LVarBounds, varByte);
+   {$IFEND}
+  {$ELSE}
+   V := VarArrayCreate(LVarBounds, varByte);
+  {$ENDIF}
   Assert(VarArrayDimCount(V) = 1);
   { Keep the data around for a bit }
   VarArrayLock(V);

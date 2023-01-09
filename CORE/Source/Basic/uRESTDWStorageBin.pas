@@ -224,13 +224,10 @@ var
  PActualRecord : PJvMemBuffer;
  aDataType     : TFieldType;
  PData         : {$IFDEF FPC} PAnsiChar {$ELSE} PByte {$ENDIF};
-
  ds            : TRESTDWMemTable;
  rc            : Longint;
  fc            : Integer;
-
  cLen          : Word;
-
  Bool          : boolean;
  L             : LongInt;
  R             : Real;
@@ -271,7 +268,7 @@ Begin
   PActualRecord := nil;
   for I := 0 to rc do begin
     PActualRecord := dataset.AllocRecordBuffer;
-    dataset.InternalAddRecord(PActualRecord,True);
+    dataset.InternalAddRecord(PActualRecord, True);
     vActualRecord := dataset.GetMemoryRecord(I);
     for B := 0 To fc do begin
       aIndex := ds.Fields[B].FieldNo - 1;
@@ -279,69 +276,69 @@ Begin
         aDataType := ds.FieldDefs[aIndex].DataType;
         if dataset.DataTypeSuported(aDataType) then begin
          if dataset.DataTypeIsBlobTypes(aDataType) then
-          PData    := Pointer(@PMemBlobArray(vActualRecord.Blobs)^[ds.Fields[B].Offset])
+          PData    := Pointer(@PMemBlobArray(PActualRecord + dataset.GetOffSetsBlobs)^[ds.Fields[B].Offset]) //Pointer(@PMemBlobArray(vActualRecord.Blobs)^[ds.Fields[B].Offset])
          else
           PData    := Pointer(PActualRecord + dataset.GetOffSets(aIndex));
         end;
-
         // field null
         Stream.Read(Bool, Sizeof(Byte));
 
         if PData <> nil then begin
           if not Bool then begin
-           if Not dataset.DataTypeIsBlobTypes(aDataType) then
-            Begin
-             PData^ := {$IFDEF FPC} Char(1) {$ELSE} Ord(True) {$ENDIF};
-             Inc(PData);
-             cLen := Dataset.GetCalcFieldLen(ds.Fields[B].DataType, ds.Fields[B].Size);
-             {$IFDEF FPC}
-              FillChar(PData^, cLen , #0);
-             {$ELSE}
-              FillChar(PData^, cLen , 0);
-             {$ENDIF}
-            End;
             case FieldTypeToDWFieldType(aDataType) of
               dwftWideString,
               dwftFixedWideChar : begin
-                Stream.Read(L, Sizeof(L));
-                S := '';
-                if L > 0 then begin
-                  SetLength(S, L);
-                  {$IFDEF FPC}
-                   Stream.Read(Pointer(S)^, L);
-                   if EncodeStrs then
-                     S := DecodeStrings(S, csUndefined);
-                   S := GetStringEncode(S, csUndefined);
-                   L := (Length(S)+1)*SizeOf(WideChar);
-                   Move(Pointer(WideString(S))^, PData^, L);
-                  {$ELSE}
-                   Stream.Read(S[InitStrPos], L);
-                   if EncodeStrs then
-                     S := DecodeStrings(S);
-                   Move(S[InitStrPos], PData^, Length(S));
-                  {$ENDIF}
-                end;
-              end;
+                                   cLen := Dataset.GetCalcFieldLen(ds.Fields[B].DataType, ds.Fields[B].Size);
+                                   {$IFDEF FPC}
+                                    FillChar(PData^, cLen , #0);
+                                   {$ELSE}
+                                    FillChar(PData^, cLen , 0);
+                                   {$ENDIF}
+                                    Stream.Read(L, Sizeof(L));
+                                    S := '';
+                                    if L > 0 then begin
+                                      SetLength(S, L);
+                                      {$IFDEF FPC}
+                                       Stream.Read(Pointer(S)^, L);
+                                       if EncodeStrs then
+                                         S := DecodeStrings(S, csUndefined);
+                                       S := GetStringEncode(S, csUndefined);
+                                       L := (Length(S)+1)*SizeOf(WideChar);
+                                       Move(Pointer(WideString(S))^, PData^, L);
+                                      {$ELSE}
+                                       Stream.Read(S[InitStrPos], L);
+                                       if EncodeStrs then
+                                         S := DecodeStrings(S);
+                                       Move(S[InitStrPos], PData^, Length(S));
+                                      {$ENDIF}
+                                    end;
+                                  end;
               dwftFixedChar,
               dwftString : begin
-                          Stream.Read(L, Sizeof(L));
-                          S := '';
-                          if L > 0 then begin
-                            SetLength(S, L);
+                            cLen := Dataset.GetCalcFieldLen(ds.Fields[B].DataType, ds.Fields[B].Size);
                             {$IFDEF FPC}
-                             Stream.Read(Pointer(S)^, L);
-                             if EncodeStrs then
-                               S := DecodeStrings(S, csUndefined);
-                             S := GetStringEncode(S, csUndefined);
-                             Move(Pointer(S)^, PData^, Length(S));
+                             FillChar(PData^, cLen , #0);
                             {$ELSE}
-                             Stream.Read(S[InitStrPos], L);
-                             if EncodeStrs then
-                               S := DecodeStrings(S);
-                             Move(S[InitStrPos], PData^, Length(S));
+                             FillChar(PData^, cLen , 0);
                             {$ENDIF}
-                          end;
-              end;
+                            Stream.Read(L, Sizeof(L));
+                            S := '';
+                            if L > 0 then begin
+                              SetLength(S, L);
+                              {$IFDEF FPC}
+                               Stream.Read(Pointer(S)^, L);
+                               if EncodeStrs then
+                                 S := DecodeStrings(S, csUndefined);
+                               S := GetStringEncode(S, csUndefined);
+                               Move(Pointer(S)^, PData^, Length(S));
+                              {$ELSE}
+                               Stream.Read(S[InitStrPos], L);
+                               if EncodeStrs then
+                                 S := DecodeStrings(S);
+                               Move(S[InitStrPos], PData^, Length(S));
+                              {$ENDIF}
+                            end;
+                           end;
               dwftByte,
               dwftShortint,
               dwftSmallint,
@@ -424,8 +421,9 @@ Begin
                             Begin
                              SetLength(aBytes, L);
                              Stream.Read(aBytes[0], L);
-                             aVariant  := PVariant(PData);
-                             DynArrayToBinVariant(aVariant^, aBytes, L);
+                             PMemBlobArray(PData)^[ds.Fields[B].Offset] := BytesToString(aBytes);
+//                             aVariant  := PVariant(PData);
+//                             DynArrayToBinVariant(aVariant^, aBytes, L);
                             End;
                           end;
               else begin

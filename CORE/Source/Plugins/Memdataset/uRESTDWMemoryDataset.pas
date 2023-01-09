@@ -179,7 +179,7 @@ type
     procedure DoAfterApplyRecord(ADataset: TDataset; RS: TRecordStatus; aApply: Boolean);
     procedure SetUseDataSetFilter(const Value: Boolean);
     procedure InternalGotoBookmarkData(BookmarkData: TJvBookmarkData);
-    function  InternalGetFieldData(Field: TField; Buffer: Pointer): Boolean;
+    function  InternalGetFieldData(Field: TField; Var Buffer: TJvValueBuffer): Boolean;
     procedure InternalSetFieldData(Field: TField; Buffer: Pointer; const ValidateBuffer: TJvValueBuffer);
   protected
     function FindFieldData(Buffer: Pointer; Field: TField): Pointer;
@@ -272,7 +272,7 @@ type
     function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
     procedure FixReadOnlyFields(MakeReadOnly: Boolean);
     Procedure ClearBuffer;
-    function GetFieldData(Field: TField; {$IFDEF RTL250_UP}var{$ENDIF} Buffer: TJvValueBuffer): Boolean; overload; override;
+    function GetFieldData(Field: TField; var Buffer: TJvValueBuffer): Boolean; overload; override;
     {$IFNDEF NEXTGEN}
       {$IFDEF RTL240_UP}
     function GetFieldData(Field: TField; Buffer: Pointer): Boolean; overload; override;
@@ -373,7 +373,9 @@ type
   public
     constructor Create(Field: TBlobField; Mode: TBlobStreamMode);
     destructor Destroy; override;
-    function Read(var Buffer; Count: Longint): Longint; override;
+//    function Read(var Buffer; Count: Longint): Longint; override;
+    function Read(Buffer: TBytes; Offset, Count: Longint): Longint; overload; //override;
+    function Read(var Buffer; Count: Longint): Longint;overload; override;
     function Write(const Buffer; Count: Longint): Longint; override;
     function Seek(Offset: Longint; Origin: Word): Longint; override;
     procedure Truncate;
@@ -590,16 +592,19 @@ constructor TJvMemoryRecord.Create(MemoryData: TRESTDWMemTable);
 begin
   CreateEx(MemoryData, True);
 end;
-constructor TJvMemoryRecord.CreateEx(MemoryData: TRESTDWMemTable; UpdateParent: Boolean);
-begin
-  inherited Create;
-  SetMemoryData(MemoryData, UpdateParent);
-end;
+
+Constructor TJvMemoryRecord.CreateEx(MemoryData: TRESTDWMemTable; UpdateParent: Boolean);
+Begin
+ Inherited Create;
+ SetMemoryData(MemoryData, UpdateParent);
+End;
+
 destructor TJvMemoryRecord.Destroy;
 begin
-  SetMemoryData(nil, True);
-  inherited Destroy;
+ SetMemoryData(nil, True);
+ inherited Destroy;
 end;
+
 function TJvMemoryRecord.GetIndex: Integer;
 begin
   if FMemoryData <> nil then
@@ -616,13 +621,21 @@ begin
   begin
     if FMemoryData <> nil then
     begin
-      if not FMemoryData.FClearing then
-        FMemoryData.FRecords.Remove(Self);
-//      if FMemoryData.BlobFieldCount > 0 then
-//        Finalize(PMemBlobArray(FBlobs)^[0], FMemoryData.BlobFieldCount);
-      ReallocMem(FBlobs, 0);
-      ReallocMem(FData, 0);
-      FMemoryData := nil;
+      If not FMemoryData.FClearing Then
+       FMemoryData.FRecords.Remove(Self);
+      {$IFDEF FPC}
+       ReallocMem(FBlobs, 0);
+       ReallocMem(FData, 0);
+      {$ELSE}
+       {$IF CompilerVersion <= 22}
+        If FMemoryData.BlobFieldCount > 0 Then
+         Finalize(PMemBlobArray(@FBlobs)^[0], FMemoryData.BlobFieldCount);
+       {$ELSE}
+        ReallocMem(FBlobs, 0);
+       {$IFEND}
+       ReallocMem(FData, 0);
+      {$ENDIF}
+     FMemoryData := Nil;
     end;
     if Value <> nil then
     begin
@@ -699,7 +712,7 @@ begin
   end;
   FreeIndexList;
   ClearRecords;
-  FRecords.Free;
+  FreeAndNil(FRecords);
   FOffsets := nil;
   inherited Destroy;
 end;
@@ -882,16 +895,27 @@ var
 begin
   Result := nil;
   Index := Field.FieldNo - 1; // FieldDefList index (-1 and 0 become less than zero => ignored)
-  if (Index >= 0) and (Buffer <> nil) then
-  begin
+  If (Index >= 0) And (Buffer <> nil) Then
+   Begin
     DataType := FieldDefs[Index].DataType;
-    if DataType in ftSupported then
+    If DataType in ftSupported then
       if DataType in ftBlobTypes then
-        Result := Pointer(GetBlobData(Field, Buffer))
-      else
-        Result := (PJvMemBuffer(Buffer) + FOffsets[Index]);
-  end;
-end;
+       Begin
+        {$IFDEF FPC}
+         Result := Pointer(GetBlobData(Field, Buffer));
+        {$ELSE}
+         {$IF CompilerVersion <= 22}
+          Result := Pointer(@PMemBlobArray(PJvMemBuffer(Buffer) + FOffsets[Index] + FBlobOfs)^[Field.Offset]);
+         {$ELSE}
+          Result := Pointer(GetBlobData(Field, Buffer));
+         {$IFEND}
+        {$ENDIF}
+       End
+      Else
+       Result := Pointer(PJvMemBuffer(Buffer) + FOffsets[Index]);
+   End;
+End;
+
 function TRESTDWMemTable.CalcRecordSize: Integer;
 var
   I: Integer;
@@ -920,7 +944,7 @@ begin
      for I := FRecords.Count - 1 downto 0  do
       TJvMemoryRecord(FRecords[I]).Free;
      FRecords.Clear;
-    End; 
+    End;
   finally
     FClearing := False;
   end;
@@ -936,13 +960,13 @@ begin
   Result := StrAlloc(FRecBufSize);
   {$ENDIF COMPILER12_UP}
   if BlobFieldCount > 0 then
-    Initialize(PMemBlobArray(Result + FBlobOfs)^[0], BlobFieldCount);
+    Initialize(PMemBlobArray(Result + FBlobOfs)[0], BlobFieldCount);
 end;
 
 procedure TRESTDWMemTable.FreeRecordBuffer(var Buffer: PJvMemBuffer);
 begin
-//  if BlobFieldCount > 0 then
-//    Finalize(PMemBlobArray(Buffer + FBlobOfs)^[0], BlobFieldCount);
+  if BlobFieldCount > 0 then
+   Finalize(PMemBlobArray(Buffer + FBlobOfs)[0], BlobFieldCount);
   {$IFDEF COMPILER12_UP}
   FreeMem(Buffer);
   {$ELSE}
@@ -1026,7 +1050,15 @@ begin
       if FRecordPos <= 0 then
       begin
         Result := grBOF;
-        FRecordPos := -1;
+        If State In [dsBrowse] Then
+         Begin
+          If RecordCount > 0 Then
+           FRecordPos := 0
+          Else
+           FRecordPos := -1;
+         End
+        Else
+         FRecordPos := -1;
       end
       else
       begin
@@ -1162,11 +1194,14 @@ begin
   end;
   Result := RecBuf <> nil;
 end;
-function TRESTDWMemTable.InternalGetFieldData(Field: TField; Buffer: Pointer): Boolean;
+function TRESTDWMemTable.InternalGetFieldData(Field: TField; Var Buffer: TJvValueBuffer): Boolean;
 var
-  RecBuf  : PJvMemBuffer;
-  Data    : PByte;
-  VarData : Variant;
+  RecBuf   : PJvMemBuffer;
+  Data     : PByte;
+  VarData  : Variant;
+  aVarData : ^TMemBlobData;
+  L        : Integer;
+  aBytes   : TRESTDWBytes;
 begin
   Result := False;
   if not GetActiveRecBuf(RecBuf) then
@@ -1174,13 +1209,12 @@ begin
   if Field.FieldNo > 0 then
   begin
     Data := FindFieldData(RecBuf, Field);
-    if Data <> nil then
+    if (Data <> nil) Or (Field is TBlobField) then
     begin
-      if Field is TBlobField then
-        Result := Data <> nil
-      else
-        Result := Data^ <> 0;
-      Inc(Data);
+     If Not (Field is TBlobField) then
+      Result := Data^ <> 0;
+//      If Not DataTypeIsBlobTypes(Field.DataType) Then
+//      Inc(Data);
       case Field.DataType of
         ftGuid:
           Result := Result and(StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
@@ -1201,34 +1235,55 @@ begin
                                                                             {$ELSE}PWideChar(Data){$ENDIF}) > 0));
         {$IFEND}
       end;
-      if Result and (Buffer <> nil) then
+      if Result then
         if Field.DataType = ftVariant then
         begin
           VarData := PVariant(Data)^;
           PVariant(Buffer)^ := VarData;
         end
-        else
-          Move(Data^, Buffer^, CalcFieldLen(Field.DataType, Field.Size));
+       Else If DataTypeIsBlobTypes(Field.DataType) Then
+        Begin
+         //Novo Codigo
+         If State in [dsBrowse] Then
+          Begin
+           aBytes := StringToBytes(PMemBlobArray(Records[RecNo -1].Blobs)^[Field.Offset]);
+           SetLength(Buffer, Length(aBytes));
+           Move(aBytes[0], Buffer[0], Length(aBytes));
+          End
+         Else
+          SetLength(Buffer, 0);
+        End
+       Else
+        Begin
+         SetLength(Buffer, CalcFieldLen(Field.DataType, Field.Size));
+         Move(Data^, Buffer[0], Length(Buffer));
+        End;
     end;
   end
   else
   if State in [dsBrowse, dsEdit, dsInsert, dsCalcFields] then
   begin
-    Inc(RecBuf, FRecordSize + Field.Offset);
-    Result := Byte(RecBuf[0]) <> 0;
-    if Result and (Buffer <> nil) then
-      Move(RecBuf[1], Buffer^, Field.DataSize);
+   If Not DataTypeIsBlobTypes(Field.DataType) Then
+    Begin
+     Inc(RecBuf, FRecordSize + Field.Offset);
+     Result := Byte(RecBuf[0]) <> 0;
+     If Result Then
+      Move(RecBuf[1], Buffer, Field.DataSize);
+    End;
   end;
 end;
-function TRESTDWMemTable.GetFieldData(Field: TField; {$IFDEF RTL250_UP}var{$ENDIF} Buffer: TJvValueBuffer): Boolean;
+function TRESTDWMemTable.GetFieldData(Field: TField; var Buffer: TJvValueBuffer): Boolean;
 begin
-  Result := InternalGetFieldData(Field, {$IFDEF RTL240_UP}@Buffer[0]{$ELSE}Buffer{$ENDIF RTL240_UP});
+ Result := InternalGetFieldData(Field, Buffer);
 end;
 {$IFNDEF NEXTGEN}
   {$IFDEF RTL240_UP}
 function TRESTDWMemTable.GetFieldData(Field: TField; Buffer: Pointer): Boolean;
+Var
+ aPointer : Pointer;
 begin
-  Result := InternalGetFieldData(Field, Buffer);
+ aPointer := @Buffer;
+ Result := InternalGetFieldData(Field, TJvValueBuffer(aPointer^));
 end;
   {$ENDIF RTL240_UP}
 {$ENDIF ~NEXTGEN}
@@ -1524,8 +1579,6 @@ end;
 {$IFNDEF FPC}
   {$IFNDEF COMPILER10_UP} // Delphi 2006+ has support for DWWideString
   procedure TRESTDWMemTable.DataConvert(Field: TField; Source, Dest: Pointer; ToNative: Boolean);
-  Var
-   D: TDateTime;
   begin
     if Field.DataType = ftWideString then
     begin
@@ -1565,13 +1618,9 @@ procedure TRESTDWMemTable.AssignMemoryRecord(Rec: TJvMemoryRecord; Buffer: PJvMe
 var
   I: Integer;
 begin
-// Rec.Data := Buffer;
-  Move(Buffer^, Rec.Data^, FRecordSize);
-//  for I := 0 to BlobFieldCount - 1 do
-//   Begin
-//    If PMemBlobArray(Rec.FBlobs)^[I] = '' Then
-//     PMemBlobArray(Rec.FBlobs)^[I] := PMemBlobArray(Buffer + FBlobOfs)^[I];
-//   End;
+ Move(Buffer^, Rec.Data^, FRecordSize);
+ For I := 0 to BlobFieldCount - 1 do
+  PMemBlobArray(Rec.FBlobs)^[I] := PMemBlobArray(Buffer + FBlobOfs)^[I];
 end;
 procedure TRESTDWMemTable.SetMemoryRecordData(Buffer: PJvMemBuffer; Pos: Integer);
 var
@@ -3164,20 +3213,30 @@ var
   Pos: Integer;
 begin
   Result := '';
-  Pos := FDataSet.FRecordPos;
-  if (Pos < 0) and (FDataSet.RecordCount > 0) then
-    Pos := 0
-  else
-  if Pos >= FDataSet.RecordCount then
-    Pos := FDataSet.RecordCount - 1;
+  Pos := FDataSet.RecNo -1;
   if (Pos >= 0) and (Pos < FDataSet.RecordCount) then
   begin
     Rec := FDataSet.Records[Pos];
     if Rec <> nil then
-      Result := PMemBlobArray(Rec.FBlobs)^[FField.Offset];
+      Result := PMemBlobArray(Rec.FBlobs)[FField.Offset];
   end;
 end;
+
+Function TJvMemBlobStream.Read(Buffer: TBytes; Offset, Count: Longint): Longint;
+Var
+ aPointer : Pointer;
+begin
+ aPointer := @Buffer;
+ Result := Read(aPointer^, Count);
+end;
+
 function TJvMemBlobStream.Read(var Buffer; Count: Longint): Longint;
+Var
+ vString  : String;
+ aBuffer  : PJvMemBuffer;
+ pBytes   : PRESTDWBytes;
+ aBytes   : TRESTDWBytes;
+ aPointer : Pointer;
 begin
   Result := 0;
   if FOpened then
@@ -3188,18 +3247,11 @@ begin
       Result := Count;
     if Result > 0 then
     begin
-      if FCached then
-      begin
-        Move(PJvMemBuffer(FDataSet.GetBlobData(FField, FBuffer))[FPosition], Buffer,
-          Result);
-        Inc(FPosition, Result);
-      end
-      else
-      begin
-        Move(PJvMemBuffer(GetBlobFromRecord(FField))[FPosition], Buffer, Result);
-        Inc(FPosition, Result);
-      end;
-    end;
+     SetLength(PRESTDWBytes(@Buffer)^, Result);
+     vString := GetBlobFromRecord(FField);
+     Move(StringToBytes(vString)[0], PRESTDWBytes(@Buffer)^, Result);
+     Inc(FPosition, Result);
+    end
   end;
 end;
 function TJvMemBlobStream.Write(const Buffer; Count: Longint): Longint;
@@ -3243,10 +3295,7 @@ function TJvMemBlobStream.GetBlobSize: Longint;
 begin
   Result := 0;
   if FOpened then
-    if FCached then
-      Result := Length(FDataSet.GetBlobData(FField, FBuffer))
-    else
-      Result := Length(GetBlobFromRecord(FField));
+   Result := Length(GetBlobFromRecord(FField));
 end;
 
 { TRESTDWStorageBase }
