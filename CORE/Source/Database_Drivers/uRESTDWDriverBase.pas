@@ -1,4 +1,4 @@
-unit uRESTDWDriverBase;
+﻿unit uRESTDWDriverBase;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -512,11 +512,15 @@ begin
   if DWParams = nil then
     Exit;
 
+{
+  // firebird funciona
+  // mssql nao funciona
   try
     Self.Prepare;
   except
 
   end;
+}
 
   for I := 0 To DWParams.Count -1 do begin
     if Self.ParamCount > I then begin
