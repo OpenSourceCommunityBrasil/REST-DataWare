@@ -30,6 +30,28 @@ uses
   uRESTDWMemExprParser{$IFNDEF FPC}, uRESTDWMemDBFilterExpr, SqlTimSt{$ENDIF},
   uRESTDWComponentBase, uRESTDWConsts;
 
+Const
+  ftBlobTypes = [ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftParadoxOle,
+                 ftDBaseOle, ftTypedBinary, ftOraBlob, ftOraClob
+                 {$IF DEFINED(FPC) OR DEFINED(COMPILER10_UP)}, ftWideMemo{$IFEND}];
+  // If you add a new supported type you _must_ also update CalcFieldLen()
+  ftSupported = [ftString, ftSmallint, ftInteger, ftWord, ftBoolean,
+                 ftFloat, ftCurrency, ftDate, ftTime, ftDateTime, ftAutoInc, ftBCD,
+                 ftFMTBCD, ftTimestamp,
+                 {$IFNDEF FPC}
+                  {$IFDEF COMPILER10_UP}
+                  ftOraTimestamp, ftFixedWideChar,
+                  {$ENDIF COMPILER10_UP}
+                  {$IFDEF COMPILER12_UP}
+                  ftLongWord, ftShortint, ftByte, ftExtended,
+                  {$ENDIF COMPILER12_UP}
+                 {$ELSE}
+                   ftFixedWideChar,
+                 {$ENDIF FPC}
+                 ftBytes, ftVarBytes, ftADT, ftFixedChar, ftWideString, ftLargeint,
+                 ftVariant, ftGuid] + ftBlobTypes;
+  fkStoredFields = [fkData];
+
 type
   {$IFDEF NEXTGEN}
    TRecordBuffer = PByte;
@@ -39,7 +61,7 @@ type
   TApplyEvent = procedure(Dataset: TDataset; Rows: Integer) of object;
   TRecordStatus = (rsOriginal, rsUpdated, rsInserted, rsDeleted);
   TApplyRecordEvent = procedure(Dataset: TDataset; RecStatus: TRecordStatus; FoundApply: Boolean) of object;
-  TMemBlobData = string;
+  TMemBlobData  = TRESTDWBytes;
   TMemBlobArray = array[0..MaxInt div SizeOf(TMemBlobData) - 1] of TMemBlobData;
   PMemBlobArray = ^TMemBlobArray;
   TJvMemoryRecord = class;
@@ -373,8 +395,7 @@ type
   public
     constructor Create(Field: TBlobField; Mode: TBlobStreamMode);
     destructor Destroy; override;
-//    function Read(var Buffer; Count: Longint): Longint; override;
-    function Read(Buffer: TBytes; Offset, Count: Longint): Longint; overload; //override;
+    function Read(Buffer: TBytes; Offset, Count: Longint): Longint; overload; override;
     function Read(var Buffer; Count: Longint): Longint;overload; override;
     function Write(const Buffer; Count: Longint): Longint; override;
     function Seek(Offset: Longint; Origin: Word): Longint; override;
@@ -416,28 +437,9 @@ uses
   uRESTDWStorageBin;
 
 const
-  ftBlobTypes = [ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftParadoxOle,
-    ftDBaseOle, ftTypedBinary, ftOraBlob, ftOraClob
-    {$IF DEFINED(FPC) OR DEFINED(COMPILER10_UP)}, ftWideMemo{$IFEND}];
-  // If you add a new supported type you _must_ also update CalcFieldLen()
-  ftSupported = [ftString, ftSmallint, ftInteger, ftWord, ftBoolean,
-    ftFloat, ftCurrency, ftDate, ftTime, ftDateTime, ftAutoInc, ftBCD,
-    ftFMTBCD, ftTimestamp,
-    {$IFNDEF FPC}
-      {$IFDEF COMPILER10_UP}
-      ftOraTimestamp, ftFixedWideChar,
-      {$ENDIF COMPILER10_UP}
-      {$IFDEF COMPILER12_UP}
-      ftLongWord, ftShortint, ftByte, ftExtended,
-      {$ENDIF COMPILER12_UP}
-    {$ELSE}
-      ftFixedWideChar,
-    {$ENDIF FPC}
-    ftBytes, ftVarBytes, ftADT, ftFixedChar, ftWideString, ftLargeint,
-    ftVariant, ftGuid] + ftBlobTypes;
-  fkStoredFields = [fkData];
   GuidSize = 38;
   STATUSNAME = 'C67F70Z90'; (* Magic *)
+
 type
   PMemBookmarkInfo = ^TMemBookmarkInfo;
   TMemBookmarkInfo = record
@@ -1004,7 +1006,7 @@ begin
   FillChar(Buffer^, FBlobOfs, 0);
  {$ENDIF}
  For I := 0 to BlobFieldCount - 1 do
-    PMemBlobArray(Buffer + FBlobOfs)^[I] := '';
+  SetLength(PMemBlobArray(Buffer + FBlobOfs)^[I], 0);
 end;
 
 procedure TRESTDWMemTable.InitRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF});
@@ -1246,7 +1248,7 @@ begin
          //Novo Codigo
          If State in [dsBrowse] Then
           Begin
-           aBytes := StringToBytes(PMemBlobArray(Records[RecNo -1].Blobs)^[Field.Offset]);
+           aBytes := PMemBlobArray(Records[RecNo -1].Blobs)^[Field.Offset];
            SetLength(Buffer, Length(aBytes));
            Move(aBytes[0], Buffer[0], Length(aBytes));
           End
@@ -1445,7 +1447,7 @@ begin
     PMemBlobArray(ActiveBuffer + FBlobOfs)^[Field.Offset] :=
       PMemBlobArray(Records[FRecordPos].FBlobs)^[Field.Offset]
   else
-    PMemBlobArray(ActiveBuffer + FBlobOfs)^[Field.Offset] := '';
+    SetLength(PMemBlobArray(ActiveBuffer + FBlobOfs)^[Field.Offset], 0);
 end;
 function TRESTDWMemTable.CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream;
 begin
@@ -3212,7 +3214,7 @@ var
   Rec: TJvMemoryRecord;
   Pos: Integer;
 begin
-  Result := '';
+  SetLength(Result, 0);
   Pos := FDataSet.RecNo -1;
   if (Pos >= 0) and (Pos < FDataSet.RecordCount) then
   begin
@@ -3226,30 +3228,54 @@ Function TJvMemBlobStream.Read(Buffer: TBytes; Offset, Count: Longint): Longint;
 Var
  aPointer : Pointer;
 begin
+ //Actual TODO XyberX
  aPointer := @Buffer;
  Result := Read(aPointer^, Count);
 end;
 
 function TJvMemBlobStream.Read(var Buffer; Count: Longint): Longint;
 Var
- vString  : String;
- aBuffer  : PJvMemBuffer;
- pBytes   : PRESTDWBytes;
- aBytes   : TRESTDWBytes;
- aPointer : Pointer;
+ vString   : TRESTDWBytes;
+ aBuffer   : PJvMemBuffer;
+ aBytes    : TRESTDWBytes;
+ aPointer  : Pointer;
+ aPosition : Integer;
 begin
+  //Actual TODO XyberX
   Result := 0;
   if FOpened then
   begin
-    if Count > Size - FPosition then
-      Result := Size - FPosition
-    else
-      Result := Count;
-    if Result > 0 then
+   If Count > 0 then
+    Result := Count
+   Else
+    Result := Size - FPosition;
+   If Result > 0 then
     begin
-     SetLength(PRESTDWBytes(@Buffer)^, Result);
-     vString := GetBlobFromRecord(FField);
-     Move(StringToBytes(vString)[0], PRESTDWBytes(@Buffer)^, Result);
+     vString  := GetBlobFromRecord(FField);
+     //aPointer := @Buffer;
+     aPointer := PRESTDWBytes(@Buffer);
+     If Result > Length(vString) Then
+      Begin
+       Result := 0;
+       SetLength(aBytes, Result);
+       PRESTDWBytes(aPointer)^ := aBytes;
+      End
+     Else If Length(vString) > 0 Then
+      Begin
+       SetLength(aBytes, Result);
+       Try
+        //Actual TODO XyberX
+        aPosition := FPosition;
+        Move(vString[aPosition], aBytes[0], Result);
+        SetLength(vString, 0);
+       Finally
+        If Length(PRESTDWBytes(aPointer)^) < Result Then
+         PRESTDWBytes(aPointer)^ := aBytes
+        Else
+         Move(aBytes[0], PRESTDWBytes(aPointer)^[0], Result);
+        SetLength(aBytes, 0);
+       End;
+      End;
      Inc(FPosition, Result);
     end
   end;
@@ -3287,7 +3313,7 @@ procedure TJvMemBlobStream.Truncate;
 begin
   if FOpened and FCached and (FMode <> bmRead) then
   begin
-    FDataSet.SetBlobData(FField, FBuffer, '');
+    FDataSet.SetBlobData(FField, FBuffer, 0);
     FModified := True;
   end;
 end;
@@ -3344,7 +3370,7 @@ begin
   if dataset.InheritsFrom(TRESTDWMemTable) then
     SaveDWMemToStream(TRESTDWMemTable(dataset),stream)
   else
-    SaveDatasetToStream(dataset,stream);
+    SaveDatasetToStream(dataset, stream);
 end;
 
 end.

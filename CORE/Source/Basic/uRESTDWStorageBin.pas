@@ -238,8 +238,9 @@ var
  bcd           : TBcd;
  aBytes        : TRESTDWBytes;
  aVariant      : PVariant;
-// MemBlobData   : TRESTDWString;
+ pMemBlobData  : TRESTDWString;
  dtRec         : TDateTimeRec;
+// aStream       : TStream;
 Begin
   ds := TRESTDWMemTable(dataset.GetDataset);
 
@@ -255,7 +256,12 @@ Begin
     vActualRecord := dataset.GetMemoryRecord(I);
     for B := 0 To fc do begin
       aIndex := ds.Fields[B].FieldNo - 1;
-      if (aIndex >= 0) And (PActualRecord <> Nil) then begin
+      If (aIndex < 0) Then
+       Continue;
+      Stream.Read(Bool, Sizeof(Byte));
+      if Bool then
+       Continue;
+      if (PActualRecord <> Nil) then begin
         aDataType := ds.FieldDefs[aIndex].DataType;
         if dataset.DataTypeSuported(aDataType) then begin
          if dataset.DataTypeIsBlobTypes(aDataType) then
@@ -263,11 +269,8 @@ Begin
          else
           PData    := Pointer(PActualRecord + dataset.GetOffSets(aIndex));
         end;
-        // field null
-        Stream.Read(Bool, Sizeof(Byte));
 
         if PData <> nil then begin
-          if not Bool then begin
             case FieldTypeToDWFieldType(aDataType) of
               dwftWideString,
               dwftFixedWideChar : begin
@@ -395,17 +398,20 @@ Begin
               dwftStream,
               dwftFmtMemo,
               dwftBlob,
-              dwftBytes : begin
+              dwftBytes : Begin
                            Stream.Read(L, Sizeof(LongInt));
                            If L > 0 Then
                             Begin
-                             SetLength(aBytes, L);
+                             //Actual TODO XyberX
+                             SetLength  (aBytes,    L);
                              Stream.Read(aBytes[0], L);
-                             PMemBlobArray(PData)^[ds.Fields[B].Offset] := BytesToString(aBytes);
-//                             aVariant  := PVariant(PData);
-//                             DynArrayToBinVariant(aVariant^, aBytes, L);
+                             Try
+                              PMemBlobArray(PData)^[ds.Fields[B].Offset] := aBytes;
+                             Finally
+                              SetLength(aBytes, 0);
+                             End;
                             End;
-                          end;
+                          End;
               else begin
                           Stream.Read(L, Sizeof(L));
                           S := '';
@@ -428,18 +434,7 @@ Begin
               end;
 
             end;
-          end
-          else begin
-            cLen := Dataset.GetCalcFieldLen(ds.Fields[B].DataType, ds.Fields[B].Size);
-            PData^ := {$IFDEF FPC} Char(0) {$ELSE}  Ord(False) {$ENDIF};
-            Inc(PData);
-            {$IFDEF FPC}
-              FillChar(PData^, cLen , #0);
-            {$ELSE}
-              FillChar(PData^, cLen , 0);
-            {$ENDIF}
           end;
-        end;
       end;
     end;
     Dataset.SetMemoryRecordData(PActualRecord,I);
@@ -817,155 +812,151 @@ Begin
       aIndex := ds.Fields[B].FieldNo - 1;
       if (aIndex >= 0) And (PActualRecord <> Nil) then begin
         aDataType := ds.FieldDefs[aIndex].DataType;
-        aBreak := False;
+        aBreak := ds.Fields[B].IsNull;
+        if aBreak then
+         Begin
+          Stream.Write(aBreak, SizeOf(Byte));
+          Continue;
+         End;
+//          if PData <> nil then begin
+//            if ds.Fields[B] is TBlobField then
+//              aBreak  := PData <> nil
+//            else
+//              aBreak  := {$IFDEF FPC} PData^ <> #0 {$ELSE} PData^ <> 0 {$ENDIF};
+//            Inc(PData);
+//          end;
+
         if dataset.DataTypeSuported(aDataType) then begin
           if dataset.DataTypeIsBlobTypes(aDataType) then
-            PData    := Pointer(dataset.GetBlobRec(ds.Fields[B], vActualRecord))
+           PData    := Pointer(@PMemBlobArray(PActualRecord + dataset.GetOffSetsBlobs)^[ds.Fields[B].Offset]) //Pointer(@PMemBlobArray(vActualRecord.Blobs)^[ds.Fields[B].Offset])
           else
             PData    := Pointer(PActualRecord + dataset.GetOffSets(aIndex));
-          if PData <> nil then begin
-            if ds.Fields[B] is TBlobField then
-              aBreak  := PData <> nil
-            else
-              aBreak  := {$IFDEF FPC} PData^ <> #0 {$ELSE} PData^ <> 0 {$ENDIF};
-            Inc(PData);
-          end;
         end;
-
-        if aBreak then begin
-          Bool := False;  // not null
-          Stream.Write(Bool, SizeOf(Byte));
-
-          case aDataType of
-            ftFixedChar,
-            ftWideString,
-            ftString : begin
-                        S := PAnsiChar(PData);
-                        if EncodeStrs then
-                          S := EncodeStrings(S{$IFDEF FPC}, csUndefined{$ENDIF});
-                        L := Length(S);
-                        Stream.Write(L, Sizeof(L));
-                        {$IFNDEF FPC}
-                          if L <> 0 then Stream.Write(S[InitStrPos], L);
-                        {$ELSE}
-                          if L <> 0 then Stream.Write(S[1], L);
-                        {$ENDIF}
-            end;
-            {$IFDEF COMPILER12_UP}
-            ftByte,
-            ftShortint : begin
-                        Move(PData^,J,Sizeof(PData));
-                        Stream.Write(J, Sizeof(Integer));
-            end;
-            {$ENDIF}
-            ftSmallint : begin
-                        Move(PData^,Si,Sizeof(PData));
-                        J := Si;
-                        Stream.Write(J, Sizeof(Integer));
-            end;
-            ftWord,
-            ftInteger,
-            ftAutoInc :  Begin
-                        Move(PData^,J,Sizeof(PData));
-                        Stream.Write(J, Sizeof(Integer));
-            end;
-            {$IFNDEF FPC}
-              {$IF CompilerVersion >= 21}
-                ftSingle   : begin
-                            Move(PData^,R,Sizeof(PData));
-                            Stream.Write(R, Sizeof(Real));
-                end;
-                ftExtended : begin
-                            Move(PData^,E,Sizeof(PData));
-                            Stream.Write(E, Sizeof(Extended));
-                end;
-              {$IFEND}
-            {$ENDIF}
-            ftFloat    : begin
-                        Move(PData^,R,Sizeof(PData));
-                        Stream.Write(R, Sizeof(Real));
-            end;
-            ftFMTBcd : begin
-                        Move(PData^,bcd,Sizeof(bcd));
-                        BCDToCurr(bcd,Cr);
-                        Stream.Write(Cr, Sizeof(Currency));
-            end;
-            ftCurrency,
-            ftBCD     :  begin
-                        Move(PData^,Cr,Sizeof(PData));
-                        Stream.Write(Cr, Sizeof(Currency));
-            end;
-            {$IFNDEF FPC}
-              {$IF CompilerVersion >= 21}
-                ftTimeStampOffset,
-              {$IFEND}
-            {$ENDIF}
-            ftDate,
-            ftTime,
-            ftDateTime : begin
-                        Move(PData^,Dt,Sizeof(Dt));
-                        R := Dt;
-                        Stream.Write(R, Sizeof(Real));
-            end;
-            ftTimeStamp : begin
-                        Move(PData^,Ts,Sizeof(Ts));
-                        Dt := {$IFDEF FPC} TimeStampToDateTime(Ts) {$ELSE} SQLTimeStampToDateTime(Ts) {$ENDIF};
-                        R := Dt;
-                        Stream.Write(R, Sizeof(Real));
-            End;
-            {$IFNDEF FPC}
-              {$IF CompilerVersion >= 21}
-                ftLongWord,
-              {$IFEND}
-            {$ENDIF}
-            ftLargeint : begin
-                        Move(PData^,L,Sizeof(PData));
-                        Stream.Write(L, Sizeof(Longint));
-            end;
-            ftBoolean  : begin
-                        Move(PData^,Bool,Sizeof(PData));
-                        Stream.Write(Bool, Sizeof(Byte));
-            End;
-            ftMemo,
-            {$IFNDEF FPC}
-              {$IF CompilerVersion > 21}
-                ftWideMemo,
-                ftStream,
-              {$IFEND}
-            {$ELSE}
-              ftWideMemo,
-            {$ENDIF}
-            ftFmtMemo,
-            ftBlob,
-            ftBytes : begin
-                        P := TMemoryStream.Create;
-                        try
-                          S := PAnsiChar(PData);
-                          L := Length(S);
-                          Stream.Write(L, Sizeof(Longint));
-                          P.Position := 0;
-                          Stream.CopyFrom(P, L);
-                        finally
-                          FreeAndNil(P);
-                        end;
-            end;
-            else begin
-                        S := PAnsiChar(PData);
-                        if EncodeStrs then
-                          S := EncodeStrings(S{$IFDEF FPC}, csUndefined{$ENDIF});
-                        L := Length(S);
-                        Stream.Write(L, Sizeof(L));
-                        {$IFNDEF FPC}
-                          If L <> 0 Then Stream.Write(S[InitStrPos], L);
-                        {$ELSE}
-                          If L <> 0 Then Stream.Write(S[1], L);
-                        {$ENDIF}
-            end;
+        case aDataType of
+          ftFixedChar,
+          ftWideString,
+          ftString : begin
+                      S := PAnsiChar(PData);
+                      if EncodeStrs then
+                        S := EncodeStrings(S{$IFDEF FPC}, csUndefined{$ENDIF});
+                      L := Length(S);
+                      Stream.Write(L, Sizeof(L));
+                      {$IFNDEF FPC}
+                        if L <> 0 then Stream.Write(S[InitStrPos], L);
+                      {$ELSE}
+                        if L <> 0 then Stream.Write(S[1], L);
+                      {$ENDIF}
           end;
-        end
-        else begin
-          Bool := True;
-          Stream.Write(Bool, SizeOf(Byte));
+          {$IFDEF COMPILER12_UP}
+          ftByte,
+          ftShortint : begin
+                      Move(PData^,J,Sizeof(PData));
+                      Stream.Write(J, Sizeof(Integer));
+          end;
+          {$ENDIF}
+          ftSmallint : begin
+                      Move(PData^,Si,Sizeof(PData));
+                      J := Si;
+                      Stream.Write(J, Sizeof(Integer));
+          end;
+          ftWord,
+          ftInteger,
+          ftAutoInc :  Begin
+                      Move(PData^,J,Sizeof(PData));
+                      Stream.Write(J, Sizeof(Integer));
+          end;
+          {$IFNDEF FPC}
+            {$IF CompilerVersion >= 21}
+              ftSingle   : begin
+                          Move(PData^,R,Sizeof(PData));
+                          Stream.Write(R, Sizeof(Real));
+              end;
+              ftExtended : begin
+                          Move(PData^,E,Sizeof(PData));
+                          Stream.Write(E, Sizeof(Extended));
+              end;
+            {$IFEND}
+          {$ENDIF}
+          ftFloat    : begin
+                      Move(PData^,R,Sizeof(PData));
+                      Stream.Write(R, Sizeof(Real));
+          end;
+          ftFMTBcd : begin
+                      Move(PData^,bcd,Sizeof(bcd));
+                      BCDToCurr(bcd,Cr);
+                      Stream.Write(Cr, Sizeof(Currency));
+          end;
+          ftCurrency,
+          ftBCD     :  begin
+                      Move(PData^,Cr,Sizeof(PData));
+                      Stream.Write(Cr, Sizeof(Currency));
+          end;
+          {$IFNDEF FPC}
+            {$IF CompilerVersion >= 21}
+              ftTimeStampOffset,
+            {$IFEND}
+          {$ENDIF}
+          ftDate,
+          ftTime,
+          ftDateTime : begin
+                      Move(PData^,Dt,Sizeof(Dt));
+                      R := Dt;
+                      Stream.Write(R, Sizeof(Real));
+          end;
+          ftTimeStamp : begin
+                      Move(PData^,Ts,Sizeof(Ts));
+                      Dt := {$IFDEF FPC} TimeStampToDateTime(Ts) {$ELSE} SQLTimeStampToDateTime(Ts) {$ENDIF};
+                      R := Dt;
+                      Stream.Write(R, Sizeof(Real));
+          End;
+          {$IFNDEF FPC}
+            {$IF CompilerVersion >= 21}
+              ftLongWord,
+            {$IFEND}
+          {$ENDIF}
+          ftLargeint : begin
+                      Move(PData^,L,Sizeof(PData));
+                      Stream.Write(L, Sizeof(Longint));
+          end;
+          ftBoolean  : begin
+                      Move(PData^,Bool,Sizeof(PData));
+                      Stream.Write(Bool, Sizeof(Byte));
+          End;
+          ftMemo,
+          {$IFNDEF FPC}
+            {$IF CompilerVersion > 21}
+              ftWideMemo,
+              ftStream,
+            {$IFEND}
+          {$ELSE}
+            ftWideMemo,
+          {$ENDIF}
+          ftFmtMemo,
+          ftBlob,
+          ftBytes : begin
+                      P := TMemoryStream.Create;
+                      try
+                        S := PAnsiChar(PData);
+                        L := Length(S);
+                        Stream.Write(L, Sizeof(Longint));
+                        P.Position := 0;
+                        Stream.CopyFrom(P, L);
+                      finally
+                        FreeAndNil(P);
+                      end;
+          end;
+          else begin
+                      S := PAnsiChar(PData);
+                      if EncodeStrs then
+                        S := EncodeStrings(S{$IFDEF FPC}, csUndefined{$ENDIF});
+                      L := Length(S);
+                      Stream.Write(L, Sizeof(L));
+                      {$IFNDEF FPC}
+                        If L <> 0 Then Stream.Write(S[InitStrPos], L);
+                      {$ELSE}
+                        If L <> 0 Then Stream.Write(S[1], L);
+                      {$ENDIF}
+          end;
         end;
       end;
     end;
@@ -976,27 +967,39 @@ end;
 
 procedure TRESTDWStorageBinRDW.SaveRecordToStream(Dataset: TDataset; stream: TStream);
 var
-  i  : integer;
-  s  : DWString;
-  L  : longint;
-  J  : integer;
-  R  : Real;
-  E  : Extended;
-  Cr : Currency;
-  P  : TMemoryStream;
-  Bool : Boolean;
+  i      : integer;
+  aBytes : TRESTDWBytes;
+  s      : DWString;
+  L      : longint;
+  J      : integer;
+  R      : Real;
+  E      : Extended;
+  Cr     : Currency;
+  P      : TMemoryStream;
+  Bool   : Boolean;
 Begin
   P := nil;
   for i := 0 to Dataset.FieldCount - 1 do begin
     if fkCalculated = Dataset.Fields[I].FieldKind then
       Bool := True
     else
-      Bool := Dataset.Fields[I].IsNull;
-
+     Begin
+      if Dataset.Fields[I].DataType in ftBlobTypes then
+       Begin
+        P := TMemoryStream.Create;
+        Try
+         TBlobField(Dataset.Fields[I]).SaveToStream(P);
+         Bool := (P.Size = 0);
+        Finally
+         FreeAndNil(P);
+        End;
+       End
+      Else
+       Bool := Dataset.Fields[I].IsNull;
+     End;
     Stream.Write(Bool, SizeOf(Byte));
     if Bool then
       Continue;
-
     case Dataset.Fields[I].DataType Of
       ftFixedChar,
       ftWideString,
@@ -1038,16 +1041,6 @@ Begin
           end;
         {$IFEND}
       {$ENDIF}
-      ftFloat    : begin
-                  R := Dataset.Fields[I].AsFloat;
-                  Stream.Write(R, Sizeof(Real));
-      end;
-      ftFMTBcd,
-      ftCurrency,
-      ftBCD     :  begin
-                  Cr := Dataset.Fields[I].AsCurrency;
-                  Stream.Write(Cr, Sizeof(Currency));
-      end;
       {$IFNDEF FPC}
         {$IF CompilerVersion >= 21}
           ftTimeStampOffset,
@@ -1056,10 +1049,17 @@ Begin
       ftDate,
       ftTime,
       ftDateTime,
-      ftTimeStamp : begin
-                  R := Dataset.Fields[I].AsDateTime;
-                  Stream.Write(R, Sizeof(Real));
-      End;
+      ftTimeStamp,
+      ftFloat    : Begin
+                    R := Dataset.Fields[I].AsFloat;
+                    Stream.Write(R, Sizeof(Real));
+                   End;
+      ftFMTBcd,
+      ftCurrency,
+      ftBCD     :  begin
+                  Cr := Dataset.Fields[I].AsCurrency;
+                  Stream.Write(Cr, Sizeof(Currency));
+      end;
       {$IFNDEF FPC}
         {$IF CompilerVersion >= 21}
           ftLongWord,
@@ -1088,17 +1088,23 @@ Begin
       {$ENDIF}
       ftFmtMemo,
       ftBlob,
-      ftBytes : begin
-                  P := TMemoryStream.Create;
-                  try
-                    TBlobField(Dataset.Fields[I]).SaveToStream(P);
-                    L := P.Size;
-                    Stream.Write(L, Sizeof(Longint));
-                    P.Position := 0;
-                    Stream.CopyFrom(P, L);
-                  finally
-                    FreeAndNil(P);
-                  end;
+      ftBytes : Begin
+                 P := TMemoryStream.Create;
+                 Try
+                  TBlobField(Dataset.Fields[I]).SaveToStream(P);
+                  L := P.Size;
+                  Stream.Write(L, Sizeof(Longint));
+                  SetLength(aBytes, L);
+                  Try
+                   P.Position := 0;
+                   P.Read(aBytes[0], L);
+                  Except
+                  End;
+                  Stream.Write(aBytes[0], L);
+                 Finally
+                  SetLength(aBytes, 0);
+                  FreeAndNil(P);
+                 End;
       end;
       else begin
                   S := Dataset.Fields[I].AsString;

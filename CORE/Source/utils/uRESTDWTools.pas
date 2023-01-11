@@ -72,9 +72,12 @@ Uses
  Function  EncodeStream           (Value                : TStream)         : String;
  Function  DecodeStream           (Value                : String)          : TMemoryStream;
  Function  BytesToString          (Const bin            : TRESTDWBytes)    : String;Overload;
+ Function  BytesToString          (Const bin            : TRESTDWBytes;
+                                   aUnicode             : Boolean)         : String;Overload;
  Function  BytesToString          (Const AValue         : TRESTDWBytes;
                                    Const AStartIndex    : Integer;
                                    Const ALength        : Integer = -1)    : String;Overload;
+ Function  BytesToStream          (Const bin            : TRESTDWBytes)    : TStream;
  Function  restdwLength           (Const ABuffer        : String;
                                    Const ALength        : Integer = -1;
                                    Const AIndex         : Integer = 1)     : Integer;Overload;
@@ -87,7 +90,9 @@ Uses
                                    AValueTwo            : Int64)           : Int64;
  Function  restdwMin              (Const AValueOne,
                                    AValueTwo            : Int64)           : Int64;
- Function  StringToBytes          (AStr                 : String)          : TRESTDWBytes;
+ Function  StringToBytes          (AStr                 : String)          : TRESTDWBytes;Overload;
+ Function  StringToBytes          (AStr                 : String;
+                                   aUnicode             : Boolean)         : TRESTDWBytes;Overload;
  Function  StreamToBytes          (Stream               : TStream)         : TRESTDWBytes;
  Function  StringToFieldType      (Const S              : String)          : Integer;
  Function  Escape_chars           (s                    : String)          : String;
@@ -3155,6 +3160,40 @@ Begin
  Finally
  End;
 end;
+
+Function StringToBytes(AStr     : String;
+                       aUnicode : Boolean) : TRESTDWBytes;
+Begin
+ SetLength(Result, 0);
+ If AStr <> '' Then
+  Begin
+   {$IFDEF FPC}
+    If aUnicode Then
+     Result := TRESTDWBytes(TEncoding.Utf8.GetBytes(Astr))
+    Else
+     Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
+   {$ELSE}
+    {$IF CompilerVersion < 23}
+     If aUnicode Then
+      Begin
+       SetLength(Result, Length(AStr) * 2);
+       Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
+      End
+     Else
+      Begin
+       SetLength(Result, Length(AStr) * 2);
+       Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
+      End;
+    {$ELSE}
+     If aUnicode Then
+      Result :=  TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr))
+     Else
+      Result :=  TRESTDWBytes(TEncoding.Utf8.GetBytes(Astr));
+    {$IFEND}
+   {$ENDIF}
+  End;
+End;
+
 Function StringToBytes(AStr: String): TRESTDWBytes;
 Begin
  SetLength(Result, 0);
@@ -3206,7 +3245,62 @@ Begin
   {$ENDIF}
   End;
 End;
-Function BytesToString(Const bin : TRESTDWBytes) : String;
+
+Function BytesToString(Const bin : TRESTDWBytes;
+                       aUnicode  : Boolean) : String;
+Var
+ I       : Integer;
+ aBytes  : TRESTDWBytes;
+ aResult : RawByteString;
+ Function Utf8BytesToString(Bytes     : PByte;
+                            ByteCount : Integer) : String;
+ Var
+  Len: Integer;
+ Begin
+  Len := UnicodeFromLocaleChars(CP_UTF8, MB_ERR_INVALID_CHARS, Pointer(Bytes), ByteCount, nil, 0);
+  If (ByteCount > 0) And (Len = 0) Then
+   Raise EEncodingError.CreateRes(@SNoMapString);
+  SetLength(Result, Len);
+  UnicodeFromLocaleChars(CP_UTF8, MB_ERR_INVALID_CHARS, Pointer(Bytes), ByteCount, Pointer(Result), Len);
+ End;
+Begin
+ I := restdwLength(bin);
+ If I > 0 Then
+  Begin
+  {$IFDEF FPC}
+   If aUnicode Then
+    SetString(Result, PChar(bin), I)
+   Else
+    SetString(Result, PAnsiChar(bin), I);
+  {$ELSE}
+   {$IF CompilerVersion < 23}
+    If aUnicode Then
+     SetString(Result, PWideChar(bin), I)
+    Else
+     SetString(Result, PAnsiChar(bin), I);
+   {$ELSE}
+    If aUnicode Then
+     Begin
+      aBytes := bin;
+      SetLength(aResult, Length(bin));
+      Move(aBytes[0], aResult[InitStrPos], Length(aBytes));
+      Result := aResult;
+//      Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)))
+     End
+    Else
+     Begin
+     {$IFDEF MSWINDOWS}
+      Result := TEncoding.ANSI.GetString(TBytes(bin));
+     {$ELSE}
+      Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
+     {$ENDIF}
+     End;
+   {$IFEND}
+  {$ENDIF}
+  End;
+End;
+
+Function BytesToString(Const bin : TRESTDWBytes)   : String;
 Var
  I : Integer;
 Begin
@@ -3228,6 +3322,20 @@ Begin
   {$ENDIF}
   End;
 End;
+
+Function BytesToStream(Const bin : TRESTDWBytes) : TStream;
+Var
+ I : Integer;
+Begin
+ I      := restdwLength(bin);
+ Result := TMemoryStream.Create;
+ If I > 0 Then
+  Begin
+   Result.Write(Bin[0], I);
+   Result.Position := 0;
+  End;
+End;
+
 Function EncodeStream (Value : TStream) : String;
  {$IFNDEF FPC}
    Function EncodeBase64(AValue : TStream) : String;

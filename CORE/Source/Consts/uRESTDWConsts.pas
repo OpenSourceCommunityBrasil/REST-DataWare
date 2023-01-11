@@ -1,4 +1,4 @@
-Unit uRESTDWConsts;
+﻿Unit uRESTDWConsts;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -203,6 +203,7 @@ Const
  Resourcestring
  cBufferIsEmpty                 = 'No bytes in buffer.';
  cBufferRangeError              = 'Index out of bounds.';
+ sNoMapString                   = 'No mapping for the Unicode character exists in the target multi-byte code page';
  cBufferMissingTerminator       = 'Buffer terminator must be specified.';
  cBufferInvalidStartPos         = 'Buffer start position is invalid.';
  cCapacityTooSmall              = 'Capacity cannot be smaller than Size.';
