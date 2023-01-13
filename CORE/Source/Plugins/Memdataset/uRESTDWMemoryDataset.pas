@@ -978,14 +978,24 @@ begin
   {$ELSE}
   Result := StrAlloc(FRecBufSize);
   {$ENDIF COMPILER12_UP}
-  if BlobFieldCount > 0 then
+  {$IFNDEF FPC}
+   If BlobFieldCount > 0 Then
     Initialize(PMemBlobArray(Result + FBlobOfs)[0], BlobFieldCount);
+  {$ELSE}
+   If BlobFieldCount > 0 Then
+    Initialize(PMemBlobArray(Result + FBlobOfs)^[0], BlobFieldCount);
+  {$ENDIF}
 end;
 
 procedure TRESTDWMemTable.FreeRecordBuffer(var Buffer: TRecordBuffer);
 begin
+  {$IFNDEF FPC}
+   if BlobFieldCount > 0 then
+    Finalize(PMemBlobArray(Buffer + FBlobOfs)[0], BlobFieldCount);
+  {$ELSE}
   if BlobFieldCount > 0 then
-   Finalize(PMemBlobArray(Buffer + FBlobOfs)[0], BlobFieldCount);
+   Finalize(PMemBlobArray(Buffer + FBlobOfs)^[0], BlobFieldCount);
+  {$ENDIF}
   {$IFDEF COMPILER12_UP}
   FreeMem(Buffer);
   {$ELSE}
@@ -1230,7 +1240,8 @@ begin
     Data := FindFieldData(RecBuf, Field);
     if (Data <> nil) Or (Field is TBlobField) then
     begin
-     If Not (Field is TBlobField) then
+     Result := (Field is TBlobField);
+     If Not Result then
       Result := Data^ <> 0;
 //      If Not DataTypeIsBlobTypes(Field.DataType) Then
 //      Inc(Data);
@@ -1270,8 +1281,8 @@ begin
             SetLength(Buffer, Length(aBytes));
             Move(aBytes[0], Buffer[0], Length(aBytes));
            {$ELSE}
-            SetLength(PRESTDWBytes(Buffer)^, Length(aBytes));
-            Move(aBytes[0], PRESTDWBytes(Buffer)^[0], Length(aBytes));
+            SetLength(TRESTDWBytes(Buffer), Length(aBytes));
+            Move(aBytes[0], Buffer^, Length(aBytes));
            {$ENDIF}
           End
          Else
@@ -1289,8 +1300,7 @@ begin
           SetLength(Buffer, CalcFieldLen(Field.DataType, Field.Size));
           Move(Data^, Buffer[0], Length(Buffer));
          {$ELSE}
-          SetLength(PRESTDWBytes(Buffer)^, CalcFieldLen(Field.DataType, Field.Size));
-          Move(Data^, PRESTDWBytes(Buffer)^[0], Length(PRESTDWBytes(Buffer)^));
+          Move(Data^, Buffer^, CalcFieldLen(Field.DataType, Field.Size));
          {$ENDIF}
         End;
     end;
