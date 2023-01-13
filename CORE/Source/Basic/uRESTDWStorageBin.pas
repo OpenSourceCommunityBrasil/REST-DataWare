@@ -251,7 +251,7 @@ Begin
   fc := fc - 1;
   PActualRecord := nil;
   for I := 0 to rc do begin
-    PActualRecord := dataset.AllocRecordBuffer;
+    PActualRecord := PJvMemBuffer(dataset.AllocRecordBuffer);
     dataset.InternalAddRecord(PActualRecord, True);
     vActualRecord := dataset.GetMemoryRecord(I);
     for B := 0 To fc do begin
@@ -269,7 +269,6 @@ Begin
          else
           PData    := Pointer(PActualRecord + dataset.GetOffSets(aIndex));
         end;
-
         if PData <> nil then begin
             case FieldTypeToDWFieldType(aDataType) of
               dwftWideString,

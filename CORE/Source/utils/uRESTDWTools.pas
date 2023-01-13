@@ -3252,17 +3252,6 @@ Var
  I       : Integer;
  aBytes  : TRESTDWBytes;
  aResult : RawByteString;
- Function Utf8BytesToString(Bytes     : PByte;
-                            ByteCount : Integer) : String;
- Var
-  Len: Integer;
- Begin
-  Len := UnicodeFromLocaleChars(CP_UTF8, MB_ERR_INVALID_CHARS, Pointer(Bytes), ByteCount, nil, 0);
-  If (ByteCount > 0) And (Len = 0) Then
-   Raise EEncodingError.CreateRes(@SNoMapString);
-  SetLength(Result, Len);
-  UnicodeFromLocaleChars(CP_UTF8, MB_ERR_INVALID_CHARS, Pointer(Bytes), ByteCount, Pointer(Result), Len);
- End;
 Begin
  I := restdwLength(bin);
  If I > 0 Then
