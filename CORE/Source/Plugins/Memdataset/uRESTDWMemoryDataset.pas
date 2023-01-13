@@ -1277,13 +1277,25 @@ begin
          If State in [dsBrowse] Then
           Begin
            aBytes := PMemBlobArray(Records[RecNo -1].Blobs)^[Field.Offset];
-           {$IFNDEF FPC}
-            SetLength(Buffer, Length(aBytes));
-            Move(aBytes[0], Buffer[0], Length(aBytes));
-           {$ELSE}
-            SetLength(TRESTDWBytes(Buffer), Length(aBytes));
-            Move(aBytes[0], Buffer^, Length(aBytes));
-           {$ENDIF}
+           if Length(aBytes) > 0 then
+            begin
+             {$IFNDEF FPC}
+              SetLength(Buffer, Length(aBytes));
+              Move(aBytes[0], Buffer[0], Length(aBytes));
+             {$ELSE}
+              SetLength(TRESTDWBytes(Buffer), Length(aBytes));
+              Move(aBytes[0], Buffer^, Length(aBytes));
+             {$ENDIF}
+            end
+           else
+            begin
+             {$IFNDEF FPC}
+              SetLength(Buffer, 0);
+             {$ELSE}
+              SetLength(PRESTDWBytes(Buffer)^, 0);
+             {$ENDIF}
+             Result := False;
+           end;
           End
          Else
           Begin
