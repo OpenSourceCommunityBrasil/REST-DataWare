@@ -69,13 +69,15 @@ Uses
   OverbyteIcsSslX509Utils;
 
 Type
-
   TPoolerHttpConnection = class(THttpAppSrvConnection)
   protected
     vRawData: AnsiString;
     vRawDataLen: Integer;
     vNeedClose: boolean;
+    vBytesIn, vBytesOut: Int64;
   public
+    function GetTrafficInBytes: Int64;
+    function GetTrafficOutBytes: Int64;
     destructor Destroy; override;
     constructor Create(AOwner: TComponent); override;
   end;
@@ -598,6 +600,8 @@ var
 begin
   Remote := Sender as TPoolerHttpConnection;
 
+  Remote.vBytesOut := Remote.vBytesOut + Remote.DocStream.Size;
+
   try
     if Assigned(vOnAnswered) then
       vOnAnswered(Remote);
@@ -1086,6 +1090,8 @@ begin
   Remote := Sender as TPoolerHttpConnection;
 
   try
+    Remote.vBytesIn := Remote.vBytesIn + Remote.RequestContentLength;
+
     if Assigned(vOnDocumentReady) then
       vOnDocumentReady(Remote, Flag);
   finally
@@ -1169,6 +1175,10 @@ begin
   SetLength(vRawData, 0);
 
   vRawDataLen := 0;
+
+  vBytesIn := 0;
+
+  vBytesOut := 0;
 end;
 
 destructor TPoolerHttpConnection.Destroy;
@@ -1180,7 +1190,21 @@ begin
 
   vRawDataLen := 0;
 
+  vBytesIn := 0;
+
+  vBytesOut := 0;
+
   inherited Destroy;
+end;
+
+function TPoolerHttpConnection.GetTrafficInBytes: Int64;
+begin
+  Result := vBytesIn;
+end;
+
+function TPoolerHttpConnection.GetTrafficOutBytes: Int64;
+begin
+  Result := vBytesOut;
 end;
 
 { TIcsBruteForceProtection }
