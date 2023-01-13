@@ -382,24 +382,27 @@ type
   end;
   TJvMemBlobStream = class(TStream)
   private
-    FField: TBlobField;
-    FDataSet: TRESTDWMemTable;
-    FBuffer: PJvMemBuffer;
-    FMode: TBlobStreamMode;
-    FOpened: Boolean;
-    FModified: Boolean;
-    FPosition: Longint;
+    FField    : TBlobField;
+    FDataSet  : TRESTDWMemTable;
+    FBuffer   : PJvMemBuffer;
+    FActualBlob : Pointer;
+    FMode     : TBlobStreamMode;
+    FOpened   : Boolean;
+    FModified : Boolean;
+    FPosition : Longint;
     FCached: Boolean;
     function GetBlobSize: Longint;
     function GetBlobFromRecord(Field: TField): TMemBlobData;
   public
     constructor Create(Field: TBlobField; Mode: TBlobStreamMode);
-    destructor Destroy; override;
-    function Read(Buffer: TBytes; Offset, Count: Longint): Longint; overload; override;
-    function Read(var Buffer; Count: Longint): Longint;overload; override;
-    function Write(const Buffer; Count: Longint): Longint; override;
-    function Seek(Offset: Longint; Origin: Word): Longint; override;
-    procedure Truncate;
+    destructor  Destroy; override;
+    procedure   ReadBuffer(var Buffer; Count: Longint);overload;
+    procedure   ReadBuffer(var Buffer: TBytes; Count: Longint); overload;
+//    function    Read(Buffer: TBytes; Offset, Count: Longint): Longint; overload;
+    function    Read(var Buffer; Count: Longint): Longint;overload; override;
+    function    Write(const Buffer; Count: Longint): Longint; override;
+    function    Seek(Offset: Longint; Origin: Word): Longint; override;
+    procedure   Truncate;
   end;
   TJvMemoryRecord = class(TPersistent)
   private
@@ -3178,6 +3181,7 @@ constructor TJvMemBlobStream.Create(Field: TBlobField; Mode: TBlobStreamMode);
 begin
   // (rom) added inherited Create;
   inherited Create;
+  FActualBlob := Nil;
   FMode := Mode;
   FField := Field;
   FDataSet := FField.DataSet as TRESTDWMemTable;
@@ -3215,64 +3219,71 @@ var
   Pos: Integer;
 begin
   SetLength(Result, 0);
-  Pos := FDataSet.RecNo -1;
-  if (Pos >= 0) and (Pos < FDataSet.RecordCount) then
-  begin
-    Rec := FDataSet.Records[Pos];
-    if Rec <> nil then
-      Result := PMemBlobArray(Rec.FBlobs)[FField.Offset];
-  end;
+  Try
+   Pos := FDataset.RecNo -1;
+   If (Pos >= 0) And (Pos < FDataset.RecordCount) Then
+    Begin
+     Rec := FDataSet.Records[Pos];
+     If Rec <> nil Then
+      Result := PMemBlobArray(Rec.FBlobs)^[FField.Offset];
+    End;
+  Except
+
+  End;
 end;
 
-Function TJvMemBlobStream.Read(Buffer: TBytes; Offset, Count: Longint): Longint;
+procedure TJvMemBlobStream.ReadBuffer(var Buffer: TBytes; Count: Longint);
+Begin
+ ReadBuffer(Buffer, 0, Count);
+End;
+
+procedure TJvMemBlobStream.ReadBuffer(var Buffer; Count: Longint);
 Var
  aPointer : Pointer;
-begin
- //Actual TODO XyberX
+Begin
  aPointer := @Buffer;
- Result := Read(aPointer^, Count);
-end;
+ Read(aPointer^, Count);
+End;
 
 function TJvMemBlobStream.Read(var Buffer; Count: Longint): Longint;
 Var
- vString   : TRESTDWBytes;
- aBuffer   : PJvMemBuffer;
- aBytes    : TRESTDWBytes;
- aPointer  : Pointer;
- aPosition : Integer;
+ aBytes  : TRESTDWBytes;
+ aRecNo  : Integer;
 begin
   //Actual TODO XyberX
   Result := 0;
   if FOpened then
   begin
-   If Count > 0 then
-    Result := Count
+   If Not Assigned(FActualBlob) Then
+    FActualBlob := @PMemBlobArray(FDataSet.Records[FDataset.RecNo -1].FBlobs)^[FField.Offset];
+   If Count > (Size - FPosition) Then
+    Result := Size - FPosition
    Else
-    Result := Size - FPosition;
+    Result := Count;
    If Result > 0 then
     begin
-     vString  := GetBlobFromRecord(FField);
-     //aPointer := @Buffer;
-     aPointer := PRESTDWBytes(@Buffer);
-     If Result > Length(vString) Then
+     Try
+      If Not Assigned(FActualBlob) Then
+       Exit;
+     Except
+      Exit;
+     End;
+     If Not Assigned(PRESTDWBytes(FActualBlob)^) Then
+      Exit;
+     If Result > Length(PRESTDWBytes(FActualBlob)^) Then
       Begin
        Result := 0;
        SetLength(aBytes, Result);
-       PRESTDWBytes(aPointer)^ := aBytes;
+       TRESTDWBytes(Buffer) := aBytes;
       End
-     Else If Length(vString) > 0 Then
+     Else If (Length(PRESTDWBytes(FActualBlob)^) > 0) Then
       Begin
        SetLength(aBytes, Result);
        Try
         //Actual TODO XyberX
-        aPosition := FPosition;
-        Move(vString[aPosition], aBytes[0], Result);
-        SetLength(vString, 0);
+        Move(PRESTDWBytes(FActualBlob)^[FPosition], aBytes[0], Result);
        Finally
-        If Length(PRESTDWBytes(aPointer)^) < Result Then
-         PRESTDWBytes(aPointer)^ := aBytes
-        Else
-         Move(aBytes[0], PRESTDWBytes(aPointer)^[0], Result);
+        Move(aBytes[0], Buffer, Result);
         SetLength(aBytes, 0);
        End;
       End;
