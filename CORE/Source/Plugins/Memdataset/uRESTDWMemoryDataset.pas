@@ -53,9 +53,19 @@ Const
   fkStoredFields = [fkData];
 
 type
-  {$IFDEF NEXTGEN}
-   TRecordBuffer = PByte;
-  {$ENDIF !NEXTGEN}
+ {$IFNDEF FPC}
+  {$IF Defined(HAS_FMX)}
+   {$IF CompilerVersion < 21}
+   TRecordBuffer          = PChar;
+   {$ELSE}
+   TRecordBuffer          = PByte;
+   {$IFEND}
+  {$ELSE}
+   {$IF CompilerVersion < 20}
+    TRecordBuffer         = PChar;
+   {$IFEND}
+  {$IFEND}
+ {$ENDIF}
   TPVariant = ^Variant;
   TApplyMode = (amNone, amAppend, amMerge);
   TApplyEvent = procedure(Dataset: TDataset; Rows: Integer) of object;
@@ -70,23 +80,30 @@ type
   TCompareRecords = function(Item1, Item2: TJvMemoryRecord): Integer of object;
   TWordArray = array of Word;
   TJvBookmarkData = Integer;
-  {$IFDEF RTL240_UP}
-  PJvMemBuffer = PByte;
-  TJvBookmark = TBookmark;
-  TJvValueBuffer = TValueBuffer;
-  TJvRecordBuffer = TRecordBuffer;
-  {$ELSE}
-  {$IFDEF UNICODE}
-  PJvMemBuffer = PByte;
-  {$ELSE}
-  PJvMemBuffer = PAnsiChar;
-  {$ENDIF UNICODE}
-  TJvBookmark = Pointer;
-  TJvValueBuffer = Pointer;
-  TJvRecordBuffer = Pointer;
-  {$ENDIF RTL240_UP}
-
-  IRESTDWMemTable = interface
+  {$IFNDEF FPC}
+   {$IFDEF RTL240_UP}
+   PJvMemBuffer = PByte;
+   TJvBookmark = TBookmark;
+   TJvValueBuffer = TValueBuffer;
+   TJvRecordBuffer = TRecordBuffer;
+   {$ELSE}
+   {$IFDEF UNICODE}
+   PJvMemBuffer = PByte;
+   {$ELSE}
+   PJvMemBuffer = PAnsiChar;
+   {$ENDIF UNICODE}
+   TJvBookmark = Pointer;
+   TJvValueBuffer = Pointer;
+   TJvRecordBuffer = Pointer;
+   {$ENDIF RTL240_UP}
+  {$ElSE}
+   TValueBuffer    = Array of Byte;
+   PJvMemBuffer    = PByte;
+   TJvBookmark     = Pointer;
+   TJvValueBuffer  = Pointer;
+   TJvRecordBuffer = TRecordBuffer;
+  {$ENDIF}
+  IRESTDWMemTable = Interface
     function GetRecordCount: Integer;
     function GetMemoryRecord(Index: integer): TJvMemoryRecord;
     function GetOffSets(index : integer) : Word;
@@ -103,8 +120,8 @@ type
                                           {$ENDIF}
                                           {$ENDIF};
                                aAppend : Boolean);
-    procedure InitRecord(Buffer: PJvMemBuffer);
-    function AllocRecordBuffer: PJvMemBuffer;
+    procedure InitRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF});
+    function AllocRecordBuffer: TRecordBuffer;
     procedure SetMemoryRecordData(Buffer: PJvMemBuffer; Pos: Integer);
     function GetDataset : TDataSet;
   end;
@@ -224,25 +241,25 @@ type
      Function  AllocRecBuf                : TRecBuf;    override;
      Procedure FreeRecBuf    (Var Buffer  : TRecBuf);   override;
     {$ENDIF NEXTGEN}
-    Function  AllocRecordBuffer           : PJvMemBuffer; {$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Procedure FreeRecordBuffer(Var Buffer : PJvMemBuffer);{$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Procedure InternalInitRecord(Buffer   : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF});{$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Function  GetRecord         (Buffer   : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF};
+    Function  AllocRecordBuffer           : TRecordBuffer; {$IFNDEF NEXTGEN}Override;{$ENDIF}
+    Procedure FreeRecordBuffer(Var Buffer : TRecordBuffer);{$IFNDEF NEXTGEN}Override;{$ENDIF}
+    Procedure InternalInitRecord(Buffer   : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF});{$IFNDEF NEXTGEN}Override;{$ENDIF}
+    Function  GetRecord         (Buffer   : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF};
                                  GetMode  : TGetMode;
                                  DoCheck  : Boolean) : TGetResult;        Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Procedure GetBookmarkData   (Buffer   : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF};
+    Procedure GetBookmarkData   (Buffer   : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF};
                                  Data     : TJvBookmark);                 Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Function  GetBookmarkFlag   (Buffer   : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF}): TBookmarkFlag; Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Procedure InternalSetToRecord(Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF});                Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Procedure SetBookmarkFlag    (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF};
+    Function  GetBookmarkFlag   (Buffer   : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}): TBookmarkFlag; Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
+    Procedure InternalSetToRecord(Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF});                Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
+    Procedure SetBookmarkFlag    (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF};
                                   Value   : TBookmarkFlag);               Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Procedure SetBookmarkData    (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF};
+    Procedure SetBookmarkData    (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF};
                                   Data    : TJvBookmark);                 Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Procedure InitRecord         (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF});Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
+    Procedure InitRecord         (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF});Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
     Procedure InternalAddRecord  (Buffer  : {$IFDEF FPC}Pointer{$ELSE}{$IFDEF NEXTGEN}TRecBuf{$ELSE}{$IF CompilerVersion <= 22}Pointer{$ELSE}TRecordBuffer{$IFEND}{$ENDIF}{$ENDIF};
                                   aAppend : Boolean);                              {$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Function  GetCurrentRecord   (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF}): Boolean;Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Procedure ClearCalcFields    (Buffer  : {$IFDEF NEXTGEN}NativeInt{$ELSE}PJvMemBuffer{$ENDIF});Override;
+    Function  GetCurrentRecord   (Buffer  : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}): Boolean;Overload;{$IFNDEF NEXTGEN}Override;{$ENDIF}
+    Procedure ClearCalcFields    (Buffer  : {$IFDEF NEXTGEN}NativeInt{$ELSE}TRecordBuffer{$ENDIF});Override;
 
     function GetRecordSize: Word; override;
     procedure SetFiltered(Value: Boolean); override;
@@ -294,7 +311,7 @@ type
     function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
     procedure FixReadOnlyFields(MakeReadOnly: Boolean);
     Procedure ClearBuffer;
-    function GetFieldData(Field: TField; var Buffer: TJvValueBuffer): Boolean; overload; override;
+    function GetFieldData(Field: TField; {$IFNDEF FPC}var Buffer: TJvValueBuffer{$ELSE}Buffer: Pointer{$ENDIF}): Boolean; overload; override;
     {$IFNDEF NEXTGEN}
       {$IFDEF RTL240_UP}
     function GetFieldData(Field: TField; Buffer: Pointer): Boolean; overload; override;
@@ -396,9 +413,6 @@ type
   public
     constructor Create(Field: TBlobField; Mode: TBlobStreamMode);
     destructor  Destroy; override;
-    procedure   ReadBuffer(var Buffer; Count: Longint);overload;
-    procedure   ReadBuffer(var Buffer: TBytes; Count: Longint); overload;
-//    function    Read(Buffer: TBytes; Offset, Count: Longint): Longint; overload;
     function    Read(var Buffer; Count: Longint): Longint;overload; override;
     function    Write(const Buffer; Count: Longint): Longint; override;
     function    Seek(Offset: Longint; Origin: Word): Longint; override;
@@ -957,7 +971,7 @@ begin
   FRecordPos := -1;
 end;
 
-function TRESTDWMemTable.AllocRecordBuffer: PJvMemBuffer;
+function TRESTDWMemTable.AllocRecordBuffer: TRecordBuffer;
 begin
   {$IFDEF COMPILER12_UP}
   GetMem(Result, FRecBufSize);
@@ -968,7 +982,7 @@ begin
     Initialize(PMemBlobArray(Result + FBlobOfs)[0], BlobFieldCount);
 end;
 
-procedure TRESTDWMemTable.FreeRecordBuffer(var Buffer: PJvMemBuffer);
+procedure TRESTDWMemTable.FreeRecordBuffer(var Buffer: TRecordBuffer);
 begin
   if BlobFieldCount > 0 then
    Finalize(PMemBlobArray(Buffer + FBlobOfs)[0], BlobFieldCount);
@@ -980,7 +994,7 @@ begin
   Buffer := nil;
 end;
 
-procedure TRESTDWMemTable.ClearCalcFields(Buffer: {$IFDEF NEXTGEN}NativeInt{$ELSE}PJvMemBuffer{$ENDIF});
+procedure TRESTDWMemTable.ClearCalcFields(Buffer: {$IFDEF NEXTGEN}NativeInt{$ELSE}TRecordBuffer{$ENDIF});
 begin
  {$IFNDEF NEXTGEN}
   FillChar(Buffer[FRecordSize], CalcFieldsSize, 0);
@@ -999,7 +1013,7 @@ Begin
 End;
 {$ENDIF}
 
-procedure TRESTDWMemTable.InternalInitRecord(Buffer : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF});
+procedure TRESTDWMemTable.InternalInitRecord(Buffer : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF});
 var
   I: Integer;
 begin
@@ -1012,7 +1026,7 @@ begin
   SetLength(PMemBlobArray(Buffer + FBlobOfs)^[I], 0);
 end;
 
-procedure TRESTDWMemTable.InitRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF});
+procedure TRESTDWMemTable.InitRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF});
 begin
   {$IFDEF NEXTGEN}
   inherited InitRecord({$IFDEF RTL250_UP}TRecBuf{$ENDIF}(Buffer));
@@ -1029,7 +1043,7 @@ begin
   end;
 end;
 
-function TRESTDWMemTable.GetCurrentRecord(Buffer : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF}): Boolean;
+function TRESTDWMemTable.GetCurrentRecord(Buffer : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}): Boolean;
 begin
   Result := False;
   if not IsEmpty and (GetBookmarkFlag(ActiveBuffer) = bfCurrent) then
@@ -1043,7 +1057,7 @@ begin
   end;
 end;
 
-function TRESTDWMemTable.GetRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF}; GetMode: TGetMode;
+function TRESTDWMemTable.GetRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}; GetMode: TGetMode;
   DoCheck: Boolean): TGetResult;
 var
   Accept: Boolean;
@@ -1103,33 +1117,33 @@ begin
       end;
   end;
   if Result = grOk then
-    RecordToBuffer(Records[FRecordPos], {$IFDEF NEXTGEN}PJvMemBuffer(Buffer){$ELSE}Buffer{$ENDIF})
+    RecordToBuffer(Records[FRecordPos], {$IFDEF NEXTGEN}PJvMemBuffer(Buffer){$ELSE}PJvMemBuffer(Buffer){$ENDIF})
   else
   if (Result = grError) and DoCheck then
     Error(RsEMemNoRecords);
 end;
 
-procedure TRESTDWMemTable.GetBookmarkData(Buffer : {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF}; Data: TJvBookmark);
+procedure TRESTDWMemTable.GetBookmarkData(Buffer : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}; Data: TJvBookmark);
 begin
   Move(PMemBookmarkInfo(Buffer + FBookmarkOfs)^.BookmarkData, TJvBookmarkData({$IFDEF RTL240_UP}Pointer(@Data[0]){$ELSE}Data{$ENDIF RTL240_UP}^), SizeOf(TJvBookmarkData));
 end;
 
-procedure TRESTDWMemTable.SetBookmarkData(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF}; Data: TJvBookmark);
+procedure TRESTDWMemTable.SetBookmarkData(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}; Data: TJvBookmark);
 begin
   Move({$IFDEF RTL240_UP}Pointer(@Data[0]){$ELSE}Data{$ENDIF RTL240_UP}^, PMemBookmarkInfo(Buffer + FBookmarkOfs)^.BookmarkData, SizeOf(TJvBookmarkData));
 end;
 
-function TRESTDWMemTable.GetBookmarkFlag(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF}): TBookmarkFlag;
+function TRESTDWMemTable.GetBookmarkFlag(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}): TBookmarkFlag;
 begin
   Result := PMemBookmarkInfo(Buffer + FBookmarkOfs)^.BookmarkFlag;
 end;
 
-procedure TRESTDWMemTable.SetBookmarkFlag(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF}; Value: TBookmarkFlag);
+procedure TRESTDWMemTable.SetBookmarkFlag(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}; Value: TBookmarkFlag);
 begin
   PMemBookmarkInfo(Buffer + FBookmarkOfs)^.BookmarkFlag := Value;
 end;
 
-procedure TRESTDWMemTable.InternalSetToRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}PJvMemBuffer{$ENDIF});
+procedure TRESTDWMemTable.InternalSetToRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF});
 begin
   InternalGotoBookmarkData(PMemBookmarkInfo(Buffer + FBookmarkOfs)^.BookmarkData);
 end;
@@ -1174,7 +1188,7 @@ begin
 //    If PMemBlobArray(Rec.FBlobs)^[I] = '' Then
 //     PMemBlobArray(Rec.FBlobs)^[I] := PMemBlobArray(Buffer)^[I];
 //   End;
-  GetCalcFields({$IFDEF RTL250_UP}TRecBuf{$ENDIF}(Buffer));
+  GetCalcFields({$IFNDEF FPC}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}(Buffer));
 end;
 function TRESTDWMemTable.GetRecordSize: Word;
 begin
@@ -1252,16 +1266,32 @@ begin
          If State in [dsBrowse] Then
           Begin
            aBytes := PMemBlobArray(Records[RecNo -1].Blobs)^[Field.Offset];
-           SetLength(Buffer, Length(aBytes));
-           Move(aBytes[0], Buffer[0], Length(aBytes));
+           {$IFNDEF FPC}
+            SetLength(Buffer, Length(aBytes));
+            Move(aBytes[0], Buffer[0], Length(aBytes));
+           {$ELSE}
+            SetLength(PRESTDWBytes(Buffer)^, Length(aBytes));
+            Move(aBytes[0], PRESTDWBytes(Buffer)^[0], Length(aBytes));
+           {$ENDIF}
           End
          Else
-          SetLength(Buffer, 0);
+          Begin
+           {$IFNDEF FPC}
+            SetLength(Buffer, 0);
+           {$ELSE}
+            SetLength(PRESTDWBytes(Buffer)^, 0);
+           {$ENDIF}
+          End;
         End
        Else
         Begin
-         SetLength(Buffer, CalcFieldLen(Field.DataType, Field.Size));
-         Move(Data^, Buffer[0], Length(Buffer));
+         {$IFNDEF FPC}
+          SetLength(Buffer, CalcFieldLen(Field.DataType, Field.Size));
+          Move(Data^, Buffer[0], Length(Buffer));
+         {$ELSE}
+          SetLength(PRESTDWBytes(Buffer)^, CalcFieldLen(Field.DataType, Field.Size));
+          Move(Data^, PRESTDWBytes(Buffer)^[0], Length(PRESTDWBytes(Buffer)^));
+         {$ENDIF}
         End;
     end;
   end
@@ -1277,7 +1307,7 @@ begin
     End;
   end;
 end;
-function TRESTDWMemTable.GetFieldData(Field: TField; var Buffer: TJvValueBuffer): Boolean;
+function TRESTDWMemTable.GetFieldData(Field: TField; {$IFNDEF FPC}var Buffer: TJvValueBuffer{$ELSE}Buffer: Pointer{$ENDIF}): Boolean;
 begin
  Result := InternalGetFieldData(Field, Buffer);
 end;
@@ -3232,19 +3262,6 @@ begin
   End;
 end;
 
-procedure TJvMemBlobStream.ReadBuffer(var Buffer: TBytes; Count: Longint);
-Begin
- ReadBuffer(Buffer, 0, Count);
-End;
-
-procedure TJvMemBlobStream.ReadBuffer(var Buffer; Count: Longint);
-Var
- aPointer : Pointer;
-Begin
- aPointer := @Buffer;
- Read(aPointer^, Count);
-End;
-
 function TJvMemBlobStream.Read(var Buffer; Count: Longint): Longint;
 Var
  aBytes  : TRESTDWBytes;
@@ -3320,11 +3337,14 @@ begin
   end;
   Result := FPosition;
 end;
+
 procedure TJvMemBlobStream.Truncate;
+Var
+ aBytes : TRESTDWBytes;
 begin
   if FOpened and FCached and (FMode <> bmRead) then
   begin
-    FDataSet.SetBlobData(FField, FBuffer, 0);
+    FDataSet.SetBlobData(FField, FBuffer, aBytes);
     FModified := True;
   end;
 end;

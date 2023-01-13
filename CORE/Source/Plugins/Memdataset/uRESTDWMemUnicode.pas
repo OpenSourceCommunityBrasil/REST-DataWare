@@ -235,7 +235,9 @@ const
       ccPunctuationFinalQuote,   // ucFinalPunctuation
       ccPunctuationInitialQuote, // ucInitialPunctuation
       ccPunctuationOther,        // ucOtherPunctuation
+      {$IFNDEF FPC}
       ccPunctuationOpen,         // ucOpenPunctuation
+      {$ENDIF}
       ccSymbolCurrency,          // ucCurrencySymbol
       ccSymbolModifier,          // ucModifierSymbol
       ccSymbolMath,              // ucMathSymbol
