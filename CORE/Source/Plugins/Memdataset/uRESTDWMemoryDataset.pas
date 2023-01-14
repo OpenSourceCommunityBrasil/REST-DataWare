@@ -81,21 +81,21 @@ type
   TWordArray = array of Word;
   TJvBookmarkData = Integer;
   {$IFNDEF FPC}
-   {$IFDEF RTL240_UP}
-   PJvMemBuffer = PByte;
-   TJvBookmark = TBookmark;
-   TJvValueBuffer = TValueBuffer;
-   TJvRecordBuffer = TRecordBuffer;
+   {$IF CompilerVersion > 21}
+    PJvMemBuffer    = PByte;
+    TJvBookmark     = TBookmark;
+    TJvValueBuffer  = TValueBuffer;
+    TJvRecordBuffer = TRecordBuffer;
    {$ELSE}
-   {$IFDEF UNICODE}
-   PJvMemBuffer = PByte;
-   {$ELSE}
-   PJvMemBuffer = PAnsiChar;
-   {$ENDIF UNICODE}
-   TJvBookmark = Pointer;
-   TJvValueBuffer = Pointer;
-   TJvRecordBuffer = Pointer;
-   {$ENDIF RTL240_UP}
+    {$IFDEF UNICODE}
+    PJvMemBuffer = PByte;
+    {$ELSE}
+    PJvMemBuffer = PAnsiChar;
+    {$ENDIF UNICODE}
+    TJvBookmark     = Pointer;
+    TJvValueBuffer  = Pointer;
+    TJvRecordBuffer = Pointer;
+   {$IFEND}
   {$ElSE}
    TValueBuffer    = Array of Byte;
    PJvMemBuffer    = PByte;
@@ -311,7 +311,8 @@ type
     function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
     procedure FixReadOnlyFields(MakeReadOnly: Boolean);
     Procedure ClearBuffer;
-    function GetFieldData(Field: TField; {$IFNDEF FPC}var Buffer: TJvValueBuffer{$ELSE}Buffer: Pointer{$ENDIF}): Boolean; overload; override;
+    function GetFieldData(Field: TField; {$IFNDEF FPC}{$IF CompilerVersion > 21}Var{$IFEND}Buffer: TJvValueBuffer
+                                         {$ELSE}Buffer: Pointer{$ENDIF}): Boolean; overload; override;
     {$IFNDEF NEXTGEN}
       {$IFDEF RTL240_UP}
     function GetFieldData(Field: TField; Buffer: Pointer): Boolean; overload; override;
@@ -1198,7 +1199,11 @@ begin
 //    If PMemBlobArray(Rec.FBlobs)^[I] = '' Then
 //     PMemBlobArray(Rec.FBlobs)^[I] := PMemBlobArray(Buffer)^[I];
 //   End;
-  GetCalcFields({$IFNDEF FPC}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}(Buffer));
+  GetCalcFields({$IFNDEF FPC}{$IFDEF NEXTGEN}TRecBuf{$ELSE}
+                               {$IF CompilerVersion <= 22}Pointer
+                               {$ELSE}TRecordBuffer
+                               {$IFEND}
+                              {$ENDIF}{$ELSE}TRecordBuffer{$ENDIF}(Buffer));
 end;
 function TRESTDWMemTable.GetRecordSize: Word;
 begin
@@ -1251,30 +1256,37 @@ begin
                                                    {$ELSE}PChar(Data){$IFEND}
                                       {$ELSE}PAnsiChar(Data){$ENDIF}) > 0);
         ftString, ftFixedChar:
-          Result := Result and (not TrimEmptyString or (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
-                                                                            {$ELSE}PChar(Data){$IFEND}
-                                                               {$ELSE}PAnsiChar(Data){$ENDIF}) > 0));
+          Result := Result and (not TrimEmptyString or ((StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
+                                                                             {$ELSE}PChar(Data){$IFEND}
+                                                                {$ELSE}PAnsiChar(Data){$ENDIF}) > 0))) And
+                                                               ({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
+                                                                             {$ELSE}PChar(Data){$IFEND}
+                                                                {$ELSE}PAnsiChar(Data){$ENDIF} <> #0);
         {$IF DEFINED(FPC) OR DEFINED(COMPILER10_UP)}
           ftFixedWideChar,
           ftWideString:
             Result := Result and (not TrimEmptyString or (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PChar(Data)
                                                                               {$ELSE}PChar(Data){$IFEND}
-                                                                              {$ELSE}PWideChar(Data){$ENDIF}) > 0));
+                                                                              {$ELSE}PWideChar(Data){$ENDIF}) > 0)) And
+                                                                ({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
+                                                                             {$ELSE}PChar(Data){$IFEND}
+                                                                {$ELSE}PAnsiChar(Data){$ENDIF} <> #0);
         {$IFEND}
         //Actual TODO XyberX
-        ftByte,
-        ftShortint,
         ftWord,
         ftAutoInc,
-        ftLongWord,
+        {$IFNDEF FPC}
+         {$IF CompilerVersion > 21}
+          ftByte,
+          ftShortint,
+          ftLongWord,
+         {$IFEND}
+        {$ENDIF}
         ftLargeint,
         ftInteger,
-        ftSmallint : Result := (Result) and (Chr(Data[0]) <> 'S');
-//        Else
-//         Begin
-//          If DataTypeIsBlobTypes(Field.DataType) Then
-//           Result := (Result) and (Length(PMemBlobArray(Records[RecNo -1].Blobs)^[Field.Offset]) > 0);
-//         End;
+        ftSmallint : Result := (Result) and ({$IFNDEF FPC}{$IF CompilerVersion <= 22}Char(Data^)
+                                             {$ELSE}Chr(Data[0]){$IFEND}
+                                             {$ELSE}Char(Data^){$ENDIF} <> 'S');
       end;
       If Result Then
        Begin
@@ -1292,8 +1304,13 @@ begin
             If Length(aBytes) > 0 Then
              Begin
               {$IFNDEF FPC}
-               SetLength(Buffer, Length(aBytes));
-               Move(aBytes[0], Buffer[0], Length(aBytes));
+               {$IF CompilerVersion <= 22}
+                SetLength(TRESTDWBytes(Buffer), Length(aBytes));
+                Move(aBytes[0], Buffer^, Length(aBytes));
+               {$ELSE}
+                SetLength(Buffer, Length(aBytes));
+                Move(aBytes[0], Buffer[0], Length(aBytes));
+               {$IFEND}
               {$ELSE}
                SetLength(TRESTDWBytes(Buffer), Length(aBytes));
                Move(aBytes[0], Buffer^, Length(aBytes));
@@ -1302,9 +1319,13 @@ begin
             Else
              Begin
               {$IFNDEF FPC}
-               SetLength(Buffer, 0);
+               {$IF CompilerVersion <= 22}
+                SetLength(TRESTDWBytes(Buffer), 0);
+               {$ELSE}
+                SetLength(Buffer, 0);
+               {$IFEND}
               {$ELSE}
-               SetLength(PRESTDWBytes(Buffer)^, 0);
+               SetLength(TRESTDWBytes(Buffer), 0);
               {$ENDIF}
               Result := False;
              End;
@@ -1312,30 +1333,40 @@ begin
           Else
            Begin
             {$IFNDEF FPC}
-             SetLength(Buffer, 0);
+             {$IF CompilerVersion <= 22}
+              SetLength(TRESTDWBytes(Buffer), 0);
+             {$ELSE}
+              SetLength(Buffer, 0);
+             {$IFEND}
             {$ELSE}
-             SetLength(PRESTDWBytes(Buffer)^, 0);
+             SetLength(TRESTDWBytes(Buffer), 0);
             {$ENDIF}
+            Result := False;
            End;
          End
         Else
          Begin
           {$IFNDEF FPC}
-           SetLength(Buffer, CalcFieldLen(Field.DataType, Field.Size));
-           Move(Data^, Buffer[0], Length(Buffer));
+           {$IF CompilerVersion <= 22}
+            Move(Data^, Buffer^, CalcFieldLen(Field.DataType, Field.Size));
            {$ELSE}
+            SetLength(Buffer, CalcFieldLen(Field.DataType, Field.Size));
+            Move(Data^, Buffer[0], Length(Buffer));
+           {$IFEND}
+          {$ELSE}
            Move(Data^, Buffer^, CalcFieldLen(Field.DataType, Field.Size));
           {$ENDIF}
          End;
        End
       Else
-       Begin
-        {$IFNDEF FPC}
-         SetLength(Buffer, 0);
-        {$ELSE}
-         SetLength(PRESTDWBytes(Buffer)^, 0);
-        {$ENDIF}
-       End;
+       Result := False;
+//       Begin
+        //{$IFNDEF FPC}
+        // SetLength(Buffer, 0);
+        //{$ELSE}
+        // SetLength(TRESTDWBytes(Buffer), 0);
+        //{$ENDIF}
+//       End;
     end;
   end
   else
@@ -1350,7 +1381,7 @@ begin
     End;
   end;
 end;
-function TRESTDWMemTable.GetFieldData(Field: TField; {$IFNDEF FPC}var Buffer: TJvValueBuffer{$ELSE}Buffer: Pointer{$ENDIF}): Boolean;
+function TRESTDWMemTable.GetFieldData(Field: TField; {$IFNDEF FPC}{$IF CompilerVersion > 21}Var{$IFEND}Buffer: TJvValueBuffer{$ELSE}Buffer: Pointer{$ENDIF}): Boolean;
 begin
  Result := InternalGetFieldData(Field, Buffer);
 end;

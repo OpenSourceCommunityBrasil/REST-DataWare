@@ -7,25 +7,30 @@ interface
 uses
   Classes, SysUtils, uRESTDWMemoryDataset, DB, Variants, uRESTDWConsts;
 
-type
-  TRESTDWStorageBinRDW = class(TRESTDWStorageBase)
-  private
-    FFieldTypes : array of integer;
-  protected
-    procedure SaveRecordToStream(Dataset : TDataset; stream  : TStream);
-    procedure LoadRecordFromStream(Dataset : TDataset; stream  : TStream);
+ Type
+  TRESTDWStorageBinRDW = Class(TRESTDWStorageBase)
+  Private
+   FFieldTypes : array of integer;
+  Protected
+   Procedure SaveRecordToStream       (Dataset    : TDataset;
+                                       stream     : TStream);
+   Procedure LoadRecordFromStream     (Dataset    : TDataset;
+                                       stream     : TStream);
+   Function  SaveRecordDWMemToStream  (Dataset    : IRESTDWMemTable;
+                                       stream     : TStream) : Longint;
+   Procedure LoadRecordDWMemFromStream(Dataset    : IRESTDWMemTable;
+                                       stream     : TStream);
+   Procedure SaveDWMemToStream        (dataset    : IRESTDWMemTable;
+                                       Var stream : TStream); Override;
+   Procedure LoadDWMemFromStream      (dataset    : IRESTDWMemTable;
+                                       stream     : TStream); Override;
+   Procedure SaveDatasetToStream      (dataset    : TDataset;
+                                       Var stream : TStream); Override;
+   Procedure LoadDatasetFromStream    (dataset    : TDataset;
+                                       stream     : TStream); Override;
+  End;
 
-    function SaveRecordDWMemToStream(Dataset : IRESTDWMemTable; stream  : TStream) : Longint;
-    procedure LoadRecordDWMemFromStream(Dataset : IRESTDWMemTable; stream  : TStream);
-  protected
-    procedure SaveDWMemToStream(dataset : IRESTDWMemTable; var stream : TStream); override;
-    procedure LoadDWMemFromStream(dataset : IRESTDWMemTable; stream : TStream); override;
-
-    procedure SaveDatasetToStream(dataset : TDataset; var stream : TStream); override;
-    procedure LoadDatasetFromStream(dataset : TDataset; stream : TStream); override;
-  end;
-
-implementation
+Implementation
 
 uses
   uRESTDWProtoTypes, uRESTDWTools, FmtBCD {$IFNDEF FPC}, SqlTimSt{$ENDIF};
@@ -243,10 +248,8 @@ var
 // aStream       : TStream;
 Begin
   ds := TRESTDWMemTable(dataset.GetDataset);
-
   stream.Read(rc,SizeOf(LongInt));
   rc := rc - 1;
-
   fc := ds.FieldCount;
   fc := fc - 1;
   PActualRecord := nil;

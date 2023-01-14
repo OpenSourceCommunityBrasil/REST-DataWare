@@ -3251,7 +3251,11 @@ Function BytesToString(Const bin : TRESTDWBytes;
 Var
  I       : Integer;
  aBytes  : TRESTDWBytes;
- aResult : RawByteString;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion > 21}
+   aResult : RawByteString;
+  {$IFEND}
+ {$ENDIF}
 Begin
  I := restdwLength(bin);
  If I > 0 Then
