@@ -1,2 +1,2 @@
-TRESTDWUniDACDriver BITMAP "..\icons\components\TRESTDWDriverUNIDAC.bmp"
-TRESTDWUniDACDriver16 BITMAP "..\icons\components\TRESTDWDriverUNIDAC16.bmp"
+TRESTDWUniDACDriver BITMAP "..\icons\components\drivers\TRESTDWUniDACDriver.bmp"
+TRESTDWUniDACDriver16 BITMAP "..\icons\components\drivers\TRESTDWUniDACDriver16.bmp"

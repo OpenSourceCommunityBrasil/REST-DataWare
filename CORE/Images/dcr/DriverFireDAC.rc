@@ -1,4 +1,4 @@
-TRESTDWFireDACDriver BITMAP "..\icons\components\TRESTDWDriverFireDAC.bmp"
-TRESTDWFireDACDriver16 BITMAP "..\icons\components\TRESTDWDriverFireDAC16.bmp"
+TRESTDWFireDACDriver BITMAP "..\icons\components\drivers\TRESTDWFireDACDriver.bmp"
+TRESTDWFireDACDriver16 BITMAP "..\icons\components\drivers\TRESTDWFireDACDriver16.bmp"
 TRESTDWFireDACPhysLink BITMAP "..\icons\components\TRESTDWFireDACPhysLink.bmp"
 TRESTDWFireDACPhysLink16 BITMAP "..\icons\components\TRESTDWFireDACPhysLink16.bmp"
