@@ -1,2 +1,2 @@
-TRESTDWShellService BITMAP "..\icons\components\TRESTDWCGIRunner.bmp"
-TRESTDWShellService16 BITMAP "..\icons\components\TRESTDWCGIRunner16.bmp"
+TRESTDWShellService BITMAP "..\icons\components\TRESTDWShellService.bmp"
+TRESTDWShellService16 BITMAP "..\icons\components\TRESTDWShellService16.bmp"

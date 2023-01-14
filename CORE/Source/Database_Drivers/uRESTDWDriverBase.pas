@@ -1,4 +1,4 @@
-﻿unit uRESTDWDriverBase;
+unit uRESTDWDriverBase;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 

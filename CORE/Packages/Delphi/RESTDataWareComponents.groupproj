@@ -27,7 +27,16 @@
         <Projects Include="Connectors\Ics\RESTDWSocketIcsDesign.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="Drivers\AnyDAC\RESTDWAnyDACDriver.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Drivers\ApolloDB\RESTDWApolloDBDriver.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="Drivers\FireDAC\RESTDWFireDACDriver.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Drivers\InterBase\RESTDWInterbaseDriver.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="Drivers\MyDAC\RESTDWMyDACDriver.dproj">
@@ -122,6 +131,24 @@
     <Target Name="RESTDWSocketIcsDesign:Make">
         <MSBuild Projects="Connectors\Ics\RESTDWSocketIcsDesign.dproj" Targets="Make"/>
     </Target>
+    <Target Name="RESTDWAnyDACDriver">
+        <MSBuild Projects="Drivers\AnyDAC\RESTDWAnyDACDriver.dproj"/>
+    </Target>
+    <Target Name="RESTDWAnyDACDriver:Clean">
+        <MSBuild Projects="Drivers\AnyDAC\RESTDWAnyDACDriver.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWAnyDACDriver:Make">
+        <MSBuild Projects="Drivers\AnyDAC\RESTDWAnyDACDriver.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWApolloDBDriver">
+        <MSBuild Projects="Drivers\ApolloDB\RESTDWApolloDBDriver.dproj"/>
+    </Target>
+    <Target Name="RESTDWApolloDBDriver:Clean">
+        <MSBuild Projects="Drivers\ApolloDB\RESTDWApolloDBDriver.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWApolloDBDriver:Make">
+        <MSBuild Projects="Drivers\ApolloDB\RESTDWApolloDBDriver.dproj" Targets="Make"/>
+    </Target>
     <Target Name="RESTDWFireDACDriver">
         <MSBuild Projects="Drivers\FireDAC\RESTDWFireDACDriver.dproj"/>
     </Target>
@@ -130,6 +157,15 @@
     </Target>
     <Target Name="RESTDWFireDACDriver:Make">
         <MSBuild Projects="Drivers\FireDAC\RESTDWFireDACDriver.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWInterbaseDriver">
+        <MSBuild Projects="Drivers\InterBase\RESTDWInterbaseDriver.dproj"/>
+    </Target>
+    <Target Name="RESTDWInterbaseDriver:Clean">
+        <MSBuild Projects="Drivers\InterBase\RESTDWInterbaseDriver.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWInterbaseDriver:Make">
+        <MSBuild Projects="Drivers\InterBase\RESTDWInterbaseDriver.dproj" Targets="Make"/>
     </Target>
     <Target Name="RESTDWMyDACDriver">
         <MSBuild Projects="Drivers\MyDAC\RESTDWMyDACDriver.dproj"/>
@@ -168,13 +204,13 @@
         <MSBuild Projects="Wizards\RESTDWWizards.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="RESTDWCore;RESTDWShellServices;RESTDWSocketIndy;RESTDWSocketIcs;RESTDWCoreDesign;RESTDWShellServicesDesign;RESTDWSocketIndyDesign;RESTDWSocketIcsDesign;RESTDWFireDACDriver;RESTDWMyDACDriver;RESTDWUniDACDriver;RESTDWZEOSDriver;RESTDWWizards"/>
+        <CallTarget Targets="RESTDWCore;RESTDWShellServices;RESTDWSocketIndy;RESTDWSocketIcs;RESTDWCoreDesign;RESTDWShellServicesDesign;RESTDWSocketIndyDesign;RESTDWSocketIcsDesign;RESTDWAnyDACDriver;RESTDWApolloDBDriver;RESTDWFireDACDriver;RESTDWInterbaseDriver;RESTDWMyDACDriver;RESTDWUniDACDriver;RESTDWZEOSDriver;RESTDWWizards"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RESTDWCore:Clean;RESTDWShellServices:Clean;RESTDWSocketIndy:Clean;RESTDWSocketIcs:Clean;RESTDWCoreDesign:Clean;RESTDWShellServicesDesign:Clean;RESTDWSocketIndyDesign:Clean;RESTDWSocketIcsDesign:Clean;RESTDWFireDACDriver:Clean;RESTDWMyDACDriver:Clean;RESTDWUniDACDriver:Clean;RESTDWZEOSDriver:Clean;RESTDWWizards:Clean"/>
+        <CallTarget Targets="RESTDWCore:Clean;RESTDWShellServices:Clean;RESTDWSocketIndy:Clean;RESTDWSocketIcs:Clean;RESTDWCoreDesign:Clean;RESTDWShellServicesDesign:Clean;RESTDWSocketIndyDesign:Clean;RESTDWSocketIcsDesign:Clean;RESTDWAnyDACDriver:Clean;RESTDWApolloDBDriver:Clean;RESTDWFireDACDriver:Clean;RESTDWInterbaseDriver:Clean;RESTDWMyDACDriver:Clean;RESTDWUniDACDriver:Clean;RESTDWZEOSDriver:Clean;RESTDWWizards:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RESTDWCore:Make;RESTDWShellServices:Make;RESTDWSocketIndy:Make;RESTDWSocketIcs:Make;RESTDWCoreDesign:Make;RESTDWShellServicesDesign:Make;RESTDWSocketIndyDesign:Make;RESTDWSocketIcsDesign:Make;RESTDWFireDACDriver:Make;RESTDWMyDACDriver:Make;RESTDWUniDACDriver:Make;RESTDWZEOSDriver:Make;RESTDWWizards:Make"/>
+        <CallTarget Targets="RESTDWCore:Make;RESTDWShellServices:Make;RESTDWSocketIndy:Make;RESTDWSocketIcs:Make;RESTDWCoreDesign:Make;RESTDWShellServicesDesign:Make;RESTDWSocketIndyDesign:Make;RESTDWSocketIcsDesign:Make;RESTDWAnyDACDriver:Make;RESTDWApolloDBDriver:Make;RESTDWFireDACDriver:Make;RESTDWInterbaseDriver:Make;RESTDWMyDACDriver:Make;RESTDWUniDACDriver:Make;RESTDWZEOSDriver:Make;RESTDWWizards:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

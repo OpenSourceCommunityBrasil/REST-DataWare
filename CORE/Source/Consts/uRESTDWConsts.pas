@@ -1,4 +1,4 @@
-﻿Unit uRESTDWConsts;
+Unit uRESTDWConsts;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -47,7 +47,7 @@ Const
  // controle de versão
  RESTDWVersionINFO          = 'v2.1.0-';
  RESTDWRelease              = '333';
- RESTDWCodeProject          = 'Galaga - GitHub';
+ RESTDWCodeProject          = 'Galaga - SourceForge';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  cSetPhysicDriver           = 'A PhysicDriver is needed to work';
  SNotEditing                = 'Not in Edit mode';
@@ -57,7 +57,7 @@ Const
                               'Components REST Dataware';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
  RESTDWParamsHeaderVersion  = 6;
-
+ cRestDWNull                    = #1#1;//Null de Binarios dataset
  ByteBuffer                     = 1024 * 8; //8kb
  CompressBuffer                 = 1024 * 2;
  HoursInDay                     = 24;     {Number of hours in a day}
