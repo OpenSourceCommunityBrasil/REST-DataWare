@@ -143,22 +143,6 @@
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="RESTDWSocketIcs.dcp"/>
         <DCCReference Include="..\..\..\..\Source\Sockets\Ics\uRESTDWIcsReg.pas"/>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIcsClientPooler.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWIcsClientPooler</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIcsClientREST.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWIcsClientREST</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIcsDataBase.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWIcsDataBase</ResourceId>
-        </RcItem>
-        <RcItem Include="..\..\..\..\Images\icons\components\TRESTDWIcsServicePooler.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TRESTDWIcsServicePooler</ResourceId>
-        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -185,8 +169,8 @@
             </Delphi.Personality>
             <Deployment Version="4">
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule"/>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\RESTDWSocketIcsDesign.bpl" Configuration="Debug" Class="ProjectOutput"/>
