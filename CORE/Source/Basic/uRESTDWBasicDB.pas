@@ -261,6 +261,7 @@ Type
 End;
 
 Type
+ TOnBuildConnection       = Procedure (DataBase: TRESTDWComponent) Of Object;
  TOnFailOverExecute       = Procedure (ConnectionServer   : TRESTDWConnectionServer) Of Object;
  TOnFailOverError         = Procedure (ConnectionServer   : TRESTDWConnectionServer;
                                        MessageError       : String)                  Of Object;
@@ -291,6 +292,7 @@ End;
 Type
  TRESTDWDatabasebaseBase = Class(TRESTDWComponent)
  Private
+  vOnBuildConnection    : TOnBuildConnection;
   vClientIpVersion      : TRESTDWClientIpVersions;
   vSSLVersions          : TRESTDWSSLVersions;
   vOnWorkBegin,
@@ -518,6 +520,7 @@ Type
   Property SSLVersions             : TRESTDWSSLVersions         Read vSSLVersions             Write vSSLVersions;
   Property UserAgent               : String                     Read vUserAgent               Write vUserAgent;
   Property ClientIpVersion         : TRESTDWClientIpVersions    Read vClientIpVersion         Write SetIpVersion default civIPv4;
+  Property OnBuildConnection       : TOnBuildConnection         Read vOnBuildConnection       Write vOnBuildConnection;
 End;
 
 Type
@@ -5185,6 +5188,11 @@ End;
 
 Function TRESTDWDatabasebaseBase.BuildConnection(aBinaryRequest : Boolean) : TRESTDWPoolerMethodClient;
 Begin
+ Result                       := nil;
+
+ if Assigned(vOnBuildConnection) then
+  vOnBuildConnection(Self);
+
  Result                       := TRESTDWPoolerMethodClient.Create(Nil);
  Result.PoolerNotFoundMessage := PoolerNotFoundMessage;
  Result.AuthenticationOptions.Assign(AuthenticationOptions);
@@ -5221,6 +5229,8 @@ Procedure TRESTDWDatabasebaseBase.SetConnection(Value          : Boolean;
 Var
  vRESTConnectionDB : TRESTDWPoolerMethodClient;
 Begin
+ vRESTConnectionDB := nil;
+
  If (csLoading in ComponentState) then
   Value := False;
  If (Value) And Not(vConnected) then
