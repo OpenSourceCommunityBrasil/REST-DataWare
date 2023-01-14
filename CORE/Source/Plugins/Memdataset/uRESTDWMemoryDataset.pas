@@ -1241,8 +1241,8 @@ begin
     if (Data <> nil) Or (Field is TBlobField) then
     begin
      Result := (Field is TBlobField);
-     If Not Result then
-      Result := Data^ <> 0;
+     If Not Result Then
+      Result := Data <> Nil;
 //      If Not DataTypeIsBlobTypes(Field.DataType) Then
 //      Inc(Data);
       case Field.DataType of
@@ -1255,66 +1255,87 @@ begin
                                                                             {$ELSE}PChar(Data){$IFEND}
                                                                {$ELSE}PAnsiChar(Data){$ENDIF}) > 0));
         {$IF DEFINED(FPC) OR DEFINED(COMPILER10_UP)}
+          ftFixedWideChar,
           ftWideString:
             Result := Result and (not TrimEmptyString or (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PChar(Data)
                                                                               {$ELSE}PChar(Data){$IFEND}
                                                                               {$ELSE}PWideChar(Data){$ENDIF}) > 0));
-          ftFixedWideChar:
-            Result := Result and (not TrimEmptyString or (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PChar(Data)
-                                                                            {$ELSE}PChar(Data){$IFEND}
-                                                                            {$ELSE}PWideChar(Data){$ENDIF}) > 0));
         {$IFEND}
+        //Actual TODO XyberX
+        ftByte,
+        ftShortint,
+        ftWord,
+        ftAutoInc,
+        ftLongWord,
+        ftLargeint,
+        ftInteger,
+        ftSmallint : Result := (Result) and (Chr(Data[0]) <> 'S');
+//        Else
+//         Begin
+//          If DataTypeIsBlobTypes(Field.DataType) Then
+//           Result := (Result) and (Length(PMemBlobArray(Records[RecNo -1].Blobs)^[Field.Offset]) > 0);
+//         End;
       end;
-      if Result then
-        if Field.DataType = ftVariant then
-        begin
+      If Result Then
+       Begin
+        If Field.DataType = ftVariant Then
+         Begin
           VarData := PVariant(Data)^;
           PVariant(Buffer)^ := VarData;
-        end
-       Else If DataTypeIsBlobTypes(Field.DataType) Then
-        Begin
-         //Novo Codigo
-         If State in [dsBrowse] Then
-          Begin
-           aBytes := PMemBlobArray(Records[RecNo -1].Blobs)^[Field.Offset];
-           if Length(aBytes) > 0 then
-            begin
-             {$IFNDEF FPC}
-              SetLength(Buffer, Length(aBytes));
-              Move(aBytes[0], Buffer[0], Length(aBytes));
-             {$ELSE}
-              SetLength(TRESTDWBytes(Buffer), Length(aBytes));
-              Move(aBytes[0], Buffer^, Length(aBytes));
-             {$ENDIF}
-            end
-           else
-            begin
-             {$IFNDEF FPC}
-              SetLength(Buffer, 0);
-             {$ELSE}
-              SetLength(PRESTDWBytes(Buffer)^, 0);
-             {$ENDIF}
-             Result := False;
-           end;
-          End
-         Else
-          Begin
-           {$IFNDEF FPC}
-            SetLength(Buffer, 0);
+         End
+        Else If DataTypeIsBlobTypes(Field.DataType) Then
+         Begin
+          //Novo Codigo
+          If State in [dsBrowse] Then
+           Begin
+            aBytes := PMemBlobArray(Records[RecNo -1].Blobs)^[Field.Offset];
+            If Length(aBytes) > 0 Then
+             Begin
+              {$IFNDEF FPC}
+               SetLength(Buffer, Length(aBytes));
+               Move(aBytes[0], Buffer[0], Length(aBytes));
+              {$ELSE}
+               SetLength(TRESTDWBytes(Buffer), Length(aBytes));
+               Move(aBytes[0], Buffer^, Length(aBytes));
+              {$ENDIF}
+             End
+            Else
+             Begin
+              {$IFNDEF FPC}
+               SetLength(Buffer, 0);
+              {$ELSE}
+               SetLength(PRESTDWBytes(Buffer)^, 0);
+              {$ENDIF}
+              Result := False;
+             End;
+           End
+          Else
+           Begin
+            {$IFNDEF FPC}
+             SetLength(Buffer, 0);
+            {$ELSE}
+             SetLength(PRESTDWBytes(Buffer)^, 0);
+            {$ENDIF}
+           End;
+         End
+        Else
+         Begin
+          {$IFNDEF FPC}
+           SetLength(Buffer, CalcFieldLen(Field.DataType, Field.Size));
+           Move(Data^, Buffer[0], Length(Buffer));
            {$ELSE}
-            SetLength(PRESTDWBytes(Buffer)^, 0);
-           {$ENDIF}
-          End;
-        End
-       Else
-        Begin
-         {$IFNDEF FPC}
-          SetLength(Buffer, CalcFieldLen(Field.DataType, Field.Size));
-          Move(Data^, Buffer[0], Length(Buffer));
-         {$ELSE}
-          Move(Data^, Buffer^, CalcFieldLen(Field.DataType, Field.Size));
-         {$ENDIF}
-        End;
+           Move(Data^, Buffer^, CalcFieldLen(Field.DataType, Field.Size));
+          {$ENDIF}
+         End;
+       End
+      Else
+       Begin
+        {$IFNDEF FPC}
+         SetLength(Buffer, 0);
+        {$ELSE}
+         SetLength(PRESTDWBytes(Buffer)^, 0);
+        {$ENDIF}
+       End;
     end;
   end
   else

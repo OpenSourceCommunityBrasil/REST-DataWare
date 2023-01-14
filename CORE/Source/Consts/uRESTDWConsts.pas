@@ -57,7 +57,7 @@ Const
                               'Components REST Dataware';
  RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
  RESTDWParamsHeaderVersion  = 6;
-
+ cRestDWNull                    = #1#1;//Null de Binarios dataset
  ByteBuffer                     = 1024 * 8; //8kb
  CompressBuffer                 = 1024 * 2;
  HoursInDay                     = 24;     {Number of hours in a day}
