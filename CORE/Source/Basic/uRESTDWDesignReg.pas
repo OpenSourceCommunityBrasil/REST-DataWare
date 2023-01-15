@@ -817,15 +817,14 @@ Begin
  {$ENDIF}
 // RegisterComponents('REST Dataware - Service',     [TRESTDWServiceNotification]);
  RegisterComponents('REST Dataware - Client',      [TRESTDWClientEvents]);
- RegisterComponents('REST Dataware - API',         [TRESTDWServerEvents, TRESTDWServerContext, TRESTDWContextRules]);
+ RegisterComponents('REST Dataware - API',         [TRESTDWServerEvents,       TRESTDWServerContext, TRESTDWContextRules]);
  RegisterComponents('REST Dataware - Tools',       [TRESTDWResponseTranslator, TRESTDWBufferDB]);
-
- RegisterComponents('REST Dataware - DB',          [TRESTDWPoolerDB,        TRESTDWMemTable,        TRESTDWClientSQL,     TRESTDWTable,  TRESTDWUpdateSQL,
-                                                    TRESTDWMassiveSQLCache, TRESTDWStoredProcedure, TRESTDWMassiveCache,  TRESTDWBatchMove]);
+ RegisterComponents('REST Dataware - DB',          [TRESTDWPoolerDB,           TRESTDWMemTable,      TRESTDWClientSQL,
+                                                    TRESTDWTable,              TRESTDWUpdateSQL,     TRESTDWMassiveSQLCache,
+                                                    TRESTDWStoredProcedure,    TRESTDWMassiveCache,  TRESTDWBatchMove]);
 // AddIDEMenu;//Menu do REST Debugger
  {$IFNDEF FPC}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
-//  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
 //  RegisterPackageWizard(TCustomMenuItemDW.Create);//Request Debbuger
  {$ELSE}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
@@ -913,9 +912,9 @@ End;
 {$IFNDEF FPC}
 Function TDWDSDesigner.DoCreateField(Const FieldName : {$IF CompilerVersion > 17}WideString{$ELSE}String{$IFEND}; Origin: string): TField;
 Begin
-// TDWCustomDataSet(DataSet).DesignNotify(FieldName, 0);
-// Result  := Inherited DoCreateField(FieldName, Origin);
-// TDWCustomDataSet(DataSet).DesignNotify(FieldName, 104);
+// TRESTDWMemtable(DataSet).DesignNotify(FieldName, 0);
+ Result  := Inherited DoCreateField(FieldName, Origin);
+// TRESTDWMemtable(DataSet).DesignNotify(FieldName, 104);
 End;
 {$ENDIF}
 

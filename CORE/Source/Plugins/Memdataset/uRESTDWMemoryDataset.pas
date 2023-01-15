@@ -304,6 +304,7 @@ type
     // interface
     property Records[Index: Integer]: TJvMemoryRecord read GetMemoryRecord;
   public
+//    Procedure  DesignNotify(const AFieldName: string; Dummy: Integer);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function BookmarkValid(aBookmark: TBookmark): Boolean; override;
@@ -658,24 +659,24 @@ begin
      FMemoryData := Nil;
     end;
     if Value <> nil then
-    begin
+     Begin
       if UpdateParent then
-      begin
+       Begin
         Value.FRecords.Add(Self);
         Inc(Value.FLastID);
         FID := Value.FLastID;
-      end;
+       End;
       FMemoryData := Value;
       if Value.BlobFieldCount > 0 then
-      begin
+       Begin
         ReallocMem(FBlobs, Value.BlobFieldCount * SizeOf(Pointer));
         Initialize(PMemBlobArray(FBlobs)^[0], Value.BlobFieldCount);
-      end;
+       End;
       DataSize := 0;
-      for I := 0 to Value.FieldDefs.Count - 1 do
-        CalcDataSize(Value.FieldDefs[I], DataSize);
+      For I := 0 to Value.FieldDefs.Count - 1 do
+       CalcDataSize(Value.FieldDefs[I], DataSize);
       ReallocMem(FData, DataSize);
-    end;
+     End;
   end;
 end;
 procedure TJvMemoryRecord.SetIndex(Value: Integer);
@@ -1194,11 +1195,10 @@ begin
     BookmarkData := Rec.ID;
     BookmarkFlag := bfCurrent;
   end;
-//  for I := 0 to BlobFieldCount - 1 do
-//   Begin
-//    If PMemBlobArray(Rec.FBlobs)^[I] = '' Then
-//     PMemBlobArray(Rec.FBlobs)^[I] := PMemBlobArray(Buffer)^[I];
-//   End;
+//  For I := 0 to BlobFieldCount - 1 do
+//   PMemBlobArray(Rec.FBlobs)^[I] := PMemBlobArray(Buffer)^[I];
+  For I := 0 To BlobFieldCount - 1 Do
+   PMemBlobArray(Buffer + FBlobOfs)[I] := PMemBlobArray(Rec.FBlobs)[I];
   GetCalcFields({$IFNDEF FPC}{$IFDEF NEXTGEN}TRecBuf{$ELSE}
                                {$IF CompilerVersion <= 22}Pointer
                                {$ELSE}TRecordBuffer
@@ -1240,8 +1240,9 @@ begin
   Result := False;
   if not GetActiveRecBuf(RecBuf) then
     Exit;
-  if Field.FieldNo > 0 then
-  begin
+  If Not IsEmpty and ((Field.FieldNo > 0) or
+    (Field.FieldKind in [fkCalculated, fkLookup])) Then
+   Begin
     Data := FindFieldData(RecBuf, Field);
     if (Data <> nil) Or (Field is TBlobField) then
     begin
@@ -1350,8 +1351,9 @@ begin
            {$IF CompilerVersion <= 22}
             Move(Data^, Buffer^, CalcFieldLen(Field.DataType, Field.Size));
            {$ELSE}
-            SetLength(Buffer, CalcFieldLen(Field.DataType, Field.Size));
-            Move(Data^, Buffer[0], Length(Buffer));
+            //SetLength(Buffer, CalcFieldLen(Field.DataType, Field.Size));
+            //Move(Data^, Buffer[0], Length(Buffer));
+            Move(Data^, PChar(Buffer)^, CalcFieldLen(Field.DataType, Field.Size));
            {$IFEND}
           {$ELSE}
            Move(Data^, Buffer^, CalcFieldLen(Field.DataType, Field.Size));
@@ -1360,26 +1362,21 @@ begin
        End
       Else
        Result := False;
-//       Begin
-        //{$IFNDEF FPC}
-        // SetLength(Buffer, 0);
-        //{$ELSE}
-        // SetLength(TRESTDWBytes(Buffer), 0);
-        //{$ENDIF}
-//       End;
-    end;
-  end
-  else
-  if State in [dsBrowse, dsEdit, dsInsert, dsCalcFields] then
-  begin
-   If Not DataTypeIsBlobTypes(Field.DataType) Then
-    Begin
-     Inc(RecBuf, FRecordSize + Field.Offset);
-     Result := Byte(RecBuf[0]) <> 0;
-     If Result Then
-      Move(RecBuf[1], Buffer, Field.DataSize);
     End;
-  end;
+   End
+  Else
+   Begin
+    If State in [dsBrowse, dsEdit, dsInsert, dsCalcFields] Then
+     Begin
+      If Not DataTypeIsBlobTypes(Field.DataType) Then
+       Begin
+        Inc(RecBuf, FRecordSize + Field.Offset);
+        Result := Byte(RecBuf[0]) <> 0;
+        If Result Then
+         Move(RecBuf[1], Buffer, Field.DataSize);
+       End;
+     End;
+   End;
 end;
 function TRESTDWMemTable.GetFieldData(Field: TField; {$IFNDEF FPC}{$IF CompilerVersion > 21}Var{$IFEND}Buffer: TJvValueBuffer{$ELSE}Buffer: Pointer{$ENDIF}): Boolean;
 begin
@@ -2053,6 +2050,20 @@ procedure TRESTDWMemTable.InternalInitFieldDefs;
 begin
   // InitFieldDefsFromFields
 end;
+
+//Procedure TRESTDWMemTable.DesignNotify(const AFieldName: string; Dummy: Integer);
+//Var
+//  Stream: TStream;
+//Begin
+//  if not (csDesigning in ComponentState) then Exit;
+//  case Dummy of
+//    100: begin
+//         end;
+//   else
+//     inherited DesignNotify(AFieldName, Dummy);
+//  end;
+//End;
+
 function TRESTDWMemTable.IsCursorOpen: Boolean;
 begin
   Result := FActive;

@@ -1,4 +1,4 @@
-Unit uRESTDWConsts;
+﻿Unit uRESTDWConsts;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 

@@ -216,8 +216,8 @@ Begin
   ds.DisableControls;
   LoadRecordDWMemFromStream(dataset,stream);
   ds.EnableControls;
-
-  ds.First;
+  if Not ds.Bof then
+   ds.First;
 end;
 
 procedure TRESTDWStorageBinRDW.LoadRecordDWMemFromStream(

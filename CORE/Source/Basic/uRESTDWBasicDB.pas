@@ -8374,13 +8374,13 @@ Var
  I        : Integer;
  FieldDef : TFieldDef;
 Begin
- TDataset(Self).Close;
+ TRESTDWMemtable(Self).Close;
  For I := 0 To Length(vFieldsList) -1 Do
   Begin
    FieldDef := FieldDefExist(Self, vFieldsList[I].FieldName);
    If FieldDef = Nil Then
     Begin
-     FieldDef          := TDataset(Self).FieldDefs.AddFieldDef;
+     FieldDef          := TRESTDWMemtable(Self).FieldDefs.AddFieldDef;
      FieldDef.Name     := vFieldsList[I].FieldName;
      FieldDef.DataType := vFieldsList[I].DataType;
      FieldDef.Size     := vFieldsList[I].Size;
@@ -10416,27 +10416,24 @@ Var
   Try
    If vTempDS <> Nil Then
     Begin
-     If (vTempDS.Fields.Count > 0) Then
+     If (vTempDS.FieldDefs.Count > 0) Then
       Begin
-       For J := 0 To vTempDS.Fields.Count - 1 Do
+       For J := 0 To vTempDS.FieldDefs.Count - 1 Do
         Begin
-         If vTempDS.Fields[J].FieldKind = fkData Then
-          Begin
-           vFieldDefinition.FieldName := vTempDS.Fields[J].FieldName;
-           vFieldDefinition.DataType  := vTempDS.Fields[J].DataType;
-           If (vFieldDefinition.DataType <> ftFloat) Then
-            vFieldDefinition.Size     := vTempDS.Fields[J].Size
-           Else
-            vFieldDefinition.Size         := 0;
-           If (vFieldDefinition.DataType In [ftCurrency, ftBCD,
-                                             {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-                                             {$IFEND}{$ENDIF} ftFMTBcd]) Then
-            vFieldDefinition.Precision := TBCDField(vTempDS.Fields[J]).Precision
-           Else If (vFieldDefinition.DataType = ftFloat) Then
-            vFieldDefinition.Precision := TFloatField(vTempDS.Fields[J]).Precision;
-           vFieldDefinition.Required   := vTempDS.Fields[J].Required;
-           NewDataField(vFieldDefinition);
-          End;
+         vFieldDefinition.FieldName := vTempDS.FieldDefs[J].Name;
+         vFieldDefinition.DataType  := vTempDS.FieldDefs[J].DataType;
+         If (vFieldDefinition.DataType <> ftFloat) Then
+          vFieldDefinition.Size     := vTempDS.FieldDefs[J].Size
+         Else
+          vFieldDefinition.Size         := 0;
+         If (vFieldDefinition.DataType In [ftCurrency, ftBCD,
+                                           {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
+                                           {$IFEND}{$ENDIF} ftFMTBcd]) Then
+          vFieldDefinition.Precision := TBCDField(vTempDS.FieldDefs[J]).Precision
+         Else If (vFieldDefinition.DataType = ftFloat) Then
+          vFieldDefinition.Precision := TFloatField(vTempDS.FieldDefs[J]).Precision;
+         vFieldDefinition.Required   := vTempDS.FieldDefs[J].Required;
+         NewDataField(vFieldDefinition);
         End;
       End;
     End;
@@ -10612,7 +10609,7 @@ Begin
            vStream.Position := 0;
            vTempDS := TRESTDWClientSQL.Create(Nil);
            Try
-            TRESTDWClientSQL(vTempDS).LoadFromStream(vStream);
+            TRESTDWClientSQLBase(vTempDS).LoadFromStream(TMemoryStream(vStream));
             NewBinaryFieldList;
            Finally
             FreeAndNil(vTempDS);
@@ -10621,19 +10618,18 @@ Begin
          vStream.Position := 0;
          SetInBlockEvents(True);
          Try
-          TRESTDWClientSQLBase(Self).LoadFromStream(TMemoryStream(vStream));
           TRESTDWClientSQLBase(Self).DisableControls;
-          SetInBlockEvents(True);
+          TRESTDWClientSQLBase(Self).LoadFromStream(TMemoryStream(vStream));
           If TRESTDWClientSQLBase(Self).Active Then
            Begin
             TRESTDWClientSQLBase(Self).SetInBlockEvents(True); // Novavix
-            TRESTDWClientSQLBase(Self).Last;
-            TRESTDWClientSQLBase(Self).SetInBlockEvents(False); // Novavix
+//            TRESTDWClientSQLBase(Self).Last;
+//            TRESTDWClientSQLBase(Self).SetInBlockEvents(False); // Novavix
             If TRESTDWClientSQLBase(Self).Recordcount > 0 Then
              vJsonCount := TRESTDWClientSQLBase(Self).Recordcount
             Else
              vJsonCount := TRESTDWClientSQLBase(Self).RecNo;
-            //A Linha a baixo e pedido do Tiago Istuque que não mostrava o recordcount com BN
+//            //A Linha a baixo e pedido do Tiago Istuque que não mostrava o recordcount com BN
             TRESTDWClientSQL(Self).SetRecordCount(vJsonCount, vJsonCount);
             TRESTDWClientSQLBase(Self).SetInBlockEvents(True); // Novavix
             TRESTDWClientSQLBase(Self).First;
@@ -10917,16 +10913,16 @@ Begin
    End;
   If State = dsBrowse Then
    CreateMassiveDataset;
-  If BinaryRequest        Then
-   Begin
-    If Assigned(OnCalcFields) Then
-     Begin
-      DisableControls;
-      Last;
-      First;
-      EnableControls;
-     End;
-   End;
+//  If BinaryRequest        Then
+//   Begin
+//    If Assigned(OnCalcFields) Then
+//     Begin
+//      DisableControls;
+//      Last;
+//      First;
+//      EnableControls;
+//     End;
+//   End;
  Except
   Raise;
  End;
@@ -11819,3 +11815,5 @@ Begin
 End;
 
 end.
+
+
