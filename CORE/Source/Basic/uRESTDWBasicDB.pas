@@ -10623,16 +10623,16 @@ Begin
           If TRESTDWClientSQLBase(Self).Active Then
            Begin
             TRESTDWClientSQLBase(Self).SetInBlockEvents(True); // Novavix
-//            TRESTDWClientSQLBase(Self).Last;
-//            TRESTDWClientSQLBase(Self).SetInBlockEvents(False); // Novavix
+            TRESTDWClientSQLBase(Self).Last;
+            TRESTDWClientSQLBase(Self).SetInBlockEvents(False); // Novavix
             If TRESTDWClientSQLBase(Self).Recordcount > 0 Then
              vJsonCount := TRESTDWClientSQLBase(Self).Recordcount
             Else
              vJsonCount := TRESTDWClientSQLBase(Self).RecNo;
 //            //A Linha a baixo e pedido do Tiago Istuque que não mostrava o recordcount com BN
-            TRESTDWClientSQL(Self).SetRecordCount(vJsonCount, vJsonCount);
             TRESTDWClientSQLBase(Self).SetInBlockEvents(True); // Novavix
-            TRESTDWClientSQLBase(Self).First;
+            TRESTDWClientSQL(Self).SetRecordCount(vJsonCount, vJsonCount);
+            TRESTDWClientSQL(Self).First;
             TRESTDWClientSQLBase(Self).SetInBlockEvents(False); // Novavix
            End;
          Finally

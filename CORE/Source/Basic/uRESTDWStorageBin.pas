@@ -216,8 +216,6 @@ Begin
   ds.DisableControls;
   LoadRecordDWMemFromStream(dataset,stream);
   ds.EnableControls;
-  if Not ds.Bof then
-   ds.First;
 end;
 
 procedure TRESTDWStorageBinRDW.LoadRecordDWMemFromStream(
@@ -376,25 +374,47 @@ Begin
               dwftDate,
               dwftTime,
               dwftDateTime : Begin
-                              Stream.Read(R, Sizeof(Real));
-                              {$IFDEF FPC}
-                               dtRec := DateTimeToDateTimeRec(aDataType,TDateTime(R));
-                               Move(dtRec, PData^, SizeOf(dtRec));
-                              {$ELSE}
-                               Case aDataType Of
-                                ftDate: dtRec.Date := DateTimeToTimeStamp(R).Date;
-                                ftTime: dtRec.Time := DateTimeToTimeStamp(R).Time;
-                                Else
-                                 dtRec.DateTime := TimeStampToMSecs(DateTimeToTimeStamp(R));
+                              If Not Bool Then
+                               Begin
+                                Stream.Read(R, Sizeof(Real));
+                                {$IFDEF FPC}
+                                 dtRec := DateTimeToDateTimeRec(aDataType,TDateTime(R));
+                                 Move(dtRec, PData^, SizeOf(dtRec));
+                                {$ELSE}
+                                 Case aDataType Of
+                                  ftDate: dtRec.Date := DateTimeToTimeStamp(R).Date;
+                                  ftTime: dtRec.Time := DateTimeToTimeStamp(R).Time;
+                                  Else
+                                   dtRec.DateTime := TimeStampToMSecs(DateTimeToTimeStamp(R));
+                                 End;
+                                 Move(dtRec, PData^, SizeOf(dtRec));
+                                {$ENDIF}
+                               End
+                              Else
+                               Begin
+                                {$IFDEF FPC}
+                                 FillChar(PData^, 1, 'S');
+                                {$ELSE}
+                                 FillChar(PData^, 1, 'S');
+                                {$ENDIF}
                                End;
-                               Move(dtRec, PData^, SizeOf(dtRec));
-                              {$ENDIF}
                              End;
               dwftTimeStampOffset,
               dwftTimeStamp : Begin
-                               Stream.Read(R, Sizeof(Real));
-                               Ts := {$IFDEF FPC} DateTimeToTimeStamp(R) {$ELSE} DateTimeToSQLTimeStamp(R) {$ENDIF};
-                               Move(Ts, PData^, Sizeof(Ts));
+                               If Not Bool Then
+                                Begin
+                                 Stream.Read(R, Sizeof(Real));
+                                 Ts := {$IFDEF FPC} DateTimeToTimeStamp(R) {$ELSE} DateTimeToSQLTimeStamp(R) {$ENDIF};
+                                 Move(Ts, PData^, Sizeof(Ts));
+                                End
+                               Else
+                                Begin
+                                 {$IFDEF FPC}
+                                  FillChar(PData^, 1, 'S');
+                                 {$ELSE}
+                                  FillChar(PData^, 1, 'S');
+                                 {$ENDIF}
+                                End;
                               End;
               dwftLongWord,
               dwftLargeint : Begin
@@ -418,6 +438,7 @@ Begin
               dwftFmtMemo,
               dwftBlob,
               dwftBytes : Begin
+                           SetLength  (aBytes,    0);
                            If Not Bool Then
                             Begin
                              Stream.Read(L, Sizeof(LongInt));
@@ -426,15 +447,15 @@ Begin
                                //Actual TODO XyberX
                                SetLength  (aBytes,    L);
                                Stream.Read(aBytes[0], L);
-                               Try
-                                PMemBlobArray(PData)^[ds.Fields[B].Offset] := aBytes;
-                               Finally
-                                SetLength(aBytes, 0);
-                               End;
                               End;
                             End;
+                           Try
+                            PMemBlobArray(PData)^[ds.Fields[B].Offset] := aBytes;
+                           Finally
+                            SetLength(aBytes, 0);
+                           End;
                           End;
-              else begin
+              Else begin
                           Stream.Read(L, Sizeof(L));
                           S := '';
                           if L > 0 then begin

@@ -1197,8 +1197,8 @@ begin
   end;
 //  For I := 0 to BlobFieldCount - 1 do
 //   PMemBlobArray(Rec.FBlobs)^[I] := PMemBlobArray(Buffer)^[I];
-  For I := 0 To BlobFieldCount - 1 Do
-   PMemBlobArray(Buffer + FBlobOfs)[I] := PMemBlobArray(Rec.FBlobs)[I];
+//  For I := 0 To BlobFieldCount - 1 Do
+//   PMemBlobArray(Buffer + FBlobOfs)[I] := PMemBlobArray(Rec.FBlobs)[I];
   GetCalcFields({$IFNDEF FPC}{$IFDEF NEXTGEN}TRecBuf{$ELSE}
                                {$IF CompilerVersion <= 22}Pointer
                                {$ELSE}TRecordBuffer
@@ -1238,7 +1238,7 @@ var
   aBytes   : TRESTDWBytes;
 begin
   Result := False;
-  if not GetActiveRecBuf(RecBuf) then
+  If Not GetActiveRecBuf(RecBuf) Then
     Exit;
   If Not IsEmpty and ((Field.FieldNo > 0) or
     (Field.FieldKind in [fkCalculated, fkLookup])) Then
@@ -1285,10 +1285,16 @@ begin
         {$ENDIF}
         ftLargeint,
         ftInteger,
-        ftSmallint : Result := (Result) and ({$IFNDEF FPC}{$IF CompilerVersion <= 22}Char(Data^)
-                                             {$ELSE}Chr(Data[0]){$IFEND}
-                                             {$ELSE}Char(Data^){$ENDIF} <> 'S');
-      end;
+        ftSmallint,
+        ftDate,
+        ftTime,
+        ftDateTime,
+        ftTimeStamp : Begin
+                       Result := Not((Result) and ({$IFNDEF FPC}{$IF CompilerVersion <= 22}Char(Data^)
+                                                   {$ELSE}Chr(Data[0]){$IFEND}
+                                                   {$ELSE}Char(Data^){$ENDIF} = 'S'));
+                      End;
+      End;
       If Result Then
        Begin
         If Field.DataType = ftVariant Then
@@ -1349,14 +1355,87 @@ begin
          Begin
           {$IFNDEF FPC}
            {$IF CompilerVersion <= 22}
-            Move(Data^, Buffer^, CalcFieldLen(Field.DataType, Field.Size));
+            If Length(TRESTDWBytes(Buffer)) = 0 Then
+             Begin
+              SetLength(TRESTDWBytes(Buffer), CalcFieldLen(Field.DataType, Field.Size));
+              If Field.DataType in [ftWord, ftAutoInc,
+                                    {$IFNDEF FPC}
+                                     {$IF CompilerVersion > 21}
+                                      ftByte,
+                                      ftShortint,
+                                      ftLongWord,
+                                     {$IFEND}
+                                    {$ENDIF}
+                                    ftLargeint, ftInteger,
+                                    ftSmallint, ftDate,
+                                    ftTime, ftDateTime,
+                                    ftTimeStamp] Then
+              Begin
+               {$IFDEF FPC}
+                FillChar(Data^, 1, 'S');
+               {$ELSE}
+                FillChar(Data^, 1, 'S');
+               {$ENDIF}
+              End;
+              Result := False;
+             End
+            Else
+             Move(Data^, Buffer^, CalcFieldLen(Field.DataType, Field.Size));
            {$ELSE}
-            //SetLength(Buffer, CalcFieldLen(Field.DataType, Field.Size));
-            //Move(Data^, Buffer[0], Length(Buffer));
-            Move(Data^, PChar(Buffer)^, CalcFieldLen(Field.DataType, Field.Size));
+            If Length(TRESTDWBytes(Buffer)) = 0 Then
+             Begin
+              SetLength(TRESTDWBytes(Buffer), CalcFieldLen(Field.DataType, Field.Size));
+              If Field.DataType in [ftWord, ftAutoInc,
+                                    {$IFNDEF FPC}
+                                     {$IF CompilerVersion > 21}
+                                      ftByte,
+                                      ftShortint,
+                                      ftLongWord,
+                                     {$IFEND}
+                                    {$ENDIF}
+                                    ftLargeint, ftInteger,
+                                    ftSmallint, ftDate,
+                                    ftTime, ftDateTime,
+                                    ftTimeStamp] Then
+              Begin
+               {$IFDEF FPC}
+                FillChar(Data^, 1, 'S');
+               {$ELSE}
+                FillChar(Data^, 1, 'S');
+               {$ENDIF}
+              End;
+              Result := False;
+             End
+            Else
+             Move(Data^, PRESTDWBytes(Buffer)^, CalcFieldLen(Field.DataType, Field.Size));
            {$IFEND}
           {$ELSE}
-           Move(Data^, Buffer^, CalcFieldLen(Field.DataType, Field.Size));
+           If Length(TRESTDWBytes(Buffer)) = 0 Then
+            Begin
+             SetLength(TRESTDWBytes(Buffer), CalcFieldLen(Field.DataType, Field.Size));
+             If Field.DataType in [ftWord, ftAutoInc,
+                                   {$IFNDEF FPC}
+                                    {$IF CompilerVersion > 21}
+                                     ftByte,
+                                     ftShortint,
+                                     ftLongWord,
+                                    {$IFEND}
+                                   {$ENDIF}
+                                   ftLargeint, ftInteger,
+                                   ftSmallint, ftDate,
+                                   ftTime, ftDateTime,
+                                   ftTimeStamp] Then
+             Begin
+              {$IFDEF FPC}
+               FillChar(Data^, 1, 'S');
+              {$ELSE}
+               FillChar(Data^, 1, 'S');
+              {$ENDIF}
+             End;
+             Result := False;
+            End
+           Else
+            Move(Data^, Buffer^, CalcFieldLen(Field.DataType, Field.Size));
           {$ENDIF}
          End;
        End
