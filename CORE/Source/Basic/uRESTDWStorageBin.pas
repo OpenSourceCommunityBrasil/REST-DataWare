@@ -249,6 +249,7 @@ var
  pMemBlobData  : TRESTDWString;
  dtRec         : TDateTimeRec;
  dByte         : Byte;
+ aField        : TField;
 Begin
   ds := TRESTDWMemTable(dataset.GetDataset);
   stream.Read(rc,SizeOf(LongInt));
@@ -261,9 +262,10 @@ Begin
     dataset.InternalAddRecord(PActualRecord, True);
     vActualRecord := dataset.GetMemoryRecord(I);
     for B := 0 To fc do begin
-      If ds.FindField(FFieldNames[B]) <> Nil Then
+      aField := ds.FindField(FFieldNames[B]);
+      If aField <> Nil Then
        Begin
-        aIndex := ds.FindField(FFieldNames[B]).FieldNo - 1;
+        aIndex := aField.FieldNo - 1;
         If (aIndex < 0) Then
          Continue;
        End
@@ -272,24 +274,24 @@ Begin
       Stream.Read(Bool, Sizeof(Byte));
       if (PActualRecord <> Nil) then
        begin
-        If ds.FindField(FFieldNames[B]) <> Nil Then
+        If aField <> Nil Then
          Begin
-          aDataType := ds.FieldDefs[aIndex].DataType;
+          aDataType := aField.DataType;
           if dataset.DataTypeSuported(aDataType) then begin
            if dataset.DataTypeIsBlobTypes(aDataType) then
-            PData    := Pointer(@PMemBlobArray(PActualRecord + dataset.GetOffSetsBlobs)^[ds.Fields[B].Offset]) //Pointer(@PMemBlobArray(vActualRecord.Blobs)^[ds.Fields[B].Offset])
+            PData    := Pointer(@PMemBlobArray(PActualRecord + dataset.GetOffSetsBlobs)^[aField.Offset]) //Pointer(@PMemBlobArray(vActualRecord.Blobs)^[ds.Fields[B].Offset])
            else
             PData    := Pointer(PActualRecord + dataset.GetOffSets(aIndex));
           end;
          End;
         if (PData <> nil) Or
-           (ds.FindField(FFieldNames[B]) = Nil) Then begin
+           (aField = Nil) Then begin
             case FieldTypeToDWFieldType(aDataType) of
               dwftWideString,
               dwftFixedWideChar : Begin
-                                   If ds.FindField(FFieldNames[B]) <> Nil Then
+                                   If aField <> Nil Then
                                     Begin
-                                     cLen := Dataset.GetCalcFieldLen(ds.Fields[B].DataType, ds.Fields[B].Size);
+                                     cLen := Dataset.GetCalcFieldLen(aField.DataType, aField.Size);
                                      {$IFDEF FPC}
                                       FillChar(PData^, cLen , #0);
                                      {$ELSE}
@@ -309,14 +311,14 @@ Begin
                                          S := DecodeStrings(S, csUndefined);
                                         S := GetStringEncode(S, csUndefined);
                                         L := (Length(S)+1)*SizeOf(WideChar);
-                                        If ds.FindField(FFieldNames[B]) <> Nil Then
+                                        If aField <> Nil Then
                                          Move(Pointer(WideString(S))^, PData^, L);
                                        {$ELSE}
                                         Stream.Read(S[InitStrPos], L);
                                         if EncodeStrs then
                                          S := DecodeStrings(S);
                                         L := (Length(S)+1)*SizeOf(WideChar);
-                                        If ds.FindField(FFieldNames[B]) <> Nil Then
+                                        If aField <> Nil Then
                                          Move(WideString(S)[InitStrPos], PData^, L);
                                        {$ENDIF}
                                       End;
@@ -324,9 +326,9 @@ Begin
                                   End;
               dwftFixedChar,
               dwftString : Begin
-                            If ds.FindField(FFieldNames[B]) <> Nil Then
+                            If aField <> Nil Then
                              Begin
-                              cLen := Dataset.GetCalcFieldLen(ds.Fields[B].DataType, ds.Fields[B].Size);
+                              cLen := Dataset.GetCalcFieldLen(aField.DataType, aField.Size);
                               {$IFDEF FPC}
                                FillChar(PData^, cLen , #0);
                               {$ELSE}
@@ -345,13 +347,13 @@ Begin
                                  if EncodeStrs then
                                    S := DecodeStrings(S, csUndefined);
                                  S := GetStringEncode(S, csUndefined);
-                                 If ds.FindField(FFieldNames[B]) <> Nil Then
+                                 If aField <> Nil Then
                                   Move(Pointer(S)^, PData^, Length(S));
                                 {$ELSE}
                                  Stream.Read(S[InitStrPos], L);
                                  If EncodeStrs Then
                                   S := DecodeStrings(S);
-                                 If ds.FindField(FFieldNames[B]) <> Nil Then
+                                 If aField <> Nil Then
                                   Move(S[InitStrPos], PData^, Length(S));
                                 {$ENDIF}
                                End;
@@ -365,7 +367,7 @@ Begin
               dwftAutoInc :  Begin
                               If Not Bool Then
                                Begin
-                                If ds.FindField(FFieldNames[B]) <> Nil Then
+                                If aField <> Nil Then
                                  Stream.Read(PData^, Sizeof(Integer))
                                 Else
                                  Stream.Read(dInt, Sizeof(Integer));
@@ -382,7 +384,7 @@ Begin
               dwftSingle   : Begin
                               If Not Bool Then
                                Begin
-                                If ds.FindField(FFieldNames[B]) <> Nil Then
+                                If aField <> Nil Then
                                  Stream.Read(PData^, Sizeof(Real))
                                 Else
                                  Stream.Read(dReal, Sizeof(Real));
@@ -399,7 +401,7 @@ Begin
               dwftExtended : Begin
                               If Not Bool Then
                                Begin
-                                If ds.FindField(FFieldNames[B]) <> Nil Then
+                                If aField <> Nil Then
                                  Stream.Read(PData^, Sizeof(Extended))
                                 Else
                                  Stream.Read(dExt, Sizeof(Extended));
@@ -416,7 +418,7 @@ Begin
               dwftFloat    : Begin
                               If Not Bool Then
                                Begin
-                                If ds.FindField(FFieldNames[B]) <> Nil Then
+                                If aField <> Nil Then
                                  Stream.Read(PData^, Sizeof(Real))
                                 Else
                                  Stream.Read(dReal, Sizeof(Real));
@@ -434,7 +436,7 @@ Begin
                               If Not Bool Then
                                Begin
                                 Stream.Read(Cr, Sizeof(Currency));
-                                If ds.FindField(FFieldNames[B]) <> Nil Then
+                                If aField <> Nil Then
                                  Begin
                                   {$IFDEF FPC}
                                     bcd := CurrToBCD(Cr);
@@ -457,7 +459,7 @@ Begin
               dwftBCD      : Begin
                               If Not Bool Then
                                Begin
-                                If ds.FindField(FFieldNames[B]) <> Nil Then
+                                If aField <> Nil Then
                                  Stream.Read(PData^, Sizeof(Currency))
                                 Else
                                  Stream.Read(Cr, Sizeof(Currency));
@@ -474,7 +476,7 @@ Begin
               dwftDate,
               dwftTime,
               dwftDateTime : Begin
-                              If ds.FindField(FFieldNames[B]) <> Nil Then
+                              If aField <> Nil Then
                                Begin
                                 If Not Bool Then
                                  Begin
@@ -509,7 +511,7 @@ Begin
                              End;
               dwftTimeStampOffset,
               dwftTimeStamp : Begin
-                               If ds.FindField(FFieldNames[B]) <> Nil Then
+                               If aField <> Nil Then
                                 Begin
                                  If Not Bool Then
                                   Begin
@@ -534,7 +536,7 @@ Begin
                               End;
               dwftLongWord,
               dwftLargeint : Begin
-                              If ds.FindField(FFieldNames[B]) <> Nil Then
+                              If aField <> Nil Then
                                Begin
                                 If Not Bool Then
                                  Stream.Read(PData^, Sizeof(LongInt))
@@ -554,7 +556,7 @@ Begin
                                End;
                              End;
               dwftBoolean  : Begin
-                              If ds.FindField(FFieldNames[B]) <> Nil Then
+                              If aField <> Nil Then
                                Begin
                                 If Not Bool Then
                                  Stream.Read(PData^, Sizeof(Byte));
@@ -581,8 +583,8 @@ Begin
                             End;
                            Try
                             If Length(aBytes) > 0 Then
-                             If ds.FindField(FFieldNames[B]) <> Nil Then
-                              PMemBlobArray(PData)^[ds.Fields[B].Offset] := aBytes;
+                             If aField <> Nil Then
+                              PMemBlobArray(PData)^[aField.Offset] := aBytes;
                            Finally
                             SetLength(aBytes, 0);
                            End;
@@ -597,17 +599,17 @@ Begin
                              if EncodeStrs then
                                S := DecodeStrings(S, csUndefined);
                              S := GetStringEncode(S, csUndefined);
-                             If ds.FindField(FFieldNames[B]) <> Nil Then
+                             If aField <> Nil Then
                               Move(Pointer(S)^, PData^, Length(S));
                             {$ELSE}
                              Stream.Read(S[InitStrPos], L);
                              if EncodeStrs then
                               S := DecodeStrings(S);
-                             If ds.FindField(FFieldNames[B]) <> Nil Then
+                             If aField <> Nil Then
                              Move(S[InitStrPos], PData^, Length(S));
                             {$ENDIF}
                           end;
-                          If ds.FindField(FFieldNames[B]) <> Nil Then
+                          If aField <> Nil Then
                           Move(S[1], PData^, L)
                          End;
 

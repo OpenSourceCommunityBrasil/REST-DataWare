@@ -2263,7 +2263,7 @@ Begin
    aFieldCount := aFields.Count;
    Matched := CompareRecord;
    If Matched Then
-    Result := FieldValues[ResultFields]
+    Result := ToBytes(FieldValues[ResultFields])
    Else
     Begin
      SaveState := SetTempState(dsCalcFields);
@@ -2279,7 +2279,7 @@ Begin
         End;
       Finally
        If Matched Then
-        Result := FieldValues[ResultFields];
+        Result := ToBytes(FieldValues[ResultFields]);
       End;
      Finally
       RestoreState(SaveState);
