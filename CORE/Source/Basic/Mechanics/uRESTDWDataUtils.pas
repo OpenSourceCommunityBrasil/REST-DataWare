@@ -1464,16 +1464,16 @@ Constructor TRESTDWClientAuthOptionParams.Create(AOwner: TPersistent);
 Begin
  inherited Create;
  FOwner             := AOwner;
- RDWAuthOption      := rdwAONone;
  RDWAuthOptionParam := Nil;
+ RDWAuthOption      := rdwAONone;
 End;
 
 Constructor TRESTDWServerAuthOptionParams.Create(AOwner: TPersistent);
 Begin
  inherited Create;
  FOwner             := AOwner;
- RDWAuthOption      := rdwAONone;
  RDWAuthOptionParam := Nil;
+ RDWAuthOption      := rdwAONone;
 End;
 
 Procedure TRESTDWClientAuthOptionParams.DestroyParam;
@@ -1596,6 +1596,7 @@ End;
 
 Constructor TRESTDWAuthOptionParam.Create;
 Begin
+ Inherited;
  vCustomAuthMessage      := 'Protected Space...';
  vCustom404TitleMessage  := '(404) The address you are looking for does not exist';
  vCustom404BodyMessage   := '404';
