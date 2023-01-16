@@ -380,41 +380,96 @@ Begin
                                End;
                              End;
               dwftSingle   : Begin
-                              If ds.FindField(FFieldNames[B]) <> Nil Then
-                               Stream.Read(PData^, Sizeof(Real))
+                              If Not Bool Then
+                               Begin
+                                If ds.FindField(FFieldNames[B]) <> Nil Then
+                                 Stream.Read(PData^, Sizeof(Real))
+                                Else
+                                 Stream.Read(dReal, Sizeof(Real));
+                               End
                               Else
-                               Stream.Read(dReal, Sizeof(Real));
-                             End;
-              dwftExtended : Begin
-                              If ds.FindField(FFieldNames[B]) <> Nil Then
-                               Stream.Read(PData^, Sizeof(Extended))
-                              Else
-                               Stream.Read(dExt, Sizeof(Extended));
-                             End;
-              dwftFloat    : Begin
-                              If ds.FindField(FFieldNames[B]) <> Nil Then
-                               Stream.Read(PData^, Sizeof(Real))
-                              Else
-                               Stream.Read(dReal, Sizeof(Real));
-                             End;
-              dwftFMTBcd   : Begin
-                              Stream.Read(Cr, Sizeof(Currency));
-                              If ds.FindField(FFieldNames[B]) <> Nil Then
                                Begin
                                 {$IFDEF FPC}
-                                  bcd := CurrToBCD(Cr);
+                                 FillChar(PData^, 1, 'S');
                                 {$ELSE}
-                                  bcd := DoubleToBcd(Cr);
+                                 FillChar(PData^, 1, 'S');
                                 {$ENDIF}
-                                Move(bcd, PData^, Sizeof(bcd));
+                               End;
+                             End;
+              dwftExtended : Begin
+                              If Not Bool Then
+                               Begin
+                                If ds.FindField(FFieldNames[B]) <> Nil Then
+                                 Stream.Read(PData^, Sizeof(Extended))
+                                Else
+                                 Stream.Read(dExt, Sizeof(Extended));
+                               End
+                              Else
+                               Begin
+                                {$IFDEF FPC}
+                                 FillChar(PData^, 1, 'S');
+                                {$ELSE}
+                                 FillChar(PData^, 1, 'S');
+                                {$ENDIF}
+                               End;
+                             End;
+              dwftFloat    : Begin
+                              If Not Bool Then
+                               Begin
+                                If ds.FindField(FFieldNames[B]) <> Nil Then
+                                 Stream.Read(PData^, Sizeof(Real))
+                                Else
+                                 Stream.Read(dReal, Sizeof(Real));
+                               End
+                              Else
+                               Begin
+                                {$IFDEF FPC}
+                                 FillChar(PData^, 1, 'S');
+                                {$ELSE}
+                                 FillChar(PData^, 1, 'S');
+                                {$ENDIF}
+                               End;
+                             End;
+              dwftFMTBcd   : Begin
+                              If Not Bool Then
+                               Begin
+                                Stream.Read(Cr, Sizeof(Currency));
+                                If ds.FindField(FFieldNames[B]) <> Nil Then
+                                 Begin
+                                  {$IFDEF FPC}
+                                    bcd := CurrToBCD(Cr);
+                                  {$ELSE}
+                                    bcd := DoubleToBcd(Cr);
+                                  {$ENDIF}
+                                  Move(bcd, PData^, Sizeof(bcd));
+                                 End;
+                               End
+                              Else
+                               Begin
+                                {$IFDEF FPC}
+                                 FillChar(PData^, 1, 'S');
+                                {$ELSE}
+                                 FillChar(PData^, 1, 'S');
+                                {$ENDIF}
                                End;
                              End;
               dwftCurrency,
               dwftBCD      : Begin
-                              If ds.FindField(FFieldNames[B]) <> Nil Then
-                               Stream.Read(PData^, Sizeof(Currency))
+                              If Not Bool Then
+                               Begin
+                                If ds.FindField(FFieldNames[B]) <> Nil Then
+                                 Stream.Read(PData^, Sizeof(Currency))
+                                Else
+                                 Stream.Read(Cr, Sizeof(Currency));
+                               End
                               Else
-                               Stream.Read(Cr, Sizeof(Currency));
+                               Begin
+                                {$IFDEF FPC}
+                                 FillChar(PData^, 1, 'S');
+                                {$ELSE}
+                                 FillChar(PData^, 1, 'S');
+                                {$ENDIF}
+                               End;
                              End;
               dwftDate,
               dwftTime,
@@ -525,8 +580,9 @@ Begin
                               End;
                             End;
                            Try
-                            If ds.FindField(FFieldNames[B]) <> Nil Then
-                             PMemBlobArray(PData)^[ds.Fields[B].Offset] := aBytes;
+                            If Length(aBytes) > 0 Then
+                             If ds.FindField(FFieldNames[B]) <> Nil Then
+                              PMemBlobArray(PData)^[ds.Fields[B].Offset] := aBytes;
                            Finally
                             SetLength(aBytes, 0);
                            End;

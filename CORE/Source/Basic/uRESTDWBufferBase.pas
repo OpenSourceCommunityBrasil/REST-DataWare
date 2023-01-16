@@ -353,9 +353,9 @@ Begin
      End;
      If aResetPosition Then
       ResetPosition;
-    End
-   Else
-    Raise Exception.Create('Range Check Error on LoadFromStream, Size and position error...');
+    End;
+//   Else
+//    Raise Exception.Create('Range Check Error on LoadFromStream, Size and position error...');
   End;
 End;
 
