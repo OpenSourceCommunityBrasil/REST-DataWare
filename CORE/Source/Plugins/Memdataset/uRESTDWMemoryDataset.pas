@@ -888,6 +888,7 @@ begin
   Offset := 0;
   inherited InitFieldDefsFromFields;
   { Calculate fields offsets }
+  //Actual TODO XyberX
   SetLength(FOffsets, FieldDefs.Count);
   FieldDefs.Update;
   FieldDefsUpdated := FieldDefs.Updated;
@@ -1273,7 +1274,6 @@ begin
                                                                              {$ELSE}PChar(Data){$IFEND}
                                                                 {$ELSE}PAnsiChar(Data){$ENDIF} <> #0);
         {$IFEND}
-        //Actual TODO XyberX
         ftWord,
         ftAutoInc,
         {$IFNDEF FPC}
@@ -1974,6 +1974,7 @@ begin
   end;
   if not InfoQuery then
   begin
+    //Actual TODO Xyberx
     if FieldCount > 0 then
       FieldDefs.Clear;
     InitFieldDefsFromFields;
@@ -2196,8 +2197,8 @@ end;
 function TRESTDWMemTable.Lookup(const KeyFields: string; const KeyValues: Variant;
   const ResultFields: string): Variant;
 var
+  aFieldCount: Integer;
   {$IFNDEF FPC}
-   FieldCount: Integer;
    aFields   : TList{$IFDEF RTL240_UP}<TField>{$ENDIF RTL240_UP};
   {$ELSE}
    aFields   : TFields;
@@ -2206,7 +2207,7 @@ var
   SaveState: TDataSetState;
   I: Integer;
   Matched: Boolean;
-  function CompareField(var Field: TField; Value: Variant): Boolean; {BG}
+  function CompareField(Field: TField; Value: Variant): Boolean; {BG}
   var
     S: string;
   begin
@@ -2227,7 +2228,7 @@ var
   var
     I: Integer;
   begin
-    if FieldCount = 1 then
+    if aFieldCount = 1 then
     begin
       Fld := TField(Fields[0]);
       Result := CompareField(Fld, KeyValues);
@@ -2235,58 +2236,60 @@ var
     else
     begin
       Result := True;
-      for I := 0 to FieldCount - 1 do
+      for I := 0 to aFieldCount - 1 do
       begin
         Fld := TField(Fields[I]);
         Result := Result and CompareField(Fld, KeyValues[I]);
       end;
     end;
   end;
-begin
+Begin
   Result := Null;
   CheckBrowseMode;
-  if IsEmpty then
-    Exit;
+  //Actual TODO Xyberx
+  If IsEmpty Then
+   Exit;
   {$IFNDEF FPC}
    aFields := TList{$IFDEF RTL240_UP}<TField>{$ENDIF RTL240_UP}.Create;
   {$ELSE}
    aFields := TFields.Create(Nil);
   {$ENDIF}
-  try
+  Try
+   {$IFNDEF FPC}
+    GetFieldList(aFields, KeyFields);
+   {$ELSE}
     GetFieldList(TList(aFields), KeyFields);
-    {$IFNDEF FPC}
-     aFields := TList{$IFDEF RTL240_UP}<TField>{$ENDIF RTL240_UP}.Create;
-    {$ELSE}
-     aFields := TFields.Create(Nil);
-    {$ENDIF}
-    Matched := CompareRecord;
-    if Matched then
-      Result := FieldValues[ResultFields]
-    else
-    begin
-      SaveState := SetTempState(dsCalcFields);
-      try
-        try
-          for I := 0 to RecordCount - 1 do
-          begin
-            RecordToBuffer(Records[I], PJvMemBuffer(TempBuffer));
-            CalculateFields(TempBuffer);
-            Matched := CompareRecord;
-            if Matched then
-              Break;
-          end;
-        finally
-          if Matched then
-            Result := FieldValues[ResultFields];
-        end;
-      finally
-        RestoreState(SaveState);
-      end;
-    end;
-  finally
-    Fields.Free;
-  end;
-end;
+   {$ENDIF}
+   aFieldCount := aFields.Count;
+   Matched := CompareRecord;
+   If Matched Then
+    Result := FieldValues[ResultFields]
+   Else
+    Begin
+     SaveState := SetTempState(dsCalcFields);
+     Try
+      Try
+       For I := 0 To RecordCount - 1 Do
+        Begin
+         RecordToBuffer(Records[I], PJvMemBuffer(TempBuffer));
+         CalculateFields(TempBuffer);
+         Matched := CompareRecord;
+         If Matched Then
+          Break;
+        End;
+      Finally
+       If Matched Then
+        Result := FieldValues[ResultFields];
+      End;
+     Finally
+      RestoreState(SaveState);
+     End;
+    End;
+  Finally
+   FreeAndNil(aFields);
+  End;
+End;
+
 procedure TRESTDWMemTable.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
@@ -3431,7 +3434,6 @@ Var
  aBytes  : TRESTDWBytes;
  aRecNo  : Integer;
 begin
-  //Actual TODO XyberX
   Result := 0;
   if FOpened then
   begin
@@ -3461,7 +3463,6 @@ begin
       Begin
        SetLength(aBytes, Result);
        Try
-        //Actual TODO XyberX
         Move(PRESTDWBytes(FActualBlob)^[FPosition], aBytes[0], Result);
        Finally
         Move(aBytes[0], Buffer, Result);

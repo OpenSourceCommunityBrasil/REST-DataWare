@@ -10416,23 +10416,23 @@ Var
   Try
    If vTempDS <> Nil Then
     Begin
-     If (vTempDS.FieldDefs.Count > 0) Then
+     If (vTempDS.Fields.Count > 0) Then
       Begin
-       For J := 0 To vTempDS.FieldDefs.Count - 1 Do
+       For J := 0 To vTempDS.Fields.Count - 1 Do
         Begin
-         vFieldDefinition.FieldName := vTempDS.FieldDefs[J].Name;
-         vFieldDefinition.DataType  := vTempDS.FieldDefs[J].DataType;
+         vFieldDefinition.FieldName := vTempDS.Fields[J].Name;
+         vFieldDefinition.DataType  := vTempDS.Fields[J].DataType;
          If (vFieldDefinition.DataType <> ftFloat) Then
-          vFieldDefinition.Size     := vTempDS.FieldDefs[J].Size
+          vFieldDefinition.Size     := vTempDS.Fields[J].Size
          Else
           vFieldDefinition.Size         := 0;
          If (vFieldDefinition.DataType In [ftCurrency, ftBCD,
                                            {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
                                            {$IFEND}{$ENDIF} ftFMTBcd]) Then
-          vFieldDefinition.Precision := TBCDField(vTempDS.FieldDefs[J]).Precision
+          vFieldDefinition.Precision := TBCDField(vTempDS.Fields[J]).Precision
          Else If (vFieldDefinition.DataType = ftFloat) Then
-          vFieldDefinition.Precision := TFloatField(vTempDS.FieldDefs[J]).Precision;
-         vFieldDefinition.Required   := vTempDS.FieldDefs[J].Required;
+          vFieldDefinition.Precision := TFloatField(vTempDS.Fields[J]).Precision;
+         vFieldDefinition.Required   := vTempDS.Fields[J].Required;
          NewDataField(vFieldDefinition);
         End;
       End;
@@ -10603,11 +10603,10 @@ Begin
         LDataSetList.WriteToDataset(dtFull, vValue, Self, vJsonCount, vDatapacks, vActualRec)
        Else
         Begin
-//         vStream         := DecodeStream(vValue);
          If (csDesigning in ComponentState) Then //Clone end compare Fields
           Begin
            vStream.Position := 0;
-           vTempDS := TRESTDWClientSQL.Create(Nil);
+           vTempDS := TRESTDWClientSQLBase.Create(Nil);
            Try
             TRESTDWClientSQLBase(vTempDS).LoadFromStream(TMemoryStream(vStream));
             NewBinaryFieldList;

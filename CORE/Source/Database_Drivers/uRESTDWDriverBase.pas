@@ -698,7 +698,7 @@ begin
     stor := TRESTDWStorageBinRDW.Create(nil);
     try
       stor.EncodeStrs := False;
-      stor.SaveToStream(qry,stream);
+      stor.SaveToStream(qry, stream);
     finally
       stor.Free;
     end;
@@ -3731,26 +3731,10 @@ Begin
       FreeAndNil(vParamsStream);
     End;
     vTempQuery.Open;
-    vStream := Nil;
-    If aBinaryCompatibleMode Then begin
-      vStream := TMemoryStream.Create;
-      Try
-       vTempQuery.SaveToStreamCompatibleMode(vStream);
-       vStream.Position := 0;
-      Finally
-      End;
-    end
-    Else
-     Begin
-      vStream := TMemoryStream.Create;
-      Try
-       vTempQuery.SaveToStream(vStream);
-       vStream.Position := 0;
-      Finally
-      End;
-     End;
-    //Gera o Binario
+    vStream := TMemoryStream.Create;
     Try
+     vTempQuery.SaveToStreamCompatibleMode(vStream);
+     vStream.Position := 0;
      BufferOutStream.InputStream(vStream);
     Finally
     If Assigned(vStream) Then
