@@ -1043,7 +1043,10 @@ begin
   vBytesOut := 0;
 
   if Assigned(DocStream) then
-    FreeAndNil(DocStream);
+  begin
+    DocStream.Free;
+    DocStream := nil;
+  end;
 
   inherited Destroy;
 end;
