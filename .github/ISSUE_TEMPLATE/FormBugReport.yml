@@ -78,7 +78,9 @@ body:
       options:
         - Windows
         - Linux
-        - Mac
+        - MacOS
+        - Android
+        - iOS
         - Outro
     validations:
       required: true
