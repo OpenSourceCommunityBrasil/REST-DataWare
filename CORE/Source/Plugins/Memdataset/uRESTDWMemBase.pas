@@ -100,10 +100,6 @@ type
    {$ENDIF}
   PPInt64 = ^PInt64;
   PPPAnsiChar = ^PPAnsiChar;
-// Int64 support
-procedure I64ToCardinals(I: Int64; out LowPart, HighPart: Cardinal);
-procedure CardinalsToI64(out I: Int64; const LowPart, HighPart: Cardinal);
-// Redefinition of TLargeInteger to relieve dependency on Windows.pas
 {$IFNDEF FPC}
 type
   PLargeInteger = ^TLargeInteger;
@@ -424,17 +420,6 @@ begin
   end
   else
     Result := '';
-end;
-// Int64 support
-procedure I64ToCardinals(I: Int64; out LowPart, HighPart: Cardinal);
-begin
-  LowPart := TJclULargeInteger(I).LowPart;
-  HighPart := TJclULargeInteger(I).HighPart;
-end;
-procedure CardinalsToI64(out I: Int64; const LowPart, HighPart: Cardinal);
-begin
-  TJclULargeInteger(I).LowPart := LowPart;
-  TJclULargeInteger(I).HighPart := HighPart;
 end;
 // Cross Platform Compatibility
 {$IFNDEF XPLATFORM_RTL}
