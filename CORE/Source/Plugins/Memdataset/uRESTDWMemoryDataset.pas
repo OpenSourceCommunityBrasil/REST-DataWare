@@ -1250,29 +1250,25 @@ begin
      Result := (Field is TBlobField);
      If Not Result Then
       Result := Data <> Nil;
-//      If Not DataTypeIsBlobTypes(Field.DataType) Then
-//      Inc(Data);
-      case Field.DataType of
-        ftGuid:
-          Result := Result and(StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
-                                                   {$ELSE}PChar(Data){$IFEND}
-                                      {$ELSE}PAnsiChar(Data){$ENDIF}) > 0);
-        ftString, ftFixedChar:
-          Result := Result and (not TrimEmptyString or ((StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
-                                                                             {$ELSE}PChar(Data){$IFEND}
-                                                                {$ELSE}PAnsiChar(Data){$ENDIF}) > 0))) And
-                                                               ({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
-                                                                             {$ELSE}PChar(Data){$IFEND}
-                                                                {$ELSE}PAnsiChar(Data){$ENDIF} <> #0);
+      Case Field.DataType Of
+        ftGuid      : Result := Result and(StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
+                                                  {$ELSE}PChar(Data){$IFEND}
+                                                  {$ELSE}PAnsiChar(Data){$ENDIF}) > 0);
+        ftString,
+        ftFixedChar : Result := Result and (not TrimEmptyString or ((StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
+                                                                            {$ELSE}PChar(Data){$IFEND}
+                                                                            {$ELSE}PAnsiChar(Data){$ENDIF}) > 0))) And
+                                                                           ({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
+                                                                            {$ELSE}PChar(Data){$IFEND}
+                                                                            {$ELSE}PAnsiChar(Data){$ENDIF} <> #0);
         {$IF DEFINED(FPC) OR DEFINED(COMPILER10_UP)}
-          ftFixedWideChar,
-          ftWideString:
-            Result := Result and (not TrimEmptyString or (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PChar(Data)
-                                                                              {$ELSE}PChar(Data){$IFEND}
-                                                                              {$ELSE}PWideChar(Data){$ENDIF}) > 0)) And
-                                                                ({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
+         ftFixedWideChar,
+         ftWideString : Result := Result and (not TrimEmptyString or (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PChar(Data)
                                                                              {$ELSE}PChar(Data){$IFEND}
-                                                                {$ELSE}PAnsiChar(Data){$ENDIF} <> #0);
+                                                                             {$ELSE}PWideChar(Data){$ENDIF}) > 0)) And
+                                                                            ({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
+                                                                             {$ELSE}PChar(Data){$IFEND}
+                                                                             {$ELSE}PAnsiChar(Data){$ENDIF} <> #0);
         {$IFEND}
         ftWord,
         ftAutoInc,
@@ -1357,7 +1353,7 @@ begin
            {$IF CompilerVersion <= 22}
             If Length(TRESTDWBytes(Buffer)) = 0 Then
              Begin
-              SetLength(TRESTDWBytes(Buffer), CalcFieldLen(Field.DataType, Field.Size));
+              SetLength(TRESTDWBytes(Buffer), 1);
               If Field.DataType in [ftWord, ftAutoInc,
                                     {$IFNDEF FPC}
                                      {$IF CompilerVersion > 21}
@@ -1384,7 +1380,7 @@ begin
            {$ELSE}
             If Length(TRESTDWBytes(Buffer)) = 0 Then
              Begin
-              SetLength(TRESTDWBytes(Buffer), CalcFieldLen(Field.DataType, Field.Size));
+              SetLength(TRESTDWBytes(Buffer), 1);
               If Field.DataType in [ftWord, ftAutoInc,
                                     {$IFNDEF FPC}
                                      {$IF CompilerVersion > 21}
@@ -1472,64 +1468,163 @@ begin
 end;
   {$ENDIF RTL240_UP}
 {$ENDIF ~NEXTGEN}
-procedure TRESTDWMemTable.InternalSetFieldData(Field: TField; Buffer: Pointer; const ValidateBuffer: TJvValueBuffer);
-var
-  RecBuf: PJvMemBuffer;
-  Data: PByte;
-  VarData: Variant;
-begin
-  if not (State in dsWriteModes) then
+Procedure TRESTDWMemTable.InternalSetFieldData(Field                : TField;
+                                               Buffer               : Pointer;
+                                               Const ValidateBuffer : TJvValueBuffer);
+Var
+ PActualRecord : PJvMemBuffer;
+ Data          : {$IFDEF FPC} PAnsiChar {$ELSE} PByte {$ENDIF};
+ aBytes        : TRESTDwbytes;
+ pBytes        : PRESTDWBytes;
+ VarData       : Variant;
+ aResult,
+ IsData        : Boolean;
+ aIndex,
+ cLen          : Integer;
+ aDataType     : TFieldType;
+Begin
+ IsData := False;
+ If Not (State in dsWriteModes) Then
+  Error('Not Editing...');
+ GetActiveRecBuf(PActualRecord);
+ aResult := False;
+ If Field.FieldNo > 0 then
+  Begin
+   aDataType := Field.DataType;
+   If State In [dsCalcFields, dsFilter]   Then
     Error('Not Editing...');
-  GetActiveRecBuf(RecBuf);
-  if Field.FieldNo > 0 then
-  begin
-    if State in [dsCalcFields, dsFilter] then
-      Error('Not Editing...');
-    if Field.ReadOnly and not (State in [dsSetKey, dsFilter]) then
-      ErrorFmt('The Field %s is readonly...', [Field.DisplayName]);
-    Field.Validate(ValidateBuffer); // The non-NEXTGEN Pointer version has "TArray<Byte> := Pointer" in it what interprets an untypes pointer as dyn. array. Not good.
-    if Field.FieldKind <> fkInternalCalc then
-    begin
-      Data := FindFieldData(RecBuf, Field);
-      if Data <> nil then
-      begin
-        if Field.DataType = ftVariant then
-        begin
-          if Buffer <> nil then
-            VarData := PVariant(Buffer)^
-          else
-            VarData := EmptyParam;
-          Data^ := Ord((Buffer <> nil) and not VarIsNullEmpty(VarData));
-          if Data^ <> 0 then
-          begin
-            Inc(Data);
-            PVariant(Data)^ := VarData;
-          end
-          else
-            FillChar(Data^, CalcFieldLen(Field.DataType, Field.Size), 0);
-        end
-        else
-        begin
-          Data^ := Ord(Buffer <> nil);
-          Inc(Data);
-          if Buffer <> nil then
-            Move(Buffer^, Data^, CalcFieldLen(Field.DataType, Field.Size))
-          else
-            FillChar(Data^, CalcFieldLen(Field.DataType, Field.Size), 0);
-        end;
-      end;
+   If Field.ReadOnly                      And
+      Not (State In [dsSetKey, dsFilter]) Then
+    ErrorFmt('The Field %s is readonly...', [Field.DisplayName]);
+   Field.Validate(ValidateBuffer); // The non-NEXTGEN Pointer version has "TArray<Byte> := Pointer" in it what interprets an untypes pointer as dyn. array. Not good.
+   If Field.FieldKind <> fkInternalCalc   Then
+    Begin
+     aIndex := Field.FieldNo - 1;
+     Data := FindFieldData(PActualRecord, Field);
+     If (Data <> Nil)         Or
+        (Field Is TBlobField) Then
+      Begin
+       aResult := (Field is TBlobField);
+       If Data <> Nil Then
+        Begin
+         If Not aResult Then
+          aResult := Data <> Nil;
+        End;
+       If aResult Then
+        Begin
+         If Field.DataType = ftVariant Then
+          Begin
+           VarData := PVariant(Buffer)^;
+           PVariant(Data)^ := VarData;
+          End
+         Else If DataTypeIsBlobTypes(Field.DataType) Then
+          Begin
+           SetLength(aBytes, Length(TRESTDWBytes(Buffer)));
+           {$IFNDEF FPC}
+            {$IF CompilerVersion <= 22}
+             Move(Buffer^, aBytes[0], Length(aBytes));
+            {$ELSE}
+             Move(TRESTDWBytes(Buffer)[0], aBytes[0], Length(aBytes));
+            {$IFEND}
+           {$ELSE}
+            Move(Buffer^, aBytes[0], Length(aBytes));
+           {$ENDIF}
+           If Length(aBytes) > 0 Then
+            Begin
+             pBytes := Pointer(@PMemBlobArray(Records[RecNo -1].Blobs)^[Field.Offset]);
+             If Length(pBytes^) = 0 Then
+              Begin
+               SetLength(pBytes^, 0);
+               SetLength(pBytes^, Length(aBytes));
+              End;
+             Move(aBytes[0], pBytes^, Length(aBytes));
+            End;
+          End
+         Else
+          Begin
+           If Length(TRESTDWBytes(Buffer)) = 0 Then
+            Begin
+             If Field.DataType in [ftWord, ftAutoInc,
+                                   {$IFNDEF FPC}
+                                    {$IF CompilerVersion > 21}
+                                     ftByte,
+                                     ftShortint,
+                                     ftLongWord,
+                                    {$IFEND}
+                                   {$ENDIF}
+                                   ftLargeint, ftInteger,
+                                   ftSmallint, ftDate,
+                                   ftTime, ftDateTime,
+                                   ftTimeStamp] Then
+             Begin
+              {$IFDEF FPC}
+               FillChar(Data^, 1, 'S');
+              {$ELSE}
+               FillChar(Data^, 1, 'S');
+              {$ENDIF}
+             End;
+            End
+           Else
+            Begin
+             cLen := GetCalcFieldLen(Field.DataType, Field.Size);
+             Case FieldTypeToDWFieldType(aDataType) of
+               dwftWideString,
+               dwftFixedWideChar,
+               dwftFixedChar,
+               dwftString : Begin
+//                               If Length(TRESTDWBytes(Data))  = 0 Then
+//                                SetLength(TRESTDWBytes(Data), cLen);
+                               {$IFDEF FPC}
+                                FillChar(Data^, cLen , #0);
+                               {$ELSE}
+                                FillChar(Data^, cLen , 0);
+                               {$ENDIF}
+                            End;
+             End;
+             Move(Buffer^, Data^, cLen);
+            End;
+//    //          if Field.DataType = ftVariant then
+//         begin
+//           if Buffer <> nil then
+//             VarData := PVariant(Buffer)^
+//           else
+//             VarData := EmptyParam;
+//    /        Data^ := Ord((Buffer <> nil) and not VarIsNullEmpty(VarData));
+//           if Data^ <> 0 then
+//           begin
+//             Inc(Data);
+//             PVariant(Data)^ := VarData;
+//           end
+//           else
+//             FillChar(Data^, CalcFieldLen(Field.DataType, Field.Size), 0);
+//         end
+//         else
+//         begin
+//           Data^ := Ord(Buffer <> nil);
+//  //         Inc(Data);
+//           if Buffer <> nil then
+//             Move(Buffer^, Data^, CalcFieldLen(Field.DataType, Field.Size))
+//           else
+//             FillChar(Data^, CalcFieldLen(Field.DataType, Field.Size), 0);
+//         end;
+          End;
+        End;
+      End;
     end;
-  end
-  else {fkCalculated, fkLookup}
-  begin
-    Inc(RecBuf, FRecordSize + Field.Offset);
-    Byte(RecBuf[0]) := Ord(Buffer <> nil);
-    if Byte(RecBuf[0]) <> 0 then
-      Move(Buffer^, RecBuf[1], Field.DataSize);
-  end;
-  if not (State in [dsCalcFields, dsFilter, dsNewValue]) then
-    DataEvent(deFieldChange, NativeInt(Field));
+  End
+ Else {fkCalculated, fkLookup}
+  Begin
+   Inc(PActualRecord, FRecordSize + Field.Offset);
+   Byte(PActualRecord[0]) := Ord(Buffer <> nil);
+   If Byte(PActualRecord[0]) <> 0 then
+    Move(Buffer^, PActualRecord[1], Field.DataSize)
+   Else
+    FillChar(PActualRecord^, CalcFieldLen(Field.DataType, Field.Size), 0);
+  End;
+ If Not (State In [dsCalcFields, dsFilter, dsNewValue]) Then
+  DataEvent(deFieldChange, NativeInt(Field));
 end;
+
 procedure TRESTDWMemTable.SetFieldData(Field: TField; Buffer: TJvValueBuffer);
 begin
   InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer[0]){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer);
@@ -1863,9 +1958,9 @@ begin
       end;
     end;
   end;
-  Records[FRecordPos].Free;
   if FRecordPos >= FRecords.Count then
     Dec(FRecordPos);
+  Records[FRecordPos].Free;
   Accept := True;
   repeat
     if Filtered then
