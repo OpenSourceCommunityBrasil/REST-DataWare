@@ -29,7 +29,7 @@ unit uRESTDWOpenSslLib;
 interface
 
 uses
-   {$IFDEF WINDOWS}
+   {$IFDEF MSWINDOWS}
      Windows,
    {$ENDIF}
     Types,
@@ -22512,7 +22512,7 @@ end;
 procedure UnloadCrypto;
 begin
   if RESTDW_CRYPYO_DLL_Handle > 32 then begin
-    UnloadLibrary(RESTDW_CRYPYO_DLL_Handle);
+    FreeLibrary(RESTDW_CRYPYO_DLL_Handle);
     RESTDW_CRYPYO_DLL_Handle := 0;
   end;
 end;
@@ -22573,7 +22573,7 @@ end;
 procedure UnloadSSL;
 begin
   if RESTDW_SSL_DLL_Handle > 32 then begin
-    UnloadLibrary(RESTDW_SSL_DLL_Handle);
+    FreeLibrary(RESTDW_SSL_DLL_Handle);
     RESTDW_SSL_DLL_Handle := 0;
   end;
 end;
