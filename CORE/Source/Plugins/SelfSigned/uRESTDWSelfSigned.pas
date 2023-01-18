@@ -236,8 +236,13 @@ var
 begin
   SetLength(Result, ASize);
   Bytes := RandomBytes(ASize);
-  for I := 0 to ASize - 1 do
-    Result[I + Low(String)] := ACharset[Bytes[I] MOD Length(ACharset) + Low(String)];
+  {$IF (Defined(FPC)) or (CompilerVersion > 21)}
+    for I := 0 to ASize - 1 do
+      Result[I + Low(String)] := ACharset[Bytes[I] MOD Length(ACharset) + Low(String)];
+  {$ELSE}
+    for I := 0 to ASize - 1 do
+      Result[I + 1] := ACharset[Bytes[I] MOD Length(ACharset) + 1];
+  {$IFEND}
 end;
 
 function TRESTDWSelfSigned.RandomString(const ASize: Integer): String;
@@ -369,31 +374,31 @@ begin
   end;
 end;
 
-{$IFNDEF FPC}
-function TRESTDWSelfSigned.HMAC_SHA256(const AKey, AData: RawByteString): String;
-const
-  EVP_MAX_MD_SIZE = 64;
-var
-  MessageAuthCode: PByte;
-  Size: Cardinal;
-  Buffer, Text: TBytes;
-begin
-  Size := EVP_MAX_MD_SIZE;
-  SetLength(Buffer, Size);
-  MessageAuthCode := HMAC(EVP_sha256, @AKey[1], Length(AKey), @AData[1], Length(AData), @Buffer[0], Size);
-  if MessageAuthCode <> nil then
+{$IF (NOT Defined(FPC)) AND (CompilerVersion > 21)}
+  function TRESTDWSelfSigned.HMAC_SHA256(const AKey, AData: RawByteString): String;
+  const
+    EVP_MAX_MD_SIZE = 64;
+  var
+    MessageAuthCode: PByte;
+    Size: Cardinal;
+    Buffer, Text: TBytes;
   begin
-    SetLength(Text, Size * 2);
-    BinToHex(Buffer, 0, Text, 0, Size);
-    Result := TEncoding.UTF8.GetString(Text).ToLower;
+    Size := EVP_MAX_MD_SIZE;
+    SetLength(Buffer, Size);
+    MessageAuthCode := HMAC(EVP_sha256, @AKey[1], Length(AKey), @AData[1], Length(AData), @Buffer[0], Size);
+    if MessageAuthCode <> nil then
+    begin
+      SetLength(Text, Size * 2);
+      BinToHex(Buffer, 0, Text, 0, Size);
+      Result := TEncoding.UTF8.GetString(Text).ToLower;
+    end;
   end;
-end;
 {$ELSE}
-function TRESTDWSelfSigned.HMAC_SHA256(const AKey, AData: RawByteString): String;
-begin
-  Result := EncryptSHA256(AKey,AData,True);
-end;
-{$ENDIF}
+  function TRESTDWSelfSigned.HMAC_SHA256(const AKey, AData: RawByteString): String;
+  begin
+    Result := EncryptSHA256(AKey,AData,True);
+  end;
+{$IFEND}
 
 function TRESTDWSelfSigned.HMAC_SHA1(const AKey, AData: RawByteString): TBytes;
 const
@@ -656,14 +661,19 @@ begin
   Buffer[0] := Buffer[0] AND $7F; // Positive value
 
   Bignum := BN_new();
-  if Bignum = nil then
-    Exit(False);
+  if Bignum = nil then begin
+    Result := False;
+    Exit;
+  end;
 
   try
     BN_bin2bn(Pointer(Buffer), Length(Buffer), Bignum);
     Serial := ASN1_INTEGER_new();
-    if Serial = nil then
-      Exit(False);
+    if Serial = nil then begin
+      Result := False;
+      Exit;
+    end;
+    
     try
       { Set the serial number }
       BN_to_ASN1_INTEGER(Bignum, Serial);
@@ -693,17 +703,23 @@ begin
 
   { Create a self-signed certificate }
   FCertificate := X509_new();
-  if FCertificate = nil then
-    Exit(False);
+  if FCertificate = nil then begin
+    Result := False;
+    Exit;
+  end;
 
   try
     { Set version to X509v3 }
-    if X509_set_version(FCertificate, 2) <> 1 then
-      Exit(False);
+    if X509_set_version(FCertificate, 2) <> 1 then begin
+      Result := False;
+      Exit;
+    end;
 
     { Set random serial }
-    if not SetRandomSerial(FCertificate) then
-      Exit(False);
+    if not SetRandomSerial(FCertificate) then begin
+      Result := False;
+      Exit;
+    end;
 
     { Set expiration of the certificate }
     X509_gmtime_adj(X509_get_notBefore(FCertificate), 0);
@@ -724,15 +740,19 @@ begin
     end;
 
     { Set issuer to subject }
-    if X509_set_issuer_name(FCertificate, AName) <> 1 then
-      Exit(False);
+    if X509_set_issuer_name(FCertificate, AName) <> 1 then begin
+      Result := False;
+      Exit;
+    end;
 
     { Set the server name }
     if FServerName <> '' then  begin
       AServerName := 'DNS:' + AnsiString(FServerName);
       Extension := X509V3_EXT_conf_nid(nil, nil, NID_subject_alt_name, PAnsiChar(AServerName));
-      if Extension = nil then
-        Exit(False);
+      if Extension = nil then begin
+        Result := False;
+        Exit;
+      end;
       try
         X509_add_ext(FCertificate, Extension, -1);
       finally
@@ -742,22 +762,30 @@ begin
 
     DoKeyPair;
 
-    if FPrivateKey = nil then
-      Exit(False);
+    if FPrivateKey = nil then begin
+      Result := False;
+      Exit;
+    end;
 
     try
       { Assign the public key from the private key }
-      if X509_set_pubkey(FCertificate, FPrivateKey) <> 1 then
-        Exit(False);
+      if X509_set_pubkey(FCertificate, FPrivateKey) <> 1 then begin
+        Result := False;
+        Exit;
+      end;
 
       { V8.51 no digest for EVP_PKEY_ED25519 }
       if EVP_PKEY_base_id(FPrivateKey) = EVP_PKEY_ED25519 then begin
-        if X509_sign(FCertificate, FPrivateKey, nil) = 0 then
-          Exit(False);
+        if X509_sign(FCertificate, FPrivateKey, nil) = 0 then begin
+          Result := False;
+          Exit;
+        end;
       end
       else begin
-        if X509_sign(FCertificate, FPrivateKey, SslGetEVPDigest(FCertDigest)) <= 0 then
-          Exit(False);
+        if X509_sign(FCertificate, FPrivateKey, SslGetEVPDigest(FCertDigest)) <= 0 then begin
+          Result := False;
+          Exit;
+        end;
       end;
 
       Result := True;

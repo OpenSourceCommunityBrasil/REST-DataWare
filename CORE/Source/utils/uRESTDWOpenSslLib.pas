@@ -8791,6 +8791,18 @@ const
   WHIRLPOOL_COUNTER = (256 div 8);
 
 type
+  // declaradas para delphi7
+  {$IF (NOT Defined(FPC)) and (CompilerVersion < 22)}
+    PUTF8Char = PAnsiChar;
+    UTF8Char = AnsiChar;
+    _PAnsiChr = PAnsiChar;
+    MarshaledAString = _PAnsiChr;
+    UInt8 = Byte;
+    UInt16 = Word;
+    UInt32 = Cardinal;
+    TBytes = array of byte;
+    RawByteString = ansiString;
+  {$IFEND}
   // Forward declarations
   PPUTF8Char = ^PUTF8Char;
   PPPUTF8Char = ^PPUTF8Char;
@@ -9545,7 +9557,7 @@ type
 
   PCRYPTO_EX_free = procedure(parent: Pointer; ptr: Pointer; ad: PCRYPTO_EX_DATA; idx: Integer; argl: Integer; argp: Pointer); cdecl;
 
-  PCRYPTO_EX_dup = function(&to: PCRYPTO_EX_DATA; from: PCRYPTO_EX_DATA; from_d: Pointer; idx: Integer; argl: Integer; argp: Pointer): Integer; cdecl;
+  PCRYPTO_EX_dup = function(vto: PCRYPTO_EX_DATA; from: PCRYPTO_EX_DATA; from_d: Pointer; idx: Integer; argl: Integer; argp: Pointer): Integer; cdecl;
 
   crypto_threadid_st = record
     dummy: Integer;
@@ -9600,7 +9612,7 @@ type
 
   asn1_string_st = record
     length: Integer;
-    &type: Integer;
+    vtype: Integer;
     data: PByte;
     flags: Integer;
   end;
@@ -9719,8 +9731,8 @@ type
       0: (ptr: PUTF8Char);
       1: (boolean: ASN1_BOOLEAN);
       2: (asn1_string: PASN1_STRING);
-      3: (&object: PASN1_OBJECT);
-      4: (&integer: PASN1_INTEGER);
+      3: (vobject: PASN1_OBJECT);
+      4: (vinteger: PASN1_INTEGER);
       5: (enumerated: PASN1_ENUMERATED);
       6: (bit_string: PASN1_BIT_STRING);
       7: (octet_string: PASN1_OCTET_STRING);
@@ -9734,14 +9746,14 @@ type
       15: (generalizedtime: PASN1_GENERALIZEDTIME);
       16: (visiblestring: PASN1_VISIBLESTRING);
       17: (utf8string: PASN1_UTF8STRING);
-      18: (&set: PASN1_STRING);
+      18: (vset: PASN1_STRING);
       19: (sequence: PASN1_STRING);
       20: (asn1_value: PASN1_VALUE);
   end;
   P_anonymous_type_1 = ^_anonymous_type_1;
 
   asn1_type_st = record
-    &type: Integer;
+    vtype: Integer;
     value: _anonymous_type_1;
   end;
 
@@ -9827,21 +9839,21 @@ type
   ASN1_TLC = ASN1_TLC_st;
   PASN1_TLC = ^ASN1_TLC;
 
-  PASN1_ex_d2i = function(pval: PPASN1_VALUE; &in: PPByte; len: Integer; it: PASN1_ITEM; tag: Integer; aclass: Integer; opt: UTF8Char; ctx: PASN1_TLC): Integer; cdecl;
+  PASN1_ex_d2i = function(pval: PPASN1_VALUE; vin: PPByte; len: Integer; it: PASN1_ITEM; tag: Integer; aclass: Integer; opt: UTF8Char; ctx: PASN1_TLC): Integer; cdecl;
 
-  PASN1_ex_i2d = function(pval: PPASN1_VALUE; &out: PPByte; it: PASN1_ITEM; tag: Integer; aclass: Integer): Integer; cdecl;
+  PASN1_ex_i2d = function(pval: PPASN1_VALUE; vout: PPByte; it: PASN1_ITEM; tag: Integer; aclass: Integer): Integer; cdecl;
 
   PASN1_ex_new_func = function(pval: PPASN1_VALUE; it: PASN1_ITEM): Integer; cdecl;
 
   PASN1_ex_free_func = procedure(pval: PPASN1_VALUE; it: PASN1_ITEM); cdecl;
 
-  PASN1_ex_print_func = function(&out: PBIO; pval: PPASN1_VALUE; indent: Integer; fname: PUTF8Char; pctx: PASN1_PCTX): Integer; cdecl;
+  PASN1_ex_print_func = function(vout: PBIO; pval: PPASN1_VALUE; indent: Integer; fname: PUTF8Char; pctx: PASN1_PCTX): Integer; cdecl;
 
   PASN1_primitive_i2c = function(pval: PPASN1_VALUE; cont: PByte; putype: PInteger; it: PASN1_ITEM): Integer; cdecl;
 
   PASN1_primitive_c2i = function(pval: PPASN1_VALUE; cont: PByte; len: Integer; utype: Integer; free_cont: PUTF8Char; it: PASN1_ITEM): Integer; cdecl;
 
-  PASN1_primitive_print = function(&out: PBIO; pval: PPASN1_VALUE; it: PASN1_ITEM; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
+  PASN1_primitive_print = function(vout: PBIO; pval: PPASN1_VALUE; it: PASN1_ITEM; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
 
   ASN1_EXTERN_FUNCS_st = record
     app_data: Pointer;
@@ -9868,7 +9880,7 @@ type
 
   ASN1_PRIMITIVE_FUNCS = ASN1_PRIMITIVE_FUNCS_st;
 
-  PASN1_aux_cb = function(operation: Integer; &in: PPASN1_VALUE; it: PASN1_ITEM; exarg: Pointer): Integer; cdecl;
+  PASN1_aux_cb = function(operation: Integer; vin: PPASN1_VALUE; it: PASN1_ITEM; exarg: Pointer): Integer; cdecl;
 
   ASN1_AUX_st = record
     app_data: Pointer;
@@ -9882,7 +9894,7 @@ type
   ASN1_AUX = ASN1_AUX_st;
 
   ASN1_PRINT_ARG_st = record
-    &out: PBIO;
+    vout: PBIO;
     indent: Integer;
     pctx: PASN1_PCTX;
   end;
@@ -9890,7 +9902,7 @@ type
   ASN1_PRINT_ARG = ASN1_PRINT_ARG_st;
 
   ASN1_STREAM_ARG_st = record
-    &out: PBIO;
+    vout: PBIO;
     ndef_bio: PBIO;
     boundary: PPByte;
   end;
@@ -9951,7 +9963,7 @@ type
   PCAST_KEY = ^CAST_KEY;
 
   obj_name_st = record
-    &type: Integer;
+    vtype: Integer;
     alias: Integer;
     name: PUTF8Char;
     data: PUTF8Char;
@@ -9961,7 +9973,7 @@ type
   POBJ_NAME = ^OBJ_NAME;
 
   EVP_CTRL_TLS1_1_MULTIBLOCK_PARAM = record
-    &out: PByte;
+    vout: PByte;
     inp: PByte;
     len: NativeUInt;
     interleave: Cardinal;
@@ -10276,7 +10288,7 @@ type
   PPNETSCAPE_SPKI = ^PNETSCAPE_SPKI;
 
   Netscape_certificate_sequence = record
-    &type: PASN1_OBJECT;
+    vtype: PASN1_OBJECT;
     certs: Pstack_st_X509;
   end;
 
@@ -10409,13 +10421,13 @@ type
 
   X509_LOOKUP_ctrl_fn = function(ctx: PX509_LOOKUP; cmd: Integer; argc: PUTF8Char; argl: Integer; ret: PPUTF8Char): Integer; cdecl;
 
-  X509_LOOKUP_get_by_subject_fn = function(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl;
+  X509_LOOKUP_get_by_subject_fn = function(ctx: PX509_LOOKUP; vtype: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl;
 
-  X509_LOOKUP_get_by_issuer_serial_fn = function(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; name: PX509_NAME; serial: PASN1_INTEGER; ret: PX509_OBJECT): Integer; cdecl;
+  X509_LOOKUP_get_by_issuer_serial_fn = function(ctx: PX509_LOOKUP; vtype: X509_LOOKUP_TYPE; name: PX509_NAME; serial: PASN1_INTEGER; ret: PX509_OBJECT): Integer; cdecl;
 
-  X509_LOOKUP_get_by_fingerprint_fn = function(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; bytes: PByte; len: Integer; ret: PX509_OBJECT): Integer; cdecl;
+  X509_LOOKUP_get_by_fingerprint_fn = function(ctx: PX509_LOOKUP; vtype: X509_LOOKUP_TYPE; bytes: PByte; len: Integer; ret: PX509_OBJECT): Integer; cdecl;
 
-  X509_LOOKUP_get_by_alias_fn = function(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; str: PUTF8Char; len: Integer; ret: PX509_OBJECT): Integer; cdecl;
+  X509_LOOKUP_get_by_alias_fn = function(ctx: PX509_LOOKUP; vtype: X509_LOOKUP_TYPE; str: PUTF8Char; len: Integer; ret: PX509_OBJECT): Integer; cdecl;
 
   pkcs7_issuer_and_serial_st = record
     issuer: PX509_NAME;
@@ -10551,7 +10563,7 @@ type
     length: Integer;
     state: Integer;
     detached: Integer;
-    &type: PASN1_OBJECT;
+    vtype: PASN1_OBJECT;
     d: _anonymous_type_4;
   end;
 
@@ -10647,7 +10659,7 @@ type
 
   X509V3_EXT_S2I = function(method: Pv3_ext_method; ctx: Pv3_ext_ctx; str: PUTF8Char): Pointer; cdecl;
 
-  X509V3_EXT_I2R = function(method: Pv3_ext_method; ext: Pointer; &out: PBIO; indent: Integer): Integer; cdecl;
+  X509V3_EXT_I2R = function(method: Pv3_ext_method; ext: Pointer; vout: PBIO; indent: Integer): Integer; cdecl;
 
   X509V3_EXT_R2I = function(method: Pv3_ext_method; ctx: Pv3_ext_ctx; str: PUTF8Char): Pointer; cdecl;
 
@@ -10671,7 +10683,7 @@ type
   X509V3_CONF_METHOD_st = record
     get_string: function(db: Pointer; section: PUTF8Char; value: PUTF8Char): PUTF8Char; cdecl;
     get_section: function(db: Pointer; section: PUTF8Char): Pstack_st_CONF_VALUE; cdecl;
-    free_string: procedure(db: Pointer; &string: PUTF8Char); cdecl;
+    free_string: procedure(db: Pointer; vstring: PUTF8Char); cdecl;
     free_section: procedure(db: Pointer; section: Pstack_st_CONF_VALUE); cdecl;
   end;
 
@@ -10757,7 +10769,7 @@ type
   P_anonymous_type_5 = ^_anonymous_type_5;
 
   GENERAL_NAME_st = record
-    &type: Integer;
+    vtype: Integer;
     d: _anonymous_type_5;
   end;
 
@@ -10808,7 +10820,7 @@ type
   P_anonymous_type_6 = ^_anonymous_type_6;
 
   DIST_POINT_NAME_st = record
-    &type: Integer;
+    vtype: Integer;
     name: _anonymous_type_6;
     dpname: PX509_NAME;
   end;
@@ -11042,7 +11054,7 @@ type
   P_anonymous_type_8 = ^_anonymous_type_8;
 
   ASIdOrRange_st = record
-    &type: Integer;
+    vtype: Integer;
     u: _anonymous_type_8;
   end;
 
@@ -11066,7 +11078,7 @@ type
   P_anonymous_type_9 = ^_anonymous_type_9;
 
   ASIdentifierChoice_st = record
-    &type: Integer;
+    vtype: Integer;
     u: _anonymous_type_9;
   end;
 
@@ -11100,7 +11112,7 @@ type
   P_anonymous_type_10 = ^_anonymous_type_10;
 
   IPAddressOrRange_st = record
-    &type: Integer;
+    vtype: Integer;
     u: _anonymous_type_10;
   end;
 
@@ -11124,7 +11136,7 @@ type
   P_anonymous_type_11 = ^_anonymous_type_11;
 
   IPAddressChoice_st = record
-    &type: Integer;
+    vtype: Integer;
     u: _anonymous_type_11;
   end;
 
@@ -11327,7 +11339,7 @@ type
 
   ERR_string_data_st = record
     error: Cardinal;
-    &string: PUTF8Char;
+    vstring: PUTF8Char;
   end;
 
   ERR_STRING_DATA = ERR_string_data_st;
@@ -11447,13 +11459,13 @@ type
   MDC2_CTX = mdc2_ctx_st;
   PMDC2_CTX = ^MDC2_CTX;
 
-  block128_f = procedure(&in: PByte; &out: PByte; key: Pointer); cdecl;
+  block128_f = procedure(vin: PByte; vout: PByte; key: Pointer); cdecl;
 
-  cbc128_f = procedure(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; enc: Integer); cdecl;
+  cbc128_f = procedure(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; enc: Integer); cdecl;
 
-  ctr128_f = procedure(&in: PByte; &out: PByte; blocks: NativeUInt; key: Pointer; ivec: PByte); cdecl;
+  ctr128_f = procedure(vin: PByte; vout: PByte; blocks: NativeUInt; key: Pointer; ivec: PByte); cdecl;
 
-  ccm128_f = procedure(&in: PByte; &out: PByte; blocks: NativeUInt; key: Pointer; ivec: PByte; cmac: PByte); cdecl;
+  ccm128_f = procedure(vin: PByte; vout: PByte; blocks: NativeUInt; key: Pointer; ivec: PByte; cmac: PByte); cdecl;
   PGCM128_CONTEXT = Pointer;
   PPGCM128_CONTEXT = ^PGCM128_CONTEXT;
   PCCM128_CONTEXT = Pointer;
@@ -11464,7 +11476,7 @@ type
   PPOCB128_CONTEXT = ^POCB128_CONTEXT;
 
   PArray = Pointer;
-  ocb128_f = procedure(&in: PByte; &out: PByte; blocks: NativeUInt; key: Pointer; start_block_num: NativeUInt; offset_i: PByte; L_: PArray {Parray [0..15] of Byte}; checksum: PByte); cdecl;
+  ocb128_f = procedure(vin: PByte; vout: PByte; blocks: NativeUInt; key: Pointer; start_block_num: NativeUInt; offset_i: PByte; L_: PArray {Parray [0..15] of Byte}; checksum: PByte); cdecl;
   POCSP_CERTID = Pointer;
   PPOCSP_CERTID = ^POCSP_CERTID;
 
@@ -11532,11 +11544,11 @@ type
 
   RAND_DRBG_get_entropy_fn = function(drbg: PRAND_DRBG; pout: PPByte; entropy: Integer; min_len: NativeUInt; max_len: NativeUInt; prediction_resistance: Integer): UInt64; cdecl;
 
-  RAND_DRBG_cleanup_entropy_fn = procedure(ctx: PRAND_DRBG; &out: PByte; outlen: NativeUInt); cdecl;
+  RAND_DRBG_cleanup_entropy_fn = procedure(ctx: PRAND_DRBG; vout: PByte; outlen: NativeUInt); cdecl;
 
   RAND_DRBG_get_nonce_fn = function(drbg: PRAND_DRBG; pout: PPByte; entropy: Integer; min_len: NativeUInt; max_len: NativeUInt): UInt64; cdecl;
 
-  RAND_DRBG_cleanup_nonce_fn = procedure(drbg: PRAND_DRBG; &out: PByte; outlen: NativeUInt); cdecl;
+  RAND_DRBG_cleanup_nonce_fn = procedure(drbg: PRAND_DRBG; vout: PByte; outlen: NativeUInt); cdecl;
   RC2_INT = Cardinal;
 
   rc2_key_st = record
@@ -11671,27 +11683,27 @@ type
 
   tls_session_secret_cb_fn = function(s: PSSL; secret: Pointer; secret_len: PInteger; peer_ciphers: Pstack_st_SSL_CIPHER; cipher: PPSSL_CIPHER; arg: Pointer): Integer; cdecl;
 
-  custom_ext_add_cb = function(s: PSSL; ext_type: Cardinal; &out: PPByte; outlen: PNativeUInt; al: PInteger; add_arg: Pointer): Integer; cdecl;
+  custom_ext_add_cb = function(s: PSSL; ext_type: Cardinal; vout: PPByte; outlen: PNativeUInt; al: PInteger; add_arg: Pointer): Integer; cdecl;
 
-  custom_ext_free_cb = procedure(s: PSSL; ext_type: Cardinal; &out: PByte; add_arg: Pointer); cdecl;
+  custom_ext_free_cb = procedure(s: PSSL; ext_type: Cardinal; vout: PByte; add_arg: Pointer); cdecl;
 
-  custom_ext_parse_cb = function(s: PSSL; ext_type: Cardinal; &in: PByte; inlen: NativeUInt; al: PInteger; parse_arg: Pointer): Integer; cdecl;
+  custom_ext_parse_cb = function(s: PSSL; ext_type: Cardinal; vin: PByte; inlen: NativeUInt; al: PInteger; parse_arg: Pointer): Integer; cdecl;
 
-  SSL_custom_ext_add_cb_ex = function(s: PSSL; ext_type: Cardinal; context: Cardinal; &out: PPByte; outlen: PNativeUInt; x: PX509; chainidx: NativeUInt; al: PInteger; add_arg: Pointer): Integer; cdecl;
+  SSL_custom_ext_add_cb_ex = function(s: PSSL; ext_type: Cardinal; context: Cardinal; vout: PPByte; outlen: PNativeUInt; x: PX509; chainidx: NativeUInt; al: PInteger; add_arg: Pointer): Integer; cdecl;
 
-  SSL_custom_ext_free_cb_ex = procedure(s: PSSL; ext_type: Cardinal; context: Cardinal; &out: PByte; add_arg: Pointer); cdecl;
+  SSL_custom_ext_free_cb_ex = procedure(s: PSSL; ext_type: Cardinal; context: Cardinal; vout: PByte; add_arg: Pointer); cdecl;
 
-  SSL_custom_ext_parse_cb_ex = function(s: PSSL; ext_type: Cardinal; context: Cardinal; &in: PByte; inlen: NativeUInt; x: PX509; chainidx: NativeUInt; al: PInteger; parse_arg: Pointer): Integer; cdecl;
+  SSL_custom_ext_parse_cb_ex = function(s: PSSL; ext_type: Cardinal; context: Cardinal; vin: PByte; inlen: NativeUInt; x: PX509; chainidx: NativeUInt; al: PInteger; parse_arg: Pointer): Integer; cdecl;
 
   SSL_verify_cb = function(preverify_ok: Integer; x509_ctx: PX509_STORE_CTX): Integer; cdecl;
 
   GEN_SESSION_CB = function(ssl: PSSL; id: PByte; id_len: PCardinal): Integer; cdecl;
 
-  SSL_CTX_npn_advertised_cb_func = function(ssl: PSSL; &out: PPByte; outlen: PCardinal; arg: Pointer): Integer; cdecl;
+  SSL_CTX_npn_advertised_cb_func = function(ssl: PSSL; vout: PPByte; outlen: PCardinal; arg: Pointer): Integer; cdecl;
 
-  SSL_CTX_npn_select_cb_func = function(s: PSSL; &out: PPByte; outlen: PByte; &in: PByte; inlen: Cardinal; arg: Pointer): Integer; cdecl;
+  SSL_CTX_npn_select_cb_func = function(s: PSSL; vout: PPByte; outlen: PByte; vin: PByte; inlen: Cardinal; arg: Pointer): Integer; cdecl;
 
-  SSL_CTX_alpn_select_cb_func = function(ssl: PSSL; &out: PPByte; outlen: PByte; &in: PByte; inlen: Cardinal; arg: Pointer): Integer; cdecl;
+  SSL_CTX_alpn_select_cb_func = function(ssl: PSSL; vout: PPByte; outlen: PByte; vin: PByte; inlen: Cardinal; arg: Pointer): Integer; cdecl;
 
   SSL_psk_client_cb_func = function(ssl: PSSL; hint: PUTF8Char; identity: PUTF8Char; max_identity_len: Cardinal; psk: PByte; max_psk_len: Cardinal): Cardinal; cdecl;
 
@@ -12030,7 +12042,7 @@ type
   EVP_MD_meth_set_final_final = function(ctx: PEVP_MD_CTX; md: PByte): Integer; cdecl;
 
 type
-  EVP_MD_meth_set_copy_copy = function(&to: PEVP_MD_CTX; from: PEVP_MD_CTX): Integer; cdecl;
+  EVP_MD_meth_set_copy_copy = function(vto: PEVP_MD_CTX; from: PEVP_MD_CTX): Integer; cdecl;
 
 type
   EVP_MD_meth_set_cleanup_cleanup = function(ctx: PEVP_MD_CTX): Integer; cdecl;
@@ -12042,7 +12054,7 @@ type
   EVP_CIPHER_meth_set_init_init = function(ctx: PEVP_CIPHER_CTX; key: PByte; iv: PByte; enc: Integer): Integer; cdecl;
 
 type
-  EVP_CIPHER_meth_set_do_cipher_do_cipher = function(ctx: PEVP_CIPHER_CTX; &out: PByte; &in: PByte; inl: NativeUInt): Integer; cdecl;
+  EVP_CIPHER_meth_set_do_cipher_do_cipher = function(ctx: PEVP_CIPHER_CTX; vout: PByte; vin: PByte; inl: NativeUInt): Integer; cdecl;
 
 type
   EVP_CIPHER_meth_set_cleanup_cleanup = function(p1: PEVP_CIPHER_CTX): Integer; cdecl;
@@ -12054,22 +12066,22 @@ type
   EVP_CIPHER_meth_set_get_asn1_params_get_asn1_parameters = function(p1: PEVP_CIPHER_CTX; p2: PASN1_TYPE): Integer; cdecl;
 
 type
-  EVP_CIPHER_meth_set_ctrl_ctrl = function(p1: PEVP_CIPHER_CTX; &type: Integer; arg: Integer; ptr: Pointer): Integer; cdecl;
+  EVP_CIPHER_meth_set_ctrl_ctrl = function(p1: PEVP_CIPHER_CTX; vtype: Integer; arg: Integer; ptr: Pointer): Integer; cdecl;
 
 type
   EVP_MD_CTX_set_update_fn_update = function(ctx: PEVP_MD_CTX; data: Pointer; count: NativeUInt): Integer; cdecl;
 
 type
-  EVP_CIPHER_do_all_fn = procedure(ciph: PEVP_CIPHER; from: PUTF8Char; &to: PUTF8Char; x: Pointer); cdecl;
+  EVP_CIPHER_do_all_fn = procedure(ciph: PEVP_CIPHER; from: PUTF8Char; vto: PUTF8Char; x: Pointer); cdecl;
 
 type
-  EVP_CIPHER_do_all_sorted_fn = procedure(ciph: PEVP_CIPHER; from: PUTF8Char; &to: PUTF8Char; x: Pointer); cdecl;
+  EVP_CIPHER_do_all_sorted_fn = procedure(ciph: PEVP_CIPHER; from: PUTF8Char; vto: PUTF8Char; x: Pointer); cdecl;
 
 type
-  EVP_MD_do_all_fn = procedure(ciph: PEVP_MD; from: PUTF8Char; &to: PUTF8Char; x: Pointer); cdecl;
+  EVP_MD_do_all_fn = procedure(ciph: PEVP_MD; from: PUTF8Char; vto: PUTF8Char; x: Pointer); cdecl;
 
 type
-  EVP_MD_do_all_sorted_fn = procedure(ciph: PEVP_MD; from: PUTF8Char; &to: PUTF8Char; x: Pointer); cdecl;
+  EVP_MD_do_all_sorted_fn = procedure(ciph: PEVP_MD; from: PUTF8Char; vto: PUTF8Char; x: Pointer); cdecl;
 
 type
   PPEVP_PBE_KEYGEN = Pointer;
@@ -12084,7 +12096,7 @@ type
   EVP_PKEY_asn1_set_public_pub_cmp = function(a: PEVP_PKEY; b: PEVP_PKEY): Integer; cdecl;
 
 type
-  EVP_PKEY_asn1_set_public_pub_print = function(&out: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
+  EVP_PKEY_asn1_set_public_pub_print = function(vout: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
 
 type
   EVP_PKEY_asn1_set_public_pkey_size = function(pk: PEVP_PKEY): Integer; cdecl;
@@ -12099,7 +12111,7 @@ type
   EVP_PKEY_asn1_set_private_priv_encode = function(p8: PPKCS8_PRIV_KEY_INFO; pk: PEVP_PKEY): Integer; cdecl;
 
 type
-  EVP_PKEY_asn1_set_private_priv_print = function(&out: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
+  EVP_PKEY_asn1_set_private_priv_print = function(vout: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
 
 type
   EVP_PKEY_asn1_set_param_param_decode = function(pkey: PEVP_PKEY; pder: PPByte; derlen: Integer): Integer; cdecl;
@@ -12111,13 +12123,13 @@ type
   EVP_PKEY_asn1_set_param_param_missing = function(pk: PEVP_PKEY): Integer; cdecl;
 
 type
-  EVP_PKEY_asn1_set_param_param_copy = function(&to: PEVP_PKEY; from: PEVP_PKEY): Integer; cdecl;
+  EVP_PKEY_asn1_set_param_param_copy = function(vto: PEVP_PKEY; from: PEVP_PKEY): Integer; cdecl;
 
 type
   EVP_PKEY_asn1_set_param_param_cmp = function(a: PEVP_PKEY; b: PEVP_PKEY): Integer; cdecl;
 
 type
-  EVP_PKEY_asn1_set_param_param_print = function(&out: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
+  EVP_PKEY_asn1_set_param_param_print = function(vout: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
 
 type
   EVP_PKEY_asn1_set_free_pkey_free = procedure(pkey: PEVP_PKEY); cdecl;
@@ -12213,13 +12225,13 @@ type
   EVP_PKEY_meth_set_encrypt_encrypt_init = function(ctx: PEVP_PKEY_CTX): Integer; cdecl;
 
 type
-  EVP_PKEY_meth_set_encrypt_encryptfn = function(ctx: PEVP_PKEY_CTX; &out: PByte; outlen: PNativeUInt; &in: PByte; inlen: NativeUInt): Integer; cdecl;
+  EVP_PKEY_meth_set_encrypt_encryptfn = function(ctx: PEVP_PKEY_CTX; vout: PByte; outlen: PNativeUInt; vin: PByte; inlen: NativeUInt): Integer; cdecl;
 
 type
   EVP_PKEY_meth_set_decrypt_decrypt_init = function(ctx: PEVP_PKEY_CTX): Integer; cdecl;
 
 type
-  EVP_PKEY_meth_set_decrypt_decrypt = function(ctx: PEVP_PKEY_CTX; &out: PByte; outlen: PNativeUInt; &in: PByte; inlen: NativeUInt): Integer; cdecl;
+  EVP_PKEY_meth_set_decrypt_decrypt = function(ctx: PEVP_PKEY_CTX; vout: PByte; outlen: PNativeUInt; vin: PByte; inlen: NativeUInt): Integer; cdecl;
 
 type
   EVP_PKEY_meth_set_derive_derive_init = function(ctx: PEVP_PKEY_CTX): Integer; cdecl;
@@ -12228,10 +12240,10 @@ type
   EVP_PKEY_meth_set_derive_derive = function(ctx: PEVP_PKEY_CTX; key: PByte; keylen: PNativeUInt): Integer; cdecl;
 
 type
-  EVP_PKEY_meth_set_ctrl_ctrl = function(ctx: PEVP_PKEY_CTX; &type: Integer; p1: Integer; p2: Pointer): Integer; cdecl;
+  EVP_PKEY_meth_set_ctrl_ctrl = function(ctx: PEVP_PKEY_CTX; vtype: Integer; p1: Integer; p2: Pointer): Integer; cdecl;
 
 type
-  EVP_PKEY_meth_set_ctrl_ctrl_str = function(ctx: PEVP_PKEY_CTX; &type: PUTF8Char; value: PUTF8Char): Integer; cdecl;
+  EVP_PKEY_meth_set_ctrl_ctrl_str = function(ctx: PEVP_PKEY_CTX; vtype: PUTF8Char; value: PUTF8Char): Integer; cdecl;
 
 type
   EVP_PKEY_meth_set_digestsign_digestsign = function(ctx: PEVP_MD_CTX; sig: PByte; var siglen: NativeUInt; tbs: PByte; tbslen: NativeUInt): Integer; cdecl;
@@ -12252,7 +12264,7 @@ type
   EVP_PKEY_meth_set_digest_custom_digest_custom = function(ctx: PEVP_PKEY_CTX; mctx: PEVP_MD_CTX): Integer; cdecl;
 
 type
-  ECDH_compute_key_KDF = function(&in: Pointer; inlen: NativeUInt; &out: Pointer; outlen: PNativeUInt): Pointer; cdecl;
+  ECDH_compute_key_KDF = function(vin: Pointer; inlen: NativeUInt; vout: Pointer; outlen: PNativeUInt): Pointer; cdecl;
 
 type
   EC_KEY_METHOD_set_init_init = function(key: PEC_KEY): Integer; cdecl;
@@ -12279,7 +12291,7 @@ type
   EC_KEY_METHOD_set_compute_key_ckey = function(psec: PPByte; pseclen: PNativeUInt; pub_key: PEC_POINT; ecdh: PEC_KEY): Integer; cdecl;
 
 type
-  EC_KEY_METHOD_set_sign_sign = function(&type: Integer; dgst: PByte; dlen: Integer; sig: PByte; siglen: PCardinal; kinv: PBIGNUM; r: PBIGNUM; eckey: PEC_KEY): Integer; cdecl;
+  EC_KEY_METHOD_set_sign_sign = function(vtype: Integer; dgst: PByte; dlen: Integer; sig: PByte; siglen: PCardinal; kinv: PBIGNUM; r: PBIGNUM; eckey: PEC_KEY): Integer; cdecl;
 
 type
   EC_KEY_METHOD_set_sign_sign_setup = function(eckey: PEC_KEY; ctx_in: PBN_CTX; kinvp: PPBIGNUM; rp: PPBIGNUM): Integer; cdecl;
@@ -12288,7 +12300,7 @@ type
   EC_KEY_METHOD_set_sign_sign_sig = function(dgst: PByte; dgst_len: Integer; in_kinv: PBIGNUM; in_r: PBIGNUM; eckey: PEC_KEY): PECDSA_SIG_st; cdecl;
 
 type
-  EC_KEY_METHOD_set_verify_verify = function(&type: Integer; dgst: PByte; dgst_len: Integer; sigbuf: PByte; sig_len: Integer; eckey: PEC_KEY): Integer; cdecl;
+  EC_KEY_METHOD_set_verify_verify = function(vtype: Integer; dgst: PByte; dgst_len: Integer; sigbuf: PByte; sig_len: Integer; eckey: PEC_KEY): Integer; cdecl;
 
 type
   EC_KEY_METHOD_set_verify_verify_sig = function(dgst: PByte; dgst_len: Integer; sig: PECDSA_SIG; eckey: PEC_KEY): Integer; cdecl;
@@ -12297,16 +12309,16 @@ type
   RSA_generate_key_callback = procedure(p1: Integer; p2: Integer; p3: Pointer); cdecl;
 
 type
-  RSA_meth_set_pub_enc_pub_enc = function(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
+  RSA_meth_set_pub_enc_pub_enc = function(flen: Integer; from: PByte; vto: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
 
 type
-  RSA_meth_set_pub_dec_pub_dec = function(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
+  RSA_meth_set_pub_dec_pub_dec = function(flen: Integer; from: PByte; vto: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
 
 type
-  RSA_meth_set_priv_enc_priv_enc = function(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
+  RSA_meth_set_priv_enc_priv_enc = function(flen: Integer; from: PByte; vto: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
 
 type
-  RSA_meth_set_priv_dec_priv_dec = function(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
+  RSA_meth_set_priv_dec_priv_dec = function(flen: Integer; from: PByte; vto: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
 
 type
   RSA_meth_set_mod_exp_mod_exp = function(r0: PBIGNUM; i: PBIGNUM; rsa: PRSA; ctx: PBN_CTX): Integer; cdecl;
@@ -12321,7 +12333,7 @@ type
   RSA_meth_set_finish_finish = function(rsa: PRSA): Integer; cdecl;
 
 type
-  RSA_meth_set_sign_sign = function(&type: Integer; m: PByte; m_length: Cardinal; sigret: PByte; siglen: PCardinal; rsa: PRSA): Integer; cdecl;
+  RSA_meth_set_sign_sign = function(vtype: Integer; m: PByte; m_length: Cardinal; sigret: PByte; siglen: PCardinal; rsa: PRSA): Integer; cdecl;
 
 type
   RSA_meth_set_verify_verify = function(dtype: Integer; m: PByte; m_length: Cardinal; sigbuf: PByte; siglen: Cardinal; rsa: PRSA): Integer; cdecl;
@@ -12474,18 +12486,18 @@ const
   AES_options : function() : PUTF8Char; cdecl = nil;
   AES_set_encrypt_key : function(userKey: PByte; bits: Integer; key: PAES_KEY): Integer; cdecl = nil;
   AES_set_decrypt_key : function(userKey: PByte; bits: Integer; key: PAES_KEY): Integer; cdecl = nil;
-  AES_encrypt : procedure(&in: PByte; &out: PByte; key: PAES_KEY); cdecl = nil;
-  AES_decrypt : procedure(&in: PByte; &out: PByte; key: PAES_KEY); cdecl = nil;
-  AES_ecb_encrypt : procedure(&in: PByte; &out: PByte; key: PAES_KEY; enc: Integer); cdecl = nil;
-  AES_cbc_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; enc: Integer); cdecl = nil;
-  AES_cfb128_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
-  AES_cfb1_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
-  AES_cfb8_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
-  AES_ofb128_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger); cdecl = nil;
-  AES_ige_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; enc: Integer); cdecl = nil;
-  AES_bi_ige_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; key2: PAES_KEY; ivec: PByte; enc: Integer); cdecl = nil;
-  AES_wrap_key : function(key: PAES_KEY; iv: PByte; &out: PByte; &in: PByte; inlen: Cardinal): Integer; cdecl = nil;
-  AES_unwrap_key : function(key: PAES_KEY; iv: PByte; &out: PByte; &in: PByte; inlen: Cardinal): Integer; cdecl = nil;
+  AES_encrypt : procedure(vin: PByte; vout: PByte; key: PAES_KEY); cdecl = nil;
+  AES_decrypt : procedure(vin: PByte; vout: PByte; key: PAES_KEY); cdecl = nil;
+  AES_ecb_encrypt : procedure(vin: PByte; vout: PByte; key: PAES_KEY; enc: Integer); cdecl = nil;
+  AES_cbc_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; enc: Integer); cdecl = nil;
+  AES_cfb128_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
+  AES_cfb1_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
+  AES_cfb8_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
+  AES_ofb128_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger); cdecl = nil;
+  AES_ige_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; enc: Integer); cdecl = nil;
+  AES_bi_ige_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: PAES_KEY; key2: PAES_KEY; ivec: PByte; enc: Integer); cdecl = nil;
+  AES_wrap_key : function(key: PAES_KEY; iv: PByte; vout: PByte; vin: PByte; inlen: Cardinal): Integer; cdecl = nil;
+  AES_unwrap_key : function(key: PAES_KEY; iv: PByte; vout: PByte; vin: PByte; inlen: Cardinal): Integer; cdecl = nil;
   OPENSSL_sk_num : function(p1: POPENSSL_STACK): Integer; cdecl = nil;
   OPENSSL_sk_value : function(p1: POPENSSL_STACK; p2: Integer): Pointer; cdecl = nil;
   OPENSSL_sk_set : function(st: POPENSSL_STACK; i: Integer; data: Pointer): Pointer; cdecl = nil;
@@ -12526,47 +12538,47 @@ const
   OPENSSL_hexchar2int : function(c: Byte): Integer; cdecl = nil;
   OpenSSL_version_num : function(): Cardinal; cdecl = nil;
   SSLeay : function(): Cardinal; cdecl = nil;
-  OpenSSL_version : function(&type: Integer): PUTF8Char; cdecl = nil;
-  SSLeay_version : function(&type: Integer): PUTF8Char; cdecl = nil;
+  OpenSSL_version : function(vtype: Integer): PUTF8Char; cdecl = nil;
+  SSLeay_version : function(vtype: Integer): PUTF8Char; cdecl = nil;
   OPENSSL_issetugid : function(): Integer; cdecl = nil;
   CRYPTO_get_ex_new_index : function(class_index: Integer; argl: Integer; argp: Pointer; new_func: PCRYPTO_EX_new; dup_func: PCRYPTO_EX_dup; free_func: PCRYPTO_EX_free): Integer; cdecl = nil;
   CRYPTO_free_ex_index : function(class_index: Integer; idx: Integer): Integer; cdecl = nil;
   CRYPTO_new_ex_data : function(class_index: Integer; obj: Pointer; ad: PCRYPTO_EX_DATA): Integer; cdecl = nil;
-  CRYPTO_dup_ex_data : function(class_index: Integer; &to: PCRYPTO_EX_DATA; from: PCRYPTO_EX_DATA): Integer; cdecl = nil;
+  CRYPTO_dup_ex_data : function(class_index: Integer; vto: PCRYPTO_EX_DATA; from: PCRYPTO_EX_DATA): Integer; cdecl = nil;
   CRYPTO_free_ex_data : procedure(class_index: Integer; obj: Pointer; ad: PCRYPTO_EX_DATA); cdecl = nil;
   CRYPTO_set_ex_data : function(ad: PCRYPTO_EX_DATA; idx: Integer; val: Pointer): Integer; cdecl = nil;
   CRYPTO_get_ex_data : function(ad: PCRYPTO_EX_DATA; idx: Integer): Pointer; cdecl = nil;
   CRYPTO_set_mem_functions : function(m: CRYPTO_set_mem_functions_m; r: CRYPTO_set_mem_functions_r; f: CRYPTO_set_mem_functions_f): Integer; cdecl = nil;
   CRYPTO_set_mem_debug : function(flag: Integer): Integer; cdecl = nil;
   CRYPTO_get_mem_functions : procedure(m: Integer; r: Integer; f: Integer); cdecl = nil;
-  CRYPTO_malloc : function(num: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl = nil;
-  CRYPTO_zalloc : function(num: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl = nil;
-  CRYPTO_memdup : function(str: Pointer; siz: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl = nil;
-  CRYPTO_strdup : function(str: PUTF8Char; &file: PUTF8Char; line: Integer): PUTF8Char; cdecl = nil;
-  CRYPTO_strndup : function(str: PUTF8Char; s: NativeUInt; &file: PUTF8Char; line: Integer): PUTF8Char; cdecl = nil;
-  CRYPTO_free : procedure(ptr: Pointer; &file: PUTF8Char; line: Integer); cdecl = nil;
-  CRYPTO_clear_free : procedure(ptr: Pointer; num: NativeUInt; &file: PUTF8Char; line: Integer); cdecl = nil;
-  CRYPTO_realloc : function(addr: Pointer; num: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl = nil;
-  CRYPTO_clear_realloc : function(addr: Pointer; old_num: NativeUInt; num: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl = nil;
+  CRYPTO_malloc : function(num: NativeUInt; vfile: PUTF8Char; line: Integer): Pointer; cdecl = nil;
+  CRYPTO_zalloc : function(num: NativeUInt; vfile: PUTF8Char; line: Integer): Pointer; cdecl = nil;
+  CRYPTO_memdup : function(str: Pointer; siz: NativeUInt; vfile: PUTF8Char; line: Integer): Pointer; cdecl = nil;
+  CRYPTO_strdup : function(str: PUTF8Char; vfile: PUTF8Char; line: Integer): PUTF8Char; cdecl = nil;
+  CRYPTO_strndup : function(str: PUTF8Char; s: NativeUInt; vfile: PUTF8Char; line: Integer): PUTF8Char; cdecl = nil;
+  CRYPTO_free : procedure(ptr: Pointer; vfile: PUTF8Char; line: Integer); cdecl = nil;
+  CRYPTO_clear_free : procedure(ptr: Pointer; num: NativeUInt; vfile: PUTF8Char; line: Integer); cdecl = nil;
+  CRYPTO_realloc : function(addr: Pointer; num: NativeUInt; vfile: PUTF8Char; line: Integer): Pointer; cdecl = nil;
+  CRYPTO_clear_realloc : function(addr: Pointer; old_num: NativeUInt; num: NativeUInt; vfile: PUTF8Char; line: Integer): Pointer; cdecl = nil;
   CRYPTO_secure_malloc_init : function(sz: NativeUInt; minsize: Integer): Integer; cdecl = nil;
   CRYPTO_secure_malloc_done : function(): Integer; cdecl = nil;
-  CRYPTO_secure_malloc : function(num: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl = nil;
-  CRYPTO_secure_zalloc : function(num: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl = nil;
-  CRYPTO_secure_free : procedure(ptr: Pointer; &file: PUTF8Char; line: Integer); cdecl = nil;
-  CRYPTO_secure_clear_free : procedure(ptr: Pointer; num: NativeUInt; &file: PUTF8Char; line: Integer); cdecl = nil;
+  CRYPTO_secure_malloc : function(num: NativeUInt; vfile: PUTF8Char; line: Integer): Pointer; cdecl = nil;
+  CRYPTO_secure_zalloc : function(num: NativeUInt; vfile: PUTF8Char; line: Integer): Pointer; cdecl = nil;
+  CRYPTO_secure_free : procedure(ptr: Pointer; vfile: PUTF8Char; line: Integer); cdecl = nil;
+  CRYPTO_secure_clear_free : procedure(ptr: Pointer; num: NativeUInt; vfile: PUTF8Char; line: Integer); cdecl = nil;
   CRYPTO_secure_allocated : function(ptr: Pointer): Integer; cdecl = nil;
   CRYPTO_secure_malloc_initialized : function(): Integer; cdecl = nil;
   CRYPTO_secure_actual_size : function(ptr: Pointer): NativeUInt; cdecl = nil;
   CRYPTO_secure_used : function(): NativeUInt; cdecl = nil;
   OPENSSL_cleanse : procedure(ptr: Pointer; len: NativeUInt); cdecl = nil;
-  OPENSSL_die : procedure(assertion: PUTF8Char; &file: PUTF8Char; line: Integer); cdecl = nil;
+  OPENSSL_die : procedure(assertion: PUTF8Char; vfile: PUTF8Char; line: Integer); cdecl = nil;
   OPENSSL_isservice : function(): Integer; cdecl = nil;
   FIPS_mode : function(): Integer; cdecl = nil;
   FIPS_mode_set : function(r: Integer): Integer; cdecl = nil;
   OPENSSL_init : procedure(); cdecl = nil;
   OPENSSL_gmtime : function(timer: PLongint; result: Ptm): Ptm; cdecl = nil;
   OPENSSL_gmtime_adj : function(tm: Ptm; offset_day: Integer; offset_sec: Integer): Integer; cdecl = nil;
-  OPENSSL_gmtime_diff : function(pday: PInteger; psec: PInteger; from: Ptm; &to: Ptm): Integer; cdecl = nil;
+  OPENSSL_gmtime_diff : function(pday: PInteger; psec: PInteger; from: Ptm; vto: Ptm): Integer; cdecl = nil;
   CRYPTO_memcmp : function(in_a: Pointer; in_b: Pointer; len: NativeUInt): Integer; cdecl = nil;
   OPENSSL_cleanup : procedure(); cdecl = nil;
   OPENSSL_init_crypto : function(opts: UInt64; settings: POPENSSL_INIT_SETTINGS): Integer; cdecl = nil;
@@ -12613,7 +12625,7 @@ const
   BIO_s_file : function(): PBIO_METHOD; cdecl = nil;
   BIO_new_file : function(filename: PUTF8Char; mode: PUTF8Char): PBIO; cdecl = nil;
   BIO_new_fp : function(stream: PPointer; close_flag: Integer): PBIO; cdecl = nil;
-  BIO_new : function(&type: PBIO_METHOD): PBIO; cdecl = nil;
+  BIO_new : function(vtype: PBIO_METHOD): PBIO; cdecl = nil;
   BIO_free : function(a: PBIO): Integer; cdecl = nil;
   BIO_set_data : procedure(a: PBIO; ptr: Pointer); cdecl = nil;
   BIO_get_data : function(a: PBIO): Pointer; cdecl = nil;
@@ -12643,7 +12655,7 @@ const
   BIO_get_retry_BIO : function(bio: PBIO; reason: PInteger): PBIO; cdecl = nil;
   BIO_get_retry_reason : function(bio: PBIO): Integer; cdecl = nil;
   BIO_set_retry_reason : procedure(bio: PBIO; reason: Integer); cdecl = nil;
-  BIO_dup_chain : function(&in: PBIO): PBIO; cdecl = nil;
+  BIO_dup_chain : function(vin: PBIO): PBIO; cdecl = nil;
   BIO_nread0 : function(bio: PBIO; buf: PPUTF8Char): Integer; cdecl = nil;
   BIO_nread : function(bio: PBIO; buf: PPUTF8Char; num: Integer): Integer; cdecl = nil;
   BIO_nwrite0 : function(bio: PBIO; buf: PPUTF8Char): Integer; cdecl = nil;
@@ -12676,7 +12688,7 @@ const
   BIO_dump_indent : function(b: PBIO; bytes: PUTF8Char; len: Integer; indent: Integer): Integer; cdecl = nil;
   BIO_dump_fp : function(fp: PPointer; s: PUTF8Char; len: Integer): Integer; cdecl = nil;
   BIO_dump_indent_fp : function(fp: PPointer; s: PUTF8Char; len: Integer; indent: Integer): Integer; cdecl = nil;
-  BIO_hex_string : function(&out: PBIO; indent: Integer; width: Integer; data: PByte; datalen: Integer): Integer; cdecl = nil;
+  BIO_hex_string : function(vout: PBIO; indent: Integer; width: Integer; data: PByte; datalen: Integer): Integer; cdecl = nil;
   BIO_ADDR_new : function(): PBIO_ADDR; cdecl = nil;
   BIO_ADDR_rawmake : function(ap: PBIO_ADDR; family: Integer; where: Pointer; wherelen: NativeUInt; port: Word): Integer; cdecl = nil;
   BIO_ADDR_free : procedure(p1: PBIO_ADDR); cdecl = nil;
@@ -12697,7 +12709,7 @@ const
   BIO_lookup : function(host: PUTF8Char; service: PUTF8Char; lookup_type: BIO_lookup_type; family: Integer; socktype: Integer; res: PPBIO_ADDRINFO): Integer; cdecl = nil;
   BIO_lookup_ex : function(host: PUTF8Char; service: PUTF8Char; lookup_type: Integer; family: Integer; socktype: Integer; protocol: Integer; res: PPBIO_ADDRINFO): Integer; cdecl = nil;
   BIO_sock_error : function(sock: Integer): Integer; cdecl = nil;
-  BIO_socket_ioctl : function(fd: Integer; &type: Integer; arg: Pointer): Integer; cdecl = nil;
+  BIO_socket_ioctl : function(fd: Integer; vtype: Integer; arg: Pointer): Integer; cdecl = nil;
   BIO_socket_nbio : function(fd: Integer; mode: Integer): Integer; cdecl = nil;
   BIO_sock_init : function(): Integer; cdecl = nil;
   BIO_set_tcp_ndelay : function(sock: Integer; turn_on: Integer): Integer; cdecl = nil;
@@ -12706,7 +12718,7 @@ const
   BIO_get_host_ip : function(str: PUTF8Char; ip: PByte): Integer; cdecl = nil;
   BIO_get_accept_socket : function(host_port: PUTF8Char; mode: Integer): Integer; cdecl = nil;
   BIO_accept : function(sock: Integer; ip_port: PPUTF8Char): Integer; cdecl = nil;
-  BIO_sock_info : function(sock: Integer; &type: BIO_sock_info_type; info: PBIO_sock_info_u): Integer; cdecl = nil;
+  BIO_sock_info : function(sock: Integer; vtype: BIO_sock_info_type; info: PBIO_sock_info_u): Integer; cdecl = nil;
   BIO_socket : function(domain: Integer; socktype: Integer; protocol: Integer; options: Integer): Integer; cdecl = nil;
   BIO_connect : function(sock: Integer; addr: PBIO_ADDR; options: Integer): Integer; cdecl = nil;
   BIO_bind : function(sock: Integer; addr: PBIO_ADDR; options: Integer): Integer; cdecl = nil;
@@ -12723,7 +12735,7 @@ const
   BIO_vprintf : function(bio: PBIO; format: PUTF8Char; args: Pointer): Integer; cdecl = nil;
   BIO_snprintf : function(buf: PUTF8Char; n: NativeUInt; format: PUTF8Char): Integer varargs; cdecl = nil;
   BIO_vsnprintf : function(buf: PUTF8Char; n: NativeUInt; format: PUTF8Char; args: Pointer): Integer; cdecl = nil;
-  BIO_meth_new : function(&type: Integer; name: PUTF8Char): PBIO_METHOD; cdecl = nil;
+  BIO_meth_new : function(vtype: Integer; name: PUTF8Char): PBIO_METHOD; cdecl = nil;
   BIO_meth_free : procedure(biom: PBIO_METHOD); cdecl = nil;
 //  BIO_meth_get_write : function(p1: PBIOp2: PUTF8Charp3: Integerbiom: PBIO_METHOD): Integer; cdecl = nil;
 //  BIO_meth_get_write_ex : function(p1: PBIOp2: PUTF8Charp3: NativeUIntp4: PNativeUIntbiom: PBIO_METHOD): Integer; cdecl = nil;
@@ -12785,12 +12797,12 @@ const
   BN_copy : function(a: PBIGNUM; b: PBIGNUM): PBIGNUM; cdecl = nil;
   BN_swap : procedure(a: PBIGNUM; b: PBIGNUM); cdecl = nil;
   BN_bin2bn : function(s: Pointer; len: Integer; ret: PBIGNUM): PBIGNUM; cdecl = nil;
-  BN_bn2bin : function(a: PBIGNUM; &to: Pointer): Integer; cdecl = nil;
-  BN_bn2binpad : function(a: PBIGNUM; &to: Pointer; tolen: Integer): Integer; cdecl = nil;
+  BN_bn2bin : function(a: PBIGNUM; vto: Pointer): Integer; cdecl = nil;
+  BN_bn2binpad : function(a: PBIGNUM; vto: Pointer; tolen: Integer): Integer; cdecl = nil;
   BN_lebin2bn : function(s: Pointer; len: Integer; ret: PBIGNUM): PBIGNUM; cdecl = nil;
-  BN_bn2lebinpad : function(a: PBIGNUM; &to: Pointer; tolen: Integer): Integer; cdecl = nil;
+  BN_bn2lebinpad : function(a: PBIGNUM; vto: Pointer; tolen: Integer): Integer; cdecl = nil;
   BN_mpi2bn : function(s: Pointer; len: Integer; ret: PBIGNUM): PBIGNUM; cdecl = nil;
-  BN_bn2mpi : function(a: PBIGNUM; &to: Pointer): Integer; cdecl = nil;
+  BN_bn2mpi : function(a: PBIGNUM; vto: Pointer): Integer; cdecl = nil;
   BN_sub : function(r: PBIGNUM; a: PBIGNUM; b: PBIGNUM): Integer; cdecl = nil;
   BN_usub : function(r: PBIGNUM; a: PBIGNUM; b: PBIGNUM): Integer; cdecl = nil;
   BN_uadd : function(r: PBIGNUM; a: PBIGNUM; b: PBIGNUM): Integer; cdecl = nil;
@@ -12865,10 +12877,10 @@ const
   BN_to_montgomery : function(r: PBIGNUM; a: PBIGNUM; mont: PBN_MONT_CTX; ctx: PBN_CTX): Integer; cdecl = nil;
   BN_from_montgomery : function(r: PBIGNUM; a: PBIGNUM; mont: PBN_MONT_CTX; ctx: PBN_CTX): Integer; cdecl = nil;
   BN_MONT_CTX_free : procedure(mont: PBN_MONT_CTX); cdecl = nil;
-  BN_MONT_CTX_set : function(mont: PBN_MONT_CTX; &mod: PBIGNUM; ctx: PBN_CTX): Integer; cdecl = nil;
-  BN_MONT_CTX_copy : function(&to: PBN_MONT_CTX; from: PBN_MONT_CTX): PBN_MONT_CTX; cdecl = nil;
-  BN_MONT_CTX_set_locked : function(pmont: PPBN_MONT_CTX; lock: PCRYPTO_RWLOCK; &mod: PBIGNUM; ctx: PBN_CTX): PBN_MONT_CTX; cdecl = nil;
-  BN_BLINDING_new : function(A: PBIGNUM; Ai: PBIGNUM; &mod: PBIGNUM): PBN_BLINDING; cdecl = nil;
+  BN_MONT_CTX_set : function(mont: PBN_MONT_CTX; vmod: PBIGNUM; ctx: PBN_CTX): Integer; cdecl = nil;
+  BN_MONT_CTX_copy : function(vto: PBN_MONT_CTX; from: PBN_MONT_CTX): PBN_MONT_CTX; cdecl = nil;
+  BN_MONT_CTX_set_locked : function(pmont: PPBN_MONT_CTX; lock: PCRYPTO_RWLOCK; vmod: PBIGNUM; ctx: PBN_CTX): PBN_MONT_CTX; cdecl = nil;
+  BN_BLINDING_new : function(A: PBIGNUM; Ai: PBIGNUM; vmod: PBIGNUM): PBN_BLINDING; cdecl = nil;
   BN_BLINDING_free : procedure(b: PBN_BLINDING); cdecl = nil;
   BN_BLINDING_update : function(b: PBN_BLINDING; ctx: PBN_CTX): Integer; cdecl = nil;
   BN_BLINDING_convert : function(n: PBIGNUM; b: PBN_BLINDING; ctx: PBN_CTX): Integer; cdecl = nil;
@@ -12920,7 +12932,7 @@ const
   BN_get0_nist_prime_384 : function(): PBIGNUM; cdecl = nil;
   BN_get0_nist_prime_521 : function(): PBIGNUM; cdecl = nil;
 //  BN_nist_mod_func : function(r: PBIGNUMa: PBIGNUMfield: PBIGNUMctx: PBN_CTXp: PBIGNUM): Integer; cdecl = nil;
-  BN_generate_dsa_nonce : function(&out: PBIGNUM; range: PBIGNUM; priv: PBIGNUM; &message: PByte; message_len: NativeUInt; ctx: PBN_CTX): Integer; cdecl = nil;
+  BN_generate_dsa_nonce : function(vout: PBIGNUM; range: PBIGNUM; priv: PBIGNUM; vmessage: PByte; message_len: NativeUInt; ctx: PBN_CTX): Integer; cdecl = nil;
   BN_get_rfc2409_prime_768 : function(bn: PBIGNUM): PBIGNUM; cdecl = nil;
   BN_get_rfc2409_prime_1024 : function(bn: PBIGNUM): PBIGNUM; cdecl = nil;
   BN_get_rfc3526_prime_1536 : function(bn: PBIGNUM): PBIGNUM; cdecl = nil;
@@ -12930,20 +12942,20 @@ const
   BN_get_rfc3526_prime_6144 : function(bn: PBIGNUM): PBIGNUM; cdecl = nil;
   BN_get_rfc3526_prime_8192 : function(bn: PBIGNUM): PBIGNUM; cdecl = nil;
   BN_bntest_rand : function(rnd: PBIGNUM; bits: Integer; top: Integer; bottom: Integer): Integer; cdecl = nil;
-  d2i_ASN1_SEQUENCE_ANY : function(a: PPASN1_SEQUENCE_ANY; &in: PPByte; len: Integer): PASN1_SEQUENCE_ANY; cdecl = nil;
-  i2d_ASN1_SEQUENCE_ANY : function(a: PASN1_SEQUENCE_ANY; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_SEQUENCE_ANY : function(a: PPASN1_SEQUENCE_ANY; vin: PPByte; len: Integer): PASN1_SEQUENCE_ANY; cdecl = nil;
+  i2d_ASN1_SEQUENCE_ANY : function(a: PASN1_SEQUENCE_ANY; vout: PPByte): Integer; cdecl = nil;
   ASN1_SEQUENCE_ANY_it : function(): PASN1_ITEM; cdecl = nil;
-  d2i_ASN1_SET_ANY : function(a: PPASN1_SEQUENCE_ANY; &in: PPByte; len: Integer): PASN1_SEQUENCE_ANY; cdecl = nil;
-  i2d_ASN1_SET_ANY : function(a: PASN1_SEQUENCE_ANY; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_SET_ANY : function(a: PPASN1_SEQUENCE_ANY; vin: PPByte; len: Integer): PASN1_SEQUENCE_ANY; cdecl = nil;
+  i2d_ASN1_SET_ANY : function(a: PASN1_SEQUENCE_ANY; vout: PPByte): Integer; cdecl = nil;
   ASN1_SET_ANY_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_TYPE_new : function(): PASN1_TYPE; cdecl = nil;
   ASN1_TYPE_free : procedure(a: PASN1_TYPE); cdecl = nil;
-  d2i_ASN1_TYPE : function(a: PPASN1_TYPE; &in: PPByte; len: Integer): PASN1_TYPE; cdecl = nil;
-  i2d_ASN1_TYPE : function(a: PASN1_TYPE; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_TYPE : function(a: PPASN1_TYPE; vin: PPByte; len: Integer): PASN1_TYPE; cdecl = nil;
+  i2d_ASN1_TYPE : function(a: PASN1_TYPE; vout: PPByte): Integer; cdecl = nil;
   ASN1_ANY_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_TYPE_get : function(a: PASN1_TYPE): Integer; cdecl = nil;
-  ASN1_TYPE_set : procedure(a: PASN1_TYPE; &type: Integer; value: Pointer); cdecl = nil;
-  ASN1_TYPE_set1 : function(a: PASN1_TYPE; &type: Integer; value: Pointer): Integer; cdecl = nil;
+  ASN1_TYPE_set : procedure(a: PASN1_TYPE; vtype: Integer; value: Pointer); cdecl = nil;
+  ASN1_TYPE_set1 : function(a: PASN1_TYPE; vtype: Integer; value: Pointer): Integer; cdecl = nil;
   ASN1_TYPE_cmp : function(a: PASN1_TYPE; b: PASN1_TYPE): Integer; cdecl = nil;
   ASN1_TYPE_pack_sequence : function(it: PASN1_ITEM; s: Pointer; t: PPASN1_TYPE): PASN1_TYPE; cdecl = nil;
   ASN1_TYPE_unpack_sequence : function(it: PASN1_ITEM; t: PASN1_TYPE): Pointer; cdecl = nil;
@@ -12957,7 +12969,7 @@ const
   ASN1_STRING_clear_free : procedure(a: PASN1_STRING); cdecl = nil;
   ASN1_STRING_copy : function(dst: PASN1_STRING; str: PASN1_STRING): Integer; cdecl = nil;
   ASN1_STRING_dup : function(a: PASN1_STRING): PASN1_STRING; cdecl = nil;
-  ASN1_STRING_type_new : function(&type: Integer): PASN1_STRING; cdecl = nil;
+  ASN1_STRING_type_new : function(vtype: Integer): PASN1_STRING; cdecl = nil;
   ASN1_STRING_cmp : function(a: PASN1_STRING; b: PASN1_STRING): Integer; cdecl = nil;
   ASN1_STRING_set : function(str: PASN1_STRING; data: Pointer; len: Integer): Integer; cdecl = nil;
   ASN1_STRING_set0 : procedure(str: PASN1_STRING; data: Pointer; len: Integer); cdecl = nil;
@@ -12968,28 +12980,28 @@ const
   ASN1_STRING_get0_data : function(x: PASN1_STRING): PByte; cdecl = nil;
   ASN1_BIT_STRING_new : function(): PASN1_BIT_STRING; cdecl = nil;
   ASN1_BIT_STRING_free : procedure(a: PASN1_BIT_STRING); cdecl = nil;
-  d2i_ASN1_BIT_STRING : function(a: PPASN1_BIT_STRING; &in: PPByte; len: Integer): PASN1_BIT_STRING; cdecl = nil;
-  i2d_ASN1_BIT_STRING : function(a: PASN1_BIT_STRING; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_BIT_STRING : function(a: PPASN1_BIT_STRING; vin: PPByte; len: Integer): PASN1_BIT_STRING; cdecl = nil;
+  i2d_ASN1_BIT_STRING : function(a: PASN1_BIT_STRING; vout: PPByte): Integer; cdecl = nil;
   ASN1_BIT_STRING_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_BIT_STRING_set : function(a: PASN1_BIT_STRING; d: PByte; length: Integer): Integer; cdecl = nil;
   ASN1_BIT_STRING_set_bit : function(a: PASN1_BIT_STRING; n: Integer; value: Integer): Integer; cdecl = nil;
   ASN1_BIT_STRING_get_bit : function(a: PASN1_BIT_STRING; n: Integer): Integer; cdecl = nil;
   ASN1_BIT_STRING_check : function(a: PASN1_BIT_STRING; flags: PByte; flags_len: Integer): Integer; cdecl = nil;
-  ASN1_BIT_STRING_name_print : function(&out: PBIO; bs: PASN1_BIT_STRING; tbl: PBIT_STRING_BITNAME; indent: Integer): Integer; cdecl = nil;
+  ASN1_BIT_STRING_name_print : function(vout: PBIO; bs: PASN1_BIT_STRING; tbl: PBIT_STRING_BITNAME; indent: Integer): Integer; cdecl = nil;
   ASN1_BIT_STRING_num_asc : function(name: PUTF8Char; tbl: PBIT_STRING_BITNAME): Integer; cdecl = nil;
   ASN1_BIT_STRING_set_asc : function(bs: PASN1_BIT_STRING; name: PUTF8Char; value: Integer; tbl: PBIT_STRING_BITNAME): Integer; cdecl = nil;
   ASN1_INTEGER_new : function(): PASN1_INTEGER; cdecl = nil;
   ASN1_INTEGER_free : procedure(a: PASN1_INTEGER); cdecl = nil;
-  d2i_ASN1_INTEGER : function(a: PPASN1_INTEGER; &in: PPByte; len: Integer): PASN1_INTEGER; cdecl = nil;
-  i2d_ASN1_INTEGER : function(a: PASN1_INTEGER; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_INTEGER : function(a: PPASN1_INTEGER; vin: PPByte; len: Integer): PASN1_INTEGER; cdecl = nil;
+  i2d_ASN1_INTEGER : function(a: PASN1_INTEGER; vout: PPByte): Integer; cdecl = nil;
   ASN1_INTEGER_it : function(): PASN1_ITEM; cdecl = nil;
   d2i_ASN1_UINTEGER : function(a: PPASN1_INTEGER; pp: PPByte; length: Integer): PASN1_INTEGER; cdecl = nil;
   ASN1_INTEGER_dup : function(x: PASN1_INTEGER): PASN1_INTEGER; cdecl = nil;
   ASN1_INTEGER_cmp : function(x: PASN1_INTEGER; y: PASN1_INTEGER): Integer; cdecl = nil;
   ASN1_ENUMERATED_new : function(): PASN1_ENUMERATED; cdecl = nil;
   ASN1_ENUMERATED_free : procedure(a: PASN1_ENUMERATED); cdecl = nil;
-  d2i_ASN1_ENUMERATED : function(a: PPASN1_ENUMERATED; &in: PPByte; len: Integer): PASN1_ENUMERATED; cdecl = nil;
-  i2d_ASN1_ENUMERATED : function(a: PASN1_ENUMERATED; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_ENUMERATED : function(a: PPASN1_ENUMERATED; vin: PPByte; len: Integer): PASN1_ENUMERATED; cdecl = nil;
+  i2d_ASN1_ENUMERATED : function(a: PASN1_ENUMERATED; vout: PPByte): Integer; cdecl = nil;
   ASN1_ENUMERATED_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_UTCTIME_check : function(a: PASN1_UTCTIME): Integer; cdecl = nil;
   ASN1_UTCTIME_set : function(s: PASN1_UTCTIME; t: Longint): PASN1_UTCTIME; cdecl = nil;
@@ -13000,97 +13012,97 @@ const
   ASN1_GENERALIZEDTIME_set : function(s: PASN1_GENERALIZEDTIME; t: Longint): PASN1_GENERALIZEDTIME; cdecl = nil;
   ASN1_GENERALIZEDTIME_adj : function(s: PASN1_GENERALIZEDTIME; t: Longint; offset_day: Integer; offset_sec: Integer): PASN1_GENERALIZEDTIME; cdecl = nil;
   ASN1_GENERALIZEDTIME_set_string : function(s: PASN1_GENERALIZEDTIME; str: PUTF8Char): Integer; cdecl = nil;
-  ASN1_TIME_diff : function(pday: PInteger; psec: PInteger; from: PASN1_TIME; &to: PASN1_TIME): Integer; cdecl = nil;
+  ASN1_TIME_diff : function(pday: PInteger; psec: PInteger; from: PASN1_TIME; vto: PASN1_TIME): Integer; cdecl = nil;
   ASN1_OCTET_STRING_new : function(): PASN1_OCTET_STRING; cdecl = nil;
   ASN1_OCTET_STRING_free : procedure(a: PASN1_OCTET_STRING); cdecl = nil;
-  d2i_ASN1_OCTET_STRING : function(a: PPASN1_OCTET_STRING; &in: PPByte; len: Integer): PASN1_OCTET_STRING; cdecl = nil;
-  i2d_ASN1_OCTET_STRING : function(a: PASN1_OCTET_STRING; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_OCTET_STRING : function(a: PPASN1_OCTET_STRING; vin: PPByte; len: Integer): PASN1_OCTET_STRING; cdecl = nil;
+  i2d_ASN1_OCTET_STRING : function(a: PASN1_OCTET_STRING; vout: PPByte): Integer; cdecl = nil;
   ASN1_OCTET_STRING_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_OCTET_STRING_dup : function(a: PASN1_OCTET_STRING): PASN1_OCTET_STRING; cdecl = nil;
   ASN1_OCTET_STRING_cmp : function(a: PASN1_OCTET_STRING; b: PASN1_OCTET_STRING): Integer; cdecl = nil;
   ASN1_OCTET_STRING_set : function(str: PASN1_OCTET_STRING; data: PByte; len: Integer): Integer; cdecl = nil;
   ASN1_VISIBLESTRING_new : function(): PASN1_VISIBLESTRING; cdecl = nil;
   ASN1_VISIBLESTRING_free : procedure(a: PASN1_VISIBLESTRING); cdecl = nil;
-  d2i_ASN1_VISIBLESTRING : function(a: PPASN1_VISIBLESTRING; &in: PPByte; len: Integer): PASN1_VISIBLESTRING; cdecl = nil;
-  i2d_ASN1_VISIBLESTRING : function(a: PASN1_VISIBLESTRING; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_VISIBLESTRING : function(a: PPASN1_VISIBLESTRING; vin: PPByte; len: Integer): PASN1_VISIBLESTRING; cdecl = nil;
+  i2d_ASN1_VISIBLESTRING : function(a: PASN1_VISIBLESTRING; vout: PPByte): Integer; cdecl = nil;
   ASN1_VISIBLESTRING_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_UNIVERSALSTRING_new : function(): PASN1_UNIVERSALSTRING; cdecl = nil;
   ASN1_UNIVERSALSTRING_free : procedure(a: PASN1_UNIVERSALSTRING); cdecl = nil;
-  d2i_ASN1_UNIVERSALSTRING : function(a: PPASN1_UNIVERSALSTRING; &in: PPByte; len: Integer): PASN1_UNIVERSALSTRING; cdecl = nil;
-  i2d_ASN1_UNIVERSALSTRING : function(a: PASN1_UNIVERSALSTRING; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_UNIVERSALSTRING : function(a: PPASN1_UNIVERSALSTRING; vin: PPByte; len: Integer): PASN1_UNIVERSALSTRING; cdecl = nil;
+  i2d_ASN1_UNIVERSALSTRING : function(a: PASN1_UNIVERSALSTRING; vout: PPByte): Integer; cdecl = nil;
   ASN1_UNIVERSALSTRING_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_UTF8STRING_new : function(): PASN1_UTF8STRING; cdecl = nil;
   ASN1_UTF8STRING_free : procedure(a: PASN1_UTF8STRING); cdecl = nil;
-  d2i_ASN1_UTF8STRING : function(a: PPASN1_UTF8STRING; &in: PPByte; len: Integer): PASN1_UTF8STRING; cdecl = nil;
-  i2d_ASN1_UTF8STRING : function(a: PASN1_UTF8STRING; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_UTF8STRING : function(a: PPASN1_UTF8STRING; vin: PPByte; len: Integer): PASN1_UTF8STRING; cdecl = nil;
+  i2d_ASN1_UTF8STRING : function(a: PASN1_UTF8STRING; vout: PPByte): Integer; cdecl = nil;
   ASN1_UTF8STRING_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_NULL_new : function(): PASN1_NULL; cdecl = nil;
   ASN1_NULL_free : procedure(a: PASN1_NULL); cdecl = nil;
-  d2i_ASN1_NULL : function(a: PPASN1_NULL; &in: PPByte; len: Integer): PASN1_NULL; cdecl = nil;
-  i2d_ASN1_NULL : function(a: PASN1_NULL; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_NULL : function(a: PPASN1_NULL; vin: PPByte; len: Integer): PASN1_NULL; cdecl = nil;
+  i2d_ASN1_NULL : function(a: PASN1_NULL; vout: PPByte): Integer; cdecl = nil;
   ASN1_NULL_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_BMPSTRING_new : function(): PASN1_BMPSTRING; cdecl = nil;
   ASN1_BMPSTRING_free : procedure(a: PASN1_BMPSTRING); cdecl = nil;
-  d2i_ASN1_BMPSTRING : function(a: PPASN1_BMPSTRING; &in: PPByte; len: Integer): PASN1_BMPSTRING; cdecl = nil;
-  i2d_ASN1_BMPSTRING : function(a: PASN1_BMPSTRING; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_BMPSTRING : function(a: PPASN1_BMPSTRING; vin: PPByte; len: Integer): PASN1_BMPSTRING; cdecl = nil;
+  i2d_ASN1_BMPSTRING : function(a: PASN1_BMPSTRING; vout: PPByte): Integer; cdecl = nil;
   ASN1_BMPSTRING_it : function(): PASN1_ITEM; cdecl = nil;
   UTF8_getc : function(str: PByte; len: Integer; val: PCardinal): Integer; cdecl = nil;
   UTF8_putc : function(str: PByte; len: Integer; value: Cardinal): Integer; cdecl = nil;
   ASN1_PRINTABLE_new : function(): PASN1_STRING; cdecl = nil;
   ASN1_PRINTABLE_free : procedure(a: PASN1_STRING); cdecl = nil;
-  d2i_ASN1_PRINTABLE : function(a: PPASN1_STRING; &in: PPByte; len: Integer): PASN1_STRING; cdecl = nil;
-  i2d_ASN1_PRINTABLE : function(a: PASN1_STRING; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_PRINTABLE : function(a: PPASN1_STRING; vin: PPByte; len: Integer): PASN1_STRING; cdecl = nil;
+  i2d_ASN1_PRINTABLE : function(a: PASN1_STRING; vout: PPByte): Integer; cdecl = nil;
   ASN1_PRINTABLE_it : function(): PASN1_ITEM; cdecl = nil;
   DIRECTORYSTRING_new : function(): PASN1_STRING; cdecl = nil;
   DIRECTORYSTRING_free : procedure(a: PASN1_STRING); cdecl = nil;
-  d2i_DIRECTORYSTRING : function(a: PPASN1_STRING; &in: PPByte; len: Integer): PASN1_STRING; cdecl = nil;
-  i2d_DIRECTORYSTRING : function(a: PASN1_STRING; &out: PPByte): Integer; cdecl = nil;
+  d2i_DIRECTORYSTRING : function(a: PPASN1_STRING; vin: PPByte; len: Integer): PASN1_STRING; cdecl = nil;
+  i2d_DIRECTORYSTRING : function(a: PASN1_STRING; vout: PPByte): Integer; cdecl = nil;
   DIRECTORYSTRING_it : function(): PASN1_ITEM; cdecl = nil;
   DISPLAYTEXT_new : function(): PASN1_STRING; cdecl = nil;
   DISPLAYTEXT_free : procedure(a: PASN1_STRING); cdecl = nil;
-  d2i_DISPLAYTEXT : function(a: PPASN1_STRING; &in: PPByte; len: Integer): PASN1_STRING; cdecl = nil;
-  i2d_DISPLAYTEXT : function(a: PASN1_STRING; &out: PPByte): Integer; cdecl = nil;
+  d2i_DISPLAYTEXT : function(a: PPASN1_STRING; vin: PPByte; len: Integer): PASN1_STRING; cdecl = nil;
+  i2d_DISPLAYTEXT : function(a: PASN1_STRING; vout: PPByte): Integer; cdecl = nil;
   DISPLAYTEXT_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_PRINTABLESTRING_new : function(): PASN1_PRINTABLESTRING; cdecl = nil;
   ASN1_PRINTABLESTRING_free : procedure(a: PASN1_PRINTABLESTRING); cdecl = nil;
-  d2i_ASN1_PRINTABLESTRING : function(a: PPASN1_PRINTABLESTRING; &in: PPByte; len: Integer): PASN1_PRINTABLESTRING; cdecl = nil;
-  i2d_ASN1_PRINTABLESTRING : function(a: PASN1_PRINTABLESTRING; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_PRINTABLESTRING : function(a: PPASN1_PRINTABLESTRING; vin: PPByte; len: Integer): PASN1_PRINTABLESTRING; cdecl = nil;
+  i2d_ASN1_PRINTABLESTRING : function(a: PASN1_PRINTABLESTRING; vout: PPByte): Integer; cdecl = nil;
   ASN1_PRINTABLESTRING_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_T61STRING_new : function(): PASN1_T61STRING; cdecl = nil;
   ASN1_T61STRING_free : procedure(a: PASN1_T61STRING); cdecl = nil;
-  d2i_ASN1_T61STRING : function(a: PPASN1_T61STRING; &in: PPByte; len: Integer): PASN1_T61STRING; cdecl = nil;
-  i2d_ASN1_T61STRING : function(a: PASN1_T61STRING; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_T61STRING : function(a: PPASN1_T61STRING; vin: PPByte; len: Integer): PASN1_T61STRING; cdecl = nil;
+  i2d_ASN1_T61STRING : function(a: PASN1_T61STRING; vout: PPByte): Integer; cdecl = nil;
   ASN1_T61STRING_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_IA5STRING_new : function(): PASN1_IA5STRING; cdecl = nil;
   ASN1_IA5STRING_free : procedure(a: PASN1_IA5STRING); cdecl = nil;
-  d2i_ASN1_IA5STRING : function(a: PPASN1_IA5STRING; &in: PPByte; len: Integer): PASN1_IA5STRING; cdecl = nil;
-  i2d_ASN1_IA5STRING : function(a: PASN1_IA5STRING; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_IA5STRING : function(a: PPASN1_IA5STRING; vin: PPByte; len: Integer): PASN1_IA5STRING; cdecl = nil;
+  i2d_ASN1_IA5STRING : function(a: PASN1_IA5STRING; vout: PPByte): Integer; cdecl = nil;
   ASN1_IA5STRING_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_GENERALSTRING_new : function(): PASN1_GENERALSTRING; cdecl = nil;
   ASN1_GENERALSTRING_free : procedure(a: PASN1_GENERALSTRING); cdecl = nil;
-  d2i_ASN1_GENERALSTRING : function(a: PPASN1_GENERALSTRING; &in: PPByte; len: Integer): PASN1_GENERALSTRING; cdecl = nil;
-  i2d_ASN1_GENERALSTRING : function(a: PASN1_GENERALSTRING; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_GENERALSTRING : function(a: PPASN1_GENERALSTRING; vin: PPByte; len: Integer): PASN1_GENERALSTRING; cdecl = nil;
+  i2d_ASN1_GENERALSTRING : function(a: PASN1_GENERALSTRING; vout: PPByte): Integer; cdecl = nil;
   ASN1_GENERALSTRING_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_UTCTIME_new : function(): PASN1_UTCTIME; cdecl = nil;
   ASN1_UTCTIME_free : procedure(a: PASN1_UTCTIME); cdecl = nil;
-  d2i_ASN1_UTCTIME : function(a: PPASN1_UTCTIME; &in: PPByte; len: Integer): PASN1_UTCTIME; cdecl = nil;
-  i2d_ASN1_UTCTIME : function(a: PASN1_UTCTIME; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_UTCTIME : function(a: PPASN1_UTCTIME; vin: PPByte; len: Integer): PASN1_UTCTIME; cdecl = nil;
+  i2d_ASN1_UTCTIME : function(a: PASN1_UTCTIME; vout: PPByte): Integer; cdecl = nil;
   ASN1_UTCTIME_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_GENERALIZEDTIME_new : function(): PASN1_GENERALIZEDTIME; cdecl = nil;
   ASN1_GENERALIZEDTIME_free : procedure(a: PASN1_GENERALIZEDTIME); cdecl = nil;
-  d2i_ASN1_GENERALIZEDTIME : function(a: PPASN1_GENERALIZEDTIME; &in: PPByte; len: Integer): PASN1_GENERALIZEDTIME; cdecl = nil;
-  i2d_ASN1_GENERALIZEDTIME : function(a: PASN1_GENERALIZEDTIME; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_GENERALIZEDTIME : function(a: PPASN1_GENERALIZEDTIME; vin: PPByte; len: Integer): PASN1_GENERALIZEDTIME; cdecl = nil;
+  i2d_ASN1_GENERALIZEDTIME : function(a: PASN1_GENERALIZEDTIME; vout: PPByte): Integer; cdecl = nil;
   ASN1_GENERALIZEDTIME_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_TIME_new : function(): PASN1_TIME; cdecl = nil;
   ASN1_TIME_free : procedure(a: PASN1_TIME); cdecl = nil;
-  d2i_ASN1_TIME : function(a: PPASN1_TIME; &in: PPByte; len: Integer): PASN1_TIME; cdecl = nil;
-  i2d_ASN1_TIME : function(a: PASN1_TIME; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASN1_TIME : function(a: PPASN1_TIME; vin: PPByte; len: Integer): PASN1_TIME; cdecl = nil;
+  i2d_ASN1_TIME : function(a: PASN1_TIME; vout: PPByte): Integer; cdecl = nil;
   ASN1_TIME_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_OCTET_STRING_NDEF_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_TIME_set : function(s: PASN1_TIME; t: Longint): PASN1_TIME; cdecl = nil;
   ASN1_TIME_adj : function(s: PASN1_TIME; t: Longint; offset_day: Integer; offset_sec: Integer): PASN1_TIME; cdecl = nil;
   ASN1_TIME_check : function(t: PASN1_TIME): Integer; cdecl = nil;
-  ASN1_TIME_to_generalizedtime : function(t: PASN1_TIME; &out: PPASN1_GENERALIZEDTIME): PASN1_GENERALIZEDTIME; cdecl = nil;
+  ASN1_TIME_to_generalizedtime : function(t: PASN1_TIME; vout: PPASN1_GENERALIZEDTIME): PASN1_GENERALIZEDTIME; cdecl = nil;
   ASN1_TIME_set_string : function(s: PASN1_TIME; str: PUTF8Char): Integer; cdecl = nil;
   ASN1_TIME_set_string_X509 : function(s: PASN1_TIME; str: PUTF8Char): Integer; cdecl = nil;
   ASN1_TIME_to_tm : function(s: PASN1_TIME; tm: Ptm): Integer; cdecl = nil;
@@ -13103,9 +13115,9 @@ const
   a2i_ASN1_ENUMERATED : function(bp: PBIO; bs: PASN1_ENUMERATED; buf: PUTF8Char; size: Integer): Integer; cdecl = nil;
   i2a_ASN1_OBJECT : function(bp: PBIO; a: PASN1_OBJECT): Integer; cdecl = nil;
   a2i_ASN1_STRING : function(bp: PBIO; bs: PASN1_STRING; buf: PUTF8Char; size: Integer): Integer; cdecl = nil;
-  i2a_ASN1_STRING : function(bp: PBIO; a: PASN1_STRING; &type: Integer): Integer; cdecl = nil;
+  i2a_ASN1_STRING : function(bp: PBIO; a: PASN1_STRING; vtype: Integer): Integer; cdecl = nil;
   i2t_ASN1_OBJECT : function(buf: PUTF8Char; buf_len: Integer; a: PASN1_OBJECT): Integer; cdecl = nil;
-  a2d_ASN1_OBJECT : function(&out: PByte; olen: Integer; buf: PUTF8Char; num: Integer): Integer; cdecl = nil;
+  a2d_ASN1_OBJECT : function(vout: PByte; olen: Integer; buf: PUTF8Char; num: Integer): Integer; cdecl = nil;
   ASN1_OBJECT_create : function(nid: Integer; data: PByte; len: Integer; sn: PUTF8Char; ln: PUTF8Char): PASN1_OBJECT; cdecl = nil;
   ASN1_INTEGER_get_int64 : function(pr: PInt64; a: PASN1_INTEGER): Integer; cdecl = nil;
   ASN1_INTEGER_set_int64 : function(a: PASN1_INTEGER; r: Int64): Integer; cdecl = nil;
@@ -13131,21 +13143,21 @@ const
   ASN1_object_size : function(constructed: Integer; length: Integer; tag: Integer): Integer; cdecl = nil;
   ASN1_dup : function(i2d: Pi2d_of_void; d2i: Pd2i_of_void; x: Pointer): Pointer; cdecl = nil;
   ASN1_item_dup : function(it: PASN1_ITEM; x: Pointer): Pointer; cdecl = nil;
-  ASN1_d2i_fp : function(xnew: ASN1_d2i_fp_xnew; d2i: Pd2i_of_void; &in: PPointer; x: PPointer): Pointer; cdecl = nil;
-  ASN1_item_d2i_fp : function(it: PASN1_ITEM; &in: PPointer; x: Pointer): Pointer; cdecl = nil;
-  ASN1_i2d_fp : function(i2d: Pi2d_of_void; &out: PPointer; x: Pointer): Integer; cdecl = nil;
-  ASN1_item_i2d_fp : function(it: PASN1_ITEM; &out: PPointer; x: Pointer): Integer; cdecl = nil;
+  ASN1_d2i_fp : function(xnew: ASN1_d2i_fp_xnew; d2i: Pd2i_of_void; vin: PPointer; x: PPointer): Pointer; cdecl = nil;
+  ASN1_item_d2i_fp : function(it: PASN1_ITEM; vin: PPointer; x: Pointer): Pointer; cdecl = nil;
+  ASN1_i2d_fp : function(i2d: Pi2d_of_void; vout: PPointer; x: Pointer): Integer; cdecl = nil;
+  ASN1_item_i2d_fp : function(it: PASN1_ITEM; vout: PPointer; x: Pointer): Integer; cdecl = nil;
   ASN1_STRING_print_ex_fp : function(fp: PPointer; str: PASN1_STRING; flags: Cardinal): Integer; cdecl = nil;
-  ASN1_STRING_to_UTF8 : function(&out: PPByte; &in: PASN1_STRING): Integer; cdecl = nil;
-  ASN1_d2i_bio : function(xnew: ASN1_d2i_bio_xnew; d2i: Pd2i_of_void; &in: PBIO; x: PPointer): Pointer; cdecl = nil;
-  ASN1_item_d2i_bio : function(it: PASN1_ITEM; &in: PBIO; x: Pointer): Pointer; cdecl = nil;
-  ASN1_i2d_bio : function(i2d: Pi2d_of_void; &out: PBIO; x: PByte): Integer; cdecl = nil;
-  ASN1_item_i2d_bio : function(it: PASN1_ITEM; &out: PBIO; x: Pointer): Integer; cdecl = nil;
+  ASN1_STRING_to_UTF8 : function(vout: PPByte; vin: PASN1_STRING): Integer; cdecl = nil;
+  ASN1_d2i_bio : function(xnew: ASN1_d2i_bio_xnew; d2i: Pd2i_of_void; vin: PBIO; x: PPointer): Pointer; cdecl = nil;
+  ASN1_item_d2i_bio : function(it: PASN1_ITEM; vin: PBIO; x: Pointer): Pointer; cdecl = nil;
+  ASN1_i2d_bio : function(i2d: Pi2d_of_void; vout: PBIO; x: PByte): Integer; cdecl = nil;
+  ASN1_item_i2d_bio : function(it: PASN1_ITEM; vout: PBIO; x: Pointer): Integer; cdecl = nil;
   ASN1_UTCTIME_print : function(fp: PBIO; a: PASN1_UTCTIME): Integer; cdecl = nil;
   ASN1_GENERALIZEDTIME_print : function(fp: PBIO; a: PASN1_GENERALIZEDTIME): Integer; cdecl = nil;
   ASN1_TIME_print : function(fp: PBIO; a: PASN1_TIME): Integer; cdecl = nil;
   ASN1_STRING_print : function(bp: PBIO; v: PASN1_STRING): Integer; cdecl = nil;
-  ASN1_STRING_print_ex : function(&out: PBIO; str: PASN1_STRING; flags: Cardinal): Integer; cdecl = nil;
+  ASN1_STRING_print_ex : function(vout: PBIO; str: PASN1_STRING; flags: Cardinal): Integer; cdecl = nil;
   ASN1_buf_print : function(bp: PBIO; buf: PByte; buflen: NativeUInt; off: Integer): Integer; cdecl = nil;
   ASN1_bn_print : function(bp: PBIO; number: PUTF8Char; num: PBIGNUM; buf: PByte; off: Integer): Integer; cdecl = nil;
   ASN1_parse : function(bp: PBIO; pp: PByte; len: Integer; indent: Integer): Integer; cdecl = nil;
@@ -13161,23 +13173,23 @@ const
   ASN1_STRING_set_default_mask : procedure(mask: Cardinal); cdecl = nil;
   ASN1_STRING_set_default_mask_asc : function(p: PUTF8Char): Integer; cdecl = nil;
   ASN1_STRING_get_default_mask : function(): Cardinal; cdecl = nil;
-  ASN1_mbstring_copy : function(&out: PPASN1_STRING; &in: PByte; len: Integer; inform: Integer; mask: Cardinal): Integer; cdecl = nil;
-  ASN1_mbstring_ncopy : function(&out: PPASN1_STRING; &in: PByte; len: Integer; inform: Integer; mask: Cardinal; minsize: Integer; maxsize: Integer): Integer; cdecl = nil;
-  ASN1_STRING_set_by_NID : function(&out: PPASN1_STRING; &in: PByte; inlen: Integer; inform: Integer; nid: Integer): PASN1_STRING; cdecl = nil;
+  ASN1_mbstring_copy : function(vout: PPASN1_STRING; vin: PByte; len: Integer; inform: Integer; mask: Cardinal): Integer; cdecl = nil;
+  ASN1_mbstring_ncopy : function(vout: PPASN1_STRING; vin: PByte; len: Integer; inform: Integer; mask: Cardinal; minsize: Integer; maxsize: Integer): Integer; cdecl = nil;
+  ASN1_STRING_set_by_NID : function(vout: PPASN1_STRING; vin: PByte; inlen: Integer; inform: Integer; nid: Integer): PASN1_STRING; cdecl = nil;
   ASN1_STRING_TABLE_get : function(nid: Integer): PASN1_STRING_TABLE; cdecl = nil;
   ASN1_STRING_TABLE_add : function(p1: Integer; p2: Integer; p3: Integer; p4: Cardinal; p5: Cardinal): Integer; cdecl = nil;
   ASN1_STRING_TABLE_cleanup : procedure(); cdecl = nil;
   ASN1_item_new : function(it: PASN1_ITEM): PASN1_VALUE; cdecl = nil;
   ASN1_item_free : procedure(val: PASN1_VALUE; it: PASN1_ITEM); cdecl = nil;
-  ASN1_item_d2i : function(val: PPASN1_VALUE; &in: PPByte; len: Integer; it: PASN1_ITEM): PASN1_VALUE; cdecl = nil;
-  ASN1_item_i2d : function(val: PASN1_VALUE; &out: PPByte; it: PASN1_ITEM): Integer; cdecl = nil;
-  ASN1_item_ndef_i2d : function(val: PASN1_VALUE; &out: PPByte; it: PASN1_ITEM): Integer; cdecl = nil;
+  ASN1_item_d2i : function(val: PPASN1_VALUE; vin: PPByte; len: Integer; it: PASN1_ITEM): PASN1_VALUE; cdecl = nil;
+  ASN1_item_i2d : function(val: PASN1_VALUE; vout: PPByte; it: PASN1_ITEM): Integer; cdecl = nil;
+  ASN1_item_ndef_i2d : function(val: PASN1_VALUE; vout: PPByte; it: PASN1_ITEM): Integer; cdecl = nil;
   ASN1_add_oid_module : procedure(); cdecl = nil;
   ASN1_add_stable_module : procedure(); cdecl = nil;
   ASN1_generate_nconf : function(str: PUTF8Char; nconf: PCONF): PASN1_TYPE; cdecl = nil;
   ASN1_generate_v3 : function(str: PUTF8Char; cnf: PX509V3_CTX): PASN1_TYPE; cdecl = nil;
   ASN1_str2mask : function(str: PUTF8Char; pmask: PCardinal): Integer; cdecl = nil;
-  ASN1_item_print : function(&out: PBIO; ifld: PASN1_VALUE; indent: Integer; it: PASN1_ITEM; pctx: PASN1_PCTX): Integer; cdecl = nil;
+  ASN1_item_print : function(vout: PBIO; ifld: PASN1_VALUE; indent: Integer; it: PASN1_ITEM; pctx: PASN1_PCTX): Integer; cdecl = nil;
   ASN1_PCTX_new : function(): PASN1_PCTX; cdecl = nil;
   ASN1_PCTX_free : procedure(p: PASN1_PCTX); cdecl = nil;
   ASN1_PCTX_get_flags : function(p: PASN1_PCTX): Cardinal; cdecl = nil;
@@ -13198,13 +13210,13 @@ const
   ASN1_SCTX_set_app_data : procedure(p: PASN1_SCTX; data: Pointer); cdecl = nil;
   ASN1_SCTX_get_app_data : function(p: PASN1_SCTX): Pointer; cdecl = nil;
   BIO_f_asn1 : function(): PBIO_METHOD; cdecl = nil;
-  BIO_new_NDEF : function(&out: PBIO; val: PASN1_VALUE; it: PASN1_ITEM): PBIO; cdecl = nil;
-  i2d_ASN1_bio_stream : function(&out: PBIO; val: PASN1_VALUE; &in: PBIO; flags: Integer; it: PASN1_ITEM): Integer; cdecl = nil;
-  PEM_write_bio_ASN1_stream : function(&out: PBIO; val: PASN1_VALUE; &in: PBIO; flags: Integer; hdr: PUTF8Char; it: PASN1_ITEM): Integer; cdecl = nil;
+  BIO_new_NDEF : function(vout: PBIO; val: PASN1_VALUE; it: PASN1_ITEM): PBIO; cdecl = nil;
+  i2d_ASN1_bio_stream : function(vout: PBIO; val: PASN1_VALUE; vin: PBIO; flags: Integer; it: PASN1_ITEM): Integer; cdecl = nil;
+  PEM_write_bio_ASN1_stream : function(vout: PBIO; val: PASN1_VALUE; vin: PBIO; flags: Integer; hdr: PUTF8Char; it: PASN1_ITEM): Integer; cdecl = nil;
   SMIME_write_ASN1 : function(bio: PBIO; val: PASN1_VALUE; data: PBIO; flags: Integer; ctype_nid: Integer; econt_nid: Integer; mdalgs: Pstack_st_X509_ALGOR; it: PASN1_ITEM): Integer; cdecl = nil;
   SMIME_read_ASN1 : function(bio: PBIO; bcont: PPBIO; it: PASN1_ITEM): PASN1_VALUE; cdecl = nil;
-  SMIME_crlf_copy : function(&in: PBIO; &out: PBIO; flags: Integer): Integer; cdecl = nil;
-  SMIME_text : function(&in: PBIO; &out: PBIO): Integer; cdecl = nil;
+  SMIME_crlf_copy : function(vin: PBIO; vout: PBIO; flags: Integer): Integer; cdecl = nil;
+  SMIME_text : function(vin: PBIO; vout: PBIO): Integer; cdecl = nil;
   ASN1_ITEM_lookup : function(name: PUTF8Char): PASN1_ITEM; cdecl = nil;
   ASN1_ITEM_get : function(i: NativeUInt): PASN1_ITEM; cdecl = nil;
   ASN1_BOOLEAN_it : function(): PASN1_ITEM; cdecl = nil;
@@ -13225,8 +13237,8 @@ const
   ZLONG_it : function(): PASN1_ITEM; cdecl = nil;
   ASN1_item_ex_new : function(pval: PPASN1_VALUE; it: PASN1_ITEM): Integer; cdecl = nil;
   ASN1_item_ex_free : procedure(pval: PPASN1_VALUE; it: PASN1_ITEM); cdecl = nil;
-  ASN1_item_ex_d2i : function(pval: PPASN1_VALUE; &in: PPByte; len: Integer; it: PASN1_ITEM; tag: Integer; aclass: Integer; opt: UTF8Char; ctx: PASN1_TLC): Integer; cdecl = nil;
-  ASN1_item_ex_i2d : function(pval: PPASN1_VALUE; &out: PPByte; it: PASN1_ITEM; tag: Integer; aclass: Integer): Integer; cdecl = nil;
+  ASN1_item_ex_d2i : function(pval: PPASN1_VALUE; vin: PPByte; len: Integer; it: PASN1_ITEM; tag: Integer; aclass: Integer; opt: UTF8Char; ctx: PASN1_TLC): Integer; cdecl = nil;
+  ASN1_item_ex_i2d : function(pval: PPASN1_VALUE; vout: PPByte; it: PASN1_ITEM; tag: Integer; aclass: Integer): Integer; cdecl = nil;
   ERR_load_ASYNC_strings : function(): Integer; cdecl = nil;
   ASYNC_init_thread : function(max_size: NativeUInt; init_size: NativeUInt): Integer; cdecl = nil;
   ASYNC_cleanup_thread : procedure(); cdecl = nil;
@@ -13240,10 +13252,10 @@ const
   BF_set_key : procedure(key: PBF_KEY; len: Integer; data: PByte); cdecl = nil;
   BF_encrypt : procedure(data: PCardinal; key: PBF_KEY); cdecl = nil;
   BF_decrypt : procedure(data: PCardinal; key: PBF_KEY); cdecl = nil;
-  BF_ecb_encrypt : procedure(&in: PByte; &out: PByte; key: PBF_KEY; enc: Integer); cdecl = nil;
-  BF_cbc_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; schedule: PBF_KEY; ivec: PByte; enc: Integer); cdecl = nil;
-  BF_cfb64_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; schedule: PBF_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
-  BF_ofb64_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; schedule: PBF_KEY; ivec: PByte; num: PInteger); cdecl = nil;
+  BF_ecb_encrypt : procedure(vin: PByte; vout: PByte; key: PBF_KEY; enc: Integer); cdecl = nil;
+  BF_cbc_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; schedule: PBF_KEY; ivec: PByte; enc: Integer); cdecl = nil;
+  BF_cfb64_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; schedule: PBF_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
+  BF_ofb64_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; schedule: PBF_KEY; ivec: PByte; num: PInteger); cdecl = nil;
   BF_options : function(): PUTF8Char; cdecl = nil;
   ERR_load_BUF_strings : function(): Integer; cdecl = nil;
   BUF_MEM_new : function(): PBUF_MEM; cdecl = nil;
@@ -13251,34 +13263,34 @@ const
   BUF_MEM_free : procedure(a: PBUF_MEM); cdecl = nil;
   BUF_MEM_grow : function(str: PBUF_MEM; len: NativeUInt): NativeUInt; cdecl = nil;
   BUF_MEM_grow_clean : function(str: PBUF_MEM; len: NativeUInt): NativeUInt; cdecl = nil;
-  BUF_reverse : procedure(&out: PByte; &in: PByte; siz: NativeUInt); cdecl = nil;
+  BUF_reverse : procedure(vout: PByte; vin: PByte; siz: NativeUInt); cdecl = nil;
   Camellia_set_key : function(userKey: PByte; bits: Integer; key: PCAMELLIA_KEY): Integer; cdecl = nil;
-  Camellia_encrypt : procedure(&in: PByte; &out: PByte; key: PCAMELLIA_KEY); cdecl = nil;
-  Camellia_decrypt : procedure(&in: PByte; &out: PByte; key: PCAMELLIA_KEY); cdecl = nil;
-  Camellia_ecb_encrypt : procedure(&in: PByte; &out: PByte; key: PCAMELLIA_KEY; enc: Integer); cdecl = nil;
-  Camellia_cbc_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; enc: Integer); cdecl = nil;
-  Camellia_cfb128_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
-  Camellia_cfb1_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
-  Camellia_cfb8_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
-  Camellia_ofb128_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger); cdecl = nil;
-  Camellia_ctr128_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; ecount_buf: PByte; num: PCardinal); cdecl = nil;
+  Camellia_encrypt : procedure(vin: PByte; vout: PByte; key: PCAMELLIA_KEY); cdecl = nil;
+  Camellia_decrypt : procedure(vin: PByte; vout: PByte; key: PCAMELLIA_KEY); cdecl = nil;
+  Camellia_ecb_encrypt : procedure(vin: PByte; vout: PByte; key: PCAMELLIA_KEY; enc: Integer); cdecl = nil;
+  Camellia_cbc_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; enc: Integer); cdecl = nil;
+  Camellia_cfb128_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
+  Camellia_cfb1_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
+  Camellia_cfb8_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
+  Camellia_ofb128_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger); cdecl = nil;
+  Camellia_ctr128_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; ecount_buf: PByte; num: PCardinal); cdecl = nil;
   CAST_set_key : procedure(key: PCAST_KEY; len: Integer; data: PByte); cdecl = nil;
-  CAST_ecb_encrypt : procedure(&in: PByte; &out: PByte; key: PCAST_KEY; enc: Integer); cdecl = nil;
+  CAST_ecb_encrypt : procedure(vin: PByte; vout: PByte; key: PCAST_KEY; enc: Integer); cdecl = nil;
   CAST_encrypt : procedure(data: PCardinal; key: PCAST_KEY); cdecl = nil;
   CAST_decrypt : procedure(data: PCardinal; key: PCAST_KEY); cdecl = nil;
-  CAST_cbc_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; ks: PCAST_KEY; iv: PByte; enc: Integer); cdecl = nil;
-  CAST_cfb64_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; schedule: PCAST_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
-  CAST_ofb64_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; schedule: PCAST_KEY; ivec: PByte; num: PInteger); cdecl = nil;
+  CAST_cbc_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; ks: PCAST_KEY; iv: PByte; enc: Integer); cdecl = nil;
+  CAST_cfb64_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; schedule: PCAST_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
+  CAST_ofb64_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; schedule: PCAST_KEY; ivec: PByte; num: PInteger); cdecl = nil;
   ERR_load_EVP_strings : function(): Integer; cdecl = nil;
   ERR_load_OBJ_strings : function(): Integer; cdecl = nil;
   OBJ_NAME_init : function(): Integer; cdecl = nil;
   OBJ_NAME_new_index : function(hash_func: OBJ_NAME_new_index_hash_func; cmp_func: OBJ_NAME_new_index_cmp_func; free_func: OBJ_NAME_new_index_free_func): Integer; cdecl = nil;
-  OBJ_NAME_get : function(name: PUTF8Char; &type: Integer): PUTF8Char; cdecl = nil;
-  OBJ_NAME_add : function(name: PUTF8Char; &type: Integer; data: PUTF8Char): Integer; cdecl = nil;
-  OBJ_NAME_remove : function(name: PUTF8Char; &type: Integer): Integer; cdecl = nil;
-  OBJ_NAME_cleanup : procedure(&type: Integer); cdecl = nil;
-  OBJ_NAME_do_all : procedure(&type: Integer; fn: OBJ_NAME_do_all_fn; arg: Pointer); cdecl = nil;
-  OBJ_NAME_do_all_sorted : procedure(&type: Integer; fn: OBJ_NAME_do_all_sorted_fn; arg: Pointer); cdecl = nil;
+  OBJ_NAME_get : function(name: PUTF8Char; vtype: Integer): PUTF8Char; cdecl = nil;
+  OBJ_NAME_add : function(name: PUTF8Char; vtype: Integer; data: PUTF8Char): Integer; cdecl = nil;
+  OBJ_NAME_remove : function(name: PUTF8Char; vtype: Integer): Integer; cdecl = nil;
+  OBJ_NAME_cleanup : procedure(vtype: Integer); cdecl = nil;
+  OBJ_NAME_do_all : procedure(vtype: Integer; fn: OBJ_NAME_do_all_fn; arg: Pointer); cdecl = nil;
+  OBJ_NAME_do_all_sorted : procedure(vtype: Integer; fn: OBJ_NAME_do_all_sorted_fn; arg: Pointer); cdecl = nil;
   OBJ_dup : function(o: PASN1_OBJECT): PASN1_OBJECT; cdecl = nil;
   OBJ_nid2obj : function(n: Integer): PASN1_OBJECT; cdecl = nil;
   OBJ_nid2ln : function(n: Integer): PUTF8Char; cdecl = nil;
@@ -13295,7 +13307,7 @@ const
   OBJ_new_nid : function(num: Integer): Integer; cdecl = nil;
   OBJ_add_object : function(obj: PASN1_OBJECT): Integer; cdecl = nil;
   OBJ_create : function(oid: PUTF8Char; sn: PUTF8Char; ln: PUTF8Char): Integer; cdecl = nil;
-  OBJ_create_objects : function(&in: PBIO): Integer; cdecl = nil;
+  OBJ_create_objects : function(vin: PBIO): Integer; cdecl = nil;
   OBJ_length : function(obj: PASN1_OBJECT): NativeUInt; cdecl = nil;
   OBJ_get0_data : function(obj: PASN1_OBJECT): PByte; cdecl = nil;
   OBJ_find_sigid_algs : function(signid: Integer; pdig_nid: PInteger; ppkey_nid: PInteger): Integer; cdecl = nil;
@@ -13311,7 +13323,7 @@ const
   EVP_MD_meth_set_flags : function(md: PEVP_MD; flags: Cardinal): Integer; cdecl = nil;
   EVP_MD_meth_set_init : function(md: PEVP_MD; init: EVP_MD_meth_set_init_init): Integer; cdecl = nil;
   EVP_MD_meth_set_update : function(md: PEVP_MD; update: EVP_MD_meth_set_update_update): Integer; cdecl = nil;
-  EVP_MD_meth_set_final : function(md: PEVP_MD; &final: EVP_MD_meth_set_final_final): Integer; cdecl = nil;
+  EVP_MD_meth_set_final : function(md: PEVP_MD; vfinal: EVP_MD_meth_set_final_final): Integer; cdecl = nil;
   EVP_MD_meth_set_copy : function(md: PEVP_MD; copy: EVP_MD_meth_set_copy_copy): Integer; cdecl = nil;
   EVP_MD_meth_set_cleanup : function(md: PEVP_MD; cleanup: EVP_MD_meth_set_cleanup_cleanup): Integer; cdecl = nil;
   EVP_MD_meth_set_ctrl : function(md: PEVP_MD; ctrl: EVP_MD_meth_set_ctrl_ctrl): Integer; cdecl = nil;
@@ -13322,7 +13334,7 @@ const
 //  EVP_MD_meth_get_init : function(ctx: PEVP_MD_CTXmd: PEVP_MD): Integer; cdecl = nil;
 //  EVP_MD_meth_get_update : function(ctx: PEVP_MD_CTXdata: Pointercount: NativeUIntmd: PEVP_MD): Integer; cdecl = nil;
 //  EVP_MD_meth_get_final : function(ctx: PEVP_MD_CTXmd: PBytemd: PEVP_MD): Integer; cdecl = nil;
-//  EVP_MD_meth_get_copy : function(&to: PEVP_MD_CTXfrom: PEVP_MD_CTXmd: PEVP_MD): Integer; cdecl = nil;
+//  EVP_MD_meth_get_copy : function(vto: PEVP_MD_CTXfrom: PEVP_MD_CTXmd: PEVP_MD): Integer; cdecl = nil;
 //  EVP_MD_meth_get_cleanup : function(ctx: PEVP_MD_CTXmd: PEVP_MD): Integer; cdecl = nil;
 //  EVP_MD_meth_get_ctrl : function(ctx: PEVP_MD_CTXcmd: Integerp1: Integerp2: Pointermd: PEVP_MD): Integer; cdecl = nil;
   EVP_CIPHER_meth_new : function(cipher_type: Integer; block_size: Integer; key_len: Integer): PEVP_CIPHER; cdecl = nil;
@@ -13338,11 +13350,11 @@ const
   EVP_CIPHER_meth_set_get_asn1_params : function(cipher: PEVP_CIPHER; get_asn1_parameters: EVP_CIPHER_meth_set_get_asn1_params_get_asn1_parameters): Integer; cdecl = nil;
   EVP_CIPHER_meth_set_ctrl : function(cipher: PEVP_CIPHER; ctrl: EVP_CIPHER_meth_set_ctrl_ctrl): Integer; cdecl = nil;
 //  EVP_CIPHER_meth_get_init : function(ctx: PEVP_CIPHER_CTXkey: PByteiv: PByteenc: Integercipher: PEVP_CIPHER): Integer; cdecl = nil;
-//  EVP_CIPHER_meth_get_do_cipher : function(ctx: PEVP_CIPHER_CTX&out: PByte&in: PByteinl: NativeUIntcipher: PEVP_CIPHER): Integer; cdecl = nil;
+//  EVP_CIPHER_meth_get_do_cipher : function(ctx: PEVP_CIPHER_CTXvout: PBytevin: PByteinl: NativeUIntcipher: PEVP_CIPHER): Integer; cdecl = nil;
 //  EVP_CIPHER_meth_get_cleanup : function(p1: PEVP_CIPHER_CTXcipher: PEVP_CIPHER): Integer; cdecl = nil;
 //  EVP_CIPHER_meth_get_set_asn1_params : function(p1: PEVP_CIPHER_CTXp2: PASN1_TYPEcipher: PEVP_CIPHER): Integer; cdecl = nil;
 //  EVP_CIPHER_meth_get_get_asn1_params : function(p1: PEVP_CIPHER_CTXp2: PASN1_TYPEcipher: PEVP_CIPHER): Integer; cdecl = nil;
-//  EVP_CIPHER_meth_get_ctrl : function(p1: PEVP_CIPHER_CTX&type: Integerarg: Integerptr: Pointercipher: PEVP_CIPHER): Integer; cdecl = nil;
+//  EVP_CIPHER_meth_get_ctrl : function(p1: PEVP_CIPHER_CTXvtype: Integerarg: Integerptr: Pointercipher: PEVP_CIPHER): Integer; cdecl = nil;
   EVP_MD_type : function(md: PEVP_MD): Integer; cdecl = nil;
   EVP_MD_pkey_type : function(md: PEVP_MD): Integer; cdecl = nil;
   EVP_MD_size : function(md: PEVP_MD): Integer; cdecl = nil;
@@ -13372,83 +13384,83 @@ const
   EVP_CIPHER_CTX_buf_noconst : function(ctx: PEVP_CIPHER_CTX): PByte; cdecl = nil;
   EVP_CIPHER_CTX_num : function(ctx: PEVP_CIPHER_CTX): Integer; cdecl = nil;
   EVP_CIPHER_CTX_set_num : procedure(ctx: PEVP_CIPHER_CTX; num: Integer); cdecl = nil;
-  EVP_CIPHER_CTX_copy : function(&out: PEVP_CIPHER_CTX; &in: PEVP_CIPHER_CTX): Integer; cdecl = nil;
+  EVP_CIPHER_CTX_copy : function(vout: PEVP_CIPHER_CTX; vin: PEVP_CIPHER_CTX): Integer; cdecl = nil;
   EVP_CIPHER_CTX_get_app_data : function(ctx: PEVP_CIPHER_CTX): Pointer; cdecl = nil;
   EVP_CIPHER_CTX_set_app_data : procedure(ctx: PEVP_CIPHER_CTX; data: Pointer); cdecl = nil;
   EVP_CIPHER_CTX_get_cipher_data : function(ctx: PEVP_CIPHER_CTX): Pointer; cdecl = nil;
   EVP_CIPHER_CTX_set_cipher_data : function(ctx: PEVP_CIPHER_CTX; cipher_data: Pointer): Pointer; cdecl = nil;
-  EVP_Cipher : function(c: PEVP_CIPHER_CTX; &out: PByte; &in: PByte; inl: Cardinal): Integer; cdecl = nil;
+  EVP_Cipher : function(c: PEVP_CIPHER_CTX; vout: PByte; vin: PByte; inl: Cardinal): Integer; cdecl = nil;
   EVP_MD_CTX_ctrl : function(ctx: PEVP_MD_CTX; cmd: Integer; p1: Integer; p2: Pointer): Integer; cdecl = nil;
   EVP_MD_CTX_new : function(): PEVP_MD_CTX; cdecl = nil;
   EVP_MD_CTX_create : function(): PEVP_MD_CTX; cdecl = nil;
   EVP_MD_CTX_reset : function(ctx: PEVP_MD_CTX): Integer; cdecl = nil;
   EVP_MD_CTX_free : procedure(ctx: PEVP_MD_CTX); cdecl = nil;
   EVP_MD_CTX_destroy : procedure(ctx: PEVP_MD_CTX); cdecl = nil;
-  EVP_MD_CTX_copy_ex : function(&out: PEVP_MD_CTX; &in: PEVP_MD_CTX): Integer; cdecl = nil;
+  EVP_MD_CTX_copy_ex : function(vout: PEVP_MD_CTX; vin: PEVP_MD_CTX): Integer; cdecl = nil;
   EVP_MD_CTX_set_flags : procedure(ctx: PEVP_MD_CTX; flags: Integer); cdecl = nil;
   EVP_MD_CTX_clear_flags : procedure(ctx: PEVP_MD_CTX; flags: Integer); cdecl = nil;
   EVP_MD_CTX_test_flags : function(ctx: PEVP_MD_CTX; flags: Integer): Integer; cdecl = nil;
-  EVP_DigestInit_ex : function(ctx: PEVP_MD_CTX; &type: PEVP_MD; impl: PENGINE): Integer; cdecl = nil;
+  EVP_DigestInit_ex : function(ctx: PEVP_MD_CTX; vtype: PEVP_MD; impl: PENGINE): Integer; cdecl = nil;
   EVP_DigestUpdate : function(ctx: PEVP_MD_CTX; d: Pointer; cnt: NativeUInt): Integer; cdecl = nil;
   EVP_DigestFinal_ex : function(ctx: PEVP_MD_CTX; md: PByte; s: PCardinal): Integer; cdecl = nil;
-  EVP_Digest : function(data: Pointer; count: NativeUInt; md: PByte; size: PCardinal; &type: PEVP_MD; impl: PENGINE): Integer; cdecl = nil;
-  EVP_MD_CTX_copy : function(&out: PEVP_MD_CTX; &in: PEVP_MD_CTX): Integer; cdecl = nil;
-  EVP_DigestInit : function(ctx: PEVP_MD_CTX; &type: PEVP_MD): Integer; cdecl = nil;
+  EVP_Digest : function(data: Pointer; count: NativeUInt; md: PByte; size: PCardinal; vtype: PEVP_MD; impl: PENGINE): Integer; cdecl = nil;
+  EVP_MD_CTX_copy : function(vout: PEVP_MD_CTX; vin: PEVP_MD_CTX): Integer; cdecl = nil;
+  EVP_DigestInit : function(ctx: PEVP_MD_CTX; vtype: PEVP_MD): Integer; cdecl = nil;
   EVP_DigestFinal : function(ctx: PEVP_MD_CTX; md: PByte; s: PCardinal): Integer; cdecl = nil;
   EVP_DigestFinalXOF : function(ctx: PEVP_MD_CTX; md: PByte; len: NativeUInt): Integer; cdecl = nil;
   EVP_read_pw_string : function(buf: PUTF8Char; length: Integer; prompt: PUTF8Char; verify: Integer): Integer; cdecl = nil;
   EVP_read_pw_string_min : function(buf: PUTF8Char; minlen: Integer; maxlen: Integer; prompt: PUTF8Char; verify: Integer): Integer; cdecl = nil;
   EVP_set_pw_prompt : procedure(prompt: PUTF8Char); cdecl = nil;
   EVP_get_pw_prompt : function(): PUTF8Char; cdecl = nil;
-  EVP_BytesToKey : function(&type: PEVP_CIPHER; md: PEVP_MD; salt: PByte; data: PByte; datal: Integer; count: Integer; key: PByte; iv: PByte): Integer; cdecl = nil;
+  EVP_BytesToKey : function(vtype: PEVP_CIPHER; md: PEVP_MD; salt: PByte; data: PByte; datal: Integer; count: Integer; key: PByte; iv: PByte): Integer; cdecl = nil;
   EVP_CIPHER_CTX_set_flags : procedure(ctx: PEVP_CIPHER_CTX; flags: Integer); cdecl = nil;
   EVP_CIPHER_CTX_clear_flags : procedure(ctx: PEVP_CIPHER_CTX; flags: Integer); cdecl = nil;
   EVP_CIPHER_CTX_test_flags : function(ctx: PEVP_CIPHER_CTX; flags: Integer): Integer; cdecl = nil;
   EVP_EncryptInit : function(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; key: PByte; iv: PByte): Integer; cdecl = nil;
   EVP_EncryptInit_ex : function(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; impl: PENGINE; key: PByte; iv: PByte): Integer; cdecl = nil;
-  EVP_EncryptUpdate : function(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger; &in: PByte; inl: Integer): Integer; cdecl = nil;
-  EVP_EncryptFinal_ex : function(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger): Integer; cdecl = nil;
-  EVP_EncryptFinal : function(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger): Integer; cdecl = nil;
+  EVP_EncryptUpdate : function(ctx: PEVP_CIPHER_CTX; vout: PByte; outl: PInteger; vin: PByte; inl: Integer): Integer; cdecl = nil;
+  EVP_EncryptFinal_ex : function(ctx: PEVP_CIPHER_CTX; vout: PByte; outl: PInteger): Integer; cdecl = nil;
+  EVP_EncryptFinal : function(ctx: PEVP_CIPHER_CTX; vout: PByte; outl: PInteger): Integer; cdecl = nil;
   EVP_DecryptInit : function(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; key: PByte; iv: PByte): Integer; cdecl = nil;
   EVP_DecryptInit_ex : function(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; impl: PENGINE; key: PByte; iv: PByte): Integer; cdecl = nil;
-  EVP_DecryptUpdate : function(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger; &in: PByte; inl: Integer): Integer; cdecl = nil;
+  EVP_DecryptUpdate : function(ctx: PEVP_CIPHER_CTX; vout: PByte; outl: PInteger; vin: PByte; inl: Integer): Integer; cdecl = nil;
   EVP_DecryptFinal : function(ctx: PEVP_CIPHER_CTX; outm: PByte; outl: PInteger): Integer; cdecl = nil;
   EVP_DecryptFinal_ex : function(ctx: PEVP_CIPHER_CTX; outm: PByte; outl: PInteger): Integer; cdecl = nil;
   EVP_CipherInit : function(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; key: PByte; iv: PByte; enc: Integer): Integer; cdecl = nil;
   EVP_CipherInit_ex : function(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; impl: PENGINE; key: PByte; iv: PByte; enc: Integer): Integer; cdecl = nil;
-  EVP_CipherUpdate : function(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger; &in: PByte; inl: Integer): Integer; cdecl = nil;
+  EVP_CipherUpdate : function(ctx: PEVP_CIPHER_CTX; vout: PByte; outl: PInteger; vin: PByte; inl: Integer): Integer; cdecl = nil;
   EVP_CipherFinal : function(ctx: PEVP_CIPHER_CTX; outm: PByte; outl: PInteger): Integer; cdecl = nil;
   EVP_CipherFinal_ex : function(ctx: PEVP_CIPHER_CTX; outm: PByte; outl: PInteger): Integer; cdecl = nil;
   EVP_SignFinal : function(ctx: PEVP_MD_CTX; md: PByte; s: PCardinal; pkey: PEVP_PKEY): Integer; cdecl = nil;
   EVP_DigestSign : function(ctx: PEVP_MD_CTX; sigret: PByte; var siglen: NativeUInt; tbs: PByte; tbslen: NativeUInt): Integer; cdecl = nil;
   EVP_VerifyFinal : function(ctx: PEVP_MD_CTX; sigbuf: PByte; siglen: Cardinal; pkey: PEVP_PKEY): Integer; cdecl = nil;
   EVP_DigestVerify : function(ctx: PEVP_MD_CTX; sigret: PByte; siglen: NativeUInt; tbs: PByte; tbslen: NativeUInt): Integer; cdecl = nil;
-  EVP_DigestSignInit : function(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; &type: PEVP_MD; e: PENGINE; pkey: PEVP_PKEY): Integer; cdecl = nil;
+  EVP_DigestSignInit : function(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; vtype: PEVP_MD; e: PENGINE; pkey: PEVP_PKEY): Integer; cdecl = nil;
   EVP_DigestSignFinal : function(ctx: PEVP_MD_CTX; sigret: PByte; var siglen: NativeUInt): Integer; cdecl = nil;
-  EVP_DigestVerifyInit : function(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; &type: PEVP_MD; e: PENGINE; pkey: PEVP_PKEY): Integer; cdecl = nil;
+  EVP_DigestVerifyInit : function(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; vtype: PEVP_MD; e: PENGINE; pkey: PEVP_PKEY): Integer; cdecl = nil;
   EVP_DigestVerifyFinal : function(ctx: PEVP_MD_CTX; sig: PByte; siglen: NativeUInt): Integer; cdecl = nil;
-  EVP_OpenInit : function(ctx: PEVP_CIPHER_CTX; &type: PEVP_CIPHER; ek: PByte; ekl: Integer; iv: PByte; priv: PEVP_PKEY): Integer; cdecl = nil;
-  EVP_OpenFinal : function(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger): Integer; cdecl = nil;
-  EVP_SealInit : function(ctx: PEVP_CIPHER_CTX; &type: PEVP_CIPHER; ek: PPByte; ekl: PInteger; iv: PByte; pubk: PPEVP_PKEY; npubk: Integer): Integer; cdecl = nil;
-  EVP_SealFinal : function(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger): Integer; cdecl = nil;
+  EVP_OpenInit : function(ctx: PEVP_CIPHER_CTX; vtype: PEVP_CIPHER; ek: PByte; ekl: Integer; iv: PByte; priv: PEVP_PKEY): Integer; cdecl = nil;
+  EVP_OpenFinal : function(ctx: PEVP_CIPHER_CTX; vout: PByte; outl: PInteger): Integer; cdecl = nil;
+  EVP_SealInit : function(ctx: PEVP_CIPHER_CTX; vtype: PEVP_CIPHER; ek: PPByte; ekl: PInteger; iv: PByte; pubk: PPEVP_PKEY; npubk: Integer): Integer; cdecl = nil;
+  EVP_SealFinal : function(ctx: PEVP_CIPHER_CTX; vout: PByte; outl: PInteger): Integer; cdecl = nil;
   EVP_ENCODE_CTX_new : function(): PEVP_ENCODE_CTX; cdecl = nil;
   EVP_ENCODE_CTX_free : procedure(ctx: PEVP_ENCODE_CTX); cdecl = nil;
   EVP_ENCODE_CTX_copy : function(dctx: PEVP_ENCODE_CTX; sctx: PEVP_ENCODE_CTX): Integer; cdecl = nil;
   EVP_ENCODE_CTX_num : function(ctx: PEVP_ENCODE_CTX): Integer; cdecl = nil;
   EVP_EncodeInit : procedure(ctx: PEVP_ENCODE_CTX); cdecl = nil;
-  EVP_EncodeUpdate : function(ctx: PEVP_ENCODE_CTX; &out: PByte; outl: PInteger; &in: PByte; inl: Integer): Integer; cdecl = nil;
-  EVP_EncodeFinal : procedure(ctx: PEVP_ENCODE_CTX; &out: PByte; outl: PInteger); cdecl = nil;
+  EVP_EncodeUpdate : function(ctx: PEVP_ENCODE_CTX; vout: PByte; outl: PInteger; vin: PByte; inl: Integer): Integer; cdecl = nil;
+  EVP_EncodeFinal : procedure(ctx: PEVP_ENCODE_CTX; vout: PByte; outl: PInteger); cdecl = nil;
   EVP_EncodeBlock : function(t: PByte; f: PByte; n: Integer): Integer; cdecl = nil;
   EVP_DecodeInit : procedure(ctx: PEVP_ENCODE_CTX); cdecl = nil;
-  EVP_DecodeUpdate : function(ctx: PEVP_ENCODE_CTX; &out: PByte; outl: PInteger; &in: PByte; inl: Integer): Integer; cdecl = nil;
-  EVP_DecodeFinal : function(ctx: PEVP_ENCODE_CTX; &out: PByte; outl: PInteger): Integer; cdecl = nil;
+  EVP_DecodeUpdate : function(ctx: PEVP_ENCODE_CTX; vout: PByte; outl: PInteger; vin: PByte; inl: Integer): Integer; cdecl = nil;
+  EVP_DecodeFinal : function(ctx: PEVP_ENCODE_CTX; vout: PByte; outl: PInteger): Integer; cdecl = nil;
   EVP_DecodeBlock : function(t: PByte; f: PByte; n: Integer): Integer; cdecl = nil;
   EVP_CIPHER_CTX_new : function(): PEVP_CIPHER_CTX; cdecl = nil;
   EVP_CIPHER_CTX_reset : function(c: PEVP_CIPHER_CTX): Integer; cdecl = nil;
   EVP_CIPHER_CTX_free : procedure(c: PEVP_CIPHER_CTX); cdecl = nil;
   EVP_CIPHER_CTX_set_key_length : function(x: PEVP_CIPHER_CTX; keylen: Integer): Integer; cdecl = nil;
   EVP_CIPHER_CTX_set_padding : function(c: PEVP_CIPHER_CTX; pad: Integer): Integer; cdecl = nil;
-  EVP_CIPHER_CTX_ctrl : function(ctx: PEVP_CIPHER_CTX; &type: Integer; arg: Integer; ptr: Pointer): Integer; cdecl = nil;
+  EVP_CIPHER_CTX_ctrl : function(ctx: PEVP_CIPHER_CTX; vtype: Integer; arg: Integer; ptr: Pointer): Integer; cdecl = nil;
   EVP_CIPHER_CTX_rand_key : function(ctx: PEVP_CIPHER_CTX; key: PByte): Integer; cdecl = nil;
   BIO_f_md : function(): PBIO_METHOD; cdecl = nil;
   BIO_f_base64 : function(): PBIO_METHOD; cdecl = nil;
@@ -13649,18 +13661,18 @@ const
   EVP_MD_do_all_sorted : procedure(fn: EVP_MD_do_all_sorted_fn; arg: Pointer); cdecl = nil;
   EVP_PKEY_decrypt_old : function(dec_key: PByte; enc_key: PByte; enc_key_len: Integer; private_key: PEVP_PKEY): Integer; cdecl = nil;
   EVP_PKEY_encrypt_old : function(enc_key: PByte; key: PByte; key_len: Integer; pub_key: PEVP_PKEY): Integer; cdecl = nil;
-  EVP_PKEY_type : function(&type: Integer): Integer; cdecl = nil;
+  EVP_PKEY_type : function(vtype: Integer): Integer; cdecl = nil;
   EVP_PKEY_id : function(pkey: PEVP_PKEY): Integer; cdecl = nil;
   EVP_PKEY_base_id : function(pkey: PEVP_PKEY): Integer; cdecl = nil;
   EVP_PKEY_bits : function(pkey: PEVP_PKEY): Integer; cdecl = nil;
   EVP_PKEY_security_bits : function(pkey: PEVP_PKEY): Integer; cdecl = nil;
   EVP_PKEY_size : function(pkey: PEVP_PKEY): Integer; cdecl = nil;
-  EVP_PKEY_set_type : function(pkey: PEVP_PKEY; &type: Integer): Integer; cdecl = nil;
+  EVP_PKEY_set_type : function(pkey: PEVP_PKEY; vtype: Integer): Integer; cdecl = nil;
   EVP_PKEY_set_type_str : function(pkey: PEVP_PKEY; str: PUTF8Char; len: Integer): Integer; cdecl = nil;
-  EVP_PKEY_set_alias_type : function(pkey: PEVP_PKEY; &type: Integer): Integer; cdecl = nil;
+  EVP_PKEY_set_alias_type : function(pkey: PEVP_PKEY; vtype: Integer): Integer; cdecl = nil;
   EVP_PKEY_set1_engine : function(pkey: PEVP_PKEY; e: PENGINE): Integer; cdecl = nil;
   EVP_PKEY_get0_engine : function(pkey: PEVP_PKEY): PENGINE; cdecl = nil;
-  EVP_PKEY_assign : function(pkey: PEVP_PKEY; &type: Integer; key: Pointer): Integer; cdecl = nil;
+  EVP_PKEY_assign : function(pkey: PEVP_PKEY; vtype: Integer; key: Pointer): Integer; cdecl = nil;
   EVP_PKEY_get0 : function(pkey: PEVP_PKEY): Pointer; cdecl = nil;
   EVP_PKEY_get0_hmac : function(pkey: PEVP_PKEY; len: PNativeUInt): PByte; cdecl = nil;
   EVP_PKEY_get0_poly1305 : function(pkey: PEVP_PKEY; len: PNativeUInt): PByte; cdecl = nil;
@@ -13680,30 +13692,30 @@ const
   EVP_PKEY_new : function(): PEVP_PKEY; cdecl = nil;
   EVP_PKEY_up_ref : function(pkey: PEVP_PKEY): Integer; cdecl = nil;
   EVP_PKEY_free : procedure(pkey: PEVP_PKEY); cdecl = nil;
-  d2i_PublicKey : function(&type: Integer; a: PPEVP_PKEY; pp: PPByte; length: Integer): PEVP_PKEY; cdecl = nil;
+  d2i_PublicKey : function(vtype: Integer; a: PPEVP_PKEY; pp: PPByte; length: Integer): PEVP_PKEY; cdecl = nil;
   i2d_PublicKey : function(a: PEVP_PKEY; pp: PPByte): Integer; cdecl = nil;
-  d2i_PrivateKey : function(&type: Integer; a: PPEVP_PKEY; pp: PPByte; length: Integer): PEVP_PKEY; cdecl = nil;
+  d2i_PrivateKey : function(vtype: Integer; a: PPEVP_PKEY; pp: PPByte; length: Integer): PEVP_PKEY; cdecl = nil;
   d2i_AutoPrivateKey : function(a: PPEVP_PKEY; pp: PPByte; length: Integer): PEVP_PKEY; cdecl = nil;
   i2d_PrivateKey : function(a: PEVP_PKEY; pp: PPByte): Integer; cdecl = nil;
-  EVP_PKEY_copy_parameters : function(&to: PEVP_PKEY; from: PEVP_PKEY): Integer; cdecl = nil;
+  EVP_PKEY_copy_parameters : function(vto: PEVP_PKEY; from: PEVP_PKEY): Integer; cdecl = nil;
   EVP_PKEY_missing_parameters : function(pkey: PEVP_PKEY): Integer; cdecl = nil;
   EVP_PKEY_save_parameters : function(pkey: PEVP_PKEY; mode: Integer): Integer; cdecl = nil;
   EVP_PKEY_cmp_parameters : function(a: PEVP_PKEY; b: PEVP_PKEY): Integer; cdecl = nil;
   EVP_PKEY_cmp : function(a: PEVP_PKEY; b: PEVP_PKEY): Integer; cdecl = nil;
-  EVP_PKEY_print_public : function(&out: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl = nil;
-  EVP_PKEY_print_private : function(&out: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl = nil;
-  EVP_PKEY_print_params : function(&out: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl = nil;
+  EVP_PKEY_print_public : function(vout: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl = nil;
+  EVP_PKEY_print_private : function(vout: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl = nil;
+  EVP_PKEY_print_params : function(vout: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl = nil;
   EVP_PKEY_get_default_digest_nid : function(pkey: PEVP_PKEY; pnid: PInteger): Integer; cdecl = nil;
   EVP_PKEY_set1_tls_encodedpoint : function(pkey: PEVP_PKEY; pt: PByte; ptlen: NativeUInt): Integer; cdecl = nil;
   EVP_PKEY_get1_tls_encodedpoint : function(pkey: PEVP_PKEY; ppt: PPByte): NativeUInt; cdecl = nil;
   EVP_CIPHER_type : function(ctx: PEVP_CIPHER): Integer; cdecl = nil;
-  EVP_CIPHER_param_to_asn1 : function(c: PEVP_CIPHER_CTX; &type: PASN1_TYPE): Integer; cdecl = nil;
-  EVP_CIPHER_asn1_to_param : function(c: PEVP_CIPHER_CTX; &type: PASN1_TYPE): Integer; cdecl = nil;
-  EVP_CIPHER_set_asn1_iv : function(c: PEVP_CIPHER_CTX; &type: PASN1_TYPE): Integer; cdecl = nil;
-  EVP_CIPHER_get_asn1_iv : function(c: PEVP_CIPHER_CTX; &type: PASN1_TYPE): Integer; cdecl = nil;
+  EVP_CIPHER_param_to_asn1 : function(c: PEVP_CIPHER_CTX; vtype: PASN1_TYPE): Integer; cdecl = nil;
+  EVP_CIPHER_asn1_to_param : function(c: PEVP_CIPHER_CTX; vtype: PASN1_TYPE): Integer; cdecl = nil;
+  EVP_CIPHER_set_asn1_iv : function(c: PEVP_CIPHER_CTX; vtype: PASN1_TYPE): Integer; cdecl = nil;
+  EVP_CIPHER_get_asn1_iv : function(c: PEVP_CIPHER_CTX; vtype: PASN1_TYPE): Integer; cdecl = nil;
   PKCS5_PBE_keyivgen : function(ctx: PEVP_CIPHER_CTX; pass: PUTF8Char; passlen: Integer; param: PASN1_TYPE; cipher: PEVP_CIPHER; md: PEVP_MD; en_de: Integer): Integer; cdecl = nil;
-  PKCS5_PBKDF2_HMAC_SHA1 : function(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; keylen: Integer; &out: PByte): Integer; cdecl = nil;
-  PKCS5_PBKDF2_HMAC : function(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; digest: PEVP_MD; keylen: Integer; &out: PByte): Integer; cdecl = nil;
+  PKCS5_PBKDF2_HMAC_SHA1 : function(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; keylen: Integer; vout: PByte): Integer; cdecl = nil;
+  PKCS5_PBKDF2_HMAC : function(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; digest: PEVP_MD; keylen: Integer; vout: PByte): Integer; cdecl = nil;
   PKCS5_v2_PBE_keyivgen : function(ctx: PEVP_CIPHER_CTX; pass: PUTF8Char; passlen: Integer; param: PASN1_TYPE; cipher: PEVP_CIPHER; md: PEVP_MD; en_de: Integer): Integer; cdecl = nil;
   EVP_PBE_scrypt : function(pass: PUTF8Char; passlen: NativeUInt; salt: PByte; saltlen: NativeUInt; N: UInt64; r: UInt64; p: UInt64; maxmem: UInt64; key: PByte; keylen: NativeUInt): Integer; cdecl = nil;
   PKCS5_v2_scrypt_keyivgen : function(ctx: PEVP_CIPHER_CTX; pass: PUTF8Char; passlen: Integer; param: PASN1_TYPE; c: PEVP_CIPHER; md: PEVP_MD; en_de: Integer): Integer; cdecl = nil;
@@ -13711,15 +13723,15 @@ const
   EVP_PBE_CipherInit : function(pbe_obj: PASN1_OBJECT; pass: PUTF8Char; passlen: Integer; param: PASN1_TYPE; ctx: PEVP_CIPHER_CTX; en_de: Integer): Integer; cdecl = nil;
   EVP_PBE_alg_add_type : function(pbe_type: Integer; pbe_nid: Integer; cipher_nid: Integer; md_nid: Integer; keygen: PEVP_PBE_KEYGEN): Integer; cdecl = nil;
   EVP_PBE_alg_add : function(nid: Integer; cipher: PEVP_CIPHER; md: PEVP_MD; keygen: PEVP_PBE_KEYGEN): Integer; cdecl = nil;
-  EVP_PBE_find : function(&type: Integer; pbe_nid: Integer; pcnid: PInteger; pmnid: PInteger; pkeygen: PPEVP_PBE_KEYGEN): Integer; cdecl = nil;
+  EVP_PBE_find : function(vtype: Integer; pbe_nid: Integer; pcnid: PInteger; pmnid: PInteger; pkeygen: PPEVP_PBE_KEYGEN): Integer; cdecl = nil;
   EVP_PBE_cleanup : procedure(); cdecl = nil;
   EVP_PBE_get : function(ptype: PInteger; ppbe_nid: PInteger; num: NativeUInt): Integer; cdecl = nil;
   EVP_PKEY_asn1_get_count : function(): Integer; cdecl = nil;
   EVP_PKEY_asn1_get0 : function(idx: Integer): PEVP_PKEY_ASN1_METHOD; cdecl = nil;
-  EVP_PKEY_asn1_find : function(pe: PPENGINE; &type: Integer): PEVP_PKEY_ASN1_METHOD; cdecl = nil;
+  EVP_PKEY_asn1_find : function(pe: PPENGINE; vtype: Integer): PEVP_PKEY_ASN1_METHOD; cdecl = nil;
   EVP_PKEY_asn1_find_str : function(pe: PPENGINE; str: PUTF8Char; len: Integer): PEVP_PKEY_ASN1_METHOD; cdecl = nil;
   EVP_PKEY_asn1_add0 : function(ameth: PEVP_PKEY_ASN1_METHOD): Integer; cdecl = nil;
-  EVP_PKEY_asn1_add_alias : function(&to: Integer; from: Integer): Integer; cdecl = nil;
+  EVP_PKEY_asn1_add_alias : function(vto: Integer; from: Integer): Integer; cdecl = nil;
   EVP_PKEY_asn1_get0_info : function(ppkey_id: PInteger; pkey_base_id: PInteger; ppkey_flags: PInteger; pinfo: PPUTF8Char; ppem_str: PPUTF8Char; ameth: PEVP_PKEY_ASN1_METHOD): Integer; cdecl = nil;
   EVP_PKEY_get0_asn1 : function(pkey: PEVP_PKEY): PEVP_PKEY_ASN1_METHOD; cdecl = nil;
   EVP_PKEY_asn1_new : function(id: Integer; flags: Integer; pem_str: PUTF8Char; info: PUTF8Char): PEVP_PKEY_ASN1_METHOD; cdecl = nil;
@@ -13740,7 +13752,7 @@ const
   EVP_PKEY_asn1_set_get_priv_key : procedure(ameth: PEVP_PKEY_ASN1_METHOD; get_priv_key: EVP_PKEY_asn1_set_get_priv_key_get_priv_key); cdecl = nil;
   EVP_PKEY_asn1_set_get_pub_key : procedure(ameth: PEVP_PKEY_ASN1_METHOD; get_pub_key: EVP_PKEY_asn1_set_get_pub_key_get_pub_key); cdecl = nil;
   EVP_PKEY_asn1_set_security_bits : procedure(ameth: PEVP_PKEY_ASN1_METHOD; pkey_security_bits: EVP_PKEY_asn1_set_security_bits_pkey_security_bits); cdecl = nil;
-  EVP_PKEY_meth_find : function(&type: Integer): PEVP_PKEY_METHOD; cdecl = nil;
+  EVP_PKEY_meth_find : function(vtype: Integer): PEVP_PKEY_METHOD; cdecl = nil;
   EVP_PKEY_meth_new : function(id: Integer; flags: Integer): PEVP_PKEY_METHOD; cdecl = nil;
   EVP_PKEY_meth_get0_info : procedure(ppkey_id: PInteger; pflags: PInteger; meth: PEVP_PKEY_METHOD); cdecl = nil;
   EVP_PKEY_meth_copy : procedure(dst: PEVP_PKEY_METHOD; src: PEVP_PKEY_METHOD); cdecl = nil;
@@ -13754,16 +13766,16 @@ const
   EVP_PKEY_CTX_dup : function(ctx: PEVP_PKEY_CTX): PEVP_PKEY_CTX; cdecl = nil;
   EVP_PKEY_CTX_free : procedure(ctx: PEVP_PKEY_CTX); cdecl = nil;
   EVP_PKEY_CTX_ctrl : function(ctx: PEVP_PKEY_CTX; keytype: Integer; optype: Integer; cmd: Integer; p1: Integer; p2: Pointer): Integer; cdecl = nil;
-  EVP_PKEY_CTX_ctrl_str : function(ctx: PEVP_PKEY_CTX; &type: PUTF8Char; value: PUTF8Char): Integer; cdecl = nil;
+  EVP_PKEY_CTX_ctrl_str : function(ctx: PEVP_PKEY_CTX; vtype: PUTF8Char; value: PUTF8Char): Integer; cdecl = nil;
   EVP_PKEY_CTX_ctrl_uint64 : function(ctx: PEVP_PKEY_CTX; keytype: Integer; optype: Integer; cmd: Integer; value: UInt64): Integer; cdecl = nil;
   EVP_PKEY_CTX_str2ctrl : function(ctx: PEVP_PKEY_CTX; cmd: Integer; str: PUTF8Char): Integer; cdecl = nil;
   EVP_PKEY_CTX_hex2ctrl : function(ctx: PEVP_PKEY_CTX; cmd: Integer; hex: PUTF8Char): Integer; cdecl = nil;
   EVP_PKEY_CTX_md : function(ctx: PEVP_PKEY_CTX; optype: Integer; cmd: Integer; md: PUTF8Char): Integer; cdecl = nil;
   EVP_PKEY_CTX_get_operation : function(ctx: PEVP_PKEY_CTX): Integer; cdecl = nil;
   EVP_PKEY_CTX_set0_keygen_info : procedure(ctx: PEVP_PKEY_CTX; dat: PInteger; datlen: Integer); cdecl = nil;
-  EVP_PKEY_new_mac_key : function(&type: Integer; e: PENGINE; key: PByte; keylen: Integer): PEVP_PKEY; cdecl = nil;
-  EVP_PKEY_new_raw_private_key : function(&type: Integer; e: PENGINE; priv: PByte; len: NativeUInt): PEVP_PKEY; cdecl = nil;
-  EVP_PKEY_new_raw_public_key : function(&type: Integer; e: PENGINE; pub: PByte; len: NativeUInt): PEVP_PKEY; cdecl = nil;
+  EVP_PKEY_new_mac_key : function(vtype: Integer; e: PENGINE; key: PByte; keylen: Integer): PEVP_PKEY; cdecl = nil;
+  EVP_PKEY_new_raw_private_key : function(vtype: Integer; e: PENGINE; priv: PByte; len: NativeUInt): PEVP_PKEY; cdecl = nil;
+  EVP_PKEY_new_raw_public_key : function(vtype: Integer; e: PENGINE; pub: PByte; len: NativeUInt): PEVP_PKEY; cdecl = nil;
   EVP_PKEY_get_raw_private_key : function(pkey: PEVP_PKEY; priv: PByte; len: PNativeUInt): Integer; cdecl = nil;
   EVP_PKEY_get_raw_public_key : function(pkey: PEVP_PKEY; pub: PByte; len: PNativeUInt): Integer; cdecl = nil;
   EVP_PKEY_new_CMAC_key : function(e: PENGINE; priv: PByte; len: NativeUInt; cipher: PEVP_CIPHER): PEVP_PKEY; cdecl = nil;
@@ -13780,9 +13792,9 @@ const
   EVP_PKEY_verify_recover_init : function(ctx: PEVP_PKEY_CTX): Integer; cdecl = nil;
   EVP_PKEY_verify_recover : function(ctx: PEVP_PKEY_CTX; rout: PByte; routlen: PNativeUInt; sig: PByte; siglen: NativeUInt): Integer; cdecl = nil;
   EVP_PKEY_encrypt_init : function(ctx: PEVP_PKEY_CTX): Integer; cdecl = nil;
-  EVP_PKEY_encrypt : function(ctx: PEVP_PKEY_CTX; &out: PByte; outlen: PNativeUInt; &in: PByte; inlen: NativeUInt): Integer; cdecl = nil;
+  EVP_PKEY_encrypt : function(ctx: PEVP_PKEY_CTX; vout: PByte; outlen: PNativeUInt; vin: PByte; inlen: NativeUInt): Integer; cdecl = nil;
   EVP_PKEY_decrypt_init : function(ctx: PEVP_PKEY_CTX): Integer; cdecl = nil;
-  EVP_PKEY_decrypt : function(ctx: PEVP_PKEY_CTX; &out: PByte; outlen: PNativeUInt; &in: PByte; inlen: NativeUInt): Integer; cdecl = nil;
+  EVP_PKEY_decrypt : function(ctx: PEVP_PKEY_CTX; vout: PByte; outlen: PNativeUInt; vin: PByte; inlen: NativeUInt): Integer; cdecl = nil;
   EVP_PKEY_derive_init : function(ctx: PEVP_PKEY_CTX): Integer; cdecl = nil;
   EVP_PKEY_derive_set_peer : function(ctx: PEVP_PKEY_CTX; peer: PEVP_PKEY): Integer; cdecl = nil;
   EVP_PKEY_derive : function(ctx: PEVP_PKEY_CTX; key: PByte; keylen: PNativeUInt): Integer; cdecl = nil;
@@ -13841,10 +13853,10 @@ const
   CMAC_CTX_cleanup : procedure(ctx: PCMAC_CTX); cdecl = nil;
   CMAC_CTX_free : procedure(ctx: PCMAC_CTX); cdecl = nil;
   CMAC_CTX_get0_cipher_ctx : function(ctx: PCMAC_CTX): PEVP_CIPHER_CTX; cdecl = nil;
-  CMAC_CTX_copy : function(&out: PCMAC_CTX; &in: PCMAC_CTX): Integer; cdecl = nil;
+  CMAC_CTX_copy : function(vout: PCMAC_CTX; vin: PCMAC_CTX): Integer; cdecl = nil;
   CMAC_Init : function(ctx: PCMAC_CTX; key: Pointer; keylen: NativeUInt; cipher: PEVP_CIPHER; impl: PENGINE): Integer; cdecl = nil;
   CMAC_Update : function(ctx: PCMAC_CTX; data: Pointer; dlen: NativeUInt): Integer; cdecl = nil;
-  CMAC_Final : function(ctx: PCMAC_CTX; &out: PByte; poutlen: PNativeUInt): Integer; cdecl = nil;
+  CMAC_Final : function(ctx: PCMAC_CTX; vout: PByte; poutlen: PNativeUInt): Integer; cdecl = nil;
   CMAC_resume : function(ctx: PCMAC_CTX): Integer; cdecl = nil;
   ERR_load_EC_strings : function(): Integer; cdecl = nil;
   EC_GFp_simple_method : function(): PEC_METHOD; cdecl = nil;
@@ -13941,8 +13953,8 @@ const
   EC_GROUP_get_basis_type : function(p1: PEC_GROUP): Integer; cdecl = nil;
   EC_GROUP_get_trinomial_basis : function(p1: PEC_GROUP; k: PCardinal): Integer; cdecl = nil;
   EC_GROUP_get_pentanomial_basis : function(p1: PEC_GROUP; k1: PCardinal; k2: PCardinal; k3: PCardinal): Integer; cdecl = nil;
-  d2i_ECPKParameters : function(p1: PPEC_GROUP; &in: PPByte; len: Integer): PEC_GROUP; cdecl = nil;
-  i2d_ECPKParameters : function(p1: PEC_GROUP; &out: PPByte): Integer; cdecl = nil;
+  d2i_ECPKParameters : function(p1: PPEC_GROUP; vin: PPByte; len: Integer): PEC_GROUP; cdecl = nil;
+  i2d_ECPKParameters : function(p1: PEC_GROUP; vout: PPByte): Integer; cdecl = nil;
   ECPKParameters_print : function(bp: PBIO; x: PEC_GROUP; off: Integer): Integer; cdecl = nil;
   ECPKParameters_print_fp : function(fp: PPointer; x: PEC_GROUP; off: Integer): Integer; cdecl = nil;
   EC_KEY_new : function(): PEC_KEY; cdecl = nil;
@@ -13978,12 +13990,12 @@ const
   EC_KEY_oct2priv : function(key: PEC_KEY; buf: PByte; len: NativeUInt): Integer; cdecl = nil;
   EC_KEY_priv2oct : function(key: PEC_KEY; buf: PByte; len: NativeUInt): NativeUInt; cdecl = nil;
   EC_KEY_priv2buf : function(eckey: PEC_KEY; pbuf: PPByte): NativeUInt; cdecl = nil;
-  d2i_ECPrivateKey : function(key: PPEC_KEY; &in: PPByte; len: Integer): PEC_KEY; cdecl = nil;
-  i2d_ECPrivateKey : function(key: PEC_KEY; &out: PPByte): Integer; cdecl = nil;
-  d2i_ECParameters : function(key: PPEC_KEY; &in: PPByte; len: Integer): PEC_KEY; cdecl = nil;
-  i2d_ECParameters : function(key: PEC_KEY; &out: PPByte): Integer; cdecl = nil;
-  o2i_ECPublicKey : function(key: PPEC_KEY; &in: PPByte; len: Integer): PEC_KEY; cdecl = nil;
-  i2o_ECPublicKey : function(key: PEC_KEY; &out: PPByte): Integer; cdecl = nil;
+  d2i_ECPrivateKey : function(key: PPEC_KEY; vin: PPByte; len: Integer): PEC_KEY; cdecl = nil;
+  i2d_ECPrivateKey : function(key: PEC_KEY; vout: PPByte): Integer; cdecl = nil;
+  d2i_ECParameters : function(key: PPEC_KEY; vin: PPByte; len: Integer): PEC_KEY; cdecl = nil;
+  i2d_ECParameters : function(key: PEC_KEY; vout: PPByte): Integer; cdecl = nil;
+  o2i_ECPublicKey : function(key: PPEC_KEY; vin: PPByte; len: Integer): PEC_KEY; cdecl = nil;
+  i2o_ECPublicKey : function(key: PEC_KEY; vout: PPByte): Integer; cdecl = nil;
   ECParameters_print : function(bp: PBIO; key: PEC_KEY): Integer; cdecl = nil;
   EC_KEY_print : function(bp: PBIO; key: PEC_KEY; off: Integer): Integer; cdecl = nil;
   ECParameters_print_fp : function(fp: PPointer; key: PEC_KEY): Integer; cdecl = nil;
@@ -13994,8 +14006,8 @@ const
   EC_KEY_get_method : function(key: PEC_KEY): PEC_KEY_METHOD; cdecl = nil;
   EC_KEY_set_method : function(key: PEC_KEY; meth: PEC_KEY_METHOD): Integer; cdecl = nil;
   EC_KEY_new_method : function(engine: PENGINE): PEC_KEY; cdecl = nil;
-  ECDH_KDF_X9_62 : function(&out: PByte; outlen: NativeUInt; Z: PByte; Zlen: NativeUInt; sinfo: PByte; sinfolen: NativeUInt; md: PEVP_MD): Integer; cdecl = nil;
-  ECDH_compute_key : function(&out: Pointer; outlen: NativeUInt; pub_key: PEC_POINT; ecdh: PEC_KEY; KDF: ECDH_compute_key_KDF): Integer; cdecl = nil;
+  ECDH_KDF_X9_62 : function(vout: PByte; outlen: NativeUInt; Z: PByte; Zlen: NativeUInt; sinfo: PByte; sinfolen: NativeUInt; md: PEVP_MD): Integer; cdecl = nil;
+  ECDH_compute_key : function(vout: Pointer; outlen: NativeUInt; pub_key: PEC_POINT; ecdh: PEC_KEY; KDF: ECDH_compute_key_KDF): Integer; cdecl = nil;
   ECDSA_SIG_new : function(): PECDSA_SIG; cdecl = nil;
   ECDSA_SIG_free : procedure(sig: PECDSA_SIG); cdecl = nil;
   i2d_ECDSA_SIG : function(sig: PECDSA_SIG; pp: PPByte): Integer; cdecl = nil;
@@ -14008,9 +14020,9 @@ const
   ECDSA_do_sign_ex : function(dgst: PByte; dgstlen: Integer; kinv: PBIGNUM; rp: PBIGNUM; eckey: PEC_KEY): PECDSA_SIG; cdecl = nil;
   ECDSA_do_verify : function(dgst: PByte; dgst_len: Integer; sig: PECDSA_SIG; eckey: PEC_KEY): Integer; cdecl = nil;
   ECDSA_sign_setup : function(eckey: PEC_KEY; ctx: PBN_CTX; kinv: PPBIGNUM; rp: PPBIGNUM): Integer; cdecl = nil;
-  ECDSA_sign : function(&type: Integer; dgst: PByte; dgstlen: Integer; sig: PByte; siglen: PCardinal; eckey: PEC_KEY): Integer; cdecl = nil;
-  ECDSA_sign_ex : function(&type: Integer; dgst: PByte; dgstlen: Integer; sig: PByte; siglen: PCardinal; kinv: PBIGNUM; rp: PBIGNUM; eckey: PEC_KEY): Integer; cdecl = nil;
-  ECDSA_verify : function(&type: Integer; dgst: PByte; dgstlen: Integer; sig: PByte; siglen: Integer; eckey: PEC_KEY): Integer; cdecl = nil;
+  ECDSA_sign : function(vtype: Integer; dgst: PByte; dgstlen: Integer; sig: PByte; siglen: PCardinal; eckey: PEC_KEY): Integer; cdecl = nil;
+  ECDSA_sign_ex : function(vtype: Integer; dgst: PByte; dgstlen: Integer; sig: PByte; siglen: PCardinal; kinv: PBIGNUM; rp: PBIGNUM; eckey: PEC_KEY): Integer; cdecl = nil;
+  ECDSA_verify : function(vtype: Integer; dgst: PByte; dgstlen: Integer; sig: PByte; siglen: Integer; eckey: PEC_KEY): Integer; cdecl = nil;
   ECDSA_size : function(eckey: PEC_KEY): Integer; cdecl = nil;
   EC_KEY_METHOD_new : function(meth: PEC_KEY_METHOD): PEC_KEY_METHOD; cdecl = nil;
   EC_KEY_METHOD_free : procedure(meth: PEC_KEY_METHOD); cdecl = nil;
@@ -14061,10 +14073,10 @@ const
   RSA_X931_generate_key_ex : function(rsa: PRSA; bits: Integer; e: PBIGNUM; cb: PBN_GENCB): Integer; cdecl = nil;
   RSA_check_key : function(p1: PRSA): Integer; cdecl = nil;
   RSA_check_key_ex : function(p1: PRSA; cb: PBN_GENCB): Integer; cdecl = nil;
-  RSA_public_encrypt : function(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl = nil;
-  RSA_private_encrypt : function(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl = nil;
-  RSA_public_decrypt : function(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl = nil;
-  RSA_private_decrypt : function(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl = nil;
+  RSA_public_encrypt : function(flen: Integer; from: PByte; vto: PByte; rsa: PRSA; padding: Integer): Integer; cdecl = nil;
+  RSA_private_encrypt : function(flen: Integer; from: PByte; vto: PByte; rsa: PRSA; padding: Integer): Integer; cdecl = nil;
+  RSA_public_decrypt : function(flen: Integer; from: PByte; vto: PByte; rsa: PRSA; padding: Integer): Integer; cdecl = nil;
+  RSA_private_decrypt : function(flen: Integer; from: PByte; vto: PByte; rsa: PRSA; padding: Integer): Integer; cdecl = nil;
   RSA_free : procedure(r: PRSA); cdecl = nil;
   RSA_up_ref : function(r: PRSA): Integer; cdecl = nil;
   RSA_flags : function(r: PRSA): Integer; cdecl = nil;
@@ -14075,46 +14087,46 @@ const
   RSA_set_method : function(rsa: PRSA; meth: PRSA_METHOD): Integer; cdecl = nil;
   RSA_PKCS1_OpenSSL : function(): PRSA_METHOD; cdecl = nil;
   RSA_pkey_ctx_ctrl : function(ctx: PEVP_PKEY_CTX; optype: Integer; cmd: Integer; p1: Integer; p2: Pointer): Integer; cdecl = nil;
-  d2i_RSAPublicKey : function(a: PPRSA; &in: PPByte; len: Integer): PRSA; cdecl = nil;
-  i2d_RSAPublicKey : function(a: PRSA; &out: PPByte): Integer; cdecl = nil;
+  d2i_RSAPublicKey : function(a: PPRSA; vin: PPByte; len: Integer): PRSA; cdecl = nil;
+  i2d_RSAPublicKey : function(a: PRSA; vout: PPByte): Integer; cdecl = nil;
   RSAPublicKey_it : function(): PASN1_ITEM; cdecl = nil;
-  d2i_RSAPrivateKey : function(a: PPRSA; &in: PPByte; len: Integer): PRSA; cdecl = nil;
-  i2d_RSAPrivateKey : function(a: PRSA; &out: PPByte): Integer; cdecl = nil;
+  d2i_RSAPrivateKey : function(a: PPRSA; vin: PPByte; len: Integer): PRSA; cdecl = nil;
+  i2d_RSAPrivateKey : function(a: PRSA; vout: PPByte): Integer; cdecl = nil;
   RSAPrivateKey_it : function(): PASN1_ITEM; cdecl = nil;
   RSA_PSS_PARAMS_new : function(): PRSA_PSS_PARAMS; cdecl = nil;
   RSA_PSS_PARAMS_free : procedure(a: PRSA_PSS_PARAMS); cdecl = nil;
-  d2i_RSA_PSS_PARAMS : function(a: PPRSA_PSS_PARAMS; &in: PPByte; len: Integer): PRSA_PSS_PARAMS; cdecl = nil;
-  i2d_RSA_PSS_PARAMS : function(a: PRSA_PSS_PARAMS; &out: PPByte): Integer; cdecl = nil;
+  d2i_RSA_PSS_PARAMS : function(a: PPRSA_PSS_PARAMS; vin: PPByte; len: Integer): PRSA_PSS_PARAMS; cdecl = nil;
+  i2d_RSA_PSS_PARAMS : function(a: PRSA_PSS_PARAMS; vout: PPByte): Integer; cdecl = nil;
   RSA_PSS_PARAMS_it : function(): PASN1_ITEM; cdecl = nil;
   RSA_OAEP_PARAMS_new : function(): PRSA_OAEP_PARAMS; cdecl = nil;
   RSA_OAEP_PARAMS_free : procedure(a: PRSA_OAEP_PARAMS); cdecl = nil;
-  d2i_RSA_OAEP_PARAMS : function(a: PPRSA_OAEP_PARAMS; &in: PPByte; len: Integer): PRSA_OAEP_PARAMS; cdecl = nil;
-  i2d_RSA_OAEP_PARAMS : function(a: PRSA_OAEP_PARAMS; &out: PPByte): Integer; cdecl = nil;
+  d2i_RSA_OAEP_PARAMS : function(a: PPRSA_OAEP_PARAMS; vin: PPByte; len: Integer): PRSA_OAEP_PARAMS; cdecl = nil;
+  i2d_RSA_OAEP_PARAMS : function(a: PRSA_OAEP_PARAMS; vout: PPByte): Integer; cdecl = nil;
   RSA_OAEP_PARAMS_it : function(): PASN1_ITEM; cdecl = nil;
   RSA_print_fp : function(fp: PPointer; r: PRSA; offset: Integer): Integer; cdecl = nil;
   RSA_print : function(bp: PBIO; r: PRSA; offset: Integer): Integer; cdecl = nil;
-  RSA_sign : function(&type: Integer; m: PByte; m_length: Cardinal; sigret: PByte; siglen: PCardinal; rsa: PRSA): Integer; cdecl = nil;
-  RSA_verify : function(&type: Integer; m: PByte; m_length: Cardinal; sigbuf: PByte; siglen: Cardinal; rsa: PRSA): Integer; cdecl = nil;
-  RSA_sign_ASN1_OCTET_STRING : function(&type: Integer; m: PByte; m_length: Cardinal; sigret: PByte; siglen: PCardinal; rsa: PRSA): Integer; cdecl = nil;
-  RSA_verify_ASN1_OCTET_STRING : function(&type: Integer; m: PByte; m_length: Cardinal; sigbuf: PByte; siglen: Cardinal; rsa: PRSA): Integer; cdecl = nil;
+  RSA_sign : function(vtype: Integer; m: PByte; m_length: Cardinal; sigret: PByte; siglen: PCardinal; rsa: PRSA): Integer; cdecl = nil;
+  RSA_verify : function(vtype: Integer; m: PByte; m_length: Cardinal; sigbuf: PByte; siglen: Cardinal; rsa: PRSA): Integer; cdecl = nil;
+  RSA_sign_ASN1_OCTET_STRING : function(vtype: Integer; m: PByte; m_length: Cardinal; sigret: PByte; siglen: PCardinal; rsa: PRSA): Integer; cdecl = nil;
+  RSA_verify_ASN1_OCTET_STRING : function(vtype: Integer; m: PByte; m_length: Cardinal; sigbuf: PByte; siglen: Cardinal; rsa: PRSA): Integer; cdecl = nil;
   RSA_blinding_on : function(rsa: PRSA; ctx: PBN_CTX): Integer; cdecl = nil;
   RSA_blinding_off : procedure(rsa: PRSA); cdecl = nil;
   RSA_setup_blinding : function(rsa: PRSA; ctx: PBN_CTX): PBN_BLINDING; cdecl = nil;
-  RSA_padding_add_PKCS1_type_1 : function(&to: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl = nil;
-  RSA_padding_check_PKCS1_type_1 : function(&to: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl = nil;
-  RSA_padding_add_PKCS1_type_2 : function(&to: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl = nil;
-  RSA_padding_check_PKCS1_type_2 : function(&to: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl = nil;
+  RSA_padding_add_PKCS1_type_1 : function(vto: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl = nil;
+  RSA_padding_check_PKCS1_type_1 : function(vto: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl = nil;
+  RSA_padding_add_PKCS1_type_2 : function(vto: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl = nil;
+  RSA_padding_check_PKCS1_type_2 : function(vto: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl = nil;
   PKCS1_MGF1 : function(mask: PByte; len: Integer; seed: PByte; seedlen: Integer; dgst: PEVP_MD): Integer; cdecl = nil;
-  RSA_padding_add_PKCS1_OAEP : function(&to: PByte; tlen: Integer; f: PByte; fl: Integer; p: PByte; pl: Integer): Integer; cdecl = nil;
-  RSA_padding_check_PKCS1_OAEP : function(&to: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer; p: PByte; pl: Integer): Integer; cdecl = nil;
-  RSA_padding_add_PKCS1_OAEP_mgf1 : function(&to: PByte; tlen: Integer; from: PByte; flen: Integer; param: PByte; plen: Integer; md: PEVP_MD; mgf1md: PEVP_MD): Integer; cdecl = nil;
-  RSA_padding_check_PKCS1_OAEP_mgf1 : function(&to: PByte; tlen: Integer; from: PByte; flen: Integer; num: Integer; param: PByte; plen: Integer; md: PEVP_MD; mgf1md: PEVP_MD): Integer; cdecl = nil;
-  RSA_padding_add_SSLv23 : function(&to: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl = nil;
-  RSA_padding_check_SSLv23 : function(&to: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl = nil;
-  RSA_padding_add_none : function(&to: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl = nil;
-  RSA_padding_check_none : function(&to: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl = nil;
-  RSA_padding_add_X931 : function(&to: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl = nil;
-  RSA_padding_check_X931 : function(&to: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl = nil;
+  RSA_padding_add_PKCS1_OAEP : function(vto: PByte; tlen: Integer; f: PByte; fl: Integer; p: PByte; pl: Integer): Integer; cdecl = nil;
+  RSA_padding_check_PKCS1_OAEP : function(vto: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer; p: PByte; pl: Integer): Integer; cdecl = nil;
+  RSA_padding_add_PKCS1_OAEP_mgf1 : function(vto: PByte; tlen: Integer; from: PByte; flen: Integer; param: PByte; plen: Integer; md: PEVP_MD; mgf1md: PEVP_MD): Integer; cdecl = nil;
+  RSA_padding_check_PKCS1_OAEP_mgf1 : function(vto: PByte; tlen: Integer; from: PByte; flen: Integer; num: Integer; param: PByte; plen: Integer; md: PEVP_MD; mgf1md: PEVP_MD): Integer; cdecl = nil;
+  RSA_padding_add_SSLv23 : function(vto: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl = nil;
+  RSA_padding_check_SSLv23 : function(vto: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl = nil;
+  RSA_padding_add_none : function(vto: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl = nil;
+  RSA_padding_check_none : function(vto: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl = nil;
+  RSA_padding_add_X931 : function(vto: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl = nil;
+  RSA_padding_check_X931 : function(vto: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl = nil;
   RSA_X931_hash_id : function(nid: Integer): Integer; cdecl = nil;
   RSA_verify_PKCS1_PSS : function(rsa: PRSA; mHash: PByte; Hash: PEVP_MD; EM: PByte; sLen: Integer): Integer; cdecl = nil;
   RSA_padding_add_PKCS1_PSS : function(rsa: PRSA; EM: PByte; mHash: PByte; Hash: PEVP_MD; sLen: Integer): Integer; cdecl = nil;
@@ -14133,13 +14145,13 @@ const
   RSA_meth_set_flags : function(meth: PRSA_METHOD; flags: Integer): Integer; cdecl = nil;
   RSA_meth_get0_app_data : function(meth: PRSA_METHOD): Pointer; cdecl = nil;
   RSA_meth_set0_app_data : function(meth: PRSA_METHOD; app_data: Pointer): Integer; cdecl = nil;
-//  RSA_meth_get_pub_enc : function(flen: Integerfrom: PByte&to: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer; cdecl = nil;
+//  RSA_meth_get_pub_enc : function(flen: Integerfrom: PBytevto: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer; cdecl = nil;
   RSA_meth_set_pub_enc : function(rsa: PRSA_METHOD; pub_enc: RSA_meth_set_pub_enc_pub_enc): Integer; cdecl = nil;
-//  RSA_meth_get_pub_dec : function(flen: Integerfrom: PByte&to: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer; cdecl = nil;
+//  RSA_meth_get_pub_dec : function(flen: Integerfrom: PBytevto: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer; cdecl = nil;
   RSA_meth_set_pub_dec : function(rsa: PRSA_METHOD; pub_dec: RSA_meth_set_pub_dec_pub_dec): Integer; cdecl = nil;
-//  RSA_meth_get_priv_enc : function(flen: Integerfrom: PByte&to: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer; cdecl = nil;
+//  RSA_meth_get_priv_enc : function(flen: Integerfrom: PBytevto: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer; cdecl = nil;
   RSA_meth_set_priv_enc : function(rsa: PRSA_METHOD; priv_enc: RSA_meth_set_priv_enc_priv_enc): Integer; cdecl = nil;
-//  RSA_meth_get_priv_dec : function(flen: Integerfrom: PByte&to: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer; cdecl = nil;
+//  RSA_meth_get_priv_dec : function(flen: Integerfrom: PBytevto: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer; cdecl = nil;
   RSA_meth_set_priv_dec : function(rsa: PRSA_METHOD; priv_dec: RSA_meth_set_priv_dec_priv_dec): Integer; cdecl = nil;
 //  RSA_meth_get_mod_exp : function(r0: PBIGNUMi: PBIGNUMrsa: PRSActx: PBN_CTXmeth: PRSA_METHOD): Integer; cdecl = nil;
   RSA_meth_set_mod_exp : function(rsa: PRSA_METHOD; mod_exp: RSA_meth_set_mod_exp_mod_exp): Integer; cdecl = nil;
@@ -14149,7 +14161,7 @@ const
   RSA_meth_set_init : function(rsa: PRSA_METHOD; init: RSA_meth_set_init_init): Integer; cdecl = nil;
 //  RSA_meth_get_finish : function(rsa: PRSAmeth: PRSA_METHOD): Integer; cdecl = nil;
   RSA_meth_set_finish : function(rsa: PRSA_METHOD; finish: RSA_meth_set_finish_finish): Integer; cdecl = nil;
-//  RSA_meth_get_sign : function(&type: Integerm: PBytem_length: Cardinalsigret: PBytesiglen: PCardinalrsa: PRSAmeth: PRSA_METHOD): Integer; cdecl = nil;
+//  RSA_meth_get_sign : function(vtype: Integerm: PBytem_length: Cardinalsigret: PBytesiglen: PCardinalrsa: PRSAmeth: PRSA_METHOD): Integer; cdecl = nil;
   RSA_meth_set_sign : function(rsa: PRSA_METHOD; sign: RSA_meth_set_sign_sign): Integer; cdecl = nil;
 //  RSA_meth_get_verify : function(dtype: Integerm: PBytem_length: Cardinalsigbuf: PBytesiglen: Cardinalrsa: PRSAmeth: PRSA_METHOD): Integer; cdecl = nil;
   RSA_meth_set_verify : function(rsa: PRSA_METHOD; verify: RSA_meth_set_verify_verify): Integer; cdecl = nil;
@@ -14195,7 +14207,7 @@ const
   DH_get_2048_256 : function(): PDH; cdecl = nil;
   DH_new_by_nid : function(nid: Integer): PDH; cdecl = nil;
   DH_get_nid : function(dh: PDH): Integer; cdecl = nil;
-  DH_KDF_X9_42 : function(&out: PByte; outlen: NativeUInt; Z: PByte; Zlen: NativeUInt; key_oid: PASN1_OBJECT; ukm: PByte; ukmlen: NativeUInt; md: PEVP_MD): Integer; cdecl = nil;
+  DH_KDF_X9_42 : function(vout: PByte; outlen: NativeUInt; Z: PByte; Zlen: NativeUInt; key_oid: PASN1_OBJECT; ukm: PByte; ukmlen: NativeUInt; md: PEVP_MD): Integer; cdecl = nil;
   DH_get0_pqg : procedure(dh: PDH; p: PPBIGNUM; q: PPBIGNUM; g: PPBIGNUM); cdecl = nil;
   DH_set0_pqg : function(dh: PDH; p: PBIGNUM; q: PBIGNUM; g: PBIGNUM): Integer; cdecl = nil;
   DH_get0_key : procedure(dh: PDH; pub_key: PPBIGNUM; priv_key: PPBIGNUM); cdecl = nil;
@@ -14255,8 +14267,8 @@ const
   DSA_bits : function(d: PDSA): Integer; cdecl = nil;
   DSA_security_bits : function(d: PDSA): Integer; cdecl = nil;
   DSA_sign_setup : function(dsa: PDSA; ctx_in: PBN_CTX; kinvp: PPBIGNUM; rp: PPBIGNUM): Integer; cdecl = nil;
-  DSA_sign : function(&type: Integer; dgst: PByte; dlen: Integer; sig: PByte; siglen: PCardinal; dsa: PDSA): Integer; cdecl = nil;
-  DSA_verify : function(&type: Integer; dgst: PByte; dgst_len: Integer; sigbuf: PByte; siglen: Integer; dsa: PDSA): Integer; cdecl = nil;
+  DSA_sign : function(vtype: Integer; dgst: PByte; dlen: Integer; sig: PByte; siglen: PCardinal; dsa: PDSA): Integer; cdecl = nil;
+  DSA_verify : function(vtype: Integer; dgst: PByte; dgst_len: Integer; sigbuf: PByte; siglen: Integer; dsa: PDSA): Integer; cdecl = nil;
   DSA_set_ex_data : function(d: PDSA; idx: Integer; arg: Pointer): Integer; cdecl = nil;
   DSA_get_ex_data : function(d: PDSA; idx: Integer): Pointer; cdecl = nil;
   d2i_DSAPublicKey : function(a: PPDSA; pp: PPByte; length: Integer): PDSA; cdecl = nil;
@@ -14352,13 +14364,13 @@ const
   OPENSSL_LH_stats : procedure(lh: POPENSSL_LHASH; fp: PPointer); cdecl = nil;
   OPENSSL_LH_node_stats : procedure(lh: POPENSSL_LHASH; fp: PPointer); cdecl = nil;
   OPENSSL_LH_node_usage_stats : procedure(lh: POPENSSL_LHASH; fp: PPointer); cdecl = nil;
-  OPENSSL_LH_stats_bio : procedure(lh: POPENSSL_LHASH; &out: PBIO); cdecl = nil;
-  OPENSSL_LH_node_stats_bio : procedure(lh: POPENSSL_LHASH; &out: PBIO); cdecl = nil;
-  OPENSSL_LH_node_usage_stats_bio : procedure(lh: POPENSSL_LHASH; &out: PBIO); cdecl = nil;
+  OPENSSL_LH_stats_bio : procedure(lh: POPENSSL_LHASH; vout: PBIO); cdecl = nil;
+  OPENSSL_LH_node_stats_bio : procedure(lh: POPENSSL_LHASH; vout: PBIO); cdecl = nil;
+  OPENSSL_LH_node_usage_stats_bio : procedure(lh: POPENSSL_LHASH; vout: PBIO); cdecl = nil;
   X509_STORE_set_depth : function(store: PX509_STORE; depth: Integer): Integer; cdecl = nil;
   X509_STORE_CTX_set_depth : procedure(ctx: PX509_STORE_CTX; depth: Integer); cdecl = nil;
-  X509_OBJECT_idx_by_subject : function(h: Pstack_st_X509_OBJECT; &type: X509_LOOKUP_TYPE; name: PX509_NAME): Integer; cdecl = nil;
-  X509_OBJECT_retrieve_by_subject : function(h: Pstack_st_X509_OBJECT; &type: X509_LOOKUP_TYPE; name: PX509_NAME): PX509_OBJECT; cdecl = nil;
+  X509_OBJECT_idx_by_subject : function(h: Pstack_st_X509_OBJECT; vtype: X509_LOOKUP_TYPE; name: PX509_NAME): Integer; cdecl = nil;
+  X509_OBJECT_retrieve_by_subject : function(h: Pstack_st_X509_OBJECT; vtype: X509_LOOKUP_TYPE; name: PX509_NAME): PX509_OBJECT; cdecl = nil;
   X509_OBJECT_retrieve_match : function(h: Pstack_st_X509_OBJECT; x: PX509_OBJECT): PX509_OBJECT; cdecl = nil;
   X509_OBJECT_up_ref_count : function(a: PX509_OBJECT): Integer; cdecl = nil;
   X509_OBJECT_new : function(): PX509_OBJECT; cdecl = nil;
@@ -14462,25 +14474,25 @@ const
   X509_LOOKUP_meth_get_get_by_alias : function(method: PX509_LOOKUP_METHOD): X509_LOOKUP_get_by_alias_fn; cdecl = nil;
   X509_STORE_add_cert : function(ctx: PX509_STORE; x: PX509): Integer; cdecl = nil;
   X509_STORE_add_crl : function(ctx: PX509_STORE; x: PX509_CRL): Integer; cdecl = nil;
-  X509_STORE_CTX_get_by_subject : function(vs: PX509_STORE_CTX; &type: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl = nil;
-  X509_STORE_get_by_subject : function(vs: PX509_STORE_CTX; &type: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl = nil;
-  X509_STORE_CTX_get_obj_by_subject : function(vs: PX509_STORE_CTX; &type: X509_LOOKUP_TYPE; name: PX509_NAME): PX509_OBJECT; cdecl = nil;
+  X509_STORE_CTX_get_by_subject : function(vs: PX509_STORE_CTX; vtype: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl = nil;
+  X509_STORE_get_by_subject : function(vs: PX509_STORE_CTX; vtype: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl = nil;
+  X509_STORE_CTX_get_obj_by_subject : function(vs: PX509_STORE_CTX; vtype: X509_LOOKUP_TYPE; name: PX509_NAME): PX509_OBJECT; cdecl = nil;
   X509_LOOKUP_ctrl : function(ctx: PX509_LOOKUP; cmd: Integer; argc: PUTF8Char; argl: Integer; ret: PPUTF8Char): Integer; cdecl = nil;
-  X509_load_cert_file : function(ctx: PX509_LOOKUP; &file: PUTF8Char; &type: Integer): Integer; cdecl = nil;
-  X509_load_crl_file : function(ctx: PX509_LOOKUP; &file: PUTF8Char; &type: Integer): Integer; cdecl = nil;
-  X509_load_cert_crl_file : function(ctx: PX509_LOOKUP; &file: PUTF8Char; &type: Integer): Integer; cdecl = nil;
+  X509_load_cert_file : function(ctx: PX509_LOOKUP; vfile: PUTF8Char; vtype: Integer): Integer; cdecl = nil;
+  X509_load_crl_file : function(ctx: PX509_LOOKUP; vfile: PUTF8Char; vtype: Integer): Integer; cdecl = nil;
+  X509_load_cert_crl_file : function(ctx: PX509_LOOKUP; vfile: PUTF8Char; vtype: Integer): Integer; cdecl = nil;
   X509_LOOKUP_new : function(method: PX509_LOOKUP_METHOD): PX509_LOOKUP; cdecl = nil;
   X509_LOOKUP_free : procedure(ctx: PX509_LOOKUP); cdecl = nil;
   X509_LOOKUP_init : function(ctx: PX509_LOOKUP): Integer; cdecl = nil;
-  X509_LOOKUP_by_subject : function(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl = nil;
-  X509_LOOKUP_by_issuer_serial : function(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; name: PX509_NAME; serial: PASN1_INTEGER; ret: PX509_OBJECT): Integer; cdecl = nil;
-  X509_LOOKUP_by_fingerprint : function(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; bytes: PByte; len: Integer; ret: PX509_OBJECT): Integer; cdecl = nil;
-  X509_LOOKUP_by_alias : function(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; str: PUTF8Char; len: Integer; ret: PX509_OBJECT): Integer; cdecl = nil;
+  X509_LOOKUP_by_subject : function(ctx: PX509_LOOKUP; vtype: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl = nil;
+  X509_LOOKUP_by_issuer_serial : function(ctx: PX509_LOOKUP; vtype: X509_LOOKUP_TYPE; name: PX509_NAME; serial: PASN1_INTEGER; ret: PX509_OBJECT): Integer; cdecl = nil;
+  X509_LOOKUP_by_fingerprint : function(ctx: PX509_LOOKUP; vtype: X509_LOOKUP_TYPE; bytes: PByte; len: Integer; ret: PX509_OBJECT): Integer; cdecl = nil;
+  X509_LOOKUP_by_alias : function(ctx: PX509_LOOKUP; vtype: X509_LOOKUP_TYPE; str: PUTF8Char; len: Integer; ret: PX509_OBJECT): Integer; cdecl = nil;
   X509_LOOKUP_set_method_data : function(ctx: PX509_LOOKUP; data: Pointer): Integer; cdecl = nil;
   X509_LOOKUP_get_method_data : function(ctx: PX509_LOOKUP): Pointer; cdecl = nil;
   X509_LOOKUP_get_store : function(ctx: PX509_LOOKUP): PX509_STORE; cdecl = nil;
   X509_LOOKUP_shutdown : function(ctx: PX509_LOOKUP): Integer; cdecl = nil;
-  X509_STORE_load_locations : function(ctx: PX509_STORE; &file: PUTF8Char; dir: PUTF8Char): Integer; cdecl = nil;
+  X509_STORE_load_locations : function(ctx: PX509_STORE; vfile: PUTF8Char; dir: PUTF8Char): Integer; cdecl = nil;
   X509_STORE_set_default_paths : function(ctx: PX509_STORE): Integer; cdecl = nil;
   X509_STORE_CTX_set_ex_data : function(ctx: PX509_STORE_CTX; idx: Integer; data: Pointer): Integer; cdecl = nil;
   X509_STORE_CTX_get_ex_data : function(ctx: PX509_STORE_CTX; idx: Integer): Pointer; cdecl = nil;
@@ -14513,8 +14525,8 @@ const
   X509_STORE_CTX_set0_dane : procedure(ctx: PX509_STORE_CTX; dane: PSSL_DANE); cdecl = nil;
   X509_VERIFY_PARAM_new : function(): PX509_VERIFY_PARAM; cdecl = nil;
   X509_VERIFY_PARAM_free : procedure(param: PX509_VERIFY_PARAM); cdecl = nil;
-  X509_VERIFY_PARAM_inherit : function(&to: PX509_VERIFY_PARAM; from: PX509_VERIFY_PARAM): Integer; cdecl = nil;
-  X509_VERIFY_PARAM_set1 : function(&to: PX509_VERIFY_PARAM; from: PX509_VERIFY_PARAM): Integer; cdecl = nil;
+  X509_VERIFY_PARAM_inherit : function(vto: PX509_VERIFY_PARAM; from: PX509_VERIFY_PARAM): Integer; cdecl = nil;
+  X509_VERIFY_PARAM_set1 : function(vto: PX509_VERIFY_PARAM; from: PX509_VERIFY_PARAM): Integer; cdecl = nil;
   X509_VERIFY_PARAM_set1_name : function(param: PX509_VERIFY_PARAM; name: PUTF8Char): Integer; cdecl = nil;
   X509_VERIFY_PARAM_set_flags : function(param: PX509_VERIFY_PARAM; flags: Cardinal): Integer; cdecl = nil;
   X509_VERIFY_PARAM_clear_flags : function(param: PX509_VERIFY_PARAM; flags: Cardinal): Integer; cdecl = nil;
@@ -14560,69 +14572,69 @@ const
   ERR_load_PKCS7_strings : function(): Integer; cdecl = nil;
   PKCS7_ISSUER_AND_SERIAL_new : function(): PPKCS7_ISSUER_AND_SERIAL; cdecl = nil;
   PKCS7_ISSUER_AND_SERIAL_free : procedure(a: PPKCS7_ISSUER_AND_SERIAL); cdecl = nil;
-  d2i_PKCS7_ISSUER_AND_SERIAL : function(a: PPPKCS7_ISSUER_AND_SERIAL; &in: PPByte; len: Integer): PPKCS7_ISSUER_AND_SERIAL; cdecl = nil;
-  i2d_PKCS7_ISSUER_AND_SERIAL : function(a: PPKCS7_ISSUER_AND_SERIAL; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS7_ISSUER_AND_SERIAL : function(a: PPPKCS7_ISSUER_AND_SERIAL; vin: PPByte; len: Integer): PPKCS7_ISSUER_AND_SERIAL; cdecl = nil;
+  i2d_PKCS7_ISSUER_AND_SERIAL : function(a: PPKCS7_ISSUER_AND_SERIAL; vout: PPByte): Integer; cdecl = nil;
   PKCS7_ISSUER_AND_SERIAL_it : function(): PASN1_ITEM; cdecl = nil;
-  PKCS7_ISSUER_AND_SERIAL_digest : function(data: PPKCS7_ISSUER_AND_SERIAL; &type: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl = nil;
+  PKCS7_ISSUER_AND_SERIAL_digest : function(data: PPKCS7_ISSUER_AND_SERIAL; vtype: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl = nil;
   d2i_PKCS7_fp : function(fp: PPointer; p7: PPPKCS7): PPKCS7; cdecl = nil;
   i2d_PKCS7_fp : function(fp: PPointer; p7: PPKCS7): Integer; cdecl = nil;
   PKCS7_dup : function(p7: PPKCS7): PPKCS7; cdecl = nil;
   d2i_PKCS7_bio : function(bp: PBIO; p7: PPPKCS7): PPKCS7; cdecl = nil;
   i2d_PKCS7_bio : function(bp: PBIO; p7: PPKCS7): Integer; cdecl = nil;
-  i2d_PKCS7_bio_stream : function(&out: PBIO; p7: PPKCS7; &in: PBIO; flags: Integer): Integer; cdecl = nil;
-  PEM_write_bio_PKCS7_stream : function(&out: PBIO; p7: PPKCS7; &in: PBIO; flags: Integer): Integer; cdecl = nil;
+  i2d_PKCS7_bio_stream : function(vout: PBIO; p7: PPKCS7; vin: PBIO; flags: Integer): Integer; cdecl = nil;
+  PEM_write_bio_PKCS7_stream : function(vout: PBIO; p7: PPKCS7; vin: PBIO; flags: Integer): Integer; cdecl = nil;
   PKCS7_SIGNER_INFO_new : function(): PPKCS7_SIGNER_INFO; cdecl = nil;
   PKCS7_SIGNER_INFO_free : procedure(a: PPKCS7_SIGNER_INFO); cdecl = nil;
-  d2i_PKCS7_SIGNER_INFO : function(a: PPPKCS7_SIGNER_INFO; &in: PPByte; len: Integer): PPKCS7_SIGNER_INFO; cdecl = nil;
-  i2d_PKCS7_SIGNER_INFO : function(a: PPKCS7_SIGNER_INFO; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS7_SIGNER_INFO : function(a: PPPKCS7_SIGNER_INFO; vin: PPByte; len: Integer): PPKCS7_SIGNER_INFO; cdecl = nil;
+  i2d_PKCS7_SIGNER_INFO : function(a: PPKCS7_SIGNER_INFO; vout: PPByte): Integer; cdecl = nil;
   PKCS7_SIGNER_INFO_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS7_RECIP_INFO_new : function(): PPKCS7_RECIP_INFO; cdecl = nil;
   PKCS7_RECIP_INFO_free : procedure(a: PPKCS7_RECIP_INFO); cdecl = nil;
-  d2i_PKCS7_RECIP_INFO : function(a: PPPKCS7_RECIP_INFO; &in: PPByte; len: Integer): PPKCS7_RECIP_INFO; cdecl = nil;
-  i2d_PKCS7_RECIP_INFO : function(a: PPKCS7_RECIP_INFO; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS7_RECIP_INFO : function(a: PPPKCS7_RECIP_INFO; vin: PPByte; len: Integer): PPKCS7_RECIP_INFO; cdecl = nil;
+  i2d_PKCS7_RECIP_INFO : function(a: PPKCS7_RECIP_INFO; vout: PPByte): Integer; cdecl = nil;
   PKCS7_RECIP_INFO_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS7_SIGNED_new : function(): PPKCS7_SIGNED; cdecl = nil;
   PKCS7_SIGNED_free : procedure(a: PPKCS7_SIGNED); cdecl = nil;
-  d2i_PKCS7_SIGNED : function(a: PPPKCS7_SIGNED; &in: PPByte; len: Integer): PPKCS7_SIGNED; cdecl = nil;
-  i2d_PKCS7_SIGNED : function(a: PPKCS7_SIGNED; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS7_SIGNED : function(a: PPPKCS7_SIGNED; vin: PPByte; len: Integer): PPKCS7_SIGNED; cdecl = nil;
+  i2d_PKCS7_SIGNED : function(a: PPKCS7_SIGNED; vout: PPByte): Integer; cdecl = nil;
   PKCS7_SIGNED_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS7_ENC_CONTENT_new : function(): PPKCS7_ENC_CONTENT; cdecl = nil;
   PKCS7_ENC_CONTENT_free : procedure(a: PPKCS7_ENC_CONTENT); cdecl = nil;
-  d2i_PKCS7_ENC_CONTENT : function(a: PPPKCS7_ENC_CONTENT; &in: PPByte; len: Integer): PPKCS7_ENC_CONTENT; cdecl = nil;
-  i2d_PKCS7_ENC_CONTENT : function(a: PPKCS7_ENC_CONTENT; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS7_ENC_CONTENT : function(a: PPPKCS7_ENC_CONTENT; vin: PPByte; len: Integer): PPKCS7_ENC_CONTENT; cdecl = nil;
+  i2d_PKCS7_ENC_CONTENT : function(a: PPKCS7_ENC_CONTENT; vout: PPByte): Integer; cdecl = nil;
   PKCS7_ENC_CONTENT_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS7_ENVELOPE_new : function(): PPKCS7_ENVELOPE; cdecl = nil;
   PKCS7_ENVELOPE_free : procedure(a: PPKCS7_ENVELOPE); cdecl = nil;
-  d2i_PKCS7_ENVELOPE : function(a: PPPKCS7_ENVELOPE; &in: PPByte; len: Integer): PPKCS7_ENVELOPE; cdecl = nil;
-  i2d_PKCS7_ENVELOPE : function(a: PPKCS7_ENVELOPE; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS7_ENVELOPE : function(a: PPPKCS7_ENVELOPE; vin: PPByte; len: Integer): PPKCS7_ENVELOPE; cdecl = nil;
+  i2d_PKCS7_ENVELOPE : function(a: PPKCS7_ENVELOPE; vout: PPByte): Integer; cdecl = nil;
   PKCS7_ENVELOPE_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS7_SIGN_ENVELOPE_new : function(): PPKCS7_SIGN_ENVELOPE; cdecl = nil;
   PKCS7_SIGN_ENVELOPE_free : procedure(a: PPKCS7_SIGN_ENVELOPE); cdecl = nil;
-  d2i_PKCS7_SIGN_ENVELOPE : function(a: PPPKCS7_SIGN_ENVELOPE; &in: PPByte; len: Integer): PPKCS7_SIGN_ENVELOPE; cdecl = nil;
-  i2d_PKCS7_SIGN_ENVELOPE : function(a: PPKCS7_SIGN_ENVELOPE; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS7_SIGN_ENVELOPE : function(a: PPPKCS7_SIGN_ENVELOPE; vin: PPByte; len: Integer): PPKCS7_SIGN_ENVELOPE; cdecl = nil;
+  i2d_PKCS7_SIGN_ENVELOPE : function(a: PPKCS7_SIGN_ENVELOPE; vout: PPByte): Integer; cdecl = nil;
   PKCS7_SIGN_ENVELOPE_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS7_DIGEST_new : function(): PPKCS7_DIGEST; cdecl = nil;
   PKCS7_DIGEST_free : procedure(a: PPKCS7_DIGEST); cdecl = nil;
-  d2i_PKCS7_DIGEST : function(a: PPPKCS7_DIGEST; &in: PPByte; len: Integer): PPKCS7_DIGEST; cdecl = nil;
-  i2d_PKCS7_DIGEST : function(a: PPKCS7_DIGEST; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS7_DIGEST : function(a: PPPKCS7_DIGEST; vin: PPByte; len: Integer): PPKCS7_DIGEST; cdecl = nil;
+  i2d_PKCS7_DIGEST : function(a: PPKCS7_DIGEST; vout: PPByte): Integer; cdecl = nil;
   PKCS7_DIGEST_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS7_ENCRYPT_new : function(): PPKCS7_ENCRYPT; cdecl = nil;
   PKCS7_ENCRYPT_free : procedure(a: PPKCS7_ENCRYPT); cdecl = nil;
-  d2i_PKCS7_ENCRYPT : function(a: PPPKCS7_ENCRYPT; &in: PPByte; len: Integer): PPKCS7_ENCRYPT; cdecl = nil;
-  i2d_PKCS7_ENCRYPT : function(a: PPKCS7_ENCRYPT; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS7_ENCRYPT : function(a: PPPKCS7_ENCRYPT; vin: PPByte; len: Integer): PPKCS7_ENCRYPT; cdecl = nil;
+  i2d_PKCS7_ENCRYPT : function(a: PPKCS7_ENCRYPT; vout: PPByte): Integer; cdecl = nil;
   PKCS7_ENCRYPT_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS7_new : function(): PPKCS7; cdecl = nil;
   PKCS7_free : procedure(a: PPKCS7); cdecl = nil;
-  d2i_PKCS7 : function(a: PPPKCS7; &in: PPByte; len: Integer): PPKCS7; cdecl = nil;
-  i2d_PKCS7 : function(a: PPKCS7; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS7 : function(a: PPPKCS7; vin: PPByte; len: Integer): PPKCS7; cdecl = nil;
+  i2d_PKCS7 : function(a: PPKCS7; vout: PPByte): Integer; cdecl = nil;
   PKCS7_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS7_ATTR_SIGN_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS7_ATTR_VERIFY_it : function(): PASN1_ITEM; cdecl = nil;
-  i2d_PKCS7_NDEF : function(a: PPKCS7; &out: PPByte): Integer; cdecl = nil;
-  PKCS7_print_ctx : function(&out: PBIO; x: PPKCS7; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl = nil;
+  i2d_PKCS7_NDEF : function(a: PPKCS7; vout: PPByte): Integer; cdecl = nil;
+  PKCS7_print_ctx : function(vout: PBIO; x: PPKCS7; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl = nil;
   PKCS7_ctrl : function(p7: PPKCS7; cmd: Integer; larg: Integer; parg: PUTF8Char): Integer; cdecl = nil;
-  PKCS7_set_type : function(p7: PPKCS7; &type: Integer): Integer; cdecl = nil;
-  PKCS7_set0_type_other : function(p7: PPKCS7; &type: Integer; other: PASN1_TYPE): Integer; cdecl = nil;
+  PKCS7_set_type : function(p7: PPKCS7; vtype: Integer): Integer; cdecl = nil;
+  PKCS7_set0_type_other : function(p7: PPKCS7; vtype: Integer; other: PASN1_TYPE): Integer; cdecl = nil;
   PKCS7_set_content : function(p7: PPKCS7; p7_data: PPKCS7): Integer; cdecl = nil;
   PKCS7_SIGNER_INFO_set : function(p7i: PPKCS7_SIGNER_INFO; x509: PX509; pkey: PEVP_PKEY; dgst: PEVP_MD): Integer; cdecl = nil;
   PKCS7_SIGNER_INFO_sign : function(si: PPKCS7_SIGNER_INFO): Integer; cdecl = nil;
@@ -14648,7 +14660,7 @@ const
   PKCS7_stream : function(boundary: PPPByte; p7: PPKCS7): Integer; cdecl = nil;
   PKCS7_get_issuer_and_serial : function(p7: PPKCS7; idx: Integer): PPKCS7_ISSUER_AND_SERIAL; cdecl = nil;
   PKCS7_digest_from_attributes : function(sk: Pstack_st_X509_ATTRIBUTE): PASN1_OCTET_STRING; cdecl = nil;
-  PKCS7_add_signed_attribute : function(p7si: PPKCS7_SIGNER_INFO; nid: Integer; &type: Integer; data: Pointer): Integer; cdecl = nil;
+  PKCS7_add_signed_attribute : function(p7si: PPKCS7_SIGNER_INFO; nid: Integer; vtype: Integer; data: Pointer): Integer; cdecl = nil;
   PKCS7_add_attribute : function(p7si: PPKCS7_SIGNER_INFO; nid: Integer; atrtype: Integer; value: Pointer): Integer; cdecl = nil;
   PKCS7_get_attribute : function(si: PPKCS7_SIGNER_INFO; nid: Integer): PASN1_TYPE; cdecl = nil;
   PKCS7_get_signed_attribute : function(si: PPKCS7_SIGNER_INFO; nid: Integer): PASN1_TYPE; cdecl = nil;
@@ -14657,9 +14669,9 @@ const
   PKCS7_sign : function(signcert: PX509; pkey: PEVP_PKEY; certs: Pstack_st_X509; data: PBIO; flags: Integer): PPKCS7; cdecl = nil;
   PKCS7_sign_add_signer : function(p7: PPKCS7; signcert: PX509; pkey: PEVP_PKEY; md: PEVP_MD; flags: Integer): PPKCS7_SIGNER_INFO; cdecl = nil;
   PKCS7_final : function(p7: PPKCS7; data: PBIO; flags: Integer): Integer; cdecl = nil;
-  PKCS7_verify : function(p7: PPKCS7; certs: Pstack_st_X509; store: PX509_STORE; indata: PBIO; &out: PBIO; flags: Integer): Integer; cdecl = nil;
+  PKCS7_verify : function(p7: PPKCS7; certs: Pstack_st_X509; store: PX509_STORE; indata: PBIO; vout: PBIO; flags: Integer): Integer; cdecl = nil;
   PKCS7_get0_signers : function(p7: PPKCS7; certs: Pstack_st_X509; flags: Integer): Pstack_st_X509; cdecl = nil;
-  PKCS7_encrypt : function(certs: Pstack_st_X509; &in: PBIO; cipher: PEVP_CIPHER; flags: Integer): PPKCS7; cdecl = nil;
+  PKCS7_encrypt : function(certs: Pstack_st_X509; vin: PBIO; cipher: PEVP_CIPHER; flags: Integer): PPKCS7; cdecl = nil;
   PKCS7_decrypt : function(p7: PPKCS7; pkey: PEVP_PKEY; cert: PX509; data: PBIO; flags: Integer): Integer; cdecl = nil;
   PKCS7_add_attrib_smimecap : function(si: PPKCS7_SIGNER_INFO; cap: Pstack_st_X509_ALGOR): Integer; cdecl = nil;
   PKCS7_get_smimecap : function(si: PPKCS7_SIGNER_INFO): Pstack_st_X509_ALGOR; cdecl = nil;
@@ -14669,7 +14681,7 @@ const
   PKCS7_add1_attrib_digest : function(si: PPKCS7_SIGNER_INFO; md: PByte; mdlen: Integer): Integer; cdecl = nil;
   SMIME_write_PKCS7 : function(bio: PBIO; p7: PPKCS7; data: PBIO; flags: Integer): Integer; cdecl = nil;
   SMIME_read_PKCS7 : function(bio: PBIO; bcont: PPBIO): PPKCS7; cdecl = nil;
-  BIO_new_PKCS7 : function(&out: PBIO; p7: PPKCS7): PBIO; cdecl = nil;
+  BIO_new_PKCS7 : function(vout: PBIO; p7: PPKCS7): PBIO; cdecl = nil;
   X509_CRL_set_default_method : procedure(meth: PX509_CRL_METHOD); cdecl = nil;
   X509_CRL_METHOD_new : function(crl_init: X509_CRL_METHOD_new_crl_init; crl_free: X509_CRL_METHOD_new_crl_free; crl_lookup: X509_CRL_METHOD_new_crl_lookup; crl_verify: X509_CRL_METHOD_new_crl_verify): PX509_CRL_METHOD; cdecl = nil;
   X509_CRL_METHOD_free : procedure(m: PX509_CRL_METHOD); cdecl = nil;
@@ -14684,7 +14696,7 @@ const
   NETSCAPE_SPKI_b64_encode : function(x: PNETSCAPE_SPKI): PUTF8Char; cdecl = nil;
   NETSCAPE_SPKI_get_pubkey : function(x: PNETSCAPE_SPKI): PEVP_PKEY; cdecl = nil;
   NETSCAPE_SPKI_set_pubkey : function(x: PNETSCAPE_SPKI; pkey: PEVP_PKEY): Integer; cdecl = nil;
-  NETSCAPE_SPKI_print : function(&out: PBIO; spki: PNETSCAPE_SPKI): Integer; cdecl = nil;
+  NETSCAPE_SPKI_print : function(vout: PBIO; spki: PNETSCAPE_SPKI): Integer; cdecl = nil;
   X509_signature_dump : function(bp: PBIO; sig: PASN1_STRING; indent: Integer): Integer; cdecl = nil;
   X509_signature_print : function(bp: PBIO; alg: PX509_ALGOR; sig: PASN1_STRING): Integer; cdecl = nil;
   X509_sign : function(x: PX509; pkey: PEVP_PKEY; md: PEVP_MD): Integer; cdecl = nil;
@@ -14696,11 +14708,11 @@ const
   X509_CRL_sign_ctx : function(x: PX509_CRL; ctx: PEVP_MD_CTX): Integer; cdecl = nil;
   X509_CRL_http_nbio : function(rctx: POCSP_REQ_CTX; pcrl: PPX509_CRL): Integer; cdecl = nil;
   NETSCAPE_SPKI_sign : function(x: PNETSCAPE_SPKI; pkey: PEVP_PKEY; md: PEVP_MD): Integer; cdecl = nil;
-  X509_pubkey_digest : function(data: PX509; &type: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl = nil;
-  X509_digest : function(data: PX509; &type: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl = nil;
-  X509_CRL_digest : function(data: PX509_CRL; &type: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl = nil;
-  X509_REQ_digest : function(data: PX509_REQ; &type: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl = nil;
-  X509_NAME_digest : function(data: PX509_NAME; &type: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl = nil;
+  X509_pubkey_digest : function(data: PX509; vtype: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl = nil;
+  X509_digest : function(data: PX509; vtype: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl = nil;
+  X509_CRL_digest : function(data: PX509_CRL; vtype: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl = nil;
+  X509_REQ_digest : function(data: PX509_REQ; vtype: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl = nil;
+  X509_NAME_digest : function(data: PX509_NAME; vtype: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl = nil;
   d2i_X509_fp : function(fp: PPointer; x509: PPX509): PX509; cdecl = nil;
   i2d_X509_fp : function(fp: PPointer; x509: PX509): Integer; cdecl = nil;
   d2i_X509_CRL_fp : function(fp: PPointer; crl: PPX509_CRL): PX509_CRL; cdecl = nil;
@@ -14787,21 +14799,21 @@ const
   X509_REQ_to_X509 : function(r: PX509_REQ; days: Integer; pkey: PEVP_PKEY): PX509; cdecl = nil;
   X509_ALGOR_new : function(): PX509_ALGOR; cdecl = nil;
   X509_ALGOR_free : procedure(a: PX509_ALGOR); cdecl = nil;
-  d2i_X509_ALGOR : function(a: PPX509_ALGOR; &in: PPByte; len: Integer): PX509_ALGOR; cdecl = nil;
-  i2d_X509_ALGOR : function(a: PX509_ALGOR; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_ALGOR : function(a: PPX509_ALGOR; vin: PPByte; len: Integer): PX509_ALGOR; cdecl = nil;
+  i2d_X509_ALGOR : function(a: PX509_ALGOR; vout: PPByte): Integer; cdecl = nil;
   X509_ALGOR_it : function(): PASN1_ITEM; cdecl = nil;
-  d2i_X509_ALGORS : function(a: PPX509_ALGORS; &in: PPByte; len: Integer): PX509_ALGORS; cdecl = nil;
-  i2d_X509_ALGORS : function(a: PX509_ALGORS; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_ALGORS : function(a: PPX509_ALGORS; vin: PPByte; len: Integer): PX509_ALGORS; cdecl = nil;
+  i2d_X509_ALGORS : function(a: PX509_ALGORS; vout: PPByte): Integer; cdecl = nil;
   X509_ALGORS_it : function(): PASN1_ITEM; cdecl = nil;
   X509_VAL_new : function(): PX509_VAL; cdecl = nil;
   X509_VAL_free : procedure(a: PX509_VAL); cdecl = nil;
-  d2i_X509_VAL : function(a: PPX509_VAL; &in: PPByte; len: Integer): PX509_VAL; cdecl = nil;
-  i2d_X509_VAL : function(a: PX509_VAL; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_VAL : function(a: PPX509_VAL; vin: PPByte; len: Integer): PX509_VAL; cdecl = nil;
+  i2d_X509_VAL : function(a: PX509_VAL; vout: PPByte): Integer; cdecl = nil;
   X509_VAL_it : function(): PASN1_ITEM; cdecl = nil;
   X509_PUBKEY_new : function(): PX509_PUBKEY; cdecl = nil;
   X509_PUBKEY_free : procedure(a: PX509_PUBKEY); cdecl = nil;
-  d2i_X509_PUBKEY : function(a: PPX509_PUBKEY; &in: PPByte; len: Integer): PX509_PUBKEY; cdecl = nil;
-  i2d_X509_PUBKEY : function(a: PX509_PUBKEY; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_PUBKEY : function(a: PPX509_PUBKEY; vin: PPByte; len: Integer): PX509_PUBKEY; cdecl = nil;
+  i2d_X509_PUBKEY : function(a: PX509_PUBKEY; vout: PPByte): Integer; cdecl = nil;
   X509_PUBKEY_it : function(): PASN1_ITEM; cdecl = nil;
   X509_PUBKEY_set : function(x: PPX509_PUBKEY; pkey: PEVP_PKEY): Integer; cdecl = nil;
   X509_PUBKEY_get0 : function(key: PX509_PUBKEY): PEVP_PKEY; cdecl = nil;
@@ -14818,60 +14830,60 @@ const
   d2i_EC_PUBKEY : function(a: PPEC_KEY; pp: PPByte; length: Integer): PEC_KEY; cdecl = nil;
   X509_SIG_new : function(): PX509_SIG; cdecl = nil;
   X509_SIG_free : procedure(a: PX509_SIG); cdecl = nil;
-  d2i_X509_SIG : function(a: PPX509_SIG; &in: PPByte; len: Integer): PX509_SIG; cdecl = nil;
-  i2d_X509_SIG : function(a: PX509_SIG; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_SIG : function(a: PPX509_SIG; vin: PPByte; len: Integer): PX509_SIG; cdecl = nil;
+  i2d_X509_SIG : function(a: PX509_SIG; vout: PPByte): Integer; cdecl = nil;
   X509_SIG_it : function(): PASN1_ITEM; cdecl = nil;
   X509_SIG_get0 : procedure(sig: PX509_SIG; palg: PPX509_ALGOR; pdigest: PPASN1_OCTET_STRING); cdecl = nil;
   X509_SIG_getm : procedure(sig: PX509_SIG; palg: PPX509_ALGOR; pdigest: PPASN1_OCTET_STRING); cdecl = nil;
   X509_REQ_INFO_new : function(): PX509_REQ_INFO; cdecl = nil;
   X509_REQ_INFO_free : procedure(a: PX509_REQ_INFO); cdecl = nil;
-  d2i_X509_REQ_INFO : function(a: PPX509_REQ_INFO; &in: PPByte; len: Integer): PX509_REQ_INFO; cdecl = nil;
-  i2d_X509_REQ_INFO : function(a: PX509_REQ_INFO; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_REQ_INFO : function(a: PPX509_REQ_INFO; vin: PPByte; len: Integer): PX509_REQ_INFO; cdecl = nil;
+  i2d_X509_REQ_INFO : function(a: PX509_REQ_INFO; vout: PPByte): Integer; cdecl = nil;
   X509_REQ_INFO_it : function(): PASN1_ITEM; cdecl = nil;
   X509_REQ_new : function(): PX509_REQ; cdecl = nil;
   X509_REQ_free : procedure(a: PX509_REQ); cdecl = nil;
-  d2i_X509_REQ : function(a: PPX509_REQ; &in: PPByte; len: Integer): PX509_REQ; cdecl = nil;
-  i2d_X509_REQ : function(a: PX509_REQ; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_REQ : function(a: PPX509_REQ; vin: PPByte; len: Integer): PX509_REQ; cdecl = nil;
+  i2d_X509_REQ : function(a: PX509_REQ; vout: PPByte): Integer; cdecl = nil;
   X509_REQ_it : function(): PASN1_ITEM; cdecl = nil;
   X509_ATTRIBUTE_new : function(): PX509_ATTRIBUTE; cdecl = nil;
   X509_ATTRIBUTE_free : procedure(a: PX509_ATTRIBUTE); cdecl = nil;
-  d2i_X509_ATTRIBUTE : function(a: PPX509_ATTRIBUTE; &in: PPByte; len: Integer): PX509_ATTRIBUTE; cdecl = nil;
-  i2d_X509_ATTRIBUTE : function(a: PX509_ATTRIBUTE; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_ATTRIBUTE : function(a: PPX509_ATTRIBUTE; vin: PPByte; len: Integer): PX509_ATTRIBUTE; cdecl = nil;
+  i2d_X509_ATTRIBUTE : function(a: PX509_ATTRIBUTE; vout: PPByte): Integer; cdecl = nil;
   X509_ATTRIBUTE_it : function(): PASN1_ITEM; cdecl = nil;
   X509_ATTRIBUTE_create : function(nid: Integer; atrtype: Integer; value: Pointer): PX509_ATTRIBUTE; cdecl = nil;
   X509_EXTENSION_new : function(): PX509_EXTENSION; cdecl = nil;
   X509_EXTENSION_free : procedure(a: PX509_EXTENSION); cdecl = nil;
-  d2i_X509_EXTENSION : function(a: PPX509_EXTENSION; &in: PPByte; len: Integer): PX509_EXTENSION; cdecl = nil;
-  i2d_X509_EXTENSION : function(a: PX509_EXTENSION; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_EXTENSION : function(a: PPX509_EXTENSION; vin: PPByte; len: Integer): PX509_EXTENSION; cdecl = nil;
+  i2d_X509_EXTENSION : function(a: PX509_EXTENSION; vout: PPByte): Integer; cdecl = nil;
   X509_EXTENSION_it : function(): PASN1_ITEM; cdecl = nil;
-  d2i_X509_EXTENSIONS : function(a: PPX509_EXTENSIONS; &in: PPByte; len: Integer): PX509_EXTENSIONS; cdecl = nil;
-  i2d_X509_EXTENSIONS : function(a: PX509_EXTENSIONS; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_EXTENSIONS : function(a: PPX509_EXTENSIONS; vin: PPByte; len: Integer): PX509_EXTENSIONS; cdecl = nil;
+  i2d_X509_EXTENSIONS : function(a: PX509_EXTENSIONS; vout: PPByte): Integer; cdecl = nil;
   X509_EXTENSIONS_it : function(): PASN1_ITEM; cdecl = nil;
   X509_NAME_ENTRY_new : function(): PX509_NAME_ENTRY; cdecl = nil;
   X509_NAME_ENTRY_free : procedure(a: PX509_NAME_ENTRY); cdecl = nil;
-  d2i_X509_NAME_ENTRY : function(a: PPX509_NAME_ENTRY; &in: PPByte; len: Integer): PX509_NAME_ENTRY; cdecl = nil;
-  i2d_X509_NAME_ENTRY : function(a: PX509_NAME_ENTRY; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_NAME_ENTRY : function(a: PPX509_NAME_ENTRY; vin: PPByte; len: Integer): PX509_NAME_ENTRY; cdecl = nil;
+  i2d_X509_NAME_ENTRY : function(a: PX509_NAME_ENTRY; vout: PPByte): Integer; cdecl = nil;
   X509_NAME_ENTRY_it : function(): PASN1_ITEM; cdecl = nil;
   X509_NAME_new : function(): PX509_NAME; cdecl = nil;
   X509_NAME_free : procedure(a: PX509_NAME); cdecl = nil;
-  d2i_X509_NAME : function(a: PPX509_NAME; &in: PPByte; len: Integer): PX509_NAME; cdecl = nil;
-  i2d_X509_NAME : function(a: PX509_NAME; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_NAME : function(a: PPX509_NAME; vin: PPByte; len: Integer): PX509_NAME; cdecl = nil;
+  i2d_X509_NAME : function(a: PX509_NAME; vout: PPByte): Integer; cdecl = nil;
   X509_NAME_it : function(): PASN1_ITEM; cdecl = nil;
   X509_NAME_set : function(xn: PPX509_NAME; name: PX509_NAME): Integer; cdecl = nil;
   X509_CINF_new : function(): PX509_CINF; cdecl = nil;
   X509_CINF_free : procedure(a: PX509_CINF); cdecl = nil;
-  d2i_X509_CINF : function(a: PPX509_CINF; &in: PPByte; len: Integer): PX509_CINF; cdecl = nil;
-  i2d_X509_CINF : function(a: PX509_CINF; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_CINF : function(a: PPX509_CINF; vin: PPByte; len: Integer): PX509_CINF; cdecl = nil;
+  i2d_X509_CINF : function(a: PX509_CINF; vout: PPByte): Integer; cdecl = nil;
   X509_CINF_it : function(): PASN1_ITEM; cdecl = nil;
   X509_new : function(): PX509; cdecl = nil;
   X509_free : procedure(a: PX509); cdecl = nil;
-  d2i_X509 : function(a: PPX509; &in: PPByte; len: Integer): PX509; cdecl = nil;
-  i2d_X509 : function(a: PX509; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509 : function(a: PPX509; vin: PPByte; len: Integer): PX509; cdecl = nil;
+  i2d_X509 : function(a: PX509; vout: PPByte): Integer; cdecl = nil;
   X509_it : function(): PASN1_ITEM; cdecl = nil;
   X509_CERT_AUX_new : function(): PX509_CERT_AUX; cdecl = nil;
   X509_CERT_AUX_free : procedure(a: PX509_CERT_AUX); cdecl = nil;
-  d2i_X509_CERT_AUX : function(a: PPX509_CERT_AUX; &in: PPByte; len: Integer): PX509_CERT_AUX; cdecl = nil;
-  i2d_X509_CERT_AUX : function(a: PX509_CERT_AUX; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_CERT_AUX : function(a: PPX509_CERT_AUX; vin: PPByte; len: Integer): PX509_CERT_AUX; cdecl = nil;
+  i2d_X509_CERT_AUX : function(a: PX509_CERT_AUX; vout: PPByte): Integer; cdecl = nil;
   X509_CERT_AUX_it : function(): PASN1_ITEM; cdecl = nil;
   X509_set_ex_data : function(r: PX509; idx: Integer; arg: Pointer): Integer; cdecl = nil;
   X509_get_ex_data : function(r: PX509; idx: Integer): Pointer; cdecl = nil;
@@ -14898,18 +14910,18 @@ const
   X509_get0_reject_objects : function(x: PX509): Pstack_st_ASN1_OBJECT; cdecl = nil;
   X509_REVOKED_new : function(): PX509_REVOKED; cdecl = nil;
   X509_REVOKED_free : procedure(a: PX509_REVOKED); cdecl = nil;
-  d2i_X509_REVOKED : function(a: PPX509_REVOKED; &in: PPByte; len: Integer): PX509_REVOKED; cdecl = nil;
-  i2d_X509_REVOKED : function(a: PX509_REVOKED; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_REVOKED : function(a: PPX509_REVOKED; vin: PPByte; len: Integer): PX509_REVOKED; cdecl = nil;
+  i2d_X509_REVOKED : function(a: PX509_REVOKED; vout: PPByte): Integer; cdecl = nil;
   X509_REVOKED_it : function(): PASN1_ITEM; cdecl = nil;
   X509_CRL_INFO_new : function(): PX509_CRL_INFO; cdecl = nil;
   X509_CRL_INFO_free : procedure(a: PX509_CRL_INFO); cdecl = nil;
-  d2i_X509_CRL_INFO : function(a: PPX509_CRL_INFO; &in: PPByte; len: Integer): PX509_CRL_INFO; cdecl = nil;
-  i2d_X509_CRL_INFO : function(a: PX509_CRL_INFO; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_CRL_INFO : function(a: PPX509_CRL_INFO; vin: PPByte; len: Integer): PX509_CRL_INFO; cdecl = nil;
+  i2d_X509_CRL_INFO : function(a: PX509_CRL_INFO; vout: PPByte): Integer; cdecl = nil;
   X509_CRL_INFO_it : function(): PASN1_ITEM; cdecl = nil;
   X509_CRL_new : function(): PX509_CRL; cdecl = nil;
   X509_CRL_free : procedure(a: PX509_CRL); cdecl = nil;
-  d2i_X509_CRL : function(a: PPX509_CRL; &in: PPByte; len: Integer): PX509_CRL; cdecl = nil;
-  i2d_X509_CRL : function(a: PX509_CRL; &out: PPByte): Integer; cdecl = nil;
+  d2i_X509_CRL : function(a: PPX509_CRL; vin: PPByte; len: Integer): PX509_CRL; cdecl = nil;
+  i2d_X509_CRL : function(a: PX509_CRL; vout: PPByte): Integer; cdecl = nil;
   X509_CRL_it : function(): PASN1_ITEM; cdecl = nil;
   X509_CRL_add0_revoked : function(crl: PX509_CRL; rev: PX509_REVOKED): Integer; cdecl = nil;
   X509_CRL_get0_by_serial : function(crl: PX509_CRL; ret: PPX509_REVOKED; serial: PASN1_INTEGER): Integer; cdecl = nil;
@@ -14918,28 +14930,28 @@ const
   X509_PKEY_free : procedure(a: PX509_PKEY); cdecl = nil;
   NETSCAPE_SPKI_new : function(): PNETSCAPE_SPKI; cdecl = nil;
   NETSCAPE_SPKI_free : procedure(a: PNETSCAPE_SPKI); cdecl = nil;
-  d2i_NETSCAPE_SPKI : function(a: PPNETSCAPE_SPKI; &in: PPByte; len: Integer): PNETSCAPE_SPKI; cdecl = nil;
-  i2d_NETSCAPE_SPKI : function(a: PNETSCAPE_SPKI; &out: PPByte): Integer; cdecl = nil;
+  d2i_NETSCAPE_SPKI : function(a: PPNETSCAPE_SPKI; vin: PPByte; len: Integer): PNETSCAPE_SPKI; cdecl = nil;
+  i2d_NETSCAPE_SPKI : function(a: PNETSCAPE_SPKI; vout: PPByte): Integer; cdecl = nil;
   NETSCAPE_SPKI_it : function(): PASN1_ITEM; cdecl = nil;
   NETSCAPE_SPKAC_new : function(): PNETSCAPE_SPKAC; cdecl = nil;
   NETSCAPE_SPKAC_free : procedure(a: PNETSCAPE_SPKAC); cdecl = nil;
-  d2i_NETSCAPE_SPKAC : function(a: PPNETSCAPE_SPKAC; &in: PPByte; len: Integer): PNETSCAPE_SPKAC; cdecl = nil;
-  i2d_NETSCAPE_SPKAC : function(a: PNETSCAPE_SPKAC; &out: PPByte): Integer; cdecl = nil;
+  d2i_NETSCAPE_SPKAC : function(a: PPNETSCAPE_SPKAC; vin: PPByte; len: Integer): PNETSCAPE_SPKAC; cdecl = nil;
+  i2d_NETSCAPE_SPKAC : function(a: PNETSCAPE_SPKAC; vout: PPByte): Integer; cdecl = nil;
   NETSCAPE_SPKAC_it : function(): PASN1_ITEM; cdecl = nil;
   NETSCAPE_CERT_SEQUENCE_new : function(): PNETSCAPE_CERT_SEQUENCE; cdecl = nil;
   NETSCAPE_CERT_SEQUENCE_free : procedure(a: PNETSCAPE_CERT_SEQUENCE); cdecl = nil;
-  d2i_NETSCAPE_CERT_SEQUENCE : function(a: PPNETSCAPE_CERT_SEQUENCE; &in: PPByte; len: Integer): PNETSCAPE_CERT_SEQUENCE; cdecl = nil;
-  i2d_NETSCAPE_CERT_SEQUENCE : function(a: PNETSCAPE_CERT_SEQUENCE; &out: PPByte): Integer; cdecl = nil;
+  d2i_NETSCAPE_CERT_SEQUENCE : function(a: PPNETSCAPE_CERT_SEQUENCE; vin: PPByte; len: Integer): PNETSCAPE_CERT_SEQUENCE; cdecl = nil;
+  i2d_NETSCAPE_CERT_SEQUENCE : function(a: PNETSCAPE_CERT_SEQUENCE; vout: PPByte): Integer; cdecl = nil;
   NETSCAPE_CERT_SEQUENCE_it : function(): PASN1_ITEM; cdecl = nil;
   X509_INFO_new : function(): PX509_INFO; cdecl = nil;
   X509_INFO_free : procedure(a: PX509_INFO); cdecl = nil;
   X509_NAME_oneline : function(a: PX509_NAME; buf: PUTF8Char; size: Integer): PUTF8Char; cdecl = nil;
   ASN1_verify : function(i2d: Pi2d_of_void; algor1: PX509_ALGOR; signature: PASN1_BIT_STRING; data: PUTF8Char; pkey: PEVP_PKEY): Integer; cdecl = nil;
-  ASN1_digest : function(i2d: Pi2d_of_void; &type: PEVP_MD; data: PUTF8Char; md: PByte; len: PCardinal): Integer; cdecl = nil;
-  ASN1_sign : function(i2d: Pi2d_of_void; algor1: PX509_ALGOR; algor2: PX509_ALGOR; signature: PASN1_BIT_STRING; data: PUTF8Char; pkey: PEVP_PKEY; &type: PEVP_MD): Integer; cdecl = nil;
-  ASN1_item_digest : function(it: PASN1_ITEM; &type: PEVP_MD; data: Pointer; md: PByte; len: PCardinal): Integer; cdecl = nil;
+  ASN1_digest : function(i2d: Pi2d_of_void; vtype: PEVP_MD; data: PUTF8Char; md: PByte; len: PCardinal): Integer; cdecl = nil;
+  ASN1_sign : function(i2d: Pi2d_of_void; algor1: PX509_ALGOR; algor2: PX509_ALGOR; signature: PASN1_BIT_STRING; data: PUTF8Char; pkey: PEVP_PKEY; vtype: PEVP_MD): Integer; cdecl = nil;
+  ASN1_item_digest : function(it: PASN1_ITEM; vtype: PEVP_MD; data: Pointer; md: PByte; len: PCardinal): Integer; cdecl = nil;
   ASN1_item_verify : function(it: PASN1_ITEM; algor1: PX509_ALGOR; signature: PASN1_BIT_STRING; data: Pointer; pkey: PEVP_PKEY): Integer; cdecl = nil;
-  ASN1_item_sign : function(it: PASN1_ITEM; algor1: PX509_ALGOR; algor2: PX509_ALGOR; signature: PASN1_BIT_STRING; data: Pointer; pkey: PEVP_PKEY; &type: PEVP_MD): Integer; cdecl = nil;
+  ASN1_item_sign : function(it: PASN1_ITEM; algor1: PX509_ALGOR; algor2: PX509_ALGOR; signature: PASN1_BIT_STRING; data: Pointer; pkey: PEVP_PKEY; vtype: PEVP_MD): Integer; cdecl = nil;
   ASN1_item_sign_ctx : function(it: PASN1_ITEM; algor1: PX509_ALGOR; algor2: PX509_ALGOR; signature: PASN1_BIT_STRING; asn: Pointer; ctx: PEVP_MD_CTX): Integer; cdecl = nil;
   X509_get_version : function(x: PX509): Integer; cdecl = nil;
   X509_set_version : function(x: PX509; version: Integer): Integer; cdecl = nil;
@@ -14994,9 +15006,9 @@ const
   X509_REQ_get_attr : function(req: PX509_REQ; loc: Integer): PX509_ATTRIBUTE; cdecl = nil;
   X509_REQ_delete_attr : function(req: PX509_REQ; loc: Integer): PX509_ATTRIBUTE; cdecl = nil;
   X509_REQ_add1_attr : function(req: PX509_REQ; attr: PX509_ATTRIBUTE): Integer; cdecl = nil;
-  X509_REQ_add1_attr_by_OBJ : function(req: PX509_REQ; obj: PASN1_OBJECT; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
-  X509_REQ_add1_attr_by_NID : function(req: PX509_REQ; nid: Integer; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
-  X509_REQ_add1_attr_by_txt : function(req: PX509_REQ; attrname: PUTF8Char; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
+  X509_REQ_add1_attr_by_OBJ : function(req: PX509_REQ; obj: PASN1_OBJECT; vtype: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
+  X509_REQ_add1_attr_by_NID : function(req: PX509_REQ; nid: Integer; vtype: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
+  X509_REQ_add1_attr_by_txt : function(req: PX509_REQ; attrname: PUTF8Char; vtype: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
   X509_CRL_set_version : function(x: PX509_CRL; version: Integer): Integer; cdecl = nil;
   X509_CRL_set_issuer_name : function(x: PX509_CRL; name: PX509_NAME): Integer; cdecl = nil;
   X509_CRL_set1_lastUpdate : function(x: PX509_CRL; tm: PASN1_TIME): Integer; cdecl = nil;
@@ -15041,18 +15053,18 @@ const
   X509_NAME_hash_old : function(x: PX509_NAME): Cardinal; cdecl = nil;
   X509_CRL_cmp : function(a: PX509_CRL; b: PX509_CRL): Integer; cdecl = nil;
   X509_CRL_match : function(a: PX509_CRL; b: PX509_CRL): Integer; cdecl = nil;
-  X509_aux_print : function(&out: PBIO; x: PX509; indent: Integer): Integer; cdecl = nil;
+  X509_aux_print : function(vout: PBIO; x: PX509; indent: Integer): Integer; cdecl = nil;
   X509_print_ex_fp : function(bp: PPointer; x: PX509; nmflag: Cardinal; cflag: Cardinal): Integer; cdecl = nil;
   X509_print_fp : function(bp: PPointer; x: PX509): Integer; cdecl = nil;
   X509_CRL_print_fp : function(bp: PPointer; x: PX509_CRL): Integer; cdecl = nil;
   X509_REQ_print_fp : function(bp: PPointer; req: PX509_REQ): Integer; cdecl = nil;
   X509_NAME_print_ex_fp : function(fp: PPointer; nm: PX509_NAME; indent: Integer; flags: Cardinal): Integer; cdecl = nil;
   X509_NAME_print : function(bp: PBIO; name: PX509_NAME; obase: Integer): Integer; cdecl = nil;
-  X509_NAME_print_ex : function(&out: PBIO; nm: PX509_NAME; indent: Integer; flags: Cardinal): Integer; cdecl = nil;
+  X509_NAME_print_ex : function(vout: PBIO; nm: PX509_NAME; indent: Integer; flags: Cardinal): Integer; cdecl = nil;
   X509_print_ex : function(bp: PBIO; x: PX509; nmflag: Cardinal; cflag: Cardinal): Integer; cdecl = nil;
   X509_print : function(bp: PBIO; x: PX509): Integer; cdecl = nil;
   X509_ocspid_print : function(bp: PBIO; x: PX509): Integer; cdecl = nil;
-  X509_CRL_print_ex : function(&out: PBIO; x: PX509_CRL; nmflag: Cardinal): Integer; cdecl = nil;
+  X509_CRL_print_ex : function(vout: PBIO; x: PX509_CRL; nmflag: Cardinal): Integer; cdecl = nil;
   X509_CRL_print : function(bp: PBIO; x: PX509_CRL): Integer; cdecl = nil;
   X509_REQ_print_ex : function(bp: PBIO; x: PX509_REQ; nmflag: Cardinal; cflag: Cardinal): Integer; cdecl = nil;
   X509_REQ_print : function(bp: PBIO; req: PX509_REQ): Integer; cdecl = nil;
@@ -15063,15 +15075,15 @@ const
   X509_NAME_get_index_by_OBJ : function(name: PX509_NAME; obj: PASN1_OBJECT; lastpos: Integer): Integer; cdecl = nil;
   X509_NAME_get_entry : function(name: PX509_NAME; loc: Integer): PX509_NAME_ENTRY; cdecl = nil;
   X509_NAME_delete_entry : function(name: PX509_NAME; loc: Integer): PX509_NAME_ENTRY; cdecl = nil;
-  X509_NAME_add_entry : function(name: PX509_NAME; ne: PX509_NAME_ENTRY; loc: Integer; &set: Integer): Integer; cdecl = nil;
-  X509_NAME_add_entry_by_OBJ : function(name: PX509_NAME; obj: PASN1_OBJECT; &type: Integer; bytes: PAnsiChar; len: Integer; loc: Integer; &set: Integer): Integer; cdecl = nil;
-  X509_NAME_add_entry_by_NID : function(name: PX509_NAME; nid: Integer; &type: Integer; bytes: PAnsiChar; len: Integer; loc: Integer; &set: Integer): Integer; cdecl = nil;
-  X509_NAME_ENTRY_create_by_txt : function(ne: PPX509_NAME_ENTRY; field: PUTF8Char; &type: Integer; bytes: PAnsiChar; len: Integer): PX509_NAME_ENTRY; cdecl = nil;
-  X509_NAME_ENTRY_create_by_NID : function(ne: PPX509_NAME_ENTRY; nid: Integer; &type: Integer; bytes: PAnsiChar; len: Integer): PX509_NAME_ENTRY; cdecl = nil;
-  X509_NAME_add_entry_by_txt : function(name: PX509_NAME; field: PUTF8Char; &type: Integer; bytes: PAnsiChar; len: Integer; loc: Integer; &set: Integer): Integer; cdecl = nil;
-  X509_NAME_ENTRY_create_by_OBJ : function(ne: PPX509_NAME_ENTRY; obj: PASN1_OBJECT; &type: Integer; bytes: PAnsiChar; len: Integer): PX509_NAME_ENTRY; cdecl = nil;
+  X509_NAME_add_entry : function(name: PX509_NAME; ne: PX509_NAME_ENTRY; loc: Integer; vset: Integer): Integer; cdecl = nil;
+  X509_NAME_add_entry_by_OBJ : function(name: PX509_NAME; obj: PASN1_OBJECT; vtype: Integer; bytes: PAnsiChar; len: Integer; loc: Integer; vset: Integer): Integer; cdecl = nil;
+  X509_NAME_add_entry_by_NID : function(name: PX509_NAME; nid: Integer; vtype: Integer; bytes: PAnsiChar; len: Integer; loc: Integer; vset: Integer): Integer; cdecl = nil;
+  X509_NAME_ENTRY_create_by_txt : function(ne: PPX509_NAME_ENTRY; field: PUTF8Char; vtype: Integer; bytes: PAnsiChar; len: Integer): PX509_NAME_ENTRY; cdecl = nil;
+  X509_NAME_ENTRY_create_by_NID : function(ne: PPX509_NAME_ENTRY; nid: Integer; vtype: Integer; bytes: PAnsiChar; len: Integer): PX509_NAME_ENTRY; cdecl = nil;
+  X509_NAME_add_entry_by_txt : function(name: PX509_NAME; field: PUTF8Char; vtype: Integer; bytes: PAnsiChar; len: Integer; loc: Integer; vset: Integer): Integer; cdecl = nil;
+  X509_NAME_ENTRY_create_by_OBJ : function(ne: PPX509_NAME_ENTRY; obj: PASN1_OBJECT; vtype: Integer; bytes: PAnsiChar; len: Integer): PX509_NAME_ENTRY; cdecl = nil;
   X509_NAME_ENTRY_set_object : function(ne: PX509_NAME_ENTRY; obj: PASN1_OBJECT): Integer; cdecl = nil;
-  X509_NAME_ENTRY_set_data : function(ne: PX509_NAME_ENTRY; &type: Integer; bytes: PAnsiChar; len: Integer): Integer; cdecl = nil;
+  X509_NAME_ENTRY_set_data : function(ne: PX509_NAME_ENTRY; vtype: Integer; bytes: PAnsiChar; len: Integer): Integer; cdecl = nil;
   X509_NAME_ENTRY_get_object : function(ne: PX509_NAME_ENTRY): PASN1_OBJECT; cdecl = nil;
   X509_NAME_ENTRY_get_data : function(ne: PX509_NAME_ENTRY): PASN1_STRING; cdecl = nil;
   X509_NAME_ENTRY_set : function(ne: PX509_NAME_ENTRY): Integer; cdecl = nil;
@@ -15124,13 +15136,13 @@ const
   X509at_get_attr : function(x: Pstack_st_X509_ATTRIBUTE; loc: Integer): PX509_ATTRIBUTE; cdecl = nil;
   X509at_delete_attr : function(x: Pstack_st_X509_ATTRIBUTE; loc: Integer): PX509_ATTRIBUTE; cdecl = nil;
   X509at_add1_attr : function(x: PPstack_st_X509_ATTRIBUTE; attr: PX509_ATTRIBUTE): Pstack_st_X509_ATTRIBUTE; cdecl = nil;
-  X509at_add1_attr_by_OBJ : function(x: PPstack_st_X509_ATTRIBUTE; obj: PASN1_OBJECT; &type: Integer; bytes: PByte; len: Integer): Pstack_st_X509_ATTRIBUTE; cdecl = nil;
-  X509at_add1_attr_by_NID : function(x: PPstack_st_X509_ATTRIBUTE; nid: Integer; &type: Integer; bytes: PByte; len: Integer): Pstack_st_X509_ATTRIBUTE; cdecl = nil;
-  X509at_add1_attr_by_txt : function(x: PPstack_st_X509_ATTRIBUTE; attrname: PUTF8Char; &type: Integer; bytes: PByte; len: Integer): Pstack_st_X509_ATTRIBUTE; cdecl = nil;
-  X509at_get0_data_by_OBJ : function(x: Pstack_st_X509_ATTRIBUTE; obj: PASN1_OBJECT; lastpos: Integer; &type: Integer): Pointer; cdecl = nil;
+  X509at_add1_attr_by_OBJ : function(x: PPstack_st_X509_ATTRIBUTE; obj: PASN1_OBJECT; vtype: Integer; bytes: PByte; len: Integer): Pstack_st_X509_ATTRIBUTE; cdecl = nil;
+  X509at_add1_attr_by_NID : function(x: PPstack_st_X509_ATTRIBUTE; nid: Integer; vtype: Integer; bytes: PByte; len: Integer): Pstack_st_X509_ATTRIBUTE; cdecl = nil;
+  X509at_add1_attr_by_txt : function(x: PPstack_st_X509_ATTRIBUTE; attrname: PUTF8Char; vtype: Integer; bytes: PByte; len: Integer): Pstack_st_X509_ATTRIBUTE; cdecl = nil;
+  X509at_get0_data_by_OBJ : function(x: Pstack_st_X509_ATTRIBUTE; obj: PASN1_OBJECT; lastpos: Integer; vtype: Integer): Pointer; cdecl = nil;
   X509_ATTRIBUTE_create_by_NID : function(attr: PPX509_ATTRIBUTE; nid: Integer; atrtype: Integer; data: Pointer; len: Integer): PX509_ATTRIBUTE; cdecl = nil;
   X509_ATTRIBUTE_create_by_OBJ : function(attr: PPX509_ATTRIBUTE; obj: PASN1_OBJECT; atrtype: Integer; data: Pointer; len: Integer): PX509_ATTRIBUTE; cdecl = nil;
-  X509_ATTRIBUTE_create_by_txt : function(attr: PPX509_ATTRIBUTE; atrname: PUTF8Char; &type: Integer; bytes: PByte; len: Integer): PX509_ATTRIBUTE; cdecl = nil;
+  X509_ATTRIBUTE_create_by_txt : function(attr: PPX509_ATTRIBUTE; atrname: PUTF8Char; vtype: Integer; bytes: PByte; len: Integer): PX509_ATTRIBUTE; cdecl = nil;
   X509_ATTRIBUTE_set1_object : function(attr: PX509_ATTRIBUTE; obj: PASN1_OBJECT): Integer; cdecl = nil;
   X509_ATTRIBUTE_set1_data : function(attr: PX509_ATTRIBUTE; attrtype: Integer; data: Pointer; len: Integer): Integer; cdecl = nil;
   X509_ATTRIBUTE_get0_data : function(attr: PX509_ATTRIBUTE; idx: Integer; atrtype: Integer; data: Pointer): Pointer; cdecl = nil;
@@ -15143,31 +15155,31 @@ const
   EVP_PKEY_get_attr : function(key: PEVP_PKEY; loc: Integer): PX509_ATTRIBUTE; cdecl = nil;
   EVP_PKEY_delete_attr : function(key: PEVP_PKEY; loc: Integer): PX509_ATTRIBUTE; cdecl = nil;
   EVP_PKEY_add1_attr : function(key: PEVP_PKEY; attr: PX509_ATTRIBUTE): Integer; cdecl = nil;
-  EVP_PKEY_add1_attr_by_OBJ : function(key: PEVP_PKEY; obj: PASN1_OBJECT; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
-  EVP_PKEY_add1_attr_by_NID : function(key: PEVP_PKEY; nid: Integer; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
-  EVP_PKEY_add1_attr_by_txt : function(key: PEVP_PKEY; attrname: PUTF8Char; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
+  EVP_PKEY_add1_attr_by_OBJ : function(key: PEVP_PKEY; obj: PASN1_OBJECT; vtype: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
+  EVP_PKEY_add1_attr_by_NID : function(key: PEVP_PKEY; nid: Integer; vtype: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
+  EVP_PKEY_add1_attr_by_txt : function(key: PEVP_PKEY; attrname: PUTF8Char; vtype: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
   X509_verify_cert : function(ctx: PX509_STORE_CTX): Integer; cdecl = nil;
   X509_find_by_issuer_and_serial : function(sk: Pstack_st_X509; name: PX509_NAME; serial: PASN1_INTEGER): PX509; cdecl = nil;
   X509_find_by_subject : function(sk: Pstack_st_X509; name: PX509_NAME): PX509; cdecl = nil;
   PBEPARAM_new : function(): PPBEPARAM; cdecl = nil;
   PBEPARAM_free : procedure(a: PPBEPARAM); cdecl = nil;
-  d2i_PBEPARAM : function(a: PPPBEPARAM; &in: PPByte; len: Integer): PPBEPARAM; cdecl = nil;
-  i2d_PBEPARAM : function(a: PPBEPARAM; &out: PPByte): Integer; cdecl = nil;
+  d2i_PBEPARAM : function(a: PPPBEPARAM; vin: PPByte; len: Integer): PPBEPARAM; cdecl = nil;
+  i2d_PBEPARAM : function(a: PPBEPARAM; vout: PPByte): Integer; cdecl = nil;
   PBEPARAM_it : function(): PASN1_ITEM; cdecl = nil;
   PBE2PARAM_new : function(): PPBE2PARAM; cdecl = nil;
   PBE2PARAM_free : procedure(a: PPBE2PARAM); cdecl = nil;
-  d2i_PBE2PARAM : function(a: PPPBE2PARAM; &in: PPByte; len: Integer): PPBE2PARAM; cdecl = nil;
-  i2d_PBE2PARAM : function(a: PPBE2PARAM; &out: PPByte): Integer; cdecl = nil;
+  d2i_PBE2PARAM : function(a: PPPBE2PARAM; vin: PPByte; len: Integer): PPBE2PARAM; cdecl = nil;
+  i2d_PBE2PARAM : function(a: PPBE2PARAM; vout: PPByte): Integer; cdecl = nil;
   PBE2PARAM_it : function(): PASN1_ITEM; cdecl = nil;
   PBKDF2PARAM_new : function(): PPBKDF2PARAM; cdecl = nil;
   PBKDF2PARAM_free : procedure(a: PPBKDF2PARAM); cdecl = nil;
-  d2i_PBKDF2PARAM : function(a: PPPBKDF2PARAM; &in: PPByte; len: Integer): PPBKDF2PARAM; cdecl = nil;
-  i2d_PBKDF2PARAM : function(a: PPBKDF2PARAM; &out: PPByte): Integer; cdecl = nil;
+  d2i_PBKDF2PARAM : function(a: PPPBKDF2PARAM; vin: PPByte; len: Integer): PPBKDF2PARAM; cdecl = nil;
+  i2d_PBKDF2PARAM : function(a: PPBKDF2PARAM; vout: PPByte): Integer; cdecl = nil;
   PBKDF2PARAM_it : function(): PASN1_ITEM; cdecl = nil;
   SCRYPT_PARAMS_new : function(): PSCRYPT_PARAMS; cdecl = nil;
   SCRYPT_PARAMS_free : procedure(a: PSCRYPT_PARAMS); cdecl = nil;
-  d2i_SCRYPT_PARAMS : function(a: PPSCRYPT_PARAMS; &in: PPByte; len: Integer): PSCRYPT_PARAMS; cdecl = nil;
-  i2d_SCRYPT_PARAMS : function(a: PSCRYPT_PARAMS; &out: PPByte): Integer; cdecl = nil;
+  d2i_SCRYPT_PARAMS : function(a: PPSCRYPT_PARAMS; vin: PPByte; len: Integer): PSCRYPT_PARAMS; cdecl = nil;
+  i2d_SCRYPT_PARAMS : function(a: PSCRYPT_PARAMS; vout: PPByte): Integer; cdecl = nil;
   SCRYPT_PARAMS_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS5_pbe_set0_algor : function(algor: PX509_ALGOR; alg: Integer; iter: Integer; salt: PByte; saltlen: Integer): Integer; cdecl = nil;
   PKCS5_pbe_set : function(alg: Integer; iter: Integer; salt: PByte; saltlen: Integer): PX509_ALGOR; cdecl = nil;
@@ -15177,15 +15189,15 @@ const
   PKCS5_pbkdf2_set : function(iter: Integer; salt: PByte; saltlen: Integer; prf_nid: Integer; keylen: Integer): PX509_ALGOR; cdecl = nil;
   PKCS8_PRIV_KEY_INFO_new : function(): PPKCS8_PRIV_KEY_INFO; cdecl = nil;
   PKCS8_PRIV_KEY_INFO_free : procedure(a: PPKCS8_PRIV_KEY_INFO); cdecl = nil;
-  d2i_PKCS8_PRIV_KEY_INFO : function(a: PPPKCS8_PRIV_KEY_INFO; &in: PPByte; len: Integer): PPKCS8_PRIV_KEY_INFO; cdecl = nil;
-  i2d_PKCS8_PRIV_KEY_INFO : function(a: PPKCS8_PRIV_KEY_INFO; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS8_PRIV_KEY_INFO : function(a: PPPKCS8_PRIV_KEY_INFO; vin: PPByte; len: Integer): PPKCS8_PRIV_KEY_INFO; cdecl = nil;
+  i2d_PKCS8_PRIV_KEY_INFO : function(a: PPKCS8_PRIV_KEY_INFO; vout: PPByte): Integer; cdecl = nil;
   PKCS8_PRIV_KEY_INFO_it : function(): PASN1_ITEM; cdecl = nil;
   EVP_PKCS82PKEY : function(p8: PPKCS8_PRIV_KEY_INFO): PEVP_PKEY; cdecl = nil;
   EVP_PKEY2PKCS8 : function(pkey: PEVP_PKEY): PPKCS8_PRIV_KEY_INFO; cdecl = nil;
   PKCS8_pkey_set0 : function(priv: PPKCS8_PRIV_KEY_INFO; aobj: PASN1_OBJECT; version: Integer; ptype: Integer; pval: Pointer; penc: PByte; penclen: Integer): Integer; cdecl = nil;
   PKCS8_pkey_get0 : function(ppkalg: PPASN1_OBJECT; pk: PPByte; ppklen: PInteger; pa: PPX509_ALGOR; p8: PPKCS8_PRIV_KEY_INFO): Integer; cdecl = nil;
   PKCS8_pkey_get0_attrs : function(p8: PPKCS8_PRIV_KEY_INFO): Pstack_st_X509_ATTRIBUTE; cdecl = nil;
-  PKCS8_pkey_add1_attr_by_NID : function(p8: PPKCS8_PRIV_KEY_INFO; nid: Integer; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
+  PKCS8_pkey_add1_attr_by_NID : function(p8: PPKCS8_PRIV_KEY_INFO; nid: Integer; vtype: Integer; bytes: PByte; len: Integer): Integer; cdecl = nil;
   X509_PUBKEY_set0_param : function(pub: PX509_PUBKEY; aobj: PASN1_OBJECT; ptype: Integer; pval: Pointer; penc: PByte; penclen: Integer): Integer; cdecl = nil;
   X509_PUBKEY_get0_param : function(ppkalg: PPASN1_OBJECT; pk: PPByte; ppklen: PInteger; pa: PPX509_ALGOR; pub: PX509_PUBKEY): Integer; cdecl = nil;
   X509_check_trust : function(x: PX509; id: Integer; flags: Integer): Integer; cdecl = nil;
@@ -15200,29 +15212,29 @@ const
   ERR_load_CONF_strings : function(): Integer; cdecl = nil;
   CONF_set_default_method : function(meth: PCONF_METHOD): Integer; cdecl = nil;
   CONF_set_nconf : procedure(conf: PCONF; hash: Plhash_st_CONF_VALUE); cdecl = nil;
-  CONF_load : function(conf: Plhash_st_CONF_VALUE; &file: PUTF8Char; eline: PInteger): Plhash_st_CONF_VALUE; cdecl = nil;
+  CONF_load : function(conf: Plhash_st_CONF_VALUE; vfile: PUTF8Char; eline: PInteger): Plhash_st_CONF_VALUE; cdecl = nil;
   CONF_load_fp : function(conf: Plhash_st_CONF_VALUE; fp: PPointer; eline: PInteger): Plhash_st_CONF_VALUE; cdecl = nil;
   CONF_load_bio : function(conf: Plhash_st_CONF_VALUE; bp: PBIO; eline: PInteger): Plhash_st_CONF_VALUE; cdecl = nil;
   CONF_get_section : function(conf: Plhash_st_CONF_VALUE; section: PUTF8Char): Pstack_st_CONF_VALUE; cdecl = nil;
   CONF_get_string : function(conf: Plhash_st_CONF_VALUE; group: PUTF8Char; name: PUTF8Char): PUTF8Char; cdecl = nil;
   CONF_get_number : function(conf: Plhash_st_CONF_VALUE; group: PUTF8Char; name: PUTF8Char): Integer; cdecl = nil;
   CONF_free : procedure(conf: Plhash_st_CONF_VALUE); cdecl = nil;
-  CONF_dump_fp : function(conf: Plhash_st_CONF_VALUE; &out: PPointer): Integer; cdecl = nil;
-  CONF_dump_bio : function(conf: Plhash_st_CONF_VALUE; &out: PBIO): Integer; cdecl = nil;
+  CONF_dump_fp : function(conf: Plhash_st_CONF_VALUE; vout: PPointer): Integer; cdecl = nil;
+  CONF_dump_bio : function(conf: Plhash_st_CONF_VALUE; vout: PBIO): Integer; cdecl = nil;
   OPENSSL_config : procedure(config_name: PUTF8Char); cdecl = nil;
   NCONF_new : function(meth: PCONF_METHOD): PCONF; cdecl = nil;
   NCONF_default : function(): PCONF_METHOD; cdecl = nil;
   NCONF_WIN32 : function(): PCONF_METHOD; cdecl = nil;
   NCONF_free : procedure(conf: PCONF); cdecl = nil;
   NCONF_free_data : procedure(conf: PCONF); cdecl = nil;
-  NCONF_load : function(conf: PCONF; &file: PUTF8Char; eline: PInteger): Integer; cdecl = nil;
+  NCONF_load : function(conf: PCONF; vfile: PUTF8Char; eline: PInteger): Integer; cdecl = nil;
   NCONF_load_fp : function(conf: PCONF; fp: PPointer; eline: PInteger): Integer; cdecl = nil;
   NCONF_load_bio : function(conf: PCONF; bp: PBIO; eline: PInteger): Integer; cdecl = nil;
   NCONF_get_section : function(conf: PCONF; section: PUTF8Char): Pstack_st_CONF_VALUE; cdecl = nil;
   NCONF_get_string : function(conf: PCONF; group: PUTF8Char; name: PUTF8Char): PUTF8Char; cdecl = nil;
   NCONF_get_number_e : function(conf: PCONF; group: PUTF8Char; name: PUTF8Char; result: PInteger): Integer; cdecl = nil;
-  NCONF_dump_fp : function(conf: PCONF; &out: PPointer): Integer; cdecl = nil;
-  NCONF_dump_bio : function(conf: PCONF; &out: PBIO): Integer; cdecl = nil;
+  NCONF_dump_fp : function(conf: PCONF; vout: PPointer): Integer; cdecl = nil;
+  NCONF_dump_bio : function(conf: PCONF; vout: PBIO): Integer; cdecl = nil;
   CONF_modules_load : function(cnf: PCONF; appname: PUTF8Char; flags: Cardinal): Integer; cdecl = nil;
   CONF_modules_load_file : function(filename: PUTF8Char; appname: PUTF8Char; flags: Cardinal): Integer; cdecl = nil;
   CONF_modules_unload : procedure(all: Integer); cdecl = nil;
@@ -15243,28 +15255,28 @@ const
   ERR_load_X509V3_strings : function(): Integer; cdecl = nil;
   PROXY_POLICY_new : function(): PPROXY_POLICY; cdecl = nil;
   PROXY_POLICY_free : procedure(a: PPROXY_POLICY); cdecl = nil;
-  d2i_PROXY_POLICY : function(a: PPPROXY_POLICY; &in: PPByte; len: Integer): PPROXY_POLICY; cdecl = nil;
-  i2d_PROXY_POLICY : function(a: PPROXY_POLICY; &out: PPByte): Integer; cdecl = nil;
+  d2i_PROXY_POLICY : function(a: PPPROXY_POLICY; vin: PPByte; len: Integer): PPROXY_POLICY; cdecl = nil;
+  i2d_PROXY_POLICY : function(a: PPROXY_POLICY; vout: PPByte): Integer; cdecl = nil;
   PROXY_POLICY_it : function(): PASN1_ITEM; cdecl = nil;
   PROXY_CERT_INFO_EXTENSION_new : function(): PPROXY_CERT_INFO_EXTENSION; cdecl = nil;
   PROXY_CERT_INFO_EXTENSION_free : procedure(a: PPROXY_CERT_INFO_EXTENSION); cdecl = nil;
-  d2i_PROXY_CERT_INFO_EXTENSION : function(a: PPPROXY_CERT_INFO_EXTENSION; &in: PPByte; len: Integer): PPROXY_CERT_INFO_EXTENSION; cdecl = nil;
-  i2d_PROXY_CERT_INFO_EXTENSION : function(a: PPROXY_CERT_INFO_EXTENSION; &out: PPByte): Integer; cdecl = nil;
+  d2i_PROXY_CERT_INFO_EXTENSION : function(a: PPPROXY_CERT_INFO_EXTENSION; vin: PPByte; len: Integer): PPROXY_CERT_INFO_EXTENSION; cdecl = nil;
+  i2d_PROXY_CERT_INFO_EXTENSION : function(a: PPROXY_CERT_INFO_EXTENSION; vout: PPByte): Integer; cdecl = nil;
   PROXY_CERT_INFO_EXTENSION_it : function(): PASN1_ITEM; cdecl = nil;
   BASIC_CONSTRAINTS_new : function(): PBASIC_CONSTRAINTS; cdecl = nil;
   BASIC_CONSTRAINTS_free : procedure(a: PBASIC_CONSTRAINTS); cdecl = nil;
-  d2i_BASIC_CONSTRAINTS : function(a: PPBASIC_CONSTRAINTS; &in: PPByte; len: Integer): PBASIC_CONSTRAINTS; cdecl = nil;
-  i2d_BASIC_CONSTRAINTS : function(a: PBASIC_CONSTRAINTS; &out: PPByte): Integer; cdecl = nil;
+  d2i_BASIC_CONSTRAINTS : function(a: PPBASIC_CONSTRAINTS; vin: PPByte; len: Integer): PBASIC_CONSTRAINTS; cdecl = nil;
+  i2d_BASIC_CONSTRAINTS : function(a: PBASIC_CONSTRAINTS; vout: PPByte): Integer; cdecl = nil;
   BASIC_CONSTRAINTS_it : function(): PASN1_ITEM; cdecl = nil;
   SXNET_new : function(): PSXNET; cdecl = nil;
   SXNET_free : procedure(a: PSXNET); cdecl = nil;
-  d2i_SXNET : function(a: PPSXNET; &in: PPByte; len: Integer): PSXNET; cdecl = nil;
-  i2d_SXNET : function(a: PSXNET; &out: PPByte): Integer; cdecl = nil;
+  d2i_SXNET : function(a: PPSXNET; vin: PPByte; len: Integer): PSXNET; cdecl = nil;
+  i2d_SXNET : function(a: PSXNET; vout: PPByte): Integer; cdecl = nil;
   SXNET_it : function(): PASN1_ITEM; cdecl = nil;
   SXNETID_new : function(): PSXNETID; cdecl = nil;
   SXNETID_free : procedure(a: PSXNETID); cdecl = nil;
-  d2i_SXNETID : function(a: PPSXNETID; &in: PPByte; len: Integer): PSXNETID; cdecl = nil;
-  i2d_SXNETID : function(a: PSXNETID; &out: PPByte): Integer; cdecl = nil;
+  d2i_SXNETID : function(a: PPSXNETID; vin: PPByte; len: Integer): PSXNETID; cdecl = nil;
+  i2d_SXNETID : function(a: PSXNETID; vout: PPByte): Integer; cdecl = nil;
   SXNETID_it : function(): PASN1_ITEM; cdecl = nil;
   SXNET_add_id_asc : function(psx: PPSXNET; zone: PUTF8Char; user: PUTF8Char; userlen: Integer): Integer; cdecl = nil;
   SXNET_add_id_ulong : function(psx: PPSXNET; lzone: Cardinal; user: PUTF8Char; userlen: Integer): Integer; cdecl = nil;
@@ -15274,18 +15286,18 @@ const
   SXNET_get_id_INTEGER : function(sx: PSXNET; zone: PASN1_INTEGER): PASN1_OCTET_STRING; cdecl = nil;
   AUTHORITY_KEYID_new : function(): PAUTHORITY_KEYID; cdecl = nil;
   AUTHORITY_KEYID_free : procedure(a: PAUTHORITY_KEYID); cdecl = nil;
-  d2i_AUTHORITY_KEYID : function(a: PPAUTHORITY_KEYID; &in: PPByte; len: Integer): PAUTHORITY_KEYID; cdecl = nil;
-  i2d_AUTHORITY_KEYID : function(a: PAUTHORITY_KEYID; &out: PPByte): Integer; cdecl = nil;
+  d2i_AUTHORITY_KEYID : function(a: PPAUTHORITY_KEYID; vin: PPByte; len: Integer): PAUTHORITY_KEYID; cdecl = nil;
+  i2d_AUTHORITY_KEYID : function(a: PAUTHORITY_KEYID; vout: PPByte): Integer; cdecl = nil;
   AUTHORITY_KEYID_it : function(): PASN1_ITEM; cdecl = nil;
   PKEY_USAGE_PERIOD_new : function(): PPKEY_USAGE_PERIOD; cdecl = nil;
   PKEY_USAGE_PERIOD_free : procedure(a: PPKEY_USAGE_PERIOD); cdecl = nil;
-  d2i_PKEY_USAGE_PERIOD : function(a: PPPKEY_USAGE_PERIOD; &in: PPByte; len: Integer): PPKEY_USAGE_PERIOD; cdecl = nil;
-  i2d_PKEY_USAGE_PERIOD : function(a: PPKEY_USAGE_PERIOD; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKEY_USAGE_PERIOD : function(a: PPPKEY_USAGE_PERIOD; vin: PPByte; len: Integer): PPKEY_USAGE_PERIOD; cdecl = nil;
+  i2d_PKEY_USAGE_PERIOD : function(a: PPKEY_USAGE_PERIOD; vout: PPByte): Integer; cdecl = nil;
   PKEY_USAGE_PERIOD_it : function(): PASN1_ITEM; cdecl = nil;
   GENERAL_NAME_new : function(): PGENERAL_NAME; cdecl = nil;
   GENERAL_NAME_free : procedure(a: PGENERAL_NAME); cdecl = nil;
-  d2i_GENERAL_NAME : function(a: PPGENERAL_NAME; &in: PPByte; len: Integer): PGENERAL_NAME; cdecl = nil;
-  i2d_GENERAL_NAME : function(a: PGENERAL_NAME; &out: PPByte): Integer; cdecl = nil;
+  d2i_GENERAL_NAME : function(a: PPGENERAL_NAME; vin: PPByte; len: Integer): PGENERAL_NAME; cdecl = nil;
+  i2d_GENERAL_NAME : function(a: PGENERAL_NAME; vout: PPByte): Integer; cdecl = nil;
   GENERAL_NAME_it : function(): PASN1_ITEM; cdecl = nil;
   GENERAL_NAME_dup : function(a: PGENERAL_NAME): PGENERAL_NAME; cdecl = nil;
   GENERAL_NAME_cmp : function(a: PGENERAL_NAME; b: PGENERAL_NAME): Integer; cdecl = nil;
@@ -15294,26 +15306,26 @@ const
   i2s_ASN1_IA5STRING : function(method: PX509V3_EXT_METHOD; ia5: PASN1_IA5STRING): PUTF8Char; cdecl = nil;
   s2i_ASN1_IA5STRING : function(method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; str: PUTF8Char): PASN1_IA5STRING; cdecl = nil;
   i2v_GENERAL_NAME : function(method: PX509V3_EXT_METHOD; gen: PGENERAL_NAME; ret: Pstack_st_CONF_VALUE): Pstack_st_CONF_VALUE; cdecl = nil;
-  GENERAL_NAME_print : function(&out: PBIO; gen: PGENERAL_NAME): Integer; cdecl = nil;
+  GENERAL_NAME_print : function(vout: PBIO; gen: PGENERAL_NAME): Integer; cdecl = nil;
   GENERAL_NAMES_new : function(): PGENERAL_NAMES; cdecl = nil;
   GENERAL_NAMES_free : procedure(a: PGENERAL_NAMES); cdecl = nil;
-  d2i_GENERAL_NAMES : function(a: PPGENERAL_NAMES; &in: PPByte; len: Integer): PGENERAL_NAMES; cdecl = nil;
-  i2d_GENERAL_NAMES : function(a: PGENERAL_NAMES; &out: PPByte): Integer; cdecl = nil;
+  d2i_GENERAL_NAMES : function(a: PPGENERAL_NAMES; vin: PPByte; len: Integer): PGENERAL_NAMES; cdecl = nil;
+  i2d_GENERAL_NAMES : function(a: PGENERAL_NAMES; vout: PPByte): Integer; cdecl = nil;
   GENERAL_NAMES_it : function(): PASN1_ITEM; cdecl = nil;
   i2v_GENERAL_NAMES : function(method: PX509V3_EXT_METHOD; gen: PGENERAL_NAMES; extlist: Pstack_st_CONF_VALUE): Pstack_st_CONF_VALUE; cdecl = nil;
   v2i_GENERAL_NAMES : function(method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; nval: Pstack_st_CONF_VALUE): PGENERAL_NAMES; cdecl = nil;
   OTHERNAME_new : function(): POTHERNAME; cdecl = nil;
   OTHERNAME_free : procedure(a: POTHERNAME); cdecl = nil;
-  d2i_OTHERNAME : function(a: PPOTHERNAME; &in: PPByte; len: Integer): POTHERNAME; cdecl = nil;
-  i2d_OTHERNAME : function(a: POTHERNAME; &out: PPByte): Integer; cdecl = nil;
+  d2i_OTHERNAME : function(a: PPOTHERNAME; vin: PPByte; len: Integer): POTHERNAME; cdecl = nil;
+  i2d_OTHERNAME : function(a: POTHERNAME; vout: PPByte): Integer; cdecl = nil;
   OTHERNAME_it : function(): PASN1_ITEM; cdecl = nil;
   EDIPARTYNAME_new : function(): PEDIPARTYNAME; cdecl = nil;
   EDIPARTYNAME_free : procedure(a: PEDIPARTYNAME); cdecl = nil;
-  d2i_EDIPARTYNAME : function(a: PPEDIPARTYNAME; &in: PPByte; len: Integer): PEDIPARTYNAME; cdecl = nil;
-  i2d_EDIPARTYNAME : function(a: PEDIPARTYNAME; &out: PPByte): Integer; cdecl = nil;
+  d2i_EDIPARTYNAME : function(a: PPEDIPARTYNAME; vin: PPByte; len: Integer): PEDIPARTYNAME; cdecl = nil;
+  i2d_EDIPARTYNAME : function(a: PEDIPARTYNAME; vout: PPByte): Integer; cdecl = nil;
   EDIPARTYNAME_it : function(): PASN1_ITEM; cdecl = nil;
   OTHERNAME_cmp : function(a: POTHERNAME; b: POTHERNAME): Integer; cdecl = nil;
-  GENERAL_NAME_set0_value : procedure(a: PGENERAL_NAME; &type: Integer; value: Pointer); cdecl = nil;
+  GENERAL_NAME_set0_value : procedure(a: PGENERAL_NAME; vtype: Integer; value: Pointer); cdecl = nil;
   GENERAL_NAME_get0_value : function(a: PGENERAL_NAME; ptype: PInteger): Pointer; cdecl = nil;
   GENERAL_NAME_set0_othername : function(gen: PGENERAL_NAME; oid: PASN1_OBJECT; value: PASN1_TYPE): Integer; cdecl = nil;
   GENERAL_NAME_get0_otherName : function(gen: PGENERAL_NAME; poid: PPASN1_OBJECT; pvalue: PPASN1_TYPE): Integer; cdecl = nil;
@@ -15321,69 +15333,69 @@ const
   s2i_ASN1_OCTET_STRING : function(method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; str: PUTF8Char): PASN1_OCTET_STRING; cdecl = nil;
   EXTENDED_KEY_USAGE_new : function(): PEXTENDED_KEY_USAGE; cdecl = nil;
   EXTENDED_KEY_USAGE_free : procedure(a: PEXTENDED_KEY_USAGE); cdecl = nil;
-  d2i_EXTENDED_KEY_USAGE : function(a: PPEXTENDED_KEY_USAGE; &in: PPByte; len: Integer): PEXTENDED_KEY_USAGE; cdecl = nil;
-  i2d_EXTENDED_KEY_USAGE : function(a: PEXTENDED_KEY_USAGE; &out: PPByte): Integer; cdecl = nil;
+  d2i_EXTENDED_KEY_USAGE : function(a: PPEXTENDED_KEY_USAGE; vin: PPByte; len: Integer): PEXTENDED_KEY_USAGE; cdecl = nil;
+  i2d_EXTENDED_KEY_USAGE : function(a: PEXTENDED_KEY_USAGE; vout: PPByte): Integer; cdecl = nil;
   EXTENDED_KEY_USAGE_it : function(): PASN1_ITEM; cdecl = nil;
   i2a_ACCESS_DESCRIPTION : function(bp: PBIO; a: PACCESS_DESCRIPTION): Integer; cdecl = nil;
   TLS_FEATURE_new : function(): PTLS_FEATURE; cdecl = nil;
   TLS_FEATURE_free : procedure(a: PTLS_FEATURE); cdecl = nil;
   CERTIFICATEPOLICIES_new : function(): PCERTIFICATEPOLICIES; cdecl = nil;
   CERTIFICATEPOLICIES_free : procedure(a: PCERTIFICATEPOLICIES); cdecl = nil;
-  d2i_CERTIFICATEPOLICIES : function(a: PPCERTIFICATEPOLICIES; &in: PPByte; len: Integer): PCERTIFICATEPOLICIES; cdecl = nil;
-  i2d_CERTIFICATEPOLICIES : function(a: PCERTIFICATEPOLICIES; &out: PPByte): Integer; cdecl = nil;
+  d2i_CERTIFICATEPOLICIES : function(a: PPCERTIFICATEPOLICIES; vin: PPByte; len: Integer): PCERTIFICATEPOLICIES; cdecl = nil;
+  i2d_CERTIFICATEPOLICIES : function(a: PCERTIFICATEPOLICIES; vout: PPByte): Integer; cdecl = nil;
   CERTIFICATEPOLICIES_it : function(): PASN1_ITEM; cdecl = nil;
   POLICYINFO_new : function(): PPOLICYINFO; cdecl = nil;
   POLICYINFO_free : procedure(a: PPOLICYINFO); cdecl = nil;
-  d2i_POLICYINFO : function(a: PPPOLICYINFO; &in: PPByte; len: Integer): PPOLICYINFO; cdecl = nil;
-  i2d_POLICYINFO : function(a: PPOLICYINFO; &out: PPByte): Integer; cdecl = nil;
+  d2i_POLICYINFO : function(a: PPPOLICYINFO; vin: PPByte; len: Integer): PPOLICYINFO; cdecl = nil;
+  i2d_POLICYINFO : function(a: PPOLICYINFO; vout: PPByte): Integer; cdecl = nil;
   POLICYINFO_it : function(): PASN1_ITEM; cdecl = nil;
   POLICYQUALINFO_new : function(): PPOLICYQUALINFO; cdecl = nil;
   POLICYQUALINFO_free : procedure(a: PPOLICYQUALINFO); cdecl = nil;
-  d2i_POLICYQUALINFO : function(a: PPPOLICYQUALINFO; &in: PPByte; len: Integer): PPOLICYQUALINFO; cdecl = nil;
-  i2d_POLICYQUALINFO : function(a: PPOLICYQUALINFO; &out: PPByte): Integer; cdecl = nil;
+  d2i_POLICYQUALINFO : function(a: PPPOLICYQUALINFO; vin: PPByte; len: Integer): PPOLICYQUALINFO; cdecl = nil;
+  i2d_POLICYQUALINFO : function(a: PPOLICYQUALINFO; vout: PPByte): Integer; cdecl = nil;
   POLICYQUALINFO_it : function(): PASN1_ITEM; cdecl = nil;
   USERNOTICE_new : function(): PUSERNOTICE; cdecl = nil;
   USERNOTICE_free : procedure(a: PUSERNOTICE); cdecl = nil;
-  d2i_USERNOTICE : function(a: PPUSERNOTICE; &in: PPByte; len: Integer): PUSERNOTICE; cdecl = nil;
-  i2d_USERNOTICE : function(a: PUSERNOTICE; &out: PPByte): Integer; cdecl = nil;
+  d2i_USERNOTICE : function(a: PPUSERNOTICE; vin: PPByte; len: Integer): PUSERNOTICE; cdecl = nil;
+  i2d_USERNOTICE : function(a: PUSERNOTICE; vout: PPByte): Integer; cdecl = nil;
   USERNOTICE_it : function(): PASN1_ITEM; cdecl = nil;
   NOTICEREF_new : function(): PNOTICEREF; cdecl = nil;
   NOTICEREF_free : procedure(a: PNOTICEREF); cdecl = nil;
-  d2i_NOTICEREF : function(a: PPNOTICEREF; &in: PPByte; len: Integer): PNOTICEREF; cdecl = nil;
-  i2d_NOTICEREF : function(a: PNOTICEREF; &out: PPByte): Integer; cdecl = nil;
+  d2i_NOTICEREF : function(a: PPNOTICEREF; vin: PPByte; len: Integer): PNOTICEREF; cdecl = nil;
+  i2d_NOTICEREF : function(a: PNOTICEREF; vout: PPByte): Integer; cdecl = nil;
   NOTICEREF_it : function(): PASN1_ITEM; cdecl = nil;
   CRL_DIST_POINTS_new : function(): PCRL_DIST_POINTS; cdecl = nil;
   CRL_DIST_POINTS_free : procedure(a: PCRL_DIST_POINTS); cdecl = nil;
-  d2i_CRL_DIST_POINTS : function(a: PPCRL_DIST_POINTS; &in: PPByte; len: Integer): PCRL_DIST_POINTS; cdecl = nil;
-  i2d_CRL_DIST_POINTS : function(a: PCRL_DIST_POINTS; &out: PPByte): Integer; cdecl = nil;
+  d2i_CRL_DIST_POINTS : function(a: PPCRL_DIST_POINTS; vin: PPByte; len: Integer): PCRL_DIST_POINTS; cdecl = nil;
+  i2d_CRL_DIST_POINTS : function(a: PCRL_DIST_POINTS; vout: PPByte): Integer; cdecl = nil;
   CRL_DIST_POINTS_it : function(): PASN1_ITEM; cdecl = nil;
   DIST_POINT_new : function(): PDIST_POINT; cdecl = nil;
   DIST_POINT_free : procedure(a: PDIST_POINT); cdecl = nil;
-  d2i_DIST_POINT : function(a: PPDIST_POINT; &in: PPByte; len: Integer): PDIST_POINT; cdecl = nil;
-  i2d_DIST_POINT : function(a: PDIST_POINT; &out: PPByte): Integer; cdecl = nil;
+  d2i_DIST_POINT : function(a: PPDIST_POINT; vin: PPByte; len: Integer): PDIST_POINT; cdecl = nil;
+  i2d_DIST_POINT : function(a: PDIST_POINT; vout: PPByte): Integer; cdecl = nil;
   DIST_POINT_it : function(): PASN1_ITEM; cdecl = nil;
   DIST_POINT_NAME_new : function(): PDIST_POINT_NAME; cdecl = nil;
   DIST_POINT_NAME_free : procedure(a: PDIST_POINT_NAME); cdecl = nil;
-  d2i_DIST_POINT_NAME : function(a: PPDIST_POINT_NAME; &in: PPByte; len: Integer): PDIST_POINT_NAME; cdecl = nil;
-  i2d_DIST_POINT_NAME : function(a: PDIST_POINT_NAME; &out: PPByte): Integer; cdecl = nil;
+  d2i_DIST_POINT_NAME : function(a: PPDIST_POINT_NAME; vin: PPByte; len: Integer): PDIST_POINT_NAME; cdecl = nil;
+  i2d_DIST_POINT_NAME : function(a: PDIST_POINT_NAME; vout: PPByte): Integer; cdecl = nil;
   DIST_POINT_NAME_it : function(): PASN1_ITEM; cdecl = nil;
   ISSUING_DIST_POINT_new : function(): PISSUING_DIST_POINT; cdecl = nil;
   ISSUING_DIST_POINT_free : procedure(a: PISSUING_DIST_POINT); cdecl = nil;
-  d2i_ISSUING_DIST_POINT : function(a: PPISSUING_DIST_POINT; &in: PPByte; len: Integer): PISSUING_DIST_POINT; cdecl = nil;
-  i2d_ISSUING_DIST_POINT : function(a: PISSUING_DIST_POINT; &out: PPByte): Integer; cdecl = nil;
+  d2i_ISSUING_DIST_POINT : function(a: PPISSUING_DIST_POINT; vin: PPByte; len: Integer): PISSUING_DIST_POINT; cdecl = nil;
+  i2d_ISSUING_DIST_POINT : function(a: PISSUING_DIST_POINT; vout: PPByte): Integer; cdecl = nil;
   ISSUING_DIST_POINT_it : function(): PASN1_ITEM; cdecl = nil;
   DIST_POINT_set_dpname : function(dpn: PDIST_POINT_NAME; iname: PX509_NAME): Integer; cdecl = nil;
   NAME_CONSTRAINTS_check : function(x: PX509; nc: PNAME_CONSTRAINTS): Integer; cdecl = nil;
   NAME_CONSTRAINTS_check_CN : function(x: PX509; nc: PNAME_CONSTRAINTS): Integer; cdecl = nil;
   ACCESS_DESCRIPTION_new : function(): PACCESS_DESCRIPTION; cdecl = nil;
   ACCESS_DESCRIPTION_free : procedure(a: PACCESS_DESCRIPTION); cdecl = nil;
-  d2i_ACCESS_DESCRIPTION : function(a: PPACCESS_DESCRIPTION; &in: PPByte; len: Integer): PACCESS_DESCRIPTION; cdecl = nil;
-  i2d_ACCESS_DESCRIPTION : function(a: PACCESS_DESCRIPTION; &out: PPByte): Integer; cdecl = nil;
+  d2i_ACCESS_DESCRIPTION : function(a: PPACCESS_DESCRIPTION; vin: PPByte; len: Integer): PACCESS_DESCRIPTION; cdecl = nil;
+  i2d_ACCESS_DESCRIPTION : function(a: PACCESS_DESCRIPTION; vout: PPByte): Integer; cdecl = nil;
   ACCESS_DESCRIPTION_it : function(): PASN1_ITEM; cdecl = nil;
   AUTHORITY_INFO_ACCESS_new : function(): PAUTHORITY_INFO_ACCESS; cdecl = nil;
   AUTHORITY_INFO_ACCESS_free : procedure(a: PAUTHORITY_INFO_ACCESS); cdecl = nil;
-  d2i_AUTHORITY_INFO_ACCESS : function(a: PPAUTHORITY_INFO_ACCESS; &in: PPByte; len: Integer): PAUTHORITY_INFO_ACCESS; cdecl = nil;
-  i2d_AUTHORITY_INFO_ACCESS : function(a: PAUTHORITY_INFO_ACCESS; &out: PPByte): Integer; cdecl = nil;
+  d2i_AUTHORITY_INFO_ACCESS : function(a: PPAUTHORITY_INFO_ACCESS; vin: PPByte; len: Integer): PAUTHORITY_INFO_ACCESS; cdecl = nil;
+  i2d_AUTHORITY_INFO_ACCESS : function(a: PAUTHORITY_INFO_ACCESS; vout: PPByte): Integer; cdecl = nil;
   AUTHORITY_INFO_ACCESS_it : function(): PASN1_ITEM; cdecl = nil;
   POLICY_MAPPING_it : function(): PASN1_ITEM; cdecl = nil;
   POLICY_MAPPING_new : function(): PPOLICY_MAPPING; cdecl = nil;
@@ -15398,9 +15410,9 @@ const
   POLICY_CONSTRAINTS_new : function(): PPOLICY_CONSTRAINTS; cdecl = nil;
   POLICY_CONSTRAINTS_free : procedure(a: PPOLICY_CONSTRAINTS); cdecl = nil;
   POLICY_CONSTRAINTS_it : function(): PASN1_ITEM; cdecl = nil;
-  a2i_GENERAL_NAME : function(&out: PGENERAL_NAME; method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; gen_type: Integer; value: PUTF8Char; is_nc: Integer): PGENERAL_NAME; cdecl = nil;
+  a2i_GENERAL_NAME : function(vout: PGENERAL_NAME; method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; gen_type: Integer; value: PUTF8Char; is_nc: Integer): PGENERAL_NAME; cdecl = nil;
   v2i_GENERAL_NAME : function(method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; cnf: PCONF_VALUE): PGENERAL_NAME; cdecl = nil;
-  v2i_GENERAL_NAME_ex : function(&out: PGENERAL_NAME; method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; cnf: PCONF_VALUE; is_nc: Integer): PGENERAL_NAME; cdecl = nil;
+  v2i_GENERAL_NAME_ex : function(vout: PGENERAL_NAME; method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; cnf: PCONF_VALUE; is_nc: Integer): PGENERAL_NAME; cdecl = nil;
   X509V3_conf_free : procedure(val: PCONF_VALUE); cdecl = nil;
   X509V3_EXT_nconf_nid : function(conf: PCONF; ctx: PX509V3_CTX; ext_nid: Integer; value: PUTF8Char): PX509_EXTENSION; cdecl = nil;
   X509V3_EXT_nconf : function(conf: PCONF; ctx: PX509V3_CTX; name: PUTF8Char; value: PUTF8Char): PX509_EXTENSION; cdecl = nil;
@@ -15443,10 +15455,10 @@ const
   X509V3_get_d2i : function(x: Pstack_st_X509_EXTENSION; nid: Integer; crit: PInteger; idx: PInteger): Pointer; cdecl = nil;
   X509V3_EXT_i2d : function(ext_nid: Integer; crit: Integer; ext_struc: Pointer): PX509_EXTENSION; cdecl = nil;
   X509V3_add1_i2d : function(x: PPstack_st_X509_EXTENSION; nid: Integer; value: Pointer; crit: Integer; flags: Cardinal): Integer; cdecl = nil;
-  X509V3_EXT_val_prn : procedure(&out: PBIO; val: Pstack_st_CONF_VALUE; indent: Integer; ml: Integer); cdecl = nil;
-  X509V3_EXT_print : function(&out: PBIO; ext: PX509_EXTENSION; flag: Cardinal; indent: Integer): Integer; cdecl = nil;
-  X509V3_EXT_print_fp : function(&out: PPointer; ext: PX509_EXTENSION; flag: Integer; indent: Integer): Integer; cdecl = nil;
-  X509V3_extensions_print : function(&out: PBIO; title: PUTF8Char; exts: Pstack_st_X509_EXTENSION; flag: Cardinal; indent: Integer): Integer; cdecl = nil;
+  X509V3_EXT_val_prn : procedure(vout: PBIO; val: Pstack_st_CONF_VALUE; indent: Integer; ml: Integer); cdecl = nil;
+  X509V3_EXT_print : function(vout: PBIO; ext: PX509_EXTENSION; flag: Cardinal; indent: Integer): Integer; cdecl = nil;
+  X509V3_EXT_print_fp : function(vout: PPointer; ext: PX509_EXTENSION; flag: Integer; indent: Integer): Integer; cdecl = nil;
+  X509V3_extensions_print : function(vout: PBIO; title: PUTF8Char; exts: Pstack_st_X509_EXTENSION; flag: Cardinal; indent: Integer): Integer; cdecl = nil;
   X509_check_ca : function(x: PX509): Integer; cdecl = nil;
   X509_check_purpose : function(x: PX509; id: Integer; ca: Integer): Integer; cdecl = nil;
   X509_supported_extension : function(ex: PX509_EXTENSION): Integer; cdecl = nil;
@@ -15484,46 +15496,46 @@ const
   a2i_IPADDRESS : function(ipasc: PUTF8Char): PASN1_OCTET_STRING; cdecl = nil;
   a2i_IPADDRESS_NC : function(ipasc: PUTF8Char): PASN1_OCTET_STRING; cdecl = nil;
   X509V3_NAME_from_section : function(nm: PX509_NAME; dn_sk: Pstack_st_CONF_VALUE; chtype: Cardinal): Integer; cdecl = nil;
-  X509_POLICY_NODE_print : procedure(&out: PBIO; node: PX509_POLICY_NODE; indent: Integer); cdecl = nil;
+  X509_POLICY_NODE_print : procedure(vout: PBIO; node: PX509_POLICY_NODE; indent: Integer); cdecl = nil;
   ASRange_new : function(): PASRange; cdecl = nil;
   ASRange_free : procedure(a: PASRange); cdecl = nil;
-  d2i_ASRange : function(a: PPASRange; &in: PPByte; len: Integer): PASRange; cdecl = nil;
-  i2d_ASRange : function(a: PASRange; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASRange : function(a: PPASRange; vin: PPByte; len: Integer): PASRange; cdecl = nil;
+  i2d_ASRange : function(a: PASRange; vout: PPByte): Integer; cdecl = nil;
   ASRange_it : function(): PASN1_ITEM; cdecl = nil;
   ASIdOrRange_new : function(): PASIdOrRange; cdecl = nil;
   ASIdOrRange_free : procedure(a: PASIdOrRange); cdecl = nil;
-  d2i_ASIdOrRange : function(a: PPASIdOrRange; &in: PPByte; len: Integer): PASIdOrRange; cdecl = nil;
-  i2d_ASIdOrRange : function(a: PASIdOrRange; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASIdOrRange : function(a: PPASIdOrRange; vin: PPByte; len: Integer): PASIdOrRange; cdecl = nil;
+  i2d_ASIdOrRange : function(a: PASIdOrRange; vout: PPByte): Integer; cdecl = nil;
   ASIdOrRange_it : function(): PASN1_ITEM; cdecl = nil;
   ASIdentifierChoice_new : function(): PASIdentifierChoice; cdecl = nil;
   ASIdentifierChoice_free : procedure(a: PASIdentifierChoice); cdecl = nil;
-  d2i_ASIdentifierChoice : function(a: PPASIdentifierChoice; &in: PPByte; len: Integer): PASIdentifierChoice; cdecl = nil;
-  i2d_ASIdentifierChoice : function(a: PASIdentifierChoice; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASIdentifierChoice : function(a: PPASIdentifierChoice; vin: PPByte; len: Integer): PASIdentifierChoice; cdecl = nil;
+  i2d_ASIdentifierChoice : function(a: PASIdentifierChoice; vout: PPByte): Integer; cdecl = nil;
   ASIdentifierChoice_it : function(): PASN1_ITEM; cdecl = nil;
   ASIdentifiers_new : function(): PASIdentifiers; cdecl = nil;
   ASIdentifiers_free : procedure(a: PASIdentifiers); cdecl = nil;
-  d2i_ASIdentifiers : function(a: PPASIdentifiers; &in: PPByte; len: Integer): PASIdentifiers; cdecl = nil;
-  i2d_ASIdentifiers : function(a: PASIdentifiers; &out: PPByte): Integer; cdecl = nil;
+  d2i_ASIdentifiers : function(a: PPASIdentifiers; vin: PPByte; len: Integer): PASIdentifiers; cdecl = nil;
+  i2d_ASIdentifiers : function(a: PASIdentifiers; vout: PPByte): Integer; cdecl = nil;
   ASIdentifiers_it : function(): PASN1_ITEM; cdecl = nil;
   IPAddressRange_new : function(): PIPAddressRange; cdecl = nil;
   IPAddressRange_free : procedure(a: PIPAddressRange); cdecl = nil;
-  d2i_IPAddressRange : function(a: PPIPAddressRange; &in: PPByte; len: Integer): PIPAddressRange; cdecl = nil;
-  i2d_IPAddressRange : function(a: PIPAddressRange; &out: PPByte): Integer; cdecl = nil;
+  d2i_IPAddressRange : function(a: PPIPAddressRange; vin: PPByte; len: Integer): PIPAddressRange; cdecl = nil;
+  i2d_IPAddressRange : function(a: PIPAddressRange; vout: PPByte): Integer; cdecl = nil;
   IPAddressRange_it : function(): PASN1_ITEM; cdecl = nil;
   IPAddressOrRange_new : function(): PIPAddressOrRange; cdecl = nil;
   IPAddressOrRange_free : procedure(a: PIPAddressOrRange); cdecl = nil;
-  d2i_IPAddressOrRange : function(a: PPIPAddressOrRange; &in: PPByte; len: Integer): PIPAddressOrRange; cdecl = nil;
-  i2d_IPAddressOrRange : function(a: PIPAddressOrRange; &out: PPByte): Integer; cdecl = nil;
+  d2i_IPAddressOrRange : function(a: PPIPAddressOrRange; vin: PPByte; len: Integer): PIPAddressOrRange; cdecl = nil;
+  i2d_IPAddressOrRange : function(a: PIPAddressOrRange; vout: PPByte): Integer; cdecl = nil;
   IPAddressOrRange_it : function(): PASN1_ITEM; cdecl = nil;
   IPAddressChoice_new : function(): PIPAddressChoice; cdecl = nil;
   IPAddressChoice_free : procedure(a: PIPAddressChoice); cdecl = nil;
-  d2i_IPAddressChoice : function(a: PPIPAddressChoice; &in: PPByte; len: Integer): PIPAddressChoice; cdecl = nil;
-  i2d_IPAddressChoice : function(a: PIPAddressChoice; &out: PPByte): Integer; cdecl = nil;
+  d2i_IPAddressChoice : function(a: PPIPAddressChoice; vin: PPByte; len: Integer): PIPAddressChoice; cdecl = nil;
+  i2d_IPAddressChoice : function(a: PIPAddressChoice; vout: PPByte): Integer; cdecl = nil;
   IPAddressChoice_it : function(): PASN1_ITEM; cdecl = nil;
   IPAddressFamily_new : function(): PIPAddressFamily; cdecl = nil;
   IPAddressFamily_free : procedure(a: PIPAddressFamily); cdecl = nil;
-  d2i_IPAddressFamily : function(a: PPIPAddressFamily; &in: PPByte; len: Integer): PIPAddressFamily; cdecl = nil;
-  i2d_IPAddressFamily : function(a: PIPAddressFamily; &out: PPByte): Integer; cdecl = nil;
+  d2i_IPAddressFamily : function(a: PPIPAddressFamily; vin: PPByte; len: Integer): PIPAddressFamily; cdecl = nil;
+  i2d_IPAddressFamily : function(a: PIPAddressFamily; vout: PPByte): Integer; cdecl = nil;
   IPAddressFamily_it : function(): PASN1_ITEM; cdecl = nil;
   X509v3_asid_add_inherit : function(asid: PASIdentifiers; which: Integer): Integer; cdecl = nil;
   X509v3_asid_add_id_or_range : function(asid: PASIdentifiers; which: Integer; min: PASN1_INTEGER; max: PASN1_INTEGER): Integer; cdecl = nil;
@@ -15546,23 +15558,23 @@ const
   X509v3_addr_validate_resource_set : function(chain: Pstack_st_X509; ext: PIPAddrBlocks; allow_inheritance: Integer): Integer; cdecl = nil;
   NAMING_AUTHORITY_new : function(): PNAMING_AUTHORITY; cdecl = nil;
   NAMING_AUTHORITY_free : procedure(a: PNAMING_AUTHORITY); cdecl = nil;
-  d2i_NAMING_AUTHORITY : function(a: PPNAMING_AUTHORITY; &in: PPByte; len: Integer): PNAMING_AUTHORITY; cdecl = nil;
-  i2d_NAMING_AUTHORITY : function(a: PNAMING_AUTHORITY; &out: PPByte): Integer; cdecl = nil;
+  d2i_NAMING_AUTHORITY : function(a: PPNAMING_AUTHORITY; vin: PPByte; len: Integer): PNAMING_AUTHORITY; cdecl = nil;
+  i2d_NAMING_AUTHORITY : function(a: PNAMING_AUTHORITY; vout: PPByte): Integer; cdecl = nil;
   NAMING_AUTHORITY_it : function(): PASN1_ITEM; cdecl = nil;
   PROFESSION_INFO_new : function(): PPROFESSION_INFO; cdecl = nil;
   PROFESSION_INFO_free : procedure(a: PPROFESSION_INFO); cdecl = nil;
-  d2i_PROFESSION_INFO : function(a: PPPROFESSION_INFO; &in: PPByte; len: Integer): PPROFESSION_INFO; cdecl = nil;
-  i2d_PROFESSION_INFO : function(a: PPROFESSION_INFO; &out: PPByte): Integer; cdecl = nil;
+  d2i_PROFESSION_INFO : function(a: PPPROFESSION_INFO; vin: PPByte; len: Integer): PPROFESSION_INFO; cdecl = nil;
+  i2d_PROFESSION_INFO : function(a: PPROFESSION_INFO; vout: PPByte): Integer; cdecl = nil;
   PROFESSION_INFO_it : function(): PASN1_ITEM; cdecl = nil;
   ADMISSIONS_new : function(): PADMISSIONS; cdecl = nil;
   ADMISSIONS_free : procedure(a: PADMISSIONS); cdecl = nil;
-  d2i_ADMISSIONS : function(a: PPADMISSIONS; &in: PPByte; len: Integer): PADMISSIONS; cdecl = nil;
-  i2d_ADMISSIONS : function(a: PADMISSIONS; &out: PPByte): Integer; cdecl = nil;
+  d2i_ADMISSIONS : function(a: PPADMISSIONS; vin: PPByte; len: Integer): PADMISSIONS; cdecl = nil;
+  i2d_ADMISSIONS : function(a: PADMISSIONS; vout: PPByte): Integer; cdecl = nil;
   ADMISSIONS_it : function(): PASN1_ITEM; cdecl = nil;
   ADMISSION_SYNTAX_new : function(): PADMISSION_SYNTAX; cdecl = nil;
   ADMISSION_SYNTAX_free : procedure(a: PADMISSION_SYNTAX); cdecl = nil;
-  d2i_ADMISSION_SYNTAX : function(a: PPADMISSION_SYNTAX; &in: PPByte; len: Integer): PADMISSION_SYNTAX; cdecl = nil;
-  i2d_ADMISSION_SYNTAX : function(a: PADMISSION_SYNTAX; &out: PPByte): Integer; cdecl = nil;
+  d2i_ADMISSION_SYNTAX : function(a: PPADMISSION_SYNTAX; vin: PPByte; len: Integer): PADMISSION_SYNTAX; cdecl = nil;
+  i2d_ADMISSION_SYNTAX : function(a: PADMISSION_SYNTAX; vout: PPByte): Integer; cdecl = nil;
   ADMISSION_SYNTAX_it : function(): PASN1_ITEM; cdecl = nil;
   NAMING_AUTHORITY_get0_authorityId : function(n: PNAMING_AUTHORITY): PASN1_OBJECT; cdecl = nil;
   NAMING_AUTHORITY_get0_authorityURL : function(n: PNAMING_AUTHORITY): PASN1_IA5STRING; cdecl = nil;
@@ -15570,10 +15582,10 @@ const
   NAMING_AUTHORITY_set0_authorityId : procedure(n: PNAMING_AUTHORITY; namingAuthorityId: PASN1_OBJECT); cdecl = nil;
   NAMING_AUTHORITY_set0_authorityURL : procedure(n: PNAMING_AUTHORITY; namingAuthorityUrl: PASN1_IA5STRING); cdecl = nil;
   NAMING_AUTHORITY_set0_authorityText : procedure(n: PNAMING_AUTHORITY; namingAuthorityText: PASN1_STRING); cdecl = nil;
-  ADMISSION_SYNTAX_get0_admissionAuthority : function(&as: PADMISSION_SYNTAX): PGENERAL_NAME; cdecl = nil;
-  ADMISSION_SYNTAX_set0_admissionAuthority : procedure(&as: PADMISSION_SYNTAX; aa: PGENERAL_NAME); cdecl = nil;
-  ADMISSION_SYNTAX_get0_contentsOfAdmissions : function(&as: PADMISSION_SYNTAX): Pstack_st_ADMISSIONS; cdecl = nil;
-  ADMISSION_SYNTAX_set0_contentsOfAdmissions : procedure(&as: PADMISSION_SYNTAX; a: Pstack_st_ADMISSIONS); cdecl = nil;
+  ADMISSION_SYNTAX_get0_admissionAuthority : function(vas: PADMISSION_SYNTAX): PGENERAL_NAME; cdecl = nil;
+  ADMISSION_SYNTAX_set0_admissionAuthority : procedure(vas: PADMISSION_SYNTAX; aa: PGENERAL_NAME); cdecl = nil;
+  ADMISSION_SYNTAX_get0_contentsOfAdmissions : function(vas: PADMISSION_SYNTAX): Pstack_st_ADMISSIONS; cdecl = nil;
+  ADMISSION_SYNTAX_set0_contentsOfAdmissions : procedure(vas: PADMISSION_SYNTAX; a: Pstack_st_ADMISSIONS); cdecl = nil;
   ADMISSIONS_get0_admissionAuthority : function(a: PADMISSIONS): PGENERAL_NAME; cdecl = nil;
   ADMISSIONS_set0_admissionAuthority : procedure(a: PADMISSIONS; aa: PGENERAL_NAME); cdecl = nil;
   ADMISSIONS_get0_namingAuthority : function(a: PADMISSIONS): PNAMING_AUTHORITY; cdecl = nil;
@@ -15585,7 +15597,7 @@ const
   PROFESSION_INFO_get0_namingAuthority : function(pi: PPROFESSION_INFO): PNAMING_AUTHORITY; cdecl = nil;
   PROFESSION_INFO_set0_namingAuthority : procedure(pi: PPROFESSION_INFO; na: PNAMING_AUTHORITY); cdecl = nil;
   PROFESSION_INFO_get0_professionItems : function(pi: PPROFESSION_INFO): Pstack_st_ASN1_STRING; cdecl = nil;
-  PROFESSION_INFO_set0_professionItems : procedure(pi: PPROFESSION_INFO; &as: Pstack_st_ASN1_STRING); cdecl = nil;
+  PROFESSION_INFO_set0_professionItems : procedure(pi: PPROFESSION_INFO; vas: Pstack_st_ASN1_STRING); cdecl = nil;
   PROFESSION_INFO_get0_professionOIDs : function(pi: PPROFESSION_INFO): Pstack_st_ASN1_OBJECT; cdecl = nil;
   PROFESSION_INFO_set0_professionOIDs : procedure(pi: PPROFESSION_INFO; po: Pstack_st_ASN1_OBJECT); cdecl = nil;
   PROFESSION_INFO_get0_registrationNumber : function(pi: PPROFESSION_INFO): PASN1_PRINTABLESTRING; cdecl = nil;
@@ -15593,15 +15605,15 @@ const
   ERR_load_CMS_strings : function(): Integer; cdecl = nil;
   CMS_ContentInfo_new : function(): PCMS_ContentInfo; cdecl = nil;
   CMS_ContentInfo_free : procedure(a: PCMS_ContentInfo); cdecl = nil;
-  d2i_CMS_ContentInfo : function(a: PPCMS_ContentInfo; &in: PPByte; len: Integer): PCMS_ContentInfo; cdecl = nil;
-  i2d_CMS_ContentInfo : function(a: PCMS_ContentInfo; &out: PPByte): Integer; cdecl = nil;
+  d2i_CMS_ContentInfo : function(a: PPCMS_ContentInfo; vin: PPByte; len: Integer): PCMS_ContentInfo; cdecl = nil;
+  i2d_CMS_ContentInfo : function(a: PCMS_ContentInfo; vout: PPByte): Integer; cdecl = nil;
   CMS_ContentInfo_it : function(): PASN1_ITEM; cdecl = nil;
   CMS_ReceiptRequest_new : function(): PCMS_ReceiptRequest; cdecl = nil;
   CMS_ReceiptRequest_free : procedure(a: PCMS_ReceiptRequest); cdecl = nil;
-  d2i_CMS_ReceiptRequest : function(a: PPCMS_ReceiptRequest; &in: PPByte; len: Integer): PCMS_ReceiptRequest; cdecl = nil;
-  i2d_CMS_ReceiptRequest : function(a: PCMS_ReceiptRequest; &out: PPByte): Integer; cdecl = nil;
+  d2i_CMS_ReceiptRequest : function(a: PPCMS_ReceiptRequest; vin: PPByte; len: Integer): PCMS_ReceiptRequest; cdecl = nil;
+  i2d_CMS_ReceiptRequest : function(a: PCMS_ReceiptRequest; vout: PPByte): Integer; cdecl = nil;
   CMS_ReceiptRequest_it : function(): PASN1_ITEM; cdecl = nil;
-  CMS_ContentInfo_print_ctx : function(&out: PBIO; x: PCMS_ContentInfo; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl = nil;
+  CMS_ContentInfo_print_ctx : function(vout: PBIO; x: PCMS_ContentInfo; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl = nil;
   CMS_get0_type : function(cms: PCMS_ContentInfo): PASN1_OBJECT; cdecl = nil;
   CMS_dataInit : function(cms: PCMS_ContentInfo; icont: PBIO): PBIO; cdecl = nil;
   CMS_dataFinal : function(cms: PCMS_ContentInfo; bio: PBIO): Integer; cdecl = nil;
@@ -15611,26 +15623,26 @@ const
   CMS_stream : function(boundary: PPPByte; cms: PCMS_ContentInfo): Integer; cdecl = nil;
   d2i_CMS_bio : function(bp: PBIO; cms: PPCMS_ContentInfo): PCMS_ContentInfo; cdecl = nil;
   i2d_CMS_bio : function(bp: PBIO; cms: PCMS_ContentInfo): Integer; cdecl = nil;
-  BIO_new_CMS : function(&out: PBIO; cms: PCMS_ContentInfo): PBIO; cdecl = nil;
-  i2d_CMS_bio_stream : function(&out: PBIO; cms: PCMS_ContentInfo; &in: PBIO; flags: Integer): Integer; cdecl = nil;
-  PEM_write_bio_CMS_stream : function(&out: PBIO; cms: PCMS_ContentInfo; &in: PBIO; flags: Integer): Integer; cdecl = nil;
+  BIO_new_CMS : function(vout: PBIO; cms: PCMS_ContentInfo): PBIO; cdecl = nil;
+  i2d_CMS_bio_stream : function(vout: PBIO; cms: PCMS_ContentInfo; vin: PBIO; flags: Integer): Integer; cdecl = nil;
+  PEM_write_bio_CMS_stream : function(vout: PBIO; cms: PCMS_ContentInfo; vin: PBIO; flags: Integer): Integer; cdecl = nil;
   SMIME_read_CMS : function(bio: PBIO; bcont: PPBIO): PCMS_ContentInfo; cdecl = nil;
   SMIME_write_CMS : function(bio: PBIO; cms: PCMS_ContentInfo; data: PBIO; flags: Integer): Integer; cdecl = nil;
   CMS_final : function(cms: PCMS_ContentInfo; data: PBIO; dcont: PBIO; flags: Cardinal): Integer; cdecl = nil;
   CMS_sign : function(signcert: PX509; pkey: PEVP_PKEY; certs: Pstack_st_X509; data: PBIO; flags: Cardinal): PCMS_ContentInfo; cdecl = nil;
   CMS_sign_receipt : function(si: PCMS_SignerInfo; signcert: PX509; pkey: PEVP_PKEY; certs: Pstack_st_X509; flags: Cardinal): PCMS_ContentInfo; cdecl = nil;
-  CMS_data : function(cms: PCMS_ContentInfo; &out: PBIO; flags: Cardinal): Integer; cdecl = nil;
-  CMS_data_create : function(&in: PBIO; flags: Cardinal): PCMS_ContentInfo; cdecl = nil;
-  CMS_digest_verify : function(cms: PCMS_ContentInfo; dcont: PBIO; &out: PBIO; flags: Cardinal): Integer; cdecl = nil;
-  CMS_digest_create : function(&in: PBIO; md: PEVP_MD; flags: Cardinal): PCMS_ContentInfo; cdecl = nil;
-  CMS_EncryptedData_decrypt : function(cms: PCMS_ContentInfo; key: PByte; keylen: NativeUInt; dcont: PBIO; &out: PBIO; flags: Cardinal): Integer; cdecl = nil;
-  CMS_EncryptedData_encrypt : function(&in: PBIO; cipher: PEVP_CIPHER; key: PByte; keylen: NativeUInt; flags: Cardinal): PCMS_ContentInfo; cdecl = nil;
+  CMS_data : function(cms: PCMS_ContentInfo; vout: PBIO; flags: Cardinal): Integer; cdecl = nil;
+  CMS_data_create : function(vin: PBIO; flags: Cardinal): PCMS_ContentInfo; cdecl = nil;
+  CMS_digest_verify : function(cms: PCMS_ContentInfo; dcont: PBIO; vout: PBIO; flags: Cardinal): Integer; cdecl = nil;
+  CMS_digest_create : function(vin: PBIO; md: PEVP_MD; flags: Cardinal): PCMS_ContentInfo; cdecl = nil;
+  CMS_EncryptedData_decrypt : function(cms: PCMS_ContentInfo; key: PByte; keylen: NativeUInt; dcont: PBIO; vout: PBIO; flags: Cardinal): Integer; cdecl = nil;
+  CMS_EncryptedData_encrypt : function(vin: PBIO; cipher: PEVP_CIPHER; key: PByte; keylen: NativeUInt; flags: Cardinal): PCMS_ContentInfo; cdecl = nil;
   CMS_EncryptedData_set1_key : function(cms: PCMS_ContentInfo; ciph: PEVP_CIPHER; key: PByte; keylen: NativeUInt): Integer; cdecl = nil;
-  CMS_verify : function(cms: PCMS_ContentInfo; certs: Pstack_st_X509; store: PX509_STORE; dcont: PBIO; &out: PBIO; flags: Cardinal): Integer; cdecl = nil;
+  CMS_verify : function(cms: PCMS_ContentInfo; certs: Pstack_st_X509; store: PX509_STORE; dcont: PBIO; vout: PBIO; flags: Cardinal): Integer; cdecl = nil;
   CMS_verify_receipt : function(rcms: PCMS_ContentInfo; ocms: PCMS_ContentInfo; certs: Pstack_st_X509; store: PX509_STORE; flags: Cardinal): Integer; cdecl = nil;
   CMS_get0_signers : function(cms: PCMS_ContentInfo): Pstack_st_X509; cdecl = nil;
-  CMS_encrypt : function(certs: Pstack_st_X509; &in: PBIO; cipher: PEVP_CIPHER; flags: Cardinal): PCMS_ContentInfo; cdecl = nil;
-  CMS_decrypt : function(cms: PCMS_ContentInfo; pkey: PEVP_PKEY; cert: PX509; dcont: PBIO; &out: PBIO; flags: Cardinal): Integer; cdecl = nil;
+  CMS_encrypt : function(certs: Pstack_st_X509; vin: PBIO; cipher: PEVP_CIPHER; flags: Cardinal): PCMS_ContentInfo; cdecl = nil;
+  CMS_decrypt : function(cms: PCMS_ContentInfo; pkey: PEVP_PKEY; cert: PX509; dcont: PBIO; vout: PBIO; flags: Cardinal): Integer; cdecl = nil;
   CMS_decrypt_set1_pkey : function(cms: PCMS_ContentInfo; pk: PEVP_PKEY; cert: PX509): Integer; cdecl = nil;
   CMS_decrypt_set1_key : function(cms: PCMS_ContentInfo; key: PByte; keylen: NativeUInt; id: PByte; idlen: NativeUInt): Integer; cdecl = nil;
   CMS_decrypt_set1_password : function(cms: PCMS_ContentInfo; pass: PByte; passlen: Int64): Integer; cdecl = nil;
@@ -15651,8 +15663,8 @@ const
   CMS_add0_recipient_password : function(cms: PCMS_ContentInfo; iter: Integer; wrap_nid: Integer; pbe_nid: Integer; pass: PByte; passlen: Int64; kekciph: PEVP_CIPHER): PCMS_RecipientInfo; cdecl = nil;
   CMS_RecipientInfo_decrypt : function(cms: PCMS_ContentInfo; ri: PCMS_RecipientInfo): Integer; cdecl = nil;
   CMS_RecipientInfo_encrypt : function(cms: PCMS_ContentInfo; ri: PCMS_RecipientInfo): Integer; cdecl = nil;
-  CMS_uncompress : function(cms: PCMS_ContentInfo; dcont: PBIO; &out: PBIO; flags: Cardinal): Integer; cdecl = nil;
-  CMS_compress : function(&in: PBIO; comp_nid: Integer; flags: Cardinal): PCMS_ContentInfo; cdecl = nil;
+  CMS_uncompress : function(cms: PCMS_ContentInfo; dcont: PBIO; vout: PBIO; flags: Cardinal): Integer; cdecl = nil;
+  CMS_compress : function(vin: PBIO; comp_nid: Integer; flags: Cardinal): PCMS_ContentInfo; cdecl = nil;
   CMS_set1_eContentType : function(cms: PCMS_ContentInfo; oid: PASN1_OBJECT): Integer; cdecl = nil;
   CMS_get0_eContentType : function(cms: PCMS_ContentInfo): PASN1_OBJECT; cdecl = nil;
   CMS_add0_CertificateChoices : function(cms: PCMS_ContentInfo): PCMS_CertificateChoices; cdecl = nil;
@@ -15686,20 +15698,20 @@ const
   CMS_signed_get_attr : function(si: PCMS_SignerInfo; loc: Integer): PX509_ATTRIBUTE; cdecl = nil;
   CMS_signed_delete_attr : function(si: PCMS_SignerInfo; loc: Integer): PX509_ATTRIBUTE; cdecl = nil;
   CMS_signed_add1_attr : function(si: PCMS_SignerInfo; attr: PX509_ATTRIBUTE): Integer; cdecl = nil;
-  CMS_signed_add1_attr_by_OBJ : function(si: PCMS_SignerInfo; obj: PASN1_OBJECT; &type: Integer; bytes: Pointer; len: Integer): Integer; cdecl = nil;
-  CMS_signed_add1_attr_by_NID : function(si: PCMS_SignerInfo; nid: Integer; &type: Integer; bytes: Pointer; len: Integer): Integer; cdecl = nil;
-  CMS_signed_add1_attr_by_txt : function(si: PCMS_SignerInfo; attrname: PUTF8Char; &type: Integer; bytes: Pointer; len: Integer): Integer; cdecl = nil;
-  CMS_signed_get0_data_by_OBJ : function(si: PCMS_SignerInfo; oid: PASN1_OBJECT; lastpos: Integer; &type: Integer): Pointer; cdecl = nil;
+  CMS_signed_add1_attr_by_OBJ : function(si: PCMS_SignerInfo; obj: PASN1_OBJECT; vtype: Integer; bytes: Pointer; len: Integer): Integer; cdecl = nil;
+  CMS_signed_add1_attr_by_NID : function(si: PCMS_SignerInfo; nid: Integer; vtype: Integer; bytes: Pointer; len: Integer): Integer; cdecl = nil;
+  CMS_signed_add1_attr_by_txt : function(si: PCMS_SignerInfo; attrname: PUTF8Char; vtype: Integer; bytes: Pointer; len: Integer): Integer; cdecl = nil;
+  CMS_signed_get0_data_by_OBJ : function(si: PCMS_SignerInfo; oid: PASN1_OBJECT; lastpos: Integer; vtype: Integer): Pointer; cdecl = nil;
   CMS_unsigned_get_attr_count : function(si: PCMS_SignerInfo): Integer; cdecl = nil;
   CMS_unsigned_get_attr_by_NID : function(si: PCMS_SignerInfo; nid: Integer; lastpos: Integer): Integer; cdecl = nil;
   CMS_unsigned_get_attr_by_OBJ : function(si: PCMS_SignerInfo; obj: PASN1_OBJECT; lastpos: Integer): Integer; cdecl = nil;
   CMS_unsigned_get_attr : function(si: PCMS_SignerInfo; loc: Integer): PX509_ATTRIBUTE; cdecl = nil;
   CMS_unsigned_delete_attr : function(si: PCMS_SignerInfo; loc: Integer): PX509_ATTRIBUTE; cdecl = nil;
   CMS_unsigned_add1_attr : function(si: PCMS_SignerInfo; attr: PX509_ATTRIBUTE): Integer; cdecl = nil;
-  CMS_unsigned_add1_attr_by_OBJ : function(si: PCMS_SignerInfo; obj: PASN1_OBJECT; &type: Integer; bytes: Pointer; len: Integer): Integer; cdecl = nil;
-  CMS_unsigned_add1_attr_by_NID : function(si: PCMS_SignerInfo; nid: Integer; &type: Integer; bytes: Pointer; len: Integer): Integer; cdecl = nil;
-  CMS_unsigned_add1_attr_by_txt : function(si: PCMS_SignerInfo; attrname: PUTF8Char; &type: Integer; bytes: Pointer; len: Integer): Integer; cdecl = nil;
-  CMS_unsigned_get0_data_by_OBJ : function(si: PCMS_SignerInfo; oid: PASN1_OBJECT; lastpos: Integer; &type: Integer): Pointer; cdecl = nil;
+  CMS_unsigned_add1_attr_by_OBJ : function(si: PCMS_SignerInfo; obj: PASN1_OBJECT; vtype: Integer; bytes: Pointer; len: Integer): Integer; cdecl = nil;
+  CMS_unsigned_add1_attr_by_NID : function(si: PCMS_SignerInfo; nid: Integer; vtype: Integer; bytes: Pointer; len: Integer): Integer; cdecl = nil;
+  CMS_unsigned_add1_attr_by_txt : function(si: PCMS_SignerInfo; attrname: PUTF8Char; vtype: Integer; bytes: Pointer; len: Integer): Integer; cdecl = nil;
+  CMS_unsigned_get0_data_by_OBJ : function(si: PCMS_SignerInfo; oid: PASN1_OBJECT; lastpos: Integer; vtype: Integer): Pointer; cdecl = nil;
   CMS_get1_ReceiptRequest : function(si: PCMS_SignerInfo; prr: PPCMS_ReceiptRequest): Integer; cdecl = nil;
   CMS_ReceiptRequest_create0 : function(id: PByte; idlen: Integer; allorfirst: Integer; receiptList: Pstack_st_GENERAL_NAMES; receiptsTo: Pstack_st_GENERAL_NAMES): PCMS_ReceiptRequest; cdecl = nil;
   CMS_add1_ReceiptRequest : function(si: PCMS_SignerInfo; rr: PCMS_ReceiptRequest): Integer; cdecl = nil;
@@ -15721,8 +15733,8 @@ const
   COMP_get_type : function(meth: PCOMP_METHOD): Integer; cdecl = nil;
   COMP_get_name : function(meth: PCOMP_METHOD): PUTF8Char; cdecl = nil;
   COMP_CTX_free : procedure(ctx: PCOMP_CTX); cdecl = nil;
-  COMP_compress_block : function(ctx: PCOMP_CTX; &out: PByte; olen: Integer; &in: PByte; ilen: Integer): Integer; cdecl = nil;
-  COMP_expand_block : function(ctx: PCOMP_CTX; &out: PByte; olen: Integer; &in: PByte; ilen: Integer): Integer; cdecl = nil;
+  COMP_compress_block : function(ctx: PCOMP_CTX; vout: PByte; olen: Integer; vin: PByte; ilen: Integer): Integer; cdecl = nil;
+  COMP_expand_block : function(ctx: PCOMP_CTX; vout: PByte; olen: Integer; vin: PByte; ilen: Integer): Integer; cdecl = nil;
   COMP_zlib : function(): PCOMP_METHOD; cdecl = nil;
   _CONF_new_section : function(conf: PCONF; section: PUTF8Char): PCONF_VALUE; cdecl = nil;
   _CONF_get_section : function(conf: PCONF; section: PUTF8Char): PCONF_VALUE; cdecl = nil;
@@ -15767,8 +15779,8 @@ const
   SCT_get_source : function(sct: PSCT): sct_source_t; cdecl = nil;
   SCT_set_source : function(sct: PSCT; source: sct_source_t): Integer; cdecl = nil;
   SCT_validation_status_string : function(sct: PSCT): PUTF8Char; cdecl = nil;
-  SCT_print : procedure(sct: PSCT; &out: PBIO; indent: Integer; logs: PCTLOG_STORE); cdecl = nil;
-  SCT_LIST_print : procedure(sct_list: Pstack_st_SCT; &out: PBIO; indent: Integer; separator: PUTF8Char; logs: PCTLOG_STORE); cdecl = nil;
+  SCT_print : procedure(sct: PSCT; vout: PBIO; indent: Integer; logs: PCTLOG_STORE); cdecl = nil;
+  SCT_LIST_print : procedure(sct_list: Pstack_st_SCT; vout: PBIO; indent: Integer; separator: PUTF8Char; logs: PCTLOG_STORE); cdecl = nil;
   SCT_get_validation_status : function(sct: PSCT): sct_validation_status_t; cdecl = nil;
   SCT_validate : function(sct: PSCT; ctx: PCT_POLICY_EVAL_CTX): Integer; cdecl = nil;
   SCT_LIST_validate : function(scts: Pstack_st_SCT; ctx: PCT_POLICY_EVAL_CTX): Integer; cdecl = nil;
@@ -15776,8 +15788,8 @@ const
   o2i_SCT_LIST : function(a: PPstack_st_SCT; pp: PPByte; len: NativeUInt): Pstack_st_SCT; cdecl = nil;
   i2d_SCT_LIST : function(a: Pstack_st_SCT; pp: PPByte): Integer; cdecl = nil;
   d2i_SCT_LIST : function(a: PPstack_st_SCT; pp: PPByte; len: Integer): Pstack_st_SCT; cdecl = nil;
-  i2o_SCT : function(sct: PSCT; &out: PPByte): Integer; cdecl = nil;
-  o2i_SCT : function(psct: PPSCT; &in: PPByte; len: NativeUInt): PSCT; cdecl = nil;
+  i2o_SCT : function(sct: PSCT; vout: PPByte): Integer; cdecl = nil;
+  o2i_SCT : function(psct: PPSCT; vin: PPByte; len: NativeUInt): PSCT; cdecl = nil;
   CTLOG_new : function(public_key: PEVP_PKEY; name: PUTF8Char): PCTLOG; cdecl = nil;
   CTLOG_new_from_base64 : function(ct_log: PPCTLOG; pkey_base64: PUTF8Char; name: PUTF8Char): Integer; cdecl = nil;
   CTLOG_free : procedure(log: PCTLOG); cdecl = nil;
@@ -15787,7 +15799,7 @@ const
   CTLOG_STORE_new : function(): PCTLOG_STORE; cdecl = nil;
   CTLOG_STORE_free : procedure(store: PCTLOG_STORE); cdecl = nil;
   CTLOG_STORE_get0_log_by_id : function(store: PCTLOG_STORE; log_id: PUInt8; log_id_len: NativeUInt): PCTLOG; cdecl = nil;
-  CTLOG_STORE_load_file : function(store: PCTLOG_STORE; &file: PUTF8Char): Integer; cdecl = nil;
+  CTLOG_STORE_load_file : function(store: PCTLOG_STORE; vfile: PUTF8Char): Integer; cdecl = nil;
   CTLOG_STORE_load_default_file : function(store: PCTLOG_STORE): Integer; cdecl = nil;
   _shadow_DES_check_key : function(): PInteger; cdecl = nil;
   DES_options : function(): PUTF8Char; cdecl = nil;
@@ -15796,19 +15808,19 @@ const
   DES_cbc_encrypt : procedure(input: PByte; output: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl = nil;
   DES_ncbc_encrypt : procedure(input: PByte; output: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl = nil;
   DES_xcbc_encrypt : procedure(input: PByte; output: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; inw: Pconst_DES_cblock; outw: Pconst_DES_cblock; enc: Integer); cdecl = nil;
-  DES_cfb_encrypt : procedure(&in: PByte; &out: PByte; numbits: Integer; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl = nil;
+  DES_cfb_encrypt : procedure(vin: PByte; vout: PByte; numbits: Integer; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl = nil;
   DES_ecb_encrypt : procedure(input: Pconst_DES_cblock; output: PDES_cblock; ks: PDES_key_schedule; enc: Integer); cdecl = nil;
   DES_encrypt1 : procedure(data: PDES_LONG; ks: PDES_key_schedule; enc: Integer); cdecl = nil;
   DES_encrypt2 : procedure(data: PDES_LONG; ks: PDES_key_schedule; enc: Integer); cdecl = nil;
   DES_encrypt3 : procedure(data: PDES_LONG; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule); cdecl = nil;
   DES_decrypt3 : procedure(data: PDES_LONG; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule); cdecl = nil;
   DES_ede3_cbc_encrypt : procedure(input: PByte; output: PByte; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl = nil;
-  DES_ede3_cfb64_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; num: PInteger; enc: Integer); cdecl = nil;
-  DES_ede3_cfb_encrypt : procedure(&in: PByte; &out: PByte; numbits: Integer; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl = nil;
-  DES_ede3_ofb64_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; num: PInteger); cdecl = nil;
+  DES_ede3_cfb64_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; num: PInteger; enc: Integer); cdecl = nil;
+  DES_ede3_cfb_encrypt : procedure(vin: PByte; vout: PByte; numbits: Integer; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl = nil;
+  DES_ede3_ofb64_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; num: PInteger); cdecl = nil;
   DES_fcrypt : function(buf: PUTF8Char; salt: PUTF8Char; ret: PUTF8Char): PUTF8Char; cdecl = nil;
   DES_crypt : function(buf: PUTF8Char; salt: PUTF8Char): PUTF8Char; cdecl = nil;
-  DES_ofb_encrypt : procedure(&in: PByte; &out: PByte; numbits: Integer; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock); cdecl = nil;
+  DES_ofb_encrypt : procedure(vin: PByte; vout: PByte; numbits: Integer; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock); cdecl = nil;
   DES_pcbc_encrypt : procedure(input: PByte; output: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl = nil;
   DES_quad_cksum : function(input: PByte; output: PDES_cblock; length: Integer; out_count: Integer; seed: PDES_cblock): DES_LONG; cdecl = nil;
   DES_random_key : function(ret: PDES_cblock): Integer; cdecl = nil;
@@ -15822,8 +15834,8 @@ const
   DES_set_key_unchecked : procedure(key: Pconst_DES_cblock; schedule: PDES_key_schedule); cdecl = nil;
   DES_string_to_key : procedure(str: PUTF8Char; key: PDES_cblock); cdecl = nil;
   DES_string_to_2keys : procedure(str: PUTF8Char; key1: PDES_cblock; key2: PDES_cblock); cdecl = nil;
-  DES_cfb64_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; num: PInteger; enc: Integer); cdecl = nil;
-  DES_ofb64_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; num: PInteger); cdecl = nil;
+  DES_cfb64_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; num: PInteger; enc: Integer); cdecl = nil;
+  DES_ofb64_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; num: PInteger); cdecl = nil;
   _openssl_ebcdic2ascii : function(dest: Pointer; srce: Pointer; count: NativeUInt): Pointer; cdecl = nil;
   _openssl_ascii2ebcdic : function(dest: Pointer; srce: Pointer; count: NativeUInt): Pointer; cdecl = nil;
   ERR_load_RAND_strings : function(): Integer; cdecl = nil;
@@ -15837,9 +15849,9 @@ const
   RAND_seed : procedure(buf: Pointer; num: Integer); cdecl = nil;
   RAND_keep_random_devices_open : procedure(keep: Integer); cdecl = nil;
   RAND_add : procedure(buf: Pointer; num: Integer; randomness: Double); cdecl = nil;
-  RAND_load_file : function(&file: PUTF8Char; max_bytes: Integer): Integer; cdecl = nil;
-  RAND_write_file : function(&file: PUTF8Char): Integer; cdecl = nil;
-  RAND_file_name : function(&file: PUTF8Char; num: NativeUInt): PUTF8Char; cdecl = nil;
+  RAND_load_file : function(vfile: PUTF8Char; max_bytes: Integer): Integer; cdecl = nil;
+  RAND_write_file : function(vfile: PUTF8Char): Integer; cdecl = nil;
+  RAND_file_name : function(vfile: PUTF8Char; num: NativeUInt): PUTF8Char; cdecl = nil;
   RAND_status : function(): Integer; cdecl = nil;
   RAND_poll : function(): Integer; cdecl = nil;
   ERR_load_PEM_strings : function(): Integer; cdecl = nil;
@@ -15859,12 +15871,12 @@ const
   PEM_ASN1_read : function(d2i: Pd2i_of_void; name: PUTF8Char; fp: PPointer; x: PPointer; cb: Ppem_password_cb; u: Pointer): Pointer; cdecl = nil;
   PEM_ASN1_write : function(i2d: Pi2d_of_void; name: PUTF8Char; fp: PPointer; x: Pointer; enc: PEVP_CIPHER; kstr: PByte; klen: Integer; callback: Ppem_password_cb; u: Pointer): Integer; cdecl = nil;
   PEM_X509_INFO_read : function(fp: PPointer; sk: Pstack_st_X509_INFO; cb: Ppem_password_cb; u: Pointer): Pstack_st_X509_INFO; cdecl = nil;
-  PEM_SignInit : function(ctx: PEVP_MD_CTX; &type: PEVP_MD): Integer; cdecl = nil;
+  PEM_SignInit : function(ctx: PEVP_MD_CTX; vtype: PEVP_MD): Integer; cdecl = nil;
   PEM_SignUpdate : function(ctx: PEVP_MD_CTX; d: PByte; cnt: Cardinal): Integer; cdecl = nil;
   PEM_SignFinal : function(ctx: PEVP_MD_CTX; sigret: PByte; siglen: PCardinal; pkey: PEVP_PKEY): Integer; cdecl = nil;
   PEM_def_callback : function(buf: PUTF8Char; num: Integer; rwflag: Integer; userdata: Pointer): Integer; cdecl = nil;
-  PEM_proc_type : procedure(buf: PUTF8Char; &type: Integer); cdecl = nil;
-  PEM_dek_info : procedure(buf: PUTF8Char; &type: PUTF8Char; len: Integer; str: PUTF8Char); cdecl = nil;
+  PEM_proc_type : procedure(buf: PUTF8Char; vtype: Integer); cdecl = nil;
+  PEM_dek_info : procedure(buf: PUTF8Char; vtype: PUTF8Char; len: Integer; str: PUTF8Char); cdecl = nil;
   PEM_read_bio_X509 : function(bp: PBIO; x: PPX509; cb: Ppem_password_cb; u: Pointer): PX509; cdecl = nil;
   PEM_read_X509 : function(fp: PPointer; x: PPX509; cb: Ppem_password_cb; u: Pointer): PX509; cdecl = nil;
   PEM_write_bio_X509 : function(bp: PBIO; x: PX509): Integer; cdecl = nil;
@@ -15962,14 +15974,14 @@ const
   PEM_write_PKCS8PrivateKey : function(fp: PPointer; x: PEVP_PKEY; enc: PEVP_CIPHER; kstr: PUTF8Char; klen: Integer; cd: Ppem_password_cb; u: Pointer): Integer; cdecl = nil;
   PEM_read_bio_Parameters : function(bp: PBIO; x: PPEVP_PKEY): PEVP_PKEY; cdecl = nil;
   PEM_write_bio_Parameters : function(bp: PBIO; x: PEVP_PKEY): Integer; cdecl = nil;
-  b2i_PrivateKey : function(&in: PPByte; length: Integer): PEVP_PKEY; cdecl = nil;
-  b2i_PublicKey : function(&in: PPByte; length: Integer): PEVP_PKEY; cdecl = nil;
-  b2i_PrivateKey_bio : function(&in: PBIO): PEVP_PKEY; cdecl = nil;
-  b2i_PublicKey_bio : function(&in: PBIO): PEVP_PKEY; cdecl = nil;
-  i2b_PrivateKey_bio : function(&out: PBIO; pk: PEVP_PKEY): Integer; cdecl = nil;
-  i2b_PublicKey_bio : function(&out: PBIO; pk: PEVP_PKEY): Integer; cdecl = nil;
-  b2i_PVK_bio : function(&in: PBIO; cb: Ppem_password_cb; u: Pointer): PEVP_PKEY; cdecl = nil;
-  i2b_PVK_bio : function(&out: PBIO; pk: PEVP_PKEY; enclevel: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl = nil;
+  b2i_PrivateKey : function(vin: PPByte; length: Integer): PEVP_PKEY; cdecl = nil;
+  b2i_PublicKey : function(vin: PPByte; length: Integer): PEVP_PKEY; cdecl = nil;
+  b2i_PrivateKey_bio : function(vin: PBIO): PEVP_PKEY; cdecl = nil;
+  b2i_PublicKey_bio : function(vin: PBIO): PEVP_PKEY; cdecl = nil;
+  i2b_PrivateKey_bio : function(vout: PBIO; pk: PEVP_PKEY): Integer; cdecl = nil;
+  i2b_PublicKey_bio : function(vout: PBIO; pk: PEVP_PKEY): Integer; cdecl = nil;
+  b2i_PVK_bio : function(vin: PBIO; cb: Ppem_password_cb; u: Pointer): PEVP_PKEY; cdecl = nil;
+  i2b_PVK_bio : function(vout: PBIO; pk: PEVP_PKEY; enclevel: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl = nil;
   ERR_load_UI_strings : function(): Integer; cdecl = nil;
   UI_new : function(): PUI; cdecl = nil;
   UI_new_method : function(method: PUI_METHOD): PUI; cdecl = nil;
@@ -16007,7 +16019,7 @@ const
   UI_method_set_flusher : function(method: PUI_METHOD; flusher: UI_method_set_flusher_flusher): Integer; cdecl = nil;
   UI_method_set_reader : function(method: PUI_METHOD; reader: UI_method_set_reader_reader): Integer; cdecl = nil;
   UI_method_set_closer : function(method: PUI_METHOD; closer: UI_method_set_closer_closer): Integer; cdecl = nil;
-  UI_method_set_data_duplicator : function(method: PUI_METHOD; duplicator: UI_method_set_data_duplicator_duplicator; &destructor: UI_method_set_data_duplicator_destructor): Integer; cdecl = nil;
+  UI_method_set_data_duplicator : function(method: PUI_METHOD; duplicator: UI_method_set_data_duplicator_duplicator; vdestructor: UI_method_set_data_duplicator_destructor): Integer; cdecl = nil;
   UI_method_set_prompt_constructor : function(method: PUI_METHOD; prompt_constructor: UI_method_set_prompt_constructor_prompt_constructor): Integer; cdecl = nil;
   UI_method_set_ex_data : function(method: PUI_METHOD; idx: Integer; data: Pointer): Integer; cdecl = nil;
 
@@ -16034,17 +16046,17 @@ const
   UI_UTIL_read_pw_string : function(buf: PUTF8Char; length: Integer; prompt: PUTF8Char; verify: Integer): Integer; cdecl = nil;
   UI_UTIL_read_pw : function(buf: PUTF8Char; buff: PUTF8Char; size: Integer; prompt: PUTF8Char; verify: Integer): Integer; cdecl = nil;
   UI_UTIL_wrap_read_pem_callback : function(cb: Ppem_password_cb; rwflag: Integer): PUI_METHOD; cdecl = nil;
-  ERR_put_error : procedure(lib: Integer; func: Integer; reason: Integer; &file: PUTF8Char; line: Integer); cdecl = nil;
+  ERR_put_error : procedure(lib: Integer; func: Integer; reason: Integer; vfile: PUTF8Char; line: Integer); cdecl = nil;
   ERR_set_error_data : procedure(data: PUTF8Char; flags: Integer); cdecl = nil;
   ERR_get_error : function(): Cardinal; cdecl = nil;
-  ERR_get_error_line : function(&file: PPUTF8Char; line: PInteger): Cardinal; cdecl = nil;
-  ERR_get_error_line_data : function(&file: PPUTF8Char; line: PInteger; data: PPUTF8Char; flags: PInteger): Cardinal; cdecl = nil;
+  ERR_get_error_line : function(vfile: PPUTF8Char; line: PInteger): Cardinal; cdecl = nil;
+  ERR_get_error_line_data : function(vfile: PPUTF8Char; line: PInteger; data: PPUTF8Char; flags: PInteger): Cardinal; cdecl = nil;
   ERR_peek_error : function(): Cardinal; cdecl = nil;
-  ERR_peek_error_line : function(&file: PPUTF8Char; line: PInteger): Cardinal; cdecl = nil;
-  ERR_peek_error_line_data : function(&file: PPUTF8Char; line: PInteger; data: PPUTF8Char; flags: PInteger): Cardinal; cdecl = nil;
+  ERR_peek_error_line : function(vfile: PPUTF8Char; line: PInteger): Cardinal; cdecl = nil;
+  ERR_peek_error_line_data : function(vfile: PPUTF8Char; line: PInteger; data: PPUTF8Char; flags: PInteger): Cardinal; cdecl = nil;
   ERR_peek_last_error : function(): Cardinal; cdecl = nil;
-  ERR_peek_last_error_line : function(&file: PPUTF8Char; line: PInteger): Cardinal; cdecl = nil;
-  ERR_peek_last_error_line_data : function(&file: PPUTF8Char; line: PInteger; data: PPUTF8Char; flags: PInteger): Cardinal; cdecl = nil;
+  ERR_peek_last_error_line : function(vfile: PPUTF8Char; line: PInteger): Cardinal; cdecl = nil;
+  ERR_peek_last_error_line_data : function(vfile: PPUTF8Char; line: PInteger; data: PPUTF8Char; flags: PInteger): Cardinal; cdecl = nil;
   ERR_clear_error : procedure(); cdecl = nil;
   ERR_error_string : function(e: Cardinal; buf: PUTF8Char): PUTF8Char; cdecl = nil;
   ERR_error_string_n : procedure(e: Cardinal; buf: PUTF8Char; len: NativeUInt); cdecl = nil;
@@ -16202,13 +16214,13 @@ const
   HMAC_CTX_set_flags : procedure(ctx: PHMAC_CTX; flags: Cardinal); cdecl = nil;
   HMAC_CTX_get_md : function(ctx: PHMAC_CTX): PEVP_MD; cdecl = nil;
   IDEA_options : function(): PUTF8Char; cdecl = nil;
-  IDEA_ecb_encrypt : procedure(&in: PByte; &out: PByte; ks: PIDEA_KEY_SCHEDULE); cdecl = nil;
+  IDEA_ecb_encrypt : procedure(vin: PByte; vout: PByte; ks: PIDEA_KEY_SCHEDULE); cdecl = nil;
   IDEA_set_encrypt_key : procedure(key: PByte; ks: PIDEA_KEY_SCHEDULE); cdecl = nil;
   IDEA_set_decrypt_key : procedure(ek: PIDEA_KEY_SCHEDULE; dk: PIDEA_KEY_SCHEDULE); cdecl = nil;
-  IDEA_cbc_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; ks: PIDEA_KEY_SCHEDULE; iv: PByte; enc: Integer); cdecl = nil;
-  IDEA_cfb64_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; ks: PIDEA_KEY_SCHEDULE; iv: PByte; num: PInteger; enc: Integer); cdecl = nil;
-  IDEA_ofb64_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; ks: PIDEA_KEY_SCHEDULE; iv: PByte; num: PInteger); cdecl = nil;
-  IDEA_encrypt : procedure(&in: PCardinal; ks: PIDEA_KEY_SCHEDULE); cdecl = nil;
+  IDEA_cbc_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; ks: PIDEA_KEY_SCHEDULE; iv: PByte; enc: Integer); cdecl = nil;
+  IDEA_cfb64_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; ks: PIDEA_KEY_SCHEDULE; iv: PByte; num: PInteger; enc: Integer); cdecl = nil;
+  IDEA_ofb64_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; ks: PIDEA_KEY_SCHEDULE; iv: PByte; num: PInteger); cdecl = nil;
+  IDEA_encrypt : procedure(vin: PCardinal; ks: PIDEA_KEY_SCHEDULE); cdecl = nil;
   ERR_load_KDF_strings : function(): Integer; cdecl = nil;
   MD4_Init : function(c: PMD4_CTX): Integer; cdecl = nil;
   MD4_Update : function(c: PMD4_CTX; data: Pointer; len: NativeUInt): Integer; cdecl = nil;
@@ -16224,53 +16236,53 @@ const
   MDC2_Update : function(c: PMDC2_CTX; data: PByte; len: NativeUInt): Integer; cdecl = nil;
   MDC2_Final : function(md: PByte; c: PMDC2_CTX): Integer; cdecl = nil;
   MDC2 : function(d: PByte; n: NativeUInt; md: PByte): PByte; cdecl = nil;
-  CRYPTO_cbc128_encrypt : procedure(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f); cdecl = nil;
-  CRYPTO_cbc128_decrypt : procedure(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f); cdecl = nil;
-  CRYPTO_ctr128_encrypt : procedure(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; ecount_buf: PByte; num: PCardinal; block: block128_f); cdecl = nil;
-  CRYPTO_ctr128_encrypt_ctr32 : procedure(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; ecount_buf: PByte; num: PCardinal; ctr: ctr128_f); cdecl = nil;
-  CRYPTO_ofb128_encrypt : procedure(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; block: block128_f); cdecl = nil;
-  CRYPTO_cfb128_encrypt : procedure(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; enc: Integer; block: block128_f); cdecl = nil;
-  CRYPTO_cfb128_8_encrypt : procedure(&in: PByte; &out: PByte; length: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; enc: Integer; block: block128_f); cdecl = nil;
-  CRYPTO_cfb128_1_encrypt : procedure(&in: PByte; &out: PByte; bits: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; enc: Integer; block: block128_f); cdecl = nil;
-  CRYPTO_cts128_encrypt_block : function(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl = nil;
-  CRYPTO_cts128_encrypt : function(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl = nil;
-  CRYPTO_cts128_decrypt_block : function(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl = nil;
-  CRYPTO_cts128_decrypt : function(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl = nil;
-  CRYPTO_nistcts128_encrypt_block : function(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl = nil;
-  CRYPTO_nistcts128_encrypt : function(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl = nil;
-  CRYPTO_nistcts128_decrypt_block : function(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl = nil;
-  CRYPTO_nistcts128_decrypt : function(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl = nil;
+  CRYPTO_cbc128_encrypt : procedure(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f); cdecl = nil;
+  CRYPTO_cbc128_decrypt : procedure(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f); cdecl = nil;
+  CRYPTO_ctr128_encrypt : procedure(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; ecount_buf: PByte; num: PCardinal; block: block128_f); cdecl = nil;
+  CRYPTO_ctr128_encrypt_ctr32 : procedure(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; ecount_buf: PByte; num: PCardinal; ctr: ctr128_f); cdecl = nil;
+  CRYPTO_ofb128_encrypt : procedure(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; block: block128_f); cdecl = nil;
+  CRYPTO_cfb128_encrypt : procedure(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; enc: Integer; block: block128_f); cdecl = nil;
+  CRYPTO_cfb128_8_encrypt : procedure(vin: PByte; vout: PByte; length: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; enc: Integer; block: block128_f); cdecl = nil;
+  CRYPTO_cfb128_1_encrypt : procedure(vin: PByte; vout: PByte; bits: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; enc: Integer; block: block128_f); cdecl = nil;
+  CRYPTO_cts128_encrypt_block : function(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl = nil;
+  CRYPTO_cts128_encrypt : function(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl = nil;
+  CRYPTO_cts128_decrypt_block : function(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl = nil;
+  CRYPTO_cts128_decrypt : function(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl = nil;
+  CRYPTO_nistcts128_encrypt_block : function(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl = nil;
+  CRYPTO_nistcts128_encrypt : function(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl = nil;
+  CRYPTO_nistcts128_decrypt_block : function(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl = nil;
+  CRYPTO_nistcts128_decrypt : function(vin: PByte; vout: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl = nil;
   CRYPTO_gcm128_new : function(key: Pointer; block: block128_f): PGCM128_CONTEXT; cdecl = nil;
   CRYPTO_gcm128_init : procedure(ctx: PGCM128_CONTEXT; key: Pointer; block: block128_f); cdecl = nil;
   CRYPTO_gcm128_setiv : procedure(ctx: PGCM128_CONTEXT; iv: PByte; len: NativeUInt); cdecl = nil;
   CRYPTO_gcm128_aad : function(ctx: PGCM128_CONTEXT; aad: PByte; len: NativeUInt): Integer; cdecl = nil;
-  CRYPTO_gcm128_encrypt : function(ctx: PGCM128_CONTEXT; &in: PByte; &out: PByte; len: NativeUInt): Integer; cdecl = nil;
-  CRYPTO_gcm128_decrypt : function(ctx: PGCM128_CONTEXT; &in: PByte; &out: PByte; len: NativeUInt): Integer; cdecl = nil;
-  CRYPTO_gcm128_encrypt_ctr32 : function(ctx: PGCM128_CONTEXT; &in: PByte; &out: PByte; len: NativeUInt; stream: ctr128_f): Integer; cdecl = nil;
-  CRYPTO_gcm128_decrypt_ctr32 : function(ctx: PGCM128_CONTEXT; &in: PByte; &out: PByte; len: NativeUInt; stream: ctr128_f): Integer; cdecl = nil;
+  CRYPTO_gcm128_encrypt : function(ctx: PGCM128_CONTEXT; vin: PByte; vout: PByte; len: NativeUInt): Integer; cdecl = nil;
+  CRYPTO_gcm128_decrypt : function(ctx: PGCM128_CONTEXT; vin: PByte; vout: PByte; len: NativeUInt): Integer; cdecl = nil;
+  CRYPTO_gcm128_encrypt_ctr32 : function(ctx: PGCM128_CONTEXT; vin: PByte; vout: PByte; len: NativeUInt; stream: ctr128_f): Integer; cdecl = nil;
+  CRYPTO_gcm128_decrypt_ctr32 : function(ctx: PGCM128_CONTEXT; vin: PByte; vout: PByte; len: NativeUInt; stream: ctr128_f): Integer; cdecl = nil;
   CRYPTO_gcm128_finish : function(ctx: PGCM128_CONTEXT; tag: PByte; len: NativeUInt): Integer; cdecl = nil;
   CRYPTO_gcm128_tag : procedure(ctx: PGCM128_CONTEXT; tag: PByte; len: NativeUInt); cdecl = nil;
   CRYPTO_gcm128_release : procedure(ctx: PGCM128_CONTEXT); cdecl = nil;
   CRYPTO_ccm128_init : procedure(ctx: PCCM128_CONTEXT; M: Cardinal; L: Cardinal; key: Pointer; block: block128_f); cdecl = nil;
   CRYPTO_ccm128_setiv : function(ctx: PCCM128_CONTEXT; nonce: PByte; nlen: NativeUInt; mlen: NativeUInt): Integer; cdecl = nil;
   CRYPTO_ccm128_aad : procedure(ctx: PCCM128_CONTEXT; aad: PByte; alen: NativeUInt); cdecl = nil;
-  CRYPTO_ccm128_encrypt : function(ctx: PCCM128_CONTEXT; inp: PByte; &out: PByte; len: NativeUInt): Integer; cdecl = nil;
-  CRYPTO_ccm128_decrypt : function(ctx: PCCM128_CONTEXT; inp: PByte; &out: PByte; len: NativeUInt): Integer; cdecl = nil;
-  CRYPTO_ccm128_encrypt_ccm64 : function(ctx: PCCM128_CONTEXT; inp: PByte; &out: PByte; len: NativeUInt; stream: ccm128_f): Integer; cdecl = nil;
-  CRYPTO_ccm128_decrypt_ccm64 : function(ctx: PCCM128_CONTEXT; inp: PByte; &out: PByte; len: NativeUInt; stream: ccm128_f): Integer; cdecl = nil;
+  CRYPTO_ccm128_encrypt : function(ctx: PCCM128_CONTEXT; inp: PByte; vout: PByte; len: NativeUInt): Integer; cdecl = nil;
+  CRYPTO_ccm128_decrypt : function(ctx: PCCM128_CONTEXT; inp: PByte; vout: PByte; len: NativeUInt): Integer; cdecl = nil;
+  CRYPTO_ccm128_encrypt_ccm64 : function(ctx: PCCM128_CONTEXT; inp: PByte; vout: PByte; len: NativeUInt; stream: ccm128_f): Integer; cdecl = nil;
+  CRYPTO_ccm128_decrypt_ccm64 : function(ctx: PCCM128_CONTEXT; inp: PByte; vout: PByte; len: NativeUInt; stream: ccm128_f): Integer; cdecl = nil;
   CRYPTO_ccm128_tag : function(ctx: PCCM128_CONTEXT; tag: PByte; len: NativeUInt): NativeUInt; cdecl = nil;
-  CRYPTO_xts128_encrypt : function(ctx: PXTS128_CONTEXT; iv: PByte; inp: PByte; &out: PByte; len: NativeUInt; enc: Integer): Integer; cdecl = nil;
-  CRYPTO_128_wrap : function(key: Pointer; iv: PByte; &out: PByte; &in: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl = nil;
-  CRYPTO_128_unwrap : function(key: Pointer; iv: PByte; &out: PByte; &in: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl = nil;
-  CRYPTO_128_wrap_pad : function(key: Pointer; icv: PByte; &out: PByte; &in: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl = nil;
-  CRYPTO_128_unwrap_pad : function(key: Pointer; icv: PByte; &out: PByte; &in: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl = nil;
+  CRYPTO_xts128_encrypt : function(ctx: PXTS128_CONTEXT; iv: PByte; inp: PByte; vout: PByte; len: NativeUInt; enc: Integer): Integer; cdecl = nil;
+  CRYPTO_128_wrap : function(key: Pointer; iv: PByte; vout: PByte; vin: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl = nil;
+  CRYPTO_128_unwrap : function(key: Pointer; iv: PByte; vout: PByte; vin: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl = nil;
+  CRYPTO_128_wrap_pad : function(key: Pointer; icv: PByte; vout: PByte; vin: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl = nil;
+  CRYPTO_128_unwrap_pad : function(key: Pointer; icv: PByte; vout: PByte; vin: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl = nil;
   CRYPTO_ocb128_new : function(keyenc: Pointer; keydec: Pointer; encrypt: block128_f; decrypt: block128_f; stream: ocb128_f): POCB128_CONTEXT; cdecl = nil;
   CRYPTO_ocb128_init : function(ctx: POCB128_CONTEXT; keyenc: Pointer; keydec: Pointer; encrypt: block128_f; decrypt: block128_f; stream: ocb128_f): Integer; cdecl = nil;
   CRYPTO_ocb128_copy_ctx : function(dest: POCB128_CONTEXT; src: POCB128_CONTEXT; keyenc: Pointer; keydec: Pointer): Integer; cdecl = nil;
   CRYPTO_ocb128_setiv : function(ctx: POCB128_CONTEXT; iv: PByte; len: NativeUInt; taglen: NativeUInt): Integer; cdecl = nil;
   CRYPTO_ocb128_aad : function(ctx: POCB128_CONTEXT; aad: PByte; len: NativeUInt): Integer; cdecl = nil;
-  CRYPTO_ocb128_encrypt : function(ctx: POCB128_CONTEXT; &in: PByte; &out: PByte; len: NativeUInt): Integer; cdecl = nil;
-  CRYPTO_ocb128_decrypt : function(ctx: POCB128_CONTEXT; &in: PByte; &out: PByte; len: NativeUInt): Integer; cdecl = nil;
+  CRYPTO_ocb128_encrypt : function(ctx: POCB128_CONTEXT; vin: PByte; vout: PByte; len: NativeUInt): Integer; cdecl = nil;
+  CRYPTO_ocb128_decrypt : function(ctx: POCB128_CONTEXT; vin: PByte; vout: PByte; len: NativeUInt): Integer; cdecl = nil;
   CRYPTO_ocb128_finish : function(ctx: POCB128_CONTEXT; tag: PByte; len: NativeUInt): Integer; cdecl = nil;
   CRYPTO_ocb128_tag : function(ctx: POCB128_CONTEXT; tag: PByte; len: NativeUInt): Integer; cdecl = nil;
   CRYPTO_ocb128_cleanup : procedure(ctx: POCB128_CONTEXT); cdecl = nil;
@@ -16375,78 +16387,78 @@ const
   OCSP_SINGLERESP_get0_id : function(x: POCSP_SINGLERESP): POCSP_CERTID; cdecl = nil;
   OCSP_SINGLERESP_new : function(): POCSP_SINGLERESP; cdecl = nil;
   OCSP_SINGLERESP_free : procedure(a: POCSP_SINGLERESP); cdecl = nil;
-  d2i_OCSP_SINGLERESP : function(a: PPOCSP_SINGLERESP; &in: PPByte; len: Integer): POCSP_SINGLERESP; cdecl = nil;
-  i2d_OCSP_SINGLERESP : function(a: POCSP_SINGLERESP; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_SINGLERESP : function(a: PPOCSP_SINGLERESP; vin: PPByte; len: Integer): POCSP_SINGLERESP; cdecl = nil;
+  i2d_OCSP_SINGLERESP : function(a: POCSP_SINGLERESP; vout: PPByte): Integer; cdecl = nil;
   OCSP_SINGLERESP_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_CERTSTATUS_new : function(): POCSP_CERTSTATUS; cdecl = nil;
   OCSP_CERTSTATUS_free : procedure(a: POCSP_CERTSTATUS); cdecl = nil;
-  d2i_OCSP_CERTSTATUS : function(a: PPOCSP_CERTSTATUS; &in: PPByte; len: Integer): POCSP_CERTSTATUS; cdecl = nil;
-  i2d_OCSP_CERTSTATUS : function(a: POCSP_CERTSTATUS; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_CERTSTATUS : function(a: PPOCSP_CERTSTATUS; vin: PPByte; len: Integer): POCSP_CERTSTATUS; cdecl = nil;
+  i2d_OCSP_CERTSTATUS : function(a: POCSP_CERTSTATUS; vout: PPByte): Integer; cdecl = nil;
   OCSP_CERTSTATUS_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_REVOKEDINFO_new : function(): POCSP_REVOKEDINFO; cdecl = nil;
   OCSP_REVOKEDINFO_free : procedure(a: POCSP_REVOKEDINFO); cdecl = nil;
-  d2i_OCSP_REVOKEDINFO : function(a: PPOCSP_REVOKEDINFO; &in: PPByte; len: Integer): POCSP_REVOKEDINFO; cdecl = nil;
-  i2d_OCSP_REVOKEDINFO : function(a: POCSP_REVOKEDINFO; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_REVOKEDINFO : function(a: PPOCSP_REVOKEDINFO; vin: PPByte; len: Integer): POCSP_REVOKEDINFO; cdecl = nil;
+  i2d_OCSP_REVOKEDINFO : function(a: POCSP_REVOKEDINFO; vout: PPByte): Integer; cdecl = nil;
   OCSP_REVOKEDINFO_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_BASICRESP_new : function(): POCSP_BASICRESP; cdecl = nil;
   OCSP_BASICRESP_free : procedure(a: POCSP_BASICRESP); cdecl = nil;
-  d2i_OCSP_BASICRESP : function(a: PPOCSP_BASICRESP; &in: PPByte; len: Integer): POCSP_BASICRESP; cdecl = nil;
-  i2d_OCSP_BASICRESP : function(a: POCSP_BASICRESP; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_BASICRESP : function(a: PPOCSP_BASICRESP; vin: PPByte; len: Integer): POCSP_BASICRESP; cdecl = nil;
+  i2d_OCSP_BASICRESP : function(a: POCSP_BASICRESP; vout: PPByte): Integer; cdecl = nil;
   OCSP_BASICRESP_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_RESPDATA_new : function(): POCSP_RESPDATA; cdecl = nil;
   OCSP_RESPDATA_free : procedure(a: POCSP_RESPDATA); cdecl = nil;
-  d2i_OCSP_RESPDATA : function(a: PPOCSP_RESPDATA; &in: PPByte; len: Integer): POCSP_RESPDATA; cdecl = nil;
-  i2d_OCSP_RESPDATA : function(a: POCSP_RESPDATA; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_RESPDATA : function(a: PPOCSP_RESPDATA; vin: PPByte; len: Integer): POCSP_RESPDATA; cdecl = nil;
+  i2d_OCSP_RESPDATA : function(a: POCSP_RESPDATA; vout: PPByte): Integer; cdecl = nil;
   OCSP_RESPDATA_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_RESPID_new : function(): POCSP_RESPID; cdecl = nil;
   OCSP_RESPID_free : procedure(a: POCSP_RESPID); cdecl = nil;
-  d2i_OCSP_RESPID : function(a: PPOCSP_RESPID; &in: PPByte; len: Integer): POCSP_RESPID; cdecl = nil;
-  i2d_OCSP_RESPID : function(a: POCSP_RESPID; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_RESPID : function(a: PPOCSP_RESPID; vin: PPByte; len: Integer): POCSP_RESPID; cdecl = nil;
+  i2d_OCSP_RESPID : function(a: POCSP_RESPID; vout: PPByte): Integer; cdecl = nil;
   OCSP_RESPID_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_RESPONSE_new : function(): POCSP_RESPONSE; cdecl = nil;
   OCSP_RESPONSE_free : procedure(a: POCSP_RESPONSE); cdecl = nil;
-  d2i_OCSP_RESPONSE : function(a: PPOCSP_RESPONSE; &in: PPByte; len: Integer): POCSP_RESPONSE; cdecl = nil;
-  i2d_OCSP_RESPONSE : function(a: POCSP_RESPONSE; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_RESPONSE : function(a: PPOCSP_RESPONSE; vin: PPByte; len: Integer): POCSP_RESPONSE; cdecl = nil;
+  i2d_OCSP_RESPONSE : function(a: POCSP_RESPONSE; vout: PPByte): Integer; cdecl = nil;
   OCSP_RESPONSE_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_RESPBYTES_new : function(): POCSP_RESPBYTES; cdecl = nil;
   OCSP_RESPBYTES_free : procedure(a: POCSP_RESPBYTES); cdecl = nil;
-  d2i_OCSP_RESPBYTES : function(a: PPOCSP_RESPBYTES; &in: PPByte; len: Integer): POCSP_RESPBYTES; cdecl = nil;
-  i2d_OCSP_RESPBYTES : function(a: POCSP_RESPBYTES; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_RESPBYTES : function(a: PPOCSP_RESPBYTES; vin: PPByte; len: Integer): POCSP_RESPBYTES; cdecl = nil;
+  i2d_OCSP_RESPBYTES : function(a: POCSP_RESPBYTES; vout: PPByte): Integer; cdecl = nil;
   OCSP_RESPBYTES_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_ONEREQ_new : function(): POCSP_ONEREQ; cdecl = nil;
   OCSP_ONEREQ_free : procedure(a: POCSP_ONEREQ); cdecl = nil;
-  d2i_OCSP_ONEREQ : function(a: PPOCSP_ONEREQ; &in: PPByte; len: Integer): POCSP_ONEREQ; cdecl = nil;
-  i2d_OCSP_ONEREQ : function(a: POCSP_ONEREQ; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_ONEREQ : function(a: PPOCSP_ONEREQ; vin: PPByte; len: Integer): POCSP_ONEREQ; cdecl = nil;
+  i2d_OCSP_ONEREQ : function(a: POCSP_ONEREQ; vout: PPByte): Integer; cdecl = nil;
   OCSP_ONEREQ_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_CERTID_new : function(): POCSP_CERTID; cdecl = nil;
   OCSP_CERTID_free : procedure(a: POCSP_CERTID); cdecl = nil;
-  d2i_OCSP_CERTID : function(a: PPOCSP_CERTID; &in: PPByte; len: Integer): POCSP_CERTID; cdecl = nil;
-  i2d_OCSP_CERTID : function(a: POCSP_CERTID; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_CERTID : function(a: PPOCSP_CERTID; vin: PPByte; len: Integer): POCSP_CERTID; cdecl = nil;
+  i2d_OCSP_CERTID : function(a: POCSP_CERTID; vout: PPByte): Integer; cdecl = nil;
   OCSP_CERTID_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_REQUEST_new : function(): POCSP_REQUEST; cdecl = nil;
   OCSP_REQUEST_free : procedure(a: POCSP_REQUEST); cdecl = nil;
-  d2i_OCSP_REQUEST : function(a: PPOCSP_REQUEST; &in: PPByte; len: Integer): POCSP_REQUEST; cdecl = nil;
-  i2d_OCSP_REQUEST : function(a: POCSP_REQUEST; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_REQUEST : function(a: PPOCSP_REQUEST; vin: PPByte; len: Integer): POCSP_REQUEST; cdecl = nil;
+  i2d_OCSP_REQUEST : function(a: POCSP_REQUEST; vout: PPByte): Integer; cdecl = nil;
   OCSP_REQUEST_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_SIGNATURE_new : function(): POCSP_SIGNATURE; cdecl = nil;
   OCSP_SIGNATURE_free : procedure(a: POCSP_SIGNATURE); cdecl = nil;
-  d2i_OCSP_SIGNATURE : function(a: PPOCSP_SIGNATURE; &in: PPByte; len: Integer): POCSP_SIGNATURE; cdecl = nil;
-  i2d_OCSP_SIGNATURE : function(a: POCSP_SIGNATURE; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_SIGNATURE : function(a: PPOCSP_SIGNATURE; vin: PPByte; len: Integer): POCSP_SIGNATURE; cdecl = nil;
+  i2d_OCSP_SIGNATURE : function(a: POCSP_SIGNATURE; vout: PPByte): Integer; cdecl = nil;
   OCSP_SIGNATURE_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_REQINFO_new : function(): POCSP_REQINFO; cdecl = nil;
   OCSP_REQINFO_free : procedure(a: POCSP_REQINFO); cdecl = nil;
-  d2i_OCSP_REQINFO : function(a: PPOCSP_REQINFO; &in: PPByte; len: Integer): POCSP_REQINFO; cdecl = nil;
-  i2d_OCSP_REQINFO : function(a: POCSP_REQINFO; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_REQINFO : function(a: PPOCSP_REQINFO; vin: PPByte; len: Integer): POCSP_REQINFO; cdecl = nil;
+  i2d_OCSP_REQINFO : function(a: POCSP_REQINFO; vout: PPByte): Integer; cdecl = nil;
   OCSP_REQINFO_it : function(): PASN1_ITEM; cdecl = nil;
 //  OCSP_CRLID_new : function(): POCSP_CRLID; cdecl = nil;
   OCSP_CRLID_free : procedure(a: POCSP_CRLID); cdecl = nil;
-  d2i_OCSP_CRLID : function(a: PPOCSP_CRLID; &in: PPByte; len: Integer): POCSP_CRLID; cdecl = nil;
-  i2d_OCSP_CRLID : function(a: POCSP_CRLID; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_CRLID : function(a: PPOCSP_CRLID; vin: PPByte; len: Integer): POCSP_CRLID; cdecl = nil;
+  i2d_OCSP_CRLID : function(a: POCSP_CRLID; vout: PPByte): Integer; cdecl = nil;
   OCSP_CRLID_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_SERVICELOC_new : function(): POCSP_SERVICELOC; cdecl = nil;
   OCSP_SERVICELOC_free : procedure(a: POCSP_SERVICELOC); cdecl = nil;
-  d2i_OCSP_SERVICELOC : function(a: PPOCSP_SERVICELOC; &in: PPByte; len: Integer): POCSP_SERVICELOC; cdecl = nil;
-  i2d_OCSP_SERVICELOC : function(a: POCSP_SERVICELOC; &out: PPByte): Integer; cdecl = nil;
+  d2i_OCSP_SERVICELOC : function(a: PPOCSP_SERVICELOC; vin: PPByte; len: Integer): POCSP_SERVICELOC; cdecl = nil;
+  i2d_OCSP_SERVICELOC : function(a: POCSP_SERVICELOC; vout: PPByte): Integer; cdecl = nil;
   OCSP_SERVICELOC_it : function(): PASN1_ITEM; cdecl = nil;
   OCSP_response_status_str : function(s: Integer): PUTF8Char; cdecl = nil;
   OCSP_cert_status_str : function(s: Integer): PUTF8Char; cdecl = nil;
@@ -16503,14 +16515,14 @@ const
   PKCS12_get_attr_gen : function(attrs: Pstack_st_X509_ATTRIBUTE; attr_nid: Integer): PASN1_TYPE; cdecl = nil;
   PKCS12_get_friendlyname : function(bag: PPKCS12_SAFEBAG): PUTF8Char; cdecl = nil;
   PKCS12_SAFEBAG_get0_attrs : function(bag: PPKCS12_SAFEBAG): Pstack_st_X509_ATTRIBUTE; cdecl = nil;
-  PKCS12_pbe_crypt : function(algor: PX509_ALGOR; pass: PUTF8Char; passlen: Integer; &in: PByte; inlen: Integer; data: PPByte; datalen: PInteger; en_de: Integer): PByte; cdecl = nil;
+  PKCS12_pbe_crypt : function(algor: PX509_ALGOR; pass: PUTF8Char; passlen: Integer; vin: PByte; inlen: Integer; data: PPByte; datalen: PInteger; en_de: Integer): PByte; cdecl = nil;
   PKCS12_item_decrypt_d2i : function(algor: PX509_ALGOR; it: PASN1_ITEM; pass: PUTF8Char; passlen: Integer; oct: PASN1_OCTET_STRING; zbuf: Integer): Pointer; cdecl = nil;
   PKCS12_item_i2d_encrypt : function(algor: PX509_ALGOR; it: PASN1_ITEM; pass: PUTF8Char; passlen: Integer; obj: Pointer; zbuf: Integer): PASN1_OCTET_STRING; cdecl = nil;
   PKCS12_init : function(mode: Integer): PPKCS12; cdecl = nil;
-  PKCS12_key_gen_asc : function(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; &out: PByte; md_type: PEVP_MD): Integer; cdecl = nil;
-  PKCS12_key_gen_uni : function(pass: PByte; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; &out: PByte; md_type: PEVP_MD): Integer; cdecl = nil;
-  PKCS12_key_gen_utf8 : function(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; &out: PByte; md_type: PEVP_MD): Integer; cdecl = nil;
-  PKCS12_key_gen : function(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; &out: PByte; md_type: PEVP_MD): Integer; cdecl = nil;
+  PKCS12_key_gen_asc : function(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; vout: PByte; md_type: PEVP_MD): Integer; cdecl = nil;
+  PKCS12_key_gen_uni : function(pass: PByte; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; vout: PByte; md_type: PEVP_MD): Integer; cdecl = nil;
+  PKCS12_key_gen_utf8 : function(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; vout: PByte; md_type: PEVP_MD): Integer; cdecl = nil;
+  PKCS12_key_gen : function(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; vout: PByte; md_type: PEVP_MD): Integer; cdecl = nil;
   PKCS12_PBE_keyivgen : function(ctx: PEVP_CIPHER_CTX; pass: PUTF8Char; passlen: Integer; param: PASN1_TYPE; cipher: PEVP_CIPHER; md_type: PEVP_MD; en_de: Integer): Integer; cdecl = nil;
   PKCS12_gen_mac : function(p12: PPKCS12; pass: PUTF8Char; passlen: Integer; mac: PByte; maclen: PCardinal): Integer; cdecl = nil;
   PKCS12_verify_mac : function(p12: PPKCS12; pass: PUTF8Char; passlen: Integer): Integer; cdecl = nil;
@@ -16522,23 +16534,23 @@ const
   OPENSSL_uni2utf8 : function(uni: PByte; unilen: Integer): PUTF8Char; cdecl = nil;
   PKCS12_new : function(): PPKCS12; cdecl = nil;
   PKCS12_free : procedure(a: PPKCS12); cdecl = nil;
-  d2i_PKCS12 : function(a: PPPKCS12; &in: PPByte; len: Integer): PPKCS12; cdecl = nil;
-  i2d_PKCS12 : function(a: PPKCS12; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS12 : function(a: PPPKCS12; vin: PPByte; len: Integer): PPKCS12; cdecl = nil;
+  i2d_PKCS12 : function(a: PPKCS12; vout: PPByte): Integer; cdecl = nil;
   PKCS12_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS12_MAC_DATA_new : function(): PPKCS12_MAC_DATA; cdecl = nil;
   PKCS12_MAC_DATA_free : procedure(a: PPKCS12_MAC_DATA); cdecl = nil;
-  d2i_PKCS12_MAC_DATA : function(a: PPPKCS12_MAC_DATA; &in: PPByte; len: Integer): PPKCS12_MAC_DATA; cdecl = nil;
-  i2d_PKCS12_MAC_DATA : function(a: PPKCS12_MAC_DATA; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS12_MAC_DATA : function(a: PPPKCS12_MAC_DATA; vin: PPByte; len: Integer): PPKCS12_MAC_DATA; cdecl = nil;
+  i2d_PKCS12_MAC_DATA : function(a: PPKCS12_MAC_DATA; vout: PPByte): Integer; cdecl = nil;
   PKCS12_MAC_DATA_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS12_SAFEBAG_new : function(): PPKCS12_SAFEBAG; cdecl = nil;
   PKCS12_SAFEBAG_free : procedure(a: PPKCS12_SAFEBAG); cdecl = nil;
-  d2i_PKCS12_SAFEBAG : function(a: PPPKCS12_SAFEBAG; &in: PPByte; len: Integer): PPKCS12_SAFEBAG; cdecl = nil;
-  i2d_PKCS12_SAFEBAG : function(a: PPKCS12_SAFEBAG; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS12_SAFEBAG : function(a: PPPKCS12_SAFEBAG; vin: PPByte; len: Integer): PPKCS12_SAFEBAG; cdecl = nil;
+  i2d_PKCS12_SAFEBAG : function(a: PPKCS12_SAFEBAG; vout: PPByte): Integer; cdecl = nil;
   PKCS12_SAFEBAG_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS12_BAGS_new : function(): PPKCS12_BAGS; cdecl = nil;
   PKCS12_BAGS_free : procedure(a: PPKCS12_BAGS); cdecl = nil;
-  d2i_PKCS12_BAGS : function(a: PPPKCS12_BAGS; &in: PPByte; len: Integer): PPKCS12_BAGS; cdecl = nil;
-  i2d_PKCS12_BAGS : function(a: PPKCS12_BAGS; &out: PPByte): Integer; cdecl = nil;
+  d2i_PKCS12_BAGS : function(a: PPPKCS12_BAGS; vin: PPByte; len: Integer): PPKCS12_BAGS; cdecl = nil;
+  i2d_PKCS12_BAGS : function(a: PPKCS12_BAGS; vout: PPByte): Integer; cdecl = nil;
   PKCS12_BAGS_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS12_SAFEBAGS_it : function(): PASN1_ITEM; cdecl = nil;
   PKCS12_AUTHSAFES_it : function(): PASN1_ITEM; cdecl = nil;
@@ -16554,16 +16566,16 @@ const
   d2i_PKCS12_bio : function(bp: PBIO; p12: PPPKCS12): PPKCS12; cdecl = nil;
   d2i_PKCS12_fp : function(fp: PPointer; p12: PPPKCS12): PPKCS12; cdecl = nil;
   PKCS12_newpass : function(p12: PPKCS12; oldpass: PUTF8Char; newpass: PUTF8Char): Integer; cdecl = nil;
-  RAND_DRBG_new : function(&type: Integer; flags: Cardinal; parent: PRAND_DRBG): PRAND_DRBG; cdecl = nil;
-  RAND_DRBG_secure_new : function(&type: Integer; flags: Cardinal; parent: PRAND_DRBG): PRAND_DRBG; cdecl = nil;
-  RAND_DRBG_set : function(drbg: PRAND_DRBG; &type: Integer; flags: Cardinal): Integer; cdecl = nil;
-  RAND_DRBG_set_defaults : function(&type: Integer; flags: Cardinal): Integer; cdecl = nil;
+  RAND_DRBG_new : function(vtype: Integer; flags: Cardinal; parent: PRAND_DRBG): PRAND_DRBG; cdecl = nil;
+  RAND_DRBG_secure_new : function(vtype: Integer; flags: Cardinal; parent: PRAND_DRBG): PRAND_DRBG; cdecl = nil;
+  RAND_DRBG_set : function(drbg: PRAND_DRBG; vtype: Integer; flags: Cardinal): Integer; cdecl = nil;
+  RAND_DRBG_set_defaults : function(vtype: Integer; flags: Cardinal): Integer; cdecl = nil;
   RAND_DRBG_instantiate : function(drbg: PRAND_DRBG; pers: PByte; perslen: NativeUInt): Integer; cdecl = nil;
   RAND_DRBG_uninstantiate : function(drbg: PRAND_DRBG): Integer; cdecl = nil;
   RAND_DRBG_free : procedure(drbg: PRAND_DRBG); cdecl = nil;
   RAND_DRBG_reseed : function(drbg: PRAND_DRBG; adin: PByte; adinlen: NativeUInt; prediction_resistance: Integer): Integer; cdecl = nil;
-  RAND_DRBG_generate : function(drbg: PRAND_DRBG; &out: PByte; outlen: NativeUInt; prediction_resistance: Integer; adin: PByte; adinlen: NativeUInt): Integer; cdecl = nil;
-  RAND_DRBG_bytes : function(drbg: PRAND_DRBG; &out: PByte; outlen: NativeUInt): Integer; cdecl = nil;
+  RAND_DRBG_generate : function(drbg: PRAND_DRBG; vout: PByte; outlen: NativeUInt; prediction_resistance: Integer; adin: PByte; adinlen: NativeUInt): Integer; cdecl = nil;
+  RAND_DRBG_bytes : function(drbg: PRAND_DRBG; vout: PByte; outlen: NativeUInt): Integer; cdecl = nil;
   RAND_DRBG_set_reseed_interval : function(drbg: PRAND_DRBG; interval: Cardinal): Integer; cdecl = nil;
   RAND_DRBG_set_reseed_time_interval : function(drbg: PRAND_DRBG; interval: Longint): Integer; cdecl = nil;
   RAND_DRBG_set_reseed_defaults : function(master_reseed_interval: Cardinal; slave_reseed_interval: Cardinal; master_reseed_time_interval: Longint; slave_reseed_time_interval: Longint): Integer; cdecl = nil;
@@ -16574,12 +16586,12 @@ const
   RAND_DRBG_get_ex_data : function(drbg: PRAND_DRBG; idx: Integer): Pointer; cdecl = nil;
   RAND_DRBG_set_callbacks : function(drbg: PRAND_DRBG; get_entropy: RAND_DRBG_get_entropy_fn; cleanup_entropy: RAND_DRBG_cleanup_entropy_fn; get_nonce: RAND_DRBG_get_nonce_fn; cleanup_nonce: RAND_DRBG_cleanup_nonce_fn): Integer; cdecl = nil;
   RC2_set_key : procedure(key: PRC2_KEY; len: Integer; data: PByte; bits: Integer); cdecl = nil;
-  RC2_ecb_encrypt : procedure(&in: PByte; &out: PByte; key: PRC2_KEY; enc: Integer); cdecl = nil;
+  RC2_ecb_encrypt : procedure(vin: PByte; vout: PByte; key: PRC2_KEY; enc: Integer); cdecl = nil;
   RC2_encrypt : procedure(data: PCardinal; key: PRC2_KEY); cdecl = nil;
   RC2_decrypt : procedure(data: PCardinal; key: PRC2_KEY); cdecl = nil;
-  RC2_cbc_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; ks: PRC2_KEY; iv: PByte; enc: Integer); cdecl = nil;
-  RC2_cfb64_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; schedule: PRC2_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
-  RC2_ofb64_encrypt : procedure(&in: PByte; &out: PByte; length: Integer; schedule: PRC2_KEY; ivec: PByte; num: PInteger); cdecl = nil;
+  RC2_cbc_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; ks: PRC2_KEY; iv: PByte; enc: Integer); cdecl = nil;
+  RC2_cfb64_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; schedule: PRC2_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
+  RC2_ofb64_encrypt : procedure(vin: PByte; vout: PByte; length: Integer; schedule: PRC2_KEY; ivec: PByte; num: PInteger); cdecl = nil;
   RC4_options : function(): PUTF8Char; cdecl = nil;
   RC4_set_key : procedure(key: PRC4_KEY; len: Integer; data: PByte); cdecl = nil;
   RC4 : procedure(key: PRC4_KEY; len: NativeUInt; indata: PByte; outdata: PByte); cdecl = nil;
@@ -16591,10 +16603,10 @@ const
   SEED_set_key : procedure(rawkey: PByte; ks: PSEED_KEY_SCHEDULE); cdecl = nil;
   SEED_encrypt : procedure(s: PByte; d: PByte; ks: PSEED_KEY_SCHEDULE); cdecl = nil;
   SEED_decrypt : procedure(s: PByte; d: PByte; ks: PSEED_KEY_SCHEDULE); cdecl = nil;
-  SEED_ecb_encrypt : procedure(&in: PByte; &out: PByte; ks: PSEED_KEY_SCHEDULE; enc: Integer); cdecl = nil;
-  SEED_cbc_encrypt : procedure(&in: PByte; &out: PByte; len: NativeUInt; ks: PSEED_KEY_SCHEDULE; ivec: PByte; enc: Integer); cdecl = nil;
-  SEED_cfb128_encrypt : procedure(&in: PByte; &out: PByte; len: NativeUInt; ks: PSEED_KEY_SCHEDULE; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
-  SEED_ofb128_encrypt : procedure(&in: PByte; &out: PByte; len: NativeUInt; ks: PSEED_KEY_SCHEDULE; ivec: PByte; num: PInteger); cdecl = nil;
+  SEED_ecb_encrypt : procedure(vin: PByte; vout: PByte; ks: PSEED_KEY_SCHEDULE; enc: Integer); cdecl = nil;
+  SEED_cbc_encrypt : procedure(vin: PByte; vout: PByte; len: NativeUInt; ks: PSEED_KEY_SCHEDULE; ivec: PByte; enc: Integer); cdecl = nil;
+  SEED_cfb128_encrypt : procedure(vin: PByte; vout: PByte; len: NativeUInt; ks: PSEED_KEY_SCHEDULE; ivec: PByte; num: PInteger; enc: Integer); cdecl = nil;
+  SEED_ofb128_encrypt : procedure(vin: PByte; vout: PByte; len: NativeUInt; ks: PSEED_KEY_SCHEDULE; ivec: PByte; num: PInteger); cdecl = nil;
   SRP_user_pwd_free : procedure(user_pwd: PSRP_user_pwd); cdecl = nil;
   SRP_VBASE_new : function(seed_key: PUTF8Char): PSRP_VBASE; cdecl = nil;
   SRP_VBASE_free : procedure(vb: PSRP_VBASE); cdecl = nil;
@@ -16642,7 +16654,7 @@ const
   OSSL_STORE_INFO_get1_CERT : function(info: POSSL_STORE_INFO): PX509; cdecl = nil;
   OSSL_STORE_INFO_get0_CRL : function(info: POSSL_STORE_INFO): PX509_CRL; cdecl = nil;
   OSSL_STORE_INFO_get1_CRL : function(info: POSSL_STORE_INFO): PX509_CRL; cdecl = nil;
-  OSSL_STORE_INFO_type_string : function(&type: Integer): PUTF8Char; cdecl = nil;
+  OSSL_STORE_INFO_type_string : function(vtype: Integer): PUTF8Char; cdecl = nil;
   OSSL_STORE_INFO_free : procedure(info: POSSL_STORE_INFO); cdecl = nil;
   OSSL_STORE_supports_search : function(ctx: POSSL_STORE_CTX; search_type: Integer): Integer; cdecl = nil;
   OSSL_STORE_SEARCH_by_name : function(name: PX509_NAME): POSSL_STORE_SEARCH; cdecl = nil;
@@ -16858,9 +16870,9 @@ const
   TS_ext_print_bio : function(bio: PBIO; extensions: Pstack_st_X509_EXTENSION): Integer; cdecl = nil;
   TS_X509_ALGOR_print_bio : function(bio: PBIO; alg: PX509_ALGOR): Integer; cdecl = nil;
   TS_MSG_IMPRINT_print_bio : function(bio: PBIO; msg: PTS_MSG_IMPRINT): Integer; cdecl = nil;
-  TS_CONF_load_cert : function(&file: PUTF8Char): PX509; cdecl = nil;
-  TS_CONF_load_certs : function(&file: PUTF8Char): Pstack_st_X509; cdecl = nil;
-  TS_CONF_load_key : function(&file: PUTF8Char; pass: PUTF8Char): PEVP_PKEY; cdecl = nil;
+  TS_CONF_load_cert : function(vfile: PUTF8Char): PX509; cdecl = nil;
+  TS_CONF_load_certs : function(vfile: PUTF8Char): Pstack_st_X509; cdecl = nil;
+  TS_CONF_load_key : function(vfile: PUTF8Char; pass: PUTF8Char): PEVP_PKEY; cdecl = nil;
   TS_CONF_get_tsa_section : function(conf: PCONF; section: PUTF8Char): PUTF8Char; cdecl = nil;
   TS_CONF_set_serial : function(conf: PCONF; section: PUTF8Char; cb: TS_serial_cb; ctx: PTS_RESP_CTX): Integer; cdecl = nil;
   TS_CONF_set_crypto_device : function(conf: PCONF; section: PUTF8Char; device: PUTF8Char): Integer; cdecl = nil;
@@ -16878,8 +16890,8 @@ const
   TS_CONF_set_tsa_name : function(conf: PCONF; section: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl = nil;
   TS_CONF_set_ess_cert_id_chain : function(conf: PCONF; section: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl = nil;
   TS_CONF_set_ess_cert_id_digest : function(conf: PCONF; section: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl = nil;
-  TXT_DB_read : function(&in: PBIO; num: Integer): PTXT_DB; cdecl = nil;
-  TXT_DB_write : function(&out: PBIO; db: PTXT_DB): Integer; cdecl = nil;
+  TXT_DB_read : function(vin: PBIO; num: Integer): PTXT_DB; cdecl = nil;
+  TXT_DB_write : function(vout: PBIO; db: PTXT_DB): Integer; cdecl = nil;
   TXT_DB_create_index : function(db: PTXT_DB; field: Integer; qual: TXT_DB_create_index_qual; hash: OPENSSL_LH_HASHFUNC; cmp: OPENSSL_LH_COMPFUNC): Integer; cdecl = nil;
   TXT_DB_free : procedure(db: PTXT_DB); cdecl = nil;
   TXT_DB_get_by_index : function(db: PTXT_DB; idx: Integer; value: POPENSSL_STRING): POPENSSL_STRING; cdecl = nil;
@@ -21335,7 +21347,7 @@ type
   SSL_CTX_callback_ctrl_ = procedure(); cdecl;
 
 type
-  SSL_set_info_callback_cb = procedure(ssl: PSSL; &type: Integer; val: Integer); cdecl;
+  SSL_set_info_callback_cb = procedure(ssl: PSSL; vtype: Integer; val: Integer); cdecl;
 
 type
   SSL_CTX_set_tmp_dh_callback_dh = function(ssl: PSSL; is_export: Integer; keylength: Integer): Pdh_st; cdecl;
@@ -21350,10 +21362,10 @@ type
   SSL_set_not_resumable_session_callback_cb = function(ssl: PSSL; is_forward_secure: Integer): Integer; cdecl;
 
 type
-  SSL_CTX_set_record_padding_callback_cb = function(ssl: PSSL; &type: Integer; len: NativeUInt; arg: Pointer): UInt64; cdecl;
+  SSL_CTX_set_record_padding_callback_cb = function(ssl: PSSL; vtype: Integer; len: NativeUInt; arg: Pointer): UInt64; cdecl;
 
 type
-  SSL_set_record_padding_callback_cb = function(ssl: PSSL; &type: Integer; len: NativeUInt; arg: Pointer): UInt64; cdecl;
+  SSL_set_record_padding_callback_cb = function(ssl: PSSL; vtype: Integer; len: NativeUInt; arg: Pointer): UInt64; cdecl;
 
 type
   SSL_set_security_callback_cb = function(s: PSSL; ctx: PSSL_CTX; op: Integer; bits: Integer; nid: Integer; other: Pointer; ex: Pointer): Integer; cdecl;
@@ -21377,7 +21389,7 @@ type
   SSL_CTX_sess_set_get_cb_get_session_cb = function(ssl: Pssl_st; data: PByte; len: Integer; copy: PInteger): Pssl_session_st; cdecl;
 
 type
-  SSL_CTX_set_info_callback_cb = procedure(ssl: PSSL; &type: Integer; val: Integer); cdecl;
+  SSL_CTX_set_info_callback_cb = procedure(ssl: PSSL; vtype: Integer; val: Integer); cdecl;
 
 type
   SSL_CTX_set_client_cert_cb_client_cert_cb = function(ssl: PSSL; x509: PPX509; pkey: PPEVP_PKEY): Integer; cdecl;
@@ -21402,7 +21414,7 @@ const
   BIO_new_ssl : function(ctx: PSSL_CTX; client: Integer): PBIO; cdecl = nil;
   BIO_new_ssl_connect : function(ctx: PSSL_CTX): PBIO; cdecl = nil;
   BIO_new_buffer_ssl_connect : function(ctx: PSSL_CTX): PBIO; cdecl = nil;
-  BIO_ssl_copy_session_id : function(&to: PBIO; from: PBIO): Integer; cdecl = nil;
+  BIO_ssl_copy_session_id : function(vto: PBIO; from: PBIO): Integer; cdecl = nil;
   BIO_ssl_shutdown : procedure(ssl_bio: PBIO); cdecl = nil;
   DTLSv1_method : function(): PSSL_METHOD; cdecl = nil;
   DTLSv1_server_method : function(): PSSL_METHOD; cdecl = nil;
@@ -21422,7 +21434,7 @@ const
   PEM_write_bio_SSL_SESSION : function(bp: PBIO; x: PSSL_SESSION): Integer; cdecl = nil;
   PEM_write_SSL_SESSION : function(fp: PPointer; x: PSSL_SESSION): Integer; cdecl = nil;
   SRP_Calc_A_param : function(s: PSSL): Integer; cdecl = nil;
-  i2d_SSL_SESSION : function(&in: PSSL_SESSION; pp: PPByte): Integer; cdecl = nil;
+  i2d_SSL_SESSION : function(vin: PSSL_SESSION; pp: PPByte): Integer; cdecl = nil;
   d2i_SSL_SESSION : function(a: PPSSL_SESSION; pp: PPByte; length: Integer): PSSL_SESSION; cdecl = nil;
   SSL_get_peer_certificate : function(s: PSSL): PX509; cdecl = nil;
   SSL_get_peer_cert_chain : function(s: PSSL): Pstack_st_X509; cdecl = nil;
@@ -21439,7 +21451,7 @@ const
   SSL_CTX_use_PrivateKey_ASN1 : function(pk: Integer; ctx: PSSL_CTX; d: PByte; len: Integer): Integer; cdecl = nil;
   SSL_CTX_use_certificate : function(ctx: PSSL_CTX; x: PX509): Integer; cdecl = nil;
   SSL_CTX_use_certificate_ASN1 : function(ctx: PSSL_CTX; len: Integer; d: PByte): Integer; cdecl = nil;
-  SSL_CTX_use_cert_and_key : function(ctx: PSSL_CTX; x509: PX509; privatekey: PEVP_PKEY; chain: Pstack_st_X509; &override: Integer): Integer; cdecl = nil;
+  SSL_CTX_use_cert_and_key : function(ctx: PSSL_CTX; x509: PX509; privatekey: PEVP_PKEY; chain: Pstack_st_X509; voverride: Integer): Integer; cdecl = nil;
   SSL_CTX_set_default_passwd_cb : procedure(ctx: PSSL_CTX; cb: Ppem_password_cb); cdecl = nil;
   SSL_CTX_set_default_passwd_cb_userdata : procedure(ctx: PSSL_CTX; u: Pointer); cdecl = nil;
   SSL_CTX_get_default_passwd_cb : function(ctx: PSSL_CTX): Ppem_password_cb; cdecl = nil;
@@ -21494,12 +21506,12 @@ const
   SSL_CTX_set_client_hello_cb : procedure(c: PSSL_CTX; cb: SSL_client_hello_cb_fn; arg: Pointer); cdecl = nil;
   SSL_client_hello_isv2 : function(s: PSSL): Integer; cdecl = nil;
   SSL_client_hello_get0_legacy_version : function(s: PSSL): Cardinal; cdecl = nil;
-  SSL_client_hello_get0_random : function(s: PSSL; &out: PPByte): NativeUInt; cdecl = nil;
-  SSL_client_hello_get0_session_id : function(s: PSSL; &out: PPByte): NativeUInt; cdecl = nil;
-  SSL_client_hello_get0_ciphers : function(s: PSSL; &out: PPByte): NativeUInt; cdecl = nil;
-  SSL_client_hello_get0_compression_methods : function(s: PSSL; &out: PPByte): NativeUInt; cdecl = nil;
-  SSL_client_hello_get1_extensions_present : function(s: PSSL; &out: PPInteger; outlen: PNativeUInt): Integer; cdecl = nil;
-  SSL_client_hello_get0_ext : function(s: PSSL; &type: Cardinal; &out: PPByte; outlen: PNativeUInt): Integer; cdecl = nil;
+  SSL_client_hello_get0_random : function(s: PSSL; vout: PPByte): NativeUInt; cdecl = nil;
+  SSL_client_hello_get0_session_id : function(s: PSSL; vout: PPByte): NativeUInt; cdecl = nil;
+  SSL_client_hello_get0_ciphers : function(s: PSSL; vout: PPByte): NativeUInt; cdecl = nil;
+  SSL_client_hello_get0_compression_methods : function(s: PSSL; vout: PPByte): NativeUInt; cdecl = nil;
+  SSL_client_hello_get1_extensions_present : function(s: PSSL; vout: PPInteger; outlen: PNativeUInt): Integer; cdecl = nil;
+  SSL_client_hello_get0_ext : function(s: PSSL; vtype: Cardinal; vout: PPByte; outlen: PNativeUInt): Integer; cdecl = nil;
   SSL_certs_clear : procedure(s: PSSL); cdecl = nil;
   SSL_free : procedure(ssl: PSSL); cdecl = nil;
   SSL_accept : function(ssl: PSSL): Integer; cdecl = nil;
@@ -21583,15 +21595,15 @@ const
   SSL_get_SSL_CTX : function(ssl: PSSL): PSSL_CTX; cdecl = nil;
   SSL_set_SSL_CTX : function(ssl: PSSL; ctx: PSSL_CTX): PSSL_CTX; cdecl = nil;
   SSL_set_info_callback : procedure(ssl: PSSL; cb: SSL_set_info_callback_cb); cdecl = nil;
-//  SSL_get_info_callback : function(ssl: PSSL&type: Integerval: Integerssl: PSSL): Integer; cdecl = nil;
+//  SSL_get_info_callback : function(ssl: PSSLvtype: Integerval: Integerssl: PSSL): Integer; cdecl = nil;
   SSL_get_state : function(ssl: PSSL): OSSL_HANDSHAKE_STATE; cdecl = nil;
   SSL_set_verify_result : procedure(ssl: PSSL; v: Integer); cdecl = nil;
   SSL_get_verify_result : function(ssl: PSSL): Integer; cdecl = nil;
   SSL_get0_verified_chain : function(s: PSSL): Pstack_st_X509; cdecl = nil;
-  SSL_get_client_random : function(ssl: PSSL; &out: PByte; outlen: NativeUInt): NativeUInt; cdecl = nil;
-  SSL_get_server_random : function(ssl: PSSL; &out: PByte; outlen: NativeUInt): NativeUInt; cdecl = nil;
-  SSL_SESSION_get_master_key : function(sess: PSSL_SESSION; &out: PByte; outlen: NativeUInt): NativeUInt; cdecl = nil;
-  SSL_SESSION_set1_master_key : function(sess: PSSL_SESSION; &in: PByte; len: NativeUInt): Integer; cdecl = nil;
+  SSL_get_client_random : function(ssl: PSSL; vout: PByte; outlen: NativeUInt): NativeUInt; cdecl = nil;
+  SSL_get_server_random : function(ssl: PSSL; vout: PByte; outlen: NativeUInt): NativeUInt; cdecl = nil;
+  SSL_SESSION_get_master_key : function(sess: PSSL_SESSION; vout: PByte; outlen: NativeUInt): NativeUInt; cdecl = nil;
+  SSL_SESSION_set1_master_key : function(sess: PSSL_SESSION; vin: PByte; len: NativeUInt): Integer; cdecl = nil;
   SSL_SESSION_get_max_fragment_length : function(sess: PSSL_SESSION): UInt8; cdecl = nil;
   SSL_set_ex_data : function(ssl: PSSL; idx: Integer; data: Pointer): Integer; cdecl = nil;
   SSL_get_ex_data : function(ssl: PSSL; idx: Integer): Pointer; cdecl = nil;
@@ -21698,7 +21710,7 @@ const
   SSL_CTX_sess_set_get_cb : procedure(ctx: PSSL_CTX; get_session_cb: SSL_CTX_sess_set_get_cb_get_session_cb); cdecl = nil;
 //  SSL_CTX_sess_get_get_cb : function(ssl: Pssl_stdata: PBytelen: Integercopy: PIntegerctx: PSSL_CTX): Integer; cdecl = nil;
   SSL_CTX_set_info_callback : procedure(ctx: PSSL_CTX; cb: SSL_CTX_set_info_callback_cb); cdecl = nil;
-//  SSL_CTX_get_info_callback : function(ssl: PSSL&type: Integerval: Integerctx: PSSL_CTX): Integer; cdecl = nil;
+//  SSL_CTX_get_info_callback : function(ssl: PSSLvtype: Integerval: Integerctx: PSSL_CTX): Integer; cdecl = nil;
   SSL_CTX_set_client_cert_cb : procedure(ctx: PSSL_CTX; client_cert_cb: SSL_CTX_set_client_cert_cb_client_cert_cb); cdecl = nil;
 //  SSL_CTX_get_client_cert_cb : function(ssl: PSSLx509: PPX509pkey: PPEVP_PKEYctx: PSSL_CTX): Integer; cdecl = nil;
   SSL_CTX_set_client_cert_engine : function(ctx: PSSL_CTX; e: PENGINE): Integer; cdecl = nil;
@@ -21712,7 +21724,7 @@ const
   SSL_CTX_set_npn_select_cb : procedure(s: PSSL_CTX; cb: SSL_CTX_npn_select_cb_func; arg: Pointer); cdecl = nil;
   SSL_get0_next_proto_negotiated : procedure(s: PSSL; data: PPByte; len: PCardinal); cdecl = nil;
   SSL_get0_npn_negotiated : procedure(s: PSSL; data: PPByte; len: PCardinal); cdecl = nil;
-  SSL_select_next_proto : function(&out: PPByte; outlen: PByte; &in: PByte; inlen: Cardinal; client: PByte; client_len: Cardinal): Integer; cdecl = nil;
+  SSL_select_next_proto : function(vout: PPByte; outlen: PByte; vin: PByte; inlen: Cardinal; client: PByte; client_len: Cardinal): Integer; cdecl = nil;
   SSL_CTX_set_alpn_protos : function(ctx: PSSL_CTX; protos: PByte; protos_len: Cardinal): Integer; cdecl = nil;
   SSL_set_alpn_protos : function(ssl: PSSL; protos: PByte; protos_len: Cardinal): Integer; cdecl = nil;
   SSL_CTX_set_alpn_select_cb : procedure(ctx: PSSL_CTX; cb: SSL_CTX_alpn_select_cb_func; arg: Pointer); cdecl = nil;
@@ -21746,10 +21758,10 @@ const
   SSL_get_recv_max_early_data : function(s: PSSL): UInt32; cdecl = nil;
   SSL_CTX_set_tlsext_max_fragment_length : function(ctx: PSSL_CTX; mode: UInt8): Integer; cdecl = nil;
   SSL_set_tlsext_max_fragment_length : function(ssl: PSSL; mode: UInt8): Integer; cdecl = nil;
-  SSL_get_servername : function(s: PSSL; &type: Integer): PUTF8Char; cdecl = nil;
+  SSL_get_servername : function(s: PSSL; vtype: Integer): PUTF8Char; cdecl = nil;
   SSL_get_servername_type : function(s: PSSL): Integer; cdecl = nil;
-  SSL_export_keying_material : function(s: PSSL; &out: PByte; olen: NativeUInt; &label: PUTF8Char; llen: NativeUInt; context: PByte; contextlen: NativeUInt; use_context: Integer): Integer; cdecl = nil;
-  SSL_export_keying_material_early : function(s: PSSL; &out: PByte; olen: NativeUInt; &label: PUTF8Char; llen: NativeUInt; context: PByte; contextlen: NativeUInt): Integer; cdecl = nil;
+  SSL_export_keying_material : function(s: PSSL; vout: PByte; olen: NativeUInt; vlabel: PUTF8Char; llen: NativeUInt; context: PByte; contextlen: NativeUInt; use_context: Integer): Integer; cdecl = nil;
+  SSL_export_keying_material_early : function(s: PSSL; vout: PByte; olen: NativeUInt; vlabel: PUTF8Char; llen: NativeUInt; context: PByte; contextlen: NativeUInt): Integer; cdecl = nil;
   SSL_get_peer_signature_type_nid : function(s: PSSL; pnid: PInteger): Integer; cdecl = nil;
   SSL_get_signature_type_nid : function(s: PSSL; pnid: PInteger): Integer; cdecl = nil;
   SSL_get_sigalgs : function(s: PSSL; idx: Integer; psign: PInteger; phash: PInteger; psignandhash: PInteger; rsig: PByte; rhash: PByte): Integer; cdecl = nil;
@@ -21817,20 +21829,20 @@ const
   SSL_use_PrivateKey_ASN1 : function(pk: Integer; ssl: PSSL; d: PByte; len: Integer): Integer; cdecl = nil;
   SSL_use_certificate : function(ssl: PSSL; x: PX509): Integer; cdecl = nil;
   SSL_use_certificate_ASN1 : function(ssl: PSSL; d: PByte; len: Integer): Integer; cdecl = nil;
-  SSL_use_cert_and_key : function(ssl: PSSL; x509: PX509; privatekey: PEVP_PKEY; chain: Pstack_st_X509; &override: Integer): Integer; cdecl = nil;
+  SSL_use_cert_and_key : function(ssl: PSSL; x509: PX509; privatekey: PEVP_PKEY; chain: Pstack_st_X509; voverride: Integer): Integer; cdecl = nil;
   SSL_CTX_use_serverinfo : function(ctx: PSSL_CTX; serverinfo: PByte; serverinfo_length: NativeUInt): Integer; cdecl = nil;
   SSL_CTX_use_serverinfo_ex : function(ctx: PSSL_CTX; version: Cardinal; serverinfo: PByte; serverinfo_length: NativeUInt): Integer; cdecl = nil;
-  SSL_CTX_use_serverinfo_file : function(ctx: PSSL_CTX; &file: PUTF8Char): Integer; cdecl = nil;
-  SSL_use_RSAPrivateKey_file : function(ssl: PSSL; &file: PUTF8Char; &type: Integer): Integer; cdecl = nil;
-  SSL_use_PrivateKey_file : function(ssl: PSSL; &file: PUTF8Char; &type: Integer): Integer; cdecl = nil;
-  SSL_use_certificate_file : function(ssl: PSSL; &file: PUTF8Char; &type: Integer): Integer; cdecl = nil;
-  SSL_CTX_use_RSAPrivateKey_file : function(ctx: PSSL_CTX; &file: PUTF8Char; &type: Integer): Integer; cdecl = nil;
-  SSL_CTX_use_PrivateKey_file : function(ctx: PSSL_CTX; &file: PUTF8Char; &type: Integer): Integer; cdecl = nil;
-  SSL_CTX_use_certificate_file : function(ctx: PSSL_CTX; &file: PUTF8Char; &type: Integer): Integer; cdecl = nil;
-  SSL_CTX_use_certificate_chain_file : function(ctx: PSSL_CTX; &file: PUTF8Char): Integer; cdecl = nil;
-  SSL_use_certificate_chain_file : function(ssl: PSSL; &file: PUTF8Char): Integer; cdecl = nil;
-  SSL_load_client_CA_file : function(&file: PUTF8Char): Pstack_st_X509_NAME; cdecl = nil;
-  SSL_add_file_cert_subjects_to_stack : function(stackCAs: Pstack_st_X509_NAME; &file: PUTF8Char): Integer; cdecl = nil;
+  SSL_CTX_use_serverinfo_file : function(ctx: PSSL_CTX; vfile: PUTF8Char): Integer; cdecl = nil;
+  SSL_use_RSAPrivateKey_file : function(ssl: PSSL; vfile: PUTF8Char; vtype: Integer): Integer; cdecl = nil;
+  SSL_use_PrivateKey_file : function(ssl: PSSL; vfile: PUTF8Char; vtype: Integer): Integer; cdecl = nil;
+  SSL_use_certificate_file : function(ssl: PSSL; vfile: PUTF8Char; vtype: Integer): Integer; cdecl = nil;
+  SSL_CTX_use_RSAPrivateKey_file : function(ctx: PSSL_CTX; vfile: PUTF8Char; vtype: Integer): Integer; cdecl = nil;
+  SSL_CTX_use_PrivateKey_file : function(ctx: PSSL_CTX; vfile: PUTF8Char; vtype: Integer): Integer; cdecl = nil;
+  SSL_CTX_use_certificate_file : function(ctx: PSSL_CTX; vfile: PUTF8Char; vtype: Integer): Integer; cdecl = nil;
+  SSL_CTX_use_certificate_chain_file : function(ctx: PSSL_CTX; vfile: PUTF8Char): Integer; cdecl = nil;
+  SSL_use_certificate_chain_file : function(ssl: PSSL; vfile: PUTF8Char): Integer; cdecl = nil;
+  SSL_load_client_CA_file : function(vfile: PUTF8Char): Pstack_st_X509_NAME; cdecl = nil;
+  SSL_add_file_cert_subjects_to_stack : function(stackCAs: Pstack_st_X509_NAME; vfile: PUTF8Char): Integer; cdecl = nil;
   SSL_add_dir_cert_subjects_to_stack : function(stackCAs: Pstack_st_X509_NAME; dir: PUTF8Char): Integer; cdecl = nil;
   SSL_state_string : function(s: PSSL): PUTF8Char; cdecl = nil;
   SSL_rstate_string : function(s: PSSL): PUTF8Char; cdecl = nil;
@@ -21853,7 +21865,7 @@ const
   SSL_SESSION_get0_ticket : procedure(s: PSSL_SESSION; tick: PPByte; len: PNativeUInt); cdecl = nil;
   SSL_SESSION_get_max_early_data : function(s: PSSL_SESSION): UInt32; cdecl = nil;
   SSL_SESSION_set_max_early_data : function(s: PSSL_SESSION; max_early_data: UInt32): Integer; cdecl = nil;
-  SSL_copy_session_id : function(&to: PSSL; from: PSSL): Integer; cdecl = nil;
+  SSL_copy_session_id : function(vto: PSSL; from: PSSL): Integer; cdecl = nil;
   SSL_SESSION_get0_peer : function(s: PSSL_SESSION): PX509; cdecl = nil;
   SSL_SESSION_set1_id_context : function(s: PSSL_SESSION; sid_ctx: PByte; sid_ctx_len: Cardinal): Integer; cdecl = nil;
   SSL_SESSION_set1_id : function(s: PSSL_SESSION; sid: PByte; sid_len: Cardinal): Integer; cdecl = nil;
@@ -21868,7 +21880,7 @@ const
   SSL_SESSION_print_keylog : function(bp: PBIO; x: PSSL_SESSION): Integer; cdecl = nil;
   SSL_SESSION_up_ref : function(ses: PSSL_SESSION): Integer; cdecl = nil;
   SSL_SESSION_free : procedure(ses: PSSL_SESSION); cdecl = nil;
-  SSL_set_session : function(&to: PSSL; session: PSSL_SESSION): Integer; cdecl = nil;
+  SSL_set_session : function(vto: PSSL; session: PSSL_SESSION): Integer; cdecl = nil;
   SSL_CTX_add_session : function(ctx: PSSL_CTX; session: PSSL_SESSION): Integer; cdecl = nil;
   SSL_CTX_remove_session : function(ctx: PSSL_CTX; session: PSSL_SESSION): Integer; cdecl = nil;
   SSL_CTX_set_generate_session_id : function(ctx: PSSL_CTX; cb: GEN_SESSION_CB): Integer; cdecl = nil;
@@ -22414,12 +22426,12 @@ var
   RESTDW_SSL_DLL_Handle : THandle;
 
 { LibCrypto Helpers }
-function BIO_get_flags(b: PBIO): Integer; inline;
-function BIO_should_retry(b: PBIO): Boolean; inline;
-function BIO_should_read(b: PBIO): Boolean; inline;
-function BIO_should_write(b: PBIO): Boolean; inline;
-function BIO_should_io_special(b: PBIO): Boolean; inline;
-function BIO_retry_type(b: PBIO): Integer; inline;
+function BIO_get_flags(b: PBIO): Integer; {$IF Defined(FPC) or (CompilerVersion > 21)}inline;{$IFEND}
+function BIO_should_retry(b: PBIO): Boolean; {$IF Defined(FPC) or (CompilerVersion > 21)}inline;{$IFEND}
+function BIO_should_read(b: PBIO): Boolean; {$IF Defined(FPC) or (CompilerVersion > 21)}inline;{$IFEND}
+function BIO_should_write(b: PBIO): Boolean; {$IF Defined(FPC) or (CompilerVersion > 21)}inline;{$IFEND}
+function BIO_should_io_special(b: PBIO): Boolean; {$IF Defined(FPC) or (CompilerVersion > 21)}inline;{$IFEND}
+function BIO_retry_type(b: PBIO): Integer; {$IF Defined(FPC) or (CompilerVersion > 21)}inline;{$IFEND}
 function BIO_get_ssl(b: PBIO; s: PSSL): Integer;
 function BIO_pending(b: PBIO): Integer;
 
@@ -22427,14 +22439,14 @@ function SSL_error(const AErrorCode: Integer): String;
 function SSL_is_fatal_error(const AErrorCode: Integer): Boolean;
 
 { LibSsl Helpers }
-function SSL_CTX_set_session_cache_mode(ctx: PSSL_CTX; mode: Integer): Integer; inline;
-function SSL_CTX_add_extra_chain_cert(ctx: PSSL_CTX; cert: PX509): Longword; inline;
-function SSL_CTX_set_tmp_dh(ctx: PSSL_CTX; dh: Pointer): Integer; inline;
-function SSL_CTX_set_tmp_ecdh(ctx: PSSL_CTX; ecdh: Pointer): Integer; inline;
+function SSL_CTX_set_session_cache_mode(ctx: PSSL_CTX; mode: Integer): Integer; {$IF Defined(FPC) or (CompilerVersion > 21)}inline;{$IFEND}
+function SSL_CTX_add_extra_chain_cert(ctx: PSSL_CTX; cert: PX509): Longword; {$IF Defined(FPC) or (CompilerVersion > 21)}inline;{$IFEND}
+function SSL_CTX_set_tmp_dh(ctx: PSSL_CTX; dh: Pointer): Integer; {$IF Defined(FPC) or (CompilerVersion > 21)}inline;{$IFEND}
+function SSL_CTX_set_tmp_ecdh(ctx: PSSL_CTX; ecdh: Pointer): Integer; {$IF Defined(FPC) or (CompilerVersion > 21)}inline;{$IFEND}
 function SSL_CTX_set_ecdh_auto(ctx: PSSL_CTX; onoff: Integer): Integer;
-function SSL_CTX_set_min_proto_version(ctx: PSSL_CTX; version: Integer): Integer; inline;
-function SSL_CTX_set_max_proto_version(ctx: PSSL_CTX; version: Integer): Integer; inline;
-function SSL_set_tlsext_host_name(const s: PSSL; const name: String): LongInt; inline;
+function SSL_CTX_set_min_proto_version(ctx: PSSL_CTX; version: Integer): Integer; {$IF Defined(FPC) or (CompilerVersion > 21)}inline;{$IFEND}
+function SSL_CTX_set_max_proto_version(ctx: PSSL_CTX; version: Integer): Integer; {$IF Defined(FPC) or (CompilerVersion > 21)}inline;{$IFEND}
+function SSL_set_tlsext_host_name(const s: PSSL; const name: String): LongInt; {$IF Defined(FPC) or (CompilerVersion > 21)}inline;{$IFEND}
 function SSL_set_mode(s: PSSL; version: Integer): Integer;
 function SSL_get_mode(s: PSSL): Integer;
 
@@ -22640,32 +22652,32 @@ begin
   Result := BIO_ctrl(b, _BIO_CTRL_PENDING, 0, nil);
 end;
 
-{$IFNDEF FPC}
-function SSL_error(const AErrorCode: Integer): String;
-var
-  P: TPtrWrapper;
-begin
-  P := TMarshal.AllocMem(1024);
-  try
-    ERR_error_string_n(AErrorCode, P.ToPointer, 1024);
-    Result := TMarshal.ReadStringAsAnsi(P);
-  finally
-    TMarshal.FreeMem(P);
+{$IF (NOT Defined(FPC)) AND (CompilerVersion > 21)}
+  function SSL_error(const AErrorCode: Integer): String;
+  var
+    P: TPtrWrapper;
+  begin
+    P := TMarshal.AllocMem(1024);
+    try
+      ERR_error_string_n(AErrorCode, P.ToPointer, 1024);
+      Result := TMarshal.ReadStringAsAnsi(P);
+    finally
+      TMarshal.FreeMem(P);
+    end;
   end;
-end;
 {$ELSE}
-function SSL_error(const AErrorCode: Integer): String;
-var
-  P: PAnsiChar;
-begin
-  P := System.AllocMem(1024);
-  try
-    ERR_error_string_n(AErrorCode, P, 1024);
-    Result := P^;
-  finally
+  function SSL_error(const AErrorCode: Integer): String;
+  var
+    P: PAnsiChar;
+  begin
+    P := AllocMem(1024);
+    try
+      ERR_error_string_n(AErrorCode, P, 1024);
+      Result := P^;
+    finally
+    end;
   end;
-end;
-{$ENDIF}
+{$IFEND}
 
 function SSL_is_fatal_error(const AErrorCode: Integer): Boolean;
 begin
