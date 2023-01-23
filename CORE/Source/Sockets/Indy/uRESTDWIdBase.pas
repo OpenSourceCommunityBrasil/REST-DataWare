@@ -445,16 +445,6 @@ begin
   Begin
    HttpRequest.Request.Charset                  := 'utf-8';
    HttpRequest.Request.AcceptCharSet            := HttpRequest.Request.Charset;
-  End
- Else If RequestCharset = esASCII Then
-  Begin
-   HttpRequest.Request.Charset                  := 'ascii';
-   HttpRequest.Request.AcceptCharSet            := HttpRequest.Request.Charset;
-  End
- Else If RequestCharset = esANSI Then
-  Begin
-   HttpRequest.Request.Charset                  := 'ansi';
-   HttpRequest.Request.AcceptCharSet            := HttpRequest.Request.Charset;
   End;
  HttpRequest.Request.Accept                    := Accept;
  HttpRequest.Request.AcceptEncoding            := AcceptEncoding;

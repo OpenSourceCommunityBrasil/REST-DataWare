@@ -1291,6 +1291,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
   I, A          : Integer;
   vFieldList    : TStringList;
   Field         : TField;
+  vStringStreamB,
   vStringStream : TMemoryStream;
   vUpdateCase   : Boolean;
   MassiveValue  : TMassiveValue;
@@ -1528,11 +1529,17 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                                           MassiveLineBuff.vMassiveValues.Items[I + 1].LoadFromStream(vStringStream) //StreamToHex(vStringStream)
                                          Else
                                           Begin
-                                           If MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> EncodeStream(vStringStream) Then //StreamToHex(vStringStream) Then
-                                            Begin
-                                             MassiveLineBuff.vMassiveValues.Items[I + 1].LoadFromStream(vStringStream); //StreamToHex(vStringStream);
-                                             MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
-                                            End;
+                                           vStringStreamB := TMemoryStream.Create;
+                                           MassiveLineBuff.vMassiveValues.Items[I + 1].SaveToStream(vStringStreamB);
+                                           Try
+                                            If EncodeStream(vStringStreamB) <> EncodeStream(vStringStream) Then //StreamToHex(vStringStream) Then
+                                             Begin
+                                              MassiveLineBuff.vMassiveValues.Items[I + 1].LoadFromStream(vStringStream); //StreamToHex(vStringStream);
+                                              MassiveLineBuff.vChanges.Add(Uppercase(Field.FieldName));
+                                             End;
+                                           Finally
+                                            FreeAndNil(vStringStreamB);
+                                           End;
                                           End;
                                         End
                                        Else

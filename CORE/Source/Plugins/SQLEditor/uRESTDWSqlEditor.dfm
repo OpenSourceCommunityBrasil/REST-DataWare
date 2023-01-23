@@ -1,10 +1,10 @@
 object FrmDWSqlEditor: TFrmDWSqlEditor
-  Left = 488
-  Top = 163
+  Left = 479
+  Top = 236
+  Width = 1079
+  Height = 756
   BorderWidth = 5
   Caption = 'RESTDWClientSQL Editor'
-  ClientHeight = 707
-  ClientWidth = 1053
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -199,10 +199,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         object TabSheetSQL: TTabSheet
           BorderWidth = 5
           Caption = 'SQL Command'
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Memo: TMemo
             Left = 0
             Top = 0
@@ -292,10 +288,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
     object TabSheetTable: TTabSheet
       BorderWidth = 5
       Caption = 'RecordSet'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DBGridRecord: TDBGrid
         Left = 0
         Top = 0
