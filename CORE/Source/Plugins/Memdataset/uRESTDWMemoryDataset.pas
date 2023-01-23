@@ -192,7 +192,7 @@ type
     FClearing: Boolean;
     FUseDataSetFilter: Boolean;
     FTrimEmptyString: Boolean;
-    FRESTDWStorage : TRESTDWStorageBase;
+    FStorageDataType : TRESTDWStorageBase;
     function AddRecord: TJvMemoryRecord;
     function InsertRecord(Index: Integer): TJvMemoryRecord;
     function FindRecordID(ID: Integer): TJvMemoryRecord;
@@ -352,6 +352,7 @@ type
     property RowsOriginal: Integer read FRowsOriginal;
     property RowsChanged: Integer read FRowsChanged;
     property RowsAffected: Integer read FRowsAffected;
+    property StorageDataType : TRESTDWStorageBase read FStorageDataType write FStorageDataType;
   published
     property Capacity: Integer read GetCapacity write SetCapacity default 0;
     property Active;
@@ -372,7 +373,6 @@ type
     property AutoIncAsInteger: Boolean read FAutoIncAsInteger write FAutoIncAsInteger default False;
     property OneValueInArray: Boolean read FOneValueInArray write FOneValueInArray default True;
     property TrimEmptyString: Boolean read FTrimEmptyString write FTrimEmptyString default True;
-    property RESTDWStorage : TRESTDWStorageBase read FRESTDWStorage write FRESTDWStorage;
     property BeforeOpen;
     property AfterOpen;
     property BeforeClose;
@@ -450,12 +450,8 @@ uses
   System.Generics.Collections,
   {$ENDIF RTL240_UP}
   FMTBcd,
-  uRESTDWMemAnsiStrings,
-  uRESTDWMemVCLUtils,
-  uRESTDWMemResources,
-  uRESTDWTools,
-  uRESTDWBasicTypes,
-  uRESTDWStorageBin;
+  uRESTDWMemAnsiStrings, uRESTDWMemVCLUtils, uRESTDWMemResources,
+  uRESTDWTools, uRESTDWBasicTypes, uRESTDWStorageBin;
 
 const
   GuidSize = 38;
@@ -716,7 +712,7 @@ begin
   FOneValueInArray := True;
   FDataSetClosed := False;
   FTrimEmptyString := True;
-  FRESTDWStorage := nil;
+  FStorageDataType := nil;
 end;
 destructor TRESTDWMemTable.Destroy;
 var
@@ -2700,7 +2696,7 @@ procedure TRESTDWMemTable.LoadFromStream(Stream: TStream);
 var
   stor : TRESTDWStorageBinRDW;
 begin
-  if FRESTDWStorage = nil then begin 
+  if FStorageDataType = nil then begin
     stor := TRESTDWStorageBinRDW.Create(nil);
     try
       stor.LoadFromStream(Self, Stream);
@@ -2709,7 +2705,7 @@ begin
     end;
   end
   else begin
-    FRESTDWStorage.LoadFromStream(Self, Stream);
+    FStorageDataType.LoadFromStream(Self, Stream);
   end;
 end;
 
@@ -2821,7 +2817,7 @@ procedure TRESTDWMemTable.SaveToStream(var Stream: TStream);
 var
   stor : TRESTDWStorageBinRDW;
 begin
-  if FRESTDWStorage = nil then begin  
+  if FStorageDataType = nil then begin
     stor := TRESTDWStorageBinRDW.Create(nil);
     try
       stor.SaveToStream(TDataset(Self), Stream);
@@ -2830,7 +2826,7 @@ begin
     end;
   end
   else begin
-    FRESTDWStorage.SaveToStream(TDataset(Self), Stream);
+    FStorageDataType.SaveToStream(TDataset(Self), Stream);
   end;
 end;
 
