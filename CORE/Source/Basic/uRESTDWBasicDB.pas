@@ -8676,8 +8676,9 @@ Begin
        Else
         Inherited OpenCursor(InfoQuery);
       Except
-       If Not (csDesigning in ComponentState) Then
-        Exception.Create(Name + ': ' + cErrorOpenDataset);
+	   Raise;
+       //If Not (csDesigning in ComponentState) Then
+       // Exception.Create(Name + ': ' + cErrorOpenDataset);
       End;
      End
     Else If (Self.FieldDefs.Count = 0)    And
