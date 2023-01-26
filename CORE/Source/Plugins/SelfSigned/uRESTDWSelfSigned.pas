@@ -33,7 +33,7 @@ interface
 uses
   Classes,
   SysUtils,
-  uRESTDWBasicComponent,
+  uRESTDWBasic,
   uRESTDWConsts,
   uRESTDWTools,
   uRESTDWSelfSignedMacros,
@@ -119,10 +119,9 @@ type
       Cipher_idea_cfb64,
       Cipher_idea_ecb,
       Cipher_idea_ofb);
-
+  Type
   { TRESTDWSelfSigned }
-
-  TRESTDWSelfSigned = class(TRESTDWComponent)
+  TRESTDWSelfSigned = class(TRESTDWSelfSignedBase)
   private
     FCertificate: PX509;
     FPrivateKey: PEVP_PKEY;
@@ -195,14 +194,7 @@ type
     property OnKeyProgress : TNotifyEvent read FOnKeyProgress write FOnKeyProgress;
   end;
 
-procedure Register;
-
 implementation
-
-procedure Register;
-begin
-  RegisterComponents('REST Dataware - Tools', [TRESTDWSelfSigned]);
-end;
 
 const
   SslPrivKeyEvpCipher: array[TSslPrivKeyCipher] of TSslCipher = (
@@ -629,7 +621,7 @@ end;
 
 constructor TRESTDWSelfSigned.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
+  inherited;
 
   FCertificate := nil;
   FPrivateKey := nil;

@@ -1463,15 +1463,15 @@ begin
            End
           Else If State in [dsInsert] Then
            Begin
-            {$IFNDEF FPC}
-             {$IF CompilerVersion <= 22}
-              SetLength(TRESTDWBytes(Buffer), 0);
-             {$ELSE}
-              SetLength(Buffer, 0);
-             {$IFEND}
-            {$ELSE}
-             SetLength(TRESTDWBytes(Buffer), 0);
-            {$ENDIF}
+//            {$IFNDEF FPC}
+//             {$IF CompilerVersion <= 22}
+//              SetLength(TRESTDWBytes(Buffer), 0);
+//             {$ELSE}
+//              SetLength(Buffer, 0);
+//             {$IFEND}
+//            {$ELSE}
+//             SetLength(TRESTDWBytes(Buffer), 0);
+//            {$ENDIF}
             Result := False;
            End;
          End
@@ -1502,16 +1502,16 @@ begin
        End
       Else
        Begin
-        {$IFNDEF FPC}
-         {$IF CompilerVersion <= 22}
-          If State = dsBrowse Then
-           SetLength(TRESTDWBytes(Buffer), 0);
-         {$ELSE}
-          SetLength(Buffer, 0);
-         {$IFEND}
-        {$ELSE}
-         SetLength(TRESTDWBytes(Buffer), 0);
-        {$ENDIF}
+//        {$IFNDEF FPC}
+//         {$IF CompilerVersion <= 22}
+//          If State = dsBrowse Then
+//           SetLength(TRESTDWBytes(Buffer), 0);
+//         {$ELSE}
+//          SetLength(Buffer, 0);
+//         {$IFEND}
+//        {$ELSE}
+//         SetLength(TRESTDWBytes(Buffer), 0);
+//        {$ENDIF}
         Result := False;
        End;
     End;

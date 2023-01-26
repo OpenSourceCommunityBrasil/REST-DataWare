@@ -375,6 +375,13 @@ Type
  End;
 
 Type
+ TRESTDWSelfSignedBase = Class(TRESTDWComponent)
+ Protected
+ Private
+ Public
+End;
+
+Type
  TRESTServiceBase = Class(TRESTDWComponent)
  Protected
  Private

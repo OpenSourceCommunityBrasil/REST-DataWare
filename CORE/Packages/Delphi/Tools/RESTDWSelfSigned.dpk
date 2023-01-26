@@ -33,9 +33,8 @@ requires
   RESTDWCore;
 
 contains
-  uRESTDWSelfSigned in '..\..\..\Source\Plugins\SelfSigned\uRESTDWSelfSigned.pas',
-  uRESTDWSelfSignedMacros in '..\..\..\Source\Plugins\SelfSigned\uRESTDWSelfSignedMacros.pas',
-  uRESTDWOpenSslLib in '..\..\..\Source\utils\uRESTDWOpenSslLib.pas';
+  uRESTDWOpenSslLib in '..\..\..\Source\utils\uRESTDWOpenSslLib.pas',
+  uRESTDWSelfSignedReg in '..\..\..\Source\Plugins\SelfSigned\uRESTDWSelfSignedReg.pas';
 
 end.
 
