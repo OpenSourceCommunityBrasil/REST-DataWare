@@ -646,12 +646,7 @@ begin
        ReallocMem(FBlobs, 0);
        ReallocMem(FData, 0);
       {$ELSE}
-       {$IF CompilerVersion <= 22}
-        If FMemoryData.BlobFieldCount > 0 Then
-         Finalize(PMemBlobArray(@FBlobs)^[0], FMemoryData.BlobFieldCount);
-       {$ELSE}
-        ReallocMem(FBlobs, 0);
-       {$IFEND}
+       ReallocMem(FBlobs, 0);
        ReallocMem(FData, 0);
       {$ENDIF}
      FMemoryData := Nil;
