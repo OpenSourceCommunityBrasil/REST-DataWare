@@ -123,6 +123,7 @@ type
     procedure InitRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF});
     function AllocRecordBuffer: TRecordBuffer;
     procedure SetMemoryRecordData(Buffer: PJvMemBuffer; Pos: Integer);
+    procedure AfterLoad;
     function GetDataset : TDataSet;
   end;
 
@@ -336,6 +337,7 @@ type
     property SaveLoadState: TSaveLoadState read FSaveLoadState;
     function GetValues(FldNames: string = ''): Variant;
     function FindDeleted(KeyValues: Variant): Integer;
+    procedure AfterLoad;
     function IsDeleted(out Index: Integer): Boolean;
     function IsInserted: Boolean;
     function IsUpdated: Boolean;
@@ -642,14 +644,9 @@ begin
     begin
       If not FMemoryData.FClearing Then
        FMemoryData.FRecords.Remove(Self);
-      {$IFDEF FPC}
        ReallocMem(FBlobs, 0);
        ReallocMem(FData, 0);
-      {$ELSE}
-       ReallocMem(FBlobs, 0);
-       ReallocMem(FData, 0);
-      {$ENDIF}
-     FMemoryData := Nil;
+       FMemoryData := Nil;
     end;
     if Value <> nil then
      Begin
@@ -1716,7 +1713,10 @@ end;
 
 procedure TRESTDWMemTable.SetFieldData(Field: TField; Buffer: TJvValueBuffer);
 begin
-  InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer[0]){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer);
+ If Length(Buffer) > 0 Then
+  InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer[0]){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer)
+ Else
+   InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer);
 end;
 {$IFNDEF NEXTGEN}
   {$IFDEF RTL240_UP}
@@ -2334,7 +2334,9 @@ begin
 end;
 function TRESTDWMemTable.GetRecordCount: Integer;
 begin
-  Result := FRecords.Count;
+  Result := 0;
+  if state <> dsInactive then
+    Result := FRecords.Count;
 end;
 function TRESTDWMemTable.GetRecNo: Integer;
 begin
@@ -2472,6 +2474,15 @@ Begin
   Finally
    FreeAndNil(aFields);
   End;
+End;
+
+procedure TRESTDWMemTable.AfterLoad;
+Begin
+  try
+    SetState(dsInactive);
+  finally
+    SetState(dsBrowse);
+  end;
 End;
 
 procedure TRESTDWMemTable.Notification(AComponent: TComponent; Operation: TOperation);
