@@ -1429,7 +1429,7 @@ begin
             Else
              Result := False;
            End
-          Else If State in [dsEdit, dsInsert] Then
+          Else If State in [dsEdit] Then
            Begin
             Result := True;
             aBytes := PMemBlobArray(Records[RecNo -1].Blobs)^[Field.Offset];
@@ -1461,7 +1461,7 @@ begin
             Else
              Result := False;
            End
-          Else
+          Else If State in [dsInsert] Then
            Begin
             {$IFNDEF FPC}
              {$IF CompilerVersion <= 22}

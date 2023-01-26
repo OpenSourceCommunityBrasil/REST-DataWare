@@ -5043,12 +5043,14 @@ Begin
       Begin
        If Assigned(vOnEventConnection) Then
         vOnEventConnection(False, cAuthenticationError);
+       // Eloy
+       If vErrorBoolean then
+        raise Exception.Create(vMessageError);
       End;
     End;
   Except
    On E : Exception do
     Begin
-//     DestroyComponents;
      If vFailOver Then
       Begin
        If vFailOverConnections.Count > 0 Then
@@ -5056,7 +5058,6 @@ Begin
          If Assigned(vFailOverConnections) Then
          For I := 0 To vFailOverConnections.Count -1 Do
           Begin
-           //DestroyComponents;
            If I = 0 Then
             Begin
              If ((vFailOverConnections[I].vTypeRequest    = Connection.TypeRequest)    And
@@ -5163,7 +5164,7 @@ Begin
     End;
   End;
  Finally
-//  DestroyComponents;
+  //DestroyComponents;
  End;
 End;
 
@@ -8631,6 +8632,8 @@ Begin
 End;
 
 Procedure TRESTDWClientSQL.OpenCursor(InfoQuery: Boolean);
+var
+ Error: String;
 Begin
  Try
   If (vRESTDataBase <> Nil) And
@@ -8676,9 +8679,7 @@ Begin
        Else
         Inherited OpenCursor(InfoQuery);
       Except
-	   Raise;
-       //If Not (csDesigning in ComponentState) Then
-       // Exception.Create(Name + ': ' + cErrorOpenDataset);
+       Raise;
       End;
      End
     Else If (Self.FieldDefs.Count = 0)    And
@@ -11815,5 +11816,3 @@ Begin
 End;
 
 end.
-
-
