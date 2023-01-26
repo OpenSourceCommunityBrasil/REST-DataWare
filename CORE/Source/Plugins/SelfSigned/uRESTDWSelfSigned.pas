@@ -195,7 +195,14 @@ type
     property OnKeyProgress : TNotifyEvent read FOnKeyProgress write FOnKeyProgress;
   end;
 
+procedure Register;
+
 implementation
+
+procedure Register;
+begin
+  RegisterComponents('REST Dataware - Tools', [TRESTDWSelfSigned]);
+end;
 
 const
   SslPrivKeyEvpCipher: array[TSslPrivKeyCipher] of TSslCipher = (

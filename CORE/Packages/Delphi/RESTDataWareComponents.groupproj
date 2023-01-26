@@ -51,6 +51,9 @@
         <Projects Include="Wizards\RESTDWWizards.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="Tools\RESTDWSelfSigned.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -203,14 +206,23 @@
     <Target Name="RESTDWWizards:Make">
         <MSBuild Projects="Wizards\RESTDWWizards.dproj" Targets="Make"/>
     </Target>
+    <Target Name="RESTDWSelfSigned">
+        <MSBuild Projects="Tools\RESTDWSelfSigned.dproj"/>
+    </Target>
+    <Target Name="RESTDWSelfSigned:Clean">
+        <MSBuild Projects="Tools\RESTDWSelfSigned.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWSelfSigned:Make">
+        <MSBuild Projects="Tools\RESTDWSelfSigned.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="RESTDWCore;RESTDWShellServices;RESTDWSocketIndy;RESTDWSocketIcs;RESTDWCoreDesign;RESTDWShellServicesDesign;RESTDWSocketIndyDesign;RESTDWSocketIcsDesign;RESTDWAnyDACDriver;RESTDWApolloDBDriver;RESTDWFireDACDriver;RESTDWInterbaseDriver;RESTDWMyDACDriver;RESTDWUniDACDriver;RESTDWZEOSDriver;RESTDWWizards"/>
+        <CallTarget Targets="RESTDWCore;RESTDWShellServices;RESTDWSocketIndy;RESTDWSocketIcs;RESTDWCoreDesign;RESTDWShellServicesDesign;RESTDWSocketIndyDesign;RESTDWSocketIcsDesign;RESTDWAnyDACDriver;RESTDWApolloDBDriver;RESTDWFireDACDriver;RESTDWInterbaseDriver;RESTDWMyDACDriver;RESTDWUniDACDriver;RESTDWZEOSDriver;RESTDWWizards;RESTDWSelfSigned"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RESTDWCore:Clean;RESTDWShellServices:Clean;RESTDWSocketIndy:Clean;RESTDWSocketIcs:Clean;RESTDWCoreDesign:Clean;RESTDWShellServicesDesign:Clean;RESTDWSocketIndyDesign:Clean;RESTDWSocketIcsDesign:Clean;RESTDWAnyDACDriver:Clean;RESTDWApolloDBDriver:Clean;RESTDWFireDACDriver:Clean;RESTDWInterbaseDriver:Clean;RESTDWMyDACDriver:Clean;RESTDWUniDACDriver:Clean;RESTDWZEOSDriver:Clean;RESTDWWizards:Clean"/>
+        <CallTarget Targets="RESTDWCore:Clean;RESTDWShellServices:Clean;RESTDWSocketIndy:Clean;RESTDWSocketIcs:Clean;RESTDWCoreDesign:Clean;RESTDWShellServicesDesign:Clean;RESTDWSocketIndyDesign:Clean;RESTDWSocketIcsDesign:Clean;RESTDWAnyDACDriver:Clean;RESTDWApolloDBDriver:Clean;RESTDWFireDACDriver:Clean;RESTDWInterbaseDriver:Clean;RESTDWMyDACDriver:Clean;RESTDWUniDACDriver:Clean;RESTDWZEOSDriver:Clean;RESTDWWizards:Clean;RESTDWSelfSigned:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RESTDWCore:Make;RESTDWShellServices:Make;RESTDWSocketIndy:Make;RESTDWSocketIcs:Make;RESTDWCoreDesign:Make;RESTDWShellServicesDesign:Make;RESTDWSocketIndyDesign:Make;RESTDWSocketIcsDesign:Make;RESTDWAnyDACDriver:Make;RESTDWApolloDBDriver:Make;RESTDWFireDACDriver:Make;RESTDWInterbaseDriver:Make;RESTDWMyDACDriver:Make;RESTDWUniDACDriver:Make;RESTDWZEOSDriver:Make;RESTDWWizards:Make"/>
+        <CallTarget Targets="RESTDWCore:Make;RESTDWShellServices:Make;RESTDWSocketIndy:Make;RESTDWSocketIcs:Make;RESTDWCoreDesign:Make;RESTDWShellServicesDesign:Make;RESTDWSocketIndyDesign:Make;RESTDWSocketIcsDesign:Make;RESTDWAnyDACDriver:Make;RESTDWApolloDBDriver:Make;RESTDWFireDACDriver:Make;RESTDWInterbaseDriver:Make;RESTDWMyDACDriver:Make;RESTDWUniDACDriver:Make;RESTDWZEOSDriver:Make;RESTDWWizards:Make;RESTDWSelfSigned:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
