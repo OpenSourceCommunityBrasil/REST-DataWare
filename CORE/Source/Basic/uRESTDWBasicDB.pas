@@ -4679,8 +4679,7 @@ Procedure TRESTDWDatabasebaseBase.ApplyUpdates(Var MassiveCache       : TRESTDWM
                                                Var MessageError       : String);
 Var
  I                    : Integer;
- vUpdateLine          : String;
- vMassiveStream       : TStream;
+ vUpdateLine          : TStream;
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  RESTClientPoolerExec : TRESTClientPoolerBase;
  ResultData           : TJSONValue;
@@ -4689,10 +4688,12 @@ Var
 Begin
  vLocalClient := False;
  SocketError := False;
- RESTClientPoolerExec := nil;
+ RESTClientPoolerExec := Nil;
+ vUpdateLine          := Nil;
  If MassiveCache.MassiveCount > 0 Then
   Begin
-   vUpdateLine := MassiveCache.ToJSON;
+   vUpdateLine := TMemoryStream.Create;
+   MassiveCache.SaveToStream(vUpdateLine);
    If vRestPooler = '' Then
     Exit;
    If Not vConnected Then
@@ -4708,7 +4709,7 @@ Begin
         ResultData := vRESTConnectionDB.ApplyUpdates_MassiveCache(vUpdateLine, vRestPooler,  vDataRoute,
                                                                   Error,       MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                                   vClientConnectionDefs.vConnectionDefs,
-                                                                  MassiveCache.ReflectChanges, vRESTClientPooler);
+                                                                  True,        vRESTClientPooler);
         If Not(Error) or (MessageError <> cInvalidAuth) Then
          Break
         Else
@@ -4784,7 +4785,7 @@ Begin
                                                                       vFailOverConnections[I].vDataRoute,
                                                                       Error,       MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                                       vClientConnectionDefs.vConnectionDefs,
-                                                                      MassiveCache.ReflectChanges);
+                                                                      True);
             If Not SocketError Then
              Begin
               If vFailOverReplaceDefaults Then
@@ -4815,6 +4816,8 @@ Begin
         MassiveCache.ProcessChanges(ResultData.Value);
       If Assigned(ResultData) Then
        FreeAndNil(ResultData);
+      If Assigned(vUpdateLine) Then
+       FreeAndNil(vUpdateLine);
       FreeAndNil(vRESTConnectionDB);
       If Not Error Then
        Error := MessageError <> '';
@@ -6613,6 +6616,7 @@ Procedure TRESTDWTable.ProcBeforeDelete(DataSet: TDataSet);
 Var
  I             : Integer;
  vDetailClient : TRESTDWClientSQLBase;
+ vStream       : TStream;
 Begin
  If Not vReadData Then
   Begin
@@ -6660,8 +6664,14 @@ Begin
           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
-            vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            vStream := TMemoryStream.Create;
+            Try
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream);
+             vMassiveCache.Add(vStream, Self);
+            Finally
+             //FreeAndNil(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            End;
            End;
          End;
        End;
@@ -6687,6 +6697,7 @@ procedure TRESTDWClientSQL.ProcBeforeDelete(DataSet: TDataSet);
 Var
  I             : Integer;
  vDetailClient : TRESTDWClientSQL;
+ vStream       : TStream;
 Begin
  If Not vReadData Then
   Begin
@@ -6736,8 +6747,14 @@ Begin
           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
-            vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            vStream := TMemoryStream.Create;
+            Try
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream);
+             vMassiveCache.Add(vStream, Self);
+            Finally
+             //FreeAndNil(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            End;
            End;
          End;
        End;
@@ -6835,6 +6852,8 @@ Begin
 End;
 
 Procedure TRESTDWTable.ProcBeforePost(DataSet: TDataSet);
+Var
+ vStream : TStream;
 Begin
  If Not vReadData Then
   Begin
@@ -6887,8 +6906,14 @@ Begin
            TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
-            vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            vStream := TMemoryStream.Create;
+            Try
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream);
+             vMassiveCache.Add(vStream, Self);
+            Finally
+             //FreeAndNil(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            End;
            End;
          End;
        End;
@@ -6912,6 +6937,8 @@ Begin
 End;
 
 procedure TRESTDWClientSQL.ProcBeforePost(DataSet: TDataSet);
+Var
+ vStream : TStream;
 Begin
  If Not vReadData Then
   Begin
@@ -6963,8 +6990,14 @@ Begin
            TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
-            vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            vStream := TMemoryStream.Create;
+            Try
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream);
+             vMassiveCache.Add(vStream, Self);
+            Finally
+             //FreeAndNil(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            End;
            End;
          End;
        End;
@@ -6988,6 +7021,8 @@ Begin
 End;
 
 procedure TRESTDWClientSQL.ProcBeforeExec(DataSet: TDataSet);
+Var
+ vStream : TStream;
 Begin
  If Not vReadData Then
   Begin
@@ -7013,8 +7048,14 @@ Begin
            If vMassiveCache <> Nil Then
             Begin
              vMassiveCache.MassiveType                          := MassiveType;
-             vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+             vStream := TMemoryStream.Create;
+             Try
+              TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream);
+              vMassiveCache.Add(vStream, Self);
+             Finally
+              //FreeAndNil(vStream);
+              TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+             End;
             End;
           End;
         End;
@@ -8725,7 +8766,8 @@ End;
 
 procedure TRESTDWTable.OldAfterPost(DataSet: TDataSet);
 Var
- vError     : String;
+ vError  : String;
+ vStream : TStream;
 Begin
  vErrorBefore := False;
  vError       := '';
@@ -8748,8 +8790,16 @@ Begin
           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
-            vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+//            vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
+//            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            vStream := TMemoryStream.Create;
+            Try
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream);
+             vMassiveCache.Add(vStream, Self);
+            Finally
+             //FreeAndNil(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            End;
            End;
          End;
        End;
@@ -8778,7 +8828,8 @@ End;
 
 procedure TRESTDWClientSQL.OldAfterPost(DataSet: TDataSet);
 Var
- vError     : String;
+ vError  : String;
+ vStream : TStream;
 Begin
  vErrorBefore := False;
  vError       := '';
@@ -8803,8 +8854,13 @@ Begin
           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
-            vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            vStream := TMemoryStream.Create;
+            Try
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
+             vMassiveCache.Add(vStream, Self);
+            Finally
+             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            End;
            End;
          End;
        End;
