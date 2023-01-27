@@ -4509,6 +4509,12 @@ Var
        End;
      End;
    End;
+   // Eloy
+   case vErrorCode of
+     401: ErrorMessage := cInvalidAuth;
+     404: ErrorMessage := cEventNotFound;
+     500: ErrorMessage := cInvalidInternalError;
+   end;
   Except
    On E : EIdHTTPProtocolException Do
     Begin
@@ -4537,11 +4543,13 @@ Var
        Case AuthenticationOptions.AuthorizationOption Of
         rdwAOBearer : Begin
                        If (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).AutoGetToken) And
+                          (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).AutoRenewToken) And
                           (TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token <> '')  Then
                         TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token := '';
                       End;
         rdwAOToken  : Begin
                        If (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).AutoGetToken)  And
+                          (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).AutoRenewToken) And
                           (TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token  <> '')  Then
                         TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token := '';
                       End;
@@ -4746,7 +4754,7 @@ Begin
             OnFailOverError(FailOverConnections[I], vErrorMessage);
             vErrorMessage := '';
            End;
-         End;
+        End;
        End;
      End;
    End;

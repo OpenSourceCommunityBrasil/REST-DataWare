@@ -600,7 +600,6 @@ Procedure TRESTDWServerEvents.CreateDWParams(EventName    : String;
 Var
  vParamNameS : String;
  dwParam     : TJSONParam;
- vParamName,
  I           : Integer;
  vFound      : Boolean;
 Begin
@@ -888,31 +887,28 @@ Begin
    Except
     On E : Exception Do
      Begin
+      // Eloy
       Error := E.Message;
       If Error = cInvalidAuth Then
        Begin
         Case vRESTClientPooler.AuthenticationOptions.AuthorizationOption Of
          rdwAOBearer : Begin
                         If (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
+                           (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken) And
                            (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token <> '')  Then
-                         TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
-                        If Assigned(vOnBeforeSend) Then
-                         vOnBeforeSend(Self);
-                        If Assigned(vRESTClientPooler.OnBeforeExecute) Then
-                         vRESTClientPooler.OnBeforeExecute(Self);
-                        If TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken Then
-                         TokenValidade(DWParams, Error);
+                         Begin
+                          TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
+                          SendEvent(EventName, DWParams, Error, NativeResult, EventType, Assyncexec);
+                         End;
                        End;
          rdwAOToken  : Begin
                         If (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)  And
-                            (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token  <> '')  Then
-                         TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
-                        If Assigned(vOnBeforeSend) Then
-                         vOnBeforeSend(Self);
-                        If Assigned(vRESTClientPooler.OnBeforeExecute) Then
-                         vRESTClientPooler.OnBeforeExecute(Self);
-                        If TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken Then
-                         TokenValidade(DWParams, Error);
+                           (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken) And
+                           (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token  <> '')  Then
+                         Begin
+                          TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
+                          SendEvent(EventName, DWParams, Error, NativeResult, EventType, Assyncexec);
+                         End;
                        End;
         End;
        End
@@ -948,9 +944,6 @@ Begin
   Begin
    Case vRESTClientPooler.AuthenticationOptions.AuthorizationOption Of
     rdwAOBearer : Begin
-//                   If (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)    And
-//                      (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).EndTime < Now()) Then
-//                    TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
                    If (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
                       (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token = '') Then
                     Begin
@@ -963,9 +956,6 @@ Begin
                     End;
                   End;
     rdwAOToken  : Begin
-//                   If (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)    And
-//                      (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).EndTime < Now()) Then
-//                    TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
                    If (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
                       (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token = '') Then
                     Begin
@@ -988,17 +978,9 @@ Function TRESTDWClientEvents.SendEvent(EventName    : String;
                                    Assyncexec   : Boolean = False): Boolean;
 Var
  vDataMode     : TDataMode;
- I,
- vErrorCode    : Integer;
- vRenewTokenData,
- vErrorBoolean : Boolean;
- vToken        : String;
 Begin
  // Add por Ico Menezes
  Result          := False;
- vErrorCode      := 0;
- vErrorBoolean   := False;
- vRenewTokenData := False;
  Error           := '';
  If vRESTClientPooler <> Nil Then
   Begin
@@ -1014,55 +996,45 @@ Begin
     End;
    TokenValidade(DWParams, Error);
    vDataMode := vEventList.EventByName[EventName].vDataMode;
-   For I := 0 To 1 Do
-    Begin
-     If Error = '' Then
-      Error    := vRESTClientPooler.SendEvent(EventName, DWParams, EventType, vDataMode, vServerEventName, Assyncexec);
-     Result    := (Error = TReplyOK) Or (Error = AssyncCommandMSG);
-     If Result Then
-      Begin
-       Error  := '';
-       Break;
-      End
-     Else
-      Begin
-       If Error = cInvalidAuth Then
-        Begin
-         Case vRESTClientPooler.AuthenticationOptions.AuthorizationOption Of
-          rdwAOBearer : Begin
-                         If (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
-                            (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token <> '')  Then
+   Try
+    Error    := vRESTClientPooler.SendEvent(EventName, DWParams, EventType, vDataMode, vServerEventName, Assyncexec);
+    Result   := (Error = TReplyOK) Or (Error = AssyncCommandMSG);
+    If Result Then
+     Error  := '';
+   Except
+    On E : Exception Do
+     Begin
+      // Eloy
+      Error := E.Message;
+      If Error = cInvalidAuth Then
+       Begin
+        Case vRESTClientPooler.AuthenticationOptions.AuthorizationOption Of
+         rdwAOBearer : Begin
+                        If (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
+                           (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken) And
+                           (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token <> '')  Then
+                         Begin
                           TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
-                         If Assigned(vOnBeforeSend) Then
-                          vOnBeforeSend(Self);
-                         If Assigned(vRESTClientPooler.OnBeforeExecute) Then
-                          vRESTClientPooler.OnBeforeExecute(Self);
-                         If TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken Then
-                          TokenValidade(DWParams, Error)
-                         Else
-                          Break;
-                        End;
-          rdwAOToken  : Begin
-                         If (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)  And
-                             (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token  <> '')  Then
+                          SendEvent(EventName, DWParams, Error, EventType, Assyncexec);
+                         End;
+                       End;
+         rdwAOToken  : Begin
+                        If (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)  And
+                           (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken) And
+                           (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token  <> '')  Then
+                         Begin
                           TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
-                         If Assigned(vOnBeforeSend) Then
-                          vOnBeforeSend(Self);
-                         If Assigned(vRESTClientPooler.OnBeforeExecute) Then
-                          vRESTClientPooler.OnBeforeExecute(Self);
-                         If TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken Then
-                          TokenValidade(DWParams, Error)
-                         Else
-                          Break;
-                        End;
-         End;
-        End
-       Else
-        Begin
-         Break;
+                          SendEvent(EventName, DWParams, Error, EventType, Assyncexec);
+                         End;
+                       End;
         End;
-      End;
-    End;
+       End
+      Else
+       Begin
+        Raise Exception.Create(Error);
+       End;
+     End;
+   End;
   End;
 End;
 

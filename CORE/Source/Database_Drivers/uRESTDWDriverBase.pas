@@ -98,7 +98,7 @@ Type
  TRESTDWDrvDataset      = Class(TComponent)
  private
   FParamsList : TStringList;
-  FRESTDWStorage : TRESTDWStorageBase;
+  FStorageDataType : TRESTDWStorageBase;
   function getRDWDrvParam(idx: integer): TRDWDrvParam;
  Protected
   Function  getFields                     : TFields; Virtual;
@@ -148,9 +148,9 @@ Type
   Procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); virtual;
 
   Property Params[idx : integer] : TRDWDrvParam read getRDWDrvParam;
+  property StorageDataType : TRESTDWStorageBase read FStorageDataType write FStorageDataType;
  Published
   Property Fields : TFields Read getFields;
-  property RESTDWStorage : TRESTDWStorageBase read FRESTDWStorage write FRESTDWStorage;
  End;
  { TRESTDWDrvStoreProc }
   TRESTDWDrvStoreProc = Class(TRESTDWDrvDataset)
@@ -190,7 +190,7 @@ Type
  Private
   FConnection : TComponent;
   FServerMethod : TServerMethodDataModule;
-  FRESTDWStorage : TRESTDWStorageBase;
+  FStorageDataType : TRESTDWStorageBase;
   vStrsTrim,
   vStrsEmpty2Null,
   vStrsTrim2Len,
@@ -392,6 +392,7 @@ Type
                                    MassiveCache           : Boolean = False);
 
   property ServerMethod  : TServerMethodDataModule read FServerMethod;
+  property StorageDataType     : TRESTDWStorageBase   Read FStorageDataType       Write FStorageDataType;
  Published
   Property Connection          : TComponent           read FConnection            write setConnection;
 
@@ -402,7 +403,6 @@ Type
   Property EncodeStringsJSON   : Boolean              Read vEncodeStrings         Write vEncodeStrings;
   Property Encoding            : TEncodeSelect        Read vEncoding              Write vEncoding;
   Property ParamCreate         : Boolean              Read vParamCreate           Write vParamCreate;
-  property RESTDWStorage       : TRESTDWStorageBase   Read FRESTDWStorage         Write FRESTDWStorage;
   {$IFDEF FPC}
   Property DatabaseCharSet     : TDatabaseCharSet     Read vDatabaseCharSet       Write vDatabaseCharSet;
   {$ENDIF}
@@ -483,7 +483,7 @@ begin
   inherited Create(AOwner);
   FParamsList := TStringList.Create;
   FParamsList.Sorted := True;
-  FRESTDWStorage := nil;
+  FStorageDataType := nil;
 end;
 
 Procedure TRESTDWDrvDataset.createSequencedField(seqname,
@@ -694,7 +694,7 @@ var
   stor : TRESTDWStorageBinRDW;
 begin
   qry := TDataSet(Self.Owner);
-  if FRESTDWStorage = nil then begin
+  if FStorageDataType = nil then begin
     stor := TRESTDWStorageBinRDW.Create(nil);
     try
       stor.EncodeStrs := False;
@@ -703,9 +703,8 @@ begin
       stor.Free;
     end;
   end
-  else begin
-    FRESTDWStorage.SaveToStream(qry,stream);
-  end;
+  else
+    FStorageDataType.SaveToStream(qry,stream);
 end;
 
 procedure TRESTDWDrvDataset.setParamDataType(IParam: integer;
@@ -2460,7 +2459,7 @@ begin
             BinaryBlob := TMemoryStream.Create;
 
           try
-            vTempQuery.RESTDWStorage := FRESTDWStorage;
+            vTempQuery.FStorageDataType := FStorageDataType;
             vTempQuery.SaveToStreamCompatibleMode(BinaryBlob);
             BinaryBlob.Position := 0;
           finally
@@ -2585,7 +2584,7 @@ begin
         if not Assigned(BinaryBlob) then
           BinaryBlob := TMemoryStream.Create;
         try
-          vTempQuery.RESTDWStorage := FRESTDWStorage;
+          vTempQuery.FStorageDataType := FStorageDataType;
           vTempQuery.SaveToStreamCompatibleMode(BinaryBlob);
           BinaryBlob.Position := 0;
         finally
@@ -3600,7 +3599,7 @@ Begin
     Else If vCompatibleMode Then begin
       vStream := TMemoryStream.Create;
       Try
-       vTempQuery.RESTDWStorage := FRESTDWStorage;
+       vTempQuery.FStorageDataType := FStorageDataType;
        vTempQuery.SaveToStreamCompatibleMode(vStream);
        vStream.Position := 0;
       Finally

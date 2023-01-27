@@ -123,6 +123,7 @@ type
     procedure InitRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF});
     function AllocRecordBuffer: TRecordBuffer;
     procedure SetMemoryRecordData(Buffer: PJvMemBuffer; Pos: Integer);
+    procedure AfterLoad;
     function GetDataset : TDataSet;
   end;
 
@@ -192,7 +193,7 @@ type
     FClearing: Boolean;
     FUseDataSetFilter: Boolean;
     FTrimEmptyString: Boolean;
-    FRESTDWStorage : TRESTDWStorageBase;
+    FStorageDataType : TRESTDWStorageBase;
     function AddRecord: TJvMemoryRecord;
     function InsertRecord(Index: Integer): TJvMemoryRecord;
     function FindRecordID(ID: Integer): TJvMemoryRecord;
@@ -336,6 +337,7 @@ type
     property SaveLoadState: TSaveLoadState read FSaveLoadState;
     function GetValues(FldNames: string = ''): Variant;
     function FindDeleted(KeyValues: Variant): Integer;
+    procedure AfterLoad;
     function IsDeleted(out Index: Integer): Boolean;
     function IsInserted: Boolean;
     function IsUpdated: Boolean;
@@ -352,6 +354,7 @@ type
     property RowsOriginal: Integer read FRowsOriginal;
     property RowsChanged: Integer read FRowsChanged;
     property RowsAffected: Integer read FRowsAffected;
+    property StorageDataType : TRESTDWStorageBase read FStorageDataType write FStorageDataType;
   published
     property Capacity: Integer read GetCapacity write SetCapacity default 0;
     property Active;
@@ -372,7 +375,6 @@ type
     property AutoIncAsInteger: Boolean read FAutoIncAsInteger write FAutoIncAsInteger default False;
     property OneValueInArray: Boolean read FOneValueInArray write FOneValueInArray default True;
     property TrimEmptyString: Boolean read FTrimEmptyString write FTrimEmptyString default True;
-    property RESTDWStorage : TRESTDWStorageBase read FRESTDWStorage write FRESTDWStorage;
     property BeforeOpen;
     property AfterOpen;
     property BeforeClose;
@@ -450,12 +452,8 @@ uses
   System.Generics.Collections,
   {$ENDIF RTL240_UP}
   FMTBcd,
-  uRESTDWMemAnsiStrings,
-  uRESTDWMemVCLUtils,
-  uRESTDWMemResources,
-  uRESTDWTools,
-  uRESTDWBasicTypes,
-  uRESTDWStorageBin;
+  uRESTDWMemAnsiStrings, uRESTDWMemVCLUtils, uRESTDWMemResources,
+  uRESTDWTools, uRESTDWBasicTypes, uRESTDWStorageBin;
 
 const
   GuidSize = 38;
@@ -646,19 +644,9 @@ begin
     begin
       If not FMemoryData.FClearing Then
        FMemoryData.FRecords.Remove(Self);
-      {$IFDEF FPC}
        ReallocMem(FBlobs, 0);
        ReallocMem(FData, 0);
-      {$ELSE}
-       {$IF CompilerVersion <= 22}
-        If FMemoryData.BlobFieldCount > 0 Then
-         Finalize(PMemBlobArray(@FBlobs)^[0], FMemoryData.BlobFieldCount);
-       {$ELSE}
-        ReallocMem(FBlobs, 0);
-       {$IFEND}
-       ReallocMem(FData, 0);
-      {$ENDIF}
-     FMemoryData := Nil;
+       FMemoryData := Nil;
     end;
     if Value <> nil then
      Begin
@@ -716,7 +704,7 @@ begin
   FOneValueInArray := True;
   FDataSetClosed := False;
   FTrimEmptyString := True;
-  FRESTDWStorage := nil;
+  FStorageDataType := nil;
 end;
 destructor TRESTDWMemTable.Destroy;
 var
@@ -1433,7 +1421,7 @@ begin
             Else
              Result := False;
            End
-          Else If State in [dsEdit, dsInsert] Then
+          Else If State in [dsEdit] Then
            Begin
             Result := True;
             aBytes := PMemBlobArray(Records[RecNo -1].Blobs)^[Field.Offset];
@@ -1465,17 +1453,17 @@ begin
             Else
              Result := False;
            End
-          Else
+          Else If State in [dsInsert] Then
            Begin
-            {$IFNDEF FPC}
-             {$IF CompilerVersion <= 22}
-              SetLength(TRESTDWBytes(Buffer), 0);
-             {$ELSE}
-              SetLength(Buffer, 0);
-             {$IFEND}
-            {$ELSE}
-             SetLength(TRESTDWBytes(Buffer), 0);
-            {$ENDIF}
+//            {$IFNDEF FPC}
+//             {$IF CompilerVersion <= 22}
+//              SetLength(TRESTDWBytes(Buffer), 0);
+//             {$ELSE}
+//              SetLength(Buffer, 0);
+//             {$IFEND}
+//            {$ELSE}
+//             SetLength(TRESTDWBytes(Buffer), 0);
+//            {$ENDIF}
             Result := False;
            End;
          End
@@ -1506,16 +1494,16 @@ begin
        End
       Else
        Begin
-        {$IFNDEF FPC}
-         {$IF CompilerVersion <= 22}
-          If State = dsBrowse Then
-           SetLength(TRESTDWBytes(Buffer), 0);
-         {$ELSE}
-          SetLength(Buffer, 0);
-         {$IFEND}
-        {$ELSE}
-         SetLength(TRESTDWBytes(Buffer), 0);
-        {$ENDIF}
+//        {$IFNDEF FPC}
+//         {$IF CompilerVersion <= 22}
+//          If State = dsBrowse Then
+//           SetLength(TRESTDWBytes(Buffer), 0);
+//         {$ELSE}
+//          SetLength(Buffer, 0);
+//         {$IFEND}
+//        {$ELSE}
+//         SetLength(TRESTDWBytes(Buffer), 0);
+//        {$ENDIF}
         Result := False;
        End;
     End;
@@ -1725,7 +1713,10 @@ end;
 
 procedure TRESTDWMemTable.SetFieldData(Field: TField; Buffer: TJvValueBuffer);
 begin
-  InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer[0]){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer);
+ If Length(Buffer) > 0 Then
+  InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer[0]){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer)
+ Else
+   InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer);
 end;
 {$IFNDEF NEXTGEN}
   {$IFDEF RTL240_UP}
@@ -2343,7 +2334,9 @@ begin
 end;
 function TRESTDWMemTable.GetRecordCount: Integer;
 begin
-  Result := FRecords.Count;
+  Result := 0;
+  if state <> dsInactive then
+    Result := FRecords.Count;
 end;
 function TRESTDWMemTable.GetRecNo: Integer;
 begin
@@ -2481,6 +2474,15 @@ Begin
   Finally
    FreeAndNil(aFields);
   End;
+End;
+
+procedure TRESTDWMemTable.AfterLoad;
+Begin
+  try
+    SetState(dsInactive);
+  finally
+    SetState(dsBrowse);
+  end;
 End;
 
 procedure TRESTDWMemTable.Notification(AComponent: TComponent; Operation: TOperation);
@@ -2700,7 +2702,7 @@ procedure TRESTDWMemTable.LoadFromStream(Stream: TStream);
 var
   stor : TRESTDWStorageBinRDW;
 begin
-  if FRESTDWStorage = nil then begin 
+  if FStorageDataType = nil then begin
     stor := TRESTDWStorageBinRDW.Create(nil);
     try
       stor.LoadFromStream(Self, Stream);
@@ -2709,7 +2711,7 @@ begin
     end;
   end
   else begin
-    FRESTDWStorage.LoadFromStream(Self, Stream);
+    FStorageDataType.LoadFromStream(Self, Stream);
   end;
 end;
 
@@ -2821,7 +2823,7 @@ procedure TRESTDWMemTable.SaveToStream(var Stream: TStream);
 var
   stor : TRESTDWStorageBinRDW;
 begin
-  if FRESTDWStorage = nil then begin  
+  if FStorageDataType = nil then begin
     stor := TRESTDWStorageBinRDW.Create(nil);
     try
       stor.SaveToStream(TDataset(Self), Stream);
@@ -2830,7 +2832,7 @@ begin
     end;
   end
   else begin
-    FRESTDWStorage.SaveToStream(TDataset(Self), Stream);
+    FStorageDataType.SaveToStream(TDataset(Self), Stream);
   end;
 end;
 
