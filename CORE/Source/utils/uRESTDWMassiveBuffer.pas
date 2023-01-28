@@ -112,7 +112,6 @@ End;
   Function    GetOldValue    : Variant;
   Procedure   SetValue(Value : Variant);
   Function    GetModified    : Boolean;
-  Procedure   SetFieldType(Value : TObjectValue);
  Protected
  Public
   Constructor Create(MassiveFields : TList; FieldIndex : Integer);
@@ -124,7 +123,7 @@ End;
   Property    AutoGenerateValue : Boolean      Read vAutoGenerateValue Write vAutoGenerateValue;
   Property    KeyField          : Boolean      Read vKeyField          Write vKeyField;
   Property    ReadOnly          : Boolean      Read vReadOnly          Write vReadOnly;
-  Property    FieldType         : TObjectValue Read vFieldType         Write SetFieldType;
+  Property    FieldType         : TObjectValue Read vFieldType         Write vFieldType;
   Property    FieldName         : String       Read vFieldName         Write vFieldName;
   Property    Size              : Integer      Read vSize              Write vSize;
   Property    Precision         : Integer      Read vPrecision         Write vPrecision;
@@ -361,7 +360,7 @@ End;
   Property Dataset          : TRESTDWClientSQLBase Read vDataset;
  End;
 
- TRESTDWMassiveCacheValue = TStream;
+ TRESTDWMassiveCacheValue = String;
 
  PMassiveCacheValue  = ^TRESTDWMassiveCacheValue;
  TRESTDWMassiveCacheList = Class(TList)
@@ -398,11 +397,12 @@ End;
  Private
   MassiveCacheList        : TRESTDWMassiveCacheList;
   MassiveCacheDatasetList : TRESTDWMassiveCacheDatasetList;
+  vReflectChanges         : Boolean;
   vMassiveType            : TMassiveType;
  Public
   Function    MassiveCount      : Integer;
-  Procedure   SaveToStream(Var aStream : TStream);
-  Procedure   Add(Value         : TStream;
+  Function    ToJSON            : String;
+  Procedure   Add(Value         : String;
                   Const Dataset : TDataset);
   Procedure   ProcessChanges(Value : String);
   Procedure   Clear;
@@ -410,6 +410,7 @@ End;
   Destructor  Destroy;Override;                      //Destroy a Classe
  Published
   Property    MassiveType       : TMassiveType Read vMassiveType    Write vMassiveType;
+  Property    ReflectChanges    : Boolean      Read vReflectChanges Write vReflectChanges;
 End;
 
  TRESTDWMassiveCacheSQLValue = Class(TCollectionItem)
@@ -579,18 +580,6 @@ Begin
    TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].SetModified(True);
    vIsNull := VarIsNull(Value);
   End;
-End;
-
-Procedure TMassiveField.SetFieldType(Value : TObjectValue);
-Var
- vRecNo : Integer;
-Begin
- vFieldType := Value;
- vRecNo := TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo;
- If vRecNo <= 0 Then
-  TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo := 1;
- vRecNo := TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vRecNo;
- TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].vJSONValue.Encoded := False;
 End;
 
 Function TMassiveField.GetModified : Boolean;
@@ -3119,8 +3108,8 @@ begin
   Begin
    If Assigned(TList(Self).Items[Index]) Then
     Begin
-     If Assigned(TRESTDWMassiveCacheValue(TList(Self).Items[Index]^)) Then
-      TRESTDWMassiveCacheValue(TList(Self).Items[Index]^).Free;
+     If TRESTDWMassiveCacheValue(TList(Self).Items[Index]^) <> '' Then
+      TRESTDWMassiveCacheValue(TList(Self).Items[Index]^) := '';
      {$IFDEF FPC}
       Dispose(PMassiveCacheValue(TList(Self).Items[Index]));
      {$ELSE}
@@ -3139,7 +3128,7 @@ end;
 
 function TRESTDWMassiveCacheList.GetRec(Index: Integer): TRESTDWMassiveCacheValue;
 begin
- Result := Nil;
+ Result := '';
  If (Index < Self.Count) And (Index > -1) Then
   Result := TRESTDWMassiveCacheValue(TList(Self).Items[Index]^);
 end;
@@ -3155,6 +3144,7 @@ end;
 Constructor TRESTDWMassiveCache.Create(AOwner: TComponent);
 Begin
   inherited;
+ vReflectChanges         := False;
  MassiveCacheList        := TRESTDWMassiveCacheList.Create;
  vMassiveType            := mtMassiveCache;
  MassiveCacheDatasetList := TRESTDWMassiveCacheDatasetList.Create;
@@ -3181,7 +3171,6 @@ Var
  vBookmark        : String;
  Dataset          : TDataset;
  vActualRecB      : Integer;
- aBookmark        : TBookmark;
  vBookmarkD       : String;
  vOldReadOnly     : Boolean;
  vStringStream    : TMemoryStream;
@@ -3213,7 +3202,6 @@ Begin
      vActualRecB   := DecodeREC(vBookmark, vLastTimeB);
      If Dataset <> Nil Then
       Begin
-       aBookmark := Dataset.GetBookmark;
        If (vActualRecB > -1) Then
         Begin
          If Dataset Is TRESTDWClientSQL Then
@@ -3517,7 +3505,6 @@ Begin
           FreeAndNil(bJsonValueX);
          End;
         End;
-       Dataset.GotoBookmark(aBookmark);
       End;
     Finally
      FreeAndNil(bJsonValueB);
@@ -3529,12 +3516,15 @@ Begin
  End;
 End;
 
-Procedure TRESTDWMassiveCache.Add(Value         : TStream;
-                                  Const Dataset : TDataset);
+Procedure TRESTDWMassiveCache.Add(Value         : String;
+                              Const Dataset : TDataset);
 Begin
  MassiveCacheList.Add(Value);
- If Dataset is TRESTDWClientSQLBase Then
-  MassiveCacheDatasetList.Add(Dataset);
+ If vReflectChanges Then
+  Begin
+   If Dataset is TRESTDWClientSQLBase Then
+    MassiveCacheDatasetList.Add(Dataset);
+  End;
 End;
 
 Procedure TRESTDWMassiveCache.Clear;
@@ -3542,25 +3532,24 @@ Begin
  MassiveCacheList.ClearAll;
 End;
 
-Procedure TRESTDWMassiveCache.SaveToStream(Var aStream : TStream);
+Function TRESTDWMassiveCache.ToJSON : String;
 Var
- I            : Integer;
- BufferStream : TRESTDWBufferBase; //Pacote de Entrada
+ I : Integer;
+ vMassiveLine : String;
 Begin
- If Not Assigned(aStream) Then
-  Exit;
- aStream.Position := 0;
- BufferStream := TRESTDWBufferBase.Create;
- Try
-  For I := 0 To MassiveCacheList.Count -1 Do
-   Begin
-    If Assigned(MassiveCacheList.Items[I]) Then
-     BufferStream.InputStream(MassiveCacheList.Items[I]);
-   End;
- Finally
-  BufferStream.SaveToStream(aStream);
-  FreeAndNil(BufferStream);
- End;
+ Result := '[%s]';
+ vMassiveLine := '';
+ For I := 0 To MassiveCacheList.Count -1 Do
+  Begin
+   If Length(vMassiveLine) = 0 Then
+    vMassiveLine := MassiveCacheList.Items[I]
+   Else
+    vMassiveLine := vMassiveLine + ', ' + MassiveCacheList.Items[I];
+  End;
+ If vMassiveLine <> '' Then
+  Result := Format(Result, [vMassiveLine])
+ Else
+  Result := vMassiveLine;
 End;
 
 Destructor TRESTDWMassiveCache.Destroy;

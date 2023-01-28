@@ -5444,7 +5444,6 @@ Var
  vError        : Boolean;
  vMessageError : String;
  vTempJSON     : TJSONValue;
- vBufferStream : TStream;
 Begin
  vTempJSON     := Nil;
  If ServerMethodsClass <> Nil Then
@@ -5476,15 +5475,9 @@ Begin
             If Not TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ConnectionSet Then
              Raise Exception.Create(cInvalidDriverConnection);
             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.PrepareConnection(ConnectionDefs);
-            vBufferStream := TMemoryStream.Create;
-            Try
-             DWParams.ItemsString['MassiveCache'].SaveToStream(vBufferStream);
-             vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdates_MassiveCache(vBufferStream, vError, vMessageError);
-            Finally
-             FreeAndNil(vBufferStream);
-            End;
-//            vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdates_MassiveCache(DWParams.ItemsString['MassiveCache'].AsString,
-//                                                                                                   vError,  vMessageError);
+//            DWParams.ItemsString['MassiveCache'].CriptOptions.Use := False;
+            vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdates_MassiveCache(DWParams.ItemsString['MassiveCache'].AsString,
+                                                                                                   vError,  vMessageError);
            Except
             On E : Exception Do
              Begin

@@ -1712,26 +1712,12 @@ Begin
 end;
 
 procedure TRESTDWMemTable.SetFieldData(Field: TField; Buffer: TJvValueBuffer);
-Begin
- {$IFNDEF FPC}
-  {$IF CompilerVersion <= 22}
-   If Length(TRESTDWBytes(Buffer)) > 0 Then
-    InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer[0]){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer)
-   Else
-    InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer);
-  {$ELSE}
-   If Length(Buffer) > 0 Then
-    InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer[0]){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer)
-   Else
-    InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer);
-  {$IFEND}
- {$ELSE}
-  If Length(TRESTDWBytes(Buffer)) > 0 Then
-   InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer[0]){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer)
-  Else
+begin
+ If Length(Buffer) > 0 Then
+  InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer[0]){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer)
+ Else
    InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer);
- {$ENDIF}
-End;
+end;
 {$IFNDEF NEXTGEN}
   {$IFDEF RTL240_UP}
 procedure TRESTDWMemTable.SetFieldData(Field: TField; Buffer: Pointer);
