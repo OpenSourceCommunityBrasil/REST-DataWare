@@ -4513,7 +4513,6 @@ Var
    case vErrorCode of
      401: ErrorMessage := cInvalidAuth;
      404: ErrorMessage := cEventNotFound;
-     500: ErrorMessage := cInvalidInternalError;
    end;
   Except
    On E : EIdHTTPProtocolException Do
