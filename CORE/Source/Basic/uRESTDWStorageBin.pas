@@ -657,7 +657,15 @@ Begin
           end;
       end;
     end;
+   Try
     Dataset.SetMemoryRecordData(PActualRecord,I);
+   Finally
+    {$IFNDEF FPC}
+     Dispose(PActualRecord);
+    {$ELSE}
+     Dispose(PJvMemBuffer(@PActualRecord));
+    {$ENDIF}
+   End;
   end;
 end;
 

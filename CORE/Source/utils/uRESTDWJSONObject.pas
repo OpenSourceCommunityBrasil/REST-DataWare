@@ -1963,6 +1963,8 @@ End;
 
 Procedure TJSONValue.Clear;
 Begin
+ If Not Assigned(Self) Then
+  Exit;
  vNullValue := True;
  Setvalue('');
  ClearFieldList;
@@ -4204,6 +4206,8 @@ End;
 Procedure TJSONValue.SetValue(Value  : Variant;
                               Encode : Boolean);
 Begin
+ If Not Assigned(Self) Then
+  Exit;
  vEncoded   := Encode;
  vNullValue := VarIsNull(Value);
  If vObjectValue in [ovDate, ovTime, ovDateTime, ovTimeStamp] then     // ajuste massive
@@ -4273,6 +4277,8 @@ Var
 {$IFEND}
 {$ENDIF}
 Begin
+ If Not Assigned(Self) Then
+  Exit;
  SetLength(aValue, 0);
  If VarIsNull(bValue) Then
   Begin

@@ -1,4 +1,4 @@
-unit uRESTDWZeosDriver;
+﻿unit uRESTDWZeosDriver;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {$IFNDEF FPC}{$I ZComponent.inc}{$ENDIF}
@@ -112,6 +112,7 @@ type
 
     function getConectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
+    Procedure zAfterPost(DataSet: TDataSet);
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
@@ -204,6 +205,11 @@ begin
   inherited Destroy;
 end;
 
+Procedure TRESTDWZeosDriver.zAfterPost(DataSet: TDataSet);
+Begin
+ TZQuery(DataSet).RefreshCurrentRow(True);
+End;
+
 function TRESTDWZeosDriver.getQuery: TRESTDWDrvQuery;
 var
   qry : TZQuery;
@@ -211,9 +217,13 @@ begin
   qry := TZQuery.Create(Self);
   qry.Connection := TZConnection(Connection);
   {$IFDEF ZEOS80UP}
-    qry.Transaction := FTransaction;
+   qry.Transaction := FTransaction;
   {$ENDIF}
-
+  {$IFNDEF FPC}
+   qry.AfterPost := zAfterPost;
+  {$ELSE}
+   qry.AfterPost := @zAfterPost;
+  {$ENDIF}
   Result := TRESTDWZeosQuery.Create(qry);
 end;
 
