@@ -919,22 +919,31 @@ Procedure TMassiveValues.Delete(Index: Integer);
 Begin
  If (Index < Self.Count) And (Index > -1) Then
   Begin
+   {$IFDEF FPC}
+   If Assigned(PMassiveValue(TList(Self).Items[Index])) Then
+    Begin
+     If Assigned(PMassiveValue(TList(Self).Items[Index])^) Then
+      Begin
+       Try
+        PMassiveValue(TList(Self).Items[Index])^.Free;
+        Dispose(PMassiveValue(TList(Self).Items[Index]));
+       Except
+       End;
+      End;
+    End;
+   {$ELSE}
    If Assigned(TList(Self).Items[Index]) Then
     Begin
      If Assigned(TMassiveValue(TList(Self).Items[Index]^)) Then
       Begin
        Try
-        If Assigned(TMassiveValue(TList(Self).Items[Index]^)) Then
-         FreeAndNil(TMassiveValue(TList(Self).Items[Index]^));
-        {$IFDEF FPC}
-         Dispose(PMassiveValue(TList(Self).Items[Index]));
-        {$ELSE}
-         Dispose(TList(Self).Items[Index]);
-        {$ENDIF}
+        TMassiveValue(TList(Self).Items[Index]^).Free;
+        Dispose(TList(Self).Items[Index]);
        Except
        End;
       End;
     End;
+   {$ENDIF}
    TList(Self).Delete(Index);
   End;
 End;
