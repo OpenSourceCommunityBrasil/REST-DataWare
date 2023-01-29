@@ -1,4 +1,4 @@
-unit uRESTDWDriverBase;
+﻿unit uRESTDWDriverBase;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -209,46 +209,46 @@ Type
  Protected
   Procedure setConnection(AValue : TComponent); Virtual;
   Function  isConnected          : Boolean;     Virtual;
-
   Function  connInTransaction    : Boolean;     Virtual;
   Procedure connStartTransaction; Virtual;
   Procedure connRollback;         Virtual;
   Procedure connCommit;           Virtual;
-
   procedure BuildReflectionChanges(Var ReflectionChanges : String;
                                    MassiveDataset        : TMassiveDatasetBuffer;
-                                   Query                 : TDataset);
+                                   Query                 : TDataset;
+                                   MassiveCache : Boolean);
   procedure PrepareDataQuery(var Query: TRESTDWDrvQuery;
                              MassiveDataset: TMassiveDatasetBuffer;
                              Params : TRESTDWParams;
+                             aMassiveCache        : boolean;
                              var ReflectionChanges : string;
                              var Error: boolean;
                              var MessageError: string);
   procedure SetUpdateBuffer(var Query : TRESTDWDrvQuery;
                             MassiveDataset : TMassiveDatasetBuffer;
                             IParam : integer; All: boolean = False);
-
   procedure PrepareDataTable(var Query: TRESTDWDrvTable;
                              MassiveDataset: TMassiveDatasetBuffer;
                              Params : TRESTDWParams;
+                             aMassiveCache         : Boolean;
                              var ReflectionChanges : String;
                              var Error: boolean;
                              var MessageError: string);
-
   Function ApplyUpdates      (MassiveDataset        : TMassiveDatasetBuffer;
                               SQL                   : String;
                               Params                : TRESTDWParams;
                               Var Error             : Boolean;
                               Var MessageError      : String;
                               Var RowsAffected      : Integer)   : TJSONValue;Overload;Virtual;
-
-
   Function isMinimumVersion(major,
                             minor,
                             sub    : Integer) : Boolean; Overload;
   Function isMinimumVersion(major,
                             minor  : Integer) : Boolean; Overload;
 
+  Function ApplyUpdates_MassiveCache  (MassiveDataset: TMassiveDatasetBuffer;
+                                       Var Error        : Boolean;
+                                       Var MessageError : String): String;Overload;
  Public
   constructor Create(AOwner : TComponent); override;
   destructor Destroy; override;
@@ -267,7 +267,6 @@ Type
                               valor                 : Integer = 1) : Integer;Overload;Virtual;
   Function GetGenID          (GenName               : String;
                               valor                 : Integer = 1) : Integer;Overload;Virtual;
-
   Function ApplyUpdates      (MassiveStream         : TStream;
                               SQL                   : String;
                               Params                : TRESTDWParams;
@@ -1577,7 +1576,7 @@ Var
             end;
           end;
         end;
-        PrepareDataTable(Query, MassiveDataset, Params, vResultReflection, Error, MessageError);
+        PrepareDataTable(Query, MassiveDataset, Params, False, vResultReflection, Error, MessageError);
         try
           if (not (MassiveDataset.ReflectChanges)) or
              ((MassiveDataset.ReflectChanges) and
@@ -1770,7 +1769,7 @@ var
             end;
           end;
         end;
-        PrepareDataQuery(Query, MassiveDataset, Params, vResultReflection, Error, MessageError);
+        PrepareDataQuery(Query, MassiveDataset, Params, MassiveDataset.ReflectChanges, vResultReflection, Error, MessageError);
         try
           if (not (MassiveDataset.ReflectChanges)) or
              ((MassiveDataset.ReflectChanges) and
@@ -1959,7 +1958,7 @@ var
             end;
           end;
         end;
-        PrepareDataTable(Query, MassiveDataset, Params, vResultReflection, Error, MessageError);
+        PrepareDataTable(Query, MassiveDataset, Params, True, vResultReflection, Error, MessageError);
         try
           if (not (MassiveDataset.ReflectChanges)) or
              ((MassiveDataset.ReflectChanges) and
@@ -2108,9 +2107,191 @@ end;
 Function TRESTDWDriverBase.ApplyUpdates_MassiveCache  (MassiveStream         : TStream;
                                                        Var Error             : Boolean;
                                                        Var MessageError      : String) : TJSONValue;
+Var
+ MassiveDataset : TMassiveDatasetBuffer;
+ aMassive       : TStream;
+ BufferStream   : TRESTDWBufferBase; //Pacote de Entrada
+ vLineString    : String;
 Begin
-
+ aMassive       := Nil;
+ MassiveDataset := Nil;
+ vLineString    := '';
+ Result         := Nil;
+ BufferStream   := TRESTDWBufferBase.Create;
+ Try
+  BufferStream.LoadToStream(MassiveStream);
+  While Not BufferStream.Eof Do
+   Begin
+    Try
+     aMassive       := BufferStream.ReadStream;
+     If aMassive <> Nil Then
+      Begin
+       MassiveDataset := TMassiveDatasetBuffer.Create(nil);
+       MassiveDataset.LoadFromStream(aMassive);
+       If vLineString = '' Then
+        vLineString := ApplyUpdates_MassiveCache(MassiveDataset, Error, MessageError)
+       Else
+        vLineString := vLineString + ', ' + ApplyUpdates_MassiveCache(MassiveDataset, Error, MessageError);
+       If Error Then
+        Break;
+      End;
+    Finally
+     If Assigned(MassiveDataset) Then
+      FreeAndNil(MassiveDataset);
+     If Assigned(aMassive) Then
+      FreeAndNil(aMassive);
+    End;
+   End;
+ Finally
+  Result := TJSONValue.Create;
+  If (vLineString <> '') Then
+   Begin
+    Result.Encoding := Encoding;
+    Result.Encoded := EncodeStringsJSON;
+    Result.SetValue('[' + vLineString + ']');
+    Error := False;
+   End
+  Else
+   Result.SetValue('[]');
+  FreeAndNil(BufferStream);
+ End;
 End;
+
+Function TRESTDWDriverBase.ApplyUpdates_MassiveCache  (MassiveDataset   : TMassiveDatasetBuffer;
+                                                       Var Error        : Boolean;
+                                                       Var MessageError : String): String;
+var
+ vTempQuery        : TRESTDWDrvQuery;
+ vStateResource,
+ vMassiveLine      : boolean;
+ vResultReflection : string;
+ Function LoadMassive(Var Query : TRESTDWDrvQuery) : Boolean;
+ Var
+  A : integer;
+ Begin
+  Result := False;
+  Try
+   If not connInTransaction Then
+    Begin
+     connStartTransaction;
+     If Assigned(FServerMethod) Then
+      Begin
+       If Assigned(FServerMethod.OnMassiveAfterStartTransaction) Then
+        FServerMethod.OnMassiveAfterStartTransaction(MassiveDataset);
+      End;
+     Try
+      MassiveDataset.First;
+      If Assigned(FServerMethod) Then
+       Begin
+        If Assigned(FServerMethod.OnMassiveBegin) Then
+         FServerMethod.OnMassiveBegin(MassiveDataset);
+       End;
+      For A := 1 to MassiveDataset.RecordCount Do
+       Begin
+        Query.SQL.Clear;
+        If Assigned(FServerMethod) Then
+         Begin
+          vMassiveLine := False;
+          If Assigned(FServerMethod.OnMassiveProcess) Then
+           Begin
+            FServerMethod.OnMassiveProcess(MassiveDataset, vMassiveLine);
+            If vMassiveLine Then
+             Begin
+              MassiveDataset.Next;
+              Continue;
+             End;
+           End;
+         End;
+         PrepareDataQuery(Query, MassiveDataset, nil, True, vResultReflection,  Error, MessageError);
+         Try
+          If (Not (MassiveDataset.ReflectChanges)) Or
+             ((MassiveDataset.ReflectChanges)      And
+             (MassiveDataset.MassiveMode In [mmExec, mmDelete])) Then
+           Begin
+            Query.ExecSQL;
+            // Inclusão do método de after massive line process
+            If Assigned(FServerMethod) Then
+             Begin
+              If Assigned(FServerMethod.OnAfterMassiveLineProcess) then
+               FServerMethod.OnAfterMassiveLineProcess(MassiveDataset, TDataset(Query.Owner));
+             End;
+           End;
+         Except
+          On E: Exception Do
+           Begin
+            Error := True;
+            Result := False;
+            MessageError := E.Message;
+            If connInTransaction Then
+             connRollback;
+            Exit;
+           End;
+         End;
+        MassiveDataset.Next;
+       End;
+     Finally
+      If Not Error Then
+       Begin
+        Try
+         Result := True;
+         If connInTransaction Then
+          Begin
+           If Assigned(FServerMethod) Then
+            Begin
+             If Assigned(FServerMethod.OnMassiveAfterBeforeCommit) Then
+              FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
+            End;
+           connCommit;
+           If Assigned(FServerMethod) Then
+            If Assigned(FServerMethod.OnMassiveAfterAfterCommit) Then
+             FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
+          End;
+        Except
+         On E: Exception Do
+          Begin
+           Error := True;
+           Result := False;
+           MessageError := E.Message;
+           If connInTransaction then
+            connRollback;
+          End;
+        End;
+       End;
+      If Assigned(FServerMethod) Then
+       If Assigned(FServerMethod.OnMassiveEnd) Then
+        FServerMethod.OnMassiveEnd(MassiveDataset);
+     End;
+    End;
+  Finally
+
+  End;
+ End;
+Begin
+ {$IFNDEF FPC}inherited;{$ENDIF}
+  vResultReflection := '';
+  Result := '';
+  try
+    Error := False;
+    vTempQuery := getQuery;
+    vStateResource := isConnected;
+    if not vStateResource then
+      Connect;
+    vTempQuery.SQL.Clear;
+    LoadMassive(vTempQuery);
+    if (vResultReflection <> '') Then
+     Begin
+      Result := vResultReflection;
+      Error := False;
+     End
+    Else
+     Result := '';
+    If Not vStateResource Then
+     Disconect;
+  Finally
+   vTempQuery.Close;
+   vTempQuery.Free;
+  End;
+end;
 
 Function TRESTDWDriverBase.ApplyUpdates_MassiveCache  (MassiveCache     : String;
                                                        Var Error        : Boolean;
@@ -2119,7 +2300,6 @@ var
   vTempQuery: TRESTDWDrvQuery;
   vStateResource, vMassiveLine: boolean;
   vResultReflection: string;
-
   function LoadMassive(var Query: TRESTDWDrvQuery): boolean;
   var
     MassiveDataset: TMassiveDatasetBuffer;
@@ -2161,7 +2341,7 @@ var
                 end;
               end;
             end;
-            PrepareDataQuery(Query, MassiveDataset, nil, vResultReflection,  Error, MessageError);
+            PrepareDataQuery(Query, MassiveDataset, nil, MassiveDataset.ReflectChanges, vResultReflection,  Error, MessageError);
             try
               if (not (MassiveDataset.ReflectChanges)) or
                 ((MassiveDataset.ReflectChanges) and
@@ -3811,6 +3991,7 @@ End;
 procedure TRESTDWDriverBase.PrepareDataQuery(var Query: TRESTDWDrvQuery;
                                              MassiveDataset: TMassiveDatasetBuffer;
                                              Params: TRESTDWParams;
+                                             aMassiveCache        : boolean;
                                              var ReflectionChanges: string;
                                              var Error: boolean;
                                              var MessageError: string);
@@ -3970,13 +4151,13 @@ begin
             raise Exception.Create(PChar('Record not found to update...'));
         end;
       end;
-      BuildDatasetLine(TRESTDWDrvDataset(Query), MassiveDataset);
+      BuildDatasetLine(TRESTDWDrvDataset(Query), MassiveDataset, aMassiveCache);
     finally
       case MassiveDataset.MassiveMode of
         mmInsert, mmUpdate: Query.Post;
       end;
       //Retorno de Dados do ReflectionChanges
-      BuildReflectionChanges(vResultReflectionLine, MassiveDataset, TDataset(Query.Owner));
+      BuildReflectionChanges(vResultReflectionLine, MassiveDataset, TDataset(Query.Owner), aMassiveCache);
       if ReflectionChanges = '' then
         ReflectionChanges := vResultReflectionLine
       else
@@ -4174,6 +4355,7 @@ end;
 procedure TRESTDWDriverBase.PrepareDataTable(var Query: TRESTDWDrvTable;
                                              MassiveDataset: TMassiveDatasetBuffer;
                                              Params: TRESTDWParams;
+                                             aMassiveCache : Boolean;
                                              var ReflectionChanges: String;
                                              var Error: boolean;
                                              var MessageError: string);
@@ -4246,7 +4428,7 @@ begin
             raise Exception.Create(PChar('Record not found to update...'));
         end;
       end;
-      BuildDatasetLine(TRESTDWDrvDataset(Query), MassiveDataset);
+      BuildDatasetLine(TRESTDWDrvDataset(Query), MassiveDataset, aMassiveCache);
     finally
       case MassiveDataset.MassiveMode of
         mmInsert, mmUpdate: begin
@@ -4256,7 +4438,7 @@ begin
         end;
       end;
       //Retorno de Dados do ReflectionChanges
-      BuildReflectionChanges(vResultReflectionLine, MassiveDataset, TDataset(Query));
+      BuildReflectionChanges(vResultReflectionLine, MassiveDataset, TDataset(Query), aMassiveCache);
       if ReflectionChanges = '' then
         ReflectionChanges := vResultReflectionLine
       else
@@ -4275,8 +4457,8 @@ begin
 end;
 
 Procedure TRESTDWDriverBase.BuildDatasetLine(var Query: TRESTDWDrvDataset;
-                            Massivedataset: TMassivedatasetBuffer;
-                            MassiveCache: Boolean);
+                                             Massivedataset: TMassivedatasetBuffer;
+                                             MassiveCache: Boolean);
 Var
  I, A              : Integer;
  vMasterField,
@@ -4493,7 +4675,13 @@ Begin
           Query.Fields[I].Required := False;
          If A > -1 Then
           Query.Fields[I].Value := A;
-         Continue;
+         If Not MassiveDataset.ReflectChanges Then
+          Continue;
+//         Else
+//          Begin
+//           MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).Value := A;
+//           MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).FieldType := ovInteger;
+//          End;
         End
        Else If (MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).isNull) Or
                (MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).ReadOnly) Then
@@ -4693,7 +4881,8 @@ End;
 
 procedure TRESTDWDriverBase.BuildReflectionChanges(var ReflectionChanges: String;
                                                    MassiveDataset: TMassiveDatasetBuffer;
-                                                   Query: TDataset);
+                                                   Query: TDataset;
+                                                   MassiveCache : Boolean);
 Var
   I: Integer;
   vTempValue, vStringFloat,
@@ -4707,10 +4896,12 @@ Begin
   vReflectionLine := '';
   vFieldChanged := False;
   vStringStream := nil;
-  If MassiveDataset.Fields.FieldByName(RESTDWFieldBookmark) <> Nil Then Begin
-    vReflectionLines := Format('{"dwbookmark":"%s"%s}',
-                               [MassiveDataset.Fields.FieldByName(RESTDWFieldBookmark).Value,
-                               ', "reflectionlines":[%s]']);
+  If MassiveDataset.Fields.FieldByName(RESTDWFieldBookmark) <> Nil Then
+   Begin
+    If Not MassiveCache then
+     vReflectionLines := Format('{"dwbookmark":"%s"%s}', [MassiveDataset.Fields.FieldByName(RESTDWFieldBookmark).Value,', "reflectionlines":[%s]'])
+    Else
+     vReflectionLines := Format('{"dwbookmark":"%s"%s, "mycomptag":"%s"}', [MassiveDataset.Fields.FieldByName(RESTDWFieldBookmark).Value, ', "reflectionlines":[%s]', MassiveDataset.MyCompTag]);
     For I := 0 To Query.Fields.Count - 1 Do Begin
       MassiveField := MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName);
       If MassiveField <> Nil Then Begin

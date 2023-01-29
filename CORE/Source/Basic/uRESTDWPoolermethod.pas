@@ -188,7 +188,7 @@ Uses
                                    ConnectTimeOut          : Integer = 3000;
                                    ConnectionDefs          : TObject           = Nil;
                                    RESTClientPooler        : TRESTClientPoolerBase = Nil)    : String;Overload;
-   Function  ApplyUpdates_MassiveCache(MassiveCache,
+   Function  ApplyUpdates_MassiveCache(MassiveCache            : TStream;
                                        Pooler, Method_Prefix   : String;
                                        Var Error               : Boolean;
                                        Var MessageError        : String;
@@ -1102,16 +1102,16 @@ Begin
  End;
 End;
 
-Function TRESTDWPoolerMethodClient.ApplyUpdates_MassiveCache(MassiveCache,
-                                                         Pooler, Method_Prefix   : String;
-                                                         Var Error               : Boolean;
-                                                         Var MessageError        : String;
-                                                         Var SocketError         : Boolean;
-                                                         TimeOut                 : Integer = 3000;
-                                                         ConnectTimeOut          : Integer = 3000;
-                                                         ConnectionDefs          : TObject = Nil;
-                                                         ReflectChanges          : Boolean = False;
-                                                         RESTClientPooler        : TRESTClientPoolerBase = Nil) : TJSONValue;
+Function TRESTDWPoolerMethodClient.ApplyUpdates_MassiveCache(MassiveCache            : TStream;
+                                                             Pooler, Method_Prefix   : String;
+                                                             Var Error               : Boolean;
+                                                             Var MessageError        : String;
+                                                             Var SocketError         : Boolean;
+                                                             TimeOut                 : Integer = 3000;
+                                                             ConnectTimeOut          : Integer = 3000;
+                                                             ConnectionDefs          : TObject = Nil;
+                                                             ReflectChanges          : Boolean = False;
+                                                             RESTClientPooler        : TRESTClientPoolerBase = Nil) : TJSONValue;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse        : String;
@@ -1169,11 +1169,8 @@ Begin
  JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MassiveCache';
  JSONParam.ObjectDirection       := odIn;
- JSONParam.ObjectValue           := ovString;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.SetValue(RESTClientPoolerExec.CriptOptions.Encrypt(MassiveCache), JSONParam.Encoded)
- Else
-  JSONParam.SetValue(MassiveCache, JSONParam.Encoded);
+ JSONParam.ObjectValue           := ovBlob;
+ JSONParam.LoadFromStream(MassiveCache);
  DWParams.Add(JSONParam);
  JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
@@ -1215,7 +1212,7 @@ Begin
   End;
  Try
   Try
-   RESTClientPoolerExec.BinaryRequest := vBinaryRequest;
+   RESTClientPoolerExec.BinaryRequest := True;
    lResponse := RESTClientPoolerExec.SendEvent('ApplyUpdates_MassiveCache', DWParams);
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
