@@ -40,7 +40,7 @@ Uses
   Classes,
   DateUtils,
   SyncObjs,
-  ExtCtrls,
+  {$IF (CompilerVersion > 22)}vcl.ExtCtrls{$ELSE}ExtCtrls{$IFEND},
   uRESTDWComponentEvents,
   uRESTDWBasicTypes,
   uRESTDWJSONObject,
