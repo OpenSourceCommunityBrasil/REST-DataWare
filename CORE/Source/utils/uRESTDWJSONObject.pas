@@ -6,17 +6,17 @@ Unit uRESTDWJSONObject;
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambÃ©m tem por objetivo levar componentes compatÃ­veis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal vocÃª usuÃ¡rio que precisa
+ de produtividade e flexibilidade para produÃ§Ã£o de ServiÃ§os REST/JSON, simplificando o processo para vocÃª programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de OrganizaÃ§Ã£o dos Projetos
+ FlÃ¡vio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -374,7 +374,7 @@ Type
   // Propriedades Novas
   Property Value              : Variant          Read GetVariantValue     Write SetVariantValue;
   Property DefaultValue       : Variant          Read vDefaultValue       Write vDefaultValue;
-  // Novas definições por tipo
+  // Novas definiÃ§Ãµes por tipo
   Property AsBCD              : Currency         Read GetAsBCD            Write SetAsBCD;
   Property AsFMTBCD           : Currency         Read GetAsFMTBCD         Write SetAsFMTBCD;
   Property AsBoolean          : Boolean          Read GetAsBoolean        Write SetAsBoolean;
@@ -870,7 +870,7 @@ Begin
  vObjectValue       := ovString;
  vtagName           := 'TAGJSON';
  vBinary            := True;
- vUtf8SpecialChars  := True; //Adicionado por padrão para special Chars
+ vUtf8SpecialChars  := True; //Adicionado por padrÃ£o para special Chars
  vNullValue         := vBinary;
  vDataMode          := dmDataware;
  vOnWriterProcess   := Nil;
@@ -1112,7 +1112,7 @@ Begin
   If vEncoded Then
    Begin
     If (vObjectValue In [ovBytes,   ovVarBytes, ovStream, ovBlob,
-                         ovGraphic, ovOraBlob,  ovOraClob,
+                         ovGraphic, ovOraBlob,  ovOraClob,]) And (vBinary) Then
                          ovDate, ovTime, ovDateTime, ovTimeStamp,
                          ovOraTimeStamp, ovTimeStampOffset]) And (vBinary) Then
      vTempString := vTempString
@@ -1164,7 +1164,11 @@ Begin
    If (Result <> '')                And
       (Result <> '0')               And
       (Lowercase(Result) <> 'null') Then
-    Result := StrToDateTime(Result)
+    Begin
+     If (Pos('/', Result) = 0) And
+        (Pos('-', Result) <= 1) Then
+      Result := StrToDateTime(Result)UnixToDateTime(StrToInt64(Result));
+    End
    Else
     Result := 0;
   End;
@@ -1707,7 +1711,7 @@ Var
  {$IFEND}
  {$ENDIF}
 Begin
- // Recebe o parametro "DataType" para fazer a tipagem na função que gera a linha "GenerateLine"
+ // Recebe o parametro "DataType" para fazer a tipagem na funÃ§Ã£o que gera a linha "GenerateLine"
  // Tiago Istuque - Por Nemi Vieira - 29/01/2019
  vDataType        := DataType;
  vTypeObject      := toDataset;
@@ -1778,7 +1782,7 @@ Var
  {$IFEND}
  {$ENDIF}
 Begin
- // Recebe o parametro "DataType" para fazer a tipagem na função que gera a linha "GenerateLine"
+ // Recebe o parametro "DataType" para fazer a tipagem na funÃ§Ã£o que gera a linha "GenerateLine"
  // Tiago Istuque - Por Nemi Vieira - 29/01/2019
  vDataType        := DataType;
  vTypeObject      := toDataset;
@@ -1918,7 +1922,7 @@ Begin
     SizeOfString := Length(aValue);
     vTempValue   := '';
     SetString(vTempValue, PChar(@aValue[0]), SizeOfString);
-{ //Comentado deleção de nulos
+{ //Comentado deleÃ§Ã£o de nulos
     While pos(#0, vTempValue) > 0 Do
      Delete(vTempValue, pos(#0, vTempValue), 1);
 }
@@ -2284,7 +2288,7 @@ Begin
     vFieldDefinition := TFieldDefinition.Create;
     If DestDS.Fields.Count = 0 Then
      DestDS.FieldDefs.Clear;
-    //Removendo campos inválidos
+    //Removendo campos invÃ¡lidos
     For J := DestDS.Fields.Count - 1 DownTo 0 Do
      Begin
       If DestDS.Fields[J].FieldKind = fkData Then
