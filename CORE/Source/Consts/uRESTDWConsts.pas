@@ -30,7 +30,6 @@ Uses
   {$IFNDEF RESTDWLAMW}LCL,{$ENDIF}
   zstream, base64,
  {$ELSE}
-  EncdDecd,
   {$IFDEF POSIX}Posix.Unistd,{$ENDIF}
  {$ENDIF}
  SysUtils, DB, Classes,

@@ -5,8 +5,9 @@ unit uprincipal;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  ComCtrls, CheckLst, ValEdit;
+  Classes, SysUtils, fphttpclient, Forms, Controls, Graphics, Dialogs, ExtCtrls,
+  StdCtrls, ComCtrls, CheckLst, ValEdit,
+  urestfunctions;
 
 type
   TSplashFormStyle = record
@@ -21,12 +22,14 @@ type
 
   TForm1 = class(TForm)
     Button1: TButton;
+    cbInstallType1: TComboBox;
     CheckListBox1: TCheckListBox;
     CheckListBox2: TCheckListBox;
     CheckListBox3: TCheckListBox;
     CheckListBox4: TCheckListBox;
     ComboBox1: TComboBox;
     cbInstallType: TComboBox;
+    FPHTTPClient1: TFPHTTPClient;
     Image1: TImage;
     imConfirmBack: TImage;
     imInstallBack: TImage;
@@ -47,6 +50,7 @@ type
     imTheme: TImage;
     Label1: TLabel;
     Label2: TLabel;
+    Label3: TLabel;
     LabeledEdit1: TLabeledEdit;
     lDataEngine: TLabel;
     lDBWare: TLabel;
@@ -70,6 +74,7 @@ type
     lTheme: TLabel;
     mmConfirm: TMemo;
     mmLogInstall: TMemo;
+    OpenDialog1: TOpenDialog;
     pConfirmaRecursos: TPanel;
     pInstall: TPanel;
     pRecursos: TPanel;
@@ -77,6 +82,7 @@ type
     pLanguage: TPanel;
     selectionbox: TShape;
     IDESelector: TShape;
+    procedure Button1Click(Sender: TObject);
     procedure ConfigureInstallOptions(Sender: TObject);
     procedure FormClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -301,6 +307,17 @@ Custom
   case cbInstallType.ItemIndex of
     0: ;
   end;
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+var
+  RestClient: TRESTClient;
+  teste: string;
+begin
+  RestClient := TRESTClient.Create;
+  ShowMessage(TStringStream(RestClient.getRepoTags).DataString);
+  teste := TStringStream(RestClient.getRepoTags).DataString;
+  teste := TStringStream(RestClient.getRepoBranches).DataString;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);

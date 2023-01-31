@@ -75,6 +75,9 @@
     </RunParams>
     <RequiredPackages>
       <Item>
+        <PackageName Value="weblaz"/>
+      </Item>
+      <Item>
         <PackageName Value="LCL"/>
       </Item>
     </RequiredPackages>
@@ -104,6 +107,10 @@
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\ulocale.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>

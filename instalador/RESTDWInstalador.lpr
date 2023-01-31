@@ -3,26 +3,25 @@ program RESTDWInstalador;
 {$mode objfpc}{$H+}
 
 uses
-  {$IFDEF UNIX}
+ {$IFDEF UNIX}
   cthreads,
-  {$ENDIF}
-  {$IFDEF HASAMIGA}
+   {$ENDIF} {$IFDEF HASAMIGA}
   athreads,
-  {$ENDIF}
+   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms,
   uconsts in 'src\funcoes\uconsts.pas',
   ulocale in 'src\funcoes\ulocale.pas',
-  uprincipal in 'src\telas\uprincipal.pas';
+  uprincipal in 'src\telas\uprincipal.pas',
+  urestfunctions in 'src\telas\urestfunctions.pas';
 
 {$R *.res}
 
 begin
   RequireDerivedFormResource := True;
-  Application.Scaled:=True;
+  Application.Scaled := True;
   Application.Initialize;
   //Application.CreateForm(TfPrincipal, fPrincipal);
   Application.CreateForm(TForm1, Form1);
   Application.Run;
 end.
-

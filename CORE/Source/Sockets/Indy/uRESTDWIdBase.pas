@@ -30,7 +30,7 @@ Uses
   {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
   {$IFNDEF FPC}
     {$IF (CompilerVersion <= 22)}
-     EncdDecd, SyncObjs, uRESTDWMassiveBuffer,
+      SyncObjs, uRESTDWMassiveBuffer,
     {$ELSE}
       SyncObjs,
     {$IFEND}

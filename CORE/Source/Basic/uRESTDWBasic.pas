@@ -27,7 +27,6 @@ interface
 
 Uses
  {$IFNDEF FPC}
-  {$IF CompilerVersion <= 22}EncdDecd,{$IFEND}
   {$IF Defined(RESTDWFMX)}System.IOUtils,{$IFEND}
  {$ENDIF}
  SysUtils, Classes, Db, Variants, SyncObjs,

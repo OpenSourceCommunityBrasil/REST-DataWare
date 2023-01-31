@@ -30,9 +30,6 @@ package RESTDWShellServices;
 {$IMPLICITBUILD OFF}
 
 requires
-  rtl,
-  soaprtl,
-  inet,
   RESTDWCore;
 
 contains

@@ -30,7 +30,6 @@ package RESTDWUniDACDriver;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl,
   RESTDWCore;
 
 contains

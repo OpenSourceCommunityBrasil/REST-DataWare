@@ -31,7 +31,6 @@ package RESTDWSocketIndyDesign;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl,
   RESTDWSocketIndy;
 
 contains

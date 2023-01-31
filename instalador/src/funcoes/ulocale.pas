@@ -51,7 +51,7 @@ begin
   with FTranslatedObject[ptBR] do
   begin
     Version := 'Versão';
-    Subtitle := 'Escolha o idioma';
+    LanguageSubtitle := 'Escolha o idioma';
     IDESubTitle := 'Escolha a IDE';
     ResourceSubTitle := 'Escolha os recursos a instalar';
     ButtonNext := 'Próximo >';
@@ -64,7 +64,7 @@ begin
   with FTranslatedObject[enUS] do
   begin
     Version := 'Version';
-    Subtitle := 'Choose your language';
+    LanguageSubtitle := 'Choose your language';
     IDESubTitle := 'Choose an IDE';
     ResourceSubTitle := 'Choose which resources to install';
     ButtonNext := 'Next >';
@@ -77,7 +77,7 @@ begin
   with FTranslatedObject[esES] do
   begin
     Version := 'Versión';
-    Subtitle := 'Seleccione su idioma';
+    LanguageSubtitle := 'Seleccione su idioma';
     IDESubTitle := 'Seleccione su IDE';
     ResourceSubTitle := 'Elija las características para instalar';
     ButtonNext := 'Próximo >';

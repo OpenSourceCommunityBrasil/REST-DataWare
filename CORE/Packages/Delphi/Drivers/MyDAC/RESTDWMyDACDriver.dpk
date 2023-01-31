@@ -30,7 +30,6 @@ package RESTDWMyDACDriver;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl,
   RESTDWCore;
 
 contains

@@ -8,25 +8,25 @@
       <Unit>
         <Filename Value="RESTDWInstalador.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="39" Y="15"/>
-        <UsageCount Value="138"/>
+        <CursorPos X="52" Y="16"/>
+        <UsageCount Value="178"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\udetectide.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="6"/>
         <CursorPos Y="40"/>
-        <UsageCount Value="135"/>
+        <UsageCount Value="175"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\uidefunctions.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="68"/>
         <CursorPos X="39" Y="80"/>
-        <UsageCount Value="135"/>
+        <UsageCount Value="175"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -34,7 +34,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="38" Y="57"/>
-        <UsageCount Value="132"/>
+        <UsageCount Value="172"/>
       </Unit>
       <Unit>
         <Filename Value="src\telas\uprincipal.pas"/>
@@ -42,26 +42,35 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="284"/>
-        <CursorPos X="8" Y="301"/>
-        <UsageCount Value="92"/>
+        <TopLine Value="305"/>
+        <CursorPos X="12" Y="320"/>
+        <UsageCount Value="132"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\ulocale.pas"/>
         <IsPartOfProject Value="True"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="53"/>
+        <CursorPos X="21" Y="80"/>
+        <UsageCount Value="120"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="9"/>
-        <CursorPos X="5" Y="29"/>
-        <UsageCount Value="80"/>
+        <TopLine Value="29"/>
+        <CursorPos X="51" Y="42"/>
+        <UsageCount Value="60"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\ulazarusdetect.pas"/>
-        <UsageCount Value="17"/>
+        <UsageCount Value="13"/>
       </Unit>
       <Unit>
         <Filename Value="src\telas\uprincipalold.pas"/>
@@ -72,7 +81,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="44"/>
         <CursorPos X="37" Y="25"/>
-        <UsageCount Value="62"/>
+        <UsageCount Value="58"/>
       </Unit>
       <Unit>
         <Filename Value="src\telas\frames\ufrideitem.pas"/>
@@ -83,7 +92,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="62"/>
+        <UsageCount Value="58"/>
       </Unit>
       <Unit>
         <Filename Value="src\frteste.pas"/>
@@ -91,7 +100,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="17"/>
+        <UsageCount Value="13"/>
       </Unit>
       <Unit>
         <Filename Value="src\uprincipal.pas"/>
@@ -101,14 +110,14 @@
         <UnitName Value="uPrincipal"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="36" Y="82"/>
-        <UsageCount Value="14"/>
+        <UsageCount Value="10"/>
       </Unit>
       <Unit>
         <Filename Value="src\udetectide.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="25"/>
         <CursorPos X="17" Y="37"/>
-        <UsageCount Value="14"/>
+        <UsageCount Value="10"/>
       </Unit>
       <Unit>
         <Filename Value="src\ufrideitem.pas"/>
@@ -117,7 +126,7 @@
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="ufrIDEItem"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="14"/>
+        <UsageCount Value="10"/>
       </Unit>
       <Unit>
         <Filename Value="uprincipal.pas"/>
@@ -127,7 +136,7 @@
         <UnitName Value="uPrincipal"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="24" Y="15"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="7"/>
       </Unit>
       <Unit>
         <Filename Value="ufrideitem.pas"/>
@@ -136,13 +145,13 @@
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="ufrIDEItem"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="7"/>
       </Unit>
       <Unit>
         <Filename Value="udetectide.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="16"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="7"/>
       </Unit>
       <Unit>
         <Filename Value="src\usplash.pas"/>
@@ -151,144 +160,197 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="50"/>
         <CursorPos X="70" Y="62"/>
-        <UsageCount Value="22"/>
-      </Unit>
-      <Unit>
-        <Filename Value="D:\IDE\lazarus\lazarus\lcl\intfgraphics.pas"/>
-        <UnitName Value="IntfGraphics"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="5724"/>
-        <CursorPos Y="5734"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="18"/>
       </Unit>
       <Unit>
         <Filename Value="D:\IDE\lazarus\lazarus\lcl\include\control.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="4505"/>
         <CursorPos X="5" Y="4515"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="1"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\SVN_Class.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="292"/>
+        <CursorPos X="34" Y="306"/>
+        <UsageCount Value="16"/>
+      </Unit>
+      <Unit>
+        <Filename Value="D:\IDE\lazarus\fpcsrc\packages\paszlib\src\gzio.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="52"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="D:\IDE\lazarus\fpcsrc\packages\zlib\src\zlib.pp"/>
+        <UnitName Value="ZLib"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="847"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="D:\IDE\lazarus\fpcsrc\packages\paszlib\src\zstream.pp"/>
+        <UnitName Value="ZStream"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="390"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\CORE\Source\utils\uRESTDWZlib.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\CORE\Source\Consts\uRESTDWConsts.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="251"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\CORE\Source\Basic\Crypto\DWDCPbase64.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="2" Y="3"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\CORE\Source\Basic\uRESTDWComponentBase.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="42"/>
+        <CursorPos X="6" Y="55"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\CORE\Source\Basic\uRESTDWBasicTypes.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="38"/>
+        <CursorPos X="25" Y="51"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\CORE\Source\utils\JSON\uRESTDWJSONInterface.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="167"/>
+        <CursorPos X="25" Y="179"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\CORE\Source\Basic\Mechanics\uRESTDWDataUtils.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="31"/>
+        <CursorPos X="6" Y="45"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\uRESTDWZlib.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="384"/>
+        <CursorPos X="3" Y="386"/>
+        <UsageCount Value="26"/>
+      </Unit>
+      <Unit>
+        <Filename Value="D:\IDE\lazarus\fpcsrc\packages\fcl-json\src\fpjson.pp"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="37"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="29">
+    <JumpHistory HistoryIndex="23">
       <Position>
         <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="240" Column="3" TopLine="237"/>
+        <Caret Line="319" TopLine="302"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="242" Column="3" TopLine="239"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="58" Column="70" TopLine="47"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="241" Column="3" TopLine="238"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="45" Column="51" TopLine="26"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="240" Column="3" TopLine="237"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="58" Column="6" TopLine="46"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="239" Column="3" TopLine="236"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="8" Column="56"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="238" Column="3" TopLine="235"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="68" Column="3" TopLine="55"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="242" Column="3" TopLine="239"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="243" Column="3" TopLine="240"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="8" Column="63"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="244" Column="3" TopLine="241"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="6" Column="40"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="243" Column="3" TopLine="240"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="8" Column="63"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="244" Column="3" TopLine="241"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="16" Column="51"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="243" Column="3" TopLine="240"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="8" Column="59"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="244" Column="3" TopLine="241"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="61" Column="37" TopLine="45"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="253" Column="3" TopLine="248"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="8" Column="71"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="262" Column="42" TopLine="248"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="45" Column="59" TopLine="52"/>
       </Position>
       <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="317" Column="25" TopLine="310"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="105" Column="45" TopLine="80"/>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="67" Column="77" TopLine="55"/>
       </Position>
       <Position>
         <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="345" Column="15" TopLine="321"/>
+        <Caret Line="319" TopLine="302"/>
+      </Position>
+      <Position>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="45" Column="48" TopLine="39"/>
       </Position>
       <Position>
         <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="336" Column="14" TopLine="322"/>
+        <Caret Line="319" TopLine="302"/>
+      </Position>
+      <Position>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="45" TopLine="39"/>
+      </Position>
+      <Position>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="42" Column="47" TopLine="29"/>
       </Position>
       <Position>
         <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="327" Column="13" TopLine="323"/>
+        <Caret Line="319" Column="5" TopLine="308"/>
+      </Position>
+      <Position>
+        <Filename Value="src\funcoes\urestfunctions.pas"/>
+        <Caret Line="42" Column="48" TopLine="29"/>
       </Position>
       <Position>
         <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="338" Column="15" TopLine="329"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="293" Column="42" TopLine="273"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="272" Column="3" TopLine="272"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="104" Column="28" TopLine="91"/>
-      </Position>
-      <Position>
-        <Filename Value="src\funcoes\ulocale.pas"/>
-        <Caret Line="33" Column="14" TopLine="19"/>
-      </Position>
-      <Position>
-        <Filename Value="src\funcoes\ulocale.pas"/>
-        <Caret Line="86" Column="3" TopLine="71"/>
-      </Position>
-      <Position>
-        <Filename Value="src\funcoes\ulocale.pas"/>
-        <Caret Line="83" TopLine="66"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="170" Column="14" TopLine="160"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="295" Column="8" TopLine="284"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="298" TopLine="284"/>
+        <Caret Line="319" Column="5" TopLine="308"/>
       </Position>
     </JumpHistory>
     <RunParams>
@@ -303,7 +365,14 @@
         <WatchScope Value="wpsLocal"/>
         <WatchKind Value="wpkWrite"/>
         <Source Value="src\telas\uprincipal.pas"/>
-        <Line Value="86"/>
+        <Line Value="92"/>
+      </Item>
+      <Item>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="src\telas\uprincipal.pas"/>
+        <Line Value="319"/>
       </Item>
     </BreakPoints>
   </Debugging>

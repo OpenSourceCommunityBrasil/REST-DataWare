@@ -36,11 +36,11 @@ unit uRESTDWIcsBase;
 interface
 
 Uses
-  System.SysUtils,
-  System.Classes,
-  System.DateUtils,
-  System.SyncObjs,
-  VCL.ExtCtrls,
+  SysUtils,
+  Classes,
+  DateUtils,
+  SyncObjs,
+  ExtCtrls,
   uRESTDWComponentEvents,
   uRESTDWBasicTypes,
   uRESTDWJSONObject,
