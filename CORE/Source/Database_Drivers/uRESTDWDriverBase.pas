@@ -2609,8 +2609,10 @@ begin
     if not Execute then begin
       if Assigned(Self.OnQueryBeforeOpen) then
         Self.OnQueryBeforeOpen(vDataSet, Params);
-       vTempQuery.Open;
-       vTempQuery.FetchAll;
+      if not (BinaryCompatibleMode) then begin
+        vTempQuery.Open;
+        vTempQuery.FetchAll;
+      end;
       if connInTransaction then
         connCommit;
       if aResult = nil then
@@ -4309,12 +4311,7 @@ begin
               end
               else if vParam.DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] then begin
                 if (not (MassiveDataset.Fields.FieldByName(vParam.Name).IsNull)) then
-                begin
-                  if MassiveDataset.Fields.FieldByName(vParam.Name).Value <> 0 then
-                    vParam.AsDateTime := MassiveDataset.Fields.FieldByName(vParam.Name).Value
-                  else
-                    vParam.Clear;
-                end
+                  vParam.AsDateTime := MassiveDataset.Fields.FieldByName(vParam.Name).Value
                 else
                   vParam.Clear;
               end  //Tratar Blobs de Parametros...
@@ -4726,12 +4723,7 @@ Begin
              If Not MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).IsNull Then
               vTempValue                   := MassiveReplyValue.NewValue
              Else
-              if (MassiveReplyValue.OldValue = null) then begin
-                vTempValue                   := '';
-              end
-              else begin
-                vTempValue                   := MassiveReplyValue.OldValue;
-              end;
+              vTempValue                   := MassiveReplyValue.OldValue;
             End
            Else
             Begin
