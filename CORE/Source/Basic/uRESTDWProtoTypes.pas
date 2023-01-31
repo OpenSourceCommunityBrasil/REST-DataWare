@@ -184,7 +184,7 @@ uses
  {$ENDIF}
  TRESTDWIPv6Address = Array [0..7] Of DWUInt16;
  {$IFNDEF FPC}
-  {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
+  {$IF (CompilerVersion >= 26) And (CompilerVersion <= 29)}
    {$IF Defined(HAS_FMX)}
     DWString     = String;
     DWWideString = WideString;
