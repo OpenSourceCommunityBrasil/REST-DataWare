@@ -1140,6 +1140,7 @@ Begin
        End;
      End;
     BufferStream.InputBytes(VarToBytes(vMassiveValues.Count, varInteger));
+    If assigned(MassiveBuffer) then
     For I := 1 To vMassiveValues.Count - 1 Do
      Begin
       If MassiveMode = mmUpdate Then
@@ -1149,29 +1150,33 @@ Begin
         vNoChange := True;
         For A := 0 To Changes.Count -1 Do
          Begin
-          If TMassiveDatasetBuffer(MassiveBuffer).Dataset <> Nil Then
+          If assigned(MassiveBuffer) then
            Begin
-            If TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Count <= (I-1) Then
-             Continue;
-            If (TMassiveDatasetBuffer(MassiveBuffer).Dataset.FindField(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) <> Nil) Then
+            If TMassiveDatasetBuffer(MassiveBuffer).Dataset <> Nil Then
              Begin
-              If TMassiveDatasetBuffer(MassiveBuffer).Dataset.FieldByName(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName).ReadOnly Then
+              If TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Count <= (I-1) Then
                Continue;
+              If (TMassiveDatasetBuffer(MassiveBuffer).Dataset.FindField(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) <> Nil) Then
+               Begin
+                If TMassiveDatasetBuffer(MassiveBuffer).Dataset.FieldByName(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName).ReadOnly Then
+                 Continue;
+               End
+              Else
+               vNoChange := Not TMassiveDatasetBuffer(MassiveBuffer).vReflectChanges;
+              If Not((TMassiveDatasetBuffer(MassiveBuffer).Dataset.FindField(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) = Nil)) Then
+               vNoChange := Lowercase(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) <> Lowercase(Changes[A]);
              End
             Else
-             vNoChange := Not TMassiveDatasetBuffer(MassiveBuffer).vReflectChanges;
-            If Not((TMassiveDatasetBuffer(MassiveBuffer).Dataset.FindField(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) = Nil)) Then
              vNoChange := Lowercase(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) <> Lowercase(Changes[A]);
-           End
-          Else
-           vNoChange := Lowercase(TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Items[I-1].vFieldName) <> Lowercase(Changes[A]);
+           End;
+
           If Not (vNoChange) Then
            Break;
          End;
         If vNoChange Then
          Continue;
        End;
-      If TMassiveDatasetBuffer(MassiveBuffer).Dataset <> Nil Then
+     If TMassiveDatasetBuffer(MassiveBuffer).Dataset <> Nil Then
        Begin
         If TMassiveDatasetBuffer(MassiveBuffer).vMassiveFields.Count <= (I-1) then
          Continue;
