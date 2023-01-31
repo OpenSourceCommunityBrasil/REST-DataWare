@@ -925,7 +925,8 @@ Begin
      If Assigned(PMassiveValue(TList(Self).Items[Index])^) Then
       Begin
        Try
-        PMassiveValue(TList(Self).Items[Index])^.Free;
+        FreeAndNil(TList(Self).Items[Index]^);
+//        PMassiveValue(TList(Self).Items[Index])^.Free;
         Dispose(PMassiveValue(TList(Self).Items[Index]));
        Except
        End;
