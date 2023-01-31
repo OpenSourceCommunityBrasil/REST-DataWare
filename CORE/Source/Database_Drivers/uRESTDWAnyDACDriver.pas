@@ -160,6 +160,26 @@ begin
     end;
     i := i + 1;
   end;
+
+  // Eloy
+  case Result of
+    dbtODBC:
+      begin
+        i := StrToIntDef(TADConnection(Connection).Params.Values['RDBMSKind'],
+          TADConnection(Connection).RDBMSKind);
+        case i of
+          0: Result := dbtUndefined;
+          1: Result := dbtOracle;
+          2: Result := dbtMsSQL;
+          3: Result := dbtAccess;
+          4: Result := dbtMySQL;
+          8: Result := dbtInterbase;
+          9: Result := dbtFirebird;
+         10: Result := dbtSQLLite;
+         11: Result := dbtPostgreSQL;
+        end;
+      end;
+  end;
 end;
 
 function TRESTDWAnyDACDriver.getQuery : TRESTDWDrvQuery;
