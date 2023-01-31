@@ -1112,7 +1112,9 @@ Begin
   If vEncoded Then
    Begin
     If (vObjectValue In [ovBytes,   ovVarBytes, ovStream, ovBlob,
-                         ovGraphic, ovOraBlob,  ovOraClob]) And (vBinary) Then
+                         ovGraphic, ovOraBlob,  ovOraClob,
+                         ovDate, ovTime, ovDateTime, ovTimeStamp,
+                         ovOraTimeStamp, ovTimeStampOffset]) And (vBinary) Then
      vTempString := vTempString
     Else
      Begin //TODO
@@ -1160,12 +1162,9 @@ Begin
  If vObjectValue In [ovDate, ovTime, ovDateTime, ovTimeStamp, ovOraTimeStamp, ovTimeStampOffset] Then
   Begin
    If (Result <> '')                And
+      (Result <> '0')               And
       (Lowercase(Result) <> 'null') Then
-    Begin
-     If (Pos('/', Result) = 0) And
-        (Pos('-', Result) <= 1) Then
-      Result := UnixToDateTime(StrToInt64(Result));
-    End
+    Result := StrToDateTime(Result)
    Else
     Result := 0;
   End;
@@ -4228,8 +4227,8 @@ Begin
         Value := StrToDateTime(Value);
       End;
     End;
-   If (Not (vNullValue)) Then
-    Value := IntToStr(DateTimeToUnix(Value))
+ //  If (Not (vNullValue)) Then
+ //   Value := IntToStr(DateTimeToUnix(Value))
   End;
  If Encode Then
   Begin

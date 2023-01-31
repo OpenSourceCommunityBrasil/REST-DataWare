@@ -4668,6 +4668,7 @@ Var
  vError        : Boolean;
  vMessageError : String;
 Begin
+ vError := False;
  vMessageError := '';
  ApplyUpdates(MassiveCache, vError, vMessageError);
  If (vError) Or (vMessageError <> '') Then
@@ -6666,7 +6667,7 @@ Begin
            Begin
             vStream := TMemoryStream.Create;
             Try
-             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
              vMassiveCache.Add(vStream, Self);
             Finally
              //FreeAndNil(vStream);
@@ -6749,7 +6750,7 @@ Begin
            Begin
             vStream := TMemoryStream.Create;
             Try
-             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
              vMassiveCache.Add(vStream, Self);
             Finally
              //FreeAndNil(vStream);
@@ -6908,7 +6909,7 @@ Begin
            Begin
             vStream := TMemoryStream.Create;
             Try
-             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
              vMassiveCache.Add(vStream, Self);
             Finally
              //FreeAndNil(vStream);
@@ -6992,7 +6993,7 @@ Begin
            Begin
             vStream := TMemoryStream.Create;
             Try
-             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
              vMassiveCache.Add(vStream, Self);
             Finally
              //FreeAndNil(vStream);
@@ -7050,7 +7051,7 @@ Begin
              vMassiveCache.MassiveType                          := MassiveType;
              vStream := TMemoryStream.Create;
              Try
-              TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream);
+              TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
               vMassiveCache.Add(vStream, Self);
              Finally
               //FreeAndNil(vStream);
@@ -8794,7 +8795,7 @@ Begin
 //            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
             vStream := TMemoryStream.Create;
             Try
-             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
              vMassiveCache.Add(vStream, Self);
             Finally
              //FreeAndNil(vStream);
@@ -8913,6 +8914,10 @@ Begin
        ProcAfterScroll(Dataset);
       End;
     Except
+      On E: Exception Do
+      Begin
+        Raise Exception.Create(E.Message);
+      End;
     End;
    End;
  Finally
@@ -8943,6 +8948,10 @@ Begin
        ProcAfterScroll(Dataset);
       End;
     Except
+      On E: Exception Do
+      Begin
+       Raise Exception.Create(E.Message);
+      End;
     End;
    End;
  Finally
