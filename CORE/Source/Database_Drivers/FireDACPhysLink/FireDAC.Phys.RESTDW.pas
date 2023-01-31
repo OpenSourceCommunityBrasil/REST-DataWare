@@ -34,7 +34,7 @@ uses
   FireDAC.Phys.RESTDWBase;
 
 type
-  {$IF CompilerVersion > 31}
+  {$IF CompilerVersion > 32}
   [ComponentPlatformsAttribute(pfidWindows or pfidOSX or pfidLinux)]
   {$IFEND}
   TRESTDWFireDACPhysLink = class(TFDPhysRDWBaseDriverLink)

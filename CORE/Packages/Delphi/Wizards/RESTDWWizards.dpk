@@ -30,7 +30,6 @@ package RESTDWWizards;
 {$IMPLICITBUILD OFF}
 
 requires
-  rtl,
   vcl,
   designide,
   xmlrtl,

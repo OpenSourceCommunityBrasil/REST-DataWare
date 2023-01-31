@@ -3468,8 +3468,8 @@ Function EncodeBase64(Const Value : String) : String;
 {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
 Function EncodeBase64(Const Value : String) : String;
 {$ELSE}
-  Function EncodeBase64(Const Value : String
-                        {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : String;
+Function EncodeBase64(Const Value : String
+                      {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : String;
 {$IFEND}
 {$IFEND}
 Var

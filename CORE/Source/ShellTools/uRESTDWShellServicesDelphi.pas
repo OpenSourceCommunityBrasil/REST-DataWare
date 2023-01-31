@@ -29,7 +29,7 @@ interface
 
 Uses
   {$IF CompilerVersion <= 22}
-   EncdDecd, uRESTDWMassiveBuffer,
+    uRESTDWMassiveBuffer,
   {$IFEND}
   SysUtils, Classes, Db, Variants, HTTPApp, SyncObjs,
   uRESTDWBasic, uRESTDWJSONObject, uRESTDWBasicTypes, uRESTDWComponentEvents,
@@ -193,9 +193,9 @@ Begin
   vContentType     := ARequest.ContentType;
   If CommandExec  (TComponent(AResponse),
                    RemoveBackslashCommands(ARequest.PathInfo),
-                   ARequest.Method + ' ' + ARequest.{$IF CompilerVersion < 21}PathInfo{$ELSE}RawPathInfo{$IFEND},
+                   ARequest.Method + ' ' + ARequest.{$IF CompilerVersion < 22}PathInfo{$ELSE}RawPathInfo{$IFEND},
                    vContentType,
-                   ARequest.{$IF CompilerVersion < 21}RemoteAddr{$ELSE}RemoteIP{$IFEND},
+                   ARequest.{$IF CompilerVersion < 22}RemoteAddr{$ELSE}RemoteIP{$IFEND},
                    ARequest.UserAgent,
                    '',
                    '',
