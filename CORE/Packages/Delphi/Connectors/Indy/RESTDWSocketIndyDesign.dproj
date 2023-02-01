@@ -169,7 +169,6 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="RESTDWSocketIndyDesign.dcr"/>
-        <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="RESTDWSocketIndy.dcp"/>
         <DCCReference Include="..\..\..\..\Source\Sockets\Indy\uRESTDWIdReg.pas"/>
         <BuildConfiguration Include="Base">

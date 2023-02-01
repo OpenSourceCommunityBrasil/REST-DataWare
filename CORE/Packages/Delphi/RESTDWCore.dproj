@@ -208,9 +208,6 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="FireDAC.dcp"/>
-        <DCCReference Include="FireDACCommonDriver.dcp"/>
-        <DCCReference Include="FireDACCommon.dcp"/>
         <DCCReference Include="dcldb.dcp"/>
         <DCCReference Include="soaprtl.dcp"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasic.pas"/>
@@ -280,8 +277,30 @@
         <DCCReference Include="..\..\Source\utils\uRESTDWMimeTypes.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBufferBase.pas"/>
         <DCCReference Include="..\..\Source\utils\uRESTDWURLFunctions.pas"/>
-        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWPropertyPersist.pas"/>
+        <DCCReference Include="..\..\Source\Basic\uRESTDWStorageBin.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemAnsiStrings.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemBase.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemCharsets.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemComponentBase.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemConsts.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemDateTime.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemDBFilterExpr.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemDBUtils.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemExprParser.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemMath.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemResources.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemStreams.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemStringConversions.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemStrings.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemStringsB.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemTranslateString.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemTypes.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemUnicode.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemVCLUtils.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemWideStrings.pas"/>
+        <DCCReference Include="..\..\Source\Basic\uRESTDWProtoTypes.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -324,12 +343,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>

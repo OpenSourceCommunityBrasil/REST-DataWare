@@ -30,7 +30,10 @@ package RESTDWFireDACDriver;
 {$IMPLICITBUILD ON}
 
 requires
-  RESTDWCore;
+  RESTDWCore,
+  FireDAC,
+  FireDACCommonDriver,
+  FireDACCommon;
 
 contains
   uRESTDWFireDACDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWFireDACDriver.pas',
