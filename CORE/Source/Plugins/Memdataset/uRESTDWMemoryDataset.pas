@@ -74,6 +74,7 @@ type
   TMemBlobData  = TRESTDWBytes;
   TMemBlobArray = array[0..MaxInt div SizeOf(TMemBlobData) - 1] of TMemBlobData;
   PMemBlobArray = ^TMemBlobArray;
+  PJvMemoryRecord = ^TJvMemoryRecord;
   TJvMemoryRecord = class;
   TLoadMode = (lmCopy, lmAppend);
   TSaveLoadState = (slsNone, slsLoading, slsSaving);
@@ -151,6 +152,20 @@ type
     property EncodeStrs : boolean read FEncodeStrs write FEncodeStrs;
   end;
 
+  PRecordList   = ^TRecordList;
+  TRecordList = Class(TList)
+  Private
+   Function   GetRec(Index : Integer)       : TJvMemoryRecord;    Overload;
+   Procedure  PutRec(Index : Integer; Item  : TJvMemoryRecord);   Overload;
+   Procedure  ClearAll;
+  Protected
+  Public
+   Destructor Destroy;Override;
+   Procedure  Delete(Index : Integer);                           Overload;
+   Function   Add   (Item  : TJvMemoryRecord) : Integer;         Overload;
+   Property   Items[Index  : Integer]         : TJvMemoryRecord Read GetRec Write PutRec; Default;
+  End;
+
   TRESTDWMemTable = class(TDataSet, IRESTDWMemTable)
   private
     FSaveLoadState: TSaveLoadState;
@@ -163,7 +178,7 @@ type
     FLastID: Integer;
     FAutoInc: Longint;
     FActive: Boolean;
-    FRecords: TList;
+    FRecords: TRecordList;
     FIndexList: TList;
     FCaseInsensitiveSort: Boolean;
     FDescendingSort: Boolean;
@@ -427,10 +442,11 @@ type
   TJvMemoryRecord = class(TPersistent)
   private
     FMemoryData: TRESTDWMemTable;
+    FIndex,
     FID: Integer;
     FData: Pointer;
     FBlobs: Pointer;
-    function GetIndex: Integer;
+    function  GetIndex: Integer;
     procedure SetMemoryData(Value: TRESTDWMemTable; UpdateParent: Boolean);
   protected
     procedure SetIndex(Value: Integer); virtual;
@@ -611,7 +627,8 @@ end;
 //=== { TJvMemoryRecord } ====================================================
 constructor TJvMemoryRecord.Create(MemoryData: TRESTDWMemTable);
 begin
-  CreateEx(MemoryData, True);
+ FIndex := -1;
+ CreateEx(MemoryData, True);
 end;
 
 Constructor TJvMemoryRecord.CreateEx(MemoryData: TRESTDWMemTable; UpdateParent: Boolean);
@@ -622,16 +639,16 @@ End;
 
 destructor TJvMemoryRecord.Destroy;
 begin
- SetMemoryData(nil, True);
+ SetMemoryData(Nil, False);
  inherited Destroy;
 end;
 
 function TJvMemoryRecord.GetIndex: Integer;
 begin
-  if FMemoryData <> nil then
-    Result := FMemoryData.FRecords.IndexOf(Self)
-  else
-    Result := -1;
+  //if FMemoryData <> nil then
+  //  Result := FMemoryData.FRecords.IndexOf(Self)
+  //else
+ Result := FIndex;
 end;
 procedure TJvMemoryRecord.SetMemoryData(Value: TRESTDWMemTable; UpdateParent: Boolean);
 var
@@ -642,8 +659,8 @@ begin
   begin
     if FMemoryData <> nil then
     begin
-      If not FMemoryData.FClearing Then
-       FMemoryData.FRecords.Remove(Self);
+      //If not FMemoryData.FClearing Then
+      // FMemoryData.FRecords.Remove(Self);
        ReallocMem(FBlobs, 0);
        ReallocMem(FData, 0);
        FMemoryData := Nil;
@@ -676,6 +693,7 @@ begin
   CurIndex := GetIndex;
   if (CurIndex >= 0) and (CurIndex <> Value) then
     FMemoryData.FRecords.Move(CurIndex, Value);
+ FIndex := Value;
 end;
 //=== { TRESTDWMemTable } ======================================================
 //Function TRESTDWMemTable.FieldByName(const FieldName: string): TField;
@@ -694,7 +712,7 @@ begin
   FRecordPos := -1;
   FLastID := Low(Integer);
   FAutoInc := 1;
-  FRecords := TList.Create;
+  FRecords := TRecordList.Create;
   FStatusName := STATUSNAME;
   FDeletedValues := TList.Create;
   FRowsOriginal := 0;
@@ -732,8 +750,8 @@ begin
     FreeAndNil(FDeletedValues);
   end;
   FreeIndexList;
-  ClearRecords;
-  FreeAndNil(FRecords);
+//  ClearRecords;
+  FRecords.Free;
   FOffsets := nil;
   inherited Destroy;
 end;
@@ -864,7 +882,7 @@ end;
 
 function TRESTDWMemTable.GetMemoryRecord(Index: Integer): TJvMemoryRecord;
 begin
-  Result := TJvMemoryRecord(@FRecords[Index]^);
+ Result := TJvMemoryRecord(FRecords[Index]);
 end;
 
 procedure TRESTDWMemTable.InitFieldDefsFromFields;
@@ -956,22 +974,15 @@ begin
 end;
 
 procedure TRESTDWMemTable.ClearRecords;
-var
-  I: Integer;
 begin
+ Try
   FClearing := True;
-  try
-   If Assigned(FRecords) Then
-    Begin
-     for I := FRecords.Count - 1 downto 0  do
-      TJvMemoryRecord(FRecords[I]).Free;
-     FRecords.Clear;
-    End;
-  finally
-    FClearing := False;
-  end;
-  FLastID := Low(Integer);
-  FRecordPos := -1;
+  FRecords.ClearAll;
+ Finally
+  FClearing := False;
+ End;
+ FLastID := Low(Integer);
+ FRecordPos := -1;
 end;
 
 function TRESTDWMemTable.AllocRecordBuffer: TRecordBuffer;
@@ -1261,7 +1272,7 @@ var
 begin
   if aAppend then
   begin
-    Rec := AddRecord;
+    Rec        := AddRecord;
     FRecordPos := FRecords.Count - 1;
   end
   else
@@ -3784,6 +3795,79 @@ procedure TRESTDWStorageBase.LoadDWMemFromStream(dataset: IRESTDWMemTable;
 begin
 
 end;
+
+Destructor TRecordList.Destroy;
+Begin
+ ClearAll;
+ Inherited;
+End;
+
+Function TRecordList.GetRec(Index: Integer): TJvMemoryRecord;
+Begin
+ Result := Nil;
+ If (Index < Self.Count) And (Index > -1) Then
+  Result := TJvMemoryRecord(TList(Self).Items[Index]^);
+End;
+
+Procedure TRecordList.PutRec(Index: Integer; Item: TJvMemoryRecord);
+Begin
+ If (Index < Self.Count) And (Index > -1) Then
+  TJvMemoryRecord(TList(Self).Items[Index]^) := Item;
+End;
+
+Function TRecordList.Add(Item : TJvMemoryRecord): Integer;
+Var
+ vItem : PJvMemoryRecord;
+Begin
+ New(vItem);
+ vItem^      := Item;
+ Result      := Inherited Add(vItem);
+ vItem^.Index := Result;
+End;
+
+Procedure TRecordList.Delete(Index: Integer);
+Begin
+ If (Index > -1) Then
+  Begin
+   Try
+    If Assigned(TList(Self).Items[Index]) Then
+     Begin
+      If Assigned(TJvMemoryRecord(TList(Self).Items[Index]^)) Then
+       Begin
+        {$IFDEF FPC}
+         FreeAndNil(TList(Self).Items[Index]^);
+        {$ELSE}
+         {$IF CompilerVersion > 33}
+          FreeAndNil(TJvMemoryRecord(TList(Self).Items[Index]^));
+         {$ELSE}
+          FreeAndNil(TList(Self).Items[Index]^);
+         {$IFEND}
+        {$ENDIF}
+       End;
+     End;
+    {$IFDEF FPC}
+     Dispose(PJvMemoryRecord(TList(Self).Items[Index]));
+    {$ELSE}
+     Dispose(TList(Self).Items[Index]);
+    {$ENDIF}
+   Except
+   End;
+   TList(Self).Delete(Index);
+  End;
+End;
+
+Procedure TRecordList.ClearAll;
+Var
+ I : Integer;
+Begin
+ I := Count -1;
+ While I > -1 Do
+  Begin
+   Delete(I);
+   Dec(I);
+  End;
+ Inherited Clear;
+End;
 
 procedure TRESTDWStorageBase.LoadFromStream(dataset: TDataset; stream: TStream);
 begin

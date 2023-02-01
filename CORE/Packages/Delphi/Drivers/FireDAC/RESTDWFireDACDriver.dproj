@@ -174,6 +174,9 @@
         </DelphiCompile>
         <DCCReference Include="RESTDWFireDACDriver.dcr"/>
         <DCCReference Include="RESTDWCore.dcp"/>
+        <DCCReference Include="FireDAC.dcp"/>
+        <DCCReference Include="FireDACCommonDriver.dcp"/>
+        <DCCReference Include="FireDACCommon.dcp"/>
         <DCCReference Include="..\..\..\..\Source\Database_Drivers\uRESTDWFireDACDriver.pas"/>
         <DCCReference Include="..\..\..\..\Source\Database_Drivers\FireDACPhysLink\FireDAC.Phys.RESTDW.pas"/>
         <BuildConfiguration Include="Base">

@@ -30,7 +30,12 @@ package RESTDWZEOSDriver;
 {$IMPLICITBUILD ON}
 
 requires
-  RESTDWCore;
+  RESTDWCore,
+  ZComponent,
+  ZDbc,
+  ZPlain,
+  ZCore,
+  ZParseSql;
 
 contains
   uRESTDWZeosDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWZeosDriver.pas';

@@ -3,8 +3,8 @@ unit uRESTDWStorageJSON;
 interface
 
 uses
-  Classes, SysUtils, uRESTDWStorageBase, DB, uRESTDWConsts,
-  uRESTDWJson;
+  Classes, SysUtils, DB, uRESTDWConsts, uRESTDWMemoryDataset,
+  uRESTDWJson, uRESTDWProtoTypes;
 
 type
   TRESTDWStorageJSON = class(TRESTDWStorageBase)

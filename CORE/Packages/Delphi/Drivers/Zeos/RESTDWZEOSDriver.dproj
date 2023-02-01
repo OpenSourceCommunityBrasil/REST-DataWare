@@ -193,7 +193,6 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="RESTDWZeosDriver.dcr"/>
-        <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="RESTDWCore.dcp"/>
         <DCCReference Include="ZComponent.dcp"/>
         <DCCReference Include="ZDbc.dcp"/>
