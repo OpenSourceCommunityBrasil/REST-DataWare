@@ -45,7 +45,7 @@ Const
  
  // controle de versão
  RESTDWVersionINFO          = 'v2.1.0-';
- RESTDWRelease              = '371';
+ RESTDWRelease              = '399';
  RESTDWCodeProject          = 'Galaga - GitHub';
  RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  cSetPhysicDriver           = 'A PhysicDriver is needed to work';
