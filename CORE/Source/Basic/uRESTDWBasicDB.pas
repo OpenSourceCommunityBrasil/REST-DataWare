@@ -5178,6 +5178,8 @@ Begin
  If Assigned(RESTClientPooler) And
     Assigned(ConnectionDB)     Then
   Begin
+   RESTClientPooler.Host            := ConnectionDB.Host;
+   RESTClientPooler.Port            := ConnectionDB.Port;
    RESTClientPooler.Accept          := ConnectionDB.Accept;
    RESTClientPooler.AcceptEncoding  := ConnectionDB.AcceptEncoding;
    RESTClientPooler.AccessTag       := ConnectionDB.AccessTag;
