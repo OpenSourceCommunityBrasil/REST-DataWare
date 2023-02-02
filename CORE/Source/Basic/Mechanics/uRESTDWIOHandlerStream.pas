@@ -26,8 +26,8 @@ unit uRESTDWIOHandlerStream;
 Interface
 
 Uses
- Classes, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWTools, uRESTDWConsts, uRESTDWIOHandler,
- uRESTDWComponentBase;
+ Classes, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWTools, uRESTDWConsts,
+ uRESTDWIOHandler, uRESTDWAbout;
 
  Type
   TRESTDWIOHandlerStream     = Class;

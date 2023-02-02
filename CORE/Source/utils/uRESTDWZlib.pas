@@ -4,9 +4,8 @@ interface
 
 Uses
 {$IFDEF FPC}zstream, base64,{$ENDIF}
-  SysUtils, Classes,
-  zlib,
-  uRESTDWDataUtils, uRESTDWTools, uRESTDWConsts;
+  SysUtils, Classes, zlib,
+  uRESTDWDataUtils, uRESTDWConsts, uRESTDWTools;
 
 // Funções de Compressão e descompressão de Stream com ZLib
 Procedure ZCompressStream(inStream, outStream: TStream;

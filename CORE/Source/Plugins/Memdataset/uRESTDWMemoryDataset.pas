@@ -27,7 +27,7 @@ interface
 uses
   SysUtils, Classes, DB, Variants, uRESTDWProtoTypes, uRESTDWMemDBUtils,
   uRESTDWMemExprParser{$IFNDEF FPC}, uRESTDWMemDBFilterExpr, SqlTimSt{$ENDIF},
-  uRESTDWComponentBase, uRESTDWConsts;
+  uRESTDWAbout, uRESTDWConsts;
 
 Const
   ftBlobTypes = [ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftParadoxOle, ftDBaseOle,

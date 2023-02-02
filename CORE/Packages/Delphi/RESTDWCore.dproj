@@ -256,11 +256,8 @@
         <DCCReference Include="..\..\Source\Basic\uRESTDWBufferDb.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWResponseTranslator.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasicClass.pas"/>
-        <DCCReference Include="..\..\Source\Basic\uRESTDWEncodeClass.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWFileBuffer.pas"/>
         <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas"/>
-        <DCCReference Include="..\..\Source\Basic\uRESTDWBasicComponent.pas"/>
-        <DCCReference Include="..\..\Source\Basic\uRESTDWComponentBase.pas"/>
         <DCCReference Include="..\..\Source\utils\StringBuilderUnit.pas"/>
         <DCCReference Include="..\..\Source\utils\uRESTDWBase64.pas"/>
         <DCCReference Include="..\..\Source\utils\uRESTDWDynamic.pas"/>
@@ -282,7 +279,6 @@
         <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemAnsiStrings.pas"/>
         <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemBase.pas"/>
         <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemCharsets.pas"/>
-        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemComponentBase.pas"/>
         <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemConsts.pas"/>
         <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemDateTime.pas"/>
         <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemDBFilterExpr.pas"/>
@@ -343,12 +339,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>

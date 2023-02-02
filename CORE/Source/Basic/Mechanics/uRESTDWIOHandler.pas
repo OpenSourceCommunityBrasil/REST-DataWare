@@ -27,7 +27,7 @@ Interface
 
 Uses
  Classes, uRESTDWException, uRESTDWBuffer, uRESTDWProtoTypes, uRESTDWTools,
- uRESTDWComponentBase, uRESTDWConsts;
+ uRESTDWAbout, uRESTDWConsts;
 
 Const
  GRecvBufferSizeDefault  = 32 * 1024;

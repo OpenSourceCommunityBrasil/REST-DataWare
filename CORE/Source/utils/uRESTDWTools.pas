@@ -31,7 +31,7 @@ Uses
   {$IF CompilerVersion > 27}NetEncoding,{$IFEND}
  {$ENDIF}
  Classes, SysUtils, DB,
- uRESTDWProtoTypes, uRESTDWEncodeClass, uRESTDWConsts, DWDCPrijndael,
+ uRESTDWProtoTypes, uRESTDWConsts, DWDCPrijndael,
  DWDCPsha256;
 
   Type

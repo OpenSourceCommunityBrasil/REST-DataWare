@@ -28,7 +28,7 @@ interface
 uses
   SysUtils, Classes, Variants, DB,
   uRESTDWParams, uRESTDWConsts, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWJSONInterface,
-  uRESTDWJSONObject, uRESTDWComponentBase, uRESTDWEncodeClass, uRESTDWBufferBase;
+  uRESTDWJSONObject, uRESTDWBufferBase, uRESTDWAbout;
 
 Const
  cJSONValue = '{"MassiveSQLMode":"%s", "SQL":"%s", "Params":"%s", "Bookmark":"%s", ' +

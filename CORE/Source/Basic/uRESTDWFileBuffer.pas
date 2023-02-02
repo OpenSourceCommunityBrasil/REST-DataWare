@@ -28,8 +28,7 @@ interface
 
 uses
   SysUtils, Types, Variants, Classes,
-  uRESTDWConsts, uRESTDWDynamic, uRESTDWTools, uRESTDWProtoTypes,
-  uRESTDWComponentBase;
+  uRESTDWConsts, uRESTDWDynamic, uRESTDWTools, uRESTDWProtoTypes, uRESTDWAbout;
 
 Const
  cFinalLine      = #10;

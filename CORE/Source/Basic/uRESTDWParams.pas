@@ -29,8 +29,8 @@ interface
 Uses
  {$IFDEF FPC} LConvEncoding,{$ENDIF}
  SysUtils, Classes, Db, Variants,
- uRESTDWConsts, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWEncodeClass,
- uRESTDWTools, uRESTDWResponseTranslator;
+ uRESTDWConsts, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWTools,
+ uRESTDWResponseTranslator;
 
 
 Type

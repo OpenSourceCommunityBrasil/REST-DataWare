@@ -43,7 +43,7 @@ uses
   Variants, TypInfo, SysUtils, Classes,
   uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWBasicDB,
   uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWMemoryDataset, uRESTDWBufferDb,
-  uRESTDWComponentBase, uRESTDWDriverBase;
+  uRESTDWAbout, uRESTDWDriverBase;
 
 {$IFNDEF CLR}
 Const

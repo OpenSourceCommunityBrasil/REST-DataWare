@@ -27,8 +27,8 @@ interface
 
 Uses
   SysUtils, Classes,
-  uRESTDWComponentBase, uRESTDWConsts, uRESTDWDataUtils, uRESTDWComponentEvents,
-  uRESTDWEncodeClass, uRESTDWBasicTypes;
+  uRESTDWAbout, uRESTDWConsts, uRESTDWDataUtils, uRESTDWComponentEvents,
+  uRESTDWBasicTypes;
 
 Type
  TRESTDWClientRESTBase = Class(TRESTDWComponent) //Novo Componente de Acesso a Requisições REST para o Servidores Diversos

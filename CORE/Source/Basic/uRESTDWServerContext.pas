@@ -33,8 +33,9 @@ Uses
   {$ELSE}
     uRESTDWJSON,
   {$IFEND}
-  SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts, uRESTDWComponentBase,
-  uRESTDWParams, uRESTDWBasic, uRESTDWBasicTypes, uRESTDWTools;
+  SysUtils, Classes,
+  uRESTDWJSONObject, uRESTDWConsts, uRESTDWParams, uRESTDWBasic,
+  uRESTDWBasicTypes, uRESTDWTools, uRESTDWAbout;
 
 Const
  TServerEventsConst = '{"typeobject":"%s", "objectdirection":"%s", "objectvalue":"%s", "paramname":"%s", "encoded":"%s", "default":"%s"}';

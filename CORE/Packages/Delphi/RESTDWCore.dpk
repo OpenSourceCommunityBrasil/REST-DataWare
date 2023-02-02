@@ -77,11 +77,8 @@ contains
   uRESTDWBufferDb in '..\..\Source\Basic\uRESTDWBufferDb.pas',
   uRESTDWResponseTranslator in '..\..\Source\Basic\uRESTDWResponseTranslator.pas',
   uRESTDWBasicClass in '..\..\Source\Basic\uRESTDWBasicClass.pas',
-  uRESTDWEncodeClass in '..\..\Source\Basic\uRESTDWEncodeClass.pas',
   uRESTDWFileBuffer in '..\..\Source\Basic\uRESTDWFileBuffer.pas',
   uRESTDWDataUtils in '..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas',
-  uRESTDWBasicComponent in '..\..\Source\Basic\uRESTDWBasicComponent.pas',
-  uRESTDWComponentBase in '..\..\Source\Basic\uRESTDWComponentBase.pas',
   StringBuilderUnit in '..\..\Source\utils\StringBuilderUnit.pas',
   uRESTDWBase64 in '..\..\Source\utils\uRESTDWBase64.pas',
   uRESTDWDynamic in '..\..\Source\utils\uRESTDWDynamic.pas',
@@ -103,7 +100,6 @@ contains
   uRESTDWMemAnsiStrings in '..\..\Source\Plugins\Memdataset\uRESTDWMemAnsiStrings.pas',
   uRESTDWMemBase in '..\..\Source\Plugins\Memdataset\uRESTDWMemBase.pas',
   uRESTDWMemCharsets in '..\..\Source\Plugins\Memdataset\uRESTDWMemCharsets.pas',
-  uRESTDWMemComponentBase in '..\..\Source\Plugins\Memdataset\uRESTDWMemComponentBase.pas',
   uRESTDWMemConsts in '..\..\Source\Plugins\Memdataset\uRESTDWMemConsts.pas',
   uRESTDWMemDateTime in '..\..\Source\Plugins\Memdataset\uRESTDWMemDateTime.pas',
   uRESTDWMemDBFilterExpr in '..\..\Source\Plugins\Memdataset\uRESTDWMemDBFilterExpr.pas',
@@ -124,4 +120,3 @@ contains
   uRESTDWProtoTypes in '..\..\Source\Basic\uRESTDWProtoTypes.pas';
 
 End.
-

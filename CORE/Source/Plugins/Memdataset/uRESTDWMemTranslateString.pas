@@ -24,7 +24,7 @@ unit uRESTDWMemTranslateString;
 interface
 uses
   Classes,
-  uRESTDWMemComponentBase, uRESTDWMemResources;
+  uRESTDWBasic, uRESTDWMemResources;
 type
   /// This component is for string-replacement. All replacements are based on
   /// delimiter-encapsulated words. The delimiters can be freely defined. The default

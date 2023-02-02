@@ -31,13 +31,19 @@ Uses
  {$ENDIF}
  SysUtils, Classes, Db, Variants, SyncObjs,
  uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWJSONObject,
- uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWDataUtils,
- uRESTDWTools, uRESTDWComponentBase, uRESTDWConsts, uRESTDWMessageCoderMIME,
- uRESTDWZLib, uRESTDWMimeTypes;
+ uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWDataUtils,
+ uRESTDWTools, uRESTDWConsts, uRESTDWMessageCoderMIME,
+ uRESTDWZLib, uRESTDWMimeTypes, uRESTDWAbout;
 
  type
   TRedirect = Procedure(Url : String;
                      AResponse   : TObject) {$IFNDEF FPC}Of Object{$ENDIF};
+
+type
+  TJvComponent = class(TRESTDWComponent)
+  private
+  published
+  end;
 
  Type
   TServerMethodClass = Class(TComponent)
