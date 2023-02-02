@@ -124,44 +124,49 @@ uses
                                                                      (Value: dwftColor;           Name: 'ftColor'));
  {$ENDIF}
 
-  FieldGroupChar: set of TFieldType = [ftFixedChar, ftString, ftMemo, ftFmtMemo];
 
-  FieldGroupWideChar: set of TFieldType = [ftFixedWideChar, ftWideString, ftWideMemo];
+  FieldGroupChar: set of 0..255 = [dwftFixedChar, dwftString, dwftMemo, dwftFMTmemo];
 
-  FieldGroupStream: set of TFieldType = [ftStream, ftBlob, ftBytes];
+  FieldGroupWideChar: set of 0..255 = [dwftFixedWideChar, dwftWideString, dwftWideMemo];
 
-  FieldGroupInt: set of TFieldType = [ftByte, ftShortint, ftSmallint, ftWord, ftInteger];
+  FieldGroupStream: set of 0..255 = [dwftStream, dwftBlob, dwftBytes];
 
-  FieldGroupCardinal: set of TFieldType = [ftLongWord];
+  FieldGroupInt: set of 0..255 = [dwftByte, dwftShortint, dwftSmallint, dwftWord, dwftInteger];
+
+  FieldGroupCardinal: set of 0..255 = [dwftLongWord];
   //  LongWord is 4 bytes unassigned on Windows 64bits and all 32bits platforms,
   // but 8 bytes unassigned for all 64bits platforms except Windows 64bits.
   //  We are setting LongWord as Cardinal (4 bytes unassigned for all platforms)
   // to avoid buffer overflows in cross-platform binary exchange.
 
-  FieldGroupInt64: set of TFieldType = [ftAutoInc, ftLargeint];
+  FieldGroupInt64: set of 0..255 = [dwftAutoInc, dwftLargeint];
   // AutoInc Should be Int64 to accept BIGINT primary keys.
 
-  FieldGroupFloat: set of TFieldType = [ftFloat];
+  FieldGroupFloat: set of 0..255 = [dwftFloat, dwftOraTimeStamp];
 
-  FieldGroupDateTime: set of TFieldType = [ftDate, ftTime, ftDateTime];
+  FieldGroupDateTime: set of 0..255 = [dwftDate, dwftTime, dwftDateTime];
 
-  FieldGroupTimeStampOffSet: set of TFieldType = [ftTimeStampOffset];
+  FieldGroupTimeStampOffSet: set of 0..255 = [dwftTimeStampOffset];
 
-  FieldGroupTimeStamp: set of TFieldType = [ftTimeStamp];
+  FieldGroupTimeStamp: set of 0..255 = [dwftTimeStamp];
 
-  FieldGroupBoolean: set of TFieldType = [ftBoolean];
+  FieldGroupBoolean: set of 0..255 = [dwftBoolean];
 
-  FieldGroupSingle: set of TFieldType = [ftSingle];
+  FieldGroupSingle: set of 0..255 = [dwftSingle];
 
-  FieldGroupExtended: set of TFieldType = [ftExtended];
+  FieldGroupExtended: set of 0..255 = [dwftExtended];
   //  Extended is 8 bytes assigned on Windows 64bits, 10 bytes assignbed on
   // Windows 32 bits and 16 bytes assigned on all other platforms.
   //  We are setting Extended as Double (8 bytes assigned for all platforms)
   // to avoid buffer overflows in cross-platform binary exchange.
 
-  FieldGroupCurrency: set of TFieldType = [ftCurrency];
+  FieldGroupCurrency: set of 0..255 = [dwftCurrency];
 
-  FieldGroupBCD: set of TFieldType = [ftBCD, ftFMTBcd];
+  FieldGroupBCD: set of 0..255 = [dwftBCD, dwftFMTBcd];
+
+  FieldGroupVariant: set of 0..255 = [dwftVariant];
+
+  FieldGroupGUID: set of 0..255 = [dwftGUID];
 
 Type
  {$IFDEF FPC}

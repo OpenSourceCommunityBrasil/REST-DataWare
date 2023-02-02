@@ -314,7 +314,7 @@ Begin
         if (pData <> nil) Or (aField = Nil) Then
         begin
           // WIDE STRING
-          if (aDataType in FieldGroupWideChar) then
+          if (FieldTypeToDWFieldType(aDataType) in FieldGroupWideChar) then
           begin
             If aField <> Nil Then
             Begin
@@ -361,7 +361,7 @@ Begin
             End;
           End
           // STRING
-          else if (aDataType in FieldGroupChar) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupChar) then
           Begin
             If aField <> Nil Then
             Begin
@@ -404,7 +404,7 @@ Begin
             End;
           End
           // CARDINAL
-          else if (aDataType in FieldGroupCardinal) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupCardinal) then
           Begin
             If Not vBoolean Then
             Begin
@@ -417,7 +417,7 @@ Begin
               FillChar(PData^, 1, 'S');
           End
           // INTEGER
-          else if (aDataType in FieldGroupInt) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupInt) then
           Begin
             If Not vBoolean Then
             Begin
@@ -430,7 +430,7 @@ Begin
               FillChar(PData^, 1, 'S');
           End
           // SINGLE
-          else if (aDataType in FieldGroupSingle) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupSingle) then
           Begin
             If Not vBoolean Then
             Begin
@@ -443,7 +443,7 @@ Begin
               FillChar(PData^, 1, 'S');
           End
           // EXTENDED
-          else if (aDataType in FieldGroupExtended) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupExtended) then
           Begin
             If Not vBoolean Then
             Begin
@@ -456,7 +456,7 @@ Begin
               FillChar(PData^, 1, 'S');
           End
           // FLOAT
-          else if (aDataType in FieldGroupFloat) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupFloat) then
           Begin
             If Not vBoolean Then
             Begin
@@ -469,7 +469,7 @@ Begin
               FillChar(pData^, 1, 'S');
           End
           // BCD
-          else if (aDataType in FieldGroupBCD) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupBCD) then
           Begin
             If Not vBoolean Then
             Begin
@@ -486,7 +486,7 @@ Begin
               FillChar(PData^, 1, 'S');
           End
           // CURRENCY
-          else if (aDataType in FieldGroupCurrency) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupCurrency) then
           Begin
             If Not vBoolean Then
             Begin
@@ -499,7 +499,7 @@ Begin
               FillChar(PData^, 1, 'S');
           End
           // DATE TIME
-          else if (aDataType in FieldGroupDateTime) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupDateTime) then
           Begin
             If aField <> Nil Then
             Begin
@@ -532,8 +532,10 @@ Begin
                 stream.Read(vFloat, SizeOf(DWFloat));
             End;
           End
+          {$IFNDEF FPC}
+            {$IF CompilerVersion >= 21}
           // TIMESTAMP OFFSET
-          else if (aDataType in FieldGroupTimeStampOffSet) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupTimeStampOffSet) then
           begin
             If Not vBoolean Then
             Begin
@@ -554,8 +556,10 @@ Begin
             Else
               FillChar(PData^, 1, 'S');
           end
+            {$IFEND}
+          {$ENDIF}
           // TIMESTAMP
-          else if (aDataType in FieldGroupTimeStamp) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupTimeStamp) then
           Begin
             If aField <> Nil Then
             Begin
@@ -577,7 +581,7 @@ Begin
             End;
           End
           // INT64
-          else if (aDataType in FieldGroupInt64) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupInt64) then
           Begin
             If aField <> Nil Then
             Begin
@@ -593,7 +597,7 @@ Begin
             End;
           End
           // BOOLEAN
-          else if (aDataType in FieldGroupBoolean) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupBoolean) then
           Begin
             If aField <> Nil Then
             Begin
@@ -604,7 +608,7 @@ Begin
               stream.Read(vByte, SizeOf(Byte));
           End
           // STREAM
-          else if (aDataType in FieldGroupStream) then
+          else if (FieldTypeToDWFieldType(aDataType) in FieldGroupStream) then
           Begin
             SetLength(vBytes, 0);
 
@@ -775,6 +779,8 @@ begin
         Stream.Read(Cr, Sizeof(Currency));
         vField.AsCurrency := Cr;
       end;
+      {$IFNDEF FPC}
+        {$IF CompilerVersion >= 21}
       dwftTimeStampOffset : begin
         Stream.Read(R, Sizeof(DWFloat));
         TsOff := DateTimeToSQLTimeStampOffset(R);
@@ -783,6 +789,8 @@ begin
         Stream.Read(Y, Sizeof(Byte));
         TsOff.TimeZoneMinute := Y;
       end;
+        {$IFEND}
+      {$ENDIF}
       dwftDate,
       dwftTime,
       dwftDateTime,
@@ -1276,9 +1284,9 @@ Begin
     if vBoolean then
       Continue;
 
-    //STRING OR WIDE STRING
-    if ((Dataset.Fields[i].DataType in FieldGroupChar) or
-      (Dataset.Fields[i].DataType in FieldGroupWideChar)) then
+    // STRING OR WIDE STRING
+    if ((FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupChar) or
+      (FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupWideChar)) then
     begin
       vString := Dataset.Fields[i].AsString;
 
@@ -1298,21 +1306,29 @@ Begin
       {$ENDIF}
     end
     // CARDINAL
-    else if (Dataset.Fields[i].DataType in FieldGroupCardinal) then
+    else if (FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupCardinal)
+    then
     begin
+      {$IFNDEF FPC}
+        {$IF CompilerVersion >= 21}
       vCardinal := Dataset.Fields[i].AsLongWord;
+        {$IFEND}
+      vCardinal := Dataset.Fields[i].AsInteger;
+      {$ELSE}
+      vCardinal := Dataset.Fields[i].AsInteger;
+      {$ENDIF}
 
       stream.Write(vCardinal, SizeOf(Cardinal));
     end
     // INTEGER
-    else if (Dataset.Fields[i].DataType in FieldGroupInt) then
+    else if (FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupInt) then
     begin
       vInt := Dataset.Fields[i].AsInteger;
 
       stream.Write(vInt, SizeOf(DWInteger));
     end
     // STREAM
-    else if (Dataset.Fields[i].DataType in FieldGroupStream) then
+    else if (FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupStream) then
     Begin
       vMemoryStream := TMemoryStream.Create;
 
@@ -1341,21 +1357,30 @@ Begin
       End;
     end
     // SINGLE
-    else if (Dataset.Fields[i].DataType in FieldGroupSingle) then
+    else if (FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupSingle) then
     begin
+      {$IFNDEF FPC}
+        {$IF CompilerVersion >= 21}
       vSingle := Dataset.Fields[i].AsSingle;
+        {$IFEND}
+      vSingle := Dataset.Fields[i].AsFloat;
+      {$ELSE}
+      vSingle := Dataset.Fields[i].AsFloat;
+      {$ENDIF}
 
       stream.Write(vSingle, SizeOf(Single));
     end
     // EXTENDED
-    else if (Dataset.Fields[i].DataType in FieldGroupExtended) then
+    else if (FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupExtended)
+    then
     begin
       vDouble := Dataset.Fields[i].AsFloat;
 
       stream.Write(vDouble, SizeOf(Double));
     end
     // CURRENCY
-    else if ((Dataset.Fields[i].DataType in FieldGroupCurrency) {$IFDEF FPC} or (Dataset.Fields[i].DataType in FieldGroupBCD) {$ENDIF}) then
+    else if ((FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupCurrency)
+      {$IFDEF FPC} or (Dataset.Fields[i].DataType in FieldGroupBCD) {$ENDIF}) then
     begin
       vCurrency := Dataset.Fields[i].AsCurrency;
 
@@ -1363,7 +1388,7 @@ Begin
     end
     {$IFNDEF FPC}
     // BCD
-    else if (Dataset.Fields[i].DataType in FieldGroupBCD) then
+    else if (FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupBCD) then
     begin
       vBCD := Dataset.Fields[i].AsBCD;
 
@@ -1371,14 +1396,17 @@ Begin
     end
     {$ENDIF}
     // FLOAT
-    else if (Dataset.Fields[i].DataType in FieldGroupFloat) then
+    else if (FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupFloat) then
     Begin
       vFloat := Dataset.Fields[i].AsFloat;
 
       stream.Write(vFloat, SizeOf(DWFloat));
     End
+    {$IFNDEF FPC}
+      {$IF CompilerVersion >= 21}
     // TIMESTAMP OFFSET
-    else if (Dataset.Fields[i].DataType in FieldGroupTimeStampOffSet) then
+    else if (FieldTypeToDWFieldType(Dataset.Fields[i].DataType)
+      in FieldGroupTimeStampOffSet) then
     begin
       vTimeStampOffset := Dataset.Fields[i].AsSQLTimeStampOffset;
 
@@ -1394,27 +1422,28 @@ Begin
 
       stream.Write(vByte, SizeOf(Byte));
     end
+      {$IFEND}
+    {$ENDIF}
     // DATETIME OR TIMESTAMP
-    else if ((Dataset.Fields[i].DataType in FieldGroupDateTime) or
-      (Dataset.Fields[i].DataType in FieldGroupTimeStamp)) then
+    else if ((FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupDateTime) or
+      (FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupTimeStamp)) then
     Begin
       vFloat := Dataset.Fields[i].AsDateTime;
 
       stream.Write(vFloat, SizeOf(DWFloat));
     End
     // INT64
-    else if (Dataset.Fields[i].DataType in FieldGroupInt64) then
+    else if (FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupInt64) then
     begin
-    {$IF NOT DEFINED(FPC) AND (CompilerVersion < 22)}
+      {$IF NOT DEFINED(FPC) AND (CompilerVersion < 22)}
       vInt64 := Dataset.Fields[i].AsInteger;
-    {$ELSE}
+      {$ELSE}
       vInt64 := Dataset.Fields[i].AsLargeInt;
-    {$IFEND}
-
+      {$IFEND}
       stream.Write(vInt64, SizeOf(DWInt64));
     end
     // BOOLEAN
-    else if (Dataset.Fields[i].DataType in FieldGroupBoolean) then
+    else if (FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupBoolean) then
     begin
       vBoolean := Dataset.Fields[i].AsBoolean;
 
