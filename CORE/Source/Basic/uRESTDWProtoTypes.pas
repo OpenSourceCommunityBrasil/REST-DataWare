@@ -124,7 +124,46 @@ uses
                                                                      (Value: dwftColor;           Name: 'ftColor'));
  {$ENDIF}
 
- Type
+  FieldGroupChar: set of TFieldType = [ftFixedChar, ftString, ftMemo, ftFmtMemo];
+
+  FieldGroupWideChar: set of TFieldType = [ftFixedWideChar, ftWideString, ftWideMemo];
+
+  FieldGroupStream: set of TFieldType = [ftStream, ftBlob, ftBytes];
+
+  FieldGroupInt: set of TFieldType = [ftByte, ftShortint, ftSmallint, ftWord, ftInteger];
+
+  FieldGroupCardinal: set of TFieldType = [ftLongWord];
+  //  LongWord is 4 bytes unassigned on Windows 64bits and all 32bits platforms,
+  // but 8 bytes unassigned for all 64bits platforms except Windows 64bits.
+  //  We are setting LongWord as Cardinal (4 bytes unassigned for all platforms)
+  // to avoid buffer overflows in cross-platform binary exchange.
+
+  FieldGroupInt64: set of TFieldType = [ftAutoInc, ftLargeint];
+  // AutoInc Should be Int64 to accept BIGINT primary keys.
+
+  FieldGroupFloat: set of TFieldType = [ftFloat];
+
+  FieldGroupDateTime: set of TFieldType = [ftDate, ftTime, ftDateTime];
+
+  FieldGroupTimeStampOffSet: set of TFieldType = [ftTimeStampOffset];
+
+  FieldGroupTimeStamp: set of TFieldType = [ftTimeStamp];
+
+  FieldGroupBoolean: set of TFieldType = [ftBoolean];
+
+  FieldGroupSingle: set of TFieldType = [ftSingle];
+
+  FieldGroupExtended: set of TFieldType = [ftExtended];
+  //  Extended is 8 bytes assigned on Windows 64bits, 10 bytes assignbed on
+  // Windows 32 bits and 16 bytes assigned on all other platforms.
+  //  We are setting Extended as Double (8 bytes assigned for all platforms)
+  // to avoid buffer overflows in cross-platform binary exchange.
+
+  FieldGroupCurrency: set of TFieldType = [ftCurrency];
+
+  FieldGroupBCD: set of TFieldType = [ftBCD, ftFMTBcd];
+
+Type
  {$IFDEF FPC}
   DWInteger       = Longint;
   DWInt16         = Integer;

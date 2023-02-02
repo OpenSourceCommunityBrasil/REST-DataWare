@@ -77,6 +77,20 @@ Uses
    Fractions : Cardinal;
  End;
 
+type
+  TSQLTimeStampOffset = record
+   Year,
+   Month,
+   Day,
+   Hour,
+   Minute,
+   Second    : Word;
+   Fractions : Cardinal;
+   TimeZoneHour: SmallInt;
+   TimeZoneMinute: SmallInt;
+ end;
+
+
  Type
   TClassNull= Class(TComponent)
  End;

@@ -40,7 +40,7 @@ Const
                  ftFMTBCD, ftTimestamp,
                  {$IFNDEF FPC}
                   {$IFDEF COMPILER10_UP}
-                  ftOraTimestamp, ftFixedWideChar,
+                  ftOraTimestamp, ftFixedWideChar, ftTimeStampOffset,
                   {$ENDIF COMPILER10_UP}
                   {$IFDEF COMPILER12_UP}
                   ftLongWord, ftShortint, ftByte, ftExtended,
@@ -49,7 +49,7 @@ Const
                    ftFixedWideChar,
                  {$ENDIF FPC}
                  ftBytes, ftVarBytes, ftADT, ftFixedChar, ftWideString, ftLargeint,
-                 ftVariant, ftGuid] + ftBlobTypes;
+                 ftVariant, ftGuid, ftSingle] + ftBlobTypes;
   fkStoredFields = [fkData];
 
 type
@@ -530,76 +530,86 @@ begin
     Result := 0
   else
   if FieldType in ftBlobTypes then
-    Result := SizeOf(Longint)
+    Result := SizeOf(DWInt64)
   else
   begin
     Result := Size;
+
     case FieldType of
       ftString,
       ftFixedChar:
         Inc(Result);
-      ftSmallint:
-        Result := SizeOf(Smallint);
-      ftInteger:
-        Result := SizeOf(Longint);
-      ftWord:
-        Result := SizeOf(Word);
+
+      ftWideString,
+      ftFixedWideChar:
+        Result := (Result + 1) * SizeOf(DWWideChar);
+
+      ftSmallint,
+      ftInteger,
+      ftWord,
+      ftShortint,
+      ftByte:
+        Result := SizeOf(DWInteger);
+
       ftBoolean:
-        Result := SizeOf(Wordbool);
-      ftFloat:
-        Result := SizeOf(Double);
+        Result := SizeOf(Byte);
+
       ftCurrency:
-        Result := SizeOf(Double);
-      ftDate, ftTime:
-        Result := SizeOf(Longint);
+        Result := SizeOf(Currency);
+
+      ftFloat,
+      ftDate,
+      ftTime,
       ftDateTime:
-        Result := SizeOf(TDateTime);
-      ftAutoInc:
-        Result := SizeOf(Longint);
+        Result := SizeOf(DWFloat);
+
+      ftSingle:
+        Result := SizeOf(Single);
+
+      ftLongWord:
+        Result := SizeOf(Cardinal);
+
+      ftExtended:
+        Result := SizeOf(Double);
+
+      ftAutoInc,
+      ftLargeint:
+        Result := SizeOf(DWInt64);
+
       {$IFDEF FPC}
-        ftBCD: Result := SizeOf(Currency);
-        ftFMTBCD: Result := SizeOf(TBCD);
+        ftTimeStamp : Result := SizeOf(TTimeStamp);
+
+        ftBCD,
+        ftFMTBCD:
+         Result := SizeOf(Currency);
       {$ELSE}
-        ftBCD, ftFMTBCD:
-          Result := SizeOf(TBcd);
-      {$ENDIF}
-      ftTimeStamp:
-        Result := SizeOf(TSQLTimeStamp);
-      {$IFNDEF FPC}
+        ftTimeStamp : Result := SizeOf(TSQLTimeStamp);
+
+        ftBCD,
+        ftFMTBCD:
+          Result := SizeOf(TBCD);
+
         {$IFDEF COMPILER10_UP}
-        ftOraTimestamp:
-          Result := SizeOf(TSQLTimeStamp);
-        ftFixedWideChar:
-          Result := (Result + 1) * SizeOf(WideChar);
-        ftWideString:
-          Result := (Result + 1) * SizeOf(WideChar);
+        ftOraTimestamp    :
+          Result := SizeOf(Double);
+
+        ftTimeStampOffset :
+          Result := SizeOf(TSQLTimeStampOffset);
         {$ENDIF COMPILER10_UP}
-        {$IFDEF COMPILER12_UP}
-        ftLongWord:
-          Result := SizeOf(LongWord);
-        ftShortint:
-          Result := SizeOf(Shortint);
-        ftByte:
-          Result := SizeOf(Byte);
-        ftExtended:
-          Result := SizeOf(Extended);
-        {$ENDIF COMPILER12_UP}
-      {$ELSE}
-        ftFixedWideChar:
-          Result := (Result + 1) * SizeOf(WideChar);
-        ftWideString:
-          Result := (Result + 1) * SizeOf(WideChar);
       {$ENDIF}
+
       ftBytes:
         Result := Size;
+
       ftVarBytes:
         Result := Size + 2;
+
       ftADT:
         Result := 0;
-      ftLargeint:
-        Result := SizeOf(Int64);
+
       ftVariant:
         Result := SizeOf(Variant);
+
       ftGuid:
         Result := GuidSize + 1;
     end;
@@ -1400,6 +1410,7 @@ begin
                                                    {$ELSE}Char(Data^){$ENDIF} = 'S'));
                       End;
       End;
+      SetLength(Buffer, 0);
       aNullData := Not Result;
       If Result Then
        Begin
@@ -2337,7 +2348,7 @@ begin
 end;
 procedure TRESTDWMemTable.InternalInitFieldDefs;
 begin
-  // InitFieldDefsFromFields
+//   InitFieldDefsFromFields;
 end;
 
 //Procedure TRESTDWMemTable.DesignNotify(const AFieldName: string; Dummy: Integer);
