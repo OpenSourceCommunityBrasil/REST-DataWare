@@ -926,6 +926,8 @@ var
 begin
   Remote := (Sender as TPoolerHttpConnection);
 
+  Remote.OnDataSent := nil;
+
   try
     Remote.vBytesIn := Remote.vBytesIn + Remote.RequestContentLength;
 
