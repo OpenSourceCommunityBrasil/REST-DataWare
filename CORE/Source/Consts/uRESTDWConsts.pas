@@ -33,7 +33,10 @@ Uses
   {$IFDEF POSIX}Posix.Unistd,{$ENDIF}
  {$ENDIF}
  SysUtils, DB, Classes,
- uRESTDWEncodeClass, ZLib, DWDCPrijndael, DWDCPsha256;
+ zlib, DWDCPrijndael, DWDCPsha256;
+
+Type
+ TEncodeSelect    = (esASCII, esUtf8, esANSI);
 
 Const
  tScriptsDetected : Array [0..1] of string = ('.map', '.webdwpc');
@@ -225,8 +228,6 @@ Const
  cReadTimeout                   = 'Read timed out.';
 
 Type
- TRESTDWAboutInfo = (RESTDWAbout);
-
   {$IF DEFINED(HAS_FMX) AND DEFINED(HAS_UTF8)}
     TRESTDWString = String;
   {$ELSE}

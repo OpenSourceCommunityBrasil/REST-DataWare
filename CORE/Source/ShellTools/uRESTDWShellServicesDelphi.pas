@@ -33,7 +33,7 @@ Uses
   {$IFEND}
   SysUtils, Classes, Db, Variants, HTTPApp, SyncObjs,
   uRESTDWBasic, uRESTDWJSONObject, uRESTDWBasicTypes, uRESTDWComponentEvents,
-  uRESTDWComponentBase, uRESTDWBasicClass, uRESTDWParams, uRESTDWBasicDB,
+  uRESTDWAbout, uRESTDWBasicClass, uRESTDWParams, uRESTDWBasicDB,
   uRESTDWTools, uRESTDWConsts;
 
 Type

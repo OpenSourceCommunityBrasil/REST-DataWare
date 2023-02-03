@@ -28,9 +28,9 @@ unit uRESTDWServerEvents;
 interface
 
 Uses
- SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts, uRESTDWComponentBase,
+ SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts,
  uRESTDWBasic, uRESTDWProtoTypes, uRESTDWTools, uRESTDWParams,
- uRESTDWJSONInterface;
+ uRESTDWJSONInterface, uRESTDWAbout;
 
 Const
  TServerEventsConst = '{"typeobject":"%s", "objectdirection":"%s", "objectvalue":"%s", "paramname":"%s", "encoded":"%s", "default":"%s"}';

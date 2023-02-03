@@ -474,7 +474,7 @@ begin
   P := PosNonSpace(P, SourceText);
   if P = 0 then
     Exit;
-  if CharInSet(SourceText[P], ['a'..'z', 'A'..'Z']) then
+  if (SourceText[P] in ['a'..'z', 'A'..'Z']) then
     Result := P;
 end;
 function ParseAttribute(var Start: Integer; const SourceText: string;
@@ -1830,16 +1830,16 @@ begin
   C := Length(S);
   if C = 0 then
     Exit;
-  while (I + 1 <= C) and CharInSet(S[I + 1], DigitChars + [',', '.']) do
+  while (I + 1 <= C) and (S[I + 1] in DigitChars + [',', '.']) do
     Inc(I);
-  if (I + 1 <= C) and CharInSet(S[I + 1], ['e', 'E']) then
+  if (I + 1 <= C) and (S[I + 1] in ['e', 'E']) then
   begin
     E := I;
     Inc(I);
-    if (I + 1 <= C) and CharInSet(S[I + 1], ['+', '-']) then
+    if (I + 1 <= C) and (S[I + 1] in ['+', '-']) then
       Inc(I);
     E2 := I;
-    while (I + 1 <= C) and CharInSet(S[I + 1], DigitChars) do
+    while (I + 1 <= C) and (S[I + 1] in DigitChars) do
       Inc(I);
     if I = E2 then
       I := E;

@@ -125,11 +125,11 @@ uses
  {$ENDIF}
 
 
-  FieldGroupChar: set of 0..255 = [dwftFixedChar, dwftString, dwftMemo, dwftFMTmemo];
+  FieldGroupChar: set of 0..255 = [dwftFixedChar, dwftString];
 
-  FieldGroupWideChar: set of 0..255 = [dwftFixedWideChar, dwftWideString, dwftWideMemo];
+  FieldGroupWideChar: set of 0..255 = [dwftFixedWideChar, dwftWideString];
 
-  FieldGroupStream: set of 0..255 = [dwftStream, dwftBlob, dwftBytes];
+  FieldGroupStream: set of 0..255 = [dwftStream, dwftBlob, dwftBytes, dwftWideMemo, dwftMemo, dwftFMTMemo];
 
   FieldGroupInt: set of 0..255 = [dwftByte, dwftShortint, dwftSmallint, dwftWord, dwftInteger];
 

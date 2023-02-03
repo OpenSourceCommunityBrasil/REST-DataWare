@@ -48,7 +48,8 @@ Uses
 //   {$IFEND}
   {$ENDIF}
   SysUtils,  Classes, Db, FMTBcd,
-  uRESTDWComponentBase, uRESTDWMemoryDataset, uRESTDWConsts, uRESTDWEncodeClass, uRESTDWProtoTypes;
+  uRESTDWAbout, uRESTDWMemoryDataset, uRESTDWConsts,
+  uRESTDWProtoTypes, uRESTDWTools;
 
  Type
   TFieldDefinition = Class
@@ -301,7 +302,7 @@ Var
 Implementation
 
 Uses
-  uRESTDWTools, uRESTDWDataJSON, uRESTDWJSONInterface, uRESTDWBasicDB,
+  uRESTDWDataJSON, uRESTDWJSONInterface, uRESTDWBasicDB,
   uRESTDWDataUtils, uRESTDWMimeTypes;
 
 Class Function TRESTDWStreamHelper.ReadBytes(Const AStream : TStream;

@@ -48,9 +48,8 @@ Uses
   uRESTDWBasicDB,
   uRESTDWParams,
   uRESTDWBasicClass,
-  uRESTDWComponentBase,
+  uRESTDWAbout,
   uRESTDWConsts,
-  uRESTDWEncodeClass,
   uRESTDWDataUtils,
   uRESTDWTools,
   OverbyteIcsWinSock,
@@ -328,10 +327,12 @@ const
   cIcsHTTPServerNotFound = 'No HTTP server found';
   cIcsHTTPConnectionClosed = 'Closed HTTP connection';
   cIcsCorruptedPackage = 'Corrupted package: RequestContentLength <> Stream.Size';
+  cIcsSSLLibNotFoundForSSLDisabled =
+    'OpenSSL libs are required by ICS to digest AuthTypes rdwAOBearer, rdwAOToken and rdwOAuth even if SSL is disabled.';
 
 Implementation
 
-Uses uRESTDWJSONInterface, VCL.Dialogs, OverbyteIcsWSockBuf, VCL.Forms;
+Uses uRESTDWJSONInterface, vcl.Dialogs, OverbyteIcsWSockBuf, vcl.Forms;
 
 Procedure TRESTDWIcsServicePooler.SetHttpServerSSL;
 var
@@ -383,10 +384,27 @@ begin
       for x := 0 to HttpAppSrv.MultiListenSockets.Count - 1 do
         HttpAppSrv.MultiListenSockets[x].SslEnable := false;
 
+      // Destroy old SSL Context
       If Assigned(HttpAppSrv.SSLContext) Then
       begin
         HttpAppSrv.SSLContext.Free;
         HttpAppSrv.SSLContext := nil;
+      end;
+
+      // OpenSSL libs are required by ICS to digest
+      // AuthTypes rdwAOBearer, rdwAOToken and rdwOAuth even if SSL is disabled
+      try
+        if atDigest in HttpAppSrv.AuthTypes then
+        begin
+          HttpAppSrv.SSLContext := TSslContext.Create(HttpAppSrv);
+
+          HttpAppSrv.SSLContext.InitializeSsl;
+        end;
+      except
+        on E: Exception do
+        begin
+          raise Exception.Create(cIcsSSLLibNotFoundForSSLDisabled + #10#10 + E.Message);
+        end;
       end;
     end;
   end
@@ -975,7 +993,6 @@ Begin
 
       If Not HttpAppSrv.ListenAllOK Then
       Begin
-
         SetHttpServerParams;
 
         SetHttpServerSSL;

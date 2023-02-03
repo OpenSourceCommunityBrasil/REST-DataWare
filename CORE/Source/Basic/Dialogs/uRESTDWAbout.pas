@@ -7,6 +7,7 @@ interface
 uses Classes, SysUtils, uRESTDWConsts{$IFDEF FPC}, lclversion{$ENDIF};
 
 Type
+ TRESTDWAboutInfo = (RESTDWAbout);
  TRESTDWComponent       = Class(TComponent)
  Private
   fsAbout : TRESTDWAboutInfo;

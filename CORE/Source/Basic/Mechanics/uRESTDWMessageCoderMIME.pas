@@ -27,8 +27,8 @@ Interface
 
 Uses
  Classes, SysUtils,
- uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWException, uRESTDWComponentBase, uRESTDWMessage,
- uRESTDWTools, uRESTDWCoder, uRESTDWMessageCoder, uRESTDWCoderHeader;
+ uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWException, uRESTDWMessage,
+ uRESTDWTools, uRESTDWCoder, uRESTDWMessageCoder, uRESTDWCoderHeader, uRESTDWAbout;
 
  Type
   eRESTDWNotEnoughDataInBuffer = Class(eRESTDWException);

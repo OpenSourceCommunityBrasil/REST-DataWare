@@ -45,8 +45,9 @@ Uses
   {$ENDIF}
   SysUtils, Classes, Db, Variants,
   uRESTDWBasic, uRESTDWBasicDB, uRESTDWComponentEvents, uRESTDWBasicTypes,
-  uRESTDWJSONObject, uRESTDWParams, uRESTDWBasicClass, uRESTDWComponentBase,
-  uRESTDWConsts, uRESTDWProtoTypes, uRESTDWEncodeClass, uRESTDWDataUtils, uRESTDWTools, uRESTDWZlib,
+  uRESTDWJSONObject, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
+  uRESTDWConsts, uRESTDWProtoTypes, uRESTDWDataUtils, uRESTDWTools, uRESTDWZlib,
+
   IdContext, IdHeaderList, IdTCPConnection, IdHTTPServer, IdCustomHTTPServer,
   IdSSLOpenSSL, IdSSL, IdAuthentication, IdTCPClient, IdHTTPHeaderInfo,
   IdComponent, IdBaseComponent, IdHTTP, IdMultipartFormData, IdMessageCoder,

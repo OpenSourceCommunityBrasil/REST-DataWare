@@ -35,7 +35,7 @@ Uses
   {$ENDIF}
   SysUtils, Classes, DB, Variants,
   uRESTDWJSONInterface, uRESTDWConsts,
-  uRESTDWTools, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWEncodeClass, uRESTDWDataUtils,
+  uRESTDWTools, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWDataUtils,
   uRESTDWResponseTranslator;
 
 Const                                      // \b  \t  \n   \f   \r

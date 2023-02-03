@@ -28,8 +28,8 @@ interface
 Uses
   {$IFNDEF FPC}StringBuilderUnit,{$ENDIF}
   Classes, SysUtils,
-  uRESTDWTools, uRESTDWConsts, uRESTDWMD5, uRESTDWBasicTypes,
-  uRESTDWEncodeClass, uRESTDWParams, uRESTDWMimeTypes,
+  uRESTDWTools, uRESTDWConsts, uRESTDWMD5, uRESTDWBasicTypes, uRESTDWParams,
+  uRESTDWMimeTypes,
   DateUtils;
 
 Type

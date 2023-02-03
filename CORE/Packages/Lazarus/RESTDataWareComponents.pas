@@ -8,9 +8,8 @@ unit RESTDataWareComponents;
 interface
 
 uses
-  uRESTDWBasic, uRESTDWBasicClass, uRESTDWBasicComponent, uRESTDWBasicDB, 
-  uRESTDWBasicTypes, uRESTDWBufferDb, uRESTDWComponentBase, 
-  uRESTDWComponentEvents, uRESTDWEncodeClass, uRESTDWFileBuffer, 
+  uRESTDWBasic, uRESTDWBasicClass, uRESTDWBasicDB, uRESTDWBasicTypes, 
+  uRESTDWBufferDb, uRESTDWComponentEvents, uRESTDWFileBuffer, 
   uRESTDWMasterDetailData, uRESTDWParams, uRESTDWPoolermethod, 
   uRESTDWResponseTranslator, uRESTDWServerContext, uRESTDWServerEvents, 
   uRESTDWAttachment, uRESTDWAttachmentFile, uRESTDWBuffer, uRESTDWCoder, 
@@ -28,13 +27,13 @@ uses
   uRESTDWMD5, uRESTDWTools, uRESTDWDataJSON, uRESTDWDynArray, uRESTDWJSON, 
   uRESTDWJSONInterface, uRESTDWSerialize, uRESTDWMimeTypes, uRESTDWAbout, 
   uRESTDWZlib, uRESTDWMemoryDataset, uRESTDWMemAnsiStrings, uRESTDWMemBase, 
-  uRESTDWMemCharsets, uRESTDWMemComponentBase, uRESTDWMemConsts, 
-  uRESTDWMemDateTime, uRESTDWMemDBFilterExpr, uRESTDWMemDBUtils, 
-  uRESTDWMemExprParser, uRESTDWMemMath, uRESTDWMemResources, 
-  uRESTDWMemStreams, uRESTDWMemStringConversions, uRESTDWMemStrings, 
-  uRESTDWMemStringsB, uRESTDWMemTranslateString, uRESTDWMemTypes, 
-  uRESTDWMemUnicode, uRESTDWMemVCLUtils, uRESTDWMemWideStrings, 
-  uRESTDWDesignReg, uRESTDWProtoTypes, LazarusPackageIntf;
+  uRESTDWMemCharsets, uRESTDWMemConsts, uRESTDWMemDateTime, 
+  uRESTDWMemDBFilterExpr, uRESTDWMemDBUtils, uRESTDWMemExprParser, 
+  uRESTDWMemMath, uRESTDWMemResources, uRESTDWMemStreams, 
+  uRESTDWMemStringConversions, uRESTDWMemStrings, uRESTDWMemStringsB, 
+  uRESTDWMemTranslateString, uRESTDWMemTypes, uRESTDWMemUnicode, 
+  uRESTDWMemVCLUtils, uRESTDWMemWideStrings, uRESTDWDesignReg, 
+  uRESTDWProtoTypes, LazarusPackageIntf;
 
 implementation
 

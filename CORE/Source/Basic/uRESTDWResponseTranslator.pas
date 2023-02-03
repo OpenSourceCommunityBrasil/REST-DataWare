@@ -30,7 +30,7 @@ interface
 
 Uses
   SysUtils, Classes,
-  uRESTDWComponentBase, uRESTDWTools, uRESTDWConsts;
+  uRESTDWAbout, uRESTDWTools, uRESTDWConsts;
 
 Type
  TPrepareGet         = Procedure (Var AUrl          : String;
