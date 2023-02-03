@@ -1427,7 +1427,7 @@ begin
 {$ELSE}Char(Data^){$ENDIF} = 'S'));
           End;
       End;
-      SetLength(Buffer, 0);
+
       aNullData := Not Result;
       If Result Then
       Begin
