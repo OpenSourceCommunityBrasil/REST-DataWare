@@ -480,7 +480,7 @@ Begin
           // TimeStampOffSet To Double - 8 Bytes
           // + TimeZone                - 2 Bytes
           else if (vDWFieldType in [dwftTimeStampOffset]) then begin
-            {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21_}
+            {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
               stream.Read(vDouble, SizeOf(vDouble));
               vTimeStampOffSet := DateTimeToSQLTimeStampOffset(vDouble);
 
@@ -558,7 +558,7 @@ Begin
             Move(PData^,vBCD,Sizeof(vBCD));
           end
           // N Bytes - WideString Blobs
-          else if (vDWFieldType in [dwftWideMemo]) then
+          else if (vDWFieldType in [dwftWideMemo,dwftFmtMemo]) then
           begin
             stream.Read(vInt64, SizeOf(vInt64));
             vString := '';
@@ -589,7 +589,7 @@ Begin
             end;
           end
           // N Bytes - String Blobs
-          else if (vDWFieldType in [dwftMemo,dwftFmtMemo]) then
+          else if (vDWFieldType in [dwftMemo]) then
           begin
             stream.Read(vInt64, SizeOf(vInt64));
             vString := '';
@@ -696,6 +696,7 @@ var
   vInt64        : Int64;
   vInt          : Integer;
   vDouble       : Double;
+  vTimeZone     : Double;
   vSingle       : Single;
   vWord         : Word;
   vCurrency     : Currency;
@@ -717,8 +718,8 @@ begin
       Continue;
 
     // N - Bytes
-    if (FFieldTypes[i] in [dwftFixedChar, dwftWideString, dwftString,
-                           dwftFixedWideChar,dwftWideMemo]) then begin
+    if (FFieldTypes[i] in [dwftFixedChar,dwftWideString,dwftString,dwftMemo,
+                           dwftFixedWideChar,dwftWideMemo,dwftFmtMemo]) then begin
       Stream.Read(vInt64, Sizeof(vInt64));
       vString := '';
       if vInt64 > 0 then begin
@@ -1123,8 +1124,9 @@ Begin
         vDWFieldType := FieldTypeToDWFieldType(vDataType);
 
         // N Bytes
-        if (vDWFieldType in [dwftFixedChar,dwftWideString,dwftString,dwftFixedWideChar,
-                             dwftWideMemo]) then begin
+        if (vDWFieldType in [dwftFixedChar,dwftWideString,dwftString,
+                             dwftFixedWideChar,dwftWideMemo,dwftFmtMemo,
+                             dwftMemo]) then begin
           vString := PAnsiChar(PData);
           if EncodeStrs then
             vString := EncodeStrings(vString{$IFDEF FPC}, csUndefined{$ENDIF});
@@ -1316,8 +1318,9 @@ Begin
     vDWFieldType := FieldTypeToDWFieldType(Dataset.Fields[i].DataType);
 
     // N - Bytes
-    if (vDWFieldType in [dwftFixedChar,dwftWideString,dwftString,dwftFixedWideChar,
-                         dwftWideMemo]) then begin
+    if (vDWFieldType in [dwftFixedChar,dwftWideString,dwftString,
+                         dwftFixedWideChar, dwftWideMemo,dwftFmtMemo,
+                         dwftMemo]) then begin
       vString := Dataset.Fields[i].AsString;
 
       if EncodeStrs then

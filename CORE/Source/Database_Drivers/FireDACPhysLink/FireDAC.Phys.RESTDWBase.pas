@@ -767,7 +767,7 @@ begin
   // TimeStampOffSet To Double - 8 Bytes
   // + TimeZone                - 2 Bytes
   else if (FFieldTypes[col] in [dwftTimeStampOffset]) then begin
-    {$IF (NOT DEFINED(FPC) AND (CompilerVersion >= 21)}
+    {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
       FStream.Read(vDouble, Sizeof(vDouble));
       Result := vDouble;
 
