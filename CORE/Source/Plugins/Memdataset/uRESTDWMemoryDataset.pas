@@ -141,8 +141,11 @@ type
   public
     constructor Create(AOwner: TComponent); override;
 
-    procedure SaveToStream(Dataset: TDataset; var stream: TStream);
-    procedure LoadFromStream(Dataset: TDataset; stream: TStream);
+    procedure SaveToStream(Dataset: TDataset; var Stream: TStream);
+    procedure LoadFromStream(Dataset: TDataset; Stream: TStream);
+
+    procedure SaveToFile(Dataset: TDataset; FileName: String);
+    procedure LoadFromFile(Dataset: TDataset; FileName: String);
   public
 {$IFDEF FPC}
     property DatabaseCharSet: TDatabaseCharSet read FDatabaseCharSet
@@ -3984,6 +3987,21 @@ Begin
   Inherited Clear;
 End;
 
+procedure TRESTDWStorageBase.LoadFromFile(Dataset: TDataset; FileName: String);
+var
+  vFileStream : TFileStream;
+begin
+  if not FileExists(FileName) then
+    Exit;
+
+  vFileStream := TFileStream.Create(FileName,fmOpenRead or fmShareDenyWrite);
+  try
+    LoadFromStream(Dataset,TStream(vFileStream));
+  finally
+    vFileStream.Free;
+  end;
+end;
+
 procedure TRESTDWStorageBase.LoadFromStream(Dataset: TDataset; stream: TStream);
 begin
   if Dataset.InheritsFrom(TRESTDWMemTable) then
@@ -4001,6 +4019,22 @@ procedure TRESTDWStorageBase.SaveDWMemToStream(Dataset: IRESTDWMemTable;
   var stream: TStream);
 begin
 
+end;
+
+procedure TRESTDWStorageBase.SaveToFile(Dataset: TDataset; FileName: String);
+var
+  vFileStream : TFileStream;
+begin
+  try
+    vFileStream := TFileStream.Create(FileName,fmCreate);
+    try
+      SaveToStream(Dataset,TStream(vFileStream));
+    except
+
+    end;
+  finally
+    vFileStream.Free;
+  end;
 end;
 
 procedure TRESTDWStorageBase.SaveToStream(Dataset: TDataset; var stream: TStream);
