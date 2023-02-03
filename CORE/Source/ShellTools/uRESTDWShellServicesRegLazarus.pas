@@ -27,8 +27,10 @@ unit uRESTDWShellServicesRegLazarus;
 interface
 
 uses
-    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWShellServicesLazarus,
-    LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb, uRESTDWComponentBase;
+    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
+    Variants, TypInfo, SysUtils, FormEditingIntf, PropEdits, lazideintf,
+    LResources, LazFileUtils, ProjectIntf, ComponentEditors, Classes, fpWeb,
+    uRESTDWShellServicesLazarus, uRESTDWAbout;
 
 Type
  TRESTDWAboutDialogProperty = class(TClassPropertyEditor)
