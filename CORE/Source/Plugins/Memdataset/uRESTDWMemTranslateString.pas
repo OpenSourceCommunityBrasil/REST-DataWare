@@ -131,7 +131,7 @@ begin
   FDateFormat := Value;
   if DateSeparator = chr(255) then
     for i := 1 to Length(Value) do
-      if not CharInSet(Value[i],['0'..'9']) then
+      if not (Value[i] in ['0'..'9']) then
       begin
         DateSeparator:= Value[i];
         Exit;
@@ -147,7 +147,7 @@ begin
   FTimeFormat := Value;
   if TimeSeparator = chr(255) then
     for i := 1 to Length(Value) do
-      if not CharInSet(Value[i],['0'..'9']) then
+      if not (Value[i] in ['0'..'9']) then
       begin
         TimeSeparator:= Value[i];
         Exit;

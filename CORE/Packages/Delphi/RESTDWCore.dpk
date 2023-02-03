@@ -31,6 +31,9 @@ package RESTDWCore;
 
 requires
   dcldb,
+  {$IF Defined(VER150)}
+  bdertl,
+  {$IFEND}
   soaprtl;
 
 contains

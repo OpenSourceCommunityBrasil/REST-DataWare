@@ -1380,7 +1380,7 @@ Begin
     end
     // CURRENCY
     else if ((FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupCurrency)
-      {$IFDEF FPC} or (Dataset.Fields[i].DataType in FieldGroupBCD) {$ENDIF}) then
+      {$IFDEF FPC} or (FieldTypeToDWFieldType(Dataset.Fields[i].DataType) in FieldGroupBCD) {$ENDIF}) then
     begin
       vCurrency := Dataset.Fields[i].AsCurrency;
 
