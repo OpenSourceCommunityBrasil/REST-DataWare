@@ -141,8 +141,11 @@ type
   public
     constructor Create(AOwner: TComponent); override;
 
-    procedure SaveToStream(Dataset: TDataset; var stream: TStream);
-    procedure LoadFromStream(Dataset: TDataset; stream: TStream);
+    procedure SaveToStream(Dataset: TDataset; var Stream: TStream);
+    procedure LoadFromStream(Dataset: TDataset; Stream: TStream);
+
+    procedure SaveToFile(Dataset: TDataset; FileName: String);
+    procedure LoadFromFile(Dataset: TDataset; FileName: String);
   public
 {$IFDEF FPC}
     property DatabaseCharSet: TDatabaseCharSet read FDatabaseCharSet
@@ -562,61 +565,84 @@ begin
 end;
 
 function CalcFieldLen(FieldType: TFieldType; Size: Word): Word;
+var
+  vDWFieldType : Byte;
 begin
-  if not(FieldType in ftSupported) then
-    Result := 0
-  else if FieldType in ftBlobTypes then
-    Result := SizeOf(DWInt64)
-  else
-  begin
+  if not(FieldType in ftSupported) then begin
+    Result := 0;
+    Exit;
+  end
+  else if FieldType in ftBlobTypes then begin
+    Result := SizeOf(Int64);
+    Exit;
+  end
+  else begin
     Result := Size;
-
-    if FieldTypeToDWFieldType(FieldType) in FieldGroupChar then
-      Inc(Result)
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupWideChar then
-      Result :=  (Result + 1) * SizeOf(DWWideChar)
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupCardinal then
-      Result := SizeOf(Cardinal)
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupInt then
-      Result := SizeOf(DWInteger)
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupInt64 then
-      Result := SizeOf(DWInt64)
-    else if (FieldTypeToDWFieldType(FieldType) in FieldGroupFloat) or
-      (FieldTypeToDWFieldType(FieldType) in FieldGroupDateTime) then
-      Result := SizeOf(DWFloat)
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupTimeStamp then
-    begin
-      {$IFDEF FPC}
-      Result := SizeOf(TTimeStamp);
-      {$ELSE}
-      Result := SizeOf(TSQLTimeStamp);
-      {$ENDIF}
-    end
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupTimeStampOffSet then
-    begin
-      {$IFNDEF FPC}
-        {$IFDEF COMPILER10_UP}
-      Result := SizeOf(TSQLTimeStampOffset);
-        {$ENDIF COMPILER10_UP}
-      {$ENDIF}
-    end
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupBoolean then
-      Result := SizeOf(Byte)
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupSingle then
-      Result := SizeOf(Single)
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupExtended then
-      Result := SizeOf(Double)
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupCurrency then
-      Result := SizeOf(Currency)
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupBCD then
-      Result := SizeOf(TBCD)
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupStream then
-      Result := Size
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupVariant then
-      Result := SizeOf(Variant)
-    else if FieldTypeToDWFieldType(FieldType) in FieldGroupGUID then
-      Result := GuidSize + 1;
   end;
+
+  vDWFieldType := FieldTypeToDWFieldType(FieldType);
+
+  if (vDWFieldType in [dwftFixedChar, dwftString, dwftMemo, dwftFMTmemo]) then
+    Inc(Result)
+  else if vDWFieldType in [dwftFixedWideChar, dwftWideString, dwftWideMemo] then
+    Result := (Result + 1) * SizeOf(DWWideChar)
+  // 1 - Byte - Inteiros
+  else if (vDWFieldType in [dwftByte,dwftShortint]) then
+    Result := SizeOf(Byte)
+  // 1 - Byte - Boolean
+  else if (vDWFieldType in [dwftBoolean]) then
+    Result := SizeOf(Boolean)
+  // 2 - Bytes
+  else if (vDWFieldType in [dwftSmallint,dwftWord]) then
+    Result := SizeOf(Word)
+  // 4 - Bytes - Inteiros
+  else if (vDWFieldType in [dwftInteger]) then
+    Result := SizeOf(Integer)
+  // 4 - Bytes - Flutuantes
+  else if (vDWFieldType in [dwftSingle]) then
+    Result := SizeOf(Single)
+  // 8 - Bytes - Inteiros
+  else if (vDWFieldType in [dwftLargeint,dwftAutoInc,dwftLongWord]) then
+    Result := SizeOf(Int64)
+  // 8 - Bytes - Flutuantes
+  else if (vDWFieldType in [dwftFloat,dwftExtended]) then
+    Result := SizeOf(Double)
+  // 8 - Bytes - Date, Time, DateTime, TimeStamp
+  else if (vDWFieldType in [dwftDate,dwftTime,dwftDateTime]) then
+    Result := SizeOf(TDateTime)
+  // 16 - Bytes - TSQLTimeStamp
+  // 8 - Bytes - TTimeStamp
+  else if (vDWFieldType in [dwftTimeStamp]) then begin
+    {$IFDEF FPC}
+      Result := SizeOf(TTimeStamp);
+    {$ELSE}
+      Result := SizeOf(TSQLTimeStamp);
+    {$ENDIF}
+  end
+  {$IFNDEF FPC}
+    {$IF CompilerVersion >= 21}
+      // TimeStampOffSet To Double - 8 Bytes
+      // + TimeZone                - 2 Bytes
+      else if (vDWFieldType in [dwftTimeStampOffset]) then
+        Result := SizeOf(TSQLTimeStampOffsetField)
+    {$IFEND}
+  {$ENDIF}
+  // 8 - Bytes - Currency
+  else if (vDWFieldType in [dwftCurrency]) then
+    Result := SizeOf(Currency)
+  else if (vDWFieldType in [dwftBCD]) then begin
+    {$IFDEF FPC}
+      Result := SizeOf(Currency);
+    {$ELSE}
+      Result := SizeOf(TBCD);
+    {$ENDIF}
+  end
+  else if (vDWFieldType in [dwftFMTBcd]) then
+    Result := SizeOf(TBCD)
+  else if vDWFieldType in FieldGroupVariant then
+    Result := SizeOf(Variant)
+  else if vDWFieldType in FieldGroupGUID then
+    Result := GuidSize + 1;
 end;
 
 procedure CalcDataSize(FieldDef: TFieldDef; var DataSize: Integer);
@@ -3961,6 +3987,21 @@ Begin
   Inherited Clear;
 End;
 
+procedure TRESTDWStorageBase.LoadFromFile(Dataset: TDataset; FileName: String);
+var
+  vFileStream : TFileStream;
+begin
+  if not FileExists(FileName) then
+    Exit;
+
+  vFileStream := TFileStream.Create(FileName,fmOpenRead or fmShareDenyWrite);
+  try
+    LoadFromStream(Dataset,TStream(vFileStream));
+  finally
+    vFileStream.Free;
+  end;
+end;
+
 procedure TRESTDWStorageBase.LoadFromStream(Dataset: TDataset; stream: TStream);
 begin
   if Dataset.InheritsFrom(TRESTDWMemTable) then
@@ -3978,6 +4019,22 @@ procedure TRESTDWStorageBase.SaveDWMemToStream(Dataset: IRESTDWMemTable;
   var stream: TStream);
 begin
 
+end;
+
+procedure TRESTDWStorageBase.SaveToFile(Dataset: TDataset; FileName: String);
+var
+  vFileStream : TFileStream;
+begin
+  try
+    vFileStream := TFileStream.Create(FileName,fmCreate);
+    try
+      SaveToStream(Dataset,TStream(vFileStream));
+    except
+
+    end;
+  finally
+    vFileStream.Free;
+  end;
 end;
 
 procedure TRESTDWStorageBase.SaveToStream(Dataset: TDataset; var stream: TStream);
