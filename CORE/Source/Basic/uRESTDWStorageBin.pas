@@ -322,9 +322,6 @@ Begin
       vDWFieldType := FFieldTypes[b];
 
       stream.Read(vBoolean, SizeOf(Byte));
-      tratarNulos;
-      if vBoolean then
-        Continue;
 
       if (pActualRecord <> Nil) then begin
         If aField <> Nil Then Begin
@@ -336,6 +333,10 @@ Begin
               pData := Pointer(pActualRecord + Dataset.GetOffSets(aIndex));
           end;
         End;
+
+        tratarNulos;
+        if vBoolean then
+          Continue;
 
         if (pData <> nil) Or (aField = Nil) then begin
           // N Bytes - WideString
@@ -401,48 +402,48 @@ Begin
           begin
             stream.Read(vByte, SizeOf(vByte));
             if aField <> Nil Then
-              Move(PData^,vByte,Sizeof(vByte));
+              Move(vByte,PData^,Sizeof(vByte));
           end
           // 1 - Byte - Boolean
           else if (vDWFieldType in [dwftBoolean]) then
           begin
             stream.Read(vBoolean, SizeOf(vBoolean));
             if aField <> Nil Then
-              Move(PData^,vBoolean,Sizeof(vBoolean));
+              Move(vBoolean,PData^,Sizeof(vBoolean));
           end
           // 2 - Bytes
           else if (vDWFieldType in [dwftSmallint,dwftWord]) then begin
             stream.Read(vWord, SizeOf(vWord));
             if aField <> Nil Then
-              Move(PData^,vWord,Sizeof(vWord));
+              Move(vWord,PData^,Sizeof(vWord));
           end
           // 4 - Bytes - Inteiros
           else if (vDWFieldType in [dwftInteger]) then
           begin
             stream.Read(vInt, SizeOf(vInt));
             if aField <> Nil Then
-              Move(PData^,vInt,Sizeof(vInt));
+              Move(vInt,PData^,Sizeof(vInt));
           end
           // 4 - Bytes - Flutuantes
           else if (vDWFieldType in [dwftSingle]) then
           begin
             stream.Read(vSingle, SizeOf(vSingle));
             if aField <> Nil Then
-              Move(PData^,vSingle,Sizeof(vSingle));
+              Move(vSingle,PData^,Sizeof(vSingle));
           end
           // 8 - Bytes - Inteiros
           else if (vDWFieldType in [dwftLargeint,dwftAutoInc,dwftLongWord]) then
           begin
             stream.Read(vInt64, SizeOf(vInt64));
             if aField <> Nil Then
-              Move(PData^,vInt64,Sizeof(vInt64));
+              Move(vInt64,PData^,Sizeof(vInt64));
           end
           // 8 - Bytes - Flutuantes
           else if (vDWFieldType in [dwftFloat,dwftExtended]) then
           begin
             stream.Read(vDouble, SizeOf(vDouble));
             if aField <> Nil Then
-              Move(PData^,vDouble,Sizeof(vDouble));
+              Move(vDouble,PData^,Sizeof(vDouble));
           end
           // 8 - Bytes - Date, Time, DateTime, TimeStamp
           else if (vDWFieldType in [dwftDate,dwftTime,dwftDateTime]) then
@@ -491,7 +492,7 @@ Begin
               vTimeStampOffSet.TimeZoneMinute := vByte;
 
               if aField <> Nil Then
-                Move(PData^,vTimeStampOffSet,Sizeof(vTimeStampOffSet));
+                Move(vTimeStampOffSet,PData^,Sizeof(vTimeStampOffSet));
             {$ELSE}
               // field foi transformado em tdatetime
               stream.Read(vDouble, SizeOf(vDouble));
@@ -530,7 +531,7 @@ Begin
           begin
             stream.Read(vCurrency, SizeOf(vCurrency));
             if aField <> Nil Then
-              Move(PData^,vCurrency,Sizeof(vCurrency));
+              Move(vCurrency,PData^,Sizeof(vCurrency));
           end
           // 8 - Bytes - Currency
           else if (vDWFieldType in [dwftBCD]) then
@@ -539,10 +540,10 @@ Begin
 
             if aField <> Nil Then begin
               {$IFDEF FPC}
-                Move(PData^,vCurrency,Sizeof(vCurrency));
+                Move(vCurrency,PData^,Sizeof(vCurrency));
               {$ELSE}
                 vBCD := CurrencyToBcd(vCurrency);
-                Move(PData^,vBCD,Sizeof(vBCD));
+                Move(vBCD,PData^,Sizeof(vBCD));
               {$ENDIF}
             end;
           end
@@ -555,7 +556,7 @@ Begin
             {$ELSE}
               vBCD := CurrencyToBcd(vCurrency);
             {$ENDIF}
-            Move(PData^,vBCD,Sizeof(vBCD));
+            Move(vBCD,PData^,Sizeof(vBCD));
           end
           // N Bytes - WideString Blobs
           else if (vDWFieldType in [dwftWideMemo,dwftFmtMemo]) then
@@ -673,14 +674,13 @@ Begin
         end;
       end;
     end;
-
     Try
       Dataset.SetMemoryRecordData(pActualRecord, i);
     Finally
       {$IFNDEF FPC}
-      Dispose(pActualRecord);
+        Dispose(pActualRecord);
       {$ELSE}
-      Dispose(PJvMemBuffer(@PActualRecord));
+        Dispose(PJvMemBuffer(@PActualRecord));
       {$ENDIF}
     End;
   end;
