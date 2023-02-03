@@ -582,10 +582,10 @@ begin
 
   vDWFieldType := FieldTypeToDWFieldType(FieldType);
 
-  if (vDWFieldType in [dwftFixedChar, dwftString, dwftMemo, dwftFMTmemo]) then
+  if (vDWFieldType in [dwftFixedChar, dwftString]) then
     Inc(Result)
-  else if vDWFieldType in [dwftFixedWideChar, dwftWideString, dwftWideMemo] then
-    Result := (Result + 1) * SizeOf(DWWideChar)
+  else if vDWFieldType in [dwftFixedWideChar, dwftWideString] then
+    Result := (Result + 1) * SizeOf(WideChar)
   // 1 - Byte - Inteiros
   else if (vDWFieldType in [dwftByte,dwftShortint]) then
     Result := SizeOf(Byte)

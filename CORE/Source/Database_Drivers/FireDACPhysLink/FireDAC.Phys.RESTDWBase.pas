@@ -680,6 +680,7 @@ var
   vWord         : Word;
   vSingle       : Single;
   vDouble       : Double;
+  VTimeZone     : Double;
   vCurrency     : Currency;
   vStringStream : TStringStream;
   {$IFNDEF FPC}
@@ -697,8 +698,8 @@ begin
     Exit;
 
   // N - Bytes
-  if (FFieldTypes[col] in [dwftFixedChar,dwftWideString,dwftString,dwftFixedWideChar,
-                           dwftWideMemo]) then begin
+  if (FFieldTypes[col] in [dwftFixedChar,dwftWideString,dwftString,
+                           dwftFixedWideChar]) then begin
     FStream.Read(vInt64, Sizeof(vInt64));
     vString := '';
     if vInt64 > 0 then begin
@@ -763,26 +764,38 @@ begin
     FStream.Read(vDouble, Sizeof(vDouble));
     Result := vDouble;
   end
-  {$IFNDEF FPC}
-    {$IF CompilerVersion >= 21}
-      // TimeStampOffSet To Double - 8 Bytes
-      // + TimeZone                - 2 Bytes
-      else if (FFieldTypes[col] in [dwftTimeStampOffset]) then begin
-        FStream.Read(vDouble, Sizeof(vDouble));
-        Result := vDouble;
+  // TimeStampOffSet To Double - 8 Bytes
+  // + TimeZone                - 2 Bytes
+  else if (FFieldTypes[col] in [dwftTimeStampOffset]) then begin
+    {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+      FStream.Read(vDouble, Sizeof(vDouble));
+      Result := vDouble;
 
-        vTimeStampOffSet := DateTimeToSQLTimeStampOffset(vDouble);
+      vTimeStampOffSet := DateTimeToSQLTimeStampOffset(vDouble);
 
-        FStream.Read(vByte, Sizeof(vByte));
-        vTimeStampOffSet.TimeZoneHour := vByte - 12;
+      FStream.Read(vByte, Sizeof(vByte));
+      vTimeStampOffSet.TimeZoneHour := vByte - 12;
 
-        FStream.Read(vByte, Sizeof(vByte));
-        vTimeStampOffSet.TimeZoneMinute := vByte;
+      FStream.Read(vByte, Sizeof(vByte));
+      vTimeStampOffSet.TimeZoneMinute := vByte;
 
-        Result := VarSQLTimeStampOffsetCreate(vTimeStampOffset);
-      end
+      Result := VarSQLTimeStampOffsetCreate(vTimeStampOffset);
+    {$ELSE}
+      // field foi transformado em datetime
+      FStream.Read(vDouble, Sizeof(vDouble));
+      FStream.Read(vByte, SizeOf(vByte));
+      vTimeZone := (vByte - 12) / 24;
+
+      FStream.Read(vByte, SizeOf(vByte));
+      if vTimeZone > 0 then
+        vTimeZone := vTimeZone + (vByte / 60 / 24)
+      else
+        vTimeZone := vTimeZone - (vByte / 60 / 24);
+
+      vDouble := vDouble - vTimeZone;
+      Result := vDouble;
     {$IFEND}
-  {$ENDIF}
+  end
   // 8 - Bytes - Currency
   else if (FFieldTypes[col] in [dwftCurrency,dwftBCD,dwftFMTBcd]) then
   begin
