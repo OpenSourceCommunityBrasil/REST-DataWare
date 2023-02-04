@@ -31,7 +31,7 @@ uses
   FireDAC.Phys.SQLGenerator, FireDAC.Stan.Util, FireDAC.Stan.Param,
   FireDAC.DatS, Firedac.Stan.Option, Variants, uRESTDWProtoTypes,
   uRESTDWBasicDB, DB, uRESTDWPoolermethod, FireDAC.Phys.RESTDWMeta,
-  uRESTDWBasicTypes;
+  uRESTDWBasicTypes, FireDAC.Stan.Error, FireDAC.Stan.Consts;
 
 type
   TFDPhysRDWConnectionBase = class;
@@ -555,6 +555,17 @@ var
   vRowsAffected : integer;
   vPoolermethod : TRESTDWPoolerMethodClient;
 
+  procedure Error(msg : string);
+  var
+    eKind: TFDCommandExceptionKind;
+    oExc: EFDDBEngineException;
+  begin
+    eKind := ekCmdAborted;
+    oExc := EFDDBEngineException.Create(er_FD_StanTimeout, msg);
+    oExc.AppendError(1, er_FD_StanTimeout, msg, '', eKind, -1, -1);
+    FDException(Self, oExc, False);
+  end;
+
   procedure addParams(AFDParams : TFDParams);
   var
     i : integer;
@@ -574,7 +585,6 @@ begin
   sSQL := GetCommandText;
   if Trim(sSQL) <> '' then begin
     vRESTDataBase := TFDPhysRDWConnectionBase(FConnection).Database;
-
     vParams := TParams.Create(nil);
     addParams(GetParams);
 
@@ -601,14 +611,13 @@ begin
     vParams.Free;
 
     if not vError then begin
-
       Result := vRowsAffected;
       if exec then
         Result := vRowsAffected;
     end
     else begin
-      Result := -1;
-      raise Exception.Create(vMessageError);
+      Result := 0;
+      Error(vMessageError);
     end;
   end
   else begin
