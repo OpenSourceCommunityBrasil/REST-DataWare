@@ -612,8 +612,6 @@ begin
 
     if not vError then begin
       Result := vRowsAffected;
-      if exec then
-        Result := vRowsAffected;
     end
     else begin
       Result := 0;
