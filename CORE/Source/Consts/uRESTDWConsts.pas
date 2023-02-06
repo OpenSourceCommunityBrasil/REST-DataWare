@@ -1,4 +1,4 @@
-Unit uRESTDWConsts;
+﻿Unit uRESTDWConsts;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -47,19 +47,18 @@ Const
  GOffsetFromUTC   : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
  
  // controle de versão
- RESTDWVersionINFO          = 'v2.1.0-';
- RESTDWRelease              = '423';
- RESTDWCodeProject          = 'Galaga - GitHub';
- RESTDWVersao               = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
- cSetPhysicDriver           = 'A PhysicDriver is needed to work';
- SNotEditing                = 'Not in Edit mode';
- RESTDWDialogoTitulo        = 'REST DataWare Components ' + RESTDWVersao;
- RESTDWSobreTitulo          = 'REST DataWare '+ RESTDWVersao;
- RESTDWSobreDescricao       = 'https://github.com/OpenSourceCommunityBrasil/REST-DataWare' + sLineBreak +
-                              'Components REST Dataware';
- RESTDWSobreLicencaStatus   = 'Open Source - Free Version';
- RESTDWParamsHeaderVersion  = 6;
- cRestDWNull                    = #1#1;//Null de Binarios dataset
+ RESTDWVersionINFO              = 'v2.1.0-';
+ RESTDWRelease                  = '423';
+ RESTDWCodeProject              = 'Galaga - GitHub';
+ RESTDWVersao                   = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
+ RESTDWDialogoTitulo            = 'REST DataWare Components ' + RESTDWVersao;
+ RESTDWSobreTitulo              = 'REST DataWare '+ RESTDWVersao;
+ RESTDWSobreDescricao           = 'https://github.com/OpenSourceCommunityBrasil/REST-DataWare' + sLineBreak +
+                                  'Components REST Dataware';
+ RESTDWSobreLicencaStatus       = 'Open Source - Free Version';
+ RESTDWParamsHeaderVersion      = 6;
+ SNotEditing                    = 'Not in Edit mode';
+ cRestDWNull                    = #1#1; //Null de Binarios dataset
  ByteBuffer                     = 1024 * 8; //8kb
  CompressBuffer                 = 1024 * 2;
  HoursInDay                     = 24;     {Number of hours in a day}
@@ -85,6 +84,7 @@ Const
  cContentTypeMultiPart          = 'multipart/form-data';
  cCORSPreflightCODE             = 200;
  cCreatedToken                  = '201 Created';
+ cDefaultAccept                 = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
  cDefaultBasicAuthUser          = 'testserver';
  cDefaultBasicAuthPassword      = 'testserver';
  cDefaultContentType            = 'application/json';
@@ -97,30 +97,33 @@ Const
  cExprIncorrect                 = 'Incorrectly formed filter expression';
  cExprExpected                  = 'Expression expected but %s found';
  cFieldNotFound                 = 'Field ''%s'' not found';
+ cInvalidAccessTag              = 'Invalid Access tag...';
+ cInvalidAuth                   = 'HTTP/1.1 401 Unauthorized';
+ cInvalidBlankPooler            = 'Invalid Pooler Name: Pooler field is blank';
  cInvalidBinaryRequest          = 'Invalid Binary Request. Resource unsupported. %s';
- cInvalidEvent                  = 'Invalid Event Name';
+ cInvalidBufferPosition         = 'Invalid Buffer Position';
+ cInvalidConnection             = 'Invalid connection. The server maybe offline...';
+ cInvalidConnectionName         = 'Invalid ConnectionName';
  cInvalidContextName            = 'Invalid Context Name';
+ cInvalidContextRule            = 'Invalid ContextRule Name';
  cInvalidCustomFieldName        = 'Invalid Custom Field Name';
- cInvalidFieldName              = 'Invalid Field Name';
- cInvalidParamName              = 'Invalid Param Name';
+ cInvalidDataContext            = 'Invalid Data Context';
+ cInvalidDataToApply            = 'No data to "Applyupdates"...';
+ cInvalidDriverConnection       = 'CustomConnection undefined on server driver selected';
  cInvalidDWParam                = 'Invalid RESTDWParam';
  cInvalidDWParams               = 'Invalid RESTDWParams';
- cInvalidPoolerName             = 'Invalid Pooler Name...';
- cInvalidBlankPooler            = 'Invalid Pooler Name: Pooler is blank';
- cInvalidContextRule            = 'Invalid ContextRule Name';
- cInvalidRequest                = 'Invalid request url.';
- cInvalidServerEventName        = 'Invalid ServerEvent name';
- cInvalidDriverConnection       = 'CustomConnection undefined on server driver selected';
- cInvalidRDWServer              = 'Invalid REST Dataware Server...';
- cInvalidConnectionName         = 'Invalid ConnectionName';
- cInvalidConnection             = 'Invalid connection. The server maybe offline...';
- cInvalidDataToApply            = 'No data to "Applyupdates"...';
- cInvalidBufferPosition         = 'Invalid Buffer Position';
- cInvalidStream                 = 'Invalid Stream...';
- cInvalidAuth                   = 'HTTP/1.1 401 Unauthorized';
+ cInvalidEvent                  = 'Invalid Event Name';
+ cInvalidFieldName              = 'Invalid Field Name';
  cInvalidInternalError          = 'Internal Server Error';
  cInvalidMessageTo              = 'Invalid Sendmessage %s to user %s, error %s';
+ cInvalidParamName              = 'Invalid Param Name';
+ cInvalidPoolerName             = 'Invalid Pooler Name...';
+ cInvalidRDWServer              = 'Invalid REST Dataware Server...';
+ cInvalidRequest                = 'Invalid request url.';
+ cInvalidServerEventName        = 'Invalid ServerEvent name';
+ cInvalidStream                 = 'Invalid Stream...';
  cInvalidVirtualMethod          = 'Invalid Virtual Method: %s, proper override method class needed';
+ cInvalidWelcomeMessage         = 'Invalid WelcomeMessage param...';
  cIOHandler_MaxCapturedLines    = -1;
  cMaxLineLengthDefault          = 16 * 1024;
  cMessagePartCreate             = 'MessagePart can not be created. Use descendant classes.';
@@ -129,6 +132,8 @@ Const
  cMethodNotImplemented          = 'Method not implemented...';
  cMIMETypeEmpty                 = 'Mimetype is Empty...';
  cMIMETypeAlreadyExists         = 'Mimetype Already Exists...';
+ cMultipleServerEvents          = 'There is more than one ServerEvent.'+ sLineBreak +
+                                  'Choose the desired ServerEvent in the ServerEventName property.';
  cNameValueSeparator            = ':';
  cNotWorkYet                    = 'It doesn''''t work yet';
  cNullvalue                     = 'null';
@@ -144,12 +149,13 @@ Const
  cRecvBufferSizeDefault         = 32 * 1024;
  cRequestRejectedMethods        = 'Request rejected. Acceptable HTTP methods: ';
  cRequestAcceptableMethods      = 'Acceptable HTTP methods not defined on server';
- cRequestRejected               = 'The Requested URL was Rejected';
+ cRequestRejected               = 'The request URL was rejected';
  cSendBufferSizeDefault         = 32 * 1024;
  cServerEventNotFound           = 'ServerEvent not found...';
  cServerMethodClassNotAssigned  = 'Property ServerMethodClass not assigned';
  cServerMessage                 = 'SERVERMESSAGE';
  cServerStream                  = 'SERVERSTREAM';
+ cSetPhysicDriver               = 'A PhysicDriver is needed to work';
  cStreamReadError               = 'Stream Error %s %s';
  cTablenameTAG                  = 'TABLENAME';
  cTimeoutDefault                = -1;

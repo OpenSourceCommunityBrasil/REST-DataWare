@@ -2765,7 +2765,7 @@ Begin
  //application/json
  ContentType                    := cContentTypeFormUrl;
  ContentEncoding                := cDefaultContentEncoding;
- Accept                         := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+ Accept                         := cDefaultAccept;
  AcceptEncoding                 := '';
  MaxAuthRetries                 := 0;
  UserAgent                      := cUserAgent;
@@ -4281,13 +4281,13 @@ Var
       If (Params <> Nil) Or (WelcomeMessage <> '') Or (Datacompress) Then
        Begin
         If HttpRequest.Accept = '' Then
-         HttpRequest.Accept         := 'application/json';
+         HttpRequest.Accept         := cDefaultContentType;
         If HttpRequest.AcceptEncoding = '' Then
          HttpRequest.AcceptEncoding := AcceptEncoding;
         If HttpRequest.ContentType = '' Then
-         HttpRequest.ContentType     := 'application/x-www-form-urlencoded';
+         HttpRequest.ContentType     := cContentTypeFormUrl;
         If HttpRequest.ContentEncoding = '' Then
-         HttpRequest.ContentEncoding := 'multipart/form-data';
+         HttpRequest.ContentEncoding := cContentTypeMultiPart;
         If TEncodeSelect(Encoding) = esUtf8 Then
          HttpRequest.Charset        := 'Utf-8'
         Else If TEncodeSelect(Encoding) in [esANSI, esASCII] Then
@@ -4349,7 +4349,7 @@ Var
        End
       Else
        Begin
-        HttpRequest.ContentType     := 'application/json';
+        HttpRequest.ContentType     := cDefaultContentType;
         HttpRequest.ContentEncoding := '';
         HttpRequest.UserAgent       := UserAgent;
         aStringStream               := TStringStream.Create('');

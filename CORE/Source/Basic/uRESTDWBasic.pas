@@ -998,46 +998,22 @@ End;
 
 Procedure TRESTClientPoolerBase.SetOnWork(Value : TOnWork);
 Begin
- {$IFDEF FPC}
-  vOnWork            := Value;
-//  HttpRequest.OnWork := vOnWork;
- {$ELSE}
-  vOnWork            := Value;
-//  HttpRequest.OnWork := vOnWork;
- {$ENDIF}
+  vOnWork := Value;
 End;
 
 Procedure TRESTClientPoolerBase.SetOnWorkBegin(Value : TOnWork);
 Begin
- {$IFDEF FPC}
-  vOnWorkBegin            := Value;
-//  HttpRequest.OnWorkBegin := vOnWorkBegin;
- {$ELSE}
-  vOnWorkBegin            := Value;
-//  HttpRequest.OnWorkBegin := vOnWorkBegin;
- {$ENDIF}
+  vOnWorkBegin := Value;
 End;
 
 Procedure TRESTClientPoolerBase.SetOnWorkEnd(Value : TOnWorkEnd);
 Begin
- {$IFDEF FPC}
-  vOnWorkEnd            := Value;
-//  HttpRequest.OnWorkEnd := vOnWorkEnd;
- {$ELSE}
-  vOnWorkEnd            := Value;
-//  HttpRequest.OnWorkEnd := vOnWorkEnd;
- {$ENDIF}
+  vOnWorkEnd := Value;
 End;
 
 Procedure TRESTClientPoolerBase.SetOnStatus(Value : TOnStatus);
 Begin
- {$IFDEF FPC}
-  vOnStatus            := Value;
-//  HttpRequest.OnStatus := vOnStatus;
- {$ELSE}
-  vOnStatus            := Value;
-//  HttpRequest.OnStatus := vOnStatus;
- {$ENDIF}
+  vOnStatus := Value;
 End;
 
 Function TRESTClientPoolerBase.GetAllowCookies: Boolean;
@@ -1433,9 +1409,9 @@ Begin
  {$IFDEF FPC}
  vDatabaseCharSet                      := csUndefined;
  {$ENDIF}
- vContentType                          := 'application/json';
- vContentEncoding                      := 'multipart/form-data';
- vAccept                               := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+ vContentType                          := cDefaultContentType;
+ vContentEncoding                      := cContentTypeMultiPart;
+ vAccept                               := cDefaultAccept;
  vAcceptEncoding                       := '';
  vFailOver                             := False;
  vFailOverReplaceDefaults              := False;
@@ -2782,7 +2758,7 @@ Begin
        If Not vDataRouteList.RouteExists(vUrlToExec) Then
         Begin
          vErrorCode := 400;
-         JSONStr    := GetPairJSONInt(-5, 'Invalid Request');
+         JSONStr    := GetPairJSONInt(-5, cInvalidRequest);
         End
        Else
         Begin
@@ -2791,7 +2767,7 @@ Begin
            If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
             Begin
              vErrorCode := 400;
-             JSONStr    := GetPairJSONInt(-5, 'Invalid Data Context');
+             JSONStr    := GetPairJSONInt(-5, cInvalidDataContext);
             End;
           End
          Else
@@ -2799,7 +2775,7 @@ Begin
            If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
             Begin
              vErrorCode := 400;
-             JSONStr    := GetPairJSONInt(-5, 'Invalid Data Context');
+             JSONStr    := GetPairJSONInt(-5, cInvalidDataContext);
             End;
           End;
         End;
@@ -3298,7 +3274,7 @@ Begin
        If vErrorCode <> 400 Then
         Begin
          vErrorCode := 401;
-         JSONStr    := GetPairJSONInt(-5, 'Server Methods Cannot Assigned');
+         JSONStr    := GetPairJSONInt(-5, cServerMethodClassNotAssigned);
         End;
       End;
      Try
@@ -3894,7 +3870,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -3970,7 +3946,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -4533,7 +4509,7 @@ Begin
    If DWParams.ItemsString['Error']        <> Nil Then
     DWParams.ItemsString['Error'].AsBoolean := True;
    If DWParams.ItemsString['MessageError'] <> Nil Then
-    DWParams.ItemsString['MessageError'].AsString := 'Invalid welcomemessage...'
+    DWParams.ItemsString['MessageError'].AsString := cInvalidWelcomeMessage
    Else
     Begin
      If (ErrorCode <= 0)  Or
@@ -4578,7 +4554,7 @@ Begin
            Begin
             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
              Begin
-              DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+              DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
               DWParams.ItemsString['Error'].AsBoolean       := True;
               Exit;
              End;
@@ -4675,7 +4651,7 @@ Begin
            Begin
             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
              Begin
-              DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+              DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
               DWParams.ItemsString['Error'].AsBoolean       := True;
               Exit;
              End;
@@ -4772,7 +4748,7 @@ Begin
            Begin
             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
              Begin
-              DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+              DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
               DWParams.ItemsString['Error'].AsBoolean       := True;
               Exit;
              End;
@@ -4884,7 +4860,7 @@ Begin
            Begin
             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
              Begin
-              DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+              DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
               DWParams.ItemsString['Error'].AsBoolean       := True;
               Exit;
              End;
@@ -4984,7 +4960,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -5076,7 +5052,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -5183,7 +5159,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -5277,7 +5253,7 @@ Begin
            Begin
             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
              Begin
-              DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+              DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
               DWParams.ItemsString['Error'].AsBoolean       := True;
               Exit;
              End;
@@ -5374,7 +5350,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -5455,7 +5431,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -5530,7 +5506,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -5617,10 +5593,9 @@ Begin
    vError := vTempJSON = '';
    If vError Then
     Begin
-     DWParams.ItemsString['MessageError'].AsString := 'Event Not Found';
+     DWParams.ItemsString['MessageError'].AsString := cEventNotFound;
      If iContSE > 1 then
-      DWParams.ItemsString['MessageError'].AsString := 'There is more than one ServerEvent.'+ sLineBreak +
-                                                       'Choose the desired ServerEvent in the ServerEventName property.';
+      DWParams.ItemsString['MessageError'].AsString := cMultipleServerEvents;
     End;
    DWParams.ItemsString['Error'].AsBoolean        := vError;
    If DWParams.ItemsString['Result'] <> Nil Then
@@ -5687,9 +5662,9 @@ Begin
            If TRESTDWServerEvents(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
              If DWParams.ItemsString['dwencodestrings'] <> Nil Then
-              vResult := EncodeStrings('Invalid Access tag...'{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+              vResult := EncodeStrings(cInvalidAccessTag{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
              Else
-              vResult := 'Invalid Access tag...';
+              vResult := cInvalidAccessTag;
              ErrorCode := 401;
              Result  := True;
              Break;
@@ -5741,7 +5716,7 @@ Begin
                vResult     := vErrorMessage;
               End
              Else
-              vResult   := 'The Requested URL was Rejected';
+              vResult   := cRequestRejected;
              If (ErrorCode <= 0)  Or
                 (ErrorCode = 200) Then
               ErrorCode := 401;
@@ -5797,19 +5772,19 @@ Begin
             End;
            If vStrAcceptedRoutes <> '' then
             Begin
-             vResult   := 'Request rejected. Acceptable HTTP methods: '+vStrAcceptedRoutes;
+             vResult   := cRequestRejectedMethods + vStrAcceptedRoutes;
              ErrorCode := 403;
             End
            Else
             Begin
-             vResult   := 'Acceptable HTTP methods not defined on server';
+             vResult   := cRequestAcceptableMethods;
              ErrorCode := 500;
             End;
           End;
          Break;
         End
        Else
-        vResult := 'Event not found...';
+        vResult := cEventNotFound;
       End;
     End;
   End;
