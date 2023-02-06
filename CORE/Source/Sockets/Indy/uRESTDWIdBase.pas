@@ -93,19 +93,12 @@ Type
   Function  SSLVerifyPeer           (Certificate      : TIdX509;
                                      AOk              : Boolean;
                                      ADepth, AError   : Integer) : Boolean;
-  Procedure GetSSLPassWord          (Var Password     : {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}
-                                                         AnsiString
-                                                        {$ELSE}
-                                                         String
-                                                        {$IFEND}
-                                                        {$ELSE}
-                                                         String
-                                                        {$ENDIF});
-  Procedure EchoPooler               (ServerMethodsClass      : TComponent;
-                                      AContext                : TComponent;
-                                      Var Pooler, MyIP        : String;
-                                      AccessTag               : String;
-                                      Var InvalidTag          : Boolean);Override;
+  Procedure GetSSLPassWord          (Var Password     : String);
+  Procedure EchoPooler              (ServerMethodsClass      : TComponent;
+                                     AContext                : TComponent;
+                                     Var Pooler, MyIP        : String;
+                                     AccessTag               : String;
+                                     Var InvalidTag          : Boolean);Override;
  Public
   Constructor Create                (AOwner           : TComponent);Override;
   Destructor  Destroy; override;
@@ -2988,15 +2981,8 @@ Begin
       ssl.OnVerifyPeer := IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
      {$ENDIF}
     End;
-   {$IFDEF FPC}
     ssl.SSLOptions.SSLVersions := vSSLVersions;
-   {$ELSE}
-    {$IF Not(DEFINED(OLDINDY))}
-     ssl.SSLOptions.SSLVersions := vSSLVersions;
-    {$ELSE}
-     ssl.SSLOptions.Method      := vSSLVersions;
-    {$IFEND}
-   {$ENDIF}
+
    SetCertOptions;
    If Assigned(HttpRequest) Then
     HttpRequest.IOHandler := ssl;
@@ -3570,16 +3556,13 @@ Begin
        (ASSLCertFile <> '')           Then
      Begin
       lHandler.SSLOptions.Method                := aSSLMethod;
-      {$IFDEF FPC}
       lHandler.SSLOptions.SSLVersions           := PIdSSLVersions(@SSLVersions)^;
+      {$IFDEF FPC}
       lHandler.OnGetPassword                    := @GetSSLPassword;
       lHandler.OnVerifyPeer                     := @SSLVerifyPeer;
       {$ELSE}
-       {$IF Not(DEFINED(OLDINDY))}
-        lHandler.SSLOptions.SSLVersions         := PIdSSLVersions(@SSLVersions)^;
-        lHandler.OnVerifyPeer                   := SSLVerifyPeer;
-       {$IFEND}
       lHandler.OnGetPassword                    := GetSSLPassword;
+      lHandler.OnVerifyPeer                     := SSLVerifyPeer;
       {$ENDIF}
       lHandler.SSLOptions.CertFile              := ASSLCertFile;
       lHandler.SSLOptions.KeyFile               := ASSLPrivateKeyFile;
@@ -3634,14 +3617,7 @@ Begin
  Inherited SetActive(HTTPServer.Active);
 End;
 
-Procedure TRESTDWIdServicePooler.GetSSLPassWord(var Password: {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}
-                                                                                     AnsiString
-                                                                                    {$ELSE}
-                                                                                     String
-                                                                                    {$IFEND}
-                                                                                    {$ELSE}
-                                                                                     String
-                                                                                    {$ENDIF});
+Procedure TRESTDWIdServicePooler.GetSSLPassWord(var Password:String);
 Begin
  Password := aSSLPrivateKeyPassword;
 End;
@@ -3708,14 +3684,8 @@ Begin
  {$ENDIF}
  If (UseSSL) Then
   Begin
-   HttpRequest.CertMode              := vSSLMode;
-   {$IFDEF FPC}
-   HttpRequest.SSLVersions           := PIdSSLVersions(@SSLVersions)^;
-   {$ELSE}
-    {$IF Not(DEFINED(OLDINDY))}
-     HttpRequest.SSLVersions         := PIdSSLVersions(@SSLVersions)^;
-    {$IFEND}
-   {$ENDIF}
+   HttpRequest.CertMode    := vSSLMode;
+   HttpRequest.SSLVersions := PIdSSLVersions(@SSLVersions)^;
   End;
 End;
 
@@ -4018,15 +3988,7 @@ Var
        If Assigned(MemoryStream) Then
         Begin
          MemoryStream.Position := 0;
-         {$IFNDEF FPC}
-          {$IF (DEFINED(OLDINDY))}
-           SendParamsData.AddObject( 'binarydata', 'application/octet-stream', MemoryStream); //StringStreamList.Items[StringStreamList.Count-1]);
-          {$ELSE}
-           SendParamsData.AddObject( 'binarydata', 'application/octet-stream', '', MemoryStream); //StringStreamList.Items[StringStreamList.Count-1]);
-          {$IFEND}
-         {$ELSE}
-          SendParamsData.AddObject( 'binarydata', 'application/octet-stream', '', MemoryStream); //StringStreamList.Items[StringStreamList.Count-1]);
-         {$ENDIF}
+         SendParamsData.AddObject( 'binarydata', 'application/octet-stream', '', MemoryStream); //StringStreamList.Items[StringStreamList.Count-1]);
         End;
       Finally
       End;
@@ -4046,19 +4008,7 @@ Var
                                {$ELSE}
                                TStringStream.Create(DWParams.Items[I].ToJSON{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND})
                                {$ENDIF});
-          {$IFNDEF FPC}
-           {$if CompilerVersion > 21}
-            SendParamsData.AddObject(DWParams.Items[I].ParamName, 'multipart/form-data', vCharsset, StringStreamList.Items[StringStreamList.Count-1]);
-           {$ELSE}
-            {$IF (DEFINED(OLDINDY))}
-             SendParamsData.AddObject(DWParams.Items[I].ParamName, 'multipart/form-data', StringStreamList.Items[StringStreamList.Count-1]);
-            {$ELSE}
-             SendParamsData.AddObject(DWParams.Items[I].ParamName, 'multipart/form-data', vCharsset, StringStreamList.Items[StringStreamList.Count-1]);
-            {$IFEND}
-           {$IFEND}
-          {$ELSE}
            SendParamsData.AddObject(DWParams.Items[I].ParamName, 'multipart/form-data', vCharsset, StringStreamList.Items[StringStreamList.Count-1]);
-          {$ENDIF}
          End
         Else
          SendParamsData.AddFormField(DWParams.Items[I].ParamName, DWParams.Items[I].ToJSON);
@@ -4182,18 +4132,8 @@ Var
       Case EventType Of
        seGET    : vErrorCode := HttpRequest.Get(vURL, TStringList(HttpRequest.DefaultCustomHeader), aStringStream);
        seDELETE : Begin
-                   {$IFDEF FPC}
-                    TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, vURL, SendParams, aStringStream, []);
-                    vErrorCode := TIdHTTPAccess(HttpRequest).ResponseCode;
-                   {$ELSE}
-                    {$IFDEF OLDINDY}
-                     vErrorCode := HttpRequest.Delete(vURL);
-                    {$ELSE}
-                     //HttpRequest.Delete(AUrl, atempResponse);
-                     TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, vURL, SendParams, aStringStream, []);
-                     vErrorCode := TIdHTTPAccess(HttpRequest).ResponseCode;
-                    {$ENDIF}
-                   {$ENDIF}
+                   TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, vURL, SendParams, aStringStream, []);
+                   vErrorCode := TIdHTTPAccess(HttpRequest).ResponseCode;
                   End;
       End;
       If Not Assyncexec Then
@@ -4367,17 +4307,9 @@ Var
            aStringStream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
           {$ENDIF}
           Case EventType Of
-           sePUT    : vErrorCode := HttpRequest.Put   (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, aStringStream);
-           sePATCH  : Begin
-                       {$IFNDEF OLDINDY}
-                        {$IFDEF INDY_NEW}
-                         {$IF CompilerVersion > 26} // Delphi XE6 pra cima
-                          vErrorCode := HttpRequest.Patch (URL, SendParams, aStringStream);
-                         {$IFEND}
-                        {$ENDIF}
-                       {$ENDIF}
-                      End;
-           sePOST   : vErrorCode := HttpRequest.Post  (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, aStringStream);
+           sePUT    : vErrorCode := HttpRequest.Put(URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, aStringStream);
+           sePATCH  : vErrorCode := HttpRequest.Patch(URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, aStringStream);
+           sePOST   : vErrorCode := HttpRequest.Post(URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, aStringStream);
           end;
           If Not Assyncexec Then
            Begin
@@ -4400,17 +4332,9 @@ Var
            StringStream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
           {$ENDIF}
           Case EventType Of
-           sePUT    : vErrorCode := HttpRequest.Put   (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, StringStream);
-           sePATCH  : Begin
-                       {$IFNDEF OLDINDY}
-                        {$IFDEF INDY_NEW}
-                         {$IF CompilerVersion > 26} // Delphi XE6 pra cima
-                          vErrorCode := HttpRequest.Patch (URL, SendParams, StringStream);
-                         {$IFEND}
-                        {$ENDIF}
-                       {$ENDIF}
-                      End;
-           sePOST   : vErrorCode := HttpRequest.Post  (URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, StringStream);
+           sePUT    : vErrorCode := HttpRequest.Put(URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, StringStream);
+           sePATCH  : vErrorCode := HttpRequest.Patch(URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, aStringStream);
+           sePOST   : vErrorCode := HttpRequest.Post(URL, TStringList(HttpRequest.DefaultCustomHeader), SendParams, StringStream);
           end;
          End;
         If SendParams <> Nil Then
@@ -4418,9 +4342,7 @@ Var
           If Assigned(StringStreamList) Then
            FreeAndNil(StringStreamList);
           {$IFNDEF FPC}
-           {$IF Not(DEFINED(OLDINDY))}
             SendParams.Clear;
-           {$IFEND}
           {$ENDIF}
           FreeAndNil(SendParams);
          End;
