@@ -1812,7 +1812,7 @@ End;
 
 Class Function TRESTDWDataUtils.Result2JSON(wsResult : TResultErro) : String;
 Begin
- Result := '{"STATUS":"' + wsResult.Status + '","MENSSAGE":"' + wsResult.MessageText + '"}';
+ Result := '{"STATUS":"' + wsResult.Status + '","MESSAGE":"' + wsResult.MessageText + '"}';
 End;
 
 Class Procedure TRESTDWDataUtils.ParseWebFormsParams(Params             : TStrings;

@@ -3671,6 +3671,10 @@ Begin
  HttpRequest.HandleRedirects             := HandleRedirects;
  HttpRequest.Charset                     := Charset;
  HttpRequest.UserAgent                   := UserAgent;
+ HttpRequest.OnWork                      := Self.OnWork;
+ HttpRequest.OnWorkBegin                 := Self.OnWorkBegin;
+ HttpRequest.OnWorkEnd                   := Self.OnWorkEnd;
+ HttpRequest.OnStatus                    := Self.OnStatus;
 End;
 
 Constructor TRESTDWIdClientPooler.Create(AOwner : TComponent);

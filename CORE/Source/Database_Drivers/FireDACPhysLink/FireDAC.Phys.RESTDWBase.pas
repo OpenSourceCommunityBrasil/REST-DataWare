@@ -29,8 +29,9 @@ interface
 uses
   Classes, SysUtils, FireDAC.Phys, FireDAC.Stan.Intf, FireDAC.Phys.Intf,
   FireDAC.Phys.SQLGenerator, FireDAC.Stan.Util, FireDAC.Stan.Param,
-  FireDAC.DatS, Firedac.Stan.Option, Variants,
-  uRESTDWBasicDB, DB, uRESTDWPoolermethod, uRESTDWProtoTypes, FireDAC.Phys.RESTDWMeta;
+  FireDAC.DatS, Firedac.Stan.Option, Variants, uRESTDWProtoTypes,
+  uRESTDWBasicDB, DB, uRESTDWPoolermethod, FireDAC.Phys.RESTDWMeta,
+  uRESTDWBasicTypes, FireDAC.Stan.Error, FireDAC.Stan.Consts;
 
 type
   TFDPhysRDWConnectionBase = class;
@@ -129,7 +130,7 @@ implementation
 
 uses
   FireDAC.Phys.RESTDWDef, Data.SqlTimSt, uRESTDWParams, uRESTDWConsts,
-  uRESTDWTools, uRESTDWBasicTypes;
+  uRESTDWTools, FmtBCD;
 
 { TFDPhysRDWDriverBase }
 
@@ -554,6 +555,17 @@ var
   vRowsAffected : integer;
   vPoolermethod : TRESTDWPoolerMethodClient;
 
+  procedure Error(msg : string);
+  var
+    eKind: TFDCommandExceptionKind;
+    oExc: EFDDBEngineException;
+  begin
+    eKind := ekCmdAborted;
+    oExc := EFDDBEngineException.Create(er_FD_StanTimeout, msg);
+    oExc.AppendError(1, er_FD_StanTimeout, msg, '', eKind, -1, -1);
+    FDException(Self, oExc, False);
+  end;
+
   procedure addParams(AFDParams : TFDParams);
   var
     i : integer;
@@ -573,7 +585,6 @@ begin
   sSQL := GetCommandText;
   if Trim(sSQL) <> '' then begin
     vRESTDataBase := TFDPhysRDWConnectionBase(FConnection).Database;
-
     vParams := TParams.Create(nil);
     addParams(GetParams);
 
@@ -600,14 +611,11 @@ begin
     vParams.Free;
 
     if not vError then begin
-
       Result := vRowsAffected;
-      if exec then
-        Result := vRowsAffected;
     end
     else begin
-      Result := -1;
-      raise Exception.Create(vMessageError);
+      Result := 0;
+      Error(vMessageError);
     end;
   end
   else begin
@@ -671,136 +679,181 @@ end;
 
 function TFDPhysRDWCommand.readDataStream(col: integer): Variant;
 var
-  L : longInt;
-  J : integer;
-  R : Real;
-  E : Extended;
-  S : ansistring;
-  Cr : Currency;
-  P : TStringStream;
-  Bool : boolean;
+  vString       : DWString;
+  vInt64        : Int64;
+  vInt          : Integer;
+  vByte         : Byte;
+  vBoolean      : Boolean;
+  vWord         : Word;
+  vSingle       : Single;
+  vDouble       : Double;
+  VTimeZone     : Double;
+  vCurrency     : Currency;
+  vStringStream : TStringStream;
+  {$IFNDEF FPC}
+    {$IF CompilerVersion >= 21}
+      vTimeStampOffset : TSQLTimeStampOffset;
+    {$IFEND}
+  {$ENDIF}
 begin
   Result := null;
 
-  FStream.Read(Bool, Sizeof(Byte));
+  FStream.Read(vBoolean, Sizeof(Byte));
 
   // is null
-  if Bool then
+  if vBoolean then
     Exit;
 
-  case FFieldTypes[col] of
-    dwftFixedChar,
-    dwftWideString,
-    dwftString : begin
-                FStream.Read(L, Sizeof(L));
-                S := '';
-                if L > 0 then begin
-                  SetLength(S, L);
-                  {$IFDEF FPC}
-                   Stream.Read(Pointer(S)^, L);
-                   if FEncodeStrs then
-                     S := DecodeStrings(S);
-                   S := GetStringEncode(S, FDatabaseCharSet);
-                  {$ELSE}
-                   FStream.Read(S[InitStrPos], L);
-                   if FEncodeStrs then
-                     S := DecodeStrings(S);
-                  {$ENDIF}
-                end;
-                Result := S;
+  // N - Bytes
+  if (FFieldTypes[col] in [dwftFixedChar,dwftWideString,dwftString,
+                           dwftFixedWideChar]) then begin
+    FStream.Read(vInt64, Sizeof(vInt64));
+    vString := '';
+    if vInt64 > 0 then begin
+      SetLength(vString, vInt64);
+      {$IFDEF FPC}
+       Stream.Read(Pointer(vString)^, vInt64);
+       if FEncodeStrs then
+         vString := DecodeStrings(vString);
+       vString := GetStringEncode(vString, FDatabaseCharSet);
+      {$ELSE}
+       FStream.Read(vString[InitStrPos], vInt64);
+       if FEncodeStrs then
+         vString := DecodeStrings(vString);
+      {$ENDIF}
     end;
-    dwftByte,
-    dwftShortint,
-    dwftSmallint,
-    dwftWord,
-    dwftInteger,
-    dwftAutoInc :  Begin
-                FStream.Read(J, Sizeof(Integer));
-                Result := J;
+    Result := vString;
+  end
+  // 1 - Byte - Inteiros
+  else if (FFieldTypes[col] in [dwftByte,dwftShortint]) then
+  begin
+    FStream.Read(vByte, Sizeof(vByte));
+    Result := vByte;
+  end
+  // 1 - Byte - Boolean
+  else if (FFieldTypes[col] in [dwftBoolean]) then
+  begin
+    FStream.Read(vBoolean, Sizeof(vBoolean));
+    Result := vBoolean;
+  end
+  // 2 - Bytes
+  else if (FFieldTypes[col] in [dwftSmallint,dwftWord]) then begin
+    FStream.Read(vWord, Sizeof(vWord));
+    Result := vWord;
+  end
+  // 4 - Bytes - Inteiros
+  else if (FFieldTypes[col] in [dwftInteger]) then
+  begin
+    FStream.Read(vInt, Sizeof(vInt));
+    Result := vInt;
+  end
+  // 4 - Bytes - Flutuantes
+  else if (FFieldTypes[col] in [dwftSingle]) then
+  begin
+    FStream.Read(vSingle, Sizeof(vSingle));
+    Result := vSingle;
+  end
+  // 8 - Bytes - Inteiros
+  else if (FFieldTypes[col] in [dwftLargeint,dwftAutoInc,dwftLongWord]) then
+  begin
+    FStream.Read(vInt64, Sizeof(vInt64));
+    Result := vInt64;
+  end
+  // 8 - Bytes - Flutuantes
+  else if (FFieldTypes[col] in [dwftFloat,dwftExtended]) then
+  begin
+    FStream.Read(vInt64, Sizeof(vInt64));
+    Result := vInt64;
+  end
+  // 8 - Bytes - Date, Time, DateTime, TimeStamp
+  else if (FFieldTypes[col] in [dwftDate,dwftTime,dwftDateTime,dwftTimeStamp]) then
+  begin
+    FStream.Read(vDouble, Sizeof(vDouble));
+    Result := vDouble;
+  end
+  // TimeStampOffSet To Double - 8 Bytes
+  // + TimeZone                - 2 Bytes
+  else if (FFieldTypes[col] in [dwftTimeStampOffset]) then begin
+    {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+      FStream.Read(vDouble, Sizeof(vDouble));
+      Result := vDouble;
+
+      vTimeStampOffSet := DateTimeToSQLTimeStampOffset(vDouble);
+
+      FStream.Read(vByte, Sizeof(vByte));
+      vTimeStampOffSet.TimeZoneHour := vByte - 12;
+
+      FStream.Read(vByte, Sizeof(vByte));
+      vTimeStampOffSet.TimeZoneMinute := vByte;
+
+      Result := VarSQLTimeStampOffsetCreate(vTimeStampOffset);
+    {$ELSE}
+      // field foi transformado em datetime
+      FStream.Read(vDouble, Sizeof(vDouble));
+      FStream.Read(vByte, SizeOf(vByte));
+      vTimeZone := (vByte - 12) / 24;
+
+      FStream.Read(vByte, SizeOf(vByte));
+      if vTimeZone > 0 then
+        vTimeZone := vTimeZone + (vByte / 60 / 24)
+      else
+        vTimeZone := vTimeZone - (vByte / 60 / 24);
+
+      vDouble := vDouble - vTimeZone;
+      Result := vDouble;
+    {$IFEND}
+  end
+  // 8 - Bytes - Currency
+  else if (FFieldTypes[col] in [dwftCurrency,dwftBCD,dwftFMTBcd]) then
+  begin
+    FStream.Read(vCurrency, Sizeof(vCurrency));
+    Result := vCurrency;
+  end
+  // N Bytes - Wide Memos
+  else if (FFieldTypes[col] in [dwftWideMemo,dwftFmtMemo]) then begin
+    FStream.Read(vInt64, Sizeof(vInt64));
+    if vInt64 > 0 then Begin
+      vStringStream := TStringStream.Create;
+      try
+        vStringStream.CopyFrom(FStream, vInt64);
+        vStringStream.Position := 0;
+        Result := TEncoding.Unicode.GetString(vStringStream.Bytes);
+      finally
+       vStringStream.Free;
+      end;
     end;
-    dwftSingle   : begin
-                FStream.Read(R, Sizeof(Real));
-                Result := R;
+  end
+  // N Bytes - Memos e Blobs
+  else if (FFieldTypes[col] in [dwftMemo,dwftStream,dwftBlob,dwftBytes]) then begin
+    FStream.Read(vInt64, Sizeof(vInt64));
+    if vInt64 > 0 then Begin
+      vStringStream := TStringStream.Create;
+      try
+        vStringStream.CopyFrom(FStream, vInt64);
+        vStringStream.Position := 0;
+        Result := vStringStream.DataString;
+      finally
+       vStringStream.Free;
+      end;
     end;
-    dwftExtended : begin
-                FStream.Read(R, Sizeof(Real));
-                Result := R;
+  end
+  else begin
+    FStream.Read(vInt64, Sizeof(vInt64));
+    vString := '';
+    if vInt64 > 0 then begin
+      SetLength(vString, vInt64);
+      {$IFDEF FPC}
+       Stream.Read(Pointer(vString)^, vInt64);
+       if FEncodeStrs then
+         vString := DecodeStrings(vString);
+       vString := GetStringEncode(vString, FDatabaseCharSet);
+      {$ELSE}
+       FStream.Read(vString[InitStrPos], vInt64);
+       if FEncodeStrs then
+         vString := DecodeStrings(vString);
+      {$ENDIF}
     end;
-    dwftFloat    : begin
-                FStream.Read(R, Sizeof(Real));
-                Result := R;
-    end;
-    dwftFMTBcd,
-    dwftCurrency,
-    dwftBCD     :  begin
-                FStream.Read(Cr, Sizeof(Currency));
-                Result := Cr;
-    end;
-    dwftTimeStampOffset,
-    dwftDate,
-    dwftTime,
-    dwftDateTime,
-    dwftTimeStamp : begin
-                FStream.Read(R, Sizeof(Real));
-                Result := R;
-    End;
-    dwftLongWord,
-    dwftLargeint : begin
-                FStream.Read(L, Sizeof(LongInt));
-                Result := L
-    end;
-    dwftBoolean  : begin
-                FStream.Read(Bool, Sizeof(Byte));
-                Result := Bool
-    End;
-    dwftWideMemo,
-    dwftFmtMemo : begin
-                FStream.Read(L, Sizeof(LongInt));
-                if L > 0 then Begin
-                  P := TStringStream.Create;
-                  try
-                    P.CopyFrom(FStream, L);
-                    P.Position := 0;
-                    Result := TEncoding.Unicode.GetString(P.Bytes);
-                  finally
-                   P.Free;
-                  end;
-                end;
-    end;
-    dwftMemo,
-    dwftStream,
-    dwftBlob,
-    dwftBytes : begin
-                FStream.Read(L, Sizeof(LongInt));
-                if L > 0 then Begin
-                  P := TStringStream.Create;
-                  try
-                    P.CopyFrom(FStream, L);
-                    P.Position := 0;
-                    Result := p.DataString;
-                  finally
-                   P.Free;
-                  end;
-                end;
-    end;
-    else begin
-                FStream.Read(L, Sizeof(L));
-                S := '';
-                if L > 0 then begin
-                  SetLength(S, L);
-                  {$IFDEF FPC}
-                   Stream.Read(Pointer(S)^, L);
-                   if FEncodeStrs then
-                     S := DecodeStrings(S);
-                   S := GetStringEncode(S, FDatabaseCharSet);
-                  {$ELSE}
-                   FStream.Read(S[InitStrPos], L);
-                   if FEncodeStrs then
-                     S := DecodeStrings(S);
-                  {$ENDIF}
-                end;
-                Result := S;
-    end;
+    Result := vString;
   end;
 end;
 
