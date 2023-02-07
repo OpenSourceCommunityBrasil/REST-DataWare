@@ -639,7 +639,6 @@ Type
   vOldRecordCount,
   vDatapacks,
   vJsonCount,
-  vParamCount,
   vActualRec            : Integer;
   vActualJSON,
   vOldSQL,
@@ -908,7 +907,6 @@ Type
   vOldRecordCount,
   vDatapacks,
   vJsonCount,
-  vParamCount,
   vActualRec            : Integer;
   vActualJSON,
   vMasterFields,
@@ -1215,7 +1213,6 @@ Type
   vParams        : TParams;
   vBinaryRequest : Boolean;
   vFieldsList    : TFieldsList;
-  vParamCount,
   vActualRec     : Integer;
   vSchemaName,
   vProcName      : String;
@@ -5869,7 +5866,6 @@ End;
 Constructor TRESTDWTable.Create(AOwner: TComponent);
 Begin
  Inherited;
- vParamCount                       := 0;
  vJsonCount                        := 0;
  vRowsAffected                     := 0;
  vOldRecordCount                   := -1;
@@ -5960,7 +5956,6 @@ End;
 Constructor TRESTDWClientSQL.Create(AOwner: TComponent);
 Begin
  Inherited;
- vParamCount                       := 0;
  vJsonCount                        := 0;
  vRowsAffected                     := 0;
  vOldRecordCount                   := -1;
@@ -6322,14 +6317,11 @@ Var
 Begin
  ParamList       := ReturnParams(vSQL.Text);
  ParamsListAtual := ReturnParamsAtual(vParams);
- vParamCount     := 0;
  If Not CompareParams(ParamsListAtual, ParamList) Then
   vParams.Clear;
  If ParamList <> Nil Then
  For I := 0 to ParamList.Count -1 Do
   CreateParam(ParamList[I]);
- If ParamList.Count > 0 Then
-  vParamCount := vParams.Count;
  ParamList.Free;
  If Assigned(ParamsListAtual) then
   FreeAndNil(ParamsListAtual);
@@ -8137,12 +8129,12 @@ End;
 
 Function TRESTDWTable.ParamCount: Integer;
 Begin
- Result := vParamCount;
+ Result := vParams.Count;
 End;
 
 Function TRESTDWClientSQL.ParamCount: Integer;
 Begin
- Result := vParamCount;
+ Result := vParams.Count;
 End;
 
 Procedure TRESTDWTable.FieldDefsToFields;
@@ -9028,7 +9020,6 @@ Begin
  vRowsAffected   := 0;
  vOldRecordCount := 0;
  vJsonCount      := 0;
- vParamCount     := 0;
  vActualRec      := 0;
  Inherited InternalClose;
 End;
@@ -11299,7 +11290,6 @@ begin
  vParams        := TParams.Create(Self);
  vProcName      := '';
  vSchemaName    := vProcName;
- vParamCount    := 0;
  vBinaryRequest := False;
 end;
 
