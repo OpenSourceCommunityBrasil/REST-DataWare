@@ -1213,7 +1213,6 @@ Type
   vParams        : TParams;
   vBinaryRequest : Boolean;
   vFieldsList    : TFieldsList;
-  vParamCount,
   vActualRec     : Integer;
   vSchemaName,
   vProcName      : String;
@@ -11291,7 +11290,6 @@ begin
  vParams        := TParams.Create(Self);
  vProcName      := '';
  vSchemaName    := vProcName;
- vParamCount    := 0;
  vBinaryRequest := False;
 end;
 
