@@ -5,7 +5,7 @@ unit uRESTDWStorageBin;
 interface
 
 uses
-  Classes, SysUtils, uRESTDWMemoryDataset, DB, Variants, uRESTDWConsts;
+  Classes, SysUtils, uRESTDWMemoryDataset, FmtBcd, DB, Variants, uRESTDWConsts;
 
  Type
   TRESTDWStorageBinRDW = Class(TRESTDWStorageBase)
@@ -34,7 +34,7 @@ uses
 Implementation
 
 uses
-  uRESTDWProtoTypes, uRESTDWBufferBase, uRESTDWTools, FmtBCD {$IFNDEF FPC}, SqlTimSt{$ENDIF};
+  uRESTDWProtoTypes, uRESTDWBufferBase, uRESTDWTools {$IFNDEF FPC}, SqlTimSt{$ENDIF};
 
 { TRESTDWStorageBinRDW }
 
@@ -540,21 +540,29 @@ Begin
 
             if aField <> Nil Then begin
               {$IFDEF FPC}
-                Move(vCurrency,PData^,Sizeof(vCurrency));
+               Move(vCurrency,PData^, Sizeof(vCurrency));
               {$ELSE}
+               {$IF CompilerVersion <= 21}
+                CurrToBCD(vCurrency, vBCD);
+               {$ELSE}
                 vBCD := CurrencyToBcd(vCurrency);
+               {$IFEND}
                 Move(vBCD,PData^,Sizeof(vBCD));
               {$ENDIF}
             end;
           end
           // 8 - Bytes - Currency
-          else if (vDWFieldType in [dwftFMTBcd]) then
+          Else if (vDWFieldType in [dwftFMTBcd]) then
           begin
             stream.Read(vCurrency, SizeOf(vCurrency));
             {$IFDEF FPC}
               vBCD := CurrToBcd(vCurrency);
             {$ELSE}
-              vBCD := CurrencyToBcd(vCurrency);
+              {$IF CompilerVersion <= 21}
+               CurrToBCD(vCurrency, vBCD);
+              {$ELSE}
+               vBCD := CurrencyToBcd(vCurrency);
+              {$IFEND}
             {$ENDIF}
             Move(vBCD,PData^,Sizeof(vBCD));
           end
@@ -1215,7 +1223,11 @@ Begin
             Move(PData^,vCurrency,Sizeof(vCurrency));
           {$ELSE}
             Move(PData^,vBCD,Sizeof(vBCD));
-            vCurrency := BCDToCurrency(vBCD);
+            {$IF CompilerVersion <= 21}
+             BCDToCurr(vBCD, vCurrency);
+            {$ELSE}
+             vCurrency := BCDToCurrency(vBCD);
+            {$IFEND}
           {$ENDIF}
           Stream.Write(vCurrency, Sizeof(vCurrency));
         end
@@ -1226,7 +1238,11 @@ Begin
           {$IFDEF FPC}
             vCurrency := BCDToDouble(vBCD);
           {$ELSE}
-            vCurrency := BCDToCurrency(vBCD);
+            {$IF CompilerVersion <= 21}
+             BCDToCurr(vBCD, vCurrency);
+            {$ELSE}
+             vCurrency := BCDToCurrency(vBCD);
+            {$IFEND}
           {$ENDIF}
           Stream.Write(vCurrency, Sizeof(vCurrency));
         end
@@ -1377,7 +1393,11 @@ Begin
     // 8 - Bytes - Inteiros
     else if (vDWFieldType in [dwftLargeint,dwftAutoInc,dwftLongWord]) then
     begin
+     {$IF CompilerVersion <= 21}
+      vInt64 := Dataset.Fields[i].AsInteger;
+     {$ELSE}
       vInt64 := Dataset.Fields[i].AsLargeInt;
+     {$IFEND}
       Stream.Write(vInt64, Sizeof(vInt64));
     end
     // 8 - Bytes - Flutuantes
