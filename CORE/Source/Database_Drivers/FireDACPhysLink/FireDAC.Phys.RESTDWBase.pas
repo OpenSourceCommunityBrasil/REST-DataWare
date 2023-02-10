@@ -757,8 +757,7 @@ begin
     Exit;
 
   // N - Bytes
-  if (FFieldTypes[col] in [dwftFixedChar,dwftWideString,dwftString,
-                           dwftFixedWideChar]) then begin
+  if (FFieldTypes[col] in [dwftFixedChar,dwftString]) then begin
     FStream.Read(vInt64, Sizeof(vInt64));
     vString := '';
     if vInt64 > 0 then begin
@@ -775,6 +774,25 @@ begin
       {$ENDIF}
     end;
     Result := vString;
+  end
+  // N - Bytes Wide
+  else if (FFieldTypes[col] in [dwftWideString,dwftFixedWideChar]) then begin
+    FStream.Read(vInt64, Sizeof(vInt64));
+    vString := '';
+    if vInt64 > 0 then begin
+      SetLength(vString, vInt64);
+      {$IFDEF FPC}
+       Stream.Read(Pointer(vString)^, vInt64);
+       if FEncodeStrs then
+         vString := DecodeStrings(vString);
+       vString := GetStringEncode(vString, FDatabaseCharSet);
+      {$ELSE}
+       FStream.Read(vString[InitStrPos], vInt64);
+       if FEncodeStrs then
+         vString := DecodeStrings(vString);
+      {$ENDIF}
+    end;
+    Result := TEncoding.Unicode.GetString(vString);
   end
   // 1 - Byte - Inteiros
   else if (FFieldTypes[col] in [dwftByte,dwftShortint]) then
