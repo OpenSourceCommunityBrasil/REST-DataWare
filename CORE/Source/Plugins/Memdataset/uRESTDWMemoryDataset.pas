@@ -37,10 +37,8 @@ Const
   ftSupported = [ftString, ftSmallint, ftInteger, ftWord, ftBoolean, ftFloat, ftCurrency,
     ftDate, ftTime, ftDateTime, ftAutoInc, ftBCD, ftFMTBCD, ftTimestamp,
 {$IFNDEF FPC}
-{$IFDEF COMPILER10_UP}
-  ftOraTimestamp, ftFixedWideChar, ftTimeStampOffset,
-{$ENDIF COMPILER10_UP}
 {$IFDEF COMPILER12_UP}
+  ftOraTimestamp, ftFixedWideChar, ftTimeStampOffset,
   ftLongWord, ftShortint, ftByte, ftExtended, ftSingle,
 {$ENDIF COMPILER12_UP}
 {$ELSE}
@@ -2158,14 +2156,22 @@ begin
   end;
   if FRecordPos >= FRecords.Count then
     Dec(FRecordPos);
-  Records[FRecordPos].Free;
+//  Records[FRecordPos].Free;
+  FRecords.Delete(FRecordPos);
   Accept := True;
-  repeat
-    if Filtered then
-      Accept := RecordFilter;
-    if not Accept then
-      Dec(FRecordPos);
-  until Accept or (FRecordPos < 0);
+  if Filtered then
+   Begin
+    repeat
+        Accept := RecordFilter;
+      if not Accept then
+        Dec(FRecordPos);
+    until Accept or (FRecordPos < 0);
+   End
+  Else
+   Begin
+    if FRecordPos >= 0 then
+     Dec(FRecordPos);
+   End;
   if FRecords.Count = 0 then
     FLastID := Low(Integer);
   if FApplyMode <> amNone then

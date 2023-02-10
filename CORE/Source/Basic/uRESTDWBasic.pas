@@ -998,46 +998,22 @@ End;
 
 Procedure TRESTClientPoolerBase.SetOnWork(Value : TOnWork);
 Begin
- {$IFDEF FPC}
-  vOnWork            := Value;
-//  HttpRequest.OnWork := vOnWork;
- {$ELSE}
-  vOnWork            := Value;
-//  HttpRequest.OnWork := vOnWork;
- {$ENDIF}
+  vOnWork := Value;
 End;
 
 Procedure TRESTClientPoolerBase.SetOnWorkBegin(Value : TOnWork);
 Begin
- {$IFDEF FPC}
-  vOnWorkBegin            := Value;
-//  HttpRequest.OnWorkBegin := vOnWorkBegin;
- {$ELSE}
-  vOnWorkBegin            := Value;
-//  HttpRequest.OnWorkBegin := vOnWorkBegin;
- {$ENDIF}
+  vOnWorkBegin := Value;
 End;
 
 Procedure TRESTClientPoolerBase.SetOnWorkEnd(Value : TOnWorkEnd);
 Begin
- {$IFDEF FPC}
-  vOnWorkEnd            := Value;
-//  HttpRequest.OnWorkEnd := vOnWorkEnd;
- {$ELSE}
-  vOnWorkEnd            := Value;
-//  HttpRequest.OnWorkEnd := vOnWorkEnd;
- {$ENDIF}
+  vOnWorkEnd := Value;
 End;
 
 Procedure TRESTClientPoolerBase.SetOnStatus(Value : TOnStatus);
 Begin
- {$IFDEF FPC}
-  vOnStatus            := Value;
-//  HttpRequest.OnStatus := vOnStatus;
- {$ELSE}
-  vOnStatus            := Value;
-//  HttpRequest.OnStatus := vOnStatus;
- {$ENDIF}
+  vOnStatus := Value;
 End;
 
 Function TRESTClientPoolerBase.GetAllowCookies: Boolean;
@@ -1433,9 +1409,9 @@ Begin
  {$IFDEF FPC}
  vDatabaseCharSet                      := csUndefined;
  {$ENDIF}
- vContentType                          := 'application/json';
- vContentEncoding                      := 'multipart/form-data';
- vAccept                               := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+ vContentType                          := cDefaultContentType;
+ vContentEncoding                      := cContentTypeMultiPart;
+ vAccept                               := cDefaultAccept;
  vAcceptEncoding                       := '';
  vFailOver                             := False;
  vFailOverReplaceDefaults              := False;
@@ -1673,9 +1649,7 @@ Var
        Else
         Begin
          If Not Assigned(DWParams) Then
-          TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                                               {$ELSE}Url{$IFEND}
-                                                                                               {$ELSE}Url{$ENDIF},
+          TRESTDWDataUtils.ParseWebFormsParams (Params, Url,
                                           QueryParams,
                                           vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
          Try
@@ -2016,15 +1990,8 @@ Begin
      RequestType := rtPatch
     Else If (UpperCase(Copy (Cmd, 1, 4)) = 'OPTI') Then
      RequestType := rtOption;
-    {$IFNDEF FPC}
-     If {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                      {$ELSE}Url{$IFEND}
-                                      {$ELSE}Url{$ENDIF} = '/favicon.ico' Then
-      Exit;
-    {$ELSE}
-     If Url = '/favicon.ico' Then
-      Exit;
-    {$ENDIF}
+    If Url = '/favicon.ico' Then
+     Exit;
     Cmd := ClearRequestType(Cmd);
     vIsQueryParam := (Pos('?', Lowercase(Url)) > 0) And
                      (Pos('=', Lowercase(Url)) > 0);
@@ -2045,13 +2012,7 @@ Begin
      TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
     If ((Params.Count > 0) And (RequestType In [rtGet, rtDelete])) Then
      Begin
-      {$IFNDEF FPC}
-       vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                        {$ELSE}Url{$IFEND}
-                                                        {$ELSE}Url{$ENDIF});
-      {$ELSE}
-       vRequestHeader.Add(Url);
-      {$ENDIF}
+      vRequestHeader.Add(Url);
       vRequestHeader.Add(Params.Text);
       vRequestHeader.Add(QueryParams);
       TRESTDWDataUtils.ParseWebFormsParams(Params, Url, QueryParams,
@@ -2083,9 +2044,7 @@ Begin
        Begin
         aurlContext  := vUrlToExec;
         If Not Assigned(DWParams) Then
-         TRESTDWDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                  {$ELSE}Url{$IFEND}
-                                                                  {$ELSE}Url{$ENDIF}, vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
+         TRESTDWDataUtils.ParseRESTURL (Url, vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
         vOldMethod := vUrlToExec;
         If DWParams <> Nil Then
          Begin
@@ -2196,9 +2155,7 @@ Begin
                    DWParams.Encoding  := vEncoding;
                   End
                  Else
-                  TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                                                       {$ELSE}Url{$IFEND}
-                                                                                                       {$ELSE}Url{$ENDIF},
+                  TRESTDWDataUtils.ParseWebFormsParams (Params, Url,
                                                     QueryParams,
                                                     vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
                 End;
@@ -2387,21 +2344,13 @@ Begin
                Finally
                End;
               End;
-            {$IFNDEF FPC}
-             {$IF Not(DEFINED(OLDINDY))}
+
              mcptEOF:
               Begin
                FreeAndNil(decoder);
                msgEnd := True
               End;
-             {$IFEND}
-            {$ELSE}
-             mcptEOF:
-              Begin
-               FreeAndNil(decoder);
-               msgEnd := True
-              End;
-            {$ENDIF}
+
             End;
            Until (Decoder = Nil) Or (msgEnd);
           Finally
@@ -2420,9 +2369,7 @@ Begin
              ContentStringStream.Position := 0;
              mb.Position  := 0;
              If Not Assigned(DWParams) Then
-              TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                                                   {$ELSE}Url{$IFEND}
-                                                                                                   {$ELSE}Url{$ENDIF},
+              TRESTDWDataUtils.ParseWebFormsParams (Params, Url,
                                                 QueryParams,
                                                 vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
              If Assigned(DWParams.ItemsString['dwReadBodyRaw']) And (DWParams.ItemsString['dwReadBodyRaw'].AsString='1') Then
@@ -2435,15 +2382,7 @@ Begin
                If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
                 Begin
                  msgEnd   := False;
-                 {$IFNDEF FPC}
-                  {$IF (DEFINED(OLDINDY))}
-                   boundary := ExtractHeaderSubItem(ContentType, 'boundary');
-                  {$ELSE}
-                   boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
-                  {$IFEND}
-                 {$ELSE}
-                  boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
-                 {$ENDIF}
+                 boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
                  startboundary := '--' + boundary;
                  Repeat
                   tmp := ReadLnFromStream(ContentStringStream, -1, True);
@@ -2478,9 +2417,7 @@ Begin
                          DWParams.Encoding  := vEncoding;
                         End
                        Else
-                        TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                                                             {$ELSE}Url{$IFEND}
-                                                                                                             {$ELSE}Url{$ENDIF},
+                        TRESTDWDataUtils.ParseWebFormsParams (Params, Url,
                                                           QueryParams,
                                                           vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
                       End;
@@ -2674,21 +2611,13 @@ Begin
                      Finally
                      End;
                     End;
-                   {$IFNDEF FPC}
-                    {$IF Not(DEFINED(OLDINDY))}
+
                     mcptEOF:
                      Begin
                       FreeAndNil(decoder);
                       msgEnd := True
                      End;
-                    {$IFEND}
-                   {$ELSE}
-                   mcptEOF:
-                    Begin
-                     FreeAndNil(decoder);
-                     msgEnd := True
-                    End;
-                   {$ENDIF}
+
                   End;
                  Until (Decoder = Nil) Or (msgEnd);
                 Finally
@@ -2698,16 +2627,13 @@ Begin
               End
              Else If (Params.Count = 0)
                       {$IFNDEF FPC}
-                       {$If Not(DEFINED(OLDINDY))}
-                        {$If (CompilerVersion > 23)}
+                       {$If (CompilerVersion > 23)}
                          And (QueryParams.Length = 0)
-                        {$IFEND}
                        {$ELSE}
                         And (Length(QueryParams) = 0)
                        {$IFEND}
-                      {$ELSE}
-                       And (QueryParams.Length = 0)
-                      {$ENDIF}Then
+                      {$ENDIF}
+                       Then
               Begin
                If vEncoding = esUtf8 Then
                 TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
@@ -2746,21 +2672,13 @@ Begin
            Begin
             If Trim(QueryParams) <> '' Then
              Begin
-              vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                               {$ELSE}Url{$IFEND}
-                                                               {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams);
-              TRESTDWDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                       {$ELSE}Url{$IFEND}
-                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams + '&' + QueryParams, vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
+              vRequestHeader.Add(Url + '?' + QueryParams + '&' + QueryParams);
+              TRESTDWDataUtils.ParseRESTURL (Url + '?' + QueryParams + '&' + QueryParams, vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
              End
             Else
              Begin
-              vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                               {$ELSE}Url{$IFEND}
-                                                               {$ELSE}Url{$ENDIF} + '?' + QueryParams);
-              TRESTDWDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                       {$ELSE}Url{$IFEND}
-                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams, vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
+              vRequestHeader.Add(Url + '?' + QueryParams);
+              TRESTDWDataUtils.ParseRESTURL (Url + '?' + QueryParams, vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
               If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then  // Ico Menezes - Post Receber WelcomeMessage   - 20-12-2018
                vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
              End;
@@ -2768,14 +2686,10 @@ Begin
           Else
            Begin
             vRequestHeader.Add(Params.Text);
-            vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                             {$ELSE}Url{$IFEND}
-                                                             {$ELSE}Url{$ENDIF});
+            vRequestHeader.Add(Url);
             vRequestHeader.Add(QueryParams);
 
-            TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                                                 {$ELSE}Url{$IFEND}
-                                                                                                 {$ELSE}Url{$ENDIF},
+            TRESTDWDataUtils.ParseWebFormsParams (Params, Url,
                                               QueryParams,
                                               vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
            End;
@@ -2784,21 +2698,13 @@ Begin
            Begin
             If Trim(QueryParams) <> '' Then
              Begin
-              vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                               {$ELSE}Url{$IFEND}
-                                                               {$ELSE}Url{$ENDIF} + '?' + QueryParams);
-              TRESTDWDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                       {$ELSE}Url{$IFEND}
-                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams, vEncoding, vmark, DWParams);
+              vRequestHeader.Add(Url + '?' + QueryParams);
+              TRESTDWDataUtils.ParseRESTURL (Url + '?' + QueryParams, vEncoding, vmark, DWParams);
              End
             Else
              Begin
-              vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                               {$ELSE}Url{$IFEND}
-                                                               {$ELSE}Url{$ENDIF} + '?' + QueryParams);
-              TRESTDWDataUtils.ParseRESTURL ({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                       {$ELSE}Url{$IFEND}
-                                                                       {$ELSE}Url{$ENDIF} + '?' + QueryParams, vEncoding, vmark, DWParams);
+              vRequestHeader.Add(Url + '?' + QueryParams);
+              TRESTDWDataUtils.ParseRESTURL (Url + '?' + QueryParams, vEncoding, vmark, DWParams);
               If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then  // Ico Menezes - Post Receber WelcomeMessage   - 20-12-2018
                vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
              End;
@@ -2806,14 +2712,10 @@ Begin
            Else
             Begin
              vRequestHeader.Add(Params.Text);
-             vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                              {$ELSE}Url{$IFEND}
-                                                              {$ELSE}Url{$ENDIF});
+             vRequestHeader.Add(Url);
              vRequestHeader.Add(QueryParams);
              If Not Assigned(DWParams) Then
-              TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                                                   {$ELSE}Url{$IFEND}
-                                                                                                   {$ELSE}Url{$ENDIF},
+              TRESTDWDataUtils.ParseWebFormsParams (Params, Url,
                                                 QueryParams,
                                                 vmark, vEncoding, DWParams, RequestType);
             End;
@@ -2825,25 +2727,17 @@ Begin
          Begin
           {$IFDEF FPC}
            vRequestHeader.Add(Params.Text);
-           vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                            {$ELSE}Url{$IFEND}
-                                                            {$ELSE}Url{$ENDIF});
+           vRequestHeader.Add(Url);
            vRequestHeader.Add(QueryParams);
-           TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                                                {$ELSE}Url{$IFEND}
-                                                                                                {$ELSE}Url{$ENDIF},
+           TRESTDWDataUtils.ParseWebFormsParams (Params, Url,
                                              QueryParams,
                                              vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
           {$ELSE}
            vRequestHeader.Add(Params.Text);
-           vRequestHeader.Add({$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                            {$ELSE}Url{$IFEND}
-                                                            {$ELSE}Url{$ENDIF});
+           vRequestHeader.Add(Url);
            vRequestHeader.Add(QueryParams);
            If Not Assigned(DWParams) Then
-            TRESTDWDataUtils.ParseWebFormsParams (Params, {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                                                 {$ELSE}Url{$IFEND}
-                                                                                                 {$ELSE}Url{$ENDIF},
+            TRESTDWDataUtils.ParseWebFormsParams (Params, Url,
                                               QueryParams,
                                               vmark, vEncoding, DWParams, RequestType);
           {$ENDIF}
@@ -2864,7 +2758,7 @@ Begin
        If Not vDataRouteList.RouteExists(vUrlToExec) Then
         Begin
          vErrorCode := 400;
-         JSONStr    := GetPairJSONInt(-5, 'Invalid Request');
+         JSONStr    := GetPairJSONInt(-5, cInvalidRequest);
         End
        Else
         Begin
@@ -2873,7 +2767,7 @@ Begin
            If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
             Begin
              vErrorCode := 400;
-             JSONStr    := GetPairJSONInt(-5, 'Invalid Data Context');
+             JSONStr    := GetPairJSONInt(-5, cInvalidDataContext);
             End;
           End
          Else
@@ -2881,7 +2775,7 @@ Begin
            If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
             Begin
              vErrorCode := 400;
-             JSONStr    := GetPairJSONInt(-5, 'Invalid Data Context');
+             JSONStr    := GetPairJSONInt(-5, cInvalidDataContext);
             End;
           End;
         End;
@@ -3380,7 +3274,7 @@ Begin
        If vErrorCode <> 400 Then
         Begin
          vErrorCode := 401;
-         JSONStr    := GetPairJSONInt(-5, 'Server Methods Cannot Assigned');
+         JSONStr    := GetPairJSONInt(-5, cServerMethodClassNotAssigned);
         End;
       End;
      Try
@@ -3474,12 +3368,8 @@ Begin
                Begin
                 If Not vSpecialServer Then
                  Begin
-                  If {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                   {$ELSE}Url{$IFEND}
-                                                   {$ELSE}Url{$ENDIF} <> '' Then
-                   sFile := GetFileOSDir(ExcludeTag(tmp + {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                                        {$ELSE}Url{$IFEND}
-                                                                                        {$ELSE}Url{$ENDIF}))
+                  If Url <> '' Then
+                   sFile := GetFileOSDir(ExcludeTag(tmp + Url))
                   Else
                    sFile := GetFileOSDir(ExcludeTag(Cmd));
                   vFileExists := RESTDWFileExists(sFile, FRootPath);
@@ -3488,12 +3378,8 @@ Begin
                     tmp := '';
 //                      If Referer <> '' Then
 //                       tmp := GetLastMethod(Referer);
-                    If {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                     {$ELSE}Url{$IFEND}
-                                                     {$ELSE}Url{$ENDIF} <> '' Then
-                     sFile := GetFileOSDir(ExcludeTag(tmp + {$IFNDEF FPC}{$IF (DEFINED(OLDINDY))}Url
-                                                                                          {$ELSE}Url{$IFEND}
-                                                                                          {$ELSE}Url{$ENDIF}))
+                    If Url <> '' Then
+                     sFile := GetFileOSDir(ExcludeTag(tmp + Url))
                     Else
                      sFile := GetFileOSDir(ExcludeTag(Cmd));
                     vFileExists := RESTDWFileExists(sFile, FRootPath);
@@ -3984,7 +3870,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -4060,7 +3946,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -4623,7 +4509,7 @@ Begin
    If DWParams.ItemsString['Error']        <> Nil Then
     DWParams.ItemsString['Error'].AsBoolean := True;
    If DWParams.ItemsString['MessageError'] <> Nil Then
-    DWParams.ItemsString['MessageError'].AsString := 'Invalid welcomemessage...'
+    DWParams.ItemsString['MessageError'].AsString := cInvalidWelcomeMessage
    Else
     Begin
      If (ErrorCode <= 0)  Or
@@ -4668,7 +4554,7 @@ Begin
            Begin
             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
              Begin
-              DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+              DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
               DWParams.ItemsString['Error'].AsBoolean       := True;
               Exit;
              End;
@@ -4765,7 +4651,7 @@ Begin
            Begin
             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
              Begin
-              DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+              DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
               DWParams.ItemsString['Error'].AsBoolean       := True;
               Exit;
              End;
@@ -4862,7 +4748,7 @@ Begin
            Begin
             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
              Begin
-              DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+              DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
               DWParams.ItemsString['Error'].AsBoolean       := True;
               Exit;
              End;
@@ -4974,7 +4860,7 @@ Begin
            Begin
             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
              Begin
-              DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+              DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
               DWParams.ItemsString['Error'].AsBoolean       := True;
               Exit;
              End;
@@ -5074,7 +4960,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -5166,7 +5052,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -5273,7 +5159,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -5367,7 +5253,7 @@ Begin
            Begin
             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
              Begin
-              DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+              DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
               DWParams.ItemsString['Error'].AsBoolean       := True;
               Exit;
              End;
@@ -5464,7 +5350,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -5545,7 +5431,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -5620,7 +5506,7 @@ Begin
           Begin
            If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
-             DWParams.ItemsString['MessageError'].AsString := 'Invalid Access tag...';
+             DWParams.ItemsString['MessageError'].AsString := cInvalidAccessTag;
              DWParams.ItemsString['Error'].AsBoolean       := True;
              Exit;
             End;
@@ -5707,10 +5593,9 @@ Begin
    vError := vTempJSON = '';
    If vError Then
     Begin
-     DWParams.ItemsString['MessageError'].AsString := 'Event Not Found';
+     DWParams.ItemsString['MessageError'].AsString := cEventNotFound;
      If iContSE > 1 then
-      DWParams.ItemsString['MessageError'].AsString := 'There is more than one ServerEvent.'+ sLineBreak +
-                                                       'Choose the desired ServerEvent in the ServerEventName property.';
+      DWParams.ItemsString['MessageError'].AsString := cMultipleServerEvents;
     End;
    DWParams.ItemsString['Error'].AsBoolean        := vError;
    If DWParams.ItemsString['Result'] <> Nil Then
@@ -5777,9 +5662,9 @@ Begin
            If TRESTDWServerEvents(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
              If DWParams.ItemsString['dwencodestrings'] <> Nil Then
-              vResult := EncodeStrings('Invalid Access tag...'{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+              vResult := EncodeStrings(cInvalidAccessTag{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
              Else
-              vResult := 'Invalid Access tag...';
+              vResult := cInvalidAccessTag;
              ErrorCode := 401;
              Result  := True;
              Break;
@@ -5831,7 +5716,7 @@ Begin
                vResult     := vErrorMessage;
               End
              Else
-              vResult   := 'The Requested URL was Rejected';
+              vResult   := cRequestRejected;
              If (ErrorCode <= 0)  Or
                 (ErrorCode = 200) Then
               ErrorCode := 401;
@@ -5887,19 +5772,19 @@ Begin
             End;
            If vStrAcceptedRoutes <> '' then
             Begin
-             vResult   := 'Request rejected. Acceptable HTTP methods: '+vStrAcceptedRoutes;
+             vResult   := cRequestRejectedMethods + vStrAcceptedRoutes;
              ErrorCode := 403;
             End
            Else
             Begin
-             vResult   := 'Acceptable HTTP methods not defined on server';
+             vResult   := cRequestAcceptableMethods;
              ErrorCode := 500;
             End;
           End;
          Break;
         End
        Else
-        vResult := 'Event not found...';
+        vResult := cEventNotFound;
       End;
     End;
   End;
