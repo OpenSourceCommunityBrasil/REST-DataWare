@@ -792,7 +792,7 @@ begin
          vString := DecodeStrings(vString);
       {$ENDIF}
     end;
-    Result := TEncoding.Unicode.GetString(vString);
+    Result := WideString(vString);
   end
   // 1 - Byte - Inteiros
   else if (FFieldTypes[col] in [dwftByte,dwftShortint]) then
