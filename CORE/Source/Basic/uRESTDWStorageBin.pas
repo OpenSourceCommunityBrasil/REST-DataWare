@@ -1393,7 +1393,7 @@ Begin
     // 8 - Bytes - Inteiros
     else if (vDWFieldType in [dwftLargeint,dwftAutoInc,dwftLongWord]) then
     begin
-     {$IF CompilerVersion <= 21}
+     {$IF NOT(Defined(FPC)) AND (CompilerVersion <= 21)}
       vInt64 := Dataset.Fields[i].AsInteger;
      {$ELSE}
       vInt64 := Dataset.Fields[i].AsLargeInt;
