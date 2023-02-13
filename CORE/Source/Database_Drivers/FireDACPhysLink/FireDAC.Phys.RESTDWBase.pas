@@ -774,6 +774,8 @@ begin
       {$ENDIF}
     end;
     Result := vString;
+    if Pos(#0,Result) > 0 then
+      Result := StringReplace(Result,#0,'',[rfReplaceAll]);
   end
   // N - Bytes Wide
   else if (FFieldTypes[col] in [dwftWideString,dwftFixedWideChar]) then begin
@@ -792,7 +794,9 @@ begin
          vString := DecodeStrings(vString);
       {$ENDIF}
     end;
-    Result := WideString(vString);
+    Result := vString;
+    if Pos(#0,Result) > 0 then
+      Result := StringReplace(Result,#0,'',[rfReplaceAll]);
   end
   // 1 - Byte - Inteiros
   else if (FFieldTypes[col] in [dwftByte,dwftShortint]) then
@@ -887,9 +891,12 @@ begin
       try
         vStringStream.CopyFrom(FStream, vInt64);
         vStringStream.Position := 0;
-        Result := TEncoding.Unicode.GetString(vStringStream.Bytes);
+//        Result := TEncoding.Unicode.GetString(vStringStream.Bytes);
+        Result := vStringStream.DataString;
+        if Pos(#0,Result) > 0 then
+          Result := StringReplace(Result,#0,'',[rfReplaceAll]);
       finally
-       vStringStream.Free;
+        vStringStream.Free;
       end;
     end;
   end
@@ -902,8 +909,10 @@ begin
         vStringStream.CopyFrom(FStream, vInt64);
         vStringStream.Position := 0;
         Result := vStringStream.DataString;
+        if Pos(#0,Result) > 0 then
+          Result := StringReplace(Result,#0,'',[rfReplaceAll]);
       finally
-       vStringStream.Free;
+        vStringStream.Free;
       end;
     end;
   end
@@ -924,6 +933,8 @@ begin
       {$ENDIF}
     end;
     Result := vString;
+    if Pos(#0,Result) > 0 then
+      Result := StringReplace(Result,#0,'',[rfReplaceAll]);
   end;
 end;
 
