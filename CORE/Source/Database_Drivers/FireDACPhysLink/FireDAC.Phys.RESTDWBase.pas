@@ -31,10 +31,16 @@ uses
   FireDAC.Phys.SQLGenerator, FireDAC.Stan.Util, FireDAC.Stan.Param,
   FireDAC.DatS, Firedac.Stan.Option, Variants, uRESTDWProtoTypes,
   uRESTDWBasicDB, DB, uRESTDWPoolermethod, FireDAC.Phys.RESTDWMeta,
-  uRESTDWBasicTypes, FireDAC.Stan.Error, FireDAC.Stan.Consts;
+  uRESTDWBasicTypes, FireDAC.Stan.Error, FireDAC.Stan.Consts,
+  uRESTDWMassiveBuffer;
 
 type
   TFDPhysRDWConnectionBase = class;
+
+  TFDPhysRDWException = class(EFDDBEngineException)
+  public
+    constructor Create(AObj : TObject; AMsg : string);
+  end;
 
   TFDPhysRDWBaseDriverLink = class(TFDPhysDriverLink)
   private
@@ -60,6 +66,8 @@ type
   TFDPhysRDWConnectionBase = class(TFDPhysConnection)
   private
     FDatabase : TRESTDWDatabasebaseBase;
+    FMassiveSQL : TRESTDWMassiveSQLCache;
+    FIntransaction : boolean;
     procedure findDatabase;
   protected
     procedure InternalConnect; override;
@@ -74,8 +82,13 @@ type
   public
     constructor Create(ADriverObj: TFDPhysDriver; AConnHost: TFDPhysConnectionHost); override;
     destructor Destroy; override;
+
+    procedure SendMassive(Var Error : Boolean; Var MessageError : String);
+    procedure ClearMassive;
   published
     property Database : TRESTDWDatabasebaseBase read FDatabase;
+    property MassiveSQL : TRESTDWMassiveSQLCache read FMassiveSQL;
+    property Intransaction : boolean read FIntransaction write FIntransaction;
   end;
 
   TFDPhysRDWTransaction = class(TFDPhysTransaction)
@@ -105,6 +118,8 @@ type
     function RDWGetTables : integer;
     function RDWGetTablesFields(tabela : string) : integer;
     function RDWGetPKTablesFields(tabela : string) : integer;
+
+    function RestDWConnection : TFDPhysRDWConnectionBase;
   protected
     procedure InternalPrepare; override;
     procedure InternalUnprepare; override;
@@ -131,6 +146,9 @@ implementation
 uses
   FireDAC.Phys.RESTDWDef, Data.SqlTimSt, uRESTDWParams, uRESTDWConsts,
   uRESTDWTools, FmtBCD;
+
+resourcestring
+  errSQLEmpty = 'Empty SQL command';
 
 { TFDPhysRDWDriverBase }
 
@@ -159,15 +177,23 @@ end;
 
 { TFDPhysRDWConnectionBase }
 
+procedure TFDPhysRDWConnectionBase.ClearMassive;
+begin
+  FMassiveSQL.Clear;
+end;
+
 constructor TFDPhysRDWConnectionBase.Create(ADriverObj: TFDPhysDriver;
   AConnHost: TFDPhysConnectionHost);
 begin
   inherited;
   FDatabase := nil;
+  FMassiveSQL := TRESTDWMassiveSQLCache.Create(nil);
+  FIntransaction := False;
 end;
 
 destructor TFDPhysRDWConnectionBase.Destroy;
 begin
+  FMassiveSQL.Free;
   if Assigned(FDatabase) then
     FDatabase.Close;
   FDatabase := nil;
@@ -233,24 +259,52 @@ begin
 
 end;
 
-{ TFDPhysRDWTransaction }
+procedure TFDPhysRDWConnectionBase.SendMassive(Var Error : Boolean;
+                                               Var MessageError : String);
+begin
+  Error := False;
+  MessageError := '';
+
+  if not FIntransaction then
+    Exit;
+
+  if FMassiveSQL.MassiveCount > 0 then
+    FDatabase.ProcessMassiveSQLCache(FMassiveSQL,Error,MessageError);
+end;
+
+{TFDPhysRDWTransaction }
 
 procedure TFDPhysRDWTransaction.InternalCommit(AID: LongWord);
+var
+  vError : Boolean;
+  vMessageError : string;
 begin
   inherited;
-
+  if ConnectionObj.InheritsFrom(TFDPhysRDWConnectionBase) then begin
+    TFDPhysRDWConnectionBase(ConnectionObj).SendMassive(vError, vMessageError);
+    if vError then begin
+      raise TFDPhysRDWException.Create(Self,vMessageError);
+    end
+    else begin
+      TFDPhysRDWConnectionBase(ConnectionObj).Intransaction := False;
+    end;
+  end;
 end;
 
 procedure TFDPhysRDWTransaction.InternalRollback(AID: LongWord);
 begin
   inherited;
-
+  if ConnectionObj.InheritsFrom(TFDPhysRDWConnectionBase) then begin
+    TFDPhysRDWConnectionBase(ConnectionObj).ClearMassive;
+    TFDPhysRDWConnectionBase(ConnectionObj).Intransaction := False;
+  end;
 end;
 
 procedure TFDPhysRDWTransaction.InternalStartTransaction(AID: LongWord);
 begin
   inherited;
-
+  if ConnectionObj.InheritsFrom(TFDPhysRDWConnectionBase) then
+    TFDPhysRDWConnectionBase(ConnectionObj).Intransaction := True;
 end;
 
 { TFDPhysRDWCommand }
@@ -554,17 +608,7 @@ var
   vDataSetList : TJSONValue;
   vRowsAffected : integer;
   vPoolermethod : TRESTDWPoolerMethodClient;
-
-  procedure Error(msg : string);
-  var
-    eKind: TFDCommandExceptionKind;
-    oExc: EFDDBEngineException;
-  begin
-    eKind := ekCmdAborted;
-    oExc := EFDDBEngineException.Create(er_FD_StanTimeout, msg);
-    oExc.AppendError(1, er_FD_StanTimeout, msg, '', eKind, -1, -1);
-    FDException(Self, oExc, False);
-  end;
+  vMassiveCache : TRESTDWMassiveCacheSQLValue;
 
   procedure addParams(AFDParams : TFDParams);
   var
@@ -584,42 +628,50 @@ begin
   Result := -1;
   sSQL := GetCommandText;
   if Trim(sSQL) <> '' then begin
-    vRESTDataBase := TFDPhysRDWConnectionBase(FConnection).Database;
-    vParams := TParams.Create(nil);
-    addParams(GetParams);
-
-    FFieldCount := -1;
-    FRecordCount := -1;
-
-    vSQL := TStringList.Create;
-    vSQL.Text := sSQL;
-
-    vDataSetList := nil;
-    try
-      vRESTDataBase.ExecuteCommand(vPoolermethod, vSQL, vParams, vError,
-                                   vMessageError, vDataSetList, vRowsAffected,
-                                   exec, (not exec), (not exec), False,
-                                   vRESTDataBase.RESTClientPooler);
-      FStream.Size := 0;
-      if (vDataSetList <> nil) and (not vDataSetList.IsNull) then
-        vDataSetList.SaveToStream(FStream);
-    finally
-      FreeAndNil(vDataSetList);
-    end;
-
-    vSQL.Free;
-    vParams.Free;
-
-    if not vError then begin
-      Result := vRowsAffected;
+    if (exec) and (RestDWConnection.Intransaction) then begin
+      vMassiveCache := TRESTDWMassiveCacheSQLValue(RestDWConnection.MassiveSQL.CachedList.Add);
+      vMassiveCache.SQL.Text := sSQL;
+      vParams := vMassiveCache.Params;
+      addParams(GetParams);
     end
     else begin
-      Result := 0;
-      Error(vMessageError);
+      vRESTDataBase := TFDPhysRDWConnectionBase(FConnection).Database;
+      vParams := TParams.Create(nil);
+      addParams(GetParams);
+
+      FFieldCount := -1;
+      FRecordCount := -1;
+
+      vSQL := TStringList.Create;
+      vSQL.Text := sSQL;
+
+      vDataSetList := nil;
+      try
+        vRESTDataBase.ExecuteCommand(vPoolermethod, vSQL, vParams, vError,
+                                     vMessageError, vDataSetList, vRowsAffected,
+                                     exec, (not exec), (not exec), False,
+                                     vRESTDataBase.RESTClientPooler);
+        FStream.Size := 0;
+        if (vDataSetList <> nil) and (not vDataSetList.IsNull) then
+          vDataSetList.SaveToStream(FStream);
+      finally
+        FreeAndNil(vDataSetList);
+      end;
+
+      vSQL.Free;
+      vParams.Free;
+
+      if not vError then begin
+        Result := vRowsAffected;
+      end
+      else begin
+        Result := 0;
+        raise TFDPhysRDWException.Create(Self,vMessageError);
+      end;
     end;
   end
   else begin
-    raise Exception.Create('Comando SQL em branco');
+    raise TFDPhysRDWException.Create(Self,errSQLEmpty);
   end;
 end;
 
@@ -705,8 +757,7 @@ begin
     Exit;
 
   // N - Bytes
-  if (FFieldTypes[col] in [dwftFixedChar,dwftWideString,dwftString,
-                           dwftFixedWideChar]) then begin
+  if (FFieldTypes[col] in [dwftFixedChar,dwftString]) then begin
     FStream.Read(vInt64, Sizeof(vInt64));
     vString := '';
     if vInt64 > 0 then begin
@@ -723,6 +774,25 @@ begin
       {$ENDIF}
     end;
     Result := vString;
+  end
+  // N - Bytes Wide
+  else if (FFieldTypes[col] in [dwftWideString,dwftFixedWideChar]) then begin
+    FStream.Read(vInt64, Sizeof(vInt64));
+    vString := '';
+    if vInt64 > 0 then begin
+      SetLength(vString, vInt64);
+      {$IFDEF FPC}
+       Stream.Read(Pointer(vString)^, vInt64);
+       if FEncodeStrs then
+         vString := DecodeStrings(vString);
+       vString := GetStringEncode(vString, FDatabaseCharSet);
+      {$ELSE}
+       FStream.Read(vString[InitStrPos], vInt64);
+       if FEncodeStrs then
+         vString := DecodeStrings(vString);
+      {$ENDIF}
+    end;
+    Result := WideString(vString);
   end
   // 1 - Byte - Inteiros
   else if (FFieldTypes[col] in [dwftByte,dwftShortint]) then
@@ -969,6 +1039,13 @@ begin
   end;
 end;
 
+function TFDPhysRDWCommand.RestDWConnection: TFDPhysRDWConnectionBase;
+begin
+  Result := nil;
+  if FConnectionObj.InheritsFrom(TFDPhysRDWConnectionBase) then
+    Result := TFDPhysRDWConnectionBase(FConnectionObj);
+end;
+
 { TFDPhysRDWBaseDriverLink }
 
 function TFDPhysRDWBaseDriverLink.GetBaseDriverID: String;
@@ -979,6 +1056,17 @@ end;
 function TFDPhysRDWBaseDriverLink.IsConfigured: Boolean;
 begin
   Result := Assigned(FDatabase);
+end;
+
+{ TFDPhysRDWException }
+
+constructor TFDPhysRDWException.Create(AObj : TObject; AMsg : string);
+var
+  eKind: TFDCommandExceptionKind;
+begin
+  Inherited Create(er_FD_StanTimeout, AMsg);
+  eKind := ekCmdAborted;
+  AppendError(1, er_FD_StanTimeout, AMsg, '', eKind, -1, -1);
 end;
 
 end.
