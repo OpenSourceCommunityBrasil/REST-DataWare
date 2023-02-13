@@ -2,7 +2,7 @@
 
 <a href="https://discord.gg/z8Wj7kQX"><img alt="Join Discord" src="https://img.shields.io/discord/918891794597544056?color=blue&label=Discord&logo=discord&style=social"></a> <a href="https://t.me/restdatawareoficial"><img src="https://img.shields.io/badge/Telegram-Join-blue?style=social&logo=telegram"> </a><br>
 
-[![enUS](https://img.shields.io/badge/Translate%20To-enUS-blue)](./README_US.md)[![ptBR](https://img.shields.io/badge/Translate%20To-ptBR-blue)](./README.md)[![esES](https://img.shields.io/badge/Translate%20To-esES-blue)](./README_ES.md)
+[![enUS](https://img.shields.io/badge/Translate%20To-enUS-blue)](./README_US.md)[![ptBR](https://img.shields.io/badge/Traduzir%20para-ptBR-blue)](./README.md)[![esES](https://img.shields.io/badge/Traducir%20a-esES-blue)](./README_ES.md)
 <br>
 REST DataWare is a component suite created to speed up the development of 3-layer applications with everything that RAD has to offer.
 Working from Delphi 7 to newer versions and also in Lazarus, RDW as we normally call it, is a complete tool for desktop, web, and cross-platform applications!
