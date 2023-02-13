@@ -1,4 +1,4 @@
-unit uRESTDWDriverBase;
+﻿unit uRESTDWDriverBase;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
@@ -2903,6 +2903,13 @@ Begin
                     qry.Open;
                    End;
     dbtMySQL     : Begin
+                    qry.SQL.Add('SELECT DATABASE()');
+                    qry.Open;
+
+                    vSchema := qry.Fields[0].AsString;
+
+                    qry.Close;
+                    qry.SQL.Clear;
                     qry.SQL.Add('SHOW TABLES');
                     qry.Open;
                    End;
@@ -2940,6 +2947,8 @@ Begin
     Begin
      sTable := Trim(qry.Fields[fdPos].AsString);
      sTable := AnsiReplaceStr(sTable,'"','');
+     if connType = dbtMySQL then
+       sTable := vSchema + '.' + sTable;
      TableNames.Add(sTable);
      qry.Next;
     End;
