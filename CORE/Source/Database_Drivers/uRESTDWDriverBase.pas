@@ -2869,7 +2869,7 @@ Var
  vStateResource : Boolean;
  connType : TRESTDWDatabaseType;
  qry : TRESTDWDrvQuery;
- vSchema, sTable : String;
+ vSchema, vTable, vCatalog : String;
  fdPos : integer;
 Begin
  If Not Assigned(TableNames) Then
@@ -2903,11 +2903,6 @@ Begin
                     qry.Open;
                    End;
     dbtMySQL     : Begin
-                    qry.SQL.Add('SELECT DATABASE()');
-                    qry.Open;
-
-                    vSchema := qry.Fields[0].AsString;
-
                     qry.Close;
                     qry.SQL.Clear;
                     qry.SQL.Add('SHOW TABLES');
@@ -2945,11 +2940,9 @@ Begin
    End;
    While Not qry.Eof Do
     Begin
-     sTable := Trim(qry.Fields[fdPos].AsString);
-     sTable := AnsiReplaceStr(sTable,'"','');
-     if connType = dbtMySQL then
-       sTable := vSchema + '.' + sTable;
-     TableNames.Add(sTable);
+     vTable := Trim(qry.Fields[fdPos].AsString);
+     vTable := AnsiReplaceStr(vTable,'"','');
+     TableNames.Add(vTable);
      qry.Next;
     End;
   Finally

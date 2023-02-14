@@ -355,6 +355,8 @@ begin
       oRow.SetData(4, null); // INDEX_NAME
       oRow.SetData(5, FInfoMetada.Strings[ARow]); // CONSTRAINT_NAME
       oRow.SetData(6, ARow); // INDEX_TYPE
+      oRow.SetData(7, null); // INDEX_TYPE
+      oRow.SetData(8, null); // INDEX_TYPE
     end
     else if GetMetaInfoKind = mkTables then begin
       sSchema := '';
@@ -373,7 +375,8 @@ begin
         oRow.SetData(2, null); // SCHEMA_NAME
 
       oRow.SetData(3, sTable); // TABLE_NAME
-      oRow.SetData(4, ctTable); // TABLE_TYPE
+      oRow.SetData(4, tkTable); // TABLE_TYPE
+      oRow.SetData(5, osMy); // SCOPE_TYPE
     end
     else if GetMetaInfoKind = mkTableFields then begin
       oRow.SetData(0, ARow); // RECNO
