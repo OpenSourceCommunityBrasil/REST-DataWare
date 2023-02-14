@@ -1,4 +1,4 @@
-unit FireDAC.Phys.RESTDWMeta;
+﻿unit FireDAC.Phys.RESTDWMeta;
 
 {$I ..\Includes\uRESTDWPlataform.inc}
 
@@ -38,8 +38,6 @@ type
   TFDPhysRDWCommandGenerator = class(TFDPhysCommandGenerator)
 
   end;
-
-
 
 implementation
 
