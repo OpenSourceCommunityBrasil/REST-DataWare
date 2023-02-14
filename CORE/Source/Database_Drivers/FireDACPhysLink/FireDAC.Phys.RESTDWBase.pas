@@ -85,6 +85,8 @@ type
 
     procedure SendMassive(Var Error : Boolean; Var MessageError : String);
     procedure ClearMassive;
+
+    function findRESTDWLink : TFDPhysRDWBaseDriverLink;
   published
     property Database : TRESTDWDatabasebaseBase read FDatabase;
     property MassiveSQL : TRESTDWMassiveSQLCache read FMassiveSQL;
@@ -204,9 +206,14 @@ procedure TFDPhysRDWConnectionBase.findDatabase;
 var
   rdwDriver : TFDPhysRDWBaseDriverLink;
 begin
-  rdwDriver := TFDPhysRDWBaseDriverLink(DriverObj.Manager.FindDriverLink(DriverObj.DriverID));
+  rdwDriver := findRESTDWLink;
   if Assigned(rdwDriver) then
     FDatabase := rdwDriver.Database;
+end;
+
+function TFDPhysRDWConnectionBase.findRESTDWLink: TFDPhysRDWBaseDriverLink;
+begin
+  Result := TFDPhysRDWBaseDriverLink(DriverObj.Manager.FindDriverLink(DriverObj.DriverID));
 end;
 
 procedure TFDPhysRDWConnectionBase.InternalConnect;
@@ -778,7 +785,7 @@ begin
     end;
     Result := vString;
     if Pos(#0,Result) > 0 then
-      Result := StringReplace(Result,#0,'',[rfReplaceAll]);
+      Result := StringReplace(Result, #0, '', [rfReplaceAll]);
   end
   // N - Bytes Wide
   else if (FFieldTypes[col] in [dwftWideString,dwftFixedWideChar]) then begin
@@ -799,7 +806,7 @@ begin
     end;
     Result := vString;
     if Pos(#0,Result) > 0 then
-      Result := StringReplace(Result,#0,'',[rfReplaceAll]);
+      Result := StringReplace(Result, #0, '', [rfReplaceAll]);
   end
   // 1 - Byte - Inteiros
   else if (FFieldTypes[col] in [dwftByte,dwftShortint]) then
@@ -897,7 +904,7 @@ begin
 //        Result := TEncoding.Unicode.GetString(vStringStream.Bytes);
         Result := vStringStream.DataString;
         if Pos(#0,Result) > 0 then
-          Result := StringReplace(Result,#0,'',[rfReplaceAll]);
+          Result := StringReplace(Result, #0, '', [rfReplaceAll]);
       finally
         vStringStream.Free;
       end;
@@ -913,7 +920,7 @@ begin
         vStringStream.Position := 0;
         Result := vStringStream.DataString;
         if Pos(#0,Result) > 0 then
-          Result := StringReplace(Result,#0,'',[rfReplaceAll]);
+          Result := StringReplace(Result, #0, '', [rfReplaceAll]);
       finally
         vStringStream.Free;
       end;
@@ -937,7 +944,7 @@ begin
     end;
     Result := vString;
     if Pos(#0,Result) > 0 then
-      Result := StringReplace(Result,#0,'',[rfReplaceAll]);
+      Result := StringReplace(Result, #0, '', [rfReplaceAll]);
   end;
 end;
 
