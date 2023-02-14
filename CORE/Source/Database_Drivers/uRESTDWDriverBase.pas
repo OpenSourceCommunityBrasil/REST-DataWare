@@ -2914,7 +2914,7 @@ Begin
                      qry.SQL.Add('INNER JOIN PG_CATALOG.PG_NAMESPACE N ON N.OID = C.RELNAMESPACE');
                      qry.SQL.Add('WHERE C.RELKIND = ''r'' and N.NSPNAME <> ''information_schema'' and ');
                      qry.SQL.Add('      N.NSPNAME <> ''pg_catalog'' and N.NSPNAME <> ''dbo'' and ');
-                     qry.SQL.Add('      N.NSPNAME <> ''sys'' and SUBSTR(C.RELNAME, 1, 3) <> ''pg_'' and');
+                     qry.SQL.Add('      N.NSPNAME <> ''sys'' and SUBSTR(C.RELNAME, 1, 3) <> ''pg_'' ');
                      If vSchema <> '' Then
                       qry.SQL.Add(' and lower(N.NSPNAME) = '+QuotedStr(LowerCase(vSchema)));
                      qry.Open;
