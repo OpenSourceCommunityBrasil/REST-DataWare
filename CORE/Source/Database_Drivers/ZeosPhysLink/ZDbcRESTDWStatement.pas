@@ -31,10 +31,30 @@ type
     procedure SetFloat(ParameterIndex: Integer; Value: Single);
     procedure SetDouble(ParameterIndex: Integer; const Value: Double);
     procedure SetCurrency(ParameterIndex: Integer; const Value: Currency); reintroduce;
-    procedure SetBigDecimal(ParameterIndex: Integer; {$IFDEF FPC_HAS_CONSTREF}constref{$ELSE}const{$ENDIF} Value: TBCD); reintroduce;
-    procedure SetDate(Index: Integer; {$IFDEF FPC_HAS_CONSTREF}constref{$ELSE}const{$ENDIF} Value: TZDate); reintroduce; overload;
-    procedure SetTime(Index: Integer; {$IFDEF FPC_HAS_CONSTREF}constref{$ELSE}const{$ENDIF} Value: TZTime); reintroduce; overload;
-    procedure SetTimestamp(Index: Integer; {$IFDEF FPC_HAS_CONSTREF}constref{$ELSE}const{$ENDIF} Value: TZTimeStamp); reintroduce; overload;
+    procedure SetBigDecimal(ParameterIndex: Integer;
+                            {$IFDEF FPC_HAS_CONSTREF}
+                            constref
+                            {$ELSE}
+                            const
+                            {$ENDIF} Value: TBCD); reintroduce;
+    procedure SetDate(Index: Integer;
+                      {$IFDEF FPC_HAS_CONSTREF}
+                      constref
+                      {$ELSE}
+                      const
+                      {$ENDIF} Value: TZDate); reintroduce; overload;
+    procedure SetTime(Index: Integer;
+                      {$IFDEF FPC_HAS_CONSTREF}
+                      constref
+                      {$ELSE}
+                      const
+                      {$ENDIF} Value: TZTime); reintroduce; overload;
+    procedure SetTimestamp(Index: Integer;
+                           {$IFDEF FPC_HAS_CONSTREF}
+                           constref
+                           {$ELSE}
+                           const
+                           {$ENDIF} Value: TZTimeStamp); reintroduce; overload;
     procedure SetBytes(Index: Integer; Value: PByte; Len: NativeUInt); reintroduce; overload;
   end;
 

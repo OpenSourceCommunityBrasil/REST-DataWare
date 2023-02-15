@@ -6,9 +6,11 @@ interface
 
 {$IFNDEF ZEOS_DISABLE_RDW} //if set we have an empty unit
 uses
-  Classes, {$IFDEF MSEgui}mclasses,{$ENDIF} SysUtils,
+  {$IFDEF MSEgui}mclasses,{$ENDIF}
+  Classes, SysUtils,
   ZDbcIntfs, ZDbcLogging, ZTokenizer, ZPlainDriver, ZGenericSqlAnalyser,
-  ZCompatibility, ZPlainRESTDWDriver, ZDbcConnection, uRESTDWBasicDB;
+  ZCompatibility, ZPlainRESTDWDriver, ZDbcConnection, ZURL,
+  uRESTDWBasicDB;
 
 type
   TZRESTDWDriver = class(TZAbstractDriver)

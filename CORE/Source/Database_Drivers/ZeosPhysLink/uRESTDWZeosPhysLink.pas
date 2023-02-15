@@ -20,14 +20,7 @@ type
     property Database : TRESTDWDatabasebaseBase read FDatabase write FDatabase;
   end;
 
-procedure Register;
-
 implementation
-
-procedure Register;
-begin
-  RegisterComponents('REST Dataware - PhysLink', [TRESTDWZeosPhysLink]);
-end;
 
 { TRESTDWZeosPhysLink }
 
