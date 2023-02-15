@@ -846,8 +846,8 @@ begin
   // 8 - Bytes - Flutuantes
   else if (FFieldTypes[col] in [dwftFloat,dwftExtended]) then
   begin
-    FStream.Read(vInt64, Sizeof(vInt64));
-    Result := vInt64;
+    FStream.Read(vDouble, Sizeof(vDouble));
+    Result := vDouble;
   end
   // 8 - Bytes - Date, Time, DateTime, TimeStamp
   else if (FFieldTypes[col] in [dwftDate,dwftTime,dwftDateTime,dwftTimeStamp]) then
