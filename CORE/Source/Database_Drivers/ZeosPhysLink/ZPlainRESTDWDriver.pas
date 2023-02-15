@@ -6,8 +6,11 @@ interface
 
 {$IFNDEF ZEOS_DISABLE_RDW}
 
-uses SysUtils, Classes, {$IFDEF MSEgui}mclasses,{$ENDIF}
-  {$IFDEF OLDFPC}ZClasses,{$ENDIF} ZCompatibility, ZPlainDriver;
+uses
+  {$IFDEF MSEgui}mclasses,{$ENDIF}
+  {$IFDEF OLDFPC}ZClasses,{$ENDIF}
+  SysUtils, Classes,
+  ZCompatibility, ZPlainDriver;
 
 type
   TZRESTDWPlainDriver = class (TZAbstractPlainDriver, IZPlainDriver)

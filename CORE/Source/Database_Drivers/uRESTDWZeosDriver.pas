@@ -41,6 +41,9 @@ uses
   ZConnection, ZDataset, ZSequence, ZDbcIntfs, ZAbstractRODataset,
   ZAbstractDataset, ZStoredProcedure, ZEncoding, ZDatasetUtils,
   uRESTDWDriverBase, uRESTDWBasicTypes, uRESTDWProtoTypes
+  {$IFNDEF FPC}
+//  , uRESTDWZeosPhysLink
+  {$ENDIF}
   ;
 
 const
@@ -138,6 +141,9 @@ implementation
 procedure Register;
 begin
   RegisterComponents('REST Dataware - Drivers', [TRESTDWZeosDriver]);
+  {$IFNDEF FPC}
+//  RegisterComponents('REST Dataware - PhysLink', [TRESTDWZeosPhysLink]);
+  {$ENDIF}
 end;
 
 { TRESTDWZeosStoreProc }
