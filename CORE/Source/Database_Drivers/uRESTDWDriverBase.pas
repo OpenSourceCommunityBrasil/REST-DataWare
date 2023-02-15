@@ -2120,28 +2120,52 @@ Begin
  BufferStream   := TRESTDWBufferBase.Create;
  Try
   BufferStream.LoadToStream(MassiveStream);
-  While Not BufferStream.Eof Do
-   Begin
-    Try
-     aMassive       := BufferStream.ReadStream;
-     If aMassive <> Nil Then
-      Begin
-       MassiveDataset := TMassiveDatasetBuffer.Create(nil);
-       MassiveDataset.LoadFromStream(aMassive);
-       If vLineString = '' Then
-        vLineString := ApplyUpdates_MassiveCache(MassiveDataset, Error, MessageError)
-       Else
-        vLineString := vLineString + ', ' + ApplyUpdates_MassiveCache(MassiveDataset, Error, MessageError);
-       If Error Then
-        Break;
-      End;
-    Finally
-     If Assigned(MassiveDataset) Then
-      FreeAndNil(MassiveDataset);
-     If Assigned(aMassive) Then
-      FreeAndNil(aMassive);
+  Try
+   If Not isConnected Then
+    Connect;
+   If not connInTransaction Then
+    connStartTransaction;
+   If Assigned(FServerMethod) Then
+    Begin
+     If Assigned(FServerMethod.OnMassiveAfterStartTransaction) Then
+      FServerMethod.OnMassiveAfterStartTransaction(MassiveDataset);
     End;
-   End;
+    While Not BufferStream.Eof Do
+     Begin
+      Try
+       aMassive       := BufferStream.ReadStream;
+       If aMassive <> Nil Then
+        Begin
+         MassiveDataset := TMassiveDatasetBuffer.Create(nil);
+         MassiveDataset.LoadFromStream(aMassive);
+         If vLineString = '' Then
+          vLineString := ApplyUpdates_MassiveCache(MassiveDataset, Error, MessageError)
+         Else
+          vLineString := vLineString + ', ' + ApplyUpdates_MassiveCache(MassiveDataset, Error, MessageError);
+         If Error Then
+          Break;
+        End;
+      Finally
+       If Assigned(MassiveDataset) Then
+        FreeAndNil(MassiveDataset);
+       If Assigned(aMassive) Then
+        FreeAndNil(aMassive);
+      End;
+     End;
+  Finally
+   If connInTransaction Then
+    Begin
+     If Assigned(FServerMethod) Then
+      Begin
+       If Assigned(FServerMethod.OnMassiveAfterBeforeCommit) Then
+        FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
+      End;
+     connCommit;
+     If Assigned(FServerMethod) Then
+      If Assigned(FServerMethod.OnMassiveAfterAfterCommit) Then
+       FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
+    End;
+  End;
  Finally
   Result := TJSONValue.Create;
   If (vLineString <> '') Then
@@ -2171,99 +2195,74 @@ var
  Begin
   Result := False;
   Try
-   If not connInTransaction Then
+   MassiveDataset.First;
+   If Assigned(FServerMethod) Then
     Begin
-     connStartTransaction;
+     If Assigned(FServerMethod.OnMassiveBegin) Then
+      FServerMethod.OnMassiveBegin(MassiveDataset);
+    End;
+   For A := 1 to MassiveDataset.RecordCount Do
+    Begin
+     Query.SQL.Clear;
      If Assigned(FServerMethod) Then
       Begin
-       If Assigned(FServerMethod.OnMassiveAfterStartTransaction) Then
-        FServerMethod.OnMassiveAfterStartTransaction(MassiveDataset);
-      End;
-     Try
-      MassiveDataset.First;
-      If Assigned(FServerMethod) Then
-       Begin
-        If Assigned(FServerMethod.OnMassiveBegin) Then
-         FServerMethod.OnMassiveBegin(MassiveDataset);
-       End;
-      For A := 1 to MassiveDataset.RecordCount Do
-       Begin
-        Query.SQL.Clear;
-        If Assigned(FServerMethod) Then
-         Begin
-          vMassiveLine := False;
-          If Assigned(FServerMethod.OnMassiveProcess) Then
-           Begin
-            FServerMethod.OnMassiveProcess(MassiveDataset, vMassiveLine);
-            If vMassiveLine Then
-             Begin
-              MassiveDataset.Next;
-              Continue;
-             End;
-           End;
-         End;
-         PrepareDataQuery(Query, MassiveDataset, nil, True, vResultReflection,  Error, MessageError);
-         Try
-          If (Not (MassiveDataset.ReflectChanges)) Or
-             ((MassiveDataset.ReflectChanges)      And
-             (MassiveDataset.MassiveMode In [mmExec, mmDelete])) Then
-           Begin
-            Query.ExecSQL;
-            // Inclusão do método de after massive line process
-            If Assigned(FServerMethod) Then
-             Begin
-              If Assigned(FServerMethod.OnAfterMassiveLineProcess) then
-               FServerMethod.OnAfterMassiveLineProcess(MassiveDataset, TDataset(Query.Owner));
-             End;
-           End;
-         Except
-          On E: Exception Do
-           Begin
-            Error := True;
-            Result := False;
-            MessageError := E.Message;
-            If connInTransaction Then
-             connRollback;
-            Exit;
-           End;
-         End;
-        MassiveDataset.Next;
-       End;
-     Finally
-      If Not Error Then
-       Begin
-        Try
-         Result := True;
-         If connInTransaction Then
+       vMassiveLine := False;
+       If Assigned(FServerMethod.OnMassiveProcess) Then
+        Begin
+         FServerMethod.OnMassiveProcess(MassiveDataset, vMassiveLine);
+         If vMassiveLine Then
           Begin
-           If Assigned(FServerMethod) Then
-            Begin
-             If Assigned(FServerMethod.OnMassiveAfterBeforeCommit) Then
-              FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
-            End;
-           connCommit;
-           If Assigned(FServerMethod) Then
-            If Assigned(FServerMethod.OnMassiveAfterAfterCommit) Then
-             FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
-          End;
-        Except
-         On E: Exception Do
-          Begin
-           Error := True;
-           Result := False;
-           MessageError := E.Message;
-           If connInTransaction then
-            connRollback;
+           MassiveDataset.Next;
+           Continue;
           End;
         End;
-       End;
-      If Assigned(FServerMethod) Then
-       If Assigned(FServerMethod.OnMassiveEnd) Then
-        FServerMethod.OnMassiveEnd(MassiveDataset);
-     End;
+      End;
+      PrepareDataQuery(Query, MassiveDataset, nil, True, vResultReflection,  Error, MessageError);
+      Try
+       If (Not (MassiveDataset.ReflectChanges)) Or
+          ((MassiveDataset.ReflectChanges)      And
+          (MassiveDataset.MassiveMode In [mmExec, mmDelete])) Then
+        Begin
+         Query.ExecSQL;
+         // Inclusão do método de after massive line process
+         If Assigned(FServerMethod) Then
+          Begin
+           If Assigned(FServerMethod.OnAfterMassiveLineProcess) then
+            FServerMethod.OnAfterMassiveLineProcess(MassiveDataset, TDataset(Query.Owner));
+          End;
+        End;
+      Except
+       On E: Exception Do
+        Begin
+         Error := True;
+         Result := False;
+         MessageError := E.Message;
+         If connInTransaction Then
+          connRollback;
+         Exit;
+        End;
+      End;
+     MassiveDataset.Next;
     End;
   Finally
-
+   If Not Error Then
+    Begin
+     Try
+      Result := True;
+     Except
+      On E: Exception Do
+       Begin
+        Error := True;
+        Result := False;
+        MessageError := E.Message;
+        If connInTransaction then
+         connRollback;
+       End;
+     End;
+    End;
+   If Assigned(FServerMethod) Then
+    If Assigned(FServerMethod.OnMassiveEnd) Then
+     FServerMethod.OnMassiveEnd(MassiveDataset);
   End;
  End;
 Begin
@@ -3898,7 +3897,7 @@ Begin
     End;
     vTempQuery.Close;
     vTempQuery.SQL.Clear;
-    vTempQuery.SQL.Add(BytesToString(vSqlStream));
+    vTempQuery.SQL.Add(StringReplace(BytesToString(vSqlStream), sLineBreak, ' ', [rfReplaceAll]));
     SetLength(vSqlStream, 0);
     DWParams := TRESTDWParams.Create;
     Try
