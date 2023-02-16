@@ -3,11 +3,18 @@ unit uconsts;
 {$mode ObjFPC}{$H+}
 
 interface
-  type
-    TRESTDWSockets = (Ics, Indy);
-    TRESTDWDatabaseDrivers = (FireDAC, UniDAC, Zeos);
   {$REGION RESTDW Consts}
   //apontar onde está a pasta CORE
+const
+  DelphiSocketsList = 'Ics,Indy';
+  LazarusSocketsList = 'Indy';
+
+  DelphiDBWareList = 'AnyDAC,ApolloDB,FireDAC,Interbase,MyDAC,UniDAC,Zeos';
+  LazarusDBWareList = 'Lazarus,UniDAC,Zeos';
+
+  DelphiResourceList = 'CGI,Wizards';
+  LazarusResourceList = 'CGI';
+
 var
   TRESTDWCorePaths: array of string = ('Source\', 'Source\Basic', 'Source\Basic\Crypto',
     'Source\Basic\Dialogs', 'Source\Basic\Mechanics', 'Source\Consts',

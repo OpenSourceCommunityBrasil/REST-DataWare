@@ -5,7 +5,7 @@ unit urestfunctions;
 interface
 
 uses
-  Classes, SysUtils, fphttpclient, opensslsockets;
+  Classes, SysUtils, fphttpclient, opensslsockets, fpjson, jsonparser;
 
 const
   TagsAPI = 'https://api.github.com/repos/OpenSourceCommunityBrasil/REST-DataWare/tags';
@@ -27,6 +27,8 @@ type
     destructor Destroy; override;
     procedure setDefaultHeaders;
     function getRepoTags: TStream;
+    function getTagsList: string;
+    function getBranchesList: string;
     function getRepoBranches: TStream;
     function Download(aDirectory: string; aVersion: string): boolean;
   end;
@@ -63,6 +65,58 @@ var
 begin
   sresp := TStringStream.Create(FHTTPREST.Get(TagsAPI), TEncoding.UTF8);
   Result := sresp;
+end;
+
+function TRESTClient.getTagsList: string;
+var
+  RestClient: TRESTClient;
+  Tags: TJSONArray;
+  slistTags: TStringList;
+  strResposta: TStream;
+  I: integer;
+begin
+  RestClient := TRESTClient.Create;
+  //Tags := TJSONArray.Create;
+  slistTags := TStringList.Create;
+  Result := '';
+  try
+    strResposta := RestClient.getRepoTags;
+    Tags := TJSONArray(GetJSON(strResposta));
+    for I := 0 to pred(Tags.Count) do
+      slistTags.Add(TJSONObject(Tags.Items[i]).Get('name'));
+    Result := slistTags.DelimitedText;
+  finally
+    slistTags.Free;
+    strResposta.Free;
+    Tags.Free;
+    RestClient.Free;
+  end;
+end;
+
+function TRESTClient.getBranchesList: string;
+var
+  RestClient: TRESTClient;
+  Tags: TJSONArray;
+  slistBranches: TStringList;
+  strResposta: TStream;
+  I: integer;
+begin
+  RestClient := TRESTClient.Create;
+  //Tags := TJSONArray.Create;
+  slistBranches := TStringList.Create;
+  Result := '';
+  try
+    strResposta := RestClient.getRepoBranches;
+    Tags := TJSONArray(GetJSON(strResposta));
+    for I := 0 to pred(Tags.Count) do
+      slistBranches.Add(TJSONObject(Tags.Items[i]).Get('name'));
+    Result := slistBranches.DelimitedText;
+  finally
+    slistBranches.Free;
+    strResposta.Free;
+    Tags.Free;
+    RestClient.Free;
+  end;
 end;
 
 function TRESTClient.getRepoBranches: TStream;

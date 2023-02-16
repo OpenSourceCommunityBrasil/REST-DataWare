@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, fphttpclient, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ComCtrls, CheckLst, ValEdit,
-  urestfunctions;
+  StdCtrls, ComCtrls, CheckLst, ValEdit, Buttons, fpJSON, jsonparser,
+  urestfunctions, uconsts;
 
 type
   TSplashFormStyle = record
@@ -21,16 +21,15 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
-    Button1: TButton;
-    cbInstallType1: TComboBox;
-    CheckListBox1: TCheckListBox;
-    CheckListBox2: TCheckListBox;
-    CheckListBox3: TCheckListBox;
-    CheckListBox4: TCheckListBox;
-    ComboBox1: TComboBox;
+    cbIDEVersion: TComboBox;
+    clbDataEngine: TCheckListBox;
+    clbDBDrivers: TCheckListBox;
+    clbResources: TCheckListBox;
+    clbPlatforms: TCheckListBox;
+    cbSources: TComboBox;
     cbInstallType: TComboBox;
-    FPHTTPClient1: TFPHTTPClient;
     Image1: TImage;
+    ImageList1: TImageList;
     imConfirmBack: TImage;
     imInstallBack: TImage;
     imConfirmNext: TImage;
@@ -48,14 +47,14 @@ type
     imIDENext: TImage;
     imResourceNext: TImage;
     imTheme: TImage;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    LabeledEdit1: TLabeledEdit;
+    lSourceVersion: TLabel;
+    lInstallType: TLabel;
+    lIDEVersion: TLabel;
+    lbedFolder: TLabeledEdit;
     lDataEngine: TLabel;
     lDBWare: TLabel;
     lOtherResources: TLabel;
-    lOtherResources1: TLabel;
+    lPlatforms: TLabel;
     lResourcesNext: TLabel;
     lConfirmNext: TLabel;
     lInstallClose: TLabel;
@@ -74,15 +73,15 @@ type
     lTheme: TLabel;
     mmConfirm: TMemo;
     mmLogInstall: TMemo;
-    OpenDialog1: TOpenDialog;
     pConfirmaRecursos: TPanel;
     pInstall: TPanel;
     pRecursos: TPanel;
     pIDE: TPanel;
     pLanguage: TPanel;
+    FolderDialog: TSelectDirectoryDialog;
     selectionbox: TShape;
     IDESelector: TShape;
-    procedure Button1Click(Sender: TObject);
+    SpeedButton1: TSpeedButton;
     procedure ConfigureInstallOptions(Sender: TObject);
     procedure FormClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -103,6 +102,7 @@ type
     procedure imThemeClick(Sender: TObject);
     procedure ImageSelect(Sender: TObject);
     procedure IDESelect(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
   private
     FThemeIndex: integer;
     FIDE: integer;
@@ -113,6 +113,8 @@ type
     procedure SetIgnoredLabels;
     procedure Translate(aLangIndex: integer);
     procedure ShowStep(aStepIndex: integer);
+    procedure PreparaVersoes;
+    procedure ConfiguraOpcoes;
   public
 
   end;
@@ -262,8 +264,49 @@ begin
   end;
 end;
 
+procedure TForm1.PreparaVersoes;
+var
+  RESTClient: TRESTClient;
+begin
+  RESTClient := TRESTClient.Create;
+  try
+    cbSources.Items.Clear;
+    cbSources.Items.AddDelimitedtext('--- Branches ---');
+    cbSources.Items.AddDelimitedtext(RESTClient.getBranchesList);
+    cbSources.Items.AddDelimitedtext('--- Tags ---');
+    cbSources.Items.AddDelimitedtext(RESTClient.getTagsList);
+  finally
+    RESTClient.Free;
+  end;
+end;
+
+procedure TForm1.ConfiguraOpcoes;
+begin
+  clbDataEngine.Items.Clear;
+  clbDBDrivers.Items.Clear;
+  clbResources.Items.Clear;
+  if FIDE = 1 then
+  begin
+    clbDataEngine.Items.AddDelimitedtext(DelphiSocketsList);
+    clbDBDrivers.Items.AddDelimitedtext(DelphiDBWareList);
+    clbResources.Items.AddDelimitedtext(DelphiResourceList);
+    cbIDEVersion.Visible := True;
+  end
+  else
+  begin
+    clbDataEngine.Items.AddDelimitedtext(LazarusSocketsList);
+    clbDBDrivers.Items.AddDelimitedtext(LazarusDBWareList);
+    clbResources.Items.AddDelimitedtext(LazarusResourceList);
+    clbPlatforms.Visible := False;
+    cbIDEVersion.Visible := False;
+  end;
+  lIDEVersion.Visible := cbIDEVersion.Visible;
+  lPlatforms.Visible := clbPlatforms.Visible;
+end;
+
 procedure TForm1.ImageSelect(Sender: TObject);
 begin
+  selectionbox.Visible := True;
   selectionbox.Left := TImage(Sender).Left - 2;
   selectionbox.Top := TImage(Sender).Top + 13;
   selectionbox.Visible := True;
@@ -272,10 +315,18 @@ end;
 
 procedure TForm1.IDESelect(Sender: TObject);
 begin
+  IDESelector.Visible := True;
   IDESelector.Left := TImage(Sender).Left + 3;
   IDESelector.Top := TImage(Sender).Top;
   IDESelector.Visible := True;
   FIde := TImage(Sender).Tag;
+  lIDENext.Enabled := FIde > -1;
+end;
+
+procedure TForm1.SpeedButton1Click(Sender: TObject);
+begin
+  if FolderDialog.Execute then
+    lbedFolder.Text := FolderDialog.FileName;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -286,6 +337,9 @@ begin
   {$ENDIF}
   SetIgnoredLabels;
   ConfigThemes;
+  FIDE := -1;
+  IDESelector.Visible := False;
+  selectionbox.Visible := False;
 
   ShowStep(0);
   SetTheme(0);
@@ -307,17 +361,6 @@ Custom
   case cbInstallType.ItemIndex of
     0: ;
   end;
-end;
-
-procedure TForm1.Button1Click(Sender: TObject);
-var
-  RestClient: TRESTClient;
-  teste: string;
-begin
-  RestClient := TRESTClient.Create;
-  ShowMessage(TStringStream(RestClient.getRepoTags).DataString);
-  teste := TStringStream(RestClient.getRepoTags).DataString;
-  teste := TStringStream(RestClient.getRepoBranches).DataString;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -386,6 +429,8 @@ end;
 
 procedure TForm1.imIDENextClick(Sender: TObject);
 begin
+  PreparaVersoes;
+  ConfiguraOpcoes;
   ShowStep(2);
 end;
 
