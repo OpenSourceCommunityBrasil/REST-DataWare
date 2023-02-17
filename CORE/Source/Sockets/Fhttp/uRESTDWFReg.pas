@@ -105,7 +105,7 @@ End;
 
 {$IFDEF FPC}
 initialization
-//{$I RESTDWFhttpSockets.lrs}
+{$I RESTDWFhttpSockets.lrs}
 {$ENDIF}
 
 end.

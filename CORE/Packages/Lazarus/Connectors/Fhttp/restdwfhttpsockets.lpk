@@ -13,6 +13,7 @@
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
+    <Version Major="2" Minor="1"/>
     <Files>
       <Item>
         <Filename Value="..\..\..\..\Source\Includes\uRESTDWPlataform.inc"/>
@@ -26,6 +27,10 @@
         <Filename Value="..\..\..\..\Source\Sockets\Fhttp\uRESTDWFReg.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="uRESTDWFReg"/>
+      </Item>
+      <Item>
+        <Filename Value="RESTDWfhttpSockets.lrs"/>
+        <Type Value="LRS"/>
       </Item>
     </Files>
     <RequiredPkgs>
