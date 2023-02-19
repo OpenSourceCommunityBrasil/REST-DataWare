@@ -3,7 +3,7 @@ unit uRESTDWZeosPhysLink;
 interface
 
 uses
-  Classes, SysUtils, ZConnection, uRESTDWAbout, uRESTDWBasicDB,
+  Classes, SysUtils, ZConnection, ZDbcIntfs, uRESTDWAbout, uRESTDWBasicDB,
   ZDbcRESTDW;
 
 type
@@ -11,12 +11,14 @@ type
   private
     FZConnection : TZConnection;
     FDatabase : TRESTDWDatabasebaseBase;
+    FProvider : TZServerProvider;
     FOldZeosBeforeConnect : TNotifyEvent;
     procedure setZConnection(const Value: TZConnection);
   protected
     procedure OnRESTDWZeosBeforeConnect(Sender : TObject);
   published
     property ZConnection : TZConnection read FZConnection write setZConnection;
+    property Provider : TZServerProvider read FProvider write FProvider;
     property Database : TRESTDWDatabasebaseBase read FDatabase write FDatabase;
   end;
 
@@ -34,7 +36,8 @@ end;
 procedure TRESTDWZeosPhysLink.setZConnection(const Value: TZConnection);
 begin
   FZConnection := Value;
-  if FZConnection <> nil then begin
+  FOldZeosBeforeConnect := nil;
+  if (FZConnection <> nil) and (ZConnection.Protocol = 'restdw') then begin
     FOldZeosBeforeConnect := FZConnection.BeforeConnect;
     FZConnection.BeforeConnect := OnRESTDWZeosBeforeConnect;
   end;

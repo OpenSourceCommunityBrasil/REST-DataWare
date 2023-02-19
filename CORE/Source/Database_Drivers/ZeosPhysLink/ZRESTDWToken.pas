@@ -39,6 +39,9 @@ type
   TZRESTDWTokenizer = class (TZTokenizer)
   protected
     procedure CreateTokenStates; override;
+
+    function NormalizeParamToken(const Token: TZToken; out ParamName: String;
+      LookUpList: TStrings; out ParamIndex: Integer; out IngoreParam: Boolean): String; override;
   end;
 
 {$ENDIF ZEOS_DISABLE_RESTDW}
@@ -113,6 +116,20 @@ begin
 
   SetCharacterState('/', '/', CommentState);
   SetCharacterState('-', '-', CommentState);
+end;
+
+function TZRESTDWTokenizer.NormalizeParamToken(const Token: TZToken;
+  out ParamName: String; LookUpList: TStrings; out ParamIndex: Integer;
+  out IngoreParam: Boolean): String;
+begin
+  Result := '?';
+  if (Token.L >= 2) and (Ord(Token.P^) in [Ord(#39), Ord('`'), Ord('"'), Ord('[')])
+  then ParamName := GetQuoteState.DecodeToken(Token, Token.P^)
+  else System.SetString(ParamName, Token.P, Token.L);
+  ParamIndex := LookUpList.IndexOf(ParamName);
+  if ParamIndex < 0 then
+    ParamIndex := LookUpList.Add(ParamName);
+  IngoreParam := False;
 end;
 
 {$ENDIF ZEOS_DISABLE_RESTDW}

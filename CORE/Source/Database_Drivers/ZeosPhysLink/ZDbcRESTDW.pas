@@ -33,8 +33,12 @@ type
     function GetPlainDriver: IZPlainDriver;
   end;
 
-  TZRESTDWConnection = class(TZAbstractSingleTxnConnection, IZConnection,
-       IZRESTDWConnection, IZTransaction)
+  {$IFDEF ZEOS80UP}
+    TZRESTDWConnection = class(TZAbstractSingleTxnConnection, IZConnection,
+         IZRESTDWConnection, IZTransaction)
+  {$ELSE}
+    TZRESTDWConnection = class(TZAbstractConnection, IZRESTDWConnection)
+  {$ENDIF}
   private
     FCatalog: string;
     FPlainDriver: TZRESTDWPlainDriver;
@@ -61,6 +65,8 @@ type
     procedure AfterConstruction; override;
 
     procedure Open; override;
+
+    property Database : TRESTDWDatabasebaseBase read FDatabase write FDatabase;
   end;
 
 var
@@ -164,13 +170,14 @@ begin
   if FDatabase = nil then
     raise Exception.Create('Error Message');
 
-  FDatabase.Open;
+  FDatabase.Active := True;
   inherited;
 end;
 
 function TZRESTDWConnection.PrepareCallWithParams(const Name: String;
   Params: TStrings): IZCallableStatement;
 begin
+  // StoreProcedure - TODO ???
   Raise EZUnsupportedException.Create(SUnsupportedOperation);
 end;
 

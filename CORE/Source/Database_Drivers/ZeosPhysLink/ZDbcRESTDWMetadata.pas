@@ -101,6 +101,9 @@ type
     function GetTimeDateFunctions: string; override;
     function GetSearchStringEscape: string; override;
     function GetExtraNameCharacters: string; override;
+
+    // minhas
+    function SupportsArrayBindings: Boolean; override;
   end;
 
   {** Implements RESTDW Database Metadata. }
@@ -313,6 +316,11 @@ end;
 function TZRESTDWDatabaseInfo.SupportsSchemasInPrivilegeDefinitions: Boolean;
 begin
   Result := False;
+end;
+
+function TZRESTDWDatabaseInfo.SupportsArrayBindings: Boolean;
+begin
+  Result := True;
 end;
 
 function TZRESTDWDatabaseInfo.SupportsCatalogsInDataManipulation: Boolean;
