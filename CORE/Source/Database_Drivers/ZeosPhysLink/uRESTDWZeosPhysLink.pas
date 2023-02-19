@@ -4,7 +4,7 @@ interface
 
 uses
   Classes, SysUtils, ZConnection, ZDbcIntfs, uRESTDWAbout, uRESTDWBasicDB,
-  ZDbcRESTDW;
+  uRESTDWZDbc;
 
 type
   TRESTDWZeosPhysLink = class(TRESTDWComponent)
@@ -23,6 +23,7 @@ type
   end;
 
 implementation
+
 
 { TRESTDWZeosPhysLink }
 

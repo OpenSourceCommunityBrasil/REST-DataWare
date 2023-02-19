@@ -1,4 +1,4 @@
-unit ZDbcRESTDWResultSet;
+unit uRESTDWZDbcResultSet;
 
 interface
 
@@ -7,10 +7,10 @@ interface
 {$IFNDEF ZEOS_DISABLE_RESTDW} //if set we have an empty unit
 uses
   System.Types, Contnrs, Classes, {$IFDEF MSEgui}mclasses,{$ENDIF} SysUtils, FmtBCD,
-  ZSysUtils, ZDbcIntfs, ZDbcResultSet, ZDbcResultSetMetadata, ZPlainRESTDWDriver,
+  ZSysUtils, ZDbcIntfs, ZDbcResultSet, ZDbcResultSetMetadata, uRESTDWZPlainDriver,
   ZCompatibility, ZDbcCache, ZDbcCachedResultSet, ZDbcGenericResolver, Variants,
-  ZDbcMetadata,
-  ZDbcRESTDW, ZSelectSchema, DB, uRESTDWConsts, uRESTDWTools, ZDatasetUtils;
+  ZDbcMetadata, ZSelectSchema, ZDatasetUtils,
+  uRESTDWZDbc, DB, uRESTDWConsts, uRESTDWTools;
 
 type
   TZRESTDWResultSetMetadata = class(TZAbstractResultSetMetadata)

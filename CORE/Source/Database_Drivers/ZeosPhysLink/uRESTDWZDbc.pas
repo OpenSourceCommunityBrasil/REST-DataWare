@@ -1,4 +1,4 @@
-unit ZDbcRESTDW;
+unit uRESTDWZDbc;
 
 interface
 
@@ -9,7 +9,7 @@ uses
   {$IFDEF MSEgui}mclasses,{$ENDIF}
   Classes, SysUtils,
   ZDbcIntfs, ZDbcLogging, ZTokenizer, ZPlainDriver, ZGenericSqlAnalyser,
-  ZCompatibility, ZPlainRESTDWDriver, ZDbcConnection, ZURL,
+  ZCompatibility, uRESTDWZPlainDriver, ZDbcConnection, ZURL,
   uRESTDWBasicDB;
 
 type
@@ -77,8 +77,8 @@ implementation
 {$IFNDEF ZEOS_DISABLE_RDW} //if set we have an empty unit
 
 uses
-  ZSysUtils, ZFastCode, ZEncoding, ZMessages, ZDbcRESTDWStatement,
-  ZRESTDWToken, ZRESTDWAnalyser, ZExceptions, ZDbcRESTDWMetadata
+  ZSysUtils, ZFastCode, ZEncoding, ZMessages, uRESTDWZDbcStatement,
+  uRESTDWZToken, uRESTDWZAnalyser, ZExceptions, uRESTDWZDbcMetadata
   {$IFDEF WITH_UNITANSISTRINGS}, AnsiStrings{$ENDIF};
 
 { TZRESTDWDriver }

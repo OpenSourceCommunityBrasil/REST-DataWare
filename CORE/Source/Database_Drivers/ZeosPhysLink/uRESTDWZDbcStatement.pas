@@ -1,4 +1,4 @@
-unit ZDbcRESTDWStatement;
+unit uRESTDWZDbcStatement;
 
 interface
 
@@ -7,7 +7,7 @@ interface
 {$IFNDEF ZEOS_DISABLE_RDW} //if set we have an empty unit
 uses
   Classes, {$IFDEF MSEgui}mclasses,{$ENDIF} SysUtils, DB, Variants,
-  ZDbcStatement, ZDbcIntfs, ZDbcRESTDW, FmtBcd, ZCompatibility, ZVariant,
+  ZDbcStatement, ZDbcIntfs, uRESTDWZDbc, FmtBcd, ZCompatibility, ZVariant,
   uRESTDWBasicDB, uRESTDWParams, uRESTDWPoolermethod, ZDatasetUtils;
 
 type
@@ -88,7 +88,7 @@ implementation
 {$IFNDEF ZEOS_DISABLE_RDW} //if set we have an empty unit
 
 uses
-  ZDbcRESTDWResultSet, ZDbcCachedResultSet;
+  uRESTDWZDbcResultSet, ZDbcCachedResultSet;
 
 { TZRESTStatement }
 
