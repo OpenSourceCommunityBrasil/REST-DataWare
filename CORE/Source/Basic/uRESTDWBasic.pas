@@ -2803,6 +2803,7 @@ Begin
        If (vTempServerMethods.ClassType = TServerMethodDatamodule)             Or
           (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule)) Then
         Begin
+         TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
          If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
           Begin
            {$IFNDEF FPC}

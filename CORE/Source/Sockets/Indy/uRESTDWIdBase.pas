@@ -336,6 +336,7 @@ Type
                                     aEncoding              : TEncodeSelect;
                                     aAccessTag             : String;
                                     aAuthenticationOptions : TRESTDWClientAuthOptionParams);Override;
+  Procedure Abort;Override;
  Published
   Property SSLMode                 : TIdSSLMode               Read vSSLMode                 Write vSSLMode;
   Property CipherList              : String                   Read vCipherList              Write vCipherList;
@@ -3652,6 +3653,11 @@ Begin
  HttpRequest.OnWorkEnd                   := Self.OnWorkEnd;
  HttpRequest.OnStatus                    := Self.OnStatus;
 End;
+
+procedure TRESTDWIdClientPooler.Abort;
+begin
+  inherited;
+end;
 
 Constructor TRESTDWIdClientPooler.Create(AOwner : TComponent);
 Begin

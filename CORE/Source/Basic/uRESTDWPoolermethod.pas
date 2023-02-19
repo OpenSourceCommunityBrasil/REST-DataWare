@@ -3299,8 +3299,9 @@ Begin
      Result         := '';
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
-     If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+     If Error Then
+      If DWParams.ItemsString['MessageError'] <> Nil Then
+       MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      Result := lResponse;
      If vBinaryRequest Then
       Begin
