@@ -1,4 +1,4 @@
-unit ZDbcRESTDWMetadata;
+unit uRESTDWZDbcMetadata;
 
 interface
 
@@ -7,9 +7,7 @@ interface
 {$IFNDEF ZEOS_DISABLE_RESTDW} //if set we have an empty unit
 uses
   Types, Classes, SysUtils, ZSysUtils, ZDbcIntfs, ZDbcMetadata,
-  ZCompatibility
-  //, ZDbcRESTDWUtils
-  ;
+  ZCompatibility;
 
 type
   TZRESTDWDatabaseInfo = class(TZAbstractDatabaseInfo)
@@ -129,7 +127,7 @@ implementation
 {$IFNDEF ZEOS_DISABLE_RESTDW} //if set we have an empty unit
 
 uses
-  ZDbcUtils, ZDbcRESTDW, ZFastCode, ZSelectSchema, ZMatchPattern,
+  ZDbcUtils, uRESTDWZDbc, ZFastCode, ZSelectSchema, ZMatchPattern,
   ZEncoding, ZDbcCachedResultSet;
 
 { TZRESTDWDatabaseInfo }
