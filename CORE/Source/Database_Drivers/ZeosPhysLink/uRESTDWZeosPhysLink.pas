@@ -24,7 +24,6 @@ type
 
 implementation
 
-
 { TRESTDWZeosPhysLink }
 
 procedure TRESTDWZeosPhysLink.OnRESTDWZeosBeforeConnect(Sender: TObject);

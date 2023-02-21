@@ -33,8 +33,6 @@ type
   end;
 
   TZRESTDWPreparedStatement = class(TZAbstractRESTDWPreparedStatement, IZPreparedStatement)
-  private
-    procedure BindSInteger(Index: Integer; SQLType: TZSQLType; Value: NativeInt);
   public
     procedure SetNull(ParameterIndex: Integer; {%H-}SQLType: TZSQLType);
     procedure SetBoolean(ParameterIndex: Integer; Value: Boolean);
@@ -55,25 +53,25 @@ type
                             {$ELSE}
                             const
                             {$ENDIF} Value: TBCD); reintroduce;
-    procedure SetDate(Index: Integer;
+    procedure SetDate(ParameterIndex: Integer;
                       {$IFDEF FPC_HAS_CONSTREF}
                       constref
                       {$ELSE}
                       const
                       {$ENDIF} Value: TZDate); reintroduce; overload;
-    procedure SetTime(Index: Integer;
+    procedure SetTime(ParameterIndex: Integer;
                       {$IFDEF FPC_HAS_CONSTREF}
                       constref
                       {$ELSE}
                       const
                       {$ENDIF} Value: TZTime); reintroduce; overload;
-    procedure SetTimestamp(Index: Integer;
+    procedure SetTimestamp(ParameterIndex: Integer;
                            {$IFDEF FPC_HAS_CONSTREF}
                            constref
                            {$ELSE}
                            const
                            {$ENDIF} Value: TZTimeStamp); reintroduce; overload;
-    procedure SetBytes(Index: Integer; Value: PByte; Len: NativeUInt); reintroduce; overload;
+    procedure SetBytes(ParameterIndex: Integer; Value: PByte; Len: NativeUInt); reintroduce; overload;
   end;
 
   TZRESTDWStatement = class(TZAbstractRESTDWPreparedStatement, IZStatement)
@@ -182,32 +180,64 @@ var
     vParaType : TParamType;
     vSize : integer;
     vValue : Variant;
+    vStream : TStream;
+    vBytes : ansistring;
+    vZDate : TZDate;
+    vZTime : TZTime;
+    vZDateTime : TZTimeStamp;
   begin
     for i := 0 to BindList.Count - 1 do begin
       dwparam := 'dwparam'+IntToStr(i+1);
       BindValue := BindList[i];
       vSize := 0;
-      if BindValue.BindType = zbtCharByRef then begin
-        vValue := String(PAnsiChar(PZCharRec(BindValue.Value)^.P));
-        vSize := PZCharRec(BindValue.Value)^.Len;
-      end
-      else begin
-        vValue := EncodeVariant(BindList.Variants[i]);
-      end;
-
-      if (BindValue.SQLType = stString) and (vSize = 0) then begin
-        vSize := Length(VarToStr(vValue));
-        if vSize > 32766 then
-          vSize := 0; // Memo
-      end;
-
       vDataType := ConvertDbcToDatasetType(BindValue.SQLType,cDynamic,vSize);
       vParaType := ProcColDbcToDatasetType[BindValue.ParamType];
       with vParams.AddParameter do begin
         Name      := dwparam;
         DataType  := vDataType;
+
+        if BindValue.BindType = zbtLob then begin
+          vStream := IZBlob(BindValue.Value).GetStream;
+          try
+            SetLength(vBytes,vStream.Size);
+            vStream.Read(vBytes[1],vStream.Size);
+            vDataType := ftString;
+            DataType := vDataType;
+            AsAnsiString := vBytes;
+          finally
+            vStream.Free;
+            SetLength(vBytes,0);
+          end;
+        end
+        else if BindValue.BindType = zbtCharByRef then begin
+          vValue := String(PAnsiChar(PZCharRec(BindValue.Value)^.P));
+          vSize := PZCharRec(BindValue.Value)^.Len;
+          AsString := vValue;
+        end
+        else if BindValue.BindType = zbtDate then begin
+          vValue := EncodeVariant(EncodeZDate(PZDate(BindValue.Value)^));
+          AsDateTime := vValue;
+        end
+        else if BindValue.BindType = zbtTime then begin
+          vValue := EncodeVariant(EncodeZTime(PZTime(BindValue.Value)^));
+          AsDateTime := vValue;
+        end
+        else if BindValue.BindType = zbtTimeStamp then begin
+          vValue := EncodeVariant(EncodeZTimeStamp(PZTimeStamp(BindValue.Value)^));
+          AsDateTime := vValue;
+        end
+        else begin
+          vValue := EncodeVariant(BindList.Variants[i]);
+          Value := vValue;
+        end;
+
+        if (BindValue.SQLType = stString) and (vSize = 0) then begin
+          vSize := Length(VarToStr(vValue));
+          if vSize > 32766 then
+            vSize := 0; // Memo
+        end;
+
         ParamType := vParaType;
-        Value     := vValue;
         Size      := vSize;
       end;
     end;
@@ -278,80 +308,83 @@ end;
 
 { TZRESTDWPreparedStatement }
 
-procedure TZRESTDWPreparedStatement.BindSInteger(Index: Integer;
-  SQLType: TZSQLType; Value: NativeInt);
-var
-  BindValue: PZBindValue;
-begin
-  CheckParameterIndex(Index);
-  BindValue := BindList[Index];
-  case SQLType of
-    stBoolean : BindList.Put(Index,Value <> 0);
-    stShort, stSmall, stInteger
-    {$IFDEF CPU64},stLong{$ENDIF},
-    stArray{overwrite}: begin
-      BindList.Put(Index, SQLType, {$IFNDEF CPU64}P4Bytes{$ELSE}P8Bytes{$ENDIF}(@Value));
-    end;
-  end;
-end;
-
 procedure TZRESTDWPreparedStatement.SetBigDecimal(ParameterIndex: Integer;
   const Value: TBCD);
 begin
-  raise Exception.Create('Error Message');
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, Value);
 end;
 
 procedure TZRESTDWPreparedStatement.SetBoolean(ParameterIndex: Integer;
   Value: Boolean);
 begin
-  BindSInteger(ParameterIndex{$IFNDEF GENERIC_INDEX}-1{$ENDIF}, stBoolean, Ord(Value));
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, stBoolean, P4Bytes(@Value));
 end;
 
 procedure TZRESTDWPreparedStatement.SetByte(ParameterIndex: Integer;
   Value: Byte);
 begin
-  raise Exception.Create('Error Message');
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, stByte, P4Bytes(@Value));
 end;
 
-procedure TZRESTDWPreparedStatement.SetBytes(Index: Integer; Value: PByte;
+procedure TZRESTDWPreparedStatement.SetBytes(ParameterIndex: Integer; Value: PByte;
   Len: NativeUInt);
 begin
-  raise Exception.Create('Error Message');
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, stBytes, Value, Len);
 end;
 
 procedure TZRESTDWPreparedStatement.SetCurrency(ParameterIndex: Integer;
   const Value: Currency);
 begin
-  raise Exception.Create('Error Message');
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, stCurrency, P8Bytes(@Value));
 end;
 
-procedure TZRESTDWPreparedStatement.SetDate(Index: Integer;
+procedure TZRESTDWPreparedStatement.SetDate(ParameterIndex: Integer;
   const Value: TZDate);
 begin
-  raise Exception.Create('Error Message');
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, Value);
 end;
 
 procedure TZRESTDWPreparedStatement.SetDouble(ParameterIndex: Integer;
   const Value: Double);
 begin
-
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, stDouble, P8Bytes(@Value));
 end;
 
 procedure TZRESTDWPreparedStatement.SetFloat(ParameterIndex: Integer;
   Value: Single);
 begin
-
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, stDouble, P8Bytes(@Value));
 end;
 
 procedure TZRESTDWPreparedStatement.SetInt(ParameterIndex, Value: Integer);
 begin
-  BindSInteger(ParameterIndex{$IFNDEF GENERIC_INDEX}-1{$ENDIF}, stInteger, Value);
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, stInteger, P4Bytes(@Value));
 end;
 
 procedure TZRESTDWPreparedStatement.SetLong(ParameterIndex: Integer;
   const Value: Int64);
 begin
-
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, stLong, P8Bytes(@Value));
 end;
 
 procedure TZRESTDWPreparedStatement.SetNull(ParameterIndex: Integer;
@@ -365,43 +398,57 @@ end;
 procedure TZRESTDWPreparedStatement.SetShort(ParameterIndex: Integer;
   Value: ShortInt);
 begin
-
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, stShort, P4Bytes(@Value));
 end;
 
 procedure TZRESTDWPreparedStatement.SetSmall(ParameterIndex: Integer;
   Value: SmallInt);
 begin
-
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, stSmall, P4Bytes(@Value));
 end;
 
-procedure TZRESTDWPreparedStatement.SetTime(Index: Integer;
+procedure TZRESTDWPreparedStatement.SetTime(ParameterIndex: Integer;
   const Value: TZTime);
 begin
-
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, Value);
 end;
 
-procedure TZRESTDWPreparedStatement.SetTimestamp(Index: Integer;
+procedure TZRESTDWPreparedStatement.SetTimestamp(ParameterIndex: Integer;
   const Value: TZTimeStamp);
 begin
-
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, Value);
 end;
 
 procedure TZRESTDWPreparedStatement.SetUInt(ParameterIndex: Integer;
   Value: Cardinal);
 begin
-
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, stLong, P8Bytes(@Value));
 end;
 
 procedure TZRESTDWPreparedStatement.SetULong(ParameterIndex: Integer;
   const Value: UInt64);
 begin
-
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, stLong, P8Bytes(@Value));
 end;
 
 procedure TZRESTDWPreparedStatement.SetWord(ParameterIndex: Integer;
   Value: Word);
 begin
-
+  {$IFNDEF GENERIC_INDEX}ParameterIndex := ParameterIndex -1;{$ENDIF}
+  CheckParameterIndex(ParameterIndex);
+  BindList.Put(ParameterIndex, stWord, P4Bytes(@Value));
 end;
 
 {$ENDIF ZEOS_DISABLE_RDW} //if set we have an empty unit
