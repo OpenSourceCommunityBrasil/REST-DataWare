@@ -860,7 +860,6 @@ begin
   else if (FFieldTypes[col] in [dwftTimeStampOffset]) then begin
     {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
       FStream.Read(vDouble, Sizeof(vDouble));
-      Result := vDouble;
 
       vTimeStampOffSet := DateTimeToSQLTimeStampOffset(vDouble);
 
@@ -894,7 +893,7 @@ begin
     Result := vCurrency;
   end
   // N Bytes - Wide Memos
-  else if (FFieldTypes[col] in [dwftWideMemo,dwftFmtMemo]) then begin
+  else if (FFieldTypes[col] in [dwftMemo,dwftWideMemo,dwftFmtMemo]) then begin
     FStream.Read(vInt64, Sizeof(vInt64));
     if vInt64 > 0 then Begin
       vStringStream := TStringStream.Create;
@@ -911,7 +910,7 @@ begin
     end;
   end
   // N Bytes - Memos e Blobs
-  else if (FFieldTypes[col] in [dwftMemo,dwftStream,dwftBlob,dwftBytes]) then begin
+  else if (FFieldTypes[col] in [dwftStream,dwftBlob,dwftBytes]) then begin
     FStream.Read(vInt64, Sizeof(vInt64));
     if vInt64 > 0 then Begin
       vStringStream := TStringStream.Create;
@@ -919,8 +918,6 @@ begin
         vStringStream.CopyFrom(FStream, vInt64);
         vStringStream.Position := 0;
         Result := vStringStream.DataString;
-        if Pos(#0,Result) > 0 then
-          Result := StringReplace(Result, #0, '', [rfReplaceAll]);
       finally
         vStringStream.Free;
       end;
