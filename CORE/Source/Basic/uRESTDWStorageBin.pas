@@ -766,7 +766,7 @@ begin
     else if (FFieldTypes[i] in [dwftInteger]) then
     begin
       Stream.Read(vInt, Sizeof(vInt));
-      vField.AsInteger := vWord;
+      vField.AsInteger := vInt;
     end
     // 4 - Bytes - Flutuantes
     else if (FFieldTypes[i] in [dwftSingle]) then
