@@ -22,7 +22,14 @@ type
     property Database : TRESTDWDatabasebaseBase read FDatabase write FDatabase;
   end;
 
+procedure Register;
+
 implementation
+
+procedure Register;
+begin
+  RegisterComponents('REST Dataware - PhysLink', [TRESTDWZeosPhysLink]);
+end;
 
 { TRESTDWZeosPhysLink }
 
@@ -39,7 +46,7 @@ begin
   FOldZeosBeforeConnect := nil;
   if (FZConnection <> nil) and (ZConnection.Protocol = 'restdw') then begin
     FOldZeosBeforeConnect := FZConnection.BeforeConnect;
-    FZConnection.BeforeConnect := OnRESTDWZeosBeforeConnect;
+    FZConnection.BeforeConnect := {$IFDEF FPC}@{$ENDIF}OnRESTDWZeosBeforeConnect;
   end;
 end;
 

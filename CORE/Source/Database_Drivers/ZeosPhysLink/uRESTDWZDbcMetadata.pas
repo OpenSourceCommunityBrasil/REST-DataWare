@@ -2,7 +2,9 @@ unit uRESTDWZDbcMetadata;
 
 interface
 
-{$I ZDbc.inc}
+{$IFNDEF FPC}
+  {$I ZDbc.inc}
+{$ENDIF}
 
 {$IFNDEF ZEOS_DISABLE_RESTDW} //if set we have an empty unit
 uses

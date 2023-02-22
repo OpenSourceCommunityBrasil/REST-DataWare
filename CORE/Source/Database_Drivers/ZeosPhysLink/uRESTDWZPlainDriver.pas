@@ -2,7 +2,9 @@ unit uRESTDWZPlainDriver;
 
 interface
 
-{$I ZPlain.inc}
+{$IFNDEF FPC}
+  {$I ZDbc.inc}
+{$ENDIF}
 
 {$IFNDEF ZEOS_DISABLE_RDW}
 
