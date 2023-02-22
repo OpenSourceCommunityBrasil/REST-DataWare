@@ -3656,7 +3656,7 @@ End;
 
 procedure TRESTDWIdClientPooler.Abort;
 begin
-  inherited;
+  {$IFNDEF FPC} inherited; {$ENDIF}
 end;
 
 Constructor TRESTDWIdClientPooler.Create(AOwner : TComponent);
