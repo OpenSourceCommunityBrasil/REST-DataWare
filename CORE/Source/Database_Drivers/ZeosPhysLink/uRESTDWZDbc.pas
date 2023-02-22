@@ -6,11 +6,10 @@ interface
 
 {$IFNDEF ZEOS_DISABLE_RDW} //if set we have an empty unit
 uses
-  {$IFDEF MSEgui}mclasses,{$ENDIF}
+  {$IFNDEF FPC} ZURL, {$ENDIF}
   Classes, SysUtils,
   ZDbcIntfs, ZDbcLogging, ZTokenizer, ZPlainDriver, ZGenericSqlAnalyser,
-  ZCompatibility, uRESTDWZPlainDriver, ZDbcConnection, ZURL,
-  uRESTDWBasicDB;
+  ZCompatibility, uRESTDWZPlainDriver, ZDbcConnection, uRESTDWBasicDB;
 
 type
   TZRESTDWDriver = class(TZAbstractDriver)
@@ -30,10 +29,12 @@ type
 
   IZRESTDWConnection = interface (IZConnection)
     ['{A4B797A9-7CF7-4DE9-A5BB-693DD32D07D3}']
-    function GetPlainDriver: IZPlainDriver;
+    function GetPlainDriver : IZPlainDriver;
+    function GetDatabase : TRESTDWDatabasebaseBase;
   end;
 
   {$IFDEF ZEOS80UP}
+  { TZRESTDWConnection }
     TZRESTDWConnection = class(TZAbstractSingleTxnConnection, IZConnection,
          IZRESTDWConnection, IZTransaction)
   {$ELSE}
@@ -42,9 +43,11 @@ type
   private
     FCatalog: string;
     FPlainDriver: TZRESTDWPlainDriver;
-    FDatabase : TRESTDWDatabasebaseBase;
   protected
     procedure InternalClose; override;
+    {$IFNDEF ZEOS80UP}
+      procedure InternalCreate; override;
+    {$ENDIF}
   public
     function GetPlainDriver: IZPlainDriver;
 
@@ -52,21 +55,26 @@ type
     procedure Rollback;
     function StartTransaction: Integer;
 
-    function CreateStatementWithParams(Info: TStrings): IZStatement;
-    function PrepareStatementWithParams(const SQL: string; Info: TStrings):
-      IZPreparedStatement;
-    function PrepareCallWithParams(const Name: String; Params: TStrings):
-      IZCallableStatement;
+    {$IFDEF ZEOS80UP}
+      function CreateStatementWithParams(Info: TStrings): IZStatement;
+      function PrepareStatementWithParams(const SQL: string; Info: TStrings):
+        IZPreparedStatement;
+      function PrepareCallWithParams(const Name: String; Params: TStrings):
+        IZCallableStatement;
+      procedure AfterConstruction; override;
+    {$ELSE}
+      function CreateRegularStatement(Info: TStrings): IZStatement; override;
+      function CreatePreparedStatement(const SQL: string; Info: TStrings):
+        IZPreparedStatement; override;
+    {$ENDIF}
 
     function GetTokenizer: IZTokenizer;
     function GetStatementAnalyser: IZStatementAnalyser;
+    function GetDatabase : TRESTDWDatabasebaseBase;
 
     function GetServerProvider: TZServerProvider; override;
-    procedure AfterConstruction; override;
 
     procedure Open; override;
-
-    property Database : TRESTDWDatabasebaseBase read FDatabase write FDatabase;
   end;
 
 var
@@ -77,8 +85,11 @@ implementation
 {$IFNDEF ZEOS_DISABLE_RDW} //if set we have an empty unit
 
 uses
+  {$IFDEF ZEOS80UP}
+    ZExceptions,
+  {$ENDIF}
   ZSysUtils, ZFastCode, ZEncoding, ZMessages, uRESTDWZDbcStatement,
-  uRESTDWZToken, uRESTDWZAnalyser, ZExceptions, uRESTDWZDbcMetadata
+  uRESTDWZToken, uRESTDWZAnalyser, uRESTDWZDbcMetadata
   {$IFDEF WITH_UNITANSISTRINGS}, AnsiStrings{$ENDIF};
 
 { TZRESTDWDriver }
@@ -116,28 +127,58 @@ end;
 
 { TZRESTDWConnection }
 
+{$IFDEF ZEOS80UP}
 procedure TZRESTDWConnection.AfterConstruction;
 begin
   FPlainDriver := PlainDriver.GetInstance as TZRESTDWPlainDriver;
   FMetadata := TZRESTDWDatabaseMetadata.Create(Self, Url);
   inherited AfterConstruction;
 end;
+{$ENDIF}
 
 procedure TZRESTDWConnection.Commit;
 begin
 
 end;
 
-function TZRESTDWConnection.CreateStatementWithParams(Info: TStrings): IZStatement;
-begin
-  if IsClosed then
-    Open;
+{$IFNDEF ZEOS80UP}
+  function TZRESTDWConnection.CreatePreparedStatement(const SQL: string;
+    Info: TStrings): IZPreparedStatement;
+  begin
+    if IsClosed then
+      Open;
 
-  Result := TZRESTDWStatement.Create(Self, Info);
-end;
+    Result := TZAbstractRESTDWPreparedStatement.Create(Self,SQL,Info);
+  end;
+{$ENDIF}
+
+{$IFNDEF ZEOS80UP}
+  function TZRESTDWConnection.CreateRegularStatement(Info: TStrings): IZStatement;
+  begin
+    if IsClosed then
+      Open;
+
+    Result := TZRESTDWStatement.Create(Self, Info);
+  end;
+{$ENDIF}
+
+{$IFDEF ZEOS80UP}
+  function TZRESTDWConnection.CreateStatementWithParams(Info: TStrings): IZStatement;
+  begin
+    if IsClosed then
+      Open;
+
+    Result := TZRESTDWStatement.Create(Self, Info);
+  end;
+{$ENDIF}
 
 function TZRESTDWConnection.GetPlainDriver: IZPlainDriver;
 begin
+  {$IFNDEF ZEOS80UP}
+    if FPlainDriver = nil then
+      FPlainDriver := PlainDriver as TZRESTDWPlainDriver;
+  {$ENDIF}
+
   Result := FPlainDriver;
 end;
 
@@ -151,43 +192,64 @@ begin
   Result := TZRESTDWStatementAnalyser.Create;
 end;
 
+function TZRESTDWConnection.GetDatabase : TRESTDWDatabasebaseBase;
+begin
+  Result := TZRESTDWDriver(GetDriver).Database;
+end;
+
 function TZRESTDWConnection.GetTokenizer: IZTokenizer;
 begin
   Result := TZRESTDWTokenizer.Create;
 end;
 
 procedure TZRESTDWConnection.InternalClose;
+var
+  vDatabase : TRESTDWDatabasebaseBase;
 begin
-  if FDatabase <> nil then
-    FDatabase.Close;
-  FDatabase := nil;
+  vDatabase := GetDatabase;
+  if vDatabase <> nil then
+    vDatabase.Close;
   inherited;
 end;
+
+{$IFNDEF ZEOS80UP}
+  procedure TZRESTDWConnection.InternalCreate;
+  begin
+    FMetadata := TZRESTDWDatabaseMetadata.Create(Self, Url);
+    inherited;
+  end;
+{$ENDIF}
 
 procedure TZRESTDWConnection.Open;
+var
+  vDatabase : TRESTDWDatabasebaseBase;
 begin
-  FDatabase := TZRESTDWDriver(GetDriver).Database;
-  if FDatabase = nil then
+  vDatabase := GetDatabase;
+  if vDatabase = nil then
     raise Exception.Create('Error Message');
 
-  FDatabase.Active := True;
+  vDatabase.Active := True;
   inherited;
 end;
 
-function TZRESTDWConnection.PrepareCallWithParams(const Name: String;
-  Params: TStrings): IZCallableStatement;
-begin
-  // StoreProcedure - TODO ???
-  Raise EZUnsupportedException.Create(SUnsupportedOperation);
-end;
+{$IFDEF ZEOS80UP}
+  function TZRESTDWConnection.PrepareCallWithParams(const Name: String;
+    Params: TStrings): IZCallableStatement;
+  begin
+    // StoreProcedure - TODO ???
+    Raise EZUnsupportedException.Create(SUnsupportedOperation);
+  end;
+{$ENDIF}
 
-function TZRESTDWConnection.PrepareStatementWithParams(const SQL: string;
-  Info: TStrings): IZPreparedStatement;
-begin
-  if IsClosed then
-    Open;
-  Result := TZRESTDWPreparedStatement.Create(Self, SQL, Info);
-end;
+{$IFDEF ZEOS80UP}
+  function TZRESTDWConnection.PrepareStatementWithParams(const SQL: string;
+    Info: TStrings): IZPreparedStatement;
+  begin
+    if IsClosed then
+      Open;
+    Result := TZRESTDWPreparedStatement.Create(Self, SQL, Info);
+  end;
+{$ENDIF}
 
 procedure TZRESTDWConnection.Rollback;
 begin

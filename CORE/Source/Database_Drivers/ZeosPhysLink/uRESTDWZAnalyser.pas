@@ -2,7 +2,9 @@ unit uRESTDWZAnalyser;
 
 interface
 
-{$I ZParseSql.inc}
+{$IFNDEF FPC}
+  {$I ZDbc.inc}
+{$ENDIF}
 
 {$IFNDEF ZEOS_DISABLE_RESTDW}
 

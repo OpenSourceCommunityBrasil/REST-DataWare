@@ -2,7 +2,9 @@ unit uRESTDWZToken;
 
 interface
 
-{$I ZParseSql.inc}
+{$IFNDEF FPC}
+  {$I ZDbc.inc}
+{$ENDIF}
 
 {$IFNDEF ZEOS_DISABLE_RDW}
 uses
@@ -15,7 +17,11 @@ type
   TZRESTDWNumberState = TZGenericSQLNoHexNumberState;
 
   {** Implements a RESTDW-specific quote string state object. }
-  TZRESTDWQuoteState = TZGenericSQLBracketQuoteState;
+  {$IFDEF ZEOS80UP}
+    TZRESTDWQuoteState = TZGenericSQLBracketQuoteState;
+  {$ELSE}
+    TZRESTDWQuoteState = TZQuoteState;
+  {$ENDIF}
 
   {**
     This state will either delegate to a comment-handling
@@ -39,9 +45,10 @@ type
   TZRESTDWTokenizer = class (TZTokenizer)
   protected
     procedure CreateTokenStates; override;
-
-    function NormalizeParamToken(const Token: TZToken; out ParamName: String;
-      LookUpList: TStrings; out ParamIndex: Integer; out IngoreParam: Boolean): String; override;
+    {$IFDEF ZEOS80UP}
+      function NormalizeParamToken(const Token: TZToken; out ParamName: String;
+        LookUpList: TStrings; out ParamIndex: Integer; out IngoreParam: Boolean): String; override;
+    {$ENDIF}
   end;
 
 {$ENDIF ZEOS_DISABLE_RESTDW}
@@ -118,19 +125,21 @@ begin
   SetCharacterState('-', '-', CommentState);
 end;
 
-function TZRESTDWTokenizer.NormalizeParamToken(const Token: TZToken;
-  out ParamName: String; LookUpList: TStrings; out ParamIndex: Integer;
-  out IngoreParam: Boolean): String;
-begin
-  Result := '?';
-  if (Token.L >= 2) and (Ord(Token.P^) in [Ord(#39), Ord('`'), Ord('"'), Ord('[')])
-  then ParamName := GetQuoteState.DecodeToken(Token, Token.P^)
-  else System.SetString(ParamName, Token.P, Token.L);
-  ParamIndex := LookUpList.IndexOf(ParamName);
-  if ParamIndex < 0 then
-    ParamIndex := LookUpList.Add(ParamName);
-  IngoreParam := False;
-end;
+{$IFDEF ZEOS80UP}
+  function TZRESTDWTokenizer.NormalizeParamToken(const Token: TZToken;
+    out ParamName: String; LookUpList: TStrings; out ParamIndex: Integer;
+    out IngoreParam: Boolean): String;
+  begin
+    Result := '?';
+    if (Token.L >= 2) and (Ord(Token.P^) in [Ord(#39), Ord('`'), Ord('"'), Ord('[')])
+    then ParamName := GetQuoteState.DecodeToken(Token, Token.P^)
+    else System.SetString(ParamName, Token.P, Token.L);
+    ParamIndex := LookUpList.IndexOf(ParamName);
+    if ParamIndex < 0 then
+      ParamIndex := LookUpList.Add(ParamName);
+    IngoreParam := False;
+  end;
+{$ENDIF}
 
 {$ENDIF ZEOS_DISABLE_RESTDW}
 

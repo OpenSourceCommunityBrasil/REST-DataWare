@@ -39,7 +39,7 @@ begin
   FOldZeosBeforeConnect := nil;
   if (FZConnection <> nil) and (ZConnection.Protocol = 'restdw') then begin
     FOldZeosBeforeConnect := FZConnection.BeforeConnect;
-    FZConnection.BeforeConnect := OnRESTDWZeosBeforeConnect;
+    FZConnection.BeforeConnect := {$IFDEF FPC}@{$ENDIF}OnRESTDWZeosBeforeConnect;
   end;
 end;
 
