@@ -8,7 +8,9 @@ unit RESTDWZeosDriver;
 interface
 
 uses
-  uRESTDWZeosDriver, LazarusPackageIntf;
+  uRESTDWZeosDriver, uRESTDWZAnalyser, uRESTDWZDbc, uRESTDWZDbcMetadata, 
+  uRESTDWZDbcResultSet, uRESTDWZDbcStatement, uRESTDWZeosPhysLink, 
+  uRESTDWZPlainDriver, uRESTDWZToken, LazarusPackageIntf;
 
 implementation
 
