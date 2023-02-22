@@ -773,10 +773,10 @@ begin
     if vInt64 > 0 then begin
       SetLength(vString, vInt64);
       {$IFDEF FPC}
-       Stream.Read(Pointer(vString)^, vInt64);
+       FStream.Read(Pointer(vString)^, vInt64);
        if FEncodeStrs then
-         vString := DecodeStrings(vString);
-       vString := GetStringEncode(vString, FDatabaseCharSet);
+         vString := DecodeStrings(vString, csUndefined);
+       vString := GetStringEncode(vString, csUTF8);
       {$ELSE}
        FStream.Read(vString[InitStrPos], vInt64);
        if FEncodeStrs then
@@ -794,10 +794,10 @@ begin
     if vInt64 > 0 then begin
       SetLength(vString, vInt64);
       {$IFDEF FPC}
-       Stream.Read(Pointer(vString)^, vInt64);
+       FStream.Read(Pointer(vString)^, vInt64);
        if FEncodeStrs then
-         vString := DecodeStrings(vString);
-       vString := GetStringEncode(vString, FDatabaseCharSet);
+         vString := DecodeStrings(vString, csUndefined);
+       vString := GetStringEncode(vString, csUTF8);
       {$ELSE}
        FStream.Read(vString[InitStrPos], vInt64);
        if FEncodeStrs then
@@ -929,10 +929,10 @@ begin
     if vInt64 > 0 then begin
       SetLength(vString, vInt64);
       {$IFDEF FPC}
-       Stream.Read(Pointer(vString)^, vInt64);
+       FStream.Read(Pointer(vString)^, vInt64);
        if FEncodeStrs then
-         vString := DecodeStrings(vString);
-       vString := GetStringEncode(vString, FDatabaseCharSet);
+         vString := DecodeStrings(vString, csUndefined);
+       vString := GetStringEncode(vString, csUTF8);
       {$ELSE}
        FStream.Read(vString[InitStrPos], vInt64);
        if FEncodeStrs then
