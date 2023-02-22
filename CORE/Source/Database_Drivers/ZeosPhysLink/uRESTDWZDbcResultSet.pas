@@ -2,7 +2,12 @@ unit uRESTDWZDbcResultSet;
 
 interface
 
-{$I ZDbc.inc}
+{$IFNDEF FPC}
+  {$I ZDbc.inc}
+{$ELSE}
+  {$MODE DELPHI}
+{$ENDIF}
+
 
 {$IFNDEF ZEOS_DISABLE_RESTDW} //if set we have an empty unit
 uses
