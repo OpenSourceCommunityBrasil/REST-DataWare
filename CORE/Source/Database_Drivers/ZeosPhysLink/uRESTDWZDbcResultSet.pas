@@ -6,11 +6,10 @@ interface
 
 {$IFNDEF ZEOS_DISABLE_RESTDW} //if set we have an empty unit
 uses
-  System.Types, Contnrs, Classes, {$IFDEF MSEgui}mclasses,{$ENDIF} SysUtils, FmtBCD,
-  ZSysUtils, ZDbcIntfs, ZDbcResultSet, ZDbcResultSetMetadata, uRESTDWZPlainDriver,
-  ZCompatibility, ZDbcCache, ZDbcCachedResultSet, ZDbcGenericResolver, Variants,
-  ZDbcMetadata, ZSelectSchema, ZDatasetUtils,
-  uRESTDWZDbc, DB, uRESTDWConsts, uRESTDWTools;
+  Classes, SysUtils, Types, Contnrs, FmtBCD, ZSysUtils, ZDbcIntfs, ZDbcResultSet,
+  ZDbcResultSetMetadata, ZCompatibility, ZDbcCache, ZDbcCachedResultSet,
+  ZDbcGenericResolver, Variants, ZDbcMetadata, ZSelectSchema, ZDatasetUtils,
+  uRESTDWZDbc, uRESTDWZPlainDriver, DB, uRESTDWConsts, uRESTDWTools;
 
 type
   TZRESTDWResultSetMetadata = class(TZAbstractResultSetMetadata)
@@ -34,6 +33,7 @@ type
     FFirstRow : boolean;
   protected
     procedure Open; override;
+    procedure streamToArray;
   public
     constructor Create(const Statement: IZStatement; const SQL: string; Stream : TStream);
 
@@ -109,7 +109,7 @@ implementation
 
 uses
   ZMessages, ZTokenizer, ZVariant, ZEncoding, ZFastCode,
-  ZGenericSqlAnalyser, uRESTDWProtoTypes;
+  ZGenericSqlAnalyser, uRESTDWProtoTypes, SqlTimSt;
 
 { TZRESTDWCachedResultSet }
 
@@ -240,29 +240,7 @@ begin
   FStream.Read(FRecordCount,SizeOf(FRecordCount));
   FRecordPos := FStream.Position;
 
-  SetLength(FVariantTable,FRecordCount);
-  for i := 0 to FRecordCount-1 do begin
-    SetLength(FVariantTable[i],FFieldCount);
-    for j := 0 to FFieldCount-1 do begin
-      FStream.Read(vBoolean,SizeOf(vBoolean));
-      if vBoolean then begin
-        FVariantTable[i,j] := variants.null;
-        Continue;
-      end;
-      if FFieldTypes[j] = dwftInteger then begin
-        FStream.Read(vInt,SizeOf(vInt));
-        FVariantTable[i,j] := vInt;
-      end
-      else if FFieldTypes[j] = dwftString then begin
-        FStream.Read(vInt64,SizeOf(vInt64));
-        vString := '';
-        SetLength(vString,vInt64);
-        if vInt64 > 0 then
-          FStream.Read(vString[InitStrPos],vInt64);
-        FVariantTable[i,j] := vString;
-      end;
-    end;
-  end;
+  streamToArray;
 
   FStream.Size := 0;
 
@@ -278,6 +256,219 @@ begin
   end;
 end;
 
+procedure TZRESTDWResultSet.streamToArray;
+var
+  i, j          : integer;
+  vString       : DWString;
+  vInt64        : Int64;
+  vInt          : Integer;
+  vByte         : Byte;
+  vBoolean      : Boolean;
+  vWord         : Word;
+  vSingle       : Single;
+  vDouble       : Double;
+  VTimeZone     : Double;
+  vCurrency     : Currency;
+  vStringStream : TStringStream;
+  {$IFNDEF FPC}
+    {$IF CompilerVersion >= 21}
+      vTimeStampOffset : TSQLTimeStampOffset;
+    {$IFEND}
+  {$ENDIF}
+begin
+  SetLength(FVariantTable,FRecordCount);
+  for i := 0 to FRecordCount-1 do begin
+    SetLength(FVariantTable[i],FFieldCount);
+    for j := 0 to FFieldCount-1 do begin
+      FStream.Read(vBoolean,SizeOf(vBoolean));
+      if vBoolean then begin
+        FVariantTable[i,j] := variants.null;
+        Continue;
+      end;
+
+      // N - Bytes
+      if (FFieldTypes[j] in [dwftFixedChar,dwftString]) then begin
+        FStream.Read(vInt64, Sizeof(vInt64));
+        vString := '';
+        if vInt64 > 0 then begin
+          SetLength(vString, vInt64);
+          {$IFDEF FPC}
+           Stream.Read(Pointer(vString)^, vInt64);
+           if FEncodeStrs then
+             vString := DecodeStrings(vString);
+           vString := GetStringEncode(vString, FDatabaseCharSet);
+          {$ELSE}
+           FStream.Read(vString[InitStrPos], vInt64);
+           if FEncodeStrs then
+             vString := DecodeStrings(vString);
+          {$ENDIF}
+        end;
+        if System.Pos(#0,vString) > 0 then
+          vString := StringReplace(vString, #0, '', [rfReplaceAll]);
+        FVariantTable[i,j] := vString;
+      end
+      // N - Bytes Wide
+      else if (FFieldTypes[j] in [dwftWideString,dwftFixedWideChar]) then begin
+        FStream.Read(vInt64, Sizeof(vInt64));
+        vString := '';
+        if vInt64 > 0 then begin
+          SetLength(vString, vInt64);
+          {$IFDEF FPC}
+           Stream.Read(Pointer(vString)^, vInt64);
+           if FEncodeStrs then
+             vString := DecodeStrings(vString);
+           vString := GetStringEncode(vString, FDatabaseCharSet);
+          {$ELSE}
+           FStream.Read(vString[InitStrPos], vInt64);
+           if FEncodeStrs then
+             vString := DecodeStrings(vString);
+          {$ENDIF}
+        end;
+        if System.Pos(#0,vString) > 0 then
+          vString := StringReplace(vString, #0, '', [rfReplaceAll]);
+        FVariantTable[i,j] := vString;
+      end
+      // 1 - Byte - Inteiros
+      else if (FFieldTypes[j] in [dwftByte,dwftShortint]) then
+      begin
+        FStream.Read(vByte, Sizeof(vByte));
+        FVariantTable[i,j] := vByte;
+      end
+      // 1 - Byte - Boolean
+      else if (FFieldTypes[j] in [dwftBoolean]) then
+      begin
+        FStream.Read(vBoolean, Sizeof(vBoolean));
+        FVariantTable[i,j] := vBoolean;
+      end
+      // 2 - Bytes
+      else if (FFieldTypes[j] in [dwftSmallint,dwftWord]) then begin
+        FStream.Read(vWord, Sizeof(vWord));
+        FVariantTable[i,j] := vWord;
+      end
+      // 4 - Bytes - Inteiros
+      else if (FFieldTypes[j] in [dwftInteger]) then
+      begin
+        FStream.Read(vInt, Sizeof(vInt));
+        FVariantTable[i,j] := vInt;
+      end
+      // 4 - Bytes - Flutuantes
+      else if (FFieldTypes[j] in [dwftSingle]) then
+      begin
+        FStream.Read(vSingle, Sizeof(vSingle));
+        FVariantTable[i,j] := vSingle;
+      end
+      // 8 - Bytes - Inteiros
+      else if (FFieldTypes[j] in [dwftLargeint,dwftAutoInc,dwftLongWord]) then
+      begin
+        FStream.Read(vInt64, Sizeof(vInt64));
+        FVariantTable[i,j] := vInt64;
+      end
+      // 8 - Bytes - Flutuantes
+      else if (FFieldTypes[j] in [dwftFloat,dwftExtended]) then
+      begin
+        FStream.Read(vDouble, Sizeof(vDouble));
+        FVariantTable[i,j] := vDouble;
+      end
+      // 8 - Bytes - Date, Time, DateTime, TimeStamp
+      else if (FFieldTypes[j] in [dwftDate,dwftTime,dwftDateTime,dwftTimeStamp]) then
+      begin
+        FStream.Read(vDouble, Sizeof(vDouble));
+        FVariantTable[i,j] := vDouble;
+      end
+      // TimeStampOffSet To Double - 8 Bytes
+      // + TimeZone                - 2 Bytes
+      else if (FFieldTypes[j] in [dwftTimeStampOffset]) then begin
+        {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+          FStream.Read(vDouble, Sizeof(vDouble));
+
+          vTimeStampOffSet := DateTimeToSQLTimeStampOffset(vDouble);
+
+          FStream.Read(vByte, Sizeof(vByte));
+          vTimeStampOffSet.TimeZoneHour := vByte - 12;
+
+          FStream.Read(vByte, Sizeof(vByte));
+          vTimeStampOffSet.TimeZoneMinute := vByte;
+
+          FVariantTable[i,j] := VarSQLTimeStampOffsetCreate(vTimeStampOffset);
+        {$ELSE}
+          // field foi transformado em datetime
+          FStream.Read(vDouble, Sizeof(vDouble));
+          FStream.Read(vByte, SizeOf(vByte));
+          vTimeZone := (vByte - 12) / 24;
+
+          FStream.Read(vByte, SizeOf(vByte));
+          if vTimeZone > 0 then
+            vTimeZone := vTimeZone + (vByte / 60 / 24)
+          else
+            vTimeZone := vTimeZone - (vByte / 60 / 24);
+
+          vDouble := vDouble - vTimeZone;
+          FVariantTable[i,j] := vDouble;
+        {$IFEND}
+      end
+      // 8 - Bytes - Currency
+      else if (FFieldTypes[j] in [dwftCurrency,dwftBCD,dwftFMTBcd]) then
+      begin
+        FStream.Read(vCurrency, Sizeof(vCurrency));
+        FVariantTable[i,j] := vCurrency;
+      end
+      // N Bytes - Wide Memos
+      else if (FFieldTypes[j] in [dwftMemo,dwftWideMemo,dwftFmtMemo]) then begin
+        FStream.Read(vInt64, Sizeof(vInt64));
+        if vInt64 > 0 then Begin
+          vStringStream := TStringStream.Create;
+          try
+            vStringStream.CopyFrom(FStream, vInt64);
+            vStringStream.Position := 0;
+    //        Result := TEncoding.Unicode.GetString(vStringStream.Bytes);
+            vString := vStringStream.DataString;
+            if System.Pos(#0,vString) > 0 then
+              vString := StringReplace(vString, #0, '', [rfReplaceAll]);
+          finally
+            vStringStream.Free;
+          end;
+          FVariantTable[i,j] := vString;
+        end;
+      end
+      // N Bytes - Memos e Blobs
+      else if (FFieldTypes[j] in [dwftStream,dwftBlob,dwftBytes]) then begin
+        FStream.Read(vInt64, Sizeof(vInt64));
+        if vInt64 > 0 then Begin
+          vStringStream := TStringStream.Create;
+          try
+            vStringStream.CopyFrom(FStream, vInt64);
+            vStringStream.Position := 0;
+
+            FVariantTable[i,j] := vStringStream.Bytes;
+          finally
+            vStringStream.Free;
+          end;
+        end;
+      end
+      else begin
+        FStream.Read(vInt64, Sizeof(vInt64));
+        vString := '';
+        if vInt64 > 0 then begin
+          SetLength(vString, vInt64);
+          {$IFDEF FPC}
+           Stream.Read(Pointer(vString)^, vInt64);
+           if FEncodeStrs then
+             vString := DecodeStrings(vString);
+           vString := GetStringEncode(vString, FDatabaseCharSet);
+          {$ELSE}
+           FStream.Read(vString[InitStrPos], vInt64);
+           if FEncodeStrs then
+             vString := DecodeStrings(vString);
+          {$ENDIF}
+        end;
+        if System.Pos(#0,vString) > 0 then
+          vString := StringReplace(vString, #0, '', [rfReplaceAll]);
+        FVariantTable[i,j] := vString;
+      end;
+    end;
+  end;
+end;
+
 function TZRESTDWResultSet.IsNull(ColumnIndex: Integer): Boolean;
 begin
   Result := FVariantTable[RowNo-1,ColumnIndex] = Null;
@@ -287,7 +478,6 @@ function TZRESTDWResultSet.GetPAnsiChar(ColumnIndex: Integer; out Len: NativeUIn
 var
   vInt64 : int64;
   vString : ansistring;
-  vBoolean : Boolean;
 begin
   Result := PAnsiChar('');
   LastWasNull := IsNull(ColumnIndex);
@@ -336,20 +526,33 @@ end;
 {$ENDIF}
 
 function TZRESTDWResultSet.GetBoolean(ColumnIndex: Integer): Boolean;
+var
+  vBoolean : Boolean;
 begin
-
+  Result := False;
+  LastWasNull := IsNull(ColumnIndex);
+  if not LastWasNull then begin
+    vBoolean := FVariantTable[RowNo-1,ColumnIndex];
+    Result := vBoolean;
+  end;
 end;
 
 function TZRESTDWResultSet.GetBytes(ColumnIndex: Integer;
   out Len: NativeUInt): PByte;
+var
+  vBytes : TBytes;
 begin
-
+  LastWasNull := IsNull(ColumnIndex);
+  if not LastWasNull then begin
+    vBytes := TBytes(FVariantTable[RowNo-1,ColumnIndex]);
+    Result := PByte(vBytes);
+    Len := Length(vBytes);
+  end;
 end;
 
 function TZRESTDWResultSet.GetInt(ColumnIndex: Integer): Integer;
 var
   vInt : integer;
-  vBoolean : Boolean;
 begin
   Result := -1;
   LastWasNull := IsNull(ColumnIndex);
@@ -362,7 +565,6 @@ end;
 function TZRESTDWResultSet.GetLong(ColumnIndex: Integer): Int64;
 var
   vInt64 : Int64;
-  vBoolean : Boolean;
 begin
   Result := -1;
   LastWasNull := IsNull(ColumnIndex);
@@ -381,7 +583,6 @@ end;
 function TZRESTDWResultSet.GetULong(ColumnIndex: Integer): System.UInt64;
 var
   vInt64 : UInt64;
-  vBoolean : Boolean;
 begin
   Result := 0;
   LastWasNull := IsNull(ColumnIndex);
@@ -398,13 +599,24 @@ begin
 end;
 
 procedure TZRESTDWResultSet.GetGUID(ColumnIndex: Integer; var Result: TGUID);
+var
+  vString : string;
 begin
-
+  vString := GetString(ColumnIndex);
+  if not LastWasNull then
+    Result := StringToGUID(vString);
 end;
 
 function TZRESTDWResultSet.GetDouble(ColumnIndex: Integer): Double;
+var
+  vDouble : Double;
 begin
-
+  Result := -1;
+  LastWasNull := IsNull(ColumnIndex);
+  if not LastWasNull then begin
+    vDouble := FVariantTable[RowNo-1,ColumnIndex];
+    Result := vDouble;
+  end;
 end;
 
 {$IFNDEF NO_ANSISTRING}
@@ -414,49 +626,69 @@ var
   L: NativeUInt;
 begin
   P := GetPAnsiChar(ColumnIndex, L);
-  if LastWasNull then
-    Result := ''
-//  else if (FPlainDriver.RESTDW3_column_type(FRESTDW3_stmt, ColumnIndex) <> RESTDW3_TEXT) or
-//          (ZOSCodePage = zCP_UTF8) then
-//    System.SetString(Result, P, L)
-  else begin
+  Result := '';
+  if not LastWasNull then begin
     FUniTemp := PRawToUnicode(P, ZFastCode.StrLen(P), zCP_UTF8);
     Result := ZUnicodeToRaw(FUniTemp, ZOSCodePage);
   end
 end;
 {$ENDIF}
 
-const BCDScales: array[Boolean] of Byte = (0,4);
 procedure TZRESTDWResultSet.GetBigDecimal(ColumnIndex: Integer; var Result: TBCD);
+var
+  vCurrency : Currency;
 begin
-
+  vCurrency := GetCurrency(ColumnIndex);
+  if not LastWasNull then
+    Result := CurrencyToBcd(vCurrency);
 end;
 
 function TZRESTDWResultSet.GetCurrency(ColumnIndex: Integer): Currency;
+var
+  vCurrency : Currency;
 begin
-
+  Result := -1;
+  LastWasNull := IsNull(ColumnIndex);
+  if not LastWasNull then begin
+    vCurrency := FVariantTable[RowNo-1,ColumnIndex];
+    Result := vCurrency;
+  end;
 end;
 
 procedure TZRESTDWResultSet.GetDate(ColumnIndex: Integer; var Result: TZDate);
+var
+  vDouble : Double;
 begin
-
+  vDouble := GetDouble(ColumnIndex);
+  if not LastWasNull then
+    Result := TZAnyValue.CreateWithDouble(vDouble).GetDate;
 end;
 
 procedure TZRESTDWResultSet.GetTime(ColumnIndex: Integer; var Result: TZTime);
+var
+  vDouble : Double;
 begin
-
+  vDouble := GetDouble(ColumnIndex);
+  if not LastWasNull then
+    Result := TZAnyValue.CreateWithDouble(vDouble).GetTime;
 end;
 
 procedure TZRESTDWResultSet.GetTimestamp(ColumnIndex: Integer;
   var Result: TZTimeStamp);
+var
+  vDouble : Double;
 begin
-
+  vDouble := GetDouble(ColumnIndex);
+  if not LastWasNull then
+    Result := TZAnyValue.CreateWithDouble(vDouble).GetTimeStamp;
 end;
 
 function TZRESTDWResultSet.GetBlob(ColumnIndex: Integer;
   LobStreamMode: TZLobStreamMode = lsmRead): IZBlob;
 begin
-
+  LastWasNull := IsNull(ColumnIndex);
+  if not LastWasNull then
+    Result.SetBytes(TBytes(FVariantTable[RowNo-1,ColumnIndex]))
 end;
 
 
@@ -466,7 +698,7 @@ begin
   if Closed then
     Exit;
 
-  if ((MaxRows > 0) and (RowNo >= MaxRows)) or (RowNo >= FRecordCount-1) then
+  if ((MaxRows > 0) and (RowNo >= MaxRows)) or (RowNo > FRecordCount-1) then
     Exit;
 
   if FFirstRow then begin
