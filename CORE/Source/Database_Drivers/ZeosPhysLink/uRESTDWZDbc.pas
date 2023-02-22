@@ -2,12 +2,15 @@ unit uRESTDWZDbc;
 
 interface
 
-{$I ZDbc.inc}
+{$IFNDEF FPC}
+  {$I ZDbc.inc}
+{$ELSE}
+  {$MODE DELPHI}
+{$ENDIF}
 
 {$IFNDEF ZEOS_DISABLE_RDW} //if set we have an empty unit
 uses
-  {$IFNDEF FPC} ZURL, {$ENDIF}
-  Classes, SysUtils,
+  ZURL, Classes, SysUtils,
   ZDbcIntfs, ZDbcLogging, ZTokenizer, ZPlainDriver, ZGenericSqlAnalyser,
   ZCompatibility, uRESTDWZPlainDriver, ZDbcConnection, uRESTDWBasicDB;
 
@@ -33,8 +36,8 @@ type
     function GetDatabase : TRESTDWDatabasebaseBase;
   end;
 
-  {$IFDEF ZEOS80UP}
   { TZRESTDWConnection }
+  {$IFDEF ZEOS80UP}
     TZRESTDWConnection = class(TZAbstractSingleTxnConnection, IZConnection,
          IZRESTDWConnection, IZTransaction)
   {$ELSE}
@@ -51,8 +54,8 @@ type
   public
     function GetPlainDriver: IZPlainDriver;
 
-    procedure Commit;
-    procedure Rollback;
+    procedure Commit; {$IFNDEF ZEOS80UP} override; {$ENDIF}
+    procedure Rollback; {$IFNDEF ZEOS80UP} override; {$ENDIF}
     function StartTransaction: Integer;
 
     {$IFDEF ZEOS80UP}
