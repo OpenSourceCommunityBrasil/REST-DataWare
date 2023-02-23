@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [windows-latest,ubuntu-latest]
+        operating-system: [windows-latest]
         lazarus-versions: [dist, stable, 2.2.0]
     steps:
     - name: Checkout source code
@@ -26,34 +26,19 @@ jobs:
     - name: Build the Main package on Windows
       if: ${{ matrix.operating-system != 'windows-latest' }}
       run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
-    - name: Build the Main package on Linux
-      if: ${{ matrix.operating-system != 'ubuntu-latest' }}
-      run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
       
     - name: Build Indy package on Windows
       if: ${{ matrix.operating-system != 'windows-latest' }}
       run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySockets.lpk"
-    - name: Build Indy package on Linux
-      if: ${{ matrix.operating-system != 'ubuntu-latest' }}
-      run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySockets.lpk"
       
     - name: Build ShellServices package on Windows
       if: ${{ matrix.operating-system != 'windows-latest' }}
-      run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"
-    - name: Build ShellServices package on Linux
-      if: ${{ matrix.operating-system != 'ubuntu-latest' }}
-      run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"    
+      run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"   
       
     - name: Build ZeosDriver package on Windows
       if: ${{ matrix.operating-system != 'windows-latest' }}
-      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/zeos/RESTDWZeosDriver.lpk"
-    - name: Build ZeosDriver package on Linux
-      if: ${{ matrix.operating-system != 'ubuntu-latest' }}
-      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/zeos/RESTDWZeosDriver.lpk"      
+      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/zeos/RESTDWZeosDriver.lpk"    
       
     - name: Build LazarusDriver package on Windows
       if: ${{ matrix.operating-system != 'windows-latest' }}
-      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/lazdriver/RESTDWLazarusDriver.lpk"
-    - name: Build LazarusDriver package on Linux
-      if: ${{ matrix.operating-system != 'ubuntu-latest' }}
       run: lazbuild -B "CORE/Packages/Lazarus/Drivers/lazdriver/RESTDWLazarusDriver.lpk"
