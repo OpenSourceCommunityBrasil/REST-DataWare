@@ -1,0 +1,74 @@
+name: lazarusbuild
+
+on:
+  pull_request:
+  push:
+    paths-ignore:
+    - "README.md"
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [windows-latest,ubuntu-latest,macos-latest]
+        lazarus-versions: [dist, stable, 2.2.4]
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v2
+    - name: Install Lazarus
+      uses: gcarreno/setup-lazarus@v3.2
+      with:
+        lazarus-version: ${{ matrix.lazarus-versions }}
+        with-cache: true
+    - name: Build the Main package on MacOS
+      if: ${{ matrix.operating-system != 'macos-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
+    - name: Build the Main package on Windows
+      if: ${{ matrix.operating-system != 'windows-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
+    - name: Build the Main package on Linux
+      if: ${{ matrix.operating-system != 'ubuntu-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
+      
+    - name: Build Indy package on MacOS
+      if: ${{ matrix.operating-system != 'macos-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySockets.lpk"
+    - name: Build Indy package on Windows
+      if: ${{ matrix.operating-system != 'windows-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySockets.lpk"
+    - name: Build Indy package on Linux
+      if: ${{ matrix.operating-system != 'ubuntu-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySockets.lpk"
+      
+    - name: Build ShellServices package on MacOS
+      if: ${{ matrix.operating-system != 'macos-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"
+    - name: Build ShellServices package on Windows
+      if: ${{ matrix.operating-system != 'windows-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"
+    - name: Build ShellServices package on Linux
+      if: ${{ matrix.operating-system != 'ubuntu-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"    
+      
+    - name: Build ZeosDriver package on MacOS
+      if: ${{ matrix.operating-system != 'macos-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/zeos/RESTDWZeosDriver.lpk"
+    - name: Build ZeosDriver package on Windows
+      if: ${{ matrix.operating-system != 'windows-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/zeos/RESTDWZeosDriver.lpk"
+    - name: Build ZeosDriver package on Linux
+      if: ${{ matrix.operating-system != 'ubuntu-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/zeos/RESTDWZeosDriver.lpk"      
+      
+    - name: Build LazarusDriver package on MacOS
+      if: ${{ matrix.operating-system != 'macos-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/lazdriver/RESTDWLazarusDriver.lpk"
+    - name: Build LazarusDriver package on Windows
+      if: ${{ matrix.operating-system != 'windows-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/lazdriver/RESTDWLazarusDriver.lpk"
+    - name: Build LazarusDriver package on Linux
+      if: ${{ matrix.operating-system != 'ubuntu-latest' }}
+      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/lazdriver/RESTDWLazarusDriver.lpk"
