@@ -22,23 +22,20 @@ jobs:
       uses: gcarreno/setup-lazarus@v3.2
       with:
         lazarus-version: ${{ matrix.lazarus-versions }}
+        include-packages: "weblaz 1.0"
+        include-packages: "indylaz 10.6.2.4089"
         with-cache: true
     - name: Build the Main package on Windows
-      if: ${{ matrix.operating-system != 'windows-latest' }}
       run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
       
     - name: Build Indy package on Windows
-      if: ${{ matrix.operating-system != 'windows-latest' }}
       run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySockets.lpk"
       
     - name: Build ShellServices package on Windows
-      if: ${{ matrix.operating-system != 'windows-latest' }}
       run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"   
       
     - name: Build ZeosDriver package on Windows
-      if: ${{ matrix.operating-system != 'windows-latest' }}
       run: lazbuild -B "CORE/Packages/Lazarus/Drivers/zeos/RESTDWZeosDriver.lpk"    
       
     - name: Build LazarusDriver package on Windows
-      if: ${{ matrix.operating-system != 'windows-latest' }}
       run: lazbuild -B "CORE/Packages/Lazarus/Drivers/lazdriver/RESTDWLazarusDriver.lpk"
