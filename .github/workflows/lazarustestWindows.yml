@@ -22,8 +22,7 @@ jobs:
       uses: gcarreno/setup-lazarus@v3.2
       with:
         lazarus-version: ${{ matrix.lazarus-versions }}
-        include-packages: "weblaz 1.0"
-        include-packages: "indylaz 10.6.2.4089"
+        include-packages: "weblaz 1.0, indylaz 10.6.2.4089"
         with-cache: true
     - name: Build the Main package on Windows
       run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
