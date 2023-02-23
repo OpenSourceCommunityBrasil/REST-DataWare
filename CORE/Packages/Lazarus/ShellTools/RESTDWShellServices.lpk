@@ -10,7 +10,7 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <OtherUnitFiles Value="..\..\..\Source\ShellTools"/>
-        <UnitOutputDirectory Value="..\..\..\Source\compiledlaz"/>
+        <UnitOutputDirectory Value="..\..\..\compiledlaz"/>
       </SearchPaths>
     </CompilerOptions>
     <License Value="GPL - 3.0"/>

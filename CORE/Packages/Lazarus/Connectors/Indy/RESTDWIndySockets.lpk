@@ -11,7 +11,7 @@
       <SearchPaths>
         <IncludeFiles Value="..\..\..\..\Source\Includes;..\..\..\..\Source\Sockets\Indy"/>
         <OtherUnitFiles Value="..\..\..\..\Source\Sockets\Indy"/>
-        <UnitOutputDirectory Value="..\..\..\..\Source\compiledlaz"/>
+        <UnitOutputDirectory Value="..\..\..\..\compiledlaz"/>
       </SearchPaths>
       <CodeGeneration>
         <Optimizations>

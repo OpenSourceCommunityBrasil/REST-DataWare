@@ -10,7 +10,7 @@
       <SearchPaths>
         <IncludeFiles Value="..\..\..\..\Source\Includes"/>
         <OtherUnitFiles Value="..\..\..\..\Source\Sockets\Fhttp"/>
-        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+        <UnitOutputDirectory Value="..\..\..\..\compiledlaz"/>
       </SearchPaths>
     </CompilerOptions>
     <Version Major="2" Minor="1"/>
