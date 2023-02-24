@@ -13,6 +13,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
@@ -301,5 +302,12 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         TitleFont.Style = []
       end
     end
+  end
+  object tmClose: TTimer
+    Enabled = False
+    Interval = 200
+    OnTimer = tmCloseTimer
+    Left = 341
+    Top = 240
   end
 end
