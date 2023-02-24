@@ -26,8 +26,14 @@ unit uRESTDWSqlEditor;
 interface
 
 uses
-  SysUtils, Dialogs, Forms, ExtCtrls, StdCtrls, ComCtrls, DBGrids, uRESTDWBasicDB, DB{$IFNDEF FPC}, Grids{$ENDIF}, Controls,
-  Classes,{$IFDEF FPC}FormEditingIntf, PropEdits, lazideintf{$ELSE}DesignEditors, DesignIntf{$ENDIF};
+  SysUtils, Dialogs, Forms, ExtCtrls, StdCtrls, ComCtrls, DBGrids,
+  uRESTDWBasicDB, DB{$IFNDEF FPC}, Grids{$ENDIF}, Controls,
+  Classes, SyncObjs,
+  {$IFDEF FPC}
+    FormEditingIntf, PropEdits, lazideintf
+  {$ELSE}
+    DesignEditors, DesignIntf
+  {$ENDIF};
 
 Const
  cSelect = 'Select %s From %s';
@@ -36,6 +42,37 @@ Const
  cUpdate = 'Update %s Set %s Where ';
 
  Type
+  TOnTrhFimBusca = procedure(Sender : TObject; evento : string; lstString : TStringList) of object;
+
+  { TThrBancoDados }
+
+  TThrBancoDados = class(TThread)
+  private
+    FRESTDWDatabase : TRESTDWDatabasebaseBase;
+    FEvent : TSimpleEvent;
+    FMustDie : boolean;
+    FTipoEvento : string;
+    FBuscar : string;
+    FMemString : TStringList;
+    FOnFimEvento : TOnTrhFimBusca;
+  protected
+    procedure Execute; override;
+    {$IFDEF FPC}
+      procedure TerminatedSet; override;
+    {$ENDIF}
+    procedure callFimBusca;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure threadDie;
+
+    procedure buscarTabelas;
+    procedure buscarFieldsNames(tabela : string);
+  published
+    property RESTDWDatabase : TRESTDWDatabasebaseBase read FRESTDWDatabase write FRESTDWDatabase;
+    property OnFimEvento : TOnTrhFimBusca read FOnFimEvento write FOnFimEvento;
+  end;
 
   { TFrmDWSqlEditor }
 
@@ -67,6 +104,7 @@ Const
    Panel1: TPanel;
    Label3: TLabel;
    lbExecutedTime: TLabel;
+   tmClose: TTimer;
    procedure BtnExecuteClick(Sender: TObject);
    {$IFNDEF FPC}
    procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -82,6 +120,8 @@ Const
      State: TDragState; var Accept: Boolean);
    procedure MemoDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure BtnCancelarClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure tmCloseTimer(Sender: TObject);
  Private
   { Private declarations }
   DataSource         : TDataSource;
@@ -90,10 +130,14 @@ Const
   RESTDWClientSQLB   : TRESTDWClientSQL;
   vLastSelect,
   vOldSQL            : String;
+  FThrBancoDados     : TThrBancoDados;
   Procedure SetFields;
   Function  BuildSQL : String;
   Procedure SetDatabase(Value : TRESTDWDatabasebaseBase);
   Procedure SetarControles(enab : boolean);
+  Procedure CarregarTabelas;
+  Procedure thrOnFimEvento(Sender : TObject; evento : string; lstString : TStringList);
+  Procedure thrOnTerminate(Sender : TObject);
  Public
   { Public declarations }
   Procedure SetClientSQL(Value : TRESTDWClientSQL);
@@ -106,6 +150,7 @@ Const
   Function  GetAttributes        : TPropertyAttributes; Override;
   Procedure Edit;                                       Override;
   Function  GetValue             : String;              Override;
+  procedure SetValue(const Value: string);              Override;
  End;
 
 Var
@@ -126,6 +171,15 @@ Begin
   Result := 'Click here to set SQL...'
 End;
 
+procedure TRESTDWSQLEditor.SetValue(const Value: string);
+Var
+  objObj : TRESTDWClientSQL;
+Begin
+  objObj        := TRESTDWClientSQL(GetComponent(0));
+  objObj.SQL.Text := Trim(Value);
+  Modified; // update na propridade do object inspector
+end;
+
 Procedure TRESTDWSQLEditor.Edit;
 Var
  objObj : TRESTDWClientSQL;
@@ -137,13 +191,17 @@ Begin
   FrmDWSqlEditor.ShowModal;
   objObj        := Nil;
   FrmDWSqlEditor.Free;
+
+  Modified; // update na propridade do object inspector
  Except
+
  End;
 End;
 
 Function TRESTDWSQLEditor.GetAttributes: TPropertyAttributes;
 Begin
- Result := [paDialog, paAutoUpdate];
+//paAutoUpdate
+ Result := [paDialog];
 End;
 
 procedure TFrmDWSqlEditor.BtnCancelarClick(Sender: TObject);
@@ -171,6 +229,11 @@ Begin
  End;
 End;
 
+procedure TFrmDWSqlEditor.FormActivate(Sender: TObject);
+begin
+ CarregarTabelas;
+end;
+
 {$IFNDEF FPC}
 procedure TFrmDWSqlEditor.FormClose(Sender: TObject; var Action: TCloseAction);
 {$ELSE}
@@ -196,8 +259,20 @@ begin
   {$ENDIF}
  End;
 
+ if FThrBancoDados <> nil then begin
+   FThrBancoDados.threadDie;
+   tmClose.Enabled := True;
+   {$IFDEF FPC}
+     CloseAction:=caNone;
+   {$ELSE}
+     Action:=caNone;
+   {$ENDIF}
+   Exit;
+ end;
+
  if ModalResult <> mrCancel then
    RESTDWClientSQL.SQL.Assign(Memo.Lines);
+
 
  RESTDWClientSQLB.Active := False;
  FreeAndNil(RESTDWClientSQLB);
@@ -212,6 +287,13 @@ begin
  RESTDWClientSQLB := TRESTDWClientSQL.Create(Self);
  DataSource       := TDataSource.Create(Self);
  vLastSelect      := '';
+
+ RESTDWDatabase := nil;
+
+ FThrBancoDados := TThrBancoDados.Create;
+ FThrBancoDados.OnFimEvento := {$IFDEF FPC}@{$ENDIF}thrOnFimEvento;
+ FThrBancoDados.OnTerminate := {$IFDEF FPC}@{$ENDIF}thrOnTerminate;
+
  SetarControles(False);
 end;
 
@@ -219,30 +301,56 @@ procedure TFrmDWSqlEditor.FormShow(Sender: TObject);
 begin
  DataSource.DataSet        := RESTDWClientSQLB;
  DBGridRecord.DataSource   := DataSource;
+
+ If Assigned(RESTDWClientSQL) Then Begin
+   RESTDWDatabase            := RESTDWClientSQL.DataBase;
+   RESTDWClientSQLB.DataBase := RESTDWDatabase;
+ end;
+
+ FThrBancoDados.RESTDWDatabase := RESTDWDatabase;
 end;
 
 Procedure TFrmDWSqlEditor.SetFields;
-Var
- vMemString : TStringList;
 Begin
  If (lbTables.Count > 0) And (lbTables.ItemIndex > -1)  And
     (vLastSelect <> lbTables.Items[lbTables.itemIndex]) Then
   Begin
-   If RESTDWClientSQL.DataBase <> Nil Then
-    Begin
-     vLastSelect                          := lbTables.Items[lbTables.itemIndex];
-     vMemString                           := TStringList.Create;
-     Try
-      RESTDWDatabase.GetFieldNames(lbTables.Items[lbTables.itemIndex], vMemString);
-      lbFields.Items.Text                 := vMemString.Text;
-     Finally
-      FreeAndNil(vMemString);
-     End;
-    End;
+   vLastSelect  := lbTables.Items[lbTables.itemIndex];
+   FThrBancoDados.buscarFieldsNames(vLastSelect);
   End
  Else If (lbTables.Count > 0) And (lbTables.ItemIndex = -1) Then
   lbFields.Items.Clear;
 End;
+
+procedure TFrmDWSqlEditor.thrOnFimEvento(Sender: TObject; evento: string;
+  lstString: TStringList);
+begin
+  if evento = 'T' then begin
+    lbTables.Items.Text := lstString.Text;
+    If lbTables.Count > 0 Then Begin
+      SetarControles(True);
+      lbTables.ItemIndex := 0;
+      SetFields;
+    End;
+  end
+  else if evento = 'F' then begin
+    lbFields.Items.Text := lstString.Text;
+  end;
+end;
+
+procedure TFrmDWSqlEditor.thrOnTerminate(Sender: TObject);
+begin
+ FThrBancoDados := nil;
+end;
+
+procedure TFrmDWSqlEditor.tmCloseTimer(Sender: TObject);
+begin
+  tmClose.Enabled := False;
+  if FThrBancoDados <> nil then
+    tmClose.Enabled := True
+  else
+    Close;
+end;
 
 procedure TFrmDWSqlEditor.SetarControles(enab: boolean);
 begin
@@ -252,35 +360,15 @@ begin
 end;
 
 Procedure TFrmDWSqlEditor.SetClientSQL(Value: TRESTDWClientSQL);
-Var
- vMemString : TStringList;
 Begin
  RESTDWClientSQL           := Value;
  vOldSQL                   := '';
  Memo.Lines.Text           := vOldSQL;
- If Assigned(RESTDWClientSQL) Then
-  Begin
+
+ if Assigned(RESTDWClientSQL) then begin
    vOldSQL                   := RESTDWClientSQL.SQL.Text;
    Memo.Lines.Text           := vOldSQL;
-   RESTDWDatabase            := RESTDWClientSQL.DataBase;
-   RESTDWClientSQLB.DataBase := RESTDWDatabase;
-   If RESTDWClientSQL.DataBase <> Nil Then
-    Begin
-     vMemString := TStringList.Create;
-     Try
-      RESTDWDatabase.GetTableNames(vMemString);
-      lbTables.Items.Text := vMemString.Text;
-      If lbTables.Count > 0 Then
-       Begin
-        SetarControles(True);
-        lbTables.ItemIndex                 := 0;
-        SetFields;
-       End;
-     Finally
-      FreeAndNil(vMemString);
-     End;
-    End;
-  End;
+ end;                                   
 End;
 
 Procedure TFrmDWSqlEditor.SetDatabase(Value : TRESTDWDatabasebaseBase);
@@ -403,6 +491,11 @@ Begin
   End;
 End;
 
+procedure TFrmDWSqlEditor.CarregarTabelas;
+begin
+  FThrBancoDados.buscarTabelas;
+end;
+
 procedure TFrmDWSqlEditor.MemoDragDrop(Sender, Source: TObject; X,
   Y: Integer);
 begin
@@ -411,6 +504,101 @@ begin
    TMemo(Sender).Lines.Text := BuildSQL
   Else
    TMemo(Sender).Lines.Text := TMemo(Sender).Lines.Text + sLineBreak + BuildSQL;
+end;
+
+{ TThrBancoDados }
+
+procedure TThrBancoDados.buscarFieldsNames(tabela: string);
+begin
+  FTipoEvento := 'F';
+  FBuscar := tabela;
+  FEvent.SetEvent;
+end;
+
+procedure TThrBancoDados.buscarTabelas;
+begin
+  FTipoEvento := 'T';
+  FBuscar := '';
+  FEvent.SetEvent;
+end;
+
+procedure TThrBancoDados.callFimBusca;
+var
+  vTipo : string;
+begin
+  vTipo := FTipoEvento;
+  FTipoEvento := ''; // limpando para nao cair no while do Execute
+  if Assigned(FOnFimEvento) then
+    FOnFimEvento(Self,vTipo,FMemString);
+end;
+
+constructor TThrBancoDados.Create;
+begin
+  FRESTDWDatabase := nil;
+  FMustDie := False;
+  FEvent := TSimpleEvent.Create;
+  FMemString := TStringList.Create;
+  FreeOnTerminate := True;
+  {$IFDEF FPC}
+    inherited Create(False);
+  {$ELSE}
+    inherited;
+  {$ENDIF}
+end;
+
+destructor TThrBancoDados.Destroy;
+begin
+  FMemString.Free;
+  FEvent.Free;
+
+  inherited;
+end;
+
+procedure TThrBancoDados.Execute;
+begin
+  while not Terminated do begin
+    FEvent.WaitFor(INFINITE);
+
+    if FMustDie then begin
+      Terminate;
+      Break;
+    end;
+
+    FMemString.Clear;
+    try
+      if FRESTDWDatabase <> nil then begin
+        if FTipoEvento = 'T' then
+          FRESTDWDatabase.GetTableNames(FMemString)
+        else if FTipoEvento = 'F' then
+          FRESTDWDatabase.GetFieldNames(FBuscar,FMemString);
+      end;
+    except
+
+    end;
+
+    if FMemString.Count > 0 then
+      Synchronize({$IFDEF FPC}@{$ENDIF}callFimBusca);
+
+    if FMustDie then begin
+      Terminate;
+      Break;
+    end;
+  end;
+end;
+
+{$IFDEF FPC}
+  procedure TThrBancoDados.TerminatedSet;
+  begin
+    inherited TerminatedSet;
+    DoTerminate;
+  end;
+{$ENDIF}
+
+procedure TThrBancoDados.threadDie;
+begin
+  FTipoEvento := '';
+  FMustDie := True;
+  FEvent.SetEvent;
 end;
 
 end.
