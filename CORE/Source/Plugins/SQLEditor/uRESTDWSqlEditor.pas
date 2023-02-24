@@ -122,6 +122,7 @@ Const
     procedure BtnCancelarClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure tmCloseTimer(Sender: TObject);
+    procedure BtnOkClick(Sender: TObject);
  Private
   { Private declarations }
   DataSource         : TDataSource;
@@ -131,6 +132,7 @@ Const
   vLastSelect,
   vOldSQL            : String;
   FThrBancoDados     : TThrBancoDados;
+  FResModal          : Cardinal;
   Procedure SetFields;
   Function  BuildSQL : String;
   Procedure SetDatabase(Value : TRESTDWDatabasebaseBase);
@@ -182,20 +184,23 @@ end;
 
 Procedure TRESTDWSQLEditor.Edit;
 Var
- objObj : TRESTDWClientSQL;
+  objObj : TRESTDWClientSQL;
+  vModal : cardinal;
 Begin
- FrmDWSqlEditor := TFrmDWSqlEditor.Create(Application);
- Try
-  objObj        := TRESTDWClientSQL(GetComponent(0));
-  FrmDWSqlEditor.SetClientSQL(objObj);
-  FrmDWSqlEditor.ShowModal;
-  objObj        := Nil;
-  FrmDWSqlEditor.Free;
+  FrmDWSqlEditor := TFrmDWSqlEditor.Create(Application);
+  Try
+    objObj        := TRESTDWClientSQL(GetComponent(0));
+    FrmDWSqlEditor.SetClientSQL(objObj);
+    vModal := FrmDWSqlEditor.ShowModal;
 
-  Modified; // update na propridade do object inspector
- Except
+    if vModal = mrOk then
+      SetValue(FrmDWSqlEditor.Memo.Text);
 
- End;
+    objObj        := Nil;
+    FrmDWSqlEditor.Free;
+  Except
+
+  End;
 End;
 
 Function TRESTDWSQLEditor.GetAttributes: TPropertyAttributes;
@@ -207,6 +212,8 @@ End;
 procedure TFrmDWSqlEditor.BtnCancelarClick(Sender: TObject);
 begin
   BtnCancelar.Tag := 1;
+  FResModal := mrCancel;
+  Close;
 end;
 
 Procedure TFrmDWSqlEditor.BtnExecuteClick(Sender: TObject);
@@ -229,6 +236,12 @@ Begin
  End;
 End;
 
+procedure TFrmDWSqlEditor.BtnOkClick(Sender: TObject);
+begin
+  FResModal := mrOk;
+  Close;
+end;
+
 procedure TFrmDWSqlEditor.FormActivate(Sender: TObject);
 begin
  CarregarTabelas;
@@ -240,7 +253,7 @@ procedure TFrmDWSqlEditor.FormClose(Sender: TObject; var Action: TCloseAction);
 procedure TFrmDWSqlEditor.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 {$ENDIF}
 begin
- If (ModalResult = mrCancel) and (vOldSQL <> Memo.Text) and (BtnCancelar.Tag = 1) Then
+ If (FResModal = mrCancel) and (vOldSQL <> Memo.Text) and (BtnCancelar.Tag = 1) Then
  Begin
    {$IFDEF FPC}
     If MessageDlg('SQL Editor', 'Realmente deseja sair ?', mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
@@ -259,6 +272,8 @@ begin
   {$ENDIF}
  End;
 
+ BtnCancelar.Tag := 2;
+
  if FThrBancoDados <> nil then begin
    FThrBancoDados.threadDie;
    tmClose.Enabled := True;
@@ -270,9 +285,7 @@ begin
    Exit;
  end;
 
- if ModalResult <> mrCancel then
-   RESTDWClientSQL.SQL.Assign(Memo.Lines);
-
+ ModalResult := FResModal; // devido o clock (passa duas vezes)
 
  RESTDWClientSQLB.Active := False;
  FreeAndNil(RESTDWClientSQLB);
@@ -287,6 +300,7 @@ begin
  RESTDWClientSQLB := TRESTDWClientSQL.Create(Self);
  DataSource       := TDataSource.Create(Self);
  vLastSelect      := '';
+ FResModal        := mrNone;
 
  RESTDWDatabase := nil;
 

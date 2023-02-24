@@ -261,8 +261,8 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Anchors = [akTop, akRight]
       Caption = 'Ok'
       Default = True
-      ModalResult = 1
       TabOrder = 0
+      OnClick = BtnOkClick
     end
     object BtnCancelar: TButton
       Left = 970
@@ -272,7 +272,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Anchors = [akTop, akRight]
       Cancel = True
       Caption = 'Cancel'
-      ModalResult = 2
       TabOrder = 1
       OnClick = BtnCancelarClick
     end
