@@ -77,8 +77,8 @@ body:
     attributes:
       label: "Sistema Operacional:"
       description: "Informe o Sistema Operacional onde o erro ocorre."
-      mutiple: true
       options:
+        multiple: true
         - Windows
         - Linux
         - MacOS
