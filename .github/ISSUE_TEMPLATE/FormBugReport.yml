@@ -78,7 +78,6 @@ body:
       label: "Sistema Operacional:"
       description: "Informe o Sistema Operacional onde o erro ocorre."
       options:
-        multiple: true
         - Windows
         - Linux
         - MacOS
