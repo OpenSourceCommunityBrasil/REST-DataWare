@@ -59,6 +59,7 @@
       </Item1>
       <Item2>
         <PackageName Value="indylaz"/>
+        <MinVersion Major="10" Minor="6" Valid="True"/>
       </Item2>
       <Item3>
         <PackageName Value="IDEIntf"/>
