@@ -1,4 +1,4 @@
-name: lazarusbuild
+name: lazarustestwindows
 
 on:
   pull_request:
