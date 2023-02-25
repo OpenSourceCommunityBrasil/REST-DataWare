@@ -22,7 +22,7 @@ jobs:
       uses: gcarreno/setup-lazarus@v3.2
       with:
         lazarus-version: ${{ matrix.lazarus-versions }}
-        include-packages: "indy10"
+        include-packages: "Indy10"
         with-cache: false
     - name: Build the Main package on Windows
       run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
