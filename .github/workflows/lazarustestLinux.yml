@@ -1,4 +1,4 @@
-name: lazarustestwindows
+name: lazarustestLinux
 
 on:
   pull_request:
