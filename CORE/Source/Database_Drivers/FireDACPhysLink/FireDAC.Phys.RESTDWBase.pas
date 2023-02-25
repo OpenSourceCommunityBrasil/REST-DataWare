@@ -760,6 +760,9 @@ var
 begin
   Result := null;
 
+  if col >= FFieldCount then
+    Exit;
+
   FStream.Read(vBoolean, Sizeof(Byte));
 
   // is null

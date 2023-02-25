@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <PathDelim Value="\"/>
+    <Name Value="RESTDWZeos8Driver"/>
+    <Type Value="RunAndDesignTime"/>
+    <Author Value="OpenSourceCommunityBrasil"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="..\..\..\..\Source\Includes"/>
+        <OtherUnitFiles Value="..\..\..\..\Source\Database_Drivers;..\..\..\..\Source\Database_Drivers\ZeosPhysLink"/>
+        <UnitOutputDirectory Value="..\..\..\..\compiledlaz"/>
+      </SearchPaths>
+      <CodeGeneration>
+        <Optimizations>
+          <OptimizationLevel Value="0"/>
+        </Optimizations>
+      </CodeGeneration>
+      <Other>
+        <CustomOptions Value="-dZEOS80UP"/>
+      </Other>
+    </CompilerOptions>
+    <Description Value="The proposal was fulfilled. REST DW was created to facilitate the creation of CRUDs in the same model that we created applications for Client / Server Database. Today, being able to write data to a bank via WebService is too complex for simple operations, making scheduling of simple screens time-consuming. With REST Dataware, you no longer have to worry about creating SQL Insertion, Deletion, Read, and Execution methods via Webservice; Simply add a RESTDataBase connection component and add a RESTClientSQL component that will already have your SQL solution fully functional as you did back in the day and with all the power of modern REST / JSON technology with data compression and everything the language can offer. Have fun.
+"/>
+    <License Value="GPL- 3.0"/>
+    <Version Major="2" Minor="1"/>
+    <Files Count="10">
+      <Item1>
+        <Filename Value="..\..\..\..\Source\Database_Drivers\uRESTDWZeosDriver.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="uRESTDWZeosDriver"/>
+      </Item1>
+      <Item2>
+        <Filename Value="..\RESTDWLazarusDrivers.lrs"/>
+        <Type Value="LRS"/>
+      </Item2>
+      <Item3>
+        <Filename Value="..\..\..\..\Source\Database_Drivers\ZeosPhysLink\uRESTDWZAnalyser.pas"/>
+        <UnitName Value="uRESTDWZAnalyser"/>
+      </Item3>
+      <Item4>
+        <Filename Value="..\..\..\..\Source\Database_Drivers\ZeosPhysLink\uRESTDWZDbc.pas"/>
+        <UnitName Value="uRESTDWZDbc"/>
+      </Item4>
+      <Item5>
+        <Filename Value="..\..\..\..\Source\Database_Drivers\ZeosPhysLink\uRESTDWZDbcMetadata.pas"/>
+        <UnitName Value="uRESTDWZDbcMetadata"/>
+      </Item5>
+      <Item6>
+        <Filename Value="..\..\..\..\Source\Database_Drivers\ZeosPhysLink\uRESTDWZDbcResultSet.pas"/>
+        <UnitName Value="uRESTDWZDbcResultSet"/>
+      </Item6>
+      <Item7>
+        <Filename Value="..\..\..\..\Source\Database_Drivers\ZeosPhysLink\uRESTDWZDbcStatement.pas"/>
+        <UnitName Value="uRESTDWZDbcStatement"/>
+      </Item7>
+      <Item8>
+        <Filename Value="..\..\..\..\Source\Database_Drivers\ZeosPhysLink\uRESTDWZeosPhysLink.pas"/>
+        <UnitName Value="uRESTDWZeosPhysLink"/>
+      </Item8>
+      <Item9>
+        <Filename Value="..\..\..\..\Source\Database_Drivers\ZeosPhysLink\uRESTDWZPlainDriver.pas"/>
+        <UnitName Value="uRESTDWZPlainDriver"/>
+      </Item9>
+      <Item10>
+        <Filename Value="..\..\..\..\Source\Database_Drivers\ZeosPhysLink\uRESTDWZToken.pas"/>
+        <UnitName Value="uRESTDWZToken"/>
+      </Item10>
+    </Files>
+    <CompatibilityMode Value="True"/>
+    <RequiredPkgs Count="3">
+      <Item1>
+        <PackageName Value="zcomponent"/>
+        <MaxVersion Major="7" Minor="9"/>
+        <MinVersion Major="8" Valid="True"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="restdatawarecomponents"/>
+        <MinVersion Major="2" Valid="True"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="FCL"/>
+      </Item3>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

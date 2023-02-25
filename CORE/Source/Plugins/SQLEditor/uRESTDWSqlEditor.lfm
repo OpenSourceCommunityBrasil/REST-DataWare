@@ -1,7 +1,7 @@
 object FrmDWSqlEditor: TFrmDWSqlEditor
-  Left = 551
+  Left = 472
   Height = 756
-  Top = 130
+  Top = 195
   Width = 1079
   BorderWidth = 5
   Caption = 'RESTDWClientSQL Editor'
@@ -11,6 +11,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
+  OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
@@ -267,8 +268,8 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Anchors = [akTop, akRight]
       Caption = 'Ok'
       Default = True
-      ModalResult = 1
       TabOrder = 0
+      OnClick = BtnOkClick
     end
     object BtnCancelar: TButton
       Left = 986
@@ -278,7 +279,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Anchors = [akTop, akRight]
       Cancel = True
       Caption = 'Cancel'
-      ModalResult = 2
       OnClick = BtnCancelarClick
       TabOrder = 1
     end
@@ -311,5 +311,12 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         TitleFont.Name = 'Tahoma'
       end
     end
+  end
+  object tmClose: TTimer
+    Enabled = False
+    Interval = 200
+    OnTimer = tmCloseTimer
+    Left = 341
+    Top = 240
   end
 end
