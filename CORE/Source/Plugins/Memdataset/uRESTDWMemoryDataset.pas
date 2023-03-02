@@ -26,7 +26,8 @@ interface
 
 uses
   {$IFNDEF FPC} SqlTimSt, {$ENDIF}
-  SysUtils, Classes, Db, FmtBCD, uRESTDWExprParser, uRESTDWAbout;
+  SysUtils, Classes, Db, FmtBCD, uRESTDWExprParser, uRESTDWAbout,
+  uRESTDWConsts;
 
 const
   ftBlobTypes = [ftBlob, ftMemo, ftBytes, ftVarBytes, ftFmtMemo, ftOraBlob,
@@ -219,7 +220,9 @@ type
     procedure InternalSetToRecord(Buffer: TRESTDWBuffer); override;
     procedure SetBookmarkData(Buffer: TRESTDWBuffer; Data: Pointer); override;
     procedure GetBookmarkData(Buffer: TRESTDWBuffer; Data: Pointer); override;
-    procedure GetBookmarkData(Buffer: TRESTDWBuffer; Data: TBookmark); override;
+    {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+      procedure GetBookmarkData(Buffer: TRESTDWBuffer; Data: TBookmark); override;
+    {$IFEND}
     procedure SetBookmarkFlag(Buffer: TRESTDWBuffer; Value: TBookmarkFlag); override;
     function GetBookmarkFlag(Buffer: TRESTDWBuffer): TBookmarkFlag; override;
 
@@ -444,13 +447,15 @@ begin
   InternalGotoBookmark (@ReqBookmark);
 end;
 
-procedure TRESTDWMemTable.GetBookmarkData(Buffer: TRESTDWBuffer; Data: TBookmark);
-var
-  vBook : integer;
-begin
-  vBook := PRESTDWRecInfo(Buffer + FRecordSize)^.Bookmark;
-  Move(vBook,Pointer(@Data[0])^,SizeOf(vBook)); // XE
-end;
+{$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+  procedure TRESTDWMemTable.GetBookmarkData(Buffer: TRESTDWBuffer; Data: TBookmark);
+  var
+    vBook : integer;
+  begin
+    vBook := PRESTDWRecInfo(Buffer + FRecordSize)^.Bookmark;
+    Move(vBook,Pointer(@Data[0])^,SizeOf(vBook)); // XE
+  end;
+{$IFEND}
 
 function TRESTDWMemTable.GetBookmarkFlag(Buffer: TRESTDWBuffer): TBookmarkFlag;
 begin
@@ -467,7 +472,7 @@ var
   vCurrency : Currency;
   vFmtBCD : tBCD;
   {$IFDEF FPC}
-    vTimeStamp : TTimeStamp
+    vTimeStamp : TTimeStamp;
   {$ELSE}
     vTimeStamp : TSQLTimeStamp;
   {$ENDIF}
@@ -548,7 +553,7 @@ var
   vDouble : Double;
   vFmtBCD : tBCD;
   {$IFDEF FPC}
-    vTimeStamp : TTimeStamp
+    vTimeStamp : TTimeStamp;
   {$ELSE}
     vTimeStamp : TSQLTimeStamp;
   {$ENDIF}
@@ -686,7 +691,11 @@ end;
 
 procedure TRESTDWMemTable.GetBookmarkData(Buffer: TRESTDWBuffer; Data: Pointer);
 begin
-  GetBookmarkData(Buffer,TBookmark(Data));
+  {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+    GetBookmarkData(Buffer,TBookmark(Data));
+  {$ELSE}
+
+  {$IFEND}
 end;
 
 procedure TRESTDWMemTable.SaveToFile(AFileName: string);
@@ -1252,8 +1261,8 @@ procedure TRESTDWBlobStream.FreeBlobField;
 begin
   FDataSet.FBlobs.Remove(FBlobField);
   FreeMem(FBlobField^.Buffer, FBlobField^.Size);
-  FBlobField.Buffer := nil;
-  FBlobField.Size := 0;
+  FBlobField^.Buffer := nil;
+  FBlobField^.Size := 0;
   FModified := True;
 end;
 
@@ -1261,13 +1270,13 @@ function TRESTDWBlobStream.Read(var Buffer; Count: Longint): Longint;
 var
   P : Pointer;
 begin
-  if FPosition + Count > FBlobField.Size then
-    Count := FBlobField.Size - FPosition;
+  if FPosition + Count > FBlobField^.Size then
+    Count := FBlobField^.Size - FPosition;
   {$IF (NOT DEFINED(FPC)) and (CompilerVersion < 21)}
     P := FBlobField.Buffer;
     Inc(PByte(P),FPosition);
   {$ELSE}
-    P := FBlobField.Buffer + FPosition;
+    P := FBlobField^.Buffer + FPosition;
   {$IFEND}
   Move(P^, Buffer, Count);
   Inc(FPosition, Count);
@@ -1278,7 +1287,7 @@ function TRESTDWBlobStream.Seek(const Offset: int64; Origin: TSeekOrigin): int64
 begin
   Case Origin of
     soBeginning : FPosition := Offset;
-    soEnd       : FPosition := FBlobField.Size + Offset;
+    soEnd       : FPosition := FBlobField^.Size + Offset;
     soCurrent   : FPosition := FPosition + Offset;
   end;
   Result := FPosition;
@@ -1288,7 +1297,7 @@ procedure TRESTDWBlobStream.SetDataBlob;
 begin
   if FModified then begin
     // Empty blob = IsNull
-    if (FBlobField = nil) or (FBlobField.Size = 0) then
+    if (FBlobField = nil) or (FBlobField^.Size = 0) then
       FField.SetData(nil)
     else
       FField.SetData(@FBlobField);
