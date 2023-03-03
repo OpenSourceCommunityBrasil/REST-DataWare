@@ -284,6 +284,7 @@ type
     property Filter;
     property Filtered;
     property FilterOptions;
+    property FieldDefs;
 
     property BeforeOpen;
     property AfterOpen;
