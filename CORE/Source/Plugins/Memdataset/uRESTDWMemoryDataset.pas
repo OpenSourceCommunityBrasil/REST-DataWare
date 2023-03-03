@@ -142,6 +142,8 @@ type
     property EncodeStrs: Boolean read FEncodeStrs write FEncodeStrs;
   end;
 
+  TRESTDWRecordStatus = (rsOriginal, rsUpdated, rsInserted, rsDeleted);
+
   { TRESTDWMemTable }
 
   TRESTDWMemTable = class(TDataSet, IRESTDWMemTable)
@@ -165,6 +167,7 @@ type
     FFilterBuffer: TRESTDWBuffer;
     FControlsDisabled : boolean; // filtro
     FFilterParser : TExprParser;
+    FStatusName : string;
 
     // create, close, and so on
     procedure InternalOpen; override;
@@ -315,6 +318,9 @@ implementation
 
 uses
   uRESTDWStorageBin;
+
+const
+  STATUSNAME = 'R35TD4T4W4R3';
 
 procedure TRESTDWMemTable.InternalOpen;
 begin
@@ -659,7 +665,16 @@ begin
         Move(Buffer^,DestBuffer^,J);
       end;
     end;
-    DataEvent (deFieldChange, Longint(Field));
+
+    {$IFDEF FPC}
+      DataEvent(deFieldChange, Ptrint(Field));
+    {$ELSE}
+      {$IF CompilerVersion < 21}
+        DataEvent(deFieldChange, Longint(Field));
+      {$ELSE}
+        DataEvent(deFieldChange, NativeInt(Field));
+      {$IFEND}
+    {$ENDIF}
   end
   else begin
     I := Field.Index;
@@ -1043,6 +1058,7 @@ begin
   FRecordCount := 0;
   FRecords := TList.Create;
   FBlobs := TList.Create;
+  FStatusName := STATUSNAME;
 end;
 
 function TRESTDWMemTable.CreateBlobStream(Field: TField;
