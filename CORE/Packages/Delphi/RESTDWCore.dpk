@@ -30,7 +30,6 @@ package RESTDWCore;
 {$IMPLICITBUILD OFF}
 
 requires
-  dcldb,
   {$IF Defined(VER150)}
   bdertl,
   {$IFEND}
@@ -88,10 +87,8 @@ contains
   uRESTDWJSONObject in '..\..\Source\utils\uRESTDWJSONObject.pas',
   uRESTDWMassiveBuffer in '..\..\Source\utils\uRESTDWMassiveBuffer.pas',
   uRESTDWMD5 in '..\..\Source\utils\uRESTDWMD5.pas',
-  uRESTDWTools in '..\..\Source\utils\uRESTDWTools.pas',
   uRESTDWZlib in '..\..\Source\utils\uRESTDWZlib.pas',
   uRESTDWDataJSON in '..\..\Source\utils\JSON\uRESTDWDataJSON.pas',
-  uRESTDWDynArray in '..\..\Source\utils\JSON\uRESTDWDynArray.pas',
   uRESTDWJSON in '..\..\Source\utils\JSON\uRESTDWJSON.pas',
   uRESTDWJSONInterface in '..\..\Source\utils\JSON\uRESTDWJSONInterface.pas',
   uRESTDWSerialize in '..\..\Source\utils\JSON\uRESTDWSerialize.pas',
@@ -101,6 +98,9 @@ contains
   uRESTDWPropertyPersist in '..\..\Source\Basic\uRESTDWPropertyPersist.pas',
   uRESTDWStorageBin in '..\..\Source\Basic\uRESTDWStorageBin.pas',
   uRESTDWMemoryDataset in '..\..\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas',
-  uRESTDWProtoTypes in '..\..\Source\Basic\uRESTDWProtoTypes.pas';
+  uRESTDWProtoTypes in '..\..\Source\Basic\uRESTDWProtoTypes.pas',
+  uRESTDWExprParser in '..\..\Source\Plugins\Memdataset\uRESTDWExprParser.pas',
+  uRESTDWDriverBase in '..\..\Source\Database_Drivers\uRESTDWDriverBase.pas',
+  uRESTDWTools in '..\..\Source\utils\uRESTDWTools.pas';
 
 End.

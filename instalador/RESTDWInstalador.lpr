@@ -13,7 +13,10 @@ uses
   uconsts in 'src\funcoes\uconsts.pas',
   ulocale in 'src\funcoes\ulocale.pas',
   uprincipal in 'src\telas\uprincipal.pas',
-  urestfunctions in 'src\funcoes\urestfunctions.pas';
+  urestfunctions in 'src\funcoes\urestfunctions.pas',
+  configdatabase in 'src\funcoes\configdatabase.pas',
+  imagefunctions in 'src\funcoes\imagefunctions.pas',
+  lclfunctions in 'src\funcoes\lclfunctions.pas', utesteanim;
 
 {$R *.res}
 
@@ -27,5 +30,6 @@ begin
   Application.Initialize;
   //Application.CreateForm(TfPrincipal, fPrincipal);
   Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TfTesteAnim, fTesteAnim);
   Application.Run;
 end.

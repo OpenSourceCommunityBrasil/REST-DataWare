@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, fphttpclient, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   StdCtrls, ComCtrls, CheckLst, ValEdit, Buttons, fpJSON, jsonparser,
-  urestfunctions, uconsts;
+  urestfunctions, uconsts, lclfunctions, utesteanim;
 
 type
   TSplashFormStyle = record
@@ -21,6 +21,8 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
+    Button1: TButton;
+    Button2: TButton;
     cbIDEVersion: TComboBox;
     clbDataEngine: TCheckListBox;
     clbDBDrivers: TCheckListBox;
@@ -29,6 +31,7 @@ type
     cbSources: TComboBox;
     cbInstallType: TComboBox;
     Image1: TImage;
+    imLogoAnim: TImage;
     ImageList1: TImageList;
     imConfirmBack: TImage;
     imInstallBack: TImage;
@@ -37,6 +40,7 @@ type
     imLazarus: TImage;
     imDelphi: TImage;
     imIDEBack: TImage;
+    imlogoBG: TImage;
     imResourceBack: TImage;
     imLanguageNext: TImage;
     imBanner: TImage;
@@ -82,6 +86,9 @@ type
     selectionbox: TShape;
     IDESelector: TShape;
     SpeedButton1: TSpeedButton;
+    Timer1: TTimer;
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
     procedure ConfigureInstallOptions(Sender: TObject);
     procedure FormClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -103,6 +110,7 @@ type
     procedure ImageSelect(Sender: TObject);
     procedure IDESelect(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
   private
     FThemeIndex: integer;
     FIDE: integer;
@@ -115,6 +123,8 @@ type
     procedure ShowStep(aStepIndex: integer);
     procedure PreparaVersoes;
     procedure ConfiguraOpcoes;
+    procedure RevisarConfiguracoes;
+
   public
 
   end;
@@ -145,9 +155,14 @@ begin
   imBackground.Picture.LoadFromResourceName(HInstance, Themes[aThemeIndex].Background);
   imTheme.Picture.LoadFromResourceName(HInstance, Themes[aThemeIndex].Theme);
   for I := 0 to pred(ComponentCount) do
+  begin
     if (Components[I] is TLabel) and (IgnoredLabels.IndexOf(
-      (Components[I] as TLabel).Name) < 0) then
-      (Components[I] as TLabel).Font.Color := Themes[aThemeIndex].FontColor;
+      TLabel(Components[I]).Name) < 0) then
+      TLabel(Components[I]).Font.Color := Themes[aThemeIndex].FontColor;
+    if (Components[I] is TLabeledEdit) and (IgnoredLabels.IndexOf(
+      TLabeledEdit(Components[I]).Name) < 0) then
+      TLabeledEdit(Components[I]).EditLabel.Font.Color := Themes[aThemeIndex].FontColor;
+  end;
   lTheme.Caption := Themes[aThemeIndex].subtitle;
   FThemeIndex := aThemeIndex;
 end;
@@ -304,6 +319,11 @@ begin
   lPlatforms.Visible := clbPlatforms.Visible;
 end;
 
+procedure TForm1.RevisarConfiguracoes;
+begin
+
+end;
+
 procedure TForm1.ImageSelect(Sender: TObject);
 begin
   selectionbox.Visible := True;
@@ -311,6 +331,7 @@ begin
   selectionbox.Top := TImage(Sender).Top + 13;
   selectionbox.Visible := True;
   Translate(TImage(Sender).Tag);
+  lLanguageNext.Enabled := True;
 end;
 
 procedure TForm1.IDESelect(Sender: TObject);
@@ -329,6 +350,17 @@ begin
     lbedFolder.Text := FolderDialog.FileName;
 end;
 
+procedure TForm1.Timer1Timer(Sender: TObject);
+begin
+  if imLogoAnim.Height < imlogoBG.Height then
+    imLogoAnim.Height := imLogoAnim.Height + 3
+  else
+  begin
+    Timer1.Enabled := False;
+    lInstallClose.Enabled := True;
+  end;
+end;
+
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   {$IFNDEF MSWindows}
@@ -338,8 +370,10 @@ begin
   SetIgnoredLabels;
   ConfigThemes;
   FIDE := -1;
-  IDESelector.Visible := False;
-  selectionbox.Visible := False;
+  LCLFunc.DesativaControles([lIDENext, lLanguageNext, lInstallClose,
+    clbResources, clbPlatforms, clbDBDrivers, clbDataEngine]);
+  LCLFunc.EscondeControles([IDESelector, selectionbox]);
+  imLogoAnim.Height := 0;
 
   ShowStep(0);
   SetTheme(0);
@@ -359,8 +393,23 @@ Full
 Custom
 }
   case cbInstallType.ItemIndex of
-    0: ;
+    3: LCLFunc.AtivaControles([clbDataEngine, clbDBDrivers, clbPlatforms, clbResources]);
+    else
+      LCLFunc.DesativaControles([clbDataEngine, clbDBDrivers, clbPlatforms, clbResources]);
   end;
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+  imLogoAnim.Height := 0;
+  lInstallClose.Enabled := False;
+  Timer1.Enabled := True;
+end;
+
+procedure TForm1.Button2Click(Sender: TObject);
+begin
+  Application.CreateForm(TfTesteAnim, fTesteAnim);
+  fTesteAnim.Show;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -414,6 +463,7 @@ end;
 
 procedure TForm1.imResourceNextClick(Sender: TObject);
 begin
+  RevisarConfiguracoes;
   ShowStep(3);
 end;
 

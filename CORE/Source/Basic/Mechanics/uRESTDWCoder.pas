@@ -3,6 +3,7 @@ unit uRESTDWCoder;
 interface
 
 {$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .

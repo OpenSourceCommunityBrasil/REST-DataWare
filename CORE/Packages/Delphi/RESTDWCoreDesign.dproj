@@ -158,6 +158,7 @@
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <VerInfo_MinorVer>1</VerInfo_MinorVer>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.1.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <DCC_UnitSearchPath>..\..\Source\Plugins\SQLEditor;..\..\Source\Plugins\JSONViewer;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -170,6 +171,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="RESTDWCoreDesign.dcr"/>
+        <DCCReference Include="dcldb.dcp"/>
         <DCCReference Include="RESTDWCore.dcp"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWDesignReg.pas"/>
         <BuildConfiguration Include="Base">
@@ -193,16 +195,17 @@
                     <Source Name="MainSource">RESTDWCoreDesign.dpk</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\PhysRDW.bpl">(untitled)</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="4">
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
@@ -618,6 +621,128 @@
                         <Operation>0</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="ProjectAndroidManifest">
+                    <Platform Name="Android">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXDebug"/>
+                <DeployClass Name="ProjectOSXEntitlements"/>
+                <DeployClass Name="ProjectOSXInfoPList"/>
+                <DeployClass Name="ProjectOSXResource">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSXARM64">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="ProjectOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\arm64-v8a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimARM64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Linux64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSXARM64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOutput_Android32">
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectUWPManifest">
+                    <Platform Name="Win32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceDebug">
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimARM64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceResourceRules"/>
+                <DeployClass Name="ProjectiOSEntitlements"/>
+                <DeployClass Name="ProjectiOSInfoPList"/>
+                <DeployClass Name="ProjectiOSLaunchScreen"/>
+                <DeployClass Name="ProjectiOSResource">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimARM64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo150">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo44">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="iOS_AppStore1024">
                     <Platform Name="iOSDevice64">
                         <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
@@ -879,128 +1004,6 @@
                     </Platform>
                     <Platform Name="iOSSimARM64">
                         <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="ProjectAndroidManifest">
-                    <Platform Name="Android">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="Android64">
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="ProjectiOSDeviceDebug">
-                    <Platform Name="iOSDevice32">
-                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSDevice64">
-                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSSimARM64">
-                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="ProjectiOSDeviceResourceRules"/>
-                <DeployClass Name="ProjectiOSEntitlements"/>
-                <DeployClass Name="ProjectiOSInfoPList"/>
-                <DeployClass Name="ProjectiOSLaunchScreen"/>
-                <DeployClass Name="ProjectiOSResource">
-                    <Platform Name="iOSDevice32">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSDevice64">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSSimARM64">
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="ProjectOSXDebug"/>
-                <DeployClass Name="ProjectOSXEntitlements"/>
-                <DeployClass Name="ProjectOSXInfoPList"/>
-                <DeployClass Name="ProjectOSXResource">
-                    <Platform Name="OSX32">
-                        <RemoteDir>Contents\Resources</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="OSX64">
-                        <RemoteDir>Contents\Resources</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="OSXARM64">
-                        <RemoteDir>Contents\Resources</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Required="true" Name="ProjectOutput">
-                    <Platform Name="Android">
-                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="Android64">
-                        <RemoteDir>library\lib\arm64-v8a</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSDevice32">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSDevice64">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSSimARM64">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="Linux64">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="OSX32">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="OSX64">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="OSXARM64">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="Win32">
-                        <Operation>0</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="ProjectOutput_Android32">
-                    <Platform Name="Android64">
-                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="ProjectUWPManifest">
-                    <Platform Name="Win32">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="Win64">
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="UWP_DelphiLogo150">
-                    <Platform Name="Win32">
-                        <RemoteDir>Assets</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="Win64">
-                        <RemoteDir>Assets</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="UWP_DelphiLogo44">
-                    <Platform Name="Win32">
-                        <RemoteDir>Assets</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="Win64">
-                        <RemoteDir>Assets</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>

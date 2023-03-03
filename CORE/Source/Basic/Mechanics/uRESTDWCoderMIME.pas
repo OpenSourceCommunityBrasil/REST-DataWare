@@ -1,6 +1,7 @@
 Unit uRESTDWCoderMIME;
 
 {$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .

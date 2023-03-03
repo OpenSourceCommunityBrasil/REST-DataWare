@@ -1,6 +1,7 @@
 unit uRESTDWBasicClass;
 
 {$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -289,9 +290,9 @@ End;
 Constructor TRESTDWClientRESTBase.Create(AOwner: TComponent);
 Begin
  Inherited;
- vContentType                    := 'application/json';
- vContentEncoding                := 'multipart/form-data';
- vAccept                         := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+ vContentType                    := cDefaultContentType;
+ vContentEncoding                := cContentTypeMultiPart;
+ vAccept                         := cDefaultAccept;
  vAcceptEncoding                 := '';
  vCharset                        := 'utf8';
  vMaxAuthRetries                 := 0;

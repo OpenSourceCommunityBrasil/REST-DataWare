@@ -112,8 +112,8 @@ RootDir=C:\Program Files (x86)\Borland\Delphi7\Bin\
 [Version Info]
 IncludeVerInfo=1
 AutoIncBuild=0
-MajorVer=1
-MinorVer=0
+MajorVer=2
+MinorVer=1
 Release=0
 Build=0
 Debug=0
@@ -126,7 +126,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=
 FileDescription=RESTDWSocketIndy
-FileVersion=1.0.0.0
+FileVersion=2.1.0.0
 InternalName=
 LegalCopyright=
 LegalTrademarks=
@@ -134,13 +134,3 @@ OriginalFilename=
 ProductName=RESTDWSocketIndy
 ProductVersion=1.0.0.0
 ProgramID=com.embarcadero.RESTDWSocketIndy
-[HistoryLists\hlConditionals]
-Count=1
-Item0=DEBUG
-[HistoryLists\hlUnitAliases]
-Count=1
-Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
-[HistoryLists\hlUnitOutputDirectory]
-Count=2
-Item0=..\..\..\..\compiled
-Item1=..\..\..\compiled

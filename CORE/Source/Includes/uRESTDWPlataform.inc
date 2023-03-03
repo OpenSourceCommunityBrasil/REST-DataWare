@@ -1,5 +1,3 @@
-{$I ..\..\Source\Includes\uRESTDW.inc}
-
 {$IF Defined(FPC)}
  {$IFDEF CPU32}
   {$DEFINE CPU32}

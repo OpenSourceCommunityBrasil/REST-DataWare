@@ -31,6 +31,7 @@ package RESTDWSocketIndyDesign;
 {$IMPLICITBUILD ON}
 
 requires
+  dcldb,
   RESTDWSocketIndy;
 
 contains

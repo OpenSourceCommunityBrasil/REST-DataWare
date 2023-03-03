@@ -30,6 +30,7 @@ uses
 type
   TOnGetVariableValue = function(Sender: TObject; const VarName: string;
     var Value: Variant): Boolean of object;
+
   TOnExecuteFunction = function(Sender: TObject; const FuncName: string;
     const Args: Variant; var ResVal: Variant): Boolean of object;
 
@@ -54,9 +55,7 @@ type
     destructor Destroy; override;
     function Eval: Boolean; overload;
     function Eval(const AExpression: string): Boolean; overload;
-
     property ErrorMessage: string read FErrorMessage;
-
   {published} // ahuser: not a TPersistent derived class
     property Expression: string read FExpression write SetExpression;
     property OnGetVariable: TOnGetVariableValue read FOnGetVariable write FOnGetVariable;
@@ -116,7 +115,6 @@ type
     constructor Create(AToken: TToken; const AStr: string; APos: Integer); overload;
     constructor Create(AToken: TToken; AChr: Char; APos: Integer); overload;
     function Debug(): string;
-
     property Token: TToken read FToken;
     property Chr: Char read FChr;
     property Str: string read FStr;
@@ -138,13 +136,11 @@ type
   end;
 
   TParser = class;
-
   TNode = class
   private
     FParser: TParser;
   public
     constructor Create(Parser: TParser); virtual;
-
     // Delphi 5 compiler shows hints about a not exported or used symbol
     // TNode.Eval. This is a compiler bug that is caused by the "abstract" keyword.
     function Eval(): Variant; virtual; abstract;
@@ -212,18 +208,14 @@ type
     FValue: Variant;
   public
     destructor Destroy; override;
-
     function Parse(): Boolean;
     function Execute(): Boolean;
-
     function Expr(): TNode;
     function Term(): TNode;
     function Factor(): TNode;
-
     function LexC(): TLex;
     function LexLook(LookAhead: Integer = 1): TLex;
     procedure LexAccept();
-
     property Parent: TExprParser read FParent write FParent;
     property Value: Variant read FValue;
     property ErrorMessage: string read FErrorMessage;
@@ -306,14 +298,12 @@ begin
   Idx := 1;
   S := '';
   CToken := tkNA;
-
   while Idx <= Len do
   begin
     C := Str[Idx];
     StartIdx := Idx;
     Inc(Idx);
     CToken := tkNA;
-
     case C of
       '(': CToken := tkLParen;
       ')': CToken := tkRParen;
@@ -389,7 +379,6 @@ begin
           FErrorMessage := Format('Bad character ''%s''', [string(C)]);
         end;
     end;
-
     case CToken of
       tkError: break;
       tkNA: ;                           // continue
@@ -502,7 +491,6 @@ begin
   try
     CNode := Term();
     Lex := LexC();
-
     if Lex.Token = tkOperator then
     begin
       if Lex.Chr in ['+', '-'] then
@@ -536,7 +524,6 @@ begin
   try
     CNode := Factor();
     Lex := LexC();
-
     if Lex.Token = tkOperator then
     begin
       if Lex.Chr in ['*', '/', '=', '&', '|', '<', '>', '~', '§', '@', '#'] then
@@ -613,7 +600,6 @@ begin
                 fNode.AddArg(Expr());
               end;
             end;
-
             if (LexC().token = tkRParen) then
               LexAccept()
             else
@@ -669,7 +655,6 @@ end;
 function TNodeBin.Eval: Variant;
 var
   LeftValue, RightValue: Variant;
-
   function FixupBoolean(var AVal1: Variant; var AVal2: Variant): Boolean;
   begin
     Result := (TVarData(AVal1).VType = varBoolean) or (TVarData(AVal2).VType = varBoolean);
@@ -679,14 +664,12 @@ var
         AVal1 := 1
       else
         AVal1 := 0;
-
       if UpperCase(AVal2) = 'TRUE' then
         AVal2 := 1
       else
         AVal2 := 0;
     end;
   end;
-
   function FixupDateTime(var AVal1: Variant; var AVal2: Variant): Boolean;
   begin
     Result := TVarData(AVal1).VType = varDate;
@@ -696,14 +679,12 @@ var
         AVal2 := StrToDateTime(AVal2); //convert;
     end;
   end;
-
   function FixupString(var aVal: Variant): Boolean;
   begin
     Result:=((TVarData(aVal).VType = varString) {$IFDEF UNICODE}or (TVarData(aVal).VType = varUString){$ENDIF UNICODE}) and FParser.Parent.FCaseInsensitive;
     if Result then
       aVal := AnsiUpperCase(aVal);
   end;
-
   //returns 'True' if a conversion was necessary.
   function FixupValues(var AVal1: Variant; var AVal2: Variant): Boolean;
   var
@@ -721,7 +702,6 @@ var
       Result := Result or bChanged; //ensure that both Fixups are executed regardless of optimisations
     end;
   end;
-
   function EvalLike: Boolean;
   var
     Wildcard1, Wildcard2: Boolean;
@@ -735,7 +715,6 @@ var
       // Left hand contains wildcards -> Match right hand against left hand.
       // Right hand contains wildcards -> Match left hand against right hand.
       // Both hands contain wildcards -> Match for string equality as if no wildcards are supported.
-
       LeftStr := LeftValue;
       RightStr := RightValue;
       Wildcard1 := (Pos('*', LeftStr) > 0) or (Pos('?', LeftStr) > 0);
@@ -749,7 +728,6 @@ var
         Result := LeftValue = RightValue;
     end;
   end;
-
   function EvalEquality: Boolean;
   begin
     // Special case, at least one of both is null:
@@ -765,7 +743,6 @@ var
         Result := LeftValue = RightValue;
     end;
   end;
-
   function EvalLT: Boolean;
   begin
     // Special case, at least one of both is Null:
@@ -775,7 +752,6 @@ var
     else
       Result := LeftValue < RightValue;
   end;
-
   function EvalGT: Boolean;
   begin
     // Special case, at least one of both is Null:
@@ -785,7 +761,6 @@ var
     else
       Result := LeftValue > RightValue;
   end;
-
   function EvalLTE: Boolean;
   begin
     // Special case, at least one of both is Null:
@@ -795,7 +770,6 @@ var
     else
       Result := LeftValue <= RightValue;
   end;
-
   function EvalGTE: Boolean;
   begin
     // Special case, at least one of both is Null:
@@ -813,7 +787,6 @@ begin
   LeftValue := FLeftNode.Eval;
   RightValue := FRightNode.Eval;
   FixupValues(LeftValue, RightValue);
-
   case FOperator.Chr of
     '+':
       begin
@@ -918,7 +891,6 @@ var
   VArgs: Variant;
   I: Integer;
 begin
-
   VArgs := VarArrayCreate([0, FArgs.Count - 1], varVariant);
   for I := 0 to FArgs.Count - 1 do
     VArgs[I] := TNode(FArgs[I]).Eval();
@@ -1014,7 +986,6 @@ begin
   // alguns parses tiveram se ser mudados
   // porque o operador é Char
   nValue := ConvertDoubleOperators(Value);
-
   if nValue <> FExpression then begin
     FExpression := nValue;
     FParser.Free;
@@ -1075,7 +1046,6 @@ begin
         sOperator := StringReplace(sOperator,'<=','@',[rfReplaceAll]);
         sOperator := StringReplace(sOperator,'<>','#',[rfReplaceAll]);
         sOperator := StringReplace(sOperator,'!=','#',[rfReplaceAll]);
-
         Result := Result + sOperator;
         sOperator := '';
       end;

@@ -13,6 +13,8 @@ const
     'https://api.github.com/repos/OpenSourceCommunityBrasil/REST-DataWare/branches';
   ZipDownloadAPI =
     'https://api.github.com/repos/OpenSourceCommunityBrasil/REST-DataWare/zipball/%s';
+  FileDownloadAPI =
+    'https://github.com/OpenSourceCommunityBrasil/REST-DataWare/raw/dev/instalador/%s';
 
 type
 
@@ -30,6 +32,7 @@ type
     function getTagsList: string;
     function getBranchesList: string;
     function getRepoBranches: TStream;
+    function getFileStream(aFileName: string): TFileStream;
     function Download(aDirectory: string; aVersion: string): boolean;
   end;
 
@@ -54,7 +57,6 @@ begin
   FHTTPREST.RequestHeaders.Clear;
   FHTTPREST.AddHeader('User-Agent', 'REST DataWare Installer Tool');
   FHTTPREST.AddHeader('Accept', '*/*');
-  FHTTPREST.AddHeader('Accept-Encoding', 'gzip2');
   FHTTPREST.AddHeader('Connection', 'keep-alive');
   FHTTPREST.AddHeader('Content-Type', 'application/json; charset=UTF-8');
 end;
@@ -76,7 +78,6 @@ var
   I: integer;
 begin
   RestClient := TRESTClient.Create;
-  //Tags := TJSONArray.Create;
   slistTags := TStringList.Create;
   Result := '';
   try
@@ -125,6 +126,11 @@ var
 begin
   sresp := TStringStream.Create(FHTTPREST.Get(BranchesAPI), TEncoding.UTF8);
   Result := sresp;
+end;
+
+function TRESTClient.getFileStream(aFileName: string): TFileStream;
+begin
+  FHTTPREST.Get(Format(FileDownloadAPI, [aFileName]), Result);
 end;
 
 function TRESTClient.Download(aDirectory: string; aVersion: string): boolean;

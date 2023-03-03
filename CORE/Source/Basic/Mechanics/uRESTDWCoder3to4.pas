@@ -1,6 +1,7 @@
 unit uRESTDWCoder3to4;
 
 {$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .

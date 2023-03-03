@@ -43,7 +43,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="src\funcoes;src\telas"/>
+            <OtherUnitFiles Value="src\funcoes;src\telas;..\..\..\.."/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -74,6 +74,9 @@
       <FormatVersion Value="2"/>
     </RunParams>
     <RequiredPackages>
+      <Item>
+        <PackageName Value="FCL"/>
+      </Item>
       <Item>
         <PackageName Value="weblaz"/>
       </Item>
@@ -113,6 +116,24 @@
         <Filename Value="src\funcoes\urestfunctions.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\configdatabase.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\imagefunctions.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src\funcoes\lclfunctions.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="utesteanim.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="fTesteAnim"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -123,7 +144,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="src\funcoes;src\telas"/>
+      <OtherUnitFiles Value="src\funcoes;src\telas;..\..\..\.."/>
       <UnitOutputDirectory Value="$(TargetCPU)-$(TargetOS)\$(TargetMode)"/>
     </SearchPaths>
     <Parsing>
