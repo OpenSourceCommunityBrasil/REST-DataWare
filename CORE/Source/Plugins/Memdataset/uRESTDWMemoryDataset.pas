@@ -275,9 +275,17 @@ type
     procedure LoadFromFile(AFileName : string); virtual;
     procedure SaveToStream(AStream : TStream); virtual;
     procedure SaveToFile(AFileName : string); virtual;
+
+    procedure EmptyTable; virtual;
   published
     // redeclared data set properties
     property Active;
+    property AutoCalcFields;
+    property Filter;
+    property Filtered;
+    property FilterOptions;
+    property FieldDefs;
+
     property BeforeOpen;
     property AfterOpen;
     property BeforeClose;
@@ -310,6 +318,9 @@ uses
 
 procedure TRESTDWMemTable.InternalOpen;
 begin
+  if FIsTableOpen then
+    Exit;
+
   InternalPreOpen; // custom method for subclasses
 
   // initialize the field definitions
@@ -320,6 +331,7 @@ begin
   // create the fields dynamically
   if DefaultFields then
     CreateFields;
+
   // connect the TField objects with the actual fields
   BindFields (True);
 
@@ -337,27 +349,14 @@ begin
 end;
 
 procedure TRESTDWMemTable.InternalClose;
-var
-  vState : TDataSetState;
 begin
-  vState := Self.State;
-  SetState(dsInactive);
+  EmptyTable;
 
-  clearBlobs;
-  clearRecords;
   // disconnet field objects
   BindFields(False);
   // destroy field object (if not persistent)
   if DefaultFields then
     DestroyFields;
-
-  FRecordCount := 0;
-  SetLength(FFieldOffsets,0);
-  FRecordBufferSize := 0;
-  FRecordSize := 0;
-
-  SetState(vState);
-
   // close the file
   FIsTableOpen := False;
 end;
@@ -793,6 +792,26 @@ begin
   end;
 end;
 
+procedure TRESTDWMemTable.EmptyTable;
+var
+  vState : TDataSetState;
+begin
+  vState := Self.State;
+  SetState(dsInactive);
+
+  clearBlobs;
+  clearRecords;
+
+  SetLength(FFieldOffsets,0);
+  SetLength(FFieldSize,0);
+  FRecordCount := 0;
+  FCurrentRecord := -1;
+  FRecordBufferSize := 0;
+  FRecordSize := 0;
+
+  SetState(vState);
+end;
+
 procedure TRESTDWMemTable.SaveToStream(AStream: TStream);
 var
   stor : TRESTDWStorageBin;
@@ -813,7 +832,7 @@ end;
 function TRESTDWMemTable.GetRecordCount: Longint;
 begin
   CheckActive;
-  Result := InternalRecordCount;
+  Result := InternalRecordCount
 end;
 
 function TRESTDWMemTable.GetRecordObj(idx: integer): TRESTDWRecord;
@@ -878,6 +897,7 @@ begin
       //Filtering
       if (Filtered) and (not ControlsDisabled) then
         vAccepted := FilterRecord(Buffer);
+
       if (GetMode = gmCurrent) and not vAccepted then
         Result:=grError;
     end;
@@ -920,6 +940,7 @@ end;
 
 procedure TRESTDWMemTable.InternalInitRecord(Buffer: TRESTDWBuffer);
 begin
+  CheckActive;
   FillChar(Buffer^, FRecordBufferSize, 0);
 end;
 
