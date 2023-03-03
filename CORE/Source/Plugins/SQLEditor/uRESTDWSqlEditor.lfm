@@ -268,8 +268,8 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Anchors = [akTop, akRight]
       Caption = 'Ok'
       Default = True
-      TabOrder = 0
       OnClick = BtnOkClick
+      TabOrder = 0
     end
     object BtnCancelar: TButton
       Left = 986
