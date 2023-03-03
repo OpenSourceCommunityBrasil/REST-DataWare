@@ -1,10 +1,10 @@
 object FrmDWSqlEditor: TFrmDWSqlEditor
   Left = 479
   Top = 236
+  Width = 1079
+  Height = 756
   BorderWidth = 5
   Caption = 'RESTDWClientSQL Editor'
-  ClientHeight = 707
-  ClientWidth = 1053
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

@@ -1,5 +1,7 @@
 ﻿unit uRESTDWMemoryDataset;
 
+{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
+
 {
   REST Dataware .
   Criado por XyberX (Gilberto Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -27,15 +29,11 @@ interface
 uses
   {$IFNDEF FPC} SqlTimSt, {$ENDIF}
   SysUtils, Classes, Db, FmtBCD, uRESTDWExprParser, uRESTDWAbout,
-  uRESTDWConsts;
+  uRESTDWConsts, uRESTDWPrototypes, uRESTDWTools;
 
 const
-  ftBlobTypes = [ftBlob, ftMemo, ftBytes, ftVarBytes, ftFmtMemo, ftOraBlob,
-                 ftOraClob
-                 {$IF (Defined(FPC)) or (CompilerVersion >= 21)}
-                  , ftWideMemo
-                 {$IFEND}
-                ];
+  ftBlobTypes = [dwftBlob, dwftMemo, dwftBytes, dwftVarBytes, dwftFmtMemo,
+                 dwftOraBlob, dwftOraClob, dwftWideMemo];
 
 type
   ERESTDWDataSetError = class (Exception);
@@ -339,7 +337,12 @@ begin
 end;
 
 procedure TRESTDWMemTable.InternalClose;
+var
+  vState : TDataSetState;
 begin
+  vState := Self.State;
+  SetState(dsInactive);
+
   clearBlobs;
   clearRecords;
   // disconnet field objects
@@ -352,6 +355,8 @@ begin
   SetLength(FFieldOffsets,0);
   FRecordBufferSize := 0;
   FRecordSize := 0;
+
+  SetState(vState);
 
   // close the file
   FIsTableOpen := False;
@@ -469,13 +474,20 @@ var
   I : integer;
   J : integer;
 
+  vDWDataType : Byte;
+
   vCurrency : Currency;
+  vDouble : Double;
+  vByte : Byte;
   vFmtBCD : tBCD;
   {$IFDEF FPC}
     vTimeStamp : TTimeStamp;
   {$ELSE}
     vTimeStamp : TSQLTimeStamp;
   {$ENDIF}
+  {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+    vTimeStampOffSet : TSQLTimeStampOffSet;
+  {$IFEND}
 begin
   I:= Field.FieldNo - 1;
   Result := GetActiveBuffer(SrcBuffer);
@@ -490,10 +502,43 @@ begin
     Result := vNull;
     if Result and Assigned(Buffer) then begin
       J := FFieldSize[I];
-      if Field.DataType = ftFMTBcd then begin
+
+      vDWDataType := FieldTypeToDWFieldType(Field.DataType);
+
+      if vDWDataType = dwftFMTBcd then begin
         Move(SrcBuffer^,vCurrency,J);
         vFmtBCD := DoubleToBCD(vCurrency);
         Move(vFmtBCD,Buffer^,J);
+      end
+      else if vDWDataType = dwftTimeStamp then begin
+        Move(SrcBuffer^,vDouble,SizeOf(vDouble));
+        {$IFDEF FPC}
+          vTimeStamp := DateTimeToTimeStamp(vDouble);
+        {$ELSE}
+          vTimeStamp := DateTimeToSQLTimeStamp(vDouble);
+        {$ENDIF}
+        Move(vTimeStamp,Buffer^,SizeOf(vTimeStamp));
+      end
+      else if vDWDataType = dwftTimeStampOffset then begin
+        {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+          Move(SrcBuffer^,vDouble,SizeOf(vDouble));
+          Inc(SrcBuffer,SizeOf(vDouble));
+
+          vTimeStampOffSet := DateTimeToSQLTimeStampOffset(vDouble);
+
+          Move(SrcBuffer^,vByte,SizeOf(vByte));
+          Inc(SrcBuffer,SizeOf(vByte));
+
+          vTimeStampOffSet.TimeZoneHour := vByte - 12;
+
+          Move(SrcBuffer^,vByte,SizeOf(vByte));
+          Inc(SrcBuffer,SizeOf(vByte));
+
+          vTimeStampOffSet.TimeZoneMinute := vByte;
+          Dec(SrcBuffer,J);
+
+          Move(vTimeStampOffSet,Buffer^,SizeOf(vTimeStampOffSet));
+        {$IFEND}
       end
       else begin
         Move(SrcBuffer^,Buffer^,J);
@@ -549,14 +594,20 @@ var
   vNull : boolean;
   I,J: integer;
 
+  vDWDataType : Byte;
+
   vCurrency : Currency;
   vDouble : Double;
+  vByte : Byte;
   vFmtBCD : tBCD;
   {$IFDEF FPC}
     vTimeStamp : TTimeStamp;
   {$ELSE}
     vTimeStamp : TSQLTimeStamp;
   {$ENDIF}
+  {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+    vTimeStampOffSet : TSQLTimeStampOffSet;
+  {$IFEND}
 begin
   I:= Field.FieldNo - 1;
   if not GetActiveBuffer(DestBuffer) then
@@ -571,12 +622,15 @@ begin
     Inc(DestBuffer);
     if Buffer <> nil then begin
       J := FFieldSize[I];
-      if Field.DataType = ftFMTBcd then begin
+
+      vDWDataType := FieldTypeToDWFieldType(Field.DataType);
+
+      if vDWDataType = dwftFMTBcd then begin
         Move(Buffer^,vFmtBCD,SizeOf(tBCD));
         vCurrency := BCDToDouble(vFmtBCD);
         Move(vCurrency,DestBuffer^,J);
       end
-      else if Field.DataType = ftTimeStamp then begin
+      else if vDWDataType = dwftTimeStamp then begin
         Move(Buffer^,vTimeStamp,SizeOf(vTimeStamp));
         {$IFDEF FPC}
           vDouble := TimeStampToDateTime(vTimeStamp);
@@ -584,6 +638,23 @@ begin
           vDouble := SQLTimeStampToDateTime(vTimeStamp);
         {$ENDIF}
         Move(vDouble,DestBuffer^,J);
+      end
+      else if vDWDataType = dwftTimeStampOffset then begin
+        {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+          Move(Buffer^,vTimeStampOffSet,SizeOf(vTimeStamp));
+          vDouble := SQLTimeStampOffsetToDateTime(vTimeStampOffSet);
+          Move(vDouble,DestBuffer^,SizeOf(vDouble));
+          Inc(DestBuffer,SizeOf(vDouble));
+
+          vByte := vTimeStampOffSet.TimeZoneHour + 12;
+          Move(vByte,DestBuffer^,SizeOf(vByte));
+          Inc(DestBuffer,SizeOf(vByte));
+
+          vByte := vTimeStampOffSet.TimeZoneMinute;
+          Move(vByte,DestBuffer^,SizeOf(vByte));
+          Inc(DestBuffer,SizeOf(vByte));
+          Dec(DestBuffer,J);
+        {$IFEND}
       end
       else begin
         Move(Buffer^,DestBuffer^,J);
@@ -690,11 +761,16 @@ begin
 end;
 
 procedure TRESTDWMemTable.GetBookmarkData(Buffer: TRESTDWBuffer; Data: Pointer);
+{$IF (DEFINED(FPC)) or (CompilerVersion < 21)}
+  var
+    vBook : integer;
+{$IFEND}
 begin
   {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
     GetBookmarkData(Buffer,TBookmark(Data));
   {$ELSE}
-
+    vBook := PRESTDWRecInfo(Buffer + FRecordSize)^.Bookmark;
+    Move(vBook,Data^,SizeOf(vBook)); // FPC/D7
   {$IFEND}
 end;
 
@@ -848,52 +924,59 @@ begin
 end;
 
 function TRESTDWMemTable.calcFieldSize(ft: TFieldType; fs: integer): integer;
+var
+  vDWFieldType : Byte;
 begin
 //    ficaram fora
 //    ftGraphic, ftParadoxOle, ftDBaseOle, ftTypedBinary, ftCursor,
 //    ftADT, ftArray, ftReference, ftDataSet,ftVariant, ftInterface,
 //    ftIDispatch
 
+  vDWFieldType := FieldTypeToDWFieldType(ft);
   Result := 0;
-  case ft of
-    ftString,
-    ftFixedChar : Inc(Result, fs + 1);
+  case vDWFieldType of
+    dwftString,
+    dwftFixedChar : Inc(Result, fs + 1);
 
-    {$IF (Defined(FPC)) or (CompilerVersion >= 21)}
-    ftFixedWideChar,
-    {$IFEND}
-    ftWideString  : Inc(Result, (fs  + 1) * SizeOf(WideChar));
+    dwftFixedWideChar,
+    dwftWideString  : Inc(Result, (fs  + 1) * SizeOf(WideChar));
 
-    ftGuid        : Inc(Result,37); // string 36 + 1;
+    dwftGuid        : Inc(Result,37); // string 36 + 1;
 
-    ftBoolean,
-    ftSmallInt,
-    ftWord      : Inc(Result, 2);
+    dwftBoolean,
+    dwftSmallInt,
+    dwftWord      : Inc(Result, 2);
 
-    ftInteger   : Inc(Result,SizeOf(Integer));
+    dwftSingle    : Inc(Result,SizeOf(Single));
+    dwftInteger   : Inc(Result,SizeOf(Integer));
 
-    ftDate,
-    ftTime,
-    ftDateTime,
-    ftTimeStamp : Inc(Result, SizeOf(TDateTime));
+    dwftDate,
+    dwftTime,
+    dwftDateTime,
+    dwftTimeStamp : Inc(Result, SizeOf(TDateTime));
 
-    ftFloat,
-    ftLargeint,
-    ftBCD,
-    ftFMTBcd,
-    ftAutoInc,
-    ftCurrency  : Inc(Result, 8);
+    dwftTimeStampOffset : begin
+      Inc(Result,SizeOf(Double));
+      Inc(Result,SizeOf(Byte));
+      Inc(Result,SizeOf(Byte));
+    end;
 
-    {$IF (Defined(FPC)) or (CompilerVersion >= 21)}
-    ftWideMemo,
-    {$IFEND}
-    ftBlob,
-    ftMemo,
-    ftBytes,
-    ftVarBytes,
-    ftFmtMemo,
-    ftOraBlob,
-    ftOraClob  : Inc(Result,SizeOf(Pointer)); //TRESTDWBlobField
+    dwftFloat,
+    dwftExtended,
+    dwftLargeint,
+    dwftBCD,
+    dwftFMTBcd,
+    dwftAutoInc,
+    dwftCurrency  : Inc(Result, 8);
+
+    dwftWideMemo,
+    dwftBlob,
+    dwftMemo,
+    dwftBytes,
+    dwftVarBytes,
+    dwftFmtMemo,
+    dwftOraBlob,
+    dwftOraClob  : Inc(Result,SizeOf(Pointer));
   else
     raise ERESTDWDataSetError.Create (
       'InitFieldsDefs: Unsupported field type');
@@ -1145,13 +1228,15 @@ var
   vField : TField;
   vBuf : TRESTDWBuffer;
   vBoolean : boolean;
+  vDWFieldType : Byte;
 begin
-  if FDataset.ComponentState = [csDestroying] then
+  if FDataset.State = dsInactive then
     Exit;
 
   i := 0;
   while i < FDataset.Fields.Count do begin
-    if FDataset.Fields[i].DataType in ftBlobTypes then begin
+    vDWFieldType := FieldTypeToDWFieldType(FDataset.Fields[i].DataType);
+    if vDWFieldType in ftBlobTypes then begin
       vBuf := TRESTDWBuffer(FBuffer);
       p := FDataset.GetFieldOffsets(i);
       Inc(vBuf,p);

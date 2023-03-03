@@ -382,7 +382,7 @@ Begin
  if Assigned(RESTDWClientSQL) then begin
    vOldSQL                   := RESTDWClientSQL.SQL.Text;
    Memo.Lines.Text           := vOldSQL;
- end;                                   
+ end;
 End;
 
 Procedure TFrmDWSqlEditor.SetDatabase(Value : TRESTDWDatabasebaseBase);
@@ -556,7 +556,7 @@ begin
   {$IFDEF FPC}
     inherited Create(False);
   {$ELSE}
-    inherited;
+    inherited Create(False);
   {$ENDIF}
 end;
 
@@ -571,7 +571,11 @@ end;
 procedure TThrBancoDados.Execute;
 begin
   while not Terminated do begin
-    FEvent.WaitFor(INFINITE);
+    {$IF (NOT DEFINED(FPC)) AND (CompilerVersion < 21)}
+      FEvent.WaitFor(DWORD($FFFFFFFF));// INFINITE
+    {$ELSE}
+      FEvent.WaitFor(INFINITE);
+    {$IFEND}
 
     if FMustDie then begin
       Terminate;
