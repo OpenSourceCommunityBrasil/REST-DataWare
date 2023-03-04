@@ -156,7 +156,8 @@ type
 
     // record data
     FRecordSize, // the size of the actual data
-    FRecordBufferSize : integer; // data + housekeeping (TRecInfo)
+    FRecordBufferSize, // data + housekeeping (TRecInfo)
+    FPosDelta : integer;
 
     FCurrentRecord, // current record (0 to FRecordCount - 1)
     BofCrack, // before the first record (crack)
@@ -168,7 +169,6 @@ type
     FFilterBuffer: TRESTDWBuffer;
     FControlsDisabled : boolean; // filtro
     FFilterParser : TExprParser;
-    FStatusName : string;
 
     // create, close, and so on
     procedure InternalOpen; override;
@@ -314,14 +314,10 @@ type
     property OnPostError;
   end;
 
-
 implementation
 
 uses
   uRESTDWStorageBin;
-
-const
-  STATUSNAME = 'R35TD4T4W4R3';
 
 procedure TRESTDWMemTable.InternalOpen;
 begin
@@ -348,6 +344,8 @@ begin
   BofCrack := -1;
   EofCrack := InternalRecordCount;
   FCurrentRecord := BofCrack;
+  FPosDelta := FRecordSize;
+  FRecordSize := FRecordSize + SizeOf(Byte);
   FRecordBufferSize := FRecordSize + SizeOf(Pointer);
   BookmarkSize := SizeOf(Integer);
 
@@ -364,6 +362,8 @@ begin
   // destroy field object (if not persistent)
   if DefaultFields then
     DestroyFields;
+
+  FieldDefs.Clear;
   // close the file
   FIsTableOpen := False;
 end;
@@ -486,10 +486,10 @@ var
   vDouble : Double;
   vByte : Byte;
   vFmtBCD : tBCD;
-  {$IFDEF FPC}
-    vTimeStamp : TTimeStamp;
-  {$ELSE}
-    vTimeStamp : TSQLTimeStamp;
+  vTimeStamp : TTimeStamp;
+  vDateTimeRec : TDateTimeRec;
+  {$IFNDEF FPC}
+    vSQLTimeStamp : TSQLTimeStamp;
   {$ENDIF}
   {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
     vTimeStampOffSet : TSQLTimeStampOffSet;
@@ -520,10 +520,22 @@ begin
         Move(SrcBuffer^,vDouble,SizeOf(vDouble));
         {$IFDEF FPC}
           vTimeStamp := DateTimeToTimeStamp(vDouble);
+          Move(vTimeStamp,Buffer^,SizeOf(vTimeStamp));
         {$ELSE}
-          vTimeStamp := DateTimeToSQLTimeStamp(vDouble);
+          vSQLTimeStamp := DateTimeToSQLTimeStamp(vDouble);
+          Move(vSQLTimeStamp,Buffer^,SizeOf(vSQLTimeStamp));
         {$ENDIF}
-        Move(vTimeStamp,Buffer^,SizeOf(vTimeStamp));
+      end
+      else if vDWDataType in [dwftDate, dwftTime, dwftDateTime] then begin
+        Move(SrcBuffer^,vDouble,SizeOf(vDouble));
+        vTimeStamp := DateTimeToTimeStamp(vDouble);
+        case vDWDataType of
+          dwftDate: vDateTimeRec.Date := vTimeStamp.Date;
+          dwftTime: vDateTimeRec.Time := vTimeStamp.Time;
+        else
+          vDateTimeRec.DateTime := TimeStampToMSecs(vTimeStamp);
+        end;
+        Move(vDateTimeRec,Buffer^,SizeOf(vDateTimeRec));
       end
       else if vDWDataType = dwftTimeStampOffset then begin
         {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
@@ -606,11 +618,12 @@ var
   vDouble : Double;
   vByte : Byte;
   vFmtBCD : tBCD;
-  {$IFDEF FPC}
-    vTimeStamp : TTimeStamp;
-  {$ELSE}
-    vTimeStamp : TSQLTimeStamp;
+  vDateTimeRec : TDateTimeRec;
+  vTimeStamp : TTimeStamp;
+  {$IFNDEF FPC}
+    vSQLTimeStamp : TSQLTimeStamp;
   {$ENDIF}
+
   {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
     vTimeStampOffSet : TSQLTimeStampOffSet;
   {$IFEND}
@@ -637,13 +650,38 @@ begin
         Move(vCurrency,DestBuffer^,J);
       end
       else if vDWDataType = dwftTimeStamp then begin
-        Move(Buffer^,vTimeStamp,SizeOf(vTimeStamp));
         {$IFDEF FPC}
+          Move(Buffer^,vTimeStamp,SizeOf(vTimeStamp));
           vDouble := TimeStampToDateTime(vTimeStamp);
         {$ELSE}
-          vDouble := SQLTimeStampToDateTime(vTimeStamp);
+          Move(Buffer^,vSQLTimeStamp,SizeOf(vSQLTimeStamp));
+          vDouble := SQLTimeStampToDateTime(vSQLTimeStamp);
         {$ENDIF}
         Move(vDouble,DestBuffer^,J);
+      end
+      else if vDWDataType in [dwftDate, dwftTime, dwftDateTime] then begin
+        Move(Buffer^,vDateTimeRec,SizeOf(vDateTimeRec));
+        case vDWDataType of
+          dwftDate:
+            begin
+              vTimeStamp.Time := 0;
+              vTimeStamp.Date := vDateTimeRec.Date;
+            end;
+          dwftTime:
+            begin
+              vTimeStamp.Time := vDateTimeRec.Time;
+              vTimeStamp.Date := DateDelta;
+            end;
+        else
+          try
+            vTimeStamp := MSecsToTimeStamp(vDateTimeRec.DateTime);
+          except
+            vTimeStamp.Time := 0;
+            vTimeStamp.Date := 0;
+          end;
+        end;
+        vDouble := TimeStampToDateTime(vTimeStamp);
+        Move(vDouble,DestBuffer^,SizeOf(vDouble));
       end
       else if vDWDataType = dwftTimeStampOffset then begin
         {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
@@ -824,6 +862,7 @@ begin
   FCurrentRecord := -1;
   FRecordBufferSize := 0;
   FRecordSize := 0;
+  FPosDelta := 0;
 
   SetState(vState);
 end;
@@ -1059,7 +1098,6 @@ begin
   FRecordCount := 0;
   FRecords := TList.Create;
   FBlobs := TList.Create;
-  FStatusName := STATUSNAME;
 end;
 
 function TRESTDWMemTable.CreateBlobStream(Field: TField;
@@ -1339,7 +1377,7 @@ end;
 
 procedure TRESTDWRecord.setBuffer(const Value: Pointer);
 begin
-  clearRecInfo;
+//  clearRecInfo;
   clearBlobsFields;
   Move(Value^,FBuffer^,FDataset.GetRecordSize);
 end;
