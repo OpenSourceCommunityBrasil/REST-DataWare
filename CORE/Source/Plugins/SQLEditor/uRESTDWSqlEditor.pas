@@ -572,7 +572,7 @@ procedure TThrBancoDados.Execute;
 begin
   while not Terminated do begin
     {$IF (NOT DEFINED(FPC)) AND (CompilerVersion < 21)}
-      FEvent.WaitFor(DWORD($FFFFFFFF));// INFINITE
+      FEvent.WaitFor($FFFFFFFF);// INFINITE
     {$ELSE}
       FEvent.WaitFor(INFINITE);
     {$IFEND}

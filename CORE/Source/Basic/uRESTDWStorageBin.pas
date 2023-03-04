@@ -1,4 +1,5 @@
 ﻿unit uRESTDWStorageBin;
+
 {
   REST Dataware .
   Criado por XyberX (Gilberto Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -20,10 +21,13 @@
  Roniery                    - Devel.
  Fernando Banhos            - Refactor Drivers REST Dataware.
 }
+
 interface
+
 uses
   {$IFNDEF FPC}SqlTimSt, {$ENDIF}
   Classes, SysUtils, uRESTDWMemoryDataset, FmtBcd, DB, Variants, uRESTDWConsts;
+
 type
   TRESTDWStorageBin = Class(TRESTDWStorageBase)
   private
@@ -40,10 +44,14 @@ type
     procedure SaveDatasetToStream(ADataset : TDataset; var AStream : TStream); override;
     procedure LoadDatasetFromStream(ADataset : TDataset; AStream : TStream); override;
   end;
-Implementation
+
+implementation
+
 uses
   uRESTDWProtoTypes, uRESTDWBufferBase, uRESTDWTools;
+
 { TRESTDWStorageBin }
+
 procedure TRESTDWStorageBin.LoadDatasetFromStream(ADataset: TDataset; AStream: TStream);
 var
   vFieldCount : integer;
@@ -123,8 +131,8 @@ begin
     ADataset.Post;
   end;
   ADataset.EnableControls;
-//  ADataset.
 end;
+
 procedure TRESTDWStorageBin.LoadDWMemFromStream(IDataset: IRESTDWMemTable; AStream: TStream);
 var
   ADataSet : TRESTDWMemTable;
@@ -197,12 +205,13 @@ begin
           ADataSet.Fields[i].ProviderFlags := ADataSet.Fields[i].ProviderFlags + [pfRefreshOnUpdate];
       {$ENDIF}
     end;
-  End;
+  end;
   ADataSet.DisableControls;
   LoadRecordDWMemFromStream(IDataset,AStream);
   ADataSet.EnableControls;
   ADataSet.First;
 end;
+
 procedure TRESTDWStorageBin.LoadRecordDWMemFromStream(IDataset: IRESTDWMemTable; AStream: TStream);
 var
   ADataset  : TRESTDWMemTable;
@@ -499,6 +508,7 @@ begin
     IDataset.AddNewRecord(vRec);
   end;
 end;
+
 procedure TRESTDWStorageBin.LoadRecordFromStream(ADataset: TDataset; AStream: TStream);
 var
   vField        : TField;
@@ -677,6 +687,7 @@ begin
     end;
   end;
 end;
+
 procedure TRESTDWStorageBin.SaveDatasetToStream(ADataset: TDataset; var AStream: TStream);
 var
   i : integer;
@@ -754,6 +765,7 @@ begin
   AStream.WriteBuffer(vRecordCount,SizeOf(Longint));
   AStream.Position := 0;
 end;
+
 procedure TRESTDWStorageBin.SaveDWMemToStream(IDataset: IRESTDWMemTable; var AStream: TStream);
 var
   i : integer;
@@ -820,6 +832,7 @@ begin
   AStream.WriteBuffer(vRecordCount,SizeOf(Longint));
   AStream.Position := 0;
 end;
+
 function TRESTDWStorageBin.SaveRecordDWMemToStream(IDataset: IRESTDWMemTable; var AStream: TStream) : Longint;
 var
   ADataSet      : TRESTDWMemTable;
@@ -975,6 +988,7 @@ Begin
   end;
   Result := Result + 1;
 end;
+
 procedure TRESTDWStorageBin.SaveRecordToStream(ADataset: TDataset; var AStream: TStream);
 var
   i: integer;
@@ -1127,4 +1141,5 @@ Begin
     end;
   end;
 end;
+
 end.
