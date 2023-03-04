@@ -674,7 +674,11 @@ begin
             end;
         else
           try
-            vTimeStamp := MSecsToTimeStamp(vDateTimeRec.DateTime);
+            {$IFDEF FPC}
+              vTimeStamp := MSecsToTimeStamp(Comp(vDateTimeRec.DateTime));
+            {$ELSE}
+              vTimeStamp := MSecsToTimeStamp(vDateTimeRec.DateTime);
+            {$ENDIF}
           except
             vTimeStamp.Time := 0;
             vTimeStamp.Date := 0;
