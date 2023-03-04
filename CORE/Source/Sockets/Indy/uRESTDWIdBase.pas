@@ -35,14 +35,6 @@ Uses
     {$ELSE}
       SyncObjs,
     {$IFEND}
-  {$IF Defined(RESTDWFMX) AND Not(Defined(RESTDWAndroidService))} FMX.Forms, {$IFEND}
-    {$IFNDEF RESTDWFMX}
-      {$IF (CompilerVersion > 22)}
-        VCL.Forms,
-      {$ELSE}
-        Forms,
-      {$IFEND}
-    {$ENDIF}
   {$ENDIF}
   SysUtils, Classes, Db, Variants,
   uRESTDWBasic, uRESTDWBasicDB, uRESTDWComponentEvents, uRESTDWBasicTypes,
@@ -715,9 +707,12 @@ Begin
      Begin
       Result := E.ErrorCode;
       If E.ErrorMessage <> '' Then
-       Raise Exception.Create(E.ErrorMessage)
+       temp := TStringStream.Create(E.ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF})
       Else
-       Raise Exception.Create(E.Message);
+       temp := TStringStream.Create(E.Message{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+      if Assigned(CustomBody) then
+        CustomBody.CopyFrom(temp, temp.Size);
+      temp.Free;
      End;
    End;
   On E: EIdSocketError do
@@ -1268,7 +1263,10 @@ Begin
        temp := TStringStream.Create(E.ErrorMessage{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF})
       Else
        temp := TStringStream.Create(E.Message{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
-      AResponse.CopyFrom(temp, temp.Size);
+      if Assigned(AResponse) then
+        AResponse.CopyFrom(temp, temp.Size)
+      else
+        AResponseText := TStringStream(temp).DataString;
       temp.Free;
      End;
    End;

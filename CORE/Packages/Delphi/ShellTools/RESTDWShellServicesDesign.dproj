@@ -168,6 +168,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="RESTDWShellServicesDesign.dcr"/>
+        <DCCReference Include="dcldb.dcp"/>
         <DCCReference Include="RESTDWShellServices.dcp"/>
         <DCCReference Include="..\..\..\Source\ShellTools\uRESTDWShellServicesRegDelphi.pas"/>
         <BuildConfiguration Include="Base">
