@@ -161,6 +161,7 @@ type
 
     // status
     FIsTableOpen: Boolean;
+    FBlockEvents : Boolean;
 
     // record data
     FRecordSize, // the size of the actual data
@@ -180,6 +181,7 @@ type
     FIndexFieldNames : string;
     FCurrentRecordObj : TRESTDWRecord;
     FFilterRecordCount : LongInt;
+    FStorageDataType : TRESTDWStorageBase;
 
     // create, close, and so on
     procedure InternalOpen; override;
@@ -213,6 +215,7 @@ type
     // filter
     function FilterRecord(Buffer : TRESTDWBuffer): Boolean;
     procedure SetFiltered(Value: Boolean); override;
+
     {$IFDEF FPC}
       procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
     {$ELSE}
@@ -302,6 +305,9 @@ type
     procedure SaveToFile(AFileName : string); virtual;
 
     procedure EmptyTable; virtual;
+    procedure RefreshStates; virtual;
+
+    property StorageDataType: TRESTDWStorageBase read FStorageDataType write FStorageDataType;
   published
     // redeclared data set properties
     property Active;
@@ -377,7 +383,11 @@ begin
 end;
 
 procedure TRESTDWMemTable.InternalClose;
+var
+  vBlock : Boolean;
 begin
+  vBlock := FBlockEvents;
+  
   EmptyTable;
 
   // disconnet field objects
@@ -386,8 +396,8 @@ begin
   if DefaultFields then
     DestroyFields;
 
-  FieldDefs.Clear;
   // close the file
+  FBlockEvents := vBlock; 
   FIsTableOpen := False;
 end;
 
@@ -420,18 +430,29 @@ end;
 
 procedure TRESTDWMemTable.LoadFromStream(AStream: TStream);
 var
-  stor : TRESTDWStorageBin;
-  SaveState: TDatasetState;
+  vStor : TRESTDWStorageBase;
+  vFiltered : Boolean;
 begin
-  SaveState := SetTempState(dsInactive);
-  stor := TRESTDWStorageBin.Create(nil);
+  Close;
+  vFiltered := Filtered;
+  Filtered := False;
+  
+  FBlockEvents := True;
+
+  if Assigned(FStorageDataType) then
+    vStor := FStorageDataType
+  else
+    vStor := TRESTDWStorageBin.Create(nil);
+
   try
-    stor.LoadFromStream(Self,AStream);
-    RestoreState(SaveState);
+    vStor.LoadFromStream(Self,AStream);
   finally
-    SetState(dsBrowse);
-    stor.Free;
+    if not Assigned(FStorageDataType) then
+      vStor.Free;
   end;
+
+  Filtered := vFiltered;
+  RefreshStates;
 end;
 
 function TRESTDWMemTable.ParserGetVariableValue(Sender: TObject;
@@ -493,6 +514,16 @@ begin
       vRec.Accept := 2;
     FreeMem(vBuffer);
     i := i + 1;
+  end;
+end;
+
+procedure TRESTDWMemTable.RefreshStates;
+begin
+  try
+    SetState(dsInactive);
+    FBlockEvents := False;
+  finally
+    SetState(dsBrowse);
   end;
 end;
 
@@ -812,12 +843,17 @@ begin
   if Active then begin
     CheckBrowseMode;
 
+    DataEvent(deDisabledStateChange,0);
+
     if Value then
       RecalcFilters;
 
-    if Filtered <> Value then
+    if Value <> Filtered then
       inherited SetFiltered(Value);
+
     First;
+    if (not FBlockEvents) then
+      RefreshStates
   end
   else begin
     inherited SetFiltered(Value);
@@ -1118,29 +1154,38 @@ end;
 
 procedure TRESTDWMemTable.InternalInitFieldDefs;
 var
-  i : integer;
+  i, k : integer;
+  vField : TField;
 begin
-  FRecordSize := 0;
-  if Fields.Count > 0 then begin
-    SetLength(FFieldOffsets,Fields.Count);
-    SetLength(FFieldSize,Fields.Count);
-    for i := 0 to Fields.Count-1 do begin
-      FFieldOffsets[i] := FRecordSize;
-      FRecordSize := FRecordSize + SizeOf(Boolean); // null
-      FFieldSize[i] := calcFieldSize(Fields[i].DataType,Fields[i].Size);
-      FRecordSize := FRecordSize + FFieldSize[i];
-    end;
-  end
-  else begin
-    SetLength(FFieldOffsets,FieldDefs.Count);
-    SetLength(FFieldSize,FieldDefs.Count);
-    for i := 0 to FieldDefs.Count-1 do begin
-      FFieldOffsets[i] := FRecordSize;
-      FRecordSize := FRecordSize + SizeOf(Boolean); // null
-      FFieldSize[i] := calcFieldSize(FieldDefs[i].DataType,FieldDefs[i].Size);
-      FRecordSize := FRecordSize + FFieldSize[i];
+  for i := 0 to FieldDefs.Count-1 do begin
+    vField := FindField(FieldDefs[i].Name);
+    if vField <> nil then begin
+      Fields.Remove(vField);
+      vField.Free;
     end;
   end;
+
+  SetLength(FFieldOffsets,FieldDefs.Count+Fields.Count);
+  SetLength(FFieldSize,FieldDefs.Count+Fields.Count);
+
+  FRecordSize := 0;
+  for i := 0 to Fields.Count-1 do begin
+    FFieldOffsets[i] := FRecordSize;
+    FRecordSize := FRecordSize + SizeOf(Boolean); // null
+    FFieldSize[i] := calcFieldSize(Fields[i].DataType,Fields[i].Size);
+    FRecordSize := FRecordSize + FFieldSize[i];
+  end;
+
+  k := Fields.Count;
+  for i := 0 to FieldDefs.Count-1 do begin
+    FFieldOffsets[k] := FRecordSize;
+    FRecordSize := FRecordSize + SizeOf(Boolean); // null
+    FFieldSize[k] := calcFieldSize(FieldDefs[i].DataType,FieldDefs[i].Size);
+    FRecordSize := FRecordSize + FFieldSize[k];
+
+    k := k + 1;
+  end;
+
   {$IFNDEF FPC}
     inherited;
   {$ENDIF}
@@ -1276,10 +1321,10 @@ end;
 {$ENDIF}
 var
   vControl : boolean;
-  SaveState: TDatasetState;
-  vBool : boolean;
 begin
-  vBool := False;
+  if FBlockEvents then
+    Exit;
+
   // ideia implementada com intuito de nao filtrar nada
   // enquanto nao estiver inserindo com DisableControls
   // e assim q dat EnableControls ativar o Filtro
@@ -1294,8 +1339,7 @@ begin
         RecalcFilters;
         First;
       end;
-      SetState(dsInactive);
-      SetState(dsBrowse);
+      RefreshStates; 
     end;
   end;
 
