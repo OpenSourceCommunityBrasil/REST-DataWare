@@ -29,7 +29,7 @@ interface
 
 uses
   {$IFNDEF FPC} SqlTimSt, {$ENDIF}
-  SysUtils, Classes, Db, FmtBCD, uRESTDWExprParser, uRESTDWAbout,
+  SysUtils, Classes, Db, FmtBCD, Variants, uRESTDWExprParser, uRESTDWAbout,
   uRESTDWConsts, uRESTDWPrototypes, uRESTDWTools;
 
 const
@@ -169,8 +169,8 @@ type
     FPosDelta : integer;
 
     FCurrentRecord, // current record (0 to FRecordCount - 1)
-    BofCrack, // before the first record (crack)
-    EofCrack: Longint; // after the last record (crack)
+    FBofCrack, // before the first record (crack)
+    FEofCrack: Longint; // after the last record (crack)
     FRecordCount : Longint;
     FFieldOffsets : array of integer;
     FFieldSize : array of integer;
@@ -182,6 +182,8 @@ type
     FCurrentRecordObj : TRESTDWRecord;
     FFilterRecordCount : LongInt;
     FStorageDataType : TRESTDWStorageBase;
+    FCaseInsensitiveSort: Boolean;
+    FIndexList : TStringList;
 
     // create, close, and so on
     procedure InternalOpen; override;
@@ -252,6 +254,7 @@ type
     procedure InternalAddRecord(Buffer: Pointer; AAppend: Boolean); override;
 
     procedure InternalPost; override;
+    procedure DoAfterPost; override;
 
     // fields
     {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
@@ -269,6 +272,9 @@ type
     procedure Sort;
     procedure QuickSort(L, R: Integer; Compare: TRESTDWCompareRecords);
     function CompareRecords(Item1, Item2: TRESTDWRecord): Integer; virtual;
+    procedure CreateIndexList(const FieldNames: string);
+    procedure FreeIndexList;
+    function FindFieldValue(Item: TRESTDWRecord; Field: TField): Variant;
 
     // IRESTDWMenTable - interface
     function GetDataset: TDataset;
@@ -306,6 +312,8 @@ type
 
     procedure EmptyTable; virtual;
     procedure RefreshStates; virtual;
+
+    procedure SortOnFields(const FieldNames: string = ''; CaseInsensitive: Boolean = True);
 
     property StorageDataType: TRESTDWStorageBase read FStorageDataType write FStorageDataType;
   published
@@ -370,9 +378,9 @@ begin
   InternalAfterOpen; // custom method for subclasses
 
   // sets cracks and record position and size
-  BofCrack := -1;
-  EofCrack := InternalRecordCount;
-  FCurrentRecord := BofCrack;
+  FBofCrack := -1;
+  FEofCrack := InternalRecordCount;
+  FCurrentRecord := FBofCrack;
   FPosDelta := FRecordSize;
   FRecordSize := FRecordSize + SizeOf(Byte);
   FRecordBufferSize := FRecordSize + SizeOf(Pointer);
@@ -451,6 +459,9 @@ begin
       vStor.Free;
   end;
 
+  if FIndexFieldNames <> '' then
+    SortOnFields(FIndexFieldNames,FCaseInsensitiveSort);
+
   Filtered := vFiltered;
   RefreshStates;
 end;
@@ -485,7 +496,8 @@ begin
       while Compare(GetRecordObj(J), P) > 0 do
         Dec(J);
       if I <= J then begin
-        FRecords.Exchange(I, J);
+        if I < J then
+          FRecords.Exchange(I, J);
         Inc(I);
         Dec(J);
       end;
@@ -544,12 +556,75 @@ begin
   inherited CreateFields;
 end;
 
+procedure TRESTDWMemTable.CreateIndexList(const FieldNames: string);
+var
+  vPos, vPosFinal : Integer;
+  vField : TField;
+  vFieldName : string;
+  vOrder : string;
+  bField : boolean;
+
+  procedure addFieldList;
+  begin
+    if vFieldName = '' then
+      Exit;
+
+    vOrder := LowerCase(vOrder);
+    if vOrder = '' then
+      vOrder := 'asc';
+
+    if (not SameText(vOrder,'asc')) or
+       (not SameText(vOrder,'desc')) then
+      vOrder := 'asc';
+
+    vField := FindField(vFieldName);
+    if vField <> nil then
+      FIndexList.AddObject(vOrder,vField);
+
+    vFieldName := '';
+    vOrder := '';
+    bField := True;
+  end;
+begin
+  if FIndexList = nil then
+    FIndexList := TStringList.Create
+  else
+    FIndexList.Clear;
+
+  {$IF (NOT DEFINED(FPC)) AND (CompilerVersion > 24)}
+    vPosFinal := High(FieldNames);
+  {$ELSE}
+    vPosFinal := Length(FieldNames);
+  {$IFEND}
+
+  vFieldName := '';
+  vOrder := '';
+  bField := True;
+  vPos := InitStrPos;
+  while vPos <= vPosFinal do begin
+    if FieldNames[vPos] in [';',','] then begin
+      addFieldList;
+    end
+    else if FieldNames[vPos] = '|' then begin
+      bField := False;
+    end
+    else begin
+      if bField then
+        vFieldName := vFieldName + FieldNames[vPos]
+      else
+        vOrder := vOrder + FieldNames[vPos];
+    end;
+    vPos := vPos + 1;
+  end;
+  addFieldList;
+end;
+
 procedure TRESTDWMemTable.InternalGotoBookmark (ABookmark: Pointer);
 var
   ReqBookmark: Integer;
 begin
   ReqBookmark := Integer(ABookmark^);
-  if (ReqBookmark >= BofCrack) and (ReqBookmark <= InternalRecordCount) then
+  if (ReqBookmark >= FBofCrack) and (ReqBookmark <= InternalRecordCount) then
     FCurrentRecord := ReqBookmark
   else
     raise ERESTDWDataSetError.Create ('Bookmark ' + IntToStr (ReqBookmark) + ' not found');
@@ -843,8 +918,6 @@ begin
   if Active then begin
     CheckBrowseMode;
 
-    DataEvent(deDisabledStateChange,0);
-
     if Value then
       RecalcFilters;
 
@@ -899,24 +972,24 @@ begin
     Exit;
 
   FIndexFieldNames := Value;
+  SortOnFields(FIndexFieldNames,FCaseInsensitiveSort);
 end;
 
 procedure TRESTDWMemTable.InternalFirst;
 begin
-  FCurrentRecord := BofCrack;
+  FCurrentRecord := FBofCrack;
 end;
 
 procedure TRESTDWMemTable.InternalLast;
 begin
-  EofCrack := InternalRecordCount;
-  FCurrentRecord := EofCrack;
+  FEofCrack := InternalRecordCount;
+  FCurrentRecord := FEofCrack;
 end;
 
 procedure TRESTDWMemTable.InternalLoadCurrentRecord(Buffer: TRESTDWBuffer);
 begin
   FCurrentRecordObj := TRESTDWRecord(FRecords.Items[FCurrentRecord]);
   FCurrentRecordObj.CopyBuffer(Pointer(Buffer));
-//  Move(FCurrentRecordObj.FBuffer^,Buffer^,FRecordBufferSize);
   with PRESTDWRecInfo(Buffer + FRecordSize)^ do begin
     BookmarkFlag := bfCurrent;
     Bookmark := FCurrentRecord;
@@ -1075,10 +1148,10 @@ end;
 
 procedure TRESTDWMemTable.Sort;
 var
-  Pos: TBookmark;
+  vPos: TBookmark;
 begin
   if Active and (FRecords <> nil) and (FRecords.Count > 0) then begin
-    Pos := Bookmark;
+    vPos := Bookmark;
     try
       {$IFDEF FPC}
       QuickSort(0, FRecords.Count - 1, @CompareRecords);
@@ -1086,7 +1159,6 @@ begin
       QuickSort(0, FRecords.Count - 1, CompareRecords);
       {$ENDIF}
       SetBufListSize(0);
-//      InitBufferPointers(False);
       try
         SetBufListSize(BufferCount + 1);
       except
@@ -1095,9 +1167,32 @@ begin
         raise;
       end;
     finally
-      Bookmark := Pos;
+      Bookmark := vPos;
     end;
-    Resync([]);
+//    Resync([]);
+  end;
+end;
+
+procedure TRESTDWMemTable.SortOnFields(const FieldNames: string;
+  CaseInsensitive : Boolean);
+begin
+  if not Active then
+    Exit;
+
+  CheckBrowseMode;
+  if FieldNames <> '' then
+    CreateIndexList(FieldNames)
+  else if FIndexFieldNames <> '' then
+    CreateIndexList(FIndexFieldNames)
+  else
+    Exit;
+
+  FCaseInsensitiveSort := CaseInsensitive;
+
+  try
+    Sort;
+  except
+    raise;
   end;
 end;
 
@@ -1291,8 +1386,36 @@ begin
 end;
 
 function TRESTDWMemTable.CompareRecords(Item1, Item2: TRESTDWRecord): Integer;
+var
+  Data1, Data2: Variant;
+  vField : TField;
+  i : Integer;
+  vDescendingSort : boolean;
 begin
+  Result := 0;
+  if FIndexList <> nil then begin
+    for i := 0 to FIndexList.Count - 1 do begin
+      vDescendingSort := SameText(FIndexList.Strings[I],'desc');
+      vField := TField(FIndexList.Objects[I]);
+      Data1 := FindFieldValue(Item1, vField);
+      Data2 := FindFieldValue(Item2, vField);
 
+      if (Data1 = null) and (Data2 <> null) then
+        Result := -1
+      else if (Data1 <> null) and (Data2 = null) then
+        Result := 1
+      else if (Data1 < Data2) then
+        Result := -1
+      else if (Data1 > Data2) then
+        Result := 1;
+
+      if vDescendingSort then
+        Result := -Result;
+
+      if Result <> 0 then
+        Exit;
+    end;
+  end;
 end;
 
 constructor TRESTDWMemTable.Create(AOwner: TComponent);
@@ -1339,7 +1462,8 @@ begin
         RecalcFilters;
         First;
       end;
-      RefreshStates; 
+      SortOnFields(FIndexFieldNames,FCaseInsensitiveSort);
+      RefreshStates;
     end;
   end;
 
@@ -1356,9 +1480,17 @@ begin
   if FFilterParser <> nil then
     FreeAndNil(FFilterParser);
 
+  FreeIndexList;
   FRecords.Free;
   FBlobs.Free;
   inherited;
+end;
+
+procedure TRESTDWMemTable.DoAfterPost;
+begin
+  inherited DoAfterPost;
+  if not ControlsDisabled then
+    SortOnFields(FIndexFieldNames,FCaseInsensitiveSort);
 end;
 
 function TRESTDWMemTable.FilterRecord(Buffer: TRESTDWBuffer): Boolean;
@@ -1388,6 +1520,107 @@ begin
   end;
 end;
 
+function TRESTDWMemTable.FindFieldValue(Item: TRESTDWRecord; Field: TField): Variant;
+var
+  vBuffer : TRESTDWBuffer;
+  vNull : Boolean;
+  vDWFieldType : Byte;
+  vValue : PByte;
+  i,j : integer;
+
+  vByte1, vByte2 : Byte;
+  vDateTime : TDatetime;
+begin
+  if Field.FieldKind = fkData then
+    i := Field.FieldNo - 1
+  else
+    i := Field.Index;
+
+  vBuffer := Item.CopyBuffer;
+  Inc(vBuffer,FFieldOffsets[i]);
+  Move(vBuffer^,vNull,Sizeof(vNull));
+  Inc(vBuffer,Sizeof(vNull));
+
+  if vNull then begin // null invertido
+    j := FFieldSize[i];
+    vDWFieldType := FieldTypeToDWFieldType(Field.DataType);
+    if vDWFieldType = dwftTimeStampOffset then begin
+      Move(vBuffer^,vDateTime,Sizeof(vDateTime));
+      Inc(vBuffer,SizeOf(Double));
+
+      Move(vBuffer^,vByte1,Sizeof(vByte1));
+      Inc(vBuffer,SizeOf(vByte1));
+
+      Move(vBuffer^,vByte2,Sizeof(vByte2));
+
+      Dec(vBuffer,SizeOf(Double));
+      Dec(vBuffer,SizeOf(Byte));
+
+      // data hora -> GMT
+      if vByte1 < 12 then begin
+        // soma
+        vDateTime := vDateTime - ((vByte1 - 12) / 24);
+        vDateTime := vDateTime + (vByte2 / 24 / 60);
+      end
+      else begin
+        // sub
+        vDateTime := vDateTime - ((vByte1 - 12) / 24);
+        vDateTime := vDateTime - (vByte2 / 24 / 60);
+      end;
+
+      Result := vDateTime;
+    end
+    else begin
+      GetMem(vValue,j);
+      FillChar(vValue^, j,0);
+      Move(vBuffer^,vValue^,j);
+
+      case vDWFieldType of
+        dwftString,
+        dwftFixedChar      : Result := PString(vValue)^;
+
+        dwftFixedWideChar,
+        dwftWideString     : Result := PWideString(vValue)^;
+
+        dwftGuid           : Result := PString(vValue)^;
+
+        dwftBoolean        : Result := PBoolean(vValue)^;
+        dwftSmallInt       : Result := PSmallInt(vValue)^;
+        dwftWord           : Result := PWord(vValue)^;
+
+        dwftSingle         : Result := PSingle(vValue)^;
+        dwftInteger        : Result := PInteger(vValue)^;
+
+        dwftDate,
+        dwftTime,
+        dwftDateTime,
+        dwftTimeStamp      : Result := TDateTime(PDouble(vValue)^);
+
+        dwftFloat          : Result := PDouble(vValue)^;
+        dwftExtended       : Result := PExtended(vValue)^;
+        dwftLargeint       : Result := PInt64(vValue)^;
+        dwftBCD            : Result := PCurrency(vValue)^;
+        dwftFMTBcd         : Result := PCurrency(vValue)^;
+        dwftAutoInc        : Result := PInt64(vValue)^;
+        dwftCurrency       : Result := PCurrency(vValue)^;
+      end;
+      FreeMem(vValue);
+    end;
+  end
+  else begin
+    Result := null;
+  end;
+
+  Dec(vBuffer,FFieldOffsets[i]+1);
+  FreeMem(vBuffer);
+end;
+
+procedure TRESTDWMemTable.FreeIndexList;
+begin
+  if Assigned(FIndexList) then
+    FreeAndNil(FIndexList);
+end;
+
 procedure TRESTDWMemTable.FreeRecordBuffer (var Buffer: TRESTDWBuffer);
 begin
   FreeMem(Buffer);
@@ -1412,14 +1645,6 @@ procedure TRESTDWMemTable.AddNewRecord(rec: TRESTDWRecord);
 begin
   FRecords.Add(rec);
   Inc(FRecordCount);
-{
-  EofCrack := FRecordCount;
-  FCurrentRecord := FRecordCount;
-
-  BofCrack := -1;
-  if FRecords.Count > 0 then
-    BofCrack := 0;
-}
 end;
 
 function TRESTDWMemTable.AllocRecordBuffer: TRESTDWBuffer;
