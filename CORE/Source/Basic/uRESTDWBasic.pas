@@ -2211,10 +2211,8 @@ Begin
                Else If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(TStringStream(ms).DataString)) > 0) Then
                 JSONParam.FromJSON(TStringStream(ms).DataString)
                Else
-                Begin
-                 JSONParam.AsString := StringReplace(StringReplace(TStringStream(ms).DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
-                 DWParams.Add(JSONParam);
-                End;
+                JSONParam.AsString := StringReplace(StringReplace(TStringStream(ms).DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
+               DWParams.Add(JSONParam);
                ms.Free;
                vDecoderHeaderList.Free;
               End;
