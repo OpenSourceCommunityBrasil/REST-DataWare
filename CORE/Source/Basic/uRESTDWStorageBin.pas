@@ -1,4 +1,5 @@
 ﻿unit uRESTDWStorageBin;
+
 {
   REST Dataware .
   Criado por XyberX (Gilberto Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -20,10 +21,13 @@
  Roniery                    - Devel.
  Fernando Banhos            - Refactor Drivers REST Dataware.
 }
+
 interface
+
 uses
   {$IFNDEF FPC}SqlTimSt, {$ENDIF}
   Classes, SysUtils, uRESTDWMemoryDataset, FmtBcd, DB, Variants, uRESTDWConsts;
+
 type
   TRESTDWStorageBin = Class(TRESTDWStorageBase)
   private
@@ -40,10 +44,14 @@ type
     procedure SaveDatasetToStream(ADataset : TDataset; var AStream : TStream); override;
     procedure LoadDatasetFromStream(ADataset : TDataset; AStream : TStream); override;
   end;
-Implementation
+
+implementation
+
 uses
   uRESTDWProtoTypes, uRESTDWBufferBase, uRESTDWTools;
+
 { TRESTDWStorageBin }
+
 procedure TRESTDWStorageBin.LoadDatasetFromStream(ADataset: TDataset; AStream: TStream);
 var
   vFieldCount : integer;
@@ -65,8 +73,10 @@ begin
   SetLength(FFieldNames, vFieldCount);
   AStream.Read(vBoolean, Sizeof(Byte));
   EncodeStrs := vBoolean;
+
   ADataset.Close;
   ADataset.FieldDefs.Clear;
+
   for i := 0 to vFieldCount-1 do begin
     AStream.Read(vInt,SizeOf(Integer));
     vFieldKind := TFieldKind(vInt);
@@ -95,6 +105,7 @@ begin
     if vFieldKind = fkInternalCalc Then
       vFieldDef.InternalCalcField := True;
   end;
+
   for i := 0 to vFieldCount-1 do begin
     if ADataset.FindField(FFieldNames[I]) <> nil then begin
       if vFieldAttrs[i] and 2 > 0 then
@@ -113,6 +124,7 @@ begin
       {$ENDIF}
     end;
   end;
+
   AStream.Read(vRecordCount,SizeOf(LongInt));
   ADataset.Open;
 
@@ -123,8 +135,8 @@ begin
     ADataset.Post;
   end;
   ADataset.EnableControls;
-//  ADataset.
 end;
+
 procedure TRESTDWStorageBin.LoadDWMemFromStream(IDataset: IRESTDWMemTable; AStream: TStream);
 var
   ADataSet : TRESTDWMemTable;
@@ -143,14 +155,17 @@ begin
   ADataSet := TRESTDWMemTable(IDataset.GetDataset);
   AStream.Position := 0;
   AStream.Read(vFieldsCount, SizeOf(vFieldsCount));
+
   SetLength(FFieldTypes, vFieldsCount);
   SetLength(vFieldAttrs, vFieldsCount);
   SetLength(FFieldNames, vFieldsCount);
+
   AStream.Read(vBoolean, Sizeof(vBoolean));
   EncodeStrs := vBoolean;
+
   ADataSet.Close;
-  if ADataSet.FieldDefs.Count > 0 Then
-    ADataSet.FieldDefs.Clear;
+  ADataSet.FieldDefs.Clear;
+
   for i := 0 to vFieldsCount-1 do begin
     AStream.Read(vInt,SizeOf(Integer));
     vFieldKind := TFieldKind(vInt);
@@ -179,7 +194,9 @@ begin
     if vFieldKind = fkInternalCalc Then
       vFieldDef.InternalCalcField := True;
   end;
+
   ADataSet.Open;
+
   for i := 0 to vFieldsCount-1 do begin
     if ADataSet.FindField(FFieldNames[i]) <> nil then begin
       if vFieldAttrs[i] and 2 > 0  Then
@@ -197,12 +214,13 @@ begin
           ADataSet.Fields[i].ProviderFlags := ADataSet.Fields[i].ProviderFlags + [pfRefreshOnUpdate];
       {$ENDIF}
     end;
-  End;
+  end;
   ADataSet.DisableControls;
   LoadRecordDWMemFromStream(IDataset,AStream);
   ADataSet.EnableControls;
   ADataSet.First;
 end;
+
 procedure TRESTDWStorageBin.LoadRecordDWMemFromStream(IDataset: IRESTDWMemTable; AStream: TStream);
 var
   ADataset  : TRESTDWMemTable;
@@ -499,6 +517,7 @@ begin
     IDataset.AddNewRecord(vRec);
   end;
 end;
+
 procedure TRESTDWStorageBin.LoadRecordFromStream(ADataset: TDataset; AStream: TStream);
 var
   vField        : TField;
@@ -677,6 +696,7 @@ begin
     end;
   end;
 end;
+
 procedure TRESTDWStorageBin.SaveDatasetToStream(ADataset: TDataset; var AStream: TStream);
 var
   i : integer;
@@ -754,6 +774,7 @@ begin
   AStream.WriteBuffer(vRecordCount,SizeOf(Longint));
   AStream.Position := 0;
 end;
+
 procedure TRESTDWStorageBin.SaveDWMemToStream(IDataset: IRESTDWMemTable; var AStream: TStream);
 var
   i : integer;
@@ -820,6 +841,7 @@ begin
   AStream.WriteBuffer(vRecordCount,SizeOf(Longint));
   AStream.Position := 0;
 end;
+
 function TRESTDWStorageBin.SaveRecordDWMemToStream(IDataset: IRESTDWMemTable; var AStream: TStream) : Longint;
 var
   ADataSet      : TRESTDWMemTable;
@@ -975,6 +997,7 @@ Begin
   end;
   Result := Result + 1;
 end;
+
 procedure TRESTDWStorageBin.SaveRecordToStream(ADataset: TDataset; var AStream: TStream);
 var
   i: integer;
@@ -1127,4 +1150,5 @@ Begin
     end;
   end;
 end;
+
 end.
