@@ -686,6 +686,7 @@ var
   vFmtBCD : tBCD;
   vTimeStamp : TTimeStamp;
   vDateTimeRec : TDateTimeRec;
+  vString : AnsiString;
   {$IFNDEF FPC}
     vSQLTimeStamp : TSQLTimeStamp;
   {$ENDIF}
@@ -756,9 +757,15 @@ begin
           Move(vTimeStampOffSet,Buffer^,SizeOf(vTimeStampOffSet));
         {$IFEND}
       end
+      else if vDWDataType = dwftWideString then begin
+        SetLength(vString,J);
+        Move(SrcBuffer^,vString[InitStrPos],J);
+        Move(vString[InitStrPos],Buffer^,J);
+      end
       else begin
         Move(SrcBuffer^,Buffer^,J);
       end;
+      Dec(SrcBuffer,FFieldOffsets[I]+1);								
     end;
   end
   // Calculated, Lookup
@@ -1948,25 +1955,32 @@ function TRESTDWBlobStream.Read(var Buffer; Count: Longint): Longint;
 var
   P : Pointer;
 begin
-  if FPosition + Count > FBlobField^.Size then
-    Count := FBlobField^.Size - FPosition;
-  {$IF (NOT DEFINED(FPC)) and (CompilerVersion < 21)}
-    P := FBlobField.Buffer;
-    Inc(PByte(P),FPosition);
-  {$ELSE}
-    P := FBlobField^.Buffer + FPosition;
-  {$IFEND}
-  Move(P^, Buffer, Count);
-  Inc(FPosition, Count);
+  if FBlobField <> nil then begin
+    if FPosition + Count > FBlobField^.Size then
+      Count := FBlobField^.Size - FPosition;
+    {$IF (NOT DEFINED(FPC)) and (CompilerVersion < 21)}
+      P := FBlobField.Buffer;
+      Inc(PByte(P),FPosition);
+    {$ELSE}
+      P := FBlobField^.Buffer + FPosition;
+    {$IFEND}
+    Move(P^, Buffer, Count);
+    Inc(FPosition, Count);
+  end
+  else begin
+    Count := 0;
+  end;
   Result := Count;
 end;
 
 function TRESTDWBlobStream.Seek(const Offset: int64; Origin: TSeekOrigin): int64;
 begin
-  Case Origin of
-    soBeginning : FPosition := Offset;
-    soEnd       : FPosition := FBlobField^.Size + Offset;
-    soCurrent   : FPosition := FPosition + Offset;
+  if FBlobField <> nil then begin
+    case Origin of
+      soBeginning : FPosition := Offset;
+      soEnd       : FPosition := FBlobField^.Size + Offset;
+      soCurrent   : FPosition := FPosition + Offset;
+    end;
   end;
   Result := FPosition;
 end;
