@@ -116,7 +116,11 @@ type
     {d5ba50cb-c81b-4648-a55c-6eb2f5d2a69b}
     function GetDataset: TDataset;
     function GetRecordObj(idx : integer) : TRESTDWRecord;
-    function GetFieldSize(idx : integer) : integer;
+
+    function GetFieldSize(idx : integer) : integer; overload;
+    function GetFieldSize(name : string) : integer; overload;
+    function GetFieldType(name : string) : TFieldType;
+
     function GetRecSize : integer;
     function GetRecordSize : word;
     procedure AddNewRecord(rec : TRESTDWRecord);
@@ -279,9 +283,11 @@ type
     // IRESTDWMenTable - interface
     function GetDataset: TDataset;
     function GetRecordObj(idx : integer) : TRESTDWRecord;
-    function GetFieldSize(idx : integer) : integer;
+    function GetFieldSize(idx : integer) : integer; overload;
     procedure AddNewRecord(rec : TRESTDWRecord);
     procedure AddBlobList(blob : PRESTDWBlobField);
+    function GetFieldSize(name : string) : integer; overload;
+    function GetFieldType(name : string) : TFieldType;
   private
     procedure setIndexFieldNames(const Value: string);
   protected
@@ -565,6 +571,8 @@ var
   bField : boolean;
 
   procedure addFieldList;
+  var
+    vDWFieldType : Byte;
   begin
     if vFieldName = '' then
       Exit;
@@ -573,13 +581,23 @@ var
     if vOrder = '' then
       vOrder := 'asc';
 
-    if (not SameText(vOrder,'asc')) or
+    if (not SameText(vOrder,'asc')) and
        (not SameText(vOrder,'desc')) then
       vOrder := 'asc';
 
     vField := FindField(vFieldName);
-    if vField <> nil then
+    if vField <> nil then begin
+      vDWFieldType := FieldTypeToDWFieldType(vField.DataType);
+      if vDWFieldType in ftBlobTypes then begin
+        raise Exception.Create('Fields blobs not accept on sort');
+        Exit;
+      end;
       FIndexList.AddObject(vOrder,vField);
+    end
+    else begin
+      raise Exception.Create('Fields '+vFieldName+' not found');
+      Exit;
+    end;
 
     vFieldName := '';
     vOrder := '';
@@ -675,7 +693,7 @@ var
     vTimeStampOffSet : TSQLTimeStampOffSet;
   {$IFEND}
 begin
-  I:= Field.FieldNo - 1;
+  I := Field.FieldNo - 1;
   Result := GetActiveBuffer(SrcBuffer);
   if not Result then
     Exit;
@@ -749,7 +767,7 @@ begin
     Inc(SrcBuffer,FFieldOffsets[I]);
     Move(SrcBuffer^,vNull,SizeOf(Boolean));
     Inc(SrcBuffer);
-    Result := not vNull;
+    Result := vNull;
     if Result and Assigned(Buffer) then begin
       J := FFieldSize[I];
       Move(SrcBuffer^,Buffer^,J);
@@ -765,6 +783,15 @@ end;
 function TRESTDWMemTable.GetFieldOffsets(idx : integer) : integer;
 begin
   Result := FFieldOffsets[idx];
+end;
+
+function TRESTDWMemTable.GetFieldSize(name: string): integer;
+var
+  vField : TField;
+begin
+  vField := FindField(name);
+  if vField <> nil then
+    Result := vField.Index;
 end;
 
 {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
@@ -888,16 +915,6 @@ begin
         Move(Buffer^,DestBuffer^,J);
       end;
     end;
-
-    {$IFDEF FPC}
-      DataEvent(deFieldChange, Ptrint(Field));
-    {$ELSE}
-      {$IF CompilerVersion < 21}
-        DataEvent(deFieldChange, Longint(Field));
-      {$ELSE}
-        DataEvent(deFieldChange, NativeInt(Field));
-      {$IFEND}
-    {$ENDIF}
   end
   else begin
     I := Field.Index;
@@ -910,6 +927,16 @@ begin
       Move(Buffer^,DestBuffer^,J);
     end;
   end;
+
+  {$IFDEF FPC}
+    DataEvent(deFieldChange, Ptrint(Field));
+  {$ELSE}
+    {$IF CompilerVersion < 21}
+      DataEvent(deFieldChange, Longint(Field));
+    {$ELSE}
+      DataEvent(deFieldChange, NativeInt(Field));
+    {$IFEND}
+  {$ENDIF}
 end;
 
 procedure TRESTDWMemTable.SetFiltered(Value: Boolean);
@@ -1236,6 +1263,10 @@ begin
     if Result = grOK then begin
       InternalLoadCurrentRecord(Buffer);
       vAccepted := FCurrentRecordObj.Accept = 1;
+      if vAccepted then begin
+        GetCalcFields(Buffer);
+        //CalculateFields(Buffer);
+	  end;
 
       if (GetMode = gmCurrent) and not vAccepted then
         Result:=grError;
@@ -1251,34 +1282,49 @@ procedure TRESTDWMemTable.InternalInitFieldDefs;
 var
   i, k : integer;
   vField : TField;
+  vFieldDef : TFieldDef;
 begin
-  for i := 0 to FieldDefs.Count-1 do begin
-    vField := FindField(FieldDefs[i].Name);
-    if vField <> nil then begin
-      Fields.Remove(vField);
-      vField.Free;
-    end;
-  end;
-
-  SetLength(FFieldOffsets,FieldDefs.Count+Fields.Count);
-  SetLength(FFieldSize,FieldDefs.Count+Fields.Count);
-
   FRecordSize := 0;
-  for i := 0 to Fields.Count-1 do begin
-    FFieldOffsets[i] := FRecordSize;
-    FRecordSize := FRecordSize + SizeOf(Boolean); // null
-    FFieldSize[i] := calcFieldSize(Fields[i].DataType,Fields[i].Size);
-    FRecordSize := FRecordSize + FFieldSize[i];
-  end;
 
-  k := Fields.Count;
-  for i := 0 to FieldDefs.Count-1 do begin
-    FFieldOffsets[k] := FRecordSize;
-    FRecordSize := FRecordSize + SizeOf(Boolean); // null
-    FFieldSize[k] := calcFieldSize(FieldDefs[i].DataType,FieldDefs[i].Size);
-    FRecordSize := FRecordSize + FFieldSize[k];
-
-    k := k + 1;
+  if Fields.Count > 0 then begin
+    FieldOptions.AutoCreateMode := acCombineAlways;
+    CreateFields;
+    for i := 0 to FieldDefs.Count-1 do begin
+      vField := Fields.FindField(FieldDefs[i].Name);
+      if vField <> nil then
+        vField.Index := i;
+    end;
+    k := FieldDefs.Count;
+    for i := 0 to Fields.Count-1 do begin
+      try
+        vFieldDef := FieldDefs.Find(Fields[i].DisplayName);
+      except
+        vFieldDef := nil;
+      end;
+      if vFieldDef = nil then begin
+        Fields[i].Index := k;
+        k := k + 1;
+      end;
+    end;
+    SetLength(FFieldOffsets,Fields.Count);
+    SetLength(FFieldSize,Fields.Count);
+    for i := 0 to Fields.Count-1 do begin
+      FFieldOffsets[i] := FRecordSize;
+      FRecordSize := FRecordSize + SizeOf(Boolean); // null
+      FFieldSize[i] := calcFieldSize(Fields[i].DataType,Fields[i].Size);
+      FRecordSize := FRecordSize + FFieldSize[i];
+    end;
+    FieldOptions.AutoCreateMode := acExclusive;
+  end
+  else begin
+    SetLength(FFieldOffsets,FieldDefs.Count);
+    SetLength(FFieldSize,FieldDefs.Count);
+    for i := 0 to FieldDefs.Count-1 do begin
+      FFieldOffsets[i] := FRecordSize;
+      FRecordSize := FRecordSize + SizeOf(Boolean); // null
+      FFieldSize[i] := calcFieldSize(FieldDefs[i].DataType,FieldDefs[i].Size);
+      FRecordSize := FRecordSize + FFieldSize[i];
+    end;
   end;
 
   {$IFNDEF FPC}
@@ -1322,7 +1368,7 @@ begin
     dwftDate,
     dwftTime,
     dwftDateTime,
-    dwftTimeStamp : Inc(Result, SizeOf(TDateTime));
+    dwftTimeStamp : Inc(Result, SizeOf(Double));
 
     dwftTimeStampOffset : begin
       Inc(Result,SizeOf(Double));
@@ -2019,6 +2065,15 @@ begin
     SaveDWMemToStream(TRESTDWMemTable(ADataset), AStream)
   else
     SaveDatasetToStream(ADataset, AStream);
+end;
+
+function TRESTDWMemTable.GetFieldType(name: string): TFieldType;
+var
+  vField : TField;
+begin
+  vField := FindField(name);
+  if vField <> nil then
+    Result := vField.DataType;
 end;
 
 end.
