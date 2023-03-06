@@ -1283,8 +1283,14 @@ var
   i, k : integer;
   vField : TField;
   vFieldDef : TFieldDef;
+  vBlock : boolean;
 begin
   FRecordSize := 0;
+
+  // aki eh necessario isso devido atualizacao dos campos
+  // em uma grid qdo usa loadfrom dataset
+  vBlock := FBlockEvents;
+  FBlockEvents := False;
 
   if Fields.Count > 0 then begin
     FieldOptions.AutoCreateMode := acCombineAlways;
@@ -1326,6 +1332,8 @@ begin
       FRecordSize := FRecordSize + FFieldSize[i];
     end;
   end;
+
+  FBlockEvents := vBlock;
 
   {$IFNDEF FPC}
     inherited;
