@@ -1317,24 +1317,49 @@ begin
   FBlockEvents := False;
 
   if Fields.Count > 0 then begin
-    FieldOptions.AutoCreateMode := acCombineAlways;
-    CreateFields;
-    for i := 0 to FieldDefs.Count-1 do begin
-      vField := Fields.FindField(FieldDefs[i].Name);
-      if vField <> nil then
-        vField.Index := i;
-    end;
-    k := FieldDefs.Count;
-    for i := 0 to Fields.Count-1 do begin
-      vFieldDef := buscaFieldDef(Fields[i].FieldName);
-      if vFieldDef = nil then
-        vFieldDef := buscaFieldDef(Fields[i].DisplayName);
-
-      if vFieldDef = nil then begin
-        Fields[i].Index := k;
-        k := k + 1;
+    {$IFNDEF FPC}
+      FieldOptions.AutoCreateMode := acCombineAlways;
+      CreateFields;
+      for i := 0 to FieldDefs.Count-1 do begin
+        vField := Fields.FindField(FieldDefs[i].Name);
+        if vField <> nil then
+          vField.Index := i;
       end;
-    end;
+      k := FieldDefs.Count;
+      for i := 0 to Fields.Count-1 do begin
+        vFieldDef := buscaFieldDef(Fields[i].FieldName);
+        if vFieldDef = nil then
+          vFieldDef := buscaFieldDef(Fields[i].DisplayName);
+
+        if vFieldDef = nil then begin
+          Fields[i].Index := k;
+          k := k + 1;
+        end;
+      end;
+      FieldOptions.AutoCreateMode := acExclusive;
+    {$ELSE}
+      for i := 0 to FieldDefs.Count-1 do begin
+        vField := Fields.FindField(FieldDefs[i].Name);
+        if vField <> nil then
+          FieldDefs[i].CreateField(Self);
+      end;
+      for i := 0 to FieldDefs.Count-1 do begin
+        vField := Fields.FindField(FieldDefs[i].Name);
+        if vField <> nil then
+          vField.Index := i;
+      end;
+      k := FieldDefs.Count;
+      for i := 0 to Fields.Count-1 do begin
+        vFieldDef := buscaFieldDef(Fields[i].FieldName);
+        if vFieldDef = nil then
+          vFieldDef := buscaFieldDef(Fields[i].DisplayName);
+
+        if vFieldDef = nil then begin
+          Fields[i].Index := k;
+          k := k + 1;
+        end;
+      end;
+    {$ENDIF}
     SetLength(FFieldOffsets,Fields.Count);
     SetLength(FFieldSize,Fields.Count);
     for i := 0 to Fields.Count-1 do begin
@@ -1343,7 +1368,6 @@ begin
       FFieldSize[i] := calcFieldSize(Fields[i].DataType,Fields[i].Size);
       FRecordSize := FRecordSize + FFieldSize[i];
     end;
-    FieldOptions.AutoCreateMode := acExclusive;
   end
   else begin
     SetLength(FFieldOffsets,FieldDefs.Count);
