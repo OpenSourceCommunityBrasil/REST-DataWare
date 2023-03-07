@@ -307,6 +307,10 @@ type
     {$IFEND}
     function GetFieldData(Field: TField; Buffer: Pointer): Boolean; override;
 
+    // status - Delta
+    procedure SetRecordStatus(rec_status : TRESTDWRecordStatus);
+    function GetRecordStatus : TRESTDWRecordStatus;
+
     // blobs
     function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
 
@@ -1180,6 +1184,29 @@ begin
   end;
 end;
 
+procedure TRESTDWMemTable.SetRecordStatus(rec_status: TRESTDWRecordStatus);
+var
+  DestBuffer: TRESTDWBuffer;
+  vDelta : Byte;
+begin
+  if not GetActiveBuffer(DestBuffer) then
+    Exit;
+
+  Inc(DestBuffer,FPosDelta);
+  vDelta := Ord(rec_status);
+  Move(vDelta,DestBuffer^,SizeoF(vDelta));
+
+  {$IFDEF FPC}
+    DataEvent(deRecordChange, 0);
+  {$ELSE}
+    {$IF CompilerVersion < 21}
+      DataEvent(deRecordChange, 0);
+    {$ELSE}
+      DataEvent(deRecordChange, 0);
+    {$IFEND}
+  {$ENDIF}
+end;
+
 procedure TRESTDWMemTable.Sort;
 var
   vPos: TBookmark;
@@ -1762,6 +1789,22 @@ end;
 function TRESTDWMemTable.GetRecordSize: Word;
 begin
   Result := FRecordBufferSize;
+end;
+
+function TRESTDWMemTable.GetRecordStatus: TRESTDWRecordStatus;
+var
+  SrcBuffer: TRESTDWBuffer;
+  vRes : Boolean;
+  vDelta : Byte;
+begin
+  Result := GetActiveBuffer(SrcBuffer);
+  if not vRes then
+    Exit;
+
+  Inc(SrcBuffer,FPosDelta);
+  Move(SrcBuffer^,Result,SizeOf(vDelta));
+
+  Result := TRESTDWRecordStatus(vDelta);
 end;
 
 function TRESTDWMemTable.GetRecSize: integer;
