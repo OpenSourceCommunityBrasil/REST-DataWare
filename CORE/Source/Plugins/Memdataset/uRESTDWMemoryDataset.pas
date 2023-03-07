@@ -686,6 +686,7 @@ var
   vFmtBCD : tBCD;
   vTimeStamp : TTimeStamp;
   vDateTimeRec : TDateTimeRec;
+  vString : AnsiString;
   {$IFNDEF FPC}
     vSQLTimeStamp : TSQLTimeStamp;
   {$ENDIF}
@@ -756,9 +757,15 @@ begin
           Move(vTimeStampOffSet,Buffer^,SizeOf(vTimeStampOffSet));
         {$IFEND}
       end
+      else if vDWDataType = dwftWideString then begin
+        SetLength(vString,J);
+        Move(SrcBuffer^,vString[InitStrPos],J);
+        Move(vString[InitStrPos],Buffer^,J);
+      end
       else begin
         Move(SrcBuffer^,Buffer^,J);
       end;
+      Dec(SrcBuffer,FFieldOffsets[I]+1);								
     end;
   end
   // Calculated, Lookup
@@ -1283,8 +1290,31 @@ var
   i, k : integer;
   vField : TField;
   vFieldDef : TFieldDef;
+  vBlock : boolean;
+
+  function buscaFieldDef(name : string) : TFieldDef;
+  var
+    f : integer;
+  begin
+    Result := nil;
+    f := 0;
+    while f < FieldDefs.Count do begin
+      if SameText(FieldDefs[f].Name,name) then begin
+        Result := FieldDefs[f];
+        Break;
+      end;
+
+      f := f + 1;
+    end;
+  end;
+
 begin
   FRecordSize := 0;
+
+  // aki eh necessario isso devido atualizacao dos campos
+  // em uma grid qdo usa loadfrom dataset
+  vBlock := FBlockEvents;
+  FBlockEvents := False;
 
   if Fields.Count > 0 then begin
     FieldOptions.AutoCreateMode := acCombineAlways;
@@ -1296,11 +1326,10 @@ begin
     end;
     k := FieldDefs.Count;
     for i := 0 to Fields.Count-1 do begin
-      try
-        vFieldDef := FieldDefs.Find(Fields[i].DisplayName);
-      except
-        vFieldDef := nil;
-      end;
+      vFieldDef := buscaFieldDef(Fields[i].FieldName);
+      if vFieldDef = nil then
+        vFieldDef := buscaFieldDef(Fields[i].DisplayName);
+
       if vFieldDef = nil then begin
         Fields[i].Index := k;
         k := k + 1;
@@ -1326,6 +1355,8 @@ begin
       FRecordSize := FRecordSize + FFieldSize[i];
     end;
   end;
+
+  FBlockEvents := vBlock;
 
   {$IFNDEF FPC}
     inherited;
@@ -1434,6 +1465,7 @@ end;
 function TRESTDWMemTable.CompareRecords(Item1, Item2: TRESTDWRecord): Integer;
 var
   Data1, Data2: Variant;
+  sData1, sData2: string;
   vField : TField;
   i : Integer;
   vDescendingSort : boolean;
@@ -1446,6 +1478,30 @@ begin
       Data1 := FindFieldValue(Item1, vField);
       Data2 := FindFieldValue(Item2, vField);
 
+      if (Data1 = null) and (Data2 <> null) then begin
+        Result := -1
+      end
+      else if (Data1 <> null) and (Data2 = null) then begin
+        Result := 1
+      end
+      else begin
+        if VarIsStr(Data1) then begin
+          sData1 := AnsiString(Data1);
+          sData2 := AnsiString(Data2);
+          if sData1 < sData2 then
+            Result := -1
+          else if sData1 > sData2 then
+            Result := 1;
+        end
+        else begin
+          if (VarCompareValue(Data1,Data2) = vrLessThan) then
+            Result := -1
+          else if (VarCompareValue(Data1,Data2) = vrGreaterThan) then
+            Result := 1;
+        end;
+      end;
+
+{
       if (Data1 = null) and (Data2 <> null) then
         Result := -1
       else if (Data1 <> null) and (Data2 = null) then
@@ -1454,7 +1510,7 @@ begin
         Result := -1
       else if (Data1 > Data2) then
         Result := 1;
-
+}
       if vDescendingSort then
         Result := -Result;
 
@@ -1574,6 +1630,9 @@ var
   vValue : PByte;
   i,j : integer;
 
+  vDouble : Double;
+  vString : AnsiString;
+  vWideString : WideString;
   vByte1, vByte2 : Byte;
   vDateTime : TDatetime;
 begin
@@ -1591,8 +1650,10 @@ begin
     j := FFieldSize[i];
     vDWFieldType := FieldTypeToDWFieldType(Field.DataType);
     if vDWFieldType = dwftTimeStampOffset then begin
-      Move(vBuffer^,vDateTime,Sizeof(vDateTime));
+      Move(vBuffer^,vDouble,Sizeof(vDouble));
       Inc(vBuffer,SizeOf(Double));
+
+      vDateTime := vDouble;
 
       Move(vBuffer^,vByte1,Sizeof(vByte1));
       Inc(vBuffer,SizeOf(vByte1));
@@ -1616,20 +1677,22 @@ begin
 
       Result := vDateTime;
     end
+    else if vDWFieldType in [dwftString,dwftFixedChar,dwftGuid] then begin
+      SetLength(vString,J);
+      Move(vBuffer^,vString[InitStrPos],J);
+      Result := vString;
+    end
+    else if vDWFieldType in [dwftWideString,dwftFixedWideChar] then begin
+      SetLength(vWideString,J);
+      Move(vBuffer^,vWideString[InitStrPos],J);
+      Result := vWideString;
+    end
     else begin
       GetMem(vValue,j);
       FillChar(vValue^, j,0);
       Move(vBuffer^,vValue^,j);
 
       case vDWFieldType of
-        dwftString,
-        dwftFixedChar      : Result := PString(vValue)^;
-
-        dwftFixedWideChar,
-        dwftWideString     : Result := PWideString(vValue)^;
-
-        dwftGuid           : Result := PString(vValue)^;
-
         dwftBoolean        : Result := PBoolean(vValue)^;
         dwftSmallInt       : Result := PSmallInt(vValue)^;
         dwftWord           : Result := PWord(vValue)^;
@@ -1940,25 +2003,32 @@ function TRESTDWBlobStream.Read(var Buffer; Count: Longint): Longint;
 var
   P : Pointer;
 begin
-  if FPosition + Count > FBlobField^.Size then
-    Count := FBlobField^.Size - FPosition;
-  {$IF (NOT DEFINED(FPC)) and (CompilerVersion < 21)}
-    P := FBlobField.Buffer;
-    Inc(PByte(P),FPosition);
-  {$ELSE}
-    P := FBlobField^.Buffer + FPosition;
-  {$IFEND}
-  Move(P^, Buffer, Count);
-  Inc(FPosition, Count);
+  if FBlobField <> nil then begin
+    if FPosition + Count > FBlobField^.Size then
+      Count := FBlobField^.Size - FPosition;
+    {$IF (NOT DEFINED(FPC)) and (CompilerVersion < 21)}
+      P := FBlobField.Buffer;
+      Inc(PByte(P),FPosition);
+    {$ELSE}
+      P := FBlobField^.Buffer + FPosition;
+    {$IFEND}
+    Move(P^, Buffer, Count);
+    Inc(FPosition, Count);
+  end
+  else begin
+    Count := 0;
+  end;
   Result := Count;
 end;
 
 function TRESTDWBlobStream.Seek(const Offset: int64; Origin: TSeekOrigin): int64;
 begin
-  Case Origin of
-    soBeginning : FPosition := Offset;
-    soEnd       : FPosition := FBlobField^.Size + Offset;
-    soCurrent   : FPosition := FPosition + Offset;
+  if FBlobField <> nil then begin
+    case Origin of
+      soBeginning : FPosition := Offset;
+      soEnd       : FPosition := FBlobField^.Size + Offset;
+      soCurrent   : FPosition := FPosition + Offset;
+    end;
   end;
   Result := FPosition;
 end;
