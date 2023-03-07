@@ -1291,6 +1291,23 @@ var
   vField : TField;
   vFieldDef : TFieldDef;
   vBlock : boolean;
+
+  function buscaFieldDef(name : string) : TFieldDef;
+  var
+    f : integer;
+  begin
+    Result := nil;
+    f := 0;
+    while f < FieldDefs.Count do begin
+      if SameText(FieldDefs[i].Name,name) then begin
+        Result := FieldDefs[i];
+        Break;
+      end;
+
+      f := f + 1;
+    end;
+  end;
+
 begin
   FRecordSize := 0;
 
@@ -1309,11 +1326,10 @@ begin
     end;
     k := FieldDefs.Count;
     for i := 0 to Fields.Count-1 do begin
-      try
-        vFieldDef := FieldDefs.Find(Fields[i].DisplayName);
-      except
-        vFieldDef := nil;
-      end;
+      vFieldDef := buscaFieldDef(Fields[i].FieldName);
+      if vFieldDef = nil then
+        vFieldDef := buscaFieldDef(Fields[i].DisplayName);
+
       if vFieldDef = nil then begin
         Fields[i].Index := k;
         k := k + 1;
@@ -1449,6 +1465,7 @@ end;
 function TRESTDWMemTable.CompareRecords(Item1, Item2: TRESTDWRecord): Integer;
 var
   Data1, Data2: Variant;
+  sData1, sData2: string;
   vField : TField;
   i : Integer;
   vDescendingSort : boolean;
@@ -1461,6 +1478,30 @@ begin
       Data1 := FindFieldValue(Item1, vField);
       Data2 := FindFieldValue(Item2, vField);
 
+      if (Data1 = null) and (Data2 <> null) then begin
+        Result := -1
+      end
+      else if (Data1 <> null) and (Data2 = null) then begin
+        Result := 1
+      end
+      else begin
+        if VarIsStr(Data1) then begin
+          sData1 := AnsiString(Data1);
+          sData2 := AnsiString(Data2);
+          if sData1 < sData2 then
+            Result := -1
+          else if sData1 > sData2 then
+            Result := 1;
+        end
+        else begin
+          if (VarCompareValue(Data1,Data2) = vrLessThan) then
+            Result := -1
+          else if (VarCompareValue(Data1,Data2) = vrGreaterThan) then
+            Result := 1;
+        end;
+      end;
+
+{
       if (Data1 = null) and (Data2 <> null) then
         Result := -1
       else if (Data1 <> null) and (Data2 = null) then
@@ -1469,7 +1510,7 @@ begin
         Result := -1
       else if (Data1 > Data2) then
         Result := 1;
-
+}
       if vDescendingSort then
         Result := -Result;
 
@@ -1589,6 +1630,9 @@ var
   vValue : PByte;
   i,j : integer;
 
+  vDouble : Double;
+  vString : AnsiString;
+  vWideString : WideString;
   vByte1, vByte2 : Byte;
   vDateTime : TDatetime;
 begin
@@ -1606,8 +1650,10 @@ begin
     j := FFieldSize[i];
     vDWFieldType := FieldTypeToDWFieldType(Field.DataType);
     if vDWFieldType = dwftTimeStampOffset then begin
-      Move(vBuffer^,vDateTime,Sizeof(vDateTime));
+      Move(vBuffer^,vDouble,Sizeof(vDouble));
       Inc(vBuffer,SizeOf(Double));
+
+      vDateTime := vDouble;
 
       Move(vBuffer^,vByte1,Sizeof(vByte1));
       Inc(vBuffer,SizeOf(vByte1));
@@ -1631,20 +1677,22 @@ begin
 
       Result := vDateTime;
     end
+    else if vDWFieldType in [dwftString,dwftFixedChar,dwftGuid] then begin
+      SetLength(vString,J);
+      Move(vBuffer^,vString[InitStrPos],J);
+      Result := vString;
+    end
+    else if vDWFieldType in [dwftWideString,dwftFixedWideChar] then begin
+      SetLength(vWideString,J);
+      Move(vBuffer^,vWideString[InitStrPos],J);
+      Result := vWideString;
+    end
     else begin
       GetMem(vValue,j);
       FillChar(vValue^, j,0);
       Move(vBuffer^,vValue^,j);
 
       case vDWFieldType of
-        dwftString,
-        dwftFixedChar      : Result := PString(vValue)^;
-
-        dwftFixedWideChar,
-        dwftWideString     : Result := PWideString(vValue)^;
-
-        dwftGuid           : Result := PString(vValue)^;
-
         dwftBoolean        : Result := PBoolean(vValue)^;
         dwftSmallInt       : Result := PSmallInt(vValue)^;
         dwftWord           : Result := PWord(vValue)^;
