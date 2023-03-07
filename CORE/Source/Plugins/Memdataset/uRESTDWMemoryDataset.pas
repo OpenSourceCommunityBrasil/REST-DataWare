@@ -1299,8 +1299,8 @@ var
     Result := nil;
     f := 0;
     while f < FieldDefs.Count do begin
-      if SameText(FieldDefs[i].Name,name) then begin
-        Result := FieldDefs[i];
+      if SameText(FieldDefs[f].Name,name) then begin
+        Result := FieldDefs[f];
         Break;
       end;
 
