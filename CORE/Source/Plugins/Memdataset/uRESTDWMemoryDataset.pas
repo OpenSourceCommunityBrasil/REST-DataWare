@@ -286,8 +286,8 @@ type
     function GetFieldSize(idx : integer) : integer; overload;
     procedure AddNewRecord(rec : TRESTDWRecord);
     procedure AddBlobList(blob : PRESTDWBlobField);
-    function GetFieldSize(name : string) : integer; overload;
-    function GetFieldType(name : string) : TFieldType;
+    function GetFieldSize(fdname : string) : integer; overload;
+    function GetFieldType(fdname : string) : TFieldType;
   private
     procedure setIndexFieldNames(const Value: string);
   protected
@@ -792,11 +792,11 @@ begin
   Result := FFieldOffsets[idx];
 end;
 
-function TRESTDWMemTable.GetFieldSize(name: string): integer;
+function TRESTDWMemTable.GetFieldSize(fdname: string): integer;
 var
   vField : TField;
 begin
-  vField := FindField(name);
+  vField := FindField(fdname);
   if vField <> nil then
     Result := vField.Index;
 end;
@@ -1292,14 +1292,14 @@ var
   vFieldDef : TFieldDef;
   vBlock : boolean;
 
-  function buscaFieldDef(name : string) : TFieldDef;
+  function buscaFieldDef(fdname : string) : TFieldDef;
   var
     f : integer;
   begin
     Result := nil;
     f := 0;
     while f < FieldDefs.Count do begin
-      if SameText(FieldDefs[f].Name,name) then begin
+      if SameText(FieldDefs[f].Name,fdname) then begin
         Result := FieldDefs[f];
         Break;
       end;
@@ -2137,11 +2137,11 @@ begin
     SaveDatasetToStream(ADataset, AStream);
 end;
 
-function TRESTDWMemTable.GetFieldType(name: string): TFieldType;
+function TRESTDWMemTable.GetFieldType(fdname: string): TFieldType;
 var
   vField : TField;
 begin
-  vField := FindField(name);
+  vField := FindField(fdname);
   if vField <> nil then
     Result := vField.DataType;
 end;
