@@ -286,8 +286,8 @@ type
     function GetFieldSize(idx : integer) : integer; overload;
     procedure AddNewRecord(rec : TRESTDWRecord);
     procedure AddBlobList(blob : PRESTDWBlobField);
-    function GetFieldSize(name : string) : integer; overload;
-    function GetFieldType(name : string) : TFieldType;
+    function GetFieldSize(fdname : string) : integer; overload;
+    function GetFieldType(fdname : string) : TFieldType;
   private
     procedure setIndexFieldNames(const Value: string);
   protected
@@ -792,11 +792,11 @@ begin
   Result := FFieldOffsets[idx];
 end;
 
-function TRESTDWMemTable.GetFieldSize(name: string): integer;
+function TRESTDWMemTable.GetFieldSize(fdname: string): integer;
 var
   vField : TField;
 begin
-  vField := FindField(name);
+  vField := FindField(fdname);
   if vField <> nil then
     Result := vField.Index;
 end;
@@ -1292,14 +1292,14 @@ var
   vFieldDef : TFieldDef;
   vBlock : boolean;
 
-  function buscaFieldDef(name : string) : TFieldDef;
+  function buscaFieldDef(fdname : string) : TFieldDef;
   var
     f : integer;
   begin
     Result := nil;
     f := 0;
     while f < FieldDefs.Count do begin
-      if SameText(FieldDefs[f].Name,name) then begin
+      if SameText(FieldDefs[f].Name,fdname) then begin
         Result := FieldDefs[f];
         Break;
       end;
@@ -1317,24 +1317,49 @@ begin
   FBlockEvents := False;
 
   if Fields.Count > 0 then begin
-    FieldOptions.AutoCreateMode := acCombineAlways;
-    CreateFields;
-    for i := 0 to FieldDefs.Count-1 do begin
-      vField := Fields.FindField(FieldDefs[i].Name);
-      if vField <> nil then
-        vField.Index := i;
-    end;
-    k := FieldDefs.Count;
-    for i := 0 to Fields.Count-1 do begin
-      vFieldDef := buscaFieldDef(Fields[i].FieldName);
-      if vFieldDef = nil then
-        vFieldDef := buscaFieldDef(Fields[i].DisplayName);
-
-      if vFieldDef = nil then begin
-        Fields[i].Index := k;
-        k := k + 1;
+    {$IFNDEF FPC}
+      FieldOptions.AutoCreateMode := acCombineAlways;
+      CreateFields;
+      for i := 0 to FieldDefs.Count-1 do begin
+        vField := Fields.FindField(FieldDefs[i].Name);
+        if vField <> nil then
+          vField.Index := i;
       end;
-    end;
+      k := FieldDefs.Count;
+      for i := 0 to Fields.Count-1 do begin
+        vFieldDef := buscaFieldDef(Fields[i].FieldName);
+        if vFieldDef = nil then
+          vFieldDef := buscaFieldDef(Fields[i].DisplayName);
+
+        if vFieldDef = nil then begin
+          Fields[i].Index := k;
+          k := k + 1;
+        end;
+      end;
+      FieldOptions.AutoCreateMode := acExclusive;
+    {$ELSE}
+      for i := 0 to FieldDefs.Count-1 do begin
+        vField := Fields.FindField(FieldDefs[i].Name);
+        if vField <> nil then
+          FieldDefs[i].CreateField(Self);
+      end;
+      for i := 0 to FieldDefs.Count-1 do begin
+        vField := Fields.FindField(FieldDefs[i].Name);
+        if vField <> nil then
+          vField.Index := i;
+      end;
+      k := FieldDefs.Count;
+      for i := 0 to Fields.Count-1 do begin
+        vFieldDef := buscaFieldDef(Fields[i].FieldName);
+        if vFieldDef = nil then
+          vFieldDef := buscaFieldDef(Fields[i].DisplayName);
+
+        if vFieldDef = nil then begin
+          Fields[i].Index := k;
+          k := k + 1;
+        end;
+      end;
+    {$ENDIF}
     SetLength(FFieldOffsets,Fields.Count);
     SetLength(FFieldSize,Fields.Count);
     for i := 0 to Fields.Count-1 do begin
@@ -1343,7 +1368,6 @@ begin
       FFieldSize[i] := calcFieldSize(Fields[i].DataType,Fields[i].Size);
       FRecordSize := FRecordSize + FFieldSize[i];
     end;
-    FieldOptions.AutoCreateMode := acExclusive;
   end
   else begin
     SetLength(FFieldOffsets,FieldDefs.Count);
@@ -2137,11 +2161,11 @@ begin
     SaveDatasetToStream(ADataset, AStream);
 end;
 
-function TRESTDWMemTable.GetFieldType(name: string): TFieldType;
+function TRESTDWMemTable.GetFieldType(fdname: string): TFieldType;
 var
   vField : TField;
 begin
-  vField := FindField(name);
+  vField := FindField(fdname);
   if vField <> nil then
     Result := vField.DataType;
 end;
