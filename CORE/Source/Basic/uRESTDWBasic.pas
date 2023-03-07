@@ -1497,7 +1497,9 @@ Var
  vOldRequest,
  vdwservereventname,
  vUrlRedirect,
- vAuthenticationString : String;
+ vAuthenticationString,
+ LBoundaryStart,
+ LBoundaryEnd          : String;
  vAuthTokenParam       : TRESTDWAuthTokenParam;
  vdwConnectionDefs     : TConnectionDefs;
  vTempServerMethods    : TObject;
@@ -1525,7 +1527,9 @@ Var
  vNeedAuthorization,
  vCompareContext,
  vIsQueryParam,
- msgEnd              : Boolean;
+ msgEnd,
+ LBoundaryFound,
+ LIsStartBoundary  : Boolean;
  vServerBaseMethod   : TComponentClass;
  vServerMethod       : TComponentClass;
  ServerContextStream : TMemoryStream;
@@ -1863,6 +1867,7 @@ Begin
  vBasePath             := ExtractFilePath(ParamStr(0));
  {$IFEND}
  vContentType          := vContentType;
+ decoder               := Nil;
  vdwConnectionDefs     := Nil;
  vTempServerMethods    := Nil;
  DWParams              := Nil;
@@ -2100,36 +2105,58 @@ Begin
        End;
       If Assigned(ContentStringStream) Then
        Begin
-         ContentStringStream.Position := 0;
-         If Not vBinaryEvent Then
-          Begin
+        ContentStringStream.Position := 0;
+        If Not vBinaryEvent Then
+         Begin
+          Try
+//            mb := TStringStream.Create(''); //{$IFNDEF FPC}{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
            Try
-            mb := TStringStream.Create(''); //{$IFNDEF FPC}{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
-            try
-             mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
-                         ContentStringStream.Position := 0;
-             mb.Position := 0;
-             If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
-              Begin
-               msgEnd   := False;
-               boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
-               startboundary := '--' + boundary;
-               Repeat
-                tmp := ReadLnFromStream(ContentStringStream, -1, True);
-               Until tmp = startboundary;
-              End;
-            finally
-             if Assigned(mb) then
-              FreeAndNil(mb);
-            end;
-           Except
+//             mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
+//                         ContentStringStream.Position := 0;
+//             mb.Position := 0;
+//             If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+            If (pos('boundary', ContentType) > 0) Then
+             Begin
+              msgEnd           := False;
+              LBoundaryFound   := False;
+              LIsStartBoundary := False;
+              boundary         := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
+              LBoundaryStart   := '--'           + boundary;
+              LBoundaryEnd     := LBoundaryStart + '--';
+              decoder          := TRESTDWMessageDecoderMIME.Create(nil);
+              TRESTDWMessageDecoderMIME(decoder).MIMEBoundary := boundary;
+              decoder.SourceStream := ContentStringStream;
+              decoder.FreeSourceStream := False;
+              Repeat
+               tmp := ReadLnFromStream(ContentStringStream, -1, True);
+               If tmp = LBoundaryStart then
+                Begin
+                 LBoundaryFound := True;
+                 LIsStartBoundary := True;
+                End
+               Else If tmp = LBoundaryEnd Then
+                LBoundaryFound := True;
+              Until LBoundaryFound;
+//               boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
+//               startboundary := '--' + boundary;
+//               Repeat
+//                tmp := ReadLnFromStream(ContentStringStream, -1, True);
+//               Until tmp = startboundary;
+             End;
+           Finally
+//           If Assigned(mb) Then
+//            FreeAndNil(mb);
            End;
+          Except
           End;
+         End;
         If (ContentStringStream.Size > 0) And (boundary <> '') Then
          Begin
           Try
+           msgEnd           := False;
            Repeat
-            decoder := TRESTDWMessageDecoderMIME.Create(nil);
+            If Not Assigned(decoder) Then
+             decoder := TRESTDWMessageDecoderMIME.Create(nil);
             TRESTDWMessageDecoderMIME(decoder).MIMEBoundary := boundary;
             decoder.SourceStream := ContentStringStream;
             decoder.FreeSourceStream := False;
@@ -2146,8 +2173,8 @@ Begin
                sFile := ExtractFileName(Decoder.FileName);
                FreeAndNil(Decoder);
                Decoder := TRESTDWMessageDecoderMIME(NewDecoder);
-               If Decoder <> Nil Then
-                TRESTDWMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
+//               If Decoder <> Nil Then
+//                TRESTDWMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
                If Not Assigned(DWParams) Then
                 Begin
                  If (Params.Count = 0) Then

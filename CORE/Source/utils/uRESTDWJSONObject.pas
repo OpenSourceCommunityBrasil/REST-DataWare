@@ -1896,7 +1896,7 @@ Begin
   vTempValue := FormatValue(vTempValue);
  {$ELSE}
  If vTempValue = '' Then
-  vTempValue := BytesToString(aValue{$IFDEF INDY_NEW}, GetEncodingID(vEncoding){$ENDIF});
+  vTempValue := BytesToString(aValue);
  If vTempValue = '' Then
   Begin
    If vNullValue Then
