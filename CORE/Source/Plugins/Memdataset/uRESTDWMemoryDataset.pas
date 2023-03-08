@@ -1230,7 +1230,7 @@ end;
 procedure TRESTDWMemTable.SortOnFields(const FieldNames: string;
   CaseInsensitive : Boolean);
 begin
-  if not Active then
+  if (not Active) or (State = dsInactive) then
     Exit;
 
   CheckBrowseMode;
@@ -1247,6 +1247,7 @@ begin
     Sort;
   except
     on e : Exception do begin
+      FreeIndexList;
       raise Exception.Create(e.Message);
     end;
   end;
@@ -1572,6 +1573,7 @@ begin
   FFilterRecordCount := -1;
   FRecords := TList.Create;
   FBlobs := TList.Create;
+  FIndexList := nil;
 end;
 
 function TRESTDWMemTable.CreateBlobStream(Field: TField;
