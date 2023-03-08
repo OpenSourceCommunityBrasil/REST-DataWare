@@ -2161,7 +2161,6 @@ Begin
             decoder.SourceStream := ContentStringStream;
             decoder.FreeSourceStream := False;
             decoder.ReadHeader;
-            Inc(I);
             Case Decoder.PartType of
              mcptAttachment:
               Begin
@@ -2359,6 +2358,8 @@ Begin
                FreeAndNil(ms);
                If Assigned(Newdecoder)  Then
                 FreeAndNil(Newdecoder);
+               decoder := nil;
+               msgEnd := true;
               End;
              mcptIgnore :
               Begin
