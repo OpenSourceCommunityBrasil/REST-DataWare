@@ -2155,7 +2155,7 @@ Begin
           Try
            msgEnd           := False;
            Repeat
-            If Not Assigned(decoder) Then
+//            If Not Assigned(decoder) Then
              decoder := TRESTDWMessageDecoderMIME.Create(nil);
             TRESTDWMessageDecoderMIME(decoder).MIMEBoundary := boundary;
             decoder.SourceStream := ContentStringStream;
@@ -2358,8 +2358,6 @@ Begin
                FreeAndNil(ms);
                If Assigned(Newdecoder)  Then
                 FreeAndNil(Newdecoder);
-               decoder := nil;
-               msgEnd := true;
               End;
              mcptIgnore :
               Begin
