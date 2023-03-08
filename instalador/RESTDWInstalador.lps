@@ -8,6 +8,7 @@
       <Unit>
         <Filename Value="RESTDWInstalador.lpr"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
         <TopLine Value="2"/>
         <CursorPos X="61" Y="19"/>
@@ -326,15 +327,21 @@
       </Unit>
       <Unit>
         <Filename Value="..\CORE\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="649"/>
-        <CursorPos X="48" Y="662"/>
+        <CursorPos X="29" Y="662"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit>
+      <Unit>
+        <Filename Value="..\CORE\Packages\Lazarus\RESTDataWareComponents.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="14"/>
+        <CursorPos X="45" Y="27"/>
+        <UsageCount Value="10"/>
+      </Unit>
     </Units>
-    <JumpHistory HistoryIndex="28">
+    <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="src\telas\uprincipal.pas"/>
         <Caret Line="62" Column="25" TopLine="53"/>
@@ -449,6 +456,10 @@
       <Position>
         <Filename Value="utesteanim.pas"/>
         <Caret Line="70" TopLine="57"/>
+      </Position>
+      <Position>
+        <Filename Value="..\CORE\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas"/>
+        <Caret Line="662" Column="29" TopLine="649"/>
       </Position>
     </JumpHistory>
     <RunParams>
