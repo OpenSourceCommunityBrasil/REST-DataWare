@@ -29,7 +29,7 @@ interface
 
 uses
   {$IFNDEF FPC} SqlTimSt, {$ENDIF}
-  SysUtils, Classes, Db, FmtBCD, Variants, uRESTDWExprParser, uRESTDWAbout,
+  SysUtils, Classes, DB, FmtBCD, Variants, uRESTDWExprParser, uRESTDWAbout,
   uRESTDWConsts, uRESTDWPrototypes, uRESTDWTools;
 
 const
@@ -58,6 +58,7 @@ type
       {$ENDIF}
     {$IFEND}
   {$ENDIF}
+  PRESTDWBuffer = ^TRESTDWBuffer;
 
   TRESTDWMemTable = class;
   TRESTDWBlobStream = class;
@@ -225,10 +226,18 @@ type
     function GetRecordCount: integer; override;
     procedure SetRecNo(Value: Integer); override;
 
+    // locate
+    function Locate(const KeyFields: string; const KeyValues: Variant;
+      Options: TLocateOptions): Boolean; override;
+    function Lookup(const KeyFields: string; const KeyValues: Variant;
+      const ResultFields: string): Variant; override;
+
     // filter
     function FilterRecord(Buffer : TRESTDWBuffer): Boolean;
     procedure SetFiltered(Value: Boolean); override;
+    procedure SetFilterText(const Value: string); override;
 
+    // events
     {$IFDEF FPC}
       procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
     {$ELSE}
@@ -239,12 +248,11 @@ type
       {$IFEND}
     {$ENDIF}
 
-    procedure SetFilterText(const Value: string); override;
-
     // parser
     function ParserGetVariableValue(Sender: TObject; const VarName: string; var Value: Variant): Boolean; virtual;
 
     // bookmarks
+    function BookmarkValid(ABookmark: TBookmark): Boolean; override;
     procedure InternalGotoBookmark(ABookmark: Pointer); override;
     procedure InternalSetToRecord(Buffer: TRESTDWBuffer); override;
     procedure SetBookmarkData(Buffer: TRESTDWBuffer; Data: Pointer); override;
@@ -290,9 +298,9 @@ type
     // IRESTDWMenTable - interface
     function GetDataset: TDataset;
     function GetRecordObj(idx : integer) : TRESTDWRecord;
-    function GetFieldSize(idx : integer) : integer; overload;
     procedure AddNewRecord(rec : TRESTDWRecord);
     procedure AddBlobList(blob : PRESTDWBlobField);
+    function GetFieldSize(idx : integer) : integer; overload;
     function GetFieldSize(fdname : string) : integer; overload;
     function GetFieldType(fdname : string) : TFieldType;
   protected
@@ -388,7 +396,7 @@ begin
     CreateFields;
 
   // connect the TField objects with the actual fields
-  BindFields (True);
+  BindFields(True);
 
   InternalAfterOpen; // custom method for subclasses
 
@@ -477,6 +485,228 @@ begin
 
   Filtered := vFiltered;
   RefreshStates;
+end;
+
+function TRESTDWMemTable.Locate(const KeyFields: string;
+  const KeyValues: Variant; Options: TLocateOptions): Boolean;
+var
+  vFieldCount : Integer;
+  {$IFNDEF FPC}
+    vFields : TList;
+  {$ELSE}
+    vFields : TFields;
+  {$ENDIF}
+  vField : TField; // else BAD mem leak on 'Field.asString'
+  SaveState: TDataSetState;
+  I: Integer;
+  vRec : TRESTDWRecord;
+  vBuffer : PRESTDWBuffer;
+  vBook : Integer;
+  vBookmark : TBookMark;
+
+  function CompareField(Field: TField; Value: Variant): Boolean; { BG }
+  var
+    S: string;
+    vDWFieldType : Byte;
+  begin
+    vDWFieldType := FieldTypeToDWFieldType(Field.DataType);
+    if vDWFieldType in [dwftString, dwftFixedChar, dwftWideString, dwftFixedWideChar] then begin
+      if Value = Null then begin
+        Result := Field.IsNull;
+      end
+      else begin
+        S := Field.AsString;
+        Result := AnsiSameStr(S, Value);
+      end;
+    end
+    else begin
+      Result := (Field.Value = Value);
+    end;
+  end;
+
+  function CompareRecord: Boolean;
+  var
+    ii : Integer;
+  begin
+    if vFieldCount = 1 then begin
+      vField := TField(Fields[0]);
+      Result := CompareField(vField, KeyValues);
+    end
+    else begin
+      Result := True;
+      for ii := 0 to vFieldCount - 1 do begin
+        vField := TField(Fields[ii]);
+        Result := Result and CompareField(vField, KeyValues[ii]);
+        if not Result then
+          Break;
+      end;
+    end;
+  end;
+begin
+  DoBeforeScroll;
+
+  Result := False;
+  CheckBrowseMode;
+  If IsEmpty Then
+    Exit;
+  {$IFNDEF FPC}
+    vFields := TList.Create;
+  {$ELSE}
+    vFields := TFields.Create(nil);
+  {$ENDIF}
+  try
+    {$IFNDEF FPC}
+      GetFieldList(vFields, KeyFields);
+    {$ELSE}
+      GetFieldList(TList(vFields), KeyFields);
+    {$ENDIF}
+    vFieldCount := vFields.Count;
+    Result := CompareRecord;
+    if Result then begin
+      Resync([]);
+      Exit;
+    end
+    else begin
+      SaveState := SetTempState(dsCalcFields);
+      try
+        try
+          vBuffer := PRESTDWBuffer(TempBuffer);
+          for i := 0 To FRecords.Count - 1 Do Begin
+            vRec := GetRecordObj(i);
+            vRec.CopyBuffer(Pointer(vBuffer));
+            CalculateFields(TempBuffer);
+            Result := CompareRecord;
+            if Result Then
+              Break;
+          end;
+        finally
+          if Result then begin
+            {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+               SetLength(vBookmark,BookmarkSize);
+               Move(i,Pointer(@vBookmark[0])^,SizeOf(vBook));
+            {$ELSE}
+               Move(i,vBookmark^,SizeOf(vBook)); // FPC/D7
+            {$IFEND}
+          end;
+        end;
+      finally
+        RestoreState(SaveState);
+        if Result and Self.BookmarkValid(vBookmark) then begin
+          Self.Bookmark := vBookmark;
+          Resync([]);
+        end;
+      end;
+    end;
+  finally
+    FreeAndNil(vFields);
+  end;
+
+  if Result then begin
+    DataEvent(deDataSetChange, 0);
+    DoAfterScroll;
+  end;
+end;
+
+function TRESTDWMemTable.Lookup(const KeyFields: string;
+  const KeyValues: Variant; const ResultFields: string): Variant;
+var
+  vFieldCount : Integer;
+  {$IFNDEF FPC}
+    vFields : TList;
+  {$ELSE}
+    vFields : TFields;
+  {$ENDIF}
+  vField : TField; // else BAD mem leak on 'Field.asString'
+  SaveState: TDataSetState;
+  I: Integer;
+  vMatched: Boolean;
+  vRec : TRESTDWRecord;
+  vBuffer : PRESTDWBuffer;
+
+  function CompareField(Field: TField; Value: Variant): Boolean; { BG }
+  var
+    S: string;
+    vDWFieldType : Byte;
+  begin
+    vDWFieldType := FieldTypeToDWFieldType(Field.DataType);
+    if vDWFieldType in [dwftString, dwftFixedChar, dwftWideString, dwftFixedWideChar] then begin
+      if Value = Null then begin
+        Result := Field.IsNull;
+      end
+      else begin
+        S := Field.AsString;
+        Result := AnsiSameStr(S, Value);
+      end;
+    end
+    else begin
+      Result := (Field.Value = Value);
+    end;
+  end;
+
+  function CompareRecord: Boolean;
+  var
+    ii : Integer;
+  begin
+    if vFieldCount = 1 then begin
+      vField := TField(Fields[0]);
+      Result := CompareField(vField, KeyValues);
+    end
+    else begin
+      Result := True;
+      for ii := 0 to vFieldCount - 1 do begin
+        vField := TField(Fields[ii]);
+        Result := Result and CompareField(vField, KeyValues[ii]);
+        if not Result then
+          Break;
+      end;
+    end;
+  end;
+
+Begin
+  Result := null;
+  CheckBrowseMode;
+  If IsEmpty Then
+    Exit;
+  {$IFNDEF FPC}
+    vFields := TList.Create;
+  {$ELSE}
+    vFields := TFields.Create(nil);
+  {$ENDIF}
+  try
+    {$IFNDEF FPC}
+      GetFieldList(vFields, KeyFields);
+    {$ELSE}
+      GetFieldList(TList(vFields), KeyFields);
+    {$ENDIF}
+    vFieldCount := vFields.Count;
+    vMatched := CompareRecord;
+    if vMatched then begin
+      Result := ToBytes(FieldValues[ResultFields])
+    end
+    else begin
+      SaveState := SetTempState(dsCalcFields);
+      try
+        try
+          vBuffer := PRESTDWBuffer(TempBuffer);
+          for i := 0 To FRecords.Count - 1 Do Begin
+            vRec := GetRecordObj(i);
+            vRec.CopyBuffer(Pointer(vBuffer));
+            CalculateFields(TempBuffer);
+            vMatched := CompareRecord;
+            if vMatched Then
+              Break;
+          end;
+        finally
+          if vMatched Then
+            Result := ToBytes(FieldValues[ResultFields]);
+        end;
+      finally
+        RestoreState(SaveState);
+      end;
+    end;
+  finally
+    FreeAndNil(vFields);
+  end;
 end;
 
 function TRESTDWMemTable.ParserGetVariableValue(Sender: TObject;
@@ -644,7 +874,7 @@ begin
   addFieldList;
 end;
 
-procedure TRESTDWMemTable.InternalGotoBookmark (ABookmark: Pointer);
+procedure TRESTDWMemTable.InternalGotoBookmark(ABookmark: Pointer);
 var
   ReqBookmark: Integer;
 begin
@@ -1312,6 +1542,7 @@ var
   vField : TField;
   vFieldDef : TFieldDef;
   vBlock : boolean;
+  vDefName : string;
 
   function buscaFieldDef(fdname : string) : TFieldDef;
   var
@@ -1338,6 +1569,31 @@ begin
   FBlockEvents := False;
 
   if Fields.Count > 0 then begin
+    // fields defs é obrigatorio para fields fkData
+    for i := 0 to Fields.Count-1 do begin
+      if Fields[i].FieldKind = fkData then begin
+        vFieldDef := buscaFieldDef(Fields[i].FieldName);
+        vDefName := Fields[i].FieldName;
+
+        if vFieldDef = nil then begin
+          vFieldDef := buscaFieldDef(Fields[i].FullName);
+          vDefName := Fields[i].FullName;
+        end;
+
+        if vFieldDef = nil then begin
+          vFieldDef := buscaFieldDef(Fields[i].DisplayName);
+          vDefName := Fields[i].DisplayName;
+        end;
+
+        if vFieldDef = nil then begin
+          vFieldDef := FieldDefs.AddFieldDef;
+          vFieldDef.Name := vDefName;
+          vFieldDef.DataType := Fields[i].DataType;
+          vFieldDef.Size := Fields[i].Size;
+          vFieldDef.Attributes := [faFixed];
+        end;
+      end;
+    end;
     {$IFNDEF FPC}
       FieldOptions.AutoCreateMode := acCombineAlways;
       CreateFields;
@@ -1349,6 +1605,8 @@ begin
       k := FieldDefs.Count;
       for i := 0 to Fields.Count-1 do begin
         vFieldDef := buscaFieldDef(Fields[i].FieldName);
+        if vFieldDef = nil then
+          vFieldDef := buscaFieldDef(Fields[i].FullName);
         if vFieldDef = nil then
           vFieldDef := buscaFieldDef(Fields[i].DisplayName);
 
@@ -1381,6 +1639,7 @@ begin
         end;
       end;
     {$ENDIF}
+
     SetLength(FFieldOffsets,Fields.Count);
     SetLength(FFieldSize,Fields.Count);
     for i := 0 to Fields.Count-1 do begin
@@ -1546,16 +1805,6 @@ begin
         end;
       end;
 
-{
-      if (Data1 = null) and (Data2 <> null) then
-        Result := -1
-      else if (Data1 <> null) and (Data2 = null) then
-        Result := 1
-      else if (Data1 < Data2) then
-        Result := -1
-      else if (Data1 > Data2) then
-        Result := 1;
-}
       if vDescendingSort then
         Result := -Result;
 
@@ -1569,11 +1818,16 @@ constructor TRESTDWMemTable.Create(AOwner: TComponent);
 begin
   inherited;
   FStatusRecord := rsInserted;
+  FStatusRecordChanged := False;
   FRecordCount := 0;
   FFilterRecordCount := -1;
   FRecords := TList.Create;
   FBlobs := TList.Create;
   FIndexList := nil;
+  FFilterBuffer := nil;
+  FFilterParser := nil;
+  FCurrentRecordObj := nil;
+  FStorageDataType := nil;
 end;
 
 function TRESTDWMemTable.CreateBlobStream(Field: TField;
@@ -1816,6 +2070,15 @@ begin
   GetMem(Result, FRecordBufferSize);
 end;
 
+function TRESTDWMemTable.BookmarkValid(ABookmark: TBookmark): Boolean;
+var
+  ReqBookmark: Integer;
+begin
+  Move(Pointer(ABookmark)^,ReqBookmark,BookmarkSize);
+  Result := (ABookmark <> nil) and Active and (ReqBookmark >= FBofCrack) and
+            (ReqBookmark < InternalRecordCount);
+end;
+
 procedure TRESTDWMemTable.InternalDelete;
 var
   vRec : TRESTDWRecord;
@@ -1828,6 +2091,7 @@ begin
 
   if FCurrentRecord >= FRecords.Count then
     Dec(FCurrentRecord);
+
   Accept := True;
   repeat
     if Filtered then begin
