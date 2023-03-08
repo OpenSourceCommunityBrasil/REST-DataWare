@@ -1630,8 +1630,8 @@ begin
     FreeAndNil(FFilterParser);
 
   FreeIndexList;
-  FRecords.Free;
-  FBlobs.Free;
+  FreeAndNil(FRecords);
+  FreeAndNil(FBlobs);
   inherited;
 end;
 
