@@ -1,3 +1,4 @@
+{$DEFINE RESTDW}
 {$IFNDEF FPC}
  {$if CompilerVersion >= 26}
   {$LEGACYIFEND ON}

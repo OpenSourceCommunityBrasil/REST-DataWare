@@ -1,7 +1,7 @@
 unit uRESTDWTools;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -30,7 +30,7 @@ Uses
  {$ELSE}
  {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
  EncdDecd,
-  {$IF Defined(RESTDWFMX)}IOUtils,{$IFEND}
+  {$IFDEF RESTDWFMX}IOUtils,{$ENDIF}
   {$IF CompilerVersion > 27}NetEncoding,{$IFEND}
  {$ENDIF}
  Classes, SysUtils, DB,
@@ -948,7 +948,7 @@ Begin
  {$IFDEF FPC}
  Result := CopyFileTo(PChar(Source), PChar(Destination));
  {$ELSE}
-  {$IF Defined(RESTDWFMX)}
+  {$IFDEF RESTDWFMX}
    Result := False;
    Try
     TFile.Copy(Source, Destination, True);
@@ -957,7 +957,7 @@ Begin
    End;
   {$ELSE}
    Result := CopyFile(PChar(Source), PChar(Destination), False);
-  {$IFEND}
+  {$ENDIF}
  {$ENDIF}
 End;
 Function GetUniqueFileName(Const APath,

@@ -1,7 +1,7 @@
 unit uRESTDWResponseTranslator;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {$IFDEF FPC}
  {$mode objfpc}{$H+}
 {$ENDIF}

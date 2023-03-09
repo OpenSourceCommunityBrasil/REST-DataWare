@@ -1,5 +1,8 @@
 unit uRESTDWDatamodule;
 
+{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+
 interface
 
 Uses

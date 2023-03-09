@@ -1,7 +1,7 @@
 ﻿unit uRESTDWDriverBase;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
