@@ -78,6 +78,7 @@ type
     FDataset : TRESTDWMemTable;
     FBuffer : Pointer;
     FAccept : Byte;
+    FID     : Integer;
     FStatus : TRESTDWRecordStatus;
     procedure setBuffer(const Value: Pointer);
   protected
@@ -94,6 +95,7 @@ type
   published
     property Accept : Byte read FAccept write FAccept;
     property Status : TRESTDWRecordStatus read FStatus write FStatus;
+    property ID : Integer read FID write FID;
   end;
 
   TRESTDWBlobStream = class(TStream)
@@ -191,6 +193,7 @@ type
     FStorageDataType : TRESTDWStorageBase;
     FCaseInsensitiveSort: Boolean;
     FIndexList : TStringList;
+    FLastID : integer;
 
     FStatusRecord : TRESTDWRecordStatus;
     FStatusRecordChanged : Boolean;
@@ -254,6 +257,7 @@ type
     function BookmarkValid(ABookmark: TBookmark): Boolean; override;
     procedure InternalGotoBookmark(ABookmark: Pointer); override;
     procedure InternalSetToRecord(Buffer: TRESTDWBuffer); override;
+
     procedure SetBookmarkData(Buffer: TRESTDWBuffer; Data: Pointer); override;
     procedure GetBookmarkData(Buffer: TRESTDWBuffer; Data: Pointer); override;
     {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
@@ -404,6 +408,7 @@ begin
   FBofCrack := -1;
   FEofCrack := InternalRecordCount;
   FCurrentRecord := FBofCrack;
+  FRecordSize := FRecordSize + SizeOf(Byte);
   FRecordBufferSize := FRecordSize + SizeOf(Pointer);
   BookmarkSize := SizeOf(Integer);
 
@@ -1353,7 +1358,11 @@ end;
 
 procedure TRESTDWMemTable.SetBookmarkData(Buffer: TRESTDWBuffer; Data: Pointer);
 begin
-  PRESTDWRecInfo(Buffer + FRecordSize)^.Bookmark := Integer(Data^);
+  {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+    SetBookmarkData(Buffer,TBookmark(Data));
+  {$ELSE}
+    PRESTDWRecInfo(Buffer + FRecordSize)^.Bookmark := Integer(Data^);
+  {$IFEND}
 end;
 
 function TRESTDWMemTable.GetRecordCount: integer;
@@ -1523,12 +1532,22 @@ begin
       vRec := GetRecordObj(FCurrentRecord);
       vRec.CopyBuffer(Pointer(Buffer));
       vAccepted := vRec.Accept = 1;
-      if vAccepted then
-        CalculateFields(Buffer);
-	  end;
 
-    if (GetMode = gmCurrent) and not vAccepted then
+      // cuidando com isso... rsrsrsrsr
+      // esse set bookmark faz com que a grid nao fique louca
+      // louca no sentido de ela nao ter fim e nem inicio
+      // fica "girando" do primeiro volta pro ultimo
+      with PRESTDWRecInfo(Buffer + FRecordSize)^ do begin
+        BookmarkFlag := bfCurrent;
+        Bookmark := FCurrentRecord;
+      end;
+      if vAccepted then begin
+        CalculateFields(Buffer);
+      end;
+	  end
+    else if (GetMode = gmCurrent) and not vAccepted then begin
       Result:=grError;
+    end;    
   until (Result <> grOK) or vAccepted;
 
   // load the data
@@ -1670,7 +1689,7 @@ end;
 procedure TRESTDWMemTable.InternalInitRecord(Buffer: TRESTDWBuffer);
 begin
   CheckActive;
-  FillChar(Buffer^, FRecordBufferSize, 0);
+  FillChar(Buffer^, FRecordSize, 0);
 end;
 
 function TRESTDWMemTable.calcFieldSize(ft: TFieldType; fs: integer): integer;
@@ -1863,7 +1882,7 @@ begin
       if (Filtered) then begin
         RecalcFilters;
         First;
-      end;
+     end;
       SortOnFields(FIndexFieldNames,FCaseInsensitiveSort);
       RefreshStates;
     end;
@@ -2120,6 +2139,7 @@ var
 begin
   InternalLast;
   vRec := TRESTDWRecord.Create(Self);
+
   Move(Buffer^,vRec.FBuffer^,FRecordBufferSize);
 
   // set status
@@ -2267,6 +2287,9 @@ begin
   FDataset := AOwner;
   FAccept := 1;
   FStatus := rsInserted;
+  FID := FDataset.FLastID;
+
+  FDataset.FLastID := FDataset.FLastID + 1;
 
   GetMem(FBuffer,FDataset.FRecordBufferSize);
   FillChar(FBuffer^,FDataset.FRecordBufferSize,0);
