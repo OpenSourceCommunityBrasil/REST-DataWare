@@ -27,26 +27,8 @@ unit uRESTDWBasicTypes;
 Interface
 
 Uses
-//  {$IFDEF RESTDWLAZDRIVER}memds,{$ENDIF}
-//  {$IFDEF RESTDWUNIDACMEM}DADump, UniDump, VirtualTable, MemDS,{$ENDIF}
-//  {$IFDEF RESTDWCLIENTDATASET}DBClient,{$ENDIF}
-//  {$IFDEF RESTKBMMEMTABLE}kbmmemtable,{$ENDIF}
   {$IFNDEF FPC}
   {$if CompilerVersion < 24}DbTables,{$IFEND}
-//   {$IF CompilerVersion > 22} // Delphi 2010 pra cima
-//    {$IFDEF RESTDWFDMEMTABLE}
-//    FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
-//    FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-//    FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-//    {$IF CompilerVersion > 26}FireDAC.Stan.StorageBin,{$IFEND}
-//    {$ENDIF}
-//    {$IFDEF RESTDWADMEMTABLE}
-//     uADStanIntf, uADStanOption, uADStanParam,
-//     uADStanError, uADPhysIntf, uADDAptIntf,
-//     uADCompDataSet, uADCompClient,
-//    {$IF CompilerVersion > 26}uADStanStorageBin,{$IFEND}
-//    {$ENDIF}
-//   {$IFEND}
   {$ENDIF}
   SysUtils,  Classes, Db, FMTBcd,
   uRESTDWAbout, uRESTDWMemoryDataset, uRESTDWConsts,
