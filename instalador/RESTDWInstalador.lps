@@ -8,10 +8,9 @@
       <Unit>
         <Filename Value="RESTDWInstalador.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="2"/>
-        <CursorPos X="61" Y="19"/>
+        <TopLine Value="3"/>
+        <CursorPos X="20" Y="30"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
       </Unit>
@@ -67,7 +66,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="82"/>
         <CursorPos X="51" Y="60"/>
-        <UsageCount Value="172"/>
+        <UsageCount Value="174"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\configdatabase.pas"/>
@@ -75,14 +74,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="44"/>
         <CursorPos X="54" Y="52"/>
-        <UsageCount Value="90"/>
+        <UsageCount Value="92"/>
       </Unit>
       <Unit>
         <Filename Value="src\funcoes\imagefunctions.pas"/>
         <IsPartOfProject Value="True"/>
         <TopLine Value="127"/>
         <CursorPos X="16" Y="133"/>
-        <UsageCount Value="51"/>
+        <UsageCount Value="53"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -90,7 +89,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="5"/>
         <CursorPos X="50" Y="8"/>
-        <UsageCount Value="36"/>
+        <UsageCount Value="38"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -101,8 +100,8 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="2"/>
         <TopLine Value="57"/>
-        <CursorPos Y="70"/>
-        <UsageCount Value="36"/>
+        <CursorPos X="54" Y="69"/>
+        <UsageCount Value="38"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -226,10 +225,12 @@
       </Unit>
       <Unit>
         <Filename Value="D:\IDE\lazarus\lazarus\lcl\include\customform.inc"/>
-        <EditorIndex Value="-1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="2152"/>
-        <CursorPos Y="2164"/>
-        <UsageCount Value="9"/>
+        <CursorPos X="24" Y="2163"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\CORE\Source\Sockets\Fhttp\uRESTDWFReg.pas"/>
@@ -327,11 +328,10 @@
       </Unit>
       <Unit>
         <Filename Value="..\CORE\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="649"/>
         <CursorPos X="29" Y="662"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\CORE\Packages\Lazarus\RESTDataWareComponents.pas"/>
@@ -342,14 +342,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="62" Column="25" TopLine="53"/>
-      </Position>
-      <Position>
-        <Filename Value="src\telas\uprincipal.pas"/>
-        <Caret Line="371" Column="71" TopLine="359"/>
-      </Position>
       <Position>
         <Filename Value="src\telas\uprincipal.pas"/>
         <Caret Line="373" Column="26" TopLine="359"/>
@@ -458,8 +450,16 @@
         <Caret Line="70" TopLine="57"/>
       </Position>
       <Position>
-        <Filename Value="..\CORE\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas"/>
-        <Caret Line="662" Column="29" TopLine="649"/>
+        <Filename Value="utesteanim.pas"/>
+        <Caret Line="69" Column="54" TopLine="57"/>
+      </Position>
+      <Position>
+        <Filename Value="D:\IDE\lazarus\lazarus\lcl\include\customform.inc"/>
+        <Caret Line="2164" TopLine="2152"/>
+      </Position>
+      <Position>
+        <Filename Value="RESTDWInstalador.lpr"/>
+        <Caret Line="30" Column="20" TopLine="8"/>
       </Position>
     </JumpHistory>
     <RunParams>
