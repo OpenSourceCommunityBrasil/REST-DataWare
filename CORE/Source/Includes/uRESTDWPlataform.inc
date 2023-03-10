@@ -16,8 +16,17 @@
 {$IFEND}
 
 {$IFDEF MSWINDOWS}
- {$DEFINE RESTDWWINDOWS}
+  {$DEFINE RESTDWWINDOWS}
+  {$IF Declared(FireMonkeyVersion)}
+    {$DEFINE RESTDWWINFMX}
+  {$IFEND}
 {$ENDIF}
+{$IF Defined(LINUX) or Defined(LINUX64)}
+  {$DEFINE RESTDWLINUX}
+  {$IFDEF HAS_FMX}
+    {$DEFINE RESTDWLINUXFMX}
+  {$ENDIF}
+{$IFEND}
 {$IFNDEF FPC}
  {$if CompilerVersion < 24}//Delphi under XE3
   //Geral

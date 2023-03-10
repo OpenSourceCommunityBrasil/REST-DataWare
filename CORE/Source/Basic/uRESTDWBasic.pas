@@ -1,7 +1,7 @@
 unit uRESTDWBasic;
 
-{$I ..\Includes\uRESTDWPlataform.inc}
 {$I ..\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -1861,11 +1861,11 @@ Begin
  vAccessTag            := '';
  vErrorMessage         := '';
  vServerMethod         := Nil;
- {$IF Defined(ANDROID) Or Defined(IOS)}
+ {$IFDEF RESTDWFMX}
  vBasePath             := System.IOUtils.TPath.Combine(System.IOUtils.TPath.GetDocumentsPath, '/');
  {$ELSE}
  vBasePath             := ExtractFilePath(ParamStr(0));
- {$IFEND}
+ {$ENDIF}
  vContentType          := vContentType;
  decoder               := Nil;
  vdwConnectionDefs     := Nil;
@@ -2162,7 +2162,7 @@ Begin
             decoder.FreeSourceStream := False;
             decoder.ReadHeader;
             Case Decoder.PartType of
-             mcptAttachment:
+             mcptAttachment: {$REGION mcptAttachment}
               Begin
                ms := TMemoryStream.Create;
                ms.Position := 0;
@@ -2241,8 +2241,8 @@ Begin
                DWParams.Add(JSONParam);
                ms.Free;
                vDecoderHeaderList.Free;
-              End;
-             mcptText :
+              End;{$ENDREGION}
+             mcptText : {$REGION mcptText}
               Begin
                {$IFDEF FPC}
                ms := TStringStream.Create('');
@@ -2358,8 +2358,8 @@ Begin
                FreeAndNil(ms);
                If Assigned(Newdecoder)  Then
                 FreeAndNil(Newdecoder);
-              End;
-             mcptIgnore :
+              End;{$ENDREGION}
+             mcptIgnore : {$REGION mcptIgnore}
               Begin
                Try
                 If decoder <> Nil Then
@@ -2368,8 +2368,7 @@ Begin
                 TRESTDWMessageDecoderMIME(decoder).MIMEBoundary := boundary;
                Finally
                End;
-              End;
-
+              End;{$ENDREGION}
              mcptEOF:
               Begin
                FreeAndNil(decoder);
@@ -2859,7 +2858,7 @@ Begin
            vErrorCode            := 401;
            vErrorMessage         := cInvalidAuth;
            Case vServerAuthOptions.AuthorizationOption Of
-            rdwAOBasic  : Begin
+            rdwAOBasic  : Begin{$REGION rdwAOBasic}
                            vNeedAuthorization := False;
                            vTempEvent   := ReturnEventValidation(TServerMethodDatamodule(vTempServerMethods), vUrlToExec);
                            If vTempEvent = Nil Then
@@ -2902,8 +2901,8 @@ Begin
                                Exit;
                               End;
                             End;
-                          End;
-            rdwAOBearer : Begin
+                          End;{$ENDREGION}
+            rdwAOBearer : Begin{$REGION rdwAOBearer}
                            vUrlToken := Lowercase(vUrlToExec);
                            If Copy(vUrlToken, InitStrPos, 1) = '/' then
                             Delete(vUrlToken, InitStrPos, 1);
@@ -3095,8 +3094,8 @@ Begin
                              Else
                               vTokenValidate := False;
                             End;
-                          End;
-            rdwAOToken  : Begin
+                          End;{$ENDREGION}
+            rdwAOToken  : Begin{$REGION rdwAOToken}
                            vUrlToken := Lowercase(vUrlToExec);
                            If vUrlToken =
                               Lowercase(TRESTDWAuthOptionTokenServer(vServerAuthOptions.OptionParams).GetTokenEvent) Then
@@ -3286,7 +3285,7 @@ Begin
                              Else
                               vTokenValidate := False;
                             End;
-                          End;
+                          End;{$ENDREGION}
            End;
            vErrorCode            := 200;
            vErrorMessage         := '';

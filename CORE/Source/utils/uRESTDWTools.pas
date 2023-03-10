@@ -1,7 +1,7 @@
 unit uRESTDWTools;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -29,16 +29,16 @@ Uses
  LConvEncoding, lazutf8,
  {$ELSE}
  {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
+ {$IFDEF RESTDWFMX}IOUtils,{$ENDIF}
+ {$IF CompilerVersion > 27}NetEncoding,{$IFEND}
  EncdDecd,
-  {$IF Defined(RESTDWFMX)}IOUtils,{$IFEND}
-  {$IF CompilerVersion > 27}NetEncoding,{$IFEND}
  {$ENDIF}
  Classes, SysUtils, DB,
  uRESTDWProtoTypes, uRESTDWConsts, DWDCPrijndael,
  DWDCPsha256;
 
-  Type
-   TCripto = Class(TPersistent)
+Type
+  TCripto = Class(TPersistent)
    Private
     vKeyString : String;
     vUseCripto : Boolean;
@@ -67,7 +67,6 @@ Uses
 
  Function  EncryptSHA256          (Key, Text          : TRESTDWString;
                                    Encrypt            : Boolean)                : String;
-
  Function  EncodeStrings          (Value                : String
                                   {$IFDEF FPC};DatabaseCharSet             : TDatabaseCharSet{$ENDIF}) : String;
  Function  DecodeStrings          (Value                : String
@@ -769,6 +768,7 @@ Begin
  Until (Charlen = 0) or (Unicode = 0);
  Result := P;
 End;
+
 Function  GetStringEncode(Value : String;DatabaseCharSet : TDatabaseCharSet) : String;
 Begin
  Result := Value;
@@ -787,6 +787,7 @@ Begin
    csISO_8859_2 : Result := ISO_8859_2ToUTF8(Value);
  End;
 End;
+
 Function  GetStringDecode(Value : String;DatabaseCharSet : TDatabaseCharSet) : String;
 Begin
  Result := Value;
@@ -806,6 +807,7 @@ Begin
  End;
 End;
 {$ENDIF}
+
 Function restdwMin(Const AValueOne,
                    AValueTwo        : Int64) : Int64;
 Begin
@@ -839,6 +841,7 @@ Begin
  WSResult.MessageText := MessageText;
  Result               := Result2JSON(WSResult); //EncodeStrings(TServerUtils.Result2JSON(WSResult){$IFDEF FPC}, csUndefined{$ENDIF});
 End;
+
 Function GetPairJSONStr(Status,
                         MessageText : String;
                         Encoding    : TEncodeSelect = esUtf8) : String;
@@ -849,28 +852,33 @@ Begin
  WSResult.MessageText := MessageText;
  Result               := Result2JSON(WSResult); //EncodeStrings(TServerUtils.Result2JSON(WSResult){$IFDEF FPC}, csUndefined{$ENDIF});
 End;
+
 Function BytesToInt16(Const AValue : TRESTDWBytes;
                       Const AIndex : Integer = 0): DWInt32;{$IFDEF USE_INLINE}inline;{$ENDIF}
 Begin
  Assert(Length(AValue) >= (AIndex+SizeOf(DWInt32)));
  Result := PDWInt32(@AValue[AIndex])^;
 End;
+
 Function BytesToInt32(Const AValue : TRESTDWBytes;
                       Const AIndex : Integer = 0) : DWInt32;{$IFDEF USE_INLINE}inline;{$ENDIF}
 Begin
  Assert(Length(AValue) >= (AIndex+SizeOf(DWInt32)));
  Result := PDWInt32(@AValue[AIndex])^;
 End;
+
 Function BytesToInt64(Const AValue : TRESTDWBytes;
                       Const AIndex : Integer = 0) : DWInt64;{$IFDEF USE_INLINE}inline;{$ENDIF}
 Begin
  Assert(Length(AValue) >= (AIndex+SizeOf(DWInt64)));
  Result := PDWInt64(@AValue[AIndex])^;
 End;
+
 Function Base64Decode(const AInput : String) : TRESTDWBytes;
 Begin
  Result := TRESTDWBase64.Decode(ToBytes(AInput));
 End;
+
 Function Base64Encode(Const S : String): String;
  Function Encode_Byte(b: Byte): char;
  Begin
@@ -897,12 +905,14 @@ Begin
    Inc(i, 3);
   End;
 End;
+
 Function RemoveHeaderEntry(Const AHeader,
                            AEntry         : String;
                            AQuoteType     : TRESTDWHeaderQuotingType) : String;
 Begin
  Result := ReplaceHeaderSubItem(AHeader, AEntry, '', AQuoteType);
 End;
+
 Function RemoveHeaderEntry(Const AHeader,
                            AEntry         : String;
                            Var VOld       : String;
@@ -910,6 +920,7 @@ Function RemoveHeaderEntry(Const AHeader,
 Begin
  Result := ReplaceHeaderSubItem(AHeader, AEntry, '', VOld, AQuoteType);
 End;
+
 Function MediaTypeMatches(Const AValue,
                           AMediaType    : String) : Boolean;
 Begin
@@ -918,6 +929,7 @@ Begin
  Else
   Result := TextStartsWith(AValue, AMediaType + '/'); {do not localize}
 End;
+
 Function MakeTempFilename(Const APath : TFileName = '') : TFileName;
 {$IFNDEF FPC}
 Var
@@ -942,13 +954,14 @@ Begin
   Result := GetUniqueFilename(lPath, 'restdw', lExt);
  {$ENDIF}
 End;
+
 Function CopyFileTo(Const Source,
                     Destination : TFileName): Boolean;
 Begin
  {$IFDEF FPC}
  Result := CopyFileTo(PChar(Source), PChar(Destination));
  {$ELSE}
-  {$IF Defined(RESTDWFMX)}
+  {$IFDEF RESTDWFMX}
    Result := False;
    Try
     TFile.Copy(Source, Destination, True);
@@ -957,9 +970,10 @@ Begin
    End;
   {$ELSE}
    Result := CopyFile(PChar(Source), PChar(Destination), False);
-  {$IFEND}
+  {$ENDIF}
  {$ENDIF}
 End;
+
 Function GetUniqueFileName(Const APath,
                            APrefix,
                            AExt         : String) : String;
@@ -1002,11 +1016,13 @@ Begin
   Until False;
   {$ENDIF}
 End;
+
 Function IsHeaderMediaType(Const AHeaderLine,
                            AMediaType         : String): Boolean;
 Begin
  Result := MediaTypeMatches(ExtractHeaderItem(AHeaderLine), AMediaType);
 End;
+
 Function IsHeaderMediaTypes(Const AHeaderLine : String;
                             Const AMediaTypes : Array Of String) : Boolean;
 Var
@@ -1024,6 +1040,7 @@ Begin
     End;
   End;
 End;
+
 Function FindFirstNotOf(Const AFind,
                         AText           : String;
                         Const ALength   : Integer = -1;
@@ -1053,6 +1070,7 @@ Begin
     End;
   End;
 End;
+
 Function FindFirstOf(Const AFind,
                      AText           : String;
                      Const ALength   : Integer = -1;
@@ -1080,6 +1098,7 @@ Begin
     End;
   End;
 End;
+
 Function UTCOffsetToStr(Const AOffset    : TDateTime;
                         Const AUseGMTStr : Boolean = False) : String;
 Var
@@ -1100,12 +1119,14 @@ Begin
     Result[1] := '+';  {do not localize}
   End;
 End;
+
 Function RDWStrToInt(Const S  : String;
                      ADefault : Integer = 0) : Integer;
                      {$IFDEF USE_INLINE}inline;{$ENDIF}
 Begin
  Result := StrToIntDef(Trim(S), ADefault);
 End;
+
 Function PosRDW(Const ASubStr,
                 AStr          : String;
                 AStartPos     : DWInt32) : DWInt32;
@@ -1166,6 +1187,7 @@ Begin
    Until False;
   End;
 End;
+
 Function ValidateBytes(Const ABytes : TRESTDWBytes;
                        AByteIndex,
                        AByteCount   : Integer) : PByte;
@@ -1183,6 +1205,7 @@ Begin
  Else
   Result := nil;
 End;
+
 Function ValidateBytes(Const ABytes : TRESTDWBytes;
                        AByteIndex,
                        AByteCount,
@@ -1201,6 +1224,7 @@ Begin
  Else
   Result := Nil;
 End;
+
 Function ValidateChars(Const AChars : TRESTDWWideChars;
                        ACharIndex,
                        ACharCount   : Integer) : PDWWideChar;
@@ -1219,10 +1243,12 @@ Begin
  Else
   Result := nil;
 End;
+
 Function BytesToStringRaw(Const AValue: TRESTDWBytes) : String; Overload;{$IFDEF USE_INLINE}inline;{$ENDIF}
 Begin
  Result := BytesToStringRaw(AValue, 0, -1);
 End;
+
 Function BytesToStringRaw(Const AValue      : TRESTDWBytes;
                           Const AStartIndex : Integer;
                           Const ALength     : Integer = -1) : String;
@@ -1245,15 +1271,18 @@ Begin
  Else
   Result := '';
 End;
+
 Function GetByteCount(Const AChars : PDWWideChar;
                       ACharCount   : Integer) : Integer;
 Begin
  Result := ACharCount * SizeOf(WideChar);
 End;
+
 Function GetCharCount(Const ABytes: PByte; AByteCount: Integer): Integer;
 Begin
  Result := AByteCount Div SizeOf(WideChar);
 End;
+
 Function GetByteCount(Const AChars : TRESTDWWideChars) : Integer;
 begin
  If AChars <> Nil Then
@@ -1261,6 +1290,7 @@ begin
  Else
   Result := 0;
 End;
+
 Function GetByteCount(Const AChars : TRESTDWWideChars;
                       ACharIndex,
                       ACharCount   : Integer): Integer;
@@ -1273,6 +1303,7 @@ Begin
  Else
   Result := 0;
 End;
+
 Function GetBytes(Const AChars : String) : TRESTDWBytes;{$IFDEF USE_INLINE}Inline;{$ENDIF}
 Var
  Len : Integer;
@@ -1285,6 +1316,7 @@ Begin
    GetBytes(PDWWideChar(AChars), Len, PByte(Result), Len);
   End;
 End;
+
 Function GetBytes(Const AChars : PDWWideChar;
                   ACharCount   : Integer): TRESTDWBytes;
 Var
@@ -1298,6 +1330,7 @@ Begin
    GetBytes(AChars, ACharCount, PByte(Result), Len);
   End;
 End;
+
 Function GetBytes(Const AChars : PDWWideChar;
                   ACharCount   : Integer;
                   ABytes       : PByte;
@@ -1318,6 +1351,7 @@ Begin
    Inc(ABytes);
   End;
 End;
+
 Function GetChars(Const ABytes : TRESTDWBytes): TRESTDWWideChars;
 Begin
  If ABytes <> Nil Then
@@ -1325,6 +1359,7 @@ Begin
  Else
   Result := nil;
 End;
+
 Function GetCharCount(Const ABytes : TRESTDWBytes;
                       AByteIndex,
                       AByteCount   : Integer) : Integer;
@@ -1337,6 +1372,7 @@ Begin
  Else
   Result := 0;
 End;
+
 Function GetChars(Const ABytes : TRESTDWBytes;
                   AByteIndex,
                   AByteCount   : Integer) : TRESTDWWideChars;
@@ -1351,6 +1387,7 @@ Begin
    GetChars(@ABytes[AByteIndex], AByteCount, Result, Len);
   End;
 End;
+
 Function GetChars(Const ABytes : TRESTDWBytes;
                   AByteIndex,
                   AByteCount   : Integer;
@@ -1365,6 +1402,7 @@ Begin
  Else
   Result := 0;
 End;
+
 Function GetChars(Const ABytes : PByte;
                   AByteCount   : Integer): TRESTDWWideChars;
 Var
@@ -1377,6 +1415,7 @@ Begin
    GetChars(ABytes, AByteCount, Result, Len);
   End;
 End;
+
 Function GetChars(Const ABytes : PByte;
                   AByteCount   : Integer;
                   Var VChars   : TRESTDWWideChars;
@@ -1402,6 +1441,7 @@ Begin
  Else
   Result := 0;
 End;
+
 Function GetChars(Const ABytes : PByte;
                   AByteCount   : Integer;
                   AChars       : PDWWideChar;
@@ -1422,6 +1462,7 @@ Begin
    Inc(P);
   End;
 End;
+
 Procedure CopyRDWString(Const ASource    : String;
                         Var VDest        : TRESTDWBytes;
                         Const ADestIndex : Integer;
@@ -1429,6 +1470,7 @@ Procedure CopyRDWString(Const ASource    : String;
 Begin
  CopyRDWString(ASource, 1, VDest, ADestIndex, ALength);
 End;
+
 Procedure CopyRDWString(Const ASource      : String;
                         Const ASourceIndex : Integer;
                         Var VDest          : TRESTDWBytes;
@@ -1444,6 +1486,7 @@ Begin
    LTmp := GetChars(RawToBytes(ASource[ASourceIndex], LLength)); // convert to Unicode
  GetBytes(LTmp, 0, Length(LTmp), VDest, ADestIndex);
 End;
+
 Function GetTokenString(Value : String) : String;
 Var
  vPos : Integer;
@@ -1463,6 +1506,7 @@ Begin
  If Trim(Result) <> '' Then
   Result := StringReplace(Result, '"', '', [rfReplaceAll]);
 End;
+
 Function GetBearerString(Value : String) : String;
 Var
  vPos : Integer;
@@ -1476,6 +1520,7 @@ Begin
  If Trim(Result) <> '' Then
   Result := StringReplace(Result, '"', '', [rfReplaceAll]);
 End;
+
 Function GetBytes(Const AChars : PDWWideChar;
                   ACharCount   : Integer;
                   Var VBytes   : TRESTDWBytes;
@@ -1503,6 +1548,7 @@ Begin
  Else
   Result := 0;
 End;
+
 Function GetBytes(Const AChars : TRESTDWWideChars;
                   ACharIndex,
                   ACharCount   : Integer;
@@ -1512,6 +1558,7 @@ Begin
  Result := GetBytes(ValidateChars(AChars, ACharIndex, ACharCount),
                     ACharCount, VBytes, AByteIndex);
 End;
+
 Function ByteToHex(Const AByte : Byte) : String;
                   {$IFDEF USE_INLINE} Inline;{$ENDIF}
 Begin
@@ -1519,6 +1566,7 @@ Begin
  Result[1] := RESTDWHexDigits[(AByte And $F0) Shr 4];
  Result[2] := RESTDWHexDigits[AByte  And $F];
 End;
+
 Procedure ExpandBytes(Var VBytes      : TRESTDWBytes;
                       Const AIndex    : Integer;
                       Const ACount    : Integer;
@@ -1540,6 +1588,7 @@ Begin
     VBytes[I] := AFillByte;
   End;
 End;
+
 Procedure InsertBytes(Var VBytes         : TRESTDWBytes;
                       Const ADestIndex   : Integer;
                       Const ASource      : TRESTDWBytes;
@@ -1554,6 +1603,7 @@ Begin
    CopyBytes(ASource, ASourceIndex, VBytes, ADestIndex, LAddLen);
   End;
 End;
+
 Procedure InsertByte(Var VBytes   : TRESTDWBytes;
                      Const AByte  : Byte;
                      Const AIndex : Integer);
@@ -1561,6 +1611,7 @@ Procedure InsertByte(Var VBytes   : TRESTDWBytes;
 Begin
  ExpandBytes(VBytes, AIndex, 1, AByte);
 End;
+
 Procedure RemoveBytes(Var VBytes   : TRESTDWBytes;
                       Const ACount : Integer;
                       Const AIndex : Integer = 0);
@@ -1580,6 +1631,7 @@ Begin
    SetLength(VBytes, restdwLength(VBytes) - LActual);
   End;
 End;
+
 Function ByteIndex(Const AByte       : Byte;
                    Const ABytes      : TRESTDWBytes;
                    Const AStartIndex : Integer = 0) : Integer;
@@ -1596,6 +1648,7 @@ Begin
     End;
   End;
 End;
+
 Function ByterdwInSet(Const ABytes : TRESTDWBytes;
                       Const AIndex : Integer;
                       Const ASet   : TRESTDWBytes) : Integer;
@@ -1608,6 +1661,7 @@ Begin
  Else
   Result := -1;
 End;
+
 Function ByteIsInSet(Const ABytes : TRESTDWBytes;
                      Const AIndex : Integer;
                      Const ASet   : TRESTDWBytes) : Boolean;
@@ -1615,6 +1669,7 @@ Function ByteIsInSet(Const ABytes : TRESTDWBytes;
 Begin
  Result := ByterdwInSet(ABytes, AIndex, ASet) > -1;
 End;
+
 Function ByteIsInEOL(Const ABytes : TRESTDWBytes;
                      Const AIndex : Integer) : Boolean;
 Var
@@ -1625,6 +1680,7 @@ Begin
  LSet[1] := 10;
  Result := ByteIsInSet(ABytes, AIndex, LSet);
 End;
+
 Procedure AppendBytes(Var VBytes    : TRESTDWBytes;
                       Const AToAdd  : TRESTDWBytes;
                       Const AIndex  : Integer = 0;
@@ -1641,11 +1697,13 @@ Begin
    CopyBytes(AToAdd, AIndex, VBytes, LOldLen, LAddLen);
   End;
 End;
+
 Function IsHeaderValue(Const AHeaderLine : String;
                        Const AValue      : String) : Boolean;
 Begin
  Result := TextIsSame(ExtractHeaderItem(AHeaderLine), AValue);
 End;
+
 Function ReadStringFromStream(AStream : TStream;
                               ASize   : Integer = -1) : String;
 Var
@@ -1654,11 +1712,13 @@ Begin
  ASize  := TRESTDWStreamHelper.ReadBytes(AStream, LBytes, ASize);
  Result := BytesToString(LBytes, 0, ASize);
 End;
+
 Procedure StringToStream(AStream    : TStream;
                          Const AStr : String);{$IFDEF USE_INLINE}Inline;{$ENDIF}
 Begin
  WriteStringToStream(AStream, AStr, -1, 1);
 End;
+
 procedure WriteStringToStream(AStream       : TStream;
                               Const AStr    : String;
                               Const ALength : Integer = -1;
@@ -1675,6 +1735,7 @@ Begin
    TRESTDWStreamHelper.Write(AStream, LBytes);
   End;
 End;
+
 Function ReadBytesFromStream(Const AStream : TStream;
                              Var   ABytes  : TRESTDWBytes;
                              Const Count   : TRESTDWStreamSize;
@@ -1682,6 +1743,7 @@ Function ReadBytesFromStream(Const AStream : TStream;
 Begin
  Result := TRESTDWStreamHelper.ReadBytes(AStream, ABytes, Count, AIndex);
 End;
+
 Procedure WriteBytesToStream(Const AStream : TStream;
                              Const ABytes  : TRESTDWBytes;
                              Const ASize   : Integer = -1;
@@ -1689,6 +1751,7 @@ Procedure WriteBytesToStream(Const AStream : TStream;
 Begin
  TRESTDWStreamHelper.Write(AStream, ABytes, ASize, AIndex);
 End;
+
 Procedure CopyBytes(Const ASource      : TRESTDWBytes;
                     Const ASourceIndex : Integer;
                     Var   VDest        : TRESTDWBytes;
@@ -1699,6 +1762,7 @@ Begin
  Assert((ASourceIndex+ALength) <= restdwLength(ASource));
  Move(ASource[ASourceIndex], VDest[ADestIndex], ALength);
 End;
+
 Function RawToBytes(Const AValue : String;
                     Const ASize  : Integer) : TRESTDWBytes;
 Var
@@ -1723,10 +1787,12 @@ Begin
   {$ENDIF}
   End;
 End;
+
 Function ToBytes(Const AValue : String) : TRESTDWBytes;
 Begin
  Result := ToBytes(AValue, -1, 1);
 End;
+
 Function ToBytes(Const AValue  : String;
                  Const ALength : Integer;
                  Const AIndex  : Integer = 1) : TRESTDWBytes;
@@ -1743,6 +1809,7 @@ Begin
  Else
   SetLength(Result, 0);
 End;
+
 Function ToBytes(Const AValue : Char) : TRESTDWBytes;
 Var
  LBytes : TRESTDWBytes;
@@ -1750,6 +1817,7 @@ Begin
  LBytes := RawToBytes(AValue, 1);
  Result := LBytes;
 End;
+
 Function ToBytes(Const AValue : TRESTDWBytes;
                  Const ASize  : Integer;
                  Const AIndex : Integer = 0) : TRESTDWBytes;
@@ -1789,12 +1857,14 @@ Begin
     End;
   End;
 End;
+
 Function restdwIndexOfName(AStrings             : TStrings;
                            Const AStr           : String;
                            Const ACaseSensitive : Boolean = False) : Integer;
 Begin
  Result := InternalrestdwIndexOfName(AStrings, AStr, ACaseSensitive);
 End;
+
 Function ExtractHeaderItem(Const AHeaderLine : String) : String;
 Var
  s : string;
@@ -1802,6 +1872,7 @@ Begin
  s      := AHeaderLine;
  Result := Trim(Fetch(s, ';'));
 End;
+
 Function CharRange(Const AMin, AMax : Char) : String;
 Var
  i : Char;
@@ -1810,6 +1881,7 @@ Begin
  For i := AMin To AMax Do
   Result[Ord(i) - Ord(AMin) + 1] := i;
 End;
+
 Function TextStartsWith(Const S, SubS : String) : Boolean;
 Var
  LLen : Integer;
@@ -1825,6 +1897,7 @@ Begin
    Result := AnsiCompareText(Copy(S, 1, LLen), SubS) = 0;
   End;
 End;
+
 Function TextEndsWith(Const S, SubS : String) : Boolean;
 Var
  LLen : Integer;
@@ -1840,6 +1913,7 @@ Begin
    Result := AnsiCompareText(Copy(S, Length(S)-LLen+1, LLen), SubS) = 0;
   End;
 End;
+
 Function Max(Const AValueOne,
              AValueTwo        : Int64) : Int64;
 Begin
@@ -1848,6 +1922,7 @@ Begin
  Else
   Result := AValueOne;
 End;
+
 Function Min(Const AValueOne,
              AValueTwo        : Int64) : Int64;{$IFDEF USE_INLINE}inline;{$ENDIF}
 Begin
@@ -1856,6 +1931,7 @@ Begin
  Else
   Result := AValueOne;
 End;
+
 Procedure SplitHeaderSubItems(AHeaderLine : String;
                               AItems      : TStrings;
                               AQuoteType  : TRESTDWHeaderQuotingType);
@@ -1929,10 +2005,12 @@ Begin
     End;
   End;
 End;
+
 Function StrToDay(Const ADay : String) : Byte;
 Begin
  Result := Succ(PosInStrArray(ADay,['SUN','MON','TUE','WED','THU','FRI','SAT'],False));
 End;
+
 Function StrToMonth(Const AMonth : String) : Byte;
 Const
  Months : Array[0..7] Of Array[1..12] Of String = (('JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'),
@@ -1959,6 +2037,7 @@ Begin
   End;
  Result := 0;
 End;
+
 Function IsNumeric(Const AString : String;
                    Const ALength : Integer;
                    Const AIndex  : Integer = 1) : Boolean;
@@ -1978,11 +2057,13 @@ Begin
    Result := True;
   End;
 End;
+
 Function IsNumeric(Const AChar : Char) : Boolean;
 Begin
  Result := (AChar >= '0') And
            (AChar <= '9'); {Do not Localize}
 End;
+
 Function CharEquals(Const AString  : String;
                     Const ACharPos : Integer;
                     Const AValue   : Char) : Boolean;
@@ -1993,6 +2074,7 @@ Begin
  If Result Then
   Result := AString[ACharPos] = AValue;
 End;
+
 Function RawStrInternetToDateTime(Var Value     : String;
                                   Var VDateTime : TDateTime) : Boolean;
 Var
@@ -2198,12 +2280,14 @@ Begin
   Result := False;
  End;
 End;
+
 Procedure RDWDelete(Var s    : String;
                     AOffset,
                     ACount   : Integer);
 Begin
  Delete(s, AOffset, ACount);
 End;
+
 Function TimeZoneToGmtOffsetStr(Const ATimeZone : String) : String;
 Type
  TimeZoneOffset = Record
@@ -2316,6 +2400,7 @@ Begin
   End;
  Result := '-0000' {do not localize}
 End;
+
 Function GmtOffsetStrToDateTime(Const S : String) : TDateTime;
 Var
  sTmp : String;
@@ -2350,6 +2435,7 @@ Begin
    End;
   End;
 End;
+
 Function ReplaceHeaderSubItem(Const AHeaderLine,
                               ASubItem,
                               AValue             : String;
@@ -2359,6 +2445,7 @@ Var
 Begin
  Result := ReplaceHeaderSubItem(AHeaderLine, ASubItem, AValue, LOld, AQuoteType);
 End;
+
 Function ReplaceHeaderSubItem(Const AHeaderLine,
                               ASubItem,
                               AValue            : String;
@@ -2447,6 +2534,7 @@ Begin
   LItems.Free;
  End;
 End;
+
 Function PosInStrArray(Const SearchStr     : String;
                        Const Contents      : Array Of String;
                        Const CaseSensitive : Boolean = True) : Integer;
@@ -2466,10 +2554,12 @@ Begin
   End;
  Result := -1;
 End;
+
 Function InternalAnsiPos(Const Substr, S : String) : Integer;
 Begin
  Result := SysUtils.AnsiPos(Substr, S);
 End;
+
 Function iif(ATest        : Boolean;
              Const ATrue  : Integer;
              Const AFalse : Integer) : Integer;
@@ -2477,10 +2567,12 @@ Begin
  If ATest Then Result := ATrue
  Else          Result := AFalse;
 End;
+
 Function TextIsSame(Const A1, A2 : String) : Boolean;
 Begin
  Result := AnsiCompareText(A1, A2) = 0;
 End;
+
 Function CharPosInSet(Const AString  : String;
                       Const ACharPos : Integer;
                       Const ASet     : String) : Integer;
@@ -2504,12 +2596,14 @@ Begin
     End;
   End;
 End;
+
 Function CharIsInSet(Const AString  : String;
                      Const ACharPos : Integer;
                      Const ASet     : String) : Boolean;
 Begin
  Result := CharPosInSet(AString, ACharPos, ASet) > 0;
 End;
+
 Function ValueFromIndex(AStrings     : TStrings;
                         Const AIndex : Integer)  : String;
 Var
@@ -2576,7 +2670,8 @@ Var
     Inc(i);
    End;
  End;
- Function ReadBytes(Const AStream : TStream;
+
+Function ReadBytes(Const AStream : TStream;
                     Var   VBytes  : TRESTDWBytes;
                     Const ACount,
                     AOffset       : Integer) : Integer;
@@ -2646,10 +2741,12 @@ Begin
  VLine := BytesToString(LLine, 0, -1);
  Result := True;
 End;
+
 Function restdwPos(Const Substr, S : String) : Integer;
 Begin
  Result := Pos(Substr, S);
 End;
+
 Function restdwMax(Const AValueOne,
                    AValueTwo        : Int64) : Int64;
 Begin
@@ -2658,6 +2755,7 @@ Begin
  Else
   Result := AValueOne;
 End;
+
 Function restdwLength(Const ABuffer : String;
                       Const ALength : Integer = -1;
                       Const AIndex  : Integer = 1) : Integer;
@@ -2671,6 +2769,7 @@ Begin
  Else
   Result := restdwMin(LAvailable, ALength);
 End;
+
 Function restdwLength(Const ABuffer : TRESTDWBytes;
                       Const ALength : Integer = -1;
                       Const AIndex  : Integer = 0) : Integer;
@@ -2685,6 +2784,7 @@ Begin
  Else
   Result := restdwMin(LAvailable, ALength);
 End;
+
 Function restdwLength(Const ABuffer : TStream;
                       Const ALength : TRESTDWStreamSize = -1): TRESTDWStreamSize;
                       {$IFDEF USE_INLINE}inline;{$ENDIF}
@@ -2697,6 +2797,7 @@ Begin
  Else
   Result := restdwMin(LAvailable, ALength);
 End;
+
 Function Fetch(Var AInput           : String;
                Const ADelim         : String  = '';
                Const ADelete        : Boolean = True;
@@ -2749,11 +2850,13 @@ Begin
  Else
   Result := FetchCaseInsensitive(AInput, ADelim, ADelete);
 End;
+
 Function restdwValueFromIndex(AStrings     : TStrings;
                               Const AIndex : Integer) : String;
 Begin
  Result := ValueFromIndex(AStrings, AIndex);
 End;
+
 Procedure DeleteInvalidChar(Var Value : String);
 Begin
  If Length(Value) > 0 Then
@@ -2763,10 +2866,12 @@ Begin
   If Value[Length(Value) - FinalStrPos] <> '{' then
    Delete(Value, Length(Value), 1);
 End;
+
 Function StringToBoolean(aValue : String) : Boolean;
 Begin
  Result := lowercase(trim(aValue)) = 'true';
 End;
+
 Function BooleanToString(aValue : Boolean) : String;
 Begin
  If aValue Then
@@ -2774,6 +2879,7 @@ Begin
  Else
   Result := 'false';
 End;
+
 Function ExtractHeaderSubItem(Const AHeaderLine,
                               ASubItem           : String;
                               QuotingType        : TRESTDWHeaderQuotingType) : String;
@@ -2792,6 +2898,7 @@ Begin
   LItems.Free;
  End;
 End;
+
 Function ReadLnFromStream(AStream         : TStream;
                           AMaxLineLength  : Integer = -1;
                           AExceptionIfEOF : Boolean = False) : String; overload;
@@ -2799,11 +2906,13 @@ Begin
  If (Not ReadLnFromStream(AStream, Result, AMaxLineLength)) and AExceptionIfEOF then
   Raise Exception.Create(Format(cStreamReadError, ['ReadLnFromStream', AStream.Position]));
 end;
+
 Function RemoveBackslashCommands(Value : String) : String;
 Begin
  Result := StringReplace(Value, '../', '', [rfReplaceAll]);
  Result := StringReplace(Result, '..\', '', [rfReplaceAll]);
 End;
+
 Function TravertalPathFind(Value : String) : Boolean;
 Begin
  Result := Pos('../', Value) > 0;
@@ -2816,6 +2925,7 @@ Begin
  If Pos('.', Result) > 0 Then
   Result := Copy(Result, Pos('.', Result) + 1, Length(Result));
 End;
+
 Function RESTDWFileExists(sFile, BaseFilePath : String) : Boolean;
 Var
  vTempFilename : String;
@@ -2829,6 +2939,7 @@ Begin
     Result := FileExists(BaseFilePath + vTempFilename);
   End;
 End;
+
 Procedure CopyStringList(Const Source, Dest : TStringList);
 Var
  I : Integer;
@@ -2837,6 +2948,7 @@ Begin
   For I := 0 To Source.Count -1 Do
    Dest.Add(Source[I]);
 End;
+
 Function HexToBookmark(Value : String) : TRESTDWBytes;
 {$IFDEF POSIX} //Android
 Var
@@ -2862,6 +2974,7 @@ begin
   {$IFEND}
  {$IFEND}
 End;
+
 Function BookmarkToHex(Value : TRESTDWBytes) : String;
 {$IFDEF POSIX}
 Var
@@ -2887,6 +3000,7 @@ Begin
    {$IFEND}
   End;
 End;
+
 Function Unescape_chars(s : String) : String;
  Function HexValue(C: Char): Byte;
  Begin
@@ -2930,6 +3044,7 @@ Begin
    Else Result := Result + C;
   End;
 End;
+
 Function Escape_chars(s : String) : String;
 Var
  b, c   : Char;

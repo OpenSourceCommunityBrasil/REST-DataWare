@@ -194,7 +194,6 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="RESTDWMyDACDriver.dcr"/>
-        <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="RESTDWCore.dcp"/>
         <DCCReference Include="..\..\..\..\Source\Database_Drivers\uRESTDWMyDACDriver.pas"/>
         <BuildConfiguration Include="Base">

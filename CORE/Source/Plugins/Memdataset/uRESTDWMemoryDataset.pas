@@ -1,7 +1,7 @@
 ﻿unit uRESTDWMemoryDataset;
 
-{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 {$I ..\..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -225,7 +225,7 @@ type
       DoCheck: Boolean): TGetResult; override;
     procedure InternalFirst; override;
     procedure InternalLast; override;
-    function GetRecNo: Longint; override;
+    function GetRecNo: integer; override;
     function GetRecordCount: integer; override;
     procedure SetRecNo(Value: Integer); override;
 
@@ -1401,7 +1401,7 @@ begin
   Result := FFilterRecordCount;
 end;
 
-function TRESTDWMemTable.GetRecNo: Longint;
+function TRESTDWMemTable.GetRecNo: Integer;
 begin
   UpdateCursorPos;
   if FCurrentRecord < 0 then

@@ -1,5 +1,6 @@
 unit uRESTDWAbout;
 
+{$I ..\..\Includes\uRESTDW.inc}
 {$I ..\..\Includes\uRESTDWPlataform.inc}
 
 interface
@@ -151,7 +152,7 @@ Begin
           'Version : '+ RESTDWVERSAO;
    Msg := DWStr(Msg);
   {$IFNDEF RESTDWLAMW}
-   {$IFNDEF LINUXFMX}
+   {$IFNDEF RESTDWFMX}
 //    frm := Tfrm_About.Create(nil);
 //    {$IFNDEF FPC}
 //     {$IF Defined(RESTDWFMX)}
