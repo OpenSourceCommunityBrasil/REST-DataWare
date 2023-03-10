@@ -49,7 +49,7 @@ Const
  
  // controle de versão
  RESTDWVersionINFO              = 'v2.1.0-';
- RESTDWRelease                  = '432';
+ RESTDWRelease                  = '596';
  RESTDWCodeProject              = 'Galaga - GitHub';
  RESTDWVersao                   = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  RESTDWDialogoTitulo            = 'REST DataWare Components ' + RESTDWVersao;
