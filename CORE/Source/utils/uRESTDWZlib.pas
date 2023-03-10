@@ -159,20 +159,17 @@ Var
   Utf8Stream: TStream;
 Begin
   Try
+  {$IFDEF RESTDWFMX}
+    Utf8Stream := TStringStream.Create(s);
+  {$ELSE}
     Utf8Stream := TMemoryStream.Create;
-{$IFDEF FPC}
-    Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
-{$ELSE}
-{$IF CompilerVersion < 25} // Delphi 2010 pra cima
-    Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
-{$ELSE} // Delphi 2010 pra cima
-{$IFDEF MSWINDOWS}
-    Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
-{$ELSE}
+  {$ENDIF}
+
+  {$IFDEF RESTDWLINUXFMX}
     Utf8Stream.Write(S[1], Length(S));
-{$ENDIF}
-{$IFEND} // Delphi 2010 pra cima
-{$ENDIF}
+  {$ELSE}
+    Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
+  {$ENDIF}
     Result := TMemoryStream.Create;
     Try
       ZCompressStream(Utf8Stream, Result, cCompressionLevel);

@@ -1861,11 +1861,11 @@ Begin
  vAccessTag            := '';
  vErrorMessage         := '';
  vServerMethod         := Nil;
- {$IF Defined(ANDROID) Or Defined(IOS)}
+ {$IFDEF RESTDWFMX}
  vBasePath             := System.IOUtils.TPath.Combine(System.IOUtils.TPath.GetDocumentsPath, '/');
  {$ELSE}
  vBasePath             := ExtractFilePath(ParamStr(0));
- {$IFEND}
+ {$ENDIF}
  vContentType          := vContentType;
  decoder               := Nil;
  vdwConnectionDefs     := Nil;
