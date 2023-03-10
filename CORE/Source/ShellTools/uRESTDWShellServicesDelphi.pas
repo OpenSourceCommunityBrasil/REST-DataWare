@@ -1,5 +1,6 @@
 unit uRESTDWShellServicesDelphi;
 
+{$I ..\Includes\uRESTDW.inc}
 {$I ..\Includes\uRESTDWPlataform.inc}
 
 {

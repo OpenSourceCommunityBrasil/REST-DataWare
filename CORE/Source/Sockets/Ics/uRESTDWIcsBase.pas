@@ -1,6 +1,8 @@
 unit uRESTDWIcsBase;
 
+{$I ..\..\Includes\uRESTDW.inc}
 {$I ..\..\Includes\uRESTDWPlataform.inc}
+
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -36,33 +38,17 @@ unit uRESTDWIcsBase;
 interface
 
 Uses
-  SysUtils,
-  Classes,
-  DateUtils,
-  SyncObjs,
+  SysUtils,  Classes,  DateUtils,  SyncObjs,
   {$IF (CompilerVersion > 22)}vcl.ExtCtrls{$ELSE}ExtCtrls{$IFEND},
-  uRESTDWComponentEvents,
-  uRESTDWBasicTypes,
-  uRESTDWJSONObject,
-  uRESTDWBasic,
-  uRESTDWBasicDB,
-  uRESTDWParams,
-  uRESTDWBasicClass,
-  uRESTDWAbout,
-  uRESTDWConsts,
-  uRESTDWDataUtils,
-  uRESTDWTools,
-  OverbyteIcsWinSock,
-  OverbyteIcsWSocket,
-  OverbyteIcsWndControl,
-  OverbyteIcsHttpAppServer,
-  OverbyteIcsUtils,
-  OverbyteIcsFormDataDecoder,
-  OverbyteIcsMimeUtils,
-  OverbyteIcsSSLEAY,
-  OverbyteIcsHttpSrv,
-  OverbyteIcsWSocketS,
-  OverbyteIcsSslX509Utils;
+
+  uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
+  uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
+  uRESTDWConsts, uRESTDWDataUtils, uRESTDWTools,
+
+  OverbyteIcsWinSock, OverbyteIcsWSocket, OverbyteIcsWndControl,
+  OverbyteIcsHttpAppServer, OverbyteIcsUtils, OverbyteIcsFormDataDecoder,
+  OverbyteIcsMimeUtils, OverbyteIcsSSLEAY, OverbyteIcsHttpSrv,
+  OverbyteIcsWSocketS, OverbyteIcsSslX509Utils;
 
 Type
   TPoolerHttpConnection = class(THttpAppSrvConnection)
@@ -332,7 +318,7 @@ const
 
 Implementation
 
-Uses uRESTDWJSONInterface, vcl.Dialogs, OverbyteIcsWSockBuf, vcl.Forms;
+Uses uRESTDWJSONInterface, vcl.Dialogs, OverbyteIcsWSockBuf;//, vcl.Forms;
 
 Procedure TRESTDWIcsServicePooler.SetHttpServerSSL;
 var

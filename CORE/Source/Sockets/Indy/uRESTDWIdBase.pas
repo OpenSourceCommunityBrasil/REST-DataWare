@@ -1,7 +1,7 @@
 unit uRESTDWIdBase;
 
-{$I ..\..\Includes\uRESTDWPlataform.inc}
 {$I ..\..\Includes\uRESTDW.inc}
+{$I ..\..\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -49,7 +49,6 @@ Uses
 Type
  PIdSSLVersions = ^TIdSSLVersions;
 
-Type
  TRESTDWIdServicePooler = Class(TRESTServicePoolerBase)
  Private
   vCipherList,
@@ -108,7 +107,6 @@ Type
   Property CipherList              : String              Read vCipherList              Write vCipherList;
 End;
 
-Type
  TRESTDWIdClientREST = Class(TRESTDWClientRESTBase)
  Private
   HttpRequest      : TIdHTTP;
@@ -286,7 +284,6 @@ Type
   Property OnGetpassword            : TOnGetpassword              Read vOnGetpassword            Write vOnGetpassword;
 End;
 
-Type
  TRESTDWIdDatabase = Class(TRESTDWDatabasebaseBase)
  Private
   vCipherList                      : String;
@@ -300,7 +297,6 @@ Type
   Property CipherList              : String                   Read vCipherList              Write vCipherList;
 End;
 
-Type
  TRESTDWIdClientPooler = Class(TRESTClientPoolerBase)
  Private
   vCipherList                      : String;
@@ -335,7 +331,6 @@ Type
   Property CipherList              : String                   Read vCipherList              Write vCipherList;
 End;
 
-Type
   TRESTDWIdPoolerList = Class(TRESTDWPoolerListBase)
   Public
     Constructor Create(AOwner  : TComponent);Override; //Cria o Componente

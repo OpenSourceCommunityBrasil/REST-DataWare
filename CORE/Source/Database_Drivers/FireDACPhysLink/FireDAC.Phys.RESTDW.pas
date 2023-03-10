@@ -1,5 +1,6 @@
 ﻿unit FireDAC.Phys.RESTDW;
 
+{$I ..\Includes\uRESTDW.inc}
 {$I ..\Includes\uRESTDWPlataform.inc}
 
 {
