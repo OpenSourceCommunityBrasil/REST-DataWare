@@ -1,7 +1,6 @@
 unit uRESTDWBufferDb;
 
 {$I ..\..\Source\Includes\uRESTDW.inc}
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -1780,7 +1779,7 @@ End;
 Constructor TMaskOptions.Create;
 Begin
  vNumberMask              := '#########0.00';
- {$IFDEF COMPILER16_UP}
+ {$IFDEF DELPHIXE2UP}
  vDecimalSeparator        := FormatSettings.DecimalSeparator;
  vDateMask                := FormatSettings.ShortDateFormat;
  vTimeMask                := FormatSettings.ShortTimeFormat;

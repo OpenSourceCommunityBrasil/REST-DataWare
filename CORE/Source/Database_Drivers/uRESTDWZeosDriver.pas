@@ -1,7 +1,6 @@
 ﻿unit uRESTDWZeosDriver;
 
 {$I ..\..\Source\Includes\uRESTDW.inc}
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 {$IFNDEF FPC}{$I ZComponent.inc}{$ENDIF}
 
 {

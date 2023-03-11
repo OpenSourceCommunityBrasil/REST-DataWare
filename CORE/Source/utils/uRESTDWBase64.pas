@@ -1,7 +1,6 @@
 unit uRESTDWBase64;
 
 {$I ..\..\Source\Includes\uRESTDW.inc}
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .

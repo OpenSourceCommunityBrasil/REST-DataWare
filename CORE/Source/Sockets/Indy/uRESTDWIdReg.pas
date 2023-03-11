@@ -1,7 +1,6 @@
 unit uRESTDWIdReg;
 
 {$I ..\..\..\Source\Includes\uRESTDW.inc}
-{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON

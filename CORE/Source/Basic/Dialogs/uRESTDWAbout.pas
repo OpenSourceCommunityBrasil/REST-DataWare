@@ -1,7 +1,6 @@
 unit uRESTDWAbout;
 
 {$I ..\..\Includes\uRESTDW.inc}
-{$I ..\..\Includes\uRESTDWPlataform.inc}
 
 interface
 

@@ -1,7 +1,6 @@
 unit uRESTDWProtoTypes;
 
 {$I ..\..\Source\Includes\uRESTDW.inc}
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -27,9 +26,7 @@ unit uRESTDWProtoTypes;
 interface
 
 uses
-  {$IFNDEF FPC}
-   {$if CompilerVersion < 24}DbTables,{$IFEND}
-  {$ENDIF}
+  {$IFNDEF DELPHIXE4UP}DbTables,{$ENDIF}
   SysUtils,  Classes, Db, FMTBcd;
 
  Const
@@ -68,7 +65,7 @@ uses
   dwftGuid            = Integer(DB.ftGuid);
   dwftTimeStamp       = Integer(DB.ftTimeStamp);
   dwftFMTBcd          = Integer(DB.ftFMTBcd);
-  {$IFDEF COMPILER10_UP}
+  {$IFDEF DELPHI2006UP}
   dwftFixedWideChar   = Integer(DB.ftFixedWideChar);
   dwftWideMemo        = Integer(DB.ftWideMemo);
   dwftOraTimeStamp    = Integer(DB.ftOraTimeStamp);
@@ -79,7 +76,7 @@ uses
   dwftOraTimeStamp    = Integer(40);
   dwftOraInterval     = Integer(41);
   {$ENDIF}
-  {$IFDEF COMPILER14_UP}
+  {$IFDEF DELPHI2010UP}
   dwftLongWord        = Integer(DB.ftLongWord); //42
   dwftShortint        = Integer(DB.ftShortint); //43
   dwftByte            = Integer(DB.ftByte); //44
@@ -106,13 +103,13 @@ uses
   dwftDataSet         = Integer(DB.ftDataSet);
   {Unknown newest types for support in future}
 
-  {$IFDEF COMPILER14_UP}
+  {$IFDEF DELPHI2010UP}
   dwftConnection      = Integer(DB.ftConnection); //46
   dwftParams          = Integer(DB.ftParams); //47
   dwftObject          = Integer(DB.ftObject); //50
   {$ENDIF}
   {$IFDEF REGION}{$ENDREGION}{$ENDIF}
- {$IFDEF COMPILER10_UP}
+ {$IFDEF DELPHI2006UP}
   FieldTypeIdents : Array[dwftColor..dwftColor] Of TIdentMapEntry = ((Value: dwftColor; Name: 'ftColor'));
  {$ELSE}
   FieldTypeIdents : Array[0..7]                 Of TIdentMapEntry = ((Value: dwftTimeStampOffset; Name: 'ftTimeStampOffset'),
@@ -228,8 +225,7 @@ Type
    {$ENDIF}
  {$ENDIF}
  TRESTDWIPv6Address = Array [0..7] Of DWUInt16;
- {$IFNDEF FPC}
-  {$IF (CompilerVersion >= 26) And (CompilerVersion <= 29)}
+  {$IF (Defined(DELPHIXE5UP)) AND (NOT Defined(DELPHI10_0UP))}
    {$IF Defined(HAS_FMX)}
     DWString     = String;
     DWWideString = WideString;
@@ -249,12 +245,11 @@ Type
     DWWideString = WideString;
     DWChar       = AnsiChar;
    {$IFEND}
+  {$ELSE}
+   DWString     = AnsiString;
+   DWWideString = WideString;
+   DWChar       = Char;
   {$IFEND}
- {$ELSE}
-  DWString     = AnsiString;
-  DWWideString = WideString;
-  DWChar       = Char;
- {$ENDIF}
  DWWideChar    = WideChar;
  TRESTDWWideChars = Array Of DWWideChar;
  PDWChar       = ^DWChar;
