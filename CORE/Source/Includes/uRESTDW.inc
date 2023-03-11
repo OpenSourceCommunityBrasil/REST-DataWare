@@ -1,6 +1,10 @@
 {$DEFINE RESTDW}
 (*  Compiler Directives for IDE Version *)
 
+{$IFDEF FPC}
+  {$DEFINE RESTDWLAZARUS}
+{$ELSE}
+
 {$IFDEF VER350}
   {$DEFINE DELPHI11_0UP}
   {$DEFINE DELPHI10_4UP}
@@ -294,10 +298,7 @@
 {$IFDEF VER150}
   {$DEFINE DELPHI7UP}
 {$ENDIF ~VER150}
-
-{$IFDEF FPC}
-  {$DEFINE RESTDWLAZARUS}
-{$ENDIF}
+{$IFEND}
 
 (* End of Compiler Directives for IDE Version *)
 (******************************************************************************)
@@ -521,5 +522,10 @@
 {.$UNDEF SUPPORTS_WEAKPACKAGEUNIT}
 
 (* End of Compiler settings *)
+(* REST DataWare Generic Definitions *)
+
+  {$DEFINE RESTDWMEMTABLE}
+
+(* End of REST DataWare Generic Definitions *)
 
 (******************************************************************************)

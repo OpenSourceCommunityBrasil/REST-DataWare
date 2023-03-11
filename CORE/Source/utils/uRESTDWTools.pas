@@ -459,13 +459,15 @@ Procedure DynArrayToBinVariant(var V: Variant; const DynArray; Len: Integer);
 var
   {$IFDEF RESTDWLAZARUS}
   LVarBounds : Array of SizeInt;
-  {$ELSEIF Defined(DELPHIXE7UP)}
-  LVarBounds : Array of Integer;
-  {$ELSEIF Defined(DELPHIXE6UP)}
-  LVarBounds : Array of NativeInt;
-  {$ELSEIF Defined(DELPHIXE2UP)}
-  LVarBounds : Array of Integer;
-  {$IFEND}
+  {$ELSE}
+    {$IF Defined(DELPHIXE7UP)}
+      LVarBounds : Array of Integer;
+    {$ELSEIF Defined(DELPHIXE6UP)}
+      LVarBounds : Array of NativeInt;
+    {$ELSEIF Defined(DELPHIXE2UP)}
+      LVarBounds : Array of Integer;
+    {$IFEND}
+  {$ENDIF}
  aVarData : PVarData;
 begin
   LVarBounds := nil;

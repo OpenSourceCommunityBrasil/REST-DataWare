@@ -26,7 +26,9 @@ unit uRESTDWProtoTypes;
 interface
 
 uses
-  {$IFNDEF DELPHIXE4UP}DbTables,{$ENDIF}
+  {$IF (NOT Defined(DELPHIXE4UP)) AND (NOT Defined(RESTDWLAZARUS))}
+  DbTables,
+  {$IFEND}
   SysUtils,  Classes, Db, FMTBcd;
 
  Const
@@ -225,7 +227,7 @@ Type
    {$ENDIF}
  {$ENDIF}
  TRESTDWIPv6Address = Array [0..7] Of DWUInt16;
-  {$IF (Defined(DELPHIXE5UP)) AND (NOT Defined(DELPHI10_0UP))}
+  {$IF (Defined(DELPHIXE5UP)) AND (NOT Defined(DELPHI10_0UP)) AND (NOT Defined(RESTDWLAZARUS))}
    {$IF Defined(HAS_FMX)}
     DWString     = String;
     DWWideString = WideString;
@@ -235,7 +237,7 @@ Type
     DWWideString = WideString;
     DWChar       = Utf8Char;
    {$IFEND}
-  {$ELSE}
+  {$ELSEIF NOT Defined(RESTDWLAZARUS)}
    {$IF Defined(HAS_FMX)}
     DWString     = Utf8String;
     DWWideString = WideString;
