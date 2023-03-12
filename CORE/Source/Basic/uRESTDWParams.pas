@@ -1551,7 +1551,10 @@ Begin
  Try
   If Not bValue.Active Then
    bValue.Open;
-  bValue.First;
+
+  if not bValue.IsUniDirectional then
+    bValue.First;
+
   {$IFDEF FPC}
   vBuildSide := 'L';
   {$ELSE}
