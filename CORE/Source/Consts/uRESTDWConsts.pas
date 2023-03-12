@@ -799,6 +799,9 @@ Var
  Utf8Stream   : TStream;
 Begin
  Try
+  {$if CompilerVersion > 25}
+   Utf8Stream := TStringStream.Create(s);
+  {$ELSE}
   Utf8Stream := TMemoryStream.Create;
  {$IFDEF FPC}
   Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
@@ -813,6 +816,7 @@ Begin
    {$ENDIF}
   {$IFEND} // Delphi 2010 pra cima
  {$ENDIF}
+ {$IFEND}
   Result := TMemoryStream.Create;
   Try
    ZCompressStream(Utf8Stream, Result, cCompressionLevel);
