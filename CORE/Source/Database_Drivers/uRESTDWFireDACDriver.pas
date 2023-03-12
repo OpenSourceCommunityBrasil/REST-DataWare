@@ -4,7 +4,7 @@
 
 {
   REST Dataware .
-  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+  Criado por XyberX (Gilberto Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
@@ -30,7 +30,8 @@ uses
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes,
   FireDAC.Comp.Client, FireDAC.Comp.DataSet, FireDAC.Stan.StorageBin,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.DApt.Intf, FireDAC.DApt,
-  FireDAC.Stan.Param, FireDAC.DatS, DB, uRESTDWBasicDB, uRESTDWProtoTypes, FireDAC.Phys.RESTDW;
+  FireDAC.Stan.Param, FireDAC.DatS, DB, uRESTDWBasicDB, uRESTDWProtoTypes,
+  FireDAC.Phys.RESTDW;
 
 const
   rdwFireDACDrivers : array[0..17] of string = (('ads'),('asa'),('db2'),('ds'),
@@ -97,6 +98,7 @@ type
     Function compConnIsValid(comp : TComponent) : boolean; override;
   public
     function getQuery : TRESTDWDrvQuery; override;
+    function getQuery(AUnidir : boolean) : TRESTDWDrvQuery; override;
     function getTable : TRESTDWDrvTable; override;
     function getStoreProc : TRESTDWDrvStoreProc; override;
 
@@ -208,6 +210,16 @@ begin
   qry.FetchOptions.Mode            := fmAll;
 
   Result := TRESTDWFireDACQuery.Create(qry);
+end;
+
+function TRESTDWFireDACDriver.getQuery(AUnidir : boolean) : TRESTDWDrvQuery;
+var
+  qry : TFDQuery;
+begin
+
+  Result := inherited getQuery(AUnidir);
+  qry := TFDQuery(Result.Owner);
+  qry.FetchOptions.Unidirectional := AUnidir;
 end;
 
 function TRESTDWFireDACDriver.getTable : TRESTDWDrvTable;

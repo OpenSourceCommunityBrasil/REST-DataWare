@@ -256,7 +256,8 @@ Type
   Function compConnIsValid(comp : TComponent) : boolean; virtual;
   Function  getConectionType : TRESTDWDatabaseType; Virtual;
   Function  getDatabaseInfo  : TRESTDWDatabaseInfo; Virtual;
-  Function  getQuery         : TRESTDWDrvQuery;   Virtual;
+  Function  getQuery : TRESTDWDrvQuery; Overload; Virtual;
+  Function  getQuery(AUnidir : boolean) : TRESTDWDrvQuery; Overload; Virtual;
   Function  getTable         : TRESTDWDrvTable;   Virtual;
   Function  getStoreProc     : TRESTDWDrvStoreProc;   Virtual;
   Procedure Connect;                                Virtual;
@@ -915,12 +916,12 @@ End;
 
 { TRESTDWDriverBase }
 
-Function TRESTDWDriverBase.getConectionType : TRESTDWDatabaseType;
+function TRESTDWDriverBase.getConectionType : TRESTDWDatabaseType;
 Begin
  Result := dbtUndefined;
 End;
 
-Function TRESTDWDriverBase.getDatabaseInfo  : TRESTDWDatabaseInfo;
+function TRESTDWDriverBase.getDatabaseInfo : TRESTDWDatabaseInfo;
 Var
  connType : TRESTDWDatabaseType;
  qry      : TRESTDWDrvQuery;
@@ -1131,37 +1132,43 @@ Begin
  End;
 End;
 
-Function TRESTDWDriverBase.getQuery: TRESTDWDrvQuery;
+function TRESTDWDriverBase.getQuery : TRESTDWDrvQuery;
 Begin
  Result := Nil;
 End;
 
-Function TRESTDWDriverBase.getTable: TRESTDWDrvTable;
+function TRESTDWDriverBase.getQuery(AUnidir : boolean) : TRESTDWDrvQuery;
+begin
+ // implementada em alguns drivers
+ Result := getQuery();
+end;
+
+function TRESTDWDriverBase.getTable : TRESTDWDrvTable;
 Begin
  Result := Nil;
 End;
 
-Function TRESTDWDriverBase.getStoreProc : TRESTDWDrvStoreProc;
+function TRESTDWDriverBase.getStoreProc : TRESTDWDrvStoreProc;
 Begin
  Result := Nil;
 End;
 
-Function TRESTDWDriverBase.isConnected: boolean;
+function TRESTDWDriverBase.isConnected : Boolean;
 Begin
  Result := False;
 End;
 
-Function TRESTDWDriverBase.connInTransaction: boolean;
+function TRESTDWDriverBase.connInTransaction : Boolean;
 Begin
  Result := False;
 End;
 
-Procedure TRESTDWDriverBase.connStartTransaction;
+procedure TRESTDWDriverBase.connStartTransaction;
 Begin
 
 End;
 
-Procedure TRESTDWDriverBase.connRollback;
+procedure TRESTDWDriverBase.connRollback;
 Begin
 
 End;
@@ -1171,12 +1178,12 @@ begin
   Result := False;
 end;
 
-Procedure TRESTDWDriverBase.connCommit;
+procedure TRESTDWDriverBase.connCommit;
 Begin
 
 End;
 
-Function TRESTDWDriverBase.isMinimumVersion(major, minor, sub: integer): boolean;
+function TRESTDWDriverBase.isMinimumVersion(major, minor, sub : Integer) : Boolean;
 Var
  info : TRESTDWDatabaseInfo;
 Begin
@@ -1186,12 +1193,12 @@ Begin
            (info.rdwDatabaseMinorVersion >= sub);
 End;
 
-Function TRESTDWDriverBase.isMinimumVersion(major, minor: integer): boolean;
+function TRESTDWDriverBase.isMinimumVersion(major, minor : Integer) : Boolean;
 Begin
  Result := isMinimumVersion(major, minor, 0);
 End;
 
-Procedure TRESTDWDriverBase.setConnection(AValue: TComponent);
+procedure TRESTDWDriverBase.setConnection(AValue : TComponent);
 Begin
  If FConnection = AValue Then
   Exit;
@@ -1387,7 +1394,7 @@ begin
   end;
 end;
 
-Procedure TRESTDWDriverBase.Connect;
+procedure TRESTDWDriverBase.Connect;
 Begin
 
 End;
@@ -1398,19 +1405,17 @@ begin
   inherited;
 end;
 
-Procedure TRESTDWDriverBase.Disconect;
+procedure TRESTDWDriverBase.Disconect;
 Begin
 
 End;
 
-Function TRESTDWDriverBase.ConnectionSet: Boolean;
+function TRESTDWDriverBase.ConnectionSet : Boolean;
 Begin
  Result := Assigned(FConnection);
 End;
 
-Function TRESTDWDriverBase.GetGenID(Query   : TRESTDWDrvQuery;
-                                    GenName : String;
-                                    valor   : Integer) : Integer;
+function TRESTDWDriverBase.GetGenID(Query : TRESTDWDrvQuery; GenName : String; valor : Integer) : Integer;
 Var
  connType : TRESTDWDatabaseType;
 Begin
@@ -1475,8 +1480,7 @@ Begin
   End;
 End;
 
-Function TRESTDWDriverBase.GetGenID(GenName : String;
-                                    valor   : Integer) : Integer;
+function TRESTDWDriverBase.GetGenID(GenName : String; valor : Integer) : Integer;
 Var
  qry : TRESTDWDrvQuery;
 Begin
@@ -1488,12 +1492,7 @@ Begin
  End;
 End;
 
-Function TRESTDWDriverBase.ApplyUpdates(MassiveStream    : TStream;
-                                        SQL              : String;
-                                        Params           : TRESTDWParams;
-                                        var Error        : Boolean;
-                                        var MessageError : String;
-                                        var RowsAffected : Integer) : TJSONValue;
+function TRESTDWDriverBase.ApplyUpdates(MassiveStream : TStream; SQL : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var RowsAffected : Integer) : TJSONValue;
 Var
  MassiveDataset : TMassiveDatasetBuffer;
 Begin
@@ -1507,12 +1506,7 @@ Begin
 End;
 
 
-Function TRESTDWDriverBase.ApplyUpdates(Massive,
-                                        SQL              : String;
-                                        Params           : TRESTDWParams;
-                                        Var Error        : Boolean;
-                                        Var MessageError : String;
-                                        Var RowsAffected : Integer): TJSONValue;
+function TRESTDWDriverBase.ApplyUpdates(Massive, SQL : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var RowsAffected : Integer) : TJSONValue;
 Var
  MassiveDataset : TMassiveDatasetBuffer;
 Begin
@@ -1525,12 +1519,7 @@ Begin
  End;
 End;
 
-Function TRESTDWDriverBase.ApplyUpdatesTB(MassiveStream    : TStream;
-                                          SQL              : String;
-                                          Params           : TRESTDWParams;
-                                          Var Error        : Boolean;
-                                          Var MessageError : String;
-                                          Var RowsAffected : Integer): TJSONValue;
+function TRESTDWDriverBase.ApplyUpdatesTB(MassiveStream : TStream; SQL : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var RowsAffected : Integer) : TJSONValue;
 Var
   vTempQuery         : TRESTDWDrvTable;
   vResultReflection  : String;
@@ -1909,11 +1898,7 @@ begin
   end;
 end;
 
-Function TRESTDWDriverBase.ApplyUpdatesTB(Massive          : String;
-                                          Params           : TRESTDWParams;
-                                          var Error        : Boolean;
-                                          var MessageError : String;
-                                          var RowsAffected : Integer): TJSONValue;
+function TRESTDWDriverBase.ApplyUpdatesTB(Massive : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var RowsAffected : Integer) : TJSONValue;
 var
   vTempQuery: TRESTDWDrvTable;
   vResultReflection : string;
@@ -2104,9 +2089,7 @@ begin
   end;
 end;
 
-Function TRESTDWDriverBase.ApplyUpdates_MassiveCache  (MassiveStream         : TStream;
-                                                       Var Error             : Boolean;
-                                                       Var MessageError      : String) : TJSONValue;
+function TRESTDWDriverBase.ApplyUpdates_MassiveCache(MassiveStream : TStream; var Error : Boolean; var MessageError : String) : TJSONValue;
 Var
  MassiveDataset : TMassiveDatasetBuffer;
  aMassive       : TStream;
@@ -2181,9 +2164,7 @@ Begin
  End;
 End;
 
-Function TRESTDWDriverBase.ApplyUpdates_MassiveCache  (MassiveDataset   : TMassiveDatasetBuffer;
-                                                       Var Error        : Boolean;
-                                                       Var MessageError : String): String;
+function TRESTDWDriverBase.ApplyUpdates_MassiveCache(MassiveDataset : TMassiveDatasetBuffer; var Error : Boolean; var MessageError : String) : String;
 var
  vTempQuery        : TRESTDWDrvQuery;
  vStateResource,
@@ -2292,9 +2273,7 @@ Begin
   End;
 end;
 
-Function TRESTDWDriverBase.ApplyUpdates_MassiveCache  (MassiveCache     : String;
-                                                       Var Error        : Boolean;
-                                                       Var MessageError : String): TJSONValue;
+function TRESTDWDriverBase.ApplyUpdates_MassiveCache(MassiveCache : String; var Error : Boolean; var MessageError : String) : TJSONValue;
 var
   vTempQuery: TRESTDWDrvQuery;
   vStateResource, vMassiveLine: boolean;
@@ -2438,23 +2417,17 @@ begin
   end;
 end;
 
-Function TRESTDWDriverBase.ApplyUpdates_MassiveCacheTB(MassiveStream         : TStream;
-                                                       Var Error             : Boolean;
-                                                       Var MessageError      : String) : TJSONValue;
+function TRESTDWDriverBase.ApplyUpdates_MassiveCacheTB(MassiveStream : TStream; var Error : Boolean; var MessageError : String) : TJSONValue;
 Begin
 
 End;
 
-Function TRESTDWDriverBase.ApplyUpdates_MassiveCacheTB(MassiveCache     : String;
-                                                       Var Error        : Boolean;
-                                                       Var MessageError : String): TJSONValue;
+function TRESTDWDriverBase.ApplyUpdates_MassiveCacheTB(MassiveCache : String; var Error : Boolean; var MessageError : String) : TJSONValue;
 Begin
 
 End;
 
-Function TRESTDWDriverBase.ProcessMassiveSQLCache(MassiveSQLCache: String;
-                                                  var Error: Boolean;
-                                                  var MessageError: String): TJSONValue;
+function TRESTDWDriverBase.ProcessMassiveSQLCache(MassiveSQLCache : String; var Error : Boolean; var MessageError : String) : TJSONValue;
 Var
  vTempQuery        : TRESTDWDrvQuery;
  vStateResource    : Boolean;
@@ -2558,30 +2531,15 @@ Begin
   End;
 end;
 
-Function TRESTDWDriverBase.ExecuteCommand(SQL                   : String;
-                                          Var Error             : Boolean;
-                                          Var MessageError      : String;
-                                          Var BinaryBlob        : TMemoryStream;
-                                          Var RowsAffected      : Integer;
-                                          Execute               : Boolean = False;
-                                          BinaryEvent           : Boolean = False;
-                                          MetaData              : Boolean = False;
-                                          BinaryCompatibleMode  : Boolean = False) : String;
+function TRESTDWDriverBase.ExecuteCommand(
+  SQL : String; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; var RowsAffected : Integer; Execute : Boolean; BinaryEvent : Boolean; MetaData : Boolean; BinaryCompatibleMode : Boolean) : String;
 Begin
  Result := ExecuteCommand(SQL, Nil, Error, MessageError, BinaryBlob, RowsAffected,
                           Execute, BinaryEvent, MetaData, BinaryCompatibleMode);
 End;
 
-Function TRESTDWDriverBase.ExecuteCommand(SQL                   : String;
-                                          Params                : TRESTDWParams;
-                                          Var Error             : Boolean;
-                                          Var MessageError      : String;
-                                          Var BinaryBlob        : TMemoryStream;
-                                          Var RowsAffected      : Integer;
-                                          Execute               : Boolean = False;
-                                          BinaryEvent           : Boolean = False;
-                                          MetaData              : Boolean = False;
-                                          BinaryCompatibleMode  : Boolean = False): String;
+function TRESTDWDriverBase.ExecuteCommand(
+  SQL : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; var RowsAffected : Integer; Execute : Boolean; BinaryEvent : Boolean; MetaData : Boolean; BinaryCompatibleMode : Boolean) : String;
 var
   vTempQuery: TRESTDWDrvQuery;
   vDataSet: TDataSet;
@@ -2592,7 +2550,7 @@ begin
   Error := False;
   Result := '';
   aResult := TJSONValue.Create;
-  vTempQuery := getQuery;
+  vTempQuery := getQuery(not Execute);
   vDataSet := TDataSet(vTempQuery.Owner);
   try
     vStateResource := isConnected;
@@ -2690,27 +2648,15 @@ begin
   FreeAndNil(vTempQuery);
 end;
 
-Function TRESTDWDriverBase.ExecuteCommandTB(Tablename: String;
-                                            var Error: Boolean;
-                                            var MessageError: String;
-                                            var BinaryBlob: TMemoryStream;
-                                            var RowsAffected: Integer;
-                                            BinaryEvent: Boolean;
-                                            MetaData: Boolean;
-                                            BinaryCompatibleMode: Boolean): String;
+function TRESTDWDriverBase.ExecuteCommandTB(
+  Tablename : String; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; var RowsAffected : Integer; BinaryEvent : Boolean; MetaData : Boolean; BinaryCompatibleMode : Boolean) : String;
 begin
   ExecuteCommandTB(Tablename,nil,Error,MessageError,BinaryBlob,RowsAffected,
                    BinaryEvent,MetaData,BinaryCompatibleMode);
 end;
 
-Function TRESTDWDriverBase.ExecuteCommandTB(Tablename: String;
-                                            Params: TRESTDWParams;
-                                            var Error: Boolean;
-                                            var MessageError: String;
-                                            var BinaryBlob: TMemoryStream;
-                                            var RowsAffected: Integer;
-                                            BinaryEvent: Boolean; MetaData: Boolean;
-                                            BinaryCompatibleMode: Boolean): String;
+function TRESTDWDriverBase.ExecuteCommandTB(
+  Tablename : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; var RowsAffected : Integer; BinaryEvent : Boolean; MetaData : Boolean; BinaryCompatibleMode : Boolean) : String;
 var
   vTempQuery     : TRESTDWDrvTable;
   vDataset       : TDataset;
@@ -2806,10 +2752,7 @@ begin
  vTempQuery.Free;
 end;
 
-Procedure TRESTDWDriverBase.ExecuteProcedure(ProcName         : String;
-                                             Params           : TRESTDWParams;
-                                             Var Error        : Boolean;
-                                             Var MessageError : String);
+procedure TRESTDWDriverBase.ExecuteProcedure(ProcName : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String);
 Var
  vStateResource  : Boolean;
  vTempStoredProc : TRESTDWDrvStoreProc;
@@ -2854,16 +2797,12 @@ Begin
   end;
 end;
 
-Procedure TRESTDWDriverBase.ExecuteProcedurePure(ProcName         : String;
-                                                 Var Error        : Boolean;
-                                                 Var MessageError : String);
+procedure TRESTDWDriverBase.ExecuteProcedurePure(ProcName : String; var Error : Boolean; var MessageError : String);
 Begin
  ExecuteProcedure(ProcName, nil, Error, MessageError);
 End;
 
-Procedure TRESTDWDriverBase.GetTableNames(Var TableNames   : TStringList;
-                                          Var Error        : Boolean;
-                                          Var MessageError : String);
+procedure TRESTDWDriverBase.GetTableNames(var TableNames : TStringList; var Error : Boolean; var MessageError : String);
 Var
  vStateResource : Boolean;
  connType : TRESTDWDatabaseType;
@@ -2959,10 +2898,7 @@ Begin
  End;
 End;
 
-Procedure TRESTDWDriverBase.GetFieldNames(TableName        : String;
-                                          Var FieldNames   : TStringList;
-                                          Var Error        : Boolean;
-                                          Var MessageError : String);
+procedure TRESTDWDriverBase.GetFieldNames(TableName : String; var FieldNames : TStringList; var Error : Boolean; var MessageError : String);
 Var
  vStateResource : Boolean;
  connType       : TRESTDWDatabaseType;
@@ -3060,10 +2996,7 @@ Begin
  End;
 end;
 
-Procedure TRESTDWDriverBase.GetKeyFieldNames(TableName        : String;
-                                             Var FieldNames   : TStringList;
-                                             Var Error        : Boolean;
-                                             Var MessageError : String);
+procedure TRESTDWDriverBase.GetKeyFieldNames(TableName : String; var FieldNames : TStringList; var Error : Boolean; var MessageError : String);
 Var
  vStateResource : Boolean;
  connType       : TRESTDWDatabaseType;
@@ -3224,9 +3157,7 @@ Begin
  End;
 End;
 
-Procedure TRESTDWDriverBase.GetProcNames(Var ProcNames    : TStringList;
-                                         Var Error        : Boolean;
-                                         Var MessageError : String);
+procedure TRESTDWDriverBase.GetProcNames(var ProcNames : TStringList; var Error : Boolean; var MessageError : String);
 Var
  vStateResource : Boolean;
  connType       : TRESTDWDatabaseType;
@@ -3308,10 +3239,7 @@ Begin
  End;
 End;
 
-Procedure TRESTDWDriverBase.GetProcParams(ProcName         : String;
-                                          Var ParamNames   : TStringList;
-                                          Var Error        : Boolean;
-                                          Var MessageError : String);
+procedure TRESTDWDriverBase.GetProcParams(ProcName : String; var ParamNames : TStringList; var Error : Boolean; var MessageError : String);
 Var
  vStateResource : Boolean;
  connType       : TRESTDWDatabaseType;
@@ -3657,17 +3585,12 @@ Begin
  End;
 End;
 
-Function TRESTDWDriverBase.InsertMySQLReturnID(SQL              : String;
-                                               Var Error        : Boolean;
-                                               Var MessageError : String) : Integer;
+function TRESTDWDriverBase.InsertMySQLReturnID(SQL : String; var Error : Boolean; var MessageError : String) : Integer;
 Begin
  Result := InsertMySQLReturnID(SQL, Nil, Error, MessageError);
 End;
 
-Function TRESTDWDriverBase.InsertMySQLReturnID(SQL              : String;
-                                               Params           : TRESTDWParams;
-                                               var Error        : Boolean;
-                                               var MessageError : String) : Integer;
+function TRESTDWDriverBase.InsertMySQLReturnID(SQL : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String) : Integer;
 Var
  vTempQuery     : TRESTDWDrvQuery;
  vStateResource : Boolean;
@@ -3715,10 +3638,7 @@ Begin
  FreeAndNil(vTempQuery);
 End;
 
-Function TRESTDWDriverBase.OpenDatasets(DatasetsLine     : String;
-                                        var Error        : Boolean;
-                                        var MessageError : String;
-                                        var BinaryBlob   : TMemoryStream): TJSONValue;
+function TRESTDWDriverBase.OpenDatasets(DatasetsLine : String; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream) : TJSONValue;
 Var
  vTempQuery      : TRESTDWDrvQuery;
  vTempJSON       : TJSONValue;
@@ -3739,7 +3659,7 @@ Begin
  vMetaData       := False;
  vCompatibleMode := False;
  bJsonArray      := Nil;
- vTempQuery      := getQuery;
+ vTempQuery      := getQuery(True);
  Try
   vStateResource := isConnected;
   If Not vStateResource Then
@@ -3846,12 +3766,8 @@ Begin
   FreeAndNil(bJsonValue);
 End;
 
-Function TRESTDWDriverBase.OpenDatasets(DatapackStream        : TStream;
-                                        Var Error             : Boolean;
-                                        Var MessageError      : String;
-                                        Var BinaryBlob        : TMemoryStream;
-                                        aBinaryEvent          : Boolean;
-                                        aBinaryCompatibleMode : Boolean): TStream;
+function TRESTDWDriverBase.OpenDatasets(
+  DatapackStream : TStream; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; aBinaryEvent : Boolean; aBinaryCompatibleMode : Boolean) : TStream;
 Var
  X               : Integer;
  vTempQuery      : TRESTDWDrvQuery;
@@ -3870,7 +3786,7 @@ Begin
  Error           := False;
  BufferInStream  := TRESTDWBufferBase.Create;
  BufferOutStream := TRESTDWBufferBase.Create;
- vTempQuery      := getQuery;
+ vTempQuery      := getQuery(True);
  Try
   BufferInStream.LoadToStream(DatapackStream);
   vStateResource := isConnected;
@@ -3969,15 +3885,14 @@ begin
     FServerMethod := TServerMethodDataModule(Self.Owner);
 end;
 
-Class Procedure TRESTDWDriverBase.CreateConnection(Const AConnectionDefs : TConnectionDefs;
-                                                   Var AConnection       : TComponent);
+class procedure TRESTDWDriverBase.CreateConnection(const AConnectionDefs : TConnectionDefs; var AConnection : TComponent);
 Begin
  If (Not Assigned(AConnection))     Or
     (Not Assigned(AConnectionDefs)) Then
   Exit;
 End;
 
-Procedure TRESTDWDriverBase.PrepareConnection(Var AConnectionDefs : TConnectionDefs);
+procedure TRESTDWDriverBase.PrepareConnection(var AConnectionDefs : TConnectionDefs);
 Begin
  If Assigned(OnPrepareConnection) Then
   OnPrepareConnection(AConnectionDefs);
@@ -4460,9 +4375,7 @@ begin
   end;
 end;
 
-Procedure TRESTDWDriverBase.BuildDatasetLine(var Query: TRESTDWDrvDataset;
-                                             Massivedataset: TMassivedatasetBuffer;
-                                             MassiveCache: Boolean);
+procedure TRESTDWDriverBase.BuildDatasetLine(var Query : TRESTDWDrvDataset; Massivedataset : TMassivedatasetBuffer; MassiveCache : Boolean);
 Var
  I, A              : Integer;
  vMasterField,
