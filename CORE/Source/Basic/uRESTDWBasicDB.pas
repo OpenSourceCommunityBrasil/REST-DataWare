@@ -9644,11 +9644,7 @@ Begin
  vAbortData            := AbortData;
  vOnThreadRequestError := OnThreadRequestError;
  {$IFNDEF FPC}
-  {$IF Defined(HAS_FMX)}
-   {$IF Not Defined(HAS_UTF8)}
-    Priority          := tpLowest;
-   {$IFEND}
-  {$ELSE}
+  {$IF Defined(RESTDWLINUXFMX)}
    Priority           := tpLowest;
   {$IFEND}
  {$ENDIF}

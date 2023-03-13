@@ -246,8 +246,8 @@ type
     procedure InternalFirst; override;
     procedure InternalLast; override;
     function GetRecNo: integer; override;
-    function GetRecordCount: Longint; override;
-    procedure SetRecNo(Value: Longint); override;
+    function GetRecordCount: Integer; override;
+    procedure SetRecNo(Value: Integer); override;
 
     // filter
     function FilterRecord(Buffer : TRESTDWBuffer): Boolean;
@@ -1487,7 +1487,7 @@ begin
   {$IFEND}
 end;
 
-function TRESTDWMemTable.GetRecordCount: Longint;
+function TRESTDWMemTable.GetRecordCount: Integer;
 begin
   Result := 0;
   if State <> dsInactive then
@@ -1535,7 +1535,7 @@ begin
     Result := FCurrentRecord + 1;
 end;
 
-procedure TRESTDWMemTable.SetRecNo(Value: Longint);
+procedure TRESTDWMemTable.SetRecNo(Value: Integer);
 begin
   CheckBrowseMode;
   if (Value >= 1) and (Value <= InternalRecordCount) then
