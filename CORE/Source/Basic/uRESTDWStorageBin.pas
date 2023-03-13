@@ -218,7 +218,6 @@ begin
   ADataSet.DisableControls;
   LoadRecordDWMemFromStream(IDataset,AStream);
   ADataSet.EnableControls;
-  ADataSet.First;
 end;
 
 procedure TRESTDWStorageBin.LoadRecordDWMemFromStream(IDataset: IRESTDWMemTable; AStream: TStream);
@@ -251,7 +250,7 @@ var
   begin
     n := IDataSet.GetRecordSize;
     FillChar(vBuf^, n, 0);
-
+{
     n := 0;
     for f := 0 to ADataset.FieldCount-1 do begin
       z := IDataSet.GetFieldSize(f) + 1;
@@ -259,6 +258,7 @@ var
       Inc(vBuf,z);
       n := n + z;
     end;
+}
 
 {
     vRecInfo := New(PRESTDWRecInfo);
@@ -272,7 +272,7 @@ var
       vRecInfo^.BookmarkFlag := bfEOF;
     Move(vRecInfo,vBuf^,SizeOf(Pointer));
 }
-    Dec(vBuf,n);
+//    Dec(vBuf,n);
   end;
 begin
   ADataset := TRESTDWMemTable(IDataset.GetDataset);
@@ -513,7 +513,7 @@ begin
     Dec(vBuf,vDecBuf);
     vRec := TRESTDWRecord.Create(ADataset);
     vRec.Buffer := vBuf;
-    FreeMem(vBuf);
+    Freemem(vBuf);
     IDataset.AddNewRecord(vRec);
   end;
 end;
@@ -757,7 +757,9 @@ begin
   i := AStream.Position;
   vRecordCount := 0;
   AStream.WriteBuffer(vRecordCount,SizeOf(Longint));
-  vBookMark := ADataset.GetBookmark;
+
+  if not ADataset.IsUniDirectional then
+    vBookMark := ADataset.GetBookmark;
   ADataset.DisableControls;
 
   if not ADataset.IsUniDirectional then
@@ -765,13 +767,20 @@ begin
 
   vRecordCount := 0;
   while not ADataset.Eof do begin
-    SaveRecordToStream(ADataset,AStream);
+    try
+      SaveRecordToStream(ADataset,AStream);
+    except
+
+    end;
     ADataset.Next;
     vRecordCount := vRecordCount + 1;
   end;
 
-  ADataset.GotoBookmark(vBookMark);
-  ADataset.FreeBookmark(vBookMark);
+  if not ADataset.IsUniDirectional then begin
+    ADataset.GotoBookmark(vBookMark);
+    ADataset.FreeBookmark(vBookMark);
+  end;
+
   ADataset.EnableControls;
   AStream.Position := i;
   AStream.WriteBuffer(vRecordCount,SizeOf(Longint));
@@ -1026,8 +1035,10 @@ Begin
   for i := 0 to ADataset.FieldCount - 1 do begin
     vBoolean := ADataset.Fields[i].IsNull;
     AStream.Write(vBoolean, SizeOf(Byte));
+
     if vBoolean then
       Continue;
+
     vDWFieldType := FieldTypeToDWFieldType(ADataset.Fields[i].DataType);
     // N - Bytes
     if (vDWFieldType in [dwftFixedChar,dwftWideString,dwftString,
