@@ -1,6 +1,6 @@
 unit uRESTDWZDbc;
 
-{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\..\Source\Includes\uRESTDW.inc}
 {$IFNDEF FPC}
   {$I ZDbc.inc}
 {$ELSE}

@@ -1,7 +1,6 @@
 unit uRESTDWParams;
 
 {$I ..\..\Source\Includes\uRESTDW.inc}
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -1552,7 +1551,10 @@ Begin
  Try
   If Not bValue.Active Then
    bValue.Open;
-  bValue.First;
+
+  if not bValue.IsUniDirectional then
+    bValue.First;
+
   {$IFDEF FPC}
   vBuildSide := 'L';
   {$ELSE}

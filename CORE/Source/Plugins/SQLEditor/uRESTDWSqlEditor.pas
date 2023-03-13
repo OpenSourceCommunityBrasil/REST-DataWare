@@ -1,6 +1,6 @@
 unit uRESTDWSqlEditor;
 
-{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\..\Source\Includes\uRESTDW.inc}
 
 {
   REST Dataware .

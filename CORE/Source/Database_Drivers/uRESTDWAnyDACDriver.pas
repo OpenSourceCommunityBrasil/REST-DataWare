@@ -1,10 +1,10 @@
 ﻿unit uRESTDWAnyDACDriver;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
-  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+  Criado por XyberX (Gilberto Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
@@ -27,9 +27,6 @@
 interface
 
 uses
-  {$IFDEF FPC}
-    LResources,
-  {$ENDIF}
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes, uADCompClient,
   uADCompDataSet, DB, uADStanStorage, uADStanIntf, uADDatSManager, 
   uADDAptIntf, uADDAptManager;
@@ -94,6 +91,7 @@ type
     function getConectionType : TRESTDWDatabaseType; override;
   public
     function getQuery : TRESTDWDrvQuery; override;
+    function getQuery(AUnidir : boolean) : TRESTDWDrvQuery; override;
     function getTable : TRESTDWDrvTable; override;
     function getStoreProc : TRESTDWDrvStoreProc; override;
 
@@ -193,6 +191,15 @@ begin
   qry.FormatOptions.StrsTrim2Len   := StrsTrim2Len;
 
   Result := TRESTDWAnyDACQuery.Create(qry);
+end;
+
+function TRESTDWAnyDACDriver.getQuery(AUnidir : boolean) : TRESTDWDrvQuery;
+var
+  qry : TADQuery;
+begin
+  Result := inherited getQuery(AUnidir);
+  qry := TADQuery(Result.Owner);
+  qry.FetchOptions.Unidirectional := AUnidir;
 end;
 
 function TRESTDWAnyDACDriver.getTable : TRESTDWDrvTable;

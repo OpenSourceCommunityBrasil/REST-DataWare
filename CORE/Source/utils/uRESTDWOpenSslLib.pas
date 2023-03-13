@@ -2,7 +2,7 @@ unit uRESTDWOpenSslLib;
 
 { Cross-platform unified OpenSSL 1.1.1 import and helper library unit for OpenSSL }
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\uRESTDW.inc}
 
 {
   REST Dataware .

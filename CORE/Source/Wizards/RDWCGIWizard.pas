@@ -10,6 +10,7 @@
 
 Unit RDWCGIWizard;
 
+{$I ..\Includes\uRESTDW.inc}
 {$I ..\Includes\RDWWIZ.inc}
 
 Interface
@@ -20,9 +21,9 @@ Uses
 Type
   TCGIapplicationwizard = Class(Tnotifierobject, Iotawizard, Iotaprojectwizard,
       Iotarepositorywizard, Iunknown
-      {$IF COMPILERVERSION > 29},IOTARepositoryWizard160 {$IFEND}
-   {$IF COMPILERVERSION > 31}, IOTARepositoryWizard190{$IFEND}
-   {$IF COMPILERVERSION > 32}, IOTARepositoryWizard260{$IFEND})
+   {$IF     DEFINED(DELPHI10_3UP)}, IOTARepositoryWizard260
+   {$ELSEIF DEFINED(DELPHI10_2UP)}, IOTARepositoryWizard190
+   {$ELSEIF DEFINED(DELPHI10_0UP)}, IOTARepositoryWizard160{$IFEND})
   Private
     Funitident: String;
     Fclassname: String;
@@ -42,39 +43,39 @@ Type
     Procedure Execute;
     // iotarepositorywizard80
     //160
-   {$IF COMPILERVERSION > 29}
+   {$IFDEF DELPHI10_0UP}
      function GetFrameworkTypes: TArray<string>;
     { Return the platform keys for the platforms this wizard supports }
     function GetPlatforms: TArray<string>;
 
     property FrameworkTypes: TArray<string> read GetFrameworkTypes;
     property Platforms: TArray<string> read GetPlatforms;
-    {$IFEND}
+    {$ENDIF}
 
     //190
-    {$IF COMPILERVERSION > 31}
+    {$IFDEF DELPHI10_2UP}
     function GetSupportedPlatforms: TArray<string>;
-    {$IFEND}
+    {$ENDIF}
 
     // 260
-    {$IF COMPILERVERSION > 32}
+    {$IFDEF DELPHI10_3UP}
     function GetGalleryCategories: TArray<IOTAGalleryCategory>;
 
     { GalleryCategories allow register a wizard under several caregories }
     property GalleryCategories: TArray<IOTAGalleryCategory> read GetGalleryCategories;
-    {$IFEND}
+    {$ENDIF}
 
-    {$IF COMPILERVERSION > 18}
+    {$IFDEF DELPHI2007UP}
     Function Getgallerycategory: Iotagallerycategory;
     Function Getpersonality: String;
-    {$IFEND}
+    {$ENDIF}
     Function Getdesigner: String;
 
   Protected
   End;
 
   TCGIprojectcreator = Class(Tnotifierobject, Iotacreator, Iotaprojectcreator,
-      Iotaprojectcreator50{$IFDEF DELPHI2006_LVL}, Iotaprojectcreator80{$ENDIF})
+      Iotaprojectcreator50{$IFDEF DELPHI2006UP}, Iotaprojectcreator80{$ENDIF})
   Private
     Fprojectfile: String;
     Fprojectdirectory: String;
@@ -99,7 +100,7 @@ Type
     Function Newprojectsource(Const Projectname: String): Iotafile;
     // iotaprojectcreator50
     Procedure Newdefaultprojectmodule(Const Project: Iotaproject);
-{$IFDEF DELPHI2006_LVL}
+{$IFDEF DELPHI2006UP}
     Function Getprojectpersonality: String;
 {$ENDIF}
   Public
@@ -109,8 +110,8 @@ Type
 
   TCGIfrmwizard = Class(Tnotifierobject, Iotawizard, Iotarepositorywizard,
       Iotaformwizard
-{$IFDEF VER180}, Iotaformwizard100{$ENDIF}
-{$IFDEF DELPHI2006_LVL}, Iotarepositorywizard80{$ENDIF}, Iunknown)
+{$IFDEF DELPHI2006UP}, Iotaformwizard100{$ENDIF}
+{$IFDEF DELPHI2006UP}, Iotarepositorywizard80{$ENDIF}, Iunknown)
   Private
     Funitident: String;
     Fclassname: String;
@@ -128,7 +129,7 @@ Type
     // function getglyph: hicon;
     Function Getglyph: Cardinal;
 
-{$IFDEF DELPHI2006_LVL}
+{$IFDEF DELPHI2006UP}
     // 60
     Function Getdesigner: String;
     Property Designer: String Read Getdesigner;
@@ -138,7 +139,7 @@ Type
     Property Gallerycategory: Iotagallerycategory Read Getgallerycategory;
     Property Personality: String Read Getpersonality;
 {$ENDIF}
-{$IFDEF ver180}
+{$IFDEF DELPHI2006UP}
     Function Isvisible(Project: Iotaproject): Boolean;
 {$ENDIF}
   End;
@@ -255,7 +256,7 @@ Type
     Constructor Create(Projname, Unitname, Formclass: String);
   End;
 
-{$IFDEF DELPHI2006_LVL}
+{$IFDEF DELPHI2006UP}
 Var
   Easydelphicategory: Iotagallerycategory = Nil;
 {$ENDIF}
@@ -267,9 +268,9 @@ Implementation
 
 Uses
   Forms, Sysutils, Designintf, Registry, Shlobj
-  {$IF COMPILERVERSION > 29}
+  {$IFDEF DELPHI10_0UP}
   ,PlatformAPI
-{$IFEND};
+  {$ENDIF};
 
 Const
   Sauthor = 'abritolda.com';
@@ -342,56 +343,43 @@ End;
 Function GetDelphiGlobalKey : String;
 Begin
  Result := '';
- {$IFNDEF ver185}
-  {$IFDEF ver180} // delphi 2006
-  Result := '\Software\Borland\BDS\4.0\Globals';
-  {$ENDIF}
- {$ENDIF}
- {$IFDEF ver185} // delphi 2007
-  Result := '\Software\Borland\BDS\5.0\Globals';
- {$ENDIF}
- {$IFDEF ver200} // delphi 2009
-  Result := '\Software\CodeGear\BDS\6.0\Globals';
- {$ENDIF}
- {$IFDEF ver210} // delphi 2010
-  Result := '\Software\CodeGear\BDS\7.0\Globals';
- {$ENDIF}
- {$IFDEF ver220} // delphi xe
-  Result := '\Software\Embarcadero\BDS\8.0\Globals';
- {$ENDIF}
- {$IFDEF ver230} // delphi xe2
-  Result := '\Software\Embarcadero\BDS\9.0\Globals';
- {$ENDIF}
- {$IFDEF ver240} // delphi xe3
-  Result := '\Software\Embarcadero\BDS\10.0\Globals';
- {$ENDIF}
- {$IFDEF ver250} // delphi xe4
-  Result := '\Software\Embarcadero\BDS\11.0\Globals';
- {$ENDIF}
- {$IFDEF ver260} // delphi xe5
-  Result := '\Software\Embarcadero\BDS\12.0\Globals';
- {$ENDIF}
- {$IFDEF ver270} // delphi xe6
-  Result := '\Software\Embarcadero\BDS\14.0\Globals';
- {$ENDIF}
- {$IFDEF ver280} // delphi xe7
-  Result := '\Software\Embarcadero\BDS\15.0\Globals';
- {$ENDIF}
- {$IFDEF ver290} // delphi xe8
-  Result := '\Software\Embarcadero\BDS\16.0\Globals';
- {$ENDIF}
- {$IFDEF ver300} // delphi xe10
-  Result := '\Software\Embarcadero\BDS\17.0\Globals';
- {$ENDIF}
- {$IFDEF ver310} // delphi xe10.1
-  Result := '\Software\Embarcadero\BDS\18.0\Globals';
- {$ENDIF}
- {$IFDEF ver320} // delphi xe10.2
-  Result := '\Software\Embarcadero\BDS\19.0\Globals';
- {$ENDIF}
- {$IFDEF ver330} // delphi xe10.3
+ {$IF DEFINED(DELPHI11UP)} // delphi 11 Alexandria
+  Result := '\Software\Embarcadero\BDS\22.0\Globals';
+ {$ELSEIF DEFINED(DELPHI10_4UP)} // delphi 10.4 Sydney
+  Result := '\Software\Embarcadero\BDS\21.0\Globals';
+ {$ELSEIF DEFINED(DELPHI10_3UP)} // delphi 10.3 Rio
   Result := '\Software\Embarcadero\BDS\20.0\Globals';
- {$ENDIF}
+ {$ELSEIF DEFINED(DELPHI10_2UP)} // delphi 10.2 Tokyo
+  Result := '\Software\Embarcadero\BDS\19.0\Globals';
+ {$ELSEIF DEFINED(DELPHI10_1UP)} // delphi 10.1 Berlin
+  Result := '\Software\Embarcadero\BDS\18.0\Globals';
+ {$ELSEIF DEFINED(DELPHI10_0UP)} // delphi 10 Seattle
+  Result := '\Software\Embarcadero\BDS\17.0\Globals';
+ {$ELSEIF DEFINED(DELPHIXE8UP)} // delphi xe8
+  Result := '\Software\Embarcadero\BDS\16.0\Globals';
+ {$ELSEIF DEFINED(DELPHIXE7UP)} // delphi xe7
+  Result := '\Software\Embarcadero\BDS\15.0\Globals';
+ {$ELSEIF DEFINED(DELPHIXE6UP)} // delphi xe6
+  Result := '\Software\Embarcadero\BDS\14.0\Globals';
+ {$ELSEIF DEFINED(DELPHIXE5UP)} // delphi xe5
+  Result := '\Software\Embarcadero\BDS\12.0\Globals';
+ {$ELSEIF DEFINED(DELPHIXE4UP)} // delphi xe4
+  Result := '\Software\Embarcadero\BDS\11.0\Globals';
+ {$ELSEIF DEFINED(DELPHIXE3UP)} // delphi xe3
+  Result := '\Software\Embarcadero\BDS\10.0\Globals';
+ {$ELSEIF DEFINED(DELPHIXE2UP)} // delphi xe2
+  Result := '\Software\Embarcadero\BDS\9.0\Globals';
+ {$ELSEIF DEFINED(DELPHIXEUP)} // delphi xe
+  Result := '\Software\Embarcadero\BDS\8.0\Globals';
+ {$ELSEIF DEFINED(DELPHI2010UP)} // delphi 2010
+  Result := '\Software\CodeGear\BDS\7.0\Globals';
+ {$ELSEIF DEFINED(DELPHI2009UP)} // delphi 2009
+  Result := '\Software\CodeGear\BDS\6.0\Globals';
+ {$ELSEIF DEFINED(DELPHI2007UP)} // delphi 2007
+  Result := '\Software\Borland\BDS\5.0\Globals';
+ {$ELSEIF DEFINED(DELPHI2006UP)} // delphi 2006
+  Result := '\Software\Borland\BDS\4.0\Globals';
+ {$IFEND}
 End;
 
 Function Getideprojectpath: String;
@@ -402,7 +390,7 @@ Begin
  r := Tregistry.Create;
  Try
   r.Rootkey := Hkey_current_user;
-  {$IFNDEF DELPHI2006_LVL}
+  {$IFNDEF DELPHI2006UP}
    Lpath := Extractfiledir(Paramstr(0));
    If Pos('BIN', Uppercase(Lpath)) > 0 Then
     Delete(Lpath, Pos('BIN', Uppercase(Lpath)), 3);
@@ -416,10 +404,10 @@ Begin
     If Lpath = '' Then
      Begin
       Lpath := Getmydocuments;
-      {$IFNDEF DELPHI2007_LVL}
+      {$IFNDEF DELPHI2007UP}
        Lpath := Includetrailingpathdelim(Lpath) + 'Borland Studio Projects' + Pathdelim;
       {$ENDIF}
-      {$IFDEF DELPHI2007_LVL}
+      {$IFDEF DELPHI2007UP}
         Lpath := Includetrailingpathdelim(Lpath) + 'RAD Studio\Projects' + Pathdelim;
       {$ENDIF}
       If Not Directoryexists(Lpath) Then
@@ -618,7 +606,7 @@ Var
   Lproj: Iotaproject;
   Frameclassname, Frameunitname: String;
 Begin
-{$IFDEF DELPHI2006_LVL}
+{$IFDEF DELPHI2006UP}
   (Borlandideservices As Iotamoduleservices).Getnewmoduleandclassname('', Funitident,
     Fclassname, Ffilename);
   Fclassname := 'RDWCGIForm' + Copy(Funitident, 5, Length(Funitident));
@@ -637,7 +625,7 @@ Begin
   Frameclassname := Fclassname;
   Frameunitname := Funitident;
 
-{$IFDEF DELPHI2006_LVL}
+{$IFDEF DELPHI2006UP}
   (Borlandideservices As Iotamoduleservices)
     .Getnewmoduleandclassname('', Funitident,
     Fclassname, Ffilename);
@@ -658,7 +646,7 @@ End;
 
 // ------------------------------------------------------------------------------
 
-{$IFDEF DELPHI2006_LVL}
+{$IFDEF DELPHI2006UP}
 { TCGIfrmwizard.iotarepositorywizard / TCGIfrmwizard.iotaformwizard }
 
 Function TCGIfrmwizard.Getgallerycategory
@@ -683,7 +671,7 @@ Begin
 End;
 {$ENDIF}
 // ------------------------------------------------------------------------------
-{$IFDEF ver180}
+{$IFDEF DELPHI2006UP}
 
 Function TCGIfrmwizard.Isvisible(Project: Iotaproject): Boolean;
 Begin
@@ -832,7 +820,7 @@ Begin
   Projectdir := Getideprojectpath;
   Projectdir := Includetrailingpathdelim(Projectdir);
 
-{$IFDEF delphi9_lvl}
+{$IFDEF DELPHI2005UP}
   If Not Fismainform Then
   Begin
     // result := projectoptions.formfile;
@@ -940,7 +928,7 @@ Begin
   Projectdir := Getideprojectpath;
   Projectdir := Includetrailingpathdelim(Projectdir);
 
-{$IFDEF DELPHI2006_LVL}
+{$IFDEF DELPHI2006UP}
   Lmoduleservices.Getnewmoduleandclassname('',
     Funitident, Fclassname, Ffilename);
   Fclassname := 'RDWCGIDatam' +
@@ -972,23 +960,23 @@ End;
 // ------------------------------------------------------------------------------
 
 
-{$IF COMPILERVERSION > 18}
+{$IFDEF DELPHI2007UP}
 Function TCGIapplicationwizard.Getgallerycategory
   : Iotagallerycategory;
 Begin
   Result := Nil;
 End;
-{$IFEND}
+{$ENDIF}
 
 // ------------------------------------------------------------------------------
 
-{$IF COMPILERVERSION > 18}
+{$IFDEF DELPHI2007UP}
 Function TCGIapplicationwizard.
   Getpersonality: String;
 Begin
   Result := Sdelphipersonality;
 End;
-{$IFEND}
+{$ENDIF}
 
 // ------------------------------------------------------------------------------
 
@@ -1035,7 +1023,7 @@ Begin
   Result := [Wsenabled];
 End;
 
-{$IF COMPILERVERSION > 29}
+{$IFDEF DELPHI10_0UP}
 function TCGIapplicationwizard.GetFrameworkTypes: TArray<string>;
 begin
   SetLength(Result, 2);
@@ -1057,9 +1045,9 @@ begin
 //  Result[5] := cOSX64Platform;
 //  Result[6] := ciOSSimulator64Platform;
 end;
- {$IFEND}
+{$ENDIF}
 
-{$IF COMPILERVERSION > 31}
+{$IFDEF DELPHI10_2UP}
 function TCGIapplicationwizard.GetSupportedPlatforms: TArray<string>;
 begin
   SetLength(Result, 6);
@@ -1072,15 +1060,14 @@ begin
 //  Result[3] := cAndroidArm32Platform;
 //  Result[4] := cAndroidArm64Platform;
 end;
-{$IFEND}
+{$ENDIF}
 
-{$IF COMPILERVERSION > 32}
+{$IFDEF DELPHI10_3UP}
 function TCGIapplicationwizard.GetGalleryCategories: TArray<IOTAGalleryCategory>;
 begin
   Result:=nil;
 end;
-
-{$IFEND}
+{$ENDIF}
 
 // ------------------------------------------------------------------------------
 
@@ -1144,15 +1131,10 @@ End;
 
 // ------------------------------------------------------------------------------
 
-{$IFDEF DELPHI2006_LVL}
-
+{$IFDEF DELPHI2006UP}
 Function TCGIprojectcreator.Getprojectpersonality: String;
 Begin
-{$IFDEF DELPHI2006_LVL}
   Result := Sdelphipersonality;
-{$ELSE}
-  Result := 'Delphi.Personality';
-{$ENDIF}
 End;
 {$ENDIF}
 // ------------------------------------------------------------------------------
@@ -1193,7 +1175,7 @@ Begin
   Frameclassname := Fformclass;
   Frameunitname := Funitname;
 
-{$IFDEF DELPHI2006_LVL}
+{$IFDEF DELPHI2006UP}
   (Borlandideservices As Iotamoduleservices)
     .Getnewmoduleandclassname('', Funitname,
     Fformclass, Ffilename);
@@ -1270,7 +1252,7 @@ Begin
   end;
   Result := 'program ' + Fprojectname + ';' +
     #13#10 +'{$APPTYPE CONSOLE}' +#13#10 +
-{$IFDEF DELPHI2006_LVL}
+{$IFDEF DELPHI2006UP}
   'uses WebBroker, CGIApp;' + #13#10 +
 {$ELSE}
   'uses WebBroker, CGIApp,' + #13#10 + ' ' + Funitname +
@@ -1282,7 +1264,7 @@ Begin
     + #13#10 +
     '  Application.WebModuleClass := WebModuleClass;' + #13#10
     + #13#10 +
-{$IFDEF DELPHI2006_LVL}
+{$IFDEF DELPHI2006UP}
 {$ELSE}
   // '  application.createform(t'+fformclass+', '+fformclass+');' + #13#10 +
 {$ENDIF}
@@ -1419,7 +1401,7 @@ Begin
   Projectdir := Getideprojectpath;
   Projectdir := Includetrailingpathdelim(Projectdir);
 
-{$IFDEF delphi9_lvl}
+{$IFDEF DELPHI2005UP}
   If Not Fismainform Then
   Begin
     // result := projectoptions.formfile;

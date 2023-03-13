@@ -1,6 +1,6 @@
 unit uRESTDWShellServicesRegLazarus;
 
-{$I ..\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .

@@ -1,7 +1,6 @@
 unit uRESTDWTools;
 
 {$I ..\..\Source\Includes\uRESTDW.inc}
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -25,12 +24,12 @@ unit uRESTDWTools;
 interface
 
 Uses
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  LConvEncoding, lazutf8,
  {$ELSE}
  {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
  {$IFDEF RESTDWFMX}IOUtils,{$ENDIF}
- {$IF CompilerVersion > 27}NetEncoding,{$IFEND}
+ {$IFDEF DELPHIXE6UP}NetEncoding,{$ENDIF}
  EncdDecd,
  {$ENDIF}
  Classes, SysUtils, DB,
@@ -458,19 +457,17 @@ Uses
 
 Procedure DynArrayToBinVariant(var V: Variant; const DynArray; Len: Integer);
 var
- {$IFDEF COMPILER16_UP}
-  LVarBounds : Array of Integer;
- {$ELSE}
-  {$IFNDEF FPC}
-   {$IF CompilerVersion < 27}
-    LVarBounds : Array of Integer;
-   {$ELSE}
-    LVarBounds : Array of NativeInt;
-   {$IFEND}
+  {$IFDEF RESTDWLAZARUS}
+  LVarBounds : Array of SizeInt;
   {$ELSE}
-   LVarBounds : Array of SizeInt;
+    {$IF Defined(DELPHIXE7UP)}
+      LVarBounds : Array of Integer;
+    {$ELSEIF Defined(DELPHIXE6UP)}
+      LVarBounds : Array of NativeInt;
+    {$ELSEIF Defined(DELPHIXE2UP)}
+      LVarBounds : Array of Integer;
+    {$IFEND}
   {$ENDIF}
- {$ENDIF}
  aVarData : PVarData;
 begin
   LVarBounds := nil;
@@ -482,15 +479,7 @@ begin
   LVarBounds[0] := 0;
   LVarBounds[1] := Len - 1;
   { Create Variant of SAFEARRAY }
-  {$IFNDEF FPC}
-   {$IF CompilerVersion > 27}
-    V := VarArrayCreate(LVarBounds, varByte);
-   {$ELSE}
-    V := VarArrayCreate(LVarBounds, varByte);
-   {$IFEND}
-  {$ELSE}
    V := VarArrayCreate(LVarBounds, varByte);
-  {$ENDIF}
   Assert(VarArrayDimCount(V) = 1);
   { Keep the data around for a bit }
   VarArrayLock(V);
@@ -601,7 +590,7 @@ Begin
   dwftGuid            : Result := ftGuid;
   dwftBCD             : Result := ftBCD;
   dwftFMTBcd          : Result := ftFMTBcd;
-  {$IF NOT DEFINED(FPC) AND (CompilerVersion > 21)}
+  {$IFDEF DELPHI2010UP}
     dwftTimeStamp       : Result := ftTimeStamp;
     dwftWideString      : Result := ftWideString;
     dwftFixedWideChar   : Result := ftFixedWideChar;
@@ -619,17 +608,12 @@ Begin
     dwftObject          : Result := ftObject;
     dwftSingle          : Result := ftSingle;
   {$ELSE}
-    {$IFNDEF FPC}
-     {$IF CompilerVersion > 22}
-       dwftFixedWideChar   : Result := ftFixedWideChar;
-       dwftWideMemo        : Result := ftWideMemo;
-     {$ELSE}
-       dwftFixedWideChar   : Result := ftFixedChar;
-       dwftWideMemo        : Result := ftMemo;
-     {$IFEND}
+    {$IFDEF DELPHIXEUP}
+    dwftFixedWideChar   : Result := ftFixedWideChar;
+    dwftWideMemo        : Result := ftWideMemo;
     {$ELSE}
-       dwftFixedWideChar   : Result := ftFixedWideChar;
-       dwftWideMemo        : Result := ftWideMemo;
+    dwftFixedWideChar   : Result := ftFixedChar;
+    dwftWideMemo        : Result := ftMemo;
     {$ENDIF}
     dwftTimeStamp       : Result := ftDateTime; // ftTimeStamp nao definido 3.2.4
     dwftWideString      : Result := ftWideString;
@@ -642,7 +626,7 @@ Begin
     dwftStream          : Result := ftBlob;
     dwftTimeStampOffset : Result := ftDateTime; // ftTimeStamp nao definido 3.2.4
     dwftSingle          : Result := ftFloat;
-  {$IFEND}
+  {$ENDIF}
  End;
 End;
 
@@ -687,8 +671,7 @@ Begin
   ftGuid            : Result := dwftGuid;
   ftTimeStamp       : Result := dwftTimeStamp;
   ftFMTBcd          : Result := dwftFMTBcd;
-  {$IFNDEF FPC}
-   {$if CompilerVersion > 21} // Delphi 2010 acima
+   {$IFDEF DELPHI2010UP} // Delphi 2010 acima
     ftFixedWideChar   : Result := dwftFixedWideChar;
     ftWideMemo        : Result := dwftWideMemo;
     ftOraTimeStamp    : Result := dwftOraTimeStamp;
@@ -703,7 +686,6 @@ Begin
     ftTimeStampOffset : Result := dwftTimeStampOffset;
     ftObject          : Result := dwftObject;
     ftSingle          : Result := dwftSingle;
-   {$IFEND}
   {$ENDIF}
  End;
 End;

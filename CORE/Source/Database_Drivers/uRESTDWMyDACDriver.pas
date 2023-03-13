@@ -1,6 +1,6 @@
 ﻿unit uRESTDWMyDACDriver;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -27,11 +27,12 @@
 interface
 
 uses
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
     LResources,
   {$ENDIF}
-  Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes, MyClasses, MyAccess,
-  MyScript, DADump, MyDump, VirtualTable, MemDS, DBAccess, DB, uRESTDWMemtable;
+  Classes, SysUtils, DB,
+  MyClasses, MyAccess, MyScript, DADump, MyDump, VirtualTable, MemDS, DBAccess,
+  uRESTDWDriverBase, uRESTDWBasicTypes, uRESTDWMemtable;
 
 type
   TRESTDWMyDACTable = class(TRESTDWDrvTable)
@@ -441,6 +442,11 @@ begin
     FreeAndNil(vDWMemtable);
   end;
 end;
+
+{$IFDEF RESTDWLAZARUS}
+initialization
+{$I ..\RESTDWLazarusDrivers.lrs}
+{$ENDIF}
 
 end.
 

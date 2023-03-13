@@ -707,7 +707,8 @@ var
   vByte : byte;
   vBookMark : TBookmark;
 begin
-  AStream.Size := 0;
+  //  AStream.Size := 0; // TBufferedFileStream nao funciona no lazarus
+  AStream.Seek(0,soBeginning);
   if not ADataset.Active then
     ADataset.Open
   else
@@ -758,15 +759,17 @@ begin
   AStream.WriteBuffer(vRecordCount,SizeOf(Longint));
   vBookMark := ADataset.GetBookmark;
   ADataset.DisableControls;
-  // fetchall
-  ADataset.Last;
-  ADataset.First;
+
+  if not ADataset.IsUniDirectional then
+    ADataset.First;
+
   vRecordCount := 0;
   while not ADataset.Eof do begin
     SaveRecordToStream(ADataset,AStream);
     ADataset.Next;
     vRecordCount := vRecordCount + 1;
   end;
+
   ADataset.GotoBookmark(vBookMark);
   ADataset.FreeBookmark(vBookMark);
   ADataset.EnableControls;
@@ -844,7 +847,7 @@ end;
 
 function TRESTDWStorageBin.SaveRecordDWMemToStream(IDataset: IRESTDWMemTable; var AStream: TStream) : Longint;
 var
-  ADataSet      : TRESTDWMemTable;
+  ADataSet : TRESTDWMemTable;
   i : Longint;
   j : integer;
   vFieldSize : integer;

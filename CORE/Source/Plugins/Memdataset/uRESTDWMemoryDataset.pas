@@ -1,7 +1,6 @@
 ﻿unit uRESTDWMemoryDataset;
 
 {$I ..\..\..\Source\Includes\uRESTDW.inc}
-{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .
@@ -194,7 +193,6 @@ type
     FCaseInsensitiveSort: Boolean;
     FIndexList : TStringList;
     FLastID : integer;
-    FListFieldsDefs : TList;
 
     FStatusRecord : TRESTDWRecordStatus;
     FStatusRecordChanged : Boolean;
@@ -228,12 +226,6 @@ type
     function GetRecNo: integer; override;
     function GetRecordCount: integer; override;
     procedure SetRecNo(Value: Integer); override;
-
-    // locate
-    function Locate(const KeyFields: string; const KeyValues: Variant;
-      Options: TLocateOptions): Boolean; override;
-    function Lookup(const KeyFields: string; const KeyValues: Variant;
-      const ResultFields: string): Variant; override;
 
     // filter
     function FilterRecord(Buffer : TRESTDWBuffer): Boolean;
@@ -315,10 +307,15 @@ type
     function calcFieldSize(ft : TFieldType; fs : integer) : integer;
     procedure clearRecords;
     procedure clearBlobs;
-    procedure clearFieldsDefs;
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
+
+    // locate
+    function Locate(const KeyFields: string; const KeyValues: Variant;
+      Options: TLocateOptions): Boolean; override;
+    function Lookup(const KeyFields: string; const KeyValues: Variant;
+      const ResultFields: string): Variant; override;
 
     {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
       function GetFieldData(Field: TField; var Buffer: TValueBuffer): Boolean; override;
@@ -383,6 +380,9 @@ type
 implementation
 
 uses
+  {$IFDEF FPC}
+    bufstream,
+  {$ENDIF}
   uRESTDWStorageBin;
 
 procedure TRESTDWMemTable.InternalOpen;
@@ -421,6 +421,9 @@ procedure TRESTDWMemTable.InternalClose;
 var
   vBlock : Boolean;
 begin
+  if not FIsTableOpen then
+    Exit;
+
   vBlock := FBlockEvents;
   FBlockEvents := False;
 
@@ -918,13 +921,13 @@ var
 
   vCurrency : Currency;
   vDouble : Double;
-  vByte : Byte;
   vFmtBCD : tBCD;
   vTimeStamp : TTimeStamp;
   vDateTimeRec : TDateTimeRec;
   vString : AnsiString;
   {$IFNDEF FPC}
     vSQLTimeStamp : TSQLTimeStamp;
+    vByte : Byte;
   {$ENDIF}
   {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
     vTimeStampOffSet : TSQLTimeStampOffSet;
@@ -1067,12 +1070,12 @@ var
 
   vCurrency : Currency;
   vDouble : Double;
-  vByte : Byte;
   vFmtBCD : tBCD;
   vDateTimeRec : TDateTimeRec;
   vTimeStamp : TTimeStamp;
   {$IFNDEF FPC}
     vSQLTimeStamp : TSQLTimeStamp;
+    vByte : Byte;
   {$ENDIF}
 
   {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
@@ -1323,6 +1326,9 @@ begin
   clearBlobs;
   clearRecords;
 
+  SetState(vState);
+  DataEvent(deDataSetChange, 0);
+
   SetLength(FFieldOffsets,0);
   SetLength(FFieldSize,0);
   FRecordCount := 0;
@@ -1331,9 +1337,6 @@ begin
   FRecordBufferSize := 0;
   FRecordSize := 0;
   FFilterBuffer := nil;
-
-  SetState(vState);
-  DataEvent(deDataSetChange, 0);
 end;
 
 procedure TRESTDWMemTable.SaveToStream(AStream: TStream);
@@ -1609,8 +1612,6 @@ begin
           vFieldDef.DataType := Fields[i].DataType;
           vFieldDef.Size := Fields[i].Size;
           vFieldDef.Attributes := [faFixed];
-
-          FListFieldsDefs.Add(vFieldDef);
         end;
       end;
     end;
@@ -1757,6 +1758,8 @@ var
   i : integer;
   vBlob : PRESTDWBlobField;
 begin
+  if FBlobs = nil then
+    Exit;
   // eh mais rapido correr a lista ao contrario
   // pq nao tem que fazer deslocamento
   i := FBlobs.Count - 1;
@@ -1771,26 +1774,13 @@ begin
   FBlobs.Clear;
 end;
 
-procedure TRESTDWMemTable.clearFieldsDefs;
-var
-  i : integer;
-begin
-  // eh mais rapido correr a lista ao contrario
-  // pq nao tem que fazer deslocamento
-
-  i := FListFieldsDefs.Count - 1;
-  while i >= 0 do begin
-    TObject(FListFieldsDefs.Items[i]).Free;
-    FListFieldsDefs.Delete(i);
-    i := i - 1;
-  end;
-end;
-
 procedure TRESTDWMemTable.clearRecords;
 var
   i : integer;
   obj : TRESTDWRecord;
 begin
+  if FRecords = nil then
+    Exit;
   // eh mais rapido correr a lista ao contrario
   // pq nao tem que fazer deslocamento
   i := FRecords.Count - 1;
@@ -1853,18 +1843,17 @@ end;
 
 constructor TRESTDWMemTable.Create(AOwner: TComponent);
 begin
+  inherited Create(AOwner);
   FStatusRecord := rsInserted;
   FStatusRecordChanged := False;
   FRecordCount := 0;
   FFilterRecordCount := -1;
   FRecords := TList.Create;
   FBlobs := TList.Create;
-  FListFieldsDefs := TList.Create;
   FIndexList := nil;
   FFilterBuffer := nil;
   FFilterParser := nil;
   FStorageDataType := nil;
-  inherited Create(AOwner);
 end;
 
 function TRESTDWMemTable.CreateBlobStream(Field: TField;
@@ -1922,15 +1911,12 @@ begin
   if FFilterParser <> nil then
     FreeAndNil(FFilterParser);
 
-  clearFieldsDefs;
-
-  FieldDefs.Clear;
   Fields.Clear;
+  FieldDefs.Clear;
 
   FreeIndexList;
   FreeAndNil(FRecords);
   FreeAndNil(FBlobs);
-  FreeAndNil(FListFieldsDefs);
 
   inherited Destroy;
 end;
@@ -2152,9 +2138,11 @@ begin
   repeat
     if Filtered then begin
       vRec := GetRecordObj(FCurrentRecord);
-      vBuffer := vRec.CopyBuffer;
-      Accept := FilterRecord(vBuffer);
-      FreeMem(vBuffer);
+      if vRec <> nil then begin
+        vBuffer := vRec.CopyBuffer;
+        Accept := FilterRecord(vBuffer);
+        FreeMem(vBuffer);
+      end;
     end;
     if not Accept then
       Dec(FCurrentRecord);
@@ -2207,7 +2195,6 @@ end;
 procedure TRESTDWMemTable.InternalPost;
 var
   vRec : TRESTDWRecord;
-  vRecs : Integer;
 begin
   inherited InternalPost;
 
@@ -2255,7 +2242,6 @@ var
   i : integer;
   vFieldOffSet : integer;
   vBlobField : PRESTDWBlobField;
-  vField : TField;
   vBuf : TRESTDWBuffer;
   vBoolean : boolean;
   vDWFieldType : Byte;
@@ -2389,6 +2375,8 @@ end;
 destructor TRESTDWBlobStream.Destroy;
 begin
   SetDataBlob;
+  FDataset := nil;
+  FField := nil;
   inherited Destroy;
 end;
 
@@ -2398,6 +2386,7 @@ begin
   FreeMem(FBlobField^.Buffer, FBlobField^.Size);
   FBlobField^.Buffer := nil;
   FBlobField^.Size := 0;
+  FBlobField := nil;
   FModified := True;
 end;
 
@@ -2527,14 +2516,16 @@ end;
 
 procedure TRESTDWStorageBase.SaveToFile(ADataset: TDataset; AFileName: String);
 var
-  vFileStream : TFileStream;
+  vFileStream : TBufferedFileStream;
 begin
   try
-    vFileStream := TFileStream.Create(AFileName,fmCreate);
+    vFileStream := TBufferedFileStream.Create(AFileName,fmCreate);
     try
       SaveToStream(ADataset,TStream(vFileStream));
     except
-
+      on e : Exception do begin
+        raise
+      end;
     end;
   finally
     vFileStream.Free;

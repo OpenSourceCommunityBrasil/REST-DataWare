@@ -1,7 +1,6 @@
 unit uRESTDWDataUtils;
 
 {$I ..\..\Includes\uRESTDW.inc}
-{$I ..\..\Includes\uRESTDWPlataform.inc}
 
 {
   REST Dataware .

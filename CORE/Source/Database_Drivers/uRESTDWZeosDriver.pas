@@ -1,11 +1,11 @@
 ﻿unit uRESTDWZeosDriver;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
-{$IFNDEF FPC}{$I ZComponent.inc}{$ENDIF}
+{$I ..\..\Source\Includes\uRESTDW.inc}
+{$IFNDEF RESTDWLAZARUS}{$I ZComponent.inc}{$ENDIF}
 
 {
   REST Dataware .
-  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+  Criado por XyberX (Gilberto Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
@@ -28,7 +28,7 @@
 interface
 
 uses
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
     LResources,
   {$ENDIF}
 
@@ -37,7 +37,7 @@ uses
   {$ELSE}
     uRESTDWMemoryDataset,
   {$ENDIF}
-  Classes, SysUtils, DB,
+  Classes, SysUtils, DB, Variants,
   ZConnection, ZDataset, ZSequence, ZDbcIntfs, ZAbstractRODataset,
   ZAbstractDataset, ZStoredProcedure, ZEncoding, ZDatasetUtils,
   uRESTDWDriverBase, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWZeosPhysLink
@@ -115,6 +115,7 @@ type
     destructor Destroy; override;
 
     function getQuery : TRESTDWDrvQuery; override;
+    function getQuery(AUnidir : boolean) : TRESTDWDrvQuery; override;
     function getTable : TRESTDWDrvTable; override;
     function getStoreProc : TRESTDWDrvStoreProc; override;
 
@@ -187,6 +188,21 @@ begin
   end;
 end;
 
+function TRESTDWZeosDriver.getQuery(AUnidir: boolean): TRESTDWDrvQuery;
+var
+  qry : TZReadOnlyQuery;
+begin
+  if AUnidir then begin
+    qry := TZReadOnlyQuery.Create(Self);
+    qry.IsUniDirectional := True;
+    qry.Connection := TZConnection(Connection);
+    Result := TRESTDWZeosQuery.Create(qry);
+  end
+  else begin
+    Result := inherited getQuery(AUnidir);
+  end;
+end;
+
 destructor TRESTDWZeosDriver.Destroy;
 begin
   inherited Destroy;
@@ -203,7 +219,7 @@ var
 begin
   qry := TZQuery.Create(Self);
   qry.Connection := TZConnection(Connection);
-  {$IFNDEF FPC}
+  {$IFNDEF RESTDWLAZARUS}
    qry.AfterPost := zAfterPost;
   {$ELSE}
    qry.AfterPost := @zAfterPost;
@@ -322,7 +338,7 @@ end;
 
 procedure TRESTDWZeosQuery.createSequencedField(seqname, field : string);
 var
-  qry : TZQuery;
+  qry : TZAbstractRODataset;
 begin
   if Trim(seqname) = '' then
     Exit;
@@ -330,19 +346,20 @@ begin
   if FSequence = nil then
     FSequence := TZSequence.Create(Self);
 
-  qry := TZQuery(Self.Owner);
+  qry := TZAbstractRODataset(Self.Owner);
+  if qry is TZQuery then begin
+    FSequence.SequenceName := seqname;
 
-  FSequence.SequenceName := seqname;
-
-  qry.Sequence := FSequence;
-  qry.SequenceField := field;
+    TZQuery(qry).Sequence := FSequence;
+    TZQuery(qry).SequenceField := field;
+  end;
 end;
 
 procedure TRESTDWZeosQuery.ExecSQL;
 var
-  qry : TZQuery;
+  qry : TZAbstractRODataset;
 begin
-  qry := TZQuery(Self.Owner);
+  qry := TZAbstractRODataset(Self.Owner);
   qry.ExecSQL;
 end;
 
@@ -357,12 +374,12 @@ end;
 procedure TRESTDWZeosQuery.LoadFromStreamParam(IParam: integer; stream: TStream;
   blobtype: TBlobType);
 var
-  qry : TZQuery;
+  qry : TZAbstractRODataset;
   {$IFDEF ZEOS80UP}
     cp : Word;
   {$ENDIF}
 begin
-  qry := TZQuery(Self.Owner);
+  qry := TZAbstractRODataset(Self.Owner);
   {$IFDEF ZEOS80UP}
     if BlobType in [ftWideString{$IFDEF WITH_WIDEMEMO}, ftFixedWideChar, ftWideMemo{$ENDIF}] then
       qry.Params[IParam].LoadTextFromStream(Stream, zCP_UTF16)
@@ -373,16 +390,19 @@ begin
       qry.Params[IParam].LoadTextFromStream(Stream, cp);
     end;
   {$ELSE}
-    qry.Params[IParam].LoadFromStream(stream,blobtype);
+    if qry is TZQuery then
+      TZQuery(qry).Params[IParam].LoadFromStream(stream,blobtype)
+    else if qry is TZReadOnlyQuery then
+      TZReadOnlyQuery(qry).Params[IParam].LoadFromStream(stream,blobtype)
   {$ENDIF}
 end;
 
 procedure TRESTDWZeosQuery.Prepare;
 var
-  qry : TZQuery;
+  qry : TZAbstractRODataset;
 begin
   inherited Prepare;
-  qry := TZQuery(Self.Owner);
+  qry := TZAbstractRODataset(Self.Owner);
   qry.Prepare;
 end;
 
@@ -395,71 +415,97 @@ end;
 
 function TRESTDWZeosQuery.RowsAffected: Int64;
 var
-  qry : TZQuery;
+  qry : TZAbstractRODataset;
 begin
-  qry := TZQuery(Self.Owner);
+  qry := TZAbstractRODataset(Self.Owner);
   Result := qry.RowsAffected;
 end;
 
 function TRESTDWZeosQuery.ParamCount : Integer;
 var
-  qry : TZQuery;
+  qry : TZAbstractRODataset;
 begin
-  qry := TZQuery(Self.Owner);
-  Result := qry.Params.Count;
+  Result := 0;
+  qry := TZAbstractRODataset(Self.Owner);
+  if qry is TZQuery then
+    Result := TZQuery(qry).Params.Count
+  else if qry is TZReadOnlyQuery then
+    Result := TZReadOnlyQuery(qry).Params.Count;
 end;
 
 function TRESTDWZeosQuery.getParamDataType(IParam : integer) : TFieldType;
 var
-  qry : TZQuery;
+  qry : TZAbstractRODataset;
 begin
-  qry := TZQuery(Self.Owner);
-  Result := qry.Params[IParam].DataType;
+  Result := ftUnknown;
+  qry := TZAbstractRODataset(Self.Owner);
+  if qry is TZQuery then
+    Result := TZQuery(qry).Params[IParam].DataType
+  else if qry is TZReadOnlyQuery then
+    Result := TZReadOnlyQuery(qry).Params[IParam].DataType;
 end;
 
 function TRESTDWZeosQuery.getParamName(IParam : integer) : string;
 var
-  qry : TZQuery;
+  qry : TZAbstractRODataset;
 begin
-  qry := TZQuery(Self.Owner);
-  Result := qry.Params[IParam].Name;
+  Result := '';
+  qry := TZAbstractRODataset(Self.Owner);
+  if qry is TZQuery then
+    Result := TZQuery(qry).Params[IParam].Name
+  else if qry is TZReadOnlyQuery then
+    Result := TZReadOnlyQuery(qry).Params[IParam].Name;
 end;
 
 function TRESTDWZeosQuery.getParamSize(IParam : integer) : integer;
 var
-  qry : TZQuery;
+  qry : TZAbstractRODataset;
 begin
-  qry := TZQuery(Self.Owner);
-  Result := qry.Params[IParam].Size;
+  Result := 0;
+  qry := TZAbstractRODataset(Self.Owner);
+  if qry is TZQuery then
+    Result := TZQuery(qry).Params[IParam].Size
+  else if qry is TZReadOnlyQuery then
+    Result := TZReadOnlyQuery(qry).Params[IParam].Size;
 end;
 
 function TRESTDWZeosQuery.getParamValue(IParam : integer) : variant;
 var
-  qry : TZQuery;
+  qry : TZAbstractRODataset;
 begin
-  qry := TZQuery(Self.Owner);
-  Result := qry.Params[IParam].Value;
+  Result := null;
+  qry := TZAbstractRODataset(Self.Owner);
+  if qry is TZQuery then
+    Result := TZQuery(qry).Params[IParam].Value
+  else if qry is TZReadOnlyQuery then
+    Result := TZReadOnlyQuery(qry).Params[IParam].Value;
 end;
 
 procedure TRESTDWZeosQuery.setParamDataType(IParam : integer; AValue : TFieldType);
 var
-  qry : TZQuery;
+  qry : TZAbstractRODataset;
 begin
-  qry := TZQuery(Self.Owner);
-  qry.Params[IParam].DataType := AValue;
+  qry := TZAbstractRODataset(Self.Owner);
+  if qry is TZQuery then
+    TZQuery(qry).Params[IParam].DataType := AValue
+  else if qry is TZReadOnlyQuery then
+    TZReadOnlyQuery(qry).Params[IParam].DataType := AValue;
 end;
 
 procedure TRESTDWZeosQuery.setParamValue(IParam : integer; AValue : variant);
 var
-  qry : TZQuery;
+  qry : TZAbstractRODataset;
 begin
-  qry := TZQuery(Self.Owner);
-  qry.Params[IParam].Value := AValue;
+  qry := TZAbstractRODataset(Self.Owner);
+  if qry is TZQuery then
+    TZQuery(qry).Params[IParam].Value := AValue
+  else if qry is TZReadOnlyQuery then
+    TZReadOnlyQuery(qry).Params[IParam].Value := AValue;
 end;
 
 procedure TRESTDWZeosQuery.SaveToStream(stream: TStream);
 var
-  qry : TZQuery;
+  qry : TZAbstractRODataset;
   {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
     memtable : TZMemTable;
   {$ELSE}
@@ -478,8 +524,7 @@ begin
     {$ELSE}
       memtable.Assign(qry);
     {$ENDIF}
-    // TODO -oXyberX -cMemTable: Função SaveToStream não existe no TRESTDWMemtable
-//    memtable.SaveToStream(stream);
+    memtable.SaveToStream(stream);
     stream.Position := 0;
   finally
     FreeAndNil(memtable);
@@ -540,15 +585,14 @@ begin
     {$ELSE}
       memtable.Assign(qry);
     {$ENDIF}
-    // TODO -oXyberX -cMemTable: Função SaveToStream não existe no TRESTDWMemtable
-//    memtable.SaveToStream(stream);
+    memtable.SaveToStream(stream);
     stream.Position := 0;
   finally
     FreeAndNil(memtable);
   end;
 end;
 
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
 initialization
 {$I ..\RESTDWLazarusDrivers.lrs}
 {$ENDIF}

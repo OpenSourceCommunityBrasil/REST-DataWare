@@ -1,6 +1,6 @@
 unit uRESTDWShellServicesRegDelphi;
 
-{$I ..\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -27,11 +27,9 @@ unit uRESTDWShellServicesRegDelphi;
 interface
 
 uses
-   {$IFDEF COMPILER16_UP} UITypes, {$ENDIF}
-   {$if CompilerVersion > 22}ExptIntf, {$ELSE} DbTables, {$IFEND}   
-   
-   Windows, SysUtils, Variants, StrEdit, TypInfo, RTLConsts, ToolsApi, Classes,
-   DesignWindows, DesignEditors, DBReg, DSDesign, ColnEdit, Db, DesignIntf,
+   {$IFNDEF DELPHIXE2UP} DbTables, {$ENDIF}
+   Classes,
+   DesignIntf,
    uRESTDWShellServicesDelphi;
 
 Procedure Register;
