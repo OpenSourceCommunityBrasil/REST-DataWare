@@ -2567,11 +2567,13 @@ begin
       if Assigned(Self.OnQueryBeforeOpen) then
         Self.OnQueryBeforeOpen(vDataSet, Params);
        vTempQuery.Open;
-       vTempQuery.FetchAll;
+
       if connInTransaction then
         connCommit;
+
       if aResult = nil then
         aResult := TJSONValue.Create;
+
       aResult.Encoding := Encoding;
       try
 
