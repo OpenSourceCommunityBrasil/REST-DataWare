@@ -91,11 +91,12 @@ Const
  cDefaultContentEncoding        = 'gzip, identity';
  cEmptyDBName                   = 'Empty Database Property';
  cErrorDatabaseNotFound         = 'Database not found...';
+ cErrorDriverNotSet             = 'Selected pooler does not have a driver set';
  cErrorNoFieldsDataset          = 'No Fields to add on Dataset...';
  cErrorOpenDataset              = 'Error when try open Dataset...';
  cEventNotFound                 = 'HTTP/1.1 404 Url Not Found';
- cExprIncorrect                 = 'Incorrectly formed filter expression';
  cExprExpected                  = 'Expression expected but %s found';
+ cExprIncorrect                 = 'Incorrectly formed filter expression';
  cFieldNotFound                 = 'Field ''%s'' not found';
  cInvalidAccessTag              = 'Invalid Access tag...';
  cInvalidAuth                   = 'HTTP/1.1 401 Unauthorized';

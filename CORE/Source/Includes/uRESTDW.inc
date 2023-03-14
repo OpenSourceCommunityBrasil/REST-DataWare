@@ -316,7 +316,8 @@
 (* FRAMEWORK Directives *)
 
 {$IFNDEF RESTDWLAZARUS}
-  {$IF Declared(FireMonkeyVersion)}
+  {$IF Declared(FireMonkeyVersion) or Defined(FRAMEWORK_FMX)
+    or Declared(FMX.Types.TFmxObject)}
     {$DEFINE HAS_FMX}
     {$DEFINE RESTDWFMX}
   {$ELSE}
@@ -341,7 +342,7 @@
   {$DEFINE RESTDWUTF8}
 {$IFEND}
 
-{$IF Defined(LINUX) or Defined(LINUX64)}
+{$IF Defined(LINUX) or Defined(LINUX32) or Defined(LINUX64)}
   {$DEFINE RESTDWLINUX}
   {$IFDEF RESTDWFMX}
     {$DEFINE RESTDWLINUXFMX}
@@ -353,6 +354,11 @@
   {$IFDEF RESTDWFMX}
     {$DEFINE RESTDWWINFMX}
   {$ENDIF}
+{$IFEND}
+
+{$IF Defined(POSIX)}
+  {$DEFINE RESTDWAPPLE}
+  {$DEFINE RESTDWLINUX}
 {$IFEND}
 
 (* End of OS Architecture Directives *)
@@ -407,7 +413,7 @@
 {$IFDEF RESTDWLAZARUS}
   {$DEFINE CPUASM} // FPC defines CPU32, CPU64 and Unix automatically
 {$ELSE}
-  {$IFDEF CPUX64}
+  {$IF Defined(CPUX64) or Defined(CPU64BITS) or Defined(CPUARM64)}
     {$DEFINE CPU64}
     {$DEFINE CPUASM}
     {$DEFINE DELPHI64_TEMPORARY}
@@ -415,7 +421,7 @@
     {$DEFINE CPU386} // For Borland compilers select the x86 compat assembler by default
     {$DEFINE CPU32}  // Assume Borland compilers are 32-bit (rather than 64-bit)
     {$DEFINE CPUASM}
-  {$ENDIF}
+  {$IFEND}
 {$ENDIF}
 
 (* End of CPU Architecture Directives *)
