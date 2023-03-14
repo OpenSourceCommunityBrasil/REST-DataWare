@@ -101,6 +101,7 @@ contains
   uRESTDWProtoTypes in '..\..\Source\Basic\uRESTDWProtoTypes.pas',
   uRESTDWExprParser in '..\..\Source\Plugins\Memdataset\uRESTDWExprParser.pas',
   uRESTDWDriverBase in '..\..\Source\Database_Drivers\uRESTDWDriverBase.pas',
-  uRESTDWTools in '..\..\Source\utils\uRESTDWTools.pas';
+  uRESTDWTools in '..\..\Source\utils\uRESTDWTools.pas',
+  uRESTDWAuthenticators in '..\..\Source\Basic\Mechanics\uRESTDWAuthenticators.pas';
 
 End.
