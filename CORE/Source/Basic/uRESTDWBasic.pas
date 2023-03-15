@@ -6094,7 +6094,7 @@ End;
 Constructor TRESTServiceBase.Create(AOwner: TComponent);
 Begin
  Inherited;
- vAuthMessages                          := TRESTDWAuthMessages.Create(AOwner);
+ vAuthMessages                          := TRESTDWAuthMessages.Create;
  vProxyOptions                          := TProxyConnectionInfo.Create;
  vDefaultPage                           := TStringList.Create;
  vCORSCustomHeaders                     := TStringList.Create;
