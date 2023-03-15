@@ -33,7 +33,7 @@ Uses
  uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWJSONObject,
  uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWDataUtils,
  uRESTDWTools, uRESTDWConsts, uRESTDWMessageCoderMIME,
- uRESTDWZLib, uRESTDWMimeTypes, uRESTDWAbout;
+ uRESTDWZLib, uRESTDWMimeTypes, uRESTDWAbout, uRESTDWAuthenticators;
 
  type
   TRedirect = Procedure(Url : String;
@@ -412,6 +412,8 @@ Type
   vForceWelcomeAccess,
   vCORS,
   vActive                : Boolean;
+  vAuthenticator         : TRESTDWAuthenticatorBase;
+  vAuthMessages          : TRESTDWAuthMessages;
   vProxyOptions          : TProxyConnectionInfo;
   vServiceTimeout,
   vServicePort           : Integer;
@@ -625,6 +627,8 @@ Type
   Destructor  Destroy; Override;//Destroy a Classe
  Published
   Property Active                  : Boolean                       Read vActive                  Write SetActive;
+  Property Authenticator           : TRESTDWAuthenticatorBase      Read vAuthenticator           Write vAuthenticator;
+  Property AuthMessages            : TRESTDWAuthMessages           Read vAuthMessages            Write vAuthMessages;
   Property CORS                    : Boolean                       Read vCORS                    Write vCORS;
   Property CORS_CustomHeaders      : TStringList                   Read vCORSCustomHeaders       Write SetCORSCustomHeader;
   Property DefaultPage             : TStringList                   Read vDefaultPage             Write SetDefaultPage;
@@ -6090,6 +6094,7 @@ End;
 Constructor TRESTServiceBase.Create(AOwner: TComponent);
 Begin
  Inherited;
+ vAuthMessages                          := TRESTDWAuthMessages.Create(AOwner);
  vProxyOptions                          := TProxyConnectionInfo.Create;
  vDefaultPage                           := TStringList.Create;
  vCORSCustomHeaders                     := TStringList.Create;
@@ -6119,6 +6124,8 @@ End;
 
 Destructor TRESTServiceBase.Destroy;
 Begin
+ If Assigned(vAuthMessages)          Then
+  FreeAndNil(vAuthMessages);
  If Assigned(vProxyOptions)          Then
   FreeAndNil(vProxyOptions);
  If Assigned(vCripto)                Then

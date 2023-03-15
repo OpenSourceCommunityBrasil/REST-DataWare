@@ -35,7 +35,7 @@ type
 
   end;
 
-  TRESTDWAuthMessages = class(TComponent)
+  TRESTDWAuthMessages = class(TPersistent)
   private
     FAuthDialog             : Boolean;
     FCustomDialogAuthMessage: String;
