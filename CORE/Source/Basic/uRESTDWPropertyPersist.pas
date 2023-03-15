@@ -71,18 +71,10 @@ Var
  cnt,
  lPropCount  : Integer;
  lPropList   : PPropList;
- {$IFNDEF FPC}
-  {$IF Defined(HAS_FMX)}
-   {$IF Defined(HAS_UTF8)}
-    lPropType   : PPTypeInfo;
-   {$ELSE}
-    lPropType   : PPTypeInfo;
-   {$IFEND}
-  {$ELSE}
-   lPropType   : PPTypeInfo;
-  {$IFEND}
+ {$IFDEF RESTDWLAZARUS}
+   lPropType : PTypeInfo;
  {$ELSE}
-  lPropType   : PTypeInfo;
+   lPropType : PPTypeInfo;
  {$ENDIF}
  Writer      : TWriter;
 Begin
@@ -96,19 +88,7 @@ Begin
    lPropType := lPropInfo^.PropType;
    If lPropInfo^.SetProc = Nil      Then Continue;
    If lPropType^.Kind    = tkMethod Then Continue;
-   {$IFNDEF FPC}
-    {$IF Defined(HAS_FMX)}
-     {$IF Defined(HAS_UTF8)} //TODO
-      //PropName  := String(lPropInfo^.Name^);
-     {$ELSE}
-      PropName  := lPropInfo^.Name;
-     {$IFEND}
-    {$ELSE}
-    PropName  := lPropInfo^.Name;
-    {$IFEND}
-   {$ELSE}
    PropName  := lPropInfo^.Name;
-   {$ENDIF}
    PropValue := GetPropValue(Self, PropName);
    Writer.WriteString(PropName);
    Writer.WriteString(PropValue);
