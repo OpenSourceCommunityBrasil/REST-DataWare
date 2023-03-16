@@ -27,7 +27,7 @@ unit uRESTDWAuthenticators;
 interface
 
 uses
-  System.Classes, System.SysUtils, uRESTDWConsts, uRESTDWAbout, uRESTDWDataUtils,
+  System.Classes, System.SysUtils, System.DateUtils, uRESTDWConsts, uRESTDWAbout, uRESTDWDataUtils,
   uRESTDWJSONInterface, uRESTDWTools;
 
 type
@@ -61,7 +61,7 @@ type
     FPassword: String;
     FUserName: String;
   public
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
   published
     property UserName: String read FUserName write FUserName;
     property Password: String read FPassword write FPassword;
@@ -90,9 +90,11 @@ type
     function  GetTokenType    (AValue: String): TRESTDWTokenType;
     function  GetCryptType    (AValue: String): TRESTDWCryptType;
   public
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure FromToken(ATokenValue: String);
+    function GetToken(ASecrets: String): String;
+    function ValidateToken(AValue: String): Boolean; overload;
   published
     property BeginTime       : TDateTime           read FBeginTime        write FBeginTime;
     property EndTime         : TDateTime           read FEndTime          write FEndTime;
@@ -124,7 +126,7 @@ type
     FRedirectURI   : String;
     FExpiresIn     : TDatetime;
   public
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
   published
     property TokenType     : TRESTDWAuthOptionTypes read FTokenType       write FTokenType;
     property AutoBuildHex  : Boolean                read FAutoBuildHex    write FAutoBuildHex;
@@ -169,8 +171,10 @@ end;
 
 { TRESTDWAuthBasic }
 
-constructor TRESTDWAuthBasic.Create;
+constructor TRESTDWAuthBasic.Create(AOwner: TComponent);
 begin
+  inherited Create(AOwner);
+
   FUserName := cDefaultBasicAuthUser;
   FPassword := cDefaultBasicAuthPassword;
 end;
@@ -185,11 +189,13 @@ begin
   FEndTime      := 0;
 end;
 
-constructor TRESTDWAuthToken.Create;
+constructor TRESTDWAuthToken.Create(AOwner: TComponent);
 begin
+  inherited Create(AOwner);
+
   FTokenHash        := 'RDWTS_HASH0011';
   FServerSignature  := 'RESTRESTDWServer01';
-  FGetTokenEvent    := 'GetToken';
+  FGetTokenEvent    := '/GetToken';
   FKey              := 'token';
   FLifeCycle        := 1800;//30 Minutos
   FTokenType        := rdwTS;
@@ -282,6 +288,31 @@ begin
     Result := rdwRSA;
 end;
 
+function TRESTDWAuthToken.GetToken(ASecrets: String): String;
+var
+  LTokenValue: TTokenValue;
+begin
+  LTokenValue           := TTokenValue.Create;
+  LTokenValue.TokenHash := FTokenHash;
+  LTokenValue.TokenType := FTokenType;
+  LTokenValue.CryptType := FCryptType;
+
+  if Trim(FServerSignature)  <> '' then
+    LTokenValue.Iss := LTokenValue.vCripto.Encrypt(FServerSignature);
+
+  LTokenValue.Secrets   := ASecrets;
+  LTokenValue.BeginTime := Now;
+
+  if FLifeCycle > 0 then
+    LTokenValue.EndTime := IncSecond(LTokenValue.BeginTime, FLifeCycle);
+
+  try
+    Result := LTokenValue.ToToken;
+  finally
+    FreeAndNil(LTokenValue);
+  end;
+End;
+
 function TRESTDWAuthToken.GetTokenType(AValue: String): TRESTDWTokenType;
 begin
   Result := rdwTS;
@@ -309,10 +340,151 @@ begin
     FromToken(FToken)
 end;
 
+function TRESTDWAuthToken.ValidateToken(AValue: String): Boolean;
+var
+  LHeader, LBody, LStringComparer: String;
+  LTokenValue: TTokenValue;
+
+  function ReadHeader(AValue: String): Boolean;
+  var
+    LJsonValue: TRESTDWJSONInterfaceObject;
+  begin
+    LJsonValue := Nil;
+    Result     := False;
+
+    try
+      LJsonValue := TRESTDWJSONInterfaceObject.Create(AValue);
+
+      if LJsonValue.PairCount = 2 then
+      begin
+        Result := (LowerCase(LJsonValue.Pairs[0].Name) = 'alg') And
+                  (LowerCase(LJsonValue.Pairs[1].Name) = 'typ');
+
+        if Result then
+        begin
+          FTokenType := GetTokenType(LJsonValue.Pairs[1].Value);
+          FCryptType := GetCryptType(LJsonValue.Pairs[0].Value);
+        end;
+      end;
+    except
+
+    end;
+
+    if Assigned(LJsonValue) Then
+      FreeAndNil(LJsonValue);
+  end;
+
+  function ReadBody(AValue: String): Boolean;
+  var
+    LJsonValue: TRESTDWJSONInterfaceObject;
+  begin
+    LJsonValue := Nil;
+    Result     := False;
+
+    try
+      LJsonValue := TRESTDWJSONInterfaceObject.Create(AValue);
+      Result     := Trim(LJsonValue.PairByName['iss'].Name) <> '';
+
+      if Result then
+      begin
+        Result := FServerSignature = LTokenValue.vCripto.Decrypt(LJsonValue.PairByName['iss'].Value);
+
+        if Result then
+        begin
+          Result            := False;
+          FServerSignature  := LTokenValue.vCripto.Decrypt(LJsonValue.PairByName['iss'].Value);
+          Result            := Trim(LJsonValue.PairByName['iat'].Name) <> '';
+
+          if Result then
+          Begin
+            Result := False;
+
+            if FTokenType = rdwTS then
+              FBeginTime := TTokenValue.DateTimeFromISO8601(LJsonValue.PairByName['iat'].Value)
+            else
+              FBeginTime   := UnixToDateTime(StrToInt64(LJsonValue.PairByName['iat'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ENDIF});
+          end;
+
+          Result := Trim(LJsonValue.PairByName['secrets'].Name) <> '';
+
+          if Result then
+            FSecrets := DecodeStrings(LJsonValue.PairByName['secrets'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+
+          if Trim(LJsonValue.PairByName['exp'].Name) <> '' Then
+          begin
+            Result := False;
+
+            if FTokenType = rdwTS then
+              FEndTime := TTokenValue.DateTimeFromISO8601(LJsonValue.PairByName['exp'].Value)
+            else
+              FEndTime := UnixToDateTime(StrToInt64(LJsonValue.PairByName['exp'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ENDIF});
+
+            Result := Now < FEndTime;
+          end;
+        end;
+      end
+      else
+        Result := FLifeCycle = 0;
+    except
+
+    end;
+
+    if Assigned(LJsonValue) Then
+      FreeAndNil(LJsonValue);
+  end;
+begin
+  LHeader         := '';
+  LBody           := '';
+  LStringComparer := '';
+  AValue          := StringReplace(AValue, ' ', '+', [rfReplaceAll]); //Remove espaços na Token e add os caracteres "+" em seu lugar
+  LHeader         := Copy(AValue, InitStrPos, Pos('.', AValue) -1);
+
+  Delete(AValue, InitStrPos, Pos('.', AValue));
+
+  LBody := Copy(AValue, InitStrPos, Pos('.', AValue) -1);
+
+  Delete(AValue, InitStrPos, Pos('.', AValue));
+
+  LStringComparer := AValue;
+  Result          := (Trim(LHeader) <> '') And (Trim(LBody) <> '') And (Trim(LStringComparer) <> '');
+
+  if Result then
+  begin
+    Result := ReadHeader(DecodeStrings(LHeader{$IFDEF FPC}, csUndefined{$ENDIF}));
+
+    if Result then
+    begin
+      Result      := False;
+      LTokenValue := TTokenValue.Create;
+
+      try
+        LTokenValue.TokenHash := FTokenHash;
+        LTokenValue.CryptType := FCryptType;
+        LStringComparer       := LTokenValue.vCripto.Decrypt(LStringComparer);
+        Result                := LStringComparer = LHeader + '.' + LBody;
+
+        if Result then
+        begin
+          Result  := False;
+          LHeader := DecodeStrings(LHeader                 {$IFDEF FPC}, csUndefined{$ENDIF});
+          LBody   := DecodeStrings(LBody                   {$IFDEF FPC}, csUndefined{$ENDIF});
+          Secrets := DecodeStrings(GetSecretsValue(LBody)  {$IFDEF FPC}, csUndefined{$ENDIF});
+          Secrets := DecodeStrings(GetSecretsValue(Secrets){$IFDEF FPC}, csUndefined{$ENDIF});
+          Result  := ReadBody(LBody);
+        end;
+      finally
+        FreeAndNil(LTokenValue);
+      end;
+    end;
+  end;
+end;
+
 { TRESTDWAuthOAuth }
 
-constructor TRESTDWAuthOAuth.Create;
+constructor TRESTDWAuthOAuth.Create(AOwner: TComponent);
 begin
+  inherited Create(AOwner);
+
   FClientID       := '';
   FClientSecret   := '';
   FToken          := '';

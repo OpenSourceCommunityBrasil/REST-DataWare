@@ -97,21 +97,21 @@ Type
   vMD5                  : String;
   vRDWTokenType         : TRESTDWTokenType;
   vRDWCryptType         : TRESTDWCryptType;
-  vCripto               : TCripto;
   Procedure   SetTokenHash (Token : String);
   Function    ToJSON       : String;
-  Function    ToToken      : String;
   Function    GetCryptType : String;
   Function    GetTokenType : String;
   Function    GetHeader    : String;
   Procedure   SetSecrets     (Value : String);
   Procedure   SetFinalRequest(Value : TDateTime);
  Public
+  vCripto: TCripto;
   Constructor    Create;
   Destructor     Destroy;Override;
   Class Function GetMD5       (Const Value : String)    : String;
   Class Function ISO8601FromDateTime(Value : TDateTime) : String;
   Class Function DateTimeFromISO8601(Value : String)    : TDateTime;
+  Function       ToToken           : String;
   Property       TokenType         : TRESTDWTokenType Read vRDWTokenType      Write vRDWTokenType;
   Property       CryptType         : TRESTDWCryptType Read vRDWCryptType      Write vRDWCryptType;
   Property       BeginTime         : TDateTime        Read vInitRequest       Write vInitRequest;
