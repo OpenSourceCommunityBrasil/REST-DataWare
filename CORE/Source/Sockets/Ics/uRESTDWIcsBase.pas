@@ -42,7 +42,7 @@ Uses
 
   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
   uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
-  uRESTDWConsts, uRESTDWDataUtils, uRESTDWTools,
+  uRESTDWConsts, uRESTDWDataUtils, uRESTDWTools, uRESTDWAuthenticators,
 
   OverbyteIcsWinSock, OverbyteIcsWSocket, OverbyteIcsWndControl,
   OverbyteIcsHttpAppServer, OverbyteIcsUtils, OverbyteIcsFormDataDecoder,
@@ -313,7 +313,7 @@ const
   cIcsHTTPConnectionClosed = 'Closed HTTP connection';
   cIcsCorruptedPackage = 'Corrupted package: RequestContentLength <> Stream.Size';
   cIcsSSLLibNotFoundForSSLDisabled =
-    'OpenSSL libs are required by ICS to digest AuthTypes rdwAOBearer, rdwAOToken and rdwOAuth even if SSL is disabled.';
+    'OpenSSL libs are required by ICS to digest AuthTypes Token and OAuth even if SSL is disabled.';
 
 Implementation
 
@@ -442,16 +442,12 @@ begin
     HttpAppSrv.onServerStarted := onServerStartedServer;
     HttpAppSrv.onServerStopped := onServerStoppedServer;
 
-    if AuthenticationOptions.AuthorizationOption <> rdwAONone then
+    if Authenticator <> nil then
     begin
-
-      case AuthenticationOptions.AuthorizationOption of
-        rdwAOBasic:
-          HttpAppSrv.AuthTypes := [atBasic];
-        rdwAOBearer, rdwAOToken, rdwOAuth:
-          HttpAppSrv.AuthTypes := [atDigest];
-      end;
-
+      if Authenticator is TRESTDWAuthBasic then
+        HttpAppSrv.AuthTypes := [atBasic]
+      else if (Authenticator is TRESTDWAuthToken) or (Authenticator is TRESTDWAuthOAuth) then
+        HttpAppSrv.AuthTypes := [atDigest];
     end
     else
       HttpAppSrv.AuthTypes := [atNone];
@@ -905,7 +901,7 @@ begin
 
         if vBruteForceProtection.BruteForceAllow(Pooler.PeerAddr) then
         begin
-          if Self.AuthenticationOptions.OptionParams.AuthDialog then
+          if Self.AuthMessages.AuthDialog then
             Pooler.Answer401
           else
             Pooler.Answer403;
