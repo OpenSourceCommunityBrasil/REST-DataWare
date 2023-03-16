@@ -39,6 +39,7 @@ Uses
   uRESTDWBasic, uRESTDWBasicDB, uRESTDWComponentEvents, uRESTDWBasicTypes,
   uRESTDWJSONObject, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
   uRESTDWConsts, uRESTDWProtoTypes, uRESTDWDataUtils, uRESTDWTools, uRESTDWZlib,
+  uRESTDWAuthenticators,
 
   IdContext, IdHeaderList, IdTCPConnection, IdHTTPServer, IdCustomHTTPServer,
   IdSSLOpenSSL, IdSSL, IdAuthentication, IdTCPClient, IdHTTPHeaderInfo,
@@ -3429,7 +3430,7 @@ Procedure TRESTDWIdServicePooler.CreatePostStream(AContext        : TIdContext;
 Var
  headerIndex : Integer;
  vValueAuth  : String;
- vAuthValue  : TRESTDWAuthOptionTokenClient;
+ vAuthValue  : TRESTDWAuthToken;
 Begin
  headerIndex := AHeaders.IndexOfName('Authorization');
  If (headerIndex = -1) Then
@@ -3452,10 +3453,10 @@ Begin
  Else
   Begin
    vValueAuth  := AHeaders[headerIndex];
-   If (AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken])  And
+   If (Authenticator is TRESTDWAuthToken)  And
       (Pos('basic', Lowercase(vValueAuth)) = 0) Then
     Begin
-     vAuthValue       := TRESTDWAuthOptionTokenClient.Create;
+     vAuthValue       := TRESTDWAuthToken.Create(Self);
      vAuthValue.Token := vValueAuth;
      {$IFNDEF FPC}
       {$IF Not Defined(HAS_FMX)}
@@ -3479,7 +3480,7 @@ Procedure TRESTDWIdServicePooler.OnParseAuthentication(AContext    : TIdContext;
                                                    Const AAuthType, AAuthData: String;
                                                    Var VUsername, VPassword: String; Var VHandled: Boolean);
 Var
- vAuthValue : TRESTDWAuthOptionTokenClient;
+ vAuthValue : TRESTDWAuthToken;
 Begin
   {$IFNDEF FPC}
    {$IF Not Defined(HAS_FMX)}
@@ -3487,10 +3488,10 @@ Begin
        (Lowercase(AAuthType) = Lowercase('token'))  And
        (AContext.Data        = Nil) Then
      Begin
-      vAuthValue       := TRESTDWAuthOptionTokenClient.Create;
+      vAuthValue       := TRESTDWAuthToken.Create(Self);
       vAuthValue.Token := AAuthType + ' ' + AAuthData;
       AContext.Data    := vAuthValue;
-      VHandled         := AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken];
+      VHandled         := Authenticator is TRESTDWAuthToken;
      End;
    {$ELSE}
     {$IFDEF HAS_UTF8}
@@ -3498,20 +3499,20 @@ Begin
        (Lowercase(AAuthType) = Lowercase('token'))  And
        ({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}  = Nil) Then
      Begin
-      vAuthValue          := TRESTDWAuthOptionTokenClient.Create;
+      vAuthValue          := TRESTDWAuthToken.Create;
       vAuthValue.Token    := AAuthType + ' ' + AAuthData;
       {$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}       := vAuthValue;
-      VHandled            := AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken];
+      VHandled            := Authenticator is TRESTDWAuthToken;
      End;
     {$ELSE}
     If (Lowercase(AAuthType) = Lowercase('bearer')) Or
        (Lowercase(AAuthType) = Lowercase('token'))  And
        (AContext.DataObject  = Nil) Then
      Begin
-      vAuthValue          := TRESTDWAuthOptionTokenClient.Create;
+      vAuthValue          := TRESTDWAuthToken.Create;
       vAuthValue.Token    := AAuthType + ' ' + AAuthData;
       AContext.DataObject := vAuthValue;
-      VHandled            := AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken];
+      VHandled            := Authenticator is TRESTDWAuthToken;
      End;
     {$ENDIF}
    {$IFEND}
@@ -3520,10 +3521,10 @@ Begin
       (Lowercase(AAuthType) = Lowercase('token'))  And
       (AContext.Data        = Nil) Then
     Begin
-     vAuthValue       := TRESTDWAuthOptionTokenClient.Create;
+     vAuthValue       := TRESTDWAuthToken.Create;
      vAuthValue.Token := AAuthType + ' ' + AAuthData;
      AContext.Data    := vAuthValue;
-     VHandled         := AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken];
+     VHandled         := Authenticator is TRESTDWAuthToken;
     End;
   {$ENDIF}
 End;
