@@ -420,7 +420,6 @@ Type
   vCripto                : TCripto;
   aServerMethod          : TComponentClass;
   vDataRouteList         : TRESTDWDataRouteList;
-  vServerAuthOptions     : TRESTDWServerAuthOptionParams;
   vLastRequest           : TLastRequest;
   vLastResponse          : TLastResponse;
   FRootPath,
@@ -588,7 +587,6 @@ Type
                                       mark                    : String;
                                       RequestHeader           : TStringList;
                                       Var ErrorCode           : Integer) : Boolean;
-  Procedure SetServerAuthOptions     (AuthenticationOptions   : TRESTDWServerAuthOptionParams);
  Public
   Procedure EchoPooler               (ServerMethodsClass      : TComponent;
                                       AContext                : TComponent;
@@ -637,7 +635,6 @@ Type
   Property RequestTimeout          : Integer                       Read vServiceTimeout          Write vServiceTimeout;
   Property ServicePort             : Integer                       Read vServicePort             Write vServicePort;  //A Porta do Serviço do DataSet
   Property ProxyOptions            : TProxyConnectionInfo          Read vProxyOptions            Write vProxyOptions; //Se tem Proxy diz quais as opções
-  Property AuthenticationOptions   : TRESTDWServerAuthOptionParams Read vServerAuthOptions       Write SetServerAuthOptions;
   Property ServerMethodClass       : TComponentClass               Read aServerMethod            Write SetServerMethod;
   Property OnLastRequest           : TLastRequest                  Read vLastRequest             Write vLastRequest;
   Property OnLastResponse          : TLastResponse                 Read vLastResponse            Write vLastResponse;
@@ -1509,7 +1506,6 @@ Var
  ContentStream         : TStream;
 // newdecoder,
 // Decoder             : TIdMessageDecoder;
- vRDWAuthOptionParam   : TRESTDWAuthOptionParam;
  JSONParam             : TJSONParam;
  JSONValue             : TJSONValue;
  vAcceptAuth,
@@ -1728,8 +1724,6 @@ Var
    FreeAndNil(vRequestHeader);
   If Assigned(vAuthTokenParam)   Then
    FreeAndNil(vAuthTokenParam);
-  If Assigned(vRDWAuthOptionParam) Then
-   FreeAndNil(vRDWAuthOptionParam);
   If Assigned(vAuthTokenParam) Then
    FreeAndNil(vAuthTokenParam);
   If Assigned(vServerMethod) Then
@@ -1852,7 +1846,6 @@ Var
 Begin
  ResultStream          := Nil;
  Result                := True;
- vRDWAuthOptionParam   := Nil;
  decoder               := Nil;
  mb2                   := Nil;
  mb                    := Nil;
@@ -2853,7 +2846,6 @@ Begin
             EnterCriticalSection(vCriticalSection);
            {$ENDIF}
           End;
-         vServerAuthOptions.CopyServerAuthParams(vRDWAuthOptionParam);
          TServerMethodDatamodule(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
          If vAuthenticator <> Nil Then
           Begin
@@ -3121,7 +3113,6 @@ Begin
           If (vTempServerMethods.ClassType = TServerMethodDatamodule)             Or
              (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule)) Then
            Begin
-            vServerAuthOptions.CopyServerAuthParams(vRDWAuthOptionParam);
             TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
            End;
           If (Not (vGettoken)) And (Not (vTokenValidate)) Then
@@ -5805,12 +5796,6 @@ Begin
   End;
 End;
 
-Procedure TRESTServiceBase.SetServerAuthOptions(AuthenticationOptions : TRESTDWServerAuthOptionParams);
-Begin
- If Assigned(AuthenticationOptions) Then
-  vServerAuthOptions := AuthenticationOptions;
-End;
-
 Procedure TRESTServiceBase.ClearDataRoute;
 Begin
  vDataRouteList.ClearList;
@@ -5847,7 +5832,6 @@ Begin
  vDatabaseCharSet                       := csUndefined;
  {$ELSE}
  {$ENDIF}
- vServerAuthOptions                     := TRESTDWServerAuthOptionParams.Create(Self);
  vActive                                := False;
  vEncode_Errors                         := False;
  vEncoding                              := esUtf8;
@@ -5876,8 +5860,6 @@ Begin
   FreeAndNil(vCORSCustomHeaders);
  If Assigned(vDataRouteList)         Then
   FreeAndNil(vDataRouteList);
- If Assigned(vServerAuthOptions)     Then
-  FreeAndNil(vServerAuthOptions);
  If Assigned(vServerIpVersionConfig) Then
   FreeAndNil(vServerIpVersionConfig);
  Inherited;
