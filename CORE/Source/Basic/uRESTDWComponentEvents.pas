@@ -28,7 +28,7 @@ interface
 Uses
  SysUtils, Classes, Db,
  uRESTDWDataUtils, uRESTDWParams, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWConsts,
- uRESTDWMassiveBuffer;
+ uRESTDWMassiveBuffer, uRESTDWAuthenticators;
 
  Type
   TOnCreate               = Procedure(Sender                : TObject)               Of Object;
@@ -111,7 +111,7 @@ Uses
   TOnGetToken             = Procedure(Welcomemsg,
                                       AccessTag             : String;
                                       Params                : TRESTDWParams;
-                                      AuthOptions           : TRESTDWAuthTokenParam;
+                                      AuthOptions           : TRESTDWAuthToken;
                                       Var ErrorCode         : Integer;
                                       Var ErrorMessage      : String;
                                       Var TokenID           : String;

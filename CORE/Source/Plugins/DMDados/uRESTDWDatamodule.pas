@@ -6,7 +6,7 @@ interface
 
 Uses
   SysUtils, Classes, uRESTDWDataUtils, uRESTDWComponentEvents,
-  uRESTDWBasicTypes, uRESTDWConsts, uRESTDWJSONObject, uRESTDWParams;
+  uRESTDWBasicTypes, uRESTDWConsts, uRESTDWJSONObject, uRESTDWParams, uRESTDWAuthenticators;
 
 Type
  TUserBasicAuth  =             Procedure(Welcomemsg, AccessTag,
@@ -18,7 +18,7 @@ Type
  TUserTokenAuth  =             Procedure(Welcomemsg,
                                          AccessTag          : String;
                                          Params             : TRESTDWParams;
-                                         AuthOptions        : TRESTDWAuthTokenParam;
+                                         AuthOptions        : TRESTDWAuthToken;
                                          Var ErrorCode      : Integer;
                                          Var ErrorMessage   : String;
                                          Var TokenID        : String;
