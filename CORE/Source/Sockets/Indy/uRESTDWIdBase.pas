@@ -3521,7 +3521,7 @@ Begin
       (Lowercase(AAuthType) = Lowercase('token'))  And
       (AContext.Data        = Nil) Then
     Begin
-     vAuthValue       := TRESTDWAuthToken.Create;
+     vAuthValue       := TRESTDWAuthToken.Create(Self);
      vAuthValue.Token := AAuthType + ' ' + AAuthData;
      AContext.Data    := vAuthValue;
      VHandled         := Authenticator is TRESTDWAuthToken;
