@@ -298,7 +298,7 @@
 {$IFDEF VER150}
   {$DEFINE DELPHI7UP}
 {$ENDIF ~VER150}
-{$IFEND}
+{$ENDIF}
 
 (* End of Compiler Directives for IDE Version *)
 (******************************************************************************)
@@ -380,7 +380,7 @@
   {$ENDIF}
   {$IFDEF DELPHI7UP}
     {$WARN DUPLICATE_CTOR_DTOR OFF}
-    {$WARN CVT_ACHAR_TO_WCHAR OFF}
+    {.$WARN CVT_ACHAR_TO_WCHAR OFF}
   {$ENDIF}
   {$WARN SYMBOL_PLATFORM OFF}
   {$WARN SYMBOL_DEPRECATED OFF}

@@ -27,8 +27,8 @@ unit uRESTDWAuthenticators;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.DateUtils, uRESTDWConsts, uRESTDWAbout, uRESTDWDataUtils,
-  uRESTDWJSONInterface, uRESTDWTools;
+  Classes, SysUtils, DateUtils,
+  uRESTDWConsts, uRESTDWAbout, uRESTDWDataUtils, uRESTDWJSONInterface, uRESTDWTools;
 
 type
   TRESTDWAuthenticatorBase = class(TRESTDWComponent)
