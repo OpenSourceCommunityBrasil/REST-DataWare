@@ -27,7 +27,7 @@ unit uRESTDWParams;
 interface
 
 Uses
- {$IFDEF FPC} LConvEncoding,{$ENDIF}
+ {$IFDEF RESTDWLAZARUS} LConvEncoding,{$ENDIF}
  SysUtils, Classes, Db, Variants,
  uRESTDWConsts, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWTools,
  uRESTDWResponseTranslator;
@@ -89,7 +89,7 @@ Type
   aValue           : TRESTDWBytes;
   vEncoding        : TEncodeSelect;
   vFieldsList      : TFieldsList;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   vEncodingLazarus : TEncoding;
   vDatabaseCharSet : TDatabaseCharSet;
   {$ENDIF}
@@ -159,7 +159,7 @@ Type
                             DataModeD        : TDataMode = dmDataware;
                             DateTimeFormat   : String = '';
                             DelimiterFormat  : String = '';
-                            {$IFDEF FPC}
+                            {$IFDEF RESTDWLAZARUS}
                             CharSet          : TDatabaseCharSet = csUndefined;
                             {$ENDIF}
                             DataType         : Boolean = False;
@@ -173,7 +173,7 @@ Type
                             DataModeD        : TDataMode = dmDataware;
                             DateTimeFormat   : String = '';
                             DelimiterFormat  : String = '';
-                            {$IFDEF FPC}
+                            {$IFDEF RESTDWLAZARUS}
                             CharSet          : TDatabaseCharSet = csUndefined;
                             {$ENDIF}
                             DataType         : Boolean = False;
@@ -193,12 +193,12 @@ Type
                             Var JsonCount    : Integer;
                             Datapacks        : Integer          = -1;
                             ActualRec        : Integer          = 0;
-                            ClearDataset     : Boolean          = False{$IFDEF FPC};
+                            ClearDataset     : Boolean          = False{$IFDEF RESTDWLAZARUS};
                             CharSet          : TDatabaseCharSet = csUndefined{$ENDIF});Overload;
   Procedure WriteToDataset (DatasetType      : TDatasetType;
                             JSONValue        : String;
                             Const DestDS     : TDataset;
-                            ClearDataset     : Boolean          = False{$IFDEF FPC};
+                            ClearDataset     : Boolean          = False{$IFDEF RESTDWLAZARUS};
                             CharSet          : TDatabaseCharSet = csUndefined{$ENDIF});Overload;
   Procedure LoadFromJSON   (bValue           : String);Overload;
   Procedure LoadFromJSON   (bValue           : String;
@@ -241,7 +241,7 @@ Type
   Property DataMode           : TDataMode          Read vDataMode           Write vDataMode;
   Property FloatDecimalFormat : String             Read vFloatDecimalFormat Write vFloatDecimalFormat;
   Property AsBytes            : TRESTDWBytes       Read GetBytes            Write WriteBytes;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Property DatabaseCharSet    : TDatabaseCharSet   Read vDatabaseCharSet    Write vDatabaseCharSet;
   {$ENDIF}
   Property OnWriterProcess    : TOnWriterProcess   Read vOnWriterProcess    Write vOnWriterProcess;
@@ -315,7 +315,7 @@ Type
   vNullValue,
   vBinary,
   vEncoded         : Boolean;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   vEncodingLazarus : TEncoding;
   vDatabaseCharSet : TDatabaseCharSet;
   {$ENDIF}
@@ -325,12 +325,12 @@ Type
   Procedure SetParamFileName(bValue     : String);
   Function  GetAsString : String;
   Procedure SetAsString    (Value      : String);
-  {$IFDEF DEFINE(FPC) Or NOT(Defined(HAS_FMX))}
+  {$IF Defined(RESTDWLAZARUS) or (not Defined(RESTDWFMX))}
   Function  GetAsWideString : WideString;
   Procedure SetAsWideString(Value      : WideString);
   Function  GetAsAnsiString : AnsiString;
   Procedure SetAsAnsiString(Value      : AnsiString);
-  {$ENDIF}
+  {$IFEND}
   Function  GetAsBCD      : Currency;
   Procedure SetAsBCD      (Value       : Currency);
   Function  GetAsFMTBCD   : Currency;
@@ -363,7 +363,7 @@ Type
   Procedure SetAsObject   (Value       : String);
   Procedure SetEncoded    (Value       : Boolean);
   Procedure SetParamContentType(Const bValue : String);
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Procedure SetDatabaseCharSet (Value  : TDatabaseCharSet);
   {$ENDIF}
   Function TestNilParam : Boolean;
@@ -401,7 +401,7 @@ Type
   Procedure LoadFromParam    (Param    : TParam);
   Procedure SaveFromParam    (Param    : TParam);
   Property  CriptOptions      : TCripto          Read vCripto             Write vCripto;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Property  DatabaseCharSet   : TDatabaseCharSet Read vDatabaseCharSet    Write SetDatabaseCharSet;
   {$ENDIF}
   Property ObjectDirection    : TObjectDirection Read vObjectDirection    Write SetObjectDirection;
@@ -437,10 +437,10 @@ Type
   Property AsString           : String           Read GetAsString         Write SetAsString;
   Property AsObject           : String           Read GetAsString         Write SetAsObject;
   Property AsByteString       : String           Read GetByteString;
-  {$IFDEF DEFINE(FPC) Or NOT(Defined(HAS_FMX))}
+  {$IF Defined(RESTDWLAZARUS) or (not Defined(RESTDWFMX))}
   Property AsWideString       : WideString       Read GetAsWideString     Write SetAsWideString;
   Property AsAnsiString       : AnsiString       Read GetAsAnsiString     Write SetAsAnsiString;
-  {$ENDIF}
+  {$IFEND}
   Property AsMemo             : String           Read GetAsString         Write SetAsString;
 End;
 
@@ -452,7 +452,7 @@ Type
   vCripto       : TCripto;
   vHeaders      : TRESTDWHeaders;
   vUrl_Redirect : String;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   vEncodingLazarus : TEncoding;
   vDatabaseCharSet : TDatabaseCharSet;
   {$ENDIF}
@@ -499,7 +499,7 @@ Type
   Property    CriptOptions          : TCripto                  Read vCripto       Write vCripto;
   Property    RequestHeaders        : TRESTDWHeaders           Read vHeaders      Write vHeaders;
   Property    Url_Redirect          : String                   Read vUrl_Redirect Write vUrl_Redirect;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Property DatabaseCharSet          : TDatabaseCharSet Read vDatabaseCharSet    Write vDatabaseCharSet;
   {$ENDIF}
 End;
@@ -566,10 +566,8 @@ Begin
   ftInteger,
   ftLargeint,
   ftWord,
-  {$IFNDEF FPC}
-   {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+  {$IFDEF DELPHIXEUP} // Delphi 2010 pra cima
     ftShortint, ftByte, ftLongWord,
-   {$IFEND}
   {$ENDIF}
   ftBoolean    : Begin
                   Value := Trim(Value);
@@ -586,15 +584,11 @@ Begin
                      Begin
                       If Field.DataType = ftLargeint Then
                        Begin
-                        {$IFNDEF FPC}
-                         {$IF CompilerVersion > 22}
-                          Field.AsLargeInt := StrToInt64(Value);
+                         {$IFDEF DELPHIXEUP}
+                           Field.AsLargeInt := StrToInt64(Value);
                          {$ELSE}
-                          Field.AsInteger  := StrToInt64(Value);
-                         {$IFEND}
-                        {$ELSE}
-                         Field.AsInteger  := StrToInt64(Value);
-                        {$ENDIF}
+                           Field.AsInteger  := StrToInt64(Value);
+                         {$ENDIF}
                        End
                       Else
                        Field.AsInteger := StrToInt(Value);
@@ -604,8 +598,7 @@ Begin
   ftFloat,
   ftCurrency,
   ftBCD,
-  {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-  {$IFEND}{$ENDIF}
+  {$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}
   ftFMTBcd     : Begin
                   Value := Trim(Value);
                   vTempValue := BuildFloatString(Value);
@@ -615,18 +608,13 @@ Begin
                      ftFloat  : Field.AsFloat := StrToFloat(vTempValue);
                      ftCurrency,
                      ftBCD,
-                     {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-                     {$IFEND}{$ENDIF}
+                     {$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}
                      ftFMTBcd : Begin
                                  If Field.DataType in [ftBCD, ftFMTBcd] Then
-                                  {$IFDEF FPC}
-                                   Field.AsFloat := StrToFloat(vTempValue)
-                                  {$ELSE}
-                                   {$IF CompilerVersion > 22}
+                                  {$IFDEF DELPHIXEUP}
                                     Field.AsBCD := StrToFloat(vTempValue)
-                                   {$ELSE}
+                                  {$ELSE}
                                     Field.AsFloat := StrToFloat(vTempValue)
-                                   {$IFEND}
                                   {$ENDIF}
                                  Else
                                   Field.AsFloat := StrToFloat(vTempValue);
@@ -647,20 +635,8 @@ Begin
                        (Pos('\', vTempValue) > 0) Or
                        (Pos('-', vTempValue) > 0) Then
                      Field.AsDateTime := StrToDateTime(vTempValue)
-                    Else
-                     Begin
-                      {$IFDEF FPC}
-                       If StrToInt64(vTempValue) > 0 Then
-                        Field.AsDateTime := UnixToDateTime(StrToInt64(vTempValue));
-                      {$ELSE}
-                       If StrToInt64(vTempValue) > 0 Then
-                       {$IF CompilerVersion < 22}
-                        Field.AsDateTime := UnixToDateTime(StrToInt64(vTempValue));
-                       {$ELSE}
-                        Field.AsDateTime := UnixToDateTime(StrToInt64(vTempValue));
-                       {$IFEND}
-                      {$ENDIF}
-                     End;
+                    Else If StrToInt64(vTempValue) > 0 Then
+                     Field.AsDateTime := UnixToDateTime(StrToInt64(vTempValue));
                    End;
                  End;
  End;
@@ -839,7 +815,7 @@ Begin
    Else
     Begin //TODO
      If Length(vTempString) > 0 Then
-      vTempString := DecodeStrings(vTempString{$IFDEF FPC}, csUndefined{$ENDIF});
+      vTempString := DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
     End;
   End
  Else
@@ -925,11 +901,9 @@ Begin
 End;
 
 Procedure TJSONValue.WriteValue(bValue : Variant);
-{$IFNDEF FPC}
-{$IF CompilerVersion < 26}
+{$IFNDEF DELPHIXEUP}
 Var
  vValueAnsi : AnsiString;
-{$IFEND}
 {$ENDIF}
 Begin
  vNullValue := False;
@@ -951,7 +925,7 @@ Begin
     vNullValue := False;
    If vObjectValue in [ovString, ovGuid, ovMemo, ovWideMemo, ovFmtMemo, ovObject, ovDataset] Then
     Begin
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
      If vEncodingLazarus = Nil Then
       SetEncoding(vEncoding);
      If vEncoded Then
@@ -993,7 +967,7 @@ Begin
     End
    Else If vObjectValue in [ovDate, ovTime, ovDateTime, ovTimeStamp, ovOraTimeStamp, ovTimeStampOffset] Then
     Begin
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
       If vEncoding = esUtf8 Then
        aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
       Else
@@ -1004,7 +978,7 @@ Begin
     End
    Else If vObjectValue in [ovSingle, ovFloat, ovCurrency, ovBCD, ovFMTBcd, ovExtended] Then
     Begin
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
       If vEncoding = esUtf8 Then
        aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
       Else
@@ -1017,19 +991,19 @@ Begin
     Begin
      If bValue <> 'null' Then
       Begin
-      {$IFDEF FPC}
+      {$IFDEF RESTDWLAZARUS}
        If vEncoding = esUtf8 Then
         aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(bValue))
        Else
         aValue := StringToBytes(String(bValue));
       {$ELSE}
-       {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+       {$IFDEF DELPHIXEUP} // Delphi 2010 pra cima
         aValue := StringToBytes(String(bValue));
        {$ELSE} // Delphi 2010 pra cima
         vValueAnsi := bValue;
         SetLength(aValue, Length(vValueAnsi));
         move(vValueAnsi[InitStrPos], pByteArray(aValue)^, Length(aValue));
-       {$IFEND}
+       {$ENDIF}
       {$ENDIF}
       End;
     End;
@@ -1163,7 +1137,7 @@ Var
  A, vRecNo  : Integer; //pr-19/08/2020
  Function GenerateHeader: String;
  Var
-  I{$IFDEF FPC}, vSize{$ENDIF} : Integer;
+  I{$IFDEF RESTDWLAZARUS}, vSize{$ENDIF} : Integer;
   vPrimary,
   vRequired,
   vReadOnly,
@@ -1182,44 +1156,40 @@ Var
      vRequired := 'S';
     If Not(bValue.Fields[i].CanModify) Then
      vReadOnly := 'S';
-    {$IFNDEF FPC}
-     {$IF CompilerVersion > 21}
+    {$IFDEF DELPHIXEUP}
       If bValue.Fields[i].AutoGenerateValue = arAutoInc Then
        vAutoinc := 'S';
      {$ELSE}
        vAutoinc := 'N';
-     {$IFEND}
     {$ENDIF}
     vFieldName := bValue.Fields[i].FieldName;
 //    If vLowercaseFieldNames Then
 //     vFieldName := Lowercase(bValue.Fields[i].FieldName);
-    If bValue.Fields[i].DataType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,{$IFEND}{$ENDIF}
+    If bValue.Fields[i].DataType In [{$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}
                                      ftFloat, ftCurrency, ftFMTBcd, ftBCD] Then
      Begin
       If bValue.Fields[i].DataType In [ftFMTBcd, ftBCD] then
        Begin
-       {$IFNDEF FPC}
+       {$IFNDEF RESTDWLAZARUS}
        vGenerateLine := Format(TJsonDatasetHeader, [vFieldName,
                                                     GetFieldType(bValue.Fields[i].DataType),
                                                     vPrimary, vRequired, TBCDField(bValue.Fields[i]).Precision,
                                                     TBCDField(bValue.Fields[i]).Size, vReadOnly, vAutoinc])
        {$ELSE}
-        {$IFDEF FPC}
         vSize := TBCDField(bValue.Fields[i]).Size;
         If vSize > 0 Then
          vSize := TBCDField(bValue.Fields[i]).Precision
         Else
          vSize := Sizeof(Double) * 2;
-        {$ENDIF}
         vGenerateLine := Format(TJsonDatasetHeader, [vFieldName,
-                                                     GetFieldType(bValue.Fields[i].DataType),
-                                                     vPrimary, vRequired, {$IFDEF FPC}vSize{$ELSE}TBCDField(bValue.Fields[i]).Precision{$ENDIF},
-                                                     {$IFDEF FPC}LazDigitsSize{$ELSE}TBCDField(bValue.Fields[i]).Size{$ENDIF}, vReadOnly, vAutoinc])
+                             GetFieldType(bValue.Fields[i].DataType), vPrimary,
+                             vRequired, vSize, LazDigitsSize, vReadOnly,
+                             vAutoinc]);
        {$ENDIF}
        End
       Else
        Begin
-        {$IFDEF FPC}
+        {$IFDEF RESTDWLAZARUS}
         vSize := TFloatField(bValue.Fields[i]).Size;
         If vSize > 0 Then
          vSize := TFloatField(bValue.Fields[i]).Precision
@@ -1228,8 +1198,8 @@ Var
         {$ENDIF}
         vGenerateLine := Format(TJsonDatasetHeader, [vFieldName,
                                                      GetFieldType(bValue.Fields[i].DataType),
-                                                     vPrimary, vRequired, {$IFDEF FPC}vSize{$ELSE}TFloatField(bValue.Fields[i]).Precision{$ENDIF},
-                                                     {$IFDEF FPC}LazDigitsSize{$ELSE}TFloatField(bValue.Fields[i]).Size{$ENDIF}, vReadOnly, vAutoinc]);
+                                                     vPrimary, vRequired, {$IFDEF RESTDWLAZARUS}vSize{$ELSE}TFloatField(bValue.Fields[i]).Precision{$ENDIF},
+                                                     {$IFDEF RESTDWLAZARUS}LazDigitsSize{$ELSE}TFloatField(bValue.Fields[i]).Size{$ENDIF}, vReadOnly, vAutoinc]);
        End;
      End
     Else
@@ -1355,10 +1325,10 @@ Var
     End;
     If Not bValue.Fields[i].IsNull then
      Begin
-      If bValue.Fields[i].DataType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftShortint, {$IFEND}{$ENDIF}
+      If bValue.Fields[i].DataType In [{$IFDEF DELPHIXEUP}ftShortint,{$ENDIF}
                                        ftSmallint, ftInteger, ftLargeint, ftAutoInc] Then
        Begin
-        If bValue.Fields[i].DataType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftShortint, {$IFEND}{$ENDIF}ftSmallint] Then
+        If bValue.Fields[i].DataType In [{$IFDEF DELPHIXEUP}ftShortint,{$ENDIF}ftSmallint] Then
          Begin
           If bValue.Fields[i].IsNull Then
            vTempValue := Format('%s%s', [vTempField, cNullvalue])
@@ -1370,18 +1340,14 @@ Var
            If bValue.Fields[i].IsNull Then
             vTempValue := Format('%s%s', [vTempField, cNullvalue])
            Else
-          {$IFNDEF FPC}
-           {$IF CompilerVersion > 22}
-            vTempValue := Format('%s%s', [vTempField, IntToStr(bValue.Fields[i].AsLargeInt)]);
-           {$ELSE}
-            vTempValue := Format('%s%s', [vTempField, IntToStr(bValue.Fields[i].AsInteger)]);
-           {$IFEND}
-          {$ELSE}
-            vTempValue := Format('%s%s', [vTempField, IntToStr(bValue.Fields[i].AsLargeInt)]);
-          {$ENDIF}
+            {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+              vTempValue := Format('%s%s', [vTempField, IntToStr(bValue.Fields[i].AsLargeInt)]);
+            {$ELSE}
+              vTempValue := Format('%s%s', [vTempField, IntToStr(bValue.Fields[i].AsInteger)]);
+            {$IFEND}
          End;
        End
-      Else If bValue.Fields[i].DataType In [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,{$IFEND}{$ENDIF}ftFloat, ftCurrency, ftFMTBcd, ftBCD] Then
+      Else If bValue.Fields[i].DataType In [{$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}ftFloat, ftCurrency, ftFMTBcd, ftBCD] Then
        Begin
         vValueMask  := BuildStringFloat(FloatToStr(bValue.Fields[i].AsFloat), DataModeD, '.');
         If ((FloatDecimalFormat <> '') And (FloatDecimalFormat <> '.')) Then
@@ -1407,15 +1373,11 @@ Var
           bStream := bValue.CreateBlobStream(TBlobField(bValue.Fields[i]), bmRead);
           Try
            bStream.Position := 0;
-           {$IFDEF FPC}
-           vStringStream.CopyFrom(bStream, bStream.Size);
+           {$IF Defined(RESTDWLAZARUS) or not(Defined(DELPHIXEUP))}
+             vStringStream.CopyFrom(bStream, bStream.Size);
            {$ELSE}
-            {$IF CompilerVersion > 21}
-            vStringStream.LoadFromStream(bStream);
-            {$ELSE}
-            vStringStream.CopyFrom(bStream, bStream.Size);
-            {$IFEND}
-           {$ENDIF}
+             vStringStream.LoadFromStream(bStream);
+           {$IFEND}
            vTempValue := Format('%s"%s"', [vTempField, EncodeStream(vStringStream)]); //StreamToHex(vStringStream)]);
           Finally
            vStringStream.Free;
@@ -1426,21 +1388,21 @@ Var
       Else
        Begin
         If bValue.Fields[i].DataType in [ftString, ftWideString, ftMemo,
-                                         {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,{$IFEND}{$ELSE}ftWideMemo,{$ENDIF}
+                                         {$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
                                          ftFmtMemo, ftFixedChar] Then
          Begin
           If bValue.Fields[i].IsNull Then
            vTempValue := Format('%s%s', [vTempField, cNullvalue])
           Else
            Begin
-            If (vEncoded) Or (bValue.Fields[i].DataType in [ftMemo, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,{$IFEND}{$ELSE}ftWideMemo,{$ENDIF}
+            If (vEncoded) Or (bValue.Fields[i].DataType in [ftMemo, {$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
                                                             ftFmtMemo]) Then
              Begin
               If DataModeD = dmRaw Then
                Begin
                 If (vEncoded) Then
                  Begin
-                  {$IFDEF FPC}
+                  {$IFDEF RESTDWLAZARUS}
                    vTempValue := Format('%s"%s"', [vTempField, EncodeStrings(StringToJsonString(bValue.Fields[i].AsString), vDatabaseCharSet)]);
                   {$ELSE}
                    vTempValue := Format('%s"%s"', [vTempField, EncodeStrings(StringToJsonString(bValue.Fields[i].AsString))]);
@@ -1456,21 +1418,21 @@ Var
                End
               Else
                Begin
-                {$IFDEF FPC}
+                {$IFDEF RESTDWLAZARUS}
                  vTempValue := Format('%s"%s"', [vTempField, EncodeStrings(bValue.Fields[i].AsString, vDatabaseCharSet)]);
                 {$ELSE}
                  vTempValue := bValue.Fields[i].AsString;
-                 {$IF (CompilerVersion < 19)}
+                 {$IFNDEF DELPHI2007UP}
                   If vEncoding = esUtf8 Then
                    Result := UTF8Decode(vTempValue);
-                 {$IFEND}
+                 {$ENDIF}
                  vTempValue := Format('%s"%s"', [vTempField, EncodeStrings(vTempValue)]);
                 {$ENDIF}
                End;
              End
             Else
              Begin
-              {$IFDEF FPC}
+              {$IFDEF RESTDWLAZARUS}
                Case DatabaseCharSet Of
                 csWin1250    : vTempValue := CP1250ToUTF8(bValue.Fields[i].AsString);
                 csWin1251    : vTempValue := CP1251ToUTF8(bValue.Fields[i].AsString);
@@ -1555,7 +1517,7 @@ Begin
   if not bValue.IsUniDirectional then
     bValue.First;
 
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   vBuildSide := 'L';
   {$ELSE}
   vBuildSide := 'D';
@@ -1567,7 +1529,7 @@ Begin
   End;
   A := 0;
   vRecNo := 1; //pr-19/08/2020
-  {$IFDEF  POSIX}  // aqui para linux tem que ser diferente o rastrwio da query
+  {$IFDEF RESTDWLINUX}  // aqui para linux tem que ser diferente o rastrwio da query
   For A := 0 To bValue.Recordcount -1 Do
    Begin
     Case DataModeD Of
@@ -1618,11 +1580,11 @@ Begin
                   If vEncoding = esUtf8 Then
                    Result := Format(Result, [vLines])
                   Else
-                  {$IF Defined(HAS_FMX)}
+                  {$IFDEF RESTDWFMX}
                    Result := Format(Result, [vLines]);
                   {$ELSE}
                    Result := Format(Result, [AnsiString(vLines)]);
-                  {$IFEND}
+                  {$ENDIF}
                  End;
    dmRaw       : Begin
                   If vtagName <> '' Then
@@ -1648,7 +1610,7 @@ End;
 Procedure TJSONValue.SetEncoding(bValue : TEncodeSelect);
 Begin
  vEncoding := bValue;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   Case vEncoding Of
    esASCII : vEncodingLazarus := TEncoding.ANSI;
    esUtf8  : vEncodingLazarus := TEncoding.Utf8;
@@ -1668,7 +1630,7 @@ Begin
   Result := vNewFieldList
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aNewFieldList;
    {$ELSE}
     Result := aNewFieldList;
@@ -1683,7 +1645,7 @@ Begin
   Result := vNewDataField
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aNewDataField;
    {$ELSE}
     Result := aNewDataField;
@@ -1703,7 +1665,7 @@ Begin
   Result := vFieldExist
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aFieldExist;
    {$ELSE}
     Result := aFieldExist;
@@ -1734,7 +1696,7 @@ Begin
   Result := vCreateDataset
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aCreateDataset;
    {$ELSE}
     Result := aCreateDataset;
@@ -1759,7 +1721,7 @@ Begin
   Result := vSetInitDataset
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aSetInitDataset;
    {$ELSE}
     Result := aSetInitDataset;
@@ -1780,7 +1742,7 @@ Begin
   Result := vSetRecordCount
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aSetRecordCount;
    {$ELSE}
     Result := aSetRecordCount;
@@ -1800,7 +1762,7 @@ Begin
   Result := vSetnotrepage
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aSetnotrepage;
    {$ELSE}
     Result := aSetnotrepage;
@@ -1820,7 +1782,7 @@ Begin
   Result := vSetInDesignEvents
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aSetInDesignEvents;
    {$ELSE}
     Result := aSetInDesignEvents;
@@ -1840,7 +1802,7 @@ Begin
   Result := vSetInBlockEvents
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aSetInBlockEvents;
    {$ELSE}
     Result := aSetInBlockEvents;
@@ -1860,7 +1822,7 @@ Begin
   Result := vSetInactive
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aSetInactive;
    {$ELSE}
     Result := aSetInactive;
@@ -1880,7 +1842,7 @@ Begin
   Result := vFieldListCount
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aFieldListCount;
    {$ELSE}
     Result := aFieldListCount;
@@ -1916,7 +1878,7 @@ Begin
   Result := vGetInDesignEvents
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aGetInDesignEvents;
    {$ELSE}
     Result := aGetInDesignEvents;
@@ -1936,7 +1898,7 @@ Begin
   Result := vPrepareDetailsNew
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aPrepareDetailsNew;
    {$ELSE}
     Result := aPrepareDetailsNew;
@@ -1956,7 +1918,7 @@ Begin
   Result := vPrepareDetails
  Else
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     Result := @aPrepareDetails;
    {$ELSE}
     Result := aPrepareDetails;
@@ -2005,16 +1967,14 @@ Function  TJSONValue.AsString : String;
 Begin
  Result := GetValue(False);
  If VarIsNull(Result) Then
-  Exit;
- {$IFNDEF FPC}
-  {$IF (CompilerVersion < 20)}
+   Exit;
+   {$IFDEF RESTDWLAZARUS}
+   Result := GetStringDecode(Result, vDatabaseCharSet);
+   {$ELSEIF not(Defined(DELPHI2009UP))}
    Result := UTF8Decode(Result);
    If vEncoding = esUtf8 Then
-    Result := UTF8Decode(Result);
-  {$IFEND}
- {$ELSE}
-  Result := GetStringDecode(Result, vDatabaseCharSet);
- {$ENDIF}
+     Result := UTF8Decode(Result);
+   {$IFEND}
 End;
 
 Procedure TJSONValue.Clear;
@@ -2041,17 +2001,15 @@ Procedure TJSONValue.LoadFromDataset(TableName        : String;
                                      DataModeD        : TDataMode = dmDataware;
                                      DateTimeFormat   : String = '';
                                      DelimiterFormat  : String = '';
-                                     {$IFDEF FPC}
+                                     {$IFDEF RESTDWLAZARUS}
                                      CharSet          : TDatabaseCharSet = csUndefined;
                                      {$ENDIF}
                                      DataType         : Boolean = False;
                                      HeaderLowercase  : Boolean = False);
 Var
  vTagGeral : String;
- {$IFNDEF FPC}
- {$IF CompilerVersion < 22} // Delphi 2010 pra cima
+ {$IFNDEF DELPHIXEUP}
  vSizeChar : Integer;
- {$IFEND}
  {$ENDIF}
 Begin
  // Recebe o parametro "DataType" para fazer a tipagem na função que gera a linha "GenerateLine"
@@ -2064,12 +2022,12 @@ Begin
  If (DataModeD = dmDataware) And (trim(TableName) = '') Then
   TableName := 'rdwtable';
  vtagName         := Lowercase(TableName);
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   If CharSet <> csUndefined Then
    DatabaseCharSet := CharSet;
  {$ENDIF}
  vTagGeral        := DatasetValues(bValue, DateTimeFormat, DataModeD, DelimiterFormat, HeaderLowercase);
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   If vEncodingLazarus = Nil Then
    SetEncoding(vEncoding);
   If vEncoding = esUtf8 Then
@@ -2077,7 +2035,7 @@ Begin
   Else
    aValue          := StringToBytes(vTagGeral);
  {$ELSE}
-  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+  {$IFDEF DELPHIXEUP}
    aValue          := StringToBytes(vTagGeral);
   {$ELSE}
    vSizeChar := 1;
@@ -2085,7 +2043,7 @@ Begin
     vSizeChar := 2;
    SetLength(aValue, Length(vTagGeral) * vSizeChar);
    move(AnsiString(vTagGeral)[InitStrPos], pByteArray(aValue)^, Length(vTagGeral) * vSizeChar);
-  {$IFEND}
+  {$ENDIF}
  {$ENDIF}
  vDataMode        := DataModeD;
  vNullValue       := Length(aValue) = 0;
@@ -2100,7 +2058,7 @@ Procedure TJSONValue.LoadFromDataset(TableName        : String;
                                      DataModeD        : TDataMode   = dmDataware;
                                      DateTimeFormat   : String = '';
                                      DelimiterFormat  : String = '';
-                                     {$IFDEF FPC}
+                                     {$IFDEF RESTDWLAZARUS}
                                      CharSet          : TDatabaseCharSet = csUndefined;
                                      {$ENDIF}
                                      DataType         : Boolean = False;
@@ -2108,10 +2066,8 @@ Procedure TJSONValue.LoadFromDataset(TableName        : String;
 Var
  vTagGeral,
  vVirtualValue : String;
- {$IFNDEF FPC}
- {$IF CompilerVersion < 22} // Delphi 2010 pra cima
+{$IFNDEF DELPHIXEUP}
  vSizeChar : Integer;
- {$IFEND}
  {$ENDIF}
 Begin
  // Recebe o parametro "DataType" para fazer a tipagem na função que gera a linha "GenerateLine"
@@ -2124,7 +2080,7 @@ Begin
  If (DataModeD = dmDataware) And (trim(TableName) = '') Then
   TableName := 'rdwtable';
  vtagName         := Lowercase(TableName);
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   If CharSet <> csUndefined Then
    DatabaseCharSet := CharSet;
  {$ENDIF}
@@ -2133,7 +2089,7 @@ Begin
  Else
   vVirtualValue := Format('"%s":', [DetailElementName]);
  vTagGeral     := DatasetValues(bValue, DateTimeFormat, DataModeD, DelimiterFormat, HeaderLowercase, vVirtualValue, DetailType, bDetail);
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   If vEncodingLazarus = Nil Then
    SetEncoding(vEncoding);
   If vEncoding = esUtf8 Then
@@ -2141,7 +2097,7 @@ Begin
   Else
    aValue          := StringToBytes(vTagGeral);
  {$ELSE}
-  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+  {$IFDEF DELPHIXEUP}
    aValue          := StringToBytes(vTagGeral);
   {$ELSE}
    vSizeChar := 1;
@@ -2156,8 +2112,7 @@ Begin
      SetLength(aValue, Length(vTagGeral) * vSizeChar);
      move(AnsiString(vTagGeral)[InitStrPos], pByteArray(aValue)^, Length(vTagGeral) * vSizeChar);
     End;
-//   aValue          := StringToBytes(vTagGeral);
-  {$IFEND}
+  {$ENDIF}
  {$ENDIF}
  vDataMode        := DataModeD;
  vNullValue       := Length(aValue) = 0;
@@ -2306,7 +2261,7 @@ Begin
 //              FieldDef.Name := sFieldName;
               If vEncoding = esUtf8 Then
                Begin
-               {$IFDEF FPC}
+               {$IFDEF RESTDWLAZARUS}
                 FieldDef.Name   := PWidechar(UTF8Decode(sFieldName));
                {$ELSE}
                 FieldDef.Name   := UTF8Decode(sFieldName);
@@ -2316,14 +2271,14 @@ Begin
                FieldDef.Name    := vTempValue;
               FieldDef.DataType := GetFieldType(TRESTDWJSONInterfaceObject(FieldJson).pairs[1].Value);
               If Not (FieldDef.DataType in [ftFloat,ftCurrency
-                                          {$IFNDEF FPC}{$IF CompilerVersion > 21},ftExtended,ftSingle
-                                          {$IFEND}{$ENDIF}]) Then
+                                          {$IFDEF DELPHIXEUP},ftExtended,ftSingle
+                                          {$ENDIF}]) Then
                FieldDef.Size     := StrToInt(TRESTDWJSONInterfaceObject(FieldJson).pairs[4].Value)
               Else
                FieldDef.Size     := 0;
               If (FieldDef.DataType In [ftCurrency, ftBCD,
-                                                {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-                                                {$IFEND}{$ENDIF} ftFMTBcd]) Then
+                                        {$IFDEF DELPHIXEUP}ftExtended, ftSingle,
+                                        {$ENDIF} ftFMTBcd]) Then
                FieldDef.Precision := StrToInt(TRESTDWJSONInterfaceObject(FieldJson).pairs[5].Value)
               Else If (FieldDef.DataType = ftFloat) Then
                FieldDef.Precision := StrToInt(TRESTDWJSONInterfaceObject(FieldJson).pairs[5].Value);
@@ -2342,7 +2297,7 @@ Begin
         DestDS.Open;
       If Not DestDS.Active Then Begin
         bJsonValue.Free;
-        Raise Exception.Create('Error on Parse JSON Data...');
+        Raise Exception.Create(cErrorParsingJSON);
         Exit;
       End;
 
@@ -2392,7 +2347,7 @@ Begin
             vTempValue := TRESTDWJSONInterfaceObject(bJsonOBJB).pairs[0].Value;
             If DestDS.FieldByName(sFieldName).DataType In [ftGraphic, ftParadoxOle, ftDBaseOle, ftTypedBinary, ftCursor, ftDataSet, ftBlob,
               ftOraBlob, ftOraClob
-{$IFNDEF FPC}{$IF CompilerVersion > 21}, ftParams, ftStream{$IFEND}{$ENDIF}] Then
+            {$IFDEF DELPHIXEUP}, ftParams, ftStream{$ENDIF}] Then
             Begin
               If (vTempValue <> 'null') And (vTempValue <> '') Then Begin
                 //HexStringToStream(vTempValue, vBlobStream);
@@ -2401,9 +2356,9 @@ Begin
                   vBlobStream.Position := 0;
                   TBlobField(DestDS.FieldByName(sFieldName)).LoadFromStream(vBlobStream);
                 Finally
-{$IFNDEF FPC}{$IF CompilerVersion > 21}
+                  {$IFDEF DELPHIXEUP}
                   vBlobStream.Clear;
-{$IFEND}{$ENDIF}
+                  {$ENDIF}
                   FreeAndNil(vBlobStream);
                 End;
               End;
@@ -2414,7 +2369,7 @@ Begin
                     DestDS.FieldByName(sFieldName).Value := ''
                   Else Begin
                     If vEncoded Then
-                      DestDS.FieldByName(sFieldName).Value := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                      DestDS.FieldByName(sFieldName).Value := DecodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
                     Else
                       DestDS.FieldByName(sFieldName).Value := vTempValue;
                   End;
@@ -2443,7 +2398,7 @@ Begin
       end;
     End Else Begin
       DestDS.Close;
-      Raise Exception.Create('Invalid JSON Data...');
+      Raise Exception.Create(cErrorInvalidJSONData);
     End;
   Finally
     FreeAndNil(bJsonOBJ);
@@ -2504,7 +2459,7 @@ Begin
       Begin
        FreeAndNil(bJsonValue);
        FreeAndNil(ListFields);
-       Raise Exception.Create('Error on Parse JSON Data...');
+       Raise Exception.Create(cErrorParsingJSON);
        Exit;
       End;
      bJsonValueB := TRESTDWJSONInterfaceObject.Create(vTempValueJSON);
@@ -2602,9 +2557,10 @@ Begin
            End;
 //          FreeAndNil(bJsonOBJB);
           vTempValue := bJsonValueB.Pairs[StrToInt(ListFields[i])].Value;
-          If DestDS.Fields[i].DataType In [ftGraphic, ftParadoxOle, ftDBaseOle, ftTypedBinary, ftCursor,
-                                           ftDataSet, ftBlob, ftOraBlob, ftOraClob{$IFNDEF FPC}{$IF CompilerVersion > 21},
-                                           ftParams, ftStream{$IFEND}{$ENDIF}] Then
+          If DestDS.Fields[i].DataType In [ftGraphic, ftParadoxOle, ftDBaseOle,
+                                           ftTypedBinary, ftCursor, ftDataSet,
+                                           ftBlob, ftOraBlob, ftOraClob
+                                           {$IFDEF DELPXEUP}, ftParams, ftStream{$ENDIF}] Then
            Begin
             If (vTempValue <> 'null') And (vTempValue <> '') Then
              Begin
@@ -2614,10 +2570,8 @@ Begin
                vBlobStream.Position := 0;
                TBlobField(DestDS.Fields[i]).LoadFromStream(vBlobStream);
               Finally
-               {$IFNDEF FPC}
-                {$IF CompilerVersion > 21}
+               {$IFDEF DELPXEUP}
                  vBlobStream.Clear;
-                {$IFEND}
                {$ENDIF}
                FreeAndNil(vBlobStream);
               End;
@@ -2628,19 +2582,21 @@ Begin
             If (Lowercase(vTempValue) <> 'null') Then
              Begin
               If DestDS.Fields[i].DataType in [ftString, ftWideString,
-                                               {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,
-                                               {$IFEND}{$ELSE}ftWideMemo,{$ENDIF}ftMemo, ftFmtMemo, ftFixedChar] Then
+                                               {$IFDEF DELPXEUP}ftWideMemo,{$ENDIF}
+                                               ftMemo, ftFmtMemo, ftFixedChar] Then
                Begin
                 If vTempValue = '' Then
                  DestDS.Fields[i].AsString := ''
                 Else
                  Begin
 //                  If vEncoded Then
-//                   DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+//                   DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
 //                  Else
                   If vUtf8SpecialChars Then
                    vTempValue := Unescape_chars(vTempValue);
-                  vTempValue  := {$IFDEF FPC}GetStringDecode(vTempValue, vDatabaseCharSet){$ELSE}vTempValue{$ENDIF};
+                  {$IFDEF RESTDWLAZARUS}
+                  vTempValue  := GetStringDecode(vTempValue, vDatabaseCharSet);
+                  {$ENDIF}
                   DestDS.Fields[i].AsString := vTempValue;
                  End;
                End
@@ -2700,8 +2656,8 @@ Begin
             Else
              Continue;
             If DestDS.Fields[i].DataType In [ftGraphic, ftParadoxOle, ftDBaseOle, ftTypedBinary, ftCursor,
-                                             ftDataSet, ftBlob, ftOraBlob, ftOraClob{$IFNDEF FPC}{$IF CompilerVersion > 21},
-                                             ftParams, ftStream{$IFEND}{$ENDIF}] Then
+                                             ftDataSet, ftBlob, ftOraBlob, ftOraClob
+                                             {$IFDEF DELPHIXEUP}, ftParams, ftStream{$ENDIF}] Then
              Begin
               If (vTempValue <> 'null') And (vTempValue <> '') Then
                Begin
@@ -2711,10 +2667,8 @@ Begin
                  vBlobStream.Position := 0;
                  TBlobField(DestDS.Fields[i]).LoadFromStream(vBlobStream);
                 Finally
-                 {$IFNDEF FPC}
-                  {$IF CompilerVersion > 21}
+                 {$IFDEF DELPHIXEUP}
                    vBlobStream.Clear;
-                  {$IFEND}
                  {$ENDIF}
                  FreeAndNil(vBlobStream);
                 End;
@@ -2725,20 +2679,22 @@ Begin
               If (Lowercase(vTempValue) <> 'null') Then
                Begin
                 If DestDS.Fields[i].DataType in [ftString, ftWideString,
-                                                 {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,
-                                                 {$IFEND}{$ELSE}ftWideMemo,{$ENDIF}ftMemo, ftFmtMemo, ftFixedChar] Then
+                                                 {$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
+                                                 ftMemo, ftFmtMemo, ftFixedChar] Then
                  Begin
                   If vTempValue = '' Then
                    DestDS.Fields[i].AsString := ''
                   Else
                    Begin
                     if vEncoded then
-                     DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                     DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
                     Else
                      Begin
                       If vUtf8SpecialChars Then
                        vTempValue := unescape_chars(vTempValue);
-                      vTempValue := {$IFDEF FPC}GetStringDecode(vTempValue, vDatabaseCharSet){$ELSE}vTempValue{$ENDIF};
+                      {$IFDEF RESTDWLAZARUS}
+                      vTempValue := GetStringDecode(vTempValue, vDatabaseCharSet);
+                      {$ENDIF}
                       DestDS.Fields[i].AsString := vTempValue;
                      End;
                    End;
@@ -3007,8 +2963,8 @@ Begin
       Else
        vFieldDefinition.Size     := 0;
       If (vFieldDefinition.DataType In [ftCurrency, ftBCD,
-                                        {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-                                        {$IFEND}{$ENDIF} ftFMTBcd]) Then
+                                        {$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}
+                                        ftFMTBcd]) Then
        vFieldDefinition.Precision := TBCDField(DestDS.Fields[J]).Precision
       Else If (vFieldDefinition.DataType = ftFloat) Then
        vFieldDefinition.Precision := TFloatField(DestDS.Fields[J]).Precision;
@@ -3032,8 +2988,8 @@ Begin
             Else
              vFieldDefinition.Size         := 0;
             If (vFieldDefinition.DataType In [ftFloat, ftCurrency, ftBCD,
-                                              {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-                                              {$IFEND}{$ENDIF} ftFMTBcd]) Then
+                                              {$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}
+                                              ftFMTBcd]) Then
              vFieldDefinition.Precision := ResponseTranslator.FieldDefs[J].Precision
             Else If (vFieldDefinition.DataType = ftFloat) Then
              vFieldDefinition.Precision := ResponseTranslator.FieldDefs[J].Precision;
@@ -3043,7 +2999,7 @@ Begin
           FieldDef          := DestDS.FieldDefs.AddFieldDef;
           If vEncoding = esUtf8 Then
            Begin
-           {$IFDEF FPC}
+           {$IFDEF RESTDWLAZARUS}
             FieldDef.Name   := vTempValue;
            {$ELSE}
             FieldDef.Name   := UTF8Encode(vTempValue);
@@ -3056,8 +3012,7 @@ Begin
           If FieldDef.DataType in [ftString, ftWideString] Then
            FieldDef.Size := 255;
           If Not (FieldDef.DataType in [ftFloat,ftCurrency
-                                        {$IFNDEF FPC}{$IF CompilerVersion > 21},ftExtended,ftSingle
-                                        {$IFEND}{$ENDIF}]) Then
+                                       {$IFDEF DELPHIXEUP},ftExtended,ftSingle{$ENDIF}]) Then
            Begin
             If (FieldDef.Size > ResponseTranslator.FieldDefs[J].FieldSize) then // ajuste em 20/12/2018 Thiago Pedro
              ResponseTranslator.FieldDefs[J].FieldSize := FieldDef.Size
@@ -3071,8 +3026,8 @@ Begin
               End;
            End;
           If (FieldDef.DataType In [ftFloat, ftCurrency, ftBCD,
-                                    {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-                                    {$IFEND}{$ENDIF} ftFMTBcd]) Then
+                                    {$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}
+                                    ftFMTBcd]) Then
            FieldDef.Precision := ResponseTranslator.FieldDefs[J].Precision;
          End;
        End;
@@ -3091,7 +3046,7 @@ Begin
       Begin
        FreeAndNil(bJsonValue);
        FreeAndNil(ListFields);
-       Raise Exception.Create('Error on Parse JSON Data...');
+       Raise Exception.Create(cErrorParsingJSON);
        Exit;
       End;
      //Add Set PK Fields
@@ -3206,9 +3161,10 @@ Begin
            End;
 //          FreeAndNil(bJsonOBJB);
           vTempValue := bJsonValueB.Pairs[StrToInt(ListFields[i])].Value;
-          If DestDS.Fields[i].DataType In [ftGraphic, ftParadoxOle, ftDBaseOle, ftTypedBinary, ftCursor,
-                                           ftDataSet, ftBlob, ftOraBlob, ftOraClob{$IFNDEF FPC}{$IF CompilerVersion > 21},
-                                           ftParams, ftStream{$IFEND}{$ENDIF}] Then
+          If DestDS.Fields[i].DataType In [ftGraphic, ftParadoxOle, ftDBaseOle,
+                                           ftTypedBinary, ftCursor, ftDataSet,
+                                           ftBlob, ftOraBlob, ftOraClob
+                                           {$IFDEF DELPHIXEUP}, ftParams, ftStream{$ENDIF}] Then
            Begin
             If (vTempValue <> 'null') And (vTempValue <> '') Then
              Begin
@@ -3218,10 +3174,8 @@ Begin
                vBlobStream.Position := 0;
                TBlobField(DestDS.Fields[i]).LoadFromStream(vBlobStream);
               Finally
-               {$IFNDEF FPC}
-                {$IF CompilerVersion > 21}
+               {$IFDEF DELPHIXEUP}
                  vBlobStream.Clear;
-                {$IFEND}
                {$ENDIF}
                FreeAndNil(vBlobStream);
               End;
@@ -3232,19 +3186,21 @@ Begin
             If (Lowercase(vTempValue) <> 'null') Then
              Begin
               If DestDS.Fields[i].DataType in [ftString, ftWideString,
-                                               {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,
-                                               {$IFEND}{$ELSE}ftWideMemo,{$ENDIF}ftMemo, ftFmtMemo, ftFixedChar] Then
+                                               {$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
+                                               ftMemo, ftFmtMemo, ftFixedChar] Then
                Begin
                 If vTempValue = '' Then
                  DestDS.Fields[i].AsString := ''
                 Else
                  Begin
 //                  If vEncoded Then
-//                   DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+//                   DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
 //                  Else
                   If vUtf8SpecialChars Then
                    vTempValue := Unescape_chars(vTempValue);
-                  vTempValue  := {$IFDEF FPC}GetStringDecode(vTempValue, vDatabaseCharSet){$ELSE}vTempValue{$ENDIF};
+                  {$IFDEF RESTDWLAZARUS}
+                  vTempValue  := GetStringDecode(vTempValue, vDatabaseCharSet);
+                  {$ENDIF}
                   DestDS.Fields[i].AsString := vTempValue;
                  End;
                End
@@ -3305,9 +3261,10 @@ Begin
              vTempValue := TRESTDWJSONInterfaceObject(bJsonOBJB).pairs[StrToInt(ListFields[i])].Value // bJsonOBJTemp.get().ToString;
             Else
              Continue;
-            If DestDS.Fields[i].DataType In [ftGraphic, ftParadoxOle, ftDBaseOle, ftTypedBinary, ftCursor,
-                                             ftDataSet, ftBlob, ftOraBlob, ftOraClob{$IFNDEF FPC}{$IF CompilerVersion > 21},
-                                             ftParams, ftStream{$IFEND}{$ENDIF}] Then
+            If DestDS.Fields[i].DataType In [ftGraphic, ftParadoxOle, ftDBaseOle,
+                                             ftTypedBinary, ftCursor, ftDataSet,
+                                             ftBlob, ftOraBlob, ftOraClob
+                                             {$IFDEF DELPHIXEUP}, ftParams, ftStream{$ENDIF}] Then
              Begin
               If (vTempValue <> 'null') And (vTempValue <> '') Then
                Begin
@@ -3317,12 +3274,10 @@ Begin
                  vBlobStream.Position := 0;
                  TBlobField(DestDS.Fields[i]).LoadFromStream(vBlobStream);
                 Finally
-                 {$IFNDEF FPC}
-                  {$IF CompilerVersion > 21}
-                   vBlobStream.Clear;
-                  {$IFEND}
-                 {$ENDIF}
-                 FreeAndNil(vBlobStream);
+                  {$IFDEF DELPHIXEUP}
+                    vBlobStream.Clear;
+                  {$ENDIF}
+                  FreeAndNil(vBlobStream);
                 End;
                End;
              End
@@ -3331,20 +3286,22 @@ Begin
               If (Lowercase(vTempValue) <> 'null') Then
                Begin
                 If DestDS.Fields[i].DataType in [ftString, ftWideString,
-                                                 {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,
-                                                 {$IFEND}{$ELSE}ftWideMemo,{$ENDIF}ftMemo, ftFmtMemo, ftFixedChar] Then
+                                                 {$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
+                                                 ftMemo, ftFmtMemo, ftFixedChar] Then
                  Begin
                   If vTempValue = '' Then
                    DestDS.Fields[i].AsString := ''
                   Else
                    Begin
                     if vEncoded then
-                     DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                     DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
                     Else
                      Begin
                       If vUtf8SpecialChars Then
                        vTempValue := unescape_chars(vTempValue);
-                      vTempValue := {$IFDEF FPC}GetStringDecode(vTempValue, vDatabaseCharSet){$ELSE}vTempValue{$ENDIF};
+                       {$IFDEF RESTDWLAZARUS}
+                         vTempValue := GetStringDecode(vTempValue, vDatabaseCharSet);
+                       {$ENDIF}
                       DestDS.Fields[i].AsString := vTempValue;
                      End;
                    End;
@@ -3389,8 +3346,10 @@ Procedure TJSONValue.WriteToDataset(DatasetType   : TDatasetType;
                                     Var JsonCount : Integer;
                                     Datapacks     : Integer = -1;
                                     ActualRec     : Integer = 0;
-                                    ClearDataset  : Boolean          = False{$IFDEF FPC};
-                                    CharSet       : TDatabaseCharSet = csUndefined{$ENDIF});
+                                    ClearDataset  : Boolean          = False
+                                    {$IFDEF RESTDWLAZARUS};
+                                    CharSet       : TDatabaseCharSet = csUndefined
+                                    {$ENDIF});
 Var
  FieldValidate    : TFieldNotifyEvent;
  bJsonOBJB,
@@ -3478,7 +3437,7 @@ Begin
   Else
    Begin
     DestDS.Close;
-    Raise Exception.Create('Invalid JSON Data...');
+    Raise Exception.Create(cErrorInvalidJSONData);
    End;
   If ActualRec = 0 Then
    Begin
@@ -3509,8 +3468,8 @@ Begin
          Else
           vFieldDefinition.Size         := 0;
          If (vFieldDefinition.DataType In [ftCurrency, ftBCD,
-                                           {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-                                           {$IFEND}{$ENDIF} ftFMTBcd]) Then
+                                           {$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}
+                                           ftFMTBcd]) Then
           vFieldDefinition.Precision := TBCDField(DestDS.Fields[J]).Precision
          Else If (vFieldDefinition.DataType = ftFloat) Then
           vFieldDefinition.Precision := TFloatField(DestDS.Fields[J]).Precision;
@@ -3532,14 +3491,15 @@ Begin
             Begin
              vFieldDefinition.FieldName     := vTempValue;
              vFieldDefinition.DataType      := GetFieldType(TRESTDWJSONInterfaceObject(bJsonOBJ).pairs[1].Value);
-             If (Not(vFieldDefinition.DataType in [ftFloat, ftCurrency, ftBCD, ftFMTBcd
-                                                  {$IFNDEF FPC}{$IF CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}])) Then
+             If (Not(vFieldDefinition.DataType in [ftFloat, ftCurrency, ftBCD,
+                                                   ftFMTBcd
+                                                  {$IFDEF DELPHIXEUP}, ftSingle{$ENDIF}])) Then
               vFieldDefinition.Size         := StrToInt(TRESTDWJSONInterfaceObject(bJsonOBJ).pairs[4].Value)
              Else
               vFieldDefinition.Size         := 0;
              If (vFieldDefinition.DataType In [ftFloat, ftCurrency, ftBCD,
-                                               {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-                                               {$IFEND}{$ENDIF} ftFMTBcd]) Then
+                                               {$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}
+                                               ftFMTBcd]) Then
               vFieldDefinition.Precision    := StrToInt(TRESTDWJSONInterfaceObject(bJsonOBJ).pairs[4].Value);
              vFieldDefinition.Required      := Uppercase(TRESTDWJSONInterfaceObject(bJsonOBJ).pairs[3].Value) = 'S';
              vLocNewDataField(vFieldDefinition);
@@ -3547,7 +3507,7 @@ Begin
            FieldDef          := DestDS.FieldDefs.AddFieldDef;
            If vEncoding = esUtf8 Then
             Begin
-            {$IFDEF FPC}
+            {$IFDEF RESTDWLAZARUS}
              FieldDef.Name   := vTempValue;
             {$ELSE}
              FieldDef.Name   := UTF8Encode(vTempValue);
@@ -3557,14 +3517,12 @@ Begin
             FieldDef.Name    := vTempValue;
            FieldDef.DataType := GetFieldType(TRESTDWJSONInterfaceObject(bJsonOBJ).pairs[1].Value);
            If not (FieldDef.DataType in [ftFloat, ftCurrency, ftBCD, ftFMTBcd
-                                         {$IFNDEF FPC}{$IF CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}]) Then
+                                         {$IFDEF DELPHIXEUP}, ftSingle{$ENDIF}]) Then
             FieldDef.Size    := StrToInt(TRESTDWJSONInterfaceObject(bJsonOBJ).pairs[4].Value)
            Else
             FieldDef.Precision := StrToInt(TRESTDWJSONInterfaceObject(bJsonOBJ).pairs[4].Value);
-           {$IFDEF FPC}
-           If (FieldDef.DataType In [ftFloat, ftCurrency, ftBCD,
-                                             {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-                                             {$IFEND}{$ENDIF} ftFMTBcd]) Then
+           {$IFDEF RESTDWLAZARUS}
+           If (FieldDef.DataType In [ftFloat, ftCurrency, ftBCD, ftFMTBcd]) Then
             Begin
              FieldDef.Size      := StrToInt(TRESTDWJSONInterfaceObject(bJsonOBJ).pairs[4].Value);
              FieldDef.Precision := StrToInt(TRESTDWJSONInterfaceObject(bJsonOBJ).pairs[5].Value);
@@ -3592,7 +3550,7 @@ Begin
        If Assigned(bJsonValue) Then
         FreeAndNil(bJsonValue);
        FreeAndNil(ListFields);
-       Raise Exception.Create('Error on Parse JSON Data...');
+       Raise Exception.Create(cErrorParsingJSON);
        Exit;
       End;
     Except
@@ -3641,14 +3599,12 @@ Begin
             Field.ProviderFlags := [pfInUpdate, pfInWhere, pfInKey]
            Else
             Field.ProviderFlags := [];
-           {$IFNDEF FPC}
-            {$IF CompilerVersion > 21}
+           {$IFDEF DELPHIXEUP}
              If bJsonOBJ.PairCount > 6 Then
               Begin
                If (Uppercase(Trim(TRESTDWJSONInterfaceObject(bJsonOBJ).pairs[7].Value)) = 'S') Then
                 Field.AutoGenerateValue := arAutoInc;
               End;
-            {$IFEND}
            {$ENDIF}
            End;
         End;
@@ -3772,10 +3728,10 @@ Begin
        If TRESTDWJSONInterfaceObject(bJsonOBJB).pairs[0].isNull Then
         Continue;
        vTempValue := TRESTDWJSONInterfaceObject(bJsonOBJB).pairs[0].Value;
-       If DestDS.Fields[i].DataType In [ftGraphic, ftParadoxOle, ftDBaseOle, ftTypedBinary, ftCursor,
-                                        ftDataSet, ftBlob,
-                                        ftOraBlob, ftOraClob{$IFNDEF FPC}{$IF CompilerVersion > 21},
-                                        ftParams, ftStream{$IFEND}{$ENDIF}] Then
+       If DestDS.Fields[i].DataType In [ftGraphic, ftParadoxOle, ftDBaseOle,
+                                        ftTypedBinary, ftCursor, ftDataSet,
+                                        ftBlob, ftOraBlob, ftOraClob
+                                        {$IFDEF DELPHIXEUP}, ftParams, ftStream{$ENDIF}] Then
         Begin
          If (vTempValue <> 'null') And (vTempValue <> '') Then
           Begin
@@ -3785,12 +3741,10 @@ Begin
             vBlobStream.Position := 0;
             TBlobField(DestDS.Fields[i]).LoadFromStream(vBlobStream);
            Finally
-            {$IFNDEF FPC}
-             {$IF CompilerVersion > 21}
-              vBlobStream.Clear;
-             {$IFEND}
-            {$ENDIF}
-            FreeAndNil(vBlobStream);
+             {$IFDEF DELPHIXEUP}
+               vBlobStream.Clear;
+             {$ENDIF}
+             FreeAndNil(vBlobStream);
            End;
           End;
         End
@@ -3799,24 +3753,22 @@ Begin
          If (Lowercase(vTempValue) <> 'null') Then
           Begin
           If DestDS.Fields[i].DataType in [ftString, ftWideString,
-                                             {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,
-                                            {$IFEND}{$ELSE}ftWideMemo,{$ENDIF}ftMemo, ftFmtMemo, ftFixedChar, ftGuid] Then
+                                           {$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
+                                           ftMemo, ftFmtMemo, ftFixedChar, ftGuid] Then
             Begin
              If vTempValue = '' Then
               DestDS.Fields[i].AsString := ''
              Else
               Begin
                If ((vEncoded) or
-                   (DestDS.Fields[i].DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,
-                                                  {$IFEND}{$ELSE}ftWideMemo,{$ENDIF}ftMemo, ftFmtMemo]))   And
-                  (Not (DestDS.Fields[i].DataType = ftGuid))                             Then
+                   (DestDS.Fields[i].DataType in [{$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
+                                                  ftMemo, ftFmtMemo]))
+                   And (Not (DestDS.Fields[i].DataType = ftGuid)) Then
                 Begin
-                 vTempValue := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
-                 {$IFNDEF FPC}
-                  {$IF CompilerVersion < 19}
+                 vTempValue := DecodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+                 {$IFNDEF DELPHI2007UP}
                    If vEncoding = esUtf8 Then
                     vTempValue := UTF8Decode(vTempValue);
-                  {$IFEND}
                  {$ENDIF}
                  DestDS.Fields[i].AsString := vTempValue;
                 End
@@ -3824,7 +3776,7 @@ Begin
                 Begin
                  If vUtf8SpecialChars Then
                   vTempValue := unescape_chars(vTempValue);
-                 {$IFDEF FPC}
+                 {$IFDEF RESTDWLAZARUS}
                  DestDS.Fields[i].AsString := GetStringDecode(vTempValue, DatabaseCharSet);
                  {$ELSE}
                  DestDS.Fields[i].AsString := vTempValue;
@@ -3916,8 +3868,10 @@ End;
 Procedure TJSONValue.WriteToDataset (DatasetType    : TDatasetType;
                                      JSONValue      : String;
                                      Const DestDS   : TDataset;
-                                     ClearDataset   : Boolean          = False{$IFDEF FPC};
-                                     CharSet        : TDatabaseCharSet = csUndefined{$ENDIF});
+                                     ClearDataset   : Boolean          = False
+                                     {$IFDEF RESTDWLAZARUS};
+                                     CharSet        : TDatabaseCharSet = csUndefined
+                                     {$ENDIF});
 Var
  JsonCount : Integer;
 Begin
@@ -3925,7 +3879,7 @@ Begin
  JSONValue := StringReplace(JSONValue, #239#187#191, '', [rfReplaceAll]);
  JSONValue := StringReplace(JSONValue, sLineBreak,   '', [rfReplaceAll]);
  WriteToDataset(DatasetType, JSONValue, DestDS, JsonCount, -1, 0,
-                ClearDataset{$IFDEF FPC}, CharSet{$ENDIF});
+                ClearDataset{$IFDEF RESTDWLAZARUS}, CharSet{$ENDIF});
 End;
 
 Procedure TJSONValue.LoadFromJSON(bValue: String);
@@ -3969,7 +3923,7 @@ Begin
         End;
        End
       Else
-       vTempValue := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+       vTempValue := DecodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
      End;
     If Not(vObjectValue In [ovBytes, ovVarBytes, ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob]) Then
      SetValue(vTempValue, vEncoded)
@@ -4047,17 +4001,11 @@ End;
 Procedure TJSONValue.SaveToFile(FileName: String);
 Var
  vStringStream : TStringStream;
- {$IFDEF FPC}
  vFileStream   : TFileStream;
- {$ELSE}
-   {$IF CompilerVersion < 22} // Delphi 2010 pra cima
-   vFileStream : TFileStream;
-   {$IFEND}
- {$ENDIF}
 Begin
  vStringStream := TStringStream.Create(ToJSON);
  Try
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   vStringStream.Position := 0;
   vFileStream   := TFileStream.Create(FileName, fmCreate);
   Try
@@ -4066,7 +4014,7 @@ Begin
    vFileStream.Free;
   End;
   {$ELSE}
-   {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+   {$IFDEF DELPHIXEUP} // Delphi XE pra cima
     vStringStream.Position := 0;
     vStringStream.SaveToFile(FileName);
    {$ELSE}
@@ -4077,7 +4025,7 @@ Begin
     Finally
      vFileStream.Free;
     End;
-   {$IFEND}
+   {$ENDIF}
   {$ENDIF}
  Finally
   vStringStream.Free;
@@ -4106,20 +4054,16 @@ End;
 
 Function TJSONValue.ToJSON : String;
 Var
- {$IFNDEF FPC}
-  {$IF CompilerVersion > 21}
-   vTempValue   : String;
+  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+    vTempValue   : String;
   {$ELSE}
-   vTempValue   : AnsiString;
-   SizeOfString : Integer;
+    vTempValue   : AnsiString;
+    SizeOfString : Integer;
   {$IFEND}
- {$ELSE}
-  vTempValue    : String;
- {$ENDIF}
 Begin
  Result     := '';
  vTempValue := '';
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  If vEncodingLazarus = Nil Then
   SetEncoding(vEncoding);
  If vEncoding = esUtf8 Then
@@ -4161,9 +4105,9 @@ Begin
   End
  Else
   Begin
-   {$IF CompilerVersion > 19} // Delphi 2010 pra cima
+   {$IFDEF DELPHI2009UP}
     vTempValue   := FormatValue(vTempValue);
-   {$ELSE} // Delphi 2010 pra cima
+   {$ELSE}
     SizeOfString := Length(aValue);
     vTempValue   := '';
     SetString(vTempValue, PChar(@aValue[0]), SizeOfString);
@@ -4174,7 +4118,7 @@ Begin
     vTempValue   := FormatValue(vTempValue);
     If vEncoding = esUtf8 Then
      vTempValue   := Utf8Decode(vTempValue);
-   {$IFEND} // Delphi 2010 pra cima
+   {$ENDIF} // Delphi 2010 pra cima
   End;
  {$ENDIF}
  If Not(Pos('"TAGJSON":}', vTempValue) > 0) Then
@@ -4219,7 +4163,7 @@ Begin
      Else
       Begin
        vBinary := False;
-       WriteValue(EncodeStrings(Value{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}))
+       WriteValue(EncodeStrings(Value{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
       End;
     End
    Else
@@ -4272,14 +4216,14 @@ Begin
  Result := GetValue;
  If VarIsNull(Result) Then
   Exit;
- {$IFNDEF FPC}
-  {$IF (CompilerVersion < 20)}
+ {$IFNDEF RESTDWLAZARUS}
+  {$IFNDEF DELPHI2009UP}
    Result := UTF8Decode(Result);
-   {$IF (CompilerVersion > 15)}
+   {$IFDEF DELPHI8UP}
     If vEncoding = esUtf8 Then
      Result := UTF8Decode(Result);
-   {$IFEND}
-  {$IFEND}
+   {$ENDIF}
+  {$ENDIF}
  {$ELSE}
   Result := GetStringDecode(Result, vDatabaseCharSet);
  {$ENDIF}
@@ -4288,16 +4232,12 @@ End;
 Constructor TJSONValue.Create;
 Begin
  Inherited;
- {$IFNDEF FPC}
-  {$IF CompilerVersion > 18}
+ {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
    vEncoding        := esUtf8;
-  {$ELSE}
-   vEncoding        := esASCII;
-  {$IFEND}
  {$ELSE}
-  vEncoding         := esUtf8;
- {$ENDIF}
- {$IFDEF FPC}
+   vEncoding        := esASCII;
+ {$IFEND}
+ {$IFDEF RESTDWLAZARUS}
   vDatabaseCharSet  := csUndefined;
  {$ENDIF}
  vFieldExist        := Nil;
@@ -4396,49 +4336,35 @@ Begin
  SetDataValue(Value, ovString);
 End;
 
-{$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}
+{$IF Defined(RESTDWLAZARUS) or not(Defined(RESTDWLINUX))}
 Function TJSONParam.GetAsWideString : WideString;
 Begin
  Result := GetValue(ovWideString);
 End;
-{$ENDIF}
 
-{$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}
 Procedure TJSONParam.SetAsWideString(Value    : WideString);
 Begin
  SetDataValue(Value, ovWideString);
 End;
-{$ENDIF}
 
-{$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}
 Function TJSONParam.GetAsAnsiString: AnsiString;
 Begin
- {$IFDEF FPC}
-  Result := GetValue(ovString);
- {$ELSE}
-  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
-   Result := Utf8ToAnsi(GetValue(ovString));
+  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+    Result := GetValue(ovString);
   {$ELSE}
-   Result := GetValue(ovString);
+    Result := Utf8ToAnsi(GetValue(ovString));
   {$IFEND}
- {$ENDIF}
 End;
-{$ENDIF}
 
-{$IFDEF DEFINE(FPC) Or NOT(DEFINE(POSIX))}
 Procedure TJSONParam.SetAsAnsiString(Value: AnsiString);
 Begin
- {$IFDEF FPC}
-  SetDataValue(Value, ovString);
- {$ELSE}
-  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
-   SetDataValue(Utf8ToAnsi(Value), ovString);
+  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+    SetDataValue(Value, ovString);
   {$ELSE}
-   SetDataValue(Value, ovString);
+    SetDataValue(Utf8ToAnsi(Value), ovString);
   {$IFEND}
- {$ENDIF}
 End;
-{$ENDIF}
+{$IFEND}
 
 Function TJSONParam.GetAsBCD      : Currency;
 Begin
@@ -4681,7 +4607,7 @@ begin
  vParamContentType := bValue;
 end;
 
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
 Procedure TJSONParam.SetDatabaseCharSet (Value  : TDatabaseCharSet);
 Begin
  vJSONValue.DatabaseCharSet := Value;
@@ -4729,7 +4655,7 @@ Begin
  vParamFileName      := '';
  vParamContentType   := '';
 // vDefaultValue    : Variant;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   vDatabaseCharSet  := csUndefined;
  {$ENDIF}
 End;
@@ -4769,13 +4695,13 @@ Begin
   vValue     := StringReplace(json, sLineBreak, '', [rfReplaceAll])
  Else
   vValue     := json;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   If vEncoding = esUtf8 Then
    bJsonValue    := TRESTDWJSONInterfaceObject.Create(PWidechar(UTF8Decode(vValue)))
   Else
    bJsonValue    := TRESTDWJSONInterfaceObject.Create(vValue);
  {$ELSE}
-  bJsonValue    := TRESTDWJSONInterfaceObject.Create(vValue);
+  bJsonValue     := TRESTDWJSONInterfaceObject.Create(vValue);
  {$ENDIF}
  Try
   vValue := CopyValue(vValue);
@@ -4787,7 +4713,7 @@ Begin
     vObjectValue       := GetValueType        (bJsonValue.Pairs[3].Value);
     vParamName         := Lowercase           (bJsonValue.Pairs[4].name);
     If vObjectValue = ovGuid Then
-     vValue            := DecodeStrings(vValue{$IFDEF FPC}, csUndefined{$ENDIF});
+     vValue            := DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
     WriteValue(vValue);
     vBinary            := vObjectValue in [ovBytes, ovVarBytes, ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob];
     vJSONValue.vBinary := vBinary;
@@ -4852,13 +4778,7 @@ End;
 Procedure TJSONParam.SaveToFile(FileName: String);
 Var
  vStringStream : TStream;
- {$IFDEF FPC}
  vFileStream   : TFileStream;
- {$ELSE}
-   {$IF CompilerVersion < 22} // Delphi 2010 pra cima
-   vFileStream : TFileStream;
-   {$IFEND}
- {$ENDIF}
 Begin
  vStringStream := Nil;
  If TestNilParam Then
@@ -4866,7 +4786,7 @@ Begin
  SaveToStream(vStringStream);
  vStringStream.Position := 0;
  Try
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   vStringStream.Position := 0;
   vFileStream   := TFileStream.Create(FileName, fmCreate);
   Try
@@ -4875,7 +4795,7 @@ Begin
    vFileStream.Free;
   End;
   {$ELSE}
-   {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+   {$IFDEF DELPHIXEUP} // Delphi 2010 pra cima
     vStringStream.Position := 0;
     TMemoryStream(vStringStream).SaveToFile(FileName);
    {$ELSE}
@@ -4886,7 +4806,7 @@ Begin
     Finally
      vFileStream.Free;
     End;
-   {$IFEND}
+   {$ENDIF}
   {$ENDIF}
  Finally
   vStringStream.Free;
@@ -5015,21 +4935,14 @@ Begin
                         End
                        Else
                         Begin
-                         {$IFNDEF FPC}
-                          {$if CompilerVersion <= 22}
-                           SetValue(inttostr(Value), vEncoded);
+                          {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+                            If vObjectValue <> ovInteger Then
+                              SetValue(IntToStr(Int64(Value)), vEncoded)
+                            Else
+                              SetValue(inttostr(Value), vEncoded);
                           {$ELSE}
-                           If vObjectValue <> ovInteger Then
-                            SetValue(IntToStr(Int64(Value)), vEncoded)
-                           Else
                             SetValue(inttostr(Value), vEncoded);
                           {$IFEND}
-                         {$ELSE}
-                          If vObjectValue <> ovInteger Then
-                           SetValue(IntToStr(Int64(Value)), vEncoded)
-                          Else
-                           SetValue(inttostr(Value), vEncoded);
-                         {$ENDIF}
                         End;
                       End;
   ovSingle,
@@ -5442,9 +5355,9 @@ Begin
    If (Encode) And Not(vBinary) Then
     Begin
      If vEncoding = esUtf8 Then
-      WriteValue(EncodeStrings(utf8encode(aValue){$IFDEF FPC}, vDatabaseCharSet{$ENDIF}))
+      WriteValue(EncodeStrings(utf8encode(aValue){$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
      Else
-      WriteValue(EncodeStrings(aValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}))
+      WriteValue(EncodeStrings(aValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
     End
    Else
     WriteValue(aValue);
@@ -5548,7 +5461,9 @@ End;
 Procedure TJSONParam.LoadFromParam(Param : TParam);
 Var
  MemoryStream : TMemoryStream;
- {$IFNDEF FPC}{$IF CompilerVersion > 21}MemoryStream2 : TStream;{$IFEND}{$ENDIF}
+ {$IFDEF DELPHIXEUP}
+ MemoryStream2 : TStream;
+ {$ENDIF}
 Begin
  If TestNilParam Then
   Exit;
@@ -5559,34 +5474,31 @@ Begin
    SetValue('');
   End
  Else If Param.DataType in [ftString, ftWideString, ftMemo, ftGuid,
-                      {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,{$IFEND}{$ELSE}ftWideMemo,{$ENDIF}
-                       ftFmtMemo, ftFixedChar] Then
+                            {$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
+                            ftFmtMemo, ftFixedChar] Then
   Begin
-   vEncoded := Not (Param.DataType in [ftMemo, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftWideMemo,{$IFEND}{$ELSE}ftWideMemo,{$ENDIF}
-                                       ftFmtMemo]);
+   vEncoded := Not (Param.DataType in [{$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
+                                       ftMemo, ftFmtMemo]);
    SetValue(Param.AsString, vEncoded);
    vEncoded := True;
   End
- Else If Param.DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongword, ftExtended, ftSingle,{$IFEND}{$ENDIF}
-                            ftAutoInc, ftInteger, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftShortint, {$IFEND}{$ENDIF}
-                            ftSmallint, ftLargeint, ftFloat, ftCurrency, ftFMTBcd, ftBCD] Then
+ Else If Param.DataType in [{$IFDEF DELPHIXEUP}ftLongword, ftExtended, ftSingle,
+                            ftShortint,{$ENDIF}
+                            ftAutoInc, ftInteger, ftSmallint, ftLargeint,
+                            ftFloat, ftCurrency, ftFMTBcd, ftBCD] Then
   SetValue(BuildStringFloat(Param.AsString, DataMode, vFloatDecimalFormat), False)
  Else If Param.DataType In [ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob] Then
   Begin
    MemoryStream := TMemoryStream.Create;
    Try
-    {$IFDEF FPC}
-     Param.SetData(MemoryStream);
-    {$ELSE}
-     {$IF CompilerVersion > 21}
-      MemoryStream2 := Param.AsStream;
-      MemoryStream.CopyFrom(MemoryStream2, -1);
-      If Assigned(MemoryStream2) Then
-       FreeAndNil(MemoryStream2);
+     {$IF Defined(RESTDWLAZARUS) or not(Defined(DELPHIXEUP))}
+       Param.SetData(MemoryStream);
      {$ELSE}
-      Param.SetData(MemoryStream);
+       MemoryStream2 := Param.AsStream;
+       MemoryStream.CopyFrom(MemoryStream2, -1);
+       If Assigned(MemoryStream2) Then
+         FreeAndNil(MemoryStream2);
      {$IFEND}
-    {$ENDIF}
     LoadFromStream(MemoryStream);
     vEncoded := False;
    Finally
@@ -5785,16 +5697,14 @@ Begin
  vDataMode     := dmDataware;
  vHeaders      := TRESTDWHeaders.Create;
  vUrl_Redirect := '';
- {$IFNDEF FPC}
-  {$IF CompilerVersion > 21}
-   vEncoding := esUtf8;
+  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+    vEncoding := esUtf8;
   {$ELSE}
-   vEncoding := esASCII;
+    vEncoding := esASCII;
   {$IFEND}
- {$ELSE}
-  vEncoding := esUtf8;
-  vDatabaseCharSet := csUndefined;
- {$ENDIF}
+  {$IFDEF RESTDWLAZARUS}
+    vDatabaseCharSet := csUndefined;
+  {$ENDIF}
 End;
 
 Procedure   TRESTDWParams.CreateParam(ParamName : String;
@@ -5937,7 +5847,7 @@ Begin
         Begin
          If (JSONParam.ObjectValue in [ovString, ovGuid, ovWideString]) And (JSONParam.Encoded) Then
           Begin
-           JSONParam.SetValue(DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+           JSONParam.SetValue(DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
           End
          Else
           JSONParam.SetValue(bJsonOBJ.Pairs[4].Value, JSONParam.Encoded);
@@ -5950,7 +5860,7 @@ Begin
      End
     Else
      Begin
-      vStringStream := TStringStream.Create(DecodeStrings(bJsonOBJ.Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+      vStringStream := TStringStream.Create(DecodeStrings(bJsonOBJ.Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
       Try
        vStringStream.Position := 0;
        TRESTDWPropertyPersist(vParam).LoadFromStream(vStringStream);
@@ -5999,15 +5909,11 @@ Begin
    Try
     If Assigned(TList(Self).Items[Index])  Then
      Begin
-      {$IFDEF FPC}
-      FreeAndNil(TList(Self).Items[Index]^);
-      {$ELSE}
-       {$IF CompilerVersion > 33}
-        FreeAndNil(TJSONParam(TList(Self).Items[Index]^));
-       {$ELSE}
+      {$IF Defined(RESTDWLAZARUS) or not(Defined(DELPHI10_4UP))}
         FreeAndNil(TList(Self).Items[Index]^);
-       {$IFEND}
-      {$ENDIF}
+      {$ELSE}
+        FreeAndNil(TJSONParam(TList(Self).Items[Index]^));
+      {$IFEND}
       Dispose(PJSONParam(TList(Self).Items[Index]));
      End;
    Except
@@ -6040,7 +5946,7 @@ Begin
  vItem^.DataMode         := vDataMode;
  vItem^.CriptOptions.Use := vCripto.Use;
  vItem^.CriptOptions.Key := vCripto.Key;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  vItem^.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  Result                  := Inherited Add(vItem);
@@ -6051,10 +5957,8 @@ Procedure TRESTDWParams.SaveToStream(Var Stream : TStream;
 Var
  ParamsHeader : TRESTDWParamsHeader;
 // vTempString  : String;
- {$IFNDEF FPC}
-  {$if CompilerVersion < 21}
+ {$IFNDEF DELPHIXEUP}
    aStream    : TStringStream;
-  {$IFEND}
  {$ENDIF}
  aCount,
  I, Temp      : Integer;
@@ -6064,14 +5968,10 @@ Var
  Var
   vNull, I : Integer;
   J, L     : DWInt64;
-  {$IFNDEF FPC}
-   {$IF (CompilerVersion >= 20)}
-     S, W     : RawByteString;
-   {$ELSE}
-     S, W     : AnsiString;
-   {$IFEND}
-  {$ELSE}
-   S, W     : AnsiString;
+  {$IFDEF DELPHI2009UP}
+  S, W     : RawByteString;
+  {$ELSE} // lazarus e delphi mofado
+  S, W     : AnsiString;
   {$ENDIF}
   Sing     : Single;
   WordData : Word;
@@ -6099,7 +5999,7 @@ Var
     S := aParam.ParamName;
     L := Length(S);
     Stream.Write(L, Sizeof(DWInt64));
-    {$IFNDEF FPC}
+    {$IFNDEF RESTDWLAZARUS}
     If L <> 0 Then Stream.Write(S[InitStrPos], L);
     {$ELSE}
     If L <> 0 Then Stream.Write(Utf8Encode(S)[1], L);
@@ -6250,95 +6150,84 @@ Var
    End;
  End;
 Begin
- aCount := 0;
-// vTempString := '';
- {$IFNDEF FPC}
-  {$if CompilerVersion < 21}
-   If Not Assigned(Stream) Then
+  aCount := 0;
+  // vTempString := '';
+  {$IF not(Defined(DELPHIXEUP)) and not(Defined(RESTDWLAZARUS))}
+  If Not Assigned(Stream) Then
     Stream := TStringStream.Create('');
-   aStream := TStringStream.Create('');
-   Try
+  aStream := TStringStream.Create('');
+  Try
     //Write init Header
     StartPos := Stream.Position;
     With ParamsHeader Do
-     Begin
+    Begin
       VersionNumber := RESTDWParamsHeaderVersion;
       DataSize      := 0;
       RecordCount   := 0;
       ParamsCount   := Count;
-     End;
-    //Write dwParamsBinList
-    SaveParamsToStream(TStream(aStream));
-    //Remap Bin size
-    EndPos := aStream.Size;
-    ParamsHeader.DataSize    := EndPos;
-    ParamsHeader.ParamsCount := aCount;
-    //Rewrite init Header
-    Stream.Position := 0;
-    aStream.Position := 0;
-    Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
-    Stream.CopyFrom(aStream, aStream.Size);
-    Stream.Position := 0;
-   Finally
+    End;
+  //Write dwParamsBinList
+  SaveParamsToStream(TStream(aStream));
+  //Remap Bin size
+  EndPos := aStream.Size;
+  ParamsHeader.DataSize    := EndPos;
+  ParamsHeader.ParamsCount := aCount;
+  //Rewrite init Header
+  Stream.Position := 0;
+  aStream.Position := 0;
+  Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
+  Stream.CopyFrom(aStream, aStream.Size);
+  Stream.Position := 0;
+  Finally
     FreeAndNil(aStream);
-   End;
-  {$ELSE}
-   If Not Assigned(Stream) Then
-    Begin
-     {$IFDEF FPC}
-      Stream := TStringStream.Create('');
-     {$ELSE}
-      Stream := TStringStream.Create(''{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
-     {$ENDIF}
-    End;
-   //Write init Header
-   StartPos := Stream.Position;
-   With ParamsHeader Do
-    Begin
-     VersionNumber := RESTDWParamsHeaderVersion;
-     DataSize      := 0;
-     RecordCount   := 0;
-     ParamsCount   := Count;
-    End;
-   Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
-   //Write dwParamsBinList
-   SaveParamsToStream(Stream);
-   //Remap Bin size
-   EndPos := Stream.Position;
-   ParamsHeader.DataSize    := EndPos - StartPos - SizeOf(TRESTDWParamsHeader);
-   ParamsHeader.ParamsCount := aCount;
-   //Rewrite init Header
-   Stream.Position := StartPos;
-   Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
-   Stream.Position := 0;
-  {$IFEND}
- {$ELSE}
- If Not Assigned(Stream) Then
-  Stream := TMemoryStream.Create;
- //Write init Header
- StartPos := Stream.Position;
- With ParamsHeader Do
-  Begin
-   VersionNumber := RESTDWParamsHeaderVersion;
-   DataSize      := 0;
-   RecordCount   := 0;
-   ParamsCount   := Count;
   End;
- Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
- //Write dwParamsBinList
- SaveParamsToStream(Stream);
- //Remap Bin size
- EndPos := Stream.Position;
- ParamsHeader.DataSize    := EndPos - StartPos - SizeOf(TRESTDWParamsHeader);
- ParamsHeader.ParamsCount := aCount;
- //Rewrite init Header
- Stream.Position := StartPos;
- Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
- Stream.Position := 0;
- {$ENDIF}
-// SetLength(vTempString, Stream.Size);
-// Stream.ReadBuffer(Pointer(vTempString)^, Length(vTempString));
-// Stream.Position := 0;
+  {$ELSEIF DELPHIXEUP}
+  If Not Assigned(Stream) Then
+    Stream := TStringStream.Create('', TEncoding.UTF8);
+  //Write init Header
+  StartPos := Stream.Position;
+  With ParamsHeader Do
+  Begin
+    VersionNumber := RESTDWParamsHeaderVersion;
+    DataSize      := 0;
+    RecordCount   := 0;
+    ParamsCount   := Count;
+  End;
+  Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
+  //Write dwParamsBinList
+  SaveParamsToStream(Stream);
+  //Remap Bin size
+  EndPos := Stream.Position;
+  ParamsHeader.DataSize    := EndPos - StartPos - SizeOf(TRESTDWParamsHeader);
+  ParamsHeader.ParamsCount := aCount;
+  //Rewrite init Header
+  Stream.Position := StartPos;
+  Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
+  Stream.Position := 0;
+  {$ELSE}
+  If Not Assigned(Stream) Then
+   Stream := TMemoryStream.Create;
+  //Write init Header
+  StartPos := Stream.Position;
+  With ParamsHeader Do
+  Begin
+    VersionNumber := RESTDWParamsHeaderVersion;
+    DataSize      := 0;
+    RecordCount   := 0;
+    ParamsCount   := Count;
+  End;
+  Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
+  //Write dwParamsBinList
+  SaveParamsToStream(Stream);
+  //Remap Bin size
+  EndPos := Stream.Position;
+  ParamsHeader.DataSize    := EndPos - StartPos - SizeOf(TRESTDWParamsHeader);
+  ParamsHeader.ParamsCount := aCount;
+  //Rewrite init Header
+  Stream.Position := StartPos;
+  Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
+  Stream.Position := 0;
+  {$IFEND}
 End;
 
 Procedure TRESTDWParams.LoadFromStream(Stream         : TStream;
@@ -6349,15 +6238,11 @@ Var
  VersionNumber,
  ParamsCount,
  L              : Integer;
- {$IFNDEF FPC}
-  {$IF (CompilerVersion >= 20)}
-   S     : RawByteString;
-  {$ELSE}
-   S     : AnsiString;
-  {$IFEND}
+ {$IF Defined(RESTDWLAZARUS) OR Not(Defined(DELPHIXEUP))}
+   S            : AnsiString;
  {$ELSE}
-  S     : AnsiString;
- {$ENDIF}
+   S            : RawByteString;
+ {$IFEND}
  DataSize,
  aSize,
  StartPos       : Int64;
@@ -6381,7 +6266,7 @@ Var
     Try
      If L <> 0 Then
       Stream.Read(S[InitStrPos], L);
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
       S := GetStringEncode(S, vDatabaseCharSet);
      {$ENDIF}
     Finally
@@ -6430,7 +6315,7 @@ Var
                       SetLength(vStringBytes, L);
                       Stream.Read(vStringBytes[0], L);
                       S := BytesToString(vStringBytes);
-                      {$IFDEF FPC}
+                      {$IFDEF RESTDWLAZARUS}
                        S := GetStringEncode(S, vDatabaseCharSet);
                       {$ENDIF}
                      End;

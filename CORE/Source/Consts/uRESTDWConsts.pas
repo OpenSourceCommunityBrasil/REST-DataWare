@@ -97,8 +97,10 @@ Const
  cErrorInvalidFieldDateTimeValue = 'Field "%s" Value %s is not a ''DateTime'' Value';
  cErrorInvalidFieldFloatValue    = 'Field "%s" Value %s is not a ''Real'' Value';
  cErrorInvalidFieldStringValue   = 'Field "%s" Value %s is not a ''String'' Value';
+ cErrorInvalidJSONData           = 'Invalid JSON Data...';
  cErrorNoFieldsDataset           = 'No Fields to add on Dataset...';
  cErrorOpenDataset               = 'Error when trying to open Dataset...';
+ cErrorParsingJSON               = 'Error on parsing JSON Data...';
  cErrorWriteDataSetNullValue     = 'Cannot write this register.' + #13 + 'Result value is null.';
  cEventNotFound                  = 'HTTP/1.1 404 Url Not Found';
  cExprExpected                   = 'Expression expected but %s found';
