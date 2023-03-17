@@ -1,4 +1,13 @@
 {$DEFINE RESTDW}
+
+(* IFEND Directives - HAS TO STAY ON TOP OF THE FILE!*)
+
+{$IF CompilerVersion > 23}
+  {$LEGACYIFEND ON}
+{$IFEND}
+
+(* End of IFEND Directives *)
+(******************************************************************************)
 (*  Compiler Directives for IDE Version *)
 
 {$IFDEF FPC}
@@ -305,14 +314,6 @@
 
 (* End of Compiler Directives for IDE Version *)
 (******************************************************************************)
-(* IFEND Directives *)
-
-{$IFDEF DELPHIXE3UP}
-  {$LEGACYIFEND ON}
-{$ENDIF}
-
-(* End of IFEND Directives *)
-(******************************************************************************)
 (* FRAMEWORK Directives *)
 
 {$IFNDEF RESTDWLAZARUS}
@@ -342,14 +343,16 @@
   {$DEFINE RESTDWUTF8}
 {$IFEND}
 
-{$IF Defined(LINUX) or Defined(LINUX32) or Defined(LINUX64)}
+{$IF Defined(LINUX) or Defined(LINUX32) or Defined(LINUX64) or Defined(UNIX)}
   {$DEFINE RESTDWLINUX}
+  {$DEFINE HAS_UTF8}
+  {$DEFINE RESTDWUTF8}
   {$IFDEF RESTDWFMX}
     {$DEFINE RESTDWLINUXFMX}
   {$ENDIF}
 {$IFEND}
 
-{$IF Defined(MSWINDOWS) or Defined(WIN32) or Defined(WIN64)}
+{$IF Defined(MSWINDOWS) or Defined(WIN32) or Defined(WIN64) or Defined(WINDOWS)}
   {$DEFINE RESTDWWINDOWS}
   {$IFDEF RESTDWFMX}
     {$DEFINE RESTDWWINFMX}
@@ -359,6 +362,11 @@
 {$IF Defined(POSIX)}
   {$DEFINE RESTDWAPPLE}
   {$DEFINE RESTDWLINUX}
+{$IFEND}
+
+{$IF Defined(NEXTGEN)}
+  {$DEFINE RESTDWANDROID}
+  {$DEFINE RESTDWAPPLE}
 {$IFEND}
 
 (* End of OS Architecture Directives *)
@@ -382,7 +390,7 @@
 
 {.$DEFINE RESTDWDEBUG}
 
-{$IFNDEF RESTDWDEBUG}
+{$IFDEF RESTDWDEBUG}
   {$IFDEF DELPHI2010UP}
     {$WARN IMPLICIT_STRING_CAST OFF}
     {$WARN IMPLICIT_STRING_CAST_LOSS OFF}
@@ -396,6 +404,10 @@
   {$WARN USE_BEFORE_DEF OFF}
   {$WARNINGS OFF}
   {$HINTS OFF}
+{$ENDIF}
+
+{$IFNDEF NEXTGEN}
+  {$DEFINE HAS_AnsiString}
 {$ENDIF}
 
 {$IFDEF DELPHICOMPILER}
