@@ -3025,7 +3025,7 @@ Begin
               End;
             End{$ENDREGION}
            Else If vAuthenticator is TRESTDWAuthOAuth Then
-            raise Exception.Create('OAuth authentication is not implemented');
+            raise Exception.Create(cErrorOAuthNotImplenented);
 
            vErrorCode            := 200;
            vErrorMessage         := '';

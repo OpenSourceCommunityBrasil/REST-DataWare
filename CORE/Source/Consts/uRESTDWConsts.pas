@@ -232,6 +232,7 @@ Const
  cTooMuchDataInBuffer           = 'Too much data in buffer.';
  cReadLnWaitMaxAttemptsExceeded = 'Max line read attempts exceeded.';
  cReadTimeout                   = 'Read timed out.';
+ cErrorOAuthNotImplenented      = 'OAuth authentication is not implemented';
 
 Type
   {$IF DEFINED(HAS_FMX) AND DEFINED(HAS_UTF8)}
