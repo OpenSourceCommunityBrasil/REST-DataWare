@@ -1,6 +1,6 @@
 unit uRESTDWDatamodule;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\..\Source\Includes\uRESTDW.inc}
 
 interface
 

@@ -92,6 +92,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Assign(ASource: TPersistent);
     procedure FromToken(ATokenValue: String);
     function GetToken(ASecrets: String): String;
     function ValidateToken(AValue: String): Boolean; overload;
@@ -181,6 +182,24 @@ end;
 
 { TRESTDWAuthToken }
 
+procedure TRESTDWAuthToken.Assign(ASource: TPersistent);
+var
+  LSrc : TRESTDWAuthToken;
+begin
+  if ASource is TRESTDWAuthToken then
+  begin
+    LSrc            := TRESTDWAuthToken(ASource);
+    TokenType       := LSrc.TokenType;
+    CryptType       := LSrc.CryptType;
+    GetTokenEvent   := LSrc.GetTokenEvent;
+    TokenHash       := LSrc.TokenHash;
+    ServerSignature := LSrc.ServerSignature;
+    LifeCycle       := LSrc.LifeCycle;
+  end
+  else
+    inherited Assign(ASource);
+end;
+
 procedure TRESTDWAuthToken.ClearToken;
 begin
   FSecrets      := '';
@@ -195,7 +214,7 @@ begin
 
   FTokenHash        := 'RDWTS_HASH0011';
   FServerSignature  := 'RESTRESTDWServer01';
-  FGetTokenEvent    := '/GetToken';
+  FGetTokenEvent    := 'GetToken';
   FKey              := 'token';
   FLifeCycle        := 1800;//30 Minutos
   FTokenType        := rdwTS;

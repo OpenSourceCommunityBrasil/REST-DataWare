@@ -2900,24 +2900,28 @@ Begin
            Else If vAuthenticator is TRESTDWAuthToken Then
             Begin {$REGION AuthToken}
              vUrlToken := Lowercase(vUrlToExec);
+             If Copy(vUrlToken, InitStrPos, 1) = '/' then
+              Delete(vUrlToken, InitStrPos, 1);
              If vUrlToken =
                 Lowercase(TRESTDWAuthToken(vAuthenticator).GetTokenEvent) Then
               Begin
-               vGettoken      := True;
-               vErrorCode     := 404;
-               vErrorMessage  := cEventNotFound;
+               vGettoken     := True;
+               vErrorCode    := 404;
+               vErrorMessage := cEventNotFound;
                If (RequestTypeToRoute(RequestType) In TRESTDWAuthToken(vAuthenticator).GetTokenRoutes) Or
                   (crAll in TRESTDWAuthToken(vAuthenticator).GetTokenRoutes) Then
                 Begin
                  If Assigned(TServerMethodDatamodule(vTempServerMethods).OnGetToken) Then
                   Begin
                    vTokenValidate := True;
-                   vAuthTokenParam := TRESTDWAuthToken(vAuthenticator);
+                   vAuthTokenParam := TRESTDWAuthToken.Create(Self);
+                   vAuthTokenParam.Assign(TRESTDWAuthToken(vAuthenticator));
+                  {$IFNDEF FPC}
                    If Trim(Token) <> '' Then
-                    vToken       := Token
+                     vToken       := Token
                    Else
-                    vToken       := RawHeaders.Values['Authorization'];
-
+                    vToken        := RawHeaders.Values['Authorization'];
+                  {$ENDIF}
                    If DWParams.ItemsString['RDWParams'] <> Nil Then
                     Begin
                      DWParamsD := TRESTDWParams.Create;
@@ -2926,13 +2930,13 @@ Begin
                      else
                        DWParamsD.FromJSON(DWParams.ItemsString['RDWParams'].Value);
                      TServerMethodDatamodule(vTempServerMethods).OnGetToken(vWelcomeMessage, vAccessTag, DWParamsD,
-                                                                            vAuthTokenParam,
+                                                                            TRESTDWAuthToken(vAuthTokenParam),
                                                                             vErrorCode, vErrorMessage, vToken, vAcceptAuth);
                      FreeAndNil(DWParamsD);
                     End
                    Else
                     TServerMethodDatamodule(vTempServerMethods).OnGetToken(vWelcomeMessage, vAccessTag, DWParams,
-                                                                           vAuthTokenParam,
+                                                                           TRESTDWAuthToken(vAuthTokenParam),
                                                                            vErrorCode, vErrorMessage, vToken, vAcceptAuth);
                    If Not vAcceptAuth Then
                     Begin
@@ -2974,7 +2978,8 @@ Begin
                 vNeedAuthorization := vTempEvent.NeedAuthorization;
                If vNeedAuthorization Then
                 Begin
-                 vAuthTokenParam := TRESTDWAuthToken(vAuthenticator);
+                 vAuthTokenParam := TRESTDWAuthToken.Create(Self);
+                 vAuthTokenParam.Assign(TRESTDWAuthToken(vAuthenticator));
                  If DWParams.ItemsString[TRESTDWAuthToken(vAuthenticator).Key] <> Nil Then
                   vToken         := DWParams.ItemsString[TRESTDWAuthToken(vAuthenticator).Key].AsString
                  Else
@@ -3004,7 +3009,7 @@ Begin
                  If Assigned(TServerMethodDatamodule(vTempServerMethods).OnUserTokenAuth) Then
                   Begin
                    TServerMethodDatamodule(vTempServerMethods).OnUserTokenAuth(vWelcomeMessage, vAccessTag, DWParams,
-                                                                               vAuthTokenParam,
+                                                                               TRESTDWAuthToken(vAuthTokenParam),
                                                                                vErrorCode, vErrorMessage, vToken, vAcceptAuth);
                    vTokenValidate := Not(vAcceptAuth);
                    If Not vAcceptAuth Then
