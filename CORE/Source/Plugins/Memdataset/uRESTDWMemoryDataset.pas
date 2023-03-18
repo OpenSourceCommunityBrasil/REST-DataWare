@@ -519,6 +519,7 @@ begin
   if not FIsTableOpen then
     Exit;
 
+  ClearBuffers;
   vBlock := FBlockEvents;
   FBlockEvents := False;
 
@@ -1037,7 +1038,6 @@ var
   vString : AnsiString;
   {$IFNDEF FPC}
     vSQLTimeStamp : TSQLTimeStamp;
-    vByte : Byte;
   {$ENDIF}
   {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
     vTimeStampOffSet : TSQLTimeStampOffSet;
@@ -1188,7 +1188,6 @@ var
   vTimeStamp : TTimeStamp;
   {$IFNDEF FPC}
     vSQLTimeStamp : TSQLTimeStamp;
-    vByte : Byte;
   {$ENDIF}
 
   {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
@@ -1900,22 +1899,11 @@ begin
 end;
 
 procedure TRESTDWMemTable.clearRecords;
-var
-  i : integer;
-  obj : TRESTDWRecord;
 begin
   if FRecords = nil then
     Exit;
-  // eh mais rapido correr a lista ao contrario
-  // pq nao tem que fazer deslocamento
-  i := FRecords.Count - 1;
-  while i >= 0 do begin
-    obj := TRESTDWRecord(FRecords.Items[i]);
-    FreeAndNil(obj);
-    FRecords.Delete(i);
-    i := i - 1;
-  end;
-  FRecords.Clear;
+
+  FRecords.ClearAll;
 end;
 
 function TRESTDWMemTable.CompareRecords(Item1, Item2: TRESTDWRecord): Integer;
@@ -2034,8 +2022,10 @@ begin
   if FFilterParser <> nil then
     FreeAndNil(FFilterParser);
 
-  Fields.Clear;
-  FieldDefs.Clear;
+  FreeIndexList;
+  SetState(dsInactive);
+
+  //  DataEvent(deDataSetChange, 0);
 
   EmptyTable;
   FreeAndNil(FRecords);
