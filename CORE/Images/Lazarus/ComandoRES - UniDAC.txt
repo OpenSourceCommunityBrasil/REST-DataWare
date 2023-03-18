@@ -1,3 +1,0 @@
-c:\lazarus\tools\lazres.exe restdwdriverunidac.lrs TRESTDWDriverUNIDAC.png
-
-pause

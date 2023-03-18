@@ -1,4 +1,4 @@
-DW BITMAP "..\icons\dwIcon.bmp"
+DW BITMAP "..\icons\package\dwIcon.bmp"
 TRESTDWBatchMove BITMAP "..\icons\components\core\TRESTDWBatchMove.bmp"
 TRESTDWBatchMove16 BITMAP "..\icons\components\core\TRESTDWBatchMove16.bmp"
 TRESTDWBufferDB BITMAP "..\icons\components\core\TRESTDWBufferDB.bmp"

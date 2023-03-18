@@ -349,7 +349,11 @@ Destructor TRESTDWIdClientREST.Destroy;
 Begin
  if Assigned(HttpRequest) then
  begin
-  HttpRequest.Disconnect(false);
+  Try
+   HttpRequest.IOHandler.CloseGracefully;
+   HttpRequest.Disconnect(false);
+  Except
+  End;
   FreeAndNil(HttpRequest);
  end;
  Inherited;

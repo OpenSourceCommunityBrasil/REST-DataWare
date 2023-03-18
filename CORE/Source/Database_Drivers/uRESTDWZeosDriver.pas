@@ -381,13 +381,25 @@ var
 begin
   qry := TZAbstractRODataset(Self.Owner);
   {$IFDEF ZEOS80UP}
-    if BlobType in [ftWideString{$IFDEF WITH_WIDEMEMO}, ftFixedWideChar, ftWideMemo{$ENDIF}] then
-      qry.Params[IParam].LoadTextFromStream(Stream, zCP_UTF16)
-    else if BlobType in [ftBlob, ftGraphic, ftTypedBinary, ftOraBlob] then
-      qry.Params[IParam].LoadBinaryFromStream(Stream)
-    else if BlobType in [ftMemo, ftParadoxOle, ftDBaseOle, ftOraClob] then begin
-      cp := qry.Connection.RawCharacterTransliterateOptions.GetRawTransliterateCodePage(ttParam);
-      qry.Params[IParam].LoadTextFromStream(Stream, cp);
+    if qry is TZQuery then begin
+      if BlobType in [ftWideString{$IFDEF WITH_WIDEMEMO}, ftFixedWideChar, ftWideMemo{$ENDIF}] then
+        TZQuery(qry).Params[IParam].LoadTextFromStream(Stream, zCP_UTF16)
+      else if BlobType in [ftBlob, ftGraphic, ftTypedBinary, ftOraBlob] then
+        TZQuery(qry).Params[IParam].LoadBinaryFromStream(Stream)
+      else if BlobType in [ftMemo, ftParadoxOle, ftDBaseOle, ftOraClob] then begin
+        cp := qry.Connection.RawCharacterTransliterateOptions.GetRawTransliterateCodePage(ttParam);
+        TZQuery(qry).Params[IParam].LoadTextFromStream(Stream, cp);
+      end;
+    end
+    else if qry is TZReadOnlyQuery then begin
+      if BlobType in [ftWideString{$IFDEF WITH_WIDEMEMO}, ftFixedWideChar, ftWideMemo{$ENDIF}] then
+        TZReadOnlyQuery(qry).Params[IParam].LoadTextFromStream(Stream, zCP_UTF16)
+      else if BlobType in [ftBlob, ftGraphic, ftTypedBinary, ftOraBlob] then
+        TZReadOnlyQuery(qry).Params[IParam].LoadBinaryFromStream(Stream)
+      else if BlobType in [ftMemo, ftParadoxOle, ftDBaseOle, ftOraClob] then begin
+        cp := qry.Connection.RawCharacterTransliterateOptions.GetRawTransliterateCodePage(ttParam);
+        TZReadOnlyQuery(qry).Params[IParam].LoadTextFromStream(Stream, cp);
+      end;
     end;
   {$ELSE}
     if qry is TZQuery then

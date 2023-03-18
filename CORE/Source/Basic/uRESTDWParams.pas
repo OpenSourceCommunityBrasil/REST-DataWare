@@ -1593,7 +1593,8 @@ Begin
                    Result := Format('[%s]', [vLines]);
                  End;
   End;
-  bValue.First;
+  if not bValue.IsUniDirectional then
+    bValue.First;
  Finally
   bValue.EnableControls;
  End;
