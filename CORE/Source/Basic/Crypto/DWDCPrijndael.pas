@@ -1,7 +1,5 @@
 unit DWDCPrijndael;
 
-{$I ..\..\Includes\uRESTDW.inc}
-
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
