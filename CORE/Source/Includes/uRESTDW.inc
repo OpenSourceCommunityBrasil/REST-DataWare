@@ -12,6 +12,9 @@
 
 {$IFDEF FPC}
   {$DEFINE RESTDWLAZARUS}
+  {$IFDEF LAMW}
+    {$DEFINE RESTDWLAMW}
+  {$ENDIF}
 {$ELSE}
 {$IFDEF CLR}
   {$DEFINE RESTDWDELPHINET}
@@ -373,7 +376,7 @@
 (******************************************************************************)
 (* GUI Directives *)
 
-{$IF Defined(CONSOLE) or Defined(FRAMEWORK) or Defined(LCL)}
+{$IF Defined(CONSOLE) or Defined(FRAMEWORK) or Defined(LCL) or Defined(LAMW)}
   {$DEFINE NOGUI}
 {$IFEND}
 
@@ -410,13 +413,9 @@
   {$DEFINE HAS_AnsiString}
 {$ENDIF}
 
-{$IFDEF DELPHICOMPILER}
+{$IF Defined(DELPHICOMPILER) or Defined(BCBCOMPILER)}
   {$DEFINE DELPHILANGUAGE}
-{$ENDIF}
-
-{$IFDEF BCBCOMPILER}
-  {$DEFINE DELPHILANGUAGE}
-{$ENDIF}
+{$IFEND}
 
 (* End of General functional Directives *)
 (******************************************************************************)
