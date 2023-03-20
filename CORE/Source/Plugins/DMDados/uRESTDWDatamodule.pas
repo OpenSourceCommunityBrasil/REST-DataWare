@@ -1,6 +1,6 @@
 unit uRESTDWDatamodule;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 interface
 
@@ -382,18 +382,14 @@ End;
 Constructor TServerMethodDataModule.Create(Sender: TComponent);
 Begin
  Inherited Create(Sender);
- vRESTDWClientInfo               := TRESTDWClientInfo.Create;
- vClientWelcomeMessage           := '';
- vServerAuthOptions              := Nil;
- {$IFNDEF FPC}
- {$IF CompilerVersion > 21}
-  Encoding         := esUtf8;
+ vRESTDWClientInfo     := TRESTDWClientInfo.Create;
+ vClientWelcomeMessage := '';
+ vServerAuthOptions    := Nil;
+ {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+  Encoding := esUtf8;
  {$ELSE}
-  Encoding         := esAscii;
+  Encoding := esAscii;
  {$IFEND}
- {$ELSE}
-  Encoding         := esUtf8;
- {$ENDIF}
 End;
 
 Procedure TServerMethodDataModule.SetClientWelcomeMessage(Value: String);

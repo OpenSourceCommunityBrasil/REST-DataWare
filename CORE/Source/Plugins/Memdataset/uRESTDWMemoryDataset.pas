@@ -1,6 +1,6 @@
 ﻿unit uRESTDWMemoryDataset;
 
-{$I ..\..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -27,7 +27,7 @@
 interface
 
 uses
-  {$IFNDEF FPC} SqlTimSt, {$ENDIF}
+  {$IFNDEF RESTDWLAZARUS} SqlTimSt, {$ENDIF}
   SysUtils, Classes, DB, FmtBCD, Variants, uRESTDWExprParser, uRESTDWAbout,
   uRESTDWConsts, uRESTDWPrototypes, uRESTDWTools;
 
@@ -44,19 +44,13 @@ type
   end;
   PRESTDWRecInfo = ^TRESTDWRecInfo;
 
-  {$IFDEF FPC}
+  {$IF Defined(RESTDWLAZARUS) or (Defined(DELPHIXEUP) and not Defined(NEXTGEN))}
     TRESTDWBuffer = TRecordBuffer;
-  {$ELSE}
-    {$IF CompilerVersion < 21}
-      TRESTDWBuffer = PChar;
-    {$ELSE}
-      {$IFDEF NEXTGEN}
-        TRESTDWBuffer = TRecBuf;
-      {$ELSE}
-        TRESTDWBuffer = TRecordBuffer;
-      {$ENDIF}
-    {$IFEND}
-  {$ENDIF}
+  {$ELSEIF Defined(NEXTGEN)}
+    TRESTDWBuffer = TRecBuf;
+  {$ELSEIF not Defined(DELPHIXEUP)}
+    TRESTDWBuffer = PChar;
+  {$IFEND}
   PRESTDWBuffer = ^TRESTDWBuffer;
 
   TRESTDWMemTable = class;
@@ -137,7 +131,7 @@ type
 
   TRESTDWStorageBase = class(TRESTDWComponent)
   private
-    {$IFDEF FPC}
+    {$IFDEF RESTDWLAZARUS}
       FDatabaseCharSet: TDatabaseCharSet;
     {$ENDIF}
     FEncodeStrs: Boolean;
@@ -156,7 +150,7 @@ type
     procedure SaveToFile(ADataset: TDataset; AFileName: String);
     procedure LoadFromFile(ADataset: TDataset; AFileName: String);
   public
-    {$IFDEF FPC}
+    {$IFDEF RESTDWLAZARUS}
       property DatabaseCharSet: TDatabaseCharSet read FDatabaseCharSet  write FDatabaseCharSet;
     {$ENDIF}
     property EncodeStrs: Boolean read FEncodeStrs write FEncodeStrs;
@@ -255,14 +249,14 @@ type
     procedure SetFilterText(const Value: string); override;
 
     // events
-    {$IFDEF FPC}
+    {$IFDEF RESTDWLAZARUS}
       procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
     {$ELSE}
-      {$IF CompilerVersion < 21}
+      {$IFNDEF DELPHIXEUP}
         procedure DataEvent(Event: TDataEvent; Info: Longint); override;
       {$ELSE}
         procedure DataEvent(Event: TDataEvent; Info: NativeInt); override;
-      {$IFEND}
+      {$ENDIF}
     {$ENDIF}
 
     // parser
@@ -275,28 +269,28 @@ type
 
     procedure SetBookmarkData(Buffer: TRESTDWBuffer; Data: Pointer); override;
     procedure GetBookmarkData(Buffer: TRESTDWBuffer; Data: Pointer); override;
-    {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+    {$IFDEF DELPHIXEUP}
       procedure GetBookmarkData(Buffer: TRESTDWBuffer; Data: TBookmark); override;
-    {$IFEND}
+    {$ENDIF}
     procedure SetBookmarkFlag(Buffer: TRESTDWBuffer; Value: TBookmarkFlag); override;
     function GetBookmarkFlag(Buffer: TRESTDWBuffer): TBookmarkFlag; override;
 
     // editing (dummy vesions)
     procedure InternalDelete; override;
 
-    {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+    {$IFDEF DELPHIXEUP}
       procedure InternalAddRecord(Buffer: TRecBuf; Append: Boolean); override;
       procedure InternalAddRecord(Buffer: TRESTDWBuffer; Append: Boolean); override;
-    {$IFEND}
+    {$ENDIF}
     procedure InternalAddRecord(Buffer: Pointer; AAppend: Boolean); override;
 
     procedure InternalPost; override;
     procedure DoAfterPost; override;
 
     // fields
-    {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+    {$IFDEF DELPHIXEUP}
       procedure SetFieldData(Field: TField; Buffer: TValueBuffer); overload; override;
-    {$IFEND}
+    {$ENDIF}
     procedure SetFieldData(Field: TField; Buffer: Pointer); overload; override;
 
     // other
@@ -339,9 +333,9 @@ type
     function Lookup(const KeyFields: string; const KeyValues: Variant;
       const ResultFields: string): Variant; override;
 
-    {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+    {$IFDEF DELPHIXEUP}
       function GetFieldData(Field: TField; var Buffer: TValueBuffer): Boolean; override;
-    {$IFEND}
+    {$ENDIF}
     function GetFieldData(Field: TField; Buffer: Pointer): Boolean; override;
 
     // status - Delta
@@ -402,7 +396,7 @@ type
 implementation
 
 uses
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
     bufstream,
   {$ENDIF}
   uRESTDWStorageBin;
@@ -446,18 +440,14 @@ begin
     try
       if Assigned(TList(Self).Items[Index]) then begin
         if Assigned(TRESTDWRecord(TList(Self).Items[Index]^)) then begin
-          {$IFDEF FPC}
-            FreeAndNil(TList(Self).Items[Index]^);
+          {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHI10_4UP)}
+          FreeAndNil(TList(Self).Items[Index]^);
           {$ELSE}
-            {$IF CompilerVersion > 33}
-              FreeAndNil(TRESTDWRecord(TList(Self).Items[Index]^));
-            {$ELSE}
-              FreeAndNil(TList(Self).Items[Index]^);
-            {$IFEND}
-          {$ENDIF}
+          FreeAndNil(TRESTDWRecord(TList(Self).Items[Index]^));
+          {$IFEND}
         end;
       end;
-      {$IFDEF FPC}
+      {$IFDEF RESTDWLAZARUS}
         Dispose(PRESTDWRecord(TList(Self).Items[Index]));
       {$ELSE}
         Dispose(TList(Self).Items[Index]);
@@ -484,8 +474,8 @@ begin
 
   FieldDefs.Updated := False;
   FieldDefs.Update;
-  {$IFNDEF FPC}
-    FieldDefList.Update;
+  {$IFNDEF RESTDWLAZARUS}
+  FieldDefList.Update;
   {$ENDIF}
 
   // if there are no persistent field objects,
@@ -690,13 +680,13 @@ begin
           end;
         finally
           if Result then begin
-            {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+            {$IFDEF DELPHIXEUP}
                SetLength(vBookmark,BookmarkSize);
                Move(i,Pointer(@vBookmark[0])^,SizeOf(vBook));
             {$ELSE}
                SetLength(vBookmark,BookmarkSize);
                Move(i,Pointer(@vBookmark[0])^,SizeOf(vBook));
-            {$IFEND}
+            {$ENDIF}
           end;
         end;
       finally
@@ -888,7 +878,7 @@ var
 begin
   for i := 0 to FieldDefs.Count - 1 do begin
     with FieldDefs.Items[I] do begin
-      {$IFDEF FPC}
+      {$IFDEF RESTDWLAZARUS}
         if DataType = ftTimeStamp then begin
           DataType := ftDateTime;
         end;
@@ -957,11 +947,11 @@ begin
   else
     FIndexList.Clear;
 
-  {$IF (NOT DEFINED(FPC)) AND (CompilerVersion > 24)}
+  {$IFDEF DELPHIXE4UP}
     vPosFinal := High(FieldNames);
   {$ELSE}
     vPosFinal := Length(FieldNames);
-  {$IFEND}
+  {$ENDIF}
 
   vFieldName := '';
   vOrder := '';
@@ -1004,7 +994,7 @@ begin
   InternalGotoBookmark(@ReqBookmark);
 end;
 
-{$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+{$IFDEF DELPHIXEUP}
   procedure TRESTDWMemTable.GetBookmarkData(Buffer: TRESTDWBuffer; Data: TBookmark);
   var
     vBook : integer;
@@ -1012,7 +1002,7 @@ end;
     vBook := PRESTDWRecInfo(Buffer + FRecordSize)^.Bookmark;
     Move(vBook,Pointer(@Data[0])^,SizeOf(vBook)); // XE
   end;
-{$IFEND}
+{$ENDIF}
 
 function TRESTDWMemTable.GetBookmarkFlag(Buffer: TRESTDWBuffer): TBookmarkFlag;
 begin
@@ -1036,12 +1026,12 @@ var
   vTimeStamp : TTimeStamp;
   vDateTimeRec : TDateTimeRec;
   vString : AnsiString;
-  {$IFNDEF FPC}
+  {$IFNDEF RESTDWLAZARUS}
     vSQLTimeStamp : TSQLTimeStamp;
   {$ENDIF}
-  {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+  {$IFDEF DELPHIXEUP}
     vTimeStampOffSet : TSQLTimeStampOffSet;
-  {$IFEND}
+  {$ENDIF}
 begin
   I := Field.FieldNo - 1;
   Result := GetActiveBuffer(SrcBuffer);
@@ -1067,7 +1057,7 @@ begin
       end
       else if vDWDataType = dwftTimeStamp then begin
         Move(SrcBuffer^,vDouble,SizeOf(vDouble));
-        {$IFDEF FPC}
+        {$IFDEF RESTDWLAZARUS}
           vTimeStamp := DateTimeToTimeStamp(vDouble);
           Move(vTimeStamp,Buffer^,SizeOf(vTimeStamp));
         {$ELSE}
@@ -1087,7 +1077,7 @@ begin
         Move(vDateTimeRec,Buffer^,SizeOf(vDateTimeRec));
       end
       else if vDWDataType = dwftTimeStampOffset then begin
-        {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+        {$IFDEF DELPHIXEUP}
           Move(SrcBuffer^,vDouble,SizeOf(vDouble));
           Inc(SrcBuffer,SizeOf(vDouble));
 
@@ -1105,7 +1095,7 @@ begin
           Dec(SrcBuffer,J);
 
           Move(vTimeStampOffSet,Buffer^,SizeOf(vTimeStampOffSet));
-        {$IFEND}
+        {$ENDIF}
       end
       else if vDWDataType = dwftWideString then begin
         SetLength(vString,J);
@@ -1152,24 +1142,24 @@ begin
     Result := vField.Index;
 end;
 
-{$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
-  function TRESTDWMemTable.GetFieldData(Field: TField; var Buffer: TValueBuffer): Boolean;
-  begin
-    Result := GetFieldData(Field,Pointer(Buffer));
-  end;
-{$IFEND}
+{$IFDEF DELPHIXEUP}
+function TRESTDWMemTable.GetFieldData(Field: TField; var Buffer: TValueBuffer): Boolean;
+begin
+  Result := GetFieldData(Field,Pointer(Buffer));
+end;
+{$ENDIF}
 
 procedure TRESTDWMemTable.SetBookmarkFlag (Buffer: TRESTDWBuffer; Value: TBookmarkFlag);
 begin
   PRESTDWRecInfo(Buffer + FRecordSize)^.BookmarkFlag := Value;
 end;
 
-{$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
-  procedure TRESTDWMemTable.SetFieldData(Field: TField; Buffer: TValueBuffer);
-  begin
-    SetFieldData(Field,Pointer(Buffer));
-  end;
-{$IFEND}
+{$IFDEF DELPHIXEUP}
+procedure TRESTDWMemTable.SetFieldData(Field: TField; Buffer: TValueBuffer);
+begin
+  SetFieldData(Field,Pointer(Buffer));
+end;
+{$ENDIF}
 
 procedure TRESTDWMemTable.SetFieldData(Field: TField; Buffer: Pointer);
 var
@@ -1186,13 +1176,12 @@ var
   vFmtBCD : tBCD;
   vDateTimeRec : TDateTimeRec;
   vTimeStamp : TTimeStamp;
-  {$IFNDEF FPC}
+  {$IFNDEF RESTDWLAZARUS}
     vSQLTimeStamp : TSQLTimeStamp;
   {$ENDIF}
-
-  {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+  {$IFDEF DELPHIXEUP}
     vTimeStampOffSet : TSQLTimeStampOffSet;
-  {$IFEND}
+  {$ENDIF}
 begin
   I:= Field.FieldNo - 1;
   if not GetActiveBuffer(DestBuffer) then
@@ -1219,7 +1208,7 @@ begin
         Move(vCurrency,DestBuffer^,J);
       end
       else if vDWDataType = dwftTimeStamp then begin
-        {$IFDEF FPC}
+        {$IFDEF RESTDWLAZARUS}
           Move(Buffer^,vTimeStamp,SizeOf(vTimeStamp));
           vDouble := TimeStampToDateTime(vTimeStamp);
         {$ELSE}
@@ -1243,7 +1232,7 @@ begin
             end;
         else
           try
-            {$IFDEF FPC}
+            {$IFDEF RESTDWLAZARUS}
               vTimeStamp := MSecsToTimeStamp(Comp(vDateTimeRec.DateTime));
             {$ELSE}
               vTimeStamp := MSecsToTimeStamp(vDateTimeRec.DateTime);
@@ -1257,7 +1246,7 @@ begin
         Move(vDouble,DestBuffer^,SizeOf(vDouble));
       end
       else if vDWDataType = dwftTimeStampOffset then begin
-        {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+        {$IFDEF DELPHIXEUP}
           Move(Buffer^,vTimeStampOffSet,SizeOf(vTimeStamp));
           vDouble := SQLTimeStampOffsetToDateTime(vTimeStampOffSet);
           Move(vDouble,DestBuffer^,SizeOf(vDouble));
@@ -1271,7 +1260,7 @@ begin
           Move(vByte,DestBuffer^,SizeOf(vByte));
           Inc(DestBuffer,SizeOf(vByte));
           Dec(DestBuffer,J);
-        {$IFEND}
+        {$ENDIF}
       end
       else begin
         Move(Buffer^,DestBuffer^,J);
@@ -1293,15 +1282,13 @@ begin
   end;
 
   if not (State in [dsCalcFields, dsFilter, dsNewValue]) then begin
-    {$IFDEF FPC}
+    {$IF Defined(RESTDWLAZARUS)}
       DataEvent(deFieldChange, Ptrint(Field));
-    {$ELSE}
-      {$IF CompilerVersion < 21}
+    {$ELSEIF not Defined(DELPHIIXEUP)}
         DataEvent(deFieldChange, Longint(Field));
-      {$ELSE}
+    {$ELSE}
         DataEvent(deFieldChange, NativeInt(Field));
-      {$IFEND}
-    {$ENDIF}
+    {$IFEND}
   end;
 end;
 
@@ -1333,7 +1320,7 @@ procedure TRESTDWMemTable.SetFilterText(const Value: string);
     FreeAndNil(FFilterParser);
     if Filter <> '' then begin
       FFilterParser := TExprParser.Create;
-      FFilterParser.OnGetVariable := {$IFDEF FPC}@{$ENDIF}ParserGetVariableValue;
+      FFilterParser.OnGetVariable := {$IFDEF RESTDWLAZARUS}@{$ENDIF}ParserGetVariableValue;
       if foCaseInsensitive in FilterOptions then
         FFilterParser.Expression := AnsiUpperCase(Filter)
       else
@@ -1406,17 +1393,17 @@ begin
 end;
 
 procedure TRESTDWMemTable.GetBookmarkData(Buffer: TRESTDWBuffer; Data: Pointer);
-{$IF (DEFINED(FPC)) or (CompilerVersion < 21)}
+{$IF Defined(RESTDWLAZARUS) or not Defined(DELPHIXEUP)}
   var
     vBook : integer;
 {$IFEND}
 begin
-  {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+  {$IFDEF DELPHIXEUP}
     GetBookmarkData(Buffer,TBookmark(Data));
   {$ELSE}
     vBook := PRESTDWRecInfo(Buffer + FRecordSize)^.Bookmark;
     Move(vBook,Data^,SizeOf(vBook)); // FPC/D7
-  {$IFEND}
+  {$ENDIF}
 end;
 
 procedure TRESTDWMemTable.SaveToFile(AFileName: string);
@@ -1480,11 +1467,11 @@ end;
 
 procedure TRESTDWMemTable.SetBookmarkData(Buffer: TRESTDWBuffer; Data: Pointer);
 begin
-  {$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
+  {$IFDEF DELPHIXEUP}
     SetBookmarkData(Buffer,TBookmark(Data));
   {$ELSE}
     PRESTDWRecInfo(Buffer + FRecordSize)^.Bookmark := Integer(Data^);
-  {$IFEND}
+  {$ENDIF}
 end;
 
 function TRESTDWMemTable.GetRecordCount: Integer;
@@ -1566,7 +1553,7 @@ begin
   if Active and (FRecords <> nil) and (FRecords.Count > 0) then begin
     vPos := Bookmark;
     try
-      {$IFDEF FPC}
+      {$IFDEF RESTDWLAZARUS}
       QuickSort(0, FRecords.Count - 1, @CompareRecords);
       {$ELSE}
       QuickSort(0, FRecords.Count - 1, CompareRecords);
@@ -1718,7 +1705,7 @@ begin
         vFieldDef := buscaFieldDef(Fields[i].FieldName);
         vDefName := Fields[i].FieldName;
 
-        {$IFNDEF FPC}
+        {$IFNDEF RESTDWLAZARUS}
           if vFieldDef = nil then begin
             vFieldDef := buscaFieldDef(Fields[i].FullName);
             vDefName := Fields[i].FullName;
@@ -1739,7 +1726,7 @@ begin
         end;
       end;
     end;
-    {$IFNDEF FPC}
+    {$IFNDEF RESTDWLAZARUS}
       FieldOptions.AutoCreateMode := acCombineAlways;
       CreateFields;
       for i := 0 to FieldDefs.Count-1 do begin
@@ -1807,7 +1794,7 @@ begin
 
   FBlockEvents := vBlock;
 
-  {$IFNDEF FPC}
+  {$IFNDEF RESTDWLAZARUS}
     inherited;
   {$ENDIF}
 end;
@@ -1975,15 +1962,13 @@ begin
   Result := TRESTDWBlobStream.Create(Self,Field as TBlobField,Mode);
 end;
 
-{$IFDEF FPC}
-  procedure TRESTDWMemTable.DataEvent(Event: TDataEvent; Info: Ptrint);
+{$IF Defined(RESTDWLAZARUS)}
+procedure TRESTDWMemTable.DataEvent(Event: TDataEvent; Info: Ptrint);
+{$ELSEIF not Defined(DELPHIXEUP)}
+procedure TRESTDWMemTable.DataEvent(Event: TDataEvent; Info: Longint);
 {$ELSE}
-  {$IF CompilerVersion < 21}
-    procedure TRESTDWMemTable.DataEvent(Event: TDataEvent; Info: Longint);
-  {$ELSE}
-    procedure TRESTDWMemTable.DataEvent(Event: TDataEvent; Info: NativeInt);
-  {$IFEND}
-{$ENDIF}
+procedure TRESTDWMemTable.DataEvent(Event: TDataEvent; Info: NativeInt);
+{$IFEND}
 var
   vControl : boolean;
 begin
@@ -2005,7 +1990,7 @@ begin
         First;
      end;
       SortOnFields(FIndexFieldNames,FCaseInsensitiveSort);
-      {$IFNDEF FPC}
+      {$IFNDEF RESTDWLAZARUS}
         RefreshStates;
       {$ENDIF}
     end;
@@ -2287,18 +2272,18 @@ begin
   FRecordCount := FRecordCount + 1;
 end;
 
-{$IF (NOT DEFINED(FPC)) AND (CompilerVersion >= 21)}
-  procedure TRESTDWMemTable.InternalAddRecord(Buffer: TRecBuf; Append: Boolean);
-  begin
-    InternalAddRecord(Pointer(Buffer),Append);
-  end;
+{$IFDEF DELPHIXEUP}
+procedure TRESTDWMemTable.InternalAddRecord(Buffer: TRecBuf; Append: Boolean);
+begin
+  InternalAddRecord(Pointer(Buffer),Append);
+end;
 
-  procedure TRESTDWMemTable.InternalAddRecord(Buffer: TRESTDWBuffer;
-    Append: Boolean);
-  begin
-    InternalAddRecord(Pointer(Buffer),Append);
-  end;
-{$IFEND}
+procedure TRESTDWMemTable.InternalAddRecord(Buffer: TRESTDWBuffer;
+  Append: Boolean);
+begin
+  InternalAddRecord(Pointer(Buffer),Append);
+end;
+{$ENDIF}
 
 procedure TRESTDWMemTable.InternalPost;
 var
@@ -2507,14 +2492,14 @@ begin
   if FBlobField <> nil then begin
     if FPosition + Count > FBlobField^.Size then
       Count := FBlobField^.Size - FPosition;
-    {$IF (NOT DEFINED(FPC)) and (CompilerVersion < 21)}
+    {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXEUP)}
       P := FBlobField^.Buffer;
       Inc(PByte(P),FPosition);
     {$ELSE}
       P := FBlobField^.Buffer + FPosition;
     {$IFEND}
     Move(P^, Buffer, Count);
-    {$IF (NOT DEFINED(FPC)) and (CompilerVersion < 21)}
+    {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXEUP)}
       Dec(PByte(P),FPosition);
     {$ELSE}
       P := FBlobField^.Buffer - FPosition;
@@ -2555,7 +2540,7 @@ var
   P : Pointer;
 begin
   AllocBlobField(FPosition+Count);
-  {$IF (NOT DEFINED(FPC)) and (CompilerVersion < 21)}
+  {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXEUP)}
     P := FBlobField^.Buffer;
     Inc(PByte(P),FPosition);
   {$ELSE}
@@ -2563,7 +2548,7 @@ begin
   {$IFEND}
   Move(Buffer, P^, Count);
   Inc(FBlobField^.Size, Count);
-  {$IF (NOT DEFINED(FPC)) and (CompilerVersion < 21)}
+  {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXEUP)}
     Dec(PByte(P),FPosition);
   {$ELSE}
     P := FBlobField^.Buffer - FPosition;

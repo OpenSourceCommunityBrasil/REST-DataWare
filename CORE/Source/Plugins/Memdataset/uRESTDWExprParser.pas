@@ -1,5 +1,7 @@
 unit uRESTDWExprParser;
 
+{$I ..\Includes\uRESTDW.inc}
+
 {
   REST Dataware .
   Criado por XyberX (Gilberto Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -77,11 +79,11 @@ implementation
 uses
   Classes, Variants, Masks;
 
-{$IFDEF COMPILER12_UP}
+{$IFDEF DELPHI2009UP}
   // Our charsets do not contain any char > 127 what makes it safe because the
   // compiler generates correct code.
   {$WARN WIDECHAR_REDUCED OFF}
-{$ENDIF COMPILER12_UP}
+{$ENDIF DELPHI2009UP}
 
 const
   cNumbers = ['0'..'9'];
