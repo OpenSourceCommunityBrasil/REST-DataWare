@@ -70,7 +70,7 @@ Const
  SecondsInDay                   = 86400;  {Number of seconds in a day}
  SecondsInHour                  = 3600;   {Number of seconds in an hour}
  SecondsInMinute                = 60;     {Number of seconds in a minute}
- UnixDate                       = 0;      {Date1900}
+ UnixDate                       = 25569;  {Date1900}
  AssyncCommandMSG               = '{"status":"OK", "assyncmsg":"AssyncCommand Executed"}';
  cApplicationJSON               = 'application/json';
  cAuthenticationError           = 'Error : ' + #13 + 'Authentication Error...';
