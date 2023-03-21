@@ -372,6 +372,10 @@
   {$DEFINE RESTDWAPPLE}
 {$IFEND}
 
+{$IF (Defined(IOS) or Defined(RESTDWANDROID)) AND Defined(RESTDWFMX)}
+  {$DEFINE RESTDWMOBILE}
+{$IFEND}
+
 (* End of OS Architecture Directives *)
 (******************************************************************************)
 (* GUI Directives *)

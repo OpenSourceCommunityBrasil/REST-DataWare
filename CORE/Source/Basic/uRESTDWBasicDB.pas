@@ -9807,6 +9807,7 @@ Var
    Begin
     If FindField(Value.Params[I].Name) <> Nil Then
      Begin
+      Value.Params[I].Clear;
       If Not Result Then
        Result := Not (Value.Params[I].Value = FindField(Value.Params[I].Name).Value) or (Value.Params[0].isnull);
       If ((Value.Params[I].Value = FindField(Value.Params[I].Name).Value)) And
@@ -9829,8 +9830,6 @@ Begin
    If vDetailClient <> Nil Then
     Begin
      vDetailClient.vInactive := False;
-     For J := 0 to vDetailClient.Params.Count -1 Do
-      vDetailClient.Params[J].Clear;
      If CloneDetails(vDetailClient) Then
       Begin
        vDetailClient.Active := False;

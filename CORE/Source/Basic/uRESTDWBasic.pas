@@ -6,17 +6,17 @@ unit uRESTDWBasic;
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambÃ©m tem por objetivo levar componentes compatÃ­veis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal vocÃª usuÃ¡rio que precisa
+ de produtividade e flexibilidade para produÃ§Ã£o de ServiÃ§os REST/JSON, simplificando o processo para vocÃª programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de OrganizaÃ§Ã£o dos Projetos
+ FlÃ¡vio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -107,14 +107,14 @@ Type
   Constructor Create        (aCollection : TCollection);Override;
   Destructor  Destroy;Override;//Destroy a Classe
  Published
-  Property Active                : Boolean                       Read vActive               Write vActive;            //Seta o Estado da Conexão
-  Property Compression           : Boolean                       Read vCompression          Write vCompression;       //Compressão de Dados
+  Property Active                : Boolean                       Read vActive               Write vActive;            //Seta o Estado da ConexÃ£o
+  Property Compression           : Boolean                       Read vCompression          Write vCompression;       //CompressÃ£o de Dados
   Property CriptOptions          : TCripto                       Read vCripto               Write SetCripto;
   Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams     Write vAuthOptionParams;
   Property Authentication        : Boolean                       Read vAuthentication       Write vAuthentication      Default True;
   Property Host                  : String                        Read vRestWebService       Write vRestWebService;    //Host do WebService REST
   Property Port                  : Integer                       Read vPoolerPort           Write vPoolerPort;        //A Porta do Pooler do DataSet
-  Property RequestTimeOut        : Integer                       Read vTimeOut              Write vTimeOut;           //Timeout da Requisição
+  Property RequestTimeOut        : Integer                       Read vTimeOut              Write vTimeOut;           //Timeout da RequisiÃ§Ã£o
   Property ConnectTimeOut        : Integer                       Read vConnectTimeOut       Write vConnectTimeOut;
   Property hEncodeStrings        : Boolean                       Read vEncodeStrings        Write vEncodeStrings;
   Property Encoding              : TEncodeSelect                 Read vEncoding             Write vEncoding;          //Encoding da string
@@ -160,9 +160,9 @@ Type
 End;
 
 Type
- TRESTClientPoolerBase = Class(TRESTDWComponent) //Novo Componente de Acesso a Requisições REST para o RESTDataware
+ TRESTClientPoolerBase = Class(TRESTDWComponent) //Novo Componente de Acesso a RequisiÃ§Ãµes REST para o RESTDataware
  Protected
-  //Variáveis, Procedures e  Funções Protegidas
+  //VariÃ¡veis, Procedures e  FunÃ§Ãµes Protegidas
   vCripto           : TCripto;
   Procedure SetOnWork      (Value             : TOnWork);
   Procedure SetOnWorkBegin (Value             : TOnWork);
@@ -172,7 +172,7 @@ Type
   Procedure SetAllowCookies(Value             : Boolean);
  Private
   vClientIpVersion      : TRESTDWClientIpVersions;
-  //Variáveis, Procedures e Funções Privadas
+  //VariÃ¡veis, Procedures e FunÃ§Ãµes Privadas
   vTransparentProxy    : TProxyConnectionInfo;
   vOnWorkBegin,
   vOnWork              : TOnWork;
@@ -221,7 +221,7 @@ Type
   Procedure   SetDataRoute   (Value : String);
   Procedure   SetIpVersion   (IpV: TRESTDWClientIpVersions);
  Public
-  //Métodos, Propriedades, Variáveis, Procedures e Funções Publicas
+  //MÃ©todos, Propriedades, VariÃ¡veis, Procedures e FunÃ§Ãµes Publicas
   Procedure   ReconfigureConnection(TypeRequest           : Ttyperequest;
                                     WelcomeMessage,
                                     Host                  : String;
@@ -250,7 +250,7 @@ Type
   Property    LastErrorMessage     : String                        Read vLastErrorMessage        Write vLastErrorMessage;
   Property    LastErrorCode        : Integer                       Read vErrorCode               Write vErrorCode;
  Published
-  //Métodos e Propriedades
+  //MÃ©todos e Propriedades
   Property DataCompression         : Boolean                       Read vDatacompress            Write vDatacompress;
   Property Accept                  : String                        Read vAccept                  Write vAccept;
   Property AcceptEncoding          : String                        Read vAcceptEncoding          Write vAcceptEncoding;
@@ -360,8 +360,8 @@ Type
    Property CriptOptions          : TCripto                    Read vCripto                Write vCripto;
    Property MultiCORE             : Boolean                    Read vMultiCORE             Write vMultiCORE;
    Property RequestTimeout        : Integer                    Read vServiceTimeout        Write vServiceTimeout;
-   Property ServicePort           : Integer                    Read vServicePort           Write vServicePort;  //A Porta do Serviço do DataSet
-   Property ProxyOptions          : TProxyConnectionInfo       Read vProxyOptions          Write vProxyOptions; //Se tem Proxy diz quais as opções
+   Property ServicePort           : Integer                    Read vServicePort           Write vServicePort;  //A Porta do ServiÃ§o do DataSet
+   Property ProxyOptions          : TProxyConnectionInfo       Read vProxyOptions          Write vProxyOptions; //Se tem Proxy diz quais as opÃ§Ãµes
    Property GarbageTime           : Integer                    Read vGarbageTime           Write vGarbageTime;
    Property AccessTag             : String                     Read vAccessTag             Write vAccessTag;
    Property LoginMessage          : String                     Read vLoginMessage          Write vLoginMessage;
@@ -629,8 +629,8 @@ Type
   Property DefaultUrl              : String                        Read aDefaultUrl              Write aDefaultUrl;
   Property PathTraversalRaiseError : Boolean                       Read vPathTraversalRaiseError Write vPathTraversalRaiseError;
   Property RequestTimeout          : Integer                       Read vServiceTimeout          Write vServiceTimeout;
-  Property ServicePort             : Integer                       Read vServicePort             Write vServicePort;  //A Porta do Serviço do DataSet
-  Property ProxyOptions            : TProxyConnectionInfo          Read vProxyOptions            Write vProxyOptions; //Se tem Proxy diz quais as opções
+  Property ServicePort             : Integer                       Read vServicePort             Write vServicePort;  //A Porta do ServiÃ§o do DataSet
+  Property ProxyOptions            : TProxyConnectionInfo          Read vProxyOptions            Write vProxyOptions; //Se tem Proxy diz quais as opÃ§Ãµes
   Property AuthenticationOptions   : TRESTDWServerAuthOptionParams Read vServerAuthOptions       Write SetServerAuthOptions;
   Property ServerMethodClass       : TComponentClass               Read aServerMethod            Write SetServerMethod;
   Property OnLastRequest           : TLastRequest                  Read vLastRequest             Write vLastRequest;
@@ -649,7 +649,7 @@ Type
   Property ServerIPVersionConfig   : TRESTDWServerIpVersionConfig  Read vServerIpVersionConfig   Write vServerIpVersionConfig;
 End;
 
-//Heranças para Servidores Standalone
+//HeranÃ§as para Servidores Standalone
 Type
  TRESTServicePoolerBase   = Class(TRESTServiceBase)
 End;
@@ -671,7 +671,7 @@ Type
   Property    OnCreate : TOnCreate     Read vOnCreate        Write vOnCreate;
 End;
 
-//Heranças para Servidores CGI/Isapi
+//HeranÃ§as para Servidores CGI/Isapi
 Type
  TRESTServiceShareBase    = Class(TRESTServiceBase)
  Protected
@@ -1076,7 +1076,7 @@ Var
  vTempSend            : String;
  vConnection          : TRESTDWPoolerMethodClient;
 Begin
- //Atualização de Token na autenticação
+ //AtualizaÃ§Ã£o de Token na autenticaÃ§Ã£o
  Result                       := '';
  MessageError                 := '';
  vConnection                  := TRESTDWPoolerMethodClient.Create(Nil);
@@ -1731,7 +1731,7 @@ Var
    If Assigned(vTempServerMethods) Then
     Begin
      Try
-      {$IFNDEF POSIX} //no linux nao precisa libertar porque é [weak]
+      {$IFNDEF POSIX} //no linux nao precisa libertar porque Ã© [weak]
       FreeAndNil(vTempServerMethods); //.free;
       {$ENDIF}
      Except
@@ -2121,6 +2121,8 @@ Begin
               LBoundaryStart   := '--'           + boundary;
               LBoundaryEnd     := LBoundaryStart + '--';
               decoder          := TRESTDWMessageDecoderMIME.Create(nil);
+              TRESTDWMessageDecoderMIME(decoder).Headers.Values['Content-Transfer-Encoding'] := '8bit';
+              TRESTDWMessageDecoderMIME(decoder).BodyEncoded := False;
               TRESTDWMessageDecoderMIME(decoder).MIMEBoundary := boundary;
               decoder.SourceStream := ContentStringStream;
               decoder.FreeSourceStream := False;
@@ -2154,6 +2156,8 @@ Begin
            Repeat
 //            If Not Assigned(decoder) Then
             decoder := TRESTDWMessageDecoderMIME.Create(nil);
+            TRESTDWMessageDecoderMIME(decoder).Headers.Values['Content-Transfer-Encoding'] := '8bit';
+            TRESTDWMessageDecoderMIME(decoder).BodyEncoded := False;
             TRESTDWMessageDecoderMIME(decoder).MIMEBoundary := boundary;
             decoder.SourceStream := ContentStringStream;
             decoder.FreeSourceStream := False;
@@ -2206,7 +2210,7 @@ Begin
                                        length(lowercase(tmp)));
                   End;
                 End;
-                // Correção de FORM-DATA / FILE criar parametros automaticos: ICO 20-09-2019
+                // CorreÃ§Ã£o de FORM-DATA / FILE criar parametros automaticos: ICO 20-09-2019
                If (vObjectName <> '') Then
                 JSONParam.ParamName        := vObjectName
                Else
@@ -2235,7 +2239,8 @@ Begin
                 End
                Else
                 Begin
-                 vBaseData := Copy(TStringStream(ms).DataString, 1, TStringStream(ms).Size);
+                 //vBaseData := Copy(TStringStream(ms).DataString, 1, TStringStream(ms).Size);
+                 SetString(vBaseData, PChar(TStringStream(ms).Memory), TStringStream(ms).Size div SizeOf(Char));
                  If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(vBaseData)) > 0) Then
                   JSONParam.FromJSON(vBaseData)
                  Else
@@ -2368,6 +2373,8 @@ Begin
                 If decoder <> Nil Then
                  FreeAndNil(decoder);
                 decoder := TRESTDWMessageDecoderMIME.Create(Nil);
+                TRESTDWMessageDecoderMIME(decoder).Headers.Values['Content-Transfer-Encoding'] := '8bit';
+                TRESTDWMessageDecoderMIME(decoder).BodyEncoded := False;
                 TRESTDWMessageDecoderMIME(decoder).MIMEBoundary := boundary;
                Finally
                End;
@@ -2418,6 +2425,8 @@ Begin
                 Try
                  Repeat
                   decoder := TRESTDWMessageDecoderMIME.Create(nil);
+                  TRESTDWMessageDecoderMIME(decoder).Headers.Values['Content-Transfer-Encoding'] := '8bit';
+                  TRESTDWMessageDecoderMIME(decoder).BodyEncoded := False;
                   TRESTDWMessageDecoderMIME(decoder).MIMEBoundary := boundary;
                   decoder.SourceStream := ContentStringStream;
                   decoder.FreeSourceStream := False;
@@ -2469,7 +2478,7 @@ Begin
                                              length(lowercase(tmp)));
                         end;
                       end;
-                      // Correção de FORM-DATA / FILE criar parametros automaticos: ICO 20-09-2019
+                      // CorreÃ§Ã£o de FORM-DATA / FILE criar parametros automaticos: ICO 20-09-2019
                       If (lowercase(vObjectName) = 'binarydata') then
                        Begin
                         DWParams.LoadFromStream(ms);
@@ -2680,7 +2689,7 @@ Begin
                   TRESTDWDataUtils.ParseBodyRawToDWParam(mb, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
                 End;
               End;
-             {Fim alteração feita por Tiago Istuque - 28/12/2018}
+             {Fim alteraÃ§Ã£o feita por Tiago Istuque - 28/12/2018}
             Finally
              mb.Free;
             End;
@@ -3574,7 +3583,7 @@ Begin
        If Assigned(vTempServerMethods) Then
         Begin
          Try
-          {$IFDEF POSIX} //no linux nao precisa libertar porque é [weak]
+          {$IFDEF POSIX} //no linux nao precisa libertar porque Ã© [weak]
           {$ELSE}
           FreeAndNil(vTempServerMethods); //.free;
           {$ENDIF}
