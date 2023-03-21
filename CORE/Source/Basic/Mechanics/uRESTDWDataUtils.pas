@@ -677,13 +677,13 @@ Begin
                  vMD5        := TTokenValue.GetMD5(vSecrets);
                  If vFinalRequest <> 0 Then
                   vBuildData := Format(cValueToken, [viss,
-                                                     IntToStr(DateTimeToUnix(vFinalRequest{$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF})),
-                                                     IntToStr(DateTimeToUnix(vInitRequest{$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF})),
+                                                     IntToStr(DateTimeToUnix(vFinalRequest, False)),
+                                                     IntToStr(DateTimeToUnix(vInitRequest, False)),
                                                      EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
                                                                    {$IFDEF FPC}, csUndefined{$ENDIF})])
                  Else
                   vBuildData := Format(cValueTokenNoLife, [viss,
-                                                           IntToStr(DateTimeToUnix(vInitRequest{$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF})),
+                                                           IntToStr(DateTimeToUnix(vInitRequest, False)),
                                                            EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
                                                                          {$IFDEF FPC}, csUndefined{$ENDIF})]);
                  Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF FPC}, csUndefined{$ENDIF});

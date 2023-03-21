@@ -274,16 +274,16 @@ begin
         begin
           if FTokenType = rdwTS then
             FBeginTime := TTokenValue.DateTimeFromISO8601(LJsonValue.PairByName['iat'].Value)
-          else if FTokenType = rdwJWT then
-            FBeginTime := UnixToDateTime(StrToInt64(LJsonValue.PairByName['iat'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ENDIF});
+          else
+            FBeginTime := UnixToDateTime(StrToInt64(LJsonValue.PairByName['iat'].Value), False);
         end;
 
         if not lJsonValue.PairByName['exp'].IsNull then
         begin
           if FTokenType = rdwTS then
             FEndTime := TTokenValue.DateTimeFromISO8601(LJsonValue.PairByName['exp'].Value)
-          else if FTokenType = rdwJWT Then
-            FEndTime := UnixToDateTime(StrToInt64(LJsonValue.PairByName['exp'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ENDIF});
+          else
+            FEndTime := UnixToDateTime(StrToInt64(LJsonValue.PairByName['exp'].Value), False);
         end;
 
         if not LJsonValue.PairByName['secrets'].IsNull Then
@@ -421,7 +421,7 @@ var
             if FTokenType = rdwTS then
               FBeginTime := TTokenValue.DateTimeFromISO8601(LJsonValue.PairByName['iat'].Value)
             else
-              FBeginTime   := UnixToDateTime(StrToInt64(LJsonValue.PairByName['iat'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ENDIF});
+              FBeginTime   := UnixToDateTime(StrToInt64(LJsonValue.PairByName['iat'].Value), False);
           end;
 
           Result := Trim(LJsonValue.PairByName['secrets'].Name) <> '';
@@ -436,7 +436,7 @@ var
             if FTokenType = rdwTS then
               FEndTime := TTokenValue.DateTimeFromISO8601(LJsonValue.PairByName['exp'].Value)
             else
-              FEndTime := UnixToDateTime(StrToInt64(LJsonValue.PairByName['exp'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ENDIF});
+              FEndTime := UnixToDateTime(StrToInt64(LJsonValue.PairByName['exp'].Value), False);
 
             Result := Now < FEndTime;
           end;
