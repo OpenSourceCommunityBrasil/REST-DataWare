@@ -1,6 +1,6 @@
 unit uRESTDWMassiveBuffer;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -46,7 +46,7 @@ End;
   vModified,
   vBinary     : Boolean;
   vJSONValue  : TJSONValue;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
    vDatabaseCharSet : TDatabaseCharSet;
   {$ENDIF}
   vValueName   : String;
@@ -74,7 +74,7 @@ End;
   Property    Value       : Variant      Read GetValue     Write SetValue;
   Property    Binary      : Boolean      Read vBinary      Write vBinary;
   Property    Modified    : Boolean      Read vModified;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Property DatabaseCharSet : TDatabaseCharSet Read vDatabaseCharSet Write vDatabaseCharSet;
   {$ENDIF}
   Property Encoding          : TEncodeSelect  Read vEncoding        Write SetEncoding;
@@ -278,7 +278,7 @@ End;
   vSequenceName,
   vSequenceField,
   vTableName       : String;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   vDatabaseCharSet : TDatabaseCharSet;
   {$ENDIF}
   vEncoding        : TEncodeSelect;
@@ -346,7 +346,7 @@ End;
   Property  Params          : TRESTDWParams        Read vDWParams        Write vDWParams;
   Property  TableName       : String               Read vTableName;
   Property  OnLoad          : Boolean              Read vOnLoad;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Property DatabaseCharSet  : TDatabaseCharSet     Read vDatabaseCharSet Write vDatabaseCharSet;
   {$ENDIF}
   Property Encoding         : TEncodeSelect        Read vEncoding        Write SetEncoding;
@@ -677,18 +677,14 @@ Begin
    If Assigned(TList(Self).Items[Index]) Then
     Begin
      If Assigned(TMassiveField(TList(Self).Items[Index]^)) Then
-      Begin
-       {$IFDEF FPC}
+     Begin
+       {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHI10_4UP)}
        FreeAndNil(TList(Self).Items[Index]^);
        {$ELSE}
-        {$IF CompilerVersion > 33}
-         FreeAndNil(TMassiveField(TList(Self).Items[Index]^));
-         {$ELSE}
-         FreeAndNil(TList(Self).Items[Index]^);
-        {$IFEND}
-       {$ENDIF}
-      End;
-     {$IFDEF FPC}
+       FreeAndNil(TMassiveField(TList(Self).Items[Index]^));
+       {$IFEND}
+     End;
+     {$IFDEF RESTDWLAZARUS}
       Dispose(PMassiveField(TList(Self).Items[Index]));
      {$ELSE}
       Dispose(TList(Self).Items[Index]);
@@ -849,7 +845,7 @@ Begin
  If vJSONValue <> Nil Then
   Begin
    vJSONValue.Binary  := vBinary;
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
    vJSONValue.DatabaseCharSet := csUndefined;
    {$ENDIF}
    vJSONValue.LoadFromStream(Stream);
@@ -880,7 +876,7 @@ Begin
  If vJSONValue <> Nil Then
   Begin
    vJSONValue.Binary  := vBinary;
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
    vJSONValue.DatabaseCharSet := csUndefined;
    {$ENDIF}
    If vJSONValue.Binary Then
@@ -919,7 +915,7 @@ Procedure TMassiveValues.Delete(Index: Integer);
 Begin
  If (Index < Self.Count) And (Index > -1) Then
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
    If Assigned(PMassiveValue(TList(Self).Items[Index])) Then
     Begin
      If Assigned(PMassiveValue(TList(Self).Items[Index])^) Then
@@ -1118,7 +1114,7 @@ Begin
    Begin
     BufferStream.InputBytes(VarToBytes(Changes.Count > 0, varBoolean));
     If Changes.Count > 0 Then
-     BufferStream.InputBytes(VarToBytes(EncodeStrings(Changes.Text{$IFDEF FPC}, TDatabaseCharSet.csUTF8{$ENDIF}), varString));
+     BufferStream.InputBytes(VarToBytes(EncodeStrings(Changes.Text{$IFDEF RESTDWLAZARUS}, TDatabaseCharSet.csUTF8{$ENDIF}), varString));
     If vPrimaryValues = Nil Then
      BufferStream.InputBytes(VarToBytes(False, varBoolean))
     Else
@@ -1228,7 +1224,7 @@ Procedure TMassiveBuffer.Delete(Index: Integer);
 Begin
  If (Index < Self.Count) And (Index > -1) Then
   Begin
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
    If (Index <= Self.Count -1) Then
    {$ENDIF}
    If Assigned(TList(Self).Items[Index]) Then
@@ -1236,7 +1232,7 @@ Begin
      Try
       If Assigned(TMassiveLine(TList(Self).Items[Index]^)) Then
        FreeAndNil(PMassiveLine(TList(Self).Items[Index])^);
-      {$IFDEF FPC}
+      {$IFDEF RESTDWLAZARUS}
        Dispose(PMassiveLine(TList(Self).Items[Index]));
       {$ELSE}
        Dispose(TList(Self).Items[Index]);
@@ -1297,7 +1293,7 @@ Begin
        MassiveValue.ObjectValue            := vMassiveFields.Items[I -1].vFieldType;
        MassiveValue.vJSONValue.ObjectValue := MassiveValue.ObjectValue;
       End;
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
      MassiveValue.DatabaseCharSet := DatabaseCharSet;
      {$ENDIF}
      If I = 0 Then
@@ -1607,8 +1603,8 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
           vBookmark := BookmarkToHex(TRESTDWBytes(TRESTDWClientSQL(Dataset).Bookmark));
          Except
          End;
-         vTagkey := IntToStr(vLastOpen) + '|' + EncodeStrings(vBookmark{$IFDEF FPC}, csUndefined{$ENDIF});
-         MassiveLineBuff.vMassiveValues.Items[MassiveLineBuff.vMassiveValues.Count -1].Value := EncodeStrings(vTagKey{$IFDEF FPC}, csUndefined{$ENDIF});
+         vTagkey := IntToStr(vLastOpen) + '|' + EncodeStrings(vBookmark{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+         MassiveLineBuff.vMassiveValues.Items[MassiveLineBuff.vMassiveValues.Count -1].Value := EncodeStrings(vTagKey{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
         End;
       End
      Else If Dataset is TRESTDWTable Then
@@ -1619,8 +1615,8 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
           vBookmark := BookmarkToHex(TRESTDWBytes(TRESTDWTable(Dataset).Bookmark));
          Except
          End;
-         vTagkey := IntToStr(vLastOpen) + '|' + EncodeStrings(vBookmark{$IFDEF FPC}, csUndefined{$ENDIF});
-         MassiveLineBuff.vMassiveValues.Items[MassiveLineBuff.vMassiveValues.Count -1].Value := EncodeStrings(vTagKey{$IFDEF FPC}, csUndefined{$ENDIF});
+         vTagkey := IntToStr(vLastOpen) + '|' + EncodeStrings(vBookmark{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+         MassiveLineBuff.vMassiveValues.Items[MassiveLineBuff.vMassiveValues.Count -1].Value := EncodeStrings(vTagKey{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
         End;
       End;
     End;
@@ -2338,7 +2334,7 @@ Var
          End;
         aBool := BytesToVar(BufferStream.ReadBytes, varBoolean);
         If aBool Then
-         MassiveLine.vChanges.Text := DecodeStrings(BytesToVar(BufferStream.ReadBytes, varString){$IFDEF FPC}, TDatabaseCharSet.csUTF8{$ENDIF});
+         MassiveLine.vChanges.Text := DecodeStrings(BytesToVar(BufferStream.ReadBytes, varString){$IFDEF RESTDWLAZARUS}, TDatabaseCharSet.csUTF8{$ENDIF});
         aBool := BytesToVar(BufferStream.ReadBytes, varBoolean);
         If aBool Then
          Begin
@@ -2449,7 +2445,7 @@ Begin
     aTagLinkFields     := BytesToVar(BufferBase.ReadBytes, varString);
     If Trim(aTagLinkFields) <> '' Then
      Begin
-      vMasterCompFields := DecodeStrings(aTagLinkFields{$IFDEF FPC}, csUndefined{$ENDIF});
+      vMasterCompFields := DecodeStrings(aTagLinkFields{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
       BuildCompFields(vMasterCompFields);
      End;
     //Carregando Body
@@ -2664,7 +2660,7 @@ Begin
       vMasterCompTag    := bJsonValue.pairs[10].Value;
       If Not (bJsonValue.pairs[11].IsNull) Then
        Begin
-        vMasterCompFields := DecodeStrings(bJsonValue.pairs[11].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+        vMasterCompFields := DecodeStrings(bJsonValue.pairs[11].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
         BuildCompFields(vMasterCompFields);
        End;
      End;
@@ -2714,10 +2710,10 @@ Begin
             Begin
              FreeAndNil(bJsonOBJC);
              bJsonOBJC    := TRESTDWJSONInterfaceObject(bJsonArrayD.GetObject(1));
-             vDataexec.Text := DecodeStrings(bJsonOBJC.Pairs[0].Value{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
+             vDataexec.Text := DecodeStrings(bJsonOBJC.Pairs[0].Value{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
              FreeAndNil(bJsonOBJC);
              bJsonOBJC    := TRESTDWJSONInterfaceObject(bJsonArrayD.GetObject(2));
-             vDWParams.FromJSON(DecodeStrings(bJsonOBJC.Pairs[0].Value{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}));
+             vDWParams.FromJSON(DecodeStrings(bJsonOBJC.Pairs[0].Value{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}));
             End;
            FreeAndNil(bJsonOBJC);
            MassiveLine  := TMassiveLine.Create;
@@ -2779,7 +2775,7 @@ Begin
                    If (Not (TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].isnull))        And
                       (TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].Value <> cNullValue) Then
                     Begin
-                     vTempValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+                     vTempValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
                      MassiveLine.Values[GetFieldIndex(MassiveLine.vChanges[C-1]) +1].Value := vTempValue;
                      {$IFNDEF FPC}
                       {$IF (CompilerVersion < 19)}
@@ -2836,7 +2832,7 @@ Begin
                    If vMassiveFields.Items[C-1].vFieldType in [ovString, ovWideString, ovMemo, ovWideMemo, ovFixedChar, ovFixedWideChar] Then
                     Begin
                      If lowercase(TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].Value) <> cNullvalue then
-                      MassiveLine.Values[C].Value := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].Value{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
+                      MassiveLine.Values[C].Value := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
                      Else
                       MassiveLine.Values[C].Value := TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].Value;
                     End
@@ -2973,8 +2969,8 @@ Var
    Begin
     vMassiveMode := MassiveLineBuff.MassiveMode;
     vTempLine    := Format('["%s", "%s", "%s"]', [MassiveModeToString(vMassiveMode),
-                                                  EncodeStrings(MassiveLineBuff.DataExec.Text{$IFDEF FPC}, csUndefined{$ENDIF}),
-                                                  EncodeStrings(MassiveLineBuff.Params.ToJSON{$IFDEF FPC}, csUndefined{$ENDIF})]);
+                                                  EncodeStrings(MassiveLineBuff.DataExec.Text{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
+                                                  EncodeStrings(MassiveLineBuff.Params.ToJSON{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
    End
   Else
    Begin
@@ -3028,7 +3024,7 @@ Var
          Begin
           If vMassiveFields.Items[I-1].vFieldType in [ovString, ovWideString, ovMemo, ovWideMemo, ovFixedChar, ovFixedWideChar] Then
            Begin
-            vTempValue    := Format('"%s"', [EncodeStrings(MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value{$IFDEF FPC}, csUndefined{$ENDIF})])
+            vTempValue    := Format('"%s"', [EncodeStrings(MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})])
            End
           Else
            vTempValue    := Format('"%s"', [MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.AsString])
@@ -3088,7 +3084,7 @@ Begin
  vTagFields := vTagFields + Format(', {"lines":[%s]}', [vLines]);
  vTagLinkFields := '';
  If Trim(vMasterCompFields) <> '' Then
-  vTagLinkFields := EncodeStrings(vMasterCompFields{$IFDEF FPC}, csUndefined{$ENDIF});
+  vTagLinkFields := EncodeStrings(vMasterCompFields{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
  Result := Format(TMassiveFormatJSON, ['ObjectType',   GetObjectName(toMassive),
                                        'Direction',    GetDirectionName(odINOUT),
                                        'Encoded',      'true',
@@ -3136,7 +3132,7 @@ begin
     Begin
      If Assigned(TRESTDWMassiveCacheValue(TList(Self).Items[Index]^)) Then
       TRESTDWMassiveCacheValue(TList(Self).Items[Index]^).Free;
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
       Dispose(PMassiveCacheValue(TList(Self).Items[Index]));
      {$ELSE}
       Dispose(TList(Self).Items[Index]);
@@ -3208,7 +3204,7 @@ Var
    Begin
     Result := StrToInt(Copy(BookmarkSTR, InitStrPos, (Pos('|', BookmarkSTR) - FinalStrPos) -1));
     DeleteStr(BookmarkSTR, InitStrPos, (Pos('|', BookmarkSTR) - FinalStrPos));
-    LastTime := DecodeStrings(BookmarkSTR{$IFDEF FPC}, csUndefined{$ENDIF});
+    LastTime := DecodeStrings(BookmarkSTR{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
    End;
  End;
 Begin
@@ -3221,7 +3217,7 @@ Begin
    Begin
     bJsonValueB := bJsonArray.GetObject(I);
     Try
-     vBookmark     := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+     vBookmark     := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
      vComponentTag := TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[2].Value;
      vJSONItems    := TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[1].Value;
      Dataset       := MassiveCacheDatasetList.GetDataset(vComponentTag);
@@ -3283,7 +3279,7 @@ Begin
                   Begin
                    If (vValue <> Null) And (Trim(vValue) <> cNullvalue) and (Trim(vValue) <> '') Then
                     Begin
-                     vValue := DecodeStrings(vValue{$IFDEF FPC}, csUndefined{$ENDIF});
+                     vValue := DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
                      {$IFNDEF FPC}{$IF CompilerVersion < 18}
                      vValue := utf8Decode(vValue);
                      {$IFEND}{$ENDIF}
@@ -3303,7 +3299,7 @@ Begin
                       Begin
                        If vValue <> Null Then
                         Begin
-                         vValue := DecodeStrings(vValue{$IFDEF FPC}, csUndefined{$ENDIF});
+                         vValue := DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
                          If TRESTDWClientSQL(Dataset).FindField(TRESTDWJSONInterfaceObject(bJsonValueY).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
                           Begin
                            {$IFNDEF FPC}
@@ -3366,7 +3362,7 @@ Begin
                      Else
                       Begin
                        If vValue <> '' Then
-                        TRESTDWClientSQL(Dataset).FindField(TRESTDWJSONInterfaceObject(bJsonValueY).Pairs[0].Name).AsString := DecodeStrings(vValue{$IFDEF FPC}, csUndefined{$ENDIF})
+                        TRESTDWClientSQL(Dataset).FindField(TRESTDWJSONInterfaceObject(bJsonValueY).Pairs[0].Name).AsString := DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
                        Else
                         TRESTDWClientSQL(Dataset).FindField(TRESTDWJSONInterfaceObject(bJsonValueY).Pairs[0].Name).Clear;
                       End;
@@ -3411,7 +3407,7 @@ Begin
                   Begin
                    If (vValue <> Null) And (Trim(vValue) <> cNullvalue) and (Trim(vValue) <> '') Then
                     Begin
-                     vValue := DecodeStrings(vValue{$IFDEF FPC}, csUndefined{$ENDIF});
+                     vValue := DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
                      {$IFNDEF FPC}{$IF CompilerVersion < 18}
                      vValue := utf8Decode(vValue);
                      {$IFEND}{$ENDIF}
@@ -3431,7 +3427,7 @@ Begin
                       Begin
                        If vValue <> Null Then
                         Begin
-                         vValue := DecodeStrings(vValue{$IFDEF FPC}, csUndefined{$ENDIF});
+                         vValue := DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
                          If TRESTDWTable(Dataset).FindField(TRESTDWJSONInterfaceObject(bJsonValueY).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
                           Begin
                            {$IFNDEF FPC}
@@ -3494,7 +3490,7 @@ Begin
                      Else
                       Begin
                        If vValue <> '' Then
-                        TRESTDWTable(Dataset).FindField(TRESTDWJSONInterfaceObject(bJsonValueY).Pairs[0].Name).AsString := DecodeStrings(vValue{$IFDEF FPC}, csUndefined{$ENDIF})
+                        TRESTDWTable(Dataset).FindField(TRESTDWJSONInterfaceObject(bJsonValueY).Pairs[0].Name).AsString := DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
                        Else
                         TRESTDWTable(Dataset).FindField(TRESTDWJSONInterfaceObject(bJsonValueY).Pairs[0].Name).Clear;
                       End;
@@ -3824,7 +3820,7 @@ Begin
  vParamCount     := 0;
  vBinaryRequest  := False;
  vMassiveSQLMode := msqlExecute;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   vSQL.OnChange := @OnChangingSQL;
  {$ELSE}
   vSQL.OnChange := OnChangingSQL;
@@ -3884,7 +3880,7 @@ Begin
    vStringStream := TStringStream.Create('');
    Try
     TRESTDWPropertyPersist(Params[I]).SaveToStream(vStringStream);
-    vTempLine := EncodeStrings(vStringStream.DataString{$IFDEF FPC}, csUndefined{$ENDIF});
+    vTempLine := EncodeStrings(vStringStream.DataString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
    Finally
     vStringStream.Free;
    End;
@@ -3915,18 +3911,18 @@ Begin
     Begin
      vDWParams     := GeTRESTDWParams(vMassiveCacheSQLList[A].vParams, vEncoding);
      If Assigned(vDWParams) Then
-      vParamsString := EncodeStrings(vDWParams.ToJSON{$IFDEF FPC}, csUndefined{$ENDIF});
+      vParamsString := EncodeStrings(vDWParams.ToJSON{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
     End
    Else
     vParamsString := EncodeStream(vMassiveCacheSQLList[A].MemDS);
    vTempJSON  := Format(cJSONValue, [MassiveSQLMode(vMassiveCacheSQLList[A].vMassiveSQLMode),
-                                     EncodeStrings(vMassiveCacheSQLList[A].vSQL.Text{$IFDEF FPC},         csUndefined{$ENDIF}),
+                                     EncodeStrings(vMassiveCacheSQLList[A].vSQL.Text{$IFDEF RESTDWLAZARUS},         csUndefined{$ENDIF}),
                                      vParamsString,
-                                     EncodeStrings(vMassiveCacheSQLList[A].vBookmark{$IFDEF FPC},         csUndefined{$ENDIF}),
+                                     EncodeStrings(vMassiveCacheSQLList[A].vBookmark{$IFDEF RESTDWLAZARUS},         csUndefined{$ENDIF}),
                                      BooleanToString(vMassiveCacheSQLList[A].vBinaryRequest),
-                                     EncodeStrings(vMassiveCacheSQLList[A].vFetchRowSQL.Text{$IFDEF FPC}, csUndefined{$ENDIF}),
-                                     EncodeStrings(vMassiveCacheSQLList[A].vLockSQL.Text{$IFDEF FPC},     csUndefined{$ENDIF}),
-                                     EncodeStrings(vMassiveCacheSQLList[A].vUnlockSQL.Text{$IFDEF FPC},   csUndefined{$ENDIF})]);
+                                     EncodeStrings(vMassiveCacheSQLList[A].vFetchRowSQL.Text{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
+                                     EncodeStrings(vMassiveCacheSQLList[A].vLockSQL.Text{$IFDEF RESTDWLAZARUS},     csUndefined{$ENDIF}),
+                                     EncodeStrings(vMassiveCacheSQLList[A].vUnlockSQL.Text{$IFDEF RESTDWLAZARUS},   csUndefined{$ENDIF})]);
    If vJSONValue = '' Then
     vJSONValue := vTempJSON
    Else
@@ -3974,18 +3970,18 @@ Begin
     Begin
      vDWParams     := GeTRESTDWParams(Items[A].vParams, vEncoding);
      If Assigned(vDWParams) Then
-      vParamsString := EncodeStrings(vDWParams.ToJSON{$IFDEF FPC}, csUndefined{$ENDIF});
+      vParamsString := EncodeStrings(vDWParams.ToJSON{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
     End
    Else
     vParamsString := EncodeStream(Items[A].MemDS);
    vTempJSON  := Format(cJSONValue, [MassiveSQLMode(Items[A].vMassiveSQLMode),
-                                     EncodeStrings(Items[A].vSQL.Text{$IFDEF FPC},         csUndefined{$ENDIF}),
+                                     EncodeStrings(Items[A].vSQL.Text{$IFDEF RESTDWLAZARUS},         csUndefined{$ENDIF}),
                                      vParamsString,
-                                     EncodeStrings(Items[A].vBookmark{$IFDEF FPC},         csUndefined{$ENDIF}),
+                                     EncodeStrings(Items[A].vBookmark{$IFDEF RESTDWLAZARUS},         csUndefined{$ENDIF}),
                                      BooleanToString(Items[A].vBinaryRequest),
-                                     EncodeStrings(Items[A].vFetchRowSQL.Text{$IFDEF FPC}, csUndefined{$ENDIF}),
-                                     EncodeStrings(Items[A].vLockSQL.Text{$IFDEF FPC},     csUndefined{$ENDIF}),
-                                     EncodeStrings(Items[A].vUnlockSQL.Text{$IFDEF FPC},   csUndefined{$ENDIF})]);
+                                     EncodeStrings(Items[A].vFetchRowSQL.Text{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
+                                     EncodeStrings(Items[A].vLockSQL.Text{$IFDEF RESTDWLAZARUS},     csUndefined{$ENDIF}),
+                                     EncodeStrings(Items[A].vUnlockSQL.Text{$IFDEF RESTDWLAZARUS},   csUndefined{$ENDIF})]);
    If vJSONValue = '' Then
     vJSONValue := vTempJSON
    Else
@@ -4078,7 +4074,7 @@ Begin
     Begin
      If Assigned(TMassiveReplyValue(TList(Self).Items[Index]^)) Then
       Begin
-       {$IFDEF FPC}
+       {$IFDEF RESTDWLAZARUS}
        FreeAndNil(TList(Self).Items[Index]^);
        {$ELSE}
         {$IF CompilerVersion > 33}
@@ -4088,7 +4084,7 @@ Begin
         {$IFEND}
        {$ENDIF}
       End;
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
       Dispose(PMassiveReplyValue(TList(Self).Items[Index]));
      {$ELSE}
       Dispose(TList(Self).Items[Index]);
@@ -4248,7 +4244,7 @@ Begin
     Begin
      If Assigned(TMassiveReplyCache(TList(Self).Items[Index]^)) Then
       Begin
-       {$IFDEF FPC}
+       {$IFDEF RESTDWLAZARUS}
        FreeAndNil(TList(Self).Items[Index]^);
        {$ELSE}
         {$IF CompilerVersion > 33}
@@ -4258,7 +4254,7 @@ Begin
         {$IFEND}
        {$ENDIF}
       End;
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
       Dispose(PMassiveReplyCache(TList(Self).Items[Index]));
      {$ELSE}
       Dispose(TList(Self).Items[Index]);
@@ -4361,7 +4357,7 @@ begin
   Begin
    If Assigned(TList(Self).Items[Index]) Then
     Begin
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
       Dispose(PMassiveCacheDataset(TList(Self).Items[Index]));
      {$ELSE}
       Dispose(TList(Self).Items[Index]);
