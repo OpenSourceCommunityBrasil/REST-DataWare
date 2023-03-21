@@ -165,18 +165,15 @@ Var
   Utf8Stream: TStringStream;
   Compressed: TMemoryStream;
 Begin
-  {$IFDEF FPC}
   Result := False;
+  {$IF Defined(DELPHIXEUP)}
+  Utf8Stream := TStringStream.Create(S, TEncoding.UTF8);
+  {$ELSEIF Defined(RESTDWLAZARUS)}
   Utf8Stream := TStringStream.Create(S);
   {$ELSE}
-  {$IF CompilerVersion > 24} // Delphi 2010 pra cima
-  Utf8Stream := TStringStream.Create(S{$IF CompilerVersion > 21},
-    TEncoding.UTF8{$IFEND});
-  {$ELSE} // Delphi 2010 pra cima
   Utf8Stream := TStringStream.Create('');
   Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
-  {$IFEND} // Delphi 2010 pra cima
-  {$ENDIF}
+  {$IFEND}
   Try
     Compressed := TMemoryStream.Create;
     Try
@@ -184,26 +181,15 @@ Begin
       Compressed.Position := 0;
       Try
         Value := StreamToHex(Compressed, False);
-        // Value := Encodeb64Stream(Compressed{$IFDEF FPC}, csUndefined{$ENDIF});
         Result := True;
       Finally
       End;
     Finally
-      {$IFNDEF FPC}
-      {$IF CompilerVersion > 21}
-      {$IFDEF LINUXFMX}
-      Compressed := Nil;
-      {$ELSE}
-      Compressed.Clear;
-      {$ENDIF}
-      {$IFEND}
-      FreeAndNil(Compressed);
-      {$ELSE}
-      Compressed := Nil;
-      {$ENDIF}
+      Compressed := nil;
+      Compressed.Free;
     End;
   Finally
-    {$IFNDEF FPC}{$IF CompilerVersion > 21}Utf8Stream.Clear; {$IFEND}{$ENDIF}
+    {$IFDEF DELPHIXEUP}Utf8Stream.Clear;{$ENDIF}
     FreeAndNil(Utf8Stream);
   End;
 End;
@@ -212,55 +198,33 @@ Function ZDecompressStreamD(Const S: TStringStream;
   Var Value: TStringStream): Boolean;
 Var
   Utf8Stream, Base64Stream: TStringStream;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Encoder: TBase64DecodingStream;
   {$ENDIF}
 Begin
-  {$IFDEF FPC}
-  Base64Stream := TStringStream.Create('');
-  S.Position := 0;
-  Base64Stream.CopyFrom(S, 0);
-  Base64Stream.Position := 0;
-  {$ELSE}
-  Base64Stream := TStringStream.Create(''{$IF CompilerVersion > 21},
-    TEncoding.UTF8{$IFEND});
+  Base64Stream := TStringStream.Create(''{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
   S.Position := 0;
   Base64Stream.CopyFrom(S, S.Size);
   Base64Stream.Position := 0;
-  {$ENDIF}
   Try
-    {$IFDEF FPC}
-    Value := TStringStream.Create('');
-    {$ELSE}
-    Value := TStringStream.Create('');
-    // {$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
-    {$ENDIF}
+    Value := TStringStream.Create(''{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
     Try
       Try
-        {$IFDEF FPC}
-        Utf8Stream := TStringStream.Create('');
+        Utf8Stream := TStringStream.Create(''{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
         HexToStream(Base64Stream.Datastring, Utf8Stream);
         Utf8Stream.Position := 0;
         ZDecompressStream(Utf8Stream, Value);
         Value.Position := 0;
-        {$ELSE}
-        Utf8Stream := TStringStream.Create(''{$IF CompilerVersion > 21},
-          TEncoding.UTF8{$IFEND});
-        HexToStream(Base64Stream.Datastring, Utf8Stream);
-        Utf8Stream.Position := 0;
-        ZDecompressStream(Utf8Stream, Value);
-        Value.Position := 0;
-        {$ENDIF}
         Result := True;
       Except
         Result := False;
       End;
     Finally
-      {$IFNDEF FPC}Utf8Stream.Size := 0; {$ENDIF}
+      {$IFNDEF RESTDWLAZARUS}Utf8Stream.Size := 0; {$ENDIF}
       FreeAndNil(Utf8Stream);
     End;
   Finally
-    {$IFNDEF FPC}Base64Stream.Size := 0; {$ENDIF}
+    {$IFNDEF RESTDWLAZARUS}Base64Stream.Size := 0; {$ENDIF}
     FreeAndNil(Base64Stream);
   End;
 End;
@@ -276,21 +240,20 @@ End;
 Function ZDecompressStr(Const S: String; Var Value: String): Boolean;
 Var
   Utf8Stream, Compressed, Base64Stream: TStringStream;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Encoder: TBase64DecodingStream;
   {$ENDIF}
 Begin
-  {$IFDEF FPC}
   Result := False;
-  Base64Stream := TStringStream.Create(S);
+  {$IFDEF DELPHIXEUP}
+  Base64Stream := TStringStream.Create(S, TEncoding.ANSI);
   {$ELSE}
-  Base64Stream := TStringStream.Create(S{$IF CompilerVersion > 22},
-    TEncoding.ANSI{$IFEND});
+  Base64Stream := TStringStream.Create(S);
   {$ENDIF}
   Try
     Compressed := TStringStream.Create('');
     Try
-      {$IFDEF FPC}
+      {$IFDEF RESTDWLAZARUS}
       Utf8Stream := TStringStream.Create('');
       Encoder := TBase64DecodingStream.Create(Base64Stream);
       Utf8Stream.CopyFrom(Encoder, Encoder.Size);
@@ -299,8 +262,7 @@ Begin
       Compressed.Position := 0;
       ZDecompressStream(Utf8Stream, Compressed);
       {$ELSE}
-      Utf8Stream := TStringStream.Create(''{$IF CompilerVersion > 21},
-        TEncoding.UTF8{$IFEND});
+      Utf8Stream := TStringStream.Create(''{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
       ZDecompressStream(Base64Stream, Compressed);
       Compressed.Position := 0;
       {$ENDIF}
@@ -308,15 +270,15 @@ Begin
         Value := Compressed.Datastring;
         Result := True;
       Finally
-        {$IFNDEF FPC}Utf8Stream.Size := 0; {$ENDIF}
+        {$IFNDEF RESTDWLAZARUS}Utf8Stream.Size := 0; {$ENDIF}
         FreeAndNil(Utf8Stream);
       End;
     Finally
-      {$IFNDEF FPC}Compressed.Size := 0; {$ENDIF}
+      {$IFNDEF RESTDWLAZARUS}Compressed.Size := 0; {$ENDIF}
       FreeAndNil(Compressed);
     End;
   Finally
-    {$IFNDEF FPC}Base64Stream.Size := 0; {$ENDIF}
+    {$IFNDEF RESTDWLAZARUS}Base64Stream.Size := 0; {$ENDIF}
     FreeAndNil(Base64Stream);
   End;
 End;

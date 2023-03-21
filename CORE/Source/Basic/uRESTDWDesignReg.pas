@@ -1,6 +1,6 @@
 unit uRESTDWDesignReg;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -557,42 +557,8 @@ Begin
 end;
 
 Procedure TPoolersListCDF.GetValues(Proc : TGetStrProc);
-Var
- vLista : TStringList;
- I      : Integer;
 Begin
- //Provide a list of Poolers
- vLista := Nil;
-// If GetComponent(0) is TRESTDWConnectionServer Then
-//  Begin
-//   With GetComponent(0) as TRESTDWConnectionServer Do
-//    Begin
-//     vLista := TRESTDWConnectionServer(GetComponent(0)).PoolerList;
-//     Try
-//      If Assigned(vLista) Then
-//       For I := 0 To vLista.Count -1 Do
-//        Proc (vLista[I]);
-//     Finally
-//      If Assigned(vLista) Then
-//       FreeAndNil(vLista);
-//     End;
-//    End;
-//  End
-// Else If GetComponent(0) is TRESTDWConnectionParams Then
-//  Begin
-//   With GetComponent(0) as TRESTDWConnectionParams Do
-//    Begin
-//     vLista := TRESTDWConnectionParams(GetComponent(0)).PoolerList;
-//     Try
-//      If Assigned(vLista) Then
-//       For I := 0 To vLista.Count -1 Do
-//        Proc (vLista[I]);
-//     Finally
-//      If Assigned(vLista) Then
-//       FreeAndNil(vLista);
-//     End;
-//    End;
-//  End;
+
 End;
 
 Procedure TTableList.GetValues(Proc : TGetStrProc);
@@ -870,22 +836,8 @@ begin
 end;
 
 procedure TServerEventsListCV.GetValues(Proc: TGetStrProc);
-Var
- vLista : TStringList;
- I      : Integer;
 Begin
- //Provide a list of Poolers
- vLista := Nil;
-// With GetComponent(0) as TRESTDWConnectionServerCP Do
-//  Begin
-//   vLista := TRESTDWConnectionServerCP(GetComponent(0)).GetPoolerList;
-//   Try
-//    For I := 0 To vLista.Count -1 Do
-//     Proc (vLista[I]);
-//   Except
-//   End;
-//   FreeAndNil(vLista);
-//  End;
+
 End;
 
 procedure TServerEventsList.GetValues(Proc: TGetStrProc);

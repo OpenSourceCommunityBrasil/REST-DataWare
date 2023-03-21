@@ -313,7 +313,7 @@
 {$IFDEF VER150 or CompilerVersion >= 15}
   {$DEFINE DELPHI7UP}
 {$ENDIF ~VER150}
-{$IFEND}
+{$ENDIF}
 
 (* End of Compiler Directives for IDE Version *)
 (******************************************************************************)
@@ -411,6 +411,11 @@
   {$WARN USE_BEFORE_DEF OFF}
   {$WARNINGS OFF}
   {$HINTS OFF}
+{$ENDIF}
+
+{$IFDEF DELPHI2010UP}
+  {$DEFINE SUPPORTS_UNICODE_STRING}
+  {$POINTERMATH ON}
 {$ENDIF}
 
 {$IFNDEF NEXTGEN}
