@@ -1,6 +1,6 @@
 unit uRESTDWDynamic;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 Interface
 
@@ -10,9 +10,6 @@ Uses
 
 Type
  {$IFNDEF FPC}
-  {$IF CompilerVersion >= 25}
-   {$LEGACYIFEND on}
-  {$IFEND}
   {$IF CompilerVersion < 21}
    NativeInt             = Integer;
    NativeUInt            = Cardinal;

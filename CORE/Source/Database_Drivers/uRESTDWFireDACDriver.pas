@@ -1,6 +1,6 @@
 ﻿unit uRESTDWFireDACDriver;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -149,10 +149,10 @@ end;
 function TRESTDWFireDACDriver.isAutoCommit: boolean;
 begin
   Result := False;
-  {$IF CompilerVersion >= 30}
+  {$IFDEF DELPHI10_0UP}
     if Assigned(Connection) then
       Result := TFDConnection(Connection).UpdateOptions.AutoCommitUpdates;
-  {$IFEND}
+  {$ENDIF}
 end;
 
 function TRESTDWFireDACDriver.getConectionType: TRESTDWDatabaseType;

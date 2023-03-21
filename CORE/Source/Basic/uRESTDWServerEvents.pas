@@ -1,27 +1,18 @@
 unit uRESTDWServerEvents;
 
+{$I ..\Includes\uRESTDW.inc}
+
 {
   REST Dataware .
-  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
- de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  Criado por XyberX (Gilberto Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
   Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
- Membros do Grupo :
-
- XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
- Ivan Cesar                 - Admin - Administrador  do pacote.
- Joanan Mendonça Jr. (jlmj) - Admin - Administrador  do pacote.
- Giovani da Cruz            - Admin - Administrador  do pacote.
- Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Alexandre Souza            - Admin - Administrador do Grupo de Organização.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Mizael Rocha               - Member Tester and DEMO Developer.
- Flávio Motta               - Member Tester and DEMO Developer.
- Itamar Gaucho              - Member Tester and DEMO Developer.
- Ico Menezes                - Member Tester and DEMO Developer.
+ Maiores informações:
+ https://github.com/OpenSourceCommunityBrasil/REST-DataWare
 }
 
 
@@ -453,7 +444,7 @@ Begin
        vparams    := bJsonOBJb.Pairs[2].Value; //params
        vneedauth  := StringToBoolean(bJsonOBJb.Pairs[3].Value); //params
        vonlypredefparams := StringToBoolean(bJsonOBJb.Pairs[4].Value); //params
-       vContentType := DecodeStrings(bJsonOBJb.Pairs[5].Value{$IFDEF FPC}, csUndefined{$ENDIF}); //Final
+       vContentType := DecodeStrings(bJsonOBJb.Pairs[5].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}); //Final
        If EventByName[vEventName] = Nil Then
         vDWEvent  := TRESTDWEvent(Self.Add)
        Else
@@ -483,7 +474,7 @@ Begin
              vDWParamMethod.Encoded         := StringToBoolean(bJsonOBJc.Pairs[4].Value); // StringToBoolean(bJsonOBJc.get('encoded').toString);
             If bJsonArrayC.ElementCount > 5 Then
              If Trim(bJsonOBJc.Pairs[5].Value) <> '' Then //Trim(bJsonOBJc.get('default').toString) <> '' Then
-              vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.Pairs[5].Value{$IFDEF FPC}, csUndefined{$ENDIF}); // bJsonOBJc.get('default').toString{$IFDEF FPC}, csUndefined{$ENDIF});
+              vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.Pairs[5].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}); // bJsonOBJc.get('default').toString{$IFDEF FPC}, csUndefined{$ENDIF});
             FreeAndNil(bJsonOBJc);
            End;
          Finally
@@ -581,7 +572,7 @@ Begin
                            GetValueType(Items[I].vDWParams[A].ObjectValue),
                            Items[I].vDWParams[A].ParamName,
                            BooleanToString(Items[I].vDWParams[A].Encoded),
-                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF FPC}, csUndefined{$ENDIF})]);
+                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
      If vParamsLines = '' Then
       vParamsLines := vParamLine
      Else
@@ -809,7 +800,7 @@ Begin
      If (lResponse = '') Then
       lResponse  := Format('Unresolved Host : ''%s''', [RESTClientPoolerExec.Host])
      Else If (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
-      lResponse  := 'Unauthorized...';
+      lResponse  := cInvalidAuth;
      Raise Exception.Create(lResponse);
      lResponse   := '';
     End;
@@ -847,20 +838,12 @@ begin
   inherited Notification(AComponent, Operation);
 end;
 
-{
-procedure TRESTDWClientEvents.SetEditParamList(Value: Boolean);
-begin
- vEditParamList := Value;
- vEventList.Editable(vEditParamList);
-end;
-}
-
 Function TRESTDWClientEvents.SendEvent(EventName        : String;
-                                   Var DWParams     : TRESTDWParams;
-                                   Var Error        : String;
-                                   Var NativeResult : String;
-                                   EventType        : TSendEvent = sePOST;
-                                   Assyncexec       : Boolean = False): Boolean;
+                                       Var DWParams     : TRESTDWParams;
+                                       Var Error        : String;
+                                       Var NativeResult : String;
+                                       EventType        : TSendEvent = sePOST;
+                                       Assyncexec       : Boolean = False): Boolean;
 Var
  vDataMode : TDataMode;
 Begin

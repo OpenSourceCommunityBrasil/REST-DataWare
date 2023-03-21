@@ -110,7 +110,6 @@ uses
   dwftParams          = Integer(DB.ftParams); //47
   dwftObject          = Integer(DB.ftObject); //50
   {$ENDIF}
-  {$IFDEF REGION}{$ENDREGION}{$ENDIF}
  {$IFDEF DELPHI2006UP}
   FieldTypeIdents : Array[dwftColor..dwftColor] Of TIdentMapEntry = ((Value: dwftColor; Name: 'ftColor'));
  {$ELSE}
@@ -126,13 +125,9 @@ uses
 
 
   FieldGroupChar: set of 0..255 = [dwftFixedChar, dwftString];
-
   FieldGroupWideChar: set of 0..255 = [dwftFixedWideChar, dwftWideString];
-
   FieldGroupStream: set of 0..255 = [dwftStream, dwftBlob, dwftBytes, dwftWideMemo, dwftMemo, dwftFMTMemo];
-
   FieldGroupInt: set of 0..255 = [dwftByte, dwftShortint, dwftSmallint, dwftWord, dwftInteger];
-
   FieldGroupCardinal: set of 0..255 = [dwftLongWord];
   //  LongWord is 4 bytes unassigned on Windows 64bits and all 32bits platforms,
   // but 8 bytes unassigned for all 64bits platforms except Windows 64bits.
@@ -141,19 +136,12 @@ uses
 
   FieldGroupInt64: set of 0..255 = [dwftAutoInc, dwftLargeint];
   // AutoInc Should be Int64 to accept BIGINT primary keys.
-
   FieldGroupFloat: set of 0..255 = [dwftFloat, dwftOraTimeStamp];
-
   FieldGroupDateTime: set of 0..255 = [dwftDate, dwftTime, dwftDateTime];
-
   FieldGroupTimeStampOffSet: set of 0..255 = [dwftTimeStampOffset];
-
   FieldGroupTimeStamp: set of 0..255 = [dwftTimeStamp];
-
   FieldGroupBoolean: set of 0..255 = [dwftBoolean];
-
   FieldGroupSingle: set of 0..255 = [dwftSingle];
-
   FieldGroupExtended: set of 0..255 = [dwftExtended];
   //  Extended is 8 bytes assigned on Windows 64bits, 10 bytes assignbed on
   // Windows 32 bits and 16 bytes assigned on all other platforms.
@@ -161,15 +149,12 @@ uses
   // to avoid buffer overflows in cross-platform binary exchange.
 
   FieldGroupCurrency: set of 0..255 = [dwftCurrency];
-
   FieldGroupBCD: set of 0..255 = [dwftBCD, dwftFMTBcd];
-
   FieldGroupVariant: set of 0..255 = [dwftVariant];
-
   FieldGroupGUID: set of 0..255 = [dwftGUID];
 
 Type
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   DWInteger       = Longint;
   DWInt16         = Integer;
   DWInt64         = Int64;
@@ -197,7 +182,7 @@ Type
  PDWUInt32        = ^DWInt32;
  PDWUInt16        = ^DWUInt16;
  PDWInt16         = ^DWUInt16;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   TCharSet = Set Of AnsiChar;
  {$ELSE}
   {$IFNDEF NEXTGEN}
@@ -217,18 +202,18 @@ Type
    {$DEFINE UInt64_IS_NATIVE}
    Type
     UInt64 = QWord;
-    {$NODEFINE UInt64}
+    {$UNDEF UInt64}
     TRESTDWUInt64 = QWord;
     {$ELSE}
     Type
      UInt64 = Int64;
      TRESTDWUInt64 = UInt64;
-    {$NODEFINE UInt64}
+    {$UNDEF UInt64}
    {$ENDIF}
  {$ENDIF}
  TRESTDWIPv6Address = Array [0..7] Of DWUInt16;
   {$IF (Defined(DELPHIXE5UP)) AND (NOT Defined(DELPHI10_0UP)) AND (NOT Defined(RESTDWLAZARUS))}
-   {$IF Defined(HAS_FMX)}
+   {$IFDEF RESTDWFMX}
     DWString     = String;
     DWWideString = WideString;
     DWChar       = Char;
@@ -236,9 +221,9 @@ Type
     DWString     = Utf8String;
     DWWideString = WideString;
     DWChar       = Utf8Char;
-   {$IFEND}
+   {$ENDIF}
   {$ELSEIF NOT Defined(RESTDWLAZARUS)}
-   {$IF Defined(HAS_FMX)}
+   {$IFDEF RESTDWFMX}
     DWString     = Utf8String;
     DWWideString = WideString;
     DWChar       = Utf8Char;
@@ -246,7 +231,7 @@ Type
     DWString     = AnsiString;
     DWWideString = WideString;
     DWChar       = AnsiChar;
-   {$IFEND}
+   {$ENDIF}
   {$ELSE}
    DWString     = AnsiString;
    DWWideString = WideString;
@@ -270,10 +255,8 @@ Type
  TRESTDWClientStage          = (csNone, csLoggedIn, csRejected);
  TDataAttributes             = Set of (dwCalcField,    dwNotNull, dwLookup,
                                        dwInternalCalc, dwAggregate);
- TSendEvent                  = (seGET,       sePOST,
-                                sePUT,       seDELETE,
-                                sePatch);
- TTypeRequest                = (trHttp,      trHttps);
+ TSendEvent                  = (seGET, sePOST, sePUT, seDELETE, sePatch);
+ TTypeRequest                = (trHttp, trHttps);
  TDatasetEvents              = Procedure (DataSet : TDataSet) Of Object;
  TRESTDwSessionData          = Class(TCollectionItem);
  TRESTDWDatabaseType         = (dbtUndefined, dbtAccess, dbtDbase, dbtFirebird, dbtInterbase, dbtMySQL,

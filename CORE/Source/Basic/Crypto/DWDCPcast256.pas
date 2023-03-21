@@ -1,6 +1,6 @@
 unit DWDCPcast256;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -223,31 +223,16 @@ begin
   if not fInitialized then
     raise EDWDCP_blockcipher.Create('Cipher not initialized');
   A[0]:= PDWord(@InData)^;
-  {$IFNDEF FPC}
-   {$IF Defined(HAS_FMX)}
-    {$IFDEF HAS_UTF8}
-     A[1]:= PDWord(PointerToInt(@InData)+4)^;
-     A[2]:= PDWord(PointerToInt(@InData)+8)^;
-     A[3]:= PDWord(PointerToInt(@InData)+12)^;
-    {$ELSE}
-    A[1]:= PDWord(PointerToInt(@InData)+4)^;
-    A[2]:= PDWord(PointerToInt(@InData)+8)^;
-    A[3]:= PDWord(PointerToInt(@InData)+12)^;
-    {$ENDIF}
-   {$ELSE}
-    A[1]:= PDWord(PointerToInt(@InData)+4)^;
-    A[2]:= PDWord(PointerToInt(@InData)+8)^;
-    A[3]:= PDWord(PointerToInt(@InData)+12)^;
-   {$IFEND}
-  {$ELSE}
-   A[1]:= PDWord(PointerToInt(@InData)+4)^;
-   A[2]:= PDWord(PointerToInt(@InData)+8)^;
-   A[3]:= PDWord(PointerToInt(@InData)+12)^;
-  {$ENDIF}
+
+  A[1]:= PDWord(PointerToInt(@InData)+4)^;
+  A[2]:= PDWord(PointerToInt(@InData)+8)^;
+  A[3]:= PDWord(PointerToInt(@InData)+12)^;
+
   A[0]:= SwapDWord(A[0]);
   A[1]:= SwapDWord(A[1]);
   A[2]:= SwapDWord(A[2]);
   A[3]:= SwapDWord(A[3]);
+
   A[2]:= A[2] xor f1(A[3],kr[0,0],km[0,0]);
   A[1]:= A[1] xor f2(A[2],kr[0,1],km[0,1]);
   A[0]:= A[0] xor f3(A[1],kr[0,2],km[0,2]);

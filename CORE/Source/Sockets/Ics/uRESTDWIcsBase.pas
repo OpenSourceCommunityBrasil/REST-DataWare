@@ -38,7 +38,7 @@ interface
 
 Uses
   SysUtils,  Classes,  DateUtils,  SyncObjs,
-  {$IF (CompilerVersion > 22)}vcl.ExtCtrls{$ELSE}ExtCtrls{$IFEND},
+  {$IFDEF DELPHIXE2UP}vcl.ExtCtrls{$ELSE}ExtCtrls{$ENDIF},
 
   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
   uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,

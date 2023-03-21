@@ -1,6 +1,8 @@
-unit uRESTDWZDbcMetadata;
+﻿unit uRESTDWZDbcMetadata;
 
-{$IFNDEF FPC}
+{$I ..\..\Includes\uRESTDW.inc}
+
+{$IFNDEF RESTDWLAZARUS}
   {$I ZDbc.inc}
 {$ENDIF}
 

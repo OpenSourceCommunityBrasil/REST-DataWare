@@ -1,6 +1,6 @@
 ﻿unit uRESTDWInterbaseDriver;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -29,7 +29,7 @@ interface
 uses
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes, uRESTDWMemtable,
   DB,
-  {$IF CompilerVersion < 22}
+  {$IFNDEF DELPHIXEUP}
     IBDatabase, IBQuery, IBCustomDataSet, IBTable, IBStoredProc
   {$ELSE}
     IBX.IBDatabase, IBX.IBQuery, IBX.IBCustomDataSet, IBX.IBTable,

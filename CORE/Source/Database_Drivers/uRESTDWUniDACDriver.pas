@@ -1,6 +1,6 @@
 ﻿unit uRESTDWUniDACDriver;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -27,7 +27,7 @@
 interface
 
 uses
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
     LResources,
   {$ENDIF}
   Classes, SysUtils, DB,
@@ -490,7 +490,7 @@ begin
   end;
 end;
 
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
 initialization
 {$I ..\RESTDWLazarusDrivers.lrs}
 {$ENDIF}

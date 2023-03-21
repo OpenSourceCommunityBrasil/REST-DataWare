@@ -1,19 +1,15 @@
 unit uRESTDWJSON;
 
-{$I ..\..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 Interface
 
 Uses
- {$IFDEF FPC}
-  {$IFNDEF RESTDWLAMW}
+ {$IF Defined(RESTDWLAZARUS) AND not Defined(RESTDWLAMW)}
    LCL,
-  {$ENDIF}
- {$ELSE}
-  {$IFDEF RESTDWWINDOWS}
+ {$ELSEIF Defined(RESTDWWINDOWS)}
    Windows,
-  {$ENDIF}
- {$ENDIF}
+ {$IFEND}
   SysUtils, Classes, TypInfo, uRESTDWTools;
 
 Type
@@ -446,21 +442,14 @@ function getFormatSettings : TFormatSettings ;
 var
   f : TFormatSettings;
 begin
- {$IFNDEF FPC}
- {$if CompilerVersion > 21} // Delphi 2010 pra cima
-  {$IFDEF MSWINDOWS}
-   {$IF DEFINED(FireMonkeyVersion)}
-    SysUtils.GetLocaleFormatSettings (windows.GetThreadLocale,f);
-   {$IFEND}
-  {$ELSE}
-   newNotImplmentedFeature();
-  {$ENDIF}
- {$IFEND}
- {$ENDIF}
- result := f;
- result.DecimalSeparator := '.';
- result.ThousandSeparator := ',';
-// result.CurrencyDecimals := 2;
+  {$IF Defined(RESTDWFMX)}
+  SysUtils.GetLocaleFormatSettings (windows.GetThreadLocale,f);
+  {$ELSEIF not Defined(RESTDWWINDOWS)}
+  newNotImplmentedFeature;
+  {$IFEND}
+  result := f;
+  result.DecimalSeparator := '.';
+  result.ThousandSeparator := ',';
 end;
 
 
@@ -510,10 +499,7 @@ begin
   end;
 end;
 
-
-
 { JSONTokener }
-
 
 constructor JSONTokener.create(s: string);
 begin
@@ -521,11 +507,9 @@ begin
  mySource := s;
 end;
 
-
-
 procedure JSONTokener.back;
 begin
-  {$IFDEF ANDROID} //Android}
+  {$IFDEF RESTDWANDROID} //Android}
   if (self.myIndex > 0) then begin
             self.myIndex := self.myIndex - 1;
   end;
@@ -535,8 +519,6 @@ begin
   end;
   {$ENDIF}
 end;
-
-
 
 class function JSONTokener.dehexchar(c: char): integer;
 begin
@@ -555,7 +537,6 @@ begin
   result := -1;
 end;
 
-
 (**
      * Determine if the source string still contains characters that next()
      * can consume.
@@ -569,13 +550,12 @@ end;
 function JSONTokener.next: char;
 begin
    if (more()) then begin
-	        result := self.mySource[self.myIndex];
-	        self.myIndex := self.myIndex + 1;
-          exit;
-    end;
+     result := self.mySource[self.myIndex];
+	   self.myIndex := self.myIndex + 1;
+     exit;
+   end;
 		result := chr(0);
 end;
-
 
  (**
      * Consume the next character, and check that it matches a specified
@@ -592,7 +572,6 @@ begin
               result + '.');
   end;
 end;
-
 
 (**
      * Get the next n characters.
@@ -865,9 +844,6 @@ begin
                                                             16));
                         exit;
                     Except
-                      on e:Exception do begin
-                        ///* Ignore the error */
-                      end;
                     end;
                 end else begin
                           If Not((Pos(',', s) > 0) or (Pos('.', s) > 0)) Then
@@ -877,18 +853,12 @@ begin
                                                             8));
                                 exit;
                             Except
-                                    on e:Exception do begin
-                                      ///* Ignore the error */
-                                    end;
                             end;
                            End;
                           try
                               result := _Double.create(s);
                               exit;
                           Except
-                                  on e:Exception do begin
-                                    ///* Ignore the error */
-                                  end;
                           end;
                 end;
             end;
@@ -901,18 +871,12 @@ begin
                    result := _Int64.create(s);
                   exit;
               Except
-                      on e:Exception do begin
-                        ///* Ignore the error */
-                      end;
               end;
              End;
             try
                 result := _Double.create(s);
                 exit;
             Except
-                    on e:Exception do begin
-                      ///* Ignore the error */
-                    end;
             end;
         end;
         result := _String.create(s);
@@ -960,8 +924,6 @@ begin
         end;
 end;
 
-
-
 (**
      * Make a ParseException to signal a syntax error.
      *
@@ -974,7 +936,6 @@ begin
  + copy (toString(),self.myIndex,10), self.myIndex);
 end;
 
-
 (**
      * Make a printable string of this JSONTokener.
      *
@@ -984,7 +945,6 @@ function JSONTokener.toString: string;
 begin
   result := ' at character ' + intToStr(self.myIndex) + ' of ' + self.mySource;
 end;
-
 
 (**
      * Convert <code>%</code><i>hh</i> sequences to single characters, and
@@ -1023,16 +983,10 @@ end;
 
 { TJSONObject }
 
-
-
-
-
 constructor TJSONObject.create;
 begin
   myHashMap := TStringListJSON.create;
 end;
-
-
 
 constructor TJSONObject.create(jo: TJSONObject; sa: array of string);
 var
@@ -1043,7 +997,6 @@ begin
             putOpt(sa[i], jo.opt(sa[i]).Clone);
   end;
 end;
-
 
 constructor TJSONObject.create(x: JSONTokener);
 var
@@ -1111,7 +1064,6 @@ begin
 
 end;
 
-
 constructor TJSONObject.create(map: TStringList);
 var
  i : integer;
@@ -1121,7 +1073,6 @@ begin
    myHashMap.AddObject(map[i],map.Objects[i]);
   end;
 end;
-
 
 constructor TJSONObject.create(s: string);
 var
@@ -1134,7 +1085,6 @@ begin
   FreeAndNil(token);
  End;
 end;
-
 
 (**
      * Accumulate values under a key. It is similar to the put method except
@@ -1168,7 +1118,6 @@ begin
   result := self;
 end;
 
-
 (**
      * Get the value object associated with a key.
      *
@@ -1187,7 +1136,6 @@ begin
   end;
   result := o;
 end;
-
 
 (**
      * Get the boolean value associated with a key.
@@ -1235,7 +1183,6 @@ begin
             quote(key) + '] is not a number.');
 end;
 
-
 (**
      * Get the int value associated with a key.
      *
@@ -1257,7 +1204,6 @@ begin
         end;
 
 end;
-
 
 function TJSONObject.getInt64(key: string): Int64;
 var
@@ -1292,7 +1238,6 @@ begin
   end;
 end;
 
-
 (**
      * Get the TJSONObject value associated with a key.
      *
@@ -1314,7 +1259,6 @@ begin
   end;
 end;
 
-
 (**
      * Get the string associated with a key.
      *
@@ -1327,7 +1271,6 @@ begin
   result := get(key).toString();
 end;
 
-
 (**
      * Determine if the TJSONObject contains a specific key.
      * @param key   A key string.
@@ -1337,7 +1280,6 @@ function TJSONObject.has(key: string): boolean;
 begin
    result := self.myHashMap.IndexOf(key) >= 0;
 end;
-
 
 (**
      * Determine if the value associated with the key is null or if there is
@@ -1370,7 +1312,6 @@ function TJSONObject.length: integer;
 begin
    result := myHashMap.Count;
 end;
-
 
 (**
      * Produce a TJSONArray containing the names of the elements of this
@@ -1410,8 +1351,6 @@ begin
    end;
 end;
 
-
-
 function TJSONObject.opt(key: string): TZAbstractObject;
 begin
    if (key = '') then begin
@@ -1425,7 +1364,6 @@ begin
    end;
 end;
 
-
 (**
      * Get an optional boolean associated with a key.
      * It returns false if there is no such key, or if the value is not
@@ -1438,7 +1376,6 @@ function TJSONObject.optBoolean(key: string): boolean;
 begin
   result := optBoolean (key, false);
 end;
-
 
 (**
      * Get an optional boolean associated with a key.
@@ -1471,7 +1408,6 @@ begin
         result := defaultValue;
 end;
 
-
 (**
      * Get an optional double associated with a key,
      * or NaN if there is no such key or if its value is not a number.
@@ -1485,7 +1421,6 @@ function TJSONObject.optDouble(key: string): double;
 begin
   result := optDouble(key, _Double.NaN);
 end;
-
 
 (**
      * Get an optional double associated with a key, or the
@@ -1533,7 +1468,6 @@ begin
   result := optInt (key, 0);
 end;
 
-
 (**
      * Get an optional int value associated with a key,
      * or the default if there is no such key or if the value is not a number.
@@ -1565,9 +1499,6 @@ begin
   end;
   result := defaultValue;
 end;
-
-
-
 
 function TJSONObject.optInt64(key: string; defaultValue: Int64): Int64;
 var
@@ -1615,7 +1546,6 @@ begin
       result := nil;
     end;
 end;
-
 
 (**
      * Get an optional TJSONObject associated with a key.
@@ -1696,7 +1626,6 @@ begin
    result := self;
 end;
 
-
 (**
      * Put a key/int pair in the TJSONObject.
      *
@@ -1764,7 +1693,6 @@ begin
    end ;
    result := self;
 end;
-
 
 (**
      * Produce a string in double quotes with backslash sequences in all the
@@ -1869,7 +1797,6 @@ begin
   result := ja;
 end;
 
-
 (**
      * Make an JSON external form string of this TJSONObject. For compactness, no
      * unnecessary whitespace is added.
@@ -1907,7 +1834,6 @@ begin
         _keys.free;
       end;
 end;
-
 
 (**
      * Make a prettyprinted JSON external form string of this TJSONObject.
@@ -1996,7 +1922,6 @@ begin
   result := CNULL;
 end;
 
-
 class function TJSONObject.valueToString(value: TZAbstractObject): string;
 begin
   if ((value = nil) or (value.equals(null))) then begin
@@ -2014,7 +1939,6 @@ begin
   end;
   result := quote(value.toString());
 end;
-
 
 (**
      * Make a prettyprinted JSON string of an object value.
@@ -2067,7 +1991,6 @@ begin
    fvalue := b;
 end;
 
-
 var
   CONST_FALSE : _Boolean;
   CONST_TRUE : _Boolean;
@@ -2111,7 +2034,6 @@ constructor _String.create(s: string);
 begin
   fvalue := s;
 end;
-
 
 function _String.equals(const Value: TZAbstractObject): Boolean;
 begin
@@ -2162,8 +2084,6 @@ begin
   result := fvalue;
 end;
 
-
-
 class function _Integer.parseInt(s: string; i: integer): integer;
 begin
   case i of
@@ -2183,8 +2103,6 @@ begin
   end;
 end;
 
-
-
 class function _Integer.parseInt(s: _String): integer;
 begin
   result := _Integer.parseInt (s.toString, 10);
@@ -2200,7 +2118,6 @@ begin
   result := intToStr (fvalue);
 end;
 
-
 { _Double }
 
 constructor _Double.create(s: string);
@@ -2212,7 +2129,6 @@ constructor _Double.create(s: _String);
 begin
   create (s.toString);
 end;
-
 
 function _Double.clone: TZAbstractObject;
 begin
@@ -2326,7 +2242,6 @@ begin
    myArrayList := TList.create;
 end;
 
-
 (**
      * Construct a TJSONArray from a source string.
      * @param string     A string that begins with
@@ -2345,7 +2260,6 @@ end;
 
 destructor TJSONArray.destroy;
 var
-
  obj : TObject;
 begin
   while myArrayList.Count > 0 do begin
@@ -2367,7 +2281,6 @@ begin
   inherited;
 end;
 
-
 (**
      * Get the object value associated with an index.
      * @param index
@@ -2386,7 +2299,6 @@ begin
   end ;
   result := o;
 end;
-
 
 (**
      * Get the boolean value associated with an index.
@@ -2449,7 +2361,6 @@ begin
      + intToStr(index) + '] is not a number.');
 end;
 
-
 (**
      * Get the int value associated with an index.
      *
@@ -2470,7 +2381,6 @@ begin
     result := trunc (getDouble (index));
   end;
 end;
-
 
 function TJSONArray.getInt64(index: integer): Int64;
 var
@@ -2502,7 +2412,6 @@ begin
   raise NoSuchElementException.create('TJSONArray[' + intToStr(index) +
           '] is not a TJSONArray.');
 end;
-
 
 (**
      * Get the TJSONObject associated with an index.
@@ -2650,7 +2559,6 @@ begin
   result := defaultValue;
 end;
 
-
 (**
  * Get the optional double value associated with an index.
  * NaN is returned if the index is not found,
@@ -2711,7 +2619,6 @@ begin
   result := optInt(index, 0);
 end;
 
-
 (**
  * Get the optional int value associated with an index.
  * The defaultValue is returned if the index is not found,
@@ -2741,7 +2648,6 @@ begin
   end;
   result := defaultValue;
 end;
-
 
 function TJSONArray.optInt64(index: integer; defaultValue: int64): int64;
 var
@@ -2806,7 +2712,6 @@ Begin
  Else
   Result := Nil;
 End;
-
 
 (**
  * Get the optional string value associated with an index. It returns an

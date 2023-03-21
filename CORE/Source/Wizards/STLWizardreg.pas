@@ -10,16 +10,16 @@
 
 unit STLWizardreg;
 
+{$I ..\Includes\uRESTDW.inc}
+
 interface
 
 uses
-  {$IFNDEF FPC}
-   {$if CompilerVersion > 22}
+   {$IFDEF DELPHIXE2UP}
     STLWizard,
    {$ELSE}
     STLWizardOldDelphi,
-   {$IFEND}
-  {$ENDIF}
+   {$ENDIF}
   RDWCGIWizard,
   Classes, DesignIntf, ToolsAPI, DesignEditors;
 

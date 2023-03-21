@@ -260,12 +260,10 @@ type
 
 implementation
 
-{$IFNDEF FPC}
- {$IFDEF WINDOWS}
-uses Windows;
- {$Q-}{$R-}
- {$ENDIF}
-{$ENDIF}
+// {$IFDEF RESTDWWINDOWS}
+//uses Windows;
+// {$Q-}{$R-}
+//{$ENDIF}
 
 const
 {$IFDEF NEXTGEN}
@@ -748,22 +746,6 @@ begin
   inherited Create(AOwner);
   fCipherMode := cmCBC;
 end;
-
-{
-procedure XorBlock(var InData1, InData2; Size: longword);
-var
-  b1,
-  b2: PByteArray;
-  i: longword;
-begin
-  b1 := @InData1;
-  b2 := @InData2;
-  for i := 0 to Size - 1 do
-    b1[i] := (b1[i] xor b2[i]);
-end;
-}
-
-{ ** RECENT Additions after Version 2.0 ** }
 
 // Version 2.1 : Partial Stream Read capability.
 function TDWDCP_cipher.PartialDecryptStream(AStream: TMemoryStream;

@@ -78,11 +78,11 @@ Var
  aByte     : Byte;
  aLongWord : LongWord;
  aDouble   : Double;
- {$IF (Not DEFINED(FPC)) AND (CompilerVersion < 21)}
+ {$IFNDEF DELPHIXEUP}
  aDate     : TDateTime;
  {$ELSE}
  aDate     : TDate;
- {$IFEND}
+ {$ENDIF}
  S         : Integer;
  vSt,
  aString   : DWString;
@@ -97,7 +97,7 @@ Begin
   varSmallint,
   varInteger,
   varInt64,
-  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
+  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE4UP)}
   varUInt64,
   {$IFEND}
   varSingle   : Begin
@@ -112,13 +112,9 @@ Begin
                  Result := aLongWord;
                 End;
   varString
-  {$IFDEF FPC}
+  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE4UP)}
    , varUString
-  {$ELSE}
-   {$IF CompilerVersion >= 22}
-    , varUString
-   {$IFEND}
-  {$ENDIF}     : Begin
+   {$IFEND}   : Begin
                   Move(Pointer(@ByteValue[0])^, Pointer(@aSize)^,  SizeOf(DWInteger));
                   If aSize > 0 Then
                    Begin
@@ -127,27 +123,27 @@ Begin
                    End
                   Else
                    Result := '';
-                 End;
+                End;
   varDouble,
-  varCurrency  : Begin
+  varCurrency : Begin
                   S := SizeOf(Double);
                   Move(Pointer(@ByteValue[0])^, aDouble, S);
                   Result := aDouble;
-                 End;
-  varDate      : Begin
+                End;
+  varDate     : Begin
                   S := SizeOf(Date);
                   Move(Pointer(@ByteValue[0])^, aDate, S);
                   Result := aDate;
-                 End;
-  varBoolean   : Begin
+                End;
+  varBoolean  : Begin
                   S := SizeOf(Boolean);
                   vSt := BytesToString(ByteValue, 0, 1);
 //                  Move(Pointer(@ByteValue[0])^, Pointer(@vSt)^,  S);
                   aBoolean    := vSt = 'T';
                   Result      := aBoolean;
-                 End;
+                End;
   varNull,
-  varEmpty     : Result := Null;
+  varEmpty    : Result := Null;
   Else
    Variant(Result) := Null;
  End;
@@ -162,11 +158,11 @@ Var
  aByte     : Byte;
  aLongWord : LongWord;
  aDouble   : Double;
- {$IF (Not DEFINED(FPC)) AND (CompilerVersion < 21)}
+ {$IFNDEF DELPHIXEUP}
  aDate     : TDateTime;
  {$ELSE}
  aDate     : TDate;
- {$IFEND}
+ {$ENDIF}
  S         : Integer;
  vSt       : Char;
  aString   : DWString;
@@ -184,7 +180,7 @@ Begin
   varSmallint,
   varInteger,
   varInt64,
-  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
+  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE4UP)}
   varUInt64,
   {$IFEND}
   varSingle   : Begin
@@ -201,7 +197,7 @@ Begin
                  Move(aLongWord, Pointer(@Result[0])^, S);
                 End;
   varString
-  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
+  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE4UP)}
   , varUString
   {$IFEND}
               : Begin

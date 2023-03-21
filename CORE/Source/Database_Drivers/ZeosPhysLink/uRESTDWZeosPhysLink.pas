@@ -1,4 +1,6 @@
-unit uRESTDWZeosPhysLink;
+﻿unit uRESTDWZeosPhysLink;
+
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -61,7 +63,7 @@ begin
   FOldZeosBeforeConnect := nil;
   if (FZConnection <> nil) and (ZConnection.Protocol = 'restdw') then begin
     FOldZeosBeforeConnect := FZConnection.BeforeConnect;
-    FZConnection.BeforeConnect := {$IFDEF FPC}@{$ENDIF}OnRESTDWZeosBeforeConnect;
+    FZConnection.BeforeConnect := {$IFDEF RESTDWLAZARUS}@{$ENDIF}OnRESTDWZeosBeforeConnect;
   end;
 end;
 

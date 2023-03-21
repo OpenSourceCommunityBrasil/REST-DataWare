@@ -304,7 +304,6 @@
         <DCCReference Include="..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas"/>
         <DCCReference Include="..\..\Source\utils\StringBuilderUnit.pas"/>
         <DCCReference Include="..\..\Source\utils\uRESTDWBase64.pas"/>
-        <DCCReference Include="..\..\Source\utils\uRESTDWDynamic.pas"/>
         <DCCReference Include="..\..\Source\utils\uRESTDWJSONObject.pas"/>
         <DCCReference Include="..\..\Source\utils\uRESTDWMassiveBuffer.pas"/>
         <DCCReference Include="..\..\Source\utils\uRESTDWMD5.pas"/>
