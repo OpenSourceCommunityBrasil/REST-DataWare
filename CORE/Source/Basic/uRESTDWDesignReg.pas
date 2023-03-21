@@ -29,7 +29,7 @@ uses
   {$IFDEF RESTDWLAZARUS}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
     LResources, LazFileUtils,  FormEditingIntf, PropEdits, lazideintf,
-    ProjectIntf, ComponentEditors, fpWeb,
+    ProjectIntf, ComponentEditors, fpWeb, TypInfo,
   {$ELSE}
     Windows,
    {$IFDEF DELPHIXE2UP}
@@ -37,9 +37,9 @@ uses
    {$ELSE}
      Graphics, DbTables,
    {$ENDIF}
+  ToolsApi, DesignEditors, DSDesign, DesignIntf, ColnEdit,
   {$ENDIF}
-  ToolsApi, Db, DesignEditors, DSDesign, DesignIntf, ColnEdit, SysUtils,
-  Classes,
+  Db, SysUtils, Classes,
   uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWBasicDB,
   uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWMemoryDataset,
   uRESTDWBufferDb, uRESTDWAbout, uRESTDWDriverBase;
@@ -949,7 +949,7 @@ End;
 {$IFDEF RESTDWLAZARUS}
  Procedure UnlistPublishedProperty (ComponentClass:TPersistentClass; const PropertyName:String);
  var
-   pi :PPropInfo;
+   pi : PPropInfo;
  begin
    pi := TypInfo.GetPropInfo (ComponentClass, PropertyName);
    if (pi <> nil) then

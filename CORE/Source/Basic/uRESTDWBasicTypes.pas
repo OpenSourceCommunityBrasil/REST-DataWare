@@ -26,7 +26,9 @@ unit uRESTDWBasicTypes;
 Interface
 
 Uses
-  {$IFNDEF DELPHIXE3UP}DbTables,{$ENDIF}
+  {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXE3UP)}
+  DbTables,
+  {$ENDIF}
   SysUtils,  Classes, Db, FMTBcd,
   uRESTDWAbout, uRESTDWMemoryDataset, uRESTDWConsts,
   uRESTDWProtoTypes, uRESTDWTools;

@@ -1969,9 +1969,9 @@ Begin
  Result := GetValue(False);
  If VarIsNull(Result) Then
    Exit;
-   {$IFDEF RESTDWLAZARUS}
+   {$IF Defined(RESTDWLAZARUS)}
    Result := GetStringDecode(Result, vDatabaseCharSet);
-   {$ELSEIF not(Defined(DELPHI2009UP))}
+   {$ELSEIF not Defined(DELPHI2009UP)}
    Result := UTF8Decode(Result);
    If vEncoding = esUtf8 Then
      Result := UTF8Decode(Result);
@@ -6182,7 +6182,7 @@ Begin
   Finally
     FreeAndNil(aStream);
   End;
-  {$ELSEIF DELPHIXEUP}
+  {$ELSEIF Defined(DELPHIXEUP)}
   If Not Assigned(Stream) Then
     Stream := TStringStream.Create('', TEncoding.UTF8);
   //Write init Header

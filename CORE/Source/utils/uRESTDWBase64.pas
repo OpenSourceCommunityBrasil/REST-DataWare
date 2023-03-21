@@ -41,7 +41,7 @@ Uses
 Implementation
 
 
-{$IF Not Defined(RESTDWLAZARUS) and not Defined(DELPHIXE6UP)}
+{$IF Defined(RESTDWLAZARUS) or not Defined(DELPHIXE6UP)}
   Type
    TPacket = Packed Record
    Case Integer of

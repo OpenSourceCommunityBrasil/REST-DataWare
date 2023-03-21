@@ -1,10 +1,11 @@
 {$DEFINE RESTDW}
 
 (* IFEND Directives - HAS TO STAY ON TOP OF THE FILE!*)
-
-{$IF CompilerVersion > 23}
-  {$LEGACYIFEND ON}
-{$IFEND}
+{$IFNDEF FPC}
+  {$IF CompilerVersion > 23}
+    {$LEGACYIFEND ON}
+  {$IFEND}
+{$ENDIF}
 
 (* End of IFEND Directives *)
 (******************************************************************************)

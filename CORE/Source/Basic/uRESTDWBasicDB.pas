@@ -7450,7 +7450,7 @@ Begin
                     Begin
                      If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFDEF DELPHIXEUP}ftLongWord,{$ENDIF}ftLargeint] Then
                       Begin
-                        {$IFDEF RESTDWLAZARUS}
+                        {$IF Defined(RESTDWLAZARUS)}
                         Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value, csUndefined));
                         {$ELSEIF Defined(DELPHIXEUP)}
                         Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
@@ -7632,7 +7632,7 @@ Begin
                     Begin
                      If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
                       Begin
-                        {$IFDEF RESTDWLAZARUS}
+                        {$IF Defined(RESTDWLAZARUS)}
                         Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value, csUndefined));
                         {$ELSEIF Defined(DELPHIXEUP)}
                         Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));

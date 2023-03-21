@@ -1,6 +1,6 @@
 ﻿unit uRESTDWZeosDriver;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDW.inc}
 {$IFNDEF RESTDWLAZARUS}{$I ZComponent.inc}{$ENDIF}
 
 {
