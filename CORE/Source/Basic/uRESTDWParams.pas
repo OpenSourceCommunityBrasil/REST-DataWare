@@ -4337,7 +4337,7 @@ Begin
  SetDataValue(Value, ovString);
 End;
 
-{$IF Defined(RESTDWLAZARUS) or not(Defined(RESTDWLINUX))}
+{$IF Defined(RESTDWLAZARUS) and not Defined(RESTDWLINUX)}
 Function TJSONParam.GetAsWideString : WideString;
 Begin
  Result := GetValue(ovWideString);

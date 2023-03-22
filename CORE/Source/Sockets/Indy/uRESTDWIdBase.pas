@@ -3444,7 +3444,7 @@ Begin
     {$IF Not Defined(HAS_FMX)}
      AContext.Data := Nil; // not an Authorization attempt
     {$ELSE}
-     {$IFDEF HAS_UTF8}
+     {$IFDEF HAS_FMX}
       {$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND} := Nil;
      {$ELSE}
       AContext.DataObject := Nil;
@@ -3467,7 +3467,7 @@ Begin
       {$IF Not Defined(HAS_FMX)}
        AContext.Data  := vAuthValue;
       {$ELSE}
-       {$IFDEF HAS_UTF8}
+       {$IFDEF HAS_FMX}
         {$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND} := vAuthValue;
        {$ELSE}
         AContext.DataObject := vAuthValue;
@@ -3499,7 +3499,7 @@ Begin
       VHandled         := AuthenticationOptions.AuthorizationOption In [rdwAOBearer, rdwAOToken];
      End;
    {$ELSE}
-    {$IFDEF HAS_UTF8}
+    {$IFDEF HAS_FMX}
     If (Lowercase(AAuthType) = Lowercase('bearer')) Or
        (Lowercase(AAuthType) = Lowercase('token'))  And
        ({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}  = Nil) Then
