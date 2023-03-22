@@ -3144,6 +3144,8 @@ Var
  vResponseHeader : TStringList;
  mb              : TStringStream;
  vRedirect       : TRedirect;
+ tmpstr          : String;
+
  Procedure WriteError;
  Begin
   AResponseInfo.ResponseNo              := StatusCode;
@@ -3228,6 +3230,10 @@ Begin
   {$ENDIF}
   vAuthRealm   := AResponseInfo.AuthRealm;
   vContentType := ARequestInfo.ContentType;
+
+ // ARequestInfo.PostStream.Position:=0;
+ // tmpstr:= idglobal.readstringfromstream(ARequestInfo.PostStream,-1, IndyTextEncoding_UTF8);
+
   If CommandExec  (TComponent(AContext),
                    RemoveBackslashCommands(ARequestInfo.URI),
                    ARequestInfo.RawHTTPCommand,

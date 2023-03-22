@@ -28,7 +28,7 @@ Interface
 Uses
   {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXE3UP)}
   DbTables,
-  {$ENDIF}
+  {$IFEND}
   SysUtils,  Classes, Db, FMTBcd,
   uRESTDWAbout, uRESTDWMemoryDataset, uRESTDWConsts,
   uRESTDWProtoTypes, uRESTDWTools;

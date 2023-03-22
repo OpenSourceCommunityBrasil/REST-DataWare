@@ -322,7 +322,7 @@
 
 {$IFNDEF RESTDWLAZARUS}
   {$IF Declared(FireMonkeyVersion) or Defined(FRAMEWORK_FMX)
-    or Declared(FMX.Types.TFmxObject)}
+    or Declared(FMX.Types.TFmxObject) or Defined(LINUX64)}
     {$DEFINE HAS_FMX}
     {$DEFINE RESTDWFMX}
   {$ELSE}

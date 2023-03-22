@@ -6262,7 +6262,7 @@ Var
   For I := 0 To ParamsCount -1 Do
    Begin
     S := '';
-    Stream.Read(L, Sizeof(DWInt64));
+    Stream.Read(L, 8);
     SetLength(S, L);
     Try
      If L <> 0 Then

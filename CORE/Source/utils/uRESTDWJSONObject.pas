@@ -392,7 +392,7 @@ Type
   Property AsString           : String           Read GetAsString         Write SetAsString;
   Property AsObject           : String           Read GetAsString         Write SetAsObject;
   Property AsByteString       : String           Read GetByteString;
-  {$IF Defined(RESTDWLAZARUS) OR not Defined(RESTDWFNX)}
+  {$IF Defined(RESTDWLAZARUS) OR not Defined(RESTDWFMX)}
   Property AsWideString       : WideString       Read GetAsWideString     Write SetAsWideString;
   Property AsAnsiString       : AnsiString       Read GetAsAnsiString     Write SetAsAnsiString;
   {$IFEND}
