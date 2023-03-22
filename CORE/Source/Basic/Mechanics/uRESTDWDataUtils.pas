@@ -98,21 +98,21 @@ Type
   vMD5                  : String;
   vRDWTokenType         : TRESTDWTokenType;
   vRDWCryptType         : TRESTDWCryptType;
-  vCripto               : TCripto;
   Procedure   SetTokenHash (Token : String);
   Function    ToJSON       : String;
-  Function    ToToken      : String;
   Function    GetCryptType : String;
   Function    GetTokenType : String;
   Function    GetHeader    : String;
   Procedure   SetSecrets     (Value : String);
   Procedure   SetFinalRequest(Value : TDateTime);
  Public
+  vCripto: TCripto;
   Constructor    Create;
   Destructor     Destroy;Override;
   Class Function GetMD5       (Const Value : String)    : String;
   Class Function ISO8601FromDateTime(Value : TDateTime) : String;
   Class Function DateTimeFromISO8601(Value : String)    : TDateTime;
+  Function       ToToken           : String;
   Property       TokenType         : TRESTDWTokenType Read vRDWTokenType      Write vRDWTokenType;
   Property       CryptType         : TRESTDWCryptType Read vRDWCryptType      Write vRDWCryptType;
   Property       BeginTime         : TDateTime        Read vInitRequest       Write vInitRequest;
@@ -679,16 +679,16 @@ Begin
                  vMD5        := TTokenValue.GetMD5(vSecrets);
                  If vFinalRequest <> 0 Then
                   vBuildData := Format(cValueToken, [viss,
-                                                     IntToStr(DateTimeToUnix(vFinalRequest{$IFDEF RESTDWLAZARUS}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF})),
-                                                     IntToStr(DateTimeToUnix(vInitRequest{$IFDEF RESTDWLAZARUS}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF})),
-                                                     EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
-                                                                   {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})])
+                                                     IntToStr(DateTimeToUnix(vFinalRequest, False)),
+                                                     IntToStr(DateTimeToUnix(vInitRequest, False)),
+                                                     EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
+                                                                   {$IFDEF FPC}, csUndefined{$ENDIF})])
                  Else
                   vBuildData := Format(cValueTokenNoLife, [viss,
-                                                           IntToStr(DateTimeToUnix(vInitRequest{$IFDEF RESTDWLAZARUS}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF})),
-                                                           EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
-                                                                         {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
-                 Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+                                                           IntToStr(DateTimeToUnix(vInitRequest, False)),
+                                                           EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
+                                                                         {$IFDEF FPC}, csUndefined{$ENDIF})]);
+                 Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF FPC}, csUndefined{$ENDIF});
                  Result     := Format(cTokenStringRDWTS, [Result + '.' + vCripto.Encrypt(Result)]);
                 End;
  End;

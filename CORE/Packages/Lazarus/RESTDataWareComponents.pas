@@ -24,10 +24,11 @@ uses
   uRESTDWJSONViewer, uRESTDWFieldSourceEditor, uRESTDWSqlEditor, 
   uRESTDWUpdSqlEditor, utemplateproglaz, uRESTDWBufferBase, StringBuilderUnit, 
   uRESTDWBase64, uRESTDWDynamic, uRESTDWJSONObject, uRESTDWMassiveBuffer, 
-  uRESTDWMD5, uRESTDWTools, uRESTDWDataJSON, uRESTDWJSON,
+  uRESTDWMD5, uRESTDWTools, uRESTDWDataJSON, uRESTDWJSON, 
   uRESTDWJSONInterface, uRESTDWSerialize, uRESTDWMimeTypes, uRESTDWAbout, 
   uRESTDWZlib, uRESTDWMemoryDataset, uRESTDWDesignReg, uRESTDWProtoTypes, 
-  uRESTDWSelfSigned, uRESTDWExprParser, LazarusPackageIntf;
+  uRESTDWSelfSigned, uRESTDWExprParser, uRESTDWAuthenticators, 
+  LazarusPackageIntf;
 
 implementation
 

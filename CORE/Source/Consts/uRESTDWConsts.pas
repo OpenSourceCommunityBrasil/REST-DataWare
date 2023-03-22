@@ -70,7 +70,7 @@ Const
  SecondsInDay                    = 86400;  {Number of seconds in a day}
  SecondsInHour                   = 3600;   {Number of seconds in an hour}
  SecondsInMinute                 = 60;     {Number of seconds in a minute}
- UnixDate                        = 0;      {Date1900}
+ UnixDate                        = 25569;  {Date1900}
  AssyncCommandMSG                = '{"status":"OK", "assyncmsg":"AssyncCommand Executed"}';
  cApplicationJSON                = 'application/json';
  cAuthenticationError            = 'Error : ' + #13 + 'Authentication Error...';
@@ -241,6 +241,7 @@ Const
  cTooMuchDataInBuffer            = 'Too much data in buffer.';
  cReadLnWaitMaxAttemptsExceeded  = 'Max line read attempts exceeded.';
  cReadTimeout                    = 'Read timed out.';
+ cErrorOAuthNotImplenented      = 'OAuth authentication is not implemented';
 
 Type
   {$IF DEFINED(HAS_FMX) AND DEFINED(HAS_UTF8)}

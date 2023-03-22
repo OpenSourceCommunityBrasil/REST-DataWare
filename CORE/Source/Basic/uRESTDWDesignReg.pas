@@ -41,8 +41,8 @@ uses
   {$ENDIF}
   Db, SysUtils, Classes,
   uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWBasicDB,
-  uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWMemoryDataset,
-  uRESTDWBufferDb, uRESTDWAbout, uRESTDWDriverBase;
+  uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWMemoryDataset, uRESTDWBufferDb,
+  uRESTDWAbout, uRESTDWDriverBase, uRESTDWAuthenticators;
 
 {$IFNDEF RESTDWDELPHINET}
 Const
@@ -709,6 +709,7 @@ Begin
  RegisterComponents('REST Dataware - DB',          [TRESTDWPoolerDB,           TRESTDWMemTable,      TRESTDWClientSQL,
                                                     TRESTDWTable,              TRESTDWUpdateSQL,     TRESTDWMassiveSQLCache,
                                                     TRESTDWStoredProcedure,    TRESTDWMassiveCache,  TRESTDWBatchMove]);
+ RegisterComponents('REST Dataware - Authenticators', [TRESTDWAuthBasic,       TRESTDWAuthToken,     TRESTDWAuthOAuth]);
 // AddIDEMenu;//Menu do REST Debugger
  {$IFNDEF RESTDWLAZARUS}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);

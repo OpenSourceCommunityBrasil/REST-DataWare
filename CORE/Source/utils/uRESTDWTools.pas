@@ -411,8 +411,10 @@ Type
  Function  DatasetStateToMassiveType(DatasetState       : TDatasetState)          : TMassiveMode;
  Function  MassiveModeToString      (MassiveMode        : TMassiveMode)           : String;
  Function  StringToMassiveMode      (Value              : String)                 : TMassiveMode;
- Function  DateTimeToUnix           (ConvDate           : TDateTime)              : Int64;
- Function  UnixToDateTime           (USec               : Int64)                  : TDateTime;
+ Function  DateTimeToUnix           (ConvDate           : TDateTime;
+                                     AInputIsUTC        : Boolean = True)         : Int64;
+ Function  UnixToDateTime           (USec               : Int64;
+                                     AInputIsUTC        : Boolean = True)         : TDateTime;
  Function  BuildFloatString         (Value              : String)                 : String;
  Function  BuildStringFloat         (Value              : String;
                                      DataModeD          : TDataMode = dmDataware;
@@ -444,6 +446,7 @@ Type
 Implementation
 
 Uses
+  DateUtils,
   uRESTDWBase64, uRESTDWException, Variants, uRESTDWBasicTypes;
 
 Procedure DynArrayToBinVariant(var V: Variant; const DynArray; Len: Integer);
@@ -3745,14 +3748,14 @@ Begin
   End;
 End;
 
-Function DateTimeToUnix(ConvDate: TDateTime): Int64;
+Function DateTimeToUnix(ConvDate: TDateTime; AInputIsUTC: Boolean = True): Int64;
 begin
- Result := Round((ConvDate - UnixDate) * 86400);
+ Result := DateUtils.DateTimeToUnix(ConvDate, AInputIsUTC);
 end;
 
-Function UnixToDateTime(USec: Int64): TDateTime;
+Function UnixToDateTime(USec : Int64; AInputIsUTC : Boolean = True) : TDateTime;
 begin
- Result := (USec / 86400) + UnixDate;
+ Result := DateUtils.UnixToDateTime(USec, AInputIsUTC);
 end;
 
 Function MassiveModeToString(MassiveMode : TMassiveMode) : String;
