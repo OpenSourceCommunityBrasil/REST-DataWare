@@ -1284,7 +1284,7 @@ begin
   if not (State in [dsCalcFields, dsFilter, dsNewValue]) then begin
     {$IF Defined(RESTDWLAZARUS)}
       DataEvent(deFieldChange, Ptrint(Field));
-    {$ELSEIF not Defined(DELPHIIXEUP)}
+    {$ELSEIF not Defined(DELPHIXEUP)}
         DataEvent(deFieldChange, Longint(Field));
     {$ELSE}
         DataEvent(deFieldChange, NativeInt(Field));
@@ -2297,7 +2297,7 @@ begin
 
   if State = dsEdit then begin
     vRec := GetRecordObj(FCurrentRecord);
-    Move(TRESTDWBuffer(ActiveBuffer)^,vRec.FBuffer^,FRecordBufferSize);
+    Move(TRESTDWBuffer(ActiveBuffer)^, vRec.FBuffer^, FRecordBufferSize);
 
     if FStatusRecordChanged then
       vRec.Status := FStatusRecord;
