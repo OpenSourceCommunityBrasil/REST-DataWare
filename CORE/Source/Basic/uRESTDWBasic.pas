@@ -1,4 +1,4 @@
-unit uRESTDWBasic;
+﻿unit uRESTDWBasic;
 
 {$I ..\Includes\uRESTDW.inc}
 
@@ -393,11 +393,11 @@ Type
    vDatabaseCharSet    : TDatabaseCharSet;
   {$ELSE}
    {$IFDEF DELPHIXEUP}
-    {$IFNDEF RESTDWWINDOWS}
+    {$IF NOT Defined(RESTDWWINDOWS) AND not Defined(RESTDWLINUXFMX)}
      vCriticalSection : TRTLCriticalSection;
     {$ELSE}
      vCriticalSection : TCriticalSection;
-    {$ENDIF}
+    {$IFEND}
    {$ELSE}
     vCriticalSection : TCriticalSection;
    {$ENDIF}
@@ -2842,14 +2842,14 @@ Begin
           Begin
            {$IFNDEF RESTDWLAZARUS}
             {$IFDEF DELPHIXEUP}
-             {$IFNDEF RESTDWWINDOWS}
+             {$IF not Defined(RESTDWWINDOWS) AND not Defined(RESTDWLINUXFMX)}
               InitializeCriticalSection(vCriticalSection);
               EnterCriticalSection(vCriticalSection);
              {$ELSE}
               If Not Assigned(vCriticalSection) Then
                vCriticalSection := TCriticalSection.Create;
               vCriticalSection.Acquire;
-             {$ENDIF}
+             {$IFEND}
             {$ELSE}
              If Not Assigned(vCriticalSection)  Then
               vCriticalSection := TCriticalSection.Create;
@@ -3311,7 +3311,7 @@ Begin
            Begin
             {$IFNDEF RESTDWLAZARUS}
              {$IFDEF DELPHIXEUP}
-              {$IFNDEF RESTDWWINDOWS}
+              {$IF not Defined(RESTDWWINDOWS) AND not Defined(RESTDWLINUXFMX)}
                If Assigned(vCriticalSection) Then
                 Begin
                  LeaveCriticalSection(vCriticalSection);
@@ -3323,7 +3323,7 @@ Begin
                  vCriticalSection.Release;
 //                 FreeAndNil(vCriticalSection);
                 End;
-              {$ENDIF}
+              {$IFEND}
              {$ELSE}
               If Assigned(vCriticalSection) Then
                Begin

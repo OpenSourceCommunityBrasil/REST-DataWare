@@ -4337,7 +4337,7 @@ Begin
  SetDataValue(Value, ovString);
 End;
 
-{$IF Defined(RESTDWLAZARUS) or not(Defined(RESTDWLINUX))}
+{$IF Defined(RESTDWLAZARUS) and not Defined(RESTDWLINUX)}
 Function TJSONParam.GetAsWideString : WideString;
 Begin
  Result := GetValue(ovWideString);
@@ -6262,7 +6262,7 @@ Var
   For I := 0 To ParamsCount -1 Do
    Begin
     S := '';
-    Stream.Read(L, Sizeof(DWInt64));
+    Stream.Read(L, 8);
     SetLength(S, L);
     Try
      If L <> 0 Then

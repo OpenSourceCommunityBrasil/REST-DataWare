@@ -3408,9 +3408,9 @@ End;
 Function Decode64(const S: string): string;
 Var
  sa : String;
- {$IF Not(Defined(FPC)) AND (CompilerVersion > 27)}
+ {$IFDEF RESTDWMOBILE}
    ne: TBase64Encoding;
- {$IFEND}
+ {$ENDIF}
 Begin
  If (Trim(S) <> '')   And
     (Trim(S) <> '""') Then
@@ -3418,7 +3418,7 @@ Begin
    SA := S;
    If Pos(sLineBreak, SA) > 0 Then
     SA := StringReplace(SA, sLineBreak, '', [rfReplaceAll]);
-    {$IF Not(Defined(FPC)) AND (CompilerVersion > 27)}
+    {$IFDEF RESTDWMOBILE} //Alterado para IOS Brito
      ne     := TBase64Encoding.Create(-1, '');
      Try
       Result := ne.Decode(SA);
@@ -3427,7 +3427,7 @@ Begin
      End;
     {$ELSE}
      Result := BytesToString(Base64Decode(SA));
-   {$IFEND}
+   {$ENDIF}
   End;
 End;
 
@@ -3466,7 +3466,7 @@ End;
 
 {$IF Defined(RESTDWMOBILE)}  //Alterado para IOS Brito
 Function EncodeBase64(Const Value : String) : String;
-{$ELSEIF (NOT Defined(RESTDWLAZARUS) AND Defined(RESTDWLINUX))} //Alteardo para Lazarus LINUX Brito
+{$ELSEIF (NOT Defined(RESTDWLAZARUS) AND Defined(RESTDWLINUX))} //Alterado para Lazarus LINUX Brito
 Function EncodeBase64(Const Value : String) : String;
 {$ELSE}
 Function EncodeBase64(Const Value : String

@@ -146,7 +146,12 @@ Begin
   {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP) OR Defined(RESTDWWINDOWS)}
   Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
   {$ELSE}
+   {$IF Defined(RESTDWLINUX)}
+   utf8stream.Seek(0, soFromBeginning);
+    utf8stream.Write(S[0], ByteLength(S));
+   {$ELSE}
   Utf8Stream.Write(S[1], Length(S));
+  {$IFEND}
   {$IFEND}
   Result := TMemoryStream.Create;
   Try
