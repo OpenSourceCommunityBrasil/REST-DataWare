@@ -442,7 +442,7 @@ function getFormatSettings : TFormatSettings ;
 var
   f : TFormatSettings;
 begin
-  {$IF Defined(RESTDWFMX)}
+  {$IF Defined(RESTDWFMX) and not Defined(POSIX)}
   SysUtils.GetLocaleFormatSettings (windows.GetThreadLocale,f);
   {$ELSEIF not Defined(RESTDWWINDOWS)}
   newNotImplmentedFeature;
