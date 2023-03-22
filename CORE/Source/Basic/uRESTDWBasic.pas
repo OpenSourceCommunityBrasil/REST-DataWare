@@ -4007,10 +4007,10 @@ Begin
     Begin
      vJsonMSG := TReplyNOK;
      Result     := True;
-     If DWParams.ItemsString['Pooler'] <> Nil Then
+     If DWParams.ItemsString['POOLER'] <> Nil Then
       Begin
        vResult    := '';
-       vResult    := DWParams.ItemsString['Pooler'].Value;
+       vResult    := DWParams.ItemsString['POOLER'].Value;
        EchoPooler(BaseObject, AContext, vResult, vResultIP, AccessTag, vInvalidTag);
        If BinaryEvent Then
         Begin

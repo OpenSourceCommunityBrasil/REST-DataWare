@@ -148,7 +148,7 @@ Begin
   {$ELSE}
    {$IF Defined(RESTDWLINUX)}
    utf8stream.Seek(0, soFromBeginning);
-    utf8stream.Write(S[0], ByteLength(S));
+    utf8stream.Write(S[1], ByteLength(S));
    {$ELSE}
   Utf8Stream.Write(S[1], Length(S));
   {$IFEND}

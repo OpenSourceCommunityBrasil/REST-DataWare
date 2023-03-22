@@ -325,7 +325,7 @@ Type
   Procedure SetParamFileName(bValue     : String);
   Function  GetAsString : String;
   Procedure SetAsString    (Value      : String);
-  {$IF Defined(RESTDWLAZARUS) or (not Defined(RESTDWFMX))}
+  {$IF Defined(RESTDWLAZARUS) and not Defined(RESTDWLINUX)}
   Function  GetAsWideString : WideString;
   Procedure SetAsWideString(Value      : WideString);
   Function  GetAsAnsiString : AnsiString;
@@ -437,7 +437,7 @@ Type
   Property AsString           : String           Read GetAsString         Write SetAsString;
   Property AsObject           : String           Read GetAsString         Write SetAsObject;
   Property AsByteString       : String           Read GetByteString;
-  {$IF Defined(RESTDWLAZARUS) or (not Defined(RESTDWFMX))}
+  {$IF Defined(RESTDWLAZARUS) and not Defined(RESTDWLINUX)}
   Property AsWideString       : WideString       Read GetAsWideString     Write SetAsWideString;
   Property AsAnsiString       : AnsiString       Read GetAsAnsiString     Write SetAsAnsiString;
   {$IFEND}
@@ -4692,8 +4692,9 @@ Var
 Begin
  If TestNilParam Then
   Exit;
- If Pos(sLineBreak, json) > 0 Then
-  vValue     := StringReplace(json, sLineBreak, '', [rfReplaceAll])
+  vValue     := StringReplace(json, '=', '', [rfReplaceAll]);
+ If Pos(sLineBreak, vValue) > 0 Then
+  vValue     := StringReplace(vValue, sLineBreak, '', [rfReplaceAll])
  Else
   vValue     := json;
  {$IFDEF RESTDWLAZARUS}
