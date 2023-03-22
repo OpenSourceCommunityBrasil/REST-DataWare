@@ -252,7 +252,7 @@ begin
     //Read Header
     if Trim(LHeader) <> '' then
     begin
-      LJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(LHeader{$IFDEF FPC}, csUndefined{$ENDIF}));
+      LJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
 
       if LJsonValue.PairCount > 0 then
       begin
@@ -266,7 +266,7 @@ begin
     //Read Body
     if Trim(LBody) <> '' then
     begin
-      LJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(LBody{$IFDEF FPC}, csUndefined{$ENDIF}));
+      LJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(LBody{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
 
       if LJsonValue.PairCount > 0 then
       begin
@@ -287,7 +287,7 @@ begin
         end;
 
         if not LJsonValue.PairByName['secrets'].IsNull Then
-          FSecrets := DecodeStrings(LJsonValue.PairByName['secrets'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+          FSecrets := DecodeStrings(LJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
       end;
 
       FreeAndNil(LJsonValue);
@@ -427,7 +427,7 @@ var
           Result := Trim(LJsonValue.PairByName['secrets'].Name) <> '';
 
           if Result then
-            FSecrets := DecodeStrings(LJsonValue.PairByName['secrets'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+            FSecrets := DecodeStrings(LJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
 
           if Trim(LJsonValue.PairByName['exp'].Name) <> '' Then
           begin
@@ -455,7 +455,8 @@ begin
   LHeader         := '';
   LBody           := '';
   LStringComparer := '';
-  AValue          := StringReplace(AValue, ' ', '+', [rfReplaceAll]); //Remove espaços na Token e add os caracteres "+" em seu lugar
+  AValue          := StringReplace(AValue, ' ', '+', [rfReplaceAll]);
+  //Remove espaços na Token e add os caracteres "+" em seu lugar
   LHeader         := Copy(AValue, InitStrPos, Pos('.', AValue) -1);
 
   Delete(AValue, InitStrPos, Pos('.', AValue));
@@ -469,7 +470,7 @@ begin
 
   if Result then
   begin
-    Result := ReadHeader(DecodeStrings(LHeader{$IFDEF FPC}, csUndefined{$ENDIF}));
+    Result := ReadHeader(DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
 
     if Result then
     begin
@@ -485,10 +486,10 @@ begin
         if Result then
         begin
           Result  := False;
-          LHeader := DecodeStrings(LHeader                 {$IFDEF FPC}, csUndefined{$ENDIF});
-          LBody   := DecodeStrings(LBody                   {$IFDEF FPC}, csUndefined{$ENDIF});
-          Secrets := DecodeStrings(GetSecretsValue(LBody)  {$IFDEF FPC}, csUndefined{$ENDIF});
-          Secrets := DecodeStrings(GetSecretsValue(Secrets){$IFDEF FPC}, csUndefined{$ENDIF});
+          LHeader := DecodeStrings(LHeader                 {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+          LBody   := DecodeStrings(LBody                   {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+          Secrets := DecodeStrings(GetSecretsValue(LBody)  {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+          Secrets := DecodeStrings(GetSecretsValue(Secrets){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
           Result  := ReadBody(LBody);
         end;
       finally
